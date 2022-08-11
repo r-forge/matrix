@@ -670,7 +670,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	clf = valid[ivalid];
     } else {
 	/* matrix->.geMatrix with unreferenced 'x' slot ... modify directly! */
-	PROTECT(from = matrix_as_geMatrix(from, '.', 0, 0));
+	PROTECT(from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 0));
 	clf = class_P(from);
     }
     

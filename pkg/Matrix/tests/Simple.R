@@ -1022,7 +1022,7 @@ stopifnotValid(sM, "sparseMatrix")
 stopifnotValid(dlM, "denseMatrix")
 (lM  <- as(dlM, "sparseMatrix"))
 lM2 <- as(dlM, "CsparseMatrix") #-> now ok
-lM0 <- Matrix:::.dense2sparse(dlM, "..C", NULL, NULL)
+lM0 <- Matrix:::.dense2sparse(dlM, "..C")
 stopifnot(identical3(lM, lM2, lM0))
 
 selectMethod("coerce",	c("lgeMatrix", "CsparseMatrix"),
@@ -1198,7 +1198,7 @@ if(doExtras) {
     cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 }
 ## in any case, test
-d4d.2 <- Matrix:::.dense2sparse(!!d4da, "..C", NULL, NULL) ## <<- did wrongly make dimnames symmetric
+d4d.2 <- Matrix:::.dense2sparse(!!d4da, "..C") ## <<- did wrongly make dimnames symmetric
 l4da <- as(d4da, "lMatrix")
 assert.EQ.Mat(l4da, as(l4da,"CsparseMatrix"))
 

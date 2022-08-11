@@ -245,7 +245,12 @@ tstMatrixClass <-
 	    m0 <- matrix(,0,0)
 	    if(canCoerce(m0, clNam)) {
 		cat("; canCoerce(matrix(,0,0), *) => as(m0, <.>): ")
-		stopifnot(Qidentical(m, as(m0, clNam))); cat("ok; ")
+                m0. <- as(m0, clNam)
+                if(.hasSlot(m, "diag") && .hasSlot(m0., "diag") &&
+                   identical(m@diag, "N") && identical(m0.@diag, "U"))
+                    ## tolerate as(0-by-0, .) formally having unit diagonal
+                    m0.@diag <- "N"
+		stopifnot(Qidentical(m, m0.)); cat("ok; ")
 	    }
             is_p <- extends(clD, "indMatrix")
             is_cor <- extends(clD, "corMatrix") # has diagonal divided out

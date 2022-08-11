@@ -94,9 +94,8 @@ SEXP packedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	ERROR_INVALID_CLASS(class_P(from), "packedMatrix_force_symmetric");
     const char *clf = valid[ivalid];
     
-    char ulf = *uplo_P(from), ult = *CHAR(asChar(uplo_to));
-    if (ult == '\0') /* to handle missing(uplo) */
-	ult = ulf;
+    char ulf = *uplo_P(from),
+	ult = (isNull(uplo_to)) ? ulf : *CHAR(asChar(uplo_to));
     if (clf[1] == 's') {
 	/* .spMatrix */
 	if (ulf == ult)

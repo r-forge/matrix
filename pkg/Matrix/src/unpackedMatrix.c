@@ -91,88 +91,6 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
     return to;
 }
 
-/* pack(x), returning packedMatrix */
-SEXP matrix_pack(SEXP from, SEXP tr, SEXP up)
-{
-    SEXP dim = getAttrib(from, R_DimSymbol);
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("attempt to pack a non-square matrix"));
-    SEXPTYPE tf = TYPEOF(from);
-    char cl[] = "..pMatrix";
-    int nprotect = 0;
-    
-    switch (tf) {
-    case LGLSXP:
-	cl[0] = 'l';
-	break;
-#ifdef HAVE_PROPER_IMATRIX
-    case INTSXP:
-	cl[0] = 'i';
-	break;
-#else
-    case INTSXP:
-	PROTECT(from = coerceVector(from, tf = REALSXP));
-	++nprotect;
-#endif
-    case REALSXP:
-	cl[0] = 'd';
-	break;
-#ifdef HAVE_PROPER_ZMATRIX
-    case CPLXSXP:
-	cl[0] = 'z';
-	break;
-#endif
-    default:
-	ERROR_INVALID_TYPE("matrix", tf, "matrix_pack");
-	break;
-    }
-    cl[1] = (asLogical(tr) != 0) ? 't' : 's';
-    
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
-	dimnames = getAttrib(from, R_DimNamesSymbol),
-	x = PROTECT(allocVector(tf, PM_LENGTH(n))),
-	uplo = mkString(asLogical(up) ? "U" : "L");
-    char ul = *CHAR(STRING_ELT(uplo, 0));
-    nprotect += 2;
-
-    SET_SLOT(to, Matrix_DimSym, dim);
-    if (!isNull(dimnames))
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    SET_SLOT(to, Matrix_xSym, x);
-    SET_SLOT(to, Matrix_uploSym, uplo);
-
-#define PACK(_PREFIX_, _PTR_)					\
-    _PREFIX_ ## dense_pack(_PTR_(x), _PTR_(from), n, ul, 'N')
-    
-    switch (tf) {
-    case LGLSXP:
-	PACK(i, LOGICAL);
-	break;
-#ifdef HAVE_PROPER_IMATRIX
-    case INTSXP:
-	PACK(i, INTEGER);
-	break;
-#endif
-    case REALSXP:
-	PACK(d, REAL);
-	break;
-#ifdef HAVE_PROPER_ZMATRIX
-    case CPLXSXP:
-	PACK(z, COMPLEX);
-	break;
-#endif
-    default:
-	ERROR_INVALID_TYPE("matrix", tf, "matrix_pack");
-	break;
-    }
-
-#undef PACK
-
-    UNPROTECT(nprotect);
-    return to;
-}
-
 /* forceSymmetric(x, uplo), returning .syMatrix */
 SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 {
@@ -186,14 +104,13 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
     const char *clf = valid[ivalid];
     
     SEXP uplo_from;
-    char ulf = 'U', ult = *CHAR(asChar(uplo_to));
+    char ulf = 'U', ult;
     if (clf[1] != 'g') {
 	/* .(sy|tr)Matrix */
 	uplo_from = GET_SLOT(from, Matrix_uploSym);
 	ulf = *CHAR(STRING_ELT(uplo_from, 0));
     }
-    if (ult == '\0') /* to handle missing(uplo) */
-	ult = ulf;
+    ult = (isNull(uplo_to)) ? ulf : *CHAR(asChar(uplo_to));
     if (clf[1] == 's') {
 	/* .syMatrix */
 	if (ulf == ult)
@@ -267,87 +184,6 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
     set_symmetrized_DimNames(to, dimnames, -1);
     SET_SLOT(to, Matrix_uploSym, mkString((ult == 'U') ? "U" : "L"));    
     UNPROTECT(1);
-    return to;
-}
-
-/* forceSymmetric(x, uplo), returning .syMatrix */
-SEXP matrix_force_symmetric(SEXP from, SEXP uplo_to) {
-    SEXP dim = getAttrib(from, R_DimSymbol);
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("attempt to symmetrize a non-square matrix"));
-    SEXPTYPE tf = TYPEOF(from);
-    char cl[] = ".syMatrix", ult = *CHAR(asChar(uplo_to));
-    int nprotect = 0;
-
-    switch (tf) {
-    case LGLSXP:
-	cl[0] = 'l';
-	break;
-#ifdef HAVE_PROPER_IMATRIX
-    case INTSXP:
-	cl[0] = 'i';
-	break;
-#else
-    case INTSXP:
-	PROTECT(from = coerceVector(from, tf = REALSXP));
-	++nprotect;
-#endif
-    case REALSXP:
-	cl[0] = 'd';
-	break;
-#ifdef HAVE_PROPER_ZMATRIX
-    case CPLXSXP:
-	cl[0] = 'z';
-	break;
-#endif
-    default:
-	ERROR_INVALID_TYPE("matrix", tf, "matrix_force_symmetric");
-	break;
-    }
-
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
-	dimnames = getAttrib(from, R_DimNamesSymbol);
-    ++nprotect;
-    
-    if (MAYBE_REFERENCED(from)) {
-	R_xlen_t nn = (R_xlen_t) n * n;
-	SEXP x = PROTECT(allocVector(tf, nn));
-	++nprotect;
-	switch (tf) {
-	case LGLSXP:
-	    Memcpy(LOGICAL(x), LOGICAL(from), nn);
-	    break;
-#ifdef HAVE_PROPER_IMATRIX
-	case INTSXP:
-	    Memcpy(INTEGER(x), INTEGER(from), nn);
-	    break;
-#endif
-	case REALSXP:
-	    Memcpy(REAL(x), REAL(from), nn);
-	    break;
-#ifdef HAVE_PROPER_ZMATRIX
-	case CPLXSXP:
-	    Memcpy(COMPLEX(x), COMPLEX(from), nn);
-	    break;
-#endif
-	default:
-	    ERROR_INVALID_TYPE("matrix", tf, "matrix_force_symmetric");
-	    break;
-	}
-	SET_SLOT(to, Matrix_xSym, x);
-    } else {
-	SET_ATTRIB(from, R_NilValue);
-	if (OBJECT(from))
-	    SET_OBJECT(from, 0);
-	SET_SLOT(to, Matrix_xSym, from);
-    }
-
-    SET_SLOT(to, Matrix_DimSym, dim);
-    if (!isNull(dimnames))
-	set_symmetrized_DimNames(to, dimnames, -1);
-    SET_SLOT(to, Matrix_uploSym, mkString((ult == 'U') ? "U" : "L"));
-    UNPROTECT(nprotect);
     return to;
 }
 

@@ -1565,60 +1565,70 @@ SEXP R_Matrix_kind(SEXP obj, SEXP iok)
     return mkString(s);
 }
 
-SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind)
+SEXP R_matrix_as_dense(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 {
-    char k;
-    if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
-	error(_("invalid 'kind' to 'R_matrix_as_geMatrix()'"));
-    return matrix_as_geMatrix(from, k, 0, 0);
+    const char *zzz;
+    if ((code = asChar(code)) == NA_STRING ||
+	(zzz = CHAR(code))[0] == '\0' ||
+	(zzz             )[1] == '\0' ||
+	!((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
+	  (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p')) ||
+	  (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p'))))
+	error(_("invalid 'code' to 'R_matrix_as_dense()'"));
+    return matrix_as_dense(from, zzz,
+			   (zzz[1] != 'g') ? *CHAR(asChar(uplo)) : 'U',
+			   (zzz[1] == 't') ? *CHAR(asChar(diag)) : 'N',
+	                   0, 0);
 }
-SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
+
+SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
+		     int new, int transpose_if_vector)
 {
     /* NB: also handing vectors 'from' _without_ a 'dim' attribute */
     SEXPTYPE tf = TYPEOF(from);
     switch (tf) {
-    case REALSXP:
     case LGLSXP:
 #ifdef HAVE_PROPER_IMATRIX
     case INTSXP:
 #endif
+    case REALSXP:
 #ifdef HAVE_PROPER_ZMATRIX
     case CPLXSXP:
 #endif
 	break;
 #ifndef HAVE_PROPER_IMATRIX
     case INTSXP:
-	if (!inherits(from, "factor")) {
+	if (!inherits(from, "factor"))
 	    break;
-	}
 #endif
     default:
-	if (IS_S4_OBJECT(from) || inherits(from, "factor"))
-	    ERROR_INVALID_CLASS(class_P(from), "matrix_as_geMatrix");
+	if (OBJECT(from))
+	    ERROR_INVALID_CLASS(class_P(from), "matrix_as_dense");
 	else
-	    ERROR_INVALID_TYPE("object", tf, "matrix_as_geMatrix");
+	    ERROR_INVALID_TYPE("object", tf, "matrix_as_dense");
 	break;
     }
-    
-    if (kind == '.')
-	kind = type2kind(tf);
-    SEXPTYPE tt = kind2type(kind);
-    
+
+    char cl[] = "...Matrix";
+    cl[0] = (code[0] == '.') ? type2kind(tf) : code[0];
+    cl[1] = code[1];
+    cl[2] = code[2];
     SEXP dim, dimnames;
     R_xlen_t len = XLENGTH(from);
-    int nprotect = 0;
-    Rboolean doDN;
-    if (isMatrix(from)) {
+    int *pdim, doDN, isM = (int) isMatrix(from), nprotect = 0;
+    
+    if (isM) {
 	dim = getAttrib(from, R_DimSymbol);
 	dimnames = getAttrib(from, R_DimNamesSymbol);
+	pdim = INTEGER(dim);
 	doDN = !(isNull(dimnames) || TRIVIAL_DIMNAMES(dimnames));
     } else {
 	if (len > INT_MAX)
 	    error(_("vector of length exceeding 2^31-1 "
-		    "to 'matrix_as_geMatrix()'"));
+		    "to 'matrix_as_dense()'"));
 	PROTECT(dim = allocVector(INTSXP, 2));
 	++nprotect;
-	int *pdim = INTEGER(dim);
+	pdim = INTEGER(dim);
 	if (transpose_if_vector) {
 	    pdim[0] = 1;
 	    pdim[1] = (int) len;
@@ -1634,49 +1644,98 @@ SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector)
 	    SET_VECTOR_ELT(dimnames, transpose_if_vector ? 1 : 0, nms);
 	}
     }
-		 
+
+    int n = pdim[0];
+    if (cl[1] != 'g' && pdim[1] != n)
+	error(_("attempt to construct triangular or symmetric "
+		"denseMatrix from non-square matrix"));
+    
+    SEXPTYPE tt = kind2type(cl[0]);
     if (tf != tt) {
 	PROTECT(from = coerceVector(from, tt));
 	++nprotect;
-    } else if (new > 0 || (new == 0 && MAYBE_REFERENCED(from))) {
-	SEXP tmp = PROTECT(allocVector(tt, len));
+    }
+
+    SEXP x;
+    if (cl[2] != 'p') {
+	
+	if (tf != tt || new < 0 || (new == 0 && !MAYBE_REFERENCED(from))) {
+	    x = from;
+	} else {
+	    PROTECT(x = allocVector(tt, len));
+	    ++nprotect;
+	    switch (tt) {
+	    case LGLSXP:
+		Memcpy(LOGICAL(x), LOGICAL(from), len);
+		break;
+	    case INTSXP:
+		Memcpy(INTEGER(x), INTEGER(from), len);
+		break;
+	    case REALSXP:
+		Memcpy(REAL(x), REAL(from), len);
+		break;
+	    case CPLXSXP:
+		Memcpy(COMPLEX(x), COMPLEX(from), len);
+		break;
+	    default:
+		break;
+	    }
+	}
+	if (!isNull(ATTRIB(x))) {
+	    SET_ATTRIB(x, R_NilValue);
+	    if (OBJECT(x))
+		SET_OBJECT(x, 0);
+	}
+	
+    } else {
+
+	PROTECT(x = allocVector(tt, PM_LENGTH(n)));
 	++nprotect;
+	
+#define PACK(_PREFIX_, _PTR_)						\
+	_PREFIX_ ## dense_pack(_PTR_(x), _PTR_(from), n, uplo, diag)
+	
 	switch (tt) {
-	case REALSXP:
-	    Memcpy(REAL(tmp), REAL(from), len);
-	    break;
 	case LGLSXP:
-	    Memcpy(LOGICAL(tmp), LOGICAL(from), len);
+	    PACK(i, LOGICAL);
 	    break;
+#ifdef HAVE_PROPER_IMATRIX
 	case INTSXP:
-	    Memcpy(INTEGER(tmp), INTEGER(from), len);
+	    PACK(i, INTEGER);
 	    break;
+#endif
+	case REALSXP:
+	    PACK(d, REAL);
+	    break;
+#ifdef HAVE_PROPER_ZMATRIX
 	case CPLXSXP:
-	    Memcpy(COMPLEX(tmp), COMPLEX(from), len);
+	    PACK(z, COMPLEX);
 	    break;
+#endif
 	default:
 	    break;
 	}
-	from = tmp;
-    }
-    if (!isNull(ATTRIB(from))) {
-	SET_ATTRIB(from, R_NilValue);
-	if (OBJECT(from))
-	    SET_OBJECT(from, 0);
-    }
 
-    char cl[] = ".geMatrix";
-    cl[0] = kind;
+#undef PACK
+	
+    }
+    
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
     ++nprotect;
-    SET_SLOT(to, Matrix_DimSym, (new > 1) ? duplicate(dim) : dim);
+    SET_SLOT(to, Matrix_DimSym, (isM && new > 1) ? duplicate(dim) : dim);
     if (doDN) {
-	if (new > 1)
+	if (cl[1] == 's')
+	    set_symmetrized_DimNames(to, dimnames, -1);
+	else if (isM && new > 1)
 	    set_DimNames(to, dimnames);
 	else
 	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
     }
-    SET_SLOT(to, Matrix_xSym, from);
+    if (cl[1] != 'g')
+	SET_SLOT(to, Matrix_uploSym, mkString((uplo == 'U') ? "U" : "L"));
+    if (cl[1] == 't')
+	SET_SLOT(to, Matrix_diagSym, mkString((diag == 'N') ? "N" : "U"));
+    SET_SLOT(to, Matrix_xSym, x);
     UNPROTECT(nprotect);
     return to;
 }
@@ -1726,9 +1785,12 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 	"ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", /* no ndiMatrix */
 	""};
     int ivalid = R_check_class_etc(from, valid);
-    if (ivalid < 0)
+    if (ivalid < 0) {
 	/* dispatch to method for base matrix and base vector */
-	return matrix_as_geMatrix(from, kind, new, transpose_if_vector);
+	char zzz[] = ".ge";
+	zzz[0] = kind;
+	return matrix_as_dense(from, zzz, '\0', '\0', new, transpose_if_vector);
+    }
 
     /* Now handling just denseMatrix and diagonalMatrix ...
        We want to be fast if 'from' is already a .geMatrix,
@@ -1840,15 +1902,15 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     } while (0)
 
     switch (kind) {
-    case 'd': 
-	AS_GE(d, double, REAL);
-	break;
-    case 'l':
     case 'n':
+    case 'l':
 	AS_GE(i, int, LOGICAL);
 	break;
     case 'i':
 	AS_GE(i, int, INTEGER);
+	break;
+    case 'd': 
+	AS_GE(d, double, REAL);
 	break;
     case 'z':
 	AS_GE(z, Rcomplex, COMPLEX);

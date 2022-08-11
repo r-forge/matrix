@@ -381,8 +381,9 @@ size_t kind2size(char kind);
 char Matrix_kind(SEXP obj, int iok);
 SEXP R_Matrix_kind(SEXP obj, SEXP iok);
     
-SEXP matrix_as_geMatrix(SEXP from, char kind, int new, int transpose_if_vector);
-SEXP R_matrix_as_geMatrix(SEXP from, SEXP kind);
+SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
+		     int new, int transpose_if_vector);
+SEXP R_matrix_as_dense(SEXP from, SEXP code, SEXP uplo, SEXP diag);
 
 SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector);
 SEXP R_dense_as_general(SEXP from, SEXP kind);
