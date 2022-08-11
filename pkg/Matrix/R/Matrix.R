@@ -195,19 +195,19 @@ if(FALSE) {
 ## This version was used in Matrix <= 1.4-1 but has several "bugs":
 ## * Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
 ##   is not a diagonalMatrix
-## * Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = FALSE)
-##   is not a symmetricMatrix
-## * Matrix(table(1)), Matrix(table(1, 1, 1)), etc. give bad errors
-## * Matrix(<sparseMatrix>, sparse = NULL) calls sparseDefault(data),
-##   requiring a sparseMatrix->matrix coercion
-## * Matrix(sparseVector(1, 1L, 10L)), etc. fail because spV2M()
-##   does not "see" the missingness of 'nrow', 'ncol'
 ## * Matrix(<diagonalMatrix>, doDiag = FALSE) is a diagonalMatrix
 ##   rather than a symmetricMatrix
 ## * Matrix(<dgeMatrix>, sparse =  TRUE, forceCheck = FALSE),
 ##   Matrix(<dgCMatrix>, sparse = FALSE, forceCheck = FALSE)
 ##   _do_ check for structure, possibly resulting in symmetricMatrix
 ##   or triangularMatrix
+## * Matrix(sparseVector(1, 1L, 10L)), etc. fail because spV2M()
+##   does not "see" the missingness of 'nrow', 'ncol'
+## * Matrix(table(1)), Matrix(table(1, 1, 1)), etc. give bad errors
+## * Matrix(structure(matrix(1, 2, 2), class = "zzz")) throws a bad
+##   error rather than unclassing as it essentially does for "table"
+## * Matrix(<sparseMatrix>, sparse = NULL) calls sparseDefault(data),
+##   requiring a sparseMatrix->matrix coercion
 ## * Matrix(x, ...), where 'x' is a vector of type other than logical,
 ##   integer, and double, evaluates .External(Mmatrix, ...) before
 ##   throwing an error, hence allocating unnecessarily
@@ -217,8 +217,6 @@ if(FALSE) {
 ##   in the interval (0, 1) and throw bad errors for 'nrow', 'ncol'
 ##   equal to 0
 ## * Calls is(data, .) much more than necessary ...
-## * Matrix(structure(matrix(1, 2, 2), class = "zzz")) throws a bad
-##   error rather than unclassing as it essentially does for "table"
 Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                     dimnames = NULL, sparse = NULL,
                     doDiag = TRUE, forceCheck = FALSE)
