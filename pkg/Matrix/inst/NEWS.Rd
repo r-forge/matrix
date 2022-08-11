@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-10 r3533)}{
+\section{Changes in version 1.4-2 (2022-08-11 r3534)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses 
@@ -103,7 +103,7 @@
       all \code{k} from \code{-m} to \code{n}, with fewer errors
       in the \code{m < n} case.
 
-      \item \code{crossprod(<Rsparse>, <Tsparse>)} and similar now works
+      \item \code{crossprod(<Rsparse>, <Tsparse>)} and similar now work
       again (optional \code{boolArith} was not passed on), fixing Matrix
       bug #6766 by David Cortes.
       Ditto for \code{tcrossprod()}, where the old result was even wrong
@@ -114,9 +114,9 @@
       coercions to \code{dMatrix} and \code{lMatrix}.
       (Previously, the result was always an \code{ngTMatrix}.)
 
-      \item \code{forceSymmetric(<RsparseMatrix>)} is now more
-      efficient, returning a symmetric \code{RsparseMatrix} without
-      a \dQuote{true} coercion to \code{CsparseMatrix}.
+      \item \code{forceSymmetric(<[RT]sparseMatrix>)} are now more
+      efficient, returning symmetric \code{[RT]sparseMatrix} without
+      intermediate coercions to \code{CsparseMatrix}.
 
       \item \code{tcrossprod(a, b)} for unit triangular sparse matrices
       now works correctly.
@@ -207,6 +207,43 @@
       \item \code{chol(<dsCMatrix>)} now gets \emph{symmetrized}
       \code{Dimnames} rather than a copy of the \code{Dimnames} slot
       of the argument, which (currently) can be asymmetric.
+
+      \item \code{as(<named vector>, "denseMatrix")} now correctly
+      propagates \code{names} to the result.
+
+      \item \code{as(<d.[CR]Matrix>, "lMatrix")} no longer drops
+      non-structural zeros, for greater consistency with analogous
+      coercions.
+
+      \item \code{Matrix(x, doDiag)} now behaves as documented
+      for diagonal matrices \code{x} with asymmetric \code{dimnames},
+      returning a \code{diagonalMatrix} when \code{doDiag = TRUE}
+      and \code{symmetricMatrix} when \code{doDiag = FALSE},
+      rather than a \code{triangularMatrix} in both cases.
+
+      \item Matrix(<n-dimensional table>) now works for \code{n != 2}.
+      
+      \item \code{Matrix(<sparseMatrix>, sparse = NULL)} now always
+      returns a \code{sparseMatrix}, no longer allocating just to count
+      nonzero elements.
+
+      \item \code{Matrix(<sparseVector>)} now works for vector lengths
+      other than 1, no longer giving an error about length mismatch
+      when neither of \code{nrow} and \code{ncol} are supplied.
+
+      \item \code{Matrix(<diagonalMatrix>, doDiag = FALSE)}
+      is now a \code{symmetricMatrix}, not a \code{diagonalMatrix},
+      matching the documentation of \code{doDiag}.
+
+      \item \code{Matrix(<.geMatrix>, sparse = TRUE, forceCheck)}
+      and \code{Matrix(<.g[CRT]Matrix>, sparse = FALSE, forceCheck)}
+      now respect \code{forceCheck = FALSE} by always returning
+      \code{generalMatrix}, i.e., \emph{not} testing for symmetric
+      or triangular structure.
+
+      \item \code{Matrix(0, nrow, )}, \code{Matrix(0, , ncol)} now
+      throw (correct) errors for \code{nrow}, \code{ncol} in the
+      interval \eqn{[0,1)}, consistent with \code{base::matrix()}.
     }
   }
   \subsection{New Features}{
@@ -314,10 +351,19 @@
       \item \code{symmpart} and \code{skewpart} are now done in C
       for all \code{denseMatrix} and all \code{[CRT]sparseMatrix}.
       Both now more faithfully preserve the \dQuote{storage} of
-      their argument.  (Previously, \code{symmpart(packedMatrix)}
+      their argument.  (Previously, \code{symmpart(<packedMatrix>)}
       was an \code{unpackedMatrix},
-      and \code{(symm|skew)part([RT]sparseMatrix)}
+      and \code{(symm|skew)part(<[RT]sparseMatrix>)}
       was a \code{CsparseMatrix}.)
+
+      \item \code{as(<vector|matrix>, "([dln]?dense|[dlnCRT]?sparse)Matrix")}
+      are now fully and more consistently implemently.  In the vector case, 
+      the result is now always a \code{length}-by-1 \code{generalMatrix}.  
+      In the matrix case, structure is now always examined, hence the result
+      is a \code{symmetricMatrix} or \code{triangularMatrix} in more cases.
+      
+      \item \code{Matrix(<classed matrix>)} now works for classes
+      other than \code{table}.
     }
   }
   \subsection{Misc}{
@@ -396,10 +442,6 @@
       with a new argument \code{packed} for efficiently indexing
       \code{packedMatrix}.  \code{indDiag()} now behaves sensibly
       in the \code{n = 0} case.
-
-      \item \code{as(<d.[CR]Matrix>, "lMatrix")} no longer drops
-      non-structural zeros, for greater consistency with analogous
-      coercions.
     }
   }
 }

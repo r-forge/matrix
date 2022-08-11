@@ -393,15 +393,22 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
         if(length(data) == 1L && !is.na(data) && data == 0 &&
            (is.null(sparse) || sparse)) {
             ## Matrix(0, ...): sparseMatrix unless sparse=FALSE
+            ## MJ: we should _try_ to behave as R's do_matrix()
+            ##     in the edge cases ... integer overflow is "OK"
+            ##     since anyNA(Dim) is caught by validity methods
             if(mnrow == mncol) {
                 nrow <- as.integer(nrow)
                 ncol <- as.integer(ncol)
             } else if(mnrow) {
                 ncol <- as.integer(ncol)
-                nrow <- if(ncol) as.integer(ceiling(1 / ncol)) else 0L
+                if(ncol == 0L)
+                    stop("data is too long")
+                nrow <- as.integer(ceiling(1 / ncol))
             } else {
                 nrow <- as.integer(nrow)
-                ncol <- if(nrow) as.integer(ceiling(1 / nrow)) else 0L
+                if(nrow == 0L)
+                    stop("data is too long")
+                ncol <- as.integer(ceiling(1 / nrow))
             }
             square <- nrow == ncol
             if(is.null(dimnames))
