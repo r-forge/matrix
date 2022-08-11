@@ -4,14 +4,15 @@
 \alias{graph2T}
 \alias{T2graph}
 %
+\alias{coerce,Matrix,graph-method}
+\alias{coerce,Matrix,graphNEL-method}
 \alias{coerce,TsparseMatrix,graphNEL-method}
 \alias{coerce,graph,CsparseMatrix-method}
 \alias{coerce,graph,Matrix-method}
+\alias{coerce,graph,RsparseMatrix-method}
+\alias{coerce,graph,TsparseMatrix-method}
+\alias{coerce,graph,sparseMatrix-method}
 \alias{coerce,graphAM,sparseMatrix-method}
-\alias{coerce,graphNEL,CsparseMatrix-method}
-\alias{coerce,graphNEL,TsparseMatrix-method}
-\alias{coerce,sparseMatrix,graph-method}
-\alias{coerce,sparseMatrix,graphNEL-method}
 %
 \description{
   The \pkg{Matrix} package has supported conversion from and to
