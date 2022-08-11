@@ -1341,6 +1341,28 @@ z1 <- symmpart(z0)
 z2 <- skewpart(z0)
 stopifnot(!isS4(z1), is.matrix(z1), !isS4(z2), is.matrix(z2))
 
+## various Matrix() bugs in Matrix <= 1.4-1
+.d0 <- new("ddiMatrix", Dim = c(1L, 1L), Dimnames = list("A", "B"), diag = "U")
+.d1 <- Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
+.s0 <- new("dsCMatrix", Dim = c(1L, 1L), Dimnames = list("B", "B"),
+           p = c(0L, 1L), i = 0L, x = 1)
+.s1 <- Matrix(.d0, doDiag = FALSE)
+stopifnot(identical(.d1, .d0),
+          identical(.s1, .s0),
+          identical(Matrix(sparseVector(1, 1L, 2L)),
+                    new("dgTMatrix", Dim = c(2L, 1L), i = 0L, j = 0L, x = 1)),
+          identical(Matrix(new("dgeMatrix"), sparse= TRUE, forceCheck=FALSE),
+                    new("dgCMatrix")),
+          identical(Matrix(new("dgCMatrix"), sparse=FALSE, forceCheck=FALSE),
+                    new("dgeMatrix")),
+          identical(Matrix(table(1)),       Matrix(1)),
+          identical(Matrix(table(1, 1, 1)), Matrix(1)),
+          grepl("too long",
+                vapply(alist(Matrix(0, 0.5,    ), Matrix(0,    , 0.5),
+                             Matrix(0, 0.0,    ), Matrix(0,    , 0.0)),
+                       function(e) conditionMessage(assertError(eval(e))[[1L]]),
+                       "")))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-11 r3539)}{
+\section{Changes in version 1.4-2 (2022-08-11 r3540)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses 
@@ -217,9 +217,8 @@
 
       \item \code{Matrix(x, doDiag)} now behaves as documented
       for diagonal matrices \code{x} with asymmetric \code{dimnames},
-      returning a \code{diagonalMatrix} when \code{doDiag = TRUE}
-      and \code{symmetricMatrix} when \code{doDiag = FALSE},
-      rather than a \code{triangularMatrix} in both cases.
+      returning a \code{diagonalMatrix} when \code{doDiag = TRUE},
+      rather than a \code{triangularMatrix}.
 
       \item Matrix(<n-dimensional table>) now works for \code{n != 2}.
       
