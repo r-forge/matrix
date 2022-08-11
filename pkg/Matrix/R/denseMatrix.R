@@ -94,7 +94,8 @@
 setAs("ANY", "denseMatrix",
       function(from) Matrix(from, sparse = FALSE, doDiag = FALSE))
 
-setAs( "matrix", "denseMatrix", ..m2dense)
+setAs("matrix", "denseMatrix", ..m2dense)
+
 setAs("numLike", "denseMatrix", ..m2ge)
 
 ## To sparseMatrix .........................................
@@ -310,7 +311,7 @@ rm(.kind, .kinds, .otherkind, .otherkinds, .xy, .repr)
 
 ## For whatever reason, we also have these granular ones in Matrix 1.4-1:
 setAs("dgeMatrix", "dsTMatrix",
-      function(from) .dense2sparse(.M2symm(from), "..T", NULL, NULL))
+      function(from) .dense2sparse(.M2symm(from), "..T"))
 } ## DEPRECATED IN 1.4-2; see ./zzz.R
 
 ## From base matrix, base vector ...........................
@@ -394,7 +395,7 @@ setAs("matrix", "nspMatrix",
 ## m|v->g[CRT]
 .to <- ".g.Matrix"
 .def <- function(from) {
-    .dense2sparse(from, .CODE, NULL, NULL)
+    .m2sparse(from, .CODE, NULL, NULL)
 }
 .b <- body(.def)
 for (.kind in c("d", "l", "n")) {
@@ -412,7 +413,7 @@ for (.kind in c("d", "l", "n")) {
 .to <- ".t.Matrix"
 .def <- function(from) {
     if(it <- isTriangular(from))
-        .dense2sparse(from, .CODE, attr(it, "kind"), "N")
+        .m2sparse(from, .CODE, attr(it, "kind"), "N")
     else
         stop("matrix is not triangular; consider triu() or tril()")
 }
@@ -431,7 +432,7 @@ for (.kind in c("d", "l", "n")) {
 .to <- ".s.Matrix"
 .def <- function(from) {
     if(isSymmetric(from))
-        .dense2sparse(from, .CODE, "U", NULL)
+        .m2sparse(from, .CODE, "U", NULL)
     else
         stop("matrix is not symmetric; consider forceSymmetric() or symmpart()")
 }
