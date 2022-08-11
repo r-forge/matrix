@@ -11,11 +11,6 @@
 
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..dense2g  <- function(from) .Call(R_dense_as_general, from, ".")
-..dense2dg <- function(from) .Call(R_dense_as_general, from, "d")
-..dense2lg <- function(from) .Call(R_dense_as_general, from, "l")
-..dense2ng <- function(from) .Call(R_dense_as_general, from, "n")
-
 ..dense2ddense <- function(from) .Call(R_dense_as_kind, from, "d")
 ..dense2ldense <- function(from) .Call(R_dense_as_kind, from, "l")
 ..dense2ndense <- function(from) .Call(R_dense_as_kind, from, "n")
@@ -26,7 +21,6 @@
     .Call(R_dense_as_sparse, from, "l.C", NULL, NULL)
 ..dense2nsparse <- function(from)
     .Call(R_dense_as_sparse, from, "n.C", NULL, NULL)
-
 ..dense2Csparse <- function(from)
     .Call(R_dense_as_sparse, from, "..C", NULL, NULL)
 ..dense2Rsparse <- function(from)
@@ -34,43 +28,65 @@
 ..dense2Tsparse <- function(from)
     .Call(R_dense_as_sparse, from, "..T", NULL, NULL)
 
-..m2ge  <- function(from) .Call(R_matrix_as_geMatrix, from, ".")
-..m2dge <- function(from) .Call(R_matrix_as_geMatrix, from, "d")
-..m2lge <- function(from) .Call(R_matrix_as_geMatrix, from, "l")
-..m2nge <- function(from) .Call(R_matrix_as_geMatrix, from, "n")
+..dense2dge <- function(from) .Call(R_dense_as_general, from, "d")
+..dense2lge <- function(from) .Call(R_dense_as_general, from, "l")
+..dense2nge <- function(from) .Call(R_dense_as_general, from, "n")
+..dense2ge  <- function(from) .Call(R_dense_as_general, from, ".")
 
-..m2dense  <- function(from) .m2dense(from, ".")
-..m2ddense <- function(from) .m2dense(from, "d")
-..m2ldense <- function(from) .m2dense(from, "l")
-..m2ndense <- function(from) .m2dense(from, "n")
+..m2ddense <- function(from) .m2dense.checking(from, "d")
+..m2ldense <- function(from) .m2dense.checking(from, "l")
+..m2ndense <- function(from) .m2dense.checking(from, "n")
+..m2dense  <- function(from) .m2dense.checking(from, ".")
 
-..m2dsparse <- function(from) .m2sparse(from, "d", "C")
-..m2lsparse <- function(from) .m2sparse(from, "l", "C")
-..m2nsparse <- function(from) .m2sparse(from, "n", "C")
+..m2dsparse <- function(from) .m2sparse.checking(from, "d", "C")
+..m2lsparse <- function(from) .m2sparse.checking(from, "l", "C")
+..m2nsparse <- function(from) .m2sparse.checking(from, "n", "C")
+..m2Csparse <- function(from) .m2sparse.checking(from, ".", "C")
+..m2Rsparse <- function(from) .m2sparse.checking(from, ".", "R")
+..m2Tsparse <- function(from) .m2sparse.checking(from, ".", "T")
 
-..m2Csparse <- function(from) .m2sparse(from, ".", "C")
-..m2Rsparse <- function(from) .m2sparse(from, ".", "R")
-..m2Tsparse <- function(from) .m2sparse(from, ".", "T")
+..m2dge <- function(from)
+    .Call(R_matrix_as_dense, from, "dge", NULL, NULL)
+..m2lge <- function(from)
+    .Call(R_matrix_as_dense, from, "lge", NULL, NULL)
+..m2nge <- function(from)
+    .Call(R_matrix_as_dense, from, "nge", NULL, NULL)
+..m2ge  <- function(from)
+    .Call(R_matrix_as_dense, from, ".ge", NULL, NULL)
 
-..pack    <- function(from) pack(from)
-..packT   <- function(from) pack(from, symmetric = FALSE)
-..packS   <- function(from) pack(from, symmetric = TRUE)
-..unpack  <- function(from) unpack(from)
+..m2dgC <- function(from)
+    .Call(R_dense_as_sparse, from, "dgC", NULL, NULL)
+..m2lgC <- function(from)
+    .Call(R_dense_as_sparse, from, "lgC", NULL, NULL)
+..m2ngC <- function(from)
+    .Call(R_dense_as_sparse, from, "ngC", NULL, NULL)
+..m2gC  <- function(from)
+    .Call(R_dense_as_sparse, from, ".gC", NULL, NULL)
+..m2gR  <- function(from)
+    .Call(R_dense_as_sparse, from, ".gR", NULL, NULL)
+..m2gT  <- function(from)
+    .Call(R_dense_as_sparse, from, ".gT", NULL, NULL)
+
+..pack   <- function(from) pack(from)
+..packT  <- function(from) pack(from, symmetric = FALSE)
+..packS  <- function(from) pack(from, symmetric = TRUE)
+..unpack <- function(from) unpack(from)
+
 ## returning .(ge|tr|sy|tp|sp)Matrix, never a subclass:
 ..pack3   <- function(from) .Call(unpackedMatrix_pack, from, FALSE, NA, NA)
 ..unpack3 <- function(from) .Call(packedMatrix_unpack, from, FALSE)
 
-..dense2m <- function(from) .Call(R_dense_as_matrix, from, FALSE)
-..ndense2m <- function(from) .Call(R_dense_as_matrix, from, TRUE)
+..dense2m  <- function(from) .Call(R_dense_as_matrix, from, FALSE)
+..ndense2m <- function(from) .Call(R_dense_as_matrix, from,  TRUE)
 
-..dense2v <- function(from) .Call(R_dense_as_vector, from, FALSE)
-..ndense2v <- function(from) .Call(R_dense_as_vector, from, TRUE)
+..dense2v  <- function(from) .Call(R_dense_as_vector, from, FALSE)
+..ndense2v <- function(from) .Call(R_dense_as_vector, from,  TRUE)
 
-..ge2m <- function(from) .Call(R_geMatrix_as_matrix, from, FALSE)
-..nge2m <- function(from) .Call(R_geMatrix_as_matrix, from, TRUE)
+..ge2m  <- function(from) .Call(R_geMatrix_as_matrix, from, FALSE)
+..nge2m <- function(from) .Call(R_geMatrix_as_matrix, from,  TRUE)
 
-..ge2v <- function(from) .Call(R_geMatrix_as_vector, from, FALSE)
-..nge2v <- function(from) .Call(R_geMatrix_as_vector, from, TRUE)
+..ge2v  <- function(from) .Call(R_geMatrix_as_vector, from, FALSE)
+..nge2v <- function(from) .Call(R_geMatrix_as_vector, from,  TRUE)
 
 
 ## To denseMatrix ..........................................
@@ -81,7 +97,7 @@ setAs("ANY", "denseMatrix",
 setAs( "matrix", "denseMatrix", ..m2dense)
 setAs("numLike", "denseMatrix", ..m2ge)
 
-## To sparse ...............................................
+## To sparseMatrix .........................................
 
 setAs("denseMatrix",  "sparseMatrix", ..dense2Csparse)
 setAs("denseMatrix", "CsparseMatrix", ..dense2Csparse)
@@ -93,10 +109,10 @@ setAs("matrix", "CsparseMatrix", ..m2Csparse)
 setAs("matrix", "RsparseMatrix", ..m2Rsparse)
 setAs("matrix", "TsparseMatrix", ..m2Tsparse)
 
-setAs("numLike",  "sparseMatrix", ..dense2Csparse)
-setAs("numLike", "CsparseMatrix", ..dense2Csparse)
-setAs("numLike", "RsparseMatrix", ..dense2Rsparse)
-setAs("numLike", "TsparseMatrix", ..dense2Tsparse)
+setAs("numLike",  "sparseMatrix", ..m2gC)
+setAs("numLike", "CsparseMatrix", ..m2gC)
+setAs("numLike", "RsparseMatrix", ..m2gR)
+setAs("numLike", "TsparseMatrix", ..m2gT)
 
 ## To base matrix, base vector .............................
 
@@ -140,55 +156,80 @@ setAs("denseMatrix", "dMatrix", ..dense2ddense)
 setAs("denseMatrix", "lMatrix", ..dense2ldense)
 setAs("denseMatrix", "nMatrix", ..dense2ndense)
 
-## With a dense _or_ sparse result:
-for (.from in c("matrix", "numLike")) {
-    setAs(.from, "dMatrix",
-          function(from) {
-              storage.mode(from) <- "double"
-              Matrix(from)
-          })
-    setAs(.from, "lMatrix",
-          function(from) {
-              storage.mode(from) <- "logical"
-              Matrix(from)
-          })
-    setAs(.from, "nMatrix",
-          function(from) {
-              storage.mode(from) <- "logical"
-              if(anyNA(from))
-                  from[is.na(from)] <- TRUE # needed before symmetry test!
-              as(Matrix(from), "nMatrix")
-          })
-}
-rm(.from)
-
 setAs("denseMatrix", "ddenseMatrix", ..dense2ddense)
 setAs("denseMatrix", "ldenseMatrix", ..dense2ldense)
 setAs("denseMatrix", "ndenseMatrix", ..dense2ndense)
-
-setAs("matrix", "ddenseMatrix", ..m2ddense)
-setAs("matrix", "ldenseMatrix", ..m2ldense)
-setAs("matrix", "ndenseMatrix", ..m2ndense)
-
-setAs("numLike", "ddenseMatrix", ..m2dge)
-setAs("numLike", "ldenseMatrix", ..m2lge)
-setAs("numLike", "ndenseMatrix", ..m2nge)
 
 setAs("denseMatrix", "dsparseMatrix", ..dense2dsparse)
 setAs("denseMatrix", "lsparseMatrix", ..dense2lsparse)
 setAs("denseMatrix", "nsparseMatrix", ..dense2nsparse)
 
+setAs("matrix", "dMatrix",
+      function(from) {
+          storage.mode(from) <- "double"
+          if(isDiagonal(from))
+              .M2diag(from, check = FALSE)
+          else if(sparseDefault(from))
+              .m2sparse.checking(from, "d", "C")
+          else .m2dense.checking(from, "d")
+      })
+setAs("matrix", "lMatrix",
+      function(from) {
+          storage.mode(from) <- "logical"
+          if(isDiagonal(from))
+              .M2diag(from, check = FALSE)
+          else if(sparseDefault(from))
+              .m2sparse.checking(from, "l", "C")
+          else .m2dense.checking(from, "l")
+      })
+setAs("matrix", "nMatrix",
+      function(from) {
+          storage.mode(from) <- "logical"
+          if(sparseDefault(from))
+              .m2sparse.checking(from, "n", "C")
+          else .m2dense.checking(from, "n")
+      })
+
+setAs("matrix", "ddenseMatrix", ..m2ddense)
+setAs("matrix", "ldenseMatrix", ..m2ldense)
+setAs("matrix", "ndenseMatrix", ..m2ndense)
+
 setAs("matrix", "dsparseMatrix", ..m2dsparse)
 setAs("matrix", "lsparseMatrix", ..m2lsparse)
 setAs("matrix", "nsparseMatrix", ..m2nsparse)
 
-setAs("numLike", "dsparseMatrix", ..dense2dsparse)
-setAs("numLike", "lsparseMatrix", ..dense2lsparse)
-setAs("numLike", "nsparseMatrix", ..dense2nsparse)
+setAs("numLike", "dMatrix",
+      function(from) {
+          if(sparseDefault(from))
+              .m2sparse(from, "dgC", NULL, NULL)
+          else .m2dense(from, "dge", NULL, NULL)
+      })
+
+setAs("numLike", "lMatrix",
+      function(from) {
+          if(sparseDefault(from))
+              .m2sparse(from, "lgC", NULL, NULL)
+          else .m2dense(from, "lge", NULL, NULL)
+      })
+
+setAs("numLike", "nMatrix",
+      function(from) {
+          if(sparseDefault(from))
+              .m2sparse(from, "ngC", NULL, NULL)
+          else .m2dense(from, "nge", NULL, NULL)
+      })
+
+setAs("numLike", "ddenseMatrix", ..m2dge)
+setAs("numLike", "ldenseMatrix", ..m2lge)
+setAs("numLike", "ndenseMatrix", ..m2nge)
+
+setAs("numLike", "dsparseMatrix", ..m2dgC)
+setAs("numLike", "lsparseMatrix", ..m2lgC)
+setAs("numLike", "nsparseMatrix", ..m2ngC)
 
 ## To general ..............................................
 
-setAs("denseMatrix", "generalMatrix", ..dense2g)
+setAs("denseMatrix", "generalMatrix", ..dense2ge)
 setAs(     "matrix", "generalMatrix", ..m2ge)
 setAs(    "numLike", "generalMatrix", ..m2ge)
 
@@ -210,8 +251,8 @@ setAs(    "numLike", "unpackedMatrix", ..m2ge)
 
 ## To packed ...............................................
 
-setAs("denseMatrix", "packedMatrix", ..pack)
-setAs(     "matrix", "packedMatrix", ..pack)
+setAs("denseMatrix",   "packedMatrix", ..pack)
+setAs(     "matrix",   "packedMatrix", ..pack)
 
 ## More granular coercions .................................
 
@@ -229,7 +270,7 @@ for (.kind in .kinds) {
     for (.xy in c("tr", "sy", "tp", "sp"))
         setAs(paste0(.kind, .xy,   "Matrix"),
               paste0(.kind,      "geMatrix"),
-              get(sprintf("..dense2%sg", .kind),
+              get(sprintf("..dense2%sge", .kind),
                   mode = "function", inherits = FALSE))
 
     ## Unpacked to packed, preserving kind and structure
@@ -410,7 +451,7 @@ rm(.from, .to, .def, .b, .kind, .repr)
 ## Exported functions, now just aliases or wrappers ........
 ## (some or all could be made deprecated) ..................
 
-..2dge <- ..dense2dg
+..2dge <- ..dense2dge
 .dense2sy <- .M2symm
 .dsy2dsp <- ..pack3
 .dsy2mat <- function(from, keep.dimnames = TRUE) {
@@ -422,25 +463,26 @@ rm(.from, .to, .def, .b, .kind, .repr)
 .m2ngCn <- function(from, na.is.not.0 = FALSE) {
     if (!na.is.not.0 && anyNA(from))
         stop("attempt to coerce matrix with NA to \"ngCMatrix\"")
-    .dense2sparse(from, "ngC", NULL, NULL)
+    .m2sparse(from, "ngC", NULL, NULL)
 }
 .m2ngTn <- function(from, na.is.not.0 = FALSE) {
     if (!na.is.not.0 && anyNA(from))
         stop("attempt to coerce matrix with NA to \"ngTMatrix\"")
-    .dense2sparse(from, "ngT", NULL, NULL)
+    .m2sparse(from, "ngT", NULL, NULL)
 }
-.m2dgC <- function(from) .dense2sparse(from, "dgC", NULL, NULL)
-.m2lgC <- function(from) .dense2sparse(from, "lgC", NULL, NULL)
+.m2dgC <- function(from) .m2sparse(from, "dgC", NULL, NULL)
+.m2lgC <- function(from) .m2sparse(from, "lgC", NULL, NULL)
 .m2ngC <- function(from) .m2ngCn(from)
 
-rm(..dense2g, ..dense2dg, ..dense2lg, ..dense2ng,
-   ..dense2ddense, ..dense2ldense, ..dense2ndense,
+rm(..dense2ddense, ..dense2ldense, ..dense2ndense,
    ..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
    ..dense2Csparse, ..dense2Rsparse, ..dense2Tsparse,
-   ..m2ge, ..m2dge, ..m2lge, ..m2nge,
-   ..m2dense, ..m2ddense, ..m2ldense, ..m2ndense,
+   ..dense2dge, ..dense2lge, ..dense2nge, ..dense2ge,
+   ..m2ddense, ..m2ldense, ..m2ndense, ..m2dense,
    ..m2dsparse, ..m2lsparse, ..m2nsparse,
    ..m2Csparse, ..m2Rsparse, ..m2Tsparse,
+   ..m2dge, ..m2lge, ..m2nge, ..m2ge,
+   ..m2dgC, ..m2lgC, ..m2ngC, ..m2gC, ..m2gR, ..m2gT,
    ..pack, ..packT, ..packS, ..unpack,
    ..pack3, ..unpack3)
 

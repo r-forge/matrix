@@ -469,7 +469,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_is_symmetric, 2),
     CALLDEF(Rsparse_is_symmetric, 2),
     
-    CALLDEF(R_matrix_as_geMatrix, 2),
+    CALLDEF(R_matrix_as_dense, 4),
     CALLDEF(R_dense_as_general, 2),
     CALLDEF(R_dense_as_sparse, 4),
     CALLDEF(R_dense_as_kind, 2),
@@ -479,8 +479,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_geMatrix_as_vector, 2),
     CALLDEF(R_dense_band, 3),
     
-    CALLDEF(matrix_pack, 3),
-    CALLDEF(matrix_force_symmetric, 2),
     CALLDEF(matrix_is_symmetric, 2),
     CALLDEF(matrix_is_triangular, 2),
     CALLDEF(matrix_is_diagonal, 1),

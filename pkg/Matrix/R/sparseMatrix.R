@@ -5,9 +5,11 @@
 ..sparse2dsparse <- function(from) .Call(R_sparse_as_kind, from, "d", FALSE)
 ..sparse2lsparse <- function(from) .Call(R_sparse_as_kind, from, "l", FALSE)
 ..sparse2nsparse <- function(from) .Call(R_sparse_as_kind, from, "n", FALSE)
-..sparse2unpacked <- function(from) .Call(R_sparse_as_dense, from, FALSE)
+
+..sparse2unpacked <- function(from)
+    .Call(R_sparse_as_dense, from, FALSE)
 ..sparse2packed   <- function(from) {
-    if(!.hasSlot(from, "uplo")) {
+    if(!.hasSlot(from, "uplo"))
         from <-
             if(isSymmetric(from))
                 forceSymmetric(from)
@@ -16,16 +18,8 @@
             else if (attr(it, "kind") == "U")
                 triu(from)
             else tril(from)
-    }
     .Call(R_sparse_as_dense, from, TRUE)
 }
-
-..tT2gC <- ..sT2gC <- function(from) .T2C(.sparse2g(from))
-..tC2gT <- ..sC2gT <- function(from) .CR2T(.sparse2g(from))
-..gT2tC <- function(from) .T2C(.M2tri(from))
-..gT2sC <- function(from) .T2C(.M2symm(from))
-..gC2tT <- function(from) .CR2T(.M2tri(from))
-..gC2sT <- function(from) .CR2T(.M2symm(from))
 
 ..sparse2dge <- function(from)
     .sparse2dense(.sparse2g(.sparse2kind(from, "d", FALSE)), FALSE)
@@ -34,9 +28,17 @@
 ..sparse2nge <- function(from)
     .sparse2dense(.sparse2g(.sparse2kind(from, "n", FALSE)), FALSE)
 
+..tT2gC <- ..sT2gC <- function(from) .T2C(.sparse2g(from))
+..tC2gT <- ..sC2gT <- function(from) .CR2T(.sparse2g(from))
+..gT2tC <- function(from) .T2C(.M2tri(from))
+..gT2sC <- function(from) .T2C(.M2symm(from))
+..gC2tT <- function(from) .CR2T(.M2tri(from))
+..gC2sT <- function(from) .CR2T(.M2symm(from))
+
 ## To sparseMatrix .........................................
 
-setAs("ANY", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
+setAs("ANY", "sparseMatrix",
+      function(from) Matrix(from, sparse = TRUE, doDiag = FALSE))
 
 ## If people used table() instead of xtabs():
 setAs("table", "sparseMatrix",

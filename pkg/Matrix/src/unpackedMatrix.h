@@ -5,10 +5,7 @@
 #include "Mutils.h"
 
 SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge);
-SEXP matrix_pack(SEXP from, SEXP tr, SEXP up);
-
 SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to);
-SEXP matrix_force_symmetric(SEXP from, SEXP uplo_to);
 
 SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN);

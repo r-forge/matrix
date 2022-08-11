@@ -35,35 +35,52 @@
 setMethod("unpack", signature(x = "unpackedMatrix"),
           function(x, ...) x)
 setMethod("unpack", signature(x = "matrix"),
-          function(x, ...) .m2dense(x, "."))
+          function(x, ...) .m2dense.checking(x, "."))
 
 .upM.pack <- function(x, ...)
     .Call(unpackedMatrix_pack, x, TRUE, NA, NA)
 
-.upM.pack.ge <- .m.pack <- function(x, symmetric = NA, upperTri = NA, ...) {
+.upM.pack.ge <- function(x, symmetric = NA, upperTri = NA, ...) {
     if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...)) {
-        .C1
+        .Call(unpackedMatrix_pack, x, TRUE, FALSE, TRUE)
     } else if((sna || !symmetric) &&
               (it <- isTriangular(x, upper = upperTri))) {
-        upper <- if(is.null(kind <- attr(it, "kind"))) upperTri else kind == "U"
-        .C2
+        upper <-
+            if(is.na(upperTri))
+                attr(it, "kind") == "U"
+            else upperTri
+        .Call(unpackedMatrix_pack, x, TRUE, TRUE, upper)
     } else {
-        kind <- if(is.na(upperTri)) "" else if(upperTri) "upper " else "lower "
+        desc <-
+            if(is.na(upperTri))
+                ""
+            else if(upperTri)
+                "upper "
+            else "lower "
         if(sna)
-            stop("matrix is not symmetric or ", kind, "triangular")
+            stop("matrix is not symmetric or ", desc, "triangular")
         else if(symmetric)
             stop("matrix is not symmetric")
-        else
-            stop("matrix is not ", kind, "triangular")
+        else stop("matrix is not ", desc, "triangular")
     }
 }
-.l <- list(.C1 = quote(.Call(unpackedMatrix_pack, x, TRUE, FALSE, TRUE)),
-           .C2 = quote(.Call(unpackedMatrix_pack, x, TRUE, TRUE, upper)))
-body(.upM.pack.ge) <- do.call(substitute, list(body(.upM.pack.ge), .l))
-.l <- list(.C1 = quote(.Call(matrix_pack, x, FALSE, TRUE)),
-           .C2 = quote(.Call(matrix_pack, x, TRUE, upper)))
-body(.m.pack) <- do.call(substitute, list(body(.m.pack), .l))
-rm(.l)
+
+.m.pack <- function(x, symmetric = NA, upperTri = NA, ...) {
+    if(.REPLACEME) {
+        .Call(R_matrix_as_dense, x, ".sp", "U", NULL)
+    } else if(.REPLACEME) {
+        uplo <-
+            if(is.na(upperTri))
+                attr(it, "kind")
+            else if(upperTri)
+                "U"
+            else "L"
+        .Call(R_matrix_as_dense, x, ".tp", uplo, "N")
+    } else .REPLACEME
+}
+body(.m.pack)[[c(2L, 2L    )]] <- body(.upM.pack.ge)[[c(2L, 2L    )]]
+body(.m.pack)[[c(2L, 4L, 2L)]] <- body(.upM.pack.ge)[[c(2L, 4L, 2L)]]
+body(.m.pack)[[c(2L, 4L, 4L)]] <- body(.upM.pack.ge)[[c(2L, 4L, 4L)]]
 
 setMethod("pack", signature(x = "unpackedMatrix"), .upM.pack)
 for (.cl in grep("^.geMatrix$", .upM.subclasses, value = TRUE))
@@ -72,14 +89,14 @@ setMethod("pack", signature(x = "matrix"), .m.pack)
 rm(.upM.pack, .upM.pack.ge, .m.pack)
 
 setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "missing"),
-          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, ""))
+          function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, NULL))
 setMethod("forceSymmetric", signature(x = "unpackedMatrix", uplo = "character"),
           function(x, uplo) .Call(unpackedMatrix_force_symmetric, x, uplo))
 
 setMethod("forceSymmetric", signature(x = "matrix", uplo = "missing"),
-          function(x, uplo) .Call(matrix_force_symmetric, x, "U"))
+          function(x, uplo) .Call(R_matrix_as_dense, x, ".sy",  "U", NULL))
 setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
-          function(x, uplo) .Call(matrix_force_symmetric, x, uplo))
+          function(x, uplo) .Call(R_matrix_as_dense, x, ".sy", uplo, NULL))
 
 .upM.is.sy <- function(object, checkDN = TRUE, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE

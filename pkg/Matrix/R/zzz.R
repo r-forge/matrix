@@ -84,8 +84,7 @@ rm(.Rv)
         stop("invalid 'Class2'")
     contains1 <- names(Class1@contains)
     contains2 <- names(Class2@contains)
-    virtual <- list(c("sparseMatrix", "denseMatrix"),
-                    c("dMatrix", "lMatrix", "nMatrix"),
+    virtual <- list(c("dMatrix", "lMatrix", "nMatrix"),
                     c("generalMatrix", "triangularMatrix", "symmetricMatrix"),
                     c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
                       "diagonalMatrix", "unpackedMatrix", "packedMatrix"))
