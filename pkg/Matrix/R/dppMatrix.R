@@ -25,8 +25,8 @@ setAs("matrix", "dppMatrix",
 
 setAs("Matrix", "dppMatrix",
       function(from) {
-          ## still needs as(<ds[py]Matrix>, "dppMatrix") to work
-          as(as(as(as(from,"symmetricMatrix"),"dMatrix"),"denseMatrix"),
+          ## still needs as(<dspMatrix>, "dppMatrix") to work
+          as(as(as(as(from,"dMatrix"),"symmetricMatrix"),"packedMatrix"),
              "dppMatrix")
       })
 

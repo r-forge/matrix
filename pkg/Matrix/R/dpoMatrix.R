@@ -25,8 +25,8 @@ setAs("matrix", "dpoMatrix",
 
 setAs("Matrix", "dpoMatrix",
       function(from) {
-          ## still needs as(<ds[yp]Matrix>, "dpoMatrix") to work
-          as(as(as(as(from,"symmetricMatrix"),"dMatrix"),"denseMatrix"),
+          ## still needs as(<dsyMatrix>, "dpoMatrix") to work
+          as(as(as(as(from,"dMatrix"),"symmetricMatrix"),"unpackedMatrix"),
              "dpoMatrix")
       })
 
