@@ -115,6 +115,9 @@ setAs("numLike", "CsparseMatrix", ..m2gC)
 setAs("numLike", "RsparseMatrix", ..m2gR)
 setAs("numLike", "TsparseMatrix", ..m2gT)
 
+## As many people have depended on this being fast:
+setAs("matrix", "dgCMatrix", ..m2dgC)
+
 ## To base matrix, base vector .............................
 
 setAs( "denseMatrix", "matrix", ..dense2m)
