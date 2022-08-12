@@ -49,15 +49,7 @@ rm(.Rv)
     ##   1 ... persistent warning
     ## >=2 ... persistent error
     ##  NA ... one-time message { d(g.|.C)Matrix } or warning { others }
-    wDC <-
-        if(is.atomic(w <- getOption("Matrix.warnDeprecatedCoerce")) &&
-           length(w) == 1L)
-            as.integer(w)
-        else if(verbose)
-            1L
-        else NA_integer_
-    if(!is.null(w))
-        options(Matrix.warnDeprecatedCoerce = wDC)
+    wDC <- as.integer(Sys.getenv("R_MATRIX_WARN_DEPRECATED_COERCE", NA))
     assign("warnDeprecatedCoerce", wDC, envir = .MatrixEnv)
 
     .Call(CHM_set_common_env, .chm_common)

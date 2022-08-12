@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-11 r3540)}{
+\section{Changes in version 1.4-2 (2022-08-12 r3542)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses 
@@ -21,9 +21,9 @@
       \code{NA} is to signal a message or warning (see below)
       with the next deprecated coercion and be silent after that.
       %
-      If unset or invalid (non-atomic or atomic of length other than one),
-      then the value of the option when the \pkg{Matrix} namespace was loaded 
-      is used. If unset or invalid at load time, then \code{NA} is used.
+      If unset or invalid, then the value of the environment variable
+      \code{R_MATRIX_WARN_DEPRECATED_COERCE} (\code{NA} if unset) is
+      used.  This is cached when the \pkg{Matrix} namespace is loaded.
       %
       Option values are coerced to integer before use.
       %
