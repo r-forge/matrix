@@ -297,8 +297,8 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	    if(any(i1 == i2)) # diagonal will be changed
 		x <- diagU2N(x) # keeps class (!)
 	}
-	else { # go to "generalMatrix" and continue
-	    x <- as(x, paste0(.M.kind(x), "gCMatrix")) ## & do not redefine clx!
+	else { # go to "generalMatrix" and (do not redefine clx!) and continue
+	    x <- as(x, "generalMatrix") # was as(x, paste0(.M.kind(x), "gCMatrix"))
 	}
     }
     ## Temporary hack for debugging --- remove eventually -- FIXME :
@@ -315,7 +315,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	has.x <- TRUE
 	x <- .Call(dCsparse_subassign,
 		   if(clx %in% c("dgCMatrix", "dtCMatrix")) x
-		   else as(x, "dgCMatrix"),
+		   else as(x, "generalMatrix"), # must get "dgCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -323,7 +323,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	has.x <- TRUE
 	x <- .Call(lCsparse_subassign,
 		   if(clx %in% c("lgCMatrix", "ltCMatrix")) x
-		   else as(x, "lgCMatrix"),
+		   else as(x, "generalMatrix"), # must get "lgCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -331,7 +331,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	has.x <- FALSE
 	x <- .Call(nCsparse_subassign,
 		   if(clx %in% c("ngCMatrix", "ntCMatrix"))x
-		   else as(x, "ngCMatrix"),
+		   else as(x, "generalMatrix"), # must get "ngCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -339,7 +339,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	has.x <- TRUE
 	x <- .Call(iCsparse_subassign,
 		   if(clx %in% c("igCMatrix", "itCMatrix"))x
-		   else as(x, "igCMatrix"),
+		   else as(x, "generalMatrix"), # must get "igCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -347,7 +347,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector")
 	has.x <- TRUE
 	x <- .Call(zCsparse_subassign,
 		   if(clx %in% c("zgCMatrix", "ztCMatrix"))x
-		   else as(x, "zgCMatrix"),
+		   else as(x, "generalMatrix"), # must get "zgCMatrix"
 		   i1, i2,
 		   ## here we only want zsparseVector {to not have to do this in C}:
 		   as(value, "zsparseVector"))
@@ -503,7 +503,8 @@ setMethod("band", "CsparseMatrix",
 	      r <- .Call(Csparse_band, x, k1, k2)
 	      if(square && as.double(k1) * k2 >= 0)
                   ## triangular result (does this always work ??)
-                  as(r, paste0(.M.kind(x), "tCMatrix"))
+                  as(r, "triangularMatrix")
+                  ## deprecated  as(r, paste0(.M.kind(x), "tCMatrix"))
 	      else r
           })
 

@@ -51,9 +51,8 @@
 }
 \references{
   The original LAPACK source code, including documentation;
-  \url{https://www.netlib.org/lapack/double/dsytrf.f}
-  and
-  \url{https://www.netlib.org/lapack/double/dsptrf.f}
+  \url{https://netlib.org/lapack/double/dsytrf.f} and
+  \url{https://netlib.org/lapack/double/dsptrf.f}
 }
 \seealso{
   The resulting class, \code{\linkS4class{BunchKaufman}}.

@@ -2,7 +2,8 @@
 ####    aka    subsetting     and  subassignment
 ####           ~~~~~~~~~~          ~~~~~~~~~~~~~
 
-options(Matrix.warnDeprecatedCoerce = NA)
+options(Matrix.warnDeprecatedCoerce = 2)
+##                                  === severe, just for Matrix-maintainers
 
 if(interactive()) {
     options(error = recover, warn = 1)
@@ -243,20 +244,21 @@ for(kind in c("n", "l", "d")) {
     kClass <-paste0(kind, "Matrix"  )
     Ckind <- paste0(kind, "gCMatrix")
     Tkind <- paste0(kind, "gTMatrix")
-    str(mC <- as(m, Ckind))
-    str(mT <- as(as(as(m, kClass), "TsparseMatrix"), Tkind))
+    str(mC <- as(as(as(m, kClass), "CsparseMatrix"), "generalMatrix")) # was as(m, Ckind) deprecated
+    #was mT <- as(as(as(m, kClass), "TsparseMatrix"), Tkind))
+    str(mT <- as(as(as(m, kClass), "generalMatrix"), "TsparseMatrix"))
     mm <- as(mC, "matrix") # also logical or double
     IDENT <- if(kind == "n") function(x,y) Q.eq2(x,y, tol=0) else identical
     stopifnot(exprs = {
         identical(mT, as(mC, "TsparseMatrix"))
-        identical(mC, as(mT, Ckind))
+        identical(mC, as(mT, "CsparseMatrix")) # was Ckind; now deprecated
         Qidentical(mC[0,0], new(Ckind)) # M..3 Csp..4
         Qidentical(mT[0,0], new(Tkind)) #  "
         identical(unname(mT[0,]), new(Tkind, Dim = c(0L,ncol(m))))# M.3 T.4 C.4
         identical(unname(mT[,0]), new(Tkind, Dim = c(nrow(m),0L)))# M.3 C.4
         is.null(cat("IDENT():\n"))
-        IDENT(mC[0,], as(mT[FALSE,], Ckind)) # M.3 C.4 M.3 + Tsp..4 Csp..4
-        IDENT(mC[,0], as(mT[,FALSE], Ckind)) # M.3 C.4 M.3 C.4
+        IDENT(mC[0,], as(mT[FALSE,], "CsparseMatrix")) # M.3 C.4 M.3 + Tsp..4 Csp..4 | as(., Ckind) deprecated
+        IDENT(mC[,0], as(mT[,FALSE], "CsparseMatrix")) # M.3 C.4 M.3 C.4             | as(., Ckind) deprecated
         is.null(cat("sapply(..):\n"))
         sapply(pmin(min(dim(mC)), c(0:2, 5:10)),
                function(k) {i <- seq_len(k); all(mC[i,i] == mT[i,i])})
@@ -494,7 +496,7 @@ stopifnot(class(x.x) == "dsCMatrix",
 head(x.x.) # Note the *non*-structural 0's printed as "0"
 tail(x.x., -3) # all but the first three lines
 
-lx.x <- as(x.x, "lsCMatrix") # FALSE only for "structural" 0
+lx.x <- as(as(x.x, "lMatrix"), "symmetricMatrix") # FALSE only for "structural" 0
 (l10 <- lx.x[1:10, 1:10])# "lsC"
 (l3 <-  lx.x[1:3, ])
 m.x <- as.mat(x.x) # as.mat() *drops* (NULL,NULL) dimnames
@@ -800,11 +802,11 @@ assert.EQ.mat(N,m.L); N ; assertWarning(
 C[i] <- v, verbose=TRUE)
 assert.EQ.mat(C,m.L); C #
 
-options(warn = 2) #---------------------# NO WARNINGS from here -----------------
-					# =====================
+## options(warn = 2) #---------------------# NO WARNINGS from here -----------------
+## 					  ## =====================
 
-## Until we purge deprecated coercions from our own code:
-options(Matrix.warnDeprecatedCoerce = FALSE)
+## ## Until we purge deprecated coercions from our own code:
+## options(Matrix.warnDeprecatedCoerce = FALSE)
 
 ## 2) negative [i,j] indices
 mc <- mC[1:5, 1:7]

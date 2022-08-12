@@ -156,7 +156,7 @@ Q.eq <- function(x, y,
         if((isDense <- extends(xcl,"denseMatrix")))
             function(m) as(m, "matrix")
         else function(m)
-            as(as(as(m,"CsparseMatrix"), "dMatrix"), "dgCMatrix")
+            as(as(as(m,"CsparseMatrix"), "dMatrix"), "generalMatrix") # => "dgC"
     if(is.na(tol)) {
 	if(isDense)
 	    all(x == y | (is.na(x) & is.na(y)))
