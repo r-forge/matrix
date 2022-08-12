@@ -355,6 +355,7 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 	nullDN
 }
 
+##' valid Matrix-class @Dimnames slot {assuming only NULL needs to be transformed}
 .M.DN <- function(x)
     dimnames(x) %||% list(NULL, NULL)
 

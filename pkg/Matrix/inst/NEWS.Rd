@@ -8,25 +8,27 @@
 \section{Changes in version 1.4-2 (2022-08-12 r3542)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
-      \item With a few exceptions, direct coercions to non-virtual subclasses 
+      \item With a few exceptions, direct coercions to non-virtual subclasses
       of \code{Matrix} (e.g., \code{dsCMatrix}) have been formally deprecated.
       For now, these will continue to work as before, but with a warning
-      indicating how to accomplish the desired coercion via virtual classes 
-      (e.g., \code{symmetricMatrix}) alone.  How such warnings are signaled 
+      indicating how to accomplish the desired coercion via virtual classes
+      (e.g., \code{symmetricMatrix}) alone.  How such warnings are signaled
       is controlled by the global option \code{Matrix.warnDeprecatedCoerce}.
-      %
-      0 or less is to be silent.
-      1 is to signal a warning with each deprecated coercion.
-      2 or greater is signal an error with each deprecated coercion.
-      \code{NA} is to signal a message or warning (see below)
-      with the next deprecated coercion and be silent after that.
+      \describe{
+	\item{\code{0} or less}{is to be silent.}
+	\item{\code{1}}{is to signal a warning with each deprecated coercion.}
+	\item{\code{2} or greater}{is to signal an error with each
+	  deprecated coercion.}
+	\item{\code{NA}}{ is to signal a message or warning (see below)
+	  with the next deprecated coercion and be silent after that.}
+      }
       %
       If unset or invalid, then the value of the environment variable
-      \code{R_MATRIX_WARN_DEPRECATED_COERCE} (\code{NA} if unset) is
+      \env{R_MATRIX_WARN_DEPRECATED_COERCE} (\code{NA} if unset) is
       used.  This is cached when the \pkg{Matrix} namespace is loaded.
-      %
+      \cr
       Option values are coerced to integer before use.
-      %
+      \cr
       To reduce disruption to existing code, the \code{NA} case signals
       messages rather than warnings with coercions to the most-used
       non-virtual subclasses of \code{Matrix}, namely \code{dg.Matrix}
@@ -123,7 +125,7 @@
 
       \item \code{!<ltrMatrix>} is no longer an error in the 0-by-0
       unit diagonal case.
-      
+
       \item Coercions among \code{[CRT]sparseMatrix} preserve the
       \code{factors} slot in more cases.
 
@@ -160,7 +162,7 @@
       \item \code{solve(<ddenseMatrix>, b)} coerced the first argument
       to \code{dgeMatrix} when \code{b} was not a \code{ddenseMatrix}
       or traditional \code{matrix}.  This unnecessary step is avoided now,
-      so that specialized methods for \code{d(tr|sy|po|tp|sp|pp)Matrix} 
+      so that specialized methods for \code{d(tr|sy|po|tp|sp|pp)Matrix}
       are used where possible (including for \code{b} inheriting from
       \code{[ln]denseMatrix}, \code{sparseMatrix}, or \code{numLike}).
 
@@ -196,7 +198,7 @@
       arithmetically (\code{x1 + ... + xn}), so that elements of the
       result are restricted to the set \code{c(0, 1, NA)}.
       This bug had also affected the result of \code{sum(<[nl].TMatrix>)}.
-      
+
       \item \code{dimnames(as(x, "matrix"))} is now \code{NULL}
       for \emph{all} \code{x} inheriting from \code{Matrix},
       when \code{x@Dimnames} is the trivial \code{list(NULL, NULL)}.
@@ -221,7 +223,7 @@
       rather than a \code{triangularMatrix}.
 
       \item Matrix(<n-dimensional table>) now works for \code{n != 2}.
-      
+
       \item \code{Matrix(<sparseMatrix>, sparse = NULL)} now always
       returns a \code{sparseMatrix}, no longer allocating just to count
       nonzero elements.
@@ -279,12 +281,12 @@
       \item \code{isTriangular(x, upper)} now has a \code{kind}
       attribute \emph{if and only if} \code{x} is triangular and
       \code{upper} is \code{NA}.
-      
+
       \item \code{diag(<unpackedMatrix>) <- value} now behaves like
       \code{diag(<packedMatrix>) <- value}, supporting coercions
       depending on \code{typeof(value)}, consistent with \code{diag<-}
       from \pkg{base}.
-      
+
       \item \code{pack} and \code{unpack} are now identity functions
       for \code{packedMatrix} and \code{unpackedMatrix} arguments,
       respectively (previously an error).  \code{pack(<.geMatrix>)}
@@ -293,21 +295,21 @@
       \code{unpack(<matrix>)} now works and is equivalent to
       \code{as(<matrix>, "unpackedMatrix")}, with result inheriting
       from \code{.(ge|tr|sy)Matrix}, as appropriate.
-      
+
       \item Many more validity methods implemented in C, for efficiency,
       including methods for \code{Matrix}, \code{compMatrix},
       \code{diagonalMatrix}, \code{indMatrix}, \code{pMatrix},
       \code{corMatrix}, \code{[liz]Matrix}, and \code{ndenseMatrix}.
-      
+
       \item The validity method of \code{dppMatrix} now follows
       the validity method of \code{dpoMatrix}, requiring non-negative
       diagonal elements.
-      
+
       \item Validation of \code{<Matrix>@Dimnames[[i]]} now tolerates
       vector types other than character, which are coerced to character
       in C via the new \code{R_DimNames_fixup()}, for greater
       consistency with base \code{matrix()}.
-      
+
       \item \code{band(x, k1, k2)} is optimized further for both
       dense and sparse \code{x}, returning \code{triangularMatrix},
       \code{symmetricMatrix}, and \code{packedMatrix} in more cases.
@@ -356,11 +358,11 @@
       was a \code{CsparseMatrix}.)
 
       \item \code{as(<vector|matrix>, "([dln]?dense|[dlnCRT]?sparse)Matrix")}
-      are now fully and more consistently implemently.  In the vector case, 
-      the result is now always a \code{length}-by-1 \code{generalMatrix}.  
+      are now fully and more consistently implemently.  In the vector case,
+      the result is now always a \code{length}-by-1 \code{generalMatrix}.
       In the matrix case, structure is now always examined, hence the result
       is a \code{symmetricMatrix} or \code{triangularMatrix} in more cases.
-      
+
       \item \code{Matrix(<classed matrix>)} now works for classes
       other than \code{table}.
     }
