@@ -478,7 +478,7 @@ setMethod("solve", signature(a = "ANY", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 
 setMethod("chol2inv", signature(x = "denseMatrix"),
-	  function (x, ...) chol2inv(as(as(x, "dMatrix"), "dtrMatrix"), ...))
+	  function (x, ...) chol2inv(as(as(as(x, "dMatrix"), "triangularMatrix"), "unpackedMatrix"), ...))
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
 	  function (x, ...) {
 	      chkDots(..., which.call=-2)
@@ -488,7 +488,7 @@ setMethod("chol2inv", signature(x = "sparseMatrix"),
 	  function (x, ...) {
 	      chkDots(..., which.call=-2)
 	      ## for now:
-	      tcrossprod(solve(as(x,"triangularMatrix")))
+	      tcrossprod(solve(as(x, "triangularMatrix")))
 	  })
 
 ## There are special sparse methods in  ./kronecker.R  ; this is a "fall back":
