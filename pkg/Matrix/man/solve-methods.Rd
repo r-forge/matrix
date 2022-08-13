@@ -7,13 +7,11 @@
 %
 \alias{solve,ANY,ANY-method}
 \alias{solve,ANY,Matrix-method}
-\alias{solve,CHMfactor,ANY-method}
-\alias{solve,CHMfactor,ddenseMatrix-method}
-\alias{solve,CHMfactor,diagonalMatrix-method}
-\alias{solve,CHMfactor,dsparseMatrix-method}
+\alias{solve,CHMfactor,denseMatrix-method}
+\alias{solve,CHMfactor,sparseMatrix-method}
 \alias{solve,CHMfactor,matrix-method}
 \alias{solve,CHMfactor,missing-method}
-\alias{solve,CHMfactor,numeric-method}
+\alias{solve,CHMfactor,numLike-method}
 \alias{solve,Matrix,ANY-method}
 \alias{solve,Matrix,diagonalMatrix-method}
 \alias{solve,Matrix,matrix-method}
@@ -93,7 +91,7 @@
   be a \code{\linkS4class{MatrixFactorization}} instead of directly a matrix.
 }
 \usage{% usage for those methods which have "surprising arguments"
-\S4method{solve}{CHMfactor,ddenseMatrix}(a, b,
+\S4method{solve}{CHMfactor,denseMatrix}(a, b,
       system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 
 \S4method{solve}{dgCMatrix,missing}(a, b, sparse = NA  , tol = .Machine$double.eps, \dots)

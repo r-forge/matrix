@@ -117,21 +117,20 @@ Summ.ln.dense <- function(x, ..., na.rm) {
 					diag= TRUE)],
 			..., na.rm = na.rm)
 	} else ## sum() -- FIXME-faster: use x@x[indTri(...)] similar to above
-	    callGeneric(as(x, paste0(if(any("ldenseMatrix" == ext)) "l" else "n", "geMatrix"))@x,
-			..., na.rm = na.rm)
+	    callGeneric(as(x, "generalMatrix")@x, ..., na.rm = na.rm)
     }
     else { ## triangular , possibly packed
 	if(.Generic != "sum") ## incl. prod() !
 	    callGeneric(x@x, if(d[1] >= 2) FALSE, if(x@diag == "U") TRUE, ..., na.rm = na.rm)
 	else ## sum() -- FIXME-faster: using indTri()..; in unit-diag. case: plus  n x TRUE = d[1]
 	    ## if packed: sum(x@x, if(x@diag == "U") d[1], ..., na.rm = na.rm)
-	    callGeneric(as(x, paste0(if(any("ldenseMatrix" == ext)) "l" else "n", "geMatrix"))@x,
-			..., na.rm = na.rm)
+	    callGeneric(as(x, "generalMatrix")@x, ..., na.rm = na.rm)
     }
 }
 
 setMethod("Summary", "ldenseMatrix", Summ.ln.dense)
 setMethod("Summary", "ndenseMatrix", Summ.ln.dense)
+rm(Summ.ln.dense)
 
 
 ###---------- lMatrix
@@ -250,6 +249,7 @@ Summary.np <- function(x, ..., na.rm) {
 setMethod("Summary", "lMatrix", Summary.l)
 setMethod("Summary", "nMatrix", Summary.np)
 setMethod("Summary", "indMatrix", Summary.np)
+rm(Summary.l, Summary.np)
 
 ###---------- nsparseMatrix
 

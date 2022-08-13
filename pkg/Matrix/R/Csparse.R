@@ -624,19 +624,18 @@ rm(.gCsp.is.tr, .Csp.subclasses, .cl)
 } ## MJ
 
 dmperm <- function(x, nAns = 6L, seed = 0L) {
-    stopifnot(length(nAns <- as.integer(nAns)) == 1, nAns %in% c(2L, 4L, 6L)
-            , length(seed <- as.integer(seed)) == 1, seed %in% -1:1
-              )
+    stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
+              length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
     if(isS4(x)) {
-        cl <- getClass(class(x))
-        if(!extends(cl, "dgCMatrix") && !extends(cl, "dtCMatrix") &&
-           !extends(cl, "ngCMatrix") && !extends(cl, "ntCMatrix")
-           ) {
-            x <- as(as(x, "dMatrix"), "CsparseMatrix")
-            x <- as(x, if(isTriangular(x)) "triangularMatrix" else "generalMatrix")
-        }
-    } else { # typically traditional matrix
-        x <- .m2ngCn(x, na.is.not.0=TRUE)
+        cld <- getClassDef(class(x))
+        if(!extends(cld, "CsparseMatrix"))
+            cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
+        if(extends(cld, "symmetricMatrix"))
+            cld <- getClassDef(class(x <- as(x, "generalMatrix")))
+        if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
+            x <- as(x, "dMatrix")
+    } else { # typically a traditional matrix
+        x <- .m2sparse(x, "dgC", NULL, NULL)
     }
-    .Call(Csparse_dmperm, x, seed, nAns)
+    .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [dn][gt]CMatrix 'x'
 }

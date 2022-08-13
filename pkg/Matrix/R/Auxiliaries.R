@@ -1347,7 +1347,7 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
 class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
     cl <- MatrixClass(cl)
-    if(cl %in% c("dpoMatrix","corMatrix"))
+    if(cl %in% c("dpoMatrix", "corMatrix"))
 	paste0(kind, "syMatrix")
     else if(cl == "dppMatrix")
 	paste0(kind, "spMatrix")
