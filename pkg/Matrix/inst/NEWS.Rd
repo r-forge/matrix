@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-12 r3542)}{
+\section{Changes in version 1.4-2 (2022-08-13 r3545)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -245,6 +245,12 @@
       \item \code{Matrix(0, nrow, )}, \code{Matrix(0, , ncol)} now
       throw (correct) errors for \code{nrow}, \code{ncol} in the
       interval \eqn{[0,1)}, consistent with \code{base::matrix()}.
+
+      \item Methods for group generic \code{Math} no longer
+      preserve \code{x@diag == "U"} or lose \code{x@Dimnames}
+      when \code{f(0) == 0} and \code{f(1) != 1}.
+      (The former happened for \code{triangularMatrix} \code{x}
+      and the latter for \code{diagonalMatrix} \code{x}.)
     }
   }
   \subsection{New Features}{
