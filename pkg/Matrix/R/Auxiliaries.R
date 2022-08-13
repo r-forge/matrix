@@ -222,21 +222,6 @@ identicalSlots <- function(x, y, slots, ...) {
     TRUE
 }
 
-
-## chol() via "dpoMatrix"
-## This will only be called for *dense* matrices
-cholMat <- function(x, pivot = FALSE, ...) {
-    packed <- .isPacked(x)
-    nmCh <- if(packed) "pCholesky" else "Cholesky"
-    if(!is.null(ch <- x@factors[[nmCh]]))
-	return(ch) ## use the cache
-    px <- as(x, if(packed) "dppMatrix" else "dpoMatrix")
-    if (isTRUE(validObject(px, test=TRUE))) ## 'pivot' is not used for dpoMatrix
-	.set.factors(x, nmCh, chol(px, pivot, ...))
-    else stop("'x' is not positive definite -- chol() undefined.")
-}
-
-
 invPerm.R <- function(p) { p[p] <- seq_along(p) ; p }
 ## how much faster would this be in C? -- less than a factor of two?
 invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)

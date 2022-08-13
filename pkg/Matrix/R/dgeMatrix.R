@@ -50,7 +50,10 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "missing"),
 	  function(x, norm, ...) rcond(x, norm = "O", ...))
 } ## MJ
 
+## MJ: redundant as ddenseMatrix has the same
+if(FALSE) {
 setMethod("chol", signature(x = "dgeMatrix"), cholMat)
+} ## MJ
 
 setMethod("lu", signature(x = "dgeMatrix"),
 	  function(x, warnSing = TRUE, ...) .Call(dgeMatrix_LU, x, warnSing))
