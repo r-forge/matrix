@@ -5,6 +5,7 @@
 ..sparse2dsparse <- function(from) .Call(R_sparse_as_kind, from, "d", FALSE)
 ..sparse2lsparse <- function(from) .Call(R_sparse_as_kind, from, "l", FALSE)
 ..sparse2nsparse <- function(from) .Call(R_sparse_as_kind, from, "n", FALSE)
+##                                                                    drop0
 
 ..sparse2unpacked <- function(from)
     .Call(R_sparse_as_dense, from, FALSE)

@@ -254,7 +254,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  if(is(x, "symmetricMatrix")) {
 	      isSym <- isTRUE(all(i == j))# work for i,j NA
 	      if(!isSym)
-		  x <- as(x, "generalMatrix")
+		  x <- .sparse2g(x)
 	  } else isSym <- FALSE
 
 	  if(isSym) {
@@ -329,7 +329,7 @@ replTmat <- function (x, i, j, ..., value)
 
 	if(!is(x,"generalMatrix")) {
 	    cl <- class(x)
-	    x <- as(x, "generalMatrix")
+	    x <- .sparse2g(x)
 	    Matrix.msg("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
 		       cl," to ",class(x))
 	}
@@ -523,7 +523,7 @@ replTmat <- function (x, i, j, ..., value)
 	   (!is.null(v <- getOption("Matrix.verbose")) && v >= 1))
 	    (if(.w) warning else message)(
 	     "M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
-        x <- as(x, "generalMatrix")
+        x <- .sparse2g(x)
         clDx <- getClassDef(clx <- class(x))
     }
 
@@ -783,7 +783,7 @@ replTmat <- function (x, i, j, ..., value)
 	if((.w <- isTRUE(getOption("Matrix.warn"))) || isTRUE(getOption("Matrix.verbose")))
 	    (if(.w) warning else message)(
 	     "M[ij] <- v :  coercing symmetric M[] into non-symmetric")
-	x <- as(x, "generalMatrix")
+	x <- .sparse2g(x)
 	clDx <- getClassDef(clx <- class(x))
     }
 

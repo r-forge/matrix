@@ -1,5 +1,5 @@
 
-R version 4.2.0 Patched (2022-05-15 r82368) -- "Vigorous Calisthenics"
+R Under development (unstable) (2022-08-11 r82713) -- "Unsuffered Consequences"
 Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -255,22 +255,22 @@ Warning message:
 In matrix(c(0, 2:-1), nr, 6) :
   data length [5] is not a sub-multiple or multiple of the number of rows [4]
 > M <- Matrix(m.)
-> (mC <- as(M, "dgCMatrix"))
+> (mC <- as(M, "CsparseMatrix"))
 4 x 6 sparse Matrix of class "dgCMatrix"
                     
 [1,] . -1  .  1  2 .
 [2,] 2  . -1  .  1 2
 [3,] 1  2  . -1  . 1
 [4,] .  1  2  . -1 .
-> (mT <- as(M, "dgTMatrix"))
+> (mT <- as(M, "TsparseMatrix"))
 4 x 6 sparse Matrix of class "dgTMatrix"
                     
 [1,] . -1  .  1  2 .
 [2,] 2  . -1  .  1 2
 [3,] 1  2  . -1  . 1
 [4,] .  1  2  . -1 .
-> stopifnot(identical(mT, as(mC, "dgTMatrix")),
-+           identical(mC, as(mT, "dgCMatrix")))
+> stopifnot(identical(mT, as(mC, "TsparseMatrix")),
++           identical(mC, as(mT, "CsparseMatrix")))
 > 
 > for(v in list(0, 2, 1:0))
 +     for(fnam in c("cbind", "rbind")) {
@@ -335,7 +335,7 @@ Time (user system elapsed): 0.049 0.009 0.058
 [3,] 1  2  . -1  . 1 . 7 . . . 1 . .
 [4,] .  1  2  . -1 . . 7 . . . . 1 .
 > stopifnot(identical3(cc, cbind(mT, 0,7,0, diag(nr), 0),
-+                      as( cbind( M, 0,7,0, diag(nr), 0), "dgCMatrix")))
++                      as( cbind( M, 0,7,0, diag(nr), 0), "CsparseMatrix")))
 > 
 > cbind(mC, 1, 100*mC, 0, 0:2)
 4 x 15 sparse Matrix of class "dgCMatrix"

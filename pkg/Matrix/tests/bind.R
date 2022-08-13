@@ -133,10 +133,10 @@ identical4(cbind(diag(4), diag(4)),
 nr <- 4
 m. <- matrix(c(0, 2:-1),  nr ,6)
 M <- Matrix(m.)
-(mC <- as(M, "dgCMatrix"))
-(mT <- as(M, "dgTMatrix"))
-stopifnot(identical(mT, as(mC, "dgTMatrix")),
-          identical(mC, as(mT, "dgCMatrix")))
+(mC <- as(M, "CsparseMatrix"))
+(mT <- as(M, "TsparseMatrix"))
+stopifnot(identical(mT, as(mC, "TsparseMatrix")),
+          identical(mC, as(mT, "CsparseMatrix")))
 
 for(v in list(0, 2, 1:0))
     for(fnam in c("cbind", "rbind")) {
@@ -158,7 +158,7 @@ stopifnot(identical(t(cbind(diag(nr),   mT)),
                       rbind(diag(nr), t(mT))))
 (cc <- cbind(mC, 0,7,0, diag(nr), 0))
 stopifnot(identical3(cc, cbind(mT, 0,7,0, diag(nr), 0),
-                     as( cbind( M, 0,7,0, diag(nr), 0), "dgCMatrix")))
+                     as( cbind( M, 0,7,0, diag(nr), 0), "CsparseMatrix")))
 
 cbind(mC, 1, 100*mC, 0, 0:2)
 cbind(mT, 1, 0, mT+10*mT, 0, 0:2)
