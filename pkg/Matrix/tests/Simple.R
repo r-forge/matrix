@@ -92,6 +92,16 @@ im <- image(M) # was not an n-by-n image plot
 stopifnot(n == diff(sort(im$y.limits)))
 ## ylimits were too small (by 1 on each side)
 
+## Image of *empty*  sparseMatrix (has failed in spite of claim in r3282 | 2018-08-20)
+(Z <- Matrix(0, 11, 22)) # empty "dgCMatrix"
+Z0 <- Z; Z0[1,1] <- 1; Z0@x <- 0 ## is also all 0, but not "empty"
+stopifnot(all(Z == Z0))
+image(Z)
+## gave Error in seq.default(zrng[1], zrng[2], length.out = cuts + 2) : 'from' must be a finite number
+image(Z, useAbs=FALSE) # gave *different* Error in seq.int... : 'length.out' must be ...
+image(Z0,useAbs=FALSE) #  (ditto)
+image(Z0) # had worked previously already
+
 assertError( Matrix(factor(letters)) )
 n.lsec <- length(.leap.seconds)# 27 (2017-07)
 mlp <- matrix(.leap.seconds)## 27 x 1 numeric matrix
