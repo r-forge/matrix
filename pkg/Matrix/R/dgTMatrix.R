@@ -98,11 +98,12 @@ setMethod("image", "dgTMatrix", ## *The* real one
 	  ## FIXME: make use of 'cuts' now
 	  ##	    and call levelplot() with 'at = ', making sure  0 is included and matching
 	  ##	    *exactly* - rather than approximately
-          if(is.null(col.regions))
+          if(is.null(col.regions)) {
+              l.col <- empty.x || diff(rx <- range(xx, finite=TRUE)) == 0
               col.regions <-
                   if(useAbs) {
-                      grey(if(empty.x) 0.9 else seq(from = 0.7, to = 0, length = 100))
-                  } else if(empty.x || diff(rx <- range(xx, finite=TRUE)) == 0)
+                      grey(if(l.col) 0.9 else seq(from = 0.7, to = 0, length = 100))
+                  } else if(l.col)
                       "gray90"
                   else { ## no abs(.), rx[1] < 0 typically
                       nn <- 100
@@ -111,6 +112,7 @@ setMethod("image", "dgTMatrix", ## *The* real one
                           c(colorRampPalette(c("blue3", "gray80"))(n0),
                             colorRampPalette(c("gray75","red3"))(nn - n0))
                   }
+          }
           if(!is.null(lwd) && !(is.numeric(lwd) && all(lwd >= 0))) # allow lwd=0
               stop("'lwd' must be NULL or non-negative numeric")
           stopifnot(length(xlim) == 2, length(ylim) == 2)

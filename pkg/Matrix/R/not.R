@@ -39,7 +39,7 @@ setMethod("!", "ltrMatrix",
 	      x@x <- !x@x ## And now fill one triangle with '!FALSE' results :
 	      ## TODO: the following should be .Call using
 	      ##	a variation of make_array_triangular:
-	      r <- as(x, "lgeMatrix")
+	      r <- .dense2g(x, "l")
 	      n <- x@Dim[1]
 	      if(n > 0L && x@diag == "U")
 		  r@x[indDiag(n)] <- FALSE ## result has diagonal all FALSE
@@ -47,7 +47,7 @@ setMethod("!", "ltrMatrix",
 	      r
 	  })
 
-setMethod("!", "ltpMatrix", function(x) !as(x, "ltrMatrix"))
+setMethod("!", "ltpMatrix", function(x) !unpack(x)) # or direct .Call(.)
 
 ## for the other ldense* ones
 setMethod("!", "lgeMatrix", function(x) { x@x <- !x@x ; x })
@@ -57,7 +57,7 @@ setMethod("!", "ldenseMatrix", function(x) {
 	x
     }
     else ## triangular are dealt with above already : "general" here:
-	!as(x, "lgeMatrix")
+	!.dense2g(x, "l")
 })
 
 ## -- ndense ---
@@ -69,7 +69,7 @@ setMethod("!", "ntrMatrix",
 
 	      ## TODO: the following should be .Call using
 	      ##	a variation of make_array_triangular:
-	      r <- as(x, "ngeMatrix")
+	      r <- .dense2g(x, "n")
 	      n <- x@Dim[1]
 	      coli <- rep(1:n, each=n)
 	      rowi <- rep(1:n, n)
@@ -84,7 +84,7 @@ setMethod("!", "ntrMatrix",
 	      r
 	  })
 
-setMethod("!", "ntpMatrix", function(x) !as(x, "ntrMatrix"))
+setMethod("!", "ntpMatrix", function(x) !unpack(x))
 
 ## for the other ldense* ones
 setMethod("!", "ngeMatrix", function(x) { x@x <- !x@x ; x })
@@ -94,7 +94,7 @@ setMethod("!", "ndenseMatrix", function(x) {
 	x
     }
     else ## triangular are dealt with above already : "general" here:
-	!as(x, "ngeMatrix")
+	!.dense2g(x, "n")
 })
 
 ### ---- sparseVector -----

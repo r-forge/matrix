@@ -124,7 +124,7 @@ mm \%*\% pm1
 pm1 \%*\% mm
 try(as(as.integer(c(3,3,1)), "pMatrix"))# Error: not a permutation
 
-as(pm1, "ngTMatrix")
+as(pm1, "TsparseMatrix")
 p10[1:7, 1:4] # gives an "ngTMatrix" (most economic!)
 
 ## row-indexing of a <pMatrix> keeps it as an <indMatrix>:
