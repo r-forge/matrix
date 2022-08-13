@@ -7,7 +7,6 @@
 \alias{chol,Matrix-method}
 \alias{chol,ddenseMatrix-method}
 \alias{chol,ddiMatrix-method}
-\alias{chol,dgeMatrix-method}
 \alias{chol,dpoMatrix-method}
 \alias{chol,dppMatrix-method}
 \alias{chol,dsCMatrix-method}
