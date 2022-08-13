@@ -20,10 +20,13 @@ is0  <- function(x) !is.na(x) & x == 0
 isN0 <- function(x)  is.na(x) | x != 0
 is1  <- function(x) !is.na(x) & x
 } else {
-## MJ: Simpler ... ?
+## MJ: These seem more natural ... ?
 is0  <- function(x) !(is.na(x) | x)
 isN0 <- function(x)   is.na(x) | x
-is1  <- function(x)  !is.na(x) & x
+is1  <- function(x)  !is.na(x) & x == 1
+isN1 <- function(x)   is.na(x) | x != 1
+isT  <- function(x)  !is.na(x) &  x
+isNT <- function(x)   is.na(x) | !x
 }
 
 ##

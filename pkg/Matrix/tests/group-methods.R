@@ -555,5 +555,16 @@ for(f in getGroupMembers("Summary")) {
   if(length(warnings())) print(summary(warnings()))
 }
 
+## <Math>(x) behaved incorrectly in Matrix <= 1.4-1
+## for unit diagonal 'x' when f(0) == 0 and f(1) != 1
+Dn <- list(c("a", "b"), c("A", "B"))
+udi <- new("ddiMatrix", Dim = c(2L, 2L), Dimnames = Dn, diag = "U")
+utC <- new("dtCMatrix", Dim = c(2L, 2L), Dimnames = Dn, diag = "U",
+           p = integer(3L))
+utr <- new("dtrMatrix", Dim = c(2L, 2L), Dimnames = Dn, diag = "U",
+           x = double(4L))
+sinu <- `dimnames<-`(sin(diag(2L)), Dn)
+for(u in list(udi, utC, utr))
+    stopifnot(identical(as(sin(u), "matrix"), sinu))
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

@@ -52,13 +52,13 @@ setMethod("solve", signature(a = "CHMfactor", b = "numeric"),
 	  valueClass = "dgeMatrix")
 
 setMethod("solve", signature(a = "CHMfactor", b = "dsparseMatrix"),
-	  function(a, b,
-		   system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"),
+	  function(a, b, system = c("A", "LDLt", "LD", "DLt",
+                                    "L", "Lt", "D", "P", "Pt"),
 		   ...) {
 	      chkDots(..., which.call=-2)
 	      sysDef <- eval(formals()$system)
 	      .Call(CHMfactor_spsolve,	#--> cholmod_spsolve() in  ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
-		    a, as(as(b, "CsparseMatrix"), "dgCMatrix"),
+		    a, as(as(b, "CsparseMatrix"), "generalMatrix"),
 		    match(match.arg(system, sysDef), sysDef, nomatch = 0L))
 	  }, valueClass = "CsparseMatrix")# < virtual value ?
 

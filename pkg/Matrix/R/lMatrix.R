@@ -119,7 +119,7 @@ setMethod("which", "nsTMatrix", function(x, arr.ind, useNames = TRUE)
 
 which.lgT <- function(x, arr.ind, useNames = TRUE) {
     if(arr.ind) {
-	iT <- is1(x@x)
+	iT <- isT(x@x)
 	ij <- cbind(x@i[iT], x@j[iT]) + 1L
         if (useNames) dimnames(ij) <- arrDimnames(ij[,1L], x@Dimnames)
         ij

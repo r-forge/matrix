@@ -863,8 +863,10 @@ setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
 
 ## the 'i' slot is 1-based *and* has no NA's:
 
-setMethod("which", "nsparseVector", function(x, arr.ind, useNames) x@i)
-setMethod("which", "lsparseVector", function(x, arr.ind, useNames) x@i[is1(x@x)])
+setMethod("which", "nsparseVector",
+          function(x, arr.ind, useNames) x@i)
+setMethod("which", "lsparseVector",
+          function(x, arr.ind, useNames) x@i[isT(x@x)])
 ## and *error* for "dsparseVector", "i*", ...
 
 ##' indices of vector x[] to construct  Toeplitz matrix
