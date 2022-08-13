@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-13 r3547)}{
+\section{Changes in version 1.4-2 (2022-08-13 r3549)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -19,10 +19,9 @@
 	\item{\code{1}}{is to signal a warning with each deprecated coercion.}
 	\item{\code{2} or greater}{is to signal an error with each
 	  deprecated coercion.}
-	\item{\code{NA}}{ is to signal a message or warning (see below)
+	\item{\code{NA}}{is to signal a message or warning (see below)
 	  with the next deprecated coercion and be silent after that.}
       }
-      %
       If unset or invalid, then the value of the environment variable
       \env{R_MATRIX_WARN_DEPRECATED_COERCE} (\code{NA} if unset) is
       used.  This is cached when the \pkg{Matrix} namespace is loaded.

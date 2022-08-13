@@ -152,10 +152,7 @@ setAs("dsCMatrix", "dsRMatrix",
 	      p = from@p, j = from@i, x = from@x,
 	      uplo = if (from@uplo == "U") "L" else "U"))
 ## FIXME: if this makes sense, do it for "l" and "n" as well as "d"
-}
-
-##setMethod("diag", signature(x = "dgRMatrix"),
-##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
+} ## MJ
 
 ## MJ: no longer needed ... now inherited from Matrix
 if(FALSE) {
@@ -177,6 +174,9 @@ setMethod("triu", "RsparseMatrix",
 setMethod("band", "RsparseMatrix",
 	  function(x, k1, k2, ...)
 	  as(band(.R.2.C(x), k1 = k1, k2 = k2, ...), "RsparseMatrix"))
+
+##setMethod("diag", signature(x = "dgRMatrix"),
+##          function(x = 1, nrow, ncol = n) .Call(csc_getDiag, x))
 } ## MJ
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
