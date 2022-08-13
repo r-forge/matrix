@@ -345,8 +345,9 @@
 \note{
   \code{boolArith = TRUE}, \code{FALSE} or \code{NA} has been newly
   introduced for \pkg{Matrix} 1.2.0 (March 2015).  Its implementation
-  may be incomplete and partly missing.  Please report such omissions if
-  detected!
+  has still not been tested extensively.  Notably the behaviour for
+  sparse matrices with \code{x} slots containing extra zeros had not been
+  documented previously, see the \code{\link{\%&\%}} help page.
 
   Currently, \code{boolArith = TRUE} is implemented via
   \code{\linkS4class{CsparseMatrix}} coercions which may be quite
@@ -381,8 +382,12 @@
       "matrix")} and other signatures, see \code{"\%*\%"} above.}
   }%{describe}
 }
-\seealso{\code{\link[base]{tcrossprod}} in \R's base,
-  \code{\link{crossprod}} and \code{\link{\%*\%}}.}
+\seealso{
+  \code{\link[base]{tcrossprod}} in \R's base, and
+  \code{\link{crossprod}} and \code{\link{\%*\%}}.
+  \pkg{Matrix} package \code{\link{\%&\%}} for boolean matrix product
+  methods.
+}
 \examples{
  ## A random sparse "incidence" matrix :
  m <- matrix(0, 400, 500)
