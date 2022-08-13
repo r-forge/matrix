@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-13 r3545)}{
+\section{Changes in version 1.4-2 (2022-08-13 r3547)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -251,6 +251,9 @@
       when \code{f(0) == 0} and \code{f(1) != 1}.
       (The former happened for \code{triangularMatrix} \code{x}
       and the latter for \code{diagonalMatrix} \code{x}.)
+
+      \item \code{image(Z)} for a completely \dQuote{empty} (all 0) sparse
+      Matrix work again (?!)
     }
   }
   \subsection{New Features}{

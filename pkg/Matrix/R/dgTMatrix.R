@@ -85,12 +85,13 @@ setMethod("image", "dgTMatrix", ## *The* real one
           ## 'at' can remain missing and be passed to levelplot
           di <- x@Dim
           xx <- x@x
-	  if(length(xx) == 0 && length(x) > 0) { # workaround having "empty" matrix
-	      x@x <- 0
+	  empty.x <- length(xx) == 0 && length(x) > 0
+	  if(empty.x) { # workaround having "empty" matrix
+	      xx <- 0
 	      x@i <- x@j <- 0L
 	  }
           if(missing(useAbs)) { ## use abs() when all values are non-neg
-              useAbs <- if(length(xx)) min(xx, na.rm=TRUE) >= 0 else TRUE
+              useAbs <- if(empty.x) FALSE else min(xx, na.rm=TRUE)
           } else if(useAbs)
               xx <- abs(xx)
           ## rx <- range(xx, finite=TRUE)
@@ -100,9 +101,10 @@ setMethod("image", "dgTMatrix", ## *The* real one
           if(is.null(col.regions))
               col.regions <-
                   if(useAbs) {
-                      grey(seq(from = 0.7, to = 0, length = 100))
-                  } else { ## no abs(.), rx[1] < 0
-                      rx <- range(xx, finite=TRUE)
+                      grey(if(empty.x) 0.9 else seq(from = 0.7, to = 0, length = 100))
+                  } else if(empty.x || diff(rx <- range(xx, finite=TRUE)) == 0)
+                      "gray90"
+                  else { ## no abs(.), rx[1] < 0 typically
                       nn <- 100
                       n0 <- min(nn, max(0, round((0 - rx[1])/(rx[2]-rx[1]) * nn)))
                       col.regions <-
