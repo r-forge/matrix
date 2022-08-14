@@ -624,6 +624,9 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     to
 }
 
+drop0.notol <- function(x)
+    .Call(R_sparse_drop0, x)
+
 if(.Matrix.supporting.cached.methods) {
 .C.2.R <- .CR2RC
 .R.2.C <- .CR2RC

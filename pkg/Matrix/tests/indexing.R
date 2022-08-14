@@ -1342,3 +1342,9 @@ stopifnot(exprs = {
     identical(xs0[length(s0) - 3:0], # gave Error ..
               new("dsparseVector", i=integer(), length=4L))
 })
+
+## Yielded an invalid object in Matrix <= 1.4-1, instead of throwing error
+llc04 <- new("dgCMatrix", Dim = c(4L, 0L))
+c40 <- new("dgCMatrix", Dim = c(0L, 4L), p = integer(5L))
+assertError(c04[1L, ] <- 1)
+assertError(c40[, 1L] <- 1)

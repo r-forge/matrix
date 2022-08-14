@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-13 r3549)}{
+\section{Changes in version 1.4-2 (2022-08-14 r3554)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -251,8 +251,14 @@
       (The former happened for \code{triangularMatrix} \code{x}
       and the latter for \code{diagonalMatrix} \code{x}.)
 
-      \item \code{image(Z)} for a completely \dQuote{empty} (all 0) sparse
-      Matrix work again (?!)
+      \item \code{image(Z)} for a completely \dQuote{empty} (all 0)
+      \code{sparseMatrix} works again (?!).
+
+      \item \code{x[i, ] <- value} and \code{y[, j] <- value}
+      is now an error in more cases
+      for \code{m}-by-0 \code{CsparseMatrix} \code{x}
+      and 0-by-\code{n} \code{CsparseMatrix} \code{y}.
+      In these cases, subassignment gave a (formally) invalid result. 
     }
   }
   \subsection{New Features}{

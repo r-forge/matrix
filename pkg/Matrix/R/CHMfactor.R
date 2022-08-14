@@ -43,8 +43,9 @@ setMethod("solve", signature(a = "CHMfactor", b = "sparseMatrix"),
 		   ...) {
 	      chkDots(..., which.call = -2L)
 	      system.def <- eval(formals()$system)
-	      .Call(CHMfactor_spsolve, a,
-                    as(as(as(b, "dMatrix"), "generalMatrix"), "CsparseMatrix"),
+              .Call(CHMfactor_spsolve, a,
+                    ## sparseMatrix->dgCMatrix
+                    .sparse2kind(.sparse2g(as(b, "CsparseMatrix")), "d", FALSE),
 		    match(match.arg(system, system.def), system.def, 0L))
 	  })
 
@@ -76,12 +77,14 @@ setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...) {
               cld <- getClassDef(class(parent))
               stopifnot(extends(cld, "sparseMatrix"))
-              if(!extends(cld, "dMatrix"))
-                  cld <-
-                      getClassDef(class(parent <- as(parent, "dMatrix")))
-              if(!extends(cld, "CsparseMatrix"))
-                  cld <-
-                      getClassDef(class(parent <- as(parent, "CsparseMatrix")))
+              if(!extends(cld, "CsparseMatrix")) {
+                  parent <- as(parent, "CsparseMatrix")
+                  cld <- getClassDef(class(parent))
+              }
+              if(!extends(cld, "dMatrix")) {
+                  parent <- .sparse2kind(parent, "d", FALSE)
+                  cld <- getClassDef(class(parent))
+              }
               if(!extends(cld, "symmetricMatrix") &&
                  !is.null(v <- getOption("Matrix.verbose")) && v >= 1L)
                   message("'parent' is not formally symmetric, will be handled as 'tcrossprod(parent)'")
