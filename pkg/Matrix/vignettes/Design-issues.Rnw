@@ -36,6 +36,7 @@ Functions and Methods:
 %% Note: These are explained in '?RweaveLatex' :
 <<preliminaries, echo=FALSE>>=
 options(width=75)
+library(Matrix)
 @
 
 \section{The Matrix class structures}
@@ -78,25 +79,26 @@ The three partioning schemes are
 \end{enumerate}
 
 For example in the most used sparseMatrix class, \code{"dgCMatrix"},
-the three initial letters \code{dgC} each codes for one of the three hierachies:
+the three initial letters \code{dgC} each codes for one of the three hierarchies:
 \begin{description}
-\item{d} \textbf{d}ouble
-\item{g} \textbf{g}eneral
-\item{C} \textbf{C}sparseMatrix, where \textbf{C} is for \textbf{C}olumn-compressed.
+\item{d: } \textbf{d}ouble
+\item{g: } \textbf{g}eneral
+\item{C: } \textbf{C}sparseMatrix, where \textbf{C} is for \textbf{C}olumn-compressed.
 \end{description}
-\textbf{dd},
+Part of this is visible from printing \code{getClass("\emph{<classname>}")}:
 <<dgC-ex>>=
 getClass("dgCMatrix")
 @
-Alternatively, the \code{"nsTMatrix"} class, where \code{nsT} stands for
+
+Another example is the \code{"nsTMatrix"} class, where \code{nsT} stands for
 \begin{description}
-\item{n} \textbf{n} is for ``patter\textbf{n}'', boolean content where
+\item{n: } \textbf{n} is for ``patter\textbf{n}'', boolean content where
   only the \emph{locations} of the non-zeros need to be stored.
-\item{t} \textbf{t}riangular matrix; either \textbf{U}pper, or \textbf{L}ower.
-\item{T} \textbf{T}sparseMatrix, where \textbf{T} is for \textbf{T}riplet,
+\item{t: } \textbf{t}riangular matrix; either \textbf{U}pper, or \textbf{L}ower.
+\item{T: } \textbf{T}sparseMatrix, where \textbf{T} is for \textbf{T}riplet,
   the simplest but least efficient way to store a sparse matrix.
 \end{description}
-\textbf{dd},
+From R itself, via \code{getClass(.)}:
 <<dgC-ex>>=
 getClass("ntTMatrix")
 @
@@ -111,7 +113,6 @@ The typical constructor is \Rfun{Diagonal} whereas the accessor
 (as for traditional matrices), \Rfun{diag} simply returns the
 \emph{vector} of diagonal entries:
 <<diag-class>>=
-library(Matrix)
 (D4 <- Diagonal(4, 10*(1:4)))
 str(D4)
 diag(D4)
@@ -134,8 +135,9 @@ getClass("diagonalMatrix") ## extending "sparseMatrix"
 Originally, we had implemented diagonal matrices as \emph{dense} rather than sparse
 matrices.  After several years it became clear that this had not been
 helpful really both from a user and programmer point of view.
-So now, indeed the \code{"diagonalMatrix"} class does extend the
-\code{"sparseMatrix"} one.  However, we do \emph{not} store explicitly
+So now, indeed the \code{"diagonalMatrix"} class does also extend
+\code{"sparseMatrix"}, i.e., is a subclass of it.
+However, we do \emph{not} store explicitly
 where the non-zero entries are, and the class does \emph{not} extend any of
 the typical sparse matrix classes, \code{"CsparseMatrix"},
 \code{"TsparseMatrix"}, or \code{"RsparseMatrix"}.
