@@ -698,13 +698,11 @@ allTrueMat <- function(x,
 
 allTrueMatrix <- function(x) allTrueMat(x)
 
-
 ## MJ: no longer needed ... can now do is(x, "packedMatrix")
 if(FALSE) {
 ## Note: !isPacked(.)  i.e. `full' still contains
 ## ----  "*sy" and "*tr" which have "undefined" lower or upper part
-isPacked <- function(x)
-{
+isPacked <- function(x) {
     ## Is 'x' a packed (dense) matrix ?
     is(x, "denseMatrix") &&
     ## unneeded(!): any("x" == slotNames(x)) &&
@@ -735,8 +733,6 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
     dimnames(x) <- list(dn[[1]], character(nc))
     x
 }
-
-
 
 ## The i-th unit vector  e[1:n] with e[j] = \delta_{i,j}
 ## .E.i.log <- function(i,n)  i == (1:n)
@@ -813,11 +809,9 @@ indTri <- function(n, upper = TRUE, diag = FALSE) {
 
 prTriang <- function(x, digits = getOption("digits"),
                      maxp = getOption("max.print"),
-		     justify = "none", right = TRUE)
-{
+		     justify = "none", right = TRUE) {
     ## modeled along stats:::print.dist
     upper <- x@uplo == "U"
-
     m <- as(x, "matrix")
     cf <- format(m, digits = digits, justify = justify)
     cf[if(upper) row(cf) > col(cf)
@@ -895,52 +889,53 @@ nnzSparse <- function(x, cl = class(x), cld = getClassDef(cl))
 ## 2-column (i,j) matrix of 0-based indices of non-zero entries:
 
 ##' the workhorse for non0ind(.), but occasionally used directly
-non0.i <- function(M, cM = class(M), uniqT=TRUE) {
-    if(extends(cM, "TsparseMatrix")) {
-	if(uniqT && is_not_uniqT(M))
-	    .Call(compressed_non_0_ij, as(M,"CsparseMatrix"), TRUE)
-	else cbind(M@i, M@j)
-    } else if(extends(cM, "indMatrix")) {
-	cbind(seq_len(nrow(M)), M@perm, deparse.level=0L) - 1L
-    } else if(extends(cM, "diagonalMatrix")) {
-	i <- seq_len(dim(M)[1]) - 1L
-	if(M@diag != "U") # e.g. Diagonal(3)
+non0.i <- function(M, cM = class(M), uniqT = TRUE) {
+    cld <- getClassDef(cM)
+    if(extends(cld, "CsparseMatrix"))
+        .Call(compressed_non_0_ij, M, TRUE)
+    else if(extends(cld, "RsparseMatrix"))
+        .Call(compressed_non_0_ij, M, FALSE)
+    else if(extends(cld, "TsparseMatrix")) {
+        if(uniqT && is_not_uniqT(M))
+	    .Call(compressed_non_0_ij, .T2C(M), TRUE)
+	else cbind(M@i, M@j, deparse.level = 0L)
+    } else if(extends(cld, "diagonalMatrix")) {
+        i <- seq.int(from = 0L, length.out = M@Dim[1L])
+        if(M@diag == "N")
 	    i <- i[isN0(M@x)]
-	cbind(i,i, deparse.level=0L)
-    } else { ## C* or R*
-	if(!(isCsp <- extends(cM, "CsparseMatrix")) &&
-	   !extends(cM, "RsparseMatrix"))
-            stop(gettextf("not yet implemented for class %s", dQuote(cM)),
-                 domain = NA)
-	.Call(compressed_non_0_ij, M, isCsp)
-    }
+	cbind(i, i, deparse.level = 0L)
+    } else if(extends(cld, "indMatrix")) {
+        i <- seq.int(from = 0L, length.out = M@Dim[1L])
+        cbind(i, M@perm - 1L, deparse.level = 0L)
+    } else
+        stop(gettextf("non0.i() not yet implemented for class %s", dQuote(cM)),
+             domain = NA)
 }
 
 ##' the "more versatile / user" function (still not exported):
 non0ind <- function(x, cld = getClassDef(class(x)),
 		    uniqT = TRUE, xtendSymm = TRUE, check.Udiag = TRUE)
 {
-    if(is.numeric(x))
-	return(if((n <- length(x))) {
-	    if(is.matrix(x)) arrayInd(seq_len(n)[isN0(x)], dim(x)) - 1L
-	    else (0:(n-1))[isN0(x)]
-	} else integer(0))
-    ## else
+    if(is.numeric(x)) {
+        n <- length(x)
+        return(if(n == 0L)
+                   integer(0L)
+               else if(is.matrix(x))
+                   arrayInd(seq_len(n)[isN0(x)], dim(x)) - 1L
+               else (0:(n-1L))[isN0(x)])
+    }
     stopifnot(extends(cld, "sparseMatrix"))
 
-    ij <- non0.i(x, cld, uniqT=uniqT)
-    if(xtendSymm && extends(cld, "symmetricMatrix")) { # also get "other" triangle
-	notdiag <- ij[,1] != ij[,2]# but not the diagonals again
-	rbind(ij, ij[notdiag, 2:1], deparse.level=0)
-    }
-    else if(check.Udiag && extends(cld, "triangularMatrix")) { # check for "U" diag
-	if(x@diag == "U") {
-	    i <- seq_len(dim(x)[1]) - 1L
-	    rbind(ij, cbind(i,i, deparse.level=0), deparse.level=0)
-	} else ij
-    }
-    else
-	ij
+    ij <- non0.i(x, cld, uniqT = uniqT)
+    if(xtendSymm && extends(cld, "symmetricMatrix")) {
+        ## also get "other" triangle, but not the diagonal again
+	notdiag <- ij[, 1L] != ij[, 2L]
+	rbind(ij, ij[notdiag, 2:1], deparse.level = 0L)
+    } else if(check.Udiag && extends(cld, "triangularMatrix") &&
+              x@diag == "U") {
+        i <- seq.int(from = 0L, length.out = x@Dim[1L])
+        rbind(ij, cbind(i, i, deparse.level = 0L), deparse.level = 0L)
+    } else ij
 }
 
 if(FALSE) { ## -- now have  .Call(m_encodeInd, ...) etc :
@@ -961,7 +956,9 @@ encodeInd2 <- function(i,j, di) {
     if(prod(di) >= .Machine$integer.max) nr <- as.double(nr)
     i +  j * nr
 }
+
 } else {
+
 ##' Encode Matrix index (i,j)  |-->  i + j * nrow   {i,j : 0-origin}
 ##'
 ##' @param ij 2-column integer matrix
@@ -978,8 +975,6 @@ encodeInd <- function(ij, dim, orig1=FALSE, checkBnds=TRUE)
 encodeInd2 <- function(i, j, dim, orig1=TRUE, checkBnds=TRUE)
     .Call(m_encodeInd2, i,j, dim, orig1, checkBnds)
 
-}
-
 ##' Decode "encoded" (i,j) indices back to  cbind(i,j)
 ##' This is the inverse of encodeInd(.)
 ##'
@@ -988,24 +983,28 @@ encodeInd2 <- function(i, j, dim, orig1=TRUE, checkBnds=TRUE)
 ##' @param nr the number of rows
 ##' @return
 ##' @author Martin Maechler
-decodeInd <- function(code, nr) cbind(as.integer(code %% nr),
-				      as.integer(code %/% nr), deparse.level=0L)
+decodeInd <- function(code, nr)
+    cbind(as.integer(code %% nr), as.integer(code %/% nr),
+          deparse.level = 0L)
 
 complementInd <- function(ij, dim, orig1=FALSE, checkBnds=FALSE) {
     ## Purpose: Compute the complement of the 2-column 0-based ij-matrix
     ##		but as 1-based indices
     n <- prod(dim)
-    if(n == 0) return(integer(0))
+    if(n == 0L)
+        return(integer(0L))
     seq_len(n)[-(1L + .Call(m_encodeInd, ij, dim, orig1, checkBnds))]
 }
 
-unionInd <- function(ij1, ij2) unique(rbind(ij1, ij2))
+unionInd <- function(ij1, ij2)
+    unique(rbind(ij1, ij2))
 
 intersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
     ## from 2-column (i,j) matrices where i in {0,.., nrow-1},
     ## return only the *common* entries
     decodeInd(intersect(.Call(m_encodeInd, ij1, di, orig1, checkBnds),
-			.Call(m_encodeInd, ij2, di, orig1, checkBnds)), nr=di[1])
+			.Call(m_encodeInd, ij2, di, orig1, checkBnds)),
+              nr = di[1L])
 }
 
 WhichintersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
@@ -1042,19 +1041,30 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 ## but really efficient would be to use only one .Call(.) for uniq(.) !
 
 drop0 <- function(x, tol = 0, is.Csparse = NA) {
-    .Call(Csparse_drop,
-	  if(isTRUE(is.Csparse) || is.na(is.Csparse) && is(x, "CsparseMatrix"))
-	      x else as(x, "CsparseMatrix"),
-	  tol)
+    ## ## MJ: My R_sparse_drop0() handles all [CRT]sparseMatrix without
+    ## ##     coercion, but we should assess how many packages depend on
+    ## ##     > is(drop0(...), "CsparseMatrix")
+    ## ##     before going ahead and using it ...
+    ## if(tol <= 0)
+    ##     return(.Call(R_sparse_drop0, x))
+    if(is.na(is.Csparse))
+        is.Csparse <- is(x, "CsparseMatrix")
+    .Call(Csparse_drop, if(is.Csparse) x else as(x, "CsparseMatrix"), tol)
 }
 
 uniq <- function(x) {
-    if(is(x, "TsparseMatrix")) uniqTsparse(x) else
-    if(is(x, "sparseMatrix")) drop0(x) else x
+    cld <- getClassDef(class(x))
+    if(extends(cld, "TsparseMatrix"))
+        uniqTsparse(x)
+    else if(extends(cld, "sparseMatrix"))
+        drop0(x)
+    else x
 }
 
 asTuniq <- function(x) {
-    if(is(x, "TsparseMatrix")) uniqTsparse(x) else as(x,"TsparseMatrix")
+    if(is(x, "TsparseMatrix"))
+        uniqTsparse(x)
+    else as(x, "TsparseMatrix")
 }
 
 ## is 'x' a uniq Tsparse Matrix ?
@@ -1062,9 +1072,10 @@ is_not_uniqT <- function(x, di = dim(x))
     is.unsorted(x@j) || anyDuplicatedT(x, di)
 
 ## is 'x' a TsparseMatrix with duplicated entries (to be *added* for uniq):
-is_duplicatedT <- # <- keep old name for a while, as ../inst/test-tools-Matrix.R has used it
 anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
+
+}
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
@@ -1392,7 +1403,7 @@ as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
 } ## MJ
 
 ## This is "general" but slower than the next definition
-if(FALSE)
+if(FALSE) {
 .sp.class <- function(x) {
     if(!is.character(x)) x <- class(x)
     for(cl in paste0(c("C", "T", "R"), "sparseMatrix"))
@@ -1400,13 +1411,14 @@ if(FALSE)
 	    return(cl)
     NA_character_
 }
-
+} else {
 ## find and return the "sparseness class" (aka "representation")
 .sp.class <- function(x) {
     cl <- MatrixClass(if(is.character(x)) x else class(x))
     if(match(repr <- substr(cl, 3L, 3L), c("C", "T", "R"), 0L))
         return(paste0(repr, "sparseMatrix"))
     NA_character_
+}
 }
 
 ## MJ: no longer used
@@ -1667,6 +1679,7 @@ if(FALSE) {
 xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
 } ## MJ
 
+if(FALSE) {
 ##' @title uni-diagonal to "regular" triangular Matrix
 ##'
 ##' NOTE:   class is *not* checked here! {speed}
@@ -1677,7 +1690,7 @@ xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
 ##' @return Matrix "like" x, but with x@diag == "N" (and 1 or TRUE values "filled" in .@x)
 ##' @author Martin Maechler
 .dense.diagU2N <- function(x, kind = .M.kind(x), isPacked = length(x@x) < n^2) {
-### FIXME: Move this to C ----- (possibly with an option of *not* copying)
+    ## FIXME: Move this to C ----- (possibly with an option of *not* copying)
     ## For denseMatrix, .@diag = "U"  means the 'x' slot can have wrong values
     ## which are documented to never be accessed
     n <- x@Dim[1]
@@ -1699,29 +1712,32 @@ xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
     x@diag <- "N"
     x
 }
+} else {
+## MJ: We now have intelligent 'diag<-' methods for all denseMatrix,
+##     so this is enough:
+.dense.diagU2N <- function(x) {
+    diag(x) <- as1(x@x)
+    x
+}
+}
 
 .diagU2N <- function(x, cl, checkDense = FALSE) {
-    ## fast "no-test" version --- we *KNOW* 'x' is 'triangularMatrix'
+    ## A fast "no-test" version, which _knows_ that 'x'
+    ## is formally a unit diagonal triangularMatrix
     if(extends(cl, "CsparseMatrix"))
 	.Call(Csparse_diagU2N, x)
     else if(extends(cl, "TsparseMatrix"))
 	.Call(Tsparse_diagU2N, x)
-    else {
-	kind <- .M.kind(x, cl)
-        if(checkDense && extends(cl,"denseMatrix")) {
-	    .dense.diagU2N(x, kind)
-        }
-        else { ## possibly dense, not [CT]sparseMatrix  ==>  Rsparse*
-	    .Call(Tsparse_diagU2N,
-		  as(as(x, paste0(kind, "Matrix")), "TsparseMatrix"))
-	    ## leave it as T* - the caller can always coerce to C* if needed
-        }
-    }
-} ## .diagU2N()
+    else if(checkDense && extends(cl, "denseMatrix"))
+        .dense.diagU2N(x)
+    else # still possibly dense
+        .Call(Tsparse_diagU2N, as(x, "TsparseMatrix"))
+    ## ^leaving as TsparseMatrix ... caller can coerce as necessary
+}
 
 diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "U")
-	.diagU2N(x, cl, checkDense=checkDense)
+	.diagU2N(x, cl, checkDense = checkDense)
     else x
 }
 
@@ -1739,12 +1755,13 @@ diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 }
 
 diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(!(extends(cl, "triangularMatrix") && x@diag == "N"))
-	return(x)
-    if(checkDense && extends(cl,"denseMatrix")) {
+    if(!extends(cl, "triangularMatrix") || x@diag == "U")
+	x
+    else if(extends(cl, "CsparseMatrix"))
+        .Call(Csparse_diagN2U, x)
+    else if(checkDense && extends(cl, "denseMatrix"))
 	.dense.diagN2U(x)
-    }
-    else ## still possibly dense
+    else # still possibly dense
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
 }
 
@@ -1789,10 +1806,8 @@ tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
 tapply.x <- function (X, n, INDEX, FUN = NULL, ..., simplify = TRUE) {
     tapply1(X, factor(INDEX, 0:(n-1)), FUN = FUN, ..., simplify = simplify)
 }
-} ## MJ
 
 ### MM: Unfortunately, these are still pretty slow for large sparse ...
-
 sparsapply <- function(x, MARGIN, FUN, sparseResult = TRUE, ...) {
     ## Purpose: "Sparse Apply": better than tapply1() for colSums(), etc.:
     ##    NOTE: Only applicable sum()-like where the "zeros do not count"
@@ -1802,7 +1817,7 @@ sparsapply <- function(x, MARGIN, FUN, sparseResult = TRUE, ...) {
     ## Author: Martin Maechler, Date: 16 May 2007
     stopifnot(MARGIN %in% 1:2)
     xi <- if(MARGIN == 1) x@i else x@j
-    ui <- unique(xi)
+    ui <- unique.default(xi)
     n <- x@Dim[MARGIN]
     ## FIXME: Here we assume 'FUN' to return  'numeric' !
     r <- if(sparseResult) new("dsparseVector", length = n) else numeric(n)
@@ -1828,8 +1843,6 @@ sp.rowMeans <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
     sparsapply(x, 1, sum, sparseResult=sparseResult, na.rm=na.rm) / nc
 }
 
-## MJ: not used
-if(FALSE) {
 all0Matrix <- function(n,m) {
     ## an  all-0 matrix	 -- chose what Matrix() also gives -- "most efficiently"
     n <- as.integer(n)
@@ -1939,10 +1952,11 @@ chk.s <- function(..., which.call = -1,
 
 ##' *Only* to be used as function in
 ##'    setMethod.("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R
-.Cmp.swap <- function(e1,e2) {
+.Cmp.swap <- function(e1, e2) {
     ## "swap RHS and LHS" and use the method below:
     switch(.Generic,
-	   "==" =, "!=" = callGeneric(e2, e1),
+	   "==" =,
+           "!=" = callGeneric(e2, e1),
 	   "<"	= e2 >	e1,
 	   "<=" = e2 >= e1,
 	   ">"	= e2 <	e1,
