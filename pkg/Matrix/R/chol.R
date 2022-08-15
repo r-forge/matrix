@@ -46,6 +46,10 @@ setMethod("chol", signature(x = "dspMatrix"),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
 
+## FIXME: Is there is a simple way at C-level to cache L' rather than L,
+##        given that chol() is documented to return L'?  Then we wouldn't
+##        need t() here.  Of course, we could construct L' as a dtRMatrix
+##        "for free" with .tCR2RC() ...
 setMethod("chol", signature(x = "dsCMatrix"),
 	  function(x, pivot = FALSE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
