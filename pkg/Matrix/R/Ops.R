@@ -641,7 +641,7 @@ setMethod("Ops", signature(e1="nMatrix", e2="dMatrix"), Ops.x.x)
 setMethod("Ops", signature(e1="dMatrix", e2="nMatrix"), Ops.x.x)
 ## ... both are sparse: cannot use Ops.x.x
 setMethod("Ops", signature(e1="nsparseMatrix", e2="lsparseMatrix"),
-	  function(e1,e2) callGeneric(..sparse2lkind(e1), e2))
+	  function(e1,e2) callGeneric(..sparse2l(e1), e2))
 setMethod("Ops", signature(e1="lsparseMatrix", e2="nsparseMatrix"),
 	  function(e1,e2) callGeneric(e1, ..sparse2l(e2)))
 setMethod("Ops", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
