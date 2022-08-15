@@ -50,7 +50,7 @@ setMethod("chol", signature(x = "dsCMatrix"),
 	  function(x, pivot = FALSE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
               if(!is.null(ch <- x@factors[[nm]]))
-		   return(ch) # use the cache
+		   return(t(as(ch, "CsparseMatrix"))) # use the cache
               tryCatch(.Call(dsCMatrix_chol, x, pivot),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
@@ -59,7 +59,7 @@ setMethod("chol", signature(x = "dsRMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
               if(!is.null(ch <- x@factors[[nm]]))
-                  return(ch) # use the cache
+                  return(t(as(ch, "CsparseMatrix"))) # use the cache
               ch <- chol(.tCR2RC(x), pivot, ...)
               if(cache) .set.factors(x, nm, ch) else ch
           })
@@ -68,7 +68,7 @@ setMethod("chol", signature(x = "dsTMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
               if(!is.null(ch <- x@factors[[nm]]))
-                  return(ch) # use the cache
+                  return(t(as(ch, "CsparseMatrix"))) # use the cache
               ch <- chol(.T2C(x), pivot, ...)
               if(cache) .set.factors(x, nm, ch) else ch
           })

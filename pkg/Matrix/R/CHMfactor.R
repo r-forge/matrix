@@ -13,7 +13,7 @@ setAs("CHMfactor", "pMatrix",
 ###       now documented in ../man/Cholesky.Rd
 setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...) list(P = as(x, "pMatrix"),
-                                L = as(x, "sparseMatrix")))
+                                L = as(x, "CsparseMatrix")))
 
 .CHM_solve <- function(a, b, system = c("A", "LDLt",
                                         "LD", "DLt", "L", "Lt", "D",
