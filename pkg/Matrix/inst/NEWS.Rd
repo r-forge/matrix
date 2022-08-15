@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-14 r3554)}{
+\section{Changes in version 1.4-2 (2022-08-15 r3559)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -258,7 +258,20 @@
       is now an error in more cases
       for \code{m}-by-0 \code{CsparseMatrix} \code{x}
       and 0-by-\code{n} \code{CsparseMatrix} \code{y}.
-      In these cases, subassignment gave a (formally) invalid result. 
+      In these cases, subassignment gave a (formally) invalid result.
+
+      \item \code{chol(<ds[yp]Matrix>)} now calls the underlying
+      C-level routine exactly once.  Previously, it was called
+      an extra time in order to test for positive definiteness,
+      with the result thrown away (!).  Hence these methods should
+      become approximately two times faster.
+
+      \item \code{lu(<dtCMatrix>)} no longer returns an invalid
+      \code{sparseLU} object in the lower triangular case.
+
+      \item \code{lu(x)} had sometimes incorrectly cached its
+      return value as element \code{"lu"} (rather than \code{"LU"})
+      of \code{x@factors}.  Now it is always \code{"LU"}.
     }
   }
   \subsection{New Features}{
@@ -372,13 +385,24 @@
       was a \code{CsparseMatrix}.)
 
       \item \code{as(<vector|matrix>, "([dln]?dense|[dlnCRT]?sparse)Matrix")}
-      are now fully and more consistently implemently.  In the vector case,
+      are now fully and more consistently implemented.  In the vector case,
       the result is now always a \code{length}-by-1 \code{generalMatrix}.
       In the matrix case, structure is now always examined, hence the result
       is a \code{symmetricMatrix} or \code{triangularMatrix} in more cases.
 
       \item \code{Matrix(<classed matrix>)} now works for classes
       other than \code{table}.
+
+      \item \code{lu(<dt[rpCRT]Matrix>)} and \code{lu(<ddiMatrix>)}
+      now behave more consistently.  In the diagonal, upper triangular,
+      and unit lower triangular cases, the result is obtained
+      \dQuote{directly}, i.e., without pivoting.  In the non-unit
+      lower triangular case, it is obtained with pivoting.
+      (Previously, pivoting was never done for \code{dtCMatrix}
+      and always done for \code{dt[rpRT]Matrix} and \code{ddiMatrix}.)
+
+      \item \code{lu(x)} now caches its return value also for all
+      \code{ds.Matrix} \code{x} (by default).
     }
   }
   \subsection{Misc}{

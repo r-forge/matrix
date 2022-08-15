@@ -76,29 +76,11 @@ setMethod("diag<-", signature(x = "dsyMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "dsyMatrix", type = "missing"),
-          function(x, type, ...) .Call(dsyMatrix_norm, x, "O"))
-
-setMethod("rcond", signature(x = "dsyMatrix", norm = "missing"),
-          function(x, norm, ...) .Call(dsyMatrix_rcond, x, "O"))
-} ## MJ
-
 setMethod("BunchKaufman", signature(x = "dsyMatrix"),
 	  function(x, ...) .Call(dsyMatrix_trf, x))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
 	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo))
-
-setMethod("norm", signature(x = "dsyMatrix", type = "character"),
-          function(x, type, ...)
-              if(identical(type, "2"))
-                  norm2(x)
-              else .Call(dsyMatrix_norm, x, type))
-
-setMethod("rcond", signature(x = "dsyMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dsyMatrix_rcond, x, norm))
 
 setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
           function(a, b, ...) .Call(dsyMatrix_solve, a))

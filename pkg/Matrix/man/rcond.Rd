@@ -4,7 +4,6 @@
 \alias{rcond}
 %
 \alias{rcond,ANY,missing-method}
-\alias{rcond,Matrix,character-method}
 \alias{rcond,denseMatrix,character-method}
 \alias{rcond,dgeMatrix,character-method}
 \alias{rcond,dpoMatrix,character-method}

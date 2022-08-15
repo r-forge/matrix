@@ -577,12 +577,6 @@ setMethod("dim<-", signature(x = "denseMatrix"),
 setMethod("show", signature(object = "denseMatrix"),
           function(object) prMatrix(object))
 
-setMethod("norm", signature(x = "denseMatrix", type = "character"),
-	  function(x, type, ...) norm(as(x, "dMatrix"), type = type, ...))
-
-setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
-	  function(x, norm, ...) rcond(as(x, "dMatrix"), norm = norm, ...))
-
 .dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
 .dense.triu <- function(x, k = 0,  ...) .Call(R_dense_band, x, k, NULL)
 .dense.tril <- function(x, k = 0,  ...) .Call(R_dense_band, x, NULL, k)

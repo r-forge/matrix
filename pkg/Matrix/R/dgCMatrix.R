@@ -62,22 +62,9 @@ setMethod("qr", signature(x = "sparseMatrix"),
 	  function(x, ...)
 	  qr(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...))
 
-LU.dgC <- function(x, errSing = TRUE, order = TRUE, tol = 1.0, keep.dimnames = TRUE, ...) {
-    chkDots(..., which.call=-2)
-    .Call(dgCMatrix_LU, x, order, tol, errSing, keep.dimnames) ## ../src/dgCMatrix.c
-}
-setMethod("lu", signature(x = "dgCMatrix"), LU.dgC)
-
-setMethod("lu", signature(x = "sparseMatrix"),
-	  function(x, ...)
-	  .set.factors(x, "lu",
-		       lu(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"),
-			  ...)))
-
-
 .solve.dgC.lu <- function(a, b, tol = .Machine$double.eps) {
     ## @MM: see also solveSparse() in  ~/R/MM/Pkg-ex/Matrix/Doran-A.R
-    lu.a <- LU.dgC(a)
+    lu.a <- lu(a)
     if(tol > 0) {
 	rU <- range(abs(diag(lu.a@U)))
 	if(rU[1] / rU[2] < tol)

@@ -2,11 +2,6 @@
 
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..sparse2dsparse <- function(from) .Call(R_sparse_as_kind, from, "d", FALSE)
-..sparse2lsparse <- function(from) .Call(R_sparse_as_kind, from, "l", FALSE)
-..sparse2nsparse <- function(from) .Call(R_sparse_as_kind, from, "n", FALSE)
-##                                                                    drop0
-
 ..sparse2unpacked <- function(from)
     .Call(R_sparse_as_dense, from, FALSE)
 ..sparse2packed   <- function(from) {
@@ -23,11 +18,11 @@
 }
 
 ..sparse2dge <- function(from)
-    .sparse2dense(.sparse2g(.sparse2kind(from, "d", FALSE)), FALSE)
+    .sparse2dense(.sparse2g(..sparse2d(from)))
 ..sparse2lge <- function(from)
-    .sparse2dense(.sparse2g(.sparse2kind(from, "l", FALSE)), FALSE)
+    .sparse2dense(.sparse2g(..sparse2l(from)))
 ..sparse2nge <- function(from)
-    .sparse2dense(.sparse2g(.sparse2kind(from, "n", FALSE)), FALSE)
+    .sparse2dense(.sparse2g(..sparse2n(from)))
 
 ..tT2gC <- ..sT2gC <- function(from) .T2C(.sparse2g(from))
 ..tC2gT <- ..sC2gT <- function(from) .CR2T(.sparse2g(from))
@@ -89,7 +84,7 @@ setMethod("as.logical", signature(x = "nsparseMatrix"),
 for (.kind in .kinds) {
     .otherkinds <- .kinds[.kinds != .kind]
     for (.otherkind in .otherkinds) {
-        .def <- get(sprintf("..sparse2%ssparse", .otherkind),
+        .def <- get(sprintf("..sparse2%s", .otherkind),
                     mode = "function", inherits = FALSE)
         ## dsparseMatrix->[^d]Matrix, etc.
         setAs(paste0(     .kind, "sparseMatrix"),
@@ -170,7 +165,7 @@ for (.kind in .kinds) {
     ## This kind to other kinds, preserving structure and storage
     .otherkinds <- .kinds[.kinds != .kind]
     for (.otherkind in .otherkinds) {
-        .def <- get(sprintf("..sparse2%ssparse", .otherkind),
+        .def <- get(sprintf("..sparse2%s", .otherkind),
                     mode = "function", inherits = FALSE)
         for (.str in .strs)
             for (.repr in .reprs)
@@ -281,15 +276,14 @@ setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
 ## (some or all could be made deprecated) ..................
 
 .T2Cmat <- function(from, isTri) .BODY; body(.T2Cmat) <- body(.T2C)
-.C2nC <- function(from, isTri) .BODY; body(.C2nC) <- body(..sparse2nsparse)
-.nC2d <- ..sparse2dsparse
-.nC2l <- ..sparse2lsparse
-.n2dgT <- ..sparse2dsparse
+.C2nC <- function(from, isTri) .BODY; body(.C2nC) <- body(..sparse2n)
+.nC2d <- ..sparse2d
+.nC2l <- ..sparse2l
+.n2dgT <- ..sparse2d
 .diag2mat <- .diag2m
 .dxC2mat <- function(from, chkUdiag) .BODY; body(.dxC2mat) <- body(.sparse2m)
 
-rm(..sparse2dsparse, ..sparse2lsparse, ..sparse2nsparse,
-   ..sparse2unpacked, ..sparse2packed,
+rm(..sparse2unpacked, ..sparse2packed,
    ..sparse2dge, ..sparse2lge, ..sparse2nge)
 
 
@@ -892,11 +886,6 @@ setMethod("diag", signature(x = "sparseMatrix"),
               diag(as(x, "CsparseMatrix"), names = names))
 } ## MJ
 
-setMethod("Cholesky", signature(A = "sparseMatrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-	  Cholesky(as(A, "CsparseMatrix"),
-		   perm=perm, LDL=LDL, super=super, Imult=Imult, ...))
-
 setMethod("dim<-", signature(x = "sparseMatrix"),
 	  function(x, value) {
 	      if(!is.numeric(value) || length(value) != 2L)
@@ -925,41 +914,8 @@ setMethod("dim<-", signature(x = "sparseMatrix"),
               else r
 	  })
 
-setMethod("rep", "sparseMatrix", function(x, ...) rep(as(x, "sparseVector"), ...))
-
-setMethod("norm", signature(x = "sparseMatrix", type = "character"),
-	  function(x, type, ...) {
-	      type <- toupper(substr(type[1], 1, 1))
-	      switch(type,  ##  max(<empty>, 0)  |-->  0
-		     "O" = ,
-		     "1" = max(colSums(abs(x)), 0), ## One-norm (L_1)
-		     "I" = max(rowSums(abs(x)), 0), ## L_Infinity
-		     "F" = sqrt(sum(x^2)), ## Frobenius
-		     "M" = max(abs(x), 0), ## Maximum modulus of all
-		     "2" = norm2(x), # maximal singular value
-		     ## otherwise:
-		     stop("invalid 'type'"))
-	  })
-
-## FIXME: need a version of LAPACK's rcond() algorithm, using sparse-arithmetic
-setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
-	  function(x, norm, useInv=FALSE, ...) {
-              ## as workaround, allow use of  1/(norm(A) * norm(solve(A)))
-              if(!identical(FALSE,useInv)) {
-                  Ix <- if(isTRUE(useInv)) solve(x) else
-                  if(is(useInv, "Matrix")) useInv
-                  return( 1/(norm(x, type=norm) * norm(Ix, type=norm)) )
-              }
-              ## else
-	      d <- dim(x)
-              ## FIXME: qr.R(qr(.)) warns about differing R (permutation!)
-              ##        really fix qr.R() *or* go via dense even in those cases
-	      rcond(if(d[1] == d[2]) {
-			warning("rcond(.) via sparse -> dense coercion")
-			as(x, "denseMatrix")
-		    } else if(d[1] > d[2]) qr.R(qr(x)) else qr.R(qr(t(x))),
-		    norm = norm, ...)
-	  })
+setMethod("rep", "sparseMatrix",
+          function(x, ...) rep(as(x, "sparseVector"), ...))
 
 setMethod("cov2cor", signature(V = "sparseMatrix"),
 	  function(V) {

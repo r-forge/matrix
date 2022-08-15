@@ -8,9 +8,6 @@ setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
 } ## MJ
 
-## Maybe TODO:
-## setAs("Matrix", "nMatrix", function(from) ....)
-
 ## Anything: we build on  as.matrix(.) :
 ## ---       authors can always provide their own specific  setAs(*, "Matrix")
 setAs("ANY", "Matrix", function(from) Matrix(as.matrix(from)))
@@ -20,21 +17,15 @@ setAs("Matrix", "matrix", # do *not* call base::as.matrix() here:
       function(from) .bail.out.2("coerce", class(from), class(to)))
 setAs("matrix", "Matrix", function(from) Matrix(from))
 
-## ## probably not needed eventually:
-## setAs(from = "ddenseMatrix", to = "matrix",
-##       function(from) {
-## 	  if(length(d <- dim(from)) != 2) stop("dim(.) has not length 2")
-## 	  array(from@x, dim = d, dimnames = dimnames(from))
-##       })
-
-.asmatrix <- function(x) as(x, "matrix") # not better; just for those hating typing
+## not better; just for those hating typing
+.asmatrix <- function(x) as(x, "matrix")
 
 ## Such that also base functions dispatch properly on our classes:
 if(.Matrix.avoiding.as.matrix) {
     as.matrix.Matrix <- function(x, ...) {
-        if(nonTRUEoption("Matrix.quiet.as.matrix") && nonTRUEoption("Matrix.quiet"))
-            warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).
-Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
+        if(nonTRUEoption("Matrix.quiet.as.matrix") &&
+           nonTRUEoption("Matrix.quiet"))
+            warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).\nUse  as(x, \"matrix\")  or  .asmatrix(x)  instead.")
         as(x, "matrix")
     }
     as.array.Matrix <- function(x, ...) {
@@ -46,9 +37,11 @@ Use  as(x, \"matrix\")  or .asmatrix(x) instead.")
 }
 
 ## should propagate to all subclasses:
-setMethod("as.matrix", signature(x = "Matrix"), function(x, ...) as(x, "matrix"))
+setMethod("as.matrix", signature(x = "Matrix"),
+          function(x, ...) as(x, "matrix"))
 ## for 'Matrix' objects, as.array() should be equivalent:
-setMethod("as.array",  signature(x = "Matrix"), function(x, ...) as(x, "matrix"))
+setMethod("as.array",  signature(x = "Matrix"),
+          function(x, ...) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
 setMethod("head", signature(x = "Matrix"), utils::head.matrix)
@@ -142,10 +135,10 @@ setMethod("skewpart", signature(x = "matrix"),
 } ## MJ
 
 setMethod("symmpart", signature(x = "Matrix"),
-	  function(x) callGeneric(as(x, "dMatrix")))
+	  function(x) symmpart(as(x, "dMatrix")))
 
 setMethod("skewpart", signature(x = "Matrix"),
-	  function(x) callGeneric(as(x, "dMatrix")))
+	  function(x) skewpart(as(x, "dMatrix")))
 
 ## NB: classes without 'x' slot must have their own methods;
 ## see, e.g., ./nsparseMatrix.R and ./sparseVector.R
@@ -469,27 +462,13 @@ setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...) callGeneric(Matrix(a), b))
 
 setMethod("solve", signature(a = "Matrix", b = "diagonalMatrix"),
-	  function(a, b, ...) callGeneric(a, as(b,"CsparseMatrix")))
+	  function(a, b, ...) callGeneric(a, as(b, "CsparseMatrix")))
 
 ## when no sub-class method is found, bail out
 setMethod("solve", signature(a = "Matrix", b = "ANY"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
 setMethod("solve", signature(a = "ANY", b = "Matrix"),
 	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-
-setMethod("chol2inv", signature(x = "denseMatrix"),
-	  function (x, ...) chol2inv(as(as(as(x, "dMatrix"), "triangularMatrix"), "unpackedMatrix"), ...))
-setMethod("chol2inv", signature(x = "diagonalMatrix"),
-	  function (x, ...) {
-	      chkDots(..., which.call=-2)
-	      tcrossprod(solve(x))
-	  })
-setMethod("chol2inv", signature(x = "sparseMatrix"),
-	  function (x, ...) {
-	      chkDots(..., which.call=-2)
-	      ## for now:
-	      tcrossprod(solve(as(x, "triangularMatrix")))
-	  })
 
 ## There are special sparse methods in  ./kronecker.R  ; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
@@ -512,41 +491,23 @@ setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
 det <- base::det
 environment(det) <- environment()## == asNamespace("Matrix")
 
-setMethod("Cholesky", signature(A = "Matrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-	  stop(gettextf("Cholesky(A) called for 'A' of class \"%s\";\n\t it is currently defined for sparseMatrix only; consider using chol() instead",
-			class(A)), call. = FALSE, domain=NA))
-
-## FIXME: All of these should never be called
-setMethod("chol", signature(x = "Matrix"),
-	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
+## MJ: no longer needed as methods are available for all subclasses
+if(FALSE) {
 setMethod("diag", signature(x = "Matrix"),
 	  function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
-if(FALSE)## TODO: activate later
-setMethod("diag<-", signature(x = "Matrix"),
-	  function(x, value) .bail.out.1("diag", class(x)))
 setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
+setMethod("chol", signature(x = "Matrix"),
+	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
+} ## MJ
+
+## TODO: activate later
+if(FALSE)
+setMethod("diag<-", signature(x = "Matrix"),
+	  function(x, value) .bail.out.1("diag", class(x)))
 
 ## NB: "sparseMatrix" works via "sparseVector"
 setMethod("rep", "Matrix", function(x, ...) rep(as(x, "matrix"), ...))
-
-setMethod("norm", signature(x = "Matrix", type = "character"),
-	  function(x, type, ...) .bail.out.1("norm", class(x)))
-setMethod("rcond", signature(x = "Matrix", norm = "character"),
-	  function(x, norm, ...) .bail.out.1("rcond", class(x)))
-
-
-## for all :
-setMethod("norm", signature(x = "ANY", type = "missing"),
-	  function(x, type, ...) norm(x, type = "O", ...))
-setMethod("rcond", signature(x = "ANY", norm = "missing"),
-	  function(x, norm, ...) rcond(x, norm = "O", ...))
-
-setMethod("lu", "matrix", function(x, warnSing = TRUE, ...)
-	  lu(..2dge(x), warnSing=warnSing, ...))
-
-
 
 ## We want to use all.equal.numeric() *and* make sure that uses
 ## not just base::as.vector but the generic with our methods:
@@ -593,8 +554,9 @@ setMethod("diff", signature(x = "Matrix"),
 	  })
 
 setMethod("image", "Matrix",
-	  function(x, ...) { # coercing to sparse is not inefficient,
-	      ##	       since we need 'i' and 'j' for levelplot()
+	  function(x, ...) {
+              ## coercing to sparse is not inefficient,
+              ## since we need 'i' and 'j' for levelplot()
 	      x <- as(as(as(x, "TsparseMatrix"), "generalMatrix"), "dMatrix")
               callGeneric()
 	  })

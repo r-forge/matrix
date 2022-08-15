@@ -741,30 +741,6 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
 setMethod("skewpart", signature(x = "diagonalMatrix"),
           function(x) symmetrizeDimnames(.setZero(x, "d")))
 
-cholDiag <- function(x, pivot, ...) { ## x : typically "ddiMatrix"
-    if(x@diag == "U") return(x)
-    ## else
-    if(any(x@x < 0))
-        stop("chol() is undefined for diagonal matrix with negative entries")
-    x@x <- sqrt(x@x)
-    x
-}
-setMethod("chol", signature(x = "ddiMatrix"), cholDiag)
-
-## chol(L) is L for logical diagonal:
-setMethod("chol", signature(x = "ldiMatrix"), function(x, pivot, ...) x)
-
-setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
-	  function(x, type, ...) {
-	      if((n <- x@Dim[1]) == 0) return(0) # as for "sparseMatrix"
-	      type <- toupper(substr(type[1], 1, 1))
-	      isU <- (x@diag == "U") # unit-diagonal
-	      if(type == "F") sqrt(if(isU) n else sum(x@x^2))
-	      else { ## norm == "I","1","O","M","2" :
-		  if(isU) 1 else max(abs(x@x))
-	      }
-	  })
-
 ## FIXME: Many of these products are not handling 'Dimnames' appropriately ...
 
 ## Basic Matrix Multiplication {many more to add}

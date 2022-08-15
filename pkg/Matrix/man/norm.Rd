@@ -4,7 +4,6 @@
 \alias{norm}
 %
 \alias{norm,ANY,missing-method}
-\alias{norm,Matrix,character-method}
 \alias{norm,denseMatrix,character-method}
 \alias{norm,dgeMatrix,character-method}
 \alias{norm,diagonalMatrix,character-method}

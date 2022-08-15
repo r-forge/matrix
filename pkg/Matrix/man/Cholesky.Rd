@@ -4,8 +4,7 @@
 %
 \alias{Cholesky}
 %
-\alias{Cholesky,CsparseMatrix-method}
-\alias{Cholesky,Matrix-method}
+\alias{Cholesky,denseMatrix-method}
 \alias{Cholesky,dsCMatrix-method}
 \alias{Cholesky,nsparseMatrix-method}
 \alias{Cholesky,sparseMatrix-method}

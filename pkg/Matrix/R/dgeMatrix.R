@@ -41,38 +41,6 @@ setMethod("diag<-", signature(x = "dgeMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "dgeMatrix", type = "missing"),
-	  function(x, type, ...) .Call(dgeMatrix_norm, x, "O"))
-
-setMethod("rcond", signature(x = "dgeMatrix", norm = "missing"),
-	  function(x, norm, ...) rcond(x, norm = "O", ...))
-} ## MJ
-
-## MJ: redundant as ddenseMatrix has the same
-if(FALSE) {
-setMethod("chol", signature(x = "dgeMatrix"), cholMat)
-} ## MJ
-
-setMethod("lu", signature(x = "dgeMatrix"),
-	  function(x, warnSing = TRUE, ...) .Call(dgeMatrix_LU, x, warnSing))
-
-setMethod("norm", signature(x = "dgeMatrix", type = "character"),
-	  function(x, type, ...)
-              if(identical(type, "2"))
-                  norm2(x)
-              else .Call(dgeMatrix_norm, x, type))
-
-setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
-	  function(x, norm, ...) {
-              d <- x@Dim
-	      if(d[1L] != d[2L])
-		  rcond(qr.R(qr(if(d[1L] < d[2L]) t(x) else x)),
-                        norm = norm, ...)
-              else .Call(dgeMatrix_rcond, x, norm)
-	  })
-
 setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dgeMatrix_solve, a))
 

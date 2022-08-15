@@ -45,6 +45,3 @@ setMethod("t", signature(x = "nsCMatrix"),
           function(x) .Call(nsCMatrix_trans, x),
           valueClass = "nsCMatrix")
 }
-
-setMethod("chol", signature(x = "nsCMatrix"),
-	  function(x, pivot=FALSE, ...) stop("temporarily disabled"))## FIXME

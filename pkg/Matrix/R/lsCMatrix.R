@@ -59,7 +59,3 @@ setMethod("t", signature(x = "lsCMatrix"),
           function(x) .Call(lsCMatrix_trans, x),
           valueClass = "lsCMatrix")
 } ## MJ
-
-setMethod("chol", signature(x = "lsCMatrix"),
-	  function(x, pivot=FALSE, ...)
-	  chol(as(x, "dgCMatrix"), pivot=pivot, ...))
