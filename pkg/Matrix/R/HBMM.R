@@ -3,7 +3,7 @@
 readone <- function(ln, iwd, nper, conv)
 {
     ln <- gsub("D", "E", ln)
-    inds <- seq(0, by = iwd, length = nper + 1)
+    inds <- seq(0, by = iwd, length.out = nper + 1)
     (conv)(substring(ln, 1 + inds[-length(inds)], inds[-1]))
 }
 

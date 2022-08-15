@@ -567,7 +567,7 @@ replSPvec <- function (x, i, value)
 	ir <- lenRepl:1
 	keep <- match(ii, ii[ir]) == ir
 	ii <- ii[keep]
-	lenV <- length(value <- rep(value, length = lenRepl)[keep])
+	lenV <- length(value <- rep(value, length.out = lenRepl)[keep])
 	lenRepl <- length(ii)
     }
 
@@ -588,7 +588,7 @@ replSPvec <- function (x, i, value)
     if(lenV > lenRepl)
 	stop("too many replacement values")
     else if(lenV < lenRepl)
-	value <- rep(value, length = lenRepl)
+	value <- rep(value, length.out = lenRepl)
     ## now:  length(value) == lenRepl > 0
 
     v0 <- is0(value)

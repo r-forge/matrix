@@ -404,7 +404,7 @@ model.spmatrix <- function(trms, mf, transpose=FALSE,
     }
     if(verbose) {
 	cat(" ---> f.matr list :\n")
-	str(f.matr, max = as.integer(verbose))
+	str(f.matr, max.level = as.integer(verbose))
 	fNms <- format(dQuote(Names))
 	dim.string <- gsub('5', as.character(floor(1+log10(n))),
 			   " -- concatenating (r, rj): dim = (%5d,%5d) | (%5d,%5d)\n")

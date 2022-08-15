@@ -102,7 +102,9 @@ setMethod("image", "dgTMatrix", ## *The* real one
               l.col <- empty.x || diff(rx <- range(xx, finite=TRUE)) == 0
               col.regions <-
                   if(useAbs) {
-                      grey(if(l.col) 0.9 else seq(from = 0.7, to = 0, length = 100))
+                      grey(if(l.col)
+                               0.9
+                           else seq(from = 0.7, to = 0, length.out = 100L))
                   } else if(l.col)
                       "gray90"
                   else { ## no abs(.), rx[1] < 0 typically
