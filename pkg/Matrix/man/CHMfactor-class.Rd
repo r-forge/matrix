@@ -10,7 +10,10 @@
 \alias{nCHMsimpl-class}
 \alias{nCHMsuper-class}
 %
+\alias{coerce,CHMfactor,CsparseMatrix-method}
 \alias{coerce,CHMfactor,Matrix-method}
+\alias{coerce,CHMfactor,dMatrix-method}
+\alias{coerce,CHMfactor,dsparseMatrix-method}
 \alias{coerce,CHMfactor,pMatrix-method}
 \alias{coerce,CHMfactor,sparseMatrix-method}
 \alias{coerce,CHMfactor,triangularMatrix-method}
