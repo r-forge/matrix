@@ -35,7 +35,7 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
 	  })
 
 setMethod("norm", signature(x = "denseMatrix", type = "character"),
-	  function(x, type, ...) norm(.dense2kind(x, "d"), type = type, ...))
+	  function(x, type, ...) norm(..dense2d(x), type = type, ...))
 
 setMethod("norm", signature(x = "dgeMatrix", type = "character"),
 	  function(x, type, ...)

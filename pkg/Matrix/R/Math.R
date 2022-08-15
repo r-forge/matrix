@@ -87,10 +87,10 @@ setMethod("log", signature(x = "ddenseMatrix"), function(x, base = exp(1))
 ###--------- denseMatrix
 
 setMethod("Math", signature(x = "denseMatrix"),
-	  function(x) callGeneric(.dense2kind(x, "d")))
+	  function(x) callGeneric(..dense2d(x)))
 
 setMethod("log", signature(x = "denseMatrix"),
-          function(x, base = exp(1)) log(.dense2kind(x, "d"), base))
+          function(x, base = exp(1)) log(..dense2d(x), base))
 
 ###--------- CsparseMatrix
 
