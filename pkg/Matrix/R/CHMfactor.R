@@ -1,9 +1,9 @@
-setAs("CHMfactor", "triangularMatrix",
-      function(from) .Call(CHMfactor_to_sparse, from))
-setAs("CHMfactor", "sparseMatrix",
-      function(from) .Call(CHMfactor_to_sparse, from))
-setAs("CHMfactor", "Matrix",
-      function(from) .Call(CHMfactor_to_sparse, from))
+for(.cl in c("dsparseMatrix", "triangularMatrix", "CsparseMatrix",
+             "dMatrix", "sparseMatrix", "Matrix"))
+    setAs("CHMfactor", .cl,
+          function(from) .Call(CHMfactor_to_sparse, from))
+rm(.cl)
+
 setAs("CHMfactor", "pMatrix",
       function(from) as(from@perm + 1L, "pMatrix"))
 
@@ -45,8 +45,8 @@ setMethod("solve", signature(a = "CHMfactor", b = "sparseMatrix"),
 	      system.def <- eval(formals()$system)
               ##-> cholmod_spsolve() in ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
               .Call(CHMfactor_spsolve, a,
-                    ## sparseMatrix->dgCMatrix
-                    .sparse2kind(.sparse2g(as(b, "CsparseMatrix")), "d", FALSE),
+                    ## 'b' as dgCMatrix:
+                    .sparse2kind(.sparse2g(as(b, "CsparseMatrix")), "d"),
 		    match(match.arg(system, system.def), system.def, 0L))
 	  })
 
@@ -58,20 +58,14 @@ setMethod("solve", signature(a = "CHMfactor", b = "missing"),
 	      chkDots(..., which.call = -2L)
 	      system.def <- eval(formals()$system)
               system <- match.arg(system, system.def)
-              as(.Call(CHMfactor_spsolve, a,
-                       ## 'b' is an identity dgCMatrix
-                       .sparseDiagonal(a@Dim[1], shape = "g"),
-                       match(system, system.def, 0L)),
-                 switch(system,
-			A =, LDLt = "symmetricMatrix",
-                        LD =, DLt =, L =, Lt =, D = "triangularMatrix",
-			P =, Pt = "pMatrix"))
-	  })
-
-setMethod("chol2inv", signature(x = "CHMfactor"),
-	  function (x, ...) {
-	      chkDots(..., which.call = -2L)
-	      solve(x, system = "A")
+              r <- .Call(CHMfactor_spsolve, a,
+                         ## 'b' gets identity dgCMatrix:
+                         .sparseDiagonal(a@Dim[1], shape = "g"),
+                         match(system, system.def, 0L))
+              switch(system,
+                     A =, LDLt = .M2symm(r),
+                     LD =, DLt =, L =, Lt =, D = .M2tri(r),
+                     P =, Pt = as(r, "pMatrix"))
 	  })
 
 setMethod("update", signature(object = "CHMfactor"),
@@ -83,7 +77,7 @@ setMethod("update", signature(object = "CHMfactor"),
                   cld <- getClassDef(class(parent))
               }
               if(!extends(cld, "dMatrix")) {
-                  parent <- .sparse2kind(parent, "d", FALSE)
+                  parent <- .sparse2kind(parent, "d")
                   cld <- getClassDef(class(parent))
               }
               if(!extends(cld, "symmetricMatrix") &&
@@ -105,7 +99,7 @@ setMethod("updown",
                   stop("'update' must be TRUE, FALSE, \"+\", or \"-\"")
               bnew <- as(L, "pMatrix") %*% C
               .Call(CHMfactor_updown,
-                    update, as(bnew, "sparseMatrix"), L)
+                    update, as(bnew, "CsparseMatrix"), L)
           })
 
 setMethod("updown",
@@ -116,7 +110,7 @@ setMethod("updown",
                   stop("'update' must be TRUE, FALSE, \"+\", or \"-\"")
               bnew <- as(L, "pMatrix") %*% C
               .Call(CHMfactor_updown,
-                    update == "+", as(bnew, "sparseMatrix"), L)
+                    update == "+", as(bnew, "CparseMatrix"), L)
           })
 
 ## "Fallback" giving a "good" error message
@@ -124,7 +118,7 @@ setMethod("updown", signature(update = "ANY", C = "ANY", L = "ANY"),
 	  function(update, C, L) stop("'update' must be TRUE, FALSE, \"+\", or \"-\"; 'C' a [mM]atrix; and 'L' a CHMfactor"))
 
 setMethod("image", "CHMfactor",
-          function(x, ...) callGeneric(as(x, "sparseMatrix"), ...))
+          function(x, ...) image(as(x, "CsparseMatrix"), ...))
 
 ##' Test whether a CHMfactor object is LDL or LL
 ##' @param x a CHMfactor object
