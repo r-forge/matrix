@@ -1626,9 +1626,9 @@ Ops.spV.spV <- function(e1, e2) {
 	    warning("longer object length is not a multiple of shorter object length")
         ## recycle the shorter one
 	if(n1 < n2) {
-            e1 <- rep(e1, length = N)
+            e1 <- rep(e1, length.out = N)
 	} else {
-            e2 <- rep(e2, length = N)
+            e2 <- rep(e2, length.out = N)
 	}
     } else { ## n1 == n2
 	N <- n1
@@ -1717,7 +1717,7 @@ Ops.M.spV <- function(e1, e2) {
 	if(N %% n2 != 0)
 	    warning("longer object length is not a multiple of shorter object length")
 	## else : 2 <= n < N --- recycle the vector
-        e2 <- rep(e2, length = N)
+        e2 <- rep(e2, length.out = N)
     } else { ## n1 == n2
 	N <- n1
     }
@@ -1743,7 +1743,7 @@ Ops.spV.M <- function(e1, e2) {
 	if(N %% n1 != 0)
 	    warning("longer object length is not a multiple of shorter object length")
 	## else : 2 <= n < N --- recycle the vector
-        e1 <- rep(e1, length = N)
+        e1 <- rep(e1, length.out = N)
     } else { ## n2 == n1
 	N <- n2
     }

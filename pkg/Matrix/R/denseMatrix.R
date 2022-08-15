@@ -11,10 +11,6 @@
 
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..dense2ddense <- function(from) .Call(R_dense_as_kind, from, "d")
-..dense2ldense <- function(from) .Call(R_dense_as_kind, from, "l")
-..dense2ndense <- function(from) .Call(R_dense_as_kind, from, "n")
-
 ..dense2dsparse <- function(from)
     .Call(R_dense_as_sparse, from, "d.C", NULL, NULL)
 ..dense2lsparse <- function(from)
@@ -156,13 +152,13 @@ rm(.kind, .from)
 
 ## To "kind" ...............................................
 
-setAs("denseMatrix", "dMatrix", ..dense2ddense)
-setAs("denseMatrix", "lMatrix", ..dense2ldense)
-setAs("denseMatrix", "nMatrix", ..dense2ndense)
+setAs("denseMatrix", "dMatrix", ..dense2d)
+setAs("denseMatrix", "lMatrix", ..dense2l)
+setAs("denseMatrix", "nMatrix", ..dense2n)
 
-setAs("denseMatrix", "ddenseMatrix", ..dense2ddense)
-setAs("denseMatrix", "ldenseMatrix", ..dense2ldense)
-setAs("denseMatrix", "ndenseMatrix", ..dense2ndense)
+setAs("denseMatrix", "ddenseMatrix", ..dense2d)
+setAs("denseMatrix", "ldenseMatrix", ..dense2l)
+setAs("denseMatrix", "ndenseMatrix", ..dense2n)
 
 setAs("denseMatrix", "dsparseMatrix", ..dense2dsparse)
 setAs("denseMatrix", "lsparseMatrix", ..dense2lsparse)
@@ -299,7 +295,7 @@ for (.kind in .kinds) {
         for (.xy in c("ge", "tr", "sy", "tp", "sp"))
             setAs(paste0(.otherkind, .xy, "Matrix"),
                   paste0(     .kind, .xy, "Matrix"),
-                  get(sprintf("..dense2%sdense", .kind),
+                  get(sprintf("..dense2%s", .kind),
                       mode = "function", inherits = FALSE))
 
     ## Dense to sparse, preserving kind and structure
@@ -478,8 +474,7 @@ rm(.from, .to, .def, .b, .kind, .repr)
 .m2lgC <- function(from) .m2sparse(from, "lgC", NULL, NULL)
 .m2ngC <- function(from) .m2ngCn(from)
 
-rm(..dense2ddense, ..dense2ldense, ..dense2ndense,
-   ..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
+rm(..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
    ..dense2Csparse, ..dense2Rsparse, ..dense2Tsparse,
    ..dense2dge, ..dense2lge, ..dense2nge, ..dense2ge,
    ..m2ddense, ..m2ldense, ..m2ndense, ..m2dense,
@@ -628,7 +623,7 @@ setMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
 		  if(extends(cld, "symmetricMatrix") &&
 		     length(i) == length(j) && isTRUE(all(i == j))) {
                       ## keep original symmetric class (but not "dpo")
-                      r <- as(r, "symmetricMatrix")
+                      r <- .M2symm(r)
                       if(.isPacked(x) && !.isPacked(r))
                           pack(r)
                       else
@@ -656,7 +651,7 @@ setMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing", drop="m
 setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "missing",
 				value = "ANY"),## double/logical/...
 	  function (x, value) {
-	      x <- as(x, "generalMatrix")
+	      x <- .dense2g(x)
 	      x@x[] <- value
 	      validObject(x)# check if type and lengths above match
 	      x
