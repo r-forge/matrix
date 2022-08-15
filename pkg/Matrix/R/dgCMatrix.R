@@ -130,7 +130,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "dsparseMatrix"),
 		  sparse <- FALSE # (old default)
 	      }
 	      ## FIXME: be better when sparse=TRUE (?)
-	      .solve.dgC(a, as(b, "denseMatrix"), tol=tol, sparse=sparse)
+	      .solve.dgC(a, .sparse2dense(b), tol=tol, sparse=sparse)
 	  })
 
 ## This is a really dumb method but some people apparently want it

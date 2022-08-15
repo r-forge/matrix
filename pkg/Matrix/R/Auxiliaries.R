@@ -538,7 +538,7 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .dense2kind <- function(from, kind)
     .Call(R_dense_as_kind, from, kind)
 
-..dense2d <- function(from)
+..dense2d <- function(from) # for setAs() but used widely:
     .Call(R_dense_as_kind, from, "d")
 
 ..dense2l <- function(from)
@@ -550,7 +550,7 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .sparse2kind <- function(from, kind, drop0 = FALSE)
     .Call(R_sparse_as_kind, from, kind, drop0)
 
-..sparse2d <- function(from)
+..sparse2d <- function(from) # for setAs() but used widely:
     .Call(R_sparse_as_kind, from, "d", FALSE)
 ##                                     drop0
 
@@ -564,6 +564,12 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 
 .diag2kind <- function(from, kind)
     .Call(R_diagonal_as_kind, from, kind)
+
+..diag2d <- function(from)
+    .Call(R_diagonal_as_kind, from, "d")
+
+..diag2l <- function(from)
+    .Call(R_diagonal_as_kind, from, "l")
 
 .dense2sparse <- function(from, code)
     .Call(R_dense_as_sparse, from, code, NULL, NULL)
@@ -1513,7 +1519,7 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
     x <- as(x, "CsparseMatrix")
     x <- if(extends(cld, "symmetricMatrix") && isSymmetric(x))
              forceSymmetric(x)
-         else if(!(extends(cld, "triangularMatrix") || (it <- isTriangular(x))))
+         else if(!(extends(cld, "triangularMatrix") && (it <- isTriangular(x))))
              .sparse2g(x)
          else if(attr(it, "kind") == "U")
              triu(x)
