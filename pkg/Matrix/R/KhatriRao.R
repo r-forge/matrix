@@ -14,8 +14,8 @@
 ## %   the k-th column of the Khatri-Rao product is defined as
 ## %   kron(A(:,k),B(:,k)).
 
-KhatriRao <- function(X, Y = X, FUN = "*", sparseY = TRUE, make.dimnames = FALSE)
-{
+KhatriRao <- function(X, Y = X, FUN = "*",
+                      sparseY = TRUE, make.dimnames = FALSE) {
     stopifnot((p <- ncol(X)) == ncol(Y))
     ## TODO? speedup when X = Diagonal(<n>)
     X <- asCspN(X) # not-U-diag CsparseMatrix -->  can use @x, @p, @i
@@ -58,10 +58,10 @@ KhatriRao <- function(X, Y = X, FUN = "*", sparseY = TRUE, make.dimnames = FALSE
     if((nX <- is(X, "nMatrix")) & (nY <- is(Y, "nMatrix")))
 	new("ngCMatrix", Dim=dim, Dimnames=dns, i = newi, p = newp)
     else { ## at least one of 'X' and 'Y' has an "x" slot:
-	if(nX) X <- as(as(X, "lMatrix"), "generalMatrix")
+	if(nX) X <- .sparse2g(..sparse2l(X))
 	x1 <- rep.int(X@x, rep.yn)
 	x2 <- if(non0) {
-		  if(nY && sparseY) Y <- as(as(Y, "lMatrix"), "generalMatrix")
+		  if(nY && sparseY) Y <- .sparse2g(..sparse2l(X))
                   yx <- if(sparseY) Y@x else c(Y)
 		  unlist(rep(split.default(yx, yj), xn.yp), use.names=FALSE)
 	      } else if(nY) logical() else (if(sparseY) Y@x else c(Y))[0]

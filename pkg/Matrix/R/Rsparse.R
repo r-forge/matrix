@@ -182,35 +182,35 @@ setMethod("band", "RsparseMatrix",
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
-		 replTmat(as(x,"TsparseMatrix"), i=i, , value=value))
+		 replTmat(.CR2T(x), i=i, , value=value))
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "missing", j = "index",
 				value = "replValue"),
 		 function (x, i, j, ..., value)# extra " , ": want nargs() == 4
-		 replTmat(as(x,"TsparseMatrix"), , j=j, value=value))
+		 replTmat(.CR2T(x), , j=j, value=value))
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
-		 replTmat(as(x,"TsparseMatrix"), i=i, j=j, value=value))
+		 replTmat(.CR2T(x), i=i, j=j, value=value))
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value)
-		 replTmat(as(x,"TsparseMatrix"), i=i, value=value))
+		 replTmat(.CR2T(x), i=i, value=value))
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "missing", j = "index",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value)# extra " , ": want nargs() == 4
-		 replTmat(as(x,"TsparseMatrix"), , j=j, value=value))
+		 replTmat(.CR2T(x), , j=j, value=value))
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value)
-		 replTmat(as(x,"TsparseMatrix"), i=i, j=j, value=value))
+		 replTmat(.CR2T(x), i=i, j=j, value=value))
 
 
 setReplaceMethod("[", signature(x = "RsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
-		 .TM.repl.i.mat(as(x,"TsparseMatrix"), i=i, value=value))
+		 .TM.repl.i.mat(.CR2T(x), i=i, value=value))

@@ -41,7 +41,7 @@ setMethod("Math", signature(x = "ddenseMatrix"), function(x)
 {
     if(.Generic %in% Math.vecGenerics)
         ## Result is a vector
-        return(callGeneric(as(x, "generalMatrix")@x))
+        return(callGeneric(.dense2g(x, ".")@x))
     cld <- getClassDef(class(x))
     if(extends(cld, "symmetricMatrix")) {
         ## Argument and result are symmetricMatrix
@@ -101,7 +101,7 @@ setMethod("Math", signature(x = "CsparseMatrix"), function(x)
         return(callGeneric(.sparse2m(x)))
     if(isN0(callGeneric(0)))
         ## Result is a denseMatrix
-        return(callGeneric(.sparse2dense(x, FALSE)))
+        return(callGeneric(.sparse2dense(x)))
     ## Result preserves sparseness and structure (symmetric, triangular)
     cld <- getClassDef(cl <- class(x))
     if(extends(cld, "triangularMatrix") && x@diag != "N" &&
@@ -127,7 +127,7 @@ setMethod("Math", signature(x = "CsparseMatrix"), function(x)
 }) ## {Math}
 
 setMethod("log", signature(x = "CsparseMatrix"),
-          function(x, base = exp(1)) log(.sparse2dense(x, FALSE), base))
+          function(x, base = exp(1)) log(.sparse2dense(x), base))
 
 ###--------- diagonalMatrix
 
@@ -252,7 +252,7 @@ setMethod("Math2", signature(x = "dsparseVector"),
               x
           })
 
-## As above, but first coercing to dsparseVector
+## As above, but first coercing to dsparseVector:
 setMethod("Math2", signature(x = "sparseVector"),
 	  function(x, digits) {
 	      x <- as(x, "dsparseVector")

@@ -212,7 +212,7 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 	      na <- nargs()
 	      Matrix.msg("Tsp[i,m,l]: nargs()=", na, .M.level=2)
 	      if(na == 4)
-		  .as.Tsp(as(x,"CsparseMatrix")[i, , drop=drop], noCheck = !drop)
+		  .as.Tsp(.T2C(x)[i, , drop=drop], noCheck = !drop)
 	      else if(na == 3) ## e.g. M[0] , M[TRUE],	M[1:2]
 		  .M.vectorSub(x,i)
 	      else ## should not happen
@@ -223,13 +223,13 @@ setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 setMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop) { ## select columns
-	      .as.Tsp(as(x,"CsparseMatrix")[, j, drop=drop], noCheck = !drop)
+	      .as.Tsp(.T2C(x)[, j, drop=drop], noCheck = !drop)
 	  })
 
 setMethod("[", signature(x = "TsparseMatrix",
 			 i = "index", j = "index", drop = "logical"),
 	  function (x, i, j, ..., drop)
-	  .as.Tsp(as(x,"CsparseMatrix")[i, j, drop=drop], noCheck = !drop))
+	  .as.Tsp(.T2C(x)[i, j, drop=drop], noCheck = !drop))
 
 ## This is "just for now" -- Thinking of *not* doing this in the future
 .as.Tsp <- function(x, noCheck)
@@ -381,7 +381,7 @@ replTmat <- function (x, i, j, ..., value)
 		x@j <- x@j[sel]
 		if(has.x)
 		    x@x <- x@x[sel]
-		if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+		if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 		    x@factors <- list()
 	    }
 	    return(x)
@@ -434,7 +434,7 @@ replTmat <- function (x, i, j, ..., value)
 	    x@i <- c(x@i, i %%  nr)
 	    x@j <- c(x@j, i %/% nr)
 	}
-	if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+	if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 	    x@factors <- list()
 	return(x)
     } ## {nargs = 3;  x[ii] <- value }
@@ -542,7 +542,7 @@ replTmat <- function (x, i, j, ..., value)
 	    x@j <- x@j[!sel]
             if(has.x)
 		x@x <- x@x[!sel]
-	    if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+	    if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 		x@factors <- list()
 	}
 	return(x)
@@ -573,7 +573,7 @@ replTmat <- function (x, i, j, ..., value)
             if(has.x)
                 x@x <- c(x@x, value)
         }
-	if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+	if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 	    x@factors <- list()
         return(x)
     }
@@ -587,7 +587,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(nonTRUEoption("Matrix.quiet"))
 	    message(gettextf("x[.,.] <- val : x being coerced from Tsparse* to CsparseMatrix"),
 		    domain = NA)
-	return(replCmat4(as(x,"CsparseMatrix"), i1, i2, iMi=iMi, jMi=jMi,
+	return(replCmat4(.T2C(x), i1, i2, iMi=iMi, jMi=jMi,
 			 value = if(spV) value else as(value, "sparseVector"),
 			 spV = TRUE))
     }
@@ -670,7 +670,7 @@ replTmat <- function (x, i, j, ..., value)
 		x@x <- c(x@x, as.vector(value[iIN0]))
 	}
     }
-    if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+    if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 	x@factors <- list()
     x
 } ## end{replTmat}
@@ -804,9 +804,9 @@ replTmat <- function (x, i, j, ..., value)
     i.repl <- !is.na(m1) # those that need to be *replaced*
 
     if(isN) { ## no 'x' slot
-	isN <- all(value %in% c(FALSE, TRUE)) # will result remain  "nMatrix" ?
+	isN <- is.logical(value) # will result remain  "nMatrix" ?
 	if(!isN)
-	    x <- as(x, if(extends(clDx, "lMatrix")) "lMatrix" else "dMatrix")
+            x <- ..sparse2d(x)
     }
     has.x <- !isN ## isN  <===> "remains pattern matrix" <===> has no 'x' slot
 
@@ -814,7 +814,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(has.x)
 	    x@x[m1[i.repl]] <- value[i.repl]
 	else { # nMatrix ; eliminate entries that are set to FALSE; keep others
-	    if(any(isF <- !value[i.repl]))  {
+	    if(any(isF <- is0(value[i.repl])))  {
 		ii <- m1[i.repl][isF]
 		x@i <- x@i[ -ii]
 		x@j <- x@j[ -ii]
@@ -829,7 +829,7 @@ replTmat <- function (x, i, j, ..., value)
 	    x@x <- c(x@x, value[i.new])
     }
 
-    if(.hasSlot(x, "factors") && length(x@factors)) # drop cashed ones
+    if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 	x@factors <- list()
     x
 } ## end{.TM.repl.i.mat}
@@ -871,9 +871,9 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 
 
 setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
-	  function(a, b, ...) solve(as(a, "CsparseMatrix"), b))
+	  function(a, b, ...) solve(.T2C(a), b))
 setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
-	  function(a, b, ...) solve(as(a, "CsparseMatrix")))
+	  function(a, b, ...) solve(.T2C(a)))
 
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {

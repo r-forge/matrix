@@ -16,29 +16,29 @@ setAs("matrix.coo", "dgTMatrix",
 
 ## Remaining matrix.c(sc|sr|oo) to dgCMatrix
 setAs("matrix.csr", "dgCMatrix",
-      function(from) as(as(from, "dgRMatrix"), "CsparseMatrix"))
+      function(from) .CR2RC(as(from, "dgRMatrix")))
 setAs("matrix.coo", "dgCMatrix",
-      function(from) as(as(from, "dgTMatrix"), "CsparseMatrix"))
+      function(from) .T2C(as(from, "dgTMatrix")))
 
 ## Each matrix.c(sc|sr|oo) to each [CRT]sparseMatrix
 setAs("matrix.csc", "CsparseMatrix",
-      function(from)    as(from, "dgCMatrix"))
+      function(from)        as(from, "dgCMatrix"))
 setAs("matrix.csc", "RsparseMatrix",
-      function(from) as(as(from, "dgCMatrix"), "RsparseMatrix"))
+      function(from) .CR2RC(as(from, "dgCMatrix")))
 setAs("matrix.csc", "TsparseMatrix",
-      function(from) as(as(from, "dgCMatrix"), "TsparseMatrix"))
+      function(from)  .CR2T(as(from, "dgCMatrix")))
 setAs("matrix.csr", "CsparseMatrix",
-      function(from) as(as(from, "dgRMatrix"), "CsparseMatrix"))
+      function(from) .CR2RC(as(from, "dgRMatrix")))
 setAs("matrix.csr", "RsparseMatrix",
-      function(from)    as(from, "dgRMatrix"))
+      function(from)        as(from, "dgRMatrix"))
 setAs("matrix.csr", "TsparseMatrix",
-      function(from) as(as(from, "dgRMatrix"), "TsparseMatrix"))
+      function(from)  .CR2T(as(from, "dgRMatrix")))
 setAs("matrix.coo", "CsparseMatrix",
-      function(from) as(as(from, "dgTMatrix"), "CsparseMatrix"))
+      function(from)   .T2C(as(from, "dgTMatrix")))
 setAs("matrix.coo", "RsparseMatrix",
-      function(from) as(as(from, "dgTMatrix"), "RsparseMatrix"))
+      function(from)   .T2R(as(from, "dgTMatrix")))
 setAs("matrix.coo", "TsparseMatrix",
-      function(from)    as(from, "dgTMatrix"))
+      function(from)        as(from, "dgTMatrix"))
 
 ## Each matrix.c(sc|sr|oo) to sparseMatrix, Matrix ("easy")
 ## NB: favouring column format over row format

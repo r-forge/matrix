@@ -538,8 +538,29 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .dense2kind <- function(from, kind)
     .Call(R_dense_as_kind, from, kind)
 
+..dense2d <- function(from)
+    .Call(R_dense_as_kind, from, "d")
+
+..dense2l <- function(from)
+    .Call(R_dense_as_kind, from, "l")
+
+..dense2n <- function(from)
+    .Call(R_dense_as_kind, from, "n")
+
 .sparse2kind <- function(from, kind, drop0 = FALSE)
     .Call(R_sparse_as_kind, from, kind, drop0)
+
+..sparse2d <- function(from)
+    .Call(R_sparse_as_kind, from, "d", FALSE)
+##                                     drop0
+
+..sparse2l <- function(from)
+    .Call(R_sparse_as_kind, from, "l", FALSE)
+##                                     drop0
+
+..sparse2n <- function(from)
+    .Call(R_sparse_as_kind, from, "n", FALSE)
+##                                     drop0
 
 .diag2kind <- function(from, kind)
     .Call(R_diagonal_as_kind, from, kind)
