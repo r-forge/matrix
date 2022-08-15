@@ -110,7 +110,7 @@ setMethod("updown",
                   stop("'update' must be TRUE, FALSE, \"+\", or \"-\"")
               bnew <- as(L, "pMatrix") %*% C
               .Call(CHMfactor_updown,
-                    update == "+", as(bnew, "CparseMatrix"), L)
+                    update == "+", as(bnew, "CsparseMatrix"), L)
           })
 
 ## "Fallback" giving a "good" error message
