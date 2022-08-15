@@ -43,6 +43,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "sparseMatrix"),
 		   ...) {
 	      chkDots(..., which.call = -2L)
 	      system.def <- eval(formals()$system)
+              ##-> cholmod_spsolve() in ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
               .Call(CHMfactor_spsolve, a,
                     ## sparseMatrix->dgCMatrix
                     .sparse2kind(.sparse2g(as(b, "CsparseMatrix")), "d", FALSE),
