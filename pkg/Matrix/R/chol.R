@@ -101,7 +101,7 @@ setMethod("Cholesky", signature(A = "dsCMatrix"),
 
 setMethod("chol2inv", signature(x = "denseMatrix"), # ->dtrMatrix
 	  function(x, ...)
-              chol2inv(unpack(.M2tri(.dense2kind(x, "d"))), ...))
+              chol2inv(unpack(.M2tri(..dense2d(x))), ...))
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
 	  function (x, ...) {

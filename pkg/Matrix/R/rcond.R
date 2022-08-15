@@ -26,7 +26,7 @@ setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
 	  })
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
-	  function(x, norm, ...) rcond(.dense2kind(x, "d"), norm = norm, ...))
+	  function(x, norm, ...) rcond(..dense2d(x), norm = norm, ...))
 
 setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
 	  function(x, norm, ...) {
