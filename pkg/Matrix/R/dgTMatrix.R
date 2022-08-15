@@ -91,7 +91,7 @@ setMethod("image", "dgTMatrix", ## *The* real one
 	      x@i <- x@j <- 0L
 	  }
           if(missing(useAbs)) { ## use abs() when all values are non-neg
-              useAbs <- if(empty.x) FALSE else min(xx, na.rm=TRUE)
+              useAbs <- if(empty.x) FALSE else min(xx, na.rm=TRUE) >= 0
           } else if(useAbs)
               xx <- abs(xx)
           ## rx <- range(xx, finite=TRUE)

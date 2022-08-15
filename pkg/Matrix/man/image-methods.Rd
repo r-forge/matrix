@@ -103,7 +103,8 @@ showMethods(image, incl=TRUE, inherit=FALSE)
 op <- options(warn = 2)
 }
 data(CAex)
-image(CAex, main = "image(CAex)")
+image(CAex, main = "image(CAex)") -> imgC; imgC
+stopifnot(!is.null(leg <- imgC$legend), is.list(leg$right)) # failed for 2 days ..
 image(CAex, useAbs=TRUE, main = "image(CAex, useAbs=TRUE)")
 
 cCA <- Cholesky(crossprod(CAex), Imult = .01)
