@@ -131,7 +131,8 @@ identical4(cbind(diag(4), diag(4)),
            cbind(D4T, D4C),
            cbind(D4C, D4T))
 nr <- 4
-m. <- matrix(c(0, 2:-1),  nr ,6)
+nc <- 6
+m. <- matrix(rep_len(c(0, 2:-1), nr * nc), nr, nc)
 M <- Matrix(m.)
 (mC <- as(M, "CsparseMatrix"))
 (mT <- as(M, "TsparseMatrix"))
