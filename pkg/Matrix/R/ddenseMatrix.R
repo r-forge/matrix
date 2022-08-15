@@ -145,29 +145,3 @@ setMethod("is.infinite", signature(x = "ddenseMatrix"),
 	      else is.na_nsp(x)
 	  })
 } ## MJ
-
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "ddenseMatrix", type = "missing"),
-	  function(x, type, ...) norm(..2dge(x), "O", ...))
-
-setMethod("rcond", signature(x = "ddenseMatrix", norm = "missing"),
-	  function(x, norm, ...) rcond(..2dge(x), "O", ...))
-} ## MJ
-
-setMethod("chol", signature(x = "ddenseMatrix"),
-          function(x, pivot = FALSE, ...) {
-              packed <- .isPacked(x)
-              nmCh <- if(packed) "pCholesky" else "Cholesky"
-              if(!is.null(ch <- x@factors[[nmCh]]))
-                  ## use the cache
-                  return(ch)
-              px <- as(x, if(packed) "dppMatrix" else "dpoMatrix")
-              if(isTRUE(validObject(px, test = TRUE)))
-                  ## 'pivot' is not used for dpoMatrix
-                  .set.factors(x, nmCh, chol(px, pivot, ...))
-              else stop("chol(x) is undefined: 'x' is not positive definite")
-          })
-
-setMethod("lu", signature(x = "ddenseMatrix"),
-	  function(x, ...) .set.factors(x, "LU", lu(.dense2g(x, "."), ...)))

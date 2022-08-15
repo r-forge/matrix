@@ -56,18 +56,6 @@ setAs("dpoMatrix", "nMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("rcond", signature(x = "dpoMatrix", norm = "missing"),
-          function(x, norm, ...) .Call(dpoMatrix_rcond, x, "O"))
-} ## MJ
-
-setMethod("chol", signature(x = "dpoMatrix"),
-	  function(x, ...) .Call(dpoMatrix_chol, x))
-
-setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dpoMatrix_rcond, x, norm))
-
 setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
           function(a, b, ...) .Call(dpoMatrix_solve, a))
 

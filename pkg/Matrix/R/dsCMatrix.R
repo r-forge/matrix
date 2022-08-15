@@ -155,18 +155,6 @@ setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
 setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
 	  function(a, b, ...) solve(a, .trDiagonal(nrow(a), unitri=FALSE), ...))
 
-
-
-setMethod("chol", signature(x = "dsCMatrix"),
-	  function(x, pivot = FALSE, ...) .Call(dsCMatrix_chol, x, pivot),
-	  valueClass = "dtCMatrix")
-
-setMethod("Cholesky", signature(A = "dsCMatrix"),
-          ## signature(): leaving away (perm, LDL,..), but specify below:
-          ##              <==> all "ANY"
-          function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-          .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
-
 ## MJ: no longer needed ... method now inherited from CsparseMatrix
 if(FALSE) {
 setMethod("t", signature(x = "dsCMatrix"),

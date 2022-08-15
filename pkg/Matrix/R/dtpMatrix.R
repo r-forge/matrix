@@ -48,24 +48,6 @@ setMethod("diag<-", signature(x = "dtpMatrix"),
 	  })
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "dtpMatrix", type = "missing"),
-	  function(x, type, ...) .Call(dtpMatrix_norm, x, "O"))
-
-setMethod("rcond", signature(x = "dtpMatrix", norm = "missing"),
-	  function(x, norm, ...) .Call(dtpMatrix_rcond, x, "O"))
-} ## MJ
-
-setMethod("norm", signature(x = "dtpMatrix", type = "character"),
-	  function(x, type, ...)
-              if(identical(type, "2"))
-                  norm2(x)
-              else .Call(dtpMatrix_norm, x, type))
-
-setMethod("rcond", signature(x = "dtpMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dtpMatrix_rcond, x, norm))
-
 setMethod("solve", signature(a = "dtpMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dtpMatrix_solve, a))
 

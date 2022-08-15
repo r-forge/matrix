@@ -3,27 +3,6 @@
 ## ... but _excluding_ ddiMatrix (FIXME?)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## fails e.g. for 'dtCMatrix'; "triangularMatrix" has own method in ./triangularMatrix.R
-setMethod("chol", signature(x = "dsparseMatrix"),
-	   function(x, pivot=FALSE, cache=TRUE, ...) {
-	       nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-	       if(!is.null(ch <- x@factors[[nm]]))
-		   return(ch) ## use the cache
-	       px <- as(x, "symmetricMatrix")
-	       if (isTRUE(validObject(px, test=TRUE))) {
-		   if(cache)
-                       .set.factors(x, nm,
-                                    chol(as(px, "CsparseMatrix"), pivot=pivot, ...))
-                   else chol(as(px, "CsparseMatrix"), pivot=pivot, ...)
-               }
-	       else stop("'x' is not positive definite -- chol() undefined.")
-	   })
-
-setMethod("lu", signature(x = "dsparseMatrix"),
-	  function(x, cache=TRUE, ...)
-	  if(cache) .set.factors(x, "lu", lu(as(x, "dgCMatrix"), ...))
-	  else lu(as(x, "dgCMatrix"), ...))
-
 setMethod("is.finite", signature(x = "dsparseMatrix"),
 	  function(x) {
 	      if(any(!is.finite(x@x))) {

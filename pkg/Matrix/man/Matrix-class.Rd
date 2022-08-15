@@ -65,7 +65,6 @@
 \alias{cov2cor,Matrix-method}
 \alias{determinant,Matrix,missing-method}
 \alias{determinant,Matrix,logical-method}
-\alias{diag,Matrix-method}
 \alias{diff,Matrix-method}
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}
@@ -86,7 +85,6 @@
 \alias{rbind2,Matrix,missing-method}
 \alias{rbind2,NULL,Matrix-method}
 \alias{rep,Matrix-method}
-\alias{t,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{unname,Matrix,missing-method}
 \alias{svd,Matrix-method} % if(.Matrix.avoiding.as.matrix)

@@ -268,7 +268,8 @@ replCmat <- function (x, i, j, ..., value)
                   iMi = iMi, jMi = jMi, value = value)
 } ## replCmat
 
-replCmat4 <- function(x, i1, i2, iMi, jMi, value, spV = is(value,"sparseVector"))
+replCmat4 <- function(x, i1, i2, iMi, jMi, value,
+                      spV = is(value, "sparseVector"))
 {
     dind <- c(length(i1), length(i2)) # dimension of replacement region
     lenRepl <- prod(dind)
@@ -553,16 +554,6 @@ setMethod("writeMM", "CsparseMatrix",
 	  function(obj, file, ...)
 	  .Call(Csparse_MatrixMarket, obj, path.expand(as.character(file))))
 
-setMethod("Cholesky", signature(A = "CsparseMatrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-	  Cholesky(as(A, "symmetricMatrix"),
-		   perm=perm, LDL=LDL, super=super, Imult=Imult, ...))
-
-## TODO (in ../TODO for quite a while .....):
-setMethod("Cholesky", signature(A = "nsparseMatrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-	  stop("Cholesky(<nsparse...>) -> *symbolic* factorization -- not yet implemented"))
-
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
 ## FIXME: do isDiagonal(<CsparseMatrix>) in C ...
@@ -642,9 +633,9 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
         if(!extends(cld, "CsparseMatrix"))
             cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
         if(extends(cld, "symmetricMatrix"))
-            cld <- getClassDef(class(x <- as(x, "generalMatrix")))
+            cld <- getClassDef(class(x <- .sparse2g(x)))
         if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
-            x <- as(x, "dMatrix")
+            x <- ..sparse2d(x)
     } else { # typically a traditional matrix
         x <- .m2sparse(x, "dgC", NULL, NULL)
     }

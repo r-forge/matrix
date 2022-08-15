@@ -39,32 +39,6 @@ setMethod("diag<-", signature(x = "dtrMatrix"),
 	  })
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "dtrMatrix", type = "missing"),
-	  function(x, type, ...) .Call(dtrMatrix_norm, x, "O"))
-
-setMethod("rcond", signature(x = "dtrMatrix", norm = "missing"),
-	  function(x, norm, ...) .Call(dtrMatrix_rcond, x, "O"))
-} ## MJ
-
-setMethod("norm", signature(x = "dtrMatrix", type = "character"),
-	  function(x, type, ...) {
-              if(identical(type, "2"))
-                  norm2(x)
-              else .Call(dtrMatrix_norm, x, type)
-          })
-
-setMethod("rcond", signature(x = "dtrMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dtrMatrix_rcond, x, norm))
-
-setMethod("chol2inv", signature(x = "dtrMatrix"),
-	  function (x, ...) {
-	      if(x@diag != "N")
-                  x <- .dense.diagU2N(x)
-	      .Call(dtrMatrix_chol2inv, x)
-	  })
-
 setMethod("solve", signature(a = "dtrMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dtrMatrix_solve, a))
 

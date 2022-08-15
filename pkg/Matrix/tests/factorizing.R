@@ -634,7 +634,13 @@ stopifnot(exprs = {
     all.equal(d*log(2), c(d2M$modulus - dS$modulus))
 })
 
-
+## misc. bugs found in Matrix 1.4-1
+L. <- new("dtCMatrix", Dim = c(1L, 1L), uplo = "L",
+          p = c(0L, 1L), i = 0L, x = 1)
+S. <- forceSymmetric(L.)
+lu(S.)
+stopifnot(validObject(lu(L.)), # was invalid
+          identical(names(S.@factors), "LU")) # was "lu"
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 

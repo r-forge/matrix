@@ -73,18 +73,6 @@ setMethod("t", signature(x = "dppMatrix"),
           valueClass = "dppMatrix")
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("rcond", signature(x = "dppMatrix", norm = "missing"),
-          function(x, norm, ...) .Call(dppMatrix_rcond, x, "O"))
-} ## MJ
-
-setMethod("chol", signature(x = "dppMatrix"),
-	  function(x, ...) .Call(dppMatrix_chol, x))
-
-setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dppMatrix_rcond, x, norm))
-
 setMethod("solve", signature(a = "dppMatrix", b = "missing"),
           function(a, b, ...) .Call(dppMatrix_solve, a))
 

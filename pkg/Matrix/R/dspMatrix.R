@@ -34,26 +34,8 @@ setMethod("diag<-", signature(x = "dspMatrix"),
 	  function(x, value) .Call(dspMatrix_setDiag, x, value))
 } ## MJ
 
-## MJ: now inherited from ANY
-if(FALSE) {
-setMethod("norm", signature(x = "dspMatrix", type = "missing"),
-          function(x, type, ...) .Call(dspMatrix_norm, x, "O"))
-
-setMethod("rcond", signature(x = "dspMatrix", norm = "missing"),
-          function(x, norm, ...) .Call(dspMatrix_rcond, x, "O"))
-} ## MJ
-
 setMethod("BunchKaufman", signature(x = "dspMatrix"),
 	  function(x, ...) .Call(dspMatrix_trf, x))
-
-setMethod("norm", signature(x = "dspMatrix", type = "character"),
-	  function(x, type, ...)
-              if(identical(type, "2"))
-                  norm2(x)
-              else .Call(dspMatrix_norm, x, type))
-
-setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dspMatrix_rcond, x, norm))
 
 setMethod("solve", signature(a = "dspMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dspMatrix_solve, a))

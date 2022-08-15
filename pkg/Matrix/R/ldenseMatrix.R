@@ -199,7 +199,6 @@ setMethod("norm", signature(x = "ldenseMatrix", type = "character"),
 .rcond_via_d <- function(x, norm, ...)
     rcond(as(as(x, "dMatrix"), "dgeMatrix"), norm=norm, ...)
 
-
 setMethod("rcond", signature(x = "ldenseMatrix", norm = "character"),
 	  .rcond_via_d, valueClass = "numeric")
 } ## MJ
