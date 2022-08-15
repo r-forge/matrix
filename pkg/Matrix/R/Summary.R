@@ -80,7 +80,7 @@ setMethod("Summary", "dsparseMatrix",
 		  if(anyNA(x@x)) NaN else 0
 	      }
 	      else
-		  callGeneric((if(isSym) as(x, "generalMatrix") else x)@x,
+		  callGeneric((if(isSym) .sparse2g(x) else x)@x,
 			      if(!full.x) 0, # one 0 <==> many 0's
 			      if(isU.tri) rep.int(1, n),
 			      ..., na.rm = na.rm)
@@ -117,14 +117,14 @@ Summ.ln.dense <- function(x, ..., na.rm) {
 					diag= TRUE)],
 			..., na.rm = na.rm)
 	} else ## sum() -- FIXME-faster: use x@x[indTri(...)] similar to above
-	    callGeneric(as(x, "generalMatrix")@x, ..., na.rm = na.rm)
+	    callGeneric(.dense2g(x)@x, ..., na.rm = na.rm)
     }
     else { ## triangular , possibly packed
 	if(.Generic != "sum") ## incl. prod() !
 	    callGeneric(x@x, if(d[1] >= 2) FALSE, if(x@diag == "U") TRUE, ..., na.rm = na.rm)
 	else ## sum() -- FIXME-faster: using indTri()..; in unit-diag. case: plus  n x TRUE = d[1]
 	    ## if packed: sum(x@x, if(x@diag == "U") d[1], ..., na.rm = na.rm)
-	    callGeneric(as(x, "generalMatrix")@x, ..., na.rm = na.rm)
+	    callGeneric(.dense2g(x)@x, ..., na.rm = na.rm)
     }
 }
 
@@ -154,7 +154,7 @@ setMethod("all", "lsparseMatrix",
 	      else if(is(x, "symmetricMatrix") && l.x == choose(d[1]+1, 2)) {
 		  if(.Generic %in% summGener1)
 		      all(x@x, ..., na.rm = na.rm)
-		  else all(as(x, "generalMatrix")@x, ..., na.rm = na.rm)
+		  else all(.sparse2g(x)@x, ..., na.rm = na.rm)
 	      }
 	      else FALSE ## has at least one structural 0
 	  })
@@ -262,7 +262,7 @@ setMethod("all", "nsparseMatrix",
 		  return(FALSE)
 	      ## else
 	      if(extends(cld, "TsparseMatrix"))
-		  cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
+		  cld <- getClassDef(class(x <- .T2C(x)))
 	      ## now have Csparse or Rsparse: length of index slot = no.{TRUE}
 	      l.x <- length(if(extends(cld, "CsparseMatrix")) x@i else x@j)
 

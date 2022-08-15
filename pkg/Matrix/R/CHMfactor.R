@@ -46,7 +46,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "sparseMatrix"),
               ##-> cholmod_spsolve() in ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
               .Call(CHMfactor_spsolve, a,
                     ## 'b' as dgCMatrix:
-                    .sparse2kind(.sparse2g(as(b, "CsparseMatrix")), "d"),
+                    ..sparse2d(.sparse2g(as(b, "CsparseMatrix"))),
 		    match(match.arg(system, system.def), system.def, 0L))
 	  })
 
@@ -77,7 +77,7 @@ setMethod("update", signature(object = "CHMfactor"),
                   cld <- getClassDef(class(parent))
               }
               if(!extends(cld, "dMatrix")) {
-                  parent <- .sparse2kind(parent, "d")
+                  parent <- ..sparse2d(parent)
                   cld <- getClassDef(class(parent))
               }
               if(!extends(cld, "symmetricMatrix") &&
