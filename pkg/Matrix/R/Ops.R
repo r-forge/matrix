@@ -163,18 +163,21 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
     slots1 <- names(cl1@slots)
     has.x <- any("x" == slots1)# *fast* check for "x" slot presence
     if(l2 > 1 && has.x)
-	return(if(n1 == 0)
-		   new(class2(cl, "l"), x = callGeneric(e1@x, e2),
-		       Dim = d, Dimnames = e1@Dimnames)
-	       else ## e2 cannot simply be compared with e1@x --> use another method
+	return(if(n1 == 0) {
+		   sNms <- .slotNames(e1)
+		   r <- copyClass(e1, class2(cl,"l"), sNames = sNms[sNms != "x"], check=FALSE)
+		   r@x <- callGeneric(e1@x, e2)
+		   r
+	       } else ## e2 cannot simply be compared with e1@x --> use another method
 		   callGeneric(e1, Matrix(e2, nrow=d[1], ncol=d[2])))
     ## else
     Udg <- extends(cl1, "triangularMatrix") && e1@diag == "U"
     r0 <- callGeneric(0, e2)
+    r <- callGeneric(if(has.x) e1@x else TRUE, e2)
     ## Udg: append the diagonal at *end*, as diagU2N():
-    r  <- callGeneric(if(Udg) c(e1@x,..diag.x(e1)) else if(has.x) e1@x else TRUE, e2)
+    r. <- if(Udg) c(r, callGeneric(..diag.x(e1), e2)) else r
     ## trivial case first (beware of NA)
-    if(isTRUE(all(r0) && all(r))) {
+    if(isTRUE(all(r0) && all(r.))) {
         r <- new(if(d[1] == d[2]) "lsyMatrix" else "lgeMatrix")
         r@Dim <- d
         r@Dimnames <- e1@Dimnames
@@ -220,6 +223,8 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
             if(Udg && remainSparse) {
             } else { ## result will not be unit-diagonal sparse
                 e1 <- .diagU2N(e1, cl = cl1) # otherwise, result is U-diag
+                ## FIXME? rather
+                ## if(extends1of(cl1, c("CsparseMatrix", "RsparseMatrix","TsparseMatrix")) {
                 if(extends(cl1, "CsparseMatrix")) {
                     ## repeat computation if e1 has changed
                     r <- callGeneric(if(has.x) e1@x else TRUE, e2)
