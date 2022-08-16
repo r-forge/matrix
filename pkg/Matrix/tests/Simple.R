@@ -313,8 +313,8 @@ stopifnot(identical(x*D, (Dx <- D*x)),
 	  identical(Dx, local({d <- D; d@x <- d@x * x; d})))
 
 Lrg <- new("dgTMatrix", Dim = c(n,n))
-l0 <- as(as(Lrg, "lMatrix"), "lgCMatrix")
-d0 <- as(l0, "dgCMatrix")
+l0 <- as(as(Lrg, "lMatrix"), "CsparseMatrix") # lgC
+d0 <- as(l0, "dMatrix")
 
 if(FALSE) { #_____________________ FIXME: Should use cholmod_l_*() everywhere (?)____
 ## problem in  Csparse_to_dense :
@@ -411,9 +411,9 @@ if(doExtras && is.finite(memGB) && memGB > 35) withAutoprint({
 ## with dimnames:
 v <- c(a=1, b=2:3)
 m <- as.matrix(v)
-M <- as(v, "dgeMatrix")
+(M <- as(v, "denseMatrix") )
 stopifnot(identical(dimnames(m), list(c("a", "b1", "b2"), NULL)),
-	  identical(M, as(m, "dgeMatrix")),
+	  inherits(M, "dgeMatrix"),
 	  identical(dimnames(M), dimnames(m)))
 
 ## dimnames(.) of symmpart() / skewpart() :
@@ -536,7 +536,9 @@ stopifnot(identical3(D3, tril(D3), triu(D3)))
 
 ## as(<diag>, <anything>) :
 str(cls <- names(getClass("Matrix")@subclasses))# all Matrix classes
-for(cl in cls)
+## Matrix >= 1.4.2 : (basically) only coerce to virtual classes:
+table(isVirt <- vapply(cls, isVirtualClass, NA))
+for(cl in cls[isVirt])
     if(canCoerce(I4, cl)) {
 	cat(cl,":")
 	M  <- as(I4, cl)
@@ -564,16 +566,18 @@ stopifnot(range(L) == 0:1, all.equal(mean(L), 5/8))
 ## from  0-diagonal to unit-diagonal triangular {low-level step}:
 tu <- t1 ; tu@diag <- "U"
 tu
-validObject(cu <- as(tu, "dtCMatrix"))
+validObject(cu <- as(tu, "CsparseMatrix")) # still unitriangular
 validObject(cnu <- diagU2N(cu))# <- testing diagU2N
-validObject(tu. <- as(cu, "dtTMatrix"))
+## validObject(tu. <- as(cu, "dtTMatrix"))
 validObject(tt <- as(cu, "TsparseMatrix"))
-stopifnot(## NOT: identical(tu, tu.), # since T* is not unique!
-	  identical(cu, as(tu., "dtCMatrix")),
-          length(cnu@i) == length(cu@i) + nrow(cu),
-          identical(cu, diagN2U(cnu)),# <- testing diagN2U
-	  all(cu >= 0, na.rm = TRUE), all(cu >= 0),
-	  any(cu >= 7))
+stopifnot(exprs = { ## NOT: identical(tu, tu.), # since T* is not unique!
+    identical(cu, as(tt, "CsparseMatrix"))
+    length(cnu@i) == length(cu@i) + nrow(cu)
+    identical(cu, diagN2U(cnu)) # <- testing diagN2U
+    all(cu >= 0, na.rm = TRUE)
+    all(cu >= 0)
+    any(cu >= 7)
+})
 validObject(tcu <- t(cu))
 validObject(ttu <- t(tu))
 validObject(ltu <- as(ttu, "lMatrix"))
@@ -715,14 +719,14 @@ stopifnot(identical4(lp[ij], ltlp, sltlp, as(lp, "matrix")[ij]),
 ###-- more solve() methods  {was ./solve.R }
 
 ## first for "dgeMatrix" and all kinds of RHS :
-(m6 <- 1 + as(diag(0:5), "dgeMatrix"))
+(m6 <- 1 + as(diag(0:5), "generalMatrix"))
 rcond(m6)
-I6 <- as(diag(6), "dgeMatrix")
+I6 <- as(diag(6), "generalMatrix")
 stopifnot(all.equal(I6, m6 %*% solve(m6)),
           all.equal(I6, solve(m6) %*% m6) )
 
 (i6 <- solve(m6, Matrix(1:6)))
-stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "dgeMatrix")),
+stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "generalMatrix")),
           identical(i6, solve(m6, 1:6)),
           identical(i6, solve(m6, matrix(1:6))),
           identical(i6, solve(m6, matrix(c(1,2,3,4,5,6))))
