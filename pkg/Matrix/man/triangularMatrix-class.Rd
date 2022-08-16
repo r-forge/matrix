@@ -28,7 +28,7 @@
       \code{"N"} for non-unit.  The diagonal elements are not
       accessed internally when \code{diag} is \code{"U"}. For
       \code{\linkS4class{denseMatrix}} classes, they need to be
-      allocated though, i.e., the length of the \code{x} slot does not
+      allocated though, such that the length of the \code{x} slot does not
       depend on \code{diag}.}
     \item{\code{Dim}, \code{Dimnames}:}{The dimension (a length-2
       \code{"integer"}) and corresponding names (or \code{NULL}),

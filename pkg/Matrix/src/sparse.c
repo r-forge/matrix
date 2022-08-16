@@ -352,7 +352,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "R_sparse_as_kind");
-    const char *clf = valid[ivalid];
+    const char *clf = valid[ivalid]; // clf := class~(from)
     if (k == '.' || k == clf[0])
 	return from;
     SEXPTYPE tx = kind2type(k); /* validating 'k' before doing more */

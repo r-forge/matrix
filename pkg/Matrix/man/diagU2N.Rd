@@ -56,9 +56,9 @@
 (t.u <- diagN2U(10*T))# changes the diagonal!
 stopifnot(all(T == uT), diag(t.u) == 1,
           identical(T, diagU2N(uT)))
-T[upper.tri(T)] <- 5
+T[upper.tri(T)] <- 5 # still "dtC"
 T <- diagN2U(as(T,"triangularMatrix"))
-dT <- as(T, "denseMatrix")
+dT <- as(T, "denseMatrix") # (unitriangular)
 dT.n <- diagU2N(dT, checkDense = TRUE)
 sT.n <- diagU2N(dT)
 stopifnot(is(dT.n, "denseMatrix"), is(sT.n, "sparseMatrix"),
