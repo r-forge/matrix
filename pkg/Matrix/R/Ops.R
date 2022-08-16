@@ -206,7 +206,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
             if(!extends(cl1, "dtpMatrix"))
                 stop("internal bug in \"Compare\" method (Cmp.Mat.atomic); please report")
 	    rx <- rep_len(r0, n1)
-	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r
+	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r.
 	    r <- new("lgeMatrix", x = rx, Dim = d, Dimnames = e1@Dimnames)
 	}
 
@@ -227,7 +227,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
                 ## if(extends1of(cl1, c("CsparseMatrix", "RsparseMatrix","TsparseMatrix")) {
                 if(extends(cl1, "CsparseMatrix")) {
                     ## repeat computation if e1 has changed
-                    r <- callGeneric(if(has.x) e1@x else TRUE, e2)
+                    r. <- callGeneric(if(has.x) e1@x else TRUE, e2)
                 }
             }
         }
@@ -260,9 +260,9 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
                 r <- copyClass(M, nCl, sNames = sN[is.na(match(sN, "x"))])
                 r@x <- callGeneric(if(has.x) M@x else 1, e2)
                 if(extends(cl1, "CsparseMatrix"))
-                    r <- as(r, "CsparseMatrix")
+                    r <- .T2C(r)
                 else if(extends(cl1, "RsparseMatrix"))
-                    r <- as(r, "RsparseMatrix")
+                    r <- .T2R(r)
             }
         }
         else { ## non sparse result; triangularity also gone, typically
@@ -270,12 +270,11 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
             Matrix.msg(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
                                lClass, .Generic, "Cmp.Mat.atomic"), .M.level = 2)
 	    rx <- rep_len(r0, n1)
-
-            ## Here, we assume that 'r' and the indices align (!)
+            ## Here, we assume that 'r.' and the indices align (!)
             encI <- .Call(m_encodeInd,
                           non0ind(e1, cl1, uniqT=FALSE, xtendSymm=FALSE),
                           di = d, orig1=FALSE, checkBounds=FALSE)
-            rx[1L + encI] <- r
+            rx[1L + encI] <- r.
             r <- new(lClass, x = rx, Dim = d, Dimnames = e1@Dimnames)
         }
     }
@@ -731,22 +730,25 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
     slots1 <- names(cl1@slots)
     has.x <- any("x" == slots1)# *fast* check for "x" slot presence
     if(l2 > 1 && has.x)
-	return(if(prod(d) == 0)
-		   new(class2(cl, "l"), x = callGeneric(e1@x, e2),
-		       Dim = d, Dimnames = e1@Dimnames)
-	       else ## e2 cannot simply be compared with e1@x --> use another method
+	return(if(n1 == 0) {
+		   sNms <- .slotNames(e1)
+		   r <- copyClass(e1, class2(cl,"l"), sNames = sNms[sNms != "x"], check=FALSE)
+		   r@x <- callGeneric(e1@x, e2)
+		   r
+	       } else ## e2 cannot simply be compared with e1@x --> use another method
 		   callGeneric(e1, Matrix(e2, nrow=d[1], ncol=d[2])))
     ## else
     Udg <- extends(cl1, "triangularMatrix") && e1@diag == "U"
     r0 <- callGeneric(0, e2)
+    r <- callGeneric(if(has.x) e1@x else TRUE, e2)
     ## Udg: append the diagonal at *end*, as diagU2N():
-    r  <- callGeneric(if(Udg) c(e1@x,..diag.x(e1)) else if(has.x) e1@x else TRUE, e2)
+    r. <- if(Udg) c(r, callGeneric(..diag.x(e1), e2)) else r
     ## trivial case first (beware of NA)
-    if(isTRUE(all(r0) && all(r))) {
+    if(isTRUE(all(r0) && all(r.))) {
         r <- new(if(d[1] == d[2]) "lsyMatrix" else "lgeMatrix")
         r@Dim <- d
         r@Dimnames <- e1@Dimnames
-        r@x <- rep.int(TRUE, prod(d))
+        r@x <- rep.int(TRUE, n1)
     }
     else if(extends(cl1, "denseMatrix")) {
 	full <- !.isPacked(e1)	   # << both "dtr" and "dsy" are 'full'
@@ -770,8 +772,8 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
             ## [dense & packed & not symmetric ] ==> must be "ltp*" :
             if(!extends(cl1, "ltpMatrix"))
                 stop("internal bug in \"Logic\" method (Logic.Mat.atomic); please report")
-	    rx <- rep_len(r0, prod(d))
-	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r
+	    rx <- rep_len(r0, n1)
+	    rx[indTri(d[1], upper = (e1@uplo == "U"), diag=TRUE)] <- r.
 	    r <- new("lgeMatrix", x = rx, Dim = d, Dimnames = e1@Dimnames)
 	}
 
@@ -789,9 +791,11 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
             if(Udg && remainSparse) {
             } else { ## result will not be unit-diagonal sparse
                 e1 <- .diagU2N(e1, cl = cl1) # otherwise, result is U-diag
+                ## FIXME? rather
+                ## if(extends1of(cl1, c("CsparseMatrix", "RsparseMatrix","TsparseMatrix")) {
                 if(extends(cl1, "CsparseMatrix")) {
                     ## repeat computation if e1 has changed
-                    r <- callGeneric(if(has.x) e1@x else TRUE, e2)
+                    r. <- callGeneric(if(has.x) e1@x else TRUE, e2)
                 }
             }
         }
@@ -834,13 +838,13 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
                 "lsyMatrix" else "lgeMatrix"
             Matrix.msg(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
                                lClass, .Generic, "Logic.Mat.atomic"), .M.level = 2)
-	    rx <- rep_len(r0, prod(d))
+	    rx <- rep_len(r0, n1)
 
-            ## Here, we assume that 'r' and the indices align (!)
+            ## Here, we assume that 'r.' and the indices align (!)
             encI <- .Call(m_encodeInd,
                           non0ind(e1, cl1, uniqT=FALSE, xtendSymm=FALSE),
                           di = d, orig1=FALSE, checkBounds=FALSE)
-            rx[1L + encI] <- r
+            rx[1L + encI] <- r.
             r <- new(lClass, x = rx, Dim = d, Dimnames = e1@Dimnames)
         }
     }

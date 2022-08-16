@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2022-08-11 r82713) -- "Unsuffered Consequences"
+R Under development (unstable) (2022-08-14 r82716) -- "Unsuffered Consequences"
 Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -250,10 +250,8 @@ Time (user system elapsed): 0.043 0.005 0.048
 +            cbind(D4C, D4T))
 [1] FALSE
 > nr <- 4
-> m. <- matrix(c(0, 2:-1),  nr ,6)
-Warning message:
-In matrix(c(0, 2:-1), nr, 6) :
-  data length [5] is not a sub-multiple or multiple of the number of rows [4]
+> nc <- 6
+> m. <- matrix(rep_len(c(0, 2:-1), nr * nc), nr, nc)
 > M <- Matrix(m.)
 > (mC <- as(M, "CsparseMatrix"))
 4 x 6 sparse Matrix of class "dgCMatrix"

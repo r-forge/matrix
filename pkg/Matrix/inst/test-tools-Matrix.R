@@ -720,9 +720,11 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	    CatF("as(mm., \"triangularMatrix\"): ")
 	    tm <- as(mm., "triangularMatrix")
 	    Cat("valid:", validObject(tm), "\n")
-	    if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
+	    if(m@uplo == tm@uplo) { ## otherwise, the matrix effectively was *diagonal*
+                if(!isSparse && Matrix:::.isPacked(m)) m <- unpack(m) # to match tm
 		## note that diagU2N(<dtr>) |-> dtC, now dtT:
 		stopifnot(Qidentical(tm, maybeDense(diagU2N(m))))
+            }
 	}
 	else if(isDiag) {
 
