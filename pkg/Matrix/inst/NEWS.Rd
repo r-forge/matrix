@@ -272,6 +272,10 @@
       \item \code{lu(x)} had sometimes incorrectly cached its
       return value as element \code{"lu"} (rather than \code{"LU"})
       of \code{x@factors}.  Now it is always \code{"LU"}.
+
+      \item \code{"Compare"} operators, e.g., \code{a > b}, \code{x != y},
+      now work correctly in more dense unitriangular and sparse 0-extent
+      cases.
     }
   }
   \subsection{New Features}{

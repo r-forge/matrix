@@ -1373,6 +1373,22 @@ stopifnot(identical(.d1, .d0),
                        function(e) conditionMessage(assertError(eval(e))[[1L]]),
                        "")))
 
+## From: Mikael Jagan <jaganmn2@gmail.com> , 16 Aug 2022
+validObject(x <- new("dtrMatrix", Dim = c(2L, 2L), diag = "U", x = double(4L)))
+x == 0 -> L
+x >  2 -> L. # ditto
+## gave Error in validObject(.Object) :
+##    invalid class "ltrMatrix" object: length of x slot != prod(Dim)
+stopifnot(all(L == ((1:4) != 2)),
+          all(L. == diag(2)))
+##
+validObject(y <- new("dgCMatrix", Dim = c(0L, 6L), p = integer(7L)))
+y == c(0, 0) -> L2
+y == rep(0,6)-> L6
+## gave Error in validObject(*): invalid class "lgCMatrix" object: slot p ...
+stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
+
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
