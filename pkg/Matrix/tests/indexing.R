@@ -1169,10 +1169,10 @@ showProc.time()
 
 ## Bugs found by Peter Ralph
 n <- 17
-x <- Matrix(0, n,n)
+x <- Matrix(0, n,n) # "ddiMatrix" now
 ## x must have at least three nonzero entries
-x[1,1] <- x[2,1:2] <- 1.
-x0 <- x <- as(x,"dgTMatrix")  # if x is dgCMatrix, no error
+x[1,1] <- x[2,1:2] <- 1.; class(x) # "dtC"
+x0 <- x <- as(x,"generalMatrix")  # if x is dgCMatrix, no error
 ##
 z <- matrix(x) # <== not the "Matrix way":  a (n, 1) matrix
 z[1] <- 0
@@ -1199,7 +1199,8 @@ x1 <- x0; x1[cbind(i, i+10)] <- i^2
 x2 <- x0; x2[cbind(i, i+10)] <- .asmatrix(i^2)
 ## failed: nargs() = 4 ... please report
 
-stopifnot(isValid(x1, "dgTMatrix"), identical(x1, x2))
+class(x1) # was "dgT", now "dgC"
+stopifnot(isValid(x1, class(x1)), identical(x1, x2))
 showProc.time()
 
 

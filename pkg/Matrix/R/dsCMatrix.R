@@ -64,7 +64,7 @@ setMethod("tril", "dsCMatrix",
 		  ## same internal structure (speedup potential !?)
 		  new("dtCMatrix", uplo = x@uplo, i = x@i, p = x@p,
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
-	      else tril(as(x, "dgCMatrix"), k = k, ...)
+	      else tril(.sparse2g(x), k = k, ...)
 	  })
 
 setMethod("triu", "dsCMatrix",
@@ -73,7 +73,7 @@ setMethod("triu", "dsCMatrix",
 		  ## same internal structure (speedup potential !?)
 		  new("dtCMatrix", uplo = x@uplo, i = x@i, p = x@p,
 		      x = x@x, Dim = x@Dim, Dimnames = x@Dimnames)
-	      else triu(as(x, "dgCMatrix"), k = k, ...)
+	      else triu(.sparse2g(x), k = k, ...)
 	  })
 } ## MJ
 
@@ -90,7 +90,7 @@ msg.and.solve.dgC.lu <- function(name, r, wrns,  a, b, tol) {
 	    }
 	    message(gettextf(fmt, name, ch))
 	}
-	.solve.dgC.lu(as(a,"dgCMatrix"), b=b, tol=tol)
+	.solve.dgC.lu(.sparse2g(a), b=b, tol=tol)
     }
     else r
 }
@@ -148,7 +148,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
 	      if (!extends(cb, "CsparseMatrix"))
 		  cb <- getClassDef(class(b <- as(b, "CsparseMatrix")))
 	      if (extends(cb, "symmetricMatrix")) ## not supported (yet) by cholmod_spsolve
-		  b <- as(b, "dgCMatrix")
+		  b <- as(b, "generalMatrix")
 	      solve.dsC.dC(a,b, LDL=LDL, tol=tol)
 	  })
 
