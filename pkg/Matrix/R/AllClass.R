@@ -708,7 +708,16 @@ setClassUnion("xMatrix", ## those Matrix classes with an 'x' slot
                 "zMatrix"))
 
 if(TRUE) { ##--- variant of setClass("dCsparse..." ..) etc working better for other pkgs -----
+    ## currently *not* (explicitly) exported
 
+## "classical" Cholmod-like sparseMatrix  (not "indMatrix" or "diagonalMatrix"):
+if(FALSE)
+  setClassUnion("CRTsparseMatrix", members = c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix"))
+  ## would be useful e.g. in ./products.R for "%&%" --- but it changes the method ordering
+  ## changing too much (for now)
+
+## These should be *closer* to their members than both {dln]sparse* and Csparse* -- but they are *NOT*
+## Could "fix" this be adding these as virtual classes and have the dgC* etc contain *these*
 setClassUnion("dCsparseMatrix", members = c("dgCMatrix", "dtCMatrix", "dsCMatrix"))
 setClassUnion("lCsparseMatrix", members = c("lgCMatrix", "ltCMatrix", "lsCMatrix"))
 setClassUnion("nCsparseMatrix", members = c("ngCMatrix", "ntCMatrix", "nsCMatrix"))
