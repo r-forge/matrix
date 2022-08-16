@@ -709,6 +709,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 				    isSparse, checkClass = FALSE))
 	}
 
+        maybeDense <- if(isSparse) identity else function(.) as(., "denseMatrix")
 	if(extends(cld, "triangularMatrix")) {
 	    mm. <- m
 	    i0 <- if(m@uplo == "L")
@@ -721,7 +722,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	    Cat("valid:", validObject(tm), "\n")
 	    if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
 		## note that diagU2N(<dtr>) |-> dtC, now dtT:
-		stopifnot(Qidentical(tm, as(diagU2N(m), "denseMatrix")))
+		stopifnot(Qidentical(tm, maybeDense(diagU2N(m))))
 	}
 	else if(isDiag) {
 
