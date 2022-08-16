@@ -400,6 +400,7 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
 ##' Should be equivalent to  %&%  which is faster [not for large dense!].
 ##' Consequently mainly used in  checkMatrix()
 boolProd <- function(x,y) as((abs(x) %*% abs(y)) > 0, "nMatrix")
+.sparse2kind <- Matrix:::.sparse2kind # (FIXME -- a version of this should be exported!)
 
 ###----- Checking a "Matrix" -----------------------------------------
 
@@ -714,12 +715,13 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 		upper.tri(mm.) else lower.tri(mm.)
 	    n.catchWarn <- if(is.n) suppressWarnings else identity
 	    n.catchWarn( mm.[i0] <- 0 ) # ideally, mm. remained triangular, but can be dge*
-	    CatF("as(<triangular (ge)matrix>, ",clNam,"): ", sep='')
-	    tm <- as(as(mm., "triangularMatrix"), clNam)
+            ## Aug.2022 - Coercion deprecations: No longer do as(*, clNam):
+	    CatF("as(mm., \"triangularMatrix\"): ")
+	    tm <- as(mm., "triangularMatrix")
 	    Cat("valid:", validObject(tm), "\n")
 	    if(m@uplo == tm@uplo) ## otherwise, the matrix effectively was *diagonal*
-		## note that diagU2N(<dtr>) |-> dtC :
-		stopifnot(Qidentical(tm, as(diagU2N(m), clNam)))
+		## note that diagU2N(<dtr>) |-> dtC, now dtT:
+		stopifnot(Qidentical(tm, as(diagU2N(m), "denseMatrix")))
 	}
 	else if(isDiag) {
 
