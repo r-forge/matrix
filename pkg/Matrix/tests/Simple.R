@@ -568,8 +568,8 @@ tu <- t1 ; tu@diag <- "U"
 tu
 validObject(cu <- as(tu, "CsparseMatrix")) # still unitriangular
 validObject(cnu <- diagU2N(cu))# <- testing diagU2N
-## validObject(tu. <- as(cu, "dtTMatrix"))
 validObject(tt <- as(cu, "TsparseMatrix"))
+tu. <- tt ## validObject(tu. <- as(cu, "dtTMatrix"))
 stopifnot(exprs = { ## NOT: identical(tu, tu.), # since T* is not unique!
     identical(cu, as(tt, "CsparseMatrix"))
     length(cnu@i) == length(cu@i) + nrow(cu)
@@ -1385,10 +1385,18 @@ x >  2 -> L. # ditto
 ##    invalid class "ltrMatrix" object: length of x slot != prod(Dim)
 stopifnot(all(L == ((1:4) != 2)),
           all(L. == diag(2)))
-##
+## 'Same' with "Logic" instead of "Compare":
+x & FALSE -> L.
+## gave Error in validObject(.Object) : invalid class "ltrMatrix" object
+stopifnot(all(L. == diag(2)))
+
 validObject(y <- new("dgCMatrix", Dim = c(0L, 6L), p = integer(7L)))
 y == c(0, 0) -> L2
 y == rep(0,6)-> L6
+## gave Error in validObject(*): invalid class "lgCMatrix" object: slot p ...
+stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
+## .. "Logic" instead of "Compare":
+y & c(FALSE, FALSE) -> L2
 ## gave Error in validObject(*): invalid class "lgCMatrix" object: slot p ...
 stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
 
