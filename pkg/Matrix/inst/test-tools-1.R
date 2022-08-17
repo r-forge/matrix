@@ -402,10 +402,13 @@ is.EQ.mat3 <- function(M1, M2, M3, tol = 1e-15, dimnames = TRUE, ...) {
 ##' here, as it also works for qr(<base matrix>)
 chkQR <- function(a,
                   y = seq_len(nrow(a)),## RHS: made to contain no 0
-                  a.qr = qr(a), tol = 1e-11, # 1e-13 failing very rarely (interesting)
+                  a.qr = qr(a),
+                  tol = 1e-11, # 1e-13 failing very rarely (interesting)
                   ##----------
-                  Qinv.chk = !sp.rank.def, QtQ.chk = !sp.rank.def,
-                  verbose = getOption("Matrix.verbose", FALSE), giveRE = verbose,
+                  Qinv.chk = !sp.rank.def,
+                  QtQ.chk = !sp.rank.def,
+                  verbose = getOption("Matrix.verbose", FALSE),
+                  giveRE = verbose,
                   quiet = FALSE)
 {
     d <- dim(a)
