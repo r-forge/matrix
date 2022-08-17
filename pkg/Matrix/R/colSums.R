@@ -149,15 +149,22 @@ rm(.recall.as.C)
 ## --- Rsparse ----
 
 ## row <-> col of the "transposed, seen as C" :
-.recall.as.C <- function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE) {
-    x <- .CR2RC(x)
-    callGeneric()
-}
-setMethod("rowSums",  signature(x = "RsparseMatrix"), .recall.as.C)
-setMethod("rowMeans", signature(x = "RsparseMatrix"), .recall.as.C)
-setMethod("colSums",  signature(x = "RsparseMatrix"), .recall.as.C)
-setMethod("colMeans", signature(x = "RsparseMatrix"), .recall.as.C)
-rm(.recall.as.C)
+setMethod("colSums", signature(x = "RsparseMatrix"),
+          function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+              rowSums(.tCR2RC(x), na.rm = na.rm, dims = dims,
+                      sparseResult = sparseResult))
+setMethod("colMeans", signature(x = "RsparseMatrix"),
+          function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+              rowMeans(.tCR2RC(x), na.rm = na.rm, dims = dims,
+                       sparseResult = sparseResult))
+setMethod("rowSums", signature(x = "RsparseMatrix"),
+          function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+              colSums(.tCR2RC(x), na.rm = na.rm, dims = dims,
+                      sparseResult = sparseResult))
+setMethod("rowMeans", signature(x = "RsparseMatrix"),
+          function(x, na.rm = FALSE, dims = 1, sparseResult = FALSE)
+              colMeans(.tCR2RC(x), na.rm = na.rm, dims = dims,
+                       sparseResult = sparseResult))
 
 ## --- indMatrix [incl pMatrix ] ---
 
