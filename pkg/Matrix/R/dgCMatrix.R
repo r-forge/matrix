@@ -51,17 +51,6 @@ setMethod("t", signature(x = "dgCMatrix"),
 	  valueClass = "dgCMatrix")
 } ## MJ
 
-setMethod("qr", signature(x = "dgCMatrix"),
-	  function(x, tol = 1e-07, LAPACK = FALSE, keep.dimnames = TRUE,
-                   verbose = !is.null(v <- getOption("Matrix.verbose")) && v >= 1)
-	  .Call(dgCMatrix_QR, # -> cs_sqr() and cs_qr() >> ../src/dgCMatrix.c
-		x, ## order =
-                if(verbose) -1L else TRUE, keep.dimnames))
-
-setMethod("qr", signature(x = "sparseMatrix"),
-	  function(x, ...)
-	  qr(as(as(as(x, "CsparseMatrix"), "dsparseMatrix"), "dgCMatrix"), ...))
-
 .solve.dgC.lu <- function(a, b, tol = .Machine$double.eps) {
     ## @MM: see also solveSparse() in  ~/R/MM/Pkg-ex/Matrix/Doran-A.R
     lu.a <- lu(a)

@@ -582,13 +582,6 @@ for (.cl in c("denseMatrix", "matrix")) {
 }
 rm(.dense.band, .dense.triu, .dense.tril, .cl)
 
-if(.Matrix.avoiding.as.matrix) {
-setMethod("qr", signature(x = "ddenseMatrix"),
-	  function(x, ...) qr.default(as(x, "matrix"), ...))
-setMethod("qr", signature(x = "denseMatrix"),
-	  function(x, ...) qr(as(x, "ddenseMatrix"), ...))
-}
-
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 

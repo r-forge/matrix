@@ -1,4 +1,6 @@
-#### Methods for the sparse QR decomposition
+## METHODS FOR CLASS: sparseQR
+## our "compact" representation of QR factorizations of sparse matrices
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## TODO: qr.R() generic that allows optional args ['backPermute']
 ## --- so we can add it to our qr.R() method,  *instead* of this :
