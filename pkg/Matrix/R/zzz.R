@@ -20,7 +20,7 @@ rm(.Rv)
 
 ## ~~~~ PACKAGE ENVIRONMENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Supporting once-per-session warnings, etc.
+## Recording default values of Matrix.* options
 .MatrixEnv <- new.env(parent = emptyenv(), hash = FALSE)
 
 ## Storing settings from 'cholmod_common'
@@ -30,19 +30,27 @@ rm(.Rv)
 ## ~~~~ NAMESPACE HOOKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .onLoad <- function(libname, pkgname) {
-    verbose <-
-        (!is.null(v <- getOption("Matrix.verbose")) && v >= 1L) ||
-        (interactive() && identical(Sys.info()[["user"]], "maechler"))
+    ## verbose:
+    ## logical/integer (but often supplied as double),
+    ## deciding _if_ conditions are signaled
+    v <- as.integer(Sys.getenv("R_MATRIX_VERBOSE", "0"))
+    assign("verbose", if(is.na(v)) 0L else v, envir = .MatrixEnv)
+
+    ## warn:
+    ## logical/integer (but often supplied as double),
+    ## deciding _what_ conditions are signaled
+    ## (0=message, 1=warning, 2=error)
+    w <- as.integer(Sys.getenv("R_MATRIX_WARN", "0"))
+    assign("warn", if(is.na(w)) 0L else w, envir = .MatrixEnv)
 
     ## ambiguityNotes:
     ## show S4 method dispatch ambiguity notes if TRUE
-    aN <-
-        !is.null(getOption("ambiguousMethodSelection")) ||
-        verbose || isTRUE(getOption("Matrix.ambiguityNotes"))
-    if(!aN)
-        options(ambiguousMethodSelection =
-                    `environment<-`(function(cond) NULL, emptyenv()))
+    aN <- as.logical(Sys.getenv("R_MATRIX_AMBIGUITY_NOTES", "false"))
+    aN <- (!is.na(aN) && aN) || !is.null(getOption("ambiguousMethodSelection"))
     assign("ambiguityNotes", aN, envir = .MatrixEnv)
+    if(!aN)
+        options(ambiguousMethodSelection = # ?methods::testInheritedMethods
+                    `environment<-`(function(cond) NULL, emptyenv()))
 
     ## warnDeprecatedCoerce:
     ## <=0 ... no conditions signaled
@@ -58,7 +66,7 @@ rm(.Rv)
 
 .onUnload <- function(libpath) {
     library.dynam.unload("Matrix", libpath)
-    if(!isTRUE(.MatrixEnv[["ambiguityNotes"]]))
+    if(!.MatrixEnv[["ambiguityNotes"]])
 	options(ambiguousMethodSelection = NULL)
     NULL
 }
@@ -96,8 +104,8 @@ Matrix.DeprecatedCoerce <- function(Class1, Class2) {
         Class1 <- getClassDef(Class1)
     if(!isClassDef(Class2))
         Class2 <- getClassDef(Class2)
-    if(is.null(w <- getOption("Matrix.warnDeprecatedCoerce")))
-        w <- .MatrixEnv[["warnDeprecatedCoerce"]]
+    w <- getOption("Matrix.warnDeprecatedCoerce",
+                   .MatrixEnv[["warnDeprecatedCoerce"]])
     if(is.atomic(w) && length(w) == 1L &&
        ((w.na <- is.na(w <- as.integer(w))) || w > 0L)) {
         cln1 <- Class1@className

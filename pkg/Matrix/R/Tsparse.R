@@ -519,10 +519,7 @@ replTmat <- function (x, i, j, ..., value)
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
-	if((.w <- isTRUE(getOption("Matrix.warn"))) ||
-	   (!is.null(v <- getOption("Matrix.verbose")) && v >= 1))
-	    (if(.w) warning else message)(
-	     "M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
+        Matrix.msg("M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
         x <- .sparse2g(x)
         clDx <- getClassDef(clx <- class(x))
     }
@@ -780,17 +777,14 @@ replTmat <- function (x, i, j, ..., value)
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
-	if((.w <- isTRUE(getOption("Matrix.warn"))) || isTRUE(getOption("Matrix.verbose")))
-	    (if(.w) warning else message)(
-	     "M[ij] <- v :  coercing symmetric M[] into non-symmetric")
+	Matrix.msg("M[ij] <- v :  coercing symmetric M[] into non-symmetric")
 	x <- .sparse2g(x)
 	clDx <- getClassDef(clx <- class(x))
     }
 
     ii.v <- .Call(m_encodeInd, i, di, orig1=TRUE, checkBounds = TRUE)
     if(id <- anyDuplicated(ii.v, fromLast=TRUE)) {
-        Matrix.msg("duplicate ij-entries in 'Matrix[ ij ] <- value'; using last",
-                   .M.level = 1)
+        Matrix.msg("M[ij] <- v :  duplicate ij-entries; using last")
         ii.v  <- ii.v [-id]
 	value <- value[-id]
         if(any(id <- duplicated(ii.v, fromLast=TRUE))) {

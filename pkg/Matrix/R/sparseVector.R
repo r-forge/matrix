@@ -259,7 +259,7 @@ setAs("TsparseMatrix", "sparseVector",
 ##' @param byrow logical (see ?matrix)
 ##' @param check logical indicating if it needs to be checked that 'x' is a sparseVector
 ##' @param symmetric logical indicating if result must be "symmetricMatrix"
-##' @return an object inheriting from "sparseMatrix"
+##' @return an object inheriting from "TsparseMatrix"
 ##' @author Martin Maechler, May 2007 ff.
 spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE)
 {
@@ -879,22 +879,17 @@ ind4toeplitz <- function(n) {
 .toeplitz.spV <-  function(x, symmetric=TRUE, repr = c("C","T","R"), giveCsparse) {
     ## semantically "identical" to stats::toeplitz
     n <- length(x)
-    r <- spV2M(x[ind4toeplitz(n)], n,n, symmetric=symmetric, check=FALSE)
+    r <- spV2M(x[ind4toeplitz(n)], n,n, symmetric = symmetric, check = FALSE)
+    ##   ^^^^^ returning TsparseMatrix
     if(!missing(giveCsparse)) {
 	if(missing(repr)) {
 	    repr <- if(giveCsparse) "C" else "T"
-	    warning(gettextf(
-		"'giveCsparse' has been deprecated; setting 'repr = \"%s\"' for you", repr),
-		domain=NA)
+	    warning(gettextf("'giveCsparse' has been deprecated; setting 'repr = \"%s\"' for you",
+                             repr),
+                    domain = NA)
 	} else ## !missing(repr)
-            if((.w <- isTRUE(getOption("Matrix.warn"))) ||
-                      isTRUE(getOption("Matrix.verbose")))
-	    (if(.w) warning else message)(
-                "'giveCsparse' has been deprecated; will use 'repr' instead")
+            Matrix.msg("'giveCsparse' has been deprecated; will use 'repr' instead")
     }
-    switch(match.arg(repr),
-               "C" = as(r, "CsparseMatrix"),
-               "T" =    r,# TsparseMatrix
-               "R" = as(r, "RsparseMatrix"))
+    switch(match.arg(repr), "C" = .T2C(r), "T" = r, "R" = .T2R(r))
 }
 setMethod("toeplitz", "sparseVector", .toeplitz.spV)
