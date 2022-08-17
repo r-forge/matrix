@@ -216,7 +216,7 @@ setMethod("Summary", "ANY",
 	  function(x, ..., na.rm) {
           if(!length(a <- list(...))) (get(.Generic, envir=baseenv()))(x, na.rm=na.rm)
           else {
-              if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
+              if(Matrix.verbose() >= 1)
                   if(length(a) > 1)
                       message(gettextf("in Summary(<ANY>, .): %s(<%s>, <%s>,...)\n",
                                        .Generic, class(x), class(a[[1]])), domain = NA)

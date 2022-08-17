@@ -80,8 +80,7 @@ setMethod("update", signature(object = "CHMfactor"),
                   parent <- ..sparse2d(parent)
                   cld <- getClassDef(class(parent))
               }
-              if(!extends(cld, "symmetricMatrix") &&
-                 !is.null(v <- getOption("Matrix.verbose")) && v >= 1L)
+              if(!extends(cld, "symmetricMatrix") && Matrix.verbose() >= 1)
                   message("'parent' is not formally symmetric, will be handled as 'tcrossprod(parent)'")
               chkDots(..., which.call = -2L)
               .Call(CHMfactor_update, object, parent, mult)

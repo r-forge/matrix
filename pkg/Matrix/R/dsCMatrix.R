@@ -77,22 +77,23 @@ setMethod("triu", "dsCMatrix",
 	  })
 } ## MJ
 
-msg.and.solve.dgC.lu <- function(name, r, wrns,  a, b, tol) {
-    if ((E <- inherits(r, "error")) || length(wrns) > 0) {
-	if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1) { ## as Matrix.msg() but more sophisticated
+msg.and.solve.dgC.lu <- function(name, r, wrns, a, b, tol) {
+    if((e <- inherits(r, "error")) || length(wrns) > 0L) {
+	if((v <- Matrix.verbose()) >= 1) {
+            ## as Matrix.msg() but more sophisticated:
 	    fmt <- "%s(): Cholmod factorization unsuccessful %s --> using LU(<dgC>)"
-	    if(v == 1)
+	    if(v < 2)
 		ch <- ""
 	    else { # v >= 2
-		ch <- if(E) conditionMessage(r) # else NULL
-		if(length(wrns)) # show them (possibly additionally)
-		    ch <- paste0(c(ch, unlist(lapply(wrns, conditionMessage))), collapse=";\n ")
+		ch <- if(e) conditionMessage(r) # else NULL
+		if(length(wrns) > 0L) # show them (possibly additionally)
+		    ch <- paste0(c(ch, unlist(lapply(wrns, conditionMessage))),
+                                 collapse = ";\n ")
 	    }
-	    message(gettextf(fmt, name, ch))
+	    message(gettextf(fmt, name, ch), domain = NA)
 	}
-	.solve.dgC.lu(.sparse2g(a), b=b, tol=tol)
-    }
-    else r
+	.solve.dgC.lu(.sparse2g(a), b = b, tol = tol)
+    } else r
 }
 
 solve.dsC.mat <- function(a,b, LDL = NA, tol = .Machine$double.eps) {

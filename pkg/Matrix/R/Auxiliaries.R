@@ -115,16 +115,45 @@ isSeq <- function(i, n, Ostart = TRUE) {
 		  fun, cl1[1L], cl2[1L]), call. = FALSE, domain=NA)
 }
 
+Matrix.verbose <- function()
+    getOption("Matrix.verbose", .MatrixEnv[["verbose"]])
+
+Matrix.warn <- function()
+    getOption("Matrix.warn", .MatrixEnv[["warn"]])
+
+## MJ: or maybe a general one?
+if(FALSE) {
+Matrix.getOption <- function(x, default = .Matrix.Env[[x]])
+    getOption(paste0("Matrix.", x), default)
+} ## MJ
+
+if(FALSE) {
 Matrix.msg <- function(..., .M.level = 1) {
     if(!is.null(v <- getOption("Matrix.verbose")) && v >= .M.level)
         message(...)
 }
+} else {
+## MJ: a bit smarter
+Matrix.msg <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
+    if(Matrix.verbose() >= .M.level) {
+        m <-
+            if((w <- Matrix.warn()) < 1)
+                function(..., call., domain) message(..., domain = domain)
+            else if(w < 2)
+                warning
+            else stop
+        m(..., call. = call., domain = domain)
+    }
+}
+}
 
-## not yet used; see also msg.and.solve.dgC.lu() in ./dsCMatrix.R
+## currently unused; see also msg.and.solve.dgC.lu() in ./dsCMatrix.R
+if(FALSE) {
 Matrix.msg12 <- function(m1, m2, ...) {
     if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
         message(if(v >= 2) m2 else m1, ...)
 }
+} ## unused
 
 ## TODO: faster via C, either R's  R_data_class() [which needs to become API !]
 ##       or even direct  getAttrib(x, R_ClassSymbol); ..
@@ -470,7 +499,8 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
                  ##     unit <- allTrue(x == 1+0i)
                  ##     "zdiMatrix" },
                  stop(gettextf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\"",
-                               typeof(x), domain = NA)))
+                               typeof(x)),
+                      domain = NA))
     new(cl, Dim = dim(from), Dimnames = .M.DN(from),
         diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
 }
@@ -592,13 +622,15 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .m2dense.checking <- function(from, kind = ".", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
            stop(gettextf("matrix of invalid type \"%s\" to .m2dense.checking()",
-                         typeof(from), domain = NA)))
+                         typeof(from)),
+                domain = NA))
     if(kind != ".") {
         ## These must happen before isSymmetric() call
         storage.mode(from) <-
             switch(kind, n =, l = "logical", d = "double",
                    stop(gettextf("invalid kind \"%s\" to .m2dense.checking()",
-                                 kind, domain = NA)))
+                                 kind),
+                        domain = NA))
         if(kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
     }
@@ -616,13 +648,15 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .m2sparse.checking <- function(from, kind = ".", repr = "C", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
            stop(gettextf("matrix of invalid type \"%s\" to .m2sparse.checking()",
-                         typeof(from), domain = NA)))
+                         typeof(from)),
+                domain = NA))
     if(kind != ".") {
         ## These must happen before isSymmetric() call
         storage.mode(from) <-
             switch(kind, n =, l = "logical", d = "double",
                    stop(gettextf("invalid kind \"%s\" to .m2sparse.checking()",
-                                 kind, domain = NA)))
+                                 kind),
+                        domain = NA))
         if(kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
     }
