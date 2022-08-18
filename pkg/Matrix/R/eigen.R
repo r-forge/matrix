@@ -42,8 +42,8 @@ setMethod("Schur", signature(x = "dgeMatrix", vectors = "logical"),
               }
               if(vectors)
                   new("Schur", Dim = x@Dim, Q = .m2ge(cl$Z), T = T,
-                      Evalues = vals)
-              else list(T = T, Evalues = vals)
+                      EValues = vals)
+              else list(T = T, EValues = vals)
           })
 
 setMethod("Schur", signature(x = "dsyMatrix", vectors = "logical"),
@@ -68,8 +68,8 @@ setMethod("Schur", signature(x = "matrix", vectors = "logical"),
                       cl$WR
                   else complex(real = cl$WR, imaginary = cl$WI)
               if(vectors)
-                  list(Q = cl$Z, T = cl$T, Evalues = vals)
-              else list(T = cl$T, Evalues = vals)
+                  list(Q = cl$Z, T = cl$T, EValues = vals)
+              else list(T = cl$T, EValues = vals)
           })
 
 ## FIXME: don't coerce from sparse to dense
@@ -98,7 +98,7 @@ setMethod("Schur", signature(x = "diagonalMatrix", vectors = "logical"),
               if(vectors) {
                   Q <- new("ddiMatrix", Dim = d, diag = "U")
                   new("Schur", Dim = d, Q = Q, T = T, EValues = vals)
-              } else list(T = T, Evalues = vals)
+              } else list(T = T, EValues = vals)
           })
 
 setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
@@ -113,14 +113,14 @@ setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
                   if(vectors) {
                       Q <- new("ddiMatrix", d = d, diag = "U")
                       new("Schur", Dim = d, Q = Q, T = x, EValues = vals)
-                  } else list(T = x, Evalues = vals)
+                  } else list(T = x, EValues = vals)
               } else {
                   perm <- n:1L
                   vals <- vals[perm]
-                  T <- triu(x[i, i, drop = FALSE])
+                  T <- triu(x[perm, perm, drop = FALSE])
                   if(vectors) {
                       Q <- new("pMatrix", d = d, perm = perm)
                       new("Schur", Dim = d, Q = Q, T = T, EValues = vals)
-                  } else list(T = x, Evalues = vals)
+                  } else list(T = x, EValues = vals)
               }
           })

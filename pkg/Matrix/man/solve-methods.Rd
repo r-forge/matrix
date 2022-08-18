@@ -50,7 +50,7 @@
 \alias{solve,dsCMatrix,dsparseMatrix-method}
 \alias{solve,dsCMatrix,matrix-method}
 \alias{solve,dsCMatrix,missing-method}
-\alias{solve,dsCMatrix,numeric-method}
+\alias{solve,dsCMatrix,numLike-method}
 \alias{solve,dspMatrix,Matrix-method}
 \alias{solve,dspMatrix,matrix-method}
 \alias{solve,dspMatrix,missing-method}
@@ -63,7 +63,7 @@
 \alias{solve,dtCMatrix,dgeMatrix-method}
 \alias{solve,dtCMatrix,matrix-method}
 \alias{solve,dtCMatrix,missing-method}
-\alias{solve,dtCMatrix,numeric-method}
+\alias{solve,dtCMatrix,numLike-method}
 \alias{solve,dtpMatrix,Matrix-method}
 \alias{solve,dtpMatrix,matrix-method}
 \alias{solve,dtpMatrix,missing-method}

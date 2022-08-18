@@ -5,6 +5,7 @@
 \alias{is.na-methods}
 %
 \alias{anyNA,nMatrix-method}
+\alias{anyNA,nsparseVector-method}
 \alias{anyNA,sparseVector-method}
 \alias{anyNA,xMatrix-method}
 %
@@ -73,7 +74,7 @@
 ## and for other classes
 
 \S4method{anyNA}{xMatrix}(x)
-\S4method{anyNA}{nsparseMatrix}(x)
+\S4method{anyNA}{nMatrix}(x)
 \S4method{anyNA}{sparseVector}(x)
 \S4method{anyNA}{nsparseVector}(x)
 }

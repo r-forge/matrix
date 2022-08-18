@@ -136,7 +136,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
 
-setMethod("solve", signature(a = "dsCMatrix", b = "numeric"),
+setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
 	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
 	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
 	  valueClass = "dgeMatrix")
