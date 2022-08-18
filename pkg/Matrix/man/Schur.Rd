@@ -3,19 +3,16 @@
 %
 \alias{Schur}
 %
-\alias{Schur,dgeMatrix,logical-method}
-\alias{Schur,dgeMatrix,missing-method}
-\alias{Schur,diagonalMatrix,logical-method}
-\alias{Schur,diagonalMatrix,missing-method}
-\alias{Schur,dsyMatrix,ANY-method}
-\alias{Schur,generalMatrix,logical-method}
-\alias{Schur,generalMatrix,missing-method}
-\alias{Schur,matrix,logical-method}
+\alias{Schur,Matrix,missing-method}
 \alias{Schur,matrix,missing-method}
+
+\alias{Schur,dgeMatrix,logical-method}
+\alias{Schur,diagonalMatrix,logical-method}
+\alias{Schur,dsyMatrix,logical-method}
+\alias{Schur,generalMatrix,logical-method}
+\alias{Schur,matrix,logical-method}
 \alias{Schur,symmetricMatrix,logical-method}
-\alias{Schur,symmetricMatrix,missing-method}
 \alias{Schur,triangularMatrix,logical-method}
-\alias{Schur,triangularMatrix,missing-method}
 %
 \description{
   Computes the Schur decomposition and eigenvalues of a square matrix;
