@@ -173,5 +173,3 @@ setMethod("norm", signature(x = "ndenseMatrix", type = "character"),
 setMethod("rcond", signature(x = "ndenseMatrix", norm = "character"),
 	  .rcond_via_d, valueClass = "numeric")
 } ## MJ
-
-setMethod("is.na", signature(x = "ndenseMatrix"), is.na_nsp)

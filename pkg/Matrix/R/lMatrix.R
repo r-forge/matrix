@@ -58,11 +58,12 @@ setAs("lMatrix", "dMatrix",
 	  r@x <- as.double(from@x)
 	  r
       })
-} ## MJ
 
 ## needed at least for lsparse* :
 setAs("lMatrix", "dgCMatrix",
       function(from) as(as(from, "lgCMatrix"), "dgCMatrix"))
+} ## MJ
+
 
 ###-------------- which( <logical Matrix> ) -----------------------------------------------------
 
@@ -131,7 +132,9 @@ setMethod("which", "ltTMatrix", function(x, arr.ind, useNames = TRUE)
 setMethod("which", "lsTMatrix", function(x, arr.ind, useNames = TRUE)
 	  which.lgT(as(x, "generalMatrix"), arr.ind, useNames))
 
+setMethod("anyNA", signature(x = "nMatrix"), function(x) FALSE)
 
+setMethod("is.na", signature(x = "nMatrix"), is.na_nsp)
 
 setMethod("is.finite", signature(x = "lMatrix"), function(x) !is.na(x))
 setMethod("is.finite", signature(x = "nMatrix"), allTrueMatrix)

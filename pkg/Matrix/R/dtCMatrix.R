@@ -78,39 +78,31 @@ setAs("dtCMatrix", "dtrMatrix",
 ## b <- .trDiagonal(n, unitri = FALSE)
 ## .Call(dtCMatrix_sparse_solve, a, b)
 ##
-## should be fixed at C level so that we do not rely on ugly hacks
-## such as this one:
+## should be fixed at C level so that we do not rely on .sortCsparse()
+## to produce a valid object
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
 	  function(a, b, ...) {
-              b <- .trDiagonal(a@Dim[1L], unitri = FALSE)
-              gC <- .Call(dtCMatrix_sparse_solve, a, b)
-              gT <- .Call(Csparse_to_Tsparse, gC, FALSE)
-              as(gT, "dtCMatrix")
+              b <- .trDiagonal(a@Dim[1L], unitri = FALSE) # dgC
+              r <- .sortCsparse(.Call(dtCMatrix_sparse_solve, a, b)) # dgC
+              (if(a@uplo == "U") triu else tril)(r) # dtC
           })
 
-setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
-	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a, b, TRUE),
-	  valueClass = "dgeMatrix")
-
 setMethod("solve", signature(a = "dtCMatrix", b = "CsparseMatrix"),
-	  function(a, b, ...) .sortCsparse(.Call(dtCMatrix_sparse_solve, a, b)),
-	  ##                  ------------ TODO: both in C code
-	  valueClass = "dgCMatrix")
+	  function(a, b, ...) .sortCsparse(.Call(dtCMatrix_sparse_solve, a, b)))
+
+setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
+	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a, b, TRUE))
 
 setMethod("solve", signature(a = "dtCMatrix", b = "matrix"),
 	  function(a, b, ...) {
-            storage.mode(b) <- "double"
-            .Call(dtCMatrix_matrix_solve, a, b, FALSE)
-	  }, valueClass = "dgeMatrix")
+              storage.mode(b) <- "double"
+              .Call(dtCMatrix_matrix_solve, a, b, FALSE)
+	  })
 
 ## Isn't this case handled by the method for (a = "Matrix', b =
 ## "numeric") in ./Matrix.R? Or is this method defined here for
 ## the as.double coercion?
-setMethod("solve", signature(a = "dtCMatrix", b = "numeric"),
-	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a,
-				    cbind(as.double(b), deparse.level=0L), FALSE),
-          valueClass = "dgeMatrix")
-
-if(FALSE)## still not working
-setMethod("diag", "dtCMatrix",  ##vvvvv see .dge.diag()
-	  function(x, nrow, ncol, names=TRUE) .Call(diag_tC, x, "diag"))
+setMethod("solve", signature(a = "dtCMatrix", b = "numLike"),
+	  function(a, b, ...)
+              .Call(dtCMatrix_matrix_solve,
+                    a, cbind(as.double(b), deparse.level = 0L), FALSE))

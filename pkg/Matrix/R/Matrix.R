@@ -140,10 +140,6 @@ setMethod("symmpart", signature(x = "Matrix"),
 setMethod("skewpart", signature(x = "Matrix"),
 	  function(x) skewpart(as(x, "dMatrix")))
 
-## NB: classes without 'x' slot must have their own methods;
-## see, e.g., ./nsparseMatrix.R and ./sparseVector.R
-setMethod("anyNA", signature(x = "xMatrix"), function(x) anyNA(x@x))
-
 setMethod("dim", signature(x = "Matrix"), function(x) x@Dim)
 
 setMethod("length", "Matrix", function(x) prod(x@Dim))
@@ -557,7 +553,7 @@ setMethod("image", "Matrix",
 	  function(x, ...) {
               ## coercing to sparse is not inefficient,
               ## since we need 'i' and 'j' for levelplot()
-	      x <- as(as(as(x, "TsparseMatrix"), "generalMatrix"), "dMatrix")
+	      x <- ..sparse2d(.sparse2g(as(x, "TsparseMatrix")))
               callGeneric()
 	  })
 

@@ -3,31 +3,38 @@
 ## ... but _excluding_ ddiMatrix (FIXME?)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## NB: classes without 'x' slot must have their own methods;
+## see, e.g., ./nsparseMatrix.R and ./sparseVector.R
+setMethod("anyNA", signature(x = "xMatrix"), function(x) anyNA(x@x))
+
+
+
+
 setMethod("is.finite", signature(x = "dsparseMatrix"),
 	  function(x) {
-	      if(any(!is.finite(x@x))) {
-                  r <- allTrueMat(x, packed = FALSE)
-                  x <- as(as(as(x,"CsparseMatrix"), "dgCMatrix"),"dgTMatrix")
-		  notF <- which(!is.finite(x@x))
+              cld <- getClassDef(class(x))
+              symmetric <- extends(cld, "symmetricMatrix")
+              if(!all(is.finite(x@x))) {
+                  r <- allTrueMat(x, symmetric = symmetric, packed = FALSE)
+                  x <- .sparse2g(if(extends(cld, "TsparseMatrix"))
+                                     x
+                                 else .CR2T(x))
+                  notF <- which(!is.finite(x@x))
 		  r[cbind(x@i[notF], x@j[notF]) + 1L] <- FALSE
                   r
-	      }
-              else allTrueMat(x)
+	      } else allTrueMat(x, symmetric = symmetric, packed = TRUE)
           })
 
 setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	  function(x) {
-	      if(any((isInf <- is.infinite(x@x)))) {
+	      if(any(isInf <- is.infinite(x@x))) {
 		  cld <- getClassDef(class(x))
 		  if(extends(cld, "triangularMatrix") && x@diag == "U")
 		      isInf <- is.infinite((x <- .diagU2N(x, cld))@x)
-		  r <- as(x, "lMatrix") # will be "lsparseMatrix" - *has* x slot
-		  r@x <- if(length(isInf) == length(r@x)) isInf else is.infinite(r@x)
-		  if(!extends(cld, "CsparseMatrix"))
-		      r <- as(r, "CsparseMatrix")
-		  as(.Call(Csparse_drop, r, 0), "nMatrix") # a 'pattern matrix
-	      }
-	      else is.na_nsp(x)
+		  r <- .sparse2kind(x, "l", drop0 = FALSE)
+		  r@x <- isInf
+		  .sparse2kind(r, "n", drop0 = TRUE)
+	      } else is.na_nsp(x)
 	  })
 
 ## MJ: no longer needed ... now inherited from [CRT]sparseMatrix
