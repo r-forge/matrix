@@ -4,8 +4,7 @@
 %
 \alias{is.na-methods}
 %
-\alias{anyNA,nsparseMatrix-method}
-\alias{anyNA,nsparseVector-method}
+\alias{anyNA,nMatrix-method}
 \alias{anyNA,sparseVector-method}
 \alias{anyNA,xMatrix-method}
 %
@@ -21,8 +20,7 @@
 \alias{is.na,lsyMatrix-method}
 \alias{is.na,ltpMatrix-method}
 \alias{is.na,ltrMatrix-method}
-\alias{is.na,ndenseMatrix-method}
-\alias{is.na,nsparseMatrix-method}
+\alias{is.na,nMatrix-method}
 \alias{is.na,nsparseVector-method}
 \alias{is.na,sparseMatrix-method}
 \alias{is.na,sparseVector-method}

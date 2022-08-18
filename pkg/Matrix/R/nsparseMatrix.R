@@ -2,8 +2,6 @@
 ## sparse matrices with no 'x' slot (nonzero pattern)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("is.na", signature(x = "nsparseMatrix"), is.na_nsp)
-
 ## MJ: no longer needed ... now inherited from Matrix
 if(FALSE) {
 setMethod("image", "nsparseMatrix",
