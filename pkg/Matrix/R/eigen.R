@@ -104,14 +104,15 @@ setMethod("Schur", signature(x = "diagonalMatrix", vectors = "logical"),
 setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
 	  function(x, vectors, ...) {
               cld <- getClassDef(class(x))
-              if(!is(x, "nMatrix") &&
+              if(!extends(cld, "nMatrix") &&
                  (anyNA(x) || (extends(cld, "dMatrix") && any(is.infinite(x)))))
+                  ## any(is.finite(<sparseMatrix>)) would allocate too much
                   stop("'x' has non-finite values")
               n <- (d <- x@Dim)[1L]
               vals <- diag(x, names = FALSE)
               if(x@uplo == "U" || n == 0L) {
                   if(vectors) {
-                      Q <- new("ddiMatrix", d = d, diag = "U")
+                      Q <- new("ddiMatrix", Dim = d, diag = "U")
                       new("Schur", Dim = d, Q = Q, T = x, EValues = vals)
                   } else list(T = x, EValues = vals)
               } else {
@@ -119,7 +120,7 @@ setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
                   vals <- vals[perm]
                   T <- triu(x[perm, perm, drop = FALSE])
                   if(vectors) {
-                      Q <- new("pMatrix", d = d, perm = perm)
+                      Q <- new("pMatrix", Dim = d, perm = perm)
                       new("Schur", Dim = d, Q = Q, T = T, EValues = vals)
                   } else list(T = x, EValues = vals)
               }
