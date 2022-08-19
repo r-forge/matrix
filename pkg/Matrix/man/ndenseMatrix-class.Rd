@@ -4,7 +4,6 @@
 %
 \alias{ndenseMatrix-class}
 %
-\alias{!,ndenseMatrix-method}
 \alias{&,ndenseMatrix,ddiMatrix-method}
 \alias{&,ndenseMatrix,ldiMatrix-method}
 \alias{*,ndenseMatrix,ddiMatrix-method}

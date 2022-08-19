@@ -1293,6 +1293,10 @@ stopifnot(identical(s44, bs44))
 l0.u <- new("ltrMatrix", diag = "U")
 !l0.u # was an error
 
+n11 <- new("ngeMatrix", Dim = c(1L, 1L), x = NA)
+nn11 <- !n11 # did not respect NA<=>TRUE
+stopifnot(is(nn11, "ngeMatrix"), identical(nn11@x, FALSE))
+
 ## coercions preserving mathematical equality ought to preserve 'factors' slot;
 ## though currently only for sparse->sparse and dense->dense
 mT <- as(as(Diagonal(x = rlnorm(5)), "TsparseMatrix"), "generalMatrix")
@@ -1399,7 +1403,6 @@ stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
 y & c(FALSE, FALSE) -> L2
 ## gave Error in validObject(*): invalid class "lgCMatrix" object: slot p ...
 stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
-
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
