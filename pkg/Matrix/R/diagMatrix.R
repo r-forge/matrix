@@ -540,12 +540,6 @@ setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
           function(x, uplo) .diag2sparse(x, ".sC", uplo = "U"))
 
-## FIXME: should not be needed {when ddi* is dsparse* etc}:
-setMethod("is.finite", signature(x = "diagonalMatrix"),
-	  function(x) is.finite(.diag2sparse(x, ".tT")))
-setMethod("is.infinite", signature(x = "diagonalMatrix"),
-	  function(x) is.infinite(.diag2sparse(x, ".tT")))
-
 ..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1])
 .diag.x  <- function(m) if(m@diag == "U") rep.int(as1(m@x), m@Dim[1]) else m@x
 

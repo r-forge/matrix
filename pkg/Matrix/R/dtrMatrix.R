@@ -51,30 +51,3 @@ setMethod("solve", signature(a = "dtrMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "dtrMatrix", b = "numLike"),
 	  function(a, b, ...) .Call(dtrMatrix_matrix_solve, a, b))
-
-.is.na <- .is.infinite <- function(x) {
-    n <- (d <- x@Dim)[1L]
-    i <- is.na(x@x)
-    i[indTri(n, (uplo <- x@uplo) != "U", x@diag != "N")] <- FALSE
-    if(any(i))
-        new("ntrMatrix", Dim = d, Dimnames = x@Dimnames,
-            uplo = uplo, diag = "N", x = i)
-    else is.na_nsp(x)
-}
-body(.is.infinite) <-
-    do.call(substitute, list(body(.is.infinite),
-                             list(is.na = quote(is.infinite))))
-
-.is.finite <- function(x) {
-    n <- (d <- x@Dim)[1L]
-    i <- is.finite(x@x)
-    i[indTri(n, x@uplo != "U", x@diag != "N")] <- TRUE
-    new("ngeMatrix", Dim = d, Dimnames = x@Dimnames, x = i)
-}
-
-for(.cl in paste0(c("d", "l"), "trMatrix"))
-    setMethod("is.na", signature(x = .cl), .is.na)
-setMethod("is.infinite", signature(x = "dtrMatrix"), .is.infinite)
-setMethod("is.finite", signature(x = "dtrMatrix"), .is.finite)
-
-rm(.cl, .is.na, .is.infinite, .is.finite)

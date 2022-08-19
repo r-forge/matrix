@@ -49,23 +49,3 @@ setMethod("solve", signature(a = "dspMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "dspMatrix", b = "numLike"),
 	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b))
-
-.is.na <- .is.infinite <- .is.finite <- function(x) {
-    if(any(i <- is.na(x@x)))
-        new("nspMatrix", Dim = x@Dim, Dimnames = x@Dimnames,
-            uplo = x@uplo, x = i)
-    else is.na_nsp(x)
-}
-body(.is.infinite) <-
-    do.call(substitute, list(body(.is.infinite),
-                             list(is.na = quote(is.infinite))))
-body(.is.finite) <-
-    do.call(substitute, list(body(.is.finite),
-                             list(is.na = quote(is.finite))))
-
-for(.cl in paste0(c("d", "l"), "spMatrix"))
-    setMethod("is.na", signature(x = .cl), .is.na)
-setMethod("is.infinite", signature(x = "dspMatrix"), .is.infinite)
-setMethod("is.finite", signature(x = "dspMatrix"), .is.finite)
-
-rm(.cl, .is.na, .is.infinite, .is.finite)

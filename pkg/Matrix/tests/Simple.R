@@ -1320,7 +1320,7 @@ stopifnot(identical(as.vector(lT.), NA),
           identical(as(lT1, "CsparseMatrix")@x, TRUE),
           identical(as(lT1, "dMatrix")@x, 1))
 
-## various is.na() bugs in Matrix <= 1.4-1
+## various is.na(), anyNA() bugs in Matrix <= 1.4-1
 .nge <- new("ngeMatrix", Dim = c(2L, 2L), x = rep.int(NA, 4L))
 .dtr <- new("dtrMatrix", Dim = c(2L, 2L), x = c(NA, 1, 2, Inf), diag = "U")
 .dsy <- new("dsyMatrix", Dim = c(2L, 2L), x = c(1, NA, 2, 3))
@@ -1328,7 +1328,10 @@ stopifnot(!any(is.na(.nge)),
           !any(is.na(.dtr)),
           !any(is.infinite(.dtr)),
           !any(is.na(.dsy)),
-          is(is.na(.dsy), "sparseMatrix"))
+          is(is.na(.dsy), "sparseMatrix"),
+          !anyNA(.nge),
+          !anyNA(.dtr),
+          !anyNA(.dsy))
 
 ## various `dim<-`() bugs in Matrix <= 1.4-1
 .dgR <- new("dgRMatrix", Dim = c(2L, 2L), p = integer(3L))

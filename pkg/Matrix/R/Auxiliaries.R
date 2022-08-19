@@ -155,11 +155,6 @@ Matrix.msg12 <- function(m1, m2, ...) {
 }
 } ## unused
 
-## TODO: faster via C, either R's  R_data_class() [which needs to become API !]
-##       or even direct  getAttrib(x, R_ClassSymbol); ..
-##' class - single string, no "package" attribute,..
-.class0 <- function(x)  as.vector(class(x))
-
 ## we can set this to FALSE and possibly measure speedup:
 .copyClass.check <- TRUE
 
@@ -716,49 +711,6 @@ colCheck <- function(a, b) {
     da[2]
 }
 
-## is.na(<nsparse>) is FALSE everywhere.  Consequently, this function
-## just gives an "all-FALSE" nCsparseMatrix of same form as x
-##'
-##' @title all FALSE nCsparseMatrix "as x"
-##' @param x Matrix
-##' @return n.CsparseMatrix "as \code{x}"
-##' @author Martin Maechler
-is.na_nsp <- function(x) {
-    d <- x@Dim
-    dn <- x@Dimnames
-    ## step-wise construction ==> no validity check for speedup
-    r <- new(if(.hasSlot(x, "diag"))
-                 "ntCMatrix"
-             else if(.hasSlot(x, "uplo"))
-                 "nsCMatrix"
-             else "ngCMatrix")
-    r@Dim <- d
-    r@Dimnames <- dn
-    r@p <- rep.int(0L, d[2L] + 1)
-    r
-}
-
-allTrueMat <- function(x,
-                       symmetric = .hasSlot(x, "uplo") && !.hasSlot(x, "diag"),
-                       packed = TRUE) {
-    r <- new(if(!symmetric)
-                 "ngeMatrix"
-             else if(packed)
-                 "nspMatrix"
-             else "nsyMatrix")
-    r@Dim <- d <- x@Dim
-    r@Dimnames <- x@Dimnames
-    r@x <- rep.int(TRUE, if(symmetric && packed) {
-                             n <- d[1L]
-                             n + (n^2 - n) / 2
-                         } else prod(d))
-    if(symmetric)
-        r@uplo <- x@uplo
-    r
-}
-
-allTrueMatrix <- function(x) allTrueMat(x)
-
 ## MJ: no longer needed ... can now do is(x, "packedMatrix")
 if(FALSE) {
 ## Note: !isPacked(.)  i.e. `full' still contains
@@ -795,6 +747,8 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
     x
 }
 
+## MJ: unused
+if(FALSE) {
 ## The i-th unit vector  e[1:n] with e[j] = \delta_{i,j}
 ## .E.i.log <- function(i,n)  i == (1:n)
 ## .E.i <- function(i,n)
@@ -802,7 +756,6 @@ emptyColnames <- function(x, msg.if.not.empty = FALSE)
 ##     r[i] <- 1.
 ##     r
 ## }
-
 idiag <- function(n, p=n)
 {
     ## Purpose: diag() returning  *integer*
@@ -822,6 +775,7 @@ ldiag <- function(n, p=n)
 	r[1 + 0:(m - 1) * (n + 1)] <- TRUE
     r
 }
+} ## MJ
 
 indDiag <- function(n, upper = TRUE, packed = FALSE)
     .Call(R_index_diagonal, n, upper, packed)
@@ -1415,6 +1369,13 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
     else if(extends(clx, "symmetricMatrix"))  "s" else "g"
 }
 
+## MJ: unused
+if(FALSE) {
+## TODO: faster via C, either R's  R_data_class() [which needs to become API !]
+##       or even direct  getAttrib(x, R_ClassSymbol); ..
+##' class - single string, no "package" attribute,..
+.class0 <- function(x)  as.vector(class(x))
+} ## MJ
 
 class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
@@ -1778,26 +1739,6 @@ if(FALSE) {
 }
 }
 
-.diagU2N <- function(x, cl, checkDense = FALSE) {
-    ## A fast "no-test" version, which _knows_ that 'x'
-    ## is formally a unit diagonal triangularMatrix
-    if(extends(cl, "CsparseMatrix"))
-	.Call(Csparse_diagU2N, x)
-    else if(extends(cl, "TsparseMatrix"))
-	.Call(Tsparse_diagU2N, x)
-    else if(checkDense && extends(cl, "denseMatrix"))
-        .dense.diagU2N(x)
-    else # still possibly dense
-        .Call(Tsparse_diagU2N, as(x, "TsparseMatrix"))
-    ## ^leaving as TsparseMatrix ... caller can coerce as necessary
-}
-
-diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(extends(cl, "triangularMatrix") && x@diag == "U")
-	.diagU2N(x, cl, checkDense = checkDense)
-    else x
-}
-
 ##' @title coerce triangular Matrix to uni-diagonal
 ##'
 ##' NOTE: class is *not* checked here! {speed}
@@ -1811,15 +1752,47 @@ diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     x
 }
 
-diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(!extends(cl, "triangularMatrix") || x@diag == "U")
-	x
-    else if(extends(cl, "CsparseMatrix"))
+## This one and the following are fast "no-test" versions,
+## which _know_ that 'x' is formally a triangularMatrix
+## having a unit or non-unit diagonal
+.diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(extends(cl, "CsparseMatrix"))
+	.Call(Csparse_diagU2N, x)
+    if(extends(cl, "RsparseMatrix"))
+	.tCR2RC(.Call(Csparse_diagU2N, .tCR2RC(x)))
+    else if(extends(cl, "TsparseMatrix"))
+	.Call(Tsparse_diagU2N, x)
+    else if(checkDense && extends(cl, "denseMatrix"))
+        .dense.diagU2N(x)
+    else # still possibly dense
+        .Call(Csparse_diagU2N, as(x, "CsparseMatrix"))
+    ## ^leaving as CsparseMatrix ... caller can coerce as necessary
+}
+
+.diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(extends(cl, "CsparseMatrix"))
         .Call(Csparse_diagN2U, x)
+    else if(extends(cl, "RsparseMatrix"))
+        .tCR2RC(.Call(Csparse_diagN2U, .tCR2RC(x)))
+    else if(extends(cl, "TsparseMatrix"))
+        .CR2T(.Call(Csparse_diagN2U, .T2C(x)))
     else if(checkDense && extends(cl, "denseMatrix"))
 	.dense.diagN2U(x)
     else # still possibly dense
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
+    ## ^leaving as CsparseMatrix ... caller can coerce as necessary
+}
+
+diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(extends(cl, "triangularMatrix") && x@diag == "U")
+        .diagU2N(x, cl, checkDense = checkDense)
+    else x
+}
+
+diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(extends(cl, "triangularMatrix") || x@diag == "N")
+	.diagN2U(x, cl, checkDense = checkDense)
+    else x
 }
 
 if(.Matrix.supporting.cached.methods) {

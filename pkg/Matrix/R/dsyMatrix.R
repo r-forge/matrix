@@ -94,26 +94,3 @@ setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "dsyMatrix", b = "numLike"),
 	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
-
-.is.na <- .is.infinite <- .is.finite <- function(x) {
-    n <- (d <- x@Dim)[1L]
-    i <- is.na(x@x)
-    uplo <- x@uplo
-    if(any(i[indTri(n, uplo == "U", TRUE)]))
-        new("nsyMatrix", Dim = d, Dimnames = x@Dimnames,
-            uplo = uplo, x = i)
-    else is.na_nsp(x)
-}
-body(.is.infinite) <-
-    do.call(substitute, list(body(.is.infinite),
-                             list(is.na = quote(is.infinite))))
-body(.is.finite) <-
-    do.call(substitute, list(body(.is.finite),
-                             list(is.na = quote(is.finite))))
-
-for(.cl in paste0(c("d", "l"), "syMatrix"))
-    setMethod("is.na", signature(x = .cl), .is.na)
-setMethod("is.infinite", signature(x = "dsyMatrix"), .is.infinite)
-setMethod("is.finite", signature(x = "dsyMatrix"), .is.finite)
-
-rm(.cl, .is.na, .is.infinite, .is.finite)
