@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-17 r3578)}{
+\section{Changes in version 1.4-2 (2022-08-19 r3584)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -276,6 +276,10 @@
       \item \code{"Compare"} operators, e.g., \code{a > b}, \code{x != y},
       now work correctly in more dense unitriangular and sparse 0-extent
       cases.
+
+      \item \code{!<nMatrix>} is now always an \code{nMatrix}, never
+      an \code{lMatrix}.  \code{!<ndenseMatrix>} now correctly handles
+      \code{NA} as \code{TRUE}.
     }
   }
   \subsection{New Features}{

@@ -5,6 +5,7 @@
 \alias{nspMatrix-class}
 \alias{nsyMatrix-class}
 %
+\alias{!,nspMatrix-method}
 \alias{coerce,matrix,nspMatrix-method}
 \alias{coerce,nspMatrix,dspMatrix-method}
 \alias{coerce,nspMatrix,lspMatrix-method}
@@ -15,6 +16,7 @@
 \alias{coerce,nspMatrix,nsyMatrix-method}
 \alias{coerce,nspMatrix,ntpMatrix-method}
 %
+\alias{!,nsyMatrix-method}
 \alias{coerce,matrix,nsyMatrix-method}
 \alias{coerce,nsyMatrix,dsyMatrix-method}
 \alias{coerce,nsyMatrix,lsyMatrix-method}

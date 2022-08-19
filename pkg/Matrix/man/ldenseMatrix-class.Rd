@@ -4,7 +4,6 @@
 %
 \alias{ldenseMatrix-class}
 %
-\alias{!,ldenseMatrix-method}
 \alias{&,ldenseMatrix,ddiMatrix-method}
 \alias{&,ldenseMatrix,ldiMatrix-method}
 \alias{*,ldenseMatrix,ddiMatrix-method}

@@ -13,6 +13,7 @@
 \alias{nsRMatrix-class}
 \alias{nsTMatrix-class}
 % nsparse
+\alias{!,nsparseMatrix-method}
 \alias{-,nsparseMatrix,missing-method}
 \alias{Arith,nsparseMatrix,Matrix-method}
 \alias{Arith,dsparseMatrix,nsparseMatrix-method}
@@ -223,14 +224,14 @@
 ## ``extract the nonzero-pattern of (m) into an nMatrix'':
 nm <- as(m, "nsparseMatrix") ## -> will be a "ngCMatrix"
 str(nm) # no 'x' slot
-nnm <- !nm     # no longer sparse
-(nnm <- as(nnm, "sparseMatrix"))# "lgCMatrix"
+nnm <- !nm # no longer sparse
 ## consistency check:
 stopifnot(xor(as( nm, "matrix"),
               as(nnm, "matrix")))
 
 ## low-level way of adding "non-structural zeros" :
-nnm@x[2:4] <- c(FALSE,NA,NA)
+nnm <- as(nnm, "lsparseMatrix") # "lgCMatrix"
+nnm@x[2:4] <- c(FALSE, NA, NA)
 nnm
 as(nnm, "nMatrix") # NAs *and* non-structural 0  |--->  'TRUE'
 
