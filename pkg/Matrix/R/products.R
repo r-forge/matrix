@@ -154,7 +154,7 @@ for(c.x in c("lMatrix", "nMatrix")) {
     for(c.y in c("lMatrix", "nMatrix"))
     setMethod("%*%", signature(x = c.x, y = c.y),
 	      function(x, y) as(x, "dMatrix") %*% as(y, "dMatrix"))
-}; rm(c.x, c.y)
+}
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 	  function(x, y) .Call(Csparse_Csparse_prod, x, y, boolArith=NA))
@@ -679,6 +679,7 @@ for(c.x in paste0(c("d", "l", "n"), "denseMatrix")) {
 		  .Call(geMatrix_geMatrix_crossprod, x, y, TRUE))
     }
 }
+rm(c.x, c.y)
 
 if(FALSE) { ## this would mask 'base::tcrossprod'
 setMethod("tcrossprod", signature(x = "matrix", y = "missing"),
@@ -947,13 +948,41 @@ setMethod("%&%", signature(x = "matrix", y = "ANY"), function(x, y) x %&% as.mat
 setMethod("%&%", signature(x = "ANY", y = "matrix"), function(x, y) as.matrix(x) %&% y)
 setMethod("%&%", signature(x = "Matrix", y = "ANY"), function(x, y) x %&% as(y, "Matrix"))
 setMethod("%&%", signature(x = "ANY", y = "Matrix"), function(x, y) as(x, "Matrix") %&% y)
-## catch all
-setMethod("%&%", signature(x = "mMatrix", y = "mMatrix"),
+## catch all --- NB: These are *not* sufficient: sparse d* and l*  need to drop0() or use  do(.., drop0=TRUE)
+## setMethod("%&%", signature(x = "mMatrix", y = "mMatrix"),
+## 	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
+## setMethod("%&%", signature(x = "Matrix", y = "Matrix"),
+## 	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
+## setMethod("%&%", signature(x = "mMatrix", y = "nMatrix"), function(x, y) as(x, "nMatrix") %&% y)
+## setMethod("%&%", signature(x = "nMatrix", y = "mMatrix"), function(x, y) x %&% as(y, "nMatrix"))
+##  ==> restrict signatures to *dense*
+setMethod("%&%", signature(x = "matrix", y = "matrix"),
 	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
 setMethod("%&%", signature(x = "Matrix", y = "Matrix"),
+	  function(x, y) as(x, "denseMatrix") %&% as(y, "denseMatrix"))
+setMethod("%&%", signature(x = "denseMatrix", y = "denseMatrix"),
 	  function(x, y) as(x, "nMatrix") %&% as(y, "nMatrix"))
-setMethod("%&%", signature(x = "mMatrix", y = "nMatrix"), function(x, y) as(x, "nMatrix") %&% y)
-setMethod("%&%", signature(x = "nMatrix", y = "mMatrix"), function(x, y) x %&% as(y, "nMatrix"))
+## ensure  drop0() happens (*efficiently*) for sparse matrices:
+for(c1 in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix")) {
+  if(c1 == "CsparseMatrix")
+      for(c2 in c("RsparseMatrix", "TsparseMatrix"))
+	  setMethod("%&%", signature(x = c1, y = c2),
+		    function(x, y) .sparse2kind(x, "n", drop0=TRUE) %&%
+				   as(.sparse2kind(y, "n", drop0=TRUE), "CsparseMatrix"))
+  else # c1 = "R..." or "T..."
+      for(c2 in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix"))
+	  setMethod("%&%", signature(x = c1, y = c2),
+		    function(x, y) as(.sparse2kind(x, "n", drop0=TRUE), "CsparseMatrix") %&%
+				   as(.sparse2kind(y, "n", drop0=TRUE), "CsparseMatrix"))
+  ## FIXME?  coercion to  'CsparseMatrix' is too bossy; need one of C,R,T however :
+  setMethod("%&%", signature(x = "mMatrix", y = c1),
+	  function(x, y) .sparse2kind(as(x, "CsparseMatrix"), "n", drop0=TRUE) %&%
+			 .sparse2kind(y, "n", drop0=TRUE))
+  setMethod("%&%", signature(x = c1, y = "mMatrix"),
+            function(x, y) .sparse2kind(x, "n", drop0=TRUE) %&%
+                           .sparse2kind(as(y, "CsparseMatrix"), "n", drop0=TRUE))
+}
+rm(c1,c2)
 
 ## sparseVectors :
 sp.bx.sp <- function(x, y) Matrix(any(x & y), 1L, 1L, sparse=FALSE)
@@ -976,7 +1005,6 @@ setMethod("%&%", signature(x = "sparseVector", y = "mMatrix"), function(x, y)
 setMethod("%&%", signature(x = "sparseVector", y = "sparseVector"), sp.bX.sp)
 setMethod("%&%", signature(x = "sparseVector", y = "numLike"),      sp.bX.sp)
 setMethod("%&%", signature(x = "numLike",      y = "sparseVector"), v.bX.sp)
-
 ## For now --- suboptimally!!! --- we coerce to nsparseMatrix always:
 setMethod("%&%", signature(x = "nMatrix", y = "nsparseMatrix"),
 	  function(x, y) as(x, "nsparseMatrix") %&% y)
