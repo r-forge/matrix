@@ -5,6 +5,10 @@
 \alias{chol-methods}
 %
 \alias{chol,diagonalMatrix-method}
+\alias{chol,dgCMatrix-method}
+\alias{chol,dgRMatrix-method}
+\alias{chol,dgTMatrix-method}
+\alias{chol,dgeMatrix-method}
 \alias{chol,dsCMatrix-method}
 \alias{chol,dsRMatrix-method}
 \alias{chol,dsTMatrix-method}
@@ -20,8 +24,8 @@
 }
 \usage{
 chol(x, \dots)
-\S4method{chol}{dsyMatrix}(x, pivot, \dots)
-\S4method{chol}{dspMatrix}(x, pivot, \dots)
+\S4method{chol}{dsyMatrix}(x, \dots)
+\S4method{chol}{dspMatrix}(x, \dots)
 \S4method{chol}{dsCMatrix}(x, pivot = FALSE, \dots)
 \S4method{chol}{dsRMatrix}(x, pivot = FALSE, cache = TRUE, \dots)
 \S4method{chol}{dsTMatrix}(x, pivot = FALSE, cache = TRUE, \dots)
