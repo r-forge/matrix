@@ -131,13 +131,3 @@ setMethod("which", "ltTMatrix", function(x, arr.ind, useNames = TRUE)
 	  which.lgT(.Call(Tsparse_diagU2N, x), arr.ind, useNames))
 setMethod("which", "lsTMatrix", function(x, arr.ind, useNames = TRUE)
 	  which.lgT(as(x, "generalMatrix"), arr.ind, useNames))
-
-setMethod("anyNA", signature(x = "nMatrix"), function(x) FALSE)
-
-setMethod("is.na", signature(x = "nMatrix"), is.na_nsp)
-
-setMethod("is.finite", signature(x = "lMatrix"), function(x) !is.na(x))
-setMethod("is.finite", signature(x = "nMatrix"), allTrueMatrix)
-
-setMethod("is.infinite", signature(x = "lMatrix"), is.na_nsp)# all FALSE
-setMethod("is.infinite", signature(x = "nMatrix"), is.na_nsp)# all FALSE

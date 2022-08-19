@@ -19,9 +19,9 @@
 }
 \usage{
  diagN2U(x, cl = getClassDef(class(x)), checkDense = FALSE)
-
  diagU2N(x, cl = getClassDef(class(x)), checkDense = FALSE)
-.diagU2N(x, cl, checkDense = FALSE)
+.diagU2N(x, cl = getClassDef(class(x)), checkDense = FALSE)
+%.diagN2U(x, cl = getClassDef(class(x)), checkDense = FALSE) % export?
 }
 \arguments{
   \item{x}{a \code{\linkS4class{triangularMatrix}}, often sparse.}

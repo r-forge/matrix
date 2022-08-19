@@ -284,10 +284,6 @@ setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "character"),
               callGeneric()
           })
 
-setMethod("is.na", signature(x = "indMatrix"), is.na_nsp)
-setMethod("is.infinite", signature(x = "indMatrix"), is.na_nsp)
-setMethod("is.finite", signature(x = "indMatrix"), allTrueMatrix)
-
 setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
 	  function(x, y) x %*% as(y, "lMatrix"))
 setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),

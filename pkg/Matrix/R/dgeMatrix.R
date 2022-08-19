@@ -53,22 +53,3 @@ setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "dgeMatrix", b = "numLike"),
 	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b))
-
-.is.na <- .is.infinite <- .is.finite <- function(x) {
-    if(any(i <- is.na(x@x)))
-        new("ngeMatrix", Dim = x@Dim, Dimnames = x@Dimnames, x = i)
-    else is.na_nsp(x)
-}
-body(.is.infinite) <-
-    do.call(substitute, list(body(.is.infinite),
-                             list(is.na = quote(is.infinite))))
-body(.is.finite) <-
-    do.call(substitute, list(body(.is.finite),
-                             list(is.na = quote(is.finite))))
-
-for(.cl in paste0(c("d", "l"), "geMatrix"))
-    setMethod("is.na", signature(x = .cl), .is.na)
-setMethod("is.infinite", signature(x = "dgeMatrix"), .is.infinite)
-setMethod("is.finite", signature(x = "dgeMatrix"), .is.finite)
-
-rm(.cl, .is.na, .is.infinite, .is.finite)

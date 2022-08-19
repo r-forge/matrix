@@ -934,21 +934,6 @@ setMethod("cov2cor", signature(V = "sparseMatrix"),
 	      as(r, "symmetricMatrix")
 	  })
 
-setMethod("is.na", signature(x = "sparseMatrix"),## NB: nsparse* have own method!
-	  function(x) {
-	      if(any((inax <- is.na(x@x)))) {
-		  cld <- getClassDef(class(x))
-		  if(extends(cld, "triangularMatrix") && x@diag == "U")
-		      inax <- is.na((x <- .diagU2N(x, cld))@x)
-		  r <- as(x, "lMatrix") # will be "lsparseMatrix" - *has* x slot
-		  r@x <- if(length(inax) == length(r@x)) inax else is.na(r@x)
-                  if(!extends(cld, "CsparseMatrix"))
-                      r <- as(r, "CsparseMatrix")
-		  as(.Call(Csparse_drop, r, 0), "nMatrix") # a 'pattern matrix
-	      }
-	      else is.na_nsp(x)
-	  })
-
 ## all.equal(): similar to all.equal_Mat() in ./Matrix.R ;
 ## -----------	eventually defer to  "sparseVector" methods:
 setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),

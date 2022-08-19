@@ -55,35 +55,6 @@ setAs("sparseVector", "zsparseVector",
           new("zsparseVector", length = from@length, i = from@i,
               x = as.complex(from@x)))
 
-setMethod("is.na", signature(x = "nsparseVector"),
-	  function(x)
-              new("nsparseVector", length = x@length))
-setMethod("is.na", signature(x = "sparseVector"),
-	  function(x)
-              new("nsparseVector", length = x@length, i = x@i[is.na(x@x)]))
-
-setMethod("anyNA", signature(x = "nsparseVector"),
-          function(x) FALSE)
-setMethod("anyNA", signature(x = "sparseVector"),
-          function(x) anyNA(x@x))
-
-setMethod("is.infinite", signature(x = "nsparseVector"),
-	  function(x)
-              new("nsparseVector", length = x@length))
-setMethod("is.infinite", signature(x = "sparseVector"),
-	  function(x)
-              new("nsparseVector", length = x@length,
-                  i = x@i[is.infinite(x@x)]))
-
-setMethod("is.finite", signature(x = "nsparseVector"),
-	  function(x) rep.int(TRUE, x@length))
-setMethod("is.finite", signature(x = "sparseVector"),
-	  function(x)  {
-	      r <- rep.int(TRUE, x@length)
-	      r[x@i[!is.finite(x@x)]] <- FALSE
-	      r
-	  })
-
 ##' Uniquify sparceVectors, i.e., bring them in "regularized" from,
 ##' --- similar in spirit (and action!) as  uniqTsparse(.) for "TsparseMatrix"
 ##' __FIXME__ better name ??  , then export and document!  __TODO__

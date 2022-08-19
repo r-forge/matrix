@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-19 r3584)}{
+\section{Changes in version 1.4-2 (2022-08-19 r3585)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -280,6 +280,11 @@
       \item \code{!<nMatrix>} is now always an \code{nMatrix}, never
       an \code{lMatrix}.  \code{!<ndenseMatrix>} now correctly handles
       \code{NA} as \code{TRUE}.
+
+      \item{anyNA(<denseMatrix>)} had incorrectly returned
+      \code{anyNA(.@x)} in many cases, giving false positives
+      for some \code{.(tr|sy)Matrix} and \code{ndenseMatrix}.
+      Now methods respect the \dQuote{rules} of these classes.
     }
   }
   \subsection{New Features}{
