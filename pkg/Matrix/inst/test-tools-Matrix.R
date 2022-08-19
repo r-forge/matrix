@@ -399,7 +399,18 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
 ##' Cheap  Boolean Arithmetic Matrix product
 ##' Should be equivalent to  %&%  which is faster [not for large dense!].
 ##' Consequently mainly used in  checkMatrix()
-boolProd <- function(x,y) as((abs(x) %*% abs(y)) > 0, "nMatrix")
+## The first version (up to Aug.2022)  -- possibly what we should use for dense case (!?)
+boolProd0 <- function(x,y) as((abs(x) %*% abs(y)) > 0, "nMatrix")
+## New since  Aug.13, 2022, ensuring that zeros are dropped
+boolProd <- function(x,y) {
+    r <- (abs(x) %*% abs(y)) > 0
+    cl <- getClassDef(class(r))
+    if(extends(cl, "CsparseMatrix") || extends(cl, "TsparseMatrix") || extends(cl, "RsparseMatrix"))
+        .sparse2kind(r, kind="n", drop0=TRUE)
+    else # also for "sparseMatrix" cases "indMatrix" (incl "pMatrix") or "diagonalMatrix"
+        ## NB: "diagonalMatrix already *does* drop0(.) when coerced to "nMatrix"
+        as(r, "nMatrix")
+}
 .sparse2kind <- Matrix:::.sparse2kind # (FIXME -- a version of this should be exported!)
 
 ###----- Checking a "Matrix" -----------------------------------------

@@ -3,7 +3,7 @@
 ####           ~~~~~~~~~~          ~~~~~~~~~~~~~
 
 options(Matrix.warnDeprecatedCoerce = 2)
-##                                  === severe, just for Matrix-maintainers
+##                                  === severe, try ..
 
 if(interactive()) {
     options(error = recover, warn = 1)
@@ -803,11 +803,8 @@ assert.EQ.mat(N,m.L); N ; assertWarning(
 C[i] <- v, verbose=TRUE)
 assert.EQ.mat(C,m.L); C #
 
-## options(warn = 2) #---------------------# NO WARNINGS from here -----------------
-## 					  ## =====================
-
-## ## Until we purge deprecated coercions from our own code:
-## options(Matrix.warnDeprecatedCoerce = FALSE)
+options(warn = 2) #----------------------# NO WARNINGS from here -----------------
+					## =====================
 
 ## 2) negative [i,j] indices
 mc <- mC[1:5, 1:7]
@@ -1119,7 +1116,7 @@ showProc.time()
 n <- 7000000
 m <-  100000
 nnz <- 20000
-op <- options(Matrix.verbose = 2, warn = 1, Matrix.warnDeprecatedCoerce = NA)
+op <- options(Matrix.verbose = 2, warn = 1)# was  Matrix.warnDeprecatedCoerce = NA)
 
 set.seed(12)
 f <- sparseMatrix(i = sample(n, size=nnz, replace=TRUE),

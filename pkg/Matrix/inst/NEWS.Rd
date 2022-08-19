@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-19 r3585)}{
+\section{Changes in version 1.4-2 (2022-08-19 r3586)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -285,6 +285,12 @@
       \code{anyNA(.@x)} in many cases, giving false positives
       for some \code{.(tr|sy)Matrix} and \code{ndenseMatrix}.
       Now methods respect the \dQuote{rules} of these classes.
+
+      \item The boolean arithmetic product \code{A \%&\% B} and e.g.,
+      \code{crossprod(A, B, boolArith=TRUE)} now should behave as if
+      \code{drop0(A)} and \code{drop0(B)} were used, i.e., for formally
+      sparse matrices, the boolean product results should be stable with
+      respect to non-structural vs structural zeros.
     }
   }
   \subsection{New Features}{
