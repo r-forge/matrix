@@ -172,7 +172,7 @@ as(2:4, "indMatrix")
 # 3 observations, 5 values, first and last do not occur in sample:
 as(list(2:4, 5), "indMatrix")
 
-as(sm1, "ngTMatrix")
+as(sm1, "nMatrix")
 s10[1:7, 1:4] # gives an "ngTMatrix" (most economic!)
 s10[1:4, ]  # preserves "indMatrix"-class
 

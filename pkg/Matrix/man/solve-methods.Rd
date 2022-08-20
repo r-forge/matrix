@@ -145,7 +145,7 @@
     }
 
     \item{\code{signature(a = "ddenseMatrix", b = "....")}}{(for all
-      \code{b}) work via \code{as(a, "dgeMatrix")}, using the its
+      \code{b}) work via \code{as(a, "generalMatrix")}, using the its
       methods, see below.}
 
     \item{\code{signature(a = "denseLU", b = "missing")}}{

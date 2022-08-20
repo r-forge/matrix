@@ -37,7 +37,7 @@
   there.
 }
 \section{Methods}{
-  Most methods are implemented via \code{as(*, "dgeMatrix")} and are
+  Most methods are implemented via \code{as(*, "generalMatrix")} and are
   mainly used as \dQuote{fallbacks} when the subclass doesn't need its
   own specialized method.
 

@@ -82,7 +82,7 @@ isTriangular(Diagonal(4))
 ## is TRUE: a diagonal matrix is also (both upper and lower) triangular
 (M <- Matrix(c(1,2,0,1), 2,2))
 isTriangular(M) # TRUE (*and* of formal class "dtrMatrix")
-isTriangular(as(M, "dgeMatrix")) # still triangular, even if not "formally"
+isTriangular(as(M, "generalMatrix")) # still triangular, even if not "formally"
 isTriangular(crossprod(M)) # FALSE
 
 isDiagonal(matrix(c(2,0,0,1), 2,2)) # TRUE

@@ -126,9 +126,7 @@
 mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
 mm # automatically dsCMatrix
 str(mm)
-
-## how would we go from a manually constructed Tsparse* :
-mT <- as(mm, "dgTMatrix")
+mT <- as(as(mm, "generalMatrix"), "TsparseMatrix")
 
 ## Either
 (symM <- as(mT, "symmetricMatrix")) # dsT

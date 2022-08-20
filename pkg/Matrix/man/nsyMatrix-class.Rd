@@ -71,10 +71,10 @@
 \examples{
 (s0 <- new("nsyMatrix"))
 
-(M2 <- Matrix(c(TRUE, NA,FALSE,FALSE), 2,2)) # logical dense (ltr)
-(sM <- M2 & t(M2))      # "lge"
-class(sM <- as(sM, "nMatrix")) # -> "nge"
-     (sM <- as(sM, "nsyMatrix")) # -> "nsy"
-str ( sM <- as(sM, "nspMatrix")) # -> "nsp": packed symmetric
+(M2 <- Matrix(c(TRUE, NA, FALSE, FALSE), 2, 2)) # logical dense (ltr)
+(sM <- M2 & t(M2)) # "lge"
+class(sM <- as(sM, "nMatrix"))         # -> "nge"
+     (sM <- as(sM, "symmetricMatrix")) # -> "nsy"
+str  (sM <- as(sM, "packedMatrix"))    # -> "nsp": packed symmetric
 }
 \keyword{classes}

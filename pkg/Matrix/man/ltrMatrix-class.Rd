@@ -68,10 +68,10 @@
 showClass("ltrMatrix")
 
 str(new("ltpMatrix"))
-(lutr <- as(upper.tri(matrix(,4,4)), "ltrMatrix"))
-str(lutp <- as(lutr, "ltpMatrix"))# packed matrix: only 10 = (4+1)*4/2 entries
-!lutp ## the logical negation (is *not* logical triangular !)
+(lutr <- as(upper.tri(matrix(, 4, 4)), "ldenseMatrix"))
+str(lutp <- pack(lutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
+!lutp # the logical negation (is *not* logical triangular !)
 ## but this one is:
-stopifnot(all.equal(lutp, as(!!lutp, "ltpMatrix")))
+stopifnot(all.equal(lutp, pack(!!lutp)))
 }
 \keyword{classes}

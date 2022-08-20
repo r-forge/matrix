@@ -393,7 +393,7 @@
  m <- matrix(0, 400, 500)
  set.seed(12)
  m[runif(314, 0, length(m))] <- 1
- mm <- as(m, "dgCMatrix")
+ mm <- as(m, "CsparseMatrix")
  object.size(m) / object.size(mm) # smaller by a factor of > 200
 
  ## tcrossprod() is very fast:

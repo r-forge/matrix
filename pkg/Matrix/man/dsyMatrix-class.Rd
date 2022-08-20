@@ -120,8 +120,8 @@ stopifnot(1 == grep("not a positive definite matrix",
 
 ## 4x4 example
 m <- matrix(0,4,4); m[upper.tri(m)] <- 1:6
-sym <- m+t(m)+diag(11:14, 4); sym
-S1 <- as(sym, "dspMatrix")
+(sym <- m+t(m)+diag(11:14, 4))
+(S1 <- pack(sym))
 (S2 <- t(S1))
 stopifnot(all(S1 == S2)) # equal "seen as matrix", but differ internally :
 str(S1)
