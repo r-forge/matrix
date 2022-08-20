@@ -160,7 +160,7 @@ chkDnProd(M = as(d, "denseMatrix"))# M: dtrMatrix (diag = "N")
 }
 
 
-m5 <- 1 + as(diag(-1:4)[-5,], "dgeMatrix")
+m5 <- 1 + as(diag(-1:4)[-5,], "generalMatrix")
 ## named dimnames:
 dimnames(m5) <- list(Rows= LETTERS[1:5], paste("C", 1:6, sep=""))
 tr5 <- tril(m5[,-6])
@@ -279,12 +279,19 @@ stopifnot(exprs = {
 Qidentical3 <- function(a,b,c) Q.eq(a,b) && Q.eq(b,c)
 Qidentical4 <- function(a,b,c,d) Q.eq(a,b) && Q.eq(b,c) && Q.eq(c,d)
 chkP <- function(mLeft, mRight, MLeft, MRight, cl = class(MLeft)) {
-    ident4 <- if(extends(cl, "generalMatrix"))
-		  function(a,b,c,d) identical4(as(a, cl), b, c, d)
-	      else function(a,b,c,d) {
-		  assert.EQ.mat(M=b, m=a, tol=0)
-		  Qidentical3(b,c,d)
-	      }
+    ident4 <-
+        if(extends(cl, "generalMatrix")) {
+            function(a,b,c,d) {
+                r <- eval(Matrix:::.as.via.virtual(
+                                       class(a)[1L], cl[1], quote(a)))
+                identical4(r,b,c,d)
+            }
+        } else {
+            function(a,b,c,d) {
+                assert.EQ.mat(M=b, m=a, tol=0)
+                Qidentical3(b,c,d)
+            }
+        }
     mm <- mLeft %*% mRight # ok
     m.m <- crossprod(mRight)
     mm. <- tcrossprod(mLeft, mLeft)
@@ -496,7 +503,7 @@ cpr   <- t(mm) %*% mm
 cpr.  <- crossprod(mm)
 cpr.. <- crossprod(mm, mm)
 stopifnot(is(cpr., "symmetricMatrix"),
-	  identical3(cpr, as(cpr., class(cpr)), cpr..))
+	  identical3(cpr, as(cpr., "generalMatrix"), cpr..))
 ## with dimnames:
 m <- Matrix(c(0, 0, 2:0), 3, 5)
 dimnames(m) <- list(LETTERS[1:3], letters[1:5])
@@ -507,8 +514,8 @@ t1 <- m %*% t(m)
 (t1. <- tcrossprod(m))
 stopifnot(isSymmetric(p1.),
 	  isSymmetric(t1.),
-	  identical(p1, as(p1., class(p1))),
-	  identical(t1, as(t1., class(t1))),
+	  identical(p1, as(p1., "generalMatrix")),
+	  identical(t1, as(t1., "generalMatrix")),
 	  identical(dimnames(p1), dimnames(p1.)),
 	  identical(dimnames(p1), list(colnames(m), colnames(m))),
 	  identical(dimnames(t1), dimnames(t1.))
@@ -677,13 +684,14 @@ chk.ngMatrix <- function(M, verbose = TRUE) {
     ##
     ## "n" x "d" (and "d" x "n") --> "d", i.e. numeric in any case
     dM <- as(M, "dMatrix")
-    stopifnot( ## dense ones:
-        identical( M %*% m, m %*% M -> Mm)
-       , ## sparse ones :
-        identical3(
-            M %*% dM, dM %*% M -> sMM,
-            as(as(m %*% m, "sparseMatrix"), class(sMM)))
-        )
+    stopifnot(exprs = {
+        ## dense ones:
+        identical(M %*% m, m %*% M -> Mm)
+        ## sparse ones :
+        identical3(M %*% dM, dM %*% M -> sMM,
+                   eval(Matrix:::.as.via.virtual(
+                                     "matrix", class(sMM), quote(m %*% m))))
+    })
     if(verbose) {cat( "M %*% m:\n"); show(Mm) }
     stopifnotValid(Mm,  "dMatrix") # not "n.."
     stopifnotValid(sMM, "dMatrix") # not "n.."
