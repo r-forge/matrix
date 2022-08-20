@@ -86,7 +86,7 @@
   ones, see the section \sQuote{Note}.
 }
 \examples{
-(sm <- as(as(Matrix(diag(5) + 1), "dsyMatrix"), "dspMatrix"))
+(sm <- pack(Matrix(diag(5) + 1))) # dspMatrix
 signif(csm <- chol(sm), 4)
 
 (pm <- crossprod(Matrix(rnorm(18), nrow = 6, ncol = 3)))

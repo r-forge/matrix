@@ -70,10 +70,10 @@
 }
 \examples{%% this is used from ./dtpMatrix-class.Rd (change with care!)
 (m <- rbind(2:3, 0:-1))
-(M <- as(m, "dgeMatrix"))
+(M <- as(m, "generalMatrix"))
 
-(T <- as(M, "dtrMatrix")) ## upper triangular is default
-(T2 <- as(t(M), "dtrMatrix"))
+(T <- as(M, "triangularMatrix")) # formally upper triangular
+(T2 <- as(t(M), "triangularMatrix"))
 stopifnot(T@uplo == "U", T2@uplo == "L", identical(T2, t(T)))
 
 m <- matrix(0,4,4); m[upper.tri(m)] <- 1:6

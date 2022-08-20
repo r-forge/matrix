@@ -80,7 +80,7 @@ set.seed(7)
 str( dm.7 <- dmperm(n7) )
 stopifnot(exprs = {
   lengths(dm.7[1:2]) == dim(n7)
-  identical(dm.7,      dmperm(as(n7, "dgCMatrix")))
+  identical(dm.7,      dmperm(as(n7, "dMatrix")))
   identical(dm.7[1:4], dmperm(n7, nAns=4))
   identical(dm.7[1:2], dmperm(n7, nAns=2))
 })

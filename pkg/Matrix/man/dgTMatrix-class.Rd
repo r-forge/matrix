@@ -24,10 +24,9 @@
   \code{\linkS4class{dgCMatrix}}.
 }
 \section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("dgTMatrix",
-    ...)}, but more typically via \code{as(*, "dgTMatrix")},
-  \code{\link{spMatrix}()}, or
-  \code{\link{sparseMatrix}(*, repr = "T")}.
+  Objects can be created by calls of the form
+  \code{new("dgTMatrix", ...)}, but more typically via
+  \code{\link{spMatrix}()} or \code{\link{sparseMatrix}(*, repr = "T")}.
 }
 \section{Slots}{
   \describe{
@@ -90,7 +89,7 @@
 \examples{
 m <- Matrix(0+1:28, nrow = 4)
 m[-3,c(2,4:5,7)] <- m[ 3, 1:4] <- m[1:3, 6] <- 0
-(mT <- as(m, "dgTMatrix"))
+(mT <- as(m, "TsparseMatrix"))
 str(mT)
 mT[1,]
 mT[4, drop = FALSE]

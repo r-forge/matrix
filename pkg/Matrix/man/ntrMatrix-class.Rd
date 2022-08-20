@@ -70,10 +70,10 @@
 showClass("ntrMatrix")
 
 str(new("ntpMatrix"))
-(nutr <- as(upper.tri(matrix(,4,4)), "ntrMatrix"))
-str(nutp <- as(nutr, "ntpMatrix"))# packed matrix: only 10 = (4+1)*4/2 entries
-!nutp ## the logical negation (is *not* logical triangular !)
+(nutr <- as(upper.tri(matrix(, 4, 4)), "ndenseMatrix"))
+str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
+!nutp # the logical negation (is *not* logical triangular !)
 ## but this one is:
-stopifnot(all.equal(nutp, as(!!nutp, "ntpMatrix")))
+stopifnot(all.equal(nutp, pack(!!nutp)))
 }
 \keyword{classes}

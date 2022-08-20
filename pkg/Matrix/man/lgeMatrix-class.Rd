@@ -61,6 +61,6 @@ set.seed(1)
 (lM <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgeMatrix
 set.seed(11)
 (lC <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgCMatrix
-as(lM, "lgCMatrix")
+as(lM, "CsparseMatrix")
 }
 \keyword{classes}

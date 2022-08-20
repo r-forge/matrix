@@ -236,7 +236,7 @@ nnm
 as(nnm, "nMatrix") # NAs *and* non-structural 0  |--->  'TRUE'
 
 data(KNex)
-nmm <- as(KNex $ mm, "ngCMatrix")
+nmm <- as(KNex $ mm, "nMatrix")
 str(xlx <- crossprod(nmm))# "nsCMatrix"
 stopifnot(isSymmetric(xlx))
 image(xlx, main=paste("crossprod(nmm) : Sparse", class(xlx)))

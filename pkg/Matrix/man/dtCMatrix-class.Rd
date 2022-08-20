@@ -40,9 +40,9 @@
 }
 \section{Objects from the Class}{
   Objects can be created by calls of the form \code{new("dtCMatrix",
-    ...)} or calls of the form  \code{new("dtTMatrix", ...)}, but more
-  typically automatically via \code{\link{Matrix}()} or coercion such as
-  \code{as(x, "triangularMatrix")}, or \code{as(x, "dtCMatrix")}.
+    ...)} or calls of the form  \code{new("dtTMatrix", ...)},
+  but more typically automatically via \code{\link{Matrix}()}
+  or coercions such as \code{as(x, "triangularMatrix")}.
 }
 \section{Slots}{
   \describe{
@@ -106,7 +106,7 @@ t1
 ## from  0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
 tu
-(cu <- as(tu, "dtCMatrix"))
+(cu <- as(tu, "CsparseMatrix"))
 str(cu)# only two entries in @i and @x
 stopifnot(cu@i == 1:0,
           all(2 * symmpart(cu) == Diagonal(4) + forceSymmetric(cu)))
@@ -136,7 +136,7 @@ stopifnot(
 )
 \dontshow{%
 i5. <- I5; colnames(i5.) <- LETTERS[11:15]
-M53 <- as(m53, "dgeMatrix")
+M53 <- as(m53, "denseMatrix")
 stopifnot(
    identical((dns <- dimnames(solve(i5., M53))),
              dimnames(solve(as.matrix(i5.), as.matrix(M53)))) ,
