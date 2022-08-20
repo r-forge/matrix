@@ -335,7 +335,7 @@ A1.8 <- A1; diag(A1.8) <- 8
 ##
 nT. <- as(AT <- as(A., "TsparseMatrix"),"nMatrix")
 stopifnot(all(nT.@i <= nT.@j),
-	  identical(qr(A1.8), qr(as(A1.8, "dgCMatrix"))))
+	  identical(qr(A1.8), qr(as(A1.8, "generalMatrix"))))
 CA <- Cholesky(A.)
 stopifnotValid(CAinv <- solve(CA), "dsCMatrix")
 MA <- as(CA, "Matrix") # with a confusing warning -- FIXME!
@@ -374,7 +374,7 @@ chkCholesky <- function(chmf, A) {
     stopifnot(is(chmf, "CHMfactor"),
               is(A, "Matrix"), isSymmetric(A))
     if(!is(A, "dsCMatrix"))
-        A <- as(A, "dsCMatrix")
+        A <- as(as(as(A, "CsparseMatrix"), "symmetricMatrix", "dMatrix"))
     L <- drop0(zapsmall(L. <- as(chmf, "Matrix")))
     cat("no. nonzeros in L {before / after drop0(zapsmall(.))}: ",
         c(nnzero(L.), nnzero(L)), "\n") ## 112, 95
@@ -545,7 +545,7 @@ checkSchur(Diagonal(x = 9:3))
 
 p <- 4L
 uTp <- new("dtpMatrix", x=c(2, 3, -1, 4:6, -2:1), Dim = c(p,p))
-(uT <- as(uTp, "dtrMatrix"))
+(uT <- as(uTp, "unpackedMatrix"))
 ## Schur ( <general> )  <--> Schur( <triangular> )
 Su <- Schur(uT) ;   checkSchur(uT, Su)
 gT <- as(uT,"generalMatrix")
@@ -554,9 +554,9 @@ Stg <- Schur(t(gT));checkSchur(t(gT), Stg)
 Stu <- Schur(t(uT));checkSchur(t(uT), Stu)
 
 stopifnot(identical3(Sg@T, uT, Su@T),
-          identical(Sg@Q, as(diag(p), "dgeMatrix")),
+          identical(Sg@Q, as(diag(p), "generalMatrix")),
           identical(Stg@T, as(t(gT[,p:1])[,p:1], "triangularMatrix")),
-          identical(Stg@Q, as(diag(p)[,p:1], "dgeMatrix")),
+          identical(Stg@Q, as(diag(p)[,p:1], "generalMatrix")),
           identical(Stu@T, Stg@T))
 assert.EQ.mat(Stu@Q, as(Stg@Q,"matrix"), tol=0)
 
@@ -579,7 +579,7 @@ stopifnot(all.equal(C, diag((5:1)^-2)))
 ## failed in some versions because of a "wrong" implicit generic
 
 U <- cbind(1:0, 2*(1:2))
-(sU <- as(U, "dtCMatrix"))
+(sU <- as(U, "CsparseMatrix"))
 validObject(sS <- crossprod(sU))
 C. <- chol(sS)
 stopifnot(all.equal(C., sU, tol=1e-15))

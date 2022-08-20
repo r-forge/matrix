@@ -31,16 +31,16 @@ stopifnot(colnames(m1) == c.nam,
 	  identical(m1, t(tm1)))
 
 ## an example of *named* dimnames
-(t34N <- as(unclass(table(x = gl(3,4), y=gl(4,3))), "dgeMatrix"))
+(t34N <- as(unclass(table(x = gl(3,4), y=gl(4,3))), "unpackedMatrix"))
 stopifnot(identical(dimnames(t34N),
 		    dimnames(as(t34N, "matrix"))),
           identical(t34N, t(t(t34N))))
 
 ## "dpo"
 checkMatrix(cm <- crossprod(m1))
-checkMatrix(cp <- as(cm, "dppMatrix"))# 'dpp' + factors
+checkMatrix(cp <- as(cm, "packedMatrix"))# 'dpp' + factors
 checkMatrix(cs <- as(cm, "dsyMatrix"))# 'dsy' + factors
-checkMatrix(dcm <- as(cm, "dgeMatrix"))#'dge'
+checkMatrix(dcm <- as(cm, "generalMatrix"))#'dge'
 checkMatrix(mcm <- as(cm, "dMatrix")) # 'dsy' + factors -- buglet? rather == cm?
 checkMatrix(mc. <- as(cm, "Matrix"))  # dpo --> dsy -- (as above)  FIXME? ??
 stopifnot(identical(mc., mcm),
@@ -58,7 +58,7 @@ stopifnot(all(eq@x),
 ## Coercion to 'dpo' should give an error if result would be invalid
 M <- Matrix(diag(4) - 1)
 assertError(as(M, "dpoMatrix"))
-M. <- as(M, "dgeMatrix")
+M. <- as(M, "generalMatrix")
 M.[1,2] <- 10 # -> not even symmetric anymore
 assertError(as(M., "dpoMatrix"))
 
@@ -66,7 +66,7 @@ assertError(as(M., "dpoMatrix"))
 ## Cholesky
 checkMatrix(ch <- chol(cm))
 checkMatrix(ch2 <- chol(as(cm, "dsyMatrix")))
-checkMatrix(ch3 <- chol(as(cm, "dgeMatrix")))
+checkMatrix(ch3 <- chol(as(cm, "generalMatrix")))
 stopifnot(is.all.equal3(as(ch, "matrix"), as(ch2, "matrix"), as(ch3, "matrix")))
 ### Very basic	triangular matrix stuff
 

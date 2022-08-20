@@ -1178,7 +1178,7 @@ x[1:n, 1:n] <- as(z, "sparseVector")
 ## gave Error: ... invalid subscript type 'S4'
 x2 <- x
 
-dim(zC <- as(z, "dgCMatrix"))
+dim(zC <- as(z, "CsparseMatrix"))
 x <- x0
 x[] <- zC # did fail, then gave warning.
 x1 <- x

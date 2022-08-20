@@ -44,9 +44,9 @@ h6 <- h9[1:6,1:6]
 stopifnot(all(h6 == Hilbert(6)), length(h6@factors) == 0)
 stopifnotValid(th9p <- t(h9p), "dppMatrix")
 stopifnotValid(h9p@factors$Cholesky,"Cholesky")
-H6  <- as(h6, "dspMatrix")
+H6  <- as(h6, "packedMatrix")
 pp6 <- as(H6, "dppMatrix")
-po6 <- as(pp6,"dpoMatrix")
+po6 <- as(pp6, "dpoMatrix")
 hs <- as(h9p, "dspMatrix")
 stopifnot(names(H6@factors)  == "pCholesky",
 	  names(pp6@factors) == "pCholesky",
@@ -157,7 +157,7 @@ mM
 stopifnot(length(mM@factors)== 0)
 (po <- as(mM, "dpoMatrix")) # still has dimnames
 mm <- as(mM, "matrix")
-msy <- as(mm, "dsyMatrix")
+msy <- as(mm, "symmetricMatrix")
 stopifnot(Qidentical(mM, msy),
 	  length(mM @factors)== 1,
 	  length(msy@factors)== 0)

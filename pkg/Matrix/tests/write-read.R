@@ -21,7 +21,7 @@ L$y <- KNex$y
 
 
 ## recreate 'mm' from ASCI file :
-mmT <- as(KNex$mm, "dgTMatrix")
+mmT <- as(KNex$mm, "TsparseMatrix")
 str(mmT)
 mm3 <- cbind(i = mmT@i, j = mmT@j, x = mmT@x)
 write.table(mm3, file = "mm-Matrix.tab", row.names=FALSE)# -> ASCII version
@@ -38,7 +38,7 @@ stopifnot(identical(mmT, mmN)) # !!
 stopifnot(all.equal(as(mmN, "matrix"),
                     as(mmT, "matrix"), tol=0))
 
-mm <- as(mmN, "dgCMatrix")
+mm <- as(mmN, "CsparseMatrix")
 stopifnot(all.equal(mm, KNex$mm))
 ## save(mm, file = "....../Matrix/data/mm.rda", compress = TRUE)
 

@@ -7,11 +7,11 @@ source(system.file("test-tools.R", package = "Matrix"))
 ## e ^ 0 = 1  - for matrices:
 assert.EQ.mat(expm(Matrix(0, 3,3)), diag(3), tol = 0)# exactly
 ## e ^ diag(.) = diag(e ^ .):
-assert.EQ.mat(expm(as(diag(-1:4), "dgeMatrix")), diag(exp(-1:4)))
+assert.EQ.mat(expm(as(diag(-1:4), "generalMatrix")), diag(exp(-1:4)))
 set.seed(1)
 rE <- replicate(100,
             { x <- rlnorm(12)
-              relErr(as(expm(as(diag(x), "dgeMatrix")),
+              relErr(as(expm(as(diag(x), "generalMatrix")),
                         "matrix"),
                      diag(exp(x))) })
 stopifnot(mean(rE) < 1e-15,
