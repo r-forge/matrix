@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-19 r3586)}{
+\section{Changes in version 1.4-2 (2022-08-20 r3592)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -278,8 +278,10 @@
       cases.
 
       \item \code{!<nMatrix>} is now always an \code{nMatrix}, never
-      an \code{lMatrix}.  \code{!<ndenseMatrix>} now correctly handles
-      \code{NA} as \code{TRUE}.
+      an \code{lMatrix}.
+
+      \item \code{!<ndenseMatrix>} and \code{which(<ndenseMatrix>)}
+      now correctly handle \code{NA} as \code{TRUE}.
 
       \item{anyNA(<denseMatrix>)} had incorrectly returned
       \code{anyNA(.@x)} in many cases, giving false positives
