@@ -67,7 +67,7 @@ graph2T <- function(from, use.weights =
 	## if(symm) new("dsTMatrix", .....) else
 	new("dgTMatrix", i = i, j = j, x = unlist(eWts),
             Dim = dm, Dimnames = dnms)
-    } else { ## no weights: 0/1 matrix -> logical
+    } else { ## no weights: 0/1 matrix -> pattern
 	edges <- lapply(from@edgeL[nd], "[[", "edges")
 	symm <- graph::edgemode(from) == "undirected"
 	if(symm)# each edge appears twice; keep upper triangle only
@@ -125,25 +125,24 @@ T2graph <- function(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
 
 ## ~~~~ COERCIONS FROM graph TO Matrix ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("graphAM", "sparseMatrix",
+setAs("graphAM", "TsparseMatrix",
       function(from) {
           symm <- graph::edgemode(from) == "undirected" &&
               isSymmetric(from@adjMat)
-	  ## This is only ok if there are no weights...
 	  if(graph.has.weights(from))
-	      as(graph.wgtMatrix(from),
-		 if(symm) "dsTMatrix" else "dgTMatrix")
-          else ## no weights: 0/1 matrix -> logical
-	      as(as(from, "matrix"),
-		 if(symm) "nsTMatrix" else "ngTMatrix")
+	      .m2sparse(graph.wgtMatrix(from), if(symm) "dsT" else "dgT")
+          else ## no weights: 0/1 matrix -> pattern
+	      .m2sparse(   as(from, "matrix"), if(symm) "nsT" else "ngT")
       })
+setAs("graphNEL", "TsparseMatrix",
+      function(from) graph2T(from))
 
 setAs("graph", "CsparseMatrix",
-      function(from) as(graph2T(as(from, "graphNEL")), "CsparseMatrix"))
+      function(from) .T2C(as(from, "TsparseMatrix")))
 setAs("graph", "RsparseMatrix",
-      function(from) as(graph2T(as(from, "graphNEL")), "RsparseMatrix"))
+      function(from) .T2R(as(from, "TsparseMatrix")))
 setAs("graph", "TsparseMatrix",
-      function(from)    graph2T(as(from, "graphNEL")))
+      function(from) graph2T(as(from, "graphNEL")))
 setAs("graph", "sparseMatrix",
       function(from) as(from, "CsparseMatrix"))
 setAs("graph", "Matrix",

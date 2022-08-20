@@ -36,7 +36,7 @@ setAs("nsparseMatrix", "pMatrix",
           d <- from@Dim
           if((n <- d[1L]) != d[2L])
               stop("attempt to a coerce a non-square matrix to pMatrix")
-          from <- as(as(from, "RsparseMatrix"), "generalMatrix")
+          from <- .sparse2g(as(from, "RsparseMatrix"))
           p <- from@p
           if(n > 0L && any(p != 0:n))
               stop("matrix must have exactly one nonzero element in each row")
