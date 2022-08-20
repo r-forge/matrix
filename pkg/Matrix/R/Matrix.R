@@ -549,15 +549,6 @@ setMethod("diff", signature(x = "Matrix"),
 	      x
 	  })
 
-setMethod("image", "Matrix",
-	  function(x, ...) {
-              ## coercing to sparse is not inefficient,
-              ## since we need 'i' and 'j' for levelplot()
-	      x <- ..sparse2d(.sparse2g(as(x, "TsparseMatrix")))
-              callGeneric()
-	  })
-
-
 ## Group Methods
 
 ## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
