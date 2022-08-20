@@ -2,9 +2,6 @@
 ####    aka    subsetting     and  subassignment
 ####           ~~~~~~~~~~          ~~~~~~~~~~~~~
 
-options(Matrix.warnDeprecatedCoerce = 2)
-##                                  === severe, try ..
-
 if(interactive()) {
     options(error = recover, warn = 1)
 } else if(FALSE) { ## MM / developer  testing *manually* :
@@ -26,7 +23,6 @@ if(exists("Sys.setLanguage", mode="function"))
 englishMsgs <- (lang <- Sys.getenv("LANGUAGE")) %in% c("en", "C")
 cat(sprintf("LANGUAGE env.: '%s'; englishMsgs: %s\n",
             lang, englishMsgs))
-
 
 ### Dense Matrices
 
@@ -1116,7 +1112,7 @@ showProc.time()
 n <- 7000000
 m <-  100000
 nnz <- 20000
-op <- options(Matrix.verbose = 2, warn = 1)# was  Matrix.warnDeprecatedCoerce = NA)
+op <- options(Matrix.verbose = 2, warn = 1)
 
 set.seed(12)
 f <- sparseMatrix(i = sample(n, size=nnz, replace=TRUE),
