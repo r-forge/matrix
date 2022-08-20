@@ -7,9 +7,12 @@
 \alias{expm,dMatrix-method}
 \alias{expm,ddiMatrix-method}
 \alias{expm,dgeMatrix-method}
+\alias{expm,dspMatrix-method}
+\alias{expm,dsparseMatrix-method}
+\alias{expm,dsyMatrix-method}
+\alias{expm,dtpMatrix-method}
+\alias{expm,dtrMatrix-method}
 \alias{expm,matrix-method}
-\alias{expm,symmetricMatrix-method}
-\alias{expm,triangularMatrix-method}
 %
 \description{
   Compute the exponential of a matrix.
