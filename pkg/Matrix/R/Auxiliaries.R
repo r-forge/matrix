@@ -1790,7 +1790,7 @@ diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
 }
 
 diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(extends(cl, "triangularMatrix") || x@diag == "N")
+    if(extends(cl, "triangularMatrix") && x@diag == "N")
 	.diagN2U(x, cl, checkDense = checkDense)
     else x
 }
