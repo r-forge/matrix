@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-20 r3596)}{
+\section{Changes in version 1.4-2 (2022-08-20 r3597)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -424,6 +424,9 @@
 
       \item \code{lu(x)} now caches its return value also for all
       \code{ds.Matrix} \code{x} (by default).
+
+      \item \code{readMM()} now warns if the number of entries found
+      is less than number reported in the header.
     }
   }
   \subsection{Misc}{
