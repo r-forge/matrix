@@ -1,8 +1,13 @@
 for(.cl in c("dsparseMatrix", "triangularMatrix", "CsparseMatrix",
              "dMatrix", "sparseMatrix", "Matrix"))
-    setAs("CHMfactor", .cl,
-          function(from) .Call(CHMfactor_to_sparse, from))
+setAs("CHMfactor", .cl,
+      function(from) .Call(CHMfactor_to_sparse, from))
 rm(.cl)
+
+setAs("CHMfactor", "RsparseMatrix",
+      function(from) .CR2RC(.Call(CHMfactor_to_sparse, from)))
+setAs("CHMfactor", "TsparseMatrix",
+      function(from) .CR2T(.Call(CHMfactor_to_sparse, from)))
 
 setAs("CHMfactor", "pMatrix",
       function(from) as(from@perm + 1L, "pMatrix"))
@@ -115,9 +120,6 @@ setMethod("updown",
 ## "Fallback" giving a "good" error message
 setMethod("updown", signature(update = "ANY", C = "ANY", L = "ANY"),
 	  function(update, C, L) stop("'update' must be TRUE, FALSE, \"+\", or \"-\"; 'C' a [mM]atrix; and 'L' a CHMfactor"))
-
-setMethod("image", "CHMfactor",
-          function(x, ...) image(as(x, "CsparseMatrix"), ...))
 
 ##' Test whether a CHMfactor object is LDL or LL
 ##' @param x a CHMfactor object

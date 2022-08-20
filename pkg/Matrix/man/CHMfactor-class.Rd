@@ -12,6 +12,8 @@
 %
 \alias{coerce,CHMfactor,CsparseMatrix-method}
 \alias{coerce,CHMfactor,Matrix-method}
+\alias{coerce,CHMfactor,RsparseMatrix-method}
+\alias{coerce,CHMfactor,TsparseMatrix-method}
 \alias{coerce,CHMfactor,dMatrix-method}
 \alias{coerce,CHMfactor,dsparseMatrix-method}
 \alias{coerce,CHMfactor,pMatrix-method}
