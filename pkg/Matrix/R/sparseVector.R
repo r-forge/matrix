@@ -179,7 +179,7 @@ setAs("CsparseMatrix", "sparseVector", ## could go via TsparseMatrix, but this i
           cld <- getClassDef(class(from))
 	  kind <- .M.kind(from, cld)
 	  if(extends(cld, "symmetricMatrix"))
-	      from <- as(from, "generalMatrix")
+	      from <- .sparse2g(from)
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
 	      from <- .Call(Csparse_diagU2N, from)
           xj <- .Call(Matrix_expand_pointers, from@p)
@@ -202,7 +202,7 @@ setAs("TsparseMatrix", "sparseVector",
           cld <- getClassDef(class(from))
 	  kind <- .M.kind(from, cld)
 	  if(extends(cld, "symmetricMatrix"))
-	      from <- as(from, "generalMatrix")
+	      from <- .sparse2g(from)
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
 	      from <- .Call(Tsparse_diagU2N, from)
 	  if(anyDuplicatedT(from, di = d))
@@ -832,13 +832,6 @@ setMethod("rep", "sparseVector",
 setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
 	  function(a, b, ...) callGeneric(a, as(b, "sparseMatrix")))
 
-## the 'i' slot is 1-based *and* has no NA's:
-
-setMethod("which", "nsparseVector",
-          function(x, arr.ind, useNames) x@i)
-setMethod("which", "lsparseVector",
-          function(x, arr.ind, useNames) x@i[isT(x@x)])
-## and *error* for "dsparseVector", "i*", ...
 
 ##' indices of vector x[] to construct  Toeplitz matrix
 ##' FIXME: write in C, port to  R('stats' package), and use in stats::toeplitz()
