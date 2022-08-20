@@ -44,4 +44,4 @@ setMethod("triu", "nsCMatrix",
 setMethod("t", signature(x = "nsCMatrix"),
           function(x) .Call(nsCMatrix_trans, x),
           valueClass = "nsCMatrix")
-}
+} ## MJ

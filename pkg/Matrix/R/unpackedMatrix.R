@@ -127,12 +127,10 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
         return(FALSE)
     if(n <= 1L)
         return(TRUE)
-    cld <- getClassDef(class(object))
-    if(!extends(cld, "generalMatrix"))
-        object <- as(object, "generalMatrix")
+    object <- .dense2g(object)
     ## now handling n-by-n [dz]geMatrix, n >= 2:
 
-    Cj <- if(extends(cld, "dMatrix")) identity else Conj
+    Cj <- if(is.complex(object@x)) Conj else identity
     ae <- function(check.attributes, ...) {
         ## discarding possible user-supplied check.attributes
         all.equal(..., check.attributes = FALSE)

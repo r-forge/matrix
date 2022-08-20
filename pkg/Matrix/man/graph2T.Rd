@@ -12,7 +12,8 @@
 \alias{coerce,graph,RsparseMatrix-method}
 \alias{coerce,graph,TsparseMatrix-method}
 \alias{coerce,graph,sparseMatrix-method}
-\alias{coerce,graphAM,sparseMatrix-method}
+\alias{coerce,graphAM,TsparseMatrix-method}
+\alias{coerce,graphNEL,TsparseMatrix-method}
 %
 \description{
   The \pkg{Matrix} package has supported conversion from and to
