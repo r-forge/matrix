@@ -55,15 +55,13 @@ stopifnot(exprs = {
 
 ###--- sparse matrices ---------
 
-m <- Matrix(c(0,0,2:0), 3,5)
-(mC <- as(m, "dgCMatrix"))
+mC <- Matrix(c(0, 0, 2:0), 3, 5)
 sm <- sin(mC)
 stopifnot(class(sm) == class(mC), class(mC) == class(mC^2),
           dim(sm) == dim(mC),
           class(0 + 100*mC) == class(mC),
           all.equal(0.1 * ((0 + 100*mC)/10), mC),
           all.equal(sqrt(mC ^ 2), mC),
-          all.equal(m^m, mC^mC),
           identical(mC^2, mC * mC),
           identical(mC*2, mC + mC)
           )
@@ -73,7 +71,7 @@ x # sparse
 (x2 <- x + 10*t(x))
 stopifnot(is(x2, "sparseMatrix"),
           identical(x2, t(x*10 + t(x))),
-	  identical(x, as((x + 10) - 10, class(x))))
+	  identical(x, as((x + 10) - 10, "CsparseMatrix")))
 
 (px <- Matrix(x^x - 1))#-> sparse again
 stopifnot(px@i == c(3,4,1,4),
@@ -233,7 +231,7 @@ nm1 <- as(lm1, "nMatrix")
 
 stopifnot(validObject(lm1), validObject(lm2),
           validObject(nm1), validObject(nm2),
-          identical(dsc, as(dsc * as(lm1, "dMatrix"), "dsCMatrix")))
+          identical(dsc, dsc * as(lm1, "dMatrix")))
 
 crossprod(lm1) # lm1: "lsC*"
 cnm1 <- crossprod(nm1)
@@ -317,7 +315,7 @@ rm(list= ls(pat="^.[mMC]?$"))
 T3 <- Diagonal(3) > 0; stopifnot(T3@diag == "U") # "uni-diagonal"
 validObject(dtp <- pack(as(dt3, "denseMatrix")))
 stopifnot(exprs = {
-    isValid(lsC <- as(lsp, "sparseMatrix"), "lsCMatrix")
+    isValid(lsC <- as(lsp, "CsparseMatrix"), "lsCMatrix")
     ## 0-extent matrices {fixes in Feb.2019}:
     isValid(L00 <- L7[FALSE,FALSE], "ldiMatrix")
     isValid(x60 <- x2[,FALSE],      "dgCMatrix")

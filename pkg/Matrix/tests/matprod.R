@@ -391,8 +391,9 @@ assert.EQ.mat(ss., tcrossprod(v,v))
 dm <- Matrix(v, sparse=FALSE)
 sm <- Matrix(v, sparse=TRUE)
 
-validObject(d.vvt <- as(as(vvt <- tcrossprod(v, v), "denseMatrix"), "dgeMatrix"))
-validObject(s.vvt <- as(as(vvt, "sparseMatrix"), "dgCMatrix"))
+vvt <- tcrossprod(v, v)
+validObject(d.vvt <- as(as(vvt, "unpackedMatrix"), "generalMatrix"))
+validObject(s.vvt <- as(as(vvt, "CsparseMatrix"), "generalMatrix"))
 
 stopifnot(
     identical4(tcrossprod(v, v), tcrossprod(mv, v),
@@ -430,7 +431,7 @@ stopifnot(identical(tcrossprod(v, M), v %*% t(M)),
 t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
 ## from	 0-diagonal to unit-diagonal {low-level step}:
 tu <- t1 ; tu@diag <- "U"
-cu <- as(tu, "dtCMatrix")
+cu <- as(tu, "CsparseMatrix")
 cl <- t(cu) # unit lower-triangular
 cl10 <- cl %*% Diagonal(4, x=10)
 assert.EQ.mat(cl10, as(cl, "matrix") %*% diag(4, x=10))
@@ -572,7 +573,7 @@ SW. <- symmpart(WW)
 SW2 <- Matrix:::forceSymmetric(WW)
 stopifnot(all.equal(as(SW.,"matrix"),
                     as(SW2,"matrix"), tol = 1e-7))
-(ch <- all.equal(WW, as(SW.,"dgCMatrix"), tolerance =0))
+(ch <- all.equal(WW, as(SW., "generalMatrix"), tolerance = 0))
 stopifnot(is.character(ch), length(ch) == 1)## had length(.)  2  previously
 IW <- solve(WW) # ( => stores in WW@factors !)
 class(I1 <- IW %*% WW)# "dge" or "dgC" (!)
@@ -609,7 +610,7 @@ assert.EQ.(dIW, IW2, tol= 8e-4)
 a <- matrix(0,5,5)
 a[1,2] <- a[2,3] <- a[3,4] <- a[4,5] <- 1
 a <- a + t(a) + 2*diag(5)
-b <- as(a, "dsCMatrix") ## ok, but we recommend to use Matrix() ``almost always'' :
+b <- as(a, "CsparseMatrix") ## ok, but we recommend to use Matrix() ``almost always'' :
 (b. <- Matrix(a, sparse = TRUE))
 stopifnot(identical(b, b.))
 
@@ -622,8 +623,8 @@ stopifnot(is(B2, "dsCMatrix"), # symmetric indexing keeps symmetry
 	  is(z.s <- solve(B2, bb), "sparseMatrix"))
 assert.EQ.mat(B2 %*% z.s, as(bb, "matrix"))
 ## -> dense RHS and dense result
-z. <- solve(as(B2, "dgCMatrix"), bb)# now *sparse*
-z  <- solve( B2, as(bb,"dgeMatrix"))
+z. <- solve(as(B2, "generalMatrix"), bb)# now *sparse*
+z  <- solve( B2, as(bb, "denseMatrix"))
 stopifnot(is(z., "sparseMatrix"),
           all.equal(z, as(z.,"denseMatrix")))
 ## finish calculating conditional variance matrix
@@ -666,10 +667,12 @@ chk.ngMatrix <- function(M, verbose = TRUE) {
     if(verbose) {cat( "crossprod(M):\n"); show(cM) }
     if(verbose) {cat("tcrossprod(M):\n"); show(tM) }
     stopifnot(is(cM,"symmetricMatrix"), is(tM,"symmetricMatrix"),
-	      identical(as( cM, "ngCMatrix"), t(M) %*%   M),
-	      identical(as( tM, "ngCMatrix"),  M   %*% t(M)))
-    assert.EQ.mat( cM,  crossprod(m) > 0)
-    assert.EQ.mat( tM, as(tcrossprod(m),"matrix") > 0)
+	      identical(as(as(cM, "CsparseMatrix"), "generalMatrix"),
+                        t(M) %*% M),
+	      identical(as(as(tM, "CsparseMatrix"), "generalMatrix"),
+                        M %*% t(M)))
+    assert.EQ.mat(cM, crossprod(m) > 0)
+    assert.EQ.mat(tM, as(tcrossprod(m), "matrix") > 0)
 
     ## Part II : matrix products pattern Matrices with numeric:
     ##
@@ -875,7 +878,7 @@ stopifnot(identical(X %x% Y,
                     as(as.matrix(X) %x% as.matrix(Y), "indMatrix")))
 ## crossprod:
 (XtY <- crossprod(X, Y))# gave warning in Matrix 1.1-3
-XtY_ok <- as(crossprod(as.matrix(X), as.matrix(Y)), "dgCMatrix")
+XtY_ok <- as(crossprod(as.matrix(X), as.matrix(Y)), "CsparseMatrix")
 stopifnot(identical(XtY, XtY_ok)) # not true, previously
 
 ###------- %&% -------- Boolean Arithmetic Matrix products
