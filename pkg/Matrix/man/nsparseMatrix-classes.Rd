@@ -191,7 +191,7 @@
     \item{\code{j}:}{Object of class \code{"integer"} of length nnzero
       (number of non-zero elements).  These are the column numbers for
       each TRUE element in the matrix.  All other elements are FALSE.
-      Present in triplet and compressed column-oriented forms only.}
+      Present in triplet and compressed row-oriented forms only.}
     \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
       of the matrix.}
   }
