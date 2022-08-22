@@ -5,7 +5,7 @@
 if(interactive()) {
     options(error = recover, warn = 1)
 } else if(FALSE) { ## MM / developer  testing *manually* :
-    options(error = recover, Matrix.verbose = 2,   warn = 1)
+    options(error = recover, Matrix.verbose = 2, warn = 1)
 } else {
     options(                 Matrix.verbose = 2, warn = 1)
 }
