@@ -1342,3 +1342,12 @@ llc04 <- new("dgCMatrix", Dim = c(4L, 0L))
 c40 <- new("dgCMatrix", Dim = c(0L, 4L), p = integer(5L))
 assertError(c04[1L, ] <- 1)
 assertError(c40[, 1L] <- 1)
+
+## Indexing with nMatrix rather than lMatrix
+set.seed(3601)
+gC <- rsparsematrix(6, 6, 0.6)
+gC@x[sample.int(length(gC@x), 6L)] <- NA
+ni <- is.na(gC)
+li <- as(ni, "lMatrix")
+stopifnot(identical(gC[ ni], gC[ li]),
+          identical(gC[!ni], gC[!li]))
