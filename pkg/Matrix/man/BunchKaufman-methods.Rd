@@ -70,10 +70,15 @@ if(FALSE) # no method defined yet for *sparse* :
 ## does apply to *dense* symmetric matrices:
 bkCA <- BunchKaufman(as(CAs, "denseMatrix"))
 bkCA
+pkCA <- pack(bkCA)
+stopifnot(is(bkCA, "triangularMatrix"),
+          is(pkCA, "triangularMatrix"),
+          is(pkCA, "packedMatrix"))
 
 image(bkCA)# shows how sparse it is, too
 str(R.CA <- as(bkCA, "sparseMatrix"))
 ## an upper triangular 72x72 matrix with only 144 non-zero entries
+stopifnot(is(R.CA, "triangularMatrix"), is(R.CA, "CsparseMatrix"))
 }
 \keyword{methods}
 

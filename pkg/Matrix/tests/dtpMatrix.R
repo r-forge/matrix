@@ -3,7 +3,11 @@ library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 cp6 <- chol(H6 <- Hilbert(6))
-tp6 <- as(cp6, "packedMatrix")
+(tp6 <- as(cp6, "packedMatrix"))
+stopifnot(exprs = {
+    grepl("^6 x 6 Matrix .*Cholesky\"", capture.output(cp6)[[1]])
+    grepl("^6 x 6 Matrix .*Cholesky\"", capture.output(tp6)[[1]])
+})
 round(tp6, 3)## round() is "Math2" group method
 1/tp6        ## "Arith" group : gives 'dgeMatrix'
 str(tp6)
