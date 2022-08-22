@@ -21,6 +21,10 @@ setMethod("show", "pBunchKaufman",
 	      cat("packed 'Bunch-Kaufman' factorization of ")
 	      str(object)
 	  })
+## However, these result from chol() and should  *just be* a matrix to the non-expert user:
+setMethod("show",  "Cholesky", function(object) prMatrix(object))
+setMethod("show", "pCholesky", function(object) prMatrix(object))
+
 
 setMethod("dim", "MatrixFactorization", function(x) x@Dim)
 
