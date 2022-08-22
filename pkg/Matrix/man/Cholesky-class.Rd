@@ -9,6 +9,8 @@
 %
 \alias{show,BunchKaufman-method}
 \alias{show,pBunchKaufman-method}
+\alias{show,Cholesky-method}
+\alias{show,pCholesky-method}
 %
 \description{The \code{"Cholesky"} class is the class of Cholesky
   decompositions of positive-semidefinite, real dense matrices.  The
