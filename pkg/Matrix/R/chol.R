@@ -64,8 +64,11 @@ setMethod("chol", signature(x = .cl),
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
               if(!is.null(ch <- x@factors[[nm]]))
                   return(t(as(ch, "CsparseMatrix"))) # use the cache
-              ch <- chol(.M2symm(x, checkDN = FALSE), ...)
-              if(cache) .set.factors(x, nm, ch) else ch
+              ch <- chol(sx <- .M2symm(x, checkDN = FALSE), pivot = pivot, ...)
+              if(cache)
+                  ## dsCMatrix_chol() caches a CHMfactor and returns a dtCMatrix
+                  .set.factors(x, nm, sx@factors[[nm]])
+              ch
           })
 rm(.cl)
 
