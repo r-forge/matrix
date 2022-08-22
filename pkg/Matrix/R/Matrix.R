@@ -647,7 +647,7 @@ setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
 }
 
 ## instead of using 'drop = "ANY"' {against ambiguity notices}:
-for(ii in c("lMatrix", "logical"))
+for(ii in c("nMatrix", "lMatrix", "logical"))
     setMethod("[", signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
 	      .M.sub.i.logical)
 rm(ii)

@@ -18,6 +18,7 @@
 \alias{[,Matrix,missing,missing,ANY-method}
 \alias{[,Matrix,missing,missing,logical-method}
 \alias{[,Matrix,missing,missing,missing-method}
+\alias{[,Matrix,nMatrix,missing,missing-method}
 \alias{[,TsparseMatrix,index,index,logical-method}
 \alias{[,TsparseMatrix,index,missing,logical-method}
 \alias{[,TsparseMatrix,missing,index,logical-method}

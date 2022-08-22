@@ -427,6 +427,11 @@
 
       \item \code{readMM()} now warns if the number of entries found
       is less than number reported in the header.
+      
+      \item \code{x[i]} now works for \code{nMatrix} \code{i},
+      just as for \code{lMatrix} i.  This supports constructions
+      such as \code{x[is.na(x)]}, where the logical operation
+      produces an \code{nMatrix} because it is never \code{NA}.
     }
   }
   \subsection{Misc}{
