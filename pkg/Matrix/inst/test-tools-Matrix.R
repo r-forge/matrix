@@ -402,10 +402,14 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
 ## The first version (up to Aug.2022)  -- possibly what we should use for dense case (!?)
 boolProd0 <- function(x,y) as((abs(x) %*% abs(y)) > 0, "nMatrix")
 ## New since  Aug.13, 2022, ensuring that zeros are dropped
+isCRT <- function(x, cl = getClass(class(x)))
+    extends(cl, "CsparseMatrix") || extends(cl, "TsparseMatrix") || extends(cl, "RsparseMatrix")
 boolProd <- function(x,y) {
+    ## treat x & y, drop0() & coercing to "n" -- this treats  NA  <==>  1  (!)
+    x <- if(isCRT(x)) .sparse2kind(x, kind="n", drop0=TRUE) else as(drop0(x), "nMatrix")
+    y <- if(isCRT(y)) .sparse2kind(y, kind="n", drop0=TRUE) else as(drop0(y), "nMatrix")
     r <- (abs(x) %*% abs(y)) > 0
-    cl <- getClassDef(class(r))
-    if(extends(cl, "CsparseMatrix") || extends(cl, "TsparseMatrix") || extends(cl, "RsparseMatrix"))
+    if(isCRT(r))
         .sparse2kind(r, kind="n", drop0=TRUE)
     else # also for "sparseMatrix" cases "indMatrix" (incl "pMatrix") or "diagonalMatrix"
         ## NB: "diagonalMatrix already *does* drop0(.) when coerced to "nMatrix"
