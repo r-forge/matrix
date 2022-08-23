@@ -46,6 +46,7 @@ SEXP dpoMatrix_chol(SEXP x)
     SET_SLOT(val, Matrix_uploSym, duplicate(uploP));
     SET_SLOT(val, Matrix_diagSym, mkString("N"));
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    set_symmetrized_DimNames(val, GET_SLOT(x, Matrix_DimNamesSym), -1);
     vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n2));
     AZERO(vx, n2, 0.0);
     F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)),

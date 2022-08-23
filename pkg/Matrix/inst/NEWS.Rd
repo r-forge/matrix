@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-22 r3600)}{
+\section{Changes in version 1.4-2 (2022-08-23 r3604)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -205,10 +205,6 @@
       \item \code{.bdiag(<named list>)} no longer propagates names
       to the \code{Dim} slot of the result.
 
-      \item \code{chol(<dsCMatrix>)} now gets \emph{symmetrized}
-      \code{Dimnames} rather than a copy of the \code{Dimnames} slot
-      of the argument, which (currently) can be asymmetric.
-
       \item \code{as(<named vector>, "denseMatrix")} now correctly
       propagates \code{names} to the result.
 
@@ -265,6 +261,14 @@
       an extra time in order to test for positive definiteness,
       with the result thrown away (!).  Hence these methods should
       become approximately two times faster.
+
+      \item \code{dimnames(chol(x))} is identical to \code{dimnames(x)}
+      in all cases, now even when \code{chol(x)} is constructed from a
+      cached \code{MatrixFactorization}, for greater consistency with
+      \code{base::chol.default()}.
+      
+      \item \code{chol(<generalMatrix>)} no longer looks at
+      \code{Dimnames} when testing for symmetry.
 
       \item \code{lu(<dtCMatrix>)} no longer returns an invalid
       \code{sparseLU} object in the lower triangular case.

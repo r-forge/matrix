@@ -33,6 +33,7 @@ SEXP dppMatrix_chol(SEXP x)
     SET_SLOT(val, Matrix_uploSym, duplicate(uploP));
     SET_SLOT(val, Matrix_diagSym, mkString("N"));
     SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
+    set_symmetrized_DimNames(val, GET_SLOT(x, Matrix_DimNamesSym), -1);
     slot_dup(val, x, Matrix_xSym);
     F77_CALL(dpptrf)(uplo, dims, REAL(GET_SLOT(val, Matrix_xSym)), &info FCONE);
     if (info) {
