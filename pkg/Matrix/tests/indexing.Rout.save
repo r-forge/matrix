@@ -1,5 +1,5 @@
 
-R version 4.2.1 Patched (2022-08-14 r82724) -- "Funny-Looking Kid"
+R version 4.2.1 Patched (2022-08-19 r82735) -- "Funny-Looking Kid"
 Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -22,7 +22,7 @@ Type 'q()' to quit R.
 > if(interactive()) {
 +     options(error = recover, warn = 1)
 + } else if(FALSE) { ## MM / developer  testing *manually* :
-+     options(error = recover, Matrix.verbose = 2,   warn = 1)
++     options(error = recover, Matrix.verbose = 2, warn = 1)
 + } else {
 +     options(                 Matrix.verbose = 2, warn = 1)
 + }
@@ -3573,6 +3573,19 @@ sparse vector (nnz/length = 0/6) of class "dsparseVector"
 > c40 <- new("dgCMatrix", Dim = c(0L, 4L), p = integer(5L))
 > assertError(c04[1L, ] <- 1)
 > assertError(c40[, 1L] <- 1)
+> 
+> ## Indexing with nMatrix rather than lMatrix
+> set.seed(3601)
+> gC <- rsparsematrix(6, 6, 0.6)
+> gC@x[sample.int(length(gC@x), 6L)] <- NA
+> ni <- is.na(gC)
+> li <- as(ni, "lMatrix")
+> stopifnot(identical(gC[ ni], gC[ li]),
++           identical(gC[!ni], gC[!li]))
+<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient
+<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient
+<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient
+<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient
 > 
 > proc.time()
    user  system elapsed 
