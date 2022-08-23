@@ -1,9 +1,15 @@
 ## METHODS FOR GENERIC: chol
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## MJ: all of the C-level *_chol() functions need a second look ...
+##     these methods feel much more complicated than they need to be ...
+
 setMethod("chol", signature(x = "generalMatrix"),
-	  function(x, ...)
-              chol(.M2symm(x, checkDN = FALSE), ...))
+	  function(x, ...) {
+              ch <- chol(.M2symm(x, checkDN = FALSE), ...)
+              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
+              ch
+          })
 
 setMethod("chol", signature(x = "symmetricMatrix"),
 	  function(x, ...) {
@@ -21,7 +27,7 @@ setMethod("chol", signature(x = "triangularMatrix"),
 
 setMethod("chol", signature(x = "diagonalMatrix"),
 	  function(x, ...) {
-              x <- .diag2kind(x, "d")
+              x <- ..diag2d(x)
               if(x@diag == "N") {
                   if(any(x@x < 0))
                       stop("chol(x) is undefined: 'x' is not positive definite")
@@ -35,6 +41,7 @@ setMethod("chol", signature(x = "dgeMatrix"),
               if(!is.null(ch <- x@factors[["Cholesky"]]))
                   return(ch) # use the cache
               ch <- chol(.M2symm(x, checkDN = FALSE), ...)
+              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               if(cache) .set.factors(x, "Cholesky", ch) else ch
           })
 
@@ -42,7 +49,7 @@ setMethod("chol", signature(x = "dsyMatrix"),
           function(x, ...) {
               if(!is.null(ch <- x@factors[["Cholesky"]]))
                   return(ch) # use the cache
-              tryCatch(.Call(dpoMatrix_chol, x),
+              tryCatch(.Call(dpoMatrix_chol, if(x@uplo == "U") x else t(x)),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
 
@@ -50,7 +57,7 @@ setMethod("chol", signature(x = "dspMatrix"),
           function(x, ...) {
               if(!is.null(ch <- x@factors[["pCholesky"]]))
                   return(ch) # use the cache
-              tryCatch(.Call(dppMatrix_chol, x),
+              tryCatch(.Call(dppMatrix_chol, if(x@uplo == "U") x else t(x)),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
 
@@ -62,12 +69,16 @@ for(.cl in paste0("dg", c("C", "R", "T"), "Matrix"))
 setMethod("chol", signature(x = .cl),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix"))) # use the cache
-              ch <- chol(sx <- .M2symm(x, checkDN = FALSE), pivot = pivot, ...)
+              if(!is.null(ch <- x@factors[[nm]])) {
+                  ch <- t(as(ch, "CsparseMatrix"))
+                  ch@Dimnames <- x@Dimnames # as MF has no 'Dimnames' slot
+                  return(ch)
+              }
+              ch <- chol(y <- .M2symm(x, checkDN = FALSE), pivot = pivot, ...)
+              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               if(cache)
-                  ## dsCMatrix_chol() caches a CHMfactor and returns a dtCMatrix
-                  .set.factors(x, nm, sx@factors[[nm]])
+                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
+                  .set.factors(x, nm, y@factors[[nm]])
               ch
           })
 rm(.cl)
@@ -75,8 +86,11 @@ rm(.cl)
 setMethod("chol", signature(x = "dsCMatrix"),
 	  function(x, pivot = FALSE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix"))) # use the cache
+              if(!is.null(ch <- x@factors[[nm]])) {
+                  ch <- t(as(ch, "CsparseMatrix"))
+                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
+                  return(ch)
+              }
               tryCatch(.Call(dsCMatrix_chol, x, pivot),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
@@ -84,19 +98,31 @@ setMethod("chol", signature(x = "dsCMatrix"),
 setMethod("chol", signature(x = "dsRMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix"))) # use the cache
-              ch <- chol(.tCR2RC(x), pivot, ...)
-              if(cache) .set.factors(x, nm, ch) else ch
+              if(!is.null(ch <- x@factors[[nm]])) {
+                  ch <- t(as(ch, "CsparseMatrix"))
+                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
+                  return(ch)
+              }
+              ch <- chol(y <- .tCR2RC(x), pivot = pivot, ...)
+              if(cache)
+                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
+                  .set.factors(x, nm, y@factors[[nm]])
+              ch
           })
 
 setMethod("chol", signature(x = "dsTMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix"))) # use the cache
-              ch <- chol(.T2C(x), pivot, ...)
-              if(cache) .set.factors(x, nm, ch) else ch
+              if(!is.null(ch <- x@factors[[nm]])) {
+                  ch <- t(as(ch, "CsparseMatrix"))
+                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
+                  return(ch)
+              }
+              ch <- chol(y <- .T2C(x), pivot = pivot, ...)
+              if(cache)
+                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
+                  .set.factors(x, nm, y@factors[[nm]])
+              ch
           })
 
 

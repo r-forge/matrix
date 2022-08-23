@@ -1,5 +1,5 @@
 \name{chol}
-\title{Choleski Decomposition - 'Matrix' S4 Generic and Methods}
+\title{The Cholesky Decomposition - 'Matrix' S4 Generic and Methods}
 %
 \alias{chol}
 \alias{chol-methods}
@@ -19,8 +19,8 @@
 \alias{chol,triangularMatrix-method}
 %
 \description{
-  Compute the Choleski factorization of a real symmetric
-  positive-definite square matrix.
+  Compute the Cholesky factorization of a real symmetric
+  positive definite square matrix.
 }
 \usage{
 chol(x, \dots)
@@ -32,8 +32,8 @@ chol(x, \dots)
 }
 \arguments{
   \item{x}{a (sparse or dense) square matrix, here inheriting from class
-    \code{\linkS4class{Matrix}}; if \code{x} is not positive definite,
-    an error is signalled.}
+    \code{\linkS4class{Matrix}}; if \code{x} is not symmetric positive
+    definite, then an error is signalled.}
   \item{pivot}{logical indicating if pivoting is to be used.  Currently,
     this is \emph{not} made use of for dense matrices.}
   \item{cache}{logical indicating if the result should be cached

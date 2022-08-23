@@ -642,5 +642,14 @@ lu(S.)
 stopifnot(validObject(lu(L.)), # was invalid
           identical(names(S.@factors), "LU")) # was "lu"
 
+## chol() should give matrix with 'Dimnames',
+## even if 'Dimnames' are not cached
+D. <- as(diag(3), "CsparseMatrix")
+D.@Dimnames <- dn <- list(zzz = letters[1:3], ZZZ = LETTERS[1:3])
+cd1 <- chol(D.) # "fresh"
+stopifnot(identical(cd1@Dimnames, rep(dn[2L], 2L)))
+cd2 <- chol(D.) # from cache
+stopifnot(identical(cd1, cd2))
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
 
