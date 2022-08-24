@@ -34,9 +34,6 @@ setMethod("diag<-", signature(x = "dspMatrix"),
 	  function(x, value) .Call(dspMatrix_setDiag, x, value))
 } ## MJ
 
-setMethod("BunchKaufman", signature(x = "dspMatrix"),
-	  function(x, ...) .Call(dspMatrix_trf, x))
-
 setMethod("solve", signature(a = "dspMatrix", b = "missing"),
 	  function(a, b, ...) .Call(dspMatrix_solve, a))
 

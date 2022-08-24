@@ -76,12 +76,6 @@ setMethod("diag<-", signature(x = "dsyMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
 
-setMethod("BunchKaufman", signature(x = "dsyMatrix"),
-	  function(x, ...) .Call(dsyMatrix_trf, x))
-
-setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo))
-
 setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
           function(a, b, ...) .Call(dsyMatrix_solve, a))
 
