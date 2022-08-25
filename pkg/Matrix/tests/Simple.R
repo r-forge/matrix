@@ -116,7 +116,7 @@ if(FALSE) { ## TODO?  POSIXlt -> numeric ??
     MLp <- Matrix(.Leap.seconds)## --> error
 }
 
-E <- rep(c(TRUE,NA,TRUE), length=8)
+E <- rep(c(TRUE,NA,TRUE), length.out=8)
 F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
 e <- as(E, "sparseVector"); f <- as(F,"lsparseVector")
 Fv <- as.vector(F, "any") # failed in Matrix <= 1.2.0, and base::as.vector(.) failed too:
@@ -128,7 +128,7 @@ F[-8:-1] # was partly "illegal" (length = 0 is ok; nnz '3' is not)
 F.ineg <- lapply(1:8, function(k) F[-8:-k])
 F.pos <-  lapply(1:8, function(k) F[seq_len(k-1)])
 F.vec <-  lapply(1:8, function(k) Fv[seq_len(k-1)])
-str(F.vec, vec=8)
+str(F.vec, vec.len=8)
 (nT <- vapply(F.vec, sum, 1L)) # == 0 0  1 1 1  2 2 2
 str(whichT <- lapply(F.vec, which))
 i.lengths <- function(L) vapply(L, function(.) length(.@i), 1L)
@@ -228,9 +228,9 @@ stopifnot(identical(L, L == TRUE), ## used to give infinite recursion
 L[sample(length(L), 10)] <- NA
 ll <- as(L,"logical")
 stopifnot(all.equal(mean(L,  na.rm=TRUE),
-		    mean(ll, na.rm=TRUE), tol= 1e-14),
+		    mean(ll, na.rm=TRUE), tolerance=1e-14),
 	  all.equal(mean(L,  na.rm=TRUE, trim=1/4),# <- with a warning
-		    mean(ll, na.rm=TRUE, trim=1/4), tol= 1e-14))
+		    mean(ll, na.rm=TRUE, trim=1/4), tolerance=1e-14))
 
 
 ## Examples where  is.na(.) was wrong:
@@ -695,7 +695,7 @@ stopifnot(all.equal(triu(t4) + tril(t4), c4),
 ###-- Numeric Dense: Crossprod & Solve
 
 set.seed(123)
-mm. <- mm <- Matrix(rnorm(500 * 150), nc = 150)
+mm. <- mm <- Matrix(rnorm(500 * 150), ncol = 150)
 stopifnot(validObject(mm))
 xpx <- crossprod(mm)
 stopifnot(identical(mm, mm.))# once upon a time, mm was altered by crossprod()
@@ -918,7 +918,7 @@ stopifnotValid(tMD, "dtCMatrix")
 eM <- eigen(mM) # works thanks to base::as.matrix hack in ../R/zzz.R
 stopifnot(all.equal(eM$values,
                 { v <- c(162.462112512353, 30.0665927567458)
-                  c(v, 15, 0, 0, 160-v[1], -15, -v[2])}, tol=1e-14))
+                  c(v, 15, 0, 0, 160-v[1], -15, -v[2])}, tolerance=1e-14))
 
 ##--- symmetric -> pos.def. needs valid test:
 m5 <- Matrix(diag(5) - 1)
@@ -1017,9 +1017,9 @@ stopifnotValid(M, "ltCMatrix")
 stopifnotValid(M2 <- M %x% M, "triangularMatrix") # is "dtT" (why not "dtC" ?)
 stopifnot(dim(M2) == c(9,9), identical(M2, kronecker(M,M)))
 M3 <- M %x% M2 #ok
-(cM3 <- colSums(M3, sparse=TRUE))
+(cM3 <- colSums(M3, sparseResult=TRUE))
 identical(as.vector(cM3),
-          as(rev(rowSums(M3, sparse=TRUE)), "vector"))
+          as(rev(rowSums(M3, sparseResult=TRUE)), "vector"))
 M. <- M2 %x% M # gave infinite recursion
 
 ## diagonal, sparse & interactions
@@ -1091,7 +1091,7 @@ r1 <- Matrix(1:24, n,m)
 validObject(M1 <- band(r1, 0,0))
 (M1 <- as(M1, "sparseMatrix"))
 r2 <- Matrix(1:18, 3, 6)
-stopifnot(identical(M1, bandSparse(n,m, k=0, diag = list(diag(r1)))),
+stopifnot(identical(M1, bandSparse(n,m, k=0, diagonals = list(diag(r1)))),
 	  identical(band(r2, 0,4),
 		    band(r2, 0,3) + band(r2, 4,4)))
 s1 <- as(r1, "sparseMatrix") # such that band(s1) is sparse, too
@@ -1137,10 +1137,10 @@ stopifnot(exprs = {
 D. <- Diagonal(x= c(-2,3:4)); D.[lower.tri(D.)] <- 1:3 ; D.
 D0 <- Diagonal(x= 0:3);       D0[upper.tri(D0)] <- 1:6 ; D0
 stopifnot(all.equal(list(modulus = structure(24, logarithm = FALSE), sign = -1L),
-                    unclass(determinant(D.,FALSE)), tol=1e-15),
+                    unclass(determinant(D.,FALSE)), tolerance=1e-15),
 	  det(Matrix(0,1)) == 0,
           all.equal(list(modulus = structure(0, logarithm = FALSE), sign = 1L),
-                    unclass(determinant(D0,FALSE)), tol=0)
+                    unclass(determinant(D0,FALSE)), tolerance=0)
           )
 
 ### More sparseVector checks: -------------------------------

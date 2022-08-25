@@ -190,7 +190,7 @@ Ppm <- pmLU@L %*% pmLU@U
 ## identical only as long as we don't keep the original class info:
 stopifnot(identical3(lu1, pmLU, pm@factors$LU),# TODO === por1@factors$LU
 	  identical(ppm, with(xp, P %*% pm %*% t(Q))),
-	  sapply(xp, is, class="Matrix"))
+	  sapply(xp, is, class2="Matrix"))
 
 Ipm <- solve(pm, sparse=FALSE)
 Spm <- solve(pm, sparse=TRUE)  # is not sparse at all, here
@@ -358,7 +358,7 @@ for(p in c(FALSE,TRUE))
             cat(if(inherits(r, "error")) " *** E ***" else
                 sprintf("%3d", r@type),"\n", sep="")
         }
-str(A., max=3) ## look at the 'factors'
+str(A., max.level=3) ## look at the 'factors'
 
 facs <- A.@factors
 names(facs) <- sub("Cholesky$", "", names(facs))
@@ -582,7 +582,7 @@ U <- cbind(1:0, 2*(1:2))
 (sU <- as(U, "CsparseMatrix"))
 validObject(sS <- crossprod(sU))
 C. <- chol(sS)
-stopifnot(all.equal(C., sU, tol=1e-15))
+stopifnot(all.equal(C., sU, tolerance=1e-15))
 ## chol(<triangular sparse which is diagonal>)
 tC7 <- .trDiagonal(7, 7:1)
 stopifnotValid(tC7, "dtCMatrix")
@@ -625,8 +625,8 @@ class(M <- as(S, "denseMatrix")) # dgeMatrix
 m <- as.matrix(M)
 (dS <- determinant(S))
 stopifnot(exprs = {
-    all.equal(determinant(m), dS, tol=1e-15)
-    all.equal(dS, determinant(M), tol=1e-15)
+    all.equal(determinant(m), dS, tolerance=1e-15)
+    all.equal(dS, determinant(M), tolerance=1e-15)
     ## These had failed, as the "LU" factor cache was kept unchanged in 2*M :
     all.equal(determinant(2*S), determinant(2*M) -> d2M)
     all.equal(determinant(S^2), determinant(M^2) -> dM2)

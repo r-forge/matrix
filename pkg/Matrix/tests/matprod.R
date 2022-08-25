@@ -258,7 +258,7 @@ assert.EQ.mat(pd..,as(pd2,"matrix"))
 
 ## check that 'solve' and '%*%' are inverses
 suppressWarnings(RNGversion("3.5.0")); set.seed(1)
-A <- Matrix(rnorm(25), nc = 5)
+A <- Matrix(rnorm(25), ncol = 5)
 y <- rnorm(5)
 all.equal((A %*% solve(A, y))@x, y)
 Atr <- new("dtrMatrix", Dim = A@Dim, x = A@x, uplo = "U")
@@ -521,7 +521,7 @@ stopifnot(isSymmetric(p1.),
 	  identical(dimnames(t1), dimnames(t1.))
 	  )
 
-showMethods("%*%", class=class(M))
+showMethods("%*%", classes=class(M))
 
 v1 <- rep(1, ncol(M))
 str(r <-  M %*% Matrix(v1))
@@ -556,7 +556,7 @@ assert.EQ.(I, drop0(sis), tol = 1e-8)# 2.6e-10;  7.96e-9
 assert.EQ.(I, SIS,        tol = 1e-7)# 8.2e-9
 assert.EQ.(I, iss,        tol = 4e-4)# 3.3e-5
 ## solve(<dsCMatrix>, <dense..>) :
-I <- diag(nr=n)
+I <- diag(nrow=n)
 SIS <- solve(symW, as(symW,"denseMatrix"))
 iw  <- solve(symW, I)
 iss <- iw %*% symW
@@ -578,13 +578,13 @@ WW[ii] <- WW[ii] * (1 + 1e-7*runif(100))
 SW. <- symmpart(WW)
 SW2 <- Matrix:::forceSymmetric(WW)
 stopifnot(all.equal(as(SW.,"matrix"),
-                    as(SW2,"matrix"), tol = 1e-7))
+                    as(SW2,"matrix"), tolerance = 1e-7))
 (ch <- all.equal(WW, as(SW., "generalMatrix"), tolerance = 0))
 stopifnot(is.character(ch), length(ch) == 1)## had length(.)  2  previously
 IW <- solve(WW) # ( => stores in WW@factors !)
 class(I1 <- IW %*% WW)# "dge" or "dgC" (!)
 class(I2 <- WW %*% IW)
-I <- diag(nr=nrow(WW))
+I <- diag(nrow=nrow(WW))
 stopifnot(all.equal(as(I1,"matrix"), I, check.attributes=FALSE, tolerance = 1e-4),
           ## "Mean relative difference: 3.296549e-05"  (or "1.999949" for Matrix_1.0-13 !!!)
           all.equal(as(I2,"matrix"), I, check.attributes=FALSE)) #default tol gives "1" for M.._1.0-13
@@ -636,7 +636,7 @@ stopifnot(is(z., "sparseMatrix"),
 ## finish calculating conditional variance matrix
 v <- b[3:5,3:5] - crossprod(bb,z)
 stopifnot(all.equal(as.mat(v),
-		    matrix(c(4/3, 1:0, 1,2,1, 0:2), 3), tol = 1e-14))
+		    matrix(c(4/3, 1:0, 1,2,1, 0:2), 3), tolerance = 1e-14))
 
 
 ###--- "logical" Matrices : ---------------------

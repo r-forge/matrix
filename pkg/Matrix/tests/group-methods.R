@@ -9,7 +9,7 @@ options(nwarnings = 1e4)
 
 set.seed(2001)
 
-mm <- Matrix(rnorm(50 * 7), nc = 7)
+mm <- Matrix(rnorm(50 * 7), ncol = 7)
 xpx <- crossprod(mm)# -> "factors" in mm !
 round(xpx, 3) # works via "Math2"
 
@@ -268,8 +268,8 @@ stopifnot(identical(crossprod(lm1),# "lgC": here works!
 	  identical(lm1, lm1 | lm2))
 
 ddsc <- kronecker(Diagonal(7), dsc)
-isValid(ddv <- rowSums(ddsc, sparse=TRUE), "sparseVector")
-sv <- colSums(kC <- kronecker(mC,kronecker(mC,mC)), sparse=TRUE)
+isValid(ddv <- rowSums(ddsc, sparseResult=TRUE), "sparseVector")
+sv <- colSums(kC <- kronecker(mC,kronecker(mC,mC)), sparseResult=TRUE)
 EQ <- ddv == rowSums(ddsc)
 na.ddv <- is.na(ddv)
 sM <- Matrix(pmax(0, round(rnorm(50*15, -1.5), 2)), 50,15)
@@ -311,7 +311,7 @@ z[sample(77,15)] <- 0
 abs(D) >= 0.5       # logical sparse
 
 ## For the checks below, remove some and add a few more objects:
-rm(list= ls(pat="^.[mMC]?$"))
+rm(list= ls(pattern="^.[mMC]?$"))
 T3 <- Diagonal(3) > 0; stopifnot(T3@diag == "U") # "uni-diagonal"
 validObject(dtp <- pack(as(dt3, "denseMatrix")))
 stopifnot(exprs = {
@@ -429,7 +429,8 @@ for(gr in getGroupMembers("Ops")) {
               cat(sprintf("\n %s %s %s gave not identical r4 & R4:\n",
                           nm, f, oM));     print(r4); print(R4)
               C1 <- (eq <- R4 == r4) | (N4 <- as.logical((nr4 <- is.na(eq)) & !is.finite(R4)))
-              if(isTRUE(all(C1)) || isTRUE(all.equal(as.mat(R4), r4, tol = 1e-14)))
+              if(isTRUE(all(C1)) || isTRUE(all.equal(as.mat(R4), r4,
+                                                     tolerance = 1e-14)))
                   cat(sprintf(
                       " --> %s %s %s (ok): only difference is %s (matrix) and %s (Matrix)\n",
                       M.knd(M), f, M.knd(M2)

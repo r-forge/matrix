@@ -194,7 +194,7 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
     ms[i,j] <- v
     ## useful to see (ii,ij), but confusing R/ESS when additionally debugging:
     ## if(!showOnly && interactive()) { op <- options(error = recover); on.exit(options(op)) }
-    assert.EQ.mat(ms, mm, show=showOnly)
+    assert.EQ.mat(ms, mm, showOnly=showOnly)
     ## vector indexing m[cbind(i,j)] == m[i + N(j-1)] ,  N = nrow(.)
     ii <- seq_len(min(length(i), length(j)))
     i <- i[ii]
@@ -218,7 +218,7 @@ chkAssign <- function(ms, mm = as(ms, "matrix"),
 	ms2[neg.ii] <- v[ord.i]
 	stopifnot(identical(ms2, ms.))
     }
-    assert.EQ.mat(ms., mm., show=showOnly)
+    assert.EQ.mat(ms., mm., showOnly=showOnly)
 } ##{chkAssign}
 
 ## Get duplicated index {because these are "hard" (and rare)
@@ -363,7 +363,7 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
         ## shows that (1) As is *not* singular  (2) the matrix is not random
         all.equal(crossprod(R.), As, tolerance=1e-15)
     })
-    print(summary(evA <- eigen(As, only.values=TRUE)$val))
+    print(summary(evA <- eigen(As, only.values=TRUE)$values))
     print(tail(evA)) ## largest three ~= 10^7,  smallest two *negative*
     print(rcond(As)) # 1.722 e-21 == very bad !
     ##-> this *is* a border line case, i.e. very close to singular !
@@ -444,7 +444,7 @@ a. <- as(A., "matrix")
 ## More testing {this was not working for a long time..}
 set.seed(1)
 for(n in 1:(if(doExtras) 100 else 6)) {
-    i <- sample(1:nrow(A), 3+2*rpois(1, lam=3), replace=TRUE)
+    i <- sample(1:nrow(A), 3+2*rpois(1, lambda=3), replace=TRUE)
     Aii  <- A[i,i]
     A.ii <- A.[i,i]
     stopifnot(class(Aii) == class(A),
@@ -1137,7 +1137,7 @@ fx <- sparseMatrix(i = sample(n, size=nnz, replace=TRUE),
                    j = sample(m, size=nnz, replace=TRUE),
                    x = round(10*rnorm(nnz)))
 class(fx)## dgCMatrix
-fx[,6000] <- (tC <- rep(thisCol, length=nrow(fx)))# fine
+fx[,6000] <- (tC <- rep(thisCol, length.out=nrow(fx)))# fine
 thCol <- fx[,2000]
 fx[,5762] <- thCol# fine
 stopifnot(is(f, "ngCMatrix"), is(fx, "dgCMatrix"),
