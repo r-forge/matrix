@@ -36,7 +36,7 @@ mmN <- with(mmr, new("dgTMatrix", Dim = c(max(i)+1:1,max(j)+1:1),
 stopifnot(identical(mmT, mmN)) # !!
 ## weaker (and hence TRUE too):
 stopifnot(all.equal(as(mmN, "matrix"),
-                    as(mmT, "matrix"), tol=0))
+                    as(mmT, "matrix"), tolerance=0))
 
 mm <- as(mmN, "CsparseMatrix")
 stopifnot(all.equal(mm, KNex$mm))

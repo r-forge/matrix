@@ -58,7 +58,7 @@ stopifnot(names(hs@factors) %in% c("Cholesky","pCholesky"),
 
 hs@x <- 1/h9p@x # is not pos.def. anymore
 validObject(hs) # "but" this does not check
-stopifnot(diag(hs) == seq(1, by = 2, length = 9))
+stopifnot(diag(hs) == seq(1, by = 2, length.out = 9))
 
 s9 <- solve(h9p, seq(nrow(h9p)))
 signif(t(s9)/10000, 4)# only rounded numbers are platform-independent
@@ -78,8 +78,8 @@ pr <- Matrix(c(1,     0.477, 0.644, 0.478, 0.651, 0.826,
 nL <-
     list(r   = nearPD(pr, conv.tol = 1e-7), # default
 	 r.1 = nearPD(pr, conv.tol = 1e-7,		corr = TRUE),
-	 rs  = nearPD(pr, conv.tol = 1e-7, doDyk=FALSE),
-	 rs1 = nearPD(pr, conv.tol = 1e-7, doDyk=FALSE, corr = TRUE),
+	 rs  = nearPD(pr, conv.tol = 1e-7, doDykstra=FALSE),
+	 rs1 = nearPD(pr, conv.tol = 1e-7, doDykstra=FALSE, corr = TRUE),
 	 rH  = nearPD(pr, conv.tol = 1e-15),
          rH.1= nearPD(pr, conv.tol = 1e-15, corr = TRUE))
 
@@ -145,7 +145,7 @@ m[ltm[sample(ne, 3/4*ne)]] <- 0
 m <- (m + t(m))/2 # now is a covariance matrix with many 0 entries
 (spr <- Matrix(m))
 cspr <- cov2cor(spr)
-ev <- eigen(cspr, only.v = TRUE)$values
+ev <- eigen(cspr, only.values = TRUE)$values
 stopifnot(is(spr, "dsCMatrix"),
           is(cspr,"dsCMatrix"),
           all.equal(ev, c(1.5901626099,  1.1902658504, 1, 1,

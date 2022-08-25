@@ -586,8 +586,10 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	      identical(diag(m), # base:: *and* Matrix diag()  now keep names
 			diag(m.m)),## not for NA: diag(m) == diag(m.m),
 	      identical(nnzero(m), sum(m.m != 0)),
-	      identical(nnzero(m, na.= FALSE), sum(m.m != 0, na.rm = TRUE)),
-	      identical(nnzero(m, na.= TRUE),  sum(m.m != 0 | is.na(m.m)))
+	      identical(nnzero(m, na.counted = FALSE),
+                        sum(m.m != 0, na.rm = TRUE)),
+	      identical(nnzero(m, na.counted = TRUE),
+                        sum(m.m != 0 | is.na(m.m)))
 	      )
 
     if(isSparse) {

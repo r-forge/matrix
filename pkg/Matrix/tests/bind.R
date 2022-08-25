@@ -45,7 +45,7 @@ stopifnot(
 	       Matrix(rbind (m2, m1+m2)))
    ,
     Qidentical(show  (rbind(R1 = 10:11, M1)),
-	       Matrix(rbind(R1 = 10:11, m1)), strict=FALSE)
+	       Matrix(rbind(R1 = 10:11, m1)), strictClass=FALSE)
   , TRUE)
 
 identical.or.eq <- function(x,y, tol=0, ...) {
@@ -174,7 +174,8 @@ cbind(mT, one, zero, mT+10*mT, zero, 0:2)
 
 
 ## logical (sparse) - should remain logical :
-L5 <- Diagonal(n = 5, x = TRUE); v5 <- rep(x = c(FALSE,TRUE), length = ncol(L5))
+L5 <- Diagonal(n = 5, x = TRUE)
+v5 <- rep(x = c(FALSE,TRUE), length.out = ncol(L5))
 stopifnot(is(show(rbind(L5,v5)), "lsparseMatrix"),
 	  is(show(cbind(v5,L5)), "lsparseMatrix"),
 	  is(rbind(L5, 2* v5), "dsparseMatrix"),

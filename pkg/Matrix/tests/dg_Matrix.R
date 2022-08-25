@@ -54,7 +54,7 @@ for(i in 1:10) {
 N <- 200
 set.seed(1)
 i <- as.integer(round(runif (N, 0, 100)))
-j <- as.integer(3* rpois (N, lam=15))
+j <- as.integer(3* rpois (N, lambda=15))
 x <- round(rnorm(N), 2)
 which(duplicated(cbind(i,j))) # 8 index pairs are duplicated
 
@@ -72,7 +72,7 @@ stopifnot(!isTRUE(all.equal.default(m1, m2)),
 stopifnot(identical(m2,um2))
 
 ### -> error/warning condition for solve() of a singular matrix (Barry Rowlingson)
-(M <- Matrix(0+ 1:16, nc = 4))
+(M <- Matrix(0+ 1:16, ncol = 4))
 assertError(solve(M), verbose=TRUE)## ".. computationally singular" + warning + caches LU
 assertError(solve(t(M)))
 options(warn=2) # no more warnings allowed from here
