@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-24 r3608)}{
+\section{Changes in version 1.4-2 (2022-08-25 r3612)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -297,6 +297,9 @@
       \code{drop0(A)} and \code{drop0(B)} were used, i.e., for formally
       sparse matrices, the boolean product results should be stable with
       respect to non-structural vs structural zeros.
+
+      \item \code{t(<symmetricMatrix>)} now retains the \code{factors}
+      slot, avoiding recomputation.
     }
   }
   \subsection{New Features}{

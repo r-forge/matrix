@@ -504,7 +504,10 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	if (ivalid < 5)
 	    /* Preserve 'diag' slot */
 	    SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
-	else if (ivalid == 5)
+	else
+	    /* Preserve 'factors' slot */
+	    SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
+	if (ivalid == 5)
 	    /* Preserve 'sd' slot */
 	    SET_SLOT(to, install("sd"), GET_SLOT(from, install("sd")));
     }

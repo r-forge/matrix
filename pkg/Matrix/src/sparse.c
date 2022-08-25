@@ -1639,6 +1639,8 @@ SEXP R_sparse_transpose(SEXP from)
 		 mkString((*uplo_P(from) == 'U') ? "L" : "U"));
 	if (cl[1] == 't')
 	    SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
+	else
+	    SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
     }
 
     /* It remains to set some subset of 'p', 'i', 'j', and 'x' ... */
@@ -3531,6 +3533,8 @@ SEXP tCRsparse_as_RCsparse(SEXP from)
 		 mkString((*uplo_P(from) == 'U') ? "L" : "U"));
     if (clf[1] == 't')
 	SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
+    if (clf[1] == 's')
+	SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
 
     UNPROTECT(1);
     return to;
