@@ -323,12 +323,12 @@ SEXP packedMatrix_transpose(SEXP from)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
     /* Toggle 'uplo' slot */
     SET_SLOT(to, Matrix_uploSym, mkString((ul == 'U') ? "L" : "U"));
-    /* Preserve 'diag' slot */
     if (ivalid < 5)
+	/* Preserve 'diag' slot */
 	SET_SLOT(to, Matrix_diagSym, GET_SLOT(from, Matrix_diagSym));
-    /* NB: Nothing to do for 'factors' slot: prototype is already list() ...
-       FIXME: However, it would be much better to also "transpose" each 
-       factorization ... */
+    else
+	/* Preserve 'factors' slot */
+	SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
     
     /* Permute 'x' slot */
     SET_SLOT(to, Matrix_xSym, packed_transpose(x, n, ul));
