@@ -82,6 +82,18 @@ setAs("matrix", "indMatrix",
 
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.ind2dge <- function(from) {
+    x <- double(prod(d <- from@Dim))
+    if((n <- d[1L]) > 0L)
+        x[seq_len(n) + (from@perm - 1L) * as.double(n)] <- 1
+    new("dgeMatrix", Dim = d, Dimnames = from@Dimnames, x = x)
+}
+.ind2lge <- function(from) {
+    x <- logical(prod(d <- from@Dim))
+    if((n <- d[1L]) > 0L)
+        x[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
+    new("lgeMatrix", Dim = d, Dimnames = from@Dimnames, x = x)
+}
 .ind2nge <- function(from) {
     x <- logical(prod(d <- from@Dim))
     if((n <- d[1L]) > 0L)
@@ -145,10 +157,13 @@ setAs("indMatrix",         "vector", .ind2v)
 
 setAs("indMatrix",        "dMatrix", .ind2dgC)
 setAs("indMatrix",  "dsparseMatrix", .ind2dgC)
+setAs("indMatrix",   "ddenseMatrix", .ind2dge)
 setAs("indMatrix",        "lMatrix", .ind2lgC)
 setAs("indMatrix",  "lsparseMatrix", .ind2lgC)
+setAs("indMatrix",   "ldenseMatrix", .ind2lge)
 setAs("indMatrix",        "nMatrix", .ind2ngC)
 setAs("indMatrix",  "nsparseMatrix", .ind2ngC)
+setAs("indMatrix",   "ndenseMatrix", .ind2nge)
 
 setAs("indMatrix",  "generalMatrix", .ind2ngC)
 ## setAs("indMatrix", "triangularMatrix", .) # inherited from Matrix
@@ -173,8 +188,9 @@ setAs("indMatrix", "ngTMatrix", .ind2ngT)
 setAs("indMatrix", "ngeMatrix", .ind2nge)
 } ## DEPRECATED IN 1.4-2; see ./zzz.R
 
-rm(.ind2nge, .ind2n.p, .ind2dgC, .ind2lgC,
-   .ind2ngC, .ind2ngR, .ind2diag, .ind2p)
+rm(.ind2dge, .ind2lge, .ind2nge, .ind2n.p,
+   .ind2dgC, .ind2lgC, .ind2ngC, .ind2ngR, # .ind2ngT,
+   .ind2diag, .ind2p)
 
 if(!.Matrix.supporting.cached.methods) {
 rm(.ind2ngT)

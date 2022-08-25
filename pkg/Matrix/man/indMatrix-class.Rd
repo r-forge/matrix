@@ -12,14 +12,17 @@
 \alias{coerce,indMatrix,RsparseMatrix-method}
 \alias{coerce,indMatrix,TsparseMatrix-method}
 \alias{coerce,indMatrix,dMatrix-method}
+\alias{coerce,indMatrix,ddenseMatrix-method}
 \alias{coerce,indMatrix,denseMatrix-method}
 \alias{coerce,indMatrix,diagonalMatrix-method}
 \alias{coerce,indMatrix,dsparseMatrix-method}
 \alias{coerce,indMatrix,generalMatrix-method}
 \alias{coerce,indMatrix,lMatrix-method}
+\alias{coerce,indMatrix,ldenseMatrix-method}
 \alias{coerce,indMatrix,lsparseMatrix-method}
 \alias{coerce,indMatrix,matrix-method}
 \alias{coerce,indMatrix,nMatrix-method}
+\alias{coerce,indMatrix,ndenseMatrix-method}
 \alias{coerce,indMatrix,ngTMatrix-method}
 \alias{coerce,indMatrix,ngeMatrix-method}
 \alias{coerce,indMatrix,nsparseMatrix-method}
