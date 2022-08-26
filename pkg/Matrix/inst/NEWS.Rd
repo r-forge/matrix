@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-25 r3612)}{
+\section{Changes in version 1.4-2 (2022-08-26 r3613)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -219,10 +219,6 @@
 
       \item Matrix(<n-dimensional table>) now works for \code{n != 2}.
 
-      \item \code{Matrix(<sparseMatrix>, sparse = NULL)} now always
-      returns a \code{sparseMatrix}, no longer allocating just to count
-      nonzero elements.
-
       \item \code{Matrix(<sparseVector>)} now works for vector lengths
       other than 1, no longer giving an error about length mismatch
       when neither of \code{nrow} and \code{ncol} are supplied.
@@ -240,6 +236,11 @@
       \item \code{Matrix(0, nrow, )}, \code{Matrix(0, , ncol)} now
       throw (correct) errors for \code{nrow}, \code{ncol} in the
       interval \eqn{[0,1)}, consistent with \code{base::matrix()}.
+
+      \item \code{sparseDefault(<sparseMatrix>)} now counts zeros
+      without coercing to \code{matrix},
+      making \code{Matrix(<sparseMatrix>, sparse = NULL)} much more
+      efficient.
 
       \item Methods for group generic \code{Math} no longer
       preserve \code{x@diag == "U"} or lose \code{x@Dimnames}

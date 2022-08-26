@@ -195,8 +195,6 @@ if(FALSE) {
 ## * Matrix(table(1)), Matrix(table(1, 1, 1)), etc. give bad errors
 ## * Matrix(structure(matrix(1, 2, 2), class = "zzz")) throws a bad
 ##   error rather than unclassing as it essentially does for "table"
-## * Matrix(<sparseMatrix>, sparse = NULL) calls sparseDefault(data),
-##   requiring a sparseMatrix->matrix coercion
 ## * Matrix(x, ...), where 'x' is a vector of type other than logical,
 ##   integer, and double, evaluates .External(Mmatrix, ...) before
 ##   throwing an error, hence allocating unnecessarily
@@ -354,7 +352,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
         if(!is.null(dimnames))
             dimnames(data) <- dimnames
         if(is.null(sparse))
-            sparse <- i.sM || sparseDefault(data)
+            sparse <- sparseDefault(data)
         if(i.M) {
             ## return early in these cases:
             if(i.dM)
