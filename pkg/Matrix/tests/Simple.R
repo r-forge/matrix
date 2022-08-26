@@ -1370,13 +1370,12 @@ stopifnot(!isS4(z1), is.matrix(z1), !isS4(z2), is.matrix(z2))
 ## various Matrix() bugs in Matrix <= 1.4-1
 .d0 <- new("ddiMatrix", Dim = c(1L, 1L), Dimnames = list("A", "B"), diag = "U")
 .d1 <- Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
-.s0 <- new("dsCMatrix", Dim = c(1L, 1L), Dimnames = list("B", "B"),
-           p = c(0L, 1L), i = 0L, x = 1)
+.s0 <- new("dsyMatrix", Dim = c(1L, 1L), Dimnames = list("B", "B"), x = 1)
 .s1 <- Matrix(.d0, doDiag = FALSE)
 stopifnot(identical(.d1, .d0),
           identical(.s1, .s0),
-          identical(Matrix(sparseVector(1, 1L, 2L)),
-                    new("dgTMatrix", Dim = c(2L, 1L), i = 0L, j = 0L, x = 1)),
+          identical(Matrix(sparseVector(1, 1L, 3L)),
+                    new("dgTMatrix", Dim = c(3L, 1L), i = 0L, j = 0L, x = 1)),
           identical(Matrix(new("dgeMatrix"), sparse= TRUE, forceCheck=FALSE),
                     new("dgCMatrix")),
           identical(Matrix(new("dgCMatrix"), sparse=FALSE, forceCheck=FALSE),
