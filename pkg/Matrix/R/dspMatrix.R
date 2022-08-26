@@ -33,16 +33,3 @@ setMethod("diag", signature(x = "dspMatrix"),
 setMethod("diag<-", signature(x = "dspMatrix"),
 	  function(x, value) .Call(dspMatrix_setDiag, x, value))
 } ## MJ
-
-setMethod("solve", signature(a = "dspMatrix", b = "missing"),
-	  function(a, b, ...) .Call(dspMatrix_solve, a))
-
-setMethod("solve", signature(a = "dspMatrix", b = "Matrix"),
-	  function(a, b, ...)
-              .Call(dspMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dspMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dspMatrix", b = "numLike"),
-	  function(a, b, ...) .Call(dspMatrix_matrix_solve, a, b))

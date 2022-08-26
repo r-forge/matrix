@@ -20,59 +20,6 @@ setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...) list(P = as(x, "pMatrix"),
                                 L = as(x, "CsparseMatrix")))
 
-.CHM_solve <- function(a, b, system = c("A", "LDLt",
-                                        "LD", "DLt", "L", "Lt", "D",
-                                        "P", "Pt"),
-                       ...)
-{
-    chkDots(..., which.call = -2L)
-    system.def <- eval(formals()$system)
-    .Call(CHMfactor_solve, a, b,
-	  match(match.arg(system, system.def), system.def, 0L))
-}
-
-## numLike|matrix|denseMatrix->dgeMatrix happens at C-level
-setMethod("solve", signature(a = "CHMfactor", b = "numLike"),
-	  .CHM_solve)
-setMethod("solve", signature(a = "CHMfactor", b = "matrix"),
-	  .CHM_solve)
-setMethod("solve", signature(a = "CHMfactor", b = "denseMatrix"),
-	  .CHM_solve)
-
-rm(.CHM_solve)
-
-setMethod("solve", signature(a = "CHMfactor", b = "sparseMatrix"),
-	  function(a, b, system = c("A", "LDLt",
-                                    "LD", "DLt", "L", "Lt", "D",
-                                    "P", "Pt"),
-		   ...) {
-	      chkDots(..., which.call = -2L)
-	      system.def <- eval(formals()$system)
-              ##-> cholmod_spsolve() in ../src/CHOLMOD/Cholesky/cholmod_spsolve.c
-              .Call(CHMfactor_spsolve, a,
-                    ## 'b' as dgCMatrix:
-                    ..sparse2d(.sparse2g(as(b, "CsparseMatrix"))),
-		    match(match.arg(system, system.def), system.def, 0L))
-	  })
-
-setMethod("solve", signature(a = "CHMfactor", b = "missing"),
-	  function(a, b, system = c("A", "LDLt",
-                                    "LD", "DLt", "L", "Lt", "D",
-                                    "P", "Pt"),
-		   ...) {
-	      chkDots(..., which.call = -2L)
-	      system.def <- eval(formals()$system)
-              system <- match.arg(system, system.def)
-              r <- .Call(CHMfactor_spsolve, a,
-                         ## 'b' gets identity dgCMatrix:
-                         .sparseDiagonal(a@Dim[1], shape = "g"),
-                         match(system, system.def, 0L))
-              switch(system,
-                     A =, LDLt = .M2symm(r),
-                     LD =, DLt =, L =, Lt =, D = .M2tri(r),
-                     P =, Pt = as(r, "pMatrix"))
-	  })
-
 setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...) {
               cld <- getClassDef(class(parent))

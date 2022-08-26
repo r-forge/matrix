@@ -70,39 +70,3 @@ setAs("dtCMatrix", "dtTMatrix",
 setAs("dtCMatrix", "dtrMatrix",
       function(from) as(as(from, "dtTMatrix"), "dtrMatrix"))
 } ## MJ
-
-## FIXME: dtCMatrix_sparse_solve() can return an invalid dtCMatrix:
-##
-## a <- new("dtCMatrix", Dim = c(5L, 5L), diag = "U",
-##          p = c(0L, 0L, 0:2, 5L), i = c(1L, 0:3), x = rep(1, 5))
-## b <- .trDiagonal(n, unitri = FALSE)
-## .Call(dtCMatrix_sparse_solve, a, b)
-##
-## should be fixed at C level so that we do not rely on .sortCsparse()
-## to produce a valid object
-setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
-	  function(a, b, ...) {
-              b <- .trDiagonal(a@Dim[1L], unitri = FALSE) # dgC
-              r <- .sortCsparse(.Call(dtCMatrix_sparse_solve, a, b)) # dgC
-              (if(a@uplo == "U") triu else tril)(r) # dtC
-          })
-
-setMethod("solve", signature(a = "dtCMatrix", b = "CsparseMatrix"),
-	  function(a, b, ...) .sortCsparse(.Call(dtCMatrix_sparse_solve, a, b)))
-
-setMethod("solve", signature(a = "dtCMatrix", b = "dgeMatrix"),
-	  function(a, b, ...) .Call(dtCMatrix_matrix_solve, a, b, TRUE))
-
-setMethod("solve", signature(a = "dtCMatrix", b = "matrix"),
-	  function(a, b, ...) {
-              storage.mode(b) <- "double"
-              .Call(dtCMatrix_matrix_solve, a, b, FALSE)
-	  })
-
-## Isn't this case handled by the method for (a = "Matrix', b =
-## "numeric") in ./Matrix.R? Or is this method defined here for
-## the as.double coercion?
-setMethod("solve", signature(a = "dtCMatrix", b = "numLike"),
-	  function(a, b, ...)
-              .Call(dtCMatrix_matrix_solve,
-                    a, cbind(as.double(b), deparse.level = 0L), FALSE))

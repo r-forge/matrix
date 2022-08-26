@@ -47,16 +47,3 @@ setMethod("diag<-", signature(x = "dtpMatrix"),
 		    value)
 	  })
 } ## MJ
-
-setMethod("solve", signature(a = "dtpMatrix", b = "missing"),
-	  function(a, b, ...) .Call(dtpMatrix_solve, a))
-
-setMethod("solve", signature(a = "dtpMatrix", b = "Matrix"),
-	  function(a, b, ...)
-              .Call(dtpMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dtpMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dtpMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dtpMatrix", b = "numLike"),
-	  function(a, b, ...) .Call(dtpMatrix_matrix_solve, a, b))

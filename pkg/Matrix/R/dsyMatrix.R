@@ -75,16 +75,3 @@ setMethod("diag", signature(x = "dsyMatrix"), .dsy.diag)
 setMethod("diag<-", signature(x = "dsyMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
-
-setMethod("solve", signature(a = "dsyMatrix", b = "missing"),
-          function(a, b, ...) .Call(dsyMatrix_solve, a))
-
-setMethod("solve", signature(a = "dsyMatrix", b = "Matrix"),
-	  function(a, b, ...)
-              .Call(dsyMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dsyMatrix", b = "matrix"),
-          function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dsyMatrix", b = "numLike"),
-	  function(a, b, ...) .Call(dsyMatrix_matrix_solve, a, b))

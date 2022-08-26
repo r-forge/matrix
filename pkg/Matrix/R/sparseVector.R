@@ -829,10 +829,6 @@ setMethod("rep", "sparseVector",
 ##		     -------
 
 
-setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
-	  function(a, b, ...) callGeneric(a, as(b, "sparseMatrix")))
-
-
 ##' indices of vector x[] to construct  Toeplitz matrix
 ##' FIXME: write in C, port to  R('stats' package), and use in stats::toeplitz()
 ind4toeplitz <- function(n) {

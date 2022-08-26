@@ -40,16 +40,3 @@ setMethod("diag", signature(x = "dgeMatrix"), .dge.diag)
 setMethod("diag<-", signature(x = "dgeMatrix"),
 	  function(x, value) .Call(dgeMatrix_setDiag, x, value))
 } ## MJ
-
-setMethod("solve", signature(a = "dgeMatrix", b = "missing"),
-	  function(a, b, ...) .Call(dgeMatrix_solve, a))
-
-setMethod("solve", signature(a = "dgeMatrix", b = "Matrix"),
-	  function(a, b, ...)
-              .Call(dgeMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dgeMatrix", b = "matrix"),
-	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dgeMatrix", b = "numLike"),
-	  function(a, b, ...) .Call(dgeMatrix_matrix_solve, a, b))

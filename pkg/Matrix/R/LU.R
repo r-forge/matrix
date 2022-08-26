@@ -91,7 +91,7 @@ setMethod("lu", signature(x = "dsRMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["LU"]]))
                   return(ch)
-              r <- lu(.sparse2g(.CR2RC(x)), ...)
+              r <- lu(.sparse2g(.tCR2RC(x)), ...)
               if(cache) .set.factors(x, "LU", r) else r
           })
 
@@ -171,12 +171,6 @@ setMethod("lu", "diagonalMatrix",
 ## returning list(L, U, P), where A = P L U
 setMethod("expand", signature(x = "denseLU"),
           function(x, ...) .Call(LU_expand, x))
-
-setMethod("solve", signature(a = "denseLU", b = "missing"),
-	  function(a, b, ...) {
-	      ll <- expand(a)
-	      solve(ll$U, solve(ll$L, ll$P))
-	  })
 
 
 ## METHODS FOR CLASS: sparseLU

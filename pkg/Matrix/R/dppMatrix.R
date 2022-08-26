@@ -72,16 +72,3 @@ setMethod("t", signature(x = "dppMatrix"),
           function(x) as(t(as(x, "dspMatrix")), "dppMatrix"),
           valueClass = "dppMatrix")
 } ## MJ
-
-setMethod("solve", signature(a = "dppMatrix", b = "missing"),
-          function(a, b, ...) .Call(dppMatrix_solve, a))
-
-setMethod("solve", signature(a = "dppMatrix", b = "Matrix"),
-          function(a, b, ...)
-              .Call(dppMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dppMatrix", b = "matrix"),
-          function(a, b, ...) .Call(dppMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dppMatrix", b = "numLike"),
-          function(a, b, ...) .Call(dppMatrix_matrix_solve, a, b))
