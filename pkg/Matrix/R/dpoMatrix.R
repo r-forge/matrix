@@ -56,15 +56,3 @@ setAs("dpoMatrix", "nMatrix",
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("solve", signature(a = "dpoMatrix", b = "missing"),
-          function(a, b, ...) .Call(dpoMatrix_solve, a))
-
-setMethod("solve", signature(a = "dpoMatrix", b = "Matrix"),
-          function(a, b, ...)
-              .Call(dpoMatrix_matrix_solve, a, as(b, "denseMatrix")))
-
-setMethod("solve", signature(a = "dpoMatrix", b = "matrix"),
-          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b))
-
-setMethod("solve", signature(a = "dpoMatrix", b = "numLike"),
-          function(a, b, ...) .Call(dpoMatrix_matrix_solve, a, b))

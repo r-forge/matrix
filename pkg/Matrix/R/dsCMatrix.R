@@ -40,6 +40,8 @@ setAs("dsCMatrix", "dsyMatrix",
       function(from) as(from, "denseMatrix"))
 } ## MJ
 
+## MJ: unused
+if(FALSE) {
 ##' Check if \code{name} (== "[sS][pP][dD]Cholesky") fits the values of the
 ##' logicals (perm, LDL, super).
 ##' @param name a string such as "sPdCholesky"
@@ -53,6 +55,7 @@ setAs("dsCMatrix", "dsyMatrix",
 
 .CHM.factor.name <- function(perm, LDL, super)
     .Call(R_chm_factor_name, perm, LDL, super)
+} ## MJ
 
 ## MJ: no longer needed ... methods now inherited from CsparseMatrix
 if(FALSE) {
@@ -77,85 +80,6 @@ setMethod("triu", "dsCMatrix",
 	  })
 } ## MJ
 
-msg.and.solve.dgC.lu <- function(name, r, wrns, a, b, tol) {
-    if((e <- inherits(r, "error")) || length(wrns) > 0L) {
-	if((v <- Matrix.verbose()) >= 1) {
-            ## as Matrix.msg() but more sophisticated:
-	    fmt <- "%s(): Cholmod factorization unsuccessful %s --> using LU(<dgC>)"
-	    if(v < 2)
-		ch <- ""
-	    else { # v >= 2
-		ch <- if(e) conditionMessage(r) # else NULL
-		if(length(wrns) > 0L) # show them (possibly additionally)
-		    ch <- paste0(c(ch, unlist(lapply(wrns, conditionMessage))),
-                                 collapse = ";\n ")
-	    }
-	    message(gettextf(fmt, name, ch), domain = NA)
-	}
-	.solve.dgC.lu(.sparse2g(a), b = b, tol = tol)
-    } else r
-}
-
-solve.dsC.mat <- function(a,b, LDL = NA, tol = .Machine$double.eps) {
-    ## need to *not* catch warnings directly, so CHOLMOD free()s
-    solveWrn <- list()
-    r <- withCallingHandlers(
-	tryCatch(.Call(dsCMatrix_matrix_solve, a, b, LDL),
-	  error = function(e) e),
-	warning = function(w) { solveWrn[[length(solveWrn)+1L]] <<- w
-				tryInvokeRestart("muffleWarning")} )
-    msg.and.solve.dgC.lu("solve.dsC.mat", r, solveWrn, a, b, tol)
-}
-
-## ``Fully-sparse'' solve()  {different Cholmod routine, otherwise "the same"}:
-solve.dsC.dC <- function(a,b, LDL = NA, tol = .Machine$double.eps) {
-    ## need to *not* catch warnings directly, so CHOLMOD free()s
-    solveWrn <- list()
-    r <- withCallingHandlers(
-	tryCatch(.Call(dsCMatrix_Csparse_solve, a, b, LDL),
-	  error = function(e) e),
-	warning = function(w) { solveWrn[[length(solveWrn)+1L]] <<- w
-				tryInvokeRestart("muffleWarning") })
-    msg.and.solve.dgC.lu("solve.dsC.dC", r, solveWrn, a, b, tol)
-}
-
-## <sparse> . <dense> ------------------------
-
-setMethod("solve", signature(a = "dsCMatrix", b = "ddenseMatrix"),
-	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...) {
-	      solve.dsC.mat(a, b = .dense2g(b, "d"), LDL=LDL, tol=tol)
-	  },
-	  valueClass = "dgeMatrix")
-setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
-	  ## only triggers for diagonal*, ldense*.. (but *not* ddense: above)
-	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol))
-
-setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
-	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
-	  valueClass = "dgeMatrix")
-
-setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
-	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...)
-	  solve.dsC.mat(a, .dense2g(b, "d"), LDL=LDL, tol=tol),
-	  valueClass = "dgeMatrix")
-
-## <sparse> . <sparse> ------------------------
-
-setMethod("solve", signature(a = "dsCMatrix", b = "dsparseMatrix"),
-	  function(a, b, LDL = NA, tol = .Machine$double.eps, ...) {
-	      cb <- getClassDef(class(b))
-	      if (!extends(cb, "CsparseMatrix"))
-		  cb <- getClassDef(class(b <- as(b, "CsparseMatrix")))
-	      if (extends(cb, "symmetricMatrix")) ## not supported (yet) by cholmod_spsolve
-		  b <- as(b, "generalMatrix")
-	      solve.dsC.dC(a,b, LDL=LDL, tol=tol)
-	  })
-
-setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
-	  function(a, b, ...) solve(a, .trDiagonal(nrow(a), unitri=FALSE), ...))
-
 ## MJ: no longer needed ... method now inherited from CsparseMatrix
 if(FALSE) {
 setMethod("t", signature(x = "dsCMatrix"),
@@ -163,7 +87,8 @@ setMethod("t", signature(x = "dsCMatrix"),
           valueClass = "dsCMatrix")
 } ## MJ
 
-### These two are very similar, the first one has the advantage to be applicable to 'Chx' directly:
+### These two are very similar, the first one has the advantage
+### to be applicable to 'Chx' directly:
 
 ## "used" currently only in ../tests/factorizing.R
 .diag.dsC <- function(x, Chx = Cholesky(x, LDL=TRUE), res.kind = "diag") {
@@ -174,12 +99,14 @@ setMethod("t", signature(x = "dsCMatrix"),
     ## => res.kind in ("trace", "sumLog", "prod", "min", "max", "range", "diag", "diagBack")
 }
 
-## nowhere used/tested (FIXME?)
+## MJ: unused
+if(FALSE) {
 ## here, we  *could* allow a 'mult = 0' factor :
 .CHM.LDL.D <- function(x, perm = TRUE, res.kind = "diag") {
     .Call(dsCMatrix_LDL_D, x, perm, res.kind)
     ##    ^^^^^^^^^^^^^^^^ from ../src/dsCMatrix.c
 }
+} ## MJ
 
 ## FIXME:  kind = "diagBack" is not yet implemented
 ##	would be much more efficient, but there's no CHOLMOD UI (?)

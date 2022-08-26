@@ -1139,29 +1139,6 @@ setMethod("%&%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
 ## TODO: Write tests in ./tests/ which ensure that many "ops" with diagonal*
 ##       do indeed work by going through sparse (and *not* ddense)!
 
-setMethod("solve", signature(a = "diagonalMatrix", b = "missing"),
-	  function(a, b, ...) {
-	      a@x <- 1 / a@x
-	      a@Dimnames <- a@Dimnames[2:1]
-	      a
-	  })
-
-solveDiag <- function(a, b, ...) {
-    if(a@Dim[1L] != nrow(b))
-        stop("incompatible matrix dimensions")
-    ## trivially invert a 'in place' and multiply:
-    a@x <- 1 / a@x
-    a@Dimnames <- a@Dimnames[2:1]
-    a %*% b
-}
-setMethod("solve", signature(a = "diagonalMatrix", b = "matrix"),
-          solveDiag)
-setMethod("solve", signature(a = "diagonalMatrix", b = "Matrix"),
-          solveDiag)
-
-## Schur()  ---> ./eigen.R
-
-
 
 ###---------------- <Ops> (<Arith>, <Logic>, <Compare> ) ----------------------
 

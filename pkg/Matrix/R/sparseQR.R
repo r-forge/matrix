@@ -135,7 +135,3 @@ setMethod("qr.fitted", signature(qr = "sparseQR", y = "Matrix"),
 	  function(qr, y, k)
 	      .Call(sparseQR_resid_fitted,
                     qr, .dense2g(as(y, "denseMatrix"), "d"), FALSE))
-
-
-setMethod("solve", signature(a = "sparseQR", b = "ANY"),
-	  function(a, b, ...) qr.coef(a, b))

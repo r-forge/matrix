@@ -861,14 +861,6 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 replTmat)
 
-
-
-
-setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
-	  function(a, b, ...) solve(.T2C(a), b))
-setMethod("solve", signature(a = "TsparseMatrix", b = "missing"),
-	  function(a, b, ...) solve(.T2C(a)))
-
 ## MJ: no longer needed ... replacement in ./sparseMatrix.R
 if(FALSE) {
 ## Want tril(), triu(), band() --- just as "indexing" ---

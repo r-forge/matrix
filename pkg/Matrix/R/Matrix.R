@@ -442,28 +442,6 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 }
 }
 
-## Methods for operations where one argument is numeric
-
-## maybe not 100% optimal, but elegant:
-setMethod("solve", signature(a = "Matrix", b = "missing"),
-	  function(a, b, ...) solve(a, Diagonal(nrow(a))))
-
-setMethod("solve", signature(a = "Matrix", b = "numeric"),
-	  function(a, b, ...) callGeneric(a, Matrix(b)))
-setMethod("solve", signature(a = "Matrix", b = "matrix"),
-	  function(a, b, ...) callGeneric(a, Matrix(b)))
-setMethod("solve", signature(a = "matrix", b = "Matrix"),
-	  function(a, b, ...) callGeneric(Matrix(a), b))
-
-setMethod("solve", signature(a = "Matrix", b = "diagonalMatrix"),
-	  function(a, b, ...) callGeneric(a, as(b, "CsparseMatrix")))
-
-## when no sub-class method is found, bail out
-setMethod("solve", signature(a = "Matrix", b = "ANY"),
-	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-setMethod("solve", signature(a = "ANY", b = "Matrix"),
-	  function(a, b, ...) .bail.out.2("solve", class(a), class(b)))
-
 ## There are special sparse methods in  ./kronecker.R  ; this is a "fall back":
 setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
 				 FUN = "ANY", make.dimnames = "ANY"),

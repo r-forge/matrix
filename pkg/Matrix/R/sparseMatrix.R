@@ -113,42 +113,12 @@ setAs("RsparseMatrix", "TsparseMatrix", .CR2T)
 setAs("TsparseMatrix", "CsparseMatrix", .T2C)
 setAs("TsparseMatrix", "RsparseMatrix", .T2R)
 
-## sC->R, sR->C, preserving kind and symmetry
-.def.template <- function(from) {
-    to <- new(.TO)
-    to@Dim <- from@Dim
-    to@Dimnames <- from@Dimnames
-    if(from@uplo == "U")
-        to@uplo <- "L"
-    to@p <- from@p
-    to@j <- from@i
-    to@x <- from@x
-    to@factors <- from@factors
-    to
-}
-for (.kind in c("d", "l", "n")) {
-    for (.repr in c("C", "R")) {
-        .otherrepr <- if(.repr == "C") "R" else "C"
-        .from <- paste0(.kind, "s",      .repr, "Matrix")
-        .to   <- paste0(.kind, "s", .otherrepr, "Matrix")
-        .def <- .def.template
-
-        .b <- body(.def)
-        .b[[2L]][[3L]][[2L]] <- .to
-        if(.repr != "C") {
-            ## reverse to@j <- from@i
-            .b[[7L]][[2L]][[3L]] <- quote(i)
-            .b[[7L]][[3L]][[3L]] <- quote(j)
-        }
-        if(.kind == "n")
-            ## delete to@x <- from@x
-            .b[[8L]] <- NULL
-        body(.def) <- .b
-
-        setAs(.from, paste0(.otherrepr, "sparseMatrix"), .def)
-    }
-}
-rm(.def.template, .def, .b, .from, .to, .kind, .repr, .otherrepr)
+for (.kind in c("d", "l", "n"))
+    for (.repr in c("C", "R"))
+        setAs(paste0(.kind, "s", .repr, "Matrix"),
+              paste0(if(.repr == "C") "R" else "C", "sparseMatrix"),
+              .tCR2RC)
+rm(.kind, .repr)
 
 ## More granular coercions .................................
 

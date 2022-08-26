@@ -6,37 +6,34 @@
 \alias{solve-methods}
 %
 \alias{solve,ANY,ANY-method}
-\alias{solve,ANY,Matrix-method}
 \alias{solve,CHMfactor,denseMatrix-method}
 \alias{solve,CHMfactor,sparseMatrix-method}
 \alias{solve,CHMfactor,matrix-method}
 \alias{solve,CHMfactor,missing-method}
 \alias{solve,CHMfactor,numLike-method}
-\alias{solve,Matrix,ANY-method}
-\alias{solve,Matrix,diagonalMatrix-method}
-\alias{solve,Matrix,matrix-method}
-\alias{solve,Matrix,missing-method}
-\alias{solve,Matrix,numeric-method}
-\alias{solve,Matrix,pMatrix-method}
+\alias{solve,CsparseMatrix,ANY-method}
 \alias{solve,Matrix,sparseVector-method}
 \alias{solve,MatrixFactorization,ANY-method}
 \alias{solve,MatrixFactorization,missing-method}
-\alias{solve,MatrixFactorization,numeric-method}
+\alias{solve,MatrixFactorization,sparseVector-method}
+\alias{solve,RsparseMatrix,ANY-method}
 \alias{solve,TsparseMatrix,ANY-method}
-\alias{solve,TsparseMatrix,missing-method}
+\alias{solve,ddiMatrix,Matrix-method}
+\alias{solve,ddiMatrix,matrix-method}
+\alias{solve,ddiMatrix,missing-method}
+\alias{solve,ddiMatrix,numLike-method}
 \alias{solve,denseLU,missing-method}
-\alias{solve,dgCMatrix,ddenseMatrix-method}
-\alias{solve,dgCMatrix,dsparseMatrix-method}
+\alias{solve,denseMatrix,ANY-method}
+\alias{solve,dgCMatrix,denseMatrix-method}
 \alias{solve,dgCMatrix,matrix-method}
 \alias{solve,dgCMatrix,missing-method}
+\alias{solve,dgCMatrix,numLike-method}
+\alias{solve,dgCMatrix,sparseMatrix-method}
 \alias{solve,dgeMatrix,Matrix-method}
 \alias{solve,dgeMatrix,matrix-method}
 \alias{solve,dgeMatrix,missing-method}
 \alias{solve,dgeMatrix,numLike-method}
-\alias{solve,dgeMatrix,sparseMatrix-method}
-\alias{solve,diagonalMatrix,Matrix-method}
-\alias{solve,diagonalMatrix,matrix-method}
-\alias{solve,diagonalMatrix,missing-method}
+\alias{solve,diagonalMatrix,ANY-method}
 \alias{solve,dpoMatrix,Matrix-method}
 \alias{solve,dpoMatrix,matrix-method}
 \alias{solve,dpoMatrix,missing-method}
@@ -45,12 +42,11 @@
 \alias{solve,dppMatrix,matrix-method}
 \alias{solve,dppMatrix,missing-method}
 \alias{solve,dppMatrix,numLike-method}
-\alias{solve,dsCMatrix,ddenseMatrix-method}
 \alias{solve,dsCMatrix,denseMatrix-method}
-\alias{solve,dsCMatrix,dsparseMatrix-method}
 \alias{solve,dsCMatrix,matrix-method}
 \alias{solve,dsCMatrix,missing-method}
 \alias{solve,dsCMatrix,numLike-method}
+\alias{solve,dsCMatrix,sparseMatrix-method}
 \alias{solve,dspMatrix,Matrix-method}
 \alias{solve,dspMatrix,matrix-method}
 \alias{solve,dspMatrix,missing-method}
@@ -59,11 +55,6 @@
 \alias{solve,dsyMatrix,matrix-method}
 \alias{solve,dsyMatrix,missing-method}
 \alias{solve,dsyMatrix,numLike-method}
-\alias{solve,dtCMatrix,CsparseMatrix-method}
-\alias{solve,dtCMatrix,dgeMatrix-method}
-\alias{solve,dtCMatrix,matrix-method}
-\alias{solve,dtCMatrix,missing-method}
-\alias{solve,dtCMatrix,numLike-method}
 \alias{solve,dtpMatrix,Matrix-method}
 \alias{solve,dtpMatrix,matrix-method}
 \alias{solve,dtpMatrix,missing-method}
@@ -72,34 +63,53 @@
 \alias{solve,dtrMatrix,matrix-method}
 \alias{solve,dtrMatrix,missing-method}
 \alias{solve,dtrMatrix,numLike-method}
-\alias{solve,matrix,Matrix-method}
+\alias{solve,indMatrix,ANY-method}
 \alias{solve,pMatrix,Matrix-method}
 \alias{solve,pMatrix,matrix-method}
 \alias{solve,pMatrix,missing-method}
+\alias{solve,pMatrix,numLike-method}
+\alias{solve,dtCMatrix,dgCMatrix-method}
+\alias{solve,dtCMatrix,dgeMatrix-method}
+\alias{solve,dtCMatrix,dsCMatrix-method}
+\alias{solve,dtCMatrix,dspMatrix-method}
+\alias{solve,dtCMatrix,dsyMatrix-method}
+\alias{solve,dtCMatrix,dtCMatrix-method}
+\alias{solve,dtCMatrix,dtpMatrix-method}
+\alias{solve,dtCMatrix,dtrMatrix-method}
+\alias{solve,dtCMatrix,denseMatrix-method}
+\alias{solve,dtCMatrix,matrix-method}
+\alias{solve,dtCMatrix,missing-method}
+\alias{solve,dtCMatrix,numLike-method}
+\alias{solve,dtCMatrix,sparseMatrix-method}
+\alias{solve,matrix,Matrix-method}
+\alias{solve,matrix,sparseVector-method}
 \alias{solve,sparseQR,ANY-method}
+\alias{solve,sparseQR,missing-method}
 %
 \description{
-  Methods for function \code{\link{solve}} to solve a linear system of
-  equations, or equivalently, solve for \eqn{X} in
-  \deqn{A X = B}
-  where \eqn{A} is a square matrix, and  \eqn{X}, \eqn{B} are matrices
-  or vectors (which are treated as 1-column matrices), and the \R syntax
-  is \preformatted{
-			X <- solve(A,B)
+  Methods for generic function \code{\link{solve}}, for solving linear
+  systems of equations.  These solve for \eqn{X} in \deqn{A X = B}
+  where \eqn{A} is a square matrix and \eqn{X} and \eqn{B} are matrices
+  with compatible dimensions.  The usual \R syntax is
+  \preformatted{
+                        x <- solve(a, b, ...)
   }
-  In \code{solve(a,b)} in the \pkg{Matrix} package, \code{a} may also
-  be a \code{\linkS4class{MatrixFactorization}} instead of directly a matrix.
+  where \code{b} may also be a vector, in which case it is treated
+  as a 1-column matrix.  Methods support \code{a} inheriting from
+  virtual classes
+  \code{\linkS4class{Matrix}} and \code{\linkS4class{MatrixFactorization}}
+  and \code{b} inheriting from virtual classes
+  \code{Matrix} and \code{\linkS4class{sparseVector}}.
 }
-\usage{% usage for those methods which have "surprising arguments"
-\S4method{solve}{CHMfactor,denseMatrix}(a, b,
-      system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
-
-\S4method{solve}{dgCMatrix,missing}(a, b, sparse = NA  , tol = .Machine$double.eps, \dots)
-\S4method{solve}{dgCMatrix,matrix}(a, b, sparse = FALSE, tol = .Machine$double.eps, \dots)
-
-  solve(a, b, ...) ## *the* two-argument version, almost always preferred to
-# solve(a)         ## the *rarely* needed one-argument version
-% ^ must comment the above; otherwise 'R CMD check' waffles ...
+\usage{
+## solve(a, b, ...) # the two-argument version, almost always preferred to
+## solve(a,    ...) # the *rarely needed* one-argument version
+%^must comment; otherwise 'R CMD check' waffles
+\S4method{solve}{dgCMatrix,missing}(a, b, sparse = NA, tol = 100 * .Machine$double.eps, \dots)
+\S4method{solve}{dgCMatrix,matrix}(a, b, sparse = FALSE, \dots)
+\S4method{solve}{dgCMatrix,denseMatrix}(a, b, sparse = FALSE, \dots)
+\S4method{solve}{dgCMatrix,sparseMatrix}(a, b, sparse = NA, tol = 100 * .Machine$double.eps, \dots)
+\S4method{solve}{CHMfactor,denseMatrix}(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 }
 \arguments{
   \item{a}{a square numeric matrix, \eqn{A}, typically of one of the
@@ -107,10 +117,6 @@
     corresponding numeric ones.}
   \item{b}{numeric vector or matrix (dense or sparse) as RHS
     of the linear system \eqn{Ax = b}.}
-  \item{system}{only if \code{a} is a \code{\linkS4class{CHMfactor}}:
-    character string indicating the kind of linear system to be
-    solved, see below.  Note that the default, \code{"A"}, does
-    \emph{not} solve the triangular system (but \code{"L"} does).}
   \item{sparse}{only when \code{a} is a
     \code{\linkS4class{sparseMatrix}}, i.e., typically a
     \code{\linkS4class{dgCMatrix}}: logical specifying if the result
@@ -118,6 +124,10 @@
     %% pos.definite etc
   \item{tol}{only used when \code{a} is sparse, in the
       \code{\link{isSymmetric}(a, tol=*)} test, where that applies.}
+  \item{system}{only if \code{a} is a \code{\linkS4class{CHMfactor}}:
+    character string indicating the kind of linear system to be
+    solved, see below.  Note that the default, \code{"A"}, does
+    \emph{not} solve the triangular system (but \code{"L"} does).}
   \item{\dots}{potentially further arguments to the methods.}
 }
 
