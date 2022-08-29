@@ -640,7 +640,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
 		 function(x,i,j, ..., value)
 	     {
 	      if(all0(value)) { # be faster
-		  r <- new(paste0(.M.kindC(getClassDef(class(x))),"tTMatrix"))# of all "0"
+		  r <- new(paste0(.M.kind(x), "tTMatrix")) # of all "0"
 		  r@Dim <- x@Dim
 		  r@Dimnames <- x@Dimnames
 		  r
