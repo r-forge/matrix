@@ -378,9 +378,13 @@ char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);
 size_t kind2size(char kind);
 
-char Matrix_kind(SEXP obj, int iok);
-SEXP R_Matrix_kind(SEXP obj, SEXP iok);
-    
+char Matrix_kind(SEXP obj, int i2d);
+SEXP R_Matrix_kind(SEXP obj, SEXP i2d);
+char Matrix_shape(SEXP obj);
+SEXP R_Matrix_shape(SEXP obj);
+char Matrix_repr(SEXP obj);
+SEXP R_Matrix_repr(SEXP obj);
+
 SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 		     int new, int transpose_if_vector);
 SEXP R_matrix_as_dense(SEXP from, SEXP code, SEXP uplo, SEXP diag);
