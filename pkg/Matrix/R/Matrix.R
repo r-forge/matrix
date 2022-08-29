@@ -663,7 +663,7 @@ subset.ij <- function(x, ij) {
 	    mi <- match(m2, m1, nomatch=0)
 	    mmi <- mi != 0L ## == (m2 %in% m1)
 	    ## Result: all FALSE or 0  apart from where we match non-zero entries
-	    ans <- vector(mode = .type.kind[.M.kindC(cld)], length = m)
+	    ans <- vector(mode = .type.kind[.M.kind(x)], length = m)
 	    ## those that are *not* zero:
 	    ans[mmi] <- if(extends(cld, "nsparseMatrix")) TRUE else x@x[mi[mmi]]
 	    if(any(ina <- is.na(m2))) # has one or two NA in that (i,j) row

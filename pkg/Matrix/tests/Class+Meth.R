@@ -281,7 +281,7 @@ tstMatrixClass <-
 		if(is_cor)
                     m0 <- cov2cor(m0)
 	    } else {
-                m0 <- vector(Matrix:::.type.kind[Matrix:::.M.kindC(clNam)])
+                m0 <- vector(Matrix:::.type.kind[Matrix:::.M.kind(m)])
                 dim(m0) <- c(0L,0L)
             }
 	    ## m0 is the 'matrix' version of our 'Matrix' m

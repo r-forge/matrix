@@ -65,7 +65,7 @@ uniqSpVec <- function(x) {
     x
 }
 
-sp2vec <- function(x, mode = .type.kind[.M.kindC(class(x))]) {
+sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
     ## sparseVector  ->  vector
     has.x <- .hasSlot(x, "x")## has "x" slot
     m.any <- (mode == "any")
@@ -176,8 +176,8 @@ setAs("CsparseMatrix", "sparseVector", ## could go via TsparseMatrix, but this i
 	  d <- dim(from)
 	  n <- prod(d) # -> numeric, no integer overflow
 	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
-          cld <- getClassDef(class(from))
-	  kind <- .M.kind(from, cld)
+          kind <- .M.kind(from)
+	  cld <- getClassDef(class(from))
 	  if(extends(cld, "symmetricMatrix"))
 	      from <- .sparse2g(from)
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
@@ -199,8 +199,8 @@ setAs("TsparseMatrix", "sparseVector",
 	  d <- dim(from)
 	  n <- prod(d) # -> numeric, no integer overflow
 	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
-          cld <- getClassDef(class(from))
-	  kind <- .M.kind(from, cld)
+          kind <- .M.kind(from)
+	  cld <- getClassDef(class(from))
 	  if(extends(cld, "symmetricMatrix"))
 	      from <- .sparse2g(from)
 	  else if(extends(cld, "triangularMatrix") && from@diag == "U")
@@ -234,8 +234,7 @@ setAs("TsparseMatrix", "sparseVector",
 ##' @author Martin Maechler, May 2007 ff.
 spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE)
 {
-    cx <- class(x)
-    if(check && !extends(cx, "sparseVector"))
+    if(check && !is(x, "sparseVector"))
 	stop("'x' must inherit from \"sparseVector\"")
     if(!missing(ncol)) { ncol <- as.integer(ncol)
 			 if(ncol < 0) stop("'ncol' must be >= 0") }
@@ -270,17 +269,16 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     }
     ## now nrow * ncol >= n  (or 'symmetric')
     ##	   ~~~~~~~~~~~~~~~~
-    cld <- getClassDef(cx)
-    kind <- .M.kindC(cld)		# "d", "n", "l", "i", "z", ...
+    kind <- .M.kind(x) # "d", "n", "l", "i", "z", ...
     has.x <- kind != "n"
     clStem <- if(symmetric) "sTMatrix" else "gTMatrix"
     ## "careful_new()" :
     cNam <- paste0(kind, clStem)
     chngCl <- is.null(slotNames(newCl <- getClass(cNam, .Force=TRUE)))
     if(chngCl) { ## e.g. "igTMatrix" is not yet implemented
-	if(substr(cNam,1,1) == "z")
+	if(kind == "z")
 	    stop(gettextf("Class %s is not yet implemented", dQuote(cNam)),
-		 domain=NA)
+		 domain = NA)
 	## coerce to "double":
 	newCl <- getClass(paste0("d", clStem))
     }

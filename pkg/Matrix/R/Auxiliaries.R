@@ -64,10 +64,18 @@ extends1of <- function(class, classes, ...) {
     FALSE
 }
 
+## MJ: This .M.kind() is 3-6 times faster than the variants used previously
+##     (see farther below).  It seems to be _slower_ than .M.kindC(cld, ext)
+##     but only with 'cld' _and_ 'ext' already computed.  That would not be
+##     the case if R_check_class_etc() were optimized as described here:
+##     https://stat.ethz.ch/pipermail/r-devel/2022-August/081952.html
 
-## "[gstd]" for Matrix, sparseVector 'x'; error for other S4, non-S4
+## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x'
+.M.kind  <- function(x) .Call(R_Matrix_kind, x, TRUE)  # integer -> "d"
+.V.kind  <- function(x) .Call(R_Matrix_kind, x, FALSE) # integer -> "i"
+## "[gstd]" for Matrix, sparseVector 'x'
 .M.shape <- function(x) .Call(R_Matrix_shape, x)
-## "[CRT]" for [CRT]sparseMatrix 'x'; "" for other S4; error for non-S4
+## "[CRT]" for [CRT]sparseMatrix 'x', "" for other S4 'x'
 .M.repr  <- function(x) .Call(R_Matrix_repr, x)
 .isCRT   <- function(x) nzchar(.M.repr(x))
 
@@ -1501,7 +1509,7 @@ as_gCsimpl <- function(from) as(as(from, "CsparseMatrix"), "generalMatrix")
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
-    kind <- .M.kindC(cld)
+    kind <- .M.kind(x)
     symmetric <- extends(cld, "symmetricMatrix") && isSymmetric(x)
     triangular <- !symmetric &&
         (extends(cld, "triangularMatrix") && (it <- isTriangular(x)))
@@ -1527,7 +1535,7 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
          else if(attr(it, "kind") == "U")
              triu(x)
          else tril(x)
-    .sparse2kind(x, .M.kindC(cld))
+    .sparse2kind(x, .M.kind(x))
 }
 
 ## as(<Matrix>, <non-unit diagonal CsparseMatrix>)

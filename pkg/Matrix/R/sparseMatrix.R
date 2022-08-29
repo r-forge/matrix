@@ -627,7 +627,7 @@ formatSpMatrix <- function(x, digits = NULL, # getOption("digits"),
 	else if(extends(cld, "TsparseMatrix"))
 	    x <- .Call(Tsparse_diagU2N, x)
 	else {
-	    kind <- .M.kind(x, cld)
+	    kind <- .M.kind(x)
 	    x <- .Call(Tsparse_diagU2N,
 		       as(as(x, paste0(kind, "Matrix")), "TsparseMatrix"))
 	    cld <- getClassDef(class(x))

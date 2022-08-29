@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-26 r3614)}{
+\section{Changes in version 1.4-2 (2022-08-29 r3619)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -518,6 +518,10 @@
       with a new argument \code{packed} for efficiently indexing
       \code{packedMatrix}.  \code{indDiag()} now behaves sensibly
       in the \code{n = 0} case.
+
+      \item \code{.M.kind()}, \code{.M.shape()}, and (new)
+      \code{.M.repr()} are now done in C via \code{R_check_class_etc()},
+      requiring a class definition only in \dQuote{rare} cases.
     }
   }
 }
