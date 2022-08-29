@@ -1309,8 +1309,8 @@ rm(A.M.n, A.n.M)
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  function(e1, e2) {
 	      ## go via "symmetric" if both are symmetric, etc...
-	      s1 <- .M.shape(e1, getClassDef(class(e1)))
-	      s2 <- .M.shape(e2, getClassDef(class(e2)))
+	      s1 <- .M.shape(e1)
+	      s2 <- .M.shape(e2)
               ## as(*, "d.CMatrix") is deprecated:
 	      ## viaCl <- paste0("d", if(s1 == s2) s1 else "g", "CMatrix")
 	      if(s1 != s2) ## go via "general"
@@ -1323,8 +1323,8 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 	  ## go via "symmetric" if both are symmetric, etc...
           function(e1, e2) {
-	      s1 <- .M.shape(e1, getClassDef(class(e1)))
-	      s2 <- .M.shape(e2, getClassDef(class(e2)))
+	      s1 <- .M.shape(e1)
+	      s2 <- .M.shape(e2)
               ## as(*, "d.CMatrix") is deprecated:
 	      ## viaCl <- paste0("l", if(s1 == s2) s1 else "g", "CMatrix")
 	      if(s1 != s2) ## go via "general"

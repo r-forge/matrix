@@ -29,7 +29,6 @@ isT  <- function(x)  !is.na(x) &  x
 isNT <- function(x)   is.na(x) | !x
 }
 
-##
 ##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
 ##all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
 allFalse <- function(x) if(is.atomic(x)) .Call(R_all0, x) else !any(x) && !any(is.na(x))
@@ -65,6 +64,7 @@ extends1of <- function(class, classes, ...) {
     FALSE
 }
 
+.M.shape <- function(x) .Call(R_Matrix_shape, x)
 
 ##' Should the matrix/Matrix  x  or a combination of x and y   be treated as  'sparse' ?
 ## sparseDefault <- function(x, y=NULL) {
@@ -1335,15 +1335,8 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
 	      domain = NA)
 }
 
-## typically used as .type.kind[.M.kind(x)]:
-.type.kind <- c("d" = "double",
-		"i" = "integer",
-		"l" = "logical",
-		"n" = "logical",
-		"z" = "complex")
-## the reverse, a "version of" .M.kind(.):
-.kind.type <- setNames(names(.type.kind), as.vector(.type.kind))
-
+## MJ: no longer needed ... replaced above
+if(FALSE) {
 .M.shape <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
     if(is.matrix(x)) { ## 'old style matrix'
@@ -1370,6 +1363,7 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
     if	   (extends(clx, "triangularMatrix")) "t"
     else if(extends(clx, "symmetricMatrix"))  "s" else "g"
 }
+} ## MJ
 
 ## MJ: unused
 if(FALSE) {
@@ -1401,6 +1395,16 @@ geClass <- function(x) {
 		       dQuote(class(x))), domain = NA)
 }
 } ## MJ
+
+## typically used as .type.kind[.M.kind(x)]:
+.type.kind <- c("d" = "double",
+		"i" = "integer",
+		"l" = "logical",
+		"n" = "logical",
+		"z" = "complex")
+
+## the reverse, a "version of" .M.kind(.):
+.kind.type <- setNames(names(.type.kind), as.vector(.type.kind))
 
 .dense.prefixes <- c("d" = "tr", ## map diagonal to triangular
                      "t" = "tr",
