@@ -1587,7 +1587,7 @@ char Matrix_shape(SEXP obj)
     static const char *valid[] = { VALID_NONVIRTUAL, "" };
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	error(_("\"kind\" not yet defined for objects of class \"%s\""),
+	error(_("\"shape\" not yet defined for objects of class \"%s\""),
 	      class_P(obj));
     if (ivalid >= 79 || valid[ivalid][3] != 'M')
 	return 'g'; /* indMatrix, pMatrix, .sparseVector */
@@ -1622,14 +1622,15 @@ char Matrix_repr(SEXP obj)
     static const char *valid[] = { VALID_CRTSPARSE, "" };
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	error(_("\"repr\" not yet defined for objects of class \"%s\""),
-	      class_P(obj));
+	return '\0'; /* useful to _not_ throw an error, for inheritance tests */
     return valid[ivalid][2];
 }
 
 SEXP R_Matrix_repr(SEXP obj)
 {
     char k = Matrix_repr(obj);
+    if (k == '\0')
+	return mkString("");
     char s[] = { k, '\0' };
     return mkString(s);
 }
