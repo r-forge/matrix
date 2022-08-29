@@ -1298,6 +1298,8 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
 }
 } ## MJ
 
+## MJ: no longer needed ... replaced above
+if(FALSE) {
 ## return "d" or "l" or "n" or "z"
 .M.kind <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
@@ -1348,8 +1350,6 @@ check.gT2sT <- function(x, toClass, do.n = extends(toClass, "nMatrix"))
 	      domain = NA)
 }
 
-## MJ: no longer needed ... replaced above
-if(FALSE) {
 .M.shape <- function(x, clx = class(x)) {
     ## 'clx': class() *or* class definition of x
     if(is.matrix(x)) { ## 'old style matrix'
