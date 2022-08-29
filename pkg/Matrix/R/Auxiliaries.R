@@ -147,7 +147,7 @@ Matrix.msg <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
 }
 }
 
-## currently unused; see also msg.and.solve.dgC.lu() in ./dsCMatrix.R
+## currently unused; see also .solve.dsC.status() in ./solve.R
 if(FALSE) {
 Matrix.msg12 <- function(m1, m2, ...) {
     if(!is.null(v <- getOption("Matrix.verbose")) && v >= 1)
@@ -723,7 +723,9 @@ isPacked <- function(x) {
 }
 } ## MJ
 
-##" Is 'x' a packed (dense) matrix -- "no-check" version
+## Is 'x' a packed, dense matrix?
+## MJ: Fast (not checking class) but "wrong" for n-by-n packedMatrix if n < 2,
+##     e.g., .isPacked(new("dtpMatrix")) == FALSE ... FIXME ??
 .isPacked <- function(x) length(x@x) < prod(x@Dim)
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE)
@@ -863,14 +865,14 @@ prMatrix <- function(x, digits = getOption("digits"),
     invisible(x)# as print() S3 methods do
 }
 
+## MJ: no longer used
+if(FALSE) {
 nonFALSE <- function(x) {
     ## typically used for lMatrices:  (TRUE,NA,FALSE) |-> (TRUE,TRUE,FALSE)
     if(any(ix <- is.na(x))) x[ix] <- TRUE
     x
 }
 
-## MJ: no longer used
-if(FALSE) {
 nz.NA <- function(x, na.value) {
     ## Non-Zeros of x
     ## na.value: TRUE: NA's give TRUE, they are not 0
