@@ -64,7 +64,12 @@ extends1of <- function(class, classes, ...) {
     FALSE
 }
 
+
+## "[gstd]" for Matrix, sparseVector 'x'; error for other S4, non-S4
 .M.shape <- function(x) .Call(R_Matrix_shape, x)
+## "[CRT]" for [CRT]sparseMatrix 'x'; "" for other S4; error for non-S4
+.M.repr  <- function(x) .Call(R_Matrix_repr, x)
+.isCRT   <- function(x) nzchar(.M.repr(x))
 
 ##' Should the matrix/Matrix  x  or a combination of x and y   be treated as  'sparse' ?
 ## sparseDefault <- function(x, y=NULL) {
@@ -1428,10 +1433,9 @@ as_M.kind <- function(x, clx) {
 as_dense <- function(x, cld = if(isS4(x)) getClassDef(class(x))) {
     as(x, paste0(.M.kind(x, cld), .dense.prefixes[.M.shape(x, cld)], "Matrix"))
 }
-} ## MJ
 
-## This is "general" but slower than the next definition
 if(FALSE) {
+## This is "general" but slower than the next definition
 .sp.class <- function(x) {
     if(!is.character(x)) x <- class(x)
     for(cl in paste0(c("C", "T", "R"), "sparseMatrix"))
@@ -1449,8 +1453,6 @@ if(FALSE) {
 }
 }
 
-## MJ: no longer used
-if(FALSE) {
 ### Goal: Eventually get rid of these --- want to foster coercions
 ### ----  *to* virtual classes whenever possible, e.g. as(*, "CsparseMatrix")
 ## 2007-12: better goal: use them only for "matrix" [maybe speed them up later]
