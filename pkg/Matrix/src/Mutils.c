@@ -1518,32 +1518,48 @@ size_t kind2size(char kind)
     }
 }
 
-char Matrix_kind(SEXP obj, int iok)
+/* TODO: compare with macros in ./Mutils.h */
+
+#define VALID_NONVIRTUAL						\
+/*  0 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix",		\
+/*  4 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dspMatrix", "dsyMatrix", \
+/*  9 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtpMatrix", "dtrMatrix", \
+/* 14 */ "ddiMatrix", "dsparseVector",					\
+/* 16 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix",		\
+/* 20 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lspMatrix", "lsyMatrix", \
+/* 25 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltpMatrix", "ltrMatrix", \
+/* 30 */ "ldiMatrix", "lsparseVector",					\
+/* 32 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix",		\
+/* 36 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nspMatrix", "nsyMatrix", \
+/* 41 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntpMatrix", "ntrMatrix", \
+/* 46 */ /* "ndiMatrix", */ "nsparseVector",				\
+/* 47 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix",		\
+/* 51 */ "isCMatrix", "isRMatrix", "isTMatrix", "ispMatrix", "isyMatrix", \
+/* 56 */ "itCMatrix", "itRMatrix", "itTMatrix", "itpMatrix", "itrMatrix", \
+/* 61 */ "idiMatrix", "isparseVector",					\
+/* 63 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix",		\
+/* 67 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zspMatrix", "zsyMatrix", \
+/* 72 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztpMatrix", "ztrMatrix", \
+/* 77 */ "zdiMatrix", "zsparseVector",					\
+/* 79 */ "indMatrix", "pMatrix"
+
+char Matrix_kind(SEXP obj, int i2d)
 {
     if (IS_S4_OBJECT(obj)) {
-	static const char *valid[] = {
-	    "indMatrix",
-	    "dMatrix", "lMatrix", "nMatrix",
-	    "iMatrix", "zMatrix",
-	    "dsparseVector", "lsparseVector", "nsparseVector",
-	    "isparseVector", "zsparseVector",
-	    ""};
+	static const char *valid[] = { VALID_NONVIRTUAL, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 	    error(_("\"kind\" not yet defined for objects of class \"%s\""),
 		  class_P(obj));
-	if (ivalid == 0)
-	    return 'n'; /* indMatrix */
-	char k = valid[ivalid][0];
-	if (!iok && k == 'i')
-	    error(_("class \"%s\" not yet supported"), valid[ivalid]);
-	return k;
+	if (ivalid >= 79)
+	    return 'n'; /* indMatrix, pMatrix */
+	return valid[ivalid][0];
     } else {
 	switch (TYPEOF(obj)) {
 	case LGLSXP:
 	    return 'l';
 	case INTSXP:
-	    return (iok) ? 'i' : 'd';
+	    return (i2d) ? 'd' : 'i';
 	case REALSXP:
 	    return 'd';
 	case CPLXSXP:
@@ -1556,11 +1572,64 @@ char Matrix_kind(SEXP obj, int iok)
     }
 }
 
-SEXP R_Matrix_kind(SEXP obj, SEXP iok)
+SEXP R_Matrix_kind(SEXP obj, SEXP i2d)
 {
-    char k = Matrix_kind(obj, asLogical(iok));
-    if (k == '\0')
-	return R_BlankString;
+    char k = Matrix_kind(obj, asLogical(i2d));
+    char s[] = { k, '\0' };
+    return mkString(s);
+}
+
+char Matrix_shape(SEXP obj)
+{
+    if (!IS_S4_OBJECT(obj))
+	error(_("\"shape\" not yet defined for objects of type \"%s\""),
+		  type2char(TYPEOF(obj)));
+    static const char *valid[] = { VALID_NONVIRTUAL, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	error(_("\"kind\" not yet defined for objects of class \"%s\""),
+	      class_P(obj));
+    if (ivalid >= 79 || valid[ivalid][3] != 'M')
+	return 'g'; /* indMatrix, pMatrix, .sparseVector */
+    return valid[ivalid][1];
+}
+
+SEXP R_Matrix_shape(SEXP obj)
+{
+    char k = Matrix_shape(obj);
+    char s[] = { k, '\0' };
+    return mkString(s);
+}
+
+/* TODO: compare with macros in ./Mutils.h */
+
+#define VALID_CRTSPARSE				\
+"dgCMatrix", "dsCMatrix", "dtCMatrix",		\
+"lgCMatrix", "lsCMatrix", "ltCMatrix",		\
+"ngCMatrix", "nsCMatrix", "ntCMatrix",		\
+"dgRMatrix", "dsRMatrix", "dtRMatrix",		\
+"lgRMatrix", "lsRMatrix", "ltRMatrix",		\
+"ngRMatrix", "nsRMatrix", "ntRMatrix",		\
+"dgTMatrix", "dsTMatrix", "dtTMatrix",		\
+"lgTMatrix", "lsTMatrix", "ltTMatrix",		\
+"ngTMatrix", "nsTMatrix", "ntTMatrix"
+
+char Matrix_repr(SEXP obj)
+{
+    if (!IS_S4_OBJECT(obj))
+	error(_("\"repr\" not yet defined for objects of type \"%s\""),
+	      type2char(TYPEOF(obj)));
+    static const char *valid[] = { VALID_CRTSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	error(_("\"repr\" not yet defined for objects of class \"%s\""),
+	      class_P(obj));
+    return valid[ivalid][2];
+}
+
+SEXP R_Matrix_repr(SEXP obj)
+{
+    char k = Matrix_repr(obj);
     char s[] = { k, '\0' };
     return mkString(s);
 }
