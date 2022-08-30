@@ -176,11 +176,15 @@ fac2Sparse <- function(from,
          )
 }
 
-## "Sparse  model.matrix()"
-##      model.matrix(object, data = environment(object),
-##                   contrasts.arg = NULL, xlev = NULL, ...)
-##
-## Originally: Cut'n'paste from model.matrix() ... just replacing small part at end:
+## Cut and paste from stats:::deparse2() in stats/R/models.R
+deparse2 <- function(x)
+    paste(deparse(x, width.cutoff = 500L,
+                  backtick = !is.symbol(x) && is.language(x)),
+          collapse = " ")
+
+## Cut and paste from stats:::model.matrix.default() in stats/R/models.R,
+## with some adaptation, most notably at the very end where we do _not_
+## call the C-level utility of 'stats'
 sparse.model.matrix <- function(object,
                                 data = environment(object),
                                 contrasts.arg = NULL,
@@ -189,71 +193,86 @@ sparse.model.matrix <- function(object,
                                 drop.unused.levels = FALSE,
                                 row.names = TRUE,
                                 sep = "",
-                                verbose = FALSE, ...)
+                                verbose = FALSE,
+                                ...)
 {
     t <- if(missing(data)) terms(object) else terms(object, data=data)
     if (is.null(attr(data, "terms")))
 	data <- model.frame(object, data, xlev=xlev)
     else {
-	reorder <- match(sapply(attr(t,"variables"),deparse,
-				width.cutoff=500)[-1L],
-			 names(data))
+	reorder <- match(vapply(attr(t, "variables"), deparse2, "")[-1L],
+                         names(data))
 	if (anyNA(reorder))
-	    stop("model frame and formula mismatch in model.matrix()")
-	if(!isSeq(reorder, ncol(data), Ostart=FALSE))
+	    stop("model frame and formula mismatch in sparse.model.matrix()")
+	if(!identical(reorder, seq_len(ncol(data))))
 	    data <- data[,reorder, drop=FALSE]
     }
     int <- attr(t, "response")
-    if(length(data)) {      # otherwise no rhs terms, so skip all this
-	contr.funs <- as.character(getOption("contrasts"))
-	namD <- names(data)
-	## turn any character columns into factors
-	for(i in namD)
-	    if(is.character(data[[i]]))
-		data[[i]] <- factor(data[[i]])
-	isF <- vapply(data, function(x) is.factor(x) || is.logical(x), NA)
-	isF[int] <- FALSE
-	isOF <- vapply(data, is.ordered, NA)
-	for(nn in namD[isF])            # drop response
-	    if(is.null(attr(data[[nn]], "contrasts")))
-		contrasts(data[[nn]]) <- contr.funs[1 + isOF[nn]]
-	## it might be safer to have numerical contrasts:
-	##	  get(contr.funs[1 + isOF[nn]])(nlevels(data[[nn]]))
-	if (!is.null(contrasts.arg) && is.list(contrasts.arg)) {
-	    if (is.null(namC <- names(contrasts.arg)))
-		stop("invalid 'contrasts.arg' argument")
-	    for (nn in namC) {
-		if (is.na(ni <- match(nn, namD)))
-		    warning(gettextf("variable '%s' is absent, its contrast will be ignored",
-                                     nn),
-			    domain = NA)
-		else {
-		    ca <- contrasts.arg[[nn]]
-		    ## for R >= 4.2 or so, simply  contrasts(*, ncol(.)) <- ca
-		    if(is.matrix(ca) || inherits(ca, "Matrix"))
-			contrasts(data[[ni]], ncol(ca)) <- ca
-		    else # function | string
-			contrasts(data[[ni]]) <- ca
-		}
-	    }
-	}
-    } else {               # internal model.matrix needs some variable
-	isF <-  FALSE
-	data <- cbind(data, x = 0)
+    if(length(data)) {
+        contr.funs <- as.character(getOption("contrasts"))
+        namD <- names(data)
+        ## turn any character columns into factors
+        for(i in namD)
+            if(is.character(data[[i]]))
+                data[[i]] <- factor(data[[i]])
+        isF <- vapply(data, function(x) is.factor(x) || is.logical(x), NA)
+        isF[int] <- FALSE
+        isOF <- vapply(data, is.ordered, NA)
+        for(nn in namD[isF])            # drop response
+            if(is.null(attr(data[[nn]], "contrasts")))
+                contrasts(data[[nn]]) <- contr.funs[1 + isOF[nn]]
+        ## it might be safer to have numerical contrasts:
+        ##	  get(contr.funs[1 + isOF[nn]])(nlevels(data[[nn]]))
+        if (!is.null(contrasts.arg)) {
+            if (!is.list(contrasts.arg))
+                warning("non-list contrasts argument ignored")
+            else {  ## contrasts.arg is a list
+                if (is.null(namC <- names(contrasts.arg)))
+                    stop("'contrasts.arg' argument must be named")
+                for (nn in namC) {
+                    if (is.na(ni <- match(nn, namD)))
+                        warning(gettextf("variable '%s' is absent, its contrast will be ignored", nn),
+                                domain = NA)
+                    else {
+                        ca <- contrasts.arg[[nn]]
+                        ## contrasts(*, ncol(m)) <- m works also
+                        ## for function||character 'm' in R >= 4.2,
+                        ## which supports how.many=NULL
+                        if(is.matrix(ca) || is(ca, "Matrix"))
+                            contrasts(data[[ni]], ncol(ca)) <- ca
+                        else contrasts(data[[ni]]) <- ca
+                    }
+                }
+            }
+        } ## non-null contrasts.arg
+    } else { #  no rhs terms ('~1', or '~0'): internal model.matrix needs some variable
+	isF <- FALSE
+	data[["x"]] <- raw(nrow(data))
     }
-    ## <Sparse> src/library/stats/R/models.R has
-    ##    ans <- .Internal(model.matrix(t, data))
+
+    ## <stats>
+    ## ans <- .External2(C_modelmatrix, t, data)
+    ## if(any(isF))
+    ##     attr(ans, "contrasts") <- lapply(data[isF], attr, "contrasts")
+    ## </stats>
+    ## <Matrix>
     if(verbose) {
-	cat("model.spmatrix(t, data, ..)  with t =\n"); str(t,give.attr=FALSE) }
-    ans <- model.spmatrix(t, data, transpose=transpose,
-    ##     ==============
-			  drop.unused.levels=drop.unused.levels,
-			  row.names=row.names, sep=sep, verbose=verbose)
-    ## </Sparse>
-    attr(ans, "contrasts") <-
-	lapply(data[isF], function(x) attr(x, "contrasts"))
+	cat("model.spmatrix(t, data, ...) with t =\n")
+        str(t, give.attr = FALSE)
+    }
+    ans <- model.spmatrix(trms = t,
+                          mf = data,
+                          transpose = transpose,
+                          drop.unused.levels = drop.unused.levels,
+			  row.names = row.names,
+                          sep = sep,
+                          verbose = verbose)
+    ## MJ: hmm ... our tests require that this "slot" exists,
+    ##     even in the empty case, i.e., !any(isF) ... why?
+    attr(ans, "contrasts") <- lapply(data[isF], attr, "contrasts")
+    ## </Matrix>
     ans
-} ## {sparse.model.matrix}
+} ## sparse.model.matrix
 
 
 ##' Produce the t(Z); Z = "design matrix" of (X : Y), where
@@ -368,7 +387,8 @@ sparseInt.r <- function(rList, do.names = TRUE, forceSparse = FALSE, verbose=FAL
 }
 
 
-## not used currently
+## MJ: unused
+if(FALSE) {
 is.model.frame <- function(x)
 {
   ## Purpose: check if x is a "valid" model.frame
@@ -385,7 +405,7 @@ is.model.frame <- function(x)
     ## all((vars <- sapply(as.list(vv[-1]), as.character)) %in% colnames(x))
     ## and we could go on testing vars
 }
-
+} ## unused
 
 ##' Create a sparse model matrix from a model frame.
 ##'
