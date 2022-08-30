@@ -91,8 +91,9 @@ setMethod("solve", signature(a = "diagonalMatrix", b = "ANY"),
 setMethod("solve", signature(a = "ddiMatrix", b = "missing"),
 	  function(a, b, ...) {
               if(a@diag == "N") {
-                  if(!all(isN0(a@x)))
-                      stop("'a' is exactly singular")
+                  ## FIXME?
+                  ## if(!all(isN0(a@x)))
+                  ##     stop("'a' is exactly singular")
                   a@x <- 1 / a@x
               }
               a@Dimnames <- a@Dimnames[2:1]
@@ -105,8 +106,9 @@ setMethod("solve", signature(a = "ddiMatrix", b = "numLike"),
                   stop("dimensions of 'a' and 'b' are incompatible")
               r <-
                   if(a@diag == "N") {
-                      if(!all(isN0(a@x)))
-                          stop("'a' is exactly singular")
+                      ## FIXME?
+                      ## if(!all(isN0(a@x)))
+                      ##     stop("'a' is exactly singular")
                       as.double(b) / a@x
                   } else as.double(b)
               names(r) <- a@Dimnames[[2L]]
@@ -118,8 +120,9 @@ setMethod("solve", signature(a = "ddiMatrix", b = "matrix"),
               if(dim(b)[1L] != a@Dim[2L])
                   stop("dimensions of 'a' and 'b' are incompatible")
               if(a@diag == "N") {
-                  if(!all(isN0(a@x)))
-                      stop("'a' is exactly singular")
+                  ## FIXME?
+                  ## if(!all(isN0(a@x)))
+                  ##     stop("'a' is exactly singular")
                   b <- b / a@x
               } else storage.mode(b) <- "double"
               r <- .m2ge(b)
@@ -132,8 +135,9 @@ setMethod("solve", signature(a = "ddiMatrix", b = "Matrix"),
               if(b@Dim[1L] != a@Dim[2L])
                   stop("dimensions of 'a' and 'b' are incompatible")
               if(a@diag == "N") {
-                  if(!all(isN0(a@x)))
-                      stop("'a' is exactly singular")
+                  ## FIXME?
+                  ## if(!all(isN0(a@x)))
+                  ##     stop("'a' is exactly singular")
                   a@x <- 1 / a@x
               }
               a@Dimnames <- a@Dimnames[2:1]
@@ -205,7 +209,7 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 ## a=dgCMatrix
 ## b=vector, matrix, or Matrix
 ## x=dg[Ce]Matrix or double vector ... x=dgCMatrix iff b=sparseMatrix
-.solve.dgC.sparse.lu <- function(a, b) {
+.solve.dgC.sparse.lu <- function(a, b, tol = .Machine$double.eps) {
     ## MM: see also solveSparse() in ~/R/MM/Pkg-ex/Matrix/Doran-A.R
     n <- (da <- a@Dim)[2L]
     if(da[1L] != n)
@@ -217,16 +221,14 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
     lu.a <- lu(a) # error if near-singular
 
     ## MJ: Is the ratio below really a good proxy for 1/kappa(A) ??
-    ##     Regardless, this use of 'tol' directly _contradicts_ our
-    ##     documentation ...
 
-    ## if(tol > 0) {
-    ##     rU <- range(abs(diag(lu.a@U)))
-    ##     if(rU[1L] / rU[2L] < tol)
-    ##         stop(gettextf("A = LU is computationally singular: min(d)/max(d) = %9.4g, d = abs(diag(U))",
-    ##     		  rU[1L] / rU[2L]),
-    ##     	 domain = NA)
-    ## }
+    if(tol > 0) {
+        rU <- range(abs(diag(lu.a@U)))
+        if(rU[1L] / rU[2L] < tol)
+            stop(gettextf("A = LU is computationally singular: min(d)/max(d) = %9.4g, d = abs(diag(U))",
+        		  rU[1L] / rU[2L]),
+        	 domain = NA)
+    }
 
     ## Solve for  X  in  A X = P' L U Q X = B  ...
     ## 1. compute P B
@@ -238,6 +240,13 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
         x <- qx[invPerm(lu.a@q, zero.p = TRUE)]
         names(x) <- a@Dimnames[[2L]]
         .m2ge(x)
+    } else if(db[2L] == 1L) {
+        ## FIXME: inexplicably, splines:::interpSpline.default() expects
+        ##        solve(<dgCMatrix>, <1-column dgeMatrix>, sparse = TRUE)
+        ##        to return a dense vector ??  [ as of r82776 ]
+        x <- qx[invPerm(lu.a@q, zero.p = TRUE), , drop = TRUE]
+        names(x) <- a@Dimnames[[2L]]
+        x
     } else {
         x <- qx[invPerm(lu.a@q, zero.p = TRUE), , drop = FALSE]
         x@Dimnames <- c(a@Dimnames[2L],
@@ -263,14 +272,13 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 }
 
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
-	  function(a, b, sparse = NA, tol = 100 * .Machine$double.eps, ...) {
+	  function(a, b, sparse = NA, ...) {
               x <-
-                  if(is.na(sparse) &&
-                     isSymmetric(a, tol = tol, checkDN = FALSE))
+                  if(is.na(sparse) && isSymmetric(a, checkDN = FALSE))
                       solve(forceSymmetric(a), ...)
                   else if(!is.na(sparse) && sparse)
-                      .solve.dgC.sparse.lu(
-                          a, .sparseDiagonal(a@Dim[2L], shape = "g"))
+                      solve(a, .sparseDiagonal(a@Dim[2L], shape = "g"),
+                            sparse = TRUE, ...)
                   else .solve.dgC.dense.lu(a, diag(a@Dim[2L]))
               x@Dimnames <- a@Dimnames[2:1]
               x
@@ -280,7 +288,7 @@ for(.cl in c("numLike", "matrix"))
 setMethod("solve", signature(a = "dgCMatrix", b = .cl),
 	  function(a, b, sparse = FALSE, ...) {
               if(!is.na(sparse) && sparse)
-                  .solve.dgC.sparse.lu(a, .m2sparse(b, "dgC"))
+                  solve(a, .m2sparse(b, "dgC"), sparse = TRUE, ...)
               else .solve.dgC.dense.lu(a, b)
           })
 rm(.cl)
@@ -288,21 +296,19 @@ rm(.cl)
 setMethod("solve", signature(a = "dgCMatrix", b = "denseMatrix"),
 	  function(a, b, sparse = FALSE, ...) {
               if(!is.na(sparse) && sparse)
-                  .solve.dgC.sparse.lu(
-                      a, ..sparse2d(.sparse2g(as(b, "CsparseMatrix"))))
+                  solve(a, ..sparse2d(.sparse2g(as(b, "CsparseMatrix"))),
+                        sparse = TRUE, ...)
               else .solve.dgC.dense.lu(a, b)
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "sparseMatrix"),
-	  function(a, b, sparse = NA, tol = 100 * .Machine$double.eps, ...) {
-              if(is.na(sparse) &&
-                 isSymmetric(a, tol = tol, checkDN = FALSE)) {
+	  function(a, b, sparse = NA, tol = .Machine$double.eps, ...) {
+              if(is.na(sparse) && isSymmetric(a, checkDN = FALSE)) {
                   a@Dimnames <- a@Dimnames[c(2L, 2L)]
                   solve(forceSymmetric(a), b, ...)
               } else if(!is.na(sparse) && sparse)
-                  .solve.dgC.sparse.lu(
-                      a, ..sparse2d(.sparse2g(as(b, "CsparseMatrix"))))
-              else .solve.dgC.dense.lu(a, as(b, "denseMatrix"))
+                  .solve.dgC.sparse.lu(a, b, tol = tol)
+              else solve(a, as(b, "denseMatrix"), sparse = FALSE, ...)
           })
 
 
@@ -612,10 +618,10 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 ## a=dgCMatrix
 ## b=vector, matrix, or Matrix
 ## x=d[gt][^RT]Matrix or double vector
-.solve.dgC.lu <- function(a, b, check = TRUE) {
+.solve.dgC.lu <- function(a, b, tol = .Machine$double.eps, check = TRUE) {
     if(check && !is(a, "dgCMatrix"))
         a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
-    .solve.dgC.sparse.lu(a, b)
+    .solve.dgC.sparse.lu(a, b, tol = tol)
 }
 
 ## a=dgCMatrix
