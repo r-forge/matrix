@@ -138,7 +138,7 @@ setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 ##'   levels should be dropped, via  factor(from)
 ##' @param factorPatt12 logical vector fp[] of length 2
 ##'   fp[1] : give contrasted t(X);  fp[2] : give "dummy" t(X) [=fac2sparse()]
-##' @param contrasts.arg character string or NULL or (coercable to)
+##' @param contrasts.arg character string or NULL or (coercible to)
 ##'		sparseMatrix, specifying the contrast
 ##'
 ##' @return a list of length two, each with the corresponding t(model matrix),
@@ -151,27 +151,29 @@ fac2Sparse <- function(from,
 		       factorPatt12,
                        contrasts.arg = NULL)
 {
-    stopifnot(is.logical(factorPatt12), length(factorPatt12) == 2)
-    if(any(factorPatt12))
-	m <- fac2sparse(from, to=to, drop.unused.levels=drop.unused.levels,
-                        repr=repr, giveCsparse=giveCsparse)
-    ##
-    ## code '2' : keep dummy, i.e. no contrasts :
-    ans <- list(NULL, if(factorPatt12[2]) m)
-    ##
-    if(factorPatt12[1]) {
-	## *do* use contrasts.arg
-	if(is.null(contrasts.arg))
-	    contrasts.arg <- getOption("contrasts")[if(is.ordered(from))
-						    "ordered" else "unordered"]
-	ans[[1]] <-
-	    crossprod(if(is.character(contrasts.arg)) {
-		stopifnot(is.function(FUN <- get(contrasts.arg)))
-		## calling  contr.*() with correct level names directly :
-		FUN(rownames(m), sparse = TRUE)
-	    } else as(contrasts.arg, "sparseMatrix"), m)
-    }
-    ans
+    stopifnot(is.logical(factorPatt12), length(factorPatt12) == 2L)
+    if(!any(factorPatt12))
+        return(list(NULL, NULL)) # nothing to do
+
+    m <- fac2sparse(from, to = to, drop.unused.levels = drop.unused.levels,
+                    repr = repr, giveCsparse = giveCsparse)
+    list(if(factorPatt12[1L]) {
+             ## contrasted coding, using 'contrasts.arg'
+             if(is.null(contrasts.arg))
+                 contrasts.arg <- getOption("contrasts")[[if(is.ordered(from))
+                                                              "ordered"
+                                                          else "unordered"]]
+             crossprod(if(is.character(contrasts.arg)) {
+                           ## calling  contr.*() with level names directly:
+                           contr <- get(contrasts.arg, mode = "function")
+                           contr(m@Dimnames[[1L]], sparse = TRUE)
+                       } else as(contrasts.arg, "sparseMatrix"),
+                       m)
+         },
+         if(factorPatt12[2L])
+             ## uncontrasted ("dummy") coding
+             m
+         )
 }
 
 ## "Sparse  model.matrix()"
@@ -179,12 +181,15 @@ fac2Sparse <- function(from,
 ##                   contrasts.arg = NULL, xlev = NULL, ...)
 ##
 ## Originally: Cut'n'paste from model.matrix() ... just replacing small part at end:
-sparse.model.matrix <-
-    function(object, data = environment(object), contrasts.arg = NULL,
-	     xlev = NULL, transpose = FALSE,
-	     drop.unused.levels = FALSE, row.names = TRUE
-	   , sep = ""
-	   , verbose = FALSE, ...)
+sparse.model.matrix <- function(object,
+                                data = environment(object),
+                                contrasts.arg = NULL,
+                                xlev = NULL,
+                                transpose = FALSE,
+                                drop.unused.levels = FALSE,
+                                row.names = TRUE,
+                                sep = "",
+                                verbose = FALSE, ...)
 {
     t <- if(missing(data)) terms(object) else terms(object, data=data)
     if (is.null(attr(data, "terms")))
