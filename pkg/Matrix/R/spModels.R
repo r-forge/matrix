@@ -1,7 +1,23 @@
 ####  Utilities  for  Sparse Model Matrices
 
-## The "first" version {no longer used}:
-fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = FALSE)
+## > from <- factor(sample(c(1:100, NA), size = 1e+04, replace = TRUE,
+## +                       prob = rep.int(c(1, 20), c(100L, 1L))))
+## > microbenchmark::microbenchmark(
+## +                     Matrix:::fac2sparse1(from, drop.unused.levels = FALSE),
+## +                     Matrix:::fac2sparse2(from, drop.unused.levels = FALSE),
+## +                     Matrix:::fac2sparse (from, drop.unused.levels = FALSE),
+## +                     times = 10000L)
+## Unit: microseconds
+##                                                    expr     min      lq     mean  median      uq       max neval
+##  Matrix:::fac2sparse1(from, drop.unused.levels = FALSE)  94.997 105.001 118.6117 107.789 110.413  4439.111 10000
+##  Matrix:::fac2sparse2(from, drop.unused.levels = FALSE) 538.289 586.341 643.7947 595.197 602.700 43128.556 10000
+##  Matrix:::fac2sparse (from, drop.unused.levels = FALSE) 163.139 185.115 221.7241 190.117 193.889 44887.784 10000
+
+if(FALSE) {
+## The "first" version, no longer used:
+fac2sparse1 <- function(from,
+                        to = c("d", "i", "l", "n", "z"),
+                        drop.unused.levels = FALSE)
 {
     ## factor(-like) --> sparseMatrix {also works for integer, character}
     fact <- if (drop.unused.levels) factor(from) else as.factor(from)
@@ -22,9 +38,14 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"), drop.unused.levels = F
     res
 }
 
-## This version can deal with NA's [maybe slightly less efficient (how much?)] :
-fac2sparse <- function(from, to = c("d","i","l","n","z"),
-		       drop.unused.levels = TRUE, repr = c("C","T","R"), giveCsparse)
+## The "second" version, no longer used:
+## * this one handles NAs correctly but may be slightly less efficient
+##   than fac2sparse1() above
+fac2sparse2 <- function(from,
+                        to = c("d", "i", "l", "n", "z"),
+                        drop.unused.levels = TRUE,
+                        repr = c("C", "T", "R"),
+                        giveCsparse)
 {
     ## factor(-like) --> sparseMatrix {also works for integer, character}
     fact <- if (drop.unused.levels) factor(from) else as.factor(from)
@@ -49,8 +70,64 @@ fac2sparse <- function(from, to = c("d","i","l","n","z"),
 	   "T" =    T,# TsparseMatrix
 	   "R" = .T2R(T))
 }
+} # if(FALSE)
+
+## The "third" version, dealing with NAs _and_ fast:
+fac2sparse <- function(from,
+                       to = c("d", "l", "n"), # no "i" or "z" yet
+		       drop.unused.levels = TRUE,
+                       repr = c("C", "R", "T"),
+                       giveCsparse)
+{
+    cl <- ".g.Matrix"
+    substr(cl, 1L, 1L) <- to <- match.arg(to)
+    substr(cl, 3L, 3L) <- repr <-
+        if(!missing(repr) || missing(giveCsparse))
+            match.arg(repr)
+        else if(giveCsparse)
+            "C"
+        else "T"
+
+    ## Arguments are valid: _now_ allocate
+    from <-
+        if(drop.unused.levels && is.factor(from))
+            factor(from)
+        else as.factor(from)
+    n <- length(from)
+    lv <- levels(from)
+    nlv <- length(lv)
+
+    res <- new(cl)
+    res@Dim <- c(nlv, n)
+    res@Dimnames <- list(lv, names(from))
+    i. <-
+        switch(repr,
+               "C" =
+                   {
+                       not.na <- !is.na(from)
+                       res@p <- c(0L, cumsum(not.na))
+                       res@i <- as.integer(from)[not.na] - 1L
+                   },
+               "R" =
+                   {
+                       res@p <- c(0L, cumsum(tabulate(from, nlv)))
+                       res@j <- order(from, na.last = NA) - 1L
+                   },
+               "T" =
+                   {
+                       which.not.na <- which(!is.na(from))
+                       res@i <- as.integer(from)[which.not.na] - 1L
+                       res@j <- which.not.na - 1L
+                   }
+               )
+    if(to != "n")
+        res@x <- rep.int(switch(to, "d" = 1, "l" = TRUE, "i" = 1L, "z" = 1+0i),
+                         length(i.))
+    res
+}
 
 setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
+## FIXME? support factor->[dlnCRT]sparseMatrix?
 
 ##' fac2Sparse() := fac2sparse w/ contrasts
 ##'
@@ -66,9 +143,13 @@ setAs("factor", "sparseMatrix", function(from) fac2sparse(from, to = "d"))
 ##'
 ##' @return a list of length two, each with the corresponding t(model matrix),
 ##'	when the corresponding factorPatt12 is true.
-fac2Sparse <- function(from, to = c("d","i","l","n","z"),
-		       drop.unused.levels = TRUE, repr = c("C","T","R"), giveCsparse,
-		       factorPatt12, contrasts.arg = NULL)
+fac2Sparse <- function(from,
+                       to = c("d", "l", "n"), # no "i" or "z" yet
+		       drop.unused.levels = TRUE,
+                       repr = c("C", "R", "T"),
+                       giveCsparse,
+		       factorPatt12,
+                       contrasts.arg = NULL)
 {
     stopifnot(is.logical(factorPatt12), length(factorPatt12) == 2)
     if(any(factorPatt12))
