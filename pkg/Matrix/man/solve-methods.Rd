@@ -105,10 +105,10 @@
 ## solve(a, b, ...) # the two-argument version, almost always preferred to
 ## solve(a,    ...) # the *rarely needed* one-argument version
 %^must comment; otherwise 'R CMD check' waffles
-\S4method{solve}{dgCMatrix,missing}(a, b, sparse = NA, tol = 100 * .Machine$double.eps, \dots)
+\S4method{solve}{dgCMatrix,missing}(a, b, sparse = NA, \dots)
 \S4method{solve}{dgCMatrix,matrix}(a, b, sparse = FALSE, \dots)
 \S4method{solve}{dgCMatrix,denseMatrix}(a, b, sparse = FALSE, \dots)
-\S4method{solve}{dgCMatrix,sparseMatrix}(a, b, sparse = NA, tol = 100 * .Machine$double.eps, \dots)
+\S4method{solve}{dgCMatrix,sparseMatrix}(a, b, sparse = NA, tol = .Machine$double.eps, \dots)
 \S4method{solve}{CHMfactor,denseMatrix}(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 }
 \arguments{
@@ -117,14 +117,16 @@
     corresponding numeric ones.}
   \item{b}{numeric vector or matrix (dense or sparse) as RHS
     of the linear system \eqn{Ax = b}.}
-  \item{sparse}{only when \code{a} is a
-    \code{\linkS4class{sparseMatrix}}, i.e., typically a
-    \code{\linkS4class{dgCMatrix}}: logical specifying if the result
-      should be a (formally) sparse matrix.}%% FIXME: mention
-    %% pos.definite etc
-  \item{tol}{only used when \code{a} is sparse, in the
-      \code{\link{isSymmetric}(a, tol=*)} test, where that applies.}
-  \item{system}{only if \code{a} is a \code{\linkS4class{CHMfactor}}:
+  \item{sparse}{only when \code{a} is a \code{\linkS4class{sparseMatrix}}: 
+    logical specifying if the result should also (formally) be sparse.} % FIXME: mention pos. def., etc.
+  \item{tol}{only when \code{a} is a \code{sparseMatrix}
+    and \code{sparse} is \code{TRUE}: an error is signaled
+    if the ratio \code{min(d)/max(d)}, where \code{d = abs(diag(U))}
+    and \code{A = L U}, is \emph{less} than \code{tol}, indicating
+    (near-)singular \eqn{A}.}
+%  \item{tol}{only used when \code{a} is sparse, in the
+%      \code{\link{isSymmetric}(a, tol=*)} test, where that applies.}
+  \item{system}{only when \code{a} is a \code{\linkS4class{CHMfactor}}:
     character string indicating the kind of linear system to be
     solved, see below.  Note that the default, \code{"A"}, does
     \emph{not} solve the triangular system (but \code{"L"} does).}
