@@ -290,7 +290,7 @@ function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
 ### FIXME -- the    X[rep(..), ] * Y[rep(..), ]   construct can become HUGE, even for sparse X[],Y[]
 ### ----- --> Matrix bug #1330 and  ~/R/MM/Pkg-ex/Matrix/sparse-matrix-fix.R
 
-    ## MJ: Moreover, as(<factor>, "sparseMatrix") is a CsparseMatrix,
+    ## MJ: Moreover, as(<factor>, "sparseMatrix") is a dgCMatrix,
     ##     for which row-indexing is already rather inefficient ... FIXME?
 
     sx <- isS4(X)
@@ -376,13 +376,13 @@ function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
 .sparse.interaction.N <- # formerly sparseInt.r()
 function(rList, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
 {
+    if((n <- length(rList)) == 0L)
+        return(NULL) # caller beware
     if(verbose)
 	cat(sprintf(".sparse.interaction.N(<list>[%d], fS=%s): is.mat=(%s)\n",
                     n, forceSparse, paste0(symnum(vapply(rList, is.matrix, NA)),
                                            collapse = "")),
             sep = "")
-    if((n <- length(rList)) == 0L)
-        return(NULL) # caller beware
     r <- rList[[1L]]
     if(n > 1L)
         for(i in 2:n)
@@ -391,7 +391,7 @@ function(rList, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
                                        do.names = do.names,
                                        verbose = verbose)
     if(forceSparse && (is.matrix(r) || is(r, "denseMatrix")))
-        .Call(R_dense_as_sparse, m, "dgC", NULL, NULL)
+        .Call(R_dense_as_sparse, r, "dgC", NULL, NULL)
     else r
 } # .sparse.interaction.N
 
@@ -413,7 +413,7 @@ is.model.frame <- function(x)
     ## all((vars <- sapply(as.list(vv[-1]), as.character)) %in% colnames(x))
     ## and we could go on testing vars
 }
-} ## unused
+} ## MJ
 
 ##' Create a sparse model matrix from a model frame.
 ##'
