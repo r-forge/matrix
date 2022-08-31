@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-0 (2022-08-31 r3628)}{
+\section{Changes in version 1.5-0 (2022-08-31 r3629)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -305,7 +305,9 @@
       \item \code{qr(<large sparse>)} no longer segfaults in some cases,
       but now warns about \dQuote{Out of memory} and stops, fixing Matrix
       bug #6610 reported by Benjamin Tyner.
-      )
+
+      \item Fixed \code{<sparse> \%*\% <dense>} possible memory corruption,
+      visible via valgrind, fixing Matrix bug #6726 reported by David Cortes.
     }
   }
   \subsection{New Features}{
