@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.4-2 (2022-08-30 r3622)}{
+\section{Changes in version 1.5-0 (2022-08-31 r3628)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -267,7 +267,7 @@
       in all cases, now even when \code{chol(x)} is constructed from a
       cached \code{MatrixFactorization}, for greater consistency with
       \code{base::chol.default()}.
-      
+
       \item \code{chol(<generalMatrix>)} no longer looks at
       \code{Dimnames} when testing for symmetry.
 
@@ -301,6 +301,11 @@
 
       \item \code{t(<symmetricMatrix>)} now retains the \code{factors}
       slot, avoiding recomputation.
+
+      \item \code{qr(<large sparse>)} no longer segfaults in some cases,
+      but now warns about \dQuote{Out of memory} and stops, fixing Matrix
+      bug #6610 reported by Benjamin Tyner.
+      )
     }
   }
   \subsection{New Features}{
@@ -435,7 +440,7 @@
 
       \item \code{readMM()} now warns if the number of entries found
       is less than number reported in the header.
-      
+
       \item \code{x[i]} now works for \code{nMatrix} \code{i},
       just as for \code{lMatrix} i.  This supports constructions
       such as \code{x[is.na(x)]}, where the logical operation
