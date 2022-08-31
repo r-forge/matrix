@@ -272,8 +272,7 @@ sparse.model.matrix <- function(object,
     attr(ans, "contrasts") <- lapply(data[isF], attr, "contrasts")
     ## </Matrix>
     ans
-} ## sparse.model.matrix
-
+} # sparse.model.matrix
 
 ##' Produce the t(Z); Z = "design matrix" of (X : Y), where
 ##'             --- t(Z) : aka rowwise -version : "r"
@@ -285,71 +284,83 @@ sparse.model.matrix <- function(object,
 ##' @param forceSparse logical
 ##' @return
 ##' @author Martin Maechler
-sparse2int <- function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
+sparse2int <- function(X, Y,
+                       do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
 {
 ### FIXME -- the    X[rep(..), ] * Y[rep(..), ]   construct can become HUGE, even for sparse X[],Y[]
 ### ----- --> Matrix bug #1330 and  ~/R/MM/Pkg-ex/Matrix/sparse-matrix-fix.R
 
+    ## MJ: Moreover, as(<factor>, "sparseMatrix") is a CsparseMatrix,
+    ##     for which row-indexing is rather inefficient ... FIXME
+
+    nx <- (dx <- dim(X))[1L]
+    ny <- (dy <- dim(Y))[1L]
     if(do.names) {
 	dnx <- dimnames(X)
 	dny <- dimnames(Y)
     }
-    dimnames(Y) <- dimnames(X) <- list(NULL,NULL)
-    nx <- nrow(X)
-    ny <- nrow(Y)
+    dimnames(Y) <- dimnames(X) <- list(NULL, NULL)
+
     r <-
-	if((nX <- is.numeric(X)) | (nY <- is.numeric(Y))) {
-	    if(nX) {
-		if (nY || nx > 1) { # both numeric, or X >=2 "columns"
-		    F <- if(forceSparse)
-                             function(m)
-                                 .Call(R_dense_as_sparse, m, ".gC", NULL, NULL)
-                         else identity
-		    F((if(ny == 1) X else X[rep.int(seq_len(nx),  ny)	, ]) *
-		      (if(nx == 1) Y else Y[rep	   (seq_len(ny),each=nx), ]))
-		}
-		else { ## numeric X (1 "column"),  sparseMatrix Y
-		    r <- Y
-		    dp <- Y@p[-1] - Y@p[-(Y@Dim[2]+1L)]
-		    ## stopifnot(all(dp %in% 0:1))
-		    ## if(nx == 1)
-		    ## FIXME: similar trick would be applicable for nx > 2
-		    r@x <- X[dp == 1L] * Y@x
-		    r
-		}
-	    }
-	    else { ## sparseMatrix X, numeric Y
-		if(ny == 1) {
-		    ## FIXME: similar trick would be applicable for ny > 2
-		    r <- X
-		    dp <- X@p[-1] - X@p[-(X@Dim[2]+1L)]
-		    ## stopifnot(all(dp %in% 0:1))
-		    r@x <- Y[dp == 1L] * X@x
-		    r
-		}
-		else { ## ny > 1 -- *larger* matrix
-		    X[rep.int(seq_len(nx),  ny)   , ] *
-		    (if(nx == 1) Y else Y[rep(seq_len(ny),each=nx), ])
-		}
-	    }
-	}
-	else { ## X & Y are both sparseMatrix
-	    (if(ny == 1) X else X[rep.int(seq_len(nx), ny)     , ]) *
-	    (if(nx == 1) Y else Y[rep    (seq_len(ny),each=nx) , ])
-	}
+        if((sx <- isS4(X)) & (sy <- isS4(Y))) {
 
-    if(verbose) cat(sprintf(" sp..2int(%s[%d],%s[%d]) ",
-			    if(nX)"<N>" else "<sparse>", nx,
-			    if(nY)"<N>" else "<sparse>", ny))
+            ## 'X' and 'Y' are sparseMatrix
+            (if(ny == 1L) X else X[rep.int(seq_len(nx), times = ny), ]) *
+            (if(nx == 1L) Y else Y[rep    (seq_len(ny),  each = nx), ])
 
-    if(do.names) {
-	## FIXME: This names business needs a good solution..
-	##        but maybe "up in the caller"
-	if(!is.null(dim(r)) &&
-	   !is.null(nX <- dnx[[1]]) &&
-	   !is.null(nY <- dny[[1]]))
-	    rownames(r) <- outer(nX, nY, paste, sep = ":")
-    }
+        } else if (sx) {
+
+            ## 'X' is a sparseMatrix, 'Y' is a numeric matrix
+            if(ny <= 1L) {
+                ## FIXME: a similar trick would be applicable for ny > 1
+                r <- X
+                dp <- X@p[-1L] - X@p[-(dx[2L]+1L)]
+                ## stopifnot(all(dp %in% 0:1))
+                r@x <- Y[dp == 1L] * X@x
+                r
+            } else { ## ny > 1 -- *larger* matrix
+                                     X[rep.int(seq_len(nx), times = ny), ] *
+                (if(nx == 1L) Y else Y[rep    (seq_len(ny),  each = nx), ])
+            }
+
+        } else if(sy) {
+
+            ## 'X' is a numeric matrix, 'Y' is a sparseMatrix
+            if(nx <= 1L) {
+                ## FIXME: a similar trick would be applicable for nx > 1
+                r <- Y
+                dp <- Y@p[-1L] - Y@p[-(dy[2L]+1L)]
+                ## stopifnot(all(dp %in% 0:1))
+                r@x <- X[dp == 1L] * Y@x
+                r
+            } else {
+                (if(ny == 1L) X else X[rep.int(seq_len(nx), times = ny), ]) *
+                                     Y[rep    (seq_len(ny),  each = nx), ]
+            }
+
+        } else {
+
+            ## 'X' and 'Y' are numeric matrices
+            F <- if(forceSparse)
+                     function(m) .Call(R_dense_as_sparse, m, "dgC", NULL, NULL)
+                 else identity
+            F((if(ny == 1L) X else X[rep.int(seq_len(nx), times = ny), ]) *
+              (if(nx == 1L) Y else Y[rep    (seq_len(ny),  each = nx), ]))
+
+        }
+
+    if(verbose)
+        cat(sprintf("sparse2int(%s[%d], %s[%d])\n",
+                    if(sx) "<sparse>" else "<N>", nx,
+                    if(sy) "<sparse>" else "<N>", ny))
+
+    ## FIXME: This 'names' business needs a good solution ...
+    ##        but maybe "up in the caller" ...
+    if(do.names &&
+       !is.null(dim(r)) &&
+       !is.null(rnx <- dnx[[1L]]) &&
+       !is.null(rny <- dny[[1L]]))
+        dimnames(r)[[1L]] <- outer(rnx, rny, paste, sep = ":")
     r
 }
 
@@ -361,7 +372,8 @@ sparse2int <- function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FAL
 ##' @param forceSparse
 ##' @param verbose
 ##' @return the model matrix corresponding to a:b:...
-sparseInt.r <- function(rList, do.names = TRUE, forceSparse = FALSE, verbose=FALSE)
+sparseInt.r <- function(rList,
+                        do.names = TRUE, forceSparse = FALSE, verbose=FALSE)
 {
     nl <- length(rList)
     if(forceSparse)
