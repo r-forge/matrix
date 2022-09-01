@@ -819,7 +819,7 @@ tcr.dd.sC <- function(x, y=NULL, boolArith=NA, ...) {
     if(isTRUE(boolArith)) ## FIXME: very inefficient
 	tcrossprod(.m2sparse(x, "..C"), y, boolArith=TRUE)
     else
-	.Call(Csparse_dense_prod, y, x, "c")
+	.Call(Csparse_dense_prod, y, x, "B")
 }
 for(.sCMatrix in paste0(c("d", "l", "n"), "sCMatrix")) { ## speedup for *symmetric* RHS
     setMethod("tcrossprod", signature(x = "ddenseMatrix", y = .sCMatrix), tcr.dd.sC)

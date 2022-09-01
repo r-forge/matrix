@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-0 (2022-08-31 r3629)}{
+\section{Changes in version 1.5-0 (2022-09-01 r3630)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
@@ -308,6 +308,10 @@
 
       \item Fixed \code{<sparse> \%*\% <dense>} possible memory corruption,
       visible via valgrind, fixing Matrix bug #6726 reported by David Cortes.
+
+      \item Fixed the (quite \emph{long standing}) Matrix bug #6777,
+      reported by Manuel Koller: \code{tcrossprod(<matrix>, <[dln]sCMatrix>)}
+      has been wrong in some cases.
     }
   }
   \subsection{New Features}{

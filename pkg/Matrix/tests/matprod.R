@@ -117,7 +117,7 @@ chkDnProd <- function(m = as(M, "matrix"), M = Matrix(m), browse=FALSE, warn.ok=
     }
     cat("\n")
     invisible(TRUE)
-}
+} # chkDnProd()
 
 ## All these are ok  {now, (2012-06-11) also for dense
 (m <- matrix(c(0, 0, 2:0), 3, 5))
@@ -133,6 +133,22 @@ tU <- dU; tU[1,2:3] <- 3:4; tU[2,3] <- 7; tU # ditto  "unitri" sparse
 (T <- new("dtrMatrix", diag = "U", x= c(0,0,5,0), Dim= c(2L,2L),
           Dimnames= list(paste0("r",1:2),paste0("C",1:2)))) # unitriangular dense
 ##                                                            ^^^^^^^^^^^^
+
+A <- matrix(c(0.4, 0.1, 0, 0), 2)
+B <- matrix(c(1.1,  0,  0, 0), 2);  ABt <- tcrossprod(A, B)
+##  Matrix version      # both Matrix version:
+class(AM <- as(A, "triangularMatrix")) # dtr
+class(BM <- as(B, "Matrix"))           # ddi
+class(Bs <- as(as(B, "CsparseMatrix"), "symmetricMatrix")) # "dsC"
+(ABst <- tcrossprod(A, Bs)) # was wrong since at least Matrix 1.3-3 (R-4.0.5)
+stopifnot(exprs = {
+    all.equal(ABt, as.matrix(ABst))
+    identical(ABst, tcrossprod(AM, BM))
+    identical(ABst, tcrossprod(AM, Bs))
+    identical(ABst, tcrossprod(A,  Bs))
+})
+
+
 ## currently many warnings about sub-optimal matrix products :
 chkDnProd(m..)
 chkDnProd(m0.)
