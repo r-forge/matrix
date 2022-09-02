@@ -99,13 +99,9 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 	    _DO_(int, INTEGER, 0, 1);			\
 	    break;					\
 	case CPLXSXP:					\
-	{						\
-	    Rcomplex zero, one;				\
-	    zero.r = 0.0; one.r = 1.0;			\
-	    zero.i = 0.0; one.i = 0.0;			\
-	    _DO_(Rcomplex, COMPLEX, zero, one);		\
+	    _DO_(Rcomplex, COMPLEX,			\
+		 Matrix_zzero, Matrix_zone);		\
 	    break;					\
-	}						\
 	default:					\
 	    break;					\
 	}						\

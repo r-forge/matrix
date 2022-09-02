@@ -604,13 +604,8 @@ SEXP unpackedMatrix_diag_get(SEXP obj, SEXP nms)
 	UPM_D_G(int, INTEGER, 1);
 	break;
     case CPLXSXP: /* z..Matrix */
-    {
-	Rcomplex one;
-	one.r = 1.0;
-	one.i = 0.0;
-	UPM_D_G(Rcomplex, COMPLEX, one);
+	UPM_D_G(Rcomplex, COMPLEX, Matrix_zone);
 	break;
-    }
     default:
 	ERROR_INVALID_TYPE("'x' slot", tx, "unpackedMatrix_diag_get");
 	break;
