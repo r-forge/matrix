@@ -374,7 +374,8 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     clt[0] = k;
     clt[1] = clf[1];
     clt[2] = clf[2];
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)), p, i;
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	p = R_NilValue, i = R_NilValue;
     
     SET_SLOT(to, Matrix_DimSym, GET_SLOT(from, Matrix_DimSym));
     SET_SLOT(to, Matrix_DimNamesSym, GET_SLOT(from, Matrix_DimNamesSym));
@@ -484,7 +485,7 @@ SEXP R_sparse_as_general(SEXP from)
 	pj1 += nnz0;
 
 	SEXP x0, x1;
-	SEXPTYPE tx;
+	SEXPTYPE tx = NILSXP;
 	if (clf[0] != 'n') {
 	    x0 = GET_SLOT(from, Matrix_xSym);
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
@@ -585,8 +586,8 @@ SEXP R_sparse_as_general(SEXP from)
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to, iSym, i1);
 
-	SEXP x0, x1;
-	SEXPTYPE tx;
+	SEXP x0 = R_NilValue, x1 = R_NilValue;
+	SEXPTYPE tx = NILSXP;
 	if (clf[0] != 'n') {
 	    x0 = GET_SLOT(from, Matrix_xSym);
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
@@ -689,7 +690,7 @@ SEXP R_sparse_as_general(SEXP from)
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 {
     const char *zzz;
-    char z0, z1, z2, ul;
+    char z0, z1, z2, ul = '\0';
     if ((code = asChar(code)) == NA_STRING ||
 	(z0 = (zzz = CHAR(code))[0]) == '\0' ||
 	(z1 = zzz[1]) == '\0' ||
@@ -728,7 +729,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     if (z1 == 't')
 	SET_SLOT(to, Matrix_diagSym, diag);
     
-    SEXP p, i, x;
+    SEXP p = R_NilValue, i = R_NilValue, x = R_NilValue;
     int k, n = INTEGER(dim)[0], nprotect = 1;
     R_xlen_t n1a = (R_xlen_t) n + 1;
     
@@ -871,7 +872,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo)
 {
     const char *zzz;
-    char z0, z1, z2, ul;
+    char z0, z1, z2, ul = '\0';
     if ((code = asChar(code)) == NA_STRING ||
 	(z0 = (zzz = CHAR(code))[0]) == '\0' ||
 	(z1 = zzz[1]) == '\0' ||
@@ -1002,8 +1003,8 @@ SEXP R_sparse_drop0(SEXP from)
     
     SEXP p0, x0 = GET_SLOT(from, Matrix_xSym);
     SEXPTYPE tx = TYPEOF(x0);
-    int *pp0, n;
-    R_xlen_t k, kend, nnz_, nnz0, nnz1 = 0, n1a;
+    int *pp0 = NULL, n = 0;
+    R_xlen_t k, kend, nnz_, nnz0, nnz1 = 0, n1a = 0;
 
     if (cl[2] == 'T') {
 	nnz0 = XLENGTH(x0);
@@ -1222,8 +1223,8 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 
     /* It remains to set some subset of 'p', 'i', 'j', 'x' ... */
     
-    SEXP p0, p1, i0, j0;
-    int *pp0, *pp1, *pi0, *pj0, d, j;
+    SEXP p0, p1, i0, j0 = R_NilValue;
+    int *pp0 = NULL, *pp1 = NULL, *pi0 = NULL, *pj0 = NULL, d, j;
     R_xlen_t k, kend, nnz0, nnz1;
     i0 = GET_SLOT(from, Matrix_iSym);
     pi0 = INTEGER(i0);
@@ -1835,10 +1836,10 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	/* Now allocating and filling out slots ... */
 
-	SEXPTYPE tx;
-	SEXP x0, x1,
+	SEXP x0 = R_NilValue, x1 = R_NilValue,
 	    i1 = PROTECT(allocVector(INTSXP, nnz1)),
 	    j1 = PROTECT(allocVector(INTSXP, nnz1));
+	SEXPTYPE tx = NILSXP;
 	int *pi1 = INTEGER(i1),
 	    *pj1 = INTEGER(j1);
 	SET_SLOT(to, Matrix_iSym, i1);
@@ -1997,8 +1998,9 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	/* Now allocating and filling out slots ... */
 
-	SEXPTYPE tx;
-	SEXP x0, x1, i1 = PROTECT(allocVector(INTSXP, nnz1));
+	SEXP x0 = R_NilValue, x1 = R_NilValue,
+	    i1 = PROTECT(allocVector(INTSXP, nnz1));
+	SEXPTYPE tx = NILSXP;
 	int *pi1 = INTEGER(i1);
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to, iSym, i1);
