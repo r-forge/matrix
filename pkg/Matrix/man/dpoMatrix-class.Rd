@@ -99,6 +99,22 @@
 }
 %\references{}
 %\author{}
+\note{Currently the validity methods for these classes such as
+  \code{\link{getValidity}(getClass("dpoMatrix"))} for efficiency reasons
+  only check the diagonal entries of the matrix -- they may not be negative.
+  This is only necessary but not sufficient for a symmetric matrix to be
+  positive semi-definite.
+
+  A more reliable (but often more expensive) check for positive
+  semi-definiteness would look at the signs of \code{diag(\link{BunchKaufman}(.))}
+  (with some tolerance for very small negative values), and for (strict)
+  positive definiteness at something like
+  \code{!inherits(tryCatch(chol(.), error=identity), "error")} .
+  Indeed, when \emph{coercing} to these classes, a version
+  of \code{\link{Cholesky}()} or \code{\link{chol}()} is
+  typically used, e.g., see \code{selectMethod("coerce",
+    c(from="dsyMatrix", to="dpoMatrix"))} .
+}
 \seealso{
   Classes \code{\linkS4class{dsyMatrix}} and \code{\linkS4class{dgeMatrix}};
   further, \code{\link{Matrix}}, \code{\link{rcond}},
