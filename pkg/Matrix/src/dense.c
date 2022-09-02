@@ -102,8 +102,10 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     if (z0 == '.')
 	txt = txf;
 
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)), p_to, i_to, j_to, x_to;
-    int m = pdim[0], n = pdim[1], i, j, *pp, *pi, *pj;
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)),
+	p_to, i_to, j_to, x_to = R_NilValue;
+    int m = pdim[0], n = pdim[1], i, j,
+	*pp = NULL, *pi = NULL, *pj = NULL;
     R_xlen_t nnz = 0;
     ++nprotect;
     
@@ -455,7 +457,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     
 #define DAS_SUBCASES(_CTYPE_, _PTR_, _NZ_)				\
     do {								\
-	_CTYPE_ *px = _PTR_(x_from), *py;				\
+	_CTYPE_ *px = _PTR_(x_from), *py = NULL;			\
 	if (clt[0] != 'n')						\
 	    py = _PTR_(x_to);						\
 	if (clt[1] == 'g')						\

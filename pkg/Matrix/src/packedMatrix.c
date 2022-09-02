@@ -1014,7 +1014,7 @@ SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index)
 SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 {
     Rboolean mi = isNull(index1), mj = isNull(index2);
-    int *pi, *pj, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
+    int *pi = NULL, *pj = NULL, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     R_xlen_t ni, nj, n2 = (R_xlen_t) n * 2;
     
     if ((double) n * n > R_XLEN_T_MAX)
@@ -1072,7 +1072,7 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
     pdim[1] = (int) nj;
 
     /* Set 'Dimnames' slot and 'names(Dimnames)' */
-    SEXP rn0, rn1, cn0, cn1,
+    SEXP rn0, rn1 = R_NilValue, cn0, cn1 = R_NilValue,
 	dn0 = GET_SLOT(obj, Matrix_DimNamesSym),
 	dn1 = PROTECT(GET_SLOT(res, Matrix_DimNamesSym));
     ++nprotect;
