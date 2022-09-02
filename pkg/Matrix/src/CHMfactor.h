@@ -2,6 +2,7 @@
 #define MATRIX_CHMFACTOR_H
 
 #include "chm_common.h"
+#include "Mutils.h"
 
 SEXP CHMfactor_ldetL2(SEXP x);
 SEXP CHMfactor_to_sparse(SEXP x);
