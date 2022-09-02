@@ -29,10 +29,10 @@
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
+Rcomplex Matrix_zzero, Matrix_zone;
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 #define EXTDEF(name, n)   {#name, (DL_FUNC) &name, n}
-
 
 static R_CallMethodDef CallEntries[] = {
     CALLDEF(BunchKaufman_validate, 1),
@@ -611,9 +611,13 @@ R_init_Matrix(DllInfo *dll)
     R_cholmod_start(&c);
 //    R_cholmod_start(&cl); << TODO; needs more work in ./chm_common.c etc
 
-    Matrix_betaSym = install("beta");
     Matrix_DimNamesSym = install("Dimnames");
     Matrix_DimSym = install("Dim");
+    Matrix_LSym = install("L");
+    Matrix_RSym = install("R");
+    Matrix_USym = install("U");
+    Matrix_VSym = install("V");
+    Matrix_betaSym = install("beta");
     Matrix_diagSym = install("diag");
     Matrix_factorSym = install("factors");
     Matrix_iSym = install("i");
@@ -623,25 +627,23 @@ R_init_Matrix(DllInfo *dll)
     Matrix_permSym = install("perm");
     Matrix_uploSym = install("uplo");
     Matrix_xSym = install("x");
-    Matrix_LSym = install("L");
-    Matrix_RSym = install("R");
-    Matrix_USym = install("U");
-    Matrix_VSym = install("V");
-
+    
     Matrix_NS = R_FindNamespace(mkString("Matrix"));
     if(Matrix_NS == R_UnboundValue)
 	error(_("missing 'Matrix' namespace: should never happen"));
-
-#ifdef DEBUG_Matrix
+#ifdef Matrix_Debug
     if(isEnvironment(Matrix_NS))
 	Rprintf("Matrix_NS: %s\n",
-		CHAR(asChar(eval(lang2(install("format"),Matrix_NS),
+		CHAR(asChar(eval(lang2(install("format"), Matrix_NS),
 				 R_GlobalEnv))));
     else
 #else
     if(!isEnvironment(Matrix_NS))
 #endif
 	error(_("Matrix namespace not determined correctly"));
+
+    Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0;
+    Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0;
 }
 
 void R_unload_Matrix(DllInfo *dll)

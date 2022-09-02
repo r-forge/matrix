@@ -89,9 +89,12 @@ typedef int R_xlen_t;
 /* A safe NEW_OBJECT(MAKE_CLASS(what)) : */
 SEXP NEW_OBJECT_OF_CLASS(const char* what);
     
-/* Stored pointers to symbols initialized in R_init_Matrix() from ./init.c */
+/* Often used symbols (typically for slots), initialized in ./init.c */
 extern
 #include "Syms.h"
+
+/* Often used numbers, initialized in ./init.c */
+extern Rcomplex Matrix_zzero, Matrix_zone;
 
 /* Duplicate the slot with name given by 'sym' from 'src' to 'dest' */
 #define slot_dup(dest, src, sym)			\

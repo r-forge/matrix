@@ -678,7 +678,7 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 
 /* For coercions ==================================================== */
 
-#define PACK(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)			\
+#define PACK(_PREFIX_, _CTYPE_, _ONE_)					\
 void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,   \
 			    char uplo, char diag)			\
 {									\
@@ -690,8 +690,7 @@ void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,   \
 		dest[dpos++] = src[spos++];				\
 	if (diag != 'N') {						\
 	    dpos = 0;							\
-	    _INIT_ONE_;							\
-    	    for (j = 0; j < n; dpos += (++j)+1)				\
+	    for (j = 0; j < n; dpos += (++j)+1)				\
 		dest[dpos] = _ONE_;					\
 	}								\
     } else {								\
@@ -700,7 +699,6 @@ void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,   \
 		dest[dpos++] = src[spos++];				\
 	if (diag != 'N') {						\
 	    dpos = 0;							\
-	    _INIT_ONE_;							\
 	    for (j = 0; j < n; dpos += n-(j++))				\
 		dest[dpos] = _ONE_;					\
 	}								\
@@ -724,15 +722,15 @@ void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,   \
  *     unit diagonal (`'U'`) or not (`'N'`).
  */
 /* ddense_pack() */
-PACK(d, double, , 1.0)
+PACK(d, double, 1.0)
 /* idense_pack() */
-PACK(i, int, , 1)
+PACK(i, int, 1)
 /* zdense_pack() */
-PACK(z, Rcomplex, Rcomplex one; one.r = 1.0; one.i = 0.0, one)
+PACK(z, Rcomplex, Matrix_zone)
 
 #undef PACK
 
-#define UNPACK(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)			\
+#define UNPACK(_PREFIX_, _CTYPE_, _ONE_)				\
 void _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
 			      char uplo, char diag)			\
 {									\
@@ -749,7 +747,6 @@ void _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
     }									\
     if (diag != 'N') {							\
 	dpos = 0;							\
-	_INIT_ONE_;							\
 	R_xlen_t n1a = (R_xlen_t) n + 1;				\
 	for (j = 0; j < n; ++j, dpos += n1a)				\
 	    dest[dpos] = _ONE_;						\
@@ -774,11 +771,11 @@ void _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
  *     whether to "force" a unit diagonal (`'U'`) or not (`'N'`).
  */
 /* ddense_unpack() */
-UNPACK(d, double, , 1.0)
+UNPACK(d, double, 1.0)
 /* idense_unpack() */
-UNPACK(i, int, , 1)
+UNPACK(i, int, 1)
 /* zdense_unpack() */
-UNPACK(z, Rcomplex, Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+UNPACK(z, Rcomplex, Matrix_zone)
 
 #undef UNPACK
 
@@ -830,14 +827,12 @@ UNPACKED_MAKE_SYMMETRIC(z, Rcomplex, UNPACKED_MAKE_SYMMETRIC_SET_CJ)
 #undef UNPACKED_MAKE_SYMMETRIC_SET_CJ
 #undef UNPACKED_MAKE_SYMMETRIC_SET_EQ
 
-#define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_,			\
-				 _INIT_ZERO_, _ZERO_, _INIT_ONE_, _ONE_) \
+#define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_, _ZERO_, _ONE_)	\
 void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *x, int m, int n, \
 						char uplo, char diag)	\
 {									\
     int i, j, r = (m < n) ? m : n;					\
     R_xlen_t pos = 0;							\
-    _INIT_ZERO_;							\
     if (uplo == 'U') {							\
 	for (j = 0; j < r; pos += (++j)+1)				\
 	    for (i = j+1; i < m; ++i)					\
@@ -852,7 +847,6 @@ void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *x, int m, int n, \
     }									\
     if (diag != 'N') {							\
 	pos = 0;							\
-	_INIT_ONE_;							\
 	R_xlen_t m1a = (R_xlen_t) m + 1;				\
 	for (j = 0; j < r; ++j, pos += m1a)				\
 	    x[pos] = _ONE_;						\
@@ -874,20 +868,15 @@ void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *x, int m, int n, \
  *     whether it should have a unit diagonal (`'U'`) or not (`'N'`).
  */
 /* ddense_unpacked_make_triangular() */
-UNPACKED_MAKE_TRIANGULAR(d, double, , 0.0, , 1.0)
+UNPACKED_MAKE_TRIANGULAR(d, double, 0.0, 1.0)
 /* idense_unpacked_make_triangular() */
-UNPACKED_MAKE_TRIANGULAR(i, int, , 0, , 1)
+UNPACKED_MAKE_TRIANGULAR(i, int, 0, 1)
 /* zdense_unpacked_make_triangular() */
-UNPACKED_MAKE_TRIANGULAR(z, Rcomplex,
-			 Rcomplex zero; zero.r = 0.0; zero.i = 0.0;,
-			 zero,
-			 zero.r = 1.0;,
-			 zero)
+UNPACKED_MAKE_TRIANGULAR(z, Rcomplex, Matrix_zzero, Matrix_zone)
 
 #undef UNPACKED_MAKE_TRIANGULAR
 
-#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_,				\
-			     _INIT_ZERO_, _ZERO_, _INIT_ONE_, _ONE_)	\
+#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_, _ZERO_, _ONE_)		\
 void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *x,			\
 					    int m, int n, int a, int b,	\
 					    char diag)			\
@@ -904,7 +893,6 @@ void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *x,			\
     int i, j, i0, i1,							\
 	j0 = (a < 0) ? 0 : a,						\
 	j1 = (b < n-m) ? m+b : n;					\
-    _INIT_ZERO_;							\
     									\
     if (j0 > 0) {							\
 	R_xlen_t dx;							\
@@ -923,22 +911,18 @@ void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *x,			\
 	Memzero(x, (R_xlen_t) m * (n - j1));				\
     if (diag != 'N' && a <= 0 && b >= 0) {				\
 	x -= m * (R_xlen_t) j;						\
-	_INIT_ONE_;							\
 	R_xlen_t m1a = (R_xlen_t) m + 1;				\
 	for (j = 0; j < n; ++j, x += m1a)				\
 	    *x = _ONE_;							\
     }									\
     return;								\
 }
-UNPACKED_MAKE_BANDED(d, double, , 0.0, , 1.0)
-UNPACKED_MAKE_BANDED(i, int, , 0, , 1)
-UNPACKED_MAKE_BANDED(z, Rcomplex,
-		     Rcomplex zero; zero.r = 0.0; zero.i = 0.0;, zero,
-		     Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+UNPACKED_MAKE_BANDED(d, double, 0.0, 1.0)
+UNPACKED_MAKE_BANDED(i, int, 0, 1)
+UNPACKED_MAKE_BANDED(z, Rcomplex, Matrix_zzero, Matrix_zone)
 #undef UNPACKED_MAKE_BANDED
 
-#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_,				\
-			   _INIT_ZERO_, _ZERO_, _INIT_ONE_, _ONE_)	\
+#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_, _ZERO_, _ONE_)		\
 void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,		        \
 					  int n, int a, int b,		\
 					  char uplo, char diag)		\
@@ -960,7 +944,6 @@ void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,		        \
     int i, j, i0, i1,							\
 	j0 = (a < 0) ? 0 : a,						\
 	j1 = (b < 0) ? n+b : n;						\
-    _INIT_ZERO_;							\
     									\
     if (uplo == 'U') {							\
 	if (j0 > 0) {							\
@@ -980,7 +963,6 @@ void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,		        \
 	    Memzero(x, PM_LENGTH(n) - PM_LENGTH(j1));			\
 	if (diag != 'N' && a == 0) {					\
 	    x -= PM_LENGTH(j);						\
-	    _INIT_ONE_;							\
 	    for (j = 0; j < n; x += (++j)+1)				\
 		*x = _ONE_;						\
 	}								\
@@ -1002,21 +984,18 @@ void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,		        \
 	    Memzero(x, PM_LENGTH(n - j1));				\
 	if (diag != 'N' && b == 0) {					\
 	    x -= PM_LENGTH(n) - PM_LENGTH(j);				\
-	    _INIT_ONE_;							\
 	    for (j = 0; j < n; x += n-(j++))				\
 		*x = _ONE_;						\
 	}								\
     }									\
     return;								\
 }
-PACKED_MAKE_BANDED(d, double, , 0.0, , 1.0)
-PACKED_MAKE_BANDED(i, int, , 0, , 1)
-PACKED_MAKE_BANDED(z, Rcomplex,
-		   Rcomplex zero; zero.r = 0.0; zero.i = 0.0;, zero,
-		   Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+PACKED_MAKE_BANDED(d, double, 0.0, 1.0)
+PACKED_MAKE_BANDED(i, int, 0, 1)
+PACKED_MAKE_BANDED(z, Rcomplex, Matrix_zzero, Matrix_zone)
 #undef PACKED_MAKE_BANDED
 
-#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)	\
+#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _ONE_)		\
 void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest,	        \
 					      const _CTYPE_ *src,	\
 					      int n, R_xlen_t len,	\
@@ -1025,7 +1004,6 @@ void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest,	        \
     int j;								\
     R_xlen_t n1a = (R_xlen_t) n + 1;					\
     if (diag != 'N') {							\
-	_INIT_ONE_;							\
 	for (j = 0; j < n; ++j, dest += n1a)				\
 	    *dest = _ONE_;						\
     } else if (len == n) {						\
@@ -1067,16 +1045,15 @@ void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest,	        \
  *     whether the matrix should have a unit diagonal (`'U'`) or not (`'N'`).
  */
 /* ddense_unpacked_copy_diagonal() */
-UNPACKED_COPY_DIAGONAL(d, double, , 1.0)
+UNPACKED_COPY_DIAGONAL(d, double, 1.0)
 /* idense_unpacked_copy_diagonal() */
-UNPACKED_COPY_DIAGONAL(i, int, , 1)
+UNPACKED_COPY_DIAGONAL(i, int, 1)
 /* zdense_unpacked_copy_diagonal() */
-UNPACKED_COPY_DIAGONAL(z, Rcomplex,
-		       Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+UNPACKED_COPY_DIAGONAL(z, Rcomplex, Matrix_zone)
 
 #undef UNPACKED_COPY_DIAGONAL
 
-#define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _INIT_ONE_, _ONE_)	\
+#define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _ONE_)			\
 void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *dest,		\
 					    const _CTYPE_ *src,		\
 					    int n, R_xlen_t len,	\
@@ -1086,7 +1063,6 @@ void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *dest,		\
 {									\
     int j;								\
     if (diag != 'N') {							\
-	_INIT_ONE_;							\
 	if (uplo_dest != 'L') {						\
 	    for (j = 0; j < n; dest += (++j)+1)				\
 		*dest = _ONE_;						\
@@ -1156,12 +1132,11 @@ void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *dest,		\
  *     unit diagonal (`'U'`) or not (`'N'`).
  */
 /* ddense_packed_copy_diagonal() */
-PACKED_COPY_DIAGONAL(d, double, , 1.0)
+PACKED_COPY_DIAGONAL(d, double, 1.0)
 /* idense_packed_copy_diagonal() */
-PACKED_COPY_DIAGONAL(i, int, , 1)
+PACKED_COPY_DIAGONAL(i, int, 1)
 /* zdense_packed_copy_diagonal() */
-PACKED_COPY_DIAGONAL(z, Rcomplex,
-		     Rcomplex one; one.r = 1.0; one.i = 0.0;, one)
+PACKED_COPY_DIAGONAL(z, Rcomplex, Matrix_zone)
 
 #undef PACKED_COPY_DIAGONAL
 
@@ -1413,13 +1388,12 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 	
     } else {
 
-#define FORCE_TRIANGULAR(_PREFIX_, _CTYPE_, _PTR_, _INIT_ONE_, _ONE_)	\
+#define FORCE_TRIANGULAR(_PREFIX_, _CTYPE_, _PTR_, _ONE_)		\
 	do {								\
 	    _CTYPE_ *px = _PTR_(x), *py = _PTR_(y);			\
 	    Memcpy(py, px, nx);						\
 	    _PREFIX_ ## dense_unpacked_make_triangular(py, n, n, uplo, diag); \
 	    if (diag != 'N') {						\
-		_INIT_ONE_;						\
 		R_xlen_t n1a = (R_xlen_t) n + 1;			\
 		for (int j = 0; j < n; ++j, py += n1a)			\
 		    *py = _ONE_;					\
@@ -1428,17 +1402,16 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 	
 	switch (tx) {
 	case REALSXP:
-	    FORCE_TRIANGULAR(d, double, REAL, , 1.0);
+	    FORCE_TRIANGULAR(d, double, REAL, 1.0);
 	    break;
 	case LGLSXP:
-	    FORCE_TRIANGULAR(i, int, LOGICAL, , 1);
+	    FORCE_TRIANGULAR(i, int, LOGICAL, 1);
 	    break;
 	case INTSXP:
-	    FORCE_TRIANGULAR(i, int, INTEGER, , 1);
+	    FORCE_TRIANGULAR(i, int, INTEGER, 1);
 	    break;
 	case CPLXSXP:
-	    FORCE_TRIANGULAR(z, Rcomplex, COMPLEX,
-			     Rcomplex one; one.r = 1.0; one.i = 0.0;, one);
+	    FORCE_TRIANGULAR(z, Rcomplex, COMPLEX, Matrix_zone);
 	    break;
 	default:
 	    break;
@@ -2273,11 +2246,10 @@ void na2one(SEXP x)
     }
     case CPLXSXP:
     {
-	Rcomplex one, *px = COMPLEX(x);
-	one.r = 1.0; one.i = 0.0;
+	Rcomplex *px = COMPLEX(x);
 	for (i = 0; i < n; ++i, ++px)
 	    if (ISNAN((*px).r) || ISNAN((*px).i))
-		*px = one;
+		*px = Matrix_zone;
 	break;
     }
     default:
@@ -2868,14 +2840,12 @@ SEXP Mmatrix(SEXP args)
 		REAL(ans)[i] = NA_REAL;
 	    break;
 	case CPLXSXP:
-	    {
-		Rcomplex na_cmplx;
-		na_cmplx.r = NA_REAL;
-		na_cmplx.i = 0;
-		for (i = 0; i < N; i++)
-		    COMPLEX(ans)[i] = na_cmplx;
-	    }
+	{
+	    Rcomplex zna = { NA_REAL, 0.0 };
+	    for (i = 0; i < N; i++)
+		COMPLEX(ans)[i] = zna;
 	    break;
+	}
 	case RAWSXP:
 	    // FIXME:  N may overflow size_t !!
 	    memset(RAW(ans), 0, N);

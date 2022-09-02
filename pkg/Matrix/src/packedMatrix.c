@@ -379,13 +379,8 @@ SEXP packedMatrix_diag_get(SEXP obj, SEXP nms)
 	PM_D_G(int, INTEGER, 1);
 	break;
     case CPLXSXP: /* z..Matrix */
-    {
-	Rcomplex one;
-	one.r = 1.0;
-	one.i = 0.0;
-	PM_D_G(Rcomplex, COMPLEX, one);
+	PM_D_G(Rcomplex, COMPLEX, Matrix_zone);
 	break;
-    }
     default:
 	ERROR_INVALID_TYPE("'x' slot", tx, "packedMatrix_diag_get");
 	break;
