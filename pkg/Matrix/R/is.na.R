@@ -310,8 +310,8 @@ setMethod("is.infinite", signature(x = "lMatrix"),
 setMethod("is.infinite", signature(x = "dsparseMatrix"),
 	  function(x) {
               if(any(is.infinite(x@x))) {
-                  r <- .sparse2kind(diagU2N(x), "l", drop0 = FALSE)
-                  r@x <- is.infinite(r@x)
+                  r <- .sparse2kind(x <- diagU2N(x), "l", drop0 = FALSE)
+                  r@x <- is.infinite(x@x)
                   .sparse2kind(r, "n", drop0 = TRUE)
               } else allFalseMatrix(x)
 	  })

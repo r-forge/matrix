@@ -1411,6 +1411,11 @@ y & c(FALSE, FALSE) -> L2
 ## gave Error in validObject(*): invalid class "lgCMatrix" object: slot p ...
 stopifnot(identical(L2, L6), is(L2, "lgCMatrix"), identical(dim(L2), c(0L, 6L)))
 
+## Briefly wrong between 1.4-1 and 1.5-0
+x.inf <- new("dgCMatrix", Dim = c(2L, 3L),
+             p = c(0:2, 2L), i = 0:1, x = c(-Inf, Inf))
+stopifnot(identical(is.infinite(x.inf), as(abs(x.inf) == Inf, "nMatrix")))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
