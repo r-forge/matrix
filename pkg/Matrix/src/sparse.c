@@ -1312,7 +1312,7 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
     /* Now allocating and filling out slots ... */
 
     SEXP i1, j1;
-    int *pi1, *pj1;
+    int *pi1 = NULL, *pj1 = NULL;
     
     PROTECT(i1 = allocVector(INTSXP, nnz1));
     SET_SLOT(to, Matrix_iSym, i1);
