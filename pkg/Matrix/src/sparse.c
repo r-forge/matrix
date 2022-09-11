@@ -3188,9 +3188,11 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     
 #define T_AS_CR_2					\
     do {						\
-	workB[0] = 0;					\
-	for (i = 1; i < m_; ++i)			\
-	    workA[i] += (workB[i] = workA[i-1]);	\
+	if (r_ > 0) {					\
+	    workB[0] = 0;				\
+	    for (i = 1; i < m_; ++i)			\
+		workA[i] += (workB[i] = workA[i-1]);	\
+	}						\
     } while (0)
     
     /* 3. Group column indices and data by row in pj_[k], px_[k]
