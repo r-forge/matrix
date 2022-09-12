@@ -5,11 +5,12 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-1 (2022-09-12 r3641)}{
+\section{Changes in version 1.5-1 (2022-09-12 r3642)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item ASAN-detected bugs fixed in \code{.T2C(<0-by-0>)}, i.e. C-level
-      \code{Tsparse_as_CRsparse()}.
+      \item ASAN-detected bugs fixed in C-level
+      \code{Tsparse_as_CRsparse()} (triggered by \code{.T2C(<0-by-0>)})
+      and \code{pMatrix_validate()}.
     }
   }
 }
