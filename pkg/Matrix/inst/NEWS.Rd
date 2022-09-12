@@ -5,7 +5,16 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-0 (2022-09-11 r3640)}{
+\section{Changes in version 1.5-1 (2022-09-12 r3641)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item ASAN-detected bugs fixed in \code{.T2C(<0-by-0>)}, i.e. C-level
+      \code{Tsparse_as_CRsparse()}.
+    }
+  }
+}
+
+\section{Changes in version 1.5-0 (2022-09-09 r3636)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual subclasses
