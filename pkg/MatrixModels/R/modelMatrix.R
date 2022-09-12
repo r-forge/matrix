@@ -273,12 +273,34 @@ glm4 <- function(formula, family, data, weights, subset,
                  "etastart", "mustart", "offset"), names(mf), 0L)
     mf <- mf[c(1L, m)]
     mf$drop.unused.levels <- TRUE
-    mf[[1L]] <- as.name("model.frame")
+    ## need stats:: for non-standard evaluation
+    mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
+
+    ## mt <- attr(mf, "terms") # allow model.frame to have updated it
+
+    Y <- model.response(mf, "any") # e.g. factors are allowed
+    ## avoid problems with 1D arrays, but keep names
+    if(length(dim(Y)) == 1L) {
+        nm <- rownames(Y)
+        dim(Y) <- NULL
+        if(!is.null(nm)) names(Y) <- nm
+    }
+    ## null model support
+
+    ## glm():
+    ## X <- if (!is.empty.model(mt)) model.matrix(mt, mf, contrasts) else matrix(,NROW(Y), 0L)
+    ## ?? Needed: ??
+    ## if(is.empty.model(mt)) stop("empty model not yet supported in glm4()")
+
+    ## if(!isTRUE (model)) .NotYetUsed("model")
+    ## if(!isFALSE(x)) .NotYetUsed("x")
+    ## if(!isTRUE (y)) .NotYetUsed("y")
 
     ans <- new("glpModel", call = call,
 	       resp = mkRespMod(mf, family),
 	       pred = as(model.Matrix(formula, mf, sparse = sparse,
+				      contrasts.arg = contrasts,
 				      drop.unused.levels=drop.unused.levels),
 			 "predModule"))
     if (doFit)
