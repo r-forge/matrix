@@ -1416,6 +1416,10 @@ x.inf <- new("dgCMatrix", Dim = c(2L, 3L),
              p = c(0:2, 2L), i = 0:1, x = c(-Inf, Inf))
 stopifnot(identical(is.infinite(x.inf), as(abs(x.inf) == Inf, "nMatrix")))
 
+## C-level bugs in 1.5-0, detected by full CRAN (incl. ASAN) check
+as(new("dgTMatrix"), "CsparseMatrix") # out-of-bounds access
+as(seq_len(10000), "pMatrix") # segfault
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
