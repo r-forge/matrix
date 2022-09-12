@@ -9,8 +9,10 @@
   \subsection{Bug Fixes}{
     \itemize{
       \item ASAN-detected bugs fixed in C-level
-      \code{Tsparse_as_CRsparse()} (triggered by \code{.T2C(<0-by-0>)})
-      and \code{pMatrix_validate()}.
+      \code{Tsparse_as_CRsparse()}
+      (triggered by \code{.T2C(<0-by-0>)})
+      and \code{pMatrix_validate()}
+      (triggered by as(<length-10000 integer>, "pMatrix")).
     }
   }
 }
@@ -458,7 +460,7 @@
       is less than number reported in the header.
 
       \item \code{x[i]} now works for \code{nMatrix} \code{i},
-      just as for \code{lMatrix} i.  This supports constructions
+      just as for \code{lMatrix} \code{i}.  This supports constructions
       such as \code{x[is.na(x)]}, where the logical operation
       produces an \code{nMatrix} because it is never \code{NA}.
     }
