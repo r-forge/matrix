@@ -3586,15 +3586,6 @@ SEXP Tsparse_is_diagonal(SEXP obj)
     return ScalarLogical(1);
 }
 
-#define RETURN_TRUE_OF_KIND(_KIND_)					\
-    do {								\
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1));			\
-	LOGICAL(ans)[0] = 1;						\
-	setAttrib(ans, install("kind"), _KIND_);			\
-	UNPROTECT(1);							\
-	return ans;							\
-    } while (0)
-
 /* isTriangular(<.g[CR]Matrix>, upper) */
 #define CR_IS_TRIANGULAR(_C_, _I_, _UPPER_, _LOWER_)			\
 SEXP _C_ ## sparse_is_triangular(SEXP obj, SEXP upper)			\

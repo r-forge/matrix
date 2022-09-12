@@ -148,6 +148,17 @@ extern Rcomplex Matrix_zzero, Matrix_zone;
     error(_("%s of invalid type \"%s\" in '%s()'"),			\
 	  _WHAT_, type2char(_SEXPTYPE_), _METHOD_)
 
+#define RETURN_TRUE_OF_KIND(_KIND_)					\
+    do {								\
+	SEXP ans = PROTECT(allocVector(LGLSXP, 1)),			\
+	    sym = PROTECT(install("kind")),				\
+	    val = PROTECT(_KIND_);					\
+	LOGICAL(ans)[0] = 1;						\
+	setAttrib(ans, sym, val);					\
+	UNPROTECT(3);							\
+	return ans;							\
+    } while (0)
+    
 /* Zero an array, but note Memzero() which might be FASTER 
    and uses R_SIZE_T (== size_t for C) */
 #define AZERO4(_X_, _N_, _ZERO_, _ITYPE_)				\

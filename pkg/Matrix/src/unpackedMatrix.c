@@ -310,15 +310,6 @@ SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN)
     return ScalarLogical(res);
 }
 
-#define RETURN_TRUE_OF_KIND(_KIND_)					\
-    do {								\
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1));			\
-	LOGICAL(ans)[0] = 1;						\
-	setAttrib(ans, install("kind"), _KIND_);			\
-	UNPROTECT(1);							\
-	return ans;							\
-    } while (0)
-
 #define RETURN_GE_IS_TR(_X_, _N_, _UPPER_, _WHAT_, _METHOD_)		\
     do {								\
 	Rboolean res = FALSE;						\
@@ -507,9 +498,12 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	else
 	    /* Preserve 'factors' slot */
 	    SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
-	if (ivalid == 5)
+	if (ivalid == 5) {
 	    /* Preserve 'sd' slot */
-	    SET_SLOT(to, install("sd"), GET_SLOT(from, install("sd")));
+	    SEXP sym = PROTECT(install("sd")); /* FIXME: add to ./Syms.h */
+	    SET_SLOT(to, sym, GET_SLOT(from, sym));
+	    UNPROTECT(1);
+	}
     }
     /* NB: Nothing to do for 'factors' slot: prototype is already list() ...
        FIXME: However, it would be much better to also "transpose" each 

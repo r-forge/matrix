@@ -219,15 +219,6 @@ SEXP packedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
     }
 }
 
-#define RETURN_TRUE_OF_KIND(_KIND_)					\
-    do {								\
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1));			\
-	LOGICAL(ans)[0] = 1;						\
-	setAttrib(ans, install("kind"), _KIND_);			\
-	UNPROTECT(1);							\
-	return ans;							\
-    } while (0)
-
 /* isTriangular(x, upper) */
 SEXP packedMatrix_is_triangular(SEXP obj, SEXP upper)
 {
