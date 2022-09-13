@@ -5,10 +5,21 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.5-2 (2022-09-13 r3646)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item C-level functions supporting methods for
+      \code{isTriangular()} now \code{PROTECT()} the
+      \code{kind} attribute of the logical result before setting it,
+      resolving some \code{rchk} warnings issued since 1.5-0.
+    }
+  }
+}
+
 \section{Changes in version 1.5-1 (2022-09-12 r3642)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item ASAN-detected bugs fixed in C-level
+      \item ASAN-detected bugs fixed in C-level functions
       \code{Tsparse_as_CRsparse()}
       (triggered by \code{.T2C(<0-by-0>)})
       and \code{pMatrix_validate()}
