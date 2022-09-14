@@ -150,12 +150,13 @@ extern Rcomplex Matrix_zzero, Matrix_zone;
 
 #define RETURN_TRUE_OF_KIND(_KIND_)					\
     do {								\
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1)),			\
-	    sym = PROTECT(install("kind")),				\
-	    val = PROTECT(_KIND_);					\
+	SEXP ans = PROTECT(allocVector(LGLSXP, 1)), val = PROTECT(_KIND_); \
+	static SEXP sym = NULL;						\
+	if (!sym)							\
+	    sym = install("kind");					\
 	LOGICAL(ans)[0] = 1;						\
 	setAttrib(ans, sym, val);					\
-	UNPROTECT(3);							\
+	UNPROTECT(2);							\
 	return ans;							\
     } while (0)
     

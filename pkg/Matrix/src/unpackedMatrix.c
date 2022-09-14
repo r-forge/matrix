@@ -498,12 +498,9 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	else
 	    /* Preserve 'factors' slot */
 	    SET_SLOT(to, Matrix_factorSym, GET_SLOT(from, Matrix_factorSym));
-	if (ivalid == 5) {
+	if (ivalid == 5)
 	    /* Preserve 'sd' slot */
-	    SEXP sym = PROTECT(install("sd")); /* FIXME: add to ./Syms.h */
-	    SET_SLOT(to, sym, GET_SLOT(from, sym));
-	    UNPROTECT(1);
-	}
+	    SET_SLOT(to, Matrix_sdSym, GET_SLOT(from, Matrix_sdSym));
     }
     /* NB: Nothing to do for 'factors' slot: prototype is already list() ...
        FIXME: However, it would be much better to also "transpose" each 

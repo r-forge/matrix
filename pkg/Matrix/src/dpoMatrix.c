@@ -16,7 +16,7 @@ SEXP dpoMatrix_validate(SEXP obj)
 SEXP corMatrix_validate(SEXP obj)
 {
     int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    SEXP sd = GET_SLOT(obj, install("sd"));
+    SEXP sd = GET_SLOT(obj, Matrix_sdSym);
     if (XLENGTH(sd) != n)
 	return mkString(_("length of 'sd' slot is not equal to n=Dim[1]"));
     double *psd = REAL(sd);

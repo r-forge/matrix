@@ -6,7 +6,7 @@ SEXP sparseQR_validate(SEXP x)
 	R = AS_CSP__(GET_SLOT(x, Matrix_RSym));
     SEXP beta = GET_SLOT(x, Matrix_betaSym),
 	p = GET_SLOT(x, Matrix_pSym),
-	q = GET_SLOT(x, install("q"));
+	q = GET_SLOT(x, Matrix_qSym);
     R_CheckStack();
 
     if (LENGTH(p) != V->m)
@@ -146,7 +146,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans, SEXP keep_dimnames)
 // Compute  qr.coef(qr, y)  :=  R^{-1} Q' y   {modulo row and column permutations}
 SEXP sparseQR_coef(SEXP qr, SEXP y)
 {
-    SEXP qslot = GET_SLOT(qr, install("q")), R_ = GET_SLOT(qr, Matrix_RSym);
+    SEXP qslot = GET_SLOT(qr, Matrix_qSym), R_ = GET_SLOT(qr, Matrix_RSym);
     CSP	R = AS_CSP__(R_);
     // FIXME: check  n_R, M (= R->m)   vs  n, m
     int *q = INTEGER(qslot), lq = LENGTH(qslot), n_R = R->n; // = ncol(R)
