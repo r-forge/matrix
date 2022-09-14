@@ -483,6 +483,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     ina <- is.na(m)
     if(do.matrix) {
 	stopifnot(all(ina == is.na(m.m)),
+                  all(is.nan(m) == is.nan(m.m)),
 		  all(is.finite(m) == is.finite(m.m)),
 		  all(is.infinite(m) == is.infinite(m.m)),
 		  all(m == m | ina), ## check all() , "==" [Compare], "|" [Logic]

@@ -5,13 +5,19 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-13 r3646)}{
+\section{Changes in version 1.5-2 (2022-09-14 r3647)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
       \code{isTriangular()} now \code{PROTECT()} the
       \code{kind} attribute of the logical result before setting it,
       resolving some \code{rchk} warnings issued since 1.5-0.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item \code{is.nan(x)} is now implemented for all \code{x}
+      inheriting from virtual class \code{Matrix} or \code{sparseVector}.
     }
   }
 }
