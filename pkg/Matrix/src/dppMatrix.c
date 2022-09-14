@@ -1,24 +1,5 @@
 #include "dppMatrix.h"
 
-SEXP dppMatrix_validate(SEXP obj)
-{
-    double *x = REAL(GET_SLOT(obj, Matrix_xSym));
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    R_xlen_t pos = 0;
-
-    /* Non-negative diagonal elements are necessary but _not_ sufficient */
-    if (*uplo_P(obj) == 'U') {
-	for (int i = 0; i < n; pos += (++i)+1)
-	    if (x[pos] < 0)
-		return mkString(_("'dppMatrix' is not positive semidefinite"));
-    } else {
-	for (int i = 0; i < n; pos += n-(i++))
-	    if (x[pos] < 0)
-		return mkString(_("'dppMatrix' is not positive semidefinite"));
-    }
-    return ScalarLogical(1);
-}
-
 SEXP dppMatrix_chol(SEXP x)
 {
     SEXP val = get_factor(x, "pCholesky"),

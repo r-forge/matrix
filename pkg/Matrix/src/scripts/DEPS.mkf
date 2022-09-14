@@ -119,3 +119,4 @@ sparseQR.o: sparseQR.c sparseQR.h Mutils.h \
 packedMatrix.o: packedMatrix.c packedMatrix.h Mutils.h Syms.h
 unpackedMatrix.o: unpackedMatrix.c unpackedMatrix.h Mutils.h Syms.h
 sparse.o: sparse.c sparse.h Mutils.h Syms.h
+validity.o: validity.c validity.h Mutils.h Syms.h

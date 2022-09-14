@@ -2,6 +2,9 @@
 #include "Tsparse.h"
 #include "chm_common.h"
 
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
+
 SEXP Tsparse_validate(SEXP x)
 {
     /* NB: we do *NOT* check a potential 'x' slot here, at all */
@@ -27,6 +30,8 @@ SEXP Tsparse_validate(SEXP x)
     }
     return ScalarLogical(1);
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
 #if 0

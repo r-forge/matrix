@@ -1,6 +1,13 @@
 			/* Sparse triangular matrices in triplet format */
+
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dtTMatrix.h"
 #include "dgTMatrix.h" /* xTMatrix_validate */
+#endif /* MJ */
+
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
 
 /* This should be use for *BOTH* triangular and symmetric Tsparse: */
 SEXP tTMatrix_validate(SEXP x)
@@ -33,4 +40,4 @@ SEXP tTMatrix_validate(SEXP x)
     }
 }
 
-/* SEXP dtTMatrix_as_dtrMatrix(SEXP x) ---> now in ./TMatrix_as.c */
+#endif /* MJ */

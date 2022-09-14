@@ -85,10 +85,6 @@ Rboolean chm_MOD_xtype(int to_xtype, cholmod_sparse *A, CHM_CM Common);
 void chm_diagN2U(CHM_SP chx, int uploT, Rboolean do_realloc);
 void chm_transpose_dense(CHM_DN ans, CHM_DN x);
 
-SEXP CHMfactor_validate(SEXP obj);
-SEXP CHMsimpl_validate(SEXP obj);
-SEXP CHMsuper_validate(SEXP obj);
-
 SEXP CHM_set_common_env(SEXP rho);
 void CHM_store_common();
 void CHM_restore_common();
