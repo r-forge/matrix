@@ -1,5 +1,12 @@
 			/* Sparse symmetric matrices in triplet format */
+
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "TMatrix_as.h"
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_as_dense() */
+#if 0
 
 #define MAYBE_DECLARE_AND_GET_X_SLOT(__T__, __S__)	\
 	      DECLARE_AND_GET_X_SLOT(__T__, __S__)
@@ -64,6 +71,11 @@ SEXP ltTMatrix_as_ltrMatrix(SEXP x)
     slot_dup(val, x, Matrix_diagSym);
     Matrix_T_as_DENSE_FINISH(xx[k], 0);
 }
+
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_as_general() */
+#if 0
 
 /*===================== Coercion to  gTMatrix ================================*/
 
@@ -139,6 +151,11 @@ SEXP lsTMatrix_as_lgTMatrix(SEXP x)
     Matrix_sT_as_GENERAL(int, LOGICAL, LGLSXP);
 }
 
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_as_dense() */
+#if 0
+
 /* Now the 'nsparseMatrix' ones where input has no 'x' slot : ---------------*/
 
 #undef  MAYBE_DECLARE_AND_GET_X_SLOT
@@ -167,8 +184,15 @@ SEXP ntTMatrix_as_ntrMatrix(SEXP x)
     Matrix_T_as_DENSE_FINISH(1, 0);
 }
 
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_as_general() */
+#if 0
+
 SEXP nsTMatrix_as_ngTMatrix(SEXP x)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("ngTMatrix"));
     Matrix_sT_as_GENERAL(int, LOGICAL, LGLSXP);
 }
+
+#endif /* MJ */

@@ -1,7 +1,10 @@
 #ifndef MATRIX_LDENSE_H
 #define MATRIX_LDENSE_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Mutils.h"
+#endif
 
 /* MJ: no longer needed ... prefer more general (un)?pack() */
 #if 0 
