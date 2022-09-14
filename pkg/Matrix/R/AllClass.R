@@ -947,10 +947,24 @@ setClassUnion("replValueSp", members = c("replValue", "sparseVector", "Matrix"))
 
 
 setClass("determinant",
-	 slots = c(modulus = "numeric",
-		   logarithm = "logical",
-		   sign = "integer",
-		   call = "call"))
+         ## based on S3 class 'det':
+         slots = c(modulus = "numeric", logarithm = "logical",
+                   sign = "integer", call = "call"),
+         validity = function(object) {
+             if(length(logarithm <- object@logarithm) != 1L)
+                 "'logarithm' slot does not have length 1"
+             else if(is.na(logarithm))
+                 "'logarithm' is not TRUE or FALSE"
+             else if(length(modulus <- object@modulus) != 1L)
+                 "'modulus' slot does not have length 1"
+             else if(logarithm && !is.na(modulus) && modulus < 0)
+                 "logarithm=FALSE but 'modulus' slot is negative"
+             else if(length(sign <- object@sign))
+                 "'sign' slot does not have length 1"
+             else if(is.na(sign) || (sign != -1L && sign != 1L))
+                 "'sign' slot is not -1 or 1"
+             else TRUE
+         })
 
 ## --- New "logic" class -- currently using "raw" instead of "logical"
 ## LOGIC setClass("logic", contains = "raw")
