@@ -823,43 +823,63 @@ setClassUnion("numericVector", members = c("logical", "integer", "numeric"))
 
 ### Sparse Vectors ---- here use 1-based indexing ! -----------
 
-## 'longindex' should allow sparseVectors of "length" > 2^32,
-## which is necessary e.g. when converted from large sparse matrices
-## setClass("longindex", contains = "numeric")
-## but we use "numeric" instead, for simplicity (efficiency?)
-setClass("sparseVector",
-         slots = c(length = "numeric", i = "numeric"), contains = "VIRTUAL",
-         ##                     "longindex"    "longindex"
-         ## note that "numeric" contains "integer" (if I like it or not..)
-	 prototype = prototype(length = 0),
+## "longindex" should allow sparseVector of length >= 2^31,
+## which is necessary, e.g., when coercing from large sparseMatrix
+##
+## > setClass("longindex", contains = "numeric")
+##
+## but we use "numeric" here instead (for simplicity? efficiency?) ...
+## note that "numeric" contains "integer" (whether I like it or not) ...
+
+setClass("sparseVector", contains = "VIRTUAL",
+         slots = c(length = "numeric", i = "numeric"), # 1-based index!
+         prototype = prototype(length = 0),
          validity = function(object) {
-	     n <- object@length
-	     if(anyNA(i <- object@i))	 "'i' slot has NAs"
-	     else if(any(!is.finite(i))) "'i' slot is not all finite"
-	     else if(any(i < 1))	 "'i' must be >= 1"
-	     else if(n == 0 && length(i))"'i' must be empty when the object length is zero"
-	     else if(any(i > n)) sprintf("'i' must be in 1:%d", n)
-	     else if(is.unsorted(i, strictly=TRUE))
-		 "'i' must be sorted strictly increasingly"
-             else TRUE
+             len <- object@length
+             if(length(len) != 1L)
+                 return("'length' slot does not have length 1")
+             if(!is.finite(len))
+                 return("'length' slot is non-finite")
+             if(len < 0)
+                 return("'length' slot is negative")
+             i <- object@i
+             i.len <- length(i)
+             if(i.len == 0L)
+                 return(TRUE)
+             if(i.len > len)
+                 return("'i' slot has length greater than 'length'")
+             i.num <- is.double(i)
+             if(i.num)
+                 i <- trunc(i)
+             i.uns <- is.unsorted(i, strictly = TRUE)
+             if(is.na(i.uns))
+                 "'i' slot contains NA"
+             else if(i.uns || i[1L] < 1 || i[i.len] > len) {
+                 m <- if(i.uns)
+                          "'i' slot is not strictly increasing"
+                      else "'i' slot has elements not in 1:<'length' slot>"
+                 if(i.num)
+                     paste0(m, " after truncation towards zero")
+                 else m
+             } else TRUE
          })
 
-##' initialization -- ensuring that  'i' is sorted (and 'x' alongside)
+## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
 setMethod("initialize", "sparseVector",
           function(.Object, i, x, ...) {
-              has.x <- !missing(x)
+              if(has.x <- !missing(x))
+                  x <- x # MJ: why is this necessary?
               if(!missing(i)) {
-                  i <- ## (be careful to assign in all cases)
-                      if(is.unsorted(i, strictly=TRUE)) {
-                          if(is(.Object, "xsparseVector") && has.x) {
-                              si <- sort.int(i, index.return=TRUE)
-                              x <- x[si$ix]
-                              si$x
-                          } else sort.int(i, method = "quick")
-                      } else i
+                  i.uns <- is.unsorted(i, strictly = TRUE)
+                  i <-
+                      if(is.na(i.uns) || !i.uns)
+                          i
+                      else if(.hasSlot(.Object, "x") && has.x) {
+                          s <- sort.int(i, method = "quick", index.return=TRUE)
+                          x <- x[s$ix]
+                          s$x
+                      } else sort.int(i, method = "quick")
               }
-              if(has.x)
-                  x <- x
               callNextMethod()
           })
 
