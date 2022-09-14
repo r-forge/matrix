@@ -58,7 +58,10 @@ SEXP Csparse_symmetric_to_general(SEXP x);
 SEXP Csparse_general_to_symmetric(SEXP x, SEXP uplo, SEXP sym_dmns);
 #endif /* MJ */
 
+/* MJ: no longer needed ... prefer CRsparse_as_Tsparse() */
+#if 0
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri);
+#endif /* MJ */
 
 /* MJ: unused */
 #if 0
@@ -101,7 +104,6 @@ SEXP matrix_to_Csparse(SEXP x, SEXP cls);
 
 /* MJ: unused */
 #if 0
-// FIXME: these are nowhere used (are they?)
 SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
 		    void* x, int nnz, int* dims, SEXP dimnames,
 		    int index1);

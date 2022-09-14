@@ -68,9 +68,8 @@ static R_CallMethodDef CallEntries[] = {
 /* MJ: no longer needed ... prefer CRsparse_to_Tsparse() */
 #if 0
     CALLDEF(compressed_to_TMatrix, 2),
-#endif
-
     CALLDEF(Csparse_to_Tsparse, 2),
+#endif
     
 /* MJ: unused */
 #if 0

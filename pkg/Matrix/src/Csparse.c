@@ -329,6 +329,9 @@ SEXP Csparse_to_vector(SEXP x)
 
 #endif /* MJ */
 
+/* MJ: no longer needed ... prefer CRsparse_as_Tsparse() */
+#if 0
+
 SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 {
     CHM_SP chxs = AS_CHM_SP__(x);
@@ -342,6 +345,8 @@ SEXP Csparse_to_Tsparse(SEXP x, SEXP tri)
 			       Rkind, tr ? diag_P(x) : "",
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
+
+#endif /* MJ */
 
 /* MJ: unused */
 #if 0
