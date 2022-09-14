@@ -740,66 +740,97 @@ setClassUnion("numLike", members = c("numeric", "logical"))
 
 ##setClassUnion("numIndex", members = "numeric")
 
-## Note "rle" is a sealed oldClass (and "virtual" as w/o prototype)
-setClass("rleDiff", slots = c(first = "numLike", rle = "rle"),
-	 prototype = prototype(first = integer(),
-			       rle = rle(integer())),
+## Idea: represent x = c(seq(from1, to1, by1), seq(from2, to2, by2), ...)
+##       as list(first = x[1L], rle = rle(diff(x)))
+setClass("rleDiff",
+         ## MJ: simpler would be slots = c(first=, lengths=, values=) ...
+         slots = c(first = "numeric", rle = "rle"),
+	 prototype = prototype(first = integer(0L), rle = rle(integer(0L))),
 	 validity = function(object) {
-	     if(length(object@first) != 1)
-		 return("'first' must be of length one")
-	     rl <- object@rle
-	     if(!is.list(rl) || length(rl) != 2 ||
-		!identical(sort(names(rl)), c("lengths", "values")))
-		 return("'rle' must be a list (lengths = *, values = *)")
-	     if(length(lens <- rl$lengths) != length(vals <- rl$values))
-		 return("'lengths' and 'values' differ in length")
-	     if(any(lens <= 0))
-		 return("'lengths' must be positive")
-	     TRUE
+	     if(length(object@first) != 1L)
+		 "'first' slot does not have length 1"
+	     else if(!is.list(rle <- object@rle))
+                 "'rle' slot is not a list"
+             else if(length(rle) != 2L)
+                 "'rle' slot does not have length 2"
+             else if(is.null(nms <- names(rle)) ||
+                     anyNA(match(nms, c("lengths", "values"))))
+                 "'rle' slot does not have names \"lengths\", \"values\""
+             else if(!is.numeric(lens <- rle$lengths))
+                 "'lengths' is not numeric"
+             else if(!is.numeric(vals <- rle$values))
+                 "'values' is not numeric"
+             else if(length(lens) != length(vals))
+                 "'lengths' and 'values' do not have equal length"
+             else if(length(lens) == 0L)
+                 TRUE
+             else if(anyNA(lens))
+                 "'lengths' contains NA"
+             else if(is.double(lens)) {
+                 if(!(all(is.finite(r <- range(lens))) &&
+                      all(lens == trunc(lens))))
+                     "'lengths' is not integer-valued"
+                 else if(r[1L] < 1)
+                     "'lengths' is not positive"
+                 else TRUE
+             } else {
+                 if(min(lens) < 1L)
+                     "'lengths' is not positive"
+                 else TRUE
+             }
 	 })
 
-### 2010-03-04 -- thinking about *implementing* some 'abIndex' methodology,
-### I conclude that the following structure would probably be even more
-### efficient than the "rleDiff" one :
-### IDEA: Store subsequences in a numeric matrix of three rows, where
-### ----- one column = [from, to, by]  defining a sub seq()ence
-
-## for now, at least use it, and [TODO!] define  "seqMat" <--> "abIndex" coercions:
+## Idea: represent x = c(seq(from1, to1, by1), seq(from2, to2, by2), ...)
+##       as rbind(c(from1, from2, ...), c(to1, to2, ...), c(by1, by2, ...))
+## MM: (2010-03-04) more efficient than "rleDiff" [TODO: write rleDiff<->seqMat]
+## MJ: (2022-09-06) data.frame(from, to, by) could be _handled_ more efficiently
 setClass("seqMat", contains = "matrix",
-	 prototype = prototype(matrix(0, nrow = 3, ncol=0)),
+	 prototype = prototype(matrix(integer(0L), nrow = 3L, ncol = 0L)),
 	 validity = function(object) {
-	     if(!is.numeric(object)) return("is not numeric")
-	     d <- dim(object)
-	     if(length(d) != 3 || d[1] != 3)
-		 return("not a	 3 x n	matrix")
-	     if(any(object != floor(object)))
-		 return("some entries are not integer valued")
-	     TRUE
+             if(!is.numeric(object))
+                 "matrix is not numeric"
+             else if(nrow(object) != 3L)
+		 "matrix does not have 3 rows"
+             else if(anyNA(object))
+                 "matrix contains NA"
+             else if(is.double(object) && !(all(is.finite(range(object))) &&
+                                            all(object == trunc(object))))
+                 "matrix is not integer-valued"
+             else {
+                 from <- object[1L, ]
+                 to   <- object[2L, ]
+                 by   <- object[3L, ]
+                 if(any((from < to & by <= 0) | (from > to & by >= 0)))
+                     "degenerate sequence: sign(to - from) != sign(by)"
+                 else TRUE
+             }
 	 })
 
-setClass("abIndex", # 'ABSTRact Index'
-         slots = c(kind = "character",
-                   ## one of ("int32", "double", "rleDiff")
-                                        # i.e., numeric or "rleDiff"
-                   x = "numLike", # for  numeric [length 0 otherwise]
-                   rleD = "rleDiff"),  # "rleDiff" result
-         prototype = prototype(kind = "int32", x = integer(0)),# rleD = ... etc
+## Idea: _ab_stract index
+## MJ: (2022-09-06) why not just
+##     setClassUnion("abIndex", members = c("numeric", "rleDiff", "seqMat")) ??
+setClass("abIndex",
+         slots = c(kind = "character", x = "numeric", rleD = "rleDiff"),
+         prototype = prototype(kind = "int32", x = integer(0L)),
          validity = function(object) {
-            switch(object@kind,
-                   "int32" = if(!is.integer(object@x))
-                   return("'x' slot must be integer when kind is 'int32'")
-                   ,
-                   "double" = if(!is.double(object@x))
-                   return("'x' slot must be double when kind is 'double'")
-                   ,
-                   "rleDiff" = {
-                       if(length(object@x))
-                   return("'x' slot must be empty when kind is 'rleDiff'")
-                   },
-                   ## otherwise
-                   return("'kind' must be one of (\"int32\", \"double\", \"rleDiff\")")
-                   )
-            TRUE
+             ## MJ: should 'rleD' be "empty" if kind != "rleDiff" ?
+             if(length(kind <- object@kind) != 1L)
+                 "'kind' slot does not have length 1"
+             else switch(kind,
+                         "int32" =
+                             if(is.integer(object@x))
+                                 TRUE
+                             else "kind=\"int32\" but 'x' slot is not of type \"integer\"",
+                         "double" =
+                             if(is.double(object@x))
+                                 TRUE
+                             else "kind=\"double\" but 'x' slot is not of type \"double\"",
+                         "rleDiff" =
+                             if(length(object@x) == 0L)
+                                 TRUE
+                             else "kind=\"rleDiff\" but 'x' slot is nonempty",
+                         ## otherwise:
+                         "'kind' is not \"int32\", \"double\", or \"rleDiff\"")
          })
 
 ## for 'i' in x[i] or A[i,] : (numeric = {double, integer})
