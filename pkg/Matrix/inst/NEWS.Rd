@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-14 r3652)}{
+\section{Changes in version 1.5-2 (2022-09-14 r3653)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -20,6 +20,10 @@
       now correctly test for structural nonzero entries on the
       wrong side of the diagonal, and fail in that case.  This test
       was previously only performed for \code{d[ts]Matrix}.
+
+      \item The validity and initialization methods for virtual class
+      \code{sparseVector} are more diligent, i.e., catching more edge
+      cases such as \code{NA} in the \code{length} or \code{i} slot.
     }
   }
   \subsection{New Features}{
