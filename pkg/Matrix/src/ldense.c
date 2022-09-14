@@ -1,4 +1,7 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "ldense.h"
+#endif
 
 /* MJ: no longer needed ... prefer more general (un)?pack() */
 #if 0

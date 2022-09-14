@@ -1,7 +1,11 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "lgCMatrix.h"
-
 #include "dgCMatrix.h"
-/* validate: -> xCMatrix_validate() in ./dgCMatrix.c */
+#endif
+
+/* MJ: no longer needed ... prefer R_sparse_as_matrix() */
+#if 0
 
 SEXP lgC_to_matrix(SEXP x)
 {
@@ -50,13 +54,4 @@ SEXP ngC_to_matrix(SEXP x)
     return ans;
 }
 
-#ifdef _NEED_logical_to_csc_FIRST_
-/* very parallel to matrix_to_csc() in ./dgCMatrix.c */
-SEXP matrix_to_lcsc(SEXP A)
-{
-    if (!(isMatrix(A) && isLogical(A)))
-	error(_("A must be a logical matrix"));
-    return logical_to_csc(LOGICAL(A),
-			  INTEGER(getAttrib(A, R_DimSymbol)));
-}
 #endif
