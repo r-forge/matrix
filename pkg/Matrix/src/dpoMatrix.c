@@ -1,34 +1,5 @@
 #include "dpoMatrix.h"
 
-SEXP dpoMatrix_validate(SEXP obj)
-{
-    double *x = REAL(GET_SLOT(obj, Matrix_xSym));
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    R_xlen_t pos = 0, np1 = (R_xlen_t) n + 1;
-    
-    /* Non-negative diagonal elements are necessary but _not_ sufficient */
-    for (int i = 0; i < n; ++i, pos += np1)
-	if (x[pos] < 0)
-	    return mkString(_("'dpoMatrix' is not positive semidefinite"));
-    return ScalarLogical(1);
-}
-
-SEXP corMatrix_validate(SEXP obj)
-{
-    int n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
-    SEXP sd = GET_SLOT(obj, Matrix_sdSym);
-    if (XLENGTH(sd) != n)
-	return mkString(_("length of 'sd' slot is not equal to n=Dim[1]"));
-    double *psd = REAL(sd);
-    for (int i = 0; i < n; ++i) {
-	if (!R_FINITE(psd[i]))
-	    return mkString(_("'sd' slot has nonfinite elements"));
-	if (psd[i] < 0)
-	    return mkString(_("'sd' slot has negative elements"));
-    }
-    return ScalarLogical(1);
-}
-
 SEXP dpoMatrix_chol(SEXP x)
 {
     SEXP val = get_factor(x, "Cholesky"),

@@ -28,4 +28,5 @@ SOURCES_C =  \
 	    abIndex.c \
 	    packedMatrix.c \
 	    unpackedMatrix.c \
-	    sparse.c
+	    sparse.c \
+	    validity.c

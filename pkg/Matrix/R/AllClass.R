@@ -196,19 +196,19 @@ setClass("diagonalMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 ## Virtual class of sparse matrices with triplet representation
 setClass("TsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(i = "integer", j = "integer"),
-	 validity = function(object) .Call(Tsparse_validate, object))
+	 validity = function(object) .Call(TsparseMatrix_validate, object))
 
 ## Virtual class of compressed sparse column-oriented matrices
 setClass("CsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(i = "integer", p = "integer"),
 	 prototype = prototype(p = 0L), # to be valid
-         validity = function(object) .Call(Csparse_validate, object))
+         validity = function(object) .Call(CsparseMatrix_validate, object))
 
 ## Virtual class of compressed sparse row-oriented matrices
 setClass("RsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(p = "integer", j = "integer"),
 	 prototype = prototype(p = 0L), # to be valid
-	 validity = function(object) .Call(Rsparse_validate, object))
+	 validity = function(object) .Call(RsparseMatrix_validate, object))
 
 if(FALSE) { # --NOT YET-- (fails)
 ## Would be nice, in theory, for new("dgCMatrix", Dim = c(3L, 3L))
@@ -358,12 +358,12 @@ setClass("ddiMatrix", contains = c("diagonalMatrix", "dMatrix"))
 ## Triplet, general
 setClass("dgTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xTMatrix_validate, object))
+	 validity = function(object) .Call(xgTMatrix_validate, object))
 
 ## Triplet, triangular
 setClass("dtTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xtTMatrix_validate, object))
 
 ## NB: We should _not_ have ".tTMatrix" inherit from ".gTMatrix",
 ## because a ".tTMatrix" could be less than fully stored if diag = "U".
@@ -374,39 +374,39 @@ setClass("dtTMatrix",
 setClass("dsTMatrix",
 	 contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xsTMatrix_validate, object))
 
 ## CSC, general
 setClass("dgCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xCMatrix_validate, object))
+	 validity = function(object) .Call(xgCMatrix_validate, object))
 
 ## CSC, triangular
 setClass("dtCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tCMatrix_validate, object))
+	 validity = function(object) .Call(xtCMatrix_validate, object))
 
 ## CSC, symmetric
 setClass("dsCMatrix",
 	 contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tCMatrix_validate, object))
+	 validity = function(object) .Call(xsCMatrix_validate, object))
 
 ## CSR, general
 setClass("dgRMatrix",
 	 contains = c("RsparseMatrix", "dsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xRMatrix_validate, object))
+	 validity = function(object) .Call(xgRMatrix_validate, object))
 
 ## CSR, triangular
 setClass("dtRMatrix",
 	 contains = c("RsparseMatrix", "dsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xtRMatrix_validate, object))
 
 ## CSR, symmetric
 setClass("dsRMatrix",
 	 contains = c("RsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xsRMatrix_validate, object))
 
 if (FALSE) { ## TODO
 ## Indicator matrix of a factor ... needs more careful definition
@@ -426,50 +426,50 @@ setClass("ldiMatrix", contains = c("diagonalMatrix", "lMatrix"))
 ## Triplet, general
 setClass("lgTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xTMatrix_validate, object))
+	 validity = function(object) .Call(xgTMatrix_validate, object))
 
 ## Triplet, triangular
 setClass("ltTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xtTMatrix_validate, object))
 
 ## Triplet, symmetric
 setClass("lsTMatrix",
 	 contains = c("TsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xsTMatrix_validate, object))
 
 ## CSC, general
 setClass("lgCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xCMatrix_validate, object))
+	 validity = function(object) .Call(xgCMatrix_validate, object))
 
 ## CSC, triangular
 setClass("ltCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(xCMatrix_validate, object))
+	 validity = function(object) .Call(xtCMatrix_validate, object))
 
 ## CSC, symmetric
 setClass("lsCMatrix",
 	 contains = c("CsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(xCMatrix_validate, object))
+	 validity = function(object) .Call(xsCMatrix_validate, object))
 
 ## CSR, general
 setClass("lgRMatrix",
 	 contains = c("RsparseMatrix", "lsparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xRMatrix_validate, object))
+	 validity = function(object) .Call(xgRMatrix_validate, object))
 
 ## CSR, triangular
 setClass("ltRMatrix",
 	 contains = c("RsparseMatrix", "lsparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xtRMatrix_validate, object))
 
 ## CSR, symmetric
 setClass("lsRMatrix",
 	 contains = c("RsparseMatrix", "lsparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xsRMatrix_validate, object))
 
 
 ## ...... Sparse, nonzero pattern ......................................
@@ -482,11 +482,13 @@ setClass("ngTMatrix",
 
 ## Triplet, triangular
 setClass("ntTMatrix",
-	 contains = c("TsparseMatrix", "nsparseMatrix", "triangularMatrix"))
+	 contains = c("TsparseMatrix", "nsparseMatrix", "triangularMatrix"),
+         validity = function(object) .Call(tTMatrix_validate, object))
 
 ## Triplet, symmetric
 setClass("nsTMatrix",
-	 contains = c("TsparseMatrix", "nsparseMatrix", "symmetricMatrix"))
+	 contains = c("TsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
+         validity = function(object) .Call(sTMatrix_validate, object))
 
 ## CSC, general
 setClass("ngCMatrix",
@@ -494,11 +496,13 @@ setClass("ngCMatrix",
 
 ## CSC, triangular
 setClass("ntCMatrix",
-	 contains = c("CsparseMatrix", "nsparseMatrix", "triangularMatrix"))
+	 contains = c("CsparseMatrix", "nsparseMatrix", "triangularMatrix"),
+         validity = function(object) .Call(tCMatrix_validate, object))
 
 ## CSC, symmetric
 setClass("nsCMatrix",
-	 contains = c("CsparseMatrix", "nsparseMatrix", "symmetricMatrix"))
+	 contains = c("CsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
+         validity = function(object) .Call(sCMatrix_validate, object))
 
 ## CSR, general
 setClass("ngRMatrix",
@@ -506,11 +510,13 @@ setClass("ngRMatrix",
 
 ## CSR, triangular
 setClass("ntRMatrix",
-	 contains = c("RsparseMatrix", "nsparseMatrix", "triangularMatrix"))
+	 contains = c("RsparseMatrix", "nsparseMatrix", "triangularMatrix"),
+         validity = function(object) .Call(tRMatrix_validate, object))
 
 ## CSR, symmetric
 setClass("nsRMatrix",
-	 contains = c("RsparseMatrix", "nsparseMatrix", "symmetricMatrix"))
+	 contains = c("RsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
+         validity = function(object) .Call(sRMatrix_validate, object))
 
 
 if(FALSE) { # --NOT YET--
@@ -520,50 +526,50 @@ if(FALSE) { # --NOT YET--
 ## Triplet, general
 setClass("igTMatrix",
 	 contains = c("TsparseMatrix", "isparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xTMatrix_validate, object))
+	 validity = function(object) .Call(xgTMatrix_validate, object))
 
 ## Triplet, triangular
 setClass("itTMatrix",
 	 contains = c("TsparseMatrix", "isparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xtTMatrix_validate, object))
 
 ## Triplet, symmetric
 setClass("isTMatrix",
 	 contains = c("TsparseMatrix", "isparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tTMatrix_validate, object))
+	 validity = function(object) .Call(xsTMatrix_validate, object))
 
 ## CSC, general
 setClass("igCMatrix",
 	 contains = c("CsparseMatrix", "isparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xCMatrix_validate, object))
+	 validity = function(object) .Call(xgCMatrix_validate, object))
 
 ## CSC, triangular
 setClass("itCMatrix",
 	 contains = c("CsparseMatrix", "isparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tCMatrix_validate, object))
+	 validity = function(object) .Call(xtCMatrix_validate, object))
 
 ## CSC, symmetric
 setClass("isCMatrix",
 	 contains = c("CsparseMatrix", "isparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tCMatrix_validate, object))
+	 validity = function(object) .Call(xsCMatrix_validate, object))
 
 ## CSR, general
 setClass("igRMatrix",
 	 contains = c("RsparseMatrix", "isparseMatrix", "generalMatrix"),
-	 validity = function(object) .Call(xRMatrix_validate, object))
+	 validity = function(object) .Call(xgRMatrix_validate, object))
 
 ## CSR, triangular
 setClass("itRMatrix",
 	 contains = c("RsparseMatrix", "isparseMatrix", "triangularMatrix"),
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xtRMatrix_validate, object))
 
 ## CSR, symmetric
 setClass("isRMatrix",
 	 contains = c("RsparseMatrix", "isparseMatrix", "symmetricMatrix"),
          ## Likewise only storing one triangle
-	 validity = function(object) .Call(tRMatrix_validate, object))
+	 validity = function(object) .Call(xsRMatrix_validate, object))
 
 } # --NOT YET--
 
@@ -590,11 +596,13 @@ setClass("CholeskyFactorization", contains = "MatrixFactorization", "VIRTUAL")
 
 ## -- Those (exceptions) inheriting from "Matrix" : ---
 
-setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"))
+setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"),
+         validity = function(object) .Call(Cholesky_validate, object))
 
 #unUsed: setClass("LDL", contains = c("dtrMatrix", "CholeskyFactorization"))
 
-setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"))
+setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
+         validity = function(object) .Call(pCholesky_validate, object))
 
 ## These are currently only produced implicitly from *solve()
 setClass("BunchKaufman", contains = c("dtrMatrix", "MatrixFactorization"),
@@ -638,11 +646,12 @@ setClass("LU", contains = c("MatrixFactorization", "VIRTUAL"))
 
 setClass("denseLU", contains = "LU",
 	 slots = c(x = "numeric", perm = "integer", Dimnames = "list"),
-	 validity = function(object) .Call(LU_validate, object))
+	 validity = function(object) .Call(denseLU_validate, object))
 
 setClass("sparseLU", contains = "LU",
 	 slots = c(L = "dtCMatrix", U = "dtCMatrix",
-		   p = "integer", q = "integer"))
+		   p = "integer", q = "integer"),
+         validity = function(object) .Call(sparseLU_validate, object))
 
 ##--- QR ---
 
@@ -677,18 +686,7 @@ setClassUnion("number", members = c("numeric", "complex"))
 setClass("Schur", contains = "MatrixFactorization",
 	 slots = c(T = "Matrix", # <- "block-triangular"; maybe triangular
                    Q = "Matrix", EValues = "number"),
-	 validity = function(object) {
-	     dim <- object@Dim
-	     if((n <- dim[1]) != dim[2])
-		 "'Dim' slot is not (n,n)"
-	     else if(any(dim(object@T) != n))
-		 "'dim(T)' is incorrect"
-	     else if(any(dim(object@Q) != n))
-		 "'dim(Q)' is incorrect"
-	     else if(length(object@EValues) != n)
-		 "'EValues' is not of correct length"
-	     else TRUE
-	 })
+	 validity = function(object) .Call(Schur_validate, object))
 
 
 ### Class Union :  no inheritance, but is(*, <class>) :

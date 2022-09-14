@@ -222,37 +222,6 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
-SEXP Dim_validate(SEXP dim, const char* domain);
-SEXP R_Dim_validate(SEXP dim);
-
-#ifdef Matrix_SupportingCachedMethods
-SEXP R_Dim_validate_old(SEXP obj, SEXP domain);
-#endif
-
-SEXP DimNames_validate(SEXP dimnames, int pdim[]);
-SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
-    
-#ifdef Matrix_SupportingCachedMethods
-SEXP R_DimNames_validate_old(SEXP obj);
-#endif
-
-SEXP string_scalar_validate(SEXP s, char *valid, char *nm);
-
-SEXP Matrix_validate(SEXP obj);
-SEXP compMatrix_validate(SEXP obj);
-SEXP symmetricMatrix_validate(SEXP obj);
-SEXP triangularMatrix_validate(SEXP obj);
-SEXP diagonalMatrix_validate(SEXP obj);
-SEXP unpackedMatrix_validate(SEXP obj);
-SEXP packedMatrix_validate(SEXP obj);
-SEXP dMatrix_validate(SEXP obj);
-SEXP lMatrix_validate(SEXP obj);
-SEXP ndenseMatrix_validate(SEXP obj);
-SEXP iMatrix_validate(SEXP obj);
-SEXP zMatrix_validate(SEXP obj);
-SEXP indMatrix_validate(SEXP obj);
-SEXP pMatrix_validate(SEXP obj);
-
 SEXP R_DimNames_fixup(SEXP dn);
 
 Rboolean DimNames_is_symmetric(SEXP dn);

@@ -26,6 +26,7 @@
 #include "packedMatrix.h"
 #include "unpackedMatrix.h"
 #include "sparse.h"
+#include "validity.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
@@ -35,8 +36,6 @@ Rcomplex Matrix_zzero, Matrix_zone;
 #define EXTDEF(name, n)   {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
-    CALLDEF(BunchKaufman_validate, 1),
-    CALLDEF(pBunchKaufman_validate, 1),
     CALLDEF(CHMfactor_to_sparse, 1),
     CALLDEF(CHMfactor_solve, 3),
     CALLDEF(CHMfactor_spsolve, 3),
@@ -45,7 +44,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_update, 3),
     CALLDEF(CHMfactor_updown,3),
     CALLDEF(destructive_CHM_update, 3),
-    CALLDEF(Cholesky_validate, 1),
     CALLDEF(Csparse_Csparse_prod, 3),
     CALLDEF(Csparse_Csparse_crossprod, 4),
     CALLDEF(Csparse_MatrixMarket, 2),
@@ -121,22 +119,17 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_transpose, 2),
 #endif
     
-    CALLDEF(Csparse_validate, 1),
     CALLDEF(Csparse_validate2, 2),
     CALLDEF(Csparse_vertcat, 2),
     CALLDEF(Csparse_dmperm, 3),
-    CALLDEF(pCholesky_validate, 1),
-    CALLDEF(Rsparse_validate, 1),
     CALLDEF(diag_tC, 2),
     CALLDEF(LU_expand, 1),
-    CALLDEF(LU_validate, 1),
 
 /* MJ: no longer needed ... prefer R_dense_as_sparse() */
 #if 0
     CALLDEF(matrix_to_Csparse, 2),
 #endif
     
-    CALLDEF(MatrixFactorization_validate, 1),
     CALLDEF(Matrix_expand_pointers, 1),
     CALLDEF(R_rbind2_vector, 2),
     CALLDEF(R_all0, 1),
@@ -148,11 +141,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_to_CMatrix, 1),
 #endif
     
-#ifdef _Matrix_has_SVD_
-    CALLDEF(SVD_validate, 1),
-#endif
-    
-    CALLDEF(Tsparse_validate, 1),
     CALLDEF(Tsparse_diagU2N, 1),
 
 /* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
@@ -247,13 +235,10 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dpoMatrix_matrix_solve, 2),
     CALLDEF(dpoMatrix_rcond, 2),
     CALLDEF(dpoMatrix_solve, 1),
-    CALLDEF(dpoMatrix_validate, 1),
-    CALLDEF(corMatrix_validate, 1),
     CALLDEF(dppMatrix_chol, 1),
     CALLDEF(dppMatrix_matrix_solve, 2),
     CALLDEF(dppMatrix_rcond, 2),
     CALLDEF(dppMatrix_solve, 1),
-    CALLDEF(dppMatrix_validate, 1),
     CALLDEF(R_chkName_Cholesky, 4),
     CALLDEF(R_chm_factor_name, 3),
     CALLDEF(dsCMatrix_Cholesky, 5),
@@ -278,6 +263,7 @@ static R_CallMethodDef CallEntries[] = {
 #if 0    
     CALLDEF(dsyMatrix_as_dspMatrix, 1),
 #endif
+    
 /* MJ: no longer needed ... prefer R_dense_as_matrix() */
 #if 0
     CALLDEF(dsyMatrix_as_matrix, 2),
@@ -350,6 +336,7 @@ static R_CallMethodDef CallEntries[] = {
 #if 0
     CALLDEF(dtrMatrix_as_dtpMatrix, 1),
 #endif
+    
 /* MJ: no longer needed ... prefer R_dense_as_matrix() */
 #if 0
     CALLDEF(dtrMatrix_as_matrix, 2),
@@ -363,15 +350,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_solve, 1),
-    
-    /* for dgC* _and_ lgC* : */
-    CALLDEF(xCMatrix_validate, 1),
-    CALLDEF(xRMatrix_validate, 1),
-    CALLDEF(xTMatrix_validate, 1),
-    CALLDEF(tCMatrix_validate, 1),
-    CALLDEF(tRMatrix_validate, 1),
-    CALLDEF(tTMatrix_validate, 1),
-
+        
     CALLDEF(lapack_qr, 2),
 
 /* MJ: no longer needed ... prefer R_sparse_as_matrix() */
@@ -396,25 +375,72 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(lsq_dense_Chol, 2),
     CALLDEF(lsq_dense_QR, 2),
-    CALLDEF(sparseQR_validate, 1),
     CALLDEF(sparseQR_qty, 4),
     CALLDEF(sparseQR_coef, 2),
     CALLDEF(sparseQR_resid_fitted, 3),
 
     CALLDEF(Matrix_validate, 1),
+    CALLDEF(MatrixFactorization_validate, 1),
     CALLDEF(compMatrix_validate, 1),
-    CALLDEF(triangularMatrix_validate, 1),
-    CALLDEF(symmetricMatrix_validate, 1),
-    CALLDEF(diagonalMatrix_validate, 1),
-    CALLDEF(unpackedMatrix_validate, 1),
-    CALLDEF(packedMatrix_validate, 1),
     CALLDEF(dMatrix_validate, 1),
     CALLDEF(lMatrix_validate, 1),
     CALLDEF(ndenseMatrix_validate, 1),
     CALLDEF(iMatrix_validate, 1),
     CALLDEF(zMatrix_validate, 1),
+
+    CALLDEF(symmetricMatrix_validate, 1),
+    CALLDEF(triangularMatrix_validate, 1),
+    CALLDEF(diagonalMatrix_validate, 1),
     CALLDEF(indMatrix_validate, 1),
     CALLDEF(pMatrix_validate, 1),
+    CALLDEF(CsparseMatrix_validate, 1),
+    CALLDEF(RsparseMatrix_validate, 1),
+    CALLDEF(TsparseMatrix_validate, 1),
+
+    CALLDEF(sCMatrix_validate, 1),
+    CALLDEF(tCMatrix_validate, 1),
+    CALLDEF(sRMatrix_validate, 1),
+    CALLDEF(tRMatrix_validate, 1),
+    CALLDEF(sTMatrix_validate, 1),
+    CALLDEF(tTMatrix_validate, 1),
+    
+    CALLDEF(xgCMatrix_validate, 1),
+    CALLDEF(xsCMatrix_validate, 1),
+    CALLDEF(xtCMatrix_validate, 1),
+    CALLDEF(xgRMatrix_validate, 1),
+    CALLDEF(xsRMatrix_validate, 1),
+    CALLDEF(xtRMatrix_validate, 1),
+    CALLDEF(xgTMatrix_validate, 1),
+    CALLDEF(xsTMatrix_validate, 1),
+    CALLDEF(xtTMatrix_validate, 1),
+    
+    CALLDEF(unpackedMatrix_validate, 1),
+    CALLDEF(packedMatrix_validate, 1),
+    CALLDEF(dpoMatrix_validate, 1),
+    CALLDEF(dppMatrix_validate, 1),
+    CALLDEF(corMatrix_validate, 1),
+    CALLDEF(Cholesky_validate, 1),
+    CALLDEF(pCholesky_validate, 1),
+    CALLDEF(BunchKaufman_validate, 1),
+    CALLDEF(pBunchKaufman_validate, 1),
+    CALLDEF(Schur_validate, 1),
+    CALLDEF(denseLU_validate, 1),
+    CALLDEF(sparseLU_validate, 1),
+    CALLDEF(sparseQR_validate, 1),
+    CALLDEF(CHMfactor_validate, 1),
+    CALLDEF(CHMsimpl_validate, 1),
+    CALLDEF(CHMsuper_validate, 1),
+
+/* MJ: some reverse dependencies built with Matrix < 1.5-0 need these */
+#ifdef Matrix_SupportingCachedMethods
+    { "Csparse_validate", (DL_FUNC) &CsparseMatrix_validate, 1},
+    { "Rsparse_validate", (DL_FUNC) &RsparseMatrix_validate, 1},
+    { "Tsparse_validate", (DL_FUNC) &TsparseMatrix_validate, 1},
+    {"xCMatrix_validate", (DL_FUNC)     &xgCMatrix_validate, 1},
+    {"xRMatrix_validate", (DL_FUNC)     &xgRMatrix_validate, 1},
+    {"xTMatrix_validate", (DL_FUNC)     &xgTMatrix_validate, 1},
+    {      "LU_validate", (DL_FUNC)       &denseLU_validate, 1},
+#endif
 
     CALLDEF(R_Dim_validate, 1),
     CALLDEF(R_DimNames_validate, 2),
@@ -510,11 +536,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_sub1, 2),
     CALLDEF(packedMatrix_sub1_mat, 2),
     CALLDEF(packedMatrix_sub2, 4),
-
-/* still simple placeholders, but already used in ../R/AllClass.R : */
-    CALLDEF(CHMfactor_validate, 1),
-    CALLDEF(CHMsimpl_validate, 1),
-    CALLDEF(CHMsuper_validate, 1),
 
     CALLDEF(CHM_set_common_env, 1),
 

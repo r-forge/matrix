@@ -31,12 +31,16 @@ SEXP Csparse_sort(SEXP x);
 SEXP Csparse2nz(SEXP x, Rboolean tri);
 SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind);
 
-SEXP Csparse_validate (SEXP x);
 SEXP Csparse_validate2(SEXP x, SEXP maybe_modify);
 SEXP Csparse_validate_(SEXP x, Rboolean maybe_modify);
 SEXP Csparse_vertcat(SEXP x, SEXP y);
 SEXP Csparse_dmperm     (SEXP mat, SEXP seed, SEXP nAns);
+
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
+SEXP Csparse_validate (SEXP x);
 SEXP Rsparse_validate(SEXP x);
+#endif /* MJ */
 
 SEXP diag_tC_ptr(int n, int *x_p, double *x_x, Rboolean is_U, int *perm,
 		 SEXP resultKind);

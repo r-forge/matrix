@@ -37,11 +37,6 @@ Rboolean isValid_Csparse(SEXP x)
     return TRUE;
 }
 
-SEXP Csparse_validate(SEXP x) {
-    return Csparse_validate_(x, FALSE);
-}
-
-
 #define _t_Csparse_validate
 #include "t_Csparse_validate.c"
 
@@ -58,6 +53,14 @@ SEXP Csparse_sort (SEXP x) {
    int ok = Csparse_sort_2(x, TRUE); // modifying x directly
    if(!ok) warning(_("Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"));
    return x;
+}
+
+/* MJ: no longer needed ... replacement in ./validate.c */
+#if 0
+
+SEXP Csparse_validate(SEXP x)
+{
+    return Csparse_validate_(x, FALSE);
 }
 
 SEXP Rsparse_validate(SEXP x)
@@ -104,6 +107,8 @@ SEXP Rsparse_validate(SEXP x)
 
     return ScalarLogical(1);
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_dense() */
 #if 0

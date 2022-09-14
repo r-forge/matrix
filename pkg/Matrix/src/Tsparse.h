@@ -3,8 +3,12 @@
 
 #include "Mutils.h"
 
-SEXP Tsparse_validate(SEXP x);
 SEXP Tsparse_diagU2N(SEXP x);
+
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
+SEXP Tsparse_validate(SEXP x);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
 #if 0

@@ -1,7 +1,12 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include <Rinternals.h>
 #include "dgTMatrix.h"
 #include "Tsparse.h"
-/* #include "chm_common.h" */
+#endif /* MJ */
+
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
 
 SEXP xTMatrix_validate(SEXP x)
 {
@@ -12,6 +17,8 @@ SEXP xTMatrix_validate(SEXP x)
 	return mkString(_("lengths of slots i and x must match"));
     return ScalarLogical(1);
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_dense(), R_sparse_as_matrix() */
 #if 0

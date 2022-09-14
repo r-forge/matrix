@@ -12,7 +12,8 @@
 #include "Csparse.h"
 #endif /* MJ */
 
-/* FIXME -- we "forget" about dimnames almost everywhere : */
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
 
 /* for dgCMatrix  _and_ lgCMatrix and others  (but *not*  ngC...) : */
 SEXP xCMatrix_validate(SEXP x)
@@ -37,6 +38,8 @@ SEXP xRMatrix_validate(SEXP x)
 
     return ScalarLogical(1);
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer CRsparse_as_Tsparse */
 #if 0
@@ -185,7 +188,6 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 }
 
 #endif /* MJ */
-
 
 // called from package MatrixModels's R code
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
@@ -429,6 +431,8 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     }
     SET_SLOT(ans, Matrix_LSym,
 	     Matrix_cs_to_SEXP(N->L, "dtCMatrix", 0, do_dn ? dn : R_NilValue));
+    if (n < 2) /* is_sym() assumes upper, which is "wrong" in this case */
+	SET_SLOT(GET_SLOT(ans, Matrix_LSym), Matrix_uploSym, mkString("L"));
 
     if(keep_dimnms) {
 	if(do_dn) {
@@ -450,11 +454,9 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     SET_SLOT(ans, Matrix_USym,
 	     Matrix_cs_to_SEXP(N->U, "dtCMatrix", 0, do_dn ? dn : R_NilValue));
     if(do_dn) UNPROTECT(1); // dn
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, /* "p" */
-			      INTSXP, n)), p, n);
+    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, n)), p, n);
     if (order)
-	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_qSym,
-				  INTSXP, n)), S->q, n);
+	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_qSym, INTSXP, n)), S->q, n);
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);

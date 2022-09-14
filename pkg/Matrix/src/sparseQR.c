@@ -1,27 +1,5 @@
 #include "sparseQR.h"
 
-SEXP sparseQR_validate(SEXP x)
-{
-    CSP V = AS_CSP__(GET_SLOT(x, Matrix_VSym)),
-	R = AS_CSP__(GET_SLOT(x, Matrix_RSym));
-    SEXP beta = GET_SLOT(x, Matrix_betaSym),
-	p = GET_SLOT(x, Matrix_pSym),
-	q = GET_SLOT(x, Matrix_qSym);
-    R_CheckStack();
-
-    if (LENGTH(p) != V->m)
-	return mkString(_("length(p) must match nrow(V)"));
-    if (LENGTH(beta) != V->n)
-	return mkString(_("length(beta) must match ncol(V)"));
-    int	lq = LENGTH(q);
-    if (lq && lq != R->n)
-	return mkString(_("length(q) must be zero or ncol(R)"));
-    if (V->n != R->n)
-	return mkString("ncol(V) != ncol(R)");
-    /* FIXME: Check that the permutations are permutations */
-    return ScalarLogical(1);
-}
-
 /**
  * Apply Householder transformations and the row permutation P to y
  *

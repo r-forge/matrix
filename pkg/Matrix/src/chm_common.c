@@ -1288,21 +1288,3 @@ void chm_diagN2U(CHM_SP chx, int uploT, Rboolean do_realloc)
 	cholmod_reallocate_sparse(n_nnz, chx, &c);
     return;
 }
-
-/* Placeholders; TODO: use checks above (search "CHMfactor_validate"): */
-
-SEXP CHMfactor_validate(SEXP obj) /* placeholder */
-{
-    return ScalarLogical(1);
-}
-
-SEXP CHMsimpl_validate(SEXP obj) /* placeholder */
-{
-    return ScalarLogical(1);
-}
-
-SEXP CHMsuper_validate(SEXP obj) /* placeholder */
-{
-    return ScalarLogical(1);
-}
-

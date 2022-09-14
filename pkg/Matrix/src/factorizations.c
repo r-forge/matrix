@@ -1,9 +1,7 @@
 #include "factorizations.h"
 
-SEXP MatrixFactorization_validate(SEXP obj)
-{
-    return Dim_validate(GET_SLOT(obj, Matrix_DimSym), "MatrixFactorization");
-}
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
 
 SEXP LU_validate(SEXP obj)
 {
@@ -18,36 +16,7 @@ SEXP LU_validate(SEXP obj)
     return DimNames_validate(obj, pdim);
 }
 
-SEXP BunchKaufman_validate(SEXP obj)
-{
-    // TODO
-    return ScalarLogical(1);
-}
-
-SEXP pBunchKaufman_validate(SEXP obj)
-{
-    // TODO
-    return ScalarLogical(1);
-}
-
-SEXP Cholesky_validate(SEXP obj)
-{
-    // TODO
-    return ScalarLogical(1);
-}
-
-SEXP pCholesky_validate(SEXP obj)
-{
-    // TODO
-    return ScalarLogical(1);
-}
-
-#ifdef _Matrix_has_SVD_
-SEXP SVD_validate(SEXP obj)
-{
-    return ScalarLogical(1);
-}
-#endif
+#endif /* MJ */
 
 SEXP LU_expand(SEXP x)
 {

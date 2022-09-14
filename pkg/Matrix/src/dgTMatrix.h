@@ -1,9 +1,15 @@
 #ifndef MATRIX_TRIPLET_H
 #define MATRIX_TRIPLET_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Mutils.h"
+#endif /* MJ */
 
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
 SEXP xTMatrix_validate(SEXP x);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_dense(), R_sparse_as_matrix() */
 #if 0
