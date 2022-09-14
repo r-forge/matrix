@@ -611,21 +611,25 @@ R_init_Matrix(DllInfo *dll)
 //    R_cholmod_start(&cl); << TODO; needs more work in ./chm_common.c etc
 
     Matrix_DimNamesSym = install("Dimnames");
-    Matrix_DimSym = install("Dim");
-    Matrix_LSym = install("L");
-    Matrix_RSym = install("R");
-    Matrix_USym = install("U");
-    Matrix_VSym = install("V");
-    Matrix_betaSym = install("beta");
-    Matrix_diagSym = install("diag");
-    Matrix_factorSym = install("factors");
-    Matrix_iSym = install("i");
-    Matrix_jSym = install("j");
-    Matrix_lengthSym = install("length");
-    Matrix_pSym = install("p");
-    Matrix_permSym = install("perm");
-    Matrix_uploSym = install("uplo");
-    Matrix_xSym = install("x");
+    Matrix_DimSym      = install("Dim");
+    Matrix_LSym        = install("L");
+    Matrix_QSym        = install("Q");
+    Matrix_RSym        = install("R");
+    Matrix_TSym        = install("T");
+    Matrix_USym        = install("U");
+    Matrix_VSym        = install("V");
+    Matrix_betaSym     = install("beta");
+    Matrix_diagSym     = install("diag");
+    Matrix_factorSym   = install("factors");
+    Matrix_iSym        = install("i");
+    Matrix_jSym        = install("j");
+    Matrix_lengthSym   = install("length");
+    Matrix_pSym        = install("p");
+    Matrix_permSym     = install("perm");
+    Matrix_qSym        = install("q");
+    Matrix_sdSym       = install("sd");
+    Matrix_uploSym     = install("uplo");
+    Matrix_xSym        = install("x");
     
     Matrix_NS = R_FindNamespace(mkString("Matrix"));
     if(Matrix_NS == R_UnboundValue)
