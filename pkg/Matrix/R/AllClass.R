@@ -43,36 +43,35 @@ setClass("Matrix", contains = "VIRTUAL",
 	 prototype = prototype(Dim = integer(2L), Dimnames = list(NULL, NULL)),
 	 validity = function(object) .Call(Matrix_validate, object))
 
-if(FALSE) {
-## Allowing 'Dimnames' to define 'Dim' ... would require changes
-## to DimNames_validate() in ../src/Mutils.c and how it is used
-## in Matrix_validate()
+## Matrix_validate() allows Dimnames[[i]] to be a vector of type
+## other than "character" and, moreover, to be a vector of length
+## zero rather than NULL.  fixupDN() takes care of the coercions.
 setMethod("initialize", "Matrix",
           function(.Object, ...) {
               .Object <- callNextMethod()
-              if(length(nms <- ...names()) && any(nms == "Dimnames")) {
-                  ## Coerce non-character Dimnames[[i]] to character
-                  ## and set zero-length Dimnames[[i]] to NULL
+              ## Suboptimal if ...names() is NULL but that with "never"
+              ## happen if ...length() is nonzero:
+              if(...length() && any(...names() == "Dimnames"))
+                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
+              .Object
+          })
+
+if(FALSE) {
+## This method would allow 'Dimnames' to (possibly) define 'Dim'.
+## However, DimNames_validate() in ../src/validity.c and the way
+## it is used in Matrix_validate() would need to change.
+setMethod("initialize", "Matrix",
+          function(.Object, ...) {
+              .Object <- callNextMethod()
+              if(...length() && any((nms <- ...names()) == "Dimnames")) {
                   .Object@Dimnames <- DN <- fixupDN(.Object@Dimnames)
                   if(!(any(nms == "Dim") ||
-                       is.null(DN[[1L]]) || is.null(DN[[2L]]))) {
-                      ## Take 'Dim' from lengths of 'Dimnames'
+                       is.null(DN[[1L]]) || is.null(DN[[2L]])))
                       .Object@Dim <- lengths(DN, use.names = FALSE)
-                  }
               }
               .Object
           })
 }
-
-setMethod("initialize", "Matrix",
-          function(.Object, ...) {
-              .Object <- callNextMethod()
-              if(length(nms <- ...names()) && any(nms == "Dimnames"))
-                  ## Coerce non-character Dimnames[[i]] to character
-                  ## and set zero-length Dimnames[[i]] to NULL
-                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
-              .Object
-          })
 
 
 ## ------ Virtual by structure -----------------------------------------
@@ -219,25 +218,31 @@ setClass("diagonalMatrix", contains = c("sparseMatrix", "VIRTUAL"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
 if(FALSE) { # --NOT YET--
-## MJ: These would support, e.g., new("dg[CR]Matrix", Dim = c(3L, 3L)),
-##     but at the same time incur a performance penalty on all other
-##     new("..[CR]Matrix") calls.  Hence it might be worth trying to
-##     implement these in C.
+## These methods would allow initialization of zero matrices _without_ 'p',
+## as in the call new("dgCMatrix", Dim = c(6L, 6L)).  However, they would
+## also incur a small performance penalty on all other new("..[CR]Matrix")
+## calls.
 setMethod("initialize", "CsparseMatrix",
           function(.Object, ...) {
-              if(length(nms <- ...names()) &&
-                 (m1 <- (m <- match(c("Dim", "p"), nms, 0L))[1L]) > 0L &&
-                 m[2L] == 0L)
-                  callNextMethod(.Object, ..., p = integer(...elt(m1)[2L] + 1))
+              ## Suboptimal if ...names() is NULL or if 'Dim' is missing
+              ## but that will "never" happen if ...length() is nonzero:
+              if(...length() &&
+                 all((nms <- ...names()) != "p") &&
+                 length(w <- which(nms == "Dim")) &&
+                 !is.character(validDim(d <- ...elt(w[1L]))))
+                  callNextMethod(.Object, ..., p = integer(d[2L] + 1))
               else callNextMethod()
           })
 
 setMethod("initialize", "RsparseMatrix",
           function(.Object, ...) {
-              if(length(nms <- ...names()) &&
-                 (m1 <- (m <- match(c("Dim", "p"), nms, 0L))[1L]) > 0L &&
-                 m[2L] == 0L)
-                  callNextMethod(.Object, ..., p = integer(...elt(m1)[1L] + 1))
+              ## Suboptimal if ...names() is NULL or if 'Dim' is missing
+              ## but that will "never" happen if ...length() is nonzero:
+              if(...length() &&
+                 all((nms <- ...names()) != "p") &&
+                 length(w <- which(nms == "Dim")) &&
+                 !is.character(validDim(d <- ...elt(w[1L]))))
+                  callNextMethod(.Object, ..., p = integer(d[1L] + 1))
               else callNextMethod()
           })
 } # --NOT YET--
