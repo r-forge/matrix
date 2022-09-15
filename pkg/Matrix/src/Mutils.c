@@ -4,55 +4,6 @@
 
 /* More for 'Dimnames' ============================================== */
 
-/**
- * @brief Standardize user-supplied `[dD]imnames`.
- *
- * Replaces length-0 vectors with `NULL` and non-character vectors
- * with the result of coercing to character. Intended to emulate the
- * behaviour of `do_matrix()` from `src/main/array.c`.
- *
- * @param dn A list of length 2 passing `DimNames_validate()`.
- * 
- * @return A modified copy of `dn`, or `dn` if no modification is
- *    necessary.
- */
-SEXP R_DimNames_fixup(SEXP dn)
-{
-    SEXP s;
-    int i;
-    Rboolean do_fixup = FALSE;
-    for (i = 0; i < 2; ++i) {
-	s = VECTOR_ELT(dn, i);
-	if (!isNull(s) && (LENGTH(s) == 0 || !isString(s))) {
-	    do_fixup = TRUE;
-	    break;
-	}
-    }
-    if (do_fixup) {
-	PROTECT(dn = duplicate(dn));
-	for (i = 0; i < 2; ++i) {
-	    if (isNull(s = VECTOR_ELT(dn, i))) {
-		continue;
-	    }
-	    if (LENGTH(s) == 0) {
-		SET_VECTOR_ELT(dn, i, R_NilValue);
-	    } else if (!isString(s)) {
-		if (inherits(s, "factor")) {
-		    SET_VECTOR_ELT(dn, i, asCharacterFactor(s));
-		} else {
-		    PROTECT(s = coerceVector(s, STRSXP));
-		    SET_ATTRIB(s, R_NilValue);
-		    SET_OBJECT(s, 0);
-		    SET_VECTOR_ELT(dn, i, s);
-		    UNPROTECT(1);
-		}
-	    }
-	}
-	UNPROTECT(1);
-    }
-    return dn;
-}    
-
 Rboolean DimNames_is_symmetric(SEXP dn)
 {
     /* NB: Assuming here that we have the 'Dimnames' slot 
