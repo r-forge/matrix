@@ -4,9 +4,6 @@
 if(.Rv < "4.0.0") {
     deparse1 <- function (expr, collapse = " ", width.cutoff = 500L, ...)
         paste(deparse(expr, width.cutoff, ...), collapse = collapse)
-    ...length <- function()
-        ## not equivalent to base::...length, as list(...) evaluates
-        eval(quote(length(list(...))), sys.frame(-1L))
     tryInvokeRestart <- function(r, ...) {
         if(!isRestart(r))
             r <- findRestart(r)
@@ -14,6 +11,11 @@ if(.Rv < "4.0.0") {
             invisible(NULL)
         else .Internal(.invokeRestart(r, list(...)))
     }
+}
+if(.Rv < "4.1.3") {
+    ...names <- function()
+        ## not equivalent to base::...names, as list(...) evaluates
+        eval(quote(names(list(...))), sys.frame(-1L))
 }
 rm(.Rv)
 
