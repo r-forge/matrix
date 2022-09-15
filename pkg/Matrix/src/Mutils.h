@@ -222,8 +222,6 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
-SEXP R_DimNames_fixup(SEXP dn);
-
 Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_DimNames_is_symmetric(SEXP dn);
     

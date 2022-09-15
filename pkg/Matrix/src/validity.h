@@ -14,6 +14,8 @@ SEXP R_Dim_validate_old(SEXP obj, SEXP domain);
 SEXP R_DimNames_validate_old(SEXP obj);
 #endif
 
+SEXP R_DimNames_fixup(SEXP dn);
+
 SEXP Matrix_validate(SEXP obj);
 SEXP MatrixFactorization_validate(SEXP obj);
 

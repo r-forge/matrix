@@ -85,7 +85,7 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
     for (int j = 0; j < 2; ++j) {
 	/* Behave as do_matrix() from src/main/array.c:
 	   Dimnames[[j]] must be NULL or _coercible to_ character
-	   of length Dim[j] or 0 ... see R_Dimnames_fixup() in ./Mutils.c
+	   of length Dim[j] or 0 ... see R_Dimnames_fixup() below
 	*/
 	SEXP s = VECTOR_ELT(dimnames, j);
 	if (!isNull(s)) {
@@ -121,6 +121,55 @@ SEXP R_DimNames_validate_old(SEXP obj)
 }
 
 #endif
+
+/**
+ * @brief Sanitize user-supplied `[dD]imnames`.
+ *
+ * Replaces length-0 vectors with `NULL` and non-character vectors
+ * with the result of coercing to character. Intended to emulate the
+ * behaviour of `do_matrix()` from `src/main/array.c`.
+ *
+ * @param dn A list of length 2 passing `DimNames_validate()`.
+ * 
+ * @return A modified copy of `dn`, or `dn` if no modification is
+ *    necessary.
+ */
+SEXP R_DimNames_fixup(SEXP dn)
+{
+    SEXP s;
+    int i;
+    Rboolean do_fixup = FALSE;
+    for (i = 0; i < 2; ++i) {
+	s = VECTOR_ELT(dn, i);
+	if (!isNull(s) && (LENGTH(s) == 0 || !isString(s))) {
+	    do_fixup = TRUE;
+	    break;
+	}
+    }
+    if (do_fixup) {
+	PROTECT(dn = duplicate(dn));
+	for (i = 0; i < 2; ++i) {
+	    if (isNull(s = VECTOR_ELT(dn, i))) {
+		continue;
+	    }
+	    if (LENGTH(s) == 0) {
+		SET_VECTOR_ELT(dn, i, R_NilValue);
+	    } else if (!isString(s)) {
+		if (inherits(s, "factor")) {
+		    SET_VECTOR_ELT(dn, i, asCharacterFactor(s));
+		} else {
+		    PROTECT(s = coerceVector(s, STRSXP));
+		    SET_ATTRIB(s, R_NilValue);
+		    SET_OBJECT(s, 0);
+		    SET_VECTOR_ELT(dn, i, s);
+		    UNPROTECT(1);
+		}
+	    }
+	}
+	UNPROTECT(1);
+    }
+    return dn;
+}
 
 
 /* Class validity methods ==============================================
