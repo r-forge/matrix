@@ -83,9 +83,9 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	return mkString(buf);
     }
     for (int j = 0; j < 2; ++j) {
-	/* Behave as 'do_matrix()' from src/main/array.c:
+	/* Behave as do_matrix() from src/main/array.c:
 	   Dimnames[[j]] must be NULL or _coercible to_ character
-	   of length Dim[j] or 0 ... see 'R_Dimnames_fixup()' below
+	   of length Dim[j] or 0 ... see R_Dimnames_fixup() in ./Mutils.c
 	*/
 	SEXP s = VECTOR_ELT(dimnames, j);
 	if (!isNull(s)) {
