@@ -27,6 +27,7 @@ for(.kind in c("d", "l")) {
                   anyNA(x@x[k])
               })
 }
+rm(.kind)
 
 setMethod("anyNA", signature(x = "nsparseVector"),
           function(x) FALSE)
@@ -149,7 +150,8 @@ for(.kind in c("d", "l"))
                   get(paste0(".is.na.", .xx),
                       mode = "function", inherits = FALSE))
 rm(.is.na.ge, .is.na.tr, .is.na.tp,
-   .is.na.sy, .is.na.sp)
+   .is.na.sy, .is.na.sp,
+   .kind, .xx)
 
 setMethod("is.na", signature(x = "sparseVector"),
 	  function(x) new("nsparseVector", length = x@length,
@@ -272,7 +274,8 @@ for(.kind in c("d", "l"))
                   get(paste0(".is.finite.", .xx),
                       mode = "function", inherits = FALSE))
 rm(.is.finite.ge, .is.finite.tr, .is.finite.tp,
-   .is.finite.sy, .is.finite.sp, ..allTrueMatrix)
+   .is.finite.sy, .is.finite.sp, ..allTrueMatrix,
+   .kind, .xx)
 
 setMethod("is.finite", signature(x = "sparseVector"),
 	  function(x)  {
@@ -376,7 +379,8 @@ for(.xx in c("ge", "tr", "tp", "sy", "sp"))
               get(paste0(".is.infinite.", .xx),
                   mode = "function", inherits = FALSE))
 rm(.is.infinite.ge, .is.infinite.tr, .is.infinite.tp,
-   .is.infinite.sy, .is.infinite.sp)
+   .is.infinite.sy, .is.infinite.sp,
+   .xx)
 
 setMethod("is.infinite", signature(x = "sparseVector"),
 	  function(x) new("nsparseVector", length = x@length,
@@ -384,8 +388,6 @@ setMethod("is.infinite", signature(x = "sparseVector"),
 
 setMethod("is.infinite", signature(x = "nsparseVector"),
 	  function(x) new("nsparseVector", length = x@length))
-
-rm(.kind, .xx)
 
 
 ## METHODS FOR GENERIC: is.nan
@@ -478,7 +480,8 @@ for(.xx in c("ge", "tr", "tp", "sy", "sp"))
               get(paste0(".is.nan.", .xx),
                   mode = "function", inherits = FALSE))
 rm(.is.nan.ge, .is.nan.tr, .is.nan.tp,
-   .is.nan.sy, .is.nan.sp)
+   .is.nan.sy, .is.nan.sp,
+   .xx)
 
 setMethod("is.nan", signature(x = "sparseVector"),
 	  function(x) new("nsparseVector", length = x@length,
@@ -487,4 +490,3 @@ setMethod("is.nan", signature(x = "sparseVector"),
 setMethod("is.nan", signature(x = "nsparseVector"),
 	  function(x) new("nsparseVector", length = x@length))
 
-rm(.kind, .xx)
