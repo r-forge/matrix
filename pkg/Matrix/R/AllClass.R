@@ -218,19 +218,27 @@ setClass("diagonalMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 prototype = prototype(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
-if(FALSE) { # --NOT YET-- (fails)
-## Would be nice, in theory, for new("dgCMatrix", Dim = c(3L, 3L))
+if(FALSE) { # --NOT YET--
+## MJ: These would support, e.g., new("dg[CR]Matrix", Dim = c(3L, 3L)),
+##     but at the same time incur a performance penalty on all other
+##     new("..[CR]Matrix") calls.  Hence it might be worth trying to
+##     implement these in C.
 setMethod("initialize", "CsparseMatrix",
           function(.Object, ...) {
-              .Object <- callNextMethod()
-              .Object@p <- integer(.Object@Dim[2L] + 1L)
-              .Object
+              if(length(nms <- ...names()) &&
+                 (m1 <- (m <- match(c("Dim", "p"), nms, 0L))[1L]) > 0L &&
+                 m[2L] == 0L)
+                  callNextMethod(.Object, ..., p = integer(...elt(m1)[2L] + 1))
+              else callNextMethod()
           })
+
 setMethod("initialize", "RsparseMatrix",
           function(.Object, ...) {
-              .Object <- callNextMethod()
-              .Object@p <- integer(.Object@Dim[1L] + 1L)
-              .Object
+              if(length(nms <- ...names()) &&
+                 (m1 <- (m <- match(c("Dim", "p"), nms, 0L))[1L]) > 0L &&
+                 m[2L] == 0L)
+                  callNextMethod(.Object, ..., p = integer(...elt(m1)[1L] + 1))
+              else callNextMethod()
           })
 } # --NOT YET--
 
