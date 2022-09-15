@@ -736,14 +736,16 @@ SEXP dppMatrix_validate(SEXP obj)
 
 SEXP corMatrix_validate(SEXP obj)
 {
-    int i, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     SEXP sd = GET_SLOT(obj, Matrix_sdSym);
+    if (TYPEOF(sd) != REALSXP)
+	return mkString(_("'sd' slot is not of type \"double\""));
+    int i, n = INTEGER(GET_SLOT(obj, Matrix_DimSym))[0];
     if (XLENGTH(sd) != n)
 	return mkString(_("'sd' slot does not have length n=Dim[1]"));
     double *psd = REAL(sd);
     for (i = 0; i < n; ++i) {
 	if (!R_FINITE(psd[i]))
-	    return mkString(_("'sd' slot has nonfinite elements"));
+	    return mkString(_("'sd' slot has non-finite elements"));
 	if (psd[i] < 0)
 	    return mkString(_("'sd' slot has negative elements"));
     }

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-14 r3656)}{
+\section{Changes in version 1.5-2 (2022-09-14 r3657)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -24,6 +24,10 @@
       \item The validity and initialization methods for virtual class
       \code{sparseVector} are more diligent, i.e., catching more edge
       cases such as \code{NA} in the \code{length} or \code{i} slot.
+
+      \item The validity method for \code{corMatrix} now throws a better
+      error when the \code{sd} slot is of type \code{"integer"} rather
+      than \code{"double"}.
     }
   }
   \subsection{New Features}{
