@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-15 r3660)}{
+\section{Changes in version 1.5-2 (2022-09-19 r3664)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -50,6 +50,11 @@
       is that users may see new error messages in \emph{invalid}
       cases, as the \code{p} and \code{i} (or \code{j}) slots are
       checked \dQuote{in parallel}.
+
+      \item Diagonal(n=, x=) now recycles \code{x} of any positive
+      length to length \code{n}, with a warning if \code{n} is not
+      an integer multiple of \code{length(x)}.  Previously,
+      recycling was supported only for \code{x} of length 1.
     }
   }
 }

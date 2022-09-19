@@ -49,7 +49,7 @@ setClass("Matrix", contains = "VIRTUAL",
 setMethod("initialize", "Matrix",
           function(.Object, ...) {
               .Object <- callNextMethod()
-              ## Suboptimal if ...names() is NULL but that with "never"
+              ## Suboptimal if ...names() is NULL but that will "never"
               ## happen if ...length() is nonzero:
               if(...length() && any(...names() == "Dimnames"))
                   .Object@Dimnames <- fixupDN(.Object@Dimnames)

@@ -314,37 +314,54 @@ setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
 
 ## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Purpose: Constructor of diagonal matrices -- ~= diag() ,
-##          but *not* diag() extractor!
-Diagonal <- function(n, x = NULL)
-{
-    ## Allow  Diagonal(4), Diagonal(x=1:5), and  Diagonal(4, TRUE)
-    n <- if(missing(n)) length(x) else {
-	stopifnot(length(n) == 1, n == as.integer(n), n >= 0)
-	as.integer(n)
+## diagonalMatrix constructor, allowing either or both of 'n' and 'x' to be
+## missing ... like base::diag() but _not_ also extracting diagonal entries
+Diagonal <- function(n, x = NULL) {
+    nx <- length(x)
+    n <-
+        if(missing(n))
+            nx
+        else if(!is.numeric(n))
+            stop("'n' must be numeric")
+        else if(length(n) != 1L)
+            stop("'n' must have length 1")
+        else if(is.na(n) || n < 0L)
+            stop("'n' must be non-negative")
+        else if(is.double(n) && n >= .Machine$integer.max + 1)
+            stop("dimensions cannot exceed 2^31-1")
+        else as.integer(n) # stripping attributes
+    if(missing(x)) {
+        r <- new("ddiMatrix")
+        r@diag <- "U"
+    } else if(is.object(x)) {
+        stop(gettextf("'x' has invalid class \"%s\"", class(x)[1L]),
+             domain = NA)
+    } else {
+        r <- new(switch(typeof(x),
+                        logical = "ldiMatrix",
+                        integer = { x <- as.double(x); "ddiMatrix" },
+                        double = "ddiMatrix",
+                        complex = "zdiMatrix",
+                        stop(gettextf("'x' has invalid type \"%s\"", typeof(x)),
+                             domain = NA)))
+        if(nx != 1L)
+            r@x <-
+                if(nx == n)
+                    x # _not_ stripping attributes ... FIXME? as.vector(x)
+                else if(nx == 0L)
+                    stop(gettextf("cannot recycle 'x' of length 0 to length 'n' (%d)", n),
+                         domain = NA)
+                else {
+                    if(n %% nx != 0L)
+                        warning("'n' is not an integer multiple of length(x)")
+                    rep_len(x, n)
+                }
+        else if(is.na(x) || x != 1)
+            r@x <- rep.int(x, n)
+        else r@diag <- "U"
     }
-
-    if(missing(x)) ## unit diagonal matrix
-	new("ddiMatrix", Dim = c(n,n), diag = "U")
-    else {
-	lx <- length(x)
-	lx.1 <- lx == 1L
-	stopifnot(lx.1 || lx == n) # but keep 'x' short for now
-	if(is.logical(x))
-	    cl <- "ldiMatrix"
-	else if(is.numeric(x)) {
-	    cl <- "ddiMatrix"
-	    x <- as.numeric(x)
-	}
-	else if(is.complex(x)) {
-	    cl <- "zdiMatrix"  # will not yet work
-	} else stop("'x' has invalid data type")
-	if(lx.1 && !is.na(x) && x == 1) # cheap check for uni-diagonal..
-	    new(cl, Dim = c(n,n), diag = "U")
-	else
-	    new(cl, Dim = c(n,n), diag = "N",
-		x = if(lx.1) rep.int(x,n) else x)
-    }
+    r@Dim <- c(n, n)
+    r
 }
 
 .sparseDiagonal <- function(n, x = 1, uplo = "U",
