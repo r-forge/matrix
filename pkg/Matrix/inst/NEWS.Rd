@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-19 r3664)}{
+\section{Changes in version 1.5-2 (2022-09-21 r3665)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -28,6 +28,10 @@
       \item The validity method for \code{corMatrix} now throws a better
       error when the \code{sd} slot is of type \code{"integer"} rather
       than \code{"double"}.
+
+      \item \code{.sparseDiagonal()} now agrees with \code{Diagonal()}
+      when called with no arguments, returning a 0-by-0 (rather than
+      1-by-1) diagonal \code{Matrix}.
     }
   }
   \subsection{New Features}{
@@ -52,9 +56,8 @@
       checked \dQuote{in parallel}.
 
       \item Diagonal(n=, x=) now recycles \code{x} of any positive
-      length to length \code{n}, with a warning if \code{n} is not
-      an integer multiple of \code{length(x)}.  Previously,
-      recycling was supported only for \code{x} of length 1.
+      length to length \code{n}.  Previously, recycling was supported
+      only for \code{x} of length 1.
     }
   }
 }
