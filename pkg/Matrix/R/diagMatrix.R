@@ -445,20 +445,19 @@ Diagonal <- function(n, x = NULL) {
     r
 }
 
-## Pkg 'spdep' had (relatively slow) versions of this as_dsCMatrix_I()
-.symDiagonal <- function(n, x = NULL, uplo = "U", kind)
-    .sparseDiagonal(n, x, uplo, shape = "s", kind = kind)
-
-## NOTA BENE: .triDiagonal() would be misleading (<=> banded tri-diagonal matrix !)
-# instead of   diagU2N(as(Diagonal(n), "CsparseMatrix")), diag = "N" in any case:
+## NB: .triDiagonal() would be misleading; it suggests tridiagonal _banded_
 .trDiagonal <- function(n, x = NULL, uplo = "U", unitri = TRUE, kind)
     .sparseDiagonal(n, x, uplo, shape = "t", unitri = unitri, kind = kind)
 
-## This is modified from a post of Bert Gunter to R-help on  1 Sep 2005.
-## Bert's code built on a post by Andy Liaw who most probably was influenced
-## by earlier posts, notably one by Scott Chasalow on S-news, 16 Jan 2002
-## who posted his bdiag() function written in December 1995.
-if(FALSE)##--- no longer used:
+## Package 'spdep' had a (relatively slow) version of this: as_dsCMatrix_I()
+.symDiagonal <- function(n, x = NULL, uplo = "U", kind)
+    .sparseDiagonal(n, x, uplo, shape = "s", kind = kind)
+
+if(FALSE) {
+## This is modified from a post of Bert Gunter to R-help on 1 Sep 2005.
+## Bert's code built on a post by Andy Liaw who was probably influenced
+## by earlier posts, notably one by Scott Chasalow on S-news on 16 Jan
+## 2002, giving his own version written in Dec 1995.
 .bdiag <- function(lst) {
     ## block-diagonal matrix [a dgTMatrix] from list of matrices
     stopifnot(is.list(lst), length(lst) >= 1)
@@ -480,93 +479,84 @@ if(FALSE)##--- no longer used:
     }
     r
 }
-## expand(<mer>) needed something like bdiag() for lower-triangular
-## (Tsparse) Matrices; hence Doug Bates provided a much more efficient
-##  implementation for those; now extended and generalized:
+} else {
+## expand(<mer>) needed something like bdiag() for lower triangular
+## TsparseMatrix, hence Doug Bates provided a much more efficient
+## implementation for those, here extended and generalized:
 .bdiag <- function(lst) {
-    ## block-diagonal matrix [a dgTMatrix] from list of matrices
-    stopifnot(is.list(lst), (nl <- length(lst)) >= 1L)
+    if(!is.list(lst))
+        stop("'lst' must be a list")
+    if((n <- length(lst)) == 0L)
+        return(new("dgTMatrix"))
+    if(n == 1L)
+        return(.CR2T(asCspN(lst[[1L]])))
 
-### FIXME: next line is *slow* when lst = list of 75'000  dense 3x3 matrices
-    Tlst <- lapply(unname(lst), function(x) .CR2T(asCspN(x)))
-    if(nl == 1L)
-        return(Tlst[[1L]])
-    ## else
-    i_off <- c(0L, cumsum(vapply(Tlst, function(x) x@Dim[1L], 1L)))
-    j_off <- c(0L, cumsum(vapply(Tlst, function(x) x@Dim[2L], 1L)))
+### FIXME? this is _slow_ when 'lst' is list of 75000 3-by-3 dense matrices
+    lst <- unname(lapply(lst, function(x) .CR2T(asCspN(x))))
 
-    clss <- vapply(Tlst, class, "")
-    ## NB ("FIXME"): this requires the component classes to be *called*
-    ## -- "dgTMatrix" | "dnTMatrix" etc (and not just *extend* those)!
-    typ <- substr(clss, 2L, 2L)
-    knd <- substr(clss, 1L, 1L)
-    sym <- typ == "s" # symmetric ones
-    tri <- typ == "t" # triangular ones
-    use.n <- any(is.n <- knd == "n")
-    if(use.n && !(use.n <- all(is.n))) {
-	Tlst[is.n] <- lapply(Tlst[is.n], ..sparse2l)
-	knd [is.n] <- "l"
-    }
-    use.l <- !use.n && all(knd == "l")
-    if(all(sym)) { ## result should be *symmetric*
-	uplos <- vapply(Tlst, slot, "", "uplo") ## either "U" or "L"
-	tLU <- table(uplos)# of length 1 or 2 ..
-	if(length(tLU) == 1L) { ## all "U" or all "L"
-	    useU <- uplos[1L] == "U"
-	} else { ## length(tLU) == 2, counting "L" and "U"
-	    useU <- diff(tLU) >= 0L
-	    if(useU && (hasL <- tLU[1L] > 0L))
-		Tlst[hasL] <- lapply(Tlst[hasL], t)
-	    else if(!useU && (hasU <- tLU[2L] > 0L))
-		Tlst[hasU] <- lapply(Tlst[hasU], t)
-	}
-	if(use.n) { ## return nsparseMatrix :
-	    r <- new("nsTMatrix")
-	} else {
-	    r <- new(paste0(if(use.l) "l" else "d", "sTMatrix"))
-	    r@x <- unlist(lapply(Tlst, slot, "x"), FALSE, FALSE)
-	}
-	r@uplo <- if(useU) "U" else "L"
-    }
-    else if(all(tri) && { ULs <- vapply(Tlst, slot, "", "uplo")##  "U" or "L"
-			  all(ULs[1L] == ULs[-1L]) } ## all upper or all lower
-       ){ ## *triangular* result
+    ## NB: class(.CR2T(.)) is always "[dln][gts]TMatrix"
+    cl <- vapply(lst, class, "")
+    kind  <- substr(cl, 1L, 1L) # "d", "l", or "n"
+    shape <- substr(cl, 2L, 2L) # "g", "t", or "s"
 
-	if(use.n) { ## return nsparseMatrix :
-	    r <- new("ntTMatrix")
-	} else {
-	    r <- new(paste0(if(use.l) "l" else "d", "tTMatrix"))
-	    r@x <- unlist(lapply(Tlst, slot, "x"), FALSE, FALSE)
-	}
-	r@uplo <- ULs[1L]
+    if(!(any(kind == (kind. <- "d")) || any(kind == (kind. <- "l"))))
+        kind. <- "n"
+    else if(any(z <- kind == "n"))
+        lst[z] <- lapply(lst[z], .sparse2kind, kind.)
+
+    shape. <-
+        if(all(symmetric <- shape == "s"))
+            "s"
+        else if(all(shape == "t"))
+            "t"
+        else "g"
+
+    if(shape. != "g") {
+        uplo <- vapply(lst, slot, "", "uplo") # "U" or "L"
+        if(shape. == "s")
+            uplo. <-
+                if(all(z <- uplo == "U"))
+                    "U"
+                else if(!any(z))
+                    "L"
+                else {
+                    uplo.. <- if(2 * sum(z) >= n) { z <- !z; "U" } else "L"
+                    lst[z] <- lapply(lst[z],
+                                     function(x) .Call(R_sparse_transpose, x))
+                    uplo..
+                }
+        else if(any(uplo != (uplo. <- uplo[1L])))
+            shape. <- "g"
     }
-    else {
-	if(any(sym))
-	    Tlst[sym] <- lapply(Tlst[sym], .sparse2g)
-	if(use.n) { ## return nsparseMatrix :
-	    r <- new("ngTMatrix")
-	} else {
-	    r <- new(paste0(if(use.l) "l" else "d", "gTMatrix"))
-	    r@x <- unlist(lapply(Tlst, slot, "x"), FALSE, FALSE)
-	}
-    }
-    r@Dim <- c(i_off[nl+1], j_off[nl + 1])
-    r@i <- unlist(lapply(1:nl, function(k) Tlst[[k]]@i + i_off[k]),
+
+    i_off <- c(0L, cumsum(vapply(lst, function(x) x@Dim[1L], 0L)))
+    j_off <- c(0L, cumsum(vapply(lst, function(x) x@Dim[2L], 0L)))
+
+    r <- new(paste0(kind., shape., "TMatrix"))
+    r@Dim <- r@Dim <- c(i_off[n + 1L], j_off[n + 1L])
+    if(shape. == "g")
+        lst[symmetric] <- lapply(lst[symmetric], .sparse2g)
+    else r@uplo <- uplo.
+    r@i <- unlist(lapply(seq_len(n), function(k) i_off[k] + lst[[k]]@i),
                   FALSE, FALSE)
-    r@j <- unlist(lapply(1:nl, function(k) Tlst[[k]]@j + j_off[k]),
+    r@j <- unlist(lapply(seq_len(n), function(k) j_off[k] + lst[[k]]@j),
                   FALSE, FALSE)
+    if(kind. != "n")
+        r@x <- unlist(lapply(lst, slot, "x"), FALSE, FALSE)
     r
+}
 }
 
 bdiag <- function(...) {
-    if((nA <- nargs()) == 0L) return(new("dgCMatrix"))
-    if(nA == 1L && !is.list(...))
-	return(as(..., "CsparseMatrix"))
-    alis <- if(nA == 1L && is.list(..1)) ..1 else list(...)
-    if(length(alis) == 1L)
-	return(as(alis[[1L]], "CsparseMatrix"))
-    ## else : two or more arguments
-    .T2C(.bdiag(alis))
+    if((n <- ...length()) == 0L)
+        new("dgCMatrix")
+    else if(n > 1L)
+        .T2C(.bdiag(list(...)))
+    else if(!is.list(x <- ..1))
+        as(x, "CsparseMatrix")
+    else if(length(x) == 1L)
+        as(x[[1L]], "CsparseMatrix")
+    else .T2C(.bdiag(x))
 }
 
 
