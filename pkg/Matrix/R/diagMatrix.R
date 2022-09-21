@@ -318,108 +318,141 @@ setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
 ## missing ... like base::diag() but _not_ also extracting diagonal entries
 Diagonal <- function(n, x = NULL) {
     nx <- length(x)
-    n <-
-        if(missing(n))
-            nx
-        else if(!is.numeric(n))
-            stop("'n' must be numeric")
-        else if(length(n) != 1L)
-            stop("'n' must have length 1")
-        else if(is.na(n) || n < 0L)
-            stop("'n' must be non-negative")
-        else if(is.double(n) && n >= .Machine$integer.max + 1)
-            stop("dimensions cannot exceed 2^31-1")
-        else as.integer(n) # stripping attributes
-    if(missing(x)) {
+    if(missing(n))
+        n <- nx
+    else if(!is.numeric(n) || length(n) != 1L || is.na(n) || n < 0L)
+        stop("'n' must be a non-negative integer")
+    if(is.double(n) && n >= .Machine$integer.max + 1)
+        stop("dimensions cannot exceed 2^31-1")
+    n <- as.integer(n) # stripping attributes
+    if(is.null(x)) {
         r <- new("ddiMatrix")
+        r@Dim <- c(n, n)
         r@diag <- "U"
-    } else if(is.object(x)) {
-        stop(gettextf("'x' has invalid class \"%s\"", class(x)[1L]),
-             domain = NA)
-    } else {
-        r <- new(switch(typeof(x),
-                        logical = "ldiMatrix",
-                        integer = { x <- as.double(x); "ddiMatrix" },
-                        double = "ddiMatrix",
-                        complex = "zdiMatrix",
-                        stop(gettextf("'x' has invalid type \"%s\"", typeof(x)),
-                             domain = NA)))
-        if(nx != 1L)
-            r@x <-
-                if(nx == n)
-                    x # _not_ stripping attributes ... FIXME? as.vector(x)
-                else if(nx == 0L)
-                    stop(gettextf("cannot recycle 'x' of length 0 to length 'n' (%d)", n),
-                         domain = NA)
-                else {
-                    if(n %% nx != 0L)
-                        warning("'n' is not an integer multiple of length(x)")
-                    rep_len(x, n)
-                }
-        else if(is.na(x) || x != 1)
-            r@x <- rep.int(x, n)
-        else r@diag <- "U"
+        return(r)
     }
+    if(is.object(x) || is.array(x))
+        stop(gettextf("'x' has unsupported class \"%s\"", class(x)[1L]),
+             domain = NA)
+    r <- new(switch(typeof(x),
+                    logical = "ldiMatrix",
+                    integer = { x <- as.double(x); "ddiMatrix" },
+                    double = "ddiMatrix",
+                    stop(gettextf("'x' has unsupported type \"%s\"", typeof(x)),
+                         domain = NA)))
     r@Dim <- c(n, n)
+    if(nx != 1L)
+        r@x <-
+            if(nx == n)
+                x # _not_ stripping attributes ... FIXME? as.vector(x)
+            else if(nx > 0L)
+                rep_len(x, n)
+            else stop("attempt to recycle 'x' of length 0 to length 'n' (n > 0)")
+    else if(is.na(x) || x != 1)
+        r@x <- rep.int(x, n)
+    else r@diag <- "U"
     r
 }
 
-.sparseDiagonal <- function(n, x = 1, uplo = "U",
-			    shape = if(missing(cols)) "t" else "g",
-			    unitri, kind,
-			    cols = if(n) 0:(n - 1L) else integer(0))
-{
-    n <- if (missing(n)) length(x) else {
-	stopifnot(length(n) == 1, n == as.integer(n), n >= 0)
-	as.integer(n)
+.sparseDiagonal <- function(n, x = NULL, uplo = "U", shape = "t", unitri = TRUE,
+                            kind, cols) {
+    if(missing(n))
+        n <- length(x)
+    else if(!is.numeric(n) || length(n) != 1L || is.na(n) || n < 0L)
+        stop("'n' must be a non-negative integer")
+    if(is.double(n) && n >= .Machine$integer.max + 1)
+        stop("dimensions cannot exceed 2^31-1")
+    n <- nj <- as.integer(n) # stripping attributes
+
+    if(!(missing(shape) ||
+         (is.character(shape) && length(shape) == 1L && !is.na(shape) &&
+          any(shape == c("g", "t", "s")))))
+        stop("'shape' must be one of \"g\", \"t\", \"s\"")
+
+    if(!((m.kind <- missing(kind)) ||
+         (is.character(kind) && length(kind) == 1L && !is.na(kind) &&
+          any(kind == c("d", "l", "n")))))
+        stop("'kind' must be one of \"d\", \"l\", \"n\"")
+
+    if(m.kind || kind != "n") {
+        if(is.null(x))
+           x <- if(m.kind) { kind <- "d"; 1 } else switch(kind, d = 1, l = TRUE)
+        else if(is.object(x) || is.array(x))
+            stop(gettextf("'x' has unsupported class \"%s\"",
+                          class(x)[1L]),
+                 domain = NA)
+        else {
+            kind. <- switch(typeof(x),
+                            logical = "l",
+                            integer = { x <- as.double(x); "d" },
+                            double = "d",
+                            stop(gettextf("'x' has unsupported type \"%s\"",
+                                          typeof(x)),
+                                 domain = NA))
+            if(m.kind)
+                kind <- kind.
+            else if(kind != kind.) {
+                warning(gettextf("mismatch between typeof(x)=\"%s\" and kind=\"%s\"; using kind=\"%s\"",
+                                 typeof(x), kind, kind.),
+                        domain = NA)
+                kind <- kind.
+            }
+        }
     }
-    if(!(mcols <- missing(cols)))
-	stopifnot(0 <= (cols <- as.integer(cols)), cols < n)
-    m <- length(cols)
-    if(missing(kind))
-	kind <-
-	    if(is.double(x)) "d"
-	    else if(is.logical(x)) "l"
-	    else { ## for now
-		storage.mode(x) <- "double"
-		"d"
-	    }
-    else stopifnot(any(kind == c("d","l","n")))
-    stopifnot(is.character(shape), nchar(shape) == 1,
-	      any(shape == c("t","s","g"))) # triangular / symmetric / general
-    if((missing(unitri) || unitri) && shape == "t" &&
-       (mcols || cols == 0:(n-1L)) &&
-       ((any(kind == c("l", "n")) && allTrue(x)) ||
-	(    kind == "d"	  && allTrue(x == 1)))) { ## uni-triangular
-	new(paste0(kind,"tCMatrix"), Dim = c(n,n),
-		   uplo = uplo, diag = "U", p = rep.int(0L, n+1L))
+
+    if(!(m.cols <- missing(cols))) {
+        if(!is.numeric(cols))
+            stop("'cols' must be numeric")
+        else if((nj <- length(cols)) > 0L &&
+                (n == 0L || anyNA(rj <- range(cols)) ||
+                 rj[1L] < 0L || rj[2L] >= n))
+            stop("'cols' has elements not in seq(0, length.out = n)")
+        else {
+            cols <- as.integer(cols)
+            shape <- "g"
+        }
     }
-    else if(kind == "n") {
-	if(shape == "g")
-	    new("ngCMatrix", Dim = c(n,m), i = cols, p = 0:m)
-	else new(paste0("n", shape, "CMatrix"), Dim = c(n,m), uplo = uplo,
-		 i = cols, p = 0:m)
+
+    r <- new(paste0(kind, shape, "CMatrix"))
+    r@Dim <- c(n, nj)
+    if(shape != "g") {
+        if(!missing(uplo)) {
+            if(is.character(uplo) && length(uplo) == 1L && !is.na(uplo) &&
+               any(uplo == c("U", "L")))
+                r@uplo <- uplo
+            else stop("'uplo' must be \"U\" or \"L\"")
+        }
+        if(shape == "t" && unitri &&
+           (kind == "n" || (!anyNA(x) && all(if(kind == "l") x else x == 1)))) {
+            r@diag <- "U"
+            r@p <- integer(nj + 1)
+            return(r)
+        }
     }
-    else { ## kind != "n" -- have x slot :
-	if((lx <- length(x)) == 1) x <- rep.int(x, m)
-	else if(lx != m) stop("length(x) must be either 1 or #{cols}")
-	if(shape == "g")
-	    new(paste0(kind, "gCMatrix"), Dim = c(n,m),
-		x = x, i = cols, p = 0:m)
-	else new(paste0(kind, shape, "CMatrix"), Dim = c(n,m), uplo = uplo,
-		 x = x, i = cols, p = 0:m)
+    if(nj > 0L) {
+        r@p <- 0:nj
+        r@i <- if(m.cols) 0:(nj - 1L) else cols
+        if(kind != "n") {
+            x <-
+                if((nx <- length(x)) == n)
+                    x # _not_ stripping attributes ... FIXME? as.vector(x)
+                else if(nx > 0L)
+                    rep_len(x, n)
+                else stop("attempt to recycle 'x' of length 0 to length 'n' (n > 0)")
+            r@x <- if(m.cols) x else x[1L + cols]
+        }
     }
+    r
 }
 
 ## Pkg 'spdep' had (relatively slow) versions of this as_dsCMatrix_I()
-.symDiagonal <- function(n, x = rep.int(1,n), uplo = "U", kind)
+.symDiagonal <- function(n, x = NULL, uplo = "U", kind)
     .sparseDiagonal(n, x, uplo, shape = "s", kind = kind)
 
 ## NOTA BENE: .triDiagonal() would be misleading (<=> banded tri-diagonal matrix !)
 # instead of   diagU2N(as(Diagonal(n), "CsparseMatrix")), diag = "N" in any case:
-.trDiagonal <- function(n, x = 1, uplo = "U", unitri = TRUE, kind)
-    .sparseDiagonal(n, x, uplo, shape = "t", unitri=unitri, kind=kind)
-
+.trDiagonal <- function(n, x = NULL, uplo = "U", unitri = TRUE, kind)
+    .sparseDiagonal(n, x, uplo, shape = "t", unitri = unitri, kind = kind)
 
 ## This is modified from a post of Bert Gunter to R-help on  1 Sep 2005.
 ## Bert's code built on a post by Andy Liaw who most probably was influenced
