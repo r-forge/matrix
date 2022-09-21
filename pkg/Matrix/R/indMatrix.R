@@ -244,11 +244,12 @@ setMethod("isDiagonal", signature(object = "indMatrix"),
 
 setMethod("t", signature(x = "indMatrix"),
           function(x) {
-              j <- x@perm
-              new("ngTMatrix",
-                  Dim = x@Dim[2:1], Dimnames = x@Dimnames[2:1],
-                  i = j - 1L,
-                  j = if((m <- length(j)) > 0L) 0:(m-1L) else integer(0L))
+              r <- new("ngTMatrix")
+              r@Dim <- x@Dim[2:1]
+              r@Dimnames = x@Dimnames[2:1]
+              r@i <- (j <- x@perm) - 1L
+              r@j <- if((m <- length(j)) > 0L) 0:(m-1L) else integer(0L)
+              r
           })
 
 setMethod("diag", signature(x = "indMatrix"),
@@ -256,49 +257,37 @@ setMethod("diag", signature(x = "indMatrix"),
               if((m <- min(x@Dim)) == 0L)
                   return(logical(0L))
               i <- seq_len(m)
-              y <- x@perm[i] == i
+              r <- x@perm[i] == i
               if(names &&
                  !any(vapply(dn <- x@Dimnames, is.null, NA)) &&
                  identical(nms <- dn[[1L]][i], dn[[2L]][i]))
-                  names(y) <- nms
-              y
+                  names(r) <- nms
+              r
           })
 
 setMethod("diag<-", signature(x = "indMatrix"),
-          function(x, value) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, value) `diag<-`(as(x, "nsparseMatrix"), value))
 
 setMethod("band", signature(x = "indMatrix"),
-          function(x, k1, k2, ...) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, k1, k2, ...) band(as(x, "nsparseMatrix"), k1, k2))
 
 setMethod("triu", signature(x = "indMatrix"),
-          function(x, k, ...) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, k, ...) triu(as(x, "nsparseMatrix")))
 
 setMethod("tril", signature(x = "indMatrix"),
-          function(x, k, ...) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, k, ...) tril(as(x, "nsparseMatrix")))
 
 setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "missing"),
-          function(x, uplo) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, uplo) forceSymmetric(as(x, "nsparseMatrix")))
 
 setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "character"),
-          function(x, uplo) {
-              x <- as(x, "nsparseMatrix")
-              callGeneric()
-          })
+          function(x, uplo) forceSymmetric(as(x, "nsparseMatrix"), uplo))
+
+setMethod("symmpart", signature(x = "indMatrix"),
+	  function(x) symmpart(as(x, "dsparseMatrix")))
+
+setMethod("skewpart", signature(x = "indMatrix"),
+	  function(x) skewpart(as(x, "dsparseMatrix")))
 
 setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
 	  function(x, y) x %*% as(y, "lMatrix"))

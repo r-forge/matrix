@@ -134,12 +134,6 @@ setMethod("skewpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
 } ## MJ
 
-setMethod("symmpart", signature(x = "Matrix"),
-	  function(x) symmpart(as(x, "dMatrix")))
-
-setMethod("skewpart", signature(x = "Matrix"),
-	  function(x) skewpart(as(x, "dMatrix")))
-
 setMethod("dim", signature(x = "Matrix"), function(x) x@Dim)
 
 setMethod("length", "Matrix", function(x) prod(x@Dim))
