@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-21 r3666)}{
+\section{Changes in version 1.5-2 (2022-09-21 r3667)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -32,6 +32,11 @@
       \item \code{.sparseDiagonal()} now agrees with \code{Diagonal()}
       when called with no arguments, returning a 0-by-0 (rather than
       1-by-1) diagonal \code{Matrix}.
+
+      \item \code{diag(x) <- value} now coerces \code{diagonalMatrix}
+      \code{x} if \code{typeof(value)} is \dQuote{higher} than
+      \code{typeof(x@x)} in the usual hierarchy, for consistency with
+      methods for \code{denseMatrix} and with \code{base::`diag<-`}.
     }
   }
   \subsection{New Features}{

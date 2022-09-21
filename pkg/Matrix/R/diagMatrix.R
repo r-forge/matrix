@@ -562,17 +562,66 @@ bdiag <- function(...) {
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+ .diag.x <- function(m) if(m@diag != "N") rep.int(as1(m@x), m@Dim[1L]) else m@x
+..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1L])
+
+setMethod("diag", signature(x = "diagonalMatrix"),
+          function(x, nrow, ncol, names = TRUE) {
+              r <- .diag.x(x)
+              if(names &&
+                 is.list(dn <- dimnames(x)) &&
+                 !any(vapply(dn, is.null, NA)) &&
+                 {
+                     i <- seq_len(min(x@Dim))
+                     identical(nms <- dn[[1L]][i], dn[[2L]][i])
+                 })
+                  names(r) <- nms
+              r
+          })
+
+setMethod("diag<-", signature(x = "diagonalMatrix"),
+          function(x, value) {
+              n <- x@Dim[1L]
+              nv <- length(value)
+              if(nv != 1L && nv != n)
+                  stop("replacement diagonal has wrong length")
+              x@x <-
+                  if(is.logical(x@x))
+                      switch(typeof(value),
+                             logical = rep_len(value, n),
+                             integer =,
+                             double =
+                                 {
+                                     x <- ..diag2d(x)
+                                     rep_len(as.double(x), n)
+                                 },
+                             stop(gettextf("replacement diagonal has incompatible type \"%s\"", typeof(value)),
+                                  domain = NA))
+                  else
+                      switch(typeof(value),
+                             logical =,
+                             integer =,
+                             double = rep_len(as.double(value), n),
+                             stop(gettextf("replacement diagonal has incompatible type \"%s\"", typeof(value)),
+                                  domain = NA))
+              x@diag <- "N"
+              x
+          })
+
+setMethod("t", signature(x = "diagonalMatrix"),
+          function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
+
 setMethod("band", signature(x = "diagonalMatrix"),
           function(x, k1, k2, ...)
               if(k1 <= 0L && k2 >= 0L) x else .setZero(x))
 
-setMethod("tril", signature(x = "diagonalMatrix"),
-          function(x, k = 0, ...)
-              if(k >= 0L) x else .setZero(x))
-
 setMethod("triu", signature(x = "diagonalMatrix"),
           function(x, k = 0, ...)
               if(k <= 0L) x else .setZero(x))
+
+setMethod("tril", signature(x = "diagonalMatrix"),
+          function(x, k = 0, ...)
+              if(k >= 0L) x else .setZero(x))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
           function(x, uplo) .diag2sparse(x, ".sC", uplo = uplo))
@@ -580,25 +629,28 @@ setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
           function(x, uplo) .diag2sparse(x, ".sC", uplo = "U"))
 
-..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1])
-.diag.x  <- function(m) if(m@diag == "U") rep.int(as1(m@x), m@Dim[1]) else m@x
+setMethod("symmpart", signature(x = "diagonalMatrix"),
+          function(x) forceSymmetric(..diag2d(x)))
 
-.diag.2N <- function(m) {
-    if(m@diag == "U") m@diag <- "N"
-    m
-}
+setMethod("skewpart", signature(x = "diagonalMatrix"),
+          function(x) symmetrizeDimnames(.setZero(x, "d")))
 
-diag.x <- function(x, nrow, ncol, names=TRUE) {
-    y <- .diag.x(x)
-    if(names) {
-        nms <- dimnames(x)
-        if(is.list(nms) && !any(vapply(nms, is.null, NA)) &&
-           identical((nm <- nms[[1L]][im <- seq_len(min(dim(x)))]), nms[[2L]][im]))
-            names(y) <- nm
-    }
-    y
-}
-setMethod("diag", signature(x = "diagonalMatrix"), diag.x)
+setMethod("isSymmetric", signature(object = "diagonalMatrix"),
+          function(object, checkDN = TRUE, ...) {
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...) check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              TRUE
+          })
+
+setMethod("isTriangular", signature(object = "diagonalMatrix"),
+          function(object, upper = NA, ...)
+              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
+
+setMethod("isDiagonal", signature(object = "diagonalMatrix"),
+          function(object) TRUE)
 
 subDiag <- function(x, i, j, ..., drop) {
     x <- .diag2sparse(x, ".gC") ## was ->TsparseMatrix but C* is faster now
@@ -746,33 +798,6 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "missing"
 setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 replDiag)
-
-
-setMethod("t", signature(x = "diagonalMatrix"),
-          function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
-
-setMethod("isSymmetric", signature(object = "diagonalMatrix"),
-          function(object, checkDN = TRUE, ...) {
-              if(checkDN) {
-                  ca <- function(check.attributes = TRUE, ...) check.attributes
-                  if(ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
-              }
-              TRUE
-          })
-
-setMethod("isTriangular", signature(object = "diagonalMatrix"),
-          function(object, upper = NA, ...)
-              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
-
-setMethod("isDiagonal", signature(object = "diagonalMatrix"),
-          function(object) TRUE)
-
-setMethod("symmpart", signature(x = "diagonalMatrix"),
-          function(x) forceSymmetric(..diag2d(x)))
-
-setMethod("skewpart", signature(x = "diagonalMatrix"),
-          function(x) symmetrizeDimnames(.setZero(x, "d")))
 
 ## FIXME: Many of these products are not handling 'Dimnames' appropriately ...
 
@@ -1195,7 +1220,8 @@ diagOdiag <- function(e1,e2) {
                 r <- as.double(r)
             if(is.double(e2@x)) {
 		e2@x <- r
-                return(.diag.2N(e2))
+                e2@diag <- "N"
+                return(e2)
             }
 	    if(!is.double(e1@x))
 		## e.g. e1, e2 are logical;
@@ -1206,7 +1232,8 @@ diagOdiag <- function(e1,e2) {
 	else stop(gettextf("intermediate 'r' is of type %s",
 			   typeof(r)), domain=NA)
 	e1@x <- r
-	.diag.2N(e1)
+        e1@diag <- "N"
+	e1
     }
     else { ## result not diagonal, but at least symmetric:
         ## e.g., m == m
