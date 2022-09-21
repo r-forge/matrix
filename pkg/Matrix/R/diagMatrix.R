@@ -569,8 +569,7 @@ setMethod("diag", signature(x = "diagonalMatrix"),
           function(x, nrow, ncol, names = TRUE) {
               r <- .diag.x(x)
               if(names &&
-                 is.list(dn <- dimnames(x)) &&
-                 !any(vapply(dn, is.null, NA)) &&
+                 !any(vapply(dn <- x@Dimnames, is.null, NA)) &&
                  {
                      i <- seq_len(min(x@Dim))
                      identical(nms <- dn[[1L]][i], dn[[2L]][i])
