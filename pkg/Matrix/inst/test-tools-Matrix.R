@@ -597,7 +597,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
 	if(!isInd && !isRsp &&
-           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d))) {
+           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d)) &&
+           !(isDiag && m@diag == "U")) {
             stopifnot(Qidentical(m, m.d)) # e.g., @factors may differ
         }
     } else if(!.MJ.Qidentical(m, m.d, strictClass=FALSE,
