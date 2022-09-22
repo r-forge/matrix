@@ -12,6 +12,7 @@ importFrom("stats"
          , diffinv, model.frame, rnorm, runif
          , symnum, terms
          , toeplitz, update#, vcov
+         , setNames
            )
 
 ## try to import all we need, but not more
@@ -26,10 +27,13 @@ importFrom("methods"
          , as, is, extends, new
          , callGeneric, callNextMethod
          , .selectSuperClasses, .slotNames, canCoerce, packageSlot
-         , getClass, getClassDef, isClassDef, validObject
+         , getClass, getClassDef, getGroupMembers, isClassDef, implicitGeneric
          , setClass, setClassUnion, setMethod, setOldClass
          , setValidity, slot, "slot<-", slotNames, .hasSlot
-         , signature, representation, prototype)
+         , signature, representation, prototype
+         , setAs, setGeneric, setReplaceMethod
+	 , validObject
+           )
 
 
 
