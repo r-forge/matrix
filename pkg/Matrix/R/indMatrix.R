@@ -289,51 +289,165 @@ setMethod("symmpart", signature(x = "indMatrix"),
 setMethod("skewpart", signature(x = "indMatrix"),
 	  function(x) skewpart(as(x, "dsparseMatrix")))
 
-setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y) x %*% as(y, "lMatrix"))
-setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y) x %*% as(y, "lMatrix"))
-
 setMethod("%*%", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y) { mmultCheck(x,y); y[x@perm ,] })
-setMethod("%*%", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y) { mmultCheck(x,y); y[x@perm ,] })
-
-
-setMethod("crossprod", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y) as(t(x), "lMatrix") %*% y)
-setMethod("crossprod", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y) as(t(x), "lMatrix") %*% y)
-setMethod("crossprod", signature(x = "indMatrix", y = "indMatrix"),
 	  function(x, y) {
-	      mmultCheck(x,y, 2L)
-              ## xy <- interaction(x@perm, y@perm)
-              ## this is wrong if any of the columns in X or Y are empty because interaction()
-              ## drops non-occuring levels from a non-factor. Explicitly defining a factor with
-              ## levels 1:ncol(<indMatrix>) avoids that.
-              nx <- x@Dim[2L]
-              ny <- y@Dim[2L]
-	      ## xy <- interaction(factor(x@perm, levels=seq_len(nx)),
-	      ##   		   factor(y@perm, levels=seq_len(ny)))
-	      ## much faster (notably for large x,y):
-	      xy <- x@perm + nx*as.double(y@perm-1L)
-	      Matrix(tabulate(xy, nbins = nx*ny), nrow = nx, ncol = ny,
-		     dimnames = list(x@Dimnames[[2L]], y@Dimnames[[2L]]))
-	  })
+              mmultDim(x@Dim, dim(y), type = 1L)
+              r <- .m2ge(y[x@perm, , drop = FALSE], "d")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r
+          })
 
-setMethod("tcrossprod", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
-setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
-setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
-	  function(x, y) { mmultCheck(x,y, 3L); x[, y@perm] })
+setMethod("%*%", signature(x = "indMatrix", y = "Matrix"),
+	  function(x, y) {
+              mmultDim(x@Dim, y@Dim, type = 1L)
+              r <- as(y[x@perm, , drop = FALSE], "dMatrix")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r
+          })
+
+setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
+	  function(x, y) x %*% as(y, "dsparseMatrix"))
+
+setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
+	  function(x, y) x %*% as(y, "dsparseMatrix"))
+
+setMethod("%*%", signature(x = "indMatrix", y = "indMatrix"),
+	  function(x, y) {
+              mmultDim(x@Dim, y@Dim, type = 1L)
+              y@perm <- y@perm[x@perm]
+              y@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              y
+          })
+
+setMethod("%&%", signature(x = "indMatrix", y = "matrix"),
+	  function(x, y) {
+              mmultDim(x@Dim, dim(y), type = 1L)
+              r <- .m2ge(y[x@perm, , drop = FALSE], "n")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r
+          })
+
+setMethod("%&%", signature(x = "indMatrix", y = "Matrix"),
+	  function(x, y) {
+              mmultDim(x@Dim, y@Dim, type = 1L)
+              r <- as(y[x@perm, , drop = FALSE], "nMatrix")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r
+          })
+
+setMethod("%&%", signature(x = "matrix", y = "indMatrix"),
+	  function(x, y) x %*% as(y, "nsparseMatrix"))
+
+setMethod("%&%", signature(x = "Matrix", y = "indMatrix"),
+	  function(x, y) x %*% as(y, "nsparseMatrix"))
+
+setMethod("%&%", signature(x = "indMatrix", y = "indMatrix"),
+	  function(x, y) {
+              mmultDim(x@Dim, y@Dim, type = 1L)
+              y@perm <- y@perm[x@perm]
+              y@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              y
+          })
 
 setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y=NULL) Diagonal(x = tabulate(x@perm, nbins=x@Dim[2L])))
+	  function(x, y = NULL, boolArith = NA, ...) {
+              n <- x@Dim[2L]
+              tt <- tabulate(x@perm, nbins = n)
+              if(isTRUE(boolArith)) {
+                  r <- new("ldiMatrix")
+                  r@x <- as.logical(tt)
+              } else {
+                  r <- new("ddiMatrix")
+                  r@x <- as.double(tt)
+              }
+              r@Dim <- c(n, n)
+              r@Dimnames <- x@Dimnames[c(2L, 2L)]
+              r
+          })
+
+setMethod("crossprod", signature(x = "indMatrix", y = "matrix"),
+	  function(x, y = NULL, boolArith = NA, ...)
+              (if(isTRUE(boolArith)) `%&%` else `%*%`)(t(x), y))
+
+setMethod("crossprod", signature(x = "indMatrix", y = "Matrix"),
+	  function(x, y = NULL, boolArith = NA, ...)
+              (if(isTRUE(boolArith)) `%&%` else `%*%`)(t(x), y))
+
+setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              boolArith <- isTRUE(boolArith)
+              cl <- if(boolArith) "nsparseMatrix" else "dsparseMatrix"
+              crossprod(x, as(y, cl), boolArith = boolArith, ...)
+          })
+
+setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              boolArith <- isTRUE(boolArith)
+              cl <- if(boolArith) "nsparseMatrix" else "dsparseMatrix"
+              crossprod(x, as(y, cl), boolArith = boolArith, ...)
+          })
+
+setMethod("crossprod", signature(x = "indMatrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              r <- new(if(boolArith <- isTRUE(boolArith))
+                           "ngTMatrix"
+                       else "dgTMatrix")
+              r@Dim <- mmultDim(x@Dim, y@Dim, type = 2L)
+              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 2L)
+              r@i <- i <- x@perm - 1L
+              r@j <-      y@perm - 1L
+              if(!boolArith && (k <- length(i)) > 0L)
+                  r@x <- rep.int(1, k)
+              r
+	  })
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y=NULL) x[,x@perm])
+	  function(x, y = NULL, boolArith = TRUE, ...) {
+              r <- t(x)[x@perm, , drop = FALSE]
+              if(!isTRUE(boolArith))
+                  r <- as(r, "dsparseMatrix")
+              r@Dimnames <- x@Dimnames[c(1L, 1L)]
+              r
+          })
 
+setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              mmultDim(x@Dim, dim(y), type = 3L)
+              r <- .m2ge(t(y)[x@perm, , drop = FALSE],
+                         if(isTRUE(boolArith)) "n" else "d")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r
+          })
+
+setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              mmultDim(x@Dim, y@Dim, type = 3L)
+              r <- as(t(y)[x@perm, , drop = FALSE],
+                      if(isTRUE(boolArith)) "nMatrix" else "dMatrix")
+              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r
+          })
+
+setMethod("tcrossprod", signature(x = "matrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...)
+              (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
+
+setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...)
+              (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
+
+setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
+	  function(x, y = NULL, boolArith = NA, ...) {
+              r <- new(if(boolArith <- isTRUE(boolArith))
+                           "ngeMatrix"
+                       else "dgeMatrix")
+              r@Dim <- mmultDim(x@Dim, y@Dim, type = 3L)
+              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 2L)
+              x.perm <- x@perm
+              r@x <- (if(boolArith) identity else as.double)(
+                  x.perm == rep(y@perm, each = length(x.perm)))
+              r
+          })
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 	  function (X, Y, FUN = "*", make.dimnames = FALSE, ...) {

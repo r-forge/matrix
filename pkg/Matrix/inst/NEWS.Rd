@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-21 r3668)}{
+\section{Changes in version 1.5-2 (2022-09-25 r3670)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -60,9 +60,37 @@
       cases, as the \code{p} and \code{i} (or \code{j}) slots are
       checked \dQuote{in parallel}.
 
-      \item Diagonal(n=, x=) now recycles \code{x} of any positive
-      length to length \code{n}.  Previously, recycling was supported
-      only for \code{x} of length 1.
+      \item \code{Diagonal(n=, x=)} now recycles \code{x} of any
+      positive length to length \code{n}.  Previously, recycling was
+      supported only for \code{x} of length 1.
+
+      \item Products involving \code{diagonalMatrix} or \code{indMatrix}
+      have been broadly improved as follows:
+      \itemize{
+	\item \code{(A \%*\% B)@Dimnames} is now always
+	\code{c(dimnames(A)[1], dimnames(B)[2])}.
+	
+	\item \code{t?crossprod()} methods involving \code{indMatrix}
+	or its subclass \code{pMatrix} gain a \code{boolArith} argument.
+	
+	\item Numeric and boolean products are always returned as
+	\code{dMatrix} and \code{nMatrix}, respectively, except in
+	a few special cases where the product can be represented
+	as an \code{indMatrix}.  (Previously, coercions were skipped
+	when one of the operands was unit diagonal.)
+	
+	\item Products of \code{diagonalMatrix} with dense
+	\code{triangularMatrix} now correctly give a
+	\code{triangularMatrix} result (and without unpacking).
+
+	\item Products of \code{diagonalMatrix} with
+	\code{[RT]sparseMatrix} now preserve storage, no longer
+	coercing to \code{CsparseMatrix}.
+
+	\item \code{crossprod(x, y)} no longer requires the product of
+	\code{ncol(x)} and \code{ncol(y)} to be less than \code{2^31}
+	when both \code{x} and \code{y} are \code{indMatrix}.
+      }
     }
   }
 }
@@ -74,7 +102,7 @@
       \code{Tsparse_as_CRsparse()}
       (triggered by \code{.T2C(<0-by-0>)})
       and \code{pMatrix_validate()}
-      (triggered by as(<length-10000 integer>, "pMatrix")).
+      (triggered by \code{as(<length-10000 integer>, "pMatrix")}).
     }
   }
 }
