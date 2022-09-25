@@ -295,42 +295,41 @@ signPerm <- function(p)
     1L - (sum(clen %% 2 == 0) %% 2L)*2L
 }
 
-dimCheck <- function(a, b) {
-    da <- dim(a)
-    db <- dim(b)
+checkDim <- function(da, db) {
     if(any(da != db))
-	stop(gettextf("Matrices must have same dimensions in %s",
+	stop(gettextf("non-conformable matrix dimensions in %s",
 		      deparse(sys.call(sys.parent()))),
 	     call. = FALSE, domain = NA)
     da
 }
 
-mmultCheck <- function(a, b, kind = 1L) {
-    ## Check matching matrix dimensions and return that matching dim
-    ## 1)    %*%    : [n x m] , [m x k]
-    ## 2)  crossprod: [m x n] , [m x k]
-    ## 3) tcrossprod: [n x m] , [k x m]
-    ## switch(kind,
-    ##    { ## %*%  (kind = 1)
-    ##        ca <- dim(a)[2L]
-    ##        rb <- dim(b)[1L]
-    ##    },
-    ##    { ## crossprod   (kind = 2)
-    ##        ca <- dim(a)[1L]
-    ##        rb <- dim(b)[1L]
-    ##    },
-    ##    { ## tcrossprod  (kind = 3)
-    ##        ca <- dim(a)[2L]
-    ##        rb <- dim(b)[2L]
-    ##    })
-    ca <- dim(a)[1L + (kind %% 2L)]
-    rb <- dim(b)[1L + (kind  > 2)]
-    if(ca != rb)
+mmultDim <- function(d.a, d.b, type = 1L) {
+    ## Return the 'dim' of the product indicated by 'type':
+    ##     type 1:    a  %*%   b
+    ##          2:  t(a) %*%   b    {crossprod}
+    ##          3:    a  %*% t(b)  {tcrossprod}
+    ## after asserting that ncol(<left operand>) == nrow(<right operand>)
+    i.a <- 1L + (type != 2L)
+    i.b <- 1L + (type == 3L)
+    if(d.a[i.a] != d.b[i.b])
 	stop(gettextf("non-conformable matrix dimensions in %s",
 		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE, domain=NA)
-    ca
+	     call. = FALSE, domain = NA)
+    c(d.a[-i.a], d.b[-i.b])
 }
+
+mmultDimnames <- function(dn.a, dn.b, type = 1L) {
+    ## Return the 'dimnames' of the product indicated by 'type':
+    ##     type 1:    a  %*%   b
+    ##          2:  t(a) %*%   b    {crossprod}
+    ##          3:    a  %*% t(b)  {tcrossprod}
+    c(if(is.null(dn.a)) list(NULL) else dn.a[2L - (type != 2L)],
+      if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
+}
+
+## Still used in many places (for now):
+dimCheck <- function(a, b) checkDim(dim(a), dim(b))
+mmultCheck <- function(a, b, kind = 1L) mmultDim(dim(a), dim(b), type = kind)
 
 ##' Constructs "sensical" dimnames for something like  a + b ;
 ##' assume dimCheck() has happened before
@@ -590,15 +589,12 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 
 ..sparse2d <- function(from) # for setAs() but used widely:
     .Call(R_sparse_as_kind, from, "d", FALSE)
-##                                     drop0
 
 ..sparse2l <- function(from)
     .Call(R_sparse_as_kind, from, "l", FALSE)
-##                                     drop0
 
 ..sparse2n <- function(from)
     .Call(R_sparse_as_kind, from, "n", FALSE)
-##                                     drop0
 
 .diag2kind <- function(from, kind)
     .Call(R_diagonal_as_kind, from, kind)
@@ -1809,6 +1805,28 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "N")
 	.diagN2U(x, cl, checkDense = checkDense)
     else x
+}
+
+## MJ: experimental
+..diagU2N <- function(x, repr = .M.repr(x)) {
+    y <- .Call(R_sparse_as_general, x)
+    x@diag <- "N"
+    switch(repr,
+           C = { x@p <- y@p; x@i <- y@i; if(.hasSlot(x, "x")) x@x <- y@x; x },
+           R = { x@p <- y@p; x@j <- y@j; if(.hasSlot(x, "x")) x@x <- y@x; x },
+           T = { x@i <- y@i; x@j <- y@j; if(.hasSlot(x, "x")) x@x <- y@x; x },
+           stop("invalid 'repr'"))
+}
+
+## MJ: experimental
+..diagN2U <- function(x) {
+    if(x@Dim[1L])
+        x <- switch(x@uplo,
+                    U = .Call(R_sparse_band, x, 1L, NULL),
+                    L = .Call(R_sparse_band, x, NULL, -1L),
+                    stop("invalid 'uplo'"))
+    x@diag <- "U"
+    x
 }
 
 if(.Matrix.supporting.cached.methods) {

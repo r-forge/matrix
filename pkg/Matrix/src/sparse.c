@@ -352,25 +352,29 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(class_P(from), "R_sparse_as_kind");
-    const char *clf = valid[ivalid]; // clf := class~(from)
-    if (k == '.' || k == clf[0])
-	return from;
+    const char *clf = valid[ivalid]; /* clf := class(from) */
+    if (k == '.')
+	k = clf[0];
     SEXPTYPE tx = kind2type(k); /* validating 'k' before doing more */
 
-    int do_drop0 =
-#if 0 /* MJ: Matrix <= 1.4-1 forces for (only??) d.[CR]Matrix->lMatrix */
-	(clf[0] == 'd' && k != 'n' && clf[2] != 'T') ||
-#endif
-	(clf[0] != 'n' && asLogical(drop0) != 0);
-    if (do_drop0)
-	PROTECT(from = R_sparse_drop0(from));
-
-    int do_aggr = (clf[2] == 'T' &&
-		   (clf[0] == 'n' || clf[0] == 'l') && k != 'n' && k != 'l');
-    if (do_aggr)
-	PROTECT(from = Tsparse_aggregate(from));
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(from, &pid);
     
-    char clt[] = "...Matrix";
+    int do_drop0 = clf[0] != 'n' && asLogical(drop0) != 0;
+    if (do_drop0)
+	REPROTECT(from = R_sparse_drop0(from), pid);
+
+    int do_aggr = clf[2] == 'T' &&
+	(clf[0] == 'n' || clf[0] == 'l') && k != 'n' && k != 'l';
+    if (do_aggr)
+	REPROTECT(from = Tsparse_aggregate(from), pid);
+
+    if(k == clf[0]) {
+	UNPROTECT(1);
+	return from;
+    }
+    
+    char clt[] = "...Matrix"; /* clt := class(to) */
     clt[0] = k;
     clt[1] = clf[1];
     clt[2] = clf[2];
@@ -412,7 +416,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 	UNPROTECT(1);
     }
 
-    UNPROTECT((do_drop0 || do_aggr) ? 2 : 1);
+    UNPROTECT(2);
     return to;
 }
 

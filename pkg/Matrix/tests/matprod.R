@@ -9,25 +9,45 @@ options(warn=1, # show as they happen
 
 ##' Check matrix multiplications with (unit) Diagonal matrices
 chkDiagProd <- function(M) {
-    stopifnot(is.matrix(M) || is(M,"Matrix"))
+    if(is.matrix(M)) {
+        noRN <- function(x) {
+            if(!is.null(dn <- dimnames(x)))
+                dimnames(x) <- c(list(NULL), dn[2L])
+            x
+        }
+        noCN <- function(x) {
+            if(!is.null(dn <- dimnames(x)))
+                dimnames(x) <- c(dn[1L], list(NULL))
+            x
+        }
+    } else if(is(M, "Matrix")) {
+        noRN <- function(x) {
+            x@Dimnames <- c(list(NULL), x@Dimnames[2L])
+            x
+        }
+        noCN <- function(x) {
+            x@Dimnames <- c(x@Dimnames[1L], list(NULL))
+            x
+        }
+    } else stop("'M' must be a [mM]atrix")
     I.l  <- Diagonal(nrow(M)) # I_n -- "unit" Diagonal
     I.r  <- Diagonal(ncol(M)) # I_d
     D2.l <- Diagonal(nrow(M), x = 2) # D_n
     D2.r <- Diagonal(ncol(M), x = 2) # I_d
-    stopifnot(is.EQ.mat(M, M %*% I.r),
-	      is.EQ.mat(M, I.l %*% M),
-	      is.EQ.mat(2*M, M %*% D2.r),
-	      is.EQ.mat(M*2, D2.l %*% M),
+    stopifnot(is.EQ.mat(noCN(M), M %*% I.r),
+	      is.EQ.mat(noRN(M), I.l %*% M),
+	      is.EQ.mat(noCN(2*M), M %*% D2.r),
+	      is.EQ.mat(noRN(M*2), D2.l %*% M),
 	      ## crossprod
-	      is.EQ.mat(t(M), crossprod(M, I.l)),
-	      is.EQ.mat(  M , crossprod(I.l, M)),
-	      is.EQ.mat(t(2*M), crossprod(M, D2.l)),
-	      is.EQ.mat(  M*2 , crossprod(D2.l, M)),
+	      is.EQ.mat(noCN(t(M)), crossprod(M, I.l)),
+	      is.EQ.mat(noRN(M), crossprod(I.l, M)),
+	      is.EQ.mat(noCN(t(2*M)), crossprod(M, D2.l)),
+	      is.EQ.mat(noRN(M*2) , crossprod(D2.l, M)),
 	      ## tcrossprod
-	      is.EQ.mat(  M , tcrossprod(M, I.r)),
-	      is.EQ.mat(t(M), tcrossprod(I.r, M)),
-	      is.EQ.mat(  2*M , tcrossprod(M, D2.r)),
-	      is.EQ.mat(t(M*2), tcrossprod(D2.r, M)))
+	      is.EQ.mat(noCN(M), tcrossprod(M, I.r)),
+	      is.EQ.mat(noRN(t(M)), tcrossprod(I.r, M)),
+	      is.EQ.mat(noCN(2*M), tcrossprod(M, D2.r)),
+	      is.EQ.mat(noRN(t(M*2)), tcrossprod(D2.r, M)))
 }
 
 ### dimnames -- notably for matrix products ----------------
@@ -141,13 +161,10 @@ class(AM <- as(A, "triangularMatrix")) # dtr
 class(BM <- as(B, "Matrix"))           # ddi
 class(Bs <- as(as(B, "CsparseMatrix"), "symmetricMatrix")) # "dsC"
 (ABst <- tcrossprod(A, Bs)) # was wrong since at least Matrix 1.3-3 (R-4.0.5)
-stopifnot(exprs = {
-    all.equal(ABt, as.matrix(ABst))
-    identical(ABst, tcrossprod(AM, BM))
-    identical(ABst, tcrossprod(AM, Bs))
-    identical(ABst, tcrossprod(A,  Bs))
-})
-
+assert.EQ.mat(ABst, ABt)
+assert.EQ.mat(tcrossprod(AM, BM), ABt)
+assert.EQ.mat(tcrossprod(AM, Bs), ABt)
+assert.EQ.mat(tcrossprod(A , Bs), ABt)
 
 ## currently many warnings about sub-optimal matrix products :
 chkDnProd(m..)
@@ -262,8 +279,8 @@ assertError(5 %*% as.matrix(d))	 # -> error
 stopifnot(exprs = {
     dim(crossprod(t(m5))) == c(5,5)
     c(class(p1),class(p2),class(pd1),class(pd2), class(pd.),class(pd..)) == "dgeMatrix"
-    identical(dimnames(pd.),  dimnames(m5))
-    identical(dimnames(pd..), dimnames(m5))
+    identical(dimnames(pd.),  c(dimnames(m5)[1L], list(NULL)))
+    identical(dimnames(pd..), c(list(NULL), dimnames(m5)[2L]))
 })
 
 assert.EQ.mat(p1, cbind(c(20,30,33,38,54)))
@@ -473,35 +490,30 @@ D4 <- Diagonal(4, x=10:7); d4 <- as(D4, "matrix")
 D.D4 <- crossprod(D4); assert.EQ.mat(D.D4, crossprod(d4))
 stopifnotValid(D.D4, "ddiMatrix")
 stopifnotValid(su <- crossprod(cu), "dsCMatrix")
-stopifnot(
+asGe <- function(x) as(as(x, "unpackedMatrix"), "generalMatrix")
+stopifnot(exprs = {
     all(cu2 == cu2.)
-   ,# was wrong for ver. <= 0.999375-4
-          identical(D.D4, tcrossprod(D4))
-,
-          identical4(crossprod(d4, D4), crossprod(D4, d4), tcrossprod(d4, D4), D.D4)
-,
-	  is(cu2, "dtCMatrix"), is(cl2, "dtCMatrix"), # triangularity preserved
-	  cu2@diag == "U", cl2@diag == "U",# UNIT-triangularity preserved
-	  all.equal(D4 %*% cu, D4 %*% mcu)
-,
-	  all.equal(cu %*% D4, mcu %*% D4)
-,
-	  all(D4 %*% su == D4 %*% as.mat(su))
-,
-	  all(su %*% D4 == as.mat(su) %*% D4)
-,
-	  identical(t(cl2), cu2)
-  , # !!
-          identical ( crossprod(cu, D4),  crossprod(mcu, D4))
-,
-          identical4(tcrossprod(cu, D4), tcrossprod(mcu, D4), cu %*% D4, mcu %*% D4)
-,
-          identical4(tcrossprod(D4,cu), tcrossprod(D4,mcu), D4 %*% t(cu), D4 %*% t(mcu))
-,
-	  identical( crossprod(cu), Matrix( crossprod(mcu),sparse=TRUE))
-,
-	  identical(tcrossprod(cu), Matrix(tcrossprod(mcu),sparse=TRUE))
-    )
+    ## was wrong for ver. <= 0.999375-4
+    identical(D.D4, tcrossprod(D4))
+    identical4(crossprod(d4, D4), crossprod(D4, d4), tcrossprod(d4, D4), asGe(D.D4))
+    is(cu2, "dtCMatrix") # triangularity preserved
+    is(cl2, "dtCMatrix")
+    cu2@diag == "U" # unit triangularity preserved
+    cl2@diag == "U"
+    all.equal(D4 %*% mcu, asGe(D4 %*% cu))
+    all.equal(mcu %*% D4, asGe(cu %*% D4))
+    all(D4 %*% su == D4 %*% as.mat(su))
+    all(su %*% D4 == as.mat(su) %*% D4)
+    identical(t(cl2), cu2)
+    ## !!
+    identical(crossprod(mcu, D4), asGe(crossprod(cu, D4)))
+    identical4(asGe(tcrossprod(cu, D4)), tcrossprod(mcu, D4),
+               asGe(cu %*% D4), mcu %*% D4)
+    identical4(asGe(tcrossprod(D4, cu)), tcrossprod(D4,mcu),
+               asGe(D4 %*% t(cu)), D4 %*% t(mcu))
+    identical( crossprod(cu), Matrix( crossprod(mcu),sparse=TRUE))
+    identical(tcrossprod(cu), Matrix(tcrossprod(mcu),sparse=TRUE))
+})
 assert.EQ.mat( crossprod(cu, D4),  crossprod(mcu, d4))
 assert.EQ.mat(tcrossprod(cu, D4), tcrossprod(mcu, d4))
 tr8 <- kronecker(rbind(c(2,0),c(1,4)), cl2)
@@ -799,17 +811,16 @@ assertError(mm %*% P) # dimension mismatch
 assertError(m  %*% P) # ditto
 assertError(crossprod(t(mm), P)) # ditto
 stopifnotValid(tm1, "dsCMatrix")
-stopifnot(
-	  all.equal(tm1, tm2, tolerance =1e-15),
-	  identical(drop0(Im2 %*% tm2[1:3,]), Matrix(cbind(diag(3),0))),
-	  identical(p, as.matrix(P)),
-	  identical(P %*% m, as.matrix(P) %*% m),
-	  all(P %*% mm	==  P %*% m),
-	  all(P %*% mm	-   P %*% m == 0),
-	  all(t(mm) %*% P ==  t(m) %*% P),
-	  identical(crossprod(m, P),
-		    crossprod(mm, P)),
-	  TRUE)
+stopifnot(exprs = {
+    all.equal(tm1, tm2, tolerance = 1e-15)
+    identical(drop0(Im2 %*% tm2[1:3,]), Matrix(cbind(diag(3), 0)))
+    identical(p, as.matrix(P))
+    all(P %*% m == as.matrix(P) %*% m)
+    all(P %*% mm == P %*% m)
+    all(P %*% mm - P %*% m == 0)
+    all(t(mm) %*% P ==  t(m) %*% P)
+    all(crossprod(m, P) == crossprod(mm, P))
+})
 
 d <- function(m) as(m,"dsparseMatrix")
 IM1 <- as(c(3,1,2), "indMatrix")
@@ -817,8 +828,8 @@ IM2 <- as(c(1,2,1), "indMatrix")
 assert.EQ.Mat(crossprod(  IM1,   IM2),
               crossprod(d(IM1),d(IM2)), tol=0)# failed at first
 iM <- as(cbind2(IM2, 0), "indMatrix")
-stopifnot(identical3(crossprod(iM), # <- wrong for Matrix <= 1.1-5
-                     crossprod(iM, iM), Diagonal(x = 2:0)))
+assert.EQ.Mat(crossprod(iM),     Diagonal(x = 2:0))
+assert.EQ.Mat(crossprod(iM, iM), Diagonal(x = 2:0))
 
 N3 <- Diagonal(x=1:3)
 U3 <- Diagonal(3) # unit diagonal (@diag = "U")
@@ -901,8 +912,8 @@ stopifnot(identical(X %x% Y,
                     as(as.matrix(X) %x% as.matrix(Y), "indMatrix")))
 ## crossprod:
 (XtY <- crossprod(X, Y))# gave warning in Matrix 1.1-3
-XtY_ok <- as(crossprod(as.matrix(X), as.matrix(Y)), "CsparseMatrix")
-stopifnot(identical(XtY, XtY_ok)) # not true, previously
+XtY_ok <- as(crossprod(as.matrix(X), as.matrix(Y)), "TsparseMatrix")
+assert.EQ.Mat(XtY, XtY_ok) # not true, previously
 
 ###------- %&% -------- Boolean Arithmetic Matrix products
 
