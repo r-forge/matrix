@@ -80,13 +80,13 @@
 
 #elif defined (_CPLX_ans)
 
-static Rcomplex cmplx_zero() {
+static Rcomplex cmplx_zero(void) {
     Rcomplex z;
     z.r = z.i = 0.;
     return z;
 }
 #ifdef _using_NA_ans // <-- get rid of "non-used" warning message
-static Rcomplex cmplx_NA() {
+static Rcomplex cmplx_NA(void) {
     Rcomplex z;
     z.r = z.i = NA_REAL;
     return z;
