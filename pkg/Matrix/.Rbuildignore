@@ -43,9 +43,3 @@ tests/useRNG
 tests/.*\.Rout.*[24]b
 tests/.*_(doExtra|nX)$
 tests/performance
------------these_give__warning___ISO_C_forbids_an_empty_translation_unit__-Wpedantic__________
-src/TMatrix_as.c
-src/dgTMatrix.c
-src/dtTMatrix.c
-src/lgCMatrix.c
-src/ldense.c
