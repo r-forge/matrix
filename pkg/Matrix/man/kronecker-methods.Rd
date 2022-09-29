@@ -15,6 +15,7 @@
 \alias{kronecker,dgTMatrix,dtTMatrix-method}
 \alias{kronecker,diagonalMatrix,ANY-method}
 \alias{kronecker,diagonalMatrix,Matrix-method}
+\alias{kronecker,diagonalMatrix,diagonalMatrix-method}
 \alias{kronecker,dsparseMatrix,dsparseMatrix-method}
 \alias{kronecker,dtTMatrix,dgTMatrix-method}
 \alias{kronecker,dtTMatrix,dtTMatrix-method}
