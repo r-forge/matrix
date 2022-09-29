@@ -436,6 +436,21 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 }
 }
 
+## There are special sparse methods in  ./kronecker.R  ; this is a "fall back":
+setMethod("kronecker", signature(X = "Matrix", Y = "ANY",
+				 FUN = "ANY", make.dimnames = "ANY"),
+	  function(X, Y, FUN, make.dimnames, ...) {
+	      if(is(X, "sparseMatrix"))
+		  warning("using slow kronecker() method")
+	      X <- as(X, "matrix") ; Matrix(callGeneric()) })
+
+setMethod("kronecker", signature(X = "ANY", Y = "Matrix",
+				 FUN = "ANY", make.dimnames = "ANY"),
+	  function(X, Y, FUN, make.dimnames, ...) {
+	      if(is(Y, "sparseMatrix"))
+		  warning("using slow kronecker() method")
+	      Y <- as(Y, "matrix") ; Matrix(callGeneric()) })
+
 ## The ``Right Thing'' to do :
 ## base::det() calls [base::]determinant();
 ## our det() should call our determinant() :

@@ -364,15 +364,15 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     if (do_drop0)
 	REPROTECT(from = R_sparse_drop0(from), pid);
 
-    if(k == clf[0]) {
-	UNPROTECT(1);
-	return from;
-    }
-    
     int do_aggr = clf[2] == 'T' &&
 	(clf[0] == 'n' || clf[0] == 'l') && k != 'n' && k != 'l';
     if (do_aggr)
 	REPROTECT(from = Tsparse_aggregate(from), pid);
+
+    if(k == clf[0]) {
+	UNPROTECT(1);
+	return from;
+    }
     
     char clt[] = "...Matrix"; /* clt := class(to) */
     clt[0] = k;
@@ -581,7 +581,6 @@ SEXP R_sparse_as_general(SEXP from)
 	    for (j = 0; j < n; ++j)
 		pp1[j] += pp0[j];
 	} else {
-	    /* FIXME: not detecting integer overflow here */
 	    for (j = 0; j < n; ++j)
 		pp1[j] = pp0[j] + j + 1;
 	}
