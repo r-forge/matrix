@@ -254,10 +254,10 @@ stopifnot(isSymmetric(M), isSymmetric(M.),
 
 Filter(function(.) inherits(get(.), "symmetricMatrix"), ls())
 ## [1] "M"   "M."  "M2"  "cM"  "d4T" "d4d" "o4"  "sD"  "sc"
-tt <- as(kronecker(cM, Diagonal(x = c(10,1))), "symmetricMatrix")
-dimnames(tt) <- list(NULL, cn <- letters[1:ncol(tt)])
-stopifnotValid(tt, "dsTMatrix")
-(cc <- as(tt, "CsparseMatrix")) # shows *symmetric* dimnames
+cc <- kronecker(cM, Diagonal(x = c(10,1)))
+dimnames(cc) <- list(NULL, cn <- letters[1:ncol(cc)])
+stopifnotValid(cc, "dsCMatrix")
+(tt <- as(cc, "TsparseMatrix")) # shows *symmetric* dimnames
 stopifnot(identical3(  cc @Dimnames,   tt @Dimnames, list(NULL, cn)),
           ## t() does not reverse 'Dimnames' slot for symmetricMatrix
 	  identical3(t(cc)@Dimnames, t(tt)@Dimnames, list(NULL, cn)),
@@ -812,8 +812,7 @@ assert.EQ.mat(kr,
 ## sparse:
 (kt1 <- kronecker(t1, tu))
 kt2 <- kronecker(t1c, cu)
-stopifnot(identical(Matrix:::uniq(kt1), Matrix:::uniq(kt2)))
-## but kt1 and kt2, both "dgT" are different since entries are not ordered!
+stopifnot(identical(as(kt1, "CsparseMatrix"), kt2))
 ktf <- kronecker(.asmatrix(t1), .asmatrix(tu))
 if(FALSE) # FIXME? our kronecker treats "0 * NA" as "0" for structural-0
 assert.EQ.mat(kt2, ktf, tol= 0)

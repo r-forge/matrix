@@ -1,4 +1,7 @@
-#### Index Matrices -- Coercion and Methods (--> ../man/indMatrix-class.Rd )
+## METHODS FOR CLASS: indMatrix
+## row index matrices, i.e., matrices with standard unit row vectors
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -449,27 +452,6 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
               r
           })
 
-setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
-	  function (X, Y, FUN = "*", make.dimnames = FALSE, ...) {
-	      if (FUN != "*") stop("kronecker method must use default 'FUN'")
-	      if(any(as.double(X@Dim)*Y@Dim >= .Machine$integer.max))
-		  stop("resulting matrix dimension would be too large")
-	      ## Explicitly defining a factor with levels 1:ncol(.) avoids that
-	      ## interaction() drops non-occuring levels when any of the
-	      ## columns in X or Y are empty:
-	      ## perm <-  as.integer(interaction(factor(rep(X@perm, each =Y@Dim[1]),
-	      ##                                        levels=seq_len(X@Dim[2])),
-	      ##                                 factor(rep.int(Y@perm, times=X@Dim[1]),
-	      ##                                        levels=seq_len(Y@Dim[2])),
-	      ##                                 lex.order=TRUE))
-	      ## much faster (notably for large X, Y):
-	      fX <- rep    (X@perm-1L, each  = Y@Dim[1])
-	      fY <- rep.int(Y@perm-1L, times = X@Dim[1])
-	      new("indMatrix", perm = 1L + fY + Y@Dim[2] * fX,
-		  Dim = X@Dim*Y@Dim)
-	  })
-
-
 setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop)
@@ -483,7 +465,6 @@ setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
 		  Dim = c(n, x@Dim[2]), Dimnames = DN)
 	  }
       })
-
 
 .indMatrix.sub <- function(x, i, j, ..., value) {
     x <- as(x, "TsparseMatrix")
