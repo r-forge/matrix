@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-25 r3670)}{
+\section{Changes in version 1.5-2 (2022-09-30 r3677)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -91,6 +91,14 @@
 	\code{ncol(x)} and \code{ncol(y)} to be less than \code{2^31}
 	when both \code{x} and \code{y} are \code{indMatrix}.
       }
+
+      \item \code{kronecker(<Matrix>, <Matrix>)} now gives the correct
+      \dQuote{shape} (general, [unit] triangular, symmetric, diagonal)
+      in all cases.
+
+      \item \code{kronecker(<[CR]sparseMatrix>, <Matrix>)} now retains
+      the storage of the first argument, no longer coercing to
+      \code{TsparseMatrix}.
     }
   }
 }

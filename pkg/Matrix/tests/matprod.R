@@ -516,7 +516,7 @@ stopifnot(exprs = {
 })
 assert.EQ.mat( crossprod(cu, D4),  crossprod(mcu, d4))
 assert.EQ.mat(tcrossprod(cu, D4), tcrossprod(mcu, d4))
-tr8 <- kronecker(rbind(c(2,0),c(1,4)), cl2)
+tr8 <- kronecker(Matrix(rbind(c(2,0),c(1,4))), cl2)
 T8 <- tr8 %*% (tr8/2) # triangularity preserved?
 T8.2 <- (T8 %*% T8) / 4
 stopifnot(is(T8, "triangularMatrix"), T8@uplo == "L", is(T8.2, "dtCMatrix"))
