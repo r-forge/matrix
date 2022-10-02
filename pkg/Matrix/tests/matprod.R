@@ -1019,10 +1019,10 @@ lXY <- lapply(rpois(2L, 10),
                                           sample(letters, n, TRUE),
                                   simplify = FALSE)
                   x@Dimnames <- dn
-                  x4 <- list(as(x, "denseMatrix"),
-                             as(x, "dMatrix"),
-                             as(x, "lMatrix"),
-                             as(x, "nMatrix"))
+                  x4 <- list(as(as(x, "dMatrix"),   "denseMatrix"),
+                             as(as(x, "dMatrix"), "CsparseMatrix"),
+                             as(as(x, "lMatrix"), "RsparseMatrix"),
+                             as(as(x, "nMatrix"), "TsparseMatrix"))
 
                   mkList <- function(y)
                       list(x,
