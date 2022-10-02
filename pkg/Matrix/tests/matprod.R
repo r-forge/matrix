@@ -985,5 +985,62 @@ stopifnot(exprs = { ## may change, once (t)crossprod(R) returns dsC*
     all.equal(tR, tcrossprod(T,R))
 })
 
+## More for kronecker() ------------------------------------------------
+
+checkKronecker <- function(X, Y, ...) {
+    k1 <- as(k0 <- kronecker(X, Y, ...), "matrix")
+    k2 <- kronecker(as(X, "matrix"), as(Y, "matrix"), ...)
+    cldX <- getClassDef(class(X))
+    cldY <- getClassDef(class(Y))
+    if(extends(cldX, "indMatrix") &&
+       extends(cldY, "indMatrix")) {
+        stopifnot(is(k0, "indMatrix"))
+        storage.mode(k2) <- "logical"
+    }
+    if(extends(cldX, "triangularMatrix") &&
+       extends(cldY, "triangularMatrix") && X@uplo == Y@uplo)
+        stopifnot(is(k0, "triangularMatrix"),
+                  k0@uplo == X@uplo,
+                  k0@diag == (if(X@diag == "N" || Y@diag == "N") "N" else "U"))
+    else if(extends(cldX, "symmetricMatrix") &&
+            extends(cldY, "symmetricMatrix"))
+        stopifnot(is(k0, "symmetricMatrix"), k0@uplo == X@uplo)
+    ## could test for more special cases
+    if(!isTRUE(ae <- all.equal(k1, k2)))
+        stop(sprintf("checkKronecker(<%s>, <%s>):\n  %s",
+                     class(X), class(Y), paste0(ae, collapse = "\n  ")))
+}
+
+set.seed(145133)
+lXY <- lapply(rpois(2L, 10),
+              function(n) {
+                  x <- rsparsematrix(n, n, 0.6)
+                  dn <- replicate(2L, if(sample(c(FALSE, TRUE), 1L))
+                                          sample(letters, n, TRUE),
+                                  simplify = FALSE)
+                  x@Dimnames <- dn
+                  x4 <- list(as(x, "denseMatrix"),
+                             as(x, "dMatrix"),
+                             as(x, "lMatrix"),
+                             as(x, "nMatrix"))
+
+                  mkList <- function(y)
+                      list(x,
+                           triu(x),
+                           tril(x),
+                           { z <- triu(x,  1L); z@diag <- "U"; z },
+                           { z <- tril(x, -1L); z@diag <- "U"; z },
+                           forceSymmetric(x, "U"),
+                           forceSymmetric(x, "L"),
+                           { z <- Diagonal(x = diag(x)); z@Dimnames <- dn; z },
+                           as(sample.int(n, replace = TRUE), "indMatrix"),
+                           as(x, "matrix"))
+                  unlist(lapply(x4, mkList), FALSE, FALSE)
+              })
+lX <- lXY[[1L]]
+lY <- lXY[[2L]]
+for(i in seq_along(lX))
+    for(j in seq_along(lY))
+        checkKronecker(lX[[i]], lY[[j]], make.dimnames = TRUE)
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

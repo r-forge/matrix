@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-09-30 r3677)}{
+\section{Changes in version 1.5-2 (2022-10-02 r3678)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions supporting methods for
@@ -37,6 +37,9 @@
       \code{x} if \code{typeof(value)} is \dQuote{higher} than
       \code{typeof(x@x)} in the usual hierarchy, for consistency with
       methods for \code{denseMatrix} and with \code{base::`diag<-`}.
+
+      \item Methods for \code{kronecker()} no longer ignore the
+      \code{make.dimnames} argument.
     }
   }
   \subsection{New Features}{
@@ -94,11 +97,11 @@
 
       \item \code{kronecker(<Matrix>, <Matrix>)} now gives the correct
       \dQuote{shape} (general, [unit] triangular, symmetric, diagonal)
-      in all cases.
+      in all cases where it can be known without checking.
 
       \item \code{kronecker(<[CR]sparseMatrix>, <Matrix>)} now retains
       the storage of the first argument, no longer coercing to
-      \code{TsparseMatrix}.
+      \code{TsparseMatrix}. 
     }
   }
 }
