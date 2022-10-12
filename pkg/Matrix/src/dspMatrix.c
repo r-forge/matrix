@@ -67,17 +67,13 @@ SEXP dspMatrix_norm(SEXP obj, SEXP type)
     return ScalarReal(norm);
 }
 
-SEXP dspMatrix_rcond(SEXP obj, SEXP type)
+SEXP dspMatrix_rcond(SEXP obj)
 {
     SEXP trf = PROTECT(dspMatrix_trf(obj)),
 	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
 	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-    
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
     
     int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
     double *px = REAL(x), norm = get_norm_dsp(obj, "O"), rcond;
@@ -88,7 +84,7 @@ SEXP dspMatrix_rcond(SEXP obj, SEXP type)
 		     (int *) R_alloc(pdim[0], sizeof(int)),
 		     &info FCONE);
     
-    UNPROTECT(6);
+    UNPROTECT(5);
     return ScalarReal(rcond);
 }
 

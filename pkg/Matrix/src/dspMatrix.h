@@ -8,7 +8,7 @@ SEXP dspMatrix_trf(SEXP obj);
 
 double get_norm_dsp(SEXP obj, const char *typstr);
 SEXP dspMatrix_norm(SEXP obj, SEXP type);
-SEXP dspMatrix_rcond(SEXP obj, SEXP type);
+SEXP dspMatrix_rcond(SEXP obj);
 SEXP dspMatrix_solve(SEXP a);
 SEXP dspMatrix_matrix_solve(SEXP a, SEXP b);
 
