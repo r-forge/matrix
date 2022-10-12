@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-10-12 r3680)}{
+\section{Changes in version 1.5-2 (2022-10-12 r3681)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions now \code{PROTECT()} the result of
@@ -40,6 +40,9 @@
 
       \item Methods for \code{kronecker()} no longer ignore the
       \code{make.dimnames} argument.
+
+      \item Printing a \code{sparseMatrix} with \code{NA} row or column
+      names is no longer an error.
     }
   }
   \subsection{New Features}{

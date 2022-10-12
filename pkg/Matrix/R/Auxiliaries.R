@@ -737,24 +737,25 @@ isPacked <- function(x) {
 ##     e.g., .isPacked(new("dtpMatrix")) == FALSE ... FIXME ??
 .isPacked <- function(x) length(x@x) < prod(x@Dim)
 
-emptyColnames <- function(x, msg.if.not.empty = FALSE)
-{
+emptyColnames <- function(x, msg.if.not.empty = FALSE) {
     ## Useful for compact printing of (parts) of sparse matrices
     ## possibly	 dimnames(x) "==" NULL :
-    dn <- dimnames(x)
-    nc <- ncol(x)
-    if(msg.if.not.empty && is.list(dn) && length(dn) >= 2 &&
-       is.character(cn <- dn[[2]]) && any(cn != "")) {
-	lc <- length(cn)
-	message(if(lc > 3)
-		gettextf("   [[ suppressing %d column names %s ... ]]", nc,
-			 paste(sQuote(cn[1:3]), collapse = ", "))
-		else
-		gettextf("   [[ suppressing %d column names %s ]]", nc,
-			 paste(sQuote(cn[1:lc]), collapse = ", ")),
-		domain=NA)
-    }
-    dimnames(x) <- list(dn[[1]], character(nc))
+    if((nd <- length(d <- dim(x))) < 2L)
+        return(x)
+    nc <- d[2L]
+    if(is.null(dn <- dimnames(x)))
+        dn <- vector("list", nd)
+    else if(msg.if.not.empty &&
+            is.character(cn <- dn[[2L]]) &&
+            any(nzchar(cn)))
+        message(gettextf("  [[ suppressing %d column name%s %s ... ]]",
+                         nc,
+                         if(nc == 1L) "" else "s",
+                         paste0(sQuote(if(nc <= 3L) cn else cn[1:3]),
+                                collapse = ", ")),
+                domain = NA)
+    dn[[2L]] <- character(nc)
+    dimnames(x) <- dn
     x
 }
 
