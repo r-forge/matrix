@@ -132,7 +132,7 @@ m. <- mm; m.@p[1] <- 1L
 stopifnot(identical(1L, grep("first element of 'p' slot",
                              validObject(m., test = TRUE))))
 m.@p <- mm@p[c(1,3:2,4:6)]
-stopifnot(identical(1L, grep("not increasing within columns",
+stopifnot(identical(1L, grep("not nondecreasing",
                              validObject(m., test = TRUE))))
 ## 2) to non-strictly increasing i's:
 m. <- mm ; ix <- c(1:3,3,5:6)

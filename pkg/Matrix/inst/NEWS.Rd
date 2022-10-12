@@ -5,13 +5,13 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-10-02 r3678)}{
+\section{Changes in version 1.5-2 (2022-10-12 r3680)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item C-level functions supporting methods for
-      \code{isTriangular()} now \code{PROTECT()} the
-      \code{kind} attribute of the logical result before setting it,
-      resolving some \code{rchk} warnings issued since 1.5-0.
+      \item C-level functions now \code{PROTECT()} the result of
+      \code{R_do_slot()}, \code{getAttrib()}, \code{mkString()}, etc.
+      in many more (but not yet all) places, resolving many new
+      and some old \code{rchk} warnings.
       
       \item \code{lu(x)@L@uplo} is now \code{"L"}, not \code{"U"},
       for 0-by-0 and 1-by-1 \code{dgCMatrix} \code{x}.
@@ -55,13 +55,6 @@
       inheriting from \code{Matrix}, the dimensions of each factor,
       the orientation of each triangular (or trapezoidal) factor, and
       the validity of each permutation vector.
-
-      \item The validity methods for \code{[CR]sparseMatrix} now
-      loop over the columns (or rows) just once, rather than twice,
-      for speed primarily in the \emph{valid} case.  A consequence
-      is that users may see new error messages in \emph{invalid}
-      cases, as the \code{p} and \code{i} (or \code{j}) slots are
-      checked \dQuote{in parallel}.
 
       \item \code{Diagonal(n=, x=)} now recycles \code{x} of any
       positive length to length \code{n}.  Previously, recycling was

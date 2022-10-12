@@ -1,89 +1,121 @@
 #include "dpoMatrix.h"
 
-SEXP dpoMatrix_chol(SEXP x)
+SEXP dpoMatrix_chol(SEXP obj)
 {
-    SEXP val = get_factor(x, "Cholesky"),
-	dimP = GET_SLOT(x, Matrix_DimSym),
-	uploP = GET_SLOT(x, Matrix_uploSym);
-    const char *uplo = CHAR(STRING_ELT(uploP, 0));
-    int *dims = INTEGER(dimP), info;
-    int n = dims[0];
-    const R_xlen_t n2 = ((R_xlen_t)n) * n; // = n^2
-    double *vx;
-
-    if (val != R_NilValue) return val;// use x@factors$Cholesky if available
-    dims = INTEGER(dimP);
-    val = PROTECT(NEW_OBJECT_OF_CLASS("Cholesky"));
-    SET_SLOT(val, Matrix_uploSym, duplicate(uploP));
-    SET_SLOT(val, Matrix_diagSym, mkString("N"));
-    SET_SLOT(val, Matrix_DimSym, duplicate(dimP));
-    set_symmetrized_DimNames(val, GET_SLOT(x, Matrix_DimNamesSym), -1);
-    vx = REAL(ALLOC_SLOT(val, Matrix_xSym, REALSXP, n2));
-    AZERO(vx, n2, 0.0);
-    F77_CALL(dlacpy)(uplo, &n, &n, REAL(GET_SLOT(x, Matrix_xSym)),
-		     &n, vx, &n FCONE);
-    if (n > 0) {
-	F77_CALL(dpotrf)(uplo, &n, vx, &n, &info  FCONE);
-	if (info) {
-	    if(info > 0)
-		error(_("the leading minor of order %d is not positive definite"),
-		      info);
-	    else /* should never happen! */
-		error(_("Lapack routine %s returned error code %d"), "dpotrf", info);
-	}
+    SEXP val;
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(val = get_factor(obj, "Cholesky"), &pid);
+    if (!isNull(val)) {
+	UNPROTECT(1);
+	return val;
     }
-    set_factor(x, "Cholesky", val);
-    UNPROTECT(1);
+    REPROTECT(val = NEW_OBJECT_OF_CLASS("Cholesky"), pid);
+    
+    R_xlen_t nn;
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
+    
+    SET_SLOT(val, Matrix_DimSym, dim);
+    set_symmetrized_DimNames(val, dimnames, -1);
+    SET_SLOT(val, Matrix_uploSym, uplo);
+    SET_SLOT(val, Matrix_xSym, y);
+
+    int *pdim = INTEGER(dim);
+    
+    if (pdim[0] > 0) {
+	int info;
+	double *px = REAL(x), *py = REAL(y);
+	const char *ul = CHAR(STRING_ELT(uplo, 0));
+	
+	Memzero(py, nn);
+	F77_CALL(dlacpy)(ul, pdim, pdim, px, pdim, py, pdim FCONE);
+	F77_CALL(dpotrf)(ul, pdim, py, pdim, &info FCONE);
+
+	if (info > 0)
+	    error(_("LAPACK '%s': leading minor of order %d is not "
+		    "positive definite"),
+		  "dpotrf", info);
+	else if (info < 0)
+	    error(_("LAPACK routine '%s' returned error code %d"),
+		  "dpotrf", info);
+    }
+    
+    set_factor(obj, "Cholesky", val);
+    UNPROTECT(6);
     return val;
 }
 
 SEXP dpoMatrix_rcond(SEXP obj, SEXP type)
 {
-    SEXP Chol = dpoMatrix_chol(obj);
-    const char typnm[] = {'O', '\0'};	/* always use the one norm */
-    int *dims = INTEGER(GET_SLOT(Chol, Matrix_DimSym)), info;
-    double anorm = get_norm_sy(obj, typnm), rcond;
+    SEXP ch = PROTECT(dpoMatrix_chol(obj)),
+	dim = PROTECT(GET_SLOT(ch, Matrix_DimSym)),
+	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
+	x = PROTECT(GET_SLOT(ch, Matrix_xSym));
 
-    F77_CALL(dpocon)(uplo_P(Chol),
-		     dims, REAL(GET_SLOT(Chol, Matrix_xSym)),
-		     dims, &anorm, &rcond,
-		     (double *) R_alloc(3*dims[0], sizeof(double)),
-		     (int *) R_alloc(dims[0], sizeof(int)), &info FCONE);
+    int *pdim = INTEGER(dim), info;
+    double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
+    const char *ul = CHAR(STRING_ELT(uplo, 0));
+
+    F77_CALL(dpocon)(ul, pdim, px, pdim, &norm, &rcond,
+		     (double *) R_alloc(3 * pdim[0], sizeof(double)),
+		     (int *) R_alloc(pdim[0], sizeof(int)),
+		     &info FCONE);
+
+    UNPROTECT(4);
     return ScalarReal(rcond);
 }
 
-SEXP dpoMatrix_solve(SEXP x)
+SEXP dpoMatrix_solve(SEXP a)
 {
-    SEXP Chol = dpoMatrix_chol(x);
-    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dpoMatrix"));
-    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)), info;
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dpoMatrix")),
+	ch = PROTECT(dpoMatrix_chol(a)),
+	dim = PROTECT(GET_SLOT(ch, Matrix_DimSym)),
+	dimnames = PROTECT(GET_SLOT(ch, Matrix_DimNamesSym)),
+	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
+	x;
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(x = GET_SLOT(ch, Matrix_xSym), &pid);
+    REPROTECT(x = duplicate(x), pid);
 
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));
-    slot_dup(val, Chol, Matrix_uploSym);
-    slot_dup(val, Chol, Matrix_xSym);
-    slot_dup(val, Chol, Matrix_DimSym);
-    SET_SLOT(val, Matrix_DimNamesSym,
-	     duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
-    F77_CALL(dpotri)(uplo_P(val), dims,
-		     REAL(GET_SLOT(val, Matrix_xSym)), dims, &info FCONE);
-    UNPROTECT(1);
+    SET_SLOT(val, Matrix_DimSym, dim);
+    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+    SET_SLOT(val, Matrix_xSym, x);
+    SET_SLOT(val, Matrix_uploSym, uplo);
+    
+    int *pdim = INTEGER(dim), info;
+    double *px = REAL(x);
+    const char *ul = CHAR(STRING_ELT(uplo, 0));
+    
+    F77_CALL(dpotri)(ul, pdim, px, pdim, &info FCONE);
+
+    UNPROTECT(5);
     return val;
 }
 
 SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b)
 {
-    SEXP Chol = dpoMatrix_chol(a),
-	val = PROTECT(dense_as_general(b, 'd', 2, 0));
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
-	info;
+    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0)),
+	adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
+	bdim = PROTECT(GET_SLOT(val, Matrix_DimSym));
+    int *padim = INTEGER(adim), *pbdim = INTEGER(bdim);
+    
+    if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
+	error(_("dimensions of system to be solved are inconsistent"));
 
-    if (*adims != *bdims || bdims[1] < 1 || *adims < 1)
-	error(_("Dimensions of system to be solved are inconsistent"));
-    F77_CALL(dpotrs)(uplo_P(Chol), adims, bdims + 1,
-		     REAL(GET_SLOT(Chol, Matrix_xSym)), adims,
-		     REAL(GET_SLOT(val, Matrix_xSym)),
-		     bdims, &info FCONE);
-    UNPROTECT(1);
+    SEXP ch = PROTECT(dpoMatrix_chol(a)),
+	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
+	x = PROTECT(GET_SLOT(ch, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(val, Matrix_xSym));
+    
+    int info;
+    double *px = REAL(x), *py = REAL(y);
+    const char *ul = CHAR(STRING_ELT(uplo, 0));
+
+    F77_CALL(dpotrs)(ul, pbdim, pbdim + 1, px, pbdim, py, pbdim, &info FCONE);
+    
+    UNPROTECT(7);
     return val;
 }

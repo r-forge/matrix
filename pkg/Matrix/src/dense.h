@@ -5,11 +5,11 @@
 #include "Mutils.h"
 
 SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag);
-SEXP R_dense_as_kind(SEXP from, SEXP kind);
 SEXP R_dense_as_matrix(SEXP from, SEXP ndense);
 SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense);
 SEXP R_dense_as_vector(SEXP from, SEXP ndense);
 SEXP R_geMatrix_as_vector(SEXP from, SEXP ndense);
+SEXP R_dense_as_kind(SEXP from, SEXP kind);
 SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2);
 
 SEXP lsq_dense_Chol(SEXP X, SEXP y);

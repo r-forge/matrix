@@ -4,32 +4,45 @@
 
 /* More for 'Dimnames' ============================================== */
 
+Rboolean DimNames_is_trivial(SEXP dn)
+{
+    if (!(isNull(VECTOR_ELT(dn, 0)) &&
+	  isNull(VECTOR_ELT(dn, 1))))
+	return FALSE;
+    Rboolean res = TRUE;
+    SEXP ndn = PROTECT(getAttrib(dn, R_NamesSymbol));
+    if (!isNull(ndn))
+	res = FALSE;
+    UNPROTECT(1);
+    return res;
+}
+
 Rboolean DimNames_is_symmetric(SEXP dn)
 {
     /* NB: Assuming here that we have the 'Dimnames' slot 
-       of a _valid_ matrix, so that the elements are either 
+       of a _valid_ Matrix, so that the elements are either 
        NULL or character vectors
 
        Keep synchronized with symmetricMatrix_validate() above,
-       (which must do slightly more)!
-    */
-    SEXP ndn = getAttrib(dn, R_NamesSymbol);
+       (which must do slightly more)! */
+
+    SEXP rn, cn;
+    int n;
+    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
+	!isNull(cn = VECTOR_ELT(dn, 1)) &&
+	rn != cn &&
+	((n = LENGTH(rn)) != LENGTH(cn) || !equal_string_vectors(rn, cn, n)))
+	return FALSE;
+    Rboolean res = TRUE;
+    SEXP ndn = PROTECT(getAttrib(dn, R_NamesSymbol));
     const char *ndn0, *ndn1;
     if (!isNull(ndn) &&
 	*(ndn0 = CHAR(STRING_ELT(ndn, 0))) != '\0' &&
 	*(ndn1 = CHAR(STRING_ELT(ndn, 1))) != '\0' &&
-	strcmp(ndn0, ndn1) != 0) {
-	return FALSE;
-    }
-    int n;
-    SEXP rn, cn;
-    if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
-	!isNull(cn = VECTOR_ELT(dn, 1)) &&
-	rn != cn &&
-	((n = LENGTH(rn)) != LENGTH(cn) || !equal_string_vectors(rn, cn, n))) {
-	return FALSE;
-    }
-    return TRUE;
+	strcmp(ndn0, ndn1) != 0)
+	res = FALSE;
+    UNPROTECT(1);
+    return res;
 }
 
 SEXP R_DimNames_is_symmetric(SEXP dn)
@@ -68,7 +81,8 @@ void symmDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 	}
     }
     /* names(dimnames(.)) */
-    if (!isNull(s = getAttrib(src, R_NamesSymbol))) {
+    PROTECT(s = getAttrib(src, R_NamesSymbol));
+    if (!isNull(s)) {
 	SEXP destnms = PROTECT(allocVector(STRSXP, 2));
 	if (*CHAR(s = STRING_ELT(s, J)) != '\0') {
 	    SET_STRING_ELT(destnms, 0, s);
@@ -77,6 +91,7 @@ void symmDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 	setAttrib(dest, R_NamesSymbol, destnms);
 	UNPROTECT(1);
     }
+    UNPROTECT(1);
     return;
 }
 
@@ -95,7 +110,8 @@ void revDN(SEXP dest, SEXP src) {
 	SET_VECTOR_ELT(dest, 1, s);
     if (!isNull(s = VECTOR_ELT(src, 1)))
 	SET_VECTOR_ELT(dest, 0, s);
-    if (!isNull(s = getAttrib(src, R_NamesSymbol))) {
+    PROTECT(s = getAttrib(src, R_NamesSymbol));
+    if (!isNull(s)) {
 	SEXP srcnms = s, destnms = PROTECT(allocVector(STRSXP, 2));
 	if (*CHAR(s = STRING_ELT(srcnms, 0)) != '\0')
 	    SET_STRING_ELT(destnms, 1, s);
@@ -104,13 +120,14 @@ void revDN(SEXP dest, SEXP src) {
 	setAttrib(dest, R_NamesSymbol, destnms);
 	UNPROTECT(1);
     }
+    UNPROTECT(1);
     return;
 }
 
 SEXP R_symmDN(SEXP dn)
 {
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
-    if (TRIVIAL_DIMNAMES(dn))
+    if (DimNames_is_trivial(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     symmDN(newdn, dn, -1);
@@ -121,7 +138,7 @@ SEXP R_symmDN(SEXP dn)
 SEXP R_revDN(SEXP dn)
 {
     /* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
-    if (TRIVIAL_DIMNAMES(dn))
+    if (DimNames_is_trivial(dn))
 	return dn;
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     revDN(newdn, dn);
@@ -130,27 +147,31 @@ SEXP R_revDN(SEXP dn)
 }
 
 SEXP get_symmetrized_DimNames(SEXP obj, int J) {
-    SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym);
-    if (TRIVIAL_DIMNAMES(dn))
+    SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    if (DimNames_is_trivial(dn)) {
+	UNPROTECT(1);
 	return dn;
+    }
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     symmDN(newdn, dn, J);
-    UNPROTECT(1);
+    UNPROTECT(2);
     return newdn;
 }
 
 SEXP get_reversed_DimNames(SEXP obj) {
-    SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym);
-    if (TRIVIAL_DIMNAMES(dn))
+    SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    if (DimNames_is_trivial(dn)) {
+	UNPROTECT(1);
 	return dn;
+    }
     SEXP newdn = PROTECT(allocVector(VECSXP, 2));
     revDN(newdn, dn);
-    UNPROTECT(1);
+    UNPROTECT(2);
     return newdn;
 }
 
 void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
-    if (!TRIVIAL_DIMNAMES(dn)) {
+    if (!DimNames_is_trivial(dn)) {
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
 	symmDN(newdn, dn, J);
 	SET_SLOT(obj, Matrix_DimNamesSym, newdn);
@@ -160,7 +181,7 @@ void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
 }
 
 void set_reversed_DimNames(SEXP obj, SEXP dn) {
-    if (!TRIVIAL_DIMNAMES(dn)) {
+    if (!DimNames_is_trivial(dn)) {
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
 	revDN(newdn, dn);
 	SET_SLOT(obj, Matrix_DimNamesSym, newdn);
@@ -171,16 +192,17 @@ void set_reversed_DimNames(SEXP obj, SEXP dn) {
 
 void set_DimNames(SEXP obj, SEXP dn)
 {
-    if (!TRIVIAL_DIMNAMES(dn)) {
+    if (!DimNames_is_trivial(dn)) {
 	SEXP s, newdn = PROTECT(allocVector(VECSXP, 2));
 	if (!isNull(s = VECTOR_ELT(dn, 0)))
 	    SET_VECTOR_ELT(newdn, 0, s);
 	if (!isNull(s = VECTOR_ELT(dn, 1)))
 	    SET_VECTOR_ELT(newdn, 1, s);
-	if (!isNull(s = getAttrib(dn, R_NamesSymbol)))
+	PROTECT(s = getAttrib(dn, R_NamesSymbol));
+	if (!isNull(s))
 	    setAttrib(newdn, R_NamesSymbol, s);
 	SET_SLOT(obj, Matrix_DimNamesSym, newdn);
-	UNPROTECT(1);
+	UNPROTECT(2);
     }
     return;
 }
@@ -188,28 +210,42 @@ void set_DimNames(SEXP obj, SEXP dn)
 
 /* More for 'factors' =============================================== */
 
-SEXP get_factor(SEXP obj, char *nm)
+SEXP get_factor(SEXP obj, const char *nm)
 {
-    SEXP fac = GET_SLOT(obj, Matrix_factorSym);
-    R_xlen_t i = strmatch(nm, getAttrib(fac, R_NamesSymbol));
-    return (i >= 0) ? VECTOR_ELT(fac, i) : R_NilValue;
-}
-
-void set_factor(SEXP obj, char *nm, SEXP val)
-{
-    PROTECT(val);
-    SEXP fac = GET_SLOT(obj, Matrix_factorSym);
-    R_xlen_t i = strmatch(nm, getAttrib(fac, R_NamesSymbol));
-    if (i >= 0) {
-	/* If there is already a 'nm' entry, then reset it : */
-	PROTECT(fac);
-	SET_VECTOR_ELT(fac, i, val);
+    SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
+    if (LENGTH(factors) > 0) {
+	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
+	R_xlen_t i = strmatch(nm, valid);
 	UNPROTECT(1);
-    } else {
-	/* Otherwise, install an augmented list with a 'nm' entry : */
-	SET_SLOT(obj, Matrix_factorSym, append_to_named_list(fac, nm, val));
+	if (i >= 0) {
+	    factors = VECTOR_ELT(factors, i);
+	    UNPROTECT(1);
+	    return factors;
+	}
     }
     UNPROTECT(1);
+    return R_NilValue;
+}
+
+void set_factor(SEXP obj, const char *nm, SEXP val)
+{
+    PROTECT(val);
+    SEXP factors;
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorSym), &pid);
+    if (LENGTH(factors) > 0) {
+	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
+	R_xlen_t i = strmatch(nm, valid);
+	UNPROTECT(1);
+	if (i >= 0) {
+	    SET_VECTOR_ELT(factors, i, val);
+	    UNPROTECT(2);
+	    return;
+	}
+    }
+    REPROTECT(factors = append_to_named_list(factors, nm, val), pid);
+    SET_SLOT(obj, Matrix_factorSym, factors);
+    UNPROTECT(2);
     return;
 }
 
@@ -231,15 +267,14 @@ void set_factor(SEXP obj, char *nm, SEXP val)
  */
 SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 {
-    if (R_has_slot(obj, Matrix_factorSym)) {
-	PROTECT(obj);
-	set_factor(obj, (char *) CHAR(asChar(nm)), val);
-	UNPROTECT(1);
-    } else {
-	if (asLogical(warn) != 0) {
-	    warning(_("attempt to set factor on 'Matrix' without 'factors' slot"));
-	}
-    }
+    if (TYPEOF(nm) != STRSXP || LENGTH(nm) < 1 ||
+	(nm = STRING_ELT(nm, 0)) == NA_STRING)
+	error(_("invalid factor name"));
+    else if (HAS_SLOT(obj, Matrix_factorSym))
+	set_factor(obj, CHAR(nm), val);
+    else if (asLogical(warn) != 0)
+	warning(_("attempt to set factor on Matrix "
+		  "without 'factors' slot"));
     return val;
 }
 
@@ -260,18 +295,18 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 SEXP R_empty_factors(SEXP obj, SEXP warn)
 {
     /* If there is a nonempty 'factors' slot, then replace it with list() */
-    if (R_has_slot(obj, Matrix_factorSym)) {
-	if (LENGTH(GET_SLOT(obj, Matrix_factorSym)) > 0) {
-	    PROTECT(obj);
-	    SET_SLOT(obj, Matrix_factorSym, allocVector(VECSXP, 0));
-	    UNPROTECT(1);
+    if (HAS_SLOT(obj, Matrix_factorSym)) {
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
+	if (LENGTH(factors) > 0) {
+	    PROTECT(factors = allocVector(VECSXP, 0));
+	    SET_SLOT(obj, Matrix_factorSym, factors);
+	    UNPROTECT(2);
 	    return ScalarLogical(1); /* slot was reset */
 	}
-    } else {
-	if (asLogical(warn) != 0) {
-	    warning(_("attempt to discard factors from 'Matrix' without 'factors' slot"));
-	}
-    }
+	UNPROTECT(1);
+    } else if (asLogical(warn) != 0)
+	warning(_("attempt to discard factors from Matrix "
+		  "without 'factors' slot"));
     return ScalarLogical(0); /* no-op */
 }
 
@@ -921,22 +956,23 @@ PACKED_TRANSPOSE(z, Rcomplex)
 SEXP packed_transpose(SEXP x, int n, char uplo)
 {
     SEXPTYPE tx = TYPEOF(x);
-    if (tx != REALSXP && tx != LGLSXP && tx != INTSXP && tx != CPLXSXP)
-	error(_("invalid type \"%s\" to 'packed_transpose()'"), type2char(tx));
-    SEXP y = PROTECT(allocVector(tx, XLENGTH(x)));
+    if (tx < LGLSXP || tx > CPLXSXP)
+	ERROR_INVALID_TYPE("'x'", tx, "packed_transpose");
+    R_xlen_t nx = XLENGTH(x);
+    SEXP y = PROTECT(allocVector(tx, nx));
 
 #define TRANSPOSE(_PREFIX_, _PTR_)					\
     _PREFIX_ ## dense_packed_transpose(_PTR_(y), _PTR_(x), n, uplo)
 
     switch (tx) {
-    case REALSXP:
-	TRANSPOSE(d, REAL);
-	break;
     case LGLSXP:
 	TRANSPOSE(i, LOGICAL);
 	break;
     case INTSXP:
 	TRANSPOSE(i, INTEGER);
+	break;
+    case REALSXP:
+	TRANSPOSE(d, REAL);
 	break;
     case CPLXSXP:
 	TRANSPOSE(z, COMPLEX);
@@ -954,10 +990,11 @@ SEXP packed_transpose(SEXP x, int n, char uplo)
 SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 {
     SEXPTYPE tx = TYPEOF(x);
-    if (tx != REALSXP && tx != LGLSXP && tx != INTSXP && tx != CPLXSXP)
-	error(_("invalid type \"%s\" to 'unpacked_force()'"), type2char(tx));
+    if (tx < LGLSXP || tx > CPLXSXP)
+	ERROR_INVALID_TYPE("'x'", tx, "unpacked_force");
     R_xlen_t nx = XLENGTH(x);
     SEXP y = PROTECT(allocVector(tx, nx));
+    
     if (diag == '\0') {
 
 #define FORCE_SYMMETRIC(_PREFIX_, _CTYPE_, _PTR_)			\
@@ -1020,6 +1057,7 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 #undef FORCE_TRIANGULAR
 	
     }
+    
     UNPROTECT(1);
     return y;
 }
@@ -1027,18 +1065,15 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 char type2kind(SEXPTYPE type)
 {
     switch (type) {
-    case REALSXP:
-#ifndef HAVE_PROPER_IMATRIX
-    case INTSXP:
-#endif
-	return 'd';
     case LGLSXP:
 	return 'l';
-#ifdef HAVE_PROPER_IMATRIX
     case INTSXP:
+#ifdef HAVE_PROPER_IMATRIX
 	return 'i';
 #endif
-#if HAVE_PROPER_ZMATRIX
+    case REALSXP:
+	return 'd';
+#ifdef HAVE_PROPER_ZMATRIX
     case CPLXSXP:
 	return 'z';
 #endif
@@ -1051,15 +1086,15 @@ char type2kind(SEXPTYPE type)
 SEXPTYPE kind2type(char kind)
 {
     switch (kind) {
-    case 'd':
-	return REALSXP;
-    case 'l':
     case 'n':
+    case 'l':
 	return LGLSXP;
 #ifdef HAVE_PROPER_IMATRIX
     case 'i':
 	return INTSXP;
 #endif
+    case 'd':
+	return REALSXP;
 #ifdef HAVE_PROPER_ZMATRIX
     case 'z':
 	return CPLXSXP;
@@ -1073,14 +1108,14 @@ SEXPTYPE kind2type(char kind)
 size_t kind2size(char kind)
 {
     switch (kind) {
-    case 'd':
-	return sizeof(double);
-    case 'l':
     case 'n':
+    case 'l':
 #ifdef HAVE_PROPER_IMATRIX
     case 'i':
 #endif
 	return sizeof(int);
+    case 'd':
+	return sizeof(double);
 #ifdef HAVE_PROPER_ZMATRIX
     case 'z':
 	return sizeof(Rcomplex);
@@ -1211,17 +1246,28 @@ SEXP R_Matrix_repr(SEXP obj)
 SEXP R_matrix_as_dense(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 {
     const char *zzz;
-    if ((code = asChar(code)) == NA_STRING ||
+    if (TYPEOF(code) != STRSXP || LENGTH(code) < 1 ||
+	(code = STRING_ELT(code, 0)) == NA_STRING ||
 	(zzz = CHAR(code))[0] == '\0' ||
 	(zzz             )[1] == '\0' ||
 	!((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
 	  (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p')) ||
 	  (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p'))))
 	error(_("invalid 'code' to 'R_matrix_as_dense()'"));
-    return matrix_as_dense(from, zzz,
-			   (zzz[1] != 'g') ? *CHAR(asChar(uplo)) : 'U',
-			   (zzz[1] == 't') ? *CHAR(asChar(diag)) : 'N',
-	                   0, 0);
+    char ul = 'U', di = 'N';
+    if (zzz[1] != 'g') {
+	if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
+	    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
+	    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+	    error(_("invalid 'uplo' to 'R_matrix_as_dense()'"));
+	if (zzz[1] == 't') {
+	    if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		(diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		((di = *CHAR(diag)) != 'N' && di != 'U'))
+		error(_("invalid 'diag' to 'R_matrix_as_dense()'"));
+	}
+    }
+    return matrix_as_dense(from, zzz, ul, di, 0, 0);
 }
 
 SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
@@ -1246,7 +1292,7 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 #endif
     default:
 	if (OBJECT(from))
-	    ERROR_INVALID_CLASS(class_P(from), "matrix_as_dense");
+	    ERROR_INVALID_CLASS(from, "matrix_as_dense");
 	else
 	    ERROR_INVALID_TYPE("object", tf, "matrix_as_dense");
 	break;
@@ -1256,42 +1302,79 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
     cl[0] = (code[0] == '.') ? type2kind(tf) : code[0];
     cl[1] = code[1];
     cl[2] = code[2];
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+    
     SEXP dim, dimnames;
+    int *pdim, m, n, doDN, isM = (int) isMatrix(from), nprotect = 1;
     R_xlen_t len = XLENGTH(from);
-    int *pdim, doDN, isM = (int) isMatrix(from), nprotect = 0;
     
     if (isM) {
-	dim = getAttrib(from, R_DimSymbol);
-	dimnames = getAttrib(from, R_DimNamesSymbol);
+	
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(dim = getAttrib(from, R_DimSymbol), &pid);
 	pdim = INTEGER(dim);
-	doDN = !(isNull(dimnames) || TRIVIAL_DIMNAMES(dimnames));
-    } else {
-	if (len > INT_MAX)
-	    error(_("vector of length exceeding 2^31-1 "
-		    "to 'matrix_as_dense()'"));
-	PROTECT(dim = allocVector(INTSXP, 2));
+	if ((m = pdim[0]) != (n = pdim[1]) || n > 0) {
+	    if (new > 1)
+		REPROTECT(dim = duplicate(dim), pid);
+	    SET_SLOT(to, Matrix_DimSym, dim);
+	}
+	UNPROTECT(1); /* dim */
+	
+	PROTECT(dimnames = getAttrib(from, R_DimNamesSymbol));
 	++nprotect;
+	doDN = !isNull(dimnames);
+	
+    } else {
+	
+	if (len > INT_MAX)
+	    error(_("dimensions cannot exceed 2^31-1"));
+	PROTECT(dim = allocVector(INTSXP, 2));
 	pdim = INTEGER(dim);
 	if (transpose_if_vector) {
-	    pdim[0] = 1;
-	    pdim[1] = (int) len;
+	    pdim[0] = m = 1;
+	    pdim[1] = n = (int) len;
 	} else {
-	    pdim[0] = (int) len;
-	    pdim[1] = 1;
+	    pdim[0] = m = (int) len;
+	    pdim[1] = n = 1;
 	}
-	SEXP nms = getAttrib(from, R_NamesSymbol);
+	SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP nms = PROTECT(getAttrib(from, R_NamesSymbol));
+	++nprotect;
 	doDN = !isNull(nms);
 	if (doDN) {
 	    PROTECT(dimnames = allocVector(VECSXP, 2));
 	    ++nprotect;
 	    SET_VECTOR_ELT(dimnames, transpose_if_vector ? 1 : 0, nms);
 	}
+	
     }
-
-    int n = pdim[0];
-    if (cl[1] != 'g' && pdim[1] != n)
+    
+    if (cl[1] != 'g' && m != n)
 	error(_("attempt to construct triangular or symmetric "
 		"denseMatrix from non-square matrix"));
+
+    if (doDN) {
+	if (cl[1] == 's')
+	    set_symmetrized_DimNames(to, dimnames, -1);
+	else if (isM && new > 1)
+	    set_DimNames(to, dimnames);
+	else
+	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    }
+    
+    if (cl[1] != 'g' && uplo != 'U') {
+	SEXP val = PROTECT(mkString("L"));
+	SET_SLOT(to, Matrix_uploSym, val);
+	UNPROTECT(1); /* val */
+    }
+
+    if (cl[1] == 't' && diag != 'N') {
+	SEXP val = PROTECT(mkString("U"));
+	SET_SLOT(to, Matrix_diagSym, val);
+	UNPROTECT(1); /* val */
+    }
     
     SEXPTYPE tt = kind2type(cl[0]);
     if (tf != tt) {
@@ -1300,11 +1383,12 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
     }
 
     SEXP x;
+    
     if (cl[2] != 'p') {
 	
-	if (tf != tt || new < 0 || (new == 0 && !MAYBE_REFERENCED(from))) {
+	if (tf != tt || new < 0 || (new == 0 && !MAYBE_REFERENCED(from)))
 	    x = from;
-	} else {
+	else {
 	    PROTECT(x = allocVector(tt, len));
 	    ++nprotect;
 	    switch (tt) {
@@ -1363,22 +1447,8 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 	
     }
     
-    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
-    ++nprotect;
-    SET_SLOT(to, Matrix_DimSym, (isM && new > 1) ? duplicate(dim) : dim);
-    if (doDN) {
-	if (cl[1] == 's')
-	    set_symmetrized_DimNames(to, dimnames, -1);
-	else if (isM && new > 1)
-	    set_DimNames(to, dimnames);
-	else
-	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    }
-    if (cl[1] != 'g')
-	SET_SLOT(to, Matrix_uploSym, mkString((uplo == 'U') ? "U" : "L"));
-    if (cl[1] == 't')
-	SET_SLOT(to, Matrix_diagSym, mkString((diag == 'N') ? "N" : "U"));
     SET_SLOT(to, Matrix_xSym, x);
+
     UNPROTECT(nprotect);
     return to;
 }
@@ -1386,7 +1456,9 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 SEXP R_dense_as_general(SEXP from, SEXP kind)
 {
     char k;
-    if ((kind = asChar(kind)) == NA_STRING || (k = *CHAR(kind)) == '\0')
+    if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	(kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	(k = *CHAR(kind)) == '\0')
 	error(_("invalid 'kind' to 'R_dense_as_general()'"));
     return dense_as_general(from, k, 0, 0);
 }
@@ -1420,12 +1492,14 @@ SEXP R_dense_as_general(SEXP from, SEXP kind)
 SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 {
     /* NB: diagonalMatrix is no longer a subclass of denseMatrix 
-           but .diMatrix are nonetheless dealt with here ... */
+           but .diMatrix are nonetheless dealt with here ... 
+    */
+    
     static const char *valid[] = {
-	"dgeMatrix", "lgeMatrix", "ngeMatrix", /* be fast */
+	"dgeMatrix", "lgeMatrix", "ngeMatrix",
 	"dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix", "ddiMatrix",
 	"ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix", "ldiMatrix",
-	"ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", /* no ndiMatrix */
+	"ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", /* "ndiMatrix", */
 	""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0) {
@@ -1434,48 +1508,59 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 	zzz[0] = kind;
 	return matrix_as_dense(from, zzz, '\0', '\0', new, transpose_if_vector);
     }
-
+    
     /* Now handling just denseMatrix and diagonalMatrix ...
        We want to be fast if 'from' is already a .geMatrix,
        and _especially_ fast if it is already a .geMatrix
-       of the right "kind" ...
+       of the right "kind" ... 
     */
     
     const char *clf = valid[ivalid];
     if (kind == '.')
 	kind = clf[0];
-    Rboolean ge = (clf[1] == 'g'), kge = (ge && kind == clf[0]);
-    if (kge && new <= 0)
+    Rboolean ge = (clf[1] == 'g'), ge0 = ge && kind == clf[0];
+    if (ge0 && new <= 0)
 	return from;
     
-    SEXP to,
-	dim = GET_SLOT(from, Matrix_DimSym),
-	dimnames = GET_SLOT(from, Matrix_DimNamesSym),
-	x0 = GET_SLOT(from, Matrix_xSym);
-    
-    if (kge) {
+    SEXP to;
+    if (ge0)
 	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
-    } else {
+    else {
 	char clt[] = ".geMatrix";
 	clt[0] = kind;
 	PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
     }
+
+    SEXP dim;
+    PROTECT_INDEX pidA;
+    PROTECT_WITH_INDEX(dim = GET_SLOT(from, Matrix_DimSym), &pidA);
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    if (m != n || n > 0) {
+	if (new > 1)
+	    REPROTECT(dim = duplicate(dim), pidA);
+	SET_SLOT(to, Matrix_DimSym, dim);
+    }
+    UNPROTECT(1); /* dim */
     
-    SET_SLOT(to, Matrix_DimSym, (new > 1) ? duplicate(dim) : dim);
+    SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
     if (clf[1] == 's')
 	set_symmetrized_DimNames(to, dimnames, -1);
     else if (new > 1)
 	set_DimNames(to, dimnames);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(1); /* dimnames */
     
-    if (kge) {
-	SET_SLOT(to, Matrix_xSym, duplicate(x0));
-	UNPROTECT(1);
+    SEXP x0;
+    PROTECT_INDEX pidB;
+    PROTECT_WITH_INDEX(x0 = GET_SLOT(from, Matrix_xSym), &pidB);
+    if (ge0) {
+	REPROTECT(x0 = duplicate(x0), pidB);
+	SET_SLOT(to, Matrix_xSym, x0);
+	UNPROTECT(2); /* x0, to */
 	return to;
     }
-
-    SEXP x1;
+    
     SEXPTYPE tf = TYPEOF(x0), tt = kind2type(kind);
     int do_na2one = clf[0] == 'n' && kind != 'n';
     if (ge) {
@@ -1488,40 +1573,53 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 		    break;
 	    do_na2one = (ix < nx);
 	}
-	PROTECT(x1 = (tf == tt
-		      ? (new > 0 || (new == 0 && do_na2one)
-			 ? duplicate(x0)
-			 : x0)
-		      : coerceVector(x0, tt)));
+	if (tf != tt)
+	    REPROTECT(x0 = coerceVector(x0, tt), pidB);
+	else if (new > 0 || (new == 0 && do_na2one))
+	    REPROTECT(x0 = duplicate(x0), pidB);
 	if (do_na2one)
-	    na2one(x1);
-	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(2);
+	    na2one(x0);
+	SET_SLOT(to, Matrix_xSym, x0);
+	UNPROTECT(2); /* x0, to */
 	return to;
     }
     
     /* Now handling 'from' inheriting from .(tr|sy|tp|sp|di)Matrix ... */
-    
-    char
-	ul = (clf[1] == 'd') ? 'U' : *uplo_P(from),
-	di = (clf[1] == 's') ? 'N' : *diag_P(from);
-    int n = INTEGER(dim)[0], nprotect = 2;
-    if (clf[2] != 'p' && clf[1] != 'd') {
+
+    char ul = 'U', di = 'N';
+    if (clf[1] != 'd') {
+	SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+    }
+    if (clf[1] != 's') {
+	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+	di = *CHAR(STRING_ELT(diag, 0));
+	UNPROTECT(1); /* diag */
+    } else if (kind == clf[0]) {
+	SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+	if (LENGTH(factors) > 0)
+	    SET_SLOT(to, Matrix_factorSym, factors);
+	UNPROTECT(1); /* factors */
+    }
+
+    SEXP x1;
+    int packed = clf[1] == 'd' || clf[2] == 'p';
+    if (!packed) {
 	/* (tr|sy)->ge */
-	PROTECT(x1 = (tf == tt
-		      ? (new >= 0
-			 ? duplicate(x0)
-			 : x0)
-		      : coerceVector(x0, tt)));
+	if (tf != tt)
+	    REPROTECT(x1 = coerceVector(x0, tt), pidB);
+	else if (new >= 0)
+	    REPROTECT(x1 = duplicate(x0), pidB);
+	else
+	    x1 = x0;
     } else {
 	/* (tp|sp|di)->ge */
 	if ((double) n * n > R_XLEN_T_MAX)
 	    error(_("attempt to allocate vector of length exceeding "
 		    "R_XLEN_T_MAX"));
-	if (tf != tt) {
-	    PROTECT(x0 = coerceVector(x0, tt));
-	    ++nprotect;
-	}
+	if (tf != tt)
+	    REPROTECT(x0 = coerceVector(x0, tt), pidB);
 	PROTECT(x1 = allocVector(tt, (R_xlen_t) n * n));
     }
 
@@ -1567,7 +1665,11 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     if (do_na2one)
 	na2one(x1);
     SET_SLOT(to, Matrix_xSym, x1);
-    UNPROTECT(nprotect);
+
+    if (packed)
+	UNPROTECT(3); /* x1, x0, to */
+    else
+	UNPROTECT(2); /* x1,     to */
     return to;
 }
 
@@ -1576,16 +1678,15 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 
 SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 {
-    int n = asInteger(n_), packed = asLogical(packed_),
-	upper = asLogical(upper_), diag = asLogical(diag_);
-    double nn = (double) n * n,
-	nx = (packed) ? nn : (nn + n) / 2.0,
-	nr = (diag) ? (nn + n) / 2.0 : (nn - n) / 2.0;
+    int n = asInteger(n_), packed = asLogical(packed_);
+    double nn = (double) n * n, nx = (packed) ? nn : 0.5 * (nn + n);
     if (nx > R_XLEN_T_MAX)
 	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
     SEXP r;
-    int i, j;
+    int i, j, upper = asLogical(upper_), diag = asLogical(diag_);
+    double nr = (diag) ? 0.5 * (nn + n) : 0.5 * (nn - n);
     if (nx > INT_MAX) {
+	
 	PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
 	double k = 1.0, *pr = REAL(r);
 
@@ -1654,28 +1755,32 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 	} while (0)
 
 	DO_INDEX(1.0, nr);
+	
     } else {
+	
 	PROTECT(r = allocVector(INTSXP, (R_xlen_t) nr));
 	int k = 1, nr_ = (int) nr, *pr = INTEGER(r);
+
 	DO_INDEX(1, nr_);
 
 #undef DO_INDEX
 	
     }
+    
     UNPROTECT(1);
     return r;
 }
 
 SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 {
-    int n = asInteger(n_), packed = asLogical(packed_),
-	upper = (packed) ? asLogical(upper_) : NA_LOGICAL;
-    double nn = (double) n * n, nx = (packed) ? nn : (nn + n) / 2.0;
+    int n = asInteger(n_), packed = asLogical(packed_);
+    double nn = (double) n * n, nx = (packed) ? nn : 0.5 * (nn + n);
     if (nx > R_XLEN_T_MAX)
 	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
     SEXP r;
-    int j;
+    int j, upper = (packed) ? asLogical(upper_) : NA_LOGICAL;
     if (nx > INT_MAX) {
+	
 	PROTECT(r = allocVector(REALSXP, n));
 	double k = 1.0, *pr = REAL(r);
 
@@ -1700,7 +1805,9 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 	} while (0)
 
 	DO_INDEX;
+	
     } else {
+
 	PROTECT(r = allocVector(INTSXP, n));
 	int k = 1, *pr = INTEGER(r);
 	DO_INDEX;
@@ -1708,6 +1815,7 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 #undef DO_INDEX
 	
     }
+    
     UNPROTECT(1);
     return r;
 }
@@ -1748,37 +1856,29 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 
     switch (TYPEOF(x)) {
     case LGLSXP:
-    {
 	DO_NNZ(int, LOGICAL,
 	       ISNA_LOGICAL, ISNZ_LOGICAL, STRICTLY_ISNZ_LOGICAL);
 	break;
-    }
     case INTSXP:
-    {
-	DO_NNZ(int, INTEGER,
+    	DO_NNZ(int, INTEGER,
 	       ISNA_INTEGER, ISNZ_INTEGER, STRICTLY_ISNZ_INTEGER);
 	break;
-    }
     case REALSXP:
-    {
-	DO_NNZ(double, REAL,
+    	DO_NNZ(double, REAL,
 	       ISNA_REAL, ISNZ_REAL, STRICTLY_ISNZ_REAL);
 	break;
-    }
     case CPLXSXP:
-    {
-	DO_NNZ(Rcomplex, COMPLEX,
+    	DO_NNZ(Rcomplex, COMPLEX,
 	       ISNA_COMPLEX, ISNZ_COMPLEX, STRICTLY_ISNZ_COMPLEX);
 	break;
-    }
     default:
 	ERROR_INVALID_TYPE("'x'", TYPEOF(x), "R_nnz");
     }
 
 #undef DO_NNZ
 
-    return
-	(nnz <= INT_MAX) ? ScalarInteger((int) nnz) : ScalarReal((double) nnz);
+    return (nnz <= INT_MAX)
+	? ScalarInteger((int) nnz) : ScalarReal((double) nnz);
 }
 
 void conjugate(SEXP x)
@@ -1885,42 +1985,37 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
 	 int Matrix_check_class(SEXP x, const char **valid);
 	 ... and this is yet another variant ...
 */
-R_xlen_t strmatch(char *x, SEXP valid)
+R_xlen_t strmatch(const char *x, SEXP valid)
 {
-    R_xlen_t i, len = xlength(valid);
-    for (i = 0; i < len; ++i)
+    R_xlen_t n = XLENGTH(valid);
+    for (R_xlen_t i = 0; i < n; ++i)
 	if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
 	    return i;
     return -1;
 }
 
-#define APPEND_TO_NAMED(_T2C_SEXPTYPE_, _SEXPTYPE_, _CTYPE_,		\
-			_XPTR_, _YPTR_, _COPY_, _APPEND_)		\
-SEXP append_to_named_ ## _T2C_SEXPTYPE_(SEXP x, char *nm, _CTYPE_ val)  \
-{									\
-    R_xlen_t len = XLENGTH(x);						\
-    SEXP nx = getAttrib(x, R_NamesSymbol),				\
-	y = PROTECT(allocVector(_SEXPTYPE_, len + 1)),			\
-	ny = PROTECT(allocVector(STRSXP, len + 1));			\
-    _XPTR_; _YPTR_;							\
-    for (R_xlen_t i = 0; i < len; ++i) {				\
-	_COPY_;								\
-	SET_STRING_ELT(ny, i, STRING_ELT(nx, i));			\
-    }									\
-    _APPEND_;								\
-    SET_STRING_ELT(ny, len, mkChar(nm));				\
-    setAttrib(y, R_NamesSymbol, ny);					\
-    UNPROTECT(2);							\
-    return y;								\
+SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
+{
+    PROTECT(val);
+    R_xlen_t n = XLENGTH(x);
+    SEXP y = PROTECT(allocVector(VECSXP, n + 1)),
+	ny = PROTECT(allocVector(STRSXP, n + 1)),
+	nval = PROTECT(mkChar(nm));
+    if (n > 0) {
+	SEXP nx = PROTECT(getAttrib(x, R_NamesSymbol));
+	R_xlen_t i;
+	for (i = 0; i < n; ++i) {
+	    SET_VECTOR_ELT( y, i, VECTOR_ELT( x, i));
+	    SET_STRING_ELT(ny, i, STRING_ELT(nx, i));
+	}
+	UNPROTECT(1);
+    }
+    SET_VECTOR_ELT( y, n,  val);
+    SET_STRING_ELT(ny, n, nval);
+    setAttrib(y, R_NamesSymbol, ny);
+    UNPROTECT(4);
+    return y;
 }
-/* append_to_named_list() */
-APPEND_TO_NAMED(list, VECSXP, SEXP,
-		,
-		,
-		SET_VECTOR_ELT(y, i, VECTOR_ELT(x, i)),
-		SET_VECTOR_ELT(y, len, val))
-#undef APPEND_TO_NAMED
-
 
 
 /* ================================================================== */
@@ -2618,7 +2713,7 @@ SEXP R_any0(SEXP x) {
  */
 SEXP NEW_OBJECT_OF_CLASS(const char* what)
 {
-    SEXP ans = NEW_OBJECT(PROTECT(MAKE_CLASS(what)));
+    SEXP class = PROTECT(MAKE_CLASS(what)), obj = NEW_OBJECT(class);
     UNPROTECT(1);
-    return ans;
+    return obj;
 }

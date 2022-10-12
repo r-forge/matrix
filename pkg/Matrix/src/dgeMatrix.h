@@ -5,8 +5,15 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP dgeMatrix_norm(SEXP obj, SEXP norm);
+SEXP dgeMatrix_LU_(SEXP obj, Rboolean warn);
+SEXP dgeMatrix_LU (SEXP obj, SEXP warn);
+
+double get_norm_dge(SEXP obj, const char *typstr);
+SEXP dgeMatrix_norm(SEXP obj, SEXP type);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);
+SEXP dgeMatrix_solve(SEXP a);
+SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
+
 /* for crossprod() and tcrossprod() -- dge*() and the generalized versions: */
 SEXP dgeMatrix_crossprod(SEXP x, SEXP trans);
 SEXP  geMatrix_crossprod(SEXP x, SEXP trans);
@@ -28,12 +35,8 @@ SEXP lgeMatrix_setDiag(SEXP x, SEXP d);
 SEXP dgeMatrix_addDiag(SEXP x, SEXP d);
 #endif
 
-SEXP dgeMatrix_LU (SEXP x, SEXP warn_singularity);
-SEXP dgeMatrix_LU_(SEXP x, Rboolean warn_sing);
 SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm);
 SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE);
-SEXP dgeMatrix_solve(SEXP a);
-SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
 SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
 SEXP dgeMatrix_exp(SEXP x);
 SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean);

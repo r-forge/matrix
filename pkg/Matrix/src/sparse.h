@@ -20,11 +20,8 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);
 SEXP R_sparse_diag_get(SEXP obj, SEXP nms);
 SEXP R_sparse_transpose(SEXP from);
 SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to);
-
-SEXP CRsparse_symmpart(SEXP from);
-SEXP  Tsparse_symmpart(SEXP from);
-SEXP CRsparse_skewpart(SEXP from);
-SEXP  Tsparse_skewpart(SEXP from);
+SEXP R_sparse_symmpart(SEXP from);
+SEXP R_sparse_skewpart(SEXP from);
 
 SEXP CRsparse_as_Tsparse(SEXP from);
 SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse);
@@ -59,14 +56,6 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 "ngCMatrix", "ngRMatrix", "ngTMatrix",		\
 "ntCMatrix", "ntRMatrix", "ntTMatrix",		\
 "nsCMatrix", "nsRMatrix", "nsTMatrix"
-
-#define VALID_CRSPARSE				\
-"dgCMatrix", "dtCMatrix", "dsCMatrix",		\
-"dgRMatrix", "dtRMatrix", "dsRMatrix",		\
-"lgCMatrix", "ltCMatrix", "lsCMatrix",		\
-"lgRMatrix", "ltRMatrix", "lsRMatrix",		\
-"ngCMatrix", "ntCMatrix", "nsCMatrix",		\
-"ngRMatrix", "ntRMatrix", "nsRMatrix"
 
 #define VALID_CSPARSE				\
 "dgCMatrix", "dtCMatrix", "dsCMatrix",		\
