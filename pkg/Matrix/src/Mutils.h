@@ -86,6 +86,9 @@ typedef int R_xlen_t;
 # define MAKE_CLASS(what)	  R_do_MAKE_CLASS(what)
 # define NEW_OBJECT(class_def)	  R_do_new_object(class_def)
 #endif
+
+#define HAS_SLOT(obj, name)       R_has_slot(obj, name)
+
 /* A safe NEW_OBJECT(MAKE_CLASS(what)) : */
 SEXP NEW_OBJECT_OF_CLASS(const char* what);
     
@@ -135,29 +138,33 @@ extern Rcomplex Matrix_zzero, Matrix_zone;
 #define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
 #define PM_LENGTH(n) (n + ((R_xlen_t) (n) * ((n) - 1)) / 2)
 
-#define TRIVIAL_DIMNAMES(_DIMNAMES_)			\
-    (isNull(VECTOR_ELT(_DIMNAMES_, 0)) &&		\
-     isNull(VECTOR_ELT(_DIMNAMES_, 1)) &&		\
-     isNull(getAttrib(_DIMNAMES_, R_NamesSymbol)))
+#define ERROR_INVALID_CLASS(_X_, _METHOD_)			\
+    do {							\
+	SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol));	\
+	if (TYPEOF(class) == STRSXP && LENGTH(class) > 0)	\
+	    error(_("invalid class \"%s\" to '%s()'"),		\
+		  CHAR(STRING_ELT(class, 0)), _METHOD_);	\
+	else							\
+	    error(_("unclassed \"%s\" to '%s()'"),		\
+		  type2char(TYPEOF(_X_)), _METHOD_);		\
+	UNPROTECT(1);						\
+    } while (0)
 
-#define ERROR_INVALID_CLASS(_CLASS_, _METHOD_)				\
-    error(_("invalid class \"%s\" to '%s()'"),				\
-	  _CLASS_, _METHOD_)
-
-#define ERROR_INVALID_TYPE(_WHAT_, _SEXPTYPE_, _METHOD_)		\
-    error(_("%s of invalid type \"%s\" in '%s()'"),			\
+#define ERROR_INVALID_TYPE(_WHAT_, _SEXPTYPE_, _METHOD_)	\
+    error(_("%s of invalid type \"%s\" in '%s()'"),		\
 	  _WHAT_, type2char(_SEXPTYPE_), _METHOD_)
 
-#define RETURN_TRUE_OF_KIND(_KIND_)					\
-    do {								\
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1)), val = PROTECT(_KIND_); \
-	static SEXP sym = NULL;						\
-	if (!sym)							\
-	    sym = install("kind");					\
-	LOGICAL(ans)[0] = 1;						\
-	setAttrib(ans, sym, val);					\
-	UNPROTECT(2);							\
-	return ans;							\
+#define RETURN_TRUE_OF_KIND(_KIND_)			\
+    do {						\
+	SEXP ans = PROTECT(allocVector(LGLSXP, 1)),	\
+	    val = PROTECT(mkString(_KIND_));		\
+	static SEXP sym = NULL;				\
+	if (!sym)					\
+	    sym = install("kind");			\
+	LOGICAL(ans)[0] = 1;				\
+	setAttrib(ans, sym, val);			\
+	UNPROTECT(2); /* val, ans */			\
+	return ans;					\
     } while (0)
     
 /* Zero an array, but note Memzero() which might be FASTER 
@@ -222,6 +229,7 @@ enum x_slot_kind {
 #define DECLARE_AND_GET_X_SLOT(__C_TYPE, __SEXP)	\
     __C_TYPE *xx = __SEXP(GET_SLOT(x, Matrix_xSym))
 
+Rboolean DimNames_is_trivial(SEXP dn);
 Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_DimNames_is_symmetric(SEXP dn);
     
@@ -237,8 +245,8 @@ void set_reversed_DimNames(SEXP obj, SEXP dn);
 
 void set_DimNames(SEXP obj, SEXP dn);
 
-SEXP get_factor(SEXP obj, char *nm);
-void set_factor(SEXP obj, char *nm, SEXP val);
+SEXP get_factor(SEXP obj, const char *nm);
+void set_factor(SEXP obj, const char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
@@ -385,8 +393,8 @@ void zeroIm(SEXP x);
 void na2one(SEXP x);
     
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
-R_xlen_t strmatch(char *nm, SEXP s);
-SEXP append_to_named_list(SEXP x, char *nm, SEXP val);
+R_xlen_t strmatch(const char *nm, SEXP s);
+SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
 
 char La_norm_type(const char *typstr);
 char La_rcond_type(const char *typstr);
@@ -481,12 +489,18 @@ int* expand_cmprPt(int ncol, const int mp[], int mj[])
 static R_INLINE
 Rboolean any_NA_in_x(SEXP obj)
 {
-    double *x = REAL(GET_SLOT(obj, Matrix_xSym));
-    int i, n = LENGTH(GET_SLOT(obj, Matrix_xSym));
-    for(i=0; i < n; i++)
-	if(ISNAN(x[i])) return TRUE;
-    /* else */
-    return FALSE;
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    R_xlen_t i, n = XLENGTH(x);
+    double *px = REAL(x);
+    Rboolean res = FALSE;
+    for (i = 0; i < n; ++i) {
+	if (ISNAN(px[i])) {
+	    res = TRUE;
+	    break;
+	}
+    }
+    UNPROTECT(1);
+    return res;
 }
 
 /** Inverse Permutation

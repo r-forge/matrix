@@ -3,11 +3,12 @@
 
 #include "Lapack-etc.h"
 #include "Mutils.h"
+#include "dsyMatrix.h"
+
+SEXP dpoMatrix_chol(SEXP obj);
 
 SEXP dpoMatrix_rcond(SEXP obj, SEXP type);
 SEXP dpoMatrix_solve(SEXP a);
 SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b);
-SEXP dpoMatrix_chol(SEXP x);
-double get_norm_sy(SEXP obj, const char *typstr);
 
 #endif
