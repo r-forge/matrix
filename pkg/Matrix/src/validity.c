@@ -97,9 +97,9 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 		SPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"), i+1);
 		return mkString(buf);
 	    } else if ((ns = XLENGTH(s)) != pdim[i] && ns != 0) {
-		SPRINTF(buf, _("length of Dimnames[[%d]] (%d) "
+		SPRINTF(buf, _("length of Dimnames[[%d]] (%lld) "
 			       "is not equal to Dim[%d] (%d)"),
-			i+1, ns, i+1, pdim[i]);
+			i+1, (long long) ns, i+1, pdim[i]);
 		return mkString(buf);
 	    }
 	}
