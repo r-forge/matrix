@@ -123,17 +123,13 @@ SEXP dsyMatrix_norm(SEXP obj, SEXP type)
     return ScalarReal(norm);
 }
 
-SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
+SEXP dsyMatrix_rcond(SEXP obj)
 {
     SEXP trf = PROTECT(dsyMatrix_trf(obj)),
 	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
 	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-    
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
     
     int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
     double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
@@ -144,7 +140,7 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP type)
 		     (int *) R_alloc(pdim[0], sizeof(int)),
 		     &info FCONE);
     
-    UNPROTECT(6);
+    UNPROTECT(5);
     return ScalarReal(rcond);
 }
 

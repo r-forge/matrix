@@ -1128,7 +1128,7 @@ SEXP R_sparse_drop0(SEXP from)
     SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), p0 = NULL;
     SEXPTYPE tx = TYPEOF(x0);
     int *pp0 = NULL;
-    R_xlen_t n1a, k, kend, nnz_, nnz0, nnz1 = 0;
+    R_xlen_t n1a = 0 /* -Wmaybe-uninitialized */, k, kend, nnz_, nnz0, nnz1 = 0;
     
     if (cl[2] != 'T') {
 	PROTECT(p0 = GET_SLOT(from, Matrix_pSym));
@@ -1191,7 +1191,7 @@ SEXP R_sparse_drop0(SEXP from)
 	SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
 	if (LENGTH(factors) > 0)
 	    SET_SLOT(to, Matrix_factorSym, factors);
-	UNPROTECT(1);
+	UNPROTECT(1); /* factors */
     }
 
     /* It remains to set some subset of 'p', 'i', 'j', and 'x' ... */
@@ -2034,7 +2034,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
     /* It remains to set some subset of 'p', 'i', 'j', and 'x' ... */
 
-    char di;
+    char di = 'N';
     if (clf[1] == 't') {
 	/* .t[CRT]Matrix */
 	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
@@ -4131,7 +4131,7 @@ SEXP Tsparse_is_triangular(SEXP obj, SEXP upper)
     }
 nokind:
     UNPROTECT(2); /* j, i */
-    return ScalarLogical(1);
+    return ScalarLogical(res);
 }
 
 #define CR_IS_SYMMETRIC_LOOP(_XCOND_)					\

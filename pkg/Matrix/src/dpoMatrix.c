@@ -48,7 +48,7 @@ SEXP dpoMatrix_chol(SEXP obj)
     return val;
 }
 
-SEXP dpoMatrix_rcond(SEXP obj, SEXP type)
+SEXP dpoMatrix_rcond(SEXP obj)
 {
     SEXP ch = PROTECT(dpoMatrix_chol(obj)),
 	dim = PROTECT(GET_SLOT(ch, Matrix_DimSym)),
