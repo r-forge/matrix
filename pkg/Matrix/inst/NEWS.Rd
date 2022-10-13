@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-10-12 r3681)}{
+\section{Changes in version 1.5-2 (2022-10-13 r3685)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions now \code{PROTECT()} the result of

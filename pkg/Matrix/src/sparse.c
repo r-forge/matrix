@@ -4,7 +4,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 {
     static const char *valid[] = {
 	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_sparse_as_dense");
     const char *clf = valid[ivalid];
@@ -16,6 +16,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
     clt[2] = (clf[1] == 'g')
 	? 'e' : ((packed) ? 'p' : ((clf[1] == 't') ? 'r' : 'y'));
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
+    ++nprotect;
 
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -52,13 +53,14 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	}
     }
     
-    SEXP x0 = NULL;
-    if (clf[0] != 'n')
-	PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
-    
     SEXPTYPE tx = kind2type(clf[0]);
     R_xlen_t nx = (R_xlen_t) dnx;
-    SEXP x1 = PROTECT(allocVector(tx, nx));
+    SEXP x0 = NULL, x1 = PROTECT(allocVector(tx, nx));
+    ++nprotect;
+    if (clf[0] != 'n') {
+	PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
+	++nprotect;
+    }
     
     /* It remains to fill 'x' ... */
     
@@ -66,6 +68,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	
 	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym)),
 	    i = PROTECT(GET_SLOT(from, Matrix_iSym));
+	nprotect += 2;
 	int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
 	++pp;
 	
@@ -120,6 +123,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	
 	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym)),
 	    j = PROTECT(GET_SLOT(from, Matrix_jSym));
+	nprotect += 2;
 	int *pp = INTEGER(p), *pj = INTEGER(j), i, k, kend;
 	++pp;
 	
@@ -176,6 +180,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	
 	SEXP i = PROTECT(GET_SLOT(from, Matrix_iSym)),
 	    j = PROTECT(GET_SLOT(from, Matrix_jSym));
+	nprotect += 2;
 	int *pi = INTEGER(i), *pj = INTEGER(j);
 	R_xlen_t index, k, nnz = XLENGTH(i);
 
@@ -313,10 +318,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 
     SET_SLOT(to, Matrix_xSym, x1);
 
-    if (clf[0] == 'n')
-	UNPROTECT(4); /* 2 of {p,i,j}, x1,     to */
-    else
-	UNPROTECT(5); /* 2 of {p,i,j}, x1, x0, to */
+    UNPROTECT(nprotect);
     return to;
 }
 
@@ -470,7 +472,7 @@ SEXP R_sparse_as_general(SEXP from)
 {
     static const char *valid[] = {
 	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_sparse_as_general");
     const char *clf = valid[ivalid];
@@ -481,6 +483,7 @@ SEXP R_sparse_as_general(SEXP from)
     clt[0] = clf[0];
     clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
+    ++nprotect;
 
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int n = INTEGER(dim)[0];
@@ -519,9 +522,9 @@ SEXP R_sparse_as_general(SEXP from)
 	    if (clf[0] != 'n') {
 		SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
 		SET_SLOT(to, Matrix_xSym, x);
-		UNPROTECT(1);
+		UNPROTECT(1); /* x */
 	    }
-	    UNPROTECT(1); /* to */
+	    UNPROTECT(nprotect);
 	    return to;
 	}
     } else {
@@ -541,6 +544,7 @@ SEXP R_sparse_as_general(SEXP from)
 	    p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 	    p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 	    i0 = PROTECT(GET_SLOT(from, iSym));
+	nprotect += 3;
 	int j, k, kend, nnz1,
 	    *pp0 = INTEGER(p0), *pp1 = INTEGER(p1), *pi0 = INTEGER(i0);
 	pp0++;
@@ -567,6 +571,7 @@ SEXP R_sparse_as_general(SEXP from)
 	}
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1 = pp1[n-1]));
+	++nprotect;
 	int *pi1 = INTEGER(i1);
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to, iSym, i1);
@@ -576,6 +581,7 @@ SEXP R_sparse_as_general(SEXP from)
 	if (clf[0] != 'n') {
 	    PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
+	    nprotect += 2;
 	    SET_SLOT(to, Matrix_xSym, x1);
 	}
 
@@ -669,6 +675,7 @@ SEXP R_sparse_as_general(SEXP from)
 
 	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 	    j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
+	nprotect += 2;
 	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0);
 	R_xlen_t k, nnz0 = XLENGTH(i0), nnz1 = nnz0;
 	
@@ -683,6 +690,7 @@ SEXP R_sparse_as_general(SEXP from)
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
 	    j1 = PROTECT(allocVector(INTSXP, nnz1));
+	nprotect += 2;
 	int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 	SET_SLOT(to, Matrix_iSym, i1);
 	SET_SLOT(to, Matrix_jSym, j1);
@@ -696,6 +704,7 @@ SEXP R_sparse_as_general(SEXP from)
 	if (clf[0] != 'n') {
 	    PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
+	    nprotect += 2;
 	    SET_SLOT(to, Matrix_xSym, x1);
 	}
 	
@@ -760,10 +769,7 @@ SEXP R_sparse_as_general(SEXP from)
 	
     }
 
-    if (clf[0] == 'n')
-	UNPROTECT(5); /*         2 of {p1,i1,j1}, 2 of {p0,i0,j0}, to */
-    else
-	UNPROTECT(7); /* x1, x0, 2 of {p1,i1,j1}, 2 of {p0,i0,j0}, to */
+    UNPROTECT(nprotect);
     return to;
 }
 
@@ -771,7 +777,7 @@ SEXP R_sparse_as_general(SEXP from)
 SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 {
     static const char *valid[] = { VALID_DIAGONAL, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_diagonal_as_sparse");
     const char *clf = valid[ivalid];
@@ -790,6 +796,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     clt[1] = zzz[1];
     clt[2] = zzz[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
+    ++nprotect;
 
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int n = INTEGER(dim)[0];
@@ -824,7 +831,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
     UNPROTECT(1); /* diag */
 
     SEXP p = NULL, i = NULL, x = NULL;
-    int k, *pp = NULL, *pi = NULL, nprotect = 1;
+    int k, *pp = NULL, *pi = NULL;
     R_xlen_t n1a;
     PROTECT_INDEX pid;
     
@@ -952,6 +959,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	SET_SLOT(to, Matrix_jSym, i);
     if (clt[0] != 'n')
 	SET_SLOT(to, Matrix_xSym, x);
+    
     UNPROTECT(nprotect);
     return to;
 }
@@ -1109,7 +1117,7 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind)
     PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pid);
     REPROTECT(x = coerceVector(x, tt), pid);
     SET_SLOT(to, Matrix_xSym, x);
-
+    
     UNPROTECT(2); /* x, to */
     return to;
 }
@@ -1120,18 +1128,20 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind)
 SEXP R_sparse_drop0(SEXP from)
 {
     static const char *valid[] = { VALID_DSPARSE, VALID_LSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_sparse_drop0");
     const char *cl = valid[ivalid];
     
     SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), p0 = NULL;
+    ++nprotect;
     SEXPTYPE tx = TYPEOF(x0);
     int *pp0 = NULL;
     R_xlen_t n1a = 0 /* -Wmaybe-uninitialized */, k, kend, nnz_, nnz0, nnz1 = 0;
     
     if (cl[2] != 'T') {
 	PROTECT(p0 = GET_SLOT(from, Matrix_pSym));
+	++nprotect;
 	pp0 = INTEGER(p0);
 	n1a = XLENGTH(p0);
 	nnz0 = pp0[n1a - 1];
@@ -1146,10 +1156,7 @@ SEXP R_sparse_drop0(SEXP from)
 	    ++px0;						\
 	}							\
 	if (nnz1 == nnz0) {					\
-	    if (cl[2] != 'T')					\
-		UNPROTECT(2);					\
-	    else						\
-		UNPROTECT(1);					\
+	    UNPROTECT(nprotect);				\
 	    return from;					\
 	}							\
 	nnz_ = nnz1;						\
@@ -1163,6 +1170,7 @@ SEXP R_sparse_drop0(SEXP from)
 #undef DROP0_START
 
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+    ++nprotect;
 
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -1200,12 +1208,14 @@ SEXP R_sparse_drop0(SEXP from)
 	i0 = PROTECT(GET_SLOT(from, iSym)),
 	i1 = PROTECT(allocVector(INTSXP, nnz1)),
 	x1 = PROTECT(allocVector(tx, nnz1));
+    nprotect += 3;
     int *pi0 = INTEGER(i0),
 	*pi1 = INTEGER(i1);
     
     if (cl[2] != 'T') {
 	
 	SEXP p1 = PROTECT(allocVector(INTSXP, n1a));
+	++nprotect;
 	int *pp1 = INTEGER(p1), j;
 	n = (int) n1a - 1;
 
@@ -1246,12 +1256,12 @@ SEXP R_sparse_drop0(SEXP from)
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to, Matrix_iSym, i1);
 	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(7); /* p1, x1, i1, i0, to, p0, x0 */
 	
     } else {
 
 	SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 	    j1 = PROTECT(allocVector(INTSXP, nnz1));
+	nprotect += 2;
 	int *pj0 = INTEGER(j0),
 	    *pj1 = INTEGER(j1);
 	
@@ -1278,10 +1288,10 @@ SEXP R_sparse_drop0(SEXP from)
 	SET_SLOT(to,        iSym, i1);
 	SET_SLOT(to, Matrix_jSym, j1);
 	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(7); /* j1, j0, x1, i1, i0, to, x0 */
 	
     }
 
+    UNPROTECT(nprotect);
     return to;
 }
 
@@ -1321,16 +1331,16 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
     if (clf[1] != 'g') {
 	SEXP uplo_from = PROTECT(GET_SLOT(from, Matrix_uploSym));
 	ulf = *CHAR(STRING_ELT(uplo_from, 0));
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo_from */
 	if (clf[1] == 't') {
 	    /* Be fast if band contains entire triangle */
 	    if ((ulf == 'U') ? (a <= 0 && b >= n-1) : (b >= 0 && a <= 1-m)) {
-		UNPROTECT(1); /* dim */
+		UNPROTECT(nprotect);
 		return from;
 	    } else if (a <= 0 && b >= 0) {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 		di = *CHAR(STRING_ELT(diag, 0));
-		UNPROTECT(1);
+		UNPROTECT(1); /* diag */
 	    }
 	}
     }
@@ -1399,9 +1409,8 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
     if (clf[2] != 'T') {
 	
 	PROTECT(p0 = GET_SLOT(from, Matrix_pSym));
-	++nprotect;
 	PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) n + 1));
-	++nprotect;
+	nprotect += 2;
 	
 	pp0 = INTEGER(p0);
 	pp1 = INTEGER(p1);
@@ -1474,10 +1483,10 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	    SET_SLOT(to, Matrix_xSym, x0);
 	    UNPROTECT(1); /* x0 */
 	}
-	if (clf[2] == 'R')
-	    to = tCRsparse_as_RCsparse(to);
-	else if (clf[2] == 'T')
+	if (clf[2] == 'T')
 	    SET_SLOT(to, Matrix_jSym, j0);
+	else if (clf[2] == 'R')
+	    to = tCRsparse_as_RCsparse(to);
 	UNPROTECT(nprotect);
 	return to;
     }
@@ -1486,10 +1495,14 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
     
     SEXP i1 = NULL, j1 = NULL;
     int *pi1 = NULL, *pj1 = NULL;
-    
     PROTECT(i1 = allocVector(INTSXP, nnz1));
     ++nprotect;
     pi1 = INTEGER(i1);
+    if (clf[2] == 'T') {
+	PROTECT(j1 = allocVector(INTSXP, nnz1));
+	++nprotect;
+	pj1 = INTEGER(j1);
+    }
 
 #define SPARSE_BAND(_XASSIGN_, _XASSIGN_IJ_, _XASSIGN_JI_)		\
     do {								\
@@ -1528,11 +1541,6 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 		}							\
 	    }								\
 	} else {							\
-									\
-	    PROTECT(j1 = allocVector(INTSXP, nnz1));			\
-	    ++nprotect;							\
-	    pj1 = INTEGER(j1);						\
-									\
 	    if (!sy && clf[1] == 's') {					\
 		for (k = 0; k < nnz0; ++k) {				\
 		    if ((d = pj0[k] - pi0[k]) >= a && d <= b) {		\
@@ -1574,20 +1582,21 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	    x1 = PROTECT(allocVector(tx = TYPEOF(x0), nnz1));
 	SPARSE_CASES(tx, SPARSE_BAND_X);
 	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(2); /* x1, x0 */
+	UNPROTECT(2);
     }
 
 #undef SPARSE_BAND_X
 #undef SPARSE_BAND
 
     SET_SLOT(to, Matrix_iSym, i1);
-    if (clf[2] != 'T')
-	SET_SLOT(to, Matrix_pSym, p1);
-    else {
+    if (clf[2] == 'T')
 	SET_SLOT(to, Matrix_jSym, j1);
+    else {
+	SET_SLOT(to, Matrix_pSym, p1);
 	if (clf[2] == 'R')
 	    to = tCRsparse_as_RCsparse(to);
     }
+    
     UNPROTECT(nprotect);
     return to;
 }
@@ -1597,7 +1606,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 {
     static const char *valid[] = {
 	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(obj, valid);
+    int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(obj, "R_sparse_diag_get");
     const char *cl = valid[ivalid];
@@ -1612,6 +1621,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
     
     SEXPTYPE type = kind2type(cl[0]);
     SEXP res = PROTECT(allocVector(type, r));
+    ++nprotect;
 
     char ul = '\0', di = '\0';
     if (cl[1] != 'g') {
@@ -1651,10 +1661,13 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	    p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 	    i = PROTECT(GET_SLOT(obj, iSym)),
 	    x = NULL;
+	nprotect += 2;
 	int j, k, kend, *pp = INTEGER(p) + 1, *pi = INTEGER(i);	
-	if (cl[0] != 'n')
+	if (cl[0] != 'n') {
 	    PROTECT(x = GET_SLOT(obj, Matrix_xSym));
-	    
+	    ++nprotect;
+	}
+	
 #define DO_DIAG(_RES_, _VAL_GENERAL_, _VAL_TRAILING_, _VAL_LEADING_, _ZERO_) \
 	do {								\
 	    if (ul == '\0') {						\
@@ -1703,13 +1716,10 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	    DO_DIAG(pres, 1, 1, 1, 0);
 	} else {
 	    SPARSE_CASES(type, DO_DIAG_X);
-	    UNPROTECT(1); /* x */
 	}
 	
 #undef DO_DIAG_X
 #undef DO_DIAG
-
-	UNPROTECT(2); /* i, p */
 	
     } else {
 	
@@ -1718,10 +1728,13 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
 	    j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
 	    x = NULL;
+	nprotect += 2;
 	int *pi = INTEGER(i), *pj = INTEGER(j);
 	R_xlen_t k, nnz = XLENGTH(i);
-	if (cl[0] != 'n')
+	if (cl[0] != 'n') {
 	    PROTECT(x = GET_SLOT(obj, Matrix_xSym));
+	    ++nprotect;
+	}
 	
 	switch (cl[0]) {
 	case 'n':
@@ -1781,10 +1794,6 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	default:
 	    break;
 	}
-
-	if (cl[0] != 'n')
-	    UNPROTECT(1); /* x */	
-	UNPROTECT(2); /* i, j */
 	
     }
     
@@ -1807,7 +1816,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	UNPROTECT(1); /* dn */
     }
 
-    UNPROTECT(1); /* res */
+    UNPROTECT(nprotect);
     return res;
 }
 
@@ -1845,13 +1854,12 @@ SEXP R_sparse_transpose(SEXP from)
     if (cl[1] != 'g') {
 	SEXP uplo_from = PROTECT(GET_SLOT(from, Matrix_uploSym));
 	char ulf = *CHAR(STRING_ELT(uplo_from, 0));
+	UNPROTECT(1); /* uplo_from */
 	if (ulf == 'U') {
 	    SEXP uplo_to = PROTECT(mkString("L"));
 	    SET_SLOT(to, Matrix_uploSym, uplo_to);
 	    UNPROTECT(1); /* uplo_to */
 	}
-	UNPROTECT(1); /* uplo_from */
-	
 	if (cl[1] == 't') {
 	    SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 	    char di = *CHAR(STRING_ELT(diag, 0));
@@ -1961,7 +1969,6 @@ SEXP R_sparse_transpose(SEXP from)
 #undef SPARSE_T
 
     Free_FROM(pp1_, m_);
-    
     SET_SLOT(to, Matrix_pSym, p1);
     SET_SLOT(to,        iSym, i1);
 
@@ -1974,7 +1981,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 {
     static const char *valid[] = {
 	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_sparse_force_symmetric");
     const char *clf = valid[ivalid];
@@ -2013,6 +2020,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
     clt[0] = clf[0];
     clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
+    ++nprotect;
     
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int *pdim = INTEGER(dim), n = pdim[0];
@@ -2065,7 +2073,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 	    SET_SLOT(to, Matrix_xSym, x);
 	    UNPROTECT(1); /* x */
 	}
-	UNPROTECT(1); /* to */
+	UNPROTECT(nprotect);
 	return to;
 	
     } else if (clf[2] != 'T') {
@@ -2076,6 +2084,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 	    p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 	    p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 	    i0 = PROTECT(GET_SLOT(from, iSym));
+	nprotect += 3;
 	int j, k, kend,
 	    *pp0 = INTEGER(p0),
 	    *pp1 = INTEGER(p1),
@@ -2144,6 +2153,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 	/* Now allocating and filling out slots ... */
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1));
+	++nprotect;
 	int *pi1 = INTEGER(i1);
 
 	SEXP x0 = NULL, x1 = NULL;
@@ -2151,6 +2161,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 	if (clf[0] != 'n') {
 	    PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
+	    nprotect += 2;
 	}
 	
 	if (clf[1] == 't') {
@@ -2354,12 +2365,8 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
-	if (clf[0] == 'n')
-	    UNPROTECT(4); /*         i1, i0, p1, p0 */
-	else {
+	if (clf[0] != 'n')
 	    SET_SLOT(to, Matrix_xSym, x1);
-	    UNPROTECT(6); /* x1, x0, i1, i0, p1, p0 */
-	}
 	
     } else {
 
@@ -2367,6 +2374,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 	    j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
+	nprotect += 2;
 	int *pi0 = INTEGER(i0),
 	    *pj0 = INTEGER(j0);
 	R_xlen_t k, nnz0 = XLENGTH(i0), nnz1 = 0;
@@ -2391,6 +2399,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
 	    j1 = PROTECT(allocVector(INTSXP, nnz1));
+	nprotect += 2;
 	int *pi1 = INTEGER(i1),
 	    *pj1 = INTEGER(j1);
 	
@@ -2399,6 +2408,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 	if (clf[0] != 'n') {
 	    PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
 	    PROTECT(x1 = allocVector(tx = TYPEOF(x0), nnz1));
+	    nprotect += 2;
 	}
 	
 	if (clf[1] == 't' && di != 'N') {
@@ -2472,16 +2482,12 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 
 	SET_SLOT(to, Matrix_iSym, i1);
 	SET_SLOT(to, Matrix_jSym, j1);
-	if (clf[0] == 'n')
-	    UNPROTECT(4); /*         j1, i1, j0, i0 */
-	else {
+	if (clf[0] != 'n')
 	    SET_SLOT(to, Matrix_xSym, x1);
-	    UNPROTECT(6); /* x1, x0, j1, i1, j0, i0 */
-	}
-	
+	    
     }
     
-    UNPROTECT(1); /* to */
+    UNPROTECT(nprotect);
     return to;
 }
 
@@ -2513,25 +2519,25 @@ SEXP R_sparse_symmpart(SEXP from)
 	error(_("attempt to get symmetric part of non-square matrix"));
     if (n > 0)
 	SET_SLOT(to, Matrix_DimSym, dim);
-    UNPROTECT(1);
+    UNPROTECT(1); /* dim */
 
     SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
     if (clf[1] != 's')
 	set_symmetrized_DimNames(to, dimnames, -1);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    UNPROTECT(1);
+    UNPROTECT(1); /* dimnames */
 
     if (clf[1] != 'g') {
 	SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	if (ul != 'U')
 	    SET_SLOT(to, Matrix_uploSym, uplo);
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo */
     } else if (clf[2] == 'R') {
 	SEXP uplo = PROTECT(mkString("L"));
 	SET_SLOT(to, Matrix_uploSym, uplo);
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo */
     }
 
     char di = 'N';
@@ -2540,7 +2546,7 @@ SEXP R_sparse_symmpart(SEXP from)
 	di = *CHAR(STRING_ELT(diag, 0));
 	if (di != 'N')
 	    REPROTECT(from = R_sparse_as_general(from), pidA); /* U->N */
-	UNPROTECT(1);
+	UNPROTECT(1); /* diag */
     }
 
     SEXP x0 = NULL, x1 = NULL;
@@ -2948,14 +2954,14 @@ SEXP R_sparse_skewpart(SEXP from)
 	error(_("attempt to get skew-symmetric part of non-square matrix"));
     if (n > 0)
 	SET_SLOT(to, Matrix_DimSym, dim);
-    UNPROTECT(1);
+    UNPROTECT(1); /* dim */
 
     SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
     if (clf[1] != 's')
 	set_symmetrized_DimNames(to, dimnames, -1);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    UNPROTECT(1);
+    UNPROTECT(1); /* dimnames */
 
     SEXP x0 = NULL, x1 = NULL;
     PROTECT_INDEX pidB;
@@ -2970,7 +2976,7 @@ SEXP R_sparse_skewpart(SEXP from)
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	if (ul != 'U')
 	    SET_SLOT(to, Matrix_uploSym, uplo);
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo */
 	
 	if (clf[0] != 'z') {
 	    /* Skew-symmetric part of symmetric matrix is zero matrix */
@@ -2980,7 +2986,7 @@ SEXP R_sparse_skewpart(SEXP from)
 		int *pp1 = INTEGER(p1);
 		Memzero(pp1, n1a);
 		SET_SLOT(to, Matrix_pSym, p1);
-		UNPROTECT(1);
+		UNPROTECT(1); /* p1 */
 	    }
 	} else {
 	    /* Skew-symmetric part of Hermitian matrix is imaginary part */
@@ -2990,17 +2996,17 @@ SEXP R_sparse_skewpart(SEXP from)
 	    if (clf[2] != 'T') {
 		SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
 		SET_SLOT(to, Matrix_pSym, p0);
-		UNPROTECT(1);
+		UNPROTECT(1); /* p0 */
 	    }
 	    if (clf[2] != 'R') {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
 		SET_SLOT(to, Matrix_iSym, i0);
-		UNPROTECT(1);
+		UNPROTECT(1); /* i0 */
 	    }
 	    if (clf[2] != 'C') {
 		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
 		SET_SLOT(to, Matrix_jSym, j0);
-		UNPROTECT(1);
+		UNPROTECT(1); /* j0 */
 	    }
 	}
 	
@@ -3239,7 +3245,7 @@ SEXP R_sparse_skewpart(SEXP from)
 	if (clf[1] == 't') {
 	    SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 	    di = *CHAR(STRING_ELT(diag, 0));
-	    UNPROTECT(1);
+	    UNPROTECT(1); /* diag */
 	}
 	if (di == 'N')
 	    for (k = 0; k < nnz0; ++k)
@@ -3437,7 +3443,7 @@ SEXP CRsparse_as_Tsparse(SEXP from)
 SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 {
     static const char *valid[] = { VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "Tsparse_as_CRsparse");
     const char *clf = valid[ivalid];
@@ -3449,6 +3455,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     clt[1] = clf[1];
     clt[2] = (doC) ? 'C' : 'R';
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
+    ++nprotect;
 
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -3495,12 +3502,15 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     }
 
     SEXP i0 = PROTECT(GET_SLOT(from, iSym)), j0 = PROTECT(GET_SLOT(from, jSym));
+    nprotect += 2;
     int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), r_ = (m_ < n_) ? n_ : m_;
     R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
 
     SEXP x0 = NULL, x1 = NULL;
-    if (clf[0] != 'n')
+    if (clf[0] != 'n') {
 	PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
+	++nprotect;
+    }
     
     /* FIXME? we would ideally only throw an error if the number
        of _unique_ (i,j) pairs exceeds INT_MAX ... 
@@ -3510,6 +3520,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 		"when length of 'i' slot exceeds 2^31-1"));
     
     SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n_ + 1)), i1 = NULL;
+    ++nprotect;
     int *pp1 = INTEGER(p1), *pi1, *pj_, *workA, *workB, *workC, i, j;
     R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r_ + m_;
     *(pp1++) = 0;
@@ -3666,6 +3677,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	T_AS_CR_5;					\
 	T_AS_CR_6;					\
 	PROTECT(i1 = allocVector(INTSXP, nnz1));	\
+	++nprotect;					\
 	pi1 = INTEGER(i1);				\
 	T_AS_CR_7();					\
     } while (0)
@@ -3682,6 +3694,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	T_AS_CR_6;					\
 	PROTECT(i1 = allocVector(INTSXP, nnz1));	\
 	PROTECT(x1 = allocVector(_SEXPTYPE_, nnz1));	\
+	nprotect += 2;					\
 	pi1 = INTEGER(i1);				\
 	px1 = _PTR_(x1);				\
 	T_AS_CR_7(px1[workB[pj_[k]]] = px_[k]);		\
@@ -3732,20 +3745,17 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     
     SET_SLOT(to, Matrix_pSym, p1);
     SET_SLOT(to,        iSym, i1);
-
-    if (clf[0] == 'n')
-	UNPROTECT(5); /*     i1, p1,     j0, i0, to */
-    else {
+    if (clf[0] != 'n')
 	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(7); /* x1, i1, p1, x0, j0, i0, to */
-    }
+    
+    UNPROTECT(nprotect);
     return to;
 }
 
 SEXP Tsparse_aggregate(SEXP from)
 {
     static const char *valid[] = { VALID_TSPARSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "Tsparse_aggregate");
     const char *cl = valid[ivalid];
@@ -3756,13 +3766,16 @@ SEXP Tsparse_aggregate(SEXP from)
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
 	i0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 	j0 = PROTECT(GET_SLOT(from, Matrix_iSym));
+    nprotect += 3;
     int *pdim = INTEGER(dim), *pi0 = INTEGER(i0), *pj0 = INTEGER(j0),
 	m_ = pdim[1], n_ = pdim[0], r_ = (m_ < n_) ? n_ : m_;
     R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
     
     SEXP x0 = NULL, x1 = NULL;
-    if (cl[0] != 'n')
+    if (cl[0] != 'n') {
 	PROTECT(x0 = GET_SLOT(from, Matrix_xSym));
+	++nprotect;
+    }
     
     if (nnz0 > INT_MAX)
 	error(_("unable to aggregate TsparseMatrix with 'i' slot "
@@ -3800,6 +3813,7 @@ SEXP Tsparse_aggregate(SEXP from)
 	if (nnz1 != nnz0) {				\
 	    PROTECT(i1 = allocVector(INTSXP, nnz1));	\
 	    PROTECT(j1 = allocVector(INTSXP, nnz1));	\
+	    nprotect += 2;				\
 	    pi1 = INTEGER(i1);				\
 	    pj1 = INTEGER(j1);				\
 	    SET_TRIPLET();				\
@@ -3807,7 +3821,7 @@ SEXP Tsparse_aggregate(SEXP from)
 	Free_FROM(workA, w);				\
 	Free_FROM(pj_, nnz0);				\
 	if (nnz1 == nnz0) {				\
-	    UNPROTECT(3); /* j0, i0, dim */		\
+	    UNPROTECT(nprotect);			\
 	    return from;				\
 	}						\
     } while (0)
@@ -3824,6 +3838,7 @@ SEXP Tsparse_aggregate(SEXP from)
 	    PROTECT(i1 = allocVector(INTSXP, nnz1));		\
 	    PROTECT(j1 = allocVector(INTSXP, nnz1));		\
 	    PROTECT(x1 = allocVector(_SEXPTYPE_, nnz1));	\
+	    nprotect += 3;					\
 	    pi1 = INTEGER(i1);					\
 	    pj1 = INTEGER(j1);					\
 	    px1 = _PTR_(x1);					\
@@ -3833,7 +3848,7 @@ SEXP Tsparse_aggregate(SEXP from)
 	Free_FROM(pj_, nnz0);					\
 	Free_FROM(px_, nnz0);					\
 	if (nnz1 == nnz0) {					\
-	    UNPROTECT(4); /* x0, j0, i0, dim */			\
+	    UNPROTECT(nprotect);				\
 	    return from;					\
 	}							\
     } while (0)
@@ -3841,6 +3856,7 @@ SEXP Tsparse_aggregate(SEXP from)
     T_AS_CR_CASES(cl[0], T_AGGR_N, T_AGGR_X);
 
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+    ++nprotect;
 
     if (m_ != n_ || n_ > 0)
 	SET_SLOT(to, Matrix_DimSym, dim);
@@ -3871,13 +3887,10 @@ SEXP Tsparse_aggregate(SEXP from)
     
     SET_SLOT(to, Matrix_iSym, j1);
     SET_SLOT(to, Matrix_jSym, i1);
-
-    if (cl[0] == 'n')
-	UNPROTECT(6); /* to,     j1, i1,     j0, i0, dim */
-    else {
+    if (cl[0] != 'n')
 	SET_SLOT(to, Matrix_xSym, x1);
-	UNPROTECT(8); /* to, x1, j1, i1, x0, j0, i0, dim */
-    }
+
+    UNPROTECT(nprotect);
     return to;
 }
 
