@@ -480,7 +480,7 @@ options(oo)
 
 ## problematic rank deficient rankMatrix() case -- only seen in large cases ??
 Z. <- readRDS(system.file("external", "Z_NA_rnk.rds", package="Matrix"))
-tools::assertWarning(rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors
+(rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors; now warns typically, but not on aarm64 (M1)
 qrZ. <- qr(Z.)
 options(warn=1)
 rnk2 <- qr2rankMatrix(qrZ.) # warning ".. only 684 out of 822 finite diag(R) entries"
