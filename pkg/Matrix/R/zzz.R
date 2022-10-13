@@ -137,6 +137,7 @@ dput(lapply(grep("to=\"[dln](di|ge|tr|sy|tp|sp|[gts][CRT])Matrix\"",
                  value = TRUE),
             function(s) unname(eval(str2lang(paste0("c(", s, ")"))))))
 }
+## Note:  Allow  as(*, "dpoMatrix")  to check for pos.(semi)definite-ness
 .from.to <- list(c("ddenseMatrix", "dgeMatrix"), c("ddiMatrix", "dgCMatrix"),
                  c("ddiMatrix", "dgeMatrix"), c("ddiMatrix", "dtCMatrix"),
                  c("dgCMatrix", "dgeMatrix"), c("dgCMatrix", "dgTMatrix"),
