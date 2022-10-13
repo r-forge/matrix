@@ -5,7 +5,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 {
     static const char *valid[] = {
 	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
-    int ivalid = R_check_class_etc(from, valid);
+    int ivalid = R_check_class_etc(from, valid), nprotect = 0;
     
     const char *zzz;
     char z0, z1, z2;
@@ -19,7 +19,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     SEXP dim, dimnames, x_from;
     SEXPTYPE txf, txt = (z0 == '.') ? NILSXP : kind2type(z0);
     PROTECT_INDEX pidA, pidB;
-    int *pdim = NULL, doDN = 1, packed = 0, nprotect = 0;
+    int *pdim = NULL, doDN = 1, packed = 0;
     char clt[] = "...Matrix", ul = 'U', di = 'N';
     clt[2] = z2;
     
@@ -140,11 +140,11 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt)), p_to, i_to, j_to, x_to;
     ++nprotect;
     p_to = i_to = j_to = x_to = NULL;
-
+    
     R_xlen_t nnz = 0;
     int m = pdim[0], n = pdim[1], i, j, *pp, *pi, *pj;
     pp = pi = pj = NULL;
-
+    
     if (m != n || n > 0)
 	SET_SLOT(to, Matrix_DimSym, dim);
     if (doDN)
@@ -761,7 +761,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     if (clf[1] != 'g') {
 	SEXP uplo_from = PROTECT(GET_SLOT(from, Matrix_uploSym));
 	ulf = *CHAR(STRING_ELT(uplo_from, 0));
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo_from */
 	if (clf[1] == 't') {
 	    /* Be fast if band contains entire triangle */
 	    if ((ulf == 'U') ? (a <= 0 && b >= n-1) : (b >= 0 && a <= 1-m)) {
@@ -770,7 +770,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	    } else if (a <= 0 && b >= 0) {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 		di = *CHAR(STRING_ELT(diag, 0));
-		UNPROTECT(1);
+		UNPROTECT(1); /* diag */
 	    }
 	}
     }
@@ -851,19 +851,19 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	set_symmetrized_DimNames(to, dimnames, -1);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-    UNPROTECT(1);
+    UNPROTECT(1); /* dimnames */
 
     ult = (tr && clf[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ulf;
     if (ult != 'U') {
 	SEXP uplo_to = PROTECT(mkString("L"));
 	SET_SLOT(to, Matrix_uploSym, uplo_to);
-	UNPROTECT(1);
+	UNPROTECT(1); /* uplo_to */
     }
     
     if (di != 'N') {
 	SEXP diag = PROTECT(mkString("U"));
 	SET_SLOT(to, Matrix_diagSym, diag);
-	UNPROTECT(1);
+	UNPROTECT(1); /* diag */
     }
     
     /* It remains to set 'x' ... */

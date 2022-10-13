@@ -431,9 +431,13 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     }
     SET_SLOT(ans, Matrix_LSym,
 	     Matrix_cs_to_SEXP(N->L, "dtCMatrix", 0, do_dn ? dn : R_NilValue));
-    if (n < 2) /* is_sym() assumes upper, which is "wrong" in this case */
-	SET_SLOT(GET_SLOT(ans, Matrix_LSym), Matrix_uploSym, mkString("L"));
-
+    if (n < 2) { /* is_sym() assumes upper, which is "wrong" in this case */
+	SEXP L = PROTECT(GET_SLOT(ans, Matrix_LSym)),
+	    uplo = PROTECT(mkString("L"));
+	SET_SLOT(L, Matrix_uploSym, uplo);
+	UNPROTECT(2);
+    }
+    
     if(keep_dimnms) {
 	if(do_dn) {
 	    UNPROTECT(1); // dn

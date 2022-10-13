@@ -91,7 +91,7 @@ SEXP dpoMatrix_solve(SEXP a)
     
     F77_CALL(dpotri)(ul, pdim, px, pdim, &info FCONE);
 
-    UNPROTECT(5);
+    UNPROTECT(6);
     return val;
 }
 

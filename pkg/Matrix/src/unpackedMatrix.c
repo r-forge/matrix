@@ -546,13 +546,12 @@ SEXP unpackedMatrix_transpose(SEXP from)
     if (ivalid >= 3) {
 	SEXP uplo_from = PROTECT(GET_SLOT(from, Matrix_uploSym));
 	char ulf = *CHAR(STRING_ELT(uplo_from, 0));
+	UNPROTECT(1); /* uplo_from */
 	if (ulf == 'U') {
 	    SEXP uplo_to = PROTECT(mkString("L"));
 	    SET_SLOT(to, Matrix_uploSym, uplo_to);
 	    UNPROTECT(1); /* uplo_to */
 	}
-	UNPROTECT(1); /* uplo_from */
-	
 	if (ivalid < 8) {
 	    /* .trMatrix */
 	    SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));

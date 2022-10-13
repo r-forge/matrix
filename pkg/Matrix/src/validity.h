@@ -84,4 +84,17 @@ SEXP CHMfactor_validate(SEXP obj);
 SEXP CHMsimpl_validate(SEXP obj);
 SEXP CHMsuper_validate(SEXP obj);
 
+#define UPRET(_N_, _S_)				\
+    do {					\
+	UNPROTECT(_N_);				\
+	return mkString(_(_S_));		\
+    } while (0)
+
+#define FRUPRET(_PTR_, _M_, _N_, _S_)		\
+    do {					\
+	Free_FROM(_PTR_, _M_);			\
+	UNPROTECT(_N_);				\
+	return mkString(_(_S_));		\
+    } while (0)
+
 #endif
