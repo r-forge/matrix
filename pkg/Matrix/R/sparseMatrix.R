@@ -470,9 +470,8 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 	if((n.x <- length(x)) > 0L && n.x != n.i) {
             if(n.x < n.i) {
                 if(n.i %% n.x != 0L)
-                    ## FIXME: missing(i)
-                    warning(if(m.i) "p[length(p)]" else "length(i)",
-                            " is not an integer multiple of length(x)")
+                    warning(if(m.i) "p[length(p)] " else "length(i) ",
+                            "is not an integer multiple of length(x)")
                 x <- rep_len(x, n.i) # recycle
             } else if(n.x == 1L)
                 x <- x[0L] # tolerate length(i) = 0, length(x) = 1

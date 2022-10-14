@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-2 (2022-10-14 r3689)}{
+\section{Changes in version 1.5-2 (2022-10-14 r3690)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions now \code{PROTECT()} the result of
@@ -32,6 +32,10 @@
       \item \code{.sparseDiagonal()} now agrees with \code{Diagonal()}
       when called with no arguments, returning a 0-by-0 (rather than
       1-by-1) diagonal \code{Matrix}.
+
+      \item \code{sparseMatrix(i, j)} with 0-length \code{i} and
+      \code{j} now returns a 0-by-0 matrix rather than throwing a
+      perplexing error.
 
       \item \code{diag(x) <- value} now coerces \code{diagonalMatrix}
       \code{x} if \code{typeof(value)} is \dQuote{higher} than
