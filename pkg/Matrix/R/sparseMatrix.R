@@ -434,7 +434,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
     dims <-
         if(!missing(dims)) {
             if(length(dims) != 2L ||
-               any(is.na(dims) | dims < 0L | dims > .Machine$integer.max))
+               any(is.na(dims) | dims < 0L | dims >= .Machine$integer.max + 1))
                 stop("invalid 'dims'")
             if(any(dims - 1L < rij[2L, ]))
                 stop("'dims' must contain all (i,j) pairs")
