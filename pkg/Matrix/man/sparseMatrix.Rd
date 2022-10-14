@@ -35,7 +35,7 @@ sparseMatrix(i, j, p, x, dims, dimnames,
     necessary.  If missing, then the result is a \bold{n}onzero pattern
     matrix, i.e., inheriting from class \code{\linkS4class{nsparseMatrix}}.}
   \item{dims}{optional length-2 integer vector of matrix dimensions.
-    If missing, then \code{!index1+c(max(i), max(j))} is used.}
+    If missing, then \code{!index1+c(max(i),max(j))} is used.}
   \item{dimnames}{optional list of \code{\link{dimnames}}; if missing,
     then \code{\link{NULL}} ones are used.}
   \item{symmetric}{logical indicating if the resulting matrix should
