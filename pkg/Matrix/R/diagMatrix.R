@@ -331,20 +331,21 @@ Diagonal <- function(n, x = NULL) {
         r@diag <- "U"
         return(r)
     }
-    if(is.object(x) || is.array(x))
+    if(is.object(x))
         stop(gettextf("'x' has unsupported class \"%s\"", class(x)[1L]),
              domain = NA)
     r <- new(switch(typeof(x),
-                    logical = "ldiMatrix",
-                    integer = { x <- as.double(x); "ddiMatrix" },
-                    double = "ddiMatrix",
+                    ## discarding attributes, incl. 'dim' in array case
+                    logical = { x <- as.logical(x); "ldiMatrix" },
+                    integer =,
+                    double = { x <- as.double(x); "ddiMatrix" },
                     stop(gettextf("'x' has unsupported type \"%s\"", typeof(x)),
                          domain = NA)))
     r@Dim <- c(n, n)
     if(nx != 1L)
         r@x <-
             if(nx == n)
-                x # _not_ stripping attributes ... FIXME? as.vector(x)
+                x
             else if(nx > 0L)
                 rep_len(x, n)
             else stop("attempt to recycle 'x' of length 0 to length 'n' (n > 0)")
@@ -377,15 +378,16 @@ Diagonal <- function(n, x = NULL) {
     if(m.kind || kind != "n") {
         if(is.null(x))
            x <- if(m.kind) { kind <- "d"; 1 } else switch(kind, d = 1, l = TRUE)
-        else if(is.object(x) || is.array(x))
+        else if(is.object(x))
             stop(gettextf("'x' has unsupported class \"%s\"",
                           class(x)[1L]),
                  domain = NA)
         else {
             kind. <- switch(typeof(x),
-                            logical = "l",
-                            integer = { x <- as.double(x); "d" },
-                            double = "d",
+                            ## discarding attributes, incl. 'dim' in array case
+                            logical = { x <- as.logical(x); "l" },
+                            integer =,
+                            double = { x <- as.double(x); "d" },
                             stop(gettextf("'x' has unsupported type \"%s\"",
                                           typeof(x)),
                                  domain = NA))
@@ -435,7 +437,7 @@ Diagonal <- function(n, x = NULL) {
         if(kind != "n") {
             x <-
                 if((nx <- length(x)) == n)
-                    x # _not_ stripping attributes ... FIXME? as.vector(x)
+                    x
                 else if(nx > 0L)
                     rep_len(x, n)
                 else stop("attempt to recycle 'x' of length 0 to length 'n' (n > 0)")
