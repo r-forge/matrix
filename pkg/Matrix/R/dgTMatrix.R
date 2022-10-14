@@ -69,14 +69,5 @@ setAs("dgeMatrix", "dgTMatrix",
 
 ## "[<-" methods { setReplaceMethod()s }  too ...
 
-## Uses the triplet convention of *adding* entries with same (i,j):
-setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
-          function(e1, e2) {
-              dimCheck(e1, e2)
-              new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
-                  x = c(e1@x, e2@x), Dim = e1@Dim, Dimnames = e1@Dimnames)
-          })
-
-
 ## setMethod("writeHB", signature(obj = "dgTMatrix"),
 ## 	  function(obj, file, ...) callGeneric(as(obj, "CsparseMatrix"), file, ...))

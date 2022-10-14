@@ -1304,6 +1304,18 @@ setMethod("Arith", signature(e1 = "numeric", e2 = "dsparseMatrix"), .Arith.atom.
 setMethod("Arith", signature(e1 = "logical", e2 = "dsparseMatrix"), .Arith.atom.CM)
 rm(A.M.n, A.n.M)
 
+
+##-------- originally from ./dgTMatrix.R --------------------
+
+## Uses the triplet convention of *adding* entries with same (i,j):
+setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
+          function(e1, e2) {
+              dimCheck(e1, e2)
+              new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
+                  x = c(e1@x, e2@x), Dim = e1@Dim, Dimnames = e1@Dimnames)
+          })
+
+
 ##-------- originally from ./Csparse.R --------------------
 
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
