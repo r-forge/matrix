@@ -259,3 +259,12 @@ setMethod("Math2", signature(x = "sparseVector"),
 	      x@x <- callGeneric(x@x, digits = digits)
 	      x
 	  })
+
+
+## ~~~~ Not group generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("zapsmall", signature(x = "dMatrix"),
+          function(x, digits = getOption("digits")) {
+              x@x <- zapsmall(x@x, digits)
+              x
+          })

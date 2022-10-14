@@ -52,17 +52,3 @@ setAs("dMatrix", "nMatrix",
 ## "Math", "Math2" in			--> ./Math.R
 ## "Summary"				--> ./Summary.R
 ## "Ops" ("Arith", "Compare", "Logic")	--> ./Ops.R
-
-
-
-## Methods for single-argument transformations
-
-setMethod("zapsmall", signature(x = "dMatrix"),
-          function(x, digits = getOption("digits")) {
-              x@x <- zapsmall(x@x, digits)
-              x
-          })
-
-## -- end(single-argument transformations) ------
-
-

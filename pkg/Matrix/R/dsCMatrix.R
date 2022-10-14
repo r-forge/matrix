@@ -87,30 +87,6 @@ setMethod("t", signature(x = "dsCMatrix"),
           valueClass = "dsCMatrix")
 } ## MJ
 
-### These two are very similar, the first one has the advantage
-### to be applicable to 'Chx' directly:
-
-## "used" currently only in ../tests/factorizing.R
-.diag.dsC <- function(x, Chx = Cholesky(x, LDL=TRUE), res.kind = "diag") {
-    force(Chx)
-    if(!missing(Chx)) stopifnot(.isLDL(Chx), is.integer(Chx@p), is.double(Chx@x))
-    .Call(diag_tC, Chx, res.kind)
-    ##    ^^^^^^^ from ../src/Csparse.c
-    ## => res.kind in ("trace", "sumLog", "prod", "min", "max", "range", "diag", "diagBack")
-}
-
-## MJ: unused
-if(FALSE) {
-## here, we  *could* allow a 'mult = 0' factor :
-.CHM.LDL.D <- function(x, perm = TRUE, res.kind = "diag") {
-    .Call(dsCMatrix_LDL_D, x, perm, res.kind)
-    ##    ^^^^^^^^^^^^^^^^ from ../src/dsCMatrix.c
-}
-} ## MJ
-
-## FIXME:  kind = "diagBack" is not yet implemented
-##	would be much more efficient, but there's no CHOLMOD UI (?)
-##
 ## Note: for det(), permutation is unimportant;
 ##       for diag(), apply *inverse* permutation
 ##    	q <- p ; q[q] <- seq_along(q); q

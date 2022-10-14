@@ -1,4 +1,4 @@
------------NOTE__matched case__in__sensitively
+# NOTE: matched case _in_sensitively
 2copy
 \.Rhistory
 ^Done$
@@ -43,3 +43,7 @@ tests/useRNG
 tests/.*\.Rout.*[24]b
 tests/.*_(doExtra|nX)$
 tests/performance
+
+# Currently "empty", not contributing to namespace :
+R/[dln](dense|sparse)?Matrix\.R$
+R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
