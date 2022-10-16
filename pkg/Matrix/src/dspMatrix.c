@@ -35,7 +35,7 @@ SEXP dspMatrix_trf(SEXP obj)
 	error(_("LAPACK routine '%s' returned with error code %d"),
 	      "dsptrf", info);
     
-    set_factor(x, "pBunchKaufman", val);
+    set_factor(obj, "pBunchKaufman", val);
     UNPROTECT(6);
     return val;
 }
