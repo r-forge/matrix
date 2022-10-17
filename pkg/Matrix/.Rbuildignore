@@ -47,3 +47,10 @@ tests/performance
 # Currently "empty", not contributing to namespace :
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
+
+# these give warning "ISO C forbids an empty translation unit" from '-Wpedantic' :
+src/TMatrix_as.[ch]
+src/dgTMatrix.[ch]
+src/dtTMatrix.[ch]
+src/lgCMatrix.[ch]
+src/ldense.[ch]
