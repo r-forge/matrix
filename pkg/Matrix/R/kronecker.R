@@ -48,6 +48,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "diagonalMatrix"),
               r
 	  })
 
+if(FALSE) { # --NOT YET--
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
 	  function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
@@ -220,6 +221,7 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
               }
               r
 	  })
+} # --NOT YET--
 
 setMethod("kronecker", signature(X = "denseMatrix", Y = "denseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
@@ -730,6 +732,10 @@ setMethod("kronecker", signature(X = "RsparseMatrix", Y = "Matrix"),
 setMethod("kronecker", signature(X = "TsparseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
               kronecker(X, as(Y, "TsparseMatrix"), FUN, make.dimnames, ...))
+
+setMethod("kronecker", signature(X = "diagonalMatrix", Y = "Matrix"),
+          function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
+              kronecker(X, as(Y, "CsparseMatrix"), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
