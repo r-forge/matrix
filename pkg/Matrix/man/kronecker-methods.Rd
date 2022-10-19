@@ -17,11 +17,10 @@
 \alias{kronecker,TsparseMatrix,diagonalMatrix-method}
 \alias{kronecker,denseMatrix,Matrix-method}
 \alias{kronecker,denseMatrix,denseMatrix-method}
-\alias{kronecker,denseMatrix,diagonalMatrix-method}
 \alias{kronecker,diagonalMatrix,CsparseMatrix-method}
+\alias{kronecker,diagonalMatrix,Matrix-method}
 \alias{kronecker,diagonalMatrix,RsparseMatrix-method}
 \alias{kronecker,diagonalMatrix,TsparseMatrix-method}
-\alias{kronecker,diagonalMatrix,denseMatrix-method}
 \alias{kronecker,diagonalMatrix,diagonalMatrix-method}
 \alias{kronecker,diagonalMatrix,indMatrix-method}
 \alias{kronecker,indMatrix,Matrix-method}
