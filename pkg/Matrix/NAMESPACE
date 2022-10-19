@@ -68,7 +68,8 @@ export("%&%",
        .diag.dsC,# -> R/dsCMatrix.R --has FIXME
        .solve.dgC.chol, .solve.dgC.qr, .solve.dgC.lu,
        "diagN2U", "diagU2N", .diagU2N, .diag2tT, .diag2sT, .diag2mat,
-       dmperm,
+       "dimScale", "rowScale", "colScale",
+       "dmperm",
        "drop0",
        "expand",
        "expm",
@@ -99,10 +100,10 @@ export("%&%",
        "skewpart",
        "tril", "triu",
        "updown",
-       "pack", "unpack"
-       , .updateCHMfactor
-       , .validateCsparse
-       , "writeMM"
+       "pack", "unpack",
+       .updateCHMfactor,
+       .validateCsparse,
+       "writeMM"
        )
 
 ## substitute for using  cbind() / rbind()
