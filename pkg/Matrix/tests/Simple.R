@@ -1419,6 +1419,14 @@ stopifnot(identical(is.infinite(x.inf), as(abs(x.inf) == Inf, "nMatrix")))
 as(new("dgTMatrix"), "CsparseMatrix") # out-of-bounds access
 as(seq_len(10000), "pMatrix") # segfault
 
+## <pMatrix> %*% <pMatrix> gave b %*% a prior to Matrix 1.5-2
+set.seed(163006)
+for(i in 1:6) {
+    x <- as(sample.int(10L), "pMatrix")
+    y <- as(sample.int(10L), "pMatrix")
+    stopifnot(as(x %*% y, "matrix") == as(x, "matrix") %*% as(y, "matrix"))
+}
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
