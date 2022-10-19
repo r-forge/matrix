@@ -2052,3 +2052,26 @@ if(FALSE) {
     ##    ^^^^^^^^^^^^^^^^ from ../src/dsCMatrix.c
 }
 } ## MJ
+
+dimScale <- function(x, d1 = 1 / sqrt(diag(x, FALSE)), d2 = d1) {
+    dim.x <- dim(x)
+    D1 <- Diagonal(n = dim.x[1L], x = d1)
+    D2 <- if(missing(d2)) D1 else Diagonal(n = dim.x[2L], x = d2)
+    y <- D1 %*% x %*% D2 # inefficient for symmetricMatrix 'x', but "general"
+    if(is(x, "symmetricMatrix"))
+        y <- forceSymmetric(y, x@uplo)
+    y@Dimnames <- dimnames(x)
+    y
+}
+
+rowScale <- function(x, d) {
+    y <- Diagonal(n = nrow(x), x = d) %*% x
+    y@Dimnames <- dimnames(x)
+    y
+}
+
+colScale <- function(x, d) {
+    y <- x %*% Diagonal(n = ncol(x), x = d)
+    y@Dimnames <- dimnames(x)
+    y
+}
