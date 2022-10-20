@@ -990,8 +990,8 @@ setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
               r
           })
 
-## FIXME? Should <unit diagonalMatrix> %*% <symmetricMatrix> be symmetric?
-##        The inherited 'rownames' and 'colnames' could differ ...
+## FIXME: <unit diagonalMatrix> %*% <symmetricMatrix> should not be symmetric,
+##        because the inherited 'rownames' and 'colnames' could differ ...
 
 .prod.diag.dense <- function(x, y, boolArith, trans) {
     if(boolArith) {
@@ -1168,10 +1168,12 @@ setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         y@x <- op(x@x[y@i + 1L], y@x)
-        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else drop0.notol(y)
+        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else y
     } else
         (if(trans) t else identity)(
-            .sparse2kind(y, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(y, "n", drop0 = TRUE)
+            else .sparse2kind(y, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
@@ -1229,10 +1231,12 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
         }
         dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
         x@x <- (if(boolArith) `&` else `*`)(x@x, rep.int(y@x, dp))
-        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else drop0.notol(x)
+        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else x
     } else
         (if(trans) t else identity)(
-            .sparse2kind(x, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(x, "n", drop0 = TRUE)
+            else .sparse2kind(x, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
@@ -1290,10 +1294,12 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
         }
         dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
         y@x <- (if(boolArith) `&` else `*`)(rep.int(x@x, dp), y@x)
-        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else drop0.notol(y)
+        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else y
     } else
         (if(trans) t else identity)(
-            .sparse2kind(y, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(y, "n", drop0 = TRUE)
+            else .sparse2kind(y, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
@@ -1351,10 +1357,12 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         x@x <- op(x@x, y@x[x@j + 1L])
-        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else drop0.notol(x)
+        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else x
     } else
         (if(trans) t else identity)(
-            .sparse2kind(x, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(x, "n", drop0 = TRUE)
+            else .sparse2kind(x, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
@@ -1412,10 +1420,12 @@ setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         y@x <- op(x@x[y@i + 1L], y@x)
-        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else drop0.notol(y)
+        if(boolArith) .sparse2kind(y, "n", drop0 = TRUE) else y
     } else
         (if(trans) t else identity)(
-            .sparse2kind(y, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(y, "n", drop0 = TRUE)
+            else .sparse2kind(y, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
@@ -1473,10 +1483,12 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         x@x <- op(x@x, y@x[x@j + 1L])
-        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else drop0.notol(x)
+        if(boolArith) .sparse2kind(x, "n", drop0 = TRUE) else x
     } else
         (if(trans) t else identity)(
-            .sparse2kind(x, if(boolArith) "n" else "d", drop0 = TRUE))
+            if(boolArith)
+                .sparse2kind(x, "n", drop0 = TRUE)
+            else .sparse2kind(x, "d", drop0 = FALSE))
 }
 
 setMethod("%*%", signature(x = "TsparseMatrix", y = "diagonalMatrix"),
