@@ -1427,6 +1427,13 @@ for(i in 1:6) {
     stopifnot(as(x %*% y, "matrix") == as(x, "matrix") %*% as(y, "matrix"))
 }
 
+## <indMatrix> %*% <indMatrix> forgot to set 'Dim' briefly prior to 1.5-2
+x <- new("indMatrix", Dim = c(5L, 3L),
+         perm = sample.int(3L, size = 5L, replace = TRUE))
+y <- new("indMatrix", Dim = c(3L, 9L),
+         perm = sample.int(9L, size = 3L, replace = TRUE))
+validObject(x %*% y)
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
