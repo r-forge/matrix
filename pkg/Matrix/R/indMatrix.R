@@ -316,9 +316,9 @@ setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
 
 setMethod("%*%", signature(x = "indMatrix", y = "indMatrix"),
 	  function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
-              y@perm <- y@perm[x@perm]
+              y@Dim <- mmultDim(x@Dim, y@Dim, type = 1L)
               y@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              y@perm <- y@perm[x@perm]
               y
           })
 
@@ -346,9 +346,9 @@ setMethod("%&%", signature(x = "Matrix", y = "indMatrix"),
 
 setMethod("%&%", signature(x = "indMatrix", y = "indMatrix"),
 	  function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
-              y@perm <- y@perm[x@perm]
+              y@Dim <- mmultDim(x@Dim, y@Dim, type = 1L)
               y@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              y@perm <- y@perm[x@perm]
               y
           })
 
