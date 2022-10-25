@@ -324,20 +324,21 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
         stop("'n' must be a non-negative integer")
     if(is.double(n) && n >= .Machine$integer.max + 1)
         stop("dimensions cannot exceed 2^31-1")
-    n <- as.integer(n) # stripping attributes
+    n <- as.integer(n) # discarding attributes
     if(is.null(x)) {
         r <- new("ddiMatrix")
-        r@Dim <- c(n, n)
         r@diag <- "U"
+        if(n > 0L) {
+            r@Dim <- c(n, n)
+            if(is.character(names) && length(names) == n)
+                r@Dimnames <- list(names, names)
+        }
         return(r)
     }
     if(is.object(x))
         stop(gettextf("'x' has unsupported class \"%s\"", class(x)[1L]),
              domain = NA)
-    names <-
-        if(is.character(nms <- names))
-            length(nms) == n
-        else isTRUE(names) && !is.null(nms <- names(x))
+    names.x <- names(x) # keeping for later
     r <- new(switch(typeof(x),
                     ## discarding attributes, incl. 'dim' and 'names'
                     logical = { x <- as.logical(x); "ldiMatrix" },
@@ -345,7 +346,8 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
                     double = { x <- as.double(x); "ddiMatrix" },
                     stop(gettextf("'x' has unsupported type \"%s\"", typeof(x)),
                          domain = NA)))
-    r@Dim <- c(n, n)
+    if(n == 0L)
+        return(r)
     if(nx != 1L)
         r@x <-
             if(nx == n)
@@ -356,9 +358,13 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
     else if(is.na(x) || x != 1)
         r@x <- rep.int(x, n)
     else r@diag <- "U"
-    if(names) {
-        nms <- rep_len(nms, n)
-        r@Dimnames <- list(nms, nms)
+    r@Dim <- c(n, n)
+    if(is.character(names)) {
+        if(length(names) == n)
+            r@Dimnames <- list(names, names)
+    } else if(isTRUE(names) && !is.null(names.x)) {
+        names.x <- rep_len(names.x, n) # we know length(names.x) > 0L
+        r@Dimnames <- list(names.x, names.x)
     }
     r
 }

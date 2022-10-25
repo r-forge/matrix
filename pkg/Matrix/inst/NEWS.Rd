@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-10-25 r3706)}{
+\section{Changes in version 1.5-3 (2022-10-25 r3707)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no

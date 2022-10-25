@@ -1440,12 +1440,19 @@ set.seed(3054)
 V <- matrix(rlnorm(16L), 4L, 4L)
 stopifnot(all.equal(as(dimScale(V), "matrix"), cov2cor(V)))
 
-## Diagonal(n, x, names) must recycle 'x' _and_ its names
+## Diagonal(n, x, names=TRUE) must recycle 'x' _and_ its names
 p <- 6L
 a0 <- c(a = 0)
 stopifnot(identical(unname(nD <- Diagonal(n = p, x = a0, names = TRUE)),
                     Diagonal(n = p, x = a0, names = FALSE)),
           identical(nD, Diagonal(n = p, x = rep(a0, p), names = TRUE)))
+
+## Diagonal(n, names=<character>) should also get 'Dimnames'
+stopifnot(identical(Diagonal(1L, names = "a")@Dimnames, list("a", "a")))
+
+## Diagonal(x=<named 0-length>, names = TRUE) should get list(NULL, NULL)
+stopifnot(identical(Diagonal(x = a0[0L], names = TRUE)@Dimnames,
+                    list(NULL, NULL)))
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
