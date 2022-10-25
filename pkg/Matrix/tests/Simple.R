@@ -1434,6 +1434,12 @@ y <- new("indMatrix", Dim = c(3L, 9L),
          perm = sample.int(9L, size = 3L, replace = TRUE))
 validObject(x %*% y)
 
+## dimScale(x) (i.e., with 'd1' missing) did not work in 1.5-2;
+## same with dimScale(<matrix with NULL dimnames>) ...
+set.seed(3054)
+V <- matrix(rlnorm(16L), 4L, 4L)
+stopifnot(all.equal(as(dimScale(V), "matrix"), cov2cor(V)))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()

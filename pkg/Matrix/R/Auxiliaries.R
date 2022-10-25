@@ -2053,7 +2053,7 @@ if(FALSE) {
 }
 } ## MJ
 
-dimScale <- function(x, d1 = sqrt(1/diag(x, FALSE)), d2 = d1) {
+dimScale <- function(x, d1 = sqrt(1/diag(x, names = FALSE)), d2 = d1) {
     dim.x <- dim(x)
     D1 <- Diagonal(n = dim.x[1L], x = d1)
     D2 <- if(missing(d2)) D1 else Diagonal(n = dim.x[2L], x = d2)
