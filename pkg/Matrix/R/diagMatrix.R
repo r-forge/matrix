@@ -334,10 +334,12 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
     if(is.object(x))
         stop(gettextf("'x' has unsupported class \"%s\"", class(x)[1L]),
              domain = NA)
-    names <- (isTRUE(names) && !is.null(nm <- names(x))) ||
-        (is.character(nm <- names) && length(nm) == n)
+    names <-
+        if(is.character(nms <- names))
+            length(nms) == n
+        else isTRUE(names) && !is.null(nms <- names(x))
     r <- new(switch(typeof(x),
-                    ## discarding attributes, incl. 'dim' in array case
+                    ## discarding attributes, incl. 'dim' and 'names'
                     logical = { x <- as.logical(x); "ldiMatrix" },
                     integer =,
                     double = { x <- as.double(x); "ddiMatrix" },
@@ -354,7 +356,10 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
     else if(is.na(x) || x != 1)
         r@x <- rep.int(x, n)
     else r@diag <- "U"
-    if(names) r@Dimnames <- list(nm, nm)
+    if(names) {
+        nms <- rep_len(nms, n)
+        r@Dimnames <- list(nms, nms)
+    }
     r
 }
 

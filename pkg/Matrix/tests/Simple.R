@@ -1440,6 +1440,13 @@ set.seed(3054)
 V <- matrix(rlnorm(16L), 4L, 4L)
 stopifnot(all.equal(as(dimScale(V), "matrix"), cov2cor(V)))
 
+## Diagonal(n, x, names) must recycle 'x' _and_ its names
+p <- 6L
+a0 <- c(a = 0)
+stopifnot(identical(unname(nD <- Diagonal(n = p, x = a0, names = TRUE)),
+                    Diagonal(n = p, x = a0, names = FALSE)),
+          identical(nD, Diagonal(n = p, x = rep(a0, p), names = TRUE)))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
