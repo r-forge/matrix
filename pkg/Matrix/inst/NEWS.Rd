@@ -5,6 +5,19 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.5-3 (2022-10-25 r3704)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{dimScale(x)} with argument \code{d1} missing is no
+      longer an error.  (The default value had \code{diag(x, FALSE)}
+      instead of \code{diag(x, names = FALSE)}.)
+
+      \item \code{(dim|row|col)Scale(x)} is no longer an error for
+      traditional matrices \code{x} without a \code{dimnames} attribute.
+    }
+  }
+}
+
 \section{Changes in version 1.5-2 (2022-10-21 r3702)}{
   \subsection{Bug Fixes}{
     \itemize{

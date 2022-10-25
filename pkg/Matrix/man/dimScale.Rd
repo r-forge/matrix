@@ -12,7 +12,7 @@
   and symmetry where appropriate.
 }
 \usage{
-dimScale(x, d1 = sqrt(1/diag(x, FALSE)), d2 = d1)
+dimScale(x, d1 = sqrt(1/diag(x, names = FALSE)), d2 = d1)
 rowScale(x, d)
 colScale(x, d)
 }
