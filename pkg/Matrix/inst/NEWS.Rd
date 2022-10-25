@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-10-25 r3704)}{
+\section{Changes in version 1.5-3 (2022-10-25 r3705)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -14,6 +14,14 @@
 
       \item \code{(dim|row|col)Scale(x)} is no longer an error for
       traditional matrices \code{x} without a \code{dimnames} attribute.
+
+      \item Our \code{cov2cor()} methods now again preserve (symmetrized!)
+      \code{dimnames}, fixing Matrix bug #6783 reported by Ben Bolker.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item \code{Diagonal()} gets a new optional \code{names} argument.
     }
   }
 }
@@ -25,27 +33,27 @@
       \code{R_do_slot()}, \code{getAttrib()}, \code{mkString()}, etc.
       in many more (but not yet all) places, resolving many new
       and some old \code{rchk} warnings.
-      
+
       \item \code{lu(x)@L@uplo} is now \code{"L"}, not \code{"U"},
       for 0-by-0 and 1-by-1 \code{dgCMatrix} \code{x}.
-      
+
       \item The validity methods for classes \code{l[ts]CMatrix}
       now correctly test for structurally nonzero entries on the
       wrong side of the diagonal, and fail in that case.  This test
       was previously only performed for \code{d[ts]Matrix}.
-      
+
       \item The validity and initialization methods for virtual class
       \code{sparseVector} are more diligent, i.e., catching more edge
       cases such as \code{NA} in the \code{length} or \code{i} slot.
-      
+
       \item The validity method for \code{corMatrix} now throws a better
       error when the \code{sd} slot is of type \code{"integer"} rather
       than \code{"double"}.
-      
+
       \item \code{.sparseDiagonal()} now agrees with \code{Diagonal()}
       when called with no arguments, returning a 0-by-0 (rather than
       1-by-1) diagonal \code{Matrix}.
-      
+
       \item \code{sparseMatrix(i, j)} with 0-length \code{i} and
       \code{j} now returns a 0-by-0 matrix rather than throwing a
       perplexing error.
@@ -57,7 +65,7 @@
       \code{x} if \code{typeof(value)} is \dQuote{higher} than
       \code{typeof(x@x)} in the usual hierarchy, for consistency with
       methods for \code{denseMatrix} and with \code{base::`diag<-`}.
-      
+
       \item Methods for \code{kronecker()} no longer ignore the
       \code{make.dimnames} argument.
 
@@ -109,16 +117,16 @@
       \itemize{
 	\item \code{dimnames(A \%*\% B)} is now always
 	\code{c(dimnames(A)[1], dimnames(B)[2])}.
-	
+
 	\item \code{t?crossprod()} methods involving \code{indMatrix}
 	or its subclass \code{pMatrix} gain a \code{boolArith} argument.
-	
+
 	\item Numeric and boolean products are always returned as
 	\code{dMatrix} and \code{nMatrix}, respectively, except in
 	a few special cases where the product can be represented
 	as an \code{indMatrix}.  (Previously, coercions were skipped
 	when one of the operands was unit diagonal.)
-	
+
 	\item Products of \code{diagonalMatrix} with dense
 	\code{triangularMatrix} now correctly give a
 	\code{triangularMatrix} result (and without unpacking).
@@ -138,7 +146,7 @@
       \item \code{kronecker(<Matrix>, <Matrix>)} now gives the correct
       \dQuote{shape} (general, [unit] triangular, symmetric, diagonal)
       in all cases where it can be known without checking.
-      
+
       \item \code{kronecker(<[CR]sparseMatrix>, <Matrix>)} now retains
       the storage of the first argument, no longer coercing to
       \code{TsparseMatrix}.
@@ -774,7 +782,7 @@
 
       \item \code{band(M, k1, k2)} now also works when \code{k1 * k2} is
       larger than 2^31-1, the maximal integer, fixing R-forge Matrix bug
-      6743 by Ariel Paulson.  Further, it works when \code{M} is a sparse
+      #6743 by Ariel Paulson.  Further, it works when \code{M} is a sparse
       \code{"symmetricMatrix"} but the band is not symmetric, \code{k1 != -k2}.
 
       \item fix leak in C-level code for \code{cbind(m1,m2)} or

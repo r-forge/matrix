@@ -316,7 +316,7 @@ setAs("ldiMatrix", "ldenseMatrix", #-> "ltr"
 
 ## diagonalMatrix constructor, allowing either or both of 'n' and 'x' to be
 ## missing ... like base::diag() but _not_ also extracting diagonal entries
-Diagonal <- function(n, x = NULL) {
+Diagonal <- function(n, x = NULL, names = FALSE) {
     nx <- length(x)
     if(missing(n))
         n <- nx
@@ -334,6 +334,8 @@ Diagonal <- function(n, x = NULL) {
     if(is.object(x))
         stop(gettextf("'x' has unsupported class \"%s\"", class(x)[1L]),
              domain = NA)
+    names <- (isTRUE(names) && !is.null(nm <- names(x))) ||
+        (is.character(nm <- names) && length(nm) == n)
     r <- new(switch(typeof(x),
                     ## discarding attributes, incl. 'dim' in array case
                     logical = { x <- as.logical(x); "ldiMatrix" },
@@ -352,6 +354,7 @@ Diagonal <- function(n, x = NULL) {
     else if(is.na(x) || x != 1)
         r@x <- rep.int(x, n)
     else r@diag <- "U"
+    if(names) r@Dimnames <- list(nm, nm)
     r
 }
 
