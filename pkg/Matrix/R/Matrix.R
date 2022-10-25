@@ -119,7 +119,7 @@ setMethod("cov2cor", signature(V = "Matrix"),
               Is <- Diagonal(x = Is)
               r <- Is %*% V %*% Is
 	      r[cbind(1:p,1:p)] <- 1 # exact in diagonal
-	      as(forceSymmetric(r), "dpoMatrix")
+	      as(forceSymmetric(`dimnames<-`(r,  dimnames(V))), "dpoMatrix")
           })
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R

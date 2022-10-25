@@ -14,7 +14,7 @@
   \code{\linkS4class{CsparseMatrix}}).
 }
 \usage{
-Diagonal(n, x = NULL)
+Diagonal(n, x = NULL, names = FALSE)
 
 .sparseDiagonal(n, x = NULL, uplo = "U", shape = "t", unitri = TRUE, kind, cols)
     .trDiagonal(n, x = NULL, uplo = "U", unitri = TRUE, kind)
@@ -27,20 +27,25 @@ Diagonal(n, x = NULL)
     entries, to be recycled as necessary.  If \code{NULL} (the default),
     then the result is a unit diagonal matrix.  \code{.sparseDiagonal()}
     and friends ignore non-\code{NULL} \code{x} when \code{kind = "n"}.}
+  \item{names}{either \code{\link{logical}} \code{TRUE} or \code{FALSE} or
+    then a \code{\link{character}} vector of \code{\link{length}}
+    \code{n}.  If true \emph{and} \code{\link{names}(x)} is not
+    \code{NULL}, use that as both row and column names for the resulting
+    matrix.  When a character vector, use it for both dimnames.}
   \item{uplo}{one of \code{c("U","L")}, specifying the \code{uplo} slot
     of the result if the result is formally triangular of symmetric.}
   \item{shape}{one of \code{c("t","s","g")}, indicating if the result
     should be formally triangular, symmetric, or \dQuote{general}.
-    The result will inherit from virtual class 
+    The result will inherit from virtual class
     \code{\linkS4class{triangularMatrix}},
     \code{\linkS4class{symmetricMatrix}}, or
     \code{\linkS4class{generalMatrix}}, respectively.}
   \item{unitri}{logical indicating if a formally triangular result with
-    ones on the diagonal should be formally \emph{unit} triangular, i.e., 
+    ones on the diagonal should be formally \emph{unit} triangular, i.e.,
     with \code{diag} slot equal to \code{"U"} rather than \code{"N"}.}
   \item{kind}{one of \code{c("d","l","n")}, indicating the \dQuote{mode}
     of the result: numeric, logical, or pattern.
-    The result will inherit from virtual class 
+    The result will inherit from virtual class
     \code{\linkS4class{dsparseMatrix}},
     \code{\linkS4class{lsparseMatrix}}, or
     \code{\linkS4class{nsparseMatrix}}, respectively.
@@ -48,7 +53,7 @@ Diagonal(n, x = NULL)
     non-\code{NULL}; in that case the mode is determined by
     \code{\link{typeof}(x)}.}
   \item{cols}{optional integer vector with values in \code{0:(n-1)},
-    indexing columns of the specified diagonal matrix.  If specified, 
+    indexing columns of the specified diagonal matrix.  If specified,
     then the result is (mathematically) \code{D[, cols+1]} rather
     than \code{D}, where \code{D = Diagonal(n, x)}, and it is always
     \dQuote{general} (i.e., \code{shape} is ignored).}
@@ -56,7 +61,7 @@ Diagonal(n, x = NULL)
 \value{
   \code{Diagonal()} returns an object inheriting from virtual class
   \code{\linkS4class{diagonalMatrix}}.
-  
+
   \code{.sparseDiagonal()} returns a \code{\linkS4class{CsparseMatrix}}
   representation of \code{Diagonal(n, x)} or, if \code{cols} is given,
   of \code{Diagonal(n, x)[, cols+1]}.  The precise class of the result
