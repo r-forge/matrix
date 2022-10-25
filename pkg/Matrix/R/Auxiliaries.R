@@ -2058,20 +2058,23 @@ dimScale <- function(x, d1 = sqrt(1/diag(x, FALSE)), d2 = d1) {
     D1 <- Diagonal(n = dim.x[1L], x = d1)
     D2 <- if(missing(d2)) D1 else Diagonal(n = dim.x[2L], x = d2)
     y <- D1 %*% x %*% D2 # inefficient for symmetricMatrix 'x', but "general"
-    if(is(x, "symmetricMatrix") && identical(d1, d2))
+    if(isS4(x) && is(x, "symmetricMatrix") && identical(d1, d2))
         y <- forceSymmetric(y, x@uplo)
-    y@Dimnames <- dimnames(x)
+    if(is.list(dn <- dimnames(x)))
+        y@Dimnames <- dn
     y
 }
 
 rowScale <- function(x, d) {
     y <- Diagonal(n = nrow(x), x = d) %*% x
-    y@Dimnames <- dimnames(x)
+    if(is.list(dn <- dimnames(x)))
+        y@Dimnames <- dn
     y
 }
 
 colScale <- function(x, d) {
     y <- x %*% Diagonal(n = ncol(x), x = d)
-    y@Dimnames <- dimnames(x)
+    if(is.list(dn <- dimnames(x)))
+        y@Dimnames <- dn
     y
 }
