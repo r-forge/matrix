@@ -1820,6 +1820,321 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
     return res;
 }
 
+/* diag(<[CRT]sparseMatrix>) <- value */
+SEXP R_sparse_diag_set(SEXP obj, SEXP val)
+{
+    static const char *valid[] = {
+	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "R_sparse_diag_set");
+    const char *clf = valid[ivalid];
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    ++nprotect;
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+    
+    SEXPTYPE tv = TYPEOF(val);
+    if (tv < LGLSXP || tv > REALSXP)
+	/* Upper bound can become CPLXSXP once we have proper zMatrix */
+	error(_("replacement diagonal has incompatible type \"%s\""),
+	      type2char(tv));
+    
+    R_xlen_t nv = XLENGTH(val);
+    if (nv != 1 && nv != r)
+	error(_("replacement diagonal has wrong length"));
+
+    SEXP x0 = NULL, x1 = NULL;
+    SEXPTYPE tx = LGLSXP;
+    PROTECT_INDEX pid;
+    if (clf[0] != 'n') {
+	PROTECT_WITH_INDEX(x0 = GET_SLOT(obj, Matrix_xSym), &pid);
+	++nprotect;
+	tx = TYPEOF(x0);
+    }
+    
+    SEXP res;
+    if (tv <= tx) {
+	PROTECT(val = coerceVector(val, tv = tx));
+	PROTECT(res = NEW_OBJECT_OF_CLASS(clf));
+	nprotect += 2;
+    } else { /* tv > tx */
+	/* dMatrix result is only possibility until we have proper [iz]Matrix */
+	PROTECT(val = coerceVector(val, tv = tx = REALSXP));
+	char clt[] = "d..Matrix";
+	clt[1] = clf[1];
+	clt[2] = clf[2];
+	PROTECT(res = NEW_OBJECT_OF_CLASS(clt));
+	nprotect += 2;
+	if (clf[0] != 'n')
+	    REPROTECT(x0 = coerceVector(x0, tv), pid);
+    }
+    
+    if (m != n || n > 0)
+	SET_SLOT(res, Matrix_DimSym, dim);
+    
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(1); /* dimnames */
+
+    char ul = 'U', di = 'N';
+    if (clf[1] != 'g') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+	if (ul != 'U')
+	    SET_SLOT(res, Matrix_uploSym, uplo);
+	
+	if (clf[1] == 't') {
+	    SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	    di = *CHAR(STRING_ELT(diag, 0));
+	    UNPROTECT(1); /* diag */
+	}
+    }
+    
+    if (clf[2] != 'T') {
+	
+	SEXP iSym = (clf[2] == 'C') ? Matrix_iSym : Matrix_jSym,
+	    p0 = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+	    p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
+	    i0 = PROTECT(GET_SLOT(obj, iSym));
+	nprotect += 3;
+	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1), *pi0 = INTEGER(i0),
+	    j, k = 0, kend, nd0 = 0, nd1 = 0;
+	pp0++;
+	*(pp1++) = 0;
+
+	if (clf[1] == 'g') {
+	    for (j = 0; j < r; ++j) {
+		kend = pp0[j];
+		while (k < kend) {
+		    if (pi0[k] >= j) {
+			if (pi0[k] == j)
+			    ++nd0;
+			k = kend;
+			break;
+		    }
+		    ++k;
+		}
+		pp1[j] = kend - nd0;
+	    }
+	    for (j = r; j < n; ++j)
+		pp1[j] = pp0[j] - nd0;
+	} else if (di != 'N') {
+	    for (j = 0; j < n; ++j)
+		pp1[j] = pp0[j];
+	} else if (ul == 'U') {
+	    for (j = 0; j < n; ++j) {
+		kend = pp0[j];
+		if (k < kend && pi0[kend-1] == j)
+		    ++nd0;
+		k = kend;
+		pp1[j] = kend - nd0;
+	    }
+	} else {
+	    for (j = 0; j < n; ++j) {
+		kend = pp0[j];
+		if (k < kend && pi0[k] == j)
+		    ++nd0;
+		k = kend;
+		pp1[j] = kend - nd0;
+	    }
+	}
+
+#define DO_COUNT(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+	do {						\
+	    _CTYPE_ *pval = _PTR_(val);			\
+	    if (nv != 1) {				\
+		for (j = 0; j < r; ++j) {		\
+		    if (_NZ_(pval[j]))			\
+			++nd1;				\
+		    pp1[j] += nd1;			\
+		}					\
+		for (j = r; j < n; ++j)			\
+		    pp1[j] += nd1;			\
+	    } else if (_NZ_(pval[0])) {			\
+		nd1 = r;				\
+		for (j = 0; j < r; ++j)			\
+		    pp1[j] += j + 1;			\
+		for (j = r; j < n; ++j)			\
+		    pp1[j] += r;			\
+	    }						\
+	} while (0)
+	    
+        SPARSE_CASES(tv, DO_COUNT);
+
+#undef DO_COUNT
+
+	if (nd1 - nd0 > INT_MAX - pp0[n-1])
+	    error(_("p[length(p)] cannot exceed 2^31-1"));
+
+	int nnz1 = pp1[n-1];
+	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1));
+	++nprotect;
+	int *pi1 = INTEGER(i1);
+	
+	if (clf[0] != 'n' || tv != LGLSXP) {
+	    PROTECT(x1 = allocVector(tx, nnz1));
+	    ++nprotect;
+	}
+
+#define SPARSE_D_S(_X_COPY_, _X_INSERT_, _NZ_VAL_)		\
+	do {							\
+	    k = 0;						\
+	    for (j = 0; j < r; ++j) {				\
+		kend = pp0[j];					\
+		while (k < kend && pi0[k] < j) {		\
+		    *(pi1++) = pi0[k];				\
+		    _X_COPY_;					\
+		    ++k;					\
+		}						\
+		if (k < kend && pi0[k] == j)			\
+		    ++k;					\
+		if (_NZ_VAL_) {					\
+		    *(pi1++) = j;				\
+		    _X_INSERT_;					\
+		}						\
+		while (k < kend) {				\
+		    *(pi1++) = pi0[k];				\
+		    _X_COPY_;					\
+		    ++k;					\
+		}						\
+	    }							\
+	    for (j = r; j < n; ++j) {				\
+		kend = pp0[j];					\
+		while (k < kend && pi0[k] < j) {		\
+		    *(pi1++) = pi0[k];				\
+		    _X_COPY_;					\
+		    ++k;					\
+		}						\
+	    }							\
+	} while (0)
+
+#define SPARSE_D_S_N(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
+	do {								\
+	    _CTYPE_ *px1 = _PTR_(x1), *pval = _PTR_(val);		\
+	    if (nv != 1)						\
+		SPARSE_D_S(*(px1++) = _ONE_, *(px1++) = pval[j],	\
+			   _NZ_(pval[j]));				\
+	    else {							\
+		int nz = _NZ_(pval[0]);					\
+		SPARSE_D_S(*(px1++) = _ONE_, *(px1++) = pval[j],	\
+			   nz);						\
+	    }								\
+	} while (0)
+	    
+#define SPARSE_D_S_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
+	do {								\
+	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1), *pval = _PTR_(val); \
+	    if (nv != 1)						\
+		SPARSE_D_S(*(px1++) = px0[k], *(px1++) = pval[j],	\
+			   _NZ_(pval[j]));				\
+	    else {							\
+		int nz = _NZ_(pval[0]);					\
+		SPARSE_D_S(*(px1++) = px0[k], *(px1++) = pval[0],	\
+			   nz);						\
+	    }								\
+	} while (0)
+
+#define SPARSE_D_S_END				\
+	do {					\
+	    if (clf[0] != 'n')			\
+		SPARSE_CASES(tv, SPARSE_D_S_X);	\
+	    else if (tv != LGLSXP)		\
+		SPARSE_CASES(tv, SPARSE_D_S_N);	\
+	    else {				\
+		int *pval = LOGICAL(val);	\
+		if (nv != 1)			\
+		    SPARSE_D_S(, , pval[j]);	\
+		else				\
+		    SPARSE_D_S(, , pval[0]);	\
+	    }					\
+	} while (0)
+
+	SPARSE_D_S_END;
+	
+#undef SPARSE_D_S
+
+	SET_SLOT(res, Matrix_pSym, p1);
+	SET_SLOT(res,        iSym, i1);
+	
+    } else {
+	
+	SEXP i0 = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+	    j0 = PROTECT(GET_SLOT(obj, Matrix_jSym));
+	nprotect += 2;
+	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), j, nd0 = 0, nd1 = 0;
+	R_xlen_t k, nnz0 = XLENGTH(i0);
+	
+	for (k = 0; k < nnz0; ++k)
+	    if (pi0[k] == pj0[k])
+		++nd0;
+	
+#define DO_COUNT(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+	do {						\
+	    _CTYPE_ *pval = _PTR_(val);			\
+	    if (nv != 1) {				\
+		for (j = 0; j < r; ++j)			\
+		    if (_NZ_(pval[j]))			\
+			++nd1;				\
+	    } else if (_NZ_(pval[0]))			\
+		nd1 = r;				\
+	} while (0)
+	
+        SPARSE_CASES(tv, DO_COUNT);
+
+#undef DO_COUNT
+	
+	if (nd1 - nd0 > R_XLEN_T_MAX - nnz0)
+	    error(_("length(i) cannot exceed R_XLEN_T_MAX"));
+
+	R_xlen_t nnz1 = nnz0 + (nd1 - nd0);
+	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
+	    j1 = PROTECT(allocVector(INTSXP, nnz1));
+	nprotect += 2;
+	int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
+
+	if (clf[0] != 'n' || tv != LGLSXP) {
+	    PROTECT(x1 = allocVector(tx, nnz1));
+	    ++nprotect;
+	}
+
+#define SPARSE_D_S(_X_COPY_, _X_INSERT_, _NZ_VAL_)	\
+	do {						\
+	    for (k = 0; k < nnz0; ++k) {		\
+		if (pi0[k] != pj0[k]) {			\
+		    *(pi1++) = pi0[k];			\
+		    *(pj1++) = pj0[k];			\
+		    _X_COPY_;				\
+		}					\
+	    }						\
+	    for (j = 0; j < r; ++j) {			\
+		if (_NZ_VAL_) {				\
+		    *(pi1++) = *(pj1++) = j;		\
+		    _X_INSERT_;				\
+		}					\
+	    }						\
+	} while (0)
+	
+	SPARSE_D_S_END;
+
+#undef SPARSE_D_S_END
+#undef SPARSE_D_S_X
+#undef SPARSE_D_S_N
+#undef SPARSE_D_S
+	
+	SET_SLOT(res, Matrix_iSym, i1);
+	SET_SLOT(res, Matrix_jSym, j1);
+	
+    }
+
+    if (clf[0] != 'n' || tv != LGLSXP)
+	SET_SLOT(res, Matrix_xSym, x1);
+    
+    UNPROTECT(nprotect);
+    return res;
+}
+
 /* t(<[CRT]sparseMatrix>) */
 SEXP R_sparse_transpose(SEXP from)
 {

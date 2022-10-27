@@ -1228,7 +1228,8 @@ forceSymmetricTsparse <- function(x, uplo) {
 }
 } ## MJ
 
-.sparse.diag <- function(x,nrow,ncol,names) .Call(R_sparse_diag_get, x, names)
+.sparse.diag.get <- function(x, nrow, ncol, names) .Call(R_sparse_diag_get, x, names)
+.sparse.diag.set <- function(x, value) .Call(R_sparse_diag_set, x, value)
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
@@ -1313,7 +1314,8 @@ forceSymmetricTsparse <- function(x, uplo) {
 .sparse.subclasses <- names(getClass("sparseMatrix")@subclasses)
 
 for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
-    setMethod("diag", signature(x = .cl), .sparse.diag)
+    setMethod("diag",   signature(x = .cl), .sparse.diag.get)
+    setMethod("diag<-", signature(x = .cl), .sparse.diag.set)
     setMethod("band", signature(x = .cl), .sparse.band)
     setMethod("triu", signature(x = .cl), .sparse.triu)
     setMethod("tril", signature(x = .cl), .sparse.tril)
