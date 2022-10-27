@@ -598,22 +598,30 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     if(isSparse) {
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
-	if(!isInd && !isRsp &&
-           !(isTsp && anyDuplicatedT(m, di = d)) &&
-           !(isDiag && m@diag == "U")) {
-            stopifnot(Qidentical(m, m.d)) # e.g., @factors may differ
-        }
-    } else if(!.MJ.Qidentical(m, m.d, strictClass=FALSE,
-                              skipSlots =
-                                  if (isTri && .hasSlot(m.d, "diag") &&
-                                      m@diag == "U" && m.d@diag == "N" &&
-                                      all(m == m.d))
-                                      c("x", "diag"))) {
-        ## Above allows coercion to more general class,
-        ## e.g., is(`diag<-`(x=<dppMatrix>, value=-1), "dspMatrix")
-        ## and `diag<-`(x=<unit triangularMatrix>, value=.)@diag == "N"
-        stop("diag(m) <- diag(m) has changed 'm' too much")
     }
+
+    if(isDiag)
+        stopifnot(exprs = {
+            .MJ.Qidentical(m, m.d, strictClass = FALSE,
+                           skipSlots = if(m@diag != "N") c("diag", "x"))
+            m@diag == "N" || (m.d@diag == "N" &&
+                              identical(m.d@x, diag(m, names = FALSE)))
+        })
+    else if(isTri && m@diag != "N")
+        stopifnot(exprs = {
+            is(m.d, "triangularMatrix") && m.d@diag == "N"
+            .MJ.Qidentical(m, m.d, strictClass = FALSE,
+                           skipSlots = c("diag", "p", "i", "j", "x"))
+            isSparse || all(m == m.d)
+        })
+    else if(isTsp || ((isCsp || isRsp) && has0))
+        stopifnot(exprs = {
+            .MJ.Qidentical(m, m.d, strictClass = FALSE,
+                           skipSlots = c("p", "i", "j", "x"))
+            isSparse || all(m == m.d)
+        })
+    else if(!isInd) .MJ.Qidentical(m, m.d, strictClass = FALSE)
+
     ## use non-square matrix when "allowed":
 
     ## m12: sparse and may have 0s even if this is not: if(isSparse && has0)

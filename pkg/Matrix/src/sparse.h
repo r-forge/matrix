@@ -18,6 +18,7 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind);
 SEXP R_sparse_drop0(SEXP from);
 SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);
 SEXP R_sparse_diag_get(SEXP obj, SEXP nms);
+SEXP R_sparse_diag_set(SEXP obj, SEXP val);
 SEXP R_sparse_transpose(SEXP from);
 SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to);
 SEXP R_sparse_symmpart(SEXP from);
