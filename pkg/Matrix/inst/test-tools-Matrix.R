@@ -614,13 +614,11 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
                            skipSlots = c("diag", "p", "i", "j", "x"))
             isSparse || all(m == m.d)
         })
-    else if(isTsp || ((isCsp || isRsp) && has0))
-        stopifnot(exprs = {
-            .MJ.Qidentical(m, m.d, strictClass = FALSE,
-                           skipSlots = c("p", "i", "j", "x"))
-            isSparse || all(m == m.d)
-        })
-    else if(!isInd) .MJ.Qidentical(m, m.d, strictClass = FALSE)
+    else if(!isInd)
+        stopifnot(.MJ.Qidentical(m, m.d, strictClass = FALSE,
+                                 skipSlots =
+                                     if(((isCsp || isRsp) && has0) || isTsp)
+                                         c("p", "i", "j", "x")))
 
     ## use non-square matrix when "allowed":
 
