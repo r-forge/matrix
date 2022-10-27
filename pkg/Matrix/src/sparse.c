@@ -1900,7 +1900,7 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 	    i0 = PROTECT(GET_SLOT(obj, iSym));
 	nprotect += 3;
 	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1), *pi0 = INTEGER(i0),
-	    j, k = 0, kend, nd0 = 0, nd1 = 0;
+	    j, k = 0, kend, nd0 = 0, nd1 = 0, n_ = (clf[2] == 'C') ? n : m;
 	pp0++;
 	*(pp1++) = 0;
 
@@ -1918,13 +1918,13 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 		}
 		pp1[j] = kend - nd0;
 	    }
-	    for (j = r; j < n; ++j)
+	    for (j = r; j < n_; ++j)
 		pp1[j] = pp0[j] - nd0;
 	} else if (di != 'N') {
-	    for (j = 0; j < n; ++j)
+	    for (j = 0; j < n_; ++j)
 		pp1[j] = pp0[j];
-	} else if (ul == 'U') {
-	    for (j = 0; j < n; ++j) {
+	} else if (ul == ((clf[2] == 'C') ? 'U' : 'L')) {
+	    for (j = 0; j < n_; ++j) {
 		kend = pp0[j];
 		if (k < kend && pi0[kend-1] == j)
 		    ++nd0;
@@ -1932,7 +1932,7 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 		pp1[j] = kend - nd0;
 	    }
 	} else {
-	    for (j = 0; j < n; ++j) {
+	    for (j = 0; j < n_; ++j) {
 		kend = pp0[j];
 		if (k < kend && pi0[k] == j)
 		    ++nd0;
@@ -1950,13 +1950,13 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 			++nd1;				\
 		    pp1[j] += nd1;			\
 		}					\
-		for (j = r; j < n; ++j)			\
+		for (j = r; j < n_; ++j)		\
 		    pp1[j] += nd1;			\
 	    } else if (_NZ_(pval[0])) {			\
 		nd1 = r;				\
 		for (j = 0; j < r; ++j)			\
 		    pp1[j] += j + 1;			\
-		for (j = r; j < n; ++j)			\
+		for (j = r; j < n_; ++j)		\
 		    pp1[j] += r;			\
 	    }						\
 	} while (0)
@@ -1965,10 +1965,10 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 
 #undef DO_COUNT
 
-	if (nd1 - nd0 > INT_MAX - pp0[n-1])
+	if (nd1 - nd0 > INT_MAX - pp0[n_-1])
 	    error(_("p[length(p)] cannot exceed 2^31-1"));
 
-	int nnz1 = pp1[n-1];
+	int nnz1 = pp1[n_-1];
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz1));
 	++nprotect;
 	int *pi1 = INTEGER(i1);
@@ -2000,7 +2000,7 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 		    ++k;					\
 		}						\
 	    }							\
-	    for (j = r; j < n; ++j) {				\
+	    for (j = r; j < n_; ++j) {				\
 		kend = pp0[j];					\
 		while (k < kend && pi0[k] < j) {		\
 		    *(pi1++) = pi0[k];				\
