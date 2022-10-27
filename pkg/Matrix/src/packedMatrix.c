@@ -493,8 +493,6 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int n = INTEGER(dim)[0];
     
-    PROTECT_INDEX pidA;
-    PROTECT_WITH_INDEX(val, &pidA);
     SEXPTYPE tv = TYPEOF(val);
     if (tv < LGLSXP || tv > REALSXP)
 	/* Upper bound can become CPLXSXP once we have proper zMatrix */
@@ -506,23 +504,23 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
 	error(_("replacement diagonal has wrong length"));
     
     SEXP x;
-    PROTECT_INDEX pidB;
-    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pid);
     SEXPTYPE tx = TYPEOF(x);
     
     /* Allocate and coerce as necessary */
     SEXP res;
     if (tv <= tx) {
-	REPROTECT(val = coerceVector(val, tv = tx), pidA);
+	PROTECT(val = coerceVector(val, tv = tx));
 	PROTECT(res = NEW_OBJECT_OF_CLASS(valid[ivalid]));
-	REPROTECT(x = duplicate(x), pidB);
+	REPROTECT(x = duplicate(x), pid);
     } else { /* tv > tx */
 	/* dMatrix result is only possibility until we have proper [iz]Matrix */
-	REPROTECT(val = coerceVector(val, tv = REALSXP), pidA);
+	PROTECT(val = coerceVector(val, tv = REALSXP));
 	char cl[] = "d.pMatrix";
 	cl[1] = valid[ivalid][1];
 	PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
-	REPROTECT(x = coerceVector(x, tx = tv), pidB);
+	REPROTECT(x = coerceVector(x, tx = tv), pid);
     }
 
     if (n > 0)
@@ -581,7 +579,7 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val)
     
     SET_SLOT(res, Matrix_xSym, x);
     
-    UNPROTECT(4); /* res, x, val, dim */
+    UNPROTECT(4); /* x, res, val, dim */
     return res;
 }
 
