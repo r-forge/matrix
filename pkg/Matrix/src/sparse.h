@@ -78,38 +78,17 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 #define SPARSE_CASES(_SEXPTYPE_, _DO_)			\
     do {						\
 	switch (_SEXPTYPE_) {				\
-	case REALSXP:					\
-	    _DO_(double, REAL, 0.0, 1.0);		\
-	    break;					\
 	case LGLSXP:					\
-	    _DO_(int, LOGICAL, 0, 1);			\
+	    _DO_(int, LOGICAL, 0, 1, ISNZ_LOGICAL);	\
 	    break;					\
 	case INTSXP:					\
-	    _DO_(int, INTEGER, 0, 1);			\
+	    _DO_(int, INTEGER, 0, 1, ISNZ_INTEGER);	\
 	    break;					\
-	case CPLXSXP:					\
-	    _DO_(Rcomplex, COMPLEX,			\
-		 Matrix_zzero, Matrix_zone);		\
-	    break;					\
-	default:					\
-	    break;					\
-	}						\
-    } while (0)
-
-#define DROP0_CASES(_SEXPTYPE_, _DO_)			\
-    do {						\
-	switch (_SEXPTYPE_) {				\
 	case REALSXP:					\
-	    _DO_(double, REAL, ISNZ_REAL);		\
-	    break;					\
-	case LGLSXP:					\
-	    _DO_(int, LOGICAL, ISNZ_LOGICAL);		\
-	    break;					\
-	case INTSXP:					\
-	    _DO_(int, INTEGER, ISNZ_INTEGER);		\
+	    _DO_(double, REAL, 0.0, 1.0, ISNZ_REAL);	\
 	    break;					\
 	case CPLXSXP:					\
-	    _DO_(Rcomplex, COMPLEX, ISNZ_COMPLEX);	\
+	    _DO_(Rcomplex, COMPLEX, Matrix_zzero, Matrix_zone, ISNZ_COMPLEX); \
 	    break;					\
 	default:					\
 	    break;					\

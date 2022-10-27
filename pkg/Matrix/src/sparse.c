@@ -101,7 +101,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	    }							\
 	} while (0)
 	
-#define SAD_C_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+#define SAD_C_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	do {						\
 	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	    Memzero(px1, nx);				\
@@ -158,7 +158,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	    }							\
 	} while (0)
 
-#define SAD_R_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+#define SAD_R_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	do {						\
 	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	    Memzero(px1, nx);				\
@@ -294,7 +294,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 
 	int j;
 	
-#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	do {						\
 	    _CTYPE_ *px1 = _PTR_(x1);			\
 	    if (!packed) {				\
@@ -448,7 +448,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
     } else if (clf[0] == 'n') {
 	SEXP x = PROTECT(allocVector(tx, nx));
 
-#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	do {						\
 	    _CTYPE_ *px = _PTR_(x);			\
 	    while (nx--)				\
@@ -609,7 +609,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}							\
 	    } while (0)
 	    
-#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SAG_CR(px1[pp1_[j]] = px0[k],			\
@@ -655,7 +655,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}							\
 	    } while (0)
 
-#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SAG_CR_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SAG_CR(*(px1++) = *(px0++), *(px1++) = _ONE_);	\
@@ -722,7 +722,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}						\
 	    } while (0)
 	    
-#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		Memcpy(px1, px0, nnz0);				\
@@ -749,7 +749,7 @@ SEXP R_sparse_as_general(SEXP from)
 		}						\
 	    } while (0)
 
-#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SAG_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		Memcpy(px1, px0, nnz0);				\
@@ -866,13 +866,13 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	    PROTECT(x = allocVector(tx, n));
 	    ++nprotect;
 	    
-#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
-	    do {				\
-		_CTYPE_ *px = _PTR_(x);		\
-		for (k = 0; k < n; ++k) {	\
-		    *(pi++) = k;		\
-		    *(px++) = _ONE_;		\
-		}				\
+#define SET1(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+	    do {					\
+		_CTYPE_ *px = _PTR_(x);			\
+		for (k = 0; k < n; ++k) {		\
+		    *(pi++) = k;			\
+		    *(px++) = _ONE_;			\
+		}					\
 	    } while (0)
 	    
 	    SPARSE_CASES(tx, SET1);
@@ -891,7 +891,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 	    
 	    int nnz = 0;
 	    
-#define DROP0_DIAGONAL(_CTYPE_, _PTR_, _NZ_)				\
+#define DROP0_DIAGONAL(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {							\
 		_CTYPE_ *px = _PTR_(x);					\
 		if (clt[2] != 'T') {					\
@@ -931,7 +931,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP drop0)
 		}							\
 	    } while (0)
 
-	    DROP0_CASES(tx, DROP0_DIAGONAL);
+	    SPARSE_CASES(tx, DROP0_DIAGONAL);
 
 #undef DROP0_DIAGONAL
 	    
@@ -1148,7 +1148,7 @@ SEXP R_sparse_drop0(SEXP from)
     } else
 	nnz0 = XLENGTH(x0);
     
-#define DROP0_START(_CTYPE_, _PTR_, _NZ_)			\
+#define DROP0_START(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
     do {							\
 	_CTYPE_ *px0 = _PTR_(x0);				\
 	while (nnz1 < nnz0 && _NZ_(*px0)) {			\
@@ -1165,7 +1165,7 @@ SEXP R_sparse_drop0(SEXP from)
 		++nnz1;						\
     } while (0)
     
-    DROP0_CASES(tx, DROP0_START);
+    SPARSE_CASES(tx, DROP0_START);
 
 #undef DROP0_START
 
@@ -1219,7 +1219,7 @@ SEXP R_sparse_drop0(SEXP from)
 	int *pp1 = INTEGER(p1), j;
 	n = (int) n1a - 1;
 
-#define DROP0_END(_CTYPE_, _PTR_, _NZ_)			\
+#define DROP0_END(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	do {						\
 	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	    Memcpy(pi1, pi0, nnz_);			\
@@ -1249,7 +1249,7 @@ SEXP R_sparse_drop0(SEXP from)
 	    }						\
 	} while (0)
     
-	DROP0_CASES(tx, DROP0_END);
+	SPARSE_CASES(tx, DROP0_END);
 
 #undef DROP0_END
 
@@ -1265,7 +1265,7 @@ SEXP R_sparse_drop0(SEXP from)
 	int *pj0 = INTEGER(j0),
 	    *pj1 = INTEGER(j1);
 	
-#define DROP0_END(_CTYPE_, _PTR_, _NZ_)				\
+#define DROP0_END(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	do {							\
 	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 	    Memcpy(pi1, pi0, nnz_);				\
@@ -1281,7 +1281,7 @@ SEXP R_sparse_drop0(SEXP from)
 	    }							\
 	} while (0)
 
-	DROP0_CASES(tx, DROP0_END);
+	SPARSE_CASES(tx, DROP0_END);
 
 #undef DROP0_END
 
@@ -1566,12 +1566,12 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	}								\
     } while (0)
 
-#define SPARSE_BAND_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
-    do {						\
-	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
-	SPARSE_BAND(*(px1++) = px0[k],			\
-		    px1[pp1_[j]] = px0[k],		\
-		    px1[pp1_[pi0[k]]] = px0[k]);	\
+#define SPARSE_BAND_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+    do {							\
+	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
+	SPARSE_BAND(*(px1++) = px0[k],				\
+		    px1[pp1_[j]] = px0[k],			\
+		    px1[pp1_[pi0[k]]] = px0[k]);		\
     } while (0)
 
     if (clf[0] == 'n')
@@ -1642,11 +1642,11 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 
 	int i;
 	
-#define DO_ONES(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
-	do {					\
-	    _CTYPE_ *pres = _PTR_(res);		\
-	    for (i = 0; i < r; ++i)		\
-		*(pres++) = _ONE_;		\
+#define DO_ONES(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+	do {						\
+	    _CTYPE_ *pres = _PTR_(res);			\
+	    for (i = 0; i < r; ++i)			\
+		*(pres++) = _ONE_;			\
 	} while (0)
 
 	SPARSE_CASES(type, DO_ONES);
@@ -1705,7 +1705,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 	    }								\
 	} while (0)
 	
-#define DO_DIAG_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)		\
+#define DO_DIAG_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	do {							\
 	    _CTYPE_ *px = _PTR_(x), *pres = _PTR_(res);		\
 	    DO_DIAG(pres, px[k], px[kend-1], px[k], _ZERO_);	\
@@ -1948,7 +1948,7 @@ SEXP R_sparse_transpose(SEXP from)
 	}						\
     } while (0)
 
-#define SPARSE_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
+#define SPARSE_T_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
     do {						\
 	_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 	SPARSE_T(px1[pp1_[i]] = px0[k]);		\
@@ -2178,10 +2178,10 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 			}					\
 		    } while (0)
 
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
-		    do {				\
-			_CTYPE_ *px1 = _PTR_(x1);	\
-			SPARSE_FS(*(px1++) = _ONE_);	\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
+		    do {					\
+			_CTYPE_ *px1 = _PTR_(x1);		\
+			SPARSE_FS(*(px1++) = _ONE_);		\
 		    } while (0)
 
 		    if (clf[0] == 'n')
@@ -2210,7 +2210,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 			}						\
 		    } while (0)
 		    
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 		    do {						\
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 			SPARSE_FS(*(px1++) = px0[k], *(px1++) = _ONE_);	\
@@ -2264,7 +2264,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		    }							\
 		} while (0)
 		
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 		do {							\
 		    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		    SPARSE_FS(*(px1++) = px0[pp0[j]-1]);		\
@@ -2292,7 +2292,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		    }							\
 		} while (0)
 		
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 		do {							\
 		    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		    SPARSE_FS(*(px1++) = px0[pp0[j-1]]);		\
@@ -2324,7 +2324,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		}						\
 	    } while (0)
 
-#define SPARSE_FS_X_BASIC(_CTYPE_, _PTR_, _ZERO_, _ONE_)	\
+#define SPARSE_FS_X_BASIC(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)	\
 	    do {						\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
 		SPARSE_FS(*(px1++) = px0[k]);			\
@@ -2428,7 +2428,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo_to)
 		}					\
 	    } while (0)
 
-#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_)			\
+#define SPARSE_FS_X(_CTYPE_, _PTR_, _ZERO_, _ONE_, _NZ_)		\
 	    do {							\
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
 		if (ulf == ult) {					\
