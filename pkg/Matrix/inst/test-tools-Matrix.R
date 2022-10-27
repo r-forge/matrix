@@ -455,15 +455,18 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 
     clNam <- class(m)
     cld <- getClassDef(clNam) ## extends(cld, FOO) is faster than is(m, FOO)
-    isCor    <- extends(cld, "corMatrix")
-    isSym    <- extends(cld, "symmetricMatrix")
+    isGen <- extends(cld, "generalMatrix")
+    isSym <- extends(cld, "symmetricMatrix")
+    isTri <- extends(cld, "triangularMatrix")
+    isCor <- isSym && extends(cld, "corMatrix")
     if(isSparse <- extends(cld, "sparseMatrix")) { # also true for these
+        isCsp  <- extends(cld, "CsparseMatrix")
 	isRsp  <- extends(cld, "RsparseMatrix")
+        isTsp  <- extends(cld, "TsparseMatrix")
 	isDiag <- extends(cld, "diagonalMatrix")
 	isInd  <- extends(cld, "indMatrix")
 	isPerm <- extends(cld, "pMatrix")
-    } else isRsp <- isDiag <- isInd <- isPerm <- FALSE
-    isTri <- !isSym && !isDiag && !isInd && extends(cld, "triangularMatrix")
+    } else isCsp <- isRsp <- isTsp <- isDiag <- isInd <- isPerm <- FALSE
     is.n     <- extends(cld, "nMatrix")
     nonMatr  <- clNam != (Mcl <- MatrixClass(clNam, cld))
 
@@ -504,8 +507,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	ttm <- t(tm)
         ## notInd: "pMatrix" ok, but others inheriting from "indMatrix" are not
         notInd <- (!isInd || isPerm)
-	if(notInd && (extends(cld, "CsparseMatrix") ||
-	   extends(cld, "generalMatrix") || isDiag))
+	if(notInd && (isCsp || isGen || isDiag))
             stopifnot(Qidentical(m, ttm, strictClass = !nonMatr))
 	else if(do.matrix) {
 	    if(notInd) stopifnot(nonMatr || class(ttm) == clNam)
@@ -597,7 +599,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	n0m <- drop0(m) #==> n0m is Csparse
 	has0 <- !Qidentical(n0m, as(m,"CsparseMatrix"))
 	if(!isInd && !isRsp &&
-           !(extends(cld, "TsparseMatrix") && anyDuplicatedT(m, di = d)) &&
+           !(isTsp && anyDuplicatedT(m, di = d)) &&
            !(isDiag && m@diag == "U")) {
             stopifnot(Qidentical(m, m.d)) # e.g., @factors may differ
         }
@@ -633,7 +635,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
                   ## only testing [CR]sparseMatrix and indMatrix here ...
                   ## sum(<n.T>) excludes duplicated (i,j) pairs whereas
                   ## length(diagU2N(<[^n].T>)) includes them ...
-                  isDiag || extends(cld, "TsparseMatrix") ||
+                  isDiag || isTsp ||
                   (if(isSym) length(if(.hasSlot(n1, "i")) n1@i else n1@j)
                    else sum(n1)) == length(if(isInd) m@perm else diagU2N(m)@x))
         Cat("ok\n")
@@ -677,7 +679,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 		CatF("ok;  determinant(): ")
 		if(!doDet)
 		    Cat(" skipped (!doDet): ")
-		else if(any(is.na(m.m)) && extends(cld, "triangularMatrix"))
+		else if(any(is.na(m.m)) && isTri)
 		    Cat(" skipped: is triang. and has NA: ")
 		else
 		    stopifnot(eqDeterminant(m, m.m, NA.Inf.ok=TRUE))
@@ -702,7 +704,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	}
 	else if(extends(cld, "lMatrix")) { ## should fulfill even with NA:
 	    stopifnot(all(m | !m | ina), !any(!m & m & !ina))
-	    if(extends(cld, "TsparseMatrix")) # allow modify, since at end here
+	    if(isTsp) # allow modify, since at end here
 		m <- uniqTsparse(m, clNam)
 	    stopifnot(identical(m, m & TRUE),
 		      identical(m, FALSE | m))
@@ -729,7 +731,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	}
 
         maybeDense <- if(isSparse) identity else function(.) as(., "denseMatrix")
-	if(extends(cld, "triangularMatrix")) {
+	if(isTri) {
 	    mm. <- m
 	    i0 <- if(m@uplo == "L")
 		upper.tri(mm.) else lower.tri(mm.)
