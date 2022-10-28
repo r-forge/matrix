@@ -2135,6 +2135,8 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
     return res;
 }
 
+/* diagU2N(<[CRT]sparseMatrix>), parallel to R-level ..diagU2N(),
+   though that is more general, working for _all_ Matrix */
 SEXP R_sparse_diag_U2N(SEXP obj) {
     if (!HAS_SLOT(obj, Matrix_diagSym))
 	return obj;
@@ -2149,6 +2151,8 @@ SEXP R_sparse_diag_U2N(SEXP obj) {
     return res;
 }
 
+/* diagU2N(<[CRT]sparseMatrix>), parallel to R-level ..diagN2U(), 
+   though that is more general, working for _all_ Matrix */
 SEXP R_sparse_diag_N2U(SEXP obj) {
     if (!HAS_SLOT(obj, Matrix_diagSym))
 	return obj;
