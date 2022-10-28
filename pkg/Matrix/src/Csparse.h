@@ -3,6 +3,8 @@
 
 #include "Mutils.h"
 
+extern SEXP R_sparse_diag_U2N(SEXP obj);
+
 Rboolean isValid_Csparse(SEXP x);
 SEXP Csp_dense_products(SEXP a, SEXP b,
 			Rboolean transp_a,
@@ -14,8 +16,6 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith);
 SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith);
 SEXP Csparse_dense_crossprod(SEXP a, SEXP b, SEXP transp);
 SEXP Csparse_dense_prod     (SEXP a, SEXP b, SEXP transp);
-SEXP Csparse_diagU2N(SEXP x);
-SEXP Csparse_diagN2U(SEXP x);
 SEXP Csparse_drop(SEXP x, SEXP tol);
 SEXP Csparse_horzcat(SEXP x, SEXP y);
 SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j);
@@ -50,6 +50,12 @@ SEXP diag_tC(SEXP obj, SEXP resultKind);
 /* MJ: however, some reverse dependencies built with Matrix < 1.5-0 need it */
 #ifdef Matrix_SupportingCachedMethods
 SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2);
+#endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_diag_(U2N|N2U)() */
+#if 0
+SEXP Csparse_diagU2N(SEXP x);
+SEXP Csparse_diagN2U(SEXP x);
 #endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_general() */

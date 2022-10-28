@@ -1,7 +1,6 @@
 SOURCES_C =  \
 	    CHMfactor.c \
 	    Csparse.c \
-	    Tsparse.c \
 	    init.c \
             Mutils.c \
 	    chm_common.c \

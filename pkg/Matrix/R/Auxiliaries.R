@@ -1539,9 +1539,7 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
 asCspN <- function(x, cl = class(x), cld = getClassDef(cl)) {
     if(!extends(cld, "CsparseMatrix"))
         cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
-    if(extends(cld, "triangularMatrix") && x@diag == "U")
-        .Call(Csparse_diagU2N, x)
-    else x
+    .Call(R_sparse_diag_U2N, x)
 }
 
 ## MJ: no longer used

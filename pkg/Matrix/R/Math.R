@@ -104,9 +104,8 @@ setMethod("Math", signature(x = "CsparseMatrix"), function(x)
         return(callGeneric(.sparse2dense(x)))
     ## Result preserves sparseness and structure (symmetric, triangular)
     cld <- getClassDef(cl <- class(x))
-    if(extends(cld, "triangularMatrix") && x@diag != "N" &&
-       isN1(callGeneric(1)))
-        x <- .Call(Csparse_diagU2N, x)
+    if(isN1(callGeneric(1)))
+        x <- .Call(R_sparse_diag_U2N, x)
     if(extends(cld, "nsparseMatrix")) {
         ## No 'x' slot
         r <- rep.int(callGeneric(1), length(x@i))

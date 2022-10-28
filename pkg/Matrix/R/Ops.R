@@ -1083,8 +1083,8 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
     dn <- dimNamesCheck(e1, e2, check = check.dimnames)
     if(triangular) {
 	## need these for the 'x' slots in any case
-	if (e1@diag == "U") e1 <- .Call(Csparse_diagU2N, e1)
-	if (e2@diag == "U") e2 <- .Call(Csparse_diagU2N, e2)
+	e1 <- .Call(R_sparse_diag_U2N, e1)
+	e2 <- .Call(R_sparse_diag_U2N, e2)
         ## slightly more efficient than non0.i() or non0ind():
 	ij1 <- .Call(compressed_non_0_ij, e1, isC=TRUE)
 	ij2 <- .Call(compressed_non_0_ij, e2, isC=TRUE)
