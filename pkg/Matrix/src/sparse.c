@@ -2135,6 +2135,53 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
     return res;
 }
 
+SEXP R_sparse_diag_U2N(SEXP obj) {
+    if (!HAS_SLOT(obj, Matrix_diagSym))
+	return obj;
+    SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char di = *CHAR(STRING_ELT(diag, 0));
+    UNPROTECT(1); /* diag */
+    if (di == 'N')
+	return obj;
+    SEXP val = PROTECT(ScalarLogical(1)),
+	res = PROTECT(R_sparse_diag_set(obj, val));
+    UNPROTECT(2); /* res, val */
+    return res;
+}
+
+SEXP R_sparse_diag_N2U(SEXP obj) {
+    if (!HAS_SLOT(obj, Matrix_diagSym))
+	return obj;
+    SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char di = *CHAR(STRING_ELT(diag, 0));
+    UNPROTECT(1); /* diag */
+    if (di != 'N')
+	return obj;
+    PROTECT(diag = mkString("U"));
+    SEXP res, dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n > 0) {
+	SEXP k, uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+	if (ul == 'U') {
+	    PROTECT(k = ScalarInteger( 1));
+	    PROTECT(res = R_sparse_band(obj, k, R_NilValue));
+	} else {
+	    PROTECT(k = ScalarInteger(-1));
+	    PROTECT(res = R_sparse_band(obj, R_NilValue, k));
+	}
+	SET_SLOT(res, Matrix_diagSym, diag);
+	UNPROTECT(3); /* res, k, diag */
+    } else {
+	PROTECT(res = duplicate(obj));
+	SET_SLOT(res, Matrix_diagSym, diag);
+	UNPROTECT(2); /* res,    diag */
+    }
+    return res;
+}
+
 /* t(<[CRT]sparseMatrix>) */
 SEXP R_sparse_transpose(SEXP from)
 {

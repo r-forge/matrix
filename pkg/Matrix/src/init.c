@@ -4,7 +4,6 @@
 #include "chm_common.h"
 #include "CHMfactor.h"
 #include "Csparse.h"
-#include "Tsparse.h"
 #include "dense.h"
 #include "dgCMatrix.h"
 #include "dgeMatrix.h"
@@ -52,8 +51,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_crossprod, 4),
     CALLDEF(Csparse_dense_crossprod, 3),
     CALLDEF(Csparse_dense_prod, 3),
-    CALLDEF(Csparse_diagN2U, 1),
-    CALLDEF(Csparse_diagU2N, 1),
     CALLDEF(Csparse_drop, 2),
     CALLDEF(Csparse_horzcat, 2),
     CALLDEF(Csparse_sort, 1),
@@ -135,9 +132,14 @@ static R_CallMethodDef CallEntries[] = {
 #if 0
     CALLDEF(R_to_CMatrix, 1),
 #endif
-    
-    CALLDEF(Tsparse_diagU2N, 1),
 
+/* MJ: no longer needed ... prefer R_sparse_diag_(U2N|N2U)() */
+#if 0
+    CALLDEF(Csparse_diagU2N, 1),
+    CALLDEF(Csparse_diagN2U, 1),
+    CALLDEF(Tsparse_diagU2N, 1),
+#endif
+    
 /* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
 #if 0
     CALLDEF(Tsparse_to_Csparse, 2),
@@ -471,6 +473,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_sparse_band, 3),
     CALLDEF(R_sparse_diag_get, 2),
     CALLDEF(R_sparse_diag_set, 2),
+    CALLDEF(R_sparse_diag_U2N, 1),
+    CALLDEF(R_sparse_diag_N2U, 1),
     CALLDEF(R_sparse_transpose, 1),
     CALLDEF(R_sparse_force_symmetric, 2),
     CALLDEF(R_sparse_symmpart, 1),
@@ -565,8 +569,14 @@ R_init_Matrix(DllInfo *dll)
 
 #define RREGDEF(name)  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
+#if 0
     RREGDEF(Csparse_diagU2N);
-
+#else
+    /* backwards compatibility, while still preferring R_sparse_diag_U2N() */
+    R_RegisterCCallable(
+	"Matrix", "Csparse_diagU2N", (DL_FUNC) R_sparse_diag_U2N);
+#endif
+    
     RREGDEF(as_cholmod_dense);
     RREGDEF(as_cholmod_factor);
     RREGDEF(as_cholmod_factor3);

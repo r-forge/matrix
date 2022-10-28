@@ -1,6 +1,9 @@
 				/* Sparse matrices in triplet form */
+
+/* MJ: no longer needed ... nothing below */
 #include "Tsparse.h"
 #include "chm_common.h"
+#endif /* MJ */
 
 /* MJ: no longer needed ... replacement in ./validity.c */
 #if 0
@@ -71,6 +74,9 @@ SEXP Tsparse_to_tCsparse(SEXP x, SEXP uplo, SEXP diag)
 }
 
 #endif /* MJ */
+
+/* MJ: no longer needed ... prefer R_sparse_diag_U2N() */
+#if 0
 
 SEXP Tsparse_diagU2N(SEXP x)
 {
@@ -149,3 +155,5 @@ SEXP Tsparse_diagU2N(SEXP x)
 	return ans;
     }
 }
+
+#endif /* MJ */

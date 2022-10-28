@@ -751,18 +751,8 @@ formatSpMatrix <- function(x, digits = NULL, # getOption("digits"),
     d <- dim(x)
     unitD <- extends(cld, "triangularMatrix") && x@diag == "U"
     ## Will note it is *unit*-diagonal by using "I" instead of "1"
-    if(unitD) {
-	if(extends(cld, "CsparseMatrix"))
-	    x <- .Call(Csparse_diagU2N, x)
-	else if(extends(cld, "TsparseMatrix"))
-	    x <- .Call(Tsparse_diagU2N, x)
-	else {
-	    kind <- .M.kind(x)
-	    x <- .Call(Tsparse_diagU2N,
-		       as(as(x, paste0(kind, "Matrix")), "TsparseMatrix"))
-	    cld <- getClassDef(class(x))
-	}
-    }
+    if(unitD)
+        x <- .Call(R_sparse_diag_U2N, x)
 
     if(maxp < 100) maxp <- 100L # "stop gap"
     if(prod(d) > maxp) { # "Large" => will be "cut"

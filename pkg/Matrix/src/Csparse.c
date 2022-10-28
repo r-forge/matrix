@@ -4,7 +4,6 @@
  * Sparse matrices in compressed column-oriented form
  */
 #include "Csparse.h"
-#include "Tsparse.h"
 #include "chm_common.h"
 #include "cs_utils.h" /* -> ./cs.h  for cs_dmperm() */
 
@@ -783,7 +782,7 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
 #ifdef AS_CHM_DIAGU2N_FIXED_FINALLY
     CHM_TR cht = tripl ? AS_CHM_TR(x) : (CHM_TR) NULL;  int nprot = 1;
 #else /* workaround needed:*/
-    SEXP xx = PROTECT(Tsparse_diagU2N(x));
+    SEXP xx = PROTECT(R_sparse_diag_U2N(x));
     CHM_TR cht = tripl ? AS_CHM_TR__(xx) : (CHM_TR) NULL; int nprot = 2;
 #endif
     CHM_SP chcp, chxt, chxc,
@@ -943,6 +942,9 @@ SEXP Csparse_band(SEXP x, SEXP k1, SEXP k2)
 
 #endif /* MJ */
 
+/* MJ: no longer needed ... prefer R_sparse_diag_(U2N|N2U)() */
+#if 0
+
 SEXP Csparse_diagU2N(SEXP x)
 {
     const char *cl = class_P(x);
@@ -993,6 +995,8 @@ SEXP Csparse_diagN2U(SEXP x)
 	return ans;
     }
 }
+
+#endif
 
 /**
  * Indexing aka subsetting : Compute  x[i,j], also for vectors i and j

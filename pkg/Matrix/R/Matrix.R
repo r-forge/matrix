@@ -630,7 +630,7 @@ subset.ij <- function(x, ij) {
 	    tri.x <- extends(cld, "triangularMatrix")
 	    if(tri.x) {
 		## need these for the 'x' slot in any case
-		if (x@diag == "U") x <- .Call(Csparse_diagU2N, x)
+		x <- .Call(R_sparse_diag_U2N, x)
 		## slightly more efficient than non0.i() or non0ind():
 		ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
 	    } else { ## symmetric / general : for symmetric, only "existing" part

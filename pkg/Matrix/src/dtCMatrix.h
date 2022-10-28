@@ -4,8 +4,6 @@
 #include "Mutils.h"
 #include "dgCMatrix.h"
 
-extern SEXP Csparse_diagU2N(SEXP x);
-
 SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed);
 SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b);
 
