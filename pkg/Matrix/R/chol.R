@@ -157,8 +157,8 @@ setMethod("chol2inv", signature(x = "denseMatrix"), # ->dtrMatrix
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
 	  function (x, ...) {
-	      if(x@diag == "U")
-                  x <- .dense.diagU2N(x)
+	      if(x@diag != "N")
+                  x <- ..diagU2N(x)
 	      .Call(dtrMatrix_chol2inv, x)
 	  })
 

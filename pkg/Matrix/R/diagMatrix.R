@@ -1174,7 +1174,7 @@ setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
             if(trans)
                 y <- t(y)
             if(y@diag != "N")
-                y <- ..diagU2N(y, "C")
+                y <- ..diagU2N(y)
         } else {
             ## y=[ld]sCMatrix
             y <- .sparse2g(y)
@@ -1237,7 +1237,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
             if(trans)
                 x <- t(x)
             if(x@diag != "N")
-                x <- ..diagU2N(x, "C")
+                x <- ..diagU2N(x)
         } else {
             ## x=[ld]sCMatrix
             x <- .sparse2g(x)
@@ -1300,7 +1300,7 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
             if(trans)
                 y <- t(y)
             if(y@diag != "N")
-                y <- ..diagU2N(y, "R")
+                y <- ..diagU2N(y)
         } else {
             ## y=[ld]sRMatrix
             y <- .sparse2g(y)
@@ -1363,7 +1363,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
             if(trans)
                 x <- t(x)
             if(x@diag != "N")
-                x <- ..diagU2N(x, "R")
+                x <- ..diagU2N(x)
         } else {
             ## x=[ld]sRMatrix
             x <- .sparse2g(x)
@@ -1426,7 +1426,7 @@ setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
             if(trans)
                 y <- t(y)
             if(y@diag != "N")
-                y <- ..diagU2N(y, "T")
+                y <- ..diagU2N(y)
         } else {
             ## y=[ld]sTMatrix
             y <- .sparse2g(y)
@@ -1489,7 +1489,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
             if(trans)
                 x <- t(x)
             if(x@diag != "N")
-                x <- ..diagU2N(x, "T")
+                x <- ..diagU2N(x)
         } else {
             ## x=[ld]sTMatrix
             x <- .sparse2g(x)
