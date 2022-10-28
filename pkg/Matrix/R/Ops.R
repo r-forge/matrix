@@ -323,9 +323,9 @@ Ops.x.x <- function(e1, e2)
 			    extends(c2, "triangularMatrix")) {
 			if(!(geM <- e1@uplo != e2@uplo || isN0(callGeneric(0,0)))) {
 			    if(e1@diag == "U")
-                                e1 <- .dense.diagU2N(e1)
+                                e1 <- ..diagU2N(e1)
 			    if(e2@diag == "U")
-                                e2 <- .dense.diagU2N(e2)
+                                e2 <- ..diagU2N(e2)
 			    p1 <- isPacked(e1)
 			    p2 <- isPacked(e2)
 			    if(p1 || p2) { ## at least one is packed

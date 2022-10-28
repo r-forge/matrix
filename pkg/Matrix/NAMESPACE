@@ -67,7 +67,7 @@ export("%&%",
        .m2ngCn, .m2ngC, .m2ngTn,
        .diag.dsC,# -> R/dsCMatrix.R --has FIXME
        .solve.dgC.chol, .solve.dgC.qr, .solve.dgC.lu,
-       "diagN2U", "diagU2N", .diagU2N, .diag2tT, .diag2sT, .diag2mat,
+       "diagN2U", "diagU2N", .diagN2U, .diagU2N, .diag2tT, .diag2sT, .diag2mat,
        "dimScale", "rowScale", "colScale",
        "dmperm",
        "drop0",

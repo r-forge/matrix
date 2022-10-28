@@ -110,7 +110,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
                           rep.int(as.double(y), nX)
                       else as.double(y) * rep(X@x, each = nY)
                   if(uX && uY)
-                      r <- ..diagN2U(r)
+                      r <- ..diagN2U(r, sparse = TRUE)
               }
               if(make.dimnames &&
                  !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
@@ -210,7 +210,7 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
                                   rep.int(rep.int(Y@x, n), rep.n.1)
                   }
                   if(uX && uY)
-                      r <- ..diagN2U(r)
+                      r <- ..diagN2U(r, sparse = TRUE)
               }
               if(make.dimnames &&
                  !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
@@ -289,7 +289,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
                   r@p <- integer(dr[2L] + 1)
               else {
                   if(!uX && uY)
-                      Y <- ..diagU2N(Y, "C")
+                      Y <- ..diagU2N(Y)
                   if((nY <- (p <- Y@p)[length(p)]) == 0L)
                       r@p <- integer(dr[2L] + 1)
                   else if(as.double(nX <- dX[1L]) * nY > .Machine$integer.max)
@@ -348,7 +348,7 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
                   r@p <- integer(dr[2L] + 1)
               else {
                   if(uX && !uY)
-                      X <- ..diagU2N(X, "C")
+                      X <- ..diagU2N(X)
                   if((nX <- (p <- X@p)[length(p)]) == 0L)
                       r@p <- integer(dr[2L] + 1)
                   else if(as.double(nY <- dY[1L]) * nX > .Machine$integer.max)
@@ -425,9 +425,9 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
                   r <- new(cl)
                   r@Dim <- dr
                   if(uX)
-                      X <- ..diagU2N(X, "C")
+                      X <- ..diagU2N(X)
                   if(uY)
-                      Y <- ..diagU2N(Y, "C")
+                      Y <- ..diagU2N(Y)
                   if(sY == "s")
                       Y <- .sparse2g(Y)
                   else if(sX == "s")
@@ -475,7 +475,7 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
                   if(shape == "t") {
                       r@uplo <- X@uplo
                       if(uX && uY)
-                          r <- ..diagN2U(r)
+                          r <- ..diagN2U(r, sparse = TRUE)
                   } else if(shape == "s")
                       r <- .Call(R_sparse_force_symmetric, r, X@uplo)
               }
@@ -522,7 +522,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
                   if(any((kind <- .M.kind(Y)) == c("n", "l")))
                       Y <- .Call(Tsparse_aggregate, Y)
                   if(!uX && uY)
-                      Y <- ..diagU2N(Y, "T")
+                      Y <- ..diagU2N(Y)
                   nX <- dX[1L]
                   nY <- length(Y@i)
                   r@i <-
@@ -575,7 +575,7 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
                   if(any((kind <- .M.kind(X)) == c("n", "l")))
                       X <- .Call(Tsparse_aggregate, X)
                   if(uX && !uY)
-                      X <- ..diagU2N(X, "T")
+                      X <- ..diagU2N(X)
                   nX <- length(X@i)
                   nY <- dY[1L]
                   r@i <- rep(nY * X@i, each = nY) + 0:(nY-1L)
@@ -633,9 +633,9 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
                   r <- new(cl)
                   r@Dim <- dr
                   if(uX)
-                      X <- ..diagU2N(X, "T")
+                      X <- ..diagU2N(X)
                   if(uY)
-                      Y <- ..diagU2N(Y, "T")
+                      Y <- ..diagU2N(Y)
                   if(sY == "s")
                       Y <- .sparse2g(Y)
                   else if(sX == "s")
@@ -659,7 +659,7 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
                   if(shape == "t") {
                       r@uplo <- X@uplo
                       if(uX && uY)
-                          r <- ..diagN2U(r)
+                          r <- ..diagN2U(r, sparse = TRUE)
                   } else if(shape == "s")
                       r <- .Call(R_sparse_force_symmetric, r, X@uplo)
               }

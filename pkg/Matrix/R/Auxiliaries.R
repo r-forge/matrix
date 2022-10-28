@@ -1708,9 +1708,7 @@ if(FALSE) {
 if(FALSE) {
 ## for "dtC*", "ltC* ..: directly
 xtC.diagU2N <- function(x) if(x@diag == "U") .Call(Csparse_diagU2N, x) else x
-} ## MJ
 
-if(FALSE) {
 ##' @title uni-diagonal to "regular" triangular Matrix
 ##'
 ##' NOTE:   class is *not* checked here! {speed}
@@ -1742,14 +1740,6 @@ if(FALSE) {
     }
     x@diag <- "N"
     x
-}
-} else {
-## MJ: We now have intelligent 'diag<-' methods for all denseMatrix,
-##     so this is enough:
-.dense.diagU2N <- function(x) {
-    diag(x) <- as1(x@x)
-    x
-}
 }
 
 ##' @title coerce triangular Matrix to uni-diagonal
@@ -1795,33 +1785,39 @@ if(FALSE) {
 	.Call(Csparse_diagN2U, as(x, "CsparseMatrix"))
     ## ^leaving as CsparseMatrix ... caller can coerce as necessary
 }
+} ## MJ
 
 diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "U")
-        .diagU2N(x, cl, checkDense = checkDense)
+        .diagU2N(x, cl = cl, checkDense = checkDense)
     else x
+}
+
+.diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(!checkDense && extends(cl, "denseMatrix"))
+        x <- as(x, "CsparseMatrix")
+    ..diagU2N(x)
+}
+
+..diagU2N <- function(x) {
+    diag(x) <- TRUE
+    x
 }
 
 diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "N")
-	.diagN2U(x, cl, checkDense = checkDense)
+	.diagN2U(x, cl = cl, checkDense = checkDense)
     else x
 }
 
-## MJ: experimental
-..diagU2N <- function(x, repr = .M.repr(x)) {
-    y <- .Call(R_sparse_as_general, x)
-    x@diag <- "N"
-    switch(repr,
-           C = { x@p <- y@p; x@i <- y@i; if(.hasSlot(x, "x")) x@x <- y@x; x },
-           R = { x@p <- y@p; x@j <- y@j; if(.hasSlot(x, "x")) x@x <- y@x; x },
-           T = { x@i <- y@i; x@j <- y@j; if(.hasSlot(x, "x")) x@x <- y@x; x },
-           stop("invalid 'repr'"))
+.diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
+    if(!checkDense & (isDense <- extends(cl, "denseMatrix")))
+        ..diagN2U(as(x, "CsparseMatrix"), sparse = TRUE)
+    else ..diagN2U(x, sparse = !isDense)
 }
 
-## MJ: experimental
-..diagN2U <- function(x) {
-    if(x@Dim[1L])
+..diagN2U <- function(x, sparse) {
+    if(sparse && x@Dim[1L] > 0L)
         x <- switch(x@uplo,
                     U = .Call(R_sparse_band, x, 1L, NULL),
                     L = .Call(R_sparse_band, x, NULL, -1L),
