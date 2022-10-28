@@ -378,7 +378,7 @@ SEXP Csparse_to_tTsparse(SEXP x, SEXP uplo, SEXP diag)
 			       GET_SLOT(x, Matrix_DimNamesSym));
 }
 
-#endif
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_general() */
 #if 0
