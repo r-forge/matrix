@@ -199,9 +199,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(lgTMatrix_to_matrix, 1),
 #endif
 
+/* MJ: no longer needed ... prefer R_dense_(col|row)Sums() */
+#if 0
+    CALLDEF(dgeMatrix_colsums, 4),
+#endif
+    
     CALLDEF(dgeMatrix_LU, 2),
     CALLDEF(dgeMatrix_Schur, 3),
-    CALLDEF(dgeMatrix_colsums, 4),
     CALLDEF(dgeMatrix_crossprod, 2),
     CALLDEF (geMatrix_crossprod, 2),
     CALLDEF(dgeMatrix_determinant, 2),
@@ -502,6 +506,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_dense_as_vector, 2),
     CALLDEF(R_geMatrix_as_vector, 2),
     CALLDEF(R_dense_band, 3),
+    CALLDEF(R_dense_colSums, 3),
+    CALLDEF(R_dense_rowSums, 3),
     
     CALLDEF(matrix_is_symmetric, 2),
     CALLDEF(matrix_is_triangular, 2),

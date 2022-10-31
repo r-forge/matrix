@@ -12,10 +12,9 @@ extern "C" {
 
 #include <stdint.h> /* C99 for int64_t */
 #include <ctype.h>
-#include <R.h> /* includes <Rconfig.h> */
-#include <Rversion.h>
+#include <R.h> /* includes Rconfig.h, R_ext/RS.h */
 #include <Rinternals.h>
-#include <R_ext/RS.h> /* for Memzero() */
+#include <Rversion.h>
 
 /* NB: For 'USE_FC_LEN_T' and 'FCONE' (for LTO),
    the "includer" will #include "Lapack-etc.h" */

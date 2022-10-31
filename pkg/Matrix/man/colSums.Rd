@@ -9,10 +9,8 @@
 \alias{colSums,CsparseMatrix-method}
 \alias{colSums,RsparseMatrix-method}
 \alias{colSums,TsparseMatrix-method}
-\alias{colSums,ddenseMatrix-method}
 \alias{colSums,denseMatrix-method}
 \alias{colSums,dgCMatrix-method}
-\alias{colSums,dgeMatrix-method}
 \alias{colSums,diagonalMatrix-method}
 \alias{colSums,indMatrix-method}
 \alias{colSums,lgCMatrix-method}
@@ -21,10 +19,8 @@
 \alias{colMeans,CsparseMatrix-method}
 \alias{colMeans,RsparseMatrix-method}
 \alias{colMeans,TsparseMatrix-method}
-\alias{colMeans,ddenseMatrix-method}
 \alias{colMeans,denseMatrix-method}
 \alias{colMeans,dgCMatrix-method}
-\alias{colMeans,dgeMatrix-method}
 \alias{colMeans,diagonalMatrix-method}
 \alias{colMeans,indMatrix-method}
 \alias{colMeans,lgCMatrix-method}
@@ -34,10 +30,8 @@
 \alias{rowSums,CsparseMatrix-method}
 \alias{rowSums,RsparseMatrix-method}
 \alias{rowSums,TsparseMatrix-method}
-\alias{rowSums,ddenseMatrix-method}
 \alias{rowSums,denseMatrix-method}
 \alias{rowSums,dgCMatrix-method}
-\alias{rowSums,dgeMatrix-method}
 \alias{rowSums,diagonalMatrix-method}
 \alias{rowSums,indMatrix-method}
 \alias{rowSums,lgCMatrix-method}
@@ -47,10 +41,8 @@
 \alias{rowMeans,CsparseMatrix-method}
 \alias{rowMeans,RsparseMatrix-method}
 \alias{rowMeans,TsparseMatrix-method}
-\alias{rowMeans,ddenseMatrix-method}
 \alias{rowMeans,denseMatrix-method}
 \alias{rowMeans,dgCMatrix-method}
-\alias{rowMeans,dgeMatrix-method}
 \alias{rowMeans,diagonalMatrix-method}
 \alias{rowMeans,indMatrix-method}
 \alias{rowMeans,lgCMatrix-method}

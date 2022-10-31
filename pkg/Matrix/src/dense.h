@@ -11,6 +11,8 @@ SEXP R_dense_as_vector(SEXP from, SEXP ndense);
 SEXP R_geMatrix_as_vector(SEXP from, SEXP ndense);
 SEXP R_dense_as_kind(SEXP from, SEXP kind);
 SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2);
+SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean);
+SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean);
 
 SEXP lsq_dense_Chol(SEXP X, SEXP y);
 SEXP lsq_dense_QR(SEXP X, SEXP y);

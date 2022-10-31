@@ -936,6 +936,610 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     return to;
 }
 
+SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
+{
+    static const char *valid[] = {
+	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "R_dense_colSums");
+    const char *cl = valid[ivalid];
+    if (cl[1] == 's')
+	return R_dense_rowSums(obj, narm, mean);
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
+    
+    char ul = 'U', di = 'N';
+    if (cl[1] == 't') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+	
+	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	di = *CHAR(STRING_ELT(diag, 0));
+	UNPROTECT(1); /* diag */
+    }
+
+    SEXP res, x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    int i, j, count = m,
+	doNaRm = asLogical(narm) != 0,
+	doMean = asLogical(mean) != 0,
+	doCount = doNaRm && doMean;
+    
+#define DENSE_COLSUMS_LOOP						\
+    do {								\
+	if (cl[1] == 'g') { /* general */				\
+	    for (j = 0; j < n; ++j, ++pres) {				\
+		DO_RESET;						\
+		for (i = 0; i < m; ++i, ++px)				\
+		    DO_INCR;						\
+		DO_SET;							\
+	    }								\
+	} else if (cl[2] != 'p') {					\
+	    if (ul == 'U') { /* unpacked upper triangular */		\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			DO_RESET;					\
+			for (i = 0; i <= j; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+			px += n-j-1;					\
+		    }							\
+		} else {						\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			DO_RESET;					\
+			for (i = 0; i < j; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_INCR_UNIT;					\
+			DO_SET;						\
+			px += n-j;					\
+		    }							\
+		}							\
+	    } else { /* unpacked lower triangular */			\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			px += j;					\
+			DO_RESET;					\
+			for (i = j; i < n; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+		    }							\
+		} else {						\
+		    for (i = j = 0; j < n; ++j, i = j, ++pres) {	\
+			px += j+1;					\
+			DO_RESET;					\
+			DO_INCR_UNIT;					\
+			for (i = j+1; i < n; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+		    }							\
+		}							\
+	    }								\
+	} else {							\
+	    if (ul == 'U') { /* packed upper triangular */		\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			DO_RESET;					\
+			for (i = 0; i <= j; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+		    }							\
+		} else {						\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			DO_RESET;					\
+			for (i = 0; i < j; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_INCR_UNIT;					\
+			DO_SET;						\
+			++px;						\
+		    }							\
+		}							\
+	    } else { /* packed lower triangular */			\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j, ++pres) {			\
+			DO_RESET;					\
+			for (i = j; i < n; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+		    }							\
+		} else {						\
+		    for (i = j = 0; j < n; ++j, i = j, ++pres) {	\
+			++px;						\
+			DO_RESET;					\
+			DO_INCR_UNIT;					\
+			for (i = j+1; i < n; ++i, ++px)			\
+			    DO_INCR;					\
+			DO_SET;						\
+		    }							\
+		}							\
+	    }								\
+	}								\
+    } while (0)
+
+#define DENSE_COLSUMS(_SEXPTYPE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_)	\
+    do {								\
+	PROTECT(res = allocVector(_SEXPTYPE_, n));			\
+	_CTYPE1_ *pres = _PTR1_(res);					\
+	_CTYPE2_ *px   = _PTR2_(x);					\
+	DENSE_COLSUMS_LOOP;						\
+    } while (0)
+    
+    switch (cl[0]) {
+    case 'n':
+    {
+	int tmp;
+
+#define DO_RESET     tmp = 0
+#define DO_INCR	     if (*px) ++tmp
+#define DO_INCR_UNIT ++tmp;
+#define DO_SET       *pres = (doMean) ? (double) tmp / count : (double) tmp
+
+	DENSE_COLSUMS(REALSXP, double, REAL, int, LOGICAL);
+	break;
+
+#undef DO_RESET
+#undef DO_INCR
+#undef DO_INCR_UNIT
+#undef DO_SET
+	
+    }
+    case 'l':
+
+#define DO_RESET				\
+	do {					\
+	    *pres = 0.0;			\
+	    if (doCount)			\
+		count = m;			\
+	} while (0)
+#define DO_INCR					\
+	do {					\
+	    if (*px != NA_LOGICAL) {		\
+		if (*px) *pres += 1.0;		\
+	    } else if (!doNaRm)			\
+		*pres = NA_REAL;		\
+	    else if (doMean)			\
+		--count;			\
+	} while (0)
+#define DO_INCR_UNIT *pres += 1.0
+#define DO_SET       if (doMean) *pres /= count;
+	
+	DENSE_COLSUMS(REALSXP, double, REAL, int, LOGICAL);
+	break;
+
+#undef DO_INCR
+	
+    case 'i':
+
+#define DO_INCR					\
+	do {					\
+	    if (*px != NA_INTEGER)		\
+		*pres += *px;			\
+	    else if (!doNaRm)			\
+		*pres = NA_REAL;		\
+	    else if (doMean)			\
+		--count;			\
+	} while (0)
+	
+	DENSE_COLSUMS(REALSXP, double, REAL, int, INTEGER);
+	break;
+
+#undef DO_INCR
+
+    case 'd':
+
+#define DO_INCR					\
+	do {					\
+	    if (!(doNaRm && ISNAN(*px)))	\
+		*pres += *px;			\
+	    else if (doMean)			\
+		--count;			\
+	} while (0)
+
+	DENSE_COLSUMS(REALSXP, double, REAL, double, REAL);
+	break;
+
+#undef DO_RESET
+#undef DO_INCR
+#undef DO_INCR_UNIT
+#undef DO_SET
+	
+    case 'z':
+
+#define DO_RESET				\
+	do {					\
+	    *pres = Matrix_zzero;		\
+	    if (doCount)			\
+		count = m;			\
+	} while (0)
+#define DO_INCR								\
+	do {								\
+	    if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) {	\
+		(*pres).r += (*px).r;					\
+		(*pres).i += (*px).i;					\
+	    } else if (doMean)						\
+		--count;						\
+	} while (0)
+#define DO_INCR_UNIT (*pres).r += 1.0 
+#define DO_SET					\
+	do {					\
+	    if (doMean) {			\
+		(*pres).r /= count;		\
+		(*pres).i /= count;		\
+	    }					\
+	} while (0)
+
+	DENSE_COLSUMS(CPLXSXP, Rcomplex, COMPLEX, Rcomplex, COMPLEX);
+	break;
+
+#undef DO_RESET
+#undef DO_INCR
+#undef DO_INCR_UNIT
+#undef DO_SET
+
+    }
+
+#undef DENSE_COLSUMS
+#undef DENSE_COLSUMS_LOOP
+    
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	nms = VECTOR_ELT(dimnames, 1);
+    if (!isNull(nms))
+	setAttrib(res, R_NamesSymbol, nms);
+    
+    UNPROTECT(3); /* dimnames, x, res */
+    return res;
+}
+
+SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
+{
+    static const char *valid[] = {
+	VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "R_dense_rowSums");
+    const char *cl = valid[ivalid];
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
+    
+    char ul = 'U', di = 'N';
+    if (cl[1] != 'g') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+
+	if (cl[1] == 't') {
+	    SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	    di = *CHAR(STRING_ELT(diag, 0));
+	    UNPROTECT(1); /* diag */
+	}
+    }
+
+    SEXP res, x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    int i, j, *pcount = NULL,
+	doNaRm = asLogical(narm) != 0,
+	doMean = asLogical(mean) != 0;
+    
+#define DENSE_ROWSUMS_LOOP						\
+    do {								\
+	if (cl[1] == 'g') { /* general */				\
+	    for (j = 0; j < n; ++j)					\
+		for (i = 0; i < m; ++i, ++px)				\
+		    DO_INCR;						\
+	} else if (cl[1] == 't') {					\
+	    if (cl[2] != 'p') {						\
+		if (ul == 'U') { /* unpacked upper triangular */	\
+		    if (di == 'N') {					\
+			for (j = 0; j < n; ++j) {			\
+			    for (i = 0; i <= j; ++i, ++px)		\
+				DO_INCR;				\
+			    px += n-j-1;				\
+			}						\
+		    } else {						\
+			for (j = 0; j < n; ++j) {			\
+			    for (i = 0; i < j; ++i, ++px)		\
+				DO_INCR;				\
+			    DO_INCR_UNIT;				\
+			    px += n-j;					\
+			}						\
+		    }							\
+		} else { /* unpacked lower triangular */		\
+		    if (di == 'N') {					\
+			for (j = 0; j < n; ++j) {			\
+			    px += j;					\
+			    for (i = j; i < n; ++i, ++px)		\
+				DO_INCR;				\
+			}						\
+		    } else {						\
+			for (i = j = 0; j < n; ++j, i = j) {		\
+			    px += j+1;					\
+			    DO_INCR_UNIT;				\
+			    for (i = j+1; i < n; ++i, ++px)		\
+				DO_INCR;				\
+			}						\
+		    }							\
+		}							\
+	    } else {							\
+		if (ul == 'U') { /* packed upper triangular */		\
+		    if (di == 'N') {					\
+			for (j = 0; j < n; ++j)				\
+			    for (i = 0; i <= j; ++i, ++px)		\
+				DO_INCR;				\
+		    } else {						\
+			for (j = 0; j < n; ++j) {			\
+			    for (i = 0; i < j; ++i, ++px)		\
+				DO_INCR;				\
+			    DO_INCR_UNIT;				\
+			    ++px;					\
+			}						\
+		    }							\
+		} else { /* packed lower triangular */			\
+		    if (di == 'N') {					\
+			for (j = 0; j < n; ++j)				\
+			    for (i = j; i < n; ++i, ++px)		\
+				DO_INCR;				\
+		    } else {						\
+			for (i = j = 0; j < n; ++j, i = j) {		\
+			    ++px;					\
+			    DO_INCR_UNIT;				\
+			    for (i = j+1; i < n; ++i, ++px)		\
+				DO_INCR;				\
+			}						\
+		    }							\
+		}							\
+	    }								\
+	} else {							\
+	    if (cl[2] != 'p') {						\
+		if (ul == 'U') { /* unpacked upper symmetric */		\
+		    for (j = 0; j < n; ++j) {				\
+			for (i = 0; i < j; ++i, ++px)			\
+			    DO_INCR_SYMM;				\
+			DO_INCR;					\
+			px += n-j;					\
+		    }							\
+		} else { /* unpacked lower symmetric */			\
+		    for (i = j = 0; j < n; ++j, i = j) {		\
+			px += j;					\
+			DO_INCR;					\
+			++px;						\
+			for (i = j+1; i < n; ++i, ++px)			\
+			    DO_INCR_SYMM;				\
+		    }							\
+		}							\
+	    } else {							\
+		if (ul == 'U') { /* packed upper symmetric */		\
+		    for (j = 0; j < n; ++j) {				\
+			for (i = 0; i < j; ++i, ++px)			\
+			    DO_INCR_SYMM;				\
+			DO_INCR;					\
+			++px;						\
+		    }							\
+		} else { /* packed lower symmetric */			\
+		    for (i = j = 0; j < n; ++j, i = j) {		\
+			DO_INCR;					\
+			++px;						\
+			for (i = j+1; i < n; ++i, ++px)			\
+			    DO_INCR_SYMM;				\
+		    }							\
+		}							\
+	    }								\
+	}								\
+    } while (0)
+    
+#define DENSE_ROWSUMS(_SEXPTYPE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_, _ZERO_) \
+    do {								\
+	PROTECT(res = allocVector(_SEXPTYPE_, m));			\
+	_CTYPE1_ *pres = _PTR1_(res);					\
+	_CTYPE2_ *px   = _PTR2_(x);					\
+	if (doNaRm && doMean && cl[0] != 'n') {				\
+	    Calloc_or_Alloca_TO(pcount, m, int);			\
+	    for (i = 0; i < m; ++i) {					\
+		pres[i] = _ZERO_;					\
+		pcount[i] = n;						\
+	    }								\
+	} else Memzero(pres, m);					\
+	DENSE_ROWSUMS_LOOP;						\
+    } while (0)
+    
+    switch (cl[0]) {
+    case 'n':
+	
+#define DO_INCR      if (*px) pres[i] += 1.0
+#define DO_INCR_UNIT pres[i] += 1.0
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (*px) {				\
+		pres[i] += 1.0;			\
+		pres[j] += 1.0;			\
+	    }					\
+	} while (0)
+	
+	DENSE_ROWSUMS(REALSXP, double, REAL, int, LOGICAL, 0.0);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'l':
+
+#define DO_INCR					\
+	do {					\
+	    if (*px != NA_LOGICAL) {		\
+		if (*px)			\
+		    pres[i] += 1.0;		\
+	    } else if (!doNaRm)			\
+		pres[i] = NA_REAL;		\
+	    else if (doMean)			\
+		--pcount[i];			\
+	} while (0)
+	
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (*px != NA_LOGICAL) {		\
+		if (*px) {			\
+		    pres[i] += 1.0;		\
+		    pres[j] += 1.0;		\
+		}				\
+	    } else if (!doNaRm) {		\
+		pres[i] = NA_REAL;		\
+		pres[j] = NA_REAL;		\
+	    } else if (doMean) {		\
+		--pcount[i];			\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+
+	DENSE_ROWSUMS(REALSXP, double, REAL, int, LOGICAL, 0.0);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'i':
+
+#define DO_INCR					\
+	do {					\
+	    if (*px != NA_INTEGER)		\
+		pres[i] += *px;			\
+	    else if (!doNaRm)			\
+		pres[i] = NA_REAL;		\
+	    else if (doMean)			\
+		--pcount[i];			\
+	} while (0)
+	
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (*px != NA_INTEGER) {		\
+		pres[i] += *px;			\
+		pres[j] += *px;			\
+	    } else if (!doNaRm) {		\
+		pres[i] = NA_REAL;		\
+		pres[j] = NA_REAL;		\
+	    } else if (doMean) {		\
+		--pcount[i];			\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+	
+	DENSE_ROWSUMS(REALSXP, double, REAL, int, INTEGER, 0.0);
+	break;
+	
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'd':
+
+#define DO_INCR					\
+	do {					\
+	    if (!(doNaRm && ISNAN(*px)))	\
+		pres[i] += *px;			\
+	    else if (doMean)			\
+		--pcount[i];			\
+	} while (0)
+
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (!(doNaRm && ISNAN(*px))) {	\
+		pres[i] += *px;			\
+		pres[j] += *px;			\
+	    } else if (doMean) {		\
+		--pcount[i];			\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+	
+	DENSE_ROWSUMS(REALSXP, double, REAL, double, REAL, 0.0);
+	break;
+	
+#undef DO_INCR
+#undef DO_INCR_UNIT
+#undef DO_INCR_SYMM
+
+    case 'z':
+
+#define DO_INCR								\
+	do {								\
+	    if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) {	\
+		pres[i].r += (*px).r;					\
+		pres[i].i += (*px).i;					\
+	    } else if (doMean)						\
+		--pcount[i];						\
+	} while (0)
+
+#define DO_INCR_UNIT pres[i].r += 1.0
+	
+#define DO_INCR_SYMM							\
+	do {								\
+	    if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) {	\
+		pres[i].r += (*px).r;					\
+		pres[i].i += (*px).i;					\
+		pres[j].r += (*px).r;					\
+		pres[j].i += (*px).i;					\
+	    } else if (doMean) {					\
+		--pcount[i];						\
+		--pcount[j];						\
+	    }								\
+	} while (0)
+	
+	DENSE_ROWSUMS(CPLXSXP, Rcomplex, COMPLEX, Rcomplex, COMPLEX,
+		      Matrix_zzero);
+	break;
+	
+#undef DO_INCR
+#undef DO_INCR_UNIT
+#undef DO_INCR_SYMM
+	
+    default:
+	break;
+    }
+
+#undef DENSE_ROWSUMS
+#undef DENSE_ROWSUMS_LOOP
+
+    if (doMean) {
+	if (cl[0] != 'z') {
+	    double *pres = REAL(res);
+	    if (doNaRm && cl[0] != 'n') {
+		for (i = 0; i < m; ++i)
+		    pres[i] /= pcount[i];
+		Free_FROM(pcount, m);
+	    } else {
+		for (i = 0; i < m; ++i)
+		    pres[i] /= n;
+	    }
+	} else {
+	    Rcomplex *pres = COMPLEX(res);
+	    if (doNaRm) {
+		for (i = 0; i < m; ++i) {
+		    pres[i].r /= pcount[i];
+		    pres[i].i /= pcount[i];
+		}
+		Free_FROM(pcount, m);
+	    } else {
+		for (i = 0; i < m; ++i) {
+		    pres[i].r /= n;
+		    pres[i].i /= n;
+		}
+	    }
+	}
+    }
+
+    SEXP dimnames;
+    if (cl[0] != 's')
+	PROTECT(dimnames = GET_SLOT(obj, Matrix_DimNamesSym));
+    else
+	PROTECT(dimnames = get_symmetrized_DimNames(obj, -1));
+    SEXP nms = VECTOR_ELT(dimnames, 0);
+    if (!isNull(nms))
+	setAttrib(res, R_NamesSymbol, nms);
+    
+    UNPROTECT(3); /* dimnames, x, res */
+    return res;
+}
+
 /**
  * Perform a left cyclic shift of columns j to k in the upper triangular
  * matrix x, then restore it to upper triangular form with Givens rotations.
