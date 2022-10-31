@@ -1,34 +1,23 @@
-#### Collect methods for  colSums(), rowSums(), colMeans(), rowMeans() here.
-####			  =======    -------    --------    --------
+## METHODS FOR GENERIC: colSums, rowSums, colMeans, rowMeans
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Dense Matrices: -------------------------------------------------
 
-setMethod("colSums", signature(x = "dgeMatrix"),
-	  function(x, na.rm = FALSE, dims = 1)
-          .Call(dgeMatrix_colsums, x, na.rm, TRUE, FALSE))
+setMethod("colSums", signature(x = "denseMatrix"),
+	  function(x, na.rm = FALSE, dims = 1L)
+              .Call(R_dense_colSums, x, na.rm, FALSE))
 
-setMethod("colMeans", signature(x = "dgeMatrix"),
-	  function(x, na.rm = FALSE, dims = 1)
-          .Call(dgeMatrix_colsums, x, na.rm, TRUE, TRUE))
+setMethod("colMeans", signature(x = "denseMatrix"),
+	  function(x, na.rm = FALSE, dims = 1L)
+              .Call(R_dense_colSums, x, na.rm, TRUE))
 
-setMethod("rowSums", signature(x = "dgeMatrix"),
-	  function(x, na.rm = FALSE, dims = 1)
-          .Call(dgeMatrix_colsums, x, na.rm, FALSE, FALSE))
+setMethod("rowSums", signature(x = "denseMatrix"),
+	  function(x, na.rm = FALSE, dims = 1L)
+              .Call(R_dense_rowSums, x, na.rm, FALSE))
 
-setMethod("rowMeans", signature(x = "dgeMatrix"),
-	  function(x, na.rm = FALSE, dims = 1)
-          .Call(dgeMatrix_colsums, x, na.rm, FALSE, TRUE))
-
-## FIXME: "works" but not optimally for triangular/symmetric (esp. packed)
-.recall.as.dge <- function(x, na.rm = FALSE, dims = 1) {
-    x <- .dense2g(x, "d")
-    callGeneric()
-}
-setMethod("colSums",  signature(x = "denseMatrix"), .recall.as.dge)
-setMethod("colMeans", signature(x = "denseMatrix"), .recall.as.dge)
-setMethod("rowSums",  signature(x = "denseMatrix"), .recall.as.dge)
-setMethod("rowMeans", signature(x = "denseMatrix"), .recall.as.dge)
-rm(.recall.as.dge)
+setMethod("rowMeans", signature(x = "denseMatrix"),
+	  function(x, na.rm = FALSE, dims = 1L)
+              .Call(R_dense_rowSums, x, na.rm, TRUE))
 
 
 ### Sparse Matrices: -------------------------------------------------

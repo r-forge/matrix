@@ -495,6 +495,7 @@ SEXP geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right) {
 
 /* MJ: no longer needed ... prefer more general unpackedMatrix_diag_[gs]et() */
 #if 0
+
 SEXP dgeMatrix_getDiag(SEXP x)
 {
 #define geMatrix_getDiag_1					\
@@ -587,6 +588,7 @@ SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
     UNPROTECT(1);
     return ret;
 }
+
 #endif /* MJ */
 
 SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm)
@@ -872,6 +874,9 @@ SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE)
     return val;
 } // dgeMatrix_Schur
 
+/* MJ: no longer needed ... prefer more general R_dense_(col|row)Sums() */
+#if 0
+
 // colSums(), colMeans(), rowSums() and rowMeans() -- called from ../R/colSums.R
 SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
 {
@@ -939,3 +944,5 @@ SEXP dgeMatrix_colsums(SEXP x, SEXP naRmP, SEXP cols, SEXP mean)
     UNPROTECT(1);
     return ans;
 }
+
+#endif /* MJ */
