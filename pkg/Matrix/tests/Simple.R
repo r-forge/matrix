@@ -1454,6 +1454,18 @@ stopifnot(identical(Diagonal(1L, names = "a")@Dimnames, list("a", "a")))
 stopifnot(identical(Diagonal(x = a0[0L], names = TRUE)@Dimnames,
                     list(NULL, NULL)))
 
+## names were forgotten prior to 1.5-3
+d1 <- Diagonal(1L, names = "b")
+stopifnot(identical(colSums(d1), c(b = 1)),
+          identical(rowMeans(as(d1, "indMatrix")), c(b = 1)))
+
+## na.rm was ignored prior to 1.5-3
+d1 <- Diagonal(x = NaN)
+stopifnot(identical(colSums(d1), NaN),
+          identical(colSums(d1, na.rm = TRUE), 0),
+          identical(rowMeans(d1), NaN),
+          identical(rowMeans(d1, na.rm = TRUE), NaN))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
