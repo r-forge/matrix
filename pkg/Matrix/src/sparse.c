@@ -1601,6 +1601,102 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
     return to;
 }
 
+#if 0
+SEXP R_sparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP trans, SEXP sparse)
+{
+    static const char *valid[] = {
+	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "R_sparse_colSums");
+    const char *cl = valid[ivalid];
+
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
+    
+    char ul = 'U', di = 'N';
+    if (cl[1] == 't') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+	
+	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	di = *CHAR(STRING_ELT(diag, 0));
+	UNPROTECT(1); /* diag */
+    }
+
+    SEXP res;
+    int doNaRm   = asLogical(narm)   != 0,
+	doMean   = asLogical(mean)   != 0,
+	doRow    = asLogical(trans)  != 0,
+	doSparse = asLogical(sparse) != 0;
+
+    if (cl[2] != 'T') {
+
+	SEXP iSym;
+	int m_, n_;
+	if (cl[2] == 'C') {
+	    iSym = Matrix_iSym;
+	    m_ = m;
+	    n_ = n;
+	} else {
+	    iSym = Matrix_jSym;
+	    m_ = n;
+	    n_ = m;
+	}
+	
+	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+	    i = PROTECT(GET_SLOT(obj, iSym)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
+	double *px = REAL(x);
+	
+	if ((cl[2] == 'C') ? !doRow : doRow) {
+
+	    if (doSparse) {
+		
+		int nonemp = 0;
+		for (j = 0; j < n_; ++j)
+		    if (pp[j] < pp[j+1])
+			++nonemp;
+		
+		PROTECT(res = NEW_OBJECT_OF_CLASS("dsparseVector"));
+
+		SEXP vi = PROTECT(allocVector(INTSXP, nonemp)),
+		    vx = PROTECT(allocVector(REALSXP, nonemp));
+		int *pvi = INTEGER(vi);
+		double *pvx = REAL(vx);
+		
+		k = 0;
+		for (j = 0; j < n_; ++j) {
+		    kend = *(++pp0);
+		    if (k < kend) {
+			*(pvi++) = j;
+			*pvx = 0.0;
+			while (k < kend) {
+			    *pvx += *(px++);
+			    ++k;
+			}
+			pvx++;
+		    }
+		}
+		
+	    } else {
+
+	    }
+	    
+	} else {
+
+	}
+	
+    } 
+    
+    
+}
+#endif
+
+
 /* diag(<[CRT]sparseMatrix>, names) */
 SEXP R_sparse_diag_get(SEXP obj, SEXP nms)
 {

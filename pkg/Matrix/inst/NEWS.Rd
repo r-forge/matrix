@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-10-31 r3717)}{
+\section{Changes in version 1.5-3 (2022-10-31 r3718)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -17,6 +17,14 @@
 
       \item Our \code{cov2cor()} methods now again preserve (symmetrized!)
       \code{dimnames}, fixing Matrix bug #6783 reported by Ben Bolker.
+
+      \item \code{colSums()} and friends now always give a \emph{named}
+      result when the marginal \code{Dimnames} are non-\code{NULL}.
+      (Names were \dQuote{forgotten} for \code{diagonalMatrix} and
+      \code{indMatrix} arguments.)
+      
+      \item \code{colSums()} and friends now respect \code{na.rm} when
+      handling \code{diagonalMatrix} with \code{NA} diagonal entries.
     }
   }
   \subsection{New Features}{
