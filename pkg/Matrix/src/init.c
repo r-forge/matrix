@@ -178,10 +178,15 @@ static R_CallMethodDef CallEntries[] = {
 #ifdef Matrix_with_SPQR
     CALLDEF(dgCMatrix_SPQR, 4),
 #endif
+
+/* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */
+#if 0
     CALLDEF(dgCMatrix_colSums, 5),
     CALLDEF(igCMatrix_colSums, 5),
     CALLDEF(lgCMatrix_colSums, 5),
     CALLDEF(ngCMatrix_colSums, 5),
+#endif
+    
     CALLDEF(dgCMatrix_cholsol, 2),
     /* CALLDEF(dgCMatrix_lusol, 2), */
     CALLDEF(dgCMatrix_matrix_solve, 3),
@@ -496,6 +501,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Tsparse_is_triangular, 2),
     CALLDEF(Csparse_is_symmetric, 2),
     CALLDEF(Rsparse_is_symmetric, 2),
+    CALLDEF(CRsparse_colSums, 4),
+    CALLDEF(CRsparse_rowSums, 4),
     
     CALLDEF(R_matrix_as_dense, 4),
     CALLDEF(R_dense_as_general, 2),

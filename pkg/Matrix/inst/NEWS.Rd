@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-10-31 r3718)}{
+\section{Changes in version 1.5-3 (2022-11-01 r3724)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -36,8 +36,13 @@
 
       \item \code{.diagU2N()} gets fast counterpart \code{.diagN2U()}.
 
-      \item \code{colSums()} and friends are now implemented efficiently
-      for all \code{denseMatrix}, no longer going via \code{.geMatrix}.
+      \item \code{colSums()} and friends are now implemented more
+      efficiently for \code{denseMatrix} and \code{[CRT]sparseMatrix}.
+      Notably, methods for triangular and symmetric matrices no longer
+      go via \code{generalMatrix}, and methods for
+      \code{[CRT]sparseMatrix} now handle nonzero pattern and logical
+      matrices directly (no longer coercing to double, a constraint
+      of the earlier implementation using CHOLMOD).
     }
   }
 }

@@ -4627,3 +4627,584 @@ CR_IS_SYMMETRIC(C, i)
 /* Rsparse_is_symmetric() */
 /* FIXME: not checking for real diagonal in complex case */
 CR_IS_SYMMETRIC(R, j)
+
+/* colSums(<CsparseMatrix>), rowSums(<RsparseMatrix>) */
+SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
+{
+    static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "CRsparse_colSums");
+    const char *cl = valid[ivalid];
+    if (cl[1] == 's')
+	return CRsparse_rowSums(obj, narm, mean, sparse);
+
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int margin = (cl[2] == 'C') ? 1 : 0,
+	*pdim = INTEGER(dim), m = pdim[!margin], n = pdim[margin];
+    UNPROTECT(1); /* dim */
+    
+    char ul = 'U', di = 'N';
+    if (cl[1] == 't') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+	
+	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	di = *CHAR(STRING_ELT(diag, 0));
+	UNPROTECT(1); /* diag */
+    }
+
+    SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
+    ++nprotect;
+    int *pp = INTEGER(p) + 1, j, k, kend, count = m,
+	doSparse = asLogical(sparse) != 0,
+	doNaRm   = asLogical(narm)   != 0,
+	doMean   = asLogical(mean)   != 0,
+	doCount = doNaRm && doMean;
+    
+    PROTECT_INDEX pid;
+    SEXP res, vl = NULL, vi = NULL, vx = NULL;
+    int *pvi = NULL;
+    if (!doSparse) {
+	PROTECT_WITH_INDEX(
+	    res = allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, n), &pid);
+	++nprotect;
+    } else {
+	int nnz;
+	if (di == 'N') {
+	    nnz = 0;
+	    for (j = 0; j < n; ++j)
+		if (pp[j-1] < pp[j])
+		    ++nnz;
+	} else {
+	    nnz = n;
+	    warning(_("sparseResult=TRUE inefficient for unit triangular 'x'"));
+	}
+	
+	char cl_[] = ".sparseVector";
+	cl_[0] = (((cl[0] == 'n' || cl[0] == 'l') && !doMean)
+		  ? 'i' : ((cl[0] != 'z') ? 'd' : 'z'));
+	PROTECT(res = NEW_OBJECT_OF_CLASS(cl_));
+	PROTECT(vl = ScalarInteger(n));
+	PROTECT(vi = allocVector(INTSXP, nnz));
+	PROTECT_WITH_INDEX(
+	    vx = allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, nnz), &pid);
+	nprotect += 4;
+	pvi = INTEGER(vi);
+    }
+    
+    if (cl[0] == 'n') {
+	double *pres = (doSparse) ? REAL(vx) : REAL(res);
+	if (!doSparse) {
+	    int u = (di == 'N') ? 0 : 1;
+	    for (j = 0; j < n; ++j) {
+		*pres = pp[j] - pp[j-1] + u;
+		if (doMean)
+		    *pres /= count;
+		++pres;
+	    }
+	} else if (di == 'N') {
+	    for (j = 0; j < n; ++j) {
+		if (pp[j-1] < pp[j]) {
+		    *pvi = j + 1;
+		    *pres = pp[j] - pp[j-1];
+		    if (doMean)
+			*pres /= count;
+		    ++pvi;
+		    ++pres;
+		}
+	    }
+	} else {
+	    for (j = 0; j < n; ++j) {
+		*pvi = j + 1;
+		*pres = pp[j] - pp[j-1] + 1;
+		if (doMean)
+		    *pres /= count;
+		++pvi;
+		++pres;
+	    }
+	}
+    } else {
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	
+#define CR_COLSUMS_LOOP							\
+	do {								\
+	    k = 0;							\
+	    if (!doSparse) {						\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j) {				\
+			kend = pp[j];					\
+			DO_INIT(ZERO);					\
+			while (k < kend) { DO_INCR; ++k; }		\
+			DO_SCALE;					\
+			++pres;						\
+		    }							\
+		} else {						\
+		    for (j = 0; j < n; ++j) {				\
+			kend = pp[j];					\
+			DO_INIT(ONE);					\
+			while (k < kend) { DO_INCR; ++k; }		\
+			DO_SCALE;					\
+			++pres;						\
+		    }							\
+		}							\
+	    } else {							\
+		if (di == 'N') {					\
+		    for (j = 0; j < n; ++j) {				\
+			kend = pp[j];					\
+			if (k < kend) {					\
+			    *pvi = j + 1;				\
+			    DO_INIT(ZERO);				\
+			    while (k < kend) { DO_INCR; ++k; }		\
+			    DO_SCALE;					\
+			    ++pvi;					\
+			    ++pres;					\
+			}						\
+		    }							\
+		} else {						\
+		    for (j = 0; j < n; ++j) {				\
+			kend = pp[j];					\
+			*pvi = j + 1;					\
+			DO_INIT(ONE);					\
+			while (k < kend) { DO_INCR; ++k; }		\
+			DO_SCALE;					\
+			++pvi;						\
+			++pres;						\
+		    }							\
+		}							\
+	    }								\
+	} while (0)
+	
+#define CR_COLSUMS(_CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_)			\
+	do {								\
+	    _CTYPE1_ *pres = (doSparse) ? _PTR1_(vx) : _PTR1_(res);	\
+	    _CTYPE2_ *px   = _PTR2_(x);					\
+	    CR_COLSUMS_LOOP;						\
+	} while (0)
+	    
+	switch (cl[0]) {
+	case 'l':
+	    
+#define ZERO         0.0
+#define ONE          1.0
+#define DO_INIT(_U_)				\
+	    do {				\
+		*pres = _U_;			\
+		if (doCount)			\
+		    count = m;			\
+	    } while (0)
+#define DO_INCR					\
+	    do {				\
+		if (px[k] != NA_LOGICAL) {	\
+		    if (px[k]) *pres += 1.0;	\
+		} else if (!doNaRm)		\
+		    *pres = NA_REAL;		\
+		else if (doMean)		\
+		    --count;			\
+	    } while (0)
+#define DO_SCALE     if (doMean) *pres /= count
+	    
+	    CR_COLSUMS(double, REAL, int, LOGICAL);
+	    break;
+	    
+#undef DO_INCR
+	    
+	case 'i':
+	    
+#define DO_INCR					\
+	    do {				\
+		if (px[k] != NA_INTEGER)	\
+		    *pres += px[k];		\
+		else if (!doNaRm)		\
+		    *pres = NA_REAL;		\
+		else if (doMean)		\
+		    --count;			\
+	    } while (0)
+	    
+	    CR_COLSUMS(double, REAL, int, INTEGER);
+	    break;
+	    
+#undef DO_INCR
+	    
+	case 'd':
+	    
+#define DO_INCR					\
+	    do {				\
+		if (!(doNaRm && ISNAN(px[k])))	\
+		    *pres += px[k];		\
+		else if (doMean)		\
+		    --count;			\
+	    } while (0)
+	    
+	    CR_COLSUMS(double, REAL, double, REAL);
+	    break;
+	    
+#undef ZERO
+#undef ONE
+#undef DO_INCR
+#undef DO_SCALE
+	    
+	case 'z':
+	    
+#define ZERO         Matrix_zzero
+#define ONE          Matrix_zone
+#define DO_INCR								\
+	    do {							\
+		if (!(doNaRm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {	\
+		    (*pres).r += px[k].r;				\
+		    (*pres).i += px[k].i;				\
+		} else if (doMean)					\
+		    --count;						\
+	    } while (0)
+#define DO_SCALE				\
+	    do {				\
+		if (doMean) {			\
+		    (*pres).r /= count;		\
+		    (*pres).i /= count;		\
+		}				\
+	    } while (0)
+	    
+	    CR_COLSUMS(Rcomplex, COMPLEX, Rcomplex, COMPLEX);
+	    break;
+	    
+#undef ZERO
+#undef ONE
+#undef DO_INIT
+#undef DO_INCR
+#undef DO_SCALE
+
+	default:
+	    break;
+	}
+	
+#undef CR_COLSUMS
+#undef CR_COLSUMS_LOOP
+
+	UNPROTECT(1); /* x */
+    }
+
+    if (doSparse) {
+	if ((cl[0] == 'n' || cl[0] == 'l') && !doMean)
+	    REPROTECT(vx = coerceVector(vx, INTSXP), pid);
+	
+	SET_SLOT(res, Matrix_lengthSym, vl);
+	SET_SLOT(res, Matrix_iSym,      vi);
+	SET_SLOT(res, Matrix_xSym,      vx);
+    } else {
+	if ((cl[0] == 'n' || cl[0] == 'l') && !doMean)
+	    REPROTECT(res = coerceVector(res, INTSXP), pid);
+	
+    	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	    nms = VECTOR_ELT(dimnames, margin);
+	if (!isNull(nms))
+	    setAttrib(res, R_NamesSymbol, nms);
+	UNPROTECT(1); /* dimnames */	
+    }
+
+    UNPROTECT(nprotect);
+    return res;
+}
+
+/* rowSums(<CsparseMatrix>), colSums(<RsparseMatrix>) */
+SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
+{
+    static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
+    int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
+    if (ivalid < 0)
+	ERROR_INVALID_CLASS(obj, "CRsparse_rowSums");
+    const char *cl = valid[ivalid];
+
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int margin = (cl[2] == 'C') ? 0 : 1,
+	*pdim = INTEGER(dim), m = pdim[margin], n = pdim[!margin];
+    UNPROTECT(1); /* dim */
+    
+    char ul = 'U', di = 'N';
+    if (cl[1] != 'g') {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+
+	if (cl[1] == 't') {
+	    SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	    di = *CHAR(STRING_ELT(diag, 0));
+	    UNPROTECT(1); /* diag */
+	}
+    }
+
+    SEXP iSym = (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym,
+	p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+	i = PROTECT(GET_SLOT(obj, iSym));
+    nprotect += 2;
+    int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k, kend, *pcount = NULL,
+	doSparse = asLogical(sparse) != 0,
+	doNaRm   = asLogical(narm)   != 0,
+	doMean   = asLogical(mean)   != 0;
+
+    SEXP x = NULL;
+    if (cl[0] != 'n') {
+	PROTECT(x = GET_SLOT(obj, Matrix_xSym));
+	++nprotect;
+    }
+
+    PROTECT_INDEX pid;
+    SEXP res;
+    PROTECT_WITH_INDEX(
+	res = allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, m), &pid);
+    ++nprotect;
+
+#define CR_ROWSUMS_LOOP						\
+    do {							\
+	k = 0;							\
+	if (cl[1] != 's') {					\
+	    for (j = 0; j < n; ++j) {				\
+		kend = pp[j];					\
+		while (k < kend) { DO_INCR; ++k; }		\
+	    }							\
+	} else if (ul == ((cl[2] == 'C') ? 'U' : 'L')) {	\
+	    for (j = 0; j < n; ++j) {				\
+		kend = pp[j];					\
+		if (k < kend) {					\
+		    while (kend - k > 1) { DO_INCR_SYMM; ++k; }	\
+		    if (pi[k] == j)				\
+			DO_INCR;				\
+		    else					\
+			DO_INCR_SYMM;				\
+		    ++k;					\
+		}						\
+	    }							\
+	} else {						\
+	    for (j = 0; j < n; ++j) {				\
+		kend = pp[j];					\
+		if (k < kend) {					\
+		    if (pi[k] == j)				\
+			DO_INCR;				\
+		    else					\
+			DO_INCR_SYMM;				\
+		    ++k;					\
+		    while (k < kend) { DO_INCR_SYMM; ++k; }	\
+		}						\
+	    }							\
+	}							\
+    } while (0)
+
+#define CR_ROWSUMS_X(_ZERO_, _ONE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_)	\
+    do {								\
+	_CTYPE2_ *px = _PTR2_(x);					\
+	CR_ROWSUMS_N(_ZERO_, _ONE_, _CTYPE1_, _PTR1_);			\
+    } while (0)
+
+#define CR_ROWSUMS_N(_ZERO_, _ONE_, _CTYPE1_, _PTR1_)			\
+    do {								\
+	_CTYPE1_ *pres = _PTR1_(res), u = (di == 'N') ? _ZERO_ : _ONE_;	\
+	if (doNaRm && doMean && cl[0] != 'n') {				\
+	    Calloc_or_Alloca_TO(pcount, m, int);			\
+	    for (k = 0; k < m; ++k) {					\
+		pres[k] = u;						\
+		pcount[k] = n;						\
+	    }								\
+	} else {							\
+	    for (k = 0; k < m; ++k)					\
+		pres[k] = u;						\
+	}								\
+	CR_ROWSUMS_LOOP;						\
+    } while (0)
+    
+    switch (cl[0]) {
+    case 'n':
+
+#define DO_INCR      pres[pi[k]] += 1.0
+#define DO_INCR_SYMM				\
+	do {					\
+	    pres[pi[k]] += 1.0;			\
+	    pres[j]     += 1.0;			\
+	} while (0)
+	
+	CR_ROWSUMS_N(0.0, 1.0, double, REAL);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'l':
+
+#define DO_INCR					\
+	do {					\
+	    if (px[k] != NA_LOGICAL) {		\
+		if (px[k])			\
+		    pres[pi[k]] += 1.0;		\
+	    } else if (!doNaRm)			\
+		pres[pi[k]] = NA_REAL;		\
+	    else if (doMean)			\
+		--pcount[pi[k]];		\
+	} while (0)
+	
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (px[k] != NA_LOGICAL) {		\
+		if (px[k]) {			\
+		    pres[pi[k]] += 1.0;		\
+		    pres[j]     += 1.0;		\
+		}				\
+	    } else if (!doNaRm) {		\
+		pres[pi[k]] = NA_REAL;		\
+		pres[j]     = NA_REAL;		\
+	    } else if (doMean) {		\
+		--pcount[pi[k]];		\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+		
+	CR_ROWSUMS_X(0.0, 1.0, double, REAL, int, LOGICAL);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+
+    case 'i':
+
+#define DO_INCR					\
+	do {					\
+	    if (px[k] != NA_INTEGER)		\
+		pres[pi[k]] += px[k];		\
+	    else if (!doNaRm)			\
+		pres[pi[k]] = NA_REAL;		\
+	    else if (doMean)			\
+		--pcount[pi[k]];		\
+	} while (0)
+	
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (px[k] != NA_INTEGER) {		\
+		pres[pi[k]] += px[k];		\
+		pres[j]     += px[k];		\
+	    } else if (!doNaRm) {		\
+		pres[pi[k]] = NA_REAL;		\
+		pres[j]     = NA_REAL;		\
+	    } else if (doMean) {		\
+		--pcount[pi[k]];		\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+
+	CR_ROWSUMS_X(0.0, 1.0, double, REAL, int, INTEGER);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'd':
+
+#define DO_INCR					\
+	do {					\
+	    if (!(doNaRm && ISNAN(px[k])))	\
+		pres[pi[k]] += px[k];		\
+	    else if (doMean)			\
+		--pcount[pi[k]];		\
+	} while (0)
+
+#define DO_INCR_SYMM				\
+	do {					\
+	    if (!(doNaRm && ISNAN(px[k]))) {	\
+		pres[pi[k]] += px[k];		\
+		pres[j]     += px[k];		\
+	    } else if (doMean) {		\
+		--pcount[pi[k]];		\
+		--pcount[j];			\
+	    }					\
+	} while (0)
+
+	CR_ROWSUMS_X(0.0, 1.0, double, REAL, double, REAL);
+	break;
+
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    case 'z':
+
+#define DO_INCR								\
+	do {								\
+	    if (!(doNaRm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {	\
+		pres[pi[k]].r += px[k].r;				\
+		pres[pi[k]].i += px[k].i;				\
+	    } else if (doMean)						\
+		--pcount[pi[k]];					\
+	} while (0)
+	
+#define DO_INCR_SYMM							\
+	do {								\
+	    if (!(doNaRm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {	\
+		pres[pi[k]].r += px[k].r;				\
+		pres[pi[k]].i += px[k].i;				\
+		pres[j].r     += px[k].r;				\
+		pres[j].i     += px[k].i;				\
+	    } else if (doMean) {					\
+		--pcount[pi[k]];					\
+		--pcount[j];						\
+	    }								\
+	} while (0)
+
+	CR_ROWSUMS_X(Matrix_zzero, Matrix_zone,
+		     Rcomplex, COMPLEX, Rcomplex, COMPLEX);
+	break;
+	
+#undef DO_INCR
+#undef DO_INCR_SYMM
+	
+    default:
+	break;
+    }
+
+#undef CR_ROWSUMS
+#undef CR_ROWSUMS_LOOP
+
+    if (doMean) {
+	if (cl[0] != 'z') {
+	    double *pres = REAL(res);
+	    if (doNaRm && cl[0] != 'n') {
+		for (k = 0; k < m; ++k)
+		    pres[k] /= pcount[k];
+		Free_FROM(pcount, m);
+	    } else {
+		for (k = 0; k < m; ++k)
+		    pres[k] /= n;
+	    }
+	} else {
+	    Rcomplex *pres = COMPLEX(res);
+	    if (doNaRm) {
+		for (k = 0; k < m; ++k) {
+		    pres[k].r /= pcount[k];
+		    pres[k].i /= pcount[k];
+		}
+		Free_FROM(pcount, m);
+	    } else {
+		for (k = 0; k < m; ++k) {
+		    pres[k].r /= n;
+		    pres[k].i /= n;
+		}
+	    }
+	}
+    }
+
+    if ((cl[0] == 'n' || cl[0] == 'l') && !doMean)
+	REPROTECT(res = coerceVector(res, INTSXP), pid);
+    if (doSparse) {
+	if (di != 'N')
+	    warning(_("sparseResult=TRUE inefficient for unit triangular 'x'"));
+	REPROTECT(res = v2spV(res), pid);
+    } else {
+	SEXP dimnames;
+	if (cl[1] != 's')
+	    PROTECT(dimnames = GET_SLOT(obj, Matrix_DimNamesSym));
+	else
+	    PROTECT(dimnames = get_symmetrized_DimNames(obj, -1));
+	SEXP nms = VECTOR_ELT(dimnames, margin);
+	if (!isNull(nms))
+	    setAttrib(res, R_NamesSymbol, nms);
+	UNPROTECT(1); /* dimnames */
+    }
+
+    UNPROTECT(nprotect);
+    return res;
+}
