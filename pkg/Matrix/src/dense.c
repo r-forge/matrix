@@ -962,7 +962,8 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 	UNPROTECT(1); /* diag */
     }
 
-    SEXP res, x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    SEXP res = PROTECT(allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, n)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     int i, j, count = m,
 	doNaRm = asLogical(narm) != 0,
 	doMean = asLogical(mean) != 0,
@@ -972,28 +973,27 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
     do {								\
 	if (cl[1] == 'g') { /* general */				\
 	    for (j = 0; j < n; ++j, ++pres) {				\
-		DO_RESET;						\
+		DO_INIT(ZERO);						\
 		for (i = 0; i < m; ++i, ++px)				\
 		    DO_INCR;						\
-		DO_SET;							\
+		DO_SCALE;						\
 	    }								\
 	} else if (cl[2] != 'p') {					\
 	    if (ul == 'U') { /* unpacked upper triangular */		\
 		if (di == 'N') {					\
 		    for (j = 0; j < n; ++j, ++pres) {			\
-			DO_RESET;					\
+			DO_INIT(ZERO);					\
 			for (i = 0; i <= j; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 			px += n-j-1;					\
 		    }							\
 		} else {						\
 		    for (j = 0; j < n; ++j, ++pres) {			\
-			DO_RESET;					\
+			DO_INIT(ONE);					\
 			for (i = 0; i < j; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_INCR_UNIT;					\
-			DO_SET;						\
+			DO_SCALE;					\
 			px += n-j;					\
 		    }							\
 		}							\
@@ -1001,19 +1001,18 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 		if (di == 'N') {					\
 		    for (j = 0; j < n; ++j, ++pres) {			\
 			px += j;					\
-			DO_RESET;					\
+			DO_INIT(ZERO);					\
 			for (i = j; i < n; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 		    }							\
 		} else {						\
 		    for (i = j = 0; j < n; ++j, i = j, ++pres) {	\
 			px += j+1;					\
-			DO_RESET;					\
-			DO_INCR_UNIT;					\
+			DO_INIT(ONE);					\
 			for (i = j+1; i < n; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 		    }							\
 		}							\
 	    }								\
@@ -1021,46 +1020,43 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 	    if (ul == 'U') { /* packed upper triangular */		\
 		if (di == 'N') {					\
 		    for (j = 0; j < n; ++j, ++pres) {			\
-			DO_RESET;					\
+			DO_INIT(ZERO);					\
 			for (i = 0; i <= j; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 		    }							\
 		} else {						\
 		    for (j = 0; j < n; ++j, ++pres) {			\
-			DO_RESET;					\
+			DO_INIT(ONE);					\
 			for (i = 0; i < j; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_INCR_UNIT;					\
-			DO_SET;						\
+			DO_SCALE;					\
 			++px;						\
 		    }							\
 		}							\
 	    } else { /* packed lower triangular */			\
 		if (di == 'N') {					\
 		    for (j = 0; j < n; ++j, ++pres) {			\
-			DO_RESET;					\
+			DO_INIT(ZERO);					\
 			for (i = j; i < n; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 		    }							\
 		} else {						\
 		    for (i = j = 0; j < n; ++j, i = j, ++pres) {	\
 			++px;						\
-			DO_RESET;					\
-			DO_INCR_UNIT;					\
+			DO_INIT(ONE);					\
 			for (i = j+1; i < n; ++i, ++px)			\
 			    DO_INCR;					\
-			DO_SET;						\
+			DO_SCALE;					\
 		    }							\
 		}							\
 	    }								\
 	}								\
     } while (0)
 
-#define DENSE_COLSUMS(_SEXPTYPE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_)	\
+#define DENSE_COLSUMS(_CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_)		\
     do {								\
-	PROTECT(res = allocVector(_SEXPTYPE_, n));			\
 	_CTYPE1_ *pres = _PTR1_(res);					\
 	_CTYPE2_ *px   = _PTR2_(x);					\
 	DENSE_COLSUMS_LOOP;						\
@@ -1068,28 +1064,24 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
     
     switch (cl[0]) {
     case 'n':
-    {
-	int tmp;
 
-#define DO_RESET     tmp = 0
-#define DO_INCR	     if (*px) ++tmp
-#define DO_INCR_UNIT ++tmp;
-#define DO_SET       *pres = (doMean) ? (double) tmp / count : (double) tmp
+#define ZERO         0.0
+#define ONE          1.0
+#define DO_INIT(_U_) *pres = _U_
+#define DO_INCR	     if (*px) *pres += 1.0
+#define DO_SCALE     if (doMean) *pres /= count
 
-	DENSE_COLSUMS(REALSXP, double, REAL, int, LOGICAL);
+	DENSE_COLSUMS(double, REAL, int, LOGICAL);
 	break;
 
-#undef DO_RESET
+#undef DO_INIT
 #undef DO_INCR
-#undef DO_INCR_UNIT
-#undef DO_SET
 	
-    }
     case 'l':
-
-#define DO_RESET				\
+	
+#define DO_INIT(_U_)				\
 	do {					\
-	    *pres = 0.0;			\
+	    *pres = _U_;			\
 	    if (doCount)			\
 		count = m;			\
 	} while (0)
@@ -1102,16 +1094,14 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 	    else if (doMean)			\
 		--count;			\
 	} while (0)
-#define DO_INCR_UNIT *pres += 1.0
-#define DO_SET       if (doMean) *pres /= count;
 	
-	DENSE_COLSUMS(REALSXP, double, REAL, int, LOGICAL);
+	DENSE_COLSUMS(double, REAL, int, LOGICAL);
 	break;
-
+	
 #undef DO_INCR
 	
     case 'i':
-
+	    
 #define DO_INCR					\
 	do {					\
 	    if (*px != NA_INTEGER)		\
@@ -1122,7 +1112,7 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 		--count;			\
 	} while (0)
 	
-	DENSE_COLSUMS(REALSXP, double, REAL, int, INTEGER);
+	DENSE_COLSUMS(double, REAL, int, INTEGER);
 	break;
 
 #undef DO_INCR
@@ -1137,22 +1127,18 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 		--count;			\
 	} while (0)
 
-	DENSE_COLSUMS(REALSXP, double, REAL, double, REAL);
+	DENSE_COLSUMS(double, REAL, double, REAL);
 	break;
 
-#undef DO_RESET
+#undef ZERO
+#undef ONE
 #undef DO_INCR
-#undef DO_INCR_UNIT
-#undef DO_SET
+#undef DO_SCALE
 	
     case 'z':
 
-#define DO_RESET				\
-	do {					\
-	    *pres = Matrix_zzero;		\
-	    if (doCount)			\
-		count = m;			\
-	} while (0)
+#define ZERO         Matrix_zzero
+#define ONE          Matrix_zone
 #define DO_INCR								\
 	do {								\
 	    if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) {	\
@@ -1161,8 +1147,7 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 	    } else if (doMean)						\
 		--count;						\
 	} while (0)
-#define DO_INCR_UNIT (*pres).r += 1.0 
-#define DO_SET					\
+#define DO_SCALE				\
 	do {					\
 	    if (doMean) {			\
 		(*pres).r /= count;		\
@@ -1170,14 +1155,17 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 	    }					\
 	} while (0)
 
-	DENSE_COLSUMS(CPLXSXP, Rcomplex, COMPLEX, Rcomplex, COMPLEX);
+	DENSE_COLSUMS(Rcomplex, COMPLEX, Rcomplex, COMPLEX);
 	break;
 
-#undef DO_RESET
+#undef ZERO
+#undef ONE
+#undef DO_INIT
 #undef DO_INCR
-#undef DO_INCR_UNIT
-#undef DO_SET
+#undef DO_SCALE
 
+    default:
+	break;
     }
 
 #undef DENSE_COLSUMS
@@ -1218,7 +1206,8 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	}
     }
 
-    SEXP res, x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    SEXP res = PROTECT(allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, m)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     int i, j, *pcount = NULL,
 	doNaRm = asLogical(narm) != 0,
 	doMean = asLogical(mean) != 0;
@@ -1242,7 +1231,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 			for (j = 0; j < n; ++j) {			\
 			    for (i = 0; i < j; ++i, ++px)		\
 				DO_INCR;				\
-			    DO_INCR_UNIT;				\
 			    px += n-j;					\
 			}						\
 		    }							\
@@ -1256,7 +1244,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 		    } else {						\
 			for (i = j = 0; j < n; ++j, i = j) {		\
 			    px += j+1;					\
-			    DO_INCR_UNIT;				\
 			    for (i = j+1; i < n; ++i, ++px)		\
 				DO_INCR;				\
 			}						\
@@ -1272,7 +1259,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 			for (j = 0; j < n; ++j) {			\
 			    for (i = 0; i < j; ++i, ++px)		\
 				DO_INCR;				\
-			    DO_INCR_UNIT;				\
 			    ++px;					\
 			}						\
 		    }							\
@@ -1284,7 +1270,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 		    } else {						\
 			for (i = j = 0; j < n; ++j, i = j) {		\
 			    ++px;					\
-			    DO_INCR_UNIT;				\
 			    for (i = j+1; i < n; ++i, ++px)		\
 				DO_INCR;				\
 			}						\
@@ -1329,18 +1314,20 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	}								\
     } while (0)
     
-#define DENSE_ROWSUMS(_SEXPTYPE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_, _ZERO_) \
+#define DENSE_ROWSUMS(_ZERO_, _ONE_, _CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_) \
     do {								\
-	PROTECT(res = allocVector(_SEXPTYPE_, m));			\
-	_CTYPE1_ *pres = _PTR1_(res);					\
+	_CTYPE1_ *pres = _PTR1_(res), u = (di == 'N') ? _ZERO_ : _ONE_;	\
 	_CTYPE2_ *px   = _PTR2_(x);					\
 	if (doNaRm && doMean && cl[0] != 'n') {				\
 	    Calloc_or_Alloca_TO(pcount, m, int);			\
 	    for (i = 0; i < m; ++i) {					\
-		pres[i] = _ZERO_;					\
+		pres[i] = u;						\
 		pcount[i] = n;						\
 	    }								\
-	} else Memzero(pres, m);					\
+	} else {							\
+	    for (i = 0; i < m; ++i)					\
+		pres[i] = u;						\
+	}								\
 	DENSE_ROWSUMS_LOOP;						\
     } while (0)
     
@@ -1348,7 +1335,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
     case 'n':
 	
 #define DO_INCR      if (*px) pres[i] += 1.0
-#define DO_INCR_UNIT pres[i] += 1.0
 #define DO_INCR_SYMM				\
 	do {					\
 	    if (*px) {				\
@@ -1357,7 +1343,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    }					\
 	} while (0)
 	
-	DENSE_ROWSUMS(REALSXP, double, REAL, int, LOGICAL, 0.0);
+	DENSE_ROWSUMS(0.0, 1.0, double, REAL, int, LOGICAL);
 	break;
 
 #undef DO_INCR
@@ -1392,7 +1378,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    }					\
 	} while (0)
 
-	DENSE_ROWSUMS(REALSXP, double, REAL, int, LOGICAL, 0.0);
+	DENSE_ROWSUMS(0.0, 1.0, double, REAL, int, LOGICAL);
 	break;
 
 #undef DO_INCR
@@ -1424,7 +1410,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    }					\
 	} while (0)
 	
-	DENSE_ROWSUMS(REALSXP, double, REAL, int, INTEGER, 0.0);
+	DENSE_ROWSUMS(0.0, 1.0, double, REAL, int, INTEGER);
 	break;
 	
 #undef DO_INCR
@@ -1451,11 +1437,10 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    }					\
 	} while (0)
 	
-	DENSE_ROWSUMS(REALSXP, double, REAL, double, REAL, 0.0);
+	DENSE_ROWSUMS(0.0, 1.0, double, REAL, double, REAL);
 	break;
 	
 #undef DO_INCR
-#undef DO_INCR_UNIT
 #undef DO_INCR_SYMM
 
     case 'z':
@@ -1468,8 +1453,6 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    } else if (doMean)						\
 		--pcount[i];						\
 	} while (0)
-
-#define DO_INCR_UNIT pres[i].r += 1.0
 	
 #define DO_INCR_SYMM							\
 	do {								\
@@ -1484,12 +1467,11 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    }								\
 	} while (0)
 	
-	DENSE_ROWSUMS(CPLXSXP, Rcomplex, COMPLEX, Rcomplex, COMPLEX,
-		      Matrix_zzero);
+	DENSE_ROWSUMS(Matrix_zzero, Matrix_zone,
+		      Rcomplex, COMPLEX, Rcomplex, COMPLEX);
 	break;
 	
 #undef DO_INCR
-#undef DO_INCR_UNIT
 #undef DO_INCR_SYMM
 	
     default:
@@ -1528,7 +1510,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
     }
 
     SEXP dimnames;
-    if (cl[0] != 's')
+    if (cl[1] != 's')
 	PROTECT(dimnames = GET_SLOT(obj, Matrix_DimNamesSym));
     else
 	PROTECT(dimnames = get_symmetrized_DimNames(obj, -1));
