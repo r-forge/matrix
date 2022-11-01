@@ -1959,6 +1959,80 @@ void na2one(SEXP x)
     return;
 }
 
+SEXP v2spV(SEXP from)
+{
+    SEXPTYPE tx = TYPEOF(from);
+    if (tx < LGLSXP || tx > CPLXSXP)
+	ERROR_INVALID_TYPE("object", tx, "v2spV");
+    SEXP to = NULL, length = NULL, i = NULL, x = NULL;
+    R_xlen_t n_ = XLENGTH(from);
+
+#define V2SPV(_KIND_, _NZ_,						\
+	      _CTYPE1_, _SEXPTYPE1_, _PTR1_,				\
+	      _CTYPE2_, _SEXPTYPE2_, _PTR2_)				\
+    do {								\
+	PROTECT(to = NEW_OBJECT_OF_CLASS(#_KIND_ "sparseVector"));	\
+	_CTYPE1_ *py = _PTR1_(from);					\
+	for (k = 0; k < n; ++k)						\
+	    if (_NZ_(py[k]))						\
+		++nnz;							\
+	PROTECT(i = allocVector(_SEXPTYPE2_, nnz));			\
+	PROTECT(x = allocVector(_SEXPTYPE1_, nnz));			\
+	_CTYPE2_ *pi = _PTR2_(i);					\
+	_CTYPE1_ *px = _PTR1_(x);					\
+	for (k = 0; k < n; ++k) {					\
+	    if (_NZ_(py[k])) {						\
+		*(pi++) = (_CTYPE2_) (k + 1);				\
+		*(px++) = py[k];					\
+	    }								\
+	}								\
+    } while (0)
+
+#define V2SPV_CASES(_CTYPE2_, _SEXPTYPE2_, _PTR2_)			\
+    do {								\
+	switch (tx) {							\
+	case LGLSXP:							\
+	    V2SPV(l, ISNZ_LOGICAL, int, LGLSXP, LOGICAL,		\
+		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
+	    break;							\
+	case INTSXP:							\
+	    V2SPV(i, ISNZ_INTEGER, int, INTSXP, INTEGER,		\
+		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
+	    break;							\
+	case REALSXP:							\
+	    V2SPV(d, ISNZ_REAL, double, REALSXP, REAL,			\
+		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
+	    break;							\
+	case CPLXSXP:							\
+	    V2SPV(z, ISNZ_COMPLEX, Rcomplex, CPLXSXP, COMPLEX,		\
+		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
+	    break;							\
+	default:							\
+	    break;							\
+	}								\
+    } while (0)
+    
+    if (n_ <= INT_MAX) {
+	int k, n = (int) n_, nnz = 0;
+	PROTECT(length = ScalarInteger(n));
+	V2SPV_CASES(int, INTSXP, INTEGER);
+    } else {
+	R_xlen_t k, n = n_, nnz = 0;
+	PROTECT(length = ScalarReal((double) n));
+	V2SPV_CASES(double, REALSXP, REAL);
+    }
+
+#undef V2SPV_CASES
+#undef V2SPV
+
+    SET_SLOT(to, Matrix_lengthSym, length);
+    SET_SLOT(to, Matrix_iSym, i);
+    SET_SLOT(to, Matrix_xSym, x);
+    
+    UNPROTECT(4); /* x, i, length, to */
+    return to;
+}
+
 /* That both 's1' and 's2' are STRSXP of length at least 'n' must be 
    checked by the caller ... see, e.g., symmetricMatrix_validate() above
 */
