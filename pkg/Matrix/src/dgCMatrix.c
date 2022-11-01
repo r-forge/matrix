@@ -609,6 +609,8 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
     return ans;
 }
 
+/* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */
+#if 0
 
 /* Define all of
  *  dgCMatrix_colSums(....)
@@ -652,3 +654,5 @@ SEXP ngCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means)
     else
 	return ngCMatrix_colSums_i(x, NArm, spRes, trans, means);
 }
+
+#endif /* MJ */

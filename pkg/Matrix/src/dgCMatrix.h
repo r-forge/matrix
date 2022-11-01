@@ -26,10 +26,13 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y);
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp, SEXP give_sparse);
 
+/* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */
+#if 0
 SEXP dgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
 SEXP igCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
 SEXP lgCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
 SEXP ngCMatrix_colSums(SEXP x, SEXP NArm, SEXP spRes, SEXP trans, SEXP means);
+#endif /* MJ */
 
 /* MJ: no longer needed ... replacement in ./validity.c */
 #if 0

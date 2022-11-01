@@ -17,7 +17,7 @@ Csparse.o: Csparse.c Csparse.h Mutils.h Syms.h \
  CHOLMOD/Include/cholmod_cholesky.h CHOLMOD/Include/cholmod_partition.h \
  CHOLMOD/Include/cholmod_camd.h CHOLMOD/Include/cholmod_supernodal.h \
  CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
- t_Csparse_validate.c t_Csparse_subassign.c t_matrix_to_Csp.c
+ t_Csparse_validate.c t_Csparse_subassign.c
 Mutils.o: Mutils.c Mutils.h Syms.h t_sparseVector.c
 abIndex.o: abIndex.c abIndex.h Mutils.h Syms.h \
  t_sparseVector.c t_Matrix_rle.c
@@ -46,8 +46,7 @@ dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h Syms.h t_sparseVector.c \
  CHOLMOD/Include/cholmod_core.h CHOLMOD/Include/cholmod_check.h \
  CHOLMOD/Include/cholmod_cholesky.h CHOLMOD/Include/cholmod_partition.h \
  CHOLMOD/Include/cholmod_camd.h CHOLMOD/Include/cholmod_supernodal.h \
- CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
- t_gCMatrix_colSums.c
+ CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h
 dgeMatrix.o: dgeMatrix.c dgeMatrix.h Mutils.h Syms.h t_sparseVector.c
 dpoMatrix.o: dpoMatrix.c dpoMatrix.h Mutils.h Syms.h t_sparseVector.c
 dppMatrix.o: dppMatrix.c dppMatrix.h Mutils.h \

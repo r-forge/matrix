@@ -56,3 +56,5 @@ src/dgTMatrix\.[ch]$
 src/dtTMatrix\.[ch]$
 src/lgCMatrix\.[ch]$
 src/ldense\.[ch]$
+src/t_matrix_to_Csp\.c$
+src/t_gCMatrix_colSums\.c$
