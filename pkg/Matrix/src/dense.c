@@ -936,6 +936,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     return to;
 }
 
+/* colSums(<denseMatrix>) */
 SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 {
     static const char *valid[] = {
@@ -1180,6 +1181,7 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
     return res;
 }
 
+/* rowSums(<denseMatrix>) */
 SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 {
     static const char *valid[] = {
