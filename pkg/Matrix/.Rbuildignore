@@ -50,9 +50,9 @@ R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
 
 # These give warning "ISO C forbids an empty translation unit"
 # from '-Wpedantic' :
-src/TMatrix_as.[ch]
-src/Tsparse.[ch]
-src/dgTMatrix.[ch]
-src/dtTMatrix.[ch]
-src/lgCMatrix.[ch]
-src/ldense.[ch]
+src/TMatrix_as\.[ch]$
+src/Tsparse\.[ch]$
+src/dgTMatrix\.[ch]$
+src/dtTMatrix\.[ch]$
+src/lgCMatrix\.[ch]$
+src/ldense\.[ch]$
