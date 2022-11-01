@@ -390,7 +390,9 @@ void conjugate(SEXP x);
 void zeroRe(SEXP x);
 void zeroIm(SEXP x);
 void na2one(SEXP x);
-    
+
+SEXP v2spV(SEXP from);
+
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 R_xlen_t strmatch(const char *nm, SEXP s);
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
