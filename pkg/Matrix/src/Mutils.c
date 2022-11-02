@@ -1962,8 +1962,6 @@ void na2one(SEXP x)
 SEXP v2spV(SEXP from)
 {
     SEXPTYPE tx = TYPEOF(from);
-    if (tx < LGLSXP || tx > CPLXSXP)
-	ERROR_INVALID_TYPE("object", tx, "v2spV");
     SEXP to = NULL, length = NULL, i = NULL, x = NULL;
     R_xlen_t n_ = XLENGTH(from);
 
@@ -2008,6 +2006,7 @@ SEXP v2spV(SEXP from)
 		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
 	    break;							\
 	default:							\
+	    ERROR_INVALID_TYPE("object", tx, "v2spV");			\
 	    break;							\
 	}								\
     } while (0)
