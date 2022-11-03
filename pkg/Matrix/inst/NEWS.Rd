@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-11-02 r3727)}{
+\section{Changes in version 1.5-3 (2022-11-03 r3729)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -43,6 +43,16 @@
       \code{[CRT]sparseMatrix} now handle nonzero pattern and logical
       matrices directly (no longer coercing to double, a constraint
       of the earlier implementation using CHOLMOD).
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item Package \pkg{methods} has been moved from \code{Imports}
+      to \code{Depends}, as suggested in the WRE manual.  Now
+      \code{as()} and other basic S4 machinery are available whenever
+      \pkg{Matrix} is attached.  This change affects R processes
+      started with environment variable \code{R_DEFAULT_PACKAGES} set
+      to \code{NULL} (or some list not containing \pkg{methods}).
     }
   }
 }
