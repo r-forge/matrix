@@ -4649,12 +4649,8 @@ SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
 	*pdim = INTEGER(dim), m = pdim[!margin], n = pdim[margin];
     UNPROTECT(1); /* dim */
     
-    char ul = 'U', di = 'N';
+    char di = 'N';
     if (cl[1] == 't') {
-	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-	ul = *CHAR(STRING_ELT(uplo, 0));
-	UNPROTECT(1); /* uplo */
-	
 	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
 	di = *CHAR(STRING_ELT(diag, 0));
 	UNPROTECT(1); /* diag */
