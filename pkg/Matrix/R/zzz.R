@@ -23,13 +23,9 @@
                        paste(deparse(expr, width.cutoff, ...),
                              collapse = collapse))
             assign("tryInvokeRestart", envir = Mns, inherits = FALSE,
-                   function(r, ...) {
-                       if(!isRestart(r))
-                           r <- findRestart(r)
-                       if(is.null(r))
-                           invisible(NULL)
-                       else .Internal(.invokeRestart(r, list(...)))
-                   })
+                   function(r, ...)
+                       tryCatch(invokeRestart(r, ...),
+                                error = function(e) invisible(NULL)))
         }
     }
 
