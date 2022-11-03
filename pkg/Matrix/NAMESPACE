@@ -3,10 +3,10 @@ useDynLib(Matrix, .registration=TRUE)
 ## Import functions we need explicitly, notably for which we define methods:
 importFrom("grDevices", colorRampPalette, grey)
 importFrom("graphics", par, image)
-importFrom("grid", grid.rect, gpar, grob)# others via 'grid::'
+importFrom("grid", grid.rect, gpar)# others via 'grid::'
 importFrom("lattice", levelplot, panel.levelplot.raster)
 
-importFrom("utils", str, head, tail, assignInNamespace, capture.output)
+importFrom("utils", str, head, tail, capture.output)
 importFrom("stats"
          , "contrasts<-", cov2cor
          , diffinv, model.frame, rnorm, runif
