@@ -392,7 +392,7 @@ size_t kind2size(char kind)
     }
 }
 
-/* TODO: compare with macros in ./Mutils.h */
+/* TODO: compare with macros in ./Mdefines.h */
 
 #define VALID_NONVIRTUAL						\
 /*  0 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix",		\
@@ -475,7 +475,7 @@ SEXP R_Matrix_shape(SEXP obj)
     return mkString(s);
 }
 
-/* TODO: compare with macros in ./Mutils.h */
+/* TODO: compare with macros in ./Mdefines.h */
 
 #define VALID_CRTSPARSE				\
 "dgCMatrix", "dsCMatrix", "dtCMatrix",		\
@@ -894,7 +894,6 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
 /* That 'valid' is a STRSXP must be checked by the caller ...
    NOTE: ./Mutils.h has
          int Matrix_check_class_(char *x, const char **valid);
-	 int Matrix_check_class(SEXP x, const char **valid);
 	 ... and this is yet another variant ...
 */
 R_xlen_t strmatch(const char *x, SEXP valid)
