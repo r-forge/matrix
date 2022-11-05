@@ -1,7 +1,6 @@
 #ifndef MATRIX_SPARSE_H
 #define MATRIX_SPARSE_H
 
-#include "Lapack-etc.h"
 #include "Mutils.h"
 
 SEXP sparse_as_dense(SEXP from, int packed);
