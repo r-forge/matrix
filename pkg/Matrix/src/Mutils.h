@@ -1,17 +1,22 @@
 #ifndef MATRIX_UTILS_H
 #define MATRIX_UTILS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* NB: system headers must come before R headers */
 
-#include <stdint.h> /* C99 for int64_t */
-#include <ctype.h>
-#include <R.h> /* includes Rconfig.h, R_ext/RS.h */
+#include <stdint.h>   /* fixed-width integer types, e.g., int64_t */
+#include <ctype.h>    /* tolower, toupper */
+
+#include <R.h>
 #include <Rinternals.h>
 #include <Rversion.h>
+
 #include "Mdefines.h"
 #include "Minlines.h"
+
+#ifdef __cplusplus
+extern "C" {
+/* NB: this block must not include system or R headers */
+#endif
 
 SEXP NEW_OBJECT_OF_CLASS(const char* what);
 
