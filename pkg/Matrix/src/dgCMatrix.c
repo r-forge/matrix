@@ -1,8 +1,3 @@
-#ifdef __GLIBC__
-// to get strdup declared in glibc (when strict -std=c11 or -stdc99):
-#define _POSIX_C_SOURCE 200809L
-#endif
-#include <string.h>
 #include "dgCMatrix.h"
 #include "chm_common.h"
 

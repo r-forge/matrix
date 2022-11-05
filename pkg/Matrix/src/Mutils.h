@@ -1,10 +1,16 @@
 #ifndef MATRIX_UTILS_H
 #define MATRIX_UTILS_H
 
+#ifdef __GLIBC__
+/* to ensure that strdup() and others are declared
+   when string.h is included with R.h (WRE) :
+*/
+# define _POSIX_C_SOURCE 200809L
+#endif
+
 /* NB: system headers must come before R headers */
 
-#include <stdint.h>   /* fixed-width integer types, e.g., int64_t */
-#include <ctype.h>    /* tolower, toupper */
+#include <stdint.h> /* fixed-width integer types, e.g., int64_t */
 
 #include <R.h>
 #include <Rinternals.h>

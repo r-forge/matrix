@@ -1,5 +1,4 @@
-#include <limits.h>
-#include <R_ext/Lapack.h>
+#include <ctype.h> /* toupper */
 #include "Mutils.h"
 
 /**
