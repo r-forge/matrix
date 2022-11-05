@@ -339,34 +339,6 @@ int Matrix_check_class(SEXP x, const char **valid)
     return Matrix_check_class_((char *) class_P(x), valid);
 }
 
-/** Accessing  *sparseVectors :  fast (and recycling)  v[i] for v = ?sparseVector:
- * -> ./sparseVector.c  -> ./t_sparseVector.c :
- */
-// Type_ans sparseVector_sub(int64_t i, int nnz_v, int* v_i, Type_ans* v_x, int len_v):
-
-/* Define all of
- *  dsparseVector_sub(....)
- *  isparseVector_sub(....)
- *  lsparseVector_sub(....)
- *  nsparseVector_sub(....)
- *  zsparseVector_sub(....)
- */
-#define _dspV_
-#include "t_sparseVector.c"
-
-#define _ispV_
-#include "t_sparseVector.c"
-
-#define _lspV_
-#include "t_sparseVector.c"
-
-#define _nspV_
-#include "t_sparseVector.c"
-
-#define _zspV_
-#include "t_sparseVector.c"
-
-
 #ifdef __cplusplus
 }
 #endif
