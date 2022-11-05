@@ -10,6 +10,7 @@ extern "C" {
 #include <R.h> /* includes Rconfig.h, R_ext/RS.h */
 #include <Rinternals.h>
 #include <Rversion.h>
+#include "Mdefines.h"
 
 SEXP NEW_OBJECT_OF_CLASS(const char* what);
 

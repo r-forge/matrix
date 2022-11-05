@@ -40,7 +40,7 @@ SEXP dense_to_symmetric(SEXP x, SEXP uplo, SEXP symm_test);
 SEXP dense_band(SEXP x, SEXP k1, SEXP k2);
 #endif /* MJ */
 
-/* TODO: compare with macros in ./Mutils.h */
+/* TODO: compare with macros in ./Mdefines.h */
 
 #define VALID_DDENSE							\
 "dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix"
