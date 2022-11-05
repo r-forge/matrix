@@ -1,3 +1,6 @@
+/* Copy and paste from WRE : */
+
+// before any R headers, or define in PKG_CPPFLAGS
 #ifndef  USE_FC_LEN_T
 # define USE_FC_LEN_T
 #endif
@@ -6,4 +9,3 @@
 #ifndef FCONE
 # define FCONE
 #endif
-
