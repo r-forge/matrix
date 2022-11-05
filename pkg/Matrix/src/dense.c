@@ -1,5 +1,216 @@
 #include "dense.h"
 
+SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
+		     int new, int transpose_if_vector)
+{
+    /* NB: also handing vectors 'from' _without_ a 'dim' attribute */
+    SEXPTYPE tf = TYPEOF(from);
+    switch (tf) {
+    case LGLSXP:
+#ifdef HAVE_PROPER_IMATRIX
+    case INTSXP:
+#endif
+    case REALSXP:
+#ifdef HAVE_PROPER_ZMATRIX
+    case CPLXSXP:
+#endif
+	break;
+#ifndef HAVE_PROPER_IMATRIX
+    case INTSXP:
+	if (!inherits(from, "factor"))
+	    break;
+#endif
+    default:
+	if (OBJECT(from))
+	    ERROR_INVALID_CLASS(from, "matrix_as_dense");
+	else
+	    ERROR_INVALID_TYPE("object", tf, "matrix_as_dense");
+	break;
+    }
+
+    char cl[] = "...Matrix";
+    cl[0] = (code[0] == '.') ? type2kind(tf) : code[0];
+    cl[1] = code[1];
+    cl[2] = code[2];
+    SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+    
+    SEXP dim, dimnames;
+    int *pdim, m, n, doDN, isM = (int) isMatrix(from), nprotect = 1;
+    R_xlen_t len = XLENGTH(from);
+    
+    if (isM) {
+	
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(dim = getAttrib(from, R_DimSymbol), &pid);
+	pdim = INTEGER(dim);
+	if ((m = pdim[0]) != (n = pdim[1]) || n > 0) {
+	    if (new > 1)
+		REPROTECT(dim = duplicate(dim), pid);
+	    SET_SLOT(to, Matrix_DimSym, dim);
+	}
+	UNPROTECT(1); /* dim */
+	
+	PROTECT(dimnames = getAttrib(from, R_DimNamesSymbol));
+	++nprotect;
+	doDN = !isNull(dimnames);
+	
+    } else {
+	
+	if (len > INT_MAX)
+	    error(_("dimensions cannot exceed 2^31-1"));
+	PROTECT(dim = allocVector(INTSXP, 2));
+	pdim = INTEGER(dim);
+	if (transpose_if_vector) {
+	    pdim[0] = m = 1;
+	    pdim[1] = n = (int) len;
+	} else {
+	    pdim[0] = m = (int) len;
+	    pdim[1] = n = 1;
+	}
+	SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP nms = PROTECT(getAttrib(from, R_NamesSymbol));
+	++nprotect;
+	doDN = !isNull(nms);
+	if (doDN) {
+	    PROTECT(dimnames = allocVector(VECSXP, 2));
+	    ++nprotect;
+	    SET_VECTOR_ELT(dimnames, transpose_if_vector ? 1 : 0, nms);
+	}
+	
+    }
+    
+    if (cl[1] != 'g' && m != n)
+	error(_("attempt to construct triangular or symmetric "
+		"denseMatrix from non-square matrix"));
+
+    if (doDN) {
+	if (cl[1] == 's')
+	    set_symmetrized_DimNames(to, dimnames, -1);
+	else if (isM && new > 1)
+	    set_DimNames(to, dimnames);
+	else
+	    SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    }
+    
+    if (cl[1] != 'g' && uplo != 'U') {
+	SEXP val = PROTECT(mkString("L"));
+	SET_SLOT(to, Matrix_uploSym, val);
+	UNPROTECT(1); /* val */
+    }
+
+    if (cl[1] == 't' && diag != 'N') {
+	SEXP val = PROTECT(mkString("U"));
+	SET_SLOT(to, Matrix_diagSym, val);
+	UNPROTECT(1); /* val */
+    }
+    
+    SEXPTYPE tt = kind2type(cl[0]);
+    if (tf != tt) {
+	PROTECT(from = coerceVector(from, tt));
+	++nprotect;
+    }
+
+    SEXP x;
+    
+    if (cl[2] != 'p') {
+	
+	if (tf != tt || new < 0 || (new == 0 && !MAYBE_REFERENCED(from)))
+	    x = from;
+	else {
+	    PROTECT(x = allocVector(tt, len));
+	    ++nprotect;
+	    switch (tt) {
+	    case LGLSXP:
+		Memcpy(LOGICAL(x), LOGICAL(from), len);
+		break;
+	    case INTSXP:
+		Memcpy(INTEGER(x), INTEGER(from), len);
+		break;
+	    case REALSXP:
+		Memcpy(REAL(x), REAL(from), len);
+		break;
+	    case CPLXSXP:
+		Memcpy(COMPLEX(x), COMPLEX(from), len);
+		break;
+	    default:
+		break;
+	    }
+	}
+	if (!isNull(ATTRIB(x))) {
+	    SET_ATTRIB(x, R_NilValue);
+	    if (OBJECT(x))
+		SET_OBJECT(x, 0);
+	}
+	
+    } else {
+
+	PROTECT(x = allocVector(tt, PM_LENGTH(n)));
+	++nprotect;
+	
+#define PACK(_PREFIX_, _PTR_)						\
+	_PREFIX_ ## dense_pack(_PTR_(x), _PTR_(from), n, uplo, diag)
+	
+	switch (tt) {
+	case LGLSXP:
+	    PACK(i, LOGICAL);
+	    break;
+#ifdef HAVE_PROPER_IMATRIX
+	case INTSXP:
+	    PACK(i, INTEGER);
+	    break;
+#endif
+	case REALSXP:
+	    PACK(d, REAL);
+	    break;
+#ifdef HAVE_PROPER_ZMATRIX
+	case CPLXSXP:
+	    PACK(z, COMPLEX);
+	    break;
+#endif
+	default:
+	    break;
+	}
+
+#undef PACK
+	
+    }
+    
+    SET_SLOT(to, Matrix_xSym, x);
+
+    UNPROTECT(nprotect);
+    return to;
+}
+
+/* as(<matrix>, ".(ge|tr|sy|tp|sp)Matrix") */
+SEXP R_matrix_as_dense(SEXP from, SEXP code, SEXP uplo, SEXP diag)
+{
+    const char *zzz;
+    if (TYPEOF(code) != STRSXP || LENGTH(code) < 1 ||
+	(code = STRING_ELT(code, 0)) == NA_STRING ||
+	(zzz = CHAR(code))[0] == '\0' ||
+	(zzz             )[1] == '\0' ||
+	!((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
+	  (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p')) ||
+	  (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p'))))
+	error(_("invalid 'code' to 'R_matrix_as_dense()'"));
+    char ul = 'U', di = 'N';
+    if (zzz[1] != 'g') {
+	if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
+	    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
+	    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+	    error(_("invalid 'uplo' to 'R_matrix_as_dense()'"));
+	if (zzz[1] == 't') {
+	    if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		(diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		((di = *CHAR(diag)) != 'N' && di != 'U'))
+		error(_("invalid 'diag' to 'R_matrix_as_dense()'"));
+	}
+    }
+    return matrix_as_dense(from, zzz, ul, di, 0, 0);
+}
+
 /* as(<denseMatrix>, "[CRT]sparseMatrix") */
 SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 {
@@ -719,6 +930,227 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
     
     UNPROTECT(2); /* x, to */
     return to;
+}
+
+/** @brief Coerce `denseMatrix` (and others) to `.geMatrix`.
+ *
+ *  This utility supports the many `*_{prod,crossprod,tcrossprod,...}`
+ *  functions that should work with both classed and unclassed matrices.
+ *  It is used in many places for `.geMatrix` ("generalized") dispatch.
+ *
+ * @param from A `denseMatrix`, a `diagonalMatrix`, a numeric or logical 
+ *     `matrix`, or a numeric or logical vector.
+ * @param kind A `char` flag, one of `'.'`, `'d'`, `'l'`, and `'n'`, 
+ *     indicating the "kind" of `.geMatrix` desired.  A dot `'.'` means 
+ *     to preserve the "kind" of `from`.
+ * @param new An `int` flag allowing the user to control allocation.
+ *     If 0, then usual copy-on-modify rules are employed.  
+ *     If less than 0, then the `x` slot of the result is the result 
+ *     of modifying in place the `x` slot of `from` (or `from` itself 
+ *     if it is a `matrix` or vector), unless the two have different 
+ *     lengths or types.
+ *     If greater than 0, then the `x` slot of the result is always 
+ *     newly allocated.
+ *     If greater than 1, then the `Dim` and `Dimnames` slots are also 
+ *     always newly allocated (but never the _elements_ of `Dimnames`).
+ * @param transpose_if_vector Should length-`n` vectors without a `dim` 
+ *     attribute become 1-by-`n` (rather than `n`-by-1) matrices?
+ *
+ * @return A `.geMatrix`.
+ */
+SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
+{
+    /* NB: diagonalMatrix is no longer a subclass of denseMatrix 
+           but .diMatrix are nonetheless dealt with here ... 
+    */
+    
+    static const char *valid[] = {
+	"dgeMatrix", "lgeMatrix", "ngeMatrix",
+	"dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix", "ddiMatrix",
+	"ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix", "ldiMatrix",
+	"ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix", /* "ndiMatrix", */
+	""};
+    int ivalid = R_check_class_etc(from, valid);
+    if (ivalid < 0) {
+	/* dispatch to method for base matrix and base vector */
+	char zzz[] = ".ge";
+	zzz[0] = kind;
+	return matrix_as_dense(from, zzz, '\0', '\0', new, transpose_if_vector);
+    }
+    
+    /* Now handling just denseMatrix and diagonalMatrix ...
+       We want to be fast if 'from' is already a .geMatrix,
+       and _especially_ fast if it is already a .geMatrix
+       of the right "kind" ... 
+    */
+    
+    const char *clf = valid[ivalid];
+    if (kind == '.')
+	kind = clf[0];
+    Rboolean ge = (clf[1] == 'g'), ge0 = ge && kind == clf[0];
+    if (ge0 && new <= 0)
+	return from;
+    
+    SEXP to;
+    if (ge0)
+	PROTECT(to = NEW_OBJECT_OF_CLASS(clf));
+    else {
+	char clt[] = ".geMatrix";
+	clt[0] = kind;
+	PROTECT(to = NEW_OBJECT_OF_CLASS(clt));
+    }
+
+    SEXP dim;
+    PROTECT_INDEX pidA;
+    PROTECT_WITH_INDEX(dim = GET_SLOT(from, Matrix_DimSym), &pidA);
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    if (m != n || n > 0) {
+	if (new > 1)
+	    REPROTECT(dim = duplicate(dim), pidA);
+	SET_SLOT(to, Matrix_DimSym, dim);
+    }
+    UNPROTECT(1); /* dim */
+    
+    SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+    if (clf[1] == 's')
+	set_symmetrized_DimNames(to, dimnames, -1);
+    else if (new > 1)
+	set_DimNames(to, dimnames);
+    else
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(1); /* dimnames */
+    
+    SEXP x0;
+    PROTECT_INDEX pidB;
+    PROTECT_WITH_INDEX(x0 = GET_SLOT(from, Matrix_xSym), &pidB);
+    if (ge0) {
+	REPROTECT(x0 = duplicate(x0), pidB);
+	SET_SLOT(to, Matrix_xSym, x0);
+	UNPROTECT(2); /* x0, to */
+	return to;
+    }
+    
+    SEXPTYPE tf = TYPEOF(x0), tt = kind2type(kind);
+    int do_na2one = clf[0] == 'n' && kind != 'n';
+    if (ge) {
+	if (new == 0 && do_na2one) {
+	    /* Try to avoid an allocation ... */
+	    R_xlen_t ix, nx = XLENGTH(x0);
+	    int *px0 = LOGICAL(x0);
+	    for (ix = 0; ix < nx; ++ix)
+		if (*(px0++) == NA_LOGICAL)
+		    break;
+	    do_na2one = (ix < nx);
+	}
+	if (tf != tt)
+	    REPROTECT(x0 = coerceVector(x0, tt), pidB);
+	else if (new > 0 || (new == 0 && do_na2one))
+	    REPROTECT(x0 = duplicate(x0), pidB);
+	if (do_na2one)
+	    na2one(x0);
+	SET_SLOT(to, Matrix_xSym, x0);
+	UNPROTECT(2); /* x0, to */
+	return to;
+    }
+    
+    /* Now handling 'from' inheriting from .(tr|sy|tp|sp|di)Matrix ... */
+
+    char ul = 'U', di = 'N';
+    if (clf[1] != 'd') {
+	SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+	ul = *CHAR(STRING_ELT(uplo, 0));
+	UNPROTECT(1); /* uplo */
+    }
+    if (clf[1] != 's') {
+	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+	di = *CHAR(STRING_ELT(diag, 0));
+	UNPROTECT(1); /* diag */
+    } else if (kind == clf[0]) {
+	SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+	if (LENGTH(factors) > 0)
+	    SET_SLOT(to, Matrix_factorSym, factors);
+	UNPROTECT(1); /* factors */
+    }
+
+    SEXP x1;
+    int packed = clf[1] == 'd' || clf[2] == 'p';
+    if (!packed) {
+	/* (tr|sy)->ge */
+	if (tf != tt)
+	    REPROTECT(x1 = coerceVector(x0, tt), pidB);
+	else if (new >= 0)
+	    REPROTECT(x1 = duplicate(x0), pidB);
+	else
+	    x1 = x0;
+    } else {
+	/* (tp|sp|di)->ge */
+	if ((double) n * n > R_XLEN_T_MAX)
+	    error(_("attempt to allocate vector of length exceeding "
+		    "R_XLEN_T_MAX"));
+	if (tf != tt)
+	    REPROTECT(x0 = coerceVector(x0, tt), pidB);
+	PROTECT(x1 = allocVector(tt, (R_xlen_t) n * n));
+    }
+
+#define AS_GE(_PREFIX_, _CTYPE_, _PTR_)					\
+    do {								\
+	_CTYPE_ *px1 = _PTR_(x1);					\
+	if (clf[1] == 'd') {						\
+	    /* di->ge */						\
+	    Memzero(px1, (R_xlen_t) n * n);				\
+	    _PREFIX_ ## dense_unpacked_copy_diagonal(			\
+		px1, _PTR_(x0), n, n, ul /* unused */, di);		\
+	} else {							\
+	    /* (tr|sy|tp|sp)->ge */					\
+	    if (clf[2] == 'p')						\
+		_PREFIX_ ## dense_unpack(px1, _PTR_(x0), n, ul, di);	\
+	    if (clf[1] == 't')						\
+		_PREFIX_ ## dense_unpacked_make_triangular(px1, n, n, ul, di); \
+	    else							\
+		_PREFIX_ ## dense_unpacked_make_symmetric(px1, n, ul);	\
+	}								\
+    } while (0)
+
+    switch (kind) {
+    case 'n':
+    case 'l':
+	AS_GE(i, int, LOGICAL);
+	break;
+    case 'i':
+	AS_GE(i, int, INTEGER);
+	break;
+    case 'd': 
+	AS_GE(d, double, REAL);
+	break;
+    case 'z':
+	AS_GE(z, Rcomplex, COMPLEX);
+	break;
+    default:
+	break;
+    }
+
+#undef AS_GE
+
+    if (do_na2one)
+	na2one(x1);
+    SET_SLOT(to, Matrix_xSym, x1);
+
+    if (packed)
+	UNPROTECT(3); /* x1, x0, to */
+    else
+	UNPROTECT(2); /* x1,     to */
+    return to;
+}
+
+/* as(<denseMatrix>, "generalMatrix") */
+SEXP R_dense_as_general(SEXP from, SEXP kind)
+{
+    char k;
+    if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	(kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	(k = *CHAR(kind)) == '\0')
+	error(_("invalid 'kind' to 'R_dense_as_general()'"));
+    return dense_as_general(from, k, 0, 0);
 }
 
 /* band(<denseMatrix>, k1, k2), tri[ul](<denseMatrix>, k)
