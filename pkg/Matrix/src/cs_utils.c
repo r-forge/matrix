@@ -173,7 +173,7 @@ css *Matrix_as_css(css *ans, SEXP x)
 {
     static const char *valid[] = {"css_LU", "css_QR", ""};
     int *nz = INTEGER(GET_SLOT(x, install("nz"))),
-	ctype = Matrix_check_class(x, valid);
+	ctype = R_check_class_etc(x, valid);
 
     if (ctype < 0)
 	error(_("invalid class of object to %s"), "Matrix_as_css");
@@ -208,7 +208,7 @@ css *Matrix_as_css(css *ans, SEXP x)
 csn *Matrix_as_csn(csn *ans, SEXP x)
 {
     static const char *valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = Matrix_check_class(x, valid);
+    int ctype = R_check_class_etc(x, valid);
 
     if (ctype < 0)
 	error(_("invalid class of object to %s"), "Matrix_as_csn");
@@ -291,7 +291,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree, SEXP dn)
 {
     SEXP ans;
     static const char *valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = Matrix_check_class(cl, valid), n = (N->U)->n;
+    int ctype = Matrix_check_class_(cl, valid), n = (N->U)->n;
 
     if (ctype < 0)
 	error(_("Inappropriate class cl='%s' in Matrix_csn_to_SEXP(S, cl, ..)"),
