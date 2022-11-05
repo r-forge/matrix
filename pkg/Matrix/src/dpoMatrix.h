@@ -1,8 +1,6 @@
 #ifndef MATRIX_POMATRIX_H
 #define MATRIX_POMATRIX_H
 
-#include "Lapack-etc.h"
-#include "Mutils.h"
 #include "dsyMatrix.h"
 
 SEXP dpoMatrix_chol(SEXP obj);
