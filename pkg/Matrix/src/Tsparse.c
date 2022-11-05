@@ -1,6 +1,7 @@
 				/* Sparse matrices in triplet form */
 
 /* MJ: no longer needed ... nothing below */
+#if 0
 #include "Tsparse.h"
 #include "chm_common.h"
 #endif /* MJ */

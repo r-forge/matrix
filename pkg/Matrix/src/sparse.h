@@ -45,7 +45,7 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
 SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
 
-/* TODO: compare with macros in ./Mutils.h */
+/* TODO: compare with macros in ./Mdefines.h */
 
 #define VALID_DSPARSE				\
 "dgCMatrix", "dgRMatrix", "dgTMatrix",		\
