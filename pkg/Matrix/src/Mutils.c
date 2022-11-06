@@ -229,7 +229,7 @@ SEXP get_factor(SEXP obj, const char *nm)
     SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
     if (LENGTH(factors) > 0) {
 	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-	R_xlen_t i = strmatch2(nm, valid);
+	int i = strmatch2(nm, valid);
 	UNPROTECT(1);
 	if (i >= 0) {
 	    factors = VECTOR_ELT(factors, i);
@@ -249,7 +249,7 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
     PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorSym), &pid);
     if (LENGTH(factors) > 0) {
 	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-	R_xlen_t i = strmatch2(nm, valid);
+	int i = strmatch2(nm, valid);
 	UNPROTECT(1);
 	if (i >= 0) {
 	    SET_VECTOR_ELT(factors, i, val);
