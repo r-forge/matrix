@@ -1,3 +1,4 @@
+#include <stdint.h> /* fixed-width integer types, e.g., int64_t */
 #include "sparseVector.h"
 
 #define _nspV_
