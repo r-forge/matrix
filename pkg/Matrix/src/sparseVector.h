@@ -14,4 +14,4 @@ SPV_SUB(d, double);
 SPV_SUB(z, Rcomplex);
 #undef SPV_SUB
 
-#endif /* MATRIX_SPVECTOR_H
+#endif /* MATRIX_SPVECTOR_H */
