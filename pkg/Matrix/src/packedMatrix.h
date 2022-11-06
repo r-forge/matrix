@@ -1,7 +1,6 @@
 #ifndef MATRIX_PAMATRIX_H
 #define MATRIX_PAMATRIX_H
 
-#include "Lapack-etc.h"
 #include "Mutils.h"
 
 SEXP packedMatrix_unpack(SEXP from, SEXP strict);
