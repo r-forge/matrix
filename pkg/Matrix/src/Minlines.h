@@ -81,14 +81,24 @@ SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
  * @return index of match or -1 for no match
  */
 static R_INLINE
-int Matrix_check_class_(char *x, const char **valid)
+int strmatch(char *x, const char **valid)
 {
     int ans = 0;
-    while (strlen(valid[ans]) > 0)
+    while (strlen(valid[ans]) > 0) {
 	if (strcmp(x, valid[ans]) == 0)
 	    return ans;
-	else
-	    ++ans;
+	++ans;
+    }
+    return -1;
+}
+
+static R_INLINE
+int strmatch2(const char *x, SEXP valid)
+{
+    int i, n = LENGTH(valid);
+    for (i = 0; i < n; ++i)
+	if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
+	    return i;
     return -1;
 }
 

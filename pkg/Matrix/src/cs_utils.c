@@ -127,7 +127,7 @@ cs *Matrix_as_cs(cs *ans, SEXP x, Rboolean check_Udiag)
 SEXP Matrix_cs_to_SEXP(cs *a, char *cl, int dofree, SEXP dn)
 {
     static const char *valid[] = {"dgCMatrix", "dsCMatrix", "dtCMatrix", ""};
-    int ctype = Matrix_check_class_(cl, valid);
+    int ctype = strmatch(cl, valid);
 
     if (ctype < 0)
 	error(_("invalid class of object to %s"), "Matrix_cs_to_SEXP");
@@ -245,7 +245,7 @@ SEXP Matrix_css_to_SEXP(css *S, char *cl, int dofree, int m, int n)
 {
     SEXP ans;
     static const char *valid[] = {"css_LU", "css_QR", ""};
-    int *nz, ctype = Matrix_check_class_(cl, valid);
+    int *nz, ctype = strmatch(cl, valid);
 
     if (ctype < 0)
 	error(_("Inappropriate class cl='%s' in Matrix_css_to_SEXP(S, cl, ..)"),
@@ -291,7 +291,7 @@ SEXP Matrix_csn_to_SEXP(csn *N, char *cl, int dofree, SEXP dn)
 {
     SEXP ans;
     static const char *valid[] = {"csn_LU", "csn_QR", ""};
-    int ctype = Matrix_check_class_(cl, valid), n = (N->U)->n;
+    int ctype = strmatch(cl, valid), n = (N->U)->n;
 
     if (ctype < 0)
 	error(_("Inappropriate class cl='%s' in Matrix_csn_to_SEXP(S, cl, ..)"),
