@@ -49,30 +49,6 @@ int* expand_cmprPt(int ncol, const int mp[], int mj[])
     return mj;
 }
 
-/**
- * Check if slot(obj, "x") contains any NA (or NaN).
- *
- * @param obj   a 'Matrix' object with a (double precision) 'x' slot.
- *
- * @return Rboolean :== any(is.na(slot(obj, "x") )
- */
-static R_INLINE
-Rboolean any_NA_in_x(SEXP obj)
-{
-    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    R_xlen_t i, n = XLENGTH(x);
-    double *px = REAL(x);
-    Rboolean res = FALSE;
-    for (i = 0; i < n; ++i) {
-	if (ISNAN(px[i])) {
-	    res = TRUE;
-	    break;
-	}
-    }
-    UNPROTECT(1);
-    return res;
-}
-
 /** Inverse Permutation
  * C version of   .inv.perm.R <- function(p) { p[p] <- seq_along(p) ; p }
  */
