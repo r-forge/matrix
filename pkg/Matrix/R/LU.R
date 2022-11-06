@@ -170,7 +170,7 @@ setMethod("lu", "diagonalMatrix",
 
 ## returning list(L, U, P), where A = P L U
 setMethod("expand", signature(x = "denseLU"),
-          function(x, ...) .Call(LU_expand, x))
+          function(x, ...) .Call(denseLU_expand, x))
 
 
 ## METHODS FOR CLASS: sparseLU
