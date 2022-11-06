@@ -1,5 +1,5 @@
+#include <float.h> /* DBL_EPSILON */
 #include "dgeMatrix.h"
-#include <float.h>
 
 /* FIXME: also allow an interface to LAPACK's 'dgesvx' which performs 
           LU factorization then optionally does "equilibration" (row and
