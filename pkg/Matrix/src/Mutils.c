@@ -229,7 +229,7 @@ SEXP get_factor(SEXP obj, const char *nm)
     SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
     if (LENGTH(factors) > 0) {
 	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-	R_xlen_t i = strmatch(nm, valid);
+	R_xlen_t i = strmatch2(nm, valid);
 	UNPROTECT(1);
 	if (i >= 0) {
 	    factors = VECTOR_ELT(factors, i);
@@ -249,7 +249,7 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
     PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorSym), &pid);
     if (LENGTH(factors) > 0) {
 	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-	R_xlen_t i = strmatch(nm, valid);
+	R_xlen_t i = strmatch2(nm, valid);
 	UNPROTECT(1);
 	if (i >= 0) {
 	    SET_VECTOR_ELT(factors, i, val);
@@ -888,20 +888,6 @@ Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
 	if (strcmp(CHAR(STRING_ELT(s1, i)), CHAR(STRING_ELT(s2, i))) != 0)
 	    return FALSE;
     return TRUE;
-}
-
-/* That 'valid' is a STRSXP must be checked by the caller ...
-   NOTE: ./Mutils.h has
-         int Matrix_check_class_(char *x, const char **valid);
-	 ... and this is yet another variant ...
-*/
-R_xlen_t strmatch(const char *x, SEXP valid)
-{
-    R_xlen_t n = XLENGTH(valid);
-    for (R_xlen_t i = 0; i < n; ++i)
-	if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
-	    return i;
-    return -1;
 }
 
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
