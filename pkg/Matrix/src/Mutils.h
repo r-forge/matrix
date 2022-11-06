@@ -1,6 +1,10 @@
 #ifndef MATRIX_UTILS_H
 #define MATRIX_UTILS_H
 
+#ifndef STRICT_R_HEADERS
+# define STRICT_R_HEADERS
+#endif
+
 #ifdef __GLIBC__
 /* to ensure that strdup() and others are declared
    when string.h is included with R.h (WRE) :
