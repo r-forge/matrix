@@ -1,6 +1,5 @@
 /* MJ: no longer needed ... nothing below */
 #if 0
-#include <Rinternals.h>
 #include "dgTMatrix.h"
 #include "Tsparse.h"
 #endif /* MJ */

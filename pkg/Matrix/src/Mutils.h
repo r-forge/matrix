@@ -10,8 +10,6 @@
 
 /* NB: system headers must come before R headers */
 
-#include <stdint.h> /* fixed-width integer types, e.g., int64_t */
-
 #include <R.h>
 #include <Rinternals.h>
 #include <Rversion.h>
