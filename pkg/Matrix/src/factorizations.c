@@ -43,7 +43,8 @@ SEXP denseLU_expand(SEXP obj)
     if (m == n) {
 	SEXP L = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
 	    U = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
-	    uplo = PROTECT(mkString("L")), diag = PROTECT(mkString("U"));
+	    uplo = PROTECT(mkString("L")),
+	    diag = PROTECT(mkString("U"));
 	SET_SLOT(L, Matrix_DimSym, dim);
 	SET_SLOT(U, Matrix_DimSym, dim);
 	SET_SLOT(P, Matrix_DimSym, dim);
@@ -74,7 +75,8 @@ SEXP denseLU_expand(SEXP obj)
 	
 	if (whichT == 0) {
             /* G is upper trapezoidal, T is unit lower triangular */
-	    SEXP uplo = PROTECT(mkString("L")), diag = PROTECT(mkString("U"));
+	    SEXP uplo = PROTECT(mkString("L")),
+		diag = PROTECT(mkString("U"));
 	    SET_SLOT(T, Matrix_uploSym, uplo);
 	    SET_SLOT(T, Matrix_diagSym, diag);
 	    UNPROTECT(2); /* diag, uplo */
@@ -122,7 +124,7 @@ SEXP denseLU_expand(SEXP obj)
 
     SET_SLOT(P, Matrix_permSym, perm);
     SET_VECTOR_ELT(res, 2, P);
-    UNPROTECT(5); /* perm, x, dim, P, res */
+    UNPROTECT(6); /* perm, pivot, x, dim, P, res */
     return res;
 }
 
