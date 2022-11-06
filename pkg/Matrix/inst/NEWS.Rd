@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-11-06 r3756)}{
+\section{Changes in version 1.5-3 (2022-11-06 r3757)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -25,6 +25,10 @@
       
       \item \code{colSums()} and friends now respect \code{na.rm} when
       handling \code{diagonalMatrix} with \code{NA} diagonal entries.
+
+      \item \code{expand(<denseLU>)} now \dQuote{copies-on-modify},
+      no longer duplicating the \code{m*n}-length \code{x} slot in
+      the \code{m == n} case, when it can be used directly.
     }
   }
   \subsection{New Features}{

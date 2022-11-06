@@ -18,6 +18,117 @@ SEXP LU_validate(SEXP obj)
 
 #endif /* MJ */
 
+SEXP denseLU_expand(SEXP obj)
+{
+    /* A = P L U, where ... 
+       
+       A -> [m,n]
+       P -> [m,m], permutation
+       L -> if m <= n then [m,n] else [m,m], lower trapezoidal, unit diagonal
+       U -> if m >= n then [m,n] else [n,n], upper trapezoidal
+       
+       square L,U given as dtrMatrix with appropriate 'uplo', 'diag' slots,
+       non-square L,U given as dgeMatrix
+    */
+    
+    const char *nms[] = {"L", "U", "P", ""};
+    PROTECT_INDEX pidA, pidB;
+    SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms)),
+	P = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
+	dim, x;
+    PROTECT_WITH_INDEX(dim = GET_SLOT(obj, Matrix_DimSym), &pidA);
+    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
+    
+    if (m == n) {
+	SEXP L = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
+	    U = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
+	    uplo = PROTECT(mkString("L")), diag = PROTECT(mkString("U"));
+	SET_SLOT(L, Matrix_DimSym, dim);
+	SET_SLOT(U, Matrix_DimSym, dim);
+	SET_SLOT(P, Matrix_DimSym, dim);
+	SET_SLOT(L, Matrix_uploSym, uplo);
+	SET_SLOT(L, Matrix_diagSym, diag);
+	SET_SLOT(L, Matrix_xSym, x);
+	SET_SLOT(U, Matrix_xSym, x);
+	SET_VECTOR_ELT(res, 0, L);
+	SET_VECTOR_ELT(res, 1, U);
+	UNPROTECT(4); /* diag, uplo, U, L */
+    } else {
+	SEXP G = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
+	    T = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
+	    y = PROTECT(allocVector(REALSXP, (R_xlen_t) r * r));
+	REPROTECT(x = duplicate(x), pidB);
+	double *px = REAL(x), *py = REAL(y);
+	int whichT = (m < n) ? 0 : 1;
+	
+	SET_SLOT(G, Matrix_DimSym, dim);
+	REPROTECT(dim = allocVector(INTSXP, 2), pidA);
+	pdim = INTEGER(dim);
+	pdim[0] = pdim[1] = r;
+	SET_SLOT(T, Matrix_DimSym, dim);
+	REPROTECT(dim = allocVector(INTSXP, 2), pidA);
+	pdim = INTEGER(dim);
+	pdim[0] = pdim[1] = m;
+	SET_SLOT(P, Matrix_DimSym, dim);
+	
+	if (whichT == 0) {
+            /* G is upper trapezoidal, T is unit lower triangular */
+	    SEXP uplo = PROTECT(mkString("L")), diag = PROTECT(mkString("U"));
+	    SET_SLOT(T, Matrix_uploSym, uplo);
+	    SET_SLOT(T, Matrix_diagSym, diag);
+	    UNPROTECT(2); /* diag, uplo */
+
+	    Memcpy(py, px, (size_t) m * m);
+	    ddense_unpacked_make_triangular(px, m, n, 'U', 'N');
+	} else {
+            /* G is unit lower trapezoidal, T is upper triangular */
+	    double *tmp = px;
+	    for (j = 0; j < n; ++j, px += m, py += r)
+		Memcpy(py, px, j+1);
+	    ddense_unpacked_make_triangular(tmp, m, n, 'L', 'U');
+	}
+	SET_SLOT(G, Matrix_xSym, x);
+	SET_SLOT(T, Matrix_xSym, y);
+	
+	SET_VECTOR_ELT(res, !whichT, G);
+	SET_VECTOR_ELT(res,  whichT, T);
+	UNPROTECT(3); /* y, T, G */
+    }
+
+    SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	perm = PROTECT(allocVector(INTSXP, m));
+    int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm, pos, tmp;
+    Calloc_or_Alloca_TO(pinvperm, m, int);
+
+    /* MJ: inversion step below can be skipped once class indMatrix
+           is generalized to include _column_ index matrices ...
+	   but may need to be kept anyway for backwards compatibility
+    */
+    
+    for (j = 0; j < m; ++j) /* initialize column permutation */
+	pinvperm[j] = j;
+    for (j = 0; j < r; ++j) { /* generate column permutation */
+	pos = ppivot[j] - 1;
+	if (pos != j) {
+	    tmp = pinvperm[j];
+	    pinvperm[j] = pinvperm[pos];
+	    pinvperm[pos] = tmp;
+	}
+    }
+    for (j = 0; j < m; ++j) /* invert column permutation (0->1 based) */
+	pperm[pinvperm[j]] = j + 1;
+    Free_FROM(pinvperm, m);
+
+    SET_SLOT(P, Matrix_permSym, perm);
+    SET_VECTOR_ELT(res, 2, P);
+    UNPROTECT(5); /* perm, x, dim, P, res */
+    return res;
+}
+
+/* MJ: no longer needed ... prefer denseLU_expand() */
+#if 0
+
 SEXP LU_expand(SEXP x)
 {
     const char *nms[] = {"L", "U", "P", ""};
@@ -111,3 +222,5 @@ SEXP LU_expand(SEXP x)
     UNPROTECT(1);
     return val;
 }
+
+#endif /* MJ */

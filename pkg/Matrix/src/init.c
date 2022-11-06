@@ -114,7 +114,11 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_vertcat, 2),
     CALLDEF(Csparse_dmperm, 3),
     CALLDEF(diag_tC, 2),
+
+/* MJ: no longer needed ... prefer denseLU_expand() */
+#if 0
     CALLDEF(LU_expand, 1),
+#endif
 
 /* MJ: no longer needed ... prefer R_dense_as_sparse() */
 #if 0
@@ -545,6 +549,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_sub1, 2),
     CALLDEF(packedMatrix_sub1_mat, 2),
     CALLDEF(packedMatrix_sub2, 4),
+
+    CALLDEF(denseLU_expand, 1),
 
     CALLDEF(CHM_set_common_env, 1),
 
