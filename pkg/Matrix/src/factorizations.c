@@ -1,26 +1,8 @@
 #include "factorizations.h"
 
-/* MJ: no longer needed ... replacement in ./validity.c */
-#if 0
-
-SEXP LU_validate(SEXP obj)
-{
-    /* NB: 'Dim' already checked by MatrixFactorization_validate() */
-    
-    SEXP x = GET_SLOT(obj, Matrix_xSym);
-    if (!isReal(x))
-	return mkString(_("'x' slot is not of type \"double\""));
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    if (XLENGTH(x) != pdim[0] * (double) pdim[1])
-	return mkString(_("length of 'x' slot is not prod(Dim)"));
-    return DimNames_validate(obj, pdim);
-}
-
-#endif /* MJ */
-
 SEXP denseLU_expand(SEXP obj)
 {
-    /* A = P L U, where ... 
+    /* A = P L U   <=>   P' A = L U   where ... 
        
        A -> [m,n]
        P -> [m,m], permutation
@@ -103,14 +85,9 @@ SEXP denseLU_expand(SEXP obj)
     int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm, pos, tmp;
     Calloc_or_Alloca_TO(pinvperm, m, int);
 
-    /* MJ: inversion step below can be skipped once class indMatrix
-           is generalized to include _column_ index matrices ...
-	   but may need to be kept anyway for backwards compatibility
-    */
-    
-    for (j = 0; j < m; ++j) /* initialize column permutation */
+    for (j = 0; j < m; ++j) /* initialize inverse permutation */
 	pinvperm[j] = j;
-    for (j = 0; j < r; ++j) { /* generate column permutation */
+    for (j = 0; j < r; ++j) { /* generate inverse permutation */
 	pos = ppivot[j] - 1;
 	if (pos != j) {
 	    tmp = pinvperm[j];
@@ -118,7 +95,7 @@ SEXP denseLU_expand(SEXP obj)
 	    pinvperm[pos] = tmp;
 	}
     }
-    for (j = 0; j < m; ++j) /* invert column permutation (0->1 based) */
+    for (j = 0; j < m; ++j) /* invert inverse permutation (0->1-based) */
 	pperm[pinvperm[j]] = j + 1;
     Free_FROM(pinvperm, m);
 
@@ -127,6 +104,199 @@ SEXP denseLU_expand(SEXP obj)
     UNPROTECT(6); /* perm, pivot, x, dim, P, res */
     return res;
 }
+
+SEXP BunchKaufman_expand(SEXP obj)
+{
+    SEXP P_ = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
+	T_ = PROTECT(NEW_OBJECT_OF_CLASS("dtCMatrix")),
+	D_ = PROTECT(NEW_OBJECT_OF_CLASS("dsCMatrix")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int i, j, s, n = INTEGER(dim)[0];
+    R_xlen_t n1a = (R_xlen_t) n + 1;
+    if (n > 0) {
+	SET_SLOT(P_, Matrix_DimSym, dim);
+	SET_SLOT(T_, Matrix_DimSym, dim);
+	SET_SLOT(D_, Matrix_DimSym, dim);
+    }
+    UNPROTECT(1); /* dim */
+
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
+    if (!upper) {
+	SET_SLOT(T_, Matrix_uploSym, uplo);
+	SET_SLOT(D_, Matrix_uploSym, uplo);
+    }
+    UNPROTECT(1); /* uplo */
+    
+    SEXP diag = PROTECT(mkString("U"));
+    SET_SLOT(T_, Matrix_diagSym, diag);
+    UNPROTECT(1); /* diag */
+    
+    SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	D_p = PROTECT(allocVector(INTSXP, n1a));
+    int *ppivot = INTEGER(pivot), *D_pp = INTEGER(D_p),
+	b = n, dp = (upper) ? 1 : 2;
+    D_pp[0] = 0;
+    j = 0;
+    while (j < n) {
+	if (ppivot[j] > 0) {
+	    D_pp[j+1] = D_pp[j] + 1;
+	    j += 1;
+	} else {
+	    D_pp[j+1] = D_pp[j] + dp;
+	    D_pp[j+2] = D_pp[j] + 3;
+	    j += 2;
+	    --b;
+	}
+    }
+    SET_SLOT(D_, Matrix_pSym, D_p);
+    UNPROTECT(1); /* D_p */
+
+    SEXP P, P_perm, T, T_p, T_i, T_x,
+	D_i = PROTECT(allocVector(INTSXP, D_pp[n])),
+	D_x = PROTECT(allocVector(REALSXP, D_pp[n])),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    int *P_pperm, *T_pp, *T_pi, *D_pi = INTEGER(D_i);
+    double *T_px, *D_px = REAL(D_x), *px = REAL(x);
+
+    int unpacked = (double) n * n <= R_XLEN_T_MAX &&
+	(R_xlen_t) n * n == XLENGTH(x);
+
+    R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (upper) ? len - 1 : 0;
+    SEXP res = PROTECT(allocVector(VECSXP, len));
+
+    j = 0;
+    while (b--) {
+	s = (ppivot[j] > 0) ? 1 : 2;
+	dp = (upper) ? j : n - j - s;
+	
+	PROTECT(P = duplicate(P_));
+	PROTECT(P_perm = allocVector(INTSXP, n));
+	PROTECT(T = duplicate(T_));
+	PROTECT(T_p = allocVector(INTSXP, n1a));
+	PROTECT(T_i = allocVector(INTSXP, (R_xlen_t) s * dp));
+	PROTECT(T_x = allocVector(REALSXP, (R_xlen_t) s * dp));
+	
+	P_pperm = INTEGER(P_perm);
+	T_pp = INTEGER(T_p);
+	T_pi = INTEGER(T_i);
+	T_px = REAL(T_x);
+	T_pp[0] = 0;
+	
+	for (i = 0; i < j; ++i) {
+	    T_pp[i+1] = 0;
+	    P_pperm[i] = i + 1;
+	}
+	for (i = j; i < j+s; ++i) {
+	    T_pp[i+1] = T_pp[i] + dp;
+	    P_pperm[i] = i + 1;
+	}
+	for (i = j+s; i < n; ++i) {
+	    T_pp[i+1] = T_pp[i];
+	    P_pperm[i] = i + 1;
+	}
+	
+	if (s == 1) {
+	    P_pperm[j] = ppivot[j];
+	    P_pperm[ppivot[j]-1] = j + 1;
+	} else if (upper) {
+	    P_pperm[j] = -ppivot[j];
+	    P_pperm[-ppivot[j]-1] = j + 1;
+	} else {
+	    P_pperm[j+1] = -ppivot[j];
+	    P_pperm[-ppivot[j]-1] = j + 2;
+	}
+
+	if (upper) {
+	    for (i = 0; i < j; ++i) {
+		*(T_pi++) = i;
+		*(T_px++) = *(px++);
+	    }
+	    *(D_pi++) = j;
+	    *(D_px++) = *(px++);
+	    ++j;
+	    if (unpacked)
+		px += n - j;
+	    if (s == 2) {
+		for (i = 0; i < j-1; ++i) {
+		    *(T_pi++) = i;
+		    *(T_px++) = *(px++);
+		}
+		*(D_pi++) = j - 1;
+		*(D_pi++) = j;
+		*(D_px++) = *(px++);
+		*(D_px++) = *(px++);
+		++j;
+		if (unpacked)
+		    px += n - j;
+	    }
+	} else {
+	    if (s == 2) {
+		*(D_pi++) = j;
+		*(D_pi++) = j + 1;
+		*(D_px++) = *(px++);
+		*(D_px++) = *(px++);
+		for (i = j+2; i < n; ++i) {
+		    *(T_pi++) = i;
+		    *(T_px++) = *(px++);
+		}
+		++j;
+		if (unpacked)
+		    px += j;
+	    }
+	    *(D_pi++) = j;
+	    *(D_px++) = *(px++);
+	    for (i = j+1; i < n; ++i) {
+		*(T_pi++) = i;
+		*(T_px++) = *(px++);
+	    }
+	    ++j;
+	    if (unpacked)
+		px += j;
+	}
+
+	SET_SLOT(P, Matrix_permSym, P_perm);
+	SET_SLOT(T, Matrix_pSym, T_p);
+	SET_SLOT(T, Matrix_iSym, T_i);
+	SET_SLOT(T, Matrix_xSym, T_x);
+
+	if (upper) {
+	    SET_VECTOR_ELT(res, k-1, P);
+	    SET_VECTOR_ELT(res, k  , T);
+	    k -= 2;
+	} else {
+	    SET_VECTOR_ELT(res, k  , P);
+	    SET_VECTOR_ELT(res, k+1, T);
+	    k += 2;
+	}
+	UNPROTECT(6); /* T_x, T_i, T_p, T, P_perm, P */
+    }
+    
+    SET_SLOT(D_, Matrix_iSym, D_i);
+    SET_SLOT(D_, Matrix_xSym, D_x);
+    SET_VECTOR_ELT(res, k, D_);
+
+    UNPROTECT(8); /* res, x, D_x, D_i, pivot, D_, T_, P_ */ 
+    return res;
+}
+
+/* MJ: no longer needed ... replacement in ./validity.c */
+#if 0
+
+SEXP LU_validate(SEXP obj)
+{
+    /* NB: 'Dim' already checked by MatrixFactorization_validate() */
+    
+    SEXP x = GET_SLOT(obj, Matrix_xSym);
+    if (!isReal(x))
+	return mkString(_("'x' slot is not of type \"double\""));
+    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
+    if (XLENGTH(x) != pdim[0] * (double) pdim[1])
+	return mkString(_("length of 'x' slot is not prod(Dim)"));
+    return DimNames_validate(obj, pdim);
+}
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer denseLU_expand() */
 #if 0
