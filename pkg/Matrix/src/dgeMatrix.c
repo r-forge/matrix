@@ -6,7 +6,7 @@
 	  column scaling) ... maybe also allow an interface to 'dgeequ' ... 
 */
 
-SEXP dgeMatrix_LU_(SEXP obj, Rboolean warn)
+SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val;
     PROTECT_INDEX pidA, pidB;
@@ -41,18 +41,26 @@ SEXP dgeMatrix_LU_(SEXP obj, Rboolean warn)
     if (info < 0)
 	error(_("LAPACK '%s' returned with error code %d"),
 	      "dgetrf", info);
-    else if (info > 0 && warn)
-	warning(_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
-		"dgetrf", info);
+    else if (info > 0 && warn > 0) {
+	/* MJ: 'dgetrf' does not distinguish between singular, finite matrices
+	       and matrices containing NaN ... hence this message can mislead
+	*/
+	if (warn > 1)
+	    error  (_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
+		    "dgetrf", info);
+	else 
+	    warning(_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
+		    "dgetrf", info);
+    }
     
     set_factor(obj, "LU", val);
     UNPROTECT(5);
     return val;
 }
 
-SEXP dgeMatrix_LU(SEXP obj, SEXP warn)
+SEXP dgeMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dgeMatrix_LU_(obj, asLogical(warn));
+    return dgeMatrix_trf(obj, asLogical(warn) != 0);
 }
 
 double get_norm_dge(SEXP obj, const char *typstr)
@@ -100,7 +108,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
     PROTECT(type = asChar(type));
     typstr[0] = La_rcond_type(CHAR(type));
 
-    SEXP lu = PROTECT(dgeMatrix_LU_(obj, FALSE)), /* no warning if singular */
+    SEXP lu = PROTECT(dgeMatrix_trf_(obj, FALSE)), /* no warning if singular */
 	x = PROTECT(GET_SLOT(lu, Matrix_xSym));
     int info;
     double *px = REAL(x), norm = get_norm_dge(obj, typstr), rcond;
@@ -114,6 +122,26 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(rcond);
 }
 
+SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm)
+{
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)
+	error(_("determinant of non-square matrix is undefined"));
+    UNPROTECT(1); /* dim */
+    SEXP res;
+    if (n == 0) {
+	int givelog = asLogical(logarithm), sign = 1;
+	double modulus = (givelog) ? 0.0 : 1.0;
+	res = as_det_obj(modulus, givelog, sign);
+    } else {
+	SEXP trf = PROTECT(dgeMatrix_trf_(x, FALSE));
+	res = denseLU_determinant(lu, logarithm);
+	UNPROTECT(1); /* lu */
+    }
+    return res;
+}
+
 SEXP dgeMatrix_solve(SEXP a)
 {
     SEXP dim = PROTECT(GET_SLOT(a, Matrix_DimSym));
@@ -123,7 +151,7 @@ SEXP dgeMatrix_solve(SEXP a)
     
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
 	dimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	lu = PROTECT(dgeMatrix_LU_(a, TRUE)),
+	lu = PROTECT(dgeMatrix_trf_(a, TRUE)),
 	perm = PROTECT(GET_SLOT(lu, Matrix_permSym)),
 	x;
     PROTECT_INDEX pid;
@@ -176,7 +204,7 @@ SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b)
     if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
 	error(_("dimensions of system to be solved are inconsistent"));
     
-    SEXP lu = PROTECT(dgeMatrix_LU_(a, TRUE)),
+    SEXP lu = PROTECT(dgeMatrix_trf_(a, TRUE)),
 	perm = PROTECT(GET_SLOT(lu, Matrix_permSym)),
 	x = PROTECT(GET_SLOT(lu, Matrix_xSym)),
 	y = PROTECT(GET_SLOT(val, Matrix_xSym));
@@ -590,48 +618,6 @@ SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
 }
 
 #endif /* MJ */
-
-SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm)
-{
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("determinant requires a square matrix"));
-
-    int givelog = asLogical(logarithm), sign = 1;
-    double modulus = (givelog) ? 0.0 : 1.0; /* result for n == 0 */
-
-    if (n > 0) {
-	SEXP lu = PROTECT(dgeMatrix_LU_(x, FALSE)), /* no warning if singular */
-	    lu_perm = PROTECT(GET_SLOT(lu, Matrix_permSym)),
-	    lu_x = PROTECT(GET_SLOT(lu, Matrix_xSym));
-	int i, *pperm = INTEGER(lu_perm);
-	double *px = REAL(lu_x);
-	for (i = 0; i < n; ++i)
-	    if (pperm[i] != i + 1)
-		sign = -sign;
-	if (givelog) {
-	    double d;
-	    for (i = 0; i < n; i++) {
-		d = px[i * (n + 1)]; /* M[i, i] */
-		modulus += log((d < 0) ? -d : d);
-		if (d < 0)
-		    sign = -sign;
-	    }
-	} else {
-	    for (i = 0; i < n; i++)
-		modulus *= px[i * (n + 1)];
-	    if (modulus < 0) {
-		modulus = -modulus;
-		sign = -sign;
-	    }
-	}
-	UNPROTECT(3);
-    }
-
-    UNPROTECT(1);
-    return as_det_obj(modulus, givelog, sign);
-}
 
 SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 {
