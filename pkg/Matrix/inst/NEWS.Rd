@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-11-07 r3759)}{
+\section{Changes in version 1.5-3 (2022-11-08 r3760)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -22,7 +22,7 @@
       result when the marginal \code{Dimnames} are non-\code{NULL}.
       (Names were \dQuote{forgotten} for \code{diagonalMatrix} and
       \code{indMatrix} arguments.)
-      
+
       \item \code{colSums()} and friends now respect \code{na.rm} when
       handling \code{diagonalMatrix} with \code{NA} diagonal entries.
 
@@ -57,6 +57,10 @@
       \pkg{Matrix} is attached.  This change affects R processes
       started with environment variable \code{R_DEFAULT_PACKAGES} set
       to \code{NULL} (or some list not containing \pkg{methods}).
+
+      \item \file{Simple.R} test for sparse \code{"POSIXlt"} example
+      adapted to latest R-devel always having \code{"zone"} which is
+      character.
     }
   }
 }
