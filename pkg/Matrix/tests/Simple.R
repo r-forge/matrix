@@ -108,14 +108,14 @@ mlp <- matrix(.leap.seconds)## 27 x 1 numeric matrix
 Mlp <- Matrix(.leap.seconds)
 stopifnot(identical(dim(Mlp), c(n.lsec, 1L)))
 assert.EQ.mat(Mlp, mlp)
-.Leap.seconds <- as.POSIXlt(.leap.seconds)
-(MLp <- as(.Leap.seconds, "Matrix"))# nice sparse  dgC* w/ col.names
-stopifnot(is.EQ.mat(MLp, as.matrix(.Leap.seconds)))
+.LS <- unclass(as.POSIXlt(.leap.seconds))
+.LS <- .LS[setdiff(names(.LS), "zone")] # is character (not there for GMT/UCC before R 4.3.0)
+(matLS <- data.matrix(data.frame(.LS)))
+stopifnot(inherits(MLp <- as(matLS, "Matrix"), "sparseMatrix"),
+          is.EQ.mat(MLp, matLS))
+printSpMatrix(MLp, col.names = TRUE) # nice sparse  dgC* w/ col.names
 (mLp <- matrix(.Leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
-if(FALSE) { ## TODO?  POSIXlt -> numeric ??
-    MLp <- Matrix(.Leap.seconds)## --> error
-}
-
+##
 E <- rep(c(TRUE,NA,TRUE), length.out=8)
 F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
 e <- as(E, "sparseVector"); f <- as(F,"lsparseVector")
@@ -357,6 +357,11 @@ stopifnot(grep("too large", e1) == 1,
           !any(ina))# <- gave warning previously
 stopifnot(suppressWarnings(any(Lrg)))# (double -> logical  warning)
 rm(e1, e2)# too large...
+## Matrix bug #6610, did segfault
+system.time({ # ... sec                           __vv__
+ ## FIXME: reproducible example (not using 'MatrixModels' which triggers) "Out of memory" etc
+})
+
 
 RNGversion("3.6.0")# future proof
 if(doExtras && is.finite(memGB) && memGB > 49) withAutoprint({
