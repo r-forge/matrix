@@ -33,7 +33,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "diagonalMatrix"),
                      .Machine$integer.max))
 		  stop("dimensions cannot exceed 2^31-1")
               r <- new("ddiMatrix")
-              r@Dim <- dr <- dX * dY  # FIXME: drop   'dr <- '
+              r@Dim <- dX * dY
               if((uX <- X@diag != "N") & (uY <- Y@diag != "N"))
                   r@diag <- "U"
               else if(uX)
