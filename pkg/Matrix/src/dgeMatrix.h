@@ -4,12 +4,13 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP dgeMatrix_LU_(SEXP obj, Rboolean warn);
-SEXP dgeMatrix_LU (SEXP obj, SEXP warn);
+SEXP dgeMatrix_trf_(SEXP obj, int warn);
+SEXP dgeMatrix_trf (SEXP obj, SEXP warn);
 
 double get_norm_dge(SEXP obj, const char *typstr);
 SEXP dgeMatrix_norm(SEXP obj, SEXP type);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);
+SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm);
 SEXP dgeMatrix_solve(SEXP a);
 SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
 
@@ -34,7 +35,6 @@ SEXP lgeMatrix_setDiag(SEXP x, SEXP d);
 SEXP dgeMatrix_addDiag(SEXP x, SEXP d);
 #endif /* MJ */
 
-SEXP dgeMatrix_determinant(SEXP x, SEXP logarithm);
 SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE);
 SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
 SEXP dgeMatrix_exp(SEXP x);
