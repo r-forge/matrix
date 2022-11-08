@@ -135,9 +135,9 @@ SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm)
 	double modulus = (givelog) ? 0.0 : 1.0;
 	res = as_det_obj(modulus, givelog, sign);
     } else {
-	SEXP trf = PROTECT(dgeMatrix_trf_(x, FALSE));
-	res = denseLU_determinant(lu, logarithm);
-	UNPROTECT(1); /* lu */
+	SEXP trf = PROTECT(dgeMatrix_trf_(x, 0));
+	res = denseLU_determinant(trf, logarithm);
+	UNPROTECT(1); /* trf */
     }
     return res;
 }
