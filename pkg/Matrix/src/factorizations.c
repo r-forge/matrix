@@ -1,3 +1,4 @@
+#include <Rmath.h> /* logspace_add, logspace_sub */
 #include "factorizations.h"
 
 SEXP denseLU_expand(SEXP obj)
@@ -278,6 +279,160 @@ SEXP BunchKaufman_expand(SEXP obj)
 
     UNPROTECT(8); /* res, x, D_x, D_i, pivot, D_, T_, P_ */ 
     return res;
+}
+
+SEXP denseLU_determinant(SEXP obj, SEXP logarithm)
+{
+    /* MJ: unfortunately, we do not retain the 'info' given by 'dgetrf'
+           ... if we knew info>0, then we could return 0/-Inf "fast" 
+	   as base R does, or check for NaN and return NaN in that case 
+	   (the "right" thing to do)
+    */
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)
+	error(_("determinant of non-square matrix is undefined"));
+    UNPROTECT(1); /* dim */
+    int givelog = asLogical(logarithm) != 0, sign = 1;
+    double modulus = (givelog) ? 0.0 : 1.0; /* result for n == 0 */
+    if (n > 0) {
+	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int j, *ppivot = INTEGER(pivot);
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	double *px = REAL(x);
+	
+	if (givelog) {
+	    for (j = 0; j < n; ++j, px += n1a, ++ppivot) {
+		if (*px < 0) {
+		    modulus += log(-(*px));
+		    if (*ppivot == j + 1)
+			sign = -sign;
+		} else {
+		    /* incl. 0, NaN cases */
+		    modulus += log(*px);
+		    if (*ppivot != j + 1)
+			sign = -sign;
+		}
+	    }
+	} else {
+	    for (j = 0; j < n; ++j, px += n1a, ++ppivot) {
+		modulus *= *px;
+		if (*ppivot != j + 1)
+		    sign = -sign;
+	    }
+	    if (modulus < 0.0) {
+		modulus = -modulus;
+		sign = -sign;
+	    }
+	}
+	UNPROTECT(2); /* x, pivot */
+    }
+    return as_det_obj(modulus, givelog, sign);
+}
+
+SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
+{
+    /* MJ: unfortunately, we do not retain the 'info' given by 'ds[yp]trf'
+           ... if we knew info>0, then we could return 0/-Inf "fast" 
+	   as base R does, or check for NaN and return NaN in that case 
+	   (the "right" thing to do)
+    */
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    int givelog = asLogical(logarithm) != 0, sign = 1;
+    double modulus = (givelog) ? 0.0 : 1.0; /* result for n == 0 */
+    if (n > 0) {
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
+	UNPROTECT(1); /* uplo */
+
+	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int j = 0, *ppivot = INTEGER(pivot);
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	double *px = REAL(x), a, b, c;
+
+	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
+	    (R_xlen_t) n * n == XLENGTH(x);
+	
+	if (givelog) {
+	    double logab, logcc;
+	    while (j < n) {
+		if (ppivot[j] > 0) {
+		    if (*px < 0) {
+			modulus += log(-(*px));
+			sign = -sign;
+		    } else {
+			/* incl. 0, NaN cases */
+			modulus += log(*px);
+		    }
+		    px += (unpacked) ? n1a : ((upper) ? j + 2 : n - j);
+		    j += 1;
+		} else {
+		    a = *px;
+		    if (upper) {
+			px += (unpacked) ? n1a : j + 2;
+			b = *px;
+			c = *(px - 1);
+			px += (unpacked) ? n1a : j + 3;
+		    } else {
+			c = *(px + 1);
+			px += (unpacked) ? n1a : n - j;
+			b = *px;
+			px += (unpacked) ? n1a : n - j - 1;
+		    }
+		    logab = log((a < 0.0) ? -a : a) + log((b < 0.0) ? -b : b);
+		    logcc = 2.0 * log((c < 0.0) ? -c : c);
+		    if ((a < 0.0) != (b < 0.0)) {
+			/* det = ab - cc = -(abs(ab) + cc) < 0 */
+			modulus += logspace_add(logab, logcc);
+			sign = -sign;
+		    } else if (logab < logcc) {
+			/* det = ab - cc = -(cc - ab) < 0 */
+			modulus += logspace_sub(logcc, logab);
+			sign = -sign;
+		    } else {
+			/* det = ab - cc > 0 */
+			modulus += logspace_sub(logab, logcc);
+		    }
+		    j += 2;
+		}
+	    }
+	} else {
+	    while (j < n) {
+		if (ppivot[j] > 0) {
+		    modulus *= *px;
+		    px += (unpacked) ? n1a : ((upper) ? j + 2 : n - j);
+		    j += 1;
+		} else {
+		    a = *px;
+		    if (upper) {
+			px += (unpacked) ? n1a : j + 2;
+			b = *px;
+			c = *(px - 1);
+			px += (unpacked) ? n1a : j + 3;
+		    } else {
+			c = *(px + 1);
+			px += (unpacked) ? n1a : n - j;
+			b = *px;
+			px += (unpacked) ? n1a : n - j - 1;
+		    }
+		    modulus *= a * b - c * c;
+		    j += 2;
+		}
+	    }
+	    if (modulus < 0.0) {
+		modulus = -modulus;
+		sign = -sign;
+	    }
+	}
+	UNPROTECT(2); /* x, pivot */
+    }
+    return as_det_obj(modulus, givelog, sign);
 }
 
 /* MJ: no longer needed ... replacement in ./validity.c */
