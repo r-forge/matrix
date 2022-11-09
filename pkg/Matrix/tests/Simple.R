@@ -114,7 +114,7 @@ assert.EQ.mat(Mlp, mlp)
 stopifnot(inherits(MLp <- as(matLS, "Matrix"), "sparseMatrix"),
           is.EQ.mat(MLp, matLS))
 printSpMatrix(MLp, col.names = TRUE) # nice sparse  dgC* w/ col.names
-(mLp <- matrix(.Leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
+(mLp <- matrix(.leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
 ##
 E <- rep(c(TRUE,NA,TRUE), length.out=8)
 F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
