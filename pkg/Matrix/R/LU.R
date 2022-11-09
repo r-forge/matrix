@@ -12,7 +12,7 @@ setMethod("lu", signature(x = "dgeMatrix"),
 	  function(x, warnSing = TRUE, ...) {
               if(!is.null(ch <- x@factors[["LU"]]))
                   return(ch)
-              .Call(dgeMatrix_trf, x, warnSing)
+              .Call(dgeMatrix_trf, x, as.logical(warnSing))
           })
 
 setMethod("lu", signature(x = "dsyMatrix"),

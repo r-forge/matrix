@@ -4,7 +4,9 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP dgeMatrix_trf_(SEXP obj, int warn);
+SEXP denseLU_determinant(SEXP obj, SEXP logarithm); /* factorizations.c */
+
+SEXP dgeMatrix_trf_(SEXP obj,  int warn);
 SEXP dgeMatrix_trf (SEXP obj, SEXP warn);
 
 double get_norm_dge(SEXP obj, const char *typstr);

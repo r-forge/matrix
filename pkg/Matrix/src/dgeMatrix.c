@@ -17,21 +17,14 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
     }
     REPROTECT(val = NEW_OBJECT_OF_CLASS("denseLU"), pidA);
     
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	perm, x;
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-    if (m < 1 || n < 1)
-	error(_("'lu' requires a nonempty matrix"));
-    
-    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	perm = PROTECT(allocVector(INTSXP, r)),
-	x;
+
+    PROTECT(perm = allocVector(INTSXP, r));
     PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
     REPROTECT(x = duplicate(x), pidB);
-    
-    SET_SLOT(val, Matrix_DimSym, dim);
-    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
-    SET_SLOT(val, Matrix_permSym, perm);
-    SET_SLOT(val, Matrix_xSym, x);
     
     int *pperm = INTEGER(perm), info;
     double *px = REAL(x);
@@ -39,19 +32,26 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
     F77_CALL(dgetrf)(pdim, pdim + 1, px, pdim, pperm, &info);
     
     if (info < 0)
-	error(_("LAPACK '%s' returned with error code %d"),
+	error(_("LAPACK '%s' returned error code %d"),
 	      "dgetrf", info);
     else if (info > 0 && warn > 0) {
-	/* MJ: 'dgetrf' does not distinguish between singular, finite matrices
-	       and matrices containing NaN ... hence this message can mislead
-	*/
+	/* MJ: 'dgetrf' does not distinguish between singular, */
+	/*     finite matrices and matrices containing NaN ... */
+	/*     hence this message can mislead                  */
 	if (warn > 1)
-	    error  (_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
+	    error  (_("LAPACK '%s': matrix is exactly singular, "
+		      "U[i,i]=0, i=%d"),
 		    "dgetrf", info);
 	else 
-	    warning(_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
+	    warning(_("LAPACK '%s': matrix is exactly singular, "
+		      "U[i,i]=0, i=%d"),
 		    "dgetrf", info);
     }
+
+    SET_SLOT(val, Matrix_DimSym, dim);
+    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+    SET_SLOT(val, Matrix_permSym, perm);
+    SET_SLOT(val, Matrix_xSym, x);
     
     set_factor(obj, "LU", val);
     UNPROTECT(5);
@@ -60,7 +60,7 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 
 SEXP dgeMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dgeMatrix_trf(obj, asLogical(warn) != 0);
+    return dgeMatrix_trf_(obj, asInteger(warn));
 }
 
 double get_norm_dge(SEXP obj, const char *typstr)
@@ -108,8 +108,8 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
     PROTECT(type = asChar(type));
     typstr[0] = La_rcond_type(CHAR(type));
 
-    SEXP lu = PROTECT(dgeMatrix_trf_(obj, FALSE)), /* no warning if singular */
-	x = PROTECT(GET_SLOT(lu, Matrix_xSym));
+    SEXP trf = PROTECT(dgeMatrix_trf_(obj, 0)),
+	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
     int info;
     double *px = REAL(x), norm = get_norm_dge(obj, typstr), rcond;
     
@@ -124,7 +124,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
 
 SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm)
 {
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), n = pdim[0];
     if (pdim[1] != n)
 	error(_("determinant of non-square matrix is undefined"));
@@ -135,7 +135,7 @@ SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm)
 	double modulus = (givelog) ? 0.0 : 1.0;
 	res = as_det_obj(modulus, givelog, sign);
     } else {
-	SEXP trf = PROTECT(dgeMatrix_trf_(x, 0));
+	SEXP trf = PROTECT(dgeMatrix_trf_(obj, 0));
 	res = denseLU_determinant(trf, logarithm);
 	UNPROTECT(1); /* trf */
     }
@@ -151,11 +151,11 @@ SEXP dgeMatrix_solve(SEXP a)
     
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
 	dimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	lu = PROTECT(dgeMatrix_trf_(a, TRUE)),
-	perm = PROTECT(GET_SLOT(lu, Matrix_permSym)),
+	trf = PROTECT(dgeMatrix_trf_(a, 1)),
+	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
 	x;
     PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(x = GET_SLOT(lu, Matrix_xSym), &pid);
+    PROTECT_WITH_INDEX(x = GET_SLOT(trf, Matrix_xSym), &pid);
     REPROTECT(x = duplicate(x), pid);
 
     SET_SLOT(val, Matrix_DimSym, dim);
@@ -204,9 +204,9 @@ SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b)
     if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
 	error(_("dimensions of system to be solved are inconsistent"));
     
-    SEXP lu = PROTECT(dgeMatrix_trf_(a, TRUE)),
-	perm = PROTECT(GET_SLOT(lu, Matrix_permSym)),
-	x = PROTECT(GET_SLOT(lu, Matrix_xSym)),
+    SEXP trf = PROTECT(dgeMatrix_trf_(a, 1)),
+	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
+	x = PROTECT(GET_SLOT(trf, Matrix_xSym)),
 	y = PROTECT(GET_SLOT(val, Matrix_xSym));
     
     int *pperm = INTEGER(perm), info;
