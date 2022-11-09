@@ -11,57 +11,63 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
     }
     REPROTECT(val = NEW_OBJECT_OF_CLASS("BunchKaufman"), pid);
 
-    R_xlen_t nn;
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	perm = PROTECT(allocVector(INTSXP, INTEGER(dim)[0])),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-	y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), lwork = -1, info;
-    double *px = REAL(x), *py = REAL(y), tmp, *work;
-    char ul = *CHAR(STRING_ELT(uplo, 0));
+	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    SET_SLOT(val, Matrix_uploSym, uplo);
+    
+    if (n > 0) {
+	R_xlen_t nn;
+	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	    perm = PROTECT(allocVector(INTSXP, n)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	    y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	int *pperm = INTEGER(perm), lwork = -1, info;
+	double *px = REAL(x), *py = REAL(y), tmp, *work;
+	
+#define DSYTRF_FINISH(_UL_)						\
+	do {								\
+	    Memzero(py, nn);						\
+	    F77_CALL(dlacpy)(&_UL_, pdim, pdim, px, pdim, py, pdim FCONE); \
+	    F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, &tmp, &lwork, \
+			     &info FCONE);				\
+	    lwork = (int) tmp;						\
+	    Calloc_or_Alloca_TO(work, lwork, double);			\
+	    F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, work, &lwork, \
+			     &info FCONE);				\
+	    Free_FROM(work, lwork);					\
+	    								\
+	    if (info < 0)						\
+		error(_("LAPACK '%s' gave error code %d"),		\
+		      "dsytrf", info);					\
+	    else if (info > 0 && warn > 0) {				\
+		/* MJ: 'dsytrf' does not distinguish between singular, */ \
+		/*     finite matrices and matrices containing NaN ... */ \
+		/*     hence this message can mislead                  */ \
+		if (warn > 1)						\
+		    error  (_("LAPACK '%s': matrix is exactly singular, " \
+			      "D[i,i]=0, i=%d"),			\
+			    "dsytrf", info);				\
+		else							\
+		    warning(_("LAPACK '%s': matrix is exactly singular, " \
+			      "D[i,i]=0, i=%d"),			\
+			    "dsytrf", info);				\
+	    }								\
+	    								\
+	    SET_SLOT(val, Matrix_DimSym, dim);				\
+	    if (!isNull(dimnames))					\
+		set_symmetrized_DimNames(val, dimnames, -1);		\
+	    SET_SLOT(val, Matrix_permSym, perm);			\
+	    SET_SLOT(val, Matrix_xSym, y);				\
+	} while (0)
 
-#define DSYTRF_FINISH(_UPLO_, _UL_)					\
-    do {								\
-	Memzero(py, nn);						\
-	F77_CALL(dlacpy)(&_UL_, pdim, pdim, px, pdim, py, pdim FCONE);	\
-	F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, &tmp, &lwork,	\
-			 &info FCONE);					\
-	lwork = (int) tmp;						\
-	Calloc_or_Alloca_TO(work, lwork, double);			\
-	F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, work, &lwork,	\
-			 &info FCONE);					\
-	Free_FROM(work, lwork);						\
-									\
-	if (info < 0)							\
-	    error(_("LAPACK '%s' returned error code %d"),		\
-		  "dsytrf", info);					\
-	else if (info > 0 && warn > 0) {				\
-	    /* MJ: 'dsytrf' does not distinguish between singular, */	\
-	    /*     finite matrices and matrices containing NaN ... */	\
-	    /*     hence this message can mislead                  */	\
-	    if (warn > 1)						\
-		error  (_("LAPACK '%s': matrix is exactly singular, "	\
-			  "D[i,i]=0, i=%d"),				\
-			"dsytrf", info);				\
-	    else							\
-		warning(_("LAPACK '%s': matrix is exactly singular, "	\
-		          "D[i,i]=0, i=%d"),				\
-			"dsytrf", info);				\
-	}								\
-									\
-	SET_SLOT(val, Matrix_DimSym, dim);				\
-	set_symmetrized_DimNames(val, dimnames, -1);			\
-	SET_SLOT(val, Matrix_uploSym, _UPLO_);				\
-	SET_SLOT(val, Matrix_permSym, perm);				\
-	SET_SLOT(val, Matrix_xSym, y);					\
-    } while (0)
-
-    DSYTRF_FINISH(uplo, ul);
+	DSYTRF_FINISH(ul);
+	UNPROTECT(4);
+    }
     
     set_factor(obj, "BunchKaufman", val);
-    UNPROTECT(7);
+    UNPROTECT(3);
     return val;
 }
 
@@ -70,33 +76,37 @@ SEXP dsyMatrix_trf(SEXP obj, SEXP warn)
     return dsyMatrix_trf_(obj, asInteger(warn));
 }
 
-SEXP matrix_trf_(SEXP obj, char uplo, int warn)
+SEXP matrix_trf_(SEXP obj, int warn, char uplo)
 {
-    SEXP dim = PROTECT(getAttrib(obj, R_DimSymbol));
-    int *pdim = INTEGER(dim);
-    if (pdim[0] != pdim[1])
-	error(_("'matrix_trf()' requires a square matrix"));
-    if (uplo != 'U')
-	uplo = 'L';
-	    
-    R_xlen_t nn = XLENGTH(obj);
-    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("BunchKaufman")),
-	dimnames = PROTECT(getAttrib(obj, R_DimNamesSymbol)),
-	ul = PROTECT(mkString((uplo == 'U') ? "U" : "L")),
-	perm = PROTECT(allocVector(INTSXP, INTEGER(dim)[0])),
-	y = PROTECT(allocVector(REALSXP, nn));
-    int *pperm = INTEGER(perm), lwork = -1, info;
-    double *px = REAL(obj), *py = REAL(y), tmp, *work;
     
-    DSYTRF_FINISH(ul, uplo);
+    SEXP dim = PROTECT(getAttrib(obj, R_DimSymbol));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)
+	error(_("'matrix_trf()' requires a square matrix"));
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("BunchKaufman")),
+	ul = PROTECT(mkString((uplo == 'U') ? "U" : "L"));
+    SET_SLOT(val, Matrix_DimSym, ul);
+
+    if (n > 0) {
+	R_xlen_t nn = XLENGTH(obj);
+	SEXP dimnames = PROTECT(getAttrib(obj, R_DimNamesSymbol)),
+	    perm = PROTECT(allocVector(INTSXP, n)),
+	    y = PROTECT(allocVector(REALSXP, nn));
+	int *pperm = INTEGER(perm), lwork = -1, info;
+	double *px = REAL(obj), *py = REAL(y), tmp, *work;
+    
+	DSYTRF_FINISH(uplo);
 
 #undef DSYTRF_FINISH
+
+	UNPROTECT(3);
+    }
     
-    UNPROTECT(6);
+    UNPROTECT(3);
     return val;
 }
 
-SEXP matrix_trf(SEXP obj, SEXP uplo, SEXP warn)
+SEXP matrix_trf(SEXP obj, SEXP warn, SEXP uplo)
 {
     if (TYPEOF(obj) != REALSXP)
 	ERROR_INVALID_TYPE("matrix", TYPEOF(obj), "matrix_trf");
@@ -109,7 +119,7 @@ SEXP matrix_trf(SEXP obj, SEXP uplo, SEXP warn)
 	((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 	error(_("invalid 'uplo' to 'matrix_trf()'; must be \"U\" or \"L\""));
     
-    return matrix_trf_(obj, ul, asInteger(warn));
+    return matrix_trf_(obj, asInteger(warn), ul);
 }
 
 double get_norm_dsy(SEXP obj, const char *typstr)

@@ -72,12 +72,12 @@
 ## Compute product of determinants in Cholesky factorization
 
 .det.dpo <- function(x, logarithm, ...) {
-    cholx <- .Call(dpoMatrix_chol, x)
+    cholx <- .Call(dpoMatrix_trf, x, 2L)
     .mkDet(, logarithm, ldet = 2 * sum(log(abs(diag(cholx)))), sig = 1L)
 }
 
 .det.dpp <- function(x, logarithm, ...) {
-    cholx <- .Call(dppMatrix_chol, x)
+    cholx <- .Call(dppMatrix_trf, x, 2L)
     .mkDet(, logarithm, ldet = 2 * sum(log(abs(diag(cholx)))), sig = 1L)
 }
 

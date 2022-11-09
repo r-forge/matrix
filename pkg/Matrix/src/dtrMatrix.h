@@ -10,10 +10,10 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type);
 SEXP dtrMatrix_solve(SEXP a);
 SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b);
 
-SEXP dtrMatrix_chol2inv(SEXP a);
-
 SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans);
 SEXP dtrMatrix_matrix_mm   (SEXP a, SEXP b, SEXP right, SEXP trans);
+
+SEXP dtrMatrix_chol2inv(SEXP a);
 
 SEXP dtrMatrix_addDiag(SEXP x, SEXP d);
 

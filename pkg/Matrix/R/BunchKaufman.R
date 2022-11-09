@@ -8,7 +8,7 @@ setMethod("BunchKaufman", signature(x = "dspMatrix"),
 	  function(x, ...) .Call(dspMatrix_trf, x, 2L))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo, 2L))
+	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, 2L, uplo))
 
 
 ## METHODS FOR CLASS: p?BunchKaufman
