@@ -1,6 +1,6 @@
 #include "dspMatrix.h"
 
-SEXP dspMatrix_trf(SEXP obj)
+SEXP dspMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val;
     PROTECT_INDEX pidA, pidB;
@@ -18,26 +18,43 @@ SEXP dspMatrix_trf(SEXP obj)
 	x;
     PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
     REPROTECT(x = duplicate(x), pidB);
-    
-    SET_SLOT(val, Matrix_DimSym, dim);
-    set_symmetrized_DimNames(val, dimnames, -1);
-    SET_SLOT(val, Matrix_uploSym, uplo);
-    SET_SLOT(val, Matrix_permSym, perm);
-    SET_SLOT(val, Matrix_xSym, x);
-
     int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
     double *px = REAL(x);
     const char *ul = CHAR(STRING_ELT(uplo, 0));
 
     F77_CALL(dsptrf)(ul, pdim, px, pperm, &info FCONE);
     
-    if (info)
-	error(_("LAPACK routine '%s' returned with error code %d"),
+    if (info < 0)
+	error(_("LAPACK '%s' returned error code %d"),
 	      "dsptrf", info);
+    else if (info > 0 && warn > 0) {
+	/* MJ: 'dsytrf' does not distinguish between singular, */
+	/*     finite matrices and matrices containing NaN ... */
+	/*     hence this message can mislead                  */
+	if (warn > 1)
+	    error  (_("LAPACK '%s': matrix is exactly singular, "
+		      "D[i,i]=0, i=%d"),
+		    "dsptrf", info);
+	else
+	    warning(_("LAPACK '%s': matrix is exactly singular, "
+		      "D[i,i]=0, i=%d"),
+		    "dsptrf", info);
+    }
+
+    SET_SLOT(val, Matrix_DimSym, dim);
+    set_symmetrized_DimNames(val, dimnames, -1);
+    SET_SLOT(val, Matrix_uploSym, uplo);
+    SET_SLOT(val, Matrix_permSym, perm);
+    SET_SLOT(val, Matrix_xSym, x);
     
     set_factor(obj, "pBunchKaufman", val);
     UNPROTECT(6);
     return val;
+}
+
+SEXP dspMatrix_trf(SEXP obj, SEXP warn)
+{
+    return dspMatrix_trf_(obj, asInteger(warn));
 }
 
 double get_norm_dsp(SEXP obj, const char *typstr)
@@ -69,7 +86,7 @@ SEXP dspMatrix_norm(SEXP obj, SEXP type)
 
 SEXP dspMatrix_rcond(SEXP obj)
 {
-    SEXP trf = PROTECT(dspMatrix_trf(obj)),
+    SEXP trf = PROTECT(dspMatrix_trf_(obj, 2)),
 	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
@@ -88,10 +105,28 @@ SEXP dspMatrix_rcond(SEXP obj)
     return ScalarReal(rcond);
 }
 
+SEXP dspMatrix_determinant(SEXP obj, SEXP logarithm)
+{
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    SEXP res;
+    if (n == 0) {
+	int givelog = asLogical(logarithm), sign = 1;
+	double modulus = (givelog) ? 0.0 : 1.0;
+	res = as_det_obj(modulus, givelog, sign);
+    } else {
+	SEXP trf = PROTECT(dspMatrix_trf_(obj, 0));
+	res = BunchKaufman_determinant(trf, logarithm);
+	UNPROTECT(1); /* trf */
+    }
+    return res;
+}
+
 SEXP dspMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dspMatrix")),
-	trf = PROTECT(dspMatrix_trf(a)),
+	trf = PROTECT(dspMatrix_trf_(a, 2)),
 	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(trf, Matrix_DimNamesSym)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
@@ -128,7 +163,7 @@ SEXP dspMatrix_matrix_solve(SEXP a, SEXP b)
     if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
 	error(_("dimensions of system to be solved are inconsistent"));
     
-    SEXP trf = PROTECT(dspMatrix_trf(a)),
+    SEXP trf = PROTECT(dspMatrix_trf_(a, 2)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
 	x = PROTECT(GET_SLOT(trf, Matrix_xSym)),

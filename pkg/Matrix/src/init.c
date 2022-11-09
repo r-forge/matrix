@@ -216,7 +216,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_Schur, 3),
     CALLDEF(dgeMatrix_crossprod, 2),
     CALLDEF (geMatrix_crossprod, 2),
-    CALLDEF(dgeMatrix_determinant, 2),
     CALLDEF(dgeMatrix_dgeMatrix_crossprod, 3),
     CALLDEF (geMatrix_geMatrix_crossprod, 3),
     CALLDEF(dgeMatrix_matrix_mm, 3),
@@ -239,6 +238,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF (geMatrix_matrix_crossprod, 3),
     CALLDEF(dgeMatrix_norm, 2),
     CALLDEF(dgeMatrix_rcond, 2),
+    CALLDEF(dgeMatrix_determinant, 2),
     CALLDEF(dgeMatrix_solve, 1),
     CALLDEF(dpoMatrix_chol, 1),
     CALLDEF(dpoMatrix_matrix_solve, 2),
@@ -282,6 +282,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dsyMatrix_matrix_solve, 2),
     CALLDEF(dsyMatrix_norm, 2),
     CALLDEF(dsyMatrix_rcond, 1),
+    CALLDEF(dsyMatrix_determinant, 2),
     CALLDEF(dsyMatrix_solve, 1),
     CALLDEF(dsyMatrix_trf, 1),
 
@@ -295,6 +296,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_matrix_solve, 2),
     CALLDEF(dspMatrix_norm, 2),
     CALLDEF(dspMatrix_rcond, 1),
+    CALLDEF(dspMatrix_determinant, 2),
     CALLDEF(dspMatrix_solve, 1),
     CALLDEF(dspMatrix_trf, 1),
     
