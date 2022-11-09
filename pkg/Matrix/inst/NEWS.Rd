@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-3 (2022-11-08 r3761)}{
+\section{Changes in version 1.5-3 (2022-11-09 r3769)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -29,6 +29,10 @@
       \item \code{expand(<denseLU>)} now \dQuote{copies-on-modify},
       no longer duplicating the \code{m*n}-length \code{x} slot in
       the \code{m == n} case, when it can be used directly.
+
+      \item \code{lu(<m-by-0>)}, \code{lu(<0-by-n>)}, and
+      \code{BunchKaufman(<0-by-0>)} now give sensible (0-extent)
+      results, rather than a LAPACK error, for \code{denseMatrix}.
     }
   }
   \subsection{New Features}{
@@ -47,6 +51,10 @@
       \code{[CRT]sparseMatrix} now handle nonzero pattern and logical
       matrices directly (no longer coercing to double, a constraint
       of the earlier implementation using CHOLMOD).
+
+      \item \code{determinant(<ds[yp]Matrix>)} is now computed via
+      the Bunch-Kaufman factorization.  Factorizations are cached in
+      the \code{factors} slot for future reuse.
     }
   }
   \subsection{Misc}{
@@ -61,6 +69,13 @@
       \item \file{Simple.R} test for sparse \code{"POSIXlt"} example
       adapted to latest R-devel always having \code{"zone"} which is
       character.
+
+      \item C-level wrappers for LAPACK \code{d..trf} routines gain
+      an argument \code{warn} indicating how to handle \code{info > 0}:
+      \code{warn <= 0} is silent, \code{warn = 1} is a warning, and
+      \code{warn > 1} is an error.  In the case of \code{dp[op]trf},
+      for which \code{info > 0} implies an incomplete factorization,
+      \code{info} is now returned as a length-1 integer.
     }
   }
 }
