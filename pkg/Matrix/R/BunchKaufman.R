@@ -2,13 +2,13 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("BunchKaufman", signature(x = "dsyMatrix"),
-	  function(x, ...) .Call(dsyMatrix_trf, x))
+	  function(x, ...) .Call(dsyMatrix_trf, x, 2L))
 
 setMethod("BunchKaufman", signature(x = "dspMatrix"),
-	  function(x, ...) .Call(dspMatrix_trf, x))
+	  function(x, ...) .Call(dspMatrix_trf, x, 2L))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo))
+	  function(x, uplo = NULL, ...) .Call(matrix_trf, x, uplo, 2L))
 
 
 ## METHODS FOR CLASS: p?BunchKaufman

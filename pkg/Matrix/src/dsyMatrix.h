@@ -4,12 +4,17 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP dsyMatrix_trf(SEXP obj);
-SEXP    matrix_trf(SEXP obj, SEXP uplo);
+SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm); /* factorizations.c */
+
+SEXP dsyMatrix_trf_(SEXP obj,             int warn);
+SEXP dsyMatrix_trf (SEXP obj,            SEXP warn);
+SEXP    matrix_trf_(SEXP obj, char uplo,  int warn);
+SEXP    matrix_trf (SEXP obj, SEXP uplo, SEXP warn);
 
 double get_norm_dsy(SEXP obj, const char *typstr);
 SEXP dsyMatrix_norm(SEXP obj, SEXP type);
 SEXP dsyMatrix_rcond(SEXP obj);
+SEXP dsyMatrix_determinant(SEXP obj, SEXP logarithm);
 SEXP dsyMatrix_solve(SEXP a);
 SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b);
 
