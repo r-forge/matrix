@@ -213,17 +213,22 @@ static R_CallMethodDef CallEntries[] = {
 #endif
     
     CALLDEF(dgeMatrix_trf, 2),
-    CALLDEF(dgeMatrix_Schur, 3),
+    CALLDEF(dgeMatrix_norm, 2),
+    CALLDEF(dgeMatrix_rcond, 2),
+    CALLDEF(dgeMatrix_determinant, 2),
+    CALLDEF(dgeMatrix_solve, 1),
+    CALLDEF(dgeMatrix_matrix_solve, 2),
     CALLDEF(dgeMatrix_crossprod, 2),
     CALLDEF (geMatrix_crossprod, 2),
     CALLDEF(dgeMatrix_dgeMatrix_crossprod, 3),
     CALLDEF (geMatrix_geMatrix_crossprod, 3),
+    CALLDEF(dgeMatrix_matrix_crossprod, 3),
+    CALLDEF (geMatrix_matrix_crossprod, 3),
     CALLDEF(dgeMatrix_matrix_mm, 3),
     CALLDEF (geMatrix_matrix_mm, 3),
-    CALLDEF(dgeMatrix_matrix_solve, 2),
-    CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
+    CALLDEF(dgeMatrix_Schur, 3),
     CALLDEF(dgeMatrix_exp, 1),
-
+    
 /* MJ: no longer needed ... prefer unpackedMatrix_diag_[gs]et() */
 #if 0
     CALLDEF(dgeMatrix_getDiag, 1),
@@ -234,20 +239,16 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_addDiag, 2),
 #endif
     
-    CALLDEF(dgeMatrix_matrix_crossprod, 3),
-    CALLDEF (geMatrix_matrix_crossprod, 3),
-    CALLDEF(dgeMatrix_norm, 2),
-    CALLDEF(dgeMatrix_rcond, 2),
-    CALLDEF(dgeMatrix_determinant, 2),
-    CALLDEF(dgeMatrix_solve, 1),
-    CALLDEF(dpoMatrix_chol, 1),
-    CALLDEF(dpoMatrix_matrix_solve, 2),
+    CALLDEF(dpoMatrix_trf, 2),
     CALLDEF(dpoMatrix_rcond, 1),
     CALLDEF(dpoMatrix_solve, 1),
-    CALLDEF(dppMatrix_chol, 1),
-    CALLDEF(dppMatrix_matrix_solve, 2),
+    CALLDEF(dpoMatrix_matrix_solve, 2),
+
+    CALLDEF(dppMatrix_trf, 2),
     CALLDEF(dppMatrix_rcond, 1),
     CALLDEF(dppMatrix_solve, 1),
+    CALLDEF(dppMatrix_matrix_solve, 2),
+
     CALLDEF(R_chkName_Cholesky, 4),
     CALLDEF(R_chm_factor_name, 3),
     CALLDEF(dsCMatrix_Cholesky, 5),
@@ -278,27 +279,27 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dsyMatrix_as_matrix, 2),
 #endif
     
-    CALLDEF(dsyMatrix_matrix_mm, 3),
-    CALLDEF(dsyMatrix_matrix_solve, 2),
+    CALLDEF(dsyMatrix_trf, 2),
     CALLDEF(dsyMatrix_norm, 2),
     CALLDEF(dsyMatrix_rcond, 1),
     CALLDEF(dsyMatrix_determinant, 2),
     CALLDEF(dsyMatrix_solve, 1),
-    CALLDEF(dsyMatrix_trf, 1),
-
+    CALLDEF(dsyMatrix_matrix_solve, 2),
+    CALLDEF(dsyMatrix_matrix_mm, 3),
+    
 /* MJ: no longer needed ... prefer packedMatrix_unpack() */
 #if 0
     CALLDEF(dspMatrix_as_dsyMatrix, 1),
     CALLDEF(dtpMatrix_as_dtrMatrix, 1),
 #endif
     
-    CALLDEF(dspMatrix_matrix_mm, 2),
-    CALLDEF(dspMatrix_matrix_solve, 2),
+    CALLDEF(dspMatrix_trf, 2),
     CALLDEF(dspMatrix_norm, 2),
     CALLDEF(dspMatrix_rcond, 1),
     CALLDEF(dspMatrix_determinant, 2),
     CALLDEF(dspMatrix_solve, 1),
-    CALLDEF(dspMatrix_trf, 1),
+    CALLDEF(dspMatrix_matrix_solve, 2),
+    CALLDEF(dspMatrix_matrix_mm, 2),
     
 /* MJ: no longer needed ... prefer packedMatrix_diag_[gs]et() */
 #if 0
@@ -337,11 +338,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(ltrMatrix_setDiag, 2),
 #endif
     
-    CALLDEF(dtpMatrix_matrix_mm, 4),
-    CALLDEF(dtpMatrix_matrix_solve, 2),
     CALLDEF(dtpMatrix_norm, 2),
     CALLDEF(dtpMatrix_rcond, 2),
     CALLDEF(dtpMatrix_solve, 1),
+    CALLDEF(dtpMatrix_matrix_solve, 2),
+    CALLDEF(dtpMatrix_matrix_mm, 4),
+    CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
 
 /* MJ: no longer needed ... prefer unpackedMatrix_pack() */
 #if 0
@@ -353,17 +355,15 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_as_matrix, 2),
 #endif
     
-    CALLDEF(dtrMatrix_matrix_mm,    4),
-    CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
-    CALLDEF(dtrMatrix_chol2inv, 1),
-    CALLDEF(dtrMatrix_addDiag, 2),
-    CALLDEF(dtrMatrix_matrix_solve, 2),
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_solve, 1),
-        
-    CALLDEF(lapack_qr, 2),
-
+    CALLDEF(dtrMatrix_matrix_solve, 2),
+    CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
+    CALLDEF(dtrMatrix_matrix_mm, 4),
+    CALLDEF(dtrMatrix_chol2inv, 1),
+    CALLDEF(dtrMatrix_addDiag, 2),
+    
 /* MJ: no longer needed ... prefer R_sparse_as_matrix() */
 #if 0
     CALLDEF(lgC_to_matrix, 1),
@@ -384,6 +384,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(lsyMatrix_as_lgeMatrix, 2),
 #endif
 
+    CALLDEF(lapack_qr, 2),
     CALLDEF(lsq_dense_Chol, 2),
     CALLDEF(lsq_dense_QR, 2),
     CALLDEF(sparseQR_qty, 4),
@@ -526,7 +527,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(matrix_is_diagonal, 1),
     CALLDEF(matrix_symmpart, 1),
     CALLDEF(matrix_skewpart, 1),
-
+    CALLDEF(matrix_trf, 3),
+    
     CALLDEF(unpackedMatrix_pack, 4),
     CALLDEF(unpackedMatrix_force_symmetric, 2),
     CALLDEF(unpackedMatrix_is_symmetric, 2),
@@ -563,7 +565,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(m_encodeInd,  4),
     CALLDEF(m_encodeInd2, 5),
 
-    CALLDEF(matrix_trf, 2),
     CALLDEF(Matrix_rle_i, 2),
     CALLDEF(Matrix_rle_d, 2),
 
@@ -594,10 +595,12 @@ R_init_Matrix(DllInfo *dll)
 
 #if 0
     RREGDEF(Csparse_diagU2N);
+    RREGDEF(dpoMatrix_chol);
 #else
-    /* backwards compatibility, while still preferring R_sparse_diag_U2N() */
     R_RegisterCCallable(
 	"Matrix", "Csparse_diagU2N", (DL_FUNC) R_sparse_diag_U2N);
+    R_RegisterCCallable(
+	"Matrix", "dpoMatrix_chol", (DL_FUNC) dpoMatrix_trf);
 #endif
     
     RREGDEF(as_cholmod_dense);
@@ -651,7 +654,6 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_vertcat);
     RREGDEF(cholmod_updown);
 
-    RREGDEF(dpoMatrix_chol);
     RREGDEF(numeric_as_chm_dense);
 
     R_cholmod_start(&c);
