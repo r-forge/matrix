@@ -1,6 +1,6 @@
 #include "dpoMatrix.h"
 
-SEXP dpoMatrix_chol(SEXP obj)
+SEXP dpoMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val;
     PROTECT_INDEX pid;
@@ -10,50 +10,63 @@ SEXP dpoMatrix_chol(SEXP obj)
 	return val;
     }
     REPROTECT(val = NEW_OBJECT_OF_CLASS("Cholesky"), pid);
-    
-    R_xlen_t nn;
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-	y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
-    
-    SET_SLOT(val, Matrix_DimSym, dim);
-    set_symmetrized_DimNames(val, dimnames, -1);
-    SET_SLOT(val, Matrix_uploSym, uplo);
-    SET_SLOT(val, Matrix_xSym, y);
 
-    int *pdim = INTEGER(dim);
-    
-    if (pdim[0] > 0) {
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    SET_SLOT(val, Matrix_uploSym, uplo);
+
+    if (n > 0) {
+	R_xlen_t nn;
+	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	    y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
+	char ul = *CHAR(STRING_ELT(uplo, 0));
 	int info;
 	double *px = REAL(x), *py = REAL(y);
-	const char *ul = CHAR(STRING_ELT(uplo, 0));
-	
-	Memzero(py, nn);
-	F77_CALL(dlacpy)(ul, pdim, pdim, px, pdim, py, pdim FCONE);
-	F77_CALL(dpotrf)(ul, pdim, py, pdim, &info FCONE);
 
-	if (info > 0)
-	    error(_("LAPACK '%s': leading minor of order %d is not "
-		    "positive definite"),
+	Memzero(py, nn);
+	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
+	F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
+
+	if (info < 0)
+	    error(_("LAPACK '%s' gave error code %d"),
 		  "dpotrf", info);
-	else if (info < 0)
-	    error(_("LAPACK routine '%s' returned error code %d"),
-		  "dpotrf", info);
+	else if (info > 0) {
+	    if (warn > 1)
+		error  (_("LAPACK '%s': leading minor of order %d is not "
+			  "positive definite"),
+			"dpotrf", info);
+	    else if (warn > 0)
+		warning(_("LAPACK '%s': leading minor of order %d is not "
+			  "positive definite"),
+			"dpotrf", info);
+	    UNPROTECT(6);
+	    return ScalarInteger(info);
+	}
+	
+	SET_SLOT(val, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(val, dimnames, -1);
+	SET_SLOT(val, Matrix_xSym, y);
+	UNPROTECT(3);
     }
     
     set_factor(obj, "Cholesky", val);
-    UNPROTECT(6);
+    UNPROTECT(3);
     return val;
+}
+
+SEXP dpoMatrix_trf(SEXP obj, SEXP warn)
+{
+    return dpoMatrix_trf_(obj, asInteger(warn));
 }
 
 SEXP dpoMatrix_rcond(SEXP obj)
 {
-    SEXP ch = PROTECT(dpoMatrix_chol(obj)),
-	dim = PROTECT(GET_SLOT(ch, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(ch, Matrix_xSym));
+    SEXP trf = PROTECT(dpoMatrix_trf_(obj, 2)),
+	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
+	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
+	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
 
     int *pdim = INTEGER(dim), info;
     double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
@@ -71,13 +84,13 @@ SEXP dpoMatrix_rcond(SEXP obj)
 SEXP dpoMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dpoMatrix")),
-	ch = PROTECT(dpoMatrix_chol(a)),
-	dim = PROTECT(GET_SLOT(ch, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(ch, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
+	trf = PROTECT(dpoMatrix_trf_(a, 2)),
+	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
+	dimnames = PROTECT(GET_SLOT(trf, Matrix_DimNamesSym)),
+	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	x;
     PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(x = GET_SLOT(ch, Matrix_xSym), &pid);
+    PROTECT_WITH_INDEX(x = GET_SLOT(trf, Matrix_xSym), &pid);
     REPROTECT(x = duplicate(x), pid);
 
     SET_SLOT(val, Matrix_DimSym, dim);
@@ -105,9 +118,9 @@ SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b)
     if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
 	error(_("dimensions of system to be solved are inconsistent"));
 
-    SEXP ch = PROTECT(dpoMatrix_chol(a)),
-	uplo = PROTECT(GET_SLOT(ch, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(ch, Matrix_xSym)),
+    SEXP trf = PROTECT(dpoMatrix_trf_(a, 2)),
+	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
+	x = PROTECT(GET_SLOT(trf, Matrix_xSym)),
 	y = PROTECT(GET_SLOT(val, Matrix_xSym));
     
     int info;

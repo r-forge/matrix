@@ -3,52 +3,57 @@
 SEXP dspMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val;
-    PROTECT_INDEX pidA, pidB;
+    PROTECT_INDEX pidA;
     PROTECT_WITH_INDEX(val = get_factor(obj, "pBunchKaufman"), &pidA);
     if (!isNull(val)) {
 	UNPROTECT(1);
 	return val;
     }
     REPROTECT(val = NEW_OBJECT_OF_CLASS("pBunchKaufman"), pidA);
-    
+
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	perm = PROTECT(allocVector(INTSXP, INTEGER(dim)[0])),
-	x;
-    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
-    REPROTECT(x = duplicate(x), pidB);
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
-    double *px = REAL(x);
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-
-    F77_CALL(dsptrf)(ul, pdim, px, pperm, &info FCONE);
-    
-    if (info < 0)
-	error(_("LAPACK '%s' returned error code %d"),
-	      "dsptrf", info);
-    else if (info > 0 && warn > 0) {
-	/* MJ: 'dsytrf' does not distinguish between singular, */
-	/*     finite matrices and matrices containing NaN ... */
-	/*     hence this message can mislead                  */
-	if (warn > 1)
-	    error  (_("LAPACK '%s': matrix is exactly singular, "
-		      "D[i,i]=0, i=%d"),
-		    "dsptrf", info);
-	else
-	    warning(_("LAPACK '%s': matrix is exactly singular, "
-		      "D[i,i]=0, i=%d"),
-		    "dsptrf", info);
-    }
-
-    SET_SLOT(val, Matrix_DimSym, dim);
-    set_symmetrized_DimNames(val, dimnames, -1);
+	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
     SET_SLOT(val, Matrix_uploSym, uplo);
-    SET_SLOT(val, Matrix_permSym, perm);
-    SET_SLOT(val, Matrix_xSym, x);
+    
+    if (n > 0) {
+	PROTECT_INDEX pidB;
+	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+	    perm = PROTECT(allocVector(INTSXP, n)), x;
+	PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
+	REPROTECT(x = duplicate(x), pidB);
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	int *pperm = INTEGER(perm), info;
+	double *px = REAL(x);
+    
+	F77_CALL(dsptrf)(&ul, pdim, px, pperm, &info FCONE);
+    
+	if (info < 0)
+	    error(_("LAPACK '%s' gave error code %d"),
+		  "dsptrf", info);
+	else if (info > 0 && warn > 0) {
+	    /* MJ: 'dsptrf' does not distinguish between singular, */
+	    /*     finite matrices and matrices containing NaN ... */
+	    /*     hence this message can mislead                  */
+	    if (warn > 1)
+		error  (_("LAPACK '%s': matrix is exactly singular, "
+			  "D[i,i]=0, i=%d"),
+			"dsptrf", info);
+	    else
+		warning(_("LAPACK '%s': matrix is exactly singular, "
+			  "D[i,i]=0, i=%d"),
+			"dsptrf", info);
+	}
+
+	SET_SLOT(val, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(val, dimnames, -1);
+	SET_SLOT(val, Matrix_permSym, perm);
+	SET_SLOT(val, Matrix_xSym, x);
+	UNPROTECT(3);
+    }
     
     set_factor(obj, "pBunchKaufman", val);
-    UNPROTECT(6);
+    UNPROTECT(3);
     return val;
 }
 

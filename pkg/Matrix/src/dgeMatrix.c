@@ -9,7 +9,7 @@
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val;
-    PROTECT_INDEX pidA, pidB;
+    PROTECT_INDEX pidA;
     PROTECT_WITH_INDEX(val = get_factor(obj, "LU"), &pidA);
     if (!isNull(val)) {
 	UNPROTECT(1);
@@ -18,43 +18,45 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
     REPROTECT(val = NEW_OBJECT_OF_CLASS("denseLU"), pidA);
     
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	perm, x;
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-
-    PROTECT(perm = allocVector(INTSXP, r));
-    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
-    REPROTECT(x = duplicate(x), pidB);
-    
-    int *pperm = INTEGER(perm), info;
-    double *px = REAL(x);
-    
-    F77_CALL(dgetrf)(pdim, pdim + 1, px, pdim, pperm, &info);
-    
-    if (info < 0)
-	error(_("LAPACK '%s' returned error code %d"),
-	      "dgetrf", info);
-    else if (info > 0 && warn > 0) {
-	/* MJ: 'dgetrf' does not distinguish between singular, */
-	/*     finite matrices and matrices containing NaN ... */
-	/*     hence this message can mislead                  */
-	if (warn > 1)
-	    error  (_("LAPACK '%s': matrix is exactly singular, "
-		      "U[i,i]=0, i=%d"),
-		    "dgetrf", info);
-	else 
-	    warning(_("LAPACK '%s': matrix is exactly singular, "
-		      "U[i,i]=0, i=%d"),
-		    "dgetrf", info);
-    }
-
+	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    int *pdim = INTEGER(dim), r = (pdim[0] < pdim[1]) ? pdim[0] : pdim[1];
     SET_SLOT(val, Matrix_DimSym, dim);
     SET_SLOT(val, Matrix_DimNamesSym, dimnames);
-    SET_SLOT(val, Matrix_permSym, perm);
-    SET_SLOT(val, Matrix_xSym, x);
+
+    if (r > 0) {
+	PROTECT_INDEX pidB;
+	SEXP perm = PROTECT(allocVector(INTSXP, r)), x;
+	PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
+	REPROTECT(x = duplicate(x), pidB);
+	int *pperm = INTEGER(perm), info;
+	double *px = REAL(x);
+	
+	F77_CALL(dgetrf)(pdim, pdim + 1, px, pdim, pperm, &info);
+	
+	if (info < 0)
+	    error(_("LAPACK '%s' gave error code %d"),
+		  "dgetrf", info);
+	else if (info > 0 && warn > 0) {
+	    /* MJ: 'dgetrf' does not distinguish between singular, */
+	    /*     finite matrices and matrices containing NaN ... */
+	    /*     hence this message can mislead                  */
+	    if (warn > 1)
+		error  (_("LAPACK '%s': matrix is exactly singular, "
+			  "U[i,i]=0, i=%d"),
+			"dgetrf", info);
+	    else 
+		warning(_("LAPACK '%s': matrix is exactly singular, "
+			  "U[i,i]=0, i=%d"),
+			"dgetrf", info);
+	}
+	
+	SET_SLOT(val, Matrix_permSym, perm);
+	SET_SLOT(val, Matrix_xSym, x);
+	UNPROTECT(2);
+    }
     
     set_factor(obj, "LU", val);
-    UNPROTECT(5);
+    UNPROTECT(3);
     return val;
 }
 

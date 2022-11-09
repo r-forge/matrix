@@ -6,10 +6,10 @@
 
 SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm); /* factorizations.c */
 
-SEXP dsyMatrix_trf_(SEXP obj,             int warn);
-SEXP dsyMatrix_trf (SEXP obj,            SEXP warn);
-SEXP    matrix_trf_(SEXP obj, char uplo,  int warn);
-SEXP    matrix_trf (SEXP obj, SEXP uplo, SEXP warn);
+SEXP dsyMatrix_trf_(SEXP obj,  int warn);
+SEXP dsyMatrix_trf (SEXP obj, SEXP warn);
+SEXP    matrix_trf_(SEXP obj,  int warn, char uplo);
+SEXP    matrix_trf (SEXP obj, SEXP warn, SEXP uplo);
 
 double get_norm_dsy(SEXP obj, const char *typstr);
 SEXP dsyMatrix_norm(SEXP obj, SEXP type);
