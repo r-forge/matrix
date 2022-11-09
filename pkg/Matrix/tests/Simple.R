@@ -108,13 +108,14 @@ mlp <- matrix(.leap.seconds)## 27 x 1 numeric matrix
 Mlp <- Matrix(.leap.seconds)
 stopifnot(identical(dim(Mlp), c(n.lsec, 1L)))
 assert.EQ.mat(Mlp, mlp)
-.LS <- unclass(as.POSIXlt(.leap.seconds))
-.LS <- .LS[setdiff(names(.LS), "zone")] # is character (not there for GMT/UCC before R 4.3.0)
+lt.leap.seconds <- .LS <- as.POSIXlt(.leap.seconds)
+.LS <- unclass(.LS); .LS <- .LS[setdiff(names(.LS), "zone")]
+                     # "zone" is character (not there for GMT/UTC in R <= 4.2.x)
 (matLS <- data.matrix(data.frame(.LS)))
 stopifnot(inherits(MLp <- as(matLS, "Matrix"), "sparseMatrix"),
           is.EQ.mat(MLp, matLS))
 printSpMatrix(MLp, col.names = TRUE) # nice sparse  dgC* w/ col.names
-(mLp <- matrix(.leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
+(mLp <- matrix(lt.leap.seconds))## prints fine as 27 x 1 matrix of dates (internally is list+dim)
 ##
 E <- rep(c(TRUE,NA,TRUE), length.out=8)
 F <- new("nsparseVector", length = 8L, i = c(2L, 5L, 8L))
