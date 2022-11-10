@@ -1988,7 +1988,7 @@ int left_cyclic(double x[], int ldx, int j, int k,
     if (ldx < k)
 	error(_("incorrect left cyclic shift, k (%d) > ldx (%d)"), k, ldx);
 
-    double *lastcol = (double*) R_alloc(k+1, sizeof(double));
+    double *lastcol = (double *) R_alloc((size_t) k + 1, sizeof(double));
     int i;
 				/* keep a copy of column j */
     for(i = 0; i <= j; i++) lastcol[i] = x[i + j*ldx];
@@ -2076,7 +2076,7 @@ SEXP lsq_dense_Chol(SEXP X, SEXP y)
     ans = PROTECT(allocMatrix(REALSXP, p, k));
     F77_CALL(dgemm)("T", "N", &p, &k, &n, &d_one, REAL(X), &n, REAL(y), &n,
 		    &d_zero, REAL(ans), &p FCONE FCONE);
-    double *xpx = (double *) R_alloc(p * p, sizeof(double));
+    double *xpx = (double *) R_alloc((size_t) p * p, sizeof(double));
     F77_CALL(dsyrk)("U", "T", &p, &n, &d_one, REAL(X), &n, &d_zero,
 		    xpx, &p FCONE FCONE);
     int info;
@@ -2102,7 +2102,10 @@ SEXP lsq_dense_QR(SEXP X, SEXP y)
 	    ydims[0], n);
     int k = ydims[1];
     if (k < 1 || p < 1) return allocMatrix(REALSXP, p, k);
-    double tmp, *xvals = (double *) Memcpy(R_alloc(n * p, sizeof(double)), REAL(X), n * p);
+    double tmp,
+	*xvals = (double *) Memcpy(R_alloc((size_t) n * p, sizeof(double)),
+				   REAL(X),
+				   (size_t) n * p);
     SEXP ans = PROTECT(duplicate(y));
     int lwork = -1, info;
     F77_CALL(dgels)("N", &n, &p, &k, xvals, &n, REAL(ans), &n,
@@ -2111,7 +2114,7 @@ SEXP lsq_dense_QR(SEXP X, SEXP y)
 	error(_("First call to Lapack routine dgels returned error code %d"),
 	      info);
     lwork = (int) tmp;
-    double *work = (double *) R_alloc(lwork, sizeof(double));
+    double *work = (double *) R_alloc((size_t) lwork, sizeof(double));
     F77_CALL(dgels)("N", &n, &p, &k, xvals, &n, REAL(ans), &n,
 		    work, &lwork, &info FCONE);
     if (info)
@@ -2168,12 +2171,13 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
 	if (info)
 	    error(_("First call to dgeqrf returned error code %d"), info);
 	lwork = (int) tmp;
-	work = (double *) R_alloc((lwork < 3*trsz) ? 3*trsz : lwork,
+	work = (double *) R_alloc(((size_t) lwork < (size_t) 3 * trsz)
+				  ? (size_t) 3 * trsz : (size_t) lwork,
 				  sizeof(double));
 	F77_CALL(dgeqrf)(&n, &p, xpt, &n, REAL(qraux), work, &lwork, &info);
 	if (info)
 	    error(_("Second call to dgeqrf returned error code %d"), info);
-	iwork = (int *) R_alloc(trsz, sizeof(int));
+	iwork = (int *) R_alloc((size_t) trsz, sizeof(int));
 	F77_CALL(dtrcon)("1", "U", "N", &rank, xpt, &n, &rcond,
 			 work, iwork, &info FCONE FCONE FCONE);
 	if (info)
