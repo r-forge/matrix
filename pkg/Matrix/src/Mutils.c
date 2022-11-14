@@ -33,8 +33,8 @@ Rboolean DimNames_is_trivial(SEXP dn)
 
 Rboolean DimNames_is_symmetric(SEXP dn)
 {
-    /* NB: Assuming here that we have the 'Dimnames' slot 
-       of a _valid_ Matrix, so that the elements are either 
+    /* NB: Assuming here that we have the 'Dimnames' slot
+       of a _valid_ Matrix, so that the elements are either
        NULL or character vectors
 
        Keep synchronized with symmetricMatrix_validate() above,
@@ -66,9 +66,9 @@ SEXP R_DimNames_is_symmetric(SEXP dn)
 
 /**
  * @brief Produce symmetric `Dimnames` from possibly asymmetric ones.
- * 
+ *
  * Roughly `dest[1:2] <- rep(src[j], 2)`, where `j` is either 1 or 2
- * depending on `J`.  If `J` is 0 or 1, then `j = J+1`.  If `J` is -1, 
+ * depending on `J`.  If `J` is 0 or 1, then `j = J+1`.  If `J` is -1,
  * then `j = 1` if and only if `src[[2]]` is `NULL` and `src[[1]]`
  * is not.  For speed, it is assumed that `dest` is newly allocated,
  * i.e., that it is `list(NULL, NULL)`.
@@ -111,8 +111,8 @@ void symmDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 
 /**
  * @brief Reverse (or "transpose") `Dimnames`.
- * 
- * Roughly `dest[1:2] <- src[2:1]`.  For speed, it is assumed that 
+ *
+ * Roughly `dest[1:2] <- src[2:1]`.  For speed, it is assumed that
  * `dest` is newly allocated, i.e., that it is `list(NULL, NULL)`.
  *
  * @param dest,src Lists of length 2, typically the `Dimnames` slots
@@ -263,18 +263,18 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
     return;
 }
 
-/** 
+/**
  * @brief Subassign by name to the `factors` slot of a `compMatrix`.
- * 
+ *
  * Like `obj\@factors[[nm]] <- val`, but modifying `obj` (rather than a copy)
  * _even if_ `obj` is referenced elsewhere, supporting "automagic" caching of
  * factorizations by R functions taking `compMatrix` as an argument.
  * _Use with care!_
- * 
+ *
  * @param obj A `compMatrix`.
  * @param nm A length-1 `STRSXP` giving a factor name.
  * @param val A `SEXP`, usually a `MatrixFactorization`.
- * @param warn A length-1 `LGLSXP`. Warn if `obj` has no `factors` slot 
+ * @param warn A length-1 `LGLSXP`. Warn if `obj` has no `factors` slot
  *     (in which case `obj` is untouched)?
  *
  * @return `val`.
@@ -292,16 +292,16 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
     return val;
 }
 
-/** 
+/**
  * @brief Empty the 'factors' slot of a 'compMatrix'.
- * 
+ *
  * Like `obj\@factors <- list()`, but modifying `obj` (rather than a copy)
  * _even if_ `obj` is referenced elsewhere, supporting "automagic" clearing
- * of the `factors` slot by R functions taking `compMatrix` as an argument. 
+ * of the `factors` slot by R functions taking `compMatrix` as an argument.
  * _Use with care!_
- * 
+ *
  * @param obj A `compMatrix`.
- * @param warn A length-1 LGLSXP. Warn if `obj` has no `factors` slot 
+ * @param warn A length-1 LGLSXP. Warn if `obj` has no `factors` slot
  *     (in which case `obj` is untouched)?
  *
  * @return `TRUE` if `obj` has a nonempty `factors` slot, `FALSE` otherwise.
@@ -343,7 +343,7 @@ char type2kind(SEXPTYPE type)
 	return 'z';
 #endif
     default:
-	error(_("unexpected type \"%s\" in 'type2kind()'"), type2char(type)); 
+	error(_("unexpected type \"%s\" in 'type2kind()'"), type2char(type));
 	return '\0';
     }
 }
@@ -521,7 +521,7 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
     int i, j, upper = asLogical(upper_), diag = asLogical(diag_);
     double nr = (diag) ? 0.5 * (nn + n) : 0.5 * (nn - n);
     if (nx > INT_MAX) {
-	
+
 	PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
 	double k = 1.0, *pr = REAL(r);
 
@@ -543,7 +543,7 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 		    }					\
 		} else {				\
 		    for (j = 0; j < n; ++j) {		\
-			k += 1.0;			\
+			k += _ONE_;			\
 			for (i = j+1; i < n; ++i) {	\
 			    *(pr++) = k;		\
 			    k += _ONE_;			\
@@ -590,18 +590,18 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 	} while (0)
 
 	DO_INDEX(1.0, nr);
-	
+
     } else {
-	
+
 	PROTECT(r = allocVector(INTSXP, (R_xlen_t) nr));
 	int k = 1, nr_ = (int) nr, *pr = INTEGER(r);
 
 	DO_INDEX(1, nr_);
 
 #undef DO_INDEX
-	
+
     }
-    
+
     UNPROTECT(1);
     return r;
 }
@@ -615,7 +615,7 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
     SEXP r;
     int j, upper = (packed) ? asLogical(upper_) : NA_LOGICAL;
     if (nx > INT_MAX) {
-	
+
 	PROTECT(r = allocVector(REALSXP, n));
 	double k = 1.0, *pr = REAL(r);
 
@@ -640,7 +640,7 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 	} while (0)
 
 	DO_INDEX;
-	
+
     } else {
 
 	PROTECT(r = allocVector(INTSXP, n));
@@ -648,9 +648,9 @@ SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 	DO_INDEX;
 
 #undef DO_INDEX
-	
+
     }
-    
+
     UNPROTECT(1);
     return r;
 }
@@ -848,7 +848,7 @@ SEXP v2spV(SEXP from)
 	    break;							\
 	}								\
     } while (0)
-    
+
     if (n_ <= INT_MAX) {
 	int k, n = (int) n_, nnz = 0;
 	PROTECT(length = ScalarInteger(n));
@@ -865,25 +865,25 @@ SEXP v2spV(SEXP from)
     SET_SLOT(to, Matrix_lengthSym, length);
     SET_SLOT(to, Matrix_iSym, i);
     SET_SLOT(to, Matrix_xSym, x);
-    
+
     UNPROTECT(4); /* x, i, length, to */
     return to;
 }
 
-/* That both 's1' and 's2' are STRSXP of length at least 'n' must be 
+/* That both 's1' and 's2' are STRSXP of length at least 'n' must be
    checked by the caller ... see, e.g., symmetricMatrix_validate() above
 */
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
 {
     /* Only check the first 'n' elements, even if 's1' or 's2' is longer ...
-    
+
        Note that 'R_compute_identical()' in src/main/identical.c
-       is careful to distinguish between NA_STRING and "NA" in STRSXP, 
+       is careful to distinguish between NA_STRING and "NA" in STRSXP,
        but we need not be here ...
-       
+
        MJ: Why not?
     */
-	
+
     for (int i = 0; i < n; ++i)
 	if (strcmp(CHAR(STRING_ELT(s1, i)), CHAR(STRING_ELT(s2, i))) != 0)
 	    return FALSE;
@@ -916,9 +916,9 @@ SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
 
 /* ================================================================== */
 /* ================================================================== */
-    
+
 /* La_norm_type() and La_rcond_type() have been in src/include/R_ext/Lapack.h
-   and later in src/modules/lapack/Lapack.c but have still not been available 
+   and later in src/modules/lapack/Lapack.c but have still not been available
    to package writers ...
 */
 char La_norm_type(const char *typstr)
