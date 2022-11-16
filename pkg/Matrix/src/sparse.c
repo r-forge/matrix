@@ -1137,7 +1137,7 @@ SEXP R_sparse_drop0(SEXP from)
     ++nprotect;
     SEXPTYPE tx = TYPEOF(x0);
     int *pp0 = NULL;
-    R_xlen_t n1a = 0 /* -Wmaybe-uninitialized */, k, kend, nnz_, nnz0, nnz1 = 0;
+    R_xlen_t n1a = 0, k, kend, nnz_ = 0, nnz0, nnz1 = 0;
     
     if (cl[2] != 'T') {
 	PROTECT(p0 = GET_SLOT(from, Matrix_pSym));
