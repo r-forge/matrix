@@ -22,6 +22,14 @@
                    function(expr, collapse = " ", width.cutoff = 500L, ...)
                        paste(deparse(expr, width.cutoff, ...),
                              collapse = collapse))
+            assign("sequence.default", envir = Mns, inherits = FALSE,
+                   function(nvec, from = 1L, by = 1L, ...)
+                       unlist(.mapply(seq.int,
+                                      list(from = as.integer(from),
+                                           by = as.integer(by),
+                                           length.out = as.integer(nvec)),
+                                      NULL),
+                              recursive = FALSE, use.names = FALSE))
             assign("tryInvokeRestart", envir = Mns, inherits = FALSE,
                    function(r, ...)
                        tryCatch(invokeRestart(r, ...),
