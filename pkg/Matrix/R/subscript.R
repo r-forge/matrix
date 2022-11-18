@@ -102,6 +102,12 @@
                },
            logical =
                {
+                   if(!is.na(a <- all(i)) && a) {
+                       x <- as.vector(x)
+                       if((len <- length(i)) <= (mn <- prod(x@Dim)))
+                           return(x)
+                       else return(c(x, rep.int(NA, len - mn)))
+                   }
                    i <- seq_len(prod(x@Dim))[i]
                    .Call(.NAME, x, i)
                },
@@ -118,8 +124,14 @@
         cld <- getClassDef(class(i))
         if(!extends(cld, "Matrix"))
             stop(.subscript.error.ist(i), domain = NA)
-        if(extends(cld, "nMatrix") || extends(cld, "lMatrix") ||
+        if((logic <- extends(cld, "nMatrix") || extends(cld, "lMatrix")) ||
            i@Dim[2L] != 2L) {
+            if(logic && !is.na(a <- all(i)) && a) {
+                x <- as.vector(x)
+                if((len <- prod(i@Dim)) <= (mn <- prod(x@Dim)))
+                    return(x)
+                else return(c(x, rep.int(NA, len - mn)))
+            }
             v <- if(extends(cld, "denseMatrix")) "vector" else "sparseVector"
             return(.subscript.1ary.vec(x, as(i, v)))
         }
@@ -198,7 +210,9 @@
                                r <- d[pos]
                                if(length(k) > r)
                                    stop(.subscript.error.lng)
-                               seq_len(r)[k]
+                               if(!is.na(a <- all(k)) && a)
+                                   NULL
+                               else seq_len(r)[k]
                            },
                        character =
                            {
