@@ -35,6 +35,44 @@
 }
 
 .subscript.1ary.vec <- function(x, i, .NAME) { # .NAME = *_subscript_1ary_vec
+    if(isS4(i)) {
+        if(!is(i, "sparseVector"))
+            stop(.subscript.error.ist(i), domain = NA)
+        if(!(has.x <- .hasSlot(i, "x")) || is.logical(i.x <- i@x)) {
+            ## [nl]sparseVector
+            mn <- prod(x@Dim)
+            i.length <- i@length
+            i.i <- i@i
+            i <-
+                if(i.length >= mn) {
+                    if(i.length > mn && i.i[length(i.i)] >= mn + 1)
+                        i.i[i.i >= mn + 1] <- NA
+                    if(has.x) i.i[i.x] else i.i
+                } else {
+                    r <- ceiling(mn / i.length)
+                    i.i <-
+                        if(r * i.length <= .Machine$integer.max)
+                            rep.int(i.i, r) +
+                                rep(seq.int(from = 0L,
+                                            by = i.length,
+                                            length.out = r),
+                                    each = length(i.i))
+                        else
+                            rep.int(as.double(i.i), r) +
+                                rep(seq.int(from = 0,
+                                            by = as.double(i.length),
+                                            length.out = r),
+                                    each = length(i.i))
+                    if(has.x) {
+                        if(r * i.length > mn) i.i[i.x & i.i <= mn] else i.i[i.x]
+                    } else {
+                        if(r * i.length > mn) i.i[      i.i <= mn] else i.i
+                    }
+                }
+            return(.Call(.NAME, x, i))
+        }
+        i <- i.x
+    }
     switch(typeof(i),
            double =
                {
@@ -78,10 +116,13 @@
 .subscript.1ary.mat <- function(x, i, .NAME) { # .NAME = *_subscript_1ary_mat
     if(isS4(i)) {
         cld <- getClassDef(class(i))
-        if(!extends(cld,  "Matrix"))
+        if(!extends(cld, "Matrix"))
             stop(.subscript.error.ist(i), domain = NA)
-        if(!extends(cld, "dMatrix") || i@Dim[2L] != 2L)
-            return(.subscript.1ary.vec(x, as.vector(i))) # FIXME: sparseVector
+        if(extends(cld, "nMatrix") || extends(cld, "lMatrix") ||
+           i@Dim[2L] != 2L) {
+            v <- if(extends(cld, "denseMatrix")) "vector" else "sparseVector"
+            return(.subscript.1ary.vec(x, as(i, v)))
+        }
         i <- as(i, "matrix")
     } else if(is.logical(i) || length(di <- dim(i)) != 2L || di[2L] != 2L)
         return(.subscript.1ary.vec(x, i))
