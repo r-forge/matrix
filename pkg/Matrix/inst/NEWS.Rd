@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2022-11-16 r3775)}{
+\section{Changes in version 1.5-4 (2022-11-18 r3780)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Defining \code{sequence.default} for \R{} \code{< 4.0.0},
