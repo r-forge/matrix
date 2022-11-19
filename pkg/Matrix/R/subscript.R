@@ -1,4 +1,4 @@
-## METHODS FOR GENERIC: [
+## METHODS FOR GENERIC: [                    UNFINISHED AND NOT-YET-USED
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## GOAL: automate method definitions and eventually replace ones in
@@ -14,14 +14,13 @@
 ##
 ##       need to write C-level functions
 ##
-##             *_subscript_1ary_vec(x, i         )
+##             *_subscript_1ary    (x, i         )
 ##             *_subscript_1ary_mat(x, i         )
 ##             *_subscript_2ary    (x, i, j, drop)
 ##
-##       for * = CRsparse,Tsparse,unpackedMatrix,packedMatrix
-##
-##       diagonalMatrix and indMatrix should go via CsparseMatrix,
-##       except for row indexing of indMatrix
+##       for * = unpackedMatrix,packedMatrix,
+##               CsparseMatrix,RsparseMatrix,TsparseMatrix,
+##               diagonalMatrix,indMatrix
 
 .subscript.error.dim <- "incorrect number of dimensions"
 .subscript.error.oob <- "subscript out of bounds"
@@ -34,7 +33,7 @@
         gettextf("invalid subscript type \"%s\"", typeof(i))
 }
 
-.subscript.1ary.vec <- function(x, i, .NAME) { # .NAME = *_subscript_1ary_vec
+.subscript.1ary <- function(x, i) {
     if(isS4(i)) {
         if(!is(i, "sparseVector"))
             stop(.subscript.error.ist(i), domain = NA)
@@ -69,7 +68,7 @@
                         if(r * i.length > mn) i.i[      i.i <= mn] else i.i
                     }
                 }
-            return(.Call(.NAME, x, i))
+            return(.Call(R_subscript_1ary, x, i))
         }
         i <- i.x
     }
@@ -85,7 +84,7 @@
                                     i <- as.double(i)
                                 i[i >= 1]
                             }
-                   .Call(.NAME, x, i)
+                   .Call(R_subscript_1ary, x, i)
                },
            integer =
                {
@@ -98,7 +97,7 @@
                                     i <- as.integer(i)
                                 i[i >= 1L]
                             }
-                   .Call(.NAME, x, i)
+                   .Call(R_subscript_1ary, x, i)
                },
            logical =
                {
@@ -109,7 +108,7 @@
                        else return(c(x, rep.int(NA, len - mn)))
                    }
                    i <- seq_len(prod(x@Dim))[i]
-                   .Call(.NAME, x, i)
+                   .Call(R_subscript_1ary, x, i)
                },
            character =
                {
@@ -119,7 +118,7 @@
            stop(.subscript.error.ist(i), domain = NA))
 }
 
-.subscript.1ary.mat <- function(x, i, .NAME) { # .NAME = *_subscript_1ary_mat
+.subscript.1ary.mat <- function(x, i) {
     if(isS4(i)) {
         cld <- getClassDef(class(i))
         if(!extends(cld, "Matrix"))
@@ -133,11 +132,11 @@
                 else return(c(x, rep.int(NA, len - mn)))
             }
             v <- if(extends(cld, "denseMatrix")) "vector" else "sparseVector"
-            return(.subscript.1ary.vec(x, as(i, v)))
+            return(.subscript.1ary(x, as(i, v)))
         }
         i <- as(i, "matrix")
     } else if(is.logical(i) || length(di <- dim(i)) != 2L || di[2L] != 2L)
-        return(.subscript.1ary.vec(x, i))
+        return(.subscript.1ary(x, i))
     switch(typeof(i),
            double =,
            integer =
@@ -162,7 +161,7 @@
                           max(n, i[, 2L], na.rm = TRUE) > n)
                            stop(.subscript.error.oob)
                    }
-                   .Call(.NAME, x, i)
+                   .Call(R_subscript_1ary_mat, x, i)
                },
            character =
                {
@@ -174,12 +173,12 @@
                        ## integer row contains at least one NA,
                        ## indicating non-match that cannot be ignored
                        stop(.subscript.error.oob)
-                   .Call(.NAME, x, m)
+                   .Call(R_subscript_1ary_mat, x, m)
                },
            stop(.subscript.error.ist(i), domain = NA))
 }
 
-.subscript.2ary <- function(x, i, j, drop, .NAME) { # .NAME = *_suscriptb_2ary
+.subscript.2ary <- function(x, i, j, drop) {
     d <- x@Dim
     index <- list(if(missing(i)) NULL else if(is.null(i)) integer(0L) else i,
                   if(missing(j)) NULL else if(is.null(j)) integer(0L) else j)
@@ -224,5 +223,172 @@
                        stop(.subscript.error.ist(k), domain = NA))
         }
     }
-    .Call(.NAME, x, index[[1L]], index[[2L]], if(missing(drop)) TRUE else drop)
+    .Call(R_subscript_2ary, x, index[[1L]], index[[2L]],
+          if(missing(drop)) TRUE else drop)
 }
+
+setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 ".", ".", ".", na),
+                         .M.level = 2)
+	      if(na == 2L) {
+                  ## x[]
+                  x
+              } else if(na == 3L) {
+                  ## x[, ]
+                  drop(x)
+              } else {
+                  ## x[, , ], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
+                         drop = "logical"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 ".", ".", "l", na),
+                         .M.level = 2)
+              if(na < 4L) {
+                  ## x[drop=], x[, drop=], x[drop=, ]
+                  x
+              } else if(na == 4L) {
+                  ## x[, , drop=], x[, drop=, ], x[drop=, , ]
+                  if(isFALSE(drop[1L])) x else drop(x)
+              } else {
+                  ## x[, , , drop=], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 "i", ".", ".", na),
+                         .M.level = 2)
+	      if(na == 2L) {
+                  ## x[i=]
+                  .subscript.1ary(x, i)
+              } else if(na == 3L) {
+                  ## x[i=, ], x[, i=]
+                  .subscript.2ary(x, i, , drop = TRUE)
+              } else {
+                  ## x[i=, , ], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
+                         drop = "logical"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 "i", ".", "l", na),
+                         .M.level = 2)
+              if(na == 3L) {
+                  ## x[i=, drop=]
+                  .subscript.1ary(x, i)
+              } else if(na == 4L) {
+                  ## x[i=, , drop=], x[, i=, drop=]
+                  .subscript.2ary(x, i, , drop = drop)
+              } else {
+                  ## x[i=, , , drop=], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 ".", "i", ".", na),
+                         .M.level = 2)
+              if(na == 2L) {
+                  ## x[j=]
+                  .subscript.1ary(x, j)
+	      } else if(na == 3L) {
+                  ## x[j=, ], x[, j=]
+                  .subscript.2ary(x, , j, drop = TRUE)
+              } else {
+                  ## x[, j=, ], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
+                         drop = "logical"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 ".", "i", "l", na),
+                         .M.level = 2)
+              if(na == 3L) {
+                  ## x[j=, drop=]
+                  .subscript.1ary(x, j)
+              } else if(na == 4L) {
+                  ## x[j=, , drop=], x[, j=, drop=]
+                  .subscript.2ary(x, , j, drop = drop)
+              } else {
+                  ## x[, j=, , drop=], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "index", j = "index",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 "i", "i", ".", na),
+                         .M.level = 2)
+	      if(na == 3L) {
+                  ## x[i=, j=], x[j=, i=]
+                  .subscript.2ary(x, i, j, drop = TRUE)
+              } else {
+                  ## x[i=, j=, ], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+setMethod("[", signature(x = "Matrix", i = "index", j = "index",
+                         drop = "logical"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 "i", "i", "l", na),
+                         .M.level = 2)
+              if(na == 4L) {
+                  ## x[i=, j=, drop=], x[j=, i=, drop=]
+                  .subscript.2ary(x, i, j, drop = drop)
+              } else {
+                  ## x[i=, j=, , drop=], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
+
+for(.cl in c("matrix", "nMatrix", "lMatrix"))
+setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop) {
+              na <- nargs()
+              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
+                                 "m", ".", ".", na),
+                         .M.level = 2)
+	      if(na == 2L) {
+                  ## x[i=]
+                  .subscript.1ary.mat(x, i)
+              } else if(na == 3L) {
+                  ## x[i=, ], x[, i=]
+                  .subscript.2ary(x, i, , drop = TRUE)
+              } else {
+                  ## x[i=, , ], etc.
+                  stop(.subscript.error.dim)
+              }
+          })
