@@ -62,3 +62,5 @@ src/t_gCMatrix_colSums\.c$
 # work in progress
 R/subscript\.R$
 R/subassign\.R$
+src/subscript\.[ch]$
+src/subassign\.[ch]$

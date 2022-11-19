@@ -1,4 +1,4 @@
-## METHODS FOR GENERIC: [<-
+## METHODS FOR GENERIC: [<-                  UNFINISHED AND NOT-YET-USED
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## GOAL: automate method definitions and eventually replace ones in
@@ -14,11 +14,10 @@
 ##
 ##       need to write C-level functions
 ##
-##             *_subassign_1ary_vec(x, i,    value)
+##             *_subassign_1ary    (x, i,    value)
 ##             *_subassign_1ary_mat(x, i,    value)
 ##             *_subassign_2ary    (x, i, j, value)
 ##
-##       for * = CRsparse,Tsparse,unpackedMatrix,packedMatrix
-##       and where 'value' is allowed to be a vector _or_ sparseVector
-##
-##       diagonalMatrix and indMatrix should go via CsparseMatrix
+##       for * = unpackedMatrix,packedMatrix,
+##               CsparseMatrix,RsparseMatrix,TsparseMatrix,
+##               diagonalMatrix,indMatrix
