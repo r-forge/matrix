@@ -43,33 +43,38 @@
             stop(.subscript.error.ist(i), domain = NA)
         if(!(has.x <- .hasSlot(i, "x")) || is.logical(i.x <- i@x)) {
             ## [nl]sparseVector
-            i.length <- i@length
-            i.i <- i@i
+            i.length <- i@length # not exceeding 2^52, if valid
             i <-
-                if(i.length >= mn) {
-                    if(i.length > mn && i.i[length(i.i)] >= mn + 1)
-                        i.i[i.i >= mn + 1] <- NA
-                    if(has.x) i.i[i.x] else i.i
-                } else {
-                    r <- ceiling(mn / i.length)
-                    i.i <-
-                        if(r * i.length <= .Machine$integer.max)
-                            rep.int(as.integer(i.i), r) +
-                                rep(seq.int(from = 0L,
-                                            by = as.integer(i.length),
-                                            length.out = r),
-                                    each = length(i.i))
-                        else {
-                            rep.int(as.double(i.i), r) +
-                                rep(seq.int(from = 0,
-                                            by = as.double(i.length),
-                                            length.out = r),
-                                    each = length(i.i))
-                        }
-                    if(has.x) {
-                        if(r * i.length > mn) i.i[i.x & i.i <= mn] else i.i[i.x]
+                if(i.length == 0L)
+                    integer(0L)
+                else {
+                    i.i <- i@i
+                    if(i.length >= mn) {
+                        if(i.length > mn && i.i[length(i.i)] >= mn + 1)
+                            i.i[i.i >= mn + 1] <- NA
+                        if(has.x) i.i[i.x] else i.i
                     } else {
-                        if(r * i.length > mn) i.i[      i.i <= mn] else i.i
+                        r <- ceiling(mn / i.length)
+                        mn. <- r * i.length
+                        i.i <-
+                            if(mn. <= .Machine$integer.max)
+                                rep.int(as.integer(i.i), r) +
+                                    rep(seq.int(from = 0L,
+                                                by = as.integer(i.length),
+                                                length.out = r),
+                                        each = length(i.i))
+                            else if(mn. <= 0x1p+52)
+                                rep.int(as.double(i.i), r) +
+                                    rep(seq.int(from = 0,
+                                                by = as.double(i.length),
+                                                length.out = r),
+                                        each = length(i.i))
+                            else stop("attempt to recycle sparseVector to length exceeding maximum 2^52")
+                        if(has.x) {
+                            if(mn. > mn) i.i[i.x & i.i <= mn] else i.i[i.x]
+                        } else {
+                            if(mn. > mn) i.i[      i.i <= mn] else i.i
+                        }
                     }
                 }
             return(..subscript.1ary(x, i, unsorted = FALSE))
@@ -79,15 +84,15 @@
     switch(typeof(i),
            double =
                {
-                   m <- min(1, i, na.rm = TRUE)
-                   if(m < 1)
-                       i <- if(m <= -1)
+                   r <- range(1, 0x1p+52, i, na.rm = TRUE)
+                   if(r[1L] < 1)
+                       i <- if(r[1L] <= -1)
                                 seq_len(mn)[i] # FIXME
-                            else {
-                                if(is.object(i))
-                                    i <- as.double(i)
-                                i[i >= 1]
-                            }
+                            else i[i >= 1]
+                   if(r[2L] > 0x1p+52) {
+                       warning("subscripts exceeding maximum 2^52; NA produced")
+                       i[i > 0x1p+52] <- NA
+                   }
                    ..subscript.1ary(x, i)
                },
            integer =
@@ -96,11 +101,7 @@
                    if(m < 1L)
                        i <- if(m <= -1L)
                                 seq_len(mn)[i] # FIXME
-                            else {
-                                if(is.object(i))
-                                    i <- as.integer(i)
-                                i[i >= 1L]
-                            }
+                            else i[i >= 1L]
                    ..subscript.1ary(x, i)
                },
            logical =
@@ -121,7 +122,7 @@
 }
 
 ## x[i] where 'i' is vector of type "integer" or "double"
-## with elements greater than or equal to 1 (or NA)
+## with elements in the interval [1,2^52] (or NA)
 ..subscript.1ary <- function(x, i,
                              shape = .M.shape(x),
                              repr = .M.repr(x),
@@ -129,12 +130,11 @@
     if(!nzchar(repr))
         return(.Call(R_subscript_1ary, x, i))
     if(repr == "R" || shape == "s") {
-        d <- x@Dim
-        m <- d[1L]
-        mn. <- min(prod(d), 0x1p+52) # R_XLEN_T_MAX
-        if(max(mn., i, na.rm = TRUE) >= mn. + 1)
-            i[i >= mn. + 1] <- NA
+        mn <- prod(d <- x@Dim)
+        if(repr == "R" && mn < 0x1p+52 && max(mn, i, na.rm = TRUE) >= mn + 1)
+            i[i >= mn + 1] <- NA
         i1s <- i - 1L
+        m <- d[1L]
         i. <- as.integer(i1s %% m)
         if(shape == "s") {
             j. <- as.integer(i1s %/% m)
@@ -144,11 +144,13 @@
                 i.[w] <- j.[w]
                 j.[w] <- tmp
             }
-            if (mn. > .Machine$integer.max)
+            if(mn > .Machine$integer.max)
                 m <- as.double(m)
             i <- m * j. + i. + 1L
         }
     }
+    if(shape == "t" && x@diag != "N")
+        x <- ..diagU2N(x)
     o <-
         if(repr == "R")
             order(i., i)
@@ -211,7 +213,7 @@
                        i <- i[!i., , drop = FALSE]
                    if(!all(j. <- i[, 2L], na.rm = TRUE))
                        i <- i[!j., , drop = FALSE]
-                   .Call(R_subscript_1ary_mat, x, i)
+                   ..subscript.1ary.mat(x, i)
                },
            character =
                {
@@ -223,7 +225,7 @@
                        ## integer row contains at least one NA,
                        ## indicating non-match that should not be ignored
                        stop(.subscript.error.oob)
-                   .Call(R_subscript_1ary_mat, x, m)
+                   ..subscript.1ary.mat(x, m)
                },
            stop(.subscript.error.ist(i), domain = NA))
 }
@@ -265,26 +267,24 @@
 ## x[i, j, drop] where 'i' and 'j' are NULL or any vector
 .subscript.2ary <- function(x, i, j, drop) {
     d <- x@Dim
-    i <- list(if(missing(i)) NULL else if(is.null(i)) integer(0L) else i,
+    l <- list(if(missing(i)) NULL else if(is.null(i)) integer(0L) else i,
               if(missing(j)) NULL else if(is.null(j)) integer(0L) else j)
     for(pos in 1:2) {
         if(!is.null(k <- i[[pos]])) {
-            i[[pos]] <-
+            l[[pos]] <-
                 switch(typeof(k),
                        double =
                            {
                                r <- d[pos]
-                               if(is.object(k))
-                                   k <- as.double(k)
                                if(max(r, k, na.rm = TRUE) >= r + 1)
                                    stop(.subscript.error.oob)
-                               seq_len(r)[k]
+                               if(min(1, k, na.rm = TRUE) < 1)
+                                   seq_len(r)[k]
+                               else as.integer(k)
                            },
                        integer =
                            {
                                r <- d[pos]
-                               if(is.object(k))
-                                   k <- as.integer(k)
                                if(max(r, k, na.rm = TRUE) > r)
                                    stop(.subscript.error.oob)
                                if(min(1L, k, na.rm = TRUE) < 1L)
@@ -310,24 +310,19 @@
                        stop(.subscript.error.ist(k), domain = NA))
         }
     }
-    ..subscript.2ary(x, i, drop = is.na(drop <- drop[1L]) && drop)
+    if(is.double(lengths(l, use.names = FALSE)))
+        stop("dimensions cannot exceed 2^31-1")
+    ..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
 }
 
-## x[i[[1L]], i[[2L]], drop] where 'i' is a length-2 list
-## of vectors of type "integer" with i[[1L]] in 1:m (or NA)
-## and i[[2L]] in 1:n (or NA) ... NULL indicates missingness
-..subscript.2ary <- function(x, i, drop) {
-    mi. <- is.null(i. <- i[[1L]])
-    mj. <- is.null(j. <- j[[2L]])
-    if(mi. && mj.) {
-
-    } else if (mi.) {
-
-    } else if (mj.) {
-
-    } else {
-
-    }
+## x[i, j, drop] where 'i' and 'j' are vectors of type "integer"
+## with 'i' in 1:m (or NA) and 'j' in 1:n (or NA) ... NULL => missing
+..subscript.2ary <- function(x, i, j, drop) {
+    if(is.null(i) && is.null(j))
+        return(if((is.na(drop) || drop) && any(x@Dim == 1L)) drop(x) else x)
+    if(is(x, "sparseMatrix") && (anyNA(i) || anyNA(j)))
+        stop("NA subscripts in x[i,j] not yet supported for x=sparseMatrix")
+    .Call(R_subscript_2ary, x, i, j, drop)
 }
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
@@ -495,3 +490,5 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                   stop(.subscript.error.dim)
               }
           })
+
+stop("what is going on")
