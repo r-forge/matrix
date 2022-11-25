@@ -20,10 +20,11 @@
 #include "unpackedMatrix.h"
 #include "sparse.h"
 #include "validity.h"
+#include "subscript.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
-Rcomplex Matrix_zzero, Matrix_zone;
+Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 #define EXTDEF(name, n)   {#name, (DL_FUNC) &name, n}
@@ -694,8 +695,8 @@ R_init_Matrix(DllInfo *dll)
 #endif
 	error(_("Matrix namespace not determined correctly"));
 
-    Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0;
-    Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0;
+    Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
+    Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
 }
 
 void R_unload_Matrix(DllInfo *dll)
