@@ -83,7 +83,7 @@ extern
 
 /* Often used numbers, defined in ./init.c */
 extern
-Rcomplex Matrix_zzero, Matrix_zone; /* 0+0i, 1+0i */
+Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 
 /* To become deprecated ... defensive code should PROTECT() more */
 #define class_P(x) CHAR(asChar(getAttrib(x, R_ClassSymbol)))
