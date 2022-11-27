@@ -20,7 +20,6 @@
 #include "unpackedMatrix.h"
 #include "sparse.h"
 #include "validity.h"
-#include "subscript.h"
 #include <R_ext/Rdynload.h>
 
 #include "Syms.h"
