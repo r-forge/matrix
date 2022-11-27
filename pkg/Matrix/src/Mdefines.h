@@ -59,15 +59,6 @@ extern void *alloca(size_t);
 	    R_Free(_VAR_);					\
     } while (0)
 
-/* To zero an array ... however, note Memzero(), which calls memset()
-   and so can be faster in the range of R_SIZE_T (an alias for size_t in C)
-*/
-#define AZERO(_X_, _N_, _ZERO_, _CTYPE_)				\
-    do {								\
-	for (_CTYPE_ _I_ = 0, _LEN_ = (_N_); _I_ < _LEN_; ++_I_)	\
-	    (_X_)[_I_] = _ZERO_;					\
-    } while (0)
-
 /* Copy and paste from now-deprecated Rdefines.h : */
 #ifndef R_DEFINES_H
 # define GET_SLOT(x, what)        R_do_slot(x, what)

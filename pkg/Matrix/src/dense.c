@@ -123,16 +123,16 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 	    ++nprotect;
 	    switch (tt) {
 	    case LGLSXP:
-		Memcpy(LOGICAL(x), LOGICAL(from), len);
+		Matrix_memcpy(LOGICAL(x), LOGICAL(from), len, sizeof(int));
 		break;
 	    case INTSXP:
-		Memcpy(INTEGER(x), INTEGER(from), len);
+		Matrix_memcpy(INTEGER(x), INTEGER(from), len, sizeof(int));
 		break;
 	    case REALSXP:
-		Memcpy(REAL(x), REAL(from), len);
+		Matrix_memcpy(REAL(x), REAL(from), len, sizeof(double));
 		break;
 	    case CPLXSXP:
-		Memcpy(COMPLEX(x), COMPLEX(from), len);
+		Matrix_memcpy(COMPLEX(x), COMPLEX(from), len, sizeof(Rcomplex));
 		break;
 	    default:
 		break;
@@ -609,14 +609,14 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #define DAS_CASES(_SEXPTYPE_)						\
     do {								\
 	switch (_SEXPTYPE_) {						\
-	case REALSXP:							\
-	    DAS_SUBCASES(double, REAL, ISNZ_REAL);			\
-	    break;							\
 	case LGLSXP:							\
 	    DAS_SUBCASES(int, LOGICAL, ISNZ_LOGICAL);			\
 	    break;							\
 	case INTSXP:							\
 	    DAS_SUBCASES(int, INTEGER, ISNZ_INTEGER);			\
+	    break;							\
+	case REALSXP:							\
+	    DAS_SUBCASES(double, REAL, ISNZ_REAL);			\
 	    break;							\
 	case CPLXSXP:							\
 	    DAS_SUBCASES(Rcomplex, COMPLEX, ISNZ_COMPLEX);		\
@@ -890,23 +890,23 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 			*px = 1;
 	    }
 	} else {
-	    /* n->[diz] */
+	    /* n->[idz] */
 	    REPROTECT(x = coerceVector(x, tt), pid);
 	    switch (tt) {
-	    case REALSXP:
-	    {
-		double *px = REAL(x);
-		for (ix = 0; ix < nx; ++ix, ++px)
-		    if (ISNAN(*px))
-			*px = 1.0;
-		break;
-	    }
 	    case INTSXP:
 	    {
 		int *px = INTEGER(x);
 		for (ix = 0; ix < nx; ++ix, ++px)
 		    if (*px == NA_INTEGER)
 			*px = 1;
+		break;
+	    }
+	    case REALSXP:
+	    {
+		double *px = REAL(x);
+		for (ix = 0; ix < nx; ++ix, ++px)
+		    if (ISNAN(*px))
+			*px = 1.0;
 		break;
 	    }
 	    case CPLXSXP:
@@ -1097,7 +1097,7 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 	_CTYPE_ *px1 = _PTR_(x1);					\
 	if (clf[1] == 'd') {						\
 	    /* di->ge */						\
-	    Memzero(px1, (R_xlen_t) n * n);				\
+	    Matrix_memset(px1, 0, (R_xlen_t) n * n, sizeof(_CTYPE_));	\
 	    _PREFIX_ ## dense_unpacked_copy_diagonal(			\
 		px1, _PTR_(x0), n, n, ul /* unused */, di);		\
 	} else {							\
@@ -1209,26 +1209,26 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
     
     SEXP x_from = NULL, x_to = NULL;
 
-#define UNPACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
+#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_, _PTR_)			\
     _PREFIX_ ## dense_unpacked_make_banded(_PTR_(x_to), m, n, a, b, di)
     
-#define PACKED_MAKE_BANDED(_PREFIX_, _PTR_)				\
+#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_, _PTR_)			\
     _PREFIX_ ## dense_packed_make_banded(_PTR_(x_to), n, a, b, ult, di)
     
 #define DENSE_BAND(_MAKE_BANDED_)					\
     do {								\
 	switch (TYPEOF(x_to)) {						\
-	case REALSXP: /* d..Matrix */					\
-	    _MAKE_BANDED_(d, REAL);					\
-	    break;							\
-	case LGLSXP: /* [ln]..Matrix */					\
-	    _MAKE_BANDED_(i, LOGICAL);					\
+	case LGLSXP: /* [nl]..Matrix */					\
+	    _MAKE_BANDED_(i, int, LOGICAL);				\
 	    break;							\
 	case INTSXP: /* i..Matrix */					\
-	    _MAKE_BANDED_(i, INTEGER);					\
+	    _MAKE_BANDED_(i, int, INTEGER);				\
+	    break;							\
+	case REALSXP: /* d..Matrix */					\
+	    _MAKE_BANDED_(d, double, REAL);				\
 	    break;							\
 	case CPLXSXP: /* z..Matrix */					\
-	    _MAKE_BANDED_(z, COMPLEX);					\
+	    _MAKE_BANDED_(z, Rcomplex, COMPLEX);			\
 	    break;							\
 	default:							\
 	    ERROR_INVALID_TYPE("'x' slot", TYPEOF(x_to), "R_dense_band"); \
@@ -1316,18 +1316,18 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 		PROTECT(x_to = allocVector(TYPEOF(x_from), nx));
 		++nprotect;
 		
-#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
+#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _PTR_)		\
 		do {							\
-		    Memzero(_PTR_(x_to), nx);				\
+		    Matrix_memset(_PTR_(x_to), 0, nx, sizeof(_CTYPE_));	\
 		    if (a <= 0 && b >= 0)				\
 			_PREFIX_ ## dense_unpacked_copy_diagonal(	\
 			    _PTR_(x_to), _PTR_(x_from),			\
 			    n, nx, 'U' /* unused */, di);		\
 		} while (0)
 
-#define PACKED_COPY_DIAGONAL(_PREFIX_, _PTR_)				\
+#define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_, _PTR_)			\
 		do {							\
-		    Memzero(_PTR_(x_to), nx);				\
+		    Matrix_memset(_PTR_(x_to), 0, nx, sizeof(_CTYPE_));	\
 		    if (a <= 0 && b >= 0)				\
 			_PREFIX_ ## dense_packed_copy_diagonal(		\
 			    _PTR_(x_to), _PTR_(x_from),			\
