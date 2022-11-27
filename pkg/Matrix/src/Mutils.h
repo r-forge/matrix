@@ -28,6 +28,9 @@ extern "C" {
 
 SEXP NEW_OBJECT_OF_CLASS(const char* what);
 
+void *Matrix_memset(void *dest,        int   ch, R_xlen_t length, size_t size);
+void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size);
+
 Rboolean DimNames_is_trivial(SEXP dn);
 Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_DimNames_is_symmetric(SEXP dn);
