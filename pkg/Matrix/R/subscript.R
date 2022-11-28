@@ -129,7 +129,9 @@
                              unsorted = is.unsorted(i)) {
     if(!nzchar(repr))
         return(.Call(R_subscript_1ary, x, i))
-    if(repr == "R" || shape == "s") {
+    if(shape == "t" && x@diag != "N")
+        x <- ..diagU2N(x)
+    if(shape == "s" || repr == "R") {
         mn <- prod(d <- x@Dim)
         if(repr == "R" && mn < 0x1p+52 && max(mn, i, na.rm = TRUE) >= mn + 1)
             i[i >= mn + 1] <- NA
@@ -140,17 +142,16 @@
             j. <- as.integer(i1s %/% m)
             op <- if(x@uplo == "U") `>` else `<`
             if(length(w <- which(op(i., j.)))) {
-                tmp <- i.[w]
-                i.[w] <- j.[w]
-                j.[w] <- tmp
+                i.. <- i.[w]
+                j.. <- j.[w]
+                if(repr == "R")
+                    i.[w] <- j..
+                if(mn > .Machine$integer.max)
+                    m <- as.double(m)
+                i[w] <- m * i.. + j.. + 1L
             }
-            if(mn > .Machine$integer.max)
-                m <- as.double(m)
-            i <- m * j. + i. + 1L
         }
     }
-    if(shape == "t" && x@diag != "N")
-        x <- ..diagU2N(x)
     o <-
         if(repr == "R")
             order(i., i)
@@ -159,7 +160,7 @@
         else return(.Call(R_subscript_1ary, x, i))
     if(is.unsorted(o)) {
         s <- .Call(R_subscript_1ary, x, i[o])
-        s[o] <- tmp
+        s[o] <- s
         s
     } else .Call(R_subscript_1ary, x, i)
 }
@@ -237,14 +238,16 @@
                                  repr = .M.repr(x)) {
     if(!nzchar(repr))
         return(.Call(R_subscript_1ary_mat, x, i))
+    if(shape == "t" && x@diag != "N")
+        x <- ..diagU2N(x)
     i. <- i[, 1L]
     j. <- i[, 2L]
     if(shape == "s") {
         op <- if(x@uplo == "U") `>` else `<`
         if(length(w <- which(op(i., j.)))) {
-            tmp <- i.[w]
+            i.. <- i.[w]
             i.[w] <- j.[w]
-            j.[w] <- tmp
+            j.[w] <- i..
         }
     }
     o <-
@@ -319,11 +322,22 @@
 ## with 'i' in 1:m (or NA) and 'j' in 1:n (or NA) ... NULL => missing
 ..subscript.2ary <- function(x, i, j, drop) {
     if(is.null(i) && is.null(j))
-        return(if((is.na(drop) || drop) && any(x@Dim == 1L)) drop(x) else x)
-    if(is(x, "sparseMatrix") && (anyNA(i) || anyNA(j)))
+        r <- x
+    else if(is(x, "sparseMatrix") && (anyNA(i) || anyNA(j)))
         stop("NA subscripts in x[i,j] not yet supported for x=sparseMatrix")
-    .Call(R_subscript_2ary, x, i, j, drop)
+    else {
+        r <- .Call(R_subscript_2ary, x, i, j)
+        dn <- dimnames(x)
+        if(!(is.null(i) || is.null(rn <- dn[[1L]])))
+            dn[1L] <- list(if(length(i)) rn[i] else NULL)
+        if(!(is.null(j) || is.null(cn <- dn[[2L]])))
+            dn[2L] <- list(if(length(j)) cn[j] else NULL)
+        r@Dimnames <- dn
+    }
+    if((is.na(drop) || drop) && any(r@Dim == 1L)) drop(as(r, "matrix")) else r
 }
+
+if(FALSE) {
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "missing"),
@@ -491,4 +505,4 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
               }
           })
 
-stop("what is going on")
+}
