@@ -273,7 +273,7 @@
     l <- list(if(missing(i)) NULL else if(is.null(i)) integer(0L) else i,
               if(missing(j)) NULL else if(is.null(j)) integer(0L) else j)
     for(pos in 1:2) {
-        if(!is.null(k <- i[[pos]])) {
+        if(!is.null(k <- l[[pos]])) {
             l[[pos]] <-
                 switch(typeof(k),
                        double =
@@ -292,7 +292,7 @@
                                    stop(.subscript.error.oob)
                                if(min(1L, k, na.rm = TRUE) < 1L)
                                    seq_len(r)[k]
-                               else r
+                               else k
                            },
                        logical =
                            {
@@ -324,7 +324,7 @@
     if(is.null(i) && is.null(j))
         r <- x
     else if(is(x, "sparseMatrix") && (anyNA(i) || anyNA(j)))
-        stop("NA subscripts in x[i,j] not yet supported for x=sparseMatrix")
+        stop("NA subscripts in x[i,j] not yet supported for sparseMatrix 'x'")
     else {
         r <- .Call(R_subscript_2ary, x, i, j)
         dn <- dimnames(x)
