@@ -7,7 +7,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse); /* defined in ./sparse.c */
 
 SEXP R_subscript_1ary    (SEXP x, SEXP i);
 SEXP R_subscript_1ary_mat(SEXP x, SEXP i);
-SEXP R_subscript_2ary    (SEXP x, SEXP i, SEXP j, SEXP drop);
+SEXP R_subscript_2ary    (SEXP x, SEXP i, SEXP j);
 
 /* TODO: compare with macros in ./Mdefines.h */
 

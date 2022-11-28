@@ -19,6 +19,7 @@
 #include "packedMatrix.h"
 #include "unpackedMatrix.h"
 #include "sparse.h"
+#include "subscript.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
 
@@ -473,6 +474,10 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_index_triangle, 4),
     CALLDEF(R_index_diagonal, 3),
     CALLDEF(R_nnz, 3),
+
+    CALLDEF(R_subscript_1ary, 2),
+    CALLDEF(R_subscript_1ary_mat, 2),
+    CALLDEF(R_subscript_2ary, 3),
 
     CALLDEF(R_sparse_as_dense, 2),
     CALLDEF(R_sparse_as_matrix, 1),
