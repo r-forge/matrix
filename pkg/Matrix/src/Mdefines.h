@@ -49,7 +49,7 @@ extern void *alloca(size_t);
 	else {							\
 	    _VAR_ = Alloca(_N_, _CTYPE_);			\
 	    R_CheckStack();					\
-	    /* Memzero(_VAR_, _N_); */				\
+	    memset(_VAR_, 0, (size_t) (_N_) * sizeof(_CTYPE_));	\
 	}							\
     } while (0)
 
