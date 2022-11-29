@@ -432,7 +432,7 @@ static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
     return res;
 }
 
-/* x[i] with 'i' of type "integer" or "double" {in [1,2^52+1) or NA} */
+/* x[i] with 'i' of type "integer" or "double" {'i' in [1,2^52] or NA} */
 SEXP R_subscript_1ary(SEXP x, SEXP i)
 {
     static const char *valid[] = { VALID_NONVIRTUAL, "" };
@@ -834,6 +834,9 @@ static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
     return res;
 }
 
+/* x[i] with 'i' of type "integer" and dimensions c(.,2) 
+   {i[,1] in 1:m or NA, i[,2] in 1:n or NA}
+*/
 SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 {
     static const char *valid[] = { VALID_NONVIRTUAL, "" };
@@ -853,7 +856,7 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
     /* NB: for [CRT], the caller must preprocess 'x' and/or 'i';
            symmetric and unit triangular 'x' are not handled specially,
 	   and it is assumed for speed that 'i' is sorted by row [R] 
-	   or column [CT] with NA last
+	   or column [CT] with NA (incl. out-of-bounds indices) last
     */
 	
     case 'C':
@@ -877,39 +880,74 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
     }
 }
 
-static int keep_tr(int *pi, int *pj, int n, int upper, int nonunit)
+static int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
 {
-    
-#define KEEP ((nonunit || memcmp(pi, pj, n * sizeof(int)) != 0) ? 1 : 2)
-    
-    int ki, kj, j_;
-    for (kj = 0; kj < n; ++kj)
-	if (pi[kj] == NA_INTEGER || pj[kj] == NA_INTEGER)
-	    return 0;
-    if (upper) {
-	for (kj = 0; kj < n; ++kj)
-	    for (ki = kj+1, j_ = pj[kj]; ki < n; ++ki)
-		if (pi[ki] <= j_)
-		    goto LO;
-	return  KEEP;
-    LO:
-	for (kj = 0; kj < n; ++kj)
-	    for (ki = 0, j_ = pj[kj]; ki < kj; ++ki)
-		if (pi[ki] <= j_)
+    int k, ident = memcmp(pi, pj, n * sizeof(int)) == 0;
+    if (checkNA) {
+	if (ident) {
+	    for (k = 0; k < n; ++k)
+		if (pi[k] == NA_INTEGER)
 		    return 0;
-	return -KEEP;
+	} else {
+	    for (k = 0; k < n; ++k)
+		if (pi[k] == NA_INTEGER || pj[k] == NA_INTEGER)
+		    return 0;
+	}
+    }
+    int r = (upper) ? 1 : -1;
+    if (ident) {
+	/* triangular iff monotone; unit diagonal is preserved */
+	if (n >= 2) {
+	    if (pi[0] == pi[1])
+		return 0;
+	    else if (pi[0] < pi[1]) {
+		for (k = 2; k < n; ++k)
+		    if (pi[k-1] >= pi[k])
+			return 0;
+		/* up->up, lo->lo */
+	    } else {
+		for (k = 2; k < n; ++k)
+		    if (pi[k-1] <= pi[k])
+			return 0;
+		/* up->lo, lo->up */
+		r = -r;
+	    }
+	}
+	if (!nonunit)
+	    r *= 2;
+	return r;
     } else {
-	for (kj = 0; kj < n; ++kj)
-	    for (ki = 0, j_ = pj[kj]; ki < kj; ++ki)
-		if (pi[ki] >= j_)
-		    goto UP;
-	return -KEEP;
-    UP:
-	for (kj = 0; kj < n; ++kj)
-	    for (ki = kj+1, j_ = pj[kj]; ki < n; ++ki)
-		if (pi[ki] >= j_)
-		    return 0;
-	return  KEEP;
+	/* brute force ... */
+	int ki, kj, j_;
+	if (upper) {
+	    for (kj = 0; kj < n; ++kj)
+		for (ki = kj+1, j_ = pj[kj]; ki < n; ++ki)
+		    if (pi[ki] <= j_)
+			goto LO;
+	    /* up->up */
+	    return  r;
+	LO:
+	    for (kj = 0; kj < n; ++kj)
+		for (ki = 0, j_ = pj[kj]; ki < kj; ++ki)
+		    if (pi[ki] <= j_)
+			return 0;
+	    /* up->lo */
+	    return -r;
+	} else {
+	    for (kj = 0; kj < n; ++kj)
+		for (ki = 0, j_ = pj[kj]; ki < kj; ++ki)
+		    if (pi[ki] >= j_)
+			goto UP;
+	    /* lo->lo */
+	    return  r;
+	UP:
+	    for (kj = 0; kj < n; ++kj)
+		for (ki = kj+1, j_ = pj[kj]; ki < n; ++ki)
+		    if (pi[ki] >= j_)
+			return 0;
+	    /* lo->up */
+	    return -r;
+	}
     }
 }
 
@@ -918,30 +956,48 @@ static int keep_sy(int *pi, int *pj, int n, int upper)
     return (memcmp(pi, pj, n * sizeof(int)) != 0) ? 0 : ((upper) ? 1 : -1);
 }
 
-#if 0
-
-static int keep_di(int *pi, int *pj, int n, int nonunit)
+static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 {
-    int ki, kj, j_;
-    for (kj = 0; kj < n; ++kj)
-	if (pi[kj] == NA_INTEGER || pj[kj] == NA_INTEGER)
-	    return 0;
-    for (kj = 0; kj < n; ++kj) {
-	j_ = pj[kj];
-	for (ki = 0; ki < kj; ++ki)
-	    if (pi[ki] == j_)
-		return 0;
-	for (ki = kj+1; ki < n; ++ki)
-	    if (pi[ki] == j_)
-		return 0;
+    int k, ident = memcmp(pi, pj, n * sizeof(int)) == 0;
+    if (checkNA) {
+	if (ident) {
+	    for (k = 0; k < n; ++k)
+		if (pi[k] == NA_INTEGER)
+		    return 0;
+	} else {
+	    for (k = 0; k < n; ++k)
+		if (pi[k] == NA_INTEGER || pj[k] == NA_INTEGER)
+		    return 0;
+	}
     }
-    return KEEP;
-
-#undef KEEP
-    
+    if (ident) {
+	/* diagonal iff no duplicates; unit diagonal is preserved */
+	char *work;
+	Calloc_or_Alloca_TO(work, lwork, char);
+	--work;
+	for (k = 0; k < n; ++k) {
+	    if (work[pi[k]])
+		return 0;
+	    work[pi[k]] = 1;
+	}
+	++work;
+	Free_FROM(work, lwork);
+	return (nonunit) ? 1 : 2;
+    } else {
+	/* brute force ... */
+	int ki, kj, j_;
+	for (kj = 0; kj < n; ++kj) {
+	    j_ = pj[kj];
+	    for (ki = 0; ki < kj; ++ki)
+		if (pi[ki] == j_)
+		    return 0;
+	    for (ki = kj+1; ki < n; ++ki)
+		if (pi[ki] == j_)
+		    return 0;
+	}
+	return 1;
+    }
 }
-
-#endif
 
 static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 					  const char *cl)
@@ -958,12 +1014,13 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	*pj = (mj) ? NULL : INTEGER(j);
 	
     int upper = 1, nonunit = 1, keep = 0;
+    SEXP uplo, diag;
     if (cl[1] != 'g') {
-	SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
+	PROTECT(uplo = GET_SLOT(x, Matrix_uploSym));
 	upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
 	UNPROTECT(1); /* uplo */
 	if (cl[1] == 't') {
-	    SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
+	    PROTECT(diag = GET_SLOT(x, Matrix_diagSym));
 	    nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
 	    UNPROTECT(1); /* diag */
 	}
@@ -973,7 +1030,7 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     cl_[0] = cl[0];
     if (cl[1] != 'g' && !(mi || mj) && ni == nj) {
 	if (cl[1] == 't') {
-	    keep = keep_tr(pi, pj, ni, upper, nonunit);
+	    keep = keep_tr(pi, pj, ni, upper, nonunit, 1);
 	    if (keep) {
 		cl_[1] = 't';
 		cl_[2] = 'r';
@@ -995,16 +1052,16 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     UNPROTECT(1); /* dim */
 
     if (keep < 0) {
-	SEXP uplo = PROTECT(GET_SLOT(res, Matrix_uploSym)),
-	    uplo0 = PROTECT(mkChar("L"));
-	SET_STRING_ELT(uplo, 0, uplo0);
-	UNPROTECT(2); /* uplo, uplo0 */
+	PROTECT(uplo = GET_SLOT(res, Matrix_uploSym));
+	SEXP uplo_ = PROTECT(mkChar("L"));
+	SET_STRING_ELT(uplo, 0, uplo_);
+	UNPROTECT(2); /* uplo_, uplo */
     }
     if (keep < -1 || keep > 1) {
-	SEXP diag = PROTECT(GET_SLOT(res, Matrix_diagSym)),
-	    diag0 = PROTECT(mkChar("U"));
-	SET_STRING_ELT(diag, 0, diag0);
-	UNPROTECT(2); /* diag, diag0 */
+	PROTECT(diag = GET_SLOT(res, Matrix_diagSym));
+	SEXP diag_ = PROTECT(mkChar("U"));
+	SET_STRING_ELT(diag, 0, diag_);
+	UNPROTECT(2); /* diag_, diag */
     }
 
     if ((double) ni * nj > R_XLEN_T_MAX)
@@ -1230,11 +1287,12 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	*pj = (mj) ? NULL : INTEGER(j);
     	
     int upper = 1, nonunit = 1, keep = 0;
-    SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
+    SEXP uplo, diag;
+    PROTECT(uplo = GET_SLOT(x, Matrix_uploSym));
     upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
     UNPROTECT(1); /* uplo */
     if (cl[1] == 't') {
-	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
+	PROTECT(diag = GET_SLOT(x, Matrix_diagSym));
 	nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
 	UNPROTECT(1); /* diag */
     }
@@ -1243,7 +1301,7 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     cl_[0] = cl[0];
     if (!(mi || mj) && ni == nj) {
 	if (cl[1] == 't') {
-	    keep = keep_tr(pi, pj, ni, upper, nonunit);
+	    keep = keep_tr(pi, pj, ni, upper, nonunit, 1);
 	    if (keep) {
 		cl_[1] = 't';
 		cl_[2] = 'p';
@@ -1260,21 +1318,21 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
     PROTECT(dim = GET_SLOT(res, Matrix_DimSym));
     pdim = INTEGER(dim);
-    pdim[0] = (int) ni;
-    pdim[1] = (int) nj;
+    pdim[0] = ni;
+    pdim[1] = nj;
     UNPROTECT(1); /* dim */
     
     if (keep < 0) {
-	SEXP uplo = PROTECT(GET_SLOT(res, Matrix_uploSym)),
-	    uplo0 = PROTECT(mkChar("L"));
-	SET_STRING_ELT(uplo, 0, uplo0);
-	UNPROTECT(2); /* uplo, uplo0 */
+	PROTECT(uplo = GET_SLOT(res, Matrix_uploSym));
+	SEXP uplo_ = PROTECT(mkChar("L"));
+	SET_STRING_ELT(uplo, 0, uplo_);
+	UNPROTECT(2); /* uplo_, uplo */
     }
     if (keep < -1 || keep > 1) {
-	SEXP diag = PROTECT(GET_SLOT(res, Matrix_diagSym)),
-	    diag0 = PROTECT(mkChar("U"));
-	SET_STRING_ELT(diag, 0, diag0);
-	UNPROTECT(2); /* diag, diag0 */
+	PROTECT(diag = GET_SLOT(res, Matrix_diagSym));
+	SEXP diag_ = PROTECT(mkChar("U"));
+	SET_STRING_ELT(diag, 0, diag_);
+	UNPROTECT(2); /* diag_, diag */
     }
 
     double ninj = (double) ni * nj;
@@ -1391,7 +1449,6 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
     SUB2_CASES;
 
-#undef SUB2_CASES
 #undef SUB2
 #undef SUB2_LOOP
 #undef XIJ_TP_U_N
@@ -1407,15 +1464,15 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     return res;
 }
 
-static SEXP  CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-					  const char *cl)
+static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
+					 const char *cl)
 {
     error(_("not yet implemented"));
     return R_NilValue;
 }
 
-static SEXP  RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-					  const char *cl)
+static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
+					 const char *cl)
 {
     error(_("not yet implemented"));
     return R_NilValue;    
@@ -1424,17 +1481,235 @@ static SEXP  RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 					  const char *cl)
 {
-    error(_("not yet implemented"));
-    return R_NilValue;
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0];
+    UNPROTECT(1); /* dim */
+
+    int mi = isNull(i),
+	mj = isNull(j),
+	ni = (mi) ? m : LENGTH(i),
+	nj = (mj) ? m : LENGTH(j),
+	*pi = (mi) ? NULL : INTEGER(i),
+	*pj = (mj) ? NULL : INTEGER(j);
+    	
+    int nonunit = 1, keep = 0;
+    SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
+    nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
+    UNPROTECT(1); /* diag */
+    
+    char cl_[] = ".gCMatrix";
+    cl_[0] = cl[0];
+    if (!(mi || mj) && ni == nj) {
+	keep = keep_di(pi, pj, ni, nonunit, 0, m);
+	if (keep) {
+	    cl_[1] = 'd';
+	    cl_[2] = 'i';
+	}
+    }
+    SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(cl_));
+
+    PROTECT(dim = GET_SLOT(res, Matrix_DimSym));
+    pdim = INTEGER(dim);
+    pdim[0] = (int) ni;
+    pdim[1] = (int) nj;
+    UNPROTECT(1); /* dim */
+    
+    if (keep > 1) {
+	
+	PROTECT(diag = GET_SLOT(res, Matrix_diagSym));
+	SEXP diag_ = PROTECT(mkChar("U"));
+	SET_STRING_ELT(diag, 0, diag_);
+	UNPROTECT(2); /* diag_, diag */
+
+    } else if (keep) {
+
+	SEXPTYPE tx1;
+	SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
+	    x1 = PROTECT(allocVector(tx1 = TYPEOF(x0), ni));
+	int j_;
+
+#define SUB2(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)	\
+	do {						\
+	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);	\
+	    while (ni--)				\
+		*(px1++) =				\
+		    (*(pi++) != (j_ = *(pj++)))		\
+		    ? _ZERO_				\
+		    : ((nonunit) ? px0[j_-1] : _ONE_);	\
+	} while (0)
+	
+	SUB2_CASES;
+
+#undef SUB2
+	
+	SET_SLOT(res, Matrix_xSym, x1);
+	UNPROTECT(2); /* x0, x1 */
+
+    } else {
+
+	SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+	int ki, kj, j_, *pp1 = INTEGER(p1);
+	*(pp1++) = 0;
+
+	for (kj = 0; kj < nj; ++kj) {
+	    pp1[kj] = 0;
+	    j_ = (mj) ? kj : pj[kj]-1;
+	    for (ki = 0; ki < ni; ++ki)
+		if (((mi) ? ki : pi[ki]-1) == j_)
+		    ++pp1[kj];
+	    if (pp1[kj] > INT_MAX - pp1[kj-1])
+		error(_("x[i,j] too dense for CsparseMatrix; "
+			"would have at least 2^31 nonzero entries"));
+	    pp1[kj] += pp1[kj-1];
+	}
+
+	SEXPTYPE tx1;
+	SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj-1])),
+	    x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
+	    x1 = PROTECT(allocVector(tx1 = TYPEOF(x0), pp1[nj-1]));
+	int *pi1 = INTEGER(i1);
+	
+#define SUB2(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_)		\
+	do {							\
+	    _CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1);		\
+	    for (kj = 0; kj < nj; ++kj) {			\
+		j_ = (mj) ? kj : pj[kj]-1;			\
+		for (ki = 0; ki < ni; ++ki) {			\
+		    if (((mi) ? ki : pi[ki]-1) == j_) {		\
+			*(pi1++) = ki;				\
+			*(px1++) = (nonunit) ? px0[j_] : _ONE_;	\
+		    }						\
+		}						\
+	    }							\
+	} while (0)
+	
+	SUB2_CASES;
+
+#undef SUB2
+
+	SET_SLOT(res, Matrix_pSym, p1);
+	SET_SLOT(res, Matrix_iSym, i1);
+	SET_SLOT(res, Matrix_xSym, x1);
+	UNPROTECT(4); /* x1, x0, i1, p1 */
+
+    }
+
+    UNPROTECT(1); /* res */
+    return res;
 }
 
-static SEXP      indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-					  const char *cl)
+/* FIXME: for pMatrix 'x', give pMatrix if 'i', 'j' are length-n permutations */
+static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
+				     const char *cl)
 {
-    error(_("not yet implemented"));
-    return R_NilValue;
+    PROTECT_INDEX pid;
+    PROTECT_WITH_INDEX(x, &pid);
+    
+    if (!isNull(i)) {
+	int ki, ni = LENGTH(i), *pi = INTEGER(i);
+	SEXP y = PROTECT(NEW_OBJECT_OF_CLASS("indMatrix")),
+	    dim0 = PROTECT(GET_SLOT(x, Matrix_DimSym)),
+	    dim1 = PROTECT(GET_SLOT(y, Matrix_DimSym)),
+	    perm0 = PROTECT(GET_SLOT(x, Matrix_permSym)),
+	    perm1 = PROTECT(allocVector(INTSXP, ni));
+	int *pdim0 = INTEGER(dim0),
+	    *pdim1 = INTEGER(dim1),
+	    *pperm0 = INTEGER(perm0),
+	    *pperm1 = INTEGER(perm1),
+	    n = pdim0[1];
+
+	pdim1[0] = ni;
+	pdim1[1] = n;
+	
+	for (ki = 0; ki < ni; ++ki)
+	    *(pperm1++) = pperm0[*(pi++)-1];
+
+	SET_SLOT(y, Matrix_permSym, perm1);
+	
+	UNPROTECT(5); /* perm1, perm0, dim1, dim0, y */
+	REPROTECT(x = y, pid);
+    }
+    
+    if (!isNull(j)) {
+	int kj, nj = LENGTH(j), *pj = INTEGER(j);
+	SEXP y = PROTECT(NEW_OBJECT_OF_CLASS("ngCMatrix")),
+	    dim0 = PROTECT(GET_SLOT(x, Matrix_DimSym)),
+	    dim1 = PROTECT(GET_SLOT(y, Matrix_DimSym)),
+	    perm0 = PROTECT(GET_SLOT(x, Matrix_permSym)),
+	    p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+	int *pdim0 = INTEGER(dim0),
+	    *pdim1 = INTEGER(dim1),
+	    *pperm0 = INTEGER(perm0),
+	    *pp1 = INTEGER(p1),
+	    k, kend, m = pdim0[0], n = pdim0[1];
+	
+	pdim1[0] = m;
+	pdim1[1] = nj;
+	
+	int *workA, *workB, *workC;
+	size_t lwork = (size_t) n + n + m;
+	Calloc_or_Alloca_TO(workA, lwork, int);
+	workB = workA + n;
+	workC = workB + n;
+	--workA; /* now 1-indexed */
+	--workB; /* now 1-indexed */
+
+	/* 1. Compute 'x' column counts in 'workA' */
+	for (k = 0; k < m; ++k)
+	    ++workA[pperm0[k]];
+
+	/* 2. Compute 'y' column pointers in 'pp1' */
+	*(pp1++) = 0;
+	for (kj = 0; kj < nj; ++kj) {
+	    pp1[kj] = workA[pj[kj]];
+	    if (pp1[kj] > INT_MAX - pp1[kj-1])
+		error(_("x[i,j] too dense for CsparseMatrix; "
+			"would have at least 2^31 nonzero entries"));
+	    pp1[kj] += pp1[kj-1];
+	}
+
+	/* 3. Compute 'x' column pointers in 'workB' and copy to 'workA' */
+	workB[1] = 0;
+	for (k = 1; k < n; ++k) {
+	    workB[k+1] = workB[k] + workA[k];
+	    workA[k] = workB[k];
+	}
+	workA[n] = workB[n];
+
+	/* 4. Sort row indices into 'workC' */
+	for (k = 0; k < m; ++k)
+	    workC[workA[pperm0[k]]++] = k;
+
+	SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj-1]));
+	int *pi1 = INTEGER(i1), pos;
+
+	/* 5. Copy row indices from 'workC' to 'pi1' */
+	k = 0;
+	for (kj = 0; kj < nj; ++kj) {
+	    kend = pp1[kj];
+	    pos = workB[pj[kj]];
+	    while (k < kend)
+		pi1[k++] = workC[pos++];
+	}
+
+	++workA; /* now 0-indexed */
+	Free_FROM(workA, lwork);
+
+	SET_SLOT(y, Matrix_pSym, p1);
+	SET_SLOT(y, Matrix_iSym, i1);
+	
+	UNPROTECT(6); /* i1, p1, perm0, dim1, dim0, y */
+	REPROTECT(x = y, pid);
+    }
+    
+    UNPROTECT(1); /* x */
+    return x;
 }
 
+/* x[i,j,drop=FALSE] with 'i' and 'j' of type "integer" and length 
+   not exceeding 2^31-1 {'i' in 1:m or NA, 'j' in 1:n or NA} ... 
+   but _not_ handling 'Dimnames'
+*/
 SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 {
     static const char *valid[] = { VALID_NONVIRTUAL, "" };
@@ -1450,6 +1725,26 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	return unpackedMatrix_subscript_2ary(x, i, j, cl);
     case 'p':
 	return   packedMatrix_subscript_2ary(x, i, j, cl);
+    default:
+	break;
+    }
+
+    if (!isNull(i)) {
+	int ni = LENGTH(i), *pi = INTEGER(i);
+	while (ni--)
+	    if (*(pi++) == NA_INTEGER)
+		error(_("NA subscripts in x[i,j] not supported "
+			"for sparseMatrix 'x'"));
+    }
+    if (!isNull(j)) {
+	int nj = LENGTH(j), *pj = INTEGER(j);
+	while (nj--)
+	    if (*(pj++) == NA_INTEGER)
+		error(_("NA subscripts in x[i,j] not supported "
+			"for sparseMatrix 'x'"));
+    }
+
+    switch (cl[2]) {
     case 'C':
 	return  CsparseMatrix_subscript_2ary(x, i, j, cl);
     case 'R':
