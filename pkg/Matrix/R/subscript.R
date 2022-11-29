@@ -319,12 +319,11 @@
 }
 
 ## x[i, j, drop] where 'i' and 'j' are vectors of type "integer"
-## with 'i' in 1:m (or NA) and 'j' in 1:n (or NA) ... NULL => missing
+## of length not exceeding 2^31-1 with 'i' in 1:m (or NA) and 'j'
+## in 1:n (or NA) ... NULL => missing
 ..subscript.2ary <- function(x, i, j, drop) {
     if(is.null(i) && is.null(j))
         r <- x
-    else if(is(x, "sparseMatrix") && (anyNA(i) || anyNA(j)))
-        stop("NA subscripts in x[i,j] not yet supported for sparseMatrix 'x'")
     else {
         r <- .Call(R_subscript_2ary, x, i, j)
         dn <- dimnames(x)
