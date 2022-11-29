@@ -1598,111 +1598,159 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     return res;
 }
 
-/* FIXME: for pMatrix 'x', give pMatrix if 'i', 'j' are length-n permutations */
 static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 				     const char *cl)
 {
-    PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(x, &pid);
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
     
+    SEXP perm0 = GET_SLOT(x, Matrix_permSym);
+    int *pperm0 = INTEGER(perm0);
+    
+    PROTECT_INDEX pidA, pidB;
+    PROTECT_WITH_INDEX(x, &pidA);
+    PROTECT_WITH_INDEX(perm0, &pidB);
+    
+    int isP = cl[0] == 'p';
+
     if (!isNull(i)) {
 	int ki, ni = LENGTH(i), *pi = INTEGER(i);
-	SEXP y = PROTECT(NEW_OBJECT_OF_CLASS("indMatrix")),
-	    dim0 = PROTECT(GET_SLOT(x, Matrix_DimSym)),
-	    dim1 = PROTECT(GET_SLOT(y, Matrix_DimSym)),
-	    perm0 = PROTECT(GET_SLOT(x, Matrix_permSym)),
-	    perm1 = PROTECT(allocVector(INTSXP, ni));
-	int *pdim0 = INTEGER(dim0),
-	    *pdim1 = INTEGER(dim1),
-	    *pperm0 = INTEGER(perm0),
-	    *pperm1 = INTEGER(perm1),
-	    n = pdim0[1];
-
-	pdim1[0] = ni;
-	pdim1[1] = n;
+	isP = isP && ni == m;
+	if (isP) {
+	    char *work;
+	    Calloc_or_Alloca_TO(work, m, char);
+	    --work; /* now 1-indexed */
+	    for (ki = 0; ki < ni; ++ki) {
+		if (work[pi[ki]]) {
+		    isP = 0;
+		    break;
+		}
+		work[pi[ki]] = 1;
+	    }
+	    ++work; /* now 0-indexed */
+	    Free_FROM(work, m);
+	}
 	
+	x = NEW_OBJECT_OF_CLASS((isP) ? "pMatrix" : "indMatrix");
+	REPROTECT(x, pidA);
+	
+	PROTECT(dim = GET_SLOT(x, Matrix_DimSym));
+	pdim = INTEGER(dim);
+	pdim[0] = m = ni;
+	pdim[1] = n;
+	UNPROTECT(1); /* dim */
+	
+	SEXP perm1 = PROTECT(allocVector(INTSXP, ni));
+	int *pperm1 = INTEGER(perm1);
+	--pperm0; /* now 1-indexed */
 	for (ki = 0; ki < ni; ++ki)
-	    *(pperm1++) = pperm0[*(pi++)-1];
-
-	SET_SLOT(y, Matrix_permSym, perm1);
+	    pperm1[ki] = pperm0[pi[ki]];
+	SET_SLOT(x, Matrix_permSym, perm1);
+	UNPROTECT(1); /* perm1 */
 	
-	UNPROTECT(5); /* perm1, perm0, dim1, dim0, y */
-	REPROTECT(x = y, pid);
+	perm0 = perm1;
+	pperm0 = pperm1;
+	REPROTECT(perm0, pidB);
     }
     
     if (!isNull(j)) {
 	int kj, nj = LENGTH(j), *pj = INTEGER(j);
-	SEXP y = PROTECT(NEW_OBJECT_OF_CLASS("ngCMatrix")),
-	    dim0 = PROTECT(GET_SLOT(x, Matrix_DimSym)),
-	    dim1 = PROTECT(GET_SLOT(y, Matrix_DimSym)),
-	    perm0 = PROTECT(GET_SLOT(x, Matrix_permSym)),
-	    p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
-	int *pdim0 = INTEGER(dim0),
-	    *pdim1 = INTEGER(dim1),
-	    *pperm0 = INTEGER(perm0),
-	    *pp1 = INTEGER(p1),
-	    k, kend, m = pdim0[0], n = pdim0[1];
-	
-	pdim1[0] = m;
-	pdim1[1] = nj;
-	
-	int *workA, *workB, *workC;
-	size_t lwork = (size_t) n + n + m;
-	Calloc_or_Alloca_TO(workA, lwork, int);
-	workB = workA + n;
-	workC = workB + n;
-	--workA; /* now 1-indexed */
-	--workB; /* now 1-indexed */
-
-	/* 1. Compute 'x' column counts in 'workA' */
-	for (k = 0; k < m; ++k)
-	    ++workA[pperm0[k]];
-
-	/* 2. Compute 'y' column pointers in 'pp1' */
-	*(pp1++) = 0;
-	for (kj = 0; kj < nj; ++kj) {
-	    pp1[kj] = workA[pj[kj]];
-	    if (pp1[kj] > INT_MAX - pp1[kj-1])
-		error(_("x[i,j] too dense for CsparseMatrix; "
-			"would have at least 2^31 nonzero entries"));
-	    pp1[kj] += pp1[kj-1];
+	isP = isP && nj == n;
+	if (isP) {
+	    char *work;
+	    Calloc_or_Alloca_TO(work, nj, char);
+	    --work; /* now 1-indexed */
+	    for (kj = 0; kj < nj; ++kj) {
+		if (work[pj[kj]]) {
+		    isP = 0;
+		    break;
+		}
+		work[pj[kj]] = 1;
+	    }
+	    ++work; /* now 0-indexed */
+	    Free_FROM(work, nj);
 	}
-
-	/* 3. Compute 'x' column pointers in 'workB' and copy to 'workA' */
-	workB[1] = 0;
-	for (k = 1; k < n; ++k) {
-	    workB[k+1] = workB[k] + workA[k];
-	    workA[k] = workB[k];
-	}
-	workA[n] = workB[n];
-
-	/* 4. Sort row indices into 'workC' */
-	for (k = 0; k < m; ++k)
-	    workC[workA[pperm0[k]]++] = k;
-
-	SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj-1]));
-	int *pi1 = INTEGER(i1), pos;
-
-	/* 5. Copy row indices from 'workC' to 'pi1' */
-	k = 0;
-	for (kj = 0; kj < nj; ++kj) {
-	    kend = pp1[kj];
-	    pos = workB[pj[kj]];
-	    while (k < kend)
-		pi1[k++] = workC[pos++];
-	}
-
-	++workA; /* now 0-indexed */
-	Free_FROM(workA, lwork);
-
-	SET_SLOT(y, Matrix_pSym, p1);
-	SET_SLOT(y, Matrix_iSym, i1);
 	
-	UNPROTECT(6); /* i1, p1, perm0, dim1, dim0, y */
-	REPROTECT(x = y, pid);
+	x = NEW_OBJECT_OF_CLASS((isP) ? "pMatrix" : "ngCMatrix");
+	REPROTECT(x, pidA);
+	
+	PROTECT(dim = GET_SLOT(x, Matrix_DimSym));
+	pdim = INTEGER(dim);
+	pdim[0] = m;
+	pdim[1] = n = nj;
+	UNPROTECT(1); /* dim */
+
+	if (isP) {
+	    SEXP perm1 = PROTECT(allocVector(INTSXP, nj));
+	    int *pperm1 = INTEGER(perm1), *work;
+	    Calloc_or_Alloca_TO(work, nj, int);
+	    --work; /* now 1-indexed */
+	    for (kj = 0; kj < nj; ++kj)
+		work[pj[kj]] = kj + 1;
+	    for (kj = 0; kj < nj; ++kj)
+		pperm1[kj] = work[pperm0[kj]];
+	    ++work; /* now 0-indexed */
+	    Free_FROM(work, nj);
+	    SET_SLOT(x, Matrix_permSym, perm1);
+	    UNPROTECT(1); /* perm1 */
+	} else {
+	    SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+	    int *pp1 = INTEGER(p1), k, kend, *workA, *workB, *workC;
+	    size_t lwork = (size_t) n + n + m;
+	    Calloc_or_Alloca_TO(workA, lwork, int);
+	    workB = workA + n;
+	    workC = workB + n;
+	    --workA; /* now 1-indexed */
+	    --workB; /* now 1-indexed */
+
+	    /* 1. Compute old column counts in 'workA' */
+	    for (k = 0; k < m; ++k)
+		++workA[pperm0[k]];
+	    
+	    /* 2. Compute new column pointers in 'pp1' */
+	    *(pp1++) = 0;
+	    for (kj = 0; kj < nj; ++kj) {
+		pp1[kj] = workA[pj[kj]];
+		if (pp1[kj] > INT_MAX - pp1[kj-1])
+		    error(_("x[i,j] too dense for CsparseMatrix; "
+			    "would have at least 2^31 nonzero entries"));
+		pp1[kj] += pp1[kj-1];
+	    }
+
+	    /* 3. Compute old column pointers in 'workB' and copy to 'workA' */
+	    workB[1] = 0;
+	    for (k = 1; k < n; ++k) {
+		workB[k+1] = workB[k] + workA[k];
+		workA[k] = workB[k];
+	    }
+	    workA[n] = workB[n];
+
+	    /* 4. Sort old row indices into 'workC' */
+	    for (k = 0; k < m; ++k)
+		workC[workA[pperm0[k]]++] = k;
+	    
+	    SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj-1]));
+	    int *pi1 = INTEGER(i1), pos;
+	    
+	    /* 5. Copy row indices from 'workC' to 'pi1' */
+	    k = 0;
+	    for (kj = 0; kj < nj; ++kj) {
+		kend = pp1[kj];
+		pos = workB[pj[kj]];
+		while (k < kend)
+		    pi1[k++] = workC[pos++];
+	    }
+	    
+	    ++workA; /* now 0-indexed */
+	    Free_FROM(workA, lwork);
+	    SET_SLOT(x, Matrix_pSym, p1);
+	    SET_SLOT(x, Matrix_iSym, i1);
+	    UNPROTECT(2); /* i1, p1 */
+	}
     }
     
-    UNPROTECT(1); /* x */
+    UNPROTECT(2); /* perm0, x */
     return x;
 }
 
