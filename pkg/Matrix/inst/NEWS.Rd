@@ -5,13 +5,25 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2022-11-18 r3780)}{
+\section{Changes in version 1.5-4 (2022-11-29 r3796)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Defining \code{sequence.default} for \R{} \code{< 4.0.0},
       so that \code{kronecker(<CsparseMatrix>, <CsparseMatrix>)},
       \code{kronecker(<CsparseMatrix>, <diagonalMatrix>)}, and
       \code{<diagonalMatrix> \%*\% <denseMatrix>} continue to work there.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item C-level utilities \code{Matrix_memset()} and
+      \code{Matrix_memcpy()}, both new, are now used in many places
+      instead of API macros \code{Memzero()} and \code{Memcpy()}
+      which never check for overflow.  C-level macro \code{AZERO()}
+      is no longer defined.
+      
+      \item C-level macro \code{Calloc_or_Alloca_TO()} now
+      zero-initializes also in the \code{alloca}-using case.
     }
   }
 }
