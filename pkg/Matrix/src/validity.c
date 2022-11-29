@@ -405,7 +405,6 @@ SEXP pMatrix_validate(SEXP obj)
 	int i, *pperm = INTEGER(perm);
 	char *work;
 	Calloc_or_Alloca_TO(work, n, char);
-	Matrix_memset(work, 0, n, sizeof(char));
 	--work;
 	for (i = 0; i < n; ++i) {
 	    if (work[*pperm])
@@ -1178,7 +1177,6 @@ SEXP sparseLU_validate(SEXP obj)
     int i, *pp = INTEGER(p), *pq = INTEGER(q);
     char *work;
     Calloc_or_Alloca_TO(work, n, char);
-    Matrix_memset(work, 0, n, sizeof(char));
     for (i = 0; i < n; ++i) {
 	if (*pp == NA_INTEGER)
 	    FRUPRET(work, n, 2, "'p' slot contains NA");
@@ -1262,7 +1260,6 @@ SEXP sparseQR_validate(SEXP obj)
     int i, *pp = INTEGER(p);
     char *work;
     Calloc_or_Alloca_TO(work, m2, char); /* n <= m <= m2 */
-    Matrix_memset(work, 0, m2, sizeof(char));
     for (i = 0; i < m2; ++i) {
 	if (*pp == NA_INTEGER)
 	    FRUPRET(work, m2, 2, "'p' slot contains NA");

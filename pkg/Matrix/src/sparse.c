@@ -3399,7 +3399,6 @@ SEXP R_sparse_skewpart(SEXP from)
 
 	int *pp1_;
 	Calloc_or_Alloca_TO(pp1_, n, int);
-	Matrix_memset(pp1_, 0, n, sizeof(int));
 	
 	SEXP x0_ = NULL;
 	if (clf[0] != 'n') {
@@ -3904,7 +3903,6 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     
 #define T_AS_CR_1					\
     do {						\
-	Matrix_memset(workA, 0, m_, sizeof(int));	\
 	for (k = 0; k < nnz0; ++k)			\
 	    ++workA[pi0[k]];				\
     } while (0)
@@ -3917,11 +3915,9 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     
 #define T_AS_CR_2					\
     do {						\
-	if (r_ > 0) {					\
-	    workB[0] = 0;				\
+	if (r_ > 0)					\
 	    for (i = 1; i < m_; ++i)			\
 		workA[i] += (workB[i] = workA[i-1]);	\
-	}						\
     } while (0)
     
     /* 3. Group column indices and data by row in pj_[k], px_[k]
