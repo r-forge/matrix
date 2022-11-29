@@ -25,7 +25,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn)
 	int info;
 	double *px = REAL(x), *py = REAL(y);
 
-	Memzero(py, nn);
+	Matrix_memset(py, 0, nn, sizeof(double));
 	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
 	F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
 

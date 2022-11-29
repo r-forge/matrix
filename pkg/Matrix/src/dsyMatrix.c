@@ -28,7 +28,7 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 	
 #define DSYTRF_FINISH(_UL_)						\
 	do {								\
-	    Memzero(py, nn);						\
+	    Matrix_memset(py, 0, nn, sizeof(double));			\
 	    F77_CALL(dlacpy)(&_UL_, pdim, pdim, px, pdim, py, pdim FCONE); \
 	    F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, &tmp, &lwork, \
 			     &info FCONE);				\
