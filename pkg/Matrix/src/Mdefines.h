@@ -1,15 +1,35 @@
 #ifndef MATRIX_DEFINES_H
 #define MATRIX_DEFINES_H
 
-/* R has the same in several places : */
-#define Matrix_CallocThreshold 10000
-#define Matrix_ErrorBufferSize  4096
+/* NB: system headers should come before R headers */
 
-#define Matrix_SupportingCachedMethods
+#ifdef __GLIBC__
+/* ensure that strdup() and others are declared when string.h is included : */
+# define _POSIX_C_SOURCE 200809L
+#endif
 
-#undef Matrix_with_SPQR
-#undef HAVE_PROPER_IMATRIX
-#undef HAVE_PROPER_ZMATRIX
+#include <string.h>
+#include <stdint.h>
+#include <limits.h>
+
+#if defined(INT_FAST64_MAX)
+typedef int_fast64_t Matrix_int_fast64_t;
+# define MATRIX_INT_FAST64_MAX INT_FAST64_MAX
+#elif defined(LLONG_MAX)
+typedef    long long Matrix_int_fast64_t;
+# define MATRIX_INT_FAST64_MAX LLONG_MAX
+#else
+typedef    long long Matrix_int_fast64_t;
+# define MATRIX_INT_FAST64_MAX 9223372036854775807 /* 2^63-1 */
+#endif
+
+#ifndef STRICT_R_HEADERS
+# define STRICT_R_HEADERS
+#endif
+
+#include <R.h>
+#include <Rinternals.h>
+#include <Rversion.h>
 
 /* Copy and paste from WRE : */
 #ifdef ENABLE_NLS
@@ -39,9 +59,13 @@ extern void *alloca(size_t);
 # endif
 #endif
 
+/* R has the same in several places : */
+#define Matrix_CallocThreshold 10000
+#define Matrix_ErrorBufferSize  4096
+
 #define Alloca(_N_, _CTYPE_)					\
     (_CTYPE_ *) alloca((size_t) (_N_) * sizeof(_CTYPE_))
-    
+
 #define Calloc_or_Alloca_TO(_VAR_, _N_, _CTYPE_)		\
     do {							\
 	if (_N_ >= Matrix_CallocThreshold)			\
@@ -163,6 +187,12 @@ enum x_slot_kind {
 /* Requires 'x' slot, hence not for nsparseMatrix or indMatrix : */
 #define Real_kind(_x_)				\
     (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
+
+/* Eventually these will no longer be needed : */
+#define Matrix_SupportingCachedMethods
+#undef Matrix_with_SPQR
+#undef HAVE_PROPER_IMATRIX
+#undef HAVE_PROPER_ZMATRIX
 
 
 /* ==== NO LONGER USED ============================================== */
