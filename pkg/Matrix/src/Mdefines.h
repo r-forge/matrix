@@ -12,15 +12,12 @@
 #include <stdint.h>
 #include <limits.h>
 
-#if defined(INT_FAST64_MAX)
+#ifdef INT_FAST64_MAX
 typedef int_fast64_t Matrix_int_fast64_t;
 # define MATRIX_INT_FAST64_MAX INT_FAST64_MAX
-#elif defined(LLONG_MAX)
-typedef    long long Matrix_int_fast64_t;
-# define MATRIX_INT_FAST64_MAX LLONG_MAX
 #else
 typedef    long long Matrix_int_fast64_t;
-# define MATRIX_INT_FAST64_MAX 9223372036854775807 /* 2^63-1 */
+# define MATRIX_INT_FAST64_MAX      LLONG_MAX
 #endif
 
 #ifndef STRICT_R_HEADERS
@@ -37,7 +34,6 @@ typedef    long long Matrix_int_fast64_t;
 # define _(String) dgettext("Matrix", String)
 #else
 # define _(String) (String)
-/* <libintl.h> tests N == 1, _not_ N > 1 */
 # define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
 #endif
 
