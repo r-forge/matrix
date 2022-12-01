@@ -43,15 +43,22 @@
             stop(.subscript.error.ist(i), domain = NA)
         if(!(has.x <- .hasSlot(i, "x")) || is.logical(i.x <- i@x)) {
             ## [nl]sparseVector
-            i.length <- i@length # not exceeding 2^52, if valid
+            i.length <- i@length
             i <-
                 if(i.length == 0L)
                     integer(0L)
                 else {
                     i.i <- i@i
                     if(i.length >= mn) {
-                        if(i.length > mn && i.i[length(i.i)] >= mn + 1)
-                            i.i[i.i >= mn + 1] <- NA
+                        if(i.length > mn) {
+                            if(mn < 0x1p+53) {
+                                if(i.i[length(i.i)] >= mn + 1)
+                                    i.i[i.i >= mn + 1] <- NA
+                            } else {
+                                if(i.i[length(i.i)] > mn)
+                                    i.i[i.i > mn] <- NA
+                            }
+                        }
                         if(has.x) i.i[i.x] else i.i
                     } else {
                         r <- ceiling(mn / i.length)
@@ -63,13 +70,14 @@
                                                 by = as.integer(i.length),
                                                 length.out = r),
                                         each = length(i.i))
-                            else if(mn. <= 0x1p+52)
+                            else if(i.i[length(i.i)] + (r - 1) * i.length <=
+                                    0x1p+53)
                                 rep.int(as.double(i.i), r) +
                                     rep(seq.int(from = 0,
                                                 by = as.double(i.length),
                                                 length.out = r),
                                         each = length(i.i))
-                            else stop("attempt to recycle sparseVector to length exceeding maximum 2^52")
+                            else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
                         if(has.x) {
                             if(mn. > mn) i.i[i.x & i.i <= mn] else i.i[i.x]
                         } else {
@@ -84,22 +92,18 @@
     switch(typeof(i),
            double =
                {
-                   r <- range(1, 0x1p+52, i, na.rm = TRUE)
-                   if(r[1L] < 1)
-                       i <- if(r[1L] <= -1)
+                   r <- min(1, i, na.rm = TRUE)
+                   if(r < 1)
+                       i <- if(r <= -1)
                                 seq_len(mn)[i] # FIXME
                             else i[i >= 1]
-                   if(r[2L] > 0x1p+52) {
-                       warning("subscripts exceeding maximum 2^52; NA produced")
-                       i[i > 0x1p+52] <- NA
-                   }
                    ..subscript.1ary(x, i)
                },
            integer =
                {
-                   m <- min(1L, i, na.rm = TRUE)
-                   if(m < 1L)
-                       i <- if(m <= -1L)
+                   r <- min(1L, i, na.rm = TRUE)
+                   if(r < 1L)
+                       i <- if(r <= -1L)
                                 seq_len(mn)[i] # FIXME
                             else i[i >= 1L]
                    ..subscript.1ary(x, i)
@@ -122,7 +126,7 @@
 }
 
 ## x[i] where 'i' is vector of type "integer" or "double"
-## with elements in the interval [1,2^52] (or NA)
+## with elements greater than or equal to 1 (or NA)
 ..subscript.1ary <- function(x, i,
                              shape = .M.shape(x),
                              repr = .M.repr(x),
@@ -133,8 +137,19 @@
         x <- ..diagU2N(x)
     if(shape == "s" || repr == "R") {
         mn <- prod(d <- x@Dim)
-        if(repr == "R" && mn < 0x1p+52 && max(mn, i, na.rm = TRUE) >= mn + 1)
-            i[i >= mn + 1] <- NA
+        if(mn < 0x1p+53) {
+            r <- max(mn, i, na.rm = TRUE)
+            if(r >= mn + 1)
+                i[i >= mn + 1] <- NA
+        } else if(is.double(i)) {
+            r <- max(0x1p+53, i, na.rm = TRUE)
+            if(r > 0x1p+53) {
+                if(any(i > 0x1p+53 && i <= mn, na.rm = TRUE))
+                    ## could be avoided in C, which has 64-bit integers :
+                    warning("subscripts exceeding 2^53 replaced with NA")
+                i[i > 0x1p+53] <- NA
+            }
+        }
         i1s <- i - 1L
         m <- d[1L]
         i. <- as.integer(i1s %% m)
@@ -178,7 +193,7 @@
         if(logic || i@Dim[2L] != 2L) {
             if(logic && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
-                if((len <- prod(i@Dim)) <= (mn <- prod(x@Dim)))
+                if((len <- prod(i@Dim)) <= (mn <- length(x)))
                     return(x)
                 else return(c(x, rep.int(NA, len - mn)))
             }
