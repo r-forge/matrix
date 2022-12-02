@@ -1,24 +1,28 @@
 /* unfinished and not-yet-used, along with ../R/subscript.R */
 #include "subscript.h"
 
-#define F_X( _X_)   (_X_)
+#define F_X( _X_)  (_X_)
 #define F_ND(_X_) ((_X_) ? 1 : 0)
 #define F_NS(_X_)          1
 
 static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    R_xlen_t l, len = XLENGTH(w);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
     
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
-
+#define SUB1_START(_SEXPTYPE_)					\
+    SEXPTYPE typ = _SEXPTYPE_;					\
+    R_xlen_t l = 0, len = XLENGTH(w);				\
+    SEXP res = allocVector(typ, len);				\
+    if (len == 0)						\
+	return res;						\
+    PROTECT(res);						\
+								\
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));		\
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];		\
+    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;	\
+    UNPROTECT(1)
+    
+    SUB1_START(kind2type(cl[0]));
+    
     int ge = cl[1] == 'g', tr = cl[1] == 't', upper = 1, nonunit = 1;
     if (!ge) {
 	SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
@@ -54,6 +58,14 @@ static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	    break;							\
 	}								\
     } while (0)
+
+#define SUB1_X(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_)	\
+    do {							\
+	PROTECT(x = GET_SLOT(x, Matrix_xSym));			\
+	_CTYPE_ *px = _PTR_(x);					\
+	SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_);	\
+	UNPROTECT(1);						\
+    } while (0)
     
 #define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_)		\
     do {								\
@@ -83,14 +95,6 @@ static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 			  _NA_, _ZERO_, _ONE_, _F_, Matrix_int_fast64_t); \
 	    }								\
 	}								\
-    } while (0)
-    
-#define SUB1_X(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_)	\
-    do {							\
-	PROTECT(x = GET_SLOT(x, Matrix_xSym));			\
-	_CTYPE_ *px = _PTR_(x);					\
-	SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_);	\
-	UNPROTECT(1);						\
     } while (0)
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_)	\
@@ -134,18 +138,8 @@ static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 static SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    R_xlen_t l, len = XLENGTH(w);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int m = INTEGER(dim)[0], n = m;
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
-
     int tr = cl[1] == 't', upper = 1, nonunit = 1;
     SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
     upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
@@ -212,17 +206,7 @@ static SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 static SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    R_xlen_t l = 0, len = XLENGTH(w);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
-    
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 	i = PROTECT(GET_SLOT(x, Matrix_iSym));
@@ -290,17 +274,7 @@ static SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 static SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    R_xlen_t l = 0, len = XLENGTH(w);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
-    
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 	j = PROTECT(GET_SLOT(x, Matrix_jSym));
@@ -368,18 +342,8 @@ static SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 static SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    R_xlen_t l, len = XLENGTH(w);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int m = INTEGER(dim)[0], n = m;
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
-
     SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
     int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
     UNPROTECT(1);
@@ -410,16 +374,7 @@ static SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 {
-    R_xlen_t l, len = XLENGTH(w);
-    SEXP res = PROTECT(allocVector(LGLSXP, len));
-    if (len == 0)
-	return res;
-    PROTECT(res);
-    
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-    UNPROTECT(1);
+    SUB1_START(LGLSXP);
     
     SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
     int *pperm = INTEGER(perm), i_, j_;
@@ -443,6 +398,7 @@ static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 
 #undef SUB1_LOOP
 #undef SUB1_N
+#undef SUB1_START
     
     UNPROTECT(2);
     return res;
@@ -494,12 +450,17 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 
 static SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    int l, len = (int) (XLENGTH(w) / 2);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    
+#define SUB1_START(_SEXPTYPE_)			\
+    SEXPTYPE typ = _SEXPTYPE_;			\
+    int l = 0, len = (int) (XLENGTH(w) / 2);	\
+    SEXP res = allocVector(typ, len);		\
+    if (len == 0)				\
+	return res;				\
+    PROTECT(res);				\
+    int *pw0 = INTEGER(w), *pw1 = pw0 + len
+
+    SUB1_START(kind2type(cl[0]));
     
     SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
     int m = INTEGER(dim)[0];
@@ -517,7 +478,6 @@ static SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	}
     }
     
-    int *pw0 = INTEGER(w), *pw1 = pw0 + len;
     Matrix_int_fast64_t i_, j_;
     
 #define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_)		\
@@ -564,12 +524,7 @@ static SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 static SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    int l, len = (int) (XLENGTH(w) / 2);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
     int m = INTEGER(dim)[0];
@@ -585,7 +540,6 @@ static SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	UNPROTECT(1);
     }
     
-    int *pw0 = INTEGER(w), *pw1 = pw0 + len;
     Matrix_int_fast64_t i_, j_;
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)		\
@@ -639,17 +593,11 @@ static SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 static SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    int l = 0, len = (int) (XLENGTH(w) / 2);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 	i = PROTECT(GET_SLOT(x, Matrix_iSym));
-    int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k = 0, kend,
-	*pw0 = INTEGER(w), *pw1 = pw0 + len;
+    int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k = 0, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)		\
     do {								\
@@ -709,17 +657,11 @@ static SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 static SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    int l = 0, len = (int) (XLENGTH(w) / 2);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 	j = PROTECT(GET_SLOT(x, Matrix_jSym));
-    int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k = 0, kend,
-	*pw0 = INTEGER(w), *pw1 = pw0 + len;
+    int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k = 0, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)		\
     do {								\
@@ -779,18 +721,11 @@ static SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 static SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-    SEXPTYPE typ = kind2type(cl[0]);
-    int l, len = (int) (XLENGTH(w) / 2);
-    SEXP res = allocVector(typ, len);
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(kind2type(cl[0]));
     
     SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
     int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
     UNPROTECT(1);
-
-    int *pw0 = INTEGER(w), *pw1 = pw0 + len;
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)	\
     do {							\
@@ -816,14 +751,10 @@ static SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 {
-    int l, len = (int) (XLENGTH(w) / 2);
-    SEXP res = PROTECT(allocVector(LGLSXP, len));
-    if (len == 0)
-	return res;
-    PROTECT(res);
+    SUB1_START(LGLSXP);
     
     SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
-    int *pperm = INTEGER(perm), *pw0 = INTEGER(w), *pw1 = pw0 + len;
+    int *pperm = INTEGER(perm);
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)		\
     do {								\
@@ -837,10 +768,11 @@ static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 
     SUB1_N(int, LOGICAL, NA_LOGICAL, 0, 1, );
 
-#undef SUB1_CASES
+#undef SUB1_LOOP
 #undef SUB1_N
 #undef SUB1_X
-#undef SUB1_LOOP
+#undef SUB1_CASES
+#undef SUB1_START
     
     UNPROTECT(2);
     return res;
@@ -1014,16 +946,21 @@ static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 					  const char *cl)
 {
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    UNPROTECT(1); /* dim */
 
-    int mi = isNull(i),
-	mj = isNull(j),
-	ni = (mi) ? m : LENGTH(i),
-	nj = (mj) ? n : LENGTH(j),
-	*pi = (mi) ? NULL : INTEGER(i),
-	*pj = (mj) ? NULL : INTEGER(j);
+#define SUB2_START					\
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));	\
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];	\
+    UNPROTECT(1); /* dim */				\
+							\
+    int ki, kj,						\
+	mi = isNull(i),					\
+	mj = isNull(j),					\
+	ni = (mi) ? m : LENGTH(i),			\
+	nj = (mj) ? n : LENGTH(j),			\
+	*pi = (mi) ? NULL : INTEGER(i),			\
+	*pj = (mj) ? NULL : INTEGER(j)
+
+    SUB2_START;
 	
     int upper = 1, nonunit = 1, keep = 0;
     SEXP uplo, diag;
@@ -1084,7 +1021,7 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 	x1 = PROTECT(allocVector(tx1 = TYPEOF(x0), nx1));
 
-    int i_, j_, ki, kj;
+    int i_, j_;
     Matrix_int_fast64_t m_ = m;
 
 #define SUB2_CASES							\
@@ -1100,7 +1037,8 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    SUB2(double, REAL, NA_REAL, 0.0, 1.0);			\
 	    break;							\
 	case CPLXSXP:							\
-	    SUB2(Rcomplex, COMPLEX, Matrix_zna, Matrix_zzero, Matrix_zone); \
+	    SUB2(Rcomplex, COMPLEX,					\
+		 Matrix_zna, Matrix_zzero, Matrix_zone);		\
 	    break;							\
 	default:							\
 	    break;							\
@@ -1285,16 +1223,7 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 					const char *cl)
 {
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0];
-    UNPROTECT(1); /* dim */
-
-    int mi = isNull(i),
-	mj = isNull(j),
-	ni = (mi) ? m : LENGTH(i),
-	nj = (mj) ? m : LENGTH(j),
-	*pi = (mi) ? NULL : INTEGER(i),
-	*pj = (mj) ? NULL : INTEGER(j);
+    SUB2_START;
     	
     int upper = 1, nonunit = 1, keep = 0;
     SEXP uplo, diag;
@@ -1354,7 +1283,7 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 	x1 = PROTECT(allocVector(tx1 = TYPEOF(x0), nx1));
 
-    int i_, j_, ki, kj;
+    int i_, j_;
     Matrix_int_fast64_t m_ = m;
 	
 #define SUB2(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_) /* FIXME: DRY? */	\
@@ -1461,8 +1390,8 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
     SUB2_CASES;
 
-#undef SUB2
 #undef SUB2_LOOP
+#undef SUB2
 #undef XIJ_TP_U_N
 #undef XIJ_TP_U_U
 #undef XIJ_TP_L_N
@@ -1493,16 +1422,7 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 					  const char *cl)
 {
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0];
-    UNPROTECT(1); /* dim */
-
-    int mi = isNull(i),
-	mj = isNull(j),
-	ni = (mi) ? m : LENGTH(i),
-	nj = (mj) ? m : LENGTH(j),
-	*pi = (mi) ? NULL : INTEGER(i),
-	*pj = (mj) ? NULL : INTEGER(j);
+    SUB2_START;
     	
     int nonunit = 1, keep = 0;
     SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
@@ -1560,7 +1480,7 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     } else {
 
 	SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
-	int ki, kj, j_, *pp1 = INTEGER(p1);
+	int *pp1 = INTEGER(p1), j_;
 	*(pp1++) = 0;
 
 	for (kj = 0; kj < nj; ++kj) {
@@ -1613,9 +1533,7 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 				     const char *cl)
 {
-    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    UNPROTECT(1); /* dim */
+    SUB2_START;
     
     SEXP perm0 = GET_SLOT(x, Matrix_permSym);
     int *pperm0 = INTEGER(perm0);
@@ -1626,8 +1544,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
     
     int isP = cl[0] == 'p';
 
-    if (!isNull(i)) {
-	int ki, ni = LENGTH(i), *pi = INTEGER(i);
+    if (!mi) {
 	isP = isP && ni == m;
 	if (isP) {
 	    char *work;
@@ -1666,8 +1583,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	REPROTECT(perm0, pidB);
     }
     
-    if (!isNull(j)) {
-	int kj, nj = LENGTH(j), *pj = INTEGER(j);
+    if (!mj) {
 	isP = isP && nj == n;
 	if (isP) {
 	    char *work;
@@ -1761,6 +1677,9 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    UNPROTECT(2); /* i1, p1 */
 	}
     }
+
+#undef SUB2_CASES
+#undef SUB2_START
     
     UNPROTECT(2); /* perm0, x */
     return x;
@@ -1789,6 +1708,7 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	break;
     }
 
+    /* FIXME: do in R using ALTREP-aware anyNA() ... needs fast class check */
     if (!isNull(i)) {
 	int ni = LENGTH(i), *pi = INTEGER(i);
 	while (ni--)
