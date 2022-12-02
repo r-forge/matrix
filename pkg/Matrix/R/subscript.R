@@ -519,4 +519,26 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
               }
           })
 
+setMethod("[", signature(x = "Matrix", i = "NULL", j = "ANY",
+                         drop = "ANY"),
+          function(x, i, j, ..., drop) {
+              i <- integer(0L)
+              callGeneric()
+          })
+
+setMethod("[", signature(x = "Matrix", i = "ANY", j = "NULL",
+                         drop = "ANY"),
+          function(x, i, j, ..., drop) {
+              j <- integer(0L)
+              callGeneric()
+          })
+
+setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
+                         drop = "ANY"),
+          function(x, i, j, ..., drop) {
+              i <- integer(0L)
+              j <- integer(0L)
+              callGeneric()
+          })
+
 }
