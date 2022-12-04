@@ -613,14 +613,20 @@ char Matrix_repr(SEXP obj)
 	return '\0';
     const char *cl = valid[ivalid];
     switch (cl[2]) {
-    case 'd':
-	return 'i';
-    case 'i':
-	return 'd';
+    case 'e':
+    case 'r':
+    case 'y':
+	return 'u'; /* unpackedMatrix */
+    case 'p':
+	return 'p'; /* packedMatrix */
     case 'C':
     case 'R':
     case 'T':
-	return cl[2];
+	return cl[2]; /* [CRT]sparseMatrix */
+    case 'i':
+	return 'd'; /* diagonalMatrix */
+    case 'd':
+	return 'i'; /* indMatrix */
     default:
 	return '\0';
     }

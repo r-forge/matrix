@@ -87,8 +87,10 @@ extends1of <- function(class, classes, ...) {
     nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) == "M"
 .isVector   <- function(x)
     nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 8L, 8L) == "V"
-.isDense    <- function(x) !nzchar(.M.repr(x))
-.isSparse   <- function(x)  nzchar(.M.repr(x))
+.isDense    <- function(x) any(.M.repr(x) == c("u", "p"))
+.isUnpacked <- function(x) .M.repr(x) == "u"
+.isPacked   <- function(x) .M.repr(x) == "p"
+.isSparse   <- function(x) any(.M.repr(x) == c("C", "R", "T", "d", "i"))
 .isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
 .isC        <- function(x) .M.repr(x) == "C"
 .isR        <- function(x) .M.repr(x) == "R"
@@ -749,10 +751,11 @@ isPacked <- function(x) {
 }
 } ## MJ
 
+## MJ: replaced above ... was "wrong" for n-by-n packedMatrix when n < 2
+if(FALSE) {
 ## Is 'x' a packed, dense matrix?
-## MJ: Fast (not checking class) but "wrong" for n-by-n packedMatrix if n < 2,
-##     e.g., .isPacked(new("dtpMatrix")) == FALSE ... FIXME ??
 .isPacked <- function(x) length(x@x) < prod(x@Dim)
+} ## MJ
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE) {
     ## Useful for compact printing of (parts) of sparse matrices
