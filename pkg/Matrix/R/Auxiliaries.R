@@ -64,20 +64,37 @@ extends1of <- function(class, classes, ...) {
     FALSE
 }
 
-## MJ: This .M.kind() is 3-6 times faster than the variants used previously
-##     (see farther below).  It seems to be _slower_ than .M.kindC(cld, ext)
-##     but only with 'cld' _and_ 'ext' already computed.  That would not be
-##     the case if R_check_class_etc() were optimized as described here:
-##     https://stat.ethz.ch/pipermail/r-devel/2022-August/081952.html
+## Fast alternative to MatrixClass():
+## - if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
+## - if strict= TRUE then may also give one of these:
+##   "pMatrix", "p?Cholesky", "p?BunchKaufman", "dp[op]Matrix", "corMatrix"
+.M.nonvirtual <- function(x, strict = FALSE)
+    .Call(R_Matrix_nonvirtual, x, strict)
 
-## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x'
-.M.kind  <- function(x) .Call(R_Matrix_kind, x, TRUE)  # integer -> "d"
+## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
+## otherwise ""
+.M.kind  <- function(x) .Call(R_Matrix_kind, x,  TRUE) # integer -> "d"
 .V.kind  <- function(x) .Call(R_Matrix_kind, x, FALSE) # integer -> "i"
-## "[gstd]" for Matrix, sparseVector 'x'
+## "[gtsd]" for Matrix, sparseVector 'x';
+## otherwise ""
 .M.shape <- function(x) .Call(R_Matrix_shape, x)
-## "[CRT]" for [CRT]sparseMatrix 'x', "" for other S4 'x'
+## "[CRTdi]" for [CRT]sparseMatrix, diagonalMatrix, indMatrix 'x' {resp.};
+## otherwise ""
 .M.repr  <- function(x) .Call(R_Matrix_repr, x)
-.isCRT   <- function(x) nzchar(.M.repr(x))
+
+## FIXME: we should these (and maybe others not yet defined) "everywhere" ...
+.isMatrix   <- function(x)
+    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) == "M"
+.isVector   <- function(x)
+    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 8L, 8L) == "V"
+.isDense    <- function(x) !nzchar(.M.repr(x))
+.isSparse   <- function(x)  nzchar(.M.repr(x))
+.isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
+.isC        <- function(x) .M.repr(x) == "C"
+.isR        <- function(x) .M.repr(x) == "R"
+.isT        <- function(x) .M.repr(x) == "T"
+.isDiagonal <- function(x) .M.repr(x) == "d"
+.isInd      <- function(x) .M.repr(x) == "i"
 
 ##' Should the matrix/Matrix  x  or a combination of x and y   be treated as  'sparse' ?
 ## sparseDefault <- function(x, y=NULL) {

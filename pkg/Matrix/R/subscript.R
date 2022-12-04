@@ -39,9 +39,10 @@
     if(is.null(i))
         i <- integer(0L)
     else if(isS4(i)) {
-        if(!is(i, "sparseVector"))
+        if(!.isVector(i))
             stop(.subscript.error.ist(i), domain = NA)
-        if(!(has.x <- .hasSlot(i, "x")) || is.logical(i.x <- i@x)) {
+        kind <- .V.kind(i)
+        if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
             i.length <- i@length
             i <-
@@ -59,7 +60,7 @@
                                     i.i[i.i > mn] <- NA
                             }
                         }
-                        if(has.x) i.i[i.x] else i.i
+                        if(pattern) i.i else i.i[i@x]
                     } else {
                         r <- ceiling(mn / i.length)
                         mn. <- r * i.length
@@ -78,16 +79,16 @@
                                                 length.out = r),
                                         each = length(i.i))
                             else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
-                        if(has.x) {
-                            if(mn. > mn) i.i[i.x & i.i <= mn] else i.i[i.x]
-                        } else {
+                        if(pattern) {
                             if(mn. > mn) i.i[      i.i <= mn] else i.i
+                        } else {
+                            if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
                         }
                     }
                 }
             return(..subscript.1ary(x, i, unsorted = FALSE))
         }
-        i <- i.x
+        i <- i@x
     }
     switch(typeof(i),
            double =
@@ -131,7 +132,7 @@
                              shape = .M.shape(x),
                              repr = .M.repr(x),
                              unsorted = is.unsorted(i)) {
-    if(!nzchar(repr))
+    if(!any(repr == c("C", "R", "T")))
         return(.Call(R_subscript_1ary, x, i))
     if(shape == "t" && x@diag != "N")
         x <- ..diagU2N(x)
@@ -183,21 +184,16 @@
 ## x[i] where 'i' is any array or Matrix
 .subscript.1ary.mat <- function(x, i) {
     if(isS4(i)) {
-        cld <- getClassDef(class(i))
-        if(!extends(cld, "Matrix"))
+        if(!.isMatrix(i))
             stop(.subscript.error.ist(i), domain = NA)
-        logic <-
-            extends(cld, "nMatrix") ||
-            extends(cld, "lMatrix") ||
-            extends(cld, "indMatrix")
-        if(logic || i@Dim[2L] != 2L) {
+        if((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
             if(logic && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
                 if((len <- prod(i@Dim)) <= (mn <- length(x)))
                     return(x)
                 else return(c(x, rep.int(NA, len - mn)))
             }
-            v <- if(extends(cld, "denseMatrix")) "vector" else "sparseVector"
+            v <- if(.isDense(i)) "vector" else "sparseVector"
             return(.subscript.1ary(x, as(i, v)))
         }
         i <- as(i, "matrix")
@@ -251,7 +247,7 @@
 ..subscript.1ary.mat <- function(x, i,
                                  shape = .M.shape(x),
                                  repr = .M.repr(x)) {
-    if(!nzchar(repr))
+    if(!any(repr == c("C", "R", "T")))
         return(.Call(R_subscript_1ary_mat, x, i))
     if(shape == "t" && x@diag != "N")
         x <- ..diagU2N(x)
@@ -339,6 +335,8 @@
 ..subscript.2ary <- function(x, i, j, drop) {
     if(is.null(i) && is.null(j))
         r <- x
+    else if(.isSparse(x) && (anyNA(i) || anyNA(j)))
+        stop("NA subscripts in x[i,j] not supported for sparseMatrix 'x'")
     else {
         r <- .Call(R_subscript_2ary, x, i, j)
         dn <- dimnames(x)

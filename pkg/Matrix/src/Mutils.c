@@ -519,30 +519,42 @@ size_t kind2size(char kind)
     }
 }
 
-/* TODO: compare with macros in ./Mdefines.h */
+const char *Matrix_nonvirtual(SEXP obj, int strict)
+{
+    if (!IS_S4_OBJECT(obj))
+	return "";
+    
+    static const char *valid_full[] = {
+	/* "denseLU", */
+	"Cholesky", "pCholesky",
+	"BunchKaufman", "pBunchKaufman",
+	"dpoMatrix", "dppMatrix",
+	"corMatrix", /* "copMatrix", */
+	"pMatrix",
+	VALID_NONVIRTUAL, "" };
 
-#define VALID_NONVIRTUAL						\
-/*  0 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix",		\
-/*  4 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dspMatrix", "dsyMatrix", \
-/*  9 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtpMatrix", "dtrMatrix", \
-/* 14 */ "ddiMatrix", "dsparseVector",					\
-/* 16 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix",		\
-/* 20 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lspMatrix", "lsyMatrix", \
-/* 25 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltpMatrix", "ltrMatrix", \
-/* 30 */ "ldiMatrix", "lsparseVector",					\
-/* 32 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix",		\
-/* 36 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nspMatrix", "nsyMatrix", \
-/* 41 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntpMatrix", "ntrMatrix", \
-/* 46 */ /* "ndiMatrix", */ "nsparseVector",				\
-/* 47 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix",		\
-/* 51 */ "isCMatrix", "isRMatrix", "isTMatrix", "ispMatrix", "isyMatrix", \
-/* 56 */ "itCMatrix", "itRMatrix", "itTMatrix", "itpMatrix", "itrMatrix", \
-/* 61 */ "idiMatrix", "isparseVector",					\
-/* 63 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix",		\
-/* 67 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zspMatrix", "zsyMatrix", \
-/* 72 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztpMatrix", "ztrMatrix", \
-/* 77 */ "zdiMatrix", "zsparseVector",					\
-/* 79 */ "indMatrix", "pMatrix"
+    const char **valid = (strict) ? valid_full : valid_full + 8;
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	return "";
+    return valid[ivalid];
+}
+
+SEXP R_Matrix_nonvirtual(SEXP obj, SEXP strict)
+{
+    return mkString(Matrix_nonvirtual(obj, asLogical(strict)));
+}
+
+#define RETURN_AS_STRSXP(_C_)			\
+    do {					\
+	char c = _C_;				\
+	if (!c)					\
+	    return mkString("");		\
+	else {					\
+	    char s[] = { c, '\0' };		\
+	    return mkString(s);			\
+	}					\
+    } while (0)
 
 char Matrix_kind(SEXP obj, int i2d)
 {
@@ -550,11 +562,9 @@ char Matrix_kind(SEXP obj, int i2d)
 	static const char *valid[] = { VALID_NONVIRTUAL, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-	    error(_("\"kind\" not yet defined for objects of class \"%s\""),
-		  class_P(obj));
-	if (ivalid >= 79)
-	    return 'n'; /* indMatrix, pMatrix */
-	return valid[ivalid][0];
+	    return '\0';
+	const char *cl = valid[ivalid];
+	return (cl[2] == 'd') ? 'n' : cl[0];
     } else {
 	switch (TYPEOF(obj)) {
 	case LGLSXP:
@@ -566,8 +576,6 @@ char Matrix_kind(SEXP obj, int i2d)
 	case CPLXSXP:
 	    return 'z';
 	default:
-	    error(_("\"kind\" not yet defined for objects of type \"%s\""),
-		  type2char(TYPEOF(obj)));
 	    return '\0';
 	}
     }
@@ -575,66 +583,55 @@ char Matrix_kind(SEXP obj, int i2d)
 
 SEXP R_Matrix_kind(SEXP obj, SEXP i2d)
 {
-    char k = Matrix_kind(obj, asLogical(i2d));
-    char s[] = { k, '\0' };
-    return mkString(s);
+    RETURN_AS_STRSXP(Matrix_kind(obj, asLogical(i2d)));
 }
 
 char Matrix_shape(SEXP obj)
 {
     if (!IS_S4_OBJECT(obj))
-	error(_("\"shape\" not yet defined for objects of type \"%s\""),
-		  type2char(TYPEOF(obj)));
+	return '\0';
     static const char *valid[] = { VALID_NONVIRTUAL, "" };
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	error(_("\"shape\" not yet defined for objects of class \"%s\""),
-	      class_P(obj));
-    if (ivalid >= 79 || valid[ivalid][3] != 'M')
-	return 'g'; /* indMatrix, pMatrix, .sparseVector */
-    return valid[ivalid][1];
+	return '\0';
+    const char *cl = valid[ivalid];
+    return (cl[2] == 'd' || cl[3] != 'M') ? 'g' : cl[1];
 }
 
 SEXP R_Matrix_shape(SEXP obj)
 {
-    char k = Matrix_shape(obj);
-    char s[] = { k, '\0' };
-    return mkString(s);
+    RETURN_AS_STRSXP(Matrix_shape(obj));
 }
-
-/* TODO: compare with macros in ./Mdefines.h */
-
-#define VALID_CRTSPARSE				\
-"dgCMatrix", "dsCMatrix", "dtCMatrix",		\
-"lgCMatrix", "lsCMatrix", "ltCMatrix",		\
-"ngCMatrix", "nsCMatrix", "ntCMatrix",		\
-"dgRMatrix", "dsRMatrix", "dtRMatrix",		\
-"lgRMatrix", "lsRMatrix", "ltRMatrix",		\
-"ngRMatrix", "nsRMatrix", "ntRMatrix",		\
-"dgTMatrix", "dsTMatrix", "dtTMatrix",		\
-"lgTMatrix", "lsTMatrix", "ltTMatrix",		\
-"ngTMatrix", "nsTMatrix", "ntTMatrix"
 
 char Matrix_repr(SEXP obj)
 {
     if (!IS_S4_OBJECT(obj))
-	error(_("\"repr\" not yet defined for objects of type \"%s\""),
-	      type2char(TYPEOF(obj)));
-    static const char *valid[] = { VALID_CRTSPARSE, "" };
+	return '\0';
+    static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
-	return '\0'; /* useful to _not_ throw an error, for inheritance tests */
-    return valid[ivalid][2];
+	return '\0';
+    const char *cl = valid[ivalid];
+    switch (cl[2]) {
+    case 'd':
+	return 'i';
+    case 'i':
+	return 'd';
+    case 'C':
+    case 'R':
+    case 'T':
+	return cl[2];
+    default:
+	return '\0';
+    }
 }
 
 SEXP R_Matrix_repr(SEXP obj)
 {
-    char k = Matrix_repr(obj);
-    if (k == '\0')
-	return mkString("");
-    char s[] = { k, '\0' };
-    return mkString(s);
+    RETURN_AS_STRSXP(Matrix_repr(obj));
 }
+
+#undef RETURN_AS_STRSXP
 
 
 /* For indexing ===================================================== */
