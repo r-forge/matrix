@@ -39,6 +39,8 @@ char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);
 size_t kind2size(char kind);
 
+const char *Matrix_nonvirtual(SEXP obj, int strict);
+SEXP R_Matrix_nonvirtual(SEXP obj, SEXP strict);
 char Matrix_kind(SEXP obj, int i2d);
 SEXP R_Matrix_kind(SEXP obj, SEXP i2d);
 char Matrix_shape(SEXP obj);

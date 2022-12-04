@@ -407,7 +407,7 @@ static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 /* x[i] with 'i' of type "integer" or "double" {i >= 1 or NA} */
 SEXP R_subscript_1ary(SEXP x, SEXP i)
 {
-    static const char *valid[] = { VALID_NONVIRTUAL, "" };
+    static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
     const char *cl = valid[ivalid];
     if (ivalid < 0)
@@ -421,7 +421,7 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
     case 'p':
 	return   packedMatrix_subscript_1ary(x, i, cl);
 	
-    /* NB: for [CRT], the caller must preprocess 'x' and/or 'i';
+    /* NB: for [CRT], the caller must preprocess 'x' and 'i';
            symmetric and unit triangular 'x' are not handled specially,
 	   and it is assumed for speed that 'i' is sorted by row [R] 
 	   or column [CT] with NA last
@@ -783,7 +783,7 @@ static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 */
 SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 {
-    static const char *valid[] = { VALID_NONVIRTUAL, "" };
+    static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
     const char *cl = valid[ivalid];
     if (ivalid < 0)
@@ -797,7 +797,7 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
     case 'p':
 	return   packedMatrix_subscript_1ary_mat(x, i, cl);
 	
-    /* NB: for [CRT], the caller must preprocess 'x' and/or 'i';
+    /* NB: for [CRT], the caller must preprocess 'x' and 'i';
            symmetric and unit triangular 'x' are not handled specially,
 	   and it is assumed for speed that 'i' is sorted by row [R] 
 	   or column [CT] with NA (incl. out-of-bounds indices) last
@@ -1691,7 +1691,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 */
 SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 {
-    static const char *valid[] = { VALID_NONVIRTUAL, "" };
+    static const char *valid[] = { "pMatrix", VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
     const char *cl = valid[ivalid];
     if (ivalid < 0)
@@ -1704,27 +1704,12 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	return unpackedMatrix_subscript_2ary(x, i, j, cl);
     case 'p':
 	return   packedMatrix_subscript_2ary(x, i, j, cl);
-    default:
-	break;
-    }
 
-    /* FIXME: do in R using ALTREP-aware anyNA() ... needs fast class check */
-    if (!isNull(i)) {
-	int ni = LENGTH(i), *pi = INTEGER(i);
-	while (ni--)
-	    if (*(pi++) == NA_INTEGER)
-		error(_("NA subscripts in x[i,j] not supported "
-			"for sparseMatrix 'x'"));
-    }
-    if (!isNull(j)) {
-	int nj = LENGTH(j), *pj = INTEGER(j);
-	while (nj--)
-	    if (*(pj++) == NA_INTEGER)
-		error(_("NA subscripts in x[i,j] not supported "
-			"for sparseMatrix 'x'"));
-    }
-
-    switch (cl[2]) {
+    /* NB: for [CRT], the caller must preprocess 'x', 'i', and 'j';
+           symmetric and unit triangular 'x' are not handled specially,
+	   and it is assumed for speed that 'i' and 'j' do not contain NA
+    */
+	
     case 'C':
 	return  CsparseMatrix_subscript_2ary(x, i, j, cl);
     case 'R':
