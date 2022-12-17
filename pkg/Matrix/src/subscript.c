@@ -1147,7 +1147,7 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    UNPROTECT(1); /* diag */					\
 	}								\
     }									\
-									\
+    									\
     char cl_[] = "...Matrix";						\
     cl_[0] = cl[0];							\
     cl_[1] = 'g';							\
@@ -1168,14 +1168,14 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	}								\
     }									\
     SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(cl_));			\
-									\
+    									\
     PROTECT(dim = GET_SLOT(res, Matrix_DimSym));			\
     pdim = INTEGER(dim);						\
     pdim[0] = ni;							\
     pdim[1] = nj;							\
     UNPROTECT(1); /* dim */						\
-									\
-    if ((cl[1] != 's') ? keep < 0 : keep < -1)				\
+    									\
+    if ((cl[1] != 's') ? keep < 0 : keep < -1) {			\
 	PROTECT(uplo = GET_SLOT(res, Matrix_uploSym));			\
 	SEXP uplo_ = PROTECT(mkChar("L"));				\
 	SET_STRING_ELT(uplo, 0, uplo_);					\
