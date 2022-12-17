@@ -131,9 +131,15 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define STRICTLY_ISNZ_REAL(_X_)    (!ISNA_REAL(_X_)    && ISNZ_REAL(_X_))
 #define STRICTLY_ISNZ_COMPLEX(_X_) (!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
 
-#define PM_AR21_UP(i, j) ((i) + (j) + ((R_xlen_t) (j) * ((j) - 1)) / 2)
-#define PM_AR21_LO(i, j, n2) ((i) + ((j) * ((n2) - (j) - 1)) / 2)
-#define PM_LENGTH(n) (n + ((R_xlen_t) (n) * ((n) - 1)) / 2)
+#define PM_AR21_UP(i, j)						\
+    ((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))
+#define PM_AR21_LO(i, j, m2)						\
+    ((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
+#define PM_LENGTH(m)							\
+    ((R_xlen_t) ((m) + ((Matrix_int_fast64_t) (m) * (       (m) - 1)) / 2))
+
+#define SHOW(_X_) _X_
+#define HIDE(_X_)
 
 #define ERROR_INVALID_CLASS(_X_, _METHOD_)			\
     do {							\
