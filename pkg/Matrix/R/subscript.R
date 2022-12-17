@@ -44,49 +44,45 @@
         kind <- .V.kind(i)
         if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
-            i.length <- i@length
             i <-
-                if(i.length == 0L)
+                if(length(i.i <- i@i) == 0L)
                     integer(0L)
-                else {
-                    i.i <- i@i
-                    if(i.length >= mn) {
-                        if(i.length > mn) {
-                            if(mn < 0x1p+53) {
-                                if(i.i[length(i.i)] >= mn + 1)
-                                    i.i[i.i >= mn + 1] <- NA
-                            } else {
-                                if(i.i[length(i.i)] > mn)
-                                    i.i[i.i > mn] <- NA
-                            }
-                        }
-                        if(pattern) i.i else i.i[i@x]
-                    } else {
-                        r <- ceiling(mn / i.length)
-                        mn. <- r * i.length
-                        i.i <-
-                            if(mn. <= .Machine$integer.max)
-                                rep.int(as.integer(i.i), r) +
-                                    rep(seq.int(from = 0L,
-                                                by = as.integer(i.length),
-                                                length.out = r),
-                                        each = length(i.i))
-                            else if(i.i[length(i.i)] + (r - 1) * i.length <=
-                                    0x1p+53)
-                                rep.int(as.double(i.i), r) +
-                                    rep(seq.int(from = 0,
-                                                by = as.double(i.length),
-                                                length.out = r),
-                                        each = length(i.i))
-                            else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
-                        if(pattern) {
-                            if(mn. > mn) i.i[      i.i <= mn] else i.i
+                else if((i.length <- i@length) >= mn) {
+                    if(i.length > mn) {
+                        if(mn < 0x1p+53) {
+                            if(i.i[length(i.i)] >= mn + 1)
+                                i.i[i.i >= mn + 1] <- NA
                         } else {
-                            if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
+                            if(i.i[length(i.i)] > mn)
+                                i.i[i.i > mn] <- NA
                         }
                     }
+                    if(pattern) i.i else i.i[i@x]
+                } else {
+                    r <- ceiling(mn / i.length)
+                    mn. <- r * i.length
+                    i.i <-
+                        if(mn. <= .Machine$integer.max)
+                            rep.int(as.integer(i.i), r) +
+                                rep(seq.int(from = 0L,
+                                            by = as.integer(i.length),
+                                            length.out = r),
+                                    each = length(i.i))
+                        else if(i.i[length(i.i)] + (r - 1) * i.length <=
+                                0x1p+53)
+                            rep.int(as.double(i.i), r) +
+                                rep(seq.int(from = 0,
+                                            by = as.double(i.length),
+                                            length.out = r),
+                                    each = length(i.i))
+                        else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
+                    if(pattern) {
+                        if(mn. > mn) i.i[      i.i <= mn] else i.i
+                    } else {
+                        if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
+                    }
                 }
-            return(..subscript.1ary(x, i, unsorted = FALSE))
+            return(..subscript.1ary(x, i, unsorted = !pattern && anyNA(i)))
         }
         i <- i@x
     }
@@ -111,7 +107,7 @@
                },
            logical =
                {
-                   if(!is.na(a <- all(i)) && a) {
+                   if(length(i) && !is.na(a <- all(i)) && a) {
                        if((len <- length(i)) <= mn)
                            return(as.vector(x))
                        else return(c(as.vector(x), rep.int(NA, len - mn)))
@@ -187,7 +183,7 @@
         if(!.isMatrix(i))
             stop(.subscript.error.ist(i), domain = NA)
         if((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
-            if(logic && !is.na(a <- all(i)) && a) {
+            if(logic && all(i@Dim) && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
                 if((len <- prod(i@Dim)) <= (mn <- length(x)))
                     return(x)
@@ -222,9 +218,9 @@
                    ## * rows containing both 0 and NA are handled
                    ##   according to value in first column
                    if(is.na(a <- all(i. <- i[, 1L])) || !a)
-                       i <- i[!i., , drop = FALSE]
+                       i <- i[i. > 0L, , drop = FALSE]
                    if(!all(j. <- i[, 2L], na.rm = TRUE))
-                       i <- i[!j., , drop = FALSE]
+                       i <- i[j. > 0L, , drop = FALSE]
                    ..subscript.1ary.mat(x, i)
                },
            character =
@@ -256,9 +252,9 @@
     if(shape == "s") {
         op <- if(x@uplo == "U") `>` else `<`
         if(length(w <- which(op(i., j.)))) {
-            i.. <- i.[w]
-            i.[w] <- j.[w]
-            j.[w] <- i..
+            i[w, ] <- i[w, 2:1]
+            i. <- i[, 1L]
+            j. <- i[, 2L]
         }
     }
     o <-
@@ -285,7 +281,7 @@
               if(missing(j)) NULL else if(is.null(j)) integer(0L) else j)
     for(pos in 1:2) {
         if(!is.null(k <- l[[pos]])) {
-            l[[pos]] <-
+            l[pos] <- list(
                 switch(typeof(k),
                        double =
                            {
@@ -310,7 +306,7 @@
                                r <- d[pos]
                                if(length(k) > r)
                                    stop(.subscript.error.lng)
-                               if(!is.na(a <- all(k)) && a)
+                               if(length(k) && !is.na(a <- all(k)) && a)
                                    NULL
                                else seq_len(r)[k]
                            },
@@ -321,7 +317,7 @@
                                    stop(.subscript.error.oob)
                                k
                            },
-                       stop(.subscript.error.ist(k), domain = NA))
+                       stop(.subscript.error.ist(k), domain = NA)))
         }
     }
     if(is.double(lengths(l, use.names = FALSE)))
@@ -335,8 +331,6 @@
 ..subscript.2ary <- function(x, i, j, drop) {
     if(is.null(i) && is.null(j))
         r <- x
-    else if(.isSparse(x) && (anyNA(i) || anyNA(j)))
-        stop("NA subscripts in x[i,j] not supported for sparseMatrix 'x'")
     else {
         r <- .Call(R_subscript_2ary, x, i, j)
         dn <- dimnames(x)
