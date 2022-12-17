@@ -7,7 +7,7 @@
 /**
  * Test that `dim` is a length-2, non-negative integer vector.
  *
- * @param dim A `SEXP`, 
+ * @param dim A `SEXP`,
  *     typically the `Dim` slot of a (to be validated) `Matrix`.
  * @param domain A string specifying a domain for message translation.
  *
@@ -21,7 +21,7 @@ SEXP Dim_validate(SEXP dim, const char* domain)
        //     return mkString(_("'Dim' slot is not numeric"));
        though above is not enough as we must prohibit Dim[i] > INT_MAX
 
-       FIXME? Prohibit is.object(dim) or maybe just inherits(dim, "factor") 
+       FIXME? Prohibit is.object(dim) or maybe just inherits(dim, "factor")
        and return a different error message in that case?
     */
     if (TYPEOF(dim) != INTSXP)
@@ -84,15 +84,14 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	return mkString(buf);
     }
 
-    SEXP s;
-    int i;
-    R_xlen_t ns;
 
     /* Behave as do_matrix() from src/main/array.c:
        Dimnames[[i]] must be NULL or _coercible to_ character
        of length Dim[i] or 0 ... see R_Dimnames_fixup() below */
-    for (i = 0; i < 2; ++i) {
+    for (int i = 0; i < 2; ++i) {
+	SEXP s;
 	if (!isNull(s = VECTOR_ELT(dimnames, i))) {
+	    R_xlen_t ns;
 	    if (!isVector(s)) {
 		SPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"), i+1);
 		return mkString(buf);
@@ -103,9 +102,9 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 	    }
 	}
     }
-    
+
 #undef SPRINTF
-    
+
     return ScalarLogical(1);
 }
 
@@ -135,7 +134,7 @@ SEXP R_DimNames_validate_old(SEXP obj)
  * behaviour of `do_matrix()` from `src/main/array.c`.
  *
  * @param dn A list of length 2 passing `DimNames_validate()`.
- * 
+ *
  * @return A modified copy of `dn`, or `dn` if no modification is
  *    necessary.
  */
@@ -177,7 +176,7 @@ SEXP R_DimNames_fixup(SEXP dn)
 
 
 /* Class validity methods ==============================================
-   NB: These assume that validity methods for superclasses 
+   NB: These assume that validity methods for superclasses
    have already been called via validObject() ...
 */
 
@@ -247,21 +246,21 @@ SEXP symmetricMatrix_validate(SEXP obj)
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
-    
+
 #ifdef ENFORCE_SYMMETRIC_DIMNAMES
-    /* This check can be expensive when both rownames and colnames have 
-       nonzero length, and even more so when coercions to character are 
-       required ... Users can avoid the expense by setting at least one 
-       of rownames and colnames to NULL or by ensuring that they are the 
+    /* This check can be expensive when both rownames and colnames have
+       nonzero length, and even more so when coercions to character are
+       required ... Users can avoid the expense by setting at least one
+       of rownames and colnames to NULL or by ensuring that they are the
        same object, as testing for pointer equality is fast ... */
-    
+
 # define ANY_TO_STRING(x)					\
     (TYPEOF(x) == STRSXP					\
      ? x							\
      : (inherits(x, "factor")					\
 	? asCharacterFactor(x)					\
 	: coerceVector(x, STRSXP)))
-    
+
     SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 	ndn = PROTECT(getAttrib(dn, R_NamesSymbol));
     const char *ndn0, *ndn1;
@@ -271,7 +270,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	strcmp(ndn0, ndn1) != 0)
 	UPRET(2, "Dimnames[1] differs from Dimnames[2]");
     if (n > 0) {
-	/* NB: It is already known that the length of 'dn[[i]]' is 0 or 'n' */ 
+	/* NB: It is already known that the length of 'dn[[i]]' is 0 or 'n' */
 	SEXP rn, cn;
 	if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
 	    !isNull(cn = VECTOR_ELT(dn, 1)) &&
@@ -284,7 +283,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	}
     }
     UNPROTECT(2); /* ndn, dn */
-    
+
 # undef ANY_TO_STRING
 #endif
 
@@ -308,7 +307,7 @@ SEXP triangularMatrix_validate(SEXP obj)
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
-	
+
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     if (TYPEOF(uplo) != STRSXP)
 	UPRET(1, "'uplo' slot is not of type \"character\"");
@@ -318,7 +317,7 @@ SEXP triangularMatrix_validate(SEXP obj)
     if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
 	UPRET(1, "'uplo' slot is not \"U\" or \"L\"");
     UNPROTECT(1); /* uplo */
-    
+
     SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
     if (TYPEOF(diag) != STRSXP)
 	UPRET(1, "'diag' slot is not of type \"character\"");
@@ -339,7 +338,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
-    
+
     SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
     if (TYPEOF(diag) != STRSXP)
 	UPRET(1, "'diag' slot is not of type \"character\"");
@@ -350,7 +349,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
 	UPRET(1, "'diag' slot is not \"N\" or \"U\"");
     int nonunit = di[0] == 'N';
     UNPROTECT(1); /* diag */
-    
+
     SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     if (nonunit) {
 	if (XLENGTH(x) != n)
@@ -362,7 +361,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
 		     "does not have length 0");
     }
     UNPROTECT(1); /* x */
-    
+
     return ScalarLogical(1);
 }
 
@@ -373,7 +372,7 @@ SEXP indMatrix_validate(SEXP obj)
     if (n == 0 && m > 0)
 	UPRET(1, "m-by-0 indMatrix invalid for positive 'm'");
     UNPROTECT(1); /* dim */
-    
+
     SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
     if (TYPEOF(perm) != INTSXP)
 	UPRET(1, "'perm' slot is not of type \"integer\"");
@@ -388,7 +387,7 @@ SEXP indMatrix_validate(SEXP obj)
 	++pperm;
     }
     UNPROTECT(1); /* perm */
-    
+
     return ScalarLogical(1);
 }
 
@@ -417,7 +416,7 @@ SEXP pMatrix_validate(SEXP obj)
 	if (i < n)
 	    return mkString(_("'perm' slot contains duplicates"));
     }
-    
+
     return ScalarLogical(1);
 }
 
@@ -426,7 +425,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     UNPROTECT(1); /* dim */
-    
+
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
     if (TYPEOF(p) != INTSXP)
 	UPRET(1, "'p' slot is not of type \"integer\"");
@@ -444,7 +443,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
 	if (pp[j] - pp[j-1] > m)
 	    UPRET(1, "first differences of 'p' slot exceed Dim[1]");
     }
-    
+
     SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
     if (TYPEOF(i) != INTSXP)
 	UPRET(2, "'i' slot is not of type \"integer\"");
@@ -467,7 +466,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
 	}
     }
     UNPROTECT(2); /* i, p */
-    
+
     return ScalarLogical(1);
 }
 
@@ -476,7 +475,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     UNPROTECT(1); /* dim */
-    
+
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
     if (TYPEOF(p) != INTSXP)
 	UPRET(1, "'p' slot is not of type \"integer\"");
@@ -494,7 +493,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
 	if (pp[i] - pp[i-1] > n)
 	    UPRET(1, "first differences of 'p' slot exceed Dim[2]");
     }
-    
+
     SEXP j = PROTECT(GET_SLOT(obj, Matrix_jSym));
     if (TYPEOF(j) != INTSXP)
 	UPRET(2, "'j' slot is not of type \"integer\"");
@@ -526,7 +525,7 @@ SEXP TsparseMatrix_validate(SEXP obj)
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     UNPROTECT(1); /* dim */
-    
+
     SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
 	j = PROTECT(GET_SLOT(obj, Matrix_jSym));
     if (TYPEOF(i) != INTSXP)
@@ -566,7 +565,7 @@ SEXP sCMatrix_validate(SEXP obj)
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	UNPROTECT(1); /* uplo */
-	
+
 	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
 	int *pi = INTEGER(i), j, k = 0, kend;
 	if (ul == 'U') {
@@ -602,14 +601,14 @@ SEXP tCMatrix_validate(SEXP obj)
     UNPROTECT(1); /* diag */
     if (di == 'N')
 	return sCMatrix_validate(obj);
-    
+
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
     int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
     if (pp[n] > 0) {
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	UNPROTECT(1); /* uplo */
-	
+
 	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
 	int *pi = INTEGER(i), j, k = 0, kend;
 	if (ul == 'U') {
@@ -638,7 +637,7 @@ SEXP tCMatrix_validate(SEXP obj)
 	UNPROTECT(1); /* i */
     }
     UNPROTECT(1); /* p */
-    
+
     return ScalarLogical(1);
 }
 
@@ -650,7 +649,7 @@ SEXP sRMatrix_validate(SEXP obj)
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	UNPROTECT(1); /* uplo */
-	
+
 	SEXP j = PROTECT(GET_SLOT(obj, Matrix_jSym));
 	int *pj = INTEGER(j), i, k = 0, kend;
 	if (ul == 'U') {
@@ -675,7 +674,7 @@ SEXP sRMatrix_validate(SEXP obj)
 	UNPROTECT(1); /* j */
     }
     UNPROTECT(1); /* p */
-    
+
     return ScalarLogical(1);
 }
 
@@ -693,7 +692,7 @@ SEXP tRMatrix_validate(SEXP obj)
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	UNPROTECT(1); /* uplo */
-	
+
 	SEXP j = PROTECT(GET_SLOT(obj, Matrix_jSym));
 	int *pj = INTEGER(j), i, k = 0, kend;
 	if (ul == 'U') {
@@ -749,7 +748,7 @@ SEXP sTMatrix_validate(SEXP obj)
 	UNPROTECT(1); /* j */
     }
     UNPROTECT(1); /* i */
-    
+
     return ScalarLogical(1);
 }
 
@@ -767,7 +766,7 @@ SEXP tTMatrix_validate(SEXP obj)
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	UNPROTECT(1); /* uplo */
-	
+
 	SEXP j = PROTECT(GET_SLOT(obj, Matrix_jSym));
 	int *pi = INTEGER(i), *pj = INTEGER(j);
 	if (ul == 'U') {
@@ -921,7 +920,7 @@ SEXP dpoMatrix_validate(SEXP obj)
     int i, n = INTEGER(dim)[0];
     R_xlen_t np1 = (R_xlen_t) n + 1;
     double *px = REAL(x);
-    
+
     /* Non-negative diagonal elements are necessary _but not_ sufficient */
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
@@ -941,7 +940,7 @@ SEXP dppMatrix_validate(SEXP obj)
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     char ul = *CHAR(STRING_ELT(uplo, 0));
     UNPROTECT(1); /* uplo */
-    
+
     /* Non-negative diagonal elements are necessary _but not_ sufficient */
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
@@ -962,7 +961,7 @@ SEXP corMatrix_validate(SEXP obj)
     SEXP sd = PROTECT(GET_SLOT(obj, Matrix_sdSym));
     if (TYPEOF(sd) != REALSXP)
 	UPRET(1, "'sd' slot is not of type \"double\"");
-    
+
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int n = INTEGER(dim)[0];
     UNPROTECT(1); /* dim */
@@ -978,7 +977,7 @@ SEXP corMatrix_validate(SEXP obj)
 	if (psd[i] < 0.0)
 	    UPRET(1, "'sd' slot has negative elements");
     }
-    
+
     UNPROTECT(1); /* sd */
     return ScalarLogical(1);
 }
@@ -990,7 +989,7 @@ SEXP Cholesky_validate(SEXP obj)
     int i, n = INTEGER(dim)[0];
     R_xlen_t np1 = (R_xlen_t) n + 1;
     double *px = REAL(x);
-    
+
     /* Non-negative diagonal elements are necessary _and_ sufficient */
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
@@ -1010,7 +1009,7 @@ SEXP pCholesky_validate(SEXP obj)
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     char ul = *CHAR(STRING_ELT(uplo, 0));
     UNPROTECT(1); /* uplo */
-    
+
     /* Non-negative diagonal elements are necessary _and_ sufficient */
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
@@ -1021,7 +1020,7 @@ SEXP pCholesky_validate(SEXP obj)
 	    if (!ISNAN(*px) && *px < 0.0)
 		UPRET(2, "matrix has negative diagonal elements");
     }
-	
+
     UNPROTECT(2); /* x, dim */
     return ScalarLogical(1);
 }
@@ -1035,7 +1034,7 @@ SEXP BunchKaufman_validate(SEXP obj)
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int n = INTEGER(dim)[0];
     UNPROTECT(1); /* dim */
-    
+
     if (XLENGTH(perm) != n)
 	UPRET(1, "'perm' slot does not have length n=Dim[1]");
 
@@ -1067,27 +1066,27 @@ SEXP pBunchKaufman_validate(SEXP obj)
 SEXP Schur_validate(SEXP obj)
 {
     /* MJ: assuming for simplicity that 'Q' and 'T' slots are formally valid */
-    
+
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), n = pdim[0];
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
-    
+
     SEXP Q = PROTECT(GET_SLOT(obj, Matrix_QSym));
     PROTECT(dim = GET_SLOT(Q, Matrix_DimSym));
     pdim = INTEGER(dim);
     if (pdim[0] != n || pdim[1] != n)
 	UPRET(2, "dimensions of 'Q' slot are not identical to 'Dim'");
     UNPROTECT(2); /* dim, Q */
-    
+
     SEXP T = PROTECT(GET_SLOT(obj, Matrix_TSym));
     PROTECT(dim = GET_SLOT(T, Matrix_DimSym));
     pdim = INTEGER(dim);
     if (pdim[0] != n || pdim[1] != n)
 	UPRET(2, "dimensions of 'T' slot are not identical to 'Dim'");
     UNPROTECT(2); /* dim, T */
-    
+
     SEXP v = PROTECT(GET_SLOT(obj, install("EValues")));
     SEXPTYPE tv = TYPEOF(v);
     if (tv != REALSXP && tv != CPLXSXP)
@@ -1095,27 +1094,27 @@ SEXP Schur_validate(SEXP obj)
     if (XLENGTH(v) != n)
 	UPRET(1, "'EValues' slot does not have length n=Dim[1]");
     UNPROTECT(1); /* v */
-    
+
     return ScalarLogical(1);
 }
 
 SEXP denseLU_validate(SEXP obj)
 {
-    /* MJ: assuming for simplicity that the 'Dimnames' slot is a valid list 
-       partly because I'd like denseLU to formally extend dgeMatrix and in 
+    /* MJ: assuming for simplicity that the 'Dimnames' slot is a valid list
+       partly because I'd like denseLU to formally extend dgeMatrix and in
        that case checking 'Dimnames' here would be redundant */
-    
+
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
     UNPROTECT(1); /* dim */
-    
+
     SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     if (TYPEOF(x) != REALSXP)
 	UPRET(1, "'x' slot is not of type \"double\"");
     if (XLENGTH(x) != (double) m * n)
 	UPRET(1, "'x' slot does not have length prod(Dim)");
     UNPROTECT(1); /* x */
-    
+
     SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
     if (TYPEOF(perm) != INTSXP)
 	UPRET(1, "'perm' slot is not of type \"integer\"");
@@ -1141,18 +1140,18 @@ SEXP sparseLU_validate(SEXP obj)
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
-    
+
     SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym));
     PROTECT(dim = GET_SLOT(L, Matrix_DimSym));
     pdim = INTEGER(dim);
     if (pdim[0] != n || pdim[1] != n)
         UPRET(2, "dimensions of 'L' slot are not identical to 'Dim'");
-    
+
     PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
     if (*CHAR(STRING_ELT(uplo, 0)) == 'U')
 	UPRET(3, "'L' slot is upper (not lower) triangular");
     UNPROTECT(3); /* uplo, dim, L */
-    
+
     SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
     PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
     pdim = INTEGER(dim);
@@ -1163,7 +1162,7 @@ SEXP sparseLU_validate(SEXP obj)
     if (*CHAR(STRING_ELT(uplo, 0)) != 'U')
 	UPRET(3, "'U' slot is lower (not upper) triangular");
     UNPROTECT(3); /* uplo, dim, U */
-    
+
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 	q = PROTECT(GET_SLOT(obj, Matrix_qSym));
     if (TYPEOF(p) != INTSXP)
@@ -1202,20 +1201,20 @@ SEXP sparseLU_validate(SEXP obj)
 SEXP sparseQR_validate(SEXP obj)
 {
     /* MJ: assuming for simplicity that 'V' and 'R' slots are formally valid */
-    
+
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     if (m < n)
 	UPRET(1, "matrix has more columns than rows");
     UNPROTECT(1); /* dim */
-    
+
     SEXP beta = PROTECT(GET_SLOT(obj, Matrix_betaSym));
     if (TYPEOF(beta) != REALSXP)
 	UPRET(1, "'beta' slot is not of type \"double\"");
     if (XLENGTH(beta) != n)
 	UPRET(1, "'beta' slot does not have length Dim[2]");
     UNPROTECT(1); /* beta */
-    
+
     int m2;
     SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
     PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
@@ -1225,7 +1224,7 @@ SEXP sparseQR_validate(SEXP obj)
     if (pdim[1] != n)
 	UPRET(2, "'V' slot does not have Dim[2] columns");
     UNPROTECT(2); /* dim, V */
-    
+
     SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
     PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
     pdim = INTEGER(dim);
