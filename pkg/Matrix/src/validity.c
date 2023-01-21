@@ -70,41 +70,32 @@ SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
  */
 SEXP DimNames_validate(SEXP dimnames, int *pdim)
 {
-    char *buf;
-
-    /* Allocate only when needed: in valid case, it is _not_ needed */
-#define SPRINTF								\
-    buf = Alloca(Matrix_ErrorBufferSize, char); R_CheckStack(); sprintf
-
-    if (TYPEOF(dimnames) != VECSXP) {
-	SPRINTF(buf, _("'Dimnames' slot is not a list"));
-	return mkString(buf);
-    } else if (LENGTH(dimnames) != 2) {
-	SPRINTF(buf, _("'Dimnames' slot does not have length 2"));
-	return mkString(buf);
-    }
-
-
+    if (TYPEOF(dimnames) != VECSXP)
+	return mkString("'Dimnames' slot is not a list");
+    if (LENGTH(dimnames) != 2)
+	return mkString("'Dimnames' slot does not have length 2");
+    
     /* Behave as do_matrix() from src/main/array.c:
        Dimnames[[i]] must be NULL or _coercible to_ character
        of length Dim[i] or 0 ... see R_Dimnames_fixup() below */
     for (int i = 0; i < 2; ++i) {
-	SEXP s;
-	if (!isNull(s = VECTOR_ELT(dimnames, i))) {
-	    R_xlen_t ns;
+	SEXP s = VECTOR_ELT(dimnames, i);
+	if (!isNull(s)) {
 	    if (!isVector(s)) {
-		SPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"), i+1);
+		char *buf;
+		SNPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"),
+			 i+1);
 		return mkString(buf);
-	    } else if ((ns = XLENGTH(s)) != pdim[i] && ns != 0) {
-		SPRINTF(buf, _("length of Dimnames[[%d]] (%lld) is not equal to Dim[%d] (%d)"),
-			i+1, (long long) ns, i+1, pdim[i]);
+	    }
+	    R_xlen_t ns = XLENGTH(s);
+	    if (ns != pdim[i] && ns != 0) {
+		char *buf;
+		SNPRINTF(buf, _("length of Dimnames[[%d]] (%lld) is not equal to Dim[%d] (%d)"),
+			 i+1, (long long) ns, i+1, pdim[i]);
 		return mkString(buf);
 	    }
 	}
     }
-
-#undef SPRINTF
-
     return ScalarLogical(1);
 }
 

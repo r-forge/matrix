@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2022-12-17 r3809)}{
+\section{Changes in version 1.5-4 (2023-01-21 r3810)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Defining \code{sequence.default} for \R{} \code{< 4.0.0},
@@ -25,8 +25,12 @@
       \item C-level macro \code{Calloc_or_Alloca_TO()} now
       zero-initializes also in the \code{alloca}-using case.
 
-      \item Replace deprecated \code{<Rdefines.h>} by \code{Rinternals.h} and also move outside
-      \code{extern "C"} wrapper in API \file{inst/include/Matrix.h}.
+      \item Replace deprecated \code{Rdefines.h} with
+      \code{Rinternals.h} and move outside \code{extern "C"}
+      wrapper in API \file{inst/include/Matrix.h}.
+
+      \item Replace \code{sprintf} with \code{snprintf} globally
+      to avoid potential buffer overflows.
     }
   }
 }
