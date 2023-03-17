@@ -680,9 +680,9 @@ stopifnot(identical3(cu[cu > 1],  tu [tu > 1], mu [mu > 1]),
 	  identical(ttu , tril(ttu)),
 	  identical(t(tu), tril(t(tu)))
           )
-assert.EQ.mat(triu(cu),   .asmatrix(triu(.asmatrix(cu))))
+assert.EQ.mat(triu(cu), as(triu(as(cu, "matrix")), "matrix"))
 for(k in -1:1)
-    assert.EQ.mat(tril(cu,k), .asmatrix(tril(.asmatrix(cu),k)))
+    assert.EQ.mat(tril(cu,k), as(tril(as(cu, "matrix"), k), "matrix"))
 
 (dtr <- Matrix(local({m <- diag(2); m[1,2] <- 3;m})))
 identical(dtr, triu(dtr))
@@ -819,7 +819,7 @@ assert.EQ.mat(kr,
 (kt1 <- kronecker(t1, tu))
 kt2 <- kronecker(t1c, cu)
 stopifnot(identical(as(kt1, "CsparseMatrix"), kt2))
-ktf <- kronecker(.asmatrix(t1), .asmatrix(tu))
+ktf <- kronecker(as(t1, "matrix"), as(tu, "matrix"))
 if(FALSE) # FIXME? our kronecker treats "0 * NA" as "0" for structural-0
 assert.EQ.mat(kt2, ktf, tol= 0)
 (cs1 <- colSums(kt1))
@@ -882,8 +882,8 @@ M <- Matrix(c(2:0,1),2); M. <- as(M, "sparseMatrix")
 stopifnot(identical(N, as(L.,"nMatrix")),
 	  identical(kronecker(	  c(1,0), M),
 		    kronecker(cbind(1:0), M)))
-assert.EQ.mat(kronecker(M,	      c(1,0,0)),
-	      kronecker(.asmatrix(M), c(1,0,0)))
+assert.EQ.mat(kronecker(M,	         c(1,0,0)),
+	      kronecker(as(M, "matrix"), c(1,0,0)))
 
 ## coercion from "dpo" or "dsy"
 xx <- as(xpx, "dsyMatrix")
