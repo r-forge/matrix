@@ -81,6 +81,94 @@
 
 ## ~~~~ DEPRECATED ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+..2dge <- function(from) {
+    .Deprecated(new = ".dense2g", package = "Matrix")
+    .dense2g(from, "d")
+}
+.C2nC <- function(from, isTri) {
+    .Deprecated(new = ".sparse2kind", package = "Matrix")
+    .sparse2kind(from, "n")
+}
+.T2Cmat <- function(from, isTri) {
+    .Deprecated(new = ".T2C", package = "Matrix")
+    .T2C(from)
+}
+.asmatrix <- function(x) {
+    .Deprecated(new = "as(., \"matrix\")", package = "Matrix")
+    as(x, "matrix")
+}
+.dense2sy <- function(from, ...) {
+    .Deprecated(new = ".M2sym", package = "Matrix")
+    .M2sym(from, ...)
+}
+.diag2mat <- function(from) {
+    .Deprecated(new = ".diag2m", package = "Matrix")
+    .diag2m(from)
+}
+.diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
+    .Deprecated(new = ".diag2sparse", package = "Matrix")
+    .diag2sparse(from, code = `substr<-`(".sT", 1L, 1L, kind),
+                 uplo = uplo, drop0 = drop0)
+}
+.diag2tT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
+    .Deprecated(new = ".diag2sparse", package = "Matrix")
+    .diag2sparse(from, code = `substr<-`(".tT", 1L, 1L, kind),
+                 uplo = uplo, drop0 = drop0)
+}
+.dsy2dsp <- function(from) {
+    .Deprecated(new = "pack", package = "Matrix")
+    pack(from)
+}
+.dsy2mat <- function(from, keep.dimnames = TRUE) {
+    .Deprecated(new = ".dense2m", package = "Matrix")
+    to <- .dense2m(from)
+    if (!keep.dimnames)
+        dimnames(to) <- NULL
+    to
+}
+.dxC2mat <- function(from, chkUdiag) {
+    .Deprecated(new = ".sparse2m", package = "Matrix")
+    .sparse2m(from)
+}
+.m2dgC <- function(from) {
+    .Deprecated(new = ".m2sparse", package = "Matrix")
+    .m2sparse(from, "dgC")
+}
+.m2lgC <- function(from) {
+    .Deprecated(new = ".m2sparse", package = "Matrix")
+    .m2sparse(from, "lgC")
+}
+.m2ngC <- function(from) {
+    .Deprecated(new = ".m2sparse", package = "Matrix")
+    if(anyNA(from))
+        stop("attempt to coerce matrix with NA to ngCMatrix")
+    .m2sparse(from, "ngC")
+}
+.m2ngCn <- function(from, na.is.not.0 = FALSE) {
+    .Deprecated(new = ".m2sparse", package = "Matrix")
+    if(!na.is.not.0 && anyNA(from))
+        stop("attempt to coerce matrix with NA to ngCMatrix")
+    .m2sparse(from, "ngC")
+}
+.m2ngTn <- function(from, na.is.not.0 = FALSE) {
+    .Deprecated(new = ".m2sparse", package = "Matrix")
+    if(!na.is.not.0 && anyNA(from))
+        stop("attempt to coerce matrix with NA to ngCMatrix")
+    .m2sparse(from, "ngT")
+}
+.n2dgT <- function(from) {
+    .Deprecated(new = ".sparse2kind", package = "Matrix")
+    .sparse2kind(from, "d")
+}
+.nC2d <- function(from) {
+    .Deprecated(new = ".sparse2kind", package = "Matrix")
+    .sparse2kind(from, "d")
+}
+.nC2l <- function(from) {
+    .Deprecated(new = ".sparse2kind", package = "Matrix")
+    .sparse2kind(from, "l")
+}
+
 ## Utility for Matrix.DeprecatedCoerce(); see below
 .as.via.virtual <- function(Class1, Class2, from = quote(from)) {
     if(!isClassDef(Class1))
@@ -106,6 +194,7 @@
     to
 }
 
+## FIXME: signal warning of class deprecatedWarning as .Deprecated() does
 Matrix.DeprecatedCoerce <- function(Class1, Class2) {
     if(!isClassDef(Class1))
         Class1 <- getClassDef(Class1)
@@ -267,12 +356,10 @@ rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 
 ## ~~~~ DEFUNCT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cBind <- function(..., deparse.level = 1) {
-    .Defunct(msg = "'cBind' is defunct; 'base::cbind' handles S4 objects since R 3.2.0")
-}
-rBind <- function(..., deparse.level = 1) {
-    .Defunct(msg = "'rBind' is defunct; 'base::rbind' handles S4 objects since R 3.2.0")
-}
+cBind <- function(..., deparse.level = 1)
+    .Defunct(new = "cbind", package = "Matrix")
+rBind <- function(..., deparse.level = 1)
+    .Defunct(msg = "rbind", package = "Matrix")
 
 
 ## ~~~~ "MISCELLANEOUS" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

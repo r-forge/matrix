@@ -537,7 +537,7 @@ setMethod("solve", signature(a = "CHMfactor", b = "missing"),
               x <- .Call(CHMfactor_spsolve,
                          a, b, match(system, system.def, 0L))
               switch(system,
-                     A =, LDLt = .M2symm(x),
+                     A =, LDLt = .M2sym(x),
                      LD =, DLt =, L =, Lt =, D = .M2tri(x),
                      P =, Pt = as(x, "pMatrix"))
 	  })

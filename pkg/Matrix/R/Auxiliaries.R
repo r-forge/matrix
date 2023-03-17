@@ -471,13 +471,13 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 }
 } ## MJ
 
-.M2symm <- function(from, ...) {
+.M2sym <- function(from, ...) {
     if(isSymmetric(from, ...))
         forceSymmetric(from)
     else
         stop("matrix is not symmetric; consider forceSymmetric() or symmpart()")
 }
-..M2symm <- function(from) { # for setAs()
+..M2sym <- function(from) { # for setAs()
     if(isSymmetric(from))
         forceSymmetric(from)
     else
