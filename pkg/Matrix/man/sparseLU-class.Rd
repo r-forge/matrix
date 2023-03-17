@@ -1,7 +1,9 @@
 \name{sparseLU-class}
 \title{Sparse LU decomposition of a square sparse matrix}
 \docType{class}
+%
 \alias{sparseLU-class}
+%
 \description{Objects of this class contain the components of the LU
   decomposition of a sparse square matrix.}
 \section{Objects from the Class}{
