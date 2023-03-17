@@ -76,14 +76,6 @@ setAs("Matrix", "diagonalMatrix",
 ..diag2gT <- function(from)
     .Call(R_diagonal_as_sparse, from, ".gT", "U", TRUE)
 
-## .diag2[ts]T() are exported ...
-.diag2tT <- function(from, uplo = "U", kind = ".", drop0 = TRUE)
-    .Call(R_diagonal_as_sparse, from,
-          `substr<-`(".tT", 1L, 1L, kind), uplo, drop0)
-.diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE)
-    .Call(R_diagonal_as_sparse, from,
-          `substr<-`(".sT", 1L, 1L, kind), uplo, drop0)
-
 ## For group methods
 .diag2tT.smart <- function(from, x, uplo = "U", kind = ".", drop0 = TRUE) {
     .Call(R_diagonal_as_sparse, from,
