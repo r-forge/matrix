@@ -693,7 +693,7 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 
 .CR2T <- function(from)
     .Call(CRsparse_as_Tsparse, from)
-.T2CR <- function(from, Csparse)
+.T2CR <- function(from, Csparse = TRUE)
     .Call(Tsparse_as_CRsparse, from, Csparse)
 
 .T2C  <- function(from)

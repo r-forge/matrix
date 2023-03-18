@@ -27,29 +27,48 @@
 \description{
 }
 \usage{
-.CR2RC(from)
-.CR2T(from)
-.M2diag(from, check = TRUE)
-.M2sym(from, ...)
 .M2tri(from, ...)
-.T2CR(from, Csparse = TRUE)
-.dense2g(from, kind = ".")
-.dense2kind(from, kind)
-.dense2m(from, ndense = FALSE)
-.dense2sparse(from, code)
-.diag2kind(from, kind)
-.diag2m(from)
-.diag2sparse(from, code, uplo = "U", drop0 = TRUE)
+.M2sym(from, ...)
+.M2diag(from, check = TRUE)
+
 .m2dense(from, code, uplo = "U", diag = "N")
 .m2sparse(from, code, uplo = "U", diag = "N")
-.sparse2dense(from, packed = FALSE)
-.sparse2g(from)
-.sparse2kind(from, kind, drop0 = FALSE)
+
+.dense2m(from, ndense = FALSE)
 .sparse2m(from)
+.diag2m(from)
+
+.dense2kind(from, kind)
+.sparse2kind(from, kind, drop0 = FALSE)
+.diag2kind(from, kind)
+
+.dense2g(from, kind = ".")
+.sparse2g(from)
+
+.sparse2dense(from, packed = FALSE)
+
+.dense2sparse(from, code)
+
+.diag2sparse(from, code, uplo = "U", drop0 = TRUE)
+
+.CR2T(from)
+.T2CR(from, Csparse = TRUE)
+
+.CR2RC(from)
 .tCR2RC(from)
 }
 \arguments{
-  \item{}{}
+  \item{from}{}
+  \item{check}{}
+  \item{code}{}
+  \item{kind}{}
+  \item{uplo}{}
+  \item{diag}{}
+  \item{drop0}{}
+  \item{packed}{}
+  \item{ndense}{}
+  \item{Csparse}{}
+  \item{\dots}{}
 }
 \value{
 }
