@@ -5,7 +5,32 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-01-21 r3810)}{
+\section{Changes in version 1.5-4 (2023-03-18 r3816)}{
+  \subsection{Deprecated and Defunct}{
+    \itemize{
+      \item The following low level coercion utilities, which were
+      previously exported but always \dQuote{hidden} and undocumented,
+      are now deprecated:
+      \code{..2dge}, \code{.C2nC}, \code{.T2Cmat}, \code{.asmatrix},
+      \code{.dense2sy}, \code{.diag2mat}, \code{.diag2sT},
+      \code{.diag2tT}, \code{.dsy2dsp}, \code{.dsy2mat}, \code{.dxC2mat},
+      \code{.m2dgC}, \code{.m2lgC}, \code{.m2ngC}, \code{.m2ngCn},
+      \code{.m2ngTn}, \code{.n2dgT}, \code{.nC2d}, \code{.nC2l}.
+      \cr
+      The deprecations follow efforts to define more general and more
+      systematic (but still fast) coercion utilities, to allow expert
+      users to bypass S4 dispatch in more cases.  The subset of these
+      currently exported is documented under \code{?FastCoercions}.
+      Deprecation warnings will suggest an appropriate replacement
+      from that list.  (One exception is \code{.dsy2dsp}, for which
+      warnings will suggest generic function \code{pack}, and that
+      \emph{does} dispatch.)
+      \cr
+      It is not always the case that the replacement can be
+      \dQuote{dropped in}, hence users should consult the relevant
+      documentation when changing their code.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Defining \code{sequence.default} for \R{} \code{< 4.0.0},
@@ -26,8 +51,9 @@
       zero-initializes also in the \code{alloca}-using case.
 
       \item Replace deprecated \code{Rdefines.h} with
-      \code{Rinternals.h} and move outside \code{extern "C"}
-      wrapper in API \file{inst/include/Matrix.h}.
+      \code{Rinternals.h} and move inclusion outside of
+      \code{extern "C"} wrapper in API header
+      \file{inst/include/Matrix.h}.
 
       \item Replace \code{sprintf} with \code{snprintf} globally
       to avoid potential buffer overflows.
