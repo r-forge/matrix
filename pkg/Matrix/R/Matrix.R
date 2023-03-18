@@ -41,8 +41,8 @@ setMethod("as.array",  signature(x = "Matrix"),
           function(x, ...) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
-setMethod("head", signature(x = "Matrix"), utils::head.matrix)
-setMethod("tail", signature(x = "Matrix"), utils::tail.matrix)
+setMethod("head", signature(x = "Matrix"), head.matrix)
+setMethod("tail", signature(x = "Matrix"), tail.matrix)
 
 setMethod("drop", signature(x = "Matrix"),
 	  function(x) if(all(x@Dim != 1L)) x else drop(as(x, "matrix")))
