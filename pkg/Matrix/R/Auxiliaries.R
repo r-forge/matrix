@@ -691,11 +691,15 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
         .m2sparse(from, paste0(kind, "g", repr), NULL, NULL)
 }
 
-.CR2T <- function(from) .Call(CRsparse_as_Tsparse, from)
-.T2CR <- function(from, Csparse) .Call(Tsparse_as_CRsparse, from, Csparse)
+.CR2T <- function(from)
+    .Call(CRsparse_as_Tsparse, from)
+.T2CR <- function(from, Csparse)
+    .Call(Tsparse_as_CRsparse, from, Csparse)
 
-.T2C  <- function(from) .Call(Tsparse_as_CRsparse, from,  TRUE)
-.T2R  <- function(from) .Call(Tsparse_as_CRsparse, from, FALSE)
+.T2C  <- function(from)
+    .Call(Tsparse_as_CRsparse, from, TRUE)
+.T2R  <- function(from)
+    .Call(Tsparse_as_CRsparse, from, FALSE)
 
 .tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
 .CR2RC <- function(from) {

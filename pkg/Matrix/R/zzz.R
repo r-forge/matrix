@@ -90,8 +90,8 @@
     .sparse2kind(from, "n")
 }
 .T2Cmat <- function(from, isTri) {
-    .Deprecated(new = ".T2C", package = "Matrix")
-    .T2C(from)
+    .Deprecated(new = ".T2CR", package = "Matrix")
+    .T2CR(from, Csparse = TRUE)
 }
 .asmatrix <- function(x) {
     .Deprecated(new = "as(., \"matrix\")", package = "Matrix")
