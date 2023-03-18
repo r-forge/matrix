@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-03-18 r3817)}{
+\section{Changes in version 1.5-4 (2023-03-18 r3818)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
