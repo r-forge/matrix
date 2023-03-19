@@ -123,7 +123,7 @@
     \item{diag}{\code{\linkS4class{diagonalMatrix}}}
   }
   
-  The names should be seen as guides, rather than as an exact
+  Abbreviations should be seen as guides, rather than as an exact
   description of behaviour.  For example, \code{.m2dense} and
   \code{.m2sparse} accept vectors in addition to matrices.
   
@@ -144,5 +144,27 @@
   to pass optional arguments to the structure-checking functions.
 }
 \examples{
-## TODO
+D. <- diag(x = c(1, 1, 2, 3, 5, 8))
+D.0 <- Diagonal(x = c(0, 0, 0, 3, 5, 8))
+S. <- toeplitz(as.double(1:6))
+C. <- new("dgCMatrix", Dim = c(3L, 4L),
+          p = c(0L, 1L, 1L, 1L, 3L), i = c(1L, 0L, 2L), x = c(-8, 2, 3))
+
+stopifnot(identical(.M2tri( D.), as(D., "triangularMatrix")),
+          identical(.M2sym( D.), as(D., "symmetricMatrix")),
+          identical(.M2diag(D.), as(D., "diagonalMatrix")),
+          identical(.sparse2kind(C., "l"),
+                    as(C., "lMatrix")),
+          identical(.dense2kind(.sparse2dense(C.), "l"),
+                    as(as(C., "denseMatrix"), "lMatrix")),
+          identical(.diag2sparse(D.0, "ntC"),
+                    .dense2sparse(.diag2dense(D.0, "ntp"), "C")),
+          identical(.dense2g(.diag2dense(D.0, "dsy")),
+                    .sparse2dense(.sparse2g(.diag2sparse(D.0, "dsT")))),
+          identical(S.,
+                    .sparse2m(.m2sparse(S., ".sR"))),
+          identical(S. * lower.tri(S.) + diag(1, 6L),
+                    .dense2m(.m2dense(S., ".tr", "L", "U"))),
+          identical(.CR2RC(C.), .T2CR(.CR2T(C.), FALSE)),
+          identical(.tCR2RC(C.), .CR2RC(t(C.))))
 }
