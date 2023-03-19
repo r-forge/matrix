@@ -1027,6 +1027,8 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     
     if (ge0) {
 	REPROTECT(x0 = duplicate(x0), pidB);
+	if (do_na2one)
+	    na2one(x0);
 	SET_SLOT(to, Matrix_xSym, x0);
 	UNPROTECT(2); /* x0, to */
 	return to;
