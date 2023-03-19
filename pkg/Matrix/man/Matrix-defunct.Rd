@@ -1,5 +1,5 @@
 \name{Matrix-defunct}
-\title{Deprecated Functions in Package \pkg{Matrix}}
+\title{Defunct Functions in Package \pkg{Matrix}}
 %
 \alias{Matrix-defunct}
 %

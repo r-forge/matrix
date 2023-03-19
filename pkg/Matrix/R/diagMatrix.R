@@ -2,8 +2,8 @@
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("Matrix", "diagonalMatrix", ..M2diag)
-setAs("matrix", "diagonalMatrix", ..M2diag)
+setAs("Matrix", "diagonalMatrix", .M2diag)
+setAs("matrix", "diagonalMatrix", .M2diag)
 
 ## MJ: no longer needed ... replacement above
 if(FALSE) {
@@ -129,7 +129,7 @@ setAs("diagonalMatrix",           "matrix", .diag2m)
 setAs("diagonalMatrix",           "vector", .diag2v)
 
 setMethod("as.vector", signature(x = "diagonalMatrix"),
-          function(x, mode) as.vector(.diag2v(x), mode))
+          function(x, mode = "any") as.vector(.diag2v(x), mode))
 
 setMethod("as.numeric", signature(x = "diagonalMatrix"),
           function(x, ...) as.double(.diag2v(x)))
@@ -706,7 +706,7 @@ replDiag <- function(x, i, j, ..., value) {
     ## TODO: the following is a bit expensive; have cases above e.g. [i,] where
     ## ----- we could check *much* faster :
     if(isDiagonal(x))
-        .M2diag(x, check = FALSE)
+        forceDiagonal(x)
     else if(isSymmetric(x))
         forceSymmetric(x)
     else if(!(it <- isTriangular(x)))

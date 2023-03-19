@@ -21,7 +21,7 @@ setMethod("chol", signature(x = "symmetricMatrix"),
 setMethod("chol", signature(x = "triangularMatrix"),
 	  function(x, ...) {
               if(isDiagonal(x))
-                  chol(.M2diag(x, check = FALSE), ...)
+                  chol(forceDiagonal(x), ...)
               else stop("chol(x) is undefined: 'x' is not symmetric")
           })
 
