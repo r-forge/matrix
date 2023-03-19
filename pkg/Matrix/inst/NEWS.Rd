@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-03-20 r3824)}{
+\section{Changes in version 1.5-4 (2023-03-20 r3825)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -20,7 +20,7 @@
       The deprecations follow efforts to define more general and more
       systematic (but still fast) coercion utilities, to allow expert
       users to bypass S4 dispatch in more cases.  The subset of these
-      currently exported is documented under \code{?FastCoercions}.
+      currently exported is documented under \code{help("fastMisc")}.
       Deprecation warnings will suggest an appropriate replacement,
       mostly from that list.
       \cr
