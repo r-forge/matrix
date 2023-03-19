@@ -604,7 +604,7 @@ assert.EQ.(as(I2,"matrix"), I, tol = 7e-7)
 set.seed(131); ii <- sample(length(WW), size= 100)
 WW[ii] <- WW[ii] * (1 + 1e-7*runif(100))
 SW. <- symmpart(WW)
-SW2 <- Matrix:::forceSymmetric(WW)
+SW2 <- forceSymmetric(WW)
 stopifnot(all.equal(as(SW.,"matrix"),
                     as(SW2,"matrix"), tolerance = 1e-7))
 (ch <- all.equal(WW, as(SW., "generalMatrix"), tolerance = 0))
