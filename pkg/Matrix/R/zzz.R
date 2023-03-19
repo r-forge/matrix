@@ -102,7 +102,7 @@
     .M2sym(from, ...)
 }
 .diag2mat <- function(from) {
-    .Deprecated(new = ".diag2m", package = "Matrix")
+    .Deprecated(new = "as(., \"matrix\")", package = "Matrix")
     .diag2m(from)
 }
 .diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-03-18 r3818)}{
+\section{Changes in version 1.5-4 (2023-03-19 r3823)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -21,10 +21,8 @@
       systematic (but still fast) coercion utilities, to allow expert
       users to bypass S4 dispatch in more cases.  The subset of these
       currently exported is documented under \code{?FastCoercions}.
-      Deprecation warnings will suggest an appropriate replacement
-      from that list.  (One exception is \code{.dsy2dsp}, for which
-      warnings will suggest generic function \code{pack}, and that
-      \emph{does} dispatch.)
+      Deprecation warnings will suggest an appropriate replacement,
+      mostly from that list.
       \cr
       It is not always the case that the replacement can be
       \dQuote{dropped in}, hence users should consult the relevant
