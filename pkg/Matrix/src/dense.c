@@ -29,7 +29,7 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
     }
 
     char cl[] = "...Matrix";
-    cl[0] = (code[0] == '.') ? type2kind(tf) : code[0];
+    cl[0] = (code[0] == '.' || code[0] == ',') ? type2kind(tf) : code[0];
     cl[1] = code[1];
     cl[2] = code[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
@@ -751,11 +751,10 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 }
 
 /* as(<denseMatrix>, "matrix") */
-SEXP R_dense_as_matrix(SEXP from, SEXP ndense)
+SEXP R_dense_as_matrix(SEXP from)
 {
     /* Result must be newly allocated because we add attributes */
-    PROTECT(from = dense_as_general(
-		from, (asLogical(ndense) != 0) ? 'l' : '.', 1, 0));
+    PROTECT(from = dense_as_general(from, ',', 1, 0));
     SEXP to = PROTECT(GET_SLOT(from, Matrix_xSym)),
 	dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
@@ -767,7 +766,7 @@ SEXP R_dense_as_matrix(SEXP from, SEXP ndense)
 }
 
 /* as(<.geMatrix>, "matrix") */
-SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense)
+SEXP R_geMatrix_as_matrix(SEXP from, SEXP pattern)
 {
     /* Result must be newly allocated because we add attributes */
     SEXP to,
@@ -776,7 +775,7 @@ SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense)
     PROTECT_INDEX pid;
     PROTECT_WITH_INDEX(to = GET_SLOT(from, Matrix_xSym), &pid);
     REPROTECT(to = duplicate(to), pid);
-    if (asLogical(ndense) != 0)
+    if (asLogical(pattern) != 0)
 	na2one(to);
     setAttrib(to, R_DimSymbol, dim);
     if (!DimNames_is_trivial(dimnames))
@@ -786,23 +785,22 @@ SEXP R_geMatrix_as_matrix(SEXP from, SEXP ndense)
 }
 
 /* as(<denseMatrix>, "vector") */
-SEXP R_dense_as_vector(SEXP from, SEXP ndense)
+SEXP R_dense_as_vector(SEXP from)
 {
     /* Result must be newly allocated if and only if different from 'x' slot */
-    PROTECT(from = dense_as_general(
-		from, (asLogical(ndense) != 0) ? 'l' : '.', 0, 0));
+    PROTECT(from = dense_as_general(from, ',', 0, 0));
     from = GET_SLOT(from, Matrix_xSym);
     UNPROTECT(1); /* from */
     return from;
 }
 
 /* as(<.geMatrix>, "vector") */
-SEXP R_geMatrix_as_vector(SEXP from, SEXP ndense)
+SEXP R_geMatrix_as_vector(SEXP from, SEXP pattern)
 {
     /* Result must be newly allocated if and only if different from 'x' slot */
     PROTECT_INDEX pid;
     PROTECT_WITH_INDEX(from = GET_SLOT(from, Matrix_xSym), &pid);
-    if (asLogical(ndense) != 0) {
+    if (asLogical(pattern) != 0) {
 	int *px = LOGICAL(from);
 	R_xlen_t nx = XLENGTH(from);
 	while (nx--) {
@@ -940,9 +938,11 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
  *
  * @param from A `denseMatrix`, a `diagonalMatrix`, a numeric or logical 
  *     `matrix`, or a numeric or logical vector.
- * @param kind A `char` flag, one of `'.'`, `'d'`, `'l'`, and `'n'`, 
+ * @param kind A `char` flag, one of `'.'`, `','`, `'d'`, `'l'`, and `'n'`, 
  *     indicating the "kind" of `.geMatrix` desired.  A dot `'.'` means 
- *     to preserve the "kind" of `from`.
+ *     to preserve the kind of `from`.  A comma `','` is equivalent to
+ *     `'.'` with the additional step of replacing `NA` with 1 for `from`
+ *     inheriting from `nMatrix`.
  * @param new An `int` flag allowing the user to control allocation.
  *     If 0, then usual copy-on-modify rules are employed.  
  *     If less than 0, then the `x` slot of the result is the result 
@@ -985,10 +985,11 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     */
     
     const char *clf = valid[ivalid];
-    if (kind == '.')
+    int do_na2one = clf[0] == 'n' && kind != 'n' && kind != '.';
+    if (kind == '.' || kind == ',')
 	kind = clf[0];
-    Rboolean ge = (clf[1] == 'g'), ge0 = ge && kind == clf[0];
-    if (ge0 && new <= 0)
+    int ge = clf[1] == 'g', ge0 = ge && kind == clf[0];
+    if (ge0 && new <= 0 && !do_na2one)
 	return from;
     
     SEXP to;
@@ -1023,6 +1024,7 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     SEXP x0;
     PROTECT_INDEX pidB;
     PROTECT_WITH_INDEX(x0 = GET_SLOT(from, Matrix_xSym), &pidB);
+    
     if (ge0) {
 	REPROTECT(x0 = duplicate(x0), pidB);
 	SET_SLOT(to, Matrix_xSym, x0);
@@ -1031,7 +1033,6 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
     }
     
     SEXPTYPE tf = TYPEOF(x0), tt = kind2type(kind);
-    int do_na2one = clf[0] == 'n' && kind != 'n';
     if (ge) {
 	if (new == 0 && do_na2one) {
 	    /* Try to avoid an allocation ... */

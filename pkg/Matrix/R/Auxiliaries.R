@@ -501,37 +501,56 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
         tril(from)
 }
 
-.M2diag <- function(from, check = TRUE) {
-    if (check && !isDiagonal(from))
-        stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
-    x <- diag(from, names = FALSE)
-    cl <- switch(typeof(x),
-                 double = {
-                     unit <- allTrue(x == 1)
-                     "ddiMatrix" },
+## MJ: Implement forceTriangular() and export this and that?
+## MJ: Notably this provides a model for (maybe, in the future) allowing
+## forceSymmetric(<non-square>) ... by truncating the "too long" dimension.
+forceDiagonal <- function(x, diag = NA_character_) {
+    y <- diag(x, names = FALSE) # FIXME? don't allocate if diag == "U"
+    cl <- switch(typeof(y),
+                 logical = {
+                     if(is.na(diag))
+                         diag <- if(allTrue(y)) "U" else "N"
+                     "ldiMatrix" },
                  integer = {
-                     unit <- allTrue(x == 1L)
-                     storage.mode(x) <- "double"
+                     if(is.na(diag))
+                         diag <- if(allTrue(y == 1L)) "U" else "N"
+                     storage.mode(y) <- "double"
                      "ddiMatrix" },
                  ## integer = {
-                 ##     unit <- allTrue(x == 1L)
+                 ##     if(is.na(diag))
+                 ##         diag <- if(allTrue(y == 1L)) "U" else "N"
                  ##     "idiMatrix" },
-                 logical = {
-                     unit <- allTrue(x)
-                     "ldiMatrix" },
+                 double = {
+                     if(is.na(diag))
+                         diag <- if(allTrue(y == 1)) "U" else "N"
+                     "ddiMatrix" },
                  complex =
                      stop("complex \"diagonalMatrix\" not yet implemented"),
                  ## complex = {
-                 ##     unit <- allTrue(x == 1+0i)
+                 ##     if(is.na(diag))
+                 ##         diag <- if(allTrue(y == 1+0i)) "U" else "N"
                  ##     "zdiMatrix" },
                  stop(gettextf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\"",
-                               typeof(x)),
+                               typeof(y)),
                       domain = NA))
-    new(cl, Dim = dim(from), Dimnames = .M.DN(from),
-        diag = if(unit) "U" else "N", x = if(unit) x[FALSE] else x)
+    n <- length(y)
+    d <- dim(x)
+    dn <- .M.DN(x)
+    if(any(d > n)) {
+        d <- c(n, n)
+        w <- if(d[1L] > n) 1L else 2L
+        if(!is.null(dnw <- dn[[w]]))
+            dn[[w]] <- dnw[seq_len(n)]
+    }
+    new(cl, Dim = d, Dimnames = dn, diag = diag,
+        x = if(diag == "N") y else y[FALSE])
 }
-..M2diag <- function(from) # for setAs()
-    .M2diag(from, check = TRUE)
+
+.M2diag <- function(from) {
+    if (!isDiagonal(from))
+        stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
+    forceDiagonal(from)
+}
 
 .dense2g <- function(from, kind = ".")
     .Call(R_dense_as_general, from, kind)
@@ -539,15 +558,15 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 .sparse2g <- function(from)
     .Call(R_sparse_as_general, from)
 
-.dense2m <- function(from, ndense = FALSE)
-    .Call(R_dense_as_matrix, from, ndense)
+.dense2m <- function(from)
+    .Call(R_dense_as_matrix, from)
 
 .sparse2m <- function(from)
     .Call(R_sparse_as_matrix, from)
 
 .diag2m <- function(from) {
-    D <- base::diag(if(from@diag == "N") from@x else as1(from@x),
-                    nrow = from@Dim[1L])
+    D <- diag(if(from@diag == "N") from@x else as1(from@x),
+              nrow = from@Dim[1L])
     if(!identical(dn <- from@Dimnames, list(NULL, NULL)))
         dimnames(D) <- dn
     D
@@ -562,11 +581,11 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     P
 }
 
-.ge2m <- function(from, ndense = FALSE)
-    .Call(R_geMatrix_as_matrix, from, ndense)
+.ge2m <- function(from, pattern = FALSE)
+    .Call(R_geMatrix_as_matrix, from, pattern)
 
-.dense2v <- function(from, ndense = FALSE)
-    .Call(R_dense_as_vector, from, ndense)
+.dense2v <- function(from)
+    .Call(R_dense_as_vector, from)
 
 .sparse2v <- function(from)
     .Call(R_sparse_as_vector, from)
@@ -588,8 +607,8 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
     x
 }
 
-.ge2v <- function(from, ndense = FALSE)
-    .Call(R_geMatrix_as_vector, from, ndense)
+.ge2v <- function(from, pattern = FALSE)
+    .Call(R_geMatrix_as_vector, from, pattern)
 
 .dense2kind <- function(from, kind)
     .Call(R_dense_as_kind, from, kind)
@@ -624,8 +643,8 @@ symmetrizeDimnames <- function(x, col=TRUE, names=TRUE) {
 ..diag2l <- function(from)
     .Call(R_diagonal_as_kind, from, "l")
 
-.dense2sparse <- function(from, code)
-    .Call(R_dense_as_sparse, from, code, NULL, NULL)
+.dense2sparse <- function(from, repr = "C")
+    .Call(R_dense_as_sparse, from, `substr<-`("...", 3L, 3L, repr), NULL, NULL)
 
 .diag2sparse <- function(from, code, uplo = "U", drop0 = TRUE)
     .Call(R_diagonal_as_sparse, from, code, uplo, drop0)

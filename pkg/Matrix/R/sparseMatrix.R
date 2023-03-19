@@ -60,7 +60,7 @@ for (.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
     setAs(.cl, "vector", .sparse2v)
 
     setMethod("as.vector", signature(x = .cl),
-              function(x, mode) as.vector(.sparse2v(x), mode))
+              function(x, mode = "any") as.vector(.sparse2v(x), mode))
 }
 rm(.cl)
 
