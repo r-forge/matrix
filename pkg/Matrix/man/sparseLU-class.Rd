@@ -81,6 +81,6 @@ PAQ. <- with(xA, P \%*\% A \%*\% t(Q))
 stopifnot(all.equal(unname(pA), unname(PAQ.), tolerance = 1e-12))
 
 pLU <- drop0(luA@L \%*\% luA@U) # L \%*\% U -- dropping extra zeros
-stopifnot(all.equal(pA, pLU, tolerance = 1e-12))
+stopifnot(all.equal(pA, pLU, tolerance = 1e-12)) # (incl. permuted row- and column-names)
 }
 \keyword{classes}

@@ -118,7 +118,7 @@
       \item{\code{.solve.dgC.*()}:}{a \code{"\linkS4class{dgCMatrix}"}.}
     }
   }
-  \item{Chx}{optionally the \code{\link{Cholesky(x,..)}} decomposition of
+  \item{Chx}{optionally the \code{\link{Cholesky}(x,..)} decomposition of
     \code{x}; if \code{Chx} is specified, \code{x} is unneeded.}
   \item{res.kind}{a string, one of \code{"trace", "sumLog", "prod", "min",
       "max", "range", "diag", "diagBack"}.}
@@ -215,7 +215,7 @@ stopifnot(identical(.M2tri( D.), as(D., "triangularMatrix")),
           identical(.CR2RC(C.), .T2CR(.CR2T(C.), FALSE)),
           identical(.tCR2RC(C.), .CR2RC(t(C.))))
 
-A <- tcrossprod(C.)/6 +Diagonal(3,1/3); A[1,2] <- 3
+A <- tcrossprod(C.)/6 + Diagonal(3, 1/3); A[1,2] <- 3; A
 stopifnot(exprs = {
     is.numeric( x. <- c(2.2, 0, -1.2) )
     all.equal(.solve.dgC.lu(A, c(1,0,0), check=FALSE),
@@ -231,7 +231,7 @@ Xt <- t(X)                 # *transposed*  X (for L.S.)
 str(solveCh <- .solve.dgC.chol(Xt, y, check=FALSE)) # Xt *is* dgC..
 stopifnot(exprs = {
     all.equal(solveCh$coef, 1:3, tol = 1e-3)# rel.err ~ 1e-4
-    all.equal(solveCh$coef, drop(solve(tcrossprod(Xt), Xt %*% y)))
+    all.equal(solveCh$coef, drop(solve(tcrossprod(Xt), Xt \%*\% y)))
     all.equal(solveCh$coef, .solve.dgC.qr(X, y, check=FALSE))
 })
 }
