@@ -221,8 +221,8 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
     lu.a <- lu(a) # error if near-singular
 
     ## MJ: Is the ratio below really a good proxy for 1/kappa(A) ??
-
-    if(tol > 0) {
+    if(tol > 0) { # ratio min_j(lambda_j) / max_j(lambda_j) of eigenvalues of U
+        ## is inexpensive but *not* the same as == ||A^-1|| * ||A||
         rU <- range(abs(diag(lu.a@U)))
         if(rU[1L] / rU[2L] < tol)
             stop(gettextf("A = LU is computationally singular: min(d)/max(d) = %9.4g, d = abs(diag(U))",
@@ -633,10 +633,11 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
     .Call(dgCMatrix_cholsol, a, b)
 }
 
+## *The* interface to cs_qrsol()
 ## a=dgCMatrix
-## b=vector or 1-column matrix
+## b=vector or 1-column matrix  {FIXME in ../src/dgCMatrix.c}
 ## x=dgeMatrix
-.solve.dgC.qr <- function(a, b, order = 1L, check = TRUE) { # -> MatrixModels
+.solve.dgC.qr <- function(a, b, order = 3L, check = TRUE) { # -> MatrixModels
     if(check && !is(a, "dgCMatrix"))
         a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
     .Call(dgCMatrix_qrsol, a, b, order)

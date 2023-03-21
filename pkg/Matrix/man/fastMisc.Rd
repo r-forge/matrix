@@ -112,18 +112,15 @@
     \code{\linkS4class{CsparseMatrix}}.}
   \item{\dots}{optional arguments passed to \code{\link{isTriangular}}
     or \code{\link{isSymmetric}}.}
-  %% .diag.dsC() / .solve.dgC.*():
-  \item{x, a}{a numeric sparse column-compressed \code{\linkS4class{Matrix}};
-    for \describe{
-      \item{\code{.diag.dsC()}:}{   a \code{"\linkS4class{dsCMatrix}"},}
-      \item{\code{.solve.dgC.*()}:}{a \code{"\linkS4class{dgCMatrix}"}.}
-    }
-  }
+  %% .diag.dsC():
+  \item{x}{a numeric sparse column-compressed \code{"\linkS4class{dgCMatrix}"}.}
   \item{Chx}{optionally the \code{\link{Cholesky}(x,..)} decomposition of
     \code{x}; if \code{Chx} is specified, \code{x} is unneeded.}
   \item{res.kind}{a string, one of \code{"trace", "sumLog", "prod", "min",
       "max", "range", "diag", "diagBack"}.}
-  %% solve.dgC.*()  --> ../R/solve.R
+  %% solve.dgC.*()  --> ../R/solve.R :
+  \item{a}{a numeric symmetric sparse column-compressed
+    \code{"\linkS4class{dsCMatrix}"}.}
   \item{b}{a vector or matrix, the \dQuote{right hand side} \eqn{b}
     where we solve \eqn{A x = b} for \eqn{x}.}
   \item{check}{a logical indicating if the first argument possibly first
