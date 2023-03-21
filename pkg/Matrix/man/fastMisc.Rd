@@ -74,7 +74,7 @@
 
 .solve.dgC.chol(a, b, check = TRUE)
 .solve.dgC.lu  (a, b, tol = .Machine$double.eps, check = TRUE)
-.solve.dgC.qr  (a, b, order = 1L, check = TRUE)
+.solve.dgC.qr  (a, b, order = 3L, check = TRUE)
 }
 \arguments{
   \item{from}{a \code{\linkS4class{Matrix}}, matrix, or vector.}
