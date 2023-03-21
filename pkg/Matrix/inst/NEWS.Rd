@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-03-21 r3833)}{
+\section{Changes in version 1.5-4 (2023-03-22 r3834)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -27,6 +27,10 @@
       It is not always the case that the replacement can be
       \dQuote{dropped in}, hence users should consult the relevant
       documentation when changing their code.
+
+      \item Warnings signaled by coercion methods deprecated
+      in \pkg{Matrix} 1.5-0 now correctly inherit from class
+      \code{deprecatedWarning}.
     }
   }
   \subsection{Bug Fixes}{
@@ -34,7 +38,8 @@
       \item Defining \code{sequence.default} for \R{} \code{< 4.0.0},
       so that \code{kronecker(<CsparseMatrix>, <CsparseMatrix>)},
       \code{kronecker(<CsparseMatrix>, <diagonalMatrix>)}, and
-      \code{<diagonalMatrix> \%*\% <denseMatrix>} continue to work there.
+      \code{<diagonalMatrix> \%*\% <denseMatrix>} continue to work
+      there.
     }
   }
   \subsection{Misc}{

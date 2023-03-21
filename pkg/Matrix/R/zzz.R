@@ -194,7 +194,6 @@
     to
 }
 
-## FIXME: signal warning of class deprecatedWarning as .Deprecated() does
 Matrix.DeprecatedCoerce <- function(Class1, Class2) {
     if(!isClassDef(Class1))
         Class1 <- getClassDef(Class1)
@@ -206,18 +205,24 @@ Matrix.DeprecatedCoerce <- function(Class1, Class2) {
        ((w.na <- is.na(w <- as.integer(w))) || w > 0L)) {
         cln1 <- Class1@className
         cln2 <- Class2@className
-        warning. <-
-            if(w.na && grepl("d(g.|.C)Matrix", cln2))
-                function(..., call., domain) message(..., domain = domain)
-            else if(w.na || w == 1L)
-                warning
-            else stop
-        warning.(gettextf("as(<%s>, \"%s\") is deprecated since Matrix 1.5-0; do %s instead",
-                          cln1, cln2,
-                          deparse1(.as.via.virtual(Class1, Class2, quote(.)))),
-                 call. = FALSE, domain = NA)
+
+        old <- sprintf("as(<%s>, \"%s\")", cln1, cln2)
+        new <- deparse1(.as.via.virtual(Class1, Class2, quote(.)))
+
         if(w.na)
-            options(Matrix.warnDeprecatedCoerce = 0L)
+            on.exit(options(Matrix.warnDeprecatedCoerce = 0L))
+        if(w.na && grepl("d(g.|.C)Matrix", cln2)) {
+            cond <-
+                tryCatch(.Deprecated(old = old, new = new, package = "Matrix"),
+                         deprecatedWarning = identity)
+            message(conditionMessage(cond), domain = NA)
+        } else {
+            if(!w.na && w > 1L) {
+                oop <- options(warn = 2L)
+                on.exit(options(oop))
+            }
+            .Deprecated(old = old, new = new, package = "Matrix")
+        }
     }
     invisible(NULL)
 }
