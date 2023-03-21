@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-4 (2023-03-21 r3829)}{
+\section{Changes in version 1.5-4 (2023-03-21 r3833)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -44,7 +44,7 @@
       instead of API macros \code{Memzero()} and \code{Memcpy()}
       which never check for overflow.  C-level macro \code{AZERO()}
       is no longer defined.
-      
+
       \item C-level macro \code{Calloc_or_Alloca_TO()} now
       zero-initializes also in the \code{alloca}-using case.
 

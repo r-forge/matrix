@@ -1580,7 +1580,7 @@ cholmod_sparse *cholmod_add
 ) ;
 
 cholmod_sparse *cholmod_l_add (cholmod_sparse *, cholmod_sparse *,
-			       double[2], double[2],
+			       double [2], double [2],
 			       int, int, cholmod_common *) ;
 
 /* -------------------------------------------------------------------------- */
