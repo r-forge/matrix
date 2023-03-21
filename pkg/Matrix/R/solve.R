@@ -627,17 +627,17 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 ## a=dgCMatrix
 ## b=vector or 1-column matrix
 ## x=dgeMatrix
-.solve.dgC.chol <- function(x, y, check = TRUE) { # -> MatrixModels
-    if(check && !is(x, "dgCMatrix"))
-        x <- as(as(as(x, "CsparseMatrix"), "generalMatrix"), "dMatrix")
-    .Call(dgCMatrix_cholsol, x, y)
+.solve.dgC.chol <- function(a, b, check = TRUE) { # -> MatrixModels
+    if(check && !is(a, "dgCMatrix"))
+        a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
+    .Call(dgCMatrix_cholsol, a, b)
 }
 
 ## a=dgCMatrix
 ## b=vector or 1-column matrix
 ## x=dgeMatrix
-.solve.dgC.qr <- function(x, y, order = 1L, check = TRUE) { # -> MatrixModels
-    if(check && !is(x, "dgCMatrix"))
-        x <- as(as(as(x, "CsparseMatrix"), "generalMatrix"), "dMatrix")
-    .Call(dgCMatrix_qrsol, x, y, order)
+.solve.dgC.qr <- function(a, b, order = 1L, check = TRUE) { # -> MatrixModels
+    if(check && !is(a, "dgCMatrix"))
+        a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
+    .Call(dgCMatrix_qrsol, a, b, order)
 }

@@ -1,5 +1,5 @@
 \name{fastMisc}
-\title{Low Level Coercion Functions}
+\title{\dQuote{Low Level} Coercions and Methods}
 %
 \alias{fastMisc}
 % coercions:
@@ -24,7 +24,7 @@
 \alias{.sparse2m}
 \alias{.sparse2v}
 \alias{.tCR2RC}
-%% other direct methods:
+% other direct methods:
 \alias{.diag.dsC}
 \alias{.solve.dgC.chol}
 \alias{.solve.dgC.lu}
@@ -35,7 +35,8 @@
   often to bypass S4 dispatch and avoid the associated overhead.
   These are exported to provide this capability to expert users.
   Typical users should continue to rely on S4 generic functions
-  to dispatch suitable methods, e.g., call \code{as(., <class>)} for coercions.
+  to dispatch suitable methods, by calling,
+  e.g., \code{as(., <class>)} for coercions.
 }
 \usage{
 .M2tri(from, ...)
@@ -71,9 +72,9 @@
 
 .diag.dsC(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag")
 
-.solve.dgC.chol(x, y, check = TRUE)
+.solve.dgC.chol(a, b, check = TRUE)
 .solve.dgC.lu  (a, b, tol = .Machine$double.eps, check = TRUE)
-.solve.dgC.qr  (x, y, order = 3L, check = TRUE)
+.solve.dgC.qr  (a, b, order = 1L, check = TRUE)
 }
 \arguments{
   \item{from}{a \code{\linkS4class{Matrix}}, matrix, or vector.}
@@ -123,7 +124,7 @@
   \item{res.kind}{a string, one of \code{"trace", "sumLog", "prod", "min",
       "max", "range", "diag", "diagBack"}.}
   %% solve.dgC.*()  --> ../R/solve.R
-  \item{y, b}{a vector or matrix, the \dQuote{right hand side} \eqn{b}
+  \item{b}{a vector or matrix, the \dQuote{right hand side} \eqn{b}
     where we solve \eqn{A x = b} for \eqn{x}.}
   \item{check}{a logical indicating if the first argument possibly first
     needs to be coerced to a \linkS4class{dgCMatrix}; should be set to
