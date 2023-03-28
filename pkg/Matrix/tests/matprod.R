@@ -152,7 +152,13 @@ dU <- diagN2U(Matrix(d, doDiag = FALSE)) # unitriangular sparse
 tU <- dU; tU[1,2:3] <- 3:4; tU[2,3] <- 7; tU # ditto  "unitri" sparse
 (T <- new("dtrMatrix", diag = "U", x= c(0,0,5,0), Dim= c(2L,2L),
           Dimnames= list(paste0("r",1:2),paste0("C",1:2)))) # unitriangular dense
-##                                                            ^^^^^^^^^^^^
+pT <- pack(T)#                                                ^^^^^^^^^^^^
+mt <- m[,2:3] %*% pT # deprecation warning in pre-1.5-4
+stopifnot(is(pT, "dtpMatrix"), validObject(pT),
+          validObject(mt), is(mt, "dgeMatrix"),
+          identical(as.matrix(mt),
+                    array(c(1,0,0, 5,2,1), dim = 3:2, dimnames = list(c("A","B","C"), c("b","c"))))
+          )
 
 A <- matrix(c(0.4, 0.1, 0, 0), 2)
 B <- matrix(c(1.1,  0,  0, 0), 2);  ABt <- tcrossprod(A, B)
