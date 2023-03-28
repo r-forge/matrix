@@ -126,7 +126,7 @@ setMethod("%*%", signature(x = "dgeMatrix", y = "dtpMatrix"),
 setMethod("%*%", signature(x = "dtpMatrix", y = "matrix"),
           function(x, y) .Call(dtpMatrix_matrix_mm, x, y, FALSE, FALSE))
 setMethod("%*%", signature(x = "matrix", y = "dtpMatrix"),
-          function(x, y) ..2dge(x) %*% y)
+          function(x, y) .m2dense(x, "dge") %*% y)
 
 ## dtpMatrix <-> numeric : the auxiliary functions are R version specific!
 ##setMethod("%*%", signature(x = "dtpMatrix", y = "numeric"), .M.v)
