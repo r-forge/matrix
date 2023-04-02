@@ -479,14 +479,17 @@ stopifnot(exprs = {
 options(oo)
 
 ## problematic rank deficient rankMatrix() case -- only seen in large cases ??
+## MJ: NA in diag(<sparseQR>@R) not seen with Apple Clang 14.0.3
 Z. <- readRDS(system.file("external", "Z_NA_rnk.rds", package="Matrix"))
 (rnkZ. <- rankMatrix(Z., method = "qr")) # gave errors; now warns typically, but not on aarm64 (M1)
 qrZ. <- qr(Z.)
 options(warn=1)
 rnk2 <- qr2rankMatrix(qrZ.) # warning ".. only 684 out of 822 finite diag(R) entries"
 oo <- options(warn=2)# no warnings allowed from here
-di <- diag(qrZ.@R)
-stopifnot(is.na(rnkZ.), is(qrZ, "sparseQR"), is.na(rnk2), anyNA(di))
+di.NA <- anyNA(diag(qrZ.@R))
+stopifnot(is(qrZ, "sparseQR"),
+          identical(is.na(rnkZ.), di.NA),
+          identical(is.na(rnk2), di.NA))
 
 ## The above bug fix was partly wrongly extended to  dense matrices for "qr.R":
 x <- cbind(1, rep(0:9, 18))
