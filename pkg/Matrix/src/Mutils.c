@@ -1334,7 +1334,10 @@ SEXP Mmatrix(SEXP args)
 	    break;
 	case CPLXSXP:
 	{
-	    Rcomplex zna = { { NA_REAL }, { 0.0 } }; /* -Wmissing-braces */
+	    /* Initialization must work whether Rcomplex is typedef-ed
+	       to a struct { R < 4.3.0 } or to a union { R >= 4.3.0 }
+	    */
+	    Rcomplex zna = { .r = NA_REAL, .i = 0.0 };
 	    for (i = 0; i < N; i++)
 		COMPLEX(ans)[i] = zna;
 	    break;
