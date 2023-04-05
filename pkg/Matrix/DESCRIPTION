@@ -14,27 +14,27 @@ BugReports: https://R-forge.R-project.org/tracker/?atid=294&group_id=61
 Contact: Matrix-authors@R-project.org
 Authors@R:
     c(person("Douglas", "Bates", role = "aut",
-              comment = c(ORCID = "0000-0001-8316-9503")),
+             comment = c(ORCID = "0000-0001-8316-9503")),
       person("Martin", "Maechler", role = c("aut", "cre"),
-              email = "mmaechler+Matrix@gmail.com",
-              comment = c(ORCID = "0000-0002-8685-9910")),
+             email = "mmaechler+Matrix@gmail.com",
+             comment = c(ORCID = "0000-0002-8685-9910")),
       person("Mikael", "Jagan", role = "aut",
-              comment = c(ORCID = "0000-0002-3542-2938")),
+             comment = c(ORCID = "0000-0002-3542-2938")),
       person("Timothy A.", "Davis", role = "ctb",
-              comment = c(ORCID = "0000-0001-7614-6899",
-	                   "SuiteSparse libraries, notably CHOLMOD and AMD",
-                           "collaborators listed in dir(pattern=\"^[A-Z]+[.]txt$\", full.names=TRUE, system.file(\"doc\", \"SuiteSparse\", package=\"Matrix\"))")),
+             comment = c(ORCID = "0000-0001-7614-6899",
+                         "SuiteSparse libraries, notably CHOLMOD and AMD",
+                         "collaborators listed in dir(pattern=\"^[A-Z]+[.]txt$\", full.names=TRUE, system.file(\"doc\", \"SuiteSparse\", package=\"Matrix\"))")),
       person("Jens", "Oehlschlägel", role = "ctb",
-              comment = "initial nearPD()"),
+             comment = "initial nearPD()"),
       person("Jason", "Riedy", role = "ctb",
-              comment = c(ORCID = "0000-0002-4345-4200",
-	                   "GNU Octave's condest() and onenormest()",
-	                   "Copyright: Regents of the University of California")),
+             comment = c(ORCID = "0000-0002-4345-4200",
+                         "GNU Octave's condest() and onenormest()",
+                         "Copyright: Regents of the University of California")),
       person("R Core Team", role = "ctb",
-              comment = "base R's matrix implementation"))
+             comment = "base R's matrix implementation"))
 Depends: R (>= 3.5.0), methods
 Imports: graphics, grid, lattice, stats, utils
-Suggests: expm, MASS
+Suggests: MASS, expm
 Enhances: MatrixModels, SparseM, graph, igraph, maptools, sfsmisc, sp, spdep
 EnhancesNote: igraph, maptools, sp, spdep for Rd xrefs
 LazyData: no
