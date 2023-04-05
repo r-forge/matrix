@@ -5,6 +5,24 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
+\section{Changes in version 1.5-5 (2023-04-05 r3838)}{
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
 \section{Changes in version 1.5-4 (2023-04-02 r3837)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
