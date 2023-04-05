@@ -1334,7 +1334,7 @@ SEXP Mmatrix(SEXP args)
 	    break;
 	case CPLXSXP:
 	{
-	    Rcomplex zna = { NA_REAL, 0.0 };
+	    Rcomplex zna = { { NA_REAL }, { 0.0 } }; /* -Wmissing-braces */
 	    for (i = 0; i < N; i++)
 		COMPLEX(ans)[i] = zna;
 	    break;
