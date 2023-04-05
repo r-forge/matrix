@@ -1686,7 +1686,7 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	   workC[kj] : smallest kj' > kj such that pj[kj'] == pj[kj]
 	*/
 	
-	int i_, j_, j_prev = n, doSort = 0;
+	int i_, j_, j_prev = n;
 	
 	for (kj = nj - 1; kj >= 0; --kj) {
 	    j_ = pj[kj] - 1;
