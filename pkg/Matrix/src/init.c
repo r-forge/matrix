@@ -556,10 +556,14 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_diag_set, 2),
     CALLDEF(packedMatrix_symmpart, 1),
     CALLDEF(packedMatrix_skewpart, 1),
+
+/* no longer needed ... replacement in ./subscript.c */
+#if 0
     CALLDEF(packedMatrix_sub1, 2),
     CALLDEF(packedMatrix_sub1_mat, 2),
     CALLDEF(packedMatrix_sub2, 4),
-
+#endif
+    
     CALLDEF(denseLU_expand, 1),
     CALLDEF(BunchKaufman_expand, 1),
     CALLDEF(denseLU_determinant, 2),

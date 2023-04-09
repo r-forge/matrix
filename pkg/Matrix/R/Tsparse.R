@@ -205,6 +205,8 @@ intI <- function(i, n, dn, give.dn = TRUE)
 }
 
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ## Select rows
 setMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
 			 drop = "logical"),
@@ -281,6 +283,7 @@ setMethod("[", signature(x = "TsparseMatrix",
 	  if (drop && any(nd == 1)) drop(as(x,"matrix")) else x
 
       })
+} ## MJ
 
 
 ###========= Sub-Assignment aka *Replace*Methods =========================

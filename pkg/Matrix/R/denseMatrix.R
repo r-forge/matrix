@@ -539,6 +539,8 @@ for (.cl in c("denseMatrix", "matrix")) {
 }
 rm(.dense.band, .dense.triu, .dense.tril, .cl)
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 
@@ -591,7 +593,7 @@ setMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing"),#drop="
 	  .dense.sub.i.2col)
 setMethod("[", signature(x = "denseMatrix", i = "matrix", j = "missing", drop="missing"),
 	  .dense.sub.i.2col)
-
+} ## MJ
 
 ## Now the "[<-" ones --- see also those in ./Matrix.R
 ## It's recommended to use setReplaceMethod() rather than setMethod("[<-",.)

@@ -623,14 +623,14 @@ stopifnot(exprs = {
     identical(m00[FALSE], tC0[FALSE])#    ditto
     ##
     identical(D0, D0[0,0]) # used to fail --> subCsp_ij  (..)
-    identical(D0, D0[ ,0]) #  (ditto)     --> subCsp_cols(..)
-    identical(D0, D0[0, ]) #     "        --> subCsp_rows(..)
+    identical(gC0, D0[, 0]) #  (ditto)     --> subCsp_cols(..)
+    identical(gC0, D0[0, ]) #     "        --> subCsp_rows(..)
     identical(D0, D0[,])          # (worked already)
     identical(m00[ 0 ],  D0[ 0 ] )#      ditto
     identical(m00[TRUE ], D0[TRUE ])#      "
     identical(m00[FALSE], D0[FALSE])#      "
     ##
-    identical(tC0.,tC0[0,0]) # failed --> subCsp_ij  (..)
+    identical(tC0, tC0[0,0]) # failed --> subCsp_ij  (..)
     identical(gC0, tC0[ ,0]) #   "    --> subCsp_cols(..)
     identical(gC0, tC0[0, ]) #   "    --> subCsp_rows(..)
     identical(tC0, tC0[,])   # (worked already)
@@ -660,7 +660,7 @@ stopifnot(exprs = {
     vapply(exR, inherits, logical(1), what = "error")
     !englishMsgs ||
     unique( vapply(exR, `[[`, "<msg>", "message")
-           ) == "logical subscript too long (1, should be 0)"
+           ) == "logical subscript too long"
 })
 
 

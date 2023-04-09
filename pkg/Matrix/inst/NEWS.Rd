@@ -5,15 +5,40 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-05 r3840)}{
+\section{Changes in version 1.5-5 (2023-04-10 r3842)}{
   \subsection{New Features}{
     \itemize{
-      \item .
+      \item Methods for subscripting \code{Matrix} now use the more
+      systematic code in \file{R/subscript.R} and
+      \code{src/subscript.c}, becoming more efficient for all
+      \code{lsparseMatrix}
+      (no longer coercing to \code{dsparseMatrix} and back),
+      sparse \code{triangularMatrix} and sparse \code{symmetricMatrix}
+      (no longer coercing to \code{generalMatrix} and back),
+      \code{unpackedMatrix}
+      (no longer coercing to \code{matrix} and back), and
+      \code{RsparseMatrix}
+      (no longer coercing to \code{TsparseMatrix}, then to
+      \code{CsparseMatrix}, then back to \code{TsparseMatrix}).
+      \cr
+      \code{x[i, j, drop = FALSE]} preserves the class of \code{x}
+      in more cases where \code{x} is a \code{triangularMatrix},
+      \code{diagonalMatrix}, or \code{pMatrix}, doing more complete
+      checks on \code{i} and \code{j}.
+      \cr
+      Notably, for \code{x} inheriting from \code{RsparseMatrix},
+      the result is now always an \code{RsparseMatrix}, rather than
+      always a \code{TsparseMatrix}.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item \code{x[integer(0), ]} and \code{x[, integer(0)]} now
+      give a \code{generalMatrix} result when \code{x} is a 0-by-0
+      \code{diagonalMatrix}, for consistency with all other cases
+      of \code{x[seq_len(n), ]} and \code{x[, seq_len(n)]}, where
+      \code{x} is an \code{n}-by-\code{n} triangular, symmetric,
+      or diagonal matrix.
     }
   }
   \subsection{Misc}{

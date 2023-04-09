@@ -491,6 +491,8 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## MJ: no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
 
 ### FIXME : we defer to the "*gT" -- conveniently, but not efficient for gC !
@@ -546,6 +548,7 @@ setMethod("[", signature(x = "sparseMatrix",
 	      if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
 		  as(x, "CsparseMatrix") else x
 	  })
+} ## MJ
 
 ### "[<-" : -----------------
 
