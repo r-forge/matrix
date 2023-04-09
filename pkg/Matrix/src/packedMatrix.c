@@ -1143,6 +1143,9 @@ SEXP packedMatrix_skewpart(SEXP from)
     return to;
 }
 
+/* no longer needed ... replacement in ./subscript.c */
+#if 0
+
 #define PM_XIJ_TR_UP_NUN(_X_, _I_, _J_, _N2_, _ZERO_, _ONE_)	\
     (_I_ <= _J_							\
      ? *(_X_ + PM_AR21_UP(_I_, _J_))				\
@@ -1590,3 +1593,5 @@ SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop)
 
 #undef PM_SUB2
 #undef PM_SUB2_LOOP
+
+#endif /* MJ */

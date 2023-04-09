@@ -1967,6 +1967,8 @@ all0Matrix <- function(n,m) {
     new(cl, Dim = d, Dimnames = x@Dimnames, p = rep.int(0L, d[2L] + 1))
 }
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ##' Subsetting matrix/vector in "vector style", e.g. M[0], M[TRUE], M[1:2], M[-7]
 ##' @param x any matrix/Matrix/(sparse)vector, to be subset
 ##' @param i integer (incl negative!) or logical 'index'.
@@ -1995,6 +1997,7 @@ all0Matrix <- function(n,m) {
     } else ## save memory (for large sparse M):
 	as.vector(x[1,1])[FALSE]
 }
+} ## MJ
 
 ## MJ: not used
 if(FALSE) {

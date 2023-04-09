@@ -659,6 +659,8 @@ setMethod("isTriangular", signature(object = "diagonalMatrix"),
 setMethod("isDiagonal", signature(object = "diagonalMatrix"),
           function(object) TRUE)
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 subDiag <- function(x, i, j, ..., drop) {
     x <- .diag2sparse(x, ".gC") ## was ->TsparseMatrix but C* is faster now
     x <- if(missing(i))
@@ -684,6 +686,7 @@ setMethod("[", signature(x = "diagonalMatrix", i = "index",
 setMethod("[", signature(x = "diagonalMatrix", i = "missing",
 			 j = "index", drop = "logical"),
 	  function(x, i, j, ..., drop) subDiag(x, j=j, drop=drop))
+} ## MJ
 
 ## When you assign to a diagonalMatrix, the result should be
 ## diagonal or sparse ---

@@ -134,7 +134,8 @@ setAs("CsparseMatrix", "symmetricMatrix",
 
 ### Some group methods:
 
-
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
 ### ---------- "["  and (currently) also ./sparseMatrix.R
 
@@ -233,7 +234,7 @@ setMethod("[", signature(x = "CsparseMatrix",
 	      Matrix.msg("Csp[i,i,l] : nargs()=",nargs(), .M.level = 2)
 	      subCsp_ij(x, i, j, drop=drop)
 	  })
-
+} ## MJ
 
 
 

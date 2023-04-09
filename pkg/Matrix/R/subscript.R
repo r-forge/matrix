@@ -1,4 +1,4 @@
-## METHODS FOR GENERIC: [                    UNFINISHED AND NOT-YET-USED
+## METHODS FOR GENERIC: [
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## GOAL: automate method definitions and eventually replace ones in
@@ -22,15 +22,10 @@
 ##               CsparseMatrix,RsparseMatrix,TsparseMatrix,
 ##               diagonalMatrix,indMatrix
 
-.subscript.error.dim <- "incorrect number of dimensions"
-.subscript.error.oob <- "subscript out of bounds"
-.subscript.error.neg <- "negative values are not allowed in a matrix subscript"
-.subscript.error.lng <- "logical subscript too long"
 .subscript.error.ist <- function(i) {
     if(isS4(i))
         gettextf("invalid subscript class \"%s\"", class(i))
-    else
-        gettextf("invalid subscript type \"%s\"", typeof(i))
+    else gettextf("invalid subscript type \"%s\"", typeof(i))
 }
 
 ## x[i] where 'i' is NULL or any vector or sparseVector
@@ -201,17 +196,17 @@
                {
                    storage.mode(i) <- "integer"
                    if(min(1L, i, na.rm = TRUE) < 1L)
-                       stop(.subscript.error.neg)
+                       stop("negative values are not allowed in a matrix subscript")
                    dx <- x@Dim
                    m <- dx[1L]
                    n <- dx[2L]
                    if(m == n) {
                        if(max(n, i, na.rm = TRUE) > n)
-                           stop(.subscript.error.oob)
+                           stop("subscript out of bounds")
                    } else {
                        if(max(m, i[, 1L], na.rm = TRUE) > m ||
                           max(n, i[, 2L], na.rm = TRUE) > n)
-                           stop(.subscript.error.oob)
+                           stop("subscript out of bounds")
                    }
                    ## * rows containing 0 are deleted
                    ## * rows containing NA are kept
@@ -232,7 +227,7 @@
                        ## error if character row contains zero NA and
                        ## integer row contains at least one NA,
                        ## indicating non-match that should not be ignored
-                       stop(.subscript.error.oob)
+                       stop("subscript out of bounds")
                    ..subscript.1ary.mat(x, m)
                },
            stop(.subscript.error.ist(i), domain = NA))
@@ -287,7 +282,7 @@
                            {
                                r <- d[pos]
                                if(max(r, k, na.rm = TRUE) >= r + 1)
-                                   stop(.subscript.error.oob)
+                                   stop("subscript out of bounds")
                                if(min(1, k, na.rm = TRUE) < 1)
                                    seq_len(r)[k]
                                else as.integer(k)
@@ -296,7 +291,7 @@
                            {
                                r <- d[pos]
                                if(max(r, k, na.rm = TRUE) > r)
-                                   stop(.subscript.error.oob)
+                                   stop("subscript out of bounds")
                                if(min(1L, k, na.rm = TRUE) < 1L)
                                    seq_len(r)[k]
                                else k
@@ -305,7 +300,7 @@
                            {
                                r <- d[pos]
                                if(length(k) > r)
-                                   stop(.subscript.error.lng)
+                                   stop("logical subscript too long")
                                if(length(k) && !is.na(a <- all(k)) && a)
                                    NULL
                                else seq_len(r)[k]
@@ -314,7 +309,7 @@
                            {
                                nms <- dimnames(x)[[pos]]
                                if(is.null(nms) || anyNA(k <- match(k, nms)))
-                                   stop(.subscript.error.oob)
+                                   stop("subscript out of bounds")
                                k
                            },
                        stop(.subscript.error.ist(k), domain = NA)))
@@ -343,8 +338,6 @@
     if((is.na(drop) || drop) && any(r@Dim == 1L)) drop(as(r, "matrix")) else r
 }
 
-if(FALSE) {
-
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop) {
@@ -360,7 +353,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                   drop(x)
               } else {
                   ## x[, , ], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -379,7 +372,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                   if(is.na(drop <- drop[1L]) || drop) drop(x) else x
               } else {
                   ## x[, , , drop=], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -398,7 +391,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                   .subscript.2ary(x, i, , drop = TRUE)
               } else {
                   ## x[i=, , ], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -417,7 +410,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                   .subscript.2ary(x, i, , drop = drop)
               } else {
                   ## x[i=, , , drop=], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -436,7 +429,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                   .subscript.2ary(x, , j, drop = TRUE)
               } else {
                   ## x[, j=, ], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -455,7 +448,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                   .subscript.2ary(x, , j, drop = drop)
               } else {
                   ## x[, j=, , drop=], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -471,7 +464,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                   .subscript.2ary(x, i, j, drop = TRUE)
               } else {
                   ## x[i=, j=, ], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -487,7 +480,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                   .subscript.2ary(x, i, j, drop = drop)
               } else {
                   ## x[i=, j=, , drop=], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -507,7 +500,7 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                   .subscript.2ary(x, i, , drop = TRUE)
               } else {
                   ## x[i=, , ], etc.
-                  stop(.subscript.error.dim)
+                  stop("incorrect number of dimensions")
               }
           })
 
@@ -532,5 +525,3 @@ setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
               j <- integer(0L)
               callGeneric()
           })
-
-}

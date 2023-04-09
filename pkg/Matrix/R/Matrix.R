@@ -518,6 +518,8 @@ setMethod("diff", signature(x = "Matrix"),
 ## Using "index" for indices should allow
 ## integer (numeric), logical, or character (names!) indices :
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 ## "x[]" *or* x[,] *or* x[, , drop=<TRUE/FALSE>]
 setMethod("[", signature(x = "Matrix",
 			 i = "missing", j = "missing", drop = "missing"),
@@ -685,6 +687,7 @@ setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing"),# drop="ANY"
 ## just against ambiguity notices :
 setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missing"),
 	  .M.sub.i.2col)
+} ## MJ
 
 
 ### "[<-" : -----------------

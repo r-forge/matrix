@@ -452,6 +452,8 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "indMatrix"),
               r
           })
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
 			 drop = "logical"),
 	  function (x, i, j, ..., drop)
@@ -465,6 +467,7 @@ setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
 		  Dim = c(n, x@Dim[2]), Dimnames = DN)
 	  }
       })
+} ## MJ
 
 .indMatrix.sub <- function(x, i, j, ..., value) {
     x <- as(x, "TsparseMatrix")

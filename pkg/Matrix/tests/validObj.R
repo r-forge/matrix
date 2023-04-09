@@ -104,7 +104,7 @@ stopifnot(is.logical(p9[1,]),
 	  isTRUE(p9[-c(1:6, 8:9), 1]),
 	  identical(t(p9), solve(p9)),
 	  identical(p9[TRUE, ], p9),
-          all.equal(p9[, TRUE], np9), # currently...
+          identical(p9[, TRUE], p9),
           identical(p9., np9.),
 	  identical(as(diag(9), "pMatrix"), as(1:9, "pMatrix"))
 	  )
@@ -167,6 +167,7 @@ foo <- new("ngCMatrix",
            p = rep(0:9, c(2,4,1,11,10,0,1,0,9,12)),
            Dim = c(36952L, 49L))
 validObject(foo)# TRUE
+t2 <- head(foo)
 foo@i[5] <- foo@i[5] + 50000L
 msg <- validObject(foo, test=TRUE)# is -- correctly -- *not* valid anymore
 stopifnot(is.character(msg))
@@ -178,9 +179,8 @@ getLastMsg <- function(tryRes) {
         sub(".*: ", "", as.character(tryRes)))
 }
 t <- try(show(foo)) ## error
-t2 <- try(head(foo))
 stopifnot(identical(msg, getLastMsg(t)),
-	  identical(1L, grep("as_cholmod_sparse", getLastMsg(t2))))
+          identical(head(foo), t2))
 
 
 cat('Time elapsed: ', proc.time(),'\n') # "stats"

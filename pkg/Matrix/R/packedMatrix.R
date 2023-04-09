@@ -94,6 +94,8 @@ setMethod("symmpart", signature(x = "packedMatrix"),
 setMethod("skewpart", signature(x = "packedMatrix"),
           function(x) .Call(packedMatrix_skewpart, x))
 
+## MJ : no longer needed ... replacement in ./subscript.R
+if(FALSE) {
 
 ## ~~~~ UTILITIES FOR INDEXING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -365,5 +367,8 @@ for (.k in seq_len(nrow(.cl))) {
     }
     setMethod("[", do.call(signature, .cl[.k, ]), .definition)
 }
+rm(.cl, .ms, .k, .i1, .f1, .definition)
 
-rm(.pM.subclasses, .cl, .ms, .k, .i1, .f1, .definition)
+} ## MJ
+
+rm(.pM.subclasses)

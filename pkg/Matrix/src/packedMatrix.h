@@ -17,8 +17,11 @@ SEXP packedMatrix_diag_set(SEXP obj, SEXP val);
 SEXP packedMatrix_symmpart(SEXP from);
 SEXP packedMatrix_skewpart(SEXP from);
 
+/* no longer needed ... replacement in ./subscript.c */
+#if 0
 SEXP packedMatrix_sub1(SEXP obj, SEXP index);
 SEXP packedMatrix_sub1_mat(SEXP obj, SEXP index);
 SEXP packedMatrix_sub2(SEXP obj, SEXP index1, SEXP index2, SEXP drop);
+#endif /* MJ */
 
 #endif
