@@ -82,7 +82,7 @@ extends1of <- function(class, classes, ...) {
 ## otherwise ""
 .M.repr  <- function(x) .Call(R_Matrix_repr, x)
 
-## FIXME: we should these (and maybe others not yet defined) "everywhere" ...
+## FIXME: we should use these (and maybe others not yet defined) "everywhere"
 .isMatrix   <- function(x)
     nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) == "M"
 .isVector   <- function(x)
