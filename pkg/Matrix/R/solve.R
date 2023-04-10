@@ -149,14 +149,15 @@ setMethod("solve", signature(a = "ddiMatrix", b = "Matrix"),
 
 ## Dispatch to methods for pMatrix (below)  {{ nonsingular <=> permutation }}
 setMethod("solve", signature(a = "indMatrix", b = "ANY"),
-          function(a, b, ...) {a <- as(a, "pMatrix"); callGeneric()})
+          function(a, b, ...) { a <- as(a, "pMatrix"); callGeneric() })
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
 	  function(a, b, ...) t(a))
 
 setMethod("solve", signature(a = "pMatrix", b = "numLike"),
 	  function(a, b, ...) {
-              r <- as.double(b)[invPerm(a@perm)]
+              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
+              r <- as.double(b)[perm]
               names(r) <- a@Dimnames[[2L]]
               .m2ge(r)
           })
@@ -164,7 +165,8 @@ setMethod("solve", signature(a = "pMatrix", b = "numLike"),
 setMethod("solve", signature(a = "pMatrix", b = "matrix"),
 	  function(a, b, ...) {
               storage.mode(b) <- "double"
-              r <- b[invPerm(a@perm), , drop = FALSE]
+              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
+              r <- b[perm, , drop = FALSE]
               dimnames(r) <-
                   c(a@Dimnames[2L],
                     if(is.null(dnb <- dimnames(b))) list(NULL) else dnb[2L])
@@ -173,8 +175,9 @@ setMethod("solve", signature(a = "pMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 	  function(a, b, ...) {
+              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
               b <- as(b, "dMatrix")
-              r <- b[invPerm(a@perm), , drop = FALSE]
+              r <- b[perm, , drop = FALSE]
               r@Dimnames <- c(a@Dimnames[2L], b@Dimnames[2L])
               r
           })

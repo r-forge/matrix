@@ -1502,9 +1502,9 @@ setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
 	  })
 ## with the following exceptions:
 setMethod("-", signature(e1 = "nsparseMatrix", e2 = "missing"),
-	  function(e1, e2) - as(.sparse2g(..sparse2d(e1)), "CsparseMatrix"))
-setMethod("-", signature(e1 = "pMatrix", e2 = "missing"),
-          function(e1, e2) - as(e1, "TsparseMatrix"))
+	  function(e1, e2) -..sparse2d(e1))
+setMethod("-", signature(e1 = "indMatrix", e2 = "missing"),
+          function(e1, e2) -as(e1, "dsparseMatrix"))
 
 ## Group method  "Arith"
 

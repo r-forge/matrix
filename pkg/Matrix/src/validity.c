@@ -358,23 +358,31 @@ SEXP diagonalMatrix_validate(SEXP obj)
 
 SEXP indMatrix_validate(SEXP obj)
 {
+    SEXP margin = PROTECT(GET_SLOT(obj, Matrix_marginSym));
+    if (LENGTH(margin) != 1)
+	UPRET(1, "'margin' slot does not have length 1");
+    int mg = INTEGER(margin)[0] - 1;
+    if (mg != 0 && mg != 1)
+	UPRET(1, "'margin' slot is not 1 or 2");
+    UNPROTECT(1); /* margin */
+    
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-    if (n == 0 && m > 0)
-	UPRET(1, "m-by-0 indMatrix invalid for positive 'm'");
+    int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
+    if (m > 0 && n == 0)
+	UPRET(1, (mg == 0) ? "m-by-0 indMatrix invalid for positive 'm' when margin=1" : "0-by-n indMatrix invalid for positive 'n' when margin=2");
     UNPROTECT(1); /* dim */
 
     SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
     if (TYPEOF(perm) != INTSXP)
 	UPRET(1, "'perm' slot is not of type \"integer\"");
     if (XLENGTH(perm) != m)
-	UPRET(1, "'perm' slot does not have length Dim[1]");
+	UPRET(1, "'perm' slot does not have length Dim[margin]");
     int *pperm = INTEGER(perm);
     while (m--) {
 	if (*pperm == NA_INTEGER)
 	    UPRET(1, "'perm' slot contains NA");
 	if (*pperm < 1 || *pperm > n)
-	    UPRET(1, "'perm' slot has elements not in {1,...,Dim[2]}");
+	    UPRET(1, "'perm' slot has elements not in {1,...,Dim[1+margin%%2]}");
 	++pperm;
     }
     UNPROTECT(1); /* perm */

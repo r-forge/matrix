@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-10 r3842)}{
+\section{Changes in version 1.5-5 (2023-04-10 r3844)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -29,6 +29,19 @@
       Notably, for \code{x} inheriting from \code{RsparseMatrix},
       the result is now always an \code{RsparseMatrix}, rather than
       always a \code{TsparseMatrix}.
+
+      \item Class \code{indMatrix} gets an additional slot \code{margin}
+      with value \code{1L} (the prototype and previously implicit value)
+      or \code{2L}, indicating that the object represents a row or column
+      index matrix, respectively.  The \code{perm} slot is interpreted
+      accordingly; see \code{help("indMatrix-class")} for details.
+      \cr
+      Methods with \code{indMatrix} or its subclass \code{pMatrix}
+      in the signature have been added, removed, or adjusted to account
+      for the new slot.  Notably, multiplication on the right by an
+      \code{indMatrix} with \code{margin = 2} is now implemented as
+      a column subscript, and the transpose of \code{indMatrix} is
+      now the same object but with \dQuote{opposite} \code{margin}.
     }
   }
   \subsection{Bug Fixes}{

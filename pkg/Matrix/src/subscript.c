@@ -1,4 +1,3 @@
-/* unfinished and not-yet-used, along with ../R/subscript.R */
 #include "subscript.h"
 
 #define F_X( _X_)  (_X_)
@@ -367,6 +366,10 @@ static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
     
     SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
     int *pperm = INTEGER(perm), i_, j_;
+
+    SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
+    int mg = INTEGER(margin)[0] - 1;
+    UNPROTECT(1);
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_)	\
     do {								\
@@ -378,7 +381,10 @@ static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 	        index = (_INT_) pw[l] - 1;				\
 		i_ = (int) (index % m);					\
 		j_ = (int) (index / m);					\
-		pres[l] = (j_ == pperm[i_] - 1) ? 1 : 0;		\
+		if (!mg)						\
+		    pres[l] = j_ == pperm[i_] - 1;			\
+		else							\
+		    pres[l] = i_ == pperm[j_] - 1;			\
 	    }								\
 	}								\
     } while (0)
@@ -733,14 +739,20 @@ static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
     
     SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
     int *pperm = INTEGER(perm);
+
+    SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
+    int mg = INTEGER(margin)[0] - 1;
+    UNPROTECT(1);
     
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_)		\
     do {								\
 	for (l = 0; l < len; ++l) {					\
 	    if (_NA_SUBSCRIPT_)						\
 		pres[l] = _NA_;						\
+	    else if (!mg)						\
+		pres[l] = pw1[l] == pperm[pw0[l] - 1];			\
 	    else							\
-		pres[l] = (pw1[l] == pperm[pw0[l] - 1]) ? 1 : 0;	\
+		pres[l] = pw0[l] == pperm[pw1[l] - 1];			\
 	}								\
     } while (0)
 
@@ -1873,17 +1885,37 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 				     const char *cl)
 {
-    SUB2_START;
+    SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
+    int mg = INTEGER(margin)[0] - 1;
+    UNPROTECT(1); /* margin */
+
+    SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
+    UNPROTECT(1); /* dim */
+
+    if (mg) {
+	SEXP i_tmp = i;
+	i = j;
+	j = i_tmp;
+    }
     
+    int ki, kj,
+	mi = isNull(i),
+	mj = isNull(j),
+    	ni = (mi) ? m : LENGTH(i),
+	nj = (mj) ? n : LENGTH(j),
+	*pi = (mi) ? NULL : INTEGER(i),
+	*pj = (mj) ? NULL : INTEGER(j),
+	isP = cl[0] == 'p';
+    
+    PROTECT_INDEX pidA;
+    PROTECT_WITH_INDEX(x, &pidA);
+    
+    PROTECT_INDEX pidB;
     SEXP perm0 = GET_SLOT(x, Matrix_permSym);
     int *pperm0 = INTEGER(perm0);
-    
-    PROTECT_INDEX pidA, pidB;
-    PROTECT_WITH_INDEX(x, &pidA);
     PROTECT_WITH_INDEX(perm0, &pidB);
     
-    int isP = cl[0] == 'p';
-
     if (!mi) {
 	isP = isP && ni == m;
 	if (isP) {
@@ -1906,8 +1938,8 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	
 	PROTECT(dim = GET_SLOT(x, Matrix_DimSym));
 	pdim = INTEGER(dim);
-	pdim[0] = ni;
-	pdim[1] = n;
+	pdim[ mg] = ni;
+	pdim[!mg] = n;
 	UNPROTECT(1); /* dim */
 	
 	SEXP perm1 = PROTECT(allocVector(INTSXP, ni));
@@ -1942,13 +1974,15 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    Free_FROM(work, nj);
 	}
 	
-	x = NEW_OBJECT_OF_CLASS((isP) ? "pMatrix" : "ngCMatrix");
+	x = NEW_OBJECT_OF_CLASS((isP)
+				? "pMatrix"
+				: ((!mg) ? "ngCMatrix" : "ngRMatrix"));
 	REPROTECT(x, pidA);
 	
 	PROTECT(dim = GET_SLOT(x, Matrix_DimSym));
 	pdim = INTEGER(dim);
-	pdim[0] = m;
-	pdim[1] = nj;
+	pdim[ mg] = m;
+	pdim[!mg] = nj;
 	UNPROTECT(1); /* dim */
 
 	if (isP) {
@@ -1985,7 +2019,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    for (kj = 0; kj < nj; ++kj) {
 		pp1[kj] = workA[pj[kj]];
 		if (pp1[kj] > INT_MAX - pp1[kj - 1])
-		    error(_("x[i,j] too dense for CsparseMatrix; "
+		    error(_("x[i,j] too dense for [CR]sparseMatrix; "
 			    "would have more than 2^31-1 nonzero entries"));
 		pp1[kj] += pp1[kj - 1];
 	    }
@@ -2017,7 +2051,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    ++workA; /* now 0-indexed */
 	    Free_FROM(workA, lwork);
 	    SET_SLOT(x, Matrix_pSym, p1);
-	    SET_SLOT(x, Matrix_iSym, i1);
+	    SET_SLOT(x, (!mg) ? Matrix_iSym : Matrix_jSym, i1);
 	    UNPROTECT(2); /* i1, p1 */
 	}
 

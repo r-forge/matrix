@@ -40,7 +40,7 @@ setMethod("nnzero", "diagonalMatrix",
               if(x@diag == "N") .nnz(x@x, na.counted) else x@Dim[1L])
 
 setMethod("nnzero", "indMatrix",
-          function(x, na.counted = NA) x@Dim[1L])
+          function(x, na.counted = NA) length(x@perm))
 
 setMethod("nnzero", "sparseMatrix",
 	  function(x, na.counted = NA) {

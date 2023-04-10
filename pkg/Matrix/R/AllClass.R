@@ -554,25 +554,15 @@ setClass("indicator", contains = "dgCMatrix",
 
 ## ...... Sparse, index ................................................
 
-## Row index
+## Row or column index
 setClass("indMatrix", contains = c("sparseMatrix", "generalMatrix"),
-	 slots = c(perm = "integer"),
+	 slots = c(perm = "integer", margin = "integer"),
+         prototype = prototype(margin = 1L), # to be valid
          validity = function(object) .Call(indMatrix_validate, object))
 
-## Permutation
+## Row or column permutation
 setClass("pMatrix", contains = c("indMatrix"),
 	 validity = function(object) .Call(pMatrix_validate, object))
-
-if(FALSE) {
-## MJ: We really ought to support a _column_ index, too, for which
-##     multiplication on the right is equivalent to selecting columns.
-##     Is it too late for us to define indMatrix like below ??
-setClass("indMatrix", contains = c("sparseMatrix", "generalMatrix"),
-         slots = c(margin = "integer", perm = "integer"),
-         prototype = prototype(margin = 1L), # to be valid
-         ## indMatrix_validate() also checking for 'margin' in 1:2, etc.
-	 validity = function(object) .Call(indMatrix_validate, object))
-}
 
 
 ########################################################################

@@ -1,7 +1,7 @@
 \name{cBind}
 \title{'cbind()' and 'rbind()' recursively built on cbind2/rbind2}
 %
-%% needed here instead of in ./sparseMatrix.Rd and ./denseMatrix.Rd
+%% needed here instead of in ./sparseMatrix-class.Rd and ./denseMatrix-class.Rd
 %% only because we use \S4Method{} below:
 \alias{cbind2,denseMatrix,sparseMatrix-method}
 \alias{cbind2,sparseMatrix,denseMatrix-method}

@@ -573,12 +573,19 @@ forceDiagonal <- function(x, diag = NA_character_) {
 }
 
 .ind2m <- function(from) {
-    P <- array(FALSE, d <- from@Dim)
-    if((n <- d[1L]) > 0L)
-        P[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
-    if(!identical(dn <- from@Dimnames, list(NULL, NULL)))
-        dimnames(P) <- dn
-    P
+    d <- from@Dim
+    dn <- from@Dimnames
+    perm <- from@perm
+    J <- array(FALSE, d, if(!identical(dn, list(NULL, NULL))) dn)
+    if((m <- length(perm)) > 0L) {
+        if(from@margin == 1L)
+            J[seq.int(  to = 0L, by =    1L, length.out = m) +
+              perm * as.double(m)] <- TRUE
+        else
+            J[seq.int(from = 0L, by = d[1L], length.out = m) +
+              perm               ] <- TRUE
+    }
+    J
 }
 
 .ge2m <- function(from, pattern = FALSE)
@@ -601,10 +608,18 @@ forceDiagonal <- function(x, diag = NA_character_) {
 }
 
 .ind2v <- function(from) {
-    x <- logical(prod(d <- from@Dim))
-    if((n <- d[1L]) > 0L)
-        x[seq_len(n) + (from@perm - 1L) * as.double(n)] <- TRUE
-    x
+    d <- from@Dim
+    perm <- from@perm
+    r <- logical(prod(d))
+    if((m <- length(perm)) > 0L) {
+        if(from@margin == 1L)
+            r[seq.int(  to = 0L, by =    1L, length.out = m) +
+              perm * as.double(m)] <- TRUE
+        else
+            r[seq.int(from = 0L, by = d[1L], length.out = m) +
+              perm               ] <- TRUE
+    }
+    r
 }
 
 .ge2v <- function(from, pattern = FALSE)
@@ -975,8 +990,11 @@ non0.i <- function(M, cM = class(M), uniqT = TRUE) {
 	    i <- i[isN0(M@x)]
 	cbind(i, i, deparse.level = 0L)
     } else if(extends(cld, "indMatrix")) {
-        i <- seq.int(from = 0L, length.out = M@Dim[1L])
-        cbind(i, M@perm - 1L, deparse.level = 0L)
+        perm <- M@perm
+        i <- seq.int(from = 0L, length.out = length(perm))
+        if(M@margin == 1L)
+            cbind(i, perm - 1L, deparse.level = 0L)
+        else cbind(perm - 1L, i, deparse.level = 0L)
     } else
         stop(gettextf("non0.i() not yet implemented for class %s", dQuote(cM)),
              domain = NA)
