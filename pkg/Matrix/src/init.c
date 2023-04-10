@@ -683,6 +683,7 @@ R_init_Matrix(DllInfo *dll)
     Matrix_iSym        = install("i");
     Matrix_jSym        = install("j");
     Matrix_lengthSym   = install("length");
+    Matrix_marginSym   = install("margin");
     Matrix_pSym        = install("p");
     Matrix_permSym     = install("perm");
     Matrix_qSym        = install("q");

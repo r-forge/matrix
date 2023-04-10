@@ -683,6 +683,9 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "diagonalMatrix"),
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 	  function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
+              if((margin <- X@margin) != Y@margin)
+                  kronecker(as(X, "CsparseMatrix"), as(Y, "CsparseMatrix"),
+                            FUN, make.dimnames, ...)
               if(!(missing(FUN) || identical(FUN, "*")))
                   stop("method for kronecker() must use default FUN=\"*\"")
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
@@ -690,8 +693,15 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 		  stop("dimensions cannot exceed 2^31-1")
               r <- new("indMatrix")
               r@Dim <- dX * dY
-              r@perm <- dY[2L] * rep(X@perm - 1L, each = dY[1L]) +
-                  rep.int(Y@perm, dX[1L])
+              r@perm <-
+                  if(margin == 1L)
+                      rep(dY[2L] * (X@perm - 1L), each = dY[1L]) +
+                          rep.int(Y@perm, dX[1L])
+                  else {
+                      r@margin <- 1L
+                      rep(dY[1L] * (X@perm - 1L), each = dY[2L]) +
+                          rep.int(Y@perm, dX[2L])
+                  }
               if(make.dimnames &&
                  !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
                                                     dimnames(Y), dY)))

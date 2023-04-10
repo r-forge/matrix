@@ -57,6 +57,10 @@
 \alias{\%&\%,nsparseMatrix,nMatrix-method}
 \alias{\%&\%,nsparseMatrix,nsparseMatrix-method}
 \alias{\%&\%,numLike,sparseVector-method}
+\alias{\%&\%,pMatrix,Matrix-method}
+\alias{\%&\%,pMatrix,indMatrix-method}
+\alias{\%&\%,pMatrix,matrix-method}
+\alias{\%&\%,pMatrix,pMatrix-method}
 \alias{\%&\%,sparseMatrix,mMatrix-method}
 \alias{\%&\%,sparseMatrix,sparseMatrix-method}
 \alias{\%&\%,sparseVector,mMatrix-method}

@@ -100,6 +100,9 @@
 \alias{\%*\%,numLike,CsparseMatrix-method}
 \alias{\%*\%,numLike,Matrix-method}
 \alias{\%*\%,numLike,sparseVector-method}
+\alias{\%*\%,pMatrix,Matrix-method}
+\alias{\%*\%,pMatrix,indMatrix-method}
+\alias{\%*\%,pMatrix,matrix-method}
 \alias{\%*\%,pMatrix,pMatrix-method}
 \alias{\%*\%,sparseMatrix,matrix-method}
 \alias{\%*\%,sparseVector,mMatrix-method}
@@ -161,7 +164,6 @@
 \alias{crossprod,dtrMatrix,dtrMatrix-method}
 \alias{crossprod,dtrMatrix,matrix-method}
 \alias{crossprod,indMatrix,Matrix-method}
-\alias{crossprod,indMatrix,indMatrix-method}
 \alias{crossprod,indMatrix,matrix-method}
 \alias{crossprod,indMatrix,missing-method}
 \alias{crossprod,ldenseMatrix,ddenseMatrix-method}
@@ -193,11 +195,7 @@
 \alias{crossprod,numLike,Matrix-method}
 \alias{crossprod,numLike,dgeMatrix-method}
 \alias{crossprod,numLike,sparseVector-method}
-\alias{crossprod,pMatrix,Matrix-method}
-\alias{crossprod,pMatrix,indMatrix-method}
-\alias{crossprod,pMatrix,matrix-method}
 \alias{crossprod,pMatrix,missing-method}
-\alias{crossprod,pMatrix,pMatrix-method}
 \alias{crossprod,sparseVector,mMatrix-method}
 \alias{crossprod,sparseVector,missing-method}
 \alias{crossprod,sparseVector,numLike-method}
@@ -224,7 +222,6 @@
 \alias{tcrossprod,Matrix,matrix-method}
 \alias{tcrossprod,Matrix,missing-method}
 \alias{tcrossprod,Matrix,numLike-method}
-\alias{tcrossprod,Matrix,pMatrix-method}
 \alias{tcrossprod,Matrix,symmetricMatrix-method}
 \alias{tcrossprod,RsparseMatrix,ANY-method}
 \alias{tcrossprod,RsparseMatrix,diagonalMatrix-method}
@@ -258,10 +255,8 @@
 \alias{tcrossprod,diagonalMatrix,missing-method}
 \alias{tcrossprod,dtrMatrix,dtrMatrix-method}
 \alias{tcrossprod,indMatrix,Matrix-method}
-\alias{tcrossprod,indMatrix,indMatrix-method}
 \alias{tcrossprod,indMatrix,matrix-method}
 \alias{tcrossprod,indMatrix,missing-method}
-\alias{tcrossprod,indMatrix,pMatrix-method}
 \alias{tcrossprod,ldenseMatrix,ddenseMatrix-method}
 \alias{tcrossprod,ldenseMatrix,ldenseMatrix-method}
 \alias{tcrossprod,ldenseMatrix,matrix-method}
@@ -278,7 +273,6 @@
 \alias{tcrossprod,matrix,indMatrix-method}
 \alias{tcrossprod,matrix,lsCMatrix-method}
 \alias{tcrossprod,matrix,nsCMatrix-method}
-\alias{tcrossprod,matrix,pMatrix-method}
 \alias{tcrossprod,ndenseMatrix,ddenseMatrix-method}
 \alias{tcrossprod,ndenseMatrix,ldenseMatrix-method}
 \alias{tcrossprod,ndenseMatrix,matrix-method}
@@ -288,8 +282,9 @@
 \alias{tcrossprod,numLike,Matrix-method}
 \alias{tcrossprod,numLike,dgeMatrix-method}
 \alias{tcrossprod,numLike,sparseVector-method}
+\alias{tcrossprod,pMatrix,Matrix-method}
+\alias{tcrossprod,pMatrix,matrix-method}
 \alias{tcrossprod,pMatrix,missing-method}
-\alias{tcrossprod,pMatrix,pMatrix-method}
 \alias{tcrossprod,sparseMatrix,sparseVector-method}
 \alias{tcrossprod,sparseVector,mMatrix-method}
 \alias{tcrossprod,sparseVector,missing-method}
