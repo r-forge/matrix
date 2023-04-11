@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-10 r3844)}{
+\section{Changes in version 1.5-5 (2023-04-11 r3845)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -42,6 +42,11 @@
       \code{indMatrix} with \code{margin = 2} is now implemented as
       a column subscript, and the transpose of \code{indMatrix} is
       now the same object but with \dQuote{opposite} \code{margin}.
+      \cr
+      \code{indMatrix} serialized under earlier versions of \pkg{Matrix}
+      must be modified for use under \pkg{Matrix} \code{>= 1.5-5},
+      typically by setting \code{x@margin <- 1L} conditional on
+      \code{packageVersion("Matrix") >= "1.5-5"}.
     }
   }
   \subsection{Bug Fixes}{
