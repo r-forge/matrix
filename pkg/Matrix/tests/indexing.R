@@ -1351,3 +1351,13 @@ ni <- is.na(gC)
 li <- as(ni, "lMatrix")
 stopifnot(identical(gC[ ni], gC[ li]),
           identical(gC[!ni], gC[!li]))
+
+## Dispatch thinko in Matrix <= 1.5-4
+R0 <- R. <-
+new("dgRMatrix",
+    Dim = c(12L, 12L),
+    p = c(0L, 0L, 4L, 5L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L, 16L),
+    j = c(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 7L, 8L, 4L, 7L, 9L, 9L, 10L, 11L),
+    x = as.double(1:16))
+R.[1:2, ] <- R.[1:2, ] # was an error
+stopifnot(identical(R0, as(R., "RsparseMatrix")))
