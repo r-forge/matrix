@@ -307,10 +307,12 @@
                            },
                        character =
                            {
-                               nms <- dimnames(x)[[pos]]
-                               if(is.null(nms) || anyNA(k <- match(k, nms)))
+                               if(length(k) == 0L)
+                                   integer(0L)
+                               else if(is.null(nms <- dimnames(x)[[pos]]) ||
+                                       anyNA(k <- match(k, nms)))
                                    stop("subscript out of bounds")
-                               k
+                               else k
                            },
                        stop(.subscript.error.ist(k), domain = NA)))
         }

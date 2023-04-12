@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-11 r3845)}{
+\section{Changes in version 1.5-5 (2023-04-12 r3846)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -57,6 +57,20 @@
       of \code{x[seq_len(n), ]} and \code{x[, seq_len(n)]}, where
       \code{x} is an \code{n}-by-\code{n} triangular, symmetric,
       or diagonal matrix.
+
+      \item For \code{x} inheriting from \code{RsparseMatrix},
+      subassignment of the form \code{x[i, ] <- value} is now
+      correctly distinguished from \code{x[i] <- value}.
+
+      \item \code{rownames(x[integer(0), , drop = FALSE])} and
+      \code{colnames(x[, integer(0), drop = FALSE])} are now always
+      \code{NULL} and never \code{character(0)}, consistent with
+      the implementation in base \R{}.
+
+      \item Subscript operations on \code{Matrix} now correctly
+      error whenever the formal argument \dots{} is matched, as
+      in \code{x[i, j, drop]}, where \code{x[i, j, drop = drop]}
+      is almost always intended.
     }
   }
   \subsection{Misc}{
