@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-12 r3846)}{
+\section{Changes in version 1.5-5 (2023-04-12 r3847)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -13,8 +13,9 @@
       \code{src/subscript.c}, becoming more efficient for all
       \code{lsparseMatrix}
       (no longer coercing to \code{dsparseMatrix} and back),
-      sparse \code{triangularMatrix} and sparse \code{symmetricMatrix}
-      (no longer coercing to \code{generalMatrix} and back),
+      sparse \code{symmetricMatrix}
+      (no longer coercing to \code{generalMatrix} and back
+      when \code{i} in \code{x[i, i]} is monotone),
       \code{unpackedMatrix}
       (no longer coercing to \code{matrix} and back), and
       \code{RsparseMatrix}
@@ -46,7 +47,8 @@
       \code{indMatrix} serialized under earlier versions of \pkg{Matrix}
       must be modified for use under \pkg{Matrix} \code{>= 1.5-5},
       typically by setting \code{x@margin <- 1L} conditional on
-      \code{packageVersion("Matrix") >= "1.5-5"}.
+      \code{packageVersion("Matrix") >= "1.5-5"}.  Defensive code
+      should check validity with \code{validObject}.
     }
   }
   \subsection{Bug Fixes}{
@@ -71,6 +73,10 @@
       error whenever the formal argument \dots{} is matched, as
       in \code{x[i, j, drop]}, where \code{x[i, j, drop = drop]}
       is almost always intended.
+
+      \item \code{x[i, ]} now correctly drops dimensions when
+      \code{x} is a 1-by-\code{n} \code{Matrix} and \code{i} is
+      \code{TRUE}.
     }
   }
   \subsection{Misc}{

@@ -1361,3 +1361,6 @@ new("dgRMatrix",
     x = as.double(1:16))
 R.[1:2, ] <- R.[1:2, ] # was an error
 stopifnot(identical(R0, as(R., "RsparseMatrix")))
+
+## Didn't drop dimensions ...
+stopifnot(identical(t(as(1:6,"CsparseMatrix"))[TRUE, ], as.double(1:6)))
