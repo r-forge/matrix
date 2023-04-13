@@ -168,7 +168,16 @@ setMethod("lu", "diagonalMatrix",
 ## METHODS FOR CLASS: denseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(L, U, P), where A = P L U
+setAs("denseLU", "Matrix",
+      function(from) {
+          to <- new("dgeMatrix")
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@x <- from@x
+          to
+      })
+
+## returning list(L, U, P), where A = P L U  { FIXME: return list(P, L, U) ?? }
 setMethod("expand", signature(x = "denseLU"),
           function(x, ...) .Call(denseLU_expand, x))
 

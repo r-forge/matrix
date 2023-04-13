@@ -1,8 +1,13 @@
 \name{LU-class}
 \title{LU (dense) Matrix Decompositions}
 \docType{class}
+%
 \alias{LU-class}
 \alias{denseLU-class}
+%
+\alias{coerce,denseLU,Matrix-method}
+\alias{show,LU-method}
+%
 \description{
   The \code{"LU"} class is the \emph{virtual} class of LU decompositions of
   real matrices.  \code{"denseLU"} the class of LU decompositions of
@@ -80,6 +85,9 @@ elu$L \%*\% elu$U
 (m2 <- with(elu, P \%*\% L \%*\% U)) # the same as 'mm'
 stopifnot(all.equal(as(mm, "matrix"),
                     as(m2, "matrix")))
+
+## see the underlying LAPACK representation in rectangular format
+as(lum, "Matrix")
 }
 \keyword{classes}
 \keyword{algebra}
