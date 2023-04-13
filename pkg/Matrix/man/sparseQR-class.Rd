@@ -27,6 +27,7 @@
 \alias{qr.resid,sparseQR,ddenseMatrix-method}
 \alias{qr.resid,sparseQR,matrix-method}
 \alias{qr.resid,sparseQR,numeric-method}
+\alias{show,sparseQR-method}
 %
 \description{Objects class \code{"sparseQR"} represent a QR decomposition of a
   sparse \eqn{m \times n}{m x n} (\dQuote{long}: \eqn{m \ge n}{m >= n})
