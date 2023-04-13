@@ -9,49 +9,50 @@
  *
  * @param dim A `SEXP`,
  *     typically the `Dim` slot of a (to be validated) `Matrix`.
- * @param domain A string specifying a domain for message translation.
+ * @param domain A string giving a domain for message translation.
  *
- * @return Either `TRUE` (indicating success) or a length-1 `STRSXP`
- *     containing an error message.
+ * @return A string containing an error message, empty if `dim`
+ *     is valid.
  */
-SEXP Dim_validate(SEXP dim, const char* domain)
+const char* Dim_validate(SEXP dim, const char* domain)
 {
     /* TODO? coerce from REALSXP to INTSXP?
        // if (TYPEOF(dim) != INTSXP && TYPEOF(dim) != REALSXP)
-       //     return mkString(_("'Dim' slot is not numeric"));
+       //     return _("'Dim' slot is not numeric");
        though above is not enough as we must prohibit Dim[i] > INT_MAX
 
        FIXME? Prohibit is.object(dim) or maybe just inherits(dim, "factor")
        and return a different error message in that case?
     */
     if (TYPEOF(dim) != INTSXP)
-	return mkString(_("'Dim' slot is not of type \"integer\""));
+	return _("'Dim' slot is not of type \"integer\"");
     if (LENGTH(dim) != 2)
-	return mkString(_("'Dim' slot does not have length 2"));
+	return _("'Dim' slot does not have length 2");
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     if (m == NA_INTEGER || n == NA_INTEGER)
-	return mkString(_("'Dim' slot contains NA"));
+	return _("'Dim' slot contains NA");
     if (m < 0 || n < 0)
-	return mkString(dngettext(domain,
-				  "'Dim' slot contains negative value",
-				  "'Dim' slot contains negative values",
-				  (m < 0 && n < 0) ? 2 : 1));
-    return ScalarLogical(1);
+	return dngettext(domain,
+			 "'Dim' slot contains negative value",
+			 "'Dim' slot contains negative values",
+			 (m < 0 && n < 0) ? 2 : 1);
+    return "";
 }
 
 SEXP R_Dim_validate(SEXP dim)
 {
-    return Dim_validate(dim, "Matrix");
+    const char *msg = Dim_validate(dim, "Matrix");
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 #ifdef Matrix_SupportingCachedMethods
 
 SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	val = Dim_validate(dim, CHAR(STRING_ELT(domain, 0)));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    const char *msg = Dim_validate(dim, CHAR(STRING_ELT(domain, 0)));
     UNPROTECT(1); /* dim */
-    return val;
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 #endif
@@ -65,15 +66,15 @@ SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
  *     typically from the `Dim` slot of a (to be validated) `Matrix`.
  *     Array validity _must_ be checked by the caller.
  *
- * @return Either `TRUE` (indicating success) or a length-1 `STRSXP`
- *     containing an error message.
+ * @return A string containing an error message, empty if `dimnames`
+ *     is valid.
  */
-SEXP DimNames_validate(SEXP dimnames, int *pdim)
+const char* DimNames_validate(SEXP dimnames, int *pdim)
 {
     if (TYPEOF(dimnames) != VECSXP)
-	return mkString("'Dimnames' slot is not a list");
+	return _("'Dimnames' slot is not a list");
     if (LENGTH(dimnames) != 2)
-	return mkString("'Dimnames' slot does not have length 2");
+	return _("'Dimnames' slot does not have length 2");
     
     /* Behave as do_matrix() from src/main/array.c:
        Dimnames[[i]] must be NULL or _coercible to_ character
@@ -85,23 +86,24 @@ SEXP DimNames_validate(SEXP dimnames, int *pdim)
 		char *buf;
 		SNPRINTF(buf, _("Dimnames[[%d]] is not NULL or a vector"),
 			 i+1);
-		return mkString(buf);
+		return buf;
 	    }
 	    R_xlen_t ns = XLENGTH(s);
 	    if (ns != pdim[i] && ns != 0) {
 		char *buf;
 		SNPRINTF(buf, _("length of Dimnames[[%d]] (%lld) is not equal to Dim[%d] (%d)"),
 			 i+1, (long long) ns, i+1, pdim[i]);
-		return mkString(buf);
+		return buf;
 	    }
 	}
     }
-    return ScalarLogical(1);
+    return "";
 }
 
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 {
-    return DimNames_validate(dimnames, INTEGER(dim));
+    const char *msg = DimNames_validate(dimnames, INTEGER(dim));
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 #ifdef Matrix_SupportingCachedMethods
@@ -109,10 +111,10 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 SEXP R_DimNames_validate_old(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-	val = DimNames_validate(dimnames, INTEGER(dim));
+	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    const char *msg = DimNames_validate(dimnames, INTEGER(dim));
     UNPROTECT(2); /* dimnames, dim */
-    return val;
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 #endif
@@ -173,24 +175,23 @@ SEXP R_DimNames_fixup(SEXP dn)
 
 SEXP Matrix_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)), val;
-    PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(val = Dim_validate(dim, "Matrix"), &pid);
-    if (TYPEOF(val) != STRSXP) {
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    const char* msg = Dim_validate(dim, "Matrix");
+    if (msg[0] == '\0') {
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	REPROTECT(val = DimNames_validate(dimnames, INTEGER(dim)), pid);
+	msg = DimNames_validate(dimnames, INTEGER(dim));
 	UNPROTECT(1); /* dimnames */
     }
-    UNPROTECT(2); /* val, dim */
-    return val;
+    UNPROTECT(1); /* dim */
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 SEXP MatrixFactorization_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	val = Dim_validate(dim, "MatrixFactorization");
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    const char *msg = Dim_validate(dim, "Matrix");
     UNPROTECT(1); /* dim */
-    return val;
+    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
 SEXP compMatrix_validate(SEXP obj)
