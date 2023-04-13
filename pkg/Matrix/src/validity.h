@@ -3,10 +3,10 @@
 
 #include "Mutils.h"
 
-SEXP Dim_validate(SEXP dim, const char* domain);
+const char* Dim_validate(SEXP dim, const char* domain);
 SEXP R_Dim_validate(SEXP dim);
 
-SEXP DimNames_validate(SEXP dimnames, int pdim[]);
+const char* DimNames_validate(SEXP dimnames, int pdim[]);
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
     
 #ifdef Matrix_SupportingCachedMethods
