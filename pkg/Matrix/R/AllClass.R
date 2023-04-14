@@ -710,15 +710,14 @@ setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
 ## Inherit most aspects of dt[rp]Matrix without extending them
 
 setClass("BunchKaufman", contains = "MatrixFactorization",
-	 slots = c(Dimnames = "list", uplo = "character", diag = "character",
+	 slots = c(Dimnames = "list", uplo = "character",
                    x = "numeric", perm = "integer"),
-         prototype = list(Dimnames = list(NULL, NULL), uplo = "U", diag = "N"),
+         prototype = list(Dimnames = list(NULL, NULL), uplo = "U"),
 	 validity = function(object) {
              object. <- new("dtrMatrix")
              object.@Dim <- object@Dim
              object.@Dimnames <- object@Dimnames
              object.@uplo <- object@uplo
-             object.@diag <- object@diag
              object.@x <- object@x
              if(is.character(valid <- validObject(object., test = TRUE)))
                  valid
@@ -726,15 +725,14 @@ setClass("BunchKaufman", contains = "MatrixFactorization",
          })
 
 setClass("pBunchKaufman", contains = "MatrixFactorization",
-	 slots = c(Dimnames = "list", uplo = "character", diag = "character",
+	 slots = c(Dimnames = "list", uplo = "character",
                    x = "numeric", perm = "integer"),
-         prototype = list(Dimnames = list(NULL, NULL), uplo = "U", diag = "N"),
+         prototype = list(Dimnames = list(NULL, NULL), uplo = "U"),
 	 validity = function(object) {
              object. <- new("dtpMatrix")
              object.@Dim <- object@Dim
              object.@Dimnames <- object@Dimnames
              object.@uplo <- object@uplo
-             object.@diag <- object@diag
              object.@x <- object@x
              if(is.character(valid <- validObject(object., test = TRUE)))
                  valid
@@ -743,13 +741,6 @@ setClass("pBunchKaufman", contains = "MatrixFactorization",
 
 
 ## ------ Schur --------------------------------------------------------
-
-## MJ: My preference would be for signature EValues = "complex" here,
-##     _even if_ base::eigen() gives a "numeric" _or_ "complex" result.
-##     We can already think of type "complex" as containing types "double"
-##     and "integer".  And for backwards compatibility, we could always
-##     define a method for initialize() coercing 'EValues' from numeric
-##     to complex.
 
 ## For eigenvalues:
 setClassUnion("number", members = c("numeric", "complex"))

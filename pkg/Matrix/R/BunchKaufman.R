@@ -20,7 +20,6 @@ setAs("BunchKaufman", "Matrix",
           to@Dim <- from@Dim
           to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
-          to@diag <- from@diag
           to@x <- from@x
           to
       })
@@ -31,7 +30,6 @@ setAs("pBunchKaufman", "Matrix",
           to@Dim <- from@Dim
           to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
-          to@diag <- from@diag
           to@x <- from@x
           to
       })
