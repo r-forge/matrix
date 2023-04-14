@@ -1293,7 +1293,7 @@ forceSymmetricTsparse <- function(x, uplo) {
     isTRUE(ae(target = x, current = tx, tolerance = tol, ...))
 }
 
-.sparse.subclasses <- names(getClass("sparseMatrix")@subclasses)
+.sparse.subclasses <- names(getClassDef("sparseMatrix")@subclasses)
 
 for (.cl in grep("^[CRT]sparseMatrix$", .sparse.subclasses, value = TRUE)) {
     setMethod("diag",   signature(x = .cl), .sparse.diag.get)

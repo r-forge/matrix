@@ -1589,7 +1589,7 @@ diagOdiag <- function(e1,e2) {
 
 ### This would be *the* way, but we get tons of "ambiguous method dispatch"
 ## we use this hack instead of signature  x = "diagonalMatrix" :
-diCls <- names(getClass("diagonalMatrix")@subclasses)
+diCls <- names(getClassDef("diagonalMatrix")@subclasses)
 if(FALSE) {
 setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
           diagOdiag)
@@ -1869,7 +1869,7 @@ for(other in c("ANY", "Matrix", "dMatrix")) {
 
 ## Direct subclasses of "denseMatrix": currently ddenseMatrix, ldense... :
 if(FALSE) # now also contains "geMatrix"
-dense.subCl <- local({ dM.scl <- getClass("denseMatrix")@subclasses
+dense.subCl <- local({ dM.scl <- getClassDef("denseMatrix")@subclasses
 		       names(dM.scl)[vapply(dM.scl, slot, 0, "distance") == 1] })
 dense.subCl <- paste0(c("d","l","n"), "denseMatrix")
 for(DI in diCls) {

@@ -219,7 +219,7 @@ setMethod("rbind2", signature(x = "sparseMatrix", y = "diagonalMatrix"),
 
 ## in order to evade method dispatch ambiguity, but still remain "general"
 ## we use this hack instead of signature  x = "diagonalMatrix"
-for(cls in names(getClass("diagonalMatrix")@subclasses)) {
+for(cls in names(getClassDef("diagonalMatrix")@subclasses)) {
 
  setMethod("cbind2", signature(x = cls, y = "matrix"),
 	   function(x, y, ...)

@@ -25,7 +25,7 @@ importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames,
            as, callGeneric, callNextMethod, canCoerce, cbind2, coerce,
            extends, getClass, getClassDef, getGroupMembers,
            implicitGeneric, is, isClassDef, kronecker, new,
-           packageSlot, prototype, rbind2, representation,
+           prototype, rbind2, representation,
            setAs, setClass, setClassUnion, setGeneric, setMethod,
            setOldClass, setReplaceMethod, setValidity,
            signature, show, slot, "slot<-", slotNames, validObject)
