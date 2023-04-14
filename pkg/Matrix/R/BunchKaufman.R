@@ -14,6 +14,28 @@ setMethod("BunchKaufman", signature(x = "matrix"),
 ## METHODS FOR CLASS: p?BunchKaufman
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setAs("BunchKaufman", "Matrix",
+      function(from) {
+          to <- new("dtrMatrix")
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          to@diag <- from@diag
+          to@x <- from@x
+          to
+      })
+
+setAs("pBunchKaufman", "Matrix",
+      function(from) {
+          to <- new("dtpMatrix")
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          to@diag <- from@diag
+          to@x <- from@x
+          to
+      })
+
 if(FALSE) {
 ## returning:
 ##

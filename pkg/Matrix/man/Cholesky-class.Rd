@@ -7,6 +7,8 @@
 \alias{BunchKaufman-class}
 \alias{pBunchKaufman-class}
 %
+\alias{coerce,BunchKaufman,Matrix-method}
+\alias{coerce,pBunchKaufman,Matrix-method}
 \alias{show,BunchKaufman-method}
 \alias{show,pBunchKaufman-method}
 \alias{show,Cholesky-method}
@@ -40,19 +42,27 @@
     \item For traditional matrices \code{m}, \code{chol(m)} is a
       traditional matrix as well, triangular, but simply an \eqn{n\times
 	n}{n * n} numeric \code{\link{matrix}}.  Hence, for compatibility,
-      the \code{"Cholesky"} and \code{"BunchKaufman"} classes (and their
-      \code{"p*"} packed versions) also extend triangular Matrix classes
-      (such as "dtrMatrix").
+      the \code{"Cholesky"} class extends a triangular Matrix class,
+      namely "dtrMatrix", and, analogously, \code{"pCholesky"} is
+      defined as an extension of \code{"dtpMatrix"}.
 
       Consequently, \code{\link{determinant}(R)} for \code{R <- chol(A)}
       returns the determinant of \code{R}, not of \code{A}.  This is in
-      contrast to class \code{\linkS4class{CHMfactor}} objects \code{C}, where
-      \code{determinant(C)} gives the determinant of the \emph{original}
-      matrix \code{A}, for \code{C <- Cholesky(A)}, see also the
-      \code{determinant} method documentation on the class
+      contrast to class \code{\linkS4class{CHMfactor}} objects \code{C},
+      where \code{determinant(C)} gives the determinant of the
+      \emph{original} matrix \code{A}, for \code{C <- Cholesky(A)},
+      see also the \code{determinant} method documentation on the class
       \code{\linkS4class{CHMfactor}} page.
+
+    \item Although the internal representation of class
+      \code{"BunchKaufman"} is triangular, similar to \code{"Cholesky"},
+      the class does not extend \code{"dtrMatrix"}, because, unlike
+      \code{"Cholesky"}, what is represented is multiple matrix factors
+      in a condensed format.  To obtain a \code{"dtrMatrix"}, one can
+      use \code{as(., "Matrix")}.
   }
 }
+%% FIXME: all _incredibly_ repetitive ...
 \section{Slots}{
   A Cholesky decomposition extends class
   \code{\linkS4class{MatrixFactorization}} but is basically a triangular
@@ -64,20 +74,23 @@
     \item{\code{Dim}:}{inherited from the \code{"dtrMatrix"} class.}
     \item{\code{Dimnames}:}{inherited from the \code{"dtrMatrix"} class.}
   }
-  A Bunch-Kaufman decomposition also extends the \code{"dtrMatrix"}
-  class and has a \code{perm} slot representing a permutation matrix.
-  The packed versions extend the \code{"dtpMatrix"} class.
+  The packed version extends the \code{"dtpMatrix"} class.
+  
+  A Bunch-Kaufman decomposition has all of the slots of a
+  \code{"dtrMatrix"} and \code{"dtpMatrix"} without extending
+  either class (or \code{"Matrix"} whatsoever).  It also has
+  a \code{perm} slot representing a permutation matrix.
 }
 \section{Extends}{
+%% FIXME: only true for Cholesky ...
   Class \code{"MatrixFactorization"} and \code{"dtrMatrix"}, directly.
-  Class \code{"dgeMatrix"}, by class \code{"dtrMatrix"}.
   Class \code{"Matrix"}, by class \code{"dtrMatrix"}.
 }
 \section{Methods}{
-  Both these factorizations can \emph{directly} be treated as
-  (triangular) matrices, as they extend \code{"dtrMatrix"}, see above.
-  There are currently no further explicit methods defined with class
-  \code{"Cholesky"} or \code{"BunchKaufman"} in the signature.
+  As \code{"Cholesky"} extends \code{"dtrMatrix"}, it is treated
+  \emph{directly} as a (triangular) matrix in computations.  That is
+  not the case for \code{"BunchKaufman"}, for which (currently)
+  there is only \code{show()} and the coercion \code{as(., "Matrix")}.
 }
 \seealso{
   Classes \code{\linkS4class{dtrMatrix}}, \code{\linkS4class{dpoMatrix}};

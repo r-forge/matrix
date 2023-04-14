@@ -707,13 +707,39 @@ setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
 
 ## ------ Bunch-Kaufman ------------------------------------------------
 
-setClass("BunchKaufman", contains = c("dtrMatrix", "MatrixFactorization"),
-	 slots = c(perm = "integer"),
-	 validity = function(object) .Call(BunchKaufman_validate, object))
+## Inherit most aspects of dt[rp]Matrix without extending them
 
-setClass("pBunchKaufman", contains = c("dtpMatrix", "MatrixFactorization"),
-	 slots = c(perm = "integer"),
-	 validity = function(object) .Call(pBunchKaufman_validate, object))
+setClass("BunchKaufman", contains = "MatrixFactorization",
+	 slots = c(Dimnames = "list", uplo = "character", diag = "character",
+                   x = "numeric", perm = "integer"),
+         prototype = list(Dimnames = list(NULL, NULL), uplo = "U", diag = "N"),
+	 validity = function(object) {
+             object. <- new("dtrMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@diag <- object@diag
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(BunchKaufman_validate, object)
+         })
+
+setClass("pBunchKaufman", contains = "MatrixFactorization",
+	 slots = c(Dimnames = "list", uplo = "character", diag = "character",
+                   x = "numeric", perm = "integer"),
+         prototype = list(Dimnames = list(NULL, NULL), uplo = "U", diag = "N"),
+	 validity = function(object) {
+             object. <- new("dtpMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@diag <- object@diag
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(pBunchKaufman_validate, object)
+         })
 
 
 ## ------ Schur --------------------------------------------------------
