@@ -86,7 +86,7 @@ elu$L \%*\% elu$U
 stopifnot(all.equal(as(mm, "matrix"),
                     as(m2, "matrix")))
 
-## see the underlying LAPACK representation in rectangular format
+## See the underlying LAPACK representation
 as(lum, "Matrix")
 }
 \keyword{classes}
