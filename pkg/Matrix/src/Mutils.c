@@ -525,15 +525,13 @@ const char *Matrix_nonvirtual(SEXP obj, int strict)
 	return "";
     
     static const char *valid_full[] = {
-	/* "denseLU", */
 	"Cholesky", "pCholesky",
-	"BunchKaufman", "pBunchKaufman",
 	"dpoMatrix", "dppMatrix",
 	"corMatrix", /* "copMatrix", */
 	"pMatrix",
 	VALID_NONVIRTUAL, "" };
 
-    const char **valid = (strict) ? valid_full : valid_full + 8;
+    const char **valid = (strict) ? valid_full : valid_full + 6;
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
 	return "";

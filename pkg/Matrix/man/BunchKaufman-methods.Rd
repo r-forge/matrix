@@ -68,15 +68,17 @@ CAs <- as(CAex, "symmetricMatrix")
 if(FALSE) # no method defined yet for *sparse* :
    bk. <- BunchKaufman(CAs)
 ## does apply to *dense* symmetric matrices:
-bkCA <- BunchKaufman(as(CAs, "denseMatrix"))
+bkCA <- BunchKaufman(as(CAs, "unpackedMatrix"))
+pkCA <- BunchKaufman(as(CAs,   "packedMatrix"))
 bkCA
-pkCA <- pack(bkCA)
-stopifnot(is(bkCA, "triangularMatrix"),
-          is(pkCA, "triangularMatrix"),
-          is(pkCA, "packedMatrix"))
 
-image(bkCA)# shows how sparse it is, too
-str(R.CA <- as(bkCA, "sparseMatrix"))
+## see the underlying LAPACK representation in triangular format
+bkCA.m <- as(bkCA, "Matrix")
+pkCA.m <- as(pkCA, "Matrix")
+pkCA.m[1:6, 1:6]
+
+image(bkCA.m)# shows how sparse it is, too
+str(R.CA <- as(bkCA.m, "sparseMatrix"))
 ## an upper triangular 72x72 matrix with only 144 non-zero entries
 stopifnot(is(R.CA, "triangularMatrix"), is(R.CA, "CsparseMatrix"))
 }

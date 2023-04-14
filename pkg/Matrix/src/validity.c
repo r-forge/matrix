@@ -1141,7 +1141,7 @@ SEXP sparseLU_validate(SEXP obj)
     PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
     if (*CHAR(STRING_ELT(uplo, 0)) == 'U')
 	UPRET(3, "'L' slot is upper (not lower) triangular");
-    UNPROTECT(3); /* uplo, dim, L */
+    UNPROTECT(3); /* uplo, dim, L */ /* FIXME: require L@diag == "U"? */
 
     SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
     PROTECT(dim = GET_SLOT(U, Matrix_DimSym));

@@ -38,8 +38,7 @@ unpackedClass <- function(packedClass) {
                   ltpMatrix = "ltrMatrix",
                   ntpMatrix = "ntrMatrix",
                   dppMatrix = "dpoMatrix",
-                  pCholesky     = "Cholesky",
-                  pBunchKaufman = "BunchKaufman")[[packedClass@className]])
+                  pCholesky = "Cholesky")[[packedClass@className]])
 }
 packedClass <- function(unpackedClass) {
     getClassDef(c(dgeMatrix = NA,
@@ -53,8 +52,7 @@ packedClass <- function(unpackedClass) {
                   ntrMatrix = "ntpMatrix",
                   dpoMatrix = "dppMatrix",
                   corMatrix = "dppMatrix", # no pcorMatrix yet
-                  Cholesky     = "pCholesky",
-                  BunchKaufman = "pBunchKaufman")[[unpackedClass@className]])
+                  Cholesky  = "pCholesky")[[unpackedClass@className]])
 }
 ...Class <- function(denseClass) {
     cl <- "...Matrix"
@@ -128,21 +126,12 @@ testDenseMatrix <- function(Class, ...) {
     is.l  <- !is.d  && extends(Class, lMatrix)
     is.n  <- !is.d  && !is.l
 
-    ## These classes need special care because they have an additional
-    ## 'perm' or 'sd' slot
-    is.bk <- is.tr &&
-        extends(Class, if (is.p) "pBunchKaufman" else "BunchKaufman")
+    ## This class needs special care because it has an additional 'sd' slot
     is.cr <- is.sy && !is.p && extends(Class, "corMatrix")
 
     newargs <- list(Class = Class, ...)
-    if (is.bk) {
-        ## FIXME: Possibly not valid, but fine for now,
-        ## as p?BunchKaufman has no validity method:
-        newargs[["perm"]] <- seq_len(newargs[["Dim"]][2L])
-    }
-    if (is.cr) {
+    if (is.cr)
         newargs[["sd"]] <- rep.int(1, newargs[["Dim"]][2L])
-    }
     .M <- M <- do.call(new, newargs)
 
     m <- M@Dim[1L]
@@ -206,11 +195,9 @@ testDenseMatrix <- function(Class, ...) {
                                  list(unpackedClass(Class), as.vector(m1))))
 
     tM <- do.call(new, replace(newargs[names(newargs) != "perm"],
-                               c(if (is.bk) "Class",
-                                 "Dim", "Dimnames", "x",
+                               c("Dim", "Dimnames", "x",
                                  if (!is.ge) "uplo"),
-                               c(if (is.bk) list(...Class(Class)),
-                                 list(M@Dim[2:1],
+                               c(list(M@Dim[2:1],
                                       M@Dimnames[if (is.sy) 1:2 else 2:1],
                                       if (is.p)
                                           tri0(t(m1), diag = TRUE)
