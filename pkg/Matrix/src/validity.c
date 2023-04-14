@@ -1100,20 +1100,11 @@ SEXP Schur_validate(SEXP obj)
 
 SEXP denseLU_validate(SEXP obj)
 {
-    /* MJ: assuming for simplicity that the 'Dimnames' slot is a valid list
-       partly because I'd like denseLU to formally extend dgeMatrix and in
-       that case checking 'Dimnames' here would be redundant */
-
+    /* In R, we start by checking that 'obj' would be a valid dgeMatrix */
+    
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
     UNPROTECT(1); /* dim */
-
-    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    if (TYPEOF(x) != REALSXP)
-	UPRET(1, "'x' slot is not of type \"double\"");
-    if (XLENGTH(x) != (double) m * n)
-	UPRET(1, "'x' slot does not have length prod(Dim)");
-    UNPROTECT(1); /* x */
 
     SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
     if (TYPEOF(perm) != INTSXP)
