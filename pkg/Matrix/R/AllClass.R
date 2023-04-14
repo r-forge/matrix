@@ -40,7 +40,7 @@ if(FALSE) {
 ## Virtual class of all Matrix objects
 setClass("Matrix", contains = "VIRTUAL",
 	 slots = c(Dim = "integer", Dimnames = "list"),
-	 prototype = prototype(Dim = integer(2L), Dimnames = list(NULL, NULL)),
+	 prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
 	 validity = function(object) .Call(Matrix_validate, object))
 
 ## Matrix_validate() allows Dimnames[[i]] to be a vector of type
@@ -88,13 +88,13 @@ setClass("generalMatrix", contains = c("compMatrix", "VIRTUAL"))
 ## Virtual class of triangular matrices
 setClass("triangularMatrix", contains = c("Matrix", "VIRTUAL"),
 	 slots = c(uplo = "character", diag = "character"),
-	 prototype = prototype(uplo = "U", diag = "N"),
+	 prototype = list(uplo = "U", diag = "N"),
 	 validity = function(object) .Call(triangularMatrix_validate, object))
 
 ## Virtual class of symmetric matrices
 setClass("symmetricMatrix", contains = c("compMatrix", "VIRTUAL"),
 	 slots = c(uplo = "character"),
-	 prototype = prototype(uplo = "U"),
+	 prototype = list(uplo = "U"),
 	 validity = function(object) .Call(symmetricMatrix_validate, object))
 
 
@@ -145,7 +145,7 @@ setClass("unpackedMatrix", contains = c("denseMatrix", "VIRTUAL"),
 ## Virtual class of dense, "packed" matrices, s.t. length(.@x) == n*(n+1)/2
 setClass("packedMatrix", contains = c("denseMatrix", "VIRTUAL"),
          slots = c(uplo = "character"),
-         prototype = prototype(uplo = "U"),
+         prototype = list(uplo = "U"),
 	 validity = function(object) .Call(packedMatrix_validate, object))
 
 
@@ -197,13 +197,13 @@ setClass("sparseMatrix", contains = c("Matrix", "VIRTUAL"))
 ## Virtual class of sparse matrices in compressed sparse column (CSC) format
 setClass("CsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(i = "integer", p = "integer"),
-	 prototype = prototype(p = 0L), # to be valid
+	 prototype = list(p = 0L), # to be valid
          validity = function(object) .Call(CsparseMatrix_validate, object))
 
 ## Virtual class of sparse matrices in compressed sparse row (CSR) format
 setClass("RsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 	 slots = c(p = "integer", j = "integer"),
-	 prototype = prototype(p = 0L), # to be valid
+	 prototype = list(p = 0L), # to be valid
 	 validity = function(object) .Call(RsparseMatrix_validate, object))
 
 ## Virtual class of sparse matrices in triplet format
@@ -214,7 +214,7 @@ setClass("TsparseMatrix", contains = c("sparseMatrix", "VIRTUAL"),
 ## Virtual class of diagonal matrices
 setClass("diagonalMatrix", contains = c("sparseMatrix", "VIRTUAL"),
          slots = c(diag = "character"),
-	 prototype = prototype(diag = "N"),
+	 prototype = list(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
 if(FALSE) { # --NOT YET--
@@ -557,7 +557,7 @@ setClass("indicator", contains = "dgCMatrix",
 ## Row or column index
 setClass("indMatrix", contains = c("sparseMatrix", "generalMatrix"),
 	 slots = c(perm = "integer", margin = "integer"),
-         prototype = prototype(margin = 1L), # to be valid
+         prototype = list(margin = 1L), # to be valid
          validity = function(object) .Call(indMatrix_validate, object))
 
 ## Row or column permutation
@@ -722,7 +722,7 @@ setClass("Schur", contains = "MatrixFactorization",
 
 setClass("sparseVector", contains = "VIRTUAL",
          slots = c(length = "numeric", i = "numeric"), # 1-based index!
-         prototype = prototype(length = 0),
+         prototype = list(length = 0),
          validity = function(object) {
              len <- object@length
              if(length(len) != 1L)
@@ -818,7 +818,7 @@ rm(.valid.xsparseVector)
 setClass("rleDiff",
          ## MJ: simpler would be slots = c(first=, lengths=, values=) ...
          slots = c(first = "numeric", rle = "rle"),
-	 prototype = prototype(first = integer(0L), rle = rle(integer(0L))),
+	 prototype = list(first = integer(0L), rle = rle(integer(0L))),
 	 validity = function(object) {
 	     if(length(object@first) != 1L)
 		 "'first' slot does not have length 1"
@@ -858,7 +858,7 @@ setClass("rleDiff",
 ## MM: (2010-03-04) more efficient than "rleDiff" [TODO: write rleDiff<->seqMat]
 ## MJ: (2022-09-06) data.frame(from, to, by) could be _handled_ more efficiently
 setClass("seqMat", contains = "matrix",
-	 prototype = prototype(matrix(integer(0L), nrow = 3L, ncol = 0L)),
+	 prototype = list(matrix(integer(0L), nrow = 3L, ncol = 0L)),
 	 validity = function(object) {
              if(!is.numeric(object))
                  "matrix is not numeric"
@@ -884,7 +884,7 @@ setClass("seqMat", contains = "matrix",
 ##     setClassUnion("abIndex", members = c("numeric", "rleDiff", "seqMat")) ?
 setClass("abIndex",
          slots = c(kind = "character", x = "numeric", rleD = "rleDiff"),
-         prototype = prototype(kind = "int32", x = integer(0L)),
+         prototype = list(kind = "int32", x = integer(0L)),
          validity = function(object) {
              ## MJ: should 'rleD' be "empty" if kind != "rleDiff" ?
              if(length(kind <- object@kind) != 1L)

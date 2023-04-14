@@ -274,13 +274,13 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     clStem <- if(symmetric) "sTMatrix" else "gTMatrix"
     ## "careful_new()" :
     cNam <- paste0(kind, clStem)
-    chngCl <- is.null(slotNames(newCl <- getClass(cNam, .Force=TRUE)))
+    chngCl <- is.null(newCl <- getClassDef(cNam))
     if(chngCl) { ## e.g. "igTMatrix" is not yet implemented
 	if(kind == "z")
 	    stop(gettextf("Class %s is not yet implemented", dQuote(cNam)),
 		 domain = NA)
 	## coerce to "double":
-	newCl <- getClass(paste0("d", clStem))
+	newCl <- getClassDef(paste0("d", clStem))
     }
     r <- new(newCl, Dim = c(nrow, ncol))
     ## now "compute"  the (i,j,x) slots given x@(i,x)

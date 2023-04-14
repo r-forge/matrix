@@ -223,7 +223,7 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     ## stopifnot(is.character(cl))
     ## Hmm, packageSlot(cl)  *can* be misleading --> use  cld@package  first:
     if(is.null(pkg <- cld@package)) {
-	if(is.null(pkg <- packageSlot(cl))) return(character())
+	if(is.null(pkg <- attr(cl, "package"))) return(character())
 	## else we use 'pkg'
     }
     if(identical(pkg, "Matrix") &&
