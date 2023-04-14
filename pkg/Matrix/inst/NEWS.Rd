@@ -5,12 +5,12 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-12 r3847)}{
+\section{Changes in version 1.5-5 (2023-04-14 r3855)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
       systematic code in \file{R/subscript.R} and
-      \code{src/subscript.c}, becoming more efficient for all
+      \file{src/subscript.c}, becoming more efficient for all
       \code{lsparseMatrix}
       (no longer coercing to \code{dsparseMatrix} and back),
       sparse \code{symmetricMatrix}
@@ -49,6 +49,13 @@
       typically by setting \code{x@margin <- 1L} conditional on
       \code{packageVersion("Matrix") >= "1.5-5"}.  Defensive code
       should check validity with \code{validObject}.
+
+      \code{as(x, "Matrix")} for \code{x} inheriting from
+      \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
+      allowing users to inspect the LAPACK representation of
+      those factorizations, notably as classes \code{BunchKaufman}
+      and \code{pBunchKaufman} no longer extend \code{Matrix};
+      see Bug Fixes.
     }
   }
   \subsection{Bug Fixes}{
@@ -77,6 +84,31 @@
       \item \code{x[i, ]} now correctly drops dimensions when
       \code{x} is a 1-by-\code{n} \code{Matrix} and \code{i} is
       \code{TRUE}.
+
+      \item The prototype of the \code{Dim} slot of virtual class
+      \code{MatrixFactorization} is now \code{integer(2L)}.
+      Previously it was \code{integer(0L)}, with the result that
+      \code{validObject(new("<subclass>"))} was always an error.
+      
+      \item The prototype of the \code{L} slot of class
+      \code{sparseLU} is now formally lower triangular, so that
+      \code{validObject(new("sparseLU"))} is not an error.
+      
+      \item The prototypes of the \code{Q} and \code{T} slots of class
+      \code{Schur} are now 0-by-0 \code{dgeMatrix} and \code{dtrMatrix},
+      respectively, so that \code{validObject(new("Schur"))} is not
+      an error.
+
+      \item Classes \code{BunchKaufman} and \code{pBunchKaufman}
+      now only extend \code{MatrixFactorization}, i.e., they no
+      longer extend \code{dtrMatrix} or \code{dtpMatrix}.  They
+      retain the slots \code{Dimnames}, \code{uplo}, and \code{x},
+      but these are no longer inherited from any superclass.
+      See \code{help("BunchKaufman-class")} for the rationale
+      and other details.
+
+      \item \code{BunchKaufman(<matrix>)} now works when argument
+      \code{uplo} (documented to be optional) is missing.
     }
   }
   \subsection{Misc}{
