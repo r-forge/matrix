@@ -28,6 +28,13 @@ if(FALSE) {
 }
 } ## MJ
 
+## new() does not work at build time because native symbols
+## such as 'Matrix_validate' are not yet available ...
+.new <- function(cl, ...) {
+    def <- getClassDef(cl)
+    structure(def@prototype, class = def@className, ...)
+}
+
 
 ########################################################################
 ##  1. Matrix
@@ -571,8 +578,14 @@ setClass("pMatrix", contains = c("indMatrix"),
 
 ## ------ The Mother Class "MatrixFactorization" -----------------------
 
+## MJ: It would be nice if this virtual class could also get a 'Dimnames'
+##     slot.  Then the prototype, validity method, and initialize method
+##     would be inherited by all subclasses.  One could more faithfully
+##     reconstruct any matrix from its factorization, too ...
+
 setClass("MatrixFactorization", contains = "VIRTUAL",
          slots = c(Dim = "integer"),
+         prototype = list(Dim = integer(2L)),
          validity = function(object) .Call(MatrixFactorization_validate, object))
 
 
@@ -580,16 +593,25 @@ setClass("MatrixFactorization", contains = "VIRTUAL",
 
 setClass("LU", contains = c("MatrixFactorization", "VIRTUAL"))
 
-## MJ: if BunchKaufman should extend dtrMatrix,
-##     then maybe denseLU should extend dgeMatrix ...
+## Inherit most aspects of dgeMatrix without formally extending it:
 
 setClass("denseLU", contains = "LU",
 	 slots = c(Dimnames = "list", x = "numeric", perm = "integer"),
-	 validity = function(object) .Call(denseLU_validate, object))
+         prototype = list(Dimnames = list(NULL, NULL)),
+	 validity = function(object) {
+             object. <- new("dgeMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(denseLU_validate, object)
+         })
 
 setClass("sparseLU", contains = "LU",
 	 slots = c(L = "dtCMatrix", U = "dtCMatrix",
 		   p = "integer", q = "integer"),
+         prototype = list(L = .new("dtCMatrix", uplo = "L")),
          validity = function(object) .Call(sparseLU_validate, object))
 
 ## unused:
@@ -614,12 +636,17 @@ setClass("denseQR", contains = "QR",
                    rank = "integer", pivot = "integer",
                    useLAPACK = "logical"),
          validity = function(object) .Call(denseQR_validate, object))
-}
 
+setClass("sparseQR", contains = "QR",
+	 slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
+		   p = "integer", q = "integer"),
+	 validity = function(object) .Call(sparseQR_validate, object))
+} else {
 setClass("sparseQR", contains = "MatrixFactorization",
 	 slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
 		   p = "integer", q = "integer"),
 	 validity = function(object) .Call(sparseQR_validate, object))
+}
 
 ## unused:
 if(FALSE) {
@@ -703,6 +730,7 @@ setClassUnion("number", members = c("numeric", "complex"))
 
 setClass("Schur", contains = "MatrixFactorization",
          slots = c(Q = "Matrix", T = "Matrix", EValues = "number"),
+         prototype = list(Q = .new("dgeMatrix"), T = .new("dtrMatrix")),
          validity = function(object) .Call(Schur_validate, object))
 
 
@@ -815,6 +843,7 @@ rm(.valid.xsparseVector)
 
 ## Idea: represent x = c(seq(from1, to1, by1), seq(from2, to2, by2), ...)
 ##       as list(first = x[1L], rle = rle(diff(x)))
+setOldClass("rle")
 setClass("rleDiff",
          ## MJ: simpler would be slots = c(first=, lengths=, values=) ...
          slots = c(first = "numeric", rle = "rle"),
@@ -858,7 +887,7 @@ setClass("rleDiff",
 ## MM: (2010-03-04) more efficient than "rleDiff" [TODO: write rleDiff<->seqMat]
 ## MJ: (2022-09-06) data.frame(from, to, by) could be _handled_ more efficiently
 setClass("seqMat", contains = "matrix",
-	 prototype = list(matrix(integer(0L), nrow = 3L, ncol = 0L)),
+	 prototype = matrix(integer(0L), nrow = 3L, ncol = 0L),
 	 validity = function(object) {
              if(!is.numeric(object))
                  "matrix is not numeric"
@@ -1018,3 +1047,5 @@ setClassUnion("replValue",
 setClassUnion("replValueSp",
               ## MJ: why Matrix but not matrix ??
               members = c("replValue", "sparseVector", "Matrix"))
+
+rm(.new)
