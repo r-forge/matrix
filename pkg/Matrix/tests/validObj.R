@@ -182,6 +182,10 @@ t <- try(show(foo)) ## error
 stopifnot(identical(msg, getLastMsg(t)),
           identical(head(foo), t2))
 
+## test that all prototypes of nonvirtual classes are valid
+for (cl in c(names(getClassDef("Matrix")@subclasses),
+             names(getClassDef("MatrixFactorization")@subclasses)))
+    if(!isVirtualClass(def <- getClassDef(cl))) validObject(new(def))
 
 cat('Time elapsed: ', proc.time(),'\n') # "stats"
 

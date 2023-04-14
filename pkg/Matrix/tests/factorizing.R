@@ -683,4 +683,7 @@ for(m in list(syU, syL, spU, spL))
         stopifnot(all.equal(determinant(   m,            givelog),
                             determinant(as(m, "matrix"), givelog)))
 
+## was an error at least in Matrix 1.5-4 ...
+BunchKaufman(as.matrix(1))
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
