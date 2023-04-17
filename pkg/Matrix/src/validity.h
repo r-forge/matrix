@@ -86,8 +86,7 @@ SEXP CHMsuper_validate(SEXP obj);
 
 #define SNPRINTF(_BUFFER_, _FORMAT_, ...)				\
     do {								\
-	_BUFFER_ = Alloca(Matrix_ErrorBufferSize, char);		\
-	R_CheckStack();							\
+	_BUFFER_ = R_alloc(Matrix_ErrorBufferSize, sizeof(char));	\
 	snprintf(_BUFFER_, Matrix_ErrorBufferSize, _FORMAT_, __VA_ARGS__); \
     } while (0)
 
