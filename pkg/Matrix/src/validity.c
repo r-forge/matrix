@@ -14,7 +14,7 @@
  * @return A string containing an error message, empty if `dim`
  *     is valid.
  */
-const char* Dim_validate(SEXP dim, const char* domain)
+char* Dim_validate(SEXP dim, const char* domain)
 {
     /* TODO? coerce from REALSXP to INTSXP?
        // if (TYPEOF(dim) != INTSXP && TYPEOF(dim) != REALSXP)
@@ -41,7 +41,7 @@ const char* Dim_validate(SEXP dim, const char* domain)
 
 SEXP R_Dim_validate(SEXP dim)
 {
-    const char *msg = Dim_validate(dim, "Matrix");
+    char *msg = Dim_validate(dim, "Matrix");
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
@@ -50,7 +50,7 @@ SEXP R_Dim_validate(SEXP dim)
 SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    const char *msg = Dim_validate(dim, CHAR(STRING_ELT(domain, 0)));
+    char *msg = Dim_validate(dim, CHAR(STRING_ELT(domain, 0)));
     UNPROTECT(1); /* dim */
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
@@ -69,7 +69,7 @@ SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
  * @return A string containing an error message, empty if `dimnames`
  *     is valid.
  */
-const char* DimNames_validate(SEXP dimnames, int *pdim)
+char* DimNames_validate(SEXP dimnames, int *pdim)
 {
     if (TYPEOF(dimnames) != VECSXP)
 	return _("'Dimnames' slot is not a list");
@@ -102,7 +102,7 @@ const char* DimNames_validate(SEXP dimnames, int *pdim)
 
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 {
-    const char *msg = DimNames_validate(dimnames, INTEGER(dim));
+    char *msg = DimNames_validate(dimnames, INTEGER(dim));
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
@@ -112,7 +112,7 @@ SEXP R_DimNames_validate_old(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-    const char *msg = DimNames_validate(dimnames, INTEGER(dim));
+    char *msg = DimNames_validate(dimnames, INTEGER(dim));
     UNPROTECT(2); /* dimnames, dim */
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
@@ -176,7 +176,7 @@ SEXP R_DimNames_fixup(SEXP dn)
 SEXP Matrix_validate(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    const char* msg = Dim_validate(dim, "Matrix");
+    char* msg = Dim_validate(dim, "Matrix");
     if (msg[0] == '\0') {
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	msg = DimNames_validate(dimnames, INTEGER(dim));
@@ -189,7 +189,7 @@ SEXP Matrix_validate(SEXP obj)
 SEXP MatrixFactorization_validate(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    const char *msg = Dim_validate(dim, "Matrix");
+    char *msg = Dim_validate(dim, "Matrix");
     UNPROTECT(1); /* dim */
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
@@ -1027,6 +1027,8 @@ SEXP pCholesky_validate(SEXP obj)
 
 SEXP BunchKaufman_validate(SEXP obj)
 {
+    /* In R, we start by checking that 'obj' would be a valid dtrMatrix */
+    
     SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
     if (TYPEOF(perm) != INTSXP)
 	UPRET(1, "'perm' slot is not of type \"integer\"");
@@ -1060,6 +1062,8 @@ SEXP BunchKaufman_validate(SEXP obj)
 
 SEXP pBunchKaufman_validate(SEXP obj)
 {
+    /* In R, we start by checking that 'obj' would be a valid dtpMatrix */
+    
     return BunchKaufman_validate(obj); /* since we only look at 'perm' */
 }
 
