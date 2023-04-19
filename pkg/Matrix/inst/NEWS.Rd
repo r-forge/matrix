@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-14 r3855)}{
+\section{Changes in version 1.5-5 (2023-04-19 r3859)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -56,6 +56,10 @@
       those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};
       see Bug Fixes.
+
+      \code{NULL} subscripts, as in \code{x[NULL]} and \code{x[NULL, ]},
+      are now supported for all \code{x} inheriting from \code{Matrix}.
+      They are handled as \code{integer(0)}, consistent with base R.
     }
   }
   \subsection{Bug Fixes}{
