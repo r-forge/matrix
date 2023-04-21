@@ -44,18 +44,6 @@ SEXP R_Dim_validate(SEXP dim)
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
-#ifdef Matrix_SupportingCachedMethods
-
-SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    char *msg = Dim_validate(dim);
-    UNPROTECT(1); /* dim */
-    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
-}
-
-#endif
-
 /**
  * Test that `dimnames` is a valid length-2 list.
  *
@@ -104,19 +92,6 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
     char *msg = DimNames_validate(dimnames, INTEGER(dim));
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
-
-#ifdef Matrix_SupportingCachedMethods
-
-SEXP R_DimNames_validate_old(SEXP obj)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-    char *msg = DimNames_validate(dimnames, INTEGER(dim));
-    UNPROTECT(2); /* dimnames, dim */
-    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
-}
-
-#endif
 
 /**
  * @brief Sanitize user-supplied `[dD]imnames`.

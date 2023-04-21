@@ -258,12 +258,8 @@ setAs("indMatrix", "ngeMatrix", .ind2nge)
 } ## DEPRECATED IN 1.5-0; see ./zzz.R
 
 rm(.ind2dge, .ind2lge, .ind2nge, .ind2n.p,
-   .ind2dgC, .ind2lgC, .ind2ngC, .ind2ngR, # .ind2ngT,
+   .ind2dgC, .ind2lgC, .ind2ngC, .ind2ngR, .ind2ngT,
    .ind2diag, .ind2p)
-
-if(!.Matrix.supporting.cached.methods) {
-rm(.ind2ngT)
-}
 
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

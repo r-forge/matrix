@@ -1,12 +1,11 @@
 #ifndef MATRIX_DEFINES_H
 #define MATRIX_DEFINES_H
 
-#define Matrix_Domain         "Matrix"
-#define Matrix_CallocThreshold   10000
-#define Matrix_ErrorBufferSize    4096
+#define Matrix_Domain          "Matrix"
+#define Matrix_CallocThreshold    10000
+#define Matrix_ErrorBufferSize     4096
 
 /* Eventually these will no longer be needed : */
-#define Matrix_SupportingCachedMethods
 #undef  Matrix_WithSPQR
 
 /* NB: system headers should come before R headers */
@@ -235,22 +234,25 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 /* Keep synchronized with ../inst/include/Matrix.h !                  */
 
 #define VALID_NONVIRTUAL_MATRIX						\
-/*  0 */ "indMatrix",							\
-/*  1 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
-/*  6 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
-/* 11 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
-/* 16 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
-/* 21 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
-/* 26 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
-/* 31 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
-/* 36 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
-/* 41 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
-/* 46 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
-/* 51 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
-/* 56 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
-/* 61 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
-/* 66 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
-/* 71 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
+/*  0 */   "pMatrix", "indMatrix",					\
+/*  2 */  "Cholesky", "pCholesky",					\
+/*  4 */ "dpoMatrix", "dppMatrix",					\
+/*  6 */ "corMatrix", "copMatrix",					\
+/*  8 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
+/* 13 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
+/* 18 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
+/* 23 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
+/* 28 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
+/* 33 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
+/* 38 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
+/* 43 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
+/* 48 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
+/* 53 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
+/* 58 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
+/* 63 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
+/* 68 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
+/* 73 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
+/* 78 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_NONVIRTUAL_VECTOR					\
 /* 76 */ "dsparseVector", "lsparseVector", "nsparseVector",	\
