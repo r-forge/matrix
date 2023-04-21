@@ -12,7 +12,7 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp,
 
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames);
 
-#ifdef Matrix_with_SPQR
+#ifdef Matrix_WithSPQR
 SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol);
 #endif
 

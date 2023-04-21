@@ -461,12 +461,12 @@ char type2kind(SEXPTYPE type)
     case LGLSXP:
 	return 'l';
     case INTSXP:
-#ifdef HAVE_PROPER_IMATRIX
+#ifdef MATRIX_ENABLE_IMATRIX
 	return 'i';
 #endif
     case REALSXP:
 	return 'd';
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case CPLXSXP:
 	return 'z';
 #endif
@@ -482,13 +482,13 @@ SEXPTYPE kind2type(char kind)
     case 'n':
     case 'l':
 	return LGLSXP;
-#ifdef HAVE_PROPER_IMATRIX
+#ifdef MATRIX_ENABLE_IMATRIX
     case 'i':
 	return INTSXP;
 #endif
     case 'd':
 	return REALSXP;
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case 'z':
 	return CPLXSXP;
 #endif
@@ -503,13 +503,13 @@ size_t kind2size(char kind)
     switch (kind) {
     case 'n':
     case 'l':
-#ifdef HAVE_PROPER_IMATRIX
+#ifdef MATRIX_ENABLE_IMATRIX
     case 'i':
 #endif
 	return sizeof(int);
     case 'd':
 	return sizeof(double);
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case 'z':
 	return sizeof(Rcomplex);
 #endif

@@ -7,15 +7,15 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
     SEXPTYPE tf = TYPEOF(from);
     switch (tf) {
     case LGLSXP:
-#ifdef HAVE_PROPER_IMATRIX
+#ifdef MATRIX_ENABLE_IMATRIX
     case INTSXP:
 #endif
     case REALSXP:
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case CPLXSXP:
 #endif
 	break;
-#ifndef HAVE_PROPER_IMATRIX
+#ifndef MATRIX_ENABLE_IMATRIX
     case INTSXP:
 	if (!inherits(from, "factor"))
 	    break;
@@ -156,7 +156,7 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 	case LGLSXP:
 	    PACK(i, LOGICAL);
 	    break;
-#ifdef HAVE_PROPER_IMATRIX
+#ifdef MATRIX_ENABLE_IMATRIX
 	case INTSXP:
 	    PACK(i, INTEGER);
 	    break;
@@ -164,7 +164,7 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 	case REALSXP:
 	    PACK(d, REAL);
 	    break;
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
 	    PACK(z, COMPLEX);
 	    break;
@@ -335,7 +335,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 	++nprotect;
 	txf = TYPEOF(x_from);
 	
-#ifndef HAVE_PROPER_IMATRIX
+#ifndef MATRIX_ENABLE_IMATRIX
 	if (z0 == '.' && txf == INTSXP)
 	    REPROTECT(x_from = coerceVector(x_from, txf = REALSXP), pidA);
 #endif

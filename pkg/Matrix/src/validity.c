@@ -9,12 +9,11 @@
  *
  * @param dim A `SEXP`,
  *     typically the `Dim` slot of a (to be validated) `Matrix`.
- * @param domain A string giving a domain for message translation.
  *
  * @return A string containing an error message, empty if `dim`
  *     is valid.
  */
-char* Dim_validate(SEXP dim, const char* domain)
+char* Dim_validate(SEXP dim)
 {
     /* TODO? coerce from REALSXP to INTSXP?
        // if (TYPEOF(dim) != INTSXP && TYPEOF(dim) != REALSXP)
@@ -32,7 +31,7 @@ char* Dim_validate(SEXP dim, const char* domain)
     if (m == NA_INTEGER || n == NA_INTEGER)
 	return _("'Dim' slot contains NA");
     if (m < 0 || n < 0)
-	return dngettext(domain,
+	return dngettext(Matrix_Domain,
 			 "'Dim' slot contains negative value",
 			 "'Dim' slot contains negative values",
 			 (m < 0 && n < 0) ? 2 : 1);
@@ -41,7 +40,7 @@ char* Dim_validate(SEXP dim, const char* domain)
 
 SEXP R_Dim_validate(SEXP dim)
 {
-    char *msg = Dim_validate(dim, "Matrix");
+    char *msg = Dim_validate(dim);
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
 
@@ -50,7 +49,7 @@ SEXP R_Dim_validate(SEXP dim)
 SEXP R_Dim_validate_old(SEXP obj, SEXP domain)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    char *msg = Dim_validate(dim, CHAR(STRING_ELT(domain, 0)));
+    char *msg = Dim_validate(dim);
     UNPROTECT(1); /* dim */
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }
@@ -176,7 +175,7 @@ SEXP R_DimNames_fixup(SEXP dn)
 SEXP Matrix_validate(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    char* msg = Dim_validate(dim, "Matrix");
+    char* msg = Dim_validate(dim);
     if (msg[0] == '\0') {
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	msg = DimNames_validate(dimnames, INTEGER(dim));
@@ -189,7 +188,7 @@ SEXP Matrix_validate(SEXP obj)
 SEXP MatrixFactorization_validate(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    char *msg = Dim_validate(dim, "Matrix");
+    char *msg = Dim_validate(dim);
     UNPROTECT(1); /* dim */
     return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
 }

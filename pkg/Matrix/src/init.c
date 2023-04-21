@@ -179,7 +179,7 @@ static R_CallMethodDef CallEntries[] = {
     
     CALLDEF(dgCMatrix_LU, 5),
     CALLDEF(dgCMatrix_QR, 3),
-#ifdef Matrix_with_SPQR
+#ifdef Matrix_WithSPQR
     CALLDEF(dgCMatrix_SPQR, 4),
 #endif
 
