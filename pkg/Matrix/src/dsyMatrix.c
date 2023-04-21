@@ -33,10 +33,10 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 	    F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, &tmp, &lwork, \
 			     &info FCONE);				\
 	    lwork = (int) tmp;						\
-	    Calloc_or_Alloca_TO(work, lwork, double);			\
+	    Matrix_Calloc(work, lwork, double);				\
 	    F77_CALL(dsytrf)(&_UL_, pdim, py, pdim, pperm, work, &lwork, \
 			     &info FCONE);				\
-	    Free_FROM(work, lwork);					\
+	    Matrix_Free(work, lwork);					\
 	    								\
 	    if (info < 0)						\
 		error(_("LAPACK '%s' gave error code %d"),		\
@@ -258,7 +258,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
     double one = 1., zero = 0.;
     R_xlen_t mn = m * (R_xlen_t)n;
     double *bcp, *vx = REAL(GET_SLOT(val, Matrix_xSym));
-    Calloc_or_Alloca_TO(bcp, mn, double);
+    Matrix_Calloc(bcp, mn, double);
     Memcpy(bcp, vx, mn);
 
     if (m >=1 && n >= 1)
@@ -271,7 +271,7 @@ SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
 	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
     SEXP nms = PROTECT(VECTOR_ELT(get_symmetrized_DimNames(a, -1), nd));
     SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
-    Free_FROM(bcp, mn);
+    Matrix_Free(bcp, mn);
     UNPROTECT(2);
     return val;
 }

@@ -84,7 +84,7 @@ SEXP denseLU_expand(SEXP obj)
     SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 	perm = PROTECT(allocVector(INTSXP, m));
     int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm, pos, tmp;
-    Calloc_or_Alloca_TO(pinvperm, m, int);
+    Matrix_Calloc(pinvperm, m, int);
 
     for (j = 0; j < m; ++j) /* initialize inverse permutation */
 	pinvperm[j] = j;
@@ -98,7 +98,7 @@ SEXP denseLU_expand(SEXP obj)
     }
     for (j = 0; j < m; ++j) /* invert inverse permutation (0->1-based) */
 	pperm[pinvperm[j]] = j + 1;
-    Free_FROM(pinvperm, m);
+    Matrix_Free(pinvperm, m);
 
     SET_SLOT(P, Matrix_permSym, perm);
     SET_VECTOR_ELT(res, 2, P);
@@ -533,7 +533,7 @@ SEXP LU_expand(SEXP x)
     if(!is_sq) // m != n -- P is  m x m
 	INTEGER(GET_SLOT(P, Matrix_DimSym))[1] = m;
     perm = INTEGER(ALLOC_SLOT(P, Matrix_permSym, INTSXP, m));
-    Calloc_or_Alloca_TO(iperm, m, int);
+    Matrix_Calloc(iperm, m, int);
 
     for (i = 0; i < m; i++) iperm[i] = i + 1; /* initialize permutation*/
     for (i = 0; i < nn; i++) {	/* generate inverse permutation */
@@ -545,7 +545,7 @@ SEXP LU_expand(SEXP x)
     // invert the inverse
     for (i = 0; i < m; i++) perm[iperm[i] - 1] = i + 1;
 
-    Free_FROM(iperm, m);
+    Matrix_Free(iperm, m);
     UNPROTECT(1);
     return val;
 }

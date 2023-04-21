@@ -588,7 +588,7 @@ SEXP R_sparse_as_general(SEXP from)
 	if (clf[1] == 's') {
 
 	    int *pp1_;
-	    Calloc_or_Alloca_TO(pp1_, n, int);
+	    Matrix_Calloc(pp1_, n, int);
 	    Matrix_memcpy(pp1_, pp1 - 1, n, sizeof(int));
 	    
 #define SAG_CR(_XASSIGN_IJ_, _XASSIGN_JI_)				\
@@ -624,7 +624,7 @@ SEXP R_sparse_as_general(SEXP from)
 #undef SAG_CR_X
 #undef SAG_CR
 
-	    Free_FROM(pp1_, n);
+	    Matrix_Free(pp1_, n);
 	    
 	} else {
 
@@ -1509,7 +1509,7 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	if (clf[2] != 'T') {						\
 	    if (!sy && clf[1] == 's') {					\
 		int *pp1_;						\
-		Calloc_or_Alloca_TO(pp1_, n, int);			\
+		Matrix_Calloc(pp1_, n, int);				\
 		Matrix_memcpy(pp1_, pp1 - 1, n, sizeof(int));		\
 		for (j = 0, k = 0; j < n; ++j) {			\
 		    kend = pp0[j];					\
@@ -1527,7 +1527,7 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 			++k;						\
 		    }							\
 		}							\
-		Free_FROM(pp1_, n);					\
+		Matrix_Free(pp1_, n);					\
 	    } else {							\
 		for (j = 0, k = 0; j < n; ++j) {			\
 		    kend = pp0[j];					\
@@ -2297,7 +2297,7 @@ SEXP R_sparse_transpose(SEXP from)
 
     /* Allocating work space */
     int *pp1_;
-    Calloc_or_Alloca_TO(pp1_, m_, int);
+    Matrix_Calloc(pp1_, m_, int);
     Matrix_memcpy(pp1_, pp1 - 1, m_, sizeof(int));
 
 #define SPARSE_T(_XASSIGN_)				\
@@ -2334,7 +2334,7 @@ SEXP R_sparse_transpose(SEXP from)
 #undef SPARSE_T_X
 #undef SPARSE_T
 
-    Free_FROM(pp1_, m_);
+    Matrix_Free(pp1_, m_);
     SET_SLOT(to, Matrix_pSym, p1);
     SET_SLOT(to,        iSym, i1);
 
@@ -3398,7 +3398,7 @@ SEXP R_sparse_skewpart(SEXP from)
 	++pp0_;
 
 	int *pp1_;
-	Calloc_or_Alloca_TO(pp1_, n, int);
+	Matrix_Calloc(pp1_, n, int);
 	
 	SEXP x0_ = NULL;
 	if (clf[0] != 'n') {
@@ -3593,7 +3593,7 @@ SEXP R_sparse_skewpart(SEXP from)
 
 #undef CRSPARSE_SKEWPART_GENERAL
 	
-	Free_FROM(pp1_, n);
+	Matrix_Free(pp1_, n);
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
 	SET_SLOT(to, Matrix_xSym, x1);
@@ -3889,8 +3889,8 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     int *pp1 = INTEGER(p1), *pi1, *pj_, *workA, *workB, *workC, i, j;
     R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r_ + m_;
     *(pp1++) = 0;
-    Calloc_or_Alloca_TO(pj_, nnz0, int);
-    Calloc_or_Alloca_TO(workA, w, int);
+    Matrix_Calloc(pj_, nnz0, int);
+    Matrix_Calloc(workA, w, int);
     workB = workA + m_;
     workC = workB + r_;
     
@@ -4047,7 +4047,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 #define T_AS_CR_X(_CTYPE_, _PTR_, _SEXPTYPE_, _XINCR_)	\
     do {						\
 	_CTYPE_ *px0 = _PTR_(x0), *px1, *px_;		\
-	Calloc_or_Alloca_TO(px_, nnz0, _CTYPE_);	\
+	Matrix_Calloc(px_, nnz0, _CTYPE_);		\
 	T_AS_CR_1;					\
 	T_AS_CR_2;					\
 	T_AS_CR_3(px_[workB[pi0[k]]] = px0[k]);		\
@@ -4060,7 +4060,7 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
 	pi1 = INTEGER(i1);				\
 	px1 = _PTR_(x1);				\
 	T_AS_CR_7(px1[workB[pj_[k]]] = px_[k]);		\
-	Free_FROM(px_, nnz0);				\
+	Matrix_Free(px_, nnz0);				\
     } while (0)
 
 #define T_AS_CR_CASES(_KIND_, _DO_N_, _DO_X_)				\
@@ -4102,8 +4102,8 @@ SEXP Tsparse_as_CRsparse(SEXP from, SEXP Csparse)
     } while (0)
 
     T_AS_CR_CASES(clf[0], T_AS_CR_N, T_AS_CR_X);
-    Free_FROM(workA, w);
-    Free_FROM(pj_, nnz0);
+    Matrix_Free(workA, w);
+    Matrix_Free(pj_, nnz0);
     
     SET_SLOT(to, Matrix_pSym, p1);
     SET_SLOT(to,        iSym, i1);
@@ -4146,8 +4146,8 @@ SEXP Tsparse_aggregate(SEXP from)
     SEXP i1 = NULL, j1 = NULL;
     int *pi1, *pj1, *pj_, *workA, *workB, *workC, i, j;
     R_xlen_t k, kstart, kend, kend_, w = (R_xlen_t) m_ + r_ + m_;
-    Calloc_or_Alloca_TO(pj_, nnz0, int);
-    Calloc_or_Alloca_TO(workA, w, int);
+    Matrix_Calloc(pj_, nnz0, int);
+    Matrix_Calloc(workA, w, int);
     workB = workA + m_;
     workC = workB + r_;
     
@@ -4180,8 +4180,8 @@ SEXP Tsparse_aggregate(SEXP from)
 	    pj1 = INTEGER(j1);				\
 	    SET_TRIPLET();				\
 	}						\
-	Free_FROM(workA, w);				\
-	Free_FROM(pj_, nnz0);				\
+	Matrix_Free(workA, w);				\
+	Matrix_Free(pj_, nnz0);				\
 	if (nnz1 == nnz0) {				\
 	    UNPROTECT(nprotect);			\
 	    return from;				\
@@ -4191,7 +4191,7 @@ SEXP Tsparse_aggregate(SEXP from)
 #define T_AGGR_X(_CTYPE_, _PTR_, _SEXPTYPE_, _XINCR_)		\
     do {							\
 	_CTYPE_ *px0 = _PTR_(x0), *px1, *px_;			\
-	Calloc_or_Alloca_TO(px_, nnz0, _CTYPE_);		\
+	Matrix_Calloc(px_, nnz0, _CTYPE_);			\
 	T_AS_CR_1;						\
 	T_AS_CR_2;						\
 	T_AS_CR_3(px_[workB[pi0[k]]] = px0[k]);			\
@@ -4206,9 +4206,9 @@ SEXP Tsparse_aggregate(SEXP from)
 	    px1 = _PTR_(x1);					\
 	    SET_TRIPLET(*(px1++) = px_[k]);			\
 	}							\
-	Free_FROM(workA, w);					\
-	Free_FROM(pj_, nnz0);					\
-	Free_FROM(px_, nnz0);					\
+	Matrix_Free(workA, w);					\
+	Matrix_Free(pj_, nnz0);					\
+	Matrix_Free(px_, nnz0);					\
 	if (nnz1 == nnz0) {					\
 	    UNPROTECT(nprotect);				\
 	    return from;					\
@@ -4550,7 +4550,7 @@ SEXP _C_ ## sparse_is_symmetric(SEXP obj, SEXP checkDN)			\
     int i, j, k, kend, *pp_, *pp = INTEGER(p0), *pi = INTEGER(i0),	\
 	nprotect = 2;							\
     Rboolean res = TRUE;						\
-    Calloc_or_Alloca_TO(pp_, n, int);					\
+    Matrix_Calloc(pp_, n, int);						\
     Matrix_memcpy(pp_, pp, n, sizeof(int));				\
     ++pp;								\
     /* For all X[i,j] in "leading" triangle, */				\
@@ -4612,7 +4612,7 @@ SEXP _C_ ## sparse_is_symmetric(SEXP obj, SEXP checkDN)			\
 	}								\
     }									\
 finish:									\
-    Free_FROM(pp_, n);							\
+    Matrix_Free(pp_, n);							\
     UNPROTECT(nprotect); /* x0, i0, p0 */				\
     return ScalarLogical(res);						\
 }
@@ -4995,7 +4995,7 @@ SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
     do {								\
 	_CTYPE1_ *pres = _PTR1_(res), u = (di == 'N') ? ZERO : ONE;	\
 	if (doNaRm && doMean && cl[0] != 'n') {				\
-	    Calloc_or_Alloca_TO(pcount, m, int);			\
+	    Matrix_Calloc(pcount, m, int);				\
 	    for (k = 0; k < m; ++k) {					\
 		pres[k] = u;						\
 		pcount[k] = n;						\
@@ -5164,7 +5164,7 @@ SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
 	    if (doNaRm && cl[0] != 'n') {
 		for (k = 0; k < m; ++k)
 		    pres[k] /= pcount[k];
-		Free_FROM(pcount, m);
+		Matrix_Free(pcount, m);
 	    } else {
 		for (k = 0; k < m; ++k)
 		    pres[k] /= n;
@@ -5176,7 +5176,7 @@ SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
 		    pres[k].r /= pcount[k];
 		    pres[k].i /= pcount[k];
 		}
-		Free_FROM(pcount, m);
+		Matrix_Free(pcount, m);
 	    } else {
 		for (k = 0; k < m; ++k) {
 		    pres[k].r /= n;
