@@ -523,18 +523,12 @@ const char *Matrix_nonvirtual(SEXP obj, int strict)
 {
     if (!IS_S4_OBJECT(obj))
 	return "";
-    
-    static const char *valid_full[] = {
-	"Cholesky", "pCholesky",
-	"dpoMatrix", "dppMatrix",
-	"corMatrix", /* "copMatrix", */
-	"pMatrix",
-	VALID_NONVIRTUAL, "" };
-
-    const char **valid = (strict) ? valid_full : valid_full + 6;
+    static const char *valid[] = { VALID_NONVIRTUAL, "" };
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
 	return "";
+    if (!strict)
+	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
     return valid[ivalid];
 }
 
@@ -561,6 +555,7 @@ char Matrix_kind(SEXP obj, int i2d)
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 	    return '\0';
+	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
 	const char *cl = valid[ivalid];
 	return (cl[2] == 'd') ? 'n' : cl[0];
     } else {
@@ -592,6 +587,7 @@ char Matrix_shape(SEXP obj)
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
 	return '\0';
+    ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
     const char *cl = valid[ivalid];
     return (cl[2] == 'd' || cl[3] != 'M') ? 'g' : cl[1];
 }
@@ -609,6 +605,7 @@ char Matrix_repr(SEXP obj)
     int ivalid = R_check_class_etc(obj, valid);
     if (ivalid < 0)
 	return '\0';
+    ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
     const char *cl = valid[ivalid];
     switch (cl[2]) {
     case 'e':
