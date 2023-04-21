@@ -169,10 +169,6 @@ setMethod("determinant",
 
 rm(.det.tri, .det.diag, .det.dsy, .det.dsp)
 
-if(.Matrix.supporting.cached.methods) {
-mkDet <- .mkDet
-}
-
 ## MJ: used only in tests
 if(TRUE) {
 ldet1.dsC <- function(x, ...)

@@ -9,11 +9,6 @@ SEXP R_Dim_validate(SEXP dim);
 char* DimNames_validate(SEXP dimnames, int pdim[]);
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
     
-#ifdef Matrix_SupportingCachedMethods
-SEXP R_Dim_validate_old(SEXP obj, SEXP domain);
-SEXP R_DimNames_validate_old(SEXP obj);
-#endif
-
 SEXP R_DimNames_fixup(SEXP dn);
 
 SEXP Matrix_validate(SEXP obj);
@@ -98,7 +93,7 @@ SEXP CHMsuper_validate(SEXP obj);
 
 #define FRUPRET(_PTR_, _M_, _N_, _S_)		\
     do {					\
-	Free_FROM(_PTR_, _M_);			\
+	Matrix_Free(_PTR_, _M_);		\
 	UNPROTECT(_N_);				\
 	return mkString(_(_S_));		\
     } while (0)

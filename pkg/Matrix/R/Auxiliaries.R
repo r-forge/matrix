@@ -5,13 +5,6 @@
 ## NB: keep ../NAMESPACE synchronized
 .Matrix.avoiding.as.matrix <- FALSE
 
-## Some reverse dependencies built with Matrix <= 1.4.1 cache methods
-## referring to objects that we no longer strictly need in the namespace.
-## TRUE ensures that these "unused" objects continue to exist, so that
-## the cached methods continue to work as before if called ...
-## NB: keep Matrix_SupportingCachedMethods in ../src/Mutils.h synchronized
-.Matrix.supporting.cached.methods <- TRUE
-
 ## These would be faster by a factor ~2 if done in C:
 if(FALSE) {
 ## Need to consider NAs ;  "== 0" even works for logical & complex:
@@ -745,15 +738,6 @@ forceDiagonal <- function(x, diag = NA_character_) {
 
 drop0.notol <- function(x)
     .Call(R_sparse_drop0, x)
-
-if(.Matrix.supporting.cached.methods) {
-.C.2.R <- .CR2RC
-.R.2.C <- .CR2RC
-.R.2.T <- .CR2T
-.T.2.C <- .T2C
-.tC.2.R <- function(m, cl, clx) .tCR2RC(m)
-.tR.2.C <- .tCR2RC
-}
 
 rowCheck <- function(a, b) {
     da <- dim(a)
@@ -1559,11 +1543,8 @@ as_geSimpl2 <- function(from, cl = class(from))
     as(from, paste0(.M.kind(from, cl), "geMatrix"))
 ## to be used directly in setAs(.) needs one-argument-only  (from) :
 as_geSimpl <- function(from) as(from, paste0(.M.kind(from), "geMatrix"))
-} ## MJ
-
-if(.Matrix.supporting.cached.methods) {
 as_gCsimpl <- function(from) as(as(from, "CsparseMatrix"), "generalMatrix")
-}
+} ## MJ
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
@@ -1885,16 +1866,13 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     x
 }
 
-if(.Matrix.supporting.cached.methods) {
+# MJ: no longer used
+if(FALSE) {
 .dgC.0.factors <- function(x) {
     if(length(x@factors))
         x@factors <- list()
     x
 }
-}
-
-# MJ: no longer used
-if(FALSE) {
 .as.dgC.0.factors <- function(x) {
     if(is(x, "dgCMatrix"))
         .dgC.0.factors(x)
