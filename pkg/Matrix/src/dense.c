@@ -1758,7 +1758,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	_CTYPE1_ *pres = _PTR1_(res), u = (di == 'N') ? ZERO : ONE;	\
 	_CTYPE2_ *px   = _PTR2_(x);					\
 	if (doNaRm && doMean && cl[0] != 'n') {				\
-	    Calloc_or_Alloca_TO(pcount, m, int);			\
+	    Matrix_Calloc(pcount, m, int);				\
 	    for (i = 0; i < m; ++i) {					\
 		pres[i] = u;						\
 		pcount[i] = n;						\
@@ -1929,7 +1929,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 	    if (doNaRm && cl[0] != 'n') {
 		for (i = 0; i < m; ++i)
 		    pres[i] /= pcount[i];
-		Free_FROM(pcount, m);
+		Matrix_Free(pcount, m);
 	    } else {
 		for (i = 0; i < m; ++i)
 		    pres[i] /= n;
@@ -1941,7 +1941,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 		    pres[i].r /= pcount[i];
 		    pres[i].i /= pcount[i];
 		}
-		Free_FROM(pcount, m);
+		Matrix_Free(pcount, m);
 	    } else {
 		for (i = 0; i < m; ++i) {
 		    pres[i].r /= n;

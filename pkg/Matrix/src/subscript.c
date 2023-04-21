@@ -936,7 +936,7 @@ static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
     if (ident) {
 	/* diagonal iff no duplicates; unit diagonal is preserved */
 	char *work;
-	Calloc_or_Alloca_TO(work, lwork, char);
+	Matrix_Calloc(work, lwork, char);
 	--work;
 	for (k = 0; k < n; ++k) {
 	    if (work[pi[k]])
@@ -944,7 +944,7 @@ static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 	    work[pi[k]] = 1;
 	}
 	++work;
-	Free_FROM(work, lwork);
+	Matrix_Free(work, lwork);
 	return (nonunit) ? 1 : 2;
     } else {
 	/* brute force ... */
@@ -978,7 +978,7 @@ static void sort_cr(SEXP obj, const char *cl)
     
     int i_, j_, k, kend, nnz = pp[n], *workA, *workB, *workC;
     size_t lwork = (size_t) m + 1 + r + nnz;
-    Calloc_or_Alloca_TO(workA, lwork, int);
+    Matrix_Calloc(workA, lwork, int);
     workB = workA + m + 1;
     workC = workB + r;
     
@@ -1028,9 +1028,9 @@ static void sort_cr(SEXP obj, const char *cl)
 #define SORT(_CTYPE_, _PTR_)				\
     do {						\
 	_CTYPE_ *px = _PTR_(x), *workD;			\
-	Calloc_or_Alloca_TO(workD, nnz,	_CTYPE_);	\
+	Matrix_Calloc(workD, nnz,	_CTYPE_);	\
 	SORT_LOOP(SHOW);				\
-	Free_FROM(workD, nnz);				\
+	Matrix_Free(workD, nnz);			\
     } while (0)
 	
     if (cl[0] == 'n')
@@ -1059,7 +1059,7 @@ static void sort_cr(SEXP obj, const char *cl)
 #undef SORT_LOOP
 #undef SORT
 
-    Free_FROM(workA, lwork);
+    Matrix_Free(workA, lwork);
     UNPROTECT(2); /* i, p */
     return;
 }
@@ -1543,7 +1543,7 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	
 	int *workA, *workB, *workC;
 	size_t lwork = (size_t) m + m + ni;
-	Calloc_or_Alloca_TO(workA, lwork, int);
+	Matrix_Calloc(workA, lwork, int);
 	workB = workA + m;
 	workC = workB + m;
 
@@ -1599,7 +1599,7 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	
 #undef SUB2_LOOP
 	
-	Free_FROM(workA, lwork);
+	Matrix_Free(workA, lwork);
 	
     }
 
@@ -1689,7 +1689,7 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	
 	int *workA, *workB, *workC;
 	size_t lwork = (size_t) n + n + nj;
-	Calloc_or_Alloca_TO(workA, lwork, int);
+	Matrix_Calloc(workA, lwork, int);
 	workB = workA + n;
 	workC = workB + n;
 
@@ -1745,7 +1745,7 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	
 #undef SUB2_LOOP
 	
-	Free_FROM(workA, lwork);
+	Matrix_Free(workA, lwork);
 	
     }
     
@@ -1920,7 +1920,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	isP = isP && ni == m;
 	if (isP) {
 	    char *work;
-	    Calloc_or_Alloca_TO(work, m, char);
+	    Matrix_Calloc(work, m, char);
 	    --work; /* now 1-indexed */
 	    for (ki = 0; ki < ni; ++ki) {
 		if (work[pi[ki]]) {
@@ -1930,7 +1930,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 		work[pi[ki]] = 1;
 	    }
 	    ++work; /* now 0-indexed */
-	    Free_FROM(work, m);
+	    Matrix_Free(work, m);
 	}
 	
 	x = NEW_OBJECT_OF_CLASS((isP) ? "pMatrix" : "indMatrix");
@@ -1961,7 +1961,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	isP = isP && nj == n;
 	if (isP) {
 	    char *work;
-	    Calloc_or_Alloca_TO(work, nj, char);
+	    Matrix_Calloc(work, nj, char);
 	    --work; /* now 1-indexed */
 	    for (kj = 0; kj < nj; ++kj) {
 		if (work[pj[kj]]) {
@@ -1971,7 +1971,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 		work[pj[kj]] = 1;
 	    }
 	    ++work; /* now 0-indexed */
-	    Free_FROM(work, nj);
+	    Matrix_Free(work, nj);
 	}
 	
 	x = NEW_OBJECT_OF_CLASS((isP)
@@ -1988,20 +1988,20 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	if (isP) {
 	    SEXP perm1 = PROTECT(allocVector(INTSXP, nj));
 	    int *pperm1 = INTEGER(perm1), *work;
-	    Calloc_or_Alloca_TO(work, nj, int);
+	    Matrix_Calloc(work, nj, int);
 	    --work; /* now 1-indexed */
 	    for (kj = 0; kj < nj; ++kj)
 		work[pj[kj]] = kj + 1;
 	    for (kj = 0; kj < nj; ++kj)
 		pperm1[kj] = work[pperm0[kj]];
 	    ++work; /* now 0-indexed */
-	    Free_FROM(work, nj);
+	    Matrix_Free(work, nj);
 	    SET_SLOT(x, Matrix_permSym, perm1);
 	    UNPROTECT(1); /* perm1 */
 	} else {
 	    int *workA, *workB, *workC;
 	    size_t lwork = (size_t) n + n + m;
-	    Calloc_or_Alloca_TO(workA, lwork, int);
+	    Matrix_Calloc(workA, lwork, int);
 	    workB = workA + n;
 	    workC = workB + n;
 	    --workA; /* now 1-indexed */
@@ -2049,7 +2049,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    }
 	    
 	    ++workA; /* now 0-indexed */
-	    Free_FROM(workA, lwork);
+	    Matrix_Free(workA, lwork);
 	    SET_SLOT(x, Matrix_pSym, p1);
 	    SET_SLOT(x, (!mg) ? Matrix_iSym : Matrix_jSym, i1);
 	    UNPROTECT(2); /* i1, p1 */

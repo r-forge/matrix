@@ -403,7 +403,7 @@ SEXP pMatrix_validate(SEXP obj)
 	SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
 	int i, *pperm = INTEGER(perm);
 	char *work;
-	Calloc_or_Alloca_TO(work, n, char);
+	Matrix_Calloc(work, n, char);
 	--work;
 	for (i = 0; i < n; ++i) {
 	    if (work[*pperm])
@@ -411,7 +411,7 @@ SEXP pMatrix_validate(SEXP obj)
 	    work[*(pperm++)] = 1;
 	}
 	++work;
-	Free_FROM(work, n);
+	Matrix_Free(work, n);
 	UNPROTECT(1); /* perm */
 	if (i < n)
 	    return mkString(_("'perm' slot contains duplicates"));
@@ -1170,7 +1170,7 @@ SEXP sparseLU_validate(SEXP obj)
 	UPRET(2, "'q' slot does not have length Dim[1]");
     int i, *pp = INTEGER(p), *pq = INTEGER(q);
     char *work;
-    Calloc_or_Alloca_TO(work, n, char);
+    Matrix_Calloc(work, n, char);
     for (i = 0; i < n; ++i) {
 	if (*pp == NA_INTEGER)
 	    FRUPRET(work, n, 2, "'p' slot contains NA");
@@ -1187,7 +1187,7 @@ SEXP sparseLU_validate(SEXP obj)
 	work[*(pp++)] += 1;
 	work[*(pq++)] += 2;
     }
-    Free_FROM(work, n);
+    Matrix_Free(work, n);
     UNPROTECT(2); /* q, p */
 
     return ScalarLogical(1);
@@ -1253,7 +1253,7 @@ SEXP sparseQR_validate(SEXP obj)
 	UPRET(2, "'q' slot does not have length Dim[2] or length 0");
     int i, *pp = INTEGER(p);
     char *work;
-    Calloc_or_Alloca_TO(work, m2, char); /* n <= m <= m2 */
+    Matrix_Calloc(work, m2, char); /* n <= m <= m2 */
     for (i = 0; i < m2; ++i) {
 	if (*pp == NA_INTEGER)
 	    FRUPRET(work, m2, 2, "'p' slot contains NA");
@@ -1276,7 +1276,7 @@ SEXP sparseQR_validate(SEXP obj)
 	    work[*(pq++)] = 1;
 	}
     }
-    Free_FROM(work, m2);
+    Matrix_Free(work, m2);
     UNPROTECT(2); /* q, p */
 
     return ScalarLogical(1);

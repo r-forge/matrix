@@ -59,21 +59,18 @@ extern void *alloca(size_t);
 #define Matrix_CallocThreshold 10000
 #define Matrix_ErrorBufferSize  4096
 
-#define Alloca(_N_, _CTYPE_)					\
-    (_CTYPE_ *) alloca((size_t) (_N_) * sizeof(_CTYPE_))
-
-#define Calloc_or_Alloca_TO(_VAR_, _N_, _CTYPE_)		\
-    do {							\
-	if (_N_ >= Matrix_CallocThreshold)			\
-	    _VAR_ = R_Calloc(_N_, _CTYPE_);			\
-	else {							\
-	    _VAR_ = Alloca(_N_, _CTYPE_);			\
-	    R_CheckStack();					\
-	    memset(_VAR_, 0, (size_t) (_N_) * sizeof(_CTYPE_));	\
-	}							\
+#define Matrix_Calloc(_VAR_, _N_, _CTYPE_)				\
+    do {								\
+	if (_N_ >= Matrix_CallocThreshold)				\
+	    _VAR_ = R_Calloc(_N_, _CTYPE_);				\
+	else {								\
+	    _VAR_ = (_CTYPE_ *) alloca((size_t) (_N_) * sizeof(_CTYPE_)); \
+	    R_CheckStack();						\
+	    memset(_VAR_, 0, (size_t) (_N_) * sizeof(_CTYPE_));		\
+	}								\
     } while (0)
 
-#define Free_FROM(_VAR_, _N_)					\
+#define Matrix_Free(_VAR_, _N_)					\
     do {							\
 	if (_N_ >= Matrix_CallocThreshold)			\
 	    R_Free(_VAR_);					\
