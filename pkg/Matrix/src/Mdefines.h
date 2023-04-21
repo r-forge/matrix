@@ -233,11 +233,14 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 /* ==== CLASS LISTS ================================================= */
 /* Keep synchronized with ../inst/include/Matrix.h !                  */
 
+/* Cholesky->dtrMatrix, etc. */
+#define VALID_NONVIRTUAL_SHIFT(i, p2ind) ((i >= 7) ? 0 : ((i >= 6) ? p2ind != 0 : ((i >= 4) ? 12 : ((i >= 2) ? 14 : 21))))
+
 #define VALID_NONVIRTUAL_MATRIX						\
-/*  0 */   "pMatrix", "indMatrix",					\
-/*  2 */  "Cholesky", "pCholesky",					\
-/*  4 */ "dpoMatrix", "dppMatrix",					\
-/*  6 */ "corMatrix", "copMatrix",					\
+/*  0 */  "Cholesky", "pCholesky",					\
+/*  2 */ "dpoMatrix", "dppMatrix",					\
+/*  4 */ "corMatrix", "copMatrix",					\
+/*  6 */   "pMatrix", "indMatrix",					\
 /*  8 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
 /* 13 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
 /* 18 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
@@ -255,8 +258,8 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 /* 78 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_NONVIRTUAL_VECTOR					\
-/* 76 */ "dsparseVector", "lsparseVector", "nsparseVector",	\
-         "isparseVector", "zsparseVector"
+/* 83 */ "dsparseVector", "lsparseVector", "nsparseVector",	\
+ 	 "isparseVector", "zsparseVector"
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 

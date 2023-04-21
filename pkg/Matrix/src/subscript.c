@@ -405,9 +405,10 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 {
     static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
-    const char *cl = valid[ivalid];
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(x, "R_subscript_1ary");
+    ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
+    const char *cl = valid[ivalid];
     
     switch (cl[2]) {
     case 'e':
@@ -776,9 +777,10 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 {
     static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
-    const char *cl = valid[ivalid];
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(x, "R_subscript_1ary_mat");
+    ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
+    const char *cl = valid[ivalid];
 
     switch (cl[2]) {
     case 'e':
@@ -2075,12 +2077,13 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
     if (isNull(i) && isNull(j))
 	return x;
     
-    static const char *valid[] = { "pMatrix", VALID_NONVIRTUAL_MATRIX, "" };
+    static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
     int ivalid = R_check_class_etc(x, valid);
-    const char *cl = valid[ivalid];
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(x, "R_subscript_2ary");
-
+    ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 0);
+    const char *cl = valid[ivalid];
+    
     switch (cl[2]) {
     case 'e':
     case 'y':
