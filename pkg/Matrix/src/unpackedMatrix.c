@@ -1429,7 +1429,7 @@ SEXP matrix_symmpart(SEXP from)
 	}
 	UPM_SYMMPART_GE(double, REAL, ASSIGN_OFFDIAG_DGE);
 	break;
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case CPLXSXP:
 	PROTECT(to = NEW_OBJECT_OF_CLASS("zsyMatrix"));
 	if (!MAYBE_REFERENCED(x))
@@ -1655,7 +1655,7 @@ SEXP matrix_skewpart(SEXP from)
 			 ASSIGN_OFFDIAG_DGE, ASSIGN_ONDIAG_DGE);
 	}
 	break;
-#ifdef HAVE_PROPER_ZMATRIX
+#ifdef MATRIX_ENABLE_ZMATRIX
     case CPLXSXP:
 	PROTECT(to = NEW_OBJECT_OF_CLASS("zgeMatrix"));
 	if (!MAYBE_REFERENCED(from)) {

@@ -3,7 +3,7 @@
 
 #include "Mutils.h"
 
-char* Dim_validate(SEXP dim, const char* domain);
+char* Dim_validate(SEXP dim);
 SEXP R_Dim_validate(SEXP dim);
 
 char* DimNames_validate(SEXP dimnames, int pdim[]);

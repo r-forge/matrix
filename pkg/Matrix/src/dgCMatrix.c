@@ -306,7 +306,7 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
     return ans;
 }
 
-#ifdef Matrix_with_SPQR
+#ifdef Matrix_WithSPQR
 /**
  * Return a SuiteSparse QR factorization of the sparse matrix A
  *
@@ -367,7 +367,7 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
     return ans;
 }
 #endif
-/* Matrix_with_SPQR */
+/* Matrix_WithSPQR */
 
 /* Modified version of Tim Davis's cs_lu_mex.c file for MATLAB */
 void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep_dimnms)

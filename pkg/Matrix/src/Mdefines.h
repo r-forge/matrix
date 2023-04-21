@@ -1,6 +1,14 @@
 #ifndef MATRIX_DEFINES_H
 #define MATRIX_DEFINES_H
 
+#define Matrix_Domain         "Matrix"
+#define Matrix_CallocThreshold   10000
+#define Matrix_ErrorBufferSize    4096
+
+/* Eventually these will no longer be needed : */
+#define Matrix_SupportingCachedMethods
+#undef  Matrix_WithSPQR
+
 /* NB: system headers should come before R headers */
 
 #ifdef __GLIBC__
@@ -31,7 +39,7 @@ typedef    long long Matrix_int_fast64_t;
 /* Copy and paste from WRE : */
 #ifdef ENABLE_NLS
 # include <libintl.h>
-# define _(String) dgettext("Matrix", String)
+# define _(String) dgettext(Matrix_Domain, String)
 #else
 # define _(String) (String)
 # define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
@@ -54,10 +62,6 @@ typedef    long long Matrix_int_fast64_t;
 extern void *alloca(size_t);
 # endif
 #endif
-
-/* R has the same in several places : */
-#define Matrix_CallocThreshold 10000
-#define Matrix_ErrorBufferSize  4096
 
 #define Matrix_Calloc(_VAR_, _N_, _CTYPE_)				\
     do {								\
@@ -186,12 +190,6 @@ enum x_slot_kind {
 /* Requires 'x' slot, hence not for nsparseMatrix or indMatrix : */
 #define Real_kind(_x_)				\
     (Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
-
-/* Eventually these will no longer be needed : */
-#define Matrix_SupportingCachedMethods
-#undef Matrix_with_SPQR
-#undef HAVE_PROPER_IMATRIX
-#undef HAVE_PROPER_ZMATRIX
 
 
 /* ==== NO LONGER USED ============================================== */
