@@ -4,7 +4,8 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP denseLU_determinant(SEXP obj, SEXP logarithm); /* factorizations.c */
+/* defined in factorizations.c : */
+SEXP denseLU_determinant(SEXP, SEXP);
 
 SEXP dgeMatrix_trf_(SEXP obj,  int warn);
 SEXP dgeMatrix_trf (SEXP obj, SEXP warn);

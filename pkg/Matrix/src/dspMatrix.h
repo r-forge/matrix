@@ -4,7 +4,8 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm); /* factorizations.c */
+/* defined in factorizations.c : */
+SEXP BunchKaufman_determinant(SEXP, SEXP);
 
 SEXP dspMatrix_trf_(SEXP obj,  int warn);
 SEXP dspMatrix_trf (SEXP obj, SEXP warn);
