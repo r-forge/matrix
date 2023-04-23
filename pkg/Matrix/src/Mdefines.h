@@ -239,7 +239,7 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 #define VALID_NONVIRTUAL_MATRIX						\
 /*  0 */  "Cholesky", "pCholesky",					\
 /*  2 */ "dpoMatrix", "dppMatrix",					\
-/*  4 */ "corMatrix", "copMatrix",					\
+/*  4 */ "corMatrix", "pcorMatrix",					\
 /*  6 */   "pMatrix", "indMatrix",					\
 /*  8 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
 /* 13 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \

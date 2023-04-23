@@ -5,6 +5,7 @@
 \alias{dpoMatrix-class}
 \alias{dppMatrix-class}
 \alias{corMatrix-class}
+\alias{pcorMatrix-class}
 %
 \alias{Arith,dpoMatrix,logical-method}
 \alias{Arith,dpoMatrix,numeric-method}
@@ -27,12 +28,14 @@
 \alias{Ops,dppMatrix,numeric-method}
 \alias{Ops,logical,dppMatrix-method}
 \alias{Ops,numeric,dppMatrix-method}
-\alias{coerce,dppMatrix,corMatrix-method}
 \alias{coerce,dppMatrix,dpoMatrix-method}
+\alias{coerce,dppMatrix,pcorMatrix-method}
 \alias{coerce,matrix,dppMatrix-method}
 \alias{determinant,dppMatrix,logical-method}
 %
 \alias{coerce,matrix,corMatrix-method}
+%
+\alias{coerce,matrix,pcorMatrix-method}
 %
 \description{
   \itemize{
@@ -41,9 +44,10 @@
     \item{The \code{"dppMatrix"} class is the same except in packed
       storage.  Only the upper triangle or the lower triangle is
       required to be available.}
-    \item{The \code{"corMatrix"} class of correlation matrices extends
-      \code{"dpoMatrix"} with a slot \code{sd}, which allows to restore
-      the original covariance matrix.}
+    \item{The \code{"corMatrix"} and \code{"pcorMatrix"} classes
+      represent correlation matrices.  They extend \code{"dpoMatrix"}
+      and \code{"dppMatrix"}, respectively, with an additional slot
+      \code{sd} allowing restoration of the original covariance matrix.}
   }
 }
 \section{Objects from the Class}{Objects can be created by calls of the
@@ -62,10 +66,10 @@
     \item{\code{factors}:}{Object of class \code{"list"}.  A named
       list of factorizations that have been computed for the matrix.}
 
-    \item{\code{sd}:}{(for \code{"corMatrix"}) a \code{\link{numeric}}
-      vector of length \code{n} containing the (original)
-      \eqn{\sqrt{var(.)}}{sqrt(var(.))} entries which allow
-	reconstruction of a covariance matrix from the correlation matrix.}
+    \item{\code{sd}:}{(for \code{"corMatrix"} and \code{"pcorMatrix"})
+      a \code{\link{numeric}} vector of length \code{n} containing the
+      (original) \eqn{\sqrt{var(.)}}{sqrt(var(.))} entries which allow
+      reconstruction of a covariance matrix from the correlation matrix.}
   }
 }
 \section{Extends}{

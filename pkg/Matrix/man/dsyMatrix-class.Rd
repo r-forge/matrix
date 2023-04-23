@@ -12,6 +12,7 @@
 %
 \alias{coerce,dspMatrix,dpoMatrix-method}
 \alias{coerce,dspMatrix,dppMatrix-method}
+\alias{coerce,dspMatrix,pcorMatrix-method}
 \alias{determinant,dspMatrix,logical-method}
 %
 \description{

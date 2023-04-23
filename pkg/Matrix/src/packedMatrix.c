@@ -314,21 +314,21 @@ SEXP packedMatrix_unpack(SEXP from, SEXP strict)
     static const char *valid_from[] = {
 	/* 0 */ "pCholesky", /* must match before dtpMatrix */
 	/* 1 */ "dtpMatrix", "ltpMatrix", "ntpMatrix",
-	/* 4 */ "dppMatrix", /* must match before dspMatrix */
-	/* 5 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
+	/* 4 */ "pcorMatrix", "dppMatrix", /* must match before dspMatrix */
+	/* 6 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
     static const char *valid_to[] = {
 	/* 0 */ "Cholesky",
 	/* 1 */ "dtrMatrix", "ltrMatrix", "ntrMatrix",
-	/* 4 */ "dpoMatrix",
-	/* 5 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
+	/* 4 */ "corMatrix", "dpoMatrix",
+	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
     int ivalid = R_check_class_etc(from, valid_from);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "packedMatrix_unpack");
     if (asLogical(strict) == 0) {
 	if (ivalid == 0)
 	    ivalid = 1; /* pCholesky->dtrMatrix */
-	else if (ivalid == 4)
-	    ivalid = 5; /* dppMatrix->dsyMatrix */
+	else if (ivalid == 4 || ivalid == 5)
+	    ivalid = 6; /* pcorMatrix,dppMatrix->dsyMatrix */
     }
 
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(valid_to[ivalid]));
@@ -364,6 +364,14 @@ SEXP packedMatrix_unpack(SEXP from, SEXP strict)
 	if (LENGTH(factors) > 0)
 	    SET_SLOT(to, Matrix_factorSym, factors);
 	UNPROTECT(1); /* factors */
+
+	if (ivalid == 4) {
+	    /* pcorMatrix */
+	    SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
+	    if (LENGTH(sd) > 0)
+		SET_SLOT(to, Matrix_sdSym, sd);
+	    UNPROTECT(1); /* sd */
+	}
     }
     
     SEXPTYPE tx;
@@ -635,14 +643,14 @@ SEXP packedMatrix_is_diagonal(SEXP obj)
 
 #undef PM_IS_DI
 
-/* t(x), typically preserving class */
+/* t(x) */
 SEXP packedMatrix_transpose(SEXP from)
 {
     static const char *valid[] = {
 	/* 0 */ "pCholesky",
 	/* 1 */ "dtpMatrix", "ltpMatrix", "ntpMatrix",
-	/* 4 */ "dppMatrix",
-	/* 5 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
+	/* 4 */ "pcorMatrix", "dppMatrix",
+	/* 6 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "packedMatrix_transpose");
@@ -685,6 +693,14 @@ SEXP packedMatrix_transpose(SEXP from)
 	if (LENGTH(factors) > 0)
 	    SET_SLOT(to, Matrix_factorSym, factors);
 	UNPROTECT(1); /* factors */
+
+	if (ivalid == 4) {
+	    /* pcorMatrix */
+	    SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
+	    if (LENGTH(sd) > 0)
+		SET_SLOT(to, Matrix_sdSym, sd);
+	    UNPROTECT(1); /* sd */
+	}
     }
     
     SEXP x_from = PROTECT(GET_SLOT(from, Matrix_xSym)),

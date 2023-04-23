@@ -384,12 +384,10 @@ setClass("dspMatrix",
 setClass("dppMatrix", contains = "dspMatrix",
          validity = function(object) .Call(dppMatrix_validate, object))
 
-if(FALSE) { # --NOT YET--
 ## Packed, symmetric, positive semidefinite, correlation
-setClass("copMatrix", contains = "dppMatrix",
+setClass("pcorMatrix", contains = "dppMatrix",
          slots = c(sd = "numeric"),
-	 validity = function(object) .Call(copMatrix_validate, object))
-} # --NOT YET--
+	 validity = function(object) .Call(pcorMatrix_validate, object))
 
 
 ## ------ Non-Virtual Sparse -------------------------------------------

@@ -458,7 +458,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     isGen <- extends(cld, "generalMatrix")
     isSym <- extends(cld, "symmetricMatrix")
     isTri <- extends(cld, "triangularMatrix")
-    isCor <- isSym && extends(cld, "corMatrix")
+    isCor <- isSym && (extends(cld, "corMatrix") || extends(cld, "pcorMatrix"))
     if(isSparse <- extends(cld, "sparseMatrix")) { # also true for these
         isCsp  <- extends(cld, "CsparseMatrix")
 	isRsp  <- extends(cld, "RsparseMatrix")

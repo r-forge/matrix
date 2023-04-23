@@ -430,6 +430,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dpoMatrix_validate, 1),
     CALLDEF(dppMatrix_validate, 1),
     CALLDEF(corMatrix_validate, 1),
+    CALLDEF(pcorMatrix_validate, 1),
     CALLDEF(Cholesky_validate, 1),
     CALLDEF(pCholesky_validate, 1),
     CALLDEF(BunchKaufman_validate, 1),

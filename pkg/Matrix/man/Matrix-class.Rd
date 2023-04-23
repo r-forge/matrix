@@ -54,6 +54,7 @@
 \alias{coerce,Matrix,matrix-method}
 \alias{coerce,Matrix,numeric-method}
 \alias{coerce,Matrix,pMatrix-method}
+\alias{coerce,Matrix,pcorMatrix-method}
 \alias{coerce,Matrix,symmetricMatrix-method}
 \alias{coerce,Matrix,triangularMatrix-method}
 \alias{coerce,Matrix,vector-method}

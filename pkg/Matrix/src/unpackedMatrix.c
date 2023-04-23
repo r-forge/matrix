@@ -458,7 +458,7 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
     static const char *valid_to[] = {
 	/* 0 */ "pCholesky",
 	/* 1 */ "dtpMatrix", "ltpMatrix", "ntpMatrix",
-	/* 4 */ "dppMatrix", "dppMatrix", /* no pcorMatrix _yet_ */
+	/* 4 */ "pcorMatrix", "dppMatrix",
 	/* 6 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
     int ivalid = R_check_class_etc(from, valid_from);
     if (ivalid < 0)
@@ -505,6 +505,14 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
 	    if (LENGTH(factors) > 0)
 		SET_SLOT(to, Matrix_factorSym, factors);
 	    UNPROTECT(1); /* factors */
+
+	    if (ivalid == 4) {
+		/* corMatrix */
+		SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
+		if (LENGTH(sd) > 0)
+		    SET_SLOT(to, Matrix_sdSym, sd);
+		UNPROTECT(1); /* sd */
+	    }
 	}
     }
     
@@ -944,7 +952,7 @@ SEXP matrix_is_diagonal(SEXP obj)
 #undef UPM_IS_TR
 #undef UPM_IS_SY
 
-/* t(x), typically preserving class */
+/* t(x) */
 /* MJ: Technically no need to do full transpose of .(tr|sy)Matrix ...  */
 /*     but then identical(.@x, t(t(.))@x) can be FALSE ...             */
 SEXP unpackedMatrix_transpose(SEXP from)
@@ -1003,10 +1011,12 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	    if (LENGTH(factors) > 0)
 		SET_SLOT(to, Matrix_factorSym, factors);
 	    UNPROTECT(1); /* factors */
+
 	    if (ivalid == 7) {
 		/* corMatrix */
 		SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
-		SET_SLOT(to, Matrix_sdSym, sd);
+		if (LENGTH(sd) > 0)
+		    SET_SLOT(to, Matrix_sdSym, sd);
 		UNPROTECT(1); /* sd */
 	    }
 	}

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-21 r3863)}{
+\section{Changes in version 1.5-5 (2023-04-23 r3864)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -30,6 +30,11 @@
       Notably, for \code{x} inheriting from \code{RsparseMatrix},
       the result is now always an \code{RsparseMatrix}, rather than
       always a \code{TsparseMatrix}.
+      \cr
+      \item \code{NULL} subscripts, as in \code{x[NULL]},
+      \code{x[NULL, j]}, and \code{x[i, NULL]}, are now supported
+      for \code{x} inheriting from \code{Matrix}.  They are handled
+      as \code{integer(0)}, consistent with base R.
 
       \item Class \code{indMatrix} gets an additional slot \code{margin}
       with value \code{1L} (the prototype and previously implicit value)
@@ -50,16 +55,18 @@
       \code{packageVersion("Matrix") >= "1.5-5"}.  Defensive code
       should check validity with \code{validObject}.
 
-      \code{as(x, "Matrix")} for \code{x} inheriting from
+      \item \code{as(x, "Matrix")} for \code{x} inheriting from
       \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
       allowing users to inspect the LAPACK representation of
       those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};
       see Bug Fixes.
 
-      \code{NULL} subscripts, as in \code{x[NULL]} and \code{x[NULL, ]},
-      are now supported for all \code{x} inheriting from \code{Matrix}.
-      They are handled as \code{integer(0)}, consistent with base R.
+      \item New nonvirtual class \code{pcorMatrix} extending
+      \code{dppMatrix}.  It is the counterpart of \code{corMatrix}
+      using packed storage, supporting more efficient storage of
+      dense correlation matrices.  Now \code{pack(<corMatrix>)}
+      gives a \code{pcorMatrix} instead of a \code{dppMatrix}.
     }
   }
   \subsection{Bug Fixes}{
@@ -98,21 +105,29 @@
       \code{sparseLU} is now formally lower triangular, so that
       \code{validObject(new("sparseLU"))} is not an error.
       
-      \item The prototypes of the \code{Q} and \code{T} slots of class
-      \code{Schur} are now 0-by-0 \code{dgeMatrix} and \code{dtrMatrix},
-      respectively, so that \code{validObject(new("Schur"))} is not
-      an error.
+      \item The prototypes of the \code{Q} and \code{T} slots
+      of class \code{Schur} are now 0-by-0 \code{dgeMatrix} and
+      \code{dtrMatrix}, respectively, so that
+      \code{validObject(new("Schur"))} is not an error.
 
       \item Classes \code{BunchKaufman} and \code{pBunchKaufman}
       now only extend \code{MatrixFactorization}, i.e., they no
       longer extend \code{dtrMatrix} or \code{dtpMatrix}.  They
-      retain the slots \code{Dimnames}, \code{uplo}, and \code{x},
+      retain slots \code{Dimnames}, \code{uplo}, and \code{x},
       but these are no longer inherited from any superclass.
       See \code{help("BunchKaufman-class")} for the rationale
       and other details.
 
       \item \code{BunchKaufman(<matrix>)} now works when argument
       \code{uplo} (documented to be optional) is missing.
+
+      \item The validity method for class \code{corMatrix} now
+      tolerates nonfinite elements in the \code{sd} slot.
+      It no longer tolerates nonunit diagonal elements in the
+      \code{x} slot.
+
+      \item Coercions to \code{corMatrix} now set the diagonal
+      elements of the result to 1, consistent with \code{cov2cor}.
     }
   }
   \subsection{Misc}{

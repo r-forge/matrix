@@ -953,7 +953,7 @@ SEXP corMatrix_validate(SEXP obj)
     double *px = REAL(x);
     for (i = 0; i < n; ++i, px += np1)
 	if (ISNAN(*px) || *px != 1.0)
-	    UPRET(1, "matrix has diagonal elements not equal to 1");
+	    UPRET(1, "matrix has nonunit diagonal elements");
     UNPROTECT(1); /* x */
     
     SEXP sd = PROTECT(GET_SLOT(obj, Matrix_sdSym));
@@ -962,14 +962,49 @@ SEXP corMatrix_validate(SEXP obj)
     if (XLENGTH(sd) != n)
 	UPRET(1, "'sd' slot does not have length n=Dim[1]");
     double *psd = REAL(sd);
-    for (i = 0; i < n; ++i) {
-	if (ISNAN(psd[i]))
-	    UPRET(1, "'sd' slot contains NA");
-	if (psd[i] < 0.0)
+    for (i = 0; i < n; ++i)
+	if (!ISNAN(psd[i]) && psd[i] < 0.0)
 	    UPRET(1, "'sd' slot has negative elements");
-    }
     UNPROTECT(1); /* sd */
 
+    return ScalarLogical(1);
+}
+
+SEXP pcorMatrix_validate(SEXP obj)
+{
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int i, n = INTEGER(dim)[0];
+    R_xlen_t np1 = (R_xlen_t) n + 1;
+    UNPROTECT(1); /* dim */
+    
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char ul = *CHAR(STRING_ELT(uplo, 0));
+    UNPROTECT(1); /* uplo */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
+    if (ul == 'U') {
+	for (i = 0; i < n; px += (++i)+1)
+	    if (ISNAN(*px) || *px != 1.0)
+		UPRET(1, "matrix has nonunit diagonal elements");
+    } else {
+	for (i = 0; i < n; px += n-(i++))
+	    if (ISNAN(*px) || *px != 1.0)
+		UPRET(1, "matrix has nonunit diagonal elements");
+    }
+    UNPROTECT(1); /* x */
+    
+    SEXP sd = PROTECT(GET_SLOT(obj, Matrix_sdSym));
+    if (TYPEOF(sd) != REALSXP)
+	UPRET(1, "'sd' slot is not of type \"double\"");
+    if (XLENGTH(sd) != n)
+	UPRET(1, "'sd' slot does not have length n=Dim[1]");
+    double *psd = REAL(sd);
+    for (i = 0; i < n; ++i)
+	if (!ISNAN(psd[i]) && psd[i] < 0.0)
+	    UPRET(1, "'sd' slot has negative elements");
+    UNPROTECT(1); /* sd */
+    
     return ScalarLogical(1);
 }
 
