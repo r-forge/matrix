@@ -167,7 +167,6 @@ foo <- new("ngCMatrix",
            p = rep(0:9, c(2,4,1,11,10,0,1,0,9,12)),
            Dim = c(36952L, 49L))
 validObject(foo)# TRUE
-t2 <- head(foo)
 foo@i[5] <- foo@i[5] + 50000L
 msg <- validObject(foo, test=TRUE)# is -- correctly -- *not* valid anymore
 stopifnot(is.character(msg))
@@ -175,12 +174,12 @@ stopifnot(is.character(msg))
 ##   invalid class "ngCMatrix" object: all row indices must be between 0 and nrow-1
 getLastMsg <- function(tryRes) {
     ## Extract "final" message from erronous try result
-    sub("\n$", "",
-        sub(".*: ", "", as.character(tryRes)))
+    sub("\n$", "", sub("^.*: ", "", as.character(tryRes)))
 }
-t <- try(show(foo)) ## error
-stopifnot(identical(msg, getLastMsg(t)),
-          identical(head(foo), t2))
+t1 <- try(show(foo)) # error
+t2 <- try(head(foo)) # error, but previously a segfault
+stopifnot(identical(msg, getLastMsg(t1)),
+          identical(msg, getLastMsg(t2)))
 
 ## test that all prototypes of nonvirtual classes are valid
 for (cl in c(names(getClassDef("Matrix")@subclasses),
