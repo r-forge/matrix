@@ -82,80 +82,67 @@ SEXP R_any0(SEXP x);
 /* ================================================================== */
     
 #define PACK(_PREFIX_, _CTYPE_)						\
-void _PREFIX_ ## dense_pack(_CTYPE_ *dest, const _CTYPE_ *src, int n,	\
-			    char uplo, char diag)
+void _PREFIX_ ## dense_pack(_CTYPE_ *, const _CTYPE_ *, int, char, char)
 PACK(d, double);
 PACK(i, int);
 PACK(z, Rcomplex);
 #undef PACK
 
 #define UNPACK(_PREFIX_, _CTYPE_)					\
-void _PREFIX_ ## dense_unpack(_CTYPE_ *dest, const _CTYPE_ *src, int n, \
-			      char uplo, char diag)
+void _PREFIX_ ## dense_unpack(_CTYPE_ *, const _CTYPE_ *, int, char, char)
 UNPACK(d, double);
 UNPACK(i, int);
 UNPACK(z, Rcomplex);
 #undef UNPACK
 
 #define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_)			\
-void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *x, int m, int n, \
-						char uplo, char diag)
+void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *, int, int, char, char)
 UNPACKED_MAKE_TRIANGULAR(d, double);
 UNPACKED_MAKE_TRIANGULAR(i, int);
 UNPACKED_MAKE_TRIANGULAR(z, Rcomplex);
 #undef UNPACKED_MAKE_TRIANGULAR
 
 #define UNPACKED_MAKE_SYMMETRIC(_PREFIX_, _CTYPE_)			\
-void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *x, int n, char uplo)
+void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *, int, char)
 UNPACKED_MAKE_SYMMETRIC(d, double);
 UNPACKED_MAKE_SYMMETRIC(i, int);
 UNPACKED_MAKE_SYMMETRIC(z, Rcomplex);
 #undef UNPACKED_MAKE_SYMMETRIC
 
 #define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
-void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *x,			\
-					    int m, int n, int a, int b,	\
-					    char diag)
+void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *, int, int, int, int, char)
 UNPACKED_MAKE_BANDED(d, double);
 UNPACKED_MAKE_BANDED(i, int);
 UNPACKED_MAKE_BANDED(z, Rcomplex);
 #undef UNPACKED_MAKE_BANDED
 
 #define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
-void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *x,			\
-					  int n, int a, int b,		\
-					  char uplo, char diag)
+void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *, int, int, int, char, char)
 PACKED_MAKE_BANDED(d, double);
 PACKED_MAKE_BANDED(i, int);
 PACKED_MAKE_BANDED(z, Rcomplex);
 #undef PACKED_MAKE_BANDED
 
 #define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)			\
-void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest,	        \
-					      const _CTYPE_ *src,	\
-					      int n, R_xlen_t len,	\
-					      char uplo, char diag)
+void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *, const _CTYPE_ *, \
+					      int, R_xlen_t, char, char)
 UNPACKED_COPY_DIAGONAL(d, double);
 UNPACKED_COPY_DIAGONAL(i, int);
 UNPACKED_COPY_DIAGONAL(z, Rcomplex);
 #undef UNPACKED_COPY_DIAGONAL
 
 #define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)				\
-void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *dest,		\
-					    const _CTYPE_ *src,		\
-					    int n, R_xlen_t len,	\
-					    char uplo_dest,		\
-					    char uplo_src,		\
-					    char diag)
+void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *, const _CTYPE_ *, \
+					    int, R_xlen_t, char, char, char)
 PACKED_COPY_DIAGONAL(d, double);
 PACKED_COPY_DIAGONAL(i, int);
 PACKED_COPY_DIAGONAL(z, Rcomplex);
 #undef PACKED_COPY_DIAGONAL
 
-SEXP unpacked_force(SEXP x, int n, char uplo, char diag);
-SEXP packed_transpose(SEXP x, int n, char uplo);
+SEXP unpacked_force(SEXP, int, char, char);
+SEXP packed_transpose(SEXP, int, char);
 
-SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector);
+SEXP dense_as_general(SEXP, char, int, int);
 
 #ifdef __cplusplus
 }
