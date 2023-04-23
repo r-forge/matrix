@@ -80,6 +80,8 @@ SEXP CHMfactor_validate(SEXP obj);
 SEXP CHMsimpl_validate(SEXP obj);
 SEXP CHMsuper_validate(SEXP obj);
 
+void validObject(SEXP obj, const char* cl);
+
 #define SNPRINTF(_BUFFER_, _FORMAT_, ...)				\
     do {								\
 	_BUFFER_ = R_alloc(Matrix_ErrorBufferSize, sizeof(char));	\

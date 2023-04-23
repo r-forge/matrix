@@ -1324,3 +1324,110 @@ SEXP CHMsuper_validate(SEXP obj) /* TODO */
 {
     return ScalarLogical(1);
 }
+
+/* where 'cl' must be an element of VALID_NONVIRTUAL_MATRIX */
+void validObject(SEXP obj, const char *cl)
+{
+#ifndef MATRIX_DISABLE_VALIDITY
+
+    SEXP status;
+    
+# define IS_VALID(_CLASS_)				\
+    do {						\
+	status = _CLASS_ ## _validate(obj);		\
+	if (TYPEOF(status) == STRSXP)			\
+	    error(_("invalid class \"%s\" object: %s"),	\
+		  cl, CHAR(STRING_ELT(status, 0)));	\
+    } while (0)
+    
+#define IS_VALID_SPARSE(_C_)			\
+    do {					\
+	IS_VALID(_C_ ## sparseMatrix);		\
+	if (cl[0] == 'n') {			\
+	    if (cl[1] == 't')			\
+		IS_VALID(t ## _C_ ## Matrix);	\
+	    else if (cl[1] == 's')		\
+		IS_VALID(s ## _C_ ## Matrix);	\
+	} else {				\
+	    if (cl[1] == 'g')			\
+		IS_VALID(xg ## _C_ ## Matrix);	\
+	    else if (cl[1] == 't')		\
+		IS_VALID(xt ## _C_ ## Matrix);	\
+	    else if (cl[1] == 's')		\
+		IS_VALID(xs ## _C_ ## Matrix);	\
+	}					\
+    } while (0)
+    
+    IS_VALID(Matrix);
+    
+    if ((cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') ||
+	(cl[0] == 'p' && cl[1] != 'C' && cl[1] != 'c')) {
+	IS_VALID(indMatrix);
+	if (cl[0] == 'p')
+	    IS_VALID(pMatrix);
+	return;
+    }
+
+    const char *cl_ = cl;
+    if (cl[0] == 'C')
+	cl = "dtrMatrix";
+    else if (cl[0] == 'p' && cl[1] == 'C')
+	cl = "dtpMatrix";
+    else if (cl[0] == 'c')
+	cl = "dpoMatrix";
+    else if (cl[0] == 'p' && cl[1] == 'c')
+	cl = "dppMatrix";
+
+    if (cl[0] == 'n' && cl[2] != 'C' && cl[2] != 'R' && cl[2] != 'T')
+	IS_VALID(ndenseMatrix);
+    else if (cl[0] == 'l')
+	IS_VALID(lMatrix);
+    else if (cl[0] == 'i')
+	IS_VALID(iMatrix);
+    else if (cl[0] == 'd')
+	IS_VALID(dMatrix);
+    else if (cl[0] == 'z')
+	IS_VALID(zMatrix);
+
+    if (cl[1] == 't')
+	IS_VALID(triangularMatrix);
+    else if (cl[1] == 's' || cl[1] == 'p')
+	IS_VALID(symmetricMatrix);
+    else if (cl[1] == 'd') {
+	IS_VALID(diagonalMatrix);
+	return;
+    }
+
+    if (cl[2] == 'C')
+	IS_VALID_SPARSE(C);
+    else if (cl[2] == 'R')
+	IS_VALID_SPARSE(R);
+    else if (cl[2] == 'T')
+	IS_VALID_SPARSE(T);
+    else if (cl[2] != 'p') {
+	IS_VALID(unpackedMatrix);
+	if (cl_[0] == 'C')
+	    IS_VALID(Cholesky);
+	else if (cl[1] == 'p') {
+	    IS_VALID(dpoMatrix);
+	    if (cl_[0] == 'c')
+		IS_VALID(corMatrix);
+	}
+    } else {
+	IS_VALID(packedMatrix);
+	if (cl_[0] == 'p' && cl_[1] == 'C')
+	    IS_VALID(pCholesky);
+	else if (cl[1] == 'p') {
+	    IS_VALID(dppMatrix);
+	    if (cl_[0] == 'p' && cl_[1] == 'c')
+		IS_VALID(pcorMatrix);
+	}
+    }
+
+# undef IS_VALID_SPARSE
+# undef IS_VALID
+	
+#endif
+    
+    return;
+}

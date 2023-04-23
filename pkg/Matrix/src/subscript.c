@@ -409,6 +409,7 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 	ERROR_INVALID_CLASS(x, "R_subscript_1ary");
     ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
     const char *cl = valid[ivalid];
+    validObject(x, cl);
     
     switch (cl[2]) {
     case 'e':
@@ -781,7 +782,8 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 	ERROR_INVALID_CLASS(x, "R_subscript_1ary_mat");
     ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
     const char *cl = valid[ivalid];
-
+    validObject(x, cl);
+    
     switch (cl[2]) {
     case 'e':
     case 'y':
@@ -2083,6 +2085,7 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	ERROR_INVALID_CLASS(x, "R_subscript_2ary");
     ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 0);
     const char *cl = valid[ivalid];
+    validObject(x, cl);
     
     switch (cl[2]) {
     case 'e':
