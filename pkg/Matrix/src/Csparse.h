@@ -3,7 +3,8 @@
 
 #include "Mutils.h"
 
-SEXP R_sparse_diag_U2N(SEXP obj); /* defined in ./sparse.c */
+/* defined in ./sparse.c : */
+SEXP R_sparse_diag_U2N(SEXP);
 
 Rboolean isValid_Csparse(SEXP x);
 SEXP Csp_dense_products(SEXP a, SEXP b,
