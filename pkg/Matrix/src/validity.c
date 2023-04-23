@@ -25,7 +25,7 @@ char* Dim_validate(SEXP dim)
     */
     if (TYPEOF(dim) != INTSXP)
 	return _("'Dim' slot is not of type \"integer\"");
-    if (LENGTH(dim) != 2)
+    if (XLENGTH(dim) != 2)
 	return _("'Dim' slot does not have length 2");
     int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
     if (m == NA_INTEGER || n == NA_INTEGER)
@@ -60,7 +60,7 @@ char* DimNames_validate(SEXP dimnames, int *pdim)
 {
     if (TYPEOF(dimnames) != VECSXP)
 	return _("'Dimnames' slot is not a list");
-    if (LENGTH(dimnames) != 2)
+    if (XLENGTH(dimnames) != 2)
 	return _("'Dimnames' slot does not have length 2");
     
     /* Behave as do_matrix() from src/main/array.c:
@@ -173,7 +173,7 @@ SEXP compMatrix_validate(SEXP obj)
     SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
     if (TYPEOF(factors) != VECSXP)
 	UPRET(1, "'factors' slot is not a list");
-    if (LENGTH(factors) > 0) {
+    if (XLENGTH(factors) > 0) {
 	SEXP nms = PROTECT(getAttrib(factors, R_NamesSymbol));
 	if (isNull(nms))
 	    UPRET(2, "'factors' slot has no 'names' attribute");
@@ -256,7 +256,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     if (TYPEOF(uplo) != STRSXP)
 	UPRET(1, "'uplo' slot is not of type \"character\"");
-    if (LENGTH(uplo) != 1)
+    if (XLENGTH(uplo) != 1)
 	UPRET(1, "'uplo' slot does not have length 1");
     const char *ul = CHAR(STRING_ELT(uplo, 0));
     if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
@@ -277,7 +277,7 @@ SEXP triangularMatrix_validate(SEXP obj)
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     if (TYPEOF(uplo) != STRSXP)
 	UPRET(1, "'uplo' slot is not of type \"character\"");
-    if (LENGTH(uplo) != 1)
+    if (XLENGTH(uplo) != 1)
 	UPRET(1, "'uplo' slot does not have length 1");
     const char *ul = CHAR(STRING_ELT(uplo, 0));
     if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
@@ -287,7 +287,7 @@ SEXP triangularMatrix_validate(SEXP obj)
     SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
     if (TYPEOF(diag) != STRSXP)
 	UPRET(1, "'diag' slot is not of type \"character\"");
-    if (LENGTH(diag) != 1)
+    if (XLENGTH(diag) != 1)
 	UPRET(1, "'diag' slot does not have length 1");
     const char *di = CHAR(STRING_ELT(diag, 0));
     if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
@@ -308,7 +308,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
     SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
     if (TYPEOF(diag) != STRSXP)
 	UPRET(1, "'diag' slot is not of type \"character\"");
-    if (LENGTH(diag) != 1)
+    if (XLENGTH(diag) != 1)
 	UPRET(1, "'diag' slot does not have length 1");
     const char *di = CHAR(STRING_ELT(diag, 0));
     if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
@@ -334,7 +334,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
 SEXP indMatrix_validate(SEXP obj)
 {
     SEXP margin = PROTECT(GET_SLOT(obj, Matrix_marginSym));
-    if (LENGTH(margin) != 1)
+    if (XLENGTH(margin) != 1)
 	UPRET(1, "'margin' slot does not have length 1");
     int mg = INTEGER(margin)[0] - 1;
     if (mg != 0 && mg != 1)
@@ -889,113 +889,132 @@ SEXP packedMatrix_validate(SEXP obj)
 
 SEXP dpoMatrix_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    /* NB: Non-finite entries are "valid" because we consider
+       crossprod(x) and tcrossprod(x) to be positive semidefinite
+       even if 'x' contains non-finite entries (for speed) ...
+    */
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int i, n = INTEGER(dim)[0];
     R_xlen_t np1 = (R_xlen_t) n + 1;
-    double *px = REAL(x);
-
+    UNPROTECT(1); /* dim */
+    
     /* Non-negative diagonal elements are necessary _but not_ sufficient */
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
-	    UPRET(2, "matrix is not positive semidefinite");
+	    UPRET(1, "matrix is not positive semidefinite");
+    UNPROTECT(1); /* x */
 
-    UNPROTECT(2); /* x, dim */
     return ScalarLogical(1);
 }
 
 SEXP dppMatrix_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    /* NB: Non-finite entries are "valid" because we consider
+       crossprod(x) and tcrossprod(x) to be positive semidefinite
+       even if 'x' contains non-finite entries (for speed) ...
+    */
+    
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int i, n = INTEGER(dim)[0];
-    double *px = REAL(x);
-
+    UNPROTECT(1); /* dim */
+    
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     char ul = *CHAR(STRING_ELT(uplo, 0));
     UNPROTECT(1); /* uplo */
 
     /* Non-negative diagonal elements are necessary _but not_ sufficient */
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(2, "matrix is not positive semidefinite");
+		UPRET(1, "matrix is not positive semidefinite");
     } else {
 	for (i = 0; i < n; px += n-(i++))
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(2, "matrix is not positive semidefinite");
+		UPRET(1, "matrix is not positive semidefinite");
     }
-
-    UNPROTECT(2); /* x, dim */
+    UNPROTECT(1); /* x */
+    
     return ScalarLogical(1);
 }
 
 SEXP corMatrix_validate(SEXP obj)
 {
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int i, n = INTEGER(dim)[0];
+    R_xlen_t np1 = (R_xlen_t) n + 1;
+    UNPROTECT(1); /* dim */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
+    for (i = 0; i < n; ++i, px += np1)
+	if (ISNAN(*px) || *px != 1.0)
+	    UPRET(1, "matrix has diagonal elements not equal to 1");
+    UNPROTECT(1); /* x */
+    
     SEXP sd = PROTECT(GET_SLOT(obj, Matrix_sdSym));
     if (TYPEOF(sd) != REALSXP)
 	UPRET(1, "'sd' slot is not of type \"double\"");
-
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-
     if (XLENGTH(sd) != n)
 	UPRET(1, "'sd' slot does not have length n=Dim[1]");
-
-    int i;
     double *psd = REAL(sd);
     for (i = 0; i < n; ++i) {
-	if (!R_FINITE(psd[i]))
-	    UPRET(1, "'sd' slot has non-finite elements");
+	if (ISNAN(psd[i]))
+	    UPRET(1, "'sd' slot contains NA");
 	if (psd[i] < 0.0)
 	    UPRET(1, "'sd' slot has negative elements");
     }
-
     UNPROTECT(1); /* sd */
+
     return ScalarLogical(1);
 }
 
 SEXP Cholesky_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int i, n = INTEGER(dim)[0];
     R_xlen_t np1 = (R_xlen_t) n + 1;
-    double *px = REAL(x);
+    UNPROTECT(1); /* dim */
 
     /* Non-negative diagonal elements are necessary _and_ sufficient */
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
-	    UPRET(2, "matrix has negative diagonal elements");
-
-    UNPROTECT(2); /* x, dim */
+	    UPRET(1, "matrix has negative diagonal elements");
+    UNPROTECT(1); /* x */
+    
     return ScalarLogical(1);
 }
 
 SEXP pCholesky_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int i, n = INTEGER(dim)[0];
-    double *px = REAL(x);
+    UNPROTECT(1); /* dim */
 
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     char ul = *CHAR(STRING_ELT(uplo, 0));
     UNPROTECT(1); /* uplo */
 
     /* Non-negative diagonal elements are necessary _and_ sufficient */
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double *px = REAL(x);
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(2, "matrix has negative diagonal elements");
+		UPRET(1, "matrix has negative diagonal elements");
     } else {
 	for (i = 0; i < n; px += n-(i++))
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(2, "matrix has negative diagonal elements");
+		UPRET(1, "matrix has negative diagonal elements");
     }
-
-    UNPROTECT(2); /* x, dim */
+    UNPROTECT(1); /* x */
+    
     return ScalarLogical(1);
 }
 
@@ -1003,17 +1022,15 @@ SEXP BunchKaufman_validate(SEXP obj)
 {
     /* In R, we start by checking that 'obj' would be a valid dtrMatrix */
     
-    SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
-    if (TYPEOF(perm) != INTSXP)
-	UPRET(1, "'perm' slot is not of type \"integer\"");
-
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int n = INTEGER(dim)[0];
     UNPROTECT(1); /* dim */
 
+    SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
+    if (TYPEOF(perm) != INTSXP)
+	UPRET(1, "'perm' slot is not of type \"integer\"");
     if (XLENGTH(perm) != n)
 	UPRET(1, "'perm' slot does not have length n=Dim[1]");
-
     int n_ = n, *pperm = INTEGER(perm);
     while (n_) {
 	if (*pperm == NA_INTEGER)
@@ -1029,8 +1046,8 @@ SEXP BunchKaufman_validate(SEXP obj)
 	} else
 	    UPRET(1, "'perm' slot has an unpaired negative element");
     }
-
     UNPROTECT(1); /* perm */
+    
     return ScalarLogical(1);
 }
 
@@ -1038,7 +1055,7 @@ SEXP pBunchKaufman_validate(SEXP obj)
 {
     /* In R, we start by checking that 'obj' would be a valid dtpMatrix */
     
-    return BunchKaufman_validate(obj); /* since we only look at 'perm' */
+    return BunchKaufman_validate(obj);
 }
 
 SEXP Schur_validate(SEXP obj)
@@ -1272,5 +1289,3 @@ SEXP CHMsuper_validate(SEXP obj) /* TODO */
 {
     return ScalarLogical(1);
 }
-
-
