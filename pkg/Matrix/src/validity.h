@@ -61,6 +61,7 @@ SEXP dpoMatrix_validate(SEXP obj);
 SEXP dppMatrix_validate(SEXP obj);
 
 SEXP corMatrix_validate(SEXP obj);
+SEXP pcorMatrix_validate(SEXP obj);
 
 SEXP Cholesky_validate(SEXP obj);
 SEXP pCholesky_validate(SEXP obj);
