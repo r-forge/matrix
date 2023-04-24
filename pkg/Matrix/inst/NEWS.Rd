@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-23 r3868)}{
+\section{Changes in version 1.5-5 (2023-04-24 r3869)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -36,24 +36,33 @@
       for \code{x} inheriting from \code{Matrix}.  They are handled
       as \code{integer(0)}, consistent with base R.
 
-      \item Class \code{indMatrix} gets an additional slot \code{margin}
-      with value \code{1L} (the prototype and previously implicit value)
-      or \code{2L}, indicating that the object represents a row or column
-      index matrix, respectively.  The \code{perm} slot is interpreted
-      accordingly; see \code{help("indMatrix-class")} for details.
+      \item Class \code{indMatrix} gains a \code{margin} slot with
+      value \code{1L} or \code{2L} (\code{1L} being the prototype
+      and previously implicit value), indicating that the object
+      represents a row or column index matrix, respectively.  The
+      \code{perm} slot is interpreted accordingly;
+      see \code{help("indMatrix-class")} for details.
       \cr
       Methods with \code{indMatrix} or its subclass \code{pMatrix}
-      in the signature have been added, removed, or adjusted to account
-      for the new slot.  Notably, multiplication on the right by an
-      \code{indMatrix} with \code{margin = 2} is now implemented as
-      a column subscript, and the transpose of \code{indMatrix} is
-      now the same object but with \dQuote{opposite} \code{margin}.
+      in the signature have been adjusted to account for the new slot.
+      Notably, multiplication on the right by an \code{indMatrix}
+      with \code{margin = 2} is now implemented as a column subscript,
+      and the transpose of \code{indMatrix} is now the same object but
+      with \dQuote{opposite} \code{margin}.
       \cr
-      \code{indMatrix} serialized under earlier versions of \pkg{Matrix}
-      must be modified for use under \pkg{Matrix} \code{>= 1.5-5},
-      typically by setting \code{x@margin <- 1L} conditional on
-      \code{packageVersion("Matrix") >= "1.5-5"}.  Defensive code
-      should check validity with \code{validObject}.
+      Objects inheriting from \code{indMatrix} and serialized
+      under earlier versions of \pkg{Matrix} must be modified
+      for use under \pkg{Matrix} \code{>= 1.5-5}, typically by
+      setting \code{margin} to its prototype \code{1L} conditional
+      on \code{packageVersion("Matrix") >= "1.5-5"}.
+      Defensive code will check validity with \code{validObject}.
+
+      \item New nonvirtual class \code{pcorMatrix} extending
+      \code{dppMatrix}.  It is the counterpart of \code{corMatrix}
+      using packed storage, supporting more efficient storage of
+      dense correlation matrices.  Now \code{pack(<corMatrix>)}
+      gives a \code{pcorMatrix} preserving the \code{sd} slot,
+      rather than a \code{dppMatrix}.
 
       \item \code{as(x, "Matrix")} for \code{x} inheriting from
       \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
@@ -61,12 +70,6 @@
       those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};
       see Bug Fixes.
-
-      \item New nonvirtual class \code{pcorMatrix} extending
-      \code{dppMatrix}.  It is the counterpart of \code{corMatrix}
-      using packed storage, supporting more efficient storage of
-      dense correlation matrices.  Now \code{pack(<corMatrix>)}
-      gives a \code{pcorMatrix} instead of a \code{dppMatrix}.
     }
   }
   \subsection{Bug Fixes}{
@@ -114,7 +117,7 @@
       now only extend \code{MatrixFactorization}, i.e., they no
       longer extend \code{dtrMatrix} or \code{dtpMatrix}.  They
       retain slots \code{Dimnames}, \code{uplo}, and \code{x},
-      but these are no longer inherited from any superclass.
+      but these are no longer inherited from \code{dtrMatrix}.
       See \code{help("BunchKaufman-class")} for the rationale
       and other details.
 
