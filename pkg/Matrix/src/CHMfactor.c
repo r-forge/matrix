@@ -154,9 +154,15 @@ SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
     CHM_FR L = AS_CHM_FR(object), Lcp;
     CHM_SP A = AS_CHM_SP__(parent);
     R_CheckStack();
-
+    
     Lcp = cholmod_copy_factor(L, &c);
-    return chm_factor_to_SEXP(chm_factor_update(Lcp, A, asReal(mult)), 1);
+    Lcp = chm_factor_update(Lcp, A, asReal(mult));
+
+    SEXP res = PROTECT(chm_factor_to_SEXP(Lcp, 1)),
+	dimnames = PROTECT(GET_SLOT(object, Matrix_DimNamesSym));
+    SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(2);
+    return res;
 }
 
 // update its argument *in place*  <==> "destructive" <==> use with much caution!

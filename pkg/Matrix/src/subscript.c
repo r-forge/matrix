@@ -1889,14 +1889,21 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 				     const char *cl)
 {
+    PROTECT_INDEX pidA;
+    PROTECT_WITH_INDEX(x, &pidA);
+
+    PROTECT_INDEX pidB;
+    SEXP perm0 = GET_SLOT(x, Matrix_permSym);
+    int *pperm0 = INTEGER(perm0);
+    PROTECT_WITH_INDEX(perm0, &pidB);
+    
     SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
     int mg = INTEGER(margin)[0] - 1;
-    UNPROTECT(1); /* margin */
-
+    
     SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym));
     int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
     UNPROTECT(1); /* dim */
-
+    
     if (mg) {
 	SEXP i_tmp = i;
 	i = j;
@@ -1911,14 +1918,6 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	*pi = (mi) ? NULL : INTEGER(i),
 	*pj = (mj) ? NULL : INTEGER(j),
 	isP = cl[0] == 'p';
-    
-    PROTECT_INDEX pidA;
-    PROTECT_WITH_INDEX(x, &pidA);
-    
-    PROTECT_INDEX pidB;
-    SEXP perm0 = GET_SLOT(x, Matrix_permSym);
-    int *pperm0 = INTEGER(perm0);
-    PROTECT_WITH_INDEX(perm0, &pidB);
     
     if (!mi) {
 	isP = isP && ni == m;
@@ -1945,6 +1944,9 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	pdim[ mg] = ni;
 	pdim[!mg] = n;
 	UNPROTECT(1); /* dim */
+
+	if (mg)
+	    SET_SLOT(x, Matrix_marginSym, margin);
 	
 	SEXP perm1 = PROTECT(allocVector(INTSXP, ni));
 	int *pperm1 = INTEGER(perm1);
@@ -2066,7 +2068,7 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 #undef SUB2_START
 #undef SUB2_START_EXTRA    
     
-    UNPROTECT(2); /* perm0, x */
+    UNPROTECT(3); /* margin, perm0, x */
     return x;
 }
 

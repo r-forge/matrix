@@ -76,15 +76,21 @@ setMethod("qr.qty", signature(qr = "sparseQR", y = "Matrix"),
               .Call(sparseQR_qty,
                     qr, .dense2g(as(y, "denseMatrix"), "d"), TRUE, TRUE))
 
-## FIXME: really should happen in C, i.e sparseQR_coef() in ../src/sparseQR.c :
+## FIXME: really should happen in C {in sparseQR_coef() in ../src/sparseQR.c} :
 .coef.trunc <- function(qr, res, drop = FALSE) {
-    if(!all((d <- lengths(res@Dimnames)) == 0L) &&
-       !identical(d, D <- res@Dim)) {
+    ldn <- lengths(res@Dimnames, use.names = FALSE)
+    d <- res@Dim
+    m <- qr@R@Dim[2L]
+    if(any(ldn > 0L | ldn != d)) {
 	## Fix dimnames from dim (when not NULL !) :
-	if(d[[1L]]) length(res@Dimnames[[1L]]) <- D[[1L]]
-	if(d[[2L]]) length(res@Dimnames[[2L]]) <- D[[2L]]
+	if(ldn[1L]) length(res@Dimnames[[1L]]) <- d[1L]
+	if(ldn[2L]) length(res@Dimnames[[2L]]) <- d[2L]
     }
-    res[seq_len(ncol(qr@R)), , drop = drop]
+    if(d[1L] != m)
+        res[seq_len(m), , drop = drop]
+    else if(any(d == 1L))
+        drop(res)
+    else res
 }
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "ddenseMatrix"),

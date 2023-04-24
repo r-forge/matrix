@@ -1,8 +1,9 @@
 #### Define those generics that we need, if they don't exist;
 #### not all will be exported
 
-    setGeneric("expand", function(x, ...) standardGeneric("expand"))
+setGeneric("expand", function(x, ...) standardGeneric("expand"))
 
+setGeneric("expand2", function(x, ...) standardGeneric("expand2"))
 
 setGeneric("isDiagonal", function(object) standardGeneric("isDiagonal"))
 

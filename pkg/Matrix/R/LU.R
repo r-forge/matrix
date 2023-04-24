@@ -48,8 +48,8 @@ setMethod("lu", signature(x = "sparseMatrix"),
 	  function(x, ...) lu(..sparse2d(as(x, "CsparseMatrix")), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
-          function(x, errSing = TRUE, order = TRUE,
-                   tol = 1.0, keep.dimnames = TRUE, ...) {
+          function(x, errSing = TRUE, order = TRUE, tol = 1,
+                   keep.dimnames = TRUE, ...) {
               if(!is.null(ch <- x@factors[["LU"]]))
                   return(ch)
               .Call(dgCMatrix_LU, x, order, tol, errSing, keep.dimnames)
@@ -177,17 +177,54 @@ setAs("denseLU", "Matrix",
           to
       })
 
-## returning list(L, U, P), where A = P L U  { FIXME: return list(P, L, U) ?? }
-setMethod("expand", signature(x = "denseLU"),
+## returning list(P, L, U), where A = P L U
+setMethod("expand2", signature(x = "denseLU"),
           function(x, ...) .Call(denseLU_expand, x))
+
+## returning list(L, U, P), where A = P L U
+## MJ: for backwards compatibility
+setMethod("expand", signature(x = "denseLU"),
+          function(x, ...) .Call(denseLU_expand, x)[c(2L, 3L, 1L)])
 
 
 ## METHODS FOR CLASS: sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## returning list(P, L, U, Q), where A = P L U Q
+setMethod("expand2", signature(x = "sparseLU"),
+          function(x, ...) {
+              dn <- x@Dimnames
+              np <- length(p <- x@p)
+              nq <- length(q <- x@q)
+              P <- new("pMatrix",
+                       Dim = c(np, np),
+                       Dimnames = c(dn[1L], list(NULL)),
+                       margin = 1L,
+                       perm = invPerm(p, zero.p = TRUE, zero.res = FALSE))
+              Q <- new("pMatrix",
+                       Dim = c(nq, nq),
+                       Dimnames = c(list(NULL), dn[2L]),
+                       margin = 2L,
+                       perm = invPerm(q, zero.p = TRUE, zero.res = FALSE))
+              list(P = P, L = x@L, U = x@U, Q = Q)
+          })
+
+## returning list(P, L, U, Q), where A = P' L U Q
+## MJ: for backwards compatibility
 setMethod("expand", signature(x = "sparseLU"),
-          function(x, ...) list(P = as(x@p + 1L, "pMatrix"),
-                                L = x@L,
-                                U = x@U,
-                                Q = as(x@q + 1L, "pMatrix")))
+          function(x, ...) {
+              np <- length(p <- x@p + 1L)
+              nq <- length(q <- x@q + 1L)
+              dn <- x@Dimnames
+              if(!is.null(rn <- dn[[1L]]))
+                  dn[[1L]] <- rn[p]
+              if(!is.null(cn <- dn[[2L]]))
+                  dn[[2L]] <- cn[q]
+              P <- new("pMatrix", Dim = c(np, np), perm = p)
+              Q <- new("pMatrix", Dim = c(nq, nq), perm = q)
+              L <- x@L
+              L@Dimnames <- c(dn[1L], list(NULL))
+              U <- x@U
+              U@Dimnames <- c(list(NULL), dn[2L])
+              list(P = P, L = L, U = U, Q = Q)
+          })

@@ -71,7 +71,7 @@ SEXP sparseQR_qty(SEXP qr, SEXP y, SEXP trans, SEXP keep_dimnames)
     CSP V = AS_CSP__(V_);						\
     R_CheckStack();							\
     SEXP ans, aa, dmns = R_NilValue;					\
-    if(_DM_NMS_) dmns = GET_SLOT(V_, Matrix_DimNamesSym);		\
+    if(_DM_NMS_) dmns = GET_SLOT(qr, Matrix_DimNamesSym);		\
     PROTECT_INDEX ipx;                                                  \
     PROTECT_WITH_INDEX(ans = dense_as_general(y, 'd', 2, 0), &ipx); \
     int *ydims = INTEGER(GET_SLOT(ans, Matrix_DimSym)),			\
@@ -128,16 +128,9 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
     CSP	R = AS_CSP__(R_);
     // FIXME: check  n_R, M (= R->m)   vs  n, m
     int *q = INTEGER(qslot), lq = LENGTH(qslot), n_R = R->n; // = ncol(R)
-    INIT_sparseQR_(FALSE); // <- FALSE: no dimnames from V
+    INIT_sparseQR_(TRUE);
     // ans := R^{-1} Q' y ==>  rownames(ans) := rownames(R^{-1}) = colnames(R)
-    dmns = PROTECT(duplicate(GET_SLOT(R_, Matrix_DimNamesSym)));
-    if(!isNull(VECTOR_ELT(dmns, 1))) { // need to correctly *permute* the colnames
-	SEXP cns = PROTECT(duplicate(VECTOR_ELT(dmns, 1)));
-	// *back* permute colnames from 'qslot' :
-	for(int j=0; j < lq; j++)
-	    SET_STRING_ELT(VECTOR_ELT(dmns, 1), q[j], STRING_ELT(cns, j));
-	UNPROTECT(1);
-    }
+    dmns = PROTECT(duplicate(dmns));
 
     // rownames(ans) := colnames(ans)
     SET_VECTOR_ELT(dmns, 0, VECTOR_ELT(dmns, 1));

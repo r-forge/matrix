@@ -60,17 +60,16 @@
 A <- as(readMM(system.file("external/pores_1.mtx",
                             package = "Matrix")),
          "CsparseMatrix")
-## with dimnames(.) - to see that they propagate to L, U :
+## with dimnames(.) - to see that they are propagated :
 dimnames(A) <- list(paste0("r", seq_len(nrow(A))),
                     paste0("C", seq_len(ncol(A))))
 str(luA <- lu(A)) # p is a 0-based permutation of the rows
                   # q is a 0-based permutation of the columns
 xA <- expand(luA)
-## which is simply doing
-stopifnot(identical(xA$ L, luA@L),
-          identical(xA$ U, luA@U),
-          identical(xA$ P, as(luA@p +1L, "pMatrix")),
-          identical(xA$ Q, as(luA@q +1L, "pMatrix")))
+stopifnot(identical(unname(xA$L), luA@L),
+          identical(unname(xA$U), luA@U),
+          identical(xA$P, as(luA@p + 1L, "pMatrix")),
+          identical(xA$Q, as(luA@q + 1L, "pMatrix")))
 
 P.LUQ <- with(xA, t(P) \%*\% L \%*\% U \%*\% Q)
 stopifnot(all.equal(unname(A), unname(P.LUQ), tolerance = 1e-12))
@@ -80,7 +79,7 @@ pA <- A[luA@p + 1L, luA@q + 1L]
 PAQ. <- with(xA, P \%*\% A \%*\% t(Q))
 stopifnot(all.equal(unname(pA), unname(PAQ.), tolerance = 1e-12))
 
-pLU <- drop0(luA@L \%*\% luA@U) # L \%*\% U -- dropping extra zeros
+pLU <- drop0(xA$L \%*\% xA$U) # L \%*\% U -- dropping extra zeros
 stopifnot(all.equal(pA, pLU, tolerance = 1e-12)) # (incl. permuted row- and column-names)
 }
 \keyword{classes}

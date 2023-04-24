@@ -41,8 +41,8 @@ setMethod("Schur", signature(x = "dgeMatrix", vectors = "logical"),
                   T <- .m2ge(cl$T)
               }
               if(vectors)
-                  new("Schur", Dim = x@Dim, Q = .m2ge(cl$Z), T = T,
-                      EValues = vals)
+                  new("Schur", Dim = x@Dim, Dimnames = x@Dimnames,
+                      Q = .m2ge(cl$Z), T = T, EValues = vals)
               else list(T = T, EValues = vals)
           })
 
@@ -52,8 +52,8 @@ setMethod("Schur", signature(x = "dsyMatrix", vectors = "logical"),
               vals <- as.double(e$values)
               T <- new("ddiMatrix", Dim = x@Dim, x = vals)
               if(vectors)
-                  new("Schur", Dim = x@Dim, Q = .m2ge(e$vectors), T = T,
-                      EValues = vals)
+                  new("Schur", Dim = x@Dim, Dimnames = symmDN(x@Dimnames),
+                      Q = .m2ge(e$vectors), T = T, EValues = vals)
               else list(T = T, EValues = vals)
           })
 
@@ -97,7 +97,8 @@ setMethod("Schur", signature(x = "diagonalMatrix", vectors = "logical"),
               }
               if(vectors) {
                   Q <- new("ddiMatrix", Dim = d, diag = "U")
-                  new("Schur", Dim = d, Q = Q, T = T, EValues = vals)
+                  new("Schur", Dim = d, Dimnames = x@Dimnames,
+                      Q = Q, T = T, EValues = vals)
               } else list(T = T, EValues = vals)
           })
 
@@ -113,7 +114,8 @@ setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
               if(x@uplo == "U" || n == 0L) {
                   if(vectors) {
                       Q <- new("ddiMatrix", Dim = d, diag = "U")
-                      new("Schur", Dim = d, Q = Q, T = x, EValues = vals)
+                      new("Schur", Dim = d, Dimnames = x@Dimnames,
+                          Q = Q, T = x, EValues = vals)
                   } else list(T = x, EValues = vals)
               } else {
                   perm <- n:1L
@@ -121,7 +123,18 @@ setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
                   T <- triu(x[perm, perm, drop = FALSE])
                   if(vectors) {
                       Q <- new("pMatrix", Dim = d, perm = perm)
-                      new("Schur", Dim = d, Q = Q, T = T, EValues = vals)
+                      new("Schur", Dim = d, Dimnames = x@Dimnames,
+                          Q = Q, T = T, EValues = vals)
                   } else list(T = x, EValues = vals)
               }
+          })
+
+setMethod("expand2", signature(x = "Schur"),
+          function(x, ...) {
+              Q  <- x@Q
+              Q. <- t(Q)
+              dn <- x@Dimnames
+              Q @Dimnames <- c(dn[1L], list(NULL))
+              Q.@Dimnames <- c(list(NULL), dn[2L])
+              list(Q = Q, T = x@T, Q. = Q.)
           })

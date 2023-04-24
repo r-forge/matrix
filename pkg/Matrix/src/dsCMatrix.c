@@ -127,14 +127,18 @@ SEXP dsCMatrix_chol(SEXP x, SEXP pivot)
     CHM_FR L = internal_chm_factor(x, pivP, /*LDL = */ 0, /* super = */ 0,
 				   /* Imult = */ 0.);
     CHM_SP R, Rt;
-    SEXP ans;
 
     Rt = cholmod_factor_to_sparse(L, &c);
     R = cholmod_transpose(Rt, /*values*/ 1, &c);
     cholmod_free_sparse(&Rt, &c);
-    ans = PROTECT(chm_sparse_to_SEXP(R, 1/*do_free*/, 1/*uploT*/, 0/*Rkind*/,
-				     "N"/*diag*/, R_NilValue));
-    set_symmetrized_DimNames(ans, GET_SLOT(x, Matrix_DimNamesSym), -1);
+    
+    SEXP ans = PROTECT(chm_sparse_to_SEXP(
+			   R, 1 /*do_free*/, 1 /*uploT*/,
+			   0 /*Rkind*/, "N" /*diag*/, R_NilValue)),
+	dimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym));
+    set_symmetrized_DimNames(ans, dimnames, -1);
+    UNPROTECT(1);
+    
     if (pivP) {
 	SEXP piv = PROTECT(allocVector(INTSXP, L->n)),
 	     L_n = PROTECT(ScalarInteger((size_t) L->minor));
@@ -160,9 +164,13 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
     if(iSuper == NA_LOGICAL)	iSuper = -1;
     /* if(iPerm  == NA_LOGICAL)	iPerm  = -1; */
     if(iLDL   == NA_LOGICAL)	iLDL   = -1;
-    SEXP r = chm_factor_to_SEXP(internal_chm_factor(Ap, iPerm, iLDL, iSuper,
-						    asReal(Imult)),
-				1 /* dofree */);
+    
+    SEXP r = PROTECT(chm_factor_to_SEXP(internal_chm_factor(
+					    Ap, iPerm, iLDL, iSuper,
+					    asReal(Imult)), 1 /* dofree */)),
+	dimnames = PROTECT(GET_SLOT(Ap, Matrix_DimNamesSym));
+    set_symmetrized_DimNames(r, dimnames, -1);
+    UNPROTECT(2);
     return r;
 }
 

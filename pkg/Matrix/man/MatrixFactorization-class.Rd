@@ -7,6 +7,7 @@
 %
 \alias{determinant,MatrixFactorization,missing-method}
 \alias{dim,MatrixFactorization-method}
+\alias{dimnames,MatrixFactorization-method}
 \alias{show,CholeskyFactorization-method}
 \alias{show,MatrixFactorization-method}
 %

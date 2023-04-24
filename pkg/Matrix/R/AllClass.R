@@ -8,28 +8,23 @@
 ## the 'contains' recursively!!
 
 
-## To be used in initialize() method for Matrix, or other constructors
-## NB: This must be defined _here_ and _not_ be migrated to ./Auxiliaries.R
+## NB: must be defined _here_ and _not_ be migrated to ./Auxiliaries.R
 fixupDN <- function(dn) .Call(R_DimNames_fixup, dn)
 
-## MJ: no longer
-if(FALSE) {
-.fixupDimnames <- function(dnms) {
-    N.N <- list(NULL, NULL)
-    if(is.null(dnms) || identical(dnms, N.N)) return(N.N)
-    ## else
-    if(any(i0 <- lengths(dnms) == 0) && !all(vapply(dnms[i0], is.null, NA)))
-	## replace character(0) etc, by NULL :
-	dnms[i0] <- list(NULL)
-    ## coerce, e.g. integer dimnames to character: -- as  R's matrix(..):
-    if(any(i0 <- vapply(dnms, function(d) !is.null(d) && !is.character(d), NA)))
-	dnms[i0] <- lapply(dnms[i0], as.character)
-    dnms
+## initialize() method for Matrix and MatrixFactorization, which both
+## allow Dimnames[[i]] to be a vector of type other than "character"
+## and furthermore to be a vector of length zero rather than NULL ...
+.initialize <- function(.Object, ...) {
+    .Object <- callNextMethod()
+    ## Suboptimal if ...names() is NULL but that will "never"
+    ## happen if ...length() is nonzero:
+    if(...length() && any(...names() == "Dimnames"))
+        .Object@Dimnames <- fixupDN(.Object@Dimnames)
+    .Object
 }
-} ## MJ
 
-## new() does not work at build time because native symbols
-## such as 'Matrix_validate' are not yet available ...
+## new() does not work at build time because native symbols such as
+## 'Matrix_validate' needed for validity checking are not available ...
 .new <- function(cl, ...) {
     def <- getClassDef(cl)
     structure(def@prototype, class = def@className, ...)
@@ -50,35 +45,7 @@ setClass("Matrix", contains = "VIRTUAL",
 	 prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
 	 validity = function(object) .Call(Matrix_validate, object))
 
-## Matrix_validate() allows Dimnames[[i]] to be a vector of type
-## other than "character" and, moreover, to be a vector of length
-## zero rather than NULL.  fixupDN() takes care of the coercions.
-setMethod("initialize", "Matrix",
-          function(.Object, ...) {
-              .Object <- callNextMethod()
-              ## Suboptimal if ...names() is NULL but that will "never"
-              ## happen if ...length() is nonzero:
-              if(...length() && any(...names() == "Dimnames"))
-                  .Object@Dimnames <- fixupDN(.Object@Dimnames)
-              .Object
-          })
-
-if(FALSE) {
-## This method would allow 'Dimnames' to (possibly) define 'Dim'.
-## However, DimNames_validate() in ../src/validity.c and the way
-## it is used in Matrix_validate() would need to change.
-setMethod("initialize", "Matrix",
-          function(.Object, ...) {
-              .Object <- callNextMethod()
-              if(...length() && any((nms <- ...names()) == "Dimnames")) {
-                  .Object@Dimnames <- DN <- fixupDN(.Object@Dimnames)
-                  if(!(any(nms == "Dim") ||
-                       is.null(DN[[1L]]) || is.null(DN[[2L]])))
-                      .Object@Dim <- lengths(DN, use.names = FALSE)
-              }
-              .Object
-          })
-}
+setMethod("initialize", "Matrix", .initialize)
 
 
 ## ------ Virtual by structure -----------------------------------------
@@ -576,15 +543,12 @@ setClass("pMatrix", contains = c("indMatrix"),
 
 ## ------ The Mother Class "MatrixFactorization" -----------------------
 
-## MJ: It would be nice if this virtual class could also get a 'Dimnames'
-##     slot.  Then the prototype, validity method, and initialize method
-##     would be inherited by all subclasses.  One could more faithfully
-##     reconstruct any matrix from its factorization, too ...
-
 setClass("MatrixFactorization", contains = "VIRTUAL",
-         slots = c(Dim = "integer"),
-         prototype = list(Dim = integer(2L)),
+         slots = c(Dim = "integer", Dimnames = "list"),
+         prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object) .Call(MatrixFactorization_validate, object))
+
+setMethod("initialize", "MatrixFactorization", .initialize)
 
 
 ## ------ LU -----------------------------------------------------------
@@ -594,9 +558,8 @@ setClass("LU", contains = c("MatrixFactorization", "VIRTUAL"))
 ## Inherit most aspects of dgeMatrix without formally extending it:
 
 setClass("denseLU", contains = "LU",
-	 slots = c(Dimnames = "list", x = "numeric", perm = "integer"),
-         prototype = list(Dimnames = list(NULL, NULL)),
-	 validity = function(object) {
+	 slots = c(x = "numeric", perm = "integer"),
+         validity = function(object) {
              object. <- new("dgeMatrix")
              object.@Dim <- object@Dim
              object.@Dimnames <- object@Dimnames
@@ -708,9 +671,8 @@ setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
 ## Inherit most aspects of dt[rp]Matrix without extending them
 
 setClass("BunchKaufman", contains = "MatrixFactorization",
-	 slots = c(Dimnames = "list", uplo = "character",
-                   x = "numeric", perm = "integer"),
-         prototype = list(Dimnames = list(NULL, NULL), uplo = "U"),
+	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
 	 validity = function(object) {
              object. <- new("dtrMatrix")
              object.@Dim <- object@Dim
@@ -723,9 +685,8 @@ setClass("BunchKaufman", contains = "MatrixFactorization",
          })
 
 setClass("pBunchKaufman", contains = "MatrixFactorization",
-	 slots = c(Dimnames = "list", uplo = "character",
-                   x = "numeric", perm = "integer"),
-         prototype = list(Dimnames = list(NULL, NULL), uplo = "U"),
+	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
 	 validity = function(object) {
              object. <- new("dtpMatrix")
              object.@Dim <- object@Dim
@@ -1063,4 +1024,4 @@ setClassUnion("replValueSp",
               ## MJ: why Matrix but not matrix ??
               members = c("replValue", "sparseVector", "Matrix"))
 
-rm(.new)
+rm(.new, .initialize)

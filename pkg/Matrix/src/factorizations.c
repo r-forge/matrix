@@ -14,7 +14,7 @@ SEXP denseLU_expand(SEXP obj)
        non-square L,U given as dgeMatrix
     */
     
-    const char *nms[] = {"L", "U", "P", ""};
+    const char *nms[] = {"P", "L", "U", ""};
     PROTECT_INDEX pidA, pidB;
     SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms)),
 	P = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
@@ -35,8 +35,8 @@ SEXP denseLU_expand(SEXP obj)
 	SET_SLOT(L, Matrix_diagSym, diag);
 	SET_SLOT(L, Matrix_xSym, x);
 	SET_SLOT(U, Matrix_xSym, x);
-	SET_VECTOR_ELT(res, 0, L);
-	SET_VECTOR_ELT(res, 1, U);
+	SET_VECTOR_ELT(res, 1, L);
+	SET_VECTOR_ELT(res, 2, U);
 	UNPROTECT(4); /* diag, uplo, U, L */
     } else {
 	SEXP G = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
@@ -44,7 +44,6 @@ SEXP denseLU_expand(SEXP obj)
 	    y = PROTECT(allocVector(REALSXP, (R_xlen_t) r * r));
 	REPROTECT(x = duplicate(x), pidB);
 	double *px = REAL(x), *py = REAL(y);
-	int whichT = (m < n) ? 0 : 1;
 	
 	SET_SLOT(G, Matrix_DimSym, dim);
 	REPROTECT(dim = allocVector(INTSXP, 2), pidA);
@@ -56,7 +55,7 @@ SEXP denseLU_expand(SEXP obj)
 	pdim[0] = pdim[1] = m;
 	SET_SLOT(P, Matrix_DimSym, dim);
 	
-	if (whichT == 0) {
+	if (m < n) {
             /* G is upper trapezoidal, T is unit lower triangular */
 	    SEXP uplo = PROTECT(mkString("L")),
 		diag = PROTECT(mkString("U"));
@@ -76,8 +75,8 @@ SEXP denseLU_expand(SEXP obj)
 	SET_SLOT(G, Matrix_xSym, x);
 	SET_SLOT(T, Matrix_xSym, y);
 	
-	SET_VECTOR_ELT(res, !whichT, G);
-	SET_VECTOR_ELT(res,  whichT, T);
+	SET_VECTOR_ELT(res, (m < n) ? 2 : 1, G);
+	SET_VECTOR_ELT(res, (m < n) ? 1 : 2, T);
 	UNPROTECT(3); /* y, T, G */
     }
 
@@ -101,7 +100,32 @@ SEXP denseLU_expand(SEXP obj)
     Matrix_Free(pinvperm, m);
 
     SET_SLOT(P, Matrix_permSym, perm);
-    SET_VECTOR_ELT(res, 2, P);
+    SET_VECTOR_ELT(res, 0, P);
+    
+#define DO_DIMNAMES							\
+    do {								\
+	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),		\
+	    ndn = PROTECT(getAttrib(dn, R_NamesSymbol));		\
+	for (j = 0; j < 2; ++j) {					\
+	    SEXP rn = VECTOR_ELT(dn, j);				\
+	    if (!isNull(rn) || !isNull(ndn)) {				\
+		SEXP X = VECTOR_ELT(res, (j == 0) ? 0 : LENGTH(res) - 1), \
+		    dnX = PROTECT(allocVector(VECSXP, 2));		\
+		SET_VECTOR_ELT(dnX, j, rn);				\
+		if (!isNull(ndn)) {					\
+		    SEXP ndnX = PROTECT(allocVector(STRSXP, 2));	\
+		    SET_STRING_ELT(ndnX, j, STRING_ELT(ndn, j));	\
+		    setAttrib(dnX, R_NamesSymbol, ndnX);		\
+		    UNPROTECT(1);					\
+		}							\
+		SET_SLOT(X, Matrix_DimNamesSym, dnX);			\
+		UNPROTECT(1);						\
+	    }								\
+	}								\
+	UNPROTECT(2);							\
+    } while (0)
+    
+    DO_DIMNAMES;
     UNPROTECT(6); /* perm, pivot, x, dim, P, res */
     return res;
 }
@@ -277,6 +301,10 @@ SEXP BunchKaufman_expand(SEXP obj)
     SET_SLOT(D_, Matrix_xSym, D_x);
     SET_VECTOR_ELT(res, k, D_);
 
+    DO_DIMNAMES;
+    
+#undef DO_DIMNAMES
+    
     UNPROTECT(8); /* res, x, D_x, D_i, pivot, D_, T_, P_ */ 
     return res;
 }
