@@ -244,10 +244,6 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
     dims[0] = m; dims[1] = n;
     css *S = cs_sqr(ord, A, 1);	/* symbolic QR ordering & analysis*/
     if (!S) error(_("cs_sqr failed"));
-    int keep_dimnms = asLogical(keep_dimnames);
-    if(keep_dimnms == NA_LOGICAL) { keep_dimnms = TRUE;
-	warning(_("dgcMatrix_QR(*, keep_dimnames = NA): NA taken as TRUE"));
-    }
     if(verbose && S->m2 > m) // in ./cs.h , m2 := # of rows for QR, after adding fictitious rows
 	Rprintf("Symbolic QR(): Matrix structurally rank deficient (m2-m = %d)\n",
 		S->m2 - m);
@@ -262,46 +258,24 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
     m = N->L->m;		/* m may be larger now */
     // MM: m := S->m2  also counting the ficticious rows (Tim Davis, p.72, 74f)
     p = cs_pinv(S->pinv, m);	/* p = pinv' */
-    SEXP dn = R_NilValue; Rboolean do_dn = FALSE;
-    if(keep_dimnms) {
-	dn = GET_SLOT(Ap, Matrix_DimNamesSym);
-	do_dn = !isNull(VECTOR_ELT(dn, 0)) && m == m0;
-	// FIXME? also deal with case m > m0 ?
-	if(do_dn) { // keep rownames
-	    dn = PROTECT(duplicate(dn));
-	    SET_VECTOR_ELT(dn, 1, R_NilValue);
-	} else dn = R_NilValue;
-    }
-    SET_SLOT(ans, Matrix_VSym, Matrix_cs_to_SEXP(N->L, "dgCMatrix", 0, dn)); // "V"
+    SET_SLOT(ans, Matrix_VSym,
+	     Matrix_cs_to_SEXP(N->L, "dgCMatrix", 0, R_NilValue)); // "V"
     Memcpy(REAL(ALLOC_SLOT(ans, Matrix_betaSym, REALSXP, n)), N->B, n);
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym,  INTSXP, m)), p, m);
-    if(do_dn) {
-	UNPROTECT(1); // dn
-	dn = R_NilValue; do_dn = FALSE;
-    }
-    if (ord) {
+    if (ord)
 	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_qSym, INTSXP, n)), S->q, n);
-	if(keep_dimnms) {
-	    dn = GET_SLOT(Ap, Matrix_DimNamesSym);
-	    do_dn = !isNull(VECTOR_ELT(dn, 1));
-	    if(do_dn) {
-		dn = PROTECT(duplicate(dn));
-		// permute colnames by S->q :  cn <- cn[ S->q ] :
-		SEXP cns = PROTECT(duplicate(VECTOR_ELT(dn, 1)));
-		for(int j=0; j < n; j++)
-		    SET_STRING_ELT(VECTOR_ELT(dn, 1), j, STRING_ELT(cns, S->q[j]));
-		UNPROTECT(1);
-		SET_VECTOR_ELT(dn, 0, R_NilValue);
-	    } else dn = R_NilValue;
-	}
-    } else
+    else
 	ALLOC_SLOT(ans, Matrix_qSym, INTSXP, 0);
-    SEXP R = PROTECT(Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0, dn));
+    SEXP R = PROTECT(Matrix_cs_to_SEXP(N->U, "dgCMatrix", 0, R_NilValue));
     SET_SLOT(ans, Matrix_RSym, R); UNPROTECT(1); // R
-    if(do_dn) UNPROTECT(1); // dn
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
+    if (asLogical(keep_dimnames)) {
+	SEXP dimnames = PROTECT(GET_SLOT(Ap, Matrix_DimNamesSym));
+	SET_SLOT(ans, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1);
+    }
     UNPROTECT(1);
     return ans;
 }
@@ -370,7 +344,8 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
 /* Matrix_WithSPQR */
 
 /* Modified version of Tim Davis's cs_lu_mex.c file for MATLAB */
-void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep_dimnms)
+void install_lu(SEXP Ap, int order, double tol,
+		Rboolean err_sing, Rboolean keep_dimnms)
 {
     // (order, tol) == (1, 1) by default, when called from R.
     CSP A = AS_CSP__(Ap);
@@ -410,64 +385,36 @@ void install_lu(SEXP Ap, int order, double tol, Rboolean err_sing, Rboolean keep
     SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("sparseLU"));
     int *dims = INTEGER(ALLOC_SLOT(ans, Matrix_DimSym, INTSXP, 2));
     dims[0] = n; dims[1] = n;
-    SEXP dn; Rboolean do_dn = FALSE;
-    if(keep_dimnms) {
-	dn = GET_SLOT(Ap, Matrix_DimNamesSym);
-	do_dn = !isNull(VECTOR_ELT(dn, 0));
-	if(do_dn) {
-	    dn = PROTECT(duplicate(dn));
-	    // permute rownames by p :  rn <- rn[ p ] :
-	    SEXP rn = PROTECT(duplicate(VECTOR_ELT(dn, 0)));
-	    for(int i=0; i < n; i++)
-		SET_STRING_ELT(VECTOR_ELT(dn, 0), i, STRING_ELT(rn, p[i]));
-	    UNPROTECT(1); // rn
-	    SET_VECTOR_ELT(dn, 1, R_NilValue); // colnames(.) := NULL
-	}
-    }
     SET_SLOT(ans, Matrix_LSym,
-	     Matrix_cs_to_SEXP(N->L, "dtCMatrix", 0, do_dn ? dn : R_NilValue));
+	     Matrix_cs_to_SEXP(N->L, "dtCMatrix", 0, R_NilValue));
     if (n < 2) { /* is_sym() assumes upper, which is "wrong" in this case */
 	SEXP L = PROTECT(GET_SLOT(ans, Matrix_LSym)),
 	    uplo = PROTECT(mkString("L"));
 	SET_SLOT(L, Matrix_uploSym, uplo);
 	UNPROTECT(2);
-    }
-    
-    if(keep_dimnms) {
-	if(do_dn) {
-	    UNPROTECT(1); // dn
-	    dn = GET_SLOT(Ap, Matrix_DimNamesSym);
-	}
-	do_dn = !isNull(VECTOR_ELT(dn, 1));
-	if(do_dn) {
-	    dn = PROTECT(duplicate(dn));
-	    if(order) { // permute colnames by S->q :  cn <- cn[ S->q ] :
-		SEXP cn = PROTECT(duplicate(VECTOR_ELT(dn, 1)));
-		for(int j=0; j < n; j++)
-		    SET_STRING_ELT(VECTOR_ELT(dn, 1), j, STRING_ELT(cn, S->q[j]));
-		UNPROTECT(1); // cn
-	    }
-	    SET_VECTOR_ELT(dn, 0, R_NilValue); // rownames(.) := NULL
-	}
-    }
+    }    
     SET_SLOT(ans, Matrix_USym,
-	     Matrix_cs_to_SEXP(N->U, "dtCMatrix", 0, do_dn ? dn : R_NilValue));
-    if(do_dn) UNPROTECT(1); // dn
+	     Matrix_cs_to_SEXP(N->U, "dtCMatrix", 0, R_NilValue));
     Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_pSym, INTSXP, n)), p, n);
     if (order)
 	Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_qSym, INTSXP, n)), S->q, n);
     cs_nfree(N);
     cs_sfree(S);
     cs_free(p);
+    if (keep_dimnms) {
+	SEXP dimnames = PROTECT(GET_SLOT(Ap, Matrix_DimNamesSym));
+	SET_SLOT(ans, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1);
+    }
     set_factor(Ap, "LU", ans);
     UNPROTECT(1);
     return;
 }
 
-SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp, SEXP error_on_sing, SEXP keep_dimnames)
+SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp,
+		  SEXP error_on_sing, SEXP keep_dimnames)
 {
     SEXP ans;
-    Rboolean err_sing = asLogical(error_on_sing);
     /* FIXME: dgCMatrix_LU should check ans for consistency in
      * permutation type with the requested value - Should have two
      * classes or two different names in the factors list for LU with
@@ -475,14 +422,12 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp, SEXP error_on_sing, SEXP keep
      * OTOH, currently  (order, tol) === (1, 1) always.
      * It is true that length(LU@q) does flag the order argument.
      */
-    if (!isNull(ans = get_factor(Ap, "LU")))
-	return ans;
-    int keep_dimnms = asLogical(keep_dimnames);
-    if(keep_dimnms == NA_LOGICAL) { keep_dimnms = TRUE;
-	warning(_("dgcMatrix_LU(*, keep_dimnames = NA): NA taken as TRUE"));
+    if (isNull(ans = get_factor(Ap, "LU"))) {
+	install_lu(Ap, asInteger(orderp), asReal(tolp),
+		   asLogical(error_on_sing), asLogical(keep_dimnames));
+	ans = get_factor(Ap, "LU");
     }
-    install_lu(Ap, asInteger(orderp), asReal(tolp), err_sing, keep_dimnms);
-    return get_factor(Ap, "LU");
+    return ans;
 }
 
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)

@@ -10,15 +10,37 @@ setAs("CHMfactor", "TsparseMatrix",
       function(from) .CR2T(.Call(CHMfactor_to_sparse, from)))
 
 setAs("CHMfactor", "pMatrix",
-      function(from) as(from@perm + 1L, "pMatrix"))
+      function(from) {
+          n <- length(perm <- from@perm)
+          new("pMatrix", Dim = c(n, n), perm = from@perm + 1L)
+      })
 
-### TODO: We really want the separate parts (P,L,D)  of  A = P' L D L' P
-### ----  --> ~/R/MM/Pkg-ex/Matrix/chol-ex.R             ---------------
-###       but we currently only get  A = P' L L' P ;
-###       now documented in ../man/Cholesky.Rd
+## returning list(P, L, L', P'), where A = P L L' P'
+## TODO: add an optional argument to get list(P, L~, D, L~', P')
+##       with unit triangular L~
+setMethod("expand2", signature(x = "CHMfactor"),
+          function(x, ...) {
+              n <- length(perm <- x@perm)
+              dn <- x@Dimnames
+              P <- new("pMatrix",
+                       Dim = c(n, n),
+                       Dimnames = c(dn[1L], list(NULL)),
+                       perm = invPerm(perm, zero.p = TRUE, zero.res = FALSE))
+              P. <- P
+              P.@Dimnames <- c(list(NULL), dn[2L])
+              P.@margin <- 2L
+              L <- .Call(CHMfactor_to_sparse, x)
+              list(P = P, L = L, L. = t(L), P. = P.)
+          })
+
+## returning list(P, L), where A = P' L L' P
+## MJ: for backwards compatibility
 setMethod("expand", signature(x = "CHMfactor"),
-          function(x, ...) list(P = as(x, "pMatrix"),
-                                L = as(x, "CsparseMatrix")))
+          function(x, ...) {
+              n <- length(perm <- x@perm + 1L)
+              list(P = new("pMatrix", Dim = c(n, n), perm = perm),
+                   L = .Call(CHMfactor_to_sparse, x))
+          })
 
 setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...) {

@@ -179,3 +179,21 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 	      chkDots(..., which.call = -2L)
 	      solve(x, system = "A")
 	  })
+
+
+## METHODS FOR CLASS: p?Cholesky
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## returning list(L, L'), where A = L L'
+for(.cl in c("Cholesky", "pCholesky"))
+setMethod("expand2", signature(x = .cl),
+          function(x, ...) {
+              dn <- x@Dimnames
+              up <- x@uplo == "U"
+              L  <- if(up) t(x) else   x
+              L. <- if(up)   x  else t(x)
+              L @Dimnames <- c(dn[1L], list(NULL))
+              L.@Dimnames <- c(list(NULL), dn[2L])
+              list(L = L, L. = L.)
+          })
+rm(.cl)

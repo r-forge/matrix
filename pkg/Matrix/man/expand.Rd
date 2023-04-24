@@ -2,11 +2,18 @@
 \title{Expand a (Matrix) Decomposition into Factors}
 %
 \alias{expand}
+\alias{expand2}
 %
 \alias{expand,CHMfactor-method}
-\alias{expand,MatrixFactorization-method}
 \alias{expand,denseLU-method}
 \alias{expand,sparseLU-method}
+%
+\alias{expand2,CHMfactor-method}
+\alias{expand2,Cholesky-method}
+\alias{expand2,Schur-method}
+\alias{expand2,denseLU-method}
+\alias{expand2,pCholesky-method}
+\alias{expand2,sparseLU-method}
 %
 \description{
   Expands decompositions stored in compact form into factors.

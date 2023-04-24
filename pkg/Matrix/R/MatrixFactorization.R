@@ -2,7 +2,11 @@
 ## mother class containing all matrix factorizations
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("dim", "MatrixFactorization", function(x) x@Dim)
+setMethod("dim", "MatrixFactorization",
+          function(x) x@Dim)
+
+setMethod("dimnames", "MatrixFactorization",
+          function(x) x@Dimnames)
 
 setMethod("show", "MatrixFactorization",
 	  function(object) {

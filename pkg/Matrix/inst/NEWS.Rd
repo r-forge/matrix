@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-24 r3869)}{
+\section{Changes in version 1.5-5 (2023-04-24 r3870)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -36,6 +36,27 @@
       for \code{x} inheriting from \code{Matrix}.  They are handled
       as \code{integer(0)}, consistent with base R.
 
+      %% TODO: update relevant ../man/*.Rd :
+      \item Virtual class \code{MatrixFactorization} gains a
+      \code{Dimnames} slot.  Now all factorizations preserve the
+      \code{Dimnames} of the original, factorized \code{Matrix}.
+      Previously, only subclasses \code{denseLU},
+      \code{p?BunchKaufman}, and \code{p?Cholesky} had
+      a \code{Dimnames} slot.  Subclass \code{sparseLU} did not,
+      but used those of its \code{L} and \code{U} slots to store
+      \emph{permuted} names.
+      \cr
+      Users can extract the value of the new \code{Dimnames} slot
+      with \code{dimnames(.)}.
+      \cr
+      Objects inheriting from \code{Schur}, \code{sparseLU},
+      \code{sparseQR}, or \code{CHMfactor} and serialized under
+      earlier versions of \pkg{Matrix} must be modified for use
+      under \pkg{Matrix} \code{>= 1.5-5}, typically by setting
+      \code{Dimnames} to its prototype \code{list(NULL, NULL)}
+      conditional on \code{packageVersion("Matrix") >= "1.5-5"}.
+      Defensive code will check validity with \code{validObject}.
+
       \item Class \code{indMatrix} gains a \code{margin} slot with
       value \code{1L} or \code{2L} (\code{1L} being the prototype
       and previously implicit value), indicating that the object
@@ -64,6 +85,18 @@
       gives a \code{pcorMatrix} preserving the \code{sd} slot,
       rather than a \code{dppMatrix}.
 
+      %% TODO: update relevant ../man/*.Rd
+      \item New generic function \code{expand2}, improving on the
+      existing generic function \code{expand} by listing \emph{all}
+      factors \emph{in order}, with row names on the first factor
+      and column names on the last factor, supporting reconstruction
+      of factorized \code{Matrix} including any \code{Dimnames} as
+      as \code{Reduce(`\%*\%`, expand2(.))}.
+      \cr
+      \code{expand} is retained for backwards compatibility.
+      It may become deprecated as soon as the next \pkg{Matrix}
+      release.
+      
       \item \code{as(x, "Matrix")} for \code{x} inheriting from
       \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
       allowing users to inspect the LAPACK representation of

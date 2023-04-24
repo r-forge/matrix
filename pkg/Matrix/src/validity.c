@@ -162,10 +162,7 @@ SEXP Matrix_validate(SEXP obj)
 
 SEXP MatrixFactorization_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    char *msg = Dim_validate(dim);
-    UNPROTECT(1); /* dim */
-    return (msg[0] == '\0') ? ScalarLogical(1) : mkString(msg);
+    return Matrix_validate(obj);
 }
 
 SEXP compMatrix_validate(SEXP obj)
@@ -974,7 +971,6 @@ SEXP pcorMatrix_validate(SEXP obj)
 {
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int i, n = INTEGER(dim)[0];
-    R_xlen_t np1 = (R_xlen_t) n + 1;
     UNPROTECT(1); /* dim */
     
     SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
