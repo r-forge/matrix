@@ -15,22 +15,32 @@ setAs("CHMfactor", "pMatrix",
           new("pMatrix", Dim = c(n, n), perm = from@perm + 1L)
       })
 
-## returning list(P, L, L', P'), where A = P L L' P'
-## TODO: add an optional argument to get list(P, L~, D, L~', P')
-##       with unit triangular L~
+## returning list(P', L, L', P) or list(P', L~, D, L~', P),
+## where  A = P' L L' P = P' L~ D L~' P  and  L = L~ sqrt(D)
 setMethod("expand2", signature(x = "CHMfactor"),
-          function(x, ...) {
+          function(x, LDL = TRUE, ...) {
               n <- length(perm <- x@perm)
               dn <- x@Dimnames
               P <- new("pMatrix",
                        Dim = c(n, n),
-                       Dimnames = c(dn[1L], list(NULL)),
+                       Dimnames = c(list(NULL), dn[2L]),
+                       margin = 2L,
                        perm = invPerm(perm, zero.p = TRUE, zero.res = FALSE))
               P. <- P
-              P.@Dimnames <- c(list(NULL), dn[2L])
-              P.@margin <- 2L
-              L <- .Call(CHMfactor_to_sparse, x)
-              list(P = P, L = L, L. = t(L), P. = P.)
+              P.@Dimnames <- c(dn[1L], list(NULL))
+              P.@margin <- 1L
+              L <- .Call(CHMfactor_to_sparse, x) # nonunit lower triangular
+              if(LDL) {
+                  ## FIXME: be faster if isLDL(x) is TRUE
+                  L.ii <- diag(L, names = FALSE)
+                  L.p <- L@p
+                  L@x <- L@x / rep.int(L.ii, L.p[-1L] - L.p[-n])
+                  L <- ..diagN2U(L, sparse = TRUE)
+                  D <- new("ddiMatrix")
+                  D@Dim <- x@Dim
+                  D@x <- L.ii * L.ii
+                  list(P. = P., L1 = L, D = D, L1. = t(L), P = P)
+              } else list(P. = P., L = L, L. = t(L), P = P)
           })
 
 ## returning list(P, L), where A = P' L L' P
@@ -62,7 +72,7 @@ setMethod("update", signature(object = "CHMfactor"),
 
 ## Exported fast version, somewhat hidden;
 ## here 'parent' _must_ inherit from d[gs]CMatrix
-.updateCHMfactor <- function(object, parent, mult)
+.updateCHMfactor <- function(object, parent, mult = 0)
     .Call(CHMfactor_update, object, parent, mult)
 
 setMethod("updown",

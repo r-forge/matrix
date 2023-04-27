@@ -184,16 +184,47 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 ## METHODS FOR CLASS: p?Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(L, L'), where A = L L'
-for(.cl in c("Cholesky", "pCholesky"))
-setMethod("expand2", signature(x = .cl),
-          function(x, ...) {
-              dn <- x@Dimnames
-              up <- x@uplo == "U"
-              L  <- if(up) t(x) else   x
-              L. <- if(up)   x  else t(x)
-              L @Dimnames <- c(dn[1L], list(NULL))
-              L.@Dimnames <- c(list(NULL), dn[2L])
-              list(L = L, L. = L.)
-          })
-rm(.cl)
+## returning list(L, L') or list(L~, D, L~'),
+## where  A = L L' = L~ D L~'  and  L = L~ sqrt(D)
+.def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
+    x <- as(x, .CL)
+    dn <- x@Dimnames
+    up <- x@uplo == "U"
+    nu <- x@diag == "N"
+    if(LDL && nu) {
+        L.ii <- diag(x, names = FALSE)
+        x@x <- x@x / if(up) .UP else .LO
+        x@diag <- "U"
+    }
+    L  <- if(up) t(x) else   x
+    L. <- if(up)   x  else t(x)
+    L @Dimnames <- c(dn[1L], list(NULL))
+    L.@Dimnames <- c(list(NULL), dn[2L])
+    if(LDL) {
+        D <- new("ddiMatrix")
+        D@Dim <- x@Dim
+        if(nu)
+            D@x <- L.ii * L.ii
+        else D@diag <- "U"
+        list(L1 = L, D = D, L1. = L.)
+    } else list(L = L, L. = L.)
+}
+
+body(.def.unpacked) <-
+    do.call(substitute,
+            list(body(.def.unpacked),
+                 list(.CL = "dtrMatrix",
+                      .UP = quote(L.ii),
+                      .LO = quote(rep(L.ii, each = x@Dim[1L])))))
+body(.def.packed) <-
+    do.call(substitute,
+            list(body(.def.packed),
+                 list(.CL = "dtpMatrix",
+                      .UP = quote(L.ii[sequence.default(seq_len(x@Dim[1L]))]),
+                      .LO = quote(rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = x@Dim[1L]))))))
+
+## returning list(L, L') or list(L1, D, L1'), where A = L L' = L1 D L1'
+setMethod("expand2", signature(x =  "Cholesky"), .def.unpacked)
+setMethod("expand2", signature(x = "pCholesky"), .def.packed)
+
+rm(.def.unpacked, .def.packed)
