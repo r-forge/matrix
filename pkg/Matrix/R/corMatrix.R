@@ -5,7 +5,7 @@
 .dpo2cor <- function(from) {
     if(!is.null(to <- from@factors$correlation))
         return(to)
-    sd.inv <- 1 / (sd <- sqrt(diag(from, names = FALSE)))
+    sd <- sqrt(diag(from, names = FALSE))
 
     to <- new("corMatrix")
     to@Dim <- d <- from@Dim
@@ -14,7 +14,7 @@
     to@sd <- sd
 
     n <- d[1L]
-    x <- sd.inv * from@x * rep(sd.inv, each = n)
+    x <- from@x / sd / rep(sd, each = n)
     x[indDiag(n)] <- 1
     to@x <- x
 
@@ -24,7 +24,7 @@
 .dpp2pcor <- function(from) {
     if(!is.null(to <- from@factors$correlation))
         return(to)
-    sd.inv <- 1 / (sd <- sqrt(diag(from, names = FALSE)))
+    sd <- sqrt(diag(from, names = FALSE))
 
     to <- new("pcorMatrix")
     to@Dim <- d <- from@Dim
@@ -41,7 +41,7 @@
         r <- seq.int(to = 1L, by = -1L, length.out = n)
         s <- seq_len(n)
     }
-    x <- rep.int(sd.inv, r) * from@x * sd.inv[sequence.default(r, s)]
+    x <-  from@x / rep.int(sd, r) / sd[sequence.default(r, s)]
     x[indDiag(n, upper = u, packed = TRUE)] <- 1
     to@x <- x
 
