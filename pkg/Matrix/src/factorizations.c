@@ -7,8 +7,8 @@ SEXP denseLU_expand(SEXP obj)
        
        A -> [m,n]
        P -> [m,m], permutation
-       L -> if m <= n then [m,n] else [m,m], lower trapezoidal, unit diagonal
-       U -> if m >= n then [m,n] else [n,n], upper trapezoidal
+       L -> if m >= n then [m,n] else [m,m], lower trapezoidal, unit diagonal
+       U -> if m <= n then [m,n] else [n,n], upper trapezoidal
        
        square L,U given as dtrMatrix with appropriate 'uplo', 'diag' slots,
        non-square L,U given as dgeMatrix
