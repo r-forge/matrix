@@ -184,38 +184,42 @@ setMethod("expand2", signature(x = "denseLU"),
 ## returning list(L, U, P), where A = P L U
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "denseLU"),
-          function(x, ...) .Call(denseLU_expand, x)[c(2L, 3L, 1L)])
+          function(x, ...) {
+              r <- .Call(denseLU_expand, x)
+              r[[1L]]@Dimnames <- r[[3L]]@Dimnames <- list(NULL, NULL)
+              r[c(2L, 3L, 1L)]
+          })
 
 
 ## METHODS FOR CLASS: sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(P, L, U, Q), where A = P L U Q
+## returning list(P', L, U, Q), where A = P' L U Q
 setMethod("expand2", signature(x = "sparseLU"),
           function(x, ...) {
               dn <- x@Dimnames
-              np <- length(p <- x@p)
-              nq <- length(q <- x@q)
-              P <- new("pMatrix",
-                       Dim = c(np, np),
-                       Dimnames = c(dn[1L], list(NULL)),
-                       margin = 1L,
-                       perm = invPerm(p, zero.p = TRUE, zero.res = FALSE))
-              Q <- new("pMatrix",
-                       Dim = c(nq, nq),
-                       Dimnames = c(list(NULL), dn[2L]),
-                       margin = 2L,
-                       perm = invPerm(q, zero.p = TRUE, zero.res = FALSE))
-              list(P = P, L = x@L, U = x@U, Q = Q)
+              np <- length(p <- x@p + 1L)
+              nq <- length(q <- x@q + 1L)
+              P. <- new("pMatrix",
+                        Dim = c(np, np),
+                        Dimnames = c(dn[1L], list(NULL)),
+                        margin = 1L,
+                        perm = p)
+              Q  <- new("pMatrix",
+                        Dim = c(nq, nq),
+                        Dimnames = c(list(NULL), dn[2L]),
+                        margin = 2L,
+                        perm = invPerm(q))
+              list(P. = P., L = x@L, U = x@U, Q = Q)
           })
 
 ## returning list(P, L, U, Q), where A = P' L U Q
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "sparseLU"),
           function(x, ...) {
+              dn <- x@Dimnames
               np <- length(p <- x@p + 1L)
               nq <- length(q <- x@q + 1L)
-              dn <- x@Dimnames
               if(!is.null(rn <- dn[[1L]]))
                   dn[[1L]] <- rn[p]
               if(!is.null(cn <- dn[[2L]]))
