@@ -1,6 +1,9 @@
 \name{lgeMatrix-class}
-\docType{class}
 \title{Class "lgeMatrix" of General Dense Logical Matrices}
+%
+\docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{lgeMatrix-class}
 %
@@ -52,4 +55,3 @@ set.seed(11)
 (lC <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgCMatrix
 as(lM, "CsparseMatrix")
 }
-\keyword{classes}

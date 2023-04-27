@@ -1,7 +1,13 @@
-\name{rcond}
+\name{rcond-methods}
 \title{Estimate the Reciprocal Condition Number}
 %
+\docType{methods}
+\keyword{algebra}
+\keyword{math}
+\keyword{methods}
+%
 \alias{rcond}
+\alias{rcond-methods}
 %
 \alias{rcond,ANY,missing-method}
 \alias{rcond,denseMatrix,character-method}
@@ -134,5 +140,3 @@ cbind(rr <- sapply(c("1","I","F","M"),
              function(N) rcond(M3, norm=N, useInv=TRUE)))
 \dontshow{stopifnot(all.equal(r., 1/72, tolerance=1e-12))}
 }
-\keyword{array}
-\keyword{algebra}

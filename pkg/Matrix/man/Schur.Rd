@@ -1,7 +1,13 @@
-\name{Schur}
+\name{Schur-methods}
 \title{Schur Decomposition of a Matrix}
 %
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
+%
 \alias{Schur}
+\alias{Schur-methods}
 %
 \alias{Schur,Matrix,missing-method}
 \alias{Schur,matrix,missing-method}
@@ -91,4 +97,3 @@ stopifnot(identical(Sch.a, list(Q = a.m(Sch.A @ Q),
 	  all.equal(a, with(Sch.a, Q \%*\% T \%*\% t(Q)))
 )
 }
-\keyword{algebra}

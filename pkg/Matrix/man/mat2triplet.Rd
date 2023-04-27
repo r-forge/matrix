@@ -1,6 +1,11 @@
 \name{mat2triplet}
 \title{Map Matrix to its Triplet Representation}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{mat2triplet}
+%
 \description{
   From an \R object coercible to \code{"\linkS4class{TsparseMatrix}"},
   typically a (sparse) matrix, produce its triplet representation which may
@@ -63,7 +68,3 @@ D <- Diagonal(x=4:2)
 summary(D)
 str(mat2triplet(D))
 }
-\keyword{classes}
-\keyword{manip}
-\keyword{utilities}
-

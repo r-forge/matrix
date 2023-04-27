@@ -1,6 +1,9 @@
 \name{dsyMatrix-class}
 \title{Symmetric Dense (Packed or Unpacked) Numeric Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dsyMatrix-class}
 \alias{dspMatrix-class}
@@ -104,4 +107,3 @@ stopifnot(all(S1 == S2)) # equal "seen as matrix", but differ internally :
 str(S1)
 S2@x
 }
-\keyword{classes}

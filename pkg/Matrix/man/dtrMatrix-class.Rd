@@ -1,6 +1,9 @@
 \name{dtrMatrix-class}
 \title{Triangular, dense, numeric matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dtrMatrix-class}
 %
@@ -72,4 +75,3 @@ stopifnot(exprs = {
    identical((t1pu - t1)@x, numeric())# sparse all-0
 })
 }
-\keyword{classes}

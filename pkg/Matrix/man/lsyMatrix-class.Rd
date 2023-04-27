@@ -1,6 +1,9 @@
 \name{lsyMatrix-class}
 \title{Symmetric Dense Logical Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{lsyMatrix-class}
 \alias{lspMatrix-class}
@@ -56,4 +59,3 @@ str(M2)
 as(sM, "symmetricMatrix")
 str(sM <- as(sM, "packedMatrix")) # packed symmetric
 }
-\keyword{classes}

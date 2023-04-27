@@ -1,43 +1,58 @@
 \name{Schur-class}
-\title{Class "Schur" of Schur Matrix Factorizations}
+\title{Schur Factorizations}
+%
 \docType{class}
+\keyword{algebra}
+\keyword{array}
+\keyword{classes}
 %
 \alias{Schur-class}
 %
 \alias{show,Schur-method}
 %
-\description{Class \code{"Schur"} is the class of Schur matrix
-  factorizations.  These are a generalization of eigen value (or
-  \dQuote{spectral}) decompositions for general (possibly asymmmetric)
-  square matrices, see the \code{\link{Schur}()} function.
-}
-\section{Objects from the Class}{
-  Objects of class \code{"Schur"} are typically created by
-  \code{\link{Schur}()}.
+\description{
+  \code{Schur} is the class of Schur factorizations of real, square
+  matrices.  The Schur factorization generalizes the eigendecomposition
+  of diagonalizable (i.e., non-defective) square matrices to general
+  square matrices.
 }
 \section{Slots}{
-  \code{"Schur"} has slots
   \describe{
-    \item{\code{T}:}{Upper Block-triangular \code{\linkS4class{Matrix}}
-      object.}
-    \item{\code{Q}:}{Square \emph{orthogonal} \code{"Matrix"}.}
-    \item{\code{EValues}:}{numeric or complex vector of eigenvalues of \code{T}.}
-    \item{\code{Dim}:}{the matrix dimension: equal to \code{c(n,n)} of
-      class \code{"integer"}.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
+      \code{\linkS4class{MatrixFactorization}}.}
+    \item{\code{Q}}{an orthogonal matrix,
+      inheriting from virtual class \code{\linkS4class{Matrix}}.}
+    \item{\code{T}}{a block upper triangular matrix,
+      inheriting from virtual class \code{\linkS4class{Matrix}}.
+      The diagonal blocks have dimensions 1-by-1 or 2-by-2.}
+    \item{\code{EValues}}{a numeric or complex vector containing
+      the eigenvalues of the diagonal blocks of \code{T}, which are
+      the eigenvalues of \code{T} and consequently of the factorized
+      matrix.}
   }
 }
 \section{Extends}{
-  Class \code{"\linkS4class{MatrixFactorization}"}, directly.
+  Class \code{\linkS4class{MatrixFactorization}}, directly.
 }
-% \section{Methods}{
-%   are all inherited from the MatrixFactorization class
-% }
-% \note{There's not yet a class for \emph{sparse} Schur decompositions;
-%   mainly because there's no \code{\link{Schur}()} method for those neither.
-% }
+\section{Instantiation}{
+  Objects can be generated directly by calls of the form
+  \code{new("Schur", ...)}, but they are more typically obtained
+  as the value of \code{\link{Schur}(x)} for \code{x} inheriting from
+  \code{\linkS4class{Matrix}} (often \code{\linkS4class{dgeMatrix}}).
+}
+\section{Methods}{
+  \describe{
+    \item{expand2}{\code{signature(x = "Schur")}:
+      see \code{\link{expand2-methods}}.}
+    \item{show}{\code{signature(object = "Schur")}:
+      prints the internal representation of the factorization using
+      \code{\link{str}}.}
+  }
+}
 \seealso{
-  \code{\link{Schur}()} for object creation;
-  \code{\linkS4class{MatrixFactorization}}.
+  Class \code{\linkS4class{dgeMatrix}}.
+  
+  Generic functions \code{\link{expand2}} and \code{\link{Schur}}.
 }
 \examples{
 showClass("Schur")
@@ -45,6 +60,5 @@ Schur(M <- Matrix(c(1:7, 10:2), 4,4))
 ## Trivial, of course:
 str(Schur(Diagonal(5)))
 
-## for more examples, see Schur()
+## for more examples, see help("Schur")
 }
-\keyword{classes}

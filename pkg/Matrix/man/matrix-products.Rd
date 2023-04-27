@@ -1,14 +1,18 @@
-\name{matrix-products}
+\name{matmult-methods}
 \title{Matrix (Cross) Products (of Transpose)}
-\docType{methods}
 %
-\alias{\%*\%-methods}
-\alias{crossprod-methods}
-\alias{tcrossprod-methods}
-% and for R CMD check:
+\docType{methods}
+\keyword{algebra}
+\keyword{arith}
+\keyword{array}
+%
 \alias{\%*\%}
+\alias{\%*\%-methods}
 \alias{crossprod}
+\alias{crossprod-methods}
 \alias{tcrossprod}
+\alias{tcrossprod-methods}
+\alias{matmult-methods}
 % `%*%`
 \alias{\%*\%,ANY,Matrix-method}
 \alias{\%*\%,ANY,TsparseMatrix-method}
@@ -416,5 +420,3 @@
  ## show sparse sub matrix
  tCmm[1:16, 1:30]
 }
-\keyword{methods}
-\keyword{algebra}

@@ -1,7 +1,13 @@
-\name{lu}
+\name{lu-methods}
 \title{(Generalized) Triangular Decomposition of a Matrix}
 %
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
+%
 \alias{lu}
+\alias{lu-methods}
 %
 \alias{lu,denseMatrix-method}
 \alias{lu,diagonalMatrix-method}
@@ -139,5 +145,3 @@ pLU <- drop0(pmLU@L \%*\% pmLU@U) # L \%*\% U -- dropping extra zeros
 ppm[1:14, 1:5]
 pLU[1:14, 1:5]
 }
-\keyword{array}
-\keyword{algebra}

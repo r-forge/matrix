@@ -1,8 +1,12 @@
 \name{solve-methods}
 \title{Methods in Package Matrix for Function \code{solve()}}
-\docType{methods}
 %
-\alias{solve} % catch ?solve too
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
+%
+\alias{solve}
 \alias{solve-methods}
 %
 \alias{solve,ANY,ANY-method}
@@ -137,7 +141,6 @@
     \item{\code{signature(a = "ANY", b = "ANY")}}{is simply the
       \pkg{base} package's S3 generic \code{\link{solve}}.}
 
-%% This is copy-paste  in  CHMfactor-class.Rd  {FIXME ?}
     \item{\code{signature(a = "CHMfactor", b = "...."), system= *}}{The
       \code{solve} methods for a \code{"\linkS4class{CHMfactor}"} object
       take an optional third argument \code{system} whose value can be
@@ -284,4 +287,3 @@ stopifnot( all.equal(as(I0, "diagonalMatrix"), Diagonal(n)),
            all.equal(as(.I0,"diagonalMatrix"), Diagonal(n)) )
 
 }
-\keyword{methods}

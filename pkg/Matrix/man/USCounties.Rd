@@ -1,7 +1,11 @@
 \name{USCounties}
 \title{USCounties Contiguity Matrix}
+%
 \docType{data}
+\keyword{datasets}
+%
 \alias{USCounties}
+%
 \description{
   This matrix represents the contiguities of 3111 US counties using the
   Queen criterion of at least a single shared boundary point. The
@@ -60,4 +64,3 @@ stopifnot(all.equal(MJ, MJ3))
 system.time(MJ4 <- n * log(rho) + Matrix:::ldetL2up(C2, nWC, 1/rho))
 stopifnot(all.equal(MJ, MJ4))
 }
-\keyword{datasets}

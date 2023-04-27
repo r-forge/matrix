@@ -1,5 +1,9 @@
 \name{bdiag}
 \title{Construct a Block Diagonal Matrix}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{bdiag}
 \alias{.bdiag}
 \description{
@@ -101,4 +105,3 @@ l12 <- replicate(12, matrix(rpois(16, lambda = 6.4), 4,4), simplify=FALSE)
 dim(T12 <- bdiag_m(l12))# 48 x 48
 T12[1:20, 1:20]
 }
-\keyword{array}

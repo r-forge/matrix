@@ -1,6 +1,11 @@
 \name{bandSparse}
 \title{Construct Sparse Banded Matrix from (Sup-/Super-) Diagonals}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{bandSparse}
+%
 \description{
   Construct a sparse banded matrix by specifying its non-zero sup- and
   super-diagonals.
@@ -87,5 +92,3 @@ stopifnot(identical(B,  bandSparse(n, k = bk, diag = bMat)),
           , inherits(B, "dtCMatrix") # triangular!
 )
 }
-\keyword{array}
-\keyword{algebra}

@@ -1,6 +1,9 @@
 \name{dsCMatrix-class}
 \title{Numeric Symmetric Sparse (column compressed) Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dsCMatrix-class}
 \alias{dsTMatrix-class}
@@ -114,5 +117,3 @@ stopifnot(identical(sT, symM), identical(sym2, symM),
 	  identical(sym2[,2], sT[,2]))
 }
 }
-\keyword{classes}
-\keyword{algebra}

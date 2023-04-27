@@ -1,6 +1,9 @@
-\name{band}
+\name{band-methods}
 \title{Extract bands of a matrix}
+%
 \docType{methods}
+\keyword{array}
+\keyword{methods}
 %
 \alias{band}
 \alias{band-methods}
@@ -117,5 +120,3 @@ stopifnot(identical(triu(x.x), t(tril(x.x))),
 	  identical(as(x.x, "generalMatrix"), as(txx, "generalMatrix")))
 }
 }
-\keyword{methods}
-\keyword{algebra}

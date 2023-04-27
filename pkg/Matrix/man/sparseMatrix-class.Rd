@@ -1,6 +1,9 @@
 \name{sparseMatrix-class}
 \title{Virtual Class "sparseMatrix" --- Mother of Sparse Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{sparseMatrix-class}
 %
@@ -12,11 +15,6 @@
 \alias{Ops,sparseMatrix,nsparseMatrix-method}
 \alias{Ops,sparseMatrix,numeric-method}
 \alias{Ops,sparseMatrix,sparseMatrix-method}
-\alias{cbind2,matrix,sparseMatrix-method}
-%\alias{cbind2,sparseMatrix,denseMatrix-method} % needed in ./cBind.Rd
-\alias{cbind2,sparseMatrix,diagonalMatrix-method}
-\alias{cbind2,sparseMatrix,matrix-method}
-\alias{cbind2,sparseMatrix,sparseMatrix-method}
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,matrix,sparseMatrix-method}
@@ -29,11 +27,6 @@
 \alias{log,sparseMatrix-method}
 \alias{mean,sparseMatrix-method}
 \alias{print,sparseMatrix-method}
-\alias{rbind2,matrix,sparseMatrix-method}
-%\alias{rbind2,sparseMatrix,denseMatrix-method} % needed in ./cBind.Rd
-\alias{rbind2,sparseMatrix,diagonalMatrix-method}
-\alias{rbind2,sparseMatrix,matrix-method}
-\alias{rbind2,sparseMatrix,sparseMatrix-method}
 \alias{rep,sparseMatrix-method}
 \alias{show,sparseMatrix-method}
 \alias{summary,sparseMatrix-method}
@@ -143,4 +136,3 @@ is.na(f.mis) <- i.mis
 Xt != (X. <- as(f.mis, "sparseMatrix")) # differ only in columns 3:5,17
 stopifnot(all(X.[,i.mis] == 0), all(Xt[,-i.mis] == X.[,-i.mis]))
 }
-\keyword{classes}

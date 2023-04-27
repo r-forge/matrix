@@ -1,6 +1,9 @@
 \name{pMatrix-class}
 \title{Permutation matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{pMatrix-class}
 %
@@ -119,4 +122,3 @@ p10[1:7, 1:4] # gives an "ngTMatrix" (most economic!)
 ## row-indexing of a <pMatrix> keeps it as an <indMatrix>:
 p10[1:3, ]
 }
-\keyword{classes}

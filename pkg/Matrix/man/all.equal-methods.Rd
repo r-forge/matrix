@@ -1,7 +1,13 @@
 \name{all.equal-methods}
 \title{Matrix Package Methods for Function all.equal()}
-\docType{methods}
 %
+\docType{methods}
+\keyword{arith}
+\keyword{logic}
+\keyword{methods}
+\keyword{programming}
+%
+\alias{all.equal}
 \alias{all.equal-methods}
 %
 \alias{all.equal,ANY,Matrix-method}
@@ -46,5 +52,3 @@ stopifnot( all.equal(as(A[lu.@p + 1L, lu.@q + 1L], "CsparseMatrix"),
            with(ex, all.equal(as(A, "CsparseMatrix"),
                               t(P) \%*\% L \%*\% U \%*\% t(Q))))
 }
-\keyword{methods}
-\keyword{arith}

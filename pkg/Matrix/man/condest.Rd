@@ -1,6 +1,10 @@
 \name{condest}
 \title{Compute Approximate CONDition number and 1-Norm of (Large) Matrices}
 %
+\keyword{algebra}
+\keyword{math}
+\keyword{utilities}
+%
 \alias{condest}
 \alias{onenormest}
 %

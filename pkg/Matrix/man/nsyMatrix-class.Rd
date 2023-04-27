@@ -1,6 +1,9 @@
 \name{nsyMatrix-class}
 \title{Symmetric Dense Nonzero-Pattern Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{nsyMatrix-class}
 \alias{nspMatrix-class}
@@ -59,4 +62,3 @@ class(sM <- as(sM, "nMatrix"))         # -> "nge"
      (sM <- as(sM, "symmetricMatrix")) # -> "nsy"
 str  (sM <- as(sM, "packedMatrix"))    # -> "nsp": packed symmetric
 }
-\keyword{classes}

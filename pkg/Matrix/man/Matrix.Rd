@@ -1,5 +1,9 @@
 \name{Matrix}
 \title{Construct a Classed Matrix}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{Matrix}
 \description{
   Construct a Matrix of a class that inherits from \code{Matrix}.
@@ -110,5 +114,3 @@ stopifnot(is(As, "symmetricMatrix"),
           is(Matrix(0, 3,3), "sparseMatrix"),
           is(Matrix(FALSE, 1,1), "sparseMatrix"))
 }
-\keyword{array}
-\keyword{algebra}

@@ -1,8 +1,14 @@
 \name{sparse.model.matrix}
 \title{Construct Sparse Design / Model Matrices}
+%
+\keyword{array}
+\keyword{models}
+\keyword{utilities}
+%
 \alias{sparse.model.matrix}
 \alias{fac2sparse}
 \alias{fac2Sparse}
+%
 \description{Construct a sparse model or \dQuote{design} matrix,
   from a formula and data frame (\code{sparse.model.matrix}) or a single
   factor (\code{fac2sparse}).
@@ -136,4 +142,3 @@ stopifnot(
   is(M <- fac2sparse(f12, drop=FALSE),"CsparseMatrix"), dim(M) == c(3,12)
  )
 }
-\keyword{models}

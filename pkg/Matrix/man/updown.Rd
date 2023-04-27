@@ -1,5 +1,10 @@
-\name{updown}
+\name{updown-methods}
 \title{Up- and Down-Dating a Cholesky Decomposition}
+%
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
 %
 \alias{updown}
 \alias{updown-methods}
@@ -57,4 +62,3 @@ image(show(as(cA, "Matrix")))
 image(show(c2 <- as(uc2,"Matrix")))# severely negative entries
 ##--> Warning
 }
-\keyword{methods}

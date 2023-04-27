@@ -1,6 +1,9 @@
 \name{dgTMatrix-class}
 \title{Sparse matrices in triplet form}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dgTMatrix-class}
 %
@@ -84,5 +87,3 @@ T2 ## has only three non-zero entries, as for repeated (i,j)'s,
    ## the corresponding x's are "implicitly" added
 stopifnot(nnzero(T2) == 3)
 }
-\keyword{classes}
-\keyword{algebra}

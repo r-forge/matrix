@@ -1,6 +1,13 @@
 \name{KhatriRao}
 \title{Khatri-Rao Matrix Product}
+%
+\keyword{algebra}
+\keyword{arith}
+\keyword{array}
+\keyword{utilities}
+%
 \alias{KhatriRao}
+%
 \description{
   Computes Khatri-Rao products for any kind of matrices.
 
@@ -114,5 +121,3 @@ stopifnot(exprs = {
     identical(K6d, K6Dd)
 })
 }
-\keyword{methods}
-\keyword{array}

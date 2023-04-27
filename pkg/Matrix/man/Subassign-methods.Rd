@@ -1,7 +1,11 @@
-\name{[<--methods}
+\name{Subassign-methods}
 \title{Methods for "[<-" - Assigning to Subsets for 'Matrix'}
-\docType{methods}
 %
+\docType{methods}
+\keyword{array}
+\keyword{methods}
+%
+\alias{[<-}
 \alias{[<--methods}
 \alias{Subassign-methods}
 %
@@ -127,5 +131,3 @@ m[,2] <- 1:7
 m[-(1:6), ] <- 3:0 # not the first 6 rows, i.e. only the 7th
 as(m, "sparseMatrix")
 }
-\keyword{methods}
-\keyword{array}

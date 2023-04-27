@@ -1,6 +1,10 @@
 \name{sparseVector}
-\alias{sparseVector}
 \title{Sparse Vector Construction from Nonzero Entries}
+%
+\keyword{utilities}
+%
+\alias{sparseVector}
+%
 \description{
   User friendly construction of sparse vectors,
   i.e., objects inheriting from \code{\link{class}}
@@ -44,4 +48,3 @@ stopifnot(identical(ss,
 stopifnot(identical(ns,
       new("nsparseVector", length = 10, i = c(2, 3, 7))))
 }
-\keyword{array}

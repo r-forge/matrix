@@ -1,7 +1,11 @@
 \name{CAex}
 \title{Albers' example Matrix with "Difficult" Eigen Factorization}
+%
 \docType{data}
+\keyword{datasets}
+%
 \alias{CAex}
+%
 \description{
   An example of a sparse matrix for which \code{\link{eigen}()} seemed
   to be difficult, an unscaled version of this has been posted to the
@@ -34,4 +38,3 @@ sCA <- as(CAex, "symmetricMatrix")
 stopifnot(class(sCA) == "dsCMatrix",
           as(sCA, "matrix") == as(CAex, "matrix"))
 }
-\keyword{datasets}

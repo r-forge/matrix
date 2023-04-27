@@ -1,6 +1,10 @@
 \name{Cholesky-class}
-\title{Cholesky Factorizations}
+\title{Dense Cholesky Factorizations}
+%
 \docType{class}
+\keyword{algebra}
+\keyword{array}
+\keyword{classes}
 %
 \alias{Cholesky-class}
 \alias{pCholesky-class}
@@ -19,11 +23,11 @@
 \section{Slots}{
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
-      \code{\linkS4class{Matrix}}.}
+      \code{\linkS4class{MatrixFactorization}}.}
     \item{\code{uplo}, \code{diag}}{inherited from virtual class
       \code{\linkS4class{triangularMatrix}}.}
     \item{\code{x}}{inherited from virtual class
-      \code{\linkS4class{dMatrix}} and contains the entries of the
+      \code{\linkS4class{dMatrix}}.  It contains the entries of the
       upper or lower triangular Cholesky factor in column-major order.}
   }
 }
@@ -34,40 +38,42 @@
 
   Class \code{\linkS4class{dtrMatrix}} or
   \code{\linkS4class{dtpMatrix}}, directly.
-  Class \code{\linkS4class{denseMatrix}}, by class
-  \code{\linkS4class{dtrMatrix}} or
+  Class \code{\linkS4class{Matrix}}, by class
+  \code{\linkS4class{dtrMatrix}} or class
   \code{\linkS4class{dtpMatrix}}, distance 3.
 }
+\section{Instantiation}{
+  Objects can be generated directly by calls of the form
+  \code{new("Cholesky", ...)} or \code{new("pCholesky", ...)},
+  but they are more typically obtained as the value of
+  \code{\link{chol}(x)} for \code{x} inheriting from
+  \code{\linkS4class{dsyMatrix}} or \code{\linkS4class{dspMatrix}}
+  (often the subclasses of those reserved for positive
+  semidefinite matrices, namely \code{\linkS4class{dpoMatrix}}
+  and \code{\linkS4class{dppMatrix}}).
+}
 \section{Methods}{
+  \describe{
+    \item{expand2}{\code{signature(x = "p?Cholesky")}:
+      see \code{\link{expand2-methods}}.}
+    \item{show}{\code{signature(object = "p?Cholesky")}:
+      prints the Cholesky factor as a typical
+      \code{\linkS4class{Matrix}} rather than as a typical
+      \code{\linkS4class{MatrixFactorization}},
+      i.e., as a rectangular array with \code{Dimnames} along the margin,
+      rather than as a list of slot values.}
+  }
+}
+\note{
   For traditional numeric matrices \code{x}, \code{chol(x)} is a
   traditional numeric matrix and also \emph{triangular}.  Accordingly,
   classes \code{Cholesky} and \code{pCholesky} extend the subclasses
   \code{\linkS4class{dtrMatrix}} and \code{\linkS4class{dtpMatrix}}
   of virtual class \code{\linkS4class{denseMatrix}} and inherit almost
   all of the corresponding methods (for arithmetic, comparison, etc.).
-
   A corollary is that \code{\link{determinant}(R <- chol(A))} returns
-  the determinant of \code{R}, not of \code{A}.  This is currently the
-  only exception to the rule that \code{\link{determinant}(x)} should
-  return the determinant of the original, factorized matrix if \code{x}
-  inherits from \code{\linkS4class{MatrixFactorization}}.
+  the determinant of \code{R}, not of \code{A}.
   
-  Classes \code{Cholesky} and \code{pCholesky} are also unique within
-  the virtual class \code{\linkS4class{MatrixFactorization}} in that
-  they are \link{show}n as a typical \code{\linkS4class{Matrix}} would
-  be, i.e., as a rectangular array rather than as a list of slot values.
-}
-\section{Objects from the class}{
-  Objects can be created directly by calls of the form
-  \code{new("Cholesky", ...)} or \code{new("pCholesky", ...)}.
-  More typically, they are obtained as the value of
-  \code{\link{chol}(x)} for \code{x} inheriting from
-  \code{\linkS4class{dsyMatrix}} or \code{\linkS4class{dspMatrix}}
-  (often the subclasses of those reserved for positive semidefinite
-  matrices, namely \code{\linkS4class{dpoMatrix}} and
-  \code{\linkS4class{dppMatrix}}).
-}
-\note{
   Class \code{Cholesky} should not be confused with the
   \link[=Cholesky]{function of the same name}.  The latter returns
   objects inheriting from virtual class \code{\linkS4class{CHMfactor}}
@@ -75,11 +81,14 @@
   factor in \emph{sparse} (rather than dense) format.
 }
 \seealso{
-  Classes \code{\linkS4class{dtrMatrix}} and
-  \code{\linkS4class{dpoMatrix}}.
-  
-  Generic functions \code{\link{chol}} and \code{\link{Cholesky}},
-  but see \sQuote{Note}.
+  Class \code{\linkS4class{CHMfactor}} for sparse Cholesky
+  factorizations.
+
+  Classes \code{\linkS4class{dpoMatrix}} and
+  \code{\linkS4class{dtrMatrix}} and their packed counterparts.
+
+  Generic functions \code{\link{expand2}}, \code{\link{chol}},
+  and \code{\link{Cholesky}}.
 }
 \examples{
 (sp <- pack(Matrix(diag(5L) + 1)))
@@ -92,5 +101,3 @@ signif(chsy <- chol(sy), 4L)
 stopifnot(all.equal(as(sy., "matrix"), as(sy, "matrix"),
                     tolerance = 1e-14))
 }
-\keyword{classes}
-\keyword{algebra}

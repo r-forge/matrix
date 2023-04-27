@@ -1,6 +1,9 @@
 \name{dtpMatrix-class}
 \title{Packed Triangular Dense Matrices - "dtpMatrix"}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dtpMatrix-class}
 %
@@ -74,4 +77,3 @@ stopifnot(length(p1@x) == 3, length(pp@x) == 3,
 	  identical(t(ip1), solve(pp)), is(ip1, "dtpMatrix"),
 	  all.equal(as(solve(p1,p1), "diagonalMatrix"), Diagonal(2)))
 }
-\keyword{classes}

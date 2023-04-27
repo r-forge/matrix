@@ -1,8 +1,9 @@
-\name{graph-sparseMatrix}
+\name{coerce-methods-graph}
 \title{Conversions "graph" <--> (sparse) Matrix}
 %
-\alias{graph2T}
-\alias{T2graph}
+\docType{methods}
+\keyword{methods}
+\keyword{utilities}
 %
 \alias{coerce,Matrix,graph-method}
 \alias{coerce,Matrix,graphNEL-method}
@@ -14,6 +15,9 @@
 \alias{coerce,graph,sparseMatrix-method}
 \alias{coerce,graphAM,TsparseMatrix-method}
 \alias{coerce,graphNEL,TsparseMatrix-method}
+%
+\alias{T2graph}
+\alias{graph2T}
 %
 \description{
   The \pkg{Matrix} package has supported conversion from and to
@@ -95,5 +99,3 @@ if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
 }
 }% only if( graph )
 }
-\keyword{graph}
-\keyword{utilities}

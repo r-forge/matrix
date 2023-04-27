@@ -1,5 +1,10 @@
-\name{chol}
+\name{chol-methods}
 \title{The Cholesky Decomposition - 'Matrix' S4 Generic and Methods}
+\docType{methods}
+%
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
 %
 \alias{chol}
 \alias{chol-methods}
@@ -145,5 +150,3 @@ stopifnot(identical(t(L1), c2),
           all.equal(M2, crossprod(crossprod(L2, P2)))# M = P'L L'P
          )
 }
-\keyword{algebra}
-\keyword{array}

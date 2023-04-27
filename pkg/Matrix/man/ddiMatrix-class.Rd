@@ -1,6 +1,9 @@
 \name{ddiMatrix-class}
 \title{Class "ddiMatrix" of Diagonal Numeric Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{ddiMatrix-class}
 %
@@ -40,13 +43,7 @@
 \alias{Ops,ddiMatrix,sparseMatrix-method}
 \alias{Summary,ddiMatrix-method}
 \alias{as.numeric,ddiMatrix-method}
-\alias{cbind2,ddiMatrix,atomicVector-method}
-\alias{cbind2,ddiMatrix,matrix-method}
-\alias{cbind2,matrix,ddiMatrix-method}
 \alias{prod,ddiMatrix-method}
-\alias{rbind2,ddiMatrix,atomicVector-method}
-\alias{rbind2,ddiMatrix,matrix-method}
-\alias{rbind2,matrix,ddiMatrix-method}
 \alias{sum,ddiMatrix-method}
 %
 \description{The class \code{"ddiMatrix"} of numerical diagonal matrices.
@@ -98,4 +95,3 @@ chol(d2) # trivial
 stopifnot(is(cd2 <- chol(d2), "ddiMatrix"),
           all.equal(cd2@x, c(sqrt(10),1)))
 }
-\keyword{classes}

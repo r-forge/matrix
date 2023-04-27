@@ -1,6 +1,9 @@
 \name{packedMatrix-class}
 \title{Virtual Class \code{"packedMatrix"} of Packed Dense Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{packedMatrix-class}
 %
@@ -61,4 +64,3 @@
 showClass("packedMatrix")
 showMethods(classes = "packedMatrix")
 }
-\keyword{classes}

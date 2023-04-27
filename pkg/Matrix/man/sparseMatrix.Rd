@@ -1,6 +1,11 @@
 \name{sparseMatrix}
 \title{General Sparse Matrix Construction from Nonzero Entries}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{sparseMatrix}
+%
 \description{
   User-friendly construction of sparse matrices (inheriting from
   virtual \code{\link{class}} \code{\linkS4class{CsparseMatrix}},
@@ -215,4 +220,3 @@ if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
   stopifnot(identical(XX, X.), identical(X., X2))
 }% if
 }% example
-\keyword{array}

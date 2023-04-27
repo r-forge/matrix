@@ -1,6 +1,12 @@
 \name{dmperm}
 \title{Dulmage-Mendelsohn Permutation / Decomposition}
+%
+\keyword{algebra}
+\keyword{array}
+\keyword{utilities}
+%
 \alias{dmperm}
+%
 \description{
   For any \eqn{n \times m}{n * m} (typically) sparse matrix \code{x}
   compute the Dulmage-Mendelsohn row and columns permutations which at
@@ -86,4 +92,3 @@ stopifnot(exprs = {
 })
 %% FIXME: Check permutations / blocks etc -- does it work ???
 }
-\keyword{algebra}

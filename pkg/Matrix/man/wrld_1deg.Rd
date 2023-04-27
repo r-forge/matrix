@@ -1,7 +1,11 @@
 \name{wrld_1deg}
 \title{World 1-degree grid contiguity matrix}
+%
 \docType{data}
+\keyword{datasets}
+%
 \alias{wrld_1deg}
+%
 \description{
   This matrix represents the distance-based contiguities of 15260
   one-degree grid cells of land areas. The representation is as a
@@ -70,4 +74,3 @@ stopifnot(all.equal(MJ, MJ2),
           all.equal(MJ, MJ3),
           all.equal(MJ, MJ4))
 }
-\keyword{datasets}

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-24 r3870)}{
+\section{Changes in version 1.5-5 (2023-04-28 r3871)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -30,13 +30,12 @@
       Notably, for \code{x} inheriting from \code{RsparseMatrix},
       the result is now always an \code{RsparseMatrix}, rather than
       always a \code{TsparseMatrix}.
-      \cr
+      
       \item \code{NULL} subscripts, as in \code{x[NULL]},
       \code{x[NULL, j]}, and \code{x[i, NULL]}, are now supported
       for \code{x} inheriting from \code{Matrix}.  They are handled
       as \code{integer(0)}, consistent with base R.
 
-      %% TODO: update relevant ../man/*.Rd :
       \item Virtual class \code{MatrixFactorization} gains a
       \code{Dimnames} slot.  Now all factorizations preserve the
       \code{Dimnames} of the original, factorized \code{Matrix}.
@@ -83,9 +82,17 @@
       using packed storage, supporting more efficient storage of
       dense correlation matrices.  Now \code{pack(<corMatrix>)}
       gives a \code{pcorMatrix} preserving the \code{sd} slot,
-      rather than a \code{dppMatrix}.
+      rather than a \code{dppMatrix} without an \code{sd} slot.
 
-      %% TODO: update relevant ../man/*.Rd
+      \item New virtual classes \code{BunchKaufmanFactorization},
+      extended by existing nonvirtual classes \code{p?BunchKaufman};
+      \code{SchurFactorization}, extended by existing nonvirtual
+      class \code{Schur}; and \code{QR}, extended by existing
+      nonvirtual class \code{sparseQR}.  These are parallel to the
+      existing virtual classes \code{CholeskyFactorization} and \code{LU}.
+      Packages defining new factorization classes may extend these.
+      
+      %% TODO: add examples and tests _using_ 'expand2'
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor
@@ -94,8 +101,16 @@
       as \code{Reduce(`\%*\%`, expand2(.))}.
       \cr
       \code{expand} is retained for backwards compatibility.
-      It may become deprecated as soon as the next \pkg{Matrix}
-      release.
+      It may become deprecated in the future, hence new code should
+      use \code{expand2}.
+      \cr
+      Notably, \code{expand2} has methods for \code{p?Cholesky} and
+      \code{Schur} not defined for \code{expand}, and its methods for
+      \code{p?Cholesky} and \code{CHMfactor} take an argument \code{LDL}
+      (with default value \code{TRUE}) indicating whether to give the
+      \eqn{L_{1} D L_{1}'} or \eqn{L L'} expansion,
+      where \eqn{L = L_{1} sqrt(D)}.
+      See \code{help("expand-methods")} for details.
       
       \item \code{as(x, "Matrix")} for \code{x} inheriting from
       \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
