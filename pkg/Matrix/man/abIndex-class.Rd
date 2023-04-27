@@ -1,6 +1,8 @@
 \name{abIndex-class}
 \title{Class "abIndex" of Abstract Index Vectors}
+%
 \docType{class}
+\keyword{classes}
 %
 \alias{abIndex-class}
 \alias{seqMat-class} % not yet documented {unexported}
@@ -101,4 +103,3 @@ ai # -> show() method
 stopifnot(identical(-3:20,
                     as(abIseq1(-3,20), "vector")))
 }
-\keyword{classes}

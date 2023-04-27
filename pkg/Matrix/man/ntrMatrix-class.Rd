@@ -1,6 +1,9 @@
 \name{ntrMatrix-class}
 \title{Triangular Dense Logical Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{ntrMatrix-class}
 \alias{ntpMatrix-class}
@@ -58,4 +61,3 @@ str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
 ## but this one is:
 stopifnot(all.equal(nutp, pack(!!nutp)))
 }
-\keyword{classes}

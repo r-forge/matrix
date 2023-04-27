@@ -1,50 +1,51 @@
 \name{sparseLU-class}
-\title{Sparse LU decomposition of a square sparse matrix}
+\title{Sparse LU Factorizations}
+%
 \docType{class}
+\keyword{algebra}
+\keyword{array}
+\keyword{classes}
 %
 \alias{sparseLU-class}
 %
-\description{Objects of this class contain the components of the LU
-  decomposition of a sparse square matrix.}
-\section{Objects from the Class}{
-  Objects can be created by calls of the form \code{new("sparseLU",
-    ...)} but are more commonly created by function \code{\link{lu}()}
-  applied to a sparse matrix, such as a matrix of class
-  \code{\linkS4class{dgCMatrix}}.
+\description{
+  \code{sparseLU} is the class of sparse, row- and column-pivoted
+  LU factorizations of real, square matrices.
 }
 \section{Slots}{
   \describe{
-    \item{\code{L}:}{Object of class \code{"\linkS4class{dtCMatrix}"}, the lower
-      triangular factor from the left.}
-    \item{\code{U}:}{Object of class \code{"\linkS4class{dtCMatrix}"}, the upper
-      triangular factor from the right.}
-    \item{\code{p}:}{Object of class \code{"integer"}, permutation
-      applied from the left. }
-    \item{\code{q}:}{Object of class \code{"integer"}, permutation
-      applied from the right.}
-    \item{\code{Dim}:}{the dimension of the original matrix; inherited
-      from class \code{\linkS4class{MatrixFactorization}}.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
+      \code{\linkS4class{MatrixFactorization}}.}
+    \item{\code{L}}{an object of class \code{\linkS4class{dtCMatrix}},
+      the lower triangular \eqn{L} factor.}
+    \item{\code{U}}{an object of class \code{\linkS4class{dtCMatrix}},
+      the upper triangular \eqn{U} factor.}
+    \item{\code{p}, \code{q}}{integer vectors of length \code{Dim[1]}
+      specifying row and column permutations, respectively.}
   }
 }
 \section{Extends}{
-  Class \code{"\linkS4class{LU}"}, directly.
-  Class \code{"\linkS4class{MatrixFactorization}"}, by class \code{"LU"}.
+  Class \code{\linkS4class{LU}}, directly.
+  Class \code{\linkS4class{MatrixFactorization}}, by class
+  \code{\linkS4class{LU}}, distance 2.
+}
+\section{Instantiation}{
+  Objects can be generated directly by calls of the form
+  \code{new("sparseLU", ...)}, but they are more typically obtained
+  as the value of \code{\link{lu}(x)} for \code{x} inheriting from
+  \code{\linkS4class{sparseMatrix}} (often \code{\linkS4class{dgCMatrix}}).
 }
 \section{Methods}{
   \describe{
-    \item{expand}{\code{signature(x = "sparseLU")} Returns a list with
-      components \code{P}, \code{L}, \code{U}, and \code{Q},
-      where \eqn{P} and \eqn{Q} represent fill-reducing
-      permutations, and \eqn{L}, and \eqn{U} the lower and upper
-      triangular matrices of the decomposition.  The original matrix
-      corresponds to the product \eqn{P'LUQ}.}
-    }
+    \item{expand}{\code{signature(x = "sparseLU")}:
+      see \code{\link{expand-methods}}.}
+    \item{expand2}{\code{signature(x = "sparseLU")}:
+      see \code{\link{expand2-methods}}.}
+  }
 }
-%\references{}
-\note{
+\details{
   The decomposition is of the form
   \deqn{A = P'LUQ,}
-  %%    ---------
   or equivalently  \eqn{PAQ' = LU},
   where all matrices are sparse and of size \eqn{n\times n}{n by n}.
   The matrices \eqn{P} and \eqn{Q}, and their transposes \eqn{P'} and
@@ -52,7 +53,11 @@
   \eqn{L} is lower triangular and \eqn{U} is upper triangular.
 }
 \seealso{
-  \code{\link{lu}}, \code{\link[base]{solve}}, \code{\linkS4class{dgCMatrix}}
+  Class \code{\linkS4class{denseLU}} for dense LU factorizations.
+  
+  Class \code{\linkS4class{dgCMatrix}}.
+
+  Generic functions \code{\link{expand2}} and \code{\link{lu}}.
 }
 \examples{
 ## Extending the one in   examples(lu), calling the matrix  A,
@@ -82,4 +87,3 @@ stopifnot(all.equal(unname(pA), unname(PAQ.), tolerance = 1e-12))
 pLU <- drop0(xA$L \%*\% xA$U) # L \%*\% U -- dropping extra zeros
 stopifnot(all.equal(pA, pLU, tolerance = 1e-12)) # (incl. permuted row- and column-names)
 }
-\keyword{classes}

@@ -1,6 +1,9 @@
 \name{RsparseMatrix-class}
 \title{Class "RsparseMatrix" of Sparse Matrices in Row-compressed Form}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{RsparseMatrix-class}
 %
@@ -61,4 +64,3 @@
 \examples{
 showClass("RsparseMatrix")
 }
-\keyword{classes}

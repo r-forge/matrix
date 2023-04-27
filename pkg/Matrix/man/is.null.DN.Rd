@@ -1,6 +1,13 @@
 \name{is.null.DN}
 \title{Are the Dimnames \code{dn} NULL-like ?}
+%
+\keyword{array}
+\keyword{attribute}
+\keyword{programming}
+\keyword{utilities}
+%
 \alias{is.null.DN}
+%
 \description{
   Are the \code{\link{dimnames}} \code{dn} \code{\link{NULL}}-like?
 

@@ -1,6 +1,9 @@
 \name{lsparseMatrix-classes}
 \title{Sparse logical matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{lsparseMatrix-class}
 \alias{lgCMatrix-class}
@@ -164,5 +167,3 @@ stopifnot(isSymmetric(xlx), isSymmetric(xnx),
           sapply(slotNames(xnx),
                  function(n) identical(slot(xnx, n), slot(xlx, n))))
 }
-\keyword{classes}
-\keyword{algebra}

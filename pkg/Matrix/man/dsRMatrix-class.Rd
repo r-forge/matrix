@@ -1,6 +1,9 @@
 \name{dsRMatrix-class}
 \title{Symmetric Sparse Compressed Row Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dsRMatrix-class}
 %
@@ -72,5 +75,3 @@ str(m2)
 dR <- as(ds2, "RsparseMatrix")
 dR # dsRMatrix
 }
-\keyword{classes}
-\keyword{algebra}

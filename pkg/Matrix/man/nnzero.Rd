@@ -1,7 +1,13 @@
-\name{nnzero}
+\name{nnzero-methods}
 \title{The Number of Non-Zero Values of a Matrix}
 %
+\docType{methods}
+\keyword{array}
+\keyword{logic}
+\keyword{methods}
+%
 \alias{nnzero}
+\alias{nnzero-methods}
 %
 \alias{nnzero,ANY-method}
 \alias{nnzero,CHMfactor-method}
@@ -91,5 +97,3 @@ nnzero(M) # more relevant than length
 ## the above are also visible from
 str(M)
 }
-\keyword{attribute}
-

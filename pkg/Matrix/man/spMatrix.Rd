@@ -1,6 +1,11 @@
 \name{spMatrix}
 \title{Sparse Matrix Constructor From Triplet}
+%
+\keyword{array}
+\keyword{utilities}
+%
 \alias{spMatrix}
+%
 \description{
   User friendly construction of a sparse matrix (inheriting from class
   \code{\linkS4class{TsparseMatrix}}) from the triplet representation.
@@ -76,4 +81,3 @@ L # an "lgTMatrix"
  M1 <- rSpMatrix(100000, 20, nnz = 200)
  summary(M1)
 }
-\keyword{array}

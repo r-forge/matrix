@@ -1,7 +1,14 @@
 \name{uniqTsparse}
 \title{Unique (Sorted) TsparseMatrix Representations}
+%
+\keyword{array}
+\keyword{logic}
+\keyword{manip}
+\keyword{utilities}
+%
 \alias{uniqTsparse}
 \alias{anyDuplicatedT}
+%
 \description{
   Detect or \dQuote{unify} (or \dQuote{standardize}) non-unique
   \code{\linkS4class{TsparseMatrix}} matrices, prducing unique
@@ -91,5 +98,3 @@ stopifnot(identical(10L, which(is.na(m.0N))), !anyNA(m.1N))
 symnum(m.0N)
 symnum(m.1N)
 }
-\keyword{utilities}
-\keyword{classes}

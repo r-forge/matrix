@@ -1,7 +1,11 @@
 \name{image-methods}
 \title{Methods for image() in Package 'Matrix'}
-\docType{methods}
 %
+\docType{methods}
+\keyword{hplot}
+\keyword{methods}
+%
+\alias{image}
 \alias{image-methods}
 %
 \alias{image,ANY-method}
@@ -149,5 +153,3 @@ if(doPNG)
    ## and now look at the *.png image in a viewer you can easily zoom in and out
 }#only if(doExtras)
 }
-\keyword{methods}
-\keyword{hplot}

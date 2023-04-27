@@ -1,9 +1,11 @@
 \name{dgCMatrix-class}
 \title{Compressed, sparse, column-oriented numeric matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dgCMatrix-class}
-% 'Arith' not yet documented {untested} ... FIXME
 \alias{Arith,dgCMatrix,dgCMatrix-method}
 \alias{Arith,dgCMatrix,logical-method}
 \alias{Arith,dgCMatrix,numeric-method}
@@ -68,5 +70,3 @@ stopifnot(inherits(try(new("dgCMatrix", i = 0:1, p = 0:2,
           "try-error"))
 }
 }
-\keyword{classes}
-\keyword{algebra}

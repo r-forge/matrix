@@ -1,8 +1,12 @@
 \name{chol2inv-methods}
 \title{Inverse from Choleski or QR Decomposition -- Matrix Methods}
-\docType{methods}
 %
-%\alias{chol2inv} % needed if we want \usage{}
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
+%
+\alias{chol2inv}
 \alias{chol2inv-methods}
 %
 \alias{chol2inv,ANY-method}
@@ -56,5 +60,3 @@
 chol2inv(cM) \%*\% M # the identity
 stopifnot(all(chol2inv(cM) \%*\% M - Diagonal(nrow(M))) < 1e-10)
 }
-\keyword{methods}
-\keyword{algebra}

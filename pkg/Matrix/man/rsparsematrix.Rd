@@ -1,6 +1,12 @@
 \name{rsparsematrix}
 \title{Random Sparse Matrix}
+%
+\keyword{array}
+\keyword{distribution}
+\keyword{utilities}
+%
 \alias{rsparsematrix}
+%
 \description{
   Generate a random sparse matrix efficiently.  The default has rounded
   gaussian non-zero entries, and \code{rand.x = NULL} generates random
@@ -68,5 +74,3 @@ nnzero(S9)# ~ 20: as 'nnz' only counts one "triangle"
 T2 <- rsparsematrix(40, 12, nnz = 99, repr = "T")
 head(T2)
 }
-\keyword{array}
-\keyword{distribution}

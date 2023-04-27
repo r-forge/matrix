@@ -1,6 +1,9 @@
 \name{nsparseMatrix-classes}
 \title{Sparse "pattern" Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{nsparseMatrix-class}
 \alias{ngCMatrix-class}
@@ -151,5 +154,3 @@ str(xlx <- crossprod(nmm))# "nsCMatrix"
 stopifnot(isSymmetric(xlx))
 image(xlx, main=paste("crossprod(nmm) : Sparse", class(xlx)))
 }
-\keyword{classes}
-\keyword{algebra}

@@ -1,6 +1,10 @@
 \name{BunchKaufman-methods}
 \title{Methods for Bunch-Kaufman Factorization}
+%
 \docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
 %
 \alias{BunchKaufman}
 \alias{BunchKaufman-methods}
@@ -92,4 +96,3 @@ stopifnot(is(bk.M,   "triangularMatrix"),
           is(bk.M.s, "triangularMatrix"),
           is(bk.M.s,    "CsparseMatrix"))
 }
-\keyword{methods}

@@ -1,6 +1,10 @@
 \name{diagU2N}
 \title{Transform Triangular Matrices from Unit Triangular to General Triangular and Back}
 %
+\keyword{array}
+\keyword{attribute}
+\keyword{utilities}
+%
 \alias{diagU2N}
 \alias{diagN2U}
 \alias{.diagU2N}

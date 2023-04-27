@@ -1,7 +1,12 @@
 \name{rankMatrix}
 \title{Rank of a Matrix}
+%
+\keyword{algebra}
+\keyword{utilities}
+%
 \alias{rankMatrix}
 \alias{qr2rankMatrix}
+%
 \description{
   Compute \sQuote{the} matrix rank, a well-defined functional in theory(*),
   somewhat ambiguous in practice.  We provide several methods, the
@@ -192,5 +197,3 @@ stopifnot(rankMatrix(D,           method='qr') == 148,
 stopifnot(sapply(meths, function(.m.)
                         rankMatrix(matrix(0, 2, 2), method = .m.)) == 0)
 }
-\keyword{algebra}
-\keyword{array}

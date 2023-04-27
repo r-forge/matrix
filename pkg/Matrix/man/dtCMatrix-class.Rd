@@ -1,13 +1,14 @@
 \name{dtCMatrix-class}
 \title{Triangular, (compressed) sparse column matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dtCMatrix-class}
 \alias{dtTMatrix-class}
 %
 \alias{Arith,dtCMatrix,dtCMatrix-method}
-%
-
 %
 \description{The \code{"dtCMatrix"} class is a class of triangular, sparse
   matrices in the compressed, column-oriented format.  In this
@@ -118,5 +119,3 @@ stopifnot(
 )
 }%dont
 }
-\keyword{classes}
-\keyword{algebra}

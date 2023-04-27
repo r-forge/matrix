@@ -1,6 +1,9 @@
 \name{dMatrix-class}
 \title{(Virtual) Class "dMatrix" of "double" Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dMatrix-class}
 \alias{lMatrix-class}
@@ -123,5 +126,3 @@
  (M. <- zapsmall(M))
  table(as.logical(M. == 0))
 }
-\keyword{classes}
-\keyword{algebra}

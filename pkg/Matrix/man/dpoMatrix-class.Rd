@@ -1,6 +1,9 @@
 \name{dpoMatrix-class}
 \title{Positive Semi-definite Dense (Packed | Non-packed) Numeric Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dpoMatrix-class}
 \alias{dppMatrix-class}
@@ -140,5 +143,3 @@ chch <- chol(ch6)
 stopifnot(identical(chch, ch6@factors$Cholesky),
           all(abs(crossprod(chch) - ch6) < 1e-10))
 }
-\keyword{classes}
-\keyword{algebra}

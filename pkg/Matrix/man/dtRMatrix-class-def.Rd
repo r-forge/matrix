@@ -1,6 +1,9 @@
 \name{dtRMatrix-class}
 \title{Triangular Sparse Compressed Row Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{dtRMatrix-class}
 %
@@ -77,5 +80,3 @@ Class \code{"Matrix"}, by class \code{"dgRMatrix"}.
 str(m2)
 (m3 <- as(Diagonal(2), "RsparseMatrix"))# --> dtRMatrix
 }
-\keyword{classes}
-\keyword{algebra}

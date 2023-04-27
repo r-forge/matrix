@@ -1,7 +1,13 @@
-\name{expm}
+\name{expm-methods}
 \title{Matrix Exponential}
 %
+\docType{methods}
+\keyword{array}
+\keyword{math}
+\keyword{methods}
+%
 \alias{expm}
+\alias{expm-methods}
 %
 \alias{expm,Matrix-method}
 \alias{expm,dMatrix-method}
@@ -69,5 +75,3 @@ stopifnot(all.equal(e1@x, c(e,0,e,e), tolerance = 1e-15))
 (m3 <- Matrix(cbind(0,rbind(6*diag(3),0))))# sparse!
 (e3 <- expm(m3)) # upper triangular
 }
-\keyword{algebra}
-\keyword{math}

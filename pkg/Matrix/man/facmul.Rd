@@ -1,7 +1,14 @@
-\name{facmul}
+\name{facmul-methods}
 \title{Multiplication by Decomposition Factors}
+%
+\docType{methods}
+\keyword{arith}
+\keyword{array}
+\keyword{methods}
+%
 \alias{facmul}
-\alias{facmul.default}
+\alias{facmul-methods}
+%
 \description{
     Performs multiplication by factors for certain decompositions (and
     allows explicit formation of those factors).

@@ -1,8 +1,14 @@
-\name{Cholesky}
-\concept{Choleski} % alternate English spelling
+\name{Cholesky-methods}
 \title{Cholesky Decomposition of a Sparse Matrix}
 %
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
+\concept{Choleski} % alternate English spelling
+%
 \alias{Cholesky}
+\alias{Cholesky-methods}
 %
 \alias{Cholesky,denseMatrix-method}
 \alias{Cholesky,dsCMatrix-method}
@@ -163,5 +169,3 @@ stopifnot(all.equal(dd,dc))
 # Version of the underlying SuiteSparse library by Tim Davis :
 .SuiteSparse_version()
 }
-\keyword{array}
-\keyword{algebra}

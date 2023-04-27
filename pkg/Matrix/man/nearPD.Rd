@@ -1,6 +1,12 @@
 \name{nearPD}
 \title{Nearest Positive Definite Matrix}
+%
+\keyword{algebra}
+\keyword{array}
+\keyword{utilities}
+%
 \alias{nearPD}
+%
 \description{
  Compute the nearest positive definite matrix to an approximate
  one, typically a correlation or variance-covariance matrix.
@@ -182,5 +188,3 @@ if(require("sfsmisc")) {
 abline(0,1, col="red3",lty=2)
 
 }
-\keyword{algebra}
-\keyword{array}

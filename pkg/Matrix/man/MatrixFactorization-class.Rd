@@ -1,56 +1,89 @@
 \name{MatrixFactorization-class}
-\title{Class "MatrixFactorization" of Matrix Factorizations}
+\title{Virtual Class "MatrixFactorization" of Matrix Factorizations}
+%
 \docType{class}
+\keyword{algebra}
+\keyword{array}
+\keyword{classes}
 %
 \alias{MatrixFactorization-class}
+%
+\alias{BunchKaufmanFactorization-class}
 \alias{CholeskyFactorization-class}
+\alias{SchurFactorization-class}
+\alias{LU-class}
+\alias{QR-class}
 %
 \alias{determinant,MatrixFactorization,missing-method}
 \alias{dim,MatrixFactorization-method}
 \alias{dimnames,MatrixFactorization-method}
-\alias{show,CholeskyFactorization-method}
 \alias{show,MatrixFactorization-method}
 %
+\alias{show,BunchKaufmanFactorization-method}
+\alias{show,CholeskyFactorization-method}
+\alias{show,SchurFactorization-method}
+\alias{show,LU-method}
+\alias{show,QR-method}
+%
 \description{
-  The class \code{"MatrixFactorization"} is the virtual (super) class of
-  (potentially) all matrix factorizations of matrices from package
-  \pkg{Matrix}.
-
-  The class \code{"CholeskyFactorization"} is the virtual class of all
-  Cholesky decompositions from \pkg{Matrix} (and trivial sub class of
-  \code{"MatrixFactorization"}).
+  \code{MatrixFactorization} is the virtual class of matrix factorizations.
+  
+  \code{CholeskyFactorization}, \code{BunchKaufmanFactorization},
+  \code{SchurFactorization}, \code{LU}, and \code{QR} are the virtual
+  subclasses of \code{MatrixFactorization} containing all Cholesky,
+  Bunch-Kaufman, Schur, LU, and QR factorizations, respectively.
 }
-\section{Objects from the Class}{A virtual Class: No objects may be
-  created from it.}
 \section{Slots}{
   \describe{
-    \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
-      of the original matrix - must be an integer vector with exactly two
-      non-negative values.}
+    \item{\code{Dim}}{an integer vector of length 2 giving the
+      dimensions of the factorized matrix.}
+    \item{\code{Dimnames}}{a list of length 2 preserving the
+      \code{dimnames} of the factorized matrix.  Each element
+      must be \code{NULL} or a character vector of length equal
+      to the corresponding element of \code{Dim}.}
   }
 }
 \section{Methods}{
   \describe{
-    \item{dim}{\code{(x)} simply returns \code{x@Dim}, see above.}
-    \item{expand}{\code{signature(x = "MatrixFactorization")}: this has
-      not been implemented yet for all matrix factorizations. It should
-      return a list whose components are matrices which when multiplied
-      return the original \code{\linkS4class{Matrix}} object.}
-    \item{show}{\code{signature(object = "MatrixFactorization")}: simple
-      printing, see \code{\link{show}}.}
-    \item{solve}{\code{signature(a = "MatrixFactorization", b= .)}: solve
-      \eqn{A x = b} for \eqn{x}; see \code{\link{solve-methods}}.}
+    \item{determinant}{\code{signature(x = "MatrixFactorization", logarithm = "missing")}:
+      sets \code{logarithm = TRUE} and recalls the generic function.}
+    \item{dim}{\code{signature(x = "MatrixFactorization")}:
+      returns \code{x@Dim}.}
+    \item{dimnames}{\code{signature(x = "MatrixFactorization")}:
+      returns \code{x@Dimnames}.}
+    \item{show}{\code{signature(object = "MatrixFactorization")}:
+      prints the internal representation of the factorization using
+      \code{\link{str}}.}
+    \item{solve}{\code{signature(a = "MatrixFactorization", b = .)}:
+      see \code{\link{solve-methods}}.}
   }
 }
 \seealso{
-  classes inheriting from \code{"MatrixFactorization"}, such as
-  \code{\linkS4class{LU}},
-  \code{\linkS4class{Cholesky}},
-  \code{\linkS4class{CHMfactor}}, and
-  \code{\linkS4class{sparseQR}}.
+  The virtual class \code{\linkS4class{compMatrix}}
+  of \emph{factorizable} matrices.
+  
+  Classes extending \code{CholeskyFactorization}, namely
+  \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
+  and \code{\linkS4class{CHMfactor}}.
+
+  Classes extending \code{BunchKaufmanFactorization}, namely
+  \code{\linkS4class{BunchKaufman}} and \code{\linkS4class{pBunchKaufman}}.
+
+  Classes extending \code{SchurFactorization}, namely
+  \code{\linkS4class{Schur}}.
+
+  Classes extending \code{LU}, namely
+  \code{\linkS4class{denseLU}} and \code{\linkS4class{sparseLU}}.
+  
+  Classes extending \code{QR}, namely \code{\linkS4class{sparseQR}}.
+  
+  Generic functions \code{\link{chol}}, \code{\link{Cholesky}},
+  \code{\link{BunchKaufman}}, \code{\link{Schur}}, \code{\link{lu}},
+  and \code{\link{qr}} for \emph{computing} factorizations.
+
+  Generic function \code{\link{expand2}} for constructing
+  matrix factors from \code{MatrixFactorization} objects.
 }
 \examples{
 showClass("MatrixFactorization")
-getClass("CholeskyFactorization")
 }
-\keyword{classes}

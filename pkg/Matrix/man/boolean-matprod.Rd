@@ -1,10 +1,15 @@
-\name{\%&\%-methods}
+\name{boolmatmult-methods}
 \title{Boolean Arithmetic Matrix Products: \code{\%&\%} and Methods}
-\docType{methods}
 %
-\concept{boolean matrix products}
+\docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{logic}
+\keyword{methods}
+%
 \alias{\%&\%}
 \alias{\%&\%-methods}
+\alias{boolmatmult-methods}
 %
 \alias{\%&\%,ANY,ANY-method}
 \alias{\%&\%,ANY,Matrix-method}
@@ -143,4 +148,3 @@ crossprod(D, boolArith =  TRUE) # pattern: "nsCMatrix"
 crossprod(L, boolArith =  TRUE) #  ditto
 crossprod(L, boolArith = FALSE) # numeric: "dsCMatrix"
 }
-\keyword{methods}

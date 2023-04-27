@@ -1,6 +1,9 @@
 \name{unpackedMatrix-class}
 \title{Virtual Class \code{"unpackedMatrix"} of Unpacked Dense Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{unpackedMatrix-class}
 %
@@ -60,4 +63,3 @@
 showClass("unpackedMatrix")
 showMethods(classes = "unpackedMatrix")
 }
-\keyword{classes}

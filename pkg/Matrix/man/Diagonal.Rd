@@ -1,6 +1,9 @@
 \name{Diagonal}
 \title{Construct a Diagonal Matrix}
 %
+\keyword{array}
+\keyword{utilities}
+%
 \alias{Diagonal}
 \alias{.sparseDiagonal}
 \alias{.trDiagonal}
@@ -104,5 +107,3 @@ stopifnot(I4@diag == "U", all(I4 == diag(4)))
   stopifnot(L@diag == "U", identical(L, Diagonal(5) > 0))
 }
 }
-\keyword{array}
-\keyword{algebra}

@@ -1,6 +1,9 @@
 \name{indMatrix-class}
 \title{Index Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{indMatrix-class}
 %
@@ -9,7 +12,6 @@
 \alias{as.logical,indMatrix-method}
 \alias{as.numeric,indMatrix-method}
 \alias{as.vector,indMatrix-method}
-\alias{cbind2,indMatrix,indMatrix-method}
 \alias{coerce,indMatrix,CsparseMatrix-method}
 \alias{coerce,indMatrix,RsparseMatrix-method}
 \alias{coerce,indMatrix,TsparseMatrix-method}
@@ -35,7 +37,6 @@
 \alias{coerce,numeric,indMatrix-method}
 \alias{diag,indMatrix-method}
 \alias{diag<-,indMatrix-method}
-\alias{rbind2,indMatrix,indMatrix-method}
 \alias{t,indMatrix-method}
 %
 \description{
@@ -195,4 +196,3 @@ stopifnot(is(I12, "indMatrix"),
           identical(I12, rbind(I1, I2)),
 	  colSums(I12) == c(2L,2:4,4:2))
 }
-\keyword{classes}

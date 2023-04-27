@@ -1,6 +1,9 @@
 \name{ltrMatrix-class}
 \title{Triangular Dense Logical Matrices}
+%
 \docType{class}
+\keyword{array}
+\keyword{classes}
 %
 \alias{ltrMatrix-class}
 \alias{ltpMatrix-class}
@@ -56,4 +59,3 @@ str(lutp <- pack(lutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
 ## but this one is:
 stopifnot(all.equal(lutp, pack(!!lutp)))
 }
-\keyword{classes}

@@ -1,14 +1,19 @@
 \name{qr-methods}
 \title{QR Decomposition -- S4 Methods and Generic}
+%
 \docType{methods}
+\keyword{algebra}
+\keyword{array}
+\keyword{methods}
 %
 \alias{qr}
 \alias{qr-methods}
-\alias{qrR}
 %
 \alias{qr,denseMatrix-method} % if(.Matrix.avoiding.as.matrix)
 \alias{qr,dgCMatrix-method}
 \alias{qr,sparseMatrix-method}
+%
+\alias{qrR}
 %
 \description{
   The \pkg{Matrix} package provides methods for the QR decomposition

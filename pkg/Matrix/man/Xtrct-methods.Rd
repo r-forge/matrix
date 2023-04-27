@@ -1,8 +1,13 @@
-\name{[-methods}
+\name{Subscript-methods}
 \title{Methods for "[": Extraction or Subsetting in Package 'Matrix'}
-\docType{methods}
 %
+\docType{methods}
+\keyword{array}
+\keyword{methods}
+%
+\alias{[}
 \alias{[-methods}
+\alias{Subscript-methods}
 %
 \alias{[,Matrix,ANY,NULL,ANY-method}
 \alias{[,Matrix,NULL,ANY,ANY-method}
@@ -57,5 +62,3 @@ m[,1:2]   # sub matrix of first two columns
 
 showMethods("[", inherited = FALSE)
 }
-\keyword{methods}
-\keyword{array}

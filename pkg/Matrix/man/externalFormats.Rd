@@ -1,6 +1,12 @@
 \name{externalFormats}
 \title{Read and write external matrix formats}
 %
+\docType{methods}
+\keyword{connection}
+\keyword{file}
+\keyword{methods}
+\keyword{utilities}
+%
 \alias{readHB}
 \alias{readMM}
 %\alias{writeHB}
@@ -93,6 +99,3 @@ str(dd <- read.table(outf, header=TRUE))
 mm <- do.call(sparseMatrix, dd)
 stopifnot(all.equal(mm, CAex, tolerance=1e-15))
 }
-\keyword{IO}
-\keyword{array}
-\keyword{algebra}
