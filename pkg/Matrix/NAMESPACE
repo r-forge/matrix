@@ -348,7 +348,7 @@ exportClasses(Matrix, # and its subclasses .............................
               dpoMatrix,
 	      dppMatrix,
               corMatrix,
-              ## copMatrix,
+              pcorMatrix,
 
               dsparseMatrix,
               dgCMatrix,
@@ -394,12 +394,13 @@ exportClasses(Matrix, # and its subclasses .............................
               denseLU,
 	      sparseLU,
 
-              ## QR,
+              QR,
               ## denseQR,
               sparseQR,
 
               Schur,
 
+              BunchKaufmanFactorization,
               BunchKaufman,
 	      pBunchKaufman,
 

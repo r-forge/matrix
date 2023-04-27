@@ -575,48 +575,26 @@ setClass("sparseLU", contains = "LU",
          prototype = list(L = .new("dtCMatrix", uplo = "L")),
          validity = function(object) .Call(sparseLU_validate, object))
 
-## unused:
-if(FALSE) {
-setClass("csn_LU",
-         slots = c(L = "dgCMatrix", U = "dgCMatrix", Pinv = "integer"))
-setClass("css_LU",
-         slots = c(Q = "integer", nz = "integer"))
-}
-
 
 ## ------ QR -----------------------------------------------------------
+
+setClass("QR", contains = c("MatrixFactorization", "VIRTUAL"))
 
 if(FALSE) {
 ## MJ: It would nice to have symmetry with LU, but then we would need
 ##     to define methods already available for S3 class 'qr'.  Still ...
-setClass("QR", contains = c("MatrixFactorization", "VIRTUAL"))
-
 setClass("denseQR", contains = "QR",
          ## based on S3 class 'qr':
-         slots = c(x = "numeric", qraux = "numeric",
+         slots = c(qr = "numeric", qraux = "numeric",
                    rank = "integer", pivot = "integer",
                    useLAPACK = "logical"),
          validity = function(object) .Call(denseQR_validate, object))
+}
 
 setClass("sparseQR", contains = "QR",
 	 slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
 		   p = "integer", q = "integer"),
 	 validity = function(object) .Call(sparseQR_validate, object))
-} else {
-setClass("sparseQR", contains = "MatrixFactorization",
-	 slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
-		   p = "integer", q = "integer"),
-	 validity = function(object) .Call(sparseQR_validate, object))
-}
-
-## unused:
-if(FALSE) {
-setClass("csn_QR",
-         slots = c(L = "dgCMatrix", U = "dgCMatrix", beta = "numeric"))
-setClass("css_QR",
-         slots = c(Q = "integer", Pinv = "integer",
-                   nz = "integer", cp = "integer", parent = "integer"))
-}
 
 
 ## ------ Cholesky -----------------------------------------------------
@@ -632,11 +610,6 @@ setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"),
 
 setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
          validity = function(object) .Call(pCholesky_validate, object))
-
-## unused:
-if(FALSE) {
-setClass("LDL", contains = c("dtrMatrix", "CholeskyFactorization"))
-}
 
 
 ## ...... Sparse .......................................................
@@ -668,9 +641,12 @@ setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
 
 ## ------ Bunch-Kaufman ------------------------------------------------
 
+setClass("BunchKaufmanFactorization",
+         contains = c("MatrixFactorization", "VIRTUAL"))
+
 ## Inherit most aspects of dt[rp]Matrix without extending them
 
-setClass("BunchKaufman", contains = "MatrixFactorization",
+setClass("BunchKaufman", contains = "BunchKaufmanFactorization",
 	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
 	 validity = function(object) {
@@ -684,7 +660,7 @@ setClass("BunchKaufman", contains = "MatrixFactorization",
              else .Call(BunchKaufman_validate, object)
          })
 
-setClass("pBunchKaufman", contains = "MatrixFactorization",
+setClass("pBunchKaufman", contains = "BunchKaufmanFactorization",
 	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
 	 validity = function(object) {
@@ -704,7 +680,9 @@ setClass("pBunchKaufman", contains = "MatrixFactorization",
 ## For eigenvalues:
 setClassUnion("number", members = c("numeric", "complex"))
 
-setClass("Schur", contains = "MatrixFactorization",
+setClass("SchurFactorization", contains = c("MatrixFactorization", "VIRTUAL"))
+
+setClass("Schur", contains = "SchurFactorization",
          slots = c(Q = "Matrix", T = "Matrix", EValues = "number"),
          prototype = list(Q = .new("dgeMatrix"), T = .new("dtrMatrix")),
          validity = function(object) .Call(Schur_validate, object))
@@ -930,11 +908,6 @@ setClass("determinant",
                  "'sign' slot is not -1 or 1"
              else TRUE
          })
-
-## unused:
-if(FALSE) {
-setClass("logic", contains = "raw") # "raw" rather than "logical"
-}
 
 
 ########################################################################

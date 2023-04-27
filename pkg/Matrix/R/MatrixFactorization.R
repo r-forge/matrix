@@ -14,21 +14,33 @@ setMethod("show", "MatrixFactorization",
 	      str(object)
 	  })
 
+setMethod("show", "CholeskyFactorization",
+          function(object) {
+              cat("Cholesky factorization of ")
+              str(object)
+          })
+
+setMethod("show", "BunchKaufmanFactorization",
+          function(object) {
+              cat("Bunch-Kaufman factorization of ")
+              str(object)
+          })
+
+setMethod("show", "SchurFactorization",
+	  function(object) {
+	      cat("Schur factorization of ")
+	      str(object)
+	  })
+
 setMethod("show", "LU",
           function(object) {
               cat("LU factorization of ")
               str(object)
           })
 
-setMethod("show", "sparseQR", # no virtual class "QR" yet
+setMethod("show", "QR",
           function(object) {
               cat("QR factorization of ")
-              str(object)
-          })
-
-setMethod("show", "CholeskyFactorization",
-          function(object) {
-              cat("Cholesky factorization of ")
               str(object)
           })
 
@@ -39,21 +51,3 @@ setMethod("show", "Cholesky",
 
 setMethod("show", "pCholesky",
           function(object) prMatrix(object))
-
-setMethod("show", "BunchKaufman",
-	  function(object) {
-	      cat("Bunch-Kaufman factorization of ")
-	      str(object)
-	  })
-
-setMethod("show", "pBunchKaufman",
-	  function(object) {
-	      cat("Bunch-Kaufman factorization of ")
-	      str(object)
-	  })
-
-setMethod("show", "Schur",
-	  function(object) {
-	      cat("Schur factorization of ")
-	      str(object)
-	  })
