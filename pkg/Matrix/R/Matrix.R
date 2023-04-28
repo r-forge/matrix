@@ -31,23 +31,76 @@ setAs("Matrix", "numeric", function(from) as.numeric(as(from, "matrix")))
 setAs("Matrix", "complex", function(from) as.complex(as(from, "matrix")))
 
 
-#### Toplevel ``virtual'' class "Matrix"
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## MJ: no longer needed ... have methods for all relevant subclasses
-if(FALSE) {
-### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
-setAs("Matrix", "CsparseMatrix", function(from) as_Csparse(from))
-setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
-setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
-} ## MJ
+setMethod("dim", signature(x = "Matrix"),
+          function(x) x@Dim)
 
+setMethod("length", "Matrix",
+          function(x) prod(x@Dim))
 
-## head and tail apply to all Matrix objects for which subscripting is allowed:
-setMethod("head", signature(x = "Matrix"), head.matrix)
-setMethod("tail", signature(x = "Matrix"), tail.matrix)
+setMethod("dimnames", signature(x = "Matrix"),
+          function(x) x@Dimnames)
+
+setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
+          function(x, value) {
+              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
+	  function(x, value) {
+              x@Dimnames <- list(NULL, NULL)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
+          function(x, value) {
+              if(length(x@factors))
+                  x@factors <- list()
+              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
+          function(x, value) {
+              if(length(x@factors))
+                  x@factors <- list()
+              x@Dimnames <- list(NULL, NULL)
+              x
+          })
+
+setMethod("unname", signature(obj = "Matrix"),
+	  function(obj, force = FALSE) {
+              obj@Dimnames <- list(NULL, NULL)
+              obj
+          })
 
 setMethod("drop", signature(x = "Matrix"),
-	  function(x) if(all(x@Dim != 1L)) x else drop(as(x, "matrix")))
+	  function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
+
+## These work nicely as long as methods are defined for '[' :
+setMethod("head", signature(x = "Matrix"),
+          head.matrix)
+setMethod("tail", signature(x = "Matrix"),
+          tail.matrix)
+setMethod("diff", signature(x = "Matrix"),
+          ## Mostly cut and paste of 'base::diff.default' :
+          function(x, lag = 1L, differences = 1L, ...) {
+              if(length(lag) != 1L || length(differences) > 1L ||
+                  lag < 1L || differences < 1L)
+                  stop("'lag' and 'differences' must be integers >= 1")
+              if(lag * differences >= x@Dim[1L])
+                  return(x[0L])
+              i1 <- -seq_len(lag)
+              for(i in seq_len(differences)) {
+                  m <- x@Dim[1L]
+                  x <- x[i1, , drop = FALSE] -
+                      x[-m:-(m - lag + 1L), , drop = FALSE]
+              }
+              x
+          })
+
 
 if(FALSE) { ## still does not work for c(1, Matrix(2))
 ## For the same reason (and just in case) also do both S3 and S4 here:
@@ -58,6 +111,13 @@ setMethod("c", "Matrix", function(x, ..., recursive) c.Matrix(x, ...))
 setMethod("c", "numMatrixLike", function(x, ..., recursive) c.Matrix(x, ...))
 }# not yet
 
+## MJ: no longer needed ... have methods for all relevant subclasses
+if(FALSE) {
+### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
+setAs("Matrix", "CsparseMatrix", function(from) as_Csparse(from))
+setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
+setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
+} ## MJ
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
@@ -71,45 +131,18 @@ setMethod("skewpart", signature(x = "matrix"),
           function(x) symmetrizeDimnames(x - t(x)) / 2)
 } ## MJ
 
-setMethod("dim", signature(x = "Matrix"), function(x) x@Dim)
+## MJ: no longer needed as methods are available for all subclasses
+if(FALSE) {
+setMethod("diag", signature(x = "Matrix"),
+	  function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
+setMethod("diag<-", signature(x = "Matrix"),
+	  function(x, value) .bail.out.1("diag", class(x)))
+setMethod("t", signature(x = "Matrix"),
+	  function(x) .bail.out.1(.Generic, class(x)))
+setMethod("chol", signature(x = "Matrix"),
+	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
+} ## MJ
 
-setMethod("length", "Matrix", function(x) prod(x@Dim))
-
-setMethod("dimnames", signature(x = "Matrix"), function(x) x@Dimnames)
-
-## not exported but used more than once for "dimnames<-" method :
-## -- or do only once for all "Matrix" classes ??
-dimnamesGets <- function(x, value) {
-    if (is.character(s <- validDN(value, dim(x)))) stop(s)
-    x@Dimnames <- fixupDN(value)
-    x
-}
-dimnamesGetsNULL <- function(x) {
-    message("dimnames(.) <- NULL translated to\ndimnames(.) <- list(NULL,NULL)")
-    x@Dimnames <- list(NULL, NULL)
-    x
-}
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
-          dimnamesGets)
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
-	  function(x, value) dimnamesGetsNULL(x))
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
-          function(x, value) {
-              if(length(x@factors)) x@factors <- list()
-              dimnamesGets(x, value)
-          })
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
-          function(x, value) {
-              if(length(x@factors)) x@factors <- list()
-              dimnamesGetsNULL(x)
-          })
-
-setMethod("unname", signature("Matrix", force = "missing"),
-	  function(obj) { obj@Dimnames <- list(NULL, NULL); obj})
 
 if(FALSE) {
 ## This version was used in Matrix <= 1.4-1 but has several "bugs":
@@ -372,18 +405,6 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     else tril(data)
 }
 }
-
-## MJ: no longer needed as methods are available for all subclasses
-if(FALSE) {
-setMethod("diag", signature(x = "Matrix"),
-	  function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
-setMethod("t", signature(x = "Matrix"),
-	  function(x) .bail.out.1(.Generic, class(x)))
-setMethod("chol", signature(x = "Matrix"),
-	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
-setMethod("diag<-", signature(x = "Matrix"),
-	  function(x, value) .bail.out.1("diag", class(x)))
-} ## MJ
 
 
 ## We want to use all.equal.numeric() *and* make sure that uses

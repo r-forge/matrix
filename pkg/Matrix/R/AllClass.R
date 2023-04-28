@@ -8,9 +8,6 @@
 ## the 'contains' recursively!!
 
 
-## NB: must be defined _here_ and _not_ be migrated to ./Auxiliaries.R
-fixupDN <- function(dn) .Call(R_DimNames_fixup, dn)
-
 ## initialize() method for Matrix and MatrixFactorization, which both
 ## allow Dimnames[[i]] to be a vector of type other than "character"
 ## and furthermore to be a vector of length zero rather than NULL ...

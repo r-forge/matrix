@@ -66,7 +66,7 @@
 \alias{initialize,Matrix-method}
 \alias{length,Matrix-method}
 \alias{tail,Matrix-method}
-\alias{unname,Matrix,missing-method}
+\alias{unname,Matrix-method}
 %
 \alias{det} % for our copy of base::det
 %
