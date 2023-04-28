@@ -64,8 +64,6 @@
 \alias{dimnames<-,Matrix,NULL-method}
 \alias{dimnames<-,Matrix,list-method}
 \alias{drop,Matrix-method}
-\alias{eigen,Matrix,ANY,logical-method} % if(.Matrix.avoiding.as.matrix)
-\alias{eigen,Matrix,ANY,missing-method} % if(.Matrix.avoiding.as.matrix)
 \alias{head,Matrix-method}
 \alias{initialize,Matrix-method}
 \alias{length,Matrix-method}
@@ -73,7 +71,6 @@
 \alias{rep,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{unname,Matrix,missing-method}
-\alias{svd,Matrix-method} % if(.Matrix.avoiding.as.matrix)
 %
 \alias{det} % for our copy of base::det
 \alias{print.Matrix} % spoof, only so that users find this topic
@@ -147,7 +144,6 @@
   %% --> ../tests/base-matrix-fun.R
 }
 \note{
-  %% Matrix.avoding.as.matrix  is in __contradiction__ to this (since 2005-09-30 !):
   Loading the \code{Matrix} namespace \dQuote{overloads}
   \code{\link{as.matrix}} and \code{\link{as.array}} in the \pkg{base}
   namespace by the equivalent of \code{function(x) as(x, "matrix")}.

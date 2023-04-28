@@ -9,7 +9,6 @@
 \alias{qr}
 \alias{qr-methods}
 %
-\alias{qr,denseMatrix-method} % if(.Matrix.avoiding.as.matrix)
 \alias{qr,dgCMatrix-method}
 \alias{qr,sparseMatrix-method}
 %

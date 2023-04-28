@@ -17,21 +17,8 @@ setAs("Matrix", "matrix", # do *not* call base::as.matrix() here:
       function(from) .bail.out.2("coerce", class(from), class(to)))
 setAs("matrix", "Matrix", function(from) Matrix(from))
 
-## Such that also base functions dispatch properly on our classes:
-if(.Matrix.avoiding.as.matrix) {
-    as.matrix.Matrix <- function(x, ...) {
-        if(nonTRUEoption("Matrix.quiet.as.matrix") &&
-           nonTRUEoption("Matrix.quiet"))
-            warning("as.matrix(<Matrix>) is deprecated (to become a no-op in the future).\nUse  as(x, \"matrix\")  instead.")
-        as(x, "matrix")
-    }
-    as.array.Matrix <- function(x, ...) {
-        warning("as.array(<Matrix>) is deprecated. Use  as(x, \"matrix\")  instead.")
-        as(x, "matrix")
-    }
-} else { ## regularly -- documented since 2005 that this works
-    as.array.Matrix <- as.matrix.Matrix <- function(x, ...) as(x, "matrix")
-}
+## documented since 2005 that this works
+as.array.Matrix <- as.matrix.Matrix <- function(x, ...) as(x, "matrix")
 
 ## should propagate to all subclasses:
 setMethod("as.matrix", signature(x = "Matrix"),
