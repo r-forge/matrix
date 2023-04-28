@@ -47,7 +47,6 @@
 \alias{coerce,Matrix,indMatrix-method}
 \alias{coerce,Matrix,integer-method}
 \alias{coerce,Matrix,logical-method}
-\alias{coerce,Matrix,matrix-method}
 \alias{coerce,Matrix,numeric-method}
 \alias{coerce,Matrix,pMatrix-method}
 \alias{coerce,Matrix,pcorMatrix-method}

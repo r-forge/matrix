@@ -1,3 +1,36 @@
+## METHODS FOR CLASS: Matrix (virtual)
+## mother class containing all matrices
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setAs(   "ANY", "Matrix", function(from) Matrix(as.matrix(from)))
+setAs("matrix", "Matrix", function(from) Matrix(          from ))
+
+## Need 'base' functions calling as.*() to dispatch to our S4 methods:
+as.vector.Matrix <- function(x, mode = "any") as.vector(as(x, "matrix"), mode)
+as.matrix.Matrix <- function(x, ...)                    as(x, "matrix")
+ as.array.Matrix  <- function(x, ...)                   as(x, "matrix")
+
+## FIXME: compare with methods for subclasses; avoid duplication
+
+setMethod("as.vector", signature(x = "Matrix"), as.vector.Matrix)
+setMethod("as.matrix", signature(x = "Matrix"), as.matrix.Matrix)
+setMethod( "as.array", signature(x = "Matrix"),  as.array.Matrix)
+
+setMethod("as.logical", signature(x = "Matrix"),
+	  function(x, ...) as.logical(as.vector(x)))
+setMethod("as.numeric", signature(x = "Matrix"),
+	  function(x, ...) as.numeric(as.vector(x)))
+
+setAs("Matrix",  "vector", function(from)  as.vector(as(from, "matrix")))
+setAs("Matrix", "logical", function(from) as.logical(as(from, "matrix")))
+setAs("Matrix", "integer", function(from) as.integer(as(from, "matrix")))
+setAs("Matrix", "numeric", function(from) as.numeric(as(from, "matrix")))
+setAs("Matrix", "complex", function(from) as.complex(as(from, "matrix")))
+
+
 #### Toplevel ``virtual'' class "Matrix"
 
 ## MJ: no longer needed ... have methods for all relevant subclasses
@@ -8,24 +41,6 @@ setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
 setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
 } ## MJ
 
-## Anything: we build on  as.matrix(.) :
-## ---       authors can always provide their own specific  setAs(*, "Matrix")
-setAs("ANY", "Matrix", function(from) Matrix(as.matrix(from)))
-
-## Most of these work; this is a last resort:
-setAs("Matrix", "matrix", # do *not* call base::as.matrix() here:
-      function(from) .bail.out.2("coerce", class(from), class(to)))
-setAs("matrix", "Matrix", function(from) Matrix(from))
-
-## documented since 2005 that this works
-as.array.Matrix <- as.matrix.Matrix <- function(x, ...) as(x, "matrix")
-
-## should propagate to all subclasses:
-setMethod("as.matrix", signature(x = "Matrix"),
-          function(x, ...) as(x, "matrix"))
-## for 'Matrix' objects, as.array() should be equivalent:
-setMethod("as.array",  signature(x = "Matrix"),
-          function(x, ...) as(x, "matrix"))
 
 ## head and tail apply to all Matrix objects for which subscripting is allowed:
 setMethod("head", signature(x = "Matrix"), head.matrix)
@@ -33,13 +48,6 @@ setMethod("tail", signature(x = "Matrix"), tail.matrix)
 
 setMethod("drop", signature(x = "Matrix"),
 	  function(x) if(all(x@Dim != 1L)) x else drop(as(x, "matrix")))
-
-## slow "fall back" method {subclasses should have faster ones}:
-setMethod("as.vector", "Matrix",
-	  function(x, mode) as.vector(as(x, "matrix"), mode))
-## so base functions calling as.vector() work too:
-## S3 dispatch works for base::as.vector(), but S4 dispatch does not
-as.vector.Matrix <- function(x, mode) as.vector(as(x, "matrix"), mode)
 
 if(FALSE) { ## still does not work for c(1, Matrix(2))
 ## For the same reason (and just in case) also do both S3 and S4 here:
@@ -49,20 +57,6 @@ setMethod("c", "Matrix", function(x, ..., recursive) c.Matrix(x, ...))
 ## The above is not sufficient for  c(NA, 3:2, <Matrix>, <matrix>)
 setMethod("c", "numMatrixLike", function(x, ..., recursive) c.Matrix(x, ...))
 }# not yet
-
-setAs("Matrix", "vector",  function(from) as.vector (as(from, "matrix")))
-setAs("Matrix", "numeric", function(from) as.numeric(as(from, "matrix")))
-setAs("Matrix", "logical", function(from) as.logical(as(from, "matrix")))
-setAs("Matrix", "integer", function(from) as.integer(as(from, "matrix")))
-setAs("Matrix", "complex", function(from) as.complex(as(from, "matrix")))
-
-## mainly need these for "dMatrix" or "lMatrix" respectively, but why not general:
-setMethod("as.numeric", signature(x = "Matrix"),
-	  function(x, ...) as.numeric(as.vector(x)))
-setMethod("as.logical", signature(x = "Matrix"),
-	  function(x, ...) as.logical(as.vector(x)))
-
-
 
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
