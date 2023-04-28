@@ -221,12 +221,15 @@ setMethod("symmpart", signature(x = "unpackedMatrix"),
           function(x) .Call(unpackedMatrix_symmpart, x))
 setMethod("symmpart", signature(x = "matrix"),
           ## function(x) .Call(matrix_symmpart, x)) # returning .syMatrix
-          function(x) symmetrizeDimnames(x + t(x)) / 2) # returning matrix
+          function(x) 0.5 * symmetrizeDimnames(x + t(x))) # returning matrix
 
 setMethod("skewpart", signature(x = "unpackedMatrix"),
           function(x) .Call(unpackedMatrix_skewpart, x))
 setMethod("skewpart", signature(x = "matrix"),
           ## function(x) .Call(matrix_skewpart, x)) # returning .geMatrix
-          function(x) symmetrizeDimnames(x - t(x)) / 2) # returning matrix
+          function(x) 0.5 * symmetrizeDimnames(x - t(x))) # returning matrix
+
+setMethod("cov2cor", signature(V = "unpackedMatrix"),
+	  function(V) as(forceSymmetric(V), "corMatrix"))
 
 rm(.upM.subclasses)

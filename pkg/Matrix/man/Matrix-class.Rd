@@ -55,7 +55,6 @@
 \alias{coerce,Matrix,triangularMatrix-method}
 \alias{coerce,Matrix,vector-method}
 \alias{coerce,matrix,Matrix-method}
-\alias{cov2cor,Matrix-method}
 \alias{determinant,Matrix,missing-method}
 \alias{determinant,Matrix,logical-method}
 \alias{diff,Matrix-method}
@@ -67,13 +66,10 @@
 \alias{head,Matrix-method}
 \alias{initialize,Matrix-method}
 \alias{length,Matrix-method}
-\alias{mean,Matrix-method}
-\alias{rep,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{unname,Matrix,missing-method}
 %
 \alias{det} % for our copy of base::det
-\alias{print.Matrix} % spoof, only so that users find this topic
 %
 \description{
   The \code{Matrix} class is a class contained by all actual

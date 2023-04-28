@@ -521,13 +521,28 @@ setMethod("dim<-", signature(x = "denseMatrix"),
 	      if((pv <- prod(value)) != (pd <- prod(d)))
 		  stop(gettextf("assigned dimensions [product %.0f] do not match Matrix length [%.0f]",
                                 pv, pd, domain = NA))
-              r <- as(x, "generalMatrix")
+              r <- .dense2g(x)
               r@Dim <- value
               r@factors <- list()
               r
           })
 
-setMethod("show", "denseMatrix", function(object) prMatrix(object))
+setMethod("mean", signature(x = "denseMatrix"),
+          function(x, trim = 0, na.rm = FALSE, ...) {
+              if(is.numeric(trim) && length(trim) == 1L && !is.na(trim) &&
+                 trim == 0) {
+                  ## Be fast in this special case :
+                  if(isTRUE(na.rm))
+                      x <- x[!is.na(x)]
+                  sum(x) / length(x)
+	      } else mean.default(.dense2v(x), trim = trim, na.rm = na.rm, ...)
+          })
+
+setMethod("rep", "denseMatrix",
+          function(x, ...) rep(.dense2v(x), ...))
+
+setMethod("show", "denseMatrix",
+          function(object) prMatrix(object))
 
 .dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
 .dense.triu <- function(x, k = 0,  ...) .Call(R_dense_band, x, k, NULL)
