@@ -197,19 +197,18 @@ setMethod("expand", signature(x = "denseLU"),
 ## returning list(P', L, U, Q), where A = P' L U Q
 setMethod("expand2", signature(x = "sparseLU"),
           function(x, ...) {
+              d <- x@Dim
               dn <- x@Dimnames
-              np <- length(p <- x@p + 1L)
-              nq <- length(q <- x@q + 1L)
               P. <- new("pMatrix",
-                        Dim = c(np, np),
+                        Dim = d,
                         Dimnames = c(dn[1L], list(NULL)),
                         margin = 1L,
-                        perm = p)
+                        perm = invPerm(x@p, zero.p = TRUE, zero.res = FALSE))
               Q  <- new("pMatrix",
-                        Dim = c(nq, nq),
+                        Dim = d,
                         Dimnames = c(list(NULL), dn[2L]),
                         margin = 2L,
-                        perm = invPerm(q))
+                        perm = invPerm(x@q, zero.p = TRUE, zero.res = FALSE))
               list(P. = P., L = x@L, U = x@U, Q = Q)
           })
 
@@ -217,15 +216,16 @@ setMethod("expand2", signature(x = "sparseLU"),
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "sparseLU"),
           function(x, ...) {
+              d <- x@Dim
               dn <- x@Dimnames
-              np <- length(p <- x@p + 1L)
-              nq <- length(q <- x@q + 1L)
+              p <- x@p + 1L
+              q <- x@q + 1L
               if(!is.null(rn <- dn[[1L]]))
                   dn[[1L]] <- rn[p]
               if(!is.null(cn <- dn[[2L]]))
                   dn[[2L]] <- cn[q]
-              P <- new("pMatrix", Dim = c(np, np), perm = p)
-              Q <- new("pMatrix", Dim = c(nq, nq), perm = q)
+              P <- new("pMatrix", Dim = d, perm = p)
+              Q <- new("pMatrix", Dim = d, perm = q)
               L <- x@L
               L@Dimnames <- c(dn[1L], list(NULL))
               U <- x@U
