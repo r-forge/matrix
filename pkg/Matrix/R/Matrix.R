@@ -62,49 +62,8 @@ setMethod("as.numeric", signature(x = "Matrix"),
 setMethod("as.logical", signature(x = "Matrix"),
 	  function(x, ...) as.logical(as.vector(x)))
 
-setMethod("mean", signature(x = "sparseMatrix"),
-	  function(x, ...) mean(as(x,"sparseVector"), ...))
-setMethod("mean", signature(x = "sparseVector"),
-	  function(x, trim = 0, na.rm = FALSE, ...)
-      {
-	  if (na.rm) # remove NAs such that new length() is ok
-	      x <- x[!is.na(x)] # remains sparse!
-	  if(is0(trim)) sum(x) / length(x)
-	  else {
-	      ## fast trimmed mean for sparseVector:
-	      ## ---> we'd need fast & sparse  sort(<sparseV>).
-	      ##      Normally this means to define a xtfrm() method;
-	      ##      however, that plus  x[order(x, ..)]  will NOT be sparse
-	      ## TODO: sortSparseVector(.)
-	      warning("trimmed mean of 'sparseVector' -- suboptimally using as.numeric(.)")
-	      mean(as.numeric(x), trim=trim)
-	  }
-      })
-## for the non-"sparseMatrix" ones:
-setMethod("mean", signature(x = "Matrix"),
-	  function(x, trim = 0, na.rm = FALSE, ...)
-      {
-	  if (na.rm)
-	      x <- x[!is.na(x)]
-	  if(is0(trim)) sum(x) / length(x)
-	  else mean(as.numeric(x), trim=trim)
-      })
 
 
-## for non-"sparseMatrix" :
-setMethod("cov2cor", signature(V = "Matrix"),
-	  function(V) { ## was as(cov2cor(as(V, "matrix")), "dpoMatrix"))
-	      r <- V
-	      p <- (d <- dim(V))[1]
-	      if(p != d[2]) stop("'V' is not a square matrix")
-	      Is <- sqrt(1/diag(V)) # diag( 1/sigma_i )
-	      if(any(!is.finite(Is)))
-		  warning("diag(.) had 0 or NA entries; non-finite result is doubtful")
-              Is <- Diagonal(x = Is)
-              r <- Is %*% V %*% Is
-	      r[cbind(1:p,1:p)] <- 1 # exact in diagonal
-	      as(forceSymmetric(`dimnames<-`(r,  dimnames(V))), "dpoMatrix")
-          })
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
@@ -420,12 +379,6 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 }
 }
 
-## The ``Right Thing'' to do :
-## base::det() calls [base::]determinant();
-## our det() should call our determinant() :
-det <- base::det
-environment(det) <- environment()## == asNamespace("Matrix")
-
 ## MJ: no longer needed as methods are available for all subclasses
 if(FALSE) {
 setMethod("diag", signature(x = "Matrix"),
@@ -434,15 +387,10 @@ setMethod("t", signature(x = "Matrix"),
 	  function(x) .bail.out.1(.Generic, class(x)))
 setMethod("chol", signature(x = "Matrix"),
 	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
-} ## MJ
-
-## TODO: activate later
-if(FALSE)
 setMethod("diag<-", signature(x = "Matrix"),
 	  function(x, value) .bail.out.1("diag", class(x)))
+} ## MJ
 
-## NB: "sparseMatrix" works via "sparseVector"
-setMethod("rep", "Matrix", function(x, ...) rep(as(x, "matrix"), ...))
 
 ## We want to use all.equal.numeric() *and* make sure that uses
 ## not just base::as.vector but the generic with our methods:
@@ -459,6 +407,7 @@ all.equal_Mat <- function(target, current, check.attributes = TRUE,
 		   all.equal_num(as.vector(target), as.vector(current),
 				 check.attributes=check.attributes, ...))
 }
+
 ## The all.equal() methods for dense matrices (and fallback):
 setMethod("all.equal", c(target = "Matrix", current = "Matrix"),
 	  all.equal_Mat)
@@ -468,25 +417,6 @@ setMethod("all.equal", c(target = "ANY", current = "Matrix"),
 	  all.equal_Mat)
 ## -> ./sparseMatrix.R, ./sparseVector.R  have specific methods
 
-
-
-## MM: More or less "Cut & paste" from
-## --- diff.default() from  R/src/library/base/R/diff.R :
-setMethod("diff", signature(x = "Matrix"),
-	  function(x, lag = 1, differences = 1, ...) {
-	      if (length(lag) > 1 || length(differences) > 1 ||
-		  lag < 1 || differences < 1)
-		  stop("'lag' and 'differences' must be integers >= 1")
-	      xlen <- nrow(x)
-	      if (lag * differences >= xlen)
-		  return(x[,FALSE][0])	# empty of proper mode
-
-	      i1 <- -1:-lag
-	      for (i in 1:differences)
-		  x <- x[i1, , drop = FALSE] -
-		      x[-nrow(x):-(nrow(x)-lag+1), , drop = FALSE]
-	      x
-	  })
 
 ## Group Methods
 
