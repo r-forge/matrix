@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-28 r3876)}{
+\section{Changes in version 1.5-5 (2023-04-28 r3878)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -92,7 +92,7 @@
       existing virtual classes \code{CholeskyFactorization} and \code{LU}.
       Packages defining new factorization classes may extend these.
       
-      %% TODO: add examples and tests _using_ 'expand2'
+      %% TODO: add examples _using_ 'expand2'
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor

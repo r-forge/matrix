@@ -686,4 +686,30 @@ for(m in list(syU, syL, spU, spL))
 ## was an error at least in Matrix 1.5-4 ...
 BunchKaufman(as.matrix(1))
 
+
+## 'expand2': product of listed factors should reproduce factorized matrix
+chkMF <- function(X, Y, FUN, ...)
+    all.equal(as(Reduce(`%*%`, expand2(FUN(X, ...))), "matrix"), Y)
+set.seed(24831)
+n <- 64L
+mS <- tcrossprod(matrix(rnorm(n * n), n, n,
+                        dimnames = list(A = paste0("s", seq_len(n)), NULL)))
+## FIXME: most of our %*% methods still mangle names(dimnames)
+names(dimnames(mS)) <- NULL
+sS <- as(pS <- as(S <- as(mS, "dpoMatrix"), "packedMatrix"), "CsparseMatrix")
+stopifnot(exprs = {
+    chkMF( S, mS,    Schur)
+    chkMF(pS, mS,    Schur)
+    chkMF( S, mS,       lu)
+    chkMF(pS, mS,       lu)
+    chkMF(sS, mS,       lu)
+    chkMF( S, mS,     chol)
+    ## chkMF(pS, mS,     chol), ## FIXME: %*% method mangles dimnames
+    chkMF(sS, mS, Cholesky, super =  TRUE, LDL =  TRUE)
+    chkMF(sS, mS, Cholesky, super =  TRUE, LDL = FALSE)
+    chkMF(sS, mS, Cholesky, super = FALSE, LDL =  TRUE)
+    chkMF(sS, mS, Cholesky, super = FALSE, LDL = FALSE)
+})
+
+
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
