@@ -335,6 +335,22 @@ setMethod("dim<-", signature(x = "sparseVector"),
 
 setMethod("length", "sparseVector", function(x) x@length)
 
+setMethod("mean", signature(x = "sparseVector"),
+	  function(x, trim = 0, na.rm = FALSE, ...) {
+              if(is.numeric(trim) && length(trim) == 1L && !is.na(trim) &&
+                 trim == 0) {
+                  ## Be fast in this special case :
+                  if(isTRUE(na.rm))
+                      ## FIXME: don't allocate !is.na(x)
+                      x <- x[!is.na(x)]
+                  sum(x) / length(x)
+	      } else {
+                  ## FIXME: don't allocate as.numeric(x); need 'sort' method
+                  warning("suboptimally using as.numeric(x) to compute trimmed mean of sparseVector 'x'")
+                  mean.default(as.numeric(x), trim = trim, na.rm = na.rm, ...)
+              }
+          })
+
 setMethod("t", "sparseVector",
           function(x) spV2M(x, nrow = 1L, ncol = x@length, check = FALSE))
 

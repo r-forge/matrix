@@ -9,6 +9,7 @@
 %
 \alias{coerce,matrix,unpackedMatrix-method}
 \alias{coerce,numLike,unpackedMatrix-method}
+\alias{cov2cor,unpackedMatrix-method}
 \alias{diag,unpackedMatrix-method}
 \alias{diag<-,unpackedMatrix-method}
 \alias{t,unpackedMatrix-method}

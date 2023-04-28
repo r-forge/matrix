@@ -8,6 +8,7 @@
 \alias{packedMatrix-class}
 %
 \alias{coerce,matrix,packedMatrix-method}
+\alias{cov2cor,packedMatrix-method}
 \alias{diag,packedMatrix-method}
 \alias{diag<-,packedMatrix-method}
 \alias{t,packedMatrix-method}

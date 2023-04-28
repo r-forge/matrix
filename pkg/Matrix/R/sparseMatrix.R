@@ -491,6 +491,10 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("mean", signature(x = "sparseMatrix"),
+	  function(x, ...) mean(as(x, "sparseVector"), ...))
+
+
 ## MJ: no longer needed ... replacement in ./subscript.R
 if(FALSE) {
 ### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R

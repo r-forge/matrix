@@ -13,6 +13,11 @@
     val
 }
 
+## 'base::det' calls 'base::determinant', which is not S4 generic,
+## so we define own our 'det' calling 'Matrix::determinant' ...
+det <- base::det
+environment(det) <- environment() # the Matrix namespace
+
 
 ## ~~~~ GENERAL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -35,6 +35,8 @@
 \alias{coerce,numLike,denseMatrix-method}
 \alias{dim<-,denseMatrix-method}
 \alias{log,denseMatrix-method}
+\alias{mean,denseMatrix-method}
+\alias{rep,denseMatrix-method}
 \alias{show,denseMatrix-method}
 %
 \description{This is the virtual class of all dense (S4) matrices.
