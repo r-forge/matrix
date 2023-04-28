@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-28 r3878)}{
+\section{Changes in version 1.5-5 (2023-04-28 r3884)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -179,6 +179,10 @@
 
       \item Coercions to \code{corMatrix} now set the diagonal
       elements of the result to 1, consistent with \code{cov2cor}.
+
+      \item \code{dimnames(x) <- value} now validates \code{x@Dim}
+      before \code{value} to avoid undefined behaviour in C-level
+      check.
     }
   }
   \subsection{Misc}{

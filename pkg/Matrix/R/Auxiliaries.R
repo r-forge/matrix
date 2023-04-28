@@ -408,6 +408,15 @@ validDN <- function(dn, dim)
 validDim <- function(dim)
     .Call(R_Dim_validate, dim)
 
+fixupDN <- function(dn)
+    .Call(R_DimNames_fixup, dn)
+
+fixupDN.if.valid <- function(dn, dim) {
+    if(is.character(s <- validDim(dim)) || is.character(s <- validDN(dn, dim)))
+        stop(s)
+    fixupDN(dn)
+}
+
 ## Is 'dn' symmetric?
 ## This allows, e.g., list(NULL, nms), _unlike_ identical(dn[1], dn[2]),
 ## the definition used by base::isSymmetric.matrix ...
