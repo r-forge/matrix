@@ -8,12 +8,8 @@ setAs("CHMfactor", "RsparseMatrix",
       function(from) .CR2RC(.Call(CHMfactor_to_sparse, from)))
 setAs("CHMfactor", "TsparseMatrix",
       function(from) .CR2T(.Call(CHMfactor_to_sparse, from)))
-
 setAs("CHMfactor", "pMatrix",
-      function(from) {
-          n <- length(perm <- from@perm)
-          new("pMatrix", Dim = c(n, n), perm = from@perm + 1L)
-      })
+      function(from) new("pMatrix", Dim = from@Dim, perm = from@perm + 1L))
 
 ## returning list(P', L, L', P) or list(P', L~, D, L~', P),
 ## where  A = P' L L' P = P' L~ D L~' P  and  L = L~ sqrt(D)
