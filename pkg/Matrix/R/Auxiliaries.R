@@ -1,10 +1,6 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
-## Always FALSE when building for CRAN ... documented since 2015
-## NB: keep ../NAMESPACE synchronized
-.Matrix.avoiding.as.matrix <- FALSE
-
 ## These would be faster by a factor ~2 if done in C:
 if(FALSE) {
 ## Need to consider NAs ;  "== 0" even works for logical & complex:

@@ -1,23 +1,5 @@
-#### eigen() , Schur() etc
-#### =====     =====
-
-## eigen() is not even generic, and we haven't any C code,
-## NOTE  base::eigen()  "magically"  can work via as.matrix()
-if(.Matrix.avoiding.as.matrix) {
-    ## ---- IFF  as.matrix(.)  <==>  as(., "matrix")  [which we consider _deprecating_]
-    ## FIXME: Code for *sparse* !! [RcppEigen ~??~]
-    setMethod("eigen", signature(x = "Matrix", only.values = "missing"),
-	      function(x, symmetric, only.values, EISPACK) # << must match generic
-		  base::eigen(as(x,"matrix"), symmetric, FALSE))
-    setMethod("eigen", signature(x = "Matrix", only.values = "logical"),
-	      function(x, symmetric, only.values, EISPACK)
-		  base::eigen(as(x,"matrix"), symmetric, only.values))
-
-    ## base::svd()  using  as.matrix() :=  asRbasematrix()
-    setMethod("svd", "Matrix",
-	      function(x, ...) base::svd(as(x, "matrix"), ...))
-}
-
+## METHODS FOR GENERIC: Schur
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## FIXME: C-level code should scan first for non-finite values
 ##        since R-level test needs an allocation
@@ -128,6 +110,10 @@ setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
                   } else list(T = x, EValues = vals)
               }
           })
+
+
+## METHODS FOR CLASS: Schur
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("expand2", signature(x = "Schur"),
           function(x, ...) {

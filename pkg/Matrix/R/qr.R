@@ -8,14 +8,6 @@
 ##        (incl. diagonal) cases, and cache it in the general and
 ##        symmetric cases.  See the methods for chol() in ./chol.R ...
 
-## base::qr.default(x) does x <- as.matrix(x) and storage.mode(x) <- "double",
-## hence if we deprecate as.matrix(<Matrix>), then we would need this:
-if(.Matrix.avoiding.as.matrix) {
-setMethod("qr", signature(x = "denseMatrix"),
-	  function(x, ...)
-              qr.default(as(x, "matrix"), ...))
-}
-
 setMethod("qr", signature(x = "sparseMatrix"),
 	  function(x, ...)
               qr(..sparse2d(.sparse2g(as(x, "CsparseMatrix"))), ...))
