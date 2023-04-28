@@ -19,13 +19,13 @@ setAs("CHMfactor", "pMatrix",
 ## where  A = P' L L' P = P' L~ D L~' P  and  L = L~ sqrt(D)
 setMethod("expand2", signature(x = "CHMfactor"),
           function(x, LDL = TRUE, ...) {
-              n <- length(perm <- x@perm)
+              d <- x@Dim
               dn <- x@Dimnames
               P <- new("pMatrix",
-                       Dim = c(n, n),
+                       Dim = d,
                        Dimnames = c(list(NULL), dn[2L]),
                        margin = 2L,
-                       perm = invPerm(perm, zero.p = TRUE, zero.res = FALSE))
+                       perm = invPerm(x@perm, zero.p = TRUE, zero.res = FALSE))
               P. <- P
               P.@Dimnames <- c(dn[1L], list(NULL))
               P.@margin <- 1L
@@ -34,10 +34,10 @@ setMethod("expand2", signature(x = "CHMfactor"),
                   ## FIXME: be faster if isLDL(x) is TRUE
                   L.ii <- diag(L, names = FALSE)
                   L.p <- L@p
-                  L@x <- L@x / rep.int(L.ii, L.p[-1L] - L.p[-n])
+                  L@x <- L@x / rep.int(L.ii, L.p[-1L] - L.p[-length(L.p)])
                   L <- ..diagN2U(L, sparse = TRUE)
                   D <- new("ddiMatrix")
-                  D@Dim <- x@Dim
+                  D@Dim <- d
                   D@x <- L.ii * L.ii
                   list(P. = P., L1 = L, D = D, L1. = t(L), P = P)
               } else list(P. = P., L = L, L. = t(L), P = P)
@@ -47,8 +47,7 @@ setMethod("expand2", signature(x = "CHMfactor"),
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...) {
-              n <- length(perm <- x@perm + 1L)
-              list(P = new("pMatrix", Dim = c(n, n), perm = perm),
+              list(P = new("pMatrix", Dim = x@Dim, perm = x@perm + 1L),
                    L = .Call(CHMfactor_to_sparse, x))
           })
 
