@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-28 r3884)}{
+\section{Changes in version 1.5-5 (2023-04-29 r3885)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -45,8 +45,8 @@
       but used those of its \code{L} and \code{U} slots to store
       \emph{permuted} names.
       \cr
-      Users can extract the value of the new \code{Dimnames} slot
-      with \code{dimnames(.)}.
+      Users can get the value of the new \code{Dimnames} slot with
+      \code{dimnames(.)} and set it with \code{dimnames(.) <- value}.
       \cr
       Objects inheriting from \code{Schur}, \code{sparseLU},
       \code{sparseQR}, or \code{CHMfactor} and serialized under

@@ -17,7 +17,11 @@
 \alias{determinant,MatrixFactorization,missing-method}
 \alias{dim,MatrixFactorization-method}
 \alias{dimnames,MatrixFactorization-method}
+\alias{dimnames<-,MatrixFactorization,NULL-method}
+\alias{dimnames<-,MatrixFactorization,list-method}
+\alias{length,MatrixFactorization-method}
 \alias{show,MatrixFactorization-method}
+\alias{unname,MatrixFactorization-method}
 %
 \alias{show,BunchKaufmanFactorization-method}
 \alias{show,CholeskyFactorization-method}
@@ -51,11 +55,22 @@
       returns \code{x@Dim}.}
     \item{dimnames}{\code{signature(x = "MatrixFactorization")}:
       returns \code{x@Dimnames}.}
+    \item{dimnames<-}{\code{signature(x = "MatrixFactorization")}:
+      returns \code{x@Dimnames}.}
+    \item{dimnames<-}{\code{signature(x = "MatrixFactorization", value = "NULL")}:
+      returns \code{x} with \code{x@Dimnames} set to \code{list(NULL, NULL)}.}
+    \item{dimnames<-}{\code{signature(x = "MatrixFactorization", value = "list")}:
+      returns \code{x} with \code{x@Dimnames} set to \code{value}.}
+    \item{length}{\code{signature(x = "MatrixFactorization")}:
+      returns \code{prod(x@Dim)}.}
     \item{show}{\code{signature(object = "MatrixFactorization")}:
       prints the internal representation of the factorization using
       \code{\link{str}}.}
     \item{solve}{\code{signature(a = "MatrixFactorization", b = .)}:
       see \code{\link{solve-methods}}.}
+    \item{unname}{\code{signature(obj = "MatrixFactorization")}:
+      returns \code{obj} with \code{obj@Dimnames} set to
+      \code{list(NULL, NULL)}.}
   }
 }
 \seealso{
