@@ -184,8 +184,8 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 ## METHODS FOR CLASS: p?Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(L, L') or list(L~, D, L~'),
-## where  A = L L' = L~ D L~'  and  L = L~ sqrt(D)
+## returning list(L, L') or list(L1, D, L1'),
+## where  A = L L' = L1 D L1'  and  L = L1 sqrt(D)
 .def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
     x <- as(x, .CL)
     dn <- x@Dimnames

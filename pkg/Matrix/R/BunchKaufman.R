@@ -14,7 +14,7 @@ setMethod("BunchKaufman", signature(x = "matrix"),
 ## METHODS FOR CLASS: p?BunchKaufman
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("BunchKaufman", "Matrix",
+setAs("BunchKaufman", "dtrMatrix",
       function(from) {
           to <- new("dtrMatrix")
           to@Dim <- from@Dim
@@ -24,7 +24,7 @@ setAs("BunchKaufman", "Matrix",
           to
       })
 
-setAs("pBunchKaufman", "Matrix",
+setAs("pBunchKaufman", "dtpMatrix",
       function(from) {
           to <- new("dtpMatrix")
           to@Dim <- from@Dim
@@ -34,30 +34,31 @@ setAs("pBunchKaufman", "Matrix",
           to
       })
 
-if(FALSE) {
+## FIXME: need all 2*b+1 factors, not only b+1; and need Dimnames
+##
 ## returning:
 ##
-## list(D, P[n], U[n], ..., P[1], U[n])
-##     where A = U' D U and U = P[n] U[n] ... P[1] U[1]
+## list(D, P[1], U[1], ..., P[b], U[b])
+##     where A = U' D U and U = P[1] U[1] ... P[b] U[b]
 ##
 ## OR
 ##
-## list(P[1], L[1], ..., P[n], L[n], D)
-##     where A = L D L' and L = P[1] L[1] ... P[n] L[n]
+## list(P[1], L[1], ..., P[b], L[b], D)
+##     where A = L D L' and L = P[1] L[1] ... P[b] L[b]
 ##
 ## as described in the documentation for LAPACK 'ds[yp]trf'
-setMethod("expand", signature(x = "BunchKaufman"),
+setMethod("expand2", signature(x = "BunchKaufman"),
           function(x, ...) .Call(BunchKaufman_expand, x))
 
-setMethod("expand", signature(x = "pBunchKaufman"),
+setMethod("expand2", signature(x = "pBunchKaufman"),
           function(x, ...) .Call(BunchKaufman_expand, x))
-}
 
 if(FALSE) {
 library(Matrix)
 set.seed(1)
 
-X <- new("dsyMatrix", Dim = c(6L, 6L), x = rnorm(36L))
+n <- 1000L
+X <- new("dsyMatrix", Dim = c(n, n), x = rnorm(n * n))
 Y <- t(X)
 
 as(bkX <- BunchKaufman(X), "dtrMatrix")
@@ -67,12 +68,10 @@ DU <- .Call("BunchKaufman_expand", bkX)
 D <- DU[[1L]]
 U <- Reduce(`%*%`, DU[-1L])
 ## FIXME: 'DU' looks correct ... but is actually wrong {second test fails}??
-stopifnot(identical(DU, .Call("BunchKaufman_expand", pack(bkX))),
-          all.equal(as(t(U) %*% D %*% U, "matrix"), as(X, "matrix")))
+stopifnot(all.equal(as(t(U) %*% D %*% U, "matrix"), as(X, "matrix")))
 
 LD <- .Call("BunchKaufman_expand", bkY)
 D <- LD[[length(LD)]]
 L <- Reduce(`%*%`, LD[-length(LD)])
-stopifnot(identical(LD, .Call("BunchKaufman_expand", pack(bkY))),
-          all.equal(as(L %*% D %*% t(L), "matrix"), as(Y, "matrix")))
+stopifnot(all.equal(as(L %*% D %*% t(L), "matrix"), as(Y, "matrix")))
 }

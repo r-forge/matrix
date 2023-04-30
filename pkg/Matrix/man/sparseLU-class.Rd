@@ -10,14 +10,22 @@
 %
 \description{
   \code{sparseLU} is the class of sparse, row- and column-pivoted
-  LU factorizations of real, square matrices.
+  LU factorizations of \eqn{n \times n}{n-by-n} real matrices \eqn{A},
+  having the general form
+  \deqn{P_{1} A P_{2} = L U}{P1 * A * P2 = L * U}
+  or (equivalently)
+  \deqn{A = P_{1}' L U P_{2}'}{A = P1' * L * U * P2'}
+  where
+  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
+  \eqn{L} is a unit lower triangular matrix, and
+  \eqn{U} is an upper triangular matrix.
 }
 \section{Slots}{
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
       \code{\linkS4class{MatrixFactorization}}.}
     \item{\code{L}}{an object of class \code{\linkS4class{dtCMatrix}},
-      the lower triangular \eqn{L} factor.}
+      the unit lower triangular \eqn{L} factor.}
     \item{\code{U}}{an object of class \code{\linkS4class{dtCMatrix}},
       the upper triangular \eqn{U} factor.}
     \item{\code{p}, \code{q}}{integer vectors of length \code{Dim[1]}
@@ -37,20 +45,11 @@
 }
 \section{Methods}{
   \describe{
-    \item{expand}{\code{signature(x = "sparseLU")}:
+    \item{\code{expand}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand-methods}}.}
-    \item{expand2}{\code{signature(x = "sparseLU")}:
+    \item{\code{expand2}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand2-methods}}.}
   }
-}
-\details{
-  The decomposition is of the form
-  \deqn{A = P'LUQ,}
-  or equivalently  \eqn{PAQ' = LU},
-  where all matrices are sparse and of size \eqn{n\times n}{n by n}.
-  The matrices \eqn{P} and \eqn{Q}, and their transposes \eqn{P'} and
-  \eqn{Q'} are permutation matrices,
-  \eqn{L} is lower triangular and \eqn{U} is upper triangular.
 }
 \seealso{
   Class \code{\linkS4class{denseLU}} for dense LU factorizations.

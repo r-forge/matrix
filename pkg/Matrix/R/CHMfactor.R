@@ -11,8 +11,8 @@ setAs("CHMfactor", "TsparseMatrix",
 setAs("CHMfactor", "pMatrix",
       function(from) new("pMatrix", Dim = from@Dim, perm = from@perm + 1L))
 
-## returning list(P', L, L', P) or list(P', L~, D, L~', P),
-## where  A = P' L L' P = P' L~ D L~' P  and  L = L~ sqrt(D)
+## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
+## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
 setMethod("expand2", signature(x = "CHMfactor"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
@@ -35,8 +35,8 @@ setMethod("expand2", signature(x = "CHMfactor"),
                   D <- new("ddiMatrix")
                   D@Dim <- d
                   D@x <- L.ii * L.ii
-                  list(P. = P., L1 = L, D = D, L1. = t(L), P = P)
-              } else list(P. = P., L = L, L. = t(L), P = P)
+                  list(P1. = P., L1 = L, D = D, L1. = t(L), P1 = P)
+              } else list(P1. = P., L = L, L. = t(L), P1 = P)
           })
 
 ## returning list(P, L), where A = P' L L' P

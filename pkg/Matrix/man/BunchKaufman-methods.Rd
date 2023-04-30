@@ -80,8 +80,8 @@ pbk <- BunchKaufman(as(S,   "packedMatrix"))
 pbk
 
 ## See the underlying LAPACK representation
- bk.M <- as( bk, "Matrix")
-pbk.M <- as(pbk, "Matrix")
+ bk.M <- as( bk, "dtrMatrix")
+pbk.M <- as(pbk, "dtpMatrix")
 pbk.M[1:6, 1:6]
 
 ## See how sparse it is, too

@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-04-29 r3885)}{
+\section{Changes in version 1.5-5 (2023-04-30 r3886)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -95,25 +95,25 @@
       %% TODO: add examples _using_ 'expand2'
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
-      factors \emph{in order}, with row names on the first factor
-      and column names on the last factor, supporting reconstruction
-      of factorized \code{Matrix} including any \code{Dimnames} as
-      as \code{Reduce(`\%*\%`, expand2(.))}.
+      factors \emph{in order}, with row names on the first factor and
+      column names on the last factor, supporting reconstruction of
+      factorized \code{Matrix} as \code{Reduce(`\%*\%`, expand2(.))}.
       \cr
-      \code{expand} is retained for backwards compatibility.
-      It may become deprecated in the future, hence new code should
-      use \code{expand2}.
+      \code{expand} and its methods are retained for backwards
+      compatibility.  It may be formally deprecated in the future,
+      hence new code should use \code{expand2}.
       \cr
-      Notably, \code{expand2} has methods for \code{p?Cholesky} and
-      \code{Schur} not defined for \code{expand}, and its methods for
-      \code{p?Cholesky} and \code{CHMfactor} take an argument \code{LDL}
-      (with default value \code{TRUE}) indicating whether to give the
-      \eqn{L_{1} D L_{1}'} or \eqn{L L'} expansion,
-      where \eqn{L = L_{1} sqrt(D)}.
-      See \code{help("expand-methods")} for details.
+      %% TODO: fix bug in expand2(<upper triangular p?BunchKaufman>)
+      Notably, \code{expand2} has methods for all factorizations in
+      \pkg{Matrix}, whereas \code{expand} continues to have methods
+      only for \code{CHMfactor}, \code{denseLU}, and \code{sparseLU}.
+      See \code{help("expand-methods")} for a list of methods,
+      including useful optional arguments for Cholesky and QR
+      factorizations.
       
-      \item \code{as(x, "Matrix")} for \code{x} inheriting from
-      \code{denseLU}, \code{BunchKaufman}, or \code{pBunchKaufman},
+      \item \code{as(x, "generalMatrix")} and
+      \code{as(x, "triangularMatrix")} for \code{x} inheriting
+      from \code{denseLU} and \code{p?BunchKaufman}, respectively,
       allowing users to inspect the LAPACK representation of
       those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};

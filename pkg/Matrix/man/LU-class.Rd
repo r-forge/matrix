@@ -8,11 +8,22 @@
 %
 \alias{denseLU-class}
 %
-\alias{coerce,denseLU,Matrix-method}
+\alias{coerce,denseLU,dgeMatrix-method}
 %
 \description{
   \code{denseLU} is the class of dense, row-pivoted LU factorizations
-  of real, square \emph{or non-square} matrices.
+  of \eqn{m \times n}{m-by-n} real matrices \eqn{A},
+  having the general form
+  \deqn{P_{1} A = L U}{P1 * A = L * U}
+  or (equivalently)
+  \deqn{A = P_{1}' L U}{A = P1' * L * U}
+  where
+  \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix, 
+  \eqn{L} is an \eqn{m \times \text{min}(m,n)}{m-by-min(m,n)}
+  lower trapezoidal matrix with unit diagonal entries, and
+  \eqn{U} is a  \eqn{\text{min}(m,n) \times n}{min(m,n)-by-n}
+  upper trapezoidal matrix.  If \eqn{m = n}, then the factors
+  \eqn{L} and \eqn{U} are triangular.
 }
 \section{Slots}{
   \describe{
@@ -39,33 +50,16 @@
 }
 \section{Methods}{
   \describe{
-    \item{coerce}{\code{signature(from = "denseLU", to = "Matrix")}:
-      returns a \code{dtrMatrix} or \code{dtpMatrix}, useful for
-      inspecting the internal representation of the factorization;
-      see Note.}
-    \item{expand}{\code{signature(x = "denseLU")}:
+    \item{\code{coerce}}{\code{signature(from = "denseLU", to = "dgeMatrix")}:
+      returns a \code{\linkS4class{dgeMatrix}}, useful for inspecting
+      the internal representation of the factorization; see \sQuote{Note}.}
+    \item{\code{expand}}{\code{signature(x = "denseLU")}:
       see \code{\link{expand-methods}}.}
-    \item{expand2}{\code{signature(x = "denseLU")}:
+    \item{\code{expand2}}{\code{signature(x = "denseLU")}:
       see \code{\link{expand2-methods}}.}
-    \item{solve}{\code{signature(a = "denseLU", b = "missing")}:
+    \item{\code{solve}}{\code{signature(a = "denseLU", b = "missing")}:
       see \code{\link{solve-methods}}.}
   }
-}
-\details{
-  The decomposition is of the form
-  \deqn{A = P L U}{A = P L U}
-  where typically all matrices are of size \eqn{n\times n}{n by n}, and
-  the matrix \eqn{P} is a permutation matrix, \eqn{L} is lower
-  triangular and \eqn{U} is upper triangular (both of class
-  \code{\linkS4class{dtrMatrix}}).
-
-  Note that the \emph{dense} decomposition is also implemented for
-  a \eqn{m\times n}{m by n} matrix \eqn{A}, when \eqn{m \ne n}{m != n}.
-
-  If \eqn{m < n} (\dQuote{wide case}), \eqn{U} is \eqn{m\times n}{m by n},
-  and hence not triangular.\cr
-  If \eqn{m > n} (\dQuote{long case}), \eqn{L} is \eqn{m\times n}{m by n},
-  and hence not triangular.
 }
 \seealso{
   Class \code{\linkS4class{sparseLU}} for sparse LU factorizations.
@@ -87,5 +81,5 @@ stopifnot(all.equal(as(mm, "matrix"),
                     as(m2, "matrix")))
 
 ## See the underlying LAPACK representation
-as(lum, "Matrix")
+as(lum, "dgeMatrix")
 }

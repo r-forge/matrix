@@ -2,6 +2,40 @@
 ## our "compact" representation of QR factorizations of sparse matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("expand2", "sparseQR",
+          function(x, complete = FALSE, ...) {
+              d <- x@Dim
+              m <- d[1L]
+              n <- d[2L]
+              r <- if(complete) m else n
+              dn <- x@Dimnames
+              p1 <- x@p
+              p2 <- x@q
+              P1. <- new("pMatrix",
+                         Dim = c(m, m),
+                         Dimnames = c(dn[1L], list(NULL)),
+                         margin = 1L,
+                         perm = invPerm(p1, zero.p = TRUE, zero.res = FALSE))
+              P2. <- new("pMatrix",
+                         Dim = c(n, n),
+                         Dimnames = c(list(NULL), dn[2L]),
+                         margin = 2L,
+                         perm = if(length(p2)) invPerm(p2, zero.p = TRUE, zero.res = FALSE) else seq_len(n))
+              ## FIXME: C code should not copy 'y' if it is unreferenced
+              ##       _and_ should have an option to not permute !!
+              Q <- .Call(sparseQR_qty, x, diag(x = 1, nrow = m, ncol = r),
+                         FALSE, FALSE)[p1 + 1L, , drop = FALSE]
+              R <- x@R
+              if(R@Dim[1L] > r)
+                  R <- R[seq_len(r), , drop = FALSE]
+              if(complete)
+                  list(P1. = P1., Q = Q, R = R, P2. = P2.)
+              else
+                  list(P1. = P1., Q1 = Q, R1 = triu(R), P2. = P2.)
+          })
+
+
+
 ## TODO: qr.R() generic that allows optional args ['backPermute']
 ## --- so we can add it to our qr.R() method,  *instead* of this :
 qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {

@@ -33,8 +33,18 @@
 %
 \description{
   \code{sparseQR} is the class of sparse, row- and column-pivoted
-  QR factorizations of real, \dQuote{long} (\code{m}-by-\code{n}
-  with \code{m >= n}) matrices.
+  QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
+  real matrices, having the general form
+  \deqn{P_{1} A P_{2} = Q R = \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} = Q_{1} R_{1}}{P1 * A * P2 = Q * R = [Q1, Q2] * [R1; 0] = Q1 * R1}
+  or (equivalently)
+  \deqn{A = P_{1}' Q R P_{2}' = P_{1}' \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} P_{2}' = P_{1}' Q_{1} R_{1} P_{2}'}{A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
+  where
+  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
+  \eqn{Q} is an \eqn{m \times m}{m-by-m} orthogonal matrix
+  (\eqn{Q_{1}}{Q1} contains the first \eqn{n} column vectors), and
+  \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
+  (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
+  upper \emph{triangular}).
 }
 \section{Slots}{
   \describe{
@@ -57,7 +67,9 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{MatrixFactorization}}, directly.
+  Class \code{\linkS4class{QR}}, directly.
+  Class \code{\linkS4class{MatrixFactorization}}, by class
+  \code{\linkS4class{QR}}, distance 2.
 }
 \section{Instantiation}{
   Objects can be generated directly by calls of the form
@@ -67,11 +79,13 @@
 }
 \section{Methods}{
   \describe{
-    \item{qr.Q}{\code{signature(qr = "sparseQR")}:
-      returns the orthogonal matrix \eqn{P' Q}.}
-    \item{qr.R}{\code{signature(qr = "sparseQR")}:
+    \item{\code{expand2}}{\code{signature(x = "sparseQR")}:
+      see \code{\link{expand2-methods}}.}
+    \item{\code{qr.Q}}{\code{signature(qr = "sparseQR")}:
+      returns the orthogonal matrix \eqn{P_{1}' Q}{P1' * Q}.}
+    \item{\code{qr.R}}{\code{signature(qr = "sparseQR")}:
       returns the upper trapezoidal matrix \eqn{R} or the result
-      \eqn{R P*'} of permuting its columns, the latter
+      \eqn{R P_{2}'}{R * P2'} of permuting its columns, the latter
       if \code{backPermute = TRUE} is passed in the call.
       This method warns about possible differences between its
       result and that of \code{base::qr.R(base::qr.default(.))}.
@@ -80,25 +94,22 @@
       or
       \code{\link{options}(Matrix.quiet = TRUE)},
       the latter having side effects not limited to this method.}
-    \item{qr.coef}{\code{signature(qr = "sparseQR", y = .)}:
+    \item{\code{qr.coef}}{\code{signature(qr = "sparseQR", y = .)}:
       returns the result of multiplying \code{y} on the left
-      by \eqn{P* R1^{-1} Q1' P}, using the conventional notation
-      \eqn{Q = [Q1, Q2]} and \eqn{R = [R1; 0]}.}
-    \item{qr.fitted}{\code{signature(qr = "sparseQR", y = .)}:
+      by \eqn{P_{2} R_{1}^{-1} Q_{1}' P_{1}}{P2 * R1^{-1} * Q1' * P1}.}
+    \item{\code{qr.fitted}}{\code{signature(qr = "sparseQR", y = .)}:
       returns the result of multiplying \code{y} on the left
-      by \eqn{P' Q1 Q1' P}, using the conventional notation
-      \eqn{Q = [Q1, Q2]} and \eqn{R = [R1; 0]}.}
-    \item{qr.resid}{\code{signature(qr = "sparseQR", y = .)}:
+      by \eqn{P_{1}' Q_{1} Q_{1}' P_{1}}{P1' * Q1 * Q1' * P1}.}
+    \item{\code{qr.resid}}{\code{signature(qr = "sparseQR", y = .)}:
       returns the result of multiplying \code{y} on the left
-      by \eqn{P' Q2 Q2' P}, using the conventional notation
-      \eqn{Q = [Q1, Q2]} and \eqn{R = [R1; 0]}.}
-    \item{qr.qty}{\code{signature(qr = "sparseQR", y = .)}:
+      by \eqn{P_{1}' Q_{2} Q_{2}' P_{1}}{P1' * Q2 * Q2' * P1}.}
+    \item{\code{qr.qty}}{\code{signature(qr = "sparseQR", y = .)}:
       returns the result of multiplying \code{y} on the left
-      by \eqn{Q' P}.}
-    \item{qr.qy}{\code{signature(qr = "sparseQR", y = .)}:
+      by \eqn{Q' P_{1}}{Q' * P1}.}
+    \item{\code{qr.qy}}{\code{signature(qr = "sparseQR", y = .)}:
       returns the result of multiplying \code{y} on the left
-      by \eqn{P' Q}.}
-    \item{solve}{\code{signature(a = "sparseQR", b = .)}:
+      by \eqn{P_{1}' Q}{P1' * Q}.}
+    \item{\code{solve}}{\code{signature(a = "sparseQR", b = .)}:
       see \code{\link{solve-methods}}.}
   }
 }
