@@ -13,12 +13,21 @@
 \alias{show,pCholesky-method}
 %
 \description{
-  Classes \code{Cholesky} and \code{pCholesky} represent Cholesky
-  factorizations of real, symmetric, positive semidefinite matrices.
-  They store the entries of the \code{n}-by-\code{n} Cholesky factor
-  in dense format as a vector of length \code{n*n} (\code{Cholesky})
-  or \code{n*(n+1)/2} (\code{pCholesky}), the latter giving the
-  \dQuote{\bold{p}acked} representation.
+  Classes \code{Cholesky} and \code{pCholesky} represent
+  Cholesky factorizations of \eqn{n \times n}{n-by-n} real,
+  symmetric, positive semidefinite matrices \eqn{A},
+  having the general form
+  \deqn{A = L_{1} D L_{1}' = L L'}{A = L1 * D * L1' = L * L'}
+  where
+  \eqn{L_{1}}{L1} is a unit lower triangular matrix,
+  \eqn{D} is a non-negative diagonal matrix, and
+  \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+
+  These classes store the entries of the Cholesky factor \eqn{L}
+  in a dense format as a vector of length
+  \eqn{nn}{n*n} (\code{Cholesky}) or
+  \eqn{n(n+1)/2}{n*(n+1)/2} (\code{pCholesky}),
+  the latter giving the \dQuote{packed} representation.
 }
 \section{Slots}{
   \describe{
@@ -54,9 +63,9 @@
 }
 \section{Methods}{
   \describe{
-    \item{expand2}{\code{signature(x = "p?Cholesky")}:
+    \item{\code{expand2}}{\code{signature(x = "p?Cholesky")}:
       see \code{\link{expand2-methods}}.}
-    \item{show}{\code{signature(object = "p?Cholesky")}:
+    \item{\code{show}}{\code{signature(object = "p?Cholesky")}:
       prints the Cholesky factor as a typical
       \code{\linkS4class{Matrix}} rather than as a typical
       \code{\linkS4class{MatrixFactorization}},
@@ -71,8 +80,8 @@
   \code{\linkS4class{dtrMatrix}} and \code{\linkS4class{dtpMatrix}}
   of virtual class \code{\linkS4class{denseMatrix}} and inherit almost
   all of the corresponding methods (for arithmetic, comparison, etc.).
-  A corollary is that \code{\link{determinant}(R <- chol(A))} returns
-  the determinant of \code{R}, not of \code{A}.
+  A corollary is that \code{determinant(R <- chol(A))} returns the
+  determinant of \code{R}, not of \code{A}.
   
   Class \code{Cholesky} should not be confused with the
   \link[=Cholesky]{function of the same name}.  The latter returns

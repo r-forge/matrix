@@ -30,7 +30,14 @@
 \alias{show,QR-method}
 %
 \description{
-  \code{MatrixFactorization} is the virtual class of matrix factorizations.
+  \code{MatrixFactorization} is the virtual class of
+  factorizations of \eqn{m \times n}{m-by-n} matrices \eqn{A},
+  having the general form
+  \deqn{P_{1} A P_{2} = A_{1} \cdots A_{p}}{P1 * A * P2 = A1 * ... * Ap}
+  or (equivalently)
+  \deqn{A = P_{1}' A_{1} \cdots A_{p} P_{2}'}{A = P1' * A1 * ... * Ap * P2'}
+  where \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices
+  (identity matrices in the absence of row and column pivoting).
   
   \code{CholeskyFactorization}, \code{BunchKaufmanFactorization},
   \code{SchurFactorization}, \code{LU}, and \code{QR} are the virtual
@@ -49,26 +56,24 @@
 }
 \section{Methods}{
   \describe{
-    \item{determinant}{\code{signature(x = "MatrixFactorization", logarithm = "missing")}:
+    \item{\code{determinant}}{\code{signature(x = "MatrixFactorization", logarithm = "missing")}:
       sets \code{logarithm = TRUE} and recalls the generic function.}
-    \item{dim}{\code{signature(x = "MatrixFactorization")}:
+    \item{\code{dim}}{\code{signature(x = "MatrixFactorization")}:
       returns \code{x@Dim}.}
-    \item{dimnames}{\code{signature(x = "MatrixFactorization")}:
+    \item{\code{dimnames}}{\code{signature(x = "MatrixFactorization")}:
       returns \code{x@Dimnames}.}
-    \item{dimnames<-}{\code{signature(x = "MatrixFactorization")}:
-      returns \code{x@Dimnames}.}
-    \item{dimnames<-}{\code{signature(x = "MatrixFactorization", value = "NULL")}:
+    \item{\code{dimnames<-}}{\code{signature(x = "MatrixFactorization", value = "NULL")}:
       returns \code{x} with \code{x@Dimnames} set to \code{list(NULL, NULL)}.}
-    \item{dimnames<-}{\code{signature(x = "MatrixFactorization", value = "list")}:
+    \item{\code{dimnames<-}}{\code{signature(x = "MatrixFactorization", value = "list")}:
       returns \code{x} with \code{x@Dimnames} set to \code{value}.}
-    \item{length}{\code{signature(x = "MatrixFactorization")}:
+    \item{\code{length}}{\code{signature(x = "MatrixFactorization")}:
       returns \code{prod(x@Dim)}.}
-    \item{show}{\code{signature(object = "MatrixFactorization")}:
+    \item{\code{show}}{\code{signature(object = "MatrixFactorization")}:
       prints the internal representation of the factorization using
       \code{\link{str}}.}
-    \item{solve}{\code{signature(a = "MatrixFactorization", b = .)}:
+    \item{\code{solve}}{\code{signature(a = "MatrixFactorization", b = .)}:
       see \code{\link{solve-methods}}.}
-    \item{unname}{\code{signature(obj = "MatrixFactorization")}:
+    \item{\code{unname}}{\code{signature(obj = "MatrixFactorization")}:
       returns \code{obj} with \code{obj@Dimnames} set to
       \code{list(NULL, NULL)}.}
   }

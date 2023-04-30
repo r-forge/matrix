@@ -32,14 +32,24 @@
 %
 \description{
   \code{CHMfactor} is the virtual class of sparse Cholesky
-  factorizations of real, symmetric, positive semidefinite matrices.
-  The implementation is based on CHOLMOD's \code{cholmod_factor_struct}.
+  factorizations of \eqn{n \times n}{n-by-n} real, symmetric,
+  positive semidefinite matrices, having the general form
+  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
+  or (equivalently)
+  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 = P1' * L * L' * P1}
+  where
+  \eqn{P_{1}}{P1} is a permutation matrix,
+  \eqn{L_{1}} is a unit lower triangular matrix,
+  \code{D} is a non-negative diagonal matrix, and
+  \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+  The implementation of class \code{CHMfactor} is based on
+  CHOLMOD's C-level \code{cholmod_factor_struct}.
   
-  Virtual subclasses \code{CHMsimpl} and \code{CHMsuper} separate the
-  simplicial and supernodal variants.  These have nonvirtual subclasses
-  \code{[dn]CHMsimpl} and \code{[dn]CHMsuper},
-  where prefix \samp{d} and prefix \samp{n} are reserved for numeric and
-  symbolic factorizations, respectively.
+  Virtual subclasses \code{CHMsimpl} and \code{CHMsuper} separate
+  the simplicial and supernodal variants.  These have nonvirtual
+  subclasses \code{[dn]CHMsimpl} and \code{[dn]CHMsuper}, where
+  prefix \samp{d} and prefix \samp{n} are reserved for numeric
+  and symbolic factorizations, respectively.
 }
 \usage{
 isLDL(x)
@@ -134,31 +144,28 @@ isLDL(x)
 }
 \section{Methods}{
   \describe{
-    \item{chol2inv}{\code{signature(x = "CHMfactor")}:
+    \item{\code{chol2inv}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{chol2inv-methods}}.}
-    \item{coerce}{\code{signature(from = "CHMfactor", to = "Matrix")}:
+    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "Matrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
-      the nonunit lower triangular Cholesky factor \eqn{L} in
-      \eqn{A = P' L L' P}, \emph{even if} \code{isLDL(from)}
-      is \code{TRUE}.}
-    \item{coerce}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
+      the lower triangular Cholesky factor \eqn{L}.}
+    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
       returns a \code{\linkS4class{pMatrix}} representing
-      the permutation matrix \eqn{P} in \eqn{A = P' L L' P}.}
-    \item{determinant}{\code{signature(x = "CHMfactor", logarithm = "logical")}:
-      returns the determinant of the nonunit lower triangular
-      Cholesky factor \eqn{L} in \eqn{A = P' L L' P},
-      which is the square root of the determinant of \eqn{A},
-      \emph{even if} \code{isLDL(x)} is \code{TRUE}.}
-    \item{expand}{\code{signature(x = "CHMfactor")}:
+      the permutation matrix \eqn{P_{1}}.}
+    \item{\code{determinant}}{\code{signature(x = "CHMfactor", logarithm = "logical")}:
+      returns the determinant of the lower triangular
+      Cholesky factor \eqn{L}, which is the square root
+      of the determinant of \eqn{A}.}
+    \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
-    \item{expand2}{\code{signature(x = "CHMfactor")}:
+    \item{\code{expand2}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand2-methods}}.}
-    \item{image}{\code{signature(x = "CHMfactor")}:
+    \item{\code{image}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{image-methods}}.}
-    \item{nnzero}{\code{signature(x = "CHMfactor")}:}
-    \item{solve}{\code{signature(a = "CHMfactor", b = .)}:
+    \item{\code{nnzero}}{\code{signature(x = "CHMfactor")}:}
+    \item{\code{solve}}{\code{signature(a = "CHMfactor", b = .)}:
       see \code{\link{solve-methods}}.}
-    \item{update}{\code{signature(object = "CHMfactor")}:
+    \item{\code{update}}{\code{signature(object = "CHMfactor")}:
       returns a copy of \code{object} with the same nonzero pattern but
       with numeric entries updated according to additional arguments
       \code{parent} and \code{mult}, where \code{parent} is (coercible to)
@@ -171,16 +178,16 @@ isLDL(x)
       if \code{object = Cholesky(S, ...)}.  Here, \code{I} is the
       identity matrix and \code{F = \link{identity}} for symmetric
       \code{parent} and \code{F = \link{tcrossprod}} otherwise.}
-    \item{updown}{\code{signature(update = ., C = "mMatrix", object = "CHMfactor")}:
+    \item{\code{updown}}{\code{signature(update = ., C = "mMatrix", object = "CHMfactor")}:
       see \code{\link{updown-methods}}.}
   }
 }
 \value{
   \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
-  \code{TRUE} if \code{x} represents a factorization \eqn{A = P' L D L' P} 
-  (where \eqn{L} is unit lower triangular and \eqn{D} is diagonal),
-  \code{FALSE} if \code{x} represents a factorization \eqn{A = P' L L' P}
-  (where \eqn{L} is nonunit lower triangular).
+  \code{TRUE} if \code{x} stores the diagonal entries of \eqn{D}
+  and strictly lower triangular elements of \eqn{L_{1}}{L1},
+  \code{FALSE} if \code{x} stores the lower triangular elements
+  of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
 }
 \seealso{
   Class \code{\linkS4class{dsCMatrix}}.

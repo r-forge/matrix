@@ -168,7 +168,7 @@ setMethod("lu", "diagonalMatrix",
 ## METHODS FOR CLASS: denseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("denseLU", "Matrix",
+setAs("denseLU", "dgeMatrix",
       function(from) {
           to <- new("dgeMatrix")
           to@Dim <- from@Dim
@@ -177,7 +177,7 @@ setAs("denseLU", "Matrix",
           to
       })
 
-## returning list(P, L, U), where A = P L U
+## returning list(P1', L, U), where A = P1' L U
 setMethod("expand2", signature(x = "denseLU"),
           function(x, ...) .Call(denseLU_expand, x))
 
@@ -185,31 +185,40 @@ setMethod("expand2", signature(x = "denseLU"),
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "denseLU"),
           function(x, ...) {
-              r <- .Call(denseLU_expand, x)
-              r[[1L]]@Dimnames <- r[[3L]]@Dimnames <- list(NULL, NULL)
-              r[c(2L, 3L, 1L)]
+              r <- .Call(denseLU_expand, x)[c(2L, 3L, 1L)]
+              names(r) <- c("L", "U", "P")
+              NN <- list(NULL, NULL)
+              for(i in 1:3)
+                  r[[i]]@Dimnames <- NN
+              r
           })
 
 
 ## METHODS FOR CLASS: sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(P', L, U, Q), where A = P' L U Q
+## returning list(P1', L, U, P2'), where A = P1' L U P2'
 setMethod("expand2", signature(x = "sparseLU"),
           function(x, ...) {
               d <- x@Dim
               dn <- x@Dimnames
-              P. <- new("pMatrix",
-                        Dim = d,
-                        Dimnames = c(dn[1L], list(NULL)),
-                        margin = 1L,
-                        perm = invPerm(x@p, zero.p = TRUE, zero.res = FALSE))
-              Q  <- new("pMatrix",
-                        Dim = d,
-                        Dimnames = c(list(NULL), dn[2L]),
-                        margin = 2L,
-                        perm = invPerm(x@q, zero.p = TRUE, zero.res = FALSE))
-              list(P. = P., L = x@L, U = x@U, Q = Q)
+              P1. <- new("pMatrix",
+                         Dim = d,
+                         Dimnames = c(dn[1L], list(NULL)),
+                         margin = 1L,
+                         perm = invPerm(
+                             x@p, zero.p = TRUE, zero.res = FALSE))
+              P2. <- new("pMatrix",
+                         Dim = d,
+                         Dimnames = c(list(NULL), dn[2L]),
+                         margin = 2L,
+                         perm = invPerm(
+                             x@q, zero.p = TRUE, zero.res = FALSE))
+              L <- x@L
+              U <- x@U
+              if(L@diag == "N")
+                  L <- ..diagN2U(L, sparse = TRUE)
+              list(P1. = P1., L = L, U = U, P2. = P2.)
           })
 
 ## returning list(P, L, U, Q), where A = P' L U Q
@@ -227,8 +236,8 @@ setMethod("expand", signature(x = "sparseLU"),
               P <- new("pMatrix", Dim = d, perm = p)
               Q <- new("pMatrix", Dim = d, perm = q)
               L <- x@L
-              L@Dimnames <- c(dn[1L], list(NULL))
               U <- x@U
+              L@Dimnames <- c(dn[1L], list(NULL))
               U@Dimnames <- c(list(NULL), dn[2L])
               list(P = P, L = L, U = U, Q = Q)
           })

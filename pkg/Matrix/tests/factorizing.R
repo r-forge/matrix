@@ -694,7 +694,7 @@ set.seed(24831)
 n <- 64L
 mS <- tcrossprod(matrix(rnorm(n * n), n, n,
                         dimnames = list(A = paste0("s", seq_len(n)), NULL)))
-## FIXME: most of our %*% methods still mangle names(dimnames)
+## FIXME: many of our %*% methods still mangle names(dimnames)
 names(dimnames(mS)) <- NULL
 sS <- as(pS <- as(S <- as(mS, "dpoMatrix"), "packedMatrix"), "CsparseMatrix")
 stopifnot(exprs = {
@@ -709,6 +709,8 @@ stopifnot(exprs = {
     chkMF(sS, mS, Cholesky, super =  TRUE, LDL = FALSE)
     chkMF(sS, mS, Cholesky, super = FALSE, LDL =  TRUE)
     chkMF(sS, mS, Cholesky, super = FALSE, LDL = FALSE)
+    chkMF(sS, mS,       qr, complete =  TRUE)
+    chkMF(sS, mS,       qr, complete = FALSE)
 })
 
 

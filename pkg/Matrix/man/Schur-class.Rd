@@ -11,10 +11,15 @@
 \alias{show,Schur-method}
 %
 \description{
-  \code{Schur} is the class of Schur factorizations of real, square
-  matrices.  The Schur factorization generalizes the eigendecomposition
-  of diagonalizable (i.e., non-defective) square matrices to general
-  square matrices.
+  \code{Schur} is the class of Schur factorizations of
+  \eqn{n \times n}{n-by-n} real matrices \eqn{A},
+  having the general form
+  \deqn{A = Q T Q'}{A = Q * T * Q'}
+  where
+  \eqn{Q} is an orthogonal matrix and
+  \eqn{T} is a block upper triangular matrix with
+  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks
+  specifying the real and complex conjugate eigenvalues of \eqn{A}.
 }
 \section{Slots}{
   \describe{
@@ -32,7 +37,9 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{MatrixFactorization}}, directly.
+  Class \code{\linkS4class{SchurFactorization}}, directly.
+  Class \code{\linkS4class{MatrixFactorization}}, by class
+  \code{\linkS4class{SchurFactorization}}, distance 2.
 }
 \section{Instantiation}{
   Objects can be generated directly by calls of the form

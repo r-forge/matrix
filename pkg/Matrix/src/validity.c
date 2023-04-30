@@ -1152,23 +1152,39 @@ SEXP denseLU_validate(SEXP obj)
 
 SEXP sparseLU_validate(SEXP obj)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)), uplo;
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     int *pdim = INTEGER(dim), n = pdim[0];
     if (pdim[1] != n)
 	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
     UNPROTECT(1); /* dim */
 
-    SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym));
+    SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym)), uplo, diag;
     PROTECT(dim = GET_SLOT(L, Matrix_DimSym));
     pdim = INTEGER(dim);
     if (pdim[0] != n || pdim[1] != n)
         UPRET(2, "dimensions of 'L' slot are not identical to 'Dim'");
-
+    
     PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
     if (*CHAR(STRING_ELT(uplo, 0)) == 'U')
 	UPRET(3, "'L' slot is upper (not lower) triangular");
-    UNPROTECT(3); /* uplo, dim, L */ /* FIXME: require L@diag == "U"? */
-
+    
+    PROTECT(diag = GET_SLOT(L, Matrix_diagSym));
+    if (*CHAR(STRING_ELT(diag, 0)) == 'N') {
+	SEXP p = PROTECT(GET_SLOT(L, Matrix_pSym)),
+	    i = PROTECT(GET_SLOT(L, Matrix_iSym)),
+	    x = PROTECT(GET_SLOT(L, Matrix_xSym));
+	int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
+	double *px = REAL(x);
+	for (j = 0; j < n; ++j) {
+	    kend = *(++pp);
+	    if (kend == k || pi[k] != j || px[k] != 1.0)
+		UPRET(7, "'L' slot has nonunit diagonal elements");
+	    k = kend;
+	}
+	UNPROTECT(3); /* x, i, p */
+    }
+    UNPROTECT(4); /* diag, uplo, dim, L */
+    
     SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
     PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
     pdim = INTEGER(dim);
