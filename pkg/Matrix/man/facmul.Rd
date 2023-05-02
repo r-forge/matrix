@@ -67,5 +67,3 @@ y <- rnorm(3)
 facmul( qr(x), factor = "Q", y)   # form Q y
 }
 }
-\keyword{array}
-\keyword{algebra}

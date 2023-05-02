@@ -72,5 +72,3 @@ stopifnot(is(dT.n, "denseMatrix"), is(sT.n, "sparseMatrix"),
           dT@diag == "U", dT.n@diag == "N", sT.n@diag == "N",
           all(dT == dT.n), all(dT == sT.n))
 }
-\keyword{utilities}
-\keyword{classes}
