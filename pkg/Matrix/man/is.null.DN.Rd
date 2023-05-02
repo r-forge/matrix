@@ -68,6 +68,4 @@ stopifnot(exprs = {
   hasNoDimnames(Matrix(m) -> M)
   hasNoDimnames(as(M, "sparseMatrix"))
 })
-
 }
-\keyword{utilities}
