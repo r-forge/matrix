@@ -12,11 +12,8 @@ setMethod("chol", signature(x = "generalMatrix"),
           })
 
 setMethod("chol", signature(x = "symmetricMatrix"),
-	  function(x, ...) {
-              if(is(x, "nMatrix"))
-                  stop("symbolic factorization of nMatrix via chol() is not yet implemented") # TODO
-              chol(as(x, "dMatrix"), ...)
-          })
+	  function(x, ...)
+              chol(as(x, "dMatrix"), ...))
 
 setMethod("chol", signature(x = "triangularMatrix"),
 	  function(x, ...) {
@@ -138,10 +135,6 @@ setMethod("Cholesky", signature(A = "sparseMatrix"), # ->dsCMatrix
               Cholesky(..sparse2d(.M2sym(as(A, "CsparseMatrix"))),
                        perm = perm, LDL = LDL, super = super, Imult = Imult,
                        ...))
-
-setMethod("Cholesky", signature(A = "nsparseMatrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-              stop("symbolic factorization of nsparseMatrix via Cholesky() is not yet implemented")) # TODO
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
