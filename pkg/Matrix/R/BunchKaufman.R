@@ -8,7 +8,11 @@ setMethod("BunchKaufman", signature(x = "dspMatrix"),
 	  function(x, ...) .Call(dspMatrix_trf, x, 2L))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo = "U", ...) .Call(matrix_trf, x, 2L, uplo))
+	  function(x, uplo = "U", ...) {
+              if(is.logical(x) || is.integer(x))
+                  storage.mode(x) <- "double"
+              .Call(matrix_trf, x, 2L, uplo)
+          })
 
 
 ## METHODS FOR CLASS: p?BunchKaufman
