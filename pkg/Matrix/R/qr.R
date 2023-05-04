@@ -13,11 +13,6 @@ setMethod("qr", signature(x = "sparseMatrix"),
               qr(..sparse2d(.sparse2g(as(x, "CsparseMatrix"))), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
-          function(x,
-                   ## also had
-                   ## > tol = 1e-07, LAPACK = FALSE,
-                   ## from base::qr.default() but these are unused
-                   ## _and_ not needed for generic consistency ...
-                   keep.dimnames = TRUE,
+          function(x, keep.dimnames = TRUE,
                    verbose = getOption("Matrix.verbose", FALSE), ...)
               .Call(dgCMatrix_QR, x, if(verbose) -1L else 1L, keep.dimnames))
