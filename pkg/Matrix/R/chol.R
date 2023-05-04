@@ -135,22 +135,16 @@ setMethod("chol2inv", signature(x = "dtrMatrix"),
 	  })
 
 setMethod("chol2inv", signature(x = "sparseMatrix"),
-	  function (x, ...) {
-	      chkDots(..., which.call = -2L)
-	      tcrossprod(solve(.M2tri(x)))
-	  })
+	  function (x, ...)
+	      tcrossprod(solve(.M2tri(x))))
 
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
-	  function (x, ...) {
-	      chkDots(..., which.call = -2L)
-	      tcrossprod(solve(x))
-	  })
+	  function (x, ...)
+	      tcrossprod(solve(x)))
 
 setMethod("chol2inv", signature(x = "CHMfactor"),
-	  function (x, ...) {
-	      chkDots(..., which.call = -2L)
-	      solve(x, system = "A")
-	  })
+	  function (x, ...)
+	      solve(x, system = "A"))
 
 
 ## METHODS FOR CLASS: p?Cholesky
