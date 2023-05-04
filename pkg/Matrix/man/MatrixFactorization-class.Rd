@@ -36,8 +36,13 @@
   \deqn{P_{1} A P_{2} = A_{1} \cdots A_{p}}{P1 * A * P2 = A1 * ... * Ap}
   or (equivalently)
   \deqn{A = P_{1}' A_{1} \cdots A_{p} P_{2}'}{A = P1' * A1 * ... * Ap * P2'}
-  where \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices
-  (identity matrices in the absence of row and column pivoting).
+  where \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices.
+  Factorizations requiring symmetric \eqn{A} have the constraint
+  \eqn{P_{2} = P_{1}'}{P2 = P1'}, and factorizations without row
+  or column pivoting have the constraints
+  \eqn{P_{1} = I_{m}}{P1 = Im} and \eqn{P_{2} = I_{n}}{P2 = In},
+  where \eqn{I_{m}}{Im} and \eqn{I_{n}}{In} are the
+  \eqn{m \times m}{m-by-m} and \eqn{n \times n}{n-by-n} identity matrices.
   
   \code{CholeskyFactorization}, \code{BunchKaufmanFactorization},
   \code{SchurFactorization}, \code{LU}, and \code{QR} are the virtual

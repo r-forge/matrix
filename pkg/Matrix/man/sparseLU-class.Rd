@@ -58,6 +58,11 @@
 
   Generic functions \code{\link{expand2}} and \code{\link{lu}}.
 }
+\references{
+  Davis, T. A. (2006).
+  \emph{Direct Methods for Sparse Linear Systems},
+  Society for Industrial and Applied Mathematics.
+}
 \examples{
 ## Extending the one in   examples(lu), calling the matrix  A,
 ## and confirming the factorization identities :

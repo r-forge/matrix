@@ -22,6 +22,7 @@
 \alias{coerce,CHMfactor,TsparseMatrix-method}
 \alias{coerce,CHMfactor,dMatrix-method}
 \alias{coerce,CHMfactor,dsparseMatrix-method}
+\alias{coerce,CHMfactor,dtCMatrix-method}
 \alias{coerce,CHMfactor,pMatrix-method}
 \alias{coerce,CHMfactor,sparseMatrix-method}
 \alias{coerce,CHMfactor,triangularMatrix-method}
@@ -42,10 +43,10 @@
   \eqn{L_{1}} is a unit lower triangular matrix,
   \code{D} is a non-negative diagonal matrix, and
   \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+
   The implementation of class \code{CHMfactor} is based on
-  CHOLMOD's C-level \code{cholmod_factor_struct}.
-  
-  Virtual subclasses \code{CHMsimpl} and \code{CHMsuper} separate
+  CHOLMOD's C-level \code{cholmod_factor_struct}. Virtual
+  subclasses \code{CHMsimpl} and \code{CHMsuper} separate
   the simplicial and supernodal variants.  These have nonvirtual
   subclasses \code{[dn]CHMsimpl} and \code{[dn]CHMsuper}, where
   prefix \samp{d} and prefix \samp{n} are reserved for numeric
@@ -55,9 +56,16 @@
 isLDL(x)
 }
 \arguments{
-  \item{x}{a Cholesky factorization inheriting from virtual class
-    \code{CHMfactor}, almost always the result of a call to generic
-    function \code{\link{Cholesky}}.}
+  \item{x}{an object inheriting from virtual class \code{CHMfactor},
+    almost always the result of a call to generic function
+    \code{\link{Cholesky}}.}
+}
+\value{
+  \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
+  \code{TRUE} if \code{x} stores the diagonal entries of \eqn{D}
+  and strictly lower triangular elements of \eqn{L_{1}}{L1},
+  \code{FALSE} if \code{x} stores the lower triangular elements
+  of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
 }
 \section{Slots}{
   Of \code{CHMfactor}:
@@ -69,8 +77,9 @@ isLDL(x)
       each column of the lower triangular Cholesky factor.
       If symbolic analysis was performed prior to factorization,
       then the estimate is exact.}
-    \item{\code{perm}}{a integer vector specifying the permutation
-      applied to the rows and columns of the factorized matrix.
+    \item{\code{perm}}{a 0-based integer vector of length \code{Dim[1]}
+      specifying the permutation applied to the rows and columns of the
+      factorized matrix.
       If symbolic analysis was performed prior to factorization,
       then the permutation is chosen to reduce fill-in.}
     \item{\code{type}}{an integer vector specifying the factorization
@@ -146,7 +155,7 @@ isLDL(x)
   \describe{
     \item{\code{chol2inv}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{chol2inv-methods}}.}
-    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "Matrix")}:
+    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "dtCMatrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L}.}
     \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
@@ -181,13 +190,6 @@ isLDL(x)
     \item{\code{updown}}{\code{signature(update = ., C = "mMatrix", object = "CHMfactor")}:
       see \code{\link{updown-methods}}.}
   }
-}
-\value{
-  \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
-  \code{TRUE} if \code{x} stores the diagonal entries of \eqn{D}
-  and strictly lower triangular elements of \eqn{L_{1}}{L1},
-  \code{FALSE} if \code{x} stores the lower triangular elements
-  of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
 }
 \seealso{
   Class \code{\linkS4class{dsCMatrix}}.

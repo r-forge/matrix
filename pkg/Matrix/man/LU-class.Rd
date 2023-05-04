@@ -20,7 +20,7 @@
   where
   \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix, 
   \eqn{L} is an \eqn{m \times \text{min}(m,n)}{m-by-min(m,n)}
-  lower trapezoidal matrix with unit diagonal entries, and
+  unit lower trapezoidal matrix, and
   \eqn{U} is a  \eqn{\text{min}(m,n) \times n}{min(m,n)-by-n}
   upper trapezoidal matrix.  If \eqn{m = n}, then the factors
   \eqn{L} and \eqn{U} are triangular.
@@ -30,11 +30,12 @@
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
       \code{\linkS4class{MatrixFactorization}}.}
     \item{\code{x}}{a numeric vector of length \code{prod(Dim)} storing
-      the \code{L} and \code{U} factors together in a packed format.
-      The details of the representation are specified by the LAPACK
-      manual for its routine \code{DGETRF}.}
+      the triangular \eqn{L} and \eqn{U} factors together in a packed
+      format.  The details of the representation are specified by the
+      manual for LAPACK routine \code{DGETRF}.}
     \item{\code{perm}}{an integer vector of length \code{min(Dim)}
-      specifying row interchanges as described in the LAPACK manual.}
+      specifying row interchanges as described in the manual for
+      LAPACK routine \code{DGETRF}.}
   }
 }
 \section{Extends}{
@@ -67,6 +68,10 @@
   Class \code{\linkS4class{dgeMatrix}}.
 
   Generic functions \code{\link{expand2}} and \code{\link{lu}}.
+}
+\references{
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dgetrf.f}.
 }
 \examples{
 set.seed(1)
