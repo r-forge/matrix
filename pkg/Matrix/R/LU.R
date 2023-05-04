@@ -1,5 +1,5 @@
 ## METHODS FOR GENERIC: lu
-## partially pivoted LU factorization, returning denseLU or sparseLU
+## pivoted LU factorization, returning denseLU or sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("lu", signature(x = "matrix"),
