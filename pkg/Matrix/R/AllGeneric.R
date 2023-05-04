@@ -59,10 +59,7 @@ setGeneric("pack", function(x, ...) standardGeneric("pack"))
     setGeneric("band", function(x, k1, k2, ...)
                standardGeneric("band"))
 
-    setGeneric("Cholesky",
-	       function(A, perm = TRUE, LDL = !super, super = FALSE,
-			Imult = 0, ...)
-               standardGeneric("Cholesky"))
+    setGeneric("Cholesky", function(A, ...) standardGeneric("Cholesky"))
 
 setGeneric("symmpart", function(x) standardGeneric("symmpart"))
 setGeneric("skewpart", function(x) standardGeneric("skewpart"))

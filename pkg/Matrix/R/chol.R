@@ -105,18 +105,13 @@ setMethod("chol", signature(x = "dsTMatrix"),
 ## METHODS FOR GENERIC: Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("Cholesky", signature(A = "denseMatrix"),
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-              stop("Cholesky(A) is implemented for sparseMatrix 'A' only; consider chol(A) instead"))
-
 setMethod("Cholesky", signature(A = "sparseMatrix"), # ->dsCMatrix
-	  function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
-              Cholesky(..sparse2d(.M2sym(as(A, "CsparseMatrix"))),
-                       perm = perm, LDL = LDL, super = super, Imult = Imult,
-                       ...))
+	  function(A, ...)
+              Cholesky(..sparse2d(.M2sym(as(A, "CsparseMatrix"))), ...))
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
-          function(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, ...)
+          function(A, perm = TRUE, LDL = !super, super = FALSE,
+                   Imult = 0, ...)
               .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
 
 
