@@ -1,5 +1,5 @@
 \name{Schur-methods}
-\title{Schur Decomposition of a Matrix}
+\title{Methods for Schur Factorization}
 %
 \docType{methods}
 \keyword{algebra}
@@ -11,7 +11,6 @@
 %
 \alias{Schur,Matrix,missing-method}
 \alias{Schur,matrix,missing-method}
-
 \alias{Schur,dgeMatrix,logical-method}
 \alias{Schur,diagonalMatrix,logical-method}
 \alias{Schur,dsyMatrix,logical-method}
@@ -21,55 +20,56 @@
 \alias{Schur,triangularMatrix,logical-method}
 %
 \description{
-  Computes the Schur decomposition and eigenvalues of a square matrix;
-  see the BACKGROUND information below.
+  Computes the Schur factorization of an \eqn{n \times n}{n-by-n}
+  real matrix \eqn{A}, which has the general form 
+  \deqn{A = Q T Q'}{A = Q * T * Q'}
+  where
+  \eqn{Q} is an orthogonal matrix and
+  \eqn{T} is a block upper triangular matrix with
+  \eqn{1 \times 1}{1-by-1} and \eqn{2 \times 2}{2-by-2} diagonal blocks
+  specifying the real and complex conjugate eigenvalues of \eqn{A}.
+  The column vectors of \eqn{Q} are the Schur vectors of \eqn{A},
+  and \eqn{T} is the Schur form of \eqn{A}.
+  
+  Methods are built on LAPACK routine \code{DGEES}.
 }
 \usage{
-Schur(x, vectors, \dots)
+Schur(x, vectors = TRUE, \dots)
 }
 \arguments{
-  \item{x}{
-    numeric %(or complex, in future)
-    square Matrix (inheriting from class \code{"Matrix"}) or traditional
-    \code{\link{matrix}}.  Missing values (NAs) are not allowed.
-  }
-  \item{vectors}{logical.  When \code{TRUE} (the default), the Schur
-    vectors are computed, and the result is a proper
-    \code{\linkS4class{MatrixFactorization}} of class
-    \code{\linkS4class{Schur}}.
-  }
-  \item{\dots}{further arguments passed to or from other methods.}
+  \item{x}{a \link[=is.finite]{finite} square matrix or
+    \code{\linkS4class{Matrix}} to be factorized.}
+  \item{vectors}{a logical.  If \code{TRUE} (the default),
+    then Schur vectors are computed in addition to the Schur form.}
+  \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  If \code{vectors} are \code{TRUE}, as per default:
-  If \code{x} is a \code{\linkS4class{Matrix}}
-  an object of class \code{\linkS4class{Schur}}, otherwise, for a
-  traditional \code{\link{matrix}} \code{x}, a \code{\link{list}} with
-  components \code{T}, \code{Q}, and \code{EValues}.
+  If \code{vectors = TRUE} and \code{x} is a
+  \code{\linkS4class{Matrix}}, then the result is an object
+  of class \code{\linkS4class{Schur}}.
 
-  If \code{vectors} are \code{FALSE}, a list with components
-  \item{T}{the upper quasi-triangular (square) matrix of the Schur decomposition.}
-  \item{EValues}{the vector of \code{\link{numeric}} or
-  \code{\link{complex}} eigen values of \eqn{T} or \eqn{A}.}
+  If \code{vectors = TRUE} and \code{x} is a tradtional matrix,
+  then the result is a named list containing the \code{Q}, \code{T},
+  and \code{EValues} slots of the \code{\linkS4class{Schur}} object.
+
+  If \code{vectors = FALSE}, then the result is the same named list
+  but without \code{Q}.
 }
-\details{
-  Based on the Lapack subroutine \code{dgees}.
-}
-\section{BACKGROUND}{
-  If \code{A} is a square matrix, then \code{A = Q T t(Q)}, where
-  \code{Q} is orthogonal, and \code{T} is upper block-triangular
-  (nearly triangular with either 1 by 1 or 2 by 2 blocks on the
-  diagonal) where the 2 by 2 blocks correspond to (non-real) complex
-  eigenvalues.
-  The eigenvalues of \code{A} are the same as those of \code{T},
-  which are easy to compute.  The Schur form is used most often for
-  computing non-symmetric eigenvalue decompositions, and for computing
-  functions of matrices such as matrix exponentials.
+\seealso{
+  Class \code{\linkS4class{Schur}} and its methods.
+
+  Class \code{\linkS4class{dgeMatrix}}.
+
+  Generic function \code{\link{expand2}},
+  for constructing matrix factors from the result.
+  
+  Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
+  \code{\link{lu}}, and \code{\link{qr}},
+  for computing other factorizations.
 }
 \references{
-  Anderson, E., et al. (1994).
-  \emph{LAPACK User's Guide,}
-  2nd edition, SIAM, Philadelphia.
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dgees.f}.
 }
 \examples{
 Schur(Hilbert(9))              # Schur factorization (real eigenvalues)

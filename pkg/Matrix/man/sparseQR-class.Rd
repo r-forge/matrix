@@ -5,6 +5,7 @@
 \keyword{algebra}
 \keyword{array}
 \keyword{classes}
+\keyword{utilities}
 %
 \alias{sparseQR-class}
 %
@@ -31,6 +32,8 @@
 \alias{qr.resid,sparseQR,matrix-method}
 \alias{qr.resid,sparseQR,numeric-method}
 %
+\alias{qrR}
+%
 \description{
   \code{sparseQR} is the class of sparse, row- and column-pivoted
   QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
@@ -46,6 +49,30 @@
   (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
   upper \emph{triangular}).
 }
+\usage{
+qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
+}
+\arguments{
+  \item{qr}{an object of class \code{\linkS4class{sparseQR}},
+    almost always the result of a call to generic function \code{qr}
+    with sparse \code{x}.}
+  \item{complete}{a logical indicating if \eqn{R} should be returned
+    instead of \eqn{R_{1}}{R1}.  Note that \eqn{R} and \eqn{R_{1}}{R1}
+    coincide in the \eqn{m = n} case.}
+  \item{backPermute}{a logical indicating if \eqn{R_{1} P_{2}'}{R1 * P2'} 
+    (\eqn{R P_{2}'}{R * P2'} if \code{complete = TRUE}) should be returned 
+    instead of \eqn{R_{1}}{R1} (\eqn{R} if \code{complete = TRUE}).}
+  \item{row.names}{a logical indicating if \code{rownames(qr)}
+    should be propagated unpermuted to the result.
+    If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
+}
+\value{
+  \code{qrR} returns
+  a \code{\linkS4class{dtCMatrix}} representing \eqn{R_{1}}{R1}
+  (if \code{complete = FALSE}) or
+  a \code{\linkS4class{dgCMatrix}} representing \eqn{R}
+  (if \code{complete = TRUE}).
+}
 \section{Slots}{
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
@@ -60,10 +87,14 @@
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
       \code{R} is the upper trapezoidal \eqn{R} factor.}
-    \item{\code{p}, \code{q}}{integer vectors of length \code{nrow(V)}
-      and \code{Dim[2]} specifying row and column permutations,
-      respectively.  \code{q} may have length 0, implying no column
-      permutation.}
+    \item{\code{p}, \code{q}}{0-based integer vectors of length
+      \code{nrow(V)} and \code{Dim[2]}, respectively, specifying
+      the permutations applied to the rows and columns of the
+      factorized matrix.  \code{q} of length 0 is valid and equivalent
+      to the identity permutation, implying no column pivoting.
+      Using \R{} syntax, the matrix \eqn{P_{1} A P_{2}}{P1 * A * P2}
+      is precisely \code{A[p+1, q+1]} (\code{A[p+1, ]} when \code{q}
+      has length 0).}
   }
 }
 \section{Extends}{
@@ -82,82 +113,77 @@
     \item{\code{expand2}}{\code{signature(x = "sparseQR")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{qr.Q}}{\code{signature(qr = "sparseQR")}:
-      returns the orthogonal matrix \eqn{P_{1}' Q}{P1' * Q}.}
+      returns as a \code{\linkS4class{dgeMatrix}} either
+      \eqn{P_{1}' Q}{P1' * Q} or \eqn{P_{1}' Q_{1}}{P1' * Q1},
+      depending on optional argument \code{complete}.  The default
+      is \code{FALSE}, indicating \eqn{P_{1}' Q_{1}}{P1' * Q1}.}
     \item{\code{qr.R}}{\code{signature(qr = "sparseQR")}:
-      returns the upper trapezoidal matrix \eqn{R} or the result
-      \eqn{R P_{2}'}{R * P2'} of permuting its columns, the latter
-      if \code{backPermute = TRUE} is passed in the call.
-      This method warns about possible differences between its
-      result and that of \code{base::qr.R(base::qr.default(.))}.
-      The warning can be suppressed with
+      returns either \eqn{R} as a \code{\linkS4class{dgCMatrix}}
+      or \eqn{R_{1}}{R1} as a \code{\linkS4class{dtCMatrix}},
+      depending on optional argument \code{complete}.  The default
+      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.
+      This method warns about possible differences in the result of
+      \code{qr.R(qr(x))} depending on whether \code{x} is sparse or
+      dense.  The warning can be suppressed with
       \code{\link{options}(Matrix.quiet.qr.R = TRUE)}
       or
       \code{\link{options}(Matrix.quiet = TRUE)},
       the latter having side effects not limited to this method.}
     \item{\code{qr.coef}}{\code{signature(qr = "sparseQR", y = .)}:
-      returns the result of multiplying \code{y} on the left
-      by \eqn{P_{2} R_{1}^{-1} Q_{1}' P_{1}}{P2 * R1^{-1} * Q1' * P1}.}
+      returns as a \code{\linkS4class{dgeMatrix}} or vector
+      the result of multiplying \code{y} on the left by
+      \eqn{P_{2} R_{1}^{-1} Q_{1}' P_{1}}{P2 * R1^{-1} * Q1' * P1}.}
     \item{\code{qr.fitted}}{\code{signature(qr = "sparseQR", y = .)}:
-      returns the result of multiplying \code{y} on the left
-      by \eqn{P_{1}' Q_{1} Q_{1}' P_{1}}{P1' * Q1 * Q1' * P1}.}
+      returns as a \code{\linkS4class{dgeMatrix}} or vector
+      the result of multiplying \code{y} on the left by
+      \eqn{P_{1}' Q_{1} Q_{1}' P_{1}}{P1' * Q1 * Q1' * P1}.}
     \item{\code{qr.resid}}{\code{signature(qr = "sparseQR", y = .)}:
-      returns the result of multiplying \code{y} on the left
-      by \eqn{P_{1}' Q_{2} Q_{2}' P_{1}}{P1' * Q2 * Q2' * P1}.}
+      returns as a \code{\linkS4class{dgeMatrix}} or vector
+      the result of multiplying \code{y} on the left by
+      \eqn{P_{1}' Q_{2} Q_{2}' P_{1}}{P1' * Q2 * Q2' * P1}.}
     \item{\code{qr.qty}}{\code{signature(qr = "sparseQR", y = .)}:
-      returns the result of multiplying \code{y} on the left
-      by \eqn{Q' P_{1}}{Q' * P1}.}
+      returns as a \code{\linkS4class{dgeMatrix}} or vector
+      the result of multiplying \code{y} on the left by
+      \eqn{Q' P_{1}}{Q' * P1}.}
     \item{\code{qr.qy}}{\code{signature(qr = "sparseQR", y = .)}:
-      returns the result of multiplying \code{y} on the left
-      by \eqn{P_{1}' Q}{P1' * Q}.}
+      returns as a \code{\linkS4class{dgeMatrix}} or vector
+      the result of multiplying \code{y} on the left by
+      \eqn{P_{1}' Q}{P1' * Q}.}
     \item{\code{solve}}{\code{signature(a = "sparseQR", b = .)}:
       see \code{\link{solve-methods}}.}
   }
 }
 \details{
-  For a sparse \eqn{m \times n}{m x n} (\dQuote{long}: \eqn{m \ge n}{m >= n})
-  rectangular matrix \eqn{A}, the sparse QR decomposition is either 
-  \cr of the form \eqn{P A = Q R} with a (row)
-  permutation matrix \eqn{P}, (encoded in the \code{p} slot of the
-  result) if the \code{q} slot is of length 0,
-  \cr or of the form \eqn{P A P* = Q R} with an extra (column) permutation
-  matrix \eqn{P*} (encoded in the \code{q} slot).
-  Note that the row permutation \eqn{P A} in \R is simply \code{A[p+1, ]}
-  where \code{p} is the \code{p}-slot, a 0-based permutation of
-  \code{1:m} applied to the rows of the original matrix.
+  The orthogonal factor \eqn{Q} is defined implicitly by slots
+  \code{V} and \code{beta}.  The columns of \code{V} and elements
+  of \code{beta} generate the \eqn{n} Householder matrices whose
+  product is \eqn{Q}.
 
-  If the \code{q} slot has length \code{n} it is a 0-based permutation
-  of \code{1:n} applied to the columns of the original matrix to reduce
-  the amount of \dQuote{fill-in} in the matrix \eqn{R}, and
-  \eqn{A P*} in \R is simply \code{A[ , q+1]}.
-
-  \eqn{R} is an \eqn{m\times n}{m by n} matrix that is zero below the
-  main diagonal, i.e., upper triangular (\eqn{m\times m}{m by n}) with
-  \eqn{m-n} extra zero rows.
-
-  The matrix \eqn{Q} is a \dQuote{virtual matrix}.  It is the product of
-  \eqn{n} Householder transformations.  The information to generate
-  these Householder transformations is stored in the \code{V} and
-  \code{beta} slots.
-  \cr
-  Note however that \code{qr.Q()} returns the row permuted matrix
-  \eqn{Q* := P^{-1}Q = P'Q}{Q* := P^(-1) Q = P'Q} as permutation matrices are
-  orthogonal; and \eqn{Q*} is orthogonal itself because \eqn{Q} and \eqn{P} are.
-  This is useful because then, as in the dense matrix and \pkg{base} \R
-  matrix \code{\link{qr}} case, we have the mathematical identity
-  \deqn{P A = Q* R,} in \R as \preformatted{            A[p+1,] == qr.Q(*) \%*\% R .}
-
-  The \code{sparseQR} methods for the \code{qr.*} functions return
-  objects of class \code{\linkS4class{dgeMatrix}}.
-  Results from \code{qr.coef},
-  \code{qr.resid} and \code{qr.fitted} (when \code{k == ncol(R)}) are
-  well-defined and should match those from the corresponding dense matrix
-  calculations.  However, because the matrix \code{Q} is not uniquely
-  defined, the results of \code{qr.qy} and \code{qr.qty} do not
-  necessarily match those from the corresponding dense matrix
-  calculations.
-
-  Also, the results of \code{qr.qy} and \code{qr.qty} apply to the
-  permuted column order when the \code{q} slot has length \code{n}.
+  The method for \code{qr.Q} does not return \eqn{Q} but rather the
+  (also orthogonal) product \eqn{P_{1}' Q}{P1' * Q}.  This behaviour
+  is algebraically consistent with the \pkg{base} implementation
+  (see \code{\link[base]{qr}}), which can be seen by noting that
+  \code{qr.default} in \pkg{base} does not pivot rows, constraining
+  \eqn{P_{1}}{P1} to be an identity matrix.  It follows that
+  \code{qr.Q(qr.default(x))} also returns \eqn{P_{1}' Q}{P1' * Q}.
+  
+  Similarly, the methods for \code{qr.qy} and \code{qr.qty} multiply
+  on the left by \eqn{P_{1}' Q}{P1' * Q} and \eqn{Q' P_{1}}{Q' * P1}
+  rather than \eqn{Q} and \eqn{Q'}.
+  
+  It is wrong to expect equality of values of \code{qr.Q}
+  (or \code{qr.R}, \code{qr.qy}, \code{qr.qty}) computed from
+  \dQuote{equivalent} sparse and dense factorizations (say,
+  \code{qr(x)} and \code{qr(as(x, "matrix"))} for \code{x}
+  of class \code{\linkS4class{dgCMatrix}}).  The underlying
+  factorization algorithms are quite different (notably as
+  they employ different criteria to select \eqn{P_{2}}{P2}),
+  and in general the factorization is not unique even for
+  fixed \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2}.
+  
+  On the other hand, the values of \code{qr.coef}, \code{qr.fitted}
+  (with \code{k = ncol(qr@R)}), and \code{qr.resid} are well-defined,
+  so the sparse and dense computations should agree.
 }
 \seealso{
   Class \code{\linkS4class{dgCMatrix}}.
@@ -170,9 +196,13 @@
   
   The many auxiliary functions for QR factorizations:
   \code{\link{qr.Q}}, \code{\link{qr.R}}, \code{\link{qr.X}},
-  \code{\link{qr.coef}}, \code{\link{qr.fitted}},
-  \code{\link{qr.qty}}, \code{\link{qr.qy}},
-  \code{\link{qr.resid}}, and \code{\link{qr.solve}}.
+  \code{\link{qr.coef}}, \code{\link{qr.fitted}}, \code{\link{qr.resid}},
+  \code{\link{qr.qty}}, \code{\link{qr.qy}}, and \code{\link{qr.solve}}.
+}
+\references{
+  Davis, T. A. (2006).
+  \emph{Direct Methods for Sparse Linear Systems},
+  Society for Industrial and Applied Mathematics.
 }
 \examples{
 data(KNex)

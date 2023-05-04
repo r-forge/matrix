@@ -8,8 +8,6 @@
 %
 \alias{Schur-class}
 %
-\alias{show,Schur-method}
-%
 \description{
   \code{Schur} is the class of Schur factorizations of
   \eqn{n \times n}{n-by-n} real matrices \eqn{A},
@@ -20,6 +18,12 @@
   \eqn{T} is a block upper triangular matrix with
   \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks
   specifying the real and complex conjugate eigenvalues of \eqn{A}.
+  The column vectors of \eqn{Q} are the Schur vectors of \eqn{A},
+  and \eqn{T} is the Schur form of \eqn{A}.
+
+  The Schur factorization generalizes the spectral decomposition
+  of normal matrices \eqn{A}, whose Schur form is block diagonal,
+  to arbitrary square matrices.
 }
 \section{Slots}{
   \describe{
@@ -51,15 +55,21 @@
   \describe{
     \item{expand2}{\code{signature(x = "Schur")}:
       see \code{\link{expand2-methods}}.}
-    \item{show}{\code{signature(object = "Schur")}:
-      prints the internal representation of the factorization using
-      \code{\link{str}}.}
   }
+}
+\details{
+  The matrix \eqn{A} and its Schur form \eqn{T} are \emph{similar}
+  and thus have the same spectrum.  The eigenvalues are computed
+  trivially as the eigenvalues of the diagonal blocks of \eqn{T}.
 }
 \seealso{
   Class \code{\linkS4class{dgeMatrix}}.
   
   Generic functions \code{\link{expand2}} and \code{\link{Schur}}.
+}
+\references{
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dgees.f}.
 }
 \examples{
 showClass("Schur")

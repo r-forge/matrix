@@ -1,5 +1,5 @@
 \name{chol-methods}
-\title{The Cholesky Decomposition - 'Matrix' S4 Generic and Methods}
+\title{Compute the Cholesky Factor of a Matrix}
 \docType{methods}
 %
 \keyword{algebra}
@@ -13,7 +13,6 @@
 \alias{chol,dgCMatrix-method}
 \alias{chol,dgRMatrix-method}
 \alias{chol,dgTMatrix-method}
-\alias{chol,dgeMatrix-method}
 \alias{chol,dsCMatrix-method}
 \alias{chol,dsRMatrix-method}
 \alias{chol,dsTMatrix-method}
@@ -24,8 +23,23 @@
 \alias{chol,triangularMatrix-method}
 %
 \description{
-  Compute the Cholesky factorization of a real symmetric
-  positive definite square matrix.
+  Computes the upper triangular Cholesky factor of an
+  \eqn{n \times n}{n-by-n} real, symmetric, positive definite
+  matrix \eqn{A}, in some cases after pivoting.
+  This is the factor \eqn{L'} in
+  \deqn{P_{1} A P_{1}' = L L'}{P1 * A * P1' = L * L'}
+  or (equivalently)
+  \deqn{A = P_{1}' L L' P_{1}}{A = P1' * L * L' * P1}
+  where
+  \eqn{P_{1}}{P1} is a permutation matrix.
+
+  Methods for \code{\linkS4class{denseMatrix}} are built on
+  LAPACK routines \code{DPOTRF} and \code{DPPTRF}, which do
+  not permute rows or columns, so that \eqn{P_{1}}{P1} is an
+  identity matrix.
+  
+  Methods for \code{\linkS4class{sparseMatrix}} are built on
+  CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
 }
 \usage{
 chol(x, \dots)
@@ -36,83 +50,68 @@ chol(x, \dots)
 \S4method{chol}{dsTMatrix}(x, pivot = FALSE, cache = TRUE, \dots)
 }
 \arguments{
-  \item{x}{a (sparse or dense) square matrix, here inheriting from class
-    \code{\linkS4class{Matrix}}; if \code{x} is not symmetric positive
-    definite, then an error is signalled.}
-  \item{pivot}{logical indicating if pivoting is to be used.  Currently,
-    this is \emph{not} made use of for dense matrices.}
-  \item{cache}{logical indicating if the result should be cached
-    in \code{x@factors}; note that this argument is experimental
-    and only available for certain classes inheriting from
-    \code{\linkS4class{compMatrix}}.}
-  \item{\dots}{potentially further arguments passed to methods.}
-}
-\details{
-  Note that these Cholesky factorizations are typically \emph{cached} with
-  \code{x} currently, and these caches are available in
-  \code{x@factors}, which may be useful for the sparse case when
-  \code{pivot = TRUE}, where the permutation can be retrieved; see also
-  the examples.
-
-  However, this should not be considered part of the API and made
-  use of.  Rather consider \code{\link{Cholesky}()} in such situations,
-  since \code{chol(x, pivot=TRUE)} uses the same algorithm (but not the
-  same return value!) as \code{\link{Cholesky}(x, LDL=FALSE)} and
-  \code{chol(x)} corresponds to
-  \code{\link{Cholesky}(x, perm=FALSE, LDL=FALSE)}.
-}
-\section{Methods}{
-  Use \code{\link{showMethods}(chol)} to see all; some are worth
-  mentioning here:
-  \describe{
-    \item{chol}{\code{signature(x = "dpoMatrix")}:
-      Returns (and stores) the Cholesky decomposition of \code{x},
-      via LAPACK routines \code{dlacpy} and \code{dpotrf}.}
-    
-    \item{chol}{\code{signature(x = "dppMatrix")}:
-      Returns (and stores) the Cholesky decomposition of \code{x},
-      via LAPACK routine \code{dpptrf}.}
-
-    \item{chol}{\code{signature(x = "dsyMatrix")}: works via
-      \code{"dpoMatrix"}, see class \code{\linkS4class{dpoMatrix}}.}
-
-    \item{chol}{\code{signature(x = "dspMatrix")}: works via
-      \code{"dppMatrix"}, see class \code{\linkS4class{dppMatrix}}.}
-    
-    \item{chol}{\code{signature(x = "dsCMatrix")}:
-      Returns (and stores) the Cholesky decomposition of \code{x}.
-      If \code{pivot} is \code{TRUE}, then the Approximate Minimal
-      Degree (AMD) algorithm is used to create a reordering of the
-      rows and columns of \code{x} so as to reduce fill-in.}
-
-    \item{chol}{\code{signature(x = "dsRMatrix")}: works via
-      \code{"dsCMatrix"}, see class \code{\linkS4class{dsCMatrix}}.}
-
-    \item{chol}{\code{signature(x = "dsTMatrix")}: works via
-      \code{"dsCMatrix"}, see class \code{\linkS4class{dsCMatrix}}.}
-  }
+  \item{x}{a \link[=is.finite]{finite}, symmetric, positive definite
+    matrix or \code{\linkS4class{Matrix}} to be factorized.}
+  \item{pivot}{a logical indicating if a fill-reducing
+    permutation of the rows and columns of \eqn{A} should be used.
+    If \code{TRUE}, then the approximate minimum degree (AMD)
+    algorithm is used to select the permutation.
+    If \code{FALSE}, then the order of the columns of \eqn{A}
+    is preserved.}
+  \item{cache}{a logical indicating if the result should be
+    cached in \code{x@factors[["s[Pp]dCholesky"]]}.  Note that
+    caching is experimental and that only methods for classes
+    extending \code{\linkS4class{compMatrix}} will have this
+    argument.}
+  \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  a matrix of class \code{\linkS4class{Cholesky}},
-  i.e., upper triangular: \eqn{R} such that \eqn{R'R = x} (if
-      \code{pivot=FALSE}) \emph{or} \eqn{P' R'R P = x} (if
-      \code{pivot=TRUE} and \eqn{P} is the corresponding permutation matrix).
+  A matrix or \code{\linkS4class{triangularMatrix}} representing
+  the upper triangular Cholesky factor \eqn{L'}.
+  The result is a traditional matrix if \code{x} is.
+  For \code{x} inheriting from
+  \code{\linkS4class{unpackedMatrix}},
+  \code{\linkS4class{packedMatrix}}, and
+  \code{\linkS4class{sparseMatrix}},
+  the result is an object of class
+  \code{\linkS4class{Cholesky}},
+  \code{\linkS4class{pCholesky}}, and
+  \code{\linkS4class{dtCMatrix}},
+  respectively.
+}
+\details{
+  For sparse \code{x}, \code{chol(x, pivot = value)} uses
+  \code{\link{Cholesky}(x, perm = value, LDL = FALSE)} under the hood.
+  If you must know the permutation \eqn{P_{1}}{P1} in addition to
+  the Cholesky factor \eqn{L} (or in this case the transpose \eqn{L'}),
+  then call \code{\link{Cholesky}} directly, as the result of
+  \code{chol(x, pivot = TRUE)} specifies \eqn{L'} but not \eqn{P_{1}}{P1}.
+}
+\seealso{
+  The default method from \pkg{base}, \code{\link[base]{chol}},
+  called for traditional matrices \code{x}.
+
+  Generic function \code{\link{Cholesky}}, for more flexibility
+  notably when computing the Cholesky \emph{factorization} and
+  not only the \emph{factor} \eqn{L'}.
 }
 \references{
-  Timothy A. Davis (2006)
-  \emph{Direct Methods for Sparse Linear Systems}, SIAM Series
-  \dQuote{Fundamentals of Algorithms}.
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dpotrf.f} and
+  \url{https://netlib.org/lapack/double/dpptrf.f}.
 
-  Tim Davis (1996),
-  An approximate minimal degree ordering algorithm,
-  \emph{SIAM J. Matrix Analysis and Applications},
-  \bold{17}, 4, 886--905.
-}
-\seealso{The default from \pkg{base}, \code{\link[base]{chol}}; for more
-  flexibility (but not returning a matrix!) \code{\link{Cholesky}}.
+  Davis, T. A. (2006).
+  \emph{Direct Methods for Sparse Linear Systems},
+  Society for Industrial and Applied Mathematics.
+  
+  Amestoy, P. R., Davis, T. A., & Duff, I. S. (2004).
+  Algorithm 837: AMD, an approximate minimum degree ordering algorithm.
+  \emph{ACM Transactions on Mathematical Software},
+  \emph{17}(4), 886-905.
+  \doi{10.1145/1024074.1024081}
 }
 \examples{
-showMethods(chol, inherited = FALSE) # show different methods
+showMethods("chol", inherited = FALSE)
 
 sy2 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, NA,32,77))
 (c2 <- chol(sy2))#-> "Cholesky" matrix

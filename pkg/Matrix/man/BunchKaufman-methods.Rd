@@ -14,57 +14,69 @@
 \alias{BunchKaufman,matrix-method}
 %
 \description{
-  The Bunch-Kaufman factorization of a symmetric matrix \eqn{A}
-  is a factorization of the form \eqn{A = U' D U} or \eqn{A = L D L'}
-  where \eqn{U} and \eqn{L} are themselves factored as products of
-  permutation matrices and unit upper or lower triangular matrices
-  and where \eqn{D} is a block diagonal matrix composed of 1-by-1 and
-  2-by-2 diagonal blocks.
+  Computes the Bunch-Kaufman factorization of an \eqn{n \times n}{n-by-n}
+  real, symmetric matrix \eqn{A}, which has the general form
+  \deqn{A = L D_{L} L' = U' D_{U} U}{A = L * DL * L' = U' * DU * U}
+  where
+  \eqn{D_{L}}{DL} and \eqn{D_{U}}{DU} are symmetric, block diagonal
+  matrices composed of \eqn{b_{L}}{bL} and \eqn{b_{U}}{bU}
+  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks,
+  and
+  \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{prod(Pk * Lk : k = 1,...,bL)}
+  is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
+  matrices, each having nonzero entries below the diagonal in 1 or 2 columns,
+  and 
+  \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{prod(Pk * Uk : k = 1,...,bU)}
+  is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular
+  matrices, each having nonzero entries above the diagonal in 1 or 2 columns.
   
-  This factorization generalizes the pivoted Cholesky factorization
-  to symmetric matrices which may not be positive semidefinite.
+  Methods are built on LAPACK routines \code{DSYTRF} and \code{DSPTRF}.
 }
 \usage{
+BunchKaufman(x, \dots)
+\S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
 \S4method{BunchKaufman}{dsyMatrix}(x, \dots)
 \S4method{BunchKaufman}{dspMatrix}(x, \dots)
-\S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
 }
 \arguments{
-  \item{x}{a square matrix.}
-  \item{uplo}{a string, either \code{"U"} or \code{"L"}, indicating
-    which triangle (upper or lower) of \code{x} should be used to
-    compute the factorization.}
-  \item{\dots}{further optional arguments passed to methods.}
-}
-\section{Methods}{
-  \describe{
-    \item{\code{x = "dsyMatrix"}}{using LAPACK routine \code{DSYTRF}.}
-    \item{\code{x = "dspMatrix"}}{using LAPACK routine \code{DSPTRF}.}
-    \item{\code{x = "matrix"}}{using LAPACK routine \code{DSYTRF},
-      where \code{x} must have type \link{double} and must be square
-      but need not be symmetric.}
-  }
+  \item{x}{a \link[=is.finite]{finite} symmetric matrix or
+    \code{\linkS4class{Matrix}} to be factorized.  If \code{x}
+    is a square traditional matrix but not symmetric, then
+    it will be \emph{treated} as symmetric; see \code{uplo}.}
+  \item{uplo}{a string, either \code{"U"} or \code{"L"},
+    indicating which triangle of \code{x} should be used
+    to compute the factorization.}
+  \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  An object inheriting from class \code{\linkS4class{BunchKaufman}}
-  or \code{\linkS4class{pBunchKaufman}}, the latter if and only if
-  \code{x} inherits from \code{\linkS4class{dspMatrix}}.
+  An object representing the factorization, inheriting from
+  virtual class \code{\linkS4class{BunchKaufmanFactorization}}.
+  The specific class is \code{\linkS4class{BunchKaufman}} unless
+  \code{x} inherits from virtual class \code{\linkS4class{packedMatrix}},
+  in which case it is \code{\linkS4class{pBunchKaufman}}.
+}
+\seealso{
+  Classes \code{\linkS4class{BunchKaufman}} and
+  \code{\linkS4class{pBunchKaufman}} and their methods.
+  
+  Classes \code{\linkS4class{dsyMatrix}} and
+  \code{\linkS4class{dspMatrix}}.
+  
+  Generic function \code{\link{expand2}},
+  for constructing matrix factors from the result.
+  
+  Generic functions \code{\link{Cholesky}}, \code{\link{Schur}},
+  \code{\link{lu}}, and \code{\link{qr}},
+  for computing other factorizations.
 }
 \references{
-  The original LAPACK source code, including documentation; see
+  The LAPACK source code, including documentation; see
   \url{https://netlib.org/lapack/double/dsytrf.f} and
   \url{https://netlib.org/lapack/double/dsptrf.f}.
 }
-\seealso{
-  Classes \code{\linkS4class{dsyMatrix}} and
-  \code{\linkS4class{BunchKaufman}}.
-  
-  Related are the LU factorization defined for general matrices
-  and computed by \code{\link{lu}}, and the Cholesky factorization
-  defined for symmetric positive definite matrices and computed by
-  \code{\link{chol}} or (in the sparse case) \code{\link{Cholesky}}.
-}
 \examples{
+showMethods("BunchKaufman", inherited = FALSE)
+
 data(CAex)
 dim(CAex)
 isSymmetric(CAex) # TRUE

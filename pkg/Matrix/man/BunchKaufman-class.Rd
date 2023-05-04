@@ -27,10 +27,12 @@
   matrices, each having nonzero entries below the diagonal in 1 or 2 columns,
   and 
   \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{prod(Pk * Uk : k = 1,...,bU)}
-  is the product of \eqn{b_{U}} row-permuted unit upper triangular matrices,
-  each having nonzero entries above the diagonal in 1 or 2 columns.
+  is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular
+  matrices, each having nonzero entries above the diagonal in 1 or 2 columns.
   
-  These classes store the nonzero entries of the sparse factors
+  These classes store the nonzero entries of the
+  \eqn{2 b_{L} + 1}{2*bL+1} or \eqn{2 b_{U} + 1}{2*bU+1} factors,
+  which are individually sparse,
   in a dense format as a vector of length
   \eqn{nn}{n*n} (\code{BunchKaufman}) or
   \eqn{n(n+1)/2}{n*(n+1)/2} (\code{pBunchKaufman}),
@@ -47,11 +49,11 @@
     \item{\code{x}}{a numeric vector of length
       \code{n*n} (\code{BunchKaufman}) or
       \code{n*(n+1)/2} (\code{pBunchKaufman}), where \code{n=Dim[1]}.
-      The details of the representation are specified by the LAPACK
-      manual for its routines \code{DSYTRF} and \code{DSPTRF}.}
+      The details of the representation are specified by the manual
+      for LAPACK routines \code{DSYTRF} and \code{DSPTRF}.}
     \item{\code{perm}}{an integer vector of length \code{n=Dim[1]}
-      specifying row and column interchanges and in turn how the
-      \code{x} slot is partitioned.}
+      specifying row and column interchanges as described in the manual
+      for LAPACK routines \code{DSYTRF} and \code{DSPTRF}.}
   }
 }
 \section{Extends}{
@@ -102,6 +104,11 @@
   Class \code{\linkS4class{dsyMatrix}} and its packed counterpart.
 
   Generic function \code{\link{BunchKaufman}}.
+}
+\references{
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dsytrf.f} and
+  \url{https://netlib.org/lapack/double/dsptrf.f}.
 }
 \examples{
 (sy <- crossprod(Matrix(rnorm(18L), 6L, 3L)))

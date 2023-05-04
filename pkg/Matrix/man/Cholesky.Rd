@@ -1,5 +1,5 @@
 \name{Cholesky-methods}
-\title{Cholesky Decomposition of a Sparse Matrix}
+\title{Methods for Cholesky Factorization}
 %
 \docType{methods}
 \keyword{algebra}
@@ -10,100 +10,139 @@
 \alias{Cholesky}
 \alias{Cholesky-methods}
 %
-\alias{Cholesky,denseMatrix-method}
 \alias{Cholesky,dsCMatrix-method}
-\alias{Cholesky,nsparseMatrix-method}
 \alias{Cholesky,sparseMatrix-method}
 %
 \alias{.SuiteSparse_version}
 %
-\usage{
-Cholesky(A, perm = TRUE, LDL = !super, super = FALSE, Imult = 0, \dots)
-}
 \description{
-  Computes the Cholesky (aka \dQuote{Choleski}) decomposition of a
-  sparse, symmetric, positive-definite matrix.  However, typically \code{\link{chol}()}
-  should rather be used unless you are interested in the different kinds
-  of sparse Cholesky decompositions.
+  Computes the pivoted Cholesky factorization of an
+  \eqn{n \times n}{n-by-n} real, symmetric, positive definite
+  matrix \eqn{A}, which has the general form
+  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
+  or (equivalently)
+  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 = P1' * L * L' * P1}
+  where
+  \eqn{P_{1}}{P1} is a permutation matrix,
+  \eqn{L_{1}} is a unit lower triangular matrix,
+  \code{D} is a positive diagonal matrix, and
+  \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+
+  Methods for \code{\linkS4class{denseMatrix}} are built on
+  LAPACK routines \code{DPOTRF} and \code{DPPTRF}, which do
+  not permute rows or columns, so that \eqn{P_{1}}{P1} is an
+  identity matrix.
+  
+  Methods for \code{\linkS4class{sparseMatrix}} are built on
+  CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
+}
+\usage{
+Cholesky(A, \dots)
+\S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
+\S4method{Cholesky}{dsyMatrix}(A, \dots)
+\S4method{Cholesky}{dsCMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
+    Imult = 0, \dots)
 }
 \arguments{
-  \item{A}{sparse symmetric matrix.  No missing values or IEEE special
-    values are allowed.}
-  \item{perm}{logical scalar indicating if a fill-reducing permutation
-    should be computed and applied to the rows and columns of \code{A}.
-    Default is \code{TRUE}.}% NA not available here
-  \item{LDL}{logical scalar indicating if the decomposition should be
-    computed as LDL' where \code{L} is a unit lower triangular matrix.
-    The alternative is LL' where \code{L} is lower triangular with
-    arbitrary diagonal elements.  Default is \code{TRUE}.  Setting it to
-    \code{\link{NA}} leaves the choice to a CHOLMOD-internal heuristic.}
-  \item{super}{logical scalar indicating if a supernodal decomposition
-    should be created.  The alternative is a simplicial decomposition.
-    Default is \code{FALSE}.  Setting it to \code{\link{NA}} leaves the
-    choice to a CHOLMOD-internal heuristic.}
-  \item{Imult}{numeric scalar which defaults to zero. The matrix that is
-    decomposed is \eqn{A+m*I} where \eqn{m} is the value of \code{Imult}
-    and \code{I} is the identity matrix of order \code{ncol(A)}.}
-  \item{\dots}{further arguments passed to or from other methods.}
+  \item{A}{a \link[=is.finite]{finite}, symmetric, positive definite
+    matrix or \code{\linkS4class{Matrix}} to be factorized.
+    If \code{A} is a square traditional matrix but not symmetric,
+    then it will be \emph{treated} as symmetric; see \code{uplo}.}
+  \item{uplo}{a string, either \code{"U"} or \code{"L"},
+    indicating which triangle of \code{A} should be used
+    to compute the factorization.}
+  \item{perm}{a logical indicating if a fill-reducing
+    permutation of the rows and columns of \eqn{A} should be used.
+    If \code{TRUE}, then the approximate minimum degree (AMD)
+    algorithm is used to select the permutation.
+    If \code{FALSE}, then the order of the columns of \eqn{A}
+    is preserved.}
+  \item{LDL}{a logical indicating if the factorization should be
+    computed as \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
+    such that the result stores the diagonal entries of \eqn{D}
+    and the strictly lower triangular entries of \eqn{L_{1}}.
+    The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
+    such that the result stores the lower triangular entries
+    of \eqn{L}.  Setting \code{LDL = NA} leaves the choice to
+    a CHOLMOD-internal heuristic.}
+  \item{super}{a logical indicating if the factorization should
+    use the supernodal algorithm.  The alternative is the simplicial
+    algorithm.  Setting \code{super = NA} leaves the choice to
+    a CHOLMOD-internal heuristic.}
+  \item{Imult}{a \link[=is.finite]{finite} number. The matrix
+    that is factorized is \code{A+Imult*diag(nrow(A))}, i.e.,
+    \code{A} plus \code{Imult} times the identity matrix.}
+  \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  an object inheriting from either
-  \code{"\linkS4class{CHMsuper}"}, or
-  \code{"\linkS4class{CHMsimpl}"}, depending on the \code{super}
-  argument; both classes extend \code{"\linkS4class{CHMfactor}"} which
-  extends \code{"\linkS4class{MatrixFactorization}"}.
-
-  In other words, the result of \code{Cholesky()} is \emph{not} a
-  matrix, and if you want one, you should probably rather use
-  \code{\link{chol}()}, see Details.
+  An object representing the factorization, inheriting from
+  virtual class \code{\linkS4class{CholeskyFactorization}}.
+  For a traditional matrix \code{x}, the specific class is
+  \code{\linkS4class{Cholesky}}.
+  For \code{x} inheriting from
+  \code{\linkS4class{unpackedMatrix}},
+  \code{\linkS4class{packedMatrix}}, and
+  \code{\linkS4class{sparseMatrix}},
+  the specific class is
+  \code{\linkS4class{Cholesky}},
+  \code{\linkS4class{pCholesky}}, and
+  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}}
+  (depending on \code{super}), respectively.
 }
-%FAILS WHY??\newcommand{\tR}{\tilde{R}}% both \tR{} and simple '\tR' fails
 \details{
-  This is a generic function with special methods for different types
-  of matrices.  Use \code{\link{showMethods}("Cholesky")} to list all
-  the methods for the \code{\link{Cholesky}} generic.
-
-  The method for class \code{\linkS4class{dsCMatrix}} of sparse matrices
-  --- the only one available currently ---
-  is based on functions from the CHOLMOD library.
-
-  Again: If you just want the Cholesky decomposition of a matrix in a
-  straightforward way, you should probably rather use \code{\link{chol}(.)}.
-
-  Note that if \code{perm=TRUE} (default), the decomposition is
-  \deqn{A = P' \tilde{L} D \tilde{L}' P = P' L L' P,}{A = P' L~ D L~' P = P' L L' P,}
-  where \eqn{L} can be extracted by \code{as(*, "Matrix")}, \eqn{P} by
-  \code{as(*, "pMatrix")} and both by \code{\link{expand}(*)}, see the
-  class \code{\linkS4class{CHMfactor}} documentation.
-
-  Note that consequently, you cannot easily get the \dQuote{traditional}
-  cholesky factor \eqn{R}, from this decomposition, as
-  \deqn{R'R = A = P'LL'P = P'\tilde{R}'\tilde{R} P = (\tilde{R}P)' (\tilde{R}P),}{
-        R'R = A = P'LL'P = P' R~' R~ P = (R~ P)' (R~ P),}
-  but \eqn{\tilde{R}P}{R~ P} is \emph{not} triangular even though \eqn{\tilde{R}}{R~} is.
-}
-\references{
-  Yanqing Chen, Timothy A. Davis, William W. Hager, and Sivasankaran Rajamanickam (2008)
-  Algorithm 887: CHOLMOD, Supernodal Sparse Cholesky Factorization and Update/Downdate.
-  \emph{ACM Trans. Math. Softw.} \bold{35}, 3, Article 22, 14 pages.
-  \doi{10.1145/1391989.1391995}
-
-  Timothy A. Davis (2006)
-  \emph{Direct Methods for Sparse Linear Systems}, SIAM Series
-  \dQuote{Fundamentals of Algorithms}.
+  Note that the result of a call to \code{Cholesky} need not inherit
+  from \code{\linkS4class{Matrix}}.  Users who just want a matrix should
+  consider using \code{\link{chol}}, whose methods are simple wrappers
+  around \code{Cholesky} returning the upper triangular Cholesky factor
+  \eqn{L'} as a \code{\linkS4class{triangularMatrix}}.  An alternative
+  is to pass the \code{Cholesky} result to \code{\link{expand2}}
+  or (only in the sparse case; see \code{\linkS4class{CHMfactor}})
+  to coerce it with \code{as(., "dtCMatrix")} or \code{as(., "pMatrix")}.
 }
 \seealso{
-  Class definitions \code{\linkS4class{CHMfactor}} and
-  \code{\linkS4class{dsCMatrix}} and function \code{\link{expand}}.
-  Note the extra \code{\link{solve}(*, system = . )} options in
-  \code{\linkS4class{CHMfactor}}.
+  Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
+  \code{\linkS4class{dCHMsimpl}} and \code{\linkS4class{dCHMsuper}}
+  and their methods.
+  
+  Classes \code{\linkS4class{dpoMatrix}}, \code{\linkS4class{dppMatrix}},  
+  and \code{\linkS4class{dsCMatrix}}.
 
-  Note that \code{\link{chol}()} returns matrices (inheriting from
-  \code{"\linkS4class{Matrix}"}) whereas \code{Cholesky()} returns a
-  \code{"\linkS4class{CHMfactor}"} object, and hence a typical user
-  will rather use \code{chol(A)}.
+  Generic function \code{\link{chol}},
+  for obtaining the upper triangular Cholesky factor \eqn{L'} as a
+  \code{\linkS4class{Matrix}}.
+  
+  Generic function \code{\link{expand2}},
+  for constructing a list of matrix factors from the result.
+  
+  Generic functions \code{\link{BunchKaufman}}, \code{\link{Schur}},
+  \code{\link{lu}}, and \code{\link{qr}},
+  for computing other factorizations.
+}
+\references{
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dpotrf.f} and
+  \url{https://netlib.org/lapack/double/dpptrf.f}.
+
+  Davis, T. A. (2006).
+  \emph{Direct Methods for Sparse Linear Systems},
+  Society for Industrial and Applied Mathematics.
+  
+  Amestoy, P. R., Davis, T. A., & Duff, I. S. (2004).
+  Algorithm 837: AMD, an approximate minimum degree ordering algorithm.
+  \emph{ACM Transactions on Mathematical Software},
+  \emph{17}(4), 886-905.
+  \doi{10.1145/1024074.1024081}
+
+  Chen, Y., Davis, T. A., Hager, W. W., Rajamanickam, S. (2008).
+  Algorithm 887: CHOLMOD, supernodal sparse Cholesky factorization
+  and update/downdate.
+  \emph{ACM Transactions on Mathematical Software},
+  \emph{35}(3), Article 22, 1-14.
+  \doi{10.1145/1391989.1391995}
 }
 \examples{
+showMethods("Cholesky", inherited = FALSE)
+
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
 str(mtm@factors) # empty list()
@@ -112,8 +151,8 @@ str(mtm@factors) # 'sPDCholesky' (simpl)
 (Cm <- Cholesky(mtm, super = TRUE))
 c(C1 = isLDL(C1), Cm = isLDL(Cm))
 str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
-str(cm1  <- as(C1, "sparseMatrix"))
-str(cmat <- as(Cm, "sparseMatrix"))# hmm: super is *less* sparse here
+str(cm1  <- as(C1, "dtCMatrix"))
+str(cmat <- as(Cm, "dtCMatrix"))# hmm: super is *less* sparse here
 cm1[1:20, 1:20]
 
 b <- matrix(c(rep(0, 711), 1), ncol = 1)
@@ -134,7 +173,7 @@ noquote(cbind(format(100 * sizes / sizes[1], digits=4)))
 ## Visualize the sparseness:
 dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
 image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
-image(cm1, main= paste("as(Cholesky(crossprod(mm)),\"sparseMatrix\"):",
+image(cm1, main= paste("as(Cholesky(crossprod(mm)), \"dtCMatrix\"):",
                         dq(class(cm1))))
 \dontshow{% FIXME-- move to ../tests/factorizing.R :
 expand(C1) ## to check printing

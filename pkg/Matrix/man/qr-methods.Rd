@@ -1,5 +1,5 @@
 \name{qr-methods}
-\title{QR Decomposition -- S4 Methods and Generic}
+\title{Methods for QR Factorization}
 %
 \docType{methods}
 \keyword{algebra}
@@ -12,47 +12,73 @@
 \alias{qr,dgCMatrix-method}
 \alias{qr,sparseMatrix-method}
 %
-\alias{qrR}
-%
 \description{
-  The \pkg{Matrix} package provides methods for the QR decomposition
-  of special classes of matrices.  There is a generic function which uses
-  \code{\link[base]{qr}} as default, but methods defined in this package
-  can take extra arguments.  In particular there is an option for
-  determining a fill-reducing permutation of the columns of a sparse,
-  rectangular matrix.
+  Computes the pivoted QR factorization of an \eqn{m \times n}{m-by-n}
+  real matrix \eqn{A}, which has the general form
+  \deqn{P_{1} A P_{2} = Q R}
+  or (equivalently)
+  \deqn{A = P_{1}' Q R P_{2}'}
+  where
+  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
+  \eqn{Q} is an \eqn{m \times m}{m-by-m} orthogonal matrix, and
+  \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix.
+
+  \code{\linkS4class{denseMatrix}} use the default method implemented
+  in \pkg{base}, namely \code{\link{qr.default}}.  It is built on
+  LINPACK routine \code{DQRDC} and LAPACK routine \code{DGEQP3}, which
+  do not pivot rows, so that \eqn{P_{1}}{P1} is an identity matrix.
+  
+  Methods for \code{\linkS4class{sparseMatrix}} are built on
+  CSparse routines \code{cs_sqr} and \code{cs_qr}, which require
+  \eqn{m \ge n}{m >= n}.
 }
 \usage{
 qr(x, \dots)
-qrR(qr, complete=FALSE, backPermute=TRUE, row.names = TRUE)
+\S4method{qr}{dgCMatrix}(x, keep.dimnames = TRUE,
+    verbose = getOption("Matrix.verbose", FALSE), \dots)
 }
 \arguments{
-  \item{x}{a numeric or complex matrix whose QR decomposition is to be
-    computed.  Logical matrices are coerced to numeric.}
-  \item{qr}{a QR decomposition of the type computed by \code{qr}.}
-  \item{complete}{logical indicating whether the \eqn{\bold{R}}
-    matrix is to be completed by binding zero-value rows beneath the
-    square upper triangle.}
-  \item{backPermute}{logical indicating if the rows of the \eqn{\bold{R}}
-    matrix should be back permuted such that \code{qrR()}'s result can
-    be used directly to reconstruct the original matrix \eqn{\bold{X}}.}
-  \item{row.names}{logical indicating if \code{\link{rownames}} should
-    propagated to the result.}
-  \item{\dots}{further arguments passed to or from other methods}
+  \item{x}{a \link[=is.finite]{finite} matrix or
+    \code{\linkS4class{Matrix}} to be factorized,
+    satisfying \code{nrow(x) >= ncol(x)} if sparse.}
+  \item{keep.dimnames}{a logical indicating if \code{x@Dimnames}
+    should be propagated to the result as \code{qr(x)@Dimnames}.}
+  \item{verbose}{a logical indicating if a diagnostic message
+    should be be printed for structurally rank deficient \code{x}.}
+  \item{\dots}{further arguments passed to or from methods}
 }
-\section{Methods}{
-  \describe{
-    \item{x = "dgCMatrix"}{QR decomposition of a general sparse
-      double-precision matrix with \code{nrow(x) >= ncol(x)}.  Returns
-      an object of class \code{"\linkS4class{sparseQR}"}.}
-    \item{x = "sparseMatrix"}{works via \code{"dgCMatrix"}.}
-  }
+\value{
+  An object representing the factorization, of S4 class
+  \code{\linkS4class{sparseQR}} or S3 class \code{\link[base]{qr}}.
+  \code{sparseQR} is given for \code{x} inheriting from virtual class
+  \code{\linkS4class{sparseMatrix}}.  \code{qr} is given for \code{x}
+  inheriting from virtual class \code{\linkS4class{denseMatrix}},
+  as well as for traditional matrices.
 }
-\seealso{\code{\link[base]{qr}}; then, the class documentations,
-  mainly \code{\linkS4class{sparseQR}}, and also
-  \code{\linkS4class{dgCMatrix}}.
+\seealso{
+  Class \code{\linkS4class{sparseQR}} and its methods.
+
+  Class \code{\linkS4class{dgCMatrix}}.
+  
+  Generic function \code{\link[base]{qr}} from \pkg{base},
+  whose default method \code{qr.default} \dQuote{defines}
+  the S3 class \code{qr} of dense QR factorizations.
+
+  Generic function \code{\link{expand2}},
+  for constructing matrix factors from the result.
+  
+  Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
+  \code{\link{Schur}}, and \code{\link{lu}},
+  for computing other factorizations.
+}
+\references{
+  Davis, T. A. (2006).
+  \emph{Direct Methods for Sparse Linear Systems},
+  Society for Industrial and Applied Mathematics.
 }
 \examples{
+showMethods("qr", inherited = FALSE)
+
 %% FIXME: Currently mixing example + regression tests <--> ../tests/factorizing.R
 ##------------- example of pivoting -- from base'  qraux.Rd -------------
 X <- cbind(int = 1,
@@ -116,6 +142,3 @@ qr.coef(qX, y)
 qr.coef(qX, Y)
 rm(m)
 }
-\keyword{methods}
-\keyword{algebra}
-\keyword{array}
