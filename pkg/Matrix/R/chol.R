@@ -66,11 +66,8 @@ for(.cl in paste0("dg", c("C", "R", "T"), "Matrix"))
 setMethod("chol", signature(x = .cl),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]])) {
-                  ch <- t(as(ch, "CsparseMatrix"))
-                  ch@Dimnames <- x@Dimnames # as MF has no 'Dimnames' slot
-                  return(ch)
-              }
+              if(!is.null(ch <- x@factors[[nm]]))
+                  return(t(as(ch, "CsparseMatrix")))
               ch <- chol(y <- .M2sym(x, checkDN = FALSE), pivot = pivot, ...)
               ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               if(cache)
@@ -83,11 +80,8 @@ rm(.cl)
 setMethod("chol", signature(x = "dsCMatrix"),
 	  function(x, pivot = FALSE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]])) {
-                  ch <- t(as(ch, "CsparseMatrix"))
-                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
-                  return(ch)
-              }
+              if(!is.null(ch <- x@factors[[nm]]))
+                  return(t(as(ch, "CsparseMatrix")))
               tryCatch(.Call(dsCMatrix_chol, x, pivot),
                        error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
           })
@@ -95,11 +89,8 @@ setMethod("chol", signature(x = "dsCMatrix"),
 setMethod("chol", signature(x = "dsRMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]])) {
-                  ch <- t(as(ch, "CsparseMatrix"))
-                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
-                  return(ch)
-              }
+              if(!is.null(ch <- x@factors[[nm]]))
+                  return(t(as(ch, "CsparseMatrix")))
               ch <- chol(y <- .tCR2RC(x), pivot = pivot, ...)
               if(cache)
                   ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
@@ -110,11 +101,8 @@ setMethod("chol", signature(x = "dsRMatrix"),
 setMethod("chol", signature(x = "dsTMatrix"),
 	  function(x, pivot = FALSE, cache = TRUE, ...) {
               nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]])) {
-                  ch <- t(as(ch, "CsparseMatrix"))
-                  ch@Dimnames <- dimnames(x) # as MF has no 'Dimnames' slot
-                  return(ch)
-              }
+              if(!is.null(ch <- x@factors[[nm]]))
+                  return(t(as(ch, "CsparseMatrix")))
               ch <- chol(y <- .T2C(x), pivot = pivot, ...)
               if(cache)
                   ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
