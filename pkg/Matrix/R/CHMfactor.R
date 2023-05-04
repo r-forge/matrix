@@ -1,4 +1,4 @@
-for(.cl in c("dsparseMatrix", "triangularMatrix", "CsparseMatrix",
+for(.cl in c("dtCMatrix", "dsparseMatrix", "triangularMatrix", "CsparseMatrix",
              "dMatrix", "sparseMatrix", "Matrix"))
 setAs("CHMfactor", .cl,
       function(from) .Call(CHMfactor_to_sparse, from))
