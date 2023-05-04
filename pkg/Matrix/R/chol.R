@@ -33,15 +33,6 @@ setMethod("chol", signature(x = "diagonalMatrix"),
               x
           })
 
-setMethod("chol", signature(x = "dgeMatrix"),
-          function(x, cache = TRUE, ...) {
-              if(!is.null(ch <- x@factors[["Cholesky"]]))
-                  return(ch) # use the cache
-              ch <- chol(.M2sym(x, checkDN = FALSE), ...)
-              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
-              if(cache) .set.factors(x, "Cholesky", ch) else ch
-          })
-
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, ...) {
               if(!is.null(ch <- x@factors[["Cholesky"]]))
