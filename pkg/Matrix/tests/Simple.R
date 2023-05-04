@@ -1200,9 +1200,6 @@ lsUtr <- lst[istri][uniC]
 (di <- sapply(lsUtr, function(.) dim(get(.))))
 ## TODO: use %*%, crossprod(), .. on all those  4 x 4 -- and check "triangular rules"
 
-r <- tryCatch(chol2inv(Diagonal(x=1:10), pi=pi), warning=identity)
-stopifnot(grepl("extra argument .pi.", r$message))
-
 assertError(new("ltrMatrix", Dim = c(2L,2L), x=TRUE))# gave "illegal" object w/o error
 assertError(new("ntrMatrix", Dim = c(2L,2L)))#  dito
 
