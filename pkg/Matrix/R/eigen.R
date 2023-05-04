@@ -5,13 +5,13 @@
 ##        since R-level test needs an allocation
 
 setMethod("Schur", signature(x = "Matrix", vectors = "missing"),
-          function(x, vectors, ...) Schur(x, TRUE, ...))
+          function(x, vectors = TRUE, ...) Schur(x, TRUE, ...))
 
 setMethod("Schur", signature(x = "matrix", vectors = "missing"),
-          function(x, vectors, ...) Schur(x, TRUE, ...))
+          function(x, vectors = TRUE, ...) Schur(x, TRUE, ...))
 
 setMethod("Schur", signature(x = "dgeMatrix", vectors = "logical"),
-	  function(x, vectors, ...) {
+	  function(x, vectors = TRUE, ...) {
               if(!all(is.finite(x@x)))
                   stop("'x' has non-finite values")
               cl <- .Call(dgeMatrix_Schur, x, vectors, TRUE)
@@ -29,7 +29,7 @@ setMethod("Schur", signature(x = "dgeMatrix", vectors = "logical"),
           })
 
 setMethod("Schur", signature(x = "dsyMatrix", vectors = "logical"),
-	  function(x, vectors, ...) {
+	  function(x, vectors = TRUE, ...) {
               e <- eigen(x, symmetric = TRUE, only.values = !vectors)
               vals <- as.double(e$values)
               T <- new("ddiMatrix", Dim = x@Dim, x = vals)
@@ -40,7 +40,7 @@ setMethod("Schur", signature(x = "dsyMatrix", vectors = "logical"),
           })
 
 setMethod("Schur", signature(x = "matrix", vectors = "logical"),
-	  function(x, vectors, ...) {
+	  function(x, vectors = TRUE, ...) {
               storage.mode(x) <- "double"
               if(!all(is.finite(x)))
                   stop("'x' has non-finite values")
@@ -56,17 +56,17 @@ setMethod("Schur", signature(x = "matrix", vectors = "logical"),
 
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "generalMatrix", vectors = "logical"),
-	  function(x, vectors, ...)
+	  function(x, vectors = TRUE, ...)
               Schur(as(as(x, "dMatrix"), "unpackedMatrix"), vectors, ...))
 
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "symmetricMatrix", vectors = "logical"),
-	  function(x, vectors, ...)
+	  function(x, vectors = TRUE, ...)
               Schur(as(as(x, "dMatrix"), "unpackedMatrix"), vectors, ...))
 
 ## Giving the _unsorted_ Schur factorization
 setMethod("Schur", signature(x = "diagonalMatrix", vectors = "logical"),
-	  function(x, vectors, ...) {
+	  function(x, vectors = TRUE, ...) {
               d <- x@Dim
               if(x@diag != "N") {
                   vals <- rep.int(1, d[1L])
@@ -85,7 +85,7 @@ setMethod("Schur", signature(x = "diagonalMatrix", vectors = "logical"),
           })
 
 setMethod("Schur", signature(x = "triangularMatrix", vectors = "logical"),
-	  function(x, vectors, ...) {
+	  function(x, vectors = TRUE, ...) {
               cld <- getClassDef(class(x))
               if(!extends(cld, "nMatrix") &&
                  (anyNA(x) || (extends(cld, "dMatrix") && any(is.infinite(x)))))

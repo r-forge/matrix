@@ -39,7 +39,7 @@ if(is.na(match("...", names(formals(implicitGeneric("crossprod")))))) {
                useAsDefault= function(x, y=NULL, ...) base::tcrossprod(x, y))
 }
 
-    setGeneric("Schur", function(x, vectors, ...) standardGeneric("Schur"))
+setGeneric("Schur", function(x, vectors = TRUE, ...) standardGeneric("Schur"))
 
 setGeneric("unpack", function(x, ...) standardGeneric("unpack"))
 setGeneric("pack", function(x, ...) standardGeneric("pack"))
