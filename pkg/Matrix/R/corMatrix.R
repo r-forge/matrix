@@ -18,7 +18,7 @@
     x[indDiag(n)] <- 1
     to@x <- x
 
-    .set.factors(from, "correlation", to)
+    .set.factor(from, "correlation", to)
 }
 
 .dpp2pcor <- function(from) {
@@ -45,7 +45,7 @@
     x[indDiag(n, upper = u, packed = TRUE)] <- 1
     to@x <- x
 
-    .set.factors(from, "correlation", to)
+    .set.factor(from, "correlation", to)
 }
 
 .M2cor <- function(from) .dpo2cor(as(from, "dpoMatrix"))
