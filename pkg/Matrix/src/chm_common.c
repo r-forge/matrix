@@ -1,9 +1,6 @@
 /** @file chm_common.c
  */
 #include "chm_common.h"
-// -> Mutils.h
-
-Rboolean isValid_Csparse(SEXP x); /* -> Csparse.c */
 
 SEXP get_SuiteSparse_version(void) {
     SEXP ans = allocVector(INTSXP, 3);
@@ -259,9 +256,10 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 	ctype = R_check_class_etc(x, valid);
     SEXP islot = GET_SLOT(x, Matrix_iSym);
 
-    if (ctype < 0) error(_("invalid class of object to as_cholmod_sparse"));
-    if (!isValid_Csparse(x))
-	error(_("invalid object passed to as_cholmod_sparse"));
+    if (ctype < 0)
+	error(_("invalid class of object to as_cholmod_sparse"));
+    validObject(x, valid[ctype]);
+    
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
 
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
