@@ -109,6 +109,12 @@ isLDL(x)
       need not be ordered monotonically.  Columns may be overallocated,
       i.e., the number of elements of \code{i} reserved for column
       \code{j} may exceed \code{nz[j]}.}
+    \item{\code{prv}, \code{nxt}}{integer vectors of length
+      \code{Dim[1]+2} indicating the order in which the columns of
+      the lower triangular Cholesky factor are stored in \code{i}
+      and \code{x}.  For \code{j} in \code{seq_len(n <- Dim[1])}:
+      \code{prv[1] = n+1}, \code{prv[n+2] = -1}, \code{prv[j+1] = j-1},
+      \code{nxt[n+1] = -1}, \code{nxt[n+2] = 0}, \code{nxt[j] = j}.}
   }
   Of \code{dCHMsimpl}:
   \describe{
