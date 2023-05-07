@@ -34,15 +34,15 @@
 }
 \usage{
 BunchKaufman(x, \dots)
-\S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
 \S4method{BunchKaufman}{dsyMatrix}(x, \dots)
 \S4method{BunchKaufman}{dspMatrix}(x, \dots)
+\S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite} symmetric matrix or
-    \code{\linkS4class{Matrix}} to be factorized.  If \code{x}
-    is a square traditional matrix but not symmetric, then
-    it will be \emph{treated} as symmetric; see \code{uplo}.}
+    \code{\linkS4class{Matrix}} to be factorized.
+    If \code{x} is square but not symmetric, then it will be
+    \emph{treated} as symmetric; see \code{uplo}.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{x} should be used
     to compute the factorization.}
