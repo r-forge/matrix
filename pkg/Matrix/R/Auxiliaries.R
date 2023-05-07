@@ -1883,21 +1883,19 @@ if(FALSE) {
         .dgC.0.factors(x)
     else as(x, "dgCMatrix") # will not have 'factors'
 }
+.drop.factors <- function(x, check = FALSE)
+    `slot<-`(x, "factors", check = check, value = list())
 } ## MJ
 
-## Caches 'value' in the 'factors' slot of 'x', i.e. modifies 'x', and returns 'value'
-## WARNING:: for updating the '@ factors' slot of a function *argument* [CARE!]
-.set.factors <- function(x, name, value, warn.no.slot=FALSE)
+## Caches 'value' in the 'factors' slot of 'x' { NOT a copy of 'x' ! }
+## and returns 'value'
+.set.factor <- function(x, name, value, warn.no.slot = FALSE)
     .Call(R_set_factor, x, name, value, warn.no.slot)
 
-##' Change function *argument* 'x', emptying its 'factors' slot; USE with CARE! __ DANGER ! __
-##' @return TRUE iff 'x' is modified, FALSE if not.
-.empty.factors <- function(x, warn.no.slot=FALSE)
+## Empties 'factors' slot of 'x' { NOT a copy of 'x' ! }
+## and returns TRUE if 'x' was modified and FALSE if not
+.empty.factors <- function(x, warn.no.slot = FALSE)
     .Call(R_empty_factors, x, warn.no.slot)
-
-##' The *SAFE* regular function version:  empty the factor slot
-.drop.factors <- function(x, check=FALSE)
-   `slot<-`(x, "factors", check=check, value=list())
 
 ## MJ: not used
 if(FALSE) {
