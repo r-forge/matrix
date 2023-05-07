@@ -7,6 +7,7 @@ SEXP sparse_as_dense(SEXP from, int packed);
 SEXP R_sparse_as_dense(SEXP from, SEXP packed);
 SEXP R_sparse_as_matrix(SEXP from);
 SEXP R_sparse_as_vector(SEXP from);
+SEXP sparse_as_kind(SEXP from, char kind, int drop0);
 SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0);
 SEXP R_sparse_as_general(SEXP from);
 

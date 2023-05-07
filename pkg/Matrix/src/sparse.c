@@ -356,44 +356,33 @@ SEXP R_sparse_as_vector(SEXP from)
     return from;
 }
 
-/* as(<[CRT]sparseMatrix>, "[nlidz]Matrix") */
-SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
+SEXP sparse_as_kind(SEXP from, char kind, int drop0)
 {
     static const char *valid[] = {
 	VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "R_sparse_as_kind");
-    const char *clf = valid[ivalid]; /* clf := class(from) */
-    
-    char k;
-    if (!isString(kind) || LENGTH(kind) < 1 ||
-	(kind = STRING_ELT(kind, 0)) == NA_STRING ||
-	(k = *CHAR(kind)) == '\0')
-	error(_("invalid 'kind' to 'R_sparse_as_kind()'"));
-    if (k == '.')
-	k = clf[0];
-    SEXPTYPE tx = kind2type(k); /* validating before doing more */
+    const char *clf = valid[ivalid];
+
+    if (kind == '.')
+	kind = clf[0];
+    SEXPTYPE tx = kind2type(kind); /* validating before doing more */
 
     PROTECT_INDEX pidA;
     PROTECT_WITH_INDEX(from, &pidA);
-    
-    int do_drop0 = clf[0] != 'n' && asLogical(drop0) != 0;
-    if (do_drop0)
+    if (drop0 && clf[0] != 'n')
 	REPROTECT(from = R_sparse_drop0(from), pidA);
-
-    if (k == clf[0]) {
+    if (kind == clf[0]) {
 	UNPROTECT(1); /* from */
 	return from;
     }
-    
-    int do_aggr = clf[2] == 'T' &&
-	(clf[0] == 'n' || clf[0] == 'l') && k != 'n' && k != 'l';
-    if (do_aggr)
+    if (clf[2] == 'T' && (clf[0] == 'n' || clf[0] == 'l') &&
+	kind != 'n' && kind != 'l')
 	REPROTECT(from = Tsparse_aggregate(from), pidA);
     
-    char clt[] = "...Matrix"; /* clt := class(to) */
-    clt[0] = k;
+    char clt[] = "...Matrix";
+    clt[0] = kind;
     clt[1] = clf[1];
     clt[2] = clf[2];
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(clt));
@@ -438,7 +427,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 	SET_SLOT(to, Matrix_jSym, j);
 	UNPROTECT(1); /* j */
     }
-    if (clf[0] != 'n' && k != 'n') {
+    if (clf[0] != 'n' && kind != 'n') {
 	SEXP x;
 	PROTECT_INDEX pidB;
 	PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pidB);
@@ -465,6 +454,18 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
 
     UNPROTECT(2); /* to, from */
     return to;
+}
+
+/* as(<[CRT]sparseMatrix>, "[nlidz]Matrix") */
+SEXP R_sparse_as_kind(SEXP from, SEXP kind, SEXP drop0)
+{
+    char kind_;
+    if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	(kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	(kind_ = *CHAR(kind)) == '\0')
+	error(_("invalid 'kind' to 'R_sparse_as_kind()'"));
+    
+    return sparse_as_kind(from, kind_, asLogical(drop0));
 }
 
 /* as(<[CRT]sparseMatrix>, "generalMatrix") */
