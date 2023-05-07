@@ -52,12 +52,12 @@
 }
 \usage{
 lu(x, \dots)
-\S4method{lu}{matrix}(x, \dots)
 \S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
 \S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = TRUE, tol = 1,
    keep.dimnames = TRUE, \dots)
 \S4method{lu}{dsyMatrix}(x, cache = TRUE, \dots)
 \S4method{lu}{dsCMatrix}(x, cache = TRUE, \dots)
+\S4method{lu}{matrix}(x, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite} matrix or
@@ -86,11 +86,11 @@ lu(x, \dots)
     If \code{FALSE}, then the order of the columns of \eqn{A}
     is preserved.  Use \code{FALSE} only if you know that the
     columns of \eqn{A} are already \dQuote{nicely} ordered.}
-  \item{tol}{a positive number.  The original pivot element
-    is used if its absolute value exceeds \code{tol * a},
+  \item{tol}{a number.  The original pivot element is used
+    if its absolute value exceeds \code{tol * a},
     where \code{a} is the maximum in absolute value of the
-    other possible pivot elements.  Set \code{tol != 1} only
-    if you know what you are doing.}
+    other possible pivot elements.
+    Set \code{tol != 1} only if you know what you are doing.}
   \item{keep.dimnames}{a logical indicating if \code{x@Dimnames}
     should be propagated to the result as \code{lu(x)@Dimnames}.}
   \item{cache}{a logical indicating if the result should be
