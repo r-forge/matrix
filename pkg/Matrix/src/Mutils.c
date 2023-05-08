@@ -354,19 +354,16 @@ void set_DimNames(SEXP obj, SEXP dn)
 
 SEXP get_factor(SEXP obj, const char *nm)
 {
-    SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
+    SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym)), val = R_NilValue;
     if (LENGTH(factors) > 0) {
 	SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
 	int i = strmatch2(nm, valid);
+	if (i >= 0)
+	    val = VECTOR_ELT(factors, i);
 	UNPROTECT(1);
-	if (i >= 0) {
-	    factors = VECTOR_ELT(factors, i);
-	    UNPROTECT(1);
-	    return factors;
-	}
     }
     UNPROTECT(1);
-    return R_NilValue;
+    return val;
 }
 
 void set_factor(SEXP obj, const char *nm, SEXP val)
@@ -450,6 +447,63 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 	warning(_("attempt to discard factors from Matrix "
 		  "without 'factors' slot"));
     return ScalarLogical(0); /* no-op */
+}
+
+
+/* For permutations ================================================= */
+
+int isPerm(int *p, int n, int off)
+{
+    if (n <= 0)
+	return 1;
+    int i, j;
+    char *work;
+    Matrix_Calloc(work, n, char);
+    for (i = 0; i < n; ++i) {
+	if (p[i] == NA_INTEGER)
+	    return 0;
+	j = p[i] - off;
+	if (j < 0 || j >= n || work[j])
+	    return 0;
+	work[j] = 1;
+    }
+    Matrix_Free(work, n);
+    return 1;
+}
+
+int signPerm(int *p, int n, int off)
+{
+    if (!isPerm(p, n, off))
+	error(_("attempt to get sign of non-permutation"));
+    int sign = 1;
+    if (n <= 0)
+	return sign;
+    int i, pos = 0;
+    char *work;
+    Matrix_Calloc(work, n, char);
+    while (pos < n) {
+	work[pos] = 1;
+	i = p[pos] - off;
+	while (!work[i]) { /* transposition */
+	    sign = -sign;
+	    work[i] = 1;
+	    i = p[i] - off;
+	}
+	while (pos < n && work[pos])
+	    ++pos;
+    }
+    Matrix_Free(work, n);
+    return sign;
+}
+
+void invPerm(int *src, int *dest, int n, int soff, int doff)
+{
+    if (!isPerm(src, n, soff))
+	error(_("attempt to invert non-permutation"));
+    int i;
+    for (i = 0; i < n; ++i)
+	dest[src[i] - soff] = i + doff;
+    return;
 }
 
 
