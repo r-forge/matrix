@@ -3,8 +3,8 @@
 
 #include "dsyMatrix.h"
 
-SEXP dpoMatrix_trf_(SEXP obj,  int warn);
-SEXP dpoMatrix_trf (SEXP obj, SEXP warn);
+/* defined in factorizations.c : */
+SEXP dpoMatrix_trf_(SEXP, int);
 
 SEXP dpoMatrix_rcond(SEXP obj);
 SEXP dpoMatrix_solve(SEXP a);

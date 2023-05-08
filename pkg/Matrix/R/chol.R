@@ -1,118 +1,133 @@
 ## METHODS FOR GENERIC: chol
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## MJ: all of the C-level *_chol() functions need a second look ...
-##     these methods feel much more complicated than they need to be ...
-
 setMethod("chol", signature(x = "generalMatrix"),
-	  function(x, ...) {
-              ch <- chol(.M2sym(x, checkDN = FALSE), ...)
+	  function(x, uplo = "U", ...) {
+              ch <- chol(forceSymmetric(x, uplo), ...)
               ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               ch
+          })
+
+setMethod("chol", signature(x = "triangularMatrix"),
+	  function(x, uplo = "U", ...) {
+              if(identical(uplo, x@uplo)) {
+                  ch <- chol(forceSymmetric(x, uplo), ...)
+                  ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
+                  ch
+              } else chol(forceDiagonal(x, x@diag), ...)
           })
 
 setMethod("chol", signature(x = "symmetricMatrix"),
 	  function(x, ...)
               chol(as(x, "dMatrix"), ...))
 
-setMethod("chol", signature(x = "triangularMatrix"),
-	  function(x, ...) {
-              if(isDiagonal(x))
-                  chol(forceDiagonal(x), ...)
-              else stop("chol(x) is undefined: 'x' is not symmetric")
-          })
-
 setMethod("chol", signature(x = "diagonalMatrix"),
-	  function(x, ...) {
-              x <- ..diag2d(x)
-              if(x@diag == "N") {
-                  if(any(x@x < 0))
-                      stop("chol(x) is undefined: 'x' is not positive definite")
-                  x@x <- sqrt(x@x)
-              }
-              x
-          })
+	  function(x, ...)
+              chol(..diag2d(x), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, ...) {
-              if(!is.null(ch <- x@factors[["Cholesky"]]))
-                  return(ch) # use the cache
-              tryCatch(.Call(dpoMatrix_trf, if(x@uplo == "U") x else t(x), 2L),
-                       error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
+              ch <- as(Cholesky(x), "dtrMatrix")
+              if(ch@uplo != "U") t(ch) else ch
           })
 
 setMethod("chol", signature(x = "dspMatrix"),
           function(x, ...) {
-              if(!is.null(ch <- x@factors[["pCholesky"]]))
-                  return(ch) # use the cache
-              tryCatch(.Call(dppMatrix_trf, if(x@uplo == "U") x else t(x), 2L),
-                       error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
+              ch <- as(Cholesky(x), "dtpMatrix")
+              if(ch@uplo != "U") t(ch) else ch
           })
 
-## FIXME: Is there is a simple way at C-level to cache L' rather than L,
-##        given that chol() is documented to return L'?  Then we wouldn't
-##        need t() here.  Of course, we could construct L' as a dtRMatrix
-##        "for free" with .tCR2RC() ...
-for(.cl in paste0("dg", c("C", "R", "T"), "Matrix"))
+for(.cl in paste0("ds", c("C", "R", "T"), "Matrix"))
 setMethod("chol", signature(x = .cl),
-	  function(x, pivot = FALSE, cache = TRUE, ...) {
-              nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix")))
-              ch <- chol(y <- .M2sym(x, checkDN = FALSE), pivot = pivot, ...)
-              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
-              if(cache)
-                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
-                  .set.factors(x, nm, y@factors[[nm]])
-              ch
-          })
-rm(.cl)
-
-setMethod("chol", signature(x = "dsCMatrix"),
-	  function(x, pivot = FALSE, ...) {
-              nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix")))
-              tryCatch(.Call(dsCMatrix_chol, x, pivot),
-                       error = function(e) stop("chol(x) is undefined: 'x' is not positive definite"))
+          function(x, pivot = FALSE, ...) {
+              ch <- Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE)
+              t(as(ch, "dtCMatrix")) # FIXME? give dtRMatrix, dtTMatrix?
           })
 
-setMethod("chol", signature(x = "dsRMatrix"),
-	  function(x, pivot = FALSE, cache = TRUE, ...) {
-              nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix")))
-              ch <- chol(y <- .tCR2RC(x), pivot = pivot, ...)
-              if(cache)
-                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
-                  .set.factors(x, nm, y@factors[[nm]])
-              ch
-          })
-
-setMethod("chol", signature(x = "dsTMatrix"),
-	  function(x, pivot = FALSE, cache = TRUE, ...) {
-              nm <- if(pivot) "sPdCholesky" else "spdCholesky"
-              if(!is.null(ch <- x@factors[[nm]]))
-                  return(t(as(ch, "CsparseMatrix")))
-              ch <- chol(y <- .T2C(x), pivot = pivot, ...)
-              if(cache)
-                  ## dsCMatrix_chol() caches CHMfactor and returns dtCMatrix
-                  .set.factors(x, nm, y@factors[[nm]])
-              ch
+setMethod("chol", signature(x = "ddiMatrix"),
+          function(x, ...) {
+              if(length(y <- x@x)) {
+                  if(is.na(min.y <- min(y)) || min.y <= 0)
+                      stop("chol(x) is undefined: 'x' is not positive definite")
+                  x@x <- sqrt(y)
+              }
+              x
           })
 
 
 ## METHODS FOR GENERIC: Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("Cholesky", signature(A = "sparseMatrix"), # ->dsCMatrix
+setMethod("Cholesky", signature(A = "generalMatrix"),
+	  function(A, uplo = "U", ...) {
+              ch <- Cholesky(forceSymmetric(A, uplo), ...)
+              ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
+              ch
+          })
+
+setMethod("Cholesky", signature(A = "triangularMatrix"),
+	  function(A, uplo = "U", ...) {
+              ch <- Cholesky(forceSymmetric(A, uplo), ...)
+              ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
+              ch
+          })
+
+setMethod("Cholesky", signature(A = "symmetricMatrix"),
 	  function(A, ...)
-              Cholesky(..sparse2d(.M2sym(as(A, "CsparseMatrix"))), ...))
+              Cholesky(as(A, "dMatrix"), ...))
+
+setMethod("Cholesky", signature(A = "diagonalMatrix"),
+	  function(A, ...)
+              Cholesky(..diag2d(A), ...))
+
+setMethod("Cholesky", signature(A = "dsyMatrix"),
+          function(A, ...)
+              tryCatch(.Call(dpoMatrix_trf, A, 2L),
+                       error = function(e) stop("Cholesky(A) is undefined: 'A' is not positive definite")))
+
+setMethod("Cholesky", signature(A = "dspMatrix"),
+          function(A, ...)
+              tryCatch(.Call(dppMatrix_trf, A, 2L),
+                       error = function(e) stop("Cholesky(A) is undefined: 'A' is not positive definite")))
 
 setMethod("Cholesky", signature(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,
                    Imult = 0, ...)
-              .Call(dsCMatrix_Cholesky, A, perm, LDL, super, Imult))
+              .Call(dpCMatrix_trf, A, perm, LDL, super, Imult))
+
+setMethod("Cholesky", signature(A = "dsRMatrix"),
+          function(A, ...)
+              Cholesky(.tCR2RC(A), ...))
+
+setMethod("Cholesky", signature(A = "dsTMatrix"),
+          function(A, ...)
+              Cholesky(.T2C(A), ...))
+
+setMethod("Cholesky", signature(A = "ddiMatrix"),
+          function(A, ...) {
+              if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y <= 0))
+                  stop("Cholesky(x) is undefined: 'A' is not positive definite")
+              n <- (d <- A@Dim)[1L]
+              r <- new("dCHMsimpl")
+              r@Dim <- d
+              r@Dimnames <- A@Dimnames
+              r@colcount <- r@nz <- rep.int(1L, n)
+              r@type <- c(0L, 1L, 0L, 1L)
+              r@p <- 0:n
+              r@i <- r@perm <- s <- seq.int(0L, length.out = n)
+              r@x <- if(length(y)) y else rep.int(1, n)
+              r@prv <- c(n + 1L, s, -1L) # @<- will error if n+1L overflows
+              r@nxt <- c(seq_len(n), -1L, 0L)
+              r
+          })
+
+setMethod("Cholesky", signature(A = "matrix"),
+	  function(A, uplo = "U", ...) {
+              ch <- Cholesky(forceSymmetric(A, uplo), ...)
+              if(!is.null(dn <- dimnames(A)))
+                  ch@Dimnames <- dn # restore asymmetric 'Dimnames'
+              ch
+          })
 
 
 ## METHODS FOR GENERIC: chol2inv

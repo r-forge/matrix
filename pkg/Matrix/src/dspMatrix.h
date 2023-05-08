@@ -5,10 +5,8 @@
 #include "Mutils.h"
 
 /* defined in factorizations.c : */
+SEXP dspMatrix_trf_(SEXP, int);
 SEXP BunchKaufman_determinant(SEXP, SEXP);
-
-SEXP dspMatrix_trf_(SEXP obj,  int warn);
-SEXP dspMatrix_trf (SEXP obj, SEXP warn);
 
 double get_norm_dsp(SEXP obj, const char *typstr);
 SEXP dspMatrix_norm(SEXP obj, SEXP type);

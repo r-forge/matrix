@@ -1,5 +1,8 @@
 #include "dsCMatrix.h"
 
+/* MJ: no longer needed ... replacement in ./factorizations.c */
+#if 0
+
 static int chk_nm(const char *nm, int perm, int LDL, int super)
 {
     if (strlen(nm) != 11) return 0;
@@ -38,8 +41,6 @@ SEXP R_chm_factor_name(SEXP perm, SEXP LDL, SEXP super)
     chm_factor_name(nm, asLogical(perm), asLogical(LDL), asLogical(super));
     return mkString(nm);
 }
-
-
 
 /**
  * Return a CHOLMOD copy of the cached Cholesky decomposition with the
@@ -174,6 +175,8 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
     return r;
 }
 
+#endif /* MJ */
+
 /**
  * Fast version of getting at the diagonal matrix D of the
  * (generalized) simplicial Cholesky LDL' decomposition of a
@@ -189,63 +192,76 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
  */
 SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
 {
+    CHM_SP A = AS_CHM_SP__(Ap);
     CHM_FR L;
-    SEXP ans;
-    L = internal_chm_factor(Ap, asLogical(permP),
-			    /*LDL*/ 1, /*super*/0, /*Imult*/0.);
-    // ./Csparse.c :
-    ans = PROTECT(diag_tC_ptr(L->n,
-			      L->p,
-			      L->x,
-			      /* is_U = */ FALSE,
-			      L->Perm,
-			      resultKind));
+    R_CheckStack();
+    dpCMatrix_trf_(A, &L,
+		   /*  perm */ asLogical(permP),
+		   /*   ldl */ 1,
+		   /* super */ 0,
+		   /*  mult */ 0.0);
+    SEXP ans = diag_tC_ptr(L->n, L->p, L->x, FALSE, L->Perm, resultKind);
     cholmod_free_factor(&L, &c);
-    UNPROTECT(1);
     return(ans);
 }
 
 // using cholmod_spsolve() --> sparse result
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b, SEXP LDL)
 {
-    int iLDL = asLogical(LDL);
-    // When parameter is set to  NA  in R, let CHOLMOD choose
-    if(iLDL == NA_LOGICAL) iLDL = -1;
-
-    CHM_FR L = internal_chm_factor(a, /*perm*/-1, iLDL, /*super*/-1, /*Imult*/0.);
+    CHM_SP A = AS_CHM_SP__(a);
+    CHM_FR L;
+    R_CheckStack();
+    dpCMatrix_trf_(A, &L,
+		   /*  perm */ 1,
+		   /*   ldl */ asLogical(LDL),
+		   /* super */ NA_LOGICAL,
+		   /*  mult */ 0.0);
     if(!chm_factor_ok(L)) {
 	cholmod_free_factor(&L, &c);
-	return R_NilValue;// == "CHOLMOD factorization failed"
+	return R_NilValue; /* CHOLMOD factorization failed */
     }
-    CHM_SP cb = AS_CHM_SP(b), cx;
+    
+    CHM_SP cb = AS_CHM_SP(b);
     R_CheckStack();
+    CHM_SP cx = cholmod_spsolve(CHOLMOD_A, L, cb, &c);
 
-    cx = cholmod_spsolve(CHOLMOD_A, L, cb, &c);
     cholmod_free_factor(&L, &c);
-    return chm_sparse_to_SEXP(cx, /*do_free*/ 1, /*uploT*/ 0,
-			      /*Rkind*/ 0, /*diag*/ "N",
-			      /*dimnames = */ R_NilValue);
+    return chm_sparse_to_SEXP(cx,
+			      /* dofree */ 1,
+			      /*  uploT */ 0,
+			      /*  Rkind */ 0,
+			      /*   diag */ "N",
+			      /*     dn */ R_NilValue);
 }
 
 // using cholmod_solve() --> dense result
 SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP LDL)
 {
-    int iLDL = asLogical(LDL);
-    // When parameter is set to  NA  in R, let CHOLMOD choose
-    if(iLDL == NA_LOGICAL) iLDL = -1;
-
-    CHM_FR L = internal_chm_factor(a, /*perm*/-1, iLDL, /*super*/-1, /*Imult*/0.);
+    CHM_SP A = AS_CHM_SP__(a);
+    CHM_FR L;
+    R_CheckStack();
+    dpCMatrix_trf_(A, &L,
+		   /*  perm */ 1,
+		   /*   ldl */ asLogical(LDL),
+		   /* super */ NA_LOGICAL,
+		   /*  mult */ 0.0);
     if(!chm_factor_ok(L)) {
 	cholmod_free_factor(&L, &c);
-	return R_NilValue;// == "CHOLMOD factorization failed"
+	return R_NilValue; /* CHOLMOD factorization failed */
     }
 
-    CHM_DN cx, cb = AS_CHM_DN(PROTECT(dense_as_general(b, 'd', 2, 0)));
+    PROTECT(b = dense_as_general(b, 'd', 2, 0));
+    CHM_DN cb = AS_CHM_DN(b);
     R_CheckStack();
-    cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
-    cholmod_free_factor(&L, &c);
+    CHM_DN cx = cholmod_solve(CHOLMOD_A, L, cb, &c);
     UNPROTECT(1);
-    return chm_dense_to_SEXP(cx, 1, 0, /*dimnames = */ R_NilValue, /* transp: */ FALSE);
+    
+    cholmod_free_factor(&L, &c);
+    return chm_dense_to_SEXP(cx,
+			     /* dofree */ 1,
+			     /*  Rkind */ 0,
+			     /*     dn */ R_NilValue,
+			     /* transp */ FALSE);
 }
 
 /* MJ: no longer used ... prefer R_sparse_as_general(), CRsparse_as_Tsparse() */

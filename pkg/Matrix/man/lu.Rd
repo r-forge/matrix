@@ -53,7 +53,7 @@
 \usage{
 lu(x, \dots)
 \S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
-\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = TRUE, tol = 1,
+\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = NA_integer_, tol = 1,
    keep.dimnames = TRUE, \dots)
 \S4method{lu}{dsyMatrix}(x, cache = TRUE, \dots)
 \S4method{lu}{dsCMatrix}(x, cache = TRUE, \dots)
@@ -69,28 +69,22 @@ lu(x, \dots)
   \item{errSing}{a logical indicating if an \link[=stop]{error} should
     be signaled for singular \code{x}.  Used only by methods for
     sparse matrices.}
-  %% \item{order}{an integer in \code{0:3} passed to CSparse routine
-  %%   \code{cs_sqr}, indicating a strategy for choosing the column
-  %%   permutation \eqn{P_{2}}{P2}. 0 means no column permutation.
-  %%   1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
-  %%   \eqn{\tilde{A}' \tilde{A}}{A~' * A~}, and \eqn{A' A}{A' * A},
-  %%   where \eqn{\tilde{A}}{A~} is \eqn{A} with \dQuote{dense} rows
-  %%   removed.  Do not set to 0 unless you know that \eqn{A} already
-  %%   has a desirable column ordering.}
-  \item{order}{a logical indicating if a fill-reducing
-    permutation of the columns of \eqn{A} should be used.
-    If \code{TRUE}, then the permutation is determined from
-    \eqn{\tilde{A}' \tilde{A}}{A~' * A~}
-    if \code{tol == 1} and from \eqn{A + A'} otherwise, where
-    \eqn{\tilde{A}}{A~} is \eqn{A} with dense rows removed.
-    If \code{FALSE}, then the order of the columns of \eqn{A}
-    is preserved.  Use \code{FALSE} only if you know that the
-    columns of \eqn{A} are already \dQuote{nicely} ordered.}
+  \item{order}{an integer in \code{0:3} passed to CSparse routine
+    \code{cs_sqr}, indicating a strategy for choosing the column
+    permutation \eqn{P_{2}}{P2}. 0 means no column permutation.
+    1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
+    \eqn{\tilde{A}' \tilde{A}}{A~' * A~}, and \eqn{A' A}{A' * A},
+    where \eqn{\tilde{A}}{A~} is \eqn{A} with \dQuote{dense} rows
+    removed.
+    \code{NA} (the default) is equivalent to 2 if \code{tol == 1}
+    and 1 otherwise.
+    Do not set to 0 unless you know that the column order of \eqn{A}
+    is already sensible.}
   \item{tol}{a number.  The original pivot element is used
     if its absolute value exceeds \code{tol * a},
     where \code{a} is the maximum in absolute value of the
     other possible pivot elements.
-    Set \code{tol != 1} only if you know what you are doing.}
+    Set \code{tol < 1} only if you know what you are doing.}
   \item{keep.dimnames}{a logical indicating if \code{x@Dimnames}
     should be propagated to the result as \code{lu(x)@Dimnames}.}
   \item{cache}{a logical indicating if the result should be
@@ -118,7 +112,8 @@ lu(x, \dots)
   abandons further computation, throwing an error if \code{errSing = TRUE}
   and otherwise returning \code{NA}.  Users of this method can
   detect singular \code{x} with an error handler or by setting
-  \code{errSing = FALSE} and testing for \code{NA} with \code{\link{is.na}}.
+  \code{errSing = FALSE} and testing for a formal result with
+  \code{\link{isS4}}.
 
   Due to caching, it is currently unsafe to mix different values of
   \code{errSing}.  Notably, if \code{x} is a singular \code{dgCMatrix},

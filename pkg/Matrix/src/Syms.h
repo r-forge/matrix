@@ -21,4 +21,4 @@ SEXP Matrix_DimNamesSym,
     Matrix_uploSym,
     Matrix_xSym,
 
-    Matrix_NS; /* the 'Matrix' namespace ("environment") */
+    MatrixNamespace;

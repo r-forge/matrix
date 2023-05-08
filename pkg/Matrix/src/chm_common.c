@@ -2,6 +2,9 @@
  */
 #include "chm_common.h"
 
+/* defined in Csparse.c : */
+Rboolean isValid_Csparse(SEXP);
+
 SEXP get_SuiteSparse_version(void) {
     SEXP ans = allocVector(INTSXP, 3);
     int* version = INTEGER(ans);
@@ -258,7 +261,8 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 
     if (ctype < 0)
 	error(_("invalid class of object to as_cholmod_sparse"));
-    validObject(x, valid[ctype]);
+    if (!isValid_Csparse(x))
+	error(_("invalid object passed to as_cholmod_sparse"));
     
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
 

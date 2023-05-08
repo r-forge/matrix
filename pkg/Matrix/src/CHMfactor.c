@@ -13,8 +13,13 @@ SEXP CHMfactor_to_sparse(SEXP x)
 	if (!cholmod_change_factor(Lcp->xtype, 1, 0, 1, 1, Lcp, &c))
 	    error(_("cholmod_change_factor failed with status %d"), c.status);
     Lm = cholmod_factor_to_sparse(Lcp, &c); cholmod_free_factor(&Lcp, &c);
-    return chm_sparse_to_SEXP(Lm, 1/*do_free*/, -1/*uploT*/, 0/*Rkind*/,
-			      "N"/*non_unit*/, R_NilValue/*dimNames*/);
+
+    SEXP dimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
+	res = PROTECT(chm_sparse_to_SEXP(
+			  Lm, 1 /* dofree */, -1 /* uploT */, 0 /* Rkind */,
+			  "N" /* diag */, dimnames /* dn */));
+    UNPROTECT(2);
+    return res;
 }
 
 SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP system)

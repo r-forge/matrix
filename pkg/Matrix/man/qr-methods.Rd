@@ -34,18 +34,24 @@
 }
 \usage{
 qr(x, \dots)
-\S4method{qr}{dgCMatrix}(x, keep.dimnames = TRUE,
-    verbose = getOption("Matrix.verbose", FALSE), \dots)
+\S4method{qr}{dgCMatrix}(x, order = 3L, keep.dimnames = TRUE, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite} matrix or
     \code{\linkS4class{Matrix}} to be factorized,
     satisfying \code{nrow(x) >= ncol(x)} if sparse.}
+  \item{order}{an integer in \code{0:3} passed to CSparse routine
+    \code{cs_sqr}, indicating a strategy for choosing the column
+    permutation \eqn{P_{2}}{P2}. 0 means no column permutation.
+    1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
+    \eqn{\tilde{A}' \tilde{A}}{A~' * A~}, and \eqn{A' A}{A' * A},
+    where \eqn{\tilde{A}}{A~} is \eqn{A} with \dQuote{dense} rows
+    removed.
+    Do not set to 0 unless you know that the column order of \eqn{A}
+    is already sensible.}
   \item{keep.dimnames}{a logical indicating if \code{x@Dimnames}
     should be propagated to the result as \code{qr(x)@Dimnames}.}
-  \item{verbose}{a logical indicating if a diagnostic message
-    should be be printed for structurally rank deficient \code{x}.}
-  \item{\dots}{further arguments passed to or from methods}
+  \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
   An object representing the factorization, of S4 class

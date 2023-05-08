@@ -9,11 +9,8 @@ setMethod("lu", signature(x = "denseMatrix"),
 	  function(x, ...) lu(..dense2d(x), ...))
 
 setMethod("lu", signature(x = "dgeMatrix"),
-	  function(x, warnSing = TRUE, ...) {
-              if(!is.null(ch <- x@factors[["LU"]]))
-                  return(ch)
-              .set.factor(x, "LU", .Call(dgeMatrix_trf, x, warnSing))
-          })
+	  function(x, warnSing = TRUE, ...)
+              .Call(dgeMatrix_trf, x, warnSing))
 
 setMethod("lu", signature(x = "dsyMatrix"),
 	  function(x, cache = TRUE, ...) {
@@ -49,13 +46,9 @@ setMethod("lu", signature(x = "sparseMatrix"),
               lu(..sparse2d(as(x, "CsparseMatrix")), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
-          function(x, errSing = TRUE, order = TRUE, tol = 1,
-                   keep.dimnames = TRUE, ...) {
-              if(!is.null(ch <- x@factors[["LU"]]))
-                  return(ch)
-              .set.factor(x, "LU", .Call(dgCMatrix_LU, x, order, tol, errSing,
-                                         keep.dimnames))
-          })
+          function(x, errSing = TRUE, order = NA_integer_, tol = 1,
+                   keep.dimnames = TRUE, ...)
+              .Call(dgCMatrix_trf, x, errSing, keep.dimnames, order, tol))
 
 setMethod("lu", signature(x = "dsCMatrix"),
           function(x, cache = TRUE, ...) {
@@ -204,18 +197,18 @@ setMethod("expand2", signature(x = "sparseLU"),
           function(x, ...) {
               d <- x@Dim
               dn <- x@Dimnames
+              p1 <- x@p
+              p2 <- x@q
               P1. <- new("pMatrix",
                          Dim = d,
                          Dimnames = c(dn[1L], list(NULL)),
                          margin = 1L,
-                         perm = invPerm(
-                             x@p, zero.p = TRUE, zero.res = FALSE))
+                         perm = invPerm(p1, zero.p = TRUE, zero.res = FALSE))
               P2. <- new("pMatrix",
                          Dim = d,
                          Dimnames = c(list(NULL), dn[2L]),
                          margin = 2L,
-                         perm = invPerm(
-                             x@q, zero.p = TRUE, zero.res = FALSE))
+                         perm = if(length(p2)) invPerm(p2, zero.p = TRUE, zero.res = FALSE) else seq_len(d[1L]))
               L <- x@L
               U <- x@U
               if(L@diag == "N")
@@ -231,12 +224,16 @@ setMethod("expand", signature(x = "sparseLU"),
               dn <- x@Dimnames
               p <- x@p + 1L
               q <- x@q + 1L
-              if(!is.null(rn <- dn[[1L]]))
+              if(length(p) && !is.null(rn <- dn[[1L]]))
                   dn[[1L]] <- rn[p]
-              if(!is.null(cn <- dn[[2L]]))
+              if(length(q) && !is.null(cn <- dn[[2L]]))
                   dn[[2L]] <- cn[q]
-              P <- new("pMatrix", Dim = d, perm = p)
-              Q <- new("pMatrix", Dim = d, perm = q)
+              P <- new("pMatrix",
+                       Dim = d,
+                       perm = p)
+              Q <- new("pMatrix",
+                       Dim = d,
+                       perm = if(length(q)) q else seq_len(d[1L]))
               L <- x@L
               U <- x@U
               L@Dimnames <- c(dn[1L], list(NULL))

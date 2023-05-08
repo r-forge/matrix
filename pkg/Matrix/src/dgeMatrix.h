@@ -5,10 +5,8 @@
 #include "Mutils.h"
 
 /* defined in factorizations.c : */
+SEXP dgeMatrix_trf_(SEXP, int);
 SEXP denseLU_determinant(SEXP, SEXP);
-
-SEXP dgeMatrix_trf_(SEXP obj,  int warn);
-SEXP dgeMatrix_trf (SEXP obj, SEXP warn);
 
 double get_norm_dge(SEXP obj, const char *typstr);
 SEXP dgeMatrix_norm(SEXP obj, SEXP type);

@@ -37,16 +37,11 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_ldetL2up, 3),
     CALLDEF(CHMfactor_update, 3),
     CALLDEF(CHMfactor_updown,3),
+    
     CALLDEF(destructive_CHM_update, 3),
     CALLDEF(Csparse_Csparse_prod, 3),
     CALLDEF(Csparse_Csparse_crossprod, 4),
-    CALLDEF(Csparse_MatrixMarket, 2),
-    
-/* MJ: no longer needed ... prefer R_sparse_band() */
-#if 0
-    CALLDEF(Csparse_band, 3),
-#endif
-
+    CALLDEF(Csparse_MatrixMarket, 2),    
     CALLDEF(Csparse_crossprod, 4),
     CALLDEF(Csparse_dense_crossprod, 3),
     CALLDEF(Csparse_dense_prod, 3),
@@ -54,164 +49,27 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(Csparse_horzcat, 2),
     CALLDEF(Csparse_sort, 1),
     
-/* MJ: no longer needed ... prefer CRsparse_to_Tsparse() */
-#if 0
-    CALLDEF(compressed_to_TMatrix, 2),
-    CALLDEF(Csparse_to_Tsparse, 2),
-#endif
-    
-/* MJ: unused */
-#if 0
-    CALLDEF(Csparse_to_tCsparse, 3),
-    CALLDEF(Csparse_to_tTsparse, 3),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_dense() */
-#if 0
-    CALLDEF(Csparse_to_dense, 2),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_kind() */
-#if 0
-    CALLDEF(Csparse_to_nz_pattern, 2),
-    CALLDEF(nz_pattern_to_Csparse, 2),	
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_matrix() */
-#if 0
-    CALLDEF(Csparse_to_matrix, 3),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_vector() */
-#if 0
-    CALLDEF(Csparse_to_vector, 1),
-#endif
-    
-    CALLDEF(Csparse_submatrix, 3),
     CALLDEF(dCsparse_subassign, 4),
     CALLDEF(lCsparse_subassign, 4),
     CALLDEF(iCsparse_subassign, 4),
     CALLDEF(nCsparse_subassign, 4),
     CALLDEF(zCsparse_subassign, 4),
-
-/* MJ: no longer needed ... prefer R_sparse_force_symmetric() */
-#if 0    
-    CALLDEF(Csparse_general_to_symmetric, 3),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_general() */
-#if 0
-    CALLDEF(Csparse_symmetric_to_general, 1),
-#endif    
-
-/* MJ: no longer needed ... prefer R_sparse_transpose() */
-#if 0
-    CALLDEF(Csparse_transpose, 2),
-#endif
     
     CALLDEF(Csparse_validate2, 2),
     CALLDEF(Csparse_vertcat, 2),
     CALLDEF(Csparse_dmperm, 3),
     CALLDEF(diag_tC, 2),
 
-/* MJ: no longer needed ... prefer denseLU_expand() */
-#if 0
-    CALLDEF(LU_expand, 1),
-#endif
-
-/* MJ: no longer needed ... prefer R_dense_as_sparse() */
-#if 0
-    CALLDEF(matrix_to_Csparse, 2),
-#endif
-    
     CALLDEF(Matrix_expand_pointers, 1),
     CALLDEF(R_rbind2_vector, 2),
     CALLDEF(R_all0, 1),
     CALLDEF(R_any0, 1),
 
-/* MJ: no longer needed ... 
-   now done via R_sparse_transpose(), tCRsparse_as_RCsparse() */
-#if 0
-    CALLDEF(R_to_CMatrix, 1),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_diag_(U2N|N2U)() */
-#if 0
-    CALLDEF(Csparse_diagU2N, 1),
-    CALLDEF(Csparse_diagN2U, 1),
-    CALLDEF(Tsparse_diagU2N, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer Tsparse_as_CRsparse() */
-#if 0
-    CALLDEF(Tsparse_to_Csparse, 2),
-#endif
-
-/* MJ: unused */
-#if 0    
-    CALLDEF(Tsparse_to_tCsparse, 3),
-#endif
-    
     CALLDEF(compressed_non_0_ij, 2),
-
-/* MJ: no longer needed ... prefer R_dense_as_sparse() */
-#if 0
-    CALLDEF(dense_to_Csparse, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer R_dense_band() */
-#if 0
-    CALLDEF(dense_band, 3),
-#endif
-
-/* MJ: no longer needed ... prefer (un)?packedMatrix_force_symmetric() */
-#if 0
-    CALLDEF(dense_to_symmetric, 3),
-#endif
-
-/* MJ: no longer needed ... prefer (un)?packedMatrix_(symm|skew)part() */
-#if 0
-    CALLDEF(ddense_symmpart, 1),
-    CALLDEF(ddense_skewpart, 1),
-#endif
-    
-    CALLDEF(dgCMatrix_LU, 5),
-    CALLDEF(dgCMatrix_QR, 3),
-#ifdef Matrix_WithSPQR
-    CALLDEF(dgCMatrix_SPQR, 4),
-#endif
-
-/* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */
-#if 0
-    CALLDEF(dgCMatrix_colSums, 5),
-    CALLDEF(igCMatrix_colSums, 5),
-    CALLDEF(lgCMatrix_colSums, 5),
-    CALLDEF(ngCMatrix_colSums, 5),
-#endif
-    
-    CALLDEF(dgCMatrix_cholsol, 2),
-    /* CALLDEF(dgCMatrix_lusol, 2), */
     CALLDEF(dgCMatrix_matrix_solve, 3),
+    CALLDEF(dgCMatrix_cholsol, 2),
     CALLDEF(dgCMatrix_qrsol, 3),
 
-/* MJ: no longer needed ... prefer R_sparse_as_dense() */
-#if 0
-    CALLDEF(dgTMatrix_to_dgeMatrix, 1),
-    CALLDEF(lgTMatrix_to_lgeMatrix, 1),
-#endif
-
-/* MJ: no longer needed ... prefer R_sparse_as_matrix() */
-#if 0
-    CALLDEF(dgTMatrix_to_matrix, 1),
-    CALLDEF(lgTMatrix_to_matrix, 1),
-#endif
-
-/* MJ: no longer needed ... prefer R_dense_(col|row)Sums() */
-#if 0
-    CALLDEF(dgeMatrix_colsums, 4),
-#endif
-    
-    CALLDEF(dgeMatrix_trf, 2),
     CALLDEF(dgeMatrix_norm, 2),
     CALLDEF(dgeMatrix_rcond, 2),
     CALLDEF(dgeMatrix_determinant, 2),
@@ -228,57 +86,18 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_Schur, 3),
     CALLDEF(dgeMatrix_exp, 1),
     
-/* MJ: no longer needed ... prefer unpackedMatrix_diag_[gs]et() */
-#if 0
-    CALLDEF(dgeMatrix_getDiag, 1),
-    CALLDEF(lgeMatrix_getDiag, 1),
-    CALLDEF(dgeMatrix_setDiag, 2),
-    CALLDEF(lgeMatrix_setDiag, 2),
-    /* was unused, not replaced: */
-    CALLDEF(dgeMatrix_addDiag, 2),
-#endif
-    
-    CALLDEF(dpoMatrix_trf, 2),
     CALLDEF(dpoMatrix_rcond, 1),
     CALLDEF(dpoMatrix_solve, 1),
     CALLDEF(dpoMatrix_matrix_solve, 2),
 
-    CALLDEF(dppMatrix_trf, 2),
     CALLDEF(dppMatrix_rcond, 1),
     CALLDEF(dppMatrix_solve, 1),
     CALLDEF(dppMatrix_matrix_solve, 2),
 
-    CALLDEF(R_chkName_Cholesky, 4),
-    CALLDEF(R_chm_factor_name, 3),
-    CALLDEF(dsCMatrix_Cholesky, 5),
     CALLDEF(dsCMatrix_LDL_D, 3),
-    CALLDEF(dsCMatrix_chol, 2),
     CALLDEF(dsCMatrix_Csparse_solve, 3),
     CALLDEF(dsCMatrix_matrix_solve,  3),
     
-/* MJ: no longer needed ... 
-   prefer R_sparse_as_general(), R_sparse_as_dense(), etc. */
-#if 0
-    CALLDEF(dsCMatrix_to_dgTMatrix, 1),
-    CALLDEF(dsTMatrix_as_dgTMatrix, 1),
-    CALLDEF(lsTMatrix_as_lgTMatrix, 1),
-    CALLDEF(nsTMatrix_as_ngTMatrix, 1),
-    CALLDEF(dsTMatrix_as_dsyMatrix, 1),
-    CALLDEF(lsTMatrix_as_lsyMatrix, 1),
-    CALLDEF(nsTMatrix_as_nsyMatrix, 1),
-#endif
-
-/* MJ: no longer needed ... prefer unpackedMatrix_pack() */
-#if 0    
-    CALLDEF(dsyMatrix_as_dspMatrix, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer R_dense_as_matrix() */
-#if 0
-    CALLDEF(dsyMatrix_as_matrix, 2),
-#endif
-    
-    CALLDEF(dsyMatrix_trf, 2),
     CALLDEF(dsyMatrix_norm, 2),
     CALLDEF(dsyMatrix_rcond, 1),
     CALLDEF(dsyMatrix_determinant, 2),
@@ -286,13 +105,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dsyMatrix_matrix_solve, 2),
     CALLDEF(dsyMatrix_matrix_mm, 3),
     
-/* MJ: no longer needed ... prefer packedMatrix_unpack() */
-#if 0
-    CALLDEF(dspMatrix_as_dsyMatrix, 1),
-    CALLDEF(dtpMatrix_as_dtrMatrix, 1),
-#endif
-    
-    CALLDEF(dspMatrix_trf, 2),
     CALLDEF(dspMatrix_norm, 2),
     CALLDEF(dspMatrix_rcond, 1),
     CALLDEF(dspMatrix_determinant, 2),
@@ -300,43 +112,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_matrix_solve, 2),
     CALLDEF(dspMatrix_matrix_mm, 2),
     
-/* MJ: no longer needed ... prefer packedMatrix_diag_[gs]et() */
-#if 0
-    CALLDEF(dspMatrix_getDiag, 1),
-    CALLDEF(lspMatrix_getDiag, 1),
-    CALLDEF(dspMatrix_setDiag, 2),
-    CALLDEF(lspMatrix_setDiag, 2),
-    /* was unused, not replaced: */
-    CALLDEF(dtpMatrix_addDiag, 2),
-#endif
-    
-    /* CALLDEF(dtCMatrix_solve, 1), */
     CALLDEF(dtCMatrix_matrix_solve, 3),
     CALLDEF(dtCMatrix_sparse_solve, 2),
 
-/* MJ: no longer needed ... prefer R_sparse_as_dense() */
-#if 0
-    CALLDEF(dtTMatrix_as_dtrMatrix, 1),
-    CALLDEF(ltTMatrix_as_ltrMatrix, 1),
-    CALLDEF(ntTMatrix_as_ntrMatrix, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer packedMatrix_diag_[gs]et() */
-#if 0
-    CALLDEF(dtpMatrix_getDiag, 1),
-    CALLDEF(ltpMatrix_getDiag, 1),
-    CALLDEF(dtpMatrix_setDiag, 2),
-    CALLDEF(ltpMatrix_setDiag, 2),
-#endif
-    
-/* MJ: no longer needed ... prefer unpackedMatrix_diag_[gs]et() */
-#if 0
-    CALLDEF(dtrMatrix_getDiag, 1),
-    CALLDEF(ltrMatrix_getDiag, 1),
-    CALLDEF(dtrMatrix_setDiag, 2),
-    CALLDEF(ltrMatrix_setDiag, 2),
-#endif
-    
     CALLDEF(dtpMatrix_norm, 2),
     CALLDEF(dtpMatrix_rcond, 2),
     CALLDEF(dtpMatrix_solve, 1),
@@ -344,16 +122,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtpMatrix_matrix_mm, 4),
     CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
 
-/* MJ: no longer needed ... prefer unpackedMatrix_pack() */
-#if 0
-    CALLDEF(dtrMatrix_as_dtpMatrix, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer R_dense_as_matrix() */
-#if 0
-    CALLDEF(dtrMatrix_as_matrix, 2),
-#endif
-    
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_solve, 1),
@@ -363,26 +131,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_chol2inv, 1),
     CALLDEF(dtrMatrix_addDiag, 2),
     
-/* MJ: no longer needed ... prefer R_sparse_as_matrix() */
-#if 0
-    CALLDEF(lgC_to_matrix, 1),
-    CALLDEF(ngC_to_matrix, 1),
-#endif
-    
-/* MJ: no longer needed ... prefer (un)?packedMatrix_(un)?pack() */
-#if 0
-    CALLDEF(lspMatrix_as_lsyMatrix, 2),
-    CALLDEF(lsyMatrix_as_lspMatrix, 2),
-    CALLDEF(ltpMatrix_as_ltrMatrix, 2),
-    CALLDEF(ltrMatrix_as_ltpMatrix, 2),
-#endif
-
-/* MJ: no longer needed ... prefer R_dense_as_general() */
-#if 0
-    CALLDEF(ltrMatrix_as_lgeMatrix, 2),
-    CALLDEF(lsyMatrix_as_lgeMatrix, 2),
-#endif
-
     CALLDEF(lapack_qr, 2),
     CALLDEF(lsq_dense_Chol, 2),
     CALLDEF(lsq_dense_QR, 2),
@@ -515,7 +263,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(matrix_is_diagonal, 1),
     CALLDEF(matrix_symmpart, 1),
     CALLDEF(matrix_skewpart, 1),
-    CALLDEF(matrix_trf, 3),
     
     CALLDEF(unpackedMatrix_pack, 4),
     CALLDEF(unpackedMatrix_force_symmetric, 2),
@@ -539,16 +286,20 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(packedMatrix_symmpart, 1),
     CALLDEF(packedMatrix_skewpart, 1),
 
-/* no longer needed ... replacement in ./subscript.c */
-#if 0
-    CALLDEF(packedMatrix_sub1, 2),
-    CALLDEF(packedMatrix_sub1_mat, 2),
-    CALLDEF(packedMatrix_sub2, 4),
-#endif
+    CALLDEF(dgeMatrix_trf, 2),
+    CALLDEF(dsyMatrix_trf, 2),
+    CALLDEF(dspMatrix_trf, 2),
+    CALLDEF(dpoMatrix_trf, 2),
+    CALLDEF(dppMatrix_trf, 2),
+    CALLDEF(dgCMatrix_trf, 5),
+    CALLDEF(dgCMatrix_orf, 4),
+    CALLDEF(dpCMatrix_trf, 5),
     
     CALLDEF(denseLU_expand, 1),
     CALLDEF(BunchKaufman_expand, 1),
     CALLDEF(denseLU_determinant, 2),
+    CALLDEF(sparseLU_determinant, 2),
+    CALLDEF(sparseQR_determinant, 2),
     CALLDEF(BunchKaufman_determinant, 2),
     
     CALLDEF(CHM_set_common_env, 1),
@@ -605,7 +356,6 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(chm_factor_update);
     RREGDEF(chm_sparse_to_SEXP);
     RREGDEF(chm_triplet_to_SEXP);
-
     RREGDEF(cholmod_aat);
     RREGDEF(cholmod_add);
     RREGDEF(cholmod_allocate_dense);
@@ -645,12 +395,14 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_triplet_to_sparse);
     RREGDEF(cholmod_vertcat);
     RREGDEF(cholmod_updown);
-
     RREGDEF(numeric_as_chm_dense);
 
     R_cholmod_start(&c);
-//    R_cholmod_start(&cl); << TODO; needs more work in ./chm_common.c etc
-
+#if 0
+    /* TODO: needs more work in ./chm_common.c, etc. */
+    R_cholmod_start(&cl);
+#endif
+    
     Matrix_DimNamesSym = install("Dimnames");
     Matrix_DimSym      = install("Dim");
     Matrix_LSym        = install("L");
@@ -673,19 +425,19 @@ R_init_Matrix(DllInfo *dll)
     Matrix_uploSym     = install("uplo");
     Matrix_xSym        = install("x");
     
-    Matrix_NS = R_FindNamespace(mkString("Matrix"));
-    if(Matrix_NS == R_UnboundValue)
-	error(_("missing 'Matrix' namespace: should never happen"));
+    MatrixNamespace = R_FindNamespace(mkString("Matrix"));
+    if(MatrixNamespace == R_UnboundValue)
+	error(_("missing 'Matrix' namespace; should never happen"));
 #ifdef Matrix_Debug
-    if(isEnvironment(Matrix_NS))
-	Rprintf("Matrix_NS: %s\n",
-		CHAR(asChar(eval(lang2(install("format"), Matrix_NS),
+    if(isEnvironment(MatrixNamespace))
+	Rprintf("MatrixNamespace: %s\n",
+		CHAR(asChar(eval(lang2(install("format"), MatrixNamespace),
 				 R_GlobalEnv))));
     else
 #else
-    if(!isEnvironment(Matrix_NS))
+    if(!isEnvironment(MatrixNamespace))
 #endif
-	error(_("Matrix namespace not determined correctly"));
+	error(_("'Matrix' namespace not determined correctly"));
 
     Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
     Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
