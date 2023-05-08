@@ -47,8 +47,8 @@ showMethods("all.equal")
 ex <- expand(lu. <- lu(A))
 stopifnot( all.equal(as(A[lu.@p + 1L, lu.@q + 1L], "CsparseMatrix"),
                      lu.@L \%*\% lu.@U),
-           with(ex, all.equal(as(P \%*\% A \%*\% Q, "CsparseMatrix"),
+           with(ex, all.equal(as(P \%*\% A \%*\% t(Q), "CsparseMatrix"),
                               L \%*\% U)),
            with(ex, all.equal(as(A, "CsparseMatrix"),
-                              t(P) \%*\% L \%*\% U \%*\% t(Q))))
+                              t(P) \%*\% L \%*\% U \%*\% Q)))
 }
