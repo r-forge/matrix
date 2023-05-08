@@ -63,8 +63,8 @@ isLDL(x)
 \value{
   \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
   \code{TRUE} if \code{x} stores the diagonal entries of \eqn{D}
-  and strictly lower triangular elements of \eqn{L_{1}}{L1},
-  \code{FALSE} if \code{x} stores the lower triangular elements
+  and strictly lower triangular entries of \eqn{L_{1}}{L1},
+  \code{FALSE} if \code{x} stores the lower triangular entries
   of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
 }
 \section{Slots}{
@@ -101,7 +101,7 @@ isLDL(x)
       Row indices of nonzero entries in column \code{j} of the
       lower triangular Cholesky factor are obtained as
       \code{i[p[j]+seq_len(nz[j])]+1}.}
-    %% MJ: Does CHOLMOD document the expected value of p[length(p)] ??
+    %% MJ: Does CHOLMOD use p[length(p)] ??
     \item{\code{i}}{an integer vector of length greater than or equal
       to \code{sum(nz)} containing the row indices of nonzero entries
       in the lower triangular Cholesky factor.  These are grouped by
