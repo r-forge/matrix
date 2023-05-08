@@ -88,13 +88,13 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
       \code{R} is the upper trapezoidal \eqn{R} factor.}
     \item{\code{p}, \code{q}}{0-based integer vectors of length
-      \code{nrow(V)} and \code{Dim[2]}, respectively, specifying
-      the permutations applied to the rows and columns of the
-      factorized matrix.  \code{q} of length 0 is valid and equivalent
-      to the identity permutation, implying no column pivoting.
+      \code{nrow(V)} and \code{Dim[2]}, respectively,
+      specifying the permutations applied to the rows and columns of
+      the factorized matrix.  \code{q} of length 0 is valid and
+      equivalent to the identity permutation, implying no column pivoting.
       Using \R{} syntax, the matrix \eqn{P_{1} A P_{2}}{P1 * A * P2}
-      is precisely \code{A[p+1, q+1]} (\code{A[p+1, ]} when \code{q}
-      has length 0).}
+      is precisely \code{A[p+1, q+1]}
+      (\code{A[p+1, ]} when \code{q} has length 0).}
   }
 }
 \section{Extends}{

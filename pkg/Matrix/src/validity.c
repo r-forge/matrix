@@ -1204,26 +1204,31 @@ SEXP sparseLU_validate(SEXP obj)
 	UPRET(2, "'q' slot is not of type \"integer\"");
     if (XLENGTH(p) != n)
 	UPRET(2, "'p' slot does not have length Dim[1]");
-    if (XLENGTH(q) != n)
-	UPRET(2, "'q' slot does not have length Dim[1]");
-    int i, *pp = INTEGER(p), *pq = INTEGER(q);
+    if (XLENGTH(q) != n && XLENGTH(q) != 0)
+	UPRET(2, "'q' slot does not have length Dim[1] or length 0");
+    int i, *pp = INTEGER(p);
     char *work;
     Matrix_Calloc(work, n, char);
     for (i = 0; i < n; ++i) {
 	if (*pp == NA_INTEGER)
 	    FRUPRET(work, n, 2, "'p' slot contains NA");
-	if (*pq == NA_INTEGER)
-	    FRUPRET(work, n, 2, "'q' slot contains NA");
 	if (*pp < 0 || *pp >= n)
 	    FRUPRET(work, n, 2, "'p' slot has elements not in {0,...,Dim[1]-1}");
-	if (*pq < 0 || *pq >= n)
-	    FRUPRET(work, n, 2, "'q' slot has elements not in {0,...,Dim[1]-1}");
-	if (work[*pp]  % 2)
+	if (work[*pp])
 	    FRUPRET(work, n, 2, "'p' slot contains duplicates");
-	if (work[*pq] >= 2)
-	    FRUPRET(work, n, 2, "'q' slot contains duplicates");
-	work[*(pp++)] += 1;
-	work[*(pq++)] += 2;
+	work[*(pp++)] = 1;
+    }
+    if (LENGTH(q) == n) {
+	int *pq = INTEGER(q);
+	for (i = 0; i < n; ++i) {
+	    if (*pq == NA_INTEGER)
+		FRUPRET(work, n, 2, "'q' slot contains NA");
+	    if (*pq < 0 || *pq >= n)
+		FRUPRET(work, n, 2, "'q' slot has elements not in {0,...,Dim[1]-1}");
+	    if (!work[*pq])
+		FRUPRET(work, n, 2, "'q' slot contains duplicates");
+	    work[*(pq++)] = 0;
+	}
     }
     Matrix_Free(work, n);
     UNPROTECT(2); /* q, p */
@@ -1278,7 +1283,7 @@ SEXP sparseQR_validate(SEXP obj)
 	}
     }
     UNPROTECT(4); /* R_i, R_p, dim, R */
-
+    
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 	q = PROTECT(GET_SLOT(obj, Matrix_qSym));
     if (TYPEOF(p) != INTSXP)
@@ -1303,15 +1308,14 @@ SEXP sparseQR_validate(SEXP obj)
     }
     if (LENGTH(q) == n) {
 	int *pq = INTEGER(q);
-	Matrix_memset(work, 0, n, sizeof(char));
 	for (i = 0; i < n; ++i) {
 	    if (*pq == NA_INTEGER)
 		FRUPRET(work, m2, 2, "'q' slot contains NA");
 	    if (*pq < 0 || *pq >= n)
 		FRUPRET(work, m2, 2, "'q' slot has elements not in {0,...,Dim[2]-1}");
-	    if (work[*pq])
+	    if (!work[*pq])
 		FRUPRET(work, m2, 2, "'q' slot contains duplicates");
-	    work[*(pq++)] = 1;
+	    work[*(pq++)] = 0;
 	}
     }
     Matrix_Free(work, m2);
