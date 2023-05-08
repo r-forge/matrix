@@ -167,10 +167,9 @@ isLDL(x)
     \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
       returns a \code{\linkS4class{pMatrix}} representing
       the permutation matrix \eqn{P_{1}}.}
-    \item{\code{determinant}}{\code{signature(x = "CHMfactor", logarithm = "logical")}:
-      returns the determinant of the lower triangular
-      Cholesky factor \eqn{L}, which is the square root
-      of the determinant of \eqn{A}.}
+    \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMfactor")}:

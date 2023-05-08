@@ -90,6 +90,14 @@ setMethod("Cholesky", signature(A = "dspMatrix"),
               tryCatch(.Call(dppMatrix_trf, A, 2L),
                        error = function(e) stop("Cholesky(A) is undefined: 'A' is not positive definite")))
 
+## FIXME: no condition signaled for non-positive definite A when LDL=TRUE ??
+## x <- new("dsCMatrix",
+##          Dim = c(4L, 4L),
+##          p = c(0L, 1L, 3L, 4L, 6L),
+##          i = c(0L, 0L, 1L, 2L, 2L, 3L),
+##          x = c(14, 2, -7, 14, 2, -7))
+## Cholesky(x, LDL = FALSE)
+## Cholesky(x, LDL = TRUE)
 setMethod("Cholesky", signature(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,
                    Imult = 0, ...)

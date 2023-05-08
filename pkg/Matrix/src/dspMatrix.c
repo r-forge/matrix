@@ -48,24 +48,6 @@ SEXP dspMatrix_rcond(SEXP obj)
     return ScalarReal(rcond);
 }
 
-SEXP dspMatrix_determinant(SEXP obj, SEXP logarithm)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-    SEXP res;
-    if (n == 0) {
-	int givelog = asLogical(logarithm), sign = 1;
-	double modulus = (givelog) ? 0.0 : 1.0;
-	res = as_det_obj(modulus, givelog, sign);
-    } else {
-	SEXP trf = PROTECT(dspMatrix_trf_(obj, 0));
-	res = BunchKaufman_determinant(trf, logarithm);
-	UNPROTECT(1); /* trf */
-    }
-    return res;
-}
-
 SEXP dspMatrix_solve(SEXP a)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dspMatrix")),

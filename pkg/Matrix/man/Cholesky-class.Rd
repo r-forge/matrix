@@ -9,6 +9,8 @@
 \alias{Cholesky-class}
 \alias{pCholesky-class}
 %
+\alias{determinant,Cholesky,logical-method}
+\alias{determinant,pCholesky,logical-method}
 \alias{show,Cholesky-method}
 \alias{show,pCholesky-method}
 %
@@ -63,6 +65,9 @@
 }
 \section{Methods}{
   \describe{
+    \item{\code{determinant}}{\code{signature(from = "p?Cholesky", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand2}}{\code{signature(x = "p?Cholesky")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{show}}{\code{signature(object = "p?Cholesky")}:

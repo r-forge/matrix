@@ -58,15 +58,13 @@ system.time(MJ <- sapply(rho,
                                            logarithm = TRUE)$modulus))
 nWC <- -wrld_1deg
 C1 <- Cholesky(nWC, Imult = 2)
-## Note that det(<CHMfactor>) = det(L) = sqrt(det(A))
-## ====> log det(A) = log( det(L)^2 ) = 2 * log det(L) :
 system.time(MJ1 <- n * log(rho) +
-   sapply(rho, function(x) c(2* determinant(update(C1, nWC, 1/x))$modulus))
+   sapply(rho, function(x) c(determinant(update(C1, nWC, 1/x))$modulus))
 )
 stopifnot(all.equal(MJ, MJ1))
 C2 <- Cholesky(nWC, super = TRUE, Imult = 2)
 system.time(MJ2 <- n * log(rho) +
-   sapply(rho, function(x) c(2* determinant(update(C2, nWC, 1/x))$modulus))
+   sapply(rho, function(x) c(determinant(update(C2, nWC, 1/x))$modulus))
 )
 system.time(MJ3 <- n * log(rho) + Matrix:::ldetL2up(C1, nWC, 1/rho))
 system.time(MJ4 <- n * log(rho) + Matrix:::ldetL2up(C2, nWC, 1/rho))

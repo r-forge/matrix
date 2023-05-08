@@ -2,13 +2,14 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Constructor for "det" objects, used liberally below
-.mkDet <- function(d, logarithm = TRUE,
-                   ldet = sum(log(abs(d))),
-                   sig = if(prod(sign(d)) < 0) -1L else 1L) {
-    ##             ^^^ -1 or 1, never 0
-    modulus <- if(logarithm) ldet else exp(ldet)
+.mkDet <- function(modulus = sum(log(abs(x))),
+                   logarithm = TRUE,
+                   sign = if(prod(base::sign(x)) < 0) -1L else 1L,
+                   x) {
+    if(!logarithm)
+        modulus <- exp(modulus)
     attr(modulus, "logarithm") <- logarithm
-    val <- list(modulus = modulus, sign = sig)
+    val <- list(modulus = modulus, sign = sign)
     class(val) <- "det"
     val
 }
@@ -19,163 +20,165 @@ det <- base::det
 environment(det) <- environment() # the Matrix namespace
 
 
-## ~~~~ GENERAL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+########################################################################
+##  1. MatrixFactorization
+########################################################################
 
-## Compute product of determinants in LU factorization
+setMethod("determinant", signature(x = "MatrixFactorization", logarithm = "missing"),
+          function(x, logarithm = TRUE, ...)
+              determinant(x, TRUE, ...))
 
-.det.dge <- function(x, logarithm = TRUE, ...)
-    .Call(dgeMatrix_determinant, x, logarithm)
+## FIXME: if we knew the specific class of 'T', then we could optimize
+## knowing that 'T' is block upper triangular with 1-by-1 and 2-by-2
+## diagonal blocks
+setMethod("determinant", signature(x = "Schur", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              determinant(x@T, logarithm, ...))
 
-.det.dgC <- function(x, logarithm = TRUE, ...) {
-    d <- x@Dim
-    if((n <- d[1L]) != d[2L])
-        stop("determinant of non-square matrix is undefined")
-    if(n <= 1L)
-        return(.mkDet(diag(x, names = FALSE), logarithm))
-    ll <- lu(x, errSing = FALSE)
-    if(identical(ll, NA))
-        ## LU factorization failed due to singularity
-	return(.mkDet(ldet = if(anyNA(x)) NaN else -Inf,
-                      logarithm = logarithm, sig = 1L))
-    r <- .mkDet(diag(ll@U), logarithm)
-    ## det(x)
-    ## = det(P L U Q)
-    ## = det(P) * 1 * det(U) * det(Q)
-    ## where det(P), det(Q) are in {-1,1}
-    r$sign <- r$sign * signPerm(ll@p + 1L) * signPerm(ll@q + 1L)
-    r
-}
+setMethod("determinant", signature(x = "denseLU", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(denseLU_determinant, x, logarithm))
 
+setMethod("determinant", signature(x = "sparseLU", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(sparseLU_determinant, x, logarithm))
 
-## ~~~~ TRIANGULAR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setMethod("determinant", signature(x = "sparseQR", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(sparseQR_determinant, x, logarithm))
 
-## Compute product of diagonal elements
+setMethod("determinant", signature(x = "BunchKaufman", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(BunchKaufman_determinant, x, logarithm))
 
-.det.tri <- function(x, logarithm = TRUE, ...) {
-    if(x@diag == "N")
-        .mkDet(diag(x, names = FALSE), logarithm)
-    else .mkDet(, logarithm, ldet = 0, sig = 1L)
-}
+setMethod("determinant", signature(x = "pBunchKaufman", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(BunchKaufman_determinant, x, logarithm))
 
-.det.diag <- function(x, logarithm = TRUE, ...) {
-    if(x@diag == "N")
-        .mkDet(x@x, logarithm)
-    else .mkDet(, logarithm, ldet = 0, sig = 1L)
-}
+setMethod("determinant", signature(x = "Cholesky", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(Cholesky_determinant, x, logarithm))
 
+setMethod("determinant", signature(x = "pCholesky", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(Cholesky_determinant, x, logarithm))
 
-## ~~~~ SYMMETRIC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## Compute product of determinants in Bunch-Kaufman factorization
-
-.det.dsy <- function(x, logarithm = TRUE, ...)
-    .Call(dsyMatrix_determinant, x, logarithm)
-
-.det.dsp <- function(x, logarithm = TRUE, ...)
-    .Call(dspMatrix_determinant, x, logarithm)
-
-## Compute product of determinants in Cholesky factorization
-
-.det.dpo <- function(x, logarithm = TRUE, ...) {
-    cholx <- .Call(dpoMatrix_trf, x, 2L)
-    .mkDet(, logarithm, ldet = 2 * sum(log(abs(diag(cholx)))), sig = 1L)
-}
-
-.det.dpp <- function(x, logarithm = TRUE, ...) {
-    cholx <- .Call(dppMatrix_trf, x, 2L)
-    .mkDet(, logarithm, ldet = 2 * sum(log(abs(diag(cholx)))), sig = 1L)
-}
-
-.det.dpC <- function(x, logarithm = TRUE, ...) {
-    cholx <- .Call(dpCMatrix_trf, x, TRUE, TRUE, FALSE, 0)
-    .mkDet(.Call(diag_tC, cholx, res.kind = "diag"), logarithm)
-}
-
-## Compute product of determinants in Cholesky factorization;
-## if that fails due to non-positive definiteness, then go via "general"
-
-.det.dsC <- function(x, logarithm = TRUE, ...) {
-    if(x@Dim[1L] <= 1L)
-        .mkDet(diag(x, names = FALSE), logarithm)
-    else
-        tryCatch(suppressWarnings(.det.dpC(x, logarithm)),
-                 error = function(e) .det.dgC(.sparse2g(x), logarithm))
-}
+setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              .Call(CHMfactor_determinant, x, logarithm))
 
 
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+########################################################################
+##  2. Matrix
+########################################################################
 
-setMethod("determinant",
-          signature(x = "Matrix", logarithm = "missing"),
-          function(x, logarithm = TRUE, ...) determinant(x, TRUE, ...))
+setMethod("determinant", signature(x = "Matrix", logarithm = "missing"),
+          function(x, logarithm = TRUE, ...)
+              determinant(x, TRUE, ...))
 
-setMethod("determinant",
-          signature(x = "MatrixFactorization", logarithm = "missing"),
-          function(x, logarithm = TRUE, ...) determinant(x, TRUE, ...))
+setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              determinant(as(x, "dMatrix"), logarithm, ...))
 
-setMethod("determinant",
-          signature(x = "Matrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) determinant(as(x, "dMatrix"), logarithm, ...))
-
-setMethod("determinant",
-          signature(x = "triangularMatrix", logarithm = "logical"),
-          .det.tri)
-
-setMethod("determinant",
-          signature(x = "diagonalMatrix", logarithm = "logical"),
-	  .det.diag)
-
-setMethod("determinant",
-          signature(x = "pMatrix", logarithm = "logical"),
-	  function(x, logarithm = TRUE, ...) {
-              if(x@Dim[1L] <= 1L)
-                  .mkDet(diag(x, names = FALSE), logarithm)
-              else .mkDet(, logarithm, ldet = 0, sig = signPerm(x@perm))
-	  })
+## .... GENERAL ........................................................
 
 setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
-          .det.dge)
-
-setMethod("determinant", signature(x = "dsyMatrix", logarithm = "logical"),
-          .det.dsy)
-
-setMethod("determinant", signature(x = "dspMatrix", logarithm = "logical"),
-          .det.dsp)
-
-setMethod("determinant", signature(x = "dpoMatrix", logarithm = "logical"),
-          .det.dpo)
-
-setMethod("determinant", signature(x = "dppMatrix", logarithm = "logical"),
-          .det.dpp)
+          function(x, logarithm = TRUE, ...) {
+              d <- x@Dim
+              if(d[1L] != d[2L])
+                  stop("determinant of non-square matrix is undefined")
+              trf <- lu(x, warnSing = FALSE)
+              determinant(trf, logarithm, ...)
+          })
 
 setMethod("determinant", signature(x = "dgCMatrix", logarithm = "logical"),
-          .det.dgC)
+          function(x, logarithm = TRUE, ...) {
+              d <- x@Dim
+              if((n <- d[1L]) != d[2L])
+                  stop("determinant of non-square matrix is undefined")
+              trf <- lu(x, errSing = FALSE)
+              if(isS4(trf))
+                  determinant(trf, logarithm, ...)
+              else .mkDet(if(anyNA(x@x)) NaN else -Inf, logarithm, 1L)
+          })
 
 setMethod("determinant", signature(x = "dgRMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) .det.dgC(.tCR2RC(x), logarithm))
+          function(x, logarithm = TRUE, ...)
+              determinant(.tCR2RC(x), logarithm, ...))
 
 setMethod("determinant", signature(x = "dgTMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) .det.dgC(.T2C(x), logarithm))
+          function(x, logarithm = TRUE, ...)
+              determinant(.T2C(x), logarithm, ...))
+
+setMethod("determinant", signature(x = "indMatrix", logarithm = "logical"),
+	  function(x, logarithm = TRUE, ...) {
+              d <- x@Dim
+              if((n <- d[1L]) != d[2L])
+                  stop("determinant of non-square matrix is undefined")
+              if(anyDuplicated.default(perm <- x@perm))
+                  .mkDet(-Inf, logarithm, 1L)
+              else .mkDet(0, logarithm, signPerm(perm))
+          })
+
+setMethod("determinant", signature(x = "pMatrix", logarithm = "logical"),
+	  function(x, logarithm = TRUE, ...)
+              .mkDet(0, logarithm, signPerm(x@perm)))
+
+
+## .... TRIANGULAR .....................................................
+
+setMethod("determinant", signature(x = "triangularMatrix", logarithm = "logical"),
+          function(x, logarithm = TRUE, ...) {
+              if(x@diag == "N")
+                  .mkDet(x = diag(x, names = FALSE), logarithm = logarithm)
+              else .mkDet(0, logarithm, 1L)
+          })
+
+setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
+	  function(x, logarithm = TRUE, ...) {
+              if(x@diag == "N")
+                  .mkDet(x = x@x, logarithm = logarithm)
+              else .mkDet(0, logarithm, 1L)
+          })
+
+
+## .... SYMMETRIC ......................................................
+
+for(.cl in c("dsyMatrix", "dspMatrix"))
+setMethod("determinant", signature(x = .cl, logarithm = "logical"),
+          function(x, logarithm = TRUE, ...) {
+              trf <- BunchKaufman(x, warnSing = FALSE)
+              determinant(trf, logarithm, ...)
+          })
+
+for(.cl in c("dpoMatrix", "dppMatrix"))
+setMethod("determinant", signature(x = .cl, logarithm = "logical"),
+          function(x, logarithm = TRUE, ...) {
+              trf <- Cholesky(x)
+              determinant(trf, logarithm, ...)
+          })
 
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
-          .det.dsC)
+          function(x, logarithm = TRUE, ...) {
+              trf <- tryCatch(
+                  Cholesky(x, perm = TRUE, LDL = FALSE, super = FALSE),
+                  error = function(e) lu(x, errSing = FALSE))
+              if(isS4(trf))
+                  determinant(trf, logarithm, ...)
+              else .mkDet(if(anyNA(x@x)) NaN else -Inf, logarithm, 1L)
+          })
 
 setMethod("determinant", signature(x = "dsRMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) .det.dsC(.tCR2RC(x), logarithm))
+          function(x, logarithm = TRUE, ...)
+              determinant(.tCR2RC(x), logarithm, ...))
 
 setMethod("determinant", signature(x = "dsTMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) .det.dsC(.T2C(x), logarithm))
-
-setMethod("determinant",
-          signature(x = "CHMfactor", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .mkDet(, logarithm,
-                     ldet = 0.5 * .Call(CHMfactor_ldetL2, x), sig = 1L))
+              determinant(.T2C(x), logarithm, ...))
 
-rm(.det.tri, .det.diag, .det.dsy, .det.dsp)
 
-## MJ: used only in tests
-if(TRUE) {
+## MJ: unused
+if(FALSE) {
 ldet1.dsC <- function(x, ...)
     .Call(CHMfactor_ldetL2, Cholesky(x, ...))
 

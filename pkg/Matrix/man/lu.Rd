@@ -102,7 +102,7 @@ lu(x, \dots)
   in which case it is \code{\linkS4class{sparseLU}}.
 }
 \details{
-  What happens when \code{x} is determined to be (nearly) singular
+  What happens when \code{x} is determined to be near-singular
   differs by method.  The method for class \code{\linkS4class{dgeMatrix}}
   completes the factorization, warning if \code{warnSing = TRUE}
   and in any case returning a valid \code{\linkS4class{denseLU}}

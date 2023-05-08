@@ -9,6 +9,7 @@
 %
 \alias{sparseQR-class}
 %
+\alias{determinant,sparseQR,logical-method}
 \alias{qr.Q,sparseQR-method}
 \alias{qr.R,sparseQR-method}
 \alias{qr.coef,sparseQR,Matrix-method}
@@ -110,6 +111,9 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
 }
 \section{Methods}{
   \describe{
+    \item{\code{determinant}}{\code{signature(from = "sparseQR", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand2}}{\code{signature(x = "sparseQR")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{qr.Q}}{\code{signature(qr = "sparseQR")}:

@@ -50,15 +50,14 @@ nWC <- -USCounties
 C1 <- Cholesky(nWC, Imult = 2)
 system.time(MJ1 <- n * log(rho) +
             sapply(rho, function(x)
-                   2 * c(determinant(update(C1, nWC, 1/x))$modulus)))
-all.equal(MJ, MJ1)
-\dontshow{stopifnot( all.equal(MJ, MJ1) )}
+                   c(determinant(update(C1, nWC, 1/x))$modulus)))
+stopifnot(all.equal(MJ, MJ1))
 
 C2 <- Cholesky(nWC, super = TRUE, Imult = 2)
 system.time(MJ2 <- n * log(rho) +
             sapply(rho, function(x)
-                   2 * c(determinant(update(C2, nWC, 1/x))$modulus)))
-all.equal(MJ, MJ2)  \dontshow{stopifnot(all.equal(MJ, MJ2))}
+                   c(determinant(update(C2, nWC, 1/x))$modulus)))
+stopifnot(all.equal(MJ, MJ2))
 system.time(MJ3 <- n * log(rho) + Matrix:::ldetL2up(C1, nWC, 1/rho))
 stopifnot(all.equal(MJ, MJ3))
 system.time(MJ4 <- n * log(rho) + Matrix:::ldetL2up(C2, nWC, 1/rho))

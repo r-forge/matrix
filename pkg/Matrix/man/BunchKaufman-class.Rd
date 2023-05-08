@@ -11,6 +11,8 @@
 %
 \alias{coerce,BunchKaufman,dtrMatrix-method}
 \alias{coerce,pBunchKaufman,dtpMatrix-method}
+\alias{determinant,BunchKaufman,logical-method}
+\alias{determinant,pBunchKaufman,logical-method}
 %
 \description{
   Classes \code{BunchKaufman} and \code{pBunchKaufman} represent
@@ -76,6 +78,9 @@
     \item{\code{coerce}}{\code{signature(from = "pBunchKaufman", to = "dtpMatrix")}:
       returns a \code{\linkS4class{dtpMatrix}}, useful for inspecting
       the internal representation of the factorization; see \sQuote{Note}.}
+    \item{\code{determinant}}{\code{signature(from = "p?BunchKaufman", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand2}}{\code{signature(x = "p?BunchKaufman")}:
       see \code{\link{expand2-methods}}.}
   }

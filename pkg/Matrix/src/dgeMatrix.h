@@ -6,12 +6,10 @@
 
 /* defined in factorizations.c : */
 SEXP dgeMatrix_trf_(SEXP, int);
-SEXP denseLU_determinant(SEXP, SEXP);
 
 double get_norm_dge(SEXP obj, const char *typstr);
 SEXP dgeMatrix_norm(SEXP obj, SEXP type);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);
-SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm);
 SEXP dgeMatrix_solve(SEXP a);
 SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
 

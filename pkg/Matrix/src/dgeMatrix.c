@@ -60,26 +60,6 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(rcond);
 }
 
-SEXP dgeMatrix_determinant(SEXP obj, SEXP logarithm)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("determinant of non-square matrix is undefined"));
-    UNPROTECT(1); /* dim */
-    SEXP res;
-    if (n == 0) {
-	int givelog = asLogical(logarithm), sign = 1;
-	double modulus = (givelog) ? 0.0 : 1.0;
-	res = as_det_obj(modulus, givelog, sign);
-    } else {
-	SEXP trf = PROTECT(dgeMatrix_trf_(obj, 0));
-	res = denseLU_determinant(trf, logarithm);
-	UNPROTECT(1); /* trf */
-    }
-    return res;
-}
-
 SEXP dgeMatrix_solve(SEXP a)
 {
     SEXP dim = PROTECT(GET_SLOT(a, Matrix_DimSym));
