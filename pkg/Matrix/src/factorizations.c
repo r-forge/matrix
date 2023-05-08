@@ -1041,6 +1041,7 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
     UNPROTECT(1); /* dim */
     int givelog = asLogical(logarithm) != 0, sign = 1;
     double modulus = 0.0; /* result for n == 0 */
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     if (n > 0) {
 	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
 	    (R_xlen_t) n * n == XLENGTH(x);	
@@ -1049,8 +1050,7 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
 	UNPROTECT(1); /* uplo */
 	
-	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym));
 	int j = 0, *ppivot = INTEGER(pivot);
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 	double *px = REAL(x), a, b, c, logab, logcc;	
@@ -1110,18 +1110,16 @@ SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
     int givelog = asLogical(logarithm) != 0, sign = 1;
     double modulus = 0.0; /* result for n == 0 */
     if (n > 0) {
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
 	    (R_xlen_t) n * n == XLENGTH(x);	
-
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
 	UNPROTECT(1); /* uplo */
 	
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int j;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 	double *px = REAL(x);
-	for (j = 0; j < n; ++j) {
+	for (int j = 0; j < n; ++j) {
 	    if (*px < 0.0) {
 		modulus += log(-(*px));
 		sign = -sign;
