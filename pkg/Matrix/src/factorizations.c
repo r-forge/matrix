@@ -903,7 +903,7 @@ static SEXP mkDet(double modulus, int logarithm, int sign)
     SEXP nms = PROTECT(allocVector(STRSXP, 2)),
 	cl = PROTECT(mkString("det")),
 	det = PROTECT(allocVector(VECSXP, 2)),
-	det0 = PROTECT(ScalarReal(modulus)),
+	det0 = PROTECT(ScalarReal((logarithm) ? modulus : exp(modulus))),
 	det1 = PROTECT(ScalarInteger(sign)),
 	det0a = PROTECT(ScalarLogical(logarithm));
     SET_STRING_ELT(nms, 0, mkChar("modulus"));
@@ -947,8 +947,6 @@ SEXP denseLU_determinant(SEXP obj, SEXP logarithm)
 	}
 	UNPROTECT(2); /* x, pivot */
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
@@ -979,7 +977,7 @@ SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
 		}
 	    } else {
 		UNPROTECT(4); /* x, i, p, U */
-		return mkDet((givelog) ? 0.0 : 1.0, givelog, 1);
+		return mkDet(0.0, givelog, 1);
 	    }
 	    k = kend;
 	}
@@ -994,8 +992,6 @@ SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
 	    sign = -sign;
 	UNPROTECT(1); /* p */
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
@@ -1033,7 +1029,7 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 		}
 	    } else {
 		UNPROTECT(4); /* x, i, p, R */
-		return mkDet((givelog) ? 0.0 : 1.0, givelog, 1);
+		return mkDet(0.0, givelog, 1);
 	    }
 	    k = kend;
 	}
@@ -1048,8 +1044,6 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 	    sign = -sign;
 	UNPROTECT(1); /* p */
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
@@ -1115,8 +1109,6 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	}
 	UNPROTECT(2); /* x, pivot */
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
@@ -1151,8 +1143,6 @@ SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
 	modulus *= 2.0;
 	UNPROTECT(1); /* x */
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
@@ -1193,8 +1183,6 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 	if (L->is_ll)
 	    modulus *= 2.0;
     }
-    if (!givelog)
-	modulus = exp(modulus);
     return mkDet(modulus, givelog, sign);
 }
 
