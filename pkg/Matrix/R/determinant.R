@@ -87,7 +87,7 @@ environment(det) <- environment() # the Matrix namespace
 }
 
 .det.dpC <- function(x, logarithm = TRUE, ...) {
-    cholx <- .Call(dsCMatrix_Cholesky, x, TRUE, TRUE, FALSE, 0)
+    cholx <- .Call(dpCMatrix_trf, x, TRUE, TRUE, FALSE, 0)
     .mkDet(.Call(diag_tC, cholx, res.kind = "diag"), logarithm)
 }
 

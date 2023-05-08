@@ -6,6 +6,7 @@
 ##       optional arguments ('backPermute', etc.) and perhaps deprecate
 ##       the 'qrR' work-around
 
+## returning list(P1', Q, R, P2'), where A = P1' Q R P2'
 setMethod("expand2", "sparseQR",
           function(x, complete = FALSE, ...) {
               d <- x@Dim
@@ -15,6 +16,8 @@ setMethod("expand2", "sparseQR",
               dn <- x@Dimnames
               p1 <- x@p
               p2 <- x@q
+              if(length(p1) > m)
+                  stop("expand2(<sparseQR>) does not support structurally rank deficient case")
               P1. <- new("pMatrix",
                          Dim = c(m, m),
                          Dimnames = c(dn[1L], list(NULL)),

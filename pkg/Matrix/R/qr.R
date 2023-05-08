@@ -1,5 +1,5 @@
 ## METHODS FOR GENERIC: qr
-## QR factorization of dense and sparse matrices
+## pivoted QR factorization of dense and sparse matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## FIXME? We could have methods for generalMatrix, symmetricMatrix,
@@ -13,6 +13,10 @@ setMethod("qr", signature(x = "sparseMatrix"),
               qr(..sparse2d(.sparse2g(as(x, "CsparseMatrix"))), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
-          function(x, keep.dimnames = TRUE,
-                   verbose = getOption("Matrix.verbose", FALSE), ...)
-              .Call(dgCMatrix_QR, x, if(verbose) -1L else 1L, keep.dimnames))
+          function(x, order = 3L, keep.dimnames = TRUE, ...) {
+              r <- .Call(dgCMatrix_orf, x, TRUE, keep.dimnames, order)
+              if(n <- r@V@Dim[1L] - r@Dim[1L])
+                  Matrix.msg(gettextf("matrix is structurally rank deficient; returning QR factorization of matrix augmented with %d rows of zeros", n),
+                             domain = NA)
+              r
+          })

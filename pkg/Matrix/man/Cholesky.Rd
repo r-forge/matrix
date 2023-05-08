@@ -10,8 +10,17 @@
 \alias{Cholesky}
 \alias{Cholesky-methods}
 %
+\alias{Cholesky,ddiMatrix-method}
+\alias{Cholesky,diagonalMatrix-method}
 \alias{Cholesky,dsCMatrix-method}
-\alias{Cholesky,sparseMatrix-method}
+\alias{Cholesky,dsRMatrix-method}
+\alias{Cholesky,dsTMatrix-method}
+\alias{Cholesky,dspMatrix-method}
+\alias{Cholesky,dsyMatrix-method}
+\alias{Cholesky,generalMatrix-method}
+\alias{Cholesky,matrix-method}
+\alias{Cholesky,symmetricMatrix-method}
+\alias{Cholesky,triangularMatrix-method}
 %
 \alias{.SuiteSparse_version}
 %
@@ -38,19 +47,20 @@
 }
 \usage{
 Cholesky(A, \dots)
-\S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
+\S4method{Cholesky}{dsyMatrix}(A, \dots)
 \S4method{Cholesky}{dsyMatrix}(A, \dots)
 \S4method{Cholesky}{dsCMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
     Imult = 0, \dots)
+\S4method{Cholesky}{ddiMatrix}(A, \dots)
+\S4method{Cholesky}{generalMatrix}(A, uplo = "U", \dots)
+\S4method{Cholesky}{triangularMatrix}(A, uplo = "U", \dots)
+\S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
 }
 \arguments{
   \item{A}{a \link[=is.finite]{finite}, symmetric, positive definite
     matrix or \code{\linkS4class{Matrix}} to be factorized.
-    If \code{A} is a square traditional matrix but not symmetric,
-    then it will be \emph{treated} as symmetric; see \code{uplo}.}
-  \item{uplo}{a string, either \code{"U"} or \code{"L"},
-    indicating which triangle of \code{A} should be used
-    to compute the factorization.}
+    If \code{x} is square but not symmetric, then it will be
+    \emph{treated} as symmetric; see \code{uplo}.}
   \item{perm}{a logical indicating if a fill-reducing
     permutation of the rows and columns of \eqn{A} should be used.
     If \code{TRUE}, then the approximate minimum degree (AMD)
@@ -63,15 +73,17 @@ Cholesky(A, \dots)
     and the strictly lower triangular entries of \eqn{L_{1}}.
     The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L}.  Setting \code{LDL = NA} leaves the choice to
-    a CHOLMOD-internal heuristic.}
+    of \eqn{L}.}
   \item{super}{a logical indicating if the factorization should
     use the supernodal algorithm.  The alternative is the simplicial
     algorithm.  Setting \code{super = NA} leaves the choice to
     a CHOLMOD-internal heuristic.}
   \item{Imult}{a \link[=is.finite]{finite} number. The matrix
-    that is factorized is \code{A+Imult*diag(nrow(A))}, i.e.,
-    \code{A} plus \code{Imult} times the identity matrix.}
+    that is factorized is \code{A+Imult*diag(nrow(A))},
+    i.e., \code{A} plus \code{Imult} times the identity matrix.}
+  \item{uplo}{a string, either \code{"U"} or \code{"L"},
+    indicating which triangle of \code{A} should be used
+    to compute the factorization.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
@@ -86,17 +98,17 @@ Cholesky(A, \dots)
   the specific class is
   \code{\linkS4class{Cholesky}},
   \code{\linkS4class{pCholesky}}, and
-  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}}
-  (depending on \code{super}), respectively.
+  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}},
+  respectively.
 }
 \details{
   Note that the result of a call to \code{Cholesky} need not inherit
   from \code{\linkS4class{Matrix}}.  Users who just want a matrix should
   consider using \code{\link{chol}}, whose methods are simple wrappers
   around \code{Cholesky} returning the upper triangular Cholesky factor
-  \eqn{L'} as a \code{\linkS4class{triangularMatrix}}.  An alternative
-  is to pass the \code{Cholesky} result to \code{\link{expand2}}
-  or (only in the sparse case; see \code{\linkS4class{CHMfactor}})
+  \eqn{L'}, typically as a \code{\linkS4class{triangularMatrix}}.
+  An alternative is to pass the result to \code{\link{expand2}}
+  or (but only in the sparse case; see \code{\linkS4class{CHMfactor}})
   to coerce it with \code{as(., "dtCMatrix")} or \code{as(., "pMatrix")}.
 }
 \seealso{

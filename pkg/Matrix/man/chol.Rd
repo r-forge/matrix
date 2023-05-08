@@ -9,10 +9,8 @@
 \alias{chol}
 \alias{chol-methods}
 %
+\alias{chol,ddiMatrix-method}
 \alias{chol,diagonalMatrix-method}
-\alias{chol,dgCMatrix-method}
-\alias{chol,dgRMatrix-method}
-\alias{chol,dgTMatrix-method}
 \alias{chol,dsCMatrix-method}
 \alias{chol,dsRMatrix-method}
 \alias{chol,dsTMatrix-method}
@@ -46,46 +44,47 @@ chol(x, \dots)
 \S4method{chol}{dsyMatrix}(x, \dots)
 \S4method{chol}{dspMatrix}(x, \dots)
 \S4method{chol}{dsCMatrix}(x, pivot = FALSE, \dots)
-\S4method{chol}{dsRMatrix}(x, pivot = FALSE, cache = TRUE, \dots)
-\S4method{chol}{dsTMatrix}(x, pivot = FALSE, cache = TRUE, \dots)
+\S4method{chol}{ddiMatrix}(x, \dots)
+\S4method{chol}{generalMatrix}(x, uplo = "U", \dots)
+\S4method{chol}{triangularMatrix}(x, uplo = "U", \dots)
 }
 \arguments{
-  \item{x}{a \link[=is.finite]{finite}, symmetric, positive definite
-    matrix or \code{\linkS4class{Matrix}} to be factorized.}
+  \item{x}{a \link[=is.finite]{finite} symmetric, positive definite
+    matrix or \code{\linkS4class{Matrix}} to be factorized.
+    If \code{x} is square but not symmetric, then it will be
+    \emph{treated} as symmetric; see \code{uplo}.}
   \item{pivot}{a logical indicating if a fill-reducing
     permutation of the rows and columns of \eqn{A} should be used.
     If \code{TRUE}, then the approximate minimum degree (AMD)
     algorithm is used to select the permutation.
     If \code{FALSE}, then the order of the columns of \eqn{A}
     is preserved.}
-  \item{cache}{a logical indicating if the result should be
-    cached in \code{x@factors[["s[Pp]dCholesky"]]}.  Note that
-    caching is experimental and that only methods for classes
-    extending \code{\linkS4class{compMatrix}} will have this
-    argument.}
+  \item{uplo}{a string, either \code{"U"} or \code{"L"},
+    indicating which triangle of \code{x} should be used
+    to compute the factorization.  The default is \code{"U"},
+    even for lower triangular \code{x}, to be consistent with
+    \code{\link[base]{chol}} from \pkg{base}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  A matrix or \code{\linkS4class{triangularMatrix}} representing
+  A matrix, \code{\linkS4class{triangularMatrix}},
+  or \code{\linkS4class{diagonalMatrix}} representing
   the upper triangular Cholesky factor \eqn{L'}.
-  The result is a traditional matrix if \code{x} is.
-  For \code{x} inheriting from
-  \code{\linkS4class{unpackedMatrix}},
-  \code{\linkS4class{packedMatrix}}, and
-  \code{\linkS4class{sparseMatrix}},
-  the result is an object of class
-  \code{\linkS4class{Cholesky}},
-  \code{\linkS4class{pCholesky}}, and
-  \code{\linkS4class{dtCMatrix}},
-  respectively.
+  The result is a traditional matrix if \code{x} is a
+  traditional matrix and sparse if \code{x} is sparse.
 }
 \details{
-  For sparse \code{x}, \code{chol(x, pivot = value)} uses
-  \code{\link{Cholesky}(x, perm = value, LDL = FALSE)} under the hood.
-  If you must know the permutation \eqn{P_{1}}{P1} in addition to
-  the Cholesky factor \eqn{L} (or in this case the transpose \eqn{L'}),
-  then call \code{\link{Cholesky}} directly, as the result of
-  \code{chol(x, pivot = TRUE)} specifies \eqn{L'} but not \eqn{P_{1}}{P1}.
+  For sparse \code{x} inheriting from \code{\linkS4class{diagonalMatrix}},
+  the diagonal result is computed directly and without permutation,
+  i.e., bypassing CHOLMOD.
+  
+  For all other sparse \code{x}, \code{chol(x, pivot = value)} uses
+  \code{\link{Cholesky}(x, perm = value, LDL = FALSE, super = FALSE)}
+  under the hood.  If you must know the permutation \eqn{P_{1}}{P1}
+  in addition to the Cholesky factor \eqn{L} (or in this case the
+  transpose \eqn{L'}), then call \code{\link{Cholesky}} directly,
+  as the result of \code{chol(x, pivot = TRUE)} specifies \eqn{L'}
+  but not \eqn{P_{1}}{P1}.
 }
 \seealso{
   The default method from \pkg{base}, \code{\link[base]{chol}},
@@ -141,8 +140,8 @@ C2 <- chol(M2, pivot=TRUE)
 ## For the experts, check the caching of the factorizations:
 ff <- M2@factors[["spdCholesky"]]
 FF <- M2@factors[["sPdCholesky"]]
-L1 <- as(ff, "Matrix")# pivot=FALSE: no perm.
-L2 <- as(FF, "Matrix"); P2 <- as(FF, "pMatrix")
+L1 <- as(ff, "dtCMatrix")# pivot=FALSE: no perm.
+L2 <- as(FF, "dtCMatrix"); P2 <- as(FF, "pMatrix")
 stopifnot(identical(t(L1), c2),
           all.equal(t(L2), C2, tolerance=0),#-- why not identical()?
           all.equal(M2, tcrossprod(L1)),             # M = LL'

@@ -7,6 +7,25 @@
 #include "chm_common.h"
 #include "cs_utils.h" /* -> ./cs.h  for cs_dmperm() */
 
+
+#define _t_Csparse_validate
+#include "t_Csparse_validate.c"
+
+#define _t_Csparse_sort
+#include "t_Csparse_validate.c"
+
+// R: .validateCsparse(x, sort.if.needed = FALSE) :
+SEXP Csparse_validate2(SEXP x, SEXP maybe_modify) {
+    return Csparse_validate_(x, asLogical(maybe_modify));
+}
+
+// R: Matrix:::.sortCsparse(x) :
+SEXP Csparse_sort (SEXP x) {
+   int ok = Csparse_sort_2(x, TRUE); // modifying x directly
+   if(!ok) warning(_("Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"));
+   return x;
+}
+
 /** "Cheap" C version of  Csparse_validate() - *not* sorting : */
 Rboolean isValid_Csparse(SEXP x)
 {
@@ -36,25 +55,7 @@ Rboolean isValid_Csparse(SEXP x)
     return TRUE;
 }
 
-#define _t_Csparse_validate
-#include "t_Csparse_validate.c"
-
-#define _t_Csparse_sort
-#include "t_Csparse_validate.c"
-
-// R: .validateCsparse(x, sort.if.needed = FALSE) :
-SEXP Csparse_validate2(SEXP x, SEXP maybe_modify) {
-    return Csparse_validate_(x, asLogical(maybe_modify));
-}
-
-// R: Matrix:::.sortCsparse(x) :
-SEXP Csparse_sort (SEXP x) {
-   int ok = Csparse_sort_2(x, TRUE); // modifying x directly
-   if(!ok) warning(_("Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"));
-   return x;
-}
-
-/* MJ: no longer needed ... replacement in ./validate.c */
+/* MJ: no longer needed ... replacement in ./validity.c */
 #if 0
 
 SEXP Csparse_validate(SEXP x)
@@ -209,6 +210,9 @@ SEXP Csparse_to_dense(SEXP x, SEXP symm_or_tri)
 
 #endif /* MJ */
 
+/* MJ: no longer needed ... prefer R_sparse_as_kind() */
+#if 0
+
 // FIXME: do not go via CHM (should not be too hard, to just *drop* the x-slot, right?
 SEXP Csparse2nz(SEXP x, Rboolean tri)
 {
@@ -222,9 +226,6 @@ SEXP Csparse2nz(SEXP x, Rboolean tri)
 			      /* diag = */ tri ? diag_P(x) : "",
 			      GET_SLOT(x, Matrix_DimNamesSym));
 }
-
-/* MJ: no longer needed ... prefer R_sparse_as_kind() */
-#if 0
 
 SEXP Csparse_to_nz_pattern(SEXP x, SEXP tri)
 {
@@ -241,8 +242,6 @@ SEXP nz_pattern_to_Csparse(SEXP x, SEXP res_kind)
 {
     return nz2Csparse(x, asInteger(res_kind));
 }
-
-#endif /* MJ */
 
 // n.CMatrix --> [dli].CMatrix  (not going through CHM!)
 // NOTE: use chm_MOD_xtype(() to change type of  'cholmod_sparse' matrix
@@ -301,6 +300,8 @@ SEXP nz2Csparse(SEXP x, enum x_slot_kind r_kind)
     UNPROTECT(1);
     return ans;
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_sparse_as_matrix() */
 #if 0
@@ -512,14 +513,14 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith)
     if(a_is_n && (force_num || (maybe_bool && !b_is_n))) {
 	/* coerce 'a' to  double;
 	 * have no CHOLMOD function (pattern -> logical) --> use "our" code */
-	SEXP da = PROTECT(nz2Csparse(a, x_double)); nprot++;
+	SEXP da = PROTECT(sparse_as_kind(a, 'd', 0)); nprot++;
 	cha = AS_CHM_SP(da);
 	R_CheckStack();
 	a_is_n = FALSE;
     }
     else if(b_is_n && (force_num || (maybe_bool && !a_is_n))) {
 	// coerce 'b' to  double
-	SEXP db = PROTECT(nz2Csparse(b, x_double)); nprot++;
+	SEXP db = PROTECT(sparse_as_kind(b, 'd', 0)); nprot++;
 	chb = AS_CHM_SP(db);
 	R_CheckStack();
 	b_is_n = FALSE;
@@ -592,14 +593,14 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
 
     if(a_is_n && (force_num || (maybe_bool && !b_is_n))) {
 	// coerce 'a' to  double
-	SEXP da = PROTECT(nz2Csparse(a, x_double)); nprot++;
+	SEXP da = PROTECT(sparse_as_kind(a, 'd', 0)); nprot++;
 	cha = AS_CHM_SP(da);
 	R_CheckStack();
 	// a_is_n = FALSE;
     }
     else if(b_is_n && (force_num || (maybe_bool && !a_is_n))) {
 	// coerce 'b' to  double
-	SEXP db = PROTECT(nz2Csparse(b, x_double)); nprot++;
+	SEXP db = PROTECT(sparse_as_kind(b, 'd', 0)); nprot++;
 	chb = AS_CHM_SP(db);
 	R_CheckStack();
 	// b_is_n = FALSE;
@@ -607,8 +608,7 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith)
     else if(do_bool == TRUE) { // Want boolean arithmetic: sufficient if *one* is pattern:
 	if(!a_is_n && !b_is_n) {
 	    // coerce 'a' to pattern
-	    SEXP da = PROTECT(Csparse2nz(a, /* tri = */
-					 R_check_class_etc(a, valid_tri) >= 0)); nprot++;
+	    SEXP da = PROTECT(sparse_as_kind(a, 'n', 0)); nprot++;
 	    cha = AS_CHM_SP(da);
 	    R_CheckStack();
 	    // a_is_n = TRUE;
@@ -728,7 +728,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 	// CHM_SP chd = cholmod_l_copy(cha, cha->stype, CHOLMOD_REAL, &cl);
 
 	// --> use our Matrix-classes: they work:
-	SEXP da = PROTECT(nz2Csparse(a, x_double)); nprot++;
+	SEXP da = PROTECT(sparse_as_kind(a, 'd', 0)); nprot++;
 	cha = AS_CHM_SP(da);
     }
 
@@ -797,15 +797,13 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith)
 
     if(x_is_n && force_num) {
 	// coerce 'x' to  double
-	SEXP dx = PROTECT(nz2Csparse(x, x_double)); nprot++;
+	SEXP dx = PROTECT(sparse_as_kind(x, 'd', 0)); nprot++;
 	chx = AS_CHM_SP(dx);
 	R_CheckStack();
     }
     else if(do_bool == TRUE && !x_is_n) { // Want boolean arithmetic; need patter[n]
 	// coerce 'x' to pattern
-	static const char *valid_tri[] = { MATRIX_VALID_tri_Csparse, "" };
-	SEXP dx = PROTECT(Csparse2nz(x, /* tri = */
-				     R_check_class_etc(x, valid_tri) >= 0)); nprot++;
+	SEXP dx = PROTECT(sparse_as_kind(x, 'n', 0)); nprot++;
 	chx = AS_CHM_SP(dx);
 	R_CheckStack();
     }
@@ -994,7 +992,10 @@ SEXP Csparse_diagN2U(SEXP x)
     }
 }
 
-#endif
+#endif /* MJ */
+
+/* MJ: no longer needed ... replacement in ./subscript.c */
+#if 0
 
 /**
  * Indexing aka subsetting : Compute  x[i,j], also for vectors i and j
@@ -1052,6 +1053,8 @@ SEXP Csparse_submatrix(SEXP x, SEXP i, SEXP j)
     return chm_sparse_to_SEXP(ans, 1, 0, Rkind, "", /* dimnames: */ R_NilValue);
 }
 #undef CHM_SUB
+
+#endif /* MJ */
 
 #define _d_Csp_
 #include "t_Csparse_subassign.c"
@@ -1228,6 +1231,8 @@ SEXP diag_tC(SEXP obj, SEXP resultKind)
     return diag_tC_ptr(n, x_p, x_x, is_U, perm, resultKind);
 }
 
+/* MJ: unused */
+#if 0
 
 /**
  * Create a Csparse matrix object from indices and/or pointers.
@@ -1364,6 +1369,8 @@ SEXP create_Csparse(char* cls, int* i, int* j, int* p, int np,
     UNPROTECT(1);
     return ans;
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_dense_as_sparse() */
 #if 0

@@ -2,7 +2,7 @@
 library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
-cp6 <- chol(H6 <- Hilbert(6))
+cp6 <- Cholesky(H6 <- Hilbert(6))
 (tp6 <- as(cp6, "packedMatrix"))
 stopifnot(exprs = {
     grepl("^6 x 6 Matrix .*Cholesky\"", capture.output(cp6)[[1]])

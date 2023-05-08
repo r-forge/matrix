@@ -395,12 +395,11 @@ chkCholesky(c1.8, A1.8)
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
 ld.3 <- .Call("dsCMatrix_LDL_D", mtm, perm=TRUE,  "sumLog")
-stopifnot(names(mtm@factors) == "sPDCholesky")
+stopifnot(identical(mtm@factors, list()))
 ld.4 <- .Call("dsCMatrix_LDL_D", mtm, perm=FALSE, "sumLog")# clearly slower
-stopifnot(names(mtm@factors) == paste(c("sPD", "spD"),"Cholesky", sep=''))
+stopifnot(identical(mtm@factors, list()))
 c2 <- Cholesky(mtm, super = TRUE)
-stopifnot(names(mtm@factors) == paste(c("sPD", "spD", "SPd"),
-               "Cholesky", sep=''))
+stopifnot(identical(names(mtm@factors), "SPdCholesky"))
 
 r <- allCholesky(mtm)
 r[-1]
@@ -655,22 +654,18 @@ cd2 <- chol(D.) # from cache
 stopifnot(identical(cd1, cd2))
 
 ## lu(<m-by-0>), lu(<0-by-n>), BunchKaufman(<0-by-0>), chol(<0-by-0>)
-.NN <- list(NULL, NULL)
-## FIXME: denseLU should inherit from dgeMatrix in order to get
-##        proper 'Dimnames' prototype and initialize() method,
-##        analogously to Cholesky/dtrMatrix, pBunchKaufman/dtpMatrix, ...
 stopifnot(identical(lu(new("dgeMatrix", Dim = c(2L, 0L))),
-                    new("denseLU", Dim = c(2L, 0L), Dimnames = .NN)),
+                    new("denseLU", Dim = c(2L, 0L))),
           identical(lu(new("dgeMatrix", Dim = c(0L, 2L))),
-                    new("denseLU", Dim = c(0L, 2L), Dimnames = .NN)),
+                    new("denseLU", Dim = c(0L, 2L))),
           identical(BunchKaufman(new("dsyMatrix", uplo = "U")),
                     new("BunchKaufman", uplo = "U")),
           identical(BunchKaufman(new("dspMatrix", uplo = "L")),
                     new("pBunchKaufman", uplo = "L")),
-          identical(chol(new("dpoMatrix", uplo = "U")),
+          identical(Cholesky(new("dpoMatrix", uplo = "U")),
                     new("Cholesky", uplo = "U")),
-          identical(chol(new("dppMatrix", uplo = "L")),
-                    new("pCholesky", uplo = "U"))) # chol() always giving "U"!
+          identical(Cholesky(new("dppMatrix", uplo = "L")),
+                    new("pCholesky", uplo = "L")))
 
 ## determinant(<ds[yp]Matrix>) going via Bunch-Kaufman
 set.seed(15742)
@@ -703,8 +698,8 @@ stopifnot(exprs = {
     chkMF( S, mS,       lu)
     chkMF(pS, mS,       lu)
     chkMF(sS, mS,       lu)
-    chkMF( S, mS,     chol)
-    ## chkMF(pS, mS,     chol), ## FIXME: %*% method mangles dimnames
+    chkMF( S, mS, Cholesky)
+    ## chkMF(pS, mS, Cholesky) ## FIXME: %*% method mangles dimnames
     chkMF(sS, mS, Cholesky, super =  TRUE, LDL =  TRUE)
     chkMF(sS, mS, Cholesky, super =  TRUE, LDL = FALSE)
     chkMF(sS, mS, Cholesky, super = FALSE, LDL =  TRUE)

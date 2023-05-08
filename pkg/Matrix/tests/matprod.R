@@ -395,7 +395,7 @@ stopifnot(all.equal(sum(rowSums(B %*% mc)), 5.82424475145))
 assert.EQ.mat(tcrossprod(B, mc), as.matrix(t(tcrossprod(mc, B))))
 
 m <- kronecker(Diagonal(2), mc)
-stopifnot(is(mc, "Cholesky"),
+stopifnot(is(mc, "dtrMatrix"),
 	  is(m, "sparseMatrix"))
 im <- solve(m)
 round(im, 3)

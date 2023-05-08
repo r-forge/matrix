@@ -2,17 +2,26 @@
 #define MATRIX_SSC_H
 
 #include "Mutils.h"
-#include "Csparse.h" /* -> diag_tC() */
 #include "chm_common.h"
 
-SEXP R_chkName_Cholesky(SEXP nm, SEXP perm, SEXP LDL, SEXP super);
-SEXP R_chm_factor_name (         SEXP perm, SEXP LDL, SEXP super);
+/* defined in factorizations.c : */
+int dpCMatrix_trf_(CHM_SP A, CHM_FR *L,
+		   int perm, int ldl, int super, double mult);
 
-SEXP dsCMatrix_Cholesky(SEXP A, SEXP perm, SEXP LDL, SEXP super, SEXP Imult);
+/* defined in Csparse.c : */
+SEXP diag_tC_ptr(int, int *, double *, Rboolean, int *, SEXP);
+
 SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind);
-SEXP dsCMatrix_chol(SEXP x, SEXP pivot);
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b, SEXP LDL);
 SEXP dsCMatrix_matrix_solve (SEXP a, SEXP b, SEXP LDL);
+
+/* MJ: no longer needed ... replacement in ./factorizations.c */
+#if 0
+SEXP R_chkName_Cholesky(SEXP nm, SEXP perm, SEXP LDL, SEXP super);
+SEXP R_chm_factor_name (         SEXP perm, SEXP LDL, SEXP super);
+SEXP dsCMatrix_chol(SEXP x, SEXP pivot);
+SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult);
+#endif /* MJ */
 
 /* MJ: no longer used ... prefer R_sparse_as_general(), CRsparse_as_Tsparse() */
 #if 0

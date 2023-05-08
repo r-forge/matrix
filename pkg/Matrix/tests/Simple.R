@@ -1305,11 +1305,11 @@ stopifnot(is(nn11, "ngeMatrix"), identical(nn11@x, FALSE))
 
 ## coercions preserving mathematical equality ought to preserve 'factors' slot;
 ## though currently only for sparse->sparse and dense->dense
-mT <- as(as(Diagonal(x = rlnorm(5)), "TsparseMatrix"), "generalMatrix")
-stopifnot(identical(mT@factors, list()))
-chol(mT)
-mR <- as(mT, "RsparseMatrix")
-mC <- as(mR, "CsparseMatrix")
+mC <- as(as(Diagonal(x = rlnorm(5)), "CsparseMatrix"), "symmetricMatrix")
+stopifnot(identical(mC@factors, list()))
+chol(mC)
+mR <- as(mC, "RsparseMatrix")
+mT <- as(mR, "TsparseMatrix")
 stopifnot(!identical(mTf <- mT@factors, list()),
           identical(mTf, mR@factors),
           identical(mTf, mC@factors))

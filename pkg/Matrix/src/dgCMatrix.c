@@ -228,6 +228,9 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
     return ycp;
 }
 
+/* MJ: no longer needed ... replacement in ./factorizations.c */
+#if 0
+
 // Modified version of Tim Davis's cs_qr_mex.c file for MATLAB (in CSparse)
 //  Usage: [V,beta,p,R,q] = cs_qr(A) ;
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
@@ -430,6 +433,8 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp,
     return ans;
 }
 
+#endif /* MJ */
+
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 // FIXME:  add  'keep_dimnames' as argument
 {
@@ -455,9 +460,12 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     Matrix_Calloc(x, n, double);
 
     if (isNull(lu = get_factor(Ap, "LU"))) {
-	install_lu(Ap, /* order = */ 1, /* tol = */ 1.0, /* err_sing = */ TRUE,
-		   /* keep_dimnames = */ TRUE);
-	lu = get_factor(Ap, "LU");
+	SEXP doError = PROTECT(ScalarLogical(1)),
+	    keepDimnames = PROTECT(ScalarLogical(0)),
+	    order = PROTECT(ScalarInteger(2)),
+	    tol = PROTECT(ScalarReal(1.0));
+	lu = dgCMatrix_trf(Ap, doError, keepDimnames, order, tol);
+	UNPROTECT(4);
     }
     qslot = GET_SLOT(lu, Matrix_qSym);
     L = AS_CSP__(GET_SLOT(lu, Matrix_LSym));
