@@ -570,6 +570,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 	beta[0] = mult_;
 	beta[1] = 0.0;
 	L = AS_CHM_FR(ch);
+	R_CheckStack();
 	L = cholmod_copy_factor(L, &c);
 	cholmod_factorize_p(A, beta, (int *) NULL, 0, L, &c);
     } else {
@@ -1041,6 +1042,9 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
     int givelog = asLogical(logarithm) != 0, sign = 1;
     double modulus = 0.0; /* result for n == 0 */
     if (n > 0) {
+	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
+	    (R_xlen_t) n * n == XLENGTH(x);	
+
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
 	UNPROTECT(1); /* uplo */
@@ -1049,11 +1053,7 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int j = 0, *ppivot = INTEGER(pivot);
 	R_xlen_t n1a = (R_xlen_t) n + 1;
-	double *px = REAL(x), a, b, c, logab, logcc;
-
-	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
-	    (R_xlen_t) n * n == XLENGTH(x);	
-	
+	double *px = REAL(x), a, b, c, logab, logcc;	
 	while (j < n) {
 	    if (ppivot[j] > 0) {
 		if (*px < 0.0) {
@@ -1096,6 +1096,67 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	    }
 	}
 	UNPROTECT(2); /* x, pivot */
+    }
+    if (!givelog)
+	modulus = exp(modulus);
+    return as_det_obj(modulus, givelog, sign);
+}
+
+SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
+{
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    int givelog = asLogical(logarithm) != 0, sign = 1;
+    double modulus = 0.0; /* result for n == 0 */
+    if (n > 0) {
+	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
+	    (R_xlen_t) n * n == XLENGTH(x);	
+
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
+	UNPROTECT(1); /* uplo */
+	
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int j;
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	double *px = REAL(x);
+	for (j = 0; j < n; ++j) {
+	    if (*px < 0.0) {
+		modulus += log(-(*px));
+		sign = -sign;
+	    } else {
+		/* incl. 0, NaN cases */
+		modulus += log(*px);
+	    }
+	    px += (unpacked) ? n1a : ((upper) ? j + 2 : n - j);
+	}
+	UNPROTECT(1); /* x */
+    }
+    if (!givelog)
+	modulus = exp(modulus);
+    return as_det_obj(modulus, givelog, sign);
+}
+
+SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
+{
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    int givelog = asLogical(logarithm) != 0, sign = 1;
+    double modulus = 0.0; /* result for n == 0 */
+    if (n > 0) {
+	CHM_FR L = AS_CHM_FR(obj);
+	R_CheckStack();
+	cholmod_change_factor(CHOLMOD_REAL, L->is_ll, 0, 0, 0, L, &c);
+	int j, *pp = L->p;
+	double *px = L->x;
+	for (j = 0; j < n; ++j) {
+	    /* incl. 0, NaN cases */
+	    modulus += log(px[pp[j]]);
+	}
+	if (L->is_ll)
+	    modulus *= 2.0;
     }
     if (!givelog)
 	modulus = exp(modulus);
