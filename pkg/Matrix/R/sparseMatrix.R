@@ -446,7 +446,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 
     r <- new(paste0(kind, shape, "TMatrix"))
     r@Dim <- dims
-    if(haveDN <- !missing(dimnames) && !is.null(dimnames))
+    if(!missing(dimnames) && !is.null(dimnames))
         r@Dimnames <-
             if(is.character(validDN(dimnames, dims)))
                 dimnames

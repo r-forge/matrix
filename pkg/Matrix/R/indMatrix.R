@@ -193,7 +193,7 @@ body(.ind2ngC)[[7L]] <- NULL
 
 .ind2ngT <- function(from) {
     J <- new("ngTMatrix")
-    J@Dim <- d <- from@Dim
+    J@Dim      <- from@Dim
     J@Dimnames <- from@Dimnames
     perm <- from@perm
     if(from@margin == 1L) {
