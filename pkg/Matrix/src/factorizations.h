@@ -40,6 +40,8 @@ SEXP denseLU_determinant(SEXP obj, SEXP logarithm);
 SEXP sparseLU_determinant(SEXP obj, SEXP logarithm);
 SEXP sparseQR_determinant(SEXP obj, SEXP logarithm);
 SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm);
+SEXP Cholesky_determinant(SEXP obj, SEXP logarithm);
+SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm);
 
 /* MJ: no longer needed ... replacement in ./validity.c */
 #if 0
