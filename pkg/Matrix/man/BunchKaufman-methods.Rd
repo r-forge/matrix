@@ -34,8 +34,8 @@
 }
 \usage{
 BunchKaufman(x, \dots)
-\S4method{BunchKaufman}{dsyMatrix}(x, \dots)
-\S4method{BunchKaufman}{dspMatrix}(x, \dots)
+\S4method{BunchKaufman}{dsyMatrix}(x, warnSing = TRUE, \dots)
+\S4method{BunchKaufman}{dspMatrix}(x, warnSing = TRUE, \dots)
 \S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
 }
 \arguments{
@@ -43,6 +43,8 @@ BunchKaufman(x, \dots)
     \code{\linkS4class{Matrix}} to be factorized.
     If \code{x} is square but not symmetric, then it will be
     \emph{treated} as symmetric; see \code{uplo}.}
+  \item{warnSing}{a logical indicating if a \link{warning} should
+    be signaled for singular \code{x}.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{x} should be used
     to compute the factorization.}

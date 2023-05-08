@@ -9,6 +9,7 @@
 \alias{denseLU-class}
 %
 \alias{coerce,denseLU,dgeMatrix-method}
+\alias{determinant,denseLU,logical-method}
 %
 \description{
   \code{denseLU} is the class of dense, row-pivoted LU factorizations
@@ -54,6 +55,9 @@
     \item{\code{coerce}}{\code{signature(from = "denseLU", to = "dgeMatrix")}:
       returns a \code{\linkS4class{dgeMatrix}}, useful for inspecting
       the internal representation of the factorization; see \sQuote{Note}.}
+    \item{\code{determinant}}{\code{signature(from = "denseLU", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "denseLU")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "denseLU")}:

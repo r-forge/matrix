@@ -69,7 +69,6 @@ SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
 
 char La_norm_type(const char *typstr);
 char La_rcond_type(const char *typstr);
-SEXP as_det_obj(double mod, int log, int sign);
 
 SEXP Matrix_expand_pointers(SEXP pP);
 SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);

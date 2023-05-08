@@ -6,12 +6,10 @@
 
 /* defined in factorizations.c : */
 SEXP dsyMatrix_trf_(SEXP, int);
-SEXP BunchKaufman_determinant(SEXP, SEXP);
 
 double get_norm_dsy(SEXP obj, const char *typstr);
 SEXP dsyMatrix_norm(SEXP obj, SEXP type);
 SEXP dsyMatrix_rcond(SEXP obj);
-SEXP dsyMatrix_determinant(SEXP obj, SEXP logarithm);
 SEXP dsyMatrix_solve(SEXP a);
 SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b);
 

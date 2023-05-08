@@ -32,7 +32,7 @@ dH6 <- determinant(H6)
 D. <- determinant(tp6)
 rc <- rcond(tp6)
 stopifnot(all.equal(dH6$modulus, determinant(as.matrix(H6))$modulus),
-          is.all.equal3(c(D.$modulus), c(dH6$modulus) / 2, -19.883103353),
+          is.all.equal3(c(D.$modulus) / 2, c(dH6$modulus) / 2, -19.883103353),
           all.equal(rc, 1.791511257e-4),
           all.equal(norm(tp6, "I") , 2.45),
           all.equal(norm(tp6, "1") , 1),

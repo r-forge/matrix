@@ -220,7 +220,7 @@ replNA <- function(x, value) { x[is.na(x)] <- value ; x }
 (EL.1 <- expand(lu.1 <- lu(M.1 <- replNA(M, -10))))
 ## so it's quite clear how  lu() of the *singular* matrix  M	should work
 ## but it's not supported by the C code in ../src/cs.c which errors out
-stopifnot(all.equal(M.1,  with(EL.1, P %*% L %*% U %*% Q)),
+stopifnot(all.equal(M.1,  with(EL.1, t(P) %*% L %*% U %*% Q)),
 	  is.na(det(M)), is.na(det(dM)),
 	  is.na(det(M0)), is.na(det(dM0)) )
 
@@ -394,12 +394,15 @@ chkCholesky(c1.8, A1.8)
 
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
-ld.3 <- .Call("dsCMatrix_LDL_D", mtm, perm=TRUE,  "sumLog")
-stopifnot(identical(mtm@factors, list()))
-ld.4 <- .Call("dsCMatrix_LDL_D", mtm, perm=FALSE, "sumLog")# clearly slower
-stopifnot(identical(mtm@factors, list()))
+ld.3 <- determinant(Cholesky(mtm, perm = TRUE))
+stopifnot(identical(names(mtm@factors),
+                    "sPDCholesky"))
+ld.4 <- determinant(Cholesky(mtm, perm = FALSE))
+stopifnot(identical(names(mtm@factors),
+                    c("sPDCholesky", "spDCholesky")))
 c2 <- Cholesky(mtm, super = TRUE)
-stopifnot(identical(names(mtm@factors), "SPdCholesky"))
+stopifnot(identical(names(mtm@factors),
+                    c("sPDCholesky", "spDCholesky", "SPdCholesky")))
 
 r <- allCholesky(mtm)
 r[-1]
@@ -423,16 +426,15 @@ for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
 ## log(|LL'|) - check if super = TRUE and simplicial give same determinant
 ld1 <- .Call("CHMfactor_ldetL2", c1)
 ld2 <- .Call("CHMfactor_ldetL2", c2)
-(ld1. <- determinant(mtm))
-## experimental
-ld3 <- .Call("dsCMatrix_LDL_D", mtm, TRUE, "sumLog")
-ld4 <- .Call("dsCMatrix_LDL_D", mtm, FALSE, "sumLog")
+(ld.1 <- determinant(mtm))
 stopifnot(all.equal(ld1, ld2),
-	  is.all.equal3(ld2, ld3, ld4),
-	  all.equal(ld.3, ld3, tolerance = 1e-14),
-	  all.equal(ld.4, ld4, tolerance = 1e-14),
-	  all.equal(ld1, as.vector(ld1.$modulus), tolerance = 1e-14))
+	  all.equal(ld1, as.vector(ld.1$modulus), tolerance = 1e-14),
+          all.equal(ld1, as.vector(ld.3$modulus), tolerance = 1e-14),
+          all.equal(ld1, as.vector(ld.4$modulus), tolerance = 1e-14))
 
+## MJ: ldet[123].dsC() are unused outside of these tests, so we no longer
+##     have them in the namespace { old definitions are in ../R/determinant.R }
+if(FALSE) {
 ## Some timing measurements
 mtm <- with(KNex, crossprod(mm))
 I <- .symDiagonal(n=nrow(mtm))
@@ -445,6 +447,7 @@ system.time(D2 <- sapply(r, function(rho) Matrix:::ldet2.dsC(mtm + (1/rho) * I))
 system.time(D3 <- sapply(r, function(rho) Matrix:::ldet3.dsC(mtm + (1/rho) * I)))
 ## 0.810
 stopifnot(is.all.equal3(D1,D2,D3, tol = 1e-13))
+}
 
 ## Updating LL'  should remain LL' and not become  LDL' :
 cholCheck <- function(Ut, tol = 1e-12, super = FALSE, LDL = !super) {

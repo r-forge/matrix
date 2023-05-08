@@ -1135,23 +1135,6 @@ char La_rcond_type(const char *typstr)
     return typup; /* 'O' or 'I' */
 }
 
-SEXP as_det_obj(double mod, int log, int sign)
-{
-    SEXP det = PROTECT(allocVector(VECSXP, 2)),
-	nms = PROTECT(allocVector(STRSXP, 2)),
-	val = PROTECT(ScalarReal(mod));
-
-    setAttrib(det, R_NamesSymbol, nms);
-    SET_STRING_ELT(nms, 0, mkChar("modulus"));
-    SET_STRING_ELT(nms, 1, mkChar("sign"));
-    setAttrib(val, install("logarithm"), ScalarLogical(log));
-    SET_VECTOR_ELT(det, 0, val);
-    SET_VECTOR_ELT(det, 1, ScalarInteger(sign));
-    setAttrib(det, R_ClassSymbol, mkString("det"));
-    UNPROTECT(3);
-    return det;
-}
-
 SEXP Matrix_expand_pointers(SEXP pP)
 {
     int n = length(pP) - 1;

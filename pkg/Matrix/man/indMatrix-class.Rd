@@ -35,6 +35,7 @@
 \alias{coerce,list,indMatrix-method}
 \alias{coerce,matrix,indMatrix-method}
 \alias{coerce,numeric,indMatrix-method}
+\alias{determinant,indMatrix,logical-method}
 \alias{diag,indMatrix-method}
 \alias{diag<-,indMatrix-method}
 \alias{t,indMatrix-method}

@@ -2074,10 +2074,10 @@ chk.s <- function(..., which.call = -1,
 ## FIXME:  kind = "diagBack" is not yet implemented
 ##	would be much more efficient, but there's no CHOLMOD UI (?)
 
-## "used" currently only in ../tests/factorizing.R
-.diag.dsC <- function(x, Chx = Cholesky(x, LDL=TRUE), res.kind = "diag") {
+.diag.dsC <- function(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag") {
     force(Chx)
-    if(!missing(Chx)) stopifnot(.isLDL(Chx), is.integer(Chx@p), is.double(Chx@x))
+    if(!missing(Chx))
+        stopifnot(.isLDL(Chx), is.integer(Chx@p), is.double(Chx@x))
     .Call(diag_tC, Chx, res.kind)
     ##    ^^^^^^^ from ../src/Csparse.c
     ## => res.kind in ("trace", "sumLog", "prod", "min", "max", "range", "diag", "diagBack")

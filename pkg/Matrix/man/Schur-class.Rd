@@ -8,6 +8,8 @@
 %
 \alias{Schur-class}
 %
+\alias{determinant,Schur,logical-method}
+%
 \description{
   \code{Schur} is the class of Schur factorizations of
   \eqn{n \times n}{n-by-n} real matrices \eqn{A},
@@ -53,6 +55,9 @@
 }
 \section{Methods}{
   \describe{
+    \item{\code{determinant}}{\code{signature(from = "Schur", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{expand2}{\code{signature(x = "Schur")}:
       see \code{\link{expand2-methods}}.}
   }

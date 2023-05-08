@@ -8,6 +8,8 @@
 %
 \alias{sparseLU-class}
 %
+\alias{determinant,sparseLU,logical-method}
+%
 \description{
   \code{sparseLU} is the class of sparse, row- and column-pivoted
   LU factorizations of \eqn{n \times n}{n-by-n} real matrices \eqn{A},
@@ -51,6 +53,9 @@
 }
 \section{Methods}{
   \describe{
+    \item{\code{determinant}}{\code{signature(from = "sparseLU", logarithm = "logical")}:
+      computes the determinant of the factorized matrix \eqn{A}
+      or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "sparseLU")}:

@@ -175,8 +175,6 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
     return r;
 }
 
-#endif /* MJ */
-
 /**
  * Fast version of getting at the diagonal matrix D of the
  * (generalized) simplicial Cholesky LDL' decomposition of a
@@ -192,18 +190,21 @@ SEXP dsCMatrix_Cholesky(SEXP Ap, SEXP perm, SEXP LDL, SEXP super, SEXP Imult)
  */
 SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
 {
-    CHM_SP A = AS_CHM_SP__(Ap);
     CHM_FR L;
-    R_CheckStack();
-    dpCMatrix_trf_(A, &L,
-		   /*  perm */ asLogical(permP),
-		   /*   ldl */ 1,
-		   /* super */ 0,
-		   /*  mult */ 0.0);
-    SEXP ans = diag_tC_ptr(L->n, L->p, L->x, FALSE, L->Perm, resultKind);
+    SEXP ans;
+    L = internal_chm_factor(Ap,
+			    /*  perm */ asLogical(permP),
+			    /*   LDL */ 1,
+			    /* super */ 0,
+			    /* Imult */ 0.0);
+    SEXP ans = PROTECT(diag_tC_ptr(
+			   L->n, L->p, L->x, FALSE, L->Perm, resultKind));
     cholmod_free_factor(&L, &c);
+    UNPROTECT(1);
     return(ans);
 }
+
+#endif /* MJ */
 
 // using cholmod_spsolve() --> sparse result
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b, SEXP LDL)
