@@ -1253,12 +1253,14 @@ SEXP sparseQR_validate(SEXP obj)
 	UPRET(1, "'beta' slot does not have length Dim[2]");
     UNPROTECT(1); /* beta */
 
-    int m2;
     SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
     PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
     pdim = INTEGER(dim);
-    if ((m2 = pdim[0]) < m)
+    int m2 = pdim[0];
+    if (m2 < m)
 	UPRET(2, "'V' slot has fewer than Dim[1] rows");
+    if (m2 > m + n)
+	UPRET(2, "'V' slot has more than Dim[1]+Dim[2] rows");
     if (pdim[1] != n)
 	UPRET(2, "'V' slot does not have Dim[2] columns");
     UNPROTECT(2); /* dim, V */

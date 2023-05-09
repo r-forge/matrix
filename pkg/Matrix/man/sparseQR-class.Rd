@@ -82,7 +82,8 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       \code{beta} contains the normalizing constants used to compute
       the Householder matrices that compose the \eqn{Q} factor.}
     \item{\code{V}}{an object of class \code{\linkS4class{dgCMatrix}}
-      with at least \code{Dim[1]} rows and exactly \code{Dim[2]} columns.  
+      with \code{Dim[2]} columns.  The number of rows \code{nrow(V)}
+      is at least \code{Dim[1]} and at most \code{Dim[1]+Dim[2]}.
       The column vectors of \code{V} generate the Householder matrices
       that compose the \eqn{Q} factor.}
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
