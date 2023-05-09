@@ -467,6 +467,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	lu = dgCMatrix_trf(Ap, doError, keepDimnames, order, tol);
 	UNPROTECT(4);
     }
+    PROTECT(lu);
     qslot = GET_SLOT(lu, Matrix_qSym);
     L = AS_CSP__(GET_SLOT(lu, Matrix_LSym));
     U = AS_CSP__(GET_SLOT(lu, Matrix_USym));
@@ -490,7 +491,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 	}
     }
     Matrix_Free(x, n);
-    UNPROTECT(1);
+    UNPROTECT(2);
     return ans;
 }
 
