@@ -207,9 +207,10 @@
   }
   \subsection{\code{.updateCHMfactor(object, parent, mult)}}{
     This updates \code{object} with the result of Cholesky factorizing
-    \code{F(parent)+mult[1]*I}, where \code{I} is the identity matrix
-    and the nonzero pattern of \code{F(parent)} must match that of
-    \code{S} if \code{object = Cholesky(S, ...)}.
+    \code{F(parent)+mult*diag(nrow(parent))}, i.e., \code{F(parent)}
+    plus \code{mult} times the identity matrix, where the
+    nonzero pattern of \code{F(parent)} must match that of \code{S}
+    if \code{object = Cholesky(S, ...)}.
     
     If \code{parent} is a \code{dsCMatrix}, then \code{F = identity}.
     If \code{parent} is a \code{dgCMatrix}, then \code{F = tcrossprod}.
