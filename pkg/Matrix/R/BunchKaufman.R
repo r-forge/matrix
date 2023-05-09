@@ -37,44 +37,53 @@ setAs("pBunchKaufman", "dtpMatrix",
           to
       })
 
-## FIXME: need all 2*b+1 factors, not only b+1; and need Dimnames
-##
 ## returning:
 ##
-## list(D, P[1], U[1], ..., P[b], U[b])
-##     where A = U' D U and U = P[1] U[1] ... P[b] U[b]
+## list(U[1]', P[1]', ..., U[b]', P[b]', D, P[b], U[b], ..., P[1], U[1])
+##     where A = U' D U and U = P[b] U[b] ... P[1] U[1]
 ##
 ## OR
 ##
-## list(P[1], L[1], ..., P[b], L[b], D)
+## list(P[1], L[1], ..., P[b], L[b], D, L[b]', P[b]', ..., L[1]', P[1]')
 ##     where A = L D L' and L = P[1] L[1] ... P[b] L[b]
 ##
 ## as described in the documentation for LAPACK 'ds[yp]trf'
-setMethod("expand2", signature(x = "BunchKaufman"),
-          function(x, ...) .Call(BunchKaufman_expand, x))
-
-setMethod("expand2", signature(x = "pBunchKaufman"),
-          function(x, ...) .Call(BunchKaufman_expand, x))
+for(.cl in c("BunchKaufman", "pBunchKaufman"))
+setMethod("expand2", signature(x = .cl),
+          function(x, ...) {
+              r <- .Call(BunchKaufman_expand, x)
+              dn <- x@Dimnames
+              if(b <- length(r) - 1L)
+                  r <- if(x@uplo == "U")
+                           c(lapply(r[(b + 1L):2], t), r)
+                       else c(r, lapply(r[b:1L], t))
+              r[[1L]]@Dimnames <- c(dn[1L], list(NULL))
+              r[[length(r)]]@Dimnames <- c(list(NULL), dn[2L])
+              r
+          })
+rm(.cl)
 
 if(FALSE) {
+## FIXME: but expansion is wrong for uplo = "U" ??
 library(Matrix)
 set.seed(1)
+n <- 6L
 
-n <- 1000L
 X <- new("dsyMatrix", Dim = c(n, n), x = rnorm(n * n))
-Y <- t(X)
+Y <- t(X) # same but with uplo = "L"
 
-as(bkX <- BunchKaufman(X), "dtrMatrix")
-as(bkY <- BunchKaufman(Y), "dtrMatrix")
+bkX <- BunchKaufman(X)
+bkY <- BunchKaufman(Y)
 
-DU <- .Call("BunchKaufman_expand", bkX)
-D <- DU[[1L]]
-U <- Reduce(`%*%`, DU[-1L])
-## FIXME: 'DU' looks correct ... but is actually wrong {second test fails}??
-stopifnot(all.equal(as(t(U) %*% D %*% U, "matrix"), as(X, "matrix")))
+bkX. <- as(bkX, "dtrMatrix")
+bkY. <- as(bkY, "dtrMatrix")
 
-LD <- .Call("BunchKaufman_expand", bkY)
-D <- LD[[length(LD)]]
-L <- Reduce(`%*%`, LD[-length(LD)])
-stopifnot(all.equal(as(L %*% D %*% t(L), "matrix"), as(Y, "matrix")))
+eX <- expand2(bkX)
+eY <- expand2(bkY)
+
+## 'eX' seems correct ... but is actually wrong {first test fails}
+stopifnot(exprs = {
+    all.equal(Reduce(`%*%`, lapply(eX, as, "matrix")), as(X, "matrix"))
+    all.equal(Reduce(`%*%`, lapply(eY, as, "matrix")), as(Y, "matrix"))
+})
 }

@@ -686,29 +686,38 @@ BunchKaufman(as.matrix(1))
 
 
 ## 'expand2': product of listed factors should reproduce factorized matrix
-chkMF <- function(X, Y, FUN, ...)
-    all.equal(as(Reduce(`%*%`, expand2(FUN(X, ...))), "matrix"), Y)
+## FIXME: many of our %*% methods still mangle dimnames or names(dimnames) ...
+##        hence for now we coerce the factors to matrix before multiplying
+chkMF <- function(X, Y, FUN, ...) {
+    X@factors <- list() # t(x)@factors may preserve factorizations with x@uplo
+    all.equal(Reduce(`%*%`, lapply(expand2(FUN(X, ...)), as, "matrix")), Y)
+}
 set.seed(24831)
-n <- 64L
+n <- 16L
 mS <- tcrossprod(matrix(rnorm(n * n), n, n,
                         dimnames = list(A = paste0("s", seq_len(n)), NULL)))
-## FIXME: many of our %*% methods still mangle names(dimnames)
 names(dimnames(mS)) <- NULL
 sS <- as(pS <- as(S <- as(mS, "dpoMatrix"), "packedMatrix"), "CsparseMatrix")
 stopifnot(exprs = {
-    chkMF( S, mS,    Schur)
-    chkMF(pS, mS,    Schur)
-    chkMF( S, mS,       lu)
-    chkMF(pS, mS,       lu)
-    chkMF(sS, mS,       lu)
-    chkMF( S, mS, Cholesky)
-    ## chkMF(pS, mS, Cholesky) ## FIXME: %*% method mangles dimnames
-    chkMF(sS, mS, Cholesky, super =  TRUE, LDL =  TRUE)
-    chkMF(sS, mS, Cholesky, super =  TRUE, LDL = FALSE)
-    chkMF(sS, mS, Cholesky, super = FALSE, LDL =  TRUE)
-    chkMF(sS, mS, Cholesky, super = FALSE, LDL = FALSE)
-    chkMF(sS, mS,       qr, complete =  TRUE)
-    chkMF(sS, mS,       qr, complete = FALSE)
+    chkMF(   S , mS,    Schur)
+    chkMF(  pS , mS,    Schur)
+    chkMF(   S , mS,       lu)
+    chkMF(  pS , mS,       lu)
+    chkMF(  sS , mS,       lu)
+    chkMF(  sS , mS,       qr, complete =  TRUE)
+    chkMF(  sS , mS,       qr, complete = FALSE)
+    ## chkMF(   S , mS, BunchKaufman) # FIXME in ../R/BunchKaufman.R
+    ## chkMF(  pS , mS, BunchKaufman) # FIXME in ../R/BunchKaufman.R
+    chkMF(t( S), mS, BunchKaufman)
+    chkMF(t(pS), mS, BunchKaufman)
+    chkMF(   S , mS, Cholesky)
+    chkMF(  pS , mS, Cholesky)
+    chkMF(t( S), mS, Cholesky)
+    chkMF(t(pS), mS, Cholesky)
+    chkMF(  sS , mS, Cholesky, super =  TRUE, LDL =  TRUE)
+    chkMF(  sS , mS, Cholesky, super =  TRUE, LDL = FALSE)
+    chkMF(  sS , mS, Cholesky, super = FALSE, LDL =  TRUE)
+    chkMF(  sS , mS, Cholesky, super = FALSE, LDL = FALSE)
 })
 
 
