@@ -48,7 +48,7 @@
 \usage{
 Cholesky(A, \dots)
 \S4method{Cholesky}{dsyMatrix}(A, \dots)
-\S4method{Cholesky}{dsyMatrix}(A, \dots)
+\S4method{Cholesky}{dspMatrix}(A, \dots)
 \S4method{Cholesky}{dsCMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
     Imult = 0, \dots)
 \S4method{Cholesky}{ddiMatrix}(A, \dots)
@@ -83,7 +83,9 @@ Cholesky(A, \dots)
     i.e., \code{A} plus \code{Imult} times the identity matrix.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{A} should be used
-    to compute the factorization.}
+    to compute the factorization.  The default is \code{"U"},
+    even for lower triangular \code{x}, to be consistent with
+    \code{\link[base]{chol}} from \pkg{base}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{

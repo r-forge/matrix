@@ -82,13 +82,11 @@ setMethod("Cholesky", signature(A = "diagonalMatrix"),
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
           function(A, ...)
-              tryCatch(.Call(dpoMatrix_trf, A, 2L),
-                       error = function(e) stop("Cholesky(A) is undefined: 'A' is not positive definite")))
+              .Call(dpoMatrix_trf, A, 2L))
 
 setMethod("Cholesky", signature(A = "dspMatrix"),
           function(A, ...)
-              tryCatch(.Call(dppMatrix_trf, A, 2L),
-                       error = function(e) stop("Cholesky(A) is undefined: 'A' is not positive definite")))
+              .Call(dppMatrix_trf, A, 2L))
 
 ## FIXME: no condition signaled for non-positive definite A when LDL=TRUE ??
 ## x <- new("dsCMatrix",
@@ -114,7 +112,7 @@ setMethod("Cholesky", signature(A = "dsTMatrix"),
 setMethod("Cholesky", signature(A = "ddiMatrix"),
           function(A, ...) {
               if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y <= 0))
-                  stop("Cholesky(x) is undefined: 'A' is not positive definite")
+                  stop("Cholesky(A) is undefined: 'A' is not positive definite")
               n <- (d <- A@Dim)[1L]
               r <- new("dCHMsimpl")
               r@Dim <- d
