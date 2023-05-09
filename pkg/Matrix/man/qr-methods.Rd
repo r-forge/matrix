@@ -42,7 +42,7 @@ qr(x, \dots)
     satisfying \code{nrow(x) >= ncol(x)} if sparse.}
   \item{order}{an integer in \code{0:3} passed to CSparse routine
     \code{cs_sqr}, indicating a strategy for choosing the column
-    permutation \eqn{P_{2}}{P2}. 0 means no column permutation.
+    permutation \eqn{P_{2}}{P2}.  0 means no column permutation.
     1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
     \eqn{\tilde{A}' \tilde{A}}{A~' * A~}, and \eqn{A' A}{A' * A},
     where \eqn{\tilde{A}}{A~} is \eqn{A} with \dQuote{dense} rows
@@ -60,6 +60,16 @@ qr(x, \dots)
   \code{\linkS4class{sparseMatrix}}.  \code{qr} is given for \code{x}
   inheriting from virtual class \code{\linkS4class{denseMatrix}},
   as well as for traditional matrices.
+}
+\details{
+  If \code{x} is sparse and structurally rank deficient, having
+  structural rank \eqn{r < n}, then \code{x} is augmented with
+  \eqn{(n-r)} rows of (partly non-structural) zeros, such that
+  the augmented matrix has structural rank \eqn{n}.
+  This augmented matrix is factorized as described above:
+  \deqn{P_{1} A P_{2} = P_{1} \begin{bmatrix} A_{0} \\ 0 \end{bmatrix} P_{2} = Q R}{P1 * A * P2 = P1 * [A0; 0] * P2 = Q * R}
+  where \eqn{A_{0}} denotes the original, user-supplied
+  \eqn{(m-(n-r)) \times n}{(m-(n-r))-by-n} matrix.
 }
 \seealso{
   Class \code{\linkS4class{sparseQR}} and its methods.
