@@ -15,9 +15,9 @@
 \description{
   Computes the pivoted QR factorization of an \eqn{m \times n}{m-by-n}
   real matrix \eqn{A}, which has the general form
-  \deqn{P_{1} A P_{2} = Q R}
+  \deqn{P_{1} A P_{2} = Q R}{P1 * A * P2 = Q * R}
   or (equivalently)
-  \deqn{A = P_{1}' Q R P_{2}'}
+  \deqn{A = P_{1}' Q R P_{2}'}{A = P1' * Q * R * P2'}
   where
   \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
   \eqn{Q} is an \eqn{m \times m}{m-by-m} orthogonal matrix, and
