@@ -113,13 +113,7 @@ lu(x, \dots)
   and otherwise returning \code{NA}.  Users of this method can
   detect singular \code{x} with an error handler or by setting
   \code{errSing = FALSE} and testing for a formal result with
-  \code{\link{isS4}}.
-
-  Due to caching, it is currently unsafe to mix different values of
-  \code{errSing}.  Notably, if \code{x} is a singular \code{dgCMatrix},
-  then the second call below will return \code{NA} instead of
-  throwing an error:
-  \preformatted{    lu(x, errSing = FALSE); lu(x, errSing = TRUE)}
+  \code{is(., "sparseLU")}.
 }
 \seealso{
   Classes \code{\linkS4class{denseLU}} and
