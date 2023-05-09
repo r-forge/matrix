@@ -150,6 +150,7 @@ setMethod("determinant", signature(x = .cl, logarithm = "logical"),
               trf <- BunchKaufman(x, warnSing = FALSE)
               determinant(trf, logarithm, ...)
           })
+rm(.cl)
 
 for(.cl in c("dpoMatrix", "dppMatrix"))
 setMethod("determinant", signature(x = .cl, logarithm = "logical"),
@@ -157,6 +158,7 @@ setMethod("determinant", signature(x = .cl, logarithm = "logical"),
               trf <- Cholesky(x)
               determinant(trf, logarithm, ...)
           })
+rm(.cl)
 
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
