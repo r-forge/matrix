@@ -15,7 +15,7 @@ function(nrow.a, nrow.b) {
 
 .solve.checkCond <-
 function(a, tol, rcond.a = rcond(a)) {
-    if(tol > 0 && rcond.a < tol)
+    if(tol > 0 && a@Dim[1L] > 0L && rcond.a < tol)
         stop(gettextf("'a' is computationally singular, rcond(a)=%g", rcond.a),
              domain = NA)
 }
@@ -39,7 +39,7 @@ function(a, tol, rcond.a = rcond(a)) {
 ##
 .solve.checkCondBound <-
 function(u, tol, rad.u = range(abs(diag(u, names = FALSE)))) {
-    if(tol > 0) {
+    if(tol > 0 && u@Dim[1L] > 0L) {
         r <- rad.u[1L] / rad.u[2L]
         if(r < tol)
             stop(gettextf("'a' is computationally singular, min(d)/max(d)=%g, d=abs(diag(U))",

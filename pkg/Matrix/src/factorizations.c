@@ -1432,7 +1432,7 @@ SEXP denseLU_solve(SEXP a, SEXP b)
     SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym));			\
     int *padim = INTEGER(adim), m = padim[0], n = m;			\
     if ((_MAYBE_NOT_SQUARE_) && padim[1] != m)				\
-	error(_("'a' is not square"));		\
+	error(_("'a' is not square"));					\
     UNPROTECT(1); /* adim */						\
     if (!isNull(b)) {							\
 	SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));		\
@@ -1442,44 +1442,55 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	n = pbdim[1];							\
 	UNPROTECT(1); /* bdim */					\
     }
+
+#define SOLVE_FINISH							\
+    SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),		\
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym));		\
+    if (isNull(b))							\
+	revDN(rdimnames, adimnames);					\
+    else {								\
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym));	\
+	solveDN(rdimnames, adimnames, bdimnames);			\
+	UNPROTECT(1); /* bdimnames */					\
+    }									\
+    UNPROTECT(2); /* adimnames, rdimnames */
     
     SOLVE_START(1);
     SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
-	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
-	rx,
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-	apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
-    int *prdim = INTEGER(rdim), info;
+	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+    int *prdim = INTEGER(rdim);
     prdim[0] = m;
     prdim[1] = n;
-    if (isNull(b)) {
-	revDN(rdimnames, adimnames);
-	PROTECT(rx = duplicate(ax));
-	int lwork = -1;
-	double work0, *work = &work0;
-	F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
-			 work, &lwork, &info);
-	ERROR_LAPACK_1(dgetri, info);
-	lwork = (int) work0;
-	work = (double *) R_alloc((size_t) lwork, sizeof(double));
-	F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
-			 work, &lwork, &info);
-	ERROR_LAPACK_2(dgetri, info, 2, U);
-    } else {
-	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
-	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-	solveDN(rdimnames, adimnames, bdimnames);
-	rx = duplicate(bx);
-	UNPROTECT(2); /* bx, bdimnames */
-	PROTECT(rx);
-	F77_CALL(dgetrs)("N", &m, &n, REAL(ax), &m, INTEGER(apivot),
-			 REAL(rx), &m, &info FCONE);
-	ERROR_LAPACK_1(dgetrs, info);
+    if (m > 0) {
+	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	    apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
+	int info;
+	if (isNull(b)) {
+	    PROTECT(rx = duplicate(ax));
+	    int lwork = -1;
+	    double work0, *work = &work0;
+	    F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+			     work, &lwork, &info);
+	    ERROR_LAPACK_1(dgetri, info);
+	    lwork = (int) work0;
+	    work = (double *) R_alloc((size_t) lwork, sizeof(double));
+	    F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+			     work, &lwork, &info);
+	    ERROR_LAPACK_2(dgetri, info, 2, U);
+	} else {
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    rx = duplicate(bx);
+	    UNPROTECT(1); /* bx */
+	    PROTECT(rx);
+	    F77_CALL(dgetrs)("N", &m, &n, REAL(ax), &m, INTEGER(apivot),
+			     REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_1(dgetrs, info);
+	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(3); /* rx, apivot, ax */
     }
-    SET_SLOT(r, Matrix_xSym, rx);
-    UNPROTECT(7); /* rx, apivot, ax, adimnames, rdimnames, rdim, r */
+    SOLVE_FINISH;
+    UNPROTECT(2); /* rdim, r */
     return r;
 }
 
@@ -1491,49 +1502,49 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b, SEXP packed)
 	((unpacked) ? "dsyMatrix" : "dspMatrix");
     SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
 	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
-	rx,
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-	apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
-    int *prdim = INTEGER(rdim), info;
-    char ul = *CHAR(STRING_ELT(auplo, 0));
+	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
+    int *prdim = INTEGER(rdim);
     prdim[0] = m;
     prdim[1] = n;
-    if (isNull(b)) {
-	revDN(rdimnames, adimnames);
-	PROTECT(rx = duplicate(ax));
+    if (isNull(b))
 	SET_SLOT(r, Matrix_uploSym, auplo);
-	double *work = (double *) R_alloc((size_t) m, sizeof(double));
-	if (unpacked) {
-	    F77_CALL(dsytri)(&ul, &m, REAL(rx), &m, INTEGER(apivot),
-			     work, &info FCONE);
-	    ERROR_LAPACK_2(dsytri, info, 2, D);
+    if (m > 0) {
+	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	    apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
+	char ul = *CHAR(STRING_ELT(auplo, 0));
+	int info;
+	if (isNull(b)) {
+	    PROTECT(rx = duplicate(ax));
+	    double *work = (double *) R_alloc((size_t) m, sizeof(double));
+	    if (unpacked) {
+		F77_CALL(dsytri)(&ul, &m, REAL(rx), &m, INTEGER(apivot),
+				 work, &info FCONE);
+		ERROR_LAPACK_2(dsytri, info, 2, D);
+	    } else {
+		F77_CALL(dsptri)(&ul, &m, REAL(rx),     INTEGER(apivot),
+				 work, &info FCONE);
+		ERROR_LAPACK_2(dsptri, info, 2, D);
+	    }
 	} else {
-	    F77_CALL(dsptri)(&ul, &m, REAL(rx),     INTEGER(apivot),
-			     work, &info FCONE);
-	    ERROR_LAPACK_2(dsptri, info, 2, D);
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    rx = duplicate(bx);
+	    UNPROTECT(1); /* bx */
+	    PROTECT(rx);
+	    if (unpacked) {
+		F77_CALL(dsytrs)(&ul, &m, &n, REAL(ax), &m, INTEGER(apivot),
+				 REAL(rx), &m, &info FCONE);
+		ERROR_LAPACK_1(dsytrs, info);
+	    } else {
+		F77_CALL(dsptrs)(&ul, &m, &n, REAL(ax),     INTEGER(apivot),
+				 REAL(rx), &m, &info FCONE);
+		ERROR_LAPACK_1(dsptrs, info);
+	    }
 	}
-    } else {
-	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
-	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-	solveDN(rdimnames, adimnames, bdimnames);
-	rx = duplicate(bx);
-	UNPROTECT(2); /* bx, bdimnames */
-	PROTECT(rx);
-	if (unpacked) {
-	    F77_CALL(dsytrs)(&ul, &m, &n, REAL(ax), &m, INTEGER(apivot),
-			     REAL(rx), &m, &info FCONE);
-	    ERROR_LAPACK_1(dsytrs, info);
-	} else {
-	    F77_CALL(dsptrs)(&ul, &m, &n, REAL(ax),     INTEGER(apivot),
-			     REAL(rx), &m, &info FCONE);
-	    ERROR_LAPACK_1(dsptrs, info);
-	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(3); /* rx, apivot, ax */
     }
-    SET_SLOT(r, Matrix_xSym, rx);
-    UNPROTECT(8); /* rx, apivot, auplo, ax, adimnames, rdimnames, rdim, r */
+    SOLVE_FINISH;
+    UNPROTECT(3); /* auplo, rdim, r */
     return r;
 }
 
@@ -1545,45 +1556,46 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 	((unpacked) ? "dpoMatrix" : "dppMatrix");
     SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
 	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
-	rx,
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
 	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
-    int *prdim = INTEGER(rdim), info;
-    char ul = *CHAR(STRING_ELT(auplo, 0));
+    int *prdim = INTEGER(rdim);
     prdim[0] = m;
     prdim[1] = n;
-    if (isNull(b)) {
-	revDN(rdimnames, adimnames);
-	PROTECT(rx = duplicate(ax));
+    if (isNull(b))
 	SET_SLOT(r, Matrix_uploSym, auplo);
-	if (unpacked) {
-	    F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
-	    ERROR_LAPACK_2(dpotri, info, 2, L);
+    if (m > 0) {
+	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	char ul = *CHAR(STRING_ELT(auplo, 0));
+	int info;
+	if (isNull(b)) {
+	    PROTECT(rx = duplicate(ax));
+	    SET_SLOT(r, Matrix_uploSym, auplo);
+	    if (unpacked) {
+		F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
+		ERROR_LAPACK_2(dpotri, info, 2, L);
+	    } else {
+		F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
+		ERROR_LAPACK_2(dpptri, info, 2, L);
+	    }
 	} else {
-	    F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
-	    ERROR_LAPACK_2(dpptri, info, 2, L);
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    rx = duplicate(bx);
+	    UNPROTECT(1); /* bx */
+	    PROTECT(rx);
+	    if (unpacked) {
+		F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
+				 REAL(rx), &m, &info FCONE);
+		ERROR_LAPACK_1(dpotrs, info);
+	    } else {
+		F77_CALL(dpptrs)(&ul, &m, &n, REAL(ax),
+				 REAL(rx), &m, &info FCONE);
+		ERROR_LAPACK_1(dpptrs, info);
+	    }
 	}
-    } else {
-	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
-	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-	solveDN(rdimnames, adimnames, bdimnames);
-	rx = duplicate(bx);
-	UNPROTECT(2); /* bx, bdimnames */
-	PROTECT(rx);
-	if (unpacked) {
-	    F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
-			     REAL(rx), &m, &info FCONE);
-	    ERROR_LAPACK_1(dpotrs, info);
-	} else {
-	    F77_CALL(dpptrs)(&ul, &m, &n, REAL(ax),
-			     REAL(rx), &m, &info FCONE);
-	    ERROR_LAPACK_1(dpptrs, info);
-	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(2); /* rx, ax */
     }
-    SET_SLOT(r, Matrix_xSym, rx);
-    UNPROTECT(7); /* rx, auplo, ax, adimnames, rdimnames, rdim, r */
+    SOLVE_FINISH;
+    UNPROTECT(3); /* auplo, rdim, r */
     return r;
 }
 
@@ -1730,18 +1742,6 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	B = cs_spfree(B);
     }
     
-#define SOLVE_FINISH							\
-    SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),		\
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym));		\
-    if (isNull(b))							\
-	revDN(rdimnames, adimnames);					\
-    else {								\
-	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym));	\
-	solveDN(rdimnames, adimnames, bdimnames);			\
-	UNPROTECT(1); /* bdimnames */					\
-    }									\
-    UNPROTECT(2); /* adimnames, rdimnames */
-
     SOLVE_FINISH;
     UNPROTECT(5); /* r, aq, ap, aU, aL */
     return r;
@@ -1857,48 +1857,51 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b, SEXP packed)
 	((unpacked) ? "dtrMatrix" : "dtpMatrix");
     SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
 	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
-	rx,
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
 	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
 	adiag = PROTECT(GET_SLOT(a, Matrix_diagSym));
-    int *prdim = INTEGER(rdim), info;
-    char ul = *CHAR(STRING_ELT(auplo, 0)), di = *CHAR(STRING_ELT(adiag, 0));
+    int *prdim = INTEGER(rdim);
     prdim[0] = m;
     prdim[1] = n;
     if (isNull(b)) {
-	revDN(rdimnames, adimnames);
-	PROTECT(rx = duplicate(ax));
 	SET_SLOT(r, Matrix_uploSym, auplo);
 	SET_SLOT(r, Matrix_diagSym, adiag);
-	if (unpacked) {
-	    F77_CALL(dtrtri)(&ul, &di, &m, REAL(rx), &m, &info FCONE FCONE);
-	    ERROR_LAPACK_2(dtrtri, info, 2, A);
-	} else {
-	    F77_CALL(dtptri)(&ul, &di, &m, REAL(rx),     &info FCONE FCONE);
-	    ERROR_LAPACK_2(dtptri, info, 2, A);
-	}
-    } else {
-	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
-	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-	solveDN(rdimnames, adimnames, bdimnames);
-	rx = duplicate(bx);
-	UNPROTECT(2); /* bx, bdimnames */
-	PROTECT(rx);
-	if (unpacked) {
-	    F77_CALL(dtrtrs)(&ul, "N", &di, &m, &n, REAL(ax), &m,
-			     REAL(rx), &m, &info FCONE FCONE FCONE);
-	    ERROR_LAPACK_1(dtrtrs, info);
-	} else {
-	    // https://bugs.r-project.org/show_bug.cgi?id=18534
-	    F77_CALL(dtptrs)(&ul, "N", &di, &m, &n, REAL(ax),
-			     REAL(rx), &m, &info FCONE FCONE);
-	    ERROR_LAPACK_1(dtptrs, info);
-	}
     }
-    SET_SLOT(r, Matrix_xSym, rx);
-    UNPROTECT(8); /* rx, adiag, auplo, ax, adimnames, rdimnames, rdim, r */
+    if (m > 0) {
+	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	char ul = *CHAR(STRING_ELT(auplo, 0)), di = *CHAR(STRING_ELT(adiag, 0));
+	int info;
+	if (isNull(b)) {
+	    PROTECT(rx = duplicate(ax));
+	    SET_SLOT(r, Matrix_uploSym, auplo);
+	    SET_SLOT(r, Matrix_diagSym, adiag);
+	    if (unpacked) {
+		F77_CALL(dtrtri)(&ul, &di, &m, REAL(rx), &m, &info FCONE FCONE);
+		ERROR_LAPACK_2(dtrtri, info, 2, A);
+	    } else {
+		F77_CALL(dtptri)(&ul, &di, &m, REAL(rx),     &info FCONE FCONE);
+		ERROR_LAPACK_2(dtptri, info, 2, A);
+	    }
+	} else {
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    rx = duplicate(bx);
+	    UNPROTECT(1); /* bx */
+	    PROTECT(rx);
+	    if (unpacked) {
+		F77_CALL(dtrtrs)(&ul, "N", &di, &m, &n, REAL(ax), &m,
+				 REAL(rx), &m, &info FCONE FCONE FCONE);
+		ERROR_LAPACK_1(dtrtrs, info);
+	    } else {
+		// https://bugs.r-project.org/show_bug.cgi?id=18534
+		F77_CALL(dtptrs)(&ul, "N", &di, &m, &n, REAL(ax),
+				 REAL(rx), &m, &info FCONE FCONE);
+		ERROR_LAPACK_1(dtptrs, info);
+	    }
+	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(2); /* rx, ax */
+    }
+    SOLVE_FINISH;
+    UNPROTECT(4); /* adiag, auplo, rdim, r */
     return r;
 }
 
