@@ -31,7 +31,7 @@
   The column vectors of \eqn{Q} are the Schur vectors of \eqn{A},
   and \eqn{T} is the Schur form of \eqn{A}.
   
-  Methods are built on LAPACK routine \code{DGEES}.
+  Methods are built on LAPACK routine \code{dgees}.
 }
 \usage{
 Schur(x, vectors = TRUE, \dots)

@@ -43,7 +43,7 @@
   upper trapezoidal matrix.
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routine \code{DGETRF}, which does not permute columns,
+  LAPACK routine \code{dgetrf}, which does not permute columns,
   so that \eqn{P_{2}}{P2} is an identity matrix.
 
   Methods for \code{\linkS4class{sparseMatrix}} are built on
@@ -53,8 +53,8 @@
 \usage{
 lu(x, \dots)
 \S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
-\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = NA_integer_, tol = 1,
-   keep.dimnames = TRUE, \dots)
+\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = NA_integer_,
+  tol = 1, \dots)
 \S4method{lu}{dsyMatrix}(x, cache = TRUE, \dots)
 \S4method{lu}{dsCMatrix}(x, cache = TRUE, \dots)
 \S4method{lu}{matrix}(x, \dots)
@@ -85,8 +85,6 @@ lu(x, \dots)
     where \code{a} is the maximum in absolute value of the
     other possible pivot elements.
     Set \code{tol < 1} only if you know what you are doing.}
-  \item{keep.dimnames}{a logical indicating if \code{x@Dimnames}
-    should be propagated to the result as \code{lu(x)@Dimnames}.}
   \item{cache}{a logical indicating if the result should be
     cached in \code{x@factors[["LU"]]}.  Note that
     caching is experimental and that only methods for classes

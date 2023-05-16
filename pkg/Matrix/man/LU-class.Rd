@@ -33,10 +33,10 @@
     \item{\code{x}}{a numeric vector of length \code{prod(Dim)} storing
       the triangular \eqn{L} and \eqn{U} factors together in a packed
       format.  The details of the representation are specified by the
-      manual for LAPACK routine \code{DGETRF}.}
+      manual for LAPACK routine \code{dgetrf}.}
     \item{\code{perm}}{an integer vector of length \code{min(Dim)}
       specifying row interchanges as described in the manual for
-      LAPACK routine \code{DGETRF}.}
+      LAPACK routine \code{dgetrf}.}
   }
 }
 \section{Extends}{

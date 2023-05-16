@@ -52,10 +52,10 @@
       \code{n*n} (\code{BunchKaufman}) or
       \code{n*(n+1)/2} (\code{pBunchKaufman}), where \code{n=Dim[1]}.
       The details of the representation are specified by the manual
-      for LAPACK routines \code{DSYTRF} and \code{DSPTRF}.}
+      for LAPACK routines \code{dsytrf} and \code{dsptrf}.}
     \item{\code{perm}}{an integer vector of length \code{n=Dim[1]}
       specifying row and column interchanges as described in the manual
-      for LAPACK routines \code{DSYTRF} and \code{DSPTRF}.}
+      for LAPACK routines \code{dsytrf} and \code{dsptrf}.}
   }
 }
 \section{Extends}{
@@ -83,6 +83,8 @@
       or its logarithm.}
     \item{\code{expand2}}{\code{signature(x = "p?BunchKaufman")}:
       see \code{\link{expand2-methods}}.}
+    \item{\code{solve}}{\code{signature(a = "p?BunchKaufman", b = .)}:
+      see \code{\link{solve-methods}}.}
   }
 }
 \note{

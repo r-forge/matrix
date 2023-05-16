@@ -32,7 +32,7 @@
   \eqn{P_{1}}{P1} is a permutation matrix.
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{DPOTRF} and \code{DPPTRF}, which do
+  LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
   not permute rows or columns, so that \eqn{P_{1}}{P1} is an
   identity matrix.
   

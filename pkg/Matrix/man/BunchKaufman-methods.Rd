@@ -30,7 +30,7 @@
   is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular
   matrices, each having nonzero entries above the diagonal in 1 or 2 columns.
   
-  Methods are built on LAPACK routines \code{DSYTRF} and \code{DSPTRF}.
+  Methods are built on LAPACK routines \code{dsytrf} and \code{dsptrf}.
 }
 \usage{
 BunchKaufman(x, \dots)

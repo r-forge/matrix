@@ -38,7 +38,7 @@
   \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{DPOTRF} and \code{DPPTRF}, which do
+  LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
   not permute rows or columns, so that \eqn{P_{1}}{P1} is an
   identity matrix.
   
