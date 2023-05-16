@@ -553,8 +553,11 @@ forceDiagonal <- function(x, diag = NA_character_) {
 .dense2g <- function(from, kind = ".")
     .Call(R_dense_as_general, from, kind)
 
-.sparse2g <- function(from)
+.sparse2g <- function(from, kind = ".") {
+    if(!identical(kind, "."))
+        from <- .Call(R_sparse_as_kind, from, kind, FALSE)
     .Call(R_sparse_as_general, from)
+}
 
 .dense2m <- function(from)
     .Call(R_dense_as_matrix, from)
