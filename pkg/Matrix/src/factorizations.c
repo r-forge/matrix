@@ -1741,7 +1741,6 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	PROTECT(r = cs2dgC(B, "dgCMatrix"));
 	B = cs_spfree(B);
     }
-    
     SOLVE_FINISH;
     UNPROTECT(5); /* r, aq, ap, aU, aL */
     return r;
@@ -1843,7 +1842,6 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	SET_SLOT(r, Matrix_uploSym, uplo);
 	UNPROTECT(1); /* uplo */
     }
-    
     SOLVE_FINISH;
     UNPROTECT(1); /* r */
     return r;
@@ -1910,15 +1908,22 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
     SOLVE_START(0);
     SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
     char ul = *CHAR(STRING_ELT(auplo, 0));
-    cs *A = dgC2cs(a);
     int j;
+    cs *A = dgC2cs(a);
     if (!asLogical(sparse)) {
+	const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
+	PROTECT(r = NEW_OBJECT_OF_CLASS(cl));
+
+	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	int *prdim = INTEGER(rdim);
+	prdim[0] = m;
+	prdim[1] = n;
+	UNPROTECT(1); /* rdim */
+
 	R_xlen_t mn = (R_xlen_t) m * n;
 	SEXP rx = PROTECT(allocVector(REALSXP, mn));
 	double *prx = REAL(rx);
 	if (isNull(b)) {
-	    PROTECT(r = NEW_OBJECT_OF_CLASS("dtrMatrix"));
-	    SET_SLOT(r, Matrix_uploSym, auplo);
 	    Matrix_memset(prx, 0, mn, sizeof(double));
 	    for (j = 0; j < n; ++j) {
 		prx[j] = 1.0;
@@ -1929,7 +1934,6 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		prx += m;
 	    }
 	} else {
-	    PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
 	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 	    double *pbx = REAL(bx);
 	    Matrix_memcpy(prx, pbx, mn, sizeof(double));
@@ -1944,14 +1948,10 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	}
 	SET_SLOT(r, Matrix_xSym, rx);
 	UNPROTECT(1); /* rx */
-
-	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
-	UNPROTECT(1); /* rdim */
     } else {
+	const char *cl = (isNull(b)) ? "dtCMatrix" : "dgCMatrix";
 	cs *B, *X;
+	
 	if (isNull(b)) {
 	    B = cs_spalloc(m, n, n, 1, 0);
 	    if (!B)
@@ -2026,15 +2026,12 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	X = cs_spfree(X);
 	if (!B)
 	    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
-	
-	if (isNull(b)) {
-	    PROTECT(r = cs2dgC(B, "dtCMatrix"));
-	    SET_SLOT(r, Matrix_uploSym, auplo);
-	} else
-	    PROTECT(r = cs2dgC(B, "dgCMatrix"));
+
+	PROTECT(r = cs2dgC(B, cl));
 	B = cs_spfree(B);
     }
-
+    if (isNull(b))
+	SET_SLOT(r, Matrix_uploSym, auplo);
     SOLVE_FINISH;
     UNPROTECT(2); /* r, auplo */
     return r;
