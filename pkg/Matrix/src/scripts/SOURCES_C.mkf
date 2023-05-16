@@ -11,10 +11,8 @@ SOURCES_C =  \
             dgeMatrix.c \
             dpoMatrix.c \
             dppMatrix.c \
-            dsCMatrix.c \
             dsyMatrix.c \
             dspMatrix.c \
-            dtCMatrix.c \
             dtrMatrix.c \
             dtpMatrix.c \
             factorizations.c \

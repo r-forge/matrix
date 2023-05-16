@@ -4,30 +4,18 @@
 #include "Mutils.h"
 #include "cs_utils.h"
 
-/* defined in factorizations.c : */
-SEXP dgCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP dgCMatrix_orf(SEXP, SEXP, SEXP, SEXP);
-
 SEXP compressed_non_0_ij(SEXP x, SEXP colP);
+SEXP dgCMatrix_lusol(SEXP x, SEXP y);
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord);
 SEXP dgCMatrix_cholsol(SEXP x, SEXP y);
-SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp, SEXP give_sparse);
-
-/* MJ: unused */
-#if 0
-SEXP dgCMatrix_lusol(SEXP x, SEXP y);
-#endif /* MJ */
 
 /* MJ: no longer needed ... replacement in ./factorizations.c */
 #if 0
 SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames);
-
-#ifdef Matrix_WithSPQR
 SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol);
-#endif
-
 SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp,
 		  SEXP error_on_sing, SEXP keep_dimnames);
+SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP bp, SEXP give_sparse);
 #endif /* MJ */
 
 /* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */

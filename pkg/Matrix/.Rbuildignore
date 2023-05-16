@@ -52,6 +52,8 @@ R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
 # from '-Wpedantic' :
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
+src/dsCMatrix\.[ch]$
+src/dtCMatrix\.[ch]$
 src/dgTMatrix\.[ch]$
 src/dtTMatrix\.[ch]$
 src/lgCMatrix\.[ch]$

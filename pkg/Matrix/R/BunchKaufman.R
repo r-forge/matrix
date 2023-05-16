@@ -37,6 +37,22 @@ setAs("pBunchKaufman", "dtpMatrix",
           to
       })
 
+.def.unpacked <- .def.packed <- function(x, ...) {
+    r <- .Call(BunchKaufman_expand, x, .PACKED)
+    dn <- x@Dimnames
+    if(b <- length(r) - 1L)
+        r <- if(x@uplo == "U")
+                 c(lapply(r[(b + 1L):2], t), r)
+             else c(r, lapply(r[b:1L], t))
+    r[[1L]]@Dimnames <- c(dn[1L], list(NULL))
+    r[[length(r)]]@Dimnames <- c(list(NULL), dn[2L])
+    r
+}
+body(.def.unpacked) <-
+    do.call(substitute, list(body(.def.unpacked), list(.PACKED = FALSE)))
+body(.def.packed) <-
+    do.call(substitute, list(body(.def.packed  ), list(.PACKED =  TRUE)))
+
 ## returning:
 ##
 ## list(U[1]', P[1]', ..., U[b]', P[b]', D, P[b], U[b], ..., P[1], U[1])
@@ -46,22 +62,11 @@ setAs("pBunchKaufman", "dtpMatrix",
 ##
 ## list(P[1], L[1], ..., P[b], L[b], D, L[b]', P[b]', ..., L[1]', P[1]')
 ##     where A = L D L' and L = P[1] L[1] ... P[b] L[b]
-##
-## as described in the documentation for LAPACK 'ds[yp]trf'
-for(.cl in c("BunchKaufman", "pBunchKaufman"))
-setMethod("expand2", signature(x = .cl),
-          function(x, ...) {
-              r <- .Call(BunchKaufman_expand, x)
-              dn <- x@Dimnames
-              if(b <- length(r) - 1L)
-                  r <- if(x@uplo == "U")
-                           c(lapply(r[(b + 1L):2], t), r)
-                       else c(r, lapply(r[b:1L], t))
-              r[[1L]]@Dimnames <- c(dn[1L], list(NULL))
-              r[[length(r)]]@Dimnames <- c(list(NULL), dn[2L])
-              r
-          })
-rm(.cl)
+setMethod("expand2", signature(x =  "BunchKaufman"), .def.unpacked)
+setMethod("expand2", signature(x = "pBunchKaufman"), .def.packed)
+
+rm(.def.unpacked, .def.packed)
+
 
 if(FALSE) {
 ## FIXME: but expansion is wrong for uplo = "U" ??

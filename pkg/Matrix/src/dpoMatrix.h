@@ -7,7 +7,5 @@
 SEXP dpoMatrix_trf_(SEXP, int);
 
 SEXP dpoMatrix_rcond(SEXP obj);
-SEXP dpoMatrix_solve(SEXP a);
-SEXP dpoMatrix_matrix_solve(SEXP a, SEXP b);
 
 #endif

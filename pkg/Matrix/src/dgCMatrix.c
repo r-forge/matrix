@@ -161,9 +161,6 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
     return ans;
 }
 
-/* MJ: unused */
-#if 0 
-
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
@@ -181,8 +178,6 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
     UNPROTECT(1);
     return ycp;
 }
-
-#endif /* MJ */
 
 // called from package MatrixModels's R code
 SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
@@ -226,6 +221,69 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
 
     UNPROTECT(1);
     return ycp;
+}
+
+// called from package MatrixModels's R code:
+SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
+{
+    /* Solve Sparse Least Squares X %*% beta ~= y  with dense RHS y,
+     * where X = t(x) i.e. we pass  x = t(X)  as argument,
+     * via  "Cholesky(X'X)" .. well not really:
+     * cholmod_factorize("x", ..) finds L in  X'X = L'L directly */
+    CHM_SP cx = AS_CHM_SP(x);
+    /* FIXME: extend this to work in multivariate case, i.e. y a matrix with > 1 column ! */
+    SEXP y_ = PROTECT(coerceVector(y, REALSXP));
+    CHM_DN cy = AS_CHM_DN(y_), rhs, cAns, resid;
+    /* const -- but do not fit when used in calls: */
+    double one[] = {1,0}, zero[] = {0,0}, neg1[] = {-1,0};
+    const char *nms[] = {"L", "coef", "Xty", "resid", ""};
+    SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
+    R_CheckStack();
+
+    size_t n = cx->ncol;/* #{obs.} {x = t(X) !} */
+    if (n < cx->nrow || n <= 0)
+	error(_("dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"));
+    if (cy->nrow != n)
+	error(_("Dimensions of system to be solved are inconsistent"));
+    rhs = cholmod_allocate_dense(cx->nrow, 1, cx->nrow, CHOLMOD_REAL, &c);
+    /* cholmod_sdmult(A, transp, alpha, beta, X, Y, &c):
+     *		Y := alpha*(A*X) + beta*Y or alpha*(A'*X) + beta*Y ;
+     * here: rhs := 1 * x %*% y + 0 =  x %*% y =  X'y  */
+    if (!(cholmod_sdmult(cx, 0 /* trans */, one, zero, cy, rhs, &c)))
+	error(_("cholmod_sdmult error (rhs)"));
+    CHM_FR L = cholmod_analyze(cx, &c);
+    if (!cholmod_factorize(cx, L, &c))
+	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+/* FIXME: Do this in stages so an "effects" vector can be calculated */
+    if (!(cAns = cholmod_solve(CHOLMOD_A, L, rhs, &c)))
+	error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
+	      c.status, L->minor, L->n);
+    /* L : */
+    SET_VECTOR_ELT(ans, 0, chm_factor_to_SEXP(L, 0));
+    /* coef : */
+            SET_VECTOR_ELT(ans, 1, allocVector(REALSXP,  cx->nrow));
+    Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
+    /* X'y : */
+/* FIXME: Change this when the "effects" vector is available */
+            SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
+    Memcpy(REAL(VECTOR_ELT(ans, 2)), (double*)(rhs->x), cx->nrow);
+    /* resid := y */
+    resid = cholmod_copy_dense(cy, &c);
+    /* cholmod_sdmult(A, transp, alp, bet, X, Y, &c):
+     *		Y := alp*(A*X) + bet*Y or alp*(A'*X) + beta*Y ;
+     * here: resid := -1 * x' %*% coef + 1 * y = y - X %*% coef  */
+    if (!(cholmod_sdmult(cx, 1/* trans */, neg1, one, cAns, resid, &c)))
+	error(_("cholmod_sdmult error (resid)"));
+    /* FIXME: for multivariate case, i.e. resid  *matrix* with > 1 column ! */
+            SET_VECTOR_ELT(ans, 3,   allocVector(REALSXP, n));
+    Memcpy(REAL(VECTOR_ELT(ans, 3)), (double*)(resid->x), n);
+
+    cholmod_free_factor(&L, &c);
+    cholmod_free_dense(&rhs, &c);
+    cholmod_free_dense(&cAns, &c);
+    UNPROTECT(2);
+    return ans;
 }
 
 /* MJ: no longer needed ... replacement in ./factorizations.c */
@@ -283,7 +341,6 @@ SEXP dgCMatrix_QR(SEXP Ap, SEXP order, SEXP keep_dimnames)
     return ans;
 }
 
-#ifdef Matrix_WithSPQR
 /**
  * Return a SuiteSparse QR factorization of the sparse matrix A
  *
@@ -343,8 +400,6 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
     UNPROTECT(1);
     return ans;
 }
-#endif
-/* Matrix_WithSPQR */
 
 /* Modified version of Tim Davis's cs_lu_mex.c file for MATLAB */
 void install_lu(SEXP Ap, int order, double tol,
@@ -433,8 +488,6 @@ SEXP dgCMatrix_LU(SEXP Ap, SEXP orderp, SEXP tolp,
     return ans;
 }
 
-#endif /* MJ */
-
 SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
 // FIXME:  add  'keep_dimnames' as argument
 {
@@ -460,12 +513,11 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     Matrix_Calloc(x, n, double);
 
     if (isNull(lu = get_factor(Ap, "LU"))) {
-	SEXP doError = PROTECT(ScalarLogical(1)),
-	    keepDimnames = PROTECT(ScalarLogical(0)),
-	    order = PROTECT(ScalarInteger(2)),
-	    tol = PROTECT(ScalarReal(1.0));
-	lu = dgCMatrix_trf(Ap, doError, keepDimnames, order, tol);
-	UNPROTECT(4);
+	SEXP order = PROTECT(ScalarInteger(2)),
+	    tol = PROTECT(ScalarReal(1.0)),
+	    doError = PROTECT(ScalarLogical(1));
+	lu = dgCMatrix_trf(Ap, order, tol, doError);
+	UNPROTECT(3);
     }
     PROTECT(lu);
     qslot = GET_SLOT(lu, Matrix_qSym);
@@ -495,68 +547,7 @@ SEXP dgCMatrix_matrix_solve(SEXP Ap, SEXP b, SEXP give_sparse)
     return ans;
 }
 
-// called from package MatrixModels's R code:
-SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
-{
-    /* Solve Sparse Least Squares X %*% beta ~= y  with dense RHS y,
-     * where X = t(x) i.e. we pass  x = t(X)  as argument,
-     * via  "Cholesky(X'X)" .. well not really:
-     * cholmod_factorize("x", ..) finds L in  X'X = L'L directly */
-    CHM_SP cx = AS_CHM_SP(x);
-    /* FIXME: extend this to work in multivariate case, i.e. y a matrix with > 1 column ! */
-    SEXP y_ = PROTECT(coerceVector(y, REALSXP));
-    CHM_DN cy = AS_CHM_DN(y_), rhs, cAns, resid;
-    /* const -- but do not fit when used in calls: */
-    double one[] = {1,0}, zero[] = {0,0}, neg1[] = {-1,0};
-    const char *nms[] = {"L", "coef", "Xty", "resid", ""};
-    SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
-    R_CheckStack();
-
-    size_t n = cx->ncol;/* #{obs.} {x = t(X) !} */
-    if (n < cx->nrow || n <= 0)
-	error(_("dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"));
-    if (cy->nrow != n)
-	error(_("Dimensions of system to be solved are inconsistent"));
-    rhs = cholmod_allocate_dense(cx->nrow, 1, cx->nrow, CHOLMOD_REAL, &c);
-    /* cholmod_sdmult(A, transp, alpha, beta, X, Y, &c):
-     *		Y := alpha*(A*X) + beta*Y or alpha*(A'*X) + beta*Y ;
-     * here: rhs := 1 * x %*% y + 0 =  x %*% y =  X'y  */
-    if (!(cholmod_sdmult(cx, 0 /* trans */, one, zero, cy, rhs, &c)))
-	error(_("cholmod_sdmult error (rhs)"));
-    CHM_FR L = cholmod_analyze(cx, &c);
-    if (!cholmod_factorize(cx, L, &c))
-	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-/* FIXME: Do this in stages so an "effects" vector can be calculated */
-    if (!(cAns = cholmod_solve(CHOLMOD_A, L, rhs, &c)))
-	error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
-	      c.status, L->minor, L->n);
-    /* L : */
-    SET_VECTOR_ELT(ans, 0, chm_factor_to_SEXP(L, 0));
-    /* coef : */
-            SET_VECTOR_ELT(ans, 1, allocVector(REALSXP,  cx->nrow));
-    Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
-    /* X'y : */
-/* FIXME: Change this when the "effects" vector is available */
-            SET_VECTOR_ELT(ans, 2, allocVector(REALSXP, cx->nrow));
-    Memcpy(REAL(VECTOR_ELT(ans, 2)), (double*)(rhs->x), cx->nrow);
-    /* resid := y */
-    resid = cholmod_copy_dense(cy, &c);
-    /* cholmod_sdmult(A, transp, alp, bet, X, Y, &c):
-     *		Y := alp*(A*X) + bet*Y or alp*(A'*X) + beta*Y ;
-     * here: resid := -1 * x' %*% coef + 1 * y = y - X %*% coef  */
-    if (!(cholmod_sdmult(cx, 1/* trans */, neg1, one, cAns, resid, &c)))
-	error(_("cholmod_sdmult error (resid)"));
-    /* FIXME: for multivariate case, i.e. resid  *matrix* with > 1 column ! */
-            SET_VECTOR_ELT(ans, 3,   allocVector(REALSXP, n));
-    Memcpy(REAL(VECTOR_ELT(ans, 3)), (double*)(resid->x), n);
-
-    cholmod_free_factor(&L, &c);
-    cholmod_free_dense(&rhs, &c);
-    cholmod_free_dense(&cAns, &c);
-    UNPROTECT(2);
-    return ans;
-}
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer CRsparse_(col|row)Sums() */
 #if 0

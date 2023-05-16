@@ -55,59 +55,6 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(rcond);
 }
 
-SEXP dtrMatrix_solve(SEXP a)
-{
-    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
-	dim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(a, Matrix_diagSym)),
-	x;
-    PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(x = GET_SLOT(a, Matrix_xSym), &pid);
-    REPROTECT(x = duplicate(x), pid);
-    
-    SET_SLOT(val, Matrix_DimSym, dim);
-    set_reversed_DimNames(val, dimnames);
-    SET_SLOT(val, Matrix_uploSym, uplo);
-    SET_SLOT(val, Matrix_diagSym, diag);
-    SET_SLOT(val, Matrix_xSym, x);
-    
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x);
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-    
-    F77_CALL(dtrtri)(ul, di, pdim, px, pdim, &info FCONE FCONE);
-
-    UNPROTECT(6);
-    return val;
-}
-
-SEXP dtrMatrix_matrix_solve(SEXP a, SEXP b)
-{
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0)),
-	adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-	bdim = PROTECT(GET_SLOT(val, Matrix_DimSym));
-    int *padim = INTEGER(adim), *pbdim = INTEGER(bdim);
-    
-    if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
-	error(_("dimensions of system to be solved are inconsistent"));
-    
-    SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(a, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(a, Matrix_xSym)),
-	y = PROTECT(GET_SLOT(val, Matrix_xSym));
-    
-    double *px = REAL(x), *py = REAL(y), one = 1.0;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-
-    F77_CALL(dtrsm)("L", ul, "N", di, pbdim, pbdim + 1, &one,
-		    px, pbdim, py, pbdim FCONE FCONE FCONE FCONE);
-
-    UNPROTECT(7);
-    return val;
-}
-
 SEXP dtrMatrix_chol2inv(SEXP a)
 {
     SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dpoMatrix")),

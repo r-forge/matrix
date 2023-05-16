@@ -1,3 +1,4 @@
+
 ## METHODS FOR GENERIC: lu
 ## pivoted LU factorization, returning denseLU or sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,9 +47,8 @@ setMethod("lu", signature(x = "sparseMatrix"),
               lu(..sparse2d(as(x, "CsparseMatrix")), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
-          function(x, errSing = TRUE, order = NA_integer_, tol = 1,
-                   keep.dimnames = TRUE, ...)
-              .Call(dgCMatrix_trf, x, errSing, keep.dimnames, order, tol))
+          function(x, errSing = TRUE, order = NA_integer_, tol = 1, ...)
+              .Call(dgCMatrix_trf, x, order, tol, errSing))
 
 setMethod("lu", signature(x = "dsCMatrix"),
           function(x, cache = TRUE, ...) {

@@ -301,7 +301,7 @@ split(rownames(r12$r.all), Duplicated(aCh.hash))
 
 ## TODO: find cases for both choices when we leave it to CHOLMOD to choose
 for(n in 1:50) { ## used to seg.fault at n = 10 !
-    mkA <- mkLDL(1+rpois(1, 30), 1/10)
+    mkA <- mkLDL(1+rpois(1, 30), 1/10, rcond = FALSE, condest = FALSE)
     cat(sprintf("n = %3d, LDL-dim = %d x %d ", n, nrow(mkA$A), ncol(mkA$A)))
     r <- allCholesky(mkA$A, silentTry=TRUE)
     ## Compare .. apart from the NAs that happen from (perm=FALSE, super=TRUE)
@@ -714,8 +714,7 @@ stopifnot(exprs = {
     chkMF(  pS , mS, Cholesky)
     chkMF(t( S), mS, Cholesky)
     chkMF(t(pS), mS, Cholesky)
-    chkMF(  sS , mS, Cholesky, super =  TRUE, LDL =  TRUE)
-    chkMF(  sS , mS, Cholesky, super =  TRUE, LDL = FALSE)
+    chkMF(  sS , mS, Cholesky, super =  TRUE)
     chkMF(  sS , mS, Cholesky, super = FALSE, LDL =  TRUE)
     chkMF(  sS , mS, Cholesky, super = FALSE, LDL = FALSE)
 })

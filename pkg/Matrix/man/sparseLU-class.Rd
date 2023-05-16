@@ -60,6 +60,8 @@
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand2-methods}}.}
+    \item{\code{solve}}{\code{signature(a = "sparseLU", b = .)}:
+      see \code{\link{solve-methods}}.}
   }
 }
 \seealso{

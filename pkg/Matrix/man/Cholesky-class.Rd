@@ -76,6 +76,8 @@
       \code{\linkS4class{MatrixFactorization}},
       i.e., as a rectangular array with \code{Dimnames} along the margin,
       rather than as a list of slot values.}
+    \item{\code{solve}}{\code{signature(a = "p?Cholesky", b = .)}:
+      see \code{\link{solve-methods}}.}
   }
 }
 \note{

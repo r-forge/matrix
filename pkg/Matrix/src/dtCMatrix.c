@@ -1,6 +1,8 @@
-				/* Sparse triangular numeric matrices */
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dtCMatrix.h"
 #include "cs_utils.h"
+#endif /* MJ */
 
 /* MJ: no longer needed ... replacement in ./validity.c */
 #if 0
@@ -78,6 +80,9 @@ SEXP tRMatrix_validate(SEXP x)
 }
 
 #endif /* MJ */
+
+/* MJ: no longer needed ... replacement in ./factorizations.c */
+#if 0
 
 SEXP dtCMatrix_matrix_solve(SEXP a, SEXP b, SEXP classed)
 {
@@ -174,3 +179,4 @@ SEXP dtCMatrix_sparse_solve(SEXP a, SEXP b)
     return ans;
 }
 
+#endif /* MJ */
