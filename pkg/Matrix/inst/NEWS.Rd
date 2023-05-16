@@ -30,7 +30,7 @@
       Notably, for \code{x} inheriting from \code{RsparseMatrix},
       the result is now always an \code{RsparseMatrix}, rather than
       always a \code{TsparseMatrix}.
-      
+
       \item \code{NULL} subscripts, as in \code{x[NULL]},
       \code{x[NULL, j]}, and \code{x[i, NULL]}, are now supported
       for \code{x} inheriting from \code{Matrix}.  They are handled
@@ -91,7 +91,7 @@
       nonvirtual class \code{sparseQR}.  These are parallel to the
       existing virtual classes \code{CholeskyFactorization} and \code{LU}.
       Packages defining new factorization classes may extend these.
-      
+
       %% TODO: add examples _using_ 'expand2'
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
@@ -110,7 +110,7 @@
       See \code{help("expand-methods")} for a list of methods,
       including useful optional arguments for Cholesky and QR
       factorizations.
-      
+
       \item \code{as(x, "generalMatrix")} and
       \code{as(x, "triangularMatrix")} for \code{x} inheriting
       from \code{denseLU} and \code{p?BunchKaufman}, respectively,
@@ -151,11 +151,11 @@
       \code{MatrixFactorization} is now \code{integer(2L)}.
       Previously it was \code{integer(0L)}, with the result that
       \code{validObject(new("<subclass>"))} was always an error.
-      
+
       \item The prototype of the \code{L} slot of class
       \code{sparseLU} is now formally lower triangular, so that
       \code{validObject(new("sparseLU"))} is not an error.
-      
+
       \item The prototypes of the \code{Q} and \code{T} slots
       of class \code{Schur} are now 0-by-0 \code{dgeMatrix} and
       \code{dtrMatrix}, respectively, so that
@@ -185,9 +185,18 @@
       check.
     }
   }
-  \subsection{Misc}{
+    \subsection{Misc}{
     \itemize{
       \item .
+    }
+  }
+}
+
+\section{Changes in version 1.5-4.1 (2023-05-16)}{% hot patch there
+  \subsection{Misc}{
+    \itemize{
+      \item Use \code{#ifdef PR18534fixed} to adapt to \R{}'s Lapack
+      header fix for \PR{18534}.
     }
   }
 }

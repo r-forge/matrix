@@ -13,4 +13,8 @@
 # define FCONE
 #endif
 
+#ifdef PR18534fixed
+# define usePR18534fix
+#endif
+
 #endif /* MATRIX_LAPACK_H */

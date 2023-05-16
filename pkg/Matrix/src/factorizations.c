@@ -1891,7 +1891,12 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b, SEXP packed)
 	    } else {
 		// https://bugs.r-project.org/show_bug.cgi?id=18534
 		F77_CALL(dtptrs)(&ul, "N", &di, &m, &n, REAL(ax),
-				 REAL(rx), &m, &info FCONE FCONE);
+				 REAL(rx), &m, &info
+#ifdef usePR18534fix
+				 FCONE FCONE FCONE);		
+#else
+		                 FCONE FCONE);
+#endif
 		ERROR_LAPACK_1(dtptrs, info);
 	    }
 	}
