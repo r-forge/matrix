@@ -48,63 +48,6 @@ SEXP dspMatrix_rcond(SEXP obj)
     return ScalarReal(rcond);
 }
 
-SEXP dspMatrix_solve(SEXP a)
-{
-    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("dspMatrix")),
-	trf = PROTECT(dspMatrix_trf_(a, 2)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	dimnames = PROTECT(GET_SLOT(trf, Matrix_DimNamesSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
-	x;
-    PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(x = GET_SLOT(trf, Matrix_xSym), &pid);
-    REPROTECT(x = duplicate(x), pid);
-    
-    SET_SLOT(val, Matrix_DimSym, dim);
-    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
-    SET_SLOT(val, Matrix_uploSym, uplo);
-    SET_SLOT(val, Matrix_xSym, x);
-    
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
-    double *px = REAL(x);
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-
-    F77_CALL(dsptri)(ul, pdim, px, pperm, 
-		     (double *) R_alloc((size_t) pdim[0], sizeof(double)),
-		     &info FCONE);
-    
-    UNPROTECT(7);
-    return val;
-}
-
-SEXP dspMatrix_matrix_solve(SEXP a, SEXP b)
-{
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0)),
-	adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-	bdim = PROTECT(GET_SLOT(val, Matrix_DimSym));
-    int *padim = INTEGER(adim), *pbdim = INTEGER(bdim);
-    
-    if (padim[0] != pbdim[0] || padim[0] < 1 || pbdim[1] < 1)
-	error(_("dimensions of system to be solved are inconsistent"));
-    
-    SEXP trf = PROTECT(dspMatrix_trf_(a, 2)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym)),
-	y = PROTECT(GET_SLOT(val, Matrix_xSym));
-    
-    int *pperm = INTEGER(perm), info;
-    double *px = REAL(x), *py = REAL(y);
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-    
-    F77_CALL(dsptrs)(ul, pbdim, pbdim + 1, px, pperm, py, pbdim,
-		     &info FCONE);
-    
-    UNPROTECT(8);
-    return val;
-}
-
 SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 {
     SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));

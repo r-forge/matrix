@@ -13,8 +13,8 @@ setMethod("qr", signature(x = "sparseMatrix"),
               qr(..sparse2d(.sparse2g(as(x, "CsparseMatrix"))), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
-          function(x, order = 3L, keep.dimnames = TRUE, ...) {
-              r <- .Call(dgCMatrix_orf, x, TRUE, keep.dimnames, order)
+          function(x, order = 3L, ...) {
+              r <- .Call(dgCMatrix_orf, x, order, TRUE)
               if(n <- r@V@Dim[1L] - r@Dim[1L])
                   Matrix.msg(gettextf("matrix is structurally rank deficient; returning QR factorization of matrix augmented with %d rows of zeros", n),
                              domain = NA)

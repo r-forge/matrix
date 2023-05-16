@@ -819,7 +819,7 @@ assertError(crossprod(t(mm), P)) # ditto
 stopifnotValid(tm1, "dsCMatrix")
 stopifnot(exprs = {
     all.equal(tm1, tm2, tolerance = 1e-15)
-    identical(drop0(Im2 %*% tm2[1:3,]), Matrix(cbind(diag(3), 0)))
+    all.equal(Im2 %*% tm2[1:3,], Matrix(cbind(diag(3), 0)))
     identical(p, as.matrix(P))
     all(P %*% m == as.matrix(P) %*% m)
     all(P %*% mm == P %*% m)

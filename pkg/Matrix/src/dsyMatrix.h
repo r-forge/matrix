@@ -10,8 +10,6 @@ SEXP dsyMatrix_trf_(SEXP, int);
 double get_norm_dsy(SEXP obj, const char *typstr);
 SEXP dsyMatrix_norm(SEXP obj, SEXP type);
 SEXP dsyMatrix_rcond(SEXP obj);
-SEXP dsyMatrix_solve(SEXP a);
-SEXP dsyMatrix_matrix_solve(SEXP a, SEXP b);
 
 SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rt);
 

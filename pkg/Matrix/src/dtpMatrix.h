@@ -7,8 +7,6 @@
 double get_norm_dtp(SEXP obj, const char *typstr);
 SEXP dtpMatrix_norm(SEXP obj, SEXP type);
 SEXP dtpMatrix_rcond(SEXP obj, SEXP type);
-SEXP dtpMatrix_solve(SEXP a);
-SEXP dtpMatrix_matrix_solve(SEXP a, SEXP b);
 
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans);
 SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y);

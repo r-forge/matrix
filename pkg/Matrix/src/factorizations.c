@@ -3,7 +3,8 @@
 
 static cs *dgC2cs(SEXP obj)
 {
-    cs *A = (cs *) R_alloc(1, sizeof(cs)); 
+    cs *A = (cs *) R_alloc(1, sizeof(cs));
+    memset(A, 0, sizeof(cs));
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 	i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
@@ -19,12 +20,12 @@ static cs *dgC2cs(SEXP obj)
     return A;
 }
 
-static SEXP cs2dgC(cs *A, const char *cl)
+static SEXP cs2dgC(const cs *A, const char *cl)
 {
-    int nnz = A->p[A->n];
+    int nnz = ((int *) A->p)[A->n];
     R_xlen_t np1 = (R_xlen_t) A->n + 1;
     SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
-	dim = PROTECT(allocVector(INTSXP, 2)),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	p = PROTECT(allocVector(INTSXP, np1)),
 	i = PROTECT(allocVector(INTSXP, nnz)),
 	x = PROTECT(allocVector(REALSXP, nnz));
@@ -33,13 +34,289 @@ static SEXP cs2dgC(cs *A, const char *cl)
     Matrix_memcpy(INTEGER(p), A->p, np1, sizeof(int));
     Matrix_memcpy(INTEGER(i), A->i, nnz, sizeof(int));
     Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
-    SET_SLOT(obj, Matrix_DimSym, dim);
     SET_SLOT(obj, Matrix_pSym, p);
     SET_SLOT(obj, Matrix_iSym, i);
     SET_SLOT(obj, Matrix_xSym, x);
     UNPROTECT(5);
     return obj;
 }
+
+static cholmod_sparse *dgC2cholmod(SEXP obj)
+{
+    cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse)); 
+    memset(A, 0, sizeof(cholmod_sparse));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+	i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    A->nrow = (size_t) INTEGER(dim)[0];
+    A->ncol = (size_t) INTEGER(dim)[1];
+    A->p = INTEGER(p);
+    A->i = INTEGER(i);
+    A->x = REAL(x);
+    A->nzmax = (size_t) ((int *) A->p)[A->ncol];
+    A->stype = 0;
+    A->itype = CHOLMOD_INT;
+    A->xtype = CHOLMOD_REAL;
+    A->dtype = CHOLMOD_DOUBLE;
+    A->sorted = 1;
+    A->packed = 1;
+    UNPROTECT(4);
+    return A;
+}
+
+static SEXP cholmod2dgC(cholmod_sparse *A, const char *cl)
+{
+    if (A->itype != CHOLMOD_INT ||
+	A->xtype != CHOLMOD_REAL ||
+	A->dtype != CHOLMOD_DOUBLE)
+	error(_("wrong itype or xtype or dtype"));
+    if (A->nrow > INT_MAX || A->ncol > INT_MAX)
+	error(_("dimensions cannot exceed 2^31-1"));
+    if (!A->sorted || !A->packed || A->stype != 0)
+	cholmod_sort(A, &c);
+    int m = (int) A->nrow, n = (int) A->ncol,
+	nnz = ((int *) A->p)[A->ncol];
+    R_xlen_t n1a = (R_xlen_t) n + 1;
+    SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	p = PROTECT(allocVector(INTSXP, n1a)),
+	i = PROTECT(allocVector(INTSXP, nnz)),
+	x = PROTECT(allocVector(REALSXP, nnz));
+    INTEGER(dim)[0] = m;
+    INTEGER(dim)[1] = n;
+    Matrix_memcpy(INTEGER(p), A->p, n1a, sizeof(int));
+    Matrix_memcpy(INTEGER(i), A->i, nnz, sizeof(int));
+    Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
+    SET_SLOT(obj, Matrix_pSym, p);
+    SET_SLOT(obj, Matrix_iSym, i);
+    SET_SLOT(obj, Matrix_xSym, x);
+    UNPROTECT(5);
+    return obj;
+}
+
+static cholmod_dense *dge2cholmod(SEXP obj)
+{
+    cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense)); 
+    memset(A, 0, sizeof(cholmod_dense));
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    A->nzmax = (size_t) XLENGTH(x);
+    A->nrow = (size_t) INTEGER(dim)[0];
+    A->ncol = (size_t) INTEGER(dim)[1];
+    A->d = A->nrow;
+    A->x = REAL(x);
+    A->xtype = CHOLMOD_REAL;
+    A->dtype = CHOLMOD_DOUBLE;
+    UNPROTECT(2);
+    return A;
+}
+
+static SEXP cholmod2dge(const cholmod_dense *A, const char *cl)
+{
+    if (A->xtype != CHOLMOD_REAL || A->dtype != CHOLMOD_DOUBLE)
+	error(_("wrong xtype or dtype"));
+    if (A->nrow > INT_MAX || A->ncol > INT_MAX)
+	error(_("dimensions cannot exceed 2^31-1"));
+    int m = (int) A->nrow, n = (int) A->ncol;
+    if ((double) m * n > R_XLEN_T_MAX)
+	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+    size_t d = A->d;
+    R_xlen_t mn = (R_xlen_t) m * n;
+    SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	x = PROTECT(allocVector(REALSXP, mn));
+    double *px = REAL(x), *py = (double *) A->x;
+    INTEGER(dim)[0] = m;
+    INTEGER(dim)[1] = n;
+    if (d == m)
+	Matrix_memcpy(px, py, mn, sizeof(double));
+    else {
+	int j;
+	for (j = 0; j < n; ++j) {
+	    Matrix_memcpy(px, py, m, sizeof(double));
+	    px += m;
+	    py += d;
+	}
+    }
+    SET_SLOT(obj, Matrix_xSym, x);
+    UNPROTECT(3);
+    return obj;
+}
+
+static cholmod_factor *mf2cholmod(SEXP obj)
+{
+    static const char *valid[] = { "dCHMsimpl", "dCHMsuper", "" };
+    int ivalid = R_check_class_etc(obj, valid);
+    if (ivalid < 0)
+	error(_("expected dCHMsimpl or dCHMsuper"));
+    SEXP type = PROTECT(GET_SLOT(obj, install("type"))),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	colcount = PROTECT(GET_SLOT(obj, install("colcount")));
+    int *ptype = INTEGER(type);
+    if (ptype[2] && !ptype[1])
+	error(_("unsupported factorization type (supernodal PAP' = LDL')"));
+    cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
+    memset(L, 0, sizeof(cholmod_factor));
+    L->n = (size_t) INTEGER(dim)[0];
+    L->minor = L->n;
+    L->Perm = INTEGER(perm);
+    L->ColCount = INTEGER(colcount);
+    L->ordering = ptype[0];
+    L->is_ll = ptype[1];
+    L->is_super = ptype[2];
+    L->is_monotonic = ptype[3];
+    L->itype = CHOLMOD_INT;
+    L->xtype = CHOLMOD_REAL;
+    L->dtype = CHOLMOD_DOUBLE;
+    L->useGPU = 0;
+    L->x = REAL(x);
+    if (L->is_super) {
+	SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
+	    pi = PROTECT(GET_SLOT(obj, install("pi"))),
+	    px = PROTECT(GET_SLOT(obj, install("px"))),
+	    s = PROTECT(GET_SLOT(obj, install("s")));
+	L->nsuper = (size_t) XLENGTH(super) - 1;
+	L->ssize = (size_t) XLENGTH(s);
+	L->xsize = (size_t) XLENGTH(x);
+	L->maxcsize = (size_t) ptype[4];
+	L->maxesize = (size_t) ptype[5];
+	L->super = INTEGER(super);
+	L->pi = INTEGER(pi);
+	L->px = INTEGER(px);
+	L->s = INTEGER(s);
+	UNPROTECT(4);
+    } else {
+	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+	    i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+	    nz = PROTECT(GET_SLOT(obj, install("nz"))),
+	    nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
+	    prv = PROTECT(GET_SLOT(obj, install("prv")));
+	L->p = INTEGER(p);
+	L->i = INTEGER(i);
+	L->nz = INTEGER(nz);
+	L->nzmax = (size_t) ((int *) L->p)[L->n];
+	L->next = INTEGER(nxt);
+	L->prev = INTEGER(prv);
+	UNPROTECT(5);
+    }
+    UNPROTECT(5);
+    return L;
+}
+
+static SEXP cholmod2mf(const cholmod_factor *L)
+{
+    if (L->itype != CHOLMOD_INT ||
+	L->xtype != CHOLMOD_REAL ||
+	L->dtype != CHOLMOD_DOUBLE)
+	error(_("wrong itype or xtype or dtype"));
+    if (L->is_super && !L->is_ll)
+	error(_("unsupported factorization type (supernodal PAP' = LDL')"));
+    if (L->n > INT_MAX)
+	error(_("dimensions cannot exceed 2^31-1"));
+    if (L->minor < L->n)
+	error(_("factorization failed at column %d"), (int) (L->minor + 1));
+    int n = (int) L->n;
+    SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(
+			   (L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
+	type = PROTECT(allocVector(INTSXP, (L->is_super) ? 6 : 4)),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+	x = PROTECT(allocVector(REALSXP, (L->is_super) ? L->xsize : L->nzmax)),
+	perm = PROTECT(allocVector(INTSXP, n)),
+	colcount = PROTECT(allocVector(INTSXP, n));
+    int *ptype = INTEGER(type), *pdim = INTEGER(dim);
+    ptype[0] = L->ordering;
+    ptype[1] = L->is_ll;
+    ptype[2] = L->is_super;
+    ptype[3] = L->is_monotonic;
+    pdim[0] = pdim[1] = n;
+    Matrix_memcpy(REAL(x), L->x, XLENGTH(x), sizeof(double));
+    Matrix_memcpy(INTEGER(perm), L->Perm, n, sizeof(int));
+    Matrix_memcpy(INTEGER(colcount), L->ColCount, n, sizeof(int));
+    SET_SLOT(obj, install("type"), type);
+    SET_SLOT(obj, Matrix_DimSym, dim);
+    SET_SLOT(obj, Matrix_xSym, x);
+    SET_SLOT(obj, Matrix_permSym, perm);
+    SET_SLOT(obj, install("colcount"), colcount);
+    if (L->is_super) {
+	SEXP super = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+	    pi = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+	    px = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+	    s = PROTECT(allocVector(INTSXP, L->ssize));
+	Matrix_memcpy(INTEGER(super), L->super, L->nsuper + 1, sizeof(int));
+	Matrix_memcpy(INTEGER(pi), L->pi, L->nsuper + 1, sizeof(int));
+	Matrix_memcpy(INTEGER(px), L->px, L->nsuper + 1, sizeof(int));
+	Matrix_memcpy(INTEGER(s), L->s, L->ssize, sizeof(int));
+	SET_SLOT(obj, install("super"), super);
+	SET_SLOT(obj, install("pi"), pi);
+	SET_SLOT(obj, install("px"), px);
+	SET_SLOT(obj, install("s"), s);
+	UNPROTECT(4);
+	ptype[4] = (int) L->maxcsize;
+	ptype[5] = (int) L->maxesize;
+    } else {
+	SEXP p = PROTECT(allocVector(INTSXP, L->n + 1)),
+	    i = PROTECT(allocVector(INTSXP, L->nzmax)),
+	    nz = PROTECT(allocVector(INTSXP, L->n)),
+	    nxt = PROTECT(allocVector(INTSXP, L->n + 2)),
+	    prv = PROTECT(allocVector(INTSXP, L->n + 2));
+	Matrix_memcpy(INTEGER(p), L->p, L->n + 1, sizeof(int));
+	Matrix_memcpy(INTEGER(i), L->i, L->nzmax, sizeof(int));
+	Matrix_memcpy(INTEGER(nz), L->nz, L->n, sizeof(int));
+	Matrix_memcpy(INTEGER(nxt), L->next, L->n + 2, sizeof(int));
+	Matrix_memcpy(INTEGER(prv), L->prev, L->n + 2, sizeof(int));
+	SET_SLOT(obj, Matrix_pSym, p);
+	SET_SLOT(obj, Matrix_iSym, i);
+	SET_SLOT(obj, install("nz"), nz);
+	SET_SLOT(obj, install("nxt"), nxt);
+	SET_SLOT(obj, install("prv"), prv);
+	UNPROTECT(5);
+    }
+    UNPROTECT(6);
+    return obj;
+}
+
+#define ERROR_LAPACK_1(_ROUTINE_, _INFO_)				\
+    do {								\
+	if ((_INFO_) < 0)						\
+	    error(_("LAPACK routine '%s': argument %d had illegal value"), \
+		  #_ROUTINE_, -(_INFO_));				\
+    } while (0)
+
+#define ERROR_LAPACK_2(_ROUTINE_, _INFO_, _WARN_, _LETTER_)		\
+    do {								\
+	ERROR_LAPACK_1(_ROUTINE_, _INFO_);				\
+	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
+	    if (_WARN_ > 1)						\
+		error  (_("LAPACK routine '%s': matrix is exactly singular, " \
+			  "%s[i,i]=0, i=%d"),				\
+			#_ROUTINE_, #_LETTER_, (_INFO_));		\
+	    else							\
+		warning(_("LAPACK routine '%s': matrix is exactly singular, " \
+			  "%s[i,i]=0, i=%d"),				\
+			#_ROUTINE_, #_LETTER_, (_INFO_));		\
+	}								\
+    } while (0)
+
+#define ERROR_LAPACK_3(_ROUTINE_, _INFO_, _WARN_, _NPROTECT_)		\
+    do {								\
+	ERROR_LAPACK_1(_ROUTINE_, _INFO_);				\
+	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
+	    if (_WARN_ > 1)						\
+		error  (_("LAPACK routine '%s': leading minor of order %d " \
+			  "is not positive definite"),			\
+			#_ROUTINE_, (_INFO_));				\
+	    else {							\
+		warning(_("LAPACK routine '%s': leading minor of order %d " \
+			  "is not positive definite"),			\
+			#_ROUTINE_, (_INFO_));				\
+		UNPROTECT(_NPROTECT_);					\
+		return ScalarInteger(_INFO_);				\
+	    }								\
+	}								\
+    } while (0)
 
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
@@ -59,23 +336,9 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 	REPROTECT(x = duplicate(x), pid);
 	int *pperm = INTEGER(perm), info;
 	double *px = REAL(x);
-	
+		
 	F77_CALL(dgetrf)(pdim, pdim + 1, px, pdim, pperm, &info);
-	
-	if (info < 0)
-	    error(_("LAPACK '%s' gave error code %d"),
-		  "dgetrf", info);
-	else if (info > 0 && warn > 0) {
-	    /* MJ: 'dgetrf' does not distinguish between singular, */
-	    /*     finite matrices and matrices containing NaN ... */
-	    /*     hence this message can mislead                  */
-	    if (warn > 1)
-		error  (_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
-			"dgetrf", info);
-	    else 
-		warning(_("LAPACK '%s': matrix is exactly singular, U[i,i]=0, i=%d"),
-			"dgetrf", info);
-	}
+	ERROR_LAPACK_2(dgetrf, info, warn, U);
 	
 	SET_SLOT(val, Matrix_permSym, perm);
 	SET_SLOT(val, Matrix_xSym, x);
@@ -115,21 +378,7 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 	Matrix_Calloc(work, lwork, double);
 	F77_CALL(dsytrf)(&ul, pdim, py, pdim, pperm, work, &lwork, &info FCONE);
 	Matrix_Free(work, lwork);
-	
-	if (info < 0)
-	    error(_("LAPACK '%s' gave error code %d"),
-		  "dsytrf", info);
-	else if (info > 0 && warn > 0) {
-	    /* MJ: 'dsytrf' does not distinguish between singular, */
-	    /*     finite matrices and matrices containing NaN ... */
-	    /*     hence this message can mislead                  */
-	    if (warn > 1)
-		error  (_("LAPACK '%s': matrix is exactly singular, D[i,i]=0, i=%d"),
-			"dsytrf", info);
-	    else
-		warning(_("LAPACK '%s': matrix is exactly singular, D[i,i]=0, i=%d"),
-			"dsytrf", info);
-	}
+	ERROR_LAPACK_2(dsytrf, info, warn, D);
 	
 	SET_SLOT(val, Matrix_permSym, perm);
 	SET_SLOT(val, Matrix_xSym, y);
@@ -163,22 +412,8 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 	double *px = REAL(x);
     
 	F77_CALL(dsptrf)(&ul, pdim, px, pperm, &info FCONE);
-    
-	if (info < 0)
-	    error(_("LAPACK '%s' gave error code %d"),
-		  "dsptrf", info);
-	else if (info > 0 && warn > 0) {
-	    /* MJ: 'dsptrf' does not distinguish between singular, */
-	    /*     finite matrices and matrices containing NaN ... */
-	    /*     hence this message can mislead                  */
-	    if (warn > 1)
-		error  (_("LAPACK '%s': matrix is exactly singular, D[i,i]=0, i=%d"),
-			"dsptrf", info);
-	    else
-		warning(_("LAPACK '%s': matrix is exactly singular, D[i,i]=0, i=%d"),
-			"dsptrf", info);
-	}
-
+	ERROR_LAPACK_2(dsptrf, info, warn, D);
+	
 	SET_SLOT(val, Matrix_permSym, perm);
 	SET_SLOT(val, Matrix_xSym, x);
 	UNPROTECT(2); /* x, perm */
@@ -212,20 +447,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn)
 	Matrix_memset(py, 0, nn, sizeof(double));
 	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
 	F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
-
-	if (info < 0)
-	    error(_("LAPACK '%s' gave error code %d"),
-		  "dpotrf", info);
-	else if (info > 0) {
-	    if (warn > 1)
-		error  (_("LAPACK '%s': leading minor of order %d is not positive definite"),
-			"dpotrf", info);
-	    else if (warn > 0)
-		warning(_("LAPACK '%s': leading minor of order %d is not positive definite"),
-			"dpotrf", info);
-	    UNPROTECT(6); /* y, x, uplo, dimnames, dim, val */
-	    return ScalarInteger(info);
-	}
+	ERROR_LAPACK_3(dpotrf, info, warn, 6);
 	
 	SET_SLOT(val, Matrix_xSym, y);
 	UNPROTECT(2); /* y, x */
@@ -258,20 +480,7 @@ SEXP dppMatrix_trf_(SEXP obj, int warn)
 	double *px = REAL(x);
 	
 	F77_CALL(dpptrf)(&ul, pdim, px, &info FCONE);
-
-	if (info < 0)
-	    error(_("LAPACK '%s' gave error code %d"),
-		  "dpptrf", info);
-	else if (info > 0) {
-	    if (warn > 1)
-		error  (_("LAPACK '%s': leading minor of order %d is not positive definite"),
-			"dpptrf", info);
-	    else if (warn > 0)
-		warning(_("LAPACK '%s': leading minor of order %d is not positive definite"),
-			"dpptrf", info);
-	    UNPROTECT(5); /* x, uplo, dimnames, dim, val */
-	    return ScalarInteger(info);
-	}
+	ERROR_LAPACK_3(dpptrf, info, warn, 5);
 	
 	SET_SLOT(val, Matrix_xSym, x);
 	UNPROTECT(1); /* x */
@@ -306,40 +515,48 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
     return dppMatrix_trf_(obj, asInteger(warn));
 }
 
-int dgCMatrix_trf_(cs *A, css **S, csn **N, int doError,
-		   int order, double tol)
+int dgCMatrix_trf_(cs *A, css **S, csn **N, int order, double tol)
 {
-    if (A->m != A->n)
-	error(_("LU factorization of m-by-n dgCMatrix requires m == n"));
-    /* Symbolic analysis : */
-    *S = cs_sqr(order, A, 0);
-    /* Numeric factorization : */
-    *N = cs_lu(A, *S, tol);
-    if (*N) {
-	cs *T;
-	/* Drop zeros from L and sort it : */
-	cs_dropzeros((*N)->L);
-	T = cs_transpose((*N)->L, 1);
-	cs_spfree((*N)->L);
-	(*N)->L = cs_transpose(T, 1);
-	cs_spfree(T);
-	/* Drop zeros from U and sort it : */
-	cs_dropzeros((*N)->U);
-	T = cs_transpose((*N)->U, 1);
-	cs_spfree((*N)->U);
-	(*N)->U = cs_transpose(T, 1);
-	cs_spfree(T);
-	return 0;
-    } else {
-	if (*S) *S = cs_sfree(*S);
-	if(doError)
-	    error(_("LU factorization of dgCMatrix failed: out of memory or near-singular"));
-	return 1;
-    }
+    cs *T = NULL;
+
+#define FREE_AND_RETURN_ZERO						\
+    do {								\
+	if (*S)								\
+	    *S = cs_sfree(*S);						\
+	if (*N)								\
+	    *N = cs_nfree(*N);						\
+	if (T)								\
+	    T = cs_spfree(T);						\
+	return 0;							\
+    } while (0)
+    
+    /* Symbolic analysis and numeric factorization : */
+    if (!(*S = cs_sqr(order, A, 0)) ||
+	!(*N = cs_lu(A, *S, tol)))
+	FREE_AND_RETURN_ZERO;
+    /* Drop zeros from L and sort it : */
+    cs_dropzeros((*N)->L);
+    T = cs_transpose((*N)->L, 1);
+    if (!T)
+	FREE_AND_RETURN_ZERO;
+    (*N)->L = cs_spfree((*N)->L);
+    (*N)->L = cs_transpose(T, 1);
+    if (!(*N)->L)
+	FREE_AND_RETURN_ZERO;
+    T = cs_spfree(T);
+    /* Drop zeros from U and sort it : */
+    T = cs_transpose((*N)->U, 1);
+    if (!T)
+	FREE_AND_RETURN_ZERO;
+    (*N)->U = cs_spfree((*N)->U);
+    (*N)->U = cs_transpose(T, 1);
+    if (!(*N)->U)
+	FREE_AND_RETURN_ZERO;
+    T = cs_spfree(T);
+    return 1;
 }
 
-SEXP dgCMatrix_trf(SEXP obj, SEXP doError, SEXP keepDimNames,
-		   SEXP order, SEXP tol)
+SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 {
     SEXP val = get_factor(obj, "LU");
     if (!isNull(val))
@@ -353,30 +570,35 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP doError, SEXP keepDimNames,
     int order_ = asInteger(order);
     if (order_ == NA_INTEGER)
 	order_ = (tol_ == 1.0) ? 2 : 1;
-    else if (order_ < 0)
+    else if (order_ < 0 || order_ > 3)
 	order_ = 0;
-    else if (order_ > 3)
-	order_ = 3;
 
     cs *A = dgC2cs(obj);
-    css *S;
-    csn *N;
-    if (dgCMatrix_trf_(A, &S, &N, asLogical(doError), order_, tol_)) {
-	if (N) cs_nfree(N);
-	if (S) cs_sfree(S);
+    css *S = NULL;
+    csn *N = NULL;
+    int *pp = NULL;
+    if (A->m != A->n)
+	error(_("LU factorization of m-by-n dgCMatrix requires m == n"));
+    if (!dgCMatrix_trf_(A, &S, &N, order_, tol_) ||
+	!(pp = cs_pinv(N->pinv, A->m))) {
+	if (!pp) {
+	    S = cs_sfree(S);
+	    N = cs_nfree(N);
+	}
+	if (asLogical(doError))
+	    error(_("LU factorization of dgCMatrix failed: out of memory or near-singular"));
+	/* Defensive code will check with is(., "sparseLU") : */
 	UNPROTECT(1); /* val */
-	/* Defensive code will check with isS4 : */
 	return ScalarLogical(NA_LOGICAL);
     }
     
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     SET_SLOT(val, Matrix_DimSym, dim);
     UNPROTECT(1); /* dim */
-    if (asLogical(keepDimNames)) {
-	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
-    }
+
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(1); /* dimnames */
     
     SEXP L = PROTECT(cs2dgC(N->L, "dtCMatrix")),
 	U = PROTECT(cs2dgC(N->U, "dtCMatrix")),
@@ -385,9 +607,8 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP doError, SEXP keepDimNames,
     SET_SLOT(val, Matrix_LSym, L);
     SET_SLOT(val, Matrix_USym, U);
     UNPROTECT(3); /* uplo, U, L */
-
+    
     SEXP p = PROTECT(allocVector(INTSXP, A->m));
-    int *pp = cs_pinv(N->pinv, A->m);
     Matrix_memcpy(INTEGER(p), pp, A->m, sizeof(int));
     SET_SLOT(val, Matrix_pSym, p);
     UNPROTECT(1); /* p */
@@ -398,50 +619,47 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP doError, SEXP keepDimNames,
 	SET_SLOT(val, Matrix_qSym, q);
 	UNPROTECT(1); /* q */
     }
-
-    cs_free(pp);
-    cs_nfree(N);
-    cs_sfree(S);
-
+    
+    S = cs_sfree(S);
+    N = cs_nfree(N);
+    pp = cs_free(pp);
+    
     set_factor(obj, "LU", val);
     UNPROTECT(1); /* val */
     return val;
 }
 
-int dgCMatrix_orf_(cs *A, css **S, csn **N, int doError,
-		   int order)
+int dgCMatrix_orf_(cs *A, css **S, csn **N, int order)
 {
-    if (A->m < A->n)
-	error(_("QR factorization of m-by-n dgCMatrix requires m >= n"));
-    /* Symbolic analysis : */
-    *S = cs_sqr(order, A, 1);
-    /* Numeric factorization : */
-    *N = cs_qr(A, *S);
-    if (*N) {
-	cs *T;
-	/* Drop zeros from V and sort it : */
-	cs_dropzeros((*N)->L);
-	T = cs_transpose((*N)->L, 1);
-	cs_spfree((*N)->L);
-	(*N)->L = cs_transpose(T, 1);
-	cs_spfree(T);
-	/* Drop zeros from R and sort it : */
-	cs_dropzeros((*N)->U);
-	T = cs_transpose((*N)->U, 1);
-	cs_spfree((*N)->U);
-	(*N)->U = cs_transpose(T, 1);
-	cs_spfree(T);
-	return 0;
-    } else {
-	if (*S) *S = cs_sfree(*S);
-	if(doError)
-	    error(_("QR factorization of dgCMatrix failed: out of memory"));
-	return 1;
-    }
+    cs *T = NULL;
+
+    /* Symbolic analysis and numeric factorization : */
+    if (!(*S = cs_sqr(order, A, 1)) ||
+	!(*N = cs_qr(A, *S)))
+	FREE_AND_RETURN_ZERO;
+    /* Drop zeros from V and sort it : */
+    cs_dropzeros((*N)->L);
+    T = cs_transpose((*N)->L, 1);
+    if (!T)
+	FREE_AND_RETURN_ZERO;
+    (*N)->L = cs_spfree((*N)->L);
+    (*N)->L = cs_transpose(T, 1);
+    if (!(*N)->L)
+	FREE_AND_RETURN_ZERO;
+    T = cs_spfree(T);
+    /* Drop zeros from R and sort it : */
+    T = cs_transpose((*N)->U, 1);
+    if (!T)
+	FREE_AND_RETURN_ZERO;
+    (*N)->U = cs_spfree((*N)->U);
+    (*N)->U = cs_transpose(T, 1);
+    if (!(*N)->U)
+	FREE_AND_RETURN_ZERO;
+    T = cs_spfree(T);
+    return 1;
 }
 
-SEXP dgCMatrix_orf(SEXP obj, SEXP doError, SEXP keepDimNames,
-		   SEXP order)
+SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 {
     SEXP val = get_factor(obj, "QR");
     if (!isNull(val))
@@ -449,30 +667,35 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP doError, SEXP keepDimNames,
     PROTECT(val = NEW_OBJECT_OF_CLASS("sparseQR"));
 
     int order_ = asInteger(order);
-    if (order_ < 0)
+    if (order_ < 0 || order_ > 3)
 	order_ = 0;
-    else if (order_ > 3)
-	order_ = 3;
 
     cs *A = dgC2cs(obj);
-    css *S;
-    csn *N;
-    if (dgCMatrix_orf_(A, &S, &N, asLogical(doError), order_)) {
-	if (N) cs_nfree(N);
-	if (S) cs_sfree(S);
+    css *S = NULL;
+    csn *N = NULL;
+    int *pp = NULL;
+    if (A->m < A->n)
+	error(_("QR factorization of m-by-n dgCMatrix requires m >= n"));
+    if (!dgCMatrix_orf_(A, &S, &N, order_) ||
+	!(pp = cs_pinv(S->pinv, S->m2))) {
+	if (!pp) {
+	    S = cs_sfree(S);
+	    N = cs_nfree(N);
+	}
+	if (asLogical(doError))
+	    error(_("QR factorization of dgCMatrix failed: out of memory"));
+	/* Defensive code will check with is(., "sparseQR") : */
 	UNPROTECT(1); /* val */
-	/* Defensive code will check with isS4 : */
 	return ScalarLogical(NA_LOGICAL);
     }
     
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
     SET_SLOT(val, Matrix_DimSym, dim);
     UNPROTECT(1); /* dim */
-    if (asLogical(keepDimNames)) {
-	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
-    }
+
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+    UNPROTECT(1); /* dimnames */
     
     SEXP V = PROTECT(cs2dgC(N->L, "dgCMatrix")),
 	R = PROTECT(cs2dgC(N->U, "dgCMatrix"));
@@ -487,7 +710,6 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP doError, SEXP keepDimNames,
     UNPROTECT(1); /* beta */
     
     SEXP p = PROTECT(allocVector(INTSXP, S->m2));
-    int *pp = cs_pinv(S->pinv, S->m2);
     Matrix_memcpy(INTEGER(p), pp, S->m2, sizeof(int));
     SET_SLOT(val, Matrix_pSym, p);
     UNPROTECT(1); /* p */
@@ -499,39 +721,51 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP doError, SEXP keepDimNames,
 	UNPROTECT(1); /* q */
     }
 
-    cs_free(pp);
-    cs_nfree(N);
-    cs_sfree(S);
-
+    S = cs_sfree(S);
+    N = cs_nfree(N);
+    pp = cs_free(pp);
+    
     set_factor(obj, "QR", val);
     UNPROTECT(1); /* val */
     return val;
 }
 
-int dpCMatrix_trf_(CHM_SP A, CHM_FR *L,
+int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
 		   int perm, int ldl, int super, double mult)
 {
     CHM_store_common();
     
+    if (*L == NULL) {
+	if (perm == 0) {
+	    c.nmethods = 1;
+	    c.method[0].ordering = CHOLMOD_NATURAL;
+	    c.postorder = 0;
+	}
+	
+	c.supernodal = (super == NA_LOGICAL) ? CHOLMOD_AUTO :
+	    ((super != 0) ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL);
+	
+	*L = cholmod_analyze(A, &c);
+    }
+    
+    if (super == NA_LOGICAL)
+	super = (*L)->is_super;
+    if (super != 0)
+	ldl = 0;
+
+    c.final_asis = 0;
+    c.final_super = super != 0;
+    c.final_ll = ldl == 0;
+    c.final_pack = 1;
+    c.final_monotonic = 1;
+    
     double beta[2];
     beta[0] = mult;
     beta[1] = 0.0;
-    
-    if (!perm) {
-	/* Require identity permutation : */
-	c.nmethods = 1;
-	c.method[0].ordering = CHOLMOD_NATURAL;
-	c.postorder = FALSE;
-    }
-    c.final_ll = ldl == 0;
-    c.supernodal = (super == NA_LOGICAL || super < 0) ? CHOLMOD_AUTO :
-	((super > 0) ? CHOLMOD_SUPERNODAL : CHOLMOD_SIMPLICIAL);
-    
-    *L = cholmod_analyze(A, &c);
     int res = cholmod_factorize_p(A, beta, (int *) NULL, 0, *L, &c);
     
     CHM_restore_common();
-
+    
     return res;
 }
 
@@ -539,55 +773,64 @@ SEXP dpCMatrix_trf(SEXP obj,
 		   SEXP perm, SEXP ldl, SEXP super, SEXP mult)
 {
     int perm_ = asLogical(perm), ldl_ = asLogical(ldl),
-	super_ = asInteger(super);
+	super_ = asLogical(super);
     double mult_ = asReal(mult);
     if (!R_FINITE(mult_))
 	error(_("'mult' is not a number or not finite"));
+    
+    SEXP trf = R_NilValue;
     char nm[] = "spdCholesky";
     if (perm_)
 	nm[1] = 'P';
-    if (ldl_)
-	nm[2] = 'D';
-    SEXP ch = R_NilValue;
-    if (super_ == NA_LOGICAL || !super_)
-	ch = get_factor(obj, nm);
-    if (isNull(ch) && (super_ == NA_LOGICAL || super_)) {
-	nm[0] = 'S';
-	ch = get_factor(obj, nm);
+    if (super_ != NA_LOGICAL && super_ != 0)
+	ldl_ = 0;
+    if (super_ == NA_LOGICAL || super_ == 0) {
+	if (ldl_)
+	    nm[2] = 'D';
+	trf = get_factor(obj, nm);
     }
-    int cached = !isNull(ch);
+    if (isNull(trf) && (super_ == NA_LOGICAL || super_ != 0)) {
+	nm[0] = 'S';
+	nm[2] = 'd';
+	trf = get_factor(obj, nm);
+    }
+
+    int cached = !isNull(trf);
     if (cached && mult_ == 0.0)
-	return ch;
-
+	return trf;
+    
     PROTECT_INDEX pid;
-    PROTECT_WITH_INDEX(ch, &pid);
-    CHM_SP A = AS_CHM_SP__(obj);
-    CHM_FR L;
-    R_CheckStack();
+    PROTECT_WITH_INDEX(trf, &pid);
+    cholmod_sparse *A = dgC2cholmod(obj);
+    cholmod_factor *L = NULL;
 
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char ul = *CHAR(STRING_ELT(uplo, 0));
+    UNPROTECT(1); /* uplo */
+    A->stype = (ul == 'U') ? 1 : -1;
+    
     if (cached) {
-	double beta[2];
-	beta[0] = mult_;
-	beta[1] = 0.0;
-	L = AS_CHM_FR(ch);
-	R_CheckStack();
+	L = mf2cholmod(trf);
 	L = cholmod_copy_factor(L, &c);
-	cholmod_factorize_p(A, beta, (int *) NULL, 0, L, &c);
+	dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
     } else {
 	dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
-	if (super_ == NA_LOGICAL)
+	if (super_ == NA_LOGICAL) {
 	    nm[0] = (L->is_super) ? 'S' : 's';
+	    nm[2] = (L->is_ll   ) ? 'd' : 'D';
+	}
     }
-    REPROTECT(ch = chm_factor_to_SEXP(L, 1), pid);
+    REPROTECT(trf = cholmod2mf(L), pid);
+    cholmod_free_factor(&L, &c);
     
     SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-    set_symmetrized_DimNames(ch, dimnames, -1);
+    set_symmetrized_DimNames(trf, dimnames, -1);
     UNPROTECT(1); /* dimnames */
     
     if (!cached && mult_ == 0.0)
-	set_factor(obj, nm, ch);
-    UNPROTECT(1); /* ch */
-    return ch;
+	set_factor(obj, nm, trf);
+    UNPROTECT(1); /* trf */
+    return trf;
 }
 
 SEXP denseLU_expand(SEXP obj)
@@ -719,7 +962,7 @@ SEXP denseLU_expand(SEXP obj)
     return res;
 }
 
-SEXP BunchKaufman_expand(SEXP obj)
+SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 {
     SEXP P_ = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
 	T_ = PROTECT(NEW_OBJECT_OF_CLASS("dtCMatrix")),
@@ -773,8 +1016,7 @@ SEXP BunchKaufman_expand(SEXP obj)
     int *P_pperm, *T_pp, *T_pi, *D_pi = INTEGER(D_i);
     double *T_px, *D_px = REAL(D_x), *px = REAL(x);
 
-    int unpacked = (double) n * n <= R_XLEN_T_MAX &&
-	(R_xlen_t) n * n == XLENGTH(x);
+    int unpacked = !asLogical(packed);
 
     R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (upper) ? len - 1 : 0;
     SEXP res = PROTECT(allocVector(VECSXP, len));
@@ -919,13 +1161,17 @@ static SEXP mkDet(double modulus, int logarithm, int sign)
 
 SEXP denseLU_determinant(SEXP obj, SEXP logarithm)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("determinant of non-square matrix is undefined"));
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
+
+#define DETERMINANT_START(_MAYBE_NOT_SQUARE_)				\
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));			\
+    int *pdim = INTEGER(dim), n = pdim[0];				\
+    if ((_MAYBE_NOT_SQUARE_) && pdim[1] != n)				\
+	error(_("determinant of non-square matrix is undefined"));	\
+    UNPROTECT(1); /* dim */						\
+    int givelog = asLogical(logarithm) != 0, sign = 1;			\
     double modulus = 0.0; /* result for n == 0 */
+
+    DETERMINANT_START(1);
     if (n > 0) {
 	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
@@ -950,110 +1196,9 @@ SEXP denseLU_determinant(SEXP obj, SEXP logarithm)
     return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
+SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm, SEXP packed)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
-    double modulus = 0.0; /* result for n == 0 */
-    if (n > 0) {
-	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
-	    p = PROTECT(GET_SLOT(U, Matrix_pSym)),
-	    i = PROTECT(GET_SLOT(U, Matrix_iSym)),
-	    x = PROTECT(GET_SLOT(U, Matrix_xSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
-	double *px = REAL(x);
-
-	for (j = 0; j < n; ++j) {
-	    kend = *(++pp);
-	    if (kend > k && pi[kend - 1] == j) {
-		if (px[kend - 1] < 0.0) {
-		    modulus += log(-px[kend - 1]);
-		    sign = -sign;
-		} else {
-		    /* incl. 0, NaN cases */
-		    modulus += log(px[kend - 1]);
-		}
-	    } else {
-		UNPROTECT(4); /* x, i, p, U */
-		return mkDet(0.0, givelog, 1);
-	    }
-	    k = kend;
-	}
-	UNPROTECT(4); /* x, i, p, U */
-
-	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-	    sign = -sign;
-	UNPROTECT(1); /* p */
-	PROTECT(p = GET_SLOT(obj, Matrix_qSym));
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-	    sign = -sign;
-	UNPROTECT(1); /* p */
-    }
-    return mkDet(modulus, givelog, sign);
-}
-
-SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim), n = pdim[0];
-    if (pdim[1] != n)
-	error(_("determinant of non-square matrix is undefined"));
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
-    double modulus = 0.0; /* result for n == 0 */
-    if (n > 0) {
-	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
-	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
-	if (INTEGER(dim)[0] > n)
-	    error(_("determinant(<sparseQR>) does not support structurally rank deficient case"));
-	UNPROTECT(1); /* dim */
-	
-	SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),
-	    i = PROTECT(GET_SLOT(R, Matrix_iSym)),
-	    x = PROTECT(GET_SLOT(R, Matrix_xSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
-	double *px = REAL(x);
-	
-	for (j = 0; j < n; ++j) {
-	    kend = *(++pp);
-	    if (kend > k && pi[kend - 1] == j) {
-		if (px[kend - 1] < 0.0) {
-		    modulus += log(-px[kend - 1]);
-		    sign = -sign;
-		} else {
-		    /* incl. 0, NaN cases */
-		    modulus += log(px[kend - 1]);
-		}
-	    } else {
-		UNPROTECT(4); /* x, i, p, R */
-		return mkDet(0.0, givelog, 1);
-	    }
-	    k = kend;
-	}
-	UNPROTECT(4); /* x, i, p, U */
-
-	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-	    sign = -sign;
-	UNPROTECT(1); /* p */
-	PROTECT(p = GET_SLOT(obj, Matrix_qSym));
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-	    sign = -sign;
-	UNPROTECT(1); /* p */
-    }
-    return mkDet(modulus, givelog, sign);
-}
-
-SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
-    double modulus = 0.0; /* result for n == 0 */
+    DETERMINANT_START(0);
     if (n > 0) {
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
@@ -1061,11 +1206,9 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	
 	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int j = 0, *ppivot = INTEGER(pivot);
+	int j = 0, unpacked = !asLogical(packed), *ppivot = INTEGER(pivot);
 	R_xlen_t n1a = (R_xlen_t) n + 1;
-	double *px = REAL(x), a, b, c, logab, logcc;	
-	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
-	    (R_xlen_t) n * n == XLENGTH(x);	
+	double *px = REAL(x), a, b, c, logab, logcc;
 	while (j < n) {
 	    if (ppivot[j] > 0) {
 		if (*px < 0.0) {
@@ -1112,24 +1255,18 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
     return mkDet(modulus, givelog, sign);
 }
 
-SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
+SEXP Cholesky_determinant(SEXP obj, SEXP logarithm, SEXP packed)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
-    double modulus = 0.0; /* result for n == 0 */
+    DETERMINANT_START(0);
     if (n > 0) {
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
 	UNPROTECT(1); /* uplo */
 	
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int j;
+	int j, unpacked = !asLogical(packed);
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 	double *px = REAL(x);
-	int unpacked = (double) n * n <= R_XLEN_T_MAX &&
-	    (R_xlen_t) n * n == XLENGTH(x);	
 	for (j = 0; j < n; ++j) {
 	    if (*px < 0.0) {
 		modulus += log(-(*px));
@@ -1146,18 +1283,98 @@ SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
     return mkDet(modulus, givelog, sign);
 }
 
+SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
+{
+    DETERMINANT_START(0);
+    if (n > 0) {
+	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
+	    p = PROTECT(GET_SLOT(U, Matrix_pSym)),
+	    i = PROTECT(GET_SLOT(U, Matrix_iSym)),
+	    x = PROTECT(GET_SLOT(U, Matrix_xSym));
+	int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
+	double *px = REAL(x);
+
+	for (j = 0; j < n; ++j) {
+	    kend = *(++pp);
+	    if (kend > k && pi[kend - 1] == j) {
+		if (px[kend - 1] < 0.0) {
+		    modulus += log(-px[kend - 1]);
+		    sign = -sign;
+		} else {
+		    /* incl. 0, NaN cases */
+		    modulus += log(px[kend - 1]);
+		}
+	    } else {
+		UNPROTECT(4); /* x, i, p, U */
+		return mkDet(0.0, givelog, 1);
+	    }
+	    k = kend;
+	}
+	UNPROTECT(4); /* x, i, p, U */
+
+	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+	    sign = -sign;
+	UNPROTECT(1); /* p */
+	PROTECT(p = GET_SLOT(obj, Matrix_qSym));
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+	    sign = -sign;
+	UNPROTECT(1); /* p */
+    }
+    return mkDet(modulus, givelog, sign);
+}
+
+SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
+{
+    DETERMINANT_START(1);
+    if (n > 0) {
+	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
+	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
+	if (INTEGER(dim)[0] > n)
+	    error(_("determinant(<sparseQR>) does not support structurally rank deficient case"));
+	UNPROTECT(1); /* dim */
+	
+	SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),
+	    i = PROTECT(GET_SLOT(R, Matrix_iSym)),
+	    x = PROTECT(GET_SLOT(R, Matrix_xSym));
+	int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
+	double *px = REAL(x);
+	
+	for (j = 0; j < n; ++j) {
+	    kend = *(++pp);
+	    if (kend > k && pi[kend - 1] == j) {
+		if (px[kend - 1] < 0.0) {
+		    modulus += log(-px[kend - 1]);
+		    sign = -sign;
+		} else {
+		    /* incl. 0, NaN cases */
+		    modulus += log(px[kend - 1]);
+		}
+	    } else {
+		UNPROTECT(4); /* x, i, p, R */
+		return mkDet(0.0, givelog, 1);
+	    }
+	    k = kend;
+	}
+	UNPROTECT(4); /* x, i, p, U */
+
+	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+	    sign = -sign;
+	UNPROTECT(1); /* p */
+	PROTECT(p = GET_SLOT(obj, Matrix_qSym));
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+	    sign = -sign;
+	UNPROTECT(1); /* p */
+    }
+    return mkDet(modulus, givelog, sign);
+}
+
 SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int n = INTEGER(dim)[0];
-    UNPROTECT(1); /* dim */
-    int givelog = asLogical(logarithm) != 0, sign = 1;
-    double modulus = 0.0; /* result for n == 0 */
+    DETERMINANT_START(0);
     if (n > 0) {
-	CHM_FR L = AS_CHM_FR(obj);
-	R_CheckStack();
-	if (L->xtype != CHOLMOD_REAL)
-	    error(_("determinant(<CHMfactor>) requires dCHMsimpl or dCHMsuper"));
+	cholmod_factor *L = mf2cholmod(obj);
 	if (L->is_super) {
 	    int i, j, nc, nsuper = (int) L->nsuper,
 		*ps = (int *) L->super,
@@ -1186,117 +1403,636 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
     return mkDet(modulus, givelog, sign);
 }
 
-/* MJ: no longer needed ... replacement in ./validity.c */
-#if 0
-
-SEXP LU_validate(SEXP obj)
+static void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
 {
-    SEXP x = GET_SLOT(obj, Matrix_xSym);
-    if (!isReal(x))
-	return mkString(_("'x' slot is not of type \"double\""));
-    int *pdim = INTEGER(GET_SLOT(obj, Matrix_DimSym));
-    if (XLENGTH(x) != pdim[0] * (double) pdim[1])
-	return mkString(_("length of 'x' slot is not prod(Dim)"));
-    return DimNames_validate(obj, pdim);
+    SEXP s;
+    if (!isNull(s = VECTOR_ELT(adn, 1)))
+	SET_VECTOR_ELT(rdn, 0, s);
+    if (!isNull(s = VECTOR_ELT(bdn, 1)))
+	SET_VECTOR_ELT(rdn, 1, s);
+    PROTECT(adn = getAttrib(adn, R_NamesSymbol));
+    PROTECT(bdn = getAttrib(bdn, R_NamesSymbol));
+    if(!isNull(adn) || !isNull(bdn)) {
+	PROTECT(s = allocVector(STRSXP, 2));
+	if (!isNull(adn))
+	    SET_STRING_ELT(s, 0, STRING_ELT(adn, 1));
+	if (!isNull(bdn))
+	    SET_STRING_ELT(s, 1, STRING_ELT(bdn, 1));
+	setAttrib(rdn, R_NamesSymbol, s);
+	UNPROTECT(1);
+    }
+    UNPROTECT(2);
+    return;
 }
 
-#endif /* MJ */
-
-/* MJ: no longer needed ... prefer denseLU_expand() */
-#if 0
-
-SEXP LU_expand(SEXP x)
+SEXP denseLU_solve(SEXP a, SEXP b)
 {
-    const char *nms[] = {"L", "U", "P", ""};
-    // x[,] is  m x n    (using LAPACK dgetrf notation)
-    SEXP L, U, P, val = PROTECT(Rf_mkNamed(VECSXP, nms)),
-	lux = GET_SLOT(x, Matrix_xSym),
-	dd = GET_SLOT(x, Matrix_DimSym);
-    int *iperm, *perm, *pivot = INTEGER(GET_SLOT(x, Matrix_permSym)),
-	*dim = INTEGER(dd), m = dim[0], n = dim[1], nn = m, i;
-    size_t m_ = (size_t) m; // to prevent integer (multiplication) overflow
-    Rboolean is_sq = (n == m), L_is_tri = TRUE, U_is_tri = TRUE;
-
-    // nn :=  min(n,m) ==  length(pivot[])
-    if(!is_sq) {
-	if(n < m) { // "long"
-	    nn = n;
-	    L_is_tri = FALSE;
-	} else { // m < n : "wide"
-	    U_is_tri = FALSE;
-	}
-    }
-
-    SET_VECTOR_ELT(val, 0, NEW_OBJECT_OF_CLASS(L_is_tri ? "dtrMatrix":"dgeMatrix"));
-    SET_VECTOR_ELT(val, 1, NEW_OBJECT_OF_CLASS(U_is_tri ? "dtrMatrix":"dgeMatrix"));
-    SET_VECTOR_ELT(val, 2, NEW_OBJECT_OF_CLASS("pMatrix"));
-    L = VECTOR_ELT(val, 0);
-    U = VECTOR_ELT(val, 1);
-    P = VECTOR_ELT(val, 2);
-    if(is_sq || !L_is_tri) {
-	SET_SLOT(L, Matrix_xSym, duplicate(lux));
-	SET_SLOT(L, Matrix_DimSym, duplicate(dd));
-    } else { // !is_sq && L_is_tri -- m < n -- "wide" -- L is  m x m
-	size_t m2 = m_ * m;
-	double *Lx = REAL(ALLOC_SLOT(L, Matrix_xSym, REALSXP, m2));
-	int *dL = INTEGER(ALLOC_SLOT(L, Matrix_DimSym, INTSXP, 2));
-	dL[0] = dL[1] = m;
-	// fill lower-diagonal (non-{0,1}) part -- remainder by ddense_unpacked_make_*() below:
-	Memcpy(Lx, REAL(lux), m2);
-    }
-    if(is_sq || !U_is_tri) {
-	SET_SLOT(U, Matrix_xSym, duplicate(lux));
-	SET_SLOT(U, Matrix_DimSym, duplicate(dd));
-    } else { // !is_sq && U_is_tri -- m > n -- "long" -- U is  n x n
-	double *Ux = REAL(ALLOC_SLOT(U, Matrix_xSym, REALSXP, ((size_t) n) * n)),
-	       *xx = REAL(lux);
-	int *dU = INTEGER(ALLOC_SLOT(U, Matrix_DimSym, INTSXP, 2));
-	dU[0] = dU[1] = n;
-	/* fill upper-diagonal (non-0) part -- remainder by ddense_unpacked_make_*() below:
-	 * this is more complicated than in the L case, as the x / lux part we need
-	 * is  *not*  continguous:  Memcpy(Ux, REAL(lux), n * n); -- is  WRONG */
-	for (size_t j = 0; j < n; j++) {
-	    Memcpy(Ux+j*n, xx+j*m, j+1);
-	    // for (i = 0; i <= j; i++)
-	    //   Ux[i + j*n] = xx[i + j*m];
-	}
-    }
-    if(L_is_tri) {
-	SET_SLOT(L, Matrix_uploSym, mkString("L"));
-	SET_SLOT(L, Matrix_diagSym, mkString("U"));
-    }
-    // fill the upper right part with 0  *and* the diagonal with 1
-    ddense_unpacked_make_triangular(REAL(GET_SLOT(L, Matrix_xSym)),
-				    m, (is_sq || !L_is_tri) ? n : m, 'L', 'U');
-
-    if(U_is_tri) {
-	SET_SLOT(U, Matrix_uploSym, mkString("U"));
-	SET_SLOT(U, Matrix_diagSym, mkString("N"));
-	
-    }
-    // fill the lower left part with 0
-    ddense_unpacked_make_triangular(REAL(GET_SLOT(U, Matrix_xSym)),
-				    (is_sq || !U_is_tri) ? m : n, n, 'U', 'N');
     
-    SET_SLOT(P, Matrix_DimSym, duplicate(dd));
-    if(!is_sq) // m != n -- P is  m x m
-	INTEGER(GET_SLOT(P, Matrix_DimSym))[1] = m;
-    perm = INTEGER(ALLOC_SLOT(P, Matrix_permSym, INTSXP, m));
-    Matrix_Calloc(iperm, m, int);
+#define SOLVE_START(_MAYBE_NOT_SQUARE_)					\
+    SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym));			\
+    int *padim = INTEGER(adim), m = padim[0], n = m;			\
+    if ((_MAYBE_NOT_SQUARE_) && padim[1] != m)				\
+	error(_("'a' is not square"));		\
+    UNPROTECT(1); /* adim */						\
+    if (!isNull(b)) {							\
+	SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));		\
+	int *pbdim = INTEGER(bdim);					\
+	if (pbdim[0] != m)						\
+	    error(_("dimensions of 'a' and 'b' are inconsistent"));	\
+	n = pbdim[1];							\
+	UNPROTECT(1); /* bdim */					\
+    }
+    
+    SOLVE_START(1);
+    SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
+	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
+	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
+	rx,
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
+	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
+    int *prdim = INTEGER(rdim), info;
+    prdim[0] = m;
+    prdim[1] = n;
+    if (isNull(b)) {
+	revDN(rdimnames, adimnames);
+	PROTECT(rx = duplicate(ax));
+	int lwork = -1;
+	double work0, *work = &work0;
+	F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+			 work, &lwork, &info);
+	ERROR_LAPACK_1(dgetri, info);
+	lwork = (int) work0;
+	work = (double *) R_alloc((size_t) lwork, sizeof(double));
+	F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+			 work, &lwork, &info);
+	ERROR_LAPACK_2(dgetri, info, 2, U);
+    } else {
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	solveDN(rdimnames, adimnames, bdimnames);
+	rx = duplicate(bx);
+	UNPROTECT(2); /* bx, bdimnames */
+	PROTECT(rx);
+	F77_CALL(dgetrs)("N", &m, &n, REAL(ax), &m, INTEGER(apivot),
+			 REAL(rx), &m, &info FCONE);
+	ERROR_LAPACK_1(dgetrs, info);
+    }
+    SET_SLOT(r, Matrix_xSym, rx);
+    UNPROTECT(7); /* rx, apivot, ax, adimnames, rdimnames, rdim, r */
+    return r;
+}
 
-    for (i = 0; i < m; i++) iperm[i] = i + 1; /* initialize permutation*/
-    for (i = 0; i < nn; i++) {	/* generate inverse permutation */
-	int newp = pivot[i] - 1;
-	if (newp != i) { // swap
-	    int tmp = iperm[i]; iperm[i] = iperm[newp]; iperm[newp] = tmp;
+SEXP BunchKaufman_solve(SEXP a, SEXP b, SEXP packed)
+{
+    SOLVE_START(0);
+    int unpacked = !asLogical(packed);
+    const char *cl = (!isNull(b)) ? "dgeMatrix" :
+	((unpacked) ? "dsyMatrix" : "dspMatrix");
+    SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
+	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
+	rx,
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
+	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
+	apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
+    int *prdim = INTEGER(rdim), info;
+    char ul = *CHAR(STRING_ELT(auplo, 0));
+    prdim[0] = m;
+    prdim[1] = n;
+    if (isNull(b)) {
+	revDN(rdimnames, adimnames);
+	PROTECT(rx = duplicate(ax));
+	SET_SLOT(r, Matrix_uploSym, auplo);
+	double *work = (double *) R_alloc((size_t) m, sizeof(double));
+	if (unpacked) {
+	    F77_CALL(dsytri)(&ul, &m, REAL(rx), &m, INTEGER(apivot),
+			     work, &info FCONE);
+	    ERROR_LAPACK_2(dsytri, info, 2, D);
+	} else {
+	    F77_CALL(dsptri)(&ul, &m, REAL(rx),     INTEGER(apivot),
+			     work, &info FCONE);
+	    ERROR_LAPACK_2(dsptri, info, 2, D);
+	}
+    } else {
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	solveDN(rdimnames, adimnames, bdimnames);
+	rx = duplicate(bx);
+	UNPROTECT(2); /* bx, bdimnames */
+	PROTECT(rx);
+	if (unpacked) {
+	    F77_CALL(dsytrs)(&ul, &m, &n, REAL(ax), &m, INTEGER(apivot),
+			     REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_1(dsytrs, info);
+	} else {
+	    F77_CALL(dsptrs)(&ul, &m, &n, REAL(ax),     INTEGER(apivot),
+			     REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_1(dsptrs, info);
 	}
     }
-    // invert the inverse
-    for (i = 0; i < m; i++) perm[iperm[i] - 1] = i + 1;
+    SET_SLOT(r, Matrix_xSym, rx);
+    UNPROTECT(8); /* rx, apivot, auplo, ax, adimnames, rdimnames, rdim, r */
+    return r;
+}
 
-    Matrix_Free(iperm, m);
-    UNPROTECT(1);
-    return val;
+SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
+{
+    SOLVE_START(0);
+    int unpacked = !asLogical(packed);
+    const char *cl = (!isNull(b)) ? "dgeMatrix" :
+	((unpacked) ? "dpoMatrix" : "dppMatrix");
+    SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
+	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
+	rx,
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
+	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
+    int *prdim = INTEGER(rdim), info;
+    char ul = *CHAR(STRING_ELT(auplo, 0));
+    prdim[0] = m;
+    prdim[1] = n;
+    if (isNull(b)) {
+	revDN(rdimnames, adimnames);
+	PROTECT(rx = duplicate(ax));
+	SET_SLOT(r, Matrix_uploSym, auplo);
+	if (unpacked) {
+	    F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_2(dpotri, info, 2, L);
+	} else {
+	    F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
+	    ERROR_LAPACK_2(dpptri, info, 2, L);
+	}
+    } else {
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	solveDN(rdimnames, adimnames, bdimnames);
+	rx = duplicate(bx);
+	UNPROTECT(2); /* bx, bdimnames */
+	PROTECT(rx);
+	if (unpacked) {
+	    F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
+			     REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_1(dpotrs, info);
+	} else {
+	    F77_CALL(dpptrs)(&ul, &m, &n, REAL(ax),
+			     REAL(rx), &m, &info FCONE);
+	    ERROR_LAPACK_1(dpptrs, info);
+	}
+    }
+    SET_SLOT(r, Matrix_xSym, rx);
+    UNPROTECT(7); /* rx, auplo, ax, adimnames, rdimnames, rdim, r */
+    return r;
+}
+
+SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
+{
+
+#define ERROR_SOLVE_OOM(_A_, _B_)					\
+    error(_("solve(<%s>, <%s>) failed: out of memory"), #_A_, #_B_)
+    
+    SOLVE_START(0);
+    SEXP r,
+	aL = PROTECT(GET_SLOT(a, Matrix_LSym)),
+	aU = PROTECT(GET_SLOT(a, Matrix_USym)),
+	ap = PROTECT(GET_SLOT(a, Matrix_pSym)),
+	aq = PROTECT(GET_SLOT(a, Matrix_qSym));
+    int j, *pap = INTEGER(ap), *paq = (LENGTH(aq)) ? INTEGER(aq) : (int *) NULL;
+    double *work = (double *) R_alloc((size_t) m, sizeof(double));
+    cs *L = dgC2cs(aL), *U = dgC2cs(aU);
+    if (!asLogical(sparse)) {
+	PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	int *prdim = INTEGER(rdim);
+	prdim[0] = m;
+	prdim[1] = n;
+	UNPROTECT(1); /* rdim */
+	R_xlen_t mn = (R_xlen_t) m * n;
+	SEXP rx = PROTECT(allocVector(REALSXP, mn));
+	double *prx = REAL(rx);
+	if (isNull(b)) {
+	    Matrix_memset(prx, 0, mn, sizeof(double));
+	    for (j = 0; j < n; ++j) {
+		prx[j] = 1.0;
+		cs_pvec(pap, prx, work, m);
+		cs_lsolve(L, work);
+		cs_usolve(U, work);
+		if (paq)
+		    cs_ipvec(paq, work, prx, m);
+		else
+		    Matrix_memcpy(prx, work, m, sizeof(double));
+		prx += m;
+	    }
+	} else {
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    double *pbx = REAL(bx);
+	    for (j = 0; j < n; ++j) {
+		cs_pvec(pap, pbx, work, m);
+		cs_lsolve(L, work);
+		cs_usolve(U, work);
+		if (paq)
+		    cs_ipvec(paq, work, prx, m);
+		else
+		    Matrix_memcpy(prx, work, m, sizeof(double));
+		prx += m;
+		pbx += m;
+	    }
+	    UNPROTECT(1); /* bx */
+	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(1); /* rx */
+    } else {
+	cs *B, *X;
+	int *papinv = cs_pinv(pap, m);
+	if (!papinv)
+	    ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	if (isNull(b)) {
+	    B = cs_spalloc(m, n, n, 1, 0);
+	    if (!B)
+		ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	    for (j = 0; j < n; ++j) {
+		B->p[j] = j;
+		B->i[j] = j;
+		B->x[j] = 1.0;
+	    }
+	    B->p[n] = n;
+	    X = cs_permute(        B, papinv, (int *) NULL, 1);
+	    B = cs_spfree(B);
+	} else
+	    X = cs_permute(dgC2cs(b), papinv, (int *) NULL, 1);
+	papinv = cs_free(papinv);
+	if (!X)
+	    ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	B = X;
+	
+	int i, k, top, *iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
+	
+#define DO_TRIANGULAR_SOLVE(_A_, _LO_, _FOR_)				\
+	do {								\
+	    X = cs_spalloc(m, n, B->nzmax, 1, 0);			\
+	    if (!X) {							\
+		B = cs_spfree(B);					\
+		ERROR_SOLVE_OOM(sparseLU, dgCMatrix);			\
+	    }								\
+	    for (j = 0, k = 0; j < n; ++j) {				\
+		top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _LO_); \
+		if (m - top > INT_MAX - X->p[j]) {			\
+		    B = cs_spfree(B);					\
+		    X = cs_spfree(X);					\
+		    error(_("attempt to construct sparse matrix with "	\
+			    "more than 2^31-1 nonzero elements"));	\
+		}							\
+		X->p[j + 1] = X->p[j] + m - top;			\
+		if (X->p[j + 1] > X->nzmax) {				\
+		    int nzmax = X->nzmax;				\
+		    nzmax = (nzmax > INT_MAX / 2) ? INT_MAX : 2 * nzmax; \
+		    if (!cs_sprealloc(X, nzmax)) {			\
+			B = cs_spfree(B);				\
+			X = cs_spfree(X);				\
+			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);		\
+		    }							\
+		}							\
+		_FOR_ {							\
+		    X->i[k] =      iwork[i];				\
+		    X->x[k] = work[iwork[i]];				\
+		    ++k;						\
+		}							\
+	    }								\
+	    B = cs_spfree(B);						\
+	    B = X;							\
+	} while (0)
+	
+	DO_TRIANGULAR_SOLVE(L, 1, for (i = top; i <    m; ++i));
+        DO_TRIANGULAR_SOLVE(U, 0, for (i = m-1; i >= top; --i));
+	
+	if (paq) {
+	    X = cs_permute(B, paq, (int *) NULL, 1);
+	    B = cs_spfree(B);
+	    if (!X)
+		ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	    B = X;
+	}
+
+	/* Drop zeros from B and sort it : */
+	cs_dropzeros(B); 
+	X = cs_transpose(B, 1);
+	B = cs_spfree(B);
+	if (!X)
+	    ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	B = cs_transpose(X, 1);
+	X = cs_spfree(X);
+	if (!B)
+	    ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+	
+	PROTECT(r = cs2dgC(B, "dgCMatrix"));
+	B = cs_spfree(B);
+    }
+    
+#define SOLVE_FINISH							\
+    SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),		\
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym));		\
+    if (isNull(b))							\
+	revDN(rdimnames, adimnames);					\
+    else {								\
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym));	\
+	solveDN(rdimnames, adimnames, bdimnames);			\
+	UNPROTECT(1); /* bdimnames */					\
+    }									\
+    UNPROTECT(2); /* adimnames, rdimnames */
+
+    SOLVE_FINISH;
+    UNPROTECT(5); /* r, aq, ap, aU, aL */
+    return r;
+}
+
+/* MJ: not needed since we have 'sparseQR_coef' : */
+#if 0
+
+SEXP sparseQR_solve(SEXP a, SEXP b, SEXP sparse)
+{
+    return R_NilValue;
 }
 
 #endif /* MJ */
+
+SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
+{
+    /* see top of :
+       ./CHOLMOD/Cholesky/cholmod_solve.c
+       ./CHOLMOD/Cholesky/cholmod_spsolve.c
+    */
+    static const char *valid[] = {
+	"A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt", "" };
+    int ivalid = -1;
+    if (TYPEOF(system) != STRSXP || LENGTH(system) < 1 ||
+	(system = STRING_ELT(system, 0)) == NA_STRING ||
+	(ivalid = strmatch(CHAR(system), valid)) < 0)
+	error(_("invalid argument 'system'"));
+    SOLVE_START(0);
+    SEXP r;
+    int j;
+    cholmod_factor *L = mf2cholmod(a);
+    if (!asLogical(sparse)) {
+	cholmod_dense *B, *X;
+	if (isNull(b)) {
+	    B = cholmod_allocate_dense(m, n, m, CHOLMOD_REAL, &c);
+	    if (!B)
+		ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+	    R_xlen_t m1a = (R_xlen_t) m + 1;
+	    double *px = (double *) B->x;
+	    Matrix_memset(px, 0, (R_xlen_t) m * n, sizeof(double));
+	    for (j = 0; j < n; ++j) {
+		*px = 1.0;
+		px += m1a;
+	    }
+	    X = cholmod_solve(ivalid, L, B, &c);
+	    if (!X)
+		ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+	    cholmod_free_dense(&B, &c);
+	    const char *cl = (ivalid < 2) ? "dpoMatrix" :
+		((ivalid < 7) ? "dtrMatrix" : "dgeMatrix");
+	    PROTECT(r = cholmod2dge(X, cl));
+	} else {
+	    B = dge2cholmod(b);
+	    X = cholmod_solve(ivalid, L, B, &c);
+	    if (!X)
+		ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+	    PROTECT(r = cholmod2dge(X, "dgeMatrix"));
+	}
+	cholmod_free_dense(&X, &c);
+    } else {
+	cholmod_sparse *B, *X;
+	if (isNull(b)) {
+	    B = cholmod_allocate_sparse(m, n, n, 1, 1, 0, CHOLMOD_REAL, &c);
+	    if (!B)
+		ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+	    int *pp = (int *) B->p, *pi = (int *) B->i;
+	    double *px = (double *) B->x;
+	    for (j = 0; j < n; ++j) {
+		pp[j] = j;
+		pi[j] = j;
+		px[j] = 1.0;
+	    }
+	    pp[n] = n;
+	    X = cholmod_spsolve(ivalid, L, B, &c);
+	    if (!X)
+		ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+	    cholmod_free_sparse(&B, &c);
+	    if (ivalid < 7) {
+		X->stype = (ivalid == 2 || ivalid == 4) ? -1 : 1;
+		cholmod_sort(X, &c);
+		if (!X)
+		    ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+	    }
+	    const char *cl = (ivalid < 2) ? "dsCMatrix" :
+		((ivalid < 7) ? "dtCMatrix" : "dgCMatrix");
+	    PROTECT(r = cholmod2dgC(X, cl));
+	} else {
+	    B = dgC2cholmod(b);
+	    X = cholmod_spsolve(ivalid, L, B, &c);
+	    if (!X)
+		ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+	    PROTECT(r = cholmod2dgC(X, "dgCMatrix"));
+	}
+	cholmod_free_sparse(&X, &c);
+    }
+    if (isNull(b) && (ivalid == 2 || ivalid == 4)) {
+	SEXP uplo = PROTECT(mkString("L"));
+	SET_SLOT(r, Matrix_uploSym, uplo);
+	UNPROTECT(1); /* uplo */
+    }
+    
+    SOLVE_FINISH;
+    UNPROTECT(1); /* r */
+    return r;
+}
+
+SEXP dtrMatrix_solve(SEXP a, SEXP b, SEXP packed)
+{
+    SOLVE_START(0);
+    int unpacked = !asLogical(packed);
+    const char *cl = (!isNull(b)) ? "dgeMatrix" :
+	((unpacked) ? "dtrMatrix" : "dtpMatrix");
+    SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
+	rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),
+	rx,
+	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
+	ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
+	adiag = PROTECT(GET_SLOT(a, Matrix_diagSym));
+    int *prdim = INTEGER(rdim), info;
+    char ul = *CHAR(STRING_ELT(auplo, 0)), di = *CHAR(STRING_ELT(adiag, 0));
+    prdim[0] = m;
+    prdim[1] = n;
+    if (isNull(b)) {
+	revDN(rdimnames, adimnames);
+	PROTECT(rx = duplicate(ax));
+	SET_SLOT(r, Matrix_uploSym, auplo);
+	SET_SLOT(r, Matrix_diagSym, adiag);
+	if (unpacked) {
+	    F77_CALL(dtrtri)(&ul, &di, &m, REAL(rx), &m, &info FCONE FCONE);
+	    ERROR_LAPACK_2(dtrtri, info, 2, A);
+	} else {
+	    F77_CALL(dtptri)(&ul, &di, &m, REAL(rx),     &info FCONE FCONE);
+	    ERROR_LAPACK_2(dtptri, info, 2, A);
+	}
+    } else {
+	SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+	    bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	solveDN(rdimnames, adimnames, bdimnames);
+	rx = duplicate(bx);
+	UNPROTECT(2); /* bx, bdimnames */
+	PROTECT(rx);
+	if (unpacked) {
+	    F77_CALL(dtrtrs)(&ul, "N", &di, &m, &n, REAL(ax), &m,
+			     REAL(rx), &m, &info FCONE FCONE FCONE);
+	    ERROR_LAPACK_1(dtrtrs, info);
+	} else {
+	    // https://bugs.r-project.org/show_bug.cgi?id=18534
+	    F77_CALL(dtptrs)(&ul, "N", &di, &m, &n, REAL(ax),
+			     REAL(rx), &m, &info FCONE FCONE);
+	    ERROR_LAPACK_1(dtptrs, info);
+	}
+    }
+    SET_SLOT(r, Matrix_xSym, rx);
+    UNPROTECT(8); /* rx, adiag, auplo, ax, adimnames, rdimnames, rdim, r */
+    return r;
+}
+
+SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
+{
+    SOLVE_START(0);
+    SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
+    char ul = *CHAR(STRING_ELT(auplo, 0));
+    cs *A = dgC2cs(a);
+    int j;
+    if (!asLogical(sparse)) {
+	R_xlen_t mn = (R_xlen_t) m * n;
+	SEXP rx = PROTECT(allocVector(REALSXP, mn));
+	double *prx = REAL(rx);
+	if (isNull(b)) {
+	    PROTECT(r = NEW_OBJECT_OF_CLASS("dtrMatrix"));
+	    SET_SLOT(r, Matrix_uploSym, auplo);
+	    Matrix_memset(prx, 0, mn, sizeof(double));
+	    for (j = 0; j < n; ++j) {
+		prx[j] = 1.0;
+		if (ul == 'U')
+		    cs_usolve(A, prx);
+		else
+		    cs_lsolve(A, prx);
+		prx += m;
+	    }
+	} else {
+	    PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+	    double *pbx = REAL(bx);
+	    Matrix_memcpy(prx, pbx, mn, sizeof(double));
+	    UNPROTECT(1); /* bx */
+	    for (j = 0; j < n; ++j) {
+		if (ul == 'U')
+		    cs_usolve(A, prx);
+		else
+		    cs_lsolve(A, prx);
+		prx += m;
+	    }
+	}
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(1); /* rx */
+
+	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	int *prdim = INTEGER(rdim);
+	prdim[0] = m;
+	prdim[1] = n;
+	UNPROTECT(1); /* rdim */
+    } else {
+	cs *B, *X;
+	if (isNull(b)) {
+	    B = cs_spalloc(m, n, n, 1, 0);
+	    if (!B)
+		ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+	    for (j = 0; j < n; ++j) {
+		B->p[j] = j;
+		B->i[j] = j;
+		B->x[j] = 1.0;
+	    }
+	    B->p[n] = n;
+	} else
+	    B = dgC2cs(b);
+
+	X = cs_spalloc(m, n, B->nzmax, 1, 0);
+	if (!X) {
+	    if (isNull(b))
+		B = cs_spfree(B);
+	    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+	}
+	X->p[0] = 0;
+	
+	int i, k, top, nz = 0, nzmax = X->nzmax,
+	    *iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
+	double *work = (double *) R_alloc((size_t) m, sizeof(double));
+
+	for (j = 0, k = 0; j < n; ++j) {
+	    top = cs_spsolve(A, B, j, iwork, work, (int *) NULL, ul != 'U');
+	    if (m - top > INT_MAX - nz) {
+		if (isNull(b))
+		    B = cs_spfree(B);
+		X = cs_spfree(X);
+		error(_("attempt to construct sparse matrix with "
+			"more than 2^31-1 nonzero elements"));
+	    }
+	    nz += m - top;
+	    if (nz > nzmax) {
+		nzmax = (nzmax > INT_MAX / 2) ? INT_MAX : 2 * nzmax;
+		if (!cs_sprealloc(X, nzmax)) {
+		    if (isNull(b))
+			B = cs_spfree(B);
+		    X = cs_spfree(X);
+		    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+		}
+	    }
+	    X->p[j + 1] = nz;
+	    if (ul == 'U') {
+		for (i = top; i <    m; ++i) {
+		    X->i[k] =      iwork[i];
+		    X->x[k] = work[iwork[i]];
+		    ++k;
+		}
+	    } else {
+		for (i = m-1; i >= top; --i) {
+		    X->i[k] =      iwork[i];
+		    X->x[k] = work[iwork[i]];
+		    ++k;
+		}
+	    }
+	}
+
+	if (isNull(b))
+	    B = cs_spfree(B);
+	B = X;
+
+	/* Drop zeros from B and sort it : */
+	cs_dropzeros(B);
+	X = cs_transpose(B, 1);
+	B = cs_spfree(B);
+	if (!X)
+	    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+	B = cs_transpose(X, 1);
+	X = cs_spfree(X);
+	if (!B)
+	    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+	
+	if (isNull(b)) {
+	    PROTECT(r = cs2dgC(B, "dtCMatrix"));
+	    SET_SLOT(r, Matrix_uploSym, auplo);
+	} else
+	    PROTECT(r = cs2dgC(B, "dgCMatrix"));
+	B = cs_spfree(B);
+    }
+
+    SOLVE_FINISH;
+    UNPROTECT(2); /* r, auplo */
+    return r;
+}

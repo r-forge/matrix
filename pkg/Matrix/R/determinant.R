@@ -49,19 +49,19 @@ setMethod("determinant", signature(x = "sparseQR", logarithm = "logical"),
 
 setMethod("determinant", signature(x = "BunchKaufman", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(BunchKaufman_determinant, x, logarithm))
+              .Call(BunchKaufman_determinant, x, logarithm, FALSE))
 
 setMethod("determinant", signature(x = "pBunchKaufman", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(BunchKaufman_determinant, x, logarithm))
+              .Call(BunchKaufman_determinant, x, logarithm, TRUE))
 
 setMethod("determinant", signature(x = "Cholesky", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(Cholesky_determinant, x, logarithm))
+              .Call(Cholesky_determinant, x, logarithm, FALSE))
 
 setMethod("determinant", signature(x = "pCholesky", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(Cholesky_determinant, x, logarithm))
+              .Call(Cholesky_determinant, x, logarithm, TRUE))
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)

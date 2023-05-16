@@ -10,8 +10,6 @@ SEXP dgeMatrix_trf_(SEXP, int);
 double get_norm_dge(SEXP obj, const char *typstr);
 SEXP dgeMatrix_norm(SEXP obj, SEXP type);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);
-SEXP dgeMatrix_solve(SEXP a);
-SEXP dgeMatrix_matrix_solve(SEXP a, SEXP b);
 
 /* for crossprod() and tcrossprod() -- dge*() and the generalized versions: */
 SEXP dgeMatrix_crossprod(SEXP x, SEXP trans);

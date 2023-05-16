@@ -1,4 +1,7 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dsCMatrix.h"
+#endif /* MJ */
 
 /* MJ: no longer needed ... replacement in ./factorizations.c */
 #if 0
@@ -204,8 +207,6 @@ SEXP dsCMatrix_LDL_D(SEXP Ap, SEXP permP, SEXP resultKind)
     return(ans);
 }
 
-#endif /* MJ */
-
 // using cholmod_spsolve() --> sparse result
 SEXP dsCMatrix_Csparse_solve(SEXP a, SEXP b, SEXP LDL)
 {
@@ -264,6 +265,8 @@ SEXP dsCMatrix_matrix_solve(SEXP a, SEXP b, SEXP LDL)
 			     /*     dn */ R_NilValue,
 			     /* transp */ FALSE);
 }
+
+#endif /* MJ */
 
 /* MJ: no longer used ... prefer R_sparse_as_general(), CRsparse_as_Tsparse() */
 #if 0

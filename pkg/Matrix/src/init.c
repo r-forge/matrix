@@ -8,10 +8,8 @@
 #include "dgeMatrix.h"
 #include "dpoMatrix.h"
 #include "dppMatrix.h"
-#include "dsCMatrix.h"
 #include "dspMatrix.h"
 #include "dsyMatrix.h"
-#include "dtCMatrix.h"
 #include "dtrMatrix.h"
 #include "dtpMatrix.h"
 #include "factorizations.h"
@@ -31,8 +29,6 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 
 static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_to_sparse, 1),
-    CALLDEF(CHMfactor_solve, 3),
-    CALLDEF(CHMfactor_spsolve, 3),
     CALLDEF(CHMfactor_ldetL2, 1),
     CALLDEF(CHMfactor_ldetL2up, 3),
     CALLDEF(CHMfactor_update, 3),
@@ -66,14 +62,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_any0, 1),
 
     CALLDEF(compressed_non_0_ij, 2),
-    CALLDEF(dgCMatrix_matrix_solve, 3),
-    CALLDEF(dgCMatrix_cholsol, 2),
+    CALLDEF(dgCMatrix_lusol, 2),
     CALLDEF(dgCMatrix_qrsol, 3),
-
+    CALLDEF(dgCMatrix_cholsol, 2),
+    
     CALLDEF(dgeMatrix_norm, 2),
     CALLDEF(dgeMatrix_rcond, 2),
-    CALLDEF(dgeMatrix_solve, 1),
-    CALLDEF(dgeMatrix_matrix_solve, 2),
     CALLDEF(dgeMatrix_crossprod, 2),
     CALLDEF (geMatrix_crossprod, 2),
     CALLDEF(dgeMatrix_dgeMatrix_crossprod, 3),
@@ -86,42 +80,24 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_exp, 1),
     
     CALLDEF(dpoMatrix_rcond, 1),
-    CALLDEF(dpoMatrix_solve, 1),
-    CALLDEF(dpoMatrix_matrix_solve, 2),
-
+    
     CALLDEF(dppMatrix_rcond, 1),
-    CALLDEF(dppMatrix_solve, 1),
-    CALLDEF(dppMatrix_matrix_solve, 2),
-
-    CALLDEF(dsCMatrix_Csparse_solve, 3),
-    CALLDEF(dsCMatrix_matrix_solve,  3),
     
     CALLDEF(dsyMatrix_norm, 2),
     CALLDEF(dsyMatrix_rcond, 1),
-    CALLDEF(dsyMatrix_solve, 1),
-    CALLDEF(dsyMatrix_matrix_solve, 2),
     CALLDEF(dsyMatrix_matrix_mm, 3),
     
     CALLDEF(dspMatrix_norm, 2),
     CALLDEF(dspMatrix_rcond, 1),
-    CALLDEF(dspMatrix_solve, 1),
-    CALLDEF(dspMatrix_matrix_solve, 2),
     CALLDEF(dspMatrix_matrix_mm, 2),
     
-    CALLDEF(dtCMatrix_matrix_solve, 3),
-    CALLDEF(dtCMatrix_sparse_solve, 2),
-
     CALLDEF(dtpMatrix_norm, 2),
     CALLDEF(dtpMatrix_rcond, 2),
-    CALLDEF(dtpMatrix_solve, 1),
-    CALLDEF(dtpMatrix_matrix_solve, 2),
     CALLDEF(dtpMatrix_matrix_mm, 4),
     CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
 
     CALLDEF(dtrMatrix_norm, 2),
     CALLDEF(dtrMatrix_rcond, 2),
-    CALLDEF(dtrMatrix_solve, 1),
-    CALLDEF(dtrMatrix_matrix_solve, 2),
     CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
     CALLDEF(dtrMatrix_matrix_mm, 4),
     CALLDEF(dtrMatrix_chol2inv, 1),
@@ -287,19 +263,32 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_trf, 2),
     CALLDEF(dpoMatrix_trf, 2),
     CALLDEF(dppMatrix_trf, 2),
-    CALLDEF(dgCMatrix_trf, 5),
-    CALLDEF(dgCMatrix_orf, 4),
+    CALLDEF(dgCMatrix_trf, 4),
+    CALLDEF(dgCMatrix_orf, 3),
     CALLDEF(dpCMatrix_trf, 5),
     
     CALLDEF(denseLU_expand, 1),
-    CALLDEF(BunchKaufman_expand, 1),
+    CALLDEF(BunchKaufman_expand, 2),
 
     CALLDEF(denseLU_determinant, 2),
+    CALLDEF(BunchKaufman_determinant, 3),
+    CALLDEF(Cholesky_determinant, 3),
     CALLDEF(sparseLU_determinant, 2),
     CALLDEF(sparseQR_determinant, 2),
-    CALLDEF(BunchKaufman_determinant, 2),
-    CALLDEF(Cholesky_determinant, 2),
     CALLDEF(CHMfactor_determinant, 2),
+
+    CALLDEF(denseLU_solve, 2),
+    CALLDEF(BunchKaufman_solve, 3),
+    CALLDEF(Cholesky_solve, 3),
+    CALLDEF(sparseLU_solve, 3),
+/* MJ: have 'sparseQR_coef' instead : */
+#if 0
+    CALLDEF(sparseQR_solve, 3),
+#endif
+    CALLDEF(CHMfactor_solve, 4),
+
+    CALLDEF(dtrMatrix_solve, 3),
+    CALLDEF(dtCMatrix_solve, 3),
     
     CALLDEF(CHM_set_common_env, 1),
 
