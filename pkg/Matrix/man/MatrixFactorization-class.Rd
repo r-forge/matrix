@@ -102,9 +102,9 @@
   
   Classes extending \code{QR}, namely \code{\linkS4class{sparseQR}}.
   
-  Generic functions \code{\link{chol}}, \code{\link{Cholesky}},
-  \code{\link{BunchKaufman}}, \code{\link{Schur}}, \code{\link{lu}},
-  and \code{\link{qr}} for \emph{computing} factorizations.
+  Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
+  \code{\link{Schur}}, \code{\link{lu}}, and \code{\link{qr}} for
+  \emph{computing} factorizations.
 
   Generic function \code{\link{expand2}} for constructing
   matrix factors from \code{MatrixFactorization} objects.
