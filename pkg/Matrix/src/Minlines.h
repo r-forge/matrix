@@ -70,24 +70,14 @@ SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
     return val;
 }
 
-/**
- * Return the 0-based index of a string match in a vector of strings
- * terminated by an empty string.  Returns -1 for no match.
- * Is  __cheap__ :  __not__ looking at superclasses --> better use  R_check_class_etc(obj, *)
- *
- * @param x string to match
- * @param valid vector of possible matches terminated by an empty string
- *
- * @return index of match or -1 for no match
- */
 static R_INLINE
-int strmatch(char *x, const char **valid)
+int strmatch(const char *x, const char **valid)
 {
-    int ans = 0;
-    while (strlen(valid[ans]) > 0) {
-	if (strcmp(x, valid[ans]) == 0)
-	    return ans;
-	++ans;
+    int i = 0;
+    while (valid[i][0] != '\0') {
+	if (strcmp(x, valid[i]) == 0)
+	    return i;
+	++i;
     }
     return -1;
 }
