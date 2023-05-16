@@ -59,7 +59,7 @@
 .sparse2kind(from, kind, drop0 = FALSE)
 
 .dense2g(from, kind = ".")
-.sparse2g(from)
+.sparse2g(from, kind = ".")
 
 .dense2sparse(from, repr = "C")
 .sparse2dense(from, packed = FALSE)
