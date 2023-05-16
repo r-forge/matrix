@@ -23,6 +23,8 @@
     .sparse2dense(.sparse2g(..sparse2l(from)))
 ..sparse2nge <- function(from)
     .sparse2dense(.sparse2g(..sparse2n(from)))
+..sparse2g <- function(from)
+    .Call(R_sparse_as_general, from)
 
 ..tT2gC <- ..sT2gC <- function(from) .T2C(.sparse2g(from))
 ..tC2gT <- ..sC2gT <- function(from) .CR2T(.sparse2g(from))
@@ -98,9 +100,9 @@ rm(.kinds, .kind, .otherkinds, .otherkind, .def)
 
 ## To "structure" ..........................................
 
-setAs("CsparseMatrix", "generalMatrix", .sparse2g)
-setAs("RsparseMatrix", "generalMatrix", .sparse2g)
-setAs("TsparseMatrix", "generalMatrix", .sparse2g)
+setAs("CsparseMatrix", "generalMatrix", ..sparse2g)
+setAs("RsparseMatrix", "generalMatrix", ..sparse2g)
+setAs("TsparseMatrix", "generalMatrix", ..sparse2g)
 ## setAs("sparseMatrix", "triangularMatrix", .) # inherited from Matrix
 ## setAs("sparseMatrix",  "symmetricMatrix", .) # inherited from Matrix
 
@@ -159,7 +161,7 @@ for (.kind in .kinds) {
     for (.str in c("t", "s"))
         for (.repr in .reprs)
             setAs(paste0(.kind, .str, .repr, "Matrix"),
-                  paste0(.kind,  "g", .repr, "Matrix"), .sparse2g)
+                  paste0(.kind,  "g", .repr, "Matrix"), ..sparse2g)
 
     ## C->[^C], R->[^R], T->[^T], preserving kind and structure
     for (.str in .strs) {
@@ -243,7 +245,7 @@ setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
 } ## DEPRECATED IN 1.5-0; see ./zzz.R
 
 rm(..sparse2unpacked, ..sparse2packed,
-   ..sparse2dge, ..sparse2lge, ..sparse2nge)
+   ..sparse2dge, ..sparse2lge, ..sparse2nge, ..sparse2g)
 
 
 ## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

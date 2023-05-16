@@ -27,7 +27,7 @@
 ..dense2dge <- function(from) .Call(R_dense_as_general, from, "d")
 ..dense2lge <- function(from) .Call(R_dense_as_general, from, "l")
 ..dense2nge <- function(from) .Call(R_dense_as_general, from, "n")
-..dense2ge  <- function(from) .Call(R_dense_as_general, from, ".")
+..dense2g   <- function(from) .Call(R_dense_as_general, from, ".")
 
 ..m2ddense <- function(from) .m2dense.checking(from, "d")
 ..m2ldense <- function(from) .m2dense.checking(from, "l")
@@ -213,7 +213,7 @@ setAs("numLike", "nsparseMatrix", ..m2ngC)
 
 ## To general ..............................................
 
-setAs("denseMatrix", "generalMatrix", ..dense2ge)
+setAs("denseMatrix", "generalMatrix", ..dense2g)
 setAs(     "matrix", "generalMatrix", ..m2ge)
 setAs(    "numLike", "generalMatrix", ..m2ge)
 
@@ -434,7 +434,7 @@ rm(.from, .to, .def, .b, .kind, .repr)
 
 rm(..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
    ..dense2Csparse, ..dense2Rsparse, ..dense2Tsparse,
-   ..dense2dge, ..dense2lge, ..dense2nge, ..dense2ge,
+   ..dense2dge, ..dense2lge, ..dense2nge, ..dense2g,
    ..m2ddense, ..m2ldense, ..m2ndense, ..m2dense,
    ..m2dsparse, ..m2lsparse, ..m2nsparse,
    ..m2Csparse, ..m2Rsparse, ..m2Tsparse,
