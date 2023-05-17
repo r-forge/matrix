@@ -82,13 +82,15 @@ isLDL(x)
       factorized matrix.
       If symbolic analysis was performed prior to factorization,
       then the permutation is chosen to reduce fill-in.}
-    \item{\code{type}}{an integer vector specifying the factorization
-      type.  The details of this vector are subject to change.
-      Currently, the length is at least 4 and the first 4 elements
-      correspond to members \code{ordering}, \code{is_ll},
-      \code{is_super}, and \code{is_monotonic} of the original
-      \code{cholmod_factor_struct}.  Subclasses may employ additional
-      elements.}
+    \item{\code{type}}{an integer vector of length 6 specifying
+      details of the factorization.  The elements correspond to
+      members \code{ordering}, \code{is_ll}, \code{is_super},
+      \code{is_monotonic}, \code{maxcsize}, and \code{maxesize}
+      of the original \code{cholmod_factor_struct}.
+      Simplicial and supernodal factorizations are distinguished
+      by \code{is_super}.  Simplicial factorizations do not use
+      \code{maxcsize} or \code{maxesize}.  Supernodal factorizations
+      do not use \code{is_ll} or \code{is_monotonic}.
   }
   Of \code{CHMsimpl} (all unused by \code{nCHMsimpl}):
   \describe{
@@ -101,7 +103,6 @@ isLDL(x)
       Row indices of nonzero entries in column \code{j} of the
       lower triangular Cholesky factor are obtained as
       \code{i[p[j]+seq_len(nz[j])]+1}.}
-    %% MJ: Does CHOLMOD use p[length(p)] ??
     \item{\code{i}}{an integer vector of length greater than or equal
       to \code{sum(nz)} containing the row indices of nonzero entries
       in the lower triangular Cholesky factor.  These are grouped by
@@ -112,11 +113,13 @@ isLDL(x)
     \item{\code{prv}, \code{nxt}}{integer vectors of length
       \code{Dim[1]+2} indicating the order in which the columns of
       the lower triangular Cholesky factor are stored in \code{i}
-      and \code{x}.}
-    %% MJ: _if_ the columns are ordered monotonically ...
-    %% For \code{j} in \code{seq_len(n <- Dim[1])}:
-    %% \code{prv[1] = n+1}, \code{prv[n+2] = -1}, \code{prv[j+1] = j-1},
-    %% \code{nxt[n+1] = -1}, \code{nxt[n+2] = 0}, \code{nxt[j] = j}.
+      and \code{x}.
+      Starting from \code{j <- Dim[1]+2},
+      the recursion \code{j <- nxt[j+1]+1} traverses the columns
+      in  forward order and terminates when \code{nxt[j+1] = -1}.
+      Starting from \code{j <- Dim[1]+1},
+      the recursion \code{j <- prv[j+1]+1} traverses the columns
+      in backward order and terminates when \code{prv[j+1] = -1}.
   }
   Of \code{dCHMsimpl}:
   \describe{
