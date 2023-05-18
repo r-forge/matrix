@@ -90,7 +90,7 @@ isLDL(x)
       Simplicial and supernodal factorizations are distinguished
       by \code{is_super}.  Simplicial factorizations do not use
       \code{maxcsize} or \code{maxesize}.  Supernodal factorizations
-      do not use \code{is_ll} or \code{is_monotonic}.
+      do not use \code{is_ll} or \code{is_monotonic}.}
   }
   Of \code{CHMsimpl} (all unused by \code{nCHMsimpl}):
   \describe{
@@ -119,7 +119,7 @@ isLDL(x)
       in  forward order and terminates when \code{nxt[j+1] = -1}.
       Starting from \code{j <- Dim[1]+1},
       the recursion \code{j <- prv[j+1]+1} traverses the columns
-      in backward order and terminates when \code{prv[j+1] = -1}.
+      in backward order and terminates when \code{prv[j+1] = -1}.}
   }
   Of \code{dCHMsimpl}:
   \describe{
