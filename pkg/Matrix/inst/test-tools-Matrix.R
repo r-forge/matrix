@@ -355,7 +355,7 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
     ##' @return an is(perm,LDL,super) matrix with interesting and *named* rownames
     CHM_to_pLs <- function(r) {
         is.perm <- function(.)
-            if(inherits(., "try-error")) NA else !all(.@perm == 0:(.@Dim[1]-1))
+            if(inherits(., "try-error")) NA else .@type[1L] != 0L
         is.LDL <- function(.)if(inherits(., "try-error")) NA else isLDL(.)
 	r.st <-
 	    cbind(perm	= sapply(r, is.perm),

@@ -281,7 +281,9 @@ mkCholhash <- function(r.all) {
     c.rn <- vapply(rn, function(ch) strsplit(ch, " ")[[1]], character(3))
     ## Now
     h1 <- function(i) {
-        ok <- c.rn[,i] != "?"
+        ok <- rep.int(TRUE, 3L)
+        if(c.rn[3L, i] == "?")
+            ok[2:3] <- FALSE # no supernodal LDL' factorization !!
         r.all[i, ok] %*% 2^((2:0)[ok])
     }
     vapply(seq_len(nrow(r.all)), h1, numeric(1))
