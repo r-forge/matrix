@@ -118,12 +118,12 @@ setMethod("Cholesky", signature(A = "ddiMatrix"),
               r@Dim <- d
               r@Dimnames <- A@Dimnames
               r@colcount <- r@nz <- rep.int(1L, n)
-              r@type <- c(0L, 1L, 0L, 1L)
+              r@type <- c(0L, 0L, 0L, 1L, 0L, 0L)
               r@p <- 0:n
-              r@i <- r@perm <- s <- seq.int(0L, length.out = n)
+              r@i <- s <- seq.int(0L, length.out = n)
               r@x <- if(length(y)) y else rep.int(1, n)
-              r@prv <- c(n + 1L, s, -1L) # @<- will error if n+1L overflows
               r@nxt <- c(seq_len(n), -1L, 0L)
+              r@prv <- c(n + 1L, s, -1L) # @<- will error if n + 1L overflows
               r
           })
 
