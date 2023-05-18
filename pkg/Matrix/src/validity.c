@@ -1224,7 +1224,7 @@ SEXP sparseLU_validate(SEXP obj)
 	    if (*pq == NA_INTEGER)
 		FRUPRET(work, n, 2, "'q' slot contains NA");
 	    if (*pq < 0 || *pq >= n)
-		FRUPRET(work, n, 2, "'q' slot has elements not in {0,...,Dim[1]-1}");
+		FRUPRET(work, n, 2, "'q' slot has elements not in {0,...,Dim[2]-1}");
 	    if (!work[*pq])
 		FRUPRET(work, n, 2, "'q' slot contains duplicates");
 	    work[*(pq++)] = 0;
@@ -1326,20 +1326,282 @@ SEXP sparseQR_validate(SEXP obj)
     return ScalarLogical(1);
 }
 
-/* NB: below three should use tests in ./chm_common.c ... C-s validate */
-
-SEXP CHMfactor_validate(SEXP obj) /* TODO */
+SEXP CHMfactor_validate(SEXP obj)
 {
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), n = pdim[0];
+    if (pdim[1] != n)
+	UPRET(1, "Dim[1] != Dim[2] (matrix is not square)");
+    UNPROTECT(1); /* dim */
+
+    SEXP type = PROTECT(GET_SLOT(obj, install("type")));
+    if (TYPEOF(type) != INTSXP)
+	UPRET(1, "'type' slot is not of type \"integer\"");
+    if (XLENGTH(type) != 6)
+	UPRET(1, "'type' slot does not have length 6");
+    int order = INTEGER(type)[0];
+    if (order < 0 || order > 4)
+	UPRET(1, "type[1] is not in 0:4");
+    UNPROTECT(1); /* type */
+    
+    SEXP colcount = PROTECT(GET_SLOT(obj, install("colcount")));
+    if (TYPEOF(colcount) != INTSXP)
+	UPRET(1, "'colcount' slot is not of type \"integer\"");
+    if (XLENGTH(colcount) != n)
+	UPRET(1, "'colcount' slot does not have length Dim[2]");
+    int j, *pcolcount = INTEGER(colcount);
+    for (j = 0; j < n; ++j) {
+	if (pcolcount[j] == NA_INTEGER)
+	    UPRET(1, "'colcount' slot contains NA");
+	if (pcolcount[j] < 0 || pcolcount[j] > n - j)
+	    UPRET(1, "colcount[j] is not in {0,...,Dim[2]-j+1)}");
+    }
+    UNPROTECT(1); /* colcount */
+    
+    SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
+    if (TYPEOF(perm) != INTSXP)
+	UPRET(1, "'perm' slot is not of type \"integer\"");
+    if (order == 0) {
+	if (XLENGTH(perm) != 0)
+	    UPRET(1, "'perm' slot does not have length 0");
+    } else {
+	if (XLENGTH(perm) != n)
+	    UPRET(1, "'perm' slot does not have length Dim[1]");
+	int *pperm = INTEGER(perm);
+	char *work;
+	Matrix_Calloc(work, n, char);
+	for (j = 0; j < n; ++j) {
+	    if (*pperm == NA_INTEGER)
+		FRUPRET(work, n, 1, "'perm' slot contains NA");
+	    if (*pperm < 0 || *pperm >= n)
+		FRUPRET(work, n, 1, "'perm' slot has elements not in {0,...,Dim[1]-1}");
+	    if (work[*pperm])
+		FRUPRET(work, n, 1, "'perm' slot contains duplicates");
+	    work[*(pperm++)] = 1;
+	}
+	Matrix_Free(work, n);
+    }
+    UNPROTECT(1); /* perm */
+    
+    return ScalarLogical(1);   
+}
+
+SEXP CHMsimpl_validate(SEXP obj)
+{
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    if (n == INT_MAX)
+	UPRET(1, "Dim[1]+1 is not representable as \"integer\"");
+    UNPROTECT(1); /* dim */
+    
+    SEXP type = PROTECT(GET_SLOT(obj, install("type")));
+    int *ptype = INTEGER(type), mono = ptype[3];
+    if (ptype[1] != 0 && ptype[1] != 1)
+	UPRET(1, "type[2] is not 0 or 1");
+    if (ptype[2] != 0)
+	UPRET(1, "type[3] is not 0");
+    if (ptype[3] != 0 && ptype[3] != 1)
+	UPRET(1, "type[4] is not 0 or 1");
+    UNPROTECT(1); /* type */
+    
+    SEXP nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
+	prv = PROTECT(GET_SLOT(obj, install("prv")));
+    if (TYPEOF(nxt) != INTSXP)
+	UPRET(2, "'nxt' slot is not of type \"integer\"");
+    if (TYPEOF(prv) != INTSXP)
+	UPRET(2, "'prv' slot is not of type \"integer\"");
+    if (XLENGTH(nxt) - 2 != n)
+	UPRET(2, "'nxt' slot does not have length Dim[2]+2");
+    if (XLENGTH(prv) - 2 != n)
+	UPRET(2, "'prv' slot does not have length Dim[2]+2");
+    int *pnxt = INTEGER(nxt), *pprv = INTEGER(prv),
+	j1 = pnxt[n + 1], j2 = pprv[n], count = n + 1;
+    while (count--) {
+	if (j1 < 0 || j1 > n)
+	    UPRET(2, "nxt[-(n+1)] has elements not in {0,...,n}, n=Dim[2]");
+	if (j2 < 0 || j2 > n + 1 || j2 == n)
+	    UPRET(2, "prv[-(n+2)] has elements not in {0,...,n+1}\\{n}, n=Dim[2]");
+	if ((count > 1) && mono && (pnxt[j1] != j1 + 1 || pprv[j2] != j2 - 1))
+	    UPRET(2, "type[4] is 1 but columns are not stored in increasing order");
+	if ((count > 1) ? j1 == n : j1 != n)
+	    UPRET(2, "traversal of 'nxt' slot does not complete in exactly length(nxt) steps");
+	if ((count > 1) ? j2 == n + 1 : j2 != n + 1)
+	    UPRET(2, "traversal of 'prv' slot does not complete in exactly length(prv) steps");
+	j1 = pnxt[j1];
+	j2 = pprv[j2];
+    }
+    if (j1 != -1)
+	UPRET(2, "nxt[Dim[2]+1] is not -1");
+    if (j2 != -1)
+	UPRET(2, "prv[Dim[2]+2] is not -1");
+
+    SEXP nz = PROTECT(GET_SLOT(obj, install("nz")));
+    if (TYPEOF(nz) != INTSXP)
+	UPRET(3, "'nz' slot is not of type \"integer\"");
+    if (XLENGTH(nz) != n)
+	UPRET(3, "'nz' slot does not have length Dim[2]");
+    int j, *pnz = INTEGER(nz);
+    for (j = 0; j < n; ++j) {
+	if (pnz[j] == NA_INTEGER)
+	    UPRET(3, "'nz' slot contains NA");
+	if (pnz[j] < 1 || pnz[j] > n - j)
+	    UPRET(3, "nz[j] is not in {1,...,Dim[2]-j+1)}");
+    }
+    
+    SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
+    if (TYPEOF(p) != INTSXP)
+	UPRET(4, "'p' slot is not of type \"integer\"");
+    if (XLENGTH(p) - 1 != n)
+	UPRET(4, "'p' slot does not have length Dim[2]+1");
+    
+    SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
+    if (TYPEOF(i) != INTSXP)
+	UPRET(5, "'i' slot is not of type \"integer\"");
+    if (XLENGTH(i) < n)
+	UPRET(5, "'i' slot has length less than Dim[2]");
+    
+    int *pp = INTEGER(p), *pi = INTEGER(i), *pi_, k;
+    R_xlen_t nzmax = XLENGTH(i);
+    j1 = pnxt[n + 1];
+    if (pp[j1] != 0)
+	UPRET(5, "column 'j' is stored first but p[j] is not 0");
+    for (j = 0; j < n; ++j) {
+	j2 = pnxt[j1];
+	if (pp[j2] == NA_INTEGER)
+	    UPRET(5, "'p' slot contains NA");
+	if (pp[j2] < pp[j1])
+	    UPRET(5, "'p' slot is not increasing (when traversed in stored column order)");
+	if (pp[j2] > nzmax)
+	    UPRET(5, "'p' slot has elements greater than length(i)");
+	if (pp[j2] - pp[j1] < pnz[j1])
+	    UPRET(5, "'i' slot allocates fewer than nz[j] elements for column 'j'");
+	if (pp[j2] - pp[j1] < pnz[j1])
+	    UPRET(5, "'i' slot allocates more than Dim[2]-j+1 elements for column 'j'");
+	pi_ = pi + pp[j1];
+	if (pi_[0] != j1)
+	    UPRET(5, "first entry in column 'j' does not have row index 'j'");
+	for (k = 1; k < pnz[j1]; ++k) {
+	    if (pi_[k] == NA_INTEGER)
+		UPRET(5, "'i' slot contains NA");
+	    if (pi_[k] < 0 || pi_[k] >= n)
+		UPRET(5, "'i' slot has elements not in {0,...,Dim[1]-1}");
+	    if (pi_[k] <= pi[k - 1])
+		UPRET(5, "'i' slot is not increasing within columns");
+	}
+	j1 = j2;
+    }
+    UNPROTECT(5); /* i, p, nz, prv, nxt */
+    
     return ScalarLogical(1);
 }
 
-SEXP CHMsimpl_validate(SEXP obj) /* TODO */
+SEXP CHMsuper_validate(SEXP obj)
 {
-    return ScalarLogical(1);
-}
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    
+    SEXP type = PROTECT(GET_SLOT(obj, install("type")));
+    int *ptype = INTEGER(type);
+    if (ptype[1] != 1)
+	UPRET(1, "type[2] is not 1");
+    if (ptype[2] != 1)
+	UPRET(1, "type[3] is not 1");
+    if (ptype[3] != 1)
+	UPRET(1, "type[4] is not 1");
+    if (ptype[4] < 0)
+	UPRET(1, "type[5] is negative");
+    if (ptype[5] < 0)
+	UPRET(1, "type[6] is negative");
+    if (n > 0 && ptype[5] >= n)
+	UPRET(1, "type[6] is not less than Dim[1]");
+    UNPROTECT(1); /* type */
+    
+    /* FIXME: maxcsize and maxesize are well-defined properties of the
+       factorization, so we should also test that the values are
+       _correct_ ... see ./CHOLMOD/Supernodal/cholmod_super_symbolic.c
+    */
+    
+    SEXP super = PROTECT(GET_SLOT(obj, install("super")));
+    if (TYPEOF(super) != INTSXP)
+	UPRET(1, "'super' slot is not of type \"integer\"");
+    R_xlen_t nsuper1a = XLENGTH(super);
+    if (nsuper1a - 1 < ((n > 0) ? 1 : 0))
+	UPRET(1, "'super' slot has length less than 2");
+    if (nsuper1a - 1 > n)
+	UPRET(1, "'super' slot has length greater than Dim[2]+1");
+    int k, nsuper = (int) (nsuper1a - 1), *psuper = INTEGER(super);
+    if (psuper[0] != 0)
+	UPRET(1, "first element of 'super' slot is not 0");
+    if (psuper[nsuper] != n)
+	UPRET(1, "last element of 'super' slot is not Dim[2]");
+    for (k = 1; k <= nsuper; ++k) {
+	if (psuper[k] == NA_INTEGER)
+	    UPRET(1, "'super' slot contains NA");
+	if (psuper[k] <= psuper[k-1])
+	    UPRET(1, "'super' slot is not increasing");
+    }
+    
+    SEXP pi = PROTECT(GET_SLOT(obj, install("pi"))),
+	px = PROTECT(GET_SLOT(obj, install("px")));
+    if (TYPEOF(pi) != INTSXP)
+	UPRET(3, "'pi' slot is not of type \"integer\"");
+    if (TYPEOF(px) != INTSXP)
+	UPRET(3, "'px' slot is not of type \"integer\"");
+    if (XLENGTH(pi) != nsuper1a)
+	UPRET(2, "'pi' and 'super' slots do not have equal length");
+    if (XLENGTH(px) != nsuper1a)
+	UPRET(2, "'px' and 'super' slots do not have equal length");
+    int *ppi = INTEGER(pi), *ppx = INTEGER(px), nr, nc;
+    if (ppi[0] != 0)
+	UPRET(3, "first element of 'pi' slot is not 0");
+    if (ppx[0] != 0)
+	UPRET(3, "first element of 'px' slot is not 0");
+    for (k = 1; k <= nsuper; ++k) {
+	if (ppi[k] == NA_INTEGER)
+	    UPRET(3, "'pi' slot contains NA");
+	if (ppx[k] == NA_INTEGER)
+	    UPRET(3, "'px' slot contains NA");
+	if (ppi[k] <= ppi[k-1])
+	    UPRET(3, "'pi' slot is not increasing");
+	if (ppx[k] <= ppx[k-1])
+	    UPRET(3, "'px' slot is not increasing");
+	nr = ppi[k] - ppi[k-1];
+	nc = psuper[k] - psuper[k-1];
+	if (nr < nc)
+	    UPRET(3, "first differences of 'pi' slot are less than those of 'super' slot");
+	if ((double) nr * nc > INT_MAX)
+	    UPRET(3, "supernode lengths exceed 2^31-1");
+	if (ppx[k] - ppx[k-1] != nr * nc)
+	    UPRET(3, "first differences of 'px' slot are not equal to supernode lengths");
+    }
+    
+    SEXP s = PROTECT(GET_SLOT(obj, install("s")));
+    if (TYPEOF(s) != INTSXP)
+	UPRET(4, "'s' slot is not of type \"integer\"");
+    if (XLENGTH(s) != ppi[nsuper])
+	UPRET(4, "'s' slot does not have length pi[length(pi)]");
+    int i, j, *ps = INTEGER(s);
+    for (k = 1; k <= nsuper; ++k) {
+	nr = ppi[k] - ppi[k-1];
+	nc = psuper[k] - (j = psuper[k-1]);
+	for (i = 0; i < nr; ++i) {
+	    if (ps[i] == NA_INTEGER)
+		UPRET(4, "'s' slot contains NA");
+	    if (ps[i] < 0 || ps[i] >= n)
+		UPRET(4, "'s' slot has elements not in {0,...,Dim[1]-1}");
+	    if (i < nc) {
+		if (ps[i] != j + i)
+		    UPRET(4, "'s' slot is wrong within diagonal blocks (row and column indices do not coincide)");
+	    } else {
+		if (ps[i] <= ps[i-1])
+		    UPRET(4, "'s' slot is not increasing within supernodes");
+	    }
+	}
+	ps += nr;
+    }
+    UNPROTECT(4); /* s, px, pi, super */
 
-SEXP CHMsuper_validate(SEXP obj) /* TODO */
-{
     return ScalarLogical(1);
 }
 

@@ -156,8 +156,6 @@ static cholmod_factor *mf2cholmod(SEXP obj)
 	perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 	colcount = PROTECT(GET_SLOT(obj, install("colcount")));
     int *ptype = INTEGER(type);
-    if (ptype[2] && !ptype[1])
-	error(_("unsupported factorization type (supernodal PAP' = LDL')"));
     cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
     memset(L, 0, sizeof(cholmod_factor));
     L->n = (size_t) INTEGER(dim)[0];
@@ -165,13 +163,10 @@ static cholmod_factor *mf2cholmod(SEXP obj)
     L->Perm = INTEGER(perm);
     L->ColCount = INTEGER(colcount);
     L->ordering = ptype[0];
-    L->is_ll = ptype[1];
     L->is_super = ptype[2];
-    L->is_monotonic = ptype[3];
     L->itype = CHOLMOD_INT;
     L->xtype = CHOLMOD_REAL;
     L->dtype = CHOLMOD_DOUBLE;
-    L->useGPU = 0;
     L->x = REAL(x);
     if (L->is_super) {
 	SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
@@ -187,6 +182,8 @@ static cholmod_factor *mf2cholmod(SEXP obj)
 	L->pi = INTEGER(pi);
 	L->px = INTEGER(px);
 	L->s = INTEGER(s);
+	L->is_ll = 1;
+	L->is_monotonic = 1;
 	UNPROTECT(4);
     } else {
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
@@ -197,9 +194,11 @@ static cholmod_factor *mf2cholmod(SEXP obj)
 	L->p = INTEGER(p);
 	L->i = INTEGER(i);
 	L->nz = INTEGER(nz);
-	L->nzmax = (size_t) ((int *) L->p)[L->n];
 	L->next = INTEGER(nxt);
 	L->prev = INTEGER(prv);
+	L->nzmax = (size_t) ((int *) L->p)[L->n];
+	L->is_ll = ptype[1];
+	L->is_monotonic = ptype[3];
 	UNPROTECT(5);
     }
     UNPROTECT(5);
@@ -212,16 +211,21 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	L->xtype != CHOLMOD_REAL ||
 	L->dtype != CHOLMOD_DOUBLE)
 	error(_("wrong itype or xtype or dtype"));
-    if (L->is_super && !L->is_ll)
-	error(_("unsupported factorization type (supernodal PAP' = LDL')"));
-    if (L->n > INT_MAX)
-	error(_("dimensions cannot exceed 2^31-1"));
     if (L->minor < L->n)
 	error(_("factorization failed at column %d"), (int) (L->minor + 1));
+    if (L->n > INT_MAX)
+	error(_("dimensions cannot exceed 2^31-1"));
+    if (L->super) {
+	if (L->maxcsize > INT_MAX)
+	    error(_("maxcsize would overflow \"integer\""));
+    } else {
+	if (L->n == INT_MAX)
+	    error(_("n+1 would overflow \"integer\""));
+    }
     int n = (int) L->n;
     SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(
 			   (L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
-	type = PROTECT(allocVector(INTSXP, (L->is_super) ? 6 : 4)),
+	type = PROTECT(allocVector(INTSXP, 6)),
 	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	x = PROTECT(allocVector(REALSXP, (L->is_super) ? L->xsize : L->nzmax)),
 	perm = PROTECT(allocVector(INTSXP, n)),
@@ -231,6 +235,8 @@ static SEXP cholmod2mf(const cholmod_factor *L)
     ptype[1] = L->is_ll;
     ptype[2] = L->is_super;
     ptype[3] = L->is_monotonic;
+    ptype[4] = (int) L->maxcsize;
+    ptype[5] = (int) L->maxesize;
     pdim[0] = pdim[1] = n;
     Matrix_memcpy(REAL(x), L->x, XLENGTH(x), sizeof(double));
     Matrix_memcpy(INTEGER(perm), L->Perm, n, sizeof(int));
@@ -254,8 +260,6 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	SET_SLOT(obj, install("px"), px);
 	SET_SLOT(obj, install("s"), s);
 	UNPROTECT(4);
-	ptype[4] = (int) L->maxcsize;
-	ptype[5] = (int) L->maxesize;
     } else {
 	SEXP p = PROTECT(allocVector(INTSXP, L->n + 1)),
 	    i = PROTECT(allocVector(INTSXP, L->nzmax)),

@@ -1178,11 +1178,11 @@ SEXP chm_factor_to_SEXP(CHM_FR f, int dofree)
 	   (int*)f->Perm, f->n);
     Memcpy(INTEGER(ALLOC_SLOT(ans, install("colcount"), INTSXP, f->n)),
 	   (int*)f->ColCount, f->n);
-    type = INTEGER(ALLOC_SLOT(ans, install("type"), INTSXP, f->is_super ? 6 : 4));
+    type = INTEGER(ALLOC_SLOT(ans, install("type"), INTSXP, 6));
     type[0] = f->ordering; type[1] = f->is_ll;
     type[2] = f->is_super; type[3] = f->is_monotonic;
+    type[4] = f->maxcsize; type[5] = f->maxesize;
     if (f->is_super) {
-	type[4] = f->maxcsize; type[5] = f->maxesize;
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("super"), INTSXP, f->nsuper + 1)),
 	       (int*)f->super, f->nsuper+1);
 	Memcpy(INTEGER(ALLOC_SLOT(ans, install("pi"), INTSXP, f->nsuper + 1)),
