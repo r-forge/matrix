@@ -1421,11 +1421,11 @@ SEXP CHMsimpl_validate(SEXP obj)
 	    UPRET(2, "nxt[-(n+1)] has elements not in {0,...,n}, n=Dim[2]");
 	if (j2 < 0 || j2 > n + 1 || j2 == n)
 	    UPRET(2, "prv[-(n+2)] has elements not in {0,...,n+1}\\{n}, n=Dim[2]");
-	if ((count > 1) && mono && (pnxt[j1] != j1 + 1 || pprv[j2] != j2 - 1))
+	if ((count >  1) && mono && (pnxt[j1] != j1 + 1 || pprv[j2] != j2 - 1))
 	    UPRET(2, "type[4] is 1 but columns are not stored in increasing order");
-	if ((count > 1) ? j1 == n : j1 != n)
+	if ((count >= 1) ? j1 == n : j1 != n)
 	    UPRET(2, "traversal of 'nxt' slot does not complete in exactly length(nxt) steps");
-	if ((count > 1) ? j2 == n + 1 : j2 != n + 1)
+	if ((count >= 1) ? j2 == n + 1 : j2 != n + 1)
 	    UPRET(2, "traversal of 'prv' slot does not complete in exactly length(prv) steps");
 	j1 = pnxt[j1];
 	j2 = pprv[j2];
