@@ -338,7 +338,8 @@ A1.8 <- A1; diag(A1.8) <- 8
 nT. <- as(AT <- as(A., "TsparseMatrix"),"nMatrix")
 stopifnot(all(nT.@i <= nT.@j),
 	  identical(qr(A1.8), qr(as(A1.8, "generalMatrix"))))
-CA <- Cholesky(A.)
+
+CA <- Cholesky(A. + Diagonal(x = rowSums(abs(A.)) + 1))
 stopifnotValid(CAinv <- solve(CA), "dsCMatrix")
 MA <- as(CA, "Matrix") # with a confusing warning -- FIXME!
 stopifnotValid(MAinv <- solve(MA), "dtCMatrix")
