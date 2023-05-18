@@ -615,13 +615,15 @@ setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
 ## from header ../src/CHOLMOD/Include/cholmod_core.h
 setClass("CHMfactor", contains = c("CholeskyFactorization", "VIRTUAL"),
 	 slots = c(colcount = "integer", perm = "integer", type = "integer"),
+         prototype = list(type = c(0L, 0L, 0L, 1L, 0L, 0L)),
 	 validity = function(object) .Call(CHMfactor_validate, object))
 
 ## Simplicial factorization
 setClass("CHMsimpl",
 	 contains = c("CHMfactor", "VIRTUAL"),
 	 slots = c(p = "integer", i = "integer", nz = "integer",
-		   prv = "integer", nxt = "integer"),
+		   nxt = "integer", prv = "integer"),
+         prototype = list(p = 0L, nxt = c(-1L, 0L), prv = c(1L, -1L)),
 	 validity = function(object) .Call(CHMsimpl_validate, object))
 
 setClass("nCHMsimpl", contains = "CHMsimpl") # symbolic factorization
@@ -629,8 +631,9 @@ setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
 
 ## Supernodal factorization
 setClass("CHMsuper", contains = c("CHMfactor", "VIRTUAL"),
-	 slots = c(pi = "integer", px = "integer", s = "integer",
-                   super = "integer"),
+	 slots = c(super = "integer", pi = "integer", px = "integer",
+                   s = "integer"),
+         prototype = list(super = 0L, pi = 0L, px = 0L),
 	 validity = function(object) .Call(CHMsuper_validate, object))
 
 setClass("nCHMsuper", contains = "CHMsuper") # symbolic factorization
