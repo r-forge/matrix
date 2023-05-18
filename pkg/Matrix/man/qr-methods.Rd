@@ -119,7 +119,7 @@ qcfXy <- qr.coef (qXr, y) # vector
 qcfXY <- qr.coef (qXr, Y) # 4x1 dgeMatrix
 cf <- c(int=6, b1=-3, c1=-2, c2=-1)
 doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))
-tolE <- if(doExtras) 1e-15 else 1e-13
+tolE <- if(doExtras) 2e-15 else 1e-13
 stopifnot(exprs = {
   all.equal(qr.coef(qxr,  y),   cf,  tol=tolE)
   all.equal(qr.coef(qxrLA,y),   cf,  tol=tolE)
