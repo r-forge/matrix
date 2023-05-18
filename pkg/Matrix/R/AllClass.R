@@ -611,21 +611,13 @@ setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
 
 ## ...... Sparse .......................................................
 
-## S4 representation of C struct 'cholmod_factor'
+## S4 representation of C struct 'cholmod_factor',
+## from header ../src/CHOLMOD/Include/cholmod_core.h
 setClass("CHMfactor", contains = c("CholeskyFactorization", "VIRTUAL"),
 	 slots = c(colcount = "integer", perm = "integer", type = "integer"),
 	 validity = function(object) .Call(CHMfactor_validate, object))
 
-## Supernodal CHMfactor
-setClass("CHMsuper", contains = c("CHMfactor", "VIRTUAL"),
-	 slots = c(pi = "integer", px = "integer", s = "integer",
-                   super = "integer"),
-	 validity = function(object) .Call(CHMsuper_validate, object))
-
-setClass("nCHMsuper", contains = "CHMsuper") # symbolic factorization
-setClass("dCHMsuper", contains = "CHMsuper", slots = c(x = "numeric"))
-
-## Simplicial CHMfactor
+## Simplicial factorization
 setClass("CHMsimpl",
 	 contains = c("CHMfactor", "VIRTUAL"),
 	 slots = c(p = "integer", i = "integer", nz = "integer",
@@ -634,6 +626,15 @@ setClass("CHMsimpl",
 
 setClass("nCHMsimpl", contains = "CHMsimpl") # symbolic factorization
 setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
+
+## Supernodal factorization
+setClass("CHMsuper", contains = c("CHMfactor", "VIRTUAL"),
+	 slots = c(pi = "integer", px = "integer", s = "integer",
+                   super = "integer"),
+	 validity = function(object) .Call(CHMsuper_validate, object))
+
+setClass("nCHMsuper", contains = "CHMsuper") # symbolic factorization
+setClass("dCHMsuper", contains = "CHMsuper", slots = c(x = "numeric"))
 
 
 ## ------ Bunch-Kaufman ------------------------------------------------
