@@ -9,7 +9,12 @@ setAs("CHMfactor", "RsparseMatrix",
 setAs("CHMfactor", "TsparseMatrix",
       function(from) .CR2T(.Call(CHMfactor_to_sparse, from)))
 setAs("CHMfactor", "pMatrix",
-      function(from) new("pMatrix", Dim = from@Dim, perm = from@perm + 1L))
+      function(from) {
+          r <- new("pMatrix")
+          r@Dim <- d <- from@Dim
+          r@perm <- if(length(perm <- from@perm)) perm + 1L else seq_len(d[1L])
+          r
+      })
 
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
@@ -17,11 +22,15 @@ setMethod("expand2", signature(x = "CHMfactor"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
               dn <- x@Dimnames
+              perm <- x@perm
+              perm <- if(length(perm))
+                          invPerm(x@perm, zero.p = TRUE, zero.res = FALSE)
+                      else seq_len(d[1L])
               P <- new("pMatrix",
                        Dim = d,
                        Dimnames = c(list(NULL), dn[2L]),
                        margin = 2L,
-                       perm = invPerm(x@perm, zero.p = TRUE, zero.res = FALSE))
+                       perm = perm)
               P. <- P
               P.@Dimnames <- c(dn[1L], list(NULL))
               P.@margin <- 1L
@@ -42,10 +51,8 @@ setMethod("expand2", signature(x = "CHMfactor"),
 ## returning list(P, L), where A = P' L L' P
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "CHMfactor"),
-          function(x, ...) {
-              list(P = new("pMatrix", Dim = x@Dim, perm = x@perm + 1L),
-                   L = .Call(CHMfactor_to_sparse, x))
-          })
+          function(x, ...)
+              list(P = as(x, "pMatrix"), L = as(x, "dtCMatrix")))
 
 setMethod("update", signature(object = "CHMfactor"),
 	  function(object, parent, mult = 0, ...) {
@@ -100,11 +107,12 @@ setMethod("updown", signature(update = "ANY", C = "ANY", L = "ANY"),
 ##' @return TRUE if 'x' is LDL, otherwise FALSE
 isLDL <- function(x)
 {
-    stopifnot(is(x, "CHMfactor"))
-    as.logical(!x@type[2L]) # '!'<=>'not' as type[2L] := (cholmod_factor)->is_ll
+    if(!is(x, "CHMfactor"))
+        stop("'x' does not inherit from virtual class CHMfactor")
+    !x@type[2L] # '!'<=>'not' as type[2L] := (cholmod_factor)->is_ll
 }
 .isLDL <- function(x)
-    as.logical(!x@type[2L])
+    !x@type[2L]
 
 ## Currently not exported, but called from some examples with ':::'
 ldetL2up <- function(x, parent, Imult)

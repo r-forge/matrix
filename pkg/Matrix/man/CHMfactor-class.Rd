@@ -81,7 +81,9 @@ isLDL(x)
       specifying the permutation applied to the rows and columns of the
       factorized matrix.
       If symbolic analysis was performed prior to factorization,
-      then the permutation is chosen to reduce fill-in.}
+      then the permutation is chosen to reduce fill-in.
+      \code{perm} of length 0 is valid and
+      equivalent to the identity permutation, implying no permutation.}
     \item{\code{type}}{an integer vector of length 6 specifying
       details of the factorization.  The elements correspond to
       members \code{ordering}, \code{is_ll}, \code{is_super},
