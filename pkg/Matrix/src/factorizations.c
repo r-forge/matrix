@@ -170,8 +170,9 @@ static cholmod_factor *mf2cholmod(SEXP obj)
 	L->Perm = INTEGER(perm);
 	UNPROTECT(1);
     } else {
-	/* Bug in CHOLMOD?  cholmod_check_factor allows L->Perm == NULL,
-	   but cholmod_copy_factor does not test, so it segfaults ... */
+	/* cholmod_check_factor allows L->Perm == NULL,
+	   but cholmod_copy_factor does not test, so it segfaults ...
+	*/
 	int j, n = (int) L->n, *Perm = (int *) R_alloc(L->n, sizeof(int));
 	for (j = 0; j < n; ++j)
 	    Perm[j] = j;
@@ -227,8 +228,6 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	L->xtype != CHOLMOD_REAL ||
 	L->dtype != CHOLMOD_DOUBLE)
 	error(_("wrong itype or xtype or dtype"));
-    if (L->minor < L->n)
-	error(_("factorization failed at column %d"), (int) (L->minor + 1));
     if (L->n > INT_MAX)
 	error(_("dimensions cannot exceed 2^31-1"));
     if (L->super) {
@@ -238,6 +237,21 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	if (L->n == INT_MAX)
 	    error(_("n+1 would overflow \"integer\""));
     }
+
+    size_t minor = L->minor;
+    if (minor == L->n && !L->is_super && !L->is_ll) {
+	/* cholmod_rowfac allows  P A P' = L D L'  with negative D[i,i]
+	   but we do not (for now) ...
+	*/
+	int *pp = (int *) L->p;
+	double *px = (double *) L->x;
+	for (minor = 0; minor < L->n; ++minor)
+	    if (px[pp[minor]] <= 0.0)
+		break;
+    }
+    if (minor < L->n)
+	error(_("leading minor of order %d is not positive definite"),
+	      (int) minor + 1);
     
     SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(
 			   (L->is_super) ? "dCHMsuper" : "dCHMsimpl")),

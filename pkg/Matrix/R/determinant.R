@@ -163,7 +163,7 @@ rm(.cl)
 setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               trf <- tryCatch(
-                  Cholesky(x, perm = TRUE, LDL = FALSE, super = FALSE),
+                  Cholesky(x, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(x, errSing = FALSE))
               if(isS4(trf))
                   determinant(trf, logarithm, ...)
