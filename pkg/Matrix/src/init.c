@@ -162,6 +162,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_validate, 1),
     CALLDEF(CHMsimpl_validate, 1),
     CALLDEF(CHMsuper_validate, 1),
+    CALLDEF(dCHMsimpl_validate, 1),
+    CALLDEF(dCHMsuper_validate, 1),
 
     CALLDEF(R_Dim_validate, 1),
     CALLDEF(R_DimNames_validate, 2),

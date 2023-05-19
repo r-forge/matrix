@@ -1416,16 +1416,17 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
     if (n > 0) {
 	cholmod_factor *L = mf2cholmod(obj);
 	if (L->is_super) {
-	    int i, j, nc, nsuper = (int) L->nsuper,
-		*ps = (int *) L->super,
+	    int k, j, nc,
+		nsuper = (int) L->nsuper,
+		*psuper = (int *) L->super,
 		*ppi = (int *) L->pi,
 		*ppx = (int *) L->px;
 	    double *px = (double *) L->x, *py;
 	    R_xlen_t nr1a;
-	    for (i = 0; i < nsuper; ++i) {
-		nc = ps[i+1] - ps[i];
-		nr1a = (R_xlen_t) (ppi[i+1] - ppi[i]) + 1;
-		py = px + ppx[i];
+	    for (k = 0; k < nsuper; ++k) {
+		nc = psuper[k+1] - psuper[k];
+		nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
+		py = px + ppx[k];
 		for (j = 0; j < nc; ++j) {
 		    modulus += log(*py);
 		    py += nr1a;
