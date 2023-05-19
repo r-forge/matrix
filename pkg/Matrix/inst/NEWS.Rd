@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-05-16 r3932)}{
+\section{Changes in version 1.5-5 (2023-05-19 r3949)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -93,6 +93,7 @@
       Packages defining new factorization classes may extend these.
 
       %% TODO: add examples _using_ 'expand2'
+      %% TODO: fix bug in expand2(<upper triangular p?BunchKaufman>)
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor and
@@ -103,7 +104,6 @@
       compatibility.  It may be formally deprecated in the future,
       hence new code should use \code{expand2}.
       \cr
-      %% TODO: fix bug in expand2(<upper triangular p?BunchKaufman>)
       Notably, \code{expand2} has methods for all factorizations in
       \pkg{Matrix}, whereas \code{expand} continues to have methods
       only for \code{CHMfactor}, \code{denseLU}, and \code{sparseLU}.
@@ -111,11 +111,11 @@
       including useful optional arguments for Cholesky and QR
       factorizations.
 
-      \item \code{as(x, "generalMatrix")} and
-      \code{as(x, "triangularMatrix")} for \code{x} inheriting
-      from \code{denseLU} and \code{p?BunchKaufman}, respectively,
-      allowing users to inspect the LAPACK representation of
-      those factorizations, notably as classes \code{BunchKaufman}
+      \item \code{as(x, "dgeMatrix")}, \code{as(x, "dtrMatrix")},
+      and \code{as(x, "dtpMatrix")} for \code{x} inheriting from
+      \code{denseLU}, \code{BunchKaufman}, and \code{pBunchKaufman},
+      respectively, allowing users to inspect the LAPACK representation
+      of those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};
       see Bug Fixes.
     }
@@ -185,7 +185,7 @@
       check.
     }
   }
-    \subsection{Misc}{
+  \subsection{Misc}{
     \itemize{
       \item .
     }
