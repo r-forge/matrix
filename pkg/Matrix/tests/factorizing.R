@@ -248,6 +248,7 @@ for(n in c(5:12)) {
               all.equal(as.matrix(L.), as.matrix(rr$ L)))
     ##
     CAp <- Cholesky(A)# perm=TRUE --> Permutation:
+    validObject(CAp)
     p <- CAp@perm + 1L
     P <- as(p, "pMatrix")
     ## the inverse permutation:
@@ -257,6 +258,7 @@ for(n in c(5:12)) {
     ldetp. <- sum(log(.diag.dsC(Chx = CAp, res.kind = "diag") ))
     ##
     CA	<- Cholesky(A,perm=FALSE)
+    validObject(CA)
     ldet <- .diag.dsC(Chx = CA, res.kind = "sumLog")
     ## not printing CAp : ends up non-integer for n >= 11
     mCAp <- as(CAp,"sparseMatrix")
@@ -292,6 +294,7 @@ mkCholhash <- function(r.all) {
 set.seed(17)
 (rr <- mkLDL(4))
 (CA <- Cholesky(rr$A))
+validObject(CA)
 stopifnot(all.equal(determinant(rr$A) -> detA,
                     determinant(as(rr$A, "matrix"))),
           is.all.equal3(c(detA$modulus), log(det(rr$D)), sum(log(rr$D@x))))
@@ -340,6 +343,7 @@ stopifnot(all(nT.@i <= nT.@j),
 	  identical(qr(A1.8), qr(as(A1.8, "generalMatrix"))))
 
 CA <- Cholesky(A. + Diagonal(x = rowSums(abs(A.)) + 1))
+validObject(CA)
 stopifnotValid(CAinv <- solve(CA), "dsCMatrix")
 MA <- as(CA, "Matrix") # with a confusing warning -- FIXME!
 stopifnotValid(MAinv <- solve(MA), "dtCMatrix")
@@ -375,6 +379,7 @@ sapply(facs, isLDL)
 
 chkCholesky <- function(chmf, A) {
     stopifnot(is(chmf, "CHMfactor"),
+              validObject(chmf),
               is(A, "Matrix"), isSymmetric(A))
     if(!is(A, "dsCMatrix"))
         A <- as(as(as(A, "CsparseMatrix"), "symmetricMatrix", "dMatrix"))
@@ -404,6 +409,7 @@ ld.4 <- determinant(Cholesky(mtm, perm = FALSE))
 stopifnot(identical(names(mtm@factors),
                     c("sPDCholesky", "spDCholesky")))
 c2 <- Cholesky(mtm, super = TRUE)
+validObject(c2)
 stopifnot(identical(names(mtm@factors),
                     c("sPDCholesky", "spDCholesky", "SPdCholesky")))
 

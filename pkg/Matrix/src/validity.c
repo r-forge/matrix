@@ -1486,7 +1486,7 @@ SEXP CHMsimpl_validate(SEXP obj)
 		UPRET(5, "'i' slot contains NA");
 	    if (pi_[k] < 0 || pi_[k] >= n)
 		UPRET(5, "'i' slot has elements not in {0,...,Dim[1]-1}");
-	    if (pi_[k] <= pi[k - 1])
+	    if (pi_[k] <= pi_[k - 1])
 		UPRET(5, "'i' slot is not increasing within columns");
 	}
 	j1 = pnxt[j1];
