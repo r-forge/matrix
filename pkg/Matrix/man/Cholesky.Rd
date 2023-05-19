@@ -67,13 +67,17 @@ Cholesky(A, \dots)
     algorithm is used to select the permutation.
     If \code{FALSE}, then the order of the columns of \eqn{A}
     is preserved.}
-  \item{LDL}{a logical indicating if the factorization should be
-    computed as \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
+  \item{LDL}{a logical indicating if the simplicial factorization
+    should be computed as
+    \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
     such that the result stores the diagonal entries of \eqn{D}
     and the strictly lower triangular entries of \eqn{L_{1}}.
     The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L}.}
+    of \eqn{L}.  This argument is ignored if \code{super = TRUE}
+    (or if \code{super = NA} and the supernodal algorithm is
+    chosen), as the supernodal code does not yet support the
+    \code{LDL = TRUE} variant.}
   \item{super}{a logical indicating if the factorization should
     use the supernodal algorithm.  The alternative is the simplicial
     algorithm.  Setting \code{super = NA} leaves the choice to
