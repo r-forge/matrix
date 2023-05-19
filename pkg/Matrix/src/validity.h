@@ -79,6 +79,8 @@ SEXP sparseQR_validate(SEXP obj);
 SEXP CHMfactor_validate(SEXP obj);
 SEXP CHMsimpl_validate(SEXP obj);
 SEXP CHMsuper_validate(SEXP obj);
+SEXP dCHMsimpl_validate(SEXP obj);
+SEXP dCHMsuper_validate(SEXP obj);
 
 void validObject(SEXP obj, const char* cl);
 

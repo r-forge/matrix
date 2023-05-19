@@ -611,15 +611,19 @@ setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
 
 ## ...... Sparse .......................................................
 
+## FIXME? simplicial symbolic factorization is specified entirely by
+##        'colcount' and 'perm' ...
+##        should 'p', 'i', 'nz', 'nxt', 'prv' slots all be emtpy ??
+##        see comments in ../src/CHOLMOD/Core/cholmod_change_factor.c
+
 ## S4 representation of C struct 'cholmod_factor',
 ## from header ../src/CHOLMOD/Include/cholmod_core.h
 setClass("CHMfactor", contains = c("CholeskyFactorization", "VIRTUAL"),
-	 slots = c(colcount = "integer", perm = "integer", type = "integer"),
+	 slots = c(type = "integer", colcount = "integer", perm = "integer"),
          validity = function(object) .Call(CHMfactor_validate, object))
 
 ## Simplicial factorization
-setClass("CHMsimpl",
-	 contains = c("CHMfactor", "VIRTUAL"),
+setClass("CHMsimpl", contains = c("CHMfactor", "VIRTUAL"),
 	 slots = c(p = "integer", i = "integer", nz = "integer",
 		   nxt = "integer", prv = "integer"),
          prototype = list(type = c(0L, 1L, 0L, 1L, 0L, 0L),
@@ -627,7 +631,9 @@ setClass("CHMsimpl",
 	 validity = function(object) .Call(CHMsimpl_validate, object))
 
 setClass("nCHMsimpl", contains = "CHMsimpl") # symbolic factorization
-setClass("dCHMsimpl", contains = "CHMsimpl", slots = c(x = "numeric"))
+setClass("dCHMsimpl", contains = "CHMsimpl",
+         slots = c(x = "numeric"),
+         validity = function(object) .Call(dCHMsimpl_validate, object))
 
 ## Supernodal factorization
 setClass("CHMsuper", contains = c("CHMfactor", "VIRTUAL"),
@@ -638,7 +644,9 @@ setClass("CHMsuper", contains = c("CHMfactor", "VIRTUAL"),
 	 validity = function(object) .Call(CHMsuper_validate, object))
 
 setClass("nCHMsuper", contains = "CHMsuper") # symbolic factorization
-setClass("dCHMsuper", contains = "CHMsuper", slots = c(x = "numeric"))
+setClass("dCHMsuper", contains = "CHMsuper",
+         slots = c(x = "numeric"),
+         validity = function(object) .Call(dCHMsuper_validate, object))
 
 
 ## ------ Bunch-Kaufman ------------------------------------------------

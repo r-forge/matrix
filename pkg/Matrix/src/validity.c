@@ -896,12 +896,12 @@ SEXP dpoMatrix_validate(SEXP obj)
     R_xlen_t np1 = (R_xlen_t) n + 1;
     UNPROTECT(1); /* dim */
     
-    /* Non-negative diagonal elements are necessary _but not_ sufficient */
+    /* Non-negative diagonal elements are necessary but _not_ sufficient */
     SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     double *px = REAL(x);
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
-	    UPRET(1, "matrix is not positive semidefinite");
+	    UPRET(1, "matrix has negative diagonal elements");
     UNPROTECT(1); /* x */
 
     return ScalarLogical(1);
@@ -922,17 +922,17 @@ SEXP dppMatrix_validate(SEXP obj)
     char ul = *CHAR(STRING_ELT(uplo, 0));
     UNPROTECT(1); /* uplo */
 
-    /* Non-negative diagonal elements are necessary _but not_ sufficient */
+    /* Non-negative diagonal elements are necessary but _not_ sufficient */
     SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
     double *px = REAL(x);
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(1, "matrix is not positive semidefinite");
+		UPRET(1, "matrix has negative diagonal elements");
     } else {
 	for (i = 0; i < n; px += n-(i++))
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(1, "matrix is not positive semidefinite");
+		UPRET(1, "matrix has negative diagonal elements");
     }
     UNPROTECT(1); /* x */
     
@@ -1016,7 +1016,7 @@ SEXP Cholesky_validate(SEXP obj)
     double *px = REAL(x);
     for (i = 0; i < n; ++i, px += np1)
 	if (!ISNAN(*px) && *px < 0.0)
-	    UPRET(1, "matrix has negative diagonal elements");
+	    UPRET(1, "Cholesky factor has negative diagonal elements");
     UNPROTECT(1); /* x */
     
     return ScalarLogical(1);
@@ -1038,11 +1038,11 @@ SEXP pCholesky_validate(SEXP obj)
     if (ul == 'U') {
 	for (i = 0; i < n; px += (++i)+1)
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(1, "matrix has negative diagonal elements");
+		UPRET(1, "Cholesky factor has negative diagonal elements");
     } else {
 	for (i = 0; i < n; px += n-(i++))
 	    if (!ISNAN(*px) && *px < 0.0)
-		UPRET(1, "matrix has negative diagonal elements");
+		UPRET(1, "Cholesky factor has negative diagonal elements");
     }
     UNPROTECT(1); /* x */
     
@@ -1341,7 +1341,7 @@ SEXP CHMfactor_validate(SEXP obj)
 	UPRET(1, "'type' slot does not have length 6");
     int order = INTEGER(type)[0];
     if (order < 0 || order > 4)
-	UPRET(1, "type[1] is not in 0:4");
+	UPRET(1, "type[1] (cholmod_factor.ordering) is not in 0:4");
     UNPROTECT(1); /* type */
     
     SEXP colcount = PROTECT(GET_SLOT(obj, install("colcount")));
@@ -1397,11 +1397,11 @@ SEXP CHMsimpl_validate(SEXP obj)
     SEXP type = PROTECT(GET_SLOT(obj, install("type")));
     int *ptype = INTEGER(type), mono = ptype[3];
     if (ptype[1] != 0 && ptype[1] != 1)
-	UPRET(1, "type[2] is not 0 or 1");
+	UPRET(1, "type[2] (cholmod_factor.is_ll) is not 0 or 1");
     if (ptype[2] != 0)
-	UPRET(1, "type[3] is not 0");
+	UPRET(1, "type[3] (cholmod_factor.is_super) is not 0");
     if (ptype[3] != 0 && ptype[3] != 1)
-	UPRET(1, "type[4] is not 0 or 1");
+	UPRET(1, "type[4] (cholmod_factor.is_monotonic) is not 0 or 1");
     UNPROTECT(1); /* type */
     
     SEXP nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
@@ -1453,30 +1453,31 @@ SEXP CHMsimpl_validate(SEXP obj)
 	UPRET(4, "'p' slot is not of type \"integer\"");
     if (XLENGTH(p) - 1 != n)
 	UPRET(4, "'p' slot does not have length Dim[2]+1");
-    
-    SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
-    if (TYPEOF(i) != INTSXP)
-	UPRET(5, "'i' slot is not of type \"integer\"");
-    if (XLENGTH(i) < n)
-	UPRET(5, "'i' slot has length less than Dim[2]");
-    
-    int *pp = INTEGER(p), *pi = INTEGER(i), *pi_, k;
-    R_xlen_t nzmax = XLENGTH(i);
     j1 = pnxt[n + 1];
+    int *pp = INTEGER(p);
     if (pp[j1] != 0)
-	UPRET(5, "column 'j' is stored first but p[j] is not 0");
+	UPRET(4, "column 'j' is stored first but p[j] is not 0");
     for (j = 0; j < n; ++j) {
 	j2 = pnxt[j1];
 	if (pp[j2] == NA_INTEGER)
-	    UPRET(5, "'p' slot contains NA");
+	    UPRET(4, "'p' slot contains NA");
 	if (pp[j2] < pp[j1])
-	    UPRET(5, "'p' slot is not increasing (when traversed in stored column order)");
-	if (pp[j2] > nzmax)
-	    UPRET(5, "'p' slot has elements greater than length(i)");
+	    UPRET(4, "'p' slot is not increasing when traversed in stored column order");
 	if (pp[j2] - pp[j1] < pnz[j1])
-	    UPRET(5, "'i' slot allocates fewer than nz[j] elements for column 'j'");
-	if (pp[j2] - pp[j1] < pnz[j1])
-	    UPRET(5, "'i' slot allocates more than Dim[2]-j+1 elements for column 'j'");
+	    UPRET(4, "'i' slot allocates fewer than nz[j] elements for column 'j'");
+	if (pp[j2] - pp[j1] > n - j1)
+	    UPRET(4, "'i' slot allocates more than Dim[2]-j+1 elements for column 'j'");
+	j1 = j2;
+    }
+
+    SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym));
+    if (TYPEOF(i) != INTSXP)
+	UPRET(5, "'i' slot is not of type \"integer\"");
+    if (XLENGTH(i) != pp[n])
+	UPRET(5, "'i' slot does not have length p[length(p)]");
+    int *pi = INTEGER(i), *pi_, k;
+    j1 = pnxt[n + 1];
+    for (j = 0; j < n; ++j) {
 	pi_ = pi + pp[j1];
 	if (pi_[0] != j1)
 	    UPRET(5, "first entry in column 'j' does not have row index 'j'");
@@ -1488,7 +1489,7 @@ SEXP CHMsimpl_validate(SEXP obj)
 	    if (pi_[k] <= pi[k - 1])
 		UPRET(5, "'i' slot is not increasing within columns");
 	}
-	j1 = j2;
+	j1 = pnxt[j1];
     }
     UNPROTECT(5); /* i, p, nz, prv, nxt */
     
@@ -1504,17 +1505,17 @@ SEXP CHMsuper_validate(SEXP obj)
     SEXP type = PROTECT(GET_SLOT(obj, install("type")));
     int *ptype = INTEGER(type);
     if (ptype[1] != 1)
-	UPRET(1, "type[2] is not 1");
+	UPRET(1, "type[2] (cholmod_factor.is_ll) is not 1");
     if (ptype[2] != 1)
-	UPRET(1, "type[3] is not 1");
+	UPRET(1, "type[3] (cholmod_factor.is_super) is not 1");
     if (ptype[3] != 1)
-	UPRET(1, "type[4] is not 1");
+	UPRET(1, "type[4] (cholmod_factor.is_monotonic) is not 1");
     if (ptype[4] < 0)
-	UPRET(1, "type[5] is negative");
+	UPRET(1, "type[5] (cholmod_factor.maxcsize) is negative");
     if (ptype[5] < 0)
-	UPRET(1, "type[6] is negative");
+	UPRET(1, "type[6] (cholmod_factor.maxesize) is negative");
     if (n > 0 && ptype[5] >= n)
-	UPRET(1, "type[6] is not less than Dim[1]");
+	UPRET(1, "type[6] (cholmod_factor.maxesize) is not less than Dim[1]");
     UNPROTECT(1); /* type */
     
     /* FIXME: maxcsize and maxesize are well-defined properties of the
@@ -1549,9 +1550,9 @@ SEXP CHMsuper_validate(SEXP obj)
     if (TYPEOF(px) != INTSXP)
 	UPRET(3, "'px' slot is not of type \"integer\"");
     if (XLENGTH(pi) != nsuper1a)
-	UPRET(2, "'pi' and 'super' slots do not have equal length");
+	UPRET(3, "'pi' and 'super' slots do not have equal length");
     if (XLENGTH(px) != nsuper1a)
-	UPRET(2, "'px' and 'super' slots do not have equal length");
+	UPRET(3, "'px' and 'super' slots do not have equal length");
     int *ppi = INTEGER(pi), *ppx = INTEGER(px), nr, nc;
     if (ppi[0] != 0)
 	UPRET(3, "first element of 'pi' slot is not 0");
@@ -1602,6 +1603,62 @@ SEXP CHMsuper_validate(SEXP obj)
     }
     UNPROTECT(4); /* s, px, pi, super */
 
+    return ScalarLogical(1);
+}
+
+SEXP dCHMsimpl_validate(SEXP obj)
+{
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    if (TYPEOF(x) != REALSXP)
+	UPRET(1, "'x' slot is not of type \"double\"");
+    
+    SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
+    int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
+    if (XLENGTH(x) != pp[n])
+	UPRET(2, "'x' slot does not have length p[length(p)]");
+
+    int j;
+    double *pu = REAL(x);
+
+    /* Non-negative diagonal elements are necessary _and_ sufficient */
+    for (j = 0; j < n; ++j)
+	if (!ISNAN(pu[pp[j]]) && pu[pp[j]] < 0.0)
+	    UPRET(2, "Cholesky factor has negative diagonal elements");
+    UNPROTECT(2); /* p, x */
+    
+    return ScalarLogical(1);
+}
+
+SEXP dCHMsuper_validate(SEXP obj)
+{
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    if (TYPEOF(x) != REALSXP)
+	UPRET(1, "'x' slot is not of type \"double\"");
+    
+    SEXP px = PROTECT(GET_SLOT(obj, install("px")));
+    int *ppx = INTEGER(px), nsuper = (int) (XLENGTH(px) - 1);
+    if (XLENGTH(x) != ppx[nsuper])
+	UPRET(2, "'x' slot does not have length px[length(px)]");
+    
+    SEXP pi = PROTECT(GET_SLOT(obj, install("pi"))),
+	super = PROTECT(GET_SLOT(obj, install("super")));
+    int *ppi = INTEGER(pi), *psuper = INTEGER(super), k, j, nc;
+    double *pu = REAL(x), *pv;
+    R_xlen_t nr1a;
+    
+    /* Non-negative diagonal elements are necessary _and_ sufficient */
+    for (k = 0; k < nsuper; ++k) {
+	nc = psuper[k+1] - psuper[k];
+	nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
+	pv = pu + ppx[k];
+	for (j = 0; j < nc; ++j) {
+	    if (!ISNAN(*pv) && *pv < 0.0)
+		UPRET(4, "Cholesky factor has negative diagonal elements");
+	    pv += nr1a;
+	}
+    }
+    UNPROTECT(4); /* super, pi, px, x */
+    
     return ScalarLogical(1);
 }
 
