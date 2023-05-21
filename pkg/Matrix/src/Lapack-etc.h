@@ -8,13 +8,14 @@
 # define USE_FC_LEN_T
 #endif
 #include <Rconfig.h>
-#include <R_ext/Lapack.h>
-#ifndef FCONE
-# define FCONE
-#endif
 
 #ifdef PR18534fixed
 # define usePR18534fix
+#endif
+
+#include <R_ext/Lapack.h>
+#ifndef FCONE
+# define FCONE
 #endif
 
 #endif /* MATRIX_LAPACK_H */
