@@ -2086,7 +2086,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
     const cs *V_ = dgC2cs(V);
     double *pbeta = REAL(beta);
     int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
-	*pp = INTEGER(p);
+	*pp = INTEGER(p), nprotect = 6;
         
     SEXP yx;
     double *pyx;
@@ -2130,8 +2130,10 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
     int *padim = INTEGER(adim);
     padim[0] = (op_ != 0) ? m : r;
     padim[1] = n;
-    if (!isNull(y) || padim[0] != m)
+    if (!isNull(y) || padim[0] != m) {
 	PROTECT(ax = allocVector(REALSXP, (R_xlen_t) padim[0] * padim[1]));
+	++nprotect;
+    }
     double *pax = REAL(ax), *work = NULL;
     if (op_ < 5)
 	work = (double *) R_alloc((size_t) m, sizeof(double));
@@ -2229,8 +2231,6 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
     }
 
     SET_SLOT(a, Matrix_xSym, ax);
-    if (ax != yx)
-	UNPROTECT(1); /* ax */
-    UNPROTECT(6); /* adim, a, yx, p, beta, V */
+    UNPROTECT(nprotect); /* ax, adim, a, yx, p, beta, V */
     return a;
 }
