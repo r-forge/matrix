@@ -13,7 +13,6 @@
 #include "dtrMatrix.h"
 #include "dtpMatrix.h"
 #include "factorizations.h"
-#include "sparseQR.h"
 #include "packedMatrix.h"
 #include "unpackedMatrix.h"
 #include "sparse.h"
@@ -106,10 +105,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(lapack_qr, 2),
     CALLDEF(lsq_dense_Chol, 2),
     CALLDEF(lsq_dense_QR, 2),
-    CALLDEF(sparseQR_qty, 4),
-    CALLDEF(sparseQR_coef, 2),
-    CALLDEF(sparseQR_resid_fitted, 3),
-
+    
     CALLDEF(Matrix_validate, 1),
     CALLDEF(MatrixFactorization_validate, 1),
     CALLDEF(compMatrix_validate, 1),
@@ -283,14 +279,15 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(BunchKaufman_solve, 3),
     CALLDEF(Cholesky_solve, 3),
     CALLDEF(sparseLU_solve, 3),
-/* MJ: have 'sparseQR_coef' instead : */
+/* MJ: not needed since we have 'sparseQR_matmult' : */
 #if 0
     CALLDEF(sparseQR_solve, 3),
 #endif
     CALLDEF(CHMfactor_solve, 4),
-
     CALLDEF(dtrMatrix_solve, 3),
     CALLDEF(dtCMatrix_solve, 3),
+
+    CALLDEF(sparseQR_matmult, 5),
     
     CALLDEF(CHM_set_common_env, 1),
 

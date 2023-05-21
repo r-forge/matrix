@@ -1,6 +1,9 @@
 ## METHODS FOR CLASS: sparseQR
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## MJ: migrated to ./qr.R
+if(FALSE) {
+
 ## TODO: define implicit generic qr.(Q|R|X|qy|qty|coef|fitted|resid) with
 ##       formal argument '...' so that we can define methods with further
 ##       optional arguments ('backPermute', etc.) and perhaps deprecate
@@ -172,3 +175,5 @@ setMethod("qr.resid", signature(qr = "sparseQR", y = "numeric"),
 setMethod("qr.resid", signature(qr = "sparseQR", y = "Matrix"),
 	  function(qr, y)
               .Call(sparseQR_resid_fitted, qr, .dense2g(as(y, "denseMatrix"), "d"), TRUE))
+
+} ## MJ

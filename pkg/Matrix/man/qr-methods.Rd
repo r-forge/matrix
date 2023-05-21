@@ -142,9 +142,9 @@ drop0(R. <- qr.R(qX), tol=tolE) # columns *permuted*: c3 b1 ..
 Q. <- qr.Q(qX)
 qI <- sort.list(qX@q) # the inverse 'q' permutation
 (X. <- drop0(Q. \%*\% R.[, qI], tol=tolE))## just = X, incl. correct colnames
-stopifnot(all(X - X.) < 8*.Machine$double.eps,
+stopifnot(all(X - X. < 8*.Machine$double.eps),
           ## qrR(.) returns R already "back permuted" (as with qI):
-          identical(R.[, qI], qrR(qX)) )
+          identical(R.[, qI], qrR(qX, row.names = FALSE)) )
 ##
 ## In this sense, classical qr.coef() is fine:
 cfqx <- qr.coef(qx, y) # quite different from

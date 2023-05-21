@@ -68,20 +68,11 @@ init.o: init.c abIndex.h \
   CHMfactor.h Csparse.h dense.h Lapack-etc.h \
   dgCMatrix.h cs_utils.h cs.h dgeMatrix.h dpoMatrix.h dsyMatrix.h \
   dppMatrix.h dspMatrix.h dtrMatrix.h \
-  dtpMatrix.h factorizations.h sparseQR.h packedMatrix.h \
+  dtpMatrix.h factorizations.h packedMatrix.h \
   unpackedMatrix.h sparse.h subscript.h validity.h
 packedMatrix.o: packedMatrix.c packedMatrix.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 sparse.o: sparse.c sparse.h Mutils.h Mdefines.h Syms.h Minlines.h
-sparseQR.o: sparseQR.c sparseQR.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h \
-  cs_utils.h cs.h chm_common.h \
-  SuiteSparse_config/SuiteSparse_config.h CHOLMOD/Include/cholmod.h \
-  CHOLMOD/Include/cholmod_io64.h CHOLMOD/Include/cholmod_config.h \
-  CHOLMOD/Include/cholmod_core.h CHOLMOD/Include/cholmod_check.h \
-  CHOLMOD/Include/cholmod_cholesky.h CHOLMOD/Include/cholmod_partition.h \
-  CHOLMOD/Include/cholmod_camd.h CHOLMOD/Include/cholmod_supernodal.h \
-  CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h
 sparseVector.o: sparseVector.c sparseVector.h \
   Mutils.h Mdefines.h Syms.h Minlines.h t_sparseVector.c
 subscript.o: subscript.c subscript.h \

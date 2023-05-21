@@ -16,7 +16,6 @@ SOURCES_C =  \
             dtrMatrix.c \
             dtpMatrix.c \
             factorizations.c \
-	    sparseQR.c \
 	    sparseVector.c \
 	    abIndex.c \
 	    packedMatrix.c \

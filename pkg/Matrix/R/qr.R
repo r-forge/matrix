@@ -2,21 +2,318 @@
 ## pivoted QR factorization of dense and sparse matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## FIXME? We could have methods for generalMatrix, symmetricMatrix,
-##        triangularMatrix, and diagonalMatrix instead?  We could
-##        construct the result "directly" in the upper triangular
-##        (incl. diagonal) cases, and cache it in the general and
-##        symmetric cases.  See the methods for chol() in ./chol.R ...
+## MJ: Well, I'd very much like to _not_ truncate by default ...
+##     not least because qr.qy and qr.qty should remain inverses ...
+.qr.rank.def.truncating <- TRUE
+
+.qr.rank.def.warn <- function(qr) {
+    if(m0 <- qr@V@Dim[1L] - qr@Dim[1L])
+        warning(gettextf("matrix is structurally rank deficient; using augmented matrix with additional %d row(s) of zeros", m0),
+                domain = NA)
+    m0
+}
 
 setMethod("qr", signature(x = "sparseMatrix"),
 	  function(x, ...)
-              qr(..sparse2d(.sparse2g(as(x, "CsparseMatrix"))), ...))
+              qr(.sparse2g(as(x, "CsparseMatrix"), "d"), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
           function(x, order = 3L, ...) {
               r <- .Call(dgCMatrix_orf, x, order, TRUE)
-              if(n <- r@V@Dim[1L] - r@Dim[1L])
-                  Matrix.msg(gettextf("matrix is structurally rank deficient; returning QR factorization of matrix augmented with %d rows of zeros", n),
-                             domain = NA)
+              .qr.rank.def.warn(r)
               r
           })
+
+
+## METHODS FOR CLASS: sparseQR
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## TODO: define implicit generic qr.(Q|R|X|coef|fitted|resid|qty|qy) with
+##       formal argument '...' so that we can define methods with further
+##       optional arguments ('backPermute', etc.) and perhaps deprecate
+##       the 'qrR' work-around
+
+## returning list(P1', Q, R, P2'), where A = P1' Q R P2'
+setMethod("expand2", signature(x = "sparseQR"),
+          function(x, complete = FALSE, ...) {
+              m0 <- .qr.rank.def.warn(x)
+              R <- x@R
+              d <- R@Dim
+              m <- d[1L]
+              n <- d[2L]
+              dn <- x@Dimnames
+              if(m0 && !is.null(dn[[1L]]))
+                  length(dn[[1L]]) <- m
+              Q <- .Call(sparseQR_matmult, x, NULL, 6L, complete, NULL)
+              if(!complete && n < m)
+                  R <- R[seq_len(n), , drop = FALSE]
+              p1 <- x@p
+              p2 <- x@q
+              P1. <- new("pMatrix",
+                         Dim = c(m, m),
+                         Dimnames = c(dn[1L], list(NULL)),
+                         margin = 1L,
+                         perm = invPerm(p1, zero.p = TRUE, zero.res = FALSE))
+              P2. <- new("pMatrix",
+                         Dim = c(n, n),
+                         Dimnames = c(list(NULL), dn[2L]),
+                         margin = 2L,
+                         perm = if(length(p2)) invPerm(p2, zero.p = TRUE, zero.res = FALSE) else seq_len(n))
+              if(complete)
+                  list(P1. = P1., Q = Q, R = R, P2. = P2.)
+              else
+                  list(P1. = P1., Q1 = Q, R1 = triu(R), P2. = P2.)
+          })
+
+setMethod("qr.Q", signature(qr = "sparseQR"),
+	  function(qr, complete = FALSE, Dvec) {
+              m0 <- .qr.rank.def.warn(qr)
+              if(missing(Dvec))
+                  Dvec <- NULL
+              else {
+                  storage.mode(Dvec) <- "double"
+                  if(length(Dvec) != qr@V@Dim[if(complete) 1L else 2L])
+                      stop("'Dvec' has the wrong length")
+              }
+              Q <- .Call(sparseQR_matmult, qr, NULL, 4L, complete, Dvec)
+              dn <- c(qr@Dimnames[1L], list(NULL))
+              if(!is.null(rn <- dn[[1L]])) {
+                  if(m0)
+                      length(rn) <- length(rn) + m0
+                  if(is.unsorted(p1 <- qr@p, strictly = TRUE))
+                      rn <- rn[p1 + 1L]
+                  dn[[1L]] <- rn
+              }
+              Q@Dimnames <- dn
+              if(m0 && .qr.rank.def.truncating) {
+                  i <- seq_len(Q@Dim[1L] - m0)
+                  Q <- if(complete)
+                           Q[i, i, drop = FALSE]
+                       else Q[i, , drop = FALSE]
+              }
+              Q
+          })
+
+qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
+    m0 <- .qr.rank.def.warn(qr)
+    R <- qr@R
+    d <- R@Dim
+    m <- d[1L]
+    n <- d[2L]
+    dn <- qr@Dimnames
+    p2 <- qr@q + 1L
+    p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
+    if(!row.names)
+        dn <- c(list(NULL), dn[2L])
+    else if(m0 && !is.null(rn <- dn[[1L]]))
+        length(dn[[1L]]) <- length(rn) + m0
+    if(p2.uns && !is.null(cn <- dn[[2L]]))
+        dn[[2L]] <- cn[p2]
+    R@Dimnames <- dn
+    R <-
+        if(!complete && n < m) {
+            if(backPermute && p2.uns)
+                R[seq_len(n), invPerm(p2), drop = FALSE]
+            else R[seq_len(n), , drop = FALSE]
+        } else {
+            if(backPermute && p2.uns)
+                R[, invPerm(p2), drop = FALSE]
+            else R
+        }
+    if(m0 && .qr.rank.def.truncating && complete)
+        R <- R[seq_len(m - m0), , drop = FALSE]
+    if(complete || backPermute) R else triu(R)
+}
+
+setMethod("qr.R", signature(qr = "sparseQR"),
+	  function(qr, complete = FALSE)
+              qrR(qr, complete = complete, backPermute = FALSE,
+                  row.names = FALSE))
+
+setMethod("qr.X", signature(qr = "sparseQR"),
+          function(qr, complete = FALSE,
+                   ## FIXME:
+                   ## R CMD check complains, but really
+                   ## formals(base::qr.X)[["ncol"]] should change ...
+                   ncol = if (complete) nrow(R) else min(dim(R))) {
+              m0 <- .qr.rank.def.warn(qr)
+              R <- qr@R
+              d <- R@Dim
+              m <- d[1L]
+              n <- d[2L]
+              ncol <- as.integer(ncol)
+              if(ncol < 0L || ncol > m)
+                  stop("invalid 'ncol'")
+              p2 <- qr@q + 1L
+              p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
+              if(p2.uns && ncol < n)
+                  stop("need larger value of 'ncol' as pivoting occurred")
+              else if(ncol < n)
+                  R <- R[, seq_len(ncol), drop = FALSE]
+              else if(ncol > n) {
+                  Rp <- R@p
+                  Ri <- R@i
+                  Rx <- R@x
+                  Rnnz <- Rp[length(Rp)]
+                  R@Dim[2L] <- ncol
+                  R@p <- c(Rp, Rnnz + seq_len(ncol - n))
+                  R@i <- c(if(length(Ri) == Rnnz) Ri else Ri[seq_len(Rnnz)],
+                           n:(ncol - 1L))
+                  R@x <- c(if(length(Rx) == Rnnz) Rx else Rx[seq_len(Rnnz)],
+                           rep.int(1, ncol - n))
+              }
+              r <- .Call(sparseQR_matmult, qr, .sparse2dense(R), 4L, NA, NULL)
+              if(p2.uns) {
+                  j <- invPerm(p2, zero.p = TRUE, zero.res = FALSE)
+                  if(ncol > n)
+                      j <- c(j, (n + 1L):ncol)
+                  r <- r[, j, drop = FALSE]
+              }
+              dn <- qr@Dimnames
+              if(m0 && !is.null(rn <- dn[[1L]]))
+                  length(dn[[1L]]) <- length(rn) + m0
+              if(!is.null(cn <- dn[[2L]]) && length(cn) != ncol)
+                  length(dn[[2L]]) <- ncol
+              r@Dimnames <- dn
+              if(m0 && .qr.rank.def.truncating) {
+                  i <- seq_len(r@Dim[1L] - m0)
+                  r <- if(ncol > length(j))
+                           r[i, i, drop = FALSE]
+                       else r[i, , drop = FALSE]
+              }
+              r
+          })
+
+.qr.y0 <- function(y, m0) {
+    d <- y@Dim
+    d[1L] <- (m <- d[1L]) + m0
+    dn <- y@Dimnames
+    if(!is.null(dn[[1L]]))
+        length(dn[[1L]]) <- d[1L]
+    y0 <- new("dgeMatrix")
+    y0@Dim <- d
+    y0@Dimnames <- dn
+    y0@x <- as.double(`[<-`(array(0, d), seq_len(m), , y@x))
+    y0
+}
+
+setMethod("qr.coef", signature(qr = "sparseQR", y = "dgeMatrix"),
+          function(qr, y) {
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 0L, NA, NULL)
+              r@Dimnames <- c(qr@Dimnames[2L], y@Dimnames[2L])
+              r
+          })
+
+setMethod("qr.coef", signature(qr = "sparseQR", y = "numLike"),
+          function(qr, y)
+              drop(qr.coef(qr, .m2ge(y, "d"))))
+
+setMethod("qr.coef", signature(qr = "sparseQR", y = "matrix"),
+          function(qr, y)
+              qr.coef(qr, .m2ge(y, "d")))
+
+setMethod("qr.coef", signature(qr = "sparseQR", y = "Matrix"),
+          function(qr, y)
+              qr.coef(qr, .m2ge(as(y, "matrix"), "d")))
+
+setMethod("qr.fitted", signature(qr = "sparseQR", y = "dgeMatrix"),
+          function(qr, y, k = qr$rank) {
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 1L, NA, NULL)
+              r@Dimnames <- y@Dimnames
+              if(m0 && .qr.rank.def.truncating)
+                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r
+          })
+
+setMethod("qr.fitted", signature(qr = "sparseQR", y = "numLike"),
+          function(qr, y, k = qr$rank)
+              drop(qr.fitted(qr, .m2ge(y, "d"))))
+
+setMethod("qr.fitted", signature(qr = "sparseQR", y = "matrix"),
+          function(qr, y, k = qr$rank)
+              qr.fitted(qr, .m2ge(y, "d")))
+
+setMethod("qr.fitted", signature(qr = "sparseQR", y = "Matrix"),
+          function(qr, y, k = qr$rank)
+              qr.fitted(qr, .m2ge(as(y, "matrix"), "d")))
+
+setMethod("qr.resid", signature(qr = "sparseQR", y = "dgeMatrix"),
+          function(qr, y) {
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 2L, NA, NULL)
+              r@Dimnames <- y@Dimnames
+              if(m0 && .qr.rank.def.truncating)
+                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r
+          })
+
+setMethod("qr.resid", signature(qr = "sparseQR", y = "numLike"),
+          function(qr, y)
+              drop(qr.resid(qr, .m2ge(y, "d"))))
+
+setMethod("qr.resid", signature(qr = "sparseQR", y = "matrix"),
+          function(qr, y)
+              qr.resid(qr, .m2ge(y, "d")))
+
+setMethod("qr.resid", signature(qr = "sparseQR", y = "Matrix"),
+          function(qr, y)
+              qr.resid(qr, .m2ge(as(y, "matrix"), "d")))
+
+setMethod("qr.qty", signature(qr = "sparseQR", y = "dgeMatrix"),
+          function(qr, y) {
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 3L, NA, NULL)
+              r@Dimnames <- c(list(NULL), y@Dimnames[2L])
+              if(m0 && .qr.rank.def.truncating)
+                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r
+          })
+
+setMethod("qr.qty", signature(qr = "sparseQR", y = "numLike"),
+          function(qr, y)
+              drop(qr.qty(qr, .m2ge(y, "d"))))
+
+setMethod("qr.qty", signature(qr = "sparseQR", y = "matrix"),
+          function(qr, y)
+              qr.qty(qr, .m2ge(y, "d")))
+
+setMethod("qr.qty", signature(qr = "sparseQR", y = "Matrix"),
+          function(qr, y)
+              qr.qty(qr, .m2ge(as(y, "matrix"), "d")))
+
+setMethod("qr.qy", signature(qr = "sparseQR", y = "dgeMatrix"),
+          function(qr, y) {
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 4L, NA, NULL)
+              dn <- c(qr@Dimnames[1L], y@Dimnames[2L])
+              if(!is.null(rn <- dn[[1L]])) {
+                  if(m0)
+                      length(rn) <- length(rn) + m0
+                  if(is.unsorted(p1 <- qr@p, strictly = TRUE))
+                      rn <- rn[p1 + 1L]
+                  dn[[1L]] <- rn
+              }
+              r@Dimnames <- dn
+              if(m0 && .qr.rank.def.truncating)
+                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r
+          })
+
+setMethod("qr.qy", signature(qr = "sparseQR", y = "numLike"),
+          function(qr, y)
+              drop(qr.qy(qr, .m2ge(y, "d"))))
+
+setMethod("qr.qy", signature(qr = "sparseQR", y = "matrix"),
+          function(qr, y)
+              qr.qy(qr, .m2ge(y, "d")))
+
+setMethod("qr.qy", signature(qr = "sparseQR", y = "Matrix"),
+          function(qr, y)
+              qr.qy(qr, .m2ge(as(y, "matrix"), "d")))

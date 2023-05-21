@@ -785,12 +785,9 @@ chk.qr.D.S <- function(d., s., y, Y = Matrix(y), force = FALSE, tol = 1e-10) {
     ## when system is rank deficient, have differing cases, not always just NA <-> 0 coef
     ## FIXME though:  resid & fitted should be well determined
     if(force || !rank.def) stopifnot(
-### FIXME: temporary:
-###	is.all.equal3(	    cc	     , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
-	is.all.equal3(	unname( cc ) , drop(qr.coef  (s.,y)), drop(qr.coef  (s.,Y)), tol=tol),
-### END{FIXME}
-	is.all.equal3(qr.resid (d.,y), drop(qr.resid (s.,y)), drop(qr.resid (s.,Y)), tol=tol),
-	is.all.equal3(qr.fitted(d.,y), drop(qr.fitted(s.,y)), drop(qr.fitted(s.,Y)), tol=tol)
+	is.all.equal3(	    cc	     , qr.coef  (s.,y), drop(qr.coef  (s.,Y)), tol=tol),
+	is.all.equal3(qr.resid (d.,y), qr.resid (s.,y), drop(qr.resid (s.,Y)), tol=tol),
+	is.all.equal3(qr.fitted(d.,y), qr.fitted(s.,y), drop(qr.fitted(s.,Y)), tol=tol)
 	)
 }
 
