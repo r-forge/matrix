@@ -555,7 +555,7 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
     return dppMatrix_trf_(obj, asInteger(warn));
 }
 
-int dgCMatrix_trf_(cs *A, css **S, csn **N, int order, double tol)
+int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
 {
     cs *T = NULL;
 
@@ -613,7 +613,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
     else if (order_ < 0 || order_ > 3)
 	order_ = 0;
 
-    cs *A = dgC2cs(obj);
+    const cs *A = dgC2cs(obj);
     css *S = NULL;
     csn *N = NULL;
     int *pp = NULL;
@@ -669,7 +669,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
     return val;
 }
 
-int dgCMatrix_orf_(cs *A, css **S, csn **N, int order)
+int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order)
 {
     cs *T = NULL;
 
@@ -710,7 +710,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
     if (order_ < 0 || order_ > 3)
 	order_ = 0;
 
-    cs *A = dgC2cs(obj);
+    const cs *A = dgC2cs(obj);
     css *S = NULL;
     csn *N = NULL;
     int *pp = NULL;
@@ -1672,10 +1672,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		cs_pvec(pap, prx, work, m);
 		cs_lsolve(L, work);
 		cs_usolve(U, work);
-		if (paq)
-		    cs_ipvec(paq, work, prx, m);
-		else
-		    Matrix_memcpy(prx, work, m, sizeof(double));
+		cs_ipvec(paq, work, prx, m);
 		prx += m;
 	    }
 	} else {
@@ -1685,10 +1682,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		cs_pvec(pap, pbx, work, m);
 		cs_lsolve(L, work);
 		cs_usolve(U, work);
-		if (paq)
-		    cs_ipvec(paq, work, prx, m);
-		else
-		    Matrix_memcpy(prx, work, m, sizeof(double));
+		cs_ipvec(paq, work, prx, m);
 		prx += m;
 		pbx += m;
 	    }
@@ -1787,7 +1781,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
     return r;
 }
 
-/* MJ: not needed since we have 'sparseQR_coef' : */
+/* MJ: not needed since we have 'sparseQR_matmult' : */
 #if 0
 
 SEXP sparseQR_solve(SEXP a, SEXP b, SEXP sparse)
@@ -2081,4 +2075,161 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
     SOLVE_FINISH;
     UNPROTECT(2); /* r, auplo */
     return r;
+}
+
+SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
+{
+    SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym)),
+	beta = PROTECT(GET_SLOT(qr, Matrix_betaSym)),
+	p = PROTECT(GET_SLOT(qr, Matrix_pSym));
+    const cs *V_ = dgC2cs(V);
+    double *pbeta = REAL(beta);
+    int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
+	*pp = INTEGER(p);
+        
+    SEXP yx;
+    double *pyx;
+    if (isNull(y)) {
+	n = (asLogical(complete)) ? m : r;
+
+	R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
+	PROTECT(yx = allocVector(REALSXP, mn));
+	pyx = REAL(yx);
+	Matrix_memset(pyx, 0, mn, sizeof(double));
+
+	if (isNull(yxjj)) {
+	    for (j = 0; j < n; ++j) {
+		*pyx = 1.0;
+		pyx += m1a;
+	    }
+	} else if (TYPEOF(yxjj) == REALSXP && XLENGTH(yxjj) >= n) {
+	    double *pyxjj = REAL(yxjj);
+	    for (j = 0; j < n; ++j) {
+		*pyx = *pyxjj;
+		pyx += m1a;
+		pyxjj += 1;
+	    }
+	} else
+	    error(_("invalid 'yxjj'"));
+    } else {
+	SEXP ydim = PROTECT(GET_SLOT(y, Matrix_DimSym));
+	int *pydim = INTEGER(ydim);
+	if (pydim[0] != m)
+	    error(_("dimensions of 'qr' and 'y' are inconsistent"));
+	n = pydim[1];
+	UNPROTECT(1); /* ydim */
+
+	PROTECT(yx = GET_SLOT(y, Matrix_xSym));
+    }
+    pyx = REAL(yx);
+    
+    SEXP a = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
+	adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
+	ax = yx;
+    int *padim = INTEGER(adim);
+    padim[0] = (op_ != 0) ? m : r;
+    padim[1] = n;
+    if (!isNull(y) || padim[0] != m)
+	PROTECT(ax = allocVector(REALSXP, (R_xlen_t) padim[0] * padim[1]));
+    double *pax = REAL(ax), *work = NULL;
+    if (op_ < 5)
+	work = (double *) R_alloc((size_t) m, sizeof(double));
+    
+    switch (op_) {
+    case 0: /* qr.coef : A = P2 R1^{-1} Q1' P1 y */
+    {
+	SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)),
+	    q = PROTECT(GET_SLOT(qr, Matrix_qSym));
+	const cs *R_ = dgC2cs(R);
+	int *pq = (LENGTH(q)) ? INTEGER(q) : (int *) NULL;
+	
+	for (j = 0; j < n; ++j) {
+	    cs_pvec(pp, pyx, work, m);
+	    for (i = 0; i < r; ++i)
+		cs_happly(V_, i, pbeta[i], work);
+	    cs_usolve(R_, work);
+	    cs_ipvec(pq, work, pax, r);
+	    pyx += m;
+	    pax += r;
+	}
+	
+	UNPROTECT(2); /* q, R */
+	break;
+    }
+    case 1: /* qr.fitted : A = P1' Q1 Q1' P1 y */
+    	for (j = 0; j < n; ++j) {
+	    cs_pvec(pp, pyx, work, m);
+	    for (i = 0; i < r; ++i)
+		cs_happly(V_, i, pbeta[i], work);
+	    if (r < m)
+		Matrix_memset(work + r, 0, m - r, sizeof(double));
+	    for (i = r - 1; i >= 0; --i)
+		cs_happly(V_, i, pbeta[i], work);
+	    cs_ipvec(pp, work, pax, m);
+	    pyx += m;
+	    pax += m;
+	}
+	break;
+    case 2: /* qr.resid : A = P1' Q2 Q2' P1 y */
+    	for (j = 0; j < n; ++j) {
+	    cs_pvec(pp, pyx, work, m);
+	    for (i = 0; i < r; ++i)
+		cs_happly(V_, i, pbeta[i], work);
+	    if (r > 0)
+		Matrix_memset(work, 0, r, sizeof(double));
+	    for (i = r - 1; i >= 0; --i)
+		cs_happly(V_, i, pbeta[i], work);
+	    cs_ipvec(pp, work, pax, m);
+	    pyx += m;
+	    pax += m;
+	}
+	break;
+    case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */
+    	for (j = 0; j < n; ++j) {
+	    cs_pvec(pp, pyx, work, m);
+	    Matrix_memcpy(pax, work, m, sizeof(double));
+	    for (i = 0; i < r; ++i)
+		cs_happly(V_, i, pbeta[i], pax);
+	    pyx += m;
+	    pax += m;
+	}
+	break;
+    case 4: /* qr.qy {w/ perm.} : A = P1' Q y */
+    	for (j = 0; j < n; ++j) {
+	    Matrix_memcpy(work, pyx, m, sizeof(double));
+	    for (i = r - 1; i >= 0; --i)
+		cs_happly(V_, i, pbeta[i], work);
+	    cs_ipvec(pp, work, pax, m);
+	    pyx += m;
+	    pax += m;
+	}
+	break;
+    case 5: /* qr.qty {w/o perm.} : A = Q' y */
+	if (ax != yx)
+	    Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
+	for (j = 0; j < n; ++j) {
+	    for (i = 0; i < r; ++i)
+		cs_happly(V_, i, pbeta[i], pax);
+	    pax += m;
+	}
+	break;
+    case 6: /* qr.qy {w/o perm.} : A = Q y */
+	if (ax != yx)
+	    Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
+	for (j = 0; j < n; ++j) {
+	    for (i = r - 1; i >= 0; --i)
+		cs_happly(V_, i, pbeta[i], pax);
+	    pax += m;
+	}
+	break;
+    default:
+	error(_("invalid 'op'"));
+	break;
+    }
+
+    SET_SLOT(a, Matrix_xSym, ax);
+    if (ax != yx)
+	UNPROTECT(1); /* ax */
+    UNPROTECT(6); /* adim, a, yx, p, beta, V */
+    return a;
 }

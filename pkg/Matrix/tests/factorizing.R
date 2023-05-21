@@ -36,7 +36,6 @@ X <- rsparsematrix(9,5, 1/4, dimnames=list(paste0("r", 1:9), LETTERS[1:5]))
 qX <- qr(X); qd <- qr(as(X, "matrix"))
 ## are the same (now, *including* names):
 assert.EQ(print(qr.coef(qX, 1:9)), qr.coef(qd, 1:9), tol=1e-14)
-if(FALSE) ## error: (FIXME ?)
 chk.qr.D.S(d. = qd, s. = qX, y = 1:9)
 
 

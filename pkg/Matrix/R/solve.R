@@ -79,11 +79,11 @@ for(.cl in c("MatrixFactorization", "triangularMatrix")) {
 
 setMethod("solve", signature(a = .cl, b = "numLike"),
           function(a, b, ...)
-              solve(a, .m2dense(b, "dge"), ...))
+              solve(a, .m2ge(b, "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "matrix"),
           function(a, b, ...)
-              solve(a, .m2dense(b, "dge"), ...))
+              solve(a, .m2ge(b, "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "denseMatrix"),
           function(a, b, ...)
@@ -185,7 +185,6 @@ setMethod("solve", signature(a = "sparseLU", b = "dgCMatrix"),
               .Call(sparseLU_solve, a, b, TRUE)
           })
 
-## FIXME for qr.coef: generate sparse result directly
 setMethod("solve", signature(a = "sparseQR", b = "missing"),
           function(a, b, sparse = TRUE, ...) {
               r <- qr.coef(a, diag(a@Dim[2L]))
@@ -196,7 +195,6 @@ setMethod("solve", signature(a = "sparseQR", b = "dgeMatrix"),
           function(a, b, ...)
               qr.coef(a, b))
 
-## FIXME for qr.coef: generate sparse result directly
 setMethod("solve", signature(a = "sparseQR", b = "dgCMatrix"),
           function(a, b, ...)
               .dense2sparse(qr.coef(a, .sparse2dense(b, FALSE)), "C"))
@@ -649,11 +647,11 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...)
-              solve(.m2dense(a, "dge"), b, ...))
+              solve(.m2ge(a, "d"), b, ...))
 
 setMethod("solve", signature(a = "matrix", b = "sparseVector"),
 	  function(a, b, ...)
-              solve(.m2dense(a, "dge"), .spV2dge(b), ...))
+              solve(.m2ge(a, "d"), .spV2dge(b), ...))
 
 
 ########################################################################

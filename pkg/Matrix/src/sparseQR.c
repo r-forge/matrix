@@ -1,4 +1,10 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "sparseQR.h"
+#endif /* MJ */
+
+/* MJ: no longer needed ... replacement in ./factorizations.c */
+#if 0
 
 /**
  * Apply Householder transformations and the row permutation P to y
@@ -131,7 +137,7 @@ SEXP sparseQR_coef(SEXP qr, SEXP y)
     INIT_sparseQR_(TRUE);
     // ans := R^{-1} Q' y ==>  rownames(ans) := rownames(R^{-1}) = colnames(R)
     dmns = PROTECT(duplicate(dmns));
-
+    
     // rownames(ans) := colnames(ans)
     SET_VECTOR_ELT(dmns, 0, VECTOR_ELT(dmns, 1));
     
@@ -198,3 +204,5 @@ SEXP sparseQR_resid_fitted(SEXP qr, SEXP y, SEXP want_resid)
     UNPROTECT(1);
     return ans;
 }
+
+#endif /* MJ */

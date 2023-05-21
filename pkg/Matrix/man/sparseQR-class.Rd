@@ -12,26 +12,27 @@
 \alias{determinant,sparseQR,logical-method}
 \alias{qr.Q,sparseQR-method}
 \alias{qr.R,sparseQR-method}
+\alias{qr.X,sparseQR-method}
 \alias{qr.coef,sparseQR,Matrix-method}
-\alias{qr.coef,sparseQR,ddenseMatrix-method}
+\alias{qr.coef,sparseQR,dgeMatrix-method}
 \alias{qr.coef,sparseQR,matrix-method}
-\alias{qr.coef,sparseQR,numeric-method}
+\alias{qr.coef,sparseQR,numLike-method}
 \alias{qr.fitted,sparseQR,Matrix-method}
-\alias{qr.fitted,sparseQR,ddenseMatrix-method}
+\alias{qr.fitted,sparseQR,dgeMatrix-method}
 \alias{qr.fitted,sparseQR,matrix-method}
-\alias{qr.fitted,sparseQR,numeric-method}
+\alias{qr.fitted,sparseQR,numLike-method}
 \alias{qr.qty,sparseQR,Matrix-method}
-\alias{qr.qty,sparseQR,ddenseMatrix-method}
+\alias{qr.qty,sparseQR,dgeMatrix-method}
 \alias{qr.qty,sparseQR,matrix-method}
-\alias{qr.qty,sparseQR,numeric-method}
+\alias{qr.qty,sparseQR,numLike-method}
 \alias{qr.qy,sparseQR,Matrix-method}
-\alias{qr.qy,sparseQR,ddenseMatrix-method}
+\alias{qr.qy,sparseQR,dgeMatrix-method}
 \alias{qr.qy,sparseQR,matrix-method}
-\alias{qr.qy,sparseQR,numeric-method}
+\alias{qr.qy,sparseQR,numLike-method}
 \alias{qr.resid,sparseQR,Matrix-method}
-\alias{qr.resid,sparseQR,ddenseMatrix-method}
+\alias{qr.resid,sparseQR,dgeMatrix-method}
 \alias{qr.resid,sparseQR,matrix-method}
-\alias{qr.resid,sparseQR,numeric-method}
+\alias{qr.resid,sparseQR,numLike-method}
 %
 \alias{qrR}
 %
@@ -63,7 +64,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   \item{backPermute}{a logical indicating if \eqn{R_{1} P_{2}'}{R1 * P2'} 
     (\eqn{R P_{2}'}{R * P2'} if \code{complete = TRUE}) should be returned 
     instead of \eqn{R_{1}}{R1} (\eqn{R} if \code{complete = TRUE}).}
-  \item{row.names}{a logical indicating if \code{rownames(qr)}
+  \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
     should be propagated unpermuted to the result.
     If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
 }
@@ -126,14 +127,14 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       returns either \eqn{R} as a \code{\linkS4class{dgCMatrix}}
       or \eqn{R_{1}}{R1} as a \code{\linkS4class{dtCMatrix}},
       depending on optional argument \code{complete}.  The default
-      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.
-      This method warns about possible differences in the result of
-      \code{qr.R(qr(x))} depending on whether \code{x} is sparse or
-      dense.  The warning can be suppressed with
-      \code{\link{options}(Matrix.quiet.qr.R = TRUE)}
-      or
-      \code{\link{options}(Matrix.quiet = TRUE)},
-      the latter having side effects not limited to this method.}
+      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.}
+    \item{\code{qr.X}}{\code{signature(qr = "sparseQR")}:
+      returns \eqn{A} as a \code{\linkS4class{dgeMatrix}},
+      by default.  If \eqn{m > n} and optional argument
+      \code{ncol} is greater than \eqn{n}, then the result
+      is augmented with \eqn{P_{1}' Q J}{P1 * Q * J}, where
+      \eqn{J} is composed of columns \eqn{(n+1)} through
+      \code{ncol} of the \eqn{m \times m}{m-by-m} identity matrix.}
     \item{\code{qr.coef}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
@@ -176,19 +177,20 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   on the left by \eqn{P_{1}' Q}{P1' * Q} and \eqn{Q' P_{1}}{Q' * P1}
   rather than \eqn{Q} and \eqn{Q'}.
   
-  It is wrong to expect equality of values of \code{qr.Q}
-  (or \code{qr.R}, \code{qr.qy}, \code{qr.qty}) computed from
-  \dQuote{equivalent} sparse and dense factorizations (say,
-  \code{qr(x)} and \code{qr(as(x, "matrix"))} for \code{x}
-  of class \code{\linkS4class{dgCMatrix}}).  The underlying
-  factorization algorithms are quite different (notably as
-  they employ different criteria to select \eqn{P_{2}}{P2}),
-  and in general the factorization is not unique even for
-  fixed \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2}.
+  It is wrong to expect the values of \code{qr.Q} (or \code{qr.R},
+  \code{qr.qy}, \code{qr.qty}) computed from \dQuote{equivalent}
+  sparse and dense factorizations
+  (say, \code{qr(x)} and \code{qr(as(x, "matrix"))} for \code{x}
+  of class \code{\linkS4class{dgCMatrix}}) to compare equal.
+  The underlying factorization algorithms are quite different,
+  notably as they employ different pivoting strategies,
+  and in general the factorization is not unique even for fixed
+  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2}.
   
-  On the other hand, the values of \code{qr.coef}, \code{qr.fitted}
-  (with \code{k = ncol(qr@R)}), and \code{qr.resid} are well-defined,
-  so the sparse and dense computations should agree.
+  On the other hand, the values of \code{qr.X}, \code{qr.coef},
+  \code{qr.fitted}, and \code{qr.resid} are well-defined, and
+  in those cases the sparse and dense computations \emph{should}
+  compare equal (within some tolerance).
 }
 \seealso{
   Class \code{\linkS4class{dgCMatrix}}.
