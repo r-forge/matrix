@@ -1723,6 +1723,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		B = cs_spfree(B);					\
 		ERROR_SOLVE_OOM(sparseLU, dgCMatrix);			\
 	    }								\
+	    X->p[0] = 0;						\
 	    for (j = 0, k = 0; j < n; ++j) {				\
 		top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _LO_); \
 		if (m - top > INT_MAX - X->p[j]) {			\
