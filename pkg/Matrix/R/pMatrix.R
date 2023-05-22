@@ -6,7 +6,7 @@
 ## MJ: could export without dot
 .changeMargin <- function(x) {
     x@margin <- if(x@margin == 1L) 2L else 1L
-    x@perm <- invPerm(x@perm)
+    x@perm <- invertPerm(x@perm)
     x
 }
 
@@ -89,10 +89,10 @@ setMethod(.op, signature(x = "pMatrix", y = "pMatrix"),
               r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
                   if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invPerm(x@perm)]
+                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
                   else {
                       r@margin <- 2L
-                      (if(x@margin == 1L) invPerm(x@perm) else x@perm)[y@perm]
+                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
                   }
               r
           })
@@ -104,10 +104,10 @@ setMethod(.op, signature(x = "pMatrix", y = "indMatrix"),
               r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
                   if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invPerm(x@perm)]
+                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
                   else {
                       r@margin <- 2L
-                      (if(x@margin == 1L) invPerm(x@perm) else x@perm)[y@perm]
+                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
                   }
               r
           })
@@ -119,10 +119,10 @@ setMethod(.op, signature(x = "indMatrix", y = "pMatrix"),
               r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
                   if(x@margin == 1L)
-                      (if(y@margin == 1L) y@perm else invPerm(y@perm))[x@perm]
+                      (if(y@margin == 1L) y@perm else invertPerm(y@perm))[x@perm]
                   else {
                       r@margin <- 2L
-                      x@perm[if(y@margin == 1L) invPerm(x@perm) else y@perm]
+                      x@perm[if(y@margin == 1L) invertPerm(x@perm) else y@perm]
                   }
               r
           })
@@ -132,7 +132,7 @@ rm(.op)
 setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
 	  function(x, y) {
               mmultDim(x@Dim, dim(y), type = 1L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- .m2ge(y[perm, , drop = FALSE], "d")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
@@ -141,7 +141,7 @@ setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
 setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
 	  function(x, y) {
               mmultDim(dim(x), y@Dim, type = 1L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- .m2ge(x[, perm, drop = FALSE], "d")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
@@ -150,7 +150,7 @@ setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
 setMethod("%*%", signature(x = "pMatrix", y = "Matrix"),
 	  function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- as(y[perm, , drop = FALSE], "dMatrix")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
@@ -159,7 +159,7 @@ setMethod("%*%", signature(x = "pMatrix", y = "Matrix"),
 setMethod("%*%", signature(x = "Matrix", y = "pMatrix"),
 	  function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- as(x[, perm, drop = FALSE], "dMatrix")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
@@ -168,7 +168,7 @@ setMethod("%*%", signature(x = "Matrix", y = "pMatrix"),
 setMethod("%&%", signature(x = "pMatrix", y = "matrix"),
 	  function(x, y) {
               mmultDim(x@Dim, dim(y), type = 1L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- .m2ge(y[perm, , drop = FALSE], "n")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
@@ -177,7 +177,7 @@ setMethod("%&%", signature(x = "pMatrix", y = "matrix"),
 setMethod("%&%", signature(x = "matrix", y = "pMatrix"),
 	  function(x, y) {
               mmultDim(dim(x), y@Dim, type = 1L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- .m2ge(x[, perm, drop = FALSE], "n")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
@@ -186,7 +186,7 @@ setMethod("%&%", signature(x = "matrix", y = "pMatrix"),
 setMethod("%&%", signature(x = "pMatrix", y = "Matrix"),
 	  function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- as(y[perm, , drop = FALSE], "nMatrix")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
@@ -195,7 +195,7 @@ setMethod("%&%", signature(x = "pMatrix", y = "Matrix"),
 setMethod("%&%", signature(x = "Matrix", y = "pMatrix"),
 	  function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- as(x[, perm, drop = FALSE], "nMatrix")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
@@ -213,7 +213,7 @@ setMethod("crossprod", signature(x = "pMatrix", y = "missing"),
 setMethod("crossprod", signature(x = "matrix", y = "pMatrix"),
 	  function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(dim(x), y@Dim, type = 2L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- .m2ge(t(x)[, perm, drop = FALSE],
                          if(isTRUE(boolArith)) "n" else "d")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
@@ -223,7 +223,7 @@ setMethod("crossprod", signature(x = "matrix", y = "pMatrix"),
 setMethod("crossprod", signature(x = "Matrix", y = "pMatrix"),
 	  function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 2L)
-              perm <- if(y@margin == 1L) invPerm(y@perm) else y@perm
+              perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
               r <- as(t(x)[, perm, drop = FALSE],
                       if(isTRUE(boolArith)) "nMatrix" else "dMatrix")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
@@ -242,7 +242,7 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "missing"),
 setMethod("tcrossprod", signature(x = "pMatrix", y = "matrix"),
 	  function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, dim(y), type = 3L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- .m2ge(t(y)[perm, , drop = FALSE],
                          if(isTRUE(boolArith)) "n" else "d")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
@@ -252,7 +252,7 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "matrix"),
 setMethod("tcrossprod", signature(x = "pMatrix", y = "Matrix"),
 	  function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 3L)
-              perm <- if(x@margin == 1L) x@perm else invPerm(x@perm)
+              perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
               r <- as(t(y)[perm, , drop = FALSE],
                       if(isTRUE(boolArith)) "nMatrix" else "dMatrix")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)

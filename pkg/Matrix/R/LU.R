@@ -203,12 +203,12 @@ setMethod("expand2", signature(x = "sparseLU"),
                          Dim = d,
                          Dimnames = c(dn[1L], list(NULL)),
                          margin = 1L,
-                         perm = invPerm(p1, zero.p = TRUE, zero.res = FALSE))
+                         perm = invertPerm(p1, 0L, 1L))
               P2. <- new("pMatrix",
                          Dim = d,
                          Dimnames = c(list(NULL), dn[2L]),
                          margin = 2L,
-                         perm = if(length(p2)) invPerm(p2, zero.p = TRUE, zero.res = FALSE) else seq_len(d[1L]))
+                         perm = if(length(p2)) invertPerm(p2, 0L, 1L) else seq_len(d[1L]))
               L <- x@L
               U <- x@U
               if(L@diag == "N")

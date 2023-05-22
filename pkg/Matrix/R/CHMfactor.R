@@ -24,7 +24,7 @@ setMethod("expand2", signature(x = "CHMfactor"),
               dn <- x@Dimnames
               perm <- x@perm
               perm <- if(length(perm))
-                          invPerm(x@perm, zero.p = TRUE, zero.res = FALSE)
+                          invertPerm(perm, 0L, 1L)
                       else seq_len(d[1L])
               P <- new("pMatrix",
                        Dim = d,
