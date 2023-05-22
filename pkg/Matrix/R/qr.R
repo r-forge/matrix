@@ -53,12 +53,12 @@ setMethod("expand2", signature(x = "sparseQR"),
                          Dim = c(m, m),
                          Dimnames = c(dn[1L], list(NULL)),
                          margin = 1L,
-                         perm = invPerm(p1, zero.p = TRUE, zero.res = FALSE))
+                         perm = invertPerm(p1, 0L, 1L))
               P2. <- new("pMatrix",
                          Dim = c(n, n),
                          Dimnames = c(list(NULL), dn[2L]),
                          margin = 2L,
-                         perm = if(length(p2)) invPerm(p2, zero.p = TRUE, zero.res = FALSE) else seq_len(n))
+                         perm = if(length(p2)) invertPerm(p2, 0L, 1L) else seq_len(n))
               if(complete)
                   list(P1. = P1., Q = Q, R = R, P2. = P2.)
               else
@@ -113,11 +113,11 @@ qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
     R <-
         if(!complete && n < m) {
             if(backPermute && p2.uns)
-                R[seq_len(n), invPerm(p2), drop = FALSE]
+                R[seq_len(n), invertPerm(p2), drop = FALSE]
             else R[seq_len(n), , drop = FALSE]
         } else {
             if(backPermute && p2.uns)
-                R[, invPerm(p2), drop = FALSE]
+                R[, invertPerm(p2), drop = FALSE]
             else R
         }
     if(m0 && .qr.rank.def.truncating && complete)
@@ -164,7 +164,7 @@ setMethod("qr.X", signature(qr = "sparseQR"),
               }
               r <- .Call(sparseQR_matmult, qr, .sparse2dense(R), 4L, NA, NULL)
               if(p2.uns) {
-                  j <- invPerm(p2, zero.p = TRUE, zero.res = FALSE)
+                  j <- invertPerm(p2, 0L, 1L)
                   if(ncol > n)
                       j <- c(j, (n + 1L):ncol)
                   r <- r[, j, drop = FALSE]

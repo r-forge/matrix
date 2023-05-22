@@ -560,7 +560,7 @@ setMethod("solve", signature(a = "pMatrix", b = "numLike"),
 	  function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
-              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
+              perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
               r <- new("dgeMatrix")
               r@Dim <- c(m, 1L)
               r@Dimnames <- c(a@Dimnames[2L], list(NULL))
@@ -573,7 +573,7 @@ setMethod("solve", signature(a = "pMatrix", b = "matrix"),
               d <- dim(b)
               .solve.checkDim2(a@Dim[1L], d[1L])
               dn <- dimnames(b)
-              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
+              perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
               r <- new("dgeMatrix")
               r@Dim <- d
               r@Dimnames <- c(a@Dimnames[2L],
@@ -585,7 +585,7 @@ setMethod("solve", signature(a = "pMatrix", b = "matrix"),
 setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 	  function(a, b, ...) {
               .solve.checkDim2(a@Dim[1L], b@Dim[1L])
-              perm <- if(a@margin == 1L) invPerm(a@perm) else a@perm
+              perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
               r <- b[perm, , drop = FALSE]
               r@Dimnames <- c(a@Dimnames[2L], b@Dimnames[2L])
               r
