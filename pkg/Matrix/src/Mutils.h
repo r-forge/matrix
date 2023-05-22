@@ -35,10 +35,14 @@ void set_factor(SEXP obj, const char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
-int isPerm(int *p, int n, int off);
-int signPerm(int *p, int n, int off);
-void invPerm(int *src, int *dest, int n, int soff, int doff);
-    
+int isPerm(const int *p, int n, int off);
+int signPerm(const int *p, int n, int off);
+void invertPerm(const int *p, int *ip, int n, int off, int ioff);
+
+SEXP R_isPerm(SEXP p, SEXP off);
+SEXP R_signPerm(SEXP p, SEXP off);
+SEXP R_invertPerm(SEXP p, SEXP off, SEXP ioff);
+
 char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);
 size_t kind2size(char kind);

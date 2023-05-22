@@ -430,6 +430,7 @@ setMethod("all.equal", c(target = "Matrix", current = "ANY"),
 	  all.equal_Mat)
 setMethod("all.equal", c(target = "ANY", current = "Matrix"),
 	  all.equal_Mat)
+rm(all.equal_Mat)
 ## -> ./sparseMatrix.R, ./sparseVector.R  have specific methods
 
 
@@ -727,6 +728,8 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ldenseMatrix", j = "missing",
 				value = "replValue"), .repl.i.lDMat)
 setReplaceMethod("[", signature(x = "Matrix", i = "ndenseMatrix", j = "missing",
 				value = "replValue"), .repl.i.lDMat)
+rm(.repl.i.lDMat)
+
 .repl.i.lSMat <- function (x, i, j, ..., value)
 {
     ## nA <- nargs()
@@ -739,6 +742,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "lsparseMatrix", j = "missing"
 				value = "replValue"), .repl.i.lSMat)
 setReplaceMethod("[", signature(x = "Matrix", i = "nsparseMatrix", j = "missing",
 				value = "replValue"), .repl.i.lSMat)
+rm(.repl.i.lSMat)
 
 ## (ANY,ANY,ANY) is used when no `real method' is implemented :
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",

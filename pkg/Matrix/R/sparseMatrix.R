@@ -245,7 +245,11 @@ setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
 } ## DEPRECATED IN 1.5-0; see ./zzz.R
 
 rm(..sparse2unpacked, ..sparse2packed,
-   ..sparse2dge, ..sparse2lge, ..sparse2nge, ..sparse2g)
+   ..sparse2dge, ..sparse2lge, ..sparse2nge, ..sparse2g,
+   ..tT2gC, ..sT2gC,
+   ..tC2gT, ..sC2gT,
+   ..gT2tC, ..gT2sC,
+   ..gC2tT, ..gC2sT)
 
 
 ## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1331,7 +1335,7 @@ for (.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
     setMethod("isSymmetric", signature(object = .cl), .sparse.is.sy.dz)
 
 rm(.cl, .sparse.subclasses, .sparse.is.sy.dz,
-   list = c(grep("^[.]sparse[.](band|tri[ul]|t|fS[21]|symmpart)$",
-                 ls(), value = TRUE),
-            grep("^[.][CRT][.](is[.](di|tr|sy)|skewpart)$",
-                 ls(), value = TRUE)))
+   list = c(grep("^[.]sparse[.](band|tri[ul]|t|fS[21]|symmpart|skewpart)$",
+                 ls(all.names = TRUE), value = TRUE),
+            grep("^[.][CRT][.]is[.](di|tr|sy)$",
+                 ls(all.names = TRUE), value = TRUE)))

@@ -175,6 +175,9 @@ SEXP CHMfactor_update(SEXP object, SEXP parent, SEXP mult)
     return res;
 }
 
+/* MJ: unused */
+#if 0
+
 // update its argument *in place*  <==> "destructive" <==> use with much caution!
 SEXP destructive_CHM_update(SEXP object, SEXP parent, SEXP mult)
 {
@@ -186,6 +189,8 @@ SEXP destructive_CHM_update(SEXP object, SEXP parent, SEXP mult)
     return R_NilValue;
 
 }
+
+#endif /* MJ */
 
 SEXP CHMfactor_ldetL2up(SEXP x, SEXP parent, SEXP mult)
 {

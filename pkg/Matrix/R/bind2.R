@@ -245,7 +245,7 @@ for(cls in names(getClassDef("diagonalMatrix")@subclasses)) {
  setMethod("rbind2", signature(x = "atomicVector", y = cls),
 	   function(x, y, ...) rbind2(matrix(x, ncol = ncol(y)), y))
 }
-
+rm(cls)
 
 ## originally from ./dsparseMatrix.R : --------------------------------
 

@@ -33,7 +33,15 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_update, 3),
     CALLDEF(CHMfactor_updown,3),
     
-    CALLDEF(destructive_CHM_update, 3),
+    CALLDEF(CHM_set_common_env, 1),
+    CALLDEF(get_SuiteSparse_version, 0),
+    
+    CALLDEF(m_encodeInd,  4),
+    CALLDEF(m_encodeInd2, 5),
+    
+    CALLDEF(Matrix_rle_i, 2),
+    CALLDEF(Matrix_rle_d, 2),
+
     CALLDEF(Csparse_Csparse_prod, 3),
     CALLDEF(Csparse_Csparse_crossprod, 4),
     CALLDEF(Csparse_MatrixMarket, 2),    
@@ -101,10 +109,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_matrix_mm, 4),
     CALLDEF(dtrMatrix_chol2inv, 1),
     CALLDEF(dtrMatrix_addDiag, 2),
-    
-    CALLDEF(lapack_qr, 2),
-    CALLDEF(lsq_dense_Chol, 2),
-    CALLDEF(lsq_dense_QR, 2),
     
     CALLDEF(Matrix_validate, 1),
     CALLDEF(MatrixFactorization_validate, 1),
@@ -175,7 +179,12 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_index_triangle, 4),
     CALLDEF(R_index_diagonal, 3),
     CALLDEF(R_nnz, 3),
-
+    CALLDEF(R_isPerm, 2),
+    CALLDEF(R_signPerm, 2),
+    CALLDEF(R_invertPerm, 3),
+    CALLDEF(R_set_factor, 4),
+    CALLDEF(R_empty_factors, 2),
+    
     CALLDEF(R_subscript_1ary, 2),
     CALLDEF(R_subscript_1ary_mat, 2),
     CALLDEF(R_subscript_2ary, 3),
@@ -288,20 +297,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtCMatrix_solve, 3),
 
     CALLDEF(sparseQR_matmult, 5),
-    
-    CALLDEF(CHM_set_common_env, 1),
 
-    CALLDEF(inv_permutation, 3),
-    CALLDEF(m_encodeInd,  4),
-    CALLDEF(m_encodeInd2, 5),
-
-    CALLDEF(Matrix_rle_i, 2),
-    CALLDEF(Matrix_rle_d, 2),
-
-    CALLDEF(R_set_factor, 4),
-    CALLDEF(R_empty_factors, 2),
-
-    CALLDEF(get_SuiteSparse_version, 0),
     {NULL, NULL, 0}
 };
 

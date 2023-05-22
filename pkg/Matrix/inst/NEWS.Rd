@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-05-21 r3956)}{
+\section{Changes in version 1.5-5 (2023-05-21 r3957)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -187,7 +187,8 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item The length of the \pkg{Matrix} namespace has been reduced
+      by ~15\%.  More than 100 unused symbols have been removed.
     }
   }
 }

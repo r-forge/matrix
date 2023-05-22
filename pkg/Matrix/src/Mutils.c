@@ -452,7 +452,7 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 
 /* For permutations ================================================= */
 
-int isPerm(int *p, int n, int off)
+int isPerm(const int *p, int n, int off)
 {
     if (n <= 0)
 	return 1;
@@ -471,7 +471,7 @@ int isPerm(int *p, int n, int off)
     return 1;
 }
 
-int signPerm(int *p, int n, int off)
+int signPerm(const int *p, int n, int off)
 {
     if (!isPerm(p, n, off))
 	error(_("attempt to get sign of non-permutation"));
@@ -496,14 +496,66 @@ int signPerm(int *p, int n, int off)
     return sign;
 }
 
-void invPerm(int *src, int *dest, int n, int soff, int doff)
+void invertPerm(const int *p, int *ip, int n, int off, int ioff)
 {
-    if (!isPerm(src, n, soff))
+    if (!isPerm(p, n, off))
 	error(_("attempt to invert non-permutation"));
-    int i;
-    for (i = 0; i < n; ++i)
-	dest[src[i] - soff] = i + doff;
+    int j;
+    for (j = 0; j < n; ++j)
+	ip[p[j] - off] = j + ioff;
     return;
+}
+
+SEXP R_isPerm(SEXP p, SEXP off)
+{
+    if (TYPEOF(p) != INTSXP)
+	error(_("'p' must be a vector of type \"integer\""));
+    if (TYPEOF(off) != INTSXP)
+	error(_("'off' must be a vector of type \"integer\""));
+    if (XLENGTH(off) != 1)
+	error(_("'off' must have length 1"));
+    if (INTEGER(off)[0] == NA_INTEGER)
+	error(_("'off' cannot be NA"));
+    R_xlen_t n = XLENGTH(p);
+    if (n > INT_MAX)
+	return ScalarLogical(0);
+    return ScalarLogical(isPerm(INTEGER(p), (int) n, INTEGER(off)[0]));
+}
+
+SEXP R_signPerm(SEXP p, SEXP off)
+{
+    if (TYPEOF(p) != INTSXP)
+	error(_("'p' must be a vector of type \"integer\""));
+    if (TYPEOF(off) != INTSXP)
+	error(_("'off' must be a vector of type \"integer\""));
+    if (XLENGTH(off) != 1)
+	error(_("'off' must have length 1"));
+    if (INTEGER(off)[0] == NA_INTEGER)
+	error(_("'off' cannot be NA"));
+    R_xlen_t n = XLENGTH(p);
+    if (n > INT_MAX)
+	error(_("attempt to get sign of non-permutation"));
+    return ScalarInteger(signPerm(INTEGER(p), (int) n, INTEGER(off)[0]));
+}
+
+SEXP R_invertPerm(SEXP p, SEXP off, SEXP ioff)
+{
+    if (TYPEOF(p) != INTSXP)
+	error(_("'p' must be a vector of type \"integer\""));
+    if (TYPEOF(off) != INTSXP || TYPEOF(ioff) != INTSXP)
+	error(_("'off' and 'ioff' must be a vectors of type \"integer\""));
+    if (XLENGTH(off) != 1 || XLENGTH(ioff) != 1)
+	error(_("'off' and 'ioff' must have length 1"));
+    if (INTEGER(off)[0] == NA_INTEGER || INTEGER(ioff)[0] == NA_INTEGER)
+	error(_("'off' and 'ioff' cannot be NA"));
+    R_xlen_t n = XLENGTH(p);
+    if (n > INT_MAX)
+	error(_("attempt to invert non-permutation"));
+    SEXP ip = PROTECT(allocVector(INTSXP, n));
+    invertPerm(INTEGER(p), INTEGER(ip), (int) n,
+	       INTEGER(off)[0], INTEGER(ioff)[0]);
+    UNPROTECT(1);
+    return ip;
 }
 
 

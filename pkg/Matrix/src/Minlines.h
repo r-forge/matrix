@@ -49,6 +49,9 @@ int* expand_cmprPt(int ncol, const int mp[], int mj[])
     return mj;
 }
 
+/* MJ: no longer needed ... prefer R_invPerm() in ./Mutils.c */
+#if 0
+
 /** Inverse Permutation
  * C version of   .inv.perm.R <- function(p) { p[p] <- seq_along(p) ; p }
  */
@@ -69,6 +72,8 @@ SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
     UNPROTECT(np);
     return val;
 }
+
+#endif /* MJ */
 
 static R_INLINE
 int strmatch(const char *x, const char **valid)

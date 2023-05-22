@@ -2057,6 +2057,9 @@ SEXP checkGivens(SEXP X, SEXP jmin, SEXP rank)
     return ans;
 }
 
+/* MJ: unused */
+#if 0
+
 SEXP lsq_dense_Chol(SEXP X, SEXP y)
 {
     SEXP ans;
@@ -2218,6 +2221,8 @@ SEXP lapack_qr(SEXP Xin, SEXP tl)
     UNPROTECT(2);
     return ans;
 }
+
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer R_dense_as_sparse() above */
 #if 0

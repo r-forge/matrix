@@ -103,6 +103,8 @@ sparseDefault <- function(x) prod(dim(x)) > 2 * sum(isN0(as(x, "matrix")))
 sparseDefault <- function(x) length(x) > 2 * nnzero(x, na.counted = TRUE)
 }
 
+## MJ: no longer used
+if(FALSE) {
 ##' return 'x' unless it is NULL where you'd use 'orElse'
 `%||%` <- function(x, orElse) if(!is.null(x)) x else orElse
 
@@ -110,7 +112,6 @@ sparseDefault <- function(x) length(x) > 2 * nnzero(x, na.counted = TRUE)
 `%nin%` <- function (x, table) is.na(match(x, table))
 
 nonTRUEoption <- function(ch) is.null(v <- getOption(ch)) || !isTRUE(v)
-
 
 ##' @title Check identical(i, 0:n) {or identical(i, 1:n) when Ostart is false}
 ##' @param i an integer vector, to be compared with 0:n or 1:n
@@ -124,12 +125,13 @@ isSeq <- function(i, n, Ostart = TRUE) {
     identical(i, if(Ostart) 0L:n else seq_len(n))
 }
 
-
 .bail.out.1 <- function(fun, cl) {
     stop(gettextf(
      'not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.',
 		  fun, cl[1L]), call. = FALSE, domain=NA)
 }
+} ## MJ
+
 .bail.out.2 <- function(fun, cl1, cl2) {
     stop(gettextf(
      'not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
@@ -232,7 +234,7 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
 attrSlotNames <- function(m, factors = TRUE) {
     ## slotnames of Matrix objects which are *not* directly content related
     sn <- slotNames(m)
-    sn[sn %nin% c("x","i","j","p", if(!factors) "factors")]
+    sn[is.na(match(sn, c("x","i","j","p", if(!factors) "factors")))]
 }
 
 ##' @param m
@@ -260,12 +262,18 @@ attr.all_Mat <- function(target, current,
     else c(if(!isTRUE(msg)) msg, if(!r.ok) r)
 }
 
+## MJ: unused
+if(FALSE) {
 identicalSlots <- function(x, y, slots, ...) {
     for (name in slots)
         if (!identical(slot(x, name), slot(y, name), ...))
             return(FALSE)
     TRUE
 }
+} ## MJ
+
+## MJ: replaced below
+if(FALSE) {
 
 invPerm.R <- function(p) { p[p] <- seq_along(p) ; p }
 ## how much faster would this be in C? -- less than a factor of two?
@@ -303,12 +311,26 @@ signPerm <- function(p)
     1L - (sum(clen %% 2 == 0) %% 2L)*2L
 }
 
-checkDim <- function(da, db) {
-    if(any(da != db))
+} else {
+
+isPerm <- function(p, off = 1L)
+    .Call(R_isPerm, as.integer(p), as.integer(off))
+signPerm <- function(p, off = 1L)
+    .Call(R_signPerm, as.integer(p), as.integer(off))
+invertPerm <- function(p, off = 1L, ioff = 1L)
+    .Call(R_invertPerm, as.integer(p), as.integer(off), as.integer(ioff))
+
+invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)
+    invertPerm(p, if(zero.p) 0L else 1L, if(zero.res) 0L else 1L)
+
+} ## MJ
+
+checkDim <- function(d.a, d.b) {
+    if(any(d.a != d.b))
 	stop(gettextf("non-conformable matrix dimensions in %s",
 		      deparse(sys.call(sys.parent()))),
 	     call. = FALSE, domain = NA)
-    da
+    d.a
 }
 
 mmultDim <- function(d.a, d.b, type = 1L) {
@@ -337,7 +359,6 @@ mmultDimnames <- function(dn.a, dn.b, type = 1L) {
 
 ## Still used in many places (for now):
 dimCheck <- function(a, b) checkDim(dim(a), dim(b))
-mmultCheck <- function(a, b, kind = 1L) mmultDim(dim(a), dim(b), type = kind)
 
 ##' Constructs "sensical" dimnames for something like  a + b ;
 ##' assume dimCheck() has happened before
@@ -386,7 +407,7 @@ dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
 
 ##' valid Matrix-class @Dimnames slot {assuming only NULL needs to be transformed}
 .M.DN <- function(x)
-    dimnames(x) %||% list(NULL, NULL)
+    if(is.null(dn <- dimnames(x))) list(NULL, NULL) else dn
 
 ## NB: Now exported and documented in ../man/is.null.DN.Rd:
 is.null.DN <- function(dn) {
@@ -1018,6 +1039,8 @@ non0ind <- function(x, cld = getClassDef(class(x)),
     } else ij
 }
 
+## MJ: unused
+if(FALSE) {
 if(FALSE) { ## -- now have  .Call(m_encodeInd, ...) etc :
 
 ## nr= nrow: since  i in {0,1,.., nrow-1}  these are 1L "decimal" encodings:
@@ -1055,6 +1078,9 @@ encodeInd <- function(ij, dim, orig1=FALSE, checkBnds=TRUE)
 encodeInd2 <- function(i, j, dim, orig1=TRUE, checkBnds=TRUE)
     .Call(m_encodeInd2, i,j, dim, orig1, checkBnds)
 
+}
+} ## MJ
+
 ##' Decode "encoded" (i,j) indices back to  cbind(i,j)
 ##' This is the inverse of encodeInd(.)
 ##'
@@ -1076,6 +1102,8 @@ complementInd <- function(ij, dim, orig1=FALSE, checkBnds=FALSE) {
     seq_len(n)[-(1L + .Call(m_encodeInd, ij, dim, orig1, checkBnds))]
 }
 
+## MJ: unused
+if(FALSE) {
 unionInd <- function(ij1, ij2)
     unique(rbind(ij1, ij2))
 
@@ -1086,6 +1114,7 @@ intersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
 			.Call(m_encodeInd, ij2, di, orig1, checkBnds)),
               nr = di[1L])
 }
+} ## MJ
 
 WhichintersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
     ## from 2-column (i,j) matrices where i \in {0,.., nrow-1},
@@ -1132,6 +1161,8 @@ drop0 <- function(x, tol = 0, is.Csparse = NA) {
     .Call(Csparse_drop, if(is.Csparse) x else as(x, "CsparseMatrix"), tol)
 }
 
+## MJ: unused
+if(FALSE) {
 uniq <- function(x) {
     cld <- getClassDef(class(x))
     if(extends(cld, "TsparseMatrix"))
@@ -1140,6 +1171,7 @@ uniq <- function(x) {
         drop0(x)
     else x
 }
+} ## MJ
 
 asTuniq <- function(x) {
     if(is(x, "TsparseMatrix"))
@@ -1154,8 +1186,6 @@ is_not_uniqT <- function(x, di = dim(x))
 ## is 'x' a TsparseMatrix with duplicated entries (to be *added* for uniq):
 anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
-
-}
 
 ## MJ: no longer needed ... replacement in ./unpackedMatrix.R
 if(FALSE) {
@@ -1469,6 +1499,8 @@ geClass <- function(x) {
 ## the reverse, a "version of" .M.kind(.):
 .kind.type <- setNames(names(.type.kind), as.vector(.type.kind))
 
+## MJ: no longer needed
+if(FALSE) {
 .dense.prefixes <- c("d" = "tr", ## map diagonal to triangular
                      "t" = "tr",
                      "s" = "sy",
@@ -1479,8 +1511,6 @@ geClass <- function(x) {
                       "s" = "s",
                       "g" = "g")
 
-## MJ: no longer needed
-if(FALSE) {
 as_M.kind <- function(x, clx) {
     if(is.character(clx)) # < speedup: get it once
 	clx <- getClassDef(clx)
