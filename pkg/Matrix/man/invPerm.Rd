@@ -27,7 +27,7 @@ invertPerm(p, off = 1L, ioff = 1L)
     contain values \code{ioff+0:(n-1)}, where \code{n=length(p)}.}
   \item{zero.p}{a logical.  Equivalent to \code{off=0} if \code{TRUE}
     and \code{off=1} if \code{FALSE}.}
-  \item{zero.p}{a logical.  Equivalent to \code{ioff=0} if \code{TRUE}
+  \item{zero.res}{a logical.  Equivalent to \code{ioff=0} if \code{TRUE}
     and \code{ioff=1} if \code{FALSE}.}
 }
 \details{
