@@ -55,16 +55,6 @@ setAs("sparseVector", "zsparseVector",
           new("zsparseVector", length = from@length, i = from@i,
               x = as.complex(from@x)))
 
-##' Uniquify sparceVectors, i.e., bring them in "regularized" from,
-##' --- similar in spirit (and action!) as  uniqTsparse(.) for "TsparseMatrix"
-##' __FIXME__ better name ??  , then export and document!  __TODO__
-uniqSpVec <- function(x) {
-    ii <- sort.list(x@i, method = "radix")
-    x@i <- x@i[ii]
-    x@x <- x@x[ii]
-    x
-}
-
 sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
     ## sparseVector  ->  vector
     has.x <- .hasSlot(x, "x")## has "x" slot
@@ -624,6 +614,7 @@ setReplaceMethod("[", signature(x = "sparseVector",
 				value = "replValueSp"),
                  ## BTW, the important case: 'i' a *logical* sparseVector
 		 replSPvec)
+rm(replSPvec)
 
 ## Something else:  Also allow	  x[ <sparseVector> ] <- v  e.g. for atomic x :
 
@@ -636,6 +627,8 @@ setReplaceMethod("[", signature(x = "atomicVector",
 		 callGeneric(x, i = intIv(i, x@length), value=value))
 }
 
+## MJ: unused
+if(FALSE) {
 ## a "method" for c(<(sparse)Vector>, <(sparse)Vector>):
 ## FIXME: This is not exported, nor used (nor documented)
 c2v <- function(x, y) {
@@ -681,6 +674,17 @@ sortSparseV <- function(x, decreasing = FALSE, na.last = NA) {
     ## TODO
     .NotYetImplemented()
 }
+
+##' Uniquify sparceVectors, i.e., bring them in "regularized" from,
+##' --- similar in spirit (and action!) as  uniqTsparse(.) for "TsparseMatrix"
+##' __FIXME__ better name ??  , then export and document!  __TODO__
+uniqSpVec <- function(x) {
+    ii <- sort.list(x@i, method = "radix")
+    x@i <- x@i[ii]
+    x@x <- x@x[ii]
+    x
+}
+} ## MJ
 
 all.equal.sparseV <- function(target, current, ...)
 {
@@ -867,3 +871,4 @@ ind4toeplitz <- function(n) {
     switch(match.arg(repr), "C" = .T2C(r), "T" = r, "R" = .T2R(r))
 }
 setMethod("toeplitz", "sparseVector", .toeplitz.spV)
+rm(.toeplitz.spV)

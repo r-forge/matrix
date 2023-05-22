@@ -1597,7 +1597,9 @@ setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
     for(c1 in diCls)
 	for(c2 in diCls)
 	    setMethod("Ops", signature(e1 = c1, e2 = c2), diagOdiag)
+    rm(c1, c2)
 }
+rm(diagOdiag)
 
 ## diagonal  o  triangular  |-->  triangular
 ## diagonal  o  symmetric   |-->  symmetric
@@ -1630,6 +1632,8 @@ diagOtri <- function(e1,e2) {
 
 setMethod("Ops", signature(e1 = "diagonalMatrix", e2 = "triangularMatrix"),
           diagOtri)
+rm(diagOtri)
+
 ## For the reverse,  Ops == "Arith" | "Compare" | "Logic"
 ##   'Arith'  :=  '"+"', '"-"', '"*"', '"^"', '"%%"', '"%/%"', '"/"'
 setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
@@ -1712,6 +1716,7 @@ setMethod("Arith", signature(e1 = "ddiMatrix", e2 = arg2),
 	      } else
 		  callGeneric(.diag2tT.smart(e1, e2, kind = "d"), e2)
 	  })
+rm(arg2)
 
 for(arg1 in c("numeric","logical"))
 setMethod("Arith", signature(e1 = arg1, e2 = "ddiMatrix"),
@@ -1736,6 +1741,7 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ddiMatrix"),
 	      } else
 		  callGeneric(e1, .diag2tT.smart(e2, e1, kind = "d"))
 	  })
+rm(arg1)
 
 ## ldi* Arith --> result numeric, potentially ddiMatrix
 for(arg2 in c("numeric","logical"))
@@ -1764,6 +1770,7 @@ setMethod("Arith", signature(e1 = "ldiMatrix", e2 = arg2),
 	      } else
 		  callGeneric(.diag2tT.smart(e1, e2, kind = "l"), e2)
 	  })
+rm(arg2)
 
 for(arg1 in c("numeric","logical"))
 setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
@@ -1791,6 +1798,7 @@ setMethod("Arith", signature(e1 = arg1, e2 = "ldiMatrix"),
 	      } else
 		  callGeneric(e1, .diag2tT.smart(e2, e1, kind = "l"))
 	  })
+rm(arg1)
 
 ## ddi*: for "Ops" without "Arith": <Compare> or <Logic> --> result logical, potentially ldi
 ##
@@ -1826,6 +1834,7 @@ setMethod("Ops", signature(e1 = "ddiMatrix", e2 = arg2),
 	      } else
 		  callGeneric(.diag2tT.smart(e1, e2, kind = "d"), e2)
 	  })
+rm(arg2)
 
 ## ldi*: for "Ops" without "Arith": <Compare> or <Logic> --> result logical, potentially ldi
 for(arg2 in c("numeric","logical"))
@@ -1851,7 +1860,7 @@ setMethod("Ops", signature(e1 = "ldiMatrix", e2 = arg2),
 	      } else
 		  callGeneric(.diag2tT.smart(e1, e2, kind = "l"), e2)
 	  })
-
+rm(arg2)
 
 ## Not {"sparseMatrix", "numeric} :  {"denseMatrix", "matrix", ... }
 for(other in c("ANY", "Matrix", "dMatrix")) {
@@ -1866,6 +1875,7 @@ for(other in c("ANY", "Matrix", "dMatrix")) {
     setMethod("Ops", signature(e1 = other, e2 = "ldiMatrix"),
 	      function(e1,e2) callGeneric(e1, .diag2T.smart(e2, e1, kind="l")))
 }
+rm(other)
 
 ## Direct subclasses of "denseMatrix": currently ddenseMatrix, ldense... :
 if(FALSE) # now also contains "geMatrix"
@@ -1890,6 +1900,7 @@ for(DI in diCls) {
 	    setMethod(Fun, signature(e1 = DI, e2 = c2), dMeth)
     }
 }
+rm(dense.subCl, DI, dMeth, c2, Fun)
 
 ## Group methods "Math", "Math2" in			--> ./Math.R
 
@@ -1914,13 +1925,13 @@ setMethod("prod", cl, function (x, ..., na.rm) {
     else ## n == 1, diag = "N" :
 	prod(x@x, ..., na.rm = na.rm)
 })
-
 setMethod("sum", cl,
 	  function(x, ..., na.rm) {
 	      r <- sum(x@x, ..., na.rm = na.rm)# double or integer, correctly
 	      if(x@diag == "U" && !is.na(r)) r + x@Dim[1L] else r
 	  })
 }
+rm(cl, diCls)
 
 ## The remaining ones are  max, min, range :
 
@@ -1970,9 +1981,6 @@ setMethod("show", signature(object = "diagonalMatrix"),
 		  invisible(object)
 	      }
 	  })
-
-rm(arg1, arg2, other, DI, Fun, cl, c1, c2,
-   dense.subCl, diCls)# not used elsewhere
 
 setMethod("summary", signature(object = "diagonalMatrix"),
 	  function(object, ...) {

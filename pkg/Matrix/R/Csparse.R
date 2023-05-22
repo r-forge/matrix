@@ -447,6 +447,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "missing",
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 replCmat)
+rm(replCmat)
 
 ## A[ ij ] <- value,  where ij is (i,j) 2-column matrix
 setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing",

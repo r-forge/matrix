@@ -1239,9 +1239,7 @@ sv2 <- as(sv, "isparseVector")
 stopifnot(validObject(sv), validObject(sv2), identical(sv., sv2),
           sv == sv.)
 n0 <- sv. != 0 # -> is "lsparseV.."
-if(FALSE)
-    debug(Matrix:::replSPvec) ## --> ../R/sparseVector.R : replSPvec()
-##
+
 sv [n0] <- sv [n0]
 sv.[n0] <- sv.[n0] # gave error
 stopifnot(identical(sv , sv0),

@@ -68,7 +68,7 @@ stopifnot(!isTRUE(all.equal.default(m1, m2)),
           identical(mc, as(m2, "CsparseMatrix")))
 
 ### -> uniq* functions now in ../R/Auxiliaries.R
-(t2 <- system.time(um2 <- Matrix:::uniq(m1)))
+(t2 <- system.time(um2 <- uniqTsparse(m1)))
 stopifnot(identical(m2,um2))
 
 ### -> error/warning condition for solve() of a singular matrix (Barry Rowlingson)

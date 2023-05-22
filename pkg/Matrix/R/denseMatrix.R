@@ -441,7 +441,10 @@ rm(..dense2dsparse, ..dense2lsparse, ..dense2nsparse,
    ..m2dge, ..m2lge, ..m2nge, ..m2ge,
    ..m2dgC, ..m2lgC, ..m2ngC, ..m2gC, ..m2gR, ..m2gT,
    ..pack, ..packT, ..packS, ..unpack,
-   ..pack3, ..unpack3)
+   ..pack3, ..unpack3,
+   ..ge2m, ..nge2m,
+   ..ge2v, ..nge2v)
+
 
 ## MJ: no longer ... replacement above
 if(FALSE) {
