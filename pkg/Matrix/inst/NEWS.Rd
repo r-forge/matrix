@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-05-21 r3958)}{
+\section{Changes in version 1.5-5 (2023-05-22 r3959)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -118,6 +118,14 @@
       of those factorizations, notably as classes \code{BunchKaufman}
       and \code{pBunchKaufman} no longer extend \code{Matrix};
       see Bug Fixes.
+
+      New utilities \code{invertPerm}, \code{signPerm}, and
+      \code{isPerm} for computing the inverse and sign of
+      permutation vectors and testing whether an integer
+      vector is a permutation.  \code{invertPerm} is a more
+      general version of the already exported \code{invPerm},
+      which is retained as a wrapper around \code{invertPerm}
+      for backwards compatibility.
     }
   }
   \subsection{Bug Fixes}{
@@ -183,6 +191,10 @@
       \item \code{dimnames(x) <- value} now validates \code{x@Dim}
       before \code{value} to avoid undefined behaviour in C-level
       check.
+
+      \item \code{invPerm(p)} no longer segfaults for \code{p}
+      that are not valid permutation vectors.  (\code{invPerm(NA)}
+      was enough to trigger a segfault.)
     }
   }
   \subsection{Misc}{
