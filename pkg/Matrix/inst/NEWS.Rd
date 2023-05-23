@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-05-22 r3960)}{
+\section{Changes in version 1.5-5 (2023-05-23 r3961)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -120,12 +120,12 @@
       see Bug Fixes.
 
       New utilities \code{invertPerm}, \code{signPerm}, and
-      \code{isPerm} for computing the inverse and sign of
-      permutation vectors and testing whether an integer
-      vector is a permutation.  \code{invertPerm} is a more
-      general version of the already exported \code{invPerm},
-      which is retained as a wrapper around \code{invertPerm}
-      for backwards compatibility.
+      \code{isPerm} for computing the inverse and sign of a
+      permutation vector and testing whether an integer vector
+      is a permutation.  \code{invertPerm} is a more general
+      version of the already exported \code{invPerm}, which
+      is retained as a wrapper around \code{invertPerm} for
+      backwards compatibility.
     }
   }
   \subsection{Bug Fixes}{
