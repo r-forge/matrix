@@ -79,7 +79,7 @@ for(.cl in c("MatrixFactorization", "triangularMatrix")) {
 
 setMethod("solve", signature(a = .cl, b = "numLike"),
           function(a, b, ...)
-              solve(a, .m2ge(b, "d"), ...))
+              drop(solve(a, .m2ge(b, "d"), ...)))
 
 setMethod("solve", signature(a = .cl, b = "matrix"),
           function(a, b, ...)
@@ -353,10 +353,8 @@ setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "numLike"),
-	  function(a, b, sparse = FALSE, ...) {
+	  function(a, b, ...) {
               trf <- lu(a, errSing = TRUE)
-              if(is.na(sparse) || sparse)
-                  b <- .m2sparse(b, "dgC")
               solve(trf, b, ...)
           })
 
@@ -393,12 +391,10 @@ setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
-	  function(a, b, sparse = FALSE, ...) {
+	  function(a, b, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
-              if(is.na(sparse) || sparse)
-                  b <- .m2sparse(b, "dgC")
               solve(trf, b, ...)
           })
 
@@ -487,15 +483,13 @@ setMethod("solve", signature(a = "ddiMatrix", b = "numLike"),
 	  function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
-              r <- new("dgeMatrix")
-              r@Dim <- c(m, 1L)
-              r@Dimnames <- c(a@Dimnames[2L], list(NULL))
-              r@x <-
-              if(a@diag == "N") {
-                  x <- a@x
-                  .solve.checkDiagonal(x)
-                  as.double(b) / x
-              } else as.double(b)
+              r <-
+                  if(a@diag == "N") {
+                      x <- a@x
+                      .solve.checkDiagonal(x)
+                      as.double(b) / x
+                  } else as.double(b)
+              names(r) <- a@Dimnames[[2L]]
               r
 	  })
 
@@ -561,10 +555,8 @@ setMethod("solve", signature(a = "pMatrix", b = "numLike"),
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
               perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
-              r <- new("dgeMatrix")
-              r@Dim <- c(m, 1L)
-              r@Dimnames <- c(a@Dimnames[2L], list(NULL))
-              r@x <- as.double(b)[perm]
+              r <- as.double(b)[perm]
+              names(r) <- a@Dimnames[[2L]]
               r
           })
 
@@ -639,11 +631,11 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 
 setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
 	  function(a, b, ...)
-              solve(a, .spV2dgC(b), ...))
+              solve(a, .spV2dgC(b), ...)) # FIXME? drop(.)?
 
 setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 	  function(a, b, ...)
-              solve(a, .spV2dgC(b), ...))
+              solve(a, .spV2dgC(b), ...)) # FIXME? drop(.)?
 
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
 	  function(a, b, ...)
@@ -651,7 +643,7 @@ setMethod("solve", signature(a = "matrix", b = "Matrix"),
 
 setMethod("solve", signature(a = "matrix", b = "sparseVector"),
 	  function(a, b, ...)
-              solve(.m2ge(a, "d"), .spV2dge(b), ...))
+              solve(.m2ge(a, "d"), .spV2dge(b), ...)) # FIXME? drop(.)?
 
 
 ########################################################################

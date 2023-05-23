@@ -132,18 +132,20 @@ solve(a, b, ...)
     then methods take \code{b} to be an identity matrix.}
   \item{tol}{a non-negative number.  For \code{a} inheriting from
     \code{\linkS4class{denseMatrix}}, an error is signaled if the
-    reciprocal condition number (see \code{\link[base]{rcond}}) of
-    \code{a} is less than \code{tol}, indicating that \code{a} is
+    reciprocal one-norm condition number (see \code{\link[base]{rcond}})
+    of \code{a} is less than \code{tol}, indicating that \code{a} is
     near-singular.  For \code{a} of class \code{\linkS4class{sparseLU}},
     an error is signaled if the ratio \code{min(d)/max(d)} is less
     than \code{tol}, where \code{d = abs(diag(a@U))}.  (Interpret
     with care, as this ratio is a cheap heuristic and \emph{not}
     in general equal to or even proportional to the reciprocal
-    condition number.)  Setting \code{tol = 0} disables the test.}
+    one-norm condition number.)  Setting \code{tol = 0} disables
+    the test.}
   \item{sparse}{a logical indicating if the result should be formally
     sparse, i.e., if the result should inherit from virtual class
     \code{\linkS4class{sparseMatrix}}.
-    Only methods for sparse \code{a} have this argument.
+    Only methods for sparse \code{a} and missing or matrix \code{b}
+    have this argument.
     Methods for missing or sparse \code{b} use \code{sparse = TRUE}
     by default.  Methods for dense \code{b} use \code{sparse = FALSE}
     by default.}
@@ -179,15 +181,17 @@ solve(a, b, ...)
   Methods for sparse \code{a} are built on CSparse routines
   \code{cs_lsolve}, \code{cs_usolve}, and \code{cs_spsolve} and
   CHOLMOD routines \code{cholmod_solve} and \code{cholmod_spsolve}.
-  By default, these methods give a sparse result if \code{b}
-  is missing or sparse and a dense result if \code{b} is dense.
-  One can override this behaviour by setting the \code{sparse}
-  argument, but that should be done with care.  Note that a
-  sparse result may be sparse only in the formal sense and not at
-  all in the mathematical sense, depending on the nonzero patterns
-  of \code{a} and \code{b}.  Furthermore, whereas dense results
-  are fully preallocated, sparse results must be \dQuote{grown}
-  in a loop over the columns of \code{b}.
+  By default, these methods give a vector result if \code{b}
+  is a vector, a sparse matrix result if \code{b} is missing
+  or a sparse matrix, and a dense matrix result if \code{b}
+  is a dense matrix.  One can override this behaviour by setting
+  the \code{sparse} argument, where available, but that should
+  be done with care.  Note that a sparse result may be sparse only
+  in the formal sense and not at all in the mathematical sense,
+  depending on the nonzero patterns of \code{a} and \code{b}.
+  Furthermore, whereas dense results are fully preallocated,
+  sparse results must be \dQuote{grown} in a loop over the columns
+  of \code{b}.
   
   Methods for \code{a} of class \code{\linkS4class{sparseQR}}
   are simple wrappers around \code{\link{qr.coef}}, giving the

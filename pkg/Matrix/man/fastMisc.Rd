@@ -244,8 +244,7 @@ stopifnot(identical(.M2tri( D.), as(D., "triangularMatrix")),
 A <- tcrossprod(C.)/6 + Diagonal(3, 1/3); A[1,2] <- 3; A
 stopifnot(exprs = {
     is.numeric( x. <- c(2.2, 0, -1.2) )
-    all.equal(.solve.dgC.lu(A, c(1,0,0), check=FALSE),
-              Matrix(x.))
+    all.equal(x., .solve.dgC.lu(A, c(1,0,0), check=FALSE))
     all.equal(x., .solve.dgC.qr(A, c(1,0,0), check=FALSE))
 })
 
