@@ -1714,46 +1714,60 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	    ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
 	B = X;
 	
-	int i, k, top, *iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
+	int i, k, top, nz, nzmax,
+	    *iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
 	
-#define DO_TRIANGULAR_SOLVE(_A_, _LO_, _FOR_)				\
+#define DO_TRIANGULAR_SOLVE(_A_, _LOA_, _FRB_, _CLA_, _CLB_)		\
 	do {								\
 	    X = cs_spalloc(m, n, B->nzmax, 1, 0);			\
 	    if (!X) {							\
-		B = cs_spfree(B);					\
-		ERROR_SOLVE_OOM(sparseLU, dgCMatrix);			\
-	    }								\
-	    X->p[0] = 0;						\
-	    for (j = 0, k = 0; j < n; ++j) {				\
-		top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _LO_); \
-		if (m - top > INT_MAX - X->p[j]) {			\
+		if (_FRB_)						\
 		    B = cs_spfree(B);					\
+		ERROR_SOLVE_OOM(_CLA_, _CLB_);				\
+	    }								\
+	    X->p[0] = nz = 0;						\
+	    nzmax = X->nzmax;						\
+	    for (j = 0, k = 0; j < n; ++j) {				\
+		top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _LOA_); \
+		if (m - top > INT_MAX - nz) {				\
+		    if (_FRB_)						\
+			B = cs_spfree(B);				\
 		    X = cs_spfree(X);					\
 		    error(_("attempt to construct sparse matrix with "	\
 			    "more than 2^31-1 nonzero elements"));	\
 		}							\
-		X->p[j + 1] = X->p[j] + m - top;			\
-		if (X->p[j + 1] > X->nzmax) {				\
-		    int nzmax = X->nzmax;				\
-		    nzmax = (nzmax > INT_MAX / 2) ? INT_MAX : 2 * nzmax; \
+		nz += m - top;						\
+		if (nz > nzmax) {					\
+		    nzmax = (nz <= INT_MAX / 2) ? 2 * nz : INT_MAX;	\
 		    if (!cs_sprealloc(X, nzmax)) {			\
-			B = cs_spfree(B);				\
+			if (_FRB_)					\
+			    B = cs_spfree(B);				\
 			X = cs_spfree(X);				\
-			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);		\
+			ERROR_SOLVE_OOM(_CLA_, _CLB_);			\
 		    }							\
 		}							\
-		_FOR_ {							\
-		    X->i[k] =      iwork[i];				\
-		    X->x[k] = work[iwork[i]];				\
-		    ++k;						\
+		X->p[j + 1] = nz;					\
+		if (_LOA_) {						\
+		    for (i = top; i <    m; ++i) {			\
+			X->i[k] =      iwork[i];			\
+			X->x[k] = work[iwork[i]];			\
+			++k;						\
+		    }							\
+		} else {						\
+		    for (i = m - 1; i >= top; --i) {			\
+			X->i[k] =      iwork[i];			\
+			X->x[k] = work[iwork[i]];			\
+			++k;						\
+		    }							\
 		}							\
 	    }								\
-	    B = cs_spfree(B);						\
+	    if (_FRB_)							\
+		B = cs_spfree(B);					\
 	    B = X;							\
 	} while (0)
 	
-	DO_TRIANGULAR_SOLVE(L, 1, for (i = top; i <    m; ++i));
-        DO_TRIANGULAR_SOLVE(U, 0, for (i = m-1; i >= top; --i));
+	DO_TRIANGULAR_SOLVE(L, 1, 1, sparseLU, dgCMatrix);
+        DO_TRIANGULAR_SOLVE(U, 0, 1, sparseLU, dgCMatrix);
 	
 	if (paq) {
 	    X = cs_permute(B, paq, (int *) NULL, 1);
@@ -2006,57 +2020,12 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	} else
 	    B = dgC2cs(b);
 
-	X = cs_spalloc(m, n, B->nzmax, 1, 0);
-	if (!X) {
-	    if (isNull(b))
-		B = cs_spfree(B);
-	    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
-	}
-	X->p[0] = 0;
-	
-	int i, k, top, nz = 0, nzmax = X->nzmax,
+	int i, k, top, nz, nzmax,
 	    *iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
 	double *work = (double *) R_alloc((size_t) m, sizeof(double));
-
-	for (j = 0, k = 0; j < n; ++j) {
-	    top = cs_spsolve(A, B, j, iwork, work, (int *) NULL, ul != 'U');
-	    if (m - top > INT_MAX - nz) {
-		if (isNull(b))
-		    B = cs_spfree(B);
-		X = cs_spfree(X);
-		error(_("attempt to construct sparse matrix with "
-			"more than 2^31-1 nonzero elements"));
-	    }
-	    nz += m - top;
-	    if (nz > nzmax) {
-		nzmax = (nzmax > INT_MAX / 2) ? INT_MAX : 2 * nzmax;
-		if (!cs_sprealloc(X, nzmax)) {
-		    if (isNull(b))
-			B = cs_spfree(B);
-		    X = cs_spfree(X);
-		    ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
-		}
-	    }
-	    X->p[j + 1] = nz;
-	    if (ul == 'U') {
-		for (i = top; i <    m; ++i) {
-		    X->i[k] =      iwork[i];
-		    X->x[k] = work[iwork[i]];
-		    ++k;
-		}
-	    } else {
-		for (i = m-1; i >= top; --i) {
-		    X->i[k] =      iwork[i];
-		    X->x[k] = work[iwork[i]];
-		    ++k;
-		}
-	    }
-	}
-
-	if (isNull(b))
-	    B = cs_spfree(B);
-	B = X;
-
+	
+	DO_TRIANGULAR_SOLVE(A, ul != 'U', isNull(b), dtCMatrix, dgCMatrix);
+	
 	/* Drop zeros from B and sort it : */
 	cs_dropzeros(B);
 	X = cs_transpose(B, 1);
