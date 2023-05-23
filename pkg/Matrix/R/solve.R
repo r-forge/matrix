@@ -62,7 +62,7 @@ function(perm, margin, n) {
     if(anyDuplicated.default(perm)) {
         i <- seq_len(n)[-perm][1L]
         if(margin == 1L)
-            stop(gettextf("matrix is exactly singular, J[,i]=0, i=%d", i),
+            stop(gettextf("matrix is exactly singular, J[,j]=0, j=%d", i),
                  domain = NA)
         else
             stop(gettextf("matrix exactly singular, J[i,]=0, i=%d", i),
