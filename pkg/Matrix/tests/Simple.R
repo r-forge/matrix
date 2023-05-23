@@ -737,7 +737,7 @@ stopifnot(all.equal(I6, m6 %*% solve(m6)),
 
 (i6 <- solve(m6, Matrix(1:6)))
 stopifnot(identical(i6, as(cbind(c(-4, rep(1,5))), "generalMatrix")),
-          identical(i6, solve(m6, 1:6)),
+          identical(drop(i6), solve(m6, 1:6)),
           identical(i6, solve(m6, matrix(1:6))),
           identical(i6, solve(m6, matrix(c(1,2,3,4,5,6))))
           )

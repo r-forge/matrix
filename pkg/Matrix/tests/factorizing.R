@@ -422,13 +422,13 @@ bv <- 1:nrow(mtm) # even integer
 b <- matrix(bv)
 ## solve(c2, b) by default solves  Ax = b, where A = c2'c2 !
 x <- solve(c2,b)
-stopifnot(identical3(x, solve(c2, bv), solve(c2, b, system = "A")),
+stopifnot(identical3(drop(x), solve(c2, bv), drop(solve(c2, b, system = "A"))),
           all.equal(x, solve(mtm, b)))
 for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
     x <- solve(c2, b,  system = sys)
     cat(sys,":\n"); print(head(x))
     stopifnot(dim(x) == c(712, 1),
-              identical(x, solve(c2, bv, system = sys)))
+              identical(drop(x), solve(c2, bv, system = sys)))
 }
 
 ## log(|LL'|) - check if super = TRUE and simplicial give same determinant
