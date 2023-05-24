@@ -141,22 +141,18 @@ Cholesky(A, \dots)
   \url{https://netlib.org/lapack/double/dpotrf.f} and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
-  Davis, T. A. (2006).
-  \emph{Direct Methods for Sparse Linear Systems},
-  Society for Industrial and Applied Mathematics.
-  
-  Amestoy, P. R., Davis, T. A., & Duff, I. S. (2004).
-  Algorithm 837: AMD, an approximate minimum degree ordering algorithm.
-  \emph{ACM Transactions on Mathematical Software},
-  \emph{17}(4), 886-905.
-  \doi{10.1145/1024074.1024081}
-
   Chen, Y., Davis, T. A., Hager, W. W., Rajamanickam, S. (2008).
   Algorithm 887: CHOLMOD, supernodal sparse Cholesky factorization
   and update/downdate.
   \emph{ACM Transactions on Mathematical Software},
   \emph{35}(3), Article 22, 1-14.
   \doi{10.1145/1391989.1391995}
+  
+  Amestoy, P. R., Davis, T. A., & Duff, I. S. (2004).
+  Algorithm 837: AMD, an approximate minimum degree ordering algorithm.
+  \emph{ACM Transactions on Mathematical Software},
+  \emph{17}(4), 886-905.
+  \doi{10.1145/1024074.1024081}
 }
 \examples{
 showMethods("Cholesky", inherited = FALSE)
