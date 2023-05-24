@@ -210,8 +210,7 @@ isLDL(x)
 \seealso{
   Class \code{\linkS4class{dsCMatrix}}.
   
-  Generic functions \code{\link{expand2}}, \code{\link{Cholesky}},
-  and \code{\link{chol}}.
+  Generic functions \code{\link{expand2}} and \code{\link{Cholesky}}.
 }
 \examples{% most are in ./Cholesky.Rd
 ## An example for the expand() method
