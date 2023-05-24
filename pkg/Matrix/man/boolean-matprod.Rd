@@ -112,7 +112,7 @@
   the matrix before using it.
   \cr
   Equivalently, for all matrices \code{M}, boolean arithmetic should work as if
-  applied to \code{M != 0} (or \code{M != FALSE}.
+  applied to \code{M != 0} (or \code{M != FALSE}).
 
   The current implementation ends up coercing both \code{x} and \code{y} to
   (virtual) class \code{\linkS4class{nsparseMatrix}} which may be quite inefficient
