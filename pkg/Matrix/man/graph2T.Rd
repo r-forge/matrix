@@ -88,7 +88,7 @@ if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
    identical(as(m3,"TsparseMatrix"), uniqTsparse(tg3))
   )
 }
-  a. <- sparseMatrix(i= 4:1, j=1:4, dimnames=list(n4,n4), giveC=FALSE) # no 'x'
+  a. <- sparseMatrix(i=4:1, j=1:4, dimnames=list(n4, n4), repr="T") # no 'x'
   show(a.) # "ngTMatrix"
   show(g. <- as(a., "graph"))
 \dontshow{
