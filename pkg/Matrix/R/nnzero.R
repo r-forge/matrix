@@ -33,7 +33,7 @@ rm(.nnz.dispatching)
 
 setMethod("nnzero", "CHMfactor",
 	  function(x, na.counted = NA)
-              callGeneric(as(x, "CsparseMatrix"), na.counted))
+              nnzero(as(x, "CsparseMatrix"), na.counted))
 
 setMethod("nnzero", "diagonalMatrix",
 	  function(x, na.counted = NA)
