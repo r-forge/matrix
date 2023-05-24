@@ -1,8 +1,8 @@
 #include <Rinternals.h> /* SEXP, Rcomplex */
+#include "Csparse.h"
+#include "CHMfactor.h"
 #include "abIndex.h"
 #include "chm_common.h"
-#include "CHMfactor.h"
-#include "Csparse.h"
 #include "dense.h"
 #include "dgCMatrix.h"
 #include "dgeMatrix.h"
@@ -10,13 +10,13 @@
 #include "dppMatrix.h"
 #include "dspMatrix.h"
 #include "dsyMatrix.h"
-#include "dtrMatrix.h"
 #include "dtpMatrix.h"
+#include "dtrMatrix.h"
 #include "factorizations.h"
 #include "packedMatrix.h"
-#include "unpackedMatrix.h"
 #include "sparse.h"
 #include "subscript.h"
+#include "unpackedMatrix.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
 
@@ -27,12 +27,6 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 #define EXTDEF(name, n)   {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
-    CALLDEF(CHMfactor_to_sparse, 1),
-    CALLDEF(CHMfactor_ldetL2, 1),
-    CALLDEF(CHMfactor_ldetL2up, 3),
-    CALLDEF(CHMfactor_update, 3),
-    CALLDEF(CHMfactor_updown,3),
-    
     CALLDEF(CHM_set_common_env, 1),
     CALLDEF(get_SuiteSparse_version, 0),
     
@@ -298,6 +292,9 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(sparseQR_matmult, 5),
 
+    CALLDEF(CHMfactor_update, 3),
+    CALLDEF(CHMfactor_updown, 3),
+    
     {NULL, NULL, 0}
 };
 
@@ -319,6 +316,21 @@ R_init_Matrix(DllInfo *dll)
 
 #define RREGDEF(name)  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
+    /* Matrix: SEXP -> CHOLMOD */
+    RREGDEF(as_cholmod_dense);
+    RREGDEF(as_cholmod_factor);
+    RREGDEF(as_cholmod_sparse);
+    RREGDEF(as_cholmod_triplet);
+
+    /* Matrix: CHOLMOD -> SEXP */
+    RREGDEF(chm_factor_to_SEXP);
+    RREGDEF(chm_sparse_to_SEXP);
+    RREGDEF(chm_triplet_to_SEXP);
+
+    /* Matrix: miscellaneous */
+    RREGDEF(chm_factor_ldetL2);
+    RREGDEF(chm_factor_update);
+    RREGDEF(numeric_as_chm_dense);
 #if 0
     RREGDEF(Csparse_diagU2N);
     RREGDEF(dpoMatrix_chol);
@@ -328,17 +340,8 @@ R_init_Matrix(DllInfo *dll)
     R_RegisterCCallable(
 	"Matrix", "dpoMatrix_chol", (DL_FUNC) dpoMatrix_trf);
 #endif
-    
-    RREGDEF(as_cholmod_dense);
-    RREGDEF(as_cholmod_factor);
-    RREGDEF(as_cholmod_factor3);
-    RREGDEF(as_cholmod_sparse);
-    RREGDEF(as_cholmod_triplet);
-    RREGDEF(chm_factor_to_SEXP);
-    RREGDEF(chm_factor_ldetL2);
-    RREGDEF(chm_factor_update);
-    RREGDEF(chm_sparse_to_SEXP);
-    RREGDEF(chm_triplet_to_SEXP);
+
+    /* CHOLMOD: */
     RREGDEF(cholmod_aat);
     RREGDEF(cholmod_add);
     RREGDEF(cholmod_allocate_dense);
@@ -378,7 +381,6 @@ R_init_Matrix(DllInfo *dll)
     RREGDEF(cholmod_triplet_to_sparse);
     RREGDEF(cholmod_vertcat);
     RREGDEF(cholmod_updown);
-    RREGDEF(numeric_as_chm_dense);
 
     R_cholmod_start(&c);
 #if 0

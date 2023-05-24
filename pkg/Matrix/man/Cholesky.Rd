@@ -169,8 +169,8 @@ str(mtm@factors) # 'sPDCholesky' (simpl)
 (Cm <- Cholesky(mtm, super = TRUE))
 c(C1 = isLDL(C1), Cm = isLDL(Cm))
 str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
-str(cm1  <- as(C1, "dtCMatrix"))
-str(cmat <- as(Cm, "dtCMatrix"))# hmm: super is *less* sparse here
+str(cm1  <- as(C1, "CsparseMatrix"))
+str(cmat <- as(Cm, "CsparseMatrix"))# hmm: super is *less* sparse here
 cm1[1:20, 1:20]
 
 b <- matrix(c(rep(0, 711), 1), ncol = 1)
@@ -191,7 +191,7 @@ noquote(cbind(format(100 * sizes / sizes[1], digits=4)))
 ## Visualize the sparseness:
 dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
 image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
-image(cm1, main= paste("as(Cholesky(crossprod(mm)), \"dtCMatrix\"):",
+image(cm1, main= paste("as(Cholesky(crossprod(mm)), \"CsparseMatrix\"):",
                         dq(class(cm1))))
 \dontshow{% FIXME-- move to ../tests/factorizing.R :
 expand(C1) ## to check printing

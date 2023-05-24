@@ -2203,3 +2203,53 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
     UNPROTECT(nprotect); /* ax, adim, a, yx, p, beta, V */
     return a;
 }
+
+SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
+{
+    double mult_ = asReal(mult);
+    if (!R_FINITE(mult_))
+	error(_("'mult' is not a number or not finite"));
+
+    cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
+    cholmod_sparse *A = dgC2cholmod(parent);
+    if (Matrix_shape(parent) == 's') {
+	SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	A->stype = (ul == 'U') ? 1 : -1;
+	UNPROTECT(1);
+    }
+    
+    dpCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
+    
+    SEXP res = PROTECT(cholmod2mf(L));
+    cholmod_free_factor(&L, &c);
+    
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+
+    UNPROTECT(2);
+    return res;
+}
+
+SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
+{
+    cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
+    cholmod_sparse *A = dgC2cholmod(parent);
+    if (Matrix_shape(parent) == 's') {
+	SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+	A->stype = (ul == 'U') ? 1 : -1;
+	UNPROTECT(1);
+    }
+
+    cholmod_updown(asLogical(update) != 0, A, L, &c);
+
+    SEXP res = PROTECT(cholmod2mf(L));
+    cholmod_free_factor(&L, &c);
+    
+    SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+    SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+
+    UNPROTECT(2);
+    return res;
+}

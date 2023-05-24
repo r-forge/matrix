@@ -47,21 +47,22 @@ tests/performance
 # Currently "empty", not contributing to namespace :
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
+R/CHMfactor\.R$
 R/sparseQR\.R$
 
 # These give warning "ISO C forbids an empty translation unit"
 # from '-Wpedantic' :
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
+src/dgTMatrix\.[ch]$
 src/dsCMatrix\.[ch]$
 src/dtCMatrix\.[ch]$
-src/dgTMatrix\.[ch]$
 src/dtTMatrix\.[ch]$
-src/lgCMatrix\.[ch]$
 src/ldense\.[ch]$
+src/lgCMatrix\.[ch]$
 src/sparseQR\.[ch]$
-src/t_matrix_to_Csp\.c$
 src/t_gCMatrix_colSums\.c$
+src/t_matrix_to_Csp\.c$
 
 # work in progress
 R/subassign\.R$

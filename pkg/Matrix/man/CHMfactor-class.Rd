@@ -16,16 +16,11 @@
 \alias{nCHMsimpl-class}
 \alias{nCHMsuper-class}
 %
-\alias{coerce,CHMfactor,CsparseMatrix-method}
-\alias{coerce,CHMfactor,Matrix-method}
-\alias{coerce,CHMfactor,RsparseMatrix-method}
-\alias{coerce,CHMfactor,TsparseMatrix-method}
-\alias{coerce,CHMfactor,dMatrix-method}
-\alias{coerce,CHMfactor,dsparseMatrix-method}
-\alias{coerce,CHMfactor,dtCMatrix-method}
 \alias{coerce,CHMfactor,pMatrix-method}
-\alias{coerce,CHMfactor,sparseMatrix-method}
-\alias{coerce,CHMfactor,triangularMatrix-method}
+\alias{coerce,CHMsimpl,CsparseMatrix-method}
+\alias{coerce,CHMsimpl,dtCMatrix-method}
+\alias{coerce,CHMsuper,CsparseMatrix-method}
+\alias{coerce,CHMsuper,dgCMatrix-method}
 \alias{determinant,CHMfactor,logical-method}
 \alias{update,CHMfactor-method}
 %
@@ -37,7 +32,7 @@
   positive semidefinite matrices, having the general form
   \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
   or (equivalently)
-  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 = P1' * L * L' * P1}
+  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' * L1 * D * L1' * P1 = P1' * L * L' * P1}
   where
   \eqn{P_{1}}{P1} is a permutation matrix,
   \eqn{L_{1}} is a unit lower triangular matrix,
@@ -162,15 +157,22 @@ isLDL(x)
   (often \code{\linkS4class{dsCMatrix}}).
   
   There is currently no API outside of calls to \code{\link{new}}
-  for generating \code{nCHMsimpl} and \code{nCHMsuper}.
+  for generating \code{nCHMsimpl} and \code{nCHMsuper}.  These
+  classes are vestigial and may be formally deprecated in a future
+  version of \pkg{Matrix}.
 }
 \section{Methods}{
   \describe{
     \item{\code{chol2inv}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{chol2inv-methods}}.}
-    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "dtCMatrix")}:
+    \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "CsparseMatrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L}.}
+    \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "CsparseMatrix")}:
+      returns a \code{\linkS4class{dgCMatrix}} representing
+      the lower triangular Cholesky factor \eqn{L}.
+      Note that, for supernodes spanning two or more columns,
+      the supernodal algorithm must store zeros above the diagonal.}
     \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
       returns a \code{\linkS4class{pMatrix}} representing
       the permutation matrix \eqn{P_{1}}.}
@@ -179,7 +181,9 @@ isLDL(x)
       or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
-    \item{\code{expand2}}{\code{signature(x = "CHMfactor")}:
+    \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
+      see \code{\link{expand2-methods}}.}
+    \item{\code{expand2}}{\code{signature(x = "CHMsuper")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{image}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{image-methods}}.}
@@ -187,8 +191,8 @@ isLDL(x)
     \item{\code{solve}}{\code{signature(a = "CHMfactor", b = .)}:
       see \code{\link{solve-methods}}.}
     \item{\code{update}}{\code{signature(object = "CHMfactor")}:
-      returns a copy of \code{object} with the same nonzero pattern but
-      with numeric entries updated according to additional arguments
+      returns a copy of \code{object} with the same nonzero pattern
+      but with numeric entries updated according to additional arguments
       \code{parent} and \code{mult}, where \code{parent} is (coercible to)
       a \code{\linkS4class{dsCMatrix}} or a \code{\linkS4class{dgCMatrix}}
       and \code{mult} is a numeric vector of positive length.
@@ -199,7 +203,7 @@ isLDL(x)
       if \code{object = Cholesky(S, ...)}.  Here, \code{I} is the
       identity matrix and \code{F = \link{identity}} for symmetric
       \code{parent} and \code{F = \link{tcrossprod}} otherwise.}
-    \item{\code{updown}}{\code{signature(update = ., C = "mMatrix", object = "CHMfactor")}:
+    \item{\code{updown}}{\code{signature(update = ., C = ., object = "CHMfactor")}:
       see \code{\link{updown-methods}}.}
   }
 }

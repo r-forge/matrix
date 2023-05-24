@@ -56,7 +56,7 @@ extends1of <- function(class, classes, ...) {
 ## Fast alternative to MatrixClass():
 ## - if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
 ## - if strict= TRUE then may also give one of these:
-##   "pMatrix", "p?Cholesky", "p?BunchKaufman", "dp[op]Matrix", "corMatrix"
+##   "pMatrix", "p?Cholesky", "dp[op]Matrix", "p?corMatrix"
 .M.nonvirtual <- function(x, strict = FALSE)
     .Call(R_Matrix_nonvirtual, x, strict)
 
@@ -2110,7 +2110,7 @@ chk.s <- function(..., which.call = -1,
 .diag.dsC <- function(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag") {
     force(Chx)
     if(!missing(Chx))
-        stopifnot(.isLDL(Chx), is.integer(Chx@p), is.double(Chx@x))
+        stopifnot(.CHM.is.LDL(Chx), is.integer(Chx@p), is.double(Chx@x))
     .Call(diag_tC, Chx, res.kind)
     ##    ^^^^^^^ from ../src/Csparse.c
     ## => res.kind in ("trace", "sumLog", "prod", "min", "max", "range", "diag", "diagBack")
