@@ -53,22 +53,27 @@ doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))
 nn <- if(doExtras) 20 else 3
 set.seed(1)
 rho <- runif(nn, 0, 1)
+
 system.time(MJ <- sapply(rho,
                    function(x) determinant(IM - x * wrld_1deg,
                                            logarithm = TRUE)$modulus))
+
+## can be done faster, by update()ing the Cholesky factor:
 nWC <- -wrld_1deg
 C1 <- Cholesky(nWC, Imult = 2)
 system.time(MJ1 <- n * log(rho) +
-   sapply(rho, function(x) c(determinant(update(C1, nWC, 1/x))$modulus))
-)
+    sapply(rho, function(x) c(determinant(update(C1, nWC, 1/x))$modulus)))
 stopifnot(all.equal(MJ, MJ1))
+
 C2 <- Cholesky(nWC, super = TRUE, Imult = 2)
 system.time(MJ2 <- n * log(rho) +
-   sapply(rho, function(x) c(determinant(update(C2, nWC, 1/x))$modulus))
-)
+   sapply(rho, function(x) c(determinant(update(C2, nWC, 1/x))$modulus)))
+stopifnot(all.equal(MJ, MJ2))
+\dontshow{
+if(FALSE) {
 system.time(MJ3 <- n * log(rho) + Matrix:::ldetL2up(C1, nWC, 1/rho))
 system.time(MJ4 <- n * log(rho) + Matrix:::ldetL2up(C2, nWC, 1/rho))
-stopifnot(all.equal(MJ, MJ2),
-          all.equal(MJ, MJ3),
-          all.equal(MJ, MJ4))
+stopifnot(all.equal(MJ, MJ3), all.equal(MJ, MJ4))
+}
+}
 }

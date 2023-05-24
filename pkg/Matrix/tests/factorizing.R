@@ -260,8 +260,8 @@ for(n in c(5:12)) {
     validObject(CA)
     ldet <- .diag.dsC(Chx = CA, res.kind = "sumLog")
     ## not printing CAp : ends up non-integer for n >= 11
-    mCAp <- as(CAp,"sparseMatrix")
-    print(mCA  <- drop0(as(CA, "sparseMatrix")))
+    mCAp <- as(CAp, "CsparseMatrix")
+    print(mCA  <- drop0(as(CA, "CsparseMatrix")))
     stopifnot(identical(A[p,p], as(P %*% A %*% t(P),
 				   "symmetricMatrix")),
 	      relErr(d.^2, .diag.dsC(Chx= CA, res.kind="diag")) < 1e-14,
@@ -344,7 +344,7 @@ stopifnot(all(nT.@i <= nT.@j),
 CA <- Cholesky(A. + Diagonal(x = rowSums(abs(A.)) + 1))
 validObject(CA)
 stopifnotValid(CAinv <- solve(CA), "dsCMatrix")
-MA <- as(CA, "Matrix") # with a confusing warning -- FIXME!
+MA <- as(CA, "CsparseMatrix") # with a confusing warning -- FIXME!
 stopifnotValid(MAinv <- solve(MA), "dtCMatrix")
 ## comparing MAinv with some solve(CA, system="...") .. *not* trivial? - TODO
 ##
@@ -382,7 +382,7 @@ chkCholesky <- function(chmf, A) {
               is(A, "Matrix"), isSymmetric(A))
     if(!is(A, "dsCMatrix"))
         A <- as(as(as(A, "CsparseMatrix"), "symmetricMatrix", "dMatrix"))
-    L <- drop0(zapsmall(L. <- as(chmf, "Matrix")))
+    L <- drop0(zapsmall(L. <- as(chmf, "CsparseMatrix")))
     cat("no. nonzeros in L {before / after drop0(zapsmall(.))}: ",
         c(nnzero(L.), nnzero(L)), "\n") ## 112, 95
     ecc <- expand(chmf)
@@ -432,13 +432,22 @@ for(sys in c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt")) {
 }
 
 ## log(|LL'|) - check if super = TRUE and simplicial give same determinant
+(ld.1 <- determinant(mtm))
+if(FALSE) {
+## MJ: CHMfactor_ldetL2 is unused outside of these tests, so we no longer
+##     have it in the namespace { old definition is in ../src/CHMfactor.c }
 ld1 <- .Call("CHMfactor_ldetL2", c1)
 ld2 <- .Call("CHMfactor_ldetL2", c2)
-(ld.1 <- determinant(mtm))
 stopifnot(all.equal(ld1, ld2),
 	  all.equal(ld1, as.vector(ld.1$modulus), tolerance = 1e-14),
           all.equal(ld1, as.vector(ld.3$modulus), tolerance = 1e-14),
           all.equal(ld1, as.vector(ld.4$modulus), tolerance = 1e-14))
+} else {
+stopifnot(all.equal(as.vector(ld.1$modulus), as.vector(ld.3$modulus),
+                    tolerance = 1e-14),
+          all.equal(as.vector(ld.1$modulus), as.vector(ld.4$modulus),
+                    tolerance = 1e-14))
+}
 
 ## MJ: ldet[123].dsC() are unused outside of these tests, so we no longer
 ##     have them in the namespace { old definitions are in ../R/determinant.R }

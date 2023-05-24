@@ -16,7 +16,8 @@
 \alias{expand,sparseLU-method}
 %
 \alias{expand2,BunchKaufman-method}
-\alias{expand2,CHMfactor-method}
+\alias{expand2,CHMsimpl-method}
+\alias{expand2,CHMsuper-method}
 \alias{expand2,Cholesky-method}
 \alias{expand2,Schur-method}
 \alias{expand2,denseLU-method}
@@ -58,7 +59,7 @@ expand (x, \dots)
 }
 \section{Methods}{
   \describe{
-    \item{\code{expand2}}{\code{signature(x = "CHMfactor")}:
+    \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
       expands the factorization
       \eqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' * L1 * D * L1' * P1 = P1' * L * L' * P1}
       as \code{list(P1., L1, D, L1., P1)} (the default)
@@ -68,6 +69,9 @@ expand (x, \dots)
       \code{L1}, \code{L1.}, \code{L}, and \code{L.} are
       \code{\linkS4class{dtCMatrix}},
       and \code{D} is a \code{\linkS4class{ddiMatrix}}.}
+    \item{\code{expand2}}{\code{signature(x = "CHMsuper")}:
+      as \code{CHMsimpl}, but the triangular factors are
+      stored as \code{\linkS4class{dgCMatrix}}.}
     \item{\code{expand2}}{\code{signature(x = "p?Cholesky")}:
       expands the factorization
       \eqn{A = L_{1} D L_{1}' = L L'}{A = L1 * D * L1' = L * L'}

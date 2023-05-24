@@ -53,4 +53,7 @@ SEXP    dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse);
 
 SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj);
 
+SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult);
+SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update);
+
 #endif

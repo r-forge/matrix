@@ -9,9 +9,13 @@
 \alias{updown}
 \alias{updown-methods}
 %
-\alias{updown,ANY,ANY,ANY-method}
-\alias{updown,character,mMatrix,CHMfactor-method}
-\alias{updown,logical,mMatrix,CHMfactor-method}
+\alias{updown,character,Matrix,CHMfactor-method}
+\alias{updown,character,matrix,CHMfactor-method}
+\alias{updown,logical,Matrix,CHMfactor-method}
+\alias{updown,logical,dgCMatrix,CHMfactor-method}
+\alias{updown,logical,dsCMatrix,CHMfactor-method}
+\alias{updown,logical,dtCMatrix,CHMfactor-method}
+\alias{updown,logical,matrix,CHMfactor-method}
 %
 \description{
   Compute the up- or down-dated Cholesky decomposition
@@ -50,15 +54,19 @@ updown(update, C, L)
  \code{\link{Cholesky}},
 }
 \examples{
-dn <- list(LETTERS[1:3], letters[1:5])
-## pointer vectors can be used, and the (i,x) slots are sorted if necessary:
-m <- sparseMatrix(i = c(3,1, 3:2, 2:1), p= c(0:2, 4,4,6), x = 1:6, dimnames = dn)
-cA <- Cholesky(A <- crossprod(m) + Diagonal(5))
-166 * as(cA,"Matrix") ^ 2
-uc1 <- updown("+",   Diagonal(5), cA)
+m <- sparseMatrix(i = c(3, 1, 3:2, 2:1), p = c(0:2, 4, 4, 6), x = 1:6,
+                  dimnames = list(LETTERS[1:3], letters[1:5]))
+uc0 <- Cholesky(A <- crossprod(m) + Diagonal(5))
+uc1 <- updown("+", Diagonal(5, 1), uc0)
+uc2 <- updown("-", Diagonal(5, 1), uc1)
+stopifnot(all.equal(uc0, uc2))
+
+\dontshow{
+if(FALSE) {
 ## Hmm: this loses positive definiteness:
-uc2 <- updown("-", 2*Diagonal(5), cA)
-image(show(as(cA, "Matrix")))
-image(show(c2 <- as(uc2,"Matrix")))# severely negative entries
-##--> Warning
+uc2 <- updown("-", Diagonal(5, 2), uc0)
+image(show(as(uc0, "CsparseMatrix")))
+image(show(as(uc2, "CsparseMatrix"))) # severely negative entries
+}
+}
 }

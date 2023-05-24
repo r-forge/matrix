@@ -208,9 +208,9 @@ setMethod("solve", signature(a = "CHMfactor", b = "missing"),
                       r <- new("ddiMatrix")
                       r@Dim <- a@Dim
                       r@Dimnames <- a@Dimnames[2:1]
-                      if(a@type[2L]) # is_ll
-                          r@diag <- "U"
-                      else r@x <- a@x[a@p + 1L]
+                      if(.CHM.is.LDL(a))
+                          r@x <- a@x[a@p + 1L]
+                      else r@diag <- "U"
                       return(r)
                   } else if(identical(system, "P") || identical(system, "Pt")) {
                       r <- new("pMatrix")

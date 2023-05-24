@@ -109,8 +109,8 @@ dsy <- lsy+1
 D3 <- Diagonal(x=4:2); L7 <- Diagonal(7) > 0
 validObject(xpp <- pack(round(xpx,2)))
 lsp <- xpp > 0
-(dsyU <- as(as(.diag2sT(D3), "dMatrix"), "denseMatrix"))
- lsyU <- as(as(.diag2sT(Diagonal(5) > 0), "lMatrix"), "denseMatrix")
+(dsyU <- .diag2dense(D3, "dsy"))
+ lsyU <- .diag2dense(Diagonal(5) > 0, "lsy")
 str(lsyU)
 stopifnot({
     isValid(dsyU,               "dsyMatrix") && dsyU@uplo == "U"
