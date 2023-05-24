@@ -27,21 +27,29 @@
 \description{
   Computes the pivoted Cholesky factorization of an
   \eqn{n \times n}{n-by-n} real, symmetric, positive definite
+  (for \code{LDL = TRUE})
   matrix \eqn{A}, which has the general form
   \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
   or (equivalently)
   \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 = P1' * L * L' * P1}
   where
-  \eqn{P_{1}}{P1} is a permutation matrix,
-  \eqn{L_{1}} is a unit lower triangular matrix,
-  \code{D} is a positive diagonal matrix, and
+  \eqn{P_1}{P1} is a permutation matrix,
+  \eqn{L_1}{L1} is a unit lower triangular matrix,
+  \code{D} is a non-negative (if \eqn{A} is positive-(semi)definite)
+  diagonal matrix, and in the pos.def case,
   \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+
+  Those formulas/equations above involving \eqn{L} apply only in the case
+  \eqn{A} \emph{is} positive semi-definite, whereas those involving \eqn{D}
+  and \eqn{L_1}{L1} apply more generally.  In these cases, \eqn{D} may have
+  negative entries.
+  % FIXME: add an example; FIXME(2): why do zero entries not work?
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
   LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
   not permute rows or columns, so that \eqn{P_{1}}{P1} is an
   identity matrix.
-  
+
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
 }
@@ -58,6 +66,7 @@ Cholesky(A, \dots)
 }
 \arguments{
   \item{A}{a \link[=is.finite]{finite}, symmetric, positive definite
+    (if \code{LDL=TRUE})
     matrix or \code{\linkS4class{Matrix}} to be factorized.
     If \code{x} is square but not symmetric, then it will be
     \emph{treated} as symmetric; see \code{uplo}.}
@@ -121,17 +130,17 @@ Cholesky(A, \dots)
   Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
   \code{\linkS4class{dCHMsimpl}} and \code{\linkS4class{dCHMsuper}}
   and their methods.
-  
-  Classes \code{\linkS4class{dpoMatrix}}, \code{\linkS4class{dppMatrix}},  
+
+  Classes \code{\linkS4class{dpoMatrix}}, \code{\linkS4class{dppMatrix}},
   and \code{\linkS4class{dsCMatrix}}.
 
   Generic function \code{\link{chol}},
   for obtaining the upper triangular Cholesky factor \eqn{L'} as a
   \code{\linkS4class{Matrix}}.
-  
+
   Generic function \code{\link{expand2}},
   for constructing a list of matrix factors from the result.
-  
+
   Generic functions \code{\link{BunchKaufman}}, \code{\link{Schur}},
   \code{\link{lu}}, and \code{\link{qr}},
   for computing other factorizations.
@@ -147,7 +156,7 @@ Cholesky(A, \dots)
   \emph{ACM Transactions on Mathematical Software},
   \emph{35}(3), Article 22, 1-14.
   \doi{10.1145/1391989.1391995}
-  
+
   Amestoy, P. R., Davis, T. A., & Duff, I. S. (2004).
   Algorithm 837: AMD, an approximate minimum degree ordering algorithm.
   \emph{ACM Transactions on Mathematical Software},
@@ -163,7 +172,7 @@ str(mtm@factors) # empty list()
 (C1 <- Cholesky(mtm))             # uses show(<MatrixFactorization>)
 str(mtm@factors) # 'sPDCholesky' (simpl)
 (Cm <- Cholesky(mtm, super = TRUE))
-c(C1 = isLDL(C1), Cm = isLDL(Cm))
+c(C1 = isLDL(C1), Cm = isLDL(Cm)) # TRUE FALSE
 str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
 str(cm1  <- as(C1, "CsparseMatrix"))
 str(cmat <- as(Cm, "CsparseMatrix"))# hmm: super is *less* sparse here
@@ -212,6 +221,19 @@ stopifnot(all.equal(t(R1), re[[1]]$L),
           all.equal(t(R0), re[[2]]$L),
           identical(as(1:5, "pMatrix"), re[[2]]$P), # no pivoting
 TRUE)
+
+## Symmetric matrix with positive *and* negative eigen values, i.e., indefinite
+mpn <- new("dsCMatrix", i = c(0L, 0:1, 0:3, 2:5, 3:6),
+           p = c(0:1, 3L, 6:7, 10:11, 15L), Dim = c(7L, 7L),
+           x = c(1, 6, 38, 10, 60, 103, -4, 6, -32, -247, -2, -16, -128, -2, -67))
+ev <- eigen(mpn, only.values = TRUE)$values
+round(ev, 3) # 139.8 3.059 0.268 -0.008 -0.140 -3.357 -317.6
+plot(ev, type="b"); abline(h=0, lty=3)
+Cpn <- Cholesky(mpn)
+expand(Cpn) # Warning: 'L' not positive definite
+## and indeed,  L matrix has [p]ositive and [n]egative diagonal entries
+(mp. <- as(Reduce(`%*%`, expand2(Cpn)), "symmetricMatrix"))
+## looks quite similar as mpn  *but* does differ (!)
 
 %% --> ../TODO : .diag.dsC() should be renamed, documented, tested,...
 \dontshow{
