@@ -234,7 +234,8 @@ Cpn <- Cholesky(mpn)
 diag(Cpn) # D matrix has [p]ositive and [n]egative diagonal elements
 try(expand(Cpn)) # cannot compute L = L1 sqrt(D)
 (mp. <- as(Reduce(`\%*\%`, expand2(Cpn)), "symmetricMatrix"))
-## looks quite similar as mpn  *but* does differ (!)
+## very close to 'mpn' but *does* differ numerically (!)
+stopifnot(all.equal(mpn, mp.))
 
 %% --> ../TODO : .diag.dsC() should be renamed, documented, tested,...
 \dontshow{
