@@ -1421,15 +1421,15 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 		*psuper = (int *) L->super,
 		*ppi = (int *) L->pi,
 		*ppx = (int *) L->px;
-	    double *px = (double *) L->x, *py;
+	    double *px = (double *) L->x, *px_;
 	    R_xlen_t nr1a;
 	    for (k = 0; k < nsuper; ++k) {
 		nc = psuper[k+1] - psuper[k];
 		nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
-		py = px + ppx[k];
+		px_ = px + ppx[k];
 		for (j = 0; j < nc; ++j) {
-		    modulus += log(*py);
-		    py += nr1a;
+		    modulus += log(*px_);
+		    px_ += nr1a;
 		}
 	    }
 	} else {
@@ -2202,6 +2202,47 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
     SET_SLOT(a, Matrix_xSym, ax);
     UNPROTECT(nprotect); /* ax, adim, a, yx, p, beta, V */
     return a;
+}
+
+SEXP CHMfactor_diag_get(SEXP obj, SEXP square)
+{
+    cholmod_factor *L = mf2cholmod(obj);
+    int n = (int) L->n, square_ = asLogical(square);
+    SEXP y = PROTECT(allocVector(REALSXP, n));
+    double *py = REAL(y);
+    if (L->is_super) {
+	int k, j, nc,
+	    nsuper = (int) L->nsuper,
+	    *psuper = (int *) L->super,
+	    *ppi = (int *) L->pi,
+	    *ppx = (int *) L->px;
+	double *px = (double *) L->x, *px_;
+	R_xlen_t nr1a;
+	for (k = 0; k < nsuper; ++k) {
+	    nc = psuper[k+1] - psuper[k];
+	    nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
+	    px_ = px + ppx[k];
+	    for (j = 0; j < nc; ++j) {
+		*py = *px_;
+		if (square_)
+		    *py *= *py;
+		++py;
+		px_ += nr1a;
+	    }
+	}
+    } else {
+	square_ = square_ && L->is_ll;
+	int j, *pp = (int *) L->p;
+	double *px = (double *) L->x;
+	for (j = 0; j < n; ++j) {
+	    *py = px[pp[j]];
+	    if (square_)
+		*py *= *py;
+	    ++py;
+	}
+    }
+    UNPROTECT(1);
+    return y;
 }
 
 SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
