@@ -26,25 +26,20 @@
 %
 \description{
   Computes the pivoted Cholesky factorization of an
-  \eqn{n \times n}{n-by-n} real, symmetric, positive definite
-  (for \code{LDL = TRUE})
-  matrix \eqn{A}, which has the general form
-  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
+  \eqn{n \times n}{n-by-n} real, symmetric matrix \eqn{A},
+  which has the general form
+  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 = P1' * L * L' * P1}
+  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} \overset{D_{jj} \ge 0}{=} P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
-  \eqn{P_1}{P1} is a permutation matrix,
-  \eqn{L_1}{L1} is a unit lower triangular matrix,
-  \code{D} is a non-negative (if \eqn{A} is positive-(semi)definite)
-  diagonal matrix, and in the pos.def case,
+  \eqn{P_{1}}{P1} is a permutation matrix,
+  \eqn{L_{1}}{L1} is a unit lower triangular matrix,
+  \eqn{D} is a diagonal matrix, and
   \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
-
-  Those formulas/equations above involving \eqn{L} apply only in the case
-  \eqn{A} \emph{is} positive semi-definite, whereas those involving \eqn{D}
-  and \eqn{L_1}{L1} apply more generally.  In these cases, \eqn{D} may have
-  negative entries.
-  % FIXME: add an example; FIXME(2): why do zero entries not work?
-
+  The second equalities hold only for positive semidefinite \eqn{A},
+  for which the diagonal entries of \eqn{D} are non-negative
+  and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
+  
   Methods for \code{\linkS4class{denseMatrix}} are built on
   LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
   not permute rows or columns, so that \eqn{P_{1}}{P1} is an
@@ -66,10 +61,12 @@ Cholesky(A, \dots)
 }
 \arguments{
   \item{A}{a \link[=is.finite]{finite}, symmetric, positive definite
-    (if \code{LDL=TRUE})
     matrix or \code{\linkS4class{Matrix}} to be factorized.
     If \code{x} is square but not symmetric, then it will be
-    \emph{treated} as symmetric; see \code{uplo}.}
+    \emph{treated} as symmetric; see \code{uplo}.
+    Methods for sparse \code{A} allow \code{A} to be indefinite
+    when \code{LDL = TRUE}, but still signal an error for \code{A}
+    found to be exactly singular.}
   \item{perm}{a logical indicating if a fill-reducing
     permutation of the rows and columns of \eqn{A} should be used.
     If \code{TRUE}, then the approximate minimum degree (AMD)
@@ -92,8 +89,12 @@ Cholesky(A, \dots)
     algorithm.  Setting \code{super = NA} leaves the choice to
     a CHOLMOD-internal heuristic.}
   \item{Imult}{a \link[=is.finite]{finite} number. The matrix
-    that is factorized is \code{A+Imult*diag(nrow(A))},
-    i.e., \code{A} plus \code{Imult} times the identity matrix.}
+    that is factorized is \code{A + Imult * diag(nrow(A))},
+    i.e., \code{A} plus \code{Imult} times the identity matrix.
+    This argument is useful for symmetric, indefinite \code{A},
+    as \code{Imult > max(rowSums(abs(A)) - diag(abs(A)))} ensures
+    that \code{A + Imult * diag(nrow(A))} is diagonally dominant.
+    (Symmetric, diagonally dominant matrices are positive definite.)}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{A} should be used
     to compute the factorization.  The default is \code{"U"},
@@ -122,9 +123,9 @@ Cholesky(A, \dots)
   consider using \code{\link{chol}}, whose methods are simple wrappers
   around \code{Cholesky} returning the upper triangular Cholesky factor
   \eqn{L'}, typically as a \code{\linkS4class{triangularMatrix}}.
-  An alternative is to pass the result to \code{\link{expand2}}
-  or (but only in the sparse case; see \code{\linkS4class{CHMfactor}})
-  to coerce it with \code{as(., "dtCMatrix")} or \code{as(., "pMatrix")}.
+  An alternative is to pass the result to \code{\link{expand2}} or
+  (but only in the sparse case; see \code{\linkS4class{CHMfactor}})
+  to coerce with \code{as(., "CsparseMatrix")} or \code{as(., "pMatrix")}.
 }
 \seealso{
   Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
