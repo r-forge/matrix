@@ -182,7 +182,8 @@ isLDL(x)
       or its logarithm.}
     \item{\code{diag}}{\code{signature(x = "CHMfactor")}:
       returns a numeric vector of length \eqn{n} containing
-      the diagonal elements of \eqn{D}.}
+      the diagonal elements of \eqn{D}, which are the squared
+      diagonal elements of \eqn{L}.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
@@ -214,7 +215,8 @@ isLDL(x)
 \seealso{
   Class \code{\linkS4class{dsCMatrix}}.
   
-  Generic functions \code{\link{expand2}} and \code{\link{Cholesky}}.
+  Generic functions \code{\link{expand2}}, \code{\link{updown}},
+  and \code{\link{Cholesky}}.
 }
 \examples{% most are in ./Cholesky.Rd
 ## An example for the expand() method

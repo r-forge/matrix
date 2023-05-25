@@ -162,7 +162,7 @@ static cholmod_factor *mf2cholmod(SEXP obj)
     L->is_super = ptype[2];
     
     L->n = (size_t) INTEGER(dim)[0];
-    L->minor = L->n;
+    L->minor = L->n; /* FIXME: could be wrong for obj <- new(...) */
     L->ColCount = INTEGER(colcount);
     
     if (L->ordering != CHOLMOD_NATURAL) {
@@ -237,22 +237,15 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	if (L->n == INT_MAX)
 	    error(_("n+1 would overflow \"integer\""));
     }
-
-    size_t minor = L->minor;
-    if (minor == L->n && !L->is_super && !L->is_ll) {
-	/* cholmod_rowfac allows  P A P' = L D L'  with negative D[i,i]
-	   but we do not (for now) ...
-	*/
-	int *pp = (int *) L->p;
-	double *px = (double *) L->x;
-	for (minor = 0; minor < L->n; ++minor)
-	    if (px[pp[minor]] <= 0.0)
-		break;
+    if (L->minor < L->n) {
+	if (L->is_ll)
+	    error(_("leading minor of order %d is not positive definite"),
+		  (int) L->minor + 1);
+	else
+	    error(_("matrix is exactly singular, D[i,i]=0, i=%d"),
+		  (int) L->minor + 1);
     }
-    if (minor < L->n)
-	error(_("leading minor of order %d is not positive definite"),
-	      (int) minor + 1);
-    
+
     SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(
 			   (L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
 	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
@@ -1432,14 +1425,26 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 		    px_ += nr1a;
 		}
 	    }
+	    modulus *= 2.0;
 	} else {
 	    int j, *pp = (int *) L->p;
 	    double *px = (double *) L->x;
-	    for (j = 0; j < n; ++j)
-		modulus += log(px[pp[j]]);
+	    if (L->is_ll) {
+		for (j = 0; j < n; ++j)
+		    modulus += log(px[pp[j]]);
+		modulus *= 2.0;
+	    } else {
+		for (j = 0; j < n; ++j) {
+		    if (px[pp[j]] < 0.0) {
+			modulus += log(-px[pp[j]]);
+			sign = -sign;
+		    } else {
+			/* incl. 0, NaN cases */
+			modulus += log(px[pp[j]]);
+		    }
+		}
+	    }
 	}
-	if (L->is_ll)
-	    modulus *= 2.0;
     }
     return mkDet(modulus, givelog, sign);
 }

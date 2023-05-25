@@ -230,8 +230,8 @@ ev <- eigen(mpn, only.values = TRUE)$values
 round(ev, 3) # 139.8 3.059 0.268 -0.008 -0.140 -3.357 -317.6
 plot(ev, type="b"); abline(h=0, lty=3)
 Cpn <- Cholesky(mpn)
-expand(Cpn) # Warning: 'L' not positive definite
-## and indeed,  L matrix has [p]ositive and [n]egative diagonal entries
+diag(Cpn) # D matrix has [p]ositive and [n]egative diagonal elements
+try(expand(Cpn)) # cannot compute L = L1 sqrt(D)
 (mp. <- as(Reduce(`\%*\%`, expand2(Cpn)), "symmetricMatrix"))
 ## looks quite similar as mpn  *but* does differ (!)
 
