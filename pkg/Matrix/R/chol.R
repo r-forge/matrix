@@ -207,10 +207,6 @@ rm(.def.unpacked, .def.packed)
 ## METHODS FOR CLASS: CHMfactor
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("diag", signature(x = "CHMfactor"),
-          function(x, nrow, ncol, names)
-              .Call(CHMfactor_diag_get, x, TRUE))
-
 .CHM.is.perm <- function(x)
     !as.logical(x@type[1L])
 .CHM.is.LDL <- function(x)
@@ -243,11 +239,19 @@ setAs("CHMsimpl", "dtCMatrix",
 setAs("CHMsimpl", "CsparseMatrix",
       function(from) {
           to <- as(from, "dtCMatrix")
-          if(.CHM.is.LDL(from)) {
-              L.ii <- sqrt(diag(to, names = FALSE))
+          if(from@Dim[1L] > 0L && .CHM.is.LDL(from)) {
+              L.ii <- diag(to, names = FALSE)
               L.p <- to@p
+              if(anyNA(L.ii))
+                  stop(gettextf("D[i,i] is NA, i=%d",
+                                which.max(is.na(L.ii))),
+                       domain = NA)
+              if(min(L.ii) < 0)
+                  stop(gettextf("D[i,i] is negative, i=%d",
+                                which.max(L.ii < 0)),
+                       domain = NA)
               diag(to) <- 1
-              to@x <- to@x * rep.int(L.ii, L.p[-1L] - L.p[-length(L.p)])
+              to@x <- to@x * rep.int(sqrt(L.ii), L.p[-1L] - L.p[-length(L.p)])
           }
           to
       })
@@ -307,6 +311,14 @@ setMethod("expand2", signature(x = "CHMsimpl"),
               L.ii <- diag(L, names = FALSE)
               L.p <- L@p
               if(!LDL) {
+                  if(anyNA(L.ii))
+                      stop(gettextf("D[i,i] is NA, i=%d",
+                                    which.max(is.na(L.ii))),
+                           domain = NA)
+                  if(min(L.ii) < 0)
+                      stop(gettextf("D[i,i] is negative, i=%d",
+                                    which.max(L.ii < 0)),
+                           domain = NA)
                   diag(L) <- 1
                   L@x <- L@x * rep.int(sqrt(L.ii), L.p[-1L] - L.p[-length(L.p)])
                   return(list(P1. = P., L = L, L. = t(L), P1 = P))
@@ -322,6 +334,10 @@ setMethod("expand2", signature(x = "CHMsimpl"),
               }
               list(P1. = P., L1 = L, D = D, L1. = t(L), P1 = P)
           })
+
+setMethod("diag", signature(x = "CHMfactor"),
+          function(x, nrow, ncol, names)
+              .Call(CHMfactor_diag_get, x, TRUE))
 
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)

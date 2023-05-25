@@ -1617,14 +1617,17 @@ SEXP dCHMsimpl_validate(SEXP obj)
     if (XLENGTH(x) != pp[n])
 	UPRET(2, "'x' slot does not have length p[length(p)]");
 
-    int j;
-    double *pu = REAL(x);
-
-    /* Non-negative diagonal elements are necessary _and_ sufficient */
-    for (j = 0; j < n; ++j)
-	if (!ISNAN(pu[pp[j]]) && pu[pp[j]] < 0.0)
-	    UPRET(2, "Cholesky factor has negative diagonal elements");
-    UNPROTECT(2); /* p, x */
+    SEXP type = PROTECT(GET_SLOT(obj, install("type")));
+    if (INTEGER(type)[1]) {
+	int j;
+	double *px = REAL(x);
+	
+	/* Non-negative diagonal elements are necessary _and_ sufficient */
+	for (j = 0; j < n; ++j)
+	    if (!ISNAN(px[pp[j]]) && px[pp[j]] < 0.0)
+		UPRET(3, "Cholesky factor has negative diagonal elements");
+    }
+    UNPROTECT(3); /* type, p, x */
     
     return ScalarLogical(1);
 }
