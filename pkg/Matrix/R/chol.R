@@ -207,6 +207,10 @@ rm(.def.unpacked, .def.packed)
 ## METHODS FOR CLASS: CHMfactor
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("diag", signature(x = "CHMfactor"),
+          function(x, nrow, ncol, names)
+              .Call(CHMfactor_diag_get, x, TRUE))
+
 .CHM.is.perm <- function(x)
     !as.logical(x@type[1L])
 .CHM.is.LDL <- function(x)

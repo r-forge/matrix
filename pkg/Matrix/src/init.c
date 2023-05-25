@@ -292,6 +292,7 @@ static R_CallMethodDef CallEntries[] = {
 
     CALLDEF(sparseQR_matmult, 5),
 
+    CALLDEF(CHMfactor_diag_get, 2),
     CALLDEF(CHMfactor_update, 3),
     CALLDEF(CHMfactor_updown, 3),
     

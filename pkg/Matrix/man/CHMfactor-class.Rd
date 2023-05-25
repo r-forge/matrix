@@ -22,6 +22,7 @@
 \alias{coerce,CHMsuper,CsparseMatrix-method}
 \alias{coerce,CHMsuper,dgCMatrix-method}
 \alias{determinant,CHMfactor,logical-method}
+\alias{diag,CHMfactor-method}
 \alias{update,CHMfactor-method}
 %
 \alias{isLDL}
@@ -179,6 +180,9 @@ isLDL(x)
     \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
+    \item{\code{diag}}{\code{signature(x = "CHMfactor")}:
+      returns a numeric vector of length \eqn{n} containing
+      the diagonal elements of \eqn{D}.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
