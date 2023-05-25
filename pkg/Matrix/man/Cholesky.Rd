@@ -232,7 +232,7 @@ plot(ev, type="b"); abline(h=0, lty=3)
 Cpn <- Cholesky(mpn)
 expand(Cpn) # Warning: 'L' not positive definite
 ## and indeed,  L matrix has [p]ositive and [n]egative diagonal entries
-(mp. <- as(Reduce(`%*%`, expand2(Cpn)), "symmetricMatrix"))
+(mp. <- as(Reduce(`\%*\%`, expand2(Cpn)), "symmetricMatrix"))
 ## looks quite similar as mpn  *but* does differ (!)
 
 %% --> ../TODO : .diag.dsC() should be renamed, documented, tested,...
