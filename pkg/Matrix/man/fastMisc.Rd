@@ -192,13 +192,13 @@
     This computes (or uses if \code{Chx} is specified) the Cholesky
     factorization of \code{x} as \eqn{L D L'} in order to calculate
     one of several statistics from the diagonal entries of \eqn{D}.
-    See \code{res.kind} in Arguments.
+    See \code{res.kind} under \sQuote{Arguments}.
   }
   \subsection{\code{.solve.dgC.*(a, b)}}{
     \code{.solve.dgC.lu(a, b)} needs a square matrix \code{a}.
     \code{.solve.dgC.qr(a, b)} needs a \dQuote{long} matrix \code{a},
     with \code{nrow(a) >= ncol(a)}.
-    \code{.solve.dgC.chol(a, b)} needs a symmetric positive definite
+    \code{.solve.dgC.chol(a, b)} needs a symmetric, positive definite
     matrix \code{a}.
     
     All three may be used to solve sparse systems directly.
@@ -207,13 +207,12 @@
   }
   \subsection{\code{.updateCHMfactor(object, parent, mult)}}{
     This updates \code{object} with the result of Cholesky factorizing
-    \code{F(parent)+mult*diag(nrow(parent))}, i.e., \code{F(parent)}
-    plus \code{mult} times the identity matrix, where the
-    nonzero pattern of \code{F(parent)} must match that of \code{S}
-    if \code{object = Cholesky(S, ...)}.
-    
-    If \code{parent} is a \code{dsCMatrix}, then \code{F = identity}.
-    If \code{parent} is a \code{dgCMatrix}, then \code{F = tcrossprod}.
+    \code{F(parent) + mult * diag(nrow(parent))}, i.e.,
+    \code{F(parent)} plus \code{mult} times the identity matrix,
+    where \code{F = identity} if \code{parent} is a \code{dsCMatrix}
+    and \code{F = tcrossprod} if \code{parent} is a \code{dgCMatrix}.
+    The nonzero pattern of \code{F(parent)} must match
+    that of \code{S} if \code{object = Cholesky(S, ...)}.
   }
 }
 \examples{

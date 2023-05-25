@@ -29,24 +29,27 @@
 %
 \description{
   \code{CHMfactor} is the virtual class of sparse Cholesky
-  factorizations of \eqn{n \times n}{n-by-n} real, symmetric,
-  positive semidefinite matrices, having the general form
-  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
+  factorizations of \eqn{n \times n}{n-by-n} real, symmetric
+  matrices \eqn{A}, having the general form
+  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} = P_{1}' L L' P_{1}}{A = P1' * L1 * D * L1' * P1 = P1' * L * L' * P1}
+  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} \overset{D_{jj} \ge 0}{=} P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
   \eqn{P_{1}}{P1} is a permutation matrix,
-  \eqn{L_{1}} is a unit lower triangular matrix,
-  \code{D} is a non-negative diagonal matrix, and
+  \eqn{L_{1}}{L1} is a unit lower triangular matrix,
+  \eqn{D} is a diagonal matrix, and
   \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
-
+  The second equalities hold only for positive semidefinite \eqn{A},
+  for which the diagonal entries of \eqn{D} are non-negative
+  and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
+  
   The implementation of class \code{CHMfactor} is based on
-  CHOLMOD's C-level \code{cholmod_factor_struct}. Virtual
+  CHOLMOD's C-level \code{cholmod_factor_struct}.  Virtual
   subclasses \code{CHMsimpl} and \code{CHMsuper} separate
   the simplicial and supernodal variants.  These have nonvirtual
-  subclasses \code{[dn]CHMsimpl} and \code{[dn]CHMsuper}, where
-  prefix \samp{d} and prefix \samp{n} are reserved for numeric
-  and symbolic factorizations, respectively.
+  subclasses \code{[dn]CHMsimpl} and \code{[dn]CHMsuper},
+  where prefix \samp{d} and prefix \samp{n} are reserved
+  for numeric and symbolic factorizations, respectively.
 }
 \usage{
 isLDL(x)
