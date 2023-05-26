@@ -48,9 +48,9 @@
       indicating which triangle (upper or lower) of the factorized
       symmetric matrix was used to compute the factorization and
       in turn how the \code{x} slot is partitioned.}
-    \item{\code{x}}{a numeric vector of length
-      \code{n*n} (\code{BunchKaufman}) or
-      \code{n*(n+1)/2} (\code{pBunchKaufman}), where \code{n=Dim[1]}.
+    \item{\code{x}}{a numeric vector of length \code{n*n}
+      (\code{BunchKaufman}) or \code{n*(n+1)/2} (\code{pBunchKaufman}),
+      where \code{n=Dim[1]}.
       The details of the representation are specified by the manual
       for LAPACK routines \code{dsytrf} and \code{dsptrf}.}
     \item{\code{perm}}{an integer vector of length \code{n=Dim[1]}
@@ -92,20 +92,17 @@
   \code{\linkS4class{dtrMatrix}} and class \code{pBunchKaufman} extended
   \code{\linkS4class{dtpMatrix}}, reflecting the fact that the internal
   representation of the factorization is fundamentally triangular:
-  there are \code{n*(n+1)/2} \dQuote{parameters}, and these can be
-  arranged systematically to form a \code{n}-by-\code{n} triangular
-  matrix.
-
-  \pkg{Matrix} 1.5-5 removed these extensions so that
-  \code{BunchKaufman} and \code{pBunchKaufman} would no longer inherit
-  methods from \code{dtrMatrix} and \code{dtpMatrix}.  The availability
-  of such methods gave the wrong impression that \code{BunchKaufman}
-  and \code{pBunchKaufman} represent proper dense triangular matrices,
-  when in fact they represent multiple sparse matrix factors, not all
-  triangular, in a dense format.
+  there are \eqn{n(n+1)/2}{n*(n+1)/2} \dQuote{parameters}, and these
+  can be arranged systematically to form an \eqn{n \times n}{n-by-n}
+  triangular matrix.
+  \pkg{Matrix} \code{1.5-5} removed these extensions so that methods
+  would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.  
+  The availability of such methods gave the wrong impression that
+  \code{BunchKaufman} and \code{pBunchKaufman} represent proper matrices, 
+  when in fact they represent an ordered set of matrix factors.
   
-  The coercions \code{as(., "triangularMatrix")} are provided for users
-  who understand these caveats.
+  The coercions \code{as(., "dtrMatrix")} and \code{as(., "dtpMatrix")}
+  are provided for users who understand the caveats.
 }
 \seealso{
   Class \code{\linkS4class{dsyMatrix}} and its packed counterpart.
