@@ -594,6 +594,42 @@ setClass("sparseQR", contains = "QR",
 	 validity = function(object) .Call(sparseQR_validate, object))
 
 
+## ------ Bunch-Kaufman ------------------------------------------------
+
+setClass("BunchKaufmanFactorization",
+         contains = c("MatrixFactorization", "VIRTUAL"))
+
+## Inherit most aspects of dt[rp]Matrix without extending them
+
+setClass("BunchKaufman", contains = "BunchKaufmanFactorization",
+	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
+	 validity = function(object) {
+             object. <- new("dtrMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(BunchKaufman_validate, object)
+         })
+
+setClass("pBunchKaufman", contains = "BunchKaufmanFactorization",
+	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
+	 validity = function(object) {
+             object. <- new("dtpMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(pBunchKaufman_validate, object)
+         })
+
+
 ## ------ Cholesky -----------------------------------------------------
 
 setClass("CholeskyFactorization",
@@ -602,11 +638,43 @@ setClass("CholeskyFactorization",
 
 ## ...... Dense ........................................................
 
+if(TRUE) {
 setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"),
          validity = function(object) .Call(Cholesky_validate, object))
 
 setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
          validity = function(object) .Call(pCholesky_validate, object))
+} else {
+## Inherit most aspects of dt[rp]Matrix without extending them
+
+setClass("Cholesky", contains = "CholeskyFactorization",
+         slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
+	 validity = function(object) {
+             object. <- new("dtrMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(Cholesky_validate, object)
+         })
+
+setClass("pCholesky", contains = "CholeskyFactorization",
+         slots = c(uplo = "character", x = "numeric", perm = "integer"),
+         prototype = list(uplo = "U"),
+	 validity = function(object) {
+             object. <- new("dtpMatrix")
+             object.@Dim <- object@Dim
+             object.@Dimnames <- object@Dimnames
+             object.@uplo <- object@uplo
+             object.@x <- object@x
+             if(is.character(valid <- validObject(object., test = TRUE)))
+                 valid
+             else .Call(pCholesky_validate, object)
+         })
+}
 
 
 ## ...... Sparse .......................................................
@@ -647,42 +715,6 @@ setClass("nCHMsuper", contains = "CHMsuper") # symbolic factorization
 setClass("dCHMsuper", contains = "CHMsuper",
          slots = c(x = "numeric"),
          validity = function(object) .Call(dCHMsuper_validate, object))
-
-
-## ------ Bunch-Kaufman ------------------------------------------------
-
-setClass("BunchKaufmanFactorization",
-         contains = c("MatrixFactorization", "VIRTUAL"))
-
-## Inherit most aspects of dt[rp]Matrix without extending them
-
-setClass("BunchKaufman", contains = "BunchKaufmanFactorization",
-	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
-         prototype = list(uplo = "U"),
-	 validity = function(object) {
-             object. <- new("dtrMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(BunchKaufman_validate, object)
-         })
-
-setClass("pBunchKaufman", contains = "BunchKaufmanFactorization",
-	 slots = c(uplo = "character", x = "numeric", perm = "integer"),
-         prototype = list(uplo = "U"),
-	 validity = function(object) {
-             object. <- new("dtpMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(pBunchKaufman_validate, object)
-         })
 
 
 ## ------ Schur --------------------------------------------------------
