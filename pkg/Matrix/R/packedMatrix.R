@@ -83,11 +83,14 @@ setMethod("isDiagonal", signature(object = "packedMatrix"), .pM.is.di)
 rm(.pM.is.sy, .pM.is.sy.dz, .pM.is.tr, .pM.is.di, .cl)
 
 setMethod("t", signature(x = "packedMatrix"),
-          function(x) .Call(packedMatrix_transpose, x))
+          function(x)
+              .Call(packedMatrix_transpose, x))
 setMethod("diag", signature(x = "packedMatrix"),
-          function(x, nrow, ncol, names) .Call(packedMatrix_diag_get, x, names))
+          function(x, nrow, ncol, names = TRUE)
+              .Call(packedMatrix_diag_get, x, names))
 setMethod("diag<-", signature(x = "packedMatrix"),
-          function(x, value) .Call(packedMatrix_diag_set, x, value))
+          function(x, value)
+              .Call(packedMatrix_diag_set, x, value))
 
 setMethod("symmpart", signature(x = "packedMatrix"),
           function(x) .Call(packedMatrix_symmpart, x))
