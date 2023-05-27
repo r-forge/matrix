@@ -35,6 +35,9 @@ void set_factor(SEXP obj, const char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
+void rowPerm(double *x, int m, int n, int *p, int off, int invert);
+void symPerm(double *x, int n, char uplo, int *p, int off, int invert);
+
 int isPerm(const int *p, int n, int off);
 int signPerm(const int *p, int n, int off);
 void invertPerm(const int *p, int *ip, int n, int off, int ioff);

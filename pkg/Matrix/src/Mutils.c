@@ -452,23 +452,141 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 
 /* For permutations ================================================= */
 
+/* Poor man's C translation of LAPACK dswap */
+static void dswap(int n, double *x, int incx, double *y, int incy)
+{
+    double tmp;
+    while (n--) {
+	tmp = *x;
+	*x = *y;
+	*y = tmp;
+	x += incx;
+	y += incy;
+    }
+    return;
+}
+
+/* Poor man's C translation of LAPACK dsyswapr */
+static void dsyswapr(char uplo, int n, double *x, int k0, int k1)
+{
+    double tmp, *x0 = x + (R_xlen_t) k0 * n, *x1 = x + (R_xlen_t) k1 * n;
+    if (uplo == 'U') {
+	dswap(k0, x0, 1, x1, 1);
+	tmp = x0[k0];
+	x0[k0] = x1[k1];
+	x1[k1] = tmp;
+	dswap(k1 - k0 - 1, x0 + k0 + n, n, x1 + k0 + 1, 1);
+	dswap(n - k1 - 1, x1 + k0 + n, n, x1 + k1 + n, n);
+    } else {
+	dswap(k0, x + k0, n, x + k1, n);
+	tmp = x0[k0];
+	x0[k0] = x1[k1];
+	x1[k1] = tmp;
+	dswap(k1 - k0 - 1, x0 + k0 + 1, 1, x0 + k1 + n, n);
+	dswap(n - k1 - 1, x0 + k1 + 1, 1, x1 + k1 + 1, 1);
+    }
+    return;
+}
+
+void rowPerm(double *x, int m, int n, int *p, int off, int invert)
+{
+    int i, k0, k1;
+    for (i = 0; i < m; ++i)
+	p[i] = -(p[i] - off + 1);
+    if (!invert) {
+	for (i = 0; i < m; ++i) {
+	    if (p[i] > 0)
+		continue;
+	    k0 = i;
+	    p[k0] = -p[k0];
+	    k1 = p[k0] - 1;
+	    while (p[k1] < 0) {
+		dswap(n, x + k0, m, x + k1, m);
+		k0 = k1;
+		p[k0] = -p[k0];
+		k1 = p[k0] - 1;
+	    }
+	}
+    } else {
+	for (i = 0; i < m; ++i) {
+	    if (p[i] > 0)
+		continue;
+	    k0 = i;
+	    p[k0] = -p[k0];
+	    k1 = p[k0] - 1;
+	    while (k1 != k0) {
+		dswap(n, x + k0, m, x + k1, m);
+		p[k1] = -p[k1];
+		k1 = p[k1] - 1;
+	    }
+	}
+    }
+    for (i = 0; i < m; ++i)
+	p[i] = p[i] + off - 1;
+    return;
+}
+
+void symPerm(double *x, int n, char uplo, int *p, int off, int invert)
+{
+    int i, k0, k1;
+    for (i = 0; i < n; ++i)
+	p[i] = -(p[i] - off + 1);
+    if (!invert) {
+	for (i = 0; i < n; ++i) {
+	    if (p[i] > 0)
+		continue;
+	    k0 = i;
+	    p[k0] = -p[k0];
+	    k1 = p[k0] - 1;
+	    while (p[k1] < 0) {
+		if (k0 < k1)
+		    dsyswapr(uplo, n, x, k0, k1);
+		else
+		    dsyswapr(uplo, n, x, k1, k0);
+		k0 = k1;
+		p[k0] = -p[k0];
+		k1 = p[k0] - 1;
+	    }
+	}
+    } else {
+	for (i = 0; i < n; ++i) {
+	    if (p[i] > 0)
+		continue;
+	    k0 = i;
+	    p[k0] = -p[k0];
+	    k1 = p[k0] - 1;
+	    while (k1 != k0) {
+		if (k0 < k1)
+		    dsyswapr(uplo, n, x, k0, k1);
+		else
+		    dsyswapr(uplo, n, x, k1, k0);
+		p[k1] = -p[k1];
+		k1 = p[k1] - 1;
+	    }
+	}
+    }
+    for (i = 0; i < n; ++i)
+	p[i] = p[i] + off - 1;
+    return;
+}
+
 int isPerm(const int *p, int n, int off)
 {
+    int res = 1;
     if (n <= 0)
-	return 1;
+	return res;
     int i, j;
     char *work;
     Matrix_Calloc(work, n, char);
     for (i = 0; i < n; ++i) {
-	if (p[i] == NA_INTEGER)
-	    return 0;
-	j = p[i] - off;
-	if (j < 0 || j >= n || work[j])
-	    return 0;
+	if (p[i] == NA_INTEGER || (j = p[i] - off) < 0 || j >= n || work[j]) {
+	    res = 0;
+	    break;
+	}
 	work[j] = 1;
     }
     Matrix_Free(work, n);
-    return 1;
+    return res;
 }
 
 int signPerm(const int *p, int n, int off)
