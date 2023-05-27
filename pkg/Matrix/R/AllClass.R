@@ -552,7 +552,7 @@ setMethod("initialize", "MatrixFactorization", .initialize)
 
 setClass("LU", contains = c("MatrixFactorization", "VIRTUAL"))
 
-## Inherit most aspects of dgeMatrix without formally extending it:
+## Inherit most aspects of dgeMatrix without extending it
 
 setClass("denseLU", contains = "LU",
 	 slots = c(x = "numeric", perm = "integer"),
