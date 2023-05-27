@@ -1,13 +1,12 @@
 ## METHODS FOR CLASS: dppMatrix
-## dense (packed) symmetric positive definite matrices
+## dense (packed) symmetric positive semidefinite matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .dsp2dpp <- function(from) {
-    if(is.null(tryCatch(.Call(dppMatrix_trf, from, 2L),
-                        error = function(e) NULL)))
-        stop("not a positive definite matrix")
+    if(is.null(tryCatch(Cholesky(from), error = function(e) NULL)))
+        stop("not a positive semidefinite matrix")
     ## FIXME: check=FALSE
     copyClass(from, "dppMatrix",
               sNames = c("Dim", "Dimnames", "uplo", "x", "factors"))

@@ -82,7 +82,7 @@ setMethod("Cholesky", signature(A = "diagonalMatrix"),
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
           function(A, ...)
-              .Call(dpoMatrix_trf, A, 2L))
+              .Call(dpoMatrix_trf, A, 2L, FALSE, -1))
 
 setMethod("Cholesky", signature(A = "dspMatrix"),
           function(A, ...)
