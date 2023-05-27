@@ -239,10 +239,10 @@ static SEXP cholmod2mf(const cholmod_factor *L)
     }
     if (L->minor < L->n) {
 	if (L->is_ll)
-	    error(_("leading minor of order %d is not positive definite"),
+	    error(_("leading principal minor of order %d is nonpositive"),
 		  (int) L->minor + 1);
 	else
-	    error(_("leading minor of order %d is exactly singular"),
+	    error(_("leading principal minor of order %d is zero"),
 		  (int) L->minor + 1);
     }
     
@@ -338,12 +338,12 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	ERROR_LAPACK_1(_ROUTINE_, _INFO_);				\
 	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
 	    if (_WARN_ > 1)						\
-		error  (_("LAPACK routine '%s': leading minor of order %d " \
-			  "is not positive definite"),			\
+		error  (_("LAPACK routine '%s': leading principal minor "\
+			  "of order %d is nonpositive"),		\
 			#_ROUTINE_, (_INFO_));				\
 	    else {							\
-		warning(_("LAPACK routine '%s': leading minor of order %d " \
-			  "is not positive definite"),			\
+		warning(_("LAPACK routine '%s': leading principal minor "\
+			  "of order %d is nonpositive"),		\
 			#_ROUTINE_, (_INFO_));				\
 		UNPROTECT(_NPROTECT_);					\
 		return ScalarInteger(_INFO_);				\
