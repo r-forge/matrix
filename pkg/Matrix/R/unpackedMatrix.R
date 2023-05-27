@@ -211,7 +211,7 @@ setMethod("t", signature(x = "unpackedMatrix"),
           function(x)
               .Call(unpackedMatrix_transpose, x))
 setMethod("diag", signature(x = "unpackedMatrix"),
-          function(x, nrow, ncol, names)
+          function(x, nrow, ncol, names = TRUE)
               .Call(unpackedMatrix_diag_get, x, names))
 setMethod("diag<-", signature(x = "unpackedMatrix"),
           function(x, value)

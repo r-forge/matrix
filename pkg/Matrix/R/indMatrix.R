@@ -323,7 +323,7 @@ setMethod("t", signature(x = "indMatrix"),
           })
 
 setMethod("diag", signature(x = "indMatrix"),
-          function(x, nrow, ncol, names) {
+          function(x, nrow, ncol, names = TRUE) {
               if((m <- min(x@Dim)) == 0L)
                   return(logical(0L))
               i <- seq_len(m)

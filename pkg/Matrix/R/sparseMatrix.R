@@ -1220,8 +1220,10 @@ forceSymmetricTsparse <- function(x, uplo) {
 }
 } ## MJ
 
-.sparse.diag.get <- function(x, nrow, ncol, names) .Call(R_sparse_diag_get, x, names)
-.sparse.diag.set <- function(x, value) .Call(R_sparse_diag_set, x, value)
+.sparse.diag.get <- function(x, nrow, ncol, names = TRUE)
+    .Call(R_sparse_diag_get, x, names)
+.sparse.diag.set <- function(x, value)
+    .Call(R_sparse_diag_set, x, value)
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0,  ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0,  ...) .Call(R_sparse_band, x, NULL, k)
