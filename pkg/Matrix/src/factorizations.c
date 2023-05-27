@@ -242,10 +242,10 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	    error(_("leading minor of order %d is not positive definite"),
 		  (int) L->minor + 1);
 	else
-	    error(_("matrix is exactly singular, D[i,i]=0, i=%d"),
+	    error(_("leading minor of order %d is exactly singular"),
 		  (int) L->minor + 1);
     }
-
+    
     SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(
 			   (L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
 	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),

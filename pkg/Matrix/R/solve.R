@@ -384,19 +384,25 @@ setMethod("solve", signature(a = "dgCMatrix", b = "sparseMatrix"),
 
 setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
 	  function(a, b, sparse = TRUE, ...) {
-              trf <- Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE)
+              trf <- tryCatch(
+                  Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
+                  error = function(e) lu(a, errSing = TRUE))
               solve(trf, sparse = sparse, ...)
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
 	  function(a, b, ...) {
-              trf <- Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE)
+              trf <- tryCatch(
+                  Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
+                  error = function(e) lu(a, errSing = TRUE))
               solve(trf, b, ...)
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 	  function(a, b, sparse = FALSE, ...) {
-              trf <- Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE)
+              trf <- tryCatch(
+                  Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
+                  error = function(e) lu(a, errSing = TRUE))
               if(is.na(sparse) || sparse)
                   b <- .m2sparse(b, "dgC")
               solve(trf, b, ...)
@@ -404,7 +410,9 @@ setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
 
 setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
 	  function(a, b, sparse = FALSE, ...) {
-              trf <- Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE)
+              trf <- tryCatch(
+                  Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
+                  error = function(e) lu(a, errSing = TRUE))
               if(is.na(sparse) || sparse)
                   b <- as(b, "CsparseMatrix")
               solve(trf, b, ...)
@@ -412,7 +420,9 @@ setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
 
 setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
 	  function(a, b, sparse = TRUE, ...) {
-              trf <- Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE)
+              trf <- tryCatch(
+                  Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
+                  error = function(e) lu(a, errSing = TRUE))
               if(!(is.na(sparse) || sparse))
                   b <- as(b, "unpackedMatrix")
               solve(trf, b, ...)
