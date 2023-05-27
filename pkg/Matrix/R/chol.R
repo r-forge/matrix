@@ -47,8 +47,8 @@ setMethod("chol", signature(x = .cl),
 setMethod("chol", signature(x = "ddiMatrix"),
           function(x, ...) {
               if(length(y <- x@x)) {
-                  if(is.na(min.y <- min(y)) || min.y <= 0)
-                      stop("chol(x) is undefined: 'x' is not positive definite")
+                  if(is.na(min.y <- min(y)) || min.y < 0)
+                      stop("chol(x) is undefined: 'x' is not positive semidefinite")
                   x@x <- sqrt(y)
               }
               x
@@ -103,8 +103,8 @@ setMethod("Cholesky", signature(A = "dsTMatrix"),
 
 setMethod("Cholesky", signature(A = "ddiMatrix"),
           function(A, ...) {
-              if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y <= 0))
-                  stop("Cholesky(A) is undefined: 'A' is not positive definite")
+              if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y < 0))
+                  stop("Cholesky(A) is undefined: 'A' is not positive semidefinite")
               n <- (d <- A@Dim)[1L]
               r <- new("dCHMsimpl")
               r@Dim <- d
@@ -162,6 +162,7 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
 ## where  A = L L' = L1 D L1'  and  L = L1 sqrt(D)
 .def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
     x <- as(x, .CL)
+    d <- x@Dim
     dn <- x@Dimnames
     up <- x@uplo == "U"
     nu <- x@diag == "N"
@@ -176,7 +177,7 @@ setMethod("chol2inv", signature(x = "CHMfactor"),
     L.@Dimnames <- c(list(NULL), dn[2L])
     if(LDL) {
         D <- new("ddiMatrix")
-        D@Dim <- x@Dim
+        D@Dim <- d
         if(nu)
             D@x <- L.ii * L.ii
         else D@diag <- "U"
@@ -189,13 +190,13 @@ body(.def.unpacked) <-
             list(body(.def.unpacked),
                  list(.CL = "dtrMatrix",
                       .UP = quote(L.ii),
-                      .LO = quote(rep(L.ii, each = x@Dim[1L])))))
+                      .LO = quote(rep(L.ii, each = d[1L])))))
 body(.def.packed) <-
     do.call(substitute,
             list(body(.def.packed),
                  list(.CL = "dtpMatrix",
-                      .UP = quote(L.ii[sequence.default(seq_len(x@Dim[1L]))]),
-                      .LO = quote(rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = x@Dim[1L]))))))
+                      .UP = quote(L.ii[sequence.default(seq_len(d[1L]))]),
+                      .LO = quote(rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))))))
 
 ## returning list(L, L') or list(L1, D, L1'), where A = L L' = L1 D L1'
 setMethod("expand2", signature(x =  "Cholesky"), .def.unpacked)
@@ -287,6 +288,10 @@ setAs("CHMfactor", "pMatrix",
           r
       })
 
+setMethod("diag", signature(x = "CHMfactor"),
+          function(x, nrow, ncol, names = TRUE)
+              .Call(CHMfactor_diag_get, x, TRUE))
+
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
 setMethod("expand2", signature(x = "CHMsimpl"),
@@ -294,16 +299,19 @@ setMethod("expand2", signature(x = "CHMsimpl"),
               d <- x@Dim
               dn <- x@Dimnames
               perm <- x@perm
-              P <- new("pMatrix",
-                       Dim = d,
-                       Dimnames = c(list(NULL), dn[2L]),
-                       margin = 2L,
-                       perm = if(length(perm))
-                                  invertPerm(perm, 0L, 1L)
-                              else seq_len(d[1L]))
+
+              P <- new("pMatrix")
+              P@Dim <- d
+              P@Dimnames <- c(list(NULL), dn[2L])
+              P@margin <- 2L
+              P@perm <- if(length(perm))
+                            invertPerm(perm, 0L, 1L)
+                        else seq_len(d[1L])
+
               P. <- P
               P.@Dimnames <- c(dn[1L], list(NULL))
               P.@margin <- 1L
+
               L <- as(x, "dtCMatrix")
               LDL. <- .CHM.is.LDL(x)
               if(!LDL && !LDL.)
@@ -335,10 +343,6 @@ setMethod("expand2", signature(x = "CHMsimpl"),
               list(P1. = P., L1 = L, D = D, L1. = t(L), P1 = P)
           })
 
-setMethod("diag", signature(x = "CHMfactor"),
-          function(x, nrow, ncol, names)
-              .Call(CHMfactor_diag_get, x, TRUE))
-
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
 setMethod("expand2", signature(x = "CHMsuper"),
@@ -346,16 +350,19 @@ setMethod("expand2", signature(x = "CHMsuper"),
               d <- x@Dim
               dn <- x@Dimnames
               perm <- x@perm
-              P <- new("pMatrix",
-                       Dim = d,
-                       Dimnames = c(list(NULL), dn[2L]),
-                       margin = 2L,
-                       perm = if(length(perm))
-                                  invertPerm(perm, 0L, 1L)
-                              else seq_len(d[1L]))
+
+              P <- new("pMatrix")
+              P@Dim <- d
+              P@Dimnames <- c(list(NULL), dn[2L])
+              P@margin <- 2L
+              P@perm <- if(length(perm))
+                            invertPerm(perm, 0L, 1L)
+                        else seq_len(d[1L])
+
               P. <- P
               P.@Dimnames <- c(dn[1L], list(NULL))
               P.@margin <- 1L
+
               L <- as(x, "dgCMatrix")
               if(!LDL)
                   return(list(P1. = P., L = L, L. = t(L), P1 = P))
