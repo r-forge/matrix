@@ -77,12 +77,9 @@ isLDL(x)
       If symbolic analysis was performed prior to factorization,
       then the estimate is exact.}
     \item{\code{perm}}{a 0-based integer vector of length \code{Dim[1]}
-      specifying the permutation applied to the rows and columns of the
-      factorized matrix.
-      If symbolic analysis was performed prior to factorization,
-      then the permutation is chosen to reduce fill-in.
-      \code{perm} of length 0 is valid and
-      equivalent to the identity permutation, implying no permutation.}
+      specifying the permutation applied to the rows and columns
+      of the factorized matrix.  \code{perm} of length 0 is valid and
+      equivalent to the identity permutation, implying no pivoting.}
     \item{\code{type}}{an integer vector of length 6 specifying
       details of the factorization.  The elements correspond to
       members \code{ordering}, \code{is_ll}, \code{is_super},
@@ -141,7 +138,7 @@ isLDL(x)
     \item{\code{s}}{an integer vector of length greater than or equal
       to \code{Dim[1]} containing the row indices of the supernodes.
       \code{s} may contain duplicates, but not within a supernode,
-      where the row indices are strictly increasing.}
+      where the row indices must be increasing.}
   }
   Of \code{dCHMsuper}:
   \describe{
@@ -205,12 +202,13 @@ isLDL(x)
       a \code{\linkS4class{dsCMatrix}} or a \code{\linkS4class{dgCMatrix}}
       and \code{mult} is a numeric vector of positive length.
       
-      The numeric entries are updated with those of the Cholesky factor
-      of \code{F(parent)+mult[1]*I}, where the nonzero pattern
-      of \code{F(parent)} \emph{must} match that of \code{S}
-      if \code{object = Cholesky(S, ...)}.  Here, \code{I} is the
-      identity matrix and \code{F = \link{identity}} for symmetric
-      \code{parent} and \code{F = \link{tcrossprod}} otherwise.}
+      The numeric entries are updated with those of the Cholesky
+      factor of \code{F(parent) + mult[1] * I}, i.e.,
+      \code{F(parent)} plus \code{mult[1]} times the identity matrix,
+      where \code{F = \link{identity}} for symmetric \code{parent}
+      and \code{F = \link{tcrossprod}} for other \code{parent}.
+      The nonzero pattern of \code{F(parent)} must match
+      that of \code{S} if \code{object = Cholesky(S, ...)}.}
     \item{\code{updown}}{\code{signature(update = ., C = ., object = "CHMfactor")}:
       see \code{\link{updown-methods}}.}
   }

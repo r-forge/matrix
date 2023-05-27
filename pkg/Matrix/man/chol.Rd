@@ -22,9 +22,9 @@
 %
 \description{
   Computes the upper triangular Cholesky factor of an
-  \eqn{n \times n}{n-by-n} real, symmetric, positive definite
-  matrix \eqn{A}, in some cases after pivoting.
-  This is the factor \eqn{L'} in
+  \eqn{n \times n}{n-by-n} real, symmetric, positive semidefinite
+  matrix \eqn{A}, optionally after pivoting.
+  That is the factor \eqn{L'} in
   \deqn{P_{1} A P_{1}' = L L'}{P1 * A * P1' = L * L'}
   or (equivalently)
   \deqn{A = P_{1}' L L' P_{1}}{A = P1' * L * L' * P1}
@@ -32,9 +32,9 @@
   \eqn{P_{1}}{P1} is a permutation matrix.
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
-  not permute rows or columns, so that \eqn{P_{1}}{P1} is an
-  identity matrix.
+  LAPACK routines \code{dpotrf} and \code{dpptrf}, which
+  do not permute rows or columns, so that \eqn{P_{1}}{P1}
+  is an identity matrix.
   
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
@@ -49,16 +49,15 @@ chol(x, \dots)
 \S4method{chol}{triangularMatrix}(x, uplo = "U", \dots)
 }
 \arguments{
-  \item{x}{a \link[=is.finite]{finite} symmetric, positive definite
-    matrix or \code{\linkS4class{Matrix}} to be factorized.
-    If \code{x} is square but not symmetric, then it will be
-    \emph{treated} as symmetric; see \code{uplo}.}
-  \item{pivot}{a logical indicating if a fill-reducing
-    permutation of the rows and columns of \eqn{A} should be used.
-    If \code{TRUE}, then the approximate minimum degree (AMD)
-    algorithm is used to select the permutation.
-    If \code{FALSE}, then the order of the columns of \eqn{A}
-    is preserved.}
+  \item{x}{a \link[=is.finite]{finite}, symmetric, positive
+    semidefinite matrix or \code{\linkS4class{Matrix}}
+    to be factorized.  If \code{x} is square but not symmetric,
+    then it will be \emph{treated} as symmetric; see \code{uplo}.}
+  \item{pivot}{a logical indicating if the rows and columns
+    of \eqn{x} should be pivoted.  Methods for sparse \code{x}
+    employ the approximate minimum degree (AMD) algorithm
+    in order to reduce fill-in, i.e., without regard for
+    numerical stability.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{x} should be used
     to compute the factorization.  The default is \code{"U"},
@@ -75,13 +74,13 @@ chol(x, \dots)
 }
 \details{
   For sparse \code{x} inheriting from
-  \code{\linkS4class{diagonalMatrix}}, the diagonal result is computed
-  directly and without permutation, i.e., bypassing CHOLMOD.
+  \code{\linkS4class{diagonalMatrix}}, the diagonal result is
+  computed directly and without pivoting, i.e., bypassing CHOLMOD.
   
   For all other sparse \code{x}, \code{chol(x, pivot = value)} uses
   \code{\link{Cholesky}(x, perm = value, LDL = FALSE, super = FALSE)}
   under the hood.  If you must know the permutation \eqn{P_{1}}{P1}
-  in addition to the Cholesky factor \eqn{L} (or in this case the
+  in addition to the Cholesky factor \eqn{L} (or in this case its
   transpose \eqn{L'}), then call \code{\link{Cholesky}} directly,
   as the result of \code{chol(x, pivot = TRUE)} specifies \eqn{L'}
   but not \eqn{P_{1}}{P1}.
