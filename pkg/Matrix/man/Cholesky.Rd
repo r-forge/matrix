@@ -41,9 +41,9 @@
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
   
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{dpotrf} and \code{dpptrf}, which do
-  not permute rows or columns, so that \eqn{P_{1}}{P1} is an
-  identity matrix.
+  LAPACK routines \code{dpotrf} and \code{dpptrf}, which
+  do not permute rows or columns, so that \eqn{P_{1}}{P1}
+  is an identity matrix.
 
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
@@ -60,19 +60,21 @@ Cholesky(A, \dots)
 \S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
 }
 \arguments{
-  \item{A}{a \link[=is.finite]{finite}, symmetric, positive definite
-    matrix or \code{\linkS4class{Matrix}} to be factorized.
-    If \code{x} is square but not symmetric, then it will be
-    \emph{treated} as symmetric; see \code{uplo}.
-    Methods for sparse \code{A} allow \code{A} to be indefinite
-    when \code{LDL = TRUE}, but still signal an error for \code{A}
-    found to be exactly singular.}
-  \item{perm}{a logical indicating if a fill-reducing
-    permutation of the rows and columns of \eqn{A} should be used.
-    If \code{TRUE}, then the approximate minimum degree (AMD)
-    algorithm is used to select the permutation.
-    If \code{FALSE}, then the order of the columns of \eqn{A}
-    is preserved.}
+  \item{A}{a \link[=is.finite]{finite}, symmetric, positive
+    semidefinite matrix or \code{\linkS4class{Matrix}}
+    to be factorized.  If \code{A} is square but not symmetric,
+    then it will be \emph{treated} as symmetric; see \code{uplo}.
+    Methods for sparse \code{A} do not require positive
+    semidefiniteness when \code{LDL = TRUE}, but still signal
+    an error for \code{A} whose leading minors (after pivoting)
+    are singular.}
+  \item{perm}{a logical indicating if the rows and columns
+    of \eqn{A} should be pivoted.  Methods for sparse \code{A}
+    employ the approximate minimum degree (AMD) algorithm
+    in order to reduce fill-in, i.e., without regard for
+    numerical stability.  Pivoting for sparsity may even introduce
+    singular leading minors, causing the factorization to fail,
+    in which case it may be necessary to set \code{perm = FALSE}.}
   \item{LDL}{a logical indicating if the simplicial factorization
     should be computed as
     \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
@@ -98,16 +100,16 @@ Cholesky(A, \dots)
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{A} should be used
     to compute the factorization.  The default is \code{"U"},
-    even for lower triangular \code{x}, to be consistent with
+    even for lower triangular \code{A}, to be consistent with
     \code{\link[base]{chol}} from \pkg{base}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
   An object representing the factorization, inheriting from
   virtual class \code{\linkS4class{CholeskyFactorization}}.
-  For a traditional matrix \code{x}, the specific class is
+  For a traditional matrix \code{A}, the specific class is
   \code{\linkS4class{Cholesky}}.
-  For \code{x} inheriting from
+  For \code{A} inheriting from
   \code{\linkS4class{unpackedMatrix}},
   \code{\linkS4class{packedMatrix}}, and
   \code{\linkS4class{sparseMatrix}},
@@ -118,14 +120,17 @@ Cholesky(A, \dots)
   respectively.
 }
 \details{
-  Note that the result of a call to \code{Cholesky} need not inherit
-  from \code{\linkS4class{Matrix}}.  Users who just want a matrix should
-  consider using \code{\link{chol}}, whose methods are simple wrappers
-  around \code{Cholesky} returning the upper triangular Cholesky factor
-  \eqn{L'}, typically as a \code{\linkS4class{triangularMatrix}}.
-  An alternative is to pass the result to \code{\link{expand2}} or
+  Note that the result of a call to \code{Cholesky} must inherit
+  from \code{\linkS4class{CholeskyFactorization}} but need not
+  inherit from \code{\linkS4class{Matrix}}.  Users who just want
+  a matrix should consider using \code{\link{chol}}, whose methods
+  are simple wrappers around \code{Cholesky} returning just the
+  upper triangular Cholesky factor \eqn{L'},
+  typically as a \code{\linkS4class{triangularMatrix}}.
+  An alternative is to pass the \code{\linkS4class{CholeskyFactorization}}
+  to \code{\link{expand2}} or
   (but only in the sparse case; see \code{\linkS4class{CHMfactor}})
-  to coerce with \code{as(., "CsparseMatrix")} or \code{as(., "pMatrix")}.
+  to coerce with \code{as(., "CsparseMatrix")}.
 }
 \seealso{
   Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
