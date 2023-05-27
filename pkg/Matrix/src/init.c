@@ -262,7 +262,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgeMatrix_trf, 2),
     CALLDEF(dsyMatrix_trf, 2),
     CALLDEF(dspMatrix_trf, 2),
-    CALLDEF(dpoMatrix_trf, 2),
+    CALLDEF(dpoMatrix_trf, 4),
     CALLDEF(dppMatrix_trf, 2),
     CALLDEF(dgCMatrix_trf, 4),
     CALLDEF(dgCMatrix_orf, 3),
