@@ -1,13 +1,12 @@
 ## METHODS FOR CLASS: dpoMatrix
-## dense (unpacked) symmetric positive definite matrices
+## dense (unpacked) symmetric positive semidefinite matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .dsy2dpo <- function(from) {
-    if(is.null(tryCatch(.Call(dpoMatrix_trf, from, 2L),
-                        error = function(e) NULL)))
-        stop("not a positive definite matrix")
+    if(is.null(tryCatch(Cholesky(from), error = function(e) NULL)))
+        stop("not a positive semidefinite matrix")
     ## FIXME: check=FALSE
     copyClass(from, "dpoMatrix",
               sNames = c("Dim", "Dimnames", "uplo", "x", "factors"))
