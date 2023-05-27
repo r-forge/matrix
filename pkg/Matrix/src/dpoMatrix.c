@@ -2,7 +2,7 @@
 
 SEXP dpoMatrix_rcond(SEXP obj)
 {
-    SEXP trf = PROTECT(dpoMatrix_trf_(obj, 2)),
+    SEXP trf = PROTECT(dpoMatrix_trf_(obj, 2, 0, -1.0)),
 	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
 	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
 	x = PROTECT(GET_SLOT(trf, Matrix_xSym));

@@ -9,13 +9,13 @@
 SEXP dgeMatrix_trf_(SEXP obj,  int warn);
 SEXP dsyMatrix_trf_(SEXP obj,  int warn);
 SEXP dspMatrix_trf_(SEXP obj,  int warn);
-SEXP dpoMatrix_trf_(SEXP obj,  int warn);
+SEXP dpoMatrix_trf_(SEXP obj,  int warn,  int pivot, double tol);
 SEXP dppMatrix_trf_(SEXP obj,  int warn);
 
 SEXP dgeMatrix_trf (SEXP obj, SEXP warn);
 SEXP dsyMatrix_trf (SEXP obj, SEXP warn);
 SEXP dspMatrix_trf (SEXP obj, SEXP warn);
-SEXP dpoMatrix_trf (SEXP obj, SEXP warn);
+SEXP dpoMatrix_trf (SEXP obj, SEXP warn, SEXP pivot,   SEXP tol);
 SEXP dppMatrix_trf (SEXP obj, SEXP warn);
 
 int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol);

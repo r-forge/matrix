@@ -4,7 +4,7 @@
 #include "dsyMatrix.h"
 
 /* defined in factorizations.c : */
-SEXP dpoMatrix_trf_(SEXP, int);
+SEXP dpoMatrix_trf_(SEXP, int, int, double);
 
 SEXP dpoMatrix_rcond(SEXP obj);
 

@@ -351,6 +351,26 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	}								\
     } while (0)
 
+#define ERROR_LAPACK_4(_ROUTINE_, _INFO_, _RANK_, _WARN_, _NPROTECT_)	\
+    do {								\
+	ERROR_LAPACK_1(_ROUTINE_, _INFO_);				\
+	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
+	    if (_WARN_ > 1)						\
+	        error  (_("LAPACK routine '%s': matrix is rank deficient " \
+			  "or not positive semidefinite, "		\
+			  "the _computed_ rank is %d"),			\
+			#_ROUTINE_, (_RANK_));				\
+	    else {							\
+		warning(_("LAPACK routine '%s': matrix is rank deficient " \
+			  "or not positive semidefinite, "		\
+			  "the _computed_ rank is %d"),			\
+			#_ROUTINE_, (_RANK_));				\
+		UNPROTECT(_NPROTECT_);					\
+		return ScalarInteger(_INFO_);				\
+	    }								\
+	}								\
+    } while (0)
+
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
     SEXP val = get_factor(obj, "LU");
@@ -363,10 +383,11 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
     SET_SLOT(val, Matrix_DimSym, dim);
     SET_SLOT(val, Matrix_DimNamesSym, dimnames);
     if (r > 0) {
-	PROTECT_INDEX pid;
-	SEXP perm = PROTECT(allocVector(INTSXP, r)), x;
-	PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pid);
-	REPROTECT(x = duplicate(x), pid);
+	SEXP perm = PROTECT(allocVector(INTSXP, r)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	x = duplicate(x);
+	UNPROTECT(1); /* x */
+	PROTECT(x);
 	int *pperm = INTEGER(perm), info;
 	double *px = REAL(x);
 		
@@ -396,15 +417,14 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
     set_symmetrized_DimNames(val, dimnames, -1);
     SET_SLOT(val, Matrix_uploSym, uplo);
     if (n > 0) {
-	R_xlen_t nn;
 	SEXP perm = PROTECT(allocVector(INTSXP, n)),
 	    x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-	    y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
+	    y = PROTECT(allocVector(REALSXP, XLENGTH(x)));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	int *pperm = INTEGER(perm), lwork = -1, info;
 	double *px = REAL(x), *py = REAL(y), tmp, *work;
 
-	Matrix_memset(py, 0, nn, sizeof(double));
+	Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
 	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
 	F77_CALL(dsytrf)(&ul, pdim, py, pdim, pperm, &tmp, &lwork, &info FCONE);
 	lwork = (int) tmp;
@@ -436,10 +456,11 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
     set_symmetrized_DimNames(val, dimnames, -1);
     SET_SLOT(val, Matrix_uploSym, uplo);
     if (n > 0) {
-	PROTECT_INDEX pid;
-	SEXP perm = PROTECT(allocVector(INTSXP, n)), x;
-	PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pid);
-	REPROTECT(x = duplicate(x), pid);
+	SEXP perm = PROTECT(allocVector(INTSXP, n)),
+	    x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	x = duplicate(x);
+	UNPROTECT(1); /* x */
+	PROTECT(x);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	int *pperm = INTEGER(perm), info;
 	double *px = REAL(x);
@@ -456,7 +477,7 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
     return val;
 }
 
-SEXP dpoMatrix_trf_(SEXP obj, int warn)
+SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
     SEXP val = get_factor(obj, "Cholesky");
     if (!isNull(val))
@@ -470,17 +491,30 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn)
     set_symmetrized_DimNames(val, dimnames, -1);
     SET_SLOT(val, Matrix_uploSym, uplo);
     if (n > 0) {
-	R_xlen_t nn;
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-	    y = PROTECT(allocVector(REALSXP, nn = XLENGTH(x)));
+	    y = PROTECT(allocVector(REALSXP, XLENGTH(x)));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	int info;
 	double *px = REAL(x), *py = REAL(y);
-
-	Matrix_memset(py, 0, nn, sizeof(double));
+	
+	Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
 	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
-	F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
-	ERROR_LAPACK_3(dpotrf, info, warn, 6);
+
+	if (pivot) {
+	    SEXP perm = PROTECT(allocVector(INTSXP, n));
+	    int *pperm = INTEGER(perm), rank;
+	    double *work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
+	    
+	    F77_CALL(dpstrf)(&ul, pdim, py, pdim,
+			     pperm, &rank, &tol, work, &info FCONE);
+	    ERROR_LAPACK_4(dpstrf, info, rank, warn, 7);
+	    
+	    SET_SLOT(val, Matrix_permSym, perm);
+	    UNPROTECT(1); /* perm */
+	} else {
+	    F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
+	    ERROR_LAPACK_3(dpotrf, info, warn, 6);
+	}
 	
 	SET_SLOT(val, Matrix_xSym, y);
 	UNPROTECT(2); /* y, x */
@@ -504,10 +538,10 @@ SEXP dppMatrix_trf_(SEXP obj, int warn)
     set_symmetrized_DimNames(val, dimnames, -1);
     SET_SLOT(val, Matrix_uploSym, uplo);
     if (n > 0) {
-	PROTECT_INDEX pid;
-	SEXP x;
-	PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pid);
-	REPROTECT(x = duplicate(x), pid);
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	x = duplicate(x);
+	UNPROTECT(1); /* x */
+	PROTECT(x);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	int info;
 	double *px = REAL(x);
@@ -538,9 +572,9 @@ SEXP dspMatrix_trf(SEXP obj, SEXP warn)
     return dspMatrix_trf_(obj, asInteger(warn));
 }
 
-SEXP dpoMatrix_trf(SEXP obj, SEXP warn)
+SEXP dpoMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 {
-    return dpoMatrix_trf_(obj, asInteger(warn));
+    return dpoMatrix_trf_(obj, asInteger(warn), asLogical(pivot), asReal(tol));
 }
 
 SEXP dppMatrix_trf(SEXP obj, SEXP warn)
@@ -1612,21 +1646,44 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int info;
+#if 0
+	SEXP aperm = PROTECT(GET_SLOT(a, Matrix_permSym));
+#endif	
 	if (isNull(b)) {
 	    PROTECT(rx = duplicate(ax));
 	    SET_SLOT(r, Matrix_uploSym, auplo);
 	    if (unpacked) {
 		F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
 		ERROR_LAPACK_2(dpotri, info, 2, L);
+#if 0
+		if (LENGTH(aperm) > 0)
+		    symPerm(REAL(rx), n, ul, INTEGER(aperm), 1, 1);
+#endif
 	    } else {
 		F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
 		ERROR_LAPACK_2(dpptri, info, 2, L);
+#if 0
+		if (LENGTH(aperm) > 0) {
+		    /* FIXME: extend symPerm() to support _packed_ matrices */
+		    double *work;
+		    size_t lwork = (size_t) n * n;
+		    Matrix_Calloc(work, lwork, double);
+		    ddense_unpack(work, REAL(rx), n, ul, 'N');
+		    symPerm(work, n, ul, INTEGER(aperm), 1, 1);
+		    ddense_pack  (REAL(rx), work, n, ul, 'N');
+		    Matrix_Free(work, lwork);
+		}
+#endif
 	    }
 	} else {
 	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 	    rx = duplicate(bx);
 	    UNPROTECT(1); /* bx */
 	    PROTECT(rx);
+#if 0
+	    if (LENGTH(aperm) > 0)
+		rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 0);
+#endif
 	    if (unpacked) {
 		F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
 				 REAL(rx), &m, &info FCONE);
@@ -1636,9 +1693,17 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 				 REAL(rx), &m, &info FCONE);
 		ERROR_LAPACK_1(dpptrs, info);
 	    }
+#if 0
+	    if (LENGTH(aperm) > 0)
+		rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 1);
+#endif
 	}
 	SET_SLOT(r, Matrix_xSym, rx);
+#if 0
+	UNPROTECT(3); /* rx, aperm, ax */
+#else
 	UNPROTECT(2); /* rx, ax */
+#endif
     }
     SOLVE_FINISH;
     UNPROTECT(3); /* auplo, rdim, r */
