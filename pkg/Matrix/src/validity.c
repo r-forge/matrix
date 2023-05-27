@@ -1263,6 +1263,30 @@ SEXP Cholesky_validate(SEXP obj)
 	    UPRET(1, "Cholesky factor has negative diagonal elements");
     UNPROTECT(1); /* x */
 
+#if 0
+    SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
+    if (TYPEOF(perm) != INTSXP)
+	UPRET(1, "'perm' slot is not of type \"integer\"");
+    if (XLENGTH(perm) != n && XLENGTH(perm) != 0)
+	UPRET(1, "'perm' slot does not have length Dim[1] or length 0");
+    if (LENGTH(perm) == n) {
+	int *pperm = INTEGER(perm);
+	char *work;
+	Matrix_Calloc(work, n, char);
+	for (i = 0; i < n; ++i) {
+	    if (*pperm == NA_INTEGER)
+		FRUPRET(work, n, 1, "'perm' slot contains NA");
+	    if (*pperm < 0 || *pperm >= n)
+		FRUPRET(work, n, 1, "'perm' slot has elements not in {0,...,Dim[1]-1}");
+	    if (work[*pperm])
+		FRUPRET(work, n, 1, "'perm' slot contains duplicates");
+	    work[*(pperm++)] = 1;
+	}
+	Matrix_Free(work, n);
+    }
+    UNPROTECT(1); /* perm */
+#endif
+
     return ScalarLogical(1);
 }
 
@@ -1291,6 +1315,30 @@ SEXP pCholesky_validate(SEXP obj)
 		UPRET(1, "Cholesky factor has negative diagonal elements");
     }
     UNPROTECT(1); /* x */
+
+#if 0
+    SEXP perm = PROTECT(GET_SLOT(obj, Matrix_permSym));
+    if (TYPEOF(perm) != INTSXP)
+	UPRET(1, "'perm' slot is not of type \"integer\"");
+    if (XLENGTH(perm) != n && XLENGTH(perm) != 0)
+	UPRET(1, "'perm' slot does not have length Dim[1] or length 0");
+    if (LENGTH(perm) == n) {
+	int *pperm = INTEGER(perm);
+	char *work;
+	Matrix_Calloc(work, n, char);
+	for (i = 0; i < n; ++i) {
+	    if (*pperm == NA_INTEGER)
+		FRUPRET(work, n, 1, "'perm' slot contains NA");
+	    if (*pperm < 0 || *pperm >= n)
+		FRUPRET(work, n, 1, "'perm' slot has elements not in {0,...,Dim[1]-1}");
+	    if (work[*pperm])
+		FRUPRET(work, n, 1, "'perm' slot contains duplicates");
+	    work[*(pperm++)] = 1;
+	}
+	Matrix_Free(work, n);
+    }
+    UNPROTECT(1); /* perm */
+#endif
 
     return ScalarLogical(1);
 }
