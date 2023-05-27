@@ -67,7 +67,7 @@ Cholesky(A, \dots)
     Methods for sparse \code{A} do not require positive
     semidefiniteness when \code{LDL = TRUE}, but still signal
     an error for \code{A} whose leading principal minors
-    (after pivoting) are nonpositive.}
+    (after pivoting) are zero.}
   \item{perm}{a logical indicating if the rows and columns
     of \eqn{A} should be pivoted.  Methods for sparse \code{A}
     employ the approximate minimum degree (AMD) algorithm
