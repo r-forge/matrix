@@ -66,15 +66,16 @@ Cholesky(A, \dots)
     then it will be \emph{treated} as symmetric; see \code{uplo}.
     Methods for sparse \code{A} do not require positive
     semidefiniteness when \code{LDL = TRUE}, but still signal
-    an error for \code{A} whose leading minors (after pivoting)
-    are singular.}
+    an error for \code{A} whose leading principal minors
+    (after pivoting) are nonpositive.}
   \item{perm}{a logical indicating if the rows and columns
     of \eqn{A} should be pivoted.  Methods for sparse \code{A}
     employ the approximate minimum degree (AMD) algorithm
     in order to reduce fill-in, i.e., without regard for
-    numerical stability.  Pivoting for sparsity may even introduce
-    singular leading minors, causing the factorization to fail,
-    in which case it may be necessary to set \code{perm = FALSE}.}
+    numerical stability.
+    Pivoting for sparsity may introduce nonpositive leading
+    principal minors, causing the factorization to fail, in
+    which case it may be necessary to set \code{perm = FALSE}.}
   \item{LDL}{a logical indicating if the simplicial factorization
     should be computed as
     \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
