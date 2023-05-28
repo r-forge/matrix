@@ -351,7 +351,7 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	}								\
     } while (0)
 
-#define ERROR_LAPACK_4(_ROUTINE_, _INFO_, _RANK_, _WARN_, _NPROTECT_)	\
+#define ERROR_LAPACK_4(_ROUTINE_, _INFO_, _RANK_, _WARN_)		\
     do {								\
 	ERROR_LAPACK_1(_ROUTINE_, _INFO_);				\
 	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
@@ -360,14 +360,11 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 			  "or not positive semidefinite, "		\
 			  "the _computed_ rank is %d"),			\
 			#_ROUTINE_, (_RANK_));				\
-	    else {							\
+	    else							\
 		warning(_("LAPACK routine '%s': matrix is rank deficient " \
 			  "or not positive semidefinite, "		\
 			  "the _computed_ rank is %d"),			\
 			#_ROUTINE_, (_RANK_));				\
-		UNPROTECT(_NPROTECT_);					\
-		return ScalarInteger(_INFO_);				\
-	    }								\
 	}								\
     } while (0)
 
@@ -479,7 +476,7 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 
 SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
-    SEXP val = get_factor(obj, "Cholesky");
+    SEXP val = get_factor(obj, (pivot) ? "Cholesky~" : "Cholesky");
     if (!isNull(val))
 	return val;
     PROTECT(val = NEW_OBJECT_OF_CLASS("Cholesky"));
@@ -499,7 +496,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	
 	Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
 	F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
-
+	
 	if (pivot) {
 	    SEXP perm = PROTECT(allocVector(INTSXP, n));
 	    int *pperm = INTEGER(perm), rank;
@@ -507,7 +504,21 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	    
 	    F77_CALL(dpstrf)(&ul, pdim, py, pdim,
 			     pperm, &rank, &tol, work, &info FCONE);
-	    ERROR_LAPACK_4(dpstrf, info, rank, warn, 7);
+	    ERROR_LAPACK_4(dpstrf, info, rank, warn);
+	    
+	    if (info > 0) {
+		/* Zero the trailing (n-rank)-by-(n-rank) principal submatrix
+		   to guarantee that the result is valid under the assumption
+		   that the factorized matrix is positive semidefinite
+		*/
+		int j;
+		R_xlen_t len = (R_xlen_t) (n - rank);
+		py += (R_xlen_t) rank * n + rank;
+		for (j = rank; j < n; ++j) {
+		    Matrix_memset(py, 0, len, sizeof(double));
+		    py += n;
+		}
+	    }
 	    
 	    SET_SLOT(val, Matrix_permSym, perm);
 	    UNPROTECT(1); /* perm */
@@ -519,7 +530,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	SET_SLOT(val, Matrix_xSym, y);
 	UNPROTECT(2); /* y, x */
     }
-    set_factor(obj, "Cholesky", val);
+    set_factor(obj, (pivot) ? "Cholesky~" : "Cholesky", val);
     UNPROTECT(4); /* uplo, dimnames, dim, val */
     return val;
 }
