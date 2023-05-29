@@ -19,6 +19,7 @@
 #include "unpackedMatrix.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
 
 #include "Syms.h"
 Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
@@ -309,11 +310,7 @@ static const R_ExternalMethodDef ExtEntries[] = {
     {NULL, NULL, 0}
 };
 
-void
-#ifdef HAVE_VISIBILITY_ATTRIBUTE
-__attribute__ ((visibility ("default")))
-#endif
-R_init_Matrix(DllInfo *dll)
+void attribute_visible R_init_Matrix(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, ExtEntries);
     R_useDynamicSymbols(dll, FALSE);
