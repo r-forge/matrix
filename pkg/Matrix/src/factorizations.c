@@ -913,20 +913,9 @@ SEXP dpCMatrix_trf(SEXP obj,
 
 SEXP denseLU_expand(SEXP obj)
 {
-    /* A = P L U   <=>   P' A = L U   where ... 
-       
-       A -> [m,n]
-       P -> [m,m], permutation
-       L -> if m >= n then [m,n] else [m,m], lower trapezoidal, unit diagonal
-       U -> if m <= n then [m,n] else [n,n], upper trapezoidal
-       
-       square L,U given as dtrMatrix with appropriate 'uplo', 'diag' slots,
-       non-square L,U given as dgeMatrix
-    */
-    
-    const char *nms[] = {"P", "L", "U", ""};
+    const char *nms[] = {"P1.", "L", "U", ""};
     PROTECT_INDEX pidA, pidB;
-    SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms)),
+    SEXP res = PROTECT(mkNamed(VECSXP, nms)),
 	P = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
 	dim, x;
     PROTECT_WITH_INDEX(dim = GET_SLOT(obj, Matrix_DimSym), &pidA);
