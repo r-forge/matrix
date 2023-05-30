@@ -1270,7 +1270,7 @@ x[i] <- y1     ; validObject(x[i]) # TRUE
 N <- x[i] + y2 ; validObject( N  ) # TRUE
 x[i] <- N ## <== bug was here ..
 validObject(x)
-## gave 'Error' invalid ..“dsparseVector”.. 'i' must be sorted strictly increasingly
+## gave 'Error' invalid .."dsparseVector".. 'i' must be sorted strictly increasingly
 stopifnot(all.equal(x[i] ,  y1+y2, tolerance=0),
 		    x[i] == y1+y2)
 showProc.time()

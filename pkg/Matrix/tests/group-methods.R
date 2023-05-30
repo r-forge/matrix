@@ -355,7 +355,7 @@ r <- M & m2 # failed in Matrix <= 1.4-1
 assert.EQ.mat(M        | m2 -> ro,
               as.mat(M)| m2, tol=0)
 D4 <- Diagonal(x=0+ 4:2)
-rd <- D4 | m2 # gave  invalid class “ltTMatrix” object: uplo='U' must not have sparse entries below the diagonal
+rd <- D4 | m2 # gave  invalid class "ltTMatrix" object: uplo='U' must not have sparse entries below the diagonal
 M2 <- Matrix(m2); T2 <- Matrix:::.diag2T.smart(D4, M2, kind="l")
 stopifnot(exprs = {
     all(!r)
