@@ -81,26 +81,25 @@ fac2Sparse(from, to = c("d", "l", "n"),
   For \code{fac2Sparse()}, a \code{\link{list}} of length two, both
   components with the corresponding transposed model matrix, where the
   corresponding \code{factorPatt12} is true.
-
-  Note that \code{\link[MatrixModels]{model.Matrix}(*, sparse=TRUE)}
-  from package \pkg{MatrixModels} may be often be preferable to
-  \code{sparse.model.matrix()} nowadays, as \code{model.Matrix()}
-  returns \code{\link[MatrixModels:modelMatrix-class]{modelMatrix}}
-  objects with additional slots \code{assign} and \code{contrasts} which
-  relate back to the variables used.
-
+  
   \code{fac2sparse()}, the basic workhorse of
   \code{sparse.model.matrix()}, returns the \emph{transpose}
   (\code{\link{t}}) of the model matrix.
+}
+\note{
+  \code{model.Matrix(sparse = TRUE)} from package \CRANpkg{MatrixModels}
+  may be nowadays be preferable to \code{sparse.model.matrix},
+  as \code{model.Matrix} returns an object of class \code{modelMatrix}
+  with additional slots \code{assign} and \code{contrasts} relating to
+  the model variables.
 }
 \author{Doug Bates and Martin Maechler, with initial suggestions from Tim
   Hesterberg.
 }
 \seealso{
-  \code{\link{model.matrix}} in standard \R's package \pkg{stats}.\cr
-  \code{\link[MatrixModels]{model.Matrix}} which calls
-  \code{sparse.model.matrix} or \code{model.matrix} depending on its
-  \code{sparse} argument may be preferred to \code{sparse.model.matrix}.
+  \code{\link{model.matrix}} in package \pkg{stats}, part of base \R{}.
+  
+  \code{model.Matrix} in package \CRANpkg{MatrixModels}; see \sQuote{Note}.
 
   \code{as(f, "sparseMatrix")} (see \code{coerce(from = "factor", ..)}
   in the class doc \linkS4class{sparseMatrix}) produces the

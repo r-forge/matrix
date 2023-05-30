@@ -1,5 +1,5 @@
 \name{USCounties}
-\title{USCounties Contiguity Matrix}
+\title{Contiguity Matrix of U.S. Counties}
 %
 \docType{data}
 \keyword{datasets}
@@ -7,33 +7,39 @@
 \alias{USCounties}
 %
 \description{
-  This matrix represents the contiguities of 3111 US counties using the
-  Queen criterion of at least a single shared boundary point. The
-  representation is as a row standardised spatial weights matrix
-  transformed to a symmetric matrix (see Ord (1975), p. 125).
+  This matrix gives the contiguities of 3111 U.S. counties,
+  using the queen criterion of at least one shared vertex
+  or edge.
 }
 \usage{data(USCounties)}
 \format{
-  A \eqn{3111 ^2} symmetric sparse matrix of class
-  \code{\linkS4class{dsCMatrix}} with 9101 non-zero entries.
+  A \eqn{3111 \times 3111}{3111-by-3111} sparse, symmetric
+  matrix of class \code{\linkS4class{dsCMatrix}}, with 9101
+  nonzero entries.
 }
-\details{
-  The data were read into \R using \code{\link[spdep]{read.gal}}, and
-  row-standardised and transformed to symmetry using
-  \code{\link[spdep]{nb2listw}} and \code{\link[spdep]{similar.listw}}.
-  This spatial weights object was converted to class
-  \code{\linkS4class{dsCMatrix}} using
-  \code{\link[spdep]{as_dsTMatrix_listw}} and coercion.
-}
-\source{ %% no \url anymore, as broken (Jan. 2015)
-  The data were retrieved from \code{http://sal.uiuc.edu/weights/zips/usc.zip},
-  files \dQuote{usc.txt} and \dQuote{usc_q.GAL}, with permission for use
-  and distribution from Luc Anselin (in early 2008).
+\source{
+  GAL lattice file \file{usc_q.GAL}
+  (retrieved in 2008 from
+  \file{http://sal.uiuc.edu/weights/zips/usc.zip}
+  with permission from Luc Anselin for use and distribution)
+  was read into \R{} using function \code{read.gal}
+  from package \CRANpkg{spdep}.
+
+  Neighbour lists were augmented with row-standardized
+  (and then symmetrized) spatial weights, using functions
+  \code{nb2listw} and \code{similar.listw} from packages
+  \CRANpkg{spdep} and \CRANpkg{spatialreg}.
+  The resulting \code{listw} object was coerced to class
+  \code{\linkS4class{dsTMatrix}}
+  using \code{as_dsTMatrix_listw} from \CRANpkg{spatialreg},
+  and subsequently to class \code{\linkS4class{dsCMatrix}}.
 }
 \references{
-  Ord, J. K. (1975)
-  Estimation methods for models of spatial interaction;
-  \emph{Journal of the American Statistical Association} \bold{70}, 120--126.
+  Ord, J. K. (1975).
+  Estimation methods for models of spatial interaction.
+  \emph{Journal of the American Statistical Association},
+  \emph{70}(349), 120-126.
+  \doi{10.2307/2285387}
 }
 \examples{
 data(USCounties)

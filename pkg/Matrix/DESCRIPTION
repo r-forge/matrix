@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 1.5-5
-Date: 2023-05-28
+Date: 2023-05-30
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,
@@ -35,8 +35,7 @@ Authors@R:
 Depends: R (>= 3.5.0), methods
 Imports: graphics, grid, lattice, stats, utils
 Suggests: MASS, sfsmisc
-Enhances: MatrixModels, SparseM, expm, graph, igraph, sp, spdep
-EnhancesNote: MatrixModels, expm, igraph, sp, spdep for Rd xrefs
+Enhances: SparseM, graph
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R and our S4 classes
 BuildResaveData: no

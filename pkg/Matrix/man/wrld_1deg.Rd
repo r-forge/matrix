@@ -1,5 +1,5 @@
 \name{wrld_1deg}
-\title{World 1-degree grid contiguity matrix}
+\title{Contiguity Matrix of World One-Degree Grid Cells}
 %
 \docType{data}
 \keyword{datasets}
@@ -7,43 +7,45 @@
 \alias{wrld_1deg}
 %
 \description{
-  This matrix represents the distance-based contiguities of 15260
-  one-degree grid cells of land areas. The representation is as a
-  row standardised spatial weights matrix transformed to a symmetric
-  matrix (see Ord (1975), p. 125).
+  This matrix gives the contiguities of 15260 one-degree
+  grid cells of world land areas, using a criterion based
+  on the great-circle distance between centers.
 }
 \usage{data(wrld_1deg)}
 \format{
-  A \eqn{15260 ^2} symmetric sparse matrix of class
-  \code{\linkS4class{dsCMatrix}} with 55973 non-zero entries.
-}
-\details{
-  The data were created into \R using the coordinates of a
-  \sQuote{SpatialPixels} object containing approximately one-degree grid
-  cells for land areas only (world excluding Antarctica), using package
-  \CRANpkg{spdep}'s
-  \code{\link[spdep]{dnearneigh}} with a cutoff distance of \code{sqrt(2)},
-  and row-standardised and transformed to symmetry using
-  \code{\link[spdep]{nb2listw}} and \code{\link[spdep]{similar.listw}}.
-  This spatial weights object was converted to a \code{\linkS4class{dsTMatrix}}
-  using \code{\link[spdep]{as_dsTMatrix_listw}} and then coerced
-  (column-compressed).
+  A \eqn{15260 \times 15260}{15260-by-15260} sparse, symmetric
+  matrix of class \code{\linkS4class{dsCMatrix}}, with 55973
+  nonzero entries.
 }
 \source{
-  The shoreline data was read into \R using \code{maptools::Rgshhs}
-  from the GSHHS coarse shoreline database distributed with the
-  former maptools package, omitting Antarctica.  A matching approximately
-  one-degree grid was generated using
-  \code{maptools::Sobj_SpatialGrid}, and the grids on land were
-  found using the appropriate \code{\link[sp]{over}}% was {overlay} till 2016-02
-  method for the \sQuote{SpatialPolygons} and \sQuote{SpatialGrid} objects,
-  yielding a \sQuote{SpatialPixels} one containing only the grid cells with
-  centres on land.
+  Shoreline data were read into \R{} from the GSHHS database
+  using function \code{Rgshhs} from package \CRANpkg{maptools}.
+  Antarctica was excluded.  An approximately one-degree grid
+  was generated using function \code{Sobj_SpatialGrid}, also
+  from \CRANpkg{maptools}.  Grid cells with centers on land
+  were identified using the \code{over} method for classes
+  \code{SpatialPolygons} and \code{SpatialGrid}, defined in
+  package \CRANpkg{sp}.  Neighbours of these were identified
+  by passing the resulting \code{SpatialPixels} object to
+  function \code{dnearneigh} from package \CRANpkg{spdep},
+  using as a cut-off a great-circle distance of \code{sqrt(2)}
+  kilometers between centers.
+
+  Neighbour lists were augmented with row-standardized
+  (and then symmetrized) spatial weights, using functions
+  \code{nb2listw} and \code{similar.listw} from packages
+  \CRANpkg{spdep} and \CRANpkg{spatialreg}.
+  The resulting \code{listw} object was coerced to class
+  \code{\linkS4class{dsTMatrix}}
+  using \code{as_dsTMatrix_listw} from \CRANpkg{spatialreg},
+  and subsequently to class \code{\linkS4class{dsCMatrix}}.
 }
 \references{
-  Ord, J. K. (1975)
-  Estimation methods for models of spatial interaction;
-  \emph{Journal of the American Statistical Association} \bold{70}, 120--126.
+  Ord, J. K. (1975).
+  Estimation methods for models of spatial interaction.
+  \emph{Journal of the American Statistical Association},
+  \emph{70}(349), 120-126.
+  \doi{10.2307/2285387}
 }
 \examples{
 data(wrld_1deg)
