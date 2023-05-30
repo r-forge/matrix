@@ -47,10 +47,6 @@ KhatriRao(X, Y = X, FUN = "*", sparseY = TRUE, make.dimnames = FALSE)
   Characterization of Probability Distributions.
   \emph{Sankhya: Indian J. Statistics, Series A} \bold{30}, 167--180.
 
-  Liu, Shuangzhe, and G\enc{õ}{oe}tz Trenkler (2008)
-  Hadamard, Khatri-Rao, Kronecker and Other Matrix Products.
-  \emph{International J. Information and Systems Sciences} \bold{4}, 160--177.
-
   Bader, Brett W, and Tamara G Kolda (2008)
   Efficient MATLAB Computations with Sparse and Factored Tensors.
   \emph{SIAM J. Scientific Computing} \bold{30}, 205--231.
