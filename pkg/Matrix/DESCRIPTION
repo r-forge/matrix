@@ -35,8 +35,8 @@ Authors@R:
 Depends: R (>= 3.5.0), methods
 Imports: graphics, grid, lattice, stats, utils
 Suggests: MASS, expm
-Enhances: MatrixModels, SparseM, graph, igraph, maptools, sfsmisc, sp, spdep
-EnhancesNote: igraph, maptools, sp, spdep for Rd xrefs
+Enhances: MatrixModels, SparseM, graph, igraph, sfsmisc, sp, spdep
+EnhancesNote: igraph, sp, spdep for Rd xrefs
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R and our S4 classes
 BuildResaveData: no
