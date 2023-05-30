@@ -2892,7 +2892,7 @@ sparse vector (nnz/length = 16/64) of class "dsparseVector"
 > x[i] <- N ## <== bug was here ..
 > validObject(x)
 [1] TRUE
-> ## gave 'Error' invalid ..“dsparseVector”.. 'i' must be sorted strictly increasingly
+> ## gave 'Error' invalid .."dsparseVector".. 'i' must be sorted strictly increasingly
 > stopifnot(all.equal(x[i] ,  y1+y2, tolerance=0),
 + 		    x[i] == y1+y2)
 > showProc.time()

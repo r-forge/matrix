@@ -1253,7 +1253,7 @@ dC <- sparseMatrix(i=1:4, j=1:4, x=5:2, triangular = TRUE)
 stopifnot(identical(--dC, dC),
           identical(--dT, dT)
           )
-## both  - <sparse-triang.> gave : Error .... 'factors’ is not a slot in class “dtTMatrix”
+## both  - <sparse-triang.> gave : Error .... 'factors' is not a slot in class "dtTMatrix"
 
 ## R PR#18250 - by Mikael Jagan
 nm2 <- c("a","b")

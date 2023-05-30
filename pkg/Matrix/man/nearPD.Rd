@@ -107,8 +107,9 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
   Computing the nearest correlation matrix - a problem from finance;
   \emph{IMA Journal of Numerical Analysis} \bold{22}, 329--343.
 }
-\author{Jens Oehlschlaegel donated a first version.  Subsequent changes
-  by the Matrix package authors.
+\author{
+  Jens \enc{Oehlschlägel}{Oehlschlaegel} donated a first version.
+  Subsequent changes by the Matrix package authors.
 }
 \seealso{A first version of this (with non-optional \code{corr=TRUE})
   has been available as \code{\link[sfsmisc]{nearcor}()}; and

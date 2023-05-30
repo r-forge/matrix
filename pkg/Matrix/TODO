@@ -15,7 +15,7 @@
     --> tests/Simple.R {'max.print'}
 ** TODO API change: Should  Matrix(diag(2), sparse=TRUE, doDiag=TRUE)  not rather give "ddiMatrix" ??
       Why change? Originally "ddiMatrix" etc extended denseMatrix but now sparseMatrix
-      Currently 'doDiag's documentation starts as  'doDiag: only when ‘sparse = FALSE’, ....'
+      Currently 'doDiag's documentation starts as  'doDiag: only when 'sparse = FALSE', ....'
       This would change, and doDiag would be active *also* for 'sparse = TRUE'
 ** TODO Do section in ./vignettes/Design-issues.Rnw (& man/symmetricMatrix-class.Rd ?) about *dimnames*
 **  also mentioning forceSymmetric(); maybe that wd "inherit" arg. 'symDimnames' in {T,F,NA} from forceCspSymmetric().
