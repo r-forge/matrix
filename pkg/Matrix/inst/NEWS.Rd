@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-05-28 r3993)}{
+\section{Changes in version 1.5-5 (2023-05-30 r4000)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -201,6 +201,15 @@
     \itemize{
       \item The length of the \pkg{Matrix} namespace has been reduced
       by ~15\%.  More than 100 unused symbols have been removed.
+
+      \item The following dependencies, needed only for a small number
+      of \code{Rd} cross references, have been removed:
+      \pkg{MatrixModels}, \pkg{expm}, \pkg{igraph}, \pkg{maptools},
+      \pkg{sp}, \pkg{spdep}.  Links to CRAN and Bioconductor in
+      \file{.Rd} files are preserved throughout.
+
+      \item \pkg{sfsmisc} has been moved from \code{Enhances} to
+      \code{Suggests}, as it is used conditionally in \file{tests}.
     }
   }
 }

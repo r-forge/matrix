@@ -59,12 +59,13 @@ expm(x)
   has been fixed by Martin Maechler.
 }
 %\note{}
-\seealso{\code{\link{Schur}}; additionally,
-    \code{\link[expm]{expm}}, \code{\link[expm]{logm}}, etc in package \CRANpkg{expm}.
-}
-\note{The \CRANpkg{expm} package contains newer (partly faster and more
-  accurate) algorithms for \code{expm()} and includes
-  \code{\link[expm]{logm}} and \code{\link[expm]{sqrtm}}.
+\seealso{
+  Package \CRANpkg{expm}, which provides newer (in some cases
+  faster, more accurate) algorithms for computing the matrix
+  exponential via its own (non-generic) function \code{expm}.
+  \pkg{expm} also implements \code{logm}, \code{sqrtm}, etc.
+
+  Generic function \code{\link{Schur}}.
 }
 \examples{
 (m1 <- Matrix(c(1,0,1,1), ncol = 2))

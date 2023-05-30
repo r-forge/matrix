@@ -20,16 +20,12 @@
 \alias{graph2T}
 %
 \description{
-  The \pkg{Matrix} package has supported conversion from and to
-  \code{"\link[graph:graph-class]{graph}"} objects from (Bioconductor) package
-  \pkg{graph} since summer 2005, via the usual \code{\link{as}(., "<class>")}
-  coercion, \preformatted{  as(from, Class)
-}%pre
-  Since 2013, this functionality is further exposed as the
-  \code{graph2T()} and \code{T2graph()} functions (with further
-  arguments than just \code{from}), which convert graphs to and from
-  the triplet form of sparse matrices (of class
-  \code{"\linkS4class{TsparseMatrix}"}) .
+  Since 2005, package \pkg{Matrix} has supported coercions to and
+  from class \code{\link[graph:graph-class]{graph}} from package
+  \href{https://bioconductor.org/packages/graph/}{\pkg{graph}}.
+  Since 2013, this functionality has been exposed via functions
+  \code{T2graph} and \code{graph2T}, which, unlike methods for
+  \code{\link{as}(from, "<Class>")}, support optional arguments.
 }
 \usage{
 graph2T(from, use.weights = )
@@ -61,10 +57,9 @@ T2graph(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
   For \code{T2graph()} an \R object of class \code{"graph"}.
 }
 \seealso{
-  Note that the CRAN package \pkg{igraph} also provides conversions from
-  and to sparse matrices (of package \pkg{Matrix}) via its
-  \code{\link[igraph]{graph.adjacency}()} and
-  \code{\link[igraph]{get.adjacency}()}.
+  Package \CRANpkg{igraph}, which provides similar coercions
+  to and from its class \code{igraph} via functions
+  \code{graph_from_adjacency_matrix} and \code{as_adjacency_matrix}.
 }
 \examples{
 if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
