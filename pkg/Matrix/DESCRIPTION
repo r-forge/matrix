@@ -34,9 +34,9 @@ Authors@R:
              comment = "base R's matrix implementation"))
 Depends: R (>= 3.5.0), methods
 Imports: graphics, grid, lattice, stats, utils
-Suggests: MASS, expm
-Enhances: MatrixModels, SparseM, graph, igraph, sfsmisc, sp, spdep
-EnhancesNote: igraph, sp, spdep for Rd xrefs
+Suggests: MASS, sfsmisc
+Enhances: MatrixModels, SparseM, expm, graph, igraph, sp, spdep
+EnhancesNote: MatrixModels, expm, igraph, sp, spdep for Rd xrefs
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R and our S4 classes
 BuildResaveData: no
