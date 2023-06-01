@@ -17,6 +17,8 @@
 \alias{norm,dsyMatrix,character-method}
 \alias{norm,dtpMatrix,character-method}
 \alias{norm,dtrMatrix,character-method}
+\alias{norm,indMatrix,character-method}
+\alias{norm,pMatrix,character-method}
 \alias{norm,sparseMatrix,character-method}
 %
 \description{
