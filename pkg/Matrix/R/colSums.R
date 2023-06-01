@@ -101,7 +101,7 @@ setMethod("rowSums",  signature(x = "indMatrix"),
 	  function(x, na.rm = FALSE, dims = 1L) {
               m <- x@Dim[1L]
               r <- if(x@margin == 1L)
-                       rep.int(1L, x@Dim[1L])
+                       rep.int(1L, m)
                    else tabulate(x@perm, m)
               if(!is.null(nms <- x@Dimnames[[1L]]))
                   names(r) <- nms
@@ -111,7 +111,7 @@ setMethod("rowMeans",  signature(x = "indMatrix"),
 	  function(x, na.rm = FALSE, dims = 1L) {
               m <- (d <- x@Dim)[1L]
               r <- if(x@margin == 1L)
-                       rep.int(1 / d[2L], x@Dim[1L])
+                       rep.int(1 / d[2L], m)
                    else tabulate(x@perm, m) / d[2L]
               if(!is.null(nms <- x@Dimnames[[1L]]))
                   names(r) <- nms
