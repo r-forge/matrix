@@ -8,7 +8,7 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
           function(x, type, ...) {
               if(any(x@Dim == 0L))
                   return(0)
-              switch(substr(type[1L], 1L, 1L),
+              switch(EXPR = type[1L],
                      "O" = , "o" = , "1" =
                          max(colSums(abs(x))),
                      "I" = , "i" =
@@ -29,7 +29,7 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
           function(x, type, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   return(0)
-              switch(substr(type[1L], 1L, 1L),
+              switch(EXPR = type[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,
@@ -45,12 +45,12 @@ setMethod("norm", signature(x = "indMatrix", type = "character"),
               d <- x@Dim
               if((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
                   return(0)
-              switch(substr(type[1L], 1L, 1L),
+              switch(EXPR = type[1L],
                      "O" = , "o" = , "1" =
                          if(x@margin == 1L) max(tabulate(x@perm, n)) else 1,
                      "I" = , "i" =
                          if(x@margin == 1L) 1 else max(tabulate(x@perm, m)),
-                     "2" = ,
+                     "2" =
                          sqrt(max(tabulate(x@perm, if(x@margin == 1L) n else m))),
                      "M" = , "m" =
                          1,
@@ -63,7 +63,7 @@ setMethod("norm", signature(x = "pMatrix", type = "character"),
           function(x, type, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   return(0)
-              switch(substr(type[1L], 1L, 1L),
+              switch(EXPR = type[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,

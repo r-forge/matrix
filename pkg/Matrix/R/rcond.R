@@ -35,7 +35,7 @@ setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
           function(x, norm, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   stop("rcond(x) is undefined: 'x' has length 0")
-              switch(substr(norm[1L], 1L, 1L),
+              switch(EXPR = norm[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,
@@ -49,7 +49,7 @@ setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
                              xx <- x@x * x@x
                              1 / sqrt(sum(xx) * sum(1 / xx))
                          } else 1 / n,
-                     stop("invalid 'type'"))
+                     stop("invalid 'norm'"))
           })
 
 setMethod("rcond", signature(x = "indMatrix", norm = "character"),
@@ -60,7 +60,7 @@ setMethod("rcond", signature(x = "indMatrix", norm = "character"),
               if (m == n) {
                   if(anyDuplicated.default(x@perm))
                       return(0)
-                  switch(substr(norm[1L], 1L, 1L),
+                  switch(EXPR = norm[1L],
                          "O" = , "o" = , "1" = ,
                          "I" = , "i" = ,
                          "2" = ,
@@ -68,7 +68,7 @@ setMethod("rcond", signature(x = "indMatrix", norm = "character"),
                              1,
                          "F" = , "f" = , "E" = , "e" =
                              1 / n,
-                         stop("invalid 'type'"))
+                         stop("invalid 'norm'"))
               } else {
                   if(m < n) {
                       x <- t(x)
@@ -83,7 +83,7 @@ setMethod("rcond", signature(x = "pMatrix", norm = "character"),
           function(x, norm, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   stop("rcond(x) is undefined: 'x' has length 0")
-              switch(substr(type[1L], 1L, 1L),
+              switch(EXPR = norm[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,
@@ -91,7 +91,7 @@ setMethod("rcond", signature(x = "pMatrix", norm = "character"),
                          1,
                      "F" = , "f" = , "E" = , "e" =
                          1 / n,
-                     stop("invalid 'type'"))
+                     stop("invalid 'norm'"))
           })
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
