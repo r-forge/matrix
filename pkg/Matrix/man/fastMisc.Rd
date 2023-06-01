@@ -135,8 +135,7 @@
     in the LU decomposition.}
   \item{order}{only used for \code{.solve.dgC.qr()}; integer code in \code{0:3},
     determining which \dQuote{symbolic Cholesky} method in \sQuote{AMD} is
-    used; see \code{\link[MatrixModels]{lm.fit.sparse}} in package
-    \CRANpkg{MatrixModels}.}
+    used; see \code{lm.fit.sparse} in package \CRANpkg{MatrixModels}.}
   %% .updateCHMfactor():
   \item{object}{a Cholesky factorization inheriting from virtual class
     \code{CHMfactor}, almost always the result of a call to generic
