@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.5-5 (2023-06-01 r4003)}{
+\section{Changes in version 1.6-0 (2023-06-01 r4005)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -51,9 +51,9 @@
       Objects inheriting from \code{Schur}, \code{sparseLU},
       \code{sparseQR}, or \code{CHMfactor} and serialized under
       earlier versions of \pkg{Matrix} must be modified for use
-      under \pkg{Matrix} \code{>= 1.5-5}, typically by setting
+      under \pkg{Matrix} \code{>= 1.6-0}, typically by setting
       \code{Dimnames} to its prototype \code{list(NULL, NULL)}
-      conditional on \code{packageVersion("Matrix") >= "1.5-5"}.
+      conditional on \code{packageVersion("Matrix") >= "1.6-0"}.
       Defensive code will check validity with \code{validObject}.
 
       \item Class \code{indMatrix} gains a \code{margin} slot with
@@ -72,9 +72,9 @@
       \cr
       Objects inheriting from \code{indMatrix} and serialized
       under earlier versions of \pkg{Matrix} must be modified
-      for use under \pkg{Matrix} \code{>= 1.5-5}, typically by
+      for use under \pkg{Matrix} \code{>= 1.6-0}, typically by
       setting \code{margin} to its prototype \code{1L} conditional
-      on \code{packageVersion("Matrix") >= "1.5-5"}.
+      on \code{packageVersion("Matrix") >= "1.6-0"}.
       Defensive code will check validity with \code{validObject}.
 
       \item New nonvirtual class \code{pcorMatrix} extending
