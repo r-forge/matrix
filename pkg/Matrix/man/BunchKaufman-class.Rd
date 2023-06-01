@@ -88,14 +88,14 @@
   }
 }
 \note{
-  In \pkg{Matrix} \code{< 1.5-5}, class \code{BunchKaufman} extended
+  In \pkg{Matrix} \code{< 1.6-0}, class \code{BunchKaufman} extended
   \code{\linkS4class{dtrMatrix}} and class \code{pBunchKaufman} extended
   \code{\linkS4class{dtpMatrix}}, reflecting the fact that the internal
   representation of the factorization is fundamentally triangular:
   there are \eqn{n(n+1)/2}{n*(n+1)/2} \dQuote{parameters}, and these
   can be arranged systematically to form an \eqn{n \times n}{n-by-n}
   triangular matrix.
-  \pkg{Matrix} \code{1.5-5} removed these extensions so that methods
+  \pkg{Matrix} \code{1.6-0} removed these extensions so that methods
   would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.  
   The availability of such methods gave the wrong impression that
   \code{BunchKaufman} and \code{pBunchKaufman} represent proper matrices, 
