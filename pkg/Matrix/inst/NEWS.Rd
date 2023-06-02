@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-01 r4005)}{
+\section{Changes in version 1.6-0 (2023-06-01 r4007)}{
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -195,6 +195,11 @@
       \item \code{invPerm(p)} no longer segfaults for \code{p}
       that are not valid permutation vectors.  (\code{invPerm(NA)}
       was enough to trigger a segfault.)
+
+      \item \code{chol2inv(x)} now computes \code{crossprod(solve(x))}
+      instead of \code{tcrossprod(solve(x))} for \emph{formally} lower
+      triangular \code{x} (and ignores the lower triangular part for
+      all other square \code{x}).
     }
   }
   \subsection{Misc}{
