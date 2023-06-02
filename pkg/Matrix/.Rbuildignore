@@ -55,9 +55,15 @@ R/sparseQR\.R$
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
 src/dgTMatrix\.[ch]$
+src/dpoMatrix\.[ch]$
+src/dppMatrix\.[ch]$
 src/dsCMatrix\.[ch]$
+src/dspMatrix\.[ch]$
+src/dsyMatrix\.[ch]$
 src/dtCMatrix\.[ch]$
 src/dtTMatrix\.[ch]$
+src/dtpMatrix\.[ch]$
+src/dtrMatrix\.[ch]$
 src/ldense\.[ch]$
 src/lgCMatrix\.[ch]$
 src/sparseQR\.[ch]$

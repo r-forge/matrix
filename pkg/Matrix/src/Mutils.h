@@ -74,9 +74,6 @@ SEXP v2spV(SEXP from);
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
 
-char La_norm_type(const char *typstr);
-char La_rcond_type(const char *typstr);
-
 SEXP Matrix_expand_pointers(SEXP pP);
 SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
 SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds);

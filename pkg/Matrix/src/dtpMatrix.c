@@ -2,60 +2,10 @@
  * Note: this means *square* {n x n} matrices
 */
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dtpMatrix.h"
-
-double get_norm_dtp(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-    
-    if (typstr[0] == 'I')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlantp)(typstr, ul, di, pdim, px,
-			    work FCONE FCONE FCONE);
-
-    UNPROTECT(4);
-    return norm;
-}
-
-SEXP dtpMatrix_norm(SEXP obj, SEXP type)
-{
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dtp(obj, typstr);
-    UNPROTECT(1);
-    return ScalarReal(norm);
-}
-
-SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
-    
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-
-    F77_CALL(dtpcon)(typstr, ul, di, pdim, px, &rcond,
-		     (double *) R_alloc((size_t) 3 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE FCONE FCONE);
-
-    UNPROTECT(5);
-    return ScalarReal(rcond);
-}
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0

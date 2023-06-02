@@ -1,11 +1,9 @@
 #ifndef MATRIX_PPMATRIX_H
 #define MATRIX_PPMATRIX_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dspMatrix.h"
-
-/* defined in factorizations.c : */
-SEXP dppMatrix_trf_(SEXP, int);
-
-SEXP dppMatrix_rcond(SEXP obj);
+#endif /* MJ */
 
 #endif
