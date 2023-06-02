@@ -1,4 +1,3 @@
-#include <ctype.h> /* toupper */
 #include "Mutils.h"
 
 /**
@@ -1266,44 +1265,6 @@ SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
 
 /* ================================================================== */
 /* ================================================================== */
-
-/* La_norm_type() and La_rcond_type() have been in src/include/R_ext/Lapack.h
-   and later in src/modules/lapack/Lapack.c but have still not been available
-   to package writers ...
-*/
-char La_norm_type(const char *typstr)
-{
-    char typup;
-
-    if (strlen(typstr) != 1)
-	error(_("argument type[1]='%s' must be a character string of string length 1"),
-	      typstr);
-    typup = (char) toupper(*typstr);
-    if (typup == '1')
-	typup = 'O'; /* aliases */
-    else if (typup == 'E')
-	typup = 'F';
-    else if (typup != 'M' && typup != 'O' && typup != 'I' && typup != 'F')
-	error(_("argument type[1]='%s' must be one of 'M','1','O','I','F', or 'E'"),
-	      typstr);
-    return typup;
-}
-
-char La_rcond_type(const char *typstr)
-{
-    char typup;
-
-    if (strlen(typstr) != 1)
-	error(_("argument type[1]='%s' must be a character string of string length 1"),
-	      typstr);
-    typup = (char) toupper(*typstr);
-    if (typup == '1')
-	typup = 'O'; /* alias */
-    else if (typup != 'O' && typup != 'I')
-	error(_("argument type[1]='%s' must be one of '1','O', or 'I'"),
-	      typstr);
-    return typup; /* 'O' or 'I' */
-}
 
 SEXP Matrix_expand_pointers(SEXP pP)
 {

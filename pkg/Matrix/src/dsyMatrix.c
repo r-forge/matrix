@@ -1,52 +1,7 @@
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "dsyMatrix.h"
-
-double get_norm_dsy(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-    
-    if (typstr[0] == 'I' || typstr[0] == 'O')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlansy)(typstr, ul, pdim, px, pdim, work FCONE FCONE);
-
-    UNPROTECT(3);
-    return norm;
-}
-
-SEXP dsyMatrix_norm(SEXP obj, SEXP type)
-{
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dsy(obj, typstr);
-    UNPROTECT(1);
-    return ScalarReal(norm);
-}
-
-SEXP dsyMatrix_rcond(SEXP obj)
-{
-    SEXP trf = PROTECT(dsyMatrix_trf_(obj, 2)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-    
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
-    double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-    
-    F77_CALL(dsycon)(ul, pdim, px, pdim, pperm, &norm, &rcond,
-		     (double *) R_alloc((size_t) 2 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
-    
-    UNPROTECT(5);
-    return ScalarReal(rcond);
-}
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
 #if 0

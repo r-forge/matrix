@@ -42,18 +42,6 @@ dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h Mdefines.h Syms.h Minlines.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h
 dgeMatrix.o: dgeMatrix.c dgeMatrix.h Lapack-etc.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
-dpoMatrix.o: dpoMatrix.c dpoMatrix.h dsyMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-dppMatrix.o: dppMatrix.c dppMatrix.h dspMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-dspMatrix.o: dspMatrix.c dspMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-dsyMatrix.o: dsyMatrix.c dsyMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-dtpMatrix.o: dtpMatrix.c dtpMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-dtrMatrix.o: dtrMatrix.c dtrMatrix.h Lapack-etc.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
 factorizations.o: factorizations.c factorizations.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 init.o: init.c abIndex.h \
@@ -66,10 +54,11 @@ init.o: init.c abIndex.h \
   CHOLMOD/Include/cholmod_supernodal.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
   CHMfactor.h Csparse.h dense.h Lapack-etc.h \
-  dgCMatrix.h cs_utils.h cs.h dgeMatrix.h dpoMatrix.h dsyMatrix.h \
-  dppMatrix.h dspMatrix.h dtrMatrix.h \
-  dtpMatrix.h factorizations.h packedMatrix.h products.h \
+  dgCMatrix.h cs_utils.h cs.h dgeMatrix.h \
+  factorizations.h packedMatrix.h products.h \
   unpackedMatrix.h sparse.h subscript.h validity.h
+kappa.o: kappa.c kappa.h Lapack-etc.h \
+  Mutils.h Mdefines.h Syms.h Minlines.h
 packedMatrix.o: packedMatrix.c packedMatrix.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 products.o: products.c products.h Lapack-etc.h \

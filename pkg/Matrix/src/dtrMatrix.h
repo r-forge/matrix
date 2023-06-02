@@ -1,12 +1,11 @@
 #ifndef MATRIX_TRMATRIX_H
 #define MATRIX_TRMATRIX_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Lapack-etc.h"
 #include "Mutils.h"
-
-double get_norm_dtr(SEXP obj, const char *typstr);
-SEXP dtrMatrix_norm(SEXP obj, SEXP type);
-SEXP dtrMatrix_rcond(SEXP obj, SEXP type);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer Cholesky_solve() */
 #if 0

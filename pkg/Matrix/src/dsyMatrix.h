@@ -1,15 +1,11 @@
 #ifndef MATRIX_SYMATRIX_H
 #define MATRIX_SYMATRIX_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Lapack-etc.h"
 #include "Mutils.h"
-
-/* defined in factorizations.c : */
-SEXP dsyMatrix_trf_(SEXP, int);
-
-double get_norm_dsy(SEXP obj, const char *typstr);
-SEXP dsyMatrix_norm(SEXP obj, SEXP type);
-SEXP dsyMatrix_rcond(SEXP obj);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
 #if 0

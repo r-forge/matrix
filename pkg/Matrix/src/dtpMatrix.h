@@ -1,12 +1,11 @@
 #ifndef MATRIX_TPMATRIX_H
 #define MATRIX_TPMATRIX_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Lapack-etc.h"
 #include "Mutils.h"
-
-double get_norm_dtp(SEXP obj, const char *typstr);
-SEXP dtpMatrix_norm(SEXP obj, SEXP type);
-SEXP dtpMatrix_rcond(SEXP obj, SEXP type);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0

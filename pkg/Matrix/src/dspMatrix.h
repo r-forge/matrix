@@ -1,15 +1,11 @@
 #ifndef MATRIX_SPMATRIX_H
 #define MATRIX_SPMATRIX_H
 
+/* MJ: no longer needed ... nothing below */
+#if 0
 #include "Lapack-etc.h"
 #include "Mutils.h"
-
-/* defined in factorizations.c : */
-SEXP dspMatrix_trf_(SEXP, int);
-
-double get_norm_dsp(SEXP obj, const char *typstr);
-SEXP dspMatrix_norm(SEXP obj, SEXP type);
-SEXP dspMatrix_rcond(SEXP obj);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0
