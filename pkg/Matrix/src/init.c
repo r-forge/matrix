@@ -14,6 +14,7 @@
 #include "dtrMatrix.h"
 #include "factorizations.h"
 #include "packedMatrix.h"
+#include "products.h"
 #include "sparse.h"
 #include "subscript.h"
 #include "unpackedMatrix.h"
@@ -102,7 +103,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
     CALLDEF(dtrMatrix_matrix_mm, 4),
-    CALLDEF(dtrMatrix_chol2inv, 1),
     CALLDEF(dtrMatrix_addDiag, 2),
     
     CALLDEF(Matrix_validate, 1),

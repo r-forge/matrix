@@ -11,8 +11,6 @@ double get_norm_dsy(SEXP obj, const char *typstr);
 SEXP dsyMatrix_norm(SEXP obj, SEXP type);
 SEXP dsyMatrix_rcond(SEXP obj);
 
-SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rt);
-
 /* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
 #if 0
 SEXP dsyMatrix_as_dspMatrix(SEXP from);

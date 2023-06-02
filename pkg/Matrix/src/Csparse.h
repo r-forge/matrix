@@ -3,22 +3,6 @@
 
 #include "Mutils.h"
 
-/* defined in ./sparse.c : */
-SEXP sparse_as_kind(SEXP, char, int);
-SEXP R_sparse_diag_U2N(SEXP);
-
-Rboolean isValid_Csparse(SEXP x);
-
-SEXP Csp_dense_products(SEXP a, SEXP b,
-			Rboolean transp_a,
-			Rboolean transp_b,
-			Rboolean transp_ans);
-
-SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP bool_arith);
-SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP bool_arith);
-SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP triplet, SEXP bool_arith);
-SEXP Csparse_dense_crossprod(SEXP a, SEXP b, SEXP transp);
-SEXP Csparse_dense_prod     (SEXP a, SEXP b, SEXP transp);
 SEXP Csparse_drop(SEXP x, SEXP tol);
 SEXP Csparse_horzcat(SEXP x, SEXP y);
 SEXP dCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);

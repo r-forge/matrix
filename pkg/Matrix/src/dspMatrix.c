@@ -48,34 +48,6 @@ SEXP dspMatrix_rcond(SEXP obj)
     return ScalarReal(rcond);
 }
 
-SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
-{
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
-    int *bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
-    int i, ione = 1, n = bdims[0], nrhs = bdims[1];
-    R_xlen_t nn = n * (R_xlen_t) nrhs;
-    const char *uplo = uplo_P(a);
-    double *ax = REAL(GET_SLOT(a, Matrix_xSym)), one = 1., zero = 0.,
-	*vx = REAL(GET_SLOT(val, Matrix_xSym)), *bx;
-
-    if (bdims[0] != n)
-	error(_("Matrices are not conformable for multiplication"));
-    if (nrhs >= 1 && n >= 1) {
-	Matrix_Calloc(bx, nn, double);
-	Memcpy(bx, vx, nn);
-	
-	R_xlen_t in;
-	for (i = 0, in = 0; i < nrhs; i++, in += n) { // in := i * n (w/o overflow!)
-	    F77_CALL(dspmv)(uplo, &n, &one, ax, bx + in, &ione,
-			    &zero, vx + in, &ione FCONE);
-	}
-	
-	Matrix_Free(bx, nn);
-    }
-    UNPROTECT(1);
-    return val;
-}
-
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0
 

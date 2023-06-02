@@ -8,9 +8,6 @@ double get_norm_dtp(SEXP obj, const char *typstr);
 SEXP dtpMatrix_norm(SEXP obj, SEXP type);
 SEXP dtpMatrix_rcond(SEXP obj, SEXP type);
 
-SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans);
-SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y);
-
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0
 SEXP dtpMatrix_getDiag(SEXP x);

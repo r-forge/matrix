@@ -48,38 +48,6 @@ SEXP dsyMatrix_rcond(SEXP obj)
     return ScalarReal(rcond);
 }
 
-SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP rtP)
-{
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));// incl. dimnames
-    int rt = asLogical(rtP); /* if(rt), compute b %*% a,  else  a %*% b */
-    int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
-	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
-	m = bdims[0], n = bdims[1];
-
-    if ((rt && n != adims[0]) || (!rt && m != adims[0]))
-	error(_("Matrices are not conformable for multiplication"));
-
-    double one = 1., zero = 0.;
-    R_xlen_t mn = m * (R_xlen_t)n;
-    double *bcp, *vx = REAL(GET_SLOT(val, Matrix_xSym));
-    Matrix_Calloc(bcp, mn, double);
-    Memcpy(bcp, vx, mn);
-
-    if (m >=1 && n >= 1)
-	F77_CALL(dsymm)(rt ? "R" :"L", uplo_P(a), &m, &n, &one,
-			REAL(GET_SLOT(a, Matrix_xSym)), adims, bcp,
-			&m, &zero, vx, &m FCONE FCONE);
-    // add dimnames:
-    int nd = rt ?
-	1 : // v <- b %*% a : rownames(v) == rownames(b)  are already there
-	0;  // v <- a %*% b : colnames(v) == colnames(b)  are already there
-    SEXP nms = PROTECT(VECTOR_ELT(get_symmetrized_DimNames(a, -1), nd));
-    SET_VECTOR_ELT(GET_SLOT(val, Matrix_DimNamesSym), nd, nms);
-    Matrix_Free(bcp, mn);
-    UNPROTECT(2);
-    return val;
-}
-
 /* MJ: no longer needed ... prefer more general unpackedMatrix_pack() */
 #if 0
 

@@ -11,8 +11,6 @@ double get_norm_dsp(SEXP obj, const char *typstr);
 SEXP dspMatrix_norm(SEXP obj, SEXP type);
 SEXP dspMatrix_rcond(SEXP obj);
 
-SEXP dspMatrix_matrix_mm(SEXP a, SEXP b);
-
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0
 SEXP dspMatrix_getDiag(SEXP x);
