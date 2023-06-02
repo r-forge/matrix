@@ -55,20 +55,6 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(rcond);
 }
 
-SEXP dtrMatrix_addDiag(SEXP x, SEXP d) {
-    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
-    SEXP ret = PROTECT(duplicate(x)),
-	r_x = GET_SLOT(ret, Matrix_xSym);
-    double *dv = REAL(d), *rv = REAL(r_x);
-
-    if ('U' == diag_P(x)[0])
-	error(_("cannot add diag() as long as 'diag = \"U\"'"));
-    for (int i = 0; i < n; i++) rv[i * (n + 1)] += dv[i];
-
-    UNPROTECT(1);
-    return ret;
-}
-
 /* MJ: no longer needed ... prefer Cholesky_solve() */
 #if 0
 
@@ -155,6 +141,20 @@ SEXP dtrMatrix_setDiag(SEXP x, SEXP d) {
 
 SEXP ltrMatrix_setDiag(SEXP x, SEXP d) {
     SET_trMatrix_Diag(  int, LOGICAL);
+}
+
+SEXP dtrMatrix_addDiag(SEXP x, SEXP d) {
+    int n = INTEGER(GET_SLOT(x, Matrix_DimSym))[0];
+    SEXP ret = PROTECT(duplicate(x)),
+	r_x = GET_SLOT(ret, Matrix_xSym);
+    double *dv = REAL(d), *rv = REAL(r_x);
+
+    if ('U' == diag_P(x)[0])
+	error(_("cannot add diag() as long as 'diag = \"U\"'"));
+    for (int i = 0; i < n; i++) rv[i * (n + 1)] += dv[i];
+
+    UNPROTECT(1);
+    return ret;
 }
 
 #endif /* MJ */
