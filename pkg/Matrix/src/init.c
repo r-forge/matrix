@@ -103,7 +103,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
     CALLDEF(dtrMatrix_matrix_mm, 4),
-    CALLDEF(dtrMatrix_addDiag, 2),
     
     CALLDEF(Matrix_validate, 1),
     CALLDEF(MatrixFactorization_validate, 1),

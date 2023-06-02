@@ -1640,10 +1640,8 @@ setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
           function(e1,e2)
       { ## this must only trigger for *dense* e1
 	  switch(.Generic,
-		 "+" = .Call(dtrMatrix_addDiag,
-                             unpack(..dense2d(e1)),   .diag.x(e2)),
-		 "-" = .Call(dtrMatrix_addDiag,
-                             unpack(..dense2d(e1)), - .diag.x(e2)),
+		 "+" = `diag<-`(e1, as.double(diag(e1, names=FALSE) + .diag.x(e2))),
+		 "-" = `diag<-`(e1, as.double(diag(e1, names=FALSE) - .diag.x(e2))),
 		 "*" = {
 		     n <- e2@Dim[1L]
 		     d2 <- if(e2@diag == "U") { # unit-diagonal
