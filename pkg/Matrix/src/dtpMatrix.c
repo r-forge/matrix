@@ -57,62 +57,6 @@ SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
     return ScalarReal(rcond);
 }
 
-SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
-{
-    SEXP val = PROTECT(dense_as_general(y, 'd', 2, 0));
-    int rt = asLogical(right); // if(rt), compute b %*% op(a), else op(a) %*% b
-    int tr = asLogical(trans); // if(tr), op(a) = t(a), else op(a) = a
-    /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
-    int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	*yDim = INTEGER(GET_SLOT(val, Matrix_DimSym));
-    int m = yDim[0], n = yDim[1];
-    int ione = 1;
-    const char *uplo = uplo_P(x), *diag = diag_P(x);
-    double *xx = REAL(GET_SLOT(x, Matrix_xSym)),
-	*vx = REAL(GET_SLOT(val, Matrix_xSym));
-
-    if (yDim[0] != xDim[1])
-    if ((rt && xDim[0] != n) || (!rt && xDim[1] != m))
-	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
-	      xDim[0], xDim[1], yDim[0], yDim[1]);
-    if (m < 1 || n < 1) {
-/* 	error(_("Matrices with zero extents cannot be multiplied")); */
-    } else /* BLAS */
-	// go via BLAS 2  dtpmv(.); there is no dtpmm in Lapack!
-	if(rt) {
-	    error(_("right=TRUE is not yet implemented __ FIXME"));
-	} else {
-	    for (int j = 0; j < n; j++) // X %*% y[,j]
-		F77_CALL(dtpmv)(uplo, /*trans = */ tr ? "T" : "N",
-				diag, yDim, xx,
-				vx + j * (size_t) m, &ione FCONE FCONE FCONE);
-	}
-    UNPROTECT(1);
-    return val;
-}
-
-/* FIXME: This function should be removed and a rt argument added to
- * dtpMatrix_matrix_mm -- also to be more parallel to ./dtrMatrix.c code */
-SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
-{
-    SEXP val = PROTECT(duplicate(x));
-    /* Since 'y' is square (n x n ),   dim(x %*% y) = dim(x) */
-    int *xDim = INTEGER(GET_SLOT(x, Matrix_DimSym)),
-	*yDim = INTEGER(GET_SLOT(y, Matrix_DimSym));
-    const char *uplo = uplo_P(y), *diag = diag_P(y);
-    double *yx = REAL(GET_SLOT(y, Matrix_xSym)),
- 	*vx = REAL(GET_SLOT(val, Matrix_xSym));
-
-    if (yDim[0] != xDim[1])
-	error(_("Dimensions of a (%d,%d) and b (%d,%d) do not conform"),
-	      xDim[0], xDim[1], yDim[0], yDim[1]);
-    for (int i = 0; i < xDim[0]; i++)/* val[i,] := Y' %*% x[i,]  */
-	F77_CALL(dtpmv)(uplo, "T", diag, yDim, yx,
-			vx + i, /* incr = */ xDim FCONE FCONE FCONE);
-    UNPROTECT(1);
-    return val;
-}
-
 /* MJ: no longer needed ... prefer more general packedMatrix_diag_[gs]et() */
 #if 0
 

@@ -8,12 +8,12 @@ double get_norm_dtr(SEXP obj, const char *typstr);
 SEXP dtrMatrix_norm(SEXP obj, SEXP type);
 SEXP dtrMatrix_rcond(SEXP obj, SEXP type);
 
-SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans);
-SEXP dtrMatrix_matrix_mm   (SEXP a, SEXP b, SEXP right, SEXP trans);
-
-SEXP dtrMatrix_chol2inv(SEXP a);
-
 SEXP dtrMatrix_addDiag(SEXP x, SEXP d);
+
+/* MJ: no longer needed ... prefer Cholesky_solve() */
+#if 0
+SEXP dtrMatrix_chol2inv(SEXP a);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general unpackedMatrix_diag_[gs]et() */
 #if 0

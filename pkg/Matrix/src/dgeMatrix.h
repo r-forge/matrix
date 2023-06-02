@@ -11,17 +11,6 @@ double get_norm_dge(SEXP obj, const char *typstr);
 SEXP dgeMatrix_norm(SEXP obj, SEXP type);
 SEXP dgeMatrix_rcond(SEXP obj, SEXP type);
 
-/* for crossprod() and tcrossprod() -- dge*() and the generalized versions: */
-SEXP dgeMatrix_crossprod(SEXP x, SEXP trans);
-SEXP  geMatrix_crossprod(SEXP x, SEXP trans);
-SEXP dgeMatrix_dgeMatrix_crossprod(SEXP x, SEXP y, SEXP trans);
-SEXP  geMatrix_geMatrix_crossprod(SEXP x, SEXP y, SEXP trans);
-SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans);
-SEXP  geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans);
-//  %*% :
-SEXP dgeMatrix_matrix_mm(SEXP a, SEXP b, SEXP right);
-SEXP  geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right);
-
 /* MJ: no longer needed ... prefer more general unpackedMatrix_diag_[gs]et() */
 #if 0
 SEXP dgeMatrix_getDiag(SEXP x);

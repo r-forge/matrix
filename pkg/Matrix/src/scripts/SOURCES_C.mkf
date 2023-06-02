@@ -19,6 +19,7 @@ SOURCES_C =  \
 	    sparseVector.c \
 	    abIndex.c \
 	    packedMatrix.c \
+	    products.c \
 	    unpackedMatrix.c \
 	    sparse.c \
 	    subscript.c \
