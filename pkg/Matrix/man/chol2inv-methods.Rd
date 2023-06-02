@@ -1,5 +1,5 @@
 \name{chol2inv-methods}
-\title{Inverse from Choleski or QR Decomposition -- Matrix Methods}
+\title{Inverse from Cholesky (or QR) Decomposition}
 %
 \docType{methods}
 \keyword{algebra}
@@ -10,19 +10,25 @@
 \alias{chol2inv-methods}
 %
 \alias{chol2inv,ANY-method}
-\alias{chol2inv,CHMfactor-method}
+\alias{chol2inv,ddiMatrix-method}
 \alias{chol2inv,denseMatrix-method}
-\alias{chol2inv,diagonalMatrix-method}
+\alias{chol2inv,dtCMatrix-method}
+\alias{chol2inv,dtpMatrix-method}
 \alias{chol2inv,dtrMatrix-method}
 \alias{chol2inv,sparseMatrix-method}
 %
 \description{
-  Invert a symmetric, positive definite square matrix from its Choleski
-  decomposition.  Equivalently, compute \eqn{(X'X)^{-1}}{(X'X)^(-1)}
-  from the (\eqn{R} part) of the QR decomposition of \eqn{X}.
-  \cr
-  Even more generally, given an upper triangular matrix \eqn{R},
-  compute \eqn{(R'R)^{-1}}{(R'R)^(-1)}.
+  For \emph{formally} upper and lower triangular matrices
+  \eqn{U} and \eqn{L}, compute \eqn{(U' U)^{-1}}{(U' U)^(-1)}
+  and \eqn{(L L')^{-1}}{(L L')^(-1)}, respectively.
+  For all other matrices, consider only the upper triangular
+  part \eqn{U} and compute \eqn{(U' U)^{-1}}{(U' U)^(-1)}.
+  
+  This function can be seen as way to invert a symmetric,
+  positive definite matrix from its Cholesky factor.
+  Equivalently, it can be seen as a way to compute
+  \eqn{(X' X)^{-1}}{(X' X)^(-1)} from the \eqn{R} part
+  of the QR factorization of \eqn{X}.
 }
 % \usage{
 % chol2inv(x, \dots)

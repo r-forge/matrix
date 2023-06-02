@@ -131,28 +131,55 @@ setMethod("Cholesky", signature(A = "matrix"),
 ## METHODS FOR GENERIC: chol2inv
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol2inv", signature(x = "denseMatrix"), # ->dtrMatrix
-	  function(x, ...)
-              chol2inv(unpack(.M2tri(..dense2d(x))), ...))
+setMethod("chol2inv", signature(x = "denseMatrix"),
+          function(x, ...) {
+              d <- x@Dim
+              if(d[1L] != d[2L])
+                  stop("matrix is not square")
+              if(.M.shape(x) != "t")
+                  x <- triu(x)
+              chol2inv(..dense2d(x), ...)
+          })
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
-	  function (x, ...) {
-	      if(x@diag != "N")
+          function(x, ...) {
+              if(x@diag != "N")
                   x <- ..diagU2N(x)
-	      .Call(dtrMatrix_chol2inv, x)
-	  })
+              r <- .Call(Cholesky_solve, x, NULL, FALSE)
+              i <- if(x@uplo == "U") 2L else 1L
+              r@Dimnames <- x@Dimnames[c(i, i)]
+              r
+          })
+
+setMethod("chol2inv", signature(x = "dtpMatrix"),
+          function(x, ...) {
+              if(x@diag != "N")
+                  x <- ..diagU2N(x)
+              r <- .Call(Cholesky_solve, x, NULL, TRUE)
+              i <- if(x@uplo == "U") 2L else 1L
+              r@Dimnames <- x@Dimnames[c(i, i)]
+              r
+          })
 
 setMethod("chol2inv", signature(x = "sparseMatrix"),
-	  function (x, ...)
-	      tcrossprod(solve(.M2tri(x))))
+          function(x, ...) {
+              d <- x@Dim
+              if(d[1L] != d[2L])
+                  stop("matrix is not square")
+              if(.M.repr(x) != "C")
+                  x <- as(x, "CsparseMatrix")
+              if(.M.shape(x) != "t")
+                  x <- triu(x)
+              chol2inv(..sparse2d(x), ...)
+          })
 
-setMethod("chol2inv", signature(x = "diagonalMatrix"),
-	  function (x, ...)
-	      tcrossprod(solve(x)))
+setMethod("chol2inv", signature(x = "dtCMatrix"),
+          function(x, ...)
+              (if(x@uplo == "U") tcrossprod else crossprod)(solve(x)))
 
-setMethod("chol2inv", signature(x = "CHMfactor"),
-	  function (x, ...)
-	      solve(x, system = "A"))
+setMethod("chol2inv", signature(x = "ddiMatrix"),
+          function(x, ...)
+              tcrossprod(solve(x)))
 
 
 ## METHODS FOR CLASS: p?Cholesky
