@@ -32,16 +32,16 @@
   \eqn{P_{1}}{P1} is a permutation matrix.
 
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{dpotrf} and \code{dpptrf}, which
-  do not permute rows or columns, so that \eqn{P_{1}}{P1}
-  is an identity matrix.
+  LAPACK routines \code{dpstrf}, \code{dpotrf}, and \code{dpptrf},
+  The latter two do not permute rows or columns,
+  so that \eqn{P_{1}}{P1} is an identity matrix.
   
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
 }
 \usage{
 chol(x, \dots)
-\S4method{chol}{dsyMatrix}(x, \dots)
+\S4method{chol}{dsyMatrix}(x, pivot = FALSE, tol = -1, \dots)
 \S4method{chol}{dspMatrix}(x, \dots)
 \S4method{chol}{dsCMatrix}(x, pivot = FALSE, \dots)
 \S4method{chol}{ddiMatrix}(x, \dots)
@@ -58,6 +58,11 @@ chol(x, \dots)
     employ the approximate minimum degree (AMD) algorithm
     in order to reduce fill-in, i.e., without regard for
     numerical stability.}
+  \item{tol}{a \link[=is.finite]{finite} numeric tolerance,
+    used only if \code{pivot = TRUE}.
+    The factorization algorithm stops if the pivot is less than
+    or equal to \code{tol}.  Negative \code{tol} is equivalent
+    to \code{nrow(x) * .Machine$double.eps * max(diag(x))}.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{x} should be used
     to compute the factorization.  The default is \code{"U"},
@@ -73,17 +78,17 @@ chol(x, \dots)
   traditional matrix and sparse if \code{x} is sparse.
 }
 \details{
-  For sparse \code{x} inheriting from
-  \code{\linkS4class{diagonalMatrix}}, the diagonal result is
-  computed directly and without pivoting, i.e., bypassing CHOLMOD.
+  For \code{x} inheriting from \code{\linkS4class{diagonalMatrix}},
+  the diagonal result is computed directly and without pivoting,
+  i.e., bypassing CHOLMOD.
   
-  For all other sparse \code{x}, \code{chol(x, pivot = value)} uses
-  \code{\link{Cholesky}(x, perm = value, LDL = FALSE, super = FALSE)}
-  under the hood.  If you must know the permutation \eqn{P_{1}}{P1}
-  in addition to the Cholesky factor \eqn{L} (or in this case its
-  transpose \eqn{L'}), then call \code{\link{Cholesky}} directly,
-  as the result of \code{chol(x, pivot = TRUE)} specifies \eqn{L'}
-  but not \eqn{P_{1}}{P1}.
+  For all other \code{x}, \code{chol(x, pivot = value)} calls
+  \code{\link{Cholesky}(x, perm = value, ...)} under the hood.
+  If you must know the permutation \eqn{P_{1}}{P1} in addition
+  to the Cholesky factor \eqn{L} (or in this case its transpose
+  \eqn{L'}), then call \code{\link{Cholesky}} directly, as the
+  result of \code{chol(x, pivot = TRUE)} specifies \eqn{L'} but
+  not \eqn{P_{1}}{P1}.
 }
 \seealso{
   The default method from \pkg{base}, \code{\link[base]{chol}},
@@ -95,7 +100,8 @@ chol(x, \dots)
 }
 \references{
   The LAPACK source code, including documentation; see
-  \url{https://netlib.org/lapack/double/dpotrf.f} and
+  \url{https://netlib.org/lapack/double/dpstrf.f},
+  \url{https://netlib.org/lapack/double/dpotrf.f}, and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
   Chen, Y., Davis, T. A., Hager, W. W., Rajamanickam, S. (2008).

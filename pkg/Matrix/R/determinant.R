@@ -64,8 +64,23 @@ setMethod("determinant", signature(x = "pCholesky", logarithm = "logical"),
               .Call(Cholesky_determinant, x, logarithm, TRUE))
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-              .Call(CHMfactor_determinant, x, logarithm))
+          function(x, logarithm = TRUE, sqrt = TRUE, ...) {
+              if(missing(sqrt)) {
+                  w <- getOption("Matrix.warnSqrtDefault",
+                                 .MatrixEnv[["warnSqrtDefault"]])
+                  if(is.atomic(w) && length(w) == 1L &&
+                     ((w.na <- is.na(w <- as.integer(w))) || w > 0L)) {
+                      if(w.na)
+                          on.exit(options(Matrix.warnSqrtDefault = 0L))
+                      else if(w > 1L) {
+                          oop <- options(warn = 2L)
+                          on.exit(options(oop))
+                      }
+                      warning("the default value of argument 'sqrt' of method 'determinant(<CHMfactor>, <logical>)' may change from TRUE to FALSE as soon as the next release of Matrix; set 'sqrt' when programming")
+                  }
+              }
+              .Call(CHMfactor_determinant, x, logarithm, sqrt)
+          })
 
 
 ########################################################################
@@ -111,7 +126,7 @@ setMethod("determinant", signature(x = "dgTMatrix", logarithm = "logical"),
               determinant(.T2C(x), logarithm, ...))
 
 setMethod("determinant", signature(x = "indMatrix", logarithm = "logical"),
-	  function(x, logarithm = TRUE, ...) {
+          function(x, logarithm = TRUE, ...) {
               d <- x@Dim
               if((n <- d[1L]) != d[2L])
                   stop("determinant of non-square matrix is undefined")
@@ -121,7 +136,7 @@ setMethod("determinant", signature(x = "indMatrix", logarithm = "logical"),
           })
 
 setMethod("determinant", signature(x = "pMatrix", logarithm = "logical"),
-	  function(x, logarithm = TRUE, ...)
+          function(x, logarithm = TRUE, ...)
               .mkDet(0, logarithm, signPerm(x@perm)))
 
 
@@ -135,7 +150,7 @@ setMethod("determinant", signature(x = "triangularMatrix", logarithm = "logical"
           })
 
 setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
-	  function(x, logarithm = TRUE, ...) {
+          function(x, logarithm = TRUE, ...) {
               if(x@diag == "N")
                   .mkDet(x = x@x, logarithm = logarithm)
               else .mkDet(0, logarithm, 1L)
@@ -155,7 +170,7 @@ rm(.cl)
 for(.cl in c("dpoMatrix", "dppMatrix"))
 setMethod("determinant", signature(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
-              trf <- Cholesky(x)
+              trf <- Cholesky(x, perm = FALSE)
               determinant(trf, logarithm, ...)
           })
 rm(.cl)
@@ -166,7 +181,7 @@ setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
                   Cholesky(x, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(x, errSing = FALSE))
               if(isS4(trf))
-                  determinant(trf, logarithm, ...)
+                  determinant(trf, logarithm, sqrt = FALSE, ...)
               else .mkDet(if(anyNA(x@x)) NaN else -Inf, logarithm, 1L)
           })
 

@@ -41,16 +41,16 @@
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
   
   Methods for \code{\linkS4class{denseMatrix}} are built on
-  LAPACK routines \code{dpotrf} and \code{dpptrf}, which
-  do not permute rows or columns, so that \eqn{P_{1}}{P1}
-  is an identity matrix.
+  LAPACK routines \code{dpstrf}, \code{dpotrf}, and \code{dpptrf}.
+  The latter two do not permute rows or columns,
+  so that \eqn{P_{1}}{P1} is an identity matrix.
 
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
 }
 \usage{
 Cholesky(A, \dots)
-\S4method{Cholesky}{dsyMatrix}(A, \dots)
+\S4method{Cholesky}{dsyMatrix}(A, perm = TRUE, tol = -1, \dots)
 \S4method{Cholesky}{dspMatrix}(A, \dots)
 \S4method{Cholesky}{dsCMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
     Imult = 0, \dots)
@@ -76,6 +76,11 @@ Cholesky(A, \dots)
     Pivoting for sparsity may introduce nonpositive leading
     principal minors, causing the factorization to fail, in
     which case it may be necessary to set \code{perm = FALSE}.}
+  \item{tol}{a \link[=is.finite]{finite} numeric tolerance,
+    used only if \code{pivot = TRUE}.
+    The factorization algorithm stops if the pivot is less than
+    or equal to \code{tol}.  Negative \code{tol} is equivalent
+    to \code{nrow(A) * .Machine$double.eps * max(diag(A))}.}
   \item{LDL}{a logical indicating if the simplicial factorization
     should be computed as
     \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
@@ -121,11 +126,11 @@ Cholesky(A, \dots)
   respectively.
 }
 \details{
-  Note that the result of a call to \code{Cholesky} must inherit
-  from \code{\linkS4class{CholeskyFactorization}} but need not
-  inherit from \code{\linkS4class{Matrix}}.  Users who just want
-  a matrix should consider using \code{\link{chol}}, whose methods
-  are simple wrappers around \code{Cholesky} returning just the
+  Note that the result of a call to \code{Cholesky} inherits
+  from \code{\linkS4class{CholeskyFactorization}} but never
+  \code{\linkS4class{Matrix}}.  Users who just want a matrix
+  should consider using \code{\link{chol}}, whose methods are
+  simple wrappers around \code{Cholesky} returning just the
   upper triangular Cholesky factor \eqn{L'},
   typically as a \code{\linkS4class{triangularMatrix}}.
   An alternative is to pass the \code{\linkS4class{CholeskyFactorization}}
@@ -154,7 +159,8 @@ Cholesky(A, \dots)
 }
 \references{
   The LAPACK source code, including documentation; see
-  \url{https://netlib.org/lapack/double/dpotrf.f} and
+  \url{https://netlib.org/lapack/double/dpstrf.f},
+  \url{https://netlib.org/lapack/double/dpotrf.f}, and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
   Chen, Y., Davis, T. A., Hager, W. W., Rajamanickam, S. (2008).

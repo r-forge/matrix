@@ -450,27 +450,21 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
 {
     static const char *valid_from[] = {
-	/* 0 */ "Cholesky", /* must match before dtrMatrix */
-	/* 1 */ "dtrMatrix", "ltrMatrix", "ntrMatrix",
-	/* 4 */ "corMatrix", "dpoMatrix", /* must match before dsyMatrix */
-	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix",
-	/* 9 */ "dgeMatrix", "lgeMatrix", "ngeMatrix", ""};
+	/* 0 */ "dtrMatrix", "ltrMatrix", "ntrMatrix",
+	/* 3 */ "corMatrix", "dpoMatrix", /* must match before dsyMatrix */
+	/* 5 */ "dsyMatrix", "lsyMatrix", "nsyMatrix",
+	/* 8 */ "dgeMatrix", "lgeMatrix", "ngeMatrix", ""};
     static const char *valid_to[] = {
-	/* 0 */ "pCholesky",
-	/* 1 */ "dtpMatrix", "ltpMatrix", "ntpMatrix",
-	/* 4 */ "pcorMatrix", "dppMatrix",
-	/* 6 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
+	/* 0 */ "dtpMatrix", "ltpMatrix", "ntpMatrix",
+	/* 3 */ "pcorMatrix", "dppMatrix",
+	/* 5 */ "dspMatrix", "lspMatrix", "nspMatrix", ""};
     int ivalid = R_check_class_etc(from, valid_from);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "unpackedMatrix_pack");
-    if (asLogical(strict) == 0) {
-	if (ivalid == 0)
-	    ivalid = 1; /* Cholesky->dtpMatrix */
-	else if (ivalid == 4 || ivalid == 5)
-	    ivalid = 6; /* corMatrix,dpoMatrix->dspMatrix */
-    }
+    if (asLogical(strict) == 0 && (ivalid == 3 || ivalid == 4))
+	ivalid = 5; /* corMatrix,dpoMatrix->dspMatrix */
     
-    int shift = (ivalid < 9) ? 0 : ((asLogical(tr_if_ge) != 0) ? 3+2+3 : 3);
+    int shift = (ivalid < 8) ? 0 : ((asLogical(tr_if_ge) != 0) ? 3+2+3 : 3);
     SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(valid_to[ivalid - shift]));
     
     SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -487,12 +481,12 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
 
     SEXP uplo;
     
-    if (ivalid >= 9)
+    if (ivalid >= 8)
 	PROTECT(uplo = mkString((asLogical(up_if_ge) != 0) ? "U" : "L"));
     else {
 	/* .(tr|sy)Matrix */
 	PROTECT(uplo = GET_SLOT(from, Matrix_uploSym));
-	if (ivalid < 4) {
+	if (ivalid < 3) {
 	    /* .trMatrix */
 	    SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 	    char di = *CHAR(STRING_ELT(diag, 0));
@@ -506,7 +500,7 @@ SEXP unpackedMatrix_pack(SEXP from, SEXP strict, SEXP tr_if_ge, SEXP up_if_ge)
 		SET_SLOT(to, Matrix_factorSym, factors);
 	    UNPROTECT(1); /* factors */
 
-	    if (ivalid == 4) {
+	    if (ivalid == 3) {
 		/* corMatrix */
 		SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
 		if (LENGTH(sd) > 0)
@@ -959,10 +953,9 @@ SEXP unpackedMatrix_transpose(SEXP from)
 {
     static const char *valid[] = {
 	/* 0 */ "dgeMatrix", "lgeMatrix", "ngeMatrix",
-	/* 3 */ "Cholesky",
-	/* 4 */ "dtrMatrix", "ltrMatrix", "ntrMatrix",
-	/* 7 */ "corMatrix", "dpoMatrix",
-	/* 9 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
+	/* 3 */ "dtrMatrix", "ltrMatrix", "ntrMatrix",
+	/* 6 */ "corMatrix", "dpoMatrix",
+	/* 8 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
     int ivalid = R_check_class_etc(from, valid);
     if (ivalid < 0)
 	ERROR_INVALID_CLASS(from, "unpackedMatrix_transpose");
@@ -983,7 +976,7 @@ SEXP unpackedMatrix_transpose(SEXP from)
     UNPROTECT(1); /* dim */
 
     SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-    if (ivalid < 7)
+    if (ivalid < 6)
 	set_reversed_DimNames(to, dimnames);
     else
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
@@ -998,7 +991,7 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	    SET_SLOT(to, Matrix_uploSym, uplo_to);
 	    UNPROTECT(1); /* uplo_to */
 	}
-	if (ivalid < 7) {
+	if (ivalid < 6) {
 	    /* .trMatrix */
 	    SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 	    char di = *CHAR(STRING_ELT(diag, 0));
@@ -1012,7 +1005,7 @@ SEXP unpackedMatrix_transpose(SEXP from)
 		SET_SLOT(to, Matrix_factorSym, factors);
 	    UNPROTECT(1); /* factors */
 
-	    if (ivalid == 7) {
+	    if (ivalid == 6) {
 		/* corMatrix */
 		SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
 		if (LENGTH(sd) > 0)

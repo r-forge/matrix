@@ -401,10 +401,10 @@ chkCholesky(c1.8, A1.8)
 
 data(KNex)
 mtm <- with(KNex, crossprod(mm))
-ld.3 <- determinant(Cholesky(mtm, perm = TRUE))
+ld.3 <- determinant(Cholesky(mtm, perm = TRUE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
                     "sPDCholesky"))
-ld.4 <- determinant(Cholesky(mtm, perm = FALSE))
+ld.4 <- determinant(Cholesky(mtm, perm = FALSE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
                     c("sPDCholesky", "spDCholesky")))
 c2 <- Cholesky(mtm, super = TRUE)
