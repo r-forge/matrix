@@ -14,7 +14,7 @@
 }
 
 setMethod("qr", signature(x = "sparseMatrix"),
-	  function(x, ...)
+          function(x, ...)
               qr(.sparse2g(as(x, "CsparseMatrix"), "d"), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
@@ -66,7 +66,7 @@ setMethod("expand2", signature(x = "sparseQR"),
           })
 
 setMethod("qr.Q", signature(qr = "sparseQR"),
-	  function(qr, complete = FALSE, Dvec) {
+          function(qr, complete = FALSE, Dvec) {
               m0 <- .qr.rank.def.warn(qr)
               if(missing(Dvec))
                   Dvec <- NULL
@@ -126,7 +126,7 @@ qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
 }
 
 setMethod("qr.R", signature(qr = "sparseQR"),
-	  function(qr, complete = FALSE)
+          function(qr, complete = FALSE)
               qrR(qr, complete = complete, backPermute = FALSE,
                   row.names = FALSE))
 

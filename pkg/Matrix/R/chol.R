@@ -2,14 +2,14 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("chol", signature(x = "generalMatrix"),
-	  function(x, uplo = "U", ...) {
+          function(x, uplo = "U", ...) {
               ch <- chol(forceSymmetric(x, uplo), ...)
               ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
 setMethod("chol", signature(x = "triangularMatrix"),
-	  function(x, uplo = "U", ...) {
+          function(x, uplo = "U", ...) {
               if(identical(uplo, x@uplo)) {
                   ch <- chol(forceSymmetric(x, uplo), ...)
                   ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
@@ -18,11 +18,11 @@ setMethod("chol", signature(x = "triangularMatrix"),
           })
 
 setMethod("chol", signature(x = "symmetricMatrix"),
-	  function(x, ...)
+          function(x, ...)
               chol(as(x, "dMatrix"), ...))
 
 setMethod("chol", signature(x = "diagonalMatrix"),
-	  function(x, ...)
+          function(x, ...)
               chol(..diag2d(x), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
@@ -59,25 +59,25 @@ setMethod("chol", signature(x = "ddiMatrix"),
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("Cholesky", signature(A = "generalMatrix"),
-	  function(A, uplo = "U", ...) {
+          function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
 setMethod("Cholesky", signature(A = "triangularMatrix"),
-	  function(A, uplo = "U", ...) {
+          function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
 setMethod("Cholesky", signature(A = "symmetricMatrix"),
-	  function(A, ...)
+          function(A, ...)
               Cholesky(as(A, "dMatrix"), ...))
 
 setMethod("Cholesky", signature(A = "diagonalMatrix"),
-	  function(A, ...)
+          function(A, ...)
               Cholesky(..diag2d(A), ...))
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
@@ -120,7 +120,7 @@ setMethod("Cholesky", signature(A = "ddiMatrix"),
           })
 
 setMethod("Cholesky", signature(A = "matrix"),
-	  function(A, uplo = "U", ...) {
+          function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               if(!is.null(dn <- dimnames(A)))
                   ch@Dimnames <- dn # restore asymmetric 'Dimnames'
@@ -456,7 +456,7 @@ setMethod("expand", signature(x = "CHMfactor"),
     .Call(CHMfactor_update, object, parent, mult)
 
 setMethod("update", signature(object = "CHMfactor"),
-	  function(object, parent, mult = 0, ...) {
+          function(object, parent, mult = 0, ...) {
               s <- .M.repr(parent)
               if(!nzchar(s))
                   stop("'parent' is not formally sparse")

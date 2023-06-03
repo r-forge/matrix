@@ -1,4 +1,3 @@
-
 ## METHODS FOR GENERIC: lu
 ## pivoted LU factorization, returning denseLU or sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -7,14 +6,14 @@ setMethod("lu", signature(x = "matrix"),
           function(x, ...) lu(.m2ge(x, "d"), ...))
 
 setMethod("lu", signature(x = "denseMatrix"),
-	  function(x, ...) lu(..dense2d(x), ...))
+          function(x, ...) lu(..dense2d(x), ...))
 
 setMethod("lu", signature(x = "dgeMatrix"),
-	  function(x, warnSing = TRUE, ...)
+          function(x, warnSing = TRUE, ...)
               .Call(dgeMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("lu", signature(x = "dsyMatrix"),
-	  function(x, cache = TRUE, ...) {
+          function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["LU"]]))
                   return(ch)
               r <- lu(.dense2g(x), ...)
@@ -22,7 +21,7 @@ setMethod("lu", signature(x = "dsyMatrix"),
           })
 
 setMethod("lu", signature(x = "dspMatrix"),
-	  function(x, cache = TRUE, ...) {
+          function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["LU"]]))
                   return(ch)
               r <- lu(.dense2g(x), ...)
@@ -31,7 +30,7 @@ setMethod("lu", signature(x = "dspMatrix"),
 
 for(.cl in c("dtrMatrix", "dtpMatrix"))
 setMethod("lu", signature(x = .cl),
-	  function(x, ...) {
+          function(x, ...) {
               if(x@uplo == "U" || x@diag == "U") {
                   r <- new("denseLU")
                   r@Dim <- d <- x@Dim
@@ -43,7 +42,7 @@ setMethod("lu", signature(x = .cl),
 rm(.cl)
 
 setMethod("lu", signature(x = "sparseMatrix"),
-	  function(x, ...)
+          function(x, ...)
               lu(..sparse2d(as(x, "CsparseMatrix")), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
@@ -59,7 +58,7 @@ setMethod("lu", signature(x = "dsCMatrix"),
           })
 
 setMethod("lu", "dtCMatrix",
-	  function(x, ...) {
+          function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
                   r <- new("sparseLU")
@@ -72,7 +71,7 @@ setMethod("lu", "dtCMatrix",
                   r@U <- if(upper) x else y
                   r@p <- r@q <- seq.int(from = 0L, length.out = n)
               } else lu(.sparse2g(x), ...)
-	  })
+          })
 
 setMethod("lu", signature(x = "dgRMatrix"),
           function(x, cache = TRUE, ...) {
@@ -140,7 +139,7 @@ setMethod("lu", signature(x = "dtTMatrix"),
           })
 
 setMethod("lu", "diagonalMatrix",
-	  function(x, ...) {
+          function(x, ...) {
               n <- (d <- x@Dim)[1L]
               L <- new("dtCMatrix")
               r <- new("sparseLU")
@@ -157,7 +156,7 @@ setMethod("lu", "diagonalMatrix",
               r@U <- L
               r@p <- r@q <- seq.int(from = 0L, length.out = n)
               r
-	  })
+          })
 
 
 ## METHODS FOR CLASS: denseLU
