@@ -330,7 +330,7 @@ for(.cl in c("dpoMatrix", "dppMatrix"))
 setMethod("solve", signature(a = .cl, b = "ANY"),
           function(a, b, tol = .Machine$double.eps, ...) {
               .solve.checkCond(a, tol)
-              trf <- Cholesky(a)
+              trf <- Cholesky(a, perm = FALSE)
               if(missing(b)) solve(trf, ...) else solve(trf, b, ...)
           })
 rm(.cl)

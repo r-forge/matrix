@@ -638,13 +638,6 @@ setClass("CholeskyFactorization",
 
 ## ...... Dense ........................................................
 
-if(TRUE) {
-setClass("Cholesky",  contains = c("dtrMatrix", "CholeskyFactorization"),
-         validity = function(object) .Call(Cholesky_validate, object))
-
-setClass("pCholesky", contains = c("dtpMatrix", "CholeskyFactorization"),
-         validity = function(object) .Call(pCholesky_validate, object))
-} else {
 ## Inherit most aspects of dt[rp]Matrix without extending them
 
 setClass("Cholesky", contains = "CholeskyFactorization",
@@ -674,7 +667,6 @@ setClass("pCholesky", contains = "CholeskyFactorization",
                  valid
              else .Call(pCholesky_validate, object)
          })
-}
 
 
 ## ...... Sparse .......................................................

@@ -233,32 +233,32 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 /* ==== CLASS LISTS ================================================= */
 /* Keep synchronized with ../inst/include/Matrix.h !                  */
 
-/* Cholesky->dtrMatrix, etc. */
-#define VALID_NONVIRTUAL_SHIFT(i, p2ind) ((i >= 7) ? 0 : ((i >= 6) ? p2ind != 0 : ((i >= 4) ? 12 : ((i >= 2) ? 14 : 21))))
+/* dpoMatrix->dsyMatrix, etc. */
+#define VALID_NONVIRTUAL_SHIFT(i, p2ind)				\
+    ((i >= 5) ? 0 : ((i >= 4) ? p2ind != 0 : ((i >= 2) ? 12 : 14)))
 
 #define VALID_NONVIRTUAL_MATRIX						\
-/*  0 */  "Cholesky", "pCholesky",					\
-/*  2 */ "dpoMatrix", "dppMatrix",					\
-/*  4 */ "corMatrix", "pcorMatrix",					\
-/*  6 */   "pMatrix", "indMatrix",					\
-/*  8 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
-/* 13 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
-/* 18 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
-/* 23 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
-/* 28 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
-/* 33 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
-/* 38 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
-/* 43 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
-/* 48 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
-/* 53 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
-/* 58 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
-/* 63 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
-/* 68 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
-/* 73 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
-/* 78 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
+/*  0 */ "dpoMatrix", "dppMatrix",					\
+/*  2 */ "corMatrix", "pcorMatrix",					\
+/*  4 */   "pMatrix", "indMatrix",					\
+/*  6 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
+/* 11 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
+/* 16 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
+/* 21 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
+/* 26 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
+/* 31 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
+/* 36 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
+/* 41 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
+/* 46 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
+/* 51 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
+/* 56 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
+/* 61 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
+/* 66 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
+/* 71 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
+/* 76 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_NONVIRTUAL_VECTOR					\
-/* 83 */ "dsparseVector", "lsparseVector", "nsparseVector",	\
+/* 81 */ "dsparseVector", "lsparseVector", "nsparseVector",	\
  	 "isparseVector", "zsparseVector"
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
@@ -271,7 +271,6 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
     "nmatrix", "ngeMatrix",			\
     "zmatrix", "zgeMatrix"
 
-/* NB: includes ddiMatrix which is no longer formally denseMatrix */
 #define MATRIX_VALID_ddense				\
     "dgeMatrix", "dtrMatrix",				\
     "dsyMatrix", "dpoMatrix", "ddiMatrix",		\
@@ -281,7 +280,6 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
     /* dtp */ "pCholesky", "pBunchKaufman",		\
     /* dpo */ "corMatrix"
 
-/* NB: includes ldiMatrix which is no longer formally denseMatrix */
 #define MATRIX_VALID_ldense			\
     "lgeMatrix",				\
     "ltrMatrix", "lsyMatrix", "ldiMatrix",	\

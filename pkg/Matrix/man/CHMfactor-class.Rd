@@ -164,8 +164,6 @@ isLDL(x)
 }
 \section{Methods}{
   \describe{
-    \item{\code{chol2inv}}{\code{signature(x = "CHMfactor")}:
-      see \code{\link{chol2inv-methods}}.}
     \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "CsparseMatrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L}.}
@@ -178,12 +176,22 @@ isLDL(x)
       returns a \code{\linkS4class{pMatrix}} representing
       the permutation matrix \eqn{P_{1}}.}
     \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
-      computes the determinant of the factorized matrix \eqn{A}
-      or its logarithm.}
+      behaves according to an optional argument \code{sqrt}.
+      If \code{sqrt = FALSE}, then this method computes the determinant
+      of the factorized matrix \eqn{A} or its logarithm.
+      If \code{sqrt = TRUE}, then this method computes the determinant
+      of the factor \eqn{L} or its logarithm, giving \code{NaN} for the
+      modulus when \eqn{D} has negative diagonal elements, as in that
+      case \eqn{L} is not defined.  For backwards compatibility, the
+      default value of \code{sqrt} is \code{TRUE}, but that is due to
+      change in a future version of \pkg{Matrix}, hence defensive code
+      will always set \code{sqrt}.  Calls to this method not setting
+      \code{sqrt} may warn about the pending change.  The warnings can
+      be disabled with \code{\link{options}(Matrix.warnSqrtDefault = 0)}.}
     \item{\code{diag}}{\code{signature(x = "CHMfactor")}:
-      returns a numeric vector of length \eqn{n} containing
-      the diagonal elements of \eqn{D}, which are the squared
-      diagonal elements of \eqn{L}.}
+      returns a numeric vector of length \eqn{n} containing the diagonal
+      elements of \eqn{D}, which (\emph{if} they are all non-negative)
+      are the squared diagonal elements of \eqn{L}.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:

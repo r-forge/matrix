@@ -3,18 +3,7 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if(FALSE) {
-## MJ: These would make a lot of sense, but we already have
-##     * as(      <denseLU>, "Matrix")
-##     * as( <BunchKaufman>, "Matrix")
-##     * as(<pBunchKaufman>, "Matrix")
-##     * as(    <CHMfactor>, "Matrix")
-##     _not_ returning the factorized matrix ...
-##
-##     Remove those and replace them with more specific coercions ??
-##     * as(      <denseLU>, "dgeMatrix")
-##     * as( <BunchKaufman>, "dtrMatrix")
-##     * as(<pBunchKaufman>, "dtpMatrix")
-##     * as(    <CHMfactor>, "dtCMatrix")
+## MJ: not yet ... existing as(<CHMfactor>, "Matrix") must become defunct first?
 setAs("MatrixFactorization", "Matrix",
       function(from) {
           n <- length(x <- expand2(from))
@@ -89,11 +78,3 @@ setMethod("show", "QR",
               cat("QR factorization of ")
               str(object)
           })
-
-## 'Cholesky' and 'pCholesky' represent matrices and we "show" them accordingly
-
-setMethod("show", "Cholesky",
-          function(object) prMatrix(object))
-
-setMethod("show", "pCholesky",
-          function(object) prMatrix(object))

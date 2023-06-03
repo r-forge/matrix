@@ -26,6 +26,7 @@
 \alias{.nC2d}
 \alias{.nC2l}
 %
+\alias{chol2inv,CHMfactor-method}
 \alias{coerce,CHMfactor,Matrix-method}
 \alias{coerce,CHMfactor,RsparseMatrix-method}
 \alias{coerce,CHMfactor,TsparseMatrix-method}
@@ -225,6 +226,16 @@
   of \pkg{Matrix} only and may be defunct as soon as the next release.
 }
 \usage{
+## Deprecated in 1.6-0
+\S4method{chol2inv}{CHMfactor}(x, ...)
+\S4method{coerce}{CHMfactor,Matrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,RsparseMatrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,TsparseMatrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,dMatrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,dsparseMatrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,sparseMatrix}(from, to, strict = TRUE)
+\S4method{coerce}{CHMfactor,triangularMatrix}(from, to, strict = TRUE)
+
 ## Deprecated in 1.5-4
 ..2dge(from)
 .C2nC(from, isTri)

@@ -5,7 +5,53 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-01 r4007)}{
+\section{Changes in version 1.6-0 (2023-06-03 r4011)}{
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item Class \code{indMatrix} gains a \code{margin} slot with value
+      \code{1L} or \code{2L} (\code{1L} being the prototype and
+      previously implicit value), indicating that the object represents
+      a row or column index matrix, with ones at \code{[i, perm[i]]} or
+      \code{[perm[j], j]}, respectively.
+      \cr
+      Methods with \code{indMatrix} or its subclass \code{pMatrix}
+      in the signature have been adjusted to account for the new slot.
+      Notably, multiplication on the right by an \code{indMatrix} with
+      \code{margin = 2} is now implemented as a column subscript, and
+      the transpose of an \code{indMatrix} is now the same object but
+      with \dQuote{opposite} \code{margin}.
+      
+      \item Virtual class \code{MatrixFactorization} gains a
+      \code{Dimnames} slot.  Now all factorizations preserve the
+      \code{Dimnames} of the original, factorized \code{Matrix},
+      whereas previously classes \code{Schur}, \code{sparseQR},
+      \code{dCHMsimpl}, and \code{dCHMsuper} did \emph{not}.
+      Users can get the value of the new \code{Dimnames} slot with
+      \code{dimnames(.)} and set it with \code{dimnames(.) <- value}.
+      
+      \item Classes \code{p?BunchKaufman} and \code{p?Cholesky} no
+      longer extend \code{dtrMatrix} or \code{dtpMatrix} and in turn
+      no longer extend \code{Matrix}.  They retain slots \code{Dim},
+      \code{Dimnames}, \code{uplo}, and \code{x}, but not \code{diag}.
+      Coercions \code{as(x, "dtrMatrix")} and \code{as(x, "dtpMatrix")}
+      are provided to support users still wanting a formally triangular
+      matrix.  This change implies that virtual classes \code{Matrix}
+      and \code{MatrixFactorization} no longer intersect.
+      
+      \item Classes \code{p?Cholesky} gain a \code{perm} slot with
+      prototype \code{integer(0L)} to support representation of
+      pivoted factorizations, as typically computed by LAPACK routine
+      \code{dpstrf}.  \code{perm} of length zero is valid and
+      equivalent to the identity permutation.
+
+      \item Methods for generic function \code{chol} that previously
+      returned an object of class \code{p?Cholesky} now return an
+      equivalent object of class \code{dtrMatrix} or \code{dtpMatrix}.
+      Existing code that relied (correctly) on \code{chol} to return
+      the upper triangular Cholesky factor as a \code{Matrix} can be
+      expected to work as before.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -20,7 +66,7 @@
       (no longer coercing to \code{matrix} and back), and
       \code{RsparseMatrix}
       (no longer coercing to \code{TsparseMatrix}, then to
-      \code{CsparseMatrix}, then back to \code{TsparseMatrix}).
+      \code{CsparseMatrix}, then back to \code{TsparseMatrix} [!]).
       \cr
       \code{x[i, j, drop = FALSE]} preserves the class of \code{x}
       in more cases where \code{x} is a \code{triangularMatrix},
@@ -36,61 +82,23 @@
       for \code{x} inheriting from \code{Matrix}.  They are handled
       as \code{integer(0)}, consistent with base R.
 
-      \item Virtual class \code{MatrixFactorization} gains a
-      \code{Dimnames} slot.  Now all factorizations preserve the
-      \code{Dimnames} of the original, factorized \code{Matrix}.
-      Previously, only subclasses \code{denseLU},
-      \code{p?BunchKaufman}, and \code{p?Cholesky} had
-      a \code{Dimnames} slot.  Subclass \code{sparseLU} did not,
-      but used those of its \code{L} and \code{U} slots to store
-      \emph{permuted} names.
-      \cr
-      Users can get the value of the new \code{Dimnames} slot with
-      \code{dimnames(.)} and set it with \code{dimnames(.) <- value}.
-      \cr
-      Objects inheriting from \code{Schur}, \code{sparseLU},
-      \code{sparseQR}, or \code{CHMfactor} and serialized under
-      earlier versions of \pkg{Matrix} must be modified for use
-      under \pkg{Matrix} \code{>= 1.6-0}, typically by setting
-      \code{Dimnames} to its prototype \code{list(NULL, NULL)}
-      conditional on \code{packageVersion("Matrix") >= "1.6-0"}.
-      Defensive code will check validity with \code{validObject}.
-
-      \item Class \code{indMatrix} gains a \code{margin} slot with
-      value \code{1L} or \code{2L} (\code{1L} being the prototype
-      and previously implicit value), indicating that the object
-      represents a row or column index matrix, respectively.  The
-      \code{perm} slot is interpreted accordingly;
-      see \code{help("indMatrix-class")} for details.
-      \cr
-      Methods with \code{indMatrix} or its subclass \code{pMatrix}
-      in the signature have been adjusted to account for the new slot.
-      Notably, multiplication on the right by an \code{indMatrix}
-      with \code{margin = 2} is now implemented as a column subscript,
-      and the transpose of \code{indMatrix} is now the same object but
-      with \dQuote{opposite} \code{margin}.
-      \cr
-      Objects inheriting from \code{indMatrix} and serialized
-      under earlier versions of \pkg{Matrix} must be modified
-      for use under \pkg{Matrix} \code{>= 1.6-0}, typically by
-      setting \code{margin} to its prototype \code{1L} conditional
-      on \code{packageVersion("Matrix") >= "1.6-0"}.
-      Defensive code will check validity with \code{validObject}.
-
       \item New nonvirtual class \code{pcorMatrix} extending
       \code{dppMatrix}.  It is the counterpart of \code{corMatrix}
       using packed storage, supporting more efficient storage of
       dense correlation matrices.  Now \code{pack(<corMatrix>)}
       gives a \code{pcorMatrix} preserving the \code{sd} slot,
       rather than a \code{dppMatrix} without an \code{sd} slot.
-
+      
       \item New virtual classes \code{BunchKaufmanFactorization},
-      extended by existing nonvirtual classes \code{p?BunchKaufman};
-      \code{SchurFactorization}, extended by existing nonvirtual
-      class \code{Schur}; and \code{QR}, extended by existing
-      nonvirtual class \code{sparseQR}.  These are parallel to the
-      existing virtual classes \code{CholeskyFactorization} and \code{LU}.
-      Packages defining new factorization classes may extend these.
+      \code{SchurFactorization}, and \code{QR}, extended by existing
+      nonvirtual classes \code{p?BunchKaufman}, \code{Schur}, and
+      \code{sparseQR}, respectively.  These are parallel to the
+      existing virtual classes \code{CholeskyFactorization} and
+      \code{LU}.  Packages defining new factorization classes may
+      extend these.
+
+      \item Virtual class \code{CHMfactor} and its subclasses
+      gain formal validity methods.
 
       %% TODO: add examples _using_ 'expand2'
       %% TODO: fix bug in expand2(<upper triangular p?BunchKaufman>)
@@ -98,12 +106,11 @@
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor and
       column names on the last factor, supporting reconstruction of
-      factorized \code{Matrix} as \code{Reduce(`\%*\%`, expand2(.))}.
+      the factorized \code{Matrix} as \code{Reduce(`\%*\%`, expand2(.))}.
       \cr
       \code{expand} and its methods are retained for backwards
-      compatibility.  It may be formally deprecated in the future,
+      compatibility.  They may be formally deprecated in the future,
       hence new code should use \code{expand2}.
-      \cr
       Notably, \code{expand2} has methods for all factorizations in
       \pkg{Matrix}, whereas \code{expand} continues to have methods
       only for \code{CHMfactor}, \code{denseLU}, and \code{sparseLU}.
@@ -111,16 +118,58 @@
       including useful optional arguments for Cholesky and QR
       factorizations.
 
-      \item \code{as(x, "dgeMatrix")}, \code{as(x, "dtrMatrix")},
-      and \code{as(x, "dtpMatrix")} for \code{x} inheriting from
-      \code{denseLU}, \code{BunchKaufman}, and \code{pBunchKaufman},
-      respectively, allowing users to inspect the LAPACK representation
-      of those factorizations, notably as classes \code{BunchKaufman}
-      and \code{pBunchKaufman} no longer extend \code{Matrix};
-      see Bug Fixes.
+      \item Generic function \code{diag} gains methods for
+      \code{p?Cholesky} and \code{CHMfactor}.  The result is a
+      numeric vector containing the diagonal entries of \eqn{D}
+      as defined in
+      \code{help("Cholesky-class")} and \code{help("CHMfactor-class")}.
 
-      New utilities \code{invertPerm}, \code{signPerm}, and
-      \code{isPerm} for computing the inverse and sign of a
+      \item New coercions \code{as(<CHMsimpl>, "dtCMatrix")}
+      and \code{as(<CHMsuper>, "dgCMatrix")}, allowing users
+      to more easily inspect the internal representation of
+      the simplicial and supernodal Cholesky factorizations.
+      These are equivalent to \code{as(., "CsparseMatrix")}
+      (i.e., they give the \code{CsparseMatrix} representation of
+      the Cholesky factor \eqn{L}) \emph{if} the \code{CHMfactor}
+      object was generated as \code{Cholesky(A, LDL = FALSE, \dots)}.
+      Otherwise, the result is actually the scaled factor
+      \eqn{L_{1}}{L1} with its diagonal entries replaced by
+      those of \eqn{D}.
+
+      %% TODO: add examples and tests _using_ the pivoted
+      %% factorizations, notably to solve a linear system 
+      \item Generic function \code{Cholesky} gains methods for
+      \code{denseMatrix} returning an object of class \code{p?Cholesky}.
+      The method for \code{dsyMatrix} admits a \code{perm} argument,
+      with default value \code{TRUE}, indicating if the pivoted
+      factorization should be computed.  The corresponding \code{chol}
+      method admits an argument \code{pivot} (with default value
+      \code{FALSE}), indicating the same.
+      
+      \item \code{determinant(x, \dots)} and \code{solve(a, b, \dots)}
+      now work for \code{x} and \code{a} inheriting from
+      \code{MatrixFactorization}, behaving as if \code{x} and \code{a}
+      were replaced by the factorized \code{Matrix}.  The exception is
+      \code{x} inheriting from \code{CHMfactor}, where for backwards
+      compatibility the default behaviour is still to compute the
+      determinant of the Cholesky factor.  This exception should be
+      considered \emph{temporary}, hence defensive code will call
+      \code{determinant} with (new) optional argument \code{sqrt} set to
+      \code{TRUE} or \code{FALSE} explicitly, to not rely on the current
+      default value.  See \code{help("CHMfactor-class")} for details.
+
+      \item The \code{lu} and \code{qr} methods for class
+      \code{dgCMatrix} now admit an \code{order} argument with
+      value in \code{0:3}, allowing the expert user to choose
+      among all ordering methods made available by the CSparse
+      library.
+      
+      \item \code{solve(<dgCMatrix>, b, sparse = TRUE)} is now
+      handled entirely in C code via \code{cs_spsolve} from the
+      CSparse library.
+      
+      \item New utilities \code{invertPerm}, \code{signPerm},
+      and \code{isPerm} for computing the inverse and sign of a
       permutation vector and testing whether an integer vector
       is a permutation.  \code{invertPerm} is a more general
       version of the already exported \code{invPerm}, which
@@ -154,11 +203,30 @@
       \item \code{x[i, ]} now correctly drops dimensions when
       \code{x} is a 1-by-\code{n} \code{Matrix} and \code{i} is
       \code{TRUE}.
-
+      
+      \item Methods for \code{solve} now obey the following rules
+      much more strictly:
+      \itemize{
+	\item \code{solve(a=<Matrix>, b=<vector>)} returns a vector.
+	\item \code{solve(a=<denseMatrix>, b=<Matrix>)} returns
+	a \code{denseMatrix}.
+	\item \code{solve(a=<sparseMatrix>, b=<Matrix>, sparse=FALSE)}
+	returns a \code{denseMatrix}.
+	\item \code{solve(a=<sparseMatrix>, b=<Matrix>, sparse=TRUE)}
+	returns a \code{sparseMatrix}.
+      }
+      resolving some longstanding incompatibilities with \pkg{base}.
+      Methods for \code{a} inheriting from \code{sparseMatrix} that
+      admit a \code{sparse} argument have different default values of
+      \code{sparse}, depending on the class of \code{b}.  Methods of
+      missing or sparse \code{b} have default \code{sparse = TRUE},
+      while methods for dense \code{b} have default \code{sparse = FALSE}.
+      
       \item The prototype of the \code{Dim} slot of virtual class
       \code{MatrixFactorization} is now \code{integer(2L)}.
       Previously it was \code{integer(0L)}, with the result that
-      \code{validObject(new("<subclass>"))} was always an error.
+      \code{validObject(new("<nonvirtual subclass>"))} was always
+      an error.
 
       \item The prototype of the \code{L} slot of class
       \code{sparseLU} is now formally lower triangular, so that
@@ -168,14 +236,6 @@
       of class \code{Schur} are now 0-by-0 \code{dgeMatrix} and
       \code{dtrMatrix}, respectively, so that
       \code{validObject(new("Schur"))} is not an error.
-
-      \item Classes \code{BunchKaufman} and \code{pBunchKaufman}
-      now only extend \code{MatrixFactorization}, i.e., they no
-      longer extend \code{dtrMatrix} or \code{dtpMatrix}.  They
-      retain slots \code{Dimnames}, \code{uplo}, and \code{x},
-      but these are no longer inherited from \code{dtrMatrix}.
-      See \code{help("BunchKaufman-class")} for the rationale
-      and other details.
 
       \item \code{BunchKaufman(<matrix>)} now works when argument
       \code{uplo} (documented to be optional) is missing.

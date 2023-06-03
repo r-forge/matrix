@@ -26,8 +26,8 @@ setMethod("chol", signature(x = "diagonalMatrix"),
               chol(..diag2d(x), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
-          function(x, ...) {
-              ch <- as(Cholesky(x), "dtrMatrix")
+          function(x, pivot = FALSE, tol = -1, ...) {
+              ch <- as(Cholesky(x, perm = pivot, tol = tol), "dtrMatrix")
               if(ch@uplo != "U") t(ch) else ch
           })
 
@@ -81,8 +81,8 @@ setMethod("Cholesky", signature(A = "diagonalMatrix"),
               Cholesky(..diag2d(A), ...))
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
-          function(A, ...)
-              .Call(dpoMatrix_trf, A, 2L, FALSE, -1))
+          function(A, perm = TRUE, tol = -1, ...)
+              .Call(dpoMatrix_trf, A, 2L, perm, tol))
 
 setMethod("Cholesky", signature(A = "dspMatrix"),
           function(A, ...)
@@ -185,31 +185,72 @@ setMethod("chol2inv", signature(x = "ddiMatrix"),
 ## METHODS FOR CLASS: p?Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## returning list(L, L') or list(L1, D, L1'),
-## where  A = L L' = L1 D L1'  and  L = L1 sqrt(D)
+## FIXME: methods for 'coerce' and 'diag' should pivot 'Dimnames'
+
+setAs("Cholesky", "dtrMatrix",
+      function(from) {
+          to <- new("dtrMatrix")
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          to@x <- from@x
+          to
+      })
+
+setAs("pCholesky", "dtpMatrix",
+      function(from) {
+          to <- new("dtpMatrix")
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          to@x <- from@x
+          to
+      })
+
+setMethod("diag", signature(x = "Cholesky"),
+          function(x, nrow, ncol, names = TRUE)
+              diag(as(x, "dtrMatrix"), names = names))
+
+setMethod("diag", signature(x = "pCholesky"),
+          function(x, nrow, ncol, names = TRUE)
+              diag(as(x, "dtpMatrix"), names = names))
+
+
+## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
+## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
 .def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
-    x <- as(x, .CL)
     d <- x@Dim
     dn <- x@Dimnames
-    up <- x@uplo == "U"
-    nu <- x@diag == "N"
-    if(LDL && nu) {
+
+    uplo <- x@uplo
+    perm <- x@perm
+
+    P <- new("pMatrix")
+    P@Dim <- d
+    P@Dimnames <- c(list(NULL), dn[2L])
+    P@margin <- 2L
+    P@perm <- if(length(perm)) invertPerm(perm) else seq_len(d[1L])
+
+    P. <- P
+    P.@Dimnames <- c(dn[1L], list(NULL))
+    P.@margin <- 1L
+
+    X <- new(.CL)
+    X@Dim <- d
+    X@uplo <- uplo
+    if(LDL) {
         L.ii <- diag(x, names = FALSE)
-        x@x <- x@x / if(up) .UP else .LO
-        x@diag <- "U"
-    }
-    L  <- if(up) t(x) else   x
-    L. <- if(up)   x  else t(x)
-    L @Dimnames <- c(dn[1L], list(NULL))
-    L.@Dimnames <- c(list(NULL), dn[2L])
+        X@x <- x@x / if(uplo == "U") .UP else .LO
+        X@diag <- "U"
+    } else X@x <- x@x
+    L  <- if(uplo == "U") t(X) else   X
+    L. <- if(uplo == "U")   X  else t(X)
     if(LDL) {
         D <- new("ddiMatrix")
         D@Dim <- d
-        if(nu)
-            D@x <- L.ii * L.ii
-        else D@diag <- "U"
-        list(L1 = L, D = D, L1. = L.)
-    } else list(L = L, L. = L.)
+        D@x <- L.ii * L.ii
+        list(P1. = P., L1 = L, D = D, L1. = L., P1 = P)
+    } else list(P1. = P., L = L, L. = L., P1 = P)
 }
 
 body(.def.unpacked) <-
@@ -234,6 +275,8 @@ rm(.def.unpacked, .def.packed)
 
 ## METHODS FOR CLASS: CHMfactor
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## FIXME: methods for 'coerce' and 'diag' should pivot 'Dimnames'
 
 .CHM.is.perm <- function(x)
     !as.logical(x@type[1L])

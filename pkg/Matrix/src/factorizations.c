@@ -1437,10 +1437,11 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
     return mkDet(modulus, givelog, sign);
 }
 
-SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
+SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt)
 {
     DETERMINANT_START(0);
     if (n > 0) {
+	int sqrt_ = asLogical(sqrt);
 	cholmod_factor *L = mf2cholmod(obj);
 	if (L->is_super) {
 	    int k, j, nc,
@@ -1470,6 +1471,8 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 	    } else {
 		for (j = 0; j < n; ++j) {
 		    if (px[pp[j]] < 0.0) {
+			if (sqrt_)
+			    return mkDet(R_NaN, givelog, 1);
 			modulus += log(-px[pp[j]]);
 			sign = -sign;
 		    } else {
@@ -1479,6 +1482,8 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm)
 		}
 	    }
 	}
+	if (sqrt_)
+	    modulus *= 0.5;
     }
     return mkDet(modulus, givelog, sign);
 }
@@ -1645,25 +1650,29 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
     if (m > 0) {
 	SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
-	int info;
-#if 0
-	SEXP aperm = PROTECT(GET_SLOT(a, Matrix_permSym));
-#endif	
+	int info, nprotect = 2;
+
+	SEXP aperm = NULL;
+	if (HAS_SLOT(a, Matrix_permSym)) {
+	    SEXP tmp = GET_SLOT(a, Matrix_permSym);
+	    if (LENGTH(tmp) > 0) {
+		PROTECT(aperm = tmp);
+		++nprotect;
+	    }
+	} /* else 'a' is a dtrMatrix or dtpMatrix, as in chol2inv */
+	
 	if (isNull(b)) {
 	    PROTECT(rx = duplicate(ax));
 	    SET_SLOT(r, Matrix_uploSym, auplo);
 	    if (unpacked) {
 		F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
 		ERROR_LAPACK_2(dpotri, info, 2, L);
-#if 0
-		if (LENGTH(aperm) > 0)
+		if (aperm)
 		    symPerm(REAL(rx), n, ul, INTEGER(aperm), 1, 1);
-#endif
 	    } else {
 		F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
 		ERROR_LAPACK_2(dpptri, info, 2, L);
-#if 0
-		if (LENGTH(aperm) > 0) {
+		if (aperm) {
 		    /* FIXME: extend symPerm() to support _packed_ matrices */
 		    double *work;
 		    size_t lwork = (size_t) n * n;
@@ -1673,17 +1682,14 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 		    ddense_pack  (REAL(rx), work, n, ul, 'N');
 		    Matrix_Free(work, lwork);
 		}
-#endif
 	    }
 	} else {
 	    SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 	    rx = duplicate(bx);
 	    UNPROTECT(1); /* bx */
 	    PROTECT(rx);
-#if 0
-	    if (LENGTH(aperm) > 0)
+	    if (aperm)
 		rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 0);
-#endif
 	    if (unpacked) {
 		F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
 				 REAL(rx), &m, &info FCONE);
@@ -1693,17 +1699,11 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 				 REAL(rx), &m, &info FCONE);
 		ERROR_LAPACK_1(dpptrs, info);
 	    }
-#if 0
-	    if (LENGTH(aperm) > 0)
+	    if (aperm)
 		rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 1);
-#endif
 	}
 	SET_SLOT(r, Matrix_xSym, rx);
-#if 0
-	UNPROTECT(3); /* rx, aperm, ax */
-#else
-	UNPROTECT(2); /* rx, ax */
-#endif
+	UNPROTECT(nprotect); /* rx, aperm, ax */
     }
     SOLVE_FINISH;
     UNPROTECT(3); /* auplo, rdim, r */

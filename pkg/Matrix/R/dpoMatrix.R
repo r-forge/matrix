@@ -5,7 +5,8 @@
 ## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .dsy2dpo <- function(from) {
-    if(is.null(tryCatch(Cholesky(from), error = function(e) NULL)))
+    if(is.null(tryCatch(Cholesky(from, perm = FALSE),
+                        error = function(e) NULL)))
         stop("not a positive semidefinite matrix")
     ## FIXME: check=FALSE
     copyClass(from, "dpoMatrix",

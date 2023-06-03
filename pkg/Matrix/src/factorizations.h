@@ -37,7 +37,7 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm, SEXP packed);
 SEXP     Cholesky_determinant(SEXP obj, SEXP logarithm, SEXP packed);
 SEXP     sparseLU_determinant(SEXP obj, SEXP logarithm);
 SEXP     sparseQR_determinant(SEXP obj, SEXP logarithm);
-SEXP    CHMfactor_determinant(SEXP obj, SEXP logarithm);
+SEXP    CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt);
 
 SEXP      denseLU_solve(SEXP a, SEXP b);
 SEXP BunchKaufman_solve(SEXP a, SEXP b, SEXP packed);

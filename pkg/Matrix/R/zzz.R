@@ -67,6 +67,14 @@
     wDC <- as.integer(Sys.getenv("R_MATRIX_WARN_DEPRECATED_COERCE", NA))
     assign("warnDeprecatedCoerce", wDC, envir = .MatrixEnv)
 
+    ## warnSqrtDefault:
+    ## <=0 ... no conditions signaled
+    ##   1 ... persistent warning
+    ## >=2 ... persistent error
+    ##  NA ... one-time warning
+    wSD <- as.integer(Sys.getenv("R_MATRIX_WARN_SQRT_DEFAULT", NA))
+    assign("warnSqrtDefault", wDC, envir = .MatrixEnv)
+
     .Call(CHM_set_common_env, .chm_common)
     NULL
 }
@@ -361,7 +369,7 @@ rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 setAs("CHMfactor", "Matrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"Matrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "as(., \"dtCMatrix\")",
                       package = "Matrix")
           as(from, "CsparseMatrix")
       })
@@ -369,50 +377,58 @@ setAs("CHMfactor", "Matrix",
 setAs("CHMfactor", "dMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dMatrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "as(., \"dtCMatrix\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          as(from, "dtCMatrix")
       })
 
 setAs("CHMfactor", "dsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dsparseMatrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "as(., \"dtCMatrix\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          as(from, "dtCMatrix")
       })
 
 setAs("CHMfactor", "sparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"sparseMatrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "as(., \"dtCMatrix\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          as(from, "dtCMatrix")
       })
 
 setAs("CHMfactor", "RsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"RsparseMatrix\")",
+                      new = "as(as(., \"dtCMatrix\"), \"RsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "RsparseMatrix")
+          as(as(from, "dtCMatrix"), "RsparseMatrix")
       })
 
 setAs("CHMfactor", "TsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"TsparseMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"TsparseMatrix\")",
+                      new = "as(as(., \"dtCMatrix\"), \"TsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "TsparseMatrix")
+          as(as(from, "dtCMatrix"), "TsparseMatrix")
       })
 
 setAs("CHMfactor", "triangularMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"triangularMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"triangularMatrix\")",
+                      new = "as(as(., \"dtCMatrix\"), \"triangularMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "triangularMatrix")
+          as(as(from, "dtCMatrix"), "triangularMatrix")
       })
+
+setMethod("chol2inv", signature(x = "CHMfactor"),
+          function(x, ...) {
+              .Deprecated(old = "chol2inv(<CHMfactor>)",
+                          new = "solve(.)",
+                          package = "Matrix")
+              solve(x)
+          })
 
 
 ## ~~~~ DEFUNCT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
