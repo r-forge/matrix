@@ -347,19 +347,19 @@ setMethod("solve", signature(a = "CsparseMatrix", b = "ANY"),
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
-	  function(a, b, sparse = TRUE, ...) {
+          function(a, b, sparse = TRUE, ...) {
               trf <- lu(a, errSing = TRUE)
               solve(trf, sparse = sparse, ...)
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "numLike"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               trf <- lu(a, errSing = TRUE)
               solve(trf, b, ...)
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
-	  function(a, b, sparse = FALSE, ...) {
+          function(a, b, sparse = FALSE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(is.na(sparse) || sparse)
                   b <- .m2sparse(b, "dgC")
@@ -367,7 +367,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "denseMatrix"),
-	  function(a, b, sparse = FALSE, ...) {
+          function(a, b, sparse = FALSE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(is.na(sparse) || sparse)
                   b <- as(b, "CsparseMatrix")
@@ -375,7 +375,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "denseMatrix"),
           })
 
 setMethod("solve", signature(a = "dgCMatrix", b = "sparseMatrix"),
-	  function(a, b, sparse = TRUE, ...) {
+          function(a, b, sparse = TRUE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(!(is.na(sparse) || sparse))
                   b <- as(b, "unpackedMatrix")
@@ -383,7 +383,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "sparseMatrix"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
-	  function(a, b, sparse = TRUE, ...) {
+          function(a, b, sparse = TRUE, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
@@ -391,7 +391,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
@@ -399,7 +399,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
-	  function(a, b, sparse = FALSE, ...) {
+          function(a, b, sparse = FALSE, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
@@ -409,7 +409,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
-	  function(a, b, sparse = FALSE, ...) {
+          function(a, b, sparse = FALSE, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
@@ -419,7 +419,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
           })
 
 setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
-	  function(a, b, sparse = TRUE, ...) {
+          function(a, b, sparse = TRUE, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
@@ -469,18 +469,18 @@ setMethod("solve", signature(a = "diagonalMatrix", b = "ANY"),
           })
 
 setMethod("solve", signature(a = "ddiMatrix", b = "missing"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               if(a@diag == "N") {
                   x <- a@x
                   .solve.checkDiagonal(x)
                   a@x <- 1 / x
               }
               a@Dimnames <- a@Dimnames[2:1]
-	      a
-	  })
+              a
+          })
 
 setMethod("solve", signature(a = "ddiMatrix", b = "numLike"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
               r <-
@@ -491,10 +491,10 @@ setMethod("solve", signature(a = "ddiMatrix", b = "numLike"),
                   } else as.double(b)
               names(r) <- a@Dimnames[[2L]]
               r
-	  })
+          })
 
 setMethod("solve", signature(a = "ddiMatrix", b = "matrix"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               d <- dim(b)
               .solve.checkDim2(a@Dim[1L], d[1L])
               dn <- dimnames(b)
@@ -509,10 +509,10 @@ setMethod("solve", signature(a = "ddiMatrix", b = "matrix"),
                   as.double(b) / x
               } else as.double(b)
               r
-	  })
+          })
 
 setMethod("solve", signature(a = "ddiMatrix", b = "Matrix"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               .solve.checkDim2(a@Dim[1L], b@Dim[1L])
               if(a@diag == "N") {
                   x <- a@x
@@ -521,7 +521,7 @@ setMethod("solve", signature(a = "ddiMatrix", b = "Matrix"),
               }
               a@Dimnames <- a@Dimnames[2:1]
               a %*% b
-	  })
+          })
 
 
 ########################################################################
@@ -544,14 +544,14 @@ setMethod("solve", signature(a = "indMatrix", b = "ANY"),
           })
 
 setMethod("solve", signature(a = "pMatrix", b = "missing"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               a@Dimnames <- a@Dimnames[2:1]
               a@margin <- if(a@margin == 1L) 2L else 1L
               a
           })
 
 setMethod("solve", signature(a = "pMatrix", b = "numLike"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
               perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
@@ -561,7 +561,7 @@ setMethod("solve", signature(a = "pMatrix", b = "numLike"),
           })
 
 setMethod("solve", signature(a = "pMatrix", b = "matrix"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               d <- dim(b)
               .solve.checkDim2(a@Dim[1L], d[1L])
               dn <- dimnames(b)
@@ -575,13 +575,13 @@ setMethod("solve", signature(a = "pMatrix", b = "matrix"),
           })
 
 setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
-	  function(a, b, ...) {
+          function(a, b, ...) {
               .solve.checkDim2(a@Dim[1L], b@Dim[1L])
               perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
               r <- b[perm, , drop = FALSE]
               r@Dimnames <- c(a@Dimnames[2L], b@Dimnames[2L])
               r
-	  })
+          })
 
 
 ########################################################################
@@ -630,19 +630,19 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 }
 
 setMethod("solve", signature(a = "Matrix", b = "sparseVector"),
-	  function(a, b, ...)
+          function(a, b, ...)
               solve(a, .spV2dgC(b), ...)) # FIXME? drop(.)?
 
 setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
-	  function(a, b, ...)
+          function(a, b, ...)
               solve(a, .spV2dgC(b), ...)) # FIXME? drop(.)?
 
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
-	  function(a, b, ...)
+          function(a, b, ...)
               solve(.m2ge(a, "d"), b, ...))
 
 setMethod("solve", signature(a = "matrix", b = "sparseVector"),
-	  function(a, b, ...)
+          function(a, b, ...)
               solve(.m2ge(a, "d"), .spV2dge(b), ...)) # FIXME? drop(.)?
 
 
@@ -703,8 +703,8 @@ if(FALSE) {
         rU <- range(abs(diag(lu.a@U)))
         if(rU[1L] / rU[2L] < tol)
             stop(gettextf("A = LU is computationally singular: min(d)/max(d) = %9.4g, d = abs(diag(U))",
-        		  rU[1L] / rU[2L]),
-        	 domain = NA)
+                          rU[1L] / rU[2L]),
+                 domain = NA)
     }
 
     ## Solve for  X  in  A X = P' L U Q X = B  ...

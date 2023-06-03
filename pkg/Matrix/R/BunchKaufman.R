@@ -2,15 +2,15 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("BunchKaufman", signature(x = "dsyMatrix"),
-	  function(x, warnSing = TRUE, ...)
+          function(x, warnSing = TRUE, ...)
               .Call(dsyMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("BunchKaufman", signature(x = "dspMatrix"),
-	  function(x, warnSing = TRUE, ...)
+          function(x, warnSing = TRUE, ...)
               .Call(dspMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("BunchKaufman", signature(x = "matrix"),
-	  function(x, uplo = "U", ...)
+          function(x, uplo = "U", ...)
               BunchKaufman(.m2dense(x, "dsy", uplo), ...))
 
 
