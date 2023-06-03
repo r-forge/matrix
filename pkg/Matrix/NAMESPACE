@@ -223,6 +223,7 @@ exportMethods("!",
               qr,
 	      qr.R,
               qr.Q,
+              qr.X,
 	      qr.coef,
 	      qr.fitted,
 	      qr.resid,
@@ -399,6 +400,7 @@ exportClasses(Matrix, # and its subclasses .............................
               ## denseQR,
               sparseQR,
 
+              SchurFactorization,
               Schur,
 
               BunchKaufmanFactorization,
