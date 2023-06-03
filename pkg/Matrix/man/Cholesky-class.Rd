@@ -101,8 +101,8 @@
   \pkg{Matrix} \code{1.6-0} removed these extensions so that methods
   would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.  
   The availability of such methods gave the wrong impression that
-  \code{Cholesky} and \code{pCholesky} represent proper matrices,
-  when in fact they represent an ordered set of matrix factors.
+  \code{Cholesky} and \code{pCholesky} represent a (singular)
+  matrix, when in fact they represent an ordered set of matrix factors.
   
   The coercions \code{as(., "dtrMatrix")} and \code{as(., "dtpMatrix")}
   are provided for users who understand the caveats.

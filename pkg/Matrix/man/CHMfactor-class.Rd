@@ -61,10 +61,10 @@ isLDL(x)
 }
 \value{
   \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
-  \code{TRUE} if \code{x} stores the diagonal entries of \eqn{D}
-  and strictly lower triangular entries of \eqn{L_{1}}{L1},
-  \code{FALSE} if \code{x} stores the lower triangular entries
-  of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+  \code{TRUE} if \code{x} stores the lower triangular elements
+  of \eqn{L_{1}-I+D}{L1-I+D},
+  \code{FALSE} if \code{x} stores the lower triangular elements
+  of \eqn{L}.
 }
 \section{Slots}{
   Of \code{CHMfactor}:
@@ -90,7 +90,7 @@ isLDL(x)
       \code{maxcsize} or \code{maxesize}.  Supernodal factorizations
       do not use \code{is_ll} or \code{is_monotonic}.}
   }
-  Of \code{CHMsimpl} (all unused by \code{nCHMsimpl}):
+  Of \code{CHMsimpl} (all unused by \code{nCHMsimpl}): % FIXME
   \describe{
     \item{\code{nz}}{an integer vector of length \code{Dim[1]}
       giving the number of nonzero entries in each column of the
@@ -121,10 +121,11 @@ isLDL(x)
   }
   Of \code{dCHMsimpl}:
   \describe{
-    \item{\code{x}}{a numeric vector parallel to \code{i} (and of
-      equal length) containing the corresponding nonzero entries
-      of the lower triangular Cholesky factor.}
-  }
+    \item{\code{x}}{a numeric vector parallel to \code{i} containing
+      the corresponding nonzero entries of the lower triangular
+      Cholesky factor \eqn{L} \emph{or} (if and only if \code{type[2]}
+      is 0) of the lower triangular matrix \eqn{L_{1}-I+D}{L1-I+D}.}
+    }
   Of \code{CHMsuper}:
   \describe{
     \item{\code{super}, \code{pi}, \code{px}}{integer vectors of
@@ -164,14 +165,22 @@ isLDL(x)
 }
 \section{Methods}{
   \describe{
-    \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "CsparseMatrix")}:
+    \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "dtCMatrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
-      the lower triangular Cholesky factor \eqn{L}.}
-    \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "CsparseMatrix")}:
+      the lower triangular Cholesky factor \eqn{L} \emph{or}
+      the lower triangular matrix \eqn{L_{1}-I+D}{L1-I+D},
+      the latter if and only if \code{from@type[2]} is 0.}
+    \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "CsparseMatrix")}:
+      like \code{as(., "dtCMatrix")}, but always giving \eqn{L}.
+      The coercion fails if \code{from} stores \eqn{L_{1}-I+D}{L1-I+D}
+      and \eqn{D} has negative diagonal elements.}
+    \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "dgCMatrix")}:
       returns a \code{\linkS4class{dgCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L}.
       Note that, for supernodes spanning two or more columns,
       the supernodal algorithm must store zeros above the diagonal.}
+    \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "CsparseMatrix")}:
+      equivalent to \code{as(., "dgCMatrix")}.}
     \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
       returns a \code{\linkS4class{pMatrix}} representing
       the permutation matrix \eqn{P_{1}}.}

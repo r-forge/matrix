@@ -53,8 +53,9 @@
 \section{Methods}{
   \describe{
     \item{\code{coerce}}{\code{signature(from = "denseLU", to = "dgeMatrix")}:
-      returns a \code{\linkS4class{dgeMatrix}}, useful for inspecting
-      the internal representation of the factorization; see \sQuote{Note}.}
+      returns a \code{\linkS4class{dgeMatrix}} with the dimensions
+      of the factorized matrix \eqn{A}, equal to \eqn{L} below the
+      diagonal and equal to \eqn{U} on and above the diagonal.}
     \item{\code{determinant}}{\code{signature(from = "denseLU", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
