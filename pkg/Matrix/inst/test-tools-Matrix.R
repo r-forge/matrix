@@ -286,7 +286,7 @@ rUnitTri <- function(n, upper = TRUE, ...)
 ##' @param n matrix dimension \eqn{n \times n}{n x n}
 ##' @param density ratio of number of non-zero entries to total number
 ##' @param d0 The sqrt of the diagonal entries of D default \code{10}, to be
-##' \dQuote{different} from \code{L} entries.
+##' \dQuote{different} from \code{L} entries.  More generally these can be negative
 ##' @param rcond logical indicating if \code{\link{rcond}(A, useInv=TRUE)}
 ##' should be returned which requires non-singular A and D.
 ##' @param condest logical indicating if \code{\link{condest}(A)$est}
@@ -302,12 +302,13 @@ mkLDL <- function(n, density = 1/3,
     stopifnot(n == round(n), density <= 1)
     n <- as.integer(n)
     stopifnot(n >= 1, is.numeric(d.half),
-              length(d.half) == n, d.half >= 0)
+              length(d.half) == n)# no longer (2023-05-24): d.half >= 0
     L <- Matrix(0, n,n)
     nnz <- round(density * n*n)
     L[sample(n*n, nnz)] <- seq_len(nnz)
     L <- tril(L, -1L)
     diag(L) <- 1
+### FIXME: allow  *negative* d.half[] entries!
     dh2 <- d.half^2
     non.sing <- sum(dh2 > 0) == n
     D <- Diagonal(x = dh2)
