@@ -98,6 +98,9 @@ SEXP dgeMatrix_addDiag(SEXP x, SEXP d)
 
 #endif /* MJ */
 
+/* MJ: unused */
+#if 0
+
 SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
 {
     int /* nu = asInteger(nnu),
@@ -138,6 +141,8 @@ SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
     UNPROTECT(1);
     return val;
 }
+
+#endif /* MJ */
 
 const static double padec [] = /* for matrix exponential calculation. */
 {

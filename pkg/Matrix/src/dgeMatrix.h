@@ -5,8 +5,12 @@
 #include "Mutils.h"
 
 SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE);
-SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
 SEXP dgeMatrix_exp(SEXP x);
+
+/* MJ: unused */
+#if 0
+SEXP dgeMatrix_svd(SEXP x, SEXP nu, SEXP nv);
+#endif /* MJ */
 
 /* MJ: no longer needed ... prefer more general unpackedMatrix_diag_[gs]et() */
 #if 0
