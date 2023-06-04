@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-03 r4014)}{
+\section{Changes in version 1.6-0 (2023-06-03 r4017)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -260,6 +260,17 @@
       instead of \code{tcrossprod(solve(x))} for \emph{formally} lower
       triangular \code{x} (and ignores the lower triangular part for
       all other square \code{x}).
+
+      \item \code{rcond(x, norm)} throws a nicer error for \code{x}
+      of length 0.
+      
+      \item Error messages due to invalid \code{norm} in
+      \code{rcond(x, norm)} now refer to the argument as \code{norm}
+      rather than \code{type}.
+      
+      \item \code{rcond(x, norm)} now validates \code{norm} also
+      for \code{x} of class \code{d(sy|sp|po|pp)Matrix}, even if
+      for such \code{x} all valid \code{norm} give the same result.
     }
   }
   \subsection{Misc}{

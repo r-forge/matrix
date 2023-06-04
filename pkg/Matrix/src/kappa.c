@@ -1,342 +1,385 @@
-#include <ctype.h> /* toupper */
 #include "kappa.h"
 
-/* La_norm_type() and La_rcond_type() have been in src/include/R_ext/Lapack.h
-   and later in src/modules/lapack/Lapack.c but have still not been available
-   to package writers ...
-*/
-
-static char La_norm_type(const char *typstr)
+static char La_norm_type(SEXP s)
 {
-    char typup;
-
-    if (strlen(typstr) != 1)
-	error(_("argument type[1]='%s' must be a character string of string length 1"),
-	      typstr);
-    typup = (char) toupper(*typstr);
-    if (typup == '1')
-	typup = 'O'; /* aliases */
-    else if (typup == 'E')
-	typup = 'F';
-    else if (typup != 'M' && typup != 'O' && typup != 'I' && typup != 'F')
-	error(_("argument type[1]='%s' must be one of 'M','1','O','I','F', or 'E'"),
-	      typstr);
-    return typup;
-}
-
-static char La_rcond_type(const char *typstr)
-{
-    char typup;
-
-    if (strlen(typstr) != 1)
-	error(_("argument type[1]='%s' must be a character string of string length 1"),
-	      typstr);
-    typup = (char) toupper(*typstr);
-    if (typup == '1')
-	typup = 'O'; /* alias */
-    else if (typup != 'O' && typup != 'I')
-	error(_("argument type[1]='%s' must be one of '1','O', or 'I'"),
-	      typstr);
-    return typup; /* 'O' or 'I' */
-}
-
-static double get_norm_dge(SEXP obj, const char *typstr)
-{
-    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    R_xlen_t i, nx = XLENGTH(x);
-    double *px = REAL(x);
-    for (i = 0; i < nx; ++i) {
-	if (ISNAN(px[i])) {
-	    UNPROTECT(1);
-	    return NA_REAL;
-	}
+#define ARGNAME "type"
+    if (TYPEOF(s) != STRSXP)
+	error(_("argument '%s' is not of type \"character\""), ARGNAME);
+    if (LENGTH(s) == 0)
+	error(_("argument '%s' has length 0"), ARGNAME);
+    const char *type = CHAR(STRING_ELT(s, 0));
+    if (type[0] == '\0' || type[1] != '\0')
+	error(_("argument '%s' (\"%s\") does not have string length 1"),
+	      ARGNAME, type);
+    char type_ = '\0';
+    switch (type[0]) {
+    case 'M':
+    case 'm':
+	type_ = 'M';
+	break;
+    case 'O':
+    case 'o':
+    case '1':
+	type_ = 'O';
+	break;
+    case 'I':
+    case 'i':
+	type_ = 'I';
+	break;
+    case 'F':
+    case 'f':
+    case 'E':
+    case 'e':
+	type_ = 'F';
+	break;
+    default:
+	error(_("argument '%s' (\"%s\") is not \"M\", \"O\", \"1\", \"I\", \"F\", or \"E\""),
+	      ARGNAME, type);
+	break;
     }
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim);
-    double norm, *work = NULL;
+    return type_;
+#undef ARGNAME
+}
 
-    if (typstr[0] == 'I')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlange)(typstr, pdim, pdim + 1, px, pdim,
-			    work FCONE);
-    
-    UNPROTECT(2);
-    return norm;
+static char La_rcond_type(SEXP s)
+{
+#define ARGNAME "norm"
+    if (TYPEOF(s) != STRSXP)
+	error(_("argument '%s' is not of type \"character\""), ARGNAME);
+    if (LENGTH(s) == 0)
+	error(_("argument '%s' has length 0"), ARGNAME);
+    const char *type = CHAR(STRING_ELT(s, 0));
+    if (type[0] == '\0' || type[1] != '\0')
+	error(_("argument '%s' (\"%s\") does not have string length 1"),
+	      ARGNAME, type);
+    char type_ = '\0';
+    switch (type[0]) {
+    case 'O':
+    case 'o':
+    case '1':
+	type_ = 'O';
+	break;
+    case 'I':
+    case 'i':
+	type_ = 'I';
+	break;
+    default:
+	error(_("argument '%s' (\"%s\") is not \"O\", \"1\", or \"I\""),
+	      ARGNAME, type);
+	break;
+    }
+    return type_;
+#undef ARGNAME
 }
 
 SEXP dgeMatrix_norm(SEXP obj, SEXP type)
 {
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dge(obj, typstr);
-    UNPROTECT(1);
+    char type_ = La_norm_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
+    if (m == 0 || n == 0)
+	return ScalarReal(0.0);
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double norm, *work = NULL;
+    if (type_ == 'I')
+	work = (double *) R_alloc((size_t) m, sizeof(double));
+    norm = F77_CALL(dlange)(&type_, &m, &n, REAL(x), &m,
+			    work FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(norm);
 }
 
-SEXP dgeMatrix_rcond(SEXP obj, SEXP type)
+SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
+    char type_ = La_rcond_type(type);
     SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-    int *pdim = INTEGER(dim);
-    if (pdim[0] != pdim[1] || pdim[0] < 1)
-	error(_("'rcond' requires a square, nonempty matrix"));
+    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+    UNPROTECT(1); /* dim */
+    if (m != n)
+	error(_("rcond(x) is undefined: 'x' is not square"));
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
 
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
-
-    SEXP trf = PROTECT(dgeMatrix_trf_(obj, 0)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-    int info;
-    double *px = REAL(x), norm = get_norm_dge(obj, typstr), rcond;
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(trf, Matrix_xSym));
+    double norm, rcond,
+	*work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    norm =
+    F77_CALL(dlange)(&type_, &n, &n, REAL(x), &n,
+		     work FCONE);
+    F77_CALL(dgecon)(&type_, &n,     REAL(y), &n, &norm, &rcond,
+		     work, iwork, &info FCONE);
+    UNPROTECT(2); /* x, y */
     
-    F77_CALL(dgecon)(typstr, pdim, px, pdim, &norm, &rcond,
-		     (double *) R_alloc((size_t) 4 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
-
-    UNPROTECT(4);
     return ScalarReal(rcond);
-}
-
-static double get_norm_dtr(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-    
-    if (typstr[0] == 'I')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlantr)(typstr, ul, di, pdim, pdim + 1, px, pdim,
-			    work FCONE FCONE FCONE);
-
-    UNPROTECT(4);
-    return norm;
 }
 
 SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 {
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dtr(obj, typstr);
-    UNPROTECT(1);
+    char type_ = La_norm_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	return ScalarReal(0.0);
+
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
+	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0],
+	diag_ = CHAR(STRING_ELT(diag, 0))[0];
+    UNPROTECT(2); /* uplo, diag */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double norm, *work = NULL;
+    if (type_ == 'I')
+	work = (double *) R_alloc((size_t) n, sizeof(double));
+    norm = F77_CALL(dlantr)(&type_, &uplo_, &diag_, &n, &n, REAL(x), &n,
+			    work FCONE FCONE FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(norm);
 }
 
 SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
 
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
+	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0],
+	diag_ = CHAR(STRING_ELT(diag, 0))[0];
+    UNPROTECT(2); /* uplo, diag */
     
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double rcond, *work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    F77_CALL(dtrcon)(&type_, &uplo_, &diag_, &n, REAL(x), &n, &rcond,
+		     work, iwork, &info FCONE FCONE FCONE);
+    UNPROTECT(1); /* x */
     
-    F77_CALL(dtrcon)(typstr, ul, di, pdim, px, pdim, &rcond,
-		     (double *) R_alloc((size_t) 3 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE FCONE FCONE);
-
-    UNPROTECT(5);
     return ScalarReal(rcond);
-}
-
-static double get_norm_dtp(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
-    
-    if (typstr[0] == 'I')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlantp)(typstr, ul, di, pdim, px,
-			    work FCONE FCONE FCONE);
-
-    UNPROTECT(4);
-    return norm;
 }
 
 SEXP dtpMatrix_norm(SEXP obj, SEXP type)
 {
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dtp(obj, typstr);
-    UNPROTECT(1);
+    char type_ = La_norm_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	return ScalarReal(0.0);
+
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
+	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0],
+	diag_ = CHAR(STRING_ELT(diag, 0))[0];
+    UNPROTECT(2); /* uplo, diag */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double norm, *work = NULL;
+    if (type_ == 'I')
+	work = (double *) R_alloc((size_t) n, sizeof(double));
+    norm = F77_CALL(dlantp)(&type_, &uplo_, &diag_, &n, REAL(x),
+			    work FCONE FCONE FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(norm);
 }
 
 SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
 {
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_rcond_type(CHAR(type));
-    
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0)), *di = CHAR(STRING_ELT(diag, 0));
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
 
-    F77_CALL(dtpcon)(typstr, ul, di, pdim, px, &rcond,
-		     (double *) R_alloc((size_t) 3 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE FCONE FCONE);
-
-    UNPROTECT(5);
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
+	diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0],
+	diag_ = CHAR(STRING_ELT(diag, 0))[0];
+    UNPROTECT(2); /* uplo, diag */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double rcond, *work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    F77_CALL(dtpcon)(&type_, &uplo_, &diag_, &n, REAL(x), &rcond,
+		     work, iwork, &info FCONE FCONE FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(rcond);
-}
-
-static double get_norm_dsy(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-    
-    if (typstr[0] == 'I' || typstr[0] == 'O')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlansy)(typstr, ul, pdim, px, pdim, work FCONE FCONE);
-
-    UNPROTECT(3);
-    return norm;
 }
 
 SEXP dsyMatrix_norm(SEXP obj, SEXP type)
 {
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dsy(obj, typstr);
-    UNPROTECT(1);
+    char type_ = La_norm_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	return ScalarReal(0.0);
+
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double norm, *work = NULL;
+    if (type_ == 'O' || type_ == 'I')
+	work = (double *) R_alloc((size_t) n, sizeof(double));
+    norm = F77_CALL(dlansy)(&type_, &uplo_, &n, REAL(x), &n,
+			    work FCONE FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(norm);
 }
 
-SEXP dsyMatrix_rcond(SEXP obj)
+SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
-    SEXP trf = PROTECT(dsyMatrix_trf_(obj, 2)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
     
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
-    double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
     
-    F77_CALL(dsycon)(ul, pdim, px, pdim, pperm, &norm, &rcond,
-		     (double *) R_alloc((size_t) 2 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(trf, Matrix_xSym)),
+	pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
+    double norm, rcond,
+	*work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    norm =
+    F77_CALL(dlansy)(&type_, &uplo_, &n, REAL(x), &n,
+		     work FCONE FCONE);
+    F77_CALL(dsycon)(        &uplo_, &n, REAL(y), &n,
+		     INTEGER(pivot), &norm, &rcond,
+		     work, iwork, &info FCONE);
+    UNPROTECT(3); /* x, y, pivot */
     
-    UNPROTECT(5);
     return ScalarReal(rcond);
-}
-
-static double get_norm_dsp(SEXP obj, const char *typstr)
-{
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-    int *pdim = INTEGER(dim);
-    double *px = REAL(x), norm, *work = NULL;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-    
-    if (typstr[0] == 'I' || typstr[0] == 'O')
-	work = (double *) R_alloc((size_t) pdim[0], sizeof(double));
-    norm = F77_CALL(dlansp)(typstr, ul, pdim, px, work FCONE FCONE);
-
-    UNPROTECT(3);
-    return norm;
 }
 
 SEXP dspMatrix_norm(SEXP obj, SEXP type)
 {
-    char typstr[] = {'\0', '\0'};
-    PROTECT(type = asChar(type));
-    typstr[0] = La_norm_type(CHAR(type));
-    double norm = get_norm_dsp(obj, typstr);
-    UNPROTECT(1);
+    char type_ = La_norm_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	return ScalarReal(0.0);
+
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+    double norm, *work = NULL;
+    if (type_ == 'O' || type_ == 'I')
+	work = (double *) R_alloc((size_t) n, sizeof(double));
+    norm = F77_CALL(dlansp)(&type_, &uplo_, &n, REAL(x),
+			    work FCONE FCONE);
+    UNPROTECT(1); /* x */
+    
     return ScalarReal(norm);
 }
 
-SEXP dspMatrix_rcond(SEXP obj)
+SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
-    SEXP trf = PROTECT(dspMatrix_trf_(obj, 2)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	perm = PROTECT(GET_SLOT(trf, Matrix_permSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
     
-    int *pdim = INTEGER(dim), *pperm = INTEGER(perm), info;
-    double *px = REAL(x), norm = get_norm_dsp(obj, "O"), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-
-    F77_CALL(dspcon)(ul, pdim, px, pperm, &norm, &rcond, 
-		     (double *) R_alloc((size_t) 2 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
     
-    UNPROTECT(5);
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(trf, Matrix_xSym)),
+	pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
+    double norm, rcond,
+	*work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    norm =
+    F77_CALL(dlansp)(&type_, &uplo_, &n, REAL(x),
+		     work FCONE FCONE);
+    F77_CALL(dspcon)(        &uplo_, &n, REAL(y),
+		     INTEGER(pivot), &norm, &rcond,
+		     work, iwork, &info FCONE);
+    UNPROTECT(3); /* x, y, pivot */
+    
     return ScalarReal(rcond);
 }
 
-SEXP dpoMatrix_rcond(SEXP obj)
+SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
-    SEXP trf = PROTECT(dpoMatrix_trf_(obj, 2, 0, -1.0)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x), norm = get_norm_dsy(obj, "O"), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-
-    F77_CALL(dpocon)(ul, pdim, px, pdim, &norm, &rcond,
-		     (double *) R_alloc((size_t) 3 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
-
-    UNPROTECT(4);
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
+    
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(trf, Matrix_xSym));
+    double norm, rcond,
+	*work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    norm =
+    F77_CALL(dlansy)(&type_, &uplo_, &n, REAL(x), &n,
+		     work FCONE FCONE);
+    F77_CALL(dpocon)(        &uplo_, &n, REAL(y), &n, &norm, &rcond,
+		     work, iwork, &info FCONE);
+    UNPROTECT(2); /* x, y */
+    
     return ScalarReal(rcond);
 }
 
-SEXP dppMatrix_rcond(SEXP obj)
+SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
-    SEXP trf = PROTECT(dppMatrix_trf_(obj, 2)),
-	dim = PROTECT(GET_SLOT(trf, Matrix_DimSym)),
-	uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym)),
-	x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-
-    int *pdim = INTEGER(dim), info;
-    double *px = REAL(x), norm = get_norm_dsp(obj, "O"), rcond;
-    const char *ul = CHAR(STRING_ELT(uplo, 0));
-
-    F77_CALL(dppcon)(ul, pdim, px, &norm, &rcond,
-		     (double *) R_alloc((size_t) 3 * pdim[0], sizeof(double)),
-		     (int *) R_alloc((size_t) pdim[0], sizeof(int)),
-		     &info FCONE);
-
-    UNPROTECT(4);
+    char type_ = La_rcond_type(type);
+    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+    int n = INTEGER(dim)[0];
+    UNPROTECT(1); /* dim */
+    if (n == 0)
+	error(_("rcond(x) is undefined: 'x' has length 0"));
+    
+    SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+    char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
+    UNPROTECT(1); /* uplo */
+    
+    SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	y = PROTECT(GET_SLOT(trf, Matrix_xSym));
+    double norm, rcond,
+	*work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
+    int info, *iwork = (int *) R_alloc((size_t) n, sizeof(int));
+    norm =
+    F77_CALL(dlansp)(&type_, &uplo_, &n, REAL(x),
+		     work FCONE FCONE);
+    F77_CALL(dppcon)(        &uplo_, &n, REAL(y), &norm, &rcond,
+		     work, iwork, &info FCONE);
+    UNPROTECT(2); /* x, y */
+    
     return ScalarReal(rcond);
 }
