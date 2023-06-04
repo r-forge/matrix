@@ -2,10 +2,11 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("rcond", signature(x = "ANY", norm = "missing"),
-	  function(x, norm, ...) rcond(x, norm = "O", ...))
+          function(x, norm, ...)
+              rcond(x, norm = "O", ...))
 
 setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
-	  function(x, norm, useInv = FALSE, ...) {
+          function(x, norm, useInv = FALSE, ...) {
               d <- x@Dim
               if((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
                   stop("rcond(x) is undefined: 'x' has length 0")
@@ -29,7 +30,7 @@ setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
                   R <- triu(qr(x)@R[seq_len(n), , drop = FALSE])
                   rcond(R, norm = norm, ...)
               }
-	  })
+           })
 
 setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
           function(x, norm, ...) {
@@ -95,15 +96,16 @@ setMethod("rcond", signature(x = "pMatrix", norm = "character"),
           })
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
-	  function(x, norm, ...) rcond(..dense2d(x), norm = norm, ...))
+          function(x, norm, ...)
+              rcond(..dense2d(x), norm = norm, ...))
 
 setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
-	  function(x, norm, ...) {
+          function(x, norm, ...) {
               d <- x@Dim
               m <- d[1L]
               n <- d[2L]
               if(m == n)
-                  .Call(dgeMatrix_rcond, x, norm)
+                  .Call(dgeMatrix_rcond, x, lu(x), norm)
               else {
                   ## MJ: norm(A = P1' Q R P2') = norm(R) holds in general
                   ##     only for norm == "2", but La_rcond_type() disallows
@@ -115,22 +117,28 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
                   R <- triu(qr(x)[["qr"]][seq_len(n), , drop = FALSE])
                   rcond(R, norm = norm, ...)
               }
-	  })
+          })
 
 setMethod("rcond", signature(x = "dtrMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dtrMatrix_rcond, x, norm))
+          function(x, norm, ...)
+              .Call(dtrMatrix_rcond, x, norm))
 
 setMethod("rcond", signature(x = "dtpMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dtpMatrix_rcond, x, norm))
+          function(x, norm, ...)
+              .Call(dtpMatrix_rcond, x, norm))
 
 setMethod("rcond", signature(x = "dsyMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dsyMatrix_rcond, x))
+          function(x, norm, ...)
+              .Call(dsyMatrix_rcond, x, BunchKaufman(x), norm))
 
 setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dspMatrix_rcond, x))
+          function(x, norm, ...)
+              .Call(dspMatrix_rcond, x, BunchKaufman(x), norm))
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
-          function(x, norm, ...) .Call(dpoMatrix_rcond, x))
+          function(x, norm, ...)
+              .Call(dpoMatrix_rcond, x, Cholesky(x, perm = FALSE), norm))
 
 setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
-	  function(x, norm, ...) .Call(dppMatrix_rcond, x))
+          function(x, norm, ...)
+              .Call(dppMatrix_rcond, x, Cholesky(x, perm = FALSE), norm))

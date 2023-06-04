@@ -64,8 +64,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgCMatrix_qrsol, 3),
     CALLDEF(dgCMatrix_cholsol, 2),
     
-    CALLDEF(dgeMatrix_norm, 2),
-    CALLDEF(dgeMatrix_rcond, 2),
+    CALLDEF(dgeMatrix_Schur, 3),
+    CALLDEF(dgeMatrix_exp, 1),
+    
     CALLDEF(dgeMatrix_crossprod, 2),
     CALLDEF (geMatrix_crossprod, 2),
     CALLDEF(dgeMatrix_dgeMatrix_crossprod, 3),
@@ -74,34 +75,16 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF (geMatrix_matrix_crossprod, 3),
     CALLDEF(dgeMatrix_matrix_mm, 3),
     CALLDEF (geMatrix_matrix_mm, 3),
-    CALLDEF(dgeMatrix_Schur, 3),
-    CALLDEF(dgeMatrix_exp, 1),
-    
-    CALLDEF(dpoMatrix_rcond, 1),
-    
-    CALLDEF(dppMatrix_rcond, 1),
-    
-    CALLDEF(dsyMatrix_norm, 2),
-    CALLDEF(dsyMatrix_rcond, 1),
-    CALLDEF(dsyMatrix_matrix_mm, 3),
-    
-    CALLDEF(dspMatrix_norm, 2),
-    CALLDEF(dspMatrix_rcond, 1),
-    CALLDEF(dspMatrix_matrix_mm, 2),
-    
-    CALLDEF(dtpMatrix_norm, 2),
-    CALLDEF(dtpMatrix_rcond, 2),
-    CALLDEF(dtpMatrix_matrix_mm, 4),
-    CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
-
-    CALLDEF(dtrMatrix_norm, 2),
-    CALLDEF(dtrMatrix_rcond, 2),
     CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
     CALLDEF(dtrMatrix_matrix_mm, 4),
+    CALLDEF(dtpMatrix_matrix_mm, 4),
+    CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
+    CALLDEF(dsyMatrix_matrix_mm, 3),
+    CALLDEF(dspMatrix_matrix_mm, 2),
     
     CALLDEF(Matrix_validate, 1),
     CALLDEF(MatrixFactorization_validate, 1),
-
+    
     CALLDEF(dMatrix_validate, 1),
     CALLDEF(lMatrix_validate, 1),
     CALLDEF(ndenseMatrix_validate, 1),
@@ -295,7 +278,21 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(CHMfactor_diag_get, 2),
     CALLDEF(CHMfactor_update, 3),
     CALLDEF(CHMfactor_updown, 3),
+
+    CALLDEF(dgeMatrix_norm, 2),
+    CALLDEF(dtrMatrix_norm, 2),
+    CALLDEF(dtpMatrix_norm, 2),
+    CALLDEF(dsyMatrix_norm, 2),
+    CALLDEF(dspMatrix_norm, 2),
     
+    CALLDEF(dgeMatrix_rcond, 3),
+    CALLDEF(dtrMatrix_rcond, 2),
+    CALLDEF(dtpMatrix_rcond, 2),
+    CALLDEF(dsyMatrix_rcond, 3),
+    CALLDEF(dspMatrix_rcond, 3),
+    CALLDEF(dpoMatrix_rcond, 3),
+    CALLDEF(dppMatrix_rcond, 3),
+
     {NULL, NULL, 0}
 };
 
