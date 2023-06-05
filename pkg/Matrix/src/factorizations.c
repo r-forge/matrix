@@ -339,11 +339,11 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
 	    if (_WARN_ > 1)						\
 		error  (_("LAPACK routine '%s': leading principal minor "\
-			  "of order %d is nonpositive"),		\
+			  "of order %d is not positive"),		\
 			#_ROUTINE_, (_INFO_));				\
 	    else {							\
 		warning(_("LAPACK routine '%s': leading principal minor "\
-			  "of order %d is nonpositive"),		\
+			  "of order %d is not positive"),		\
 			#_ROUTINE_, (_INFO_));				\
 		UNPROTECT(_NPROTECT_);					\
 		return ScalarInteger(_INFO_);				\
@@ -357,12 +357,12 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 	if ((_INFO_) > 0 && (_WARN_) > 0) {				\
 	    if (_WARN_ > 1)						\
 	        error  (_("LAPACK routine '%s': matrix is rank deficient " \
-			  "or not positive semidefinite, "		\
+			  "or not positive definite, "			\
 			  "the _computed_ rank is %d"),			\
 			#_ROUTINE_, (_RANK_));				\
 	    else							\
 		warning(_("LAPACK routine '%s': matrix is rank deficient " \
-			  "or not positive semidefinite, "		\
+			  "or not positive definite, "			\
 			  "the _computed_ rank is %d"),			\
 			#_ROUTINE_, (_RANK_));				\
 	}								\
