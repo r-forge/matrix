@@ -1236,7 +1236,7 @@ if(doExtras) {
             checkMatrix(.m)
         }
     }
-    cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
+    showProc.time()
 }
 ## in any case, test
 d4d.2 <- .dense2sparse(!!d4da, "C") ## <<- did wrongly make dimnames symmetric
