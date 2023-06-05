@@ -369,7 +369,7 @@ rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 setAs("CHMfactor", "Matrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"Matrix\")",
-                      new = "as(., \"dtCMatrix\")",
+                      new = "as(., \"CsparseMatrix\")",
                       package = "Matrix")
           as(from, "CsparseMatrix")
       })
@@ -377,49 +377,49 @@ setAs("CHMfactor", "Matrix",
 setAs("CHMfactor", "dMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dMatrix\")",
-                      new = "as(., \"dtCMatrix\")",
+                      new = "as(., \"CsparseMatrix\")",
                       package = "Matrix")
-          as(from, "dtCMatrix")
+          as(from, "CsparseMatrix")
       })
 
 setAs("CHMfactor", "dsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dsparseMatrix\")",
-                      new = "as(., \"dtCMatrix\")",
+                      new = "as(., \"CsparseMatrix\")",
                       package = "Matrix")
-          as(from, "dtCMatrix")
+          as(from, "CsparseMatrix")
       })
 
 setAs("CHMfactor", "sparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"sparseMatrix\")",
-                      new = "as(., \"dtCMatrix\")",
+                      new = "as(., \"CsparseMatrix\")",
                       package = "Matrix")
-          as(from, "dtCMatrix")
+          as(from, "CsparseMatrix")
       })
 
-setAs("CHMfactor", "RsparseMatrix",
+setAs("CHMfactor", "CsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
-                      new = "as(as(., \"dtCMatrix\"), \"RsparseMatrix\")",
+                      new = "as(as(., \"CsparseMatrix\"), \"RsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "dtCMatrix"), "RsparseMatrix")
+          as(as(from, "CsparseMatrix"), "RsparseMatrix")
       })
 
 setAs("CHMfactor", "TsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"TsparseMatrix\")",
-                      new = "as(as(., \"dtCMatrix\"), \"TsparseMatrix\")",
+                      new = "as(as(., \"CsparseMatrix\"), \"TsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "dtCMatrix"), "TsparseMatrix")
+          as(as(from, "CsparseMatrix"), "TsparseMatrix")
       })
 
 setAs("CHMfactor", "triangularMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"triangularMatrix\")",
-                      new = "as(as(., \"dtCMatrix\"), \"triangularMatrix\")",
+                      new = "as(as(., \"CsparseMatrix\"), \"triangularMatrix\")",
                       package = "Matrix")
-          as(as(from, "dtCMatrix"), "triangularMatrix")
+          as(as(from, "CsparseMatrix"), "triangularMatrix")
       })
 
 setMethod("chol2inv", signature(x = "CHMfactor"),
