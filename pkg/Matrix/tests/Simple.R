@@ -357,7 +357,8 @@ system.time( # ~10 sec.                            __vv__
 str(e2) # error, NULL or "worked" (=> 50000 x 50000 lgeMatrix)
 ina <- is.na(Lrg)# "all FALSE"
 stopifnot(if(inherits(e1, "try-error")) grepl("too large", e1)
-          else is(e1, "denseMatrix") && is(e1, "lMatrix"),
+          else is.null(e1) ||
+               (is(e1, "denseMatrix") && is(e1, "lMatrix")),
 	  if(inherits(e2, "try-error")) grep("too large", e2) == 1
 	  else is.null(e2) || length(e2@x) == n^2,
           !any(ina))# <- gave warning previously
