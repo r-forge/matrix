@@ -398,7 +398,7 @@ setAs("CHMfactor", "sparseMatrix",
           as(from, "CsparseMatrix")
       })
 
-setAs("CHMfactor", "CsparseMatrix",
+setAs("CHMfactor", "RsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
                       new = "as(as(., \"CsparseMatrix\"), \"RsparseMatrix\")",
