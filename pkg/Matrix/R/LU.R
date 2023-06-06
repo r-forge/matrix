@@ -208,11 +208,7 @@ setMethod("expand2", signature(x = "sparseLU"),
                          Dimnames = c(list(NULL), dn[2L]),
                          margin = 2L,
                          perm = if(length(p2)) invertPerm(p2, 0L, 1L) else seq_len(d[1L]))
-              L <- x@L
-              U <- x@U
-              if(L@diag == "N")
-                  L <- ..diagN2U(L, sparse = TRUE)
-              list(P1. = P1., L = L, U = U, P2. = P2.)
+              list(P1. = P1., L = x@L, U = x@U, P2. = P2.)
           })
 
 ## returning list(P, L, U, Q), where A = P' L U Q
