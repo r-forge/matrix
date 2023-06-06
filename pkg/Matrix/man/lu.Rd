@@ -137,24 +137,33 @@ lu(x, \dots)
 }
 \examples{
 showMethods("lu", inherited = FALSE)
+set.seed(0)
 
-##--- Dense  -------------------------
-x <- Matrix(rnorm(9), 3, 3)
-lu(x)
-dim(x2 <- round(10 * x[,-3]))# non-square
-expand(lu2 <- lu(x2))
+## ---- Dense --------------------------
 
-##--- Sparse (see more in ?"sparseLU-class")----- % ./sparseLU-class.Rd
+(x1 <- Matrix(rnorm(9L), 3L, 3L))
+(lu1 <- lu(x1))
+(x2 <- round(10 * x1[, -3L]))
+lu2 <- lu(x2)
 
-pm <- as(readMM(system.file("external/pores_1.mtx",
-                            package = "Matrix")),
+## A ~ P1' L U in floating point
+(e.lu2 <- expand2(lu2))
+stopifnot(all.equal(x2, Reduce(`\%*\%`, e.lu2)))
+
+(lu2m <- as(lu2, "dgeMatrix")) # L and U interlaced
+stopifnot(identical(as(lu2m, "matrix"), `dim<-`(lu2@x, lu2@Dim)))
+
+## ---- Sparse -------------------------
+
+x3 <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
          "CsparseMatrix")
-str(pmLU <- lu(pm))		# p is a 0-based permutation of the rows
-                                # q is a 0-based permutation of the columns
-## permute rows and columns of original matrix
-ppm <- pm[pmLU@p + 1L, pmLU@q + 1L]
-pLU <- drop0(pmLU@L \%*\% pmLU@U) # L \%*\% U -- dropping extra zeros
-## equal up to "rounding"
-ppm[1:14, 1:5]
-pLU[1:14, 1:5]
+(lu3 <- lu(x3))
+
+## A ~ P1' L U P2' in floating point
+e.lu3 <- expand2(lu3)
+stopifnot(all.equal(x3, Reduce(`\%*\%`, e.lu3)))
+
+## P1 A P2 ~ L U is checked by permuting A
+x3.perm <- x3[lu3@p + 1L, lu3@q + 1L]
+norm(x3.perm - lu3@L \%*\% lu3@U) / norm(x3.perm)
 }

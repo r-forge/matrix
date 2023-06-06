@@ -79,17 +79,21 @@
   \url{https://netlib.org/lapack/double/dgetrf.f}.
 }
 \examples{
+showClass("denseLU")
 set.seed(1)
-mm <- Matrix(round(rnorm(9),2), nrow = 3)
-mm
-str(lum <- lu(mm))
-elu <- expand(lum)
-elu # three components: "L", "U", and "P", the permutation
-elu$L \%*\% elu$U
-(m2 <- with(elu, P \%*\% L \%*\% U)) # the same as 'mm'
-stopifnot(all.equal(as(mm, "matrix"),
-                    as(m2, "matrix")))
 
-## See the underlying LAPACK representation
-as(lum, "dgeMatrix")
+(A <- Matrix(round(rnorm(9L), 2L), 3L, 3L))
+(lu.A <- lu(A))
+(e.lu.A <- expand2(lu.A))
+
+## A ~ P1' L U in floating point
+stopifnot(all.equal(A, with(e.lu.A, P1. \%*\% L \%*\% U)))
+
+## Factorization handled as factorized matrix
+b <- rnorm(3L)
+stopifnot(identical(det(A), det(lu.A)),
+          identical(solve(A, b), solve(lu.A, b)))
+
+## Underlying LAPACK representation
+as(lu.A, "dgeMatrix")
 }
