@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-03 r4017)}{
+\section{Changes in version 1.6-0 (2023-06-06 r4024)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -256,11 +256,14 @@
       that are not valid permutation vectors.  (\code{invPerm(NA)}
       was enough to trigger a segfault.)
 
-      \item \code{chol2inv(x)} now computes \code{crossprod(solve(x))}
-      instead of \code{tcrossprod(solve(x))} for \emph{formally} lower
-      triangular \code{x} (and ignores the lower triangular part for
-      all other square \code{x}).
+      \item \code{chol2inv(x)} now ignores the lower triangular part
+      of \code{x} not inheriting from \code{triangularMatrix}.
 
+      \item \code{chol2inv(x)} now computes \code{crossprod(solve(x))}
+      instead of \code{tcrossprod(solve(x))} for all formally lower
+      triangular \code{x}.  Previously, \code{crossprod} was used only
+      for dense \code{x}.
+      
       \item \code{rcond(x, norm)} throws a nicer error for \code{x}
       of length 0.
       
