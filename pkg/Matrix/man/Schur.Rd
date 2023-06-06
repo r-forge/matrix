@@ -72,28 +72,26 @@ Schur(x, vectors = TRUE, \dots)
   \url{https://netlib.org/lapack/double/dgees.f}.
 }
 \examples{
-Schur(Hilbert(9))              # Schur factorization (real eigenvalues)
+showMethods("Schur", inherited = FALSE)
+set.seed(0)
 
-(A <- Matrix(round(rnorm(5*5, sd = 100)), nrow = 5))
-(Sch.A <- Schur(A))
+Schur(Hilbert(9L)) # real eigenvalues
 
-eTA <- eigen(Sch.A@T)
-str(SchA <- Schur(A, vectors=FALSE))# no 'T' ==> simple list
-stopifnot(all.equal(eTA$values, eigen(A)$values, tolerance = 1e-13),
-          all.equal(eTA$values,
-                    local({z <- Sch.A@EValues
-                           z[order(Mod(z), decreasing=TRUE)]}), tolerance = 1e-13),
-          identical(SchA$T, Sch.A@T),
-          identical(SchA$EValues, Sch.A@EValues))
+A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L)
+Sch.A <- Schur(A) # complex eigenvalues
 
-## For the faint of heart, we provide Schur() also for traditional matrices:
+(e1 <- eigen(Sch.A@T, only.values = TRUE)$values)
+(e2 <- eigen(    A  , only.values = TRUE)$values)
+(e3 <- Sch.A@EValues)
 
-a.m <- function(M) unname(as(M, "matrix"))
-a <- a.m(A)
-Sch.a <- Schur(a)
-stopifnot(identical(Sch.a, list(Q = a.m(Sch.A @ Q),
-				T = a.m(Sch.A @ T),
-				EValues = Sch.A@EValues)),
-	  all.equal(a, with(Sch.a, Q \%*\% T \%*\% t(Q)))
-)
+stopifnot(exprs = {
+    all.equal(e1, e2, tolerance = 1e-13)
+    all.equal(e1, e3[order(Mod(e3), decreasing = TRUE)], tolerance = 1e-13) 
+    all.equal(A, Reduce(`\%*\%`, expand2(Sch.A)))
+    identical(Schur(A, vectors = FALSE),
+              list(T = Sch.A@T, EValues = e3))    
+    identical(Schur(as(A, "matrix")),
+              list(Q = as(Sch.A@Q, "matrix"),
+                   T = as(Sch.A@T, "matrix"), EValues = e3))
+})
 }

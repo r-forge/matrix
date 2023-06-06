@@ -297,6 +297,25 @@ setMethod("solve", signature(a = .cl, b = "triangularMatrix"),
           })
 rm(.cl)
 
+## MJ: truly an exceptional case ...
+setMethod("solve", signature(a = "Schur", b = "ANY"),
+          function(a, b, ...) {
+              Q <- a@Q
+              T <- a@T
+              if(missing(b)) {
+                  r <- Q %*% solve(T, t(Q))
+                  r@Dimnames <- a@Dimnames[2:1]
+                  r
+              } else {
+                  db <- dim(b)
+                  dnb <- dimnames(b)
+                  r <- Q %*% solve(T, crossprod(Q, b))
+                  r@Dimnames <- c(a@Dimnames[2L],
+                                  if(is.null(dnb)) list(NULL) else dnb[2L])
+                  if(is.null(db)) drop(r) else r
+              }
+          })
+
 
 ########################################################################
 ##  2. denseMatrix excl. triangularMatrix
