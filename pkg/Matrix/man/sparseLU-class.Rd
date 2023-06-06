@@ -77,30 +77,38 @@
   Society for Industrial and Applied Mathematics.
 }
 \examples{
-## Extending the one in   examples(lu), calling the matrix  A,
-## and confirming the factorization identities :
-A <- as(readMM(system.file("external/pores_1.mtx",
-                            package = "Matrix")),
-         "CsparseMatrix")
-## with dimnames(.) - to see that they are propagated :
-dimnames(A) <- list(paste0("r", seq_len(nrow(A))),
-                    paste0("C", seq_len(ncol(A))))
-str(luA <- lu(A)) # p is a 0-based permutation of the rows
-                  # q is a 0-based permutation of the columns
-xA <- expand(luA)
-stopifnot(identical(unname(xA$L), luA@L),
-          identical(unname(xA$U), luA@U),
-          identical(xA$P, as(luA@p + 1L, "pMatrix")),
-          identical(xA$Q, as(luA@q + 1L, "pMatrix")))
+showClass("sparseLU")
+set.seed(2)
 
-P.LUQ <- with(xA, t(P) \%*\% L \%*\% U \%*\% Q)
-stopifnot(all.equal(unname(A), unname(P.LUQ), tolerance = 1e-12))
+## Continuing from example("lu") ...
+A <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
+        "CsparseMatrix")
 
-## permute rows and columns of original matrix
-pA <- A[luA@p + 1L, luA@q + 1L]
-PAQ. <- with(xA, P \%*\% A \%*\% t(Q))
-stopifnot(all.equal(unname(pA), unname(PAQ.), tolerance = 1e-12))
+## with dimnames, to see that they are propagated :
+d <- dim(A)
+dn <- list(paste0("r", seq_len(d[1L])),
+           paste0("c", seq_len(d[2L])))
+dimnames(A) <- dn
 
-pLU <- drop0(xA$L \%*\% xA$U) # L \%*\% U -- dropping extra zeros
-stopifnot(all.equal(pA, pLU, tolerance = 1e-12)) # (incl. permuted row- and column-names)
+lu.A <- lu(A)
+e.lu.A <- expand2(lu.A)
+
+.N <- list(NULL)
+stopifnot(exprs = {
+    identical(e.lu.A$L, lu.A@L)
+    identical(e.lu.A$U, lu.A@U)
+    identical(e.lu.A$P1.,
+              new("pMatrix", Dim = d, Dimnames = c(dn[1L], .N),
+                  margin = 1L, perm = invertPerm(lu.A@p, 0L, 1L)))
+    identical(e.lu.A$P2.,
+              new("pMatrix", Dim = d, Dimnames = c(.N, dn[2L]),
+                  margin = 2L, perm = invertPerm(lu.A@q, 0L, 1L)))
+    all.equal(A, with(e.lu.A, P1. \%*\% L \%*\% U \%*\% P2.),
+              tolerance = 1e-12)
+})
+
+## Factorization handled as factorized matrix
+b <- rnorm(d[1L])
+stopifnot(identical(det(A), det(lu.A)),
+          identical(solve(A, b), solve(lu.A, b)))
 }
