@@ -31,6 +31,7 @@
 \alias{solve,MatrixFactorization,numLike-method}
 \alias{solve,MatrixFactorization,sparseVector-method}
 \alias{solve,RsparseMatrix,ANY-method}
+\alias{solve,Schur,ANY-method}
 \alias{solve,TsparseMatrix,ANY-method}
 \alias{solve,ddiMatrix,Matrix-method}
 \alias{solve,ddiMatrix,matrix-method}

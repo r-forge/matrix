@@ -60,6 +60,8 @@
       or its logarithm.}
     \item{expand2}{\code{signature(x = "Schur")}:
       see \code{\link{expand2-methods}}.}
+    \item{\code{solve}}{\code{signature(a = "Schur", b = .)}:
+      see \code{\link{solve-methods}}.}
   }
 }
 \details{
@@ -78,9 +80,20 @@
 }
 \examples{
 showClass("Schur")
-Schur(M <- Matrix(c(1:7, 10:2), 4,4))
-## Trivial, of course:
-str(Schur(Diagonal(5)))
+set.seed(0)
 
-## for more examples, see help("Schur")
+(A <- Matrix(rnorm(16L), 4L, 4L))
+(Sch.A <- Schur(A))
+(e.Sch.A <- expand2(Sch.A))
+
+## A ~ Q T Q' in floating point
+stopifnot(all.equal(A, with(e.Sch.A, Q \%*\% T \%*\% Q.)))
+
+## Factorization handled as factorized matrix
+b <- rnorm(4L)
+stopifnot(all.equal(det(A), det(Sch.A)),
+          all.equal(solve(A, b), solve(Sch.A, b)))
+
+## One of the non-general cases:
+Schur(Diagonal(5L))
 }
