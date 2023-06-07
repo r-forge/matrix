@@ -862,15 +862,20 @@ SEXP R_Matrix_repr(SEXP obj)
 
 SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 {
-    int n = asInteger(n_), packed = asLogical(packed_);
-    double nn = (double) n * n, nx = (packed) ? nn : 0.5 * (nn + n);
-    if (nx > R_XLEN_T_MAX)
-	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
     SEXP r;
-    int i, j, upper = asLogical(upper_), diag = asLogical(diag_);
-    double nr = (diag) ? 0.5 * (nn + n) : 0.5 * (nn - n);
+    int n = asInteger(n_), packed = asLogical(packed_),
+	diag = asLogical(diag_);
+    Matrix_int_fast64_t
+	nn = (Matrix_int_fast64_t) n * n,
+	nx = (packed) ? nn : n + (nn - n) / 2,
+	nr = (diag) ? n + (nn - n) / 2 : (nn - n) / 2;
+    if (nx > 0x1.0p+53)
+	error(_("indices would exceed 2^53"));
+    if (nr > R_XLEN_T_MAX)
+	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+    int i, j, upper = asLogical(upper_);
     if (nx > INT_MAX) {
-
+	
 	PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
 	double k = 1.0, *pr = REAL(r);
 
@@ -957,12 +962,14 @@ SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
 
 SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
 {
-    int n = asInteger(n_), packed = asLogical(packed_);
-    double nn = (double) n * n, nx = (packed) ? nn : 0.5 * (nn + n);
-    if (nx > R_XLEN_T_MAX)
-	error(_("cannot index a vector of length exceeding R_XLEN_T_MAX"));
     SEXP r;
-    int j, upper = (packed) ? asLogical(upper_) : NA_LOGICAL;
+    int n = asInteger(n_), packed = asLogical(packed_);
+    Matrix_int_fast64_t
+	nn = (Matrix_int_fast64_t) n * n,
+	nx = (packed) ? nn : n + (nn - n) / 2;
+    if (nx > 0x1.0p+53)
+	error(_("indices would exceed 2^53"));
+    int j, upper = asLogical(upper_);
     if (nx > INT_MAX) {
 
 	PROTECT(r = allocVector(REALSXP, n));
