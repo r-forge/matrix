@@ -115,6 +115,9 @@
   \url{https://netlib.org/lapack/double/dsptrf.f}.
 }
 \examples{
+showClass( "BunchKaufman")
+showClass("pBunchKaufman")
+
 (sy <- crossprod(Matrix(rnorm(18L), 6L, 3L)))
 (bksy <- BunchKaufman(sy))
 

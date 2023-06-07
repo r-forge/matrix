@@ -127,16 +127,25 @@ Cholesky(A, \dots)
 }
 \details{
   Note that the result of a call to \code{Cholesky} inherits
-  from \code{\linkS4class{CholeskyFactorization}} but never
+  from \code{\linkS4class{CholeskyFactorization}} but not
   \code{\linkS4class{Matrix}}.  Users who just want a matrix
   should consider using \code{\link{chol}}, whose methods are
   simple wrappers around \code{Cholesky} returning just the
   upper triangular Cholesky factor \eqn{L'},
   typically as a \code{\linkS4class{triangularMatrix}}.
-  An alternative is to pass the \code{\linkS4class{CholeskyFactorization}}
-  to \code{\link{expand2}} or
-  (but only in the sparse case; see \code{\linkS4class{CHMfactor}})
-  to coerce with \code{as(., "CsparseMatrix")}.
+  An alternative is to extract factors from the list result
+  of \code{\link{expand2}(x, LDL=)}, where \code{x} is the
+  \code{CholeskyFactorization} object.
+  Yet another alternative is to coerce \code{x}, with
+  \code{as(x, "dtrMatrix")},
+  \code{as(x, "dtpMatrix")}, and
+  \code{as(x, "CsparseMatrix")} for \code{x} of class
+  \code{\linkS4class{Cholesky}},
+  \code{\linkS4class{pCholesky}}, and 
+  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}},
+  respectively.  In all cases the result represents \eqn{L}.
+  Indeed, in cases where \eqn{L} is needed explicitly but not any
+  other factor, coercion should be preferred over \code{expand2}.
 }
 \seealso{
   Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
