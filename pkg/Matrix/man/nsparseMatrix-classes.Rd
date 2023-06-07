@@ -40,17 +40,14 @@
 % ngC
 % ngR
 % ngT
-\alias{which,ngTMatrix-method}
 % ntC
 % ntR
 % ntT
-\alias{which,ntTMatrix-method}
 % nsC
 \alias{coerce,nsCMatrix,RsparseMatrix-method}
 % nsR
 \alias{coerce,nsRMatrix,CsparseMatrix-method}
 % nsT
-\alias{which,nsTMatrix-method}
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse
   \emph{\dQuote{pattern}} matrices, i.e., binary matrices conceptually

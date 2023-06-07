@@ -38,19 +38,16 @@
 % lgT
 \alias{Arith,lgTMatrix,lgTMatrix-method}
 \alias{Logic,lgTMatrix,lgTMatrix-method}
-\alias{which,lgTMatrix-method}
 % ltC
 \alias{Logic,ltCMatrix,ltCMatrix-method}
 % ltR
 % ltT
-\alias{which,ltTMatrix-method}
 % lsC
 \alias{Logic,lsCMatrix,lsCMatrix-method}
 \alias{coerce,lsCMatrix,RsparseMatrix-method}
 % lsR
 \alias{coerce,lsRMatrix,CsparseMatrix-method}
 % lsT
-\alias{which,lsTMatrix-method}
 %
 \description{The \code{lsparseMatrix} class is a virtual class of sparse
   matrices with \code{TRUE}/\code{FALSE} or \code{NA} entries.  Only the
