@@ -1085,7 +1085,7 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 
     int unpacked = !asLogical(packed);
 
-    R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (upper) ? len - 1 : 0;
+    R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (upper) ? len - 2 : 0;
     SEXP res = PROTECT(allocVector(VECSXP, len));
 
     j = 0;
@@ -1197,7 +1197,7 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
     
     SET_SLOT(D_, Matrix_iSym, D_i);
     SET_SLOT(D_, Matrix_xSym, D_x);
-    SET_VECTOR_ELT(res, k, D_);
+    SET_VECTOR_ELT(res, len-1, D_);
 
     DO_DIMNAMES;
     

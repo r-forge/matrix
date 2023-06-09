@@ -16,19 +16,18 @@
 \description{
   Computes the Bunch-Kaufman factorization of an \eqn{n \times n}{n-by-n}
   real, symmetric matrix \eqn{A}, which has the general form
-  \deqn{A = L D_{L} L' = U' D_{U} U}{A = L * DL * L' = U' * DU * U}
+  \deqn{A = U D_{U} U' = L D_{L} L'}{A = U * DU * U' = L * DL * L'}
   where
   \eqn{D_{L}}{DL} and \eqn{D_{U}}{DU} are symmetric, block diagonal
   matrices composed of \eqn{b_{L}}{bL} and \eqn{b_{U}}{bU}
-  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks,
-  and
-  \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{prod(Pk * Lk : k = 1,...,bL)}
-  is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
-  matrices, each having nonzero entries below the diagonal in 1 or 2 columns,
-  and 
-  \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{prod(Pk * Uk : k = 1,...,bU)}
+  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks;
+  \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
   is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular
-  matrices, each having nonzero entries above the diagonal in 1 or 2 columns.
+  matrices, each having nonzero entries above the diagonal in 1 or 2 columns;
+  and
+  \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
+  is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
+  matrices, each having nonzero entries below the diagonal in 1 or 2 columns.
   
   Methods are built on LAPACK routines \code{dsytrf} and \code{dsptrf}.
 }
@@ -78,35 +77,31 @@ BunchKaufman(x, \dots)
 }
 \examples{
 showMethods("BunchKaufman", inherited = FALSE)
+set.seed(0)
 
-data(CAex)
-dim(CAex)
-isSymmetric(CAex) # TRUE
+data(CAex, package = "Matrix")
+class(CAex) # dgCMatrix
+isSymmetric(CAex) # symmetric, but not formally
 
-S <- as(CAex, "symmetricMatrix") # dsCMatrix
+A <- as(CAex, "symmetricMatrix")
+class(A) # dsCMatrix
 
-## No methods for sparseMatrix yet:
-if(FALSE)
-   BunchKaufman(S)
-## But two for *dense*Matrix:
- bk <- BunchKaufman(as(S, "unpackedMatrix"))
-pbk <- BunchKaufman(as(S,   "packedMatrix"))
-pbk
+## Have methods for denseMatrix (unpacked and packed),
+## but not yet sparseMatrix ...
 
-## See the underlying LAPACK representation
- bk.M <- as( bk, "dtrMatrix")
-pbk.M <- as(pbk, "dtpMatrix")
-pbk.M[1:6, 1:6]
+\dontrun{
+BunchKaufman(A)
+}
 
-## See how sparse it is, too
-bk.M.s <- as(bk.M, "sparseMatrix")
-image(bk.M.s)
+(bk.A <- BunchKaufman(as(A, "unpackedMatrix")))
+e.bk.A <- expand2(bk.A)
 
-## An upper triangular 72-by-72 matrix with only 144 nonzero entries
-str(bk.M.s)
+## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
 
-stopifnot(is(bk.M,   "triangularMatrix"),
-          is(bk.M,     "unpackedMatrix"),
-          is(bk.M.s, "triangularMatrix"),
-          is(bk.M.s,    "CsparseMatrix"))
+m.bk.A <- as(bk.A, "dtrMatrix")
+stopifnot(identical(as(m.bk.A, "matrix"), `dim<-`(bk.A@x, bk.A@Dim)))
+
+## Underlying LAPACK representation is quite sparse
+image(m.bk.A)
 }

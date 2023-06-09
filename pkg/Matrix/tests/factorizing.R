@@ -723,8 +723,8 @@ stopifnot(exprs = {
     chkMF(  sS , mS,       lu)
     chkMF(  sS , mS,       qr, complete =  TRUE)
     chkMF(  sS , mS,       qr, complete = FALSE)
-    ## chkMF(   S , mS, BunchKaufman) # FIXME in ../R/BunchKaufman.R
-    ## chkMF(  pS , mS, BunchKaufman) # FIXME in ../R/BunchKaufman.R
+    chkMF(   S , mS, BunchKaufman)
+    chkMF(  pS , mS, BunchKaufman)
     chkMF(t( S), mS, BunchKaufman)
     chkMF(t(pS), mS, BunchKaufman)
     chkMF(   S , mS, Cholesky)
