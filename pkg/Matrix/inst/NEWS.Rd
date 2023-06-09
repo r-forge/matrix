@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-06 r4027)}{
+\section{Changes in version 1.6-0 (2023-06-09 r4033)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -274,6 +274,10 @@
       \item \code{rcond(x, norm)} now validates \code{norm} also
       for \code{x} of class \code{d(sy|sp|po|pp)Matrix}, even if
       for such \code{x} all valid \code{norm} give the same result.
+
+      \item \code{which(<[RT]sparseMatrix>, ...)} now gives indices
+      in column-major order in all cases, to be consistent with
+      \code{help("which")}.
     }
   }
   \subsection{Misc}{

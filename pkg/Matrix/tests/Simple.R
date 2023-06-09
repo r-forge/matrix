@@ -343,7 +343,7 @@ system.time( # ~10 sec.                            __vv__
               try(Lrg == Lrg)
               ## had Cholmod error 'problem too large' at file ../Core/cholmod_dense.c, line 105
 ## (error message almost ok)
-    }) # now works, taking 42.7 sec on ada-20 w/ 504 GB; 
+    }) # now works, taking 42.7 sec on ada-20 w/ 504 GB;
 if(is(e1, "Matrix")) object.size(e1) # 10000001176 bytes
 system.time( # ~10 sec.                            __vv__
     e2 <- if(doExtras && is.finite(memGB) && memGB > 30) { # need around 18 GB
@@ -351,8 +351,8 @@ system.time( # ~10 sec.                            __vv__
               ## and immediately errors if LONG_VECTORs are not available
           }) ## when it works, see
 ## Warning in .sparse2dense(x) : sparse->dense coercion: allocating vector of size 9.3 GiB
-##  user  system elapsed 
-## 6.812  10.744  17.612 
+##  user  system elapsed
+## 6.812  10.744  17.612
 
 str(e2) # error, NULL or "worked" (=> 50000 x 50000 lgeMatrix)
 ina <- is.na(Lrg)# "all FALSE"
@@ -1492,7 +1492,13 @@ stopifnot(identical(colSums(d1), NaN),
           identical(rowMeans(d1), NaN),
           identical(rowMeans(d1, na.rm = TRUE), NaN))
 
-
+## Matrix bug #6810
+library(Matrix)
+x <- as(matrix(c(FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE), 4L, 2L),
+        "RsparseMatrix")
+stopifnot(identical(which(x), seq_along(x)[as.vector(!is.na(x) & x)]),
+          identical(which(x, arr.ind = TRUE, useNames = FALSE),
+                    arrayInd(which(x), dim(x), dimnames(x), useNames = FALSE)))
 
 
 ## Platform - and other such info -- so we find it in old saved outputs
