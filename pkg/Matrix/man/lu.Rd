@@ -141,29 +141,29 @@ set.seed(0)
 
 ## ---- Dense --------------------------
 
-(x1 <- Matrix(rnorm(9L), 3L, 3L))
-(lu1 <- lu(x1))
-(x2 <- round(10 * x1[, -3L]))
-lu2 <- lu(x2)
+(A1 <- Matrix(rnorm(9L), 3L, 3L))
+(lu.A1 <- lu(A1))
+(A2 <- round(10 * A1[, -3L]))
+lu.A2 <- lu(A2)
 
 ## A ~ P1' L U in floating point
-(e.lu2 <- expand2(lu2))
-stopifnot(all.equal(x2, Reduce(`\%*\%`, e.lu2)))
+(e.lu.A2 <- expand2(lu.A2))
+stopifnot(all.equal(A2, Reduce(`\%*\%`, e.lu.A2)))
 
-(lu2m <- as(lu2, "dgeMatrix")) # L and U interlaced
-stopifnot(identical(as(lu2m, "matrix"), `dim<-`(lu2@x, lu2@Dim)))
+(m.lu.A2 <- as(lu.A2, "dgeMatrix")) # L and U interlaced
+stopifnot(identical(as(m.lu.A2, "matrix"), `dim<-`(lu.A2@x, lu.A2@Dim)))
 
 ## ---- Sparse -------------------------
 
-x3 <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
+A3 <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
          "CsparseMatrix")
-(lu3 <- lu(x3))
+(lu.A3 <- lu(A3))
 
 ## A ~ P1' L U P2' in floating point
-e.lu3 <- expand2(lu3)
-stopifnot(all.equal(x3, Reduce(`\%*\%`, e.lu3)))
+e.lu.A3 <- expand2(lu.A3)
+stopifnot(all.equal(A3, Reduce(`\%*\%`, e.lu.A3)))
 
 ## P1 A P2 ~ L U is checked by permuting A
-x3.perm <- x3[lu3@p + 1L, lu3@q + 1L]
-norm(x3.perm - lu3@L \%*\% lu3@U) / norm(x3.perm)
+A3.perm <- A3[lu.A3@p + 1L, lu.A3@q + 1L]
+norm(A3.perm - lu.A3@L \%*\% lu.A3@U) / norm(A3.perm)
 }
