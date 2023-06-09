@@ -90,7 +90,7 @@ set.seed(0)
 stopifnot(all.equal(A, with(e.Sch.A, Q \%*\% T \%*\% Q.)))
 
 ## Factorization handled as factorized matrix
-b <- rnorm(4L)
+b <- rnorm(nrow(A))
 stopifnot(all.equal(det(A), det(Sch.A)),
           all.equal(solve(A, b), solve(Sch.A, b)))
 
