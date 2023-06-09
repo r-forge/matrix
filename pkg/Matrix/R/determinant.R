@@ -170,7 +170,9 @@ rm(.cl)
 for(.cl in c("dpoMatrix", "dppMatrix"))
 setMethod("determinant", signature(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
-              trf <- Cholesky(x, perm = FALSE)
+              trf <- tryCatch(
+                  Cholesky(x, perm = FALSE),
+                  error = function(e) BunchKaufman(x, warnSing = FALSE))
               determinant(trf, logarithm, ...)
           })
 rm(.cl)

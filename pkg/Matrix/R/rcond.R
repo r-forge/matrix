@@ -104,9 +104,10 @@ setMethod("rcond", signature(x = "dgeMatrix", norm = "character"),
               d <- x@Dim
               m <- d[1L]
               n <- d[2L]
-              if(m == n)
-                  .Call(dgeMatrix_rcond, x, lu(x), norm)
-              else {
+              if(m == n) {
+                  trf <- lu(x, warnSing = FALSE)
+                  .Call(dgeMatrix_rcond, x, trf, norm)
+              } else {
                   ## MJ: norm(A = P1' Q R P2') = norm(R) holds in general
                   ##     only for norm == "2", but La_rcond_type() disallows
                   ##     norm == "2" ... FIXME ??
@@ -128,17 +129,41 @@ setMethod("rcond", signature(x = "dtpMatrix", norm = "character"),
               .Call(dtpMatrix_rcond, x, norm))
 
 setMethod("rcond", signature(x = "dsyMatrix", norm = "character"),
-          function(x, norm, ...)
-              .Call(dsyMatrix_rcond, x, BunchKaufman(x), norm))
+          function(x, norm, ...) {
+              trf <- BunchKaufman(x, warnSing = FALSE)
+              .Call(dsyMatrix_rcond, x, trf, norm)
+          })
 
 setMethod("rcond", signature(x = "dspMatrix", norm = "character"),
-          function(x, norm, ...)
-              .Call(dspMatrix_rcond, x, BunchKaufman(x), norm))
+          function(x, norm, ...) {
+              trf <- BunchKaufman(x, warnSing = FALSE)
+              .Call(dspMatrix_rcond, x, trf, norm)
+          })
 
 setMethod("rcond", signature(x = "dpoMatrix", norm = "character"),
-          function(x, norm, ...)
-              .Call(dpoMatrix_rcond, x, Cholesky(x, perm = FALSE), norm))
+          function(x, norm, ...) {
+              ok <- TRUE
+              trf <- tryCatch(
+                  Cholesky(x, perm = FALSE),
+                  error = function(e) {
+                      ok <<- FALSE
+                      BunchKaufman(x, warnSing = FALSE)
+                  })
+              if(ok)
+                  .Call(dpoMatrix_rcond, x, trf, norm)
+              else .Call(dsyMatrix_rcond, x, trf, norm)
+          })
 
 setMethod("rcond", signature(x = "dppMatrix", norm = "character"),
-          function(x, norm, ...)
-              .Call(dppMatrix_rcond, x, Cholesky(x, perm = FALSE), norm))
+          function(x, norm, ...) {
+              ok <- TRUE
+              trf <- tryCatch(
+                  Cholesky(x, perm = FALSE),
+                  error = function(e) {
+                      ok <<- FALSE
+                      BunchKaufman(x, warnSing = FALSE)
+                  })
+              if(ok)
+                  .Call(dppMatrix_rcond, x, trf, norm)
+              else .Call(dspMatrix_rcond, x, trf, norm)
+          })
