@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-09 r4033)}{
+\section{Changes in version 1.6-0 (2023-06-09 r4037)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -100,7 +100,6 @@
       gain formal validity methods.
 
       %% TODO: add examples _using_ 'expand2'
-      %% TODO: fix bug in expand2(<upper triangular p?BunchKaufman>)
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor and

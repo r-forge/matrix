@@ -18,22 +18,21 @@
   Classes \code{BunchKaufman} and \code{pBunchKaufman} represent
   Bunch-Kaufman factorizations of \eqn{n \times n}{n-by-n} real,
   symmetric matrices \eqn{A}, having the general form
-  \deqn{A = L D_{L} L' = U' D_{U} U}{A = L * DL * L' = U' * DU * U}
+  \deqn{A = U D_{U} U' = L D_{L} L'}{A = U * DU * U' = L * DL * L'}
   where
   \eqn{D_{L}}{DL} and \eqn{D_{U}}{DU} are symmetric, block diagonal
   matrices composed of \eqn{b_{L}}{bL} and \eqn{b_{U}}{bU}
-  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks,
-  and
-  \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{prod(Pk * Lk : k = 1,...,bL)}
-  is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
-  matrices, each having nonzero entries below the diagonal in 1 or 2 columns,
-  and 
-  \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{prod(Pk * Uk : k = 1,...,bU)}
+  \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks;
+  \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
   is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular
-  matrices, each having nonzero entries above the diagonal in 1 or 2 columns.
+  matrices, each having nonzero entries above the diagonal in 1 or 2 columns;
+  and
+  \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
+  is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
+  matrices, each having nonzero entries below the diagonal in 1 or 2 columns.
   
   These classes store the nonzero entries of the
-  \eqn{2 b_{L} + 1}{2*bL+1} or \eqn{2 b_{U} + 1}{2*bU+1} factors,
+  \eqn{2 b_{U} + 1}{2*bU+1} or \eqn{2 b_{L} + 1}{2*bL+1} factors,
   which are individually sparse,
   in a dense format as a vector of length
   \eqn{nn}{n*n} (\code{BunchKaufman}) or
@@ -115,16 +114,22 @@
   \url{https://netlib.org/lapack/double/dsptrf.f}.
 }
 \examples{
-showClass( "BunchKaufman")
-showClass("pBunchKaufman")
+showClass("BunchKaufman")
+set.seed(1)
 
-(sy <- crossprod(Matrix(rnorm(18L), 6L, 3L)))
-(bksy <- BunchKaufman(sy))
+(A <- forceSymmetric(Matrix(rnorm(36L), 6L, 6L)))
+(bk.A <- BunchKaufman(A))
+e.bk.A <- expand2(bk.A)
+length(e.bk.A)
 
-(sp <- pack(Matrix(diag(5L) + 1)))
-(bksp <- BunchKaufman(sp))
+## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
 
-## See the underlying LAPACK representation 
-as(bksy, "dtrMatrix")
-as(bksp, "dtpMatrix")
+## Factorization handled as factorized matrix
+b <- rnorm(nrow(A))
+stopifnot(identical(det(A), det(bk.A)),
+          identical(solve(A, b), solve(bk.A, b)))
+
+## Underlying LAPACK representation
+as(bk.A, "dtrMatrix")
 }
