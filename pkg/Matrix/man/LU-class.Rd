@@ -90,7 +90,7 @@ set.seed(1)
 stopifnot(all.equal(A, with(e.lu.A, P1. \%*\% L \%*\% U)))
 
 ## Factorization handled as factorized matrix
-b <- rnorm(3L)
+b <- rnorm(nrow(A))
 stopifnot(identical(det(A), det(lu.A)),
           identical(solve(A, b), solve(lu.A, b)))
 
