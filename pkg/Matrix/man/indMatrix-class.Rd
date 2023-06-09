@@ -30,6 +30,7 @@
 \alias{coerce,indMatrix,nsparseMatrix-method}
 \alias{coerce,indMatrix,pMatrix-method}
 \alias{coerce,indMatrix,packedMatrix-method}
+\alias{coerce,indMatrix,sparseVector-method}
 \alias{coerce,indMatrix,unpackedMatrix-method}
 \alias{coerce,indMatrix,vector-method}
 \alias{coerce,list,indMatrix-method}

@@ -56,7 +56,7 @@ init.o: init.c abIndex.h \
   CHMfactor.h Csparse.h dense.h Lapack-etc.h \
   dgCMatrix.h cs_utils.h cs.h dgeMatrix.h \
   factorizations.h packedMatrix.h products.h \
-  unpackedMatrix.h sparse.h subscript.h validity.h
+  unpackedMatrix.h sparse.h sparseVector.h subscript.h validity.h
 kappa.o: kappa.c kappa.h Lapack-etc.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 packedMatrix.o: packedMatrix.c packedMatrix.h \
@@ -72,7 +72,7 @@ products.o: products.c products.h Lapack-etc.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h
 sparse.o: sparse.c sparse.h Mutils.h Mdefines.h Syms.h Minlines.h
 sparseVector.o: sparseVector.c sparseVector.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h t_sparseVector.c
+  Mutils.h Mdefines.h Syms.h Minlines.h
 subscript.o: subscript.c subscript.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 unpackedMatrix.o: unpackedMatrix.c unpackedMatrix.h \

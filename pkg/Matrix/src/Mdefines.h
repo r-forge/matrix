@@ -263,6 +263,39 @@ enum CBLAS_SIDE {CblasLeft=141, CblasRight=142};
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 
+#define VALID_NSPARSE				\
+"ngCMatrix", "ngRMatrix", "ngTMatrix",		\
+"ntCMatrix", "ntRMatrix", "ntTMatrix",		\
+"nsCMatrix", "nsRMatrix", "nsTMatrix"
+
+#define VALID_LSPARSE				\
+"lgCMatrix", "lgRMatrix", "lgTMatrix",		\
+"ltCMatrix", "ltRMatrix", "ltTMatrix",		\
+"lsCMatrix", "lsRMatrix", "lsTMatrix"
+
+#define VALID_DSPARSE				\
+"dgCMatrix", "dgRMatrix", "dgTMatrix",		\
+"dtCMatrix", "dtRMatrix", "dtTMatrix",		\
+"dsCMatrix", "dsRMatrix", "dsTMatrix"
+
+#define VALID_CSPARSE				\
+"dgCMatrix", "dtCMatrix", "dsCMatrix",		\
+"lgCMatrix", "ltCMatrix", "lsCMatrix",		\
+"ngCMatrix", "ntCMatrix", "nsCMatrix"
+
+#define VALID_RSPARSE				\
+"dgRMatrix", "dtRMatrix", "dsRMatrix",		\
+"lgRMatrix", "ltRMatrix", "lsRMatrix",		\
+"ngRMatrix", "ntRMatrix", "nsRMatrix"
+
+#define VALID_TSPARSE				\
+"dgTMatrix", "dtTMatrix", "dsTMatrix",		\
+"lgTMatrix", "ltTMatrix", "lsTMatrix",		\
+"ngTMatrix", "ntTMatrix", "nsTMatrix"
+    
+#define VALID_DIAGONAL				\
+"ddiMatrix", "ldiMatrix"
+
 /* Older ones : */
 
 #define MATRIX_VALID_ge_dense			\

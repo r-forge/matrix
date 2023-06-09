@@ -11,7 +11,7 @@ setAs("matrix", "Matrix", function(from) Matrix(          from ))
 ## Need 'base' functions calling as.*() to dispatch to our S4 methods:
 as.vector.Matrix <- function(x, mode = "any") as.vector(as(x, "matrix"), mode)
 as.matrix.Matrix <- function(x, ...)                    as(x, "matrix")
- as.array.Matrix  <- function(x, ...)                   as(x, "matrix")
+ as.array.Matrix <- function(x, ...)                    as(x, "matrix")
 
 ## FIXME: compare with methods for subclasses; avoid duplication
 
