@@ -18,8 +18,8 @@
   real, symmetric matrix \eqn{A}, which has the general form
   \deqn{A = U D_{U} U' = L D_{L} L'}{A = U * DU * U' = L * DL * L'}
   where
-  \eqn{D_{L}}{DL} and \eqn{D_{U}}{DU} are symmetric, block diagonal
-  matrices composed of \eqn{b_{L}}{bL} and \eqn{b_{U}}{bU}
+  \eqn{D_{U}}{DU} and \eqn{D_{L}}{DL} are symmetric, block diagonal
+  matrices composed of \eqn{b_{U}}{bU} and \eqn{b_{L}}{bL}
   \eqn{1 \times 1}{1-by-1} or \eqn{2 \times 2}{2-by-2} diagonal blocks;
   \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
   is the product of \eqn{b_{U}}{bU} row-permuted unit upper triangular

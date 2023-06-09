@@ -82,17 +82,17 @@ expand (x, \dots)
       and \code{D} is a \code{\linkS4class{ddiMatrix}}.}
     \item{\code{expand2}}{\code{signature(x = "p?BunchKaufman")}:
       expands the factorization
-      \eqn{A = L D_{L} L' = U' D_{U} U}{A = L * DL * L' = U' * DU * U}
+      \eqn{A = U D_{U} U' = L D_{L} L'}{A = U * DU * U' = L * DL * L'}
       where
-      \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{prod(Pk * Lk : k = 1,...,bL)}
+      \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
       and
-      \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{prod(Pk * Uk : k = 1,...,bU)}
+      \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
       as a list containing the \eqn{2 b_{L} + 1}{2*bL+1} or
       \eqn{2 b_{U} + 1}{2*bU+1} matrix factors, depending on \code{x@uplo}.
       \eqn{P_{k}}{Pk} are represented as \code{\linkS4class{pMatrix}},
-      \eqn{L_{k}}{Lk} and \eqn{U_{k}}{Uk}, are represented as
+      \eqn{U_{k}}{Uk} and \eqn{L_{k}}{Lk}, are represented as
       \code{\linkS4class{dtCMatrix}}, and
-      \eqn{D_{L}}{DL} and \eqn{D_{U}}{DU} are represented as
+      \eqn{D_{U}}{DU} and \eqn{D_{L}}{DL} are represented as
       \code{\linkS4class{dsCMatrix}}.}
     \item{\code{expand2}}{\code{signature(x = "Schur")}:
       expands the factorization
