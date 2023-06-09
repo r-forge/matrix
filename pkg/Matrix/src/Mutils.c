@@ -860,153 +860,138 @@ SEXP R_Matrix_repr(SEXP obj)
 
 /* For indexing ===================================================== */
 
-SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_)
+SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
 {
     SEXP r;
-    int n = asInteger(n_), packed = asLogical(packed_),
-	diag = asLogical(diag_);
+    int i, j, n_ = asInteger(n), packed_ = asLogical(packed),
+	upper_ = asLogical(upper), diag_ = asLogical(diag);
     Matrix_int_fast64_t
-	nn = (Matrix_int_fast64_t) n * n,
-	nx = (packed) ? nn : n + (nn - n) / 2,
-	nr = (diag) ? n + (nn - n) / 2 : (nn - n) / 2;
+	nn = (Matrix_int_fast64_t) n_ * n_,
+	nx = (packed_) ? n_ + (nn - n_) / 2 : nn,
+	nr = (diag_) ? n_ + (nn - n_) / 2 : (nn - n_) / 2;
     if (nx > 0x1.0p+53)
 	error(_("indices would exceed 2^53"));
     if (nr > R_XLEN_T_MAX)
 	error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
-    int i, j, upper = asLogical(upper_);
     if (nx > INT_MAX) {
 	
 	PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
-	double k = 1.0, *pr = REAL(r);
-
-#define DO_INDEX(_ONE_, _NR_)				\
+	double k = 1.0, nr_ = (double) nr, *pr = REAL(r);
+	
+#define DO_INDEX					\
 	do {						\
-	    if (packed) {				\
-		if (diag) {				\
-		    while (k <= _NR_) {			\
-			*(pr++) = k;			\
-			k += _ONE_;			\
-		    }					\
-		} else if (upper) {			\
-		    for (j = 0; j < n; ++j) {		\
-			for (i = 0; i < j; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
-			k += _ONE_;			\
+	    if (packed_) {				\
+		if (diag_) {				\
+		    while (k <= nr_)			\
+			*(pr++) = k++;			\
+		} else if (upper_) {			\
+		    for (j = 0; j < n_; ++j) {		\
+			for (i = 0; i < j; ++i)		\
+			    *(pr++) = k++;		\
+			k++;				\
 		    }					\
 		} else {				\
-		    for (j = 0; j < n; ++j) {		\
-			k += _ONE_;			\
-			for (i = j+1; i < n; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
+		    for (j = 0; j < n_; ++j) {		\
+			k++;				\
+			for (i = j+1; i < n_; ++i)	\
+			    *(pr++) = k++;		\
 		    }					\
 		}					\
-	    } else if (diag) {				\
-		if (upper) {				\
-		    for (j = 0; j < n; ++j) {		\
-			for (i = 0; i <= j; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
-			k += n-j-1;			\
+	    } else if (diag_) {				\
+		if (upper_) {				\
+		    for (j = 0; j < n_; ++j) {		\
+			for (i = 0; i <= j; ++i)	\
+			    *(pr++) = k++;		\
+			k += n_-j-1;			\
 		    }					\
 		} else {				\
-		    for (j = 0; j < n; ++j) {		\
+		    for (j = 0; j < n_; ++j) {		\
 			k += j;				\
-			for (i = j; i < n; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
+			for (i = j; i < n_; ++i)	\
+			    *(pr++) = k++;		\
 		    }					\
 		}					\
 	    } else {					\
-		if (upper) {				\
-		    for (j = 0; j < n; ++j) {		\
-			for (i = 0; i < j; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
-			k += n-j;			\
+		if (upper_) {				\
+		    for (j = 0; j < n_; ++j) {		\
+			for (i = 0; i < j; ++i)		\
+			    *(pr++) = k++;		\
+			k += n_-j;			\
 		    }					\
 		} else {				\
-		    for (j = 0; j < n; ++j) {		\
+		    for (j = 0; j < n_; ++j) {		\
 			k += j+1;			\
-			for (i = j+1; i < n; ++i) {	\
-			    *(pr++) = k;		\
-			    k += _ONE_;			\
-			}				\
+			for (i = j+1; i < n_; ++i)	\
+			    *(pr++) = k++;		\
 		    }					\
 		}					\
 	    }						\
 	} while (0)
-
-	DO_INDEX(1.0, nr);
-
+	
+	DO_INDEX;
+	
     } else {
 
 	PROTECT(r = allocVector(INTSXP, (R_xlen_t) nr));
 	int k = 1, nr_ = (int) nr, *pr = INTEGER(r);
-
-	DO_INDEX(1, nr_);
-
+	
+	DO_INDEX;
+	
 #undef DO_INDEX
-
+	
     }
 
     UNPROTECT(1);
     return r;
 }
 
-SEXP R_index_diagonal(SEXP n_, SEXP upper_, SEXP packed_)
+SEXP R_index_diagonal(SEXP n, SEXP packed, SEXP upper)
 {
     SEXP r;
-    int n = asInteger(n_), packed = asLogical(packed_);
+    int j, n_ = asInteger(n), packed_ = asLogical(packed),
+	upper_ = asLogical(upper);
     Matrix_int_fast64_t
-	nn = (Matrix_int_fast64_t) n * n,
-	nx = (packed) ? nn : n + (nn - n) / 2;
+	nn = (Matrix_int_fast64_t) n_ * n_,
+	nx = (packed_) ? n_ + (nn - n_) / 2 : nn;
     if (nx > 0x1.0p+53)
 	error(_("indices would exceed 2^53"));
-    int j, upper = asLogical(upper_);
     if (nx > INT_MAX) {
-
-	PROTECT(r = allocVector(REALSXP, n));
+	
+	PROTECT(r = allocVector(REALSXP, n_));
 	double k = 1.0, *pr = REAL(r);
-
+	
 #define DO_INDEX				\
 	do {					\
-	    if (!packed) {			\
-		for (j = 0; j < n; ++j) {	\
-		    *(pr++) = k;		\
-		    k += n+1;			\
+	    if (!packed_) {			\
+		for (j = 0; j < n_; ++j) {	\
+		    *(pr++) = k++;		\
+		    k += n_;			\
 		}				\
-	    } else if (upper) {			\
-		for (j = 0; j < n; ++j) {	\
+	    } else if (upper_) {		\
+		for (j = 0; j < n_; ++j) {	\
 		    *(pr++) = k;		\
 		    k += j+2;			\
 		}				\
 	    } else {				\
-		for (j = 0; j < n; ++j) {	\
+		for (j = 0; j < n_; ++j) {	\
 		    *(pr++) = k;		\
-		    k += n-j;			\
+		    k += n_-j;			\
 		}				\
 	    }					\
 	} while (0)
-
+	
 	DO_INDEX;
-
+	
     } else {
-
-	PROTECT(r = allocVector(INTSXP, n));
+	
+	PROTECT(r = allocVector(INTSXP, n_));
 	int k = 1, *pr = INTEGER(r);
 	DO_INDEX;
 
 #undef DO_INDEX
-
+	
     }
-
+    
     UNPROTECT(1);
     return r;
 }
@@ -1151,79 +1136,6 @@ void na2one(SEXP x)
 	break;
     }
     return;
-}
-
-SEXP v2spV(SEXP from)
-{
-    SEXPTYPE tx = TYPEOF(from);
-    SEXP to = NULL, length = NULL, i = NULL, x = NULL;
-    R_xlen_t n_ = XLENGTH(from);
-
-#define V2SPV(_KIND_, _NZ_,						\
-	      _CTYPE1_, _SEXPTYPE1_, _PTR1_,				\
-	      _CTYPE2_, _SEXPTYPE2_, _PTR2_)				\
-    do {								\
-	PROTECT(to = NEW_OBJECT_OF_CLASS(#_KIND_ "sparseVector"));	\
-	_CTYPE1_ *py = _PTR1_(from);					\
-	for (k = 0; k < n; ++k)						\
-	    if (_NZ_(py[k]))						\
-		++nnz;							\
-	PROTECT(i = allocVector(_SEXPTYPE2_, nnz));			\
-	PROTECT(x = allocVector(_SEXPTYPE1_, nnz));			\
-	_CTYPE2_ *pi = _PTR2_(i);					\
-	_CTYPE1_ *px = _PTR1_(x);					\
-	for (k = 0; k < n; ++k) {					\
-	    if (_NZ_(py[k])) {						\
-		*(pi++) = (_CTYPE2_) (k + 1);				\
-		*(px++) = py[k];					\
-	    }								\
-	}								\
-    } while (0)
-
-#define V2SPV_CASES(_CTYPE2_, _SEXPTYPE2_, _PTR2_)			\
-    do {								\
-	switch (tx) {							\
-	case LGLSXP:							\
-	    V2SPV(l, ISNZ_LOGICAL, int, LGLSXP, LOGICAL,		\
-		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
-	    break;							\
-	case INTSXP:							\
-	    V2SPV(i, ISNZ_INTEGER, int, INTSXP, INTEGER,		\
-		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
-	    break;							\
-	case REALSXP:							\
-	    V2SPV(d, ISNZ_REAL, double, REALSXP, REAL,			\
-		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
-	    break;							\
-	case CPLXSXP:							\
-	    V2SPV(z, ISNZ_COMPLEX, Rcomplex, CPLXSXP, COMPLEX,		\
-		  _CTYPE2_, _SEXPTYPE2_, _PTR2_);			\
-	    break;							\
-	default:							\
-	    ERROR_INVALID_TYPE("object", tx, "v2spV");			\
-	    break;							\
-	}								\
-    } while (0)
-
-    if (n_ <= INT_MAX) {
-	int k, n = (int) n_, nnz = 0;
-	PROTECT(length = ScalarInteger(n));
-	V2SPV_CASES(int, INTSXP, INTEGER);
-    } else {
-	R_xlen_t k, n = n_, nnz = 0;
-	PROTECT(length = ScalarReal((double) n));
-	V2SPV_CASES(double, REALSXP, REAL);
-    }
-
-#undef V2SPV_CASES
-#undef V2SPV
-
-    SET_SLOT(to, Matrix_lengthSym, length);
-    SET_SLOT(to, Matrix_iSym, i);
-    SET_SLOT(to, Matrix_xSym, x);
-
-    UNPROTECT(4); /* x, i, length, to */
-    return to;
 }
 
 /* That both 's1' and 's2' are STRSXP of length at least 'n' must be

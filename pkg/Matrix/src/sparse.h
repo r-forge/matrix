@@ -3,6 +3,9 @@
 
 #include "Mutils.h"
 
+/* defined in ./sparseVector.c : */
+SEXP v2spV(SEXP);
+
 SEXP sparse_as_dense(SEXP from, int packed);
 SEXP R_sparse_as_dense(SEXP from, SEXP packed);
 SEXP R_sparse_as_matrix(SEXP from);
@@ -45,41 +48,6 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 
 SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
 SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
-
-/* TODO: compare with macros in ./Mdefines.h */
-
-#define VALID_DSPARSE				\
-"dgCMatrix", "dgRMatrix", "dgTMatrix",		\
-"dtCMatrix", "dtRMatrix", "dtTMatrix",		\
-"dsCMatrix", "dsRMatrix", "dsTMatrix"
-
-#define VALID_LSPARSE				\
-"lgCMatrix", "lgRMatrix", "lgTMatrix",		\
-"ltCMatrix", "ltRMatrix", "ltTMatrix",		\
-"lsCMatrix", "lsRMatrix", "lsTMatrix"
-
-#define VALID_NSPARSE				\
-"ngCMatrix", "ngRMatrix", "ngTMatrix",		\
-"ntCMatrix", "ntRMatrix", "ntTMatrix",		\
-"nsCMatrix", "nsRMatrix", "nsTMatrix"
-
-#define VALID_CSPARSE				\
-"dgCMatrix", "dtCMatrix", "dsCMatrix",		\
-"lgCMatrix", "ltCMatrix", "lsCMatrix",		\
-"ngCMatrix", "ntCMatrix", "nsCMatrix"
-
-#define VALID_RSPARSE				\
-"dgRMatrix", "dtRMatrix", "dsRMatrix",		\
-"lgRMatrix", "ltRMatrix", "lsRMatrix",		\
-"ngRMatrix", "ntRMatrix", "nsRMatrix"
-
-#define VALID_TSPARSE				\
-"dgTMatrix", "dtTMatrix", "dsTMatrix",		\
-"lgTMatrix", "ltTMatrix", "lsTMatrix",		\
-"ngTMatrix", "ntTMatrix", "nsTMatrix"
-    
-#define VALID_DIAGONAL				\
-"ddiMatrix", "ldiMatrix"
 
 #define SPARSE_CASES(_SEXPTYPE_, _DO_)			\
     do {						\

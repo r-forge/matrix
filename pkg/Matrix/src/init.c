@@ -11,6 +11,7 @@
 #include "packedMatrix.h"
 #include "products.h"
 #include "sparse.h"
+#include "sparseVector.h"
 #include "subscript.h"
 #include "unpackedMatrix.h"
 #include "validity.h"
@@ -292,6 +293,9 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dspMatrix_rcond, 3),
     CALLDEF(dpoMatrix_rcond, 3),
     CALLDEF(dppMatrix_rcond, 3),
+
+    CALLDEF(v2spV, 1),
+    CALLDEF(CR2spV, 1),
 
     {NULL, NULL, 0}
 };

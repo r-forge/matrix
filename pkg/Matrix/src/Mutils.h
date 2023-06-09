@@ -59,8 +59,8 @@ SEXP R_Matrix_shape(SEXP obj);
 char Matrix_repr(SEXP obj);
 SEXP R_Matrix_repr(SEXP obj);
 
-SEXP R_index_triangle(SEXP n_, SEXP upper_, SEXP diag_, SEXP packed_);
-SEXP R_index_diagonal(SEXP n_, SEXP upper_,             SEXP packed_);
+SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag);
+SEXP R_index_diagonal(SEXP n, SEXP packed, SEXP upper);
 
 SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax);
 
@@ -68,8 +68,6 @@ void conjugate(SEXP x);
 void zeroRe(SEXP x);
 void zeroIm(SEXP x);
 void na2one(SEXP x);
-
-SEXP v2spV(SEXP from);
 
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);

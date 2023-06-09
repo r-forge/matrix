@@ -1,22 +1,8 @@
-#### All Methods in relation with the sparseVector (sub)classes
+## METHODS FOR CLASS: sparseVector (virtual)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("atomicVector", "sparseVector",
-      function(from) {
-	  r <- new(paste0(.V.kind(from), "sparseVector"))
-	  r@length <- length(from)
-	  r@i <- ii <- which(isN0(from))
-          r@x <- from[ii]
-	  r
-      })
 
-setAs("atomicVector", "dsparseVector",
-      function(from) {
-	  r <- new("dsparseVector")
-	  r@length <- length(from)
-          r@i <- ii <- which(isN0(from))
-	  r@x <- as.double(from)[ii]
-	  r
-      })
+## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setAs("nsparseVector", "lsparseVector",
       function(from)
@@ -55,175 +41,8 @@ setAs("sparseVector", "zsparseVector",
           new("zsparseVector", length = from@length, i = from@i,
               x = as.complex(from@x)))
 
-sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
-    ## sparseVector  ->  vector
-    has.x <- .hasSlot(x, "x")## has "x" slot
-    m.any <- (mode == "any")
-    if(m.any)
-	mode <- if(has.x) mode(x@x) else "logical"
-    else if(has.x) # is.<mode>() is much faster than inherits() | is():
-        xxOk <- switch(mode,
-		       "double" = is.double(x@x),
-		       "logical" = is.logical(x@x),
-		       "integer" = is.integer(x@x),
-		       "complex" = is.complex(x@x),
-		       ## otherwise (does not happen with default 'mode'):
-		       inherits(x@x, mode))
-    r <- vector(mode, x@length)
-    r[x@i] <-
-	if(has.x) {
-	    if(m.any || xxOk) x@x else as(x@x, mode)
-	} else TRUE
-    r
-}
-
-## so base functions calling as.vector() work too:
-## S3 dispatch works for base::as.vector(), but S4 dispatch does not:
-as.vector.sparseVector <- sp2vec
-## work as in base:
-as.matrix.sparseVector <- function(x, ...) as.matrix.default(sp2vec(x))
-as.array.sparseVector  <- function(x, ...) as.array.default (sp2vec(x))
-
-##' Construct new sparse vector , *dropping* zeros
-
-##' @param class  character, the sparseVector class
-##' @param x      numeric/logical/...:  the 'x' slot -- if missing ==> "nsparseVector"
-##' @param i      integer: index of non-zero entries
-##' @param length integer: the 'length' slot
-
-##' @return a sparseVector, with 0-dropped 'x' (and 'i')
-newSpV <- function(class, x, i, length, drop0 = TRUE, checkSort = TRUE) {
-    if(has.x <- !missing(x)) {
-	if(length(x) == 1 && (li <- length(i)) != 1) ## recycle x :
-	    x <- rep.int(x, li)
-	if(drop0 && isTRUE(any(x0 <- x == 0))) {
-	    keep <- is.na(x) | !x0
-	    x <- x[keep]
-	    i <- i[keep]
-	}
-    }
-    if(checkSort && is.unsorted(i)) {
-	ii <- sort.list(i)
-	if(has.x) x <- x[ii]
-	i <- i[ii]
-    }
-    if(has.x)
-	new(class, x = x, i = i, length = length)
-    else
-	new(class,        i = i, length = length)
-}
-## a "version" of 'prev' with changed contents:
-newSpVec <- function(class, x, prev)
-    newSpV(class, x=x, i=prev@i, length=prev@length)
-
-## Exported:
-sparseVector <- function(x, i, length) {
-    newSpV(class = paste0(if(missing(x)) "n" else .V.kind(x), "sparseVector"),
-           x=x, i=i, length=length)
-}
-
-
-setAs("sparseVector", "vector", function(from) sp2vec(from))
-
-setMethod("as.vector", "sparseVector", sp2vec)
-
-setMethod("as.numeric", "sparseVector", function(x) sp2vec(x, mode = "double"))
-setMethod("as.logical", "sparseVector", function(x) sp2vec(x, mode = "logical"))
-
-setAs("sparseVector", "numeric", function(from) sp2vec(from, mode = "double"))
-setAs("sparseVector", "integer", function(from) sp2vec(from, mode = "integer"))
-setAs("sparseVector", "logical", function(from) sp2vec(from, mode = "logical"))
-
-## the "catch all remaining" method:
-setAs("ANY", "sparseVector",
-      function(from) as(as.vector(from), "sparseVector"))
-## "nsparse*" is special -- by default "lsparseVector" are produced
-setAs("ANY", "nsparseVector",
-      function(from) as(as(from, "sparseVector"),"nsparseVector"))
-
-setAs("diagonalMatrix", "sparseVector",
-      function(from) {
-	  kind <- .M.kind(from) ## currently only "l" and "d" --> have 'x'
-	  n <- nrow(from)
-          n2 <- as.double(n) * n
-	  if(n2 > .Machine$integer.max) { ## double (i, length)
-	      ii <- seq(1, by = n+1, length.out = n) ## 1-based indexing
-	  } else { # integer ok
-	      n2 <- as.integer(n2)
-	      ii <- as.integer(seq(1L, by = n+1L, length.out = n))
-	  }
-	  new(paste0(kind, "sparseVector"),
-	      length = n2, i = ii,
-	      x = if(from@diag != "U") from@x else
-		  rep.int(switch(kind, "d" = 1, "l" = TRUE, "i" = 1L, "z" = 1+0i), n))
-	 })
-
-setAs("sparseMatrix", "sparseVector",
-      function(from) as(as(from, "TsparseMatrix"), "sparseVector"))
-
-setAs("CsparseMatrix", "sparseVector", ## could go via TsparseMatrix, but this is faster:
-      function(from) {
-	  d <- dim(from)
-	  n <- prod(d) # -> numeric, no integer overflow
-	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
-          kind <- .M.kind(from)
-	  cld <- getClassDef(class(from))
-	  from <-
-              if(extends(cld, "symmetricMatrix"))
-                  .sparse2g(from)
-              else .Call(R_sparse_diag_U2N, from)
-          xj <- .Call(Matrix_expand_pointers, from@p)
-	  ii <- if(int.n)
-	      1L + from@i + d[1] * xj
-	  else
-	      1 + from@i + as.double(d[1]) * xj
-	  cl <- paste0(kind, "sparseVector")
-	  if(kind != "n") ## have 'x' slot
-	      new(cl, i = ii, length = n, x = from@x)
-	  else
-	      new(cl, i = ii, length = n)
-      })
-
-setAs("TsparseMatrix", "sparseVector",
-      function(from) {
-	  d <- dim(from)
-	  n <- prod(d) # -> numeric, no integer overflow
-	  if((int.n <- n <= .Machine$integer.max)) n <- as.integer(n)
-          kind <- .M.kind(from)
-	  cld <- getClassDef(class(from))
-	  from <-
-              if(extends(cld, "symmetricMatrix"))
-                  .sparse2g(from)
-              else .Call(R_sparse_diag_U2N, from)
-	  if(anyDuplicatedT(from, di = d))
-	      from <- uniqTsparse(from)
-	  ii <- if(int.n)
-	      1L + from@i + d[1] * from@j
-	  else
-	      1 + from@i + as.double(d[1]) * from@j
-	  cl <- paste0(kind, "sparseVector")
-	  if(kind != "n") ## have 'x' slot
-	      new(cl, i = ii, length = n, x = from@x)
-	  else
-	      new(cl, i = ii, length = n)
-      })
-
-
-##' <description>
-##'
-##' <details>
-## Utility -- used in `dim<-` below, but also in  Matrix(.) :
-##' @title sparseVector --> sparseMatrix constructor
-##' @param x "sparseVector" object
-##' @param nrow integer or missing, as in matrix(), see ?matrix
-##' @param ncol (ditto)
-##' @param byrow logical (see ?matrix)
-##' @param check logical indicating if it needs to be checked that 'x' is a sparseVector
-##' @param symmetric logical indicating if result must be "symmetricMatrix"
-##' @return an object inheriting from "TsparseMatrix"
-##' @author Martin Maechler, May 2007 ff.
-spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE)
-{
+spV2M <- function(x, nrow, ncol, byrow = FALSE,
+                  check = TRUE, symmetric = FALSE) {
     if(check && !is(x, "sparseVector"))
 	stop("'x' must inherit from \"sparseVector\"")
     if(!missing(ncol)) { ncol <- as.integer(ncol)
@@ -294,15 +113,176 @@ spV2M <- function (x, nrow, ncol, byrow = FALSE, check = TRUE, symmetric = FALSE
     r@i <- i
     if(has.x) r@x <- x
     r
-}## {spV2M}
+}
 
 .sparseV2Mat <- function(from)
     spV2M(from, nrow = from@length, ncol = 1L, check = FALSE)
-setAs("sparseVector", "Matrix", .sparseV2Mat)
-setAs("sparseVector", "sparseMatrix", .sparseV2Mat)
+
+setAs("sparseVector",        "Matrix", .sparseV2Mat)
+setAs("sparseVector",  "sparseMatrix", .sparseV2Mat)
 setAs("sparseVector", "TsparseMatrix", .sparseV2Mat)
 setAs("sparseVector", "CsparseMatrix", function(from) .T2C(.sparseV2Mat(from)))
 setAs("sparseVector", "RsparseMatrix", function(from) .T2R(.sparseV2Mat(from)))
+
+sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
+    ## sparseVector  ->  vector
+    has.x <- .hasSlot(x, "x")## has "x" slot
+    m.any <- (mode == "any")
+    if(m.any)
+	mode <- if(has.x) mode(x@x) else "logical"
+    else if(has.x) # is.<mode>() is much faster than inherits() | is():
+        xxOk <- switch(mode,
+		       "double" = is.double(x@x),
+		       "logical" = is.logical(x@x),
+		       "integer" = is.integer(x@x),
+		       "complex" = is.complex(x@x),
+		       ## otherwise (does not happen with default 'mode'):
+		       inherits(x@x, mode))
+    r <- vector(mode, x@length)
+    r[x@i] <-
+	if(has.x) {
+	    if(m.any || xxOk) x@x else as(x@x, mode)
+	} else TRUE
+    r
+}
+
+## Need 'base' functions calling as.*() to dispatch to our S4 methods:
+as.vector.sparseVector <- sp2vec
+as.matrix.sparseVector <- function(x, ...) as.matrix.default(sp2vec(x))
+ as.array.sparseVector <- function(x, ...)  as.array.default(sp2vec(x))
+
+setAs("sparseVector", "vector",  function(from) sp2vec(from))
+setAs("sparseVector", "logical", function(from) sp2vec(from, mode = "logical"))
+setAs("sparseVector", "integer", function(from) sp2vec(from, mode = "integer"))
+setAs("sparseVector", "numeric", function(from) sp2vec(from, mode = "double"))
+
+setMethod("as.vector",  "sparseVector", sp2vec)
+setMethod("as.logical", "sparseVector", function(x) sp2vec(x, mode = "logical"))
+setMethod("as.numeric", "sparseVector", function(x) sp2vec(x, mode = "double"))
+
+
+## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setAs("ANY", "sparseVector",
+      function(from) as(as.vector(from), "sparseVector"))
+
+setAs("ANY", "nsparseVector",
+      function(from) as(as(from, "sparseVector"), "nsparseVector"))
+
+setAs("atomicVector", "sparseVector",
+      function(from) {
+	  r <- new(paste0(.V.kind(from), "sparseVector"))
+	  r@length <- length(from)
+	  r@i <- ii <- which(isN0(from))
+          r@x <- from[ii]
+	  r
+      })
+
+setAs("atomicVector", "dsparseVector",
+      function(from) {
+	  r <- new("dsparseVector")
+	  r@length <- length(from)
+          r@i <- ii <- which(isN0(from))
+	  r@x <- as.double(from)[ii]
+	  r
+      })
+
+setAs("CsparseMatrix", "sparseVector",
+      function(from) .Call(CR2spV, from))
+
+setAs("RsparseMatrix", "sparseVector",
+      function(from) .Call(CR2spV, from))
+
+setAs("TsparseMatrix", "sparseVector",
+      function(from) .Call(CR2spV, .T2C(from)))
+
+setAs("diagonalMatrix", "sparseVector",
+      function(from) {
+          n <- (d <- from@Dim)[1L]
+          nn <- prod(d)
+          kind <- .M.kind(from)
+          to <- new(paste0(kind, "sparseVector"))
+          to@length <-
+              if(nn <= .Machine$integer.max)
+                  as.integer(nn)
+              else nn
+          to@i <- indDiag(n)
+          to@x <-
+              if(from@diag == "N")
+                  from@x
+              else rep.int(switch(kind,
+                                  "l" = TRUE,
+                                  "i" = 1L,
+                                  "d" = 1,
+                                  "z" = 1+0i),
+                           n)
+          to
+      })
+
+setAs("indMatrix", "sparseVector",
+      function(from) {
+          d <- from@Dim
+          m <- d[1L]
+          n <- d[2L]
+          mn <- prod(d)
+          perm <- from@perm
+          to <- new("nsparseVector")
+          if(mn <= .Machine$integer.max) {
+              to@length <- as.integer(mn)
+              to@i <-
+                  if(from@margin == 1L)
+                      seq.int(to = 0L, by = 1L, length.out = m) + perm * m
+                  else seq.int(from = 0L, by = m, length.out = n) + perm
+          } else {
+              to@length <- mn
+              to@i <-
+                  if(from@margin == 1L)
+                      seq.int(to = 0, by = 1, length.out = m) + perm * as.double(m)
+                  else seq.int(from = 0, by = as.double(m), length.out = n) + as.double(perm)
+          }
+          to
+      })
+
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##' Construct new sparse vector , *dropping* zeros
+
+##' @param class  character, the sparseVector class
+##' @param x      numeric/logical/...:  the 'x' slot -- if missing ==> "nsparseVector"
+##' @param i      integer: index of non-zero entries
+##' @param length integer: the 'length' slot
+
+##' @return a sparseVector, with 0-dropped 'x' (and 'i')
+newSpV <- function(class, x, i, length, drop0 = TRUE, checkSort = TRUE) {
+    if(has.x <- !missing(x)) {
+	if(length(x) == 1 && (li <- length(i)) != 1) ## recycle x :
+	    x <- rep.int(x, li)
+	if(drop0 && isTRUE(any(x0 <- x == 0))) {
+	    keep <- is.na(x) | !x0
+	    x <- x[keep]
+	    i <- i[keep]
+	}
+    }
+    if(checkSort && is.unsorted(i)) {
+	ii <- sort.list(i)
+	if(has.x) x <- x[ii]
+	i <- i[ii]
+    }
+    if(has.x)
+	new(class, x = x, i = i, length = length)
+    else
+	new(class,        i = i, length = length)
+}
+## a "version" of 'prev' with changed contents:
+newSpVec <- function(class, x, prev)
+    newSpV(class, x=x, i=prev@i, length=prev@length)
+
+## Exported:
+sparseVector <- function(x, i, length) {
+    newSpV(class = paste0(if(missing(x)) "n" else .V.kind(x), "sparseVector"),
+           x=x, i=i, length=length)
+}
 
 setMethod("dim<-", signature(x = "sparseVector"),
 	  function(x, value) {

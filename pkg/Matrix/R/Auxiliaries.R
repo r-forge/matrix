@@ -861,10 +861,10 @@ ldiag <- function(n, p=n)
 } ## MJ
 
 indDiag <- function(n, upper = TRUE, packed = FALSE)
-    .Call(R_index_diagonal, n, upper, packed)
+    .Call(R_index_diagonal, n, packed, upper)
 
 indTri <- function(n, upper = TRUE, diag = FALSE, packed = FALSE)
-    .Call(R_index_triangle, n, upper, diag, packed)
+    .Call(R_index_triangle, n, packed, upper, diag)
 
 ## MJ: now done in C, above, with options for packedMatrix
 if(FALSE) {
