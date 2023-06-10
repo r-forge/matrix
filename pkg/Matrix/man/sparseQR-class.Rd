@@ -212,17 +212,37 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   Society for Industrial and Applied Mathematics.
 }
 \examples{
-data(KNex)
-mm <- KNex $ mm
- y <- KNex $  y
- y. <- as(y, "CsparseMatrix")
-str(qrm <- qr(mm))
- qc  <- qr.coef  (qrm, y); qc. <- qr.coef  (qrm, y.) # 2nd failed in Matrix <= 1.1-0
- qf  <- qr.fitted(qrm, y); qf. <- qr.fitted(qrm, y.)
- qs  <- qr.resid (qrm, y); qs. <- qr.resid (qrm, y.)
-stopifnot(all.equal(qc, as.numeric(qc.),  tolerance=1e-12),
-          all.equal(qf, as.numeric(qf.),  tolerance=1e-12),
-          all.equal(qs, as.numeric(qs.),  tolerance=1e-12),
-          all.equal(qf+qs, y, tolerance=1e-12))
-%% FIXME: add more similarly to ./lu.Rd, see also ./qr-methods.Rd
+showClass("sparseQR")
+
+data(KNex, package = "Matrix")
+A <- KNex[["mm"]]
+(qr.A <- qr(A))
+E.qr.A <- expand2(qr.A, complete = TRUE)
+e.qr.A <- expand2(qr.A, complete = FALSE)
+
+dim(A)
+t(sapply(e.qr.A, dim))
+t(sapply(E.qr.A, dim))
+
+ae <- function(target, current)
+    all.equal(as(target, "matrix"), as(current, "matrix"))
+
+## A ~ P1' Q R P2' ~ P1' Q1 R1 P2' in floating point
+stopifnot(exprs = {
+    ae(A, with(E.qr.A, P1. \%*\% Q  \%*\% R  \%*\% P2.))
+    ae(A, with(e.qr.A, P1. \%*\% Q1 \%*\% R1 \%*\% P2.))
+    ae(A, qr.X(qr.A))
+})
+
+## More identities
+b <- KNex[["y"]]
+stopifnot(exprs = {
+    ae(qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
+    ae(qr.R     (qr.A   ), with(e.qr.A, R1))
+    ae(qr.coef  (qr.A, b), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% b))
+    ae(qr.fitted(qr.A, b), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% b))
+    ae(qr.resid (qr.A, b), with(e.qr.A, b - tcrossprod(P1. \%*\% Q1) \%*\% b))
+    ae(qr.qy    (qr.A, b), with(E.qr.A,   P1. \%*\% Q  \%*\% b))
+    ae(qr.qty   (qr.A, b), with(E.qr.A, t(P1. \%*\% Q) \%*\% b))
+})
 }
