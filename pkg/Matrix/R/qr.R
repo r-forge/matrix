@@ -164,7 +164,7 @@ setMethod("qr.X", signature(qr = "sparseQR"),
               }
               r <- .Call(sparseQR_matmult, qr, .sparse2dense(R), 4L, NA, NULL)
               if(p2.uns) {
-                  j <- invertPerm(p2, 0L, 1L)
+                  j <- invertPerm(p2)
                   if(ncol > n)
                       j <- c(j, (n + 1L):ncol)
                   r <- r[, j, drop = FALSE]
