@@ -166,7 +166,6 @@ setAs("denseLU", "dgeMatrix",
       function(from) {
           to <- new("dgeMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@x <- from@x
           to
       })
