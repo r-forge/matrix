@@ -21,7 +21,6 @@ setAs("BunchKaufman", "dtrMatrix",
       function(from) {
           to <- new("dtrMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
           to@x <- from@x
           to
@@ -31,7 +30,6 @@ setAs("pBunchKaufman", "dtpMatrix",
       function(from) {
           to <- new("dtpMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
           to@x <- from@x
           to

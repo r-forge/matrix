@@ -28,20 +28,24 @@ setMethod("chol", signature(x = "diagonalMatrix"),
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
               ch <- as(Cholesky(x, perm = pivot, tol = tol), "dtrMatrix")
+              ch@Dimnames <- dimnames(x)
               if(ch@uplo != "U") t(ch) else ch
           })
 
 setMethod("chol", signature(x = "dspMatrix"),
           function(x, ...) {
               ch <- as(Cholesky(x), "dtpMatrix")
+              ch@Dimnames <- dimnames(x)
               if(ch@uplo != "U") t(ch) else ch
           })
 
 for(.cl in paste0("ds", c("C", "R", "T"), "Matrix"))
 setMethod("chol", signature(x = .cl),
           function(x, pivot = FALSE, ...) {
-              ch <- Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE)
-              t(as(ch, "dtCMatrix")) # FIXME? give dtRMatrix, dtTMatrix?
+              ch <- t(as(Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE),
+                         "dtCMatrix")) # FIXME? give dtRMatrix, dtTMatrix?
+              ch@Dimnames <- dimnames(x)
+              ch
           })
 
 setMethod("chol", signature(x = "ddiMatrix"),
@@ -185,13 +189,10 @@ setMethod("chol2inv", signature(x = "ddiMatrix"),
 ## METHODS FOR CLASS: p?Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## FIXME: methods for 'coerce' and 'diag' should pivot 'Dimnames'
-
 setAs("Cholesky", "dtrMatrix",
       function(from) {
           to <- new("dtrMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
           to@x <- from@x
           to
@@ -201,7 +202,6 @@ setAs("pCholesky", "dtpMatrix",
       function(from) {
           to <- new("dtpMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@uplo <- from@uplo
           to@x <- from@x
           to
@@ -209,12 +209,11 @@ setAs("pCholesky", "dtpMatrix",
 
 setMethod("diag", signature(x = "Cholesky"),
           function(x, nrow, ncol, names = TRUE)
-              diag(as(x, "dtrMatrix"), names = names))
+              diag(as(x, "dtrMatrix"), names = FALSE))
 
 setMethod("diag", signature(x = "pCholesky"),
           function(x, nrow, ncol, names = TRUE)
-              diag(as(x, "dtpMatrix"), names = names))
-
+              diag(as(x, "dtpMatrix"), names = FALSE))
 
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
@@ -299,7 +298,6 @@ setAs("CHMsimpl", "dtCMatrix",
 
           to <- new("dtCMatrix")
           to@Dim  <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@uplo <- "L"
           to@p <- c(0L, cumsum(nz))
           to@i <- from@i[k]
@@ -339,7 +337,6 @@ setAs("CHMsuper", "dgCMatrix",
 
           to <- new("dgCMatrix")
           to@Dim <- from@Dim
-          to@Dimnames <- from@Dimnames
           to@p <- c(0L, cumsum(dp))
           to@i <- from@s[sequence.default(dp, rep.int(pi[-b] + 1L, nc))]
           to@x <- from@x
