@@ -224,8 +224,8 @@ dim(A)
 t(sapply(e.qr.A, dim))
 t(sapply(E.qr.A, dim))
 
-ae <- function(target, current)
-    all.equal(as(target, "matrix"), as(current, "matrix"))
+ae <- function(target, current, ...)
+    all.equal(as(target, "matrix"), as(current, "matrix"), ...)
 
 ## A ~ P1' Q R P2' ~ P1' Q1 R1 P2' in floating point
 stopifnot(exprs = {
