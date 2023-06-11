@@ -93,6 +93,13 @@ qr(x, \dots)
 \examples{
 showMethods("qr", inherited = FALSE)
 
+## ---- 1. A has full rank ---------------------------------------------
+
+## ---- 2. A is rank deficient but has full structural rank ------------
+
+## ---- 3. A is structurally rank deficient ----------------------------
+
+
 %% FIXME: Currently mixing example + regression tests <--> ../tests/factorizing.R
 ##------------- example of pivoting -- from base'  qraux.Rd -------------
 X <- cbind(int = 1,

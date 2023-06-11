@@ -47,7 +47,7 @@ expand (x, \dots)
 }
 \details{
   Methods for \code{expand} are retained only for backwards
-  compatibility with \pkg{Matrix} \code{<= 1.5-4}.  New code
+  compatibility with \pkg{Matrix} \code{< 1.6-0}.  New code
   should use \code{expand2} whose methods are more consistent,
   all obeying the rule that the product of the returned
   matrix factors should reproduce (within some tolerance)
@@ -87,10 +87,10 @@ expand (x, \dots)
       \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
       and
       \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
-      as a list containing the \eqn{2 b_{L} + 1}{2*bL+1} or
-      \eqn{2 b_{U} + 1}{2*bU+1} matrix factors, depending on \code{x@uplo}.
+      as a list containing the \eqn{2 b_{U} + 1}{2*bU+1} or
+      \eqn{2 b_{L} + 1}{2*bL+1} matrix factors, depending on \code{x@uplo}.
       \eqn{P_{k}}{Pk} are represented as \code{\linkS4class{pMatrix}},
-      \eqn{U_{k}}{Uk} and \eqn{L_{k}}{Lk}, are represented as
+      \eqn{U_{k}}{Uk} and \eqn{L_{k}}{Lk} are represented as
       \code{\linkS4class{dtCMatrix}}, and
       \eqn{D_{U}}{DU} and \eqn{D_{L}}{DL} are represented as
       \code{\linkS4class{dsCMatrix}}.}
@@ -158,11 +158,20 @@ expand (x, \dots)
   The virtual class \code{\linkS4class{MatrixFactorization}}
   of matrix factorizations.
   
-  Generic functions \code{\link{chol}}, \code{\link{Cholesky}},
-  \code{\link{BunchKaufman}}, \code{\link{Schur}}, \code{\link{lu}},
-  and \code{\link{qr}} for \emph{computing} factorizations.
+  Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
+  \code{\link{Schur}}, \code{\link{lu}}, and \code{\link{qr}} for
+  \emph{computing} factorizations.
 }
 \examples{
-(x <- Matrix(round(rnorm(9),2), 3, 3))
-(ex <- expand(lux <- lu(x)))
+(A <- Matrix(round(rnorm(9L), 2L), 3L, 3L))
+(lu.A <- lu(A))
+(e.lu.A <- expand2(lu.A))
+stopifnot(exprs = {
+    is.list(e.lu.A)
+    identical(names(e.lu.A), c("P1.", "L", "U"))
+    all(sapply(e.lu.A, is, "Matrix"))
+    all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.lu.A), "matrix"))
+})
+
+## see help("denseLU-class") and others for more examples
 }
