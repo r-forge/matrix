@@ -35,8 +35,9 @@
       format.  The details of the representation are specified by the
       manual for LAPACK routine \code{dgetrf}.}
     \item{\code{perm}}{an integer vector of length \code{min(Dim)}
-      specifying row interchanges as described in the manual for
-      LAPACK routine \code{dgetrf}.}
+      specifying the permutation \eqn{P_{1}}{P1} as a product of
+      transpositions.   If \code{perm[i] = j}, then rows \code{i} and
+      \code{j} were interchanged in step \code{i} of the factorization.}
   }
 }
 \section{Extends}{
@@ -82,18 +83,51 @@
 showClass("denseLU")
 set.seed(1)
 
-(A <- Matrix(round(rnorm(9L), 2L), 3L, 3L))
+n <- 3L
+(A <- Matrix(round(rnorm(n * n), 2L), n, n))
+
+## With dimnames, to see that they are propagated :
+dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
+                          paste0("c", seq_len(n)))
+
 (lu.A <- lu(A))
-(e.lu.A <- expand2(lu.A))
-
-## A ~ P1' L U in floating point
-stopifnot(all.equal(A, with(e.lu.A, P1. \%*\% L \%*\% U)))
-
-## Factorization handled as factorized matrix
-b <- rnorm(nrow(A))
-stopifnot(identical(det(A), det(lu.A)),
-          identical(solve(A, b), solve(lu.A, b)))
+e.lu.A <- expand2(lu.A)
 
 ## Underlying LAPACK representation
-as(lu.A, "dgeMatrix")
+as(lu.A, "dgeMatrix") # which is L and U interlaced
+
+## Get permutation from product of transpositions :
+asPerm <- function(pivot) {
+    perm <- seq_along(pivot)
+    for(i in seq_along(pivot)) {
+        tmp <- perm[i]
+        perm[i] <- perm[pivot[i]]
+        perm[pivot[i]] <- tmp
+    }
+    perm
+}
+
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
+
+## A ~ P1' L U in floating point
+stopifnot(exprs = {
+    identical(names(e.lu.A), c("P1.", "L", "U"))
+    identical(e.lu.A[["P1."]],
+              new(  "pMatrix", Dim = c(n, n), Dimnames = c(dn[1L], list(NULL)),
+                  margin = 1L, perm = invertPerm(asPerm(lu.A@perm))))
+    identical(e.lu.A[["L"]],
+              new("dtrMatrix", Dim = c(n, n), Dimnames = list(NULL, NULL),
+                  uplo = "L", diag = "U", x = lu.A@x))
+    identical(e.lu.A[["U"]],
+              new("dtrMatrix", Dim = c(n, n), Dimnames = c(list(NULL), dn[2L]),
+                  uplo = "U", diag = "N", x = lu.A@x))
+    ae1(A, with(e.lu.A, P1. \%*\% L \%*\% U))
+    ae2(A[asPerm(lu.A@perm), ], with(e.lu.A, L \%*\% U))
+})
+
+## Factorization handled as factorized matrix
+b <- rnorm(n)
+stopifnot(identical(det(A), det(lu.A)),
+          identical(solve(A, b), solve(lu.A, b)))
 }

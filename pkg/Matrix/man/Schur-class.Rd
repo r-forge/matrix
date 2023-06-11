@@ -82,18 +82,27 @@
 showClass("Schur")
 set.seed(0)
 
-(A <- Matrix(rnorm(16L), 4L, 4L))
-(Sch.A <- Schur(A))
-(e.Sch.A <- expand2(Sch.A))
+n <- 4L
+(A <- Matrix(rnorm(n * n), n, n))
+
+## With dimnames, to see that they are propagated :
+dimnames(A) <- list(paste0("r", seq_len(n)),
+                    paste0("c", seq_len(n)))
+
+(sc.A <- Schur(A))
+e.sc.A <- expand2(sc.A)
 
 ## A ~ Q T Q' in floating point
-stopifnot(all.equal(A, with(e.Sch.A, Q \%*\% T \%*\% Q.)))
+stopifnot(exprs = {
+    identical(names(e.sc.A), c("Q", "T", "Q."))
+    all.equal(A, with(e.sc.A, Q \%*\% T \%*\% Q.))
+})
 
 ## Factorization handled as factorized matrix
-b <- rnorm(nrow(A))
-stopifnot(all.equal(det(A), det(Sch.A)),
-          all.equal(solve(A, b), solve(Sch.A, b)))
+b <- rnorm(n)
+stopifnot(all.equal(det(A), det(sc.A)),
+          all.equal(solve(A, b), solve(sc.A, b)))
 
 ## One of the non-general cases:
-Schur(Diagonal(5L))
+Schur(Diagonal(6L))
 }

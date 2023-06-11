@@ -117,19 +117,34 @@
 showClass("BunchKaufman")
 set.seed(1)
 
-(A <- forceSymmetric(Matrix(rnorm(36L), 6L, 6L)))
+n <- 6L
+(A <- forceSymmetric(Matrix(rnorm(n * n), n, n)))
+
+## With dimnames, to see that they are propagated :
+dimnames(A) <- rep.int(list(paste0("x", seq_len(n))), 2L)
+
 (bk.A <- BunchKaufman(A))
 e.bk.A <- expand2(bk.A)
-length(e.bk.A)
-
-## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
-stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
-
-## Factorization handled as factorized matrix
-b <- rnorm(nrow(A))
-stopifnot(identical(det(A), det(bk.A)),
-          identical(solve(A, b), solve(bk.A, b)))
 
 ## Underlying LAPACK representation
 as(bk.A, "dtrMatrix")
+
+## Number of factors is 2*b+1, b <= n, which can be nontrivial,
+## hence methods for 'expand2' are mostly didactic
+(b <- (length(e.bk.A) - 1L) \%/\% 2L)
+
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
+
+## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+stopifnot(exprs = {
+    ae1(  Reduce(`\%*\%`, e.bk.A[ seq_len(b     )]),
+        t(Reduce(`\%*\%`, e.bk.A[-seq_len(b + 1L)])))
+    ae1(A, Reduce(`\%*\%`, e.bk.A))
+})
+
+## Factorization handled as factorized matrix
+b <- rnorm(n)
+stopifnot(identical(det(A), det(bk.A)),
+          identical(solve(A, b), solve(bk.A, b)))
 }

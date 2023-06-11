@@ -80,35 +80,37 @@
 showClass("sparseLU")
 set.seed(2)
 
-## Continuing from example("lu") ...
-A <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
+A <- as(readMM(system.file("external", "pores_1.mtx", package = "Matrix")),
         "CsparseMatrix")
+(n <- A@Dim[1L])
 
-## with dimnames, to see that they are propagated :
-d <- dim(A)
-dn <- list(paste0("r", seq_len(d[1L])),
-           paste0("c", seq_len(d[2L])))
-dimnames(A) <- dn
+## With dimnames, to see that they are propagated :
+dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
+                          paste0("c", seq_len(n)))
 
-lu.A <- lu(A)
+(lu.A <- lu(A))
 e.lu.A <- expand2(lu.A)
 
-.N <- list(NULL)
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
+
+## A ~ P1' L U P2' in floating point
 stopifnot(exprs = {
-    identical(e.lu.A$L, lu.A@L)
-    identical(e.lu.A$U, lu.A@U)
-    identical(e.lu.A$P1.,
-              new("pMatrix", Dim = d, Dimnames = c(dn[1L], .N),
+    identical(names(e.lu.A), c("P1.", "L", "U", "P2."))
+    identical(e.lu.A[["P1."]],
+              new("pMatrix", Dim = c(n, n), Dimnames = c(dn[1L], list(NULL)),
                   margin = 1L, perm = invertPerm(lu.A@p, 0L, 1L)))
-    identical(e.lu.A$P2.,
-              new("pMatrix", Dim = d, Dimnames = c(.N, dn[2L]),
+    identical(e.lu.A[["P2."]],
+              new("pMatrix", Dim = c(n, n), Dimnames = c(list(NULL), dn[2L]),
                   margin = 2L, perm = invertPerm(lu.A@q, 0L, 1L)))
-    all.equal(A, with(e.lu.A, P1. \%*\% L \%*\% U \%*\% P2.),
-              tolerance = 1e-12)
+    identical(e.lu.A[["L"]], lu.A@L)
+    identical(e.lu.A[["U"]], lu.A@U)
+    ae1(A, with(e.lu.A, P1. \%*\% L \%*\% U \%*\% P2.))
+    ae2(A[lu.A@p + 1L, lu.A@q + 1L], with(e.lu.A, L \%*\% U))
 })
 
 ## Factorization handled as factorized matrix
-b <- rnorm(d[1L])
+b <- rnorm(n)
 stopifnot(identical(det(A), det(lu.A)),
           identical(solve(A, b), solve(lu.A, b)))
 }

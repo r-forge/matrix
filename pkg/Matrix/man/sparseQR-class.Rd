@@ -216,33 +216,55 @@ showClass("sparseQR")
 
 data(KNex, package = "Matrix")
 A <- KNex[["mm"]]
-(qr.A <- qr(A))
-E.qr.A <- expand2(qr.A, complete = TRUE)
-e.qr.A <- expand2(qr.A, complete = FALSE)
 
-dim(A)
+## With dimnames, to see that they are propagated :
+d <- dim(A)
+dimnames(A) <- dn <- list(paste0("r", seq_len(d[1L])),
+                          paste0("c", seq_len(d[2L])))
+
+(qr.A <- qr(A))
+e.qr.A <- expand2(qr.A)
+E.qr.A <- expand2(qr.A, complete = TRUE)
+
+d
 t(sapply(e.qr.A, dim))
 t(sapply(E.qr.A, dim))
 
-ae <- function(target, current, ...)
-    all.equal(as(target, "matrix"), as(current, "matrix"), ...)
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 
 ## A ~ P1' Q R P2' ~ P1' Q1 R1 P2' in floating point
 stopifnot(exprs = {
-    ae(A, with(E.qr.A, P1. \%*\% Q  \%*\% R  \%*\% P2.))
-    ae(A, with(e.qr.A, P1. \%*\% Q1 \%*\% R1 \%*\% P2.))
-    ae(A, qr.X(qr.A))
+    identical(names(e.qr.A), c("P1.", "Q1", "R1", "P2."))
+    identical(names(E.qr.A), c("P1.", "Q" , "R" , "P2."))
+    identical(e.qr.A[["P1."]], E.qr.A[["P1."]])
+    identical(e.qr.A[["P2."]], E.qr.A[["P2."]])
+    identical(e.qr.A[["P1."]],
+              new("pMatrix", Dim = d[c(1L, 1L)], Dimnames = c(dn[1L], list(NULL)),
+                  margin = 1L, perm = invertPerm(qr.A@p, 0L, 1L)))
+    identical(e.qr.A[["P2."]],
+              new("pMatrix", Dim = d[c(2L, 2L)], Dimnames = c(list(NULL), dn[2L]),
+                  margin = 2L, perm = invertPerm(qr.A@q, 0L, 1L)))
+    identical(e.qr.A[["Q1"]],      E.qr.A[["Q"]][, seq_len(d[2L])] )
+    identical(e.qr.A[["R1"]], triu(E.qr.A[["R"]][seq_len(d[2L]), ]))
+ ## identical(E.qr.A[["Q"]], someNontrivialFunction(qr.A@V, qr.A@beta))
+    identical(E.qr.A[["R"]], qr.A@R)
+    ae1(A, with(e.qr.A, P1. \%*\% Q1 \%*\% R1 \%*\% P2.))
+    ae1(A, with(E.qr.A, P1. \%*\% Q  \%*\% R  \%*\% P2.))
+    ae2(A[qr.A@p + 1L, qr.A@q + 1L], with(e.qr.A, Q1 \%*\% R1))
+    ae2(A[qr.A@p + 1L, qr.A@q + 1L], with(E.qr.A, Q  \%*\% R ))
 })
 
 ## More identities
 b <- KNex[["y"]]
 stopifnot(exprs = {
-    ae(qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
-    ae(qr.R     (qr.A   ), with(e.qr.A, R1))
-    ae(qr.coef  (qr.A, b), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% b))
-    ae(qr.fitted(qr.A, b), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% b))
-    ae(qr.resid (qr.A, b), with(e.qr.A, b - tcrossprod(P1. \%*\% Q1) \%*\% b))
-    ae(qr.qy    (qr.A, b), with(E.qr.A,   P1. \%*\% Q  \%*\% b))
-    ae(qr.qty   (qr.A, b), with(E.qr.A, t(P1. \%*\% Q) \%*\% b))
+    ae1(qr.X     (qr.A   ), A)
+    ae2(qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
+    ae2(qr.R     (qr.A   ), with(e.qr.A, R1))
+    ae2(qr.coef  (qr.A, b), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% b))
+    ae2(qr.fitted(qr.A, b), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% b))
+    ae2(qr.resid (qr.A, b), with(e.qr.A, b - tcrossprod(P1. \%*\% Q1) \%*\% b))
+    ae2(qr.qy    (qr.A, b), with(E.qr.A,   P1. \%*\% Q  \%*\% b))
+    ae2(qr.qty   (qr.A, b), with(E.qr.A, t(P1. \%*\% Q) \%*\% b))
 })
 }

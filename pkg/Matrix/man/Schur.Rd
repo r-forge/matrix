@@ -78,7 +78,12 @@ set.seed(0)
 Schur(Hilbert(9L)) # real eigenvalues
 
 A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L)
-Sch.A <- Schur(A) # complex eigenvalues
+(Sch.A <- Schur(A)) # complex eigenvalues
+
+## A ~ Q T Q' in floating point
+e.Sch.A <- expand2(Sch.A)
+names(e.Sch.A)
+stopifnot(all.equal(A, Reduce(`\%*\%`, e.Sch.A)))
 
 (e1 <- eigen(Sch.A@T, only.values = TRUE)$values)
 (e2 <- eigen(    A  , only.values = TRUE)$values)
@@ -87,7 +92,6 @@ Sch.A <- Schur(A) # complex eigenvalues
 stopifnot(exprs = {
     all.equal(e1, e2, tolerance = 1e-13)
     all.equal(e1, e3[order(Mod(e3), decreasing = TRUE)], tolerance = 1e-13) 
-    all.equal(A, Reduce(`\%*\%`, expand2(Sch.A)))
     identical(Schur(A, vectors = FALSE),
               list(T = Sch.A@T, EValues = e3))    
     identical(Schur(as(A, "matrix")),

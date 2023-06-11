@@ -115,13 +115,53 @@
   Generic functions \code{\link{expand2}} and \code{\link{Cholesky}}.
 }
 \examples{
-(sp <- pack(Matrix(diag(5L) + 1)))
-signif(chsp <- chol(sp), 4L)
+showClass("Cholesky")
+set.seed(1)
 
-(sy <- crossprod(Matrix(rnorm(18L), 6L, 3L)))
-signif(chsy <- chol(sy), 4L)
+m <- 30L
+n <- 6L
+(A <- crossprod(Matrix(rnorm(m * n), m, n)))
 
-(sy. <- if (chsy@uplo == "U") crossprod(chsy) else tcrossprod(chsy))
-stopifnot(all.equal(as(sy., "matrix"), as(sy, "matrix"),
-                    tolerance = 1e-14))
+## With dimnames, to see that they are propagated :
+dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
+
+(ch.A <- Cholesky(A)) # pivoted, by default
+e.ch.A <- expand2(ch.A)
+E.ch.A <- expand2(ch.A, LDL = FALSE)
+
+## Underlying LAPACK representation
+as(ch.A, "dtrMatrix") # which is L', not L, because
+A@uplo == "U"
+
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
+
+## A ~ P1' L1 D L1' P1 ~ P1' L L' P1 in floating point
+stopifnot(exprs = {
+    identical(names(e.ch.A), c("P1.", "L1", "D", "L1.", "P1"))
+    identical(names(E.ch.A), c("P1.", "L" ,      "L." , "P1"))
+    identical(e.ch.A[["P1"]],
+              new("pMatrix", Dim = c(n, n), Dimnames = c(list(NULL), dn[2L]),
+                  margin = 2L, perm = invertPerm(ch.A@perm)))
+    identical(e.ch.A[["P1."]], t(e.ch.A[["P1"]]))
+    identical(e.ch.A[["L1."]], t(e.ch.A[["L1"]]))
+    identical(E.ch.A[["L." ]], t(E.ch.A[["L" ]]))
+    identical(e.ch.A[["D"]], Diagonal(x = diag(ch.A)))
+    ae1(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
+    ae1(A, with(e.ch.A, P1. \%*\% L1 \%*\% D \%*\% L1. \%*\% P1))
+    ae1(A, with(E.ch.A, P1. \%*\% L  \%*\%         L.  \%*\% P1))
+    ae2(A[ch.A@perm, ch.A@perm], with(e.ch.A, L1 \%*\% D \%*\% L1.))
+    ae2(A[ch.A@perm, ch.A@perm], with(E.ch.A, L  \%*\%         L. ))
+})
+
+## Factorization handled as factorized matrix
+b <- rnorm(n)
+all.equal(det(A), det(ch.A), tolerance = 0)
+all.equal(solve(A, b), solve(ch.A, b), tolerance = 0)
+
+## For identical results, we need the _unpivoted_ factorization
+## computed by det(A) and solve(A, b)
+(ch.A.nopivot <- Cholesky(A, perm = FALSE))
+stopifnot(identical(det(A), det(ch.A.nopivot)),
+          identical(solve(A, b), solve(ch.A.nopivot, b)))
 }

@@ -236,30 +236,57 @@ isLDL(x)
   Generic functions \code{\link{expand2}}, \code{\link{updown}},
   and \code{\link{Cholesky}}.
 }
-\examples{% most are in ./Cholesky.Rd
-## An example for the expand() method
-n <- 1000; m <- 200; nnz <- 2000
-set.seed(1)
-M1 <- spMatrix(n, m,
-               i = sample(n, nnz, replace = TRUE),
-               j = sample(m, nnz, replace = TRUE),
-               x = round(rnorm(nnz),1))
-XX <- crossprod(M1) ## = M1'M1  = M M'  where M <- t(M1)
-CX <- Cholesky(XX)
-isLDL(CX)
-str(CX) ## a "dCHMsimpl" object
-r <- expand(CX)
-L.P <- with(r, crossprod(L,P))  ## == L'P
-PLLP <- crossprod(L.P)          ## == (L'P)' L'P == P'LL'P  = XX = M M'
-b <- sample(m)
-stopifnot(all.equal(PLLP, XX), % not needed: factorsCheck is off: check.attributes=FALSE),
-          all(as.vector(solve(CX, b, system="P" )) == r$P \%*\% b),
-          all(as.vector(solve(CX, b, system="Pt")) == t(r$P) \%*\% b) )
+\references{
+  The CHOLMOD source code; see
+  \url{https://github.com/DrTimothyAldenDavis/SuiteSparse},
+  notably the header file \file{CHOLMOD/Include/cholmod.h}
+  defining \code{cholmod_factor_struct}.
+}
+\examples{
+showClass("dCHMsimpl")
+showClass("dCHMsuper")
+set.seed(2)
 
-u1 <- update(CX, XX,    mult=pi)
-u2 <- update(CX, t(M1), mult=pi) # with the original M, where XX = M M'
-stopifnot(all.equal(u1,u2, tol=1e-14))
+m <- 1000L
+n <- 200L
+M <- rsparsematrix(m, n, 0.01)
+A <- crossprod(M)
 
-   ## [ See  help(Cholesky)  for more examples ]
-   ##        -------------
+## With dimnames, to see that they are propagated :
+dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
+
+(ch.A <- Cholesky(A, LDL = TRUE, super = FALSE)) # pivoted, by default
+e.ch.A <- expand2(ch.A)
+E.ch.A <- expand2(ch.A, LDL = FALSE) # NB: fails if min(diag(D)) < 0 !
+
+ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
+ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
+
+## A ~ P1' L1 D L1' P1 ~ P1' L L' P1 in floating point
+stopifnot(exprs = {
+    identical(names(e.ch.A), c("P1.", "L1", "D", "L1.", "P1"))
+    identical(names(E.ch.A), c("P1.", "L" ,      "L." , "P1"))
+    identical(e.ch.A[["P1"]],
+              new("pMatrix", Dim = c(n, n), Dimnames = c(list(NULL), dn[2L]),
+                  margin = 2L, perm = invertPerm(ch.A@perm, 0L, 1L)))
+    identical(e.ch.A[["P1."]], t(e.ch.A[["P1"]]))
+    identical(e.ch.A[["L1."]], t(e.ch.A[["L1"]]))
+    identical(E.ch.A[["L." ]], t(E.ch.A[["L" ]]))
+    identical(e.ch.A[["D"]], Diagonal(x = diag(ch.A)))
+    ae1(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
+    ae1(A, with(e.ch.A, P1. \%*\% L1 \%*\% D \%*\% L1. \%*\% P1))
+    ae1(A, with(E.ch.A, P1. \%*\% L  \%*\%         L.  \%*\% P1))
+    ae2(A[ch.A@perm + 1L, ch.A@perm + 1L], with(e.ch.A, L1 \%*\% D \%*\% L1.))
+    ae2(A[ch.A@perm + 1L, ch.A@perm + 1L], with(E.ch.A, L  \%*\%         L. ))
+})
+
+## Factorization handled as factorized matrix
+## (in some cases optionally, depending on arguments)
+b <- rnorm(n)
+stopifnot(identical(det(A), det(ch.A, sqrt = FALSE)),
+          identical(solve(A, b), solve(ch.A, b, system = "A")))
+
+u1 <- update(ch.A,   A , mult = sqrt(2))
+u2 <- update(ch.A, t(M), mult = sqrt(2)) # updating with crossprod(M), not M
+stopifnot(all.equal(u1, u2, tolerance = 1e-14))
 }

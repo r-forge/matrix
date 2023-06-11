@@ -88,20 +88,17 @@ class(A) # dsCMatrix
 
 ## Have methods for denseMatrix (unpacked and packed),
 ## but not yet sparseMatrix ...
-
 \dontrun{
-BunchKaufman(A)
+(bk.A <- BunchKaufman(A))
 }
-
 (bk.A <- BunchKaufman(as(A, "unpackedMatrix")))
-e.bk.A <- expand2(bk.A)
 
 ## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+e.bk.A <- expand2(bk.A)
 stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
 
+## Underlying LAPACK representation
 m.bk.A <- as(bk.A, "dtrMatrix")
 stopifnot(identical(as(m.bk.A, "matrix"), `dim<-`(bk.A@x, bk.A@Dim)))
-
-## Underlying LAPACK representation is quite sparse
-image(m.bk.A)
+image(m.bk.A) # can be sparse if A is sparse
 }
