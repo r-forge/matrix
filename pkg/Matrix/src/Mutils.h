@@ -41,6 +41,7 @@ void symPerm(double *x, int n, char uplo, int *p, int off, int invert);
 int isPerm(const int *p, int n, int off);
 int signPerm(const int *p, int n, int off);
 void invertPerm(const int *p, int *ip, int n, int off, int ioff);
+void asPerm(const int *p, int *ip, int m, int n, int off, int ioff);
 
 SEXP R_isPerm(SEXP p, SEXP off);
 SEXP R_signPerm(SEXP p, SEXP off);

@@ -623,6 +623,22 @@ void invertPerm(const int *p, int *ip, int n, int off, int ioff)
     return;
 }
 
+void asPerm(const int *p, int *ip, int m, int n, int off, int ioff)
+{
+    int i, j, tmp;
+    for (i = 0; i < n; ++i)
+	ip[i] = i + ioff;
+    for (i = 0; i < m; ++i) {
+	j = p[i] - off;
+	if (j != i) {
+	    tmp = ip[j];
+	    ip[j] = ip[i];
+	    ip[i] = tmp;
+	}
+    }
+    return;
+}
+
 SEXP R_isPerm(SEXP p, SEXP off)
 {
     if (TYPEOF(p) != INTSXP)
