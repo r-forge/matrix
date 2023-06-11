@@ -208,19 +208,22 @@ setAs("pCholesky", "dtpMatrix",
       })
 
 setMethod("diag", signature(x = "Cholesky"),
-          function(x, nrow, ncol, names = TRUE)
-              diag(as(x, "dtrMatrix"), names = FALSE))
+          function(x, nrow, ncol, names = TRUE) {
+              d <- diag(as(x, "dtrMatrix"), names = FALSE)
+              d * d
+          })
 
 setMethod("diag", signature(x = "pCholesky"),
-          function(x, nrow, ncol, names = TRUE)
-              diag(as(x, "dtpMatrix"), names = FALSE))
+          function(x, nrow, ncol, names = TRUE) {
+              d <- diag(as(x, "dtpMatrix"), names = FALSE)
+              d * d
+          })
 
 ## returning list(P1', L, L', P1) or list(P1', L1, D, L1', P1),
 ## where  A = P1' L L' P1 = P1' L1 D L1' P1  and  L = L1 sqrt(D)
 .def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
     d <- x@Dim
     dn <- x@Dimnames
-
     uplo <- x@uplo
     perm <- x@perm
 
@@ -234,14 +237,12 @@ setMethod("diag", signature(x = "pCholesky"),
     P.@Dimnames <- c(dn[1L], list(NULL))
     P.@margin <- 1L
 
-    X <- new(.CL)
-    X@Dim <- d
-    X@uplo <- uplo
+    X <- as(x, .CL)
     if(LDL) {
-        L.ii <- diag(x, names = FALSE)
+        L.ii <- diag(X, names = FALSE)
         X@x <- x@x / if(uplo == "U") .UP else .LO
         X@diag <- "U"
-    } else X@x <- x@x
+    }
     L  <- if(uplo == "U") t(X) else   X
     L. <- if(uplo == "U")   X  else t(X)
     if(LDL) {
