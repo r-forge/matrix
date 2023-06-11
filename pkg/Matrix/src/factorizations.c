@@ -981,7 +981,7 @@ SEXP denseLU_expand(SEXP obj)
 
     SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 	perm = PROTECT(allocVector(INTSXP, m));
-    int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm, pos, tmp;
+    int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm;
     Matrix_Calloc(pinvperm, m, int);
     asPerm(ppivot, pinvperm, r, m, 1, 0);
     invertPerm(pinvperm, pperm, m, 0, 1);
