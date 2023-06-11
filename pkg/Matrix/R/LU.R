@@ -172,7 +172,8 @@ setAs("denseLU", "dgeMatrix",
 
 ## returning list(P1', L, U), where A = P1' L U
 setMethod("expand2", signature(x = "denseLU"),
-          function(x, ...) .Call(denseLU_expand, x))
+          function(x, ...)
+              .Call(denseLU_expand, x))
 
 ## returning list(L, U, P), where A = P L U
 ## MJ: for backwards compatibility
@@ -197,16 +198,22 @@ setMethod("expand2", signature(x = "sparseLU"),
               dn <- x@Dimnames
               p1 <- x@p
               p2 <- x@q
-              P1. <- new("pMatrix",
-                         Dim = d,
-                         Dimnames = c(dn[1L], list(NULL)),
-                         margin = 1L,
-                         perm = invertPerm(p1, 0L, 1L))
-              P2. <- new("pMatrix",
-                         Dim = d,
-                         Dimnames = c(list(NULL), dn[2L]),
-                         margin = 2L,
-                         perm = if(length(p2)) invertPerm(p2, 0L, 1L) else seq_len(d[1L]))
+
+              P1. <- new("pMatrix")
+              P1.@Dim <- d
+              P1.@Dimnames <- c(dn[1L], list(NULL))
+              P1.@margin <- 1L
+              P1.@perm <- invertPerm(p1, 0L, 1L)
+
+              P2. <- new("pMatrix")
+              P2.@Dim <- d
+              P2.@Dimnames <- c(list(NULL), dn[2L])
+              P2.@margin <- 2L
+              P2.@perm <-
+                  if(length(p2))
+                      invertPerm(p2, 0L, 1L)
+                  else seq_len(d[1L])
+
               list(P1. = P1., L = x@L, U = x@U, P2. = P2.)
           })
 
@@ -222,15 +229,15 @@ setMethod("expand", signature(x = "sparseLU"),
                   dn[[1L]] <- rn[p]
               if(length(q) && !is.null(cn <- dn[[2L]]))
                   dn[[2L]] <- cn[q]
-              P <- new("pMatrix",
-                       Dim = d,
-                       perm = p)
-              Q <- new("pMatrix",
-                       Dim = d,
-                       perm = if(length(q)) q else seq_len(d[1L]))
+              P <- new("pMatrix")
+              P@Dim <- d
+              P@perm <- p
+              Q <- new("pMatrix")
+              Q@Dim <- d
+              Q@perm <- if(length(q)) q else seq_len(d[1L])
               L <- x@L
-              U <- x@U
               L@Dimnames <- c(dn[1L], list(NULL))
+              U <- x@U
               U@Dimnames <- c(list(NULL), dn[2L])
               list(P = P, L = L, U = U, Q = Q)
           })
