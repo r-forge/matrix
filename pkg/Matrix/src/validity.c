@@ -1143,8 +1143,20 @@ SEXP sparseQR_validate(SEXP obj)
 	UPRET(2, "'V' slot has more than Dim[1]+Dim[2] rows");
     if (pdim[1] != n)
 	UPRET(2, "'V' slot does not have Dim[2] columns");
-    UNPROTECT(2); /* dim, V */
-
+    
+    SEXP V_p = PROTECT(GET_SLOT(V, Matrix_pSym)),
+	V_i = PROTECT(GET_SLOT(V, Matrix_iSym));
+    int *V_pp = INTEGER(V_p), *V_pi = INTEGER(V_i), j, k, kend;
+    for (j = 0, k = 0; j < n; ++j) {
+	kend = *(++V_pp);
+	if (k < kend) {
+	    if (V_pi[k] < j)
+		UPRET(4, "'V' slot must be lower trapezoidal but has entries above the diagonal");
+	}
+	k = kend;
+    }
+    UNPROTECT(4); /* V_i, V_p, dim, V */
+    
     SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
     PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
     pdim = INTEGER(dim);
@@ -1154,17 +1166,22 @@ SEXP sparseQR_validate(SEXP obj)
 	UPRET(2, "'R' slot does not have Dim[2] columns");
 
     SEXP R_p = PROTECT(GET_SLOT(R, Matrix_pSym)),
-	R_i = PROTECT(GET_SLOT(R, Matrix_iSym));
-    int *R_pp = INTEGER(R_p), *R_pi = INTEGER(R_i), j, k = 0, kend;
-    for (j = 0; j < n; ++j) {
+	R_i = PROTECT(GET_SLOT(R, Matrix_iSym)),
+	R_x = PROTECT(GET_SLOT(R, Matrix_xSym));
+    int *R_pp = INTEGER(R_p), *R_pi = INTEGER(R_i);
+    double *R_px = REAL(R_x);
+    for (j = 0, k = 0; j < n; ++j) {
 	kend = *(++R_pp);
-	while (k < kend) {
-	    if (R_pi[k] > j)
-		UPRET(4, "'R' slot must be upper trapezoidal but has entries below the diagonal");
-	    ++k;
+	if (k < kend) {
+	    if (R_pi[kend - 1] > j)
+		UPRET(5, "'R' slot must be upper trapezoidal but has entries below the diagonal");
+	    if (R_pi[kend - 1] == j &&
+		!ISNAN(R_px[kend - 1]) && R_px[kend - 1] < 0.0)
+		UPRET(5, "'R' slot has negative diagonal elements");
 	}
+	k = kend;
     }
-    UNPROTECT(4); /* R_i, R_p, dim, R */
+    UNPROTECT(5); /* R_x, R_i, R_p, dim, R */
     
     SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 	q = PROTECT(GET_SLOT(obj, Matrix_qSym));
