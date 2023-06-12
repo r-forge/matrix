@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-09 r4040)}{
+\section{Changes in version 1.6-0 (2023-06-12 r4050)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -99,7 +99,10 @@
       \item Virtual class \code{CHMfactor} and its subclasses
       gain formal validity methods.
 
-      %% TODO: add examples _using_ 'expand2'
+      \item The validity method for class \code{sparseQR} now
+      checks that the \code{V} slot is lower trapezoidal and that
+      the \code{R} slot has non-negative diagonal elements.
+
       \item New generic function \code{expand2}, improving on the
       existing generic function \code{expand} by listing \emph{all}
       factors \emph{in order}, with row names on the first factor and
@@ -116,8 +119,6 @@
       including useful optional arguments for Cholesky and QR
       factorizations.
       
-      %% TODO: add examples and tests _using_ the pivoted
-      %% factorizations, notably to solve a linear system 
       \item Generic function \code{Cholesky} gains methods for
       \code{denseMatrix} returning an object of class \code{p?Cholesky}.
       The method for subclass \code{dsyMatrix} admits an argument
@@ -218,8 +219,9 @@
       resolving some longstanding incompatibilities with \pkg{base}.
       \cr
       Note that methods for sparse \code{a} and missing or sparse
-      \code{b} have default \code{sparse = TRUE}, while methods for
-      sparse \code{a} and dense \code{b} have default \code{sparse = FALSE}.
+      \code{b} have default \code{sparse = TRUE}, while methods
+      for sparse \code{a} and dense \code{b} have default
+      \code{sparse = FALSE}.
       
       \item The prototype of the \code{Dim} slot of virtual class
       \code{MatrixFactorization} is now \code{integer(2L)}.
@@ -277,6 +279,13 @@
       \item \code{which(<[RT]sparseMatrix>, ...)} now gives indices
       in column-major order in all cases, to be consistent with
       \code{help("which")}.
+
+      \item Factorizations inheriting from virtual class \code{LU}
+      are now cached under the name \code{denseLU} or \code{sparseLU},
+      depending on the nonvirtual class, rather than always under
+      the name \code{LU}.  Note that user code should \emph{not} rely
+      on the details of the cache and should instead rely on functions
+      such as \code{lu} to retrieve cached factorizations.
     }
   }
   \subsection{Misc}{
