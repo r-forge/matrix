@@ -187,7 +187,7 @@ xp <- expand(pmLU)
 ppm <- pm[pmLU@p + 1:1, pmLU@q + 1:1]
 Ppm <- pmLU@L %*% pmLU@U
 ## identical only as long as we don't keep the original class info:
-stopifnot(identical3(lu1, pmLU, pm@factors$LU),# TODO === por1@factors$LU
+stopifnot(identical3(lu1, pmLU, pm@factors$sparseLU),# TODO === por1@factors$LU
 	  identical(ppm, with(xp, P %*% pm %*% t(Q))),
 	  sapply(xp, is, class2="Matrix"))
 
@@ -662,7 +662,7 @@ L. <- new("dtCMatrix", Dim = c(1L, 1L), uplo = "L",
 S. <- forceSymmetric(L.)
 lu(S.)
 stopifnot(validObject(lu(L.)), # was invalid
-          identical(names(S.@factors), "LU")) # was "lu"
+          identical(names(S.@factors), "sparseLU")) # was "lu"
 
 ## chol() should give matrix with 'Dimnames',
 ## even if 'Dimnames' are not cached

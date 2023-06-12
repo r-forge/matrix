@@ -370,11 +370,8 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
-    SEXP val = get_factor(obj, "LU");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("denseLU"));
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("denseLU")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
     int *pdim = INTEGER(dim), r = (pdim[0] < pdim[1]) ? pdim[0] : pdim[1];
     SET_SLOT(val, Matrix_DimSym, dim);
@@ -395,18 +392,14 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_xSym, x);
 	UNPROTECT(2); /* x, perm */
     }
-    set_factor(obj, "LU", val);
     UNPROTECT(3); /* dimnames, dim, val */
     return val;
 }
 
 SEXP dsyMatrix_trf_(SEXP obj, int warn)
 {
-    SEXP val = get_factor(obj, "BunchKaufman");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("BunchKaufman"));
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("BunchKaufman")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     int *pdim = INTEGER(dim), n = pdim[0];
@@ -434,18 +427,14 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_xSym, y);
 	UNPROTECT(3); /* y, x, perm */
     }
-    set_factor(obj, "BunchKaufman", val);
     UNPROTECT(4); /* uplo, dimnames, dim, val */
     return val;
 }
 
 SEXP dspMatrix_trf_(SEXP obj, int warn)
 {
-    SEXP val = get_factor(obj, "pBunchKaufman");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("pBunchKaufman"));
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("pBunchKaufman")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     int *pdim = INTEGER(dim), n = pdim[0];
@@ -469,18 +458,14 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_xSym, x);
 	UNPROTECT(2); /* x, perm */
     }
-    set_factor(obj, "pBunchKaufman", val);
     UNPROTECT(4); /* uplo, dimnames, dim, val */
     return val;
 }
 
 SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
-    SEXP val = get_factor(obj, (pivot) ? "Cholesky~" : "Cholesky");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("Cholesky"));
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("Cholesky")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     int *pdim = INTEGER(dim), n = pdim[0];
@@ -530,18 +515,14 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	SET_SLOT(val, Matrix_xSym, y);
 	UNPROTECT(2); /* y, x */
     }
-    set_factor(obj, (pivot) ? "Cholesky~" : "Cholesky", val);
     UNPROTECT(4); /* uplo, dimnames, dim, val */
     return val;
 }
 
 SEXP dppMatrix_trf_(SEXP obj, int warn)
 {
-    SEXP val = get_factor(obj, "pCholesky");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("pCholesky"));
-    SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+    SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("pCholesky")),
+	dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 	dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 	uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
     int *pdim = INTEGER(dim), n = pdim[0];
@@ -563,34 +544,65 @@ SEXP dppMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_xSym, x);
 	UNPROTECT(1); /* x */
     }
-    set_factor(obj, "pCholesky", val);
     UNPROTECT(4); /* uplo, dimnames, dim, val */
     return val;
 }
 
 SEXP dgeMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dgeMatrix_trf_(obj, asInteger(warn));
+    SEXP val = get_factor(obj, "denseLU");
+    if (isNull(val)) {
+	PROTECT(val = dgeMatrix_trf_(obj, asInteger(warn)));
+	set_factor(obj, "denseLU", val);
+	UNPROTECT(1);
+    }
+    return val;
 }
 
 SEXP dsyMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dsyMatrix_trf_(obj, asInteger(warn));
+    SEXP val = get_factor(obj, "BunchKaufman");
+    if (isNull(val)) {
+	PROTECT(val = dsyMatrix_trf_(obj, asInteger(warn)));
+	set_factor(obj, "BunchKaufman", val);
+	UNPROTECT(1);
+    }
+    return val;
 }
 
 SEXP dspMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dspMatrix_trf_(obj, asInteger(warn));
+    SEXP val = get_factor(obj, "pBunchKaufman");
+    if (isNull(val)) {
+	PROTECT(val = dspMatrix_trf_(obj, asInteger(warn)));
+	set_factor(obj, "pBunchKaufman", val);
+	UNPROTECT(1);
+    }
+    return val;
 }
 
 SEXP dpoMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 {
-    return dpoMatrix_trf_(obj, asInteger(warn), asLogical(pivot), asReal(tol));
+    int pivot_ = asLogical(pivot);
+    SEXP val = get_factor(obj, (pivot_) ? "Cholesky~" : "Cholesky");
+    if (isNull(val)) {
+	double tol_ = asReal(tol);
+	PROTECT(val = dpoMatrix_trf_(obj, asInteger(warn), pivot_, tol_));
+	set_factor(obj, (pivot_) ? "Cholesky~" : "Cholesky", val);
+	UNPROTECT(1);
+    }
+    return val;
 }
 
 SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 {
-    return dppMatrix_trf_(obj, asInteger(warn));
+    SEXP val = get_factor(obj, "pCholesky");
+    if (isNull(val)) {
+	PROTECT(val = dppMatrix_trf_(obj, asInteger(warn)));
+	set_factor(obj, "pCholesky", val);
+	UNPROTECT(1);
+    }
+    return val;
 }
 
 int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
@@ -636,21 +648,21 @@ int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
 
 SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 {
-    SEXP val = get_factor(obj, "LU");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("sparseLU"));
-
     double tol_ = asReal(tol);
     if (ISNAN(tol_))
 	error(_("'tol' is not a number"));
-    
+
     int order_ = asInteger(order);
     if (order_ == NA_INTEGER)
 	order_ = (tol_ == 1.0) ? 2 : 1;
     else if (order_ < 0 || order_ > 3)
 	order_ = 0;
-
+    
+    SEXP val = get_factor(obj, (order_) ? "sparseLU~" : "sparseLU");
+    if (!isNull(val))
+	return val;
+    PROTECT(val = NEW_OBJECT_OF_CLASS("sparseLU"));
+    
     const cs *A = dgC2cs(obj);
     css *S = NULL;
     csn *N = NULL;
@@ -702,7 +714,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
     N = cs_nfree(N);
     pp = cs_free(pp);
     
-    set_factor(obj, "LU", val);
+    set_factor(obj, (order_) ? "sparseLU~" : "sparseLU", val);
     UNPROTECT(1); /* val */
     return val;
 }
@@ -739,14 +751,14 @@ int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order)
 
 SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 {
-    SEXP val = get_factor(obj, "QR");
-    if (!isNull(val))
-	return val;
-    PROTECT(val = NEW_OBJECT_OF_CLASS("sparseQR"));
-
     int order_ = asInteger(order);
     if (order_ < 0 || order_ > 3)
 	order_ = 0;
+
+    SEXP val = get_factor(obj, (order_) ? "sparseQR~" : "sparseQR");
+    if (!isNull(val))
+	return val;
+    PROTECT(val = NEW_OBJECT_OF_CLASS("sparseQR"));
 
     const cs *A = dgC2cs(obj);
     css *S = NULL;
@@ -803,7 +815,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
     N = cs_nfree(N);
     pp = cs_free(pp);
     
-    set_factor(obj, "QR", val);
+    set_factor(obj, (order_) ? "sparseQR~" : "sparseQR", val);
     UNPROTECT(1); /* val */
     return val;
 }
@@ -1362,7 +1374,7 @@ SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
 		}
 	    } else {
 		UNPROTECT(4); /* x, i, p, U */
-		return mkDet(0.0, givelog, 1);
+		return mkDet(R_NegInf, givelog, 1);
 	    }
 	    k = kend;
 	}
@@ -1408,7 +1420,7 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 		}
 	    } else {
 		UNPROTECT(4); /* x, i, p, R */
-		return mkDet(0.0, givelog, 1);
+		return mkDet(R_NegInf, givelog, 1);
 	    }
 	    k = kend;
 	}
@@ -1422,6 +1434,8 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 	    sign = -sign;
 	UNPROTECT(1); /* p */
+	if (n % 2)
+	    sign = -sign;
     }
     return mkDet(modulus, givelog, sign);
 }
