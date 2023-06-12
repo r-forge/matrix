@@ -123,7 +123,7 @@
   Lucas, C. (2004).
   \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
   LAPACK Working Note, Number 161.
-  \url{http://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
+  \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
   
   Golub, G. H., & Van Loan, C. F. (2013).
   \emph{Matrix computations} (4th ed.).
