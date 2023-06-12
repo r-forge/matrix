@@ -175,7 +175,7 @@ Cholesky(A, \dots)
   Lucas, C. (2004).
   \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
   LAPACK Working Note, Number 161.
-  \url{http://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
+  \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
   
   The CHOLMOD source code; see
   \url{https://github.com/DrTimothyAldenDavis/SuiteSparse},
