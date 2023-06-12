@@ -183,7 +183,7 @@ ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 
 stopifnot(exprs = {
     length(qr.A1   @q) == ncol(A1)
-    length(qr.A1.pp@q) == 0L
+    length(qr.A1.pp@q) == 0L # indicating no column pivoting
     ae2(A1[, qr.A1@q + 1L], qr.Q(qr.A1   ) \%*\% qr.R(qr.A1   ))
     ae2(A1                , qr.Q(qr.A1.pp) \%*\% qr.R(qr.A1.pp))
 })
