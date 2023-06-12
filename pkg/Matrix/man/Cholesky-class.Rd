@@ -18,7 +18,7 @@
 %
 \description{
   Classes \code{Cholesky} and \code{pCholesky} represent
-  dense Cholesky factorizations of \eqn{n \times n}{n-by-n}
+  dense, pivoted Cholesky factorizations of \eqn{n \times n}{n-by-n}
   real, symmetric, positive semidefinite matrices \eqn{A},
   having the general form
   \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' = L L'}{P1 * A * P1' = L1 * D * L1' = L * L'}
@@ -113,6 +113,17 @@
   Classes \code{\linkS4class{dpoMatrix}} and \code{\linkS4class{dppMatrix}}.
   
   Generic functions \code{\link{expand2}} and \code{\link{Cholesky}}.
+}
+\references{
+  The LAPACK source code, including documentation; see
+  \url{https://netlib.org/lapack/double/dpstrf.f},
+  \url{https://netlib.org/lapack/double/dpotrf.f}, and
+  \url{https://netlib.org/lapack/double/dpptrf.f}.
+
+  Golub, G. H., & Van Loan, C. F. (2013).
+  \emph{Matrix computations} (4th ed.).
+  Johns Hopkins University Press.
+  \doi{10.56021/9781421407944}
 }
 \examples{
 showClass("Cholesky")

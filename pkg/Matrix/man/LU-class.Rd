@@ -78,6 +78,11 @@
 \references{
   The LAPACK source code, including documentation; see
   \url{https://netlib.org/lapack/double/dgetrf.f}.
+  
+  Golub, G. H., & Van Loan, C. F. (2013).
+  \emph{Matrix computations} (4th ed.).
+  Johns Hopkins University Press.
+  \doi{10.56021/9781421407944}
 }
 \examples{
 showClass("denseLU")

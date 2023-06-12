@@ -132,8 +132,14 @@ lu(x, \dots)
   \url{https://netlib.org/lapack/double/dgetrf.f}.
   
   Davis, T. A. (2006).
-  \emph{Direct Methods for Sparse Linear Systems},
+  \emph{Direct methods for sparse linear systems}.
   Society for Industrial and Applied Mathematics.
+  \doi{10.1137/1.9780898718881}
+
+  Golub, G. H., & Van Loan, C. F. (2013).
+  \emph{Matrix computations} (4th ed.).
+  Johns Hopkins University Press.
+  \doi{10.56021/9781421407944}
 }
 \examples{
 showMethods("lu", inherited = FALSE)

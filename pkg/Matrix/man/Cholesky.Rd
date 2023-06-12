@@ -172,7 +172,12 @@ Cholesky(A, \dots)
   \url{https://netlib.org/lapack/double/dpotrf.f}, and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
-  Chen, Y., Davis, T. A., Hager, W. W., Rajamanickam, S. (2008).
+  The CHOLMOD source code; see
+  \url{https://github.com/DrTimothyAldenDavis/SuiteSparse},
+  notably the header file \file{CHOLMOD/Include/cholmod.h}
+  defining \code{cholmod_factor_struct}.
+
+  Chen, Y., Davis, T. A., Hager, W. W., & Rajamanickam, S. (2008).
   Algorithm 887: CHOLMOD, supernodal sparse Cholesky factorization
   and update/downdate.
   \emph{ACM Transactions on Mathematical Software},
@@ -184,6 +189,11 @@ Cholesky(A, \dots)
   \emph{ACM Transactions on Mathematical Software},
   \emph{17}(4), 886-905.
   \doi{10.1145/1024074.1024081}
+
+  Golub, G. H., & Van Loan, C. F. (2013).
+  \emph{Matrix computations} (4th ed.).
+  Johns Hopkins University Press.
+  \doi{10.56021/9781421407944}
 }
 \examples{
 showMethods("Cholesky", inherited = FALSE)
