@@ -45,11 +45,13 @@
   \deqn{A = P_{1}' Q R P_{2}' = P_{1}' \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} P_{2}' = P_{1}' Q_{1} R_{1} P_{2}'}{A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
   where
   \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
-  \eqn{Q} is an \eqn{m \times m}{m-by-m} orthogonal matrix
-  (\eqn{Q_{1}}{Q1} contains the first \eqn{n} column vectors), and
+  \eqn{Q = \prod_{j = 1}^{n} Q_{j}}{Q = prod(Qj : j = 1,...,n)}
+  is an \eqn{m \times m}{m-by-m} orthogonal matrix
+  (\eqn{Q_{1}}{Q1} contains the first \eqn{n} column vectors)
+  equal to the product of \eqn{n} Householder matrices \eqn{Q_{j}}{Qj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
   (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
-  upper \emph{triangular}).
+  upper \emph{triangular}) with non-negative diagonal elements.
 }
 \usage{
 qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
@@ -79,17 +81,19 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
       \code{\linkS4class{MatrixFactorization}}.}
-    \item{\code{beta}}{a numeric vector of length \code{Dim[2]}.
-      \code{beta} contains the normalizing constants used to compute
-      the Householder matrices that compose the \eqn{Q} factor.}
+    \item{\code{beta}}{a numeric vector of length \code{Dim[2]},
+      used to construct Householder matrices; see \code{V} below.}
     \item{\code{V}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{Dim[2]} columns.  The number of rows \code{nrow(V)}
       is at least \code{Dim[1]} and at most \code{Dim[1]+Dim[2]}.
-      The column vectors of \code{V} generate the Householder matrices
-      that compose the \eqn{Q} factor.}
+      \code{V} is lower trapezoidal, and its column vectors generate the
+      Householder matrices \eqn{Q_{j}}{Qj} that compose the orthogonal
+      \eqn{Q} factor.  Specifically, \eqn{Q_{j}}{Qj} is constructed as
+      \code{diag(Dim[1]) - beta[j] * tcrossprod(V[, j])}.}
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
-      \code{R} is the upper trapezoidal \eqn{R} factor.}
+      \code{R} is the upper trapezoidal \eqn{R} factor with
+      non-negative diagonal elements.}
     \item{\code{p}, \code{q}}{0-based integer vectors of length
       \code{nrow(V)} and \code{Dim[2]}, respectively,
       specifying the permutations applied to the rows and columns of
@@ -160,11 +164,6 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   }
 }
 \details{
-  The orthogonal factor \eqn{Q} is defined implicitly by slots
-  \code{V} and \code{beta}.  The columns of \code{V} and elements
-  of \code{beta} generate the \eqn{n} Householder matrices whose
-  product is \eqn{Q}.
-
   The method for \code{qr.Q} does not return \eqn{Q} but rather the
   (also orthogonal) product \eqn{P_{1}' Q}{P1' * Q}.  This behaviour
   is algebraically consistent with the \pkg{base} implementation
@@ -230,6 +229,19 @@ d
 t(sapply(e.qr.A, dim))
 t(sapply(E.qr.A, dim))
 
+## Horribly inefficient, but instructive :
+slowQ <- function(V, beta) {
+    d <- dim(V)
+    Q <- diag(d[1L])
+    if(d[2L] > 0L) {
+        for(j in d[2L]:1L) {
+            cat(j, "\n", sep = "")
+            Q <- Q - (beta[j] * tcrossprod(V[, j])) \%*\% Q
+        }
+    }
+    Q
+}
+
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 
@@ -237,18 +249,17 @@ ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 stopifnot(exprs = {
     identical(names(e.qr.A), c("P1.", "Q1", "R1", "P2."))
     identical(names(E.qr.A), c("P1.", "Q" , "R" , "P2."))
-    identical(e.qr.A[["P1."]], E.qr.A[["P1."]])
-    identical(e.qr.A[["P2."]], E.qr.A[["P2."]])
     identical(e.qr.A[["P1."]],
               new("pMatrix", Dim = d[c(1L, 1L)], Dimnames = c(dn[1L], list(NULL)),
                   margin = 1L, perm = invertPerm(qr.A@p, 0L, 1L)))
     identical(e.qr.A[["P2."]],
               new("pMatrix", Dim = d[c(2L, 2L)], Dimnames = c(list(NULL), dn[2L]),
                   margin = 2L, perm = invertPerm(qr.A@q, 0L, 1L)))
-    identical(e.qr.A[["Q1"]],      E.qr.A[["Q"]][, seq_len(d[2L])] )
     identical(e.qr.A[["R1"]], triu(E.qr.A[["R"]][seq_len(d[2L]), ]))
- ## identical(E.qr.A[["Q"]], someNontrivialFunction(qr.A@V, qr.A@beta))
+    identical(e.qr.A[["Q1"]],      E.qr.A[["Q"]][, seq_len(d[2L])] )
     identical(E.qr.A[["R"]], qr.A@R)
+ ## ae1(E.qr.A[["Q"]], slowQ(qr.A@V, qr.A@beta))
+    ae1(crossprod(E.qr.A[["Q"]]), diag(d[1L]))
     ae1(A, with(e.qr.A, P1. \%*\% Q1 \%*\% R1 \%*\% P2.))
     ae1(A, with(E.qr.A, P1. \%*\% Q  \%*\% R  \%*\% P2.))
     ae2(A[qr.A@p + 1L, qr.A@q + 1L], with(e.qr.A, Q1 \%*\% R1))
@@ -257,14 +268,25 @@ stopifnot(exprs = {
 
 ## More identities
 b <- KNex[["y"]]
+B <- cbind(b, sin(b), deparse.level = 0)
 stopifnot(exprs = {
     ae1(qr.X     (qr.A   ), A)
     ae2(qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
     ae2(qr.R     (qr.A   ), with(e.qr.A, R1))
-    ae2(qr.coef  (qr.A, b), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% b))
-    ae2(qr.fitted(qr.A, b), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% b))
-    ae2(qr.resid (qr.A, b), with(e.qr.A, b - tcrossprod(P1. \%*\% Q1) \%*\% b))
-    ae2(qr.qy    (qr.A, b), with(E.qr.A,   P1. \%*\% Q  \%*\% b))
-    ae2(qr.qty   (qr.A, b), with(E.qr.A, t(P1. \%*\% Q) \%*\% b))
+    ae2(qr.coef  (qr.A, B), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% B))
+    ae2(qr.fitted(qr.A, B), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% B))
+    ae2(qr.resid (qr.A, B), with(e.qr.A, B - tcrossprod(P1. \%*\% Q1) \%*\% B))
+    ae2(qr.qy    (qr.A, B), with(E.qr.A,   P1. \%*\% Q  \%*\% B))
+    ae2(qr.qty   (qr.A, B), with(E.qr.A, t(P1. \%*\% Q) \%*\% B))
+    ae2(qr.qy(qr.A, qr.qty(qr.A, B)), B)
+})
+
+## Sparse and dense computations should agree here
+qr.Am <- qr(as(A, "matrix")) # <=> qr.default(A)
+stopifnot(exprs = {
+    ae2(qr.X     (qr.A   ), qr.X     (qr.Am   ))
+    ae2(qr.coef  (qr.A, B), qr.coef  (qr.Am, B))
+    ae2(qr.fitted(qr.A, B), qr.fitted(qr.Am, B))
+    ae2(qr.resid (qr.A, B), qr.resid (qr.Am, B))
 })
 }
