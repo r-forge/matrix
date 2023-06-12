@@ -172,6 +172,11 @@ Cholesky(A, \dots)
   \url{https://netlib.org/lapack/double/dpotrf.f}, and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
+  Lucas, C. (2004).
+  \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
+  LAPACK Working Note, Number 161.
+  \url{http://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
+  
   The CHOLMOD source code; see
   \url{https://github.com/DrTimothyAldenDavis/SuiteSparse},
   notably the header file \file{CHOLMOD/Include/cholmod.h}
