@@ -209,7 +209,8 @@ isLDL(x)
       see \code{\link{expand2-methods}}.}
     \item{\code{image}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{image-methods}}.}
-    \item{\code{nnzero}}{\code{signature(x = "CHMfactor")}:}
+    \item{\code{nnzero}}{\code{signature(x = "CHMfactor")}:
+      see \code{\link{nnzero-methods}}.}
     \item{\code{solve}}{\code{signature(a = "CHMfactor", b = .)}:
       see \code{\link{solve-methods}}.}
     \item{\code{update}}{\code{signature(object = "CHMfactor")}:
@@ -299,7 +300,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-## (in some cases optionally, depending on arguments)
+## (in some cases only optionally, depending on arguments)
 b <- rnorm(n)
 stopifnot(identical(det(A), det(ch.A, sqrt = FALSE)),
           identical(solve(A, b), solve(ch.A, b, system = "A")))
