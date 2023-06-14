@@ -1362,3 +1362,13 @@ stopifnot(identical(R0, as(R., "RsparseMatrix")))
 
 ## Didn't drop dimensions ...
 stopifnot(identical(t(as(1:6,"CsparseMatrix"))[TRUE, ], as.double(1:6)))
+
+## Was briefly wrong prior to Matrix 1.6-0
+set.seed(0)
+S <- new("dsyMatrix", Dim = c(4L, 4L), x = rnorm(16L))
+Sii <- S[4:1, 4:1]
+stopifnot(exprs = {
+    is(Sii, "dsyMatrix")
+    Sii@uplo == "L"
+    identical(as(Sii, "matrix"), as(S, "matrix")[4:1, 4:1])
+})
