@@ -92,7 +92,7 @@ Cholesky(A, \dots)
     of \eqn{L_{1}-I+D}{L1-I+D}.
     The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L = L_{1} \sqrt(D)}{L = L1 * sqrt(D)}.  This argument
+    of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.  This argument
     is ignored if \code{super = TRUE} (or if \code{super = NA}
     and the supernodal algorithm is chosen), as the supernodal
     code does not yet support the \code{LDL = TRUE} variant.}
@@ -166,8 +166,8 @@ Cholesky(A, \dots)
   semidefinite even if \eqn{A} is not.  It follows that one way to
   test for positive semidefiniteness of \eqn{A} in the event of a
   warning is to analyze the error
-  \deqn{\frac{\lVert A - P' L L' P \rVert}{\lVert A \rVert}}{
-    norm(A - P' * L * L' * P) / norm(A)}.
+  \deqn{\frac{\lVert A - P' L L' P \rVert}{\lVert A \rVert}\,.}{
+    norm(A - P' * L * L' * P) / norm(A).}
   See the examples and LAPACK Working Note (\dQuote{LAWN}) 161
   for details.
 }
