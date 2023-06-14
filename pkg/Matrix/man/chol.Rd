@@ -50,9 +50,13 @@ chol(x, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite}, symmetric, positive
-    semidefinite matrix or \code{\linkS4class{Matrix}}
-    to be factorized.  If \code{x} is square but not symmetric,
-    then it will be \emph{treated} as symmetric; see \code{uplo}.}
+    semidefinite matrix or \code{\linkS4class{Matrix}} to
+    be factorized.  If \code{x} is square but not symmetric,
+    then it will be \emph{treated} as symmetric; see \code{uplo}.
+    Methods for dense \code{x} require positive definiteness
+    when \code{pivot = FALSE}.
+    Methods for sparse (but not diagonal) \code{x} require
+    positive definiteness unconditionally.}
   \item{pivot}{a logical indicating if the rows and columns
     of \eqn{x} should be pivoted.  Methods for sparse \code{x}
     employ the approximate minimum degree (AMD) algorithm
@@ -75,7 +79,8 @@ chol(x, \dots)
   or \code{\linkS4class{diagonalMatrix}} representing
   the upper triangular Cholesky factor \eqn{L'}.
   The result is a traditional matrix if \code{x} is a
-  traditional matrix and sparse if \code{x} is sparse.
+  traditional matrix, dense if \code{x} is dense, and
+  sparse if \code{x} is sparse.
 }
 \details{
   For \code{x} inheriting from \code{\linkS4class{diagonalMatrix}},
@@ -83,12 +88,11 @@ chol(x, \dots)
   i.e., bypassing CHOLMOD.
   
   For all other \code{x}, \code{chol(x, pivot = value)} calls
-  \code{\link{Cholesky}(x, perm = value, ...)} under the hood.
+  \code{\link{Cholesky}(x, perm = value, \dots)} under the hood.
   If you must know the permutation \eqn{P_{1}}{P1} in addition
-  to the Cholesky factor \eqn{L} (or in this case its transpose
-  \eqn{L'}), then call \code{\link{Cholesky}} directly, as the
-  result of \code{chol(x, pivot = TRUE)} specifies \eqn{L'} but
-  not \eqn{P_{1}}{P1}.
+  to the Cholesky factor \eqn{L'}, then call \code{\link{Cholesky}}
+  directly, as the result of \code{chol(x, pivot = TRUE)} specifies
+  \eqn{L'} but not \eqn{P_{1}}{P1}.
 }
 \seealso{
   The default method from \pkg{base}, \code{\link[base]{chol}},
@@ -129,40 +133,83 @@ chol(x, \dots)
 }
 \examples{
 showMethods("chol", inherited = FALSE)
+set.seed(0)
 
-sy2 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, NA,32,77))
-(c2 <- chol(sy2))#-> "Cholesky" matrix
-stopifnot(all.equal(c2, chol(as(sy2, "dpoMatrix")), tolerance= 1e-13))
-str(c2)
+## ---- Dense ----------------------------------------------------------
 
-## An example where chol() can't work
-(sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7)))
-try(chol(sy3)) # error, since it is not positive definite
+## chol(x, pivot = value) wrapping Cholesky(x, perm = value)
+selectMethod("chol", "dsyMatrix")
 
-## A sparse example --- exemplifying 'pivot'
-(mm <- toeplitz(as(c(10, 0, 1, 0, 3), "sparseVector"))) # 5 x 5
-(R <- chol(mm)) ## default:  pivot = FALSE
-R2 <- chol(mm, pivot=FALSE)
-stopifnot( identical(R, R2), all.equal(crossprod(R), mm) )
-(R. <- chol(mm, pivot=TRUE))# nice band structure,
-## but of course crossprod(R.) is *NOT* equal to mm
-## --> see Cholesky() and its examples, for the pivot structure & factorization
-stopifnot(all.equal(sqrt(det(mm)), det(R)),
-          all.equal(prod(diag(R)), det(R)),
-          all.equal(prod(diag(R.)), det(R)))
+## Except in packed cases where pivoting is not yet available
+selectMethod("chol", "dspMatrix")
 
-## a second, even sparser example:
-(M2 <- toeplitz(as(c(1,.5, rep(0,12), -.1), "sparseVector")))
-c2 <- chol(M2)
-C2 <- chol(M2, pivot=TRUE)
-## For the experts, check the caching of the factorizations:
-ff <- M2@factors[["spdCholesky"]]
-FF <- M2@factors[["sPdCholesky"]]
-L1 <- as(ff, "dtCMatrix")# pivot=FALSE: no perm.
-L2 <- as(FF, "dtCMatrix"); P2 <- as(FF, "pMatrix")
-stopifnot(identical(t(L1), c2),
-          all.equal(t(L2), C2, tolerance=0),#-- why not identical()?
-          all.equal(M2, tcrossprod(L1)),             # M = LL'
-          all.equal(M2, crossprod(crossprod(L2, P2)))# M = P'L L'P
-         )
+## .... Positive definite ..............................................
+
+(A1 <- new("dsyMatrix", Dim = c(2L, 2L), x = c(1, 2, 2, 5)))
+(R1.nopivot <- chol(A1))
+(R1 <- chol(A1, pivot = TRUE))
+
+## In 2-by-2 cases, we know that the permutation is 1:2 or 2:1,
+## even if in general 'chol' does not say ...
+
+stopifnot(exprs = {
+   all.equal(  A1           , as(crossprod(R1.nopivot), "dsyMatrix"))
+   all.equal(t(A1[2:1, 2:1]), as(crossprod(R1        ), "dsyMatrix"))
+   identical(Cholesky(A1)@perm, 2:1) # because 5 > 1
+})
+
+## .... Positive semidefinite but not positive definite ................
+
+(A2 <- new("dpoMatrix", Dim = c(2L, 2L), x = c(1, 2, 2, 4)))
+try(R2.nopivot <- chol(A2)) # fails as not positive definite
+(R2 <- chol(A2, pivot = TRUE)) # returns, with a warning and ...
+
+stopifnot(exprs = {
+   all.equal(t(A2[2:1, 2:1]), as(crossprod(R2), "dsyMatrix"))
+   identical(Cholesky(A2)@perm, 2:1) # because 4 > 1
+})
+
+## .... Not positive semidefinite ......................................
+
+(A3 <- new("dsyMatrix", Dim = c(2L, 2L), x = c(1, 2, 2, 3)))
+try(R3.nopivot <- chol(A3)) # fails as not positive definite
+(R3 <- chol(A3, pivot = TRUE)) # returns, with a warning and ...
+
+## _Not_ equal: see details and examples in help("Cholesky")
+all.equal(t(A3[2:1, 2:1]), as(crossprod(R3), "dsyMatrix"))
+
+## ---- Sparse ---------------------------------------------------------
+
+## chol(x, pivot = value) wrapping
+## Cholesky(x, perm = value, LDL = FALSE, super = FALSE)
+selectMethod("chol", "dsCMatrix")
+
+## Except in diagonal cases which are handled "directly"
+selectMethod("chol", "ddiMatrix")
+
+(A4 <- toeplitz(as(c(10, 0, 1, 0, 3), "sparseVector")))
+(ch.A4.nopivot <- Cholesky(A4, perm = FALSE, LDL = FALSE, super = FALSE))
+(ch.A4 <- Cholesky(A4, perm = TRUE, LDL = FALSE, super = FALSE))
+(R4.nopivot <- chol(A4))
+(R4 <- chol(A4, pivot = TRUE))
+
+det4 <- det(A4)
+b4 <- rnorm(5L)
+x4 <- solve(A4, b4)
+
+stopifnot(exprs = {
+    identical(R4.nopivot, t(as(ch.A.nopivot, "CsparseMatrix")))
+    identical(R4, t(as(ch.A, "CsparseMatrix")))
+    all.equal(A4, crossprod(R4.nopivot))
+    all.equal(A4[ch.A4@perm + 1L, ch.A4@perm + 1L], crossprod(R4))
+    all.equal(diag(R4.nopivot), sqrt(diag(ch.A.nopivot)))
+    all.equal(diag(R4), sqrt(diag(ch.A)))
+    all.equal(sqrt(det4), det(R4.nopivot))
+    all.equal(sqrt(det4), det(R4))
+    all.equal(det4, det(ch.A4.nopivot))
+    all.equal(det4, det(ch.A4))
+    all.equal(x4, solve(t(R4.nopivot), solve(R4.nopivot, b4)))
+    all.equal(x4, solve(ch.A4.nopivot, b4))
+    all.equal(x4, solve(ch.A4, b4))
+})
 }
