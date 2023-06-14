@@ -54,12 +54,12 @@ qr(x, \dots)
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  An object representing the factorization, of S4 class
-  \code{\linkS4class{sparseQR}} or S3 class \code{\link[base]{qr}}.
-  \code{sparseQR} is given for \code{x} inheriting from virtual class
-  \code{\linkS4class{sparseMatrix}}.  \code{qr} is given for \code{x}
-  inheriting from virtual class \code{\linkS4class{denseMatrix}},
-  as well as for traditional matrices.
+  An object representing the factorization, inheriting from
+  virtual S4 class \code{\linkS4class{QR}} or S3 class
+  \code{\link[base]{qr}}.  The specific class is \code{qr}
+  unless \code{x} inherits from virtual class
+  \code{\linkS4class{sparseMatrix}}, in which case it is
+  \code{\linkS4class{sparseQR}}.
 }
 \details{
   If \code{x} is sparse and structurally rank deficient, having

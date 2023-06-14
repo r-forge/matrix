@@ -92,10 +92,10 @@ Cholesky(A, \dots)
     of \eqn{L_{1}-I+D}{L1-I+D}.
     The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L}.  This argument is ignored if \code{super = TRUE}
-    (or if \code{super = NA} and the supernodal algorithm is
-    chosen), as the supernodal code does not yet support the
-    \code{LDL = TRUE} variant.}
+    of \eqn{L = L_{1} \sqrt(D)}{L = L1 * sqrt(D)}.  This argument
+    is ignored if \code{super = TRUE} (or if \code{super = NA}
+    and the supernodal algorithm is chosen), as the supernodal
+    code does not yet support the \code{LDL = TRUE} variant.}
   \item{super}{a logical indicating if the factorization should
     use the supernodal algorithm.  The alternative is the simplicial
     algorithm.  Setting \code{super = NA} leaves the choice to
@@ -165,7 +165,7 @@ Cholesky(A, \dots)
   order to guarantee that \eqn{P' L L' P}{P' * L * L' * P} is positive
   semidefinite even if \eqn{A} is not.  It follows that one way to
   test for positive semidefiniteness of \eqn{A} in the event of a
-  warning is to compute the error
+  warning is to analyze the error
   \deqn{\frac{\lVert A - P' L L' P \rVert}{\lVert A \rVert}}{
     norm(A - P' * L * L' * P) / norm(A)}.
   See the examples and LAPACK Working Note (\dQuote{LAWN}) 161
@@ -234,8 +234,8 @@ set.seed(0)
 
 n <- 6L
 (A1 <- crossprod(Matrix(rnorm(n * n), n, n)))
-(ch.A1 <- Cholesky(A1))
 (ch.A1.nopivot <- Cholesky(A1, perm = FALSE))
+(ch.A1 <- Cholesky(A1))
 stopifnot(exprs = {
     length(ch.A1@perm) == ncol(A1)
     isPerm(ch.A1@perm)
@@ -257,7 +257,7 @@ A2 <- A1
 A2[1L, ] <- A2[, 1L] <- 0
 A2
 try(Cholesky(A2, perm = FALSE)) # fails as not positive definite
-ch.A2 <- Cholesky(A2) # succeeds with a warning and ...
+ch.A2 <- Cholesky(A2) # returns, with a warning and ...
 A2.hat <- Reduce(`\%*\%`, expand2(ch.A2, LDL = FALSE))
 norm(A2 - A2.hat, "2") / norm(A2, "2") # 7.670858e-17
 
@@ -267,7 +267,7 @@ A3 <- A1
 A3[1L, ] <- A3[, 1L] <- -1
 A3
 try(Cholesky(A3, perm = FALSE)) # fails as not positive definite
-ch.A3 <- Cholesky(A3) # succeeds with a warning and ...
+ch.A3 <- Cholesky(A3) # returns, with a warning and ...
 A3.hat <- Reduce(`\%*\%`, expand2(ch.A3, LDL = FALSE))
 norm(A3 - A3.hat, "2") / norm(A3, "2") # 1.781568
 
@@ -353,9 +353,10 @@ stopifnot(exprs = {
     identical(Diagonal(x = diag(simpl1)), e.ch.A4[["D"]])
 })
 
-## chol(A) is a simple wrapper around Cholesky(A, LDL = FALSE),
-## returning L' = sqrt(D) L1' _but_ giving no information about
-## the permutation P1
+## chol(A, pivot = value) is a simple wrapper around
+## Cholesky(A, perm = value, LDL = FALSE, super = FALSE),
+## returning L' = sqrt(D) L1' _but_ giving no information
+## about the permutation P1
 selectMethod("chol", "dsCMatrix")
 stopifnot(all.equal(chol(A4, pivot = TRUE), E.ch.A4[["L."]]))
 
