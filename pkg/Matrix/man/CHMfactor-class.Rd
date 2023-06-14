@@ -189,14 +189,16 @@ isLDL(x)
       If \code{sqrt = FALSE}, then this method computes the determinant
       of the factorized matrix \eqn{A} or its logarithm.
       If \code{sqrt = TRUE}, then this method computes the determinant
-      of the factor \eqn{L} or its logarithm, giving \code{NaN} for the
-      modulus when \eqn{D} has negative diagonal elements, as in that
-      case \eqn{L} is not defined.  For backwards compatibility, the
+      of the factor \eqn{L = L_{1} sqrt(D)}{L = L1 * sqrt(D)} or its
+      logarithm, giving \code{NaN} for the modulus when \eqn{D} has
+      negative diagonal elements.  For backwards compatibility, the
       default value of \code{sqrt} is \code{TRUE}, but that is due to
       change in a future version of \pkg{Matrix}, hence defensive code
-      will always set \code{sqrt}.  Calls to this method not setting
-      \code{sqrt} may warn about the pending change.  The warnings can
-      be disabled with \code{\link{options}(Matrix.warnSqrtDefault = 0)}.}
+      will always set \code{sqrt} (to \code{TRUE}, if the code must be
+      backwards compatible with \pkg{Matrix} \code{< 1.6-0}).  Calls
+      to this method not setting \code{sqrt} may warn about the pending
+      change.  The warnings can be disabled with
+      \code{\link{options}(Matrix.warnSqrtDefault = 0)}.}
     \item{\code{diag}}{\code{signature(x = "CHMfactor")}:
       returns a numeric vector of length \eqn{n} containing the diagonal
       elements of \eqn{D}, which (\emph{if} they are all non-negative)
