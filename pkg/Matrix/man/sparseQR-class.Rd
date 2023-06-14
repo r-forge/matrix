@@ -268,31 +268,30 @@ stopifnot(exprs = {
     ae1(crossprod(E.qr.A[["Q"]]), diag(d[1L]))
     ae1(A, with(e.qr.A, P1. \%*\% Q1 \%*\% R1 \%*\% P2.))
     ae1(A, with(E.qr.A, P1. \%*\% Q  \%*\% R  \%*\% P2.))
-    ae2(A[qr.A@p + 1L, qr.A@q + 1L], with(e.qr.A, Q1 \%*\% R1))
-    ae2(A[qr.A@p + 1L, qr.A@q + 1L], with(E.qr.A, Q  \%*\% R ))
+    ae2(A.perm <- A[qr.A@p + 1L, qr.A@q + 1L], with(e.qr.A, Q1 \%*\% R1))
+    ae2(A.perm                               , with(E.qr.A, Q  \%*\% R ))
 })
 
 ## More identities
 b <- KNex[["y"]]
 B <- cbind(b, sin(b), deparse.level = 0)
 stopifnot(exprs = {
-    ae1(qr.X     (qr.A   ), A)
-    ae2(qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
-    ae2(qr.R     (qr.A   ), with(e.qr.A, R1))
-    ae2(qr.coef  (qr.A, B), with(e.qr.A, solve(R1 \%*\% P2., t(P1. \%*\% Q1)) \%*\% B))
-    ae2(qr.fitted(qr.A, B), with(e.qr.A,     tcrossprod(P1. \%*\% Q1) \%*\% B))
-    ae2(qr.resid (qr.A, B), with(e.qr.A, B - tcrossprod(P1. \%*\% Q1) \%*\% B))
-    ae2(qr.qy    (qr.A, B), with(E.qr.A,   P1. \%*\% Q  \%*\% B))
-    ae2(qr.qty   (qr.A, B), with(E.qr.A, t(P1. \%*\% Q) \%*\% B))
-    ae2(qr.qy(qr.A, qr.qty(qr.A, B)), B)
+    ae1(qrX <- qr.X     (qr.A   ), A)
+    ae2(qrQ <- qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))
+    ae2(       qr.R     (qr.A   ), with(e.qr.A, R1))
+    ae2(qrc <- qr.coef  (qr.A, B), with(e.qr.A, solve(R1 \%*\% P2., t(qrQ)) \%*\% B))
+    ae2(qrf <- qr.fitted(qr.A, B), with(e.qr.A, tcrossprod(qrQ) \%*\% B))
+    ae2(qrr <- qr.resid (qr.A, B), B - qrf)
+    ae2(qrq <- qr.qy    (qr.A, B), with(E.qr.A, P1. \%*\% Q \%*\% B))
+    ae2(qr.qty(qr.A, qrq), B)
 })
 
 ## Sparse and dense computations should agree here
 qr.Am <- qr(as(A, "matrix")) # <=> qr.default(A)
 stopifnot(exprs = {
-    ae2(qr.X     (qr.A   ), qr.X     (qr.Am   ))
-    ae2(qr.coef  (qr.A, B), qr.coef  (qr.Am, B))
-    ae2(qr.fitted(qr.A, B), qr.fitted(qr.Am, B))
-    ae2(qr.resid (qr.A, B), qr.resid (qr.Am, B))
+    ae2(qrX, qr.X     (qr.Am   ))
+    ae2(qrc, qr.coef  (qr.Am, B))
+    ae2(qrf, qr.fitted(qr.Am, B))
+    ae2(qrr, qr.resid (qr.Am, B))
 })
 }
