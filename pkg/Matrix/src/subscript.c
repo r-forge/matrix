@@ -1314,14 +1314,25 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	    }								\
 	} else {							\
 	    Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_));	\
-	    if (upper)							\
-		SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),			\
-			  XIJ_SY_U, , px1 += ni - kj - 1,		\
-			  _NA_, _ZERO_, _ONE_);				\
-	    else							\
-		SUB2_LOOP(for (ki = kj; ki < ni; ++ki),			\
-			  XIJ_SY_L, px1 += kj, ,			\
-			  _NA_, _ZERO_, _ONE_);				\
+	    if (upper) {						\
+		if (keep > 0)						\
+		    SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),		\
+			      XIJ_SY_U, , px1 += ni - kj - 1,		\
+			      _NA_, _ZERO_, _ONE_);			\
+		else							\
+		    SUB2_LOOP(for (ki = kj; ki < ni; ++ki),		\
+			      XIJ_SY_U, px1 += kj, ,			\
+			      _NA_, _ZERO_, _ONE_);			\
+	    } else {							\
+		if (keep > 0)						\
+		    SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),		\
+			      XIJ_SY_L, , px1 += ni - kj - 1,		\
+			      _NA_, _ZERO_, _ONE_);			\
+		else							\
+		    SUB2_LOOP(for (ki = kj; ki < ni; ++ki),		\
+			      XIJ_SY_L, px1 += kj, ,			\
+			      _NA_, _ZERO_, _ONE_);			\
+	    }								\
 	}								\
     } while (0)
 
@@ -1452,12 +1463,21 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 		}							\
 	    }								\
 	} else {							\
-	    if (upper)							\
-		SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),			\
-			  XIJ_SP_U, , , _NA_, _ZERO_, _ONE_);		\
-	    else							\
-		SUB2_LOOP(for (ki = kj; ki < ni; ++ki),			\
-			  XIJ_SP_L, , , _NA_, _ZERO_, _ONE_);		\
+	    if (upper) {						\
+		if (keep > 0)						\
+		    SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),		\
+			      XIJ_SP_U, , , _NA_, _ZERO_, _ONE_);	\
+		else							\
+		    SUB2_LOOP(for (ki = kj; ki < ni; ++ki),		\
+			      XIJ_SP_U, , , _NA_, _ZERO_, _ONE_);	\
+	    } else {							\
+		if (keep > 0)						\
+		    SUB2_LOOP(for (ki = 0; ki <= kj; ++ki),		\
+			      XIJ_SP_L, , , _NA_, _ZERO_, _ONE_);	\
+		else							\
+		    SUB2_LOOP(for (ki = kj; ki < ni; ++ki),		\
+			      XIJ_SP_L, , , _NA_, _ZERO_, _ONE_);	\
+	    }								\
 	}								\
     } while (0)
     
