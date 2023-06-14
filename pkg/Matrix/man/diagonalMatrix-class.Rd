@@ -50,7 +50,7 @@
   created from it.}
 \section{Slots}{
   \describe{
-    \item{\code{diag}:}{code{"character"} string, either \code{"U"} or
+    \item{\code{diag}:}{\code{\link{character}} string, either \code{"U"} or
       \code{"N"}, where \code{"U"} means \sQuote{unit-diagonal}.}
     \item{\code{Dim}:}{matrix dimension, and}
     \item{\code{Dimnames}:}{the \code{\link{dimnames}}, a
