@@ -239,7 +239,7 @@ static SEXP cholmod2mf(const cholmod_factor *L)
     }
     if (L->minor < L->n) {
 	if (L->is_ll)
-	    error(_("leading principal minor of order %d is nonpositive"),
+	    error(_("leading principal minor of order %d is not positive"),
 		  (int) L->minor + 1);
 	else
 	    error(_("leading principal minor of order %d is zero"),
