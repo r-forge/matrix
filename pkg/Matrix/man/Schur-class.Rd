@@ -94,19 +94,19 @@ n <- 4L
 dimnames(A) <- list(paste0("r", seq_len(n)),
                     paste0("c", seq_len(n)))
 
-(sc.A <- Schur(A))
-e.sc.A <- expand2(sc.A)
+(sch.A <- Schur(A))
+str(e.sch.A <- expand2(sch.A), max.level = 2L)
 
 ## A ~ Q T Q' in floating point
 stopifnot(exprs = {
-    identical(names(e.sc.A), c("Q", "T", "Q."))
-    all.equal(A, with(e.sc.A, Q \%*\% T \%*\% Q.))
+    identical(names(e.sch.A), c("Q", "T", "Q."))
+    all.equal(A, with(e.sch.A, Q \%*\% T \%*\% Q.))
 })
 
 ## Factorization handled as factorized matrix
 b <- rnorm(n)
-stopifnot(all.equal(det(A), det(sc.A)),
-          all.equal(solve(A, b), solve(sc.A, b)))
+stopifnot(all.equal(det(A), det(sch.A)),
+          all.equal(solve(A, b), solve(sch.A, b)))
 
 ## One of the non-general cases:
 Schur(Diagonal(6L))

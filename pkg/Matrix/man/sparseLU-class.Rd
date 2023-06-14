@@ -95,7 +95,7 @@ dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
                           paste0("c", seq_len(n)))
 
 (lu.A <- lu(A))
-e.lu.A <- expand2(lu.A)
+str(e.lu.A <- expand2(lu.A), max.level = 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)

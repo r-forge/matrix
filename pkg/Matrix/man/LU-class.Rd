@@ -96,10 +96,11 @@ dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
                           paste0("c", seq_len(n)))
 
 (lu.A <- lu(A))
-e.lu.A <- expand2(lu.A)
+str(e.lu.A <- expand2(lu.A), max.level = 2L)
 
 ## Underlying LAPACK representation
-as(lu.A, "dgeMatrix") # which is L and U interlaced
+(m.lu.A <- as(lu.A, "dgeMatrix")) # which is L and U interlaced
+stopifnot(identical(as(m.lu.A, "matrix"), `dim<-`(lu.A@x, lu.A@Dim)))
 
 ## Get permutation from product of transpositions :
 asPerm <- function(pivot) {

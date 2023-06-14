@@ -82,25 +82,24 @@ set.seed(0)
 
 Schur(Hilbert(9L)) # real eigenvalues
 
-A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L)
-(Sch.A <- Schur(A)) # complex eigenvalues
+(A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L))
+(sch.A <- Schur(A)) # complex eigenvalues
 
 ## A ~ Q T Q' in floating point
-e.Sch.A <- expand2(Sch.A)
-names(e.Sch.A)
-stopifnot(all.equal(A, Reduce(`\%*\%`, e.Sch.A)))
+str(e.sch.A <- expand2(sch.A), max.level = 2L)
+stopifnot(all.equal(A, Reduce(`\%*\%`, e.sch.A)))
 
-(e1 <- eigen(Sch.A@T, only.values = TRUE)$values)
+(e1 <- eigen(sch.A@T, only.values = TRUE)$values)
 (e2 <- eigen(    A  , only.values = TRUE)$values)
-(e3 <- Sch.A@EValues)
+(e3 <- sch.A@EValues)
 
 stopifnot(exprs = {
     all.equal(e1, e2, tolerance = 1e-13)
     all.equal(e1, e3[order(Mod(e3), decreasing = TRUE)], tolerance = 1e-13) 
     identical(Schur(A, vectors = FALSE),
-              list(T = Sch.A@T, EValues = e3))    
+              list(T = sch.A@T, EValues = e3))    
     identical(Schur(as(A, "matrix")),
-              list(Q = as(Sch.A@Q, "matrix"),
-                   T = as(Sch.A@T, "matrix"), EValues = e3))
+              list(Q = as(sch.A@Q, "matrix"),
+                   T = as(sch.A@T, "matrix"), EValues = e3))
 })
 }

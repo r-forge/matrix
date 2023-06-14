@@ -129,10 +129,11 @@ n <- 6L
 dimnames(A) <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (bk.A <- BunchKaufman(A))
-e.bk.A <- expand2(bk.A)
+str(e.bk.A <- expand2(bk.A), max.level = 2L)
 
 ## Underlying LAPACK representation
-as(bk.A, "dtrMatrix")
+(m.bk.A <- as(bk.A, "dtrMatrix"))
+stopifnot(identical(as(m.bk.A, "matrix"), `dim<-`(bk.A@x, bk.A@Dim)))
 
 ## Number of factors is 2*b+1, b <= n, which can be nontrivial,
 ## hence methods for 'expand2' are mostly didactic
