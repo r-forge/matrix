@@ -142,12 +142,13 @@ n <- 6L
 dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (ch.A <- Cholesky(A)) # pivoted, by default
-e.ch.A <- expand2(ch.A)
-E.ch.A <- expand2(ch.A, LDL = FALSE)
+str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
+str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
 
 ## Underlying LAPACK representation
-as(ch.A, "dtrMatrix") # which is L', not L, because
+(m.ch.A <- as(ch.A, "dtrMatrix")) # which is L', not L, because
 A@uplo == "U"
+stopifnot(identical(as(m.ch.A, "matrix"), `dim<-`(ch.A@x, ch.A@Dim)))
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
@@ -163,7 +164,7 @@ stopifnot(exprs = {
     identical(e.ch.A[["L1."]], t(e.ch.A[["L1"]]))
     identical(E.ch.A[["L." ]], t(E.ch.A[["L" ]]))
     identical(e.ch.A[["D"]], Diagonal(x = diag(ch.A)))
-    ae1(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
+    all.equal(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
     ae1(A, with(e.ch.A, P1. \%*\% L1 \%*\% D \%*\% L1. \%*\% P1))
     ae1(A, with(E.ch.A, P1. \%*\% L  \%*\%         L.  \%*\% P1))
     ae2(A[ch.A@perm, ch.A@perm], with(e.ch.A, L1 \%*\% D \%*\% L1.))

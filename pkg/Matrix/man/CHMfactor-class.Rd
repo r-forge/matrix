@@ -61,9 +61,9 @@ isLDL(x)
 }
 \value{
   \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
-  \code{TRUE} if \code{x} stores the lower triangular elements
+  \code{TRUE} if \code{x} stores the lower triangular entries
   of \eqn{L_{1}-I+D}{L1-I+D},
-  \code{FALSE} if \code{x} stores the lower triangular elements
+  \code{FALSE} if \code{x} stores the lower triangular entries
   of \eqn{L}.
 }
 \section{Slots}{
@@ -274,9 +274,9 @@ A <- crossprod(M)
 ## With dimnames, to see that they are propagated :
 dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
-(ch.A <- Cholesky(A, LDL = TRUE, super = FALSE)) # pivoted, by default
-e.ch.A <- expand2(ch.A)
-E.ch.A <- expand2(ch.A, LDL = FALSE) # NB: fails if min(diag(D)) < 0 !
+(ch.A <- Cholesky(A)) # pivoted, by default
+str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
+str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
@@ -292,7 +292,7 @@ stopifnot(exprs = {
     identical(e.ch.A[["L1."]], t(e.ch.A[["L1"]]))
     identical(E.ch.A[["L." ]], t(E.ch.A[["L" ]]))
     identical(e.ch.A[["D"]], Diagonal(x = diag(ch.A)))
-    ae1(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
+    all.equal(E.ch.A[["L"]], with(e.ch.A, L1 \%*\% sqrt(D)))
     ae1(A, with(e.ch.A, P1. \%*\% L1 \%*\% D \%*\% L1. \%*\% P1))
     ae1(A, with(E.ch.A, P1. \%*\% L  \%*\%         L.  \%*\% P1))
     ae2(A[ch.A@perm + 1L, ch.A@perm + 1L], with(e.ch.A, L1 \%*\% D \%*\% L1.))

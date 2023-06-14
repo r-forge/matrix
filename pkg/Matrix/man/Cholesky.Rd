@@ -60,14 +60,18 @@ Cholesky(A, \dots)
 \S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
 }
 \arguments{
-  \item{A}{a \link[=is.finite]{finite}, symmetric, positive
-    semidefinite matrix or \code{\linkS4class{Matrix}}
-    to be factorized.  If \code{A} is square but not symmetric,
-    then it will be \emph{treated} as symmetric; see \code{uplo}.
-    Methods for sparse \code{A} do not require positive
-    semidefiniteness when \code{LDL = TRUE}, but still signal
-    an error for \code{A} whose leading principal minors
-    (after pivoting) are zero.}
+  \item{A}{a \link[=is.finite]{finite}, symmetric matrix or
+    \code{\linkS4class{Matrix}} to be factorized.  If \code{A}
+    is square but not symmetric, then it will be \emph{treated}
+    as symmetric; see \code{uplo}.
+    Methods for dense \code{A} require positive definiteness
+    when \code{perm = FALSE} and positive semidefiniteness
+    when \code{perm = TRUE}.
+    Methods for sparse \code{A} require positive definiteness
+    when \code{LDL = TRUE} and nonzero leading principal minors
+    (after pivoting) when \code{LDL = FALSE}.
+    Methods for sparse, \emph{diagonal} \code{A} are an exception,
+    requiring positive semidefiniteness unconditionally.}
   \item{perm}{a logical indicating if the rows and columns
     of \eqn{A} should be pivoted.  Methods for sparse \code{A}
     employ the approximate minimum degree (AMD) algorithm
@@ -77,15 +81,15 @@ Cholesky(A, \dots)
     principal minors, causing the factorization to fail, in
     which case it may be necessary to set \code{perm = FALSE}.}
   \item{tol}{a \link[=is.finite]{finite} numeric tolerance,
-    used only if \code{pivot = TRUE}.
+    used only if \code{perm = TRUE}.
     The factorization algorithm stops if the pivot is less than
     or equal to \code{tol}.  Negative \code{tol} is equivalent
     to \code{nrow(A) * .Machine$double.eps * max(diag(A))}.}
   \item{LDL}{a logical indicating if the simplicial factorization
     should be computed as
     \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
-    such that the result stores the diagonal entries of \eqn{D}
-    and the strictly lower triangular entries of \eqn{L_{1}}.
+    such that the result stores the lower triangular entries
+    of \eqn{L_{1}-I+D}{L1-I+D}.
     The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
     of \eqn{L}.  This argument is ignored if \code{super = TRUE}
@@ -143,9 +147,29 @@ Cholesky(A, \dots)
   \code{\linkS4class{Cholesky}},
   \code{\linkS4class{pCholesky}}, and 
   \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}},
-  respectively.  In all cases the result represents \eqn{L}.
-  Indeed, in cases where \eqn{L} is needed explicitly but not any
-  other factor, coercion should be preferred over \code{expand2}.
+  respectively.  All three coercions return \eqn{L} or \eqn{L'}
+  (depending on the \code{uplo} slot of \code{x} in the dense case,
+  whereas the result is always \eqn{L} in the sparse case).
+  Indeed, in cases where \eqn{L} or \eqn{L'} is needed explicitly
+  but not any other factor, coercion should be preferred over a
+  full expansion.
+
+  The behaviour of \code{Cholesky(A, perm = TRUE)} for dense \code{A}
+  is somewhat exceptional, in that it expects \emph{without} checking
+  that \code{A} is positive semidefinite.  By construction, if \eqn{A}
+  is positive semidefinite and the exact algorithm encounters a zero
+  pivot, then the unfactorized trailing submatrix is the zero matrix,
+  and there is nothing left to do.  Hence when the finite precision
+  algorithm encounters a pivot less than \code{tol}, it signals a
+  warning instead of an error and zeros the trailing submatrix in
+  order to guarantee that \eqn{P' L L' P}{P' * L * L' * P} is positive
+  semidefinite even if \eqn{A} is not.  It follows that one way to
+  test for positive semidefiniteness of \eqn{A} in the event of a
+  warning is to compute the error
+  \deqn{\frac{\lVert A - P' L L' P \rVert}{\lVert A \rVert}}{
+    norm(A - P' * L * L' * P) / norm(A)}.
+  See the examples and LAPACK Working Note (\dQuote{LAWN}) 161
+  for details.
 }
 \seealso{
   Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
@@ -172,16 +196,16 @@ Cholesky(A, \dots)
   \url{https://netlib.org/lapack/double/dpotrf.f}, and
   \url{https://netlib.org/lapack/double/dpptrf.f}.
 
-  Lucas, C. (2004).
-  \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
-  LAPACK Working Note, Number 161.
-  \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
-  
   The CHOLMOD source code; see
   \url{https://github.com/DrTimothyAldenDavis/SuiteSparse},
   notably the header file \file{CHOLMOD/Include/cholmod.h}
   defining \code{cholmod_factor_struct}.
 
+  Lucas, C. (2004).
+  \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
+  LAPACK Working Note, Number 161.
+  \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
+  
   Chen, Y., Davis, T. A., Hager, W. W., & Rajamanickam, S. (2008).
   Algorithm 887: CHOLMOD, supernodal sparse Cholesky factorization
   and update/downdate.
@@ -202,83 +226,165 @@ Cholesky(A, \dots)
 }
 \examples{
 showMethods("Cholesky", inherited = FALSE)
+set.seed(0)
 
-data(KNex)
-mtm <- with(KNex, crossprod(mm))
-str(mtm@factors) # empty list()
-(C1 <- Cholesky(mtm))             # uses show(<MatrixFactorization>)
-str(mtm@factors) # 'sPDCholesky' (simpl)
-(Cm <- Cholesky(mtm, super = TRUE))
-c(C1 = isLDL(C1), Cm = isLDL(Cm)) # TRUE FALSE
-str(mtm@factors) # 'sPDCholesky'  *and* 'SPdCholesky'
-str(cm1  <- as(C1, "CsparseMatrix"))
-str(cmat <- as(Cm, "CsparseMatrix"))# hmm: super is *less* sparse here
-cm1[1:20, 1:20]
+## ---- Dense ----------------------------------------------------------
 
-b <- matrix(c(rep(0, 711), 1), ncol = 1)
-## solve(Cm, b) by default solves  Ax = b, where A = Cm'Cm (= mtm)!
-## hence, the identical() check *should* work, but fails on some GOTOblas:
-x <- solve(Cm, b)
-stopifnot(identical(x, solve(Cm, b, system = "A")),
-          all.equal(x, solve(mtm, b)))
+## .... Positive definite ..............................................
 
-Cn <- Cholesky(mtm, perm = FALSE)# no permutation -- much worse:
-sizes <- c(simple = object.size(C1),
-           super  = object.size(Cm),
-           noPerm = object.size(Cn))
-## simple is 100, super= 137, noPerm= 812 :
-noquote(cbind(format(100 * sizes / sizes[1], digits=4)))
+n <- 6L
+(A1 <- crossprod(Matrix(rnorm(n * n), n, n)))
+(ch.A1 <- Cholesky(A1))
+(ch.A1.nopivot <- Cholesky(A1, perm = FALSE))
+stopifnot(exprs = {
+    length(ch.A1@perm) == ncol(A1)
+    isPerm(ch.A1@perm)
+    is.unsorted(ch.A1@perm) # typically not the identity permutation
+    length(ch.A1.nopivot@perm) == 0L
+})
 
+## A ~ P1' L D L' P1 ~ P1' L L' P1 in floating point
+str(e.ch.A1 <- expand2(ch.A1, LDL =  TRUE), max.level = 2L)
+str(E.ch.A1 <- expand2(ch.A1, LDL = FALSE), max.level = 2L)
+stopifnot(exprs = {
+    all.equal(as(A1, "matrix"), as(Reduce(`\%*\%`, e.ch.A1), "matrix"))
+    all.equal(as(A1, "matrix"), as(Reduce(`\%*\%`, E.ch.A1), "matrix"))
+})
 
-## Visualize the sparseness:
-dq <- function(ch) paste('"',ch,'"', sep="") ## dQuote(<UTF-8>) gives bad plots
-image(mtm, main=paste("crossprod(mm) : Sparse", dq(class(mtm))))
-image(cm1, main= paste("as(Cholesky(crossprod(mm)), \"CsparseMatrix\"):",
-                        dq(class(cm1))))
-\dontshow{% FIXME-- move to ../tests/factorizing.R :
-expand(C1) ## to check printing
+## .... Positive semidefinite but not positive definite ................
+
+A2 <- A1
+A2[1L, ] <- A2[, 1L] <- 0
+A2
+try(Cholesky(A2, perm = FALSE)) # fails as not positive definite
+ch.A2 <- Cholesky(A2) # succeeds with a warning and ...
+A2.hat <- Reduce(`\%*\%`, expand2(ch.A2, LDL = FALSE))
+norm(A2 - A2.hat, "2") / norm(A2, "2") # 7.670858e-17
+
+## .... Not positive semidefinite ......................................
+
+A3 <- A1
+A3[1L, ] <- A3[, 1L] <- -1
+A3
+try(Cholesky(A3, perm = FALSE)) # fails as not positive definite
+ch.A3 <- Cholesky(A3) # succeeds with a warning and ...
+A3.hat <- Reduce(`\%*\%`, expand2(ch.A3, LDL = FALSE))
+norm(A3 - A3.hat, "2") / norm(A3, "2") # 1.781568
+
+## Indeed, 'A3' is not positive semidefinite, but 'A3.hat' _is_
+ch.A3.hat <- Cholesky(A3.hat)
+A3.hat.hat <- Reduce(`\%*\%`, expand2(ch.A3.hat, LDL = FALSE))
+norm(A3.hat - A3.hat.hat, "2") / norm(A3.hat, "2") # 1.777944e-16
+
+## ---- Sparse ---------------------------------------------------------
+
+## Really just three cases modulo permutation :
+##
+##            type        factorization  minors of P1 A P1'
+##   1  simplicial  P1 A P1' = L1 D L1'             nonzero
+##   2  simplicial  P1 A P1' = L    L '            positive
+##   3  supernodal  P1 A P2' = L    L '            positive
+
+data(KNex, package = "Matrix")
+A4 <- crossprod(KNex[["mm"]])
+
+ch.A4 <-
+list(pivoted =
+     list(simpl1 = Cholesky(A4, perm =  TRUE, super = FALSE, LDL =  TRUE),
+          simpl0 = Cholesky(A4, perm =  TRUE, super = FALSE, LDL = FALSE),
+          super0 = Cholesky(A4, perm =  TRUE, super =  TRUE             )),
+     unpivoted =
+     list(simpl1 = Cholesky(A4, perm = FALSE, super = FALSE, LDL =  TRUE),
+          simpl0 = Cholesky(A4, perm = FALSE, super = FALSE, LDL = FALSE),
+          super0 = Cholesky(A4, perm = FALSE, super =  TRUE             )))
+ch.A4
+
+s <- simplify2array
+rapply2 <- function(object, f, ...) rapply(object, f, , , how = "list", ...)
+
+s(rapply2(ch.A4, isLDL))
+s(m.ch.A4 <- rapply2(ch.A4, as, "CsparseMatrix")) # giving L = L1 sqrt(D)
+
+## By design, the pivoted and simplicial factorizations
+## are more sparse than the unpivoted and supernodal ones ...
+s(rapply2(m.ch.A4, object.size))
+
+## Which is nicely visualized by methods for 'image'
+%% op <- par(mfcol = c(3L, 2L)) % FIXME: why doesn't this work ??
+for(j in c("pivoted", "unpivoted"))
+    for(i in c("simpl1", "simpl0", "super0"))
+        print(image(m.ch.A4[[c(j, i)]], main = paste(j, i)))
+%% par(op)
+
+simpl1 <- ch.A4[[c("pivoted", "simpl1")]]
+stopifnot(exprs = {
+    length(simpl1@perm) == ncol(A4)
+    isPerm(simpl1@perm, 0L)
+    is.unsorted(simpl1@perm) # typically not the identity permutation
+})
+
+## One can expand with and without D regardless of isLDL(.),
+## but "without" requires L = L1 sqrt(D), which is conditional
+## on min(diag(D)) >= 0, hence "with" is the default
+isLDL(simpl1)
+stopifnot(min(diag(simpl1)) >= 0)
+str(e.ch.A4 <- expand2(simpl1, LDL =  TRUE), max.level = 2L) # the default
+str(E.ch.A4 <- expand2(simpl1, LDL = FALSE), max.level = 2L)
+stopifnot(exprs = {
+    all.equal(E.ch.A4[["L" ]], e.ch.A4[["L1" ]] \%*\% sqrt(e.ch.A4[["D"]]))
+    all.equal(E.ch.A4[["L."]], sqrt(e.ch.A4[["D"]]) \%*\% e.ch.A4[["L1."]])
+    all.equal(A4, as(Reduce(`\%*\%`, e.ch.A4), "symmetricMatrix"))
+    all.equal(A4, as(Reduce(`\%*\%`, E.ch.A4), "symmetricMatrix"))
+})
+
+## The "same" permutation matrix with "alternate" representation
+## [i, perm[i]] {margin=1} <-> [invertPerm(perm)[j], j] {margin=2}
+alt <- function(P) {
+    P@margin <- 1L + !(P@margin - 1L) # 1 <-> 2
+    P@perm <- invertPerm(P@perm)
+    P
 }
 
-## Smaller example, with same matrix as in  help(chol) :
-(mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)) # 5 x 5
-(opts <- expand.grid(perm = c(TRUE,FALSE), LDL = c(TRUE,FALSE), super = c(FALSE,TRUE)))
-rr <- lapply(seq_len(nrow(opts)), function(i)
-             do.call(Cholesky, c(list(A = mm), opts[i,])))
-nn <- do.call(expand.grid, c(attr(opts, "out.attrs")$dimnames,
-              stringsAsFactors=FALSE,KEEP.OUT.ATTRS=FALSE))
-names(rr) <- apply(nn, 1, function(r)
-                   paste(sub("(=.).*","\\\\1", r), collapse=","))% extra '\\' in Rd
-str(rr, max.level=1)
+## Expansions are elegant but inefficient (transposes are redundant)
+## hence programmers should consider the 'coerce' and 'diag' methods
+stopifnot(exprs = {
+    identical(as(simpl1, "pMatrix"), alt(e.ch.A4[["P1"]]))
+    identical(as(simpl1, "CsparseMatrix"), E.ch.A4[["L"]])
+    identical(Diagonal(x = diag(simpl1)), e.ch.A4[["D"]])
+})
 
-str(re <- lapply(rr, expand), max.level=2) ## each has a 'P' and a 'L' matrix
-%% FIXME !! --- "check" them  __unfinished__
-R0 <- chol(mm, pivot=FALSE)
-R1 <- chol(mm, pivot=TRUE )
-stopifnot(all.equal(t(R1), re[[1]]$L),
-          all.equal(t(R0), re[[2]]$L),
-          identical(as(1:5, "pMatrix"), re[[2]]$P), # no pivoting
-TRUE)
+## chol(A) is a simple wrapper around Cholesky(A, LDL = FALSE),
+## returning L' = sqrt(D) L1' _but_ giving no information about
+## the permutation P1
+selectMethod("chol", "dsCMatrix")
+stopifnot(all.equal(chol(A4, pivot = TRUE), E.ch.A4[["L."]]))
 
-## Symmetric matrix with positive *and* negative eigen values, i.e., indefinite
-mpn <- new("dsCMatrix", i = c(0L, 0:1, 0:3, 2:5, 3:6),
-           p = c(0:1, 3L, 6:7, 10:11, 15L), Dim = c(7L, 7L),
-           x = c(1, 6, 38, 10, 60, 103, -4, 6, -32, -247, -2, -16, -128, -2, -67))
-ev <- eigen(mpn, only.values = TRUE)$values
-round(ev, 3) # 139.8 3.059 0.268 -0.008 -0.140 -3.357 -317.6
-plot(ev, type="b"); abline(h=0, lty=3)
-Cpn <- Cholesky(mpn)
-diag(Cpn) # D matrix has [p]ositive and [n]egative diagonal elements
-try(expand(Cpn)) # cannot compute L = L1 sqrt(D)
-(mp. <- as(Reduce(`\%*\%`, expand2(Cpn)), "symmetricMatrix"))
-## very close to 'mpn' but *does* differ numerically (!)
-stopifnot(all.equal(mpn, mp.))
+## Now a symmetric matrix with positive _and_ negative eigenvalues,
+## hence _not_ positive semidefinite
+A5 <- new("dsCMatrix",
+          Dim = c(7L, 7L),
+          p = c(0:1, 3L, 6:7, 10:11, 15L),
+          i = c(0L, 0:1, 0:3, 2:5, 3:6),
+          x = c(1, 6, 38, 10, 60, 103, -4, 6, -32, -247, -2, -16, -128, -2, -67))
+(ev <- eigen(A5, only.values = TRUE)$values)
+(t.ev <- table(factor(sign(ev), -1:1))) # the matrix "inertia"
 
-%% --> ../TODO : .diag.dsC() should be renamed, documented, tested,...
-\dontshow{
-str(dd <- .diag.dsC(mtm))
-dc <- .diag.dsC(Chx=C1) # <- directly from the Cholesky
-stopifnot(all.equal(dd,dc))
-}%dont
-# Version of the underlying SuiteSparse library by Tim Davis :
+ch.A5 <- Cholesky(A5)
+isLDL(ch.A5)
+(d.A5 <- diag(ch.A5)) # diag(D) is partly negative
+
+## Sylvester's law of inertia holds here, but not in general
+## in finite precision arithmetic
+stopifnot(identical(table(factor(sign(d.A5), -1:1)), t.ev))
+
+try(as(ch.A5, "CsparseMatrix"))  # unable to compute L = L1 sqrt(D)
+try(expand2(ch.A5, LDL = FALSE)) # ditto
+try(chol(A5, pivot = TRUE))      # ditto
+
+## The default expansion is "square root free" and still works here
+str(e.ch.A5 <- expand2(ch.A5, LDL = TRUE), max.level = 2L)
+stopifnot(all.equal(A5, as(Reduce(`\%*\%`, e.ch.A5), "symmetricMatrix")))
+
+## Version of the SuiteSparse library, which includes CHOLMOD
 .SuiteSparse_version()
 }

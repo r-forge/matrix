@@ -145,7 +145,7 @@ lu(x, \dots)
 showMethods("lu", inherited = FALSE)
 set.seed(0)
 
-## ---- Dense --------------------------
+## ---- Dense ----------------------------------------------------------
 
 (A1 <- Matrix(rnorm(9L), 3L, 3L))
 (lu.A1 <- lu(A1))
@@ -154,22 +154,16 @@ set.seed(0)
 (lu.A2 <- lu(A2))
 
 ## A ~ P1' L U in floating point
-e.lu.A2 <- expand2(lu.A2)
-names(e.lu.A2)
+str(e.lu.A2 <- expand2(lu.A2), max.level = 2L)
 stopifnot(all.equal(A2, Reduce(`\%*\%`, e.lu.A2)))
 
-## Underlying LAPACK representation
-m.lu.A2 <- as(lu.A2, "dgeMatrix")
-stopifnot(identical(as(m.lu.A2, "matrix"), `dim<-`(lu.A2@x, lu.A2@Dim)))
-
-## ---- Sparse -------------------------
+## ---- Sparse ---------------------------------------------------------
 
 A3 <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
          "CsparseMatrix")
 (lu.A3 <- lu(A3))
 
 ## A ~ P1' L U P2' in floating point
-e.lu.A3 <- expand2(lu.A3)
-names(e.lu.A3)
+str(e.lu.A3 <- expand2(lu.A3), max.level = 2L)
 stopifnot(all.equal(A3, Reduce(`\%*\%`, e.lu.A3)))
 }

@@ -99,11 +99,6 @@ class(A) # dsCMatrix
 (bk.A <- BunchKaufman(as(A, "unpackedMatrix")))
 
 ## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
-e.bk.A <- expand2(bk.A)
+str(e.bk.A <- expand2(bk.A), max.level = 2L)
 stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
-
-## Underlying LAPACK representation
-m.bk.A <- as(bk.A, "dtrMatrix")
-stopifnot(identical(as(m.bk.A, "matrix"), `dim<-`(bk.A@x, bk.A@Dim)))
-image(m.bk.A) # can be sparse if A is sparse
 }
