@@ -44,16 +44,18 @@ Schur(x, vectors = TRUE, \dots)
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  If \code{vectors = TRUE} and \code{x} is a
-  \code{\linkS4class{Matrix}}, then the result is an object
-  of class \code{\linkS4class{Schur}}.
-
-  If \code{vectors = TRUE} and \code{x} is a tradtional matrix,
-  then the result is a named list containing the \code{Q}, \code{T},
-  and \code{EValues} slots of the \code{\linkS4class{Schur}} object.
-
-  If \code{vectors = FALSE}, then the result is the same named list
-  but without \code{Q}.
+  An object representing the factorization, inheriting
+  from virtual class \code{\linkS4class{SchurFactorization}}
+  if \code{vectors = TRUE}.  Currently, the specific class
+  is always \code{\linkS4class{Schur}} in that case.
+  %% FIXME? no other factorization behaves this way:
+  An exception is if \code{x} is a traditional matrix,
+  in which case the result is a named list containing
+  \code{Q}, \code{T}, and \code{EValues} slots of the
+  \code{\linkS4class{Schur}} object.
+  
+  If \code{vectors = FALSE}, then the result is the same
+  named list but without \code{Q}.
 }
 \seealso{
   Class \code{\linkS4class{Schur}} and its methods.
