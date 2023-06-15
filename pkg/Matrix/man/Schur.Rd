@@ -9,15 +9,13 @@
 \alias{Schur}
 \alias{Schur-methods}
 %
-\alias{Schur,Matrix,missing-method}
-\alias{Schur,matrix,missing-method}
-\alias{Schur,dgeMatrix,logical-method}
-\alias{Schur,diagonalMatrix,logical-method}
-\alias{Schur,dsyMatrix,logical-method}
-\alias{Schur,generalMatrix,logical-method}
-\alias{Schur,matrix,logical-method}
-\alias{Schur,symmetricMatrix,logical-method}
-\alias{Schur,triangularMatrix,logical-method}
+\alias{Schur,dgeMatrix-method}
+\alias{Schur,diagonalMatrix-method}
+\alias{Schur,dsyMatrix-method}
+\alias{Schur,generalMatrix-method}
+\alias{Schur,matrix-method}
+\alias{Schur,symmetricMatrix-method}
+\alias{Schur,triangularMatrix-method}
 %
 \description{
   Computes the Schur factorization of an \eqn{n \times n}{n-by-n}

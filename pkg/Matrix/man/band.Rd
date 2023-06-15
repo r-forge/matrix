@@ -41,8 +41,8 @@
 }
 \usage{
 band(x, k1, k2, \dots)
-triu(x, k = 0, \dots)
-tril(x, k = 0, \dots)
+triu(x, k = 0L, \dots)
+tril(x, k = 0L, \dots)
 }
 \arguments{
   \item{x}{a matrix-like object}

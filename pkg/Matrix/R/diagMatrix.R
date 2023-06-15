@@ -623,11 +623,11 @@ setMethod("band", signature(x = "diagonalMatrix"),
               if(k1 <= 0L && k2 >= 0L) x else .setZero(x))
 
 setMethod("triu", signature(x = "diagonalMatrix"),
-          function(x, k = 0, ...)
+          function(x, k = 0L, ...)
               if(k <= 0L) x else .setZero(x))
 
 setMethod("tril", signature(x = "diagonalMatrix"),
-          function(x, k = 0, ...)
+          function(x, k = 0L, ...)
               if(k >= 0L) x else .setZero(x))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
