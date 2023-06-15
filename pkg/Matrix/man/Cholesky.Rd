@@ -309,12 +309,13 @@ s(m.ch.A4 <- rapply2(ch.A4, as, "CsparseMatrix")) # giving L = L1 sqrt(D)
 ## are more sparse than the unpivoted and supernodal ones ...
 s(rapply2(m.ch.A4, object.size))
 
-## Which is nicely visualized by methods for 'image'
-%% op <- par(mfcol = c(3L, 2L)) % FIXME: why doesn't this work ??
-for(j in c("pivoted", "unpivoted"))
-    for(i in c("simpl1", "simpl0", "super0"))
-        print(image(m.ch.A4[[c(j, i)]], main = paste(j, i)))
-%% par(op)
+## Which is nicely visualized lattice-based methods for 'image'
+inm <- c("pivoted", "unpivoted")
+jnm <- c("simpl1", "simpl0", "super0")
+for(i in 1:2)
+for(j in 1:3)
+print(image(m.ch.A4[[c(i, j)]], main = paste(inm[i], jnm[j])),
+            split = c(j, i, 3L, 2L), more = i * j < 6L)
 
 simpl1 <- ch.A4[[c("pivoted", "simpl1")]]
 stopifnot(exprs = {
