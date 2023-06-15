@@ -342,10 +342,10 @@ setMethod("band", signature(x = "indMatrix"),
           function(x, k1, k2, ...) band(as(x, "nsparseMatrix"), k1, k2))
 
 setMethod("triu", signature(x = "indMatrix"),
-          function(x, k, ...) triu(as(x, "nsparseMatrix")))
+          function(x, k = 0L, ...) triu(as(x, "nsparseMatrix")))
 
 setMethod("tril", signature(x = "indMatrix"),
-          function(x, k, ...) tril(as(x, "nsparseMatrix")))
+          function(x, k = 0L, ...) tril(as(x, "nsparseMatrix")))
 
 setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "missing"),
           function(x, uplo) forceSymmetric(as(x, "nsparseMatrix")))
