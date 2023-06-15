@@ -34,8 +34,6 @@
 \alias{qr.resid,sparseQR,matrix-method}
 \alias{qr.resid,sparseQR,numLike-method}
 %
-\alias{qrR}
-%
 \description{
   \code{sparseQR} is the class of sparse, row- and column-pivoted
   QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
@@ -52,30 +50,6 @@
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
   (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
   upper \emph{triangular}) with non-negative diagonal elements.
-}
-\usage{
-qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
-}
-\arguments{
-  \item{qr}{an object of class \code{\linkS4class{sparseQR}},
-    almost always the result of a call to generic function \code{qr}
-    with sparse \code{x}.}
-  \item{complete}{a logical indicating if \eqn{R} should be returned
-    instead of \eqn{R_{1}}{R1}.  Note that \eqn{R} and \eqn{R_{1}}{R1}
-    coincide in the \eqn{m = n} case.}
-  \item{backPermute}{a logical indicating if \eqn{R_{1} P_{2}'}{R1 * P2'} 
-    (\eqn{R P_{2}'}{R * P2'} if \code{complete = TRUE}) should be returned 
-    instead of \eqn{R_{1}}{R1} (\eqn{R} if \code{complete = TRUE}).}
-  \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
-    should be propagated unpermuted to the result.
-    If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
-}
-\value{
-  \code{qrR} returns
-  a \code{\linkS4class{dtCMatrix}} representing \eqn{R_{1}}{R1}
-  (if \code{complete = FALSE}) or
-  a \code{\linkS4class{dgCMatrix}} representing \eqn{R}
-  (if \code{complete = TRUE}).
 }
 \section{Slots}{
   \describe{
@@ -131,7 +105,10 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       returns either \eqn{R} as a \code{\linkS4class{dgCMatrix}}
       or \eqn{R_{1}}{R1} as a \code{\linkS4class{dtCMatrix}},
       depending on optional argument \code{complete}.  The default
-      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.}
+      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.  If optional
+      argument \code{backPermute} is \code{TRUE}, then the result
+      is \eqn{R P_{2}'}{R * P2'} or \eqn{R_{1} P_{2}'}{R1 * P2'}
+      instead, always as a \code{\linkS4class{dgCMatrix}}.}
     \item{\code{qr.X}}{\code{signature(qr = "sparseQR")}:
       returns \eqn{A} as a \code{\linkS4class{dgeMatrix}},
       by default.  If \eqn{m > n} and optional argument

@@ -94,47 +94,37 @@ setMethod("qr.Q", signature(qr = "sparseQR"),
               Q
           })
 
-qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
-    m0 <- .qr.rank.def.warn(qr)
-    R <- qr@R
-    d <- R@Dim
-    m <- d[1L]
-    n <- d[2L]
-    dn <- qr@Dimnames
-    p2 <- qr@q + 1L
-    p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
-    if(!row.names)
-        dn <- c(list(NULL), dn[2L])
-    else if(m0 && !is.null(rn <- dn[[1L]]))
-        length(dn[[1L]]) <- length(rn) + m0
-    if(p2.uns && !is.null(cn <- dn[[2L]]))
-        dn[[2L]] <- cn[p2]
-    R@Dimnames <- dn
-    R <-
-        if(!complete && n < m) {
-            if(backPermute && p2.uns)
-                R[seq_len(n), invertPerm(p2), drop = FALSE]
-            else R[seq_len(n), , drop = FALSE]
-        } else {
-            if(backPermute && p2.uns)
-                R[, invertPerm(p2), drop = FALSE]
-            else R
-        }
-    if(m0 && .qr.rank.def.truncating && complete)
-        R <- R[seq_len(m - m0), , drop = FALSE]
-    if(complete || backPermute) R else triu(R)
-}
-
 setMethod("qr.R", signature(qr = "sparseQR"),
-          function(qr, complete = FALSE)
-              qrR(qr, complete = complete, backPermute = FALSE,
-                  row.names = FALSE))
+          function(qr, complete = FALSE, backPermute = FALSE, ...) {
+              m0 <- .qr.rank.def.warn(qr)
+              R <- qr@R
+              d <- R@Dim
+              m <- d[1L]
+              n <- d[2L]
+              dn <- c(list(NULL), qr@Dimnames[2L])
+              p2 <- qr@q + 1L
+              p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
+              if(p2.uns && !is.null(cn <- dn[[2L]]))
+                  dn[[2L]] <- cn[p2]
+              R@Dimnames <- dn
+              R <-
+                  if(!complete && n < m) {
+                      if(backPermute && p2.uns)
+                          R[seq_len(n), invertPerm(p2), drop = FALSE]
+                      else R[seq_len(n), , drop = FALSE]
+                  } else {
+                      if(backPermute && p2.uns)
+                          R[, invertPerm(p2), drop = FALSE]
+                      else R
+                  }
+              if(m0 && .qr.rank.def.truncating && complete)
+                  R <- R[seq_len(m - m0), , drop = FALSE]
+              if(complete || backPermute) R else triu(R)
+          })
 
 setMethod("qr.X", signature(qr = "sparseQR"),
           function(qr, complete = FALSE,
-                   ## FIXME:
-                   ## R CMD check complains, but really
-                   ## formals(base::qr.X)[["ncol"]] should change ...
+                   ## FIXME: R CMD check complains, but see ./AllGenerics.R
                    ncol = if (complete) nrow(R) else min(dim(R))) {
               m0 <- .qr.rank.def.warn(qr)
               R <- qr@R

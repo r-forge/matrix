@@ -108,7 +108,6 @@ export(.CR2RC,
        nearPD,
        onenormest,
        qr2rankMatrix,
-       qrR,
        printSpMatrix,
        printSpMatrix2,
        rankMatrix,
@@ -123,6 +122,9 @@ export(.CR2RC,
        sparseMatrix,
        sparseVector,
        uniqTsparse)
+
+## Deprecated since Matrix 1.6-0 {Jul 2023}
+export(qrR)
 
 ## Deprecated since Matrix 1.5-4 {Apr 2023}
 export(..2dge, .C2nC, .T2Cmat, .asmatrix, .dense2sy,
