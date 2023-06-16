@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-14 r4067)}{
+\section{Changes in version 1.6-0 (2023-06-16 r4073)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -176,6 +176,12 @@
       version of the already exported \code{invPerm}, which
       is retained as a wrapper around \code{invertPerm} for
       backwards compatibility.
+
+      \item The \code{qr.R} method for class \code{sparseQR}
+      gains a \code{backPermute} argument with default \code{FALSE},
+      for compatibility with \pkg{base}.  Function \code{qrR},
+      which existed primarily to provide a back-permuting option,
+      is retained for backwards compatibility.
     }
   }
   \subsection{Bug Fixes}{

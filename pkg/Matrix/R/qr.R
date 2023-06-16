@@ -126,8 +126,8 @@ qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
 }
 
 setMethod("qr.R", signature(qr = "sparseQR"),
-          function(qr, complete = FALSE)
-              qrR(qr, complete = complete, backPermute = FALSE,
+          function(qr, complete = FALSE, backPermute = FALSE, ...)
+              qrR(qr, complete = complete, backPermute = backPermute,
                   row.names = FALSE))
 
 setMethod("qr.X", signature(qr = "sparseQR"),
