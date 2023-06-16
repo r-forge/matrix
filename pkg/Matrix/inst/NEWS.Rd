@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-16 r4073)}{
+\section{Changes in version 1.6-0 (2023-06-16 r4075)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -228,6 +228,12 @@
       \code{b} have default \code{sparse = TRUE}, while methods
       for sparse \code{a} and dense \code{b} have default
       \code{sparse = FALSE}.
+
+      \item \code{solve(<symmetricMatrix>)} now always gives a
+      \code{symmetricMatrix} result.  \code{solve(<dpoMatrix>)}
+      and \code{solve(<dppMatrix>)} preserve formal positive
+      definiteness, giving a \code{dpoMatrix} and \code{dppMatrix},
+      respectively.
       
       \item The prototype of the \code{Dim} slot of virtual class
       \code{MatrixFactorization} is now \code{integer(2L)}.
