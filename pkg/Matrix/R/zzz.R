@@ -176,11 +176,6 @@
     .Deprecated(new = ".sparse2kind", package = "Matrix")
     .sparse2kind(from, "l")
 }
-qrR <- function(qr, complete = FALSE, backPermute = TRUE,
-                row.names = TRUE) {
-    .Deprecated(new = "qr.R", package = "Matrix")
-    qr.R(qr, complete = complete, backPermute = backPermute)
-}
 
 ## Utility for Matrix.DeprecatedCoerce(); see below
 .as.via.virtual <- function(Class1, Class2, from = quote(from)) {
