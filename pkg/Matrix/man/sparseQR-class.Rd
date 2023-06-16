@@ -61,21 +61,12 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
     almost always the result of a call to generic function \code{qr}
     with sparse \code{x}.}
   \item{complete}{a logical indicating if \eqn{R} should be returned
-    instead of \eqn{R_{1}}{R1}.  Note that \eqn{R} and \eqn{R_{1}}{R1}
-    coincide in the \eqn{m = n} case.}
-  \item{backPermute}{a logical indicating if \eqn{R_{1} P_{2}'}{R1 * P2'} 
-    (\eqn{R P_{2}'}{R * P2'} if \code{complete = TRUE}) should be returned 
-    instead of \eqn{R_{1}}{R1} (\eqn{R} if \code{complete = TRUE}).}
+    instead of \eqn{R_{1}}{R1}.}
+  \item{backPermute}{a logical indicating if \eqn{R} or \eqn{R_{1}}{R1}
+    should be multiplied on the right by \eqn{P_{2}'}{P2'}.}
   \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
     should be propagated unpermuted to the result.
     If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
-}
-\value{
-  \code{qrR} returns
-  a \code{\linkS4class{dtCMatrix}} representing \eqn{R_{1}}{R1}
-  (if \code{complete = FALSE}) or
-  a \code{\linkS4class{dgCMatrix}} representing \eqn{R}
-  (if \code{complete = TRUE}).
 }
 \section{Slots}{
   \describe{
@@ -128,10 +119,14 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       depending on optional argument \code{complete}.  The default
       is \code{FALSE}, indicating \eqn{P_{1}' Q_{1}}{P1' * Q1}.}
     \item{\code{qr.R}}{\code{signature(qr = "sparseQR")}:
-      returns either \eqn{R} as a \code{\linkS4class{dgCMatrix}}
-      or \eqn{R_{1}}{R1} as a \code{\linkS4class{dtCMatrix}},
-      depending on optional argument \code{complete}.  The default
-      is \code{FALSE}, indicating \eqn{R_{1}}{R1}.}
+      \code{qrR} returns \eqn{R}, \eqn{R_{1}}{R1}, 
+      \eqn{R P2'}{R * P2'}, or \eqn{R_{1} P2'}{R1 *  P2'},
+      depending on optional arguments \code{complete} and
+      \code{backPermute}.  The default in both cases is \code{FALSE},
+      indicating \eqn{R_{1}}{R1}, for compatibility with \pkg{base}.  
+      The class of the result in that case is
+      \code{\linkS4class{dtCMatrix}}.  In the other three cases,
+      it is \code{\linkS4class{dgCMatrix}}.}
     \item{\code{qr.X}}{\code{signature(qr = "sparseQR")}:
       returns \eqn{A} as a \code{\linkS4class{dgeMatrix}},
       by default.  If \eqn{m > n} and optional argument
@@ -190,6 +185,12 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   \code{qr.fitted}, and \code{qr.resid} are well-defined, and
   in those cases the sparse and dense computations \emph{should}
   compare equal (within some tolerance).
+
+  The method for \code{qr.R} is a simple wrapper around \code{qrR},
+  but not back-permuting by default and never giving row names.
+  It did not support \code{backPermute = TRUE} until \pkg{Matrix}
+  \code{1.6-0}, hence code needing the back-permuted result should
+  call \code{qrR} if \pkg{Matrix} \code{>= 1.6-0} is not known.
 }
 \seealso{
   Class \code{\linkS4class{dgCMatrix}}.
