@@ -25,7 +25,6 @@
 \alias{.n2dgT}
 \alias{.nC2d}
 \alias{.nC2l}
-\alias{qrR}
 %
 \alias{chol2inv,CHMfactor-method}
 \alias{coerce,CHMfactor,Matrix-method}
@@ -228,7 +227,6 @@
 }
 \usage{
 ## Deprecated in 1.6-0
-qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
 \S4method{chol2inv}{CHMfactor}(x, ...)
 \S4method{coerce}{CHMfactor,Matrix}(from, to, strict = TRUE)
 \S4method{coerce}{CHMfactor,RsparseMatrix}(from, to, strict = TRUE)
