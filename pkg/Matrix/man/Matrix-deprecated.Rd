@@ -32,7 +32,6 @@
 \alias{coerce,CHMfactor,TsparseMatrix-method}
 \alias{coerce,CHMfactor,dMatrix-method}
 \alias{coerce,CHMfactor,dsparseMatrix-method}
-\alias{coerce,CHMfactor,sparseMatrix-method}
 \alias{coerce,CHMfactor,triangularMatrix-method}
 \alias{coerce,RsparseMatrix,dgeMatrix-method}
 \alias{coerce,ddenseMatrix,dgeMatrix-method}

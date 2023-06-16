@@ -348,6 +348,11 @@ setAs("CHMsuper", "CsparseMatrix",
       function(from)
           as(from, "dgCMatrix"))
 
+## MJ: was documented, hence keeping for backwards compatibility
+setAs("CHMfactor", "sparseMatrix",
+      function(from)
+          as(from, "CsparseMatrix"))
+
 setAs("CHMfactor", "pMatrix",
       function(from) {
           r <- new("pMatrix")
