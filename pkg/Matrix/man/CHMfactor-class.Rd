@@ -16,6 +16,7 @@
 \alias{nCHMsimpl-class}
 \alias{nCHMsuper-class}
 %
+\alias{coerce,CHMfactor,sparseMatrix-method}
 \alias{coerce,CHMfactor,pMatrix-method}
 \alias{coerce,CHMsimpl,CsparseMatrix-method}
 \alias{coerce,CHMsimpl,dtCMatrix-method}
@@ -181,6 +182,10 @@ isLDL(x)
       the supernodal algorithm must store zeros above the diagonal.}
     \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "CsparseMatrix")}:
       equivalent to \code{as(., "dgCMatrix")}.}
+    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "sparseMatrix")}:
+      equivalent to \code{as(., "CsparseMatrix")} and available
+      primarily for backwards compatibility.  New code should
+      coerce directly to \code{\linkS4class{CsparseMatrix}}.}
     \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
       returns a \code{\linkS4class{pMatrix}} representing
       the permutation matrix \eqn{P_{1}}.}
