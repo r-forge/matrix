@@ -40,7 +40,7 @@ setGeneric("expm",
                standardGeneric("expm"))
 
 setGeneric("facmul",
-           function(x, factor, y, transpose, left, ...)
+           function(x, factor, y, trans = FALSE, left = TRUE, ...)
                standardGeneric("facmul"),
            signature = c("x", "y"))
 
