@@ -83,6 +83,7 @@ export(.CR2RC,
        abIseq,
        abIseq1,
        anyDuplicatedT,
+       asPerm,
        bandSparse,
        bdiag,
        c.sparseVector, # c() dispatches on first argument only => allow method to be called explicitly if that argument may not be a sparseVector
