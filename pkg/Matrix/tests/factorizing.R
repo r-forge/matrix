@@ -721,8 +721,7 @@ stopifnot(exprs = {
     chkMF(   S , mS,       lu)
     chkMF(  pS , mS,       lu)
     chkMF(  sS , mS,       lu)
-    chkMF(  sS , mS,       qr, complete =  TRUE)
-    chkMF(  sS , mS,       qr, complete = FALSE)
+    chkMF(  sS , mS,       qr)
     chkMF(   S , mS, BunchKaufman)
     chkMF(  pS , mS, BunchKaufman)
     chkMF(t( S), mS, BunchKaufman)
@@ -731,9 +730,9 @@ stopifnot(exprs = {
     chkMF(  pS , mS, Cholesky)
     chkMF(t( S), mS, Cholesky)
     chkMF(t(pS), mS, Cholesky)
-    chkMF(  sS , mS, Cholesky, super =  TRUE)
     chkMF(  sS , mS, Cholesky, super = FALSE, LDL =  TRUE)
     chkMF(  sS , mS, Cholesky, super = FALSE, LDL = FALSE)
+    chkMF(  sS , mS, Cholesky, super =  TRUE, LDL = FALSE)
 })
 
 

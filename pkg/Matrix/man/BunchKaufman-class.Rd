@@ -129,24 +129,25 @@ n <- 6L
 dimnames(A) <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (bk.A <- BunchKaufman(A))
-str(e.bk.A <- expand2(bk.A), max.level = 2L)
+str(e.bk.A <- expand2(bk.A, complete = FALSE), max.level = 2L)
+str(E.bk.A <- expand2(bk.A, complete =  TRUE), max.level = 2L)
 
 ## Underlying LAPACK representation
 (m.bk.A <- as(bk.A, "dtrMatrix"))
 stopifnot(identical(as(m.bk.A, "matrix"), `dim<-`(bk.A@x, bk.A@Dim)))
 
-## Number of factors is 2*b+1, b <= n, which can be nontrivial,
-## hence methods for 'expand2' are mostly didactic
-(b <- (length(e.bk.A) - 1L) \%/\% 2L)
+## Number of factors is 2*b+1, b <= n, which can be nontrivial ...
+(b <- (length(E.bk.A) - 1L) \%/\% 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 
-## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+## A ~ U DU U', U := prod(Pk Uk) in floating point
 stopifnot(exprs = {
-    ae1(  Reduce(`\%*\%`, e.bk.A[ seq_len(b     )]),
-        t(Reduce(`\%*\%`, e.bk.A[-seq_len(b + 1L)])))
-    ae1(A, Reduce(`\%*\%`, e.bk.A))
+    identical(names(e.bk.A), c("U", "DU", "U."))
+    identical(e.bk.A[["U" ]], Reduce(`\%*\%`, E.bk.A[seq_len(b)]))
+    identical(e.bk.A[["U."]], t(e.bk.A[["U"]]))
+    ae1(A, with(e.bk.A, U \%*\% DU \%*\% U.))
 })
 
 ## Factorization handled as factorized matrix

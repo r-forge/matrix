@@ -35,14 +35,34 @@ setAs("pBunchKaufman", "dtpMatrix",
           to
       })
 
-.def.unpacked <- .def.packed <- function(x, ...) {
+.def.unpacked <- .def.packed <- function(x, complete = FALSE, ...) {
     r <- .Call(BunchKaufman_expand, x, .PACKED)
+    b <- length(r) - 1L
+    if(complete) {
+        if(b > 0L)
+            r <- c(r, lapply(r[b:1L], t))
+    } else {
+        if(b > 0L) {
+            m <- r[[b]]
+            if(b > 1L)
+                for(i in (b - 1L):1L)
+                    m <- r[[i]] %*% m
+            r <- list(m, r[[b + 1L]], t(m))
+        } else {
+            m <- new("ddiMatrix")
+            m@Dim <- x@Dim
+            m@diag <- "U"
+            r <- list(m, r[[1L]], m)
+        }
+        names(r) <- if(x@uplo == "U") c("U", "DU", "U.") else c("L", "DL", "L.")
+    }
     dn <- x@Dimnames
-    if(b <- length(r) - 1L) {
-        r <- c(r, lapply(r[b:1L], t))
+    if(length(r) == 1L)
+        r[[1L]]@Dimnames <- dn
+    else {
         r[[1L]]@Dimnames <- c(dn[1L], list(NULL))
         r[[length(r)]]@Dimnames <- c(list(NULL), dn[2L])
-    } else r@Dimnames <- dn
+    }
     r
 }
 body(.def.unpacked) <-
@@ -50,16 +70,10 @@ body(.def.unpacked) <-
 body(.def.packed) <-
     do.call(substitute, list(body(.def.packed  ), list(.PACKED =  TRUE)))
 
-## returning:
-##
-## list(P[b], U[b], ..., P[1], U[1], D, U[1]', P[1]', ..., U[b]', P[b]')
-##     where A = U D U' and U = P[b] U[b] ... P[1] U[1]
-##
+## returning
+## list(U, DU, U') where A = U DU U' and U = P[b] U[b] ... P[1] U[1]
 ## OR
-##
-## list(P[1], L[1], ..., P[b], L[b], D, L[b]', P[b]', ..., L[1]', P[1]')
-##     where A = L D L' and L = P[1] L[1] ... P[b] L[b]
+## list(L, DL, L') where A = L DL L' and L = P[1] L[1] ... P[b] L[b]
 setMethod("expand2", signature(x =  "BunchKaufman"), .def.unpacked)
 setMethod("expand2", signature(x = "pBunchKaufman"), .def.packed)
-
 rm(.def.unpacked, .def.packed)
