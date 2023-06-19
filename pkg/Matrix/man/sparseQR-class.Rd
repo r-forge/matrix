@@ -201,6 +201,8 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
 
   \code{\link{qr-methods}} for methods defined in \pkg{Matrix}.
   
+  Generic functions \code{\link{expand1}} and \code{\link{expand2}}.
+  
   The many auxiliary functions for QR factorizations:
   \code{\link{qr.Q}}, \code{\link{qr.R}}, \code{\link{qr.X}},
   \code{\link{qr.coef}}, \code{\link{qr.fitted}}, \code{\link{qr.resid}},

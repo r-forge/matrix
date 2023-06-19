@@ -31,6 +31,11 @@ setGeneric("expand",
            function(x, ...)
                standardGeneric("expand"))
 
+setGeneric("expand1",
+           function(x, which, ...)
+               standardGeneric("expand1"),
+           signature = "x")
+
 setGeneric("expand2",
            function(x, ...)
                standardGeneric("expand2"))

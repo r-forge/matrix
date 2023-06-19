@@ -120,7 +120,7 @@ lu(x, \dots)
   Classes \code{\linkS4class{dgeMatrix}} and
   \code{\linkS4class{dgCMatrix}}.
 
-  Generic function \code{\link{expand2}},
+  Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
   
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},

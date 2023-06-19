@@ -369,49 +369,49 @@ rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 setAs("CHMfactor", "Matrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"Matrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "expand1(., \"L\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          expand1(from, "L")
       })
 
 setAs("CHMfactor", "dMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dMatrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "expand1(., \"L\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          expand1(from, "L")
       })
 
 setAs("CHMfactor", "dsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"dsparseMatrix\")",
-                      new = "as(., \"CsparseMatrix\")",
+                      new = "expand1(., \"L\")",
                       package = "Matrix")
-          as(from, "CsparseMatrix")
+          expand1(from, "L")
       })
 
 setAs("CHMfactor", "RsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"RsparseMatrix\")",
+                      new = "as(expand1(., \"L\"), \"RsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "RsparseMatrix")
+          as(expand1(from, "L"), "RsparseMatrix")
       })
 
 setAs("CHMfactor", "TsparseMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"TsparseMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"TsparseMatrix\")",
+                      new = "as(expand1(., \"L\"), \"TsparseMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "TsparseMatrix")
+          as(expand1(from, "L"), "TsparseMatrix")
       })
 
 setAs("CHMfactor", "triangularMatrix",
       function(from) {
           .Deprecated(old = "as(<CHMfactor>, \"triangularMatrix\")",
-                      new = "as(as(., \"CsparseMatrix\"), \"triangularMatrix\")",
+                      new = "as(expand1(., \"L\"), \"triangularMatrix\")",
                       package = "Matrix")
-          as(as(from, "CsparseMatrix"), "triangularMatrix")
+          as(expand1(from, "L"), "triangularMatrix")
       })
 
 setMethod("chol2inv", signature(x = "CHMfactor"),

@@ -240,9 +240,9 @@ isLDL(x)
 }
 \seealso{
   Class \code{\linkS4class{dsCMatrix}}.
-  
-  Generic functions \code{\link{expand2}}, \code{\link{updown}},
-  and \code{\link{Cholesky}}.
+
+  Generic functions \code{\link{Cholesky}}, \code{\link{updown}},
+  \code{\link{expand1}} and \code{\link{expand2}}.
 }
 \references{
   The CHOLMOD source code; see

@@ -28,10 +28,36 @@ setMethod("qr", signature(x = "dgCMatrix"),
 ## METHODS FOR CLASS: sparseQR
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## TODO: define implicit generic qr.(Q|R|X|coef|fitted|resid|qty|qy) with
-##       formal argument '...' so that we can define methods with further
-##       optional arguments ('backPermute', etc.) and perhaps deprecate
-##       the 'qrR' work-around
+setMethod("expand1", signature(x = "sparseQR"),
+          function(x, which, ...) {
+              .qr.rank.def.warn(x)
+              R <- x@R
+              d <- R@Dim
+              m <- d[1L]
+              n <- d[2L]
+              switch(which,
+                     "P1" =, "P1." = {
+                         r <- new("pMatrix")
+                         r@Dim <- c(m, m)
+                         r@perm <- x@p + 1L
+                         if(which == "P1.")
+                             r@margin <- 2L
+                         r
+                     },
+                     "P2" =, "P2." = {
+                         r <- new("pMatrix")
+                         r@Dim <- c(n, n)
+                         r@perm <- if(length(x@q)) x@q + 1L else seq_len(n)
+                         if(which == "P2")
+                             r@margin <- 2L
+                         r
+                     },
+                     "Q"  = .Call(sparseQR_matmult, x, NULL, 6L,  TRUE, NULL),
+                     "Q1" = .Call(sparseQR_matmult, x, NULL, 6L, FALSE, NULL),
+                     "R"  = R,
+                     "R1" = triu(if(m == n) R else R[seq_len(n), , drop = FALSE]),
+                     stop("'which' is not \"P1\", \"P1.\", \"P2\", \"P2.\", \"Q\", \"Q1\", \"R\", or \"R1\""))
+          })
 
 ## returning list(P1', Q, R, P2'), where A = P1' Q R P2'
 setMethod("expand2", signature(x = "sparseQR"),

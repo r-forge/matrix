@@ -69,7 +69,8 @@
   
   Class \code{\linkS4class{dgCMatrix}}.
 
-  Generic functions \code{\link{expand2}} and \code{\link{lu}}.
+  Generic functions \code{\link{lu}},
+  \code{\link{expand1}} and \code{\link{expand2}}.
 }
 \references{
   Davis, T. A. (2006).

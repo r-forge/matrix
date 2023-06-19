@@ -170,6 +170,60 @@ setAs("denseLU", "dgeMatrix",
           to
       })
 
+setMethod("expand1", signature(x = "denseLU"),
+          function(x, which, ...) {
+              d <- x@Dim
+              m <- d[1L]
+              n <- d[2L]
+              switch(which,
+                     "P1" =, "P1." = {
+                         r <- new("pMatrix")
+                         r@Dim <- c(m, m)
+                         r@perm <- asPerm(x@perm)
+                         if(which == "P1.")
+                             r@margin <- 2L
+                         r
+                     },
+                     "L" = {
+                         if(m <= n) {
+                             r <- new("dtrMatrix")
+                             r@Dim <- c(m, m)
+                             r@uplo <- "L"
+                             r@diag <- "U"
+                             r@x <-
+                                 if(m == n)
+                                     x@x
+                                 else x@x[seq_len(m * as.double(m))]
+                         } else {
+                             r <- new("dgeMatrix")
+                             r@Dim <- d
+                             r@x <- x@x
+                         }
+                         r
+                     },
+                     "U" = {
+                         if (m >= n) {
+                             r <- new("dtrMatrix")
+                             r@Dim <- c(n, n)
+                             r@x <-
+                                 if(m == n)
+                                     x@x
+                                 else {
+                                     length.out <- rep.int(n, n)
+                                     from <- seq.int(from = 1L, by = m,
+                                                     length.out = n)
+                                     x@x[sequence.default(length.out, from)]
+                                 }
+                         } else {
+                             r <- new("dgeMatrix")
+                             r@Dim <- d
+                             r@x <- x@x
+                         }
+                         r
+                     },
+                     stop("'which' is not \"P1\", \"P1.\", \"L\", or \"U\""))
+          })
+
 ## returning list(P1', L, U), where A = P1' L U
 setMethod("expand2", signature(x = "denseLU"),
           function(x, ...)
@@ -191,6 +245,30 @@ setMethod("expand", signature(x = "denseLU"),
 ## METHODS FOR CLASS: sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("expand1", signature(x = "sparseLU"),
+          function(x, which, ...) {
+              switch(which,
+                     "P1" =, "P1." = {
+                         r <- new("pMatrix")
+                         r@Dim <- x@Dim
+                         r@perm <- x@p + 1L
+                         if(which == "P1.")
+                             x@margin <- 2L
+                         r
+                     },
+                     "P2" =, "P2." = {
+                         r <- new("pMatrix")
+                         r@Dim <- d <- x@Dim
+                         r@perm <- if(length(x@q)) x@q + 1L else seq_len(d[1L])
+                         if(which == "P2")
+                             r@margin <- 2L
+                         r
+                     },
+                     "L" = x@L,
+                     "U" = x@U,
+                     stop("'which' is not \"P1\", \"P1.\", \"P2\", \"P2.\", \"L\", or \"U\""))
+          })
+
 ## returning list(P1', L, U, P2'), where A = P1' L U P2'
 setMethod("expand2", signature(x = "sparseLU"),
           function(x, ...) {
@@ -202,7 +280,6 @@ setMethod("expand2", signature(x = "sparseLU"),
               P1. <- new("pMatrix")
               P1.@Dim <- d
               P1.@Dimnames <- c(dn[1L], list(NULL))
-              P1.@margin <- 1L
               P1.@perm <- invertPerm(p1, 0L, 1L)
 
               P2. <- new("pMatrix")

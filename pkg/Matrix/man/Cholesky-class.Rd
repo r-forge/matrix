@@ -112,7 +112,8 @@
 
   Classes \code{\linkS4class{dpoMatrix}} and \code{\linkS4class{dppMatrix}}.
   
-  Generic functions \code{\link{expand2}} and \code{\link{Cholesky}}.
+  Generic functions \code{\link{Cholesky}},
+  \code{\link{expand1}} and \code{\link{expand2}}.
 }
 \references{
   The LAPACK source code, including documentation; see

@@ -183,8 +183,8 @@ Cholesky(A, \dots)
   for obtaining the upper triangular Cholesky factor \eqn{L'} as a
   \code{\linkS4class{Matrix}}.
 
-  Generic function \code{\link{expand2}},
-  for constructing a list of matrix factors from the result.
+  Generic functions \code{\link{expand1}} and \code{\link{expand2}},
+  for constructing matrix factors from the result.
 
   Generic functions \code{\link{BunchKaufman}}, \code{\link{Schur}},
   \code{\link{lu}}, and \code{\link{qr}},

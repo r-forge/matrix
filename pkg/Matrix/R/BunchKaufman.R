@@ -35,6 +35,48 @@ setAs("pBunchKaufman", "dtpMatrix",
           to
       })
 
+.def.unpacked <- .def.packed <- function(x, which, ...) {
+    r <- .Call(BunchKaufman_expand, x, .PACKED)
+    b <- length(r) - 1L
+    switch(which,
+           "DU" =, "DL" = {
+               if(!endsWith(which, x@uplo))
+                   stop(gettextf("which=\"%s\" invalid for x@uplo=\"%s\"",
+                                 which, x@uplo),
+                        domain = NA)
+               r[[b + 1L]]
+           },
+           "U" =, "U." =, "L" =, "L." = {
+               if(!startsWith(which, x@uplo))
+                   stop(gettextf("which=\"%s\" invalid for x@uplo=\"%s\"",
+                                 which, x@uplo),
+                        domain = NA)
+               if(b > 0L) {
+                   m <- r[[b]]
+                   if(b > 1L)
+                       for(i in (b - 1L):1L)
+                           m <- r[[i]] %*% m
+                   if(endsWith(which, ".")) t(m) else m
+               } else {
+                   m <- new("ddiMatrix")
+                   m@Dim <- x@Dim
+                   m@diag <- "U"
+                   m
+               }
+           },
+           stop(gettextf("'which' is not \"%1$s\", \"D%1$s\", or \"%1$s.\"",
+                         x@uplo),
+                domain = NA))
+}
+body(.def.unpacked) <-
+    do.call(substitute, list(body(.def.unpacked), list(.PACKED = FALSE)))
+body(.def.packed) <-
+    do.call(substitute, list(body(.def.packed  ), list(.PACKED =  TRUE)))
+
+setMethod("expand1", signature(x =  "BunchKaufman"), .def.unpacked)
+setMethod("expand1", signature(x = "pBunchKaufman"), .def.packed)
+rm(.def.unpacked, .def.packed)
+
 .def.unpacked <- .def.packed <- function(x, complete = FALSE, ...) {
     r <- .Call(BunchKaufman_expand, x, .PACKED)
     b <- length(r) - 1L

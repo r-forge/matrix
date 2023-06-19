@@ -63,7 +63,7 @@ BunchKaufman(x, \dots)
   Classes \code{\linkS4class{dsyMatrix}} and
   \code{\linkS4class{dspMatrix}}.
   
-  Generic function \code{\link{expand2}},
+  Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
   
   Generic functions \code{\link{Cholesky}}, \code{\link{Schur}},

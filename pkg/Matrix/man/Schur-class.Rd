@@ -58,6 +58,8 @@
     \item{\code{determinant}}{\code{signature(from = "Schur", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
+    \item{expand1}{\code{signature(x = "Schur")}:
+      see \code{\link{expand1-methods}}.}
     \item{expand2}{\code{signature(x = "Schur")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{solve}}{\code{signature(a = "Schur", b = .)}:
@@ -72,7 +74,8 @@
 \seealso{
   Class \code{\linkS4class{dgeMatrix}}.
   
-  Generic functions \code{\link{expand2}} and \code{\link{Schur}}.
+  Generic functions \code{\link{Schur}},
+  \code{\link{expand1}} and \code{\link{expand2}}.
 }
 \references{
   The LAPACK source code, including documentation; see
