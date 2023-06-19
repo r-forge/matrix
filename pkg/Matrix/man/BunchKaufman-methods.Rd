@@ -98,7 +98,7 @@ class(A) # dsCMatrix
 }
 (bk.A <- BunchKaufman(as(A, "unpackedMatrix")))
 
-## A ~ prod(Pk Uk) D prod(Pk Uk)' in floating point
+## A ~ U DU U' in floating point
 str(e.bk.A <- expand2(bk.A), max.level = 2L)
 stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
 }
