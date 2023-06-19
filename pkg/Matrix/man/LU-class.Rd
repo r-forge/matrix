@@ -36,8 +36,8 @@
       manual for LAPACK routine \code{dgetrf}.}
     \item{\code{perm}}{an integer vector of length \code{min(Dim)}
       specifying the permutation \eqn{P_{1}}{P1} as a product of
-      transpositions.   If \code{perm[i] = j}, then rows \code{i} and
-      \code{j} were interchanged in step \code{i} of the factorization.}
+      transpositions.   The corresponding permutation vector can
+      be obtained as \code{\link{asPerm}(perm)}.}
   }
 }
 \section{Extends}{
