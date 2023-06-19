@@ -80,6 +80,8 @@
     \item{\code{determinant}}{\code{signature(from = "p?BunchKaufman", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
+    \item{\code{expand1}}{\code{signature(x = "p?BunchKaufman")}:
+      see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "p?BunchKaufman")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{solve}}{\code{signature(a = "p?BunchKaufman", b = .)}:
@@ -106,7 +108,8 @@
 \seealso{
   Class \code{\linkS4class{dsyMatrix}} and its packed counterpart.
 
-  Generic function \code{\link{BunchKaufman}}.
+  Generic functions \code{\link{BunchKaufman}},
+  \code{\link{expand1}}, and \code{\link{expand2}}.
 }
 \references{
   The LAPACK source code, including documentation; see

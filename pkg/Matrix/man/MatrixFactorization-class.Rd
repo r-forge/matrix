@@ -106,8 +106,9 @@
   \code{\link{Schur}}, \code{\link{lu}}, and \code{\link{qr}} for
   \emph{computing} factorizations.
 
-  Generic function \code{\link{expand2}} for constructing
-  matrix factors from \code{MatrixFactorization} objects.
+  Generic functions \code{\link{expand1}} and \code{\link{expand2}}
+  for constructing matrix factors from \code{MatrixFactorization}
+  objects.
 }
 \examples{
 showClass("MatrixFactorization")

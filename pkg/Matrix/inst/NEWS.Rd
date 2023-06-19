@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-19 r4078)}{
+\section{Changes in version 1.6-0 (2023-06-19 r4082)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -103,21 +103,29 @@
       checks that the \code{V} slot is lower trapezoidal and that
       the \code{R} slot has non-negative diagonal elements.
 
-      \item New generic function \code{expand2}, improving on the
-      existing generic function \code{expand} by listing \emph{all}
-      factors \emph{in order}, with row names on the first factor and
-      column names on the last factor, supporting reconstruction of
-      the factorized \code{Matrix} as \code{Reduce(`\%*\%`, expand2(.))}.
+      %% TODO: examples and tests using expand1
+      %% DONE: examples and tests using expand2
+      \item New generic functions \code{expand1} and \code{expand2},
+      intended to eventually replace \code{expand} and certain coercions
+      from (subclasses of) \code{MatrixFactorization} to (subclasses of)
+      \code{Matrix}.  \code{expand1} is used as
+      \code{expand1(<MatrixFactorization>, <character string>)}
+      and constructs by name factors appearing in the factorization.
+      \code{expand2} is used as \code{expand2(<MatrixFactorization>)}
+      and returns a named list of \emph{all} factors appearing in the
+      factorization, in order and with row names on the first factor
+      and column names on the last factor.  The result can be used to
+      reconstruct the factorized \code{Matrix} as the product of the
+      elements of the list, namely \code{Reduce(`\%*\%`, expand2(.))}.
       \cr
       \code{expand} and its methods are retained for backwards
       compatibility.  They may be formally deprecated in the future,
-      hence new code should use \code{expand2}.
-      Notably, \code{expand2} has methods for all factorizations in
-      \pkg{Matrix}, whereas \code{expand} continues to have methods
-      only for \code{denseLU}, \code{sparseLU}, and \code{CHMfactor}.
-      See \code{help("expand2-methods")} for a list of methods,
-      including useful optional arguments for Cholesky and QR
-      factorizations.
+      hence new code should use \code{expand1} and \code{expand2}.
+      Notably, \code{expand1} and \code{expand2} have methods for all
+      factorizations in \pkg{Matrix}, whereas \code{expand} continues
+      to have methods only for \code{denseLU}, \code{sparseLU}, and
+      \code{CHMfactor}.  See \code{help("expand-methods")} for a list
+      of methods, including useful optional arguments.
       
       \item Generic function \code{Cholesky} gains methods for
       \code{denseMatrix} returning an object of class \code{p?Cholesky}.

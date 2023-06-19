@@ -109,6 +109,11 @@ setMethod("Schur", signature(x = "triangularMatrix"),
 ## METHODS FOR CLASS: Schur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+setMethod("expand1", signature(x = "Schur"),
+          function(x, which, ...)
+              switch(which, "Q" = x@Q, "T" = x@T, "Q." = t(x@Q),
+                     stop("'which' is not \"Q\", \"T\", or \"Q.\"")))
+
 setMethod("expand2", signature(x = "Schur"),
           function(x, ...) {
               Q  <- x@Q

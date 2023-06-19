@@ -1,4 +1,4 @@
-\name{expand2-methods}
+\name{expand-methods}
 \title{Expand Matrix Factorizations}
 %
 \docType{methods}
@@ -8,12 +8,25 @@
 %
 \alias{expand}
 \alias{expand-methods}
+\alias{expand1}
+\alias{expand1-methods}
 \alias{expand2}
 \alias{expand2-methods}
 %
 \alias{expand,CHMfactor-method}
 \alias{expand,denseLU-method}
 \alias{expand,sparseLU-method}
+%
+\alias{expand1,BunchKaufman-method}
+\alias{expand1,CHMsimpl-method}
+\alias{expand1,CHMsuper-method}
+\alias{expand1,Cholesky-method}
+\alias{expand1,Schur-method}
+\alias{expand1,denseLU-method}
+\alias{expand1,pBunchKaufman-method}
+\alias{expand1,pCholesky-method}
+\alias{expand1,sparseLU-method}
+\alias{expand1,sparseQR-method}
 %
 \alias{expand2,BunchKaufman-method}
 \alias{expand2,CHMsimpl-method}
@@ -27,37 +40,64 @@
 \alias{expand2,sparseQR-method}
 %
 \description{
-  \code{expand} and \code{expand2} construct matrix factors from objects
-  specifying matrix factorizations.  Such objects typically do not store
-  factors explicitly, employing instead a compact representation to save
-  memory.
+  \code{expand1} and \code{expand2} construct matrix factors from
+  objects specifying matrix factorizations.  Such objects typically
+  do not store the factors explicitly, employing instead a compact
+  representation to save memory.
 }
 \usage{
+expand1(x, which, \dots)
 expand2(x, \dots)
+
 expand (x, \dots)
 }
 \arguments{
   \item{x}{a matrix factorization, typically inheriting from
     virtual class \code{\linkS4class{MatrixFactorization}}.}
+  \item{which}{a character string indicating a matrix factor.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{
-  A list of matrix factors, typically with names using conventional
-  notation, as in \code{list(L=, U=)}.
+  \code{expand1} returns an object inheriting from virtual class
+  \code{\linkS4class{Matrix}}, representing the factor indicated
+  by \code{which}.
+
+  \code{expand2} returns a list of factors, typically with names
+  using conventional notation, as in \code{list(L=, U=)}.
 }
 \details{
   Methods for \code{expand} are retained only for backwards
   compatibility with \pkg{Matrix} \code{< 1.6-0}.  New code
-  should use \code{expand2} whose methods are more consistent,
-  all obeying the rule that the product of the returned
-  matrix factors should reproduce (within some tolerance)
-  the factorized matrix, \emph{including} its \code{dimnames}.
+  should use \code{expand1} and \code{expand2}, whose methods
+  provide more control and behave more consistently.  Notably,
+  \code{expand2} obeys the rule that the product of the matrix
+  factors in the returned list should reproduce
+  (within some tolerance) the factorized matrix,
+  \emph{including} its \code{dimnames}.
   
-  Hence if \code{x} is a matrix and \code{y} is its factorization, then
+  Hence if \code{x} is a matrix and \code{y} is its factorization,
+  then
   \preformatted{    all.equal(as(x, "matrix"), as(Reduce(`\%*\%`, expand2(y)), "matrix"))}
   should in most cases return \code{TRUE}.
 }
 \section{Methods}{
+  The following table lists methods for \code{expand1} together with
+  allowed values of argument \code{which}.
+
+  \tabular{rl}{
+    \code{class(x)} \tab \code{which}\cr
+    \code{\linkS4class{Schur}} \tab \code{c("Q", "T", "Q.")}\cr
+    \code{\linkS4class{denseLU}} \tab \code{c("P1", "P1.", "L", "U")}\cr
+    \code{\linkS4class{sparseLU}} \tab \code{c("P1", "P1.", "P2", "P2.", "L", "U")}\cr
+    \code{\linkS4class{sparseQR}} \tab \code{c("P1", "P1.", "P2", "P2.", "Q", "Q1", "R", "R1")}\cr
+    \code{\linkS4class{BunchKaufman}}, \code{\linkS4class{pBunchKaufman}} \tab \code{c("U", "DU", "U.", "L", "DL", "L.")}\cr
+    \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}\cr
+    \code{\linkS4class{CHMsimpl}}, \code{\linkS4class{CHMsimpl}} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}
+  }
+
+  Methods for \code{expand2} and \code{expand} are described
+  below.  Factor names and classes apply also to \code{expand1}.
+  
   \describe{
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
       expands the factorization
