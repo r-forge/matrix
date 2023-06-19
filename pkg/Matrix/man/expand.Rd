@@ -87,8 +87,11 @@ expand (x, \dots)
       \eqn{U = \prod_{k = 1}^{b_{U}} P_{k} U_{k}}{U = prod(Pk * Uk : k = 1,...,bU)}
       and
       \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
-      as a list containing the \eqn{2 b_{U} + 1}{2*bU+1} or
-      \eqn{2 b_{L} + 1}{2*bL+1} matrix factors, depending on \code{x@uplo}.
+      as \code{list(U, DU, U.)} or \code{list(L, DL, L.)},
+      depending on \code{x@uplo}.  If optional argument \code{complete}
+      is \code{TRUE}, then an unnamed list giving the full expansion
+      with \eqn{2 b_{U} + 1}{2*bU+1} or \eqn{2 b_{L} + 1}{2*bL+1} matrix
+      factors is returned instead.
       \eqn{P_{k}}{Pk} are represented as \code{\linkS4class{pMatrix}},
       \eqn{U_{k}}{Uk} and \eqn{L_{k}}{Lk} are represented as
       \code{\linkS4class{dtCMatrix}}, and
