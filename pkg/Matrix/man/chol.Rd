@@ -198,8 +198,8 @@ b4 <- rnorm(5L)
 x4 <- solve(A4, b4)
 
 stopifnot(exprs = {
-    identical(R4.nopivot, t(as(ch.A4.nopivot, "CsparseMatrix")))
-    identical(R4, t(as(ch.A4, "CsparseMatrix")))
+    identical(R4.nopivot, expand1(ch.A4.nopivot, "L."))
+    identical(R4, expand1(ch.A4, "L."))
     all.equal(A4, crossprod(R4.nopivot))
     all.equal(A4[ch.A4@perm + 1L, ch.A4@perm + 1L], crossprod(R4))
     all.equal(diag(R4.nopivot), sqrt(diag(ch.A4.nopivot)))
