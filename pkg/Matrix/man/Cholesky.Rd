@@ -137,22 +137,10 @@ Cholesky(A, \dots)
   simple wrappers around \code{Cholesky} returning just the
   upper triangular Cholesky factor \eqn{L'},
   typically as a \code{\linkS4class{triangularMatrix}}.
-  An alternative is to extract factors from the list result
-  of \code{\link{expand2}(x, LDL=)}, where \code{x} is the
-  \code{CholeskyFactorization} object.
-  Yet another alternative is to coerce \code{x}, with
-  \code{as(x, "dtrMatrix")},
-  \code{as(x, "dtpMatrix")}, and
-  \code{as(x, "CsparseMatrix")} for \code{x} of class
-  \code{\linkS4class{Cholesky}},
-  \code{\linkS4class{pCholesky}}, and 
-  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}},
-  respectively.  All three coercions return \eqn{L} or \eqn{L'}
-  (depending on the \code{uplo} slot of \code{x} in the dense case,
-  whereas the result is always \eqn{L} in the sparse case).
-  Indeed, in cases where \eqn{L} or \eqn{L'} is needed explicitly
-  but not any other factor, coercion should be preferred over a
-  full expansion.
+  However, a more principled approach would be to construct
+  factors as needed from the \code{CholeskyFactorization} object,
+  e.g., with \code{\link{expand1}(x, "L")}, if \code{x} is the
+  object.
 
   The behaviour of \code{Cholesky(A, perm = TRUE)} for dense \code{A}
   is somewhat exceptional, in that it expects \emph{without} checking
@@ -303,7 +291,7 @@ s <- simplify2array
 rapply2 <- function(object, f, ...) rapply(object, f, , , how = "list", ...)
 
 s(rapply2(ch.A4, isLDL))
-s(m.ch.A4 <- rapply2(ch.A4, as, "CsparseMatrix")) # giving L = L1 sqrt(D)
+s(m.ch.A4 <- rapply2(ch.A4, expand1, "L")) # giving L = L1 sqrt(D)
 
 ## By design, the pivoted and simplicial factorizations
 ## are more sparse than the unpivoted and supernodal ones ...
@@ -349,8 +337,8 @@ alt <- function(P) {
 ## Expansions are elegant but inefficient (transposes are redundant)
 ## hence programmers should consider the 'coerce' and 'diag' methods
 stopifnot(exprs = {
-    identical(as(simpl1, "pMatrix"), alt(e.ch.A4[["P1"]]))
-    identical(as(simpl1, "CsparseMatrix"), E.ch.A4[["L"]])
+    identical(expand1(simpl1, "P1"), alt(e.ch.A4[["P1"]]))
+    identical(expand1(simpl1, "L"), E.ch.A4[["L"]])
     identical(Diagonal(x = diag(simpl1)), e.ch.A4[["D"]])
 })
 
@@ -379,7 +367,7 @@ isLDL(ch.A5)
 ## in finite precision arithmetic
 stopifnot(identical(table(factor(sign(d.A5), -1:1)), t.ev))
 
-try(as(ch.A5, "CsparseMatrix"))  # unable to compute L = L1 sqrt(D)
+try(expand1(ch.A5, "L"))         # unable to compute L = L1 sqrt(D)
 try(expand2(ch.A5, LDL = FALSE)) # ditto
 try(chol(A5, pivot = TRUE))      # ditto
 

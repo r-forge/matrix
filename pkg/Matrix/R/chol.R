@@ -368,23 +368,6 @@ setAs("CHMsuper", "dgCMatrix",
           to
       })
 
-setAs("CHMsimpl", "CsparseMatrix",
-      function(from)
-          expand1(from, "L"))
-
-setAs("CHMsuper", "CsparseMatrix",
-      function(from)
-          expand1(from, "L"))
-
-## MJ: was documented, hence keeping for backwards compatibility
-setAs("CHMfactor", "sparseMatrix",
-      function(from)
-          expand1(from, "L"))
-
-setAs("CHMfactor", "pMatrix",
-      function(from)
-          expand1(from, "P1"))
-
 setMethod("diag", signature(x = "CHMfactor"),
           function(x, nrow, ncol, names = TRUE)
               .Call(CHMfactor_diag_get, x, TRUE))
@@ -557,7 +540,7 @@ setMethod("expand2", signature(x = "CHMsuper"),
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "CHMfactor"),
           function(x, ...)
-              list(P = as(x, "pMatrix"), L = as(x, "CsparseMatrix")))
+              list(P = expand1(x, "P1"), L = expand1(x, "L")))
 
 .updateCHMfactor <- function(object, parent, mult = 0)
     .Call(CHMfactor_update, object, parent, mult)

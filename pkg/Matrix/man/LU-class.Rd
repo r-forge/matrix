@@ -62,6 +62,8 @@
       or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "denseLU")}:
       see \code{\link{expand-methods}}.}
+    \item{expand1}{\code{signature(x = "denseLU")}:
+      see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "denseLU")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{solve}}{\code{signature(a = "denseLU", b = "missing")}:

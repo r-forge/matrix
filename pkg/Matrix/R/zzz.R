@@ -368,57 +368,91 @@ rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 
 setAs("CHMfactor", "Matrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"Matrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
+          }
           expand1(from, "L")
       })
 
 setAs("CHMfactor", "dMatrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"dMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
+          }
           expand1(from, "L")
       })
 
 setAs("CHMfactor", "dsparseMatrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"dsparseMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
+          }
+          expand1(from, "L")
+      })
+
+setAs("CHMfactor", "CsparseMatrix",
+      function(from) {
+          if(FALSE) {
+          .Deprecated(old = "as(<CHMfactor>, \"CsparseMatrix\")",
+                      new = "expand1(., \"L\")",
+                      package = "Matrix")
+          }
           expand1(from, "L")
       })
 
 setAs("CHMfactor", "RsparseMatrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
                       new = "as(expand1(., \"L\"), \"RsparseMatrix\")",
                       package = "Matrix")
+          }
           as(expand1(from, "L"), "RsparseMatrix")
       })
 
 setAs("CHMfactor", "TsparseMatrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"TsparseMatrix\")",
                       new = "as(expand1(., \"L\"), \"TsparseMatrix\")",
                       package = "Matrix")
+          }
           as(expand1(from, "L"), "TsparseMatrix")
       })
 
 setAs("CHMfactor", "triangularMatrix",
       function(from) {
+          if(FALSE) {
           .Deprecated(old = "as(<CHMfactor>, \"triangularMatrix\")",
                       new = "as(expand1(., \"L\"), \"triangularMatrix\")",
                       package = "Matrix")
+          }
           as(expand1(from, "L"), "triangularMatrix")
+      })
+
+setAs("CHMfactor", "pMatrix",
+      function(from) {
+          if(FALSE) {
+          .Deprecated(old = "as(<CHMfactor>, \"pMatrix\")",
+                      new = "expand1(., \"P1\")",
+                      package = "Matrix")
+          }
+          expand1(from, "P1")
       })
 
 setMethod("chol2inv", signature(x = "CHMfactor"),
           function(x, ...) {
+              if(FALSE) {
               .Deprecated(old = "chol2inv(<CHMfactor>)",
                           new = "solve(.)",
                           package = "Matrix")
+              }
               solve(x)
           })
 

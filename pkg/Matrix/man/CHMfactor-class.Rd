@@ -16,11 +16,7 @@
 \alias{nCHMsimpl-class}
 \alias{nCHMsuper-class}
 %
-\alias{coerce,CHMfactor,sparseMatrix-method}
-\alias{coerce,CHMfactor,pMatrix-method}
-\alias{coerce,CHMsimpl,CsparseMatrix-method}
 \alias{coerce,CHMsimpl,dtCMatrix-method}
-\alias{coerce,CHMsuper,CsparseMatrix-method}
 \alias{coerce,CHMsuper,dgCMatrix-method}
 \alias{determinant,CHMfactor,logical-method}
 \alias{diag,CHMfactor-method}
@@ -171,24 +167,11 @@ isLDL(x)
       the lower triangular Cholesky factor \eqn{L} \emph{or}
       the lower triangular matrix \eqn{L_{1}-I+D}{L1-I+D},
       the latter if and only if \code{from@type[2]} is 0.}
-    \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "CsparseMatrix")}:
-      like \code{as(., "dtCMatrix")}, but always giving \eqn{L}.
-      The coercion fails if \code{from} stores \eqn{L_{1}-I+D}{L1-I+D}
-      and \eqn{D} has negative diagonal elements.}
     \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "dgCMatrix")}:
       returns a \code{\linkS4class{dgCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L}.
       Note that, for supernodes spanning two or more columns,
       the supernodal algorithm must store zeros above the diagonal.}
-    \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "CsparseMatrix")}:
-      equivalent to \code{as(., "dgCMatrix")}.}
-    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "sparseMatrix")}:
-      equivalent to \code{as(., "CsparseMatrix")} and available
-      primarily for backwards compatibility.  New code should
-      coerce directly to \code{\linkS4class{CsparseMatrix}}.}
-    \item{\code{coerce}}{\code{signature(from = "CHMfactor", to = "pMatrix")}:
-      returns a \code{\linkS4class{pMatrix}} representing
-      the permutation matrix \eqn{P_{1}}.}
     \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
       behaves according to an optional argument \code{sqrt}.
       If \code{sqrt = FALSE}, then this method computes the determinant
@@ -210,6 +193,10 @@ isLDL(x)
       are the squared diagonal elements of \eqn{L}.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
+    \item{expand1}{\code{signature(x = "CHMsimpl")}:
+      see \code{\link{expand1-methods}}.}
+    \item{expand1}{\code{signature(x = "CHMsuper")}:
+      see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsuper")}:
@@ -222,11 +209,12 @@ isLDL(x)
       see \code{\link{solve-methods}}.}
     \item{\code{update}}{\code{signature(object = "CHMfactor")}:
       returns a copy of \code{object} with the same nonzero pattern
-      but with numeric entries updated according to additional arguments
-      \code{parent} and \code{mult}, where \code{parent} is (coercible to)
-      a \code{\linkS4class{dsCMatrix}} or a \code{\linkS4class{dgCMatrix}}
-      and \code{mult} is a numeric vector of positive length.
-      
+      but with numeric entries updated according to additional
+      arguments \code{parent} and \code{mult}, where \code{parent}
+      is (coercible to) a \code{\linkS4class{dsCMatrix}} or a
+      \code{\linkS4class{dgCMatrix}} and \code{mult} is a numeric
+      vector of positive length.
+      \cr
       The numeric entries are updated with those of the Cholesky
       factor of \code{F(parent) + mult[1] * I}, i.e.,
       \code{F(parent)} plus \code{mult[1]} times the identity matrix,
