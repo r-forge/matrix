@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-16 r4075)}{
+\section{Changes in version 1.6-0 (2023-06-19 r4078)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -170,11 +170,12 @@
       CSparse library.
       
       \item New utilities \code{invertPerm}, \code{signPerm},
-      and \code{isPerm} for computing the inverse and sign of a
-      permutation vector and testing whether an integer vector
-      is a permutation.  \code{invertPerm} is a more general
-      version of the already exported \code{invPerm}, which
-      is retained as a wrapper around \code{invertPerm} for
+      \code{isPerm}, and \code{asPerm} for computing the inverse
+      and sign of a permutation vector, testing if an integer vector
+      is a permutation vector, and coercing a transposition vector
+      to a permutation vector.  \code{invertPerm} is a more general
+      version of the already exported function \code{invPerm},
+      which is retained as a wrapper around \code{invertPerm} for
       backwards compatibility.
 
       \item The \code{qr.R} method for class \code{sparseQR}

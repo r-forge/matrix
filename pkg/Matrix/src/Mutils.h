@@ -46,6 +46,7 @@ void asPerm(const int *p, int *ip, int m, int n, int off, int ioff);
 SEXP R_isPerm(SEXP p, SEXP off);
 SEXP R_signPerm(SEXP p, SEXP off);
 SEXP R_invertPerm(SEXP p, SEXP off, SEXP ioff);
+SEXP R_asPerm(SEXP p, SEXP off, SEXP ioff, SEXP n);
 
 char type2kind(SEXPTYPE type);
 SEXPTYPE kind2type(char kind);

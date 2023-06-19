@@ -102,17 +102,6 @@ str(e.lu.A <- expand2(lu.A), max.level = 2L)
 (m.lu.A <- as(lu.A, "dgeMatrix")) # which is L and U interlaced
 stopifnot(identical(as(m.lu.A, "matrix"), `dim<-`(lu.A@x, lu.A@Dim)))
 
-## Get permutation from product of transpositions :
-asPerm <- function(pivot) {
-    perm <- seq_along(pivot)
-    for(i in seq_along(pivot)) {
-        tmp <- perm[i]
-        perm[i] <- perm[pivot[i]]
-        perm[pivot[i]] <- tmp
-    }
-    perm
-}
-
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
 

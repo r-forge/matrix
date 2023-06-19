@@ -160,6 +160,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(R_isPerm, 2),
     CALLDEF(R_signPerm, 2),
     CALLDEF(R_invertPerm, 3),
+    CALLDEF(R_asPerm, 4),
     CALLDEF(R_set_factor, 4),
     CALLDEF(R_empty_factors, 2),
     
