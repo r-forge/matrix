@@ -60,10 +60,13 @@ expand (x, \dots)
 \value{
   \code{expand1} returns an object inheriting from virtual class
   \code{\linkS4class{Matrix}}, representing the factor indicated
-  by \code{which}.
+  by \code{which}, always without row and column names.
 
   \code{expand2} returns a list of factors, typically with names
   using conventional notation, as in \code{list(L=, U=)}.
+  The first and last factors get the row and column names of the
+  factorized matrix, which are preserved in the \code{Dimnames}
+  slot of \code{x}.
 }
 \details{
   Methods for \code{expand} are retained only for backwards
@@ -206,7 +209,11 @@ expand (x, \dots)
   \emph{computing} factorizations.
 }
 \examples{
-(A <- Matrix(round(rnorm(9L), 2L), 3L, 3L))
+showMethods("expand1", inherited = FALSE)
+showMethods("expand2", inherited = FALSE)
+set.seed(0)
+
+(A <- Matrix(rnorm(9L, 0, 10), 3L, 3L))
 (lu.A <- lu(A))
 (e.lu.A <- expand2(lu.A))
 stopifnot(exprs = {
@@ -215,6 +222,12 @@ stopifnot(exprs = {
     all(sapply(e.lu.A, is, "Matrix"))
     all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.lu.A), "matrix"))
 })
+
+## 'expand1' and 'expand2' give equivalent results modulo
+## dimnames and representation of permutation matrices;
+## see also function 'alt' in example("Cholesky-methods")
+(a1 <- sapply(names(e.lu.A), expand1, x = lu.A, simplify = FALSE))
+all.equal(a1, e.lu.A)
 
 ## see help("denseLU-class") and others for more examples
 }

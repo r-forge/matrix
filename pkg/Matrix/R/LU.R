@@ -162,6 +162,41 @@ setMethod("lu", "diagonalMatrix",
 ## METHODS FOR CLASS: denseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## TODO: we have C-level functions that do this, but no R interface
+
+.mkL <- function(x, m, n) {
+    if(m == n)
+        x
+    else if(m < n)
+        x[seq_len(prod(m, m))]
+    else {
+        x[seq.int(from = 1L, by = m + 1, length.out = n)] <- 1
+        if(n > 1L) {
+            nvec <- seq_len(n - 1L)
+            from <- seq.int(from = m + 1, by = m, length.out = n - 1L)
+            x[sequence.default(nvec, from)] <- 0
+        }
+        x
+    }
+}
+
+.mkU <- function(x, m, n) {
+    if(m == n)
+        x
+    else if(m > n) {
+        nvec <- rep.int(n, n)
+        from <- seq.int(from = 1L, by = m, length.out = n)
+        x[sequence.default(nvec, from)]
+    } else {
+        if(m > 1L) {
+            nvec <- seq.int(to = 1L, by = -1L, length.out = m - 1L)
+            from <- seq.int(from = 2L, by = m + 1, length.out = m - 1L)
+            x[sequence.default(nvec, from)] <- 0
+        }
+        x
+    }
+}
+
 setAs("denseLU", "dgeMatrix",
       function(from) {
           to <- new("dgeMatrix")
@@ -179,7 +214,7 @@ setMethod("expand1", signature(x = "denseLU"),
                      "P1" =, "P1." = {
                          r <- new("pMatrix")
                          r@Dim <- c(m, m)
-                         r@perm <- asPerm(x@perm)
+                         r@perm <- asPerm(x@perm, n = m)
                          if(which == "P1.")
                              r@margin <- 2L
                          r
@@ -190,35 +225,22 @@ setMethod("expand1", signature(x = "denseLU"),
                              r@Dim <- c(m, m)
                              r@uplo <- "L"
                              r@diag <- "U"
-                             r@x <-
-                                 if(m == n)
-                                     x@x
-                                 else x@x[seq_len(m * as.double(m))]
                          } else {
-                             r <- new("dgeMatrix")
+                             r<- new("dgeMatrix")
                              r@Dim <- d
-                             r@x <- x@x
                          }
+                         r@x <- .mkL(x@x, m, n)
                          r
                      },
                      "U" = {
                          if (m >= n) {
                              r <- new("dtrMatrix")
                              r@Dim <- c(n, n)
-                             r@x <-
-                                 if(m == n)
-                                     x@x
-                                 else {
-                                     length.out <- rep.int(n, n)
-                                     from <- seq.int(from = 1L, by = m,
-                                                     length.out = n)
-                                     x@x[sequence.default(length.out, from)]
-                                 }
                          } else {
                              r <- new("dgeMatrix")
                              r@Dim <- d
-                             r@x <- x@x
                          }
+                         r@x <- .mkU(x@x, m, n)
                          r
                      },
                      stop("'which' is not \"P1\", \"P1.\", \"L\", or \"U\""))
@@ -226,14 +248,46 @@ setMethod("expand1", signature(x = "denseLU"),
 
 ## returning list(P1', L, U), where A = P1' L U
 setMethod("expand2", signature(x = "denseLU"),
-          function(x, ...)
-              .Call(denseLU_expand, x))
+          function(x, ...) {
+              d <- x@Dim
+              dn <- x@Dimnames
+              m <- d[1L]
+              n <- d[2L]
+
+              P1. <- new("pMatrix")
+              P1.@Dim <- c(m, m)
+              P1.@Dimnames <- c(dn[1L], list(NULL))
+              P1.@perm <- invertPerm(asPerm(x@perm, n = m))
+
+              if(m <= n) {
+                  L <- new("dtrMatrix")
+                  L@Dim <- c(m, m)
+                  L@uplo <- "L"
+                  L@diag <- "U"
+              } else {
+                  L <- new("dgeMatrix")
+                  L@Dim <- d
+              }
+              L@x <- .mkL(x@x, m, n)
+
+              if (m >= n) {
+                  U <- new("dtrMatrix")
+                  U@Dim <- c(n, n)
+              } else {
+                  U <- new("dgeMatrix")
+                  U@Dim <- d
+              }
+              U@Dimnames <- c(list(NULL), dn[2L])
+              U@x <- .mkU(x@x, m, n)
+
+              list(P1. = P1., L = L, U = U)
+          })
 
 ## returning list(L, U, P), where A = P L U
 ## MJ: for backwards compatibility
 setMethod("expand", signature(x = "denseLU"),
           function(x, ...) {
-              r <- .Call(denseLU_expand, x)[c(2L, 3L, 1L)]
+              r <- expand2(x)[c(2L, 3L, 1L)]
               names(r) <- c("L", "U", "P")
               NN <- list(NULL, NULL)
               for(i in 1:3)
@@ -253,7 +307,7 @@ setMethod("expand1", signature(x = "sparseLU"),
                          r@Dim <- x@Dim
                          r@perm <- x@p + 1L
                          if(which == "P1.")
-                             x@margin <- 2L
+                             r@margin <- 2L
                          r
                      },
                      "P2" =, "P2." = {

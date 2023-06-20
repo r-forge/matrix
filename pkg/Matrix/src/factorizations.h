@@ -29,7 +29,6 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
 SEXP dpCMatrix_trf(SEXP obj,
 		   SEXP perm, SEXP ldl, SEXP super, SEXP mult);
 
-SEXP denseLU_expand(SEXP obj);
 SEXP BunchKaufman_expand(SEXP obj, SEXP packed);
 
 SEXP      denseLU_determinant(SEXP obj, SEXP logarithm);

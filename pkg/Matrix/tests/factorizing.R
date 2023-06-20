@@ -706,14 +706,23 @@ BunchKaufman(as.matrix(1))
 ## FIXME: many of our %*% methods still mangle dimnames or names(dimnames) ...
 ##        hence for now we coerce the factors to matrix before multiplying
 chkMF <- function(X, Y, FUN, ...) {
-    X@factors <- list() # t(x)@factors may preserve factorizations with x@uplo
-    all.equal(Reduce(`%*%`, lapply(expand2(FUN(X, ...)), as, "matrix")), Y)
+    ## t(x)@factors may preserve factorizations with x@uplo
+    X@factors <- list()
+
+    mf <- FUN(X, ...)
+    e2.mf <- expand2(mf)
+    e1.mf <- sapply(names(e2.mf), expand1, x = mf, simplify = FALSE)
+
+    m.e2.mf <- lapply(e2.mf, as, "matrix")
+    m.e1.mf <- lapply(e1.mf, as, "matrix")
+
+    identical(m.e1.mf, lapply(m.e2.mf, unname)) &&
+        isTRUE(all.equal(Reduce(`%*%`, m.e2.mf), Y))
 }
 set.seed(24831)
 n <- 16L
 mS <- tcrossprod(matrix(rnorm(n * n), n, n,
                         dimnames = list(A = paste0("s", seq_len(n)), NULL)))
-names(dimnames(mS)) <- NULL
 sS <- as(pS <- as(S <- as(mS, "dpoMatrix"), "packedMatrix"), "CsparseMatrix")
 stopifnot(exprs = {
     chkMF(   S , mS,    Schur)

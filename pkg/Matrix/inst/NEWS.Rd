@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-19 r4083)}{
+\section{Changes in version 1.6-0 (2023-06-20 r4085)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -103,8 +103,6 @@
       checks that the \code{V} slot is lower trapezoidal and that
       the \code{R} slot has non-negative diagonal elements.
 
-      %% TODO: examples and tests using expand1
-      %% DONE: examples and tests using expand2
       \item New generic functions \code{expand1} and \code{expand2},
       intended to eventually replace \code{expand} and certain coercions
       from (subclasses of) \code{MatrixFactorization} to (subclasses of)

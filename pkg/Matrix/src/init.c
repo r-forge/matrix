@@ -253,7 +253,6 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(dgCMatrix_orf, 3),
     CALLDEF(dpCMatrix_trf, 5),
     
-    CALLDEF(denseLU_expand, 1),
     CALLDEF(BunchKaufman_expand, 2),
 
     CALLDEF(denseLU_determinant, 2),
