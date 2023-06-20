@@ -297,7 +297,7 @@ s(m.ch.A4 <- rapply2(ch.A4, expand1, "L")) # giving L = L1 sqrt(D)
 ## are more sparse than the unpivoted and supernodal ones ...
 s(rapply2(m.ch.A4, object.size))
 
-## Which is nicely visualized lattice-based methods for 'image'
+## Which is nicely visualized by lattice-based methods for 'image'
 inm <- c("pivoted", "unpivoted")
 jnm <- c("simpl1", "simpl0", "super0")
 for(i in 1:2)
@@ -335,7 +335,7 @@ alt <- function(P) {
 }
 
 ## Expansions are elegant but inefficient (transposes are redundant)
-## hence programmers should consider the 'coerce' and 'diag' methods
+## hence programmers should consider methods for 'expand1' and 'diag'
 stopifnot(exprs = {
     identical(expand1(simpl1, "P1"), alt(e.ch.A4[["P1"]]))
     identical(expand1(simpl1, "L"), E.ch.A4[["L"]])

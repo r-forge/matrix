@@ -169,24 +169,27 @@ isLDL(x)
       the latter if and only if \code{from@type[2]} is 0.}
     \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "dgCMatrix")}:
       returns a \code{\linkS4class{dgCMatrix}} representing
-      the lower triangular Cholesky factor \eqn{L}.
-      Note that, for supernodes spanning two or more columns,
-      the supernodal algorithm must store zeros above the diagonal.}
+      the lower triangular Cholesky factor \eqn{L}.  Note that,
+      for supernodes spanning two or more columns, the supernodal
+      algorithm by design stores non-structural zeros above
+      the main diagonal, hence \code{\linkS4class{dgCMatrix}} is
+      indeed more appropriate than \code{\linkS4class{dtCMatrix}}
+      as a coercion target.}
     \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
       behaves according to an optional argument \code{sqrt}.
       If \code{sqrt = FALSE}, then this method computes the determinant
       of the factorized matrix \eqn{A} or its logarithm.
       If \code{sqrt = TRUE}, then this method computes the determinant
-      of the factor \eqn{L = L_{1} sqrt(D)}{L = L1 * sqrt(D)} or its
-      logarithm, giving \code{NaN} for the modulus when \eqn{D} has
-      negative diagonal elements.  For backwards compatibility, the
-      default value of \code{sqrt} is \code{TRUE}, but that is due to
-      change in a future version of \pkg{Matrix}, hence defensive code
-      will always set \code{sqrt} (to \code{TRUE}, if the code must be
-      backwards compatible with \pkg{Matrix} \code{< 1.6-0}).  Calls
-      to this method not setting \code{sqrt} may warn about the pending
-      change.  The warnings can be disabled with
-      \code{\link{options}(Matrix.warnSqrtDefault = 0)}.}
+      of the factor \eqn{L = L_{1} sqrt(D)}{L = L1 * sqrt(D)} or
+      its logarithm, giving \code{NaN} for the modulus when \eqn{D}
+      has negative diagonal elements.  For backwards compatibility,
+      the default value of \code{sqrt} is \code{TRUE}, but that can
+      be expected change in a future version of \pkg{Matrix}, hence
+      defensive code will always set \code{sqrt} (to \code{TRUE},
+      if the code must remain backwards compatible with \pkg{Matrix}
+      \code{< 1.6-0}).  Calls to this method not setting \code{sqrt}
+      may warn about the pending change.  The warnings can be disabled
+      with \code{\link{options}(Matrix.warnSqrtDefault = 0)}.}
     \item{\code{diag}}{\code{signature(x = "CHMfactor")}:
       returns a numeric vector of length \eqn{n} containing the diagonal
       elements of \eqn{D}, which (\emph{if} they are all non-negative)
