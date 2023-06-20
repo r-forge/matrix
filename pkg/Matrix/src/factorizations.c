@@ -923,113 +923,6 @@ SEXP dpCMatrix_trf(SEXP obj,
     return trf;
 }
 
-SEXP denseLU_expand(SEXP obj)
-{
-    const char *nms[] = {"P1.", "L", "U", ""};
-    PROTECT_INDEX pidA, pidB;
-    SEXP res = PROTECT(mkNamed(VECSXP, nms)),
-	P = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
-	dim, x;
-    PROTECT_WITH_INDEX(dim = GET_SLOT(obj, Matrix_DimSym), &pidA);
-    PROTECT_WITH_INDEX(x = GET_SLOT(obj, Matrix_xSym), &pidB);
-    int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
-    
-    if (m == n) {
-	SEXP L = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
-	    U = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
-	    uplo = PROTECT(mkString("L")),
-	    diag = PROTECT(mkString("U"));
-	SET_SLOT(L, Matrix_DimSym, dim);
-	SET_SLOT(U, Matrix_DimSym, dim);
-	SET_SLOT(P, Matrix_DimSym, dim);
-	SET_SLOT(L, Matrix_uploSym, uplo);
-	SET_SLOT(L, Matrix_diagSym, diag);
-	SET_SLOT(L, Matrix_xSym, x);
-	SET_SLOT(U, Matrix_xSym, x);
-	SET_VECTOR_ELT(res, 1, L);
-	SET_VECTOR_ELT(res, 2, U);
-	UNPROTECT(4); /* diag, uplo, U, L */
-    } else {
-	SEXP G = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
-	    T = PROTECT(NEW_OBJECT_OF_CLASS("dtrMatrix")),
-	    y = PROTECT(allocVector(REALSXP, (R_xlen_t) r * r));
-	REPROTECT(x = duplicate(x), pidB);
-	double *px = REAL(x), *py = REAL(y);
-	
-	SET_SLOT(G, Matrix_DimSym, dim);
-	REPROTECT(dim = allocVector(INTSXP, 2), pidA);
-	pdim = INTEGER(dim);
-	pdim[0] = pdim[1] = r;
-	SET_SLOT(T, Matrix_DimSym, dim);
-	REPROTECT(dim = allocVector(INTSXP, 2), pidA);
-	pdim = INTEGER(dim);
-	pdim[0] = pdim[1] = m;
-	SET_SLOT(P, Matrix_DimSym, dim);
-	
-	if (m < n) {
-            /* G is upper trapezoidal, T is unit lower triangular */
-	    SEXP uplo = PROTECT(mkString("L")),
-		diag = PROTECT(mkString("U"));
-	    SET_SLOT(T, Matrix_uploSym, uplo);
-	    SET_SLOT(T, Matrix_diagSym, diag);
-	    UNPROTECT(2); /* diag, uplo */
-
-	    Matrix_memcpy(py, px, (R_xlen_t) m * m, sizeof(double));
-	    ddense_unpacked_make_triangular(px, m, n, 'U', 'N');
-	} else {
-            /* G is unit lower trapezoidal, T is upper triangular */
-	    double *tmp = px;
-	    for (j = 0; j < n; ++j, px += m, py += r)
-		Matrix_memcpy(py, px, j+1, sizeof(double));
-	    ddense_unpacked_make_triangular(tmp, m, n, 'L', 'U');
-	}
-	SET_SLOT(G, Matrix_xSym, x);
-	SET_SLOT(T, Matrix_xSym, y);
-	
-	SET_VECTOR_ELT(res, (m < n) ? 2 : 1, G);
-	SET_VECTOR_ELT(res, (m < n) ? 1 : 2, T);
-	UNPROTECT(3); /* y, T, G */
-    }
-
-    SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-	perm = PROTECT(allocVector(INTSXP, m));
-    int *ppivot = INTEGER(pivot), *pperm = INTEGER(perm), *pinvperm;
-    Matrix_Calloc(pinvperm, m, int);
-    asPerm(ppivot, pinvperm, r, m, 1, 0);
-    invertPerm(pinvperm, pperm, m, 0, 1);
-    Matrix_Free(pinvperm, m);
-
-    SET_SLOT(P, Matrix_permSym, perm);
-    SET_VECTOR_ELT(res, 0, P);
-    
-#define DO_DIMNAMES							\
-    do {								\
-	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),		\
-	    ndn = PROTECT(getAttrib(dn, R_NamesSymbol));		\
-	for (j = 0; j < 2; ++j) {					\
-	    SEXP rn = VECTOR_ELT(dn, j);				\
-	    if (!isNull(rn) || !isNull(ndn)) {				\
-		SEXP X = VECTOR_ELT(res, (j == 0) ? 0 : LENGTH(res) - 1), \
-		    dnX = PROTECT(allocVector(VECSXP, 2));		\
-		SET_VECTOR_ELT(dnX, j, rn);				\
-		if (!isNull(ndn)) {					\
-		    SEXP ndnX = PROTECT(allocVector(STRSXP, 2));	\
-		    SET_STRING_ELT(ndnX, j, STRING_ELT(ndn, j));	\
-		    setAttrib(dnX, R_NamesSymbol, ndnX);		\
-		    UNPROTECT(1);					\
-		}							\
-		SET_SLOT(X, Matrix_DimNamesSym, dnX);			\
-		UNPROTECT(1);						\
-	    }								\
-	}								\
-	UNPROTECT(2);							\
-    } while (0)
-    
-    DO_DIMNAMES;
-    UNPROTECT(6); /* perm, pivot, x, dim, P, res */
-    return res;
-}
-
 SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 {
     SEXP P_ = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
@@ -1200,11 +1093,7 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
     SET_SLOT(D_, Matrix_xSym, D_x);
     SET_VECTOR_ELT(res, len-1, D_);
 
-    DO_DIMNAMES;
-    
-#undef DO_DIMNAMES
-    
-    UNPROTECT(8); /* res, x, D_x, D_i, pivot, D_, T_, P_ */ 
+    UNPROTECT(8); /* res, x, D_x, D_i, pivot, D_, T_, P_ */
     return res;
 }
 
