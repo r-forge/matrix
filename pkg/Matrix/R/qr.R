@@ -156,20 +156,21 @@ setMethod("qr.R", signature(qr = "sparseQR"),
               qrR(qr, complete = complete, backPermute = backPermute,
                   row.names = FALSE))
 
+## https://stat.ethz.ch/pipermail/r-devel/2023-June/082649.html
 setMethod("qr.X", signature(qr = "sparseQR"),
-          function(qr, complete = FALSE,
-                   ## FIXME:
-                   ## R CMD check complains, but really
-                   ## formals(base::qr.X)[["ncol"]] should change ...
-                   ncol = if (complete) nrow(R) else min(dim(R))) {
+          function(qr, complete = FALSE, ncol) {
               m0 <- .qr.rank.def.warn(qr)
               R <- qr@R
               d <- R@Dim
               m <- d[1L]
               n <- d[2L]
-              ncol <- as.integer(ncol)
-              if(ncol < 0L || ncol > m)
-                  stop("invalid 'ncol'")
+              if(missing(ncol))
+                  ncol <- if(complete) m else min(m, n)
+              else {
+                  ncol <- as.integer(ncol)
+                  if(ncol < 0L || ncol > m)
+                      stop("invalid 'ncol'")
+              }
               p2 <- qr@q + 1L
               p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
               if(p2.uns && ncol < n)
