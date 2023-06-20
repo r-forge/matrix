@@ -1,6 +1,7 @@
-# NOTE: matched case _in_sensitively
+## NB: patterns are matched case insensitively
+
 2copy
-\.Rhistory
+\.Rhistory$
 ^Done$
 omit-SPQR
 ^[A-Za-z0-9][-_A-Za-z0-9]*\.R$
@@ -30,19 +31,27 @@ Matrix_[1-9][0-9]*\.[0-9]
 jss.submit
 .*_results
 TAGS
-R/.*\.R__*$
 _no_UFlong
-inst/doc/unused
-inst/doc/DSC20
-inst/doc/.*\.(log|blg|aux|out|tex|bbl|jpg|zip)$
 _?svn-?
+
+R/.*\.R__*$
+inst/Copyrights$
+inst/Doxyfile$
+inst/doc/DSC2009
+inst/doc/unused
+inst/doc/.*\.(aux|bbl|blg|jpg|log|out|tex|zip)$
+inst/doc/Announce\.txt$
+inst/doc/SuiteSparse/UserGuides\.txt$
 src/SuiteSparse-
-po/translator
-vignettes/fullpage\.sty
+src/scripts/.*\.R$
+src/scripts/.*\.sh$
+po/.*\.sh$
+po/.*\.txt$
 tests/useRNG
-tests/.*\.Rout.*[24]b
+tests/.*\.Rout.*[24]b$
 tests/.*_(doExtra|nX)$
-tests/performance
+tests/performance\.R$
+vignettes/fullpage\.sty$
 
 # Currently "empty", not contributing to namespace :
 R/[dln](dense|sparse)?Matrix\.R$
@@ -71,6 +80,6 @@ src/t_gCMatrix_colSums\.c$
 src/t_matrix_to_Csp\.c$
 src/t_sparseVector\.c$
 
-# work in progress
+# Work in progress :
 R/subassign\.R$
 src/subassign\.[ch]$
