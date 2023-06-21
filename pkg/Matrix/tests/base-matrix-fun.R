@@ -10,7 +10,8 @@ library(utils)
 
 library(Matrix)
 
-data(KNex); mm <- KNex$mm
+data(KNex, package = "Matrix")
+mm <- KNex$mm
 str(m1 <- mm[1:500, 1:200])
 m11 <- m1[1:100, 1:20]
 ## These now work thanks to using our as.matrix():

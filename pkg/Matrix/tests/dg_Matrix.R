@@ -3,10 +3,10 @@ library(stats)
 library(utils)
 
 library(Matrix)
-
 source(system.file("test-tools.R", package = "Matrix"))
 
-data(KNex) ; mm <- KNex$mm
+data(KNex, package = "Matrix")
+mm <- KNex$mm
 stopifnot(##is(mm) == c("dgCMatrix", "dMatrix", "Matrix"),
           dim(mm) == (dm <- c(1850, 712)),
           identical(dimnames(mm), list(NULL,NULL)))

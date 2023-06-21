@@ -5,7 +5,6 @@ library(stats)
 library(utils)
 
 library(Matrix)
-
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 options(warn = 0)
 is64bit <- .Machine$sizeof.pointer == 8
@@ -13,7 +12,9 @@ cat("doExtras:", doExtras,";  is64bit:", is64bit, "\n")
 
 ### "sparseQR" : Check consistency of methods
 ##   --------
-data(KNex); mm <- KNex$mm; y <- KNex$y
+data(KNex, package = "Matrix")
+mm <- KNex$mm
+y  <- KNex$y
 stopifnot(is((Y <- Matrix(y)), "dgeMatrix"))
 md <- as(mm, "matrix")                  # dense
 
@@ -403,7 +404,7 @@ chkCholesky(c1.8, A1.8)
 
 ## --- now a "large" (712 x 712) real data example ---------------------------
 
-data(KNex)
+data(KNex, package = "Matrix")
 mtm <- with(KNex, crossprod(mm))
 ld.3 <- determinant(Cholesky(mtm, perm = TRUE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),

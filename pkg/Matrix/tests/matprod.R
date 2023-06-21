@@ -534,7 +534,8 @@ mr8 <- as(tr8,"matrix")
 m8. <- (mr8 %*% mr8 %*% mr8 %*% mr8)/16
 assert.EQ.mat(T8.2, m8.)
 
-data(KNex); mm <- KNex$mm
+data(KNex, package = "Matrix")
+mm <- KNex$mm
 M <- mm[1:500, 1:200]
 MT <- as(M, "TsparseMatrix")
 cpr   <- t(mm) %*% mm
