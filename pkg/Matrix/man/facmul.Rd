@@ -41,7 +41,7 @@ facmul(x, factor, y, trans = FALSE, left = TRUE, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 ## Conceptually, methods for 'facmul' _would_ behave as follows ...
 \dontrun{

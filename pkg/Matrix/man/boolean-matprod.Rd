@@ -130,7 +130,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 set.seed(7)
 L <- Matrix(rnorm(20) > 1,    4,5)

@@ -75,7 +75,7 @@ Class \code{"Matrix"}, by class \code{"dgRMatrix"}.
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 (m0 <- new("dtRMatrix"))
 (m2 <- new("dtRMatrix", Dim = c(2L,2L),

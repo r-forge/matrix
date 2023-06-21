@@ -133,7 +133,7 @@ chol(x, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 showMethods("chol", inherited = FALSE)
 set.seed(0)

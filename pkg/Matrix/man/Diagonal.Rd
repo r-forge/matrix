@@ -90,7 +90,7 @@ Diagonal(n, x = NULL, names = FALSE)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 Diagonal(3)
 Diagonal(x = 10^(3:1))

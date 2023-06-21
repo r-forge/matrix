@@ -89,7 +89,7 @@ onenormest(A, t = min(n, 5), A.x, At.x, n,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 data(KNex, package = "Matrix")
 mtm <- with(KNex, crossprod(mm))

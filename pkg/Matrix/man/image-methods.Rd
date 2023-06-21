@@ -101,8 +101,8 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(grDevices, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(grDevices, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 showMethods(image)
 ## And if you want to see the method definitions:

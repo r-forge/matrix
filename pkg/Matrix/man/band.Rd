@@ -85,7 +85,7 @@ tril(x, k = 0L, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 ## A random sparse matrix :
 set.seed(7)

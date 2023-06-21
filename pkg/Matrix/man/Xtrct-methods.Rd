@@ -51,8 +51,8 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 % regression tests are in ../tests/indexing.R
 str(m <- Matrix(round(rnorm(7*4),2), nrow = 7))

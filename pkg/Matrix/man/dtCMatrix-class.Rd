@@ -74,7 +74,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 showClass("dtCMatrix")
 showClass("dtTMatrix")

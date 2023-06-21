@@ -57,8 +57,8 @@ anyDuplicatedT(x, di = dim(x))
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 example("dgTMatrix-class", echo=FALSE)
 ## -> 'T2'  with (i,j,x) slots of length 5 each

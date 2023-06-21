@@ -65,7 +65,7 @@ writeMM(obj, file, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 str(pores <- readMM(system.file("external/pores_1.mtx", package = "Matrix")))
 str(utm   <- readHB(system.file("external/utm300.rua" , package = "Matrix")))

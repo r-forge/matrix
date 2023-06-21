@@ -63,7 +63,7 @@ dmperm(x, nAns = 6L, seed = 0L)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 set.seed(17)
 (S9 <- rsparsematrix(9, 9, nnz = 10, symmetric=TRUE)) # dsCMatrix

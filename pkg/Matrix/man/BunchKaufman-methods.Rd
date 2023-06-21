@@ -82,7 +82,7 @@ BunchKaufman(x, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 showMethods("BunchKaufman", inherited = FALSE)
 set.seed(0)
