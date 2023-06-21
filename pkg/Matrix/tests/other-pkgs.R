@@ -91,9 +91,8 @@ if(requireNamespace("graph")) {
     gg <- as(cc, "graph")
 
     ## don't trigger 'R CMD check' :
-    if(get("requireNamespace")("Rgraphviz"))
-        get("plot", as.environment("package:Rgraphviz"),
-            mode = "function")(gg, "circo")
+    if(match.fun("requireNamespace")("Rgraphviz"))
+        get("plot", asNamespace("Rgraphviz"), mode = "function")(gg, "circo")
 
     stopifnot(all.equal(graph::edgeMatrix(gg),
                         rbind(from = c(rep(1:24, each=2), 25:48),
