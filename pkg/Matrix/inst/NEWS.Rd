@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-21 r4094)}{
+\section{Changes in version 1.6-0 (2023-06-21 r4095)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -328,9 +328,10 @@
       \code{Suggests}, as it is used conditionally in \file{tests}.
 
 	  \item \pkg{grDevices} and \pkg{datasets} have been added
-	  to \code{Imports} and \code{Suggests}, respectively, as
-	  \file{NAMESPACE} does import from \pkg{grDevices} and
-	  vignettes do load data from \pkg{datasets}.
+	  to \code{Imports} and \code{Suggests}, respectively,
+	  as \file{NAMESPACE} does import from \pkg{grDevices}
+	  and vignettes do load data (albeit \emph{un}conditionally)
+	  from \pkg{datasets}.
 
 	  \item Example, test, and vignette code no longer fails when
 	  \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to

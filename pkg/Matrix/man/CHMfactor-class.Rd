@@ -196,9 +196,9 @@ isLDL(x)
       are the squared diagonal elements of \eqn{L}.}
     \item{\code{expand}}{\code{signature(x = "CHMfactor")}:
       see \code{\link{expand-methods}}.}
-    \item{expand1}{\code{signature(x = "CHMsimpl")}:
+    \item{\code{expand1}}{\code{signature(x = "CHMsimpl")}:
       see \code{\link{expand1-methods}}.}
-    \item{expand1}{\code{signature(x = "CHMsuper")}:
+    \item{\code{expand1}}{\code{signature(x = "CHMsuper")}:
       see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
       see \code{\link{expand2-methods}}.}

@@ -58,7 +58,7 @@
       or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand-methods}}.}
-    \item{expand1}{\code{signature(x = "sparseLU")}:
+    \item{\code{expand1}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "sparseLU")}:
       see \code{\link{expand2-methods}}.}
