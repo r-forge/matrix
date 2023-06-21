@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-21 r4098)}{
+\section{Changes in version 1.6-0 (2023-06-21 r4100)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -305,6 +305,11 @@
       the name \code{LU}.  Note that user code should \emph{not} rely
       on the details of the cache and should instead rely on functions
       such as \code{lu} to retrieve cached factorizations.
+
+	  \item Errors signaled by \code{as(<dsyMatrix>, "dpoMatrix")}
+	  and \code{as(<dspMatrix>, "dppMatrix")} now clarify that the
+	  coercions do not attempt to test for positive semidefiniteness
+	  when the matrix is not positive definite.
     }
   }
   \subsection{Misc}{
@@ -325,8 +330,9 @@
       \file{.Rd} files are preserved throughout.
 
       \item \pkg{sfsmisc} has been moved from \code{Enhances} to
-      \code{Suggests}, as it is used conditionally in \file{tests}.
-
+      \code{Suggests}, as \pkg{Matrix} does not formally enhance it
+	  by providing methods, etc.
+	  
 	  \item \pkg{grDevices} and \pkg{datasets} have been added
 	  to \code{Imports} and \code{Suggests}, respectively,
 	  as \file{NAMESPACE} does import from \pkg{grDevices}
@@ -337,7 +343,7 @@
 	  \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
 	  additional \dQuote{invisible} \code{library} calls in the
 	  problematic source files.
-
+	  
 	  \item Examples now use \code{requireNamespace} instead of
 	  \code{require}, preserving the user search path in more cases.
     }
