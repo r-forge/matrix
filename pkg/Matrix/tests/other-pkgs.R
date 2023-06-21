@@ -1,5 +1,9 @@
 ####--------- Test interfaces to other non-standard Packages ---------------
 
+## for R_DEFAULT_PACKAGES=NULL :
+library(grDevices)
+library(utils)
+
 library(Matrix)
 
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc

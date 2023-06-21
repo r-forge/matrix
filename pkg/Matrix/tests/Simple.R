@@ -1,6 +1,11 @@
 #### Currently a collection of simple tests
 ##	(since 'Matrix' takes long to load, rather have fewer source files!)
 
+## for R_DEFAULT_PACKAGES=NULL :
+library(methods)
+library(stats)
+library(utils)
+
 ##-------- *BEFORE* attaching Matrix: --------------------------------
 str(Matrix::Matrix)# -> load the namespace
 T <- new("ngTMatrix", i=0L, j=2L, Dim = c(2L,6L))

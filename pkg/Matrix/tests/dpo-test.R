@@ -1,4 +1,9 @@
 ### Testing positive definite matrices
+
+## for R_DEFAULT_PACKAGES=NULL :
+library(stats)
+library(utils)
+
 library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 cat("doExtras:",doExtras,"\n")

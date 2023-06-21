@@ -4,6 +4,10 @@
 ####	" x <- as.matrix(x) "  or   " X <- as.array(X) "
 #### will work for 'Matrix'-matrices
 
+## for R_DEFAULT_PACKAGES=NULL :
+library(stats)
+library(utils)
+
 library(Matrix)
 
 data(KNex); mm <- KNex$mm
@@ -21,6 +25,7 @@ stopifnot(identical(kappa(Matrix(2:5, 2)),
 ## also matplot() or pairs().
 
 ## a regression test for  as.matrix.dist(.) still working
+data(USJudgeRatings, package = "datasets")
 stopifnot(c(43, 43) == dim(as.matrix(d <- dist(USJudgeRatings))))
 
 m <- Matrix(0:5, 3, 2)
