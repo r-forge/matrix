@@ -81,10 +81,13 @@ BunchKaufman(x, \dots)
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showMethods("BunchKaufman", inherited = FALSE)
 set.seed(0)
 
-utils::data(CAex, package = "Matrix")
+data(CAex, package = "Matrix")
 class(CAex) # dgCMatrix
 isSymmetric(CAex) # symmetric, but not formally
 
@@ -99,6 +102,6 @@ class(A) # dsCMatrix
 (bk.A <- BunchKaufman(as(A, "unpackedMatrix")))
 
 ## A ~ U DU U' in floating point
-utils::str(e.bk.A <- expand2(bk.A), max.level = 2L)
+str(e.bk.A <- expand2(bk.A), max.level = 2L)
 stopifnot(all.equal(as(A, "matrix"), as(Reduce(`\%*\%`, e.bk.A), "matrix")))
 }

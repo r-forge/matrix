@@ -55,6 +55,9 @@
   \code{\linkS4class{triangularMatrix}}
 }
 \examples{%% this is used from ./dtpMatrix-class.Rd (change with care!)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (m <- rbind(2:3, 0:-1))
 (M <- as(m, "generalMatrix"))
 
@@ -64,7 +67,7 @@ stopifnot(T@uplo == "U", T2@uplo == "L", identical(T2, t(T)))
 
 m <- matrix(0,4,4); m[upper.tri(m)] <- 1:6
 (t1 <- Matrix(m+diag(,4)))
-utils::str(t1p <- pack(t1))
+str(t1p <- pack(t1))
 (t1pu <- diagN2U(t1p))
 stopifnot(exprs = {
    inherits(t1 , "dtrMatrix"); validObject(t1)

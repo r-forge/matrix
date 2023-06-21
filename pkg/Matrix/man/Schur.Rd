@@ -77,16 +77,20 @@ Schur(x, vectors = TRUE, \dots)
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showMethods("Schur", inherited = FALSE)
 set.seed(0)
 
 Schur(Hilbert(9L)) # real eigenvalues
 
-(A <- Matrix(round(stats::rnorm(25L, sd = 100)), 5L, 5L))
+(A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L))
 (sch.A <- Schur(A)) # complex eigenvalues
 
 ## A ~ Q T Q' in floating point
-utils::str(e.sch.A <- expand2(sch.A), max.level = 2L)
+str(e.sch.A <- expand2(sch.A), max.level = 2L)
 stopifnot(all.equal(A, Reduce(`\%*\%`, e.sch.A)))
 
 (e1 <- eigen(sch.A@T, only.values = TRUE)$values)

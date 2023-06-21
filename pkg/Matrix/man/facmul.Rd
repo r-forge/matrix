@@ -40,11 +40,14 @@ facmul(x, factor, y, trans = FALSE, left = TRUE, \dots)
   exported from \pkg{Matrix}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 ## Conceptually, methods for 'facmul' _would_ behave as follows ...
 \dontrun{
 n <- 3L
-x <- lu(Matrix(stats::rnorm(n * n), n, n))
-y <- stats::rnorm(n)
+x <- lu(Matrix(rnorm(n * n), n, n))
+y <- rnorm(n)
 L <- unname(expand2(x)[[nm <- "L"]])
 stopifnot(exprs = {
     all.equal(facmul(x, nm, y, trans = FALSE, left =  TRUE), L \%*\% y)

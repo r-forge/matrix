@@ -83,10 +83,13 @@
   Class \code{\linkS4class{diagonalMatrix}} and function \code{\link{Diagonal}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (d2 <- Diagonal(x = c(10,1)))
-utils::str(d2)
+str(d2)
 ## slightly larger in internal size:
-utils::str(as(d2, "sparseMatrix"))
+str(as(d2, "sparseMatrix"))
 
 M <- Matrix(cbind(1,2:4))
 M \%*\% d2 #> `fast' multiplication

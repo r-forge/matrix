@@ -215,6 +215,9 @@
   }
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 D. <- diag(x = c(1, 1, 2, 3, 5, 8))
 D.0 <- Diagonal(x = c(0, 0, 0, 3, 5, 8))
 S. <- toeplitz(as.double(1:6))
@@ -251,7 +254,7 @@ stopifnot(exprs = {
 X <- rbind(A, Diagonal(3)) # design matrix X (for L.S.)
 Xt <- t(X)                 # *transposed*  X (for L.S.)
 (y <- drop(crossprod(Xt, 1:3)) + c(-1,1)/1000) # small rand.err.
-utils::str(solveCh <- .solve.dgC.chol(Xt, y, check=FALSE)) # Xt *is* dgC..
+str(solveCh <- .solve.dgC.chol(Xt, y, check=FALSE)) # Xt *is* dgC..
 stopifnot(exprs = {
     all.equal(solveCh$coef, 1:3, tol = 1e-3)# rel.err ~ 1e-4
     all.equal(solveCh$coef, drop(solve(tcrossprod(Xt), Xt \%*\% y)))

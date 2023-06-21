@@ -100,13 +100,17 @@
   \code{\link[lattice]{print.trellis}} from package \pkg{lattice}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(grDevices, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showMethods(image)
-## If you want to see all the methods' implementations:
-showMethods(image, incl=TRUE, inherit=FALSE)
-\dontshow{## warnings should not happen here, notably when print(<trellis>)
+## And if you want to see the method definitions:
+showMethods(image, includeDefs = TRUE, inherited = FALSE)
+\dontshow{ % warnings should not happen here, notably when print(<trellis>)
 op <- options(warn = 2)
 }
-utils::data(CAex)
+data(CAex, package = "Matrix")
 image(CAex, main = "image(CAex)") -> imgC; imgC
 stopifnot(!is.null(leg <- imgC$legend), is.list(leg$right)) # failed for 2 days ..
 image(CAex, useAbs=TRUE, main = "image(CAex, useAbs=TRUE)")
@@ -118,7 +122,7 @@ print(image(cCA, main="Cholesky(crossprod(CAex), Imult = .01)"),
 print(image(cCA, useAbs=TRUE),
       split=c(x=2,y=1,nx=2,ny=1))
 
-utils::data(USCounties)
+data(USCounties, package = "Matrix")
 image(USCounties)# huge
 image(sign(USCounties))## just the pattern
     # how the result looks, may depend heavily on
@@ -145,11 +149,11 @@ if(interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))) {
 ## Using raster graphics: For PDF this would give a 77 MB file,
 ## however, for such a large matrix, this is typically considerably
 ## *slower* (than vector graphics rectangles) in most cases :
-if(doPNG <- !grDevices::dev.interactive())
-   grDevices::png("image-USCounties-raster.png", width=3200, height=3200)
+if(doPNG <- !dev.interactive())
+   png("image-USCounties-raster.png", width=3200, height=3200)
 image(USCounties, useRaster = TRUE) # should not suffer from anti-aliasing
 if(doPNG)
-   grDevices::dev.off()
+   dev.off()
    ## and now look at the *.png image in a viewer you can easily zoom in and out
 }#only if(doExtras)
 }

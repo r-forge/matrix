@@ -132,6 +132,9 @@ chol(x, \dots)
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 showMethods("chol", inherited = FALSE)
 set.seed(0)
 
@@ -194,7 +197,7 @@ selectMethod("chol", "ddiMatrix")
 (R4 <- chol(A4, pivot = TRUE))
 
 det4 <- det(A4)
-b4 <- stats::rnorm(5L)
+b4 <- rnorm(5L)
 x4 <- solve(A4, b4)
 
 stopifnot(exprs = {

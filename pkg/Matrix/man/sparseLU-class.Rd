@@ -86,6 +86,10 @@
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showClass("sparseLU")
 set.seed(2)
 
@@ -98,7 +102,7 @@ dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
                           paste0("c", seq_len(n)))
 
 (lu.A <- lu(A))
-utils::str(e.lu.A <- expand2(lu.A), max.level = 2L)
+str(e.lu.A <- expand2(lu.A), max.level = 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
@@ -119,7 +123,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- stats::rnorm(n)
+b <- rnorm(n)
 stopifnot(identical(det(A), det(lu.A)),
           identical(solve(A, b), solve(lu.A, b)))
 }

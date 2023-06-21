@@ -50,21 +50,17 @@ mat2triplet(x, uniqT = FALSE)
   \code{\link{spMatrix}} and (one case of) \code{\link{sparseMatrix}}.
 }
 \examples{% ../R/sparseMatrix.R
-if(FALSE) ## The function is defined (don't redefine here!), simply as
-mat2triplet <- function(x, uniqT = FALSE) {
-    T <- as(x, "TsparseMatrix")
-    if(uniqT && anyDuplicatedT(T)) T <- .uniqTsparse(T)
-    if(is(T, "nsparseMatrix"))
-         list(i = T@i + 1L, j = T@j + 1L)
-    else list(i = T@i + 1L, j = T@j + 1L, x = T@x)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
 }
+mat2triplet # simple definition
 
 i <- c(1,3:8); j <- c(2,9,6:10); x <- 7 * (1:7)
 (Ax <- sparseMatrix(i, j, x = x)) ##  8 x 10 "dgCMatrix"
-utils::str(trA <- mat2triplet(Ax))
+str(trA <- mat2triplet(Ax))
 stopifnot(i == sort(trA$i),  sort(j) == trA$j,  x == sort(trA$x))
 
 D <- Diagonal(x=4:2)
 summary(D)
-utils::str(mat2triplet(D))
+str(mat2triplet(D))
 }

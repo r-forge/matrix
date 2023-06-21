@@ -65,12 +65,15 @@
   \code{\linkS4class{dgTMatrix}}, and \code{\linkS4class{dgeMatrix}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (m0 <- new("dsRMatrix"))
 m2 <- new("dsRMatrix", Dim = c(2L,2L),
           x = c(3,1), j = c(1L,1L), p = 0:2)
 m2
 stopifnot(colSums(as(m2, "TsparseMatrix")) == 3:4)
-utils::str(m2)
+str(m2)
 (ds2 <- forceSymmetric(diag(2))) # dsy*
 dR <- as(ds2, "RsparseMatrix")
 dR # dsRMatrix

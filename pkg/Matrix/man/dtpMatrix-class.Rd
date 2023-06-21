@@ -61,11 +61,14 @@
   Class \code{\linkS4class{dtrMatrix}}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showClass("dtrMatrix")
 
-utils::example("dtrMatrix-class", echo=FALSE)
+example("dtrMatrix-class", echo=FALSE)
 (p1 <- pack(T2))
-utils::str(p1)
+str(p1)
 (pp <- pack(T))
 ip1 <- solve(p1)
 stopifnot(length(p1@x) == 3, length(pp@x) == 3,

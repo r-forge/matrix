@@ -295,9 +295,6 @@
 \alias{tcrossprod,sparseVector,numLike-method}
 \alias{tcrossprod,sparseVector,sparseMatrix-method}
 \alias{tcrossprod,sparseVector,sparseVector-method}
-% no longer, as not to mask base::tcrossprod
-%\alias{tcrossprod,matrix,missing-method}
-%\alias{tcrossprod,numeric,missing-method}
 %
 \description{
   The basic matrix product, \code{\%*\%} is implemented for all our
@@ -403,12 +400,16 @@
   methods.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
  ## A random sparse "incidence" matrix :
  m <- matrix(0, 400, 500)
  set.seed(12)
- m[stats::runif(314, 0, length(m))] <- 1
+ m[runif(314, 0, length(m))] <- 1
  mm <- as(m, "CsparseMatrix")
- utils::object.size(m) / utils::object.size(mm) # smaller by a factor of > 200
+ object.size(m) / object.size(mm) # smaller by a factor of > 200
 
  ## tcrossprod() is very fast:
  system.time(tCmm <- tcrossprod(mm))# 0   (PIII, 933 MHz)

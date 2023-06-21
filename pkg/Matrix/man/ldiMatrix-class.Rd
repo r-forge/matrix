@@ -80,8 +80,11 @@
   \code{\linkS4class{diagonalMatrix}}; function \code{\link{Diagonal}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (lM <- Diagonal(x = c(TRUE,FALSE,FALSE)))
-utils::str(lM)#> gory details (slots)
+str(lM)#> gory details (slots)
 
 crossprod(lM) # numeric
 (nM <- as(lM, "nMatrix"))# -> sparse (not formally ``diagonal'')

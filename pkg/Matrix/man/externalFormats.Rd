@@ -64,39 +64,38 @@ writeMM(obj, file, \dots)
   \url{https://sparse.tamu.edu/}% was https://www.cise.ufl.edu/research/sparse/matrices/
 }
 \examples{
-utils::str(pores <- readMM(system.file("external/pores_1.mtx",
-                                       package = "Matrix")))
-utils::str(utm <- readHB(system.file("external/utm300.rua",
-                                     package = "Matrix")))
-utils::str(lundA <- readMM(system.file("external/lund_a.mtx",
-                                       package = "Matrix")))
-utils::str(lundA <- readHB(system.file("external/lund_a.rsa",
-                                       package = "Matrix")))
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
+str(pores <- readMM(system.file("external/pores_1.mtx", package = "Matrix")))
+str(utm   <- readHB(system.file("external/utm300.rua" , package = "Matrix")))
+str(lundA <- readMM(system.file("external/lund_a.mtx" , package = "Matrix")))
+str(lundA <- readHB(system.file("external/lund_a.rsa" , package = "Matrix")))
 ## https://math.nist.gov/MatrixMarket/data/Harwell-Boeing/counterx/counterx.htm
-utils::str(jgl009 <- readMM(system.file("external/jgl009.mtx",
-                                        package = "Matrix")))
-\dontrun{
+str(jgl   <- readMM(system.file("external/jgl009.mtx" , package = "Matrix")))
+
 ## NOTE: The following examples take quite some time
 ## ----  even on a fast internet connection:
-if(FALSE) { # the URL has been corrected, but we need an un-tar step!
+if(FALSE) {
+## The URL has been corrected, but we need an untar step:
 u. <- url("https://www.cise.ufl.edu/research/sparse/RB/Boeing/msc00726.tar.gz")
-utils::str(sm <- readHB(gzcon(u.)))
+str(sm <- readHB(gzcon(u.)))
 }
-}
-utils::data(KNex)
+
+data(KNex, package = "Matrix")
 ## Store as MatrixMarket (".mtx") file, here inside temporary dir./folder:
 (MMfile <- file.path(tempdir(), "mmMM.mtx"))
 writeMM(KNex$mm, file=MMfile)
 file.info(MMfile)[,c("size", "ctime")] # (some confirmation of the file's)
 
 ## very simple export - in triplet format - to text file:
-utils::data(CAex)
+data(CAex, package = "Matrix")
 s.CA <- summary(CAex)
 s.CA # shows  (i, j, x)  [columns of a data frame]
 message("writing to ", outf <- tempfile())
 write.table(s.CA, file = outf, row.names=FALSE)
 ## and read it back -- showing off  sparseMatrix():
-utils::str(dd <- read.table(outf, header=TRUE))
+str(dd <- read.table(outf, header=TRUE))
 ## has columns (i, j, x) -> we can use via do.call() as arguments to sparseMatrix():
 mm <- do.call(sparseMatrix, dd)
 stopifnot(all.equal(mm, CAex, tolerance=1e-15))

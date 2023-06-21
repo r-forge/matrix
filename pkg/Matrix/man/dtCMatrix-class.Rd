@@ -73,8 +73,10 @@
   \code{\linkS4class{dgeMatrix}}, and \code{\linkS4class{dtrMatrix}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showClass("dtCMatrix")
-
 showClass("dtTMatrix")
 t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
 t1
@@ -82,7 +84,7 @@ t1
 tu <- t1 ; tu@diag <- "U"
 tu
 (cu <- as(tu, "CsparseMatrix"))
-utils::str(cu)# only two entries in @i and @x
+str(cu)# only two entries in @i and @x
 stopifnot(cu@i == 1:0,
           all(2 * symmpart(cu) == Diagonal(4) + forceSymmetric(cu)))
 

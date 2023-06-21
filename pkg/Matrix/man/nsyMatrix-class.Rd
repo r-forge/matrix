@@ -54,11 +54,14 @@
   \code{\link[base]{t}}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (s0 <- new("nsyMatrix"))
 
 (M2 <- Matrix(c(TRUE, NA, FALSE, FALSE), 2, 2)) # logical dense (ltr)
 (sM <- M2 & t(M2))                       # -> "lge"
 class(sM <- as(sM, "nMatrix"))           # -> "nge"
      (sM <- as(sM, "symmetricMatrix"))   # -> "nsy"
-utils::str(sM <- as(sM, "packedMatrix")) # -> "nsp", i.e., packed symmetric
+str(sM <- as(sM, "packedMatrix")) # -> "nsp", i.e., packed symmetric
 }

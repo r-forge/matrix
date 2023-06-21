@@ -117,6 +117,12 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
   \code{\link[sfsmisc]{posdefify}()}, both from package \pkg{sfsmisc}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(graphics, pos = "package:methods")
+library(grDevices, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
  ## Higham(2002), p.334f - simple example
  A <- matrix(1, 3,3); A[1,3] <- A[3,1] <- 0
  n.A <- nearPD(A, corr=TRUE, do2eigen=FALSE)
@@ -128,12 +134,12 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
    all.equal(n.A.m, unname(as.matrix(n.A$mat)), tolerance = 1e-15)# seen rel.d.= 1.46e-16
  })
  set.seed(27)
- m <- matrix(round(stats::rnorm(25),2), 5, 5)
+ m <- matrix(round(rnorm(25),2), 5, 5)
  m <- m + t(m)
  diag(m) <- pmax(0, diag(m)) + 1
  (m <- round(cov2cor(m), 2))
 
- utils::str(near.m <- nearPD(m, trace = TRUE))
+ str(near.m <- nearPD(m, trace = TRUE))
  round(near.m$mat, 2)
  norm(m - near.m$mat) # 1.102 / 1.08
 
@@ -160,7 +166,7 @@ nc.$iterations  # 2
 nc.1 <- nearPD(pr, conv.tol = 1e-7, corr = TRUE)
 nc.1$iterations # 11 / 12 (!)
 ncr   <- nearPD(pr, conv.tol = 1e-15)
-utils::str(ncr)# still 2 iterations
+str(ncr)# still 2 iterations
 ncr.1 <- nearPD(pr, conv.tol = 1e-15, corr = TRUE)
 ncr.1 $ iterations # 27 / 30 !
 
@@ -176,7 +182,7 @@ norm(pr -       ncr.1$mat)  # = 0.08746 / 0.08805
 (load(system.file("external", "symW.rda", package="Matrix"))) # "symW"
 dim(symW) #  24 x 24
 class(symW)# "dsCMatrix": sparse symmetric
-if(grDevices::dev.interactive())  image(symW)
+if(dev.interactive())  image(symW)
 EV <- eigen(symW, only=TRUE)$values
 summary(EV) ## looking more closely {EV sorted decreasingly}:
 tail(EV)# all 6 are negative
@@ -187,5 +193,5 @@ if(requireNamespace("sfsmisc")) {
     for(side in 1:2) sfsmisc::eaxis(side)
 } else
     plot(pmax(1e-3,EV), EV2, type="o", log="xy")
-graphics::abline(0, 1, col="red3", lty=2)
+abline(0, 1, col="red3", lty=2)
 }

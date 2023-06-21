@@ -260,6 +260,10 @@ isLDL(x)
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showClass("dCHMsimpl")
 showClass("dCHMsuper")
 set.seed(2)
@@ -273,8 +277,8 @@ A <- crossprod(M)
 dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (ch.A <- Cholesky(A)) # pivoted, by default
-utils::str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
-utils::str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
+str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
+str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
@@ -299,7 +303,7 @@ stopifnot(exprs = {
 
 ## Factorization handled as factorized matrix
 ## (in some cases only optionally, depending on arguments)
-b <- stats::rnorm(n)
+b <- rnorm(n)
 stopifnot(identical(det(A), det(ch.A, sqrt = FALSE)),
           identical(solve(A, b), solve(ch.A, b, system = "A")))
 

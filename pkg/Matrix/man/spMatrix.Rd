@@ -45,13 +45,17 @@ spMatrix(nrow, ncol, i = integer(), j = integer(), x = double())
   definition help files.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 ## simple example
 A <- spMatrix(10,20, i = c(1,3:8),
                      j = c(2,9,6:10),
                      x = 7 * (1:7))
 A # a "dgTMatrix"
 summary(A)
-utils::str(A) # note that *internally* 0-based indices (i,j) are used
+str(A) # note that *internally* 0-based indices (i,j) are used
 
 L <- spMatrix(9, 30, i = rep(1:9, 3), 1:27,
               (1:27) \%\% 4 != 1)
@@ -61,7 +65,7 @@ L # an "lgTMatrix"
 ## A simplified predecessor of  Matrix'  rsparsematrix() function :
 
  rSpMatrix <- function(nrow, ncol, nnz,
-                       rand.x = function(n) round(stats::rnorm(nnz), 2))
+                       rand.x = function(n) round(rnorm(nnz), 2))
  {
      ## Purpose: random sparse matrix
      ## --------------------------------------------------------------

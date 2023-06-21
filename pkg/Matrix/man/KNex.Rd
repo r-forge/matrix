@@ -23,11 +23,14 @@
   \doi{10.18637/jss.v008.i06}
 }
 \examples{
-utils::data(KNex)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
+data(KNex, package = "Matrix")
 class(KNex$mm)
 dim(KNex$mm)
 image(KNex$mm)
-utils::str(KNex)
+str(KNex)
 
 system.time( # a fraction of a second
   sparse.sol <- with(KNex, solve(crossprod(mm), crossprod(mm, y))))

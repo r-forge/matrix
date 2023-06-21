@@ -107,9 +107,12 @@
   \code{\link{Extract}} about the standard subset assignment (and extraction).
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 %% Note that ./Xtrct-methods.Rd has the indexing ones
 set.seed(101)
-(a <- m <- Matrix(round(stats::rnorm(7*4),2), nrow = 7))
+(a <- m <- Matrix(round(rnorm(7*4),2), nrow = 7))
 
 a[] <- 2.2 # <<- replaces **every** entry
 a

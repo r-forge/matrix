@@ -134,19 +134,23 @@
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showClass("Cholesky")
 set.seed(1)
 
 m <- 30L
 n <- 6L
-(A <- crossprod(Matrix(stats::rnorm(m * n), m, n)))
+(A <- crossprod(Matrix(rnorm(m * n), m, n)))
 
 ## With dimnames, to see that they are propagated :
 dimnames(A) <- dn <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (ch.A <- Cholesky(A)) # pivoted, by default
-utils::str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
-utils::str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
+str(e.ch.A <- expand2(ch.A, LDL =  TRUE), max.level = 2L)
+str(E.ch.A <- expand2(ch.A, LDL = FALSE), max.level = 2L)
 
 ## Underlying LAPACK representation
 (m.ch.A <- as(ch.A, "dtrMatrix")) # which is L', not L, because
@@ -175,7 +179,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- stats::rnorm(n)
+b <- rnorm(n)
 all.equal(det(A), det(ch.A), tolerance = 0)
 all.equal(solve(A, b), solve(ch.A, b), tolerance = 0)
 
