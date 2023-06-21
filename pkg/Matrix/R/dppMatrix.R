@@ -7,7 +7,7 @@
 .dsp2dpp <- function(from) {
     if(is.null(tryCatch(Cholesky(from, perm = FALSE),
                         error = function(e) NULL)))
-        stop("not a positive semidefinite matrix")
+        stop("not a positive definite matrix (and positive semidefiniteness is not checked)")
     ## FIXME: check=FALSE
     copyClass(from, "dppMatrix",
               sNames = c("Dim", "Dimnames", "uplo", "x", "factors"))
