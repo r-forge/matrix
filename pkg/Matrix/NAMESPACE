@@ -29,9 +29,9 @@ importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames,
            setOldClass, setReplaceMethod, setValidity,
            signature, show, slot, "slot<-", slotNames, validObject)
 
-importFrom("stats", contr.SAS, contr.poly, contr.sum, contr.treatment,
-           "contrasts<-", cov2cor , diffinv, model.frame, rnorm, runif,
-           symnum, terms, toeplitz, update, setNames)
+importFrom("stats", contr.SAS, contr.helmert, contr.poly, contr.sum,
+           contr.treatment, "contrasts<-", cov2cor , diffinv, model.frame,
+           rnorm, runif, symnum, terms, toeplitz, update, setNames)
 
 importFrom("utils", capture.output, head, head.matrix, str, tail, tail.matrix)
 
