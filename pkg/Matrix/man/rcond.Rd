@@ -107,7 +107,10 @@ rcond(x, norm, \dots)
   2nd edition, Johns Hopkins, Baltimore.
 }
 \examples{
-x <- Matrix(stats::rnorm(9), 3, 3)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
+x <- Matrix(rnorm(9), 3, 3)
 rcond(x)
 ## typically "the same" (with more computational effort):
 1 / (norm(x) * norm(solve(x)))

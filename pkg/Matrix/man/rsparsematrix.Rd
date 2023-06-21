@@ -57,10 +57,13 @@ rsparsematrix(nrow, ncol, density, nnz = round(density * maxE),
 }
 \author{Martin Maechler}
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 set.seed(17)# to be reproducible
 M <- rsparsematrix(8, 12, nnz = 30) # small example, not very sparse
 M
-M1 <- rsparsematrix(1000, 20,  nnz = 123,  rand.x = stats::runif)
+M1 <- rsparsematrix(1000, 20,  nnz = 123,  rand.x = runif)
 summary(M1)
 
 ## a random *symmetric* Matrix

@@ -52,11 +52,14 @@
   function \code{\link[base]{t}}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showClass("ntrMatrix")
 
-utils::str(new("ntpMatrix"))
+str(new("ntpMatrix"))
 (nutr <- as(upper.tri(matrix(, 4, 4)), "ndenseMatrix"))
-utils::str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
+str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
 !nutp # the logical negation (is *not* logical triangular !)
 ## but this one is:
 stopifnot(all.equal(nutp, pack(!!nutp)))

@@ -136,14 +136,17 @@
   the class \code{\linkS4class{dgCMatrix}} and \code{\linkS4class{dgTMatrix}}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
 (lm <- (m > 1)) # lgC
 !lm     # no longer sparse
 stopifnot(is(lm,"lsparseMatrix"),
           identical(!lm, m <= 1))
 
-utils::data(KNex)
-utils::str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
+data(KNex, package = "Matrix")
+str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
 table(mmG.1@x)# however with many ``non-structural zeros''
 ## from logical to nz_pattern -- okay when there are no NA's :
 nmG.1 <- as(mmG.1, "nMatrix") # <<< has "TRUE" also where mmG.1 had FALSE

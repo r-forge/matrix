@@ -44,8 +44,12 @@
   \code{\link{dimnames}}, \code{\link{matrix}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 m1 <- m2 <- m3 <- m4 <- m <-
-    matrix(round(100 * stats::rnorm(6)), 2, 3)
+    matrix(round(100 * rnorm(6)), 2, 3)
 dimnames(m1) <- list(NULL, NULL)
 dimnames(m2) <- list(NULL, character())
 dimnames(m3) <- rev(dimnames(m2))
@@ -53,7 +57,7 @@ dimnames(m4) <- rep(list(character()),2)
 
 m4 # prints absolutely identically to m
 
-c.o <- utils::capture.output
+c.o <- capture.output
 cm <- c.o(m)
 stopifnot(exprs = {
     m == m1; m == m2; m == m3; m == m4

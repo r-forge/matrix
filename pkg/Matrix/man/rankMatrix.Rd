@@ -134,6 +134,9 @@ qr2rankMatrix(qr, tol = NULL, isBqr = is.qr(qr), do.warn = TRUE)
  \code{\link{qr}}, \code{\link{svd}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 rankMatrix(cbind(1, 0, 1:3)) # 2
 
 (meths <- eval(formals(rankMatrix)$method))
@@ -175,7 +178,7 @@ sapply(meths, function(.m.) rankMatrix(M15, method = .m., tol = 1e-7)) # all 14
 n <- 250000; p <- 33; nnz <- 10000
 L <- sparseMatrix(i = sample.int(n, nnz, replace=TRUE),
                   j = sample.int(p, nnz, replace=TRUE),
-                  x = stats::rnorm(nnz))
+                  x = rnorm(nnz))
 (st1 <- system.time(r1 <- rankMatrix(L)))                # warning+ ~1.5 sec (2013)
 (st2 <- system.time(r2 <- rankMatrix(L, method = "qr"))) # considerably faster!
 r1[[1]] == print(r2[[1]]) ## -->  ( 33  TRUE )

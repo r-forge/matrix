@@ -107,6 +107,9 @@ fac2Sparse(from, to = c("d", "l", "n"),
   (and \emph{no} contrasts).
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 dd <- data.frame(a = gl(3,4), b = gl(4,1,12))# balanced 2-way
 options("contrasts") # the default:  "contr.treatment"
 sparse.model.matrix(~ a + b, dd)
@@ -115,10 +118,10 @@ sparse.model.matrix(~ a + b, dd, contrasts = list(a="contr.sum"))
 sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
 
 ## Sparse method is equivalent to the traditional one :
-stopifnot(all(sparse.model.matrix(~ a + b, dd) ==
-	      Matrix(stats::model.matrix(~ a + b, dd), sparse=TRUE)),
-	  all(sparse.model.matrix(~ 0+ a + b, dd) ==
-	      Matrix(stats::model.matrix(~ 0+ a + b, dd), sparse=TRUE)))
+stopifnot(all(sparse.model.matrix(~    a + b, dd) ==
+	          Matrix(model.matrix(~    a + b, dd), sparse=TRUE)),
+	      all(sparse.model.matrix(~0 + a + b, dd) ==
+	          Matrix(model.matrix(~0 + a + b, dd), sparse=TRUE)))
 %% many more and tougher examples ---> ../tests/spModel.matrix.R
 
 (ff <- gl(3,4,, c("X","Y", "Z")))

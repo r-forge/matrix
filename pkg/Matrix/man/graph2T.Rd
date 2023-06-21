@@ -87,7 +87,8 @@ if(requireNamespace("graph")) {
   show(a.) # "ngTMatrix"
   show(g. <- as(a., "graph"))
 \dontshow{
-  stopifnot(edgemode(g.) == "undirected", numEdges(g.) == 2,
+  stopifnot(graph::edgemode(g.) == "undirected",
+            graph::numEdges(g.) == 2,
             all.equal(as(g., "TsparseMatrix"),
                       as(a., "symmetricMatrix"))
 )

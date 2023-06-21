@@ -79,21 +79,24 @@ nnzero(x, na.counted = NA)
   \code{\link{drop0}}, \code{\link{zapsmall}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 m <- Matrix(0+1:28, nrow = 4)
 m[-3,c(2,4:5,7)] <- m[ 3, 1:4] <- m[1:3, 6] <- 0
 (mT <- as(m, "TsparseMatrix"))
 nnzero(mT)
 (S <- crossprod(mT))
 nnzero(S)
-utils::str(S) # slots are smaller than nnzero()
+str(S) # slots are smaller than nnzero()
 stopifnot(nnzero(S) == sum(as.matrix(S) != 0))# failed earlier
 
-utils::data(KNex)
+data(KNex, package = "Matrix")
 M <- KNex$mm
 class(M)
 dim(M)
 length(M); stopifnot(length(M) == prod(dim(M)))
 nnzero(M) # more relevant than length
 ## the above are also visible from
-utils::str(M)
+str(M)
 }

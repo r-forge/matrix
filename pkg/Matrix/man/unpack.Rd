@@ -83,6 +83,9 @@ unpack(x, \dots)
   \code{\link{identical}()}.  See the examples.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showMethods("pack")
 (s <- crossprod(matrix(sample(15), 5,3))) # traditional symmetric matrix
 (sp <- pack(s))
@@ -95,7 +98,7 @@ stopifnot(identical(pt, pack(tt)),
 showMethods("unpack")
 (cp4 <- chol(Hilbert(4))) # is triangular
 tp4 <- pack(cp4) # [t]riangular [p]acked
-utils::str(tp4)
+str(tp4)
 (unpack(tp4))
 stopifnot(identical(tp4, pack(unpack(tp4))))
 

@@ -116,12 +116,16 @@
 }
 %\author{Martin}
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 showClass("sparseMatrix") ## and look at the help() of its subclasses
 M <- Matrix(0, 10000, 100)
 M[1,1] <- M[2,3] <- 3.14
 M  ## show(.) method suppresses printing of the majority of rows
 
-utils::data(CAex); dim(CAex) # 72 x 72 matrix
+data(CAex, package = "Matrix")
+dim(CAex) # 72 x 72 matrix
 determinant(CAex) # works via sparse lu(.)
 
 ## factor -> t( <sparse design matrix> ) :

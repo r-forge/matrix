@@ -42,13 +42,17 @@
   \doi{10.2307/2285387}
 }
 \examples{
-utils::data(USCounties)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
+data(USCounties, package = "Matrix")
 (n <- ncol(USCounties))
 I <- .symDiagonal(n)
 
 set.seed(1)
 r <- 50L
-rho <- 1 / stats::runif(r, 0, 0.5)
+rho <- 1 / runif(r, 0, 0.5)
 
 system.time(MJ0 <- sapply(rho, function(mult)
     determinant(USCounties + mult * I, logarithm = TRUE)$modulus))

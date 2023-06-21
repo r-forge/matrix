@@ -128,12 +128,15 @@
   \code{\link[base]{chol}}, \code{\link[base]{solve}}, \code{\link{crossprod}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 h6 <- Hilbert(6)
 rcond(h6)
-utils::str(h6)
+str(h6)
 h6 * 27720 # is ``integer''
 solve(h6)
-utils::str(hp6 <- as(h6, "dppMatrix"))
+str(hp6 <- as(h6, "dppMatrix"))
 
 ### Note that  as(*, "corMatrix")  *scales* the matrix
 (ch6 <- as(h6, "corMatrix"))

@@ -129,11 +129,14 @@
   or an \code{"\linkS4class{ldiMatrix}"} in case of a diagonal matrix.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+}
 set.seed(7)
-L <- Matrix(stats::rnorm(20) > 1,    4,5)
+L <- Matrix(rnorm(20) > 1,    4,5)
 (N <- as(L, "nMatrix"))
 L. <- L; L.[1:2,1] <- TRUE; L.@x[1:2] <- FALSE; L. # has "zeros" to drop0()
-D <- Matrix(round(stats::rnorm(30)), 5,6) # -> values in -1:1 (for this seed)
+D <- Matrix(round(rnorm(30)), 5,6) # -> values in -1:1 (for this seed)
 L \%&\% D
 stopifnot(identical(L \%&\% D, N \%&\% D),
           all(L \%&\% D == as((L \%*\% abs(D)) > 0, "sparseMatrix")))

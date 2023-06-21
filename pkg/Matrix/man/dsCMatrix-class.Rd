@@ -97,9 +97,12 @@
   \code{\linkS4class{dgeMatrix}} and those mentioned above.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
 mm # automatically dsCMatrix
-utils::str(mm)
+str(mm)
 mT <- as(as(mm, "generalMatrix"), "TsparseMatrix")
 
 ## Either

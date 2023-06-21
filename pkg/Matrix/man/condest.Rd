@@ -88,7 +88,10 @@ onenormest(A, t = min(n, 5), A.x, At.x, n,
   \code{\link{norm}}, \code{\link{rcond}}.
 }
 \examples{
-utils::data(KNex)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
+data(KNex, package = "Matrix")
 mtm <- with(KNex, crossprod(mm))
 system.time(ce <- condest(mtm))
 sum(abs(ce$v)) ## || v ||_1  == 1
@@ -103,7 +106,7 @@ rc
 all.equal(rc, 1/ce$est) # TRUE -- the approxmation was good
 
 one <- onenormest(mtm)
-utils::str(one) ## est = 12.3
+str(one) ## est = 12.3
 ## the maximal column:
 which(one$v == 1) # mostly 4, rarely 1, depending on random seed
 }

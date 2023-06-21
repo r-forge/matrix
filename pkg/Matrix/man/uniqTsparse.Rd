@@ -56,7 +56,11 @@ anyDuplicatedT(x, di = dim(x))
  \code{\linkS4class{dgTMatrix}}.
 }
 \examples{
-utils::example("dgTMatrix-class", echo=FALSE)
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
+example("dgTMatrix-class", echo=FALSE)
 ## -> 'T2'  with (i,j,x) slots of length 5 each
 T2u <- uniqTsparse(T2)
 stopifnot(## They "are" the same (and print the same):
@@ -76,7 +80,7 @@ non_uniqT(T2u) # FALSE
 T3 <- T2u
 T3[1, c(1,3)] <- 10; T3[2, c(1,5)] <- 20
 T3u <- uniqTsparse(T3)
-utils::str(T3u) # sorted in 'j', and within j, sorted in i
+str(T3u) # sorted in 'j', and within j, sorted in i
 stopifnot(!non_uniqT(T3u))
 
 ## Logical l.TMatrix and n.TMatrix :
@@ -95,6 +99,6 @@ validObject(L.1N)
 (m.0N <- as.matrix(L.0N))
 (m.1N <- as.matrix(L.1N))
 stopifnot(identical(10L, which(is.na(m.0N))), !anyNA(m.1N))
-stats::symnum(m.0N)
-stats::symnum(m.1N)
+symnum(m.0N)
+symnum(m.1N)
 }

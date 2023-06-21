@@ -122,18 +122,22 @@
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showClass("BunchKaufman")
 set.seed(1)
 
 n <- 6L
-(A <- forceSymmetric(Matrix(stats::rnorm(n * n), n, n)))
+(A <- forceSymmetric(Matrix(rnorm(n * n), n, n)))
 
 ## With dimnames, to see that they are propagated :
 dimnames(A) <- rep.int(list(paste0("x", seq_len(n))), 2L)
 
 (bk.A <- BunchKaufman(A))
-utils::str(e.bk.A <- expand2(bk.A, complete = FALSE), max.level = 2L)
-utils::str(E.bk.A <- expand2(bk.A, complete =  TRUE), max.level = 2L)
+str(e.bk.A <- expand2(bk.A, complete = FALSE), max.level = 2L)
+str(E.bk.A <- expand2(bk.A, complete =  TRUE), max.level = 2L)
 
 ## Underlying LAPACK representation
 (m.bk.A <- as(bk.A, "dtrMatrix"))
@@ -154,7 +158,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- stats::rnorm(n)
+b <- rnorm(n)
 stopifnot(identical(det(A), det(bk.A)),
           identical(solve(A, b), solve(bk.A, b)))
 }

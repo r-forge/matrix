@@ -213,6 +213,10 @@ Cholesky(A, \dots)
   \doi{10.56021/9781421407944}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showMethods("Cholesky", inherited = FALSE)
 set.seed(0)
 
@@ -221,7 +225,7 @@ set.seed(0)
 ## .... Positive definite ..............................................
 
 n <- 6L
-(A1 <- crossprod(Matrix(stats::rnorm(n * n), n, n)))
+(A1 <- crossprod(Matrix(rnorm(n * n), n, n)))
 (ch.A1.nopivot <- Cholesky(A1, perm = FALSE))
 (ch.A1 <- Cholesky(A1))
 stopifnot(exprs = {
@@ -232,8 +236,8 @@ stopifnot(exprs = {
 })
 
 ## A ~ P1' L D L' P1 ~ P1' L L' P1 in floating point
-utils::str(e.ch.A1 <- expand2(ch.A1, LDL =  TRUE), max.level = 2L)
-utils::str(E.ch.A1 <- expand2(ch.A1, LDL = FALSE), max.level = 2L)
+str(e.ch.A1 <- expand2(ch.A1, LDL =  TRUE), max.level = 2L)
+str(E.ch.A1 <- expand2(ch.A1, LDL = FALSE), max.level = 2L)
 stopifnot(exprs = {
     all.equal(as(A1, "matrix"), as(Reduce(`\%*\%`, e.ch.A1), "matrix"))
     all.equal(as(A1, "matrix"), as(Reduce(`\%*\%`, E.ch.A1), "matrix"))
@@ -273,7 +277,7 @@ norm(A3.hat - A3.hat.hat, "2") / norm(A3.hat, "2") # 1.777944e-16
 ##   2  simplicial  P1 A P1' = L    L '            positive
 ##   3  supernodal  P1 A P2' = L    L '            positive
 
-utils::data(KNex, package = "Matrix")
+data(KNex, package = "Matrix")
 A4 <- crossprod(KNex[["mm"]])
 
 ch.A4 <-
@@ -295,7 +299,7 @@ s(m.ch.A4 <- rapply2(ch.A4, expand1, "L")) # giving L = L1 sqrt(D)
 
 ## By design, the pivoted and simplicial factorizations
 ## are more sparse than the unpivoted and supernodal ones ...
-s(rapply2(m.ch.A4, utils::object.size))
+s(rapply2(m.ch.A4, object.size))
 
 ## Which is nicely visualized by lattice-based methods for 'image'
 inm <- c("pivoted", "unpivoted")
@@ -317,8 +321,8 @@ stopifnot(exprs = {
 ## on min(diag(D)) >= 0, hence "with" is the default
 isLDL(simpl1)
 stopifnot(min(diag(simpl1)) >= 0)
-utils::str(e.ch.A4 <- expand2(simpl1, LDL =  TRUE), max.level = 2L) # default
-utils::str(E.ch.A4 <- expand2(simpl1, LDL = FALSE), max.level = 2L)
+str(e.ch.A4 <- expand2(simpl1, LDL =  TRUE), max.level = 2L) # default
+str(E.ch.A4 <- expand2(simpl1, LDL = FALSE), max.level = 2L)
 stopifnot(exprs = {
     all.equal(E.ch.A4[["L" ]], e.ch.A4[["L1" ]] \%*\% sqrt(e.ch.A4[["D"]]))
     all.equal(E.ch.A4[["L."]], sqrt(e.ch.A4[["D"]]) \%*\% e.ch.A4[["L1."]])
@@ -372,7 +376,7 @@ try(expand2(ch.A5, LDL = FALSE)) # ditto
 try(chol(A5, pivot = TRUE))      # ditto
 
 ## The default expansion is "square root free" and still works here
-utils::str(e.ch.A5 <- expand2(ch.A5, LDL = TRUE), max.level = 2L)
+str(e.ch.A5 <- expand2(ch.A5, LDL = TRUE), max.level = 2L)
 stopifnot(all.equal(A5, as(Reduce(`\%*\%`, e.ch.A5), "symmetricMatrix")))
 
 ## Version of the SuiteSparse library, which includes CHOLMOD

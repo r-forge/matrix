@@ -52,10 +52,13 @@
   \code{\link[base]{t}}
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:methods")
+}
 (M2 <- Matrix(c(TRUE, NA, FALSE, FALSE), 2, 2)) # logical dense (ltr)
-utils::str(M2)
+str(M2)
 # can
 (sM <- M2 | t(M2)) # "lge"
 as(sM, "symmetricMatrix")
-utils::str(sM <- as(sM, "packedMatrix")) # packed symmetric
+str(sM <- as(sM, "packedMatrix")) # packed symmetric
 }

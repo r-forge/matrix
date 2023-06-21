@@ -47,11 +47,15 @@ Class \code{"Matrix"}, by class \code{"ldenseMatrix"}.
   \emph{sparse} logical classes such as \code{\linkS4class{lgCMatrix}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(stats, pos = "package:methods")
+library(utils, pos = "package:methods")
+}
 showClass("lgeMatrix")
-utils::str(new("lgeMatrix"))
+str(new("lgeMatrix"))
 set.seed(1)
-(lM <- Matrix(matrix(stats::rnorm(28), 4,7) > 0))# a simple random lgeMatrix
+(lM <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgeMatrix
 set.seed(11)
-(lC <- Matrix(matrix(stats::rnorm(28), 4,7) > 0))# a simple random lgCMatrix
+(lC <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgCMatrix
 as(lM, "CsparseMatrix")
 }
