@@ -146,7 +146,7 @@ sparseMatrix(i, j, p, x, dims, dimnames,
 i <- c(1,3:8); j <- c(2,9,6:10); x <- 7 * (1:7)
 (A <- sparseMatrix(i, j, x = x))                    ##  8 x 10 "dgCMatrix"
 summary(A)
-str(A) # note that *internally* 0-based row indices are used
+utils::str(A) # note that *internally* 0-based row indices are used
 
 (sA <- sparseMatrix(i, j, x = x, symmetric = TRUE)) ## 10 x 10 "dsCMatrix"
 (tA <- sparseMatrix(i, j, x = x, triangular= TRUE)) ## 10 x 10 "dtCMatrix"
@@ -183,7 +183,7 @@ dn <- list(LETTERS[1:3], letters[1:5])
 ## pointer vectors can be used, and the (i,x) slots are sorted if necessary:
 m <- sparseMatrix(i = c(3,1, 3:2, 2:1), p= c(0:2, 4,4,6), x = 1:6, dimnames = dn)
 m
-str(m)
+utils::str(m)
 stopifnot(identical(dimnames(m), dn))
 
 sparseMatrix(x = 2.72, i=1:3, j=2:4) # recycling x
@@ -208,7 +208,7 @@ M1 <- rsparsematrix(1000, 20, nnz = 200)
 summary(M1)
 
 ## pointers example in converting from other sparse matrix representations.
-if(require(SparseM) && packageVersion("SparseM") >= 0.87 &&
+if(require(SparseM) && utils::packageVersion("SparseM") >= "0.87" &&
    nzchar(dfil <- system.file("extdata", "rua_32_ax.rua", package = "SparseM"))) {
   X <- model.matrix(read.matrix.hb(dfil))
   XX <- sparseMatrix(j = X@ja, p = X@ia - 1L, x = X@ra, dims = X@dimension)

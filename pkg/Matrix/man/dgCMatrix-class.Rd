@@ -62,7 +62,7 @@
 }
 \examples{
 (m <- Matrix(c(0,0,2:0), 3,5))
-str(m)
+utils::str(m)
 m[,1]
 \dontshow{## regression test: this must give a validity-check error:
 stopifnot(inherits(try(new("dgCMatrix", i = 0:1, p = 0:2,

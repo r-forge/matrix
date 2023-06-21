@@ -116,9 +116,9 @@ sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
 
 ## Sparse method is equivalent to the traditional one :
 stopifnot(all(sparse.model.matrix(~ a + b, dd) ==
-	      Matrix(model.matrix(~ a + b, dd), sparse=TRUE)),
+	      Matrix(stats::model.matrix(~ a + b, dd), sparse=TRUE)),
 	  all(sparse.model.matrix(~ 0+ a + b, dd) ==
-	      Matrix(model.matrix(~ 0+ a + b, dd), sparse=TRUE)))
+	      Matrix(stats::model.matrix(~ 0+ a + b, dd), sparse=TRUE)))
 %% many more and tougher examples ---> ../tests/spModel.matrix.R
 
 (ff <- gl(3,4,, c("X","Y", "Z")))

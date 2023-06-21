@@ -194,7 +194,7 @@ selectMethod("chol", "ddiMatrix")
 (R4 <- chol(A4, pivot = TRUE))
 
 det4 <- det(A4)
-b4 <- rnorm(5L)
+b4 <- stats::rnorm(5L)
 x4 <- solve(A4, b4)
 
 stopifnot(exprs = {

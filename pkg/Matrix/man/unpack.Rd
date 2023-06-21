@@ -95,7 +95,7 @@ stopifnot(identical(pt, pack(tt)),
 showMethods("unpack")
 (cp4 <- chol(Hilbert(4))) # is triangular
 tp4 <- pack(cp4) # [t]riangular [p]acked
-str(tp4)
+utils::str(tp4)
 (unpack(tp4))
 stopifnot(identical(tp4, pack(unpack(tp4))))
 

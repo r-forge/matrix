@@ -63,9 +63,9 @@
 \examples{
 showClass("dtrMatrix")
 
-example("dtrMatrix-class", echo=FALSE)
+utils::example("dtrMatrix-class", echo=FALSE)
 (p1 <- pack(T2))
-str(p1)
+utils::str(p1)
 (pp <- pack(T))
 ip1 <- solve(p1)
 stopifnot(length(p1@x) == 3, length(pp@x) == 3,

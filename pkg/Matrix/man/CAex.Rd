@@ -26,8 +26,8 @@
 }
 % \source{}
 \examples{
-data(CAex)
-str(CAex) # of class "dgCMatrix"
+utils::data(CAex)
+utils::str(CAex) # of class "dgCMatrix"
 
 image(CAex)# -> it's a simple band matrix with 5 bands
 ## and the eigen values are basically 1 (42 times) and 0 (30 x):

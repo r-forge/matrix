@@ -54,9 +54,9 @@
 \examples{
 showClass("ntrMatrix")
 
-str(new("ntpMatrix"))
+utils::str(new("ntpMatrix"))
 (nutr <- as(upper.tri(matrix(, 4, 4)), "ndenseMatrix"))
-str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
+utils::str(nutp <- pack(nutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
 !nutp # the logical negation (is *not* logical triangular !)
 ## but this one is:
 stopifnot(all.equal(nutp, pack(!!nutp)))

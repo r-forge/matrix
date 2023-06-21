@@ -213,7 +213,7 @@ showMethods("expand1", inherited = FALSE)
 showMethods("expand2", inherited = FALSE)
 set.seed(0)
 
-(A <- Matrix(rnorm(9L, 0, 10), 3L, 3L))
+(A <- Matrix(stats::rnorm(9L, 0, 10), 3L, 3L))
 (lu.A <- lu(A))
 (e.lu.A <- expand2(lu.A))
 stopifnot(exprs = {

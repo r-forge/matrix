@@ -147,14 +147,14 @@ set.seed(0)
 
 ## ---- Dense ----------------------------------------------------------
 
-(A1 <- Matrix(rnorm(9L), 3L, 3L))
+(A1 <- Matrix(stats::rnorm(9L), 3L, 3L))
 (lu.A1 <- lu(A1))
 
 (A2 <- round(10 * A1[, -3L]))
 (lu.A2 <- lu(A2))
 
 ## A ~ P1' L U in floating point
-str(e.lu.A2 <- expand2(lu.A2), max.level = 2L)
+utils::str(e.lu.A2 <- expand2(lu.A2), max.level = 2L)
 stopifnot(all.equal(A2, Reduce(`\%*\%`, e.lu.A2)))
 
 ## ---- Sparse ---------------------------------------------------------
@@ -164,6 +164,6 @@ A3 <- as(readMM(system.file("external/pores_1.mtx", package = "Matrix")),
 (lu.A3 <- lu(A3))
 
 ## A ~ P1' L U P2' in floating point
-str(e.lu.A3 <- expand2(lu.A3), max.level = 2L)
+utils::str(e.lu.A3 <- expand2(lu.A3), max.level = 2L)
 stopifnot(all.equal(A3, Reduce(`\%*\%`, e.lu.A3)))
 }

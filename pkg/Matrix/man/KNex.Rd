@@ -23,11 +23,11 @@
   \doi{10.18637/jss.v008.i06}
 }
 \examples{
-data(KNex)
+utils::data(KNex)
 class(KNex$mm)
-  dim(KNex$mm)
+dim(KNex$mm)
 image(KNex$mm)
-str(KNex)
+utils::str(KNex)
 
 system.time( # a fraction of a second
   sparse.sol <- with(KNex, solve(crossprod(mm), crossprod(mm, y))))

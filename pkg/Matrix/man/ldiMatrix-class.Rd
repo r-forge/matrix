@@ -81,7 +81,7 @@
 }
 \examples{
 (lM <- Diagonal(x = c(TRUE,FALSE,FALSE)))
-str(lM)#> gory details (slots)
+utils::str(lM)#> gory details (slots)
 
 crossprod(lM) # numeric
 (nM <- as(lM, "nMatrix"))# -> sparse (not formally ``diagonal'')

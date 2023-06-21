@@ -104,7 +104,7 @@ as(l3, "CsparseMatrix")# "lgCMatrix"
 Matrix(1:9, nrow=3,
        dimnames = list(c("a", "b", "c"), c("A", "B", "C")))
 (I3 <- Matrix(diag(3)))# identity, i.e., unit "diagonalMatrix"
-str(I3) # note  'diag = "U"' and the empty 'x' slot
+utils::str(I3) # note  'diag = "U"' and the empty 'x' slot
 
 (A <- cbind(a=c(2,1), b=1:2))# symmetric *apart* from dimnames
 Matrix(A)                    # hence 'dgeMatrix'

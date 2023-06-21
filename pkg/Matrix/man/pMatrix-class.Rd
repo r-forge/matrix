@@ -111,7 +111,7 @@ set.seed(11)
 (p10 <- as(sample(10),"pMatrix"))
 
 ## Permute rows / columns of a numeric matrix :
-(mm <- round(array(rnorm(3 * 3), c(3, 3)), 2))
+(mm <- round(array(stats::rnorm(3 * 3), c(3, 3)), 2))
 mm \%*\% pm1
 pm1 \%*\% mm
 try(as(as.integer(c(3,3,1)), "pMatrix"))# Error: not a permutation

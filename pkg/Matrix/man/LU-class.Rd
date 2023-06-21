@@ -92,14 +92,14 @@ showClass("denseLU")
 set.seed(1)
 
 n <- 3L
-(A <- Matrix(round(rnorm(n * n), 2L), n, n))
+(A <- Matrix(round(stats::rnorm(n * n), 2L), n, n))
 
 ## With dimnames, to see that they are propagated :
 dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
                           paste0("c", seq_len(n)))
 
 (lu.A <- lu(A))
-str(e.lu.A <- expand2(lu.A), max.level = 2L)
+utils::str(e.lu.A <- expand2(lu.A), max.level = 2L)
 
 ## Underlying LAPACK representation
 (m.lu.A <- as(lu.A, "dgeMatrix")) # which is L and U interlaced
@@ -125,7 +125,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- rnorm(n)
+b <- stats::rnorm(n)
 stopifnot(identical(det(A), det(lu.A)),
           identical(solve(A, b), solve(lu.A, b)))
 }

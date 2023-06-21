@@ -98,7 +98,7 @@ dimnames(A) <- dn <- list(paste0("r", seq_len(n)),
                           paste0("c", seq_len(n)))
 
 (lu.A <- lu(A))
-str(e.lu.A <- expand2(lu.A), max.level = 2L)
+utils::str(e.lu.A <- expand2(lu.A), max.level = 2L)
 
 ae1 <- function(a, b, ...) all.equal(as(a, "matrix"), as(b, "matrix"), ...)
 ae2 <- function(a, b, ...) ae1(unname(a), unname(b), ...)
@@ -119,7 +119,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- rnorm(n)
+b <- stats::rnorm(n)
 stopifnot(identical(det(A), det(lu.A)),
           identical(solve(A, b), solve(lu.A, b)))
 }

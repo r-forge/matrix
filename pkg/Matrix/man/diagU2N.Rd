@@ -58,7 +58,7 @@
   \code{"\linkS4class{dtCMatrix}"}.
 }
 \examples{
-(T <- Diagonal(7) + triu(Matrix(rpois(49, 1/4), 7,7), k = 1))
+(T <- Diagonal(7) + triu(Matrix(stats::rpois(49, 1/4), 7, 7), k = 1))
 (uT <- diagN2U(T)) # "unitriangular"
 (t.u <- diagN2U(10*T))# changes the diagonal!
 stopifnot(all(T == uT), diag(t.u) == 1,

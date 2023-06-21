@@ -91,14 +91,14 @@ showClass("Schur")
 set.seed(0)
 
 n <- 4L
-(A <- Matrix(rnorm(n * n), n, n))
+(A <- Matrix(stats::rnorm(n * n), n, n))
 
 ## With dimnames, to see that they are propagated :
 dimnames(A) <- list(paste0("r", seq_len(n)),
                     paste0("c", seq_len(n)))
 
 (sch.A <- Schur(A))
-str(e.sch.A <- expand2(sch.A), max.level = 2L)
+utils::str(e.sch.A <- expand2(sch.A), max.level = 2L)
 
 ## A ~ Q T Q' in floating point
 stopifnot(exprs = {
@@ -107,7 +107,7 @@ stopifnot(exprs = {
 })
 
 ## Factorization handled as factorized matrix
-b <- rnorm(n)
+b <- stats::rnorm(n)
 stopifnot(all.equal(det(A), det(sch.A)),
           all.equal(solve(A, b), solve(sch.A, b)))
 

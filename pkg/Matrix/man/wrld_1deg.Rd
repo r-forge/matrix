@@ -48,14 +48,14 @@
   \doi{10.2307/2285387}
 }
 \examples{
-data(wrld_1deg)
+utils::data(wrld_1deg)
 (n <- ncol(wrld_1deg))
 I <- .symDiagonal(n)
 
 doExtras <- interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))
 set.seed(1)
 r <- if(doExtras) 20L else 3L
-rho <- 1 / runif(r, 0, 0.5)
+rho <- 1 / stats::runif(r, 0, 0.5)
 
 system.time(MJ0 <- sapply(rho, function(mult)
     determinant(wrld_1deg + mult * I, logarithm = TRUE)$modulus))

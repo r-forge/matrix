@@ -121,8 +121,10 @@ M
 colSums(M)
 rowMeans(M)
 ## Assertions :
-stopifnot(all.equal(colSums(M),
-		    setNames(c(1,1,6,6,6,6,3,2), colnames(M))),
-	  all.equal(rowMeans(M), structure(c(1,1,4,8,12,3,2) / 8,
-					   .Names = paste0("r", 1:7))))
+stopifnot(exprs = {
+    all.equal(colSums(M),
+              structure(c(1,1,6,6,6,6,3,2), names = colnames(M)))
+    all.equal(rowMeans(M),
+              structure(c(1,1,4,8,12,3,2)/8, names = paste0("r", 1:7)))
+})
 }

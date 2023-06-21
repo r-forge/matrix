@@ -121,7 +121,7 @@ M <- Matrix(0, 10000, 100)
 M[1,1] <- M[2,3] <- 3.14
 M  ## show(.) method suppresses printing of the majority of rows
 
-data(CAex); dim(CAex) # 72 x 72 matrix
+utils::data(CAex); dim(CAex) # 72 x 72 matrix
 determinant(CAex) # works via sparse lu(.)
 
 ## factor -> t( <sparse design matrix> ) :

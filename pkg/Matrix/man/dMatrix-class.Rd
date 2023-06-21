@@ -121,8 +121,8 @@
  showClass("dMatrix")
 
  set.seed(101)
- round(Matrix(rnorm(28), 4,7), 2)
- M <- Matrix(rlnorm(56, sd=10), 4,14)
+ round(Matrix(stats::rnorm(28), 4,7), 2)
+ M <- Matrix(stats::rlnorm(56, sd=10), 4,14)
  (M. <- zapsmall(M))
  table(as.logical(M. == 0))
 }

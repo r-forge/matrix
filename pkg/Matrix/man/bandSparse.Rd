@@ -73,7 +73,9 @@ bk <- c(0:4, 7,9)
 
 ## If you want a pattern matrix, but with "sparse"-diagonals,
 ## you currently need to go via logical sparse:
-lLis <- lapply(list(rpois(20, 2), rpois(20,1), rpois(20,3))[c(1:3,2:3,3:2)],
+lLis <- lapply(list(stats::rpois(20, 2),
+                    stats::rpois(20, 1),
+                    stats::rpois(20, 3))[c(1:3, 2:3, 3:2)],
                as.logical)
 (s4 <- bandSparse(20, k = bk, symm = TRUE, diag = lLis))
 (s4. <- as(drop0(s4), "nsparseMatrix"))

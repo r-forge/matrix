@@ -406,9 +406,9 @@
  ## A random sparse "incidence" matrix :
  m <- matrix(0, 400, 500)
  set.seed(12)
- m[runif(314, 0, length(m))] <- 1
+ m[stats::runif(314, 0, length(m))] <- 1
  mm <- as(m, "CsparseMatrix")
- object.size(m) / object.size(mm) # smaller by a factor of > 200
+ utils::object.size(m) / utils::object.size(mm) # smaller by a factor of > 200
 
  ## tcrossprod() is very fast:
  system.time(tCmm <- tcrossprod(mm))# 0   (PIII, 933 MHz)

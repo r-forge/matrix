@@ -213,7 +213,7 @@ v <- as(c(0,0,3, 3.2, rep(0,9),-3,0,-1, rep(0,20),5,0),
          "sparseVector")
 v <- rep(rep(v, 50), 5000)
 set.seed(1); v[sample(v@i, 1e6)] <- 0
-str(v)
+utils::str(v)
 % Formal class 'dsparseVector' [package "Matrix"] with 3 slots
 %   ..@ x     : num [1:250000] 3.2 -1 -3 3 5 3.2 -3 3 -1 5 ...
 %   ..@ length: int 9500000

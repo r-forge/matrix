@@ -82,7 +82,7 @@ t1
 tu <- t1 ; tu@diag <- "U"
 tu
 (cu <- as(tu, "CsparseMatrix"))
-str(cu)# only two entries in @i and @x
+utils::str(cu)# only two entries in @i and @x
 stopifnot(cu@i == 1:0,
           all(2 * symmpart(cu) == Diagonal(4) + forceSymmetric(cu)))
 

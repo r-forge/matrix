@@ -48,10 +48,10 @@ Class \code{"Matrix"}, by class \code{"ldenseMatrix"}.
 }
 \examples{
 showClass("lgeMatrix")
-str(new("lgeMatrix"))
+utils::str(new("lgeMatrix"))
 set.seed(1)
-(lM <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgeMatrix
+(lM <- Matrix(matrix(stats::rnorm(28), 4,7) > 0))# a simple random lgeMatrix
 set.seed(11)
-(lC <- Matrix(matrix(rnorm(28), 4,7) > 0))# a simple random lgCMatrix
+(lC <- Matrix(matrix(stats::rnorm(28), 4,7) > 0))# a simple random lgCMatrix
 as(lM, "CsparseMatrix")
 }
