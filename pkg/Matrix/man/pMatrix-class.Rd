@@ -100,7 +100,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 (pm1 <- as(as.integer(c(2,3,1)), "pMatrix"))
 t(pm1) # is the same as

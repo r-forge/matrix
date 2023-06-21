@@ -45,8 +45,8 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 m1 <- m2 <- m3 <- m4 <- m <-
     matrix(round(100 * rnorm(6)), 2, 3)

@@ -80,7 +80,7 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 Matrix(0, 3, 2)             # 3 by 2 matrix of zeros -> sparse
 Matrix(0, 3, 2, sparse=FALSE)# -> 'dense'

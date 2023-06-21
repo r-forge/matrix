@@ -84,7 +84,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 (d2 <- Diagonal(x = c(10,1)))
 str(d2)

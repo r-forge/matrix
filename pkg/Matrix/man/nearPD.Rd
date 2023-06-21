@@ -118,10 +118,10 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
-library(graphics, pos = "package:methods")
-library(grDevices, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
+library(graphics, pos = "package:methods", verbose = FALSE)
+library(grDevices, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
  ## Higham(2002), p.334f - simple example
  A <- matrix(1, 3,3); A[1,3] <- A[3,1] <- 0

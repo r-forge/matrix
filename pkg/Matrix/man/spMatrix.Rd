@@ -46,8 +46,8 @@ spMatrix(nrow, ncol, i = integer(), j = integer(), x = double())
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
-library(utils, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 ## simple example
 A <- spMatrix(10,20, i = c(1,3:8),

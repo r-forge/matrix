@@ -62,7 +62,7 @@ bandSparse(n, m = n, k, diagonals, symmetric = FALSE,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 diags <- list(1:30, 10*(1:20), 100*(1:20))
 s1 <- bandSparse(13, k = -c(0:2, 6), diag = c(diags, diags[2]), symm=TRUE)

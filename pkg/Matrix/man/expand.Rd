@@ -210,7 +210,7 @@ expand (x, \dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 showMethods("expand1", inherited = FALSE)
 showMethods("expand2", inherited = FALSE)

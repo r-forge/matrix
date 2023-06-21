@@ -55,7 +55,7 @@ bdiag(\dots)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods")
+library(stats, pos = "package:methods", verbose = FALSE)
 }
 bdiag(matrix(1:4, 2), diag(3))
 ## combine "Matrix" class and traditional matrices:

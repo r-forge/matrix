@@ -37,7 +37,7 @@ sparseVector(x, i, length)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods")
+library(utils, pos = "package:methods", verbose = FALSE)
 }
 str(sv <- sparseVector(x = 1:10, i = sample(999, 10), length=1000))
 
