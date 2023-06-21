@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-21 r4095)}{
+\section{Changes in version 1.6-0 (2023-06-21 r4096)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -337,6 +337,10 @@
 	  \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
 	  additional \code{::} and \code{library} calls in the problematic
 	  source files.
+
+	  \item Examples now use \code{requireNamespace} instead of
+	  \code{require} in order to preserve the user search path
+	  in more cases.
     }
   }
 }

@@ -62,11 +62,11 @@ T2graph(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
   \code{graph_from_adjacency_matrix} and \code{as_adjacency_matrix}.
 }
 \examples{
-if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
+if(requireNamespace("graph")) {
   n4 <- LETTERS[1:4]; dns <- list(n4,n4)
   show(a1 <- sparseMatrix(i= c(1:4),   j=c(2:4,1),   x = 2,    dimnames=dns))
   show(g1 <- as(a1, "graph")) # directed
-  unlist(edgeWeights(g1)) # all '2'
+  unlist(graph::edgeWeights(g1)) # all '2'
 
   show(a2 <- sparseMatrix(i= c(1:4,4), j=c(2:4,1:2), x = TRUE, dimnames=dns))
   show(g2 <- as(a2, "graph")) # directed
@@ -92,5 +92,5 @@ if(isTRUE(try(require(graph)))) { ## super careful .. for "checking reasons"
                       as(a., "symmetricMatrix"))
 )
 }
-}% only if( graph )
+}
 }

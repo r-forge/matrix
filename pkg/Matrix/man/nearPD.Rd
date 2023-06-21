@@ -137,8 +137,8 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
  round(near.m$mat, 2)
  norm(m - near.m$mat) # 1.102 / 1.08
 
- if(require("sfsmisc")) {
-    m2 <- posdefify(m) # a simpler approach
+ if(requireNamespace("sfsmisc")) {
+    m2 <- sfsmisc::posdefify(m) # a simpler approach
     norm(m - m2)  # 1.185, i.e., slightly "less near"
  }
 
@@ -182,9 +182,10 @@ summary(EV) ## looking more closely {EV sorted decreasingly}:
 tail(EV)# all 6 are negative
 EV2 <- eigen(sWpos <- nearPD(symW)$mat, only=TRUE)$values
 stopifnot(EV2 > 0)
-if(require("sfsmisc")) {
-       plot(pmax(1e-3,EV), EV2, type="o", log="xy", xaxt="n",yaxt="n")
-       eaxis(1); eaxis(2)
-} else plot(pmax(1e-3,EV), EV2, type="o", log="xy")
-graphics::abline(0,1, col="red3",lty=2)
+if(requireNamespace("sfsmisc")) {
+    plot(pmax(1e-3,EV), EV2, type="o", log="xy", xaxt="n", yaxt="n")
+    for(side in 1:2) sfsmisc::eaxis(side)
+} else
+    plot(pmax(1e-3,EV), EV2, type="o", log="xy")
+graphics::abline(0, 1, col="red3", lty=2)
 }

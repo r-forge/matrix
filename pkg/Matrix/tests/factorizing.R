@@ -304,8 +304,8 @@ stopifnot(all.equal(determinant(rr$A) -> detA,
 A12 <- mkLDL(12, 1/10)
 (r12 <- allCholesky(A12$A))[-1]
 aCh.hash <- mkCholhash(r12$r.all)
-if(FALSE)## if(require("sfsmisc"))
-split(rownames(r12$r.all), Duplicated(aCh.hash))
+if(requireNamespace("sfsmisc"))
+split(rownames(r12$r.all), sfsmisc::Duplicated(aCh.hash))
 
 ## TODO: find cases for both choices when we leave it to CHOLMOD to choose
 for(n in 1:50) { ## used to seg.fault at n = 10 !
