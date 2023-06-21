@@ -58,9 +58,9 @@
     \item{\code{determinant}}{\code{signature(from = "Schur", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
-    \item{expand1}{\code{signature(x = "Schur")}:
+    \item{\code{expand1}}{\code{signature(x = "Schur")}:
       see \code{\link{expand1-methods}}.}
-    \item{expand2}{\code{signature(x = "Schur")}:
+    \item{\code{expand2}}{\code{signature(x = "Schur")}:
       see \code{\link{expand2-methods}}.}
     \item{\code{solve}}{\code{signature(a = "Schur", b = .)}:
       see \code{\link{solve-methods}}.}

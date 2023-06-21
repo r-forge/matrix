@@ -111,7 +111,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
     \item{\code{determinant}}{\code{signature(from = "sparseQR", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
-    \item{expand1}{\code{signature(x = "sparseQR")}:
+    \item{\code{expand1}}{\code{signature(x = "sparseQR")}:
       see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "sparseQR")}:
       see \code{\link{expand2-methods}}.}

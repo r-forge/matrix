@@ -87,7 +87,7 @@
       returns a numeric vector of length \eqn{n} containing the diagonal
       elements of \eqn{D}, which are the squared diagonal elements of
       \eqn{L}.}
-    \item{expand1}{\code{signature(x = "p?Cholesky")}:
+    \item{\code{expand1}}{\code{signature(x = "p?Cholesky")}:
       see \code{\link{expand1-methods}}.}
     \item{\code{expand2}}{\code{signature(x = "p?Cholesky")}:
       see \code{\link{expand2-methods}}.}
