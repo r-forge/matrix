@@ -145,11 +145,11 @@ if(interactive() || nzchar(Sys.getenv("R_MATRIX_CHECK_EXTRA"))) {
 ## Using raster graphics: For PDF this would give a 77 MB file,
 ## however, for such a large matrix, this is typically considerably
 ## *slower* (than vector graphics rectangles) in most cases :
-if(doPNG <- !dev.interactive())
-   png("image-USCounties-raster.png", width=3200, height=3200)
+if(doPNG <- !grDevices::dev.interactive())
+   grDevices::png("image-USCounties-raster.png", width=3200, height=3200)
 image(USCounties, useRaster = TRUE) # should not suffer from anti-aliasing
 if(doPNG)
-   dev.off()
+   grDevices::dev.off()
    ## and now look at the *.png image in a viewer you can easily zoom in and out
 }#only if(doExtras)
 }
