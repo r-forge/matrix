@@ -33,8 +33,8 @@ Authors@R:
 	  person("R Core Team", role = "ctb",
 	         comment = "base R's matrix implementation"))
 Depends: R (>= 3.5.0), methods
-Imports: graphics, grid, lattice, stats, utils
-Suggests: MASS, sfsmisc
+Imports: grDevices, graphics, grid, lattice, stats, utils
+Suggests: MASS, datasets, sfsmisc
 Enhances: SparseM, graph
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R and our S4 classes
