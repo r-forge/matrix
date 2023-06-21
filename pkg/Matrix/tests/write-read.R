@@ -1,3 +1,6 @@
+## for R_DEFAULT_PACKAGES=NULL :
+library(utils)
+
 library(Matrix)
 
 ####  Read / Write  (sparse) Matrix objects ----------------------

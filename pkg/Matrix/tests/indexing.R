@@ -2,6 +2,10 @@
 ####    aka    subsetting     and  subassignment
 ####           ~~~~~~~~~~          ~~~~~~~~~~~~~
 
+## for R_DEFAULT_PACKAGES=NULL :
+library(stats)
+library(utils)
+
 if(interactive()) {
     options(error = recover, warn = 1)
 } else if(FALSE) { ## MM / developer  testing *manually* :

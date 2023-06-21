@@ -47,10 +47,10 @@ src/scripts/.*\.R$
 src/scripts/.*\.sh$
 po/.*\.sh$
 po/.*\.txt$
-tests/useRNG
 tests/.*\.Rout.*[24]b$
 tests/.*_(doExtra|nX)$
 tests/performance\.R$
+tests/useRNG_files$
 vignettes/fullpage\.sty$
 
 # Currently "empty", not contributing to namespace :

@@ -2,6 +2,9 @@
 ## proper subclasses of 'denseMatrix' with methods for the (new, more
 ## general) virtual subclasses '(un)?packedMatrix'.
 
+## for R_DEFAULT_PACKAGES=NULL :
+library(stats)
+
 library(Matrix)
 set.seed(145206)
 

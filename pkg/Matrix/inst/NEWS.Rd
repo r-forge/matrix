@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-20 r4087)}{
+\section{Changes in version 1.6-0 (2023-06-21 r4093)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -326,6 +326,16 @@
 
       \item \pkg{sfsmisc} has been moved from \code{Enhances} to
       \code{Suggests}, as it is used conditionally in \file{tests}.
+
+	  \item \pkg{grDevices} and \pkg{datasets} have been added
+	  to \code{Imports} and \code{Suggests}, respectively, as
+	  \file{NAMESPACE} does import from \pkg{grDevices} and
+	  vignettes do load data from \pkg{datasets}.
+
+	  \item Example, test, and vignette code no longer fails when
+	  \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
+	  additional \code{::} and \code{library} calls in the problematic
+	  source files.
     }
   }
 }
@@ -456,7 +466,7 @@
       to \code{Depends}, as suggested in the WRE manual.  Now
       \code{as()} and other basic S4 machinery are available whenever
       \pkg{Matrix} is attached.  This change affects R processes
-      started with environment variable \code{R_DEFAULT_PACKAGES} set
+      started with environment variable \env{R_DEFAULT_PACKAGES} set
       to \code{NULL} (or some list not containing \pkg{methods}).
 
       \item \file{Simple.R} test for sparse \code{"POSIXlt"} example
