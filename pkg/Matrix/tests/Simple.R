@@ -27,7 +27,6 @@ stopifnot(is(mt, "sparseMatrix"))
 ##--------------------------------------------------------------------
 
 library(Matrix)
-
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 
 if(interactive()) {
@@ -1016,8 +1015,7 @@ assertError(new("ngCMatrix", p = c(0L,2L), i = c(0L,0L), Dim = 2:1))
 
 
 ### "d" <-> "l"  for (symmetric) sparse : --------------------------------------
-suppressWarnings( data(KNex) ) ## may warn, as 'Matrix' is recommended
-                               ## and exist more than once at check-time
+data(KNex, package = "Matrix")
 mm <- KNex$mm
 xpx <- crossprod(mm)
 ## extract nonzero pattern

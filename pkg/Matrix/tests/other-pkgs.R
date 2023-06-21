@@ -83,7 +83,7 @@ if(requireNamespace("graph")) {
               identical(gmgw, gmgw2),
               identical(gmgU, gmgU2))
 
-    data(CAex)
+    data(CAex, package = "Matrix")
     cc <- crossprod(CAex)
     ## work around bug in 'graph': diagonal must be empty:
     diag(cc) <- 0; cc <- drop0(cc)
