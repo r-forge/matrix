@@ -36,7 +36,7 @@ sparseVector(x, i, length)
   the class \code{\linkS4class{sparseVector}}.
 }
 \examples{
-str(sv <- sparseVector(x = 1:10, i = sample(999, 10), length=1000))
+utils::str(sv <- sparseVector(x = 1:10, i = sample(999, 10), length=1000))
 
 sx <- c(0,0,3, 3.2, 0,0,0,-3:1,0,0,2,0,0,5,0,0)
 ss <- as(sx, "sparseVector")

@@ -251,7 +251,7 @@ stopifnot(exprs = {
 X <- rbind(A, Diagonal(3)) # design matrix X (for L.S.)
 Xt <- t(X)                 # *transposed*  X (for L.S.)
 (y <- drop(crossprod(Xt, 1:3)) + c(-1,1)/1000) # small rand.err.
-str(solveCh <- .solve.dgC.chol(Xt, y, check=FALSE)) # Xt *is* dgC..
+utils::str(solveCh <- .solve.dgC.chol(Xt, y, check=FALSE)) # Xt *is* dgC..
 stopifnot(exprs = {
     all.equal(solveCh$coef, 1:3, tol = 1e-3)# rel.err ~ 1e-4
     all.equal(solveCh$coef, drop(solve(tcrossprod(Xt), Xt \%*\% y)))

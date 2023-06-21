@@ -61,10 +61,10 @@ mat2triplet <- function(x, uniqT = FALSE) {
 
 i <- c(1,3:8); j <- c(2,9,6:10); x <- 7 * (1:7)
 (Ax <- sparseMatrix(i, j, x = x)) ##  8 x 10 "dgCMatrix"
-str(trA <- mat2triplet(Ax))
+utils::str(trA <- mat2triplet(Ax))
 stopifnot(i == sort(trA$i),  sort(j) == trA$j,  x == sort(trA$x))
 
 D <- Diagonal(x=4:2)
 summary(D)
-str(mat2triplet(D))
+utils::str(mat2triplet(D))
 }

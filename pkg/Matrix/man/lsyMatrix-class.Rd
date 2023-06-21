@@ -53,9 +53,9 @@
 }
 \examples{
 (M2 <- Matrix(c(TRUE, NA, FALSE, FALSE), 2, 2)) # logical dense (ltr)
-str(M2)
+utils::str(M2)
 # can
 (sM <- M2 | t(M2)) # "lge"
 as(sM, "symmetricMatrix")
-str(sM <- as(sM, "packedMatrix")) # packed symmetric
+utils::str(sM <- as(sM, "packedMatrix")) # packed symmetric
 }

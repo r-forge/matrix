@@ -96,7 +96,7 @@
 \examples{
 showClass("abIndex")
 ii <- c(-3:40, 20:70)
-str(ai <- as(ii, "abIndex"))# note
+utils::str(ai <- as(ii, "abIndex"))# note
 ai # -> show() method
 %% FIXME: add / exchange with ../tests/abIndex-tsts.R
 

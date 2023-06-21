@@ -99,7 +99,7 @@
 \examples{
 mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
 mm # automatically dsCMatrix
-str(mm)
+utils::str(mm)
 mT <- as(as(mm, "generalMatrix"), "TsparseMatrix")
 
 ## Either

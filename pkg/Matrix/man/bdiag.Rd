@@ -73,7 +73,7 @@ stopifnot(is(bdiag(ml), "lsparseMatrix"),% failed in Matrix <= 1.0-2
 rblockTri <- function(nb, max.ni, lambda = 3) {
    .bdiag(replicate(nb, {
          n <- sample.int(max.ni, 1)
-         tril(Matrix(rpois(n*n, lambda=lambda), n,n)) }))
+         tril(Matrix(stats::rpois(n * n, lambda = lambda), n, n)) }))
 }
 
 (T4 <- rblockTri(4, 10, lambda = 1))
@@ -101,7 +101,8 @@ bdiag_m <- function(lmat) {
         x = as.double(unlist(lmat, recursive=FALSE, use.names=FALSE)))
 }
 
-l12 <- replicate(12, matrix(rpois(16, lambda = 6.4), 4,4), simplify=FALSE)
+l12 <- replicate(12, matrix(stats::rpois(16, lambda = 6.4), 4, 4),
+                 simplify=FALSE)
 dim(T12 <- bdiag_m(l12))# 48 x 48
 T12[1:20, 1:20]
 }

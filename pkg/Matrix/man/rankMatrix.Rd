@@ -174,7 +174,8 @@ sapply(meths, function(.m.) rankMatrix(M15, method = .m., tol = 1e-7)) # all 14
 ## "large" sparse
 n <- 250000; p <- 33; nnz <- 10000
 L <- sparseMatrix(i = sample.int(n, nnz, replace=TRUE),
-                  j = sample.int(p, nnz, replace=TRUE), x = rnorm(nnz))
+                  j = sample.int(p, nnz, replace=TRUE),
+                  x = stats::rnorm(nnz))
 (st1 <- system.time(r1 <- rankMatrix(L)))                # warning+ ~1.5 sec (2013)
 (st2 <- system.time(r2 <- rankMatrix(L, method = "qr"))) # considerably faster!
 r1[[1]] == print(r2[[1]]) ## -->  ( 33  TRUE )

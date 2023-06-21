@@ -82,11 +82,11 @@ set.seed(0)
 
 Schur(Hilbert(9L)) # real eigenvalues
 
-(A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L))
+(A <- Matrix(round(stats::rnorm(25L, sd = 100)), 5L, 5L))
 (sch.A <- Schur(A)) # complex eigenvalues
 
 ## A ~ Q T Q' in floating point
-str(e.sch.A <- expand2(sch.A), max.level = 2L)
+utils::str(e.sch.A <- expand2(sch.A), max.level = 2L)
 stopifnot(all.equal(A, Reduce(`\%*\%`, e.sch.A)))
 
 (e1 <- eigen(sch.A@T, only.values = TRUE)$values)

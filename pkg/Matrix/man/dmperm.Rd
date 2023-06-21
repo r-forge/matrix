@@ -64,11 +64,11 @@ dmperm(x, nAns = 6L, seed = 0L)
 \examples{
 set.seed(17)
 (S9 <- rsparsematrix(9, 9, nnz = 10, symmetric=TRUE)) # dsCMatrix
-str( dm9 <- dmperm(S9) )
+utils::str( dm9 <- dmperm(S9) )
 (S9p <- with(dm9, S9[p, q]))
 ## looks good, but *not* quite upper triangular; these, too:
-str( dm9.0 <- dmperm(S9, seed=-1)) # non-random too.
-str( dm9_1 <- dmperm(S9, seed= 1)) # a random one
+utils::str( dm9.0 <- dmperm(S9, seed=-1)) # non-random too.
+utils::str( dm9_1 <- dmperm(S9, seed= 1)) # a random one
 ## The last two permutations differ, but have the same effect!
 (S9p0 <- with(dm9.0, S9[p, q])) # .. hmm ..
 stopifnot(all.equal(S9p0, S9p))# same as as default, but different from the random one
@@ -83,7 +83,7 @@ dMp <- dmperm(Mp); with(dMp, Mp[p, q])
 
 set.seed(7)
 (n7 <- rsparsematrix(5, 12, nnz = 10, rand.x = NULL))
-str( dm.7 <- dmperm(n7) )
+utils::str( dm.7 <- dmperm(n7) )
 stopifnot(exprs = {
   lengths(dm.7[1:2]) == dim(n7)
   identical(dm.7,      dmperm(as(n7, "dMatrix")))

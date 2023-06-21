@@ -106,7 +106,7 @@ showMethods(image, incl=TRUE, inherit=FALSE)
 \dontshow{## warnings should not happen here, notably when print(<trellis>)
 op <- options(warn = 2)
 }
-data(CAex)
+utils::data(CAex)
 image(CAex, main = "image(CAex)") -> imgC; imgC
 stopifnot(!is.null(leg <- imgC$legend), is.list(leg$right)) # failed for 2 days ..
 image(CAex, useAbs=TRUE, main = "image(CAex, useAbs=TRUE)")
@@ -118,7 +118,7 @@ print(image(cCA, main="Cholesky(crossprod(CAex), Imult = .01)"),
 print(image(cCA, useAbs=TRUE),
       split=c(x=2,y=1,nx=2,ny=1))
 
-data(USCounties)
+utils::data(USCounties)
 image(USCounties)# huge
 image(sign(USCounties))## just the pattern
     # how the result looks, may depend heavily on

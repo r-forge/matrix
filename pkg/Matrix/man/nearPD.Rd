@@ -128,12 +128,12 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
    all.equal(n.A.m, unname(as.matrix(n.A$mat)), tolerance = 1e-15)# seen rel.d.= 1.46e-16
  })
  set.seed(27)
- m <- matrix(round(rnorm(25),2), 5, 5)
+ m <- matrix(round(stats::rnorm(25),2), 5, 5)
  m <- m + t(m)
  diag(m) <- pmax(0, diag(m)) + 1
  (m <- round(cov2cor(m), 2))
 
- str(near.m <- nearPD(m, trace = TRUE))
+ utils::str(near.m <- nearPD(m, trace = TRUE))
  round(near.m$mat, 2)
  norm(m - near.m$mat) # 1.102 / 1.08
 
@@ -160,7 +160,7 @@ nc.$iterations  # 2
 nc.1 <- nearPD(pr, conv.tol = 1e-7, corr = TRUE)
 nc.1$iterations # 11 / 12 (!)
 ncr   <- nearPD(pr, conv.tol = 1e-15)
-str(ncr)# still 2 iterations
+utils::str(ncr)# still 2 iterations
 ncr.1 <- nearPD(pr, conv.tol = 1e-15, corr = TRUE)
 ncr.1 $ iterations # 27 / 30 !
 
@@ -176,7 +176,7 @@ norm(pr -       ncr.1$mat)  # = 0.08746 / 0.08805
 (load(system.file("external", "symW.rda", package="Matrix"))) # "symW"
 dim(symW) #  24 x 24
 class(symW)# "dsCMatrix": sparse symmetric
-if(dev.interactive())  image(symW)
+if(grDevices::dev.interactive())  image(symW)
 EV <- eigen(symW, only=TRUE)$values
 summary(EV) ## looking more closely {EV sorted decreasingly}:
 tail(EV)# all 6 are negative
@@ -186,6 +186,5 @@ if(require("sfsmisc")) {
        plot(pmax(1e-3,EV), EV2, type="o", log="xy", xaxt="n",yaxt="n")
        eaxis(1); eaxis(2)
 } else plot(pmax(1e-3,EV), EV2, type="o", log="xy")
-abline(0,1, col="red3",lty=2)
-
+graphics::abline(0,1, col="red3",lty=2)
 }

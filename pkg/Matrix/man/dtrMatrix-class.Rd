@@ -64,7 +64,7 @@ stopifnot(T@uplo == "U", T2@uplo == "L", identical(T2, t(T)))
 
 m <- matrix(0,4,4); m[upper.tri(m)] <- 1:6
 (t1 <- Matrix(m+diag(,4)))
-str(t1p <- pack(t1))
+utils::str(t1p <- pack(t1))
 (t1pu <- diagN2U(t1p))
 stopifnot(exprs = {
    inherits(t1 , "dtrMatrix"); validObject(t1)

@@ -142,8 +142,8 @@
 stopifnot(is(lm,"lsparseMatrix"),
           identical(!lm, m <= 1))
 
-data(KNex)
-str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
+utils::data(KNex)
+utils::str(mmG.1 <- (KNex $ mm) > 0.1)# "lgC..."
 table(mmG.1@x)# however with many ``non-structural zeros''
 ## from logical to nz_pattern -- okay when there are no NA's :
 nmG.1 <- as(mmG.1, "nMatrix") # <<< has "TRUE" also where mmG.1 had FALSE

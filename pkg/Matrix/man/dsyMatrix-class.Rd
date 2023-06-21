@@ -83,7 +83,7 @@
 \examples{
 ## Only upper triangular part matters (when uplo == "U" as per default)
 (sy2 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, NA,32,77)))
-str(t(sy2)) # uplo = "L", and the lower tri. (i.e. NA is replaced).
+utils::str(t(sy2)) # uplo = "L", and the lower tri. (i.e. NA is replaced).
 
 chol(sy2) #-> "Cholesky" matrix
 (sp2 <- pack(sy2)) # a "dspMatrix"
@@ -104,6 +104,6 @@ m <- matrix(0,4,4); m[upper.tri(m)] <- 1:6
 (S1 <- pack(sym))
 (S2 <- t(S1))
 stopifnot(all(S1 == S2)) # equal "seen as matrix", but differ internally :
-str(S1)
+utils::str(S1)
 S2@x
 }

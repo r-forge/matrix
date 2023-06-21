@@ -234,8 +234,8 @@ dimnames(A) <- dn <- list(paste0("r", seq_len(m)),
                           paste0("c", seq_len(n)))
 
 (qr.A <- qr(A))
-str(e.qr.A <- expand2(qr.A, complete = FALSE), max.level = 2L)
-str(E.qr.A <- expand2(qr.A, complete =  TRUE), max.level = 2L)
+utils::str(e.qr.A <- expand2(qr.A, complete = FALSE), max.level = 2L)
+utils::str(E.qr.A <- expand2(qr.A, complete =  TRUE), max.level = 2L)
 
 t(sapply(e.qr.A, dim))
 t(sapply(E.qr.A, dim))
@@ -278,7 +278,7 @@ stopifnot(exprs = {
 })
 
 ## More identities
-b <- rnorm(m)
+b <- stats::rnorm(m)
 stopifnot(exprs = {
     ae1(qrX <- qr.X     (qr.A   ), A)
     ae2(qrQ <- qr.Q     (qr.A   ), with(e.qr.A, P1. \%*\% Q1))

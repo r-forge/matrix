@@ -133,7 +133,7 @@
 (m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
 ## ``extract the nonzero-pattern of (m) into an nMatrix'':
 nm <- as(m, "nsparseMatrix") ## -> will be a "ngCMatrix"
-str(nm) # no 'x' slot
+utils::str(nm) # no 'x' slot
 nnm <- !nm # no longer sparse
 ## consistency check:
 stopifnot(xor(as( nm, "matrix"),
@@ -145,9 +145,9 @@ nnm@x[2:4] <- c(FALSE, NA, NA)
 nnm
 as(nnm, "nMatrix") # NAs *and* non-structural 0  |--->  'TRUE'
 
-data(KNex)
+utils::data(KNex)
 nmm <- as(KNex $ mm, "nMatrix")
-str(xlx <- crossprod(nmm))# "nsCMatrix"
+utils::str(xlx <- crossprod(nmm))# "nsCMatrix"
 stopifnot(isSymmetric(xlx))
 image(xlx, main=paste("crossprod(nmm) : Sparse", class(xlx)))
 }

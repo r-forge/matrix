@@ -51,7 +51,7 @@
 }
 \examples{
 % regression tests are in ../tests/indexing.R
-str(m <- Matrix(round(rnorm(7*4),2), nrow = 7))
+utils::str(m <- Matrix(round(stats::rnorm(7*4),2), nrow = 7))
 stopifnot(identical(m, m[]))
 m[2, 3]   # simple number
 m[2, 3:4] # simple numeric of length 2

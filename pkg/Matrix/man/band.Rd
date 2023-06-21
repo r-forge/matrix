@@ -94,12 +94,12 @@ tril(mm)        # lower triangle
 tril(mm, -1)    # strict lower triangle
 triu(mm,  1)    # strict upper triangle
 band(mm, -1, 2) # general band
-(m5 <- Matrix(rnorm(25), ncol = 5))
+(m5 <- Matrix(stats::rnorm(25), ncol = 5))
 tril(m5)        # lower triangle
 tril(m5, -1)    # strict lower triangle
 triu(m5, 1)     # strict upper triangle
 band(m5, -1, 2) # general band
-(m65 <- Matrix(rnorm(30), ncol = 5))  # not square
+(m65 <- Matrix(stats::rnorm(30), ncol = 5))  # not square
 triu(m65)       # result not "dtrMatrix" unless square
 (sm5 <- crossprod(m65)) # symmetric
    band(sm5, -1, 1)# "dsyMatrix": symmetric band preserves symmetry property

@@ -130,10 +130,10 @@
 \examples{
 h6 <- Hilbert(6)
 rcond(h6)
-str(h6)
+utils::str(h6)
 h6 * 27720 # is ``integer''
 solve(h6)
-str(hp6 <- as(h6, "dppMatrix"))
+utils::str(hp6 <- as(h6, "dppMatrix"))
 
 ### Note that  as(*, "corMatrix")  *scales* the matrix
 (ch6 <- as(h6, "corMatrix"))
