@@ -28,7 +28,7 @@ if(requireNamespace("graph")) {
     } else { ## do things
 
     if(doPdf <- !dev.interactive(orNone = TRUE))
-        pdf("other-pkg-graph.pdf")
+        pdf("other-pkgs-graph.pdf")
 
     ## 0) Simplest non-trivial graph: has no weights:
     g0 <- graph::graphNEL(paste(1:2), edgeL=list("1"="2"), "directed")
@@ -90,15 +90,16 @@ if(requireNamespace("graph")) {
     image(cc)
     gg <- as(cc, "graph")
 
-    ## don't trigger 'R CMD check' :
-    if(match.fun("requireNamespace")("Rgraphviz"))
+    ## Don't run on CRAN and don't trigger 'R CMD check' :
+    if(doExtras && match.fun("requireNamespace")("Rgraphviz"))
         get("plot", asNamespace("Rgraphviz"), mode = "function")(gg, "circo")
 
     stopifnot(all.equal(graph::edgeMatrix(gg),
                         rbind(from = c(rep(1:24, each=2), 25:48),
                               to   = c(rbind(25:48,49:72), 49:72))))
 
-    if(doPdf) dev.off()
+    if(doPdf)
+        dev.off()
 
     } # {else}
 
