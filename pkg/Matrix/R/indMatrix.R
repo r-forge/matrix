@@ -265,10 +265,10 @@ rm(.ind2dge, .ind2lge, .ind2nge, .ind2n.p,
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("isSymmetric", signature(object = "indMatrix"),
-	  function(object, checkDN = TRUE, ...) {
-	      d <- object@Dim
-	      if((n <- d[1L]) != d[2L])
-		  return(FALSE)
+          function(object, checkDN = TRUE, ...) {
+              d <- object@Dim
+              if((n <- d[1L]) != d[2L])
+                  return(FALSE)
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...) check.attributes
                   if(ca(...) && !isSymmetricDN(object@Dimnames))
@@ -276,13 +276,13 @@ setMethod("isSymmetric", signature(object = "indMatrix"),
               }
               perm <- object@perm
               all(perm[perm] == seq_len(n))
-	  })
+          })
 
 setMethod("isTriangular", signature(object = "indMatrix"),
           function(object, upper = NA, ...) {
               d <- object@Dim
-	      if((n <- d[1L]) != d[2L])
-		  return(FALSE)
+              if((n <- d[1L]) != d[2L])
+                  return(FALSE)
               if(object@margin == 1L) {
                   i <- seq_len(n)
                   j <- object@perm
@@ -306,8 +306,8 @@ setMethod("isTriangular", signature(object = "indMatrix"),
 setMethod("isDiagonal", signature(object = "indMatrix"),
           function(object) {
               d <- object@Dim
-	      if((n <- d[1L]) != d[2L])
-		  return(FALSE)
+              if((n <- d[1L]) != d[2L])
+                  return(FALSE)
               all(object@perm == seq_len(n))
           })
 
@@ -354,13 +354,13 @@ setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "character"),
           function(x, uplo) forceSymmetric(as(x, "nsparseMatrix"), uplo))
 
 setMethod("symmpart", signature(x = "indMatrix"),
-	  function(x) symmpart(as(x, "dsparseMatrix")))
+          function(x) symmpart(as(x, "dsparseMatrix")))
 
 setMethod("skewpart", signature(x = "indMatrix"),
-	  function(x) skewpart(as(x, "dsparseMatrix")))
+          function(x) skewpart(as(x, "dsparseMatrix")))
 
 setMethod("%*%", signature(x = "indMatrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               mx <- x@margin
               my <- y@margin
               px <- x@perm
@@ -385,7 +385,7 @@ setMethod("%*%", signature(x = "indMatrix", y = "indMatrix"),
           })
 
 setMethod("%*%", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y) {
+          function(x, y) {
               if(x@margin != 1L)
                   return(as(x, "dsparseMatrix") %*% y)
               mmultDim(x@Dim, dim(y), type = 1L)
@@ -395,7 +395,7 @@ setMethod("%*%", signature(x = "indMatrix", y = "matrix"),
           })
 
 setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               if(y@margin == 1L)
                   return(x %*% as(y, "dsparseMatrix"))
               mmultDim(dim(x), y@Dim, type = 1L)
@@ -405,7 +405,7 @@ setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
           })
 
 setMethod("%*%", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y) {
+          function(x, y) {
               if(x@margin != 1L)
                   return(as(x, "dsparseMatrix") %*% y)
               mmultDim(x@Dim, y@Dim, type = 1L)
@@ -415,7 +415,7 @@ setMethod("%*%", signature(x = "indMatrix", y = "Matrix"),
           })
 
 setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               if(y@margin == 1L)
                   return(x %*% as(y, "dsparseMatrix"))
               mmultDim(x@Dim, y@Dim, type = 1L)
@@ -425,7 +425,7 @@ setMethod("%*%", signature(x = "Matrix", y = "indMatrix"),
           })
 
 setMethod("%&%", signature(x = "indMatrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               mx <- x@margin
               my <- y@margin
               px <- x@perm
@@ -449,7 +449,7 @@ setMethod("%&%", signature(x = "indMatrix", y = "indMatrix"),
           })
 
 setMethod("%&%", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y) {
+          function(x, y) {
               if(x@margin != 1L)
                   return(as(x, "nsparseMatrix") %&% y)
               mmultDim(x@Dim, dim(y), type = 1L)
@@ -459,7 +459,7 @@ setMethod("%&%", signature(x = "indMatrix", y = "matrix"),
           })
 
 setMethod("%&%", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               if(y@margin == 1L)
                   return(x %&% as(y, "nsparseMatrix"))
               mmultDim(dim(x), y@Dim, type = 1L)
@@ -469,7 +469,7 @@ setMethod("%&%", signature(x = "matrix", y = "indMatrix"),
           })
 
 setMethod("%&%", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y) {
+          function(x, y) {
               if(x@margin != 1L)
                   return(as(x, "nsparseMatrix") %&% y)
               mmultDim(x@Dim, y@Dim, type = 1L)
@@ -479,7 +479,7 @@ setMethod("%&%", signature(x = "indMatrix", y = "Matrix"),
           })
 
 setMethod("%&%", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y) {
+          function(x, y) {
               if(y@margin == 1L)
                   return(x %&% as(y, "nsparseMatrix"))
               mmultDim(x@Dim, y@Dim, type = 1L)
@@ -489,7 +489,7 @@ setMethod("%&%", signature(x = "Matrix", y = "indMatrix"),
           })
 
 setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith = NA, ...) {
+          function(x, y = NULL, boolArith = NA, ...) {
               if(x@margin != 1L)
                   return(tcrossprod(t(x), boolArith = boolArith, ...))
               n <- x@Dim[2L]
@@ -507,11 +507,11 @@ setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
           })
 
 setMethod("crossprod", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y = NULL, boolArith = NA, ...)
+          function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(t(x), y))
 
 setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y = NULL, boolArith = NA, ...) {
+          function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(dim(x), y@Dim, type = 2L)
               boolArith <- isTRUE(boolArith)
               if(y@margin == 1L) {
@@ -527,11 +527,11 @@ setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
           })
 
 setMethod("crossprod", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y = NULL, boolArith = NA, ...)
+          function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(t(x), y))
 
 setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y = NULL, boolArith = NA, ...) {
+          function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 2L)
               boolArith <- isTRUE(boolArith)
               if(y@margin == 1L) {
@@ -547,7 +547,7 @@ setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
           })
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
-	  function(x, y = NULL, boolArith = TRUE, ...) {
+          function(x, y = NULL, boolArith = TRUE, ...) {
               if(x@margin != 1L)
                   return(crossprod(t(x), boolArith = boolArith, ...))
               if(isTRUE(boolArith)) {
@@ -565,7 +565,7 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
           })
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
-	  function(x, y = NULL, boolArith = NA, ...) {
+          function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, dim(y), type = 3L)
               boolArith <- isTRUE(boolArith)
               if(y@margin == 1L) {
@@ -581,11 +581,11 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
           })
 
 setMethod("tcrossprod", signature(x = "matrix", y = "indMatrix"),
-	  function(x, y = NULL, boolArith = NA, ...)
+          function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
-	  function(x, y = NULL, boolArith = NA, ...) {
+          function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 3L)
               boolArith <- isTRUE(boolArith)
               if(y@margin == 1L) {
@@ -601,24 +601,23 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
           })
 
 setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
-	  function(x, y = NULL, boolArith = NA, ...)
+          function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
 
 ## MJ : no longer needed ... replacement in ./subscript.R
 if(FALSE) {
 setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
-			 drop = "logical"),
-	  function (x, i, j, ..., drop)
-      {
-	  n <- length(newperm <- x@perm[i])
-	  if(drop && n == 1) { ## -> logical unit vector
-	      newperm == seq_len(x@Dim[2])
-	  } else { ## stay matrix
-	      if(!is.null((DN <- x@Dimnames)[[1]])) DN[[1]] <- DN[[1]][i]
-	      new("indMatrix", perm = newperm,
-		  Dim = c(n, x@Dim[2]), Dimnames = DN)
-	  }
-      })
+                         drop = "logical"),
+          function (x, i, j, ..., drop) {
+              n <- length(newperm <- x@perm[i])
+              if(drop && n == 1) { ## -> logical unit vector
+                  newperm == seq_len(x@Dim[2])
+              } else { ## stay matrix
+                  if(!is.null((DN <- x@Dimnames)[[1]])) DN[[1]] <- DN[[1]][i]
+                  new("indMatrix", perm = newperm,
+                      Dim = c(n, x@Dim[2]), Dimnames = DN)
+              }
+          })
 } ## MJ
 
 .indMatrix.sub <- function(x, i, j, ..., value) {

@@ -230,6 +230,6 @@ setMethod("skewpart", signature(x = "matrix"),
           function(x) 0.5 * symmetrizeDimnames(x - t(x))) # returning matrix
 
 setMethod("cov2cor", signature(V = "unpackedMatrix"),
-	  function(V) as(forceSymmetric(V), "corMatrix"))
+          function(V) as(forceSymmetric(V), "corMatrix"))
 
 rm(.upM.subclasses)

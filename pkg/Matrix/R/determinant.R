@@ -195,7 +195,6 @@ setMethod("determinant", signature(x = "dsTMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               determinant(.T2C(x), logarithm, ...))
 
-
 ## MJ: unused
 if(FALSE) {
 ldet1.dsC <- function(x, ...)
@@ -210,27 +209,4 @@ ldet2.dsC <- function(x, ...) {
 ## <1% faster than ldet2:
 ldet3.dsC <- function(x, perm = TRUE)
     .Call(dsCMatrix_LDL_D, x, perm = perm, "sumLog")
-} ## MJ
-
-## MJ: no longer needed ... replacement above
-if(FALSE) {
-setMethod("determinant", signature(x = "dsCMatrix", logarithm = "logical"),
-	  function(x, logarithm, ...) {
-	  if(x@Dim[1] <= 1L)
-	      return(mkDet(diag(x), logarithm))
-	  Chx <- tryCatch(suppressWarnings(Cholesky(x, LDL=TRUE)),
-                          error = function(e) NULL)
-	  ## or
-	  ## ldet <- .Call("CHMfactor_ldetL2", Chx) # which would also work
-	  ##				     when Chx <- Cholesky(x, super=TRUE)
-          ## ldet <- tryCatch(.Call(dsCMatrix_LDL_D, x, perm=TRUE, "sumLog"),
-	  ## if(is.null(ldet))
-
-          if(is.null(Chx))  ## we do *not* have a positive definite matrix
-	      detSparseLU(x, logarithm)
-	  else {
-              d <- .Call(diag_tC, Chx, res.kind = "diag")
-	      mkDet(d, logarithm=logarithm)
-          }
-      })
 } ## MJ

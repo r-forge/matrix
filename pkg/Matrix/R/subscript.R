@@ -347,7 +347,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  ".", ".", ".", na),
                          .M.level = 2)
-	      if(na == 2L) {
+              if(na == 2L) {
                   ## x[]
                   x
               } else if(na == 3L) {
@@ -385,7 +385,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", ".", ".", na),
                          .M.level = 2)
-	      if(na == 2L) {
+              if(na == 2L) {
                   ## x[i=]
                   .subscript.1ary(x, i)
               } else if(na == 3L) {
@@ -426,7 +426,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
               if(na == 2L) {
                   ## x[j=]
                   .subscript.1ary(x, j)
-	      } else if(na == 3L) {
+              } else if(na == 3L) {
                   ## x[j=, ], x[, j=]
                   .subscript.2ary(x, , j, drop = TRUE)
               } else {
@@ -461,7 +461,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", "i", ".", na),
                          .M.level = 2)
-	      if(na == 3L) {
+              if(na == 3L) {
                   ## x[i=, j=], x[j=, i=]
                   .subscript.2ary(x, i, j, drop = TRUE)
               } else {
@@ -494,7 +494,7 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "m", ".", ".", na),
                          .M.level = 2)
-	      if(na == 2L) {
+              if(na == 2L) {
                   ## x[i=]
                   .subscript.1ary.mat(x, i)
               } else if(na == 3L) {

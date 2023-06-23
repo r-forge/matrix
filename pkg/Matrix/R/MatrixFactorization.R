@@ -32,22 +32,22 @@ setMethod("dimnames<-", signature(x = "MatrixFactorization", value = "list"),
           })
 
 setMethod("dimnames<-", signature(x = "MatrixFactorization", value = "NULL"),
-	  function(x, value) {
+          function(x, value) {
               x@Dimnames <- list(NULL, NULL)
               x
           })
 
 setMethod("unname", signature(obj = "MatrixFactorization"),
-	  function(obj, force = FALSE) {
+          function(obj, force = FALSE) {
               obj@Dimnames <- list(NULL, NULL)
               obj
           })
 
 setMethod("show", "MatrixFactorization",
-	  function(object) {
-	      cat("matrix factorization of ")
-	      str(object)
-	  })
+          function(object) {
+              cat("matrix factorization of ")
+              str(object)
+          })
 
 setMethod("show", "CholeskyFactorization",
           function(object) {
@@ -62,10 +62,10 @@ setMethod("show", "BunchKaufmanFactorization",
           })
 
 setMethod("show", "SchurFactorization",
-	  function(object) {
-	      cat("Schur factorization of ")
-	      str(object)
-	  })
+          function(object) {
+              cat("Schur factorization of ")
+              str(object)
+          })
 
 setMethod("show", "LU",
           function(object) {

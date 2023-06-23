@@ -543,7 +543,7 @@ setClass("pMatrix", contains = c("indMatrix"),
 setClass("MatrixFactorization", contains = "VIRTUAL",
          slots = c(Dim = "integer", Dimnames = "list"),
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
-         validity = function(object) .Call(MatrixFactorization_validate, object))
+         validity = function(object).Call(MatrixFactorization_validate, object))
 
 setMethod("initialize", "MatrixFactorization", .initialize)
 
