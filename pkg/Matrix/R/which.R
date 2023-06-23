@@ -17,28 +17,28 @@ setMethod("which", "ldenseMatrix",
           })
 
 setMethod("which", "nsparseMatrix",
-	  function(x, arr.ind = FALSE, useNames = TRUE) {
+          function(x, arr.ind = FALSE, useNames = TRUE) {
               wh <- which(as(x, "sparseVector"))
               if(arr.ind)
                   arrayInd(wh, x@Dim, dimnames(x), useNames = useNames)
-	      else wh
-	  })
+              else wh
+          })
 setMethod("which", "lsparseMatrix",
-	  function(x, arr.ind = FALSE, useNames = TRUE) {
+          function(x, arr.ind = FALSE, useNames = TRUE) {
               wh <- which(as(x, "sparseVector"))
               if(arr.ind)
                   arrayInd(wh, x@Dim, dimnames(x), useNames = useNames)
-	      else wh
-	  })
+              else wh
+           })
 setMethod("which", "ldiMatrix",
-	  function(x, arr.ind = FALSE, useNames = TRUE) {
+          function(x, arr.ind = FALSE, useNames = TRUE) {
               d <- x@Dim
               wh <- indDiag(d[1L])
               if(x@diag == "N")
                   wh <- wh[which(x@x)]
               if(arr.ind)
                   arrayInd(wh, d, x@Dimnames, useNames = useNames)
-	      else wh
+              else wh
           })
 
 setMethod("which", "nsparseVector",

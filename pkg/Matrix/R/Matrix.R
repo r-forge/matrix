@@ -20,9 +20,9 @@ setMethod("as.matrix", signature(x = "Matrix"), as.matrix.Matrix)
 setMethod( "as.array", signature(x = "Matrix"),  as.array.Matrix)
 
 setMethod("as.logical", signature(x = "Matrix"),
-	  function(x, ...) as.logical(as.vector(x)))
+          function(x, ...) as.logical(as.vector(x)))
 setMethod("as.numeric", signature(x = "Matrix"),
-	  function(x, ...) as.numeric(as.vector(x)))
+          function(x, ...) as.numeric(as.vector(x)))
 
 setAs("Matrix",  "vector", function(from)  as.vector(as(from, "matrix")))
 setAs("Matrix", "logical", function(from) as.logical(as(from, "matrix")))
@@ -49,7 +49,7 @@ setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
           })
 
 setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
-	  function(x, value) {
+          function(x, value) {
               x@Dimnames <- list(NULL, NULL)
               x
           })
@@ -71,13 +71,13 @@ setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
           })
 
 setMethod("unname", signature(obj = "Matrix"),
-	  function(obj, force = FALSE) {
+          function(obj, force = FALSE) {
               obj@Dimnames <- list(NULL, NULL)
               obj
           })
 
 setMethod("drop", signature(x = "Matrix"),
-	  function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
+          function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
 
 ## These work nicely as long as methods are defined for '[' :
 setMethod("head", signature(x = "Matrix"),
@@ -134,13 +134,13 @@ setMethod("skewpart", signature(x = "matrix"),
 ## MJ: no longer needed as methods are available for all subclasses
 if(FALSE) {
 setMethod("diag", signature(x = "Matrix"),
-	  function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
+          function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
 setMethod("diag<-", signature(x = "Matrix"),
-	  function(x, value) .bail.out.1("diag", class(x)))
+          function(x, value) .bail.out.1("diag", class(x)))
 setMethod("t", signature(x = "Matrix"),
-	  function(x) .bail.out.1(.Generic, class(x)))
+          function(x) .bail.out.1(.Generic, class(x)))
 setMethod("chol", signature(x = "Matrix"),
-	  function(x, pivot, ...) .bail.out.1("chol", class(x)))
+          function(x, pivot, ...) .bail.out.1("chol", class(x)))
 } ## MJ
 
 
@@ -175,98 +175,94 @@ Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     i.M <- is(data, "Matrix")
     sM <- FALSE
     if(i.M) {
-	if(is(data, "diagonalMatrix")) return(data) # in all cases
-	sV <- FALSE
+        if(is(data, "diagonalMatrix")) return(data) # in all cases
+        sV <- FALSE
     } else if(inherits(data, "table")) # special treatment
-	class(data) <- "matrix" # "matrix" first for S4 dispatch
+        class(data) <- "matrix" # "matrix" first for S4 dispatch
     else if(is(data, "sparseVector")) {
-	data <- spV2M(data, nrow, ncol, byrow=byrow)
-	i.M <- sparse <- forceCheck <- sM <- sV <- TRUE
+        data <- spV2M(data, nrow, ncol, byrow=byrow)
+        i.M <- sparse <- forceCheck <- sM <- sV <- TRUE
     }
     if(is.null(sparse) && (i.M || is(data, "matrix")))
-	sparse <- sparseDefault(data)
+        sparse <- sparseDefault(data)
     doDN <- TRUE # by default
     if (i.M) {
-	if (!sV) {
-	    if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
-		warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
-	    sM <- is(data,"sparseMatrix")
-	    if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
-		return(data)
-	    ## else : convert  dense <-> sparse -> at end
-	}
+        if (!sV) {
+            if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
+                warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
+            sM <- is(data,"sparseMatrix")
+            if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
+                return(data)
+            ## else : convert  dense <-> sparse -> at end
+        }
     }
     else if(!is.matrix(data)) { ## cut & paste from "base::matrix" :
-	## avoid copying to strip attributes in simple cases
-	if (is.object(data) || !is.atomic(data)) data <- as.vector(data)
-	if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
-	    ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
-	    if(is.null(sparse)) sparse <- TRUE
-	    i.M <- sM <- TRUE
-	    if (missing(nrow)) nrow <- ceiling(1/ncol) else
-	    if (missing(ncol)) ncol <- ceiling(1/nrow)
+        ## avoid copying to strip attributes in simple cases
+        if (is.object(data) || !is.atomic(data)) data <- as.vector(data)
+        if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
+            ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
+            if(is.null(sparse)) sparse <- TRUE
+            i.M <- sM <- TRUE
+            if (missing(nrow)) nrow <- ceiling(1/ncol)
+            else if (missing(ncol)) ncol <- ceiling(1/nrow)
             isSym <- nrow == ncol
-	    ## will be sparse: do NOT construct full matrix!
-	    data <- new(paste0(if(is.numeric(data)) "d" else
-                               if(is.logical(data)) "l" else
-                               stop("invalid 'data'"),
+            ## will be sparse: do NOT construct full matrix!
+            data <- new(paste0(if(is.numeric(data)) "d"
+                               else if(is.logical(data)) "l"
+                               else stop("invalid 'data'"),
                                if(isSym) "s" else "g", "CMatrix"),
-			p = rep.int(0L, ncol+1L),
-			Dim = as.integer(c(nrow,ncol)),
-			Dimnames = if(is.null.DN(dimnames)) list(NULL,NULL)
-			else dimnames)
-	} else { ## normal case
-	    data <- .External(Mmatrix,
-			      data, nrow, ncol, byrow, dimnames,
-			      missing(nrow), missing(ncol))
-	    if(is.null(sparse))
-		sparse <- sparseDefault(data)
-	}
+                        p = rep.int(0L, ncol+1L),
+                        Dim = as.integer(c(nrow,ncol)),
+                        Dimnames = if(is.null.DN(dimnames)) list(NULL,NULL)
+                                   else dimnames)
+        } else { ## normal case
+            data <- .External(Mmatrix,
+                              data, nrow, ncol, byrow, dimnames,
+                              missing(nrow), missing(ncol))
+            if(is.null(sparse))
+                sparse <- sparseDefault(data)
+        }
         doDN <- FALSE # .. set above
     } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow)) ## i.m == is.matrix(.)
-	warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
-
+        warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
     ## 'data' is now a "matrix" or "Matrix"
     if (doDN && !is.null(dimnames))
-	dimnames(data) <- dimnames
-
+        dimnames(data) <- dimnames
     ## check for symmetric / triangular / diagonal :
     isSym <- isSymmetric(data)
     if((isTri <- !isSym))
-	isTri <- isTriangular(data)
+        isTri <- isTriangular(data)
     isDiag <- isSym # cannot be diagonal if it isn't symmetric
     if(isDiag)
-	isDiag <- doDiag && isDiagonal(data)
-
+        isDiag <- doDiag && isDiagonal(data)
     ## try to coerce ``via'' virtual classes
     if(isDiag) { ## diagonal is preferred to sparse !
-	data <- as(data, "diagonalMatrix")
-	isSym <- FALSE
+        data <- as(data, "diagonalMatrix")
+        isSym <- FALSE
     } else if(sparse && !sM)
-	data <- as(data, "sparseMatrix")
+        data <- as(data, "sparseMatrix")
     else if(!sparse) {
-	if(i.M) { ## data is 'Matrix'
-	    if(!is(data, "denseMatrix"))
-		data <- as(data, "denseMatrix")
-	} else { ## data is "matrix" (and result "dense" -> go via "general"
-	    ctype <- typeof(data)
-	    if (ctype == "complex")
-		stop("complex matrices not yet implemented in Matrix package")
-	    if (ctype == "integer") ## integer Matrices not yet implemented
-		storage.mode(data) <- "double"
-	    data <- new(paste0(.M.kind(data), "geMatrix"),
-			Dim = dim(data),
-			Dimnames = .M.DN(data),
-			x = c(data))
-	}
+        if(i.M) { ## data is 'Matrix'
+            if(!is(data, "denseMatrix"))
+                data <- as(data, "denseMatrix")
+        } else { ## data is "matrix" (and result "dense" -> go via "general"
+            ctype <- typeof(data)
+            if (ctype == "complex")
+                stop("complex matrices not yet implemented in Matrix package")
+            if (ctype == "integer") ## integer Matrices not yet implemented
+                storage.mode(data) <- "double"
+            data <- new(paste0(.M.kind(data), "geMatrix"),
+                        Dim = dim(data),
+                        Dimnames = .M.DN(data),
+                        x = c(data))
+        }
     }
 
     if(isTri && !is(data, "triangularMatrix")) {
-	if(attr(isTri,"kind") == "L") tril(data) else triu(data)
+        if(attr(isTri,"kind") == "L") tril(data) else triu(data)
     } else if(isSym && !is(data, "symmetricMatrix"))
-	forceSymmetric(data)
-    else
-	data
+        forceSymmetric(data)
+    else data
 }
 } else {
 ## This version fixes the issues documented above
@@ -369,17 +365,17 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                            x = vector(mode., nrow)))
             data <- new(paste0(kind, if(square) "s" else "g", "CMatrix"),
                         Dim = c(nrow, ncol),
-			Dimnames = dimnames,
+                        Dimnames = dimnames,
                         p = integer(ncol + 1))
             i.M <- i.sM <- sparse <- TRUE
-	} else {
+        } else {
             ## usual case: vector|array->matrix
-	    data <- .External(Mmatrix,
-			      data, nrow, ncol, byrow, dimnames, mnrow, mncol)
+            data <- .External(Mmatrix,
+                              data, nrow, ncol, byrow, dimnames, mnrow, mncol)
             if(is.null(sparse))
                 sparse <- sparseDefault(data)
             i.m <- TRUE
-	}
+        }
     }
 
     ## 'data' is a Matrix (but _not_ a diagonalMatrix) or a
@@ -409,8 +405,9 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 
 ## We want to use all.equal.numeric() *and* make sure that uses
 ## not just base::as.vector but the generic with our methods:
-all.equal_num <- base::all.equal.numeric ## from <R>/src/library/base/R/all.equal.R
-environment(all.equal_num) <- environment()## == as.environment("Matrix")
+all.equal_num <- base::all.equal.numeric
+##               ^^^^^^<R>/src/library/base/R/all.equal.R
+environment(all.equal_num) <- environment() # our namespace
 
 all.equal_Mat <- function(target, current, check.attributes = TRUE,
                           factorsCheck = FALSE, ...)
@@ -419,17 +416,17 @@ all.equal_Mat <- function(target, current, check.attributes = TRUE,
                         factorsCheck=factorsCheck, ...)
     if(is.list(msg)) msg[[1]]
     else .a.e.comb(msg,
-		   all.equal_num(as.vector(target), as.vector(current),
-				 check.attributes=check.attributes, ...))
+                   all.equal_num(as.vector(target), as.vector(current),
+                                 check.attributes=check.attributes, ...))
 }
 
 ## The all.equal() methods for dense matrices (and fallback):
 setMethod("all.equal", c(target = "Matrix", current = "Matrix"),
-	  all.equal_Mat)
+          all.equal_Mat)
 setMethod("all.equal", c(target = "Matrix", current = "ANY"),
-	  all.equal_Mat)
+          all.equal_Mat)
 setMethod("all.equal", c(target = "ANY", current = "Matrix"),
-	  all.equal_Mat)
+          all.equal_Mat)
 rm(all.equal_Mat)
 ## -> ./sparseMatrix.R, ./sparseVector.R  have specific methods
 
@@ -454,89 +451,93 @@ rm(all.equal_Mat)
 ## MJ : no longer needed ... replacement in ./subscript.R
 if(FALSE) {
 ## "x[]" *or* x[,] *or* x[, , drop=<TRUE/FALSE>]
+setMethod("[",
+          signature(x = "Matrix", i = "missing", j = "missing", drop = "missing"),
+          function(x,i,j, ..., drop) {
+              Matrix.msg("M[m,m,m] : nargs()=",nargs(), .M.level = 2)
+              if(nargs() == 2) { ##  M[]
+                  x
+              } else { # nargs() = 3
+                  callGeneric(x, , , drop=TRUE)
+              }
+          })
 setMethod("[", signature(x = "Matrix",
-			 i = "missing", j = "missing", drop = "missing"),
-	  function(x,i,j, ..., drop) {
-	      Matrix.msg("M[m,m,m] : nargs()=",nargs(), .M.level = 2)
-	      if(nargs() == 2) { ##  M[]
-		  x
-	      } else { # nargs() = 3
-		  callGeneric(x, , , drop=TRUE)
-	      }
-	  })
-setMethod("[", signature(x = "Matrix",
-			 i = "missing", j = "missing", drop = "logical"),
-	  function (x, i, j, ..., drop) {
-	      Matrix.msg(sprintf("M[m,m, %s] : nargs()=%d", format(drop), nargs()), .M.level = 2)
-	      if(isTRUE(drop) && any(x@Dim == 1L)) drop(as(x, "matrix")) else x
-	  })
+                         i = "missing", j = "missing", drop = "logical"),
+          function (x, i, j, ..., drop) {
+              Matrix.msg(sprintf("M[m,m, %s] : nargs()=%d", format(drop), nargs()), .M.level = 2)
+              if(isTRUE(drop) && any(x@Dim == 1L)) drop(as(x, "matrix")) else x
+          })
 ## otherwise:  drop is neither missing nor logical
-setMethod("[", signature(x = "Matrix",
-			 i = "missing", j = "missing", drop = "ANY"),
-	  function (x, i, j, ..., drop) stop("invalid 'drop' in Matrix subsetting"))
-
-
+setMethod("[",
+          signature(x = "Matrix", i = "missing", j = "missing", drop = "ANY"),
+          function (x, i, j, ..., drop)
+              stop("invalid 'drop' in Matrix subsetting"))
 ## missing 'drop' --> 'drop = TRUE'
 ##                     -----------
 ## select rows __ or __ vector indexing:
-setMethod("[", signature(x = "Matrix", i = "index", j = "missing", drop = "missing"),
-	  function(x,i,j, ..., drop) {
-	      Matrix.msg("M[i,m,m] : nargs()=",nargs(), .M.level = 2)
-	      if(nargs() == 2) { ## e.g. M[0] , M[TRUE], M[1:2], M[-7]
+setMethod("[",
+          signature(x = "Matrix", i = "index", j = "missing", drop = "missing"),
+          function(x,i,j, ..., drop) {
+              Matrix.msg("M[i,m,m] : nargs()=",nargs(), .M.level = 2)
+              if(nargs() == 2) { ## e.g. M[0] , M[TRUE], M[1:2], M[-7]
                   .M.vectorSub(x,i)
-	      } else {
-		  callGeneric(x, i=i, , drop=TRUE)
-		  ##		      ^^
-	      }
-	  })
+              } else {
+                  callGeneric(x, i=i, , drop=TRUE)
+              }
+          })
 ## select columns
-setMethod("[", signature(x = "Matrix", i = "missing", j = "index", drop = "missing"),
-	  function(x,i,j, ..., drop) {
-	      Matrix.msg("M[m,i,m] : nargs()=",nargs(), .M.level = 2)
-	      callGeneric(x, , j=j, drop= TRUE)
-	  })
+setMethod("[",
+          signature(x = "Matrix", i = "missing", j = "index", drop = "missing"),
+          function(x,i,j, ..., drop) {
+              Matrix.msg("M[m,i,m] : nargs()=",nargs(), .M.level = 2)
+              callGeneric(x, , j=j, drop= TRUE)
+          })
 ## select both rows *and* columns
-setMethod("[", signature(x = "Matrix", i = "index", j = "index", drop = "missing"),
-	  function(x,i,j, ..., drop) {
-	      Matrix.msg("M[i,i,m] : nargs()=",nargs(), .M.level = 2)
-	      callGeneric(x, i=i, j=j, drop= TRUE)
-	  })
+setMethod("[",
+          signature(x = "Matrix", i = "index", j = "index", drop = "missing"),
+          function(x,i,j, ..., drop) {
+              Matrix.msg("M[i,i,m] : nargs()=",nargs(), .M.level = 2)
+              callGeneric(x, i=i, j=j, drop= TRUE)
+          })
 
 ## bail out if any of (i,j,drop) is "non-sense"
-setMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
-	  function(x,i,j, ..., drop)
-	  stop("invalid or not-yet-implemented 'Matrix' subsetting"))
+setMethod("[",
+          signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
+          function(x,i,j, ..., drop)
+              stop("invalid or not-yet-implemented 'Matrix' subsetting"))
 
 ## logical indexing, such as M[ M >= 7 ] *BUT* also M[ M[,1] >= 3,],
 ## The following is *both* for    M [ <logical>   ]
 ##                 and also for   M [ <logical> , ]
-.M.sub.i.logical <- function (x, i, j, ..., drop)
-{
+.M.sub.i.logical <- function (x, i, j, ..., drop) {
     nA <- nargs() # counts 'M[i]' as 2 arguments,  'M[i,]' as 3
     Matrix.msg("M[logi,m,m] : nargs()=", nA, .M.level = 2)
     if(nA == 2) { ##  M [ M >= 7 ]
-	## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
-	if(is(x, "sparseMatrix"))
-	    message("<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient")
-	as(as(x, "generalMatrix"), "denseMatrix")@x[as.vector(i)]
-	## -> error when lengths don't match
+        ## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
+        if(is(x, "sparseMatrix"))
+            message("<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient")
+        as(as(x, "generalMatrix"), "denseMatrix")@x[as.vector(i)]
+        ## -> error when lengths don't match
     }
-    else if(nA == 3) { ## M[ <logic>, ]  e.g.,  M [ M[,1, drop=FALSE] >= 7, ]  or M[TRUE,]
-	if(length(i) && x@Dim[1L] && !anyNA(i) && all(i)) ## select everything
-	    x
-	else ## not selecting all -> result is *NOT* diagonal/triangular/symmetric/..
-	    ## keep j missing, but  drop = "logical"
-	    callGeneric(as(x,"generalMatrix"), i = i, , drop = TRUE)
-
-    } else stop(gettextf(
-		"nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?",
-			 nA), domain=NA)
+    else if(nA == 3) {
+        ## M[ <logic>, ]  e.g.,  M [ M[,1, drop=FALSE] >= 7, ]  or M[TRUE,]
+        if(length(i) && x@Dim[1L] && !anyNA(i) && all(i)) ## select everything
+            x
+        else
+            ## not selecting all -> result *NOT* diagonal/triangular/symmetric/
+            ## keep j missing, but  drop = "logical"
+            callGeneric(as(x,"generalMatrix"), i = i, , drop = TRUE)
+    } else
+        stop(gettextf("nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?",
+                      nA),
+             domain = NA)
 }
 
 ## instead of using 'drop = "ANY"' {against ambiguity notices}:
 for(ii in c("nMatrix", "lMatrix", "logical"))
-    setMethod("[", signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
-	      .M.sub.i.logical)
+setMethod("[",
+          signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
+          .M.sub.i.logical)
 rm(ii)
 
 ##' x[ ij ]  where ij is (i,j) 2-column matrix
@@ -545,42 +546,41 @@ subset.ij <- function(x, ij) {
     m <- nrow(ij)
     if(m > 3) {
         cld <- getClassDef(class(x))
-	sym.x <- extends(cld, "symmetricMatrix")
-	if(sym.x) {
-	    W <- if(x@uplo == "U") # stored only [i,j] with i <= j
-		ij[,1] > ij[,2] else ij[,1] < ij[,2]
-	    if(any(W))
-		ij[W,] <- ij[W, 2:1]
+        sym.x <- extends(cld, "symmetricMatrix")
+        if(sym.x) {
+            W <- if(x@uplo == "U") # stored only [i,j] with i <= j
+                     ij[,1] > ij[,2] else ij[,1] < ij[,2]
+            if(any(W))
+                ij[W,] <- ij[W, 2:1]
         }
         if(extends(cld, "sparseMatrix")) {
-	    ## do something smarter:
-	    di <- dim(x)
-	    if(!extends(cld, "CsparseMatrix")) {
-		x <- as(x, "CsparseMatrix") # simpler; our standard
-		cld <- getClassDef(class(x))
-	    }
-	    tri.x <- extends(cld, "triangularMatrix")
-	    if(tri.x) {
-		## need these for the 'x' slot in any case
-		x <- .Call(R_sparse_diag_U2N, x)
-		## slightly more efficient than non0.i() or non0ind():
-		ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
-	    } else { ## symmetric / general : for symmetric, only "existing" part
-		ij.x <- non0.i(x, cld)
-	    }
-
-	    m1 <- .Call(m_encodeInd, ij.x, di, orig1=FALSE, checkBounds=FALSE)
+            ## do something smarter:
+            di <- dim(x)
+            if(!extends(cld, "CsparseMatrix")) {
+                x <- as(x, "CsparseMatrix") # simpler; our standard
+                cld <- getClassDef(class(x))
+            }
+            tri.x <- extends(cld, "triangularMatrix")
+            if(tri.x) {
+                ## need these for the 'x' slot in any case
+                x <- .Call(R_sparse_diag_U2N, x)
+                ## slightly more efficient than non0.i() or non0ind():
+                ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
+            } else {
+                ## symmetric / general : for symmetric, only "existing" part
+                ij.x <- non0.i(x, cld)
+            }
+            m1 <- .Call(m_encodeInd, ij.x, di, orig1=FALSE, checkBounds=FALSE)
             m2 <- .Call(m_encodeInd, ij,   di, orig1= TRUE, checkBounds= TRUE)
-	    mi <- match(m2, m1, nomatch=0)
-	    mmi <- mi != 0L ## == (m2 %in% m1)
-	    ## Result: all FALSE or 0  apart from where we match non-zero entries
-	    ans <- vector(mode = .type.kind[.M.kind(x)], length = m)
-	    ## those that are *not* zero:
-	    ans[mmi] <- if(extends(cld, "nsparseMatrix")) TRUE else x@x[mi[mmi]]
-	    if(any(ina <- is.na(m2))) # has one or two NA in that (i,j) row
-		is.na(ans) <- ina
-	    ans
-
+            mi <- match(m2, m1, nomatch=0)
+            mmi <- mi != 0L ## == (m2 %in% m1)
+            ## Result: all FALSE or 0 apart from where we match non-zero entries
+            ans <- vector(mode = .type.kind[.M.kind(x)], length = m)
+            ## those that are *not* zero:
+            ans[mmi] <- if(extends(cld, "nsparseMatrix")) TRUE else x@x[mi[mmi]]
+            if(any(ina <- is.na(m2))) # has one or two NA in that (i,j) row
+                is.na(ans) <- ina
+            ans
         } else { ## non-sparse : dense
             ##---- NEVER happens:  'denseMatrix' has its own setMethod(.) !
             message("m[<ij-matrix>]: inefficiently indexing single elements - should not happen, please report!")
@@ -597,12 +597,12 @@ subset.ij <- function(x, ij) {
 }
 
 ## A[ ij ]  where ij is (i,j) 2-column matrix -- but also when that is logical mat!
-.M.sub.i.2col <- function (x, i, j, ..., drop)
-{
+.M.sub.i.2col <- function (x, i, j, ..., drop) {
     nA <- nargs()
     if(nA != 2)
-        stop(domain=NA, gettextf(
-            "nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?", nA))
+        stop(gettextf("nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?",
+                      nA),
+             domain = NA)
     ## else: (nA == 2):	 M [ cbind(ii,jj) ] or M [ <logical matrix> ]
     if(!is.integer(nc <- ncol(i)))
         stop(".M.sub.i.2col(): 'i' has no integer column number;\n should never happen; please report")
@@ -613,13 +613,14 @@ subset.ij <- function(x, ij) {
     if(!nrow(i)) return(vector(mode = .type.kind[.M.kind(x)]))
     ## else
     subset.ij(x, i)
-
 }
-setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing"),# drop="ANY"
-	  .M.sub.i.2col)
+setMethod("[",
+          signature(x = "Matrix", i = "matrix", j = "missing", drop = "ANY"),
+          .M.sub.i.2col)
 ## just against ambiguity notices :
-setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missing"),
-	  .M.sub.i.2col)
+setMethod("[",
+          signature(x = "Matrix", i = "matrix", j = "missing", drop="missing"),
+          .M.sub.i.2col)
 } ## MJ
 
 
@@ -631,126 +632,129 @@ setMethod("[", signature(x = "Matrix", i = "matrix", j = "missing", drop="missin
 ## sparse all use  .TM.repl.i.mat()
 ## NOTE:  need '...' below such that setMethod() does
 ##	  not use .local() such that nargs() will work correctly:
-.M.repl.i.2col <- function (x, i, j, ..., value)
-{
+.M.repl.i.2col <- function (x, i, j, ..., value) {
     nA <- nargs()
     if(nA == 3) { ##  M [ cbind(ii,jj) ] <- value  or M [ Lmat ] <- value
-	if(!is.integer(nc <- ncol(i)))
-	    stop(".M.repl.i.2col(): 'i' has no integer column number;\n should never happen; please report")
-	else if(!is.numeric(i) || nc != 2)
-	    stop("such indexing must be by logical or 2-column numeric matrix")
-	if(is.logical(i)) {
-	    message(".M.repl.i.2col(): drop 'matrix' case ...")
-	    ## c(i) : drop "matrix" to logical vector
-	    return( callGeneric(x, i=c(i), value=value) )
-	}
-	if(!is.integer(i)) storage.mode(i) <- "integer"
-	if(any(i < 0))
-	    stop("negative values are not allowed in a matrix subscript")
-	if(anyNA(i))
-	    stop("NAs are not allowed in subscripted assignments")
-	if(any(i0 <- (i == 0))) # remove them
+        if(!is.integer(nc <- ncol(i)))
+            stop(".M.repl.i.2col(): 'i' has no integer column number;\n should never happen; please report")
+        else if(!is.numeric(i) || nc != 2)
+            stop("such indexing must be by logical or 2-column numeric matrix")
+        if(is.logical(i)) {
+            message(".M.repl.i.2col(): drop 'matrix' case ...")
+            ## c(i) : drop "matrix" to logical vector
+            return( callGeneric(x, i=c(i), value=value) )
+        }
+        if(!is.integer(i)) storage.mode(i) <- "integer"
+        if(any(i < 0))
+            stop("negative values are not allowed in a matrix subscript")
+        if(anyNA(i))
+            stop("NAs are not allowed in subscripted assignments")
+        if(any(i0 <- (i == 0))) # remove them
             i <- i[ - which(i0, arr.ind = TRUE)[,"row"], ]
         ## now have integer i >= 1
-	m <- nrow(i)
-	## mod.x <- .type.kind[.M.kind(x)]
-	if(length(value) > 0 && m %% length(value) != 0)
-	    warning("number of items to replace is not a multiple of replacement length")
-	## recycle:
-	value <- rep_len(value, m)
-	i1 <- i[,1]
-	i2 <- i[,2]
-	if(m > 2)
-	    message("m[ <ij-matrix> ] <- v: inefficiently treating single elements")
-	## inefficient -- FIXME -- (also loses "symmetry" unnecessarily)
-	for(k in seq_len(m))
-	    x[i1[k], i2[k]] <- value[k]
-
-	x
-    } else stop(gettextf(
-		"nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' ?",
-			 nA), domain=NA)
+        m <- nrow(i)
+        ## mod.x <- .type.kind[.M.kind(x)]
+        if(length(value) > 0 && m %% length(value) != 0)
+            warning("number of items to replace is not a multiple of replacement length")
+        ## recycle:
+        value <- rep_len(value, m)
+        i1 <- i[,1]
+        i2 <- i[,2]
+        if(m > 2)
+            message("m[ <ij-matrix> ] <- v: inefficiently treating single elements")
+        ## inefficient -- FIXME -- (also loses "symmetry" unnecessarily)
+        for(k in seq_len(m))
+            x[i1[k], i2[k]] <- value[k]
+        x
+    } else
+        stop(gettextf("nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' ?",
+                      nA),
+             domain = NA)
 }
 
-setReplaceMethod("[", signature(x = "Matrix", i = "matrix", j = "missing",
-				value = "replValue"),
-		 .M.repl.i.2col)
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "matrix", j = "missing",
+                           value = "replValue"),
+                 .M.repl.i.2col)
 
 ## Three catch-all methods ... would be very inefficient for sparse*
 ## --> extra methods in ./sparseMatrix.R
-setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
-				value = "Matrix"),
-		 function (x, i, j, ..., value)
-		 callGeneric(x=x, , j=j, value = as.vector(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "missing", j = "ANY",
+                           value = "Matrix"),
+                 function(x, i, j, ..., value)
+                     callGeneric(x=x, , j=j, value = as.vector(value)))
 
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
-				value = "Matrix"),
-		 function (x, i, j, ..., value)
-		     if(nargs() == 3)
-			 callGeneric(x=x, i=i, value = as.vector(value))
-		     else
-			 callGeneric(x=x, i=i, , value = as.vector(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ANY", j = "missing",
+                           value = "Matrix"),
+                 function(x, i, j, ..., value)
+                     if(nargs() == 3)
+                         callGeneric(x=x, i=i, value = as.vector(value))
+                     else
+                         callGeneric(x=x, i=i, , value = as.vector(value)))
 
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
-				value = "Matrix"),
-		 function (x, i, j, ..., value)
-		 callGeneric(x=x, i=i, j=j, value = as.vector(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ANY", j = "ANY",
+                           value = "Matrix"),
+                 function(x, i, j, ..., value)
+                     callGeneric(x=x, i=i, j=j, value = as.vector(value)))
 
 
-setReplaceMethod("[", signature(x = "Matrix", i = "missing", j = "ANY",
-				value = "matrix"),
-		 function (x, i, j, ..., value)
-		 callGeneric(x=x, , j=j, value = c(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "missing", j = "ANY",
+                           value = "matrix"),
+                 function(x, i, j, ..., value)
+                     callGeneric(x=x, , j=j, value = c(value)))
 
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "missing",
-				value = "matrix"),
-		 function (x, i, j, ..., value)
-		     if(nargs() == 3)
-			 callGeneric(x=x, i=i, value = c(value))
-		     else
-			 callGeneric(x=x, i=i, , value = c(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ANY", j = "missing",
+                           value = "matrix"),
+                 function(x, i, j, ..., value)
+                     if(nargs() == 3)
+                         callGeneric(x=x, i=i, value = c(value))
+                     else
+                         callGeneric(x=x, i=i, , value = c(value)))
 
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
-				value = "matrix"),
-		 function (x, i, j, value)
-		 callGeneric(x=x, i=i, j=j, value = c(value)))
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ANY", j = "ANY",
+                           value = "matrix"),
+                 function(x, i, j, value)
+                     callGeneric(x=x, i=i, j=j, value = c(value)))
 
-##  M [ <lMatrix> ] <- value; used notably for x = "CsparseMatrix"  -------------------
+
+##  M [ <lMatrix> ] <- value; used notably for x = "CsparseMatrix"
 .repl.i.lDMat <- function (x, i, j, ..., value)
-{
-    ## nA <- nargs()
-    ## if(nA != 3) stop(gettextf("nargs() = %d should never happen; please report.", nA), domain=NA)
-    ## else: nA == 3  i.e.,  M [ Lmat ] <- value
-    ## x[i] <- value ; return(x)
     `[<-`(x, i=which(as.vector(i)), value=value)
-}
-setReplaceMethod("[", signature(x = "Matrix", i = "ldenseMatrix", j = "missing",
-				value = "replValue"), .repl.i.lDMat)
-setReplaceMethod("[", signature(x = "Matrix", i = "ndenseMatrix", j = "missing",
-				value = "replValue"), .repl.i.lDMat)
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ldenseMatrix", j = "missing",
+                           value = "replValue"),
+                 .repl.i.lDMat)
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "ndenseMatrix", j = "missing",
+                           value = "replValue"),
+                 .repl.i.lDMat)
 rm(.repl.i.lDMat)
 
 .repl.i.lSMat <- function (x, i, j, ..., value)
-{
-    ## nA <- nargs()
-    ## if(nA != 3) stop(gettextf("nargs() = %d should never happen; please report.", nA), domain=NA)
-    ## else: nA == 3  i.e.,  M [ Lmat ] <- value
-    ## x[i] <- value ; return(x)
     `[<-`(x, i=which(as(i, "sparseVector")), value=value)
-}
-setReplaceMethod("[", signature(x = "Matrix", i = "lsparseMatrix", j = "missing",
-				value = "replValue"), .repl.i.lSMat)
-setReplaceMethod("[", signature(x = "Matrix", i = "nsparseMatrix", j = "missing",
-				value = "replValue"), .repl.i.lSMat)
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "lsparseMatrix", j = "missing",
+                           value = "replValue"),
+                 .repl.i.lSMat)
+setReplaceMethod("[",
+                 signature(x = "Matrix", i = "nsparseMatrix", j = "missing",
+                           value = "replValue"),
+                 .repl.i.lSMat)
 rm(.repl.i.lSMat)
 
 ## (ANY,ANY,ANY) is used when no `real method' is implemented :
 setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),
-	  function (x, i, j, value) {
-              if(!is.atomic(value))
-		  stop(gettextf(
-		"RHS 'value' (class %s) matches 'ANY', but must match matrix class %s",
-			       class(value), class(x)), domain=NA)
-              else stop("not-yet-implemented 'Matrix[<-' method")
-          })
+                 function (x, i, j, value) {
+                     if(!is.atomic(value))
+                         stop(gettextf("RHS 'value' (class %s) matches 'ANY', but must match matrix class %s",
+                                       class(value), class(x)),
+                              domain = NA)
+                     else stop("not-yet-implemented 'Matrix[<-' method")
+                 })

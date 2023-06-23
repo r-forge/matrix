@@ -82,7 +82,7 @@
 .onUnload <- function(libpath) {
     library.dynam.unload("Matrix", libpath)
     if(!.MatrixEnv[["ambiguityNotes"]])
-	options(ambiguousMethodSelection = NULL)
+        options(ambiguousMethodSelection = NULL)
     NULL
 }
 

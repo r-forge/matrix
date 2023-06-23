@@ -98,7 +98,7 @@ setMethod("skewpart", signature(x = "packedMatrix"),
           function(x) .Call(packedMatrix_skewpart, x))
 
 setMethod("cov2cor", signature(V = "packedMatrix"),
-	  function(V) as(forceSymmetric(V), "pcorMatrix"))
+          function(V) as(forceSymmetric(V), "pcorMatrix"))
 
 
 ## MJ : no longer needed ... replacement in ./subscript.R
@@ -285,7 +285,7 @@ setMethod("[", signature(x = "packedMatrix", i = "missing", j = "missing", drop 
               Matrix.msg(sprintf("pM[%s, %s, %s] : nargs() = %d",
                                  "missing", "missing", "missing", na),
                          .M.level = 2)
-	      if (na == 2L) {
+              if (na == 2L) {
                   ## x[]
                   x
               } else if (na == 3L) {
