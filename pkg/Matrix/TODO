@@ -41,6 +41,17 @@
 		MJ: most users will not know that, e.g., 0x1p+53 + 1 = 0x1p+53
 		    is TRUE where .Machine$double.digits = 53
 		MJ: of course, 64-bit integers would be nice ...
+** TODO compMatrix: do we really need it?
+		MJ: caching of factorizations seems to be an easy source of headache
+		    and bugs; it is not idiomatic
+		MJ: we should encourage users to compute factorizations, assign them
+		    to variables, and operate on them directly; we should *not*
+		    encourage users to rely on invisible side effects, as we do now
+		MJ: we now have solve, determinant, etc., methods for subclasses
+		    of MatrixFactorization
+		MJ: rcond(A) may need A and its factorization ... but in that case
+		    we could have usage like rcond(A, norm, trf = BunchKaufman(A))
+		    allowing the user to supply 'trf' or rely on lazy evaluation
 
 * Very *Urgent*
 ** DONE 0-dim sparseMatrices fail for all "Ops" --> ~/R/MM/Pkg-ex/Matrix/bug-0-length-Ops.R
