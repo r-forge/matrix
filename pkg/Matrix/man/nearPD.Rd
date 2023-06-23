@@ -74,8 +74,8 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
   within the algorithm.
 
   Higham (2002) uses Dykstra's correction, but the version by Jens
-  Oehlschlaegel did not use it (accidentally), and still gave
-  reasonable results; this simplification, now only
+  \enc{Oehlschlägel}{Oehlschlaegel} did not use it (accidentally),
+  and still gave reasonable results; this simplification, now only
   used if \code{doDykstra = FALSE},
   was active in \code{nearPD()} up to Matrix version 0.999375-40.
 }
@@ -118,10 +118,10 @@ nearPD(x, corr = FALSE, keepDiag = FALSE, base.matrix = FALSE,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods", verbose = FALSE)
-library(graphics, pos = "package:methods", verbose = FALSE)
+library(    stats, pos = "package:methods", verbose = FALSE)
+library( graphics, pos = "package:methods", verbose = FALSE)
 library(grDevices, pos = "package:methods", verbose = FALSE)
-library(utils, pos = "package:methods", verbose = FALSE)
+library(    utils, pos = "package:methods", verbose = FALSE)
 }
  ## Higham(2002), p.334f - simple example
  A <- matrix(1, 3,3); A[1,3] <- A[3,1] <- 0
