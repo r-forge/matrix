@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-22 r4102)}{
+\section{Changes in version 1.6-0 (2023-06-23 r4104)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -253,9 +253,8 @@
       \code{validObject(new("sparseLU"))} is not an error.
 
       \item The prototypes of the \code{Q} and \code{T} slots
-      of class \code{Schur} are now 0-by-0 \code{dgeMatrix} and
-      \code{dtrMatrix}, respectively, so that
-      \code{validObject(new("Schur"))} is not an error.
+      of class \code{Schur} are now 0-by-0 \code{dgeMatrix},
+	  so that \code{validObject(new("Schur"))} is not an error.
 
       \item \code{BunchKaufman(<matrix>)} now works when argument
       \code{uplo} (documented to be optional) is missing.
