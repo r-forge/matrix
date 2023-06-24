@@ -30,7 +30,7 @@ SEXP sparse_as_dense(SEXP from, int packed)
 	if (dsize > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: "
 		          "allocating vector of size %0.1f GiB"),
-				0x1.0p-30 * dsize);
+		        0x1.0p-30 * dsize);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -1001,7 +1001,7 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP code, SEXP uplo)
 	if (size > 0x1.0p+30) /* 1 GiB */
 		warning(_("sparse->dense coercion: "
 		          "allocating vector of size %0.1f GiB"),
-				0x1.0p-30 * size);
+		        0x1.0p-30 * size);
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -1839,7 +1839,7 @@ SEXP R_sparse_diag_set(SEXP obj, SEXP val)
 	if (tv < LGLSXP || tv > REALSXP)
 		/* Upper bound can become CPLXSXP once we have proper zMatrix */
 		error(_("replacement diagonal has incompatible type \"%s\""),
-		        type2char(tv));
+		      type2char(tv));
 
 	R_xlen_t nv = XLENGTH(val);
 	if (nv != 1 && nv != r)

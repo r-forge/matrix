@@ -375,7 +375,7 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 {
 	SEXPTYPE tx = TYPEOF(x);
 	if (tx < LGLSXP || tx > CPLXSXP)
-	ERROR_INVALID_TYPE("'x'", tx, "unpacked_force");
+		ERROR_INVALID_TYPE("'x'", tx, "unpacked_force");
 	R_xlen_t nx = XLENGTH(x);
 	SEXP y = PROTECT(allocVector(tx, nx));
 
