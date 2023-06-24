@@ -83,7 +83,7 @@ SEXP matrix_as_dense(SEXP from, const char *code, char uplo, char diag,
 
 	if (cl[1] != 'g' && m != n)
 		error(_("attempt to construct triangular or symmetric "
-				"denseMatrix from non-square matrix"));
+		        "denseMatrix from non-square matrix"));
 
 	if (doDN) {
 		if (cl[1] == 's')
@@ -563,7 +563,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP code, SEXP uplo, SEXP diag)
 #define DAS_VALID2T \
 	if (nnz > INT_MAX) \
 		error(_("attempt to construct sparse matrix with " \
-				"more than 2^31-1 nonzero elements"))
+		        "more than 2^31-1 nonzero elements"))
 
 #define DAS_VALID2CR \
 	do { DAS_VALID2T; else *(pp++) = (int) nnz; } while (0)
@@ -1088,7 +1088,7 @@ SEXP dense_as_general(SEXP from, char kind, int new, int transpose_if_vector)
 		/* (tp|sp|di)->ge */
 		if ((double) n * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding "
-					"R_XLEN_T_MAX"));
+			        "R_XLEN_T_MAX"));
 		if (tf != tt)
 			REPROTECT(x0 = coerceVector(x0, tt), pidB);
 		PROTECT(x1 = allocVector(tt, (R_xlen_t) n * n));
