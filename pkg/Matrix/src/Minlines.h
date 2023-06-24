@@ -1,5 +1,5 @@
-#ifndef MATRIX_INLINES_H
-#define MATRIX_INLINES_H
+#ifndef MATRIX_MINLINES_H
+#define MATRIX_MINLINES_H
 
 /**
  * Allocate an SEXP of given type and length, assign it as slot nm in
@@ -22,10 +22,10 @@
 static R_INLINE
 SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, R_xlen_t length)
 {
-    SEXP val = allocVector(type, length);
+	SEXP val = allocVector(type, length);
 
-    SET_SLOT(obj, nm, val);
-    return val;
+	SET_SLOT(obj, nm, val);
+	return val;
 }
 
 /**
@@ -39,62 +39,37 @@ SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, R_xlen_t length)
  * @return mj
  */
 static R_INLINE
-int* expand_cmprPt(int ncol, const int mp[], int mj[])
+int *expand_cmprPt(int ncol, const int mp[], int mj[])
 {
-    int j;
-    for (j = 0; j < ncol; j++) {
-	int j2 = mp[j+1], jj;
-	for (jj = mp[j]; jj < j2; jj++) mj[jj] = j;
-    }
-    return mj;
+	int j;
+	for (j = 0; j < ncol; j++) {
+		int j2 = mp[j+1], jj;
+		for (jj = mp[j]; jj < j2; jj++)
+			mj[jj] = j;
+	}
+	return mj;
 }
-
-/* MJ: no longer needed ... prefer R_invPerm() in ./Mutils.c */
-#if 0
-
-/** Inverse Permutation
- * C version of   .inv.perm.R <- function(p) { p[p] <- seq_along(p) ; p }
- */
-static R_INLINE
-SEXP inv_permutation(SEXP p_, SEXP zero_p, SEXP zero_res)
-{
-    int np = 1;
-    if(!isInteger(p_)) {p_ = PROTECT(coerceVector(p_, INTSXP)); np++; }
-    int *p = INTEGER(p_), n = LENGTH(p_);
-    SEXP val = PROTECT(allocVector(INTSXP, n));
-    int *v = INTEGER(val), p_0 = asLogical(zero_p), r_0 = asLogical(zero_res);
-    if(!p_0) v--; // ==> use 1-based indices
-    // shorter (but not 100% sure if ok: is LHS always eval'ed *before* RHS ?) :
-    // for(int i=0; i < n; ) v[p[i]] = ++i;
-    for(int i=0; i < n; ) {
-	int j = p[i]; v[j] = (r_0) ? i++ : ++i;
-    }
-    UNPROTECT(np);
-    return val;
-}
-
-#endif /* MJ */
 
 static R_INLINE
 int strmatch(const char *x, const char **valid)
 {
-    int i = 0;
-    while (valid[i][0] != '\0') {
-	if (strcmp(x, valid[i]) == 0)
-	    return i;
-	++i;
-    }
-    return -1;
+	int i = 0;
+	while (valid[i][0] != '\0') {
+		if (strcmp(x, valid[i]) == 0)
+			return i;
+		++i;
+	}
+	return -1;
 }
 
 static R_INLINE
 int strmatch2(const char *x, SEXP valid)
 {
-    int i, n = LENGTH(valid);
-    for (i = 0; i < n; ++i)
-	if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
-	    return i;
-    return -1;
+	int i, n = LENGTH(valid);
+	for (i = 0; i < n; ++i)
+		if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
+			return i;
+	return -1;
 }
 
-#endif /* MATRIX_INLINES_H */
+#endif /* MATRIX_MINLINES_H */

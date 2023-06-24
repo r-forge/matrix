@@ -23,4 +23,4 @@ SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type);
 
 SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type);
 
-#endif
+#endif /* MATRIX_KAPPA_H */

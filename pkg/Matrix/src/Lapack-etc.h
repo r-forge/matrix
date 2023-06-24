@@ -1,5 +1,5 @@
-#ifndef MATRIX_LAPACK_H
-#define MATRIX_LAPACK_H
+#ifndef MATRIX_LAPACK_ETC_H
+#define MATRIX_LAPACK_ETC_H
 
 /* Copy and paste from WRE : */
 
@@ -18,4 +18,4 @@
 # define FCONE
 #endif
 
-#endif /* MATRIX_LAPACK_H */
+#endif /* MATRIX_LAPACK_ETC_H */

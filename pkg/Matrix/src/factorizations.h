@@ -1,5 +1,5 @@
-#ifndef MATRIX_FACTORS_H
-#define MATRIX_FACTORS_H
+#ifndef MATRIX_FACTORIZATIONS_H
+#define MATRIX_FACTORIZATIONS_H
 
 #include "cs.h"
 #include "chm_common.h"
@@ -25,9 +25,9 @@ int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order);
 SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError);
 
 int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
-		   int perm, int ldl, int super, double mult);
+                   int perm, int ldl, int super, double mult);
 SEXP dpCMatrix_trf(SEXP obj,
-		   SEXP perm, SEXP ldl, SEXP super, SEXP mult);
+                   SEXP perm, SEXP ldl, SEXP super, SEXP mult);
 
 SEXP BunchKaufman_expand(SEXP obj, SEXP packed);
 
@@ -56,4 +56,4 @@ SEXP CHMfactor_diag_get(SEXP obj, SEXP square);
 SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult);
 SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update);
 
-#endif
+#endif /* MATRIX_FACTORIZATIONS_H */
