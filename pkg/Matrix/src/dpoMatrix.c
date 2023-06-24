@@ -1,4 +1,1 @@
-/* MJ: no longer needed ... nothing below */
-#if 0
-#include "dpoMatrix.h"
-#endif /* MJ */
+/* in .Rbuildignore since r4010, empty since r4108 */

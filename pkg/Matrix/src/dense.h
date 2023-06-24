@@ -20,11 +20,4 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2);
 SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean);
 SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean);
 
-/* MJ: unused */
-#if 0
-SEXP lsq_dense_chol(SEXP X, SEXP y);
-SEXP lsq_dense_qr(SEXP X, SEXP y);
-SEXP lapack_qr(SEXP Xin, SEXP tl);
-#endif /* MJ */
-
 #endif /* MATRIX_DENSE_H */

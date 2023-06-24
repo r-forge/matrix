@@ -1,37 +1,9 @@
-## Methods for virtual class "sparseMatrix" of sparse matrices
+## METHODS FOR CLASS: sparseMatrix (virtual)
+## sparse matrices
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ## ~~~~ COERCIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-..sparse2unpacked <- function(from)
-    .Call(R_sparse_as_dense, from, FALSE)
-..sparse2packed   <- function(from) {
-    if(!.hasSlot(from, "uplo"))
-        from <-
-            if(isSymmetric(from))
-                forceSymmetric(from)
-            else if(!(it <- isTriangular(from)))
-                stop("matrix is not symmetric or triangular")
-            else if (attr(it, "kind") == "U")
-                triu(from)
-            else tril(from)
-    .Call(R_sparse_as_dense, from, TRUE)
-}
-
-..sparse2dge <- function(from)
-    .sparse2dense(.sparse2g(..sparse2d(from)))
-..sparse2lge <- function(from)
-    .sparse2dense(.sparse2g(..sparse2l(from)))
-..sparse2nge <- function(from)
-    .sparse2dense(.sparse2g(..sparse2n(from)))
-..sparse2g <- function(from)
-    .Call(R_sparse_as_general, from)
-
-..tT2gC <- ..sT2gC <- function(from) .T2C(.sparse2g(from))
-..tC2gT <- ..sC2gT <- function(from) .CR2T(.sparse2g(from))
-..gT2tC <- function(from) .T2C(.M2tri(from))
-..gT2sC <- function(from) .T2C(.M2sym(from))
-..gC2tT <- function(from) .CR2T(.M2tri(from))
-..gC2sT <- function(from) .CR2T(.M2sym(from))
 
 ## To sparseMatrix .........................................
 
@@ -48,12 +20,28 @@ setAs("table", "sparseMatrix",
 
 ## To dense ................................................
 
+..sparse2unpacked <- function(from)
+    .Call(R_sparse_as_dense, from, FALSE)
+..sparse2packed   <- function(from) {
+    if(!.hasSlot(from, "uplo"))
+        from <-
+            if(isSymmetric(from))
+                forceSymmetric(from)
+            else if(!(it <- isTriangular(from)))
+                stop("matrix is not symmetric or triangular")
+            else if (attr(it, "kind") == "U")
+                triu(from)
+            else tril(from)
+    .Call(R_sparse_as_dense, from, TRUE)
+}
+
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
     setAs(.cl,    "denseMatrix", ..sparse2unpacked)
     setAs(.cl, "unpackedMatrix", ..sparse2unpacked)
     setAs(.cl,   "packedMatrix", ..sparse2packed)
 }
-rm(.cl)
+
+rm(.cl, ..sparse2unpacked, ..sparse2packed)
 
 ## To base matrix, base vector .............................
 
@@ -100,11 +88,16 @@ rm(.kinds, .kind, .otherkinds, .otherkind, .def)
 
 ## To "structure" ..........................................
 
+..sparse2g <- function(from)
+    .Call(R_sparse_as_general, from)
+
 setAs("CsparseMatrix", "generalMatrix", ..sparse2g)
 setAs("RsparseMatrix", "generalMatrix", ..sparse2g)
 setAs("TsparseMatrix", "generalMatrix", ..sparse2g)
 ## setAs("sparseMatrix", "triangularMatrix", .) # inherited from Matrix
 ## setAs("sparseMatrix",  "symmetricMatrix", .) # inherited from Matrix
+
+rm(..sparse2g)
 
 ## To "storage" ............................................
 
@@ -122,135 +115,6 @@ for (.kind in c("d", "l", "n"))
               .tCR2RC)
 rm(.kind, .repr)
 
-## More granular coercions .................................
-
-## DEPRECATED IN 1.5-0; see ./zzz.R
-if(FALSE) {
-.kinds <- c("d", "l", "n")
-.strs  <- c("g", "t", "s")
-.reprs <- c("C", "R", "T")
-.map.str <- c(g = "e", t = "r", s = "y")
-.map.repr <- list(C = list(R = .CR2RC, T = .CR2T),
-                  R = list(C = .CR2RC, T = .CR2T),
-                  T = list(C = .T2C,   R = .T2R))
-for (.kind in .kinds) {
-    ## This kind to other kinds, preserving structure and storage
-    .otherkinds <- .kinds[.kinds != .kind]
-    for (.otherkind in .otherkinds) {
-        .def <- get(sprintf("..sparse2%s", .otherkind),
-                    mode = "function", inherits = FALSE)
-        for (.str in .strs)
-            for (.repr in .reprs)
-                setAs(paste0(     .kind, .str, .repr, "Matrix"),
-                      paste0(.otherkind, .str, .repr, "Matrix"), .def)
-    }
-
-    ## Non-symmetric to symmetric, preserving kind and storage
-    for (.str in c("g", "t"))
-        for (.repr in .reprs)
-            setAs(paste0(.kind, .str, .repr, "Matrix"),
-                  paste0(.kind,  "s", .repr, "Matrix"), ..M2sym)
-
-    ## Non-triangular to triangular, preserving kind and storage
-    for (.str in c("g", "s"))
-        for (.repr in .reprs)
-            setAs(paste0(.kind, .str, .repr, "Matrix"),
-                  paste0(.kind,  "t", .repr, "Matrix"), ..M2tri)
-
-    ## Non-general to general, preserving kind and storage
-    for (.str in c("t", "s"))
-        for (.repr in .reprs)
-            setAs(paste0(.kind, .str, .repr, "Matrix"),
-                  paste0(.kind,  "g", .repr, "Matrix"), ..sparse2g)
-
-    ## C->[^C], R->[^R], T->[^T], preserving kind and structure
-    for (.str in .strs) {
-        for (.repr in .reprs) {
-            .otherreprs <- .reprs[.reprs != .repr]
-            for (.otherrepr in .otherreprs)
-                setAs(paste0(.kind, .str,      .repr, "Matrix"),
-                      paste0(.kind, .str, .otherrepr, "Matrix"),
-                      .map.repr[[c(.repr, .otherrepr)]])
-        }
-    }
-
-    ## Sparse to dense, preserving kind and structure
-    for (.str in .strs) {
-        for (.repr in .reprs) {
-            setAs(paste0(.kind, .str,            .repr, "Matrix"),
-                  paste0(.kind, .str, .map.str[[.str]], "Matrix"),
-                  ..sparse2unpacked)
-            if (.str == "g") next
-            setAs(paste0(.kind, .str,            .repr, "Matrix"),
-                  paste0(.kind, .str,              "p", "Matrix"),
-                  ..sparse2packed)
-        }
-    }
-
-    ## sC<->sR, preserving kind
-    .def.template <- function(from)
-        new(.TO, Dim = from@Dim, Dimnames = from@Dimnames,
-            uplo = if(from@uplo == "U") "L" else "U",
-            p = from@p, j = from@i, x = from@x)
-    for (.repr in c("C", "R")) {
-        .otherrepr <- if(.repr == "C") "R" else "C"
-        .from <- paste0(.kind, "s",      .repr, "Matrix")
-        .to   <- paste0(.kind, "s", .otherrepr, "Matrix")
-        .def <- .def.template
-
-        .b <- body(.def)
-        .b[[2L]] <- .to
-        if(.repr != "C") { # reverse j = from@i
-            .m <- match("j", names(.b))
-            names(.b)[.m] <- "i"
-            .b[[.m]][[3L]] <- quote(j)
-        }
-        if(.kind == "n") { # delete x = from@x
-            .m <- match("x", names(.b))
-            .b[[.m]] <- NULL
-        }
-        body(.def) <- .b
-
-        setAs(.from, .to, .def)
-        setAs(.from, paste0(.otherrepr, "sparseMatrix"), .def)
-    }
-
-    ## gC->[^g]T, [^g]C->gT, gT->[^g]C, [^g]T->gC, preserving kind
-    for (.str in c("t", "s")) {
-        for (.repr in c("C", "T")) {
-            .otherrepr <- if(.repr == "C") "T" else "C"
-            setAs(paste0(.kind,  "g",      .repr, "Matrix"),
-                  paste0(.kind, .str, .otherrepr, "Matrix"),
-                  get(paste0("..g", .repr, "2", .str, .otherrepr),
-                      mode = "function", inherits = FALSE))
-            setAs(paste0(.kind, .str,      .repr, "Matrix"),
-                  paste0(.kind,  "g", .otherrepr, "Matrix"),
-                  get(paste0("..", .str, .repr, "2g", .otherrepr),
-                      mode = "function", inherits = FALSE))
-        }
-    }
-}
-rm(.kinds, .kind, .otherkinds, .otherkind,
-   .strs, .str, .map.str,
-   .reprs, .repr, .otherreprs, .otherrepr, .map.repr,
-   .from, .to, .def, .def.template, .b, .m)
-
-## For whatever reason, we also have these granular ones in Matrix 1.4-1:
-setAs("RsparseMatrix", "dgeMatrix", ..sparse2dge)
-setAs(    "dtCMatrix", "dgeMatrix", ..sparse2dge)
-setAs(    "dsCMatrix", "dgeMatrix", ..sparse2dge)
-setAs(    "dtTMatrix", "dgeMatrix", ..sparse2dge)
-setAs(    "dsTMatrix", "dgeMatrix", ..sparse2dge)
-setAs(    "ngTMatrix", "lgeMatrix", ..sparse2lge)
-} ## DEPRECATED IN 1.5-0; see ./zzz.R
-
-rm(..sparse2unpacked, ..sparse2packed,
-   ..sparse2dge, ..sparse2lge, ..sparse2nge, ..sparse2g,
-   ..tT2gC, ..sT2gC,
-   ..tC2gT, ..sC2gT,
-   ..gT2tC, ..gT2sC,
-   ..gC2tT, ..gC2sT)
-
 
 ## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -261,116 +125,6 @@ spMatrix <- function(nrow, ncol, i = integer(), j = integer(), x = double())
         j = as.integer(j) - 1L,
         x = if(is.integer(x)) as.double(x) else x)
 
-if(FALSE) {
-## This version was used in Matrix <= 1.5-1
-sparseMatrix <- function(i = ep, j = ep, p, x, dims, dimnames,
-                         symmetric = FALSE, triangular = FALSE, index1 = TRUE,
-                         repr = "C", giveCsparse = (repr == "C"),
-                         check = TRUE, use.last.ij = FALSE)
-{
-  ## Purpose: user-level substitute for most  new(<sparseMatrix>, ..) calls
-  ## Author: Douglas Bates, Date: 12 Jan 2009, based on Martin's version
-    if((m.i <- missing(i)) + (m.j <- missing(j)) + (m.p <- missing(p)) != 1)
-        stop("exactly one of 'i', 'j', or 'p' must be missing from call")
-    if(!m.p) {
-        p <- as.integer(p)
-        if((lp <- length(p)) < 1 || p[1] != 0 || any((dp <- p[-1] - p[-lp]) < 0))
-            stop("'p' must be a non-decreasing vector (0, ...)")
-        ep <- rep.int(seq_along(dp), dp)
-    }
-    stopifnot(length(repr) == 1L, repr %in% c("C", "T", "R"))
-    ## NB: up to 2020-05, only had giveCsparse=TRUE  --> "C" or "T" -- remain back-compatible:
-    if(missing(repr) && !giveCsparse) {
-        warning("'giveCsparse' has been deprecated; setting 'repr = \"T\"' for you")
-        repr <- "T"
-    } else if(!missing(repr) && !missing(giveCsparse))
-        warning("'giveCsparse' has been deprecated; will use 'repr' instead")
-    ## i and j are now both defined (via default = ep).  Make them 1-based indices.
-    i1 <- as.logical(index1)[1]
-    i <- as.integer(i + !(m.i || i1))
-    j <- as.integer(j + !(m.j || i1))
-
-    ## "minimal dimensions" from (i,j,p); no warnings from empty i or j :
-    dims.min <- suppressWarnings(c(max(i), max(j)))
-    if(anyNA(dims.min)) stop("NA's in (i,j) are not allowed")
-    if(missing(dims)) {
-        dims <- if(symmetric || triangular) rep(max(dims.min), 2) else dims.min
-    } else { ## check dims
-        stopifnot(all(dims >= dims.min))
-        dims <- as.integer(dims)
-    }
-    if(symmetric && triangular)
-        stop("Both 'symmetric' and 'triangular', i.e. asking for diagonal matrix.  Use 'Diagonal()' instead")
-    sx <-
-        if(symmetric) {
-            if(dims[1] != dims[2]) stop("symmetric matrix must be square")
-            "s"
-        } else if(triangular) {
-            if(dims[1] != dims[2]) stop("triangular matrix must be square")
-            "t"
-        } else "g"
-    isPat <- missing(x) ## <-> patter"n" Matrix
-    kx <- if(isPat) "n" else .M.kind(x)
-    r <- new(paste0(kx, sx, "TMatrix"))
-    r@Dim <- dims
-    if(symmetric && all(i >= j)) r@uplo <- "L" # else "U", the default
-    else if(triangular) {
-        r@uplo <-
-            if(all(i >= j))
-                "L"
-            else if(all(i <= j))
-                "U"
-            else stop("triangular matrix must have all i >= j or i <= j")
-    }
-    if(!isPat) {
-        if(kx == "d" && !is.double(x))
-            x <- as.double(x)
-        if(length(x) != (n <- length(i))) { ## recycle
-            if(length(x) != 1 && n %% length(x) != 0)
-                warning("length(i) is not a multiple of length(x)")
-            x <- rep_len(x, n)
-        }
-        if(use.last.ij && (id <- anyDuplicated(cbind(i,j), fromLast=TRUE))) {
-            i <- i[-id]
-            j <- j[-id]
-            x <- x[-id]
-            if(any(idup <- duplicated(cbind(i,j), fromLast=TRUE))) {
-                ndup <- -which(idup)
-                i <- i[ndup]
-                j <- j[ndup]
-                x <- x[ndup]
-            }
-        }
-        r@x <- x
-    }
-    r@i <- i - 1L
-    r@j <- j - 1L
-    if(haveDN <- !missing(dimnames) && !is.null(dimnames))
-        r@Dimnames <- dimnames
-    if(check)
-        validObject(r)
-    if(haveDN && (check || !(is.character(validDim(dims)) ||
-                             is.character(validDN(dimnames, dims)))))
-        ## fixup* needs a valid argument!
-        r@Dimnames <- fixupDN(r@Dimnames)
-    switch(repr,
-           "C" = as(r, "CsparseMatrix"),
-           "T" =    r,# TsparseMatrix
-           "R" = as(r, "RsparseMatrix"),
-           stop("invalid 'repr'; must be \"C\", \"T\", or \"R\""))
-}
-} else {
-## This version modifies the above (backwards compatibly) as follows:
-## * avoids default value 'ep' for 'i' and 'j', which is likely to confuse
-##   users not familiar with lazy evaluation and which was never explained
-##   in ../man/sparseMatrix.Rd
-## * uses a default value of 'repr' showing all allowed values,
-##   in conjunction with match.arg()
-## * omits the default value of 'giveCsparse' to further discourage use
-## * performs a few more (cheap) checks on the arguments to avoid bad errors
-## * supports length-0 'i', 'j'
-## * gives more appropriate errors in the missing(i) case
-## * allocates less in many places
 sparseMatrix <- function(i, j, p, x, dims, dimnames,
                          symmetric = FALSE, triangular = FALSE, index1 = TRUE,
                          repr = c("C", "R", "T"), giveCsparse,
@@ -493,74 +247,12 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
            ## should never happen:
            stop("invalid 'repr'; must be \"C\", \"R\", or \"T\""))
 }
-}
 
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("mean", signature(x = "sparseMatrix"),
           function(x, ...) mean(as(x, "sparseVector"), ...))
-
-
-## MJ: no longer needed ... replacement in ./subscript.R
-if(FALSE) {
-### Subsetting -- basic things (drop = "missing") are done in ./Matrix.R
-
-### FIXME : we defer to the "*gT" -- conveniently, but not efficient for gC !
-
-## [dl]sparse -> [dl]gT   -- treat both in one via superclass
-##                        -- more useful when have "z" (complex) and even more
-
-setMethod("[", signature(x = "sparseMatrix", i = "index", j = "missing",
-                         drop = "logical"),
-          function (x, i,j, ..., drop) {
-              Matrix.msg("sp[i,m,l] : nargs()=",nargs(), .M.level = 2)
-              cld <- getClassDef(class(x))
-              na <- nargs()
-              x <- if(na == 4) as(x, "TsparseMatrix")[i, , drop=drop]
-                   else if(na == 3) as(x, "TsparseMatrix")[i, drop=drop]
-                   else ## should not happen
-                       stop("Matrix-internal error in <sparseM>[i,,d]; please report")
-              ##
-              ## try_as(x, c(cl, sub("T","C", viaCl)))
-              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-                  as(x, "CsparseMatrix") else x
-          })
-
-setMethod("[", signature(x = "sparseMatrix", i = "missing", j = "index",
-                         drop = "logical"),
-          function (x,i,j, ..., drop) {
-              Matrix.msg("sp[m,i,l] : nargs()=",nargs(), .M.level = 2)
-              cld <- getClassDef(class(x))
-              ## why should this be needed; can still happen in <Tsparse>[..]:
-              ##> if(!extends(cld, "generalMatrix"))
-              ##>     x <- as(x, "generalMatrix")
-              ##> viaCl <- paste0(.M.kind(x, cld), "gTMatrix")
-              x <- as(x, "TsparseMatrix")[, j, drop=drop]
-              ## which is simpler than
-              ## x <- callGeneric(x = as(x, "TsparseMatrix"), j=j, drop=drop)
-              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-                  as(x, "CsparseMatrix") else x
-          })
-
-setMethod("[", signature(x = "sparseMatrix", i = "index", j = "index",
-                         drop = "logical"),
-          function (x, i, j, ..., drop) {
-              Matrix.msg("sp[i,i,l] : nargs()=",nargs(), .M.level = 2)
-              cld <- getClassDef(class(x))
-              ## be smart to keep symmetric indexing of <symm.Mat.> symmetric:
-              ##> doSym <- (extends(cld, "symmetricMatrix") &&
-              ##>     length(i) == length(j) && all(i == j))
-              ## why should this be needed; can still happen in <Tsparse>[..]:
-              ##> if(!doSym && !extends(cld, "generalMatrix"))
-              ##>     x <- as(x, "generalMatrix")
-              ##> viaCl <- paste0(.M.kind(x, cld),
-              ##>                 if(doSym) "sTMatrix" else "gTMatrix")
-              x <- as(x, "TsparseMatrix")[i, j, drop=drop]
-              if(is(x, "Matrix") && extends(cld, "CsparseMatrix"))
-                  as(x, "CsparseMatrix") else x
-          })
-} ## MJ
 
 ### "[<-" : -----------------
 
@@ -977,30 +669,6 @@ print.sparseSummary <- function (x, ...) {
     invisible(x)
 }
 
-## MJ: no longer needed ... replacement below
-if(FALSE) {
-## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
-## which have their own methods
-setMethod("isDiagonal", signature(object = "sparseMatrix"),
-          function(object) {
-              d <- object@Dim
-              d[1L] == d[2L] && callGeneric(as(object, "TsparseMatrix"))
-          })
-## Fallback, used for RsparseMatrix and others, but not [CT]sparseMatrix,
-## triangularMatrix, or symmetricMatrix which have their own methods
-setMethod("isTriangular", signature(object = "sparseMatrix"),
-          function(object, upper = NA, ...) {
-              d <- object@Dim
-              if(d[1L] == d[2L])
-                  callGeneric(as(object, "TsparseMatrix"), upper = upper, ...)
-              else FALSE
-          })
-
-setMethod("diag", signature(x = "sparseMatrix"),
-          function(x, nrow, ncol, names)
-              diag(as(x, "CsparseMatrix"), names = names))
-} ## MJ
-
 setMethod("dim<-", signature(x = "sparseMatrix"),
           function(x, value) {
               if(!is.numeric(value) || length(value) != 2L)
@@ -1188,60 +856,6 @@ scale.sparseMatrix <- function(x, center = FALSE, scale = TRUE) {
     if(is.numeric(scale)) attr(x, "scaled:scale") <- scale
     x
 }
-
-setMethod("pack", signature(x = "sparseMatrix"),
-          function(x, ...) stop(sprintf("invalid class \"%s\" to 'pack()'; only dense matrices can be packed", class(x))))
-
-setMethod("unpack", signature(x = "sparseMatrix"),
-          function(x, ...) stop(sprintf("invalid class \"%s\" to 'unpack()'; only dense matrices can be unpacked", class(x))))
-
-## MJ: no longer needed ... replacement below
-if(FALSE) {
-forceSymmetricCsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
-        x <- .Call(Csparse_diagU2N, x)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    .Call(Csparse_general_to_symmetric, x, uplo, TRUE)
-}
-
-forceSymmetricRsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    tx <- .tCR2RC(x)
-    if((tri <- .hasSlot(tx, "diag")) && tx@diag == "U")
-        tx <- .Call(Csparse_diagU2N, tx)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    .tCR2RC(.Call(Csparse_general_to_symmetric, tx,
-                  if(uplo == "U") "L" else "U", TRUE))
-}
-
-forceSymmetricTsparse <- function(x, uplo) {
-    d <- x@Dim
-    if (d[1L] != d[2L])
-        stop("attempt to symmetrize a non-square matrix")
-    if((tri <- .hasSlot(x, "diag")) && x@diag == "U")
-        x <- .Call(Tsparse_diagU2N, x)
-    if(missing(uplo))
-        uplo <- if(tri) x@uplo else "U"
-    dn <- symmDN(x@Dimnames)
-    i <- x@i
-    j <- x@j
-    k <- if(uplo == "U") i <= j else i >= j
-    Class <- paste0(kind <- .M.kind(x), "sTMatrix")
-    if(kind == "n")
-        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
-            i = i[k], j = j[k])
-    else
-        new(Class, Dim = d, Dimnames = dn, uplo = uplo,
-            i = i[k], j = j[k], x = x@x[k])
-}
-} ## MJ
 
 .sparse.diag.get <- function(x, nrow, ncol, names = TRUE)
     .Call(R_sparse_diag_get, x, names)

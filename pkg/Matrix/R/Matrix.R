@@ -31,241 +31,8 @@ setAs("Matrix", "numeric", function(from) as.numeric(as(from, "matrix")))
 setAs("Matrix", "complex", function(from) as.complex(as(from, "matrix")))
 
 
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("dim", signature(x = "Matrix"),
-          function(x) x@Dim)
-
-setMethod("length", "Matrix",
-          function(x) prod(x@Dim))
-
-setMethod("dimnames", signature(x = "Matrix"),
-          function(x) x@Dimnames)
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
-          function(x, value) {
-              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
-          function(x, value) {
-              x@Dimnames <- list(NULL, NULL)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
-          function(x, value) {
-              if(length(x@factors))
-                  x@factors <- list()
-              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
-          function(x, value) {
-              if(length(x@factors))
-                  x@factors <- list()
-              x@Dimnames <- list(NULL, NULL)
-              x
-          })
-
-setMethod("unname", signature(obj = "Matrix"),
-          function(obj, force = FALSE) {
-              obj@Dimnames <- list(NULL, NULL)
-              obj
-          })
-
-setMethod("drop", signature(x = "Matrix"),
-          function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
-
-## These work nicely as long as methods are defined for '[' :
-setMethod("head", signature(x = "Matrix"),
-          head.matrix)
-setMethod("tail", signature(x = "Matrix"),
-          tail.matrix)
-setMethod("diff", signature(x = "Matrix"),
-          ## Mostly cut and paste of 'base::diff.default' :
-          function(x, lag = 1L, differences = 1L, ...) {
-              if(length(lag) != 1L || length(differences) > 1L ||
-                  lag < 1L || differences < 1L)
-                  stop("'lag' and 'differences' must be integers >= 1")
-              if(lag * differences >= x@Dim[1L])
-                  return(x[0L])
-              i1 <- -seq_len(lag)
-              for(i in seq_len(differences)) {
-                  m <- x@Dim[1L]
-                  x <- x[i1, , drop = FALSE] -
-                      x[-m:-(m - lag + 1L), , drop = FALSE]
-              }
-              x
-          })
-
-
-if(FALSE) { ## still does not work for c(1, Matrix(2))
-## For the same reason (and just in case) also do both S3 and S4 here:
-c.Matrix <- function(...) unlist(lapply(list(...), as.vector))
-## NB: Must use   signature  '(x, ..., recursive = FALSE)' :
-setMethod("c", "Matrix", function(x, ..., recursive) c.Matrix(x, ...))
-## The above is not sufficient for  c(NA, 3:2, <Matrix>, <matrix>)
-setMethod("c", "numMatrixLike", function(x, ..., recursive) c.Matrix(x, ...))
-}# not yet
-
-## MJ: no longer needed ... have methods for all relevant subclasses
-if(FALSE) {
-### Virtual coercions -- via smart "helpers" (-> ./Auxiliaries.R)
-setAs("Matrix", "CsparseMatrix", function(from) as_Csparse(from))
-setAs("Matrix", "sparseMatrix", function(from) as(from, "CsparseMatrix"))
-setAs("Matrix", "denseMatrix",  function(from) as_dense(from))
-} ## MJ
-
-## MJ: no longer needed ... replacement in ./unpackedMatrix.R
-if(FALSE) {
-## "base" has an isSymmetric() S3-generic since R 2.3.0
-setMethod("isTriangular", signature(object = "matrix"), isTriMat)
-setMethod("isDiagonal", signature(object = "matrix"), .is.diagonal)
-
-setMethod("symmpart", signature(x = "matrix"),
-          function(x) symmetrizeDimnames(x + t(x)) / 2)
-setMethod("skewpart", signature(x = "matrix"),
-          function(x) symmetrizeDimnames(x - t(x)) / 2)
-} ## MJ
-
-## MJ: no longer needed as methods are available for all subclasses
-if(FALSE) {
-setMethod("diag", signature(x = "Matrix"),
-          function(x, nrow, ncol, names=TRUE) .bail.out.1("diag", class(x)))
-setMethod("diag<-", signature(x = "Matrix"),
-          function(x, value) .bail.out.1("diag", class(x)))
-setMethod("t", signature(x = "Matrix"),
-          function(x) .bail.out.1(.Generic, class(x)))
-setMethod("chol", signature(x = "Matrix"),
-          function(x, pivot, ...) .bail.out.1("chol", class(x)))
-} ## MJ
-
-
-if(FALSE) {
-## This version was used in Matrix <= 1.4-1 but has several "bugs":
-## * Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
-##   is not a diagonalMatrix
-## * Matrix(<diagonalMatrix>, doDiag = FALSE) is a diagonalMatrix
-##   rather than a symmetricMatrix
-## * Matrix(<dgeMatrix>, sparse =  TRUE, forceCheck = FALSE),
-##   Matrix(<dgCMatrix>, sparse = FALSE, forceCheck = FALSE)
-##   _do_ check for structure, possibly resulting in symmetricMatrix
-##   or triangularMatrix
-## * Matrix(sparseVector(1, 1L, 10L)), etc. fail because spV2M()
-##   does not "see" the missingness of 'nrow', 'ncol'
-## * Matrix(table(1)), Matrix(table(1, 1, 1)), etc. give bad errors
-## * Matrix(structure(matrix(1, 2, 2), class = "zzz")) throws a bad
-##   error rather than unclassing as it essentially does for "table"
-## * Matrix(x, ...), where 'x' is a vector of type other than logical,
-##   integer, and double, evaluates .External(Mmatrix, ...) before
-##   throwing an error, hence allocating unnecessarily
-## * Matrix(0, n, n) constructs an intermediate dsCMatrix instead
-##   of returning a ddiMatrix right away
-## * Matrix(0, nrow, ), Matrix(0, , ncol) are wrong for 'nrow', 'ncol'
-##   in the interval (0, 1) and throw bad errors for 'nrow', 'ncol'
-##   equal to 0
-## * Calls is(data, .) much more than necessary ...
-Matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE,
-                    dimnames = NULL, sparse = NULL,
-                    doDiag = TRUE, forceCheck = FALSE)
-{
-    i.M <- is(data, "Matrix")
-    sM <- FALSE
-    if(i.M) {
-        if(is(data, "diagonalMatrix")) return(data) # in all cases
-        sV <- FALSE
-    } else if(inherits(data, "table")) # special treatment
-        class(data) <- "matrix" # "matrix" first for S4 dispatch
-    else if(is(data, "sparseVector")) {
-        data <- spV2M(data, nrow, ncol, byrow=byrow)
-        i.M <- sparse <- forceCheck <- sM <- sV <- TRUE
-    }
-    if(is.null(sparse) && (i.M || is(data, "matrix")))
-        sparse <- sparseDefault(data)
-    doDN <- TRUE # by default
-    if (i.M) {
-        if (!sV) {
-            if(!missing(nrow) || !missing(ncol)|| !missing(byrow))
-                warning("'nrow', 'ncol', etc, are disregarded when 'data' is \"Matrix\" already")
-            sM <- is(data,"sparseMatrix")
-            if(!forceCheck && ((sparse && sM) || (!sparse && !sM)))
-                return(data)
-            ## else : convert  dense <-> sparse -> at end
-        }
-    }
-    else if(!is.matrix(data)) { ## cut & paste from "base::matrix" :
-        ## avoid copying to strip attributes in simple cases
-        if (is.object(data) || !is.atomic(data)) data <- as.vector(data)
-        if(length(data) == 1 && is0(data) && !identical(sparse, FALSE)) {
-            ## Matrix(0, ...) : always sparse unless "sparse = FALSE":
-            if(is.null(sparse)) sparse <- TRUE
-            i.M <- sM <- TRUE
-            if (missing(nrow)) nrow <- ceiling(1/ncol)
-            else if (missing(ncol)) ncol <- ceiling(1/nrow)
-            isSym <- nrow == ncol
-            ## will be sparse: do NOT construct full matrix!
-            data <- new(paste0(if(is.numeric(data)) "d"
-                               else if(is.logical(data)) "l"
-                               else stop("invalid 'data'"),
-                               if(isSym) "s" else "g", "CMatrix"),
-                        p = rep.int(0L, ncol+1L),
-                        Dim = as.integer(c(nrow,ncol)),
-                        Dimnames = if(is.null.DN(dimnames)) list(NULL,NULL)
-                                   else dimnames)
-        } else { ## normal case
-            data <- .External(Mmatrix,
-                              data, nrow, ncol, byrow, dimnames,
-                              missing(nrow), missing(ncol))
-            if(is.null(sparse))
-                sparse <- sparseDefault(data)
-        }
-        doDN <- FALSE # .. set above
-    } else if(!missing(nrow) || !missing(ncol)|| !missing(byrow)) ## i.m == is.matrix(.)
-        warning("'nrow', 'ncol', etc, are disregarded for matrix 'data'")
-    ## 'data' is now a "matrix" or "Matrix"
-    if (doDN && !is.null(dimnames))
-        dimnames(data) <- dimnames
-    ## check for symmetric / triangular / diagonal :
-    isSym <- isSymmetric(data)
-    if((isTri <- !isSym))
-        isTri <- isTriangular(data)
-    isDiag <- isSym # cannot be diagonal if it isn't symmetric
-    if(isDiag)
-        isDiag <- doDiag && isDiagonal(data)
-    ## try to coerce ``via'' virtual classes
-    if(isDiag) { ## diagonal is preferred to sparse !
-        data <- as(data, "diagonalMatrix")
-        isSym <- FALSE
-    } else if(sparse && !sM)
-        data <- as(data, "sparseMatrix")
-    else if(!sparse) {
-        if(i.M) { ## data is 'Matrix'
-            if(!is(data, "denseMatrix"))
-                data <- as(data, "denseMatrix")
-        } else { ## data is "matrix" (and result "dense" -> go via "general"
-            ctype <- typeof(data)
-            if (ctype == "complex")
-                stop("complex matrices not yet implemented in Matrix package")
-            if (ctype == "integer") ## integer Matrices not yet implemented
-                storage.mode(data) <- "double"
-            data <- new(paste0(.M.kind(data), "geMatrix"),
-                        Dim = dim(data),
-                        Dimnames = .M.DN(data),
-                        x = c(data))
-        }
-    }
-
-    if(isTri && !is(data, "triangularMatrix")) {
-        if(attr(isTri,"kind") == "L") tril(data) else triu(data)
-    } else if(isSym && !is(data, "symmetricMatrix"))
-        forceSymmetric(data)
-    else data
-}
-} else {
-## This version fixes the issues documented above
 Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                    dimnames = NULL, sparse = NULL,
                    doDiag = TRUE, forceCheck = FALSE)
@@ -400,8 +167,86 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
         triu(data)
     else tril(data)
 }
-}
 
+
+## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("dim", signature(x = "Matrix"),
+          function(x) x@Dim)
+
+setMethod("length", "Matrix",
+          function(x) prod(x@Dim))
+
+setMethod("dimnames", signature(x = "Matrix"),
+          function(x) x@Dimnames)
+
+setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
+          function(x, value) {
+              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
+          function(x, value) {
+              x@Dimnames <- list(NULL, NULL)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
+          function(x, value) {
+              if(length(x@factors))
+                  x@factors <- list()
+              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
+              x
+          })
+
+setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
+          function(x, value) {
+              if(length(x@factors))
+                  x@factors <- list()
+              x@Dimnames <- list(NULL, NULL)
+              x
+          })
+
+setMethod("unname", signature(obj = "Matrix"),
+          function(obj, force = FALSE) {
+              obj@Dimnames <- list(NULL, NULL)
+              obj
+          })
+
+setMethod("drop", signature(x = "Matrix"),
+          function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
+
+## These work nicely as long as methods are defined for '[' :
+setMethod("head", signature(x = "Matrix"),
+          head.matrix)
+setMethod("tail", signature(x = "Matrix"),
+          tail.matrix)
+setMethod("diff", signature(x = "Matrix"),
+          ## Mostly cut and paste of 'base::diff.default' :
+          function(x, lag = 1L, differences = 1L, ...) {
+              if(length(lag) != 1L || length(differences) > 1L ||
+                  lag < 1L || differences < 1L)
+                  stop("'lag' and 'differences' must be integers >= 1")
+              if(lag * differences >= x@Dim[1L])
+                  return(x[0L])
+              i1 <- -seq_len(lag)
+              for(i in seq_len(differences)) {
+                  m <- x@Dim[1L]
+                  x <- x[i1, , drop = FALSE] -
+                      x[-m:-(m - lag + 1L), , drop = FALSE]
+              }
+              x
+          })
+
+if(FALSE) { ## still does not work for c(1, Matrix(2))
+## For the same reason (and just in case) also do both S3 and S4 here:
+c.Matrix <- function(...) unlist(lapply(list(...), as.vector))
+## NB: Must use   signature  '(x, ..., recursive = FALSE)' :
+setMethod("c", "Matrix", function(x, ..., recursive) c.Matrix(x, ...))
+## The above is not sufficient for  c(NA, 3:2, <Matrix>, <matrix>)
+setMethod("c", "numMatrixLike", function(x, ..., recursive) c.Matrix(x, ...))
+}# not yet
 
 ## We want to use all.equal.numeric() *and* make sure that uses
 ## not just base::as.vector but the generic with our methods:
@@ -429,200 +274,6 @@ setMethod("all.equal", c(target = "ANY", current = "Matrix"),
           all.equal_Mat)
 rm(all.equal_Mat)
 ## -> ./sparseMatrix.R, ./sparseVector.R  have specific methods
-
-
-## Group Methods
-
-## NOTE:  "&" and "|"  are now in group "Logic" c "Ops" --> ./Ops.R
-##        "!" is in ./not.R
-
-## Further, see ./Ops.R
-##                ~~~~~
-
-
-### --------------------------------------------------------------------------
-###
-### Subsetting "["  and
-### SubAssign  "[<-" : The "missing" cases can be dealt with here, "at the top":
-
-## Using "index" for indices should allow
-## integer (numeric), logical, or character (names!) indices :
-
-## MJ : no longer needed ... replacement in ./subscript.R
-if(FALSE) {
-## "x[]" *or* x[,] *or* x[, , drop=<TRUE/FALSE>]
-setMethod("[",
-          signature(x = "Matrix", i = "missing", j = "missing", drop = "missing"),
-          function(x,i,j, ..., drop) {
-              Matrix.msg("M[m,m,m] : nargs()=",nargs(), .M.level = 2)
-              if(nargs() == 2) { ##  M[]
-                  x
-              } else { # nargs() = 3
-                  callGeneric(x, , , drop=TRUE)
-              }
-          })
-setMethod("[", signature(x = "Matrix",
-                         i = "missing", j = "missing", drop = "logical"),
-          function (x, i, j, ..., drop) {
-              Matrix.msg(sprintf("M[m,m, %s] : nargs()=%d", format(drop), nargs()), .M.level = 2)
-              if(isTRUE(drop) && any(x@Dim == 1L)) drop(as(x, "matrix")) else x
-          })
-## otherwise:  drop is neither missing nor logical
-setMethod("[",
-          signature(x = "Matrix", i = "missing", j = "missing", drop = "ANY"),
-          function (x, i, j, ..., drop)
-              stop("invalid 'drop' in Matrix subsetting"))
-## missing 'drop' --> 'drop = TRUE'
-##                     -----------
-## select rows __ or __ vector indexing:
-setMethod("[",
-          signature(x = "Matrix", i = "index", j = "missing", drop = "missing"),
-          function(x,i,j, ..., drop) {
-              Matrix.msg("M[i,m,m] : nargs()=",nargs(), .M.level = 2)
-              if(nargs() == 2) { ## e.g. M[0] , M[TRUE], M[1:2], M[-7]
-                  .M.vectorSub(x,i)
-              } else {
-                  callGeneric(x, i=i, , drop=TRUE)
-              }
-          })
-## select columns
-setMethod("[",
-          signature(x = "Matrix", i = "missing", j = "index", drop = "missing"),
-          function(x,i,j, ..., drop) {
-              Matrix.msg("M[m,i,m] : nargs()=",nargs(), .M.level = 2)
-              callGeneric(x, , j=j, drop= TRUE)
-          })
-## select both rows *and* columns
-setMethod("[",
-          signature(x = "Matrix", i = "index", j = "index", drop = "missing"),
-          function(x,i,j, ..., drop) {
-              Matrix.msg("M[i,i,m] : nargs()=",nargs(), .M.level = 2)
-              callGeneric(x, i=i, j=j, drop= TRUE)
-          })
-
-## bail out if any of (i,j,drop) is "non-sense"
-setMethod("[",
-          signature(x = "Matrix", i = "ANY", j = "ANY", drop = "ANY"),
-          function(x,i,j, ..., drop)
-              stop("invalid or not-yet-implemented 'Matrix' subsetting"))
-
-## logical indexing, such as M[ M >= 7 ] *BUT* also M[ M[,1] >= 3,],
-## The following is *both* for    M [ <logical>   ]
-##                 and also for   M [ <logical> , ]
-.M.sub.i.logical <- function (x, i, j, ..., drop) {
-    nA <- nargs() # counts 'M[i]' as 2 arguments,  'M[i,]' as 3
-    Matrix.msg("M[logi,m,m] : nargs()=", nA, .M.level = 2)
-    if(nA == 2) { ##  M [ M >= 7 ]
-        ## FIXME: when both 'x' and 'i' are sparse, this can be very inefficient
-        if(is(x, "sparseMatrix"))
-            message("<sparse>[ <logic> ]: .M.sub.i.logical() maybe inefficient")
-        as(as(x, "generalMatrix"), "denseMatrix")@x[as.vector(i)]
-        ## -> error when lengths don't match
-    }
-    else if(nA == 3) {
-        ## M[ <logic>, ]  e.g.,  M [ M[,1, drop=FALSE] >= 7, ]  or M[TRUE,]
-        if(length(i) && x@Dim[1L] && !anyNA(i) && all(i)) ## select everything
-            x
-        else
-            ## not selecting all -> result *NOT* diagonal/triangular/symmetric/
-            ## keep j missing, but  drop = "logical"
-            callGeneric(as(x,"generalMatrix"), i = i, , drop = TRUE)
-    } else
-        stop(gettextf("nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.logical)?",
-                      nA),
-             domain = NA)
-}
-
-## instead of using 'drop = "ANY"' {against ambiguity notices}:
-for(ii in c("nMatrix", "lMatrix", "logical"))
-setMethod("[",
-          signature(x = "Matrix", i = ii, j = "missing", drop = "missing"),
-          .M.sub.i.logical)
-rm(ii)
-
-##' x[ ij ]  where ij is (i,j) 2-column matrix
-##' @note only called from  .M.sub.i.2col(x, i) below
-subset.ij <- function(x, ij) {
-    m <- nrow(ij)
-    if(m > 3) {
-        cld <- getClassDef(class(x))
-        sym.x <- extends(cld, "symmetricMatrix")
-        if(sym.x) {
-            W <- if(x@uplo == "U") # stored only [i,j] with i <= j
-                     ij[,1] > ij[,2] else ij[,1] < ij[,2]
-            if(any(W))
-                ij[W,] <- ij[W, 2:1]
-        }
-        if(extends(cld, "sparseMatrix")) {
-            ## do something smarter:
-            di <- dim(x)
-            if(!extends(cld, "CsparseMatrix")) {
-                x <- as(x, "CsparseMatrix") # simpler; our standard
-                cld <- getClassDef(class(x))
-            }
-            tri.x <- extends(cld, "triangularMatrix")
-            if(tri.x) {
-                ## need these for the 'x' slot in any case
-                x <- .Call(R_sparse_diag_U2N, x)
-                ## slightly more efficient than non0.i() or non0ind():
-                ij.x <- .Call(compressed_non_0_ij, x, isC=TRUE)
-            } else {
-                ## symmetric / general : for symmetric, only "existing" part
-                ij.x <- non0.i(x, cld)
-            }
-            m1 <- .Call(m_encodeInd, ij.x, di, orig1=FALSE, checkBounds=FALSE)
-            m2 <- .Call(m_encodeInd, ij,   di, orig1= TRUE, checkBounds= TRUE)
-            mi <- match(m2, m1, nomatch=0)
-            mmi <- mi != 0L ## == (m2 %in% m1)
-            ## Result: all FALSE or 0 apart from where we match non-zero entries
-            ans <- vector(mode = .type.kind[.M.kind(x)], length = m)
-            ## those that are *not* zero:
-            ans[mmi] <- if(extends(cld, "nsparseMatrix")) TRUE else x@x[mi[mmi]]
-            if(any(ina <- is.na(m2))) # has one or two NA in that (i,j) row
-                is.na(ans) <- ina
-            ans
-        } else { ## non-sparse : dense
-            ##---- NEVER happens:  'denseMatrix' has its own setMethod(.) !
-            message("m[<ij-matrix>]: inefficiently indexing single elements - should not happen, please report!")
-            i1 <- ij[,1]
-            i2 <- ij[,2]
-            ## very inefficient for large m
-            unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
-        }
-    } else { # 1 <= m <= 3
-        i1 <- ij[,1]
-        i2 <- ij[,2]
-        unlist(lapply(seq_len(m), function(j) x[i1[j], i2[j]]))
-    }
-}
-
-## A[ ij ]  where ij is (i,j) 2-column matrix -- but also when that is logical mat!
-.M.sub.i.2col <- function (x, i, j, ..., drop) {
-    nA <- nargs()
-    if(nA != 2)
-        stop(gettextf("nargs() = %d.  Extraneous illegal arguments inside '[ .. ]' (i.2col)?",
-                      nA),
-             domain = NA)
-    ## else: (nA == 2):	 M [ cbind(ii,jj) ] or M [ <logical matrix> ]
-    if(!is.integer(nc <- ncol(i)))
-        stop(".M.sub.i.2col(): 'i' has no integer column number;\n should never happen; please report")
-    if(is.logical(i))
-        return(.M.sub.i.logical(x, i=i)) # call with 2 args!
-    else if(!is.numeric(i) || nc != 2)
-        stop("such indexing must be by logical or 2-column numeric matrix")
-    if(!nrow(i)) return(vector(mode = .type.kind[.M.kind(x)]))
-    ## else
-    subset.ij(x, i)
-}
-setMethod("[",
-          signature(x = "Matrix", i = "matrix", j = "missing", drop = "ANY"),
-          .M.sub.i.2col)
-## just against ambiguity notices :
-setMethod("[",
-          signature(x = "Matrix", i = "matrix", j = "missing", drop="missing"),
-          .M.sub.i.2col)
-} ## MJ
-
 
 ### "[<-" : -----------------
 
