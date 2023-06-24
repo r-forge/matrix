@@ -21,6 +21,8 @@
 ** TODO indMatrix with length-0 perm  <==>  unit diagonal
 		MJ: then pMatrix with length-0 perm  <==>  identity matrix, efficiently
 		MJ: would be analogous to diagonalMatrix with diag="U"
+		MJ: would need to think about  { m > n, margin = 1 }
+		    and { m < n, margin = 2 } cases ... invalid ?
 ** TODO Length-0 'perm', 'p', and 'q' slots should be valid "everywhere"
 		MJ: our classes should represent "general" factorizations and
 		    not assume pivoting even if our methods do always pivot
