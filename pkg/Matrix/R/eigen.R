@@ -1,12 +1,9 @@
 ## METHODS FOR GENERIC: Schur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## FIXME: C-level code should scan first for non-finite values
-##        since R-level test needs an allocation
-
 setMethod("Schur", signature(x = "dgeMatrix"),
           function(x, vectors = TRUE, ...) {
-              if(!all(is.finite(x@x)))
+              if(length(x.x <- x@x) && !all(is.finite(range(x.x))))
                   stop("'x' has non-finite values")
               cl <- .Call(dgeMatrix_Schur, x, vectors, TRUE)
               if(all(cl$WI == 0)) {
@@ -35,8 +32,10 @@ setMethod("Schur", signature(x = "dsyMatrix"),
 
 setMethod("Schur", signature(x = "matrix"),
           function(x, vectors = TRUE, ...) {
+              if(is.complex(x))
+                  stop("Schur(x) not yet supported for 'x' of type \"complex\"")
               storage.mode(x) <- "double"
-              if(!all(is.finite(x)))
+              if(length(x) && !all(is.finite(range(x))))
                   stop("'x' has non-finite values")
               cl <- .Call(dgeMatrix_Schur, x, vectors, FALSE)
               vals <-
@@ -58,7 +57,6 @@ setMethod("Schur", signature(x = "symmetricMatrix"),
           function(x, vectors = TRUE, ...)
               Schur(as(as(x, "dMatrix"), "unpackedMatrix"), vectors, ...))
 
-## Giving the _unsorted_ Schur factorization
 setMethod("Schur", signature(x = "diagonalMatrix"),
           function(x, vectors = TRUE, ...) {
               d <- x@Dim
@@ -67,7 +65,7 @@ setMethod("Schur", signature(x = "diagonalMatrix"),
                   T <- new("ddiMatrix", Dim = d, diag = "U")
               } else {
                   vals <- x@x
-                  if(!all(is.finite(vals)))
+                  if(length(vals) && !all(is.finite(range(vals))))
                       stop("'x' has non-finite values")
                   T <- new("ddiMatrix", Dim = d, x = vals)
               }
@@ -80,14 +78,13 @@ setMethod("Schur", signature(x = "diagonalMatrix"),
 
 setMethod("Schur", signature(x = "triangularMatrix"),
           function(x, vectors = TRUE, ...) {
-              cld <- getClassDef(class(x))
-              if(!extends(cld, "nMatrix") &&
-                 (anyNA(x) || (extends(cld, "dMatrix") && any(is.infinite(x)))))
-                  ## any(is.finite(<sparseMatrix>)) would allocate too much
-                  stop("'x' has non-finite values")
               n <- (d <- x@Dim)[1L]
+              if(n == 0L)
+                  x@uplo <- "U"
+              else if(.M.kind(x) != "n" && !all(is.finite(range(x))))
+                  stop("'x' has non-finite values")
               vals <- diag(x, names = FALSE)
-              if(x@uplo == "U" || n == 0L) {
+              if(x@uplo == "U") {
                   if(vectors) {
                       Q <- new("ddiMatrix", Dim = d, diag = "U")
                       new("Schur", Dim = d, Dimnames = x@Dimnames,
