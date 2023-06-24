@@ -251,12 +251,6 @@ setMethod("as.numeric", signature(x = "indMatrix"),
 setMethod("as.logical", signature(x = "indMatrix"),
           function(x, ...) .ind2v(x))
 
-## DEPRECATED IN 1.5-0; see ./zzz.R
-if(FALSE) {
-setAs("indMatrix", "ngTMatrix", .ind2ngT)
-setAs("indMatrix", "ngeMatrix", .ind2nge)
-} ## DEPRECATED IN 1.5-0; see ./zzz.R
-
 rm(.ind2dge, .ind2lge, .ind2nge, .ind2n.p,
    .ind2dgC, .ind2lgC, .ind2ngC, .ind2ngR, .ind2ngT,
    .ind2diag, .ind2p)
@@ -604,28 +598,13 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
 
-## MJ : no longer needed ... replacement in ./subscript.R
-if(FALSE) {
-setMethod("[", signature(x = "indMatrix", i = "index", j = "missing",
-                         drop = "logical"),
-          function (x, i, j, ..., drop) {
-              n <- length(newperm <- x@perm[i])
-              if(drop && n == 1) { ## -> logical unit vector
-                  newperm == seq_len(x@Dim[2])
-              } else { ## stay matrix
-                  if(!is.null((DN <- x@Dimnames)[[1]])) DN[[1]] <- DN[[1]][i]
-                  new("indMatrix", perm = newperm,
-                      Dim = c(n, x@Dim[2]), Dimnames = DN)
-              }
-          })
-} ## MJ
 
 .indMatrix.sub <- function(x, i, j, ..., value) {
     x <- as(x, "TsparseMatrix")
     callGeneric()
 }
 for (.i in c("missing", "index"))
-    for (.j in c("missing", "index"))
-        setReplaceMethod("[", signature(x = "indMatrix", i = .i, j = .j),
-                         .indMatrix.sub)
+for (.j in c("missing", "index"))
+setReplaceMethod("[", signature(x = "indMatrix", i = .i, j = .j, value = "ANY"),
+                 .indMatrix.sub)
 rm(.indMatrix.sub, .i, .j)

@@ -35,24 +35,3 @@ setAs("Matrix", "dpoMatrix",
 ## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setAs("dpoMatrix", "dppMatrix", function(from) pack(from))
-
-## MJ: no longer needed ... prefer above
-if(FALSE) {
-setAs("dpoMatrix", "dppMatrix",
-      function(from) {
-          ## FIXME: check=FALSE
-          copyClass(.Call(dsyMatrix_as_dspMatrix, from), "dppMatrix",
-                    sNames = c("x", "Dim", "Dimnames", "uplo", "factors"))
-      })
-} ## MJ
-
-## MJ: no longer needed ... replacement in ./denseMatrix.R
-if(FALSE) {
-setAs("dpoMatrix", "lMatrix",
-      function(from) as(as(from, "dsyMatrix"), "lMatrix"))
-setAs("dpoMatrix", "nMatrix",
-      function(from) as(as(from, "dsyMatrix"), "nMatrix"))
-} ## MJ
-
-
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
