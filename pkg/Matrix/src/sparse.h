@@ -49,24 +49,24 @@ SEXP Tsparse_is_symmetric(SEXP obj, SEXP checkDN);
 SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
 SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse);
 
-#define SPARSE_CASES(_SEXPTYPE_, _DO_)			\
-    do {						\
-	switch (_SEXPTYPE_) {				\
-	case LGLSXP:					\
-	    _DO_(int, LOGICAL, 0, 1, ISNZ_LOGICAL);	\
-	    break;					\
-	case INTSXP:					\
-	    _DO_(int, INTEGER, 0, 1, ISNZ_INTEGER);	\
-	    break;					\
-	case REALSXP:					\
-	    _DO_(double, REAL, 0.0, 1.0, ISNZ_REAL);	\
-	    break;					\
-	case CPLXSXP:					\
-	    _DO_(Rcomplex, COMPLEX, Matrix_zzero, Matrix_zone, ISNZ_COMPLEX); \
-	    break;					\
-	default:					\
-	    break;					\
-	}						\
-    } while (0)
+#define SPARSE_CASES(_SEXPTYPE_, _DO_) \
+do { \
+	switch (_SEXPTYPE_) { \
+	case LGLSXP: \
+		_DO_(int, LOGICAL, 0, 1, ISNZ_LOGICAL); \
+		break; \
+	case INTSXP: \
+		_DO_(int, INTEGER, 0, 1, ISNZ_INTEGER); \
+		break; \
+	case REALSXP: \
+		_DO_(double, REAL, 0.0, 1.0, ISNZ_REAL); \
+		break; \
+	case CPLXSXP: \
+		_DO_(Rcomplex, COMPLEX, Matrix_zzero, Matrix_zone, ISNZ_COMPLEX); \
+		break; \
+	default: \
+		break; \
+	} \
+} while (0)
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef MATRIX_VALIDATE_H
-#define MATRIX_VALIDATE_H
+#ifndef MATRIX_VALIDITY_H
+#define MATRIX_VALIDITY_H
 
 #include "Mutils.h"
 
@@ -8,7 +8,7 @@ SEXP R_Dim_validate(SEXP dim);
 
 char* DimNames_validate(SEXP dimnames, int pdim[]);
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim);
-    
+
 SEXP R_DimNames_fixup(SEXP dn);
 
 SEXP Matrix_validate(SEXP obj);
@@ -73,23 +73,23 @@ SEXP Schur_validate(SEXP obj);
 
 void validObject(SEXP obj, const char* cl);
 
-#define SNPRINTF(_BUFFER_, _FORMAT_, ...)				\
-    do {								\
-	_BUFFER_ = R_alloc(Matrix_ErrorBufferSize, sizeof(char));	\
+#define SNPRINTF(_BUFFER_, _FORMAT_, ...) \
+do { \
+	_BUFFER_ = R_alloc(Matrix_ErrorBufferSize, sizeof(char)); \
 	snprintf(_BUFFER_, Matrix_ErrorBufferSize, _FORMAT_, __VA_ARGS__); \
-    } while (0)
+} while (0)
 
-#define UPRET(_N_, _S_)				\
-    do {					\
-	UNPROTECT(_N_);				\
-	return mkString(_(_S_));		\
-    } while (0)
+#define UPRET(_N_, _S_) \
+do { \
+	UNPROTECT(_N_); \
+	return mkString(_(_S_)); \
+} while (0)
 
-#define FRUPRET(_PTR_, _M_, _N_, _S_)		\
-    do {					\
-	Matrix_Free(_PTR_, _M_);		\
-	UNPROTECT(_N_);				\
-	return mkString(_(_S_));		\
-    } while (0)
+#define FRUPRET(_PTR_, _M_, _N_, _S_) \
+do { \
+	Matrix_Free(_PTR_, _M_); \
+	UNPROTECT(_N_); \
+	return mkString(_(_S_)); \
+} while (0)
 
-#endif
+#endif /* MATRIX_VALIDITY_H */

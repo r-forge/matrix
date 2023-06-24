@@ -1,5 +1,5 @@
-#ifndef MATRIX_UTILS_H
-#define MATRIX_UTILS_H
+#ifndef MATRIX_MUTILS_H
+#define MATRIX_MUTILS_H
 
 #include "Mdefines.h"
 #include "Minlines.h"
@@ -9,7 +9,7 @@ extern "C" {
 /* NB: this block must not include system or R headers */
 #endif
 
-SEXP NEW_OBJECT_OF_CLASS(const char* what);
+SEXP NEW_OBJECT_OF_CLASS(const char *what);
 
 void *Matrix_memset(void *dest,        int   ch, R_xlen_t length, size_t size);
 void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size);
@@ -17,7 +17,7 @@ void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size);
 Rboolean DimNames_is_trivial(SEXP dn);
 Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_DimNames_is_symmetric(SEXP dn);
-    
+
 void symmDN(SEXP dest, SEXP src, int J);
 SEXP R_symmDN(SEXP dn);
 SEXP get_symmetrized_DimNames(SEXP obj, int J);
@@ -83,56 +83,56 @@ SEXP R_rbind2_vector(SEXP a, SEXP b);
 SEXP R_all0(SEXP x);
 SEXP R_any0(SEXP x);
 
-    
+
 /* ================================================================== */
 /* Defined elsewhere but used in a few places, hence "exported" here: */
 /* ================================================================== */
-    
-#define PACK(_PREFIX_, _CTYPE_)						\
+
+#define PACK(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_pack(_CTYPE_ *, const _CTYPE_ *, int, char, char)
 PACK(d, double);
 PACK(i, int);
 PACK(z, Rcomplex);
 #undef PACK
 
-#define UNPACK(_PREFIX_, _CTYPE_)					\
+#define UNPACK(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_unpack(_CTYPE_ *, const _CTYPE_ *, int, char, char)
 UNPACK(d, double);
 UNPACK(i, int);
 UNPACK(z, Rcomplex);
 #undef UNPACK
 
-#define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_)			\
+#define UNPACKED_MAKE_TRIANGULAR(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_unpacked_make_triangular(_CTYPE_ *, int, int, char, char)
 UNPACKED_MAKE_TRIANGULAR(d, double);
 UNPACKED_MAKE_TRIANGULAR(i, int);
 UNPACKED_MAKE_TRIANGULAR(z, Rcomplex);
 #undef UNPACKED_MAKE_TRIANGULAR
 
-#define UNPACKED_MAKE_SYMMETRIC(_PREFIX_, _CTYPE_)			\
+#define UNPACKED_MAKE_SYMMETRIC(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_unpacked_make_symmetric(_CTYPE_ *, int, char)
 UNPACKED_MAKE_SYMMETRIC(d, double);
 UNPACKED_MAKE_SYMMETRIC(i, int);
 UNPACKED_MAKE_SYMMETRIC(z, Rcomplex);
 #undef UNPACKED_MAKE_SYMMETRIC
 
-#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
+#define UNPACKED_MAKE_BANDED(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_unpacked_make_banded(_CTYPE_ *, int, int, int, int, char)
 UNPACKED_MAKE_BANDED(d, double);
 UNPACKED_MAKE_BANDED(i, int);
 UNPACKED_MAKE_BANDED(z, Rcomplex);
 #undef UNPACKED_MAKE_BANDED
 
-#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_)				\
+#define PACKED_MAKE_BANDED(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_packed_make_banded(_CTYPE_ *, int, int, int, char, char)
 PACKED_MAKE_BANDED(d, double);
 PACKED_MAKE_BANDED(i, int);
 PACKED_MAKE_BANDED(z, Rcomplex);
 #undef PACKED_MAKE_BANDED
 
-#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)			\
+#define UNPACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *, const _CTYPE_ *, \
-					      int, R_xlen_t, char, char)
+                                              int, R_xlen_t, char, char)
 UNPACKED_COPY_DIAGONAL(d, double);
 UNPACKED_COPY_DIAGONAL(i, int);
 UNPACKED_COPY_DIAGONAL(z, Rcomplex);
@@ -140,7 +140,7 @@ UNPACKED_COPY_DIAGONAL(z, Rcomplex);
 
 #define PACKED_COPY_DIAGONAL(_PREFIX_, _CTYPE_)				\
 void _PREFIX_ ## dense_packed_copy_diagonal(_CTYPE_ *, const _CTYPE_ *, \
-					    int, R_xlen_t, char, char, char)
+                                            int, R_xlen_t, char, char, char)
 PACKED_COPY_DIAGONAL(d, double);
 PACKED_COPY_DIAGONAL(i, int);
 PACKED_COPY_DIAGONAL(z, Rcomplex);
@@ -157,4 +157,4 @@ void validObject(SEXP, const char *);
 }
 #endif
 
-#endif /* MATRIX_UTILS_H */
+#endif /* MATRIX_MUTILS_H */
