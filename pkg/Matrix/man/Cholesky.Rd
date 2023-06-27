@@ -169,7 +169,7 @@ Cholesky(A, \dots)
 
   Generic function \code{\link{chol}},
   for obtaining the upper triangular Cholesky factor \eqn{L'} as a
-  \code{\linkS4class{Matrix}}.
+  matrix or \code{\linkS4class{Matrix}}.
 
   Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
