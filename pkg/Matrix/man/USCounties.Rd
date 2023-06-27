@@ -43,8 +43,8 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods", verbose = FALSE)
-library(utils, pos = "package:methods", verbose = FALSE)
+library(stats, pos = "package:base", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 data(USCounties, package = "Matrix")
 (n <- ncol(USCounties))

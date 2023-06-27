@@ -135,7 +135,7 @@ qr2rankMatrix(qr, tol = NULL, isBqr = is.qr(qr), do.warn = TRUE)
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods", verbose = FALSE)
+library(stats, pos = "package:base", verbose = FALSE)
 }
 rankMatrix(cbind(1, 0, 1:3)) # 2
 

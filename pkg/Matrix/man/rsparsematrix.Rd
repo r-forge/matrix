@@ -58,7 +58,7 @@ rsparsematrix(nrow, ncol, density, nnz = round(density * maxE),
 \author{Martin Maechler}
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods", verbose = FALSE)
+library(stats, pos = "package:base", verbose = FALSE)
 }
 set.seed(17)# to be reproducible
 M <- rsparsematrix(8, 12, nnz = 30) # small example, not very sparse

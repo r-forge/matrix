@@ -82,7 +82,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 ## Only upper triangular part matters (when uplo == "U" as per default)
 (sy2 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, NA,32,77)))

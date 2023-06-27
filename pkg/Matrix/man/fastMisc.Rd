@@ -216,7 +216,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 D. <- diag(x = c(1, 1, 2, 3, 5, 8))
 D.0 <- Diagonal(x = c(0, 0, 0, 3, 5, 8))

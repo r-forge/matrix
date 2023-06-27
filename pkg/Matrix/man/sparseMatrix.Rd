@@ -143,7 +143,7 @@ sparseMatrix(i, j, p, x, dims, dimnames,
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 ## simple example
 i <- c(1,3:8); j <- c(2,9,6:10); x <- 7 * (1:7)
