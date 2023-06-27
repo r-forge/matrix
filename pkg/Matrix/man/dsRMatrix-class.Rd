@@ -66,7 +66,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 (m0 <- new("dsRMatrix"))
 m2 <- new("dsRMatrix", Dim = c(2L,2L),

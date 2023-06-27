@@ -56,7 +56,7 @@
 }
 \examples{%% this is used from ./dtpMatrix-class.Rd (change with care!)
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 (m <- rbind(2:3, 0:-1))
 (M <- as(m, "generalMatrix"))

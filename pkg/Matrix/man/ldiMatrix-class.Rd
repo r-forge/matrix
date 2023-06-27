@@ -81,7 +81,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 (lM <- Diagonal(x = c(TRUE,FALSE,FALSE)))
 str(lM)#> gory details (slots)

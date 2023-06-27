@@ -98,7 +98,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:methods", verbose = FALSE)
+library(utils, pos = "package:base", verbose = FALSE)
 }
 mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
 mm # automatically dsCMatrix

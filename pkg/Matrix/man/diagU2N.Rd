@@ -59,7 +59,7 @@
 }
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:methods", verbose = FALSE)
+library(stats, pos = "package:base", verbose = FALSE)
 }
 (T <- Diagonal(7) + triu(Matrix(rpois(49, 1/4), 7, 7), k = 1))
 (uT <- diagN2U(T)) # "unitriangular"
