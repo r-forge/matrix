@@ -20,9 +20,9 @@
   \deqn{A = P_{1}' Q R P_{2}'}{A = P1' * Q * R * P2'}
   where
   \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
-  \eqn{Q = \prod_{j = 1}^{n} Q_{j}}{Q = prod(Qj : j = 1,...,n)}
+  \eqn{Q = \prod_{j = 1}^{n} H_{j}}{Q = prod(Hj : j = 1,...,n)}
   is an \eqn{m \times m}{m-by-m} orthogonal matrix
-  equal to the product of \eqn{n} Householder matrices \eqn{Q_{j}}{Qj}, and
+  equal to the product of \eqn{n} Householder matrices \eqn{H_{j}}{Hj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix.
   
   \code{\linkS4class{denseMatrix}} use the default method implemented
