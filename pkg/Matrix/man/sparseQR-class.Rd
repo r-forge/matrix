@@ -45,10 +45,10 @@
   \deqn{A = P_{1}' Q R P_{2}' = P_{1}' \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} P_{2}' = P_{1}' Q_{1} R_{1} P_{2}'}{A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
   where
   \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
-  \eqn{Q = \prod_{j = 1}^{n} Q_{j}}{Q = prod(Qj : j = 1,...,n)}
+  \eqn{Q = \prod_{j = 1}^{n} H_{j}}{Q = prod(Hj : j = 1,...,n)}
   is an \eqn{m \times m}{m-by-m} orthogonal matrix
   (\eqn{Q_{1}}{Q1} contains the first \eqn{n} column vectors)
-  equal to the product of \eqn{n} Householder matrices \eqn{Q_{j}}{Qj}, and
+  equal to the product of \eqn{n} Householder matrices \eqn{H_{j}}{Hj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
   (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
   upper \emph{triangular}) with non-negative diagonal elements.
@@ -78,8 +78,8 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       with \code{Dim[2]} columns.  The number of rows \code{nrow(V)}
       is at least \code{Dim[1]} and at most \code{Dim[1]+Dim[2]}.
       \code{V} is lower trapezoidal, and its column vectors generate the
-      Householder matrices \eqn{Q_{j}}{Qj} that compose the orthogonal
-      \eqn{Q} factor.  Specifically, \eqn{Q_{j}}{Qj} is constructed as
+      Householder matrices \eqn{H_{j}}{Hj} that compose the orthogonal
+      \eqn{Q} factor.  Specifically, \eqn{H_{j}}{Hj} is constructed as
       \code{diag(Dim[1]) - beta[j] * tcrossprod(V[, j])}.}
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
