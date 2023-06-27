@@ -54,7 +54,8 @@ chol2inv(x, \dots)
 \value{
   A matrix, \code{\linkS4class{symmetricMatrix}},
   or \code{\linkS4class{diagonalMatrix}} representing
-  the positive semidefinite matrix whose Cholesky factor is \code{x}.
+  the inverse of the positive definite matrix whose
+  Cholesky factor is \code{x}.
   The result is a traditional matrix if \code{x} is a
   traditional matrix, dense if \code{x} is dense, and
   sparse if \code{x} is sparse.
