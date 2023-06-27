@@ -135,15 +135,25 @@ setMethod("Cholesky", signature(A = "matrix"),
 ## METHODS FOR GENERIC: chol2inv
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol2inv", signature(x = "denseMatrix"),
-          function(x, ...) {
+setMethod("chol2inv", signature(x = "generalMatrix"),
+          function(x, uplo = "U", ...) {
               d <- x@Dim
               if(d[1L] != d[2L])
                   stop("matrix is not square")
-              if(.M.shape(x) != "t")
-                  x <- triu(x)
-              chol2inv(..dense2d(x), ...)
+              chol2inv((if(  uplo == "U") triu else tril)(x), ...)
           })
+
+setMethod("chol2inv", signature(x = "symmetricMatrix"),
+          function(x, ...)
+              chol2inv((if(x@uplo == "U") triu else tril)(x), ...))
+
+setMethod("chol2inv", signature(x = "triangularMatrix"),
+          function(x, ...)
+              chol2inv(as(x, "dMatrix"), ...))
+
+setMethod("chol2inv", signature(x = "diagonalMatrix"),
+          function(x, ...)
+              chol2inv(..diag2d(x), ...))
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
           function(x, ...) {
@@ -165,25 +175,15 @@ setMethod("chol2inv", signature(x = "dtpMatrix"),
               r
           })
 
-setMethod("chol2inv", signature(x = "sparseMatrix"),
-          function(x, ...) {
-              d <- x@Dim
-              if(d[1L] != d[2L])
-                  stop("matrix is not square")
-              if(.M.repr(x) != "C")
-                  x <- as(x, "CsparseMatrix")
-              if(.M.shape(x) != "t")
-                  x <- triu(x)
-              chol2inv(..sparse2d(x), ...)
-          })
-
-setMethod("chol2inv", signature(x = "dtCMatrix"),
+for(.cl in paste0("dt", c("C", "R", "T"), "Matrix"))
+setMethod("chol2inv", signature(x = .cl),
           function(x, ...)
               (if(x@uplo == "U") tcrossprod else crossprod)(solve(x)))
 
+## 'uplo' can affect the 'Dimnames' of the result here :
 setMethod("chol2inv", signature(x = "ddiMatrix"),
-          function(x, ...)
-              tcrossprod(solve(x)))
+          function(x, uplo = "U", ...)
+              (if(  uplo == "U") tcrossprod else crossprod)(solve(x)))
 
 
 ## METHODS FOR CLASS: p?Cholesky
