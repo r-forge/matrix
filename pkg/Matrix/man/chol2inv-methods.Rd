@@ -22,14 +22,14 @@
 \alias{chol2inv,triangularMatrix-method}
 %
 \description{
-  For \emph{formally} upper and lower triangular matrices
+  Given \emph{formally} upper and lower triangular matrices
   \eqn{U} and \eqn{L}, compute \eqn{(U' U)^{-1}}{(U' U)^(-1)}
   and \eqn{(L L')^{-1}}{(L L')^(-1)}, respectively.
 
   This function can be seen as way to compute the inverse of a
   symmetric positive definite matrix given its Cholesky factor.
   Equivalently, it can be seen as a way to compute
-  \eqn{(X' X)^{-1}}{(X' X)^(-1)} from the \eqn{R} part
+  \eqn{(X' X)^{-1}}{(X' X)^(-1)} given the \eqn{R} part
   of the QR factorization of \eqn{X}.
 }
 \usage{

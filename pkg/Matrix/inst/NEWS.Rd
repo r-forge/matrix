@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-28 r4115)}{
+\section{Changes in version 1.6-0 (2023-06-28 r4116)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
