@@ -32,7 +32,7 @@ void set_DimNames(SEXP obj, SEXP dn);
 
 SEXP get_factor(SEXP obj, const char *nm);
 void set_factor(SEXP obj, const char *nm, SEXP val);
-SEXP R_set_factor(SEXP obj, SEXP val, SEXP nm, SEXP warn);
+SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn);
 SEXP R_empty_factors(SEXP obj, SEXP warn);
 
 void rowPerm(double *x, int m, int n, int *p, int off, int invert);
