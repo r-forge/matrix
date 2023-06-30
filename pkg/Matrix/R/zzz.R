@@ -396,6 +396,16 @@ setAs("CHMfactor", "dsparseMatrix",
           expand1(from, "L")
       })
 
+setAs("CHMfactor", "sparseMatrix",
+      function(from) {
+          if(FALSE) {
+          .Deprecated(old = "as(<CHMfactor>, \"sparseMatrix\")",
+                      new = "expand1(., \"L\")",
+                      package = "Matrix")
+          }
+          expand1(from, "L")
+      })
+
 setAs("CHMfactor", "CsparseMatrix",
       function(from) {
           if(FALSE) {
