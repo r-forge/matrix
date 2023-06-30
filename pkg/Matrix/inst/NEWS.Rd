@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
 
-\section{Changes in version 1.6-0 (2023-06-29 r4118)}{
+\section{Changes in version 1.6-0 (2023-06-30 r4120)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -20,7 +20,7 @@
       \code{margin = 2} is now implemented as a column subscript, and
       the transpose of an \code{indMatrix} is now the same object but
       with \dQuote{opposite} \code{margin}.
-      
+
       \item Virtual class \code{MatrixFactorization} gains a
       \code{Dimnames} slot.  Now all factorizations preserve the
       \code{Dimnames} of the original, factorized \code{Matrix},
@@ -29,14 +29,14 @@
       \emph{not}.
       Users can get the value of the new \code{Dimnames} slot with
       \code{dimnames(.)} and set it with \code{dimnames(.) <- value}.
-      
+
       \item Classes \code{p?BunchKaufman} and \code{p?Cholesky} no
       longer extend \code{dtrMatrix} or \code{dtpMatrix} and in turn
       no longer extend \code{Matrix}.  They retain slots \code{Dim},
       \code{Dimnames}, \code{uplo}, and \code{x}, but not \code{diag}.
       This change implies that virtual classes \code{Matrix} and
       \code{MatrixFactorization} no longer intersect.
-      
+
       \item Classes \code{p?Cholesky} gain a \code{perm} slot with
       prototype \code{integer(0L)} to support representation of
       pivoted factorizations, as typically computed by LAPACK routine
@@ -87,7 +87,7 @@
       dense correlation matrices.  Now \code{pack(<corMatrix>)}
       gives a \code{pcorMatrix} preserving the \code{sd} slot,
       rather than a \code{dppMatrix} without an \code{sd} slot.
-      
+
       \item New virtual classes \code{BunchKaufmanFactorization},
       \code{SchurFactorization}, and \code{QR}, extended by existing
       nonvirtual classes \code{p?BunchKaufman}, \code{Schur}, and
@@ -124,7 +124,7 @@
       to have methods only for \code{denseLU}, \code{sparseLU}, and
       \code{CHMfactor}.  See \code{help("expand-methods")} for a list
       of methods, including useful optional arguments.
-      
+
       \item Generic function \code{Cholesky} gains methods for
       \code{denseMatrix} returning an object of class \code{p?Cholesky}.
       The method for subclass \code{dsyMatrix} admits an argument
@@ -137,7 +137,7 @@
       coerced to \dQuote{nearby} subclasses of \code{Matrix}.
       The resulting \code{Matrix} reflects the internal representation
       of the factorization and not necessarily a particular matrix
-      factor.  The new coercions are: 
+      factor.  The new coercions are:
       \code{as(<denseLU>, "dgeMatrix")},
       \code{as(<BunchKaufman>, "dtrMatrix")},
       \code{as(<pBunchKaufman>, "dtpMatrix")},
@@ -146,7 +146,7 @@
       \code{as(<CHMsimpl>, "dtCMatrix")}, and
       \code{as(<CHMsuper>, "dgCMatrix")}.
       See \code{help("denseLU-class")} (and similar) for details.
-      
+
       \item \code{determinant(x, \dots)} and \code{solve(a, b, \dots)}
       now work for \code{x} and \code{a} inheriting from
       \code{MatrixFactorization}, behaving as if \code{x} and \code{a}
@@ -164,17 +164,17 @@
       is a numeric vector containing the diagonal entries
       of the diagonal matrix \eqn{D}, as defined in
       \code{help("Cholesky-class")} and \code{help("CHMfactor-class")}.
-      
+
       \item The \code{lu} and \code{qr} methods for class
       \code{dgCMatrix} now admit an \code{order} argument with
       value in \code{0:3}, allowing the expert user to choose
       among all ordering methods made available by the CSparse
       library.
-      
+
       \item \code{solve(<dgCMatrix>, b, sparse = TRUE)} is now
       handled entirely in C code via \code{cs_spsolve} from the
       CSparse library.
-      
+
       \item New utilities \code{invertPerm}, \code{signPerm},
       \code{isPerm}, and \code{asPerm} for computing the inverse
       and sign of a permutation vector, testing if an integer vector
@@ -217,7 +217,7 @@
       \item \code{x[i, ]} now correctly drops dimensions when
       \code{x} is a 1-by-\code{n} \code{Matrix} and \code{i} is
       \code{TRUE}.
-      
+
       \item Methods for \code{solve} now obey the following rules
       much more strictly:
       \itemize{
@@ -241,7 +241,7 @@
       and \code{solve(<dppMatrix>)} preserve formal positive
       definiteness, giving a \code{dpoMatrix} and \code{dppMatrix},
       respectively.
-      
+
       \item The prototype of the \code{Dim} slot of virtual class
       \code{MatrixFactorization} is now \code{integer(2L)}.
       Previously it was \code{integer(0L)}, with the result that
@@ -282,14 +282,14 @@
       instead of \code{tcrossprod(solve(x))} for all formally lower
       triangular \code{x}.  Previously, \code{crossprod} was used only
       for dense \code{x}.
-      
+
       \item \code{rcond(x, norm)} throws a nicer error for \code{x}
       of length 0.
-      
+
       \item Error messages due to invalid \code{norm} in
       \code{rcond(x, norm)} now refer to the argument as \code{norm}
       rather than \code{type}.
-      
+
       \item \code{rcond(x, norm)} now validates \code{norm} also
       for \code{x} of class \code{d(sy|sp|po|pp)Matrix}, even if
       for such \code{x} all valid \code{norm} give the same result.
@@ -305,10 +305,10 @@
       on the details of the cache and should instead rely on functions
       such as \code{lu} to retrieve cached factorizations.
 
-	  \item Errors signaled by \code{as(<dsyMatrix>, "dpoMatrix")}
-	  and \code{as(<dspMatrix>, "dppMatrix")} now clarify that the
-	  coercions do not attempt to test for positive semidefiniteness
-	  when the matrix is not positive definite.
+      \item Errors signaled by \code{as(<dsyMatrix>, "dpoMatrix")}
+      and \code{as(<dspMatrix>, "dppMatrix")} now clarify that the
+      coercions do not attempt to test for positive semidefiniteness
+      when the matrix is not positive definite.
     }
   }
   \subsection{Misc}{
@@ -318,7 +318,7 @@
 
       \item C code interfacing the CSparse library now checks in more
       places for failed allocations inside of \code{cs_*()}.
-      
+
       \item The length of the \pkg{Matrix} namespace has been reduced
       by ~15\%.  More than 100 unused symbols have been removed.
 
@@ -330,21 +330,24 @@
 
       \item \pkg{sfsmisc} has been moved from \code{Enhances} to
       \code{Suggests}, as \pkg{Matrix} does not formally enhance it
-	  by providing methods, etc.
-	  
-	  \item \pkg{grDevices} and \pkg{datasets} have been added
-	  to \code{Imports} and \code{Suggests}, respectively,
-	  as \file{NAMESPACE} does import from \pkg{grDevices}
-	  and vignettes do load data (albeit \emph{un}conditionally)
-	  from \pkg{datasets}.
+      by providing methods, etc.
 
-	  \item Example, test, and vignette code no longer fails when
-	  \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
-	  additional \dQuote{invisible} \code{library} calls in the
-	  problematic source files.
-	  
-	  \item Examples now use \code{requireNamespace} instead of
-	  \code{require}, preserving the user search path in more cases.
+      \item \pkg{grDevices} and \pkg{datasets} have been added
+      to \code{Imports} and \code{Suggests}, respectively,
+      as \file{NAMESPACE} does import from \pkg{grDevices}
+      and vignettes do load data (albeit \emph{un}conditionally)
+      from \pkg{datasets}.
+
+      \item Example, test, and vignette code no longer fails when
+      \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
+      additional \dQuote{invisible} \code{library} calls in the
+      problematic source files.
+
+      \item Examples now use \code{requireNamespace} instead of
+      \code{require}, preserving the user search path in more cases.
+
+      \item Updates to \file{po/*.\{po,pot\}} and \file{inst/po/*} for
+      translators.
     }
   }
 }
