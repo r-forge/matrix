@@ -7,8 +7,7 @@
 ##
 ##        double result:           integer result:
 ##        * [nl]denseMatrix        * [nl]sparseMatrix
-##        * indMatrix {rowSums}    * indMatrix {colSums}
-##        * ldiMatrix
+##        * ldiMatrix              * indMatrix
 ##
 ##        hence we might consider changing to always give double ...
 
