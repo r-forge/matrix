@@ -32,8 +32,9 @@ setMethod("Schur", signature(x = "dsyMatrix"),
 
 setMethod("Schur", signature(x = "matrix"),
           function(x, vectors = TRUE, ...) {
-              if(is.complex(x))
-                  stop("Schur(x) not yet supported for 'x' of type \"complex\"")
+              ## MJ: breaks package 'control' ?!
+              ## if(is.complex(x))
+              ##     stop("Schur(x) not yet supported for 'x' of type \"complex\"")
               storage.mode(x) <- "double"
               if(length(x) && !all(is.finite(range(x))))
                   stop("'x' has non-finite values")
