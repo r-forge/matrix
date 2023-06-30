@@ -68,11 +68,11 @@ system.time(MJ0 <- sapply(rho, function(mult)
 
 C1 <- Cholesky(wrld_1deg, Imult = 2)
 system.time(MJ1 <- sapply(rho, function(mult)
-    c(determinant(update(C1, wrld_1deg, mult), sqrt = FALSE)$modulus)))
+    determinant(update(C1, wrld_1deg, mult), sqrt = FALSE)$modulus))
 stopifnot(all.equal(MJ0, MJ1))
 
 C2 <- Cholesky(wrld_1deg, super = TRUE, Imult = 2)
 system.time(MJ2 <- sapply(rho, function(mult)
-    c(determinant(update(C2, wrld_1deg, mult), sqrt = FALSE)$modulus)))
+    determinant(update(C2, wrld_1deg, mult), sqrt = FALSE)$modulus))
 stopifnot(all.equal(MJ0, MJ2))
 }
