@@ -169,7 +169,7 @@ setMethod("qr.X", signature(qr = "sparseQR"),
               else {
                   ncol <- as.integer(ncol)
                   if(ncol < 0L || ncol > m)
-                      stop("invalid 'ncol'")
+                      stop(gettextf("invalid 'ncol': not in 0:%d", m), domain=NA)
               }
               p2 <- qr@q + 1L
               p2.uns <- is.unsorted(p2, strictly = TRUE) # FALSE if length is 0
@@ -193,7 +193,7 @@ setMethod("qr.X", signature(qr = "sparseQR"),
               if(p2.uns) {
                   j <- invertPerm(p2)
                   if(ncol > n)
-                      j <- c(j, (n + 1L):ncol)
+                       j <- c(j, (n + 1L):ncol)
                   r <- r[, j, drop = FALSE]
               }
               dn <- qr@Dimnames
