@@ -28,14 +28,14 @@
   \code{CHMfactor} is the virtual class of sparse Cholesky
   factorizations of \eqn{n \times n}{n-by-n} real, symmetric
   matrices \eqn{A}, having the general form
-  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
+  \deqn{P_1 A P_1' = L_1 D L_1' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} \overset{D_{jj} \ge 0}{=} P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
+  \deqn{A = P_1' L_1 D L_1' P_1 \overset{D_{jj} \ge 0}{=} P_1' L L' P_1}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
-  \eqn{P_{1}}{P1} is a permutation matrix,
-  \eqn{L_{1}}{L1} is a unit lower triangular matrix,
+  \eqn{P_1}{P1} is a permutation matrix,
+  \eqn{L_1}{L1} is a unit lower triangular matrix,
   \eqn{D} is a diagonal matrix, and
-  \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+  \eqn{L = L_1 \sqrt{D}}{L = L1 * sqrt(D)}.
   The second equalities hold only for positive semidefinite \eqn{A},
   for which the diagonal entries of \eqn{D} are non-negative
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
@@ -59,7 +59,7 @@ isLDL(x)
 \value{
   \code{isLDL(x)} returns \code{TRUE} or \code{FALSE}:
   \code{TRUE} if \code{x} stores the lower triangular entries
-  of \eqn{L_{1}-I+D}{L1-I+D},
+  of \eqn{L_1-I+D}{L1-I+D},
   \code{FALSE} if \code{x} stores the lower triangular entries
   of \eqn{L}.
 }
@@ -121,7 +121,7 @@ isLDL(x)
     \item{\code{x}}{a numeric vector parallel to \code{i} containing
       the corresponding nonzero entries of the lower triangular
       Cholesky factor \eqn{L} \emph{or} (if and only if \code{type[2]}
-      is 0) of the lower triangular matrix \eqn{L_{1}-I+D}{L1-I+D}.}
+      is 0) of the lower triangular matrix \eqn{L_1-I+D}{L1-I+D}.}
     }
   Of \code{CHMsuper}:
   \describe{
@@ -165,7 +165,7 @@ isLDL(x)
     \item{\code{coerce}}{\code{signature(from = "CHMsimpl", to = "dtCMatrix")}:
       returns a \code{\linkS4class{dtCMatrix}} representing
       the lower triangular Cholesky factor \eqn{L} \emph{or}
-      the lower triangular matrix \eqn{L_{1}-I+D}{L1-I+D},
+      the lower triangular matrix \eqn{L_1-I+D}{L1-I+D},
       the latter if and only if \code{from@type[2]} is 0.}
     \item{\code{coerce}}{\code{signature(from = "CHMsuper", to = "dgCMatrix")}:
       returns a \code{\linkS4class{dgCMatrix}} representing
@@ -180,7 +180,7 @@ isLDL(x)
       If \code{sqrt = FALSE}, then this method computes the determinant
       of the factorized matrix \eqn{A} or its logarithm.
       If \code{sqrt = TRUE}, then this method computes the determinant
-      of the factor \eqn{L = L_{1} sqrt(D)}{L = L1 * sqrt(D)} or
+      of the factor \eqn{L = L_1 sqrt(D)}{L = L1 * sqrt(D)} or
       its logarithm, giving \code{NaN} for the modulus when \eqn{D}
       has negative diagonal elements.  For backwards compatibility,
       the default value of \code{sqrt} is \code{TRUE}, but that can
