@@ -28,14 +28,14 @@
   Computes the pivoted Cholesky factorization of an
   \eqn{n \times n}{n-by-n} real, symmetric matrix \eqn{A},
   which has the general form
-  \deqn{P_{1} A P_{1}' = L_{1} D L_{1}' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
+  \deqn{P_1 A P_1' = L_1 D L_1' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \deqn{A = P_{1}' L_{1} D L_{1}' P_{1} \overset{D_{jj} \ge 0}{=} P_{1}' L L' P_{1}}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
+  \deqn{A = P_1' L_1 D L_1' P_1 \overset{D_{jj} \ge 0}{=} P_1' L L' P_1}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
-  \eqn{P_{1}}{P1} is a permutation matrix,
-  \eqn{L_{1}}{L1} is a unit lower triangular matrix,
+  \eqn{P_1}{P1} is a permutation matrix,
+  \eqn{L_1}{L1} is a unit lower triangular matrix,
   \eqn{D} is a diagonal matrix, and
-  \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.
+  \eqn{L = L_1 \sqrt{D}}{L = L1 * sqrt(D)}.
   The second equalities hold only for positive semidefinite \eqn{A},
   for which the diagonal entries of \eqn{D} are non-negative
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
@@ -43,7 +43,7 @@
   Methods for \code{\linkS4class{denseMatrix}} are built on
   LAPACK routines \code{dpstrf}, \code{dpotrf}, and \code{dpptrf}.
   The latter two do not permute rows or columns,
-  so that \eqn{P_{1}}{P1} is an identity matrix.
+  so that \eqn{P_1}{P1} is an identity matrix.
 
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
@@ -87,12 +87,12 @@ Cholesky(A, \dots)
     to \code{nrow(A) * .Machine$double.eps * max(diag(A))}.}
   \item{LDL}{a logical indicating if the simplicial factorization
     should be computed as
-    \eqn{P_{1}' L_{1} D L_{1}' P_{1}}{P1' * L1 * D * L1' * P1},
+    \eqn{P_1' L_1 D L_1' P_1}{P1' * L1 * D * L1' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L_{1}-I+D}{L1-I+D}.
-    The alternative is \eqn{P_{1}' L L' P_{1}}{P1' * L * L' * P1},
+    of \eqn{L_1-I+D}{L1-I+D}.
+    The alternative is \eqn{P_1' L L' P_1}{P1' * L * L' * P1},
     such that the result stores the lower triangular entries
-    of \eqn{L = L_{1} \sqrt{D}}{L = L1 * sqrt(D)}.  This argument
+    of \eqn{L = L_1 \sqrt{D}}{L = L1 * sqrt(D)}.  This argument
     is ignored if \code{super = TRUE} (or if \code{super = NA}
     and the supernodal algorithm is chosen), as the supernodal
     code does not yet support the \code{LDL = TRUE} variant.}

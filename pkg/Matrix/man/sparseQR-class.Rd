@@ -40,17 +40,21 @@
   \code{sparseQR} is the class of sparse, row- and column-pivoted
   QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
   real matrices, having the general form
-  \deqn{P_{1} A P_{2} = Q R = \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} = Q_{1} R_{1}}{P1 * A * P2 = Q * R = [Q1, Q2] * [R1; 0] = Q1 * R1}
+  \deqn{P_1 A P_2 = Q R = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} 
+    \begin{bmatrix} R_1 \\ 0 \end{bmatrix} = Q_1 R_1}{%
+    P1 * A * P2 = Q * R = [Q1, Q2] * [R1; 0] = Q1 * R1}
   or (equivalently)
-  \deqn{A = P_{1}' Q R P_{2}' = P_{1}' \begin{bmatrix} Q_{1} & Q_{2} \end{bmatrix} \begin{bmatrix} R_{1} \\ 0 \end{bmatrix} P_{2}' = P_{1}' Q_{1} R_{1} P_{2}'}{A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
+  \deqn{A = P_1' Q R P_2' = P_1' \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} 
+    \begin{bmatrix} R_1 \\ 0 \end{bmatrix} P_2' = P_1' Q_1 R_1 P_2'}{%
+        A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
   where
-  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2} are permutation matrices,
-  \eqn{Q = \prod_{j = 1}^{n} H_{j}}{Q = prod(Hj : j = 1,...,n)}
+  \eqn{P_1}{P1} and \eqn{P_2}{P2} are permutation matrices,
+  \eqn{Q = \prod_{j = 1}^{n} H_j}{Q = prod(Hj : j = 1,...,n)}
   is an \eqn{m \times m}{m-by-m} orthogonal matrix
-  (\eqn{Q_{1}}{Q1} contains the first \eqn{n} column vectors)
-  equal to the product of \eqn{n} Householder matrices \eqn{H_{j}}{Hj}, and
+  (\eqn{Q_1}{Q1} contains the first \eqn{n} column vectors)
+  equal to the product of \eqn{n} Householder matrices \eqn{H_j}{Hj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
-  (\eqn{R_{1}}{R1} contains the first \eqn{n} row vectors and is
+  (\eqn{R_1}{R1} contains the first \eqn{n} row vectors and is
   upper \emph{triangular}) with non-negative diagonal elements.
 }
 \usage{
@@ -61,9 +65,9 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
     almost always the result of a call to generic function \code{qr}
     with sparse \code{x}.}
   \item{complete}{a logical indicating if \eqn{R} should be returned
-    instead of \eqn{R_{1}}{R1}.}
-  \item{backPermute}{a logical indicating if \eqn{R} or \eqn{R_{1}}{R1}
-    should be multiplied on the right by \eqn{P_{2}'}{P2'}.}
+    instead of \eqn{R_1}{R1}.}
+  \item{backPermute}{a logical indicating if \eqn{R} or \eqn{R_1}{R1}
+    should be multiplied on the right by \eqn{P_2'}{P2'}.}
   \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
     should be propagated unpermuted to the result.
     If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
@@ -78,8 +82,8 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       with \code{Dim[2]} columns.  The number of rows \code{nrow(V)}
       is at least \code{Dim[1]} and at most \code{Dim[1]+Dim[2]}.
       \code{V} is lower trapezoidal, and its column vectors generate the
-      Householder matrices \eqn{H_{j}}{Hj} that compose the orthogonal
-      \eqn{Q} factor.  Specifically, \eqn{H_{j}}{Hj} is constructed as
+      Householder matrices \eqn{H_j}{Hj} that compose the orthogonal
+      \eqn{Q} factor.  Specifically, \eqn{H_j}{Hj} is constructed as
       \code{diag(Dim[1]) - beta[j] * tcrossprod(V[, j])}.}
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
@@ -90,7 +94,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       specifying the permutations applied to the rows and columns of
       the factorized matrix.  \code{q} of length 0 is valid and
       equivalent to the identity permutation, implying no column pivoting.
-      Using \R{} syntax, the matrix \eqn{P_{1} A P_{2}}{P1 * A * P2}
+      Using \R{} syntax, the matrix \eqn{P_1 A P_2}{P1 * A * P2}
       is precisely \code{A[p+1, q+1]}
       (\code{A[p+1, ]} when \code{q} has length 0).}
   }
@@ -117,15 +121,15 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       see \code{\link{expand2-methods}}.}
     \item{\code{qr.Q}}{\code{signature(qr = "sparseQR")}:
       returns as a \code{\linkS4class{dgeMatrix}} either
-      \eqn{P_{1}' Q}{P1' * Q} or \eqn{P_{1}' Q_{1}}{P1' * Q1},
+      \eqn{P_1' Q}{P1' * Q} or \eqn{P_1' Q_1}{P1' * Q1},
       depending on optional argument \code{complete}.  The default
-      is \code{FALSE}, indicating \eqn{P_{1}' Q_{1}}{P1' * Q1}.}
+      is \code{FALSE}, indicating \eqn{P_1' Q_1}{P1' * Q1}.}
     \item{\code{qr.R}}{\code{signature(qr = "sparseQR")}:
-      \code{qrR} returns \eqn{R}, \eqn{R_{1}}{R1}, 
-      \eqn{R P2'}{R * P2'}, or \eqn{R_{1} P2'}{R1 *  P2'},
+      \code{qrR} returns \eqn{R}, \eqn{R_1}{R1}, 
+      \eqn{R P2'}{R * P2'}, or \eqn{R_1 P2'}{R1 *  P2'},
       depending on optional arguments \code{complete} and
       \code{backPermute}.  The default in both cases is \code{FALSE},
-      indicating \eqn{R_{1}}{R1}, for compatibility with \pkg{base}.  
+      indicating \eqn{R_1}{R1}, for compatibility with \pkg{base}.  
       The class of the result in that case is
       \code{\linkS4class{dtCMatrix}}.  In the other three cases,
       it is \code{\linkS4class{dgCMatrix}}.}
@@ -133,44 +137,44 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       returns \eqn{A} as a \code{\linkS4class{dgeMatrix}},
       by default.  If \eqn{m > n} and optional argument
       \code{ncol} is greater than \eqn{n}, then the result
-      is augmented with \eqn{P_{1}' Q J}{P1 * Q * J}, where
+      is augmented with \eqn{P_1' Q J}{P1 * Q * J}, where
       \eqn{J} is composed of columns \eqn{(n+1)} through
       \code{ncol} of the \eqn{m \times m}{m-by-m} identity matrix.}
     \item{\code{qr.coef}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
-      \eqn{P_{2} R_{1}^{-1} Q_{1}' P_{1}}{P2 * R1^{-1} * Q1' * P1}.}
+      \eqn{P_2 R_1^{-1} Q_1' P_1}{P2 * R1^{-1} * Q1' * P1}.}
     \item{\code{qr.fitted}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
-      \eqn{P_{1}' Q_{1} Q_{1}' P_{1}}{P1' * Q1 * Q1' * P1}.}
+      \eqn{P_1' Q_1 Q_1' P_1}{P1' * Q1 * Q1' * P1}.}
     \item{\code{qr.resid}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
-      \eqn{P_{1}' Q_{2} Q_{2}' P_{1}}{P1' * Q2 * Q2' * P1}.}
+      \eqn{P_1' Q_2 Q_2' P_1}{P1' * Q2 * Q2' * P1}.}
     \item{\code{qr.qty}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
-      \eqn{Q' P_{1}}{Q' * P1}.}
+      \eqn{Q' P_1}{Q' * P1}.}
     \item{\code{qr.qy}}{\code{signature(qr = "sparseQR", y = .)}:
       returns as a \code{\linkS4class{dgeMatrix}} or vector
       the result of multiplying \code{y} on the left by
-      \eqn{P_{1}' Q}{P1' * Q}.}
+      \eqn{P_1' Q}{P1' * Q}.}
     \item{\code{solve}}{\code{signature(a = "sparseQR", b = .)}:
       see \code{\link{solve-methods}}.}
   }
 }
 \details{
   The method for \code{qr.Q} does not return \eqn{Q} but rather the
-  (also orthogonal) product \eqn{P_{1}' Q}{P1' * Q}.  This behaviour
+  (also orthogonal) product \eqn{P_1' Q}{P1' * Q}.  This behaviour
   is algebraically consistent with the \pkg{base} implementation
   (see \code{\link[base]{qr}}), which can be seen by noting that
   \code{qr.default} in \pkg{base} does not pivot rows, constraining
-  \eqn{P_{1}}{P1} to be an identity matrix.  It follows that
-  \code{qr.Q(qr.default(x))} also returns \eqn{P_{1}' Q}{P1' * Q}.
+  \eqn{P_1}{P1} to be an identity matrix.  It follows that
+  \code{qr.Q(qr.default(x))} also returns \eqn{P_1' Q}{P1' * Q}.
   
   Similarly, the methods for \code{qr.qy} and \code{qr.qty} multiply
-  on the left by \eqn{P_{1}' Q}{P1' * Q} and \eqn{Q' P_{1}}{Q' * P1}
+  on the left by \eqn{P_1' Q}{P1' * Q} and \eqn{Q' P_1}{Q' * P1}
   rather than \eqn{Q} and \eqn{Q'}.
   
   It is wrong to expect the values of \code{qr.Q} (or \code{qr.R},
@@ -181,7 +185,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   The underlying factorization algorithms are quite different,
   notably as they employ different pivoting strategies,
   and in general the factorization is not unique even for fixed
-  \eqn{P_{1}}{P1} and \eqn{P_{2}}{P2}.
+  \eqn{P_1}{P1} and \eqn{P_2}{P2}.
   
   On the other hand, the values of \code{qr.X}, \code{qr.coef},
   \code{qr.fitted}, and \code{qr.resid} are well-defined, and
