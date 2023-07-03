@@ -1,6 +1,6 @@
 Package: MatrixModels
 Version: 0.5-2
-Date: 2022-09-12
+Date: 2023-07-03
 Title: Modelling with Sparse and Dense Matrices
 Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
 Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
@@ -14,3 +14,4 @@ Encoding: UTF-8
 LazyLoad: yes
 License: GPL (>= 2)
 URL: https://Matrix.R-forge.R-project.org/
+BugReports: https://R-forge.R-project.org/tracker/?atid=294&group_id=61
