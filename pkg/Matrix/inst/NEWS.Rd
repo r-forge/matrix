@@ -1,9 +1,26 @@
-% Check from R:
-%  news(db = tools:::.build_news_db_from_package_NEWS_Rd("~/R/Pkgs/Matrix/inst/NEWS.Rd"))
+%% Build and check from R:
+%% news(db = tools:::.build_news_db_from_package_NEWS_Rd("<Matrix>/inst/NEWS.Rd"))
 \name{NEWS}
-\title{News for \R{} Package \pkg{Matrix}}% MM: look into ../svn-log-from.all
+\title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
-%% NB: The date (yyyy-mm-dd) is the "Packaged:" date in ../DESCRIPTION
+%% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
+\section{Changes in version 1.6-1 (2023-07-08 r4128)}{
+  \subsection{New Features}{
+	\itemize{
+	  \item .
+	}
+  }
+  \subsection{Bug Fixes}{
+	\itemize{
+	  \item .
+	}
+  }
+  \subsection{Misc}{
+	\itemize{
+	  \item .
+	}
+  }
+}
 
 \section{Changes in version 1.6-0 (2023-06-30 r4125)}{
   \subsection{Significant User-Visible Changes}{

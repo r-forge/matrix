@@ -1,10 +1,10 @@
 Package: Matrix
-Version: 1.6-0
-Date: 2023-06-30
+Version: 1.6-1
+Date: 2023-07-08
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,
-	including general, triangular, symmetric, and diagonal matrices
+	including general, symmetric, triangular, and diagonal matrices
 	with numeric, logical, or pattern entries.  Efficient methods for
 	operating on such matrices, often wrapping the 'BLAS', 'LAPACK',
 	and 'SuiteSparse' libraries.
