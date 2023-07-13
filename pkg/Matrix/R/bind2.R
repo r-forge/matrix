@@ -1,4 +1,31 @@
-#### Containing all  cbind2() and rbind2() methods for all our Matrices
+## METHODS FOR GENERIC: cbind2, rbind2
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+## ==== Trivial special cases ==========================================
+
+setMethod("cbind2", signature(x = "Matrix", y = "missing"),
+          function(x, y, ...) x)
+setMethod("cbind2", signature(x = "Matrix", y = "NULL"),
+          function(x, y, ...) x)
+setMethod("cbind2", signature(x = "NULL", y = "Matrix"),
+          function(x, y, ...) y)
+setMethod("cbind2", signature(x = "Matrix", y = "vector"),
+          function(x, y, ...) cbind2(x, matrix(y, x@Dim[1L], 1L)))
+setMethod("cbind2", signature(x = "vector", y = "Matrix"),
+          function(x, y, ...) cbind2(matrix(x, y@Dim[1L], 1L), y))
+
+setMethod("rbind2", signature(x = "Matrix", y = "missing"),
+          function(x, y, ...) x)
+setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
+          function(x, y, ...) x)
+setMethod("rbind2", signature(x = "NULL", y = "Matrix"),
+          function(x, y, ...) y)
+setMethod("rbind2", signature(x = "Matrix", y = "vector"),
+          function(x, y, ...) rbind2(x, matrix(y, 1L, x@Dim[2L])))
+setMethod("rbind2", signature(x = "vector", y = "Matrix"),
+          function(x, y, ...) rbind2(matrix(x, 1L, y@Dim[2L]), y))
+
 
 ###-- General -----------------------------------------------------------
 
@@ -24,38 +51,6 @@ setMethod("rbind2", signature(x = "matrix", y = "sparseMatrix"),
           })
 
 ## originally from ./Matrix.R : -------------------------------
-
-## The trivial methods :
-setMethod("cbind2", signature(x = "Matrix", y = "NULL"),
-          function(x, y, ...) x)
-setMethod("cbind2", signature(x = "Matrix", y = "missing"),
-          function(x, y, ...) x)
-setMethod("cbind2", signature(x = "NULL", y="Matrix"),
-          function(x, y, ...) y)
-## using "atomicVector" not just "numeric"
-setMethod("cbind2", signature(x = "Matrix", y = "atomicVector"),
-	  function(x, y, ...) cbind2(x, matrix(y, nrow = nrow(x))))
-setMethod("cbind2", signature(x = "atomicVector", y = "Matrix"),
-	  function(x, y, ...) cbind2(matrix(x, nrow = nrow(y)), y))
-setMethod("cbind2", signature(x = "ANY", y = "Matrix"),
-	  function(x, y, ...) .bail.out.2(.Generic, class(x), class(y)))
-setMethod("cbind2", signature(x = "Matrix", y = "ANY"),
-	  function(x, y, ...) .bail.out.2(.Generic, class(x), class(y)))
-
-setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
-          function(x, y, ...) x)
-setMethod("rbind2", signature(x = "Matrix", y = "missing"),
-          function(x, y, ...) x)
-setMethod("rbind2", signature(x = "NULL", y="Matrix"),
-          function(x, y, ...) y)
-setMethod("rbind2", signature(x = "Matrix", y = "atomicVector"),
-	  function(x, y, ...) rbind2(x, matrix(y, ncol = ncol(x))))
-setMethod("rbind2", signature(x = "atomicVector", y = "Matrix"),
-	  function(x, y, ...) rbind2(matrix(x, ncol = ncol(y)), y))
-setMethod("rbind2", signature(x = "ANY", y = "Matrix"),
-	  function(x, y, ...) .bail.out.2(.Generic, class(x), class(y)))
-setMethod("rbind2", signature(x = "Matrix", y = "ANY"),
-	  function(x, y, ...) .bail.out.2(.Generic, class(x), class(y)))
 
 ## Makes sure one gets x decent error message for the unimplemented cases:
 setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
@@ -236,13 +231,13 @@ for(cls in names(getClassDef("diagonalMatrix")@subclasses)) {
 
  ## These are already defined for "Matrix"
  ## -- repeated here for method dispatch disambiguation	 {"design-FIXME" ?}
- setMethod("cbind2", signature(x = cls, y = "atomicVector"),
+ setMethod("cbind2", signature(x = cls, y = "vector"),
 	   function(x, y, ...) cbind2(x, matrix(y, nrow = nrow(x))))
- setMethod("cbind2", signature(x = "atomicVector", y = cls),
+ setMethod("cbind2", signature(x = "vector", y = cls),
 	   function(x, y, ...) cbind2(matrix(x, nrow = nrow(y)), y))
- setMethod("rbind2", signature(x = cls, y = "atomicVector"),
+ setMethod("rbind2", signature(x = cls, y = "vector"),
 	   function(x, y, ...) rbind2(x, matrix(y, ncol = ncol(x))))
- setMethod("rbind2", signature(x = "atomicVector", y = cls),
+ setMethod("rbind2", signature(x = "vector", y = cls),
 	   function(x, y, ...) rbind2(matrix(x, ncol = ncol(y)), y))
 }
 rm(cls)
@@ -308,8 +303,6 @@ setMethod("rbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
 	      rbind2sparse(x,y)
 	  })
 
-if(length(formals(cbind2)) >= 3) { ## newer R -- can use optional 'sparse = NA'
-
 setMethod("cbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
 	  function(x, y, sparse = NA, ...) {
 	      nr <- rowCheck(x,y)
@@ -342,45 +335,6 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
 		(nrow(x)+nrow(y)) * as.double(nc)
 	      if(sparse) rbind2sparse(x,y) else rbind2(x, as(y, "denseMatrix"))
 	  })
-
-} else { ## older version of R -- cbind2() has no "..."
-
-setMethod("cbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
-	  function(x, y, ...) {
-	      nr <- rowCheck(x,y)
-	      ## result is sparse if "enough zeros" <==> sparseDefault() in Matrix()
-	      sparse <- (nnzero(x,na.counted=TRUE)+nnzero(y,na.counted=TRUE)) * 2 <
-		  as.double(nr) * (ncol(x)+ncol(y))
-	      if(sparse) cbind2sparse(x,y) else cbind2(as(x, "denseMatrix"), y)
-	  })
-setMethod("cbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
-	  function(x, y, ...) {
-	      nr <- rowCheck(x,y)
-	      ## result is sparse if "enough zeros" <==> sparseDefault() in Matrix()
-	      sparse <- (nnzero(x,na.counted=TRUE)+nnzero(y,na.counted=TRUE)) * 2 <
-		  as.double(nr) * (ncol(x)+ncol(y))
-	      if(sparse) cbind2sparse(x,y) else cbind2(x, as(y, "denseMatrix"))
-	  })
-setMethod("rbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
-	  function(x, y, ...) {
-	      nc <- colCheck(x,y)
-	      ## result is sparse if "enough zeros" <==> sparseDefault() in Matrix()
-	      sparse <- (nnzero(x,na.counted=TRUE)+nnzero(y,na.counted=TRUE)) * 2 <
-		  (nrow(x)+nrow(y)) * as.double(nc)
-	      if(sparse) rbind2sparse(x,y) else rbind2(as(x, "denseMatrix"), y)
-	  })
-setMethod("rbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
-	  function(x, y, ...) {
-	      nc <- colCheck(x,y)
-	      ## result is sparse if "enough zeros" <==> sparseDefault() in Matrix()
-	      sparse <- (nnzero(x,na.counted=TRUE)+nnzero(y,na.counted=TRUE)) * 2 <
-		  (nrow(x)+nrow(y)) * as.double(nc)
-	      if(sparse) rbind2sparse(x,y) else rbind2(x, as(y, "denseMatrix"))
-	  })
-}# older R -- no "sparse = NA"
-
-
-
 
 if(FALSE) {
     ## FIXME
