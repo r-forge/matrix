@@ -82,8 +82,8 @@
   defined methods for these and the \code{'Matrix'} matrices.
 }
 \usage{
-## cbind(\dots, deparse.level = 1)
-## rbind(\dots, deparse.level = 1)
+## cbind(..., deparse.level = 1)
+## rbind(..., deparse.level = 1)
 
 \S4method{cbind2}{denseMatrix,sparseMatrix}(x, y, sparse = NA, \dots)
 \S4method{cbind2}{sparseMatrix,denseMatrix}(x, y, sparse = NA, \dots)
