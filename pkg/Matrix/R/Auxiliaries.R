@@ -214,14 +214,6 @@ asPerm <- function(pivot, off = 1L, ioff = 1L, n = length(pivot))
 invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)
     invertPerm(p, if(zero.p) 0L else 1L, if(zero.res) 0L else 1L)
 
-checkDim <- function(d.a, d.b) {
-    if(any(d.a != d.b))
-	stop(gettextf("non-conformable matrix dimensions in %s",
-		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE, domain = NA)
-    d.a
-}
-
 mmultDim <- function(d.a, d.b, type = 1L) {
     ## Return the 'dim' of the product indicated by 'type':
     ##     type 1:    a  %*%   b
@@ -244,54 +236,6 @@ mmultDimnames <- function(dn.a, dn.b, type = 1L) {
     ##          3:    a  %*% t(b)  {tcrossprod}
     c(if(is.null(dn.a)) list(NULL) else dn.a[2L - (type != 2L)],
       if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
-}
-
-## Still used in many places (for now):
-dimCheck <- function(a, b) checkDim(dim(a), dim(b))
-
-##' Constructs "sensical" dimnames for something like  a + b ;
-##' assume dimCheck() has happened before
-##'
-##' NOTA BENE:   R's  ?Arithmetic  says
-##' ---------
-##'>  For arrays (and an array result) the dimensions and dimnames are taken from
-##'>  first argument if it is an array, otherwise the second.
-##' but that's not quite correct:
-##' The dimnames are taken from second *if* the first are NULL.
-##'
-##' @title Construct dimnames for  a  o  b
-##' @param a matrix
-##' @param b matrix
-##' @param useFirst logical indicating if dimnames(a), the first, is taken, unless NULL
-##' @param check logical indicating if a warning should be signalled for mismatches
-##' @return a \code{\link{list}} of length two with dimnames
-##' @author Martin Maechler
-dimNamesCheck <- function(a, b, useFirst = TRUE, check = FALSE) {
-    nullDN <- list(NULL,NULL)
-    h.a <- !identical(nullDN, dna <- dimnames(a))
-    h.b <- !identical(nullDN, dnb <- dimnames(b))
-    if(h.a || h.b) {
-        if(useFirst) {
-            if(!h.a) dnb else dna
-        } else {
-            if (!h.b) dna
-            else if(!h.a) dnb
-            else { ## both have non-trivial dimnames
-                r <- dna # "default" result
-                for(j in 1:2) if(!is.null(dn <- dnb[[j]])) {
-                    if(is.null(r[[j]]))
-                        r[[j]] <- dn
-                    else if(check && !identical(r[[j]], dn))
-                        warning(gettextf("dimnames [%d] mismatch in %s", j,
-                                         deparse(sys.call(sys.parent()))),
-                                call. = FALSE, domain=NA)
-                }
-                r
-            }
-        }
-    }
-    else
-	nullDN
 }
 
 ##' valid Matrix-class @Dimnames slot {assuming only NULL needs to be transformed}
@@ -629,28 +573,6 @@ forceDiagonal <- function(x, diag = NA_character_) {
 
 drop0.notol <- function(x)
     .Call(R_sparse_drop0, x)
-
-rowCheck <- function(a, b) {
-    da <- dim(a)
-    db <- dim(b)
-    if(da[1] != db[1])
-	stop(gettextf("Matrices must have same number of rows in %s",
-		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE, domain=NA)
-    ## return the common nrow()
-    da[1]
-}
-
-colCheck <- function(a, b) {
-    da <- dim(a)
-    db <- dim(b)
-    if(da[2] != db[2])
-	stop(gettextf("Matrices must have same number of columns in %s",
-		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE, domain=NA)
-    ## return the common ncol()
-    da[2]
-}
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE) {
     ## Useful for compact printing of (parts) of sparse matrices

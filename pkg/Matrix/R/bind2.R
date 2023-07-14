@@ -1,6 +1,22 @@
 ## METHODS FOR GENERIC: cbind2, rbind2
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.cbind2.checkDim <- function(nrow.a, nrow.b) {
+    if(nrow.a != nrow.b)
+        stop(gettextf("number of rows of matrices must match in %s",
+                      deparse(sys.call(sys.parent()))),
+             call. = FALSE, domain = NA)
+    nrow.a
+}
+
+.rbind2.checkDim <- function(ncol.a, ncol.b) {
+    if(ncol.a != ncol.b)
+        stop(gettextf("number of columns of matrices must match in %s",
+                      deparse(sys.call(sys.parent()))),
+             call. = FALSE, domain = NA)
+    ncol.a
+}
+
 
 ## ==== Trivial special cases ==========================================
 
@@ -55,7 +71,7 @@ setMethod("rbind2", signature(x = "matrix", y = "sparseMatrix"),
 ## Makes sure one gets x decent error message for the unimplemented cases:
 setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
           function(x, y, ...) {
-              rowCheck(x,y)
+              .cbind2.checkDim(nrow(x), nrow(y))
               .bail.out.2("cbind2", class(x), class(y))
           })
 
@@ -63,7 +79,7 @@ setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
 ## FIXME: implement rbind2 via "cholmod" for C* and Tsparse ones
 setMethod("rbind2", signature(x = "Matrix", y = "Matrix"),
           function(x, y, ...) {
-              colCheck(x,y)
+              .rbind2.checkDim(ncol(x), ncol(y))
               t(cbind2(t(x), t(y)))
           })
 
@@ -120,7 +136,7 @@ cbind2DN <- function(dnx, dny, ncx, ncy) {
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {
-              rowCheck(x,y)
+              .cbind2.checkDim(nrow(x), nrow(y))
               ncx <- x@Dim[2]
               ncy <- y@Dim[2]
               ## beware of (packed) triangular, symmetric, ...
@@ -187,7 +203,7 @@ rbind2DN <- function(dnx, dny, nrx, nry) {
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {
-              colCheck(x,y)
+              .rbind2.checkDim(ncol(x), ncol(y))
               nrx <- x@Dim[1]
               nry <- y@Dim[1]
               ## beware of (packed) triangular, symmetric, ...
@@ -298,7 +314,7 @@ cbind2sparse <- function(x,y) {
 }
 setMethod("cbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y, ...) {
-              rowCheck(x,y)
+              .cbind2.checkDim(nrow(x), nrow(y))
               cbind2sparse(x,y)
           })
 
@@ -328,13 +344,13 @@ rbind2sparse <- function(x,y) {
 }
 setMethod("rbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y, ...) {
-              colCheck(x,y)
+              .rbind2.checkDim(ncol(x), ncol(y))
               rbind2sparse(x,y)
           })
 
 setMethod("cbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nr <- rowCheck(x,y)
+              nr <- .cbind2.checkDim(nrow(x), nrow(y))
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
@@ -346,7 +362,7 @@ setMethod("cbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           })
 setMethod("cbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nr <- rowCheck(x,y)
+              nr <- .cbind2.checkDim(nrow(x), nrow(y))
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
@@ -358,7 +374,7 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
           })
 setMethod("rbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nc <- colCheck(x,y)
+              nc <- .rbind2.checkDim(ncol(x), ncol(y))
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
@@ -370,7 +386,7 @@ setMethod("rbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           })
 setMethod("rbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nc <- colCheck(x,y)
+              nc <- .rbind2.checkDim(ncol(x), ncol(y))
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +

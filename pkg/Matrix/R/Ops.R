@@ -1,6 +1,43 @@
-####--- All "Ops" group methods for all Matrix classes (incl sparseVector) -----
+####--- All "Ops" group methods for all Matrix classes (incl sparseVector) ---
 ####         ===   but diagonalMatrix  -> ./diagMatrix.R and  abIndex.R
 ####                                        ~~~~~~~~~~~~      ~~~~~~~~~
+
+
+.Ops.checkDim <- function(d.a, d.b) {
+    if(any(d.a != d.b))
+        stop(gettextf("non-conformable matrix dimensions in %s",
+                      deparse(sys.call(sys.parent()))),
+             call. = FALSE, domain = NA)
+    d.a
+}
+
+.Ops.checkDimNames <- function(dn.a, dn.b, useFirst = TRUE, check = FALSE) {
+    ## behave as described in ?Arithmetic
+    nullDN <- list(NULL, NULL)
+    h.a <- !identical(nullDN, dn.a)
+    h.b <- !identical(nullDN, dn.b)
+    if(h.a || h.b) {
+        if(useFirst) {
+            if(!h.a) dn.b else dn.a
+        } else {
+            if (!h.b) dn.a
+            else if(!h.a) dn.b
+            else { ## both have non-trivial dimnames
+                r <- dn.a # "default" result
+                for(j in 1:2)
+                    if(!is.null(dn <- dn.b[[j]])) {
+                        if(is.null(r[[j]]))
+                            r[[j]] <- dn
+                        else if(check && !identical(r[[j]], dn))
+                            warning(gettextf("dimnames [%d] mismatch in %s", j,
+                                             deparse(sys.call(sys.parent()))),
+                                    call. = FALSE, domain = NA)
+                    }
+                r
+            }
+        }
+    } else nullDN
+}
 
 ### Note that the "Ops" group consists of
 ### sub-groups   "Arith", "Compare", and "Logic"
@@ -22,8 +59,6 @@ if(FALSE) { # unused
 
 ### Design decision for *sparseMatrix*:
 ### work via Csparse  since Tsparse are not-unique (<-> slots not compatible)
-
-### Dimnames: (partly) via  dimNamesCheck()  [ ./Auxiliaries.R ]
 
 ### --  0 -- (not dense *or* sparse) -----------------------------------
 
@@ -79,13 +114,13 @@ setMethod("Ops", signature(e1 = "NULL", e2 = "Matrix"),
 ## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
 .bail.out.Ops <- function(e1, e2) {
     if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-        dimCheck(e1, e2)
+        .Ops.checkDim(dim(e1), dim(e2))
     .bail.out.2(.Generic, class(e1), class(e2))
 }
 setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
           function(e1, e2) {
               if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-                  dimCheck(e1,e2)
+                  .Ops.checkDim(dim(e1), dim(e2))
               if(is.matrix(e2) && identical(e2, as.matrix(e2)) &&
                  is.object(e2) && !isS4(e2)) # e.g. for "table"
                   callGeneric(e1, unclass(e2))
@@ -95,7 +130,7 @@ setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
 setMethod("Ops", signature(e1 = "ANY", e2 = "Matrix"),
           function(e1, e2) {
               if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-                  dimCheck(e1,e2)
+                  .Ops.checkDim(dim(e1), dim(e2))
               if(is.matrix(e1) && identical(e1, as.matrix(e1)) &&
                  is.object(e1) && !isS4(e1)) # e.g. for "table"
                   callGeneric(unclass(e1), e2)
@@ -131,7 +166,7 @@ setMethod("Compare", signature(e1 = "Matrix", e2 = "Matrix"),
 ## can be done for matching-dim "*geMatrix", and also
 ## matching-{dim + uplo} for *packed* (only!) symmetric+triangular
 .Ops.via.x <- function(e1,e2) {
-    dimCheck(e1, e2)
+    .Ops.checkDim(dim(e1), dim(e2))
     e1@x <- callGeneric(e1@x, e2@x)
     .empty.factors(e1)
     e1
@@ -300,7 +335,7 @@ rm(Cmp.Mat.atomic)
 ##  -------  {also used for "Arith"}:
 Ops.x.x <- function(e1, e2)
 {
-    d <- dimCheck(e1,e2)
+    d <- .Ops.checkDim(dim(e1), dim(e2))
     if((dens1 <- extends(c1 <- class(e1), "denseMatrix")))
         gen1 <- extends(c1, "generalMatrix")
     if((dens2 <- extends(c2 <- class(e2), "denseMatrix")))
@@ -496,7 +531,7 @@ setMethod("Arith", signature(e1 = "dgeMatrix", e2 = "dgeMatrix"),
               x2 <- e2@x
               if(same.dim) {
                   d <- d1
-                  dn <- dimNamesCheck(e1, e2)
+                  dn <- .Ops.checkDimNames(dimnames(e1), dimnames(e2))
               } else { # nrows differ ----> maybe recycling
                   if(d2[2] %% d1[2] == 0) { # nrow(e2) is a multiple
                       x1 <- rep.int(x1, d2[2] %/% d1[2])
@@ -663,7 +698,7 @@ rm(.Arith.atom.denseM)
 ## These all had "Logic", now also for "Compare",
 ## but "Arith" differs: result will be "dgeMatrix' :
 .Ops2dge.via.x <- function(e1,e2) {
-    dimCheck(e1, e2)
+    .Ops.checkDim(dim(e1), dim(e2))
     r <- copyClass(e1, "dgeMatrix", sNames = c("Dim","Dimnames"))
     r@x <- as.numeric(callGeneric(e1@x, e2@x))
     r
@@ -716,7 +751,7 @@ setMethod("Ops", signature(e1 = "nsparseMatrix", e2 = "nsparseMatrix"),
                                        as(e2, "TsparseMatrix")))
 
 Ops.nT.nT <- function(e1,e2) {
-    d <- dimCheck(e1,e2)
+    d <- .Ops.checkDim(dim(e1), dim(e2))
     ## e1, e2 are nTsparse, i.e., inheriting from  "ngTMatrix", "ntTMatrix", "nsTMatrix"
     gen1 <- extends(cD1 <- getClassDef(class(e1)), "generalMatrix")
     gen2 <- extends(cD2 <- getClassDef(class(e2)), "generalMatrix")
@@ -988,8 +1023,8 @@ Ops.x.x.via.d <- function(e1, e2) callGeneric(..sparse2d(e1), ..sparse2d(e2))
 
 Logic.lCMat <- function(e1, e2, isOR) {
     stopifnot(is.logical(isOR))
-    d <- dimCheck(e1, e2)
-    dn <- dimNamesCheck(e1, e2)
+    d <- .Ops.checkDim(dim(e1), dim(e2))
+    dn <- .Ops.checkDimNames(dimnames(e1), dimnames(e2))
     ## Very easy case first :
     if(identical(e1@i, e2@i) && identical(e1@p, e2@p)) {
         e1@x <- if(isOR) e1@x | e2@x else e1@x & e2@x
@@ -1006,8 +1041,8 @@ Logic.lCMat <- function(e1, e2, isOR) {
 m.Logic.lCMat <- function(e1, e2) Logic.lCMat(e1, e2, isOR = .Generic == "|")
 
 Logic.lTMat <- function(e1,e2) {
-    d <- dimCheck(e1, e2)
-    dn <- dimNamesCheck(e1, e2)
+    d <- .Ops.checkDim(dim(e1), dim(e2))
+    dn <- .Ops.checkDimNames(dimnames(e1), dimnames(e2))
     ## Very easy case first :
     if(identical(e1@i, e2@i) && identical(e1@j, e2@j)) {
         e1@x <- callGeneric(e1@x, e2@x)
@@ -1050,7 +1085,7 @@ setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
                   if(isOR) # both triangles => "general"
                       Logic.lCMat(.sparse2g(e1), .sparse2g(e2), isOR=TRUE)
                   else { ## have '&': all FALSE apart from diagonal
-                      d <- dimCheck(e1, e2)
+                      d <- .Ops.checkDim(dim(e1), dim(e2))
                       .diag2sparse(new("ldiMatrix", Dim = d,
                                        x = get(.Generic)(diag(e1), diag(e2))),
                                    code = "ltC", uplo = e1@uplo, drop0 = TRUE)
@@ -1137,8 +1172,9 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
     ## Generic is one of  "+", "-", "*", "^", "%%", "%/%", "/"
 
     ## triangular:  TRUE  iff e1,e2 are triangular  _and_  e1@uplo == e2@uplo
-    d <- dimCheck(e1, e2)
-    dn <- dimNamesCheck(e1, e2, check = check.dimnames)
+    d <- .Ops.checkDim(dim(e1), dim(e2))
+    dn <- .Ops.checkDimNames(dimnames(e1), dimnames(e2),
+                             check = check.dimnames)
     if(triangular) {
         ## need these for the 'x' slots in any case
         e1 <- .Call(R_sparse_diag_U2N, e1)
@@ -1374,7 +1410,7 @@ rm(A.M.n, A.n.M, .Arith.atom.CM, .Arith.CM.atom)
 ## Uses the triplet convention of *adding* entries with same (i,j):
 setMethod("+", signature(e1 = "dgTMatrix", e2 = "dgTMatrix"),
           function(e1, e2) {
-              dimCheck(e1, e2)
+              .Ops.checkDim(dim(e1), dim(e2))
               new("dgTMatrix", i = c(e1@i, e2@i), j = c(e1@j, e2@j),
                   x = c(e1@x, e2@x), Dim = e1@Dim, Dimnames = e1@Dimnames)
           })
@@ -1412,7 +1448,7 @@ setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 
 setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
           function(e1, e2) {
-              d <- dimCheck(e1,e2)
+              d <- .Ops.checkDim(dim(e1), dim(e2))
 
               ## How do the "0" or "FALSE" entries compare?
               ## Depends if we have an "EQuality RELation" or not:
@@ -1461,7 +1497,8 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
                   shape <- if(T) "t" else if(S) "s" else "g"
               }
 
-              dn <- dimNamesCheck(e1, e2) ## <- FIXME: for 'S'; allow staying
+              dn <- .Ops.checkDimNames(dimnames(e1), dimnames(e2))
+              ## ^^ FIXME: for 'S'; allow staying
               ## the result object:
               newC <- sub("^.", "l", MatrixClass(class(e1)))
               ## FIXME: "n" result when e1 & e2 are "n",
