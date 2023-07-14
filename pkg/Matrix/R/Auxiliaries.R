@@ -793,7 +793,10 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
                 "z" = "complex")
 
 ## the reverse, a "version of" .M.kind(.):
-.kind.type <- `names<-`(names(.type.kind), `names<-`(.type.kind, NULL))
+.kind.type <- c("logical" = "l",
+                "integer" = "i",
+                "double" = "d",
+                "complex" = "z")
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
