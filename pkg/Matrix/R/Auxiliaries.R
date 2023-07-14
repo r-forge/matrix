@@ -223,9 +223,9 @@ mmultDim <- function(d.a, d.b, type = 1L) {
     i.a <- 1L + (type != 2L)
     i.b <- 1L + (type == 3L)
     if(d.a[i.a] != d.b[i.b])
-	stop(gettextf("non-conformable matrix dimensions in %s",
-		      deparse(sys.call(sys.parent()))),
-	     call. = FALSE, domain = NA)
+        stop(gettextf("non-conformable matrix dimensions in %s",
+                      deparse(sys.call(sys.parent()))),
+             call. = FALSE, domain = NA)
     c(d.a[-i.a], d.b[-i.b])
 }
 
@@ -238,7 +238,7 @@ mmultDimnames <- function(dn.a, dn.b, type = 1L) {
       if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
 }
 
-##' valid Matrix-class @Dimnames slot {assuming only NULL needs to be transformed}
+## dimnames->Dimnames
 .M.DN <- function(x)
     if(is.null(dn <- dimnames(x))) list(NULL, NULL) else dn
 
@@ -786,14 +786,14 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
 }
 
 ## typically used as .type.kind[.M.kind(x)]:
-.type.kind <- c("d" = "double",
-		"i" = "integer",
-		"l" = "logical",
-		"n" = "logical",
-		"z" = "complex")
+.type.kind <- c("n" = "logical",
+                "l" = "logical",
+                "i" = "integer",
+                "d" = "double",
+                "z" = "complex")
 
 ## the reverse, a "version of" .M.kind(.):
-.kind.type <- setNames(names(.type.kind), as.vector(.type.kind))
+.kind.type <- `names<-`(names(.type.kind), `names<-`(.type.kind, NULL))
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
