@@ -1,20 +1,32 @@
 ## METHODS FOR GENERIC: cbind2, rbind2
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.cbind2.checkDim <- function(nrow.a, nrow.b) {
-    if(nrow.a != nrow.b)
-        stop(gettextf("number of rows of matrices must match in %s",
-                      deparse(sys.call(sys.parent()))),
-             call. = FALSE, domain = NA)
-    nrow.a
+bindDim <- function(d.x, d.y, margin) {
+    r <- d.x
+    if(d.x[margin] != d.y[margin]) {
+        if(margin == 1L)
+            stop("number of rows of matrices must match")
+        else stop("number of columns of matrices must match")
+    }
+    n.x <- d.x[-margin]
+    n.y <- d.y[-margin]
+    if(n.y > .Machine$integer.max - n.x)
+        stop("dimensions cannot exceed 2^31-1")
+    r[-margin] <- n.x + n.y
+    r
 }
 
-.rbind2.checkDim <- function(ncol.a, ncol.b) {
-    if(ncol.a != ncol.b)
-        stop(gettextf("number of columns of matrices must match in %s",
-                      deparse(sys.call(sys.parent()))),
-             call. = FALSE, domain = NA)
-    ncol.a
+bindDimnames <- function(dn.x, dn.y, d.x, d.y, margin) {
+    r <- list(NULL, NULL)
+    if(!(is.null(tmp <- dn.x[[margin]]) && is.null(tmp <- dn.y[[margin]])))
+        r[[margin]] <- tmp
+    nms.x <- dn.x[[-margin]]
+    nms.y <- dn.y[[-margin]]
+    if(!(is.null(nms.x) && is.null(nms.y)))
+        r[[-margin]] <-
+            c(if(is.null(nms.x)) character(d.x[-margin]) else nms.x,
+              if(is.null(nms.y)) character(d.y[-margin]) else nms.y)
+    r
 }
 
 
@@ -71,7 +83,7 @@ setMethod("rbind2", signature(x = "matrix", y = "sparseMatrix"),
 ## Makes sure one gets x decent error message for the unimplemented cases:
 setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
           function(x, y, ...) {
-              .cbind2.checkDim(nrow(x), nrow(y))
+              bindDim(x@Dim, y@Dim, 1L)
               .bail.out.2("cbind2", class(x), class(y))
           })
 
@@ -79,7 +91,7 @@ setMethod("cbind2", signature(x = "Matrix", y = "Matrix"),
 ## FIXME: implement rbind2 via "cholmod" for C* and Tsparse ones
 setMethod("rbind2", signature(x = "Matrix", y = "Matrix"),
           function(x, y, ...) {
-              .rbind2.checkDim(ncol(x), ncol(y))
+              bindDim(x@Dim, y@Dim, 2L)
               t(cbind2(t(x), t(y)))
           })
 
@@ -117,47 +129,25 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "matrix"),
 setMethod("cbind2", signature(x = "matrix", y = "denseMatrix"),
           function(x, y, ...) cbind2(.m2ge(x, "."), y))
 
-cbind2DN <- function(dnx, dny, ncx, ncy) {
-    ## R and S+ are different in which names they take
-    ## if they differ -- but there's no warning in any case
-    rn <-
-        if(!is.null(dnx[[1]]))
-            dnx[[1]]
-        else dny[[1]]
-    cx <- dnx[[2]]
-    cy <- dny[[2]]
-    cn <-
-        if(is.null(cx) && is.null(cy))
-            NULL
-        else c(if(!is.null(cx)) cx else character(ncx),
-               if(!is.null(cy)) cy else character(ncy))
-    list(rn, cn)
-}
-
 setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {
-              .cbind2.checkDim(nrow(x), nrow(y))
-              ncx <- x@Dim[2]
-              ncy <- y@Dim[2]
+              d.x <- x@Dim
+              d.y <- y@Dim
+              d.r <- bindDim(d.x, d.y, 1L)
               ## beware of (packed) triangular, symmetric, ...
-              hasDN <-
-                  !is.null.DN(dnx <- dimnames(x)) |
-                  !is.null.DN(dny <- dimnames(y))
               x <- .dense2g(x)
               y <- .dense2g(y)
               xx <- c(x@x, y@x)
               ## be careful, e.g., if we have an 'n' and 'd'
               if(identical((tr <- typeof(xx)), typeof(x@x))) {
                   x@x <- xx
-                  x@Dim[2] <- ncx + ncy
-                  if(hasDN)
-                      x@Dimnames <- cbind2DN(dnx, dny, ncx, ncy)
+                  x@Dim <- d.r
+                  x@Dimnames <- bindDimnames(dimnames(x), dimnames(y), d.x, d.y, 1L)
                   x
               } else if(identical(tr, typeof(y@x))) {
                   y@x <- xx
-                  y@Dim[2] <- ncx + ncy
-                  if(hasDN)
-                      y@Dimnames <- cbind2DN(dnx, dny, ncx, ncy)
+                  y@Dim <- d.r
+                  y@Dimnames <- bindDimnames(dimnames(x), dimnames(y), d.x, d.y, 1L)
                   y
               } else stop("resulting x-slot has different type than x's or y's")
           })
@@ -187,44 +177,25 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "matrix"),
 setMethod("rbind2", signature(x = "matrix", y = "denseMatrix"),
           function(x, y, ...) rbind2(.m2ge(x, "."), y))
 
-rbind2DN <- function(dnx, dny, nrx, nry) {
-    if(!is.null.DN(dnx) || !is.null.DN(dny)) {
-        ## R and S+ are different in which names they take
-        ## if they differ -- but there's no warning in any case
-        list(if(is.null(rx <- dnx[[1]]) & is.null(ry <- dny[[1]]))
-                 NULL
-             else c(if(!is.null(rx)) rx else character(nrx),
-                    if(!is.null(ry)) ry else character(nry)),
-             if(!is.null(dnx[[2]]))
-                 dnx[[2]]
-             else dny[[2]])
-    } else list(NULL, NULL)
-}
-
 setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {
-              .rbind2.checkDim(ncol(x), ncol(y))
-              nrx <- x@Dim[1]
-              nry <- y@Dim[1]
+              d.x <- x@Dim
+              d.y <- y@Dim
+              d.r <- bindDim(d.x, d.y, 2L)
               ## beware of (packed) triangular, symmetric, ...
-              hasDN <-
-                  !is.null.DN(dnx <- dimnames(x)) |
-                  !is.null.DN(dny <- dimnames(y))
               x <- .dense2g(x)
               y <- .dense2g(y)
               xx <- .Call(R_rbind2_vector, x, y)
               ## be careful, e.g., if we have an 'n' and 'd'
               if(identical((tr <- typeof(xx)), typeof(x@x))) {
                   x@x <- xx
-                  x@Dim[1] <- nrx + nry
-                  if(hasDN)
-                      x@Dimnames <- rbind2DN(dnx, dny, nrx, nry)
+                  x@Dim <- d.r
+                  x@Dimnames <- bindDimnames(dimnames(x), dimnames(y), d.x, d.y, 2L)
                   x
               } else if(identical(tr, typeof(y@x))) {
                   y@x <- xx
-                  y@Dim[1] <- nrx + nry
-                  if(hasDN)
-                      y@Dimnames <- rbind2DN(dnx, dny, nrx, nry)
+                  y@Dim <- d.r
+                  y@Dimnames <- bindDimnames(dimnames(x), dimnames(y), d.x, d.y, 2L)
                   y
               } else stop("resulting x-slot has different type than x's or y's")
           })
@@ -283,16 +254,16 @@ rm(cls)
 ## ------> ../src/Csparse.c
 
 ## Fast - almost non-checking methods
-.cbind2Csp <- function(x,y) .Call(Csparse_horzcat, asCspN(x), asCspN(y))
-.rbind2Csp <- function(x,y) .Call(Csparse_vertcat, asCspN(x), asCspN(y))
+.cbind2Csp <- function(x, y) .Call(Csparse_horzcat, asCspN(x), asCspN(y))
+.rbind2Csp <- function(x, y) .Call(Csparse_vertcat, asCspN(x), asCspN(y))
 
-cbind2sparse <- function(x,y) {
+cbind2sparse <- function(x, y) {
     ## beware of (packed) triangular, symmetric, ...
     if(identical(c(dnx <- dimnames(x),
                    dny <- dimnames(y)),
                  list(NULL, NULL, NULL, NULL)))
         ## keep empty dimnames
-        .cbind2Csp(x,y)
+        .cbind2Csp(x, y)
     else {
         ## R and S+ are different in which names they take
         ## if they differ -- but there's no warning in any case
@@ -307,24 +278,24 @@ cbind2sparse <- function(x,y) {
                 NULL
             else c(if(!is.null(cx)) cx else character(ncol(x)),
                    if(!is.null(cy)) cy else character(ncol(y)))
-        ans <- .cbind2Csp(x,y)
+        ans <- .cbind2Csp(x, y)
         ans@Dimnames <- list(rn, cn)
         ans
     }
 }
 setMethod("cbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y, ...) {
-              .cbind2.checkDim(nrow(x), nrow(y))
-              cbind2sparse(x,y)
+              bindDim(x@Dim, y@Dim, 1L)
+              cbind2sparse(x, y)
           })
 
-rbind2sparse <- function(x,y) {
+rbind2sparse <- function(x, y) {
     ## beware of (packed) triangular, symmetric, ...
     if(identical(c(dnx <- dimnames(x),
                    dny <- dimnames(y)),
                  list(NULL, NULL, NULL, NULL)))
         ## keep empty dimnames
-        .rbind2Csp(x,y)
+        .rbind2Csp(x, y)
     else {
         ## R and S+ are different in which names they take
         ## if they differ -- but there's no warning in any case
@@ -337,63 +308,63 @@ rbind2sparse <- function(x,y) {
                   NULL
               else c(if(!is.null(rx)) rx else character(nrow(x)),
                      if(!is.null(ry)) ry else character(nrow(y)))
-        ans <- .rbind2Csp(x,y)
+        ans <- .rbind2Csp(x, y)
         ans@Dimnames <- list(rn, cn)
         ans
     }
 }
 setMethod("rbind2", signature(x = "sparseMatrix", y = "sparseMatrix"),
           function(x, y, ...) {
-              .rbind2.checkDim(ncol(x), ncol(y))
-              rbind2sparse(x,y)
+              bindDim(x@Dim, y@Dim, 2L)
+              rbind2sparse(x, y)
           })
 
 setMethod("cbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nr <- .cbind2.checkDim(nrow(x), nrow(y))
+              d.r <- bindDim(x@Dim, y@Dim, 1L)
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
                            nnzero(y, na.counted = TRUE)) <
-                      as.double(nr) * (ncol(x) + ncol(y))
+                      as.double(d.r[1L]) * (ncol(x) + ncol(y))
               if(sparse)
                   cbind2sparse(x, y)
               else cbind2(as(x, "denseMatrix"), y)
           })
 setMethod("cbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nr <- .cbind2.checkDim(nrow(x), nrow(y))
+              d.r <- bindDim(x@Dim, y@Dim, 1L)
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
                            nnzero(y, na.counted = TRUE)) <
-                      as.double(nr) * (ncol(x) + ncol(y))
+                      as.double(d.r[1L]) * (ncol(x) + ncol(y))
               if(sparse)
                   cbind2sparse(x, y)
               else cbind2(x, as(y, "denseMatrix"))
           })
 setMethod("rbind2", signature(x = "sparseMatrix", y = "denseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nc <- .rbind2.checkDim(ncol(x), ncol(y))
+              d.r <- bindDim(x@Dim, y@Dim, 2L)
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
                            nnzero(y, na.counted = TRUE)) <
-                      (nrow(x) + nrow(y)) * as.double(nc)
+                      (nrow(x) + nrow(y)) * as.double(d.r[2L])
               if(sparse)
                   rbind2sparse(x, y)
               else rbind2(as(x, "denseMatrix"), y)
           })
 setMethod("rbind2", signature(x = "denseMatrix", y = "sparseMatrix"),
           function(x, y, sparse = NA, ...) {
-              nc <- .rbind2.checkDim(ncol(x), ncol(y))
+              d.r <- bindDim(x@Dim, y@Dim, 2L)
               if(is.na(sparse))
                   sparse <-
                       2 * (nnzero(x, na.counted = TRUE) +
                            nnzero(y, na.counted = TRUE)) <
-                      (nrow(x) + nrow(y)) * as.double(nc)
+                      (nrow(x) + nrow(y)) * as.double(d.r[2L])
               if(sparse)
-                  rbind2sparse(x,y)
+                  rbind2sparse(x, y)
               else rbind2(x, as(y, "denseMatrix"))
           })
 
@@ -439,38 +410,26 @@ setMethod("cbind2", signature(x = "numeric", y = "sparseMatrix"),
 
 setMethod("rbind2", signature(x = "indMatrix", y = "indMatrix"),
           function(x, y, ...) {
-              dx <- x@Dim
-              dy <- y@Dim
-              if((n <- dx[2L]) != dy[2L])
-                  stop(gettextf("number of columns of matrices must match in %s",
-                                deparse(sys.call(sys.parent()))),
-                       call. = FALSE, domain = NA)
               if(x@margin != 1L || y@margin != 1L)
                   return(rbind2(as(x, "RsparseMatrix"), as(y, "RsparseMatrix")))
-              mx <- dx[1L]
-              my <- dy[1L]
+              d.x <- x@Dim
+              d.y <- y@Dim
               r <- new("indMatrix")
-              r@Dim <- c(mx + my, n)
-              r@Dimnames <- rbind2DN(x@Dimnames, y@Dimnames, mx, my)
+              r@Dim <- bindDim(d.x, d.y, 2L)
+              r@Dimnames <- bindDimnames(x@Dimnames, y@Dimnames, d.x, d.y, 2L)
               r@perm <- c(x@perm, y@perm)
               r
           })
 
 setMethod("cbind2", signature(x = "indMatrix", y = "indMatrix"),
           function(x, y, ...) {
-              dx <- x@Dim
-              dy <- y@Dim
-              if((m <- dx[1L]) != dy[1L])
-                  stop(gettextf("number of rows of matrices must match in %s",
-                                deparse(sys.call(sys.parent()))),
-                       call. = FALSE, domain = NA)
               if(x@margin == 1L || y@margin == 1L)
                   return(cbind2(as(x, "CsparseMatrix"), as(y, "CsparseMatrix")))
-              nx <- dx[2L]
-              ny <- dy[2L]
+              d.x <- x@Dim
+              d.y <- y@Dim
               r <- new("indMatrix")
-              r@Dim <- c(m, nx + ny)
-              r@Dimnames <- cbind2DN(x@Dimnames, y@Dimnames, nx, ny)
+              r@Dim <- bindDim(d.x, d.y, 1L)
+              r@Dimnames <- bindDimnames(x@Dimnames, y@Dimnames, d.x, d.y, 1L)
               r@perm <- c(x@perm, y@perm)
               r@margin <- 2L
               r
