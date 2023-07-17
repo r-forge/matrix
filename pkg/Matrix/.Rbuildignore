@@ -83,3 +83,4 @@ src/t_sparseVector\.c$
 # Work in progress :
 R/subassign\.R$
 src/subassign\.[ch]$
+src/bind\.[ch]$
