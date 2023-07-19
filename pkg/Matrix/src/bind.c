@@ -184,7 +184,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		}
 		if (!rdimnames[ margin]) {
 			if (TAG(a) != R_NilValue ||
-				level == 2 || (level == 1 && TYPEOF(CAR(e)) == SYMSXP))
+			    level == 2 || (level == 1 && TYPEOF(CAR(e)) == SYMSXP))
 				rdimnames[ margin] = 1;
 		}
 		if (!rdimnames[!margin] && xlen == rdim[!margin]) {
@@ -419,7 +419,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 					if (TAG(a) != R_NilValue)
 						s[margin] = coerceVector(TAG(a), STRSXP);
 					else if (level == 2) {
-					    PROTECT(s_ = allocVector(EXPRSXP, 1));
+						PROTECT(s_ = allocVector(EXPRSXP, 1));
 						SET_VECTOR_ELT(s_, 0, CAR(e));
 						s[margin] = coerceVector(s_, STRSXP);
 						UNPROTECT(1);
