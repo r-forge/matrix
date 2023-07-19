@@ -1,13 +1,12 @@
 ## METHODS FOR GENERIC: cbind2, rbind2
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(FALSE) {
-## GOAL: write methods that preallocate, i.e., do _not_ use [cr]bind2
-##       but still take care to handle deparse.level as in [cr]bind2 ...
-cbind.Matrix <- function(..., deparse.level = 1) .External(R_cbind, ...)
-rbind.Matrix <- function(..., deparse.level = 1) .External(R_rbind, ...)
-## and maybe implement c.Matrix and *.sparseVector similarly ... ?
-}
+## GOAL: write methods that preallocate, i.e., do _not_ use [cr]bind2,
+##       and maybe implement c.Matrix and *.sparseVector similarly ... ?
+.cbind <- function(..., deparse.level = 1)
+    .External(R_bind, 1L, deparse.level, substitute(list(...)), ...)
+.rbind <- function(..., deparse.level = 1)
+    .External(R_bind, 0L, deparse.level, substitute(list(...)), ...)
 
 bindDim <- function(d.x, d.y, margin) {
     r <- d.x
