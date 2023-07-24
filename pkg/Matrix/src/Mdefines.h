@@ -115,6 +115,8 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 
 #define MAXOF(x, y) ((x < y) ? y : x)
 #define MINOF(x, y) ((x < y) ? x : y)
+#define  FIRSTOF(x, y) (x)
+#define SECONDOF(x, y) (y)
 
 #define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
 #define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
@@ -142,19 +144,20 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define PM_LENGTH(m) \
 	((R_xlen_t) ((m) + ((Matrix_int_fast64_t) (m) * (       (m) - 1)) / 2))
 
-#define SHOW(_X_) _X_
-#define HIDE(_X_)
+#define SHOW(...) __VA_ARGS__
+#define HIDE(...)
 
 #define ERROR_INVALID_CLASS(_X_, _METHOD_) \
 do { \
-	SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
-	if (TYPEOF(class) == STRSXP && LENGTH(class) > 0) \
+	if (!OBJECT(_X_)) \
+		error(_("invalid type \"%s\" to '%s()'"), \
+		      type2char(TYPEOF(_X_)), _METHOD_); \
+	else { \
+		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
 		error(_("invalid class \"%s\" to '%s()'"), \
 		      CHAR(STRING_ELT(class, 0)), _METHOD_); \
-	else \
-		error(_("unclassed \"%s\" to '%s()'"), \
-		      type2char(TYPEOF(_X_)), _METHOD_); \
-	UNPROTECT(1); \
+		UNPROTECT(1); \
+	} \
 } while (0)
 
 #define ERROR_INVALID_TYPE(_WHAT_, _SEXPTYPE_, _METHOD_) \
