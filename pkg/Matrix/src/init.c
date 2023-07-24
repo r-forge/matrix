@@ -2,7 +2,6 @@
 #include "Csparse.h"
 #include "CHMfactor.h"
 #include "abIndex.h"
-#include "bind.h"
 #include "chm_common.h"
 #include "dense.h"
 #include "dgCMatrix.h"
@@ -303,7 +302,6 @@ static R_CallMethodDef CallEntries[] = {
 
 static const R_ExternalMethodDef ExtEntries[] = {
 	EXTDEF(Mmatrix, 7),
-	EXTDEF(R_bind, -1),
 	{NULL, NULL, 0}
 };
 
