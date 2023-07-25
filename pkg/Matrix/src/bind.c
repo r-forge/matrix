@@ -768,7 +768,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 #undef BIND_C1R0
 #undef BIND_C0R1
 #undef BIND_T
-	
+
 	return;
 }
 
