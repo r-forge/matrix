@@ -163,34 +163,57 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		}
 	}
 
+	if (rdim[!margin] < 0) {
+		/* Arguments are all vectors or NULL */
+		R_xlen_t maxlen = -1;
+		for (a = args; a != R_NilValue; a = CDR(a)) {
+			s = CAR(a);
+			if (s == R_NilValue)
+				continue;
+			slen = XLENGTH(s);
+			if (slen > INT_MAX)
+				error(_("dimensions cannot exceed 2^31-1"));
+			else if (slen > maxlen)
+				maxlen = slen;
+		}
+		if (maxlen < 0)
+			/* Arguments are all NULL */
+			return;
+		rdim[!margin] = (int) maxlen;
+	}
+
 	for (a = args, e = exprs; a != R_NilValue; a = CDR(a), e = CDR(e)) {
 		s = CAR(a);
-		if (s == R_NilValue || IS_S4_OBJECT(s))
+		if ((s == R_NilValue && rdim[!margin] > 0) || IS_S4_OBJECT(s))
 			continue;
-		tmp = getAttrib(s, R_DimSymbol);
-		if (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)
-			continue;
-		slen = XLENGTH(s);
-		if (rdim[!margin] > 0 && slen == 0)
-			continue;
-		if (rdim[margin] == INT_MAX)
-			error(_("dimensions cannot exceed 2^31-1"));
-		rdim[margin] += 1;
-		if (slen > rdim[!margin] || rdim[!margin] % (int) slen) {
-			if (margin == 1)
-				warning(_("number of rows of result is not a multiple of vector length"));
-			else
-				warning(_("number of columns of result is not a multiple of vector length"));
+		if (s == R_NilValue)
+			rdim[margin] += 1;
+		else {
+			tmp = getAttrib(s, R_DimSymbol);
+			if (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)
+				continue;
+			slen = XLENGTH(s);
+			if (slen == 0 && rdim[!margin] > 0)
+				continue;
+			if (rdim[margin] == INT_MAX)
+				error(_("dimensions cannot exceed 2^31-1"));
+			rdim[margin] += 1;
+			if (slen > rdim[!margin] || rdim[!margin] % (int) slen) {
+				if (margin == 1)
+					warning(_("number of rows of result is not a multiple of vector length"));
+				else
+					warning(_("number of columns of result is not a multiple of vector length"));
+			}
+			if (!rdimnames[!margin] && slen == rdim[!margin]) {
+				tmp = getAttrib(s, R_NamesSymbol);
+				if (tmp != R_NilValue)
+					rdimnames[!margin] = 1;
+			}
 		}
-		if (!rdimnames[ margin]) {
+		if (!rdimnames[margin]) {
 			if (TAG(a) != R_NilValue ||
 			    level == 2 || (level == 1 && TYPEOF(CAR(e)) == SYMSXP))
-				rdimnames[ margin] = 1;
-		}
-		if (!rdimnames[!margin] && slen == rdim[!margin]) {
-			tmp = getAttrib(s, R_NamesSymbol);
-			if (tmp != R_NilValue)
-				rdimnames[!margin] = 1;
+				rdimnames[margin] = 1;
 		}
 	}
 
@@ -478,9 +501,13 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 
 	if (repr == 'e') {
 
+		if (rdim[0] == 0 || rdim[1] == 0)
+			return;
+
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP x = PROTECT(allocVector(kind2type(kind), mn)), tmp;
+		SET_SLOT(res, Matrix_xSym, x);
 
 #define BIND_E(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -553,13 +580,22 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_E(int, LOGICAL, SHOW);
 		else
 			BIND_CASES(BIND_E);
-		SET_SLOT(res, Matrix_xSym, x);
 		UNPROTECT(1);
 
 	} else if ((repr == 'C' && margin == 1) || (repr == 'R' && margin == 0)) {
 
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1)), sp;
-		int *pp = INTEGER(p), *psp, nnz = 0, j, n;
+		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1));
+		int *pp = INTEGER(p);
+		SET_SLOT(res, Matrix_pSym, p);
+
+		if (rdim[0] == 0 || rdim[1] == 0) {
+			Matrix_memset(pp, 0, (R_xlen_t) rdim[margin] + 1, sizeof(int));
+			UNPROTECT(1);
+			return;
+		}
+
+		SEXP sp;
+		int *psp, j, n, nnz = 0;
 		*(pp++) = nnz = 0;
 		for (a = args; a != R_NilValue; a = CDR(a)) {
 			s = CAR(a);
@@ -577,6 +613,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi;
+		SET_SLOT(res, iSym, i);
 
 #define BIND_C1R0(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -605,20 +642,26 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_C1R0(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
-			BIND_CASES(BIND_C1R0);
 			SET_SLOT(res, Matrix_xSym, x);
+			BIND_CASES(BIND_C1R0);
 			UNPROTECT(1);
 		}
-		SET_SLOT(res, Matrix_pSym, p);
-		SET_SLOT(res, iSym, i);
 		UNPROTECT(2);
 
 	} else if ((repr == 'C' && margin == 0) || (repr == 'R' && margin == 1)) {
 
-		int j, n = rdim[!margin];
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)), sp;
-		int *pp = INTEGER(p), *psp;
-		Matrix_memset(pp, 0, (R_xlen_t) n + 1, sizeof(int));
+		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
+		int *pp = INTEGER(p);
+		SET_SLOT(res, Matrix_pSym, p);
+		Matrix_memset(pp, 0, (R_xlen_t) rdim[!margin] + 1, sizeof(int));
+
+		if (rdim[0] == 0 || rdim[1] == 0) {
+			UNPROTECT(1);
+			return;
+		}
+
+		SEXP sp;
+		int *psp, j, n = rdim[!margin];
 		++pp;
 		for (a = args; a != R_NilValue; a = CDR(a)) {
 			s = CAR(a);
@@ -637,6 +680,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi, *work, k, kend, pos = 0;
+		SET_SLOT(res, iSym, i);
 		Matrix_Calloc(work, n, int);
 		Matrix_memcpy(work, pp, n, sizeof(int));
 
@@ -672,16 +716,17 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_C0R1(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
-			BIND_CASES(BIND_C0R1);
 			SET_SLOT(res, Matrix_xSym, x);
+			BIND_CASES(BIND_C0R1);
 			UNPROTECT(1);
 		}
-		SET_SLOT(res, Matrix_pSym, p);
-		SET_SLOT(res, iSym, i);
 		UNPROTECT(2);
 		Matrix_Free(work, n);
 
 	} else if (repr == 'T') {
+
+		if (rdim[0] == 0 || rdim[1] == 0)
+			return;
 
 		R_xlen_t k, nnz = 0;
 		for (a = args; a != R_NilValue; a = CDR(a)) {
@@ -698,6 +743,8 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			i = PROTECT(allocVector(INTSXP, nnz)),
 			j = PROTECT(allocVector(INTSXP, nnz));
 		int *psi, *psj, *pi = INTEGER(i), *pj = INTEGER(j), pos = 0;
+		SET_SLOT(res, Matrix_iSym, i);
+		SET_SLOT(res, Matrix_jSym, j);
 
 #define BIND_T(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -736,12 +783,10 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_T(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
-			BIND_CASES(BIND_T);
 			SET_SLOT(res, Matrix_xSym, x);
+			BIND_CASES(BIND_T);
 			UNPROTECT(1);
 		}
-		SET_SLOT(res, Matrix_iSym, i);
-		SET_SLOT(res, Matrix_jSym, j);
 		UNPROTECT(2);
 
 	} else {
@@ -778,6 +823,9 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	char kind, repr;
 	scanArgs(args, exprs, margin, level,
 	         rdim, rdimnames, &kind, &repr);
+	if (rdim[!margin] < 0)
+		/* Arguments are all NULL */
+		return R_NilValue;
 	if (repr == 'e' && (Matrix_int_fast64_t) rdim[0] * rdim[1] > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
 	char rcl[] = "...Matrix";
@@ -810,7 +858,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 			PROTECT(marnames = allocVector(STRSXP, rdim[margin]));
 		for (a = args, e = exprs; a != R_NilValue; a = CDR(a), e = CDR(e)) {
 			s = CAR(a);
-			if (s == R_NilValue)
+			if (s == R_NilValue && rdim[!margin] > 0)
 				continue;
 			nms[0] = nms[1] = R_NilValue;
 			if (IS_S4_OBJECT(s)) {
@@ -848,7 +896,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 					} else if (level == 1 && TYPEOF(CAR(e)) == SYMSXP)
 						nms[margin] = coerceVector(CAR(e), STRSXP);
 				} else
-					r = 0;
+					continue;
 			}
 			if (rdimnames[!margin] && nms[!margin] != R_NilValue) {
 				SET_VECTOR_ELT(dimnames, !margin, nms[!margin]);
