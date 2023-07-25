@@ -2723,7 +2723,7 @@ SEXP MJ_sparse_as_Csparse(SEXP from, const char *class)
 			trans(p0, i0, NULL, p1, i1, NULL, n, m);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = PROTECT(allocVector(TYPEOF(from), INTEGER(p0)[m]));
+				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[m]));
 			SET_SLOT(to, Matrix_xSym, x1);
 			trans(p0, i0, x0, p1, i1, x1, n, m);
 			UNPROTECT(2); /* x1, x0 */
@@ -2819,7 +2819,7 @@ SEXP MJ_sparse_as_Rsparse(SEXP from, const char *class)
 			trans(p0, i0, NULL, p1, i1, NULL, m, n);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = PROTECT(allocVector(TYPEOF(from), INTEGER(p0)[n]));
+				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[n]));
 			SET_SLOT(to, Matrix_xSym, x1);
 			trans(p0, i0, x0, p1, i1, x1, m, n);
 			UNPROTECT(2); /* x1, x0 */
