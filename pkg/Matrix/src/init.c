@@ -2,7 +2,9 @@
 #include "Csparse.h"
 #include "CHMfactor.h"
 #include "abIndex.h"
+#include "bind.h"
 #include "chm_common.h"
+#include "coerce.h"
 #include "dense.h"
 #include "dgCMatrix.h"
 #include "dgeMatrix.h"
@@ -297,11 +299,40 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(v2spV, 1),
 	CALLDEF(CR2spV, 1),
 
+	CALLDEF(MJ_R_matrix_as_dense, 4),
+	CALLDEF(MJ_R_sparse_as_dense, 2),
+	CALLDEF(MJ_R_diagonal_as_dense, 3),
+	CALLDEF(MJ_R_index_as_dense, 2),
+	CALLDEF(MJ_R_matrix_as_sparse, 4),
+	CALLDEF(MJ_R_dense_as_sparse, 2),
+	CALLDEF(MJ_R_diagonal_as_sparse, 3),
+	CALLDEF(MJ_R_index_as_sparse, 3),
+	CALLDEF(MJ_R_dense_as_kind, 2),
+	CALLDEF(MJ_R_sparse_as_kind, 2),
+	CALLDEF(MJ_R_diagonal_as_kind, 2),
+	CALLDEF(MJ_R_index_as_kind, 2),
+	CALLDEF(MJ_R_dense_as_general, 1),
+	CALLDEF(MJ_R_sparse_as_general, 1),
+	CALLDEF(MJ_R_dense_as_unpacked, 1),
+	CALLDEF(MJ_R_dense_as_packed, 3),
+	CALLDEF(MJ_R_sparse_as_Csparse, 1),
+	CALLDEF(MJ_R_sparse_as_Rsparse, 1),
+	CALLDEF(MJ_R_sparse_as_Tsparse, 1),
+	CALLDEF(MJ_R_Matrix_as_vector, 1),
+	CALLDEF(MJ_R_Matrix_as_matrix, 1),
+	CALLDEF(MJ_R_Matrix_as_unpacked, 1),
+	CALLDEF(MJ_R_Matrix_as_packed, 1),
+	CALLDEF(MJ_R_Matrix_as_Csparse, 1),
+	CALLDEF(MJ_R_Matrix_as_Rsparse, 1),
+	CALLDEF(MJ_R_Matrix_as_Tsparse, 1),
+	CALLDEF(MJ_R_Matrix_as_kind, 2),
+
 	{NULL, NULL, 0}
 };
 
 static const R_ExternalMethodDef ExtEntries[] = {
 	EXTDEF(Mmatrix, 7),
+	EXTDEF(R_bind, -1),
 	{NULL, NULL, 0}
 };
 

@@ -3,7 +3,9 @@ SOURCES_C =  \
 	Csparse.c \
 	init.c \
 	Mutils.c \
+	bind.c \
 	chm_common.c \
+	coerce.c \
 	cs.c \
 	cs_utils.c \
 	dense.c \
