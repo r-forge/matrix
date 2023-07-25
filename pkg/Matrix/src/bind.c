@@ -218,11 +218,19 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 	}
 
 	if (anyZ)
+#ifdef MATRIX_ENABLE_ZMATRIX
 		*kind = 'z';
+#else
+		error(_("complex matrices are not yet supported"));
+#endif
 	else if (anyD)
 		*kind = 'd';
 	else if (anyI)
+#ifdef MATRIX_ENABLE_IMATRIX
 		*kind = 'i';
+#else
+		*kind = 'd';
+#endif
 	else if (anyL)
 		*kind = 'l';
 	else if (anyN)
