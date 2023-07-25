@@ -3,7 +3,7 @@
 
 ## GOAL: write methods that preallocate, i.e., do _not_ use [cr]bind2,
 ##       and maybe implement c.Matrix and *.sparseVector similarly ... ?
-if(FALSE) {
+if(TRUE) {
 .cbind <- function(..., deparse.level = 1)
     .External(R_bind, deparse.level, 1L, substitute(list(...)), ...)
 .rbind <- function(..., deparse.level = 1)

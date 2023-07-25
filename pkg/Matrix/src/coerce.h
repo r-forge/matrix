@@ -98,4 +98,6 @@ SEXP MJ_R_Matrix_as_Rsparse(SEXP from);
 
 SEXP MJ_R_Matrix_as_Tsparse(SEXP from);
 
+SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind);
+
 #endif
