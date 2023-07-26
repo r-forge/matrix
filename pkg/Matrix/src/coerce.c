@@ -518,12 +518,13 @@ SEXP MJ_R_sparse_as_dense(SEXP from, SEXP packed)
 	return MJ_sparse_as_dense(from, valid[ivalid], packed_);
 }
 
-SEXP MJ_diagonal_as_dense(SEXP from, const char *class, const char *zzz, char ul)
+SEXP MJ_diagonal_as_dense(SEXP from, const char *class,
+                          char shape, int packed, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? class[0] : zzz[0];
-	cl[1] = zzz[1];
-	cl[2] = zzz[2];
+	cl[0] = class[0];
+	cl[1] = shape;
+	cl[2] = (cl[1] == 'g') ? 'e' : ((packed) ? 'p' : ((cl[1] == 's') ? 'y' : 'r'));
 	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -601,32 +602,35 @@ SEXP MJ_diagonal_as_dense(SEXP from, const char *class, const char *zzz, char ul
 }
 
 /* as(<diagonalMatrix>, ".(ge|sy|sp|tr|tp)Matrix") */
-SEXP MJ_R_diagonal_as_dense(SEXP from, SEXP class, SEXP uplo)
+SEXP MJ_R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
 {
 	static const char *valid[] = { VALID_DIAGONAL, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz              )[1] == '\0' ||
-	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
-	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
-	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("invalid '%s' to '%s()'"), "class", __func__);
+	char shape_;
+	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
+	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
+	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
+		error(_("invalid '%s' to '%s()'"), "shape", __func__);
 
+	int packed_ = 0;
+	if (shape_ != 'g') {
+		if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
+		    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
+			error(_("invalid '%s' to '%s()'"), "packed", __func__);
+	}
+	
 	char ul = 'U';
-	if (zzz[1] != 'g') {
+	if (shape_ != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
 	}
 
-	return MJ_diagonal_as_dense(from, valid[ivalid], zzz, ul);
+	return MJ_diagonal_as_dense(from, valid[ivalid], shape_, packed_, ul);
 }
 
 SEXP MJ_index_as_dense(SEXP from, const char *class, char kind)
@@ -1199,12 +1203,13 @@ SEXP MJ_R_dense_as_sparse(SEXP from, SEXP repr)
 	return MJ_dense_as_sparse(from, valid[ivalid], repr_);
 }
 
-SEXP MJ_diagonal_as_sparse(SEXP from, const char *class, const char *zzz, char ul)
+SEXP MJ_diagonal_as_sparse(SEXP from, const char *class,
+                           char shape, char repr, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? class[0] : zzz[0];
-	cl[1] = zzz[1];
-	cl[2] = zzz[2];
+	cl[0] = class[0];
+	cl[1] = shape;
+	cl[2] = repr;
 	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -1362,30 +1367,34 @@ SEXP MJ_diagonal_as_sparse(SEXP from, const char *class, const char *zzz, char u
 }
 
 /* as(<diagonalMatrix>, ".[gst][CRT]Matrix") */
-SEXP MJ_R_diagonal_as_sparse(SEXP from, SEXP class, SEXP uplo)
+SEXP MJ_R_diagonal_as_sparse(SEXP from, SEXP shape, SEXP repr, SEXP uplo)
 {
 	static const char *valid[] = { VALID_DIAGONAL, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
-	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("invalid '%s' to '%s()'"), "class", __func__);
+	char shape_;
+	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
+	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
+	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
+		error(_("invalid '%s' to '%s()'"), "shape", __func__);
+
+	char repr_;
+	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
+	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
+	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
+		error(_("invalid '%s' to '%s()'"), "repr", __func__);
 
 	char ul = 'U';
-	if (zzz[1] != 'g') {
+	if (shape_ != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
 	}
 
-	return MJ_diagonal_as_sparse(from, valid[ivalid], zzz, ul);
+	return MJ_diagonal_as_sparse(from, valid[ivalid], shape_, repr_, ul);
 }
 
 SEXP MJ_index_as_sparse(SEXP from, const char *class, char kind, char repr)
@@ -1503,7 +1512,8 @@ SEXP MJ_R_index_as_sparse(SEXP from, SEXP kind, SEXP repr)
 	char repr_;
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
-	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
+	    ((repr_ = CHAR(repr)[0]) != '.' &&
+	     repr_ != 'C' && repr_ != 'R' && repr_ != 'T'))
 		error(_("invalid '%s' to '%s()'"), "repr", __func__);
 
 	return MJ_index_as_sparse(from, valid[ivalid], kind_, repr_);
@@ -3015,7 +3025,7 @@ SEXP MJ_R_Matrix_as_vector(SEXP from)
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(from = MJ_diagonal_as_dense(from, cl, ".ge", '\0'), pid);
+		REPROTECT(from = MJ_diagonal_as_dense(from, cl, 'g', 0, '\0'), pid);
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'd':
@@ -3079,7 +3089,7 @@ SEXP MJ_R_Matrix_as_matrix(SEXP from)
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(from = MJ_diagonal_as_dense(from, cl, ".ge", '\0'), pid);
+		REPROTECT(from = MJ_diagonal_as_dense(from, cl, 'g', 0, '\0'), pid);
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'd':
@@ -3135,7 +3145,7 @@ SEXP MJ_R_Matrix_as_unpacked(SEXP from)
 	case 'T':
 		return MJ_sparse_as_dense(from, cl, 0);
 	case 'i':
-		return MJ_diagonal_as_dense(from, cl, ".tr", 'U');
+		return MJ_diagonal_as_dense(from, cl, 't', 0, 'U');
 	case 'd':
 		return MJ_index_as_dense(from, cl, 'n');
 	default:
@@ -3166,7 +3176,7 @@ SEXP MJ_R_Matrix_as_packed(SEXP from)
 	case 'T':
 		return MJ_sparse_as_dense(from, cl, 1);
 	case 'i':
-		return MJ_diagonal_as_dense(from, cl, ".tp", 'U');
+		return MJ_diagonal_as_dense(from, cl, 't', 1, 'U');
 	default:
 		return R_NilValue;
 	}
@@ -3192,7 +3202,7 @@ SEXP MJ_R_Matrix_as_Csparse(SEXP from)
 	case 'T':
 		return MJ_sparse_as_Csparse(from, cl);
 	case 'i':
-		return MJ_diagonal_as_sparse(from, cl, ".tC", 'U');
+		return MJ_diagonal_as_sparse(from, cl, 't', 'C', 'U');
 	case 'd':
 		return MJ_index_as_sparse(from, cl, 'n', 'C');
 	default:
@@ -3220,7 +3230,7 @@ SEXP MJ_R_Matrix_as_Rsparse(SEXP from)
 	case 'T':
 		return MJ_sparse_as_Rsparse(from, cl);
 	case 'i':
-		return MJ_diagonal_as_sparse(from, cl, ".tR", 'U');
+		return MJ_diagonal_as_sparse(from, cl, 't', 'C', 'U');
 	case 'd':
 		return MJ_index_as_sparse(from, cl, 'n', 'R');
 	default:
@@ -3248,7 +3258,7 @@ SEXP MJ_R_Matrix_as_Tsparse(SEXP from)
 	case 'T':
 		return MJ_sparse_as_Rsparse(from, cl);
 	case 'i':
-		return MJ_diagonal_as_sparse(from, cl, ".tT", 'U');
+		return MJ_diagonal_as_sparse(from, cl, 't', 'T', 'U');
 	case 'd':
 		return MJ_index_as_sparse(from, cl, 'n', 'T');
 	default:
@@ -3288,4 +3298,61 @@ SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind)
 	default:
 		return R_NilValue;
 	}
+}
+
+/* as(as(<Matrix>, "[nlidz]Matrix"), "generalMatrix") */
+SEXP MJ_R_Matrix_as_general(SEXP from, SEXP kind)
+{
+	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+
+	char kind_;
+	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	    (kind_ = CHAR(kind)[0]) == '\0')
+		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(from, &pid);
+
+	char cl_[] = "...Matrix";
+	cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+	cl_[1] = cl[1];
+	cl_[2] = cl[2];
+
+	switch (cl[2]) {
+	case 'e':
+	case 'y':
+	case 'r':
+	case 'p':
+	{
+		REPROTECT(from = MJ_dense_as_kind(from, cl, kind_), pid);
+		int new = (cl[0] == cl_[0]) || ((cl[0] == 'n' && cl_[0] == 'l') ||
+		                                (cl[0] == 'l' && cl_[0] == 'n'));
+		REPROTECT(from = MJ_dense_as_general(from, cl_, new), pid);
+		break;
+	}
+	case 'C':
+	case 'R':
+	case 'T':
+		REPROTECT(from = MJ_sparse_as_kind(from, cl, kind_), pid);
+		REPROTECT(from = MJ_sparse_as_general(from, cl_), pid);
+		break;;
+	case 'i':
+		REPROTECT(from = MJ_diagonal_as_kind(from, cl, kind_), pid);
+		REPROTECT(from = MJ_diagonal_as_sparse(from, cl_, 'g', 'C', '\0'), pid);
+		break;
+	case 'd':
+		/* indMatrix extends generalMatrix, but we typically want this: */
+		REPROTECT(from = MJ_index_as_sparse(from, cl, kind_, '.'), pid);
+		break;
+	default:
+		break;
+	}
+
+	UNPROTECT(1);
+	return from;
 }

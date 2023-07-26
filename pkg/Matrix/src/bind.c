@@ -357,7 +357,7 @@ static void coerceArgs(SEXP args, int margin,
 {
 	SEXP a, s, tmp;
 	int ivalid, isM;
-	char nscl[] = "...Matrix";
+	char scl_[] = "...Matrix";
 	const char *scl;
 
 	for (a = args; a != R_NilValue; a = CDR(a)) {
@@ -377,18 +377,18 @@ static void coerceArgs(SEXP args, int margin,
 				switch (repr) {
 				case 'e':
 					REPROTECT(s = MJ_dense_as_kind(s, scl, kind), pid);
-					nscl[0] = kind; nscl[1] = scl[1]; nscl[2] = scl[2];
+					scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
 					REPROTECT(s = MJ_dense_as_general(
-						s, nscl, kind2type(kind) == kind2type(scl[0])), pid);
+						s, scl_, kind2type(kind) == kind2type(scl[0])), pid);
 					break;
 				case 'C':
 				case 'R':
 				case 'T':
 					REPROTECT(s = MJ_dense_as_sparse(s, scl, repr), pid);
-					nscl[0] = scl[0]; nscl[1] = scl[1]; nscl[2] = repr;
-					REPROTECT(s = MJ_sparse_as_kind(s, nscl, kind), pid);
-					nscl[0] = kind;
-					REPROTECT(s = MJ_sparse_as_general(s, nscl), pid);
+					scl_[0] = scl[0]; scl_[1] = scl[1]; scl_[2] = repr;
+					REPROTECT(s = MJ_sparse_as_kind(s, scl_, kind), pid);
+					scl_[0] = kind;
+					REPROTECT(s = MJ_sparse_as_general(s, scl_), pid);
 					break;
 				default:
 					break;
@@ -398,21 +398,21 @@ static void coerceArgs(SEXP args, int margin,
 			case 'R':
 			case 'T':
 				REPROTECT(s = MJ_sparse_as_kind(s, scl, kind), pid);
-				nscl[0] = kind; nscl[1] = scl[1]; nscl[2] = scl[2];
-				REPROTECT(s = MJ_sparse_as_general(s, nscl), pid);
-				nscl[1] = 'g';
+				scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
+				REPROTECT(s = MJ_sparse_as_general(s, scl_), pid);
+				scl_[1] = 'g';
 				switch (repr) {
 				case 'e':
-					REPROTECT(s = MJ_sparse_as_dense(s, nscl, 0), pid);
+					REPROTECT(s = MJ_sparse_as_dense(s, scl_, 0), pid);
 					break;
 				case 'C':
-					REPROTECT(s = MJ_sparse_as_Csparse(s, nscl), pid);
+					REPROTECT(s = MJ_sparse_as_Csparse(s, scl_), pid);
 					break;
 				case 'R':
-					REPROTECT(s = MJ_sparse_as_Rsparse(s, nscl), pid);
+					REPROTECT(s = MJ_sparse_as_Rsparse(s, scl_), pid);
 					break;
 				case 'T':
-					REPROTECT(s = MJ_sparse_as_Tsparse(s, nscl), pid);
+					REPROTECT(s = MJ_sparse_as_Tsparse(s, scl_), pid);
 					break;
 				default:
 					break;
@@ -420,19 +420,16 @@ static void coerceArgs(SEXP args, int margin,
 				break;
 			case 'i':
 				REPROTECT(s = MJ_diagonal_as_kind(s, scl, kind), pid);
-				nscl[0] = kind; nscl[1] = 'd'; nscl[2] = 'i';
+				scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
 				switch (repr) {
 				case 'e':
-					REPROTECT(s = MJ_diagonal_as_dense(s, nscl, ".ge", '\0'), pid);
+					REPROTECT(s = MJ_diagonal_as_dense(s, scl_, 'g', 0, '\0'), pid);
 					break;
 				case 'C':
 				case 'R':
 				case 'T':
-				{
-					char zzz[] = ".g."; zzz[2] = repr;
-					REPROTECT(s = MJ_diagonal_as_sparse(s, nscl, zzz, '\0'), pid);
+					REPROTECT(s = MJ_diagonal_as_sparse(s, scl_, 'g', repr, '\0'), pid);
 					break;
-				}
 				default:
 					break;
 				}
@@ -470,9 +467,9 @@ static void coerceArgs(SEXP args, int margin,
 						call = PROTECT(lang3(replen, s, lengthout));
 					REPROTECT(s = eval(call, R_GlobalEnv), pid);
 				}
-				nscl[1] = 'g';
-				nscl[2] = repr;
-				REPROTECT(s = MJ_matrix_as_sparse(s, nscl, '\0', '\0', !margin), pid);
+				scl_[1] = 'g';
+				scl_[2] = repr;
+				REPROTECT(s = MJ_matrix_as_sparse(s, scl_, '\0', '\0', !margin), pid);
 			}
 		}
 		SETCAR(a, s);

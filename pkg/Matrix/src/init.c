@@ -301,11 +301,11 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(MJ_R_matrix_as_dense, 4),
 	CALLDEF(MJ_R_sparse_as_dense, 2),
-	CALLDEF(MJ_R_diagonal_as_dense, 3),
+	CALLDEF(MJ_R_diagonal_as_dense, 4),
 	CALLDEF(MJ_R_index_as_dense, 2),
 	CALLDEF(MJ_R_matrix_as_sparse, 4),
 	CALLDEF(MJ_R_dense_as_sparse, 2),
-	CALLDEF(MJ_R_diagonal_as_sparse, 3),
+	CALLDEF(MJ_R_diagonal_as_sparse, 4),
 	CALLDEF(MJ_R_index_as_sparse, 3),
 	CALLDEF(MJ_R_dense_as_kind, 2),
 	CALLDEF(MJ_R_sparse_as_kind, 2),
@@ -326,6 +326,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(MJ_R_Matrix_as_Rsparse, 1),
 	CALLDEF(MJ_R_Matrix_as_Tsparse, 1),
 	CALLDEF(MJ_R_Matrix_as_kind, 2),
+	CALLDEF(MJ_R_Matrix_as_general, 2),
 
 	{NULL, NULL, 0}
 };
