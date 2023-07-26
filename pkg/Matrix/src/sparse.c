@@ -1128,11 +1128,14 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind)
 */
 SEXP R_sparse_drop0(SEXP from)
 {
-	static const char *valid[] = { VALID_DSPARSE, VALID_LSPARSE, "" };
+	static const char *valid[] = {
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
 	int ivalid = R_check_class_etc(from, valid), nprotect = 0;
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, "R_sparse_drop0");
 	const char *cl = valid[ivalid];
+	if (cl[0] == 'n')
+		return from;
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), p0 = NULL;
 	++nprotect;
