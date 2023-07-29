@@ -250,6 +250,7 @@ SEXP Csparse_dmperm(SEXP mat, SEXP seed, SEXP nAns) {
       }
     }
     setAttrib(ans, R_NamesSymbol, nms);
+    DMp = cs_dfree(DMp);
     UNPROTECT(2);
     return ans;
 }
