@@ -2014,7 +2014,7 @@ SEXP MJ_sparse_as_general(SEXP from, const char *class)
 			for (j = 0; j < n; ++j)
 				pp1[j] += pp0[j];
 		} else {
-			if (n > INT_MAX - pp1[n - 1])
+			if (n > INT_MAX - pp0[n - 1])
 				error(_("attempt to construct sparseMatrix with more than 2^31-1 nonzero entries"));
 			for (j = 0; j < n; ++j)
 				pp1[j] = pp0[j] + j + 1;
@@ -2879,21 +2879,21 @@ SEXP MJ_sparse_as_Csparse(SEXP from, const char *class)
 
 	if (class[2] == 'R') {
 		SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
-			i0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
+			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 			i1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[m]));
 		SET_SLOT(to, Matrix_pSym, p1);
 		SET_SLOT(to, Matrix_iSym, i1);
 		if (class[0] == 'n')
-			trans(p0, i0, NULL, p1, i1, NULL, n, m);
+			trans(p0, j0, NULL, p1, i1, NULL, n, m);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[m]));
 			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, i0, x0, p1, i1, x1, n, m);
+			trans(p0, j0, x0, p1, i1, x1, n, m);
 			UNPROTECT(2); /* x1, x0 */
 		}
-		UNPROTECT(4); /* i1, p1, i0, p0 */
+		UNPROTECT(4); /* i1, p1, j0, p0 */
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
@@ -2904,7 +2904,7 @@ SEXP MJ_sparse_as_Csparse(SEXP from, const char *class)
 			PROTECT(i1);
 			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to, Matrix_iSym, i1);
-			UNPROTECT(1); /* i1, p1 */
+			UNPROTECT(2); /* i1, p1 */
 		} else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = NULL;
@@ -2980,19 +2980,19 @@ SEXP MJ_sparse_as_Rsparse(SEXP from, const char *class)
 		SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) m + 1)),
-			i1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[n]));
+			j1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[n]));
 		SET_SLOT(to, Matrix_pSym, p1);
-		SET_SLOT(to, Matrix_jSym, i1);
+		SET_SLOT(to, Matrix_jSym, j1);
 		if (class[0] == 'n')
-			trans(p0, i0, NULL, p1, i1, NULL, m, n);
+			trans(p0, i0, NULL, p1, j1, NULL, m, n);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[n]));
 			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, i0, x0, p1, i1, x1, m, n);
+			trans(p0, i0, x0, p1, j1, x1, m, n);
 			UNPROTECT(2); /* x1, x0 */
 		}
-		UNPROTECT(4); /* i1, p1, i0, p0 */
+		UNPROTECT(4); /* j1, p1, i0, p0 */
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
