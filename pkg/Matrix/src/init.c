@@ -325,7 +325,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(MJ_R_Matrix_as_Csparse, 1),
 	CALLDEF(MJ_R_Matrix_as_Rsparse, 1),
 	CALLDEF(MJ_R_Matrix_as_Tsparse, 1),
-	CALLDEF(MJ_R_Matrix_as_kind, 2),
+	CALLDEF(MJ_R_Matrix_as_kind, 3),
 	CALLDEF(MJ_R_Matrix_as_general, 2),
 
 	{NULL, NULL, 0}

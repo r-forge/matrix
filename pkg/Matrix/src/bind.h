@@ -3,9 +3,6 @@
 
 #include "Mutils.h"
 
-/* defined in ./sparse.c : */
-SEXP Tsparse_aggregate(SEXP);
-
 SEXP R_bind(SEXP args);
 
 #endif
