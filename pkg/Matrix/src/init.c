@@ -39,7 +39,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Csparse_Csparse_prod, 3),
 	CALLDEF(Csparse_Csparse_crossprod, 4),
 	CALLDEF(Csparse_MatrixMarket, 2),
-	CALLDEF(Csparse_crossprod, 4),
+	CALLDEF(Csparse_crossprod, 3),
 	CALLDEF(Csparse_dense_crossprod, 3),
 	CALLDEF(Csparse_dense_prod, 3),
 	CALLDEF(Csparse_drop, 2),

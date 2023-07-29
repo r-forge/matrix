@@ -416,7 +416,7 @@ setMethod("crossprod", signature(x = "dtpMatrix", y = "matrix"),
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "missing"),
 	  function(x, y = NULL, boolArith=NA, ...)
-	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = FALSE, boolArith=boolArith))
+	      .Call(Csparse_crossprod, x, trans = FALSE, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 	  function(x, y = NULL, boolArith = NA, ...)
@@ -445,7 +445,7 @@ setMethod("crossprod", signature(x = "CsparseMatrix", y = "numLike"),
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL, boolArith = NA, ...)
-	      .Call(Csparse_crossprod, x, trans = FALSE, triplet = TRUE, boolArith=boolArith))
+	      .Call(Csparse_crossprod, x, trans = FALSE, boolArith=boolArith))
 
 setMethod("crossprod", signature(x = "TsparseMatrix", y = "ANY"),
 	  function(x, y = NULL, boolArith = NA, ...)
@@ -789,7 +789,7 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "CsparseMatrix"),
 
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "missing"),
 	  function(x, y = NULL, boolArith = NA, ...)
-	      .Call(Csparse_crossprod, x, trans = TRUE, triplet = FALSE, boolArith=boolArith))
+	      .Call(Csparse_crossprod, x, trans = TRUE, boolArith=boolArith))
 
 for(dmat in c("ddenseMatrix", "matrix")) {
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = dmat),
@@ -837,8 +837,7 @@ rm(.sCMatrix, tcr.dd.sC)
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "missing"),
 	  function(x, y = NULL, boolArith = NA, ...)
-	      .Call(Csparse_crossprod, x, trans = TRUE, triplet = TRUE,
-		    boolArith=boolArith))
+	      .Call(Csparse_crossprod, x, trans = TRUE, boolArith=boolArith))
 
 setMethod("tcrossprod", signature(x = "ANY", y = "TsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
