@@ -2,7 +2,7 @@
 #include "chm_common.h"
 
 /* defined in ./coerce.c : */
-MJ_sparse_as_kind(SEXP, const char *, char);
+SEXP MJ_sparse_as_kind(SEXP, const char *, char);
 
 SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
 {
