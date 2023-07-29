@@ -96,9 +96,13 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				anyRsparse = 1;
 				break;
 			case 'T':
+			{
+				/* defined in ./sparse.c : */
+				SEXP Tsparse_aggregate(SEXP);
 				SETCAR(a, Tsparse_aggregate(s));
 				anyTsparse = 1;
 				break;
+			}
 			case 'i':
 				anyDiagonal = 1;
 				break;

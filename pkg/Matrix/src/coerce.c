@@ -60,12 +60,10 @@ SEXP MJ_matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		error(_("attempt to construct symmetricMatrix or triangularMatrix from non-square matrix"));
 
 	if (doDN) {
-		if (cl[1] == 's')
-			set_symmetrized_DimNames(to, dimnames, -1);
-		else if (isM && new > 1)
-			set_DimNames(to, dimnames);
-		else
+		if (cl[1] != 's')
 			SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+		else
+			set_symmetrized_DimNames(to, dimnames, -1);			
 	}
 
 	if (cl[1] != 'g' && ul != 'U') {
@@ -90,9 +88,9 @@ SEXP MJ_matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 
 	if (cl[2] != 'p') {
 
-		if (tf != tt || new < 0 || (new == 0 && !MAYBE_REFERENCED(from))) {
+		if (!new || tf != tt || !MAYBE_REFERENCED(from)) {
 			x = from;
-			if (new >= 0 && ATTRIB(x) != R_NilValue) {
+			if (new && ATTRIB(x) != R_NilValue) {
 				SET_ATTRIB(x, R_NilValue);
 				if (OBJECT(x))
 					SET_OBJECT(x, 0);
@@ -194,7 +192,7 @@ SEXP MJ_R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag)
 		}
 	}
 
-	return MJ_matrix_as_dense(from, zzz, ul, di, 0, 0);
+	return MJ_matrix_as_dense(from, zzz, ul, di, 0, 1);
 }
 
 SEXP MJ_sparse_as_dense(SEXP from, const char *class, int packed)
@@ -561,6 +559,7 @@ SEXP MJ_diagonal_as_dense(SEXP from, const char *class,
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) len));
+	SET_SLOT(to, Matrix_xSym, x1);
 
 #define DAD_SUBCASES(_CTYPE_, _PTR_, _PREFIX_) \
 	do { \
@@ -621,7 +620,7 @@ SEXP MJ_R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
 		    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
 			error(_("invalid '%s' to '%s()'"), "packed", __func__);
 	}
-	
+
 	char ul = 'U';
 	if (shape_ != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
@@ -645,7 +644,7 @@ SEXP MJ_index_as_dense(SEXP from, const char *class, char kind)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	Matrix_int_fast64_t len = (Matrix_int_fast64_t) n * n;
+	Matrix_int_fast64_t len = (Matrix_int_fast64_t) m * n;
 	if (len > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
 	double bytes = (double) len * kind2size(cl[0]);
@@ -730,7 +729,7 @@ SEXP MJ_matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : 'r');
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
-	REPROTECT(from = MJ_matrix_as_dense(from, cl, ul, di, transpose_if_vector, -1), pid);
+	REPROTECT(from = MJ_matrix_as_dense(from, cl, ul, di, transpose_if_vector, 1), pid);
 	REPROTECT(from = MJ_dense_as_sparse(from, cl, zzz[2]), pid);
 	cl[2] = zzz[2];
 	REPROTECT(from = MJ_sparse_as_kind(from, cl, zzz[0]), pid);
@@ -1315,12 +1314,12 @@ SEXP MJ_diagonal_as_sparse(SEXP from, const char *class,
 		}
 	}
 
-	if (di != 'N' && cl[1] == 't') {
+	if (cl[1] == 't' && di != 'N') {
 		UNPROTECT(2); /* x0, to */
 		return to;
 	}
 
-	SEXP i = PROTECT(allocVector(INTSXP, n));
+	SEXP i = PROTECT(allocVector(INTSXP, nnz));
 	if (cl[2] != 'T')
 		SET_SLOT(to, (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym, i);
 	else {
@@ -1339,8 +1338,8 @@ SEXP MJ_diagonal_as_sparse(SEXP from, const char *class,
 				if (_NZ_(*px0)) { \
 					*(pi++) = d; \
 					_MASK_(*(px1++) = *px0); \
-					++px0; \
 				} \
+				++px0; \
 			} \
 		} else { \
 			for (d = 0; d < n; ++d) { \
@@ -1352,7 +1351,7 @@ SEXP MJ_diagonal_as_sparse(SEXP from, const char *class,
 
 	if (class[0] == 'n')
 		DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
-	else if (nnz == n) {
+	else if (di == 'N' && nnz == n) {
 		SET_SLOT(to, Matrix_xSym, x0);
 		DAS_CASES(HIDE);
 	} else {
@@ -1440,7 +1439,7 @@ SEXP MJ_index_as_sparse(SEXP from, const char *class, char kind, char repr)
 			*(pp++) = k;
 			*(pi++) = *(pperm++) - 1;
 		}
-		pp[r] = r;
+		*pp = r;
 		SET_SLOT(to, Matrix_pSym, p);
 		SET_SLOT(to, (mg != 0) ? Matrix_iSym : Matrix_jSym, i);
 	} else {
@@ -1608,8 +1607,11 @@ SEXP MJ_sparse_as_kind(SEXP from, const char *class, char kind)
 	SEXPTYPE tt = kind2type(kind);
 
 	if (class[2] == 'T' && (class[0] == 'n' || class[0] == 'l') &&
-	    kind != 'n' && kind != 'l')
+	    kind != 'n' && kind != 'l') {
+		/* defined in ./sparse.c : */
+		SEXP Tsparse_aggregate(SEXP);
 		from = Tsparse_aggregate(from);
+	}
 	PROTECT(from);
 
 	char cl[] = "...Matrix";
@@ -1827,22 +1829,9 @@ SEXP MJ_R_index_as_kind(SEXP from, SEXP kind)
 
 SEXP MJ_dense_as_general(SEXP from, const char *class, int new)
 {
-	if (class[1] == 'g') {
-		if (new <= 1)
-			return from;
-		/* new > 1: duplicate 'x' and discard 'factors' */
-		SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class)),
-			dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
-			dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym)),
-			x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-			x1 = PROTECT(duplicate(x0));
-		SET_SLOT(to, Matrix_DimSym, dim);
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(5);
-		return to;
-	}
-
+	if (class[1] == 'g')
+		return from;
+	
 	char cl[] = ".geMatrix";
 	cl[0] = class[0];
 	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
@@ -1854,10 +1843,10 @@ SEXP MJ_dense_as_general(SEXP from, const char *class, int new)
 	UNPROTECT(1); /* dim */
 
 	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's')
-		set_symmetrized_DimNames(to, dimnames, -1);
-	else
+	if (class[1] != 's')
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
 	SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
@@ -1952,9 +1941,9 @@ SEXP MJ_sparse_as_general(SEXP from, const char *class)
 
 	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
 	if (class[1] == 's')
-		set_symmetrized_DimNames(to, dimnames, -1);
-	else
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
 	if (class[1] == 's') {
@@ -2129,6 +2118,7 @@ SEXP MJ_sparse_as_general(SEXP from, const char *class)
 			nnz1 = n;
 		if (nnz1 > R_XLEN_T_MAX - nnz0)
 			error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		nnz1 += nnz0;
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
 			j1 = PROTECT(allocVector(INTSXP, nnz1));
@@ -2421,15 +2411,15 @@ SEXP MJ_R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    ((diag = STRING_ELT(diag, 0)) != NA_STRING &&
-		     (di = *CHAR(diag)) != 'N' && di != 'U'))
+		     (di = *CHAR(diag)) != '\0' && di != 'N' && di != 'U'))
 			error(_("invalid '%s' to '%s()'"), "diag", __func__);
 	}
 
 	return MJ_dense_as_packed(from, valid[ivalid], ul, di);
 }
 
-static void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
-                  int m, int n)
+void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
+           int m, int n)
 {
 	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1),
 		*pi0 = INTEGER(i0), *pi1 = INTEGER(i1),
@@ -2487,8 +2477,8 @@ static void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 	return;
 }
 
-static void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP p1, SEXP *i1, SEXP *x1,
-                  int m, int n)
+void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
+           int m, int n)
 {
 	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
 	if (nnz0 > INT_MAX)
@@ -2496,7 +2486,8 @@ static void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP p1, SEXP *i1, SEXP *x1,
 
 	/* FIXME: test for overflow and throw error only in that case */
 
-	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pp1 = INTEGER(p1), *pi1,
+	PROTECT(*p1 = allocVector(INTSXP, (R_xlen_t) n + 1));
+	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pp1 = INTEGER(*p1), *pi1,
 		i, j, r = (m < n) ? n : m;
 	R_xlen_t k, kstart, kend, kend_;
 	*(pp1++) = 0;
@@ -2679,6 +2670,170 @@ static void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP p1, SEXP *i1, SEXP *x1,
 #undef TSORT_LOOP
 
 	Matrix_Free(workA, lwork);
+	UNPROTECT(1); /* *p1 */
+	return;
+}
+
+void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
+           int m, int n)
+{
+	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
+	if (nnz0 > INT_MAX)
+		error(_("unable to aggregate TsparseMatrix with 'i' and 'j' slots of length exceeding 2^31-1"));
+
+	/* FIXME: test for overflow and throw error only in that case */
+
+	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pi1, *pj1,
+		i, j, r = (m < n) ? n : m;
+	R_xlen_t k, kstart, kend, kend_;
+
+	int *workA, *workB, *workC, *pj_;
+	size_t lwork = (size_t) m + r + m + nnz0;
+	Matrix_Calloc(workA, lwork, int);
+	workB = workA + m;
+	workC = workB + r;
+	pj_   = workC + m;
+
+#define TAGGR_LOOP(_CTYPE_, _PTR_, _MASK_, _INCR_) \
+	do { \
+		_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1, *px_); \
+		_MASK_(Matrix_Calloc(px_, nnz0, _CTYPE_)); \
+		 \
+		/* 1. Tabulate column indices in workA[i]                         */ \
+		 \
+		for (k = 0; k < nnz0; ++k) \
+			++workA[pi0[k]]; \
+		 \
+		/* 2. Compute cumulative sum in workA[i], copying to workB[i]     */ \
+		/*                                                                */ \
+		/* workA[i]: number of column indices listed for row i,           */ \
+		/*           incl. duplicates                                     */ \
+		 \
+		for (i = 1; i < m; ++i) \
+			workA[i] += (workB[i] = workA[i - 1]); \
+		 \
+		/* 3. Group column indices and data by row in pj_[k], px_[k]      */ \
+		/*                                                                */ \
+		/* workA[i]: number of column indices listed for row <= i,        */ \
+		/*           incl. duplicates                                     */ \
+		/* workB[i]: number of column indices listed for row <  i,        */ \
+		/*           incl. duplicates                                     */ \
+		 \
+		for (k = 0; k < nnz0; ++k) { \
+			       pj_[workB[pi0[k]]] = pj0[k] ; \
+			_MASK_(px_[workB[pi0[k]]] = px0[k]); \
+			++workB[pi0[k]]; \
+		} \
+		 \
+		/* 4. Gather _unique_ column indices at the front of each group,  */ \
+		/*    aggregating data accordingly; record in workC[i] where      */ \
+		/*    the unique column indices stop and the duplicates begin     */ \
+		/*                                                                */ \
+		/* workB[.]: unused                                               */ \
+		/*   pj_[k]: column indices grouped by row,                       */ \
+		/*           incl. duplicates, unsorted                           */ \
+		/*   px_[k]: corresponding data                                   */ \
+		 \
+		k = 0; \
+		for (j = 0; j < n; ++j) \
+			workB[j] = -1; \
+		for (i = 0; i < m; ++i) { \
+			kstart = kend_ = k; \
+			kend = workA[i]; \
+			while (k < kend) { \
+				if (workB[pj_[k]] < kstart) { \
+					/* Have not yet seen this column index */ \
+					workB[pj_[k]] = kend_; \
+					       pj_[kend_] = pj_[k] ; \
+					_MASK_(px_[kend_] = px_[k]); \
+					++kend_; \
+				} else { \
+					/* Have already seen this column index */ \
+					_MASK_(_INCR_); \
+				} \
+				++k; \
+			} \
+			workC[i] = kend_; \
+			nnz1 += kend_ - kstart; \
+		} \
+		if (nnz1 != nnz0) { \
+			       PROTECT(*i1 = allocVector(    INTSXP, nnz1)) ; \
+			       PROTECT(*j1 = allocVector(    INTSXP, nnz1)) ; \
+			_MASK_(PROTECT(*x1 = allocVector(TYPEOF(x0), nnz1))); \
+			       pi1 = INTEGER(*i1) ; \
+			       pj1 = INTEGER(*j1) ; \
+			_MASK_(px1 =   _PTR_(*x1)); \
+			 \
+			k = 0; \
+			for (i = 0; i < m; ++i) { \
+				kend_ = workC[i]; \
+				while (k < kend_) { \
+					       *(pi1++) =      i ; \
+					       *(pj1++) = pj_[k] ; \
+					_MASK_(*(px1++) = px_[k]); \
+					++k; \
+				} \
+				k = workA[i]; \
+			} \
+			 \
+			_MASK_(UNPROTECT(1)); \
+			       UNPROTECT(2) ; \
+		} \
+		_MASK_(Matrix_Free(px_, nnz0)); \
+	} while (0)
+
+	if (!x0)
+		TAGGR_LOOP(int, LOGICAL, HIDE, );
+	else {
+		switch (TYPEOF(x0)) {
+		case LGLSXP:
+			TAGGR_LOOP(int, LOGICAL, SHOW,
+			           do {
+			               if (px_[k] == NA_LOGICAL) {
+			                   if (px_[workB[pj_[k]]] == 0)
+			                       px_[workB[pj_[k]]] = NA_LOGICAL;
+			               } else if (px_[k] != 0)
+			                  px_[workB[pj_[k]]] = 1;
+			           } while (0));
+			break;
+		case INTSXP:
+			TAGGR_LOOP(int, INTEGER, SHOW,
+
+			           do {
+			               if (px_[workB[pj_[k]]] != NA_INTEGER) {
+			                   if (px_[k] == NA_INTEGER)
+			                       px_[workB[pj_[k]]] = NA_INTEGER;
+			                   else if ((px_[k] < 0)
+			                            ? (px_[workB[pj_[k]]] <= INT_MIN - px_[k])
+			                            : (px_[workB[pj_[k]]] >  INT_MAX - px_[k])) {
+			                       warning(_("NAs produced by integer overflow"));
+			                       px_[workB[pj_[k]]] = NA_INTEGER;
+			                   } else
+			                       px_[workB[pj_[k]]] += px_[k];
+			               }
+			           } while (0));
+			break;
+		case REALSXP:
+			TAGGR_LOOP(double, REAL, SHOW,
+			           do {
+			               px_[workB[pj_[k]]] += px_[k];
+			           } while (0));
+			break;
+		case CPLXSXP:
+			TAGGR_LOOP(Rcomplex, COMPLEX, SHOW,
+			           do {
+			               px_[workB[pj_[k]]].r += px_[k].r;
+			               px_[workB[pj_[k]]].i += px_[k].i;
+			           } while (0));
+			break;
+		default:
+			break;
+		}
+	}
+
+#undef TAGGR_LOOP
+
+	Matrix_Free(workA, lwork);
 	return;
 }
 
@@ -2742,24 +2897,27 @@ SEXP MJ_sparse_as_Csparse(SEXP from, const char *class)
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
-			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
-			i1 = NULL;
+			p1 = NULL, i1 = NULL;
 		if (class[0] == 'n') {
-			tsort(i0, j0, NULL, p1, &i1, NULL, m, n);
+			tsort(i0, j0, NULL, &p1, &i1, NULL, m, n);
+			PROTECT(p1);
 			PROTECT(i1);
+			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to, Matrix_iSym, i1);
-			UNPROTECT(1); /* i1 */
+			UNPROTECT(1); /* i1, p1 */
 		} else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = NULL;
-			tsort(i0, j0, x0, p1, &i1, &x1, m, n);
+			tsort(i0, j0, x0, &p1, &i1, &x1, m, n);
+			PROTECT(p1);
 			PROTECT(i1);
 			PROTECT(x1);
+			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to, Matrix_iSym, i1);
 			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(3); /* x1, i1, x0 */
+			UNPROTECT(4); /* x1, i1, p1, x0 */
 		}
-		UNPROTECT(3); /* p1, j0, i0 */
+		UNPROTECT(2); /* j0, i0 */
 	}
 
 	UNPROTECT(1); /* to */
@@ -2838,24 +2996,27 @@ SEXP MJ_sparse_as_Rsparse(SEXP from, const char *class)
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
-			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) m + 1)),
-			j1 = NULL;
+			p1 = NULL, j1 = NULL;
 		if (class[0] == 'n') {
-			tsort(j0, i0, NULL, p1, &j1, NULL, n, m);
+			tsort(j0, i0, NULL, &p1, &j1, NULL, n, m);
+			PROTECT(p1);
 			PROTECT(j1);
+			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to, Matrix_jSym, j1);
-			UNPROTECT(1); /* j1 */
+			UNPROTECT(2); /* j1, p1 */
 		} else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = NULL;
-			tsort(j0, i0, x0, p1, &j1, &x1, n, m);
+			tsort(j0, i0, x0, &p1, &j1, &x1, n, m);
+			PROTECT(p1);
 			PROTECT(j1);
 			PROTECT(x1);
+			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to, Matrix_jSym, j1);
 			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(3); /* x1, j1, x0 */
+			UNPROTECT(4); /* x1, j1, p1, x0 */
 		}
-		UNPROTECT(3); /* p1, j0, i0 */
+		UNPROTECT(2); /* j0, i0 */
 	}
 
 	UNPROTECT(1); /* to */
@@ -3045,14 +3206,14 @@ SEXP MJ_R_Matrix_as_vector(SEXP from)
 		if (cl[0] == 'n') {
 			PROTECT(to);
 			na2one(to);
-			UNPROTECT(1); /* to */
+			UNPROTECT(1);
 		}
 		break;
 	default:
 		break;
 	}
 
-	UNPROTECT(1); /* from */
+	UNPROTECT(1);
 	return to;
 }
 
@@ -3120,7 +3281,7 @@ SEXP MJ_R_Matrix_as_matrix(SEXP from)
 		break;
 	}
 
-	UNPROTECT(4); /* dimnames, dim, to, from */
+	UNPROTECT(4);
 	return to;
 }
 
@@ -3230,7 +3391,7 @@ SEXP MJ_R_Matrix_as_Rsparse(SEXP from)
 	case 'T':
 		return MJ_sparse_as_Rsparse(from, cl);
 	case 'i':
-		return MJ_diagonal_as_sparse(from, cl, 't', 'C', 'U');
+		return MJ_diagonal_as_sparse(from, cl, 't', 'R', 'U');
 	case 'd':
 		return MJ_index_as_sparse(from, cl, 'n', 'R');
 	default:
@@ -3256,7 +3417,7 @@ SEXP MJ_R_Matrix_as_Tsparse(SEXP from)
 	case 'C':
 	case 'R':
 	case 'T':
-		return MJ_sparse_as_Rsparse(from, cl);
+		return MJ_sparse_as_Tsparse(from, cl);
 	case 'i':
 		return MJ_diagonal_as_sparse(from, cl, 't', 'T', 'U');
 	case 'd':
@@ -3267,7 +3428,7 @@ SEXP MJ_R_Matrix_as_Tsparse(SEXP from)
 }
 
 /* as(<Matrix>, "[nldiz]Matrix") */
-SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind)
+SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 {
 	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
 	int ivalid = R_check_class_etc(from, valid);
@@ -3281,20 +3442,78 @@ SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind)
 	    (kind_ = CHAR(kind)[0]) == '\0')
 		error(_("invalid '%s' to '%s()'"), "kind", __func__);
 
+	if (TYPEOF(sparse) != LGLSXP || LENGTH(sparse) < 1)
+		error(_("invalid '%s' to '%s()'"), "sparse", __func__);
+	int sparse_ = LOGICAL(sparse)[0];
+
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
 	case 'p':
-		return MJ_dense_as_kind(from, cl, kind_);
+		if (sparse_ == NA_LOGICAL || !sparse_)
+			from = MJ_dense_as_kind(from, cl, kind_);
+		else {
+			from = MJ_dense_as_sparse(from, cl, 'C');
+			PROTECT(from);
+			char cl_[] = "..CMatrix";
+			cl_[0] = cl[0];
+			cl_[1] = cl[1];
+			from = MJ_sparse_as_kind(from, cl_, kind_);
+			UNPROTECT(1);
+		}
+		return from;
 	case 'C':
 	case 'R':
 	case 'T':
-		return MJ_sparse_as_kind(from, cl, kind_);
+		from = MJ_sparse_as_kind(from, cl, kind_);
+		if (sparse_ != NA_LOGICAL && !sparse_) {
+			PROTECT(from);
+			char cl_[] = "...Matrix";
+			cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+			cl_[1] = cl[1];
+			cl_[2] = cl[2];
+			from = MJ_sparse_as_dense(from, cl_, 0);
+			UNPROTECT(1);
+		}
+		return from;
 	case 'i':
-		return MJ_diagonal_as_kind(from, cl, kind_);
+		/* Ugly because there is no ndiMatrix,
+		   and because [ld]diMatrix does not extend [ld]sparseMatrix
+		*/
+		if (kind_ != 'n') {
+			from = MJ_diagonal_as_kind(from, cl, kind_);
+			if (sparse_ != NA_LOGICAL) {
+				PROTECT(from);
+				char cl_[] = ".diMatrix";
+				cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+				if (sparse_)
+					from = MJ_diagonal_as_sparse(from, cl_, 't', 'C', 'U');
+				else
+					from = MJ_diagonal_as_dense(from, cl_, 't', 0, 'U');
+				UNPROTECT(1);
+			}
+		} else {
+			from = MJ_diagonal_as_sparse(from, cl, 't', 'C', 'U');
+			PROTECT(from);
+			char cl_[] = ".tCMatrix";
+			cl_[0] = cl[0];
+			from = MJ_sparse_as_kind(from, cl_, 'n');
+			UNPROTECT(1);
+			if (sparse_ != NA_LOGICAL && !sparse_) {
+				PROTECT(from);
+				cl_[0] = 'n';
+				from = MJ_sparse_as_dense(from, cl_, 0);
+				UNPROTECT(1);
+			}
+		}
+		return from;
 	case 'd':
-		return MJ_index_as_kind(from, cl, kind_);
+		if (sparse_ == NA_LOGICAL || sparse_)
+			from = MJ_index_as_sparse(from, cl, kind_, '.');
+		else
+			from = MJ_index_as_dense(from, cl, kind_);
+		return from;
 	default:
 		return R_NilValue;
 	}
@@ -3315,44 +3534,53 @@ SEXP MJ_R_Matrix_as_general(SEXP from, SEXP kind)
 	    (kind_ = CHAR(kind)[0]) == '\0')
 		error(_("invalid '%s' to '%s()'"), "kind", __func__);
 
-	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(from, &pid);
-
-	char cl_[] = "...Matrix";
-	cl_[0] = (kind_ == '.') ? cl[0] : kind_;
-	cl_[1] = cl[1];
-	cl_[2] = cl[2];
-
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
 	case 'p':
 	{
-		REPROTECT(from = MJ_dense_as_kind(from, cl, kind_), pid);
+		char cl_[] = "...Matrix";
+		cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+		cl_[1] = cl[1];
+		cl_[2] = cl[2];
 		int new = (cl[0] == cl_[0]) || ((cl[0] == 'n' && cl_[0] == 'l') ||
 		                                (cl[0] == 'l' && cl_[0] == 'n'));
-		REPROTECT(from = MJ_dense_as_general(from, cl_, new), pid);
-		break;
+		from = MJ_dense_as_kind(from, cl, kind_);
+		PROTECT(from);
+		from = MJ_dense_as_general(from, cl_, new);
+		UNPROTECT(1);
+		return from;
 	}
 	case 'C':
 	case 'R':
 	case 'T':
-		REPROTECT(from = MJ_sparse_as_kind(from, cl, kind_), pid);
-		REPROTECT(from = MJ_sparse_as_general(from, cl_), pid);
-		break;;
-	case 'i':
-		REPROTECT(from = MJ_diagonal_as_kind(from, cl, kind_), pid);
-		REPROTECT(from = MJ_diagonal_as_sparse(from, cl_, 'g', 'C', '\0'), pid);
-		break;
-	case 'd':
-		/* indMatrix extends generalMatrix, but we typically want this: */
-		REPROTECT(from = MJ_index_as_sparse(from, cl, kind_, '.'), pid);
-		break;
-	default:
-		break;
+	{
+		char cl_[] = "...Matrix";
+		cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+		cl_[1] = cl[1];
+		cl_[2] = cl[2];
+		from = MJ_sparse_as_kind(from, cl, kind_);
+		PROTECT(from);
+		from = MJ_sparse_as_general(from, cl_);
+		UNPROTECT(1);
+		return from;
 	}
-
-	UNPROTECT(1);
-	return from;
+	case 'i':
+	{
+		/* As there is no ndiMatrix, we cannot use diagonal_as_kind here: */
+		char cl_[] = ".gCMatrix";
+		cl_[0] = cl[0];
+		from = MJ_diagonal_as_sparse(from, cl, 'g', 'C', '\0');
+		PROTECT(from);
+		from = MJ_sparse_as_kind(from, cl_, 'n');
+		UNPROTECT(1);
+		return from;
+	}
+	case 'd':
+		/* indMatrix extends generalMatrix, but we typically do want this: */
+		return MJ_index_as_sparse(from, cl, kind_, '.');
+	default:
+		return R_NilValue;
+	}
 }

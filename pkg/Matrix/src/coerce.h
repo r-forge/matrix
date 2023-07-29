@@ -3,9 +3,6 @@
 
 #include "Mutils.h"
 
-/* defined in ./sparse.c : */
-SEXP Tsparse_aggregate(SEXP from);
-
 SEXP MJ_matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
                      int transpose_if_vector, int new);
 
@@ -100,7 +97,7 @@ SEXP MJ_R_Matrix_as_Rsparse(SEXP from);
 
 SEXP MJ_R_Matrix_as_Tsparse(SEXP from);
 
-SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind);
+SEXP MJ_R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse);
 
 SEXP MJ_R_Matrix_as_general(SEXP from, SEXP kind);
 
