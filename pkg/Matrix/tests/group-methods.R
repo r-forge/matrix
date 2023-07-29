@@ -208,7 +208,9 @@ local({
                                grep("bogomips", readLines("/proc/cpuinfo"),
                                     ignore.case=TRUE, # e.g. ARM : "BogoMIPS"
                                     value=TRUE)[[1]])))
-        if(is.numeric(mips) && all(mips) > 0)
+        print(mips)
+        if(is.numeric(mips) && all(mips) > 0 && doExtras)
+                                        # doExtras: valgrind (2023-07-26) gave large 'st[1]'
         stopifnot(st[1] < 1000/mips)# ensure there was no gross inefficiency
     }
 })

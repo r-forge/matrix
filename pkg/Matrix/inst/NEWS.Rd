@@ -4,11 +4,11 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-07-29 r4161)}{
+\section{Changes in version 1.6-1 (2023-07-29 r4163)}{
   \subsection{New Features}{
-	\itemize{
-	  \item .
-	}
+    \itemize{
+      \item .
+    }
   }
   \subsection{Bug Fixes}{
 	\itemize{
@@ -17,9 +17,10 @@
 	}
   }
   \subsection{Misc}{
-	\itemize{
-	  \item .
-	}
+    \itemize{
+      \item run speed-measuring tests only if(doExtras): were too slow when
+      run under valgrind.
+    }
   }
 }
 
