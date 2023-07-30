@@ -4,10 +4,11 @@
 
 .pM.subclasses <- names(getClassDef("packedMatrix")@subclasses)
 
+setMethod("unpack", signature(x = "packedMatrix"),
+          function(x, ...) .Call(R_dense_as_unpacked, x))
+
 setMethod("pack", signature(x = "packedMatrix"),
           function(x, ...) x)
-setMethod("unpack", signature(x = "packedMatrix"),
-          function(x, ...) .Call(packedMatrix_unpack, x, TRUE))
 
 setMethod("forceSymmetric", signature(x = "packedMatrix", uplo = "missing"),
           function(x, uplo) .Call(packedMatrix_force_symmetric, x, NULL))
