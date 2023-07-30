@@ -36,26 +36,26 @@ setMethod("expm", signature(x = "dgeMatrix"),
 
 setMethod("expm", signature(x = "dtrMatrix"),
 	  function(x) {
-              r <- .Call(dgeMatrix_exp, .dense2g(x))
+              r <- .Call(dgeMatrix_exp, .M2gen(x))
               if(x@uplo == "U") triu(r) else tril(r)
           })
 
 setMethod("expm", signature(x = "dtpMatrix"),
 	  function(x) {
-              r <- .Call(dgeMatrix_exp, .dense2g(x))
+              r <- .Call(dgeMatrix_exp, .M2gen(x))
               ## Pack without checking:
               .Call(unpackedMatrix_pack, r, TRUE, TRUE, x@uplo == "U")
           })
 
 setMethod("expm", signature(x = "dsyMatrix"),
 	  function(x) {
-              r <- .Call(dgeMatrix_exp, .dense2g(x))
+              r <- .Call(dgeMatrix_exp, .M2gen(x))
               forceSymmetric(r)
           })
 
 setMethod("expm", signature(x = "dspMatrix"),
 	  function(x) {
-              r <- .Call(dgeMatrix_exp, .dense2g(x))
+              r <- .Call(dgeMatrix_exp, .M2gen(x))
               ## Pack without checking:
               .Call(unpackedMatrix_pack, r, TRUE, FALSE, x@uplo == "U")
           })

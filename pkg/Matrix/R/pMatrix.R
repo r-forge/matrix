@@ -34,7 +34,7 @@ setAs("nsparseMatrix", "pMatrix",
           d <- from@Dim
           if((n <- d[1L]) != d[2L])
               stop("attempt to coerce non-square matrix to pMatrix")
-          from <- .sparse2g(from)
+          from <- .M2gen(from)
           J <- new("pMatrix")
           J@Dim <- d
           J@Dimnames <- from@Dimnames

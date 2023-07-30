@@ -72,7 +72,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	     (lenRepl == 1L || lenV == 1L ||
 	      isSymmetric(mkArray(value, dim=dind))))
 	## x.sym : result is *still* symmetric
-	x <- .sparse2g(x) ## but do *not* redefine clx!
+	x <- .M2gen(x) ## but do *not* redefine clx!
     }
     else if(extends(clDx, "triangularMatrix")) {
 	xU <- x@uplo == "U"
@@ -83,7 +83,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 		x <- diagU2N(x) # keeps class (!)
 	}
 	else { # go to "generalMatrix" and (do not redefine clx!) and continue
-	    x <- .sparse2g(x) # was as(x, paste0(.M.kind(x), "gCMatrix"))
+	    x <- .M2gen(x) # was as(x, paste0(.M.kind(x), "gCMatrix"))
 	}
     }
     ## Temporary hack for debugging --- remove eventually -- FIXME :
@@ -100,7 +100,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	has.x <- TRUE
 	x <- .Call(dCsparse_subassign,
 		   if(clx %in% c("dgCMatrix", "dtCMatrix")) x
-		   else .sparse2g(x), # must get "dgCMatrix"
+		   else .M2gen(x), # must get "dgCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -108,7 +108,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	has.x <- TRUE
 	x <- .Call(lCsparse_subassign,
 		   if(clx %in% c("lgCMatrix", "ltCMatrix")) x
-		   else .sparse2g(x), # must get "lgCMatrix"
+		   else .M2gen(x), # must get "lgCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -116,7 +116,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	has.x <- FALSE
 	x <- .Call(nCsparse_subassign,
 		   if(clx %in% c("ngCMatrix", "ntCMatrix"))x
-		   else .sparse2g(x), # must get "ngCMatrix"
+		   else .M2gen(x), # must get "ngCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -124,7 +124,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	has.x <- TRUE
 	x <- .Call(iCsparse_subassign,
 		   if(clx %in% c("igCMatrix", "itCMatrix"))x
-		   else .sparse2g(x), # must get "igCMatrix"
+		   else .M2gen(x), # must get "igCMatrix"
 		   i1, i2,
 		   as(value, "sparseVector"))
     }
@@ -132,7 +132,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	has.x <- TRUE
 	x <- .Call(zCsparse_subassign,
 		   if(clx %in% c("zgCMatrix", "ztCMatrix"))x
-		   else .sparse2g(x), # must get "zgCMatrix"
+		   else .M2gen(x), # must get "zgCMatrix"
 		   i1, i2,
 		   ## here we only want zsparseVector {to not have to do this in C}:
 		   as(value, "zsparseVector"))
@@ -249,7 +249,7 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
         if(!extends(cld, "CsparseMatrix"))
             cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
         if(extends(cld, "symmetricMatrix"))
-            cld <- getClassDef(class(x <- .sparse2g(x)))
+            cld <- getClassDef(class(x <- .M2gen(x)))
         if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
             x <- ..sparse2d(x)
     } else { # typically a traditional matrix

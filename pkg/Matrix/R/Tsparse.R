@@ -151,7 +151,7 @@ replTmat <- function (x, i, j, ..., value)
 
 	if(!is(x,"generalMatrix")) {
 	    cl <- class(x)
-	    x <- .sparse2g(x)
+	    x <- .M2gen(x)
 	    Matrix.msg("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
 		       cl," to ",class(x))
 	}
@@ -342,7 +342,7 @@ replTmat <- function (x, i, j, ..., value)
     }
     if(toGeneral) { # go to "generalMatrix" and continue
         Matrix.msg("M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
-        x <- .sparse2g(x)
+        x <- .M2gen(x)
         clDx <- getClassDef(clx <- class(x))
     }
 
@@ -600,7 +600,7 @@ replTmat <- function (x, i, j, ..., value)
     }
     if(toGeneral) { # go to "generalMatrix" and continue
 	Matrix.msg("M[ij] <- v :  coercing symmetric M[] into non-symmetric")
-	x <- .sparse2g(x)
+	x <- .M2gen(x)
 	clDx <- getClassDef(clx <- class(x))
     }
 

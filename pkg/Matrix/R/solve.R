@@ -87,19 +87,19 @@ setMethod("solve", signature(a = .cl, b = "matrix"),
 
 setMethod("solve", signature(a = .cl, b = "denseMatrix"),
           function(a, b, ...)
-              solve(a, .dense2g(b, "d"), ...))
+              solve(a, .M2gen(b, "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "CsparseMatrix"),
           function(a, b, ...)
-              solve(a, .sparse2g(b, "d"), ...))
+              solve(a, .M2gen(b, "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "RsparseMatrix"),
           function(a, b, ...)
-              solve(a, .sparse2g(.M2C(b), "d"), ...))
+              solve(a, .M2gen(.M2C(b), "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "TsparseMatrix"),
           function(a, b, ...)
-              solve(a, .sparse2g(.M2C(b), "d"), ...))
+              solve(a, .M2gen(.M2C(b), "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "diagonalMatrix"),
           function(a, b, ...)
