@@ -185,6 +185,83 @@
     .M2kind(from, "l")
 }
 
+.dense2m <- .sparse2m <- function(from) {
+    if(FALSE) {
+    .Deprecated(new = ".M2m", package = "Matrix")
+    }
+    .M2m(from)
+}
+
+.dense2v <- .sparse2v <- function(from) {
+    if(FALSE) {
+    .Deprecated(new = ".M2v", package = "Matrix")
+    }
+    .M2v(from)
+}
+
+.dense2kind <- function(from, kind) {
+    if(FALSE) {
+    .Deprecated(new = ".M2kind", package = "Matrix")
+    }
+    .M2kind(from, kind)
+}
+
+.sparse2kind <- function(from, kind, drop0 = FALSE) {
+    if(FALSE) {
+    .Deprecated(new = ".M2kind", package = "Matrix")
+    }
+    .M2kind(if(drop0) drop0.notol(from) else from, kind)
+}
+
+.dense2g <- .sparse2g <- function(from, kind = ".") {
+    if(FALSE) {
+    .Deprecated(new = ".M2gen", package = "Matrix")
+    }
+    .M2gen(from, kind)
+}
+
+.CR2RC <- function(from) {
+    if(.M.repr(from) != "C") {
+        if(FALSE) {
+        .Deprecated(new = ".M2C", package = "Matrix")
+        }
+        .M2C(from)
+    } else {
+        if(FALSE) {
+        .Deprecated(new = ".M2R", package = "Matrix")
+        }
+        .M2R(from)
+    }
+}
+
+.CR2T <- function(from) {
+    if(FALSE) {
+    .Deprecated(new = ".M2T", package = "Matrix")
+    }
+    .M2T(from)
+}
+
+.T2CR <- function(from, Csparse = TRUE) {
+    if(Csparse) {
+        if(FALSE) {
+        .Deprecated(new = ".M2C", package = "Matrix")
+        }
+        .M2C(from)
+    } else {
+        if(FALSE) {
+        .Deprecated(new = ".M2R", package = "Matrix")
+        }
+        .M2R(from)
+    }
+}
+
+.tCR2RC <- function(from) {
+    if(FALSE) {
+    .Deprecated(new = ".tCRT", package = "Matrix")
+    }
+    .tCRT(from)
+}
+
 ## Utility for Matrix.DeprecatedCoerce(); see below
 .as.via.virtual <- function(Class1, Class2, from = quote(from)) {
     if(!isClassDef(Class1))
