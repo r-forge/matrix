@@ -69,8 +69,8 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 	if (class[1] != 'g') {
 		if (ge) {
 			/* defined in ./coerce.c : */
-			SEXP MJ_dense_as_general(SEXP, const char *, int);
-			SEXP to = PROTECT(MJ_dense_as_general(from, class, 1)),
+			SEXP dense_as_general(SEXP, const char *, int);
+			SEXP to = PROTECT(dense_as_general(from, class, 1)),
 				x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
 			BAND_CASES(UNPACKED_MAKE_BANDED);
 			UNPROTECT(2);
@@ -181,8 +181,8 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	int ivalid = R_check_class_etc(from, valid), isS4 = ivalid >= 0;
 	if (!isS4) {
 		/* defined in ./coerce.c : */
-		SEXP MJ_matrix_as_dense(SEXP, const char *, char, char, int, int);
-		from = MJ_matrix_as_dense(from, ".ge", '\0', '\0', 0, 1);
+		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
+		from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 1);
 	}
 	PROTECT(from);
 	if (!isS4)
