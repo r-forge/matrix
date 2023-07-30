@@ -99,7 +99,7 @@ setMethod("solve", signature(a = .cl, b = "RsparseMatrix"),
 
 setMethod("solve", signature(a = .cl, b = "TsparseMatrix"),
           function(a, b, ...)
-              solve(a, .sparse2g(.T2C(b), "d"), ...))
+              solve(a, .sparse2g(.M2C(b), "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "diagonalMatrix"),
           function(a, b, ...)
@@ -472,7 +472,7 @@ setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
 
 setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..sparse2d(.T2C(a))
+              a <- ..sparse2d(.M2C(a))
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 

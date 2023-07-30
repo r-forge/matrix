@@ -213,7 +213,7 @@ setMethod("is.finite", signature(x = "dsparseMatrix"),
                   ## FIXME: use packed=TRUE once [<- is fast for packedMatrix
                   r <- allTrueMatrix(x, symmetric = NA, packed = FALSE)
                   if(.hasSlot(x, "p"))
-                      x <- .CR2T(x)
+                      x <- .M2T(x)
                   n <- x@Dim[1L]
                   w <- which(!is.finite(x@x))
                   r@x[as.double(n) * x@j[w] + x@i[w] + 1] <- FALSE
@@ -227,7 +227,7 @@ setMethod("is.finite", signature(x = "lsparseMatrix"),
                   ## FIXME: use packed=TRUE once [<- is fast for packedMatrix
                   r <- allTrueMatrix(x, symmetric = NA, packed = FALSE)
                   if(.hasSlot(x, "p"))
-                      x <- .CR2T(x)
+                      x <- .M2T(x)
                   n <- x@Dim[1L]
                   w <- which(is.na(x@x))
                   r@x[as.double(n) * x@j[w] + x@i[w] + 1] <- FALSE

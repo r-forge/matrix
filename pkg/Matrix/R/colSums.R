@@ -154,13 +154,13 @@ setMethod("rowMeans", signature(x = "RsparseMatrix"),
 
 setMethod("colSums",  signature(x = "TsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(CRsparse_colSums, .T2C(x), na.rm, FALSE, sparseResult))
+              .Call(CRsparse_colSums, .M2C(x), na.rm, FALSE, sparseResult))
 setMethod("colMeans",  signature(x = "TsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(CRsparse_colSums, .T2C(x), na.rm, TRUE, sparseResult))
+              .Call(CRsparse_colSums, .M2C(x), na.rm, TRUE, sparseResult))
 setMethod("rowSums",  signature(x = "TsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(CRsparse_colSums, .T2R(x), na.rm, FALSE, sparseResult))
+              .Call(CRsparse_colSums, .M2R(x), na.rm, FALSE, sparseResult))
 setMethod("rowMeans",  signature(x = "TsparseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(CRsparse_colSums, .T2R(x), na.rm, TRUE, sparseResult))
+              .Call(CRsparse_colSums, .M2R(x), na.rm, TRUE, sparseResult))

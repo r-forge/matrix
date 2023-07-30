@@ -163,12 +163,12 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
     if((n <- length(lst)) == 0L)
         return(new("dgTMatrix"))
     if(n == 1L)
-        return(.CR2T(asCspN(lst[[1L]])))
+        return(.M2T(asCspN(lst[[1L]])))
 
 ### FIXME? this is _slow_ when 'lst' is list of 75000 3-by-3 dense matrices
-    lst <- unname(lapply(lst, function(x) .CR2T(asCspN(x))))
+    lst <- unname(lapply(lst, function(x) .M2T(asCspN(x))))
 
-    ## NB: class(.CR2T(.)) is always "[dln][gts]TMatrix"
+    ## NB: class(.M2T(.)) is always "[dln][gts]TMatrix"
     cl <- vapply(lst, class, "")
     kind  <- substr(cl, 1L, 1L) # "d", "l", or "n"
     shape <- substr(cl, 2L, 2L) # "g", "t", or "s"
@@ -224,12 +224,12 @@ bdiag <- function(...) {
     if((n <- ...length()) == 0L)
         new("dgCMatrix")
     else if(n > 1L)
-        .T2C(.bdiag(list(...)))
+        .M2C(.bdiag(list(...)))
     else if(!is.list(x <- ..1))
         as(x, "CsparseMatrix")
     else if(length(x) == 1L)
         as(x[[1L]], "CsparseMatrix")
-    else .T2C(.bdiag(x))
+    else .M2C(.bdiag(x))
 }
 
 

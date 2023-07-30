@@ -54,7 +54,7 @@ setMethod("Summary", "dsparseMatrix",
 	  clx <- getClassDef(class(x))
 	  isTri <- extends(clx, "triangularMatrix")
 	  if(extends(clx, "TsparseMatrix") && anyDuplicatedT(x, di = d))
-	      x <- .T2C(x) # = as(x, "Csparsematrix")
+	      x <- .M2C(x) # = as(x, "Csparsematrix")
 	  l.x <- length(x@x)
 	  if(l.x == ne) ## fully non-zero (and "general") - very rare but quick
 	      return( callGeneric(x@x, ..., na.rm = na.rm) )
@@ -262,7 +262,7 @@ setMethod("all", "nsparseMatrix",
 		  return(FALSE)
 	      ## else
 	      if(extends(cld, "TsparseMatrix"))
-		  cld <- getClassDef(class(x <- .T2C(x)))
+		  cld <- getClassDef(class(x <- .M2C(x)))
 	      ## now have Csparse or Rsparse: length of index slot = no.{TRUE}
 	      l.x <- length(if(extends(cld, "CsparseMatrix")) x@i else x@j)
 

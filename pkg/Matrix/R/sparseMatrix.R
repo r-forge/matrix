@@ -129,7 +129,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 
     if(check)
         validObject(r)
-    switch(repr, "C" = .T2C(r), "T" = r, "R" = .T2R(r),
+    switch(repr, "C" = .M2C(r), "T" = r, "R" = .M2R(r),
            ## should never happen:
            stop("invalid 'repr'; must be \"C\", \"R\", or \"T\""))
 }

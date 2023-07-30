@@ -406,7 +406,7 @@ replTmat <- function (x, i, j, ..., value)
 	if(!isTRUE(getOption("Matrix.quiet")))
 	    message(gettextf("x[.,.] <- val : x being coerced from Tsparse* to CsparseMatrix"),
 		    domain = NA)
-	return(replCmat4(.T2C(x), i1, i2, iMi=iMi, jMi=jMi,
+	return(replCmat4(.M2C(x), i1, i2, iMi=iMi, jMi=jMi,
 			 value = if(spV) value else as(value, "sparseVector"),
 			 spV = TRUE))
     }
