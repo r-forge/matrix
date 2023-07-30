@@ -1642,10 +1642,8 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 		sort_cr(res, cl);
 	if (cl[1] == 's' && (keep == -1 || keep == 1)) {
 		/* defined in ./sparse.c : */
-		SEXP R_sparse_force_symmetric(SEXP, SEXP);
-		PROTECT(uplo = mkString((keep == 1) ? "U" : "L"));
-		res = R_sparse_force_symmetric(res, uplo);
-		UNPROTECT(1); /* uplo */
+		SEXP sparse_force_symmetric(SEXP, const char *, char);
+		res = sparse_force_symmetric(res, cl_, (keep == 1) ? 'U' : 'L');
 	}
 	UNPROTECT(2); /* x, res */
 	return res;
@@ -1792,10 +1790,8 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 		sort_cr(res, cl);
 	if (cl[1] == 's' && (keep == -1 || keep == 1)) {
 		/* defined in ./sparse.c : */
-		SEXP R_sparse_force_symmetric(SEXP, SEXP);
-		PROTECT(uplo = mkString((keep == 1) ? "U" : "L"));
-		res = R_sparse_force_symmetric(res, uplo);
-		UNPROTECT(1); /* uplo */
+		SEXP sparse_force_symmetric(SEXP, const char *, char);
+		res = sparse_force_symmetric(res, cl_, (keep == 1) ? 'U' : 'L');
 	}
 	UNPROTECT(2); /* x, res */
 	return res;

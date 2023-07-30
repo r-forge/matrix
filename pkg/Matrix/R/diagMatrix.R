@@ -287,7 +287,7 @@ Diagonal <- function(n, x = NULL, names = FALSE) {
                 else {
                     uplo.. <- if(2 * sum(z) >= n) { z <- !z; "U" } else "L"
                     lst[z] <- lapply(lst[z],
-                                     function(x) .Call(R_sparse_transpose, x))
+                                     function(x) .Call(R_sparse_transpose, x, FALSE))
                     uplo..
                 }
         else if(any(uplo != (uplo. <- uplo[1L])))

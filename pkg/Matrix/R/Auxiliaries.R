@@ -563,9 +563,9 @@ forceDiagonal <- function(x, diag = NA_character_) {
 .T2R  <- function(from)
     .Call(Tsparse_as_CRsparse, from, FALSE)
 
-.tCR2RC <- function(from) .Call(tCRsparse_as_RCsparse, from)
+.tCR2RC <- function(from) .Call(R_sparse_transpose, from, TRUE)
 .CR2RC <- function(from) {
-    to <- .tCR2RC(.Call(R_sparse_transpose, from))
+    to <- .Call(R_sparse_transpose, .Call(R_sparse_transpose, from, TRUE), FALSE)
     if(.hasSlot(from, "factors"))
         to@factors <- from@factors
     to

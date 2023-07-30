@@ -868,8 +868,8 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP boolArith)
 		R_CheckStack();
 	} else {
 		/* defined in ./sparse.c : */
-		SEXP R_sparse_diag_U2N(SEXP);
-		x = R_sparse_diag_U2N(x); /* work around as_cholmod_triplet (?) */
+		SEXP sparse_diag_U2N(SEXP, const char *);
+		x = sparse_diag_U2N(x, cl); /* work around as_cholmod_triplet (?) */
 		UNPROTECT(1);
 		PROTECT(x);
 		CHM_TR tmp = AS_CHM_TR__(x);

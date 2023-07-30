@@ -864,7 +864,7 @@ scale.sparseMatrix <- function(x, center = FALSE, scale = TRUE) {
 .sparse.band <- function(x, k1, k2, ...) .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0L, ...) .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0L, ...) .Call(R_sparse_band, x, NULL, k)
-.sparse.t    <- function(x)              .Call(R_sparse_transpose, x)
+.sparse.t    <- function(x)              .Call(R_sparse_transpose, x, FALSE)
 .sparse.fS1  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, NULL)
 .sparse.fS2  <- function(x, uplo) .Call(R_sparse_force_symmetric, x, uplo)
 .sparse.symmpart <- function(x) .Call(R_sparse_symmpart, x)
