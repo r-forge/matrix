@@ -95,7 +95,7 @@ setMethod("solve", signature(a = .cl, b = "CsparseMatrix"),
 
 setMethod("solve", signature(a = .cl, b = "RsparseMatrix"),
           function(a, b, ...)
-              solve(a, .sparse2g(.CR2RC(b), "d"), ...))
+              solve(a, .sparse2g(.M2C(b), "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "TsparseMatrix"),
           function(a, b, ...)
@@ -453,7 +453,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
 ########################################################################
 
 ## TODO: implement triangular solver for dtRMatrix, so that we can handle
-##       A = <dgRMatrix>  and  A' = .tCR2RC(A)  like so:
+##       A = <dgRMatrix>  and  A' = .tCRT(A)  like so:
 ##
 ##                   P1 A' P2 = L U
 ##       A x = b  <==================>  x = P1' inv(L') inv(U') P2' b
@@ -461,7 +461,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
 
 setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..sparse2d(.CR2RC(a))
+              a <- ..sparse2d(.M2C(a))
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 

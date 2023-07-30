@@ -341,8 +341,9 @@ forceDiagonal <- function(x, diag = NA_character_) {
         x = if(diag == "N") y else y[FALSE])
 }
 
-drop0.notol <- function(x)
-    .Call(R_sparse_drop0, x)
+drop0.notol <- function(x) .Call(R_sparse_drop0, x)
+
+.tCRT <- function(x, lazy = TRUE) .Call(R_sparse_transpose, x, lazy)
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE) {
     ## Useful for compact printing of (parts) of sparse matrices

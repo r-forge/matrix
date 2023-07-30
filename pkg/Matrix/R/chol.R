@@ -99,7 +99,7 @@ setMethod("Cholesky", signature(A = "dsCMatrix"),
 
 setMethod("Cholesky", signature(A = "dsRMatrix"),
           function(A, ...)
-              Cholesky(.tCR2RC(A), ...))
+              Cholesky(.tCRT(A), ...))
 
 setMethod("Cholesky", signature(A = "dsTMatrix"),
           function(A, ...)

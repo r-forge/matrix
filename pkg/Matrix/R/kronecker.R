@@ -491,15 +491,15 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
 
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "RsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              .tCR2RC(kronecker(t(X), .tCR2RC(Y), FUN, make.dimnames, ...)))
+              .tCRT(kronecker(t(X), .tCRT(Y), FUN, make.dimnames, ...)))
 
 setMethod("kronecker", signature(X = "RsparseMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              .tCR2RC(kronecker(.tCR2RC(X), t(Y), FUN, make.dimnames, ...)))
+              .tCRT(kronecker(.tCRT(X), t(Y), FUN, make.dimnames, ...)))
 
 setMethod("kronecker", signature(X = "RsparseMatrix", Y = "RsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              .tCR2RC(kronecker(.tCR2RC(X), .tCR2RC(Y), FUN, make.dimnames, ...)))
+              .tCRT(kronecker(.tCRT(X), .tCRT(Y), FUN, make.dimnames, ...)))
 
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
