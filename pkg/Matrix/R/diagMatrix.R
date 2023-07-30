@@ -296,10 +296,10 @@ setMethod("tril", signature(x = "diagonalMatrix"),
               if(k >= 0L) x else .setZero(x))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
-          function(x, uplo) .diag2sparse(x, ".sC", uplo = uplo))
+          function(x, uplo) .diag2sparse(x, "s", "C", uplo))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
-          function(x, uplo) .diag2sparse(x, ".sC", uplo = "U"))
+          function(x, uplo) .diag2sparse(x, "s", "C", "U"))
 
 setMethod("symmpart", signature(x = "diagonalMatrix"),
           function(x) forceSymmetric(..diag2d(x)))
@@ -328,7 +328,7 @@ setMethod("isDiagonal", signature(object = "diagonalMatrix"),
 ## diagonal or sparse ---
 replDiag <- function(x, i, j, ..., value) {
 ## FIXME: if   (i == j)  &&  isSymmetric(value) then -- want symmetricMatrix result! -- or diagMatrix
-    x <- .diag2sparse(x, ".gC") # was ->TsparseMatrix till 2012-07
+    x <- .diag2sparse(x, "g", "C") # was ->TsparseMatrix till 2012-07
     if(missing(i))
         x[, j] <- value
     else if(missing(j)) { ##  x[i , ] <- v  *OR*   x[i] <- v
@@ -409,7 +409,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 ### FIXME:  use  uplo="U" or uplo="L"  (or *not* "triangularMatrix")
 ### depending on LE <- i <= j
 ### all(LE) //  all(!LE) // remaining cases
-                             x <- .diag2sparse(x, ".tC") # was ->TsparseMatrix
+                             x <- .diag2sparse(x, "t", "C") # was ->TsparseMatrix
                              x[i] <- value
                              x
                          }
@@ -1293,7 +1293,7 @@ setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
                          e2
                      },
                      "^" = { ## will be dense ( as  <ANY> ^ 0 == 1 ):
-                         e1 ^ .diag2dense(e2, ".ge")
+                         e1 ^ .diag2dense(e2, "g", FALSE)
                      },
                      ## otherwise:
                      callGeneric(e1, .diag2T.smart(e2, e1)))

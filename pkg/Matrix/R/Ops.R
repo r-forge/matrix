@@ -1088,7 +1088,7 @@ setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
                       d <- .Ops.checkDim(dim(e1), dim(e2))
                       .diag2sparse(new("ldiMatrix", Dim = d,
                                        x = get(.Generic)(diag(e1), diag(e2))),
-                                   code = "ltC", uplo = e1@uplo, drop0 = TRUE)
+                                   shape = "t", repr = "C", uplo = e1@uplo)
                   }
               }
           })
