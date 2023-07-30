@@ -41,7 +41,7 @@ setMethod("Math", signature(x = "ddenseMatrix"), function(x)
 {
     if(.Generic %in% Math.vecGenerics)
         ## Result is a vector
-        return(callGeneric(.dense2g(x, ".")@x))
+        return(callGeneric(.M2gen(x, ".")@x))
     cld <- getClassDef(class(x))
     if(extends(cld, "symmetricMatrix")) {
         ## Argument and result are symmetricMatrix
@@ -62,7 +62,7 @@ setMethod("Math", signature(x = "ddenseMatrix"), function(x)
         x
     } else {
         ## Argument is triangularMatrix, result is generalMatrix
-        callGeneric(.dense2g(x, "."))
+        callGeneric(.M2gen(x, "."))
     }
 })
 
@@ -80,7 +80,7 @@ setMethod("log", signature(x = "ddenseMatrix"), function(x, base = exp(1))
         x
     } else {
         ## Argument is triangularMatrix, result is generalMatrix
-        log(.dense2g(x, "."), base)
+        log(.M2gen(x, "."), base)
     }
 })
 

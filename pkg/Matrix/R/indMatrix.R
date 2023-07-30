@@ -71,7 +71,7 @@ setAs("list", "indMatrix",
 
 setAs("nsparseMatrix", "indMatrix",
       function(from) {
-          from <- .sparse2g(from)
+          from <- .M2gen(from)
           J <- new("indMatrix")
           J@Dim <- from@Dim
           J@Dimnames <- from@Dimnames

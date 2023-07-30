@@ -15,7 +15,7 @@
 
 setMethod("qr", signature(x = "sparseMatrix"),
           function(x, ...)
-              qr(.sparse2g(as(x, "CsparseMatrix"), "d"), ...))
+              qr(.M2gen(as(x, "CsparseMatrix"), "d"), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
           function(x, order = 3L, ...) {

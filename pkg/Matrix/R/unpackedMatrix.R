@@ -99,7 +99,7 @@ setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
         return(FALSE)
     if(n <= 1L)
         return(TRUE)
-    object <- .dense2g(object)
+    object <- .M2gen(object)
     ## now handling n-by-n [dz]geMatrix, n >= 2:
 
     Cj <- if(is.complex(object@x)) Conj else identity

@@ -20,7 +20,7 @@ setMethod("dim<-", signature(x = "denseMatrix"),
               if((pv <- prod(value)) != (pd <- prod(d)))
                   stop(gettextf("assigned dimensions [product %.0f] do not match Matrix length [%.0f]",
                                 pv, pd, domain = NA))
-              r <- .dense2g(x)
+              r <- .M2gen(x)
               r@Dim <- value
               r@factors <- list()
               r
@@ -57,7 +57,7 @@ rm(.dense.band, .dense.triu, .dense.tril, .cl)
 setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "missing",
                                 value = "ANY"),## double/logical/...
                  function (x, value) {
-                     x <- .dense2g(x)
+                     x <- .M2gen(x)
                      x@x[] <- value
                      validObject(x)# check if type and lengths above match
                      x

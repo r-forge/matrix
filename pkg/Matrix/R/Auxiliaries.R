@@ -576,7 +576,7 @@ as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
     triangular <- !symmetric &&
         (extends(cld, "triangularMatrix") && (it <- isTriangular(x)))
     if(!(symmetric || triangular))
-        return(.dense2g(x, kind))
+        return(.M2gen(x, kind))
     y <- if(symmetric)
              forceSymmetric(x)
          else if (attr(it, "kind") == "U")
@@ -593,7 +593,7 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
     x <- if(extends(cld, "symmetricMatrix") && isSymmetric(x))
              forceSymmetric(x)
          else if(!(extends(cld, "triangularMatrix") && (it <- isTriangular(x))))
-             .sparse2g(x)
+             .M2gen(x)
          else if(attr(it, "kind") == "U")
              triu(x)
          else tril(x)

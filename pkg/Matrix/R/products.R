@@ -144,8 +144,8 @@ setMethod("%*%", signature(x = "ldenseMatrix", y = "lsparseMatrix"),
 
 ## and coerce lsparse* to lgC*
 setMethod("%*%", signature(x = "lsparseMatrix", y = "lsparseMatrix"),
-	  function(x, y) .sparse2g(as(x, "CsparseMatrix")) %*%
-                         .sparse2g(as(y, "CsparseMatrix")))
+	  function(x, y) .M2gen(as(x, "CsparseMatrix")) %*%
+                         .M2gen(as(y, "CsparseMatrix")))
 
 for(c.x in c("lMatrix", "nMatrix")) {
     setMethod("%*%", signature(x = c.x, y = "dMatrix"),
@@ -198,8 +198,8 @@ setMethod("%*%", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
 	  function(x, y) .dense2sparse(x, "C") %*% y)
 ## and coerce nsparse* to lgC*
 setMethod("%*%", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
-	  function(x, y) .sparse2g(as(x, "CsparseMatrix")) %*%
-                         .sparse2g(as(y, "CsparseMatrix")))
+	  function(x, y) .M2gen(as(x, "CsparseMatrix")) %*%
+                         .M2gen(as(y, "CsparseMatrix")))
 
 ## x %*% y =  t(crossprod(y, t(x)))  unless when x is vector
 setMethod("%*%", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
@@ -517,8 +517,8 @@ setMethod("crossprod", signature(x = "ldenseMatrix", y = "lsparseMatrix"),
 
 setMethod("crossprod", signature(x = "lsparseMatrix", y = "lsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(.sparse2g(as(x, "CsparseMatrix")),
-                        .sparse2g(as(y, "CsparseMatrix")),
+              crossprod(.M2gen(as(x, "CsparseMatrix")),
+                        .M2gen(as(y, "CsparseMatrix")),
                         boolArith=boolArith, ...))
 
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "ndenseMatrix"),
@@ -531,8 +531,8 @@ setMethod("crossprod", signature(x = "ndenseMatrix", y = "nsparseMatrix"),
 
 setMethod("crossprod", signature(x = "nsparseMatrix", y = "nsparseMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-              crossprod(.sparse2g(as(x, "CsparseMatrix")),
-                        .sparse2g(as(y, "CsparseMatrix")),
+              crossprod(.M2gen(as(x, "CsparseMatrix")),
+                        .M2gen(as(y, "CsparseMatrix")),
                         boolArith=boolArith, ...))
 
 setMethod("crossprod", signature(x = "ddenseMatrix", y = "CsparseMatrix"),
@@ -725,7 +725,7 @@ setMethod("tcrossprod", signature(x = "numLike", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "ddenseMatrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(.dense2g(x), boolArith=boolArith, ...))
+	      tcrossprod(.M2gen(x), boolArith=boolArith, ...))
 
 
 setMethod("tcrossprod", signature(x = "dtrMatrix", y = "dtrMatrix"),

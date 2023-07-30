@@ -674,7 +674,7 @@ setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
                     op(x@x[sequence.default(n:1,            1:n)], y@x)
             } else {
                 ## y=[nd]s[yp]Matrix
-                y <- .dense2g(y)
+                y <- .M2gen(y)
                 y@factors <- list()
                 op(x@x, y@x)
             }
@@ -751,7 +751,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
                     op(x@x, rep.int(y@x, n:1))
             } else {
                 ## x=[nd]s[yp]Matrix
-                x <- .dense2g(x)
+                x <- .M2gen(x)
                 x@factors <- list()
                 op(x@x, rep(y@x, each = x@Dim[1L]))
             }
@@ -811,7 +811,7 @@ setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
                 y <- ..diagU2N(y)
         } else {
             ## y=[ld]sCMatrix
-            y <- .sparse2g(y)
+            y <- .M2gen(y)
             y@factors <- list()
         }
         op <- if(boolArith) `&` else `*`
@@ -874,7 +874,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
                 x <- ..diagU2N(x)
         } else {
             ## x=[ld]sCMatrix
-            x <- .sparse2g(x)
+            x <- .M2gen(x)
             x@factors <- list()
         }
         dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
@@ -937,7 +937,7 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
                 y <- ..diagU2N(y)
         } else {
             ## y=[ld]sRMatrix
-            y <- .sparse2g(y)
+            y <- .M2gen(y)
             y@factors <- list()
         }
         dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
@@ -1000,7 +1000,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
                 x <- ..diagU2N(x)
         } else {
             ## x=[ld]sRMatrix
-            x <- .sparse2g(x)
+            x <- .M2gen(x)
             x@factors <- list()
         }
         op <- if(boolArith) `&` else `*`
@@ -1063,7 +1063,7 @@ setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
                 y <- ..diagU2N(y)
         } else {
             ## y=[ld]sTMatrix
-            y <- .sparse2g(y)
+            y <- .M2gen(y)
             y@factors <- list()
         }
         op <- if(boolArith) `&` else `*`
@@ -1126,7 +1126,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
                 x <- ..diagU2N(x)
         } else {
             ## x=[ld]sTMatrix
-            x <- .sparse2g(x)
+            x <- .M2gen(x)
             x@factors <- list()
         }
         op <- if(boolArith) `&` else `*`

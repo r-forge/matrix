@@ -112,7 +112,7 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "numeric"),
               d <- dim(x); nr <- d[1]; nc <- d[2]
               y <- rep_len(y, nr) # 'silent procrustes'
               ## beware of (packed) triangular, symmetric, ...
-              x <- .dense2g(x)
+              x <- .M2gen(x)
               x@x <- c(x@x, as.double(y))
               x@Dim[2] <- nc + 1L
               if(is.character(dn <- x@Dimnames[[2]]))
@@ -124,7 +124,7 @@ setMethod("cbind2", signature(x = "numeric", y = "denseMatrix"),
           function(x, y, ...) {
               d <- dim(y); nr <- d[1]; nc <- d[2]
               x <- rep_len(x, nr)
-              y <- .dense2g(y)
+              y <- .M2gen(y)
               y@x <- c(as.double(x), y@x)
               y@Dim[2] <- nc + 1L
               if(is.character(dn <- y@Dimnames[[2]]))
@@ -144,8 +144,8 @@ setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
               d.y <- y@Dim
               d.r <- bindDim(d.x, d.y, 1L)
               ## beware of (packed) triangular, symmetric, ...
-              x <- .dense2g(x)
-              y <- .dense2g(y)
+              x <- .M2gen(x)
+              y <- .M2gen(y)
               xx <- c(x@x, y@x)
               ## be careful, e.g., if we have an 'n' and 'd'
               if(identical((tr <- typeof(xx)), typeof(x@x))) {
@@ -192,8 +192,8 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
               d.y <- y@Dim
               d.r <- bindDim(d.x, d.y, 2L)
               ## beware of (packed) triangular, symmetric, ...
-              x <- .dense2g(x)
-              y <- .dense2g(y)
+              x <- .M2gen(x)
+              y <- .M2gen(y)
               xx <- .Call(R_rbind2_vector, x, y)
               ## be careful, e.g., if we have an 'n' and 'd'
               if(identical((tr <- typeof(xx)), typeof(x@x))) {
