@@ -323,7 +323,7 @@ setMethod("solve", signature(a = "Schur", b = "ANY"),
 
 setMethod("solve", signature(a = "denseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..dense2d(a)
+              a <- .M2kind(a, "d")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -361,7 +361,7 @@ rm(.cl)
 
 setMethod("solve", signature(a = "CsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..sparse2d(a)
+              a <- .M2kind(a, "d")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -461,7 +461,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
 
 setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..sparse2d(.M2C(a))
+              a <- .M2kind(.M2C(a), "d")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -472,7 +472,7 @@ setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
 
 setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..sparse2d(.M2C(a))
+              a <- .M2kind(.M2C(a), "d")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 

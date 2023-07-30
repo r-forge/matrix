@@ -622,7 +622,7 @@ replTmat <- function (x, i, j, ..., value)
     if(isN) { ## no 'x' slot
 	isN <- is.logical(value) # will result remain  "nMatrix" ?
 	if(!isN)
-            x <- ..sparse2d(x)
+            x <- .M2kind(x, "d")
     }
     has.x <- !isN ## isN  <===> "remains pattern matrix" <===> has no 'x' slot
 

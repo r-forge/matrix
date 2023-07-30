@@ -6,7 +6,7 @@ setMethod("lu", signature(x = "matrix"),
           function(x, ...) lu(.m2dense(x, "dge"), ...))
 
 setMethod("lu", signature(x = "denseMatrix"),
-          function(x, ...) lu(..dense2d(x), ...))
+          function(x, ...) lu(.M2kind(x, "d"), ...))
 
 setMethod("lu", signature(x = "dgeMatrix"),
           function(x, warnSing = TRUE, ...)
@@ -43,7 +43,7 @@ rm(.cl)
 
 setMethod("lu", signature(x = "sparseMatrix"),
           function(x, ...)
-              lu(..sparse2d(as(x, "CsparseMatrix")), ...))
+              lu(.M2kind(.M2C(x), "d"), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
           function(x, errSing = TRUE, order = NA_integer_, tol = 1, ...)

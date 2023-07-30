@@ -652,12 +652,12 @@ setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
 
 .prod.diag.dense <- function(x, y, boolArith, trans) {
     if(boolArith) {
-        y <- ..dense2n(y)
+        y <- .M2kind(y, "n")
         op <- `&`
         one <- TRUE
     } else {
         if(!is.double(y@x))
-            y <- ..dense2d(y)
+            y <- .M2kind(y, "d")
         op <- `*`
         one <- 1
     }
@@ -729,12 +729,12 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
 
 .prod.dense.diag <- function(x, y, boolArith, trans) {
     if(boolArith) {
-        x <- ..dense2n(x)
+        x <- .M2kind(x, "n")
         op <- `&`
         one <- TRUE
     } else {
         if(!is.double(x@x))
-            x <- ..dense2d(x)
+            x <- .M2kind(x, "d")
         op <- `*`
         one <- 1
     }
