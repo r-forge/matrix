@@ -728,22 +728,22 @@ rm(Ops.x.x)
 
 ## ... both are sparse: cannot use Ops.x.x
 setMethod("Ops", signature(e1="nsparseMatrix", e2="lsparseMatrix"),
-          function(e1,e2) callGeneric(..sparse2l(e1), e2))
+          function(e1,e2) callGeneric(.M2kind(e1, "l"), e2))
 setMethod("Ops", signature(e1="lsparseMatrix", e2="nsparseMatrix"),
-          function(e1,e2) callGeneric(e1, ..sparse2l(e2)))
+          function(e1,e2) callGeneric(e1, .M2kind(e2, "l")))
 setMethod("Ops", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
-          function(e1,e2) callGeneric(..sparse2l(e1), e2))
+          function(e1,e2) callGeneric(.M2kind(e1, "l"), e2))
 setMethod("Ops", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
-          function(e1,e2) callGeneric(e1, ..sparse2l(e2)))
+          function(e1,e2) callGeneric(e1, .M2kind(e2, "l")))
 ## For "Arith"  go to "d*", not "l*": {the above, replaced "l by "d :
 setMethod("Arith", signature(e1="nsparseMatrix", e2="lsparseMatrix"),
-          function(e1,e2) callGeneric(..sparse2d(e1), e2))
+          function(e1,e2) callGeneric(.M2kind(e1, "d"), e2))
 setMethod("Arith", signature(e1="lsparseMatrix", e2="nsparseMatrix"),
-          function(e1,e2) callGeneric(e1, ..sparse2d(e2)))
+          function(e1,e2) callGeneric(e1, .M2kind(e2, "d")))
 setMethod("Arith", signature(e1="nsparseMatrix", e2="dsparseMatrix"),
-          function(e1,e2) callGeneric(..sparse2d(e1), e2))
+          function(e1,e2) callGeneric(.M2kind(e1, "d"), e2))
 setMethod("Arith", signature(e1="dsparseMatrix", e2="nsparseMatrix"),
-          function(e1,e2) callGeneric(e1, ..sparse2d(e2)))
+          function(e1,e2) callGeneric(e1, .M2kind(e2, "d")))
 if(FALSE) { ##-- not yet ---------
 ## New: for both "nsparseMatrix", *preserve* nsparse* -- via Tsp -- "nTsparseMatrix"
 setMethod("Ops", signature(e1 = "nsparseMatrix", e2 = "nsparseMatrix"),
@@ -946,7 +946,7 @@ rm(Logic.Mat.atomic, Mcl, cl)
 
 ### -- II -- sparse ----------------------------------------------------------
 
-Ops.x.x.via.d <- function(e1, e2) callGeneric(..sparse2d(e1), ..sparse2d(e2))
+Ops.x.x.via.d <- function(e1, e2) callGeneric(.M2kind(e1, "d"), .M2kind(e2, "d"))
 
 
 ## Have lgC o lgC  and then lgT o lgT  Logic - quite similarly -
@@ -1100,13 +1100,13 @@ rm(Ops.x.x.via.d)
 
 ## More generally:  Arith: l* and n*  via  d*
 setMethod("Arith", signature(e1="lsparseMatrix", e2="Matrix"),
-          function(e1, e2) callGeneric(..sparse2d(e1), as(e2,"dMatrix")))
+          function(e1, e2) callGeneric(.M2kind(e1, "d"), as(e2,"dMatrix")))
 setMethod("Arith", signature(e1="Matrix", e2="lsparseMatrix"),
-          function(e1, e2) callGeneric(as(e1,"dMatrix"), ..sparse2d(e2)))
+          function(e1, e2) callGeneric(as(e1,"dMatrix"), .M2kind(e2, "d")))
 setMethod("Arith", signature(e1="nsparseMatrix", e2="Matrix"),
-          function(e1, e2) callGeneric(..sparse2d(e1), as(e2,"dMatrix")))
+          function(e1, e2) callGeneric(.M2kind(e1, "d"), as(e2,"dMatrix")))
 setMethod("Arith", signature(e1="Matrix", e2="nsparseMatrix"),
-          function(e1, e2) callGeneric(as(e1,"dMatrix"), ..sparse2d(e2)))
+          function(e1, e2) callGeneric(as(e1,"dMatrix"), .M2kind(e2, "d")))
 ##
 for(cl in c("numeric", "logical")) # "complex", "raw" : basically "replValue"
   for(Mcl in c("lMatrix", "nMatrix")) {
@@ -1273,7 +1273,7 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
     if(length(e2) == 1) { ## e.g.,  Mat ^ a
         f0 <- callGeneric(0, e2)
         if(is0(f0)) { ## remain sparse, symm., tri.,...
-            e1 <- ..sparse2d(e1)
+            e1 <- .M2kind(e1, "d")
             if(!extends(cld <- getClassDef(class(e1)), "CsparseMatrix"))
                 cld <- getClassDef(class(e1 <- as(e1, "CsparseMatrix")))
             if(extends(cld, "triangularMatrix") &&
@@ -1285,14 +1285,14 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
         }
     }
     ## all other (potentially non-sparse) cases: give up symm, tri,..
-    callGeneric(as(.M2gen(..sparse2d(e1)), "CsparseMatrix"), e2)
+    callGeneric(as(.M2gen(.M2kind(e1, "d")), "CsparseMatrix"), e2)
 }
 ## The same,  e1 <-> e2 :
 .Arith.atom.CM <- function(e1, e2) {
     if(length(e1) == 1) {
         f0 <- callGeneric(e1, 0)
         if(is0(f0)) {
-            e2 <- ..sparse2d(e2)
+            e2 <- .M2kind(e2, "d")
             if(!extends(cld <- getClassDef(class(e2)), "CsparseMatrix"))
                 cld <- getClassDef(class(e2 <- as(e2, "CsparseMatrix")))
             if(extends(cld, "triangularMatrix") &&
@@ -1303,7 +1303,7 @@ setMethod("Arith", signature(e1 = "dtCMatrix", e2 = "dtCMatrix"),
             return(e2)
         }
     }
-    callGeneric(e1, as(.M2gen(..sparse2d(e2)), "CsparseMatrix"))
+    callGeneric(e1, as(.M2gen(.M2kind(e2, "d")), "CsparseMatrix"))
 }
 setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "numeric"),
           .Arith.CM.atom)
@@ -1426,10 +1426,10 @@ setMethod("Arith", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
               ## as(*, "d.CMatrix") is deprecated:
               ## viaCl <- paste0("d", if(s1 == s2) s1 else "g", "CMatrix")
               if(s1 != s2) ## go via "general"
-                  callGeneric(.M2gen(..sparse2d(e1)),
-                              .M2gen(..sparse2d(e2)))
+                  callGeneric(.M2gen(.M2kind(e1, "d")),
+                              .M2gen(.M2kind(e2, "d")))
               else
-                  callGeneric(..sparse2d(e1), ..sparse2d(e2))
+                  callGeneric(.M2kind(e1, "d"), .M2kind(e2, "d"))
           })
 
 setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
@@ -1440,10 +1440,10 @@ setMethod("Logic", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
               ## as(*, "d.CMatrix") is deprecated:
               ## viaCl <- paste0("l", if(s1 == s2) s1 else "g", "CMatrix")
               if(s1 != s2) ## go via "general"
-                  callGeneric(.M2gen(..sparse2l(e1)),
-                              .M2gen(..sparse2l(e2)))
+                  callGeneric(.M2gen(.M2kind(e1, "l")),
+                              .M2gen(.M2kind(e2, "l")))
               else
-                  callGeneric(..sparse2l(e1), ..sparse2l(e2))
+                  callGeneric(.M2kind(e1, "l"), .M2kind(e2, "l"))
           })
 
 setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
@@ -1605,7 +1605,7 @@ setMethod("-", signature(e1 = "sparseMatrix", e2 = "missing"),
           })
 ## with the following exceptions:
 setMethod("-", signature(e1 = "nsparseMatrix", e2 = "missing"),
-          function(e1, e2) -..sparse2d(e1))
+          function(e1, e2) -.M2kind(e1, "d"))
 setMethod("-", signature(e1 = "indMatrix", e2 = "missing"),
           function(e1, e2) -as(e1, "dsparseMatrix"))
 
@@ -1616,10 +1616,10 @@ setMethod("-", signature(e1 = "indMatrix", e2 = "missing"),
 
 setMethod("Ops", signature(e1 = "sparseMatrix", e2 = "nsparseMatrix"),
           function(e1, e2)
-              callGeneric(as(e1, "CsparseMatrix"), ..sparse2l(e2)))
+              callGeneric(as(e1, "CsparseMatrix"), .M2kind(e2, "l")))
 setMethod("Ops", signature(e1 = "nsparseMatrix", e2 = "sparseMatrix"),
           function(e1, e2)
-              callGeneric(..sparse2l(e1), as(e2, "CsparseMatrix")))
+              callGeneric(.M2kind(e1, "l"), as(e2, "CsparseMatrix")))
 
 ## these were 'Arith', now generalized:
 if(FALSE) { ## just shifts the ambiguity warnings ..

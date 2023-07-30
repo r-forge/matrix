@@ -251,7 +251,7 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
         if(extends(cld, "symmetricMatrix"))
             cld <- getClassDef(class(x <- .M2gen(x)))
         if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
-            x <- ..sparse2d(x)
+            x <- .M2kind(x, "d")
     } else { # typically a traditional matrix
         x <- .m2sparse(x, "dgC", NULL, NULL)
     }

@@ -75,7 +75,7 @@ setMethod("norm", signature(x = "pMatrix", type = "character"),
           })
 
 setMethod("norm", signature(x = "denseMatrix", type = "character"),
-          function(x, type, ...) norm(..dense2d(x), type = type, ...))
+          function(x, type, ...) norm(.M2kind(x, "d"), type = type, ...))
 
 setMethod("norm", signature(x = "dgeMatrix", type = "character"),
           function(x, type, ...)
