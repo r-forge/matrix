@@ -23,7 +23,7 @@ setMethod("chol", signature(x = "symmetricMatrix"),
 
 setMethod("chol", signature(x = "diagonalMatrix"),
           function(x, ...)
-              chol(.M2kind(d, "d"), ...))
+              chol(.M2kind(x, "d"), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
