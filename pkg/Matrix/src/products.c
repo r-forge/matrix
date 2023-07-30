@@ -616,7 +616,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 	Rboolean
 		b_is_vector = !(IS_S4_OBJECT(b) || isMatrix(b)),
 		b_transpose_if_vector = b_is_vector && XLENGTH(b) != a_nc;
-	if (trans_b && b_transpose_if_vector)
+	if (b_is_vector)
 		trans_b = FALSE; /* don't transpose twice! */
 	PROTECT(b = dense_as_general(b, 'd', 2, b_transpose_if_vector));
 
