@@ -4047,7 +4047,7 @@ SEXP Tsparse_aggregate(SEXP from)
 		PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
-		UNPROTECT(3); /* to, j1, i1 */
+		UNPROTECT(5); /* to, j1, i1, j0, i0 */
 	} else {
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 			x1 = NULL;
@@ -4063,7 +4063,7 @@ SEXP Tsparse_aggregate(SEXP from)
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(5); /* to, x1, j1, i1, x0 */
+		UNPROTECT(7); /* to, x1, j1, i1, x0, j0, i0 */
 	}
 
 	PROTECT(to);
