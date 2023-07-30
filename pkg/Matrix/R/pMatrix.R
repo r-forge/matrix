@@ -10,9 +10,6 @@
     x
 }
 
-
-## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 setAs("numeric", "pMatrix",
       function(from) {
           J <- new("pMatrix")
@@ -59,16 +56,8 @@ setAs("nsparseMatrix", "pMatrix",
           stop("matrix must have exactly one nonzero element in each row and column")
       })
 
-setAs("Matrix", "pMatrix",
-      function(from) as(as(from, "nsparseMatrix"), "pMatrix"))
-
-setAs("matrix", "pMatrix",
-      function(from) as(as(from, "nsparseMatrix"), "pMatrix"))
-
-
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## NB: pMatrix are orthogonal, hence the transpose and inverse coincide
+setAs("indMatrix", "pMatrix",
+      function(from) new("pMatrix", from))
 
 setMethod("t", signature(x = "pMatrix"),
           function(x) {
