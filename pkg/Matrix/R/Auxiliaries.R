@@ -76,8 +76,6 @@ extends1of <- function(class, classes, ...) {
 .isDiagonal <- function(x) .M.repr(x) == "d"
 .isInd      <- function(x) .M.repr(x) == "i"
 
-sparseDefault <- function(x) length(x) > 2 * nnzero(x, na.counted = TRUE)
-
 ## MJ: no longer used
 if(FALSE) {
 .bail.out.1 <- function(fun, cl) {
