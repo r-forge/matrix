@@ -1,8 +1,72 @@
 #include "products.h"
 #include "chm_common.h"
+#include "coerce.h"
 
-/* defined in ./coerce.c : */
-SEXP MJ_sparse_as_kind(SEXP, const char *, char);
+/* Given a denseMatrix, diagonalMatrix, matrix, or vector,
+   return a newly allocated dgeMatrix with newly allocated 'x'
+   and 'Dimnames' slots and an empty 'factors' slot; the 'Dim'
+   slot and elements of the 'Dimnames' slots need not be newly
+   allocated.
+
+   FIXME: Refactor the products and avoid such complexity altogether.
+*/
+static SEXP asdge(SEXP from, int transpose_if_vector)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, VALID_DIAGONAL, "" };
+	int ivalid = R_check_class_etc(from, valid);
+
+	SEXP to;
+	if (ivalid < 0)
+		PROTECT(to = MJ_matrix_as_dense(from, "dge", '\0', '\0',
+		                             transpose_if_vector, 1));
+	else {
+		const char *cl = valid[ivalid];
+		if (cl[0] == 'd' && cl[1] == 'g' && cl[2] == 'e') {
+			PROTECT(to = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+			SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
+				dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym)),
+				x = PROTECT(GET_SLOT(from, Matrix_xSym));
+			PROTECT(x = duplicate(x));
+			SET_SLOT(to, Matrix_DimSym, dim);
+			SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+			SET_SLOT(to, Matrix_xSym, x);
+			UNPROTECT(4);
+		} else if (cl[0] == 'd') {
+			if (cl[1] == 'd' && cl[2] == 'i')
+				PROTECT(to = MJ_diagonal_as_dense(from, cl, 'g', 0, '\0'));
+			else {
+				PROTECT(to = MJ_dense_as_general(from, cl, 1));
+				SEXP factors = PROTECT(allocVector(VECSXP, 0));
+				SET_SLOT(to, Matrix_factorSym, factors);
+				UNPROTECT(1);
+			}
+		} else {
+			char cl_[] = "d..Matrix";
+			cl_[1] = cl[1]; cl_[2] = cl[2];
+			if (cl[1] == 'd' && cl[2] == 'i') {
+				to = MJ_diagonal_as_kind(from, cl, 'd');
+				PROTECT(to);
+				to = MJ_diagonal_as_dense(to, cl_, 'g', 0, '\0');
+			} else {
+				to = MJ_dense_as_kind(from, cl, 'd');
+				PROTECT(to);
+				to = MJ_dense_as_general(to, cl_, 0);
+			}
+			UNPROTECT(1);
+			PROTECT(to);
+		}
+	}
+
+	SEXP dn0 = PROTECT(GET_SLOT(to, Matrix_DimNamesSym)),
+		dn1 = PROTECT(allocVector(VECSXP, 2));
+	for (int i = 0; i < 2; ++i)
+		SET_VECTOR_ELT(dn1, i, VECTOR_ELT(dn0, i));
+	SET_SLOT(to, Matrix_DimNamesSym, dn1);
+
+	UNPROTECT(3);
+	return to;
+}
 
 SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
 {
@@ -68,7 +132,7 @@ static SEXP _geMatrix_crossprod(SEXP x, SEXP trans)
 
 SEXP geMatrix_crossprod(SEXP x, SEXP trans)
 {
-    SEXP y = PROTECT(dense_as_general(x, '.', 2, 0)),
+    SEXP y = PROTECT(asdge(x, 0)),
 	val = _geMatrix_crossprod(y, trans);
     UNPROTECT(1);
     return val;
@@ -133,8 +197,8 @@ static SEXP _geMatrix__geMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
 
 SEXP geMatrix_geMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
 {
-    SEXP gx = PROTECT(dense_as_general(x, '.', 2, 0)),
-	gy = PROTECT(dense_as_general(y, '.', 2, 0)),
+    SEXP gx = PROTECT(asdge(x, 0)),
+	gy = PROTECT(asdge(y, 0)),
 	val = _geMatrix__geMatrix_crossprod(gx, gy, trans);
     UNPROTECT(2);
     return val;
@@ -222,7 +286,7 @@ static SEXP _geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
 }
 
 SEXP geMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans) {
-    SEXP dx = PROTECT(dense_as_general(x, '.', 2, 0)),
+    SEXP dx = PROTECT(asdge(x, 0)),
 	val = _geMatrix_matrix_crossprod(dx, y, trans);
     UNPROTECT(1);
     return val;
@@ -278,7 +342,7 @@ SEXP dgeMatrix_matrix_mm(SEXP a, SEXP bP, SEXP right)
     UNPROTECT(nprot);							\
     return val
 
-    SEXP b = PROTECT(dense_as_general(bP, 'd', 2, 0));
+    SEXP b = PROTECT(asdge(bP, 0));
     DGE_MAT_MM_1(1);
     DGE_MAT_MM_DO(REAL(GET_SLOT(a, Matrix_xSym)),
                   REAL(GET_SLOT(b, Matrix_xSym)));
@@ -296,8 +360,8 @@ static SEXP _geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
 //! %*% -- generalized from dge to *ge():
 SEXP geMatrix_matrix_mm(SEXP a, SEXP b, SEXP right) {
     SEXP
-	da = PROTECT(dense_as_general(a, '.', 2, 0)),
-	db = PROTECT(dense_as_general(b, '.', 2, 0)),
+	da = PROTECT(asdge(a, 0)),
+	db = PROTECT(asdge(b, 0)),
 	val = _geMatrix_matrix_mm(da, db, right);
     UNPROTECT(2);
     return val;
@@ -322,7 +386,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      * TWO cases : (1) result is triangular  <=> uplo's "match" (i.e., non-equal iff trans)
      * ===         (2) result is "general"
      */
-    SEXP val,/* = in case (2):  dense_as_general(b, 'd', 2, 0); */
+    SEXP val,/* = in case (2):  asdge(b, 0); */
 	d_a = GET_SLOT(a, Matrix_DimSym),
 	uplo_a = GET_SLOT(a, Matrix_uploSym),  diag_a = GET_SLOT(a, Matrix_diagSym),
 	uplo_b = GET_SLOT(b, Matrix_uploSym),  diag_b = GET_SLOT(b, Matrix_diagSym);
@@ -358,7 +422,7 @@ SEXP dtrMatrix_dtrMatrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 		valx[i * np1] = 1.;
 	}
     } else { /* different "uplo" ==> result is "dgeMatrix" ! */
-	val = PROTECT(dense_as_general(b, 'd', 2, 0));
+	val = PROTECT(asdge(b, 0));
 	SEXP
 	    dn_a = GET_SLOT( a , Matrix_DimNamesSym),
 	    dn   = GET_SLOT(val, Matrix_DimNamesSym);
@@ -410,7 +474,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
      *
      * Because 'a' must be square, the size of the answer 'val',
      * is the same as the size of 'b' */
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
+    SEXP val = PROTECT(asdge(b, 0));
     int rt = asLogical(right); /* if(rt), compute b %*% op(a),  else  op(a) %*% b */
     int tr = asLogical(trans);/* if true, use t(a) */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
@@ -447,7 +511,7 @@ SEXP dtrMatrix_matrix_mm(SEXP a, SEXP b, SEXP right, SEXP trans)
 
 SEXP dtpMatrix_matrix_mm(SEXP x, SEXP y, SEXP right, SEXP trans)
 {
-    SEXP val = PROTECT(dense_as_general(y, 'd', 2, 0));
+    SEXP val = PROTECT(asdge(y, 0));
     int rt = asLogical(right); // if(rt), compute b %*% op(a), else op(a) %*% b
     int tr = asLogical(trans); // if(tr), op(a) = t(a), else op(a) = a
     /* Since 'x' is square (n x n ),   dim(x %*% y) = dim(y) */
@@ -503,7 +567,7 @@ SEXP dgeMatrix_dtpMatrix_mm(SEXP x, SEXP y)
 
 SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 {
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));
+    SEXP val = PROTECT(asdge(b, 0));
     int *bdims = INTEGER(GET_SLOT(val, Matrix_DimSym));
     int i, ione = 1, n = bdims[0], nrhs = bdims[1];
     R_xlen_t nn = n * (R_xlen_t) nrhs;
@@ -531,7 +595,7 @@ SEXP dspMatrix_matrix_mm(SEXP a, SEXP b)
 
 SEXP dsyMatrix_matrix_mm(SEXP a, SEXP b, SEXP right)
 {
-    SEXP val = PROTECT(dense_as_general(b, 'd', 2, 0));// incl. dimnames
+    SEXP val = PROTECT(asdge(b, 0));// incl. dimnames
     int rt = asLogical(right); /* if(rt), compute b %*% a,  else  a %*% b */
     int *adims = INTEGER(GET_SLOT(a, Matrix_DimSym)),
 	*bdims = INTEGER(GET_SLOT(val, Matrix_DimSym)),
@@ -618,7 +682,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 		b_transpose_if_vector = b_is_vector && XLENGTH(b) != a_nc;
 	if (b_is_vector)
 		trans_b = FALSE; /* don't transpose twice! */
-	PROTECT(b = dense_as_general(b, 'd', 2, b_transpose_if_vector));
+	PROTECT(b = asdge(b, b_transpose_if_vector));
 
 	CHM_DN chb = AS_CHM_DN(b);
 	R_CheckStack();
