@@ -98,7 +98,7 @@ setMethod("Math", signature(x = "CsparseMatrix"), function(x)
 {
     if(.Generic %in% Math.vecGenerics)
         ## Result is a vector
-        return(callGeneric(.sparse2m(x)))
+        return(callGeneric(.M2m(x)))
     if(isN0(callGeneric(0)))
         ## Result is a denseMatrix
         return(callGeneric(.sparse2dense(x)))
@@ -134,7 +134,7 @@ setMethod("Math", signature(x = "diagonalMatrix"), function(x)
 {
     if(.Generic %in% Math.vecGenerics)
         ## Result is a vector
-        return(callGeneric(.diag2m(x)))
+        return(callGeneric(.M2m(x)))
     unit <- x@diag != "N"
     r <- callGeneric(if(unit) 1 else x@x)
     if(isN0(f0 <- callGeneric(0))) {
