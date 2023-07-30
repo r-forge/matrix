@@ -249,8 +249,8 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "denseMatrix"),
                       r@diag <- "U"
               }
               if(all(dr)) {
-                  X <- .dense2m(X)
-                  Y <- .dense2m(Y)
+                  X <- .M2m(X)
+                  Y <- .M2m(Y)
                   storage.mode(X) <- "double"
                   storage.mode(Y) <- "double"
                   r@x <-

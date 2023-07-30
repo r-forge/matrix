@@ -34,11 +34,11 @@ setMethod("mean", signature(x = "denseMatrix"),
                   if(isTRUE(na.rm))
                       x <- x[!is.na(x)]
                   sum(x) / length(x)
-              } else mean.default(.dense2v(x), trim = trim, na.rm = na.rm, ...)
+              } else mean.default(.M2v(x), trim = trim, na.rm = na.rm, ...)
           })
 
 setMethod("rep", "denseMatrix",
-          function(x, ...) rep(.dense2v(x), ...))
+          function(x, ...) rep(.M2v(x), ...))
 
 setMethod("show", "denseMatrix",
           function(object) prMatrix(object))
