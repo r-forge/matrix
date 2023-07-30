@@ -277,7 +277,7 @@ setMethod("diag<-", signature(x = "diagonalMatrix"),
                              integer =,
                              double =
                                  {
-                                     x <- ..diag2d(x)
+                                     x <- .M2kind(x, "d")
                                      rep_len(as.double(x), n)
                                  },
                              stop(gettextf("replacement diagonal has incompatible type \"%s\"", typeof(value)),
@@ -315,7 +315,7 @@ setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
           function(x, uplo) .diag2sparse(x, "s", "C", "U"))
 
 setMethod("symmpart", signature(x = "diagonalMatrix"),
-          function(x) forceSymmetric(..diag2d(x)))
+          function(x) forceSymmetric(.M2kind(x, "d")))
 
 setMethod("skewpart", signature(x = "diagonalMatrix"),
           function(x) symmetrizeDimnames(.setZero(x, "d")))
@@ -466,10 +466,10 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
 .prod.diag.missing <- function(x, boolArith) {
     if(boolArith) {
         if(!is.logical(x@x))
-            x <- ..diag2l(x)
+            x <- .M2kind(x, "l")
     } else {
         if(!is.double(x@x))
-            x <- ..diag2d(x)
+            x <- .M2kind(x, "d")
         if(x@diag == "N")
             x@x <- x@x * x@x
     }
@@ -494,23 +494,23 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
     if(boolArith) {
         if(x@diag == "N") {
             if(!is.logical(x@x))
-                x <- ..diag2l(x)
+                x <- .M2kind(x, "l")
             if(y@diag == "N")
                 x@x <- x@x & y@x
             x
         } else if(is.logical(y@x))
             y
-        else ..diag2l(y)
+        else .M2kind(y, "l")
     } else {
         if(x@diag == "N") {
             if(!is.double(x@x))
-                x <- ..diag2d(x)
+                x <- .M2kind(x, "d")
             if(y@diag == "N")
                 x@x <- x@x * y@x
             x
         } else if(is.double(y@x))
             y
-        else ..diag2d(y)
+        else .M2kind(y, "d")
     }
 }
 
@@ -1204,10 +1204,10 @@ diagOdiag <- function(e1,e2) {
             }
             if(!is.double(e1@x))
                 ## e.g. e1, e2 are logical;
-                e1 <- ..diag2d(e1)
+                e1 <- .M2kind(e1, "d")
         }
         else if(is.logical(r))
-            e1 <- ..diag2l(e1)
+            e1 <- .M2kind(e1, "l")
         else stop(gettextf("intermediate 'r' is of type %s",
                            typeof(r)), domain=NA)
         e1@x <- r

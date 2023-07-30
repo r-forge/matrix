@@ -23,7 +23,7 @@ setMethod("chol", signature(x = "symmetricMatrix"),
 
 setMethod("chol", signature(x = "diagonalMatrix"),
           function(x, ...)
-              chol(..diag2d(x), ...))
+              chol(.M2kind(d, "d"), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
@@ -82,7 +82,7 @@ setMethod("Cholesky", signature(A = "symmetricMatrix"),
 
 setMethod("Cholesky", signature(A = "diagonalMatrix"),
           function(A, ...)
-              Cholesky(..diag2d(A), ...))
+              Cholesky(.M2kind(A, "d"), ...))
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
           function(A, perm = TRUE, tol = -1, ...)
@@ -153,7 +153,7 @@ setMethod("chol2inv", signature(x = "triangularMatrix"),
 
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
           function(x, ...)
-              chol2inv(..diag2d(x), ...))
+              chol2inv(.M2kind(x, "d"), ...))
 
 setMethod("chol2inv", signature(x = "dtrMatrix"),
           function(x, ...) {
