@@ -72,9 +72,9 @@ setMethod("is.na", signature(x = "nMatrix"),
 setMethod("is.na", signature(x = "dsparseMatrix"),
           function(x) {
               if(anyNA(x@x)) { # don't allocate in FALSE case
-                  r <- .sparse2kind(diagU2N(x), "l", drop0 = FALSE)
+                  r <- .M2kind(diagU2N(x), "l")
                   r@x <- is.na(r@x)
-                  .sparse2kind(r, "n", drop0 = TRUE)
+                  .M2kind(drop0.notol(r), "n")
               } else allFalseMatrix(x)
           })
 
@@ -83,7 +83,7 @@ setMethod("is.na", signature(x = "lsparseMatrix"),
               if(anyNA(x@x)) { # don't allocate in FALSE case
                   r <- diagU2N(x)
                   r@x <- is.na(r@x)
-                  .sparse2kind(r, "n", drop0 = TRUE)
+                  .M2kind(drop0.notol(r), "n")
               } else allFalseMatrix(x)
           })
 
@@ -314,9 +314,9 @@ setMethod("is.infinite", signature(x = "lMatrix"),
 setMethod("is.infinite", signature(x = "dsparseMatrix"),
           function(x) {
               if(any(is.infinite(x@x))) {
-                  r <- .sparse2kind(x <- diagU2N(x), "l", drop0 = FALSE)
+                  r <- .M2kind(x <- diagU2N(x), "l")
                   r@x <- is.infinite(x@x)
-                  .sparse2kind(r, "n", drop0 = TRUE)
+                  .M2kind(drop0.notol(r), "n")
               } else allFalseMatrix(x)
           })
 
@@ -415,9 +415,9 @@ setMethod("is.nan", signature(x = "lMatrix"),
 setMethod("is.nan", signature(x = "dsparseMatrix"),
           function(x) {
               if(any(is.nan(x@x))) {
-                  r <- .sparse2kind(x <- diagU2N(x), "l", drop0 = FALSE)
+                  r <- .M2kind(x <- diagU2N(x), "l")
                   r@x <- is.nan(x@x)
-                  .sparse2kind(r, "n", drop0 = TRUE)
+                  .M2kind(drop0.notol(r), "n")
               } else allFalseMatrix(x)
           })
 

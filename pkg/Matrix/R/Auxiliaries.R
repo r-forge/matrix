@@ -45,7 +45,7 @@ extends1of <- function(class, classes, ...) {
 ## Fast alternative to MatrixClass():
 ## - if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
 ## - if strict= TRUE then may also give one of these:
-##   "pMatrix", "p?Cholesky", "dp[op]Matrix", "p?corMatrix"
+##   "pMatrix", "dp[op]Matrix", "p?corMatrix"
 .M.nonvirtual <- function(x, strict = FALSE)
     .Call(R_Matrix_nonvirtual, x, strict)
 
@@ -571,41 +571,61 @@ class2 <- function(cl, kind = "l", do.sub = TRUE) {
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
-    kind <- .M.kind(x)
-    symmetric <- extends(cld, "symmetricMatrix") && isSymmetric(x)
+    cl <- .M.nonvirtual(new(cld))
+    if(cl == "indMatrix")
+        cl <- "ngeMatrix"
+    kind <- substr(cl, 1L, 1L)
+    symmetric <- substr(cl, 2L, 2L) == "s" && isSymmetric(x)
     triangular <- !symmetric &&
-        (extends(cld, "triangularMatrix") && (it <- isTriangular(x)))
-    if(!(symmetric || triangular))
-        return(.M2gen(x, kind))
-    y <- if(symmetric)
-             forceSymmetric(x)
-         else if (attr(it, "kind") == "U")
-             triu(x)
-         else tril(x)
-    if(extends(cld, "packedMatrix"))
-        y <- pack(y)
-    .dense2kind(y, kind)
+        substr(cl, 2L, 2L) == "t" && (it <- isTriangular(x))
+    packed <- (symmetric || triangular) && substr(cl, 3L, 3L) == "p"
+    if(isS4(x)) {
+        r <- if(symmetric || triangular)
+                 .M2kind(if(symmetric)
+                             forceSymmetric(x)
+                         else if(attr(it, "kind") == "U")
+                             triu(x)
+                         else tril(x),
+                         kind)
+             else .M2gen(x, kind)
+        if(packed) pack(r) else r
+    }
+    else if(symmetric)
+        .m2dense(x, paste0(kind, "s", if(packed) "p" else "y"), "U", NULL)
+    else if(triangular)
+        .m2dense(x, paste0(kind, "t", if(packed) "p" else "r"), attr(it, "kind"), "N")
+    else .m2dense(x, paste0(kind, "ge"))
 }
 
 ## (matrix|sparseMatrix)->CsparseMatrix as similar as possible to "target"
 as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
-    x <- as(x, "CsparseMatrix")
-    x <- if(extends(cld, "symmetricMatrix") && isSymmetric(x))
-             forceSymmetric(x)
-         else if(!(extends(cld, "triangularMatrix") && (it <- isTriangular(x))))
-             .M2gen(x)
-         else if(attr(it, "kind") == "U")
-             triu(x)
-         else tril(x)
-    .sparse2kind(x, .M.kind(x))
+    cl <- .M.nonvirtual(new(cld))
+    if(cl == "indMatrix")
+        cl <- "ngeMatrix"
+    kind <- substr(cl, 1L, 1L)
+    symmetric <- substr(cl, 2L, 2L) == "s" && isSymmetric(x)
+    triangular <- !symmetric &&
+        substr(cl, 2L, 2L) == "t" && (it <- isTriangular(x))
+    if(isS4(x)) {
+        r <- if(symmetric || triangular)
+                 .M2kind(if(symmetric)
+                             forceSymmetric(x)
+                         else if(attr(it, "kind") == "U")
+                             triu(x)
+                         else tril(x),
+                         kind)
+             else .M2gen(x, kind)
+        .M2C(r)
+    }
+    else if(symmetric)
+        .m2sparse(x, paste0(kind, "sC"), "U", NULL)
+    else if(triangular)
+        .m2sparse(x, paste0(kind, "tC"), attr(it, "kind"), "N")
+    else .m2sparse(x, paste0(kind, "gC"))
 }
 
-## as(<Matrix>, <non-unit diagonal CsparseMatrix>)
-asCspN <- function(x, cl = class(x), cld = getClassDef(cl)) {
-    if(!extends(cld, "CsparseMatrix"))
-        cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
-    .Call(R_sparse_diag_U2N, x)
-}
+## as(<Matrix>, <non-unit triangular CsparseMatrix>)
+asCspN <- function(x) .Call(R_sparse_diag_U2N, .M2C(x))
 
 diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "U")
@@ -626,7 +646,7 @@ diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
 
 diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "N")
-	.diagN2U(x, cl = cl, checkDense = checkDense)
+        .diagN2U(x, cl = cl, checkDense = checkDense)
     else x
 }
 
