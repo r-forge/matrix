@@ -560,7 +560,7 @@ setMethod("update", signature(object = "CHMfactor"),
               }
               s <- .M.kind(parent)
               if(s != "d")
-                  parent <- .sparse2kind(parent, "d")
+                  parent <- .M2kind(parent, "d")
               .updateCHMfactor(object, parent, mult)
           })
 
