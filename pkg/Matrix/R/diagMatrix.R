@@ -2,6 +2,19 @@
 ## diagonal matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## For group methods
+.diag2tT.smart <- function(from, x, kind = ".") {
+    shape <- .M.shape(x)
+    uplo <- if(shape == "t") x@uplo else "U"
+    .diag2sparse(.M2kind(from, kind), "t", "T", uplo)
+}
+.diag2T.smart <- function(from, x, kind = ".") {
+    shape <- .M.shape(x)
+    uplo <- if(shape == "s" || shape == "t") x@uplo else "U"
+    .diag2sparse(.M2kind(from, kind), if(shape == "s") "s" else "t", "T", uplo)
+}
+
+
 ## ~~~~ CONSTRUCTORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## diagonalMatrix constructor, allowing either or both of 'n' and 'x' to be
