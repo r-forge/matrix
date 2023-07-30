@@ -218,7 +218,7 @@ setMethod("%*%", signature(x = "indMatrix", y = "matrix"),
               if(x@margin != 1L)
                   return(as(x, "dsparseMatrix") %*% y)
               mmultDim(x@Dim, dim(y), type = 1L)
-              r <- .m2ge(y[x@perm, , drop = FALSE], "d")
+              r <- .m2dense(y[x@perm, , drop = FALSE], "dge")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -228,7 +228,7 @@ setMethod("%*%", signature(x = "matrix", y = "indMatrix"),
               if(y@margin == 1L)
                   return(x %*% as(y, "dsparseMatrix"))
               mmultDim(dim(x), y@Dim, type = 1L)
-              r <- .m2ge(x[, y@perm, drop = FALSE], "d")
+              r <- .m2dense(x[, y@perm, drop = FALSE], "dge")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -282,7 +282,7 @@ setMethod("%&%", signature(x = "indMatrix", y = "matrix"),
               if(x@margin != 1L)
                   return(as(x, "nsparseMatrix") %&% y)
               mmultDim(x@Dim, dim(y), type = 1L)
-              r <- .m2ge(y[x@perm, , drop = FALSE], "n")
+              r <- .m2dense(y[x@perm, , drop = FALSE], "nge")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -292,7 +292,7 @@ setMethod("%&%", signature(x = "matrix", y = "indMatrix"),
               if(y@margin == 1L)
                   return(x %&% as(y, "nsparseMatrix"))
               mmultDim(dim(x), y@Dim, type = 1L)
-              r <- .m2ge(x[, y@perm, drop = FALSE], "n")
+              r <- .m2dense(x[, y@perm, drop = FALSE], "nge")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -347,8 +347,8 @@ setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
                   cl <- if(boolArith) "nsparseMatrix" else "dsparseMatrix"
                   r <- crossprod(x, as(y, cl), boolArith = boolArith, ...)
               } else {
-                  kind <- if(boolArith) "n" else "d"
-                  r <- .m2ge(t(x)[, y@perm, drop = FALSE], kind)
+                  r <- .m2dense(t(x)[, y@perm, drop = FALSE],
+                                if(boolArith) "nge" else "dge")
                   r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames,
                                               type = 2L)
               }
@@ -398,8 +398,8 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
               mmultDim(x@Dim, dim(y), type = 3L)
               boolArith <- isTRUE(boolArith)
               if(y@margin == 1L) {
-                  kind <- if(boolArith) "n" else "d"
-                  r <- .m2ge(t(y)[x@perm, , drop = FALSE], kind)
+                  r <- .m2dense(t(y)[x@perm, , drop = FALSE],
+                                if(boolArith) "nge" else "dge")
                   r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y),
                                               type = 3L)
               } else {

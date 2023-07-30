@@ -134,9 +134,9 @@ setMethod("cbind2", signature(x = "numeric", y = "denseMatrix"),
 
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "matrix"),
-          function(x, y, ...) cbind2(x, .m2ge(y, ".")))
+          function(x, y, ...) cbind2(x, .m2dense(y, ".ge")))
 setMethod("cbind2", signature(x = "matrix", y = "denseMatrix"),
-          function(x, y, ...) cbind2(.m2ge(x, "."), y))
+          function(x, y, ...) cbind2(.m2dense(x, ".ge"), y))
 
 setMethod("cbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {
@@ -182,9 +182,9 @@ setMethod("rbind2", signature(x = "numeric", y = "denseMatrix"),
           })
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "matrix"),
-          function(x, y, ...) rbind2(x, .m2ge(y, ".")))
+          function(x, y, ...) rbind2(x, .m2dense(y, ".ge")))
 setMethod("rbind2", signature(x = "matrix", y = "denseMatrix"),
-          function(x, y, ...) rbind2(.m2ge(x, "."), y))
+          function(x, y, ...) rbind2(.m2dense(x, ".ge"), y))
 
 setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
           function(x, y, ...) {

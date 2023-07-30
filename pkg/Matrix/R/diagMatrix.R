@@ -547,8 +547,6 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           })
 
 .prod.diag.m <- function(x, y, boolArith, trans) {
-    ## MJ: .m2ge() avoids a copy when argument is unreferenced,
-    ##     so it is more efficient than Matrix() here
     if(boolArith) {
         kind <- "n"
         op <- `&`
@@ -556,12 +554,12 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
         kind <- "d"
         op <- `*`
     }
-    .m2ge(if(x@diag == "N")
-              op(x@x, if(trans) t(y) else y)
-          else if(trans)
-              t(y)
-          else y,
-          kind)
+    .m2dense(if(x@diag == "N")
+                 op(x@x, if(trans) t(y) else y)
+             else if(trans)
+                 t(y)
+             else y,
+             paste0(kind, "ge"))
 }
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"),
@@ -599,8 +597,6 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "matrix"),
           })
 
 .prod.m.diag <- function(x, y, boolArith, trans) {
-    ## MJ: .m2ge() avoids a copy when argument is unreferenced,
-    ##     so it is more efficient than Matrix() here
     if(boolArith) {
         kind <- "n"
         op <- `&`
@@ -608,13 +604,13 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "matrix"),
         kind <- "d"
         op <- `*`
     }
-    .m2ge(if(y@diag == "N")
-              op(if(trans) t(x) else x,
-                 rep(y@x, each = dim(x)[1L + trans]))
-          else if(trans)
-              t(x)
-          else x,
-          kind)
+    .m2dense(if(y@diag == "N")
+                 op(if(trans) t(x) else x,
+                    rep(y@x, each = dim(x)[1L + trans]))
+             else if(trans)
+                 t(x)
+             else x,
+             paste0(kind, "ge"))
 }
 
 setMethod("%*%", signature(x = "matrix", y = "diagonalMatrix"),

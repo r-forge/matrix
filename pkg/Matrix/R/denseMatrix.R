@@ -75,7 +75,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
                      else if(na == 4)
                          r[i, ] <- value
                      else stop(gettextf("invalid nargs()= %d", na), domain=NA)
-                     .m2ge(r, .M.kind(x))
+                     .m2dense(r, paste0(.M.kind(x), "ge"))
                  })
 
 setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
@@ -83,7 +83,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
                  function (x, i, j, ..., value) {
                      r <- as(x, "matrix")
                      r[, j] <- value
-                     .m2ge(r, .M.kind(x))
+                     .m2dense(r, paste0(.M.kind(x), "ge"))
                  })
 
 setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
@@ -99,5 +99,5 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
                  function(x, i, j, ..., value) {
                      r <- as(x, "matrix")
                      r[ i ] <- value
-                     .m2ge(r, .M.kind(x))
+                     .m2dense(r, paste0(.M.kind(x), "ge"))
                  })

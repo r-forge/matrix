@@ -713,19 +713,19 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 
 setMethod("kronecker", signature(X = "Matrix", Y = "matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, .m2ge(Y, "d"), FUN, make.dimnames, ...))
+              kronecker(X, .m2dense(Y, "dge"), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "Matrix", Y = "vector"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, .m2ge(Y, "d"), FUN, make.dimnames, ...))
+              kronecker(X, .m2dense(Y, "dge"), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "matrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.m2ge(X, "d"), Y, FUN, make.dimnames, ...))
+              kronecker(.m2dense(X, "dge"), Y, FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "vector", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.m2ge(X, "d"), Y, FUN, make.dimnames, ...))
+              kronecker(.m2dense(X, "dge"), Y, FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "denseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
