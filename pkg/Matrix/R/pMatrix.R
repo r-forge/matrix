@@ -122,7 +122,7 @@ setMethod("%*%", signature(x = "pMatrix", y = "matrix"),
           function(x, y) {
               mmultDim(x@Dim, dim(y), type = 1L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- .m2ge(y[perm, , drop = FALSE], "d")
+              r <- .m2dense(y[perm, , drop = FALSE], "dge")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -131,7 +131,7 @@ setMethod("%*%", signature(x = "matrix", y = "pMatrix"),
           function(x, y) {
               mmultDim(dim(x), y@Dim, type = 1L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2ge(x[, perm, drop = FALSE], "d")
+              r <- .m2dense(x[, perm, drop = FALSE], "dge")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -158,7 +158,7 @@ setMethod("%&%", signature(x = "pMatrix", y = "matrix"),
           function(x, y) {
               mmultDim(x@Dim, dim(y), type = 1L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- .m2ge(y[perm, , drop = FALSE], "n")
+              r <- .m2dense(y[perm, , drop = FALSE], "nge")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -167,7 +167,7 @@ setMethod("%&%", signature(x = "matrix", y = "pMatrix"),
           function(x, y) {
               mmultDim(dim(x), y@Dim, type = 1L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2ge(x[, perm, drop = FALSE], "n")
+              r <- .m2dense(x[, perm, drop = FALSE], "nge")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -203,8 +203,8 @@ setMethod("crossprod", signature(x = "matrix", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(dim(x), y@Dim, type = 2L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2ge(t(x)[, perm, drop = FALSE],
-                         if(isTRUE(boolArith)) "n" else "d")
+              r <- .m2dense(t(x)[, perm, drop = FALSE],
+                            if(isTRUE(boolArith)) "nge" else "dge")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
               r
           })
@@ -232,8 +232,8 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, dim(y), type = 3L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- .m2ge(t(y)[perm, , drop = FALSE],
-                         if(isTRUE(boolArith)) "n" else "d")
+              r <- .m2dense(t(y)[perm, , drop = FALSE],
+                            if(isTRUE(boolArith)) "nge" else "dge")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
               r
           })

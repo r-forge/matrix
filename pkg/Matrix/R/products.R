@@ -305,7 +305,7 @@ setMethod("crossprod", signature(x = "dgeMatrix", y = "numLike"),
 
 setMethod("crossprod", signature(x = "matrix", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      crossprod(.m2ge(x, "d"), y, boolArith=boolArith, ...))
+	      crossprod(.m2dense(x, "dge"), y, boolArith=boolArith, ...))
 
 setMethod("crossprod", signature(x = "numLike", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
@@ -681,7 +681,7 @@ setMethod("tcrossprod", signature(x = "dgeMatrix", y = "numLike"),
 
 setMethod("tcrossprod", signature(x = "matrix", y = "dgeMatrix"),
 	  function(x, y=NULL, boolArith=NA, ...)
-	      tcrossprod(.m2ge(x, "d"), y, boolArith=boolArith, ...))
+	      tcrossprod(.m2dense(x, "dge"), y, boolArith=boolArith, ...))
 setMethod("tcrossprod", signature(x = "numLike", y = "dgeMatrix"), .v.Mt)
 
 setMethod("tcrossprod", signature(x = "dgeMatrix", y = "missing"),

@@ -79,11 +79,11 @@ for(.cl in c("MatrixFactorization", "triangularMatrix")) {
 
 setMethod("solve", signature(a = .cl, b = "numLike"),
           function(a, b, ...)
-              drop(solve(a, .m2ge(b, "d"), ...)))
+              drop(solve(a, .m2dense(b, "dge"), ...)))
 
 setMethod("solve", signature(a = .cl, b = "matrix"),
           function(a, b, ...)
-              solve(a, .m2ge(b, "d"), ...))
+              solve(a, .m2dense(b, "dge"), ...))
 
 setMethod("solve", signature(a = .cl, b = "denseMatrix"),
           function(a, b, ...)
@@ -658,11 +658,11 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
           function(a, b, ...)
-              solve(.m2ge(a, "d"), b, ...))
+              solve(.m2dense(a, "dge"), b, ...))
 
 setMethod("solve", signature(a = "matrix", b = "sparseVector"),
           function(a, b, ...)
-              solve(.m2ge(a, "d"), .spV2dge(b), ...)) # FIXME? drop(.)?
+              solve(.m2dense(a, "dge"), .spV2dge(b), ...)) # FIXME? drop(.)?
 
 
 ########################################################################

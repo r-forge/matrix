@@ -3,7 +3,7 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("lu", signature(x = "matrix"),
-          function(x, ...) lu(.m2ge(x, "d"), ...))
+          function(x, ...) lu(.m2dense(x, "dge"), ...))
 
 setMethod("lu", signature(x = "denseMatrix"),
           function(x, ...) lu(..dense2d(x), ...))
