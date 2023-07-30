@@ -4,34 +4,6 @@
 
 .upM.subclasses <- names(getClassDef("unpackedMatrix")@subclasses)
 
-
-## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## as(<unpackedMatrix>,             "matrix") inherited from denseMatrix
-## as(<unpackedMatrix>,        "[dln]Matrix") inherited from denseMatrix
-## as(<unpackedMatrix>,   "[dln]denseMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,  "[dln]sparseMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,      "generalMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,   "triangularMatrix") inherited from      Matrix
-## as(<unpackedMatrix>,    "symmetricMatrix") inherited from      Matrix
-## as(<unpackedMatrix>,       "packedMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>, "[CRT]?sparseMatrix") inherited from denseMatrix
-## as(<unpackedMatrix>,     "diagonalMatrix") inherited from      Matrix
-## as(<unpackedMatrix>,          "indMatrix") inherited from      Matrix
-
-
-## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-## as(          <numLike>, "unpackedMatrix") in ./denseMatrix.R
-## as(           <matrix>, "unpackedMatrix") in ./denseMatrix.R
-## as(      <denseMatrix>, "unpackedMatrix") in ./denseMatrix.R
-## as(<[CRT]sparseMatrix>, "unpackedMatrix") in ./sparseMatrix.R
-## as(   <diagonalMatrix>, "unpackedMatrix") in ./diagMatrix.R
-## as(        <indMatrix>, "unpackedMatrix") in ./indMatrix.R
-
-
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 setMethod("unpack", signature(x = "unpackedMatrix"),
           function(x, ...) x)
 setMethod("unpack", signature(x = "matrix"),
