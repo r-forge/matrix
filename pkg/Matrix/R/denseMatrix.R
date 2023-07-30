@@ -44,8 +44,8 @@ setMethod("show", "denseMatrix",
           function(object) prMatrix(object))
 
 .dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
-.dense.triu <- function(x, k = 0L,  ...) .Call(R_dense_band, x, k, NULL)
-.dense.tril <- function(x, k = 0L,  ...) .Call(R_dense_band, x, NULL, k)
+.dense.triu <- function(x, k = 0L, ...) .Call(R_dense_band, x, k, NULL)
+.dense.tril <- function(x, k = 0L, ...) .Call(R_dense_band, x, NULL, k)
 for (.cl in c("denseMatrix", "matrix")) {
     setMethod("band", signature(x = .cl), .dense.band)
     setMethod("triu", signature(x = .cl), .dense.triu)

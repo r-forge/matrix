@@ -349,9 +349,7 @@ function(X, Y, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
             ## 'X' and 'Y' are numeric matrices
             r <- (if(ny == 1L) X else X[rep.int(seq_len(nx), times = ny), ]) *
                  (if(nx == 1L) Y else Y[rep    (seq_len(ny),  each = nx), ])
-            if(forceSparse)
-                .Call(R_dense_as_sparse, r, "dgC", NULL, NULL)
-            else r
+            if(forceSparse) .m2sparse(r, "dgC") else r
 
         }
 
@@ -390,8 +388,12 @@ function(rList, do.names = TRUE, forceSparse = FALSE, verbose = FALSE)
                                        forceSparse = forceSparse,
                                        do.names = do.names,
                                        verbose = verbose)
-    if(forceSparse && (is.matrix(r) || is(r, "denseMatrix")))
-        .Call(R_dense_as_sparse, r, "dgC", NULL, NULL)
+    if(!forceSparse)
+        r
+    else if(!isS4(r))
+        .m2sparse(r, "dgC")
+    else if(is(r, "denseMatrix"))
+        .dense2sparse(r, "C")
     else r
 } # .sparse.interaction.N
 
