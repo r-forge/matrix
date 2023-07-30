@@ -170,16 +170,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_subscript_1ary_mat, 2),
 	CALLDEF(R_subscript_2ary, 3),
 
-	CALLDEF(R_sparse_as_dense, 2),
-	CALLDEF(R_sparse_as_matrix, 1),
-	CALLDEF(R_sparse_as_vector, 1),
-	CALLDEF(R_sparse_as_kind, 3),
-	CALLDEF(R_sparse_as_general, 1),
-
-	CALLDEF(R_diagonal_as_sparse, 4),
-	CALLDEF(R_diagonal_as_dense, 3),
-	CALLDEF(R_diagonal_as_kind, 2),
-
 	CALLDEF(R_sparse_drop0, 1),
 	CALLDEF(R_sparse_band, 3),
 	CALLDEF(R_sparse_diag_get, 2),
@@ -191,10 +181,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_symmpart, 1),
 	CALLDEF(R_sparse_skewpart, 1),
 
-	CALLDEF(CRsparse_as_Tsparse, 1),
-	CALLDEF(Tsparse_as_CRsparse, 2),
 	CALLDEF(Tsparse_aggregate, 1),
-	CALLDEF(tCRsparse_as_RCsparse, 1),
 	CALLDEF(Csparse_is_diagonal, 1),
 	CALLDEF(Rsparse_is_diagonal, 1),
 	CALLDEF(Tsparse_is_diagonal, 1),
@@ -206,14 +193,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(CRsparse_colSums, 4),
 	CALLDEF(CRsparse_rowSums, 4),
 
-	CALLDEF(R_matrix_as_dense, 4),
-	CALLDEF(R_dense_as_general, 2),
-	CALLDEF(R_dense_as_sparse, 4),
-	CALLDEF(R_dense_as_kind, 2),
-	CALLDEF(R_dense_as_matrix, 1),
-	CALLDEF(R_geMatrix_as_matrix, 2),
-	CALLDEF(R_dense_as_vector, 1),
-	CALLDEF(R_geMatrix_as_vector, 2),
 	CALLDEF(R_dense_band, 3),
 	CALLDEF(R_dense_colSums, 3),
 	CALLDEF(R_dense_rowSums, 3),
@@ -224,7 +203,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(matrix_symmpart, 1),
 	CALLDEF(matrix_skewpart, 1),
 
-	CALLDEF(unpackedMatrix_pack, 4),
 	CALLDEF(unpackedMatrix_force_symmetric, 2),
 	CALLDEF(unpackedMatrix_is_symmetric, 2),
 	CALLDEF(unpackedMatrix_is_triangular, 2),
@@ -235,7 +213,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(unpackedMatrix_symmpart, 1),
 	CALLDEF(unpackedMatrix_skewpart, 1),
 
-	CALLDEF(packedMatrix_unpack, 2),
 	CALLDEF(packedMatrix_force_symmetric, 2),
 	CALLDEF(packedMatrix_is_symmetric, 2),
 	CALLDEF(packedMatrix_is_triangular, 2),

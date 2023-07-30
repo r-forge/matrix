@@ -149,8 +149,6 @@ PACKED_COPY_DIAGONAL(z, Rcomplex);
 SEXP unpacked_force(SEXP, int, char, char);
 SEXP packed_transpose(SEXP, int, char);
 
-SEXP dense_as_general(SEXP, char, int, int);
-
 void validObject(SEXP, const char *);
 
 #ifdef __cplusplus
