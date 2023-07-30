@@ -18,7 +18,7 @@ static SEXP asdge(SEXP from, int transpose_if_vector)
 
 	SEXP to;
 	if (ivalid < 0)
-		PROTECT(to = MJ_matrix_as_dense(from, "dge", '\0', '\0',
+		PROTECT(to = matrix_as_dense(from, "dge", '\0', '\0',
 		                             transpose_if_vector, 1));
 	else {
 		const char *cl = valid[ivalid];
@@ -34,9 +34,9 @@ static SEXP asdge(SEXP from, int transpose_if_vector)
 			UNPROTECT(4);
 		} else if (cl[0] == 'd') {
 			if (cl[1] == 'd' && cl[2] == 'i')
-				PROTECT(to = MJ_diagonal_as_dense(from, cl, 'g', 0, '\0'));
+				PROTECT(to = diagonal_as_dense(from, cl, 'g', 0, '\0'));
 			else {
-				PROTECT(to = MJ_dense_as_general(from, cl, 1));
+				PROTECT(to = dense_as_general(from, cl, 1));
 				SEXP factors = PROTECT(allocVector(VECSXP, 0));
 				SET_SLOT(to, Matrix_factorSym, factors);
 				UNPROTECT(1);
@@ -45,13 +45,13 @@ static SEXP asdge(SEXP from, int transpose_if_vector)
 			char cl_[] = "d..Matrix";
 			cl_[1] = cl[1]; cl_[2] = cl[2];
 			if (cl[1] == 'd' && cl[2] == 'i') {
-				to = MJ_diagonal_as_kind(from, cl, 'd');
+				to = diagonal_as_kind(from, cl, 'd');
 				PROTECT(to);
-				to = MJ_diagonal_as_dense(to, cl_, 'g', 0, '\0');
+				to = diagonal_as_dense(to, cl_, 'g', 0, '\0');
 			} else {
-				to = MJ_dense_as_kind(from, cl, 'd');
+				to = dense_as_kind(from, cl, 'd');
 				PROTECT(to);
-				to = MJ_dense_as_general(to, cl_, 0);
+				to = dense_as_general(to, cl_, 0);
 			}
 			UNPROTECT(1);
 			PROTECT(to);
@@ -667,7 +667,7 @@ SEXP Csp_dense_products(SEXP a, SEXP b,
 #if 0
 		warning(_("cholmod_sdmult() not yet implemented for pattern matrices -> coercing to double"));
 #endif
-		a = MJ_sparse_as_kind(a, cl, 'd');
+		a = sparse_as_kind(a, cl, 'd');
 	}
 	PROTECT(a);
 
@@ -745,17 +745,17 @@ SEXP Csparse_Csparse_prod(SEXP a, SEXP b, SEXP boolArith)
 		doBool = (acl[0] == 'n' && bcl[0] == 'n');
 	if (doBool) {
 		if (acl[0] != 'n')
-			a = MJ_sparse_as_kind(a, acl, 'n');
+			a = sparse_as_kind(a, acl, 'n');
 		PROTECT(a);
 		if (bcl[0] != 'n')
-			b = MJ_sparse_as_kind(b, bcl, 'n');
+			b = sparse_as_kind(b, bcl, 'n');
 		PROTECT(b);
 	} else {
 		if (acl[0] != 'd')
-			a = MJ_sparse_as_kind(a, acl, 'd');
+			a = sparse_as_kind(a, acl, 'd');
 		PROTECT(a);
 		if (bcl[0] != 'd')
-			b = MJ_sparse_as_kind(b, bcl, 'd');
+			b = sparse_as_kind(b, bcl, 'd');
 		PROTECT(b);
 	}
 
@@ -833,17 +833,17 @@ SEXP Csparse_Csparse_crossprod(SEXP a, SEXP b, SEXP trans, SEXP boolArith)
 		doBool = (acl[0] == 'n' && bcl[0] == 'n');
 	if (doBool) {
 		if (acl[0] != 'n')
-			a = MJ_sparse_as_kind(a, acl, 'n');
+			a = sparse_as_kind(a, acl, 'n');
 		PROTECT(a);
 		if (bcl[0] != 'n')
-			b = MJ_sparse_as_kind(b, bcl, 'n');
+			b = sparse_as_kind(b, bcl, 'n');
 		PROTECT(b);
 	} else {
 		if (acl[0] != 'd')
-			a = MJ_sparse_as_kind(a, acl, 'd');
+			a = sparse_as_kind(a, acl, 'd');
 		PROTECT(a);
 		if (bcl[0] != 'd')
-			b = MJ_sparse_as_kind(b, bcl, 'd');
+			b = sparse_as_kind(b, bcl, 'd');
 		PROTECT(b);
 	}
 
@@ -918,10 +918,10 @@ SEXP Csparse_crossprod(SEXP x, SEXP trans, SEXP boolArith)
 		doBool = cl[0] == 'n';
 	if (doBool) {
 		if (cl[0] != 'n')
-			x = MJ_sparse_as_kind(x, cl, 'n');
+			x = sparse_as_kind(x, cl, 'n');
 	} else {
 		if (cl[0] != 'd')
-			x = MJ_sparse_as_kind(x, cl, 'd');
+			x = sparse_as_kind(x, cl, 'd');
 	}
 	PROTECT(x);
 

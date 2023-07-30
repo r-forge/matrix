@@ -436,9 +436,9 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 		cl_[1] = cl[1];
 
 		/* defined in ./coerce.c : */
-		SEXP MJ_sparse_as_Csparse(SEXP, const char *);
+		SEXP sparse_as_Csparse(SEXP, const char *);
 
-		x = MJ_sparse_as_Csparse(x, cl);
+		x = sparse_as_Csparse(x, cl);
 		PROTECT(x);
 		x = CsparseMatrix_subscript_1ary(x, i, cl_);
 		UNPROTECT(1);
@@ -811,9 +811,9 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 		cl_[1] = cl[1];
 
 		/* defined in ./coerce.c : */
-		SEXP MJ_sparse_as_Csparse(SEXP, const char *);
+		SEXP sparse_as_Csparse(SEXP, const char *);
 
-		x = MJ_sparse_as_Csparse(x, cl);
+		x = sparse_as_Csparse(x, cl);
 		PROTECT(x);
 		x = CsparseMatrix_subscript_1ary_mat(x, i, cl_);
 		UNPROTECT(1);
@@ -1503,8 +1503,8 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 	if (cl[1] != 'g' && cl_[1] == 'g') {
 		/* defined in ./coerce.c : */
-		SEXP MJ_sparse_as_general(SEXP, const char *);
-		x = MJ_sparse_as_general(x, cl);
+		SEXP sparse_as_general(SEXP, const char *);
+		x = sparse_as_general(x, cl);
 	}
 	PROTECT(x);
 
@@ -1656,8 +1656,8 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 	if (cl[1] != 'g' && cl_[1] == 'g') {
 		/* defined in ./coerce.c : */
-		SEXP MJ_sparse_as_general(SEXP, const char *);
-		x = MJ_sparse_as_general(x, cl);
+		SEXP sparse_as_general(SEXP, const char *);
+		x = sparse_as_general(x, cl);
 	}
 	PROTECT(x);
 
@@ -2159,15 +2159,15 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 		cl_[1] = cl[1];
 
 		/* defined in ./coerce.c : */
-		SEXP MJ_sparse_as_Csparse(SEXP, const char *);
-		SEXP MJ_sparse_as_Tsparse(SEXP, const char *);
+		SEXP sparse_as_Csparse(SEXP, const char *);
+		SEXP sparse_as_Tsparse(SEXP, const char *);
 
-		x = MJ_sparse_as_Csparse(x, cl);
+		x = sparse_as_Csparse(x, cl);
 		PROTECT(x);
 		x = CsparseMatrix_subscript_2ary(x, i, j, cl_);
 		UNPROTECT(1);
 		PROTECT(x);
-		x = MJ_sparse_as_Tsparse(x, valid[R_check_class_etc(x, valid)]);
+		x = sparse_as_Tsparse(x, valid[R_check_class_etc(x, valid)]);
 		UNPROTECT(1);
 		return x;
 	}

@@ -81,8 +81,8 @@ SEXP CR2spV(SEXP from)
 	const char *cl = valid[ivalid];
 
 	/* defined in ./coerce.c : */
-	SEXP MJ_sparse_as_general(SEXP, const char *);
-	PROTECT(from = MJ_sparse_as_general(from, cl));
+	SEXP sparse_as_general(SEXP, const char *);
+	PROTECT(from = sparse_as_general(from, cl));
 
 	char vcl[] = ".sparseVector";
 	vcl[0] = cl[0];
