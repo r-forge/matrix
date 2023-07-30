@@ -23,7 +23,7 @@ replCmat <- function (x, i, j, ..., value)
 	       if(iMi || jMi) sprintf("missing (i,j) = (%d,%d)", iMi, jMi),
 	       .M.level = 2)
     if(na == 3L) { ## vector (or 2-col) indexing M[i] <- v : includes M[TRUE] <- v or M[] <- v !
-	x <- .CR2T(x)
+	x <- .M2T(x)
 	x[i] <- value # may change class, e.g., from dtT* to dgT*
 	cl.C <- sub(".Matrix$", "CMatrix", class(x))
 	if(.hasSlot(x, "x") && any0(x@x))

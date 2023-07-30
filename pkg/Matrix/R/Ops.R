@@ -300,9 +300,9 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
                 r <- copyClass(M, nCl, sNames = sN[is.na(match(sN, "x"))])
                 r@x <- callGeneric(if(has.x) M@x else 1, e2)
                 if(extends(cl1, "CsparseMatrix"))
-                    r <- .T2C(r)
+                    r <- .M2C(r)
                 else if(extends(cl1, "RsparseMatrix"))
-                    r <- .T2R(r)
+                    r <- .M2R(r)
             }
         } else {
             ## non sparse result; triangularity also gone, typically
@@ -916,9 +916,9 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
                                sNames = sN[is.na(match(sN, c("x","factors")))])
                 r@x <- callGeneric(if(has.x) M@x else TRUE, e2)
                 if(extends(cl1, "CsparseMatrix"))
-                    r <- .T2C(r)
+                    r <- .M2C(r)
                 else if(extends(cl1, "RsparseMatrix"))
-                    r <- .T2R(r)
+                    r <- .M2R(r)
             }
         } else {
             ## non sparse result
@@ -1033,7 +1033,7 @@ Logic.lCMat <- function(e1, e2, isOR) {
     }
     ## else :
 
-    .T2C(.do.Logic.lsparse(e1, e2, d = d, dn = dn, isOR = isOR,
+    .M2C(.do.Logic.lsparse(e1, e2, d = d, dn = dn, isOR = isOR,
                            ij1 = .Call(compressed_non_0_ij, e1, TRUE),
                            ij2 = .Call(compressed_non_0_ij, e2, TRUE)))
 }
@@ -1203,7 +1203,7 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
            if((nz <- e1@p[nc1]) < length(e1@x)) e1@x <- e1@x[seq_len(nz)]
            if((nz <- e2@p[nc1]) < length(e2@x)) e2@x <- e2@x[seq_len(nz)]
            ## special "T" convention: repeated entries are *summed*
-           .T2C(newTMat(i = c(ij1[,1], ij2[,1]),
+           .M2C(newTMat(i = c(ij1[,1], ij2[,1]),
                         j = c(ij1[,2], ij2[,2]),
                         x = if(Generic == "+")
                                 c(e1@x, e2@x)
@@ -1215,7 +1215,7 @@ setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
            ##  X * 0 == 0 * X == 0 --> keep common non-0
            ii <- WhichintersectInd(ij1, ij2, di=d)
            ij <- ij1[ii[[1]], , drop = FALSE]
-           .T2C(newTMat(i = ij[,1],
+           .M2C(newTMat(i = ij[,1],
                         j = ij[,2],
                         x = e1@x[ii[[1]]] * e2@x[ii[[2]]]))
        },
@@ -1579,7 +1579,7 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
                       j <- j[n0]
                       x <- x[n0]
                   }
-                  .T2C(if(e1is.n && e2is.n)
+                  .M2C(if(e1is.n && e2is.n)
                            new(paste0("n",shape,"TMatrix"), Dim = d,
                                Dimnames = dn, i = i, j = j)
                        else if(!S && !T)

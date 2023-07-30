@@ -66,9 +66,9 @@ fac2sparse2 <- function(from,
 		if(giveCsparse) "C" else "T"
 	    else match.arg(repr)
     switch(repr,
-	   "C" = .T2C(T),
+	   "C" = .M2C(T),
 	   "T" =    T,# TsparseMatrix
-	   "R" = .T2R(T))
+	   "R" = .M2R(T))
 }
 } # if(FALSE)
 

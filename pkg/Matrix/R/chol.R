@@ -103,7 +103,7 @@ setMethod("Cholesky", signature(A = "dsRMatrix"),
 
 setMethod("Cholesky", signature(A = "dsTMatrix"),
           function(A, ...)
-              Cholesky(.T2C(A), ...))
+              Cholesky(.M2C(A), ...))
 
 setMethod("Cholesky", signature(A = "ddiMatrix"),
           function(A, ...) {

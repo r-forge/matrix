@@ -425,7 +425,7 @@ non0.i <- function(M, cM = class(M), uniqT = TRUE) {
         .Call(compressed_non_0_ij, M, FALSE)
     else if(extends(cld, "TsparseMatrix")) {
         if(uniqT && is_not_uniqT(M))
-	    .Call(compressed_non_0_ij, .T2C(M), TRUE)
+	    .Call(compressed_non_0_ij, .M2C(M), TRUE)
 	else cbind(M@i, M@j, deparse.level = 0L)
     } else if(extends(cld, "diagonalMatrix")) {
         i <- seq.int(from = 0L, length.out = M@Dim[1L])
@@ -512,11 +512,11 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
     if(!extends(class.x, "TsparseMatrix"))
 	stop(gettextf("not yet implemented for class \"%s\"", dQuote(class.x)),
 	     domain = NA)
-    .CR2T(.T2C(x))
+    .M2T(.M2C(x))
 }
 
 ##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
-.uniqTsparse <- function(x) .CR2T(.T2C(x))
+.uniqTsparse <- function(x) .M2T(.M2C(x))
 
 drop0 <- function(x, tol = 0, is.Csparse = NA) {
     ## ## MJ: My R_sparse_drop0() handles all [CRT]sparseMatrix without
