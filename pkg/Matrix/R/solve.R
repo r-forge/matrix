@@ -483,7 +483,7 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 
 setMethod("solve", signature(a = "diagonalMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- ..diag2d(a)
+              a <- .M2kind(a, "d")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
