@@ -215,16 +215,16 @@ setMethod("rbind2", signature(x = "denseMatrix", y = "denseMatrix"),
 
 setMethod("cbind2", signature(x = "diagonalMatrix", y = "sparseMatrix"),
           function(x, y, ...)
-              cbind2(.diag2sparse(x, ".gC"), as(y, "CsparseMatrix")))
+              cbind2(.diag2sparse(x, "g", "C"), .M2C(y)))
 setMethod("cbind2", signature(x = "sparseMatrix", y = "diagonalMatrix"),
           function(x, y, ...)
-              cbind2(as(x, "CsparseMatrix"), .diag2sparse(y, ".gC")))
+              cbind2(.M2C(x), .diag2sparse(y, "g", "C")))
 setMethod("rbind2", signature(x = "diagonalMatrix", y = "sparseMatrix"),
           function(x, y, ...)
-              rbind2(.diag2sparse(x, ".gC"), as(y, "CsparseMatrix")))
+              rbind2(.diag2sparse(x, "g", "C"), .M2C(y)))
 setMethod("rbind2", signature(x = "sparseMatrix", y = "diagonalMatrix"),
           function(x, y, ...)
-              rbind2(as(x, "CsparseMatrix"), .diag2sparse(y, ".gC")))
+              rbind2(.M2C(x), .diag2sparse(y, "g", "C")))
 
 ## in order to evade method dispatch ambiguity, but still remain "general"
 ## we use this hack instead of signature  x = "diagonalMatrix"
@@ -232,16 +232,16 @@ for(cls in names(getClassDef("diagonalMatrix")@subclasses)) {
 
 setMethod("cbind2", signature(x = cls, y = "matrix"),
           function(x, y, ...)
-              cbind2(.diag2sparse(x, ".gC"), .m2sparse(y, ".gC")))
+              cbind2(.diag2sparse(x, "g", "C"), .m2sparse(y, ".gC")))
 setMethod("cbind2", signature(x = "matrix", y = cls),
           function(x, y, ...)
-              cbind2(.m2sparse(x, ".gC"), .diag2sparse(y, ".gC")))
+              cbind2(.m2sparse(x, ".gC"), .diag2sparse(y, "g", "C")))
 setMethod("rbind2", signature(x = cls, y = "matrix"),
           function(x, y, ...)
-              rbind2(.diag2sparse(x, ".gC"), .m2sparse(y, ".gC")))
+              rbind2(.diag2sparse(x, "g", "C"), .m2sparse(y, ".gC")))
 setMethod("rbind2", signature(x = "matrix", y = cls),
           function(x, y, ...)
-              rbind2(.m2sparse(x, ".gC"), .diag2sparse(y, ".gC")))
+              rbind2(.m2sparse(x, ".gC"), .diag2sparse(y, "g", "C")))
 
  ## These are already defined for "Matrix"
  ## -- repeated here for method dispatch disambiguation {"design-FIXME" ?}
