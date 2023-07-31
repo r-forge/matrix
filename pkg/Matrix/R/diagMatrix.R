@@ -825,11 +825,11 @@ setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         y@x <- op(x@x[y@i + 1L], y@x)
-        if(boolArith) .M2kind(drop0.notol(y), "n") else y
+        if(boolArith) .M2kind(.drop0(y), "n") else y
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(y), "n")
+                .M2kind(.drop0(y), "n")
             else .M2kind(y, "d"))
 }
 
@@ -888,11 +888,11 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
         }
         dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
         x@x <- (if(boolArith) `&` else `*`)(x@x, rep.int(y@x, dp))
-        if(boolArith) .M2kind(drop0.notol(x), "n") else x
+        if(boolArith) .M2kind(.drop0(x), "n") else x
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(x), "n")
+                .M2kind(.drop0(x), "n")
             else .M2kind(x, "d"))
 }
 
@@ -951,11 +951,11 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
         }
         dp <- if((n <- length(p <- y@p)) > 1L) p[-1L] - p[-n] else integer(0L)
         y@x <- (if(boolArith) `&` else `*`)(rep.int(x@x, dp), y@x)
-        if(boolArith) .M2kind(drop0.notol(y), "n") else y
+        if(boolArith) .M2kind(.drop0(y), "n") else y
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(y), "n")
+                .M2kind(.drop0(y), "n")
             else .M2kind(y, "d"))
 }
 
@@ -1014,11 +1014,11 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         x@x <- op(x@x, y@x[x@j + 1L])
-        if(boolArith) .M2kind(drop0.notol(x), "n") else x
+        if(boolArith) .M2kind(.drop0(x), "n") else x
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(x), "n")
+                .M2kind(.drop0(x), "n")
             else .M2kind(x, "d"))
 }
 
@@ -1077,11 +1077,11 @@ setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         y@x <- op(x@x[y@i + 1L], y@x)
-        if(boolArith) .M2kind(drop0.notol(y), "n") else y
+        if(boolArith) .M2kind(.drop0(y), "n") else y
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(y), "n")
+                .M2kind(.drop0(y), "n")
             else .M2kind(y, "d"))
 }
 
@@ -1140,11 +1140,11 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
         }
         op <- if(boolArith) `&` else `*`
         x@x <- op(x@x, y@x[x@j + 1L])
-        if(boolArith) .M2kind(drop0.notol(x), "n") else x
+        if(boolArith) .M2kind(.drop0(x), "n") else x
     } else
         (if(trans) t else identity)(
             if(boolArith)
-                .M2kind(drop0.notol(x), "n")
+                .M2kind(.drop0(x), "n")
             else .M2kind(x, "d"))
 }
 

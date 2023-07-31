@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-07-31 r4201)}{
+\section{Changes in version 1.6-1 (2023-07-31 r4202)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -13,6 +13,17 @@
       \code{.M2m} makes both \code{.dense2m} and \code{.sparse2m}
       redundant.  The superceded ones are not yet formally deprecated,
       but are no longer documented.
+
+      \item \code{drop0} is now implemented independently
+      of \code{CHOLMOD}, becoming more efficient notably for
+      logical arguments, no longer requiring a coercion to double.
+
+      \item \code{drop0} gains an argument \code{give.Csparse}
+      to complement \code{is.Csparse}.  \code{FALSE} indicates
+      that \code{RsparseMatrix}, \code{TsparseMatrix}, and
+      \code{indMatrix} arguments should be handled directly,
+      without a coercion to \code{CsparseMatrix}.  The default
+      value is \code{TRUE}, for backwards compatibility.
     }
   }
   \subsection{Bug Fixes}{

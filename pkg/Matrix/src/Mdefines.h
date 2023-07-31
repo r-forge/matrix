@@ -120,7 +120,7 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 
 #define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
 #define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
-#define ISNA_REAL(_X_)    ISNAN(_X_)
+#define ISNA_REAL(_X_)    (ISNAN(_X_))
 #define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
 
 #define ISNZ_LOGICAL(_X_) ((_X_) != 0)
