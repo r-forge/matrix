@@ -71,21 +71,13 @@ setMethod("rbind2", signature(x = "vector", y = "Matrix"),
 ###-- Sparse ------------------------------------------------------------
 
 setMethod("cbind2", signature(x = "sparseMatrix", y = "matrix"),
-          function(x, y, ...) {
-              cbind2(x, .Call(R_dense_as_sparse, y, ".gC", NULL, NULL))
-          })
+          function(x, y, ...) cbind2(x, .m2sparse(y, ".gC")))
 setMethod("cbind2", signature(x = "matrix", y = "sparseMatrix"),
-          function(x, y, ...) {
-              cbind2(.Call(R_dense_as_sparse, x, ".gC", NULL, NULL), y)
-          })
+          function(x, y, ...) cbind2(.m2sparse(x, ".gC"), y))
 setMethod("rbind2", signature(x = "sparseMatrix", y = "matrix"),
-          function(x, y, ...) {
-              rbind2(x, .Call(R_dense_as_sparse, y, ".gC", NULL, NULL))
-          })
+          function(x, y, ...) rbind2(x, .m2sparse(y, ".gC")))
 setMethod("rbind2", signature(x = "matrix", y = "sparseMatrix"),
-          function(x, y, ...) {
-              rbind2(.Call(R_dense_as_sparse, x, ".gC", NULL, NULL), y)
-          })
+          function(x, y, ...) rbind2(.m2sparse(x, ".gC"), y))
 
 ## originally from ./Matrix.R : -------------------------------
 

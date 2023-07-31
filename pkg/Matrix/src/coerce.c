@@ -1311,7 +1311,8 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
-		}
+		} else
+			nnz = n;
 	}
 
 	if (cl[1] == 't' && di != 'N') {
@@ -1319,14 +1320,14 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		return to;
 	}
 
-	SEXP i = PROTECT(allocVector(INTSXP, nnz));
+	SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
 	if (cl[2] != 'T')
-		SET_SLOT(to, (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym, i);
+		SET_SLOT(to, (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym, i1);
 	else {
-		SET_SLOT(to, Matrix_iSym, i);
-		SET_SLOT(to, Matrix_jSym, i);
+		SET_SLOT(to, Matrix_iSym, i1);
+		SET_SLOT(to, Matrix_jSym, i1);
 	}
-	int *pi = INTEGER(i);
+	int *pi1 = INTEGER(i1);
 
 #undef DAS_LOOP
 #define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
@@ -1336,14 +1337,14 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			_CTYPE_ *px0 = _PTR_(x0); \
 			for (d = 0; d < n; ++d) { \
 				if (_NZ_(*px0)) { \
-					*(pi++) = d; \
+					*(pi1++) = d; \
 					_MASK_(*(px1++) = *px0); \
 				} \
 				++px0; \
 			} \
 		} else { \
 			for (d = 0; d < n; ++d) { \
-				*(pi++) = d; \
+				*(pi1++) = d; \
 				_MASK_(*(px1++) = _ONE_); \
 			} \
 		} \
@@ -1361,7 +1362,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		UNPROTECT(1); /* x1 */
 	}
 
-	UNPROTECT(3); /* i, x0, to */
+	UNPROTECT(3); /* i1, x0, to */
 	return to;
 }
 
@@ -1430,7 +1431,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 			*(pj++) = *(pperm++) - 1;
 		}
 		SET_SLOT(to, Matrix_iSym, (mg == 0) ? i : j);
-		SET_SLOT(to, Matrix_iSym, (mg == 0) ? j : i);
+		SET_SLOT(to, Matrix_jSym, (mg == 0) ? j : i);
 	} else if ((cl[2] == 'C') == (mg != 0)) {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) r + 1)),
 			i = PROTECT(allocVector(INTSXP, r));
@@ -1443,16 +1444,22 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SET_SLOT(to, Matrix_pSym, p);
 		SET_SLOT(to, (mg != 0) ? Matrix_iSym : Matrix_jSym, i);
 	} else {
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1)),
-			j = PROTECT(allocVector(INTSXP, r));
-		int k, *pp = INTEGER(p), *pj = INTEGER(j);
+		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1));
+		int k, *pp = INTEGER(p);
 		Matrix_memset(pp, 0, (R_xlen_t) s + 1, sizeof(int));
-		for (k = 0; k < r; ++k) {
-			++pp[*(pperm++)];
-			*(pj++) = k;
-		}
+		for (k = 0; k < r; ++k)
+			++pp[pperm[k]];
 		for (k = 0; k < s; ++k)
 			pp[k + 1] += pp[k];
+		SEXP j = PROTECT(allocVector(INTSXP, r));
+		int *pj = INTEGER(j), *work;
+		Matrix_Calloc(work, s, int);
+		Matrix_memcpy(work, pp, s, sizeof(int));
+		--work;
+		for (k = 0; k < r; ++k)
+			pj[work[pperm[k]]++] = k;
+		++work;
+		Matrix_Free(work, s);
 		SET_SLOT(to, Matrix_pSym, p);
 		SET_SLOT(to, (mg != 0) ? Matrix_jSym : Matrix_iSym, j);
 	}
@@ -1941,9 +1948,9 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
 	if (class[1] == 's')
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	else
 		set_symmetrized_DimNames(to, dimnames, -1);
+	else
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
 	if (class[1] == 's') {
@@ -3573,7 +3580,7 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 		cl_[0] = cl[0];
 		from = diagonal_as_sparse(from, cl, 'g', 'C', '\0');
 		PROTECT(from);
-		from = sparse_as_kind(from, cl_, 'n');
+		from = sparse_as_kind(from, cl_, kind_);
 		UNPROTECT(1);
 		return from;
 	}
