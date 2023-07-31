@@ -4,22 +4,53 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-07-29 r4163)}{
+\section{Changes in version 1.6-1 (2023-07-31 r4199)}{
   \subsection{New Features}{
     \itemize{
-      \item .
+      \item Several new coercion utilities, exported and documented
+      in \code{help("fastMisc")}.  Some of these supercede ones made
+      available (experimentally) in \pkg{Matrix} 1.5-4; for example,
+      \code{.M2m} makes both \code{.dense2m} and \code{.sparse2m}
+      redundant.  The superceded ones are not yet formally deprecated,
+      but are no longer documented.
+
+      Coercions from \code{indMatrix} to \code{[nld]sparseMatrix} now
+      return an \code{.gRMatrix} or a \code{.gCMatrix} depending on the
+      \code{margin} slot.
     }
   }
   \subsection{Bug Fixes}{
-	\itemize{
-	  %% TODO: also fix ../src/factorizations.c { dpCMatrix_trf() } ??
-	  \item Fix four Valgrind-detected memory bugs.
-	}
+    \itemize{
+      %% MJ: dpCMatrix_trf() is unfixed, but I don't see the problem there ...
+      \item Fix four Valgrind-detected memory bugs.
+
+      \item \code{<diagonalMatrix> \%*\% <RsparseMatrix>} works again.
+
+      \item \code{as(<diagonalMatrix>, "symmetricMatrix")} now checks
+      for symmetric \code{Dimnames}, for consistency.
+
+      \item \code{as(<[CR]sparseMatrix>, "generalMatrix")} now checks
+      if the number of nonzero entries in the result would exceed
+      \code{INT_MAX} and throws an error in that case.
+
+      \item C level \code{chm_sparse_to_SEXP} now sorts and packs
+      its first argument \emph{before} assigning struct members
+      to variables, no longer accessing blocks of memory freed by
+      \code{cholmod_sort}).
+    }
   }
   \subsection{Misc}{
     \itemize{
-      \item run speed-measuring tests only if(doExtras): were too slow when
-      run under valgrind.
+      \item Run speed-measuring tests only \code{if(doExtras)}:
+      these were too slow when run under Valgrind.
+
+      \item Most coercion code has been migrated to \file{coerce.[Rch]}
+      from elsewhere.
+
+      \item The number of methods for generic functions \code{coerce}
+      and \code{as.*} has been reduced substantially, from 306 to 194
+      (not counting deprecated ones), partly as a result of efforts to
+      do more fine-grained dispatch in C code.
     }
   }
 }
