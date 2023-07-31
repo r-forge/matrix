@@ -1006,20 +1006,20 @@ for(c1 in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix")) {
   if(c1 == "CsparseMatrix")
       for(c2 in c("RsparseMatrix", "TsparseMatrix"))
 	  setMethod("%&%", signature(x = c1, y = c2),
-		    function(x, y) .M2kind(drop0.notol(x), "n") %&%
-				   as(.M2kind(drop0.notol(y), "n"), "CsparseMatrix"))
+		    function(x, y) .M2kind(.drop0(x), "n") %&%
+				   as(.M2kind(.drop0(y), "n"), "CsparseMatrix"))
   else # c1 = "R..." or "T..."
       for(c2 in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix"))
 	  setMethod("%&%", signature(x = c1, y = c2),
-		    function(x, y) as(.M2kind(drop0.notol(x), "n"), "CsparseMatrix") %&%
-				   as(.M2kind(drop0.notol(y), "n"), "CsparseMatrix"))
+		    function(x, y) as(.M2kind(.drop0(x), "n"), "CsparseMatrix") %&%
+				   as(.M2kind(.drop0(y), "n"), "CsparseMatrix"))
   ## FIXME?  coercion to  'CsparseMatrix' is too bossy; need one of C,R,T however :
   setMethod("%&%", signature(x = "mMatrix", y = c1),
-	  function(x, y) .M2kind(drop0.notol(as(x, "CsparseMatrix")), "n") %&%
-			 .M2kind(drop0.notol(y), "n"))
+	  function(x, y) .M2kind(.drop0(as(x, "CsparseMatrix")), "n") %&%
+			 .M2kind(.drop0(y), "n"))
   setMethod("%&%", signature(x = c1, y = "mMatrix"),
-            function(x, y) .M2kind(drop0.notol(x), "n") %&%
-                           .M2kind(drop0.notol(as(y, "CsparseMatrix")), "n"))
+            function(x, y) .M2kind(.drop0(x), "n") %&%
+                           .M2kind(.drop0(as(y, "CsparseMatrix")), "n"))
 }
 rm(c1,c2)
 

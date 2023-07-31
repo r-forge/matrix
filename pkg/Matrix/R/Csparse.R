@@ -171,7 +171,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	    x@x[sel] <- as.vector(value[iN0])
 	    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cached ones
 		x@factors <- list()
-	    if(has0) x <- .Call(Csparse_drop, x, 0)
+	    if(has0) x <- .drop0(x)
 
 	    return(if(x.sym) as_CspClass(x, clx) else x)
 	}

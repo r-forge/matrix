@@ -1,11 +1,18 @@
+#include <math.h> /* fabs, hypot */
 #include "sparse.h"
 
-SEXP sparse_drop0(SEXP from, const char *class)
+SEXP sparse_drop0(SEXP from, const char *class, double tol)
 {
 	if (class[0] == 'n')
 		return from;
 
 	SEXP to, x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+
+#define TOLBASED_ISNZ_REAL(_X_) \
+	(ISNA_REAL(_X_) || fabs(_X_) > tol)
+
+#define TOLBASED_ISNZ_COMPLEX(_X_) \
+	(ISNA_COMPLEX(_X_) || hypot((_X_).r, (_X_).i) > tol)
 
 #define DROP0_CASES(_DO_) \
 	do { \
@@ -17,10 +24,16 @@ SEXP sparse_drop0(SEXP from, const char *class)
 			_DO_(int, INTEGER, ISNZ_INTEGER); \
 			break; \
 		case 'd': \
-			_DO_(double, REAL, ISNZ_REAL); \
+			if (tol > 0.0) \
+				_DO_(double, REAL, TOLBASED_ISNZ_REAL); \
+			else \
+				_DO_(double, REAL, ISNZ_REAL); \
 			break; \
 		case 'z': \
-			_DO_(Rcomplex, COMPLEX, ISNZ_COMPLEX); \
+			if (tol > 0.0) \
+				_DO_(Rcomplex, COMPLEX, TOLBASED_ISNZ_COMPLEX); \
+			else \
+				_DO_(Rcomplex, COMPLEX, ISNZ_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -157,6 +170,8 @@ SEXP sparse_drop0(SEXP from, const char *class)
 		UNPROTECT(1); /* factors */
 	}
 
+#undef TOLBASED_ISNZ_REAL
+#undef TOLBASED_ISNZ_COMPLEX
 #undef DROP0_CASES
 #undef DROP0_LOOP1
 #undef DROP0_LOOP2
@@ -165,10 +180,8 @@ SEXP sparse_drop0(SEXP from, const char *class)
 	return to;
 }
 
-/* drop0(<[CRT]sparseMatrix>)
-   TODO: support 'tol' argument, to be interpreted as modulus for zMatrix
-*/
-SEXP R_sparse_drop0(SEXP from)
+/* drop0(<[CRT]sparseMatrix>, tol) */
+SEXP R_sparse_drop0(SEXP from, SEXP tol)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
@@ -176,7 +189,12 @@ SEXP R_sparse_drop0(SEXP from)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
-	return sparse_drop0(from, valid[ivalid]);
+	double tol_;
+	if (TYPEOF(tol) != REALSXP || LENGTH(tol) < 1 ||
+	    ISNAN(tol_ = REAL(tol)[0]))
+		error(_("'%s' is not a number"), "tol");
+
+	return sparse_drop0(from, valid[ivalid], tol_);
 }
 
 SEXP sparse_band(SEXP from, const char *class, int a, int b)

@@ -3,8 +3,8 @@
 
 #include "Mutils.h"
 
-SEXP sparse_drop0(SEXP from, const char *class);
-SEXP R_sparse_drop0(SEXP from);
+SEXP sparse_drop0(SEXP from, const char *class, double tol);
+SEXP R_sparse_drop0(SEXP from, SEXP tol);
 
 SEXP sparse_band(SEXP from, const char *class, int a, int b);
 SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2);

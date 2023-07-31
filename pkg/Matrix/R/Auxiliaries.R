@@ -339,9 +339,23 @@ forceDiagonal <- function(x, diag = NA_character_) {
         x = if(diag == "N") y else y[FALSE])
 }
 
-drop0.notol <- function(x) .Call(R_sparse_drop0, x)
-
 .tCRT <- function(x, lazy = TRUE) .Call(R_sparse_transpose, x, lazy)
+
+
+.drop0 <- function(x, tol = 0)
+    .Call(R_sparse_drop0, x, tol)
+
+drop0 <- function(x, tol = 0, is.Csparse = NA, give.Csparse = TRUE) {
+    tryCoerce <-
+        if(give.Csparse)
+            is.na(is.Csparse) || !is.Csparse
+        else if(.M.kind(x) == "n") # incl. indMatrix
+            return(x)
+        else !.isCRT(x)
+    if(tryCoerce)
+        x <- if(isS4(x)) .M2C(x) else .m2sparse.checking(x, ".", "C")
+    .Call(R_sparse_drop0, x, as.double(tol))
+}
 
 emptyColnames <- function(x, msg.if.not.empty = FALSE) {
     ## Useful for compact printing of (parts) of sparse matrices
@@ -516,18 +530,6 @@ uniqTsparse <- function(x, class.x = c(class(x))) {
 
 ##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
 .uniqTsparse <- function(x) .M2T(.M2C(x))
-
-drop0 <- function(x, tol = 0, is.Csparse = NA) {
-    ## ## MJ: My R_sparse_drop0() handles all [CRT]sparseMatrix without
-    ## ##     coercion, but we should assess how many packages depend on
-    ## ##     > is(drop0(...), "CsparseMatrix")
-    ## ##     before going ahead and using it ...
-    ## if(tol <= 0)
-    ##     return(.Call(R_sparse_drop0, x))
-    if(is.na(is.Csparse))
-        is.Csparse <- is(x, "CsparseMatrix")
-    .Call(Csparse_drop, if(is.Csparse) x else as(x, "CsparseMatrix"), tol)
-}
 
 asTuniq <- function(x) {
     if(is(x, "TsparseMatrix"))

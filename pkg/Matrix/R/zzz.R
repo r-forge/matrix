@@ -116,19 +116,19 @@
 .diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
     .Deprecated(new = ".diag2sparse", package = "Matrix")
     r <- .diag2sparse(from, "s", "T", uplo)
-    if (kind != ".")
+    if(kind != ".")
         r <- .M2kind(r, kind)
-    if (drop0)
-        r <- drop0.notol(r)
+    if(drop0)
+        r <- .drop0(r)
     r
 }
 .diag2tT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
     .Deprecated(new = ".diag2sparse", package = "Matrix")
     to <- .diag2sparse(from, "t", "T", uplo)
-    if (kind != ".")
+    if(kind != ".")
         to <- .M2kind(to, kind)
-    if (drop0)
-        to <- drop0.notol(to)
+    if(drop0)
+        to <- .drop0(to)
     to
 }
 .dsy2dsp <- function(from) {
@@ -138,7 +138,7 @@
 .dsy2mat <- function(from, keep.dimnames = TRUE) {
     .Deprecated(new = ".M2m", package = "Matrix")
     to <- .M2m(from)
-    if (!keep.dimnames)
+    if(!keep.dimnames)
         dimnames(to) <- NULL
     to
 }
@@ -210,7 +210,7 @@
     if(FALSE) {
     .Deprecated(new = ".M2kind", package = "Matrix")
     }
-    .M2kind(if(drop0) drop0.notol(from) else from, kind)
+    .M2kind(if(drop0) .drop0(from) else from, kind)
 }
 
 .dense2g <- .sparse2g <- function(from, kind = ".") {
