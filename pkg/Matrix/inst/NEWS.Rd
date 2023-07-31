@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-07-31 r4200)}{
+\section{Changes in version 1.6-1 (2023-07-31 r4201)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -13,15 +13,10 @@
       \code{.M2m} makes both \code{.dense2m} and \code{.sparse2m}
       redundant.  The superceded ones are not yet formally deprecated,
       but are no longer documented.
-
-      Coercions from \code{indMatrix} to \code{[nld]sparseMatrix} now
-      return an \code{.gRMatrix} or a \code{.gCMatrix} depending on the
-      \code{margin} slot.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      %% MJ: dpCMatrix_trf() is unfixed, but I don't see the problem there ...
       \item Fix four Valgrind-detected memory bugs.
 
       \item \code{<diagonalMatrix> \%*\% <RsparseMatrix>} works again.
@@ -29,14 +24,18 @@
       \item \code{as(<diagonalMatrix>, "symmetricMatrix")} now checks
       for symmetric \code{Dimnames}, for consistency.
 
+      \item as(<indMatrix>, "[nld](sparse)?Matrix") now returns
+      a \code{.gRMatrix} or a \code{.gCMatrix} depending on the
+      \code{margin} slot.
+
       \item \code{as(<[CR]sparseMatrix>, "generalMatrix")} now checks
       if the number of nonzero entries in the result would exceed
       \code{INT_MAX} and throws an error in that case.
 
-      \item C level \code{chm_sparse_to_SEXP} now sorts and packs
-      its first argument \emph{before} assigning struct members
+      \item API C function \code{chm_sparse_to_SEXP} now sorts and
+      packs its first argument \emph{before} assigning struct members
       to variables, no longer accessing blocks of memory freed by
-      \code{cholmod_sort}).
+      \code{cholmod_sort}.
     }
   }
   \subsection{Misc}{
