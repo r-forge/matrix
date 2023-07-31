@@ -337,6 +337,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 
 			nnz += snnz;
 			len += slen;
+			UNPROTECT(1);
 		}
 
 		if (nnz > INT_MAX || nnz > len / 2)
@@ -458,8 +459,10 @@ static void coerceArgs(SEXP args, int margin,
 		} else {
 			tmp = getAttrib(s, R_DimSymbol);
 			isM = TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2;
-			if (!isM && rdim[!margin] > 0 && XLENGTH(s) == 0)
+			if (!isM && rdim[!margin] > 0 && XLENGTH(s) == 0) {
+				UNPROTECT(1);
 				continue;
+			}
 			if (TYPEOF(s) != kind2type(kind))
 				REPROTECT(s = coerceVector(s, kind2type(kind)), pid);
 			if (repr != 'e') {
@@ -470,6 +473,7 @@ static void coerceArgs(SEXP args, int margin,
 					SEXP lengthout = PROTECT(ScalarInteger(rdim[!margin])),
 						call = PROTECT(lang3(replen, s, lengthout));
 					REPROTECT(s = eval(call, R_GlobalEnv), pid);
+					UNPROTECT(2);
 				}
 				scl_[1] = 'g';
 				scl_[2] = repr;
@@ -861,10 +865,13 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	if (rdimnames[0] || rdimnames[1]) {
 		SEXP dimnames = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)),
 			marnames, nms[2], nms_, a, e, s, tmp;
-		int i, ivalid, r, pos = 0;
+		int i, ivalid, r, pos = 0, nprotect = 1;
 		const char *scl;
-		if (rdimnames[margin])
+		if (rdimnames[margin]) {
 			PROTECT(marnames = allocVector(STRSXP, rdim[margin]));
+			++nprotect;
+			SET_VECTOR_ELT(dimnames, margin, marnames);
+		}
 		for (a = args, e = exprs; a != R_NilValue; a = CDR(a), e = CDR(e)) {
 			s = CAR(a);
 			if (s == R_NilValue && rdim[!margin] > 0)
@@ -919,11 +926,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 					               STRING_ELT(nms[margin], i));
 			pos += r;
 		}
-		if (rdimnames[margin]) {
-			SET_VECTOR_ELT(dimnames, margin, marnames);
-			UNPROTECT(1);
-		}
-		UNPROTECT(1);
+		UNPROTECT(nprotect);
 	}
 
 	UNPROTECT(1);
