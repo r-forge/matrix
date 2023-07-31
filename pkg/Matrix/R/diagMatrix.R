@@ -949,7 +949,7 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
             y <- .M2gen(y)
             y@factors <- list()
         }
-        dp <- if((n <- length(p <- x@p)) > 1L) p[-1L] - p[-n] else integer(0L)
+        dp <- if((n <- length(p <- y@p)) > 1L) p[-1L] - p[-n] else integer(0L)
         y@x <- (if(boolArith) `&` else `*`)(rep.int(x@x, dp), y@x)
         if(boolArith) .M2kind(drop0.notol(y), "n") else y
     } else

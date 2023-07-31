@@ -299,9 +299,15 @@ setAs("matrix",   "diagonalMatrix",  .M2diag)
 rm(..m2gen)
 
 setAs("diagonalMatrix",  "symmetricMatrix",
-      function(from) .diag2sparse(from, "s", "C", "U"))
+      function(from) {
+          if(!isSymmetricDN(from@Dimnames))
+              stop("matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)")
+          .diag2sparse(from, "s", "C", "U")
+      })
+
 setAs("diagonalMatrix", "triangularMatrix",
-      function(from) .diag2sparse(from, "t", "C", "U"))
+      function(from)
+          .diag2sparse(from, "t", "C", "U"))
 
 
 ## ==== To "representation" ============================================

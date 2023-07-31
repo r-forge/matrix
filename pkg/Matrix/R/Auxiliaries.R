@@ -622,8 +622,8 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
     else .m2sparse(x, paste0(kind, "gC"))
 }
 
-## as(<Matrix>, <non-unit triangular CsparseMatrix>)
-asCspN <- function(x) .Call(R_sparse_diag_U2N, .M2C(x))
+## as(<[Mm]atrix>, <non-unit triangular CsparseMatrix>)
+asCspN <- function(x) .Call(R_sparse_diag_U2N, as(x, "CsparseMatrix"))
 
 diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(extends(cl, "triangularMatrix") && x@diag == "U")
