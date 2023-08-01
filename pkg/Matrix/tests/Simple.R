@@ -1504,6 +1504,30 @@ stopifnot(identical(which(x), seq_along(x)[as.vector(!is.na(x) & x)]),
           identical(which(x, arr.ind = TRUE, useNames = FALSE),
                     arrayInd(which(x), dim(x), dimnames(x), useNames = FALSE)))
 
+## drop0(give.Csparse = FALSE)
+R <- new("dtRMatrix", Dim = c(6L, 6L), p = 0:6, j = 0:5, x = 0+0:5)
+T <- as(as(R, "TsparseMatrix"), "symmetricMatrix")
+for(tol in 0+0:5) {
+    i.tol <- R@x > tol
+    stopifnot(exprs = {
+        identical(drop0(R, tol = tol, give.Csparse = FALSE),
+                  new("dtRMatrix", Dim = c(6L, 6L),
+                      p = c(0L, cumsum(i.tol)), j = R@j[i.tol], x = R@x[i.tol]))
+        identical(drop0(T, tol = tol, give.Csparse = FALSE),
+                  new("dsTMatrix", Dim = c(6L, 6L),
+                      i = R@j[i.tol], j = R@j[i.tol], x = R@x[i.tol]))
+    })
+}
+## No-op for pattern-like sparse matrices:
+i1 <- new("indMatrix", Dim = c(6L, 8L), margin = 1L,
+          perm = sample.int(8L, size = 6L, replace = TRUE))
+i1.s <- as(i1, "nsparseMatrix")
+i1.d <- as(i1,  "ndenseMatrix")
+stopifnot(exprs = {
+    identical(drop0(i1  , give.Csparse = FALSE), i1)
+    identical(drop0(i1.s, give.Csparse = FALSE), i1.s)
+    identical(drop0(i1.d, give.Csparse = FALSE), as(i1.d, "CsparseMatrix"))
+})
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
