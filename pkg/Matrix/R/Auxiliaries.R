@@ -349,9 +349,11 @@ drop0 <- function(x, tol = 0, is.Csparse = NA, give.Csparse = TRUE) {
     tryCoerce <-
         if(give.Csparse)
             is.na(is.Csparse) || !is.Csparse
-        else if(.M.kind(x) == "n") # incl. indMatrix
-            return(x)
-        else !.isCRT(x)
+        else if(.M.kind(x) != "n")
+            !.isCRT(x)
+        else if(all(.M.repr(x) != c("C", "R", "T", "i")))
+            TRUE
+        else return(x) # n[gst][CRT]Matrix or indMatrix
     if(tryCoerce)
         x <- if(isS4(x)) .M2C(x) else .m2sparse.checking(x, ".", "C")
     .Call(R_sparse_drop0, x, as.double(tol))
