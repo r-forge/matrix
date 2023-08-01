@@ -397,7 +397,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 			BAND_CASES;
 			UNPROTECT(2); /* x1, x0 */
 		}
-		if (class[0] == 'R')
+		if (class[2] == 'R')
 			to = sparse_transpose(to, cl, 1);
 
 	} else {
