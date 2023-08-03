@@ -505,13 +505,15 @@ SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
 	if (k1 == R_NilValue)
 		a = (m > 0) ? 1-m : 0;
 	else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
-		error(_("'k1' must be an integer from -Dim[1] to Dim[2]"));
+		error(_("'%s' must be an integer from %s to %s"),
+		      "k1", "-Dim[1]", "Dim[2]");
 	if (k2 == R_NilValue)
 		b = (n > 0) ? n-1 : 0;
 	else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
-		error(_("'k2' must be an integer from -Dim[1] to Dim[2]"));
+		error(_("'%s' must be an integer from %s to %s"),
+		      "k2", "-Dim[1]", "Dim[2]");
 	else if (b < a)
-		error(_("'k1' must be less than or equal to 'k2'"));
+		error(_("'%s' must be less than or equal to '%s'"), "k1", "k2");
 
 	return sparse_band(from, valid[ivalid], a, b);
 }
@@ -696,7 +698,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP names)
 	int names_;
 	if (TYPEOF(names) != LGLSXP || LENGTH(names) < 1 ||
 	    (names_ = LOGICAL(names)[0]) == NA_LOGICAL)
-		error(_("'%s' must be TRUE or FALSE"), "names");
+		error(_("'%s' must be %s or %s"), "names", "TRUE", "FALSE");
 
 	return sparse_diag_get(obj, valid[ivalid], names_);
 }
@@ -825,7 +827,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		SDS_CASES;
 
 		if (nd1 - nd0 > INT_MAX - pp0[n_ - 1])
-			error(_("p[length(p)] cannot exceed 2^31-1"));
+			error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n_ - 1]));
 		SET_SLOT(to, iSym, i1);
@@ -906,7 +908,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		SDS_CASES;
 
 		if (nd1 - nd0 > R_XLEN_T_MAX - nnz0)
-			error(_("length(i) cannot exceed R_XLEN_T_MAX"));
+			error(_("%s cannot exceed %s"), "length(i)", "R_XLEN_T_MAX");
 		nnz1 += nd1 - nd0;
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
@@ -1221,7 +1223,7 @@ SEXP R_sparse_transpose(SEXP from, SEXP lazy)
 	int lazy_;
 	if (TYPEOF(lazy) != LGLSXP || LENGTH(lazy) < 1 ||
 	    (lazy_ = LOGICAL(lazy)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s()'"), "lazy", __func__);
+		error(_("invalid '%s' to %s()"), "lazy", __func__);
 
 	return sparse_transpose(from, valid[ivalid], lazy_);
 }
@@ -1613,7 +1615,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 	}
 
 	return sparse_force_symmetric(from, valid[ivalid], ul);
@@ -2687,8 +2689,7 @@ SEXP _C_ ## sparse_is_symmetric(SEXP obj, SEXP checkDN) \
 			break; \
 		} \
 		default: \
-			ERROR_INVALID_TYPE( \
-				"'x' slot", TYPEOF(x0), "[CR]sparse_is_symmetric"); \
+			ERROR_INVALID_TYPE(x0, __func__); \
 			break; \
 		} \
 	} \
@@ -2718,7 +2719,7 @@ SEXP CRsparse_colSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
 	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
 	int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "CRsparse_colSums");
+		ERROR_INVALID_CLASS(obj, __func__);
 	const char *cl = valid[ivalid];
 	if (cl[1] == 's')
 		return CRsparse_rowSums(obj, narm, mean, sparse);
@@ -2993,7 +2994,7 @@ SEXP CRsparse_rowSums(SEXP obj, SEXP narm, SEXP mean, SEXP sparse)
 	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
 	int ivalid = R_check_class_etc(obj, valid), nprotect = 0;
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "CRsparse_rowSums");
+		ERROR_INVALID_CLASS(obj, __func__);
 	const char *cl = valid[ivalid];
 
 	int doSparse = asLogical(sparse) != 0,

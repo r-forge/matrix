@@ -1,5 +1,7 @@
 #include "validity.h"
 
+/* FIXME: (1) UPRET is ugly; (2) use SNPRINTF more, for easier translation */
+
 /* Slot validity methods ===============================================
    Called by various class validity methods (see below).
 */

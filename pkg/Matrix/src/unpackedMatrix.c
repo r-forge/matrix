@@ -225,7 +225,7 @@ void _PREFIX_ ## dense_unpacked_copy_diagonal(_CTYPE_ *dest, \
 		for (j = 0; j < n; ++j, dest += n1a, src += n1a) \
 			*dest = *src; \
 	} else { \
-		error(_("incompatible 'n' and 'len' to '*_copy_diagonal()'")); \
+		error(_("incompatible '%s' and '%s' in %s()"), "n", "len", __func__); \
 	} \
 	return; \
 }
@@ -375,7 +375,7 @@ SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
 {
 	SEXPTYPE tx = TYPEOF(x);
 	if (tx < LGLSXP || tx > CPLXSXP)
-		ERROR_INVALID_TYPE("'x'", tx, "unpacked_force");
+		ERROR_INVALID_TYPE(x, __func__);
 	R_xlen_t nx = XLENGTH(x);
 	SEXP y = PROTECT(allocVector(tx, nx));
 
@@ -456,7 +456,7 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, "unpackedMatrix_force_symmetric");
+		ERROR_INVALID_CLASS(from, __func__);
 	const char *clf = valid[ivalid];
 
 	char ulf = 'U', ult = 'U';
@@ -471,7 +471,7 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	    (TYPEOF(uplo_to) != STRSXP || LENGTH(uplo_to) < 1 ||
 	    (uplo_to = STRING_ELT(uplo_to, 0)) == NA_STRING ||
 	    ((ult = *CHAR(uplo_to)) != 'U' && ult != 'L')))
-		error(_("invalid 'uplo' to 'unpackedMatrix_force_symmetric()'"));
+		error(_("invalid '%s' to %s()"), "uplo", __func__);
 
 	if (clf[1] == 's') {
 		/* .syMatrix */
@@ -547,7 +547,7 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 			COPY_DIAGONAL(z, Rcomplex, COMPLEX);
 			break;
 		default:
-			ERROR_INVALID_TYPE("'x' slot", tx, "unpackedMatrix_force_symmetric");
+			ERROR_INVALID_TYPE(x_from, __func__);
 			break;
 		}
 
@@ -561,7 +561,7 @@ SEXP unpackedMatrix_force_symmetric(SEXP from, SEXP uplo_to)
 	return to;
 }
 
-#define UPM_IS_TR(_RES_, _X_, _N_, _UPLO_, _WHAT_, _METHOD_) \
+#define UPM_IS_TR(_RES_, _X_, _N_, _UPLO_) \
 do { \
 	switch (TYPEOF(_X_)) { \
 	case LGLSXP: \
@@ -577,13 +577,13 @@ do { \
 		_RES_ = zdense_unpacked_is_triangular(COMPLEX(_X_), _N_, _UPLO_); \
 		break; \
 	default: \
-		ERROR_INVALID_TYPE(_WHAT_, TYPEOF(_X_), _METHOD_); \
+		ERROR_INVALID_TYPE(_X_, __func__); \
 		_RES_ = FALSE; \
 		break; \
 	} \
 } while (0)
 
-#define UPM_IS_SY(_RES_, _X_, _N_, _LDENSE_, _WHAT_, _METHOD_) \
+#define UPM_IS_SY(_RES_, _X_, _N_, _LDENSE_) \
 do { \
 	switch (TYPEOF(_X_)) { \
 	case LGLSXP: \
@@ -601,13 +601,13 @@ do { \
 		_RES_ = zdense_unpacked_is_symmetric(COMPLEX(_X_), _N_); \
 		break; \
 	default: \
-		ERROR_INVALID_TYPE(_WHAT_, TYPEOF(_X_), _METHOD_); \
+		ERROR_INVALID_TYPE(_X_, __func__); \
 		_RES_ = FALSE; \
 		break; \
 	} \
 } while (0)
 
-#define UPM_IS_DI(_RES_, _X_, _N_, _WHAT_, _METHOD_) \
+#define UPM_IS_DI(_RES_, _X_, _N_) \
 do { \
 	switch (TYPEOF(_X_)) { \
 	case LGLSXP: \
@@ -623,29 +623,28 @@ do { \
 		_RES_ = zdense_unpacked_is_diagonal(COMPLEX(_X_), _N_); \
 		break; \
 	default: \
-		ERROR_INVALID_TYPE(_WHAT_, TYPEOF(_X_), _METHOD_); \
+		ERROR_INVALID_TYPE(_X_, __func__); \
 		_RES_ = FALSE; \
 		break; \
 	} \
 } while (0)
 
-#define RETURN_GE_IS_TR(_X_, _N_, _UPPER_, _NPROT_, _WHAT_, _METHOD_) \
+#define RETURN_GE_IS_TR(_X_, _N_, _UPPER_, _NPROT_) \
 do { \
 	Rboolean res = FALSE; \
 	if (_UPPER_ == NA_LOGICAL) { \
-		UPM_IS_TR(res, _X_, _N_, 'U', _WHAT_, _METHOD_); \
+		UPM_IS_TR(res, _X_, _N_, 'U'); \
 		if (res) { \
 			UNPROTECT(_NPROT_); \
 			RETURN_TRUE_OF_KIND("U"); \
 		} \
-		UPM_IS_TR(res, _X_, _N_, 'L', _WHAT_, _METHOD_); \
+		UPM_IS_TR(res, _X_, _N_, 'L'); \
 		if (res) { \
 			UNPROTECT(_NPROT_); \
 			RETURN_TRUE_OF_KIND("L"); \
 		} \
 	} else { \
-		UPM_IS_TR(res, _X_, _N_, (_UPPER_ != 0) ? 'U' : 'L', \
-		          _WHAT_, _METHOD_); \
+		UPM_IS_TR(res, _X_, _N_, (_UPPER_ != 0) ? 'U' : 'L'); \
 	} \
 	UNPROTECT(_NPROT_); \
 	return ScalarLogical(res); \
@@ -660,7 +659,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "unpackedMatrix_is_triangular");
+		ERROR_INVALID_CLASS(obj, __func__);
 
 	int need_upper = asLogical(upper);
 
@@ -672,8 +671,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 		if (!s)
 			return ScalarLogical(0);
 		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		RETURN_GE_IS_TR(x, n, need_upper, /* unprotect this many: */ 1,
-		                "'x' slot", "unpackedMatrix_is_triangular");
+		RETURN_GE_IS_TR(x, n, need_upper, /* unprotect this many: */ 1);
 	} else {
 		/* .(tr|sy)Matrix */
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -685,8 +683,7 @@ SEXP unpackedMatrix_is_triangular(SEXP obj, SEXP upper)
 		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)), \
 			dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)); \
 		int n = INTEGER(dim)[0]; \
-		UPM_IS_TR(res, x, n, (ul == 'U') ? 'L' : 'U', \
-		          "'x' slot", "unpackedMatrix_is_triangular"); \
+		UPM_IS_TR(res, x, n, (ul == 'U') ? 'L' : 'U'); \
 		UNPROTECT(2); /* dim, x */ \
 		if (res)
 
@@ -726,8 +723,7 @@ SEXP matrix_is_triangular(SEXP obj, SEXP upper)
 	if (!s)
 		return ScalarLogical(0);
 	int need_upper = asLogical(upper);
-	RETURN_GE_IS_TR(obj, n, need_upper, /* unprotect this many: */ 0,
-	                "matrix", "matrix_is_triangular");
+	RETURN_GE_IS_TR(obj, n, need_upper, /* unprotect this many: */ 0);
 }
 
 #undef RETURN_GE_IS_TR
@@ -742,7 +738,7 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0) {
-		ERROR_INVALID_CLASS(obj, "unpackedMatrix_is_symmetric");
+		ERROR_INVALID_CLASS(obj, __func__);
 		return R_NilValue;
 	} else if (ivalid < 6) {
 		/* .(ge|tr)Matrix */
@@ -760,15 +756,13 @@ SEXP unpackedMatrix_is_symmetric(SEXP obj, SEXP checkDN)
 		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 		if (ivalid < 3) {
 			/* .geMatrix: need to do a complete symmetry check */
-			UPM_IS_SY(res, x, n, ivalid == 1,
-			          "'x' slot", "unpackedMatrix_is_symmetric");
+			UPM_IS_SY(res, x, n, ivalid == 1);
 		} else {
 			/* .trMatrix: symmetric iff diagonal (upper _and_ lower tri.) */
 			SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 			char ul = (*CHAR(STRING_ELT(uplo, 0)) == 'U') ? 'L' : 'U';
 			UNPROTECT(1); /* uplo */
-			UPM_IS_TR(res, x, n, ul,
-			          "'x' slot", "unpackedMatrix_is_symmetric");
+			UPM_IS_TR(res, x, n, ul);
 		}
 		UNPROTECT(1); /* x */
 		return ScalarLogical(res);
@@ -792,7 +786,7 @@ SEXP matrix_is_symmetric(SEXP obj, SEXP checkDN)
 	if (!s)
 		return ScalarLogical(0);
 	Rboolean res = FALSE;
-	UPM_IS_SY(res, obj, n, 1, "matrix", "matrix_is_symmetric");
+	UPM_IS_SY(res, obj, n, 1);
 	return ScalarLogical(res);
 }
 
@@ -805,7 +799,7 @@ SEXP unpackedMatrix_is_diagonal(SEXP obj)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "unpackedMatrix_is_diagonal");
+		ERROR_INVALID_CLASS(obj, __func__);
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0], s = pdim[1] == n;
 	UNPROTECT(1); /* dim */
@@ -815,13 +809,13 @@ SEXP unpackedMatrix_is_diagonal(SEXP obj)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	if (ivalid < 3) {
 		/* .geMatrix: need to do a complete diagonality check */
-		UPM_IS_DI(res, x, n, "'x' slot", "unpackedMatrix_is_diagonal");
+		UPM_IS_DI(res, x, n);
 	} else {
 		/* .(tr|sy)Matrix: diagonal iff stored triangle is zero off diagonal */
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 		char ul = (*CHAR(STRING_ELT(uplo, 0)) == 'U') ? 'L' : 'U';
 		UNPROTECT(1); /* uplo */
-		UPM_IS_TR(res, x, n, ul, "'x' slot", "unpackedMatrix_is_diagonal");
+		UPM_IS_TR(res, x, n, ul);
 	}
 	UNPROTECT(1); /* x */
 	return ScalarLogical(res);
@@ -836,7 +830,7 @@ SEXP matrix_is_diagonal(SEXP obj)
 	if (!s)
 		return ScalarLogical(0);
 	Rboolean res = FALSE;
-	UPM_IS_DI(res, obj, n, "matrix", "matrix_is_diagonal");
+	UPM_IS_DI(res, obj, n);
 	return ScalarLogical(res);
 }
 
@@ -856,7 +850,7 @@ SEXP unpackedMatrix_transpose(SEXP from)
 	/* 8 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, "unpackedMatrix_transpose");
+		ERROR_INVALID_CLASS(from, __func__);
 	const char *cl = valid[ivalid];
 
 	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
@@ -942,7 +936,7 @@ SEXP unpackedMatrix_transpose(SEXP from)
 		UPM_T(Rcomplex, COMPLEX);
 		break;
 	default:
-		ERROR_INVALID_TYPE("'x' slot", tx, "unpackedMatrix_transpose");
+		ERROR_INVALID_TYPE(x_from, __func__);
 		break;
 	}
 
@@ -959,7 +953,7 @@ SEXP unpackedMatrix_diag_get(SEXP obj, SEXP nms)
 {
 	int do_nms = asLogical(nms);
 	if (do_nms == NA_LOGICAL)
-		error(_("'names' must be TRUE or FALSE"));
+		error(_("'%s' must be %s or %s"), "names", "TRUE", "FALSE");
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	int *pdim = INTEGER(dim),
@@ -1012,7 +1006,7 @@ SEXP unpackedMatrix_diag_get(SEXP obj, SEXP nms)
 		UPM_D_G(Rcomplex, COMPLEX, Matrix_zone);
 		break;
 	default:
-		ERROR_INVALID_TYPE("'x' slot", tx, "unpackedMatrix_diag_get");
+		ERROR_INVALID_TYPE(x, __func__);
 		break;
 	}
 
@@ -1050,7 +1044,7 @@ SEXP unpackedMatrix_diag_set(SEXP obj, SEXP val)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "unpackedMatrix_diag_set");
+		ERROR_INVALID_CLASS(obj, __func__);
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	int *pdim = INTEGER(dim),
@@ -1129,7 +1123,7 @@ SEXP unpackedMatrix_diag_set(SEXP obj, SEXP val)
 		UPM_D_S(Rcomplex, COMPLEX);
 		break;
 	default:
-		ERROR_INVALID_TYPE("'x' slot", tx, "unpackedMatrix_diag_set");
+		ERROR_INVALID_TYPE(x, __func__);
 		break;
 	}
 
@@ -1150,7 +1144,7 @@ SEXP unpackedMatrix_symmpart(SEXP from)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, "unpackedMatrix_symmpart");
+		ERROR_INVALID_CLASS(from, __func__);
 
 	const char *clf = valid[ivalid];
 	if (clf[0] == 'd' && clf[1] == 's')
@@ -1326,7 +1320,7 @@ SEXP matrix_symmpart(SEXP from)
 		break;
 #endif
 	default:
-		ERROR_INVALID_TYPE("matrix", TYPEOF(x), "matrix_symmpart");
+		ERROR_INVALID_TYPE(x, __func__);
 		break;
 	}
 
@@ -1356,7 +1350,7 @@ SEXP unpackedMatrix_skewpart(SEXP from)
 	/* 6 */ "dsyMatrix", "lsyMatrix", "nsyMatrix", ""};
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, "unpackedMatrix_skewpart");
+		ERROR_INVALID_CLASS(from, __func__);
 	const char *clf = valid[ivalid];
 
 	char clt[] = "...Matrix";
@@ -1554,7 +1548,7 @@ SEXP matrix_skewpart(SEXP from)
 		break;
 #endif
 	default:
-		ERROR_INVALID_TYPE("matrix", TYPEOF(x), "matrix_skewpart");
+		ERROR_INVALID_TYPE(x, __func__);
 		break;
 	}
 

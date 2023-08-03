@@ -28,7 +28,7 @@ SEXP v2spV(SEXP from)
 
 #define V2SPV_CASES(_CTYPE2_, _SEXPTYPE2_, _PTR2_) \
 	do { \
-		switch (TYPEOF(from)) {\
+		switch (TYPEOF(from)) { \
 		case LGLSXP: \
 			V2SPV(l, ISNZ_LOGICAL, int, LGLSXP, LOGICAL, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
@@ -46,7 +46,7 @@ SEXP v2spV(SEXP from)
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		default: \
-			ERROR_INVALID_TYPE("object", TYPEOF(from), "v2spV"); \
+			ERROR_INVALID_TYPE(from, __func__); \
 			break; \
 		} \
 	} while (0)

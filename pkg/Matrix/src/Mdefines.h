@@ -173,7 +173,7 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 		_X_.i += _Y_.i; \
 	} while (0)
 
-#define PM_AR21_UP(i, j)												\
+#define PM_AR21_UP(i, j) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))
 #define PM_AR21_LO(i, j, m2) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
@@ -183,22 +183,21 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)
 
-#define ERROR_INVALID_CLASS(_X_, _METHOD_) \
+#define ERROR_INVALID_TYPE(_X_, _FUNC_) \
+	error(_("invalid type \"%s\" in %s()"), \
+	      type2char(TYPEOF(_X_)), _FUNC_)
+
+#define ERROR_INVALID_CLASS(_X_, _FUNC_) \
 do { \
 	if (!OBJECT(_X_)) \
-		error(_("invalid type \"%s\" to '%s()'"), \
-		      type2char(TYPEOF(_X_)), _METHOD_); \
+		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else { \
 		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
-		error(_("invalid class \"%s\" to '%s()'"), \
-		      CHAR(STRING_ELT(class, 0)), _METHOD_); \
+		error(_("invalid class \"%s\" in %s()"), \
+		      CHAR(STRING_ELT(class, 0)), _FUNC_); \
 		UNPROTECT(1); \
 	} \
 } while (0)
-
-#define ERROR_INVALID_TYPE(_WHAT_, _SEXPTYPE_, _METHOD_) \
-	error(_("%s of invalid type \"%s\" in '%s()'"), \
-	      _WHAT_, type2char(_SEXPTYPE_), _METHOD_)
 
 /* For C-level isTriangular() : */
 #define RETURN_TRUE_OF_KIND(_KIND_) \
