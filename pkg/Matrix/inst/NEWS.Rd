@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-08-03 r4207)}{
+\section{Changes in version 1.6-1 (2023-08-03 r4210)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -46,6 +46,10 @@
       \item \code{as(<[CR]sparseMatrix>, "generalMatrix")} now checks
       if the number of nonzero entries in the result would exceed
       \code{INT_MAX} and throws an error in that case.
+
+      \item Validity checks on the \code{perm} slot of classes
+      \code{Cholesky} and \code{pCholesky} have been enabled
+      (forgotten in \pkg{Matrix} 1.6-0).
 
       \item API C function \code{chm_sparse_to_SEXP} now sorts and
       packs its first argument \emph{before} assigning struct members
