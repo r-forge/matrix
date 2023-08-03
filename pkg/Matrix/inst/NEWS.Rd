@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-08-01 r4203)}{
+\section{Changes in version 1.6-1 (2023-08-03 r4207)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -31,6 +31,10 @@
       \item Fix four Valgrind-detected memory bugs.
 
       \item \code{<diagonalMatrix> \%*\% <RsparseMatrix>} works again.
+
+      \item \code{diag(<non-square RsparseMatrix>) <- value}
+      works again, no longer giving a \code{p} slot of length
+      \code{Dim[2]} rather than \code{Dim[1]}.
 
       \item \code{as(<diagonalMatrix>, "symmetricMatrix")} now checks
       for symmetric \code{Dimnames}, for consistency.
