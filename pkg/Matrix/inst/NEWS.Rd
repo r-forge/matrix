@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-08-03 r4210)}{
+\section{Changes in version 1.6-1 (2023-08-03 r4212)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -69,6 +69,10 @@
       and \code{as.*} has been reduced substantially, from 306 to 194
       (not counting deprecated ones), partly as a result of efforts to
       do more fine-grained dispatch in C code.
+
+      \item Files in \file{po/} and \code{inst/po/} have been updated
+      (again), as many more C level messages now use format strings
+      as a result of \code{vsnprintf} usage in \file{src/validity.c}.
     }
   }
 }
