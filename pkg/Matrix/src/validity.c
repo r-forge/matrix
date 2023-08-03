@@ -89,7 +89,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 	SEXP s;
 	int i;
 	R_xlen_t ns;
-	
+
 	for (i = 0; i < 2; ++i) {
 		s = VECTOR_ELT(dimnames, i);
 		if (s == R_NilValue)
@@ -102,7 +102,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 			    "Dimnames", i + 1, (long long) ns,
 			    "Dim"     , i + 1,        pdim[i]);
 	}
-	
+
 	return NULL;
 }
 
@@ -213,7 +213,7 @@ SEXP compMatrix_validate(SEXP obj)
 		if (nms == R_NilValue)
 			RMKMS(_("'%s' slot has no '%s' attribute"), "factors", "names");
 	}
-	
+
 	return ScalarLogical(1);
 }
 
@@ -276,7 +276,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	const char *ul = CHAR(STRING_ELT(uplo, 0));
 	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
-	
+
 	return ScalarLogical(1);
 }
 
@@ -375,7 +375,7 @@ SEXP indMatrix_validate(SEXP obj)
 			      "perm", "1,...,Dim[1+margin%%2]");
 		++pperm;
 	}
-	
+
 	return ScalarLogical(1);
 }
 
@@ -517,10 +517,10 @@ SEXP TsparseMatrix_validate(SEXP obj)
 	if (TYPEOF(i) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "i", "integer");
 	if (TYPEOF(j) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "j", "integer");	
+		RMKMS(_("'%s' slot is not of type \"%s\""), "j", "integer");
 	R_xlen_t nnz = XLENGTH(i);
 	if (XLENGTH(j) != nnz)
-		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "j");	
+		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "j");
 	if (nnz > 0) {
 		if (m == 0 || n == 0)
 			RMKMS(_("'%s' slot has nonzero length but %s is 0"), "i", "prod(Dim)");
@@ -550,7 +550,7 @@ SEXP sCMatrix_validate(SEXP obj)
 	int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
 	if (pp[n] > 0) {
 		PROTECT(p);
-		
+
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -595,7 +595,7 @@ SEXP tCMatrix_validate(SEXP obj)
 	int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
 	if (pp[n] > 0) {
 		PROTECT(p);
-		
+
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -641,7 +641,7 @@ SEXP sRMatrix_validate(SEXP obj)
 	int *pp = INTEGER(p), m = (int) (XLENGTH(p) - 1);
 	if (pp[m] > 0) {
 		PROTECT(p);
-		
+
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -686,7 +686,7 @@ SEXP tRMatrix_validate(SEXP obj)
 	int *pp = INTEGER(p), m = (int) (XLENGTH(p) - 1);
 	if (pp[m] > 0) {
 		PROTECT(p);
-		
+
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -767,7 +767,7 @@ SEXP tTMatrix_validate(SEXP obj)
 	R_xlen_t nnz = XLENGTH(i);
 	if (nnz > 0) {
 		PROTECT(i);
-		
+
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -913,7 +913,7 @@ SEXP dpoMatrix_validate(SEXP obj)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
-	
+
 	/* Non-negative diagonal elements are necessary but _not_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	double *px = REAL(x);
@@ -933,7 +933,7 @@ SEXP dppMatrix_validate(SEXP obj)
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
-	
+
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 
@@ -1070,7 +1070,7 @@ SEXP sparseLU_validate(SEXP obj)
 			k = kend;
 		}
 	}
-	
+
 	SEXP U = GET_SLOT(obj, Matrix_USym);
 	PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
 	PROTECT(uplo = GET_SLOT(U, Matrix_uploSym));
@@ -1149,7 +1149,7 @@ SEXP sparseQR_validate(SEXP obj)
 	PROTECT(p = GET_SLOT(V, Matrix_pSym));
 	PROTECT(i = GET_SLOT(V, Matrix_iSym));
 	UNPROTECT(4); /* i, p, dim, V */
-	
+
 	pdim = INTEGER(dim);
 	int m0 = pdim[0];
 	if (m0 < m)
@@ -1285,7 +1285,7 @@ SEXP Cholesky_validate(SEXP obj)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
-	
+
 	/* Non-negative diagonal elements are necessary _and_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	double *px = REAL(x);
@@ -1584,7 +1584,7 @@ SEXP CHMsuper_validate(SEXP obj)
 		px = PROTECT(GET_SLOT(obj, install("px"))),
 		s = PROTECT(GET_SLOT(obj, install("s")));
 	UNPROTECT(4); /* s, px, pi, super */
-	
+
 	if (TYPEOF(super) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "super", "integer");
 	R_xlen_t nsuper1a = XLENGTH(super);
