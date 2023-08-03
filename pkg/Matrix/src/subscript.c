@@ -1212,7 +1212,8 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 	double ninj = (double) ni * nj;
 	if (ninj > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 
 	SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) ninj));
@@ -1396,7 +1397,8 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	double ninj = (double) ni * nj,
 	ninj_ = (keep) ? 0.5 * (ninj + ni) : ninj;
 	if (ninj_ > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 
 	SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) ninj_));
@@ -1520,7 +1522,8 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 #define SUB2_FINISH \
 	if (nnz > INT_MAX) \
-		error(_("x[i,j] too dense for CsparseMatrix; would have more than 2^31-1 nonzero entries")); \
+		error(_("%s too dense for %s; would have more than %s nonzero entries"), \
+		      "x[i,j]", "[CR]sparseMatrix", "2^31-1"); \
 	 \
 	PROTECT(i1 = allocVector(INTSXP, (R_xlen_t) nnz)); \
 	pi1 = INTEGER(i1); \
@@ -1673,7 +1676,8 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 #define SUB2_FINISH \
 	if (nnz > INT_MAX) \
-		error(_("x[i,j] too dense for RsparseMatrix; would have more than 2^31-1 nonzero entries")); \
+		error(_("%s too dense for %s; would have more than %s nonzero entries"), \
+		      "x[i,j]", "[CR]sparseMatrix", "2^31-1"); \
 	 \
 	PROTECT(j1 = allocVector(INTSXP, (R_xlen_t) nnz)); \
 	pj1 = INTEGER(j1); \
@@ -1873,7 +1877,9 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 						++pp1[kj];
 			}
 			if (pp1[kj] > INT_MAX - pp1[kj - 1])
-				error(_("x[i,j] too dense for CsparseMatrix; would have more than 2^31-1 nonzero entries"));
+				error(_("%s too dense for %s; would have more than %s nonzero entries"), \
+				      "x[i,j]", "[CR]sparseMatrix", "2^31-1"); \
+
 			pp1[kj] += pp1[kj-1];
 		}
 
@@ -2050,7 +2056,9 @@ static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 			for (kj = 0; kj < nj; ++kj) {
 				pp1[kj] = workA[pj[kj]];
 				if (pp1[kj] > INT_MAX - pp1[kj - 1])
-					error(_("x[i,j] too dense for [CR]sparseMatrix; would have more than 2^31-1 nonzero entries"));
+					error(_("%s too dense for %s; would have more than %s nonzero entries"), \
+					      "x[i,j]", "[CR]sparseMatrix", "2^31-1"); \
+
 				pp1[kj] += pp1[kj - 1];
 			}
 
@@ -2135,7 +2143,8 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 			SETCADR(call, _I_); \
 			PROTECT(value = eval(call, R_BaseEnv)); \
 			if (asLogical(value)) \
-				error(_("NA subscripts in x[i,j] not supported for sparseMatrix 'x'")); \
+				error(_("NA subscripts in %s not supported for '%s' inheriting from %s"), \
+					  "x[i,j]", "x", "sparseMatrix"); \
 			UNPROTECT(1); \
 		} \
 	} while (0)

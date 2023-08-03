@@ -196,13 +196,16 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 	if (k1 == R_NilValue)
 		a = (m > 0) ? 1-m : 0;
 	else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
-		error(_("'k1' must be an integer from -Dim[1] to Dim[2]"));
+		error(_("'%s' must be an integer from %s to %s"),
+		      "k1", "-Dim[1]", "Dim[2]");
 	if (k2 == R_NilValue)
 		b = (n > 0) ? n-1 : 0;
 	else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
-		error(_("'k2' must be an integer from -Dim[1] to Dim[2]"));
+		error(_("'%s' must be an integer from %s to %s"),
+		      "k2", "-Dim[1]", "Dim[2]");
 	else if (b < a)
-		error(_("'k1' must be less than or equal to 'k2'"));
+		error(_("'%s' must be less than or equal to '%s'"),
+		      "k1", "k2");
 
 	from = dense_band(from, valid[ivalid], a, b, isS4);
 	UNPROTECT(1);
@@ -216,7 +219,7 @@ SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
 		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "R_dense_colSums");
+		ERROR_INVALID_CLASS(obj, __func__);
 	const char *cl = valid[ivalid];
 	if (cl[1] == 's')
 		return R_dense_rowSums(obj, narm, mean);
@@ -462,7 +465,7 @@ SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
 		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, "R_dense_rowSums");
+		ERROR_INVALID_CLASS(obj, __func__);
 	const char *cl = valid[ivalid];
 
 	int doNaRm = asLogical(narm) != 0,

@@ -1,4 +1,4 @@
-SOURCES_C =  \
+SOURCES_C = \
 	CHMfactor.c \
 	Csparse.c \
 	init.c \

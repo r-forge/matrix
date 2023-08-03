@@ -34,7 +34,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	} else {
 
 		if (len > INT_MAX)
-			error(_("dimensions cannot exceed 2^31-1"));
+			error(_("dimensions cannot exceed %s"), "2^31-1");
 		dim = GET_SLOT(to, Matrix_DimSym);
 		pdim = INTEGER(dim);
 		if (transpose_if_vector) {
@@ -57,7 +57,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	}
 
 	if (cl[1] != 'g' && m != n)
-		error(_("attempt to construct symmetricMatrix or triangularMatrix from non-square matrix"));
+		error(_("attempt to construct %s or %s from non-square matrix"),
+		      "symmetricMatrix", "triangularMatrix");
 
 	if (doDN) {
 		if (cl[1] != 's')
@@ -176,19 +177,19 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag)
 	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
 	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
 	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("invalid '%s' to '%s()'"), "class", __func__);
+		error(_("invalid '%s' to %s()"), "class", __func__);
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 		if (zzz[1] == 't') {
 			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s()'"), "diag", __func__);
+				error(_("invalid '%s' to %s()"), "diag", __func__);
 		}
 	}
 
@@ -212,9 +213,11 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	if (packed)
 		len = (len + n) / 2;
 	if (len > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	if (class[2] != 'C' && packed && len > R_XLEN_T_MAX)
-		error(_("coercing n-by-n [RT]sparseMatrix to packedMatrix is not supported for n*n exceeding R_XLEN_T_MAX"));
+		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
+		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
 	double bytes = (double) len * kind2size(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
@@ -485,7 +488,7 @@ SEXP R_sparse_as_dense(SEXP from, SEXP packed)
 	int packed_;
 	if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 	    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s()'"), "packed", __func__);
+		error(_("invalid '%s' to %s()"), "packed", __func__);
 
 	return sparse_as_dense(from, valid[ivalid], packed_);
 }
@@ -503,7 +506,8 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	int n = INTEGER(dim)[0];
 	Matrix_int_fast64_t len = (Matrix_int_fast64_t) n * n;
 	if (len > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	double bytes = (double) len * kind2size(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
@@ -586,13 +590,13 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
 	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
 	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
-		error(_("invalid '%s' to '%s()'"), "shape", __func__);
+		error(_("invalid '%s' to %s()"), "shape", __func__);
 
 	int packed_ = 0;
 	if (shape_ != 'g') {
 		if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 		    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-			error(_("invalid '%s' to '%s()'"), "packed", __func__);
+			error(_("invalid '%s' to %s()"), "packed", __func__);
 	}
 
 	char ul = 'U';
@@ -600,7 +604,7 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 	}
 
 	return diagonal_as_dense(from, valid[ivalid], shape_, packed_, ul);
@@ -620,7 +624,8 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	Matrix_int_fast64_t len = (Matrix_int_fast64_t) m * n;
 	if (len > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	double bytes = (double) len * kind2size(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
@@ -689,7 +694,7 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	return index_as_dense(from, valid[ivalid], kind_);
 }
@@ -740,19 +745,19 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag)
 	    (zzz = CHAR(class))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("invalid '%s' to '%s()'"), "class", __func__);
+		error(_("invalid '%s' to %s()"), "class", __func__);
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 		if (zzz[1] == 't') {
 			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s()'"), "diag", __func__);
+				error(_("invalid '%s' to %s()"), "diag", __func__);
 		}
 	}
 
@@ -821,7 +826,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} \
 	} while (0)
 
-#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _NZ_)	\
+#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _NZ_) \
 	do { \
 		       _CTYPE_ *px0 = _PTR_(x0) ; \
 		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
@@ -848,7 +853,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	} while (0)
 
 #undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NZ_)\
+#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NZ_) \
 	do { \
 		switch (cl[2]) { \
 		case 'C': \
@@ -1053,7 +1058,8 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 
 #define DAS_VALID2T \
 	if (nnz > INT_MAX) \
-		error(_("attempt to construct sparseMatrix with more than 2^31-1 nonzero entries"))
+		error(_("attempt to construct %s with more than %s nonzero entries"), \
+		      "sparseMatrix", "2^31-1")
 
 #define DAS_VALID2C \
 	do { DAS_VALID2T; else *(pp++) = (int) nnz; } while (0)
@@ -1176,7 +1182,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP repr)
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to '%s()'"), "repr", __func__);
+		error(_("invalid '%s' to %s()"), "repr", __func__);
 
 	return dense_as_sparse(from, valid[ivalid], repr_);
 }
@@ -1357,20 +1363,20 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP shape, SEXP repr, SEXP uplo)
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
 	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
 	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
-		error(_("invalid '%s' to '%s()'"), "shape", __func__);
+		error(_("invalid '%s' to %s()"), "shape", __func__);
 
 	char repr_;
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to '%s()'"), "repr", __func__);
+		error(_("invalid '%s' to %s()"), "repr", __func__);
 
 	char ul = 'U';
 	if (shape_ != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 	}
 
 	return diagonal_as_sparse(from, valid[ivalid], shape_, repr_, ul);
@@ -1492,14 +1498,14 @@ SEXP R_index_as_sparse(SEXP from, SEXP kind, SEXP repr)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	char repr_;
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != '.' &&
 	     repr_ != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to '%s()'"), "repr", __func__);
+		error(_("invalid '%s' to %s()"), "repr", __func__);
 
 	return index_as_sparse(from, valid[ivalid], kind_, repr_);
 }
@@ -1581,7 +1587,7 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	return dense_as_kind(from, valid[ivalid], kind_);
 }
@@ -1712,7 +1718,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	return sparse_as_kind(from, valid[ivalid], kind_);
 }
@@ -1786,7 +1792,7 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	return diagonal_as_kind(from, valid[ivalid], kind_);
 }
@@ -1808,7 +1814,7 @@ SEXP R_index_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	return index_as_kind(from, valid[ivalid], kind_);
 }
@@ -1851,7 +1857,8 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	}
 
 	if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
 	int nprotect = 2;
 	if (class[2] == 'p' || new > 0) {
@@ -1997,12 +2004,14 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			for (j = 1; j < n; ++j)
 				pp1[j] += pp1[j-1];
 			if (pp1[n - 1] > INT_MAX - pp0[n - 1])
-				error(_("attempt to construct sparseMatrix with more than 2^31-1 nonzero entries"));
+				error(_("attempt to construct %s with more than %s nonzero entries"),
+				      "sparseMatrix", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp1[j] += pp0[j];
 		} else {
 			if (n > INT_MAX - pp0[n - 1])
-				error(_("attempt to construct sparseMatrix with more than 2^31-1 nonzero entries"));
+				error(_("attempt to construct %s with more than %s nonzero entries"),
+				      "sparseMatrix", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp1[j] = pp0[j] + j + 1;
 		}
@@ -2104,7 +2113,8 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		} else
 			nnz1 = n;
 		if (nnz1 > R_XLEN_T_MAX - nnz0)
-			error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
 		nnz1 += nnz0;
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
@@ -2191,7 +2201,8 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
 	if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -2395,11 +2406,11 @@ SEXP R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s()'"), "uplo", __func__);
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    ((diag = STRING_ELT(diag, 0)) != NA_STRING &&
 		     (di = *CHAR(diag)) != '\0' && di != 'N' && di != 'U'))
-			error(_("invalid '%s' to '%s()'"), "diag", __func__);
+			error(_("invalid '%s' to %s()"), "diag", __func__);
 	}
 
 	return dense_as_packed(from, valid[ivalid], ul, di);
@@ -2469,7 +2480,8 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 {
 	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
 	if (nnz0 > INT_MAX)
-		error(_("unable to aggregate TsparseMatrix with 'i' and 'j' slots of length exceeding 2^31-1"));
+		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
+		      "TsparseMatrix", "i", "j", "2^31-1");
 
 	/* FIXME: test for overflow and throw error only in that case */
 
@@ -2666,7 +2678,8 @@ void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
 {
 	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
 	if (nnz0 > INT_MAX)
-		error(_("unable to aggregate TsparseMatrix with 'i' and 'j' slots of length exceeding 2^31-1"));
+		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
+		      "TsparseMatrix", "i", "j", "2^31-1");
 
 	/* FIXME: test for overflow and throw error only in that case */
 
@@ -3286,7 +3299,7 @@ SEXP R_Matrix_as_packed(SEXP from)
 	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	if (cl[1] == 'g' || cl[2] == 'd')
-		error(_("attempt to pack a generalMatrix"));
+		error(_("attempt to pack a %s"), "generalMatrix");
 
 	switch (cl[2]) {
 	case 'y':
@@ -3402,10 +3415,10 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	if (TYPEOF(sparse) != LGLSXP || LENGTH(sparse) < 1)
-		error(_("invalid '%s' to '%s()'"), "sparse", __func__);
+		error(_("invalid '%s' to %s()"), "sparse", __func__);
 	int sparse_ = LOGICAL(sparse)[0];
 
 	switch (cl[2]) {
@@ -3494,7 +3507,7 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to '%s()'"), "kind", __func__);
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	switch (cl[2]) {
 	case 'e':

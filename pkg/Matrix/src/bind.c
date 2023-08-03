@@ -1,4 +1,3 @@
-/* MJ: work in progress ... see also ../R/bind2.R */
 #include "bind.h"
 #include "coerce.h"
 
@@ -45,7 +44,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 					error(_("number of columns of matrices must match"));
 			}
 			if (sdim[margin] > INT_MAX - rdim[margin])
-				error(_("dimensions cannot exceed 2^31-1"));
+				error(_("dimensions cannot exceed %s"), "2^31-1");
 			rdim[margin] += sdim[margin];
 
 			if (!rdimnames[0] || !rdimnames[1]) {
@@ -134,9 +133,9 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				break;
 			default:
 				if (margin == 1)
-					ERROR_INVALID_TYPE("object", TYPEOF(s), "cbind.Matrix");
+					ERROR_INVALID_TYPE(s, "cbind.Matrix");
 				else
-					ERROR_INVALID_TYPE("object", TYPEOF(s), "rbind.Matrix");
+					ERROR_INVALID_TYPE(s, "rbind.Matrix");
 				break;
 			}
 
@@ -152,7 +151,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 						error(_("number of columns of matrices must match"));
 				}
 				if (sdim[margin] > INT_MAX - rdim[margin])
-					error(_("dimensions cannot exceed 2^31-1"));
+					error(_("dimensions cannot exceed %s"), "2^31-1");
 				rdim[margin] += sdim[margin];
 
 				if (!rdimnames[0] || !rdimnames[1]) {
@@ -176,7 +175,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				continue;
 			slen = XLENGTH(s);
 			if (slen > INT_MAX)
-				error(_("dimensions cannot exceed 2^31-1"));
+				error(_("dimensions cannot exceed %s"), "2^31-1");
 			else if (slen > maxlen)
 				maxlen = slen;
 		}
@@ -200,7 +199,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			if (slen == 0 && rdim[!margin] > 0)
 				continue;
 			if (rdim[margin] == INT_MAX)
-				error(_("dimensions cannot exceed 2^31-1"));
+				error(_("dimensions cannot exceed %s"), "2^31-1");
 			rdim[margin] += 1;
 			if (slen > rdim[!margin] || rdim[!margin] % (int) slen) {
 				if (margin == 1)
@@ -618,7 +617,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			psp = INTEGER(sp);
 			n = (int) (XLENGTH(sp) - 1);
 			if (psp[n] > INT_MAX - nnz)
-				error(_("p[length(p)] cannot exceed 2^31-1"));
+				error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 			for (j = 0; j < n; ++j)
 				*(pp++) = nnz = nnz + (psp[j + 1] - psp[j]);
 		}
@@ -683,7 +682,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			sp = GET_SLOT(s, Matrix_pSym);
 			psp = INTEGER(sp) + 1;
 			if (n > 0 && psp[n - 1] > INT_MAX - pp[n - 1])
-				error(_("p[length(p)] cannot exceed 2^31-1"));
+				error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp[j] += psp[j];
 		}
@@ -748,7 +747,8 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 				continue;
 			k = XLENGTH(GET_SLOT(s, Matrix_iSym));
 			if (k > R_XLEN_T_MAX - nnz)
-				error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+				error(_("attempt to allocate vector of length exceeding %s"),
+				      "R_XLEN_T_MAX");
 			nnz += k;
 		}
 
@@ -840,7 +840,8 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 		/* Arguments are all NULL */
 		return R_NilValue;
 	if (repr == 'e' && (Matrix_int_fast64_t) rdim[0] * rdim[1] > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding R_XLEN_T_MAX"));
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
 	char rcl[] = "...Matrix";
 	if (kind == '\0' || repr == '\0') {
 		if (kind != repr)
