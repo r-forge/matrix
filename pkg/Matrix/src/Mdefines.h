@@ -137,7 +137,43 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define STRICTLY_ISNZ_COMPLEX(_X_) \
 	(!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
 
-#define PM_AR21_UP(i, j) \
+#define INCREMENT_PATTERN(_X_, _Y_) \
+	do { \
+		_X_ = 1; \
+	} while (0)
+#define INCREMENT_LOGICAL(_X_, _Y_) \
+	do { \
+		if (_Y_ == NA_LOGICAL) { \
+			if (_X_ == 0) \
+				_X_ = NA_LOGICAL; \
+		} else if (_Y_ != 0) \
+			_X_ = 1; \
+	} while (0)
+#define INCREMENT_INTEGER(_X_, _Y_) \
+	do { \
+		if (_X_ != NA_INTEGER) { \
+			if (_Y_ == NA_INTEGER) \
+				_X_ = NA_INTEGER; \
+			else if ((_Y_ < 0) \
+					 ? (_X_ <= INT_MIN - _Y_) \
+					 : (_X_ >  INT_MAX - _Y_)) { \
+				warning(_("NAs produced by integer overflow")); \
+				_X_ = NA_INTEGER; \
+			} else \
+				_X_ += _Y_; \
+		} \
+	} while (0)
+#define INCREMENT_REAL(_X_, _Y_) \
+	do { \
+		_X_ += _Y_; \
+	} while (0)
+#define INCREMENT_COMPLEX(_X_, _Y_) \
+	do { \
+		_X_.r += _Y_.r; \
+		_X_.i += _Y_.i; \
+	} while (0)
+
+#define PM_AR21_UP(i, j)												\
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))
 #define PM_AR21_LO(i, j, m2) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))

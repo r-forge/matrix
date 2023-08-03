@@ -273,54 +273,23 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	do { \
 		switch (class[0]) { \
 		case 'l': \
-			SAD_SUBCASES(int, LOGICAL, SHOW, FIRSTOF, 1, \
-			             do { \
-			                 if (*px0 == NA_LOGICAL) { \
-			                     if (px1[index] == 0) \
-			                         px1[index] = NA_LOGICAL; \
-			                 } else if (*px0 != 0) \
-			                     px1[index] = 1; \
-			                 ++px0; \
-			             } while (0)); \
+			SAD_SUBCASES(int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL, 1); \
 			break; \
 		case 'i': \
-			SAD_SUBCASES(int, INTEGER, SHOW, FIRSTOF, 1, \
-			             do { \
-			                 if (px1[index] != NA_INTEGER) { \
-			                     if (*px0 == NA_INTEGER) \
-			                         px1[index] = NA_INTEGER; \
-			                     else if ((*px0 < 0) \
-			                              ? (px1[index] <= INT_MIN - *px0) \
-			                              : (px1[index] >  INT_MAX - *px0)) { \
-			                         warning(_("NAs produced by integer overflow")); \
-			                         px1[index] = NA_INTEGER; \
-			                     } else \
-			                         px1[index] += *px0; \
-			                 } \
-			                 ++px0; \
-			             } while (0)); \
+			SAD_SUBCASES(int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER, 1); \
 			break; \
 		case 'd': \
-			SAD_SUBCASES(double, REAL, SHOW, FIRSTOF, 1.0, \
-			             do { \
-			                 px1[index] += *px0; \
-			                 ++px0; \
-			             } while (0)); \
+			SAD_SUBCASES(double, REAL, SHOW, FIRSTOF, INCREMENT_REAL, 1.0); \
 			break; \
 		case 'z': \
-			SAD_SUBCASES(Rcomplex, COMPLEX, SHOW, FIRSTOF, Matrix_zone, \
-			             do { \
-			                 px1[index].r += (*px0).r; \
-			                 px1[index].i += (*px0).i; \
-			                 ++px0; \
-			             } while (0)); \
+			SAD_SUBCASES(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX, Matrix_zone); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define SAD_SUBCASES(_CTYPE_, _PTR_, _MASK_, _REPLACE_, _ONE_, _INCR_) \
+#define SAD_SUBCASES(_CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_, _ONE_) \
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 		       _CTYPE_ *px1 = _PTR_(x1) ; \
@@ -328,7 +297,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		if (!packed) { \
 			/* .(ge|sy|tr)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2NP, SAD_LOOP_R2NP, SAD_LOOP_T2NP, \
-			                _REPLACE_, _ONE_, _INCR_); \
+			                _MASK_, _REPLACE_, _INCREMENT_); \
 			if (class[1] == 't' && di != 'N') { \
 				px1 = _PTR_(x1); \
 				R_xlen_t n1a = (R_xlen_t) n + 1; \
@@ -338,7 +307,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		} else if (ul == 'U') { \
 			/* upper triangular .(sp|tp)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2UP, SAD_LOOP_R2UP, SAD_LOOP_T2UP, \
-			                _REPLACE_, _ONE_, _INCR_); \
+			                _MASK_, _REPLACE_, _INCREMENT_); \
 			if (class[1] == 't' && di != 'N') { \
 				px1 = _PTR_(x1); \
 				for (int d = 0; d < n; px1 += (++d) + 1) \
@@ -347,7 +316,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		} else { \
 			/* lower triangular .(sp|tp)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2LP, SAD_LOOP_R2LP, SAD_LOOP_T2LP, \
-			                _REPLACE_, _ONE_, _INCR_); \
+			                _MASK_, _REPLACE_, _INCREMENT_); \
 			if (class[1] == 't' && di != 'N') { \
 				px1 = _PTR_(x1); \
 				for (int d = 0; d < n; px1 += n - (d++)) \
@@ -356,25 +325,25 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		} \
 	} while (0)
 
-#define SAD_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _REPLACE_, _ONE_, _INCR_) \
+#define SAD_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		switch (class[2]) { \
 		case 'C': \
 		{ \
 			int j, k, kend; \
-			_LOOP_C_(_REPLACE_, _ONE_); \
+			_LOOP_C_(_MASK_, _REPLACE_, _INCREMENT_); \
 			break; \
 		} \
 		case 'R': \
 		{ \
 			int i, k, kend; \
-			_LOOP_R_(_REPLACE_, _ONE_); \
+			_LOOP_R_(_MASK_, _REPLACE_, _INCREMENT_); \
 			break; \
 		} \
 		case 'T': \
 		{ \
 			R_xlen_t index, k, nnz = XLENGTH(i0); \
-			_LOOP_T_(_INCR_); \
+			_LOOP_T_(_MASK_, _REPLACE_, _INCREMENT_); \
 			break; \
 		} \
 		default: \
@@ -382,103 +351,105 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		} \
 	} while (0)
 
-#define SAD_LOOP_C2NP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_C2NP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		for (j = 0, k = 0; j < n; ++j, px1 += m) { \
 			kend = pp[j]; \
 			while (k < kend) { \
-				px1[*pi] = _REPLACE_(*(px0++), _ONE_); \
-				++pi; ++k; \
+				px1[*pi] = _REPLACE_(*px0, 1); \
+				++k; ++pi; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_C2UP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_C2UP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		for (j = 0, k = 0; j < n; px1 += (++j)) { \
 			kend = pp[j]; \
 			while (k < kend) { \
-				px1[*pi] = _REPLACE_(*(px0++), _ONE_); \
-				++pi; ++k; \
+				px1[*pi] = _REPLACE_(*px0, 1); \
+				++k; ++pi; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_C2LP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_C2LP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		for (j = 0, k = 0; j < n; px1 += n - (j++)) { \
 			kend = pp[j]; \
 			while (k < kend) { \
-				px1[*pi - j] = _REPLACE_(*(px0++), _ONE_); \
-				++pi; ++k; \
+				px1[*pi - j] = _REPLACE_(*px0, 1); \
+				++k; ++pi; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_R2NP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_R2NP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		R_xlen_t m1 = (R_xlen_t) m; \
 		for (i = 0, k = 0; i < m; ++i, ++px1) { \
 			kend = pp[i]; \
 			while (k < kend) { \
-				px1[m1 * *pj] = _REPLACE_(*(px0++), _ONE_); \
-				++pj; ++k; \
+				px1[m1 * *pj] = _REPLACE_(*px0, 1); \
+				++k; ++pj; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_R2UP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_R2UP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		for (i = 0, k = 0; i < n; ++i) { \
 			kend = pp[i]; \
 			while (k < kend) { \
-				px1[PM_AR21_UP(i, *pj)] = _REPLACE_(*(px0++), _ONE_); \
-				++pj; ++k; \
+				px1[PM_AR21_UP(i, *pj)] = _REPLACE_(*px0, 1); \
+				++k; ++pj; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_R2LP(_REPLACE_, _ONE_) \
+#define SAD_LOOP_R2LP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		R_xlen_t n2 = (R_xlen_t) n * 2; \
 		for (i = 0, k = 0; i < n; ++i) { \
 			kend = pp[i]; \
 			while (k < kend) { \
-				px1[PM_AR21_LO(i, *pj, n2)] = _REPLACE_(*(px0++), _ONE_); \
-				++pj; ++k; \
+				px1[PM_AR21_LO(i, *pj, n2)] = _REPLACE_(*px0, 1); \
+				++k; ++pj; _MASK_(++px0); \
 			} \
 		} \
 	} while (0)
 
-#define SAD_LOOP_T2NP(_INCR_) \
+#define SAD_LOOP_T2NP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		R_xlen_t m1 = (R_xlen_t) m; \
-		for (k = 0; k < nnz; ++k, ++pi, ++pj) { \
+		for (k = 0; k < nnz; ++k) { \
 			index = m1 * *pj + *pi; \
-			_INCR_; \
+			_INCREMENT_(px1[index], (*px0)); \
+			++pi; ++pj; _MASK_(++px0); \
 		} \
 	} while (0)
 
-#define SAD_LOOP_T2UP(_INCR_) \
+#define SAD_LOOP_T2UP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
-		for (k = 0; k < nnz; ++k, ++pi, ++pj) { \
+		for (k = 0; k < nnz; ++k) { \
 			index = PM_AR21_UP(*pi, *pj); \
-			_INCR_; \
+			_INCREMENT_(px1[index], (*px0)); \
+			++pi; ++pj; _MASK_(++px0); \
 		} \
 	} while (0)
 
-#define SAD_LOOP_T2LP(_INCR_) \
+#define SAD_LOOP_T2LP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		R_xlen_t n2 = (R_xlen_t) n * 2; \
 		for (k = 0; k < nnz; ++k) { \
 			index = PM_AR21_LO(*pi, *pj, n2); \
-			_INCR_; \
+			_INCREMENT_(px1[index], (*px0)); \
+			++pi; ++pj; _MASK_(++px0); \
 		} \
 	} while (0)
 
 	if (class[0] == 'n')
-		SAD_SUBCASES(int, LOGICAL, HIDE, SECONDOF, 1,
-		             px1[index] = 1);
+		SAD_SUBCASES(int, LOGICAL, HIDE, SECONDOF, INCREMENT_PATTERN, 1);
 	else {
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 		SAD_CASES;
@@ -520,7 +491,7 @@ SEXP R_sparse_as_dense(SEXP from, SEXP packed)
 }
 
 SEXP diagonal_as_dense(SEXP from, const char *class,
-                          char shape, int packed, char ul)
+                       char shape, int packed, char ul)
 {
 	char cl[] = "...Matrix";
 	cl[0] = class[0];
@@ -2710,7 +2681,7 @@ void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
 	workC = workB + r;
 	pj_   = workC + m;
 
-#define TAGGR_LOOP(_CTYPE_, _PTR_, _MASK_, _INCR_) \
+#define TAGGR_LOOP(_CTYPE_, _PTR_, _MASK_, _INCREMENT_) \
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1, *px_); \
 		_MASK_(Matrix_Calloc(px_, nnz0, _CTYPE_)); \
@@ -2765,7 +2736,7 @@ void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
 					++kend_; \
 				} else { \
 					/* Have already seen this column index */ \
-					_MASK_(_INCR_); \
+					_MASK_(_INCREMENT_(px_[k], px_[workB[pj_[k]]])); \
 				} \
 				++k; \
 			} \
@@ -2803,44 +2774,16 @@ void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
 	else {
 		switch (TYPEOF(x0)) {
 		case LGLSXP:
-			TAGGR_LOOP(int, LOGICAL, SHOW,
-			           do {
-			               if (px_[k] == NA_LOGICAL) {
-			                   if (px_[workB[pj_[k]]] == 0)
-			                       px_[workB[pj_[k]]] = NA_LOGICAL;
-			               } else if (px_[k] != 0)
-			                  px_[workB[pj_[k]]] = 1;
-			           } while (0));
+			TAGGR_LOOP(int, LOGICAL, SHOW, INCREMENT_LOGICAL);
 			break;
 		case INTSXP:
-			TAGGR_LOOP(int, INTEGER, SHOW,
-
-			           do {
-			               if (px_[workB[pj_[k]]] != NA_INTEGER) {
-			                   if (px_[k] == NA_INTEGER)
-			                       px_[workB[pj_[k]]] = NA_INTEGER;
-			                   else if ((px_[k] < 0)
-			                            ? (px_[workB[pj_[k]]] <= INT_MIN - px_[k])
-			                            : (px_[workB[pj_[k]]] >  INT_MAX - px_[k])) {
-			                       warning(_("NAs produced by integer overflow"));
-			                       px_[workB[pj_[k]]] = NA_INTEGER;
-			                   } else
-			                       px_[workB[pj_[k]]] += px_[k];
-			               }
-			           } while (0));
+			TAGGR_LOOP(int, INTEGER, SHOW, INCREMENT_INTEGER);
 			break;
 		case REALSXP:
-			TAGGR_LOOP(double, REAL, SHOW,
-			           do {
-			               px_[workB[pj_[k]]] += px_[k];
-			           } while (0));
+			TAGGR_LOOP(double, REAL, SHOW, INCREMENT_REAL);
 			break;
 		case CPLXSXP:
-			TAGGR_LOOP(Rcomplex, COMPLEX, SHOW,
-			           do {
-			               px_[workB[pj_[k]]].r += px_[k].r;
-			               px_[workB[pj_[k]]].i += px_[k].i;
-			           } while (0));
+			TAGGR_LOOP(Rcomplex, COMPLEX, SHOW, INCREMENT_COMPLEX);
 			break;
 		default:
 			break;
