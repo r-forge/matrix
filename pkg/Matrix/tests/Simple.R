@@ -1529,6 +1529,12 @@ stopifnot(exprs = {
     identical(drop0(i1.d, give.Csparse = FALSE), as(i1.d, "CsparseMatrix"))
 })
 
+## Setting diagonal elements of non-square RsparseMatrix produced
+## an invalid object
+x <- new("dgRMatrix", Dim = c(1L, 2L), p = c(0L, 0L))
+diag(x) <- 1
+validObject(x)
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
