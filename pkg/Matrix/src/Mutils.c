@@ -443,7 +443,7 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 		}
 		UNPROTECT(1);
 	} else if (asLogical(warn) != 0)
-		warning(_("attempt to discard factors from %s without '%s' slot")
+		warning(_("attempt to discard factors from %s without '%s' slot"),
 		        "Matrix", "factors");
 	return ScalarLogical(0); /* no-op */
 }
