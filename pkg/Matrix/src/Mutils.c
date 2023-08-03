@@ -443,7 +443,8 @@ SEXP R_empty_factors(SEXP obj, SEXP warn)
 		}
 		UNPROTECT(1);
 	} else if (asLogical(warn) != 0)
-		warning(_("attempt to discard factors from Matrix without 'factors' slot"));
+		warning(_("attempt to discard factors from %s without '%s' slot")
+		        "Matrix", "factors");
 	return ScalarLogical(0); /* no-op */
 }
 
@@ -709,7 +710,7 @@ SEXP R_asPerm(SEXP p, SEXP off, SEXP ioff, SEXP n)
 	if (off_ == NA_INTEGER || ioff_ == NA_INTEGER)
 		error(_("'%s' or '%s' is NA"), "off", "ioff");
 	if (TYPEOF(n) != INTSXP)
-		error(_("'n' is not of type \"integer\""));
+		error(_("'%s' is not of type \"%s\""), "n", "integer");
 	if (XLENGTH(n) != 1)
 		error(_("'%s' does not have length %d"), "n", 1);
 	int n_ = INTEGER(n)[0];
