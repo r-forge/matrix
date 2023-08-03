@@ -1071,7 +1071,7 @@ SEXP sparseLU_validate(SEXP obj)
 		}
 	}
 
-	SEXP U = GET_SLOT(obj, Matrix_USym);
+	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
 	PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
 	PROTECT(uplo = GET_SLOT(U, Matrix_uploSym));
 	UNPROTECT(3); /* uplo, dim, U */
@@ -1429,7 +1429,7 @@ SEXP CHMfactor_validate(SEXP obj)
 
 SEXP CHMsimpl_validate(SEXP obj)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == INT_MAX)
 		RMKMS(_("%s is not representable as \"%s\""), "Dim[1]+1", "integer");
@@ -1579,7 +1579,7 @@ SEXP CHMsuper_validate(SEXP obj)
 	   _correct_ ... see ./CHOLMOD/Supernodal/cholmod_super_symbolic.c
 	*/
 
-	SEXP super = GET_SLOT(obj, install("super")),
+	SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
 		pi = PROTECT(GET_SLOT(obj, install("pi"))),
 		px = PROTECT(GET_SLOT(obj, install("px"))),
 		s = PROTECT(GET_SLOT(obj, install("s")));
