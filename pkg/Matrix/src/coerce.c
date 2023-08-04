@@ -1258,13 +1258,14 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
 		SET_SLOT(to, Matrix_pSym, p);
 		int *pp = INTEGER(p);
+		*(pp++) = 0;
 		if (di == 'N') {
+			nnz = 0;
 
 #undef DAS_LOOP
 #define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
-				*(pp++) = nnz = 0; \
 				for (d = 0; d < n; ++d) { \
 					if (_NZ_(*px0)) \
 						++nnz; \
@@ -1279,18 +1280,18 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				DAS_CASES(SHOW);
 		} else {
 			nnz = n;
-			for (d = 0; d <= n; ++d)
+			for (d = 1; d <= n; ++d)
 				*(pp++) = d;
 		}
 		UNPROTECT(1); /* p */
 	} else {
 		if (di == 'N') {
+			nnz = 0;
 
 #undef DAS_LOOP
 #define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
-				nnz = 0; \
 				for (d = 0; d < n; ++d) { \
 					if (_NZ_(*px0)) \
 						++nnz; \
