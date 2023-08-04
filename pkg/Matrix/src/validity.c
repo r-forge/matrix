@@ -4,22 +4,21 @@ static char *Matrix_sprintf(const char *format, ...)
 {
 	char *buf = R_alloc(Matrix_ErrorBufferSize, sizeof(char));
 	va_list args;
-    va_start(args, format);
+	va_start(args, format);
 	vsnprintf(buf, Matrix_ErrorBufferSize, format, args);
 	va_end(args);
 	return buf;
 }
 
-#define     MK(_FORMAT_     ) mkString(_FORMAT_)
+#define     MK(_FORMAT_     )       mkString(_FORMAT_             )
 #define     MS(_FORMAT_, ...) Matrix_sprintf(_FORMAT_, __VA_ARGS__)
-#define   MKMS(_FORMAT_, ...) MK(MS(_FORMAT_, __VA_ARGS__))
 
 #define    RMK(_FORMAT_     ) \
-	return   MK(_FORMAT_)
+	return MK(   _FORMAT_              )
 #define    RMS(_FORMAT_, ...) \
-	return   MS(_FORMAT_, __VA_ARGS__)
+	return    MS(_FORMAT_, __VA_ARGS__)
 #define  RMKMS(_FORMAT_, ...) \
-    return MKMS(_FORMAT_, __VA_ARGS__)
+	return MK(MS(_FORMAT_, __VA_ARGS__))
 
 #define FRMKMS(_FORMAT_, ...) \
 	do { \
@@ -329,11 +328,11 @@ SEXP diagonalMatrix_validate(SEXP obj)
 	if (nonunit) {
 		if (XLENGTH(x) != n)
 			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			        "diag", "N", "x", "Dim[1]");
+			      "diag", "N", "x", "Dim[1]");
 	} else {
 		if (XLENGTH(x) != 0)
 			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			        "diag", "U", "x",      "0");
+			      "diag", "U", "x",      "0");
 	}
 
 	return ScalarLogical(1);
@@ -494,7 +493,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
 				RMKMS(_("'%s' slot contains NA"), "j");
 			if (jk < 0 || jk >= n)
 				RMKMS(_("'%s' slot has elements not in {%s}"),
-				        "j", "0,...,Dim[2]-1");
+				      "j", "0,...,Dim[2]-1");
 			if (jk <= j0)
 				RMKMS(_("'%s' slot is not increasing within rows"), "j");
 			j0 = jk;
