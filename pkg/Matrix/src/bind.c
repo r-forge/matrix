@@ -261,7 +261,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		   which cannot overflow Matrix_int_fast64_t as long as R
 		   builds require sizeof(int) equal to 4
 		 */
-		Matrix_int_fast64_t nnz = 0, len = 0, snnz, slen;
+		Matrix_int_fast64_t nnz = 0, len = 0, snnz = 0, slen = 0;
 		for (a = args; a != R_NilValue && nnz < INT_MAX; a = CDR(a)) {
 			s = CAR(a);
 			if (!IS_S4_OBJECT(s))
@@ -833,7 +833,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 {
 	int rdim[2], rdimnames[2];
-	char kind, repr;
+	char kind = '\0', repr = '\0';
 	scanArgs(args, exprs, margin, level,
 	         rdim, rdimnames, &kind, &repr);
 	if (rdim[!margin] < 0)
@@ -865,7 +865,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 
 	if (rdimnames[0] || rdimnames[1]) {
 		SEXP dimnames = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)),
-			marnames, nms[2], nms_, a, e, s, tmp;
+			marnames = R_NilValue, nms[2], nms_, a, e, s, tmp;
 		int i, ivalid, r, pos = 0, nprotect = 1;
 		const char *scl;
 		if (rdimnames[margin]) {
