@@ -1221,6 +1221,17 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
+	if (cl[1] == 't' && di != 'N') {
+		if (cl[2] != 'T') {
+			SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
+			SET_SLOT(to, Matrix_pSym, p);
+			Matrix_memset(INTEGER(p), 0, (R_xlen_t) n + 1, sizeof(int));
+			UNPROTECT(1); /* p */
+		}
+		UNPROTECT(1); /* to */
+		return to;
+	}
+
 #define DAS_CASES(_MASK_) \
 	do { \
 		switch (class[0]) { \
@@ -1248,7 +1259,6 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		SET_SLOT(to, Matrix_pSym, p);
 		int *pp = INTEGER(p);
 		if (di == 'N') {
-			nnz = 0;
 
 #undef DAS_LOOP
 #define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
@@ -1267,9 +1277,6 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
-		} else if (cl[1] == 't') {
-			for (d = 0; d <= n; ++d)
-				*(pp++) = 0;
 		} else {
 			nnz = n;
 			for (d = 0; d <= n; ++d)
@@ -1278,7 +1285,6 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		UNPROTECT(1); /* p */
 	} else {
 		if (di == 'N') {
-			nnz = 0;
 
 #undef DAS_LOOP
 #define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
@@ -1298,11 +1304,6 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				DAS_CASES(SHOW);
 		} else
 			nnz = n;
-	}
-
-	if (cl[1] == 't' && di != 'N') {
-		UNPROTECT(2); /* x0, to */
-		return to;
 	}
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
