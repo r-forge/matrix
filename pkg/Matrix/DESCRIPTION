@@ -1,6 +1,6 @@
 Package: Matrix
 Version: 1.6-1
-Date: 2023-08-03
+Date: 2023-08-04
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,

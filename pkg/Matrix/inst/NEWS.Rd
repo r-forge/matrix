@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-08-03 r4212)}{
+\section{Changes in version 1.6-1 (2023-08-04 r4216)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -1966,7 +1966,7 @@
       \emph{semantically} equivalent to \code{list(nms, nms)}.
 
       \item \code{as.vector(<sparseVector>)} etc, now work, too.
-      \item \code{lu(\emph{<sparseMatrix>})} now keeps \code{dimnames}.
+      \item \code{lu(<sparseMatrix>)} now keeps \code{dimnames}.
       \item better \file{NEWS.Rd} (which pleases Kurt and \command{tidy} ;-)
     }
   }
