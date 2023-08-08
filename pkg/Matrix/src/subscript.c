@@ -1546,7 +1546,6 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 	if (mi) {
 
-		pp1[0] = 0;
 		for (kj = 0; kj < nj; ++kj) {
 			nnz += pp0[pj[kj]] - pp0[pj[kj] - 1];
 			pp1[kj] = (int) nnz;
@@ -1694,7 +1693,6 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 
 	if (mj) {
 
-		pp1[0] = 0;
 		for (ki = 0; ki < ni; ++ki) {
 			nnz += pp0[pi[ki]] - pp0[pi[ki] - 1];
 			pp1[ki] = (int) nnz;
