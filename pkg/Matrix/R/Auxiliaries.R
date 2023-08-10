@@ -601,10 +601,10 @@ as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
 
 ## (matrix|sparseMatrix)->CsparseMatrix as similar as possible to "target"
 as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
+    kind <- .M.kind(x)
     cl <- .M.nonvirtual(new(cld))
     if(cl == "indMatrix")
         cl <- "ngeMatrix"
-    kind <- substr(cl, 1L, 1L)
     symmetric <- substr(cl, 2L, 2L) == "s" && isSymmetric(x)
     triangular <- !symmetric &&
         substr(cl, 2L, 2L) == "t" && (it <- isTriangular(x))
