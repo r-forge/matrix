@@ -140,8 +140,16 @@ as.matrix.Matrix <- function(x, ...)                    .M2m(x)
 
 setMethod("as.vector" , signature(x = "Matrix"),
           as.vector.Matrix)
+if(FALSE) {
+## 2023-08-10: breaks iGraphMatch, mcmcsae, mcompanion
+## which define proper subclasses of Matrix not extending
+## any of _our_ proper subclasses of Matrix
 setMethod("as.matrix" , signature(x = "Matrix"),
           as.matrix.Matrix)
+} else {
+setMethod("as.matrix" , signature(x = "Matrix"),
+          function(x, ...) as(x, "matrix"))
+}
 setMethod("as.array"  , signature(x = "Matrix"),
           as.array.Matrix)
 setMethod("as.logical", signature(x = "Matrix"),
