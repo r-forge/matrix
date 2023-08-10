@@ -47,10 +47,18 @@ setMethod("cbind2", signature(x = "Matrix", y = "NULL"),
           function(x, y, ...) x)
 setMethod("cbind2", signature(x = "NULL", y = "Matrix"),
           function(x, y, ...) y)
+if(FALSE) {
+## Correct, but breaks evclust ... leaving for 1.6-2
 setMethod("cbind2", signature(x = "Matrix", y = "vector"),
           function(x, y, ...) cbind2(x, matrix(y, x@Dim[1L], 1L)))
 setMethod("cbind2", signature(x = "vector", y = "Matrix"),
           function(x, y, ...) cbind2(matrix(x, y@Dim[1L], 1L), y))
+} else {
+setMethod("cbind2", signature(x = "Matrix", y = "vector"),
+          function(x, y, ...) cbind2(x, matrix(y, nrow = x@Dim[1L])))
+setMethod("cbind2", signature(x = "vector", y = "Matrix"),
+          function(x, y, ...) cbind2(matrix(x, nrow = y@Dim[1L]), y))
+}
 
 setMethod("rbind2", signature(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
@@ -58,10 +66,18 @@ setMethod("rbind2", signature(x = "Matrix", y = "NULL"),
           function(x, y, ...) x)
 setMethod("rbind2", signature(x = "NULL", y = "Matrix"),
           function(x, y, ...) y)
+if(FALSE) {
+## Correct, but breaks evclust ... leaving for 1.6-2
 setMethod("rbind2", signature(x = "Matrix", y = "vector"),
           function(x, y, ...) rbind2(x, matrix(y, 1L, x@Dim[2L])))
 setMethod("rbind2", signature(x = "vector", y = "Matrix"),
           function(x, y, ...) rbind2(matrix(x, 1L, y@Dim[2L]), y))
+} else {
+setMethod("rbind2", signature(x = "Matrix", y = "vector"),
+          function(x, y, ...) rbind2(x, matrix(y, ncol = x@Dim[2L])))
+setMethod("rbind2", signature(x = "vector", y = "Matrix"),
+          function(x, y, ...) rbind2(matrix(x, ncol = y@Dim[2L]), y))
+}
 
 
 ###-- General -----------------------------------------------------------
