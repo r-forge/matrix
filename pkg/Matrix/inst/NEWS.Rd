@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-1 (2023-08-10 r4222)}{
+\section{Changes in version 1.6-1 (2023-08-10 r4225)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented
@@ -30,10 +30,10 @@
     \itemize{
       \item Fix four Valgrind-detected memory bugs.
 
-      \item \code{[cr]bind(<vector>, <Matrix>)} now behaves as
-      \code{[cr]bind(<vector>, <matrix>)} in more cases, always
-      handling the vector as a 1-column (\code{cbind}) or 1-row
-      (\code{rbind}) matrix.
+      %% \item \code{[cr]bind(<vector>, <Matrix>)} now behaves as
+      %% \code{[cr]bind(<vector>, <matrix>)} in more cases, always
+      %% handling the vector as a 1-column (\code{cbind}) or 1-row
+      %% (\code{rbind}) matrix.
 
       \item \code{<diagonalMatrix> \%*\% <RsparseMatrix>} works again.
 
