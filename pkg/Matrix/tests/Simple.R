@@ -1535,6 +1535,12 @@ x <- new("dgRMatrix", Dim = c(1L, 2L), p = c(0L, 0L))
 diag(x) <- 1
 validObject(x)
 
+## Subassigning double to logical briefly did not change class
+x <- new("lgeMatrix", Dim = c(2L, 3L), x = logical(6L))
+y <- new("dgeMatrix", Dim = c(2L, 3L), x = replace(double(6L), 1L, 1))
+x[1L, 1L] <- 1
+stopifnot(identical(x, y))
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
