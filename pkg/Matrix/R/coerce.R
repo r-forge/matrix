@@ -134,24 +134,26 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 ## ==== From Matrix to vector ==========================================
 
 ## Need 'base' functions calling as.*() to dispatch to our S4 methods:
-as.vector.Matrix <- function(x, mode = "any") as.vector(.M2v(x), mode)
-as.matrix.Matrix <- function(x, ...)                    .M2m(x)
- as.array.Matrix <- function(x, ...)                    .M2m(x)
-
-setMethod("as.vector" , signature(x = "Matrix"),
-          as.vector.Matrix)
-if(FALSE) {
+if (FALSE) {
 ## 2023-08-10: breaks iGraphMatch, mcmcsae, mcompanion
 ## which define proper subclasses of Matrix not extending
 ## any of _our_ proper subclasses of Matrix
+as.vector.Matrix <- function(x, mode = "any") as.vector(.M2v(x), mode)
+as.matrix.Matrix <- function(x, ...)                    .M2m(x)
+ as.array.Matrix <- function(x, ...)                    .M2m(x)
+} else {
+## Hence, for now ...
+as.vector.Matrix <- function(x, mode = "any") as.vector(as(x, "matrix"), mode)
+as.matrix.Matrix <- function(x, ...)                    as(x, "matrix")
+ as.array.Matrix <- function(x, ...)                    as(x, "matrix")
+}
+
+setMethod("as.vector" , signature(x = "Matrix"),
+          as.vector.Matrix)
 setMethod("as.matrix" , signature(x = "Matrix"),
           as.matrix.Matrix)
-} else {
-setMethod("as.matrix" , signature(x = "Matrix"),
-          function(x, ...) as(x, "matrix"))
-}
 setMethod("as.array"  , signature(x = "Matrix"),
-          as.array.Matrix)
+           as.array.Matrix)
 setMethod("as.logical", signature(x = "Matrix"),
           function(x, ...) as.logical(.M2v(x)))
 setMethod("as.integer", signature(x = "Matrix"),
