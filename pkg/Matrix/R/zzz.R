@@ -91,7 +91,9 @@
 
 ..2dge <- function(from) {
     .Deprecated(new = ".M2gen", package = "Matrix")
-    .M2gen(from, "d")
+    if(isS4(from))
+        .M2gen(from, "d")
+    else .m2dense(from, "dge")
 }
 .C2nC <- function(from, isTri) {
     .Deprecated(new = ".M2kind", package = "Matrix")
