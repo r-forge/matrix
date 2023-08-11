@@ -1541,6 +1541,12 @@ y <- new("dgeMatrix", Dim = c(2L, 3L), x = replace(double(6L), 1L, 1))
 x[1L, 1L] <- 1
 stopifnot(identical(x, y))
 
+## as(<data.frame>, "Matrix") was briefly a error (invalid type "list")
+stopifnot(identical(as(data.frame(a = 1:2, b = 3:4), "Matrix"),
+                    new("dgeMatrix", x = as.double(1:4),
+                        Dim = c(2L, 2L), Dimnames = list(NULL, c("a", "b")))))
+
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()
