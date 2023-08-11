@@ -187,12 +187,14 @@ setAs("matrix", "Matrix",
       })
 setAs("vector", "Matrix",
       function(from) {
-          if(.sparseDefault(from))
+          if(is.object(from)) # e.g., data.frame
+              as(as.matrix(from), "Matrix")
+          else if(.sparseDefault(from))
               .m2sparse(from, ".gC")
           else .m2dense(from, ".ge")
       })
 setAs("ANY", "Matrix",
-      function(from) as(as.matrix(from), "Matrix"))
+      function(from) as(as(from, "matrix"), "Matrix"))
 
 
 ## ==== To "kind" ======================================================
@@ -353,11 +355,17 @@ setAs("matrix", "dgCMatrix",
       function(from) .m2sparse(from, "dgC"))
 
 setAs("vector",    "denseMatrix",
-      function(from)  .m2dense(from, ".ge"))
+      function(from)
+          if(is.object(from)) # e.g., data.frame
+              as(as.matrix(from),  "denseMatrix")
+          else .m2dense(from, ".ge"))
 setAs("vector", "unpackedMatrix",
       function(from)  .m2dense(from, ".ge"))
 setAs("vector",   "sparseMatrix",
-      function(from) .m2sparse(from, ".gC"))
+      function(from)
+          if(is.object(from)) # e.g., data.frame
+              as(as.matrix(from), "sparseMatrix")
+          else .m2sparse(from, ".gC"))
 setAs("vector",  "CsparseMatrix",
       function(from) .m2sparse(from, ".gC"))
 setAs("vector",  "RsparseMatrix",
@@ -366,9 +374,9 @@ setAs("vector",  "TsparseMatrix",
       function(from) .m2sparse(from, ".gT"))
 
 setAs("ANY",  "denseMatrix",
-      function(from) as(as.matrix(from),  "denseMatrix"))
+      function(from) as(as(from, "matrix"),  "denseMatrix"))
 setAs("ANY", "sparseMatrix",
-      function(from) as(as.matrix(from), "sparseMatrix"))
+      function(from) as(as(from, "matrix"), "sparseMatrix"))
 
 setAs("Matrix", "indMatrix",
       function(from) as(as(from, "nsparseMatrix"), "indMatrix"))
