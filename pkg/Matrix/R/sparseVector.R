@@ -405,42 +405,6 @@ intIv <- function(i, n, cl.i = getClass(class(i)))
         stop("index must be numeric, logical or sparseVector for indexing sparseVectors")
 } ## intIv()
 
-
-setMethod("head", signature(x = "sparseVector"),
-	  function(x, n = 6, ...) {
-	      stopifnot(length(n) == 1)
-	      if(n >= (nx <- x@length)) return(x)
-	      if(is.integer(x@i)) n <- as.integer(n) else stopifnot(n == round(n))
-              if(n < 0) n <- max(0L, n + nx)
-	      x@length <- n
-	      if(length(x@i)) {
-		  ## now be careful *NOT* to use seq_len(n), as this be efficient for huge n
-		  ## As we *know* that '@i' is sorted increasingly: [x@i <= n] <==> [1:kk]
-		  x@i <- x@i[ii <- seq_len(which.max(x@i > n) - 1L)]
-		  if(.hasSlot(x, "x")) ## has.x: has "x" slot
-		      x@x <- x@x[ii]
-	      }
-	      x
-	  })
-setMethod("tail", signature(x = "sparseVector"),
-	  function(x, n = 6, ...) {
-	      stopifnot(length(n) == 1)
-	      if(n >= (nx <- x@length)) return(x)
-	      if(is.integer(x@i)) n <- as.integer(n) else stopifnot(n == round(n))
-	      if(n < 0) n <- max(0L, n + nx)
-	      x@length <- n
-	      if((N <- length(x@i))) {
-		  ## now be careful *NOT* to use seq_len(n) ... (see above)
-		  n <- nx-n # and keep indices > n
-		  ii <- if(any(G <- x@i > n)) which.max(G):N else FALSE
-		  x@i <- x@i[ii] - n
-		  if(.hasSlot(x, "x")) ## has.x: has "x" slot
-		      x@x <- x@x[ii]
-              }
-	      x
-	  })
-
-
 setMethod("[", signature(x = "sparseVector", i = "index"),
 	  function (x, i, j, ..., drop) {
 	      has.x <- .hasSlot(x, "x")## has "x" slot

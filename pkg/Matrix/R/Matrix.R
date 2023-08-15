@@ -189,11 +189,6 @@ setMethod("unname", signature(obj = "Matrix"),
 setMethod("drop", signature(x = "Matrix"),
           function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
 
-## These work nicely as long as methods are defined for '[' :
-setMethod("head", signature(x = "Matrix"),
-          head.matrix)
-setMethod("tail", signature(x = "Matrix"),
-          tail.matrix)
 setMethod("diff", signature(x = "Matrix"),
           ## Mostly cut and paste of 'base::diff.default' :
           function(x, lag = 1L, differences = 1L, ...) {
