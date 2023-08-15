@@ -227,11 +227,6 @@ setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
                                        check.attributes=check.attributes, ...))
           })
 
-
-setMethod("writeMM", "sparseMatrix",
-          function(obj, file, ...)
-              writeMM(as(obj, "CsparseMatrix"), as.character(file), ...))
-
 ### --- sparse model matrix,  fac2sparse, etc ----> ./spModels.R
 
 ###  xtabs(*, sparse = TRUE) ---> part of standard package 'stats' since R 2.10.0

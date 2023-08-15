@@ -10,10 +10,6 @@
 ## more useful:
 .sortCsparse <- function(x) .Call(Csparse_sort, x) ## modifies 'x' !!
 
-setMethod("writeMM", "CsparseMatrix",
-	  function(obj, file, ...)
-	  .Call(Csparse_MatrixMarket, obj, path.expand(as.character(file))))
-
 dmperm <- function(x, nAns = 6L, seed = 0L) {
     stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
               length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
