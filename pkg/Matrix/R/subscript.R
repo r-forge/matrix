@@ -506,3 +506,65 @@ setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
               j <- integer(0L)
               callGeneric()
           })
+
+
+## METHODS FOR GENERIC: head
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("head", signature(x = "Matrix"),
+          head.matrix)
+
+setMethod("head", signature(x = "sparseVector"),
+          function(x, n = 6L, ...) {
+              stopifnot(is.numeric(n), length(n) == 1L, !is.na(n))
+              len <- x@length
+              n <- if(n < 0L) max(len + n, 0L) else min(n, len)
+              if(n >= len)
+                  return(x)
+              nnz <- length(i <- x@i)
+              x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
+              if(nnz > 0L && i[nnz] > n) {
+                  if(i[1L] > n) {
+                      x@i <- integer(0L)
+                      if(.hasSlot(x, "x"))
+                          x@x <- vector(typeof(x@x), 0L)
+                  } else {
+                      ii <- 1L:(which.max(i > n) - 1L)
+                      x@i <- i[ii]
+                      if(.hasSlot(x, "x"))
+                          x@x <- x@x[ii]
+                  }
+              }
+              x
+          })
+
+
+## METHODS FOR GENERIC: tail
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+setMethod("tail", signature(x = "Matrix"),
+          tail.matrix)
+
+setMethod("tail", signature(x = "sparseVector"),
+          function(x, n = 6L, ...) {
+              stopifnot(is.numeric(n), length(n) == 1L, !is.na(n))
+              len <- x@length
+              n <- if(n < 0L) max(len + n, 0L) else min(n, len)
+              if(n >= len)
+                  return(x)
+              nnz <- length(i <- x@i)
+              x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
+              if(nnz > 0L && i[1L] <= (k <- len - n)) {
+                  if(i[nnz] <= k) {
+                      x@i <- integer(0L)
+                      if(.hasSlot(x, "x"))
+                          x@x <- vector(typeof(x@x), 0L)
+                  } else {
+                      ii <- which.min(i <= k):nnz
+                      x@i <- i[ii] - k
+                      if(.hasSlot(x, "x"))
+                          x@x <- x@x[ii]
+                  }
+              }
+              x
+          })
