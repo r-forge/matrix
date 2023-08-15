@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-14 r4229)}{
+\section{Changes in version 1.6-2 (2023-08-14 r4231)}{
   \subsection{New Features}{
     \itemize{
       \item .
@@ -12,7 +12,8 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item Methods for \code{cbind2} and \code{rbind2} did not in all
+      cases handle vectors as 1-column and 1-row matrices, respectively.
     }
   }
   \subsection{Misc}{
