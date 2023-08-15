@@ -1,27 +1,6 @@
 ## METHODS FOR GENERIC: [
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## GOAL: automate method definitions and eventually replace ones in
-##
-##             ./Csparse.R
-##             ./Matrix.R
-##             ./Tsparse.R
-##             ./denseMatrix.R
-##             ./diagMatrix.R
-##             ./indMatrix.R
-##             ./packedMatrix.R
-##             ./sparseMatrix.R
-##
-##       need to write C-level functions
-##
-##             *_subscript_1ary    (x, i         )
-##             *_subscript_1ary_mat(x, i         )
-##             *_subscript_2ary    (x, i, j, drop)
-##
-##       for * = unpackedMatrix,packedMatrix,
-##               CsparseMatrix,RsparseMatrix,TsparseMatrix,
-##               diagonalMatrix,indMatrix
-
 .subscript.error.ist <- function(i) {
     if(isS4(i))
         gettextf("invalid subscript class \"%s\"", class(i))
@@ -342,7 +321,7 @@
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "missing"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  ".", ".", ".", na),
@@ -361,7 +340,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "logical"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  ".", ".", "l", na),
@@ -380,7 +359,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "missing"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", ".", ".", na),
@@ -399,7 +378,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "logical"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", ".", "l", na),
@@ -418,7 +397,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "missing"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  ".", "i", ".", na),
@@ -437,7 +416,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "logical"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  ".", "i", "l", na),
@@ -456,7 +435,7 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "missing"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", "i", ".", na),
@@ -472,7 +451,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "logical"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "i", "i", "l", na),
@@ -489,7 +468,7 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
 for(.cl in c("matrix", "nMatrix", "lMatrix"))
 setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                          drop = "missing"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
               Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
                                  "m", ".", ".", na),
@@ -508,21 +487,21 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
 
 setMethod("[", signature(x = "Matrix", i = "NULL", j = "ANY",
                          drop = "ANY"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               i <- integer(0L)
               callGeneric()
           })
 
 setMethod("[", signature(x = "Matrix", i = "ANY", j = "NULL",
                          drop = "ANY"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               j <- integer(0L)
               callGeneric()
           })
 
 setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
                          drop = "ANY"),
-          function(x, i, j, ..., drop) {
+          function(x, i, j, ..., drop = TRUE) {
               i <- integer(0L)
               j <- integer(0L)
               callGeneric()
