@@ -143,52 +143,6 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
 
 ## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("dim", signature(x = "Matrix"),
-          function(x) x@Dim)
-
-setMethod("length", "Matrix",
-          function(x) prod(x@Dim))
-
-setMethod("dimnames", signature(x = "Matrix"),
-          function(x) x@Dimnames)
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "list"),
-          function(x, value) {
-              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "Matrix", value = "NULL"),
-          function(x, value) {
-              x@Dimnames <- list(NULL, NULL)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "list"),
-          function(x, value) {
-              if(length(x@factors))
-                  x@factors <- list()
-              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "compMatrix", value = "NULL"),
-          function(x, value) {
-              if(length(x@factors))
-                  x@factors <- list()
-              x@Dimnames <- list(NULL, NULL)
-              x
-          })
-
-setMethod("unname", signature(obj = "Matrix"),
-          function(obj, force = FALSE) {
-              obj@Dimnames <- list(NULL, NULL)
-              obj
-          })
-
-setMethod("drop", signature(x = "Matrix"),
-          function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
-
 setMethod("diff", signature(x = "Matrix"),
           ## Mostly cut and paste of 'base::diff.default' :
           function(x, lag = 1L, differences = 1L, ...) {

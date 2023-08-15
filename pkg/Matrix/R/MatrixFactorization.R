@@ -12,30 +12,3 @@ setAs("MatrixFactorization", "Matrix",
           to
       })
 }
-
-setMethod("dim", signature(x = "MatrixFactorization"),
-          function(x) x@Dim)
-
-setMethod("length", "MatrixFactorization",
-          function(x) prod(x@Dim))
-
-setMethod("dimnames", signature(x = "MatrixFactorization"),
-          function(x) x@Dimnames)
-
-setMethod("dimnames<-", signature(x = "MatrixFactorization", value = "list"),
-          function(x, value) {
-              x@Dimnames <- fixupDN.if.valid(value, x@Dim)
-              x
-          })
-
-setMethod("dimnames<-", signature(x = "MatrixFactorization", value = "NULL"),
-          function(x, value) {
-              x@Dimnames <- list(NULL, NULL)
-              x
-          })
-
-setMethod("unname", signature(obj = "MatrixFactorization"),
-          function(obj, force = FALSE) {
-              obj@Dimnames <- list(NULL, NULL)
-              obj
-          })

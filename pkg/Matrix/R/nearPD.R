@@ -122,7 +122,7 @@ nearPD <-
     structure(list(mat =
 			if(base.matrix) X
 			else new("dpoMatrix", x = as.vector(X),
-				 Dim = c(n,n), Dimnames = .M.DN(x)),
+				 Dim = c(n,n), Dimnames = dimnames(x)) %||% list(NULL, NULL),
                    eigenvalues = d,
                    corr = corr, normF = norm(x-X, "F"), iterations = iter,
 		   rel.tol = conv, converged = converged),
