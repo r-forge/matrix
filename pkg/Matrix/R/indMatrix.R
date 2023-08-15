@@ -432,14 +432,3 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
 setMethod("tcrossprod", signature(x = "Matrix", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               (if(isTRUE(boolArith)) `%&%` else `%*%`)(x, t(y)))
-
-
-.indMatrix.sub <- function(x, i, j, ..., value) {
-    x <- as(x, "TsparseMatrix")
-    callGeneric()
-}
-for (.i in c("missing", "index"))
-for (.j in c("missing", "index"))
-setReplaceMethod("[", signature(x = "indMatrix", i = .i, j = .j, value = "ANY"),
-                 .indMatrix.sub)
-rm(.indMatrix.sub, .i, .j)

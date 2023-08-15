@@ -140,50 +140,6 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 setMethod("mean", signature(x = "sparseMatrix"),
           function(x, ...) mean(as(x, "sparseVector"), ...))
 
-### "[<-" : -----------------
-
-## setReplaceMethod("[", .........)
-## -> ./Tsparse.R
-## &  ./Csparse.R  & ./Rsparse.R {those go via Tsparse}
-
-## x[] <- value :
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing",
-                                value = "ANY"),## double/logical/...
-                 function (x, i, j,..., value) {
-                     if(all0(value)) { # be faster
-                         cld <- getClassDef(class(x))
-                         x <- diagU2N(x, cl = cld)
-                         for(nm in intersect(nsl <- names(cld@slots),
-                                             c("x", "i","j", "factors")))
-                             length(slot(x, nm)) <- 0L
-                         if("p" %in% nsl)
-                             x@p <- rep.int(0L, ncol(x)+1L)
-                     } else {
-                         ## typically non-sense: assigning to full sparseMatrix
-                         x[TRUE] <- value
-                     }
-                     x
-                 })
-
-## Do not use as.vector() (see ./Matrix.R ) for sparse matrices :
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "ANY",
-                                value = "sparseMatrix"),
-                 function (x, i, j, ..., value)
-                     callGeneric(x=x, , j=j, value=as(value, "sparseVector")))
-
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
-                                value = "sparseMatrix"),
-                 function (x, i, j, ..., value)
-                     if(nargs() == 3)
-                         callGeneric(x=x, i=i, value=as(value, "sparseVector"))
-                     else
-                         callGeneric(x=x, i=i, , value=as(value, "sparseVector")))
-
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
-                                value = "sparseMatrix"),
-                 function (x, i, j, ..., value)
-                     callGeneric(x=x, i=i, j=j, value=as(value, "sparseVector")))
-
 ### --- print() and show() methods ---
 
 .formatSparseSimple <- function(m, asLogical=FALSE, digits=NULL,
