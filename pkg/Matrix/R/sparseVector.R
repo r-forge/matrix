@@ -405,61 +405,6 @@ intIv <- function(i, n, cl.i = getClass(class(i)))
         stop("index must be numeric, logical or sparseVector for indexing sparseVectors")
 } ## intIv()
 
-setMethod("[", signature(x = "sparseVector", i = "index"),
-	  function (x, i, j, ..., drop) {
-	      has.x <- .hasSlot(x, "x")## has "x" slot
-	      n <- x@length
-	      if(extends(cl.i <- getClass(class(i)), "numeric") && any(i < 0)) {
-		  if(any(i > 0))
-		      stop("you cannot mix negative and positive indices")
-		  if(any(z <- i == 0)) i <- i[!z]
-		  ## all (i < 0), negative indices:
-		  ## want to remain sparse --> *not* using intIv()
-		  ##
-		  ## TODO: more efficient solution would use C ..
-		  i <- unique(sort(-i)) # so we need to drop the 'i's
-		  nom <- is.na(m <- match(x@i, i))
-		  ## eliminate those non-0 which do match:
-		  x@i <- x@i[nom]
-		  if(has.x) x@x <- x@x[nom]
-		  ## now all x@i "appear in 'i' but must be adjusted for the removals:
-		  x@i <- x@i - findInterval(x@i, i)
-		  x@length <- n - length(i)
-              } else { ## i >= 0  or  non-numeric 'i'
-                  ii <- intIv(i, n, cl.i=cl.i)
-                  m <- match(x@i, ii, nomatch = 0)
-                  sel <- m > 0L
-                  x@length <- length(ii)
-                  x@i <- m[sel]
-		  if(any(iDup <- duplicated(ii))) {
-                      i.i <- match(ii[iDup], ii)
-                      jm <- lapply(i.i, function(.) which(. == m))
-                      if (has.x) sel <- c(which(sel), unlist(jm))
-                      x@i <- c(x@i, rep.int(which(iDup), lengths(jm)))
-                  }
-                  if(doSort <- is.unsorted(x@i)) {
-                      io <- order(x@i, method="radix")
-                      x@i <- x@i[io]
-                  }
-                  if (has.x)
-                      x@x <- if(doSort) x@x[sel][io] else x@x[sel]
-              }
-	      x
-	  })
-
-setMethod("[", signature(x = "sparseVector", i = "lsparseVector"),
-	  function (x, i, j, ..., drop) x[sort.int(i@i[i@x])])
-setMethod("[", signature(x = "sparseVector", i = "nsparseVector"),
-	  function (x, i, j, ..., drop) x[sort.int(i@i)])
-
-##--- Something else:  Allow    v[ <sparseVector> ] -- exactly similarly:
-if(FALSE) { ## R_FIXME: Not working, as internal "[" only dispatches on 1st argument
-setMethod("[", signature(x = "atomicVector", i = "lsparseVector"),
-	  function (x, i, j, ..., drop) x[sort.int(i@i[i@x])])
-setMethod("[", signature(x = "atomicVector", i = "nsparseVector"),
-	  function (x, i, j, ..., drop) x[sort.int(i@i)])
-}
-
 ##' Implement   x[i] <- value
 
 ##' @param x  a "sparseVector"
