@@ -200,7 +200,7 @@ solve(a, b, ...)
   
   Methods for \code{a} inheriting from \code{\linkS4class{CHMfactor}}
   can solve systems other than the default one \eqn{A X = B}{A * X = B}.
-  The correspondance between its \code{system} argument the system
+  The correspondence between its \code{system} argument the system
   actually solved is outlined in the table below.
   See \code{\link{CHMfactor-class}} for a definition of notation.
   
