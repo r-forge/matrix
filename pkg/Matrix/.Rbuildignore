@@ -54,6 +54,7 @@ tests/useRNG_files$
 vignettes/fullpage\.sty$
 
 # Currently "empty", not contributing to namespace :
+R/[RT]sparse\.R$
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
 R/CHMfactor\.R$
@@ -81,7 +82,4 @@ src/t_matrix_to_Csp\.c$
 src/t_sparseVector\.c$
 
 # Work in progress :
-R/subassign\.R$
 src/subassign\.[ch]$
-# src/bind\.[ch]$
-# src/coerce\.[ch]$
