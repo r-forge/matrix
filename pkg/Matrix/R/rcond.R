@@ -2,14 +2,13 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("rcond", signature(x = "ANY", norm = "missing"),
-          function(x, norm, ...)
-              rcond(x, norm = "O", ...))
+          function(x, norm, ...) rcond(x, norm = "O", ...))
 
 setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
           function(x, norm, useInv = FALSE, ...) {
               d <- x@Dim
               if((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
-                  stop("rcond(x) is undefined: 'x' has length 0")
+                  return(Inf)
               if(m == n) {
                   if(isS4(useInv) || useInv) {
                       if(!isS4(useInv))
@@ -35,7 +34,7 @@ setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
 setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
           function(x, norm, ...) {
               if((n <- x@Dim[1L]) == 0L)
-                  stop("rcond(x) is undefined: 'x' has length 0")
+                  return(Inf)
               switch(EXPR = norm[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
@@ -57,7 +56,7 @@ setMethod("rcond", signature(x = "indMatrix", norm = "character"),
           function(x, norm, ...) {
               d <- x@Dim
               if((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
-                  stop("rcond(x) is undefined: 'x' has length 0")
+                  return(Inf)
               if (m == n) {
                   if(anyDuplicated.default(x@perm))
                       return(0)
@@ -83,7 +82,7 @@ setMethod("rcond", signature(x = "indMatrix", norm = "character"),
 setMethod("rcond", signature(x = "pMatrix", norm = "character"),
           function(x, norm, ...) {
               if((n <- x@Dim[1L]) == 0L)
-                  stop("rcond(x) is undefined: 'x' has length 0")
+                  return(Inf)
               switch(EXPR = norm[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,

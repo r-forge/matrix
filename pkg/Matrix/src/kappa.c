@@ -106,7 +106,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	if (m != n)
 		error(_("%s(%s) is undefined: '%s' is not square"), "rcond", "x", "x");
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
@@ -157,7 +157,7 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
@@ -210,7 +210,7 @@ SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
@@ -261,7 +261,7 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
@@ -316,7 +316,7 @@ SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
@@ -346,7 +346,7 @@ SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
@@ -374,7 +374,7 @@ SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	int n = INTEGER(dim)[0];
 	UNPROTECT(1); /* dim */
 	if (n == 0)
-		error(_("%s(%s) is undefined: '%s' has length %d"), "rcond", "x", "x", 0);
+		return(ScalarReal(R_PosInf));
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
 	char uplo_ = CHAR(STRING_ELT(uplo, 0))[0];
