@@ -324,57 +324,6 @@ setMethod("mean", signature(x = "sparseVector"),
 setMethod("t", "sparseVector",
           function(x) spV2M(x, nrow = 1L, ncol = x@length, check = FALSE))
 
-setMethod("show", signature(object = "sparseVector"),
-   function(object) {
-       n <- object@length
-       cl <- class(object)
-       cat(sprintf('sparse vector (nnz/length = %d/%.0f) of class "%s"\n',
-		   length(object@i), as.double(n), cl))
-       maxp <- max(1, getOption("max.print"))
-       if(n <= maxp) {
-	   prSpVector(object, maxp = maxp)
-       } else { # n > maxp : will cut length of what we'll display :
-	   ## cannot easily show head(.) & tail(.) because of "[1] .." printing of tail
-	   prSpVector(head(object, maxp), maxp = maxp)
-	   cat(" ............................",
-	       "\n ........suppressing ", n - maxp,
-	       " entries in show(); maybe adjust 'options(max.print= *)'",
-	       "\n ............................\n\n", sep='')
-       }
-       invisible(object)
-   })
-
-prSpVector <- function(x, digits = getOption("digits"),
-		    maxp = getOption("max.print"), zero.print = ".")
-{
-    cld <- getClassDef(class(x))
-    stopifnot(extends(cld, "sparseVector"), maxp >= 1)
-    if(is.logical(zero.print))
-	zero.print <- if(zero.print) "0" else " "
-##     kind <- .M.kindC(cld)
-##     has.x <- kind != "n"
-    n <- x@length
-    if(n > 0) {
-	if(n > maxp) { # n > maxp =: nn : will cut length of what we'll display :
-	    x <- head(x, maxp)
-	    n <- maxp
-	}
-        xi <- x@i
-        is.n <- extends(cld, "nsparseVector")
-        logi <- is.n || extends(cld, "lsparseVector")
-        cx <- if(logi) rep.int("N", n) else character(n)
-        cx[if(length(xi)) -xi else TRUE] <- zero.print
-        cx[ xi] <- {
-	    if(is.n) "|" else if(logi) c(":","|")[x@x + 1L] else
-	    ## numeric (or --not yet-- complex): 'has.x' in any cases
-	    format(x@x, digits = digits)
-        }
-        ## right = TRUE : cheap attempt to get better "." alignment
-        print(cx, quote = FALSE, right = TRUE, max = maxp)
-    }
-    invisible(x) # TODO? in case of n > maxp, "should" return original x
-}
-
 ## MJ: unused
 if(FALSE) {
 ## a "method" for c(<(sparse)Vector>, <(sparse)Vector>):

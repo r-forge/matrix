@@ -387,47 +387,6 @@ indDiag <- function(n, upper = TRUE, packed = FALSE)
 indTri <- function(n, upper = TRUE, diag = FALSE, packed = FALSE)
     .Call(R_index_triangle, n, packed, upper, diag)
 
-prTriang <- function(x, digits = getOption("digits"),
-                     maxp = getOption("max.print"),
-		     justify = "none", right = TRUE) {
-    ## modeled along stats:::print.dist
-    upper <- x@uplo == "U"
-    m <- as(x, "matrix")
-    cf <- format(m, digits = digits, justify = justify)
-    cf[if(upper) row(cf) > col(cf)
-	else	 row(cf) < col(cf)] <- "."
-    print(cf, quote = FALSE, right = right, max = maxp)
-    invisible(x)
-}
-
-prMatrix <- function(x, digits = getOption("digits"),
-                     maxp = getOption("max.print")) {
-    d <- dim(x)
-    cl <- class(x) ## cld <- getClassDef(cl)
-    tri <- extends(cl, "triangularMatrix")
-    xtra <- if(tri && x@diag == "U") " (unitriangular)" else ""
-    cat(sprintf('%d x %d Matrix of class "%s"%s\n',
-		d[1], d[2], cl, xtra))
-    if(prod(d) <= maxp) {
-	if(tri)
-	    prTriang(x, digits = digits, maxp = maxp)
-	else
-	    print(as(x, "matrix"), digits = digits, max = maxp)
-    }
-    else { ## d[1] > maxp / d[2] >= nr :
-	m <- as(x, "matrix")
-	nr <- maxp %/% d[2]
-	n2 <- ceiling(nr / 2)
-	print(head(m, max(1, n2)))
-	cat("\n ..........\n\n")
-	print(tail(m, max(1, nr - n2)))
-	cat("\n ..........\n\n")
-
-    }
-    ## DEBUG: cat("str(.):\n") ; str(x)
-    invisible(x)# as print() S3 methods do
-}
-
 ## For sparseness handling, return a
 ## 2-column (i,j) matrix of 0-based indices of non-zero entries:
 

@@ -40,9 +40,6 @@ setMethod("mean", signature(x = "denseMatrix"),
 setMethod("rep", "denseMatrix",
           function(x, ...) rep(.M2v(x), ...))
 
-setMethod("show", "denseMatrix",
-          function(object) prMatrix(object))
-
 .dense.band <- function(x, k1, k2, ...) .Call(R_dense_band, x, k1, k2)
 .dense.triu <- function(x, k = 0L, ...) .Call(R_dense_band, x, k, NULL)
 .dense.tril <- function(x, k = 0L, ...) .Call(R_dense_band, x, NULL, k)
