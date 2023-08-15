@@ -2,9 +2,6 @@
 ## Hermitian {incl. real, symmetric} matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("dimnames", signature(x = "symmetricMatrix"),
-          function(x) symmDN(x@Dimnames))
-
 setMethod("isSymmetric", signature(object = "symmetricMatrix"),
           function(object, ...) TRUE)
 

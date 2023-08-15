@@ -284,27 +284,6 @@ sparseVector <- function(x, i, length) {
            x=x, i=i, length=length)
 }
 
-setMethod("dim<-", signature(x = "sparseVector"),
-	  function(x, value) {
-	      if(!is.numeric(value) || length(value) != 2L)
-		  stop("dimensions must be numeric of length 2")
-              if(anyNA(value))
-		  stop("dimensions cannot contain NA")
-              if(any(value < 0))
-                  stop("dimensions cannot contain negative values")
-              if(!is.integer(value)) {
-                  if(any(value > .Machine$integer.max))
-                      stop("dimensions cannot exceed 2^31-1")
-                  value <- as.integer(value)
-              }
-	      if((p <- prod(value)) != (len <- length(x)))
-		  stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
-                                p, len, domain = NA))
-	      spV2M(x, nrow = value[1L], ncol = value[2L])
-	  })
-
-setMethod("length", "sparseVector", function(x) x@length)
-
 setMethod("mean", signature(x = "sparseVector"),
 	  function(x, trim = 0, na.rm = FALSE, ...) {
               if(is.numeric(trim) && length(trim) == 1L && !is.na(trim) &&

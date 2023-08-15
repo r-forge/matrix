@@ -1,6 +1,8 @@
 #### "Namespace private" Auxiliaries  such as method functions
 #### (called from more than one place --> need to be defined early)
 
+`%||%` <- function(L, R) if (is.null(L)) R else L # stats:::`%||%`
+
 is0  <- function(x) !(is.na(x) | x)
 isN0 <- function(x)   is.na(x) | x
 is1  <- function(x)  !is.na(x) & x == 1
@@ -236,64 +238,6 @@ mmultDimnames <- function(dn.a, dn.b, type = 1L) {
       if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
 }
 
-## dimnames->Dimnames
-.M.DN <- function(x)
-    if(is.null(dn <- dimnames(x))) list(NULL, NULL) else dn
-
-## NB: Now exported and documented in ../man/is.null.DN.Rd:
-is.null.DN <- function(dn) {
-    if(is.null(dn))
-        return(TRUE)
-    if(!is.null(names(dn)))
-        names(dn) <- NULL
-    identical(dn, list(NULL, NULL)) ||
-        identical(dn, list(ch0 <- character(0L), NULL)) ||
-        identical(dn, list(NULL, ch0)) ||
-        identical(dn, list(ch0, ch0))
-}
-
-## Is 'dn' valid in the sense of 'validObject(<Matrix>)'?
-## It is assumed that 'dim' is a length-2 non-negative integer vector.
-validDN <- function(dn, dim)
-    .Call(R_DimNames_validate, dn, dim)
-
-validDim <- function(dim)
-    .Call(R_Dim_validate, dim)
-
-fixupDN <- function(dn)
-    .Call(R_DimNames_fixup, dn)
-
-fixupDN.if.valid <- function(dn, dim) {
-    if(is.character(s <- validDim(dim)) || is.character(s <- validDN(dn, dim)))
-        stop(s)
-    fixupDN(dn)
-}
-
-## Is 'dn' symmetric?
-## This allows, e.g., list(NULL, nms), _unlike_ identical(dn[1], dn[2]),
-## the definition used by base::isSymmetric.matrix ...
-isSymmetricDN <- function(dn)
-    .Call(R_DimNames_is_symmetric, dn)
-
-symmDN <- function(dn)
-    .Call(R_symmDN, dn)
-
-##' @title Symmetrize dimnames
-##' @param x A square matrix.
-##' @return
-##' \code{y} identical to \code{x} except with \code{dny <- dimnames(y)}
-##' given by \code{rep(dimnames(x)[J], 2)} rather than \code{dimnames(x)}
-##' (where \code{J} is 1 if \code{x} has row names but not column names,
-##' and 2 otherwise) and thus satisfying \code{identical(dny[1], dny[2])}.
-##' @author Martin Maechler and Mikael Jagan
-symmetrizeDimnames <- function(x) {
-    if(isS4(x)) # assuming is(x, "Matrix")
-        `dimnames<-`(x, symmDN(x@Dimnames))
-    else if(!is.null(dn <- dimnames(x))) # assuming list of length 2
-        `dimnames<-`(x, symmDN(dn))
-    else x
-}
-
 ## MJ: Implement forceTriangular() and export this and that?
 ## MJ: Notably this provides a model for (maybe, in the future) allowing
 ## forceSymmetric(<non-square>) ... by truncating the "too long" dimension.
@@ -328,7 +272,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
                       domain = NA))
     n <- length(y)
     d <- dim(x)
-    dn <- .M.DN(x)
+    dn <- dimnames(x) %||% list(NULL, NULL)
     if(any(d > n)) {
         d <- c(n, n)
         w <- if(d[1L] > n) 1L else 2L

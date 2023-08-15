@@ -318,7 +318,7 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
           function(x) forceSymmetric(.M2kind(x, "d")))
 
 setMethod("skewpart", signature(x = "diagonalMatrix"),
-          function(x) symmetrizeDimnames(.setZero(x, "d")))
+          function(x) symmetrizeDN(.setZero(x, "d")))
 
 setMethod("isSymmetric", signature(object = "diagonalMatrix"),
           function(object, checkDN = TRUE, ...) {
