@@ -7,6 +7,48 @@
     else gettextf("invalid subscript type \"%s\"", typeof(i))
 }
 
+.subscript.recycle <- function(i, mn, pattern) {
+    ## Return integer vector corresponding to [nl]sparseVector 'i'
+    ## recycled to length 'mn' :
+    if(length(i.i <- i@i) == 0L)
+        integer(0L)
+    else if((i.length <- i@length) >= mn) {
+        if(i.length > mn) {
+            if(mn < 0x1p+53) {
+                if(i.i[length(i.i)] >= mn + 1)
+                    i.i[i.i >= mn + 1] <- NA
+            } else {
+                if(i.i[length(i.i)] > mn)
+                    i.i[i.i > mn] <- NA
+            }
+        }
+        if(pattern) i.i else i.i[i@x]
+    } else {
+        r <- ceiling(mn / i.length)
+        mn. <- r * i.length
+        i.i <-
+            if(mn. <= .Machine$integer.max)
+                rep.int(as.integer(i.i), r) +
+                    rep(seq.int(from = 0L,
+                                by = as.integer(i.length),
+                                length.out = r),
+                        each = length(i.i))
+            else if(i.i[length(i.i)] + (r - 1) * i.length <=
+                    0x1p+53)
+                rep.int(as.double(i.i), r) +
+                    rep(seq.int(from = 0,
+                                by = as.double(i.length),
+                                length.out = r),
+                        each = length(i.i))
+            else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
+        if(pattern) {
+            if(mn. > mn) i.i[      i.i <= mn] else i.i
+        } else {
+            if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
+        }
+    }
+}
+
 ## x[i] where 'i' is NULL or any vector or sparseVector
 .subscript.1ary <- function(x, i) {
     mn <- prod(x@Dim)
@@ -18,44 +60,7 @@
         kind <- .V.kind(i)
         if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
-            i <-
-                if(length(i.i <- i@i) == 0L)
-                    integer(0L)
-                else if((i.length <- i@length) >= mn) {
-                    if(i.length > mn) {
-                        if(mn < 0x1p+53) {
-                            if(i.i[length(i.i)] >= mn + 1)
-                                i.i[i.i >= mn + 1] <- NA
-                        } else {
-                            if(i.i[length(i.i)] > mn)
-                                i.i[i.i > mn] <- NA
-                        }
-                    }
-                    if(pattern) i.i else i.i[i@x]
-                } else {
-                    r <- ceiling(mn / i.length)
-                    mn. <- r * i.length
-                    i.i <-
-                        if(mn. <= .Machine$integer.max)
-                            rep.int(as.integer(i.i), r) +
-                                rep(seq.int(from = 0L,
-                                            by = as.integer(i.length),
-                                            length.out = r),
-                                    each = length(i.i))
-                        else if(i.i[length(i.i)] + (r - 1) * i.length <=
-                                0x1p+53)
-                            rep.int(as.double(i.i), r) +
-                                rep(seq.int(from = 0,
-                                            by = as.double(i.length),
-                                            length.out = r),
-                                    each = length(i.i))
-                        else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
-                    if(pattern) {
-                        if(mn. > mn) i.i[      i.i <= mn] else i.i
-                    } else {
-                        if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
-                    }
-                }
+            i <- .subscript.recycle(i, mn, pattern)
             return(..subscript.1ary(x, i, unsorted = !pattern && anyNA(i)))
         }
         i <- i@x
