@@ -57,8 +57,9 @@ vignettes/fullpage\.sty$
 R/Hilbert\.R$
 R/MatrixFactorization\.R$
 R/[CRT]sparse\.R$
+R/corMatrix\.R$
 R/[dln](dense|sparse)?Matrix\.R$
-R/[dln](ge|tr|tp|sy|sp|di|[gts][CRT])Matrix\.R$
+R/[dln](ge|tr|tp|sy|sp|po|pp|di|[gts][CRT])Matrix\.R$
 R/CHMfactor\.R$
 R/sparseQR\.R$
 

@@ -185,7 +185,4 @@ setMethod("skewpart", signature(x = "matrix"),
           ## function(x) .Call(matrix_skewpart, x)) # returning .geMatrix
           function(x) symmetrizeDN(0.5 * (x - t(x)))) # returning matrix
 
-setMethod("cov2cor", signature(V = "unpackedMatrix"),
-          function(V) as(forceSymmetric(V), "corMatrix"))
-
 rm(.upM.subclasses)

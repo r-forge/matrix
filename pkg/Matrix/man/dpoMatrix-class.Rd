@@ -36,8 +36,10 @@
 \alias{coerce,matrix,dppMatrix-method}
 \alias{determinant,dppMatrix,logical-method}
 %
+\alias{coerce,corMatrix,pcorMatrix-method}
 \alias{coerce,matrix,corMatrix-method}
 %
+\alias{coerce,pcorMatrix,corMatrix-method}
 \alias{coerce,matrix,pcorMatrix-method}
 %
 \description{
@@ -136,12 +138,14 @@ rcond(h6)
 str(h6)
 h6 * 27720 # is ``integer''
 solve(h6)
-str(hp6 <- as(h6, "dppMatrix"))
+str(hp6 <- pack(h6))
 
 ### Note that  as(*, "corMatrix")  *scales* the matrix
 (ch6 <- as(h6, "corMatrix"))
-stopifnot(all.equal(h6 * 27720, round(27720 * h6), tolerance = 1e-14),
-          all.equal(ch6@sd^(-2), 2*(1:6)-1, tolerance= 1e-12))
+stopifnot(all.equal(as(h6 * 27720, "dsyMatrix"), round(27720 * h6),
+                    tolerance = 1e-14),
+          all.equal(ch6@sd^(-2), 2*(1:6)-1,
+                    tolerance = 1e-12))
 chch <- Cholesky(ch6, perm = FALSE)
 stopifnot(identical(chch, ch6@factors$Cholesky),
           all(abs(crossprod(as(chch, "dtrMatrix")) - ch6) < 1e-10))

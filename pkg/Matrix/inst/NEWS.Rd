@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-14 r4232)}{
+\section{Changes in version 1.6-2 (2023-08-16 r4248)}{
   \subsection{New Features}{
     \itemize{
       \item .
@@ -16,6 +16,10 @@
       cases handle vectors as 1-column and 1-row matrices, respectively.
 
 	  \item \code{rcond(<0-by-0>)} now returns \code{Inf}; see \PR{18543}.
+
+	  \item \code{round(<dp[op]Matrix>)} and \code{signif(<dp[op]Matrix>)}
+	  now return \code{ds[yp]Matrix} rather than \code{dp[op]Matrix} and
+	  now discard \code{factors}.
     }
   }
   \subsection{Misc}{
