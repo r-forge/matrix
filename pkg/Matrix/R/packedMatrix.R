@@ -71,7 +71,4 @@ setMethod("symmpart", signature(x = "packedMatrix"),
 setMethod("skewpart", signature(x = "packedMatrix"),
           function(x) .Call(packedMatrix_skewpart, x))
 
-setMethod("cov2cor", signature(V = "packedMatrix"),
-          function(V) as(forceSymmetric(V), "pcorMatrix"))
-
 rm(.pM.subclasses)

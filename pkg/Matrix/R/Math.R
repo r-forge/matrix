@@ -233,7 +233,10 @@ setMethod("log", "sparseVector", function(x, base = exp(1))
 
 setMethod("Math2", signature(x = "dMatrix"),
           function(x, digits) {
+              x <- .indefinite(x)
               x@x <- callGeneric(x@x, digits = digits)
+              if(.hasSlot(x, "factors") && length(x@factors) > 0L)
+                  x@factors <- list()
               x
           })
 

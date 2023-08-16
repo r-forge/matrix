@@ -958,7 +958,7 @@ pp <- as(pm,"dppMatrix")
 x <- round(100 * crossprod(Matrix(runif(25),5)))
 D <- Diagonal(5, round(1000*runif(5)))
 px <- pack(x)
-stopifnot(is(x, "dpoMatrix"), is(px,"dppMatrix"), is(D, "ddiMatrix"))
+stopifnot(is(x, "dsyMatrix"), is(px, "dspMatrix"), is(D, "ddiMatrix"))
 
 class(x+D)#--> now "dsyMatrix"
 stopifnot(is(x+D, "symmetricMatrix"),

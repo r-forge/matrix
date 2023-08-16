@@ -10,10 +10,8 @@
 %
 \alias{coerce,dsyMatrix,corMatrix-method}
 \alias{coerce,dsyMatrix,dpoMatrix-method}
-\alias{coerce,dsyMatrix,dppMatrix-method}
 \alias{determinant,dsyMatrix,logical-method}
 %
-\alias{coerce,dspMatrix,dpoMatrix-method}
 \alias{coerce,dspMatrix,dppMatrix-method}
 \alias{coerce,dspMatrix,pcorMatrix-method}
 \alias{determinant,dspMatrix,logical-method}

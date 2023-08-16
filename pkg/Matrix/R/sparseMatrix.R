@@ -47,24 +47,6 @@ setMethod("dim<-", signature(x = "sparseMatrix"),
 setMethod("rep", "sparseMatrix",
           function(x, ...) rep(as(x, "sparseVector"), ...))
 
-setMethod("cov2cor", signature(V = "sparseMatrix"),
-          function(V) {
-              ## like stats::cov2cor() but making sure all matrices stay sparse
-              p <- (d <- dim(V))[1]
-              if (p != d[2])
-                  stop("'V' is not a *square* matrix")
-              if(!is(V, "dMatrix"))
-                  V <- as(V, "dMatrix")# actually "dsparseMatrix"
-              Is <- sqrt(1/diag(V))
-              if (any(!is.finite(Is))) ## original had 0 or NA
-                  warning("diag(.) had 0 or NA entries; non-finite result is doubtful")
-              Is <- Diagonal(x = Is)# , names = TRUE
-              r <- Is %*% V %*% Is
-              r[cbind(1:p,1:p)] <- 1 # exact in diagonal
-              as(`dimnames<-`(r, symmDN(dimnames(V))), "symmetricMatrix")
-              ## as(r, "symmetricMatrix")
-          })
-
 ## all.equal(): similar to all.equal_Mat() in ./Matrix.R ;
 ## -----------	eventually defer to  "sparseVector" methods:
 setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),
