@@ -353,7 +353,7 @@ void set_DimNames(SEXP obj, SEXP dn)
 
 SEXP get_factor(SEXP obj, const char *nm)
 {
-	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym)), val = R_NilValue;
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym)), val = R_NilValue;
 	if (LENGTH(factors) > 0) {
 		SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
 		int i = strmatch2(nm, valid);
@@ -370,7 +370,7 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
 	PROTECT(val);
 	SEXP factors;
 	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorSym), &pid);
+	PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorsSym), &pid);
 	if (LENGTH(factors) > 0) {
 		SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
 		int i = strmatch2(nm, valid);
@@ -382,7 +382,7 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
 		}
 	}
 	REPROTECT(factors = append_to_named_list(factors, nm, val), pid);
-	SET_SLOT(obj, Matrix_factorSym, factors);
+	SET_SLOT(obj, Matrix_factorsSym, factors);
 	UNPROTECT(2);
 	return;
 }
@@ -408,7 +408,7 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 	if (TYPEOF(nm) != STRSXP || LENGTH(nm) < 1 ||
 		(nm = STRING_ELT(nm, 0)) == NA_STRING)
 	error(_("invalid factor name"));
-	else if (HAS_SLOT(obj, Matrix_factorSym))
+	else if (HAS_SLOT(obj, Matrix_factorsSym))
 		set_factor(obj, CHAR(nm), val);
 	else if (asLogical(warn) != 0)
 		warning(_("attempt to set factor on %s without '%s' slot"),
@@ -433,11 +433,11 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 SEXP R_empty_factors(SEXP obj, SEXP warn)
 {
 	/* If there is a nonempty 'factors' slot, then replace it with list() */
-	if (HAS_SLOT(obj, Matrix_factorSym)) {
-		SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorSym));
+	if (HAS_SLOT(obj, Matrix_factorsSym)) {
+		SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym));
 		if (LENGTH(factors) > 0) {
 			PROTECT(factors = allocVector(VECSXP, 0));
-			SET_SLOT(obj, Matrix_factorSym, factors);
+			SET_SLOT(obj, Matrix_factorsSym, factors);
 			UNPROTECT(2);
 			return ScalarLogical(1); /* slot was reset */
 		}

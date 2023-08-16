@@ -202,7 +202,7 @@ KINDMATRIX_VALIDATE(     z, CPLXSXP)
 
 SEXP compMatrix_validate(SEXP obj)
 {
-	SEXP factors = GET_SLOT(obj, Matrix_factorSym);
+	SEXP factors = GET_SLOT(obj, Matrix_factorsSym);
 	if (TYPEOF(factors) != VECSXP)
 		RMKMS(_("'%s' slot is not a list"), "factors");
 	if (XLENGTH(factors) > 0) {

@@ -9,7 +9,7 @@ SEXP
 	Matrix_VSym,
 	Matrix_betaSym,
 	Matrix_diagSym,
-	Matrix_factorSym,
+	Matrix_factorsSym,
 	Matrix_iSym,
 	Matrix_jSym,
 	Matrix_lengthSym,

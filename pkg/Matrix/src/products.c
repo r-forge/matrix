@@ -38,7 +38,7 @@ static SEXP asdge(SEXP from, int transpose_if_vector)
 			else {
 				PROTECT(to = dense_as_general(from, cl, 1));
 				SEXP factors = PROTECT(allocVector(VECSXP, 0));
-				SET_SLOT(to, Matrix_factorSym, factors);
+				SET_SLOT(to, Matrix_factorsSym, factors);
 				UNPROTECT(1);
 			}
 		} else {
@@ -85,7 +85,7 @@ SEXP dgeMatrix_crossprod(SEXP x, SEXP trans)
     									\
     Memzero(vx, n2);							\
     SET_SLOT(val, Matrix_uploSym, mkString("U"));			\
-    ALLOC_SLOT(val, Matrix_factorSym, VECSXP, 0);			\
+    ALLOC_SLOT(val, Matrix_factorsSym, VECSXP, 0);			\
     vDims[0] = vDims[1] = n;						\
     SET_VECTOR_ELT(vDnms, 0, duplicate(nms));				\
     SET_VECTOR_ELT(vDnms, 1, duplicate(nms))
@@ -154,7 +154,7 @@ SEXP dgeMatrix_dgeMatrix_crossprod(SEXP x, SEXP y, SEXP trans)
     if (xd != yd)							\
 	error(_("Dimensions of x and y are not compatible for %s"),	\
 	      tr ? "tcrossprod" : "crossprod");				\
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));		\
+    SET_SLOT(val, Matrix_factorsSym, allocVector(VECSXP, 0));		\
     /* establish dimnames */						\
     SET_VECTOR_ELT(dn, 0,						\
 		   duplicate(VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym), \
@@ -247,7 +247,7 @@ SEXP dgeMatrix_matrix_crossprod(SEXP x, SEXP y, SEXP trans)
     if (xd != yd)							\
 	error(_("Dimensions of x and y are not compatible for %s"),	\
 	      tr ? "tcrossprod" : "crossprod");				\
-    SET_SLOT(val, Matrix_factorSym, allocVector(VECSXP, 0));		\
+    SET_SLOT(val, Matrix_factorsSym, allocVector(VECSXP, 0));		\
     vDims = INTEGER(ALLOC_SLOT(val, Matrix_DimSym, INTSXP, 2));		\
     vDims[0] = m; vDims[1] = n;						\
     /* establish dimnames */						\
