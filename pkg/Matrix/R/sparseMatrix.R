@@ -47,33 +47,6 @@ setMethod("dim<-", signature(x = "sparseMatrix"),
 setMethod("rep", "sparseMatrix",
           function(x, ...) rep(as(x, "sparseVector"), ...))
 
-## all.equal(): similar to all.equal_Mat() in ./Matrix.R ;
-## -----------	eventually defer to  "sparseVector" methods:
-setMethod("all.equal", c(target = "sparseMatrix", current = "sparseMatrix"),
-          function(target, current, check.attributes = TRUE, ...) {
-              msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
-              if(is.list(msg)) msg[[1]]
-              else .a.e.comb(msg,
-                             all.equal(as(target, "sparseVector"), as(current, "sparseVector"),
-                                       check.attributes=check.attributes, ...))
-          })
-setMethod("all.equal", c(target = "sparseMatrix", current = "ANY"),
-          function(target, current, check.attributes = TRUE, ...) {
-              msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
-              if(is.list(msg)) msg[[1]]
-              else .a.e.comb(msg,
-                             all.equal(as(target, "sparseVector"), current,
-                                       check.attributes=check.attributes, ...))
-          })
-setMethod("all.equal", c(target = "ANY", current = "sparseMatrix"),
-          function(target, current, check.attributes = TRUE, ...) {
-              msg <- attr.all_Mat(target, current, check.attributes=check.attributes, ...)
-              if(is.list(msg)) msg[[1]]
-              else .a.e.comb(msg,
-                             all.equal(target, as(current, "sparseVector"),
-                                       check.attributes=check.attributes, ...))
-          })
-
 if(FALSE) ### FIXME: This would *NOT* be needed, if    as.matrix(<sparseMatrix>) was a no-op ;
           ### -----  and then,  base::scale() -> base::scale.default() would work "magically" already..
 ## scale() is S3 generic in base

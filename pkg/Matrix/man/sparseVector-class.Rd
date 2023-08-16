@@ -262,7 +262,8 @@ stopifnot(exprs = {
     all.equal(c1, .s(c(.v(x20), 0,0,0, -10*.v(x20))),      tol = 0)
     all.equal(c2, .s(c(.v(ns), .v(is), FALSE)),            tol = 0)
     all.equal(c3, .s(c(.v(ns), !.v(ns), TRUE, NA, FALSE)), tol = 0)
-    all.equal(c4, .s(c(.v(ns), rev(.v(ns)))),              tol = 0)
+    all.equal(c4, .s(c(.v(ns), rev(.v(ns)))),              tol = 0,
+              check.class = FALSE)
     all.equal(c5, .s(c(0,0, .v(x20))),                     tol = 0)
 })
 }

@@ -286,7 +286,7 @@ stopifnot(sv == colSums(kC), is.na(as.vector(ddv)) == na.ddv,
 ## Subclasses (!)
 setClass("m.spV", contains = "dsparseVector")
 (m.ddv <- as(ddv, "m.spV"))
-stopifnot(all.equal(m.ddv, ddv))# failed
+stopifnot(all.equal(m.ddv, ddv, check.class = FALSE))# failed
 setClass("m.dgC", contains = "dgCMatrix")
 (m.mC <- as(mC, "m.dgC"))
 stopifnot(all(m.mC == mC))
@@ -526,9 +526,9 @@ for(f in c(mM, mM2)) {
     r <- fn(m <- if(is.m) as.mat(M) else as.vector(M))
     stopifnot(identical(dim(R), dim(r)))
     if(givesVec || !is.m) {
-        assert.EQ(R, r)
+        assert.EQ(R, r, check.class = FALSE)
     } else { ## (almost always:) matrix result
-        assert.EQ.mat(R, r)
+        assert.EQ.mat(R, r, check.class = FALSE)
 	## check preservation of properties, notably super class
 	if(prod(dim(M)) > 1 && is(M, "diagonalMatrix"  ) && isDiagonal(R) && !is(R, "diagonalMatrix"  )) doStop()
 	if(prod(dim(M)) > 1 && is(M, "triangularMatrix") && (iT <- isTriangular(R)) && attr(iT, "kind") == M@uplo &&
