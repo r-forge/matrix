@@ -54,6 +54,7 @@ tests/useRNG_files$
 vignettes/fullpage\.sty$
 
 # Currently "empty", not contributing to namespace :
+R/Hilbert\.R$
 R/MatrixFactorization\.R$
 R/[CRT]sparse\.R$
 R/[dln](dense|sparse)?Matrix\.R$
