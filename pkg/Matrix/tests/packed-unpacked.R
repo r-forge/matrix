@@ -293,7 +293,7 @@ testDenseMatrix <- function(Class, ...) {
                   identical(isTriangular(M, upper = TRUE), TRUE),
                   identical(isTriangular(M, upper = FALSE), TRUE),
                   identical(isTriangular(M, upper = NA),
-                            `attr<-`(TRUE, "kind", "U")),
+                            `attr<-`(TRUE, "kind", M@uplo)),
                   isDiagonal(M))
     } else {
         ## Not symmetric

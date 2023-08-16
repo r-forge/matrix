@@ -17,6 +17,19 @@
  .diag.x <- function(m) if(m@diag != "N") rep.int(as1(m@x), m@Dim[1L]) else m@x
 ..diag.x <- function(m)                   rep.int(as1(m@x), m@Dim[1L])
 
+
+setMethod("band", signature(x = "diagonalMatrix"),
+          function(x, k1, k2, ...)
+              if(k1 <= 0L && k2 >= 0L) x else .setZero(x))
+
+setMethod("triu", signature(x = "diagonalMatrix"),
+          function(x, k = 0L, ...)
+              if(k <= 0L) x else .setZero(x))
+
+setMethod("tril", signature(x = "diagonalMatrix"),
+          function(x, k = 0L, ...)
+              if(k >= 0L) x else .setZero(x))
+
 setMethod("diag", signature(x = "diagonalMatrix"),
           function(x, nrow, ncol, names = TRUE) {
               r <- .diag.x(x)
@@ -62,23 +75,11 @@ setMethod("diag<-", signature(x = "diagonalMatrix"),
 setMethod("t", signature(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
 
-setMethod("band", signature(x = "diagonalMatrix"),
-          function(x, k1, k2, ...)
-              if(k1 <= 0L && k2 >= 0L) x else .setZero(x))
-
-setMethod("triu", signature(x = "diagonalMatrix"),
-          function(x, k = 0L, ...)
-              if(k <= 0L) x else .setZero(x))
-
-setMethod("tril", signature(x = "diagonalMatrix"),
-          function(x, k = 0L, ...)
-              if(k >= 0L) x else .setZero(x))
+setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
+          function(x, uplo) .diag2sparse(x, "s", "C", "U"))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
           function(x, uplo) .diag2sparse(x, "s", "C", uplo))
-
-setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
-          function(x, uplo) .diag2sparse(x, "s", "C", "U"))
 
 setMethod("symmpart", signature(x = "diagonalMatrix"),
           function(x) forceSymmetric(.M2kind(x, "d")))
@@ -86,22 +87,23 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
 setMethod("skewpart", signature(x = "diagonalMatrix"),
           function(x) symmetrizeDN(.setZero(x, "d")))
 
-setMethod("isSymmetric", signature(object = "diagonalMatrix"),
-          function(object, checkDN = TRUE, ...) {
-              if(checkDN) {
-                  ca <- function(check.attributes = TRUE, ...) check.attributes
-                  if(ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
-              }
-              TRUE
-          })
+setMethod("isDiagonal", signature(object = "diagonalMatrix"),
+          function(object) TRUE)
 
 setMethod("isTriangular", signature(object = "diagonalMatrix"),
           function(object, upper = NA, ...)
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
-setMethod("isDiagonal", signature(object = "diagonalMatrix"),
-          function(object) TRUE)
+setMethod("isSymmetric", signature(object = "diagonalMatrix"),
+          function(object, checkDN = TRUE, ...) {
+              if(checkDN) {
+                  ca <- function(check.attributes = TRUE, ...)
+                      check.attributes
+                  if(ca(...) && !isSymmetricDN(object@Dimnames))
+                      return(FALSE)
+              }
+              TRUE
+          })
 
 ## FIXME: Many of these products are not handling 'Dimnames' appropriately ...
 
