@@ -45,39 +45,6 @@ uniqSpVec <- function(x) {
 }
 } ## MJ
 
-## S3 method for 'c' [but only for dispatch on 1st arg, hence also exported as fn]
-c.sparseVector <- function(...) {
-    svl <- lapply(list(...), as, Class = "sparseVector")
-    ## cls <- unique(unlist(lapply(svl, is)))
-    ns <- vapply(svl, slot, 1, "length")
-    if((N <- sum(ns)) < .Machine$integer.max) { # some purism ..
-	ns <- as.integer(ns)
-	N <- as.integer(N)
-    }
-    narg <- length(ns)
-    iss <- lapply(svl, slot, "i")
-    ## new 'i' slot:
-    ii <- unlist(iss) + rep(cumsum(c(0L, ns[-narg])), lengths(iss))
-    ## result must have 'x' slot if we have any
-    has.x <- any(have.x <- vapply(svl, .hasSlot, logical(1L), name = "x"))
-    if(has.x) {
-	cls <- if     (any(vapply(svl, is, NA, "zsparseVector"))) "zsparseVector"
-	       else if(any(vapply(svl, is, NA, "dsparseVector"))) "dsparseVector"
-	       else if(any(vapply(svl, is, NA, "isparseVector"))) "isparseVector"
-	       else "lsparseVector"
-	if(!(all.x <- all(have.x)))
-	    one <- if     (identical(cls, "lsparseVector")) TRUE
-		   else if(identical(cls, "isparseVector")) 1L else 1.
-	xx <- unlist(if(all.x) lapply(svl, slot, "x")
-		     else lapply(seq_len(narg), function(i) {
-			 if(have.x[[i]]) svl[[i]]@x
-			 else rep_len(one, length(iss[[i]]))
-		     }))
-	new(cls, x = xx,     i = ii, length = N)
-    } else ## no "x" slot
-	new("nsparseVector", i = ii, length = N)
-}
-
 ### rep(x, ...) -- rep() is primitive with internal default method with these args:
 ### -----------
 ### till R 2.3.1, it had  rep.default()  which we use as 'model' here.
