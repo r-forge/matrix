@@ -1,46 +1,6 @@
 ## METHODS FOR CLASS: sparseVector (virtual)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-## ~~~~ COERCIONS FROM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-setAs("nsparseVector", "lsparseVector",
-      function(from)
-          new("lsparseVector", length = from@length, i = from@i,
-              x = rep.int(TRUE, length(from@i))))
-setAs("nsparseVector", "isparseVector",
-      function(from)
-          new("isparseVector", length = from@length, i = from@i,
-              x = rep.int(1L, length(from@i))))
-setAs("nsparseVector", "dsparseVector",
-      function(from)
-          new("dsparseVector", length = from@length, i = from@i,
-              x = rep.int(1, length(from@i))))
-setAs("nsparseVector", "zsparseVector",
-      function(from)
-          new("zsparseVector", length = from@length, i = from@i,
-              x = rep.int(1+0i, length(from@i))))
-
-setAs("sparseVector", "nsparseVector",
-      function(from)
-	  new("nsparseVector", length = from@length, i = from@i))
-setAs("sparseVector", "lsparseVector",
-      function(from)
-          new("lsparseVector", length = from@length, i = from@i,
-              x = as.logical(from@x)))
-setAs("sparseVector", "isparseVector",
-      function(from)
-          new("isparseVector", length = from@length, i = from@i,
-              x = as.integer(from@x)))
-setAs("sparseVector", "dsparseVector",
-      function(from)
-          new("dsparseVector", length = from@length, i = from@i,
-              x = as.double(from@x)))
-setAs("sparseVector", "zsparseVector",
-      function(from)
-          new("zsparseVector", length = from@length, i = from@i,
-              x = as.complex(from@x)))
-
 spV2M <- function(x, nrow, ncol, byrow = FALSE,
                   check = TRUE, symmetric = FALSE) {
     if(check && !is(x, "sparseVector"))
@@ -118,12 +78,6 @@ spV2M <- function(x, nrow, ncol, byrow = FALSE,
 .sparseV2Mat <- function(from)
     spV2M(from, nrow = from@length, ncol = 1L, check = FALSE)
 
-setAs("sparseVector",        "Matrix", .sparseV2Mat)
-setAs("sparseVector",  "sparseMatrix", .sparseV2Mat)
-setAs("sparseVector", "TsparseMatrix", .sparseV2Mat)
-setAs("sparseVector", "CsparseMatrix", function(from) .M2C(.sparseV2Mat(from)))
-setAs("sparseVector", "RsparseMatrix", function(from) .M2R(.sparseV2Mat(from)))
-
 sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
     ## sparseVector  ->  vector
     has.x <- .hasSlot(x, "x")## has "x" slot
@@ -146,114 +100,6 @@ sp2vec <- function(x, mode = .type.kind[.M.kind(x)]) {
     r
 }
 
-## Need 'base' functions calling as.*() to dispatch to our S4 methods:
-as.vector.sparseVector <- sp2vec
-as.matrix.sparseVector <- function(x, ...) as.matrix.default(sp2vec(x))
- as.array.sparseVector <- function(x, ...)  as.array.default(sp2vec(x))
-
-setAs("sparseVector", "vector",  function(from) sp2vec(from))
-setAs("sparseVector", "logical", function(from) sp2vec(from, mode = "logical"))
-setAs("sparseVector", "integer", function(from) sp2vec(from, mode = "integer"))
-setAs("sparseVector", "numeric", function(from) sp2vec(from, mode = "double"))
-
-setMethod("as.vector",  "sparseVector", sp2vec)
-setMethod("as.logical", "sparseVector", function(x) sp2vec(x, mode = "logical"))
-setMethod("as.numeric", "sparseVector", function(x) sp2vec(x, mode = "double"))
-
-
-## ~~~~ COERCIONS TO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-setAs("ANY", "sparseVector",
-      function(from) as(as.vector(from), "sparseVector"))
-
-setAs("ANY", "nsparseVector",
-      function(from) as(as(from, "sparseVector"), "nsparseVector"))
-
-setAs("atomicVector", "sparseVector",
-      function(from) {
-	  r <- new(paste0(.V.kind(from), "sparseVector"))
-	  r@length <- length(from)
-	  r@i <- ii <- which(isN0(from))
-          r@x <- from[ii]
-	  r
-      })
-
-setAs("atomicVector", "dsparseVector",
-      function(from) {
-	  r <- new("dsparseVector")
-	  r@length <- length(from)
-          r@i <- ii <- which(isN0(from))
-	  r@x <- as.double(from)[ii]
-	  r
-      })
-
-setAs("CsparseMatrix", "sparseVector",
-      function(from) .Call(CR2spV, from))
-
-setAs("RsparseMatrix", "sparseVector",
-      function(from) .Call(CR2spV, from))
-
-setAs("TsparseMatrix", "sparseVector",
-      function(from) .Call(CR2spV, .M2C(from)))
-
-setAs("diagonalMatrix", "sparseVector",
-      function(from) {
-          n <- (d <- from@Dim)[1L]
-          nn <- prod(d)
-          kind <- .M.kind(from)
-          to <- new(paste0(kind, "sparseVector"))
-          to@length <-
-              if(nn <= .Machine$integer.max)
-                  as.integer(nn)
-              else nn
-          to@i <- indDiag(n)
-          to@x <-
-              if(from@diag == "N")
-                  from@x
-              else rep.int(switch(kind,
-                                  "l" = TRUE,
-                                  "i" = 1L,
-                                  "d" = 1,
-                                  "z" = 1+0i),
-                           n)
-          to
-      })
-
-setAs("indMatrix", "sparseVector",
-      function(from) {
-          d <- from@Dim
-          m <- d[1L]
-          n <- d[2L]
-          mn <- prod(d)
-          perm <- from@perm
-          to <- new("nsparseVector")
-          if(mn <= .Machine$integer.max) {
-              to@length <- as.integer(mn)
-              to@i <-
-                  if(from@margin == 1L)
-                      seq.int(to = 0L, by = 1L, length.out = m) + perm * m
-                  else seq.int(from = 0L, by = m, length.out = n) + perm
-          } else {
-              to@length <- mn
-              to@i <-
-                  if(from@margin == 1L)
-                      seq.int(to = 0, by = 1, length.out = m) + perm * as.double(m)
-                  else seq.int(from = 0, by = as.double(m), length.out = n) + as.double(perm)
-          }
-          to
-      })
-
-
-## ~~~~ METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-##' Construct new sparse vector , *dropping* zeros
-
-##' @param class  character, the sparseVector class
-##' @param x      numeric/logical/...:  the 'x' slot -- if missing ==> "nsparseVector"
-##' @param i      integer: index of non-zero entries
-##' @param length integer: the 'length' slot
-
-##' @return a sparseVector, with 0-dropped 'x' (and 'i')
 newSpV <- function(class, x, i, length, drop0 = TRUE, checkSort = TRUE) {
     if(has.x <- !missing(x)) {
 	if(length(x) == 1 && (li <- length(i)) != 1) ## recycle x :
@@ -274,11 +120,10 @@ newSpV <- function(class, x, i, length, drop0 = TRUE, checkSort = TRUE) {
     else
 	new(class,        i = i, length = length)
 }
-## a "version" of 'prev' with changed contents:
+
 newSpVec <- function(class, x, prev)
     newSpV(class, x=x, i=prev@i, length=prev@length)
 
-## Exported:
 sparseVector <- function(x, i, length) {
     newSpV(class = paste0(if(missing(x)) "n" else .V.kind(x), "sparseVector"),
            x=x, i=i, length=length)
@@ -305,40 +150,6 @@ setMethod("t", "sparseVector",
 
 ## MJ: unused
 if(FALSE) {
-## a "method" for c(<(sparse)Vector>, <(sparse)Vector>):
-## FIXME: This is not exported, nor used (nor documented)
-c2v <- function(x, y) {
-    ## these as(., "sp..V..") check input implicitly:
-    cx <- class(x <- as(x, "sparseVector"))
-    cy <- class(y <- as(y, "sparseVector"))
-    if(cx != cy) { ## find "common" class; result does have 'x' slot
-        cxy <- c(cx,cy)
-        commType <- {
-            if(all(cxy %in% c("nsparseVector", "lsparseVector")))
-                "lsparseVector"
-            else { # ==> "numeric" ("integer") or "complex"
-                xslot1 <- function(u, cl.u)
-                    if(cl.u != "nsparseVector") u@x[1] else TRUE
-                switch(typeof(xslot1(x, cx) + xslot1(y, cy)),
-                       ## "integer", "double", or "complex"
-                       "integer" = "isparseVector",
-                       "double" = "dsparseVector",
-                       "complex" = "zsparseVector")
-            }
-        }
-        if(cx != commType) x <- as(x, commType)
-        if(cy != commType) y <- as(y, commType)
-        cx <- commType
-    }
-    ## now *have* common type -- transform 'x' into result:
-    nx <- x@length
-    x@length <- nx + y@length
-    x@i <- c(x@i, nx + y@i)
-    if(cx != "nsparseVector")
-        x@x <- c(x@x, y@x)
-    x
-}
-
 ## sort.default() does
 ##		x[order(x, na.last = na.last, decreasing = decreasing)]
 ## but that uses a *dense* integer order vector
@@ -512,16 +323,6 @@ setMethod("rep", "sparseVector",
 	      }
 	      else r
 	  })
-
-
-### Group Methods (!)
-## "Ops" : ["Arith", "Compare", "Logic"]:  ---> in ./Ops.R
-##						     -----
-## "Summary"  ---> ./Summary.R
-##		     ---------
-## "Math", "Math2": ./Math.R
-##		     -------
-
 
 ##' indices of vector x[] to construct  Toeplitz matrix
 ##' FIXME: write in C, port to  R('stats' package), and use in stats::toeplitz()
