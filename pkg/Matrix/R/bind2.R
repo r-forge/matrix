@@ -1,21 +1,67 @@
-## METHODS FOR GENERIC: cbind2, rbind2
+## METHODS FOR GENERIC: c
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## GOAL: write methods that preallocate, i.e., do _not_ use [cr]bind2,
-##       and maybe implement c.Matrix similarly ... ?
-if(TRUE) {
-.cbind <- function(..., deparse.level = 1)
+c.Matrix <- function(...) {
+    if(nargs() == 0L)
+        return(NULL)
+    args <- lapply(list(...), as.vector)
+    unlist(args, FALSE, TRUE)
+}
+
+c.sparseVector <- function(...) {
+    N <- nargs()
+    if(N == 0L)
+        return(NULL)
+    args        <- lapply(list(...), as, "sparseVector")
+    args.length <- vapply(args, slot, 0, "length")
+    args.i      <- lapply(args, slot,         "i")
+    args.nnz    <- lengths(args.i, FALSE)
+
+    s <- c("n", "l", "i", "d", "z")
+    i <- match(vapply(args, .V.kind, ""), s)
+    k <- range(i)
+    n <- sum(args.length)
+    a <- if(n <= .Machine$integer.max) as.integer else as.double
+
+    r <- new(paste0(s[k[2L]], "sparseVector"))
+    r@length <- a(n)
+    r@i <- a(unlist(args.i, FALSE, FALSE)) +
+        rep.int(cumsum(c(0L, a(args.length)[-N])), args.nnz)
+    if(k[2L] > 1L) {
+        if(k[1L] > 1L)
+            args.x <- lapply(args, slot, "x")
+        else {
+            pattern <- i == 1L
+            args.x <- vector("list", N)
+            args.x[!pattern] <- lapply(args    [!pattern],    slot,      "x")
+            args.x[ pattern] <- lapply(args.nnz[ pattern], rep.int, x = TRUE)
+        }
+        r@x <- unlist(args.x, FALSE, FALSE)
+    }
+    r
+}
+
+## These are insufficient as dispatch only consides the first argument,
+## which need not be a Matrix or sparseVector:
+if(FALSE) {
+setMethod("c",       "Matrix", function(x, ...) c.Matrix      (x, ...))
+setMethod("c", "sparseVector", function(x, ...) c.sparseVector(x, ...))
+}
+
+
+## METHODS FOR GENERIC: cbind, rbind
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if(FALSE) {
+cbind.Matrix <- function(..., deparse.level = 1)
     .External(R_bind, deparse.level, 1L, substitute(list(...)), ...)
-.rbind <- function(..., deparse.level = 1)
+rbind.Matrix <- function(..., deparse.level = 1)
     .External(R_bind, deparse.level, 0L, substitute(list(...)), ...)
 }
 
-if(FALSE) {
-c.Matrix <- function(...) unlist(lapply(list(...), as.vector))
-setMethod("c",        "Matrix", function(x, ...) c.Matrix(x, ...))
-setMethod("c", "numMatrixLike", function(x, ...) c.Matrix(x, ...))
-## First method above is not sufficient for c(NA, 3:2, <Matrix>, <matrix>) ...
-}
+
+## METHODS FOR GENERIC: cbind2, rbind2
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 bindDim <- function(d.x, d.y, margin) {
     r <- d.x
