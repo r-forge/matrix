@@ -10,9 +10,6 @@
 \alias{coerce,matrix,unpackedMatrix-method}
 \alias{coerce,vector,unpackedMatrix-method}
 \alias{cov2cor,unpackedMatrix-method}
-\alias{diag,unpackedMatrix-method}
-\alias{diag<-,unpackedMatrix-method}
-\alias{t,unpackedMatrix-method}
 %
 \description{
   Class \code{"unpackedMatrix"} is the \emph{virtual} class of dense

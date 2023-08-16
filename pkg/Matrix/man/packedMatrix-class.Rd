@@ -9,9 +9,6 @@
 %
 \alias{coerce,matrix,packedMatrix-method}
 \alias{cov2cor,packedMatrix-method}
-\alias{diag,packedMatrix-method}
-\alias{diag<-,packedMatrix-method}
-\alias{t,packedMatrix-method}
 %
 \description{
   Class \code{"packedMatrix"} is the \emph{virtual} class of dense

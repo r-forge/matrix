@@ -15,20 +15,18 @@
 \alias{symmpart,CsparseMatrix-method}
 \alias{symmpart,RsparseMatrix-method}
 \alias{symmpart,TsparseMatrix-method}
+\alias{symmpart,denseMatrix-method}
 \alias{symmpart,diagonalMatrix-method}
 \alias{symmpart,indMatrix-method}
-\alias{symmpart,packedMatrix-method}
 \alias{symmpart,matrix-method}
-\alias{symmpart,unpackedMatrix-method}
 %
 \alias{skewpart,CsparseMatrix-method}
 \alias{skewpart,RsparseMatrix-method}
 \alias{skewpart,TsparseMatrix-method}
+\alias{skewpart,denseMatrix-method}
 \alias{skewpart,diagonalMatrix-method}
 \alias{skewpart,indMatrix-method}
-\alias{skewpart,packedMatrix-method}
 \alias{skewpart,matrix-method}
-\alias{skewpart,unpackedMatrix-method}
 %
 \description{
   \code{symmpart(x)} computes the symmetric part \code{(x + t(x))/2} and

@@ -20,6 +20,7 @@
 \alias{coerce,matrix,sparseMatrix-method}
 \alias{coerce,vector,sparseMatrix-method}
 \alias{cov2cor,sparseMatrix-method}
+\alias{diff,sparseMatrix-method}
 \alias{dim<-,sparseMatrix-method}
 \alias{format,sparseMatrix-method}
 \alias{log,sparseMatrix-method}

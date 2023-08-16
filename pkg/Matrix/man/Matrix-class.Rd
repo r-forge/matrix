@@ -72,7 +72,6 @@
 \alias{coerce,vector,Matrix-method}
 \alias{determinant,Matrix,missing-method}
 \alias{determinant,Matrix,logical-method}
-\alias{diff,Matrix-method}
 \alias{dim,Matrix-method}
 \alias{dimnames,Matrix-method}
 \alias{dimnames<-,Matrix,NULL-method}
