@@ -333,7 +333,7 @@ printSpMatrix2 <- function(x,
     }
     else { ## d[1] > maxp / d[2] >= nr : -- this needs [,] working:
         validObject(x)
-        sTxt <- c(" ", gettext("in show(); maybe adjust 'options(max.print= *, width = *)'"),
+        sTxt <- c(" ", gettext("in show(); maybe adjust options(max.print=, width=)"),
                   "\n ..............................\n")
         useW <- width - (format.info(d[1], digits=digits)[1] + 3+1)
         ##  ==  width - space for the largest row label : "[<last>,] "
