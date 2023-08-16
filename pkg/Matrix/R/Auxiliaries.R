@@ -450,6 +450,26 @@ is_not_uniqT <- function(x, di = dim(x))
 anyDuplicatedT <- function(x, di = dim(x))
     anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
 
+.validateCsparse <- function(x, sort.if.needed = FALSE)
+    .Call(Csparse_validate2, x, sort.if.needed)
+
+dmperm <- function(x, nAns = 6L, seed = 0L) {
+    stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
+              length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
+    if(isS4(x)) {
+        cld <- getClassDef(class(x))
+        if(!extends(cld, "CsparseMatrix"))
+            cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
+        if(extends(cld, "symmetricMatrix"))
+            cld <- getClassDef(class(x <- .M2gen(x)))
+        if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
+            x <- .M2kind(x, "d")
+    } else { # typically a traditional matrix
+        x <- .m2sparse(x, "dgC", NULL, NULL)
+    }
+    .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [dn][gt]CMatrix 'x'
+}
+
 class2 <- function(cl, kind = "l", do.sub = TRUE) {
     ## Find "corresponding" class; since pos.def. matrices have no pendant:
     cl <- MatrixClass(cl)

@@ -23,7 +23,7 @@
 #  error "no valid  _t_Csparse_* option"
 #endif
 
-
+static
 CSPARSE_VAL_RES_TYPE CSPARSE_VAL_FN_NAME(SEXP x, Rboolean maybe_modify)
 {
     /* NB: we do *NOT* check a potential 'x' slot here, at all */

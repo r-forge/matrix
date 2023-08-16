@@ -123,7 +123,7 @@ m.@i <- m.i <- mm@i[ip]
 m.@x <- m.x <- mm@x[ip]
 stopifnot(identical(1L, grep("not increasing within columns",
                              validObject(m., test = TRUE))))
-Matrix:::.sortCsparse(m.) # don't use this at home, boys!
+.validateCsparse(m., TRUE) # don't use this at home, boys!
 m. # now is fixed
 
 ## Make sure that validObject() objects...

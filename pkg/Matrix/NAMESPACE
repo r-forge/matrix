@@ -147,10 +147,10 @@ export(.CR2RC, .CR2T, .T2CR, .dense2g, .dense2kind, .dense2m, .dense2v,
 ## ---- S3 methods -----------------------------------------------------
 
 ## So that dispatch also happens inside of 'base' functions:
-S3method(as.array, Matrix)
-S3method(as.array, sparseVector)
 S3method(as.matrix, Matrix)
 S3method(as.matrix, sparseVector)
+S3method(as.array, Matrix)
+S3method(as.array, sparseVector)
 
 ## Because S4 dispatch is "hard" for c():
 S3method(c, abIndex)
