@@ -41,9 +41,9 @@
 % lsR
 % lsT
 %
-\description{The \code{lsparseMatrix} class is a virtual class of sparse
-  matrices with \code{TRUE}/\code{FALSE} or \code{NA} entries.  Only the
-  positions of the elements that are \code{TRUE} are stored.
+\description{The \code{lsparseMatrix} class is a virtual class
+  of logical sparse matrices, i.e., sparse matrices with entries
+  \code{TRUE}, \code{FALSE}, or \code{NA}.
 
   These can be stored in the \dQuote{triplet} form (class
   \code{\linkS4class{TsparseMatrix}}, subclasses \code{lgTMatrix},
