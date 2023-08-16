@@ -3,9 +3,7 @@
 
 #include "Mutils.h"
 
-SEXP Csparse_validate_(SEXP x, Rboolean maybe_modify);
 SEXP Csparse_validate2(SEXP x, SEXP maybe_modify);
-SEXP Csparse_sort(SEXP x);
 SEXP Csparse_horzcat(SEXP x, SEXP y);
 SEXP Csparse_vertcat(SEXP x, SEXP y);
 

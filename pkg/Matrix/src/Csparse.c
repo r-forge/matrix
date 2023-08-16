@@ -10,19 +10,10 @@
 #define _t_Csparse_validate
 #include "t_Csparse_validate.c"
 
-#define _t_Csparse_sort
-#include "t_Csparse_validate.c"
-
 // R: .validateCsparse(x, sort.if.needed = FALSE) :
-SEXP Csparse_validate2(SEXP x, SEXP maybe_modify) {
+SEXP Csparse_validate2(SEXP x, SEXP maybe_modify)
+{
     return Csparse_validate_(x, asLogical(maybe_modify));
-}
-
-// R: Matrix:::.sortCsparse(x) :
-SEXP Csparse_sort (SEXP x) {
-   int ok = Csparse_sort_2(x, TRUE); // modifying x directly
-   if(!ok) warning(_("Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"));
-   return x;
 }
 
 /** "Cheap" C version of  Csparse_validate() - *not* sorting : */
