@@ -10,7 +10,6 @@
 \alias{-,indMatrix,missing-method}
 \alias{Summary,indMatrix-method}
 \alias{coerce,indMatrix,pMatrix-method}
-\alias{coerce,indMatrix,sparseVector-method}
 \alias{coerce,list,indMatrix-method}
 \alias{coerce,matrix,indMatrix-method}
 \alias{coerce,numeric,indMatrix-method}

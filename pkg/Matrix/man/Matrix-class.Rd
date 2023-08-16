@@ -65,6 +65,7 @@
 \alias{coerce,Matrix,packedMatrix-method}
 \alias{coerce,Matrix,pcorMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
+\alias{coerce,Matrix,sparseVector-method}
 \alias{coerce,Matrix,symmetricMatrix-method}
 \alias{coerce,Matrix,triangularMatrix-method}
 \alias{coerce,Matrix,unpackedMatrix-method}
