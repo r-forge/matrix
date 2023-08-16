@@ -1848,9 +1848,9 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	UNPROTECT(1); /* uplo */
 
 	if (class[1] == 's') {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 	} else {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
@@ -1943,9 +1943,9 @@ SEXP sparse_as_general(SEXP from, const char *class)
 	UNPROTECT(1); /* dimnames */
 
 	if (class[1] == 's') {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 	} else {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
@@ -2220,9 +2220,9 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	UNPROTECT(1); /* uplo */
 
 	if (cl[1] != 't') {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 
 		if (cl[0] == 'c') {
@@ -2344,9 +2344,9 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 				SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
 		} else {
-			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 			if (LENGTH(factors) > 0)
-				SET_SLOT(to, Matrix_factorSym, factors);
+				SET_SLOT(to, Matrix_factorsSym, factors);
 			UNPROTECT(1); /* factors */
 
 			if (cl[0] == 'c') {
@@ -2817,9 +2817,9 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 	}
 
@@ -2916,9 +2916,9 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 	}
 
@@ -3015,9 +3015,9 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorSym, factors);
+			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */
 	}
 

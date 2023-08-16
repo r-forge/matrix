@@ -376,7 +376,7 @@ void attribute_visible R_init_Matrix(DllInfo *dll)
 	Matrix_VSym        = install("V");
 	Matrix_betaSym     = install("beta");
 	Matrix_diagSym     = install("diag");
-	Matrix_factorSym   = install("factors");
+	Matrix_factorsSym  = install("factors");
 	Matrix_iSym        = install("i");
 	Matrix_jSym        = install("j");
 	Matrix_lengthSym   = install("length");

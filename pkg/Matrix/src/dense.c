@@ -500,9 +500,9 @@ SEXP dense_transpose(SEXP from, const char *class)
 				SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
 		} else {
-			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 			if (LENGTH(factors) > 0)
-				SET_SLOT(to, Matrix_factorSym, factors);
+				SET_SLOT(to, Matrix_factorsSym, factors);
 			UNPROTECT(1); /* factors */
 
 			if (isCor && n > 0) {
