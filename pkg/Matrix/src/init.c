@@ -10,12 +10,10 @@
 #include "dgeMatrix.h"
 #include "factorizations.h"
 #include "kappa.h"
-#include "packedMatrix.h"
 #include "products.h"
 #include "sparse.h"
 #include "sparseVector.h"
 #include "subscript.h"
-#include "unpackedMatrix.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
@@ -169,57 +167,32 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_subscript_2ary, 3),
 
 	CALLDEF(R_sparse_drop0, 2),
+	CALLDEF(R_sparse_diag_U2N, 1),
+	CALLDEF(R_sparse_diag_N2U, 1),
 	CALLDEF(R_sparse_band, 3),
 	CALLDEF(R_sparse_diag_get, 2),
 	CALLDEF(R_sparse_diag_set, 2),
-	CALLDEF(R_sparse_diag_U2N, 1),
-	CALLDEF(R_sparse_diag_N2U, 1),
 	CALLDEF(R_sparse_transpose, 2),
 	CALLDEF(R_sparse_force_symmetric, 2),
 	CALLDEF(R_sparse_symmpart, 1),
 	CALLDEF(R_sparse_skewpart, 1),
-
+	CALLDEF(R_sparse_is_symmetric, 2),
+	CALLDEF(R_sparse_is_triangular, 2),
+	CALLDEF(R_sparse_is_diagonal, 1),
+	CALLDEF(R_sparse_marginsum, 5),
 	CALLDEF(Tsparse_aggregate, 1),
-	CALLDEF(Csparse_is_diagonal, 1),
-	CALLDEF(Rsparse_is_diagonal, 1),
-	CALLDEF(Tsparse_is_diagonal, 1),
-	CALLDEF(Csparse_is_triangular, 2),
-	CALLDEF(Rsparse_is_triangular, 2),
-	CALLDEF(Tsparse_is_triangular, 2),
-	CALLDEF(Csparse_is_symmetric, 2),
-	CALLDEF(Rsparse_is_symmetric, 2),
-	CALLDEF(CRsparse_colSums, 4),
-	CALLDEF(CRsparse_rowSums, 4),
 
 	CALLDEF(R_dense_band, 3),
-	CALLDEF(R_dense_colSums, 3),
-	CALLDEF(R_dense_rowSums, 3),
-
-	CALLDEF(matrix_is_symmetric, 2),
-	CALLDEF(matrix_is_triangular, 2),
-	CALLDEF(matrix_is_diagonal, 1),
-	CALLDEF(matrix_symmpart, 1),
-	CALLDEF(matrix_skewpart, 1),
-
-	CALLDEF(unpackedMatrix_force_symmetric, 2),
-	CALLDEF(unpackedMatrix_is_symmetric, 2),
-	CALLDEF(unpackedMatrix_is_triangular, 2),
-	CALLDEF(unpackedMatrix_is_diagonal, 1),
-	CALLDEF(unpackedMatrix_transpose, 1),
-	CALLDEF(unpackedMatrix_diag_get, 2),
-	CALLDEF(unpackedMatrix_diag_set, 2),
-	CALLDEF(unpackedMatrix_symmpart, 1),
-	CALLDEF(unpackedMatrix_skewpart, 1),
-
-	CALLDEF(packedMatrix_force_symmetric, 2),
-	CALLDEF(packedMatrix_is_symmetric, 2),
-	CALLDEF(packedMatrix_is_triangular, 2),
-	CALLDEF(packedMatrix_is_diagonal, 1),
-	CALLDEF(packedMatrix_transpose, 1),
-	CALLDEF(packedMatrix_diag_get, 2),
-	CALLDEF(packedMatrix_diag_set, 2),
-	CALLDEF(packedMatrix_symmpart, 1),
-	CALLDEF(packedMatrix_skewpart, 1),
+	CALLDEF(R_dense_diag_get, 2),
+	CALLDEF(R_dense_diag_set, 2),
+	CALLDEF(R_dense_transpose, 1),
+	CALLDEF(R_dense_force_symmetric, 2),
+	CALLDEF(R_dense_symmpart, 1),
+	CALLDEF(R_dense_skewpart, 1),
+	CALLDEF(R_dense_is_symmetric, 2),
+	CALLDEF(R_dense_is_triangular, 2),
+	CALLDEF(R_dense_is_diagonal, 1),
+	CALLDEF(R_dense_marginsum, 4),
 
 	CALLDEF(dgeMatrix_trf, 2),
 	CALLDEF(dsyMatrix_trf, 2),

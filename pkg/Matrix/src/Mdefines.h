@@ -113,21 +113,25 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	if (!isNull(GET_SLOT(src, sym))) \
 		SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
 
-#define MAXOF(x, y) ((x < y) ? y : x)
-#define MINOF(x, y) ((x < y) ? x : y)
+#define    MINOF(x, y) ((x < y) ? x : y)
+#define    MAXOF(x, y) ((x < y) ? y : x)
 #define  FIRSTOF(x, y) (x)
 #define SECONDOF(x, y) (y)
 
+#define ISNA_PATTERN(_X_) (0)
 #define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
 #define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
 #define ISNA_REAL(_X_)    (ISNAN(_X_))
 #define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
 
+#define ISNZ_PATTERN(_X_) ((_X_) != 0)
 #define ISNZ_LOGICAL(_X_) ((_X_) != 0)
 #define ISNZ_INTEGER(_X_) ((_X_) != 0)
 #define ISNZ_REAL(_X_)    ((_X_) != 0.0)
 #define ISNZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
 
+#define STRICTLY_ISNZ_PATTERN(_X_) \
+	(                      ISNZ_PATTERN(_X_))
 #define STRICTLY_ISNZ_LOGICAL(_X_) \
 	(!ISNA_LOGICAL(_X_) && ISNZ_LOGICAL(_X_))
 #define STRICTLY_ISNZ_INTEGER(_X_) \
@@ -136,6 +140,24 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	(!ISNA_REAL(   _X_) && ISNZ_REAL(   _X_))
 #define STRICTLY_ISNZ_COMPLEX(_X_) \
 	(!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
+
+#define NOTREAL_PATTERN(_X_) 0
+#define NOTREAL_LOGICAL(_X_) 0
+#define NOTREAL_INTEGER(_X_) 0
+#define NOTREAL_REAL(_X_)    0
+#define NOTREAL_COMPLEX(_X_) (_X_.i != 0.0)
+
+#define NOTCONJ_PATTERN(_X_, _Y_) \
+	((_X_ != 0) != (_Y_ != 0))
+#define NOTCONJ_LOGICAL(_X_, _Y_) \
+	(_X_ != _Y_)
+#define NOTCONJ_INTEGER(_X_, _Y_) \
+	(_X_ != _Y_)
+#define NOTCONJ_REAL(_X_, _Y_) \
+	((ISNAN(_X_)) ? !ISNAN(_Y_) : ISNAN(_Y_) || _X_ != _Y_)
+#define NOTCONJ_COMPLEX(_X_, _Y_) \
+	(((ISNAN(_X_.r)) ? !ISNAN(_Y_.r) : ISNAN(_Y_.r) || _X_.r !=  _Y_.r) || \
+	 ((ISNAN(_X_.i)) ? !ISNAN(_Y_.i) : ISNAN(_Y_.i) || _X_.r != -_Y_.r))
 
 #define INCREMENT_PATTERN(_X_, _Y_) \
 	do { \
@@ -172,6 +194,21 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 		_X_.r += _Y_.r; \
 		_X_.i += _Y_.i; \
 	} while (0)
+
+#define ASSIGN_REAL(_X_, _Y_) \
+	do { _X_   = _Y_  ;                } while (0)
+#define ASSIGN_COMPLEX(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i = _Y_.i; } while (0)
+
+#define MULTIPLY_REAL(_X_, _A_) \
+	do { _X_   *= _A_;               } while (0)
+#define MULTIPLY_COMPLEX(_X_, _A_) \
+	do { _X_.r *= _A_; _X_.i *= _A_; } while (0)
+
+#define DIVIDE_REAL(_X_, _A_) \
+	do { _X_   /= _A_;               } while (0)
+#define DIVIDE_COMPLEX(_X_, _A_) \
+	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
 #define PM_AR21_UP(i, j) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))

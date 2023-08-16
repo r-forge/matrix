@@ -826,113 +826,113 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} \
 	} while (0)
 
-#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _NZ_) \
+#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
 	do { \
 		       _CTYPE_ *px0 = _PTR_(x0) ; \
 		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
 		if (class[1] == 'g') \
 			/* .geMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_GEN2C, DAS_LOOP_GEN2R, DAS_LOOP_GEN2C, \
-			                _MASK_, _NZ_);	 \
+			                _MASK_, _ISNZ_);	 \
 		else if (class[2] != 'p' && di == 'N') \
 			/* .syMatrix, non-unit diagonal .trMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TRN2C, DAS_LOOP_TRN2R, DAS_LOOP_TRN2C, \
-			                _MASK_, _NZ_); \
+			                _MASK_, _ISNZ_); \
 		else if (class[2] != 'p') \
 			/* unit diagonal .trMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TRU2C, DAS_LOOP_TRU2R, DAS_LOOP_TRU2C, \
-			                _MASK_, _NZ_); \
+			                _MASK_, _ISNZ_); \
 		else if (di == 'N') \
 			/* .spMatrix, non-unit diagonal .tpMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TPN2C, DAS_LOOP_TPN2R, DAS_LOOP_TPN2C, \
-			                _MASK_, _NZ_); \
+			                _MASK_, _ISNZ_); \
 		else \
 			/* unit diagonal .tpMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TPU2C, DAS_LOOP_TPU2R, DAS_LOOP_TPU2C, \
-			                _MASK_, _NZ_); \
+			                _MASK_, _ISNZ_); \
 	} while (0)
 
 #undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NZ_) \
+#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _ISNZ_) \
 	do { \
 		switch (cl[2]) { \
 		case 'C': \
-			_LOOP_C_(_NZ_, ++nnz, DAS_VALID2C); \
+			_LOOP_C_(_ISNZ_, ++nnz, DAS_VALID2C); \
 			break; \
 		case 'R': \
-			_LOOP_R_(_NZ_, ++nnz, DAS_VALID2R); \
+			_LOOP_R_(_ISNZ_, ++nnz, DAS_VALID2R); \
 			break; \
 		case 'T': \
-			_LOOP_T_(_NZ_, ++nnz, DAS_VALID2T); \
+			_LOOP_T_(_ISNZ_, ++nnz, DAS_VALID2T); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_GEN2C(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_GEN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		for (j = 0; j < n; ++j) { \
 			for (i = 0; i < m; ++i, ++px0) \
-				if (_NZ_(*px0)) _DO_INNER_; \
+				if (_ISNZ_(*px0)) _DO_INNER_; \
 			_DO_OUTER_; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_GEN2R(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_GEN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
 		for (i = 0; i < m; ++i, px0 -= mn1s) { \
 			for (j = 0; j < n; ++j, px0 += m) \
-				if (_NZ_(*px0)) _DO_INNER_; \
+				if (_ISNZ_(*px0)) _DO_INNER_; \
 			_DO_OUTER_; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRN2C(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 0; j < n; px0 += n - (++j)) { \
 				for (i = 0; i <= j; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; px0 += (++j)) { \
 				for (i = j; i < n; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRN2R(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
 			d = (R_xlen_t) n * n - 1; \
 			for (i = 0; i < n; ++i, px0 -= (d -= n)) { \
 				for (j = i; j < n; ++j, px0 += n) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			d = -1; \
 			for (i = 0; i < n; ++i, px0 -= (d += n)) { \
 				for (j = 0; j <= i; ++j, px0 += n) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRU2C(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRU2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			px0 += n; \
 			for (j = 1; j < n; ++j) { \
 				for (i = 0; i < j; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 				px0 += n - j; \
 			} \
@@ -940,13 +940,13 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (j = 0; j < n; ++j) { \
 				px0 += j + 1; \
 				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRU2R(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRU2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
@@ -954,7 +954,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (i = 0; i < n; ++i) { \
 				for (j = i + 1; j < n; ++j) { \
 					px0 += n; \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				} \
 				_DO_OUTER_; \
 				px0 -= (d -= n); \
@@ -964,7 +964,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			d = -1; \
 			for (i = 1; i < n; ++i) { \
 				for (j = 0; j < i; ++j) { \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 					px0 += n; \
 				} \
 				_DO_OUTER_; \
@@ -973,63 +973,63 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPN2C(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i <= j; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; ++j) { \
 				for (i = j; i < n; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPN2R(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
 			d = PM_LENGTH(n) - 1; \
 			for (i = 0; i < n; px0 -= (d -= (++i))) { \
 				for (j = i; j < n; px0 += (++j)) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			d = -1; \
 			for (i = 0; i < n; px0 -= (d += n - (++i))) { \
 				for (j = 0; j <= i; px0 += n - (++j)) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPU2C(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPU2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 1; j < n; ++j) { \
 				++px0; \
 				for (i = 0; i < j; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; ++j) { \
 				++px0; \
 				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPU2R(_NZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPU2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
@@ -1037,7 +1037,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (i = 0; i < n; ++i) { \
 				for (j = i + 1; j < n; ++j) { \
 					px0 += j; \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 				} \
 				_DO_OUTER_; \
 				px0 -= (d -= i + 1); \
@@ -1047,7 +1047,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			d = -1; \
 			for (i = 1; i < n; ++i) { \
 				for (j = 0; j < i; ++j) { \
-					if (_NZ_(*px0)) _DO_INNER_; \
+					if (_ISNZ_(*px0)) _DO_INNER_; \
 					px0 += n - j - 1; \
 				} \
 				_DO_OUTER_; \
@@ -1102,25 +1102,25 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	}
 
 #undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NZ_) \
+#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _ISNZ_) \
 	do { \
 		switch (repr) { \
 		case 'C': \
-			_LOOP_C_(_NZ_, \
+			_LOOP_C_(_ISNZ_, \
 			         do { \
 			             *(pi++) = i; \
 			             _MASK_(*(px1++) = *px0); \
 			         } while (0), ); \
 			break; \
 		case 'R': \
-			_LOOP_R_(_NZ_, \
+			_LOOP_R_(_ISNZ_, \
 			         do { \
 			             *(pj++) = j; \
 			             _MASK_(*(px1++) = *px0); \
 			         } while (0), ); \
 			break; \
 		case 'T': \
-			_LOOP_T_(_NZ_, \
+			_LOOP_T_(_ISNZ_, \
 			         do { \
 			             *(pi++) = i; \
 			             *(pj++) = j; \
@@ -1263,11 +1263,11 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			nnz = 0;
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (d = 0; d < n; ++d) { \
-					if (_NZ_(*px0)) \
+					if (_ISNZ_(*px0)) \
 						++nnz; \
 					*(pp++) = nnz; \
 					++px0; \
@@ -1289,11 +1289,11 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			nnz = 0;
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (d = 0; d < n; ++d) { \
-					if (_NZ_(*px0)) \
+					if (_ISNZ_(*px0)) \
 						++nnz; \
 					++px0; \
 				} \
@@ -1317,13 +1317,13 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	int *pi1 = INTEGER(i1);
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
 	do { \
 		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
 		if (di == 'N') { \
 			_CTYPE_ *px0 = _PTR_(x0); \
 			for (d = 0; d < n; ++d) { \
-				if (_NZ_(*px0)) { \
+				if (_ISNZ_(*px0)) { \
 					*(pi1++) = d; \
 					_MASK_(*(px1++) = *px0); \
 				} \
@@ -2004,7 +2004,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 				}
 			}
 			for (j = 1; j < n; ++j)
-				pp1[j] += pp1[j-1];
+				pp1[j] += pp1[j - 1];
 			if (pp1[n - 1] > INT_MAX - pp0[n - 1])
 				error(_("attempt to construct %s with more than %s nonzero entries"),
 				      "sparseMatrix", "2^31-1");
@@ -2500,7 +2500,7 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 	workC = workB + r;
 	pj_   = workC + m;
 
-#define TSORT_LOOP(_CTYPE_, _PTR_, _MASK_, _INCR_) \
+#define TSORT_LOOP(_CTYPE_, _PTR_, _MASK_, _INCREMENT_) \
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1, *px_); \
 		_MASK_(Matrix_Calloc(px_, nnz0, _CTYPE_)); \
@@ -2555,7 +2555,7 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 					++kend_; \
 				} else { \
 					/* Have already seen this column index */ \
-					_MASK_(_INCR_); \
+					_MASK_(_INCREMENT_(px_[workB[pj_[k]]], px_[k])); \
 				} \
 				++k; \
 			} \
@@ -2620,48 +2620,20 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 	} while (0)
 
 	if (!x0)
-		TSORT_LOOP(int, LOGICAL, HIDE, );
+		TSORT_LOOP(int, LOGICAL, HIDE, INCREMENT_PATTERN);
 	else {
 		switch (TYPEOF(x0)) {
 		case LGLSXP:
-			TSORT_LOOP(int, LOGICAL, SHOW,
-			           do {
-			               if (px_[k] == NA_LOGICAL) {
-			                   if (px_[workB[pj_[k]]] == 0)
-			                       px_[workB[pj_[k]]] = NA_LOGICAL;
-			               } else if (px_[k] != 0)
-			                  px_[workB[pj_[k]]] = 1;
-			           } while (0));
+			TSORT_LOOP(int, LOGICAL, SHOW, INCREMENT_LOGICAL);
 			break;
 		case INTSXP:
-			TSORT_LOOP(int, INTEGER, SHOW,
-
-			           do {
-			               if (px_[workB[pj_[k]]] != NA_INTEGER) {
-			                   if (px_[k] == NA_INTEGER)
-			                       px_[workB[pj_[k]]] = NA_INTEGER;
-			                   else if ((px_[k] < 0)
-			                            ? (px_[workB[pj_[k]]] <= INT_MIN - px_[k])
-			                            : (px_[workB[pj_[k]]] >  INT_MAX - px_[k])) {
-			                       warning(_("NAs produced by integer overflow"));
-			                       px_[workB[pj_[k]]] = NA_INTEGER;
-			                   } else
-			                       px_[workB[pj_[k]]] += px_[k];
-			               }
-			           } while (0));
+			TSORT_LOOP(int, INTEGER, SHOW, INCREMENT_INTEGER);
 			break;
 		case REALSXP:
-			TSORT_LOOP(double, REAL, SHOW,
-			           do {
-			               px_[workB[pj_[k]]] += px_[k];
-			           } while (0));
+			TSORT_LOOP(double, REAL, SHOW, INCREMENT_REAL);
 			break;
 		case CPLXSXP:
-			TSORT_LOOP(Rcomplex, COMPLEX, SHOW,
-			           do {
-			               px_[workB[pj_[k]]].r += px_[k].r;
-			               px_[workB[pj_[k]]].i += px_[k].i;
-			           } while (0));
+			TSORT_LOOP(Rcomplex, COMPLEX, SHOW, INCREMENT_COMPLEX);
 			break;
 		default:
 			break;
