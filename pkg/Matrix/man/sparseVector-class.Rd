@@ -235,16 +235,16 @@ system.time(for(i in 1:4) h2 <- v[1:1e6])
 
 stopifnot(identical(hv, h2),
           identical(is | FALSE, is != 0),
-	  validObject(svN), validObject(lis), as.logical(is.na(svN[4])),
-	  identical(is^2 > 0,	is & TRUE),
-	  all(!lis), !any(lis), length(nn@i) == 0, !any(nn), all(!nn),
-	  sum(lis) == 0, !prod(lis), range(lis) == c(0,0))
+          validObject(svN), validObject(lis), as.logical(is.na(svN[4])),
+          identical(is^2 > 0, is & TRUE),
+          all(!lis), !any(lis), length(nn@i) == 0, !any(nn), all(!nn),
+          sum(lis) == 0, !prod(lis), range(lis) == c(0,0))
 
 ## create and use the t(.) method:
 t(x20 <- sparseVector(c(9,3:1), i=c(1:2,4,7), length=20))
 (T20 <- toeplitz(x20))
 stopifnot(is(T20, "symmetricMatrix"), is(T20, "sparseMatrix"),
-	  identical(unname(as.matrix(T20)),
+          identical(unname(as.matrix(T20)),
                     toeplitz(as.vector(x20))))
 
 ## c() method for "sparseVector" - also available as regular function
@@ -258,11 +258,11 @@ stopifnot(is(T20, "symmetricMatrix"), is(T20, "sparseMatrix"),
 ## checking (consistency)
 .v <- as.vector
 .s <- function(v) as(v, "sparseVector")
-stopifnot(
-  all.equal(c1, .s(c(.v(x20), 0,0,0, -10*.v(x20))),      tol=0),
-  all.equal(c2, .s(c(.v(ns), .v(is), FALSE)),            tol=0),
-  all.equal(c3, .s(c(.v(ns), !.v(ns), TRUE, NA, FALSE)), tol=0),
-  all.equal(c4, .s(c(.v(ns), rev(.v(ns)))),              tol=0),
-  all.equal(c5, .s(c(0,0, .v(x20))),                     tol=0)
-)
+stopifnot(exprs = {
+    all.equal(c1, .s(c(.v(x20), 0,0,0, -10*.v(x20))),      tol = 0)
+    all.equal(c2, .s(c(.v(ns), .v(is), FALSE)),            tol = 0)
+    all.equal(c3, .s(c(.v(ns), !.v(ns), TRUE, NA, FALSE)), tol = 0)
+    all.equal(c4, .s(c(.v(ns), rev(.v(ns)))),              tol = 0)
+    all.equal(c5, .s(c(0,0, .v(x20))),                     tol = 0)
+})
 }
