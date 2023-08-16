@@ -1,13 +1,14 @@
 #include "dense.h"
 
-SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
+SEXP dense_band(SEXP from, const char *class, int a, int b)
 {
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	UNPROTECT(1); /* dim */
 
 	/* Need tri[ul](<0-by-0>) and tri[ul](<1-by-1>) to be triangularMatrix */
-	if (a <= 1-m && b >= n-1 && (class[1] == 't' || m != n || m > 1 || n > 1))
+	if (a <= 1 - m && b >= n - 1 &&
+	    (class[1] == 't' || m != n || m > 1 || n > 1))
 		return from;
 
 	int ge = 0, sy = 0, tr = 0;
@@ -35,19 +36,11 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 		} \
 	} while (0)
 
-#define IF_UNPACKED_ELSE(_IF_, _ELSE_) \
-	do { \
-		if (class[2] != 'p') \
-			BAND_CASES(_IF_); \
-		else \
-			BAND_CASES(_ELSE_); \
-	} while (0)
-
 #define UNPACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
 	_PREFIX_ ## dense_unpacked_make_banded(_PTR_(x1), m, n, a, b, di)
 
 #define PACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
-	_PREFIX_ ## dense_packed_make_banded(_PTR_(x1), n, a, b, ult, di)
+	_PREFIX_ ## dense_packed_make_banded(_PTR_(x1), n, a, b, ul1, di)
 
 #define UNPACKED_COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_) \
 	do { \
@@ -62,10 +55,10 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 		Matrix_memset(_PTR_(x1), 0, len, sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
 			_PREFIX_ ## dense_packed_copy_diagonal( \
-				_PTR_(x1), _PTR_(x0), n, len, ult, ulf, di); \
+				_PTR_(x1), _PTR_(x0), n, len, ul1, ul0, di); \
 	} while (0)
 
-	char ulf = 'U', ult = 'U', di = 'N';
+	char ul0 = 'U', ul1 = 'U', di = 'N';
 	if (class[1] != 'g') {
 		if (ge) {
 			/* defined in ./coerce.c : */
@@ -78,12 +71,13 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 		}
 
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ulf = *CHAR(STRING_ELT(uplo, 0));
+		ul0 = *CHAR(STRING_ELT(uplo, 0));
 		UNPROTECT(1); /* uplo */
 
 		if (class[1] == 't') {
 			/* Be fast if band contains entire triangle */
-			if ((ulf == 'U') ? (a <= 0 && b >= n-1) : (b >= 0 && a <= 1-m))
+			if ((ul0 == 'U')
+			    ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
 				return from;
 			else if (a <= 0 && b >= 0) {
 				SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
@@ -113,10 +107,13 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 
 	if (ge) {
 		SEXP x1 = PROTECT(GET_SLOT(from, Matrix_xSym));
-		if (new) {
-			x1 = duplicate(x1);
-			UNPROTECT(1);
-			PROTECT(x1);
+		x1 = duplicate(x1);
+		UNPROTECT(1);
+		PROTECT(x1);
+		if (ATTRIB(x1) != R_NilValue) {
+			SET_ATTRIB(x1, R_NilValue);
+			if (OBJECT(x1))
+				SET_OBJECT(x1, 0);
 		}
 		SET_SLOT(to, Matrix_xSym, x1);
 		BAND_CASES(UNPACKED_MAKE_BANDED);
@@ -126,8 +123,8 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 
 	/* Returning .(sy|sp|tr|tp)Matrix ... */
 
-	ult = (tr && class[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ulf;
-	if (ult != 'U') {
+	ul1 = (tr && class[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ul0;
+	if (ul1 != 'U') {
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
@@ -144,49 +141,55 @@ SEXP dense_band(SEXP from, const char *class, int a, int b, int new)
 		/* Result is either a diagonal matrix or a zero matrix */
 		R_xlen_t len = XLENGTH(x0);
 		PROTECT(x1 = allocVector(TYPEOF(x0), len));
-		IF_UNPACKED_ELSE(UNPACKED_COPY_DIAGONAL, PACKED_COPY_DIAGONAL);
+		if (class[2] != 'p')
+			BAND_CASES(UNPACKED_COPY_DIAGONAL);
+		else
+			BAND_CASES(  PACKED_COPY_DIAGONAL);
 	} else {
-		if (!new)
-			PROTECT(x1 = x0);
-		else if (sy || (tr && (class[1] == 'g' || ulf == ult || n <= 1)))
+		if (sy || (tr && (class[1] == 'g' || ul0 == ul1 || n <= 1))) {
 			PROTECT(x1 = duplicate(x0));
-		else if (class[2] != 'p')
+			if (ATTRIB(x1) != R_NilValue) {
+				SET_ATTRIB(x1, R_NilValue);
+				if (OBJECT(x1))
+					SET_OBJECT(x1, 0);
+			}
+		} else if (class[2] != 'p')
 			/* band is "opposite" the stored triangle: */
-			PROTECT(x1 = unpacked_force(x0, n, ulf, '\0'));
+			PROTECT(x1 = unpacked_force(x0, n, ul0, '\0'));
 		else
 			/* band is "opposite" the stored triangle: */
-			PROTECT(x1 = packed_transpose(x0, n, ulf));
-		IF_UNPACKED_ELSE(UNPACKED_MAKE_BANDED, PACKED_MAKE_BANDED);
+			PROTECT(x1 = packed_transpose(x0, n, ul0));
+		if (class[2] != 'p')
+			BAND_CASES(UNPACKED_MAKE_BANDED);
+		else
+			BAND_CASES(  PACKED_MAKE_BANDED);
 	}
 	SET_SLOT(to, Matrix_xSym, x1);
 
 #undef BAND_CASES
-#undef IF_UNPACKED_ELSE
 #undef UNPACKED_MAKE_BANDED
+#undef   PACKED_MAKE_BANDED
 #undef UNPACKED_COPY_DIAGONAL
-#undef PACKED_MAKE_BANDED
-#undef PACKED_COPY_DIAGONAL
+#undef   PACKED_COPY_DIAGONAL
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
 }
 
 /* band(<denseMatrix>, k1, k2), tri[ul](<denseMatrix>, k) */
-/* band(     <matrix>, k1, k2), tri[ul](     <matrix>, k) */
 /* NB: argument validation more or less copied by R_sparse_band() */
 SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
-	int ivalid = R_check_class_etc(from, valid), isS4 = ivalid >= 0;
-	if (!isS4) {
-		/* defined in ./coerce.c : */
+	if (!IS_S4_OBJECT(from)) {
 		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
-		from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 1);
+		from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 0);
 	}
 	PROTECT(from);
-	if (!isS4)
-		ivalid = R_check_class_etc(from, valid);
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -194,12 +197,12 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 
 	int a, b;
 	if (k1 == R_NilValue)
-		a = (m > 0) ? 1-m : 0;
+		a = (m > 0) ? 1 - m : 0;
 	else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
 		error(_("'%s' must be an integer from %s to %s"),
 		      "k1", "-Dim[1]", "Dim[2]");
 	if (k2 == R_NilValue)
-		b = (n > 0) ? n-1 : 0;
+		b = (n > 0) ? n - 1 : 0;
 	else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
 		error(_("'%s' must be an integer from %s to %s"),
 		      "k2", "-Dim[1]", "Dim[2]");
@@ -207,602 +210,1566 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 		error(_("'%s' must be less than or equal to '%s'"),
 		      "k1", "k2");
 
-	from = dense_band(from, valid[ivalid], a, b, isS4);
+	from = dense_band(from, valid[ivalid], a, b);
 	UNPROTECT(1);
 	return from;
 }
 
-/* colSums(<denseMatrix>) */
-SEXP R_dense_colSums(SEXP obj, SEXP narm, SEXP mean)
+SEXP dense_diag_get(SEXP obj, const char *class, int names)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *cl = valid[ivalid];
-	if (cl[1] == 's')
-		return R_dense_rowSums(obj, narm, mean);
-
-	int doNaRm = asLogical(narm) != 0,
-		doMean = asLogical(mean) != 0,
-		doCount = doNaRm && doMean;
-
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
 	UNPROTECT(1); /* dim */
 
 	char ul = 'U', di = 'N';
-	if (cl[1] == 't') {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-		ul = *CHAR(STRING_ELT(uplo, 0));
-		UNPROTECT(1); /* uplo */
-
-		SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
-		di = *CHAR(STRING_ELT(diag, 0));
-		UNPROTECT(1); /* diag */
-	}
-
-	SEXP res = PROTECT(allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, n)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int i, j, count = m;
-
-#define DENSE_COLSUMS_LOOP \
-	do { \
-		if (cl[1] == 'g') { /* general */ \
-			for (j = 0; j < n; ++j, ++pres) { \
-				DO_INIT(ZERO); \
-				for (i = 0; i < m; ++i, ++px) \
-					DO_INCR; \
-				DO_SCALE; \
-			} \
-		} else if (cl[2] != 'p') { \
-			if (ul == 'U') { /* unpacked upper triangular */ \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						DO_INIT(ZERO); \
-						for (i = 0; i <= j; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-						px += n-j-1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						DO_INIT(ONE); \
-						for (i = 0; i < j; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-						px += n-j; \
-					} \
-				} \
-			} else { /* unpacked lower triangular */ \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						px += j; \
-						DO_INIT(ZERO); \
-						for (i = j; i < n; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-					} \
-				} else { \
-					for (i = j = 0; j < n; ++j, i = j, ++pres) { \
-						px += j+1; \
-						DO_INIT(ONE); \
-						for (i = j+1; i < n; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-					} \
-				} \
-			} \
-		} else { \
-			if (ul == 'U') { /* packed upper triangular */ \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						DO_INIT(ZERO); \
-						for (i = 0; i <= j; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						DO_INIT(ONE); \
-						for (i = 0; i < j; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-						++px; \
-					} \
-				} \
-			} else { /* packed lower triangular */ \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j, ++pres) { \
-						DO_INIT(ZERO); \
-						for (i = j; i < n; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-					} \
-				} else { \
-					for (i = j = 0; j < n; ++j, i = j, ++pres) { \
-						++px; \
-						DO_INIT(ONE); \
-						for (i = j+1; i < n; ++i, ++px) \
-							DO_INCR; \
-						DO_SCALE; \
-					} \
-				} \
-			} \
-		} \
-	} while (0)
-
-#define DENSE_COLSUMS(_CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_) \
-	do { \
-		_CTYPE1_ *pres = _PTR1_(res); \
-		_CTYPE2_ *px = _PTR2_(x); \
-		DENSE_COLSUMS_LOOP; \
-	} while (0)
-
-	switch (cl[0]) {
-	case 'n':
-
-#define ZERO         0.0
-#define ONE          1.0
-#define DO_INIT(_U_) *pres = _U_
-#define DO_INCR      if (*px) *pres += 1.0
-#define DO_SCALE     if (doMean) *pres /= count
-
-		DENSE_COLSUMS(double, REAL, int, LOGICAL);
-		break;
-
-#undef DO_INIT
-#undef DO_INCR
-
-	case 'l':
-
-#define DO_INIT(_U_) \
-		do { \
-			*pres = _U_; \
-			if (doCount) \
-				count = m; \
-		} while (0)
-#define DO_INCR \
-		do { \
-			if (*px != NA_LOGICAL) { \
-				if (*px) *pres += 1.0; \
-			} else if (!doNaRm) \
-				*pres = NA_REAL; \
-			else if (doMean) \
-				--count; \
-		} while (0)
-
-	DENSE_COLSUMS(double, REAL, int, LOGICAL);
-	break;
-
-#undef DO_INCR
-
-	case 'i':
-
-#define DO_INCR \
-		do { \
-			if (*px != NA_INTEGER) \
-				*pres += *px; \
-			else if (!doNaRm) \
-				*pres = NA_REAL; \
-			else if (doMean) \
-				--count; \
-		} while (0)
-
-		DENSE_COLSUMS(double, REAL, int, INTEGER);
-		break;
-
-#undef DO_INCR
-
-	case 'd':
-
-#define DO_INCR \
-		do { \
-			if (!(doNaRm && ISNAN(*px))) \
-				*pres += *px; \
-			else if (doMean) \
-				--count; \
-		} while (0)
-
-		DENSE_COLSUMS(double, REAL, double, REAL);
-		break;
-
-#undef ZERO
-#undef ONE
-#undef DO_INCR
-#undef DO_SCALE
-
-	case 'z':
-
-#define ZERO         Matrix_zzero
-#define ONE          Matrix_zone
-#define DO_INCR \
-		do { \
-			if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
-				(*pres).r += (*px).r; \
-				(*pres).i += (*px).i; \
-			} else if (doMean) \
-				--count; \
-		} while (0)
-#define DO_SCALE \
-		do { \
-			if (doMean) { \
-				(*pres).r /= count; \
-				(*pres).i /= count; \
-			} \
-		} while (0)
-
-		DENSE_COLSUMS(Rcomplex, COMPLEX, Rcomplex, COMPLEX);
-		break;
-
-#undef ZERO
-#undef ONE
-#undef DO_INIT
-#undef DO_INCR
-#undef DO_SCALE
-
-	default:
-		break;
-	}
-
-#undef DENSE_COLSUMS
-#undef DENSE_COLSUMS_LOOP
-
-	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		nms = VECTOR_ELT(dimnames, 1);
-	if (!isNull(nms))
-		setAttrib(res, R_NamesSymbol, nms);
-
-	UNPROTECT(3); /* dimnames, x, res */
-	return res;
-}
-
-/* rowSums(<denseMatrix>) */
-SEXP R_dense_rowSums(SEXP obj, SEXP narm, SEXP mean)
-{
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *cl = valid[ivalid];
-
-	int doNaRm = asLogical(narm) != 0,
-		doMean = asLogical(mean) != 0;
-
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	UNPROTECT(1); /* dim */
-
-	char ul = 'U', di = 'N';
-	if (cl[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-		ul = *CHAR(STRING_ELT(uplo, 0));
-		UNPROTECT(1); /* uplo */
-
-		if (cl[1] == 't') {
+	if (class[1] != 'g') {
+		if (class[2] == 'p') {
+			SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+			ul = *CHAR(STRING_ELT(uplo, 0));
+			UNPROTECT(1); /* uplo */
+		}
+		if (class[1] == 't') {
 			SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
 			di = *CHAR(STRING_ELT(diag, 0));
 			UNPROTECT(1); /* diag */
 		}
 	}
 
-	SEXP res = PROTECT(allocVector((cl[0] != 'z') ? REALSXP : CPLXSXP, m)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int i, j, *pcount = NULL;
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		res = PROTECT(allocVector(TYPEOF(x), r));
 
-#define DENSE_ROWSUMS_LOOP \
+#define DG_LOOP(_CTYPE_, _PTR_, _ONE_) \
 	do { \
-		if (cl[1] == 'g') { /* general */ \
-			for (j = 0; j < n; ++j) \
-				for (i = 0; i < m; ++i, ++px) \
-					DO_INCR; \
-		} else if (cl[1] == 't') { \
-			if (cl[2] != 'p') { \
-				if (ul == 'U') { /* unpacked upper triangular */ \
-					if (di == 'N') { \
-						for (j = 0; j < n; ++j) { \
-							for (i = 0; i <= j; ++i, ++px) \
-								DO_INCR; \
-							px += n-j-1; \
-						} \
-					} else { \
-						for (j = 0; j < n; ++j) { \
-							for (i = 0; i < j; ++i, ++px) \
-								DO_INCR; \
-							px += n-j; \
-						} \
-					} \
-				} else { /* unpacked lower triangular */ \
-					if (di == 'N') { \
-						for (j = 0; j < n; ++j) { \
-							px += j; \
-							for (i = j; i < n; ++i, ++px) \
-								DO_INCR; \
-						} \
-					} else { \
-						for (i = j = 0; j < n; ++j, i = j) { \
-							px += j+1; \
-							for (i = j+1; i < n; ++i, ++px) \
-								DO_INCR; \
-						} \
-					} \
-				} \
-			} else { \
-				if (ul == 'U') { /* packed upper triangular */ \
-					if (di == 'N') { \
-						for (j = 0; j < n; ++j) \
-							for (i = 0; i <= j; ++i, ++px) \
-								DO_INCR; \
-					} else { \
-						for (j = 0; j < n; ++j) { \
-							for (i = 0; i < j; ++i, ++px) \
-								DO_INCR; \
-							++px; \
-						} \
-					} \
-				} else { /* packed lower triangular */ \
-					if (di == 'N') { \
-						for (j = 0; j < n; ++j) \
-							for (i = j; i < n; ++i, ++px) \
-								DO_INCR; \
-					} else { \
-						for (i = j = 0; j < n; ++j, i = j) { \
-							++px; \
-							for (i = j+1; i < n; ++i, ++px) \
-								DO_INCR; \
-						} \
-					} \
-				} \
-			} \
-		} else { \
-			if (cl[2] != 'p') { \
-				if (ul == 'U') { /* unpacked upper symmetric */ \
-					for (j = 0; j < n; ++j) { \
-						for (i = 0; i < j; ++i, ++px) \
-							DO_INCR_SYMM; \
-						DO_INCR; \
-						px += n-j; \
-					} \
-				} else { /* unpacked lower symmetric */ \
-					for (i = j = 0; j < n; ++j, i = j) { \
-						px += j; \
-						DO_INCR; \
-						++px; \
-						for (i = j+1; i < n; ++i, ++px) \
-							DO_INCR_SYMM; \
-					} \
-				} \
-			} else { \
-				if (ul == 'U') { /* packed upper symmetric */ \
-					for (j = 0; j < n; ++j) { \
-						for (i = 0; i < j; ++i, ++px) \
-							DO_INCR_SYMM; \
-						DO_INCR; \
-						++px; \
-					} \
-				} else { /* packed lower symmetric */ \
-					for (i = j = 0; j < n; ++j, i = j) { \
-						DO_INCR; \
-						++px; \
-						for (i = j+1; i < n; ++i, ++px) \
-							DO_INCR_SYMM; \
-					} \
-				} \
-			} \
+		_CTYPE_ *pres = _PTR_(res), *px = _PTR_(x); \
+		if (di == 'U') \
+			for (j = 0; j < r; ++j) \
+				*(pres++) = _ONE_; \
+		else if (class[2] != 'p') { \
+			R_xlen_t m1a = (R_xlen_t) m + 1; \
+			for (j = 0; j < r; ++j, px += m1a) \
+				*(pres++) = *px; \
 		} \
+		else if (ul == 'U') \
+			for (j = 0; j < n; px += (++j) + 1) \
+				*(pres++) = *px; \
+		else \
+			for (j = 0; j < n; px += n - (j++)) \
+				*(pres++) = *px; \
 	} while (0)
 
-#define DENSE_ROWSUMS(_CTYPE1_, _PTR1_, _CTYPE2_, _PTR2_) \
-	do { \
-		_CTYPE1_ *pres = _PTR1_(res), u = (di == 'N') ? ZERO : ONE; \
-		_CTYPE2_ *px   = _PTR2_(x); \
-		if (doNaRm && doMean && cl[0] != 'n') { \
-			Matrix_Calloc(pcount, m, int); \
-			for (i = 0; i < m; ++i) { \
-				pres[i] = u; \
-				pcount[i] = n; \
-			} \
-		} else { \
-			for (i = 0; i < m; ++i) \
-				pres[i] = u; \
-		} \
-		DENSE_ROWSUMS_LOOP; \
-	} while (0)
-
-	switch (cl[0]) {
+	switch (class[0]) {
 	case 'n':
-
-#define ZERO         0.0
-#define ONE          1.0
-#define DO_INCR      if (*px) pres[i] += 1.0
-#define DO_INCR_SYMM \
-		do { \
-			if (*px) { \
-				pres[i] += 1.0; \
-				pres[j] += 1.0; \
-			} \
-		} while (0)
-
-		DENSE_ROWSUMS(double, REAL, int, LOGICAL);
-		break;
-
-#undef DO_INCR
-#undef DO_INCR_SYMM
-
 	case 'l':
-
-#define DO_INCR \
-		do { \
-			if (*px != NA_LOGICAL) { \
-				if (*px) \
-					pres[i] += 1.0; \
-			} else if (!doNaRm) \
-				pres[i] = NA_REAL; \
-			else if (doMean) \
-				--pcount[i]; \
-		} while (0)
-#define DO_INCR_SYMM \
-		do { \
-			if (*px != NA_LOGICAL) { \
-				if (*px) { \
-					pres[i] += 1.0; \
-					pres[j] += 1.0; \
-				} \
-			} else if (!doNaRm) { \
-				pres[i] = NA_REAL; \
-				pres[j] = NA_REAL; \
-			} else if (doMean) { \
-				--pcount[i]; \
-				--pcount[j]; \
-			} \
-		} while (0)
-
-		DENSE_ROWSUMS(double, REAL, int, LOGICAL);
+		DG_LOOP(int, LOGICAL, 1);
 		break;
-
-#undef DO_INCR
-#undef DO_INCR_SYMM
-
 	case 'i':
-
-#define DO_INCR \
-		do { \
-			if (*px != NA_INTEGER) \
-				pres[i] += *px; \
-			else if (!doNaRm) \
-				pres[i] = NA_REAL; \
-			else if (doMean) \
-				--pcount[i]; \
-		} while (0)
-#define DO_INCR_SYMM \
-		do { \
-			if (*px != NA_INTEGER) { \
-				pres[i] += *px; \
-				pres[j] += *px; \
-			} else if (!doNaRm) { \
-				pres[i] = NA_REAL; \
-				pres[j] = NA_REAL; \
-			} else if (doMean) { \
-				--pcount[i]; \
-				--pcount[j]; \
-			} \
-		} while (0)
-
-		DENSE_ROWSUMS(double, REAL, int, INTEGER);
+		DG_LOOP(int, INTEGER, 1);
 		break;
-
-#undef DO_INCR
-#undef DO_INCR_SYMM
-
 	case 'd':
-
-#define DO_INCR \
-		do { \
-			if (!(doNaRm && ISNAN(*px))) \
-				pres[i] += *px; \
-			else if (doMean) \
-				--pcount[i]; \
-		} while (0)
-#define DO_INCR_SYMM \
-		do { \
-			if (!(doNaRm && ISNAN(*px))) { \
-				pres[i] += *px; \
-				pres[j] += *px; \
-			} else if (doMean) { \
-				--pcount[i]; \
-				--pcount[j]; \
-			} \
-		} while (0)
-
-		DENSE_ROWSUMS(double, REAL, double, REAL);
+		DG_LOOP(double, REAL, 1.0);
 		break;
-
-#undef ZERO
-#undef ONE
-#undef DO_INCR
-#undef DO_INCR_SYMM
-
 	case 'z':
-
-#define ZERO         Matrix_zzero
-#define ONE          Matrix_zone
-#define DO_INCR \
-		do { \
-			if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
-				pres[i].r += (*px).r; \
-				pres[i].i += (*px).i; \
-			} else if (doMean) \
-				--pcount[i]; \
-		} while (0)
-#define DO_INCR_SYMM \
-		do { \
-			if (!(doNaRm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
-				pres[i].r += (*px).r; \
-				pres[i].i += (*px).i; \
-				pres[j].r += (*px).r; \
-				pres[j].i += (*px).i; \
-			} else if (doMean) { \
-				--pcount[i]; \
-				--pcount[j]; \
-			} \
-		} while (0)
-
-		DENSE_ROWSUMS(Rcomplex, COMPLEX, Rcomplex, COMPLEX);
+		DG_LOOP(Rcomplex, COMPLEX, Matrix_zone);
 		break;
-
-#undef ZERO
-#undef ONE
-#undef DO_INCR
-#undef DO_INCR_SYMM
-
 	default:
 		break;
 	}
 
-#undef DENSE_ROWSUMS
-#undef DENSE_ROWSUMS_LOOP
-
-	if (doMean) {
-		if (cl[0] != 'z') {
-			double *pres = REAL(res);
-			if (doNaRm && cl[0] != 'n') {
-				for (i = 0; i < m; ++i)
-					pres[i] /= pcount[i];
-				Matrix_Free(pcount, m);
-			} else {
-				for (i = 0; i < m; ++i)
-					pres[i] /= n;
-			}
+	if (names) {
+		/* NB: The logic here must be adjusted once the validity method
+		   for 'symmetricMatrix' enforces symmetric 'Dimnames'
+		*/
+		SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+			rn = VECTOR_ELT(dn, 0),
+			cn = VECTOR_ELT(dn, 1);
+		if (cn == R_NilValue) {
+			if (class[1] == 's' && rn != R_NilValue)
+				setAttrib(res, R_NamesSymbol, rn);
 		} else {
-			Rcomplex *pres = COMPLEX(res);
-			if (doNaRm) {
-				for (i = 0; i < m; ++i) {
-					pres[i].r /= pcount[i];
-					pres[i].i /= pcount[i];
-				}
-				Matrix_Free(pcount, m);
-			} else {
-				for (i = 0; i < m; ++i) {
-					pres[i].r /= n;
-					pres[i].i /= n;
-				}
+			if (class[1] == 's')
+				setAttrib(res, R_NamesSymbol, cn);
+			else if (rn != R_NilValue &&
+			         (rn == cn || equal_string_vectors(rn, cn, r)))
+				setAttrib(res, R_NamesSymbol, (r == m) ? rn : cn);
+		}
+		UNPROTECT(1); /* dn */
+	}
+
+#undef DG_LOOP
+
+	UNPROTECT(2); /* x, res */
+	return res;
+}
+
+SEXP R_dense_diag_get(SEXP obj, SEXP names)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	int names_;
+	if (TYPEOF(names) != LGLSXP || LENGTH(names) < 1 ||
+	    (names_ = LOGICAL(names)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "names", "TRUE", "FALSE");
+
+	return dense_diag_get(obj, valid[ivalid], names_);
+}
+
+SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
+{
+	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class));
+	int v = LENGTH(value) != 1;
+
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
+	if (m != n || n > 0)
+		SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1); /* dimnames */
+
+	char ul = 'U';
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (ul != 'U')
+			SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
+
+	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
+	if (new) {
+		x = duplicate(x);
+		UNPROTECT(1); /* x */
+		PROTECT(x);
+	}
+	SET_SLOT(to, Matrix_xSym, x);
+
+#define DS_LOOP(_CTYPE_, _PTR_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *pvalue = _PTR_(value); \
+		if (class[2] != 'p') { \
+			R_xlen_t m1a = (R_xlen_t) m + 1; \
+			if (v) \
+				for (j = 0; j < r; ++j, px += m1a) \
+					*px = *(pvalue++); \
+			else \
+				for (j = 0; j < r; ++j, px += m1a) \
+					*px = *pvalue; \
+		} else if (ul == 'U') { \
+			if (v) \
+				for (j = 0; j < n; px += (++j) + 1) \
+					*px = *(pvalue++); \
+			else \
+				for (j = 0; j < n; px += (++j) + 1) \
+					*px = *pvalue; \
+		} else { \
+			if (v) \
+				for (j = 0; j < n; px += n - (j++)) \
+					*px = *(pvalue++); \
+			else \
+				for (j = 0; j < n; px += n - (j++)) \
+					*px = *pvalue; \
+		} \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+	case 'l':
+		DS_LOOP(int, LOGICAL);
+		break;
+	case 'i':
+		DS_LOOP(int, INTEGER);
+		break;
+	case 'd':
+		DS_LOOP(double, REAL);
+		break;
+	case 'z':
+		DS_LOOP(Rcomplex, COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef DS_LOOP
+
+	UNPROTECT(2); /* x, to */
+	return to;
+}
+
+SEXP R_dense_diag_set(SEXP from, SEXP value)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+	const char *class = valid[ivalid];
+
+	SEXPTYPE tx = kind2type(class[0]), tv = TYPEOF(value);
+
+	switch (tv) {
+	case LGLSXP:
+	case INTSXP:
+	case REALSXP:
+#ifdef MATRIX_ENABLE_ZMATRIX
+	case CPLXSXP:
+#endif
+		break;
+	default:
+		error(_("replacement diagonal has incompatible type \"%s\""),
+		      type2char(tv));
+		break;
+	}
+
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	R_xlen_t len = XLENGTH(value);
+	if (len != 1 && len != r)
+		error(_("replacement diagonal has wrong length"));
+
+	int new = 1;
+	if (tv <= tx) {
+		PROTECT(from);
+		PROTECT(value = coerceVector(value, tx));
+	} else {
+		/* defined in ./coerce.c : */
+		SEXP dense_as_kind(SEXP, const char *, char);
+		PROTECT(from = dense_as_kind(from, class, type2kind(tv)));
+#ifndef MATRIX_ENABLE_IMATRIX
+		if (tv == INTSXP)
+			value = coerceVector(value, REALSXP);
+#endif
+		PROTECT(value);
+		class = valid[R_check_class_etc(from, valid)];
+		new = 0;
+	}
+
+	from = dense_diag_set(from, class, value, new);
+	UNPROTECT(2);
+	return from;
+}
+
+SEXP dense_transpose(SEXP from, const char *class)
+{
+	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class));
+
+	int isCor = class[0] == 'c' || (class[0] == 'p' && class[1] == 'c');
+	if (isCor)
+		class = (class[0] != 'p') ? "dsyMatrix" : "dspMatrix";
+	else if (class[1] == 'p')
+		class = (class[2] != 'p') ? "dsyMatrix" : "dspMatrix";
+
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], i, j;
+	if (m != n) {
+		UNPROTECT(1); /* dim */
+		PROTECT(dim = GET_SLOT(to, Matrix_DimSym));
+		pdim = INTEGER(dim);
+		pdim[0] = n;
+		pdim[1] = m;
+	} else if (n > 0)
+		SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	if (class[1] == 's')
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_reversed_DimNames(to, dimnames);
+	UNPROTECT(1); /* dimnames */
+
+	char ul = 'U';
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		UNPROTECT(1); /* uplo */
+		if (ul == 'U') {
+			PROTECT(uplo = mkString("L"));
+			SET_SLOT(to, Matrix_uploSym, uplo);
+			UNPROTECT(1); /* uplo */
+		}
+		if (class[1] == 't') {
+			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+			char di = *CHAR(STRING_ELT(diag, 0));
+			if (di != 'N')
+				SET_SLOT(to, Matrix_diagSym, diag);
+			UNPROTECT(1); /* diag */
+		} else {
+			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorSym));
+			if (LENGTH(factors) > 0)
+				SET_SLOT(to, Matrix_factorSym, factors);
+			UNPROTECT(1); /* factors */
+
+			if (isCor && n > 0) {
+				SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
+				SET_SLOT(to, Matrix_sdSym, sd);
+				UNPROTECT(1); /* sd */
 			}
 		}
 	}
 
-	SEXP dimnames;
-	if (cl[1] != 's')
-		PROTECT(dimnames = GET_SLOT(obj, Matrix_DimNamesSym));
-	else
-		PROTECT(dimnames = get_symmetrized_DimNames(obj, -1));
-	SEXP nms = VECTOR_ELT(dimnames, 0);
-	if (!isNull(nms))
-		setAttrib(res, R_NamesSymbol, nms);
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
+		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+	SET_SLOT(to, Matrix_xSym, x1);
 
-	UNPROTECT(3); /* dimnames, x, res */
+#define TRANS_LOOP(_CTYPE_, _PTR_) \
+	do { \
+		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		if (class[2] != 'p') { \
+			R_xlen_t len1s = XLENGTH(x0) - 1; \
+			for (j = 0; j < m; ++j, px0 -= len1s) \
+				for (i = 0; i < n; ++i, px0 += m) \
+					*(px1++) = *px0; \
+		} else if (ul == 'U') { \
+			for (j = 0; j < n; ++j) \
+				for (i = j; i < n; ++i) \
+					*(px1++) = *(px0 + PM_AR21_UP(j, i)); \
+		} else { \
+			R_xlen_t n2 = (R_xlen_t) n * 2; \
+			for (j = 0; j < n; ++j) \
+				for (i = 0; i <= j; ++i) \
+					*(px1++) = *(px0 + PM_AR21_LO(j, i, n2)); \
+		} \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+	case 'l':
+		TRANS_LOOP(int, LOGICAL);
+		break;
+	case 'i':
+		TRANS_LOOP(int, INTEGER);
+		break;
+	case 'd':
+		TRANS_LOOP(double, REAL);
+		break;
+	case 'z':
+		TRANS_LOOP(Rcomplex, COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef TRANS_LOOP
+
+	UNPROTECT(3); /* x1, x0, to */
+	return to;
+}
+
+SEXP R_dense_transpose(SEXP from)
+{
+	static const char *valid[] = {
+		"corMatrix", "pcorMatrix", "dpoMatrix", "dppMatrix",
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+
+	return dense_transpose(from, valid[ivalid]);
+}
+
+SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
+{
+	char ul0 = 'U', ul1 = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		ul0 = ul1 = *CHAR(STRING_ELT(uplo, 0));
+		UNPROTECT(1); /* uplo */
+
+		if (class[1] == 't') {
+			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+			di = *CHAR(STRING_ELT(diag, 0));
+			UNPROTECT(1); /* diag */
+		}
+	}
+
+	if (ul != '\0')
+		ul1 = ul;
+
+	if (class[1] == 's') {
+		/* .s[yp]Matrix */
+		if (ul0 == ul1)
+			return from;
+		SEXP to = PROTECT(dense_transpose(from, class));
+		if (class[0] == 'z') {
+			/* Need _conjugate_ transpose */
+			SEXP x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
+			conjugate(x1);
+			UNPROTECT(1); /* x1 */
+		}
+		UNPROTECT(1) /* to */;
+		return to;
+	}
+
+	/* Now handling just .(ge|tr|tp)Matrix ... */
+
+	char cl[] = ".s.Matrix";
+	cl[0] = class[0];
+	cl[2] = (class[2] != 'p') ? 'y' : 'p';
+	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		error(_("attempt to symmetrize a non-square matrix"));
+	if (n > 0)
+		SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	set_symmetrized_DimNames(to, dimnames, -1);
+	UNPROTECT(1); /* dimnames */
+
+	if (ul1 != 'U') {
+		SEXP uplo = PROTECT(mkString("L"));
+		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
+
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+
+	if (class[1] == 'g' || ul0 == ul1)
+		SET_SLOT(to, Matrix_xSym, x0);
+	else {
+		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+		SET_SLOT(to, Matrix_xSym, x1);
+
+		R_xlen_t len = XLENGTH(x1);
+
+#define COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_) \
+		do { \
+			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
+			if (class[2] != 'p') \
+				_PREFIX_ ## dense_unpacked_copy_diagonal( \
+					px1, px0, n, len, '\0' /* not used */, di); \
+			else \
+				_PREFIX_ ## dense_packed_copy_diagonal( \
+					px1, px0, n, len, ul1, ul0, di); \
+		} while (0)
+
+		switch (class[0]) {
+		case 'n':
+		case 'l':
+			COPY_DIAGONAL(int, LOGICAL, i);
+			break;
+		case 'i':
+			COPY_DIAGONAL(int, INTEGER, i);
+			break;
+		case 'd':
+			COPY_DIAGONAL(double, REAL, d);
+			break;
+		case 'z':
+			COPY_DIAGONAL(Rcomplex, COMPLEX, z);
+			break;
+		default:
+			break;
+		}
+
+#undef COPY_DIAGONAL
+
+		UNPROTECT(1); /* x1 */
+	}
+
+	UNPROTECT(2); /* x0, to */
+	return to;
+}
+
+SEXP R_dense_force_symmetric(SEXP from, SEXP uplo)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+
+	char ul = '\0';
+	if (uplo != R_NilValue) {
+		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
+		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
+		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+			error(_("invalid '%s' to %s()"), "uplo", __func__);
+	}
+
+	return dense_force_symmetric(from, valid[ivalid], ul);
+}
+
+SEXP dense_symmpart(SEXP from, const char *class)
+{
+	if (class[0] != 'z' && class[0] != 'd') {
+		/* defined in ./coerce.c : */
+		SEXP dense_as_kind(SEXP, const char *, char);
+		from = dense_as_kind(from, class, 'd');
+	}
+	if (class[0] != 'z' && class[1] == 's')
+		return from;
+	PROTECT(from);
+
+	char cl[] = ".s.Matrix";
+	cl[0] = (class[0] != 'z') ? 'd' : 'z';
+	cl[2] = (class[2] != 'p') ? 'y' : 'p';
+	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		error(_("attempt to get symmetric part of non-square matrix"));
+	if (n > 0)
+		SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	if (class[1] == 's')
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
+	UNPROTECT(1); /* dimnames */
+
+	char ul = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (ul != 'U')
+			SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+		if (class[1] == 't') {
+			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+			di = *CHAR(STRING_ELT(diag, 0));
+			UNPROTECT(1); /* diag */
+		}
+	}
+
+	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
+	if (class[0] == 'z' || class[0] == 'd') {
+		x = duplicate(x);
+		UNPROTECT(1); /* x */
+		PROTECT(x);
+	}
+	SET_SLOT(to, Matrix_xSym, x);
+
+	if (class[1] == 's') {
+		/* Symmetric part of Hermitian matrix is real part */
+		zeroIm(x);
+		UNPROTECT(3); /* x, to, from */
+		return to;
+	}
+
+	int i, j;
+
+#define SP_LOOP(_CTYPE_, _PTR_, _INCREMENT_, _MULTIPLY_, _ONE_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x); \
+		if (class[1] == 'g') { \
+			_CTYPE_ *py = px; \
+			for (j = 0; j < n; ++j) { \
+				for (i = j + 1; i < n; ++i) { \
+					px += n; \
+					py += 1; \
+					_INCREMENT_((*px), (*py)); \
+					_MULTIPLY_((*px), 0.5); \
+				} \
+				px = (py += j + 2); \
+			} \
+		} else if (class[2] != 'p') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						_MULTIPLY_((*px), 0.5); \
+						px += 1; \
+					} \
+					px += n - j; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					px += j + 1; \
+					for (i = j + 1; i < n; ++i) { \
+						_MULTIPLY_((*px), 0.5); \
+						px += 1; \
+					} \
+				} \
+			} \
+			if (di != 'N') { \
+				R_xlen_t n1a = (R_xlen_t) n + 1; \
+				px = _PTR_(x); \
+				for (j = 0; j < n; ++j, px += n1a) \
+					*px = _ONE_; \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						_MULTIPLY_((*px), 0.5); \
+						px += 1; \
+					} \
+					px += 1; \
+				} \
+				if (di != 'N') { \
+					px = _PTR_(x); \
+					for (j = 0; j < n; px += (++j) + 1) \
+						*px = _ONE_; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					px += 1; \
+					for (i = j + 1; i < n; ++i) { \
+						_MULTIPLY_((*px), 0.5); \
+						px += 1; \
+					} \
+				} \
+				if (di != 'N') { \
+					px = _PTR_(x); \
+					for (j = 0; j < n; px += n - (j++)) \
+						*px = _ONE_; \
+				} \
+			} \
+		} \
+	} while (0)
+
+	if (cl[0] == 'd')
+		SP_LOOP(double, REAL, INCREMENT_REAL, MULTIPLY_REAL, 1.0);
+	else
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, MULTIPLY_COMPLEX, Matrix_zone);
+
+#undef SP_LOOP
+
+	UNPROTECT(3); /* x, to, from */
+	return to;
+}
+
+SEXP R_dense_symmpart(SEXP from)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+
+	return dense_symmpart(from, valid[ivalid]);
+}
+
+SEXP dense_skewpart(SEXP from, const char *class)
+{
+	if (class[0] != 'z' && class[0] != 'd') {
+		/* defined in ./coerce.c : */
+		SEXP dense_as_kind(SEXP, const char *, char);
+		from = dense_as_kind(from, class, 'd');
+	}
+	PROTECT(from);
+
+	char cl[] = "...Matrix";
+	cl[0] = (class[0] != 'z') ? 'd' : 'z';
+	cl[1] = (class[1] != 's') ? 'g' : 's';
+	cl[2] = (class[1] != 's') ? 'e' :
+		((class[0] != 'z') ? 'C' : ((class[2] != 'p') ? 'y' : 'p'));
+	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		error(_("attempt to get skew-symmetric part of non-square matrix"));
+	if (n > 0)
+		SET_SLOT(to, Matrix_DimSym, dim);
+	UNPROTECT(1); /* dim */
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	if (class[1] == 's')
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
+	UNPROTECT(1); /* dimnames */
+
+	char ul = 'U';
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (class[1] == 's' && ul != 'U')
+			SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
+
+	if (class[1] == 's' && class[0] != 'z') {
+		/* Skew-symmetric part of Hermitian matrix is imaginary part */
+		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
+		int *pp = INTEGER(p);
+		Matrix_memset(pp, 0, (R_xlen_t) n + 1, sizeof(int));
+		SET_SLOT(to, Matrix_pSym, p);
+		UNPROTECT(3); /* p, to, from */
+		return to;
+	}
+
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
+
+	if (class[1] == 's') {
+		/* Skew-symmetric part of Hermitian matrix is imaginary part */
+		x1 = duplicate(x1);
+		UNPROTECT(1); /* x1 */
+		PROTECT(x1);
+		SET_SLOT(to, Matrix_xSym, x1);
+		zeroRe(x1);
+		UNPROTECT(3); /* x1, to, from */
+		return to;
+	}
+
+	if (class[2] == 'p' || class[0] == 'z' || class[0] == 'd') {
+		if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
+		x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n);
+	}
+	PROTECT(x1);
+	SET_SLOT(to, Matrix_xSym, x1);
+
+	int i, j;
+	R_xlen_t upos = 0, lpos = 0;
+
+#define SP_LOOP(_CTYPE_, _PTR_, _INCREMENT_, _ASSIGN_, _ZERO_) \
+	do { \
+		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) { \
+				lpos = j; \
+				for (i = 0; i < j; ++i) { \
+					_ASSIGN_(px1[upos], 0.5 * px0[upos]); \
+					_INCREMENT_(px1[upos], -0.5 * px0[lpos]); \
+					_ASSIGN_(px1[lpos], -px1[upos]); \
+					upos += 1; \
+					lpos += n; \
+				} \
+				px1[upos] = _ZERO_; \
+				upos += n - j; \
+			} \
+		} else if (class[2] != 'p') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					lpos = j; \
+					for (i = 0; i < j; ++i) { \
+						_ASSIGN_(px1[upos], 0.5 * px0[upos]); \
+						_ASSIGN_(px1[lpos], -px1[upos]); \
+						upos += 1; \
+						lpos += n; \
+					} \
+					px1[upos] = _ZERO_; \
+					upos += n - j; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					upos = lpos; \
+					px1[lpos] = _ZERO_; \
+					for (i = j + 1; i < n; ++i) { \
+						upos += n; \
+						lpos += 1; \
+						_ASSIGN_(px1[lpos], 0.5 * px0[lpos]); \
+						_ASSIGN_(px1[upos], -px1[lpos]); \
+					} \
+					lpos += j + 2; \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j, ++px0) { \
+					lpos = j; \
+					for (i = 0; i < j; ++i, ++px0) { \
+						_ASSIGN_(px1[upos], 0.5 * (*px0)); \
+						_ASSIGN_(px1[lpos], -px1[upos]); \
+						upos += 1; \
+						lpos += n; \
+					} \
+					px1[upos] = _ZERO_; \
+					upos += n - j; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j, ++px0) { \
+					upos = lpos; \
+					px1[lpos] = _ZERO_; \
+					for (i = j + 1; i < n; ++i, ++px0) { \
+						upos += n; \
+						lpos += 1; \
+						_ASSIGN_(px1[lpos], 0.5 * (*px0)); \
+						_ASSIGN_(px1[upos], -px1[lpos]); \
+					} \
+					lpos += j + 2; \
+				} \
+			} \
+		} \
+	} while (0)
+
+	if (cl[0] == 'd')
+		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN_REAL, 0.0);
+	else
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN_COMPLEX, Matrix_zzero);
+
+#undef SP_LOOP
+
+	UNPROTECT(4); /* x1, x0, to, from */
+	return to;
+}
+
+SEXP R_dense_skewpart(SEXP from)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+
+	return dense_skewpart(from, valid[ivalid]);
+}
+
+int dense_is_symmetric(SEXP obj, const char *class, int checkDN)
+{
+	if (class[1] == 's')
+		return 1;
+
+	if (checkDN) {
+		SEXP dimnames = GET_SLOT(obj, Matrix_DimNamesSym);
+		if (!DimNames_is_symmetric(dimnames))
+			return 0;
+	}
+
+	if (class[1] == 't')
+		return dense_is_diagonal(obj, class);
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		return 0;
+	if (n <= 1)
+		return 1;
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j;
+
+#define IS_LOOP(_CTYPE_, _PTR_, _NOTREAL_, _NOTCONJ_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *py = px; \
+		for (j = 0; j < n; px = (py += (++j) + 1)) { \
+			if (_NOTREAL_((*px))) \
+				return 0; \
+			for (i = j + 1; i < n; ++i) { \
+				px += n; \
+				py += 1; \
+				if (_NOTCONJ_((*px), (*py))) \
+					return 0; \
+			} \
+		} \
+		return 1; \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+		IS_LOOP(int, LOGICAL, NOTREAL_PATTERN, NOTCONJ_PATTERN);
+		break;
+	case 'l':
+		IS_LOOP(int, LOGICAL, NOTREAL_LOGICAL, NOTCONJ_LOGICAL);
+		break;
+	case 'i':
+		IS_LOOP(int, INTEGER, NOTREAL_INTEGER, NOTCONJ_INTEGER);
+		break;
+	case 'd':
+		IS_LOOP(double, REAL, NOTREAL_REAL, NOTCONJ_REAL);
+		break;
+	case 'z':
+		IS_LOOP(Rcomplex, COMPLEX, NOTREAL_COMPLEX, NOTCONJ_COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef IS_LOOP
+
+	return 0;
+}
+
+SEXP R_dense_is_symmetric(SEXP obj, SEXP checkDN)
+{
+	if (!IS_S4_OBJECT(obj)) {
+		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
+		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
+	}
+	PROTECT(obj);
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	int checkDN_;
+	if (TYPEOF(checkDN) != LGLSXP || LENGTH(checkDN) < 1 ||
+	    (checkDN_ = LOGICAL(checkDN)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
+
+	SEXP ans = ScalarLogical(dense_is_symmetric(obj, valid[ivalid], checkDN_));
+	UNPROTECT(1);
+	return ans;
+}
+
+int dense_is_triangular(SEXP obj, const char *class, int upper)
+{
+	if (class[1] == 't') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		char ul = *CHAR(STRING_ELT(uplo, 0));
+		if (upper == NA_LOGICAL || (upper != 0) == (ul == 'U'))
+			return (ul == 'U') ? 1 : -1;
+		else if (dense_is_diagonal(obj, class))
+			return (ul == 'U') ? -1 : 1;
+		else
+			return 0;
+	}
+
+	if (class[1] == 's') {
+		if (!dense_is_diagonal(obj, class))
+			return 0;
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		char ul = *CHAR(STRING_ELT(uplo, 0));
+		if (upper == NA_LOGICAL)
+			return (ul == 'U') ? 1 : -1;
+		else
+			return (upper != 0) ? 1 : -1;
+	}
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		return 0;
+	if (n <= 1)
+		return (upper != 0) ? 1 : -1;
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j;
+
+#define IT_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
+	do { \
+		_CTYPE_ *px; \
+		if (upper == NA_LOGICAL) { \
+			px = _PTR_(x); \
+			for (j = 0; j < n; px += (++j)) { \
+				px += 1; \
+				for (i = j + 1; i < n; ++i, px += 1) { \
+					if (_ISNZ_(*px)) { \
+						j = n; \
+						break; \
+					} \
+				} \
+			} \
+			if (j == n) \
+				return  1; \
+			px = _PTR_(x); \
+			for (j = 0; j < n; px += n - (++j)) { \
+				for (i = 0; i < j; ++i, px += 1) { \
+					if (_ISNZ_(*px)) { \
+						j = n; \
+						break; \
+					} \
+				} \
+				px += 1; \
+			} \
+			if (j == n) \
+				return -1; \
+			return 0; \
+		} else if (upper != 0) { \
+			px = _PTR_(x); \
+			for (j = 0; j < n; px += (++j)) {	\
+				px += 1; \
+				for (i = j + 1; i < n; ++i, px += 1) \
+					if (_ISNZ_(*px)) \
+						return 0; \
+			} \
+			return  1; \
+		} else { \
+			px = _PTR_(x); \
+			for (j = 0; j < n; px += n - (++j)) { \
+				for (i = 0; i < j; ++i, px += 1) \
+					if (_ISNZ_(*px)) \
+						return 0; \
+				px += 1; \
+			} \
+			return -1; \
+		} \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+		IT_LOOP(int, LOGICAL, ISNZ_PATTERN);
+		break;
+	case 'l':
+		IT_LOOP(int, LOGICAL, ISNZ_LOGICAL);
+		break;
+	case 'i':
+		IT_LOOP(int, INTEGER, ISNZ_INTEGER);
+		break;
+	case 'd':
+		IT_LOOP(double, REAL, ISNZ_REAL);
+		break;
+	case 'z':
+		IT_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef IT_LOOP
+
+	return 0;
+}
+
+SEXP R_dense_is_triangular(SEXP obj, SEXP upper)
+{
+	if (!IS_S4_OBJECT(obj)) {
+		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
+		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
+	}
+	PROTECT(obj);
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	if (TYPEOF(upper) != LGLSXP || LENGTH(upper) < 1)
+		error(_("'%s' must be %s or %s or %s"), "upper", "TRUE", "FALSE", "NA");
+	int upper_ = LOGICAL(upper)[0];
+
+	int ans_ = dense_is_triangular(obj, valid[ivalid], upper_);
+	SEXP ans = allocVector(LGLSXP, 1);
+	LOGICAL(ans)[0] = ans_ != 0;
+	if (upper_ == NA_LOGICAL && ans_ != 0) {
+		PROTECT(ans);
+		static
+		SEXP kindSym = NULL;
+		SEXP kindVal = PROTECT(mkString((ans_ > 0) ? "U" : "L"));
+		if (!kindSym) kindSym = install("kind");
+		setAttrib(ans, kindSym, kindVal);
+		UNPROTECT(2);
+	}
+	UNPROTECT(1);
+	return ans;
+}
+
+int dense_is_diagonal(SEXP obj, const char *class)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		return 0;
+	if (n <= 1)
+		return 1;
+
+	char ul = 'U';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = *CHAR(STRING_ELT(uplo, 0));
+	}
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j;
+
+#define ID_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x); \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < j; ++i) { \
+					if (_ISNZ_(*px)) \
+						return 0; \
+					px += 1; \
+				} \
+				px += 1; \
+				for (i = j + 1; i < n; ++i) { \
+					if (_ISNZ_(*px)) \
+						return 0; \
+					px += 1; \
+				} \
+			} \
+		} else if (class[2] != 'p') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						if (_ISNZ_(*px)) \
+							return 0; \
+						px += 1; \
+					} \
+					px += n - j; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					px += j + 1; \
+					for (i = j + 1; i < n; ++i) { \
+						if (_ISNZ_(*px)) \
+							return 0; \
+						px += 1; \
+					} \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						if (_ISNZ_(*px)) \
+							return 0; \
+						px += 1; \
+					} \
+					px += 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					px += 1; \
+					for (i = j + 1; i < n; ++i) { \
+						if (_ISNZ_(*px)) \
+							return 0; \
+						px += 1; \
+					} \
+				} \
+			} \
+		} \
+		return 1; \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+		ID_LOOP(int, LOGICAL, ISNZ_PATTERN);
+		break;
+	case 'l':
+		ID_LOOP(int, LOGICAL, ISNZ_LOGICAL);
+		break;
+	case 'i':
+		ID_LOOP(int, INTEGER, ISNZ_INTEGER);
+		break;
+	case 'd':
+		ID_LOOP(double, REAL, ISNZ_REAL);
+		break;
+	case 'z':
+		ID_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef ID_LOOP
+
+	return 0;
+}
+
+SEXP R_dense_is_diagonal(SEXP obj)
+{
+	if (!IS_S4_OBJECT(obj)) {
+		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
+		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
+	}
+	PROTECT(obj);
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	SEXP ans = ScalarLogical(dense_is_diagonal(obj, valid[ivalid]));
+	UNPROTECT(1);
+	return ans;
+}
+
+#define CAST_PATTERN(_X_) (double) (_X_ != 0)
+#define CAST_LOGICAL(_X_) (double) (_X_ != 0)
+#define CAST_INTEGER(_X_) (double)  _X_
+#define CAST_REAL(_X_)              _X_
+#define CAST_COMPLEX(_X_)           _X_
+
+#define SUM_CASES \
+do { \
+	switch (class[0]) { \
+	case 'n': \
+		SUM_LOOP(int, LOGICAL, double, REAL, \
+		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
+		         CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
+		break; \
+	case 'l': \
+		SUM_LOOP(int, LOGICAL, double, REAL, \
+		         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
+		         CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+		break; \
+	case 'i': \
+		SUM_LOOP(int, INTEGER, double, REAL, \
+		         0.0, 1.0, NA_REAL, ISNA_INTEGER, \
+		         CAST_INTEGER, INCREMENT_REAL, DIVIDE_REAL); \
+		break; \
+	case 'd': \
+		SUM_LOOP(double, REAL, double, REAL, \
+		         0.0, 1.0, NA_REAL, ISNA_REAL, \
+		         CAST_REAL, INCREMENT_REAL, DIVIDE_REAL); \
+		break; \
+	case 'z': \
+		SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, \
+		         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
+		         CAST_COMPLEX, INCREMENT_COMPLEX, DIVIDE_COMPLEX); \
+		break; \
+	default: \
+		break; \
+	} \
+} while (0)
+
+static void dense_colsum(SEXP x, const char *class,
+                         int m, int n, char ul, char di, int narm, int mean,
+                         SEXP res)
+{
+	int narm_ = narm && mean && class[0] != 'n', i, j, count;
+
+#define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_, _DIVIDE_) \
+	do { \
+		if (mean) \
+			count = m; \
+		_FOR_ { \
+			if (_ISNA_(*px0)) { \
+				if (!narm) \
+					*px1 = _NA_; \
+				else if (narm_) \
+					--count; \
+			} else { \
+				tmp = _CAST_(*px0); \
+				_INCREMENT_((*px1), tmp); \
+			} \
+			++px0; \
+		} \
+		if (mean) \
+			_DIVIDE_((*px1), count); \
+	} while (0)
+
+#undef SUM_LOOP
+#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
+		         _ZERO_, _ONE_, _NA_, _ISNA_, \
+		         _CAST_, _INCREMENT_, _DIVIDE_) \
+	do { \
+		_CTYPE0_ *px0 = _PTR0_(  x); \
+		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) { \
+				*px1 = _ZERO_; \
+				SUM_KERNEL(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
+				           _CAST_, _INCREMENT_, _DIVIDE_); \
+				px1 += 1; \
+			} \
+		} else if (class[2] != 'p') { \
+			if (ul == 'U') { \
+				if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						*px1 = _ZERO_; \
+						SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px0 += n - j - 1; \
+						px1 += 1; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						*px1 = _ONE_; \
+						SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px0 += n - j - 1; \
+						px1 += 1; \
+					} \
+				} \
+			} else { \
+				if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						px0 += j; \
+						*px1 = _ZERO_; \
+						SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px1 += 1; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						px0 += j + 1; \
+						*px1 = _ONE_; \
+						SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px1 += 1; \
+					} \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						*px1 = _ZERO_; \
+						SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px1 += 1; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						*px1 = _ONE_; \
+						SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px0 += 1; \
+						px1 += 1; \
+					} \
+				} \
+			} else { \
+				if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						*px1 = _ZERO_; \
+						SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px1 += 1; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						px1 += 1; \
+						*px1 = _ZERO_; \
+						SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+						           _CAST_, _INCREMENT_, _DIVIDE_); \
+						px1 += 1; \
+					} \
+				} \
+			} \
+		} \
+	} while (0)
+
+	SUM_CASES;
+	return;
+}
+
+static void dense_rowsum(SEXP x, const char *class,
+                         int m, int n, char ul, char di, int narm, int mean,
+                         SEXP res)
+{
+	int narm_ = narm && mean && class[0] != 'n', i, j, *count;
+	if (narm_) {
+		Matrix_Calloc(count, m, int);
+		for (i = 0; i < m; ++i)
+			count[i] = n;
+	}
+
+#define SUM_KERNEL1(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_) \
+	do { \
+		_FOR_ { \
+			if (_ISNA_(*px0)) { \
+				if (!narm) \
+					px1[i] = _NA_; \
+				else if (narm_) \
+					--count; \
+			} else { \
+				tmp = _CAST_(*px0); \
+				_INCREMENT_(px1[i], tmp); \
+			} \
+			++px0; \
+		} \
+	} while (0)
+
+#define SUM_KERNEL2(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_) \
+	do { \
+		_FOR_ { \
+			off = i != j; \
+			if (_ISNA_(*px0)) { \
+				if (!narm) { \
+					px1[i] = _NA_; \
+					if (off) \
+					px1[j] = _NA_; \
+				} else if (narm_) { \
+					--count[i]; \
+					if (off) \
+					--count[j]; \
+				} \
+			} else { \
+				tmp = _CAST_(*px0); \
+				_INCREMENT_(px1[i], tmp); \
+				if (off) \
+				_INCREMENT_(px1[j], tmp); \
+			} \
+			++px0; \
+		} \
+	} while (0)
+
+#undef SUM_LOOP
+#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
+		         _ZERO_, _ONE_, _NA_, _ISNA_, \
+		         _CAST_, _INCREMENT_, _DIVIDE_) \
+	do { \
+		_CTYPE0_ *px0 = _PTR0_(  x); \
+		_CTYPE1_ *px1 = _PTR1_(res), tmp = (di == 'N') ? _ZERO_ : _ONE_; \
+		for (i = 0; i < m; ++i) \
+			px1[i] = tmp; \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) \
+				SUM_KERNEL1(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
+				            _CAST_, _INCREMENT_); \
+		} else if (class[1] == 's') { \
+			int off; \
+			if (class[2] != 'p') { \
+				if (ul == 'U') { \
+					for (j = 0; j < n; ++j) { \
+						SUM_KERNEL2(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+						px0 += n - j - 1; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						px0 += j; \
+						SUM_KERNEL2(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+					} \
+				} \
+			} else { \
+				if (ul == 'U') { \
+					for (j = 0; j < n; ++j) \
+						SUM_KERNEL2(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+				} else { \
+					for (j = 0; j < n; ++j) \
+						SUM_KERNEL2(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+				} \
+			} \
+		} else { \
+			if (class[2] != 'p') { \
+				if (ul == 'U') { \
+					if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						SUM_KERNEL1(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+						px0 += n - j - 1; \
+					} \
+					} else { \
+					for (j = 0; j < n; ++j) { \
+						SUM_KERNEL1(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+						px0 += n - j; \
+					} \
+					} \
+				} else { \
+					if (di == 'N') { \
+					for (j = 0; j < n; ++j) { \
+						px0 += j; \
+						SUM_KERNEL1(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+					} \
+					} else { \
+					for (j = 0; j < n; ++j) { \
+						px0 += j + 1; \
+						SUM_KERNEL1(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+					} \
+					} \
+				} \
+			} else { \
+				if (ul == 'U') { \
+					if (di == 'N') { \
+					for (j = 0; j < n; ++j) \
+						SUM_KERNEL1(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+					} else { \
+					for (j = 0; j < n; ++j) { \
+						SUM_KERNEL1(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+						px0 += 1; \
+					} \
+					} \
+				} else { \
+					if (di == 'N') { \
+					for (j = 0; j < n; ++j) \
+						SUM_KERNEL1(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+					} else { \
+						for (i = j = 0; j < n; ++j, i = j) { \
+						px0 += 1; \
+						SUM_KERNEL1(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+						            _CAST_, _INCREMENT_); \
+						} \
+					} \
+				} \
+			} \
+		} \
+		if (mean) { \
+			if (narm_) \
+				for (i = 0; i < m; ++i) \
+					_DIVIDE_(px1[i], count[i]); \
+			else \
+				for (i = 0; i < m; ++i) \
+					_DIVIDE_(px1[i], n); \
+		} \
+	} while (0)
+
+	SUM_CASES;
+
+#undef SUM_CASES
+#undef SUM_LOOP
+#undef SUM_KERNEL1
+#undef SUM_KERNEL2
+
+	if (narm_)
+		Matrix_Free(count, m);
+	return;
+}
+
+SEXP dense_marginsum(SEXP obj, const char *class, int margin,
+                     int narm, int mean)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1],
+		r = (margin == 0) ? m : n;
+
+	SEXPTYPE type = (class[0] != 'z') ? REALSXP : CPLXSXP;
+	SEXP res = PROTECT(allocVector(type, r)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+
+	SEXP dimnames = (class[1] != 's')
+		? GET_SLOT(obj, Matrix_DimNamesSym)
+		: get_symmetrized_DimNames(obj, -1),
+		marnames = VECTOR_ELT(dimnames, margin);
+	if (marnames != R_NilValue) {
+		PROTECT(marnames);
+		setAttrib(res, R_NamesSymbol, marnames);
+		UNPROTECT(1); /* marnames */
+	}
+
+	char ul = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (class[1] == 't') {
+			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+			di = *CHAR(STRING_ELT(diag, 0));
+		}
+	}
+
+	if (margin == 0 || class[1] == 's')
+		dense_rowsum(x, class, m, n, ul, di, narm, mean, res);
+	else
+		dense_colsum(x, class, m, n, ul, di, narm, mean, res);
+
+	UNPROTECT(2); /* x, res */
 	return res;
+}
+
+/* (row|col)(Sums|Means)(<denseMatrix>) */
+SEXP R_dense_marginsum(SEXP obj, SEXP margin,
+                       SEXP narm, SEXP mean)
+{
+	static const char *valid[] = {
+		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	int margin_;
+	if (TYPEOF(margin) != INTSXP || LENGTH(margin) < 1 ||
+	    ((margin_ = INTEGER(margin)[0]) != 0 && margin_ != 1))
+		error(_("'%s' must be %d or %d"), "margin", 0, 1);
+
+	int narm_;
+	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
+	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
+
+	int mean_;
+	if (TYPEOF(mean) != LGLSXP || LENGTH(mean) < 1 ||
+	    (mean_ = LOGICAL(mean)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "mean", "TRUE", "FALSE");
+
+	return dense_marginsum(obj, valid[ivalid], margin_, narm_, mean_);
 }
 
 /* MJ: unused */
