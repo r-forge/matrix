@@ -33,16 +33,6 @@ sortSparseV <- function(x, decreasing = FALSE, na.last = NA) {
     ## TODO
     .NotYetImplemented()
 }
-
-##' Uniquify sparceVectors, i.e., bring them in "regularized" from,
-##' --- similar in spirit (and action!) as  uniqTsparse(.) for "TsparseMatrix"
-##' __FIXME__ better name ??  , then export and document!  __TODO__
-uniqSpVec <- function(x) {
-    ii <- sort.list(x@i, method = "radix")
-    x@i <- x@i[ii]
-    x@x <- x@x[ii]
-    x
-}
 } ## MJ
 
 ### rep(x, ...) -- rep() is primitive with internal default method with these args:
