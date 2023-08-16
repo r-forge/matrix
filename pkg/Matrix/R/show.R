@@ -50,6 +50,28 @@ prDiag <- function(x, digits = getOption("digits"),
     invisible(x)
 }
 
+emptyColnames <- function(x, msg.if.not.empty = FALSE) {
+    ## Useful for compact printing of (parts) of sparse matrices
+    ## possibly	 dimnames(x) "==" NULL :
+    if((nd <- length(d <- dim(x))) < 2L)
+        return(x)
+    nc <- d[2L]
+    if(is.null(dn <- dimnames(x)))
+        dn <- vector("list", nd)
+    else if(msg.if.not.empty &&
+            is.character(cn <- dn[[2L]]) &&
+            any(nzchar(cn)))
+        message(gettextf("  [[ suppressing %d column name%s %s ... ]]",
+                         nc,
+                         if(nc == 1L) "" else "s",
+                         paste0(sQuote(if(nc <= 3L) cn else cn[1:3]),
+                                collapse = ", ")),
+                domain = NA)
+    dn[[2L]] <- character(nc)
+    dimnames(x) <- dn
+    x
+}
+
 .formatSparseSimple <- function(m,
                                 asLogical = FALSE,
                                 digits = NULL,

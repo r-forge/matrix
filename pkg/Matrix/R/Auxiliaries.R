@@ -34,50 +34,6 @@ as0 <- function(x, mod=mode(x))
     switch(mod, "integer"= 0L, "double"=, "numeric"= 0, "logical"= FALSE,
 	   "complex"= 0+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
 
-##' equivalent to   extends(cl, classes[1]) || extends(cl, classes[2]) || ....
-extends1of <- function(class, classes, ...) {
-    if(is.character(class))
-	class <- getClassDef(class[[1L]])
-    for(c2 in classes)
-	if(extends(class, c2, ...)) return(TRUE)
-    ## otherwise return
-    FALSE
-}
-
-## Fast alternative to MatrixClass():
-## - if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
-## - if strict= TRUE then may also give one of these:
-##   "pMatrix", "dp[op]Matrix", "p?corMatrix"
-.M.nonvirtual <- function(x, strict = FALSE)
-    .Call(R_Matrix_nonvirtual, x, strict)
-
-## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
-## otherwise ""
-.M.kind  <- function(x) .Call(R_Matrix_kind, x,  TRUE) # integer -> "d"
-.V.kind  <- function(x) .Call(R_Matrix_kind, x, FALSE) # integer -> "i"
-## "[gtsd]" for Matrix, sparseVector 'x';
-## otherwise ""
-.M.shape <- function(x) .Call(R_Matrix_shape, x)
-## "[CRTdi]" for [CRT]sparseMatrix, diagonalMatrix, indMatrix 'x' {resp.};
-## otherwise ""
-.M.repr  <- function(x) .Call(R_Matrix_repr, x)
-
-## FIXME: we should use these (and maybe others not yet defined) "everywhere"
-.isMatrix   <- function(x)
-    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) == "M"
-.isVector   <- function(x)
-    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 8L, 8L) == "V"
-.isDense    <- function(x) any(.M.repr(x) == c("u", "p"))
-.isUnpacked <- function(x) .M.repr(x) == "u"
-.isPacked   <- function(x) .M.repr(x) == "p"
-.isSparse   <- function(x) any(.M.repr(x) == c("C", "R", "T", "d", "i"))
-.isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
-.isC        <- function(x) .M.repr(x) == "C"
-.isR        <- function(x) .M.repr(x) == "R"
-.isT        <- function(x) .M.repr(x) == "T"
-.isDiagonal <- function(x) .M.repr(x) == "d"
-.isInd      <- function(x) .M.repr(x) == "i"
-
 ## MJ: no longer used
 if(FALSE) {
 .bail.out.1 <- function(fun, cl) {
@@ -117,59 +73,6 @@ Matrix.msg <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     }
 }
 
-## we can set this to FALSE and possibly measure speedup:
-.copyClass.check <- TRUE
-
-## This should be done in C and be exported by 'methods':  [FIXME - ask JMC ]
-copyClass <- function(x, newCl, sNames =
-		      intersect(slotNames(newCl), slotNames(x)),
-                      check = .copyClass.check)
-{
-    r <- new(newCl)
-    ## Equivalent of
-    ##   for(n in sNames) slot(r, n, check=check) <- slot(x, n)  :
-    if(check) for(n in sNames) slot(r, n) <- slot(x, n)
-    else for(n in sNames) # don't check, be fast
-	## .Call("R_set_slot", r, n, slot(x,n), PACKAGE = "methods")
-	## "ugly", but not using .Call(*, "methods")
-	attr(r, n) <- attr(x, n)
-    r
-}
-
-##' Return the (maybe super-)class of class 'cl'   from "Matrix", returning  character(0) if there is none.
-##'
-##' @title The Matrix (Super-) Class of a Class
-##' @param cl string, class name
-##' @param cld its class definition
-##' @param ...Matrix if TRUE, the result must be of pattern "[dlniz]..Matrix"
-##'     where the first letter "[dlniz]" denotes the content kind.
-##' @param dropVirtual
-##' @param ... other arguments are passed to .selectSuperClasses()
-##' @return a character string
-##' @author Martin Maechler, Date: 24 Mar 2009
-MatrixClass <- function(cl, cld = getClassDef(cl),
-			...Matrix = TRUE, dropVirtual = TRUE, ...)
-{
-    ## stopifnot(is.character(cl))
-    ## Hmm, packageSlot(cl)  *can* be misleading --> use  cld@package  first:
-    if(is.null(pkg <- cld@package)) {
-	if(is.null(pkg <- attr(cl, "package"))) return(character())
-	## else we use 'pkg'
-    }
-    if(identical(pkg, "Matrix") &&
-       (!...Matrix || (cl != "indMatrix" && identical(1L, grep("^[dlniz]..Matrix$", cl)))))
-	cl
-    else { ## possibly recursively
-	r <- .selectSuperClasses(cld@contains, dropVirtual = dropVirtual,
-				 namesOnly = TRUE, ...)
-	if(length(r)) {
-	    while(!length(r1 <- Recall(r[1], ...Matrix = ...Matrix, dropVirtual = dropVirtual))
-		  && length(r) > 1) r <- r[-1]
-	    r1
-	} else r
-    }
-}
-
 attrSlotNames <- function(m, factors = TRUE) {
     ## slotnames of Matrix objects which are *not* directly content related
     sn <- slotNames(m)
@@ -200,19 +103,6 @@ attr.all_Mat <- function(target, current,
     if((is.null(msg) || isTRUE(msg)) & (r.ok <- isTRUE(r))) TRUE
     else c(if(!isTRUE(msg)) msg, if(!r.ok) r)
 }
-
-isPerm <- function(p, off = 1L)
-    .Call(R_isPerm, as.integer(p), as.integer(off))
-signPerm <- function(p, off = 1L)
-    .Call(R_signPerm, as.integer(p), as.integer(off))
-invertPerm <- function(p, off = 1L, ioff = 1L)
-    .Call(R_invertPerm, as.integer(p), as.integer(off), as.integer(ioff))
-asPerm <- function(pivot, off = 1L, ioff = 1L, n = length(pivot))
-    .Call(R_asPerm, as.integer(pivot), as.integer(off), as.integer(ioff),
-          as.integer(n))
-
-invPerm <- function(p, zero.p = FALSE, zero.res = FALSE)
-    invertPerm(p, if(zero.p) 0L else 1L, if(zero.res) 0L else 1L)
 
 mmultDim <- function(d.a, d.b, type = 1L) {
     ## Return the 'dim' of the product indicated by 'type':
@@ -301,28 +191,6 @@ drop0 <- function(x, tol = 0, is.Csparse = NA, give.Csparse = TRUE) {
     if(tryCoerce)
         x <- if(isS4(x)) .M2C(x) else .m2sparse.checking(x, ".", "C")
     .Call(R_sparse_drop0, x, as.double(tol))
-}
-
-emptyColnames <- function(x, msg.if.not.empty = FALSE) {
-    ## Useful for compact printing of (parts) of sparse matrices
-    ## possibly	 dimnames(x) "==" NULL :
-    if((nd <- length(d <- dim(x))) < 2L)
-        return(x)
-    nc <- d[2L]
-    if(is.null(dn <- dimnames(x)))
-        dn <- vector("list", nd)
-    else if(msg.if.not.empty &&
-            is.character(cn <- dn[[2L]]) &&
-            any(nzchar(cn)))
-        message(gettextf("  [[ suppressing %d column name%s %s ... ]]",
-                         nc,
-                         if(nc == 1L) "" else "s",
-                         paste0(sQuote(if(nc <= 3L) cn else cn[1:3]),
-                                collapse = ", ")),
-                domain = NA)
-    dn[[2L]] <- character(nc)
-    dimnames(x) <- dn
-    x
 }
 
 indDiag <- function(n, upper = TRUE, packed = FALSE)
@@ -469,30 +337,6 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
     }
     .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [dn][gt]CMatrix 'x'
 }
-
-class2 <- function(cl, kind = "l", do.sub = TRUE) {
-    ## Find "corresponding" class; since pos.def. matrices have no pendant:
-    cl <- MatrixClass(cl)
-    if(cl %in% c("dpoMatrix", "corMatrix"))
-	paste0(kind, "syMatrix")
-    else if(cl == "dppMatrix")
-	paste0(kind, "spMatrix")
-    else if(do.sub) sub("^[a-z]", kind, cl)
-    else cl
-}
-
-## typically used as .type.kind[.M.kind(x)]:
-.type.kind <- c("n" = "logical",
-                "l" = "logical",
-                "i" = "integer",
-                "d" = "double",
-                "z" = "complex")
-
-## the reverse, a "version of" .M.kind(.):
-.kind.type <- c("logical" = "l",
-                "integer" = "i",
-                "double" = "d",
-                "complex" = "z")
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
