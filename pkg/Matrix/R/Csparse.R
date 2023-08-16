@@ -1,1 +1,1 @@
-## in .Rbuildignore since r4244, empty since r4244
+## in .Rbuildignore since r4245, empty since r4245
