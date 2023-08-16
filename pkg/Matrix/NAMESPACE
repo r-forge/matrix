@@ -151,8 +151,6 @@ S3method(as.array, Matrix)
 S3method(as.array, sparseVector)
 S3method(as.matrix, Matrix)
 S3method(as.matrix, sparseVector)
-S3method(as.vector, Matrix)
-S3method(as.vector, sparseVector)
 
 ## Because S4 dispatch is "hard" for c():
 S3method(c, abIndex)
@@ -198,6 +196,7 @@ exportMethods("!",
               any,
               all.equal,
               as.array,
+              as.complex,
               as.integer,
               as.logical,
               as.matrix,
