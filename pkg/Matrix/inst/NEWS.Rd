@@ -4,10 +4,19 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-16 r4248)}{
+\section{Changes in version 1.6-2 (2023-08-17 r4266)}{
   \subsection{New Features}{
     \itemize{
-      \item .
+      \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
+      Non-structural zeros are sorted as \dQuote{greater than} structural
+      zeros.
+	  
+      \item \code{mean(<sparseVector>, trim=)} now works efficiently
+      for nonzero values of \code{trim}, thanks in part to the above
+      mentioned \code{sort} method.
+
+      \item \code{rep(<sparseVector>, each=)} now works efficiently,
+	  avoiding \code{rep(., times = rep(each, times = length(.)))}.
     }
   }
   \subsection{Bug Fixes}{
@@ -20,6 +29,9 @@
 	  \item \code{round(<dp[op]Matrix>)} and \code{signif(<dp[op]Matrix>)}
 	  now return \code{ds[yp]Matrix} rather than \code{dp[op]Matrix} and
 	  now discard \code{factors}.
+
+      \item Methods for \code{length} now return \code{integer} rather
+      than \code{double} if the result does not exceed \code{INT_MAX}.
     }
   }
   \subsection{Misc}{
