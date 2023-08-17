@@ -10,13 +10,13 @@
       \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
       Non-structural zeros are sorted as \dQuote{greater than} structural
       zeros.
-	  
+
       \item \code{mean(<sparseVector>, trim=)} now works efficiently
       for nonzero values of \code{trim}, thanks in part to the above
       mentioned \code{sort} method.
 
       \item \code{rep(<sparseVector>, each=)} now works efficiently,
-	  avoiding \code{rep(., times = rep(each, times = length(.)))}.
+      avoiding \code{rep(., times = rep(each, times = length(.)))}.
     }
   }
   \subsection{Bug Fixes}{
@@ -24,11 +24,11 @@
       \item Methods for \code{cbind2} and \code{rbind2} did not in all
       cases handle vectors as 1-column and 1-row matrices, respectively.
 
-	  \item \code{rcond(<0-by-0>)} now returns \code{Inf}; see \PR{18543}.
+     \item \code{rcond(<0-by-0>)} now returns \code{Inf}; see \PR{18543}.
 
-	  \item \code{round(<dp[op]Matrix>)} and \code{signif(<dp[op]Matrix>)}
-	  now return \code{ds[yp]Matrix} rather than \code{dp[op]Matrix} and
-	  now discard \code{factors}.
+      \item \code{round(<dp[op]Matrix>)} and \code{signif(<dp[op]Matrix>)}
+      now return \code{ds[yp]Matrix} rather than \code{dp[op]Matrix} and
+      now discard \code{factors}.
 
       \item Methods for \code{length} now return \code{integer} rather
       than \code{double} if the result does not exceed \code{INT_MAX}.
