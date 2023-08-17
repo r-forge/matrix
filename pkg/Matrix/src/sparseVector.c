@@ -80,6 +80,14 @@ SEXP CR2spV(SEXP from)
 		ERROR_INVALID_CLASS(from, __func__);
 	const char *cl = valid[ivalid];
 
+	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n;
+	UNPROTECT(1); /* dim */
+
+	if (mn > 0x1.0p+53)
+		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+
 	/* defined in ./coerce.c : */
 	SEXP sparse_as_general(SEXP, const char *);
 	PROTECT(from = sparse_as_general(from, cl));
@@ -87,11 +95,6 @@ SEXP CR2spV(SEXP from)
 	char vcl[] = ".sparseVector";
 	vcl[0] = cl[0];
 	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(vcl));
-
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n;
-	UNPROTECT(1); /* dim */
 
 	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym));
 	int *pp = INTEGER(p), nnz = (cl[2] == 'C') ? pp[n] : pp[m];

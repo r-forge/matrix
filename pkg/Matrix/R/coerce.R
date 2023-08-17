@@ -227,67 +227,58 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 
 ## FIXME: define R_Matrix_as_sparseVector in ../src/coerce.c and use here
 .M2V <- function(from) {
-    switch(.M.repr(from),
-           "u" = , "p" = .Call( v2spV, .M2v(from)),
-           "C" = , "R" = .Call(CR2spV,      from ),
-           "T" =         .Call(CR2spV, .M2C(from)),
-           "d" =
-               {
-                   n <- (d <- from@Dim)[1L]
-                   nn <- prod(d)
-                   kind <- .M.kind(from)
-                   to <- new(paste0(kind, "sparseVector"))
-                   to@length <-
-                       if(nn <= .Machine$integer.max)
-                           as.integer(nn)
-                       else nn
-                   to@i <- indDiag(n)
-                   if(kind != "n") {
-                       to@x <-
-                           if(from@diag == "N")
-                               from@x
-                           else
-                               rep.int(switch(kind, "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i), n)
-                   }
-                   to
-               },
-           "i" =
-               {
-                   d <- from@Dim
-                   m <- d[1L]
-                   n <- d[2L]
-                   mn <- prod(d)
-                   perm <- from@perm
-                   to <- new("nsparseVector")
-                   if(mn <= .Machine$integer.max) {
-                       to@length <- as.integer(mn)
-                       to@i <-
-                       if(from@margin == 1L)
-                       seq.int(to =   0L, by = 1L, length.out = m) +
-                           perm * m
-                       else
-                       seq.int(from = 0L, by =  m, length.out = n) +
-                           perm
-                   } else {
-                       to@length <- mn
-                       to@i <-
-                       if(from@margin == 1L)
-                       seq.int(  to = 0, by =            1, length.out = m) +
-                           perm * as.double(m)
-                       else
-                       seq.int(from = 0, by = as.double(m), length.out = n) +
-                           as.double(perm)
-                   }
-                   to
-               },
-           if(is.object(from))
-               stop(gettextf("invalid class \"%s\" in %s()",
-                             class(from)[1L], ".M2V"),
-                    domain = NA)
-           else
-               stop(gettextf("invalid type \"%s\" in %s()",
-                             typeof(from), ".M2V"),
-                    domain = NA))
+    repr <- .M.repr(from)
+    if(repr == "u" || repr == "p")
+        return(.Call( v2spV, .M2v(from)))
+    if(repr == "C" || repr == "R")
+        return(.Call(CR2spV,      from ))
+    if(repr == "T")
+        return(.Call(CR2spV, .M2C(from)))
+    if(repr != "d" && repr != "i") {
+        if(is.object(from))
+            stop(gettextf("invalid class \"%s\" in %s()",
+                          class(from)[1L], ".M2V"),
+                 domain = NA)
+        else
+            stop(gettextf("invalid type \"%s\" in %s()",
+                          typeof(from), ".M2V"),
+                 domain = NA)
+    }
+    d <- from@Dim
+    m <- d[1L]
+    n <- d[2L]
+    mn <- prod(d)
+    if(mn <= .Machine$integer.max)
+        mn <- as.integer(mn)
+    else if(mn > 0x1p+53)
+        stop("sparseVector length cannot exceed 2^53")
+    kind <- .M.kind(from)
+    to <- new(paste0(kind, "sparseVector"))
+    to@length <- mn
+    to@i <-
+        if(repr == "d")
+            to@i <- indDiag(n)
+        else if(is.integer(mn)) {
+            if(from@margin == 1L)
+                seq.int(to =   0L, by = 1L, length.out = m) +
+                    from@perm * m
+            else
+                seq.int(from = 0L, by =  m, length.out = n) +
+                    from@perm
+        } else {
+            if(from@margin == 1L)
+                seq.int(  to = 0, by =            1, length.out = m) +
+                    from@perm * as.double(m)
+            else
+                seq.int(from = 0, by = as.double(m), length.out = n) +
+                    as.double(from@perm)
+        }
+    if(kind != "n")
+        to@x <-
+            if(from@diag == "N")
+                from@x
+            else rep.int(switch(kind, "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i), n)
+    to
 }
 
 .m2V <- function(from, kind = ".") {

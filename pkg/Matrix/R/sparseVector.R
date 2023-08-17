@@ -56,83 +56,100 @@ setMethod("mean", signature(x = "sparseVector"),
           })
 
 .V.rep.each <- function(x, each) {
+    each <- as.double(each)
     if(length(each) != 1L) {
         warning("first element used of 'each' argument")
         each <- each[1L]
     }
-    each <- trunc(as.double(each))
-    if(!is.finite(each) || each < 0)
+    if(!is.finite(each) || each <= -1)
         stop("invalid 'each' argument")
-    if(each == 0)
+    if(each < 1)
         return(x[0L])
-    if(each == 1)
+    if(each < 2)
         return(x)
     n <- length(x)
-    if(n * each <= .Machine$integer.max) {
-        each <- as.integer(each)
-        x@length <- n * each
-        x@i <- rep(each * (as.integer(x@i) - 1L), each = each) + seq_len(each)
+    each <- trunc(each)
+    if(n * each > 0x1p+53)
+        stop("sparseVector length cannot exceed 2^53")
+    else if(n * each > .Machine$integer.max) {
+        a <- as.double
+        one <- 1
     } else {
-        x@length <- n * each
-        x@i <- rep(each * (as.double (x@i) - 1 ), each = each) + seq_len(each)
+        each <- as.integer(each)
+        a <- as.integer
+        one <- 1L
     }
+    x@length <- n * each
+    x@i <- rep(each * (a(x@i) - one), each = each) + seq_len(each)
     if(.hasSlot(x, "x"))
         x@x <- rep(x@x, each = each)
     x
 }
 
 .V.rep.int  <- function(x, times) {
+    times <- as.double(times)
     if(length(times) != 1L) {
         ## FIXME: support length(times) == length(x)
         warning("first element used of 'times' argument")
         times <- times[1L]
     }
-    times <- trunc(as.double(times))
-    if(!is.finite(times) || times < 0)
+    if(!is.finite(times) || times <= -1)
         stop("invalid 'times' argument")
-    if(times == 0)
+    if(times < 1)
         return(x[0L])
-    if(times == 1)
+    if(times < 2)
         return(x)
     n <- length(x)
-    if(n * times <= .Machine$integer.max) {
-        times <- as.integer(times)
-        x@length <- n * times
-        x@i <- rep(seq.int(from = 0L, by = n, length.out = times),
-                   each = length(x@i)) + as.integer(x@i)
+    times <- trunc(times)
+    if(n * times > 0x1p+53)
+        stop("sparseVector length cannot exceed 2^53")
+    else if(n * times > .Machine$integer.max) {
+        a <- as.double
+        zero <- 0
     } else {
-        x@length <- n * times
-        x@i <- rep(seq.int(from = 0 , by = n, length.out = times),
-                   each = length(x@i)) + as.double (x@i)
+        times <- as.integer(times)
+        a <- as.integer
+        zero <- 0L
     }
+    x@length <- n * times
+    x@i <- rep(a(seq.int(from = zero, by = n, length.out = times)),
+               each = length(x@i)) + x@i
     if(.hasSlot(x, "x"))
         x@x <- rep.int(x@x, times)
     x
 }
 
 .V.rep.len  <- function(x, length.out) {
+    length.out <- as.double(length.out)
     if(length(length.out) != 1L) {
         warning("first element used of 'length.out' argument")
         length.out <- length.out[1L]
     }
-    length.out <- trunc(as.double(length.out))
-    if(!is.finite(length.out) || length.out < 0)
+    if(!is.finite(length.out) || length.out <= -1)
         stop("invalid 'length.out' argument")
+    if(length.out > 0x1p+53)
+        stop("sparseVector length cannot exceed 2^53")
     n <- length(x)
-    if(length.out > n) {
-        if(n == 0L) {
-            if(length.out <= .Machine$integer.max)
-                length.out <- as.integer(length.out)
-            x@length <- length.out
-            x@i <- seq_len(length.out)
-            if(.hasSlot(x, "x"))
-                x@x <- rep.int(x@x[NA_integer_], length.out)
-            return(x)
-        }
+    length.out <-
+        if(length.out - 1 < .Machine$integer.max)
+            as.integer(length.out)
+        else trunc(length.out)
+    if(length.out > n && n > 0L) {
         x <- .V.rep.int(x, ceiling(length.out / n))
         n <- length(x)
     }
-    if(length.out == n) x else x[seq_len(length.out)]
+    x@length <- length.out
+    if(length.out < n) {
+        head <- x@i <= length.out
+        x@i <- x@i[head]
+        if(.hasSlot(x, "x"))
+            x@x <- x@x[head]
+    } else if(length.out > n && n == 0L) {
+        x@i <- seq_len(length.out)
+        if(.hasSlot(x, "x"))
+            x@x <- rep.int(x@x[NA_integer_], length.out)
+    }
+    x
 }
 
 setMethod("rep", signature(x = "sparseVector"),
