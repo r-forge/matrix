@@ -56,7 +56,11 @@ setMethod("mean", signature(x = "sparseVector"),
           })
 
 .V.rep.each <- function(x, each) {
-    each <- trunc(as.double(each)[1L])
+    if(length(each) != 1L) {
+        warning("first element used of 'each' argument")
+        each <- each[1L]
+    }
+    each <- trunc(as.double(each))
     if(!is.finite(each) || each < 0)
         stop("invalid 'each' argument")
     if(each == 0)
@@ -78,7 +82,12 @@ setMethod("mean", signature(x = "sparseVector"),
 }
 
 .V.rep.int  <- function(x, times) {
-    times <- trunc(as.double(times)[1L])
+    if(length(times) != 1L) {
+        ## FIXME: support length(times) == length(x)
+        warning("first element used of 'times' argument")
+        times <- times[1L]
+    }
+    times <- trunc(as.double(times))
     if(!is.finite(times) || times < 0)
         stop("invalid 'times' argument")
     if(times == 0)
@@ -102,7 +111,11 @@ setMethod("mean", signature(x = "sparseVector"),
 }
 
 .V.rep.len  <- function(x, length.out) {
-    length.out <- trunc(as.double(length.out)[1L])
+    if(length(length.out) != 1L) {
+        warning("first element used of 'length.out' argument")
+        length.out <- length.out[1L]
+    }
+    length.out <- trunc(as.double(length.out))
     if(!is.finite(length.out) || length.out < 0)
         stop("invalid 'length.out' argument")
     n <- length(x)
