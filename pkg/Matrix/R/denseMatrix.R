@@ -95,18 +95,10 @@ setMethod("diff", signature(x = "denseMatrix"),
           })
 
 setMethod("mean", signature(x = "denseMatrix"),
-          function(x, trim = 0, na.rm = FALSE, ...) {
-              if(is.numeric(trim) && length(trim) == 1L && !is.na(trim) &&
-                 trim == 0) {
-                  ## Be fast in this special case :
-                  if(isTRUE(na.rm))
-                      x <- x[!is.na(x)]
-                  sum(x) / length(x)
-              } else mean.default(.M2v(x), trim = trim, na.rm = na.rm, ...)
-          })
+          function(x, ...) mean.default(.M2v(x), ...))
 
 setMethod("rep", signature(x = "denseMatrix"),
-          function(x, ...) rep(.M2v(x), ...))
+          function(x, ...)          rep(.M2v(x), ...))
 
 setMethod("band"  , signature(x = "denseMatrix"), .dense.band)
 
