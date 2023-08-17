@@ -71,9 +71,11 @@
 \alias{tail,sparseVector-method}
 \alias{toeplitz,sparseVector-method}
 % nsparse
+\alias{!,nsparseVector-method}
 \alias{Summary,nsparseVector-method}
 \alias{which,nsparseVector-method}
 % lsparse
+\alias{!,lsparseVector-method}
 \alias{Logic,lsparseVector,lsparseVector-method}
 \alias{which,lsparseVector-method}
 % isparse

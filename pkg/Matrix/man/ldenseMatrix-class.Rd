@@ -7,7 +7,7 @@
 %
 \alias{ldenseMatrix-class}
 %
-\alias{!,ndenseMatrix-method}
+\alias{!,ldenseMatrix-method}
 \alias{&,ldenseMatrix,ddiMatrix-method}
 \alias{&,ldenseMatrix,ldiMatrix-method}
 \alias{*,ldenseMatrix,ddiMatrix-method}
