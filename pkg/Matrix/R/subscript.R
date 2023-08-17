@@ -545,7 +545,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                                  if(max(0, i, na.rm = TRUE) >= mn + 1)
                                      i[i >= mn + 1] <- NA
                                  if((a <- anyNA(i)) && pattern) {
-                                     x <- as(x, "lsparseVector")
+                                     x <- .V2kind(x, "l")
                                      pattern <- FALSE
                                  }
                                  j <- match(trunc(i), x@i, 0L)
@@ -590,7 +590,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                                  if(max(0L, i, na.rm = TRUE) > mn)
                                      i[i > mn] <- NA
                                  if((a <- anyNA(i)) && pattern) {
-                                     x <- as(x, "lsparseVector")
+                                     x <- .V2kind(x, "l")
                                      pattern <- FALSE
                                  }
                                  j <- match(i, x@i, 0L)
@@ -613,7 +613,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                              if(length(i) && !is.na(a <- all(i)) && a) {
                                  if((len <- length(i)) > mn) {
                                      if(pattern)
-                                         x <- as(x, "lsparseVector")
+                                         x <- .V2kind(x, "l")
                                      x@length <- len
                                      x@i <- c(x@i, (mn + 1):len)
                                      x@x <- c(x@x, rep.int(NA, len - mn))

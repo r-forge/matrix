@@ -130,6 +130,20 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
         .m2sparse(from, paste0(kind, "g", repr), NULL, NULL)
 }
 
+.V2kind <- function(from, kind = ".") {
+    if(kind == "." || (kind. <- .V.kind(from)) == kind)
+        return(from)
+    to <- new(paste0(kind, "sparseVector"))
+    to@length <- from@length
+    to@i <- from@i
+    if(kind != "n")
+        to@x <-
+            if(kind. == "n")
+                rep.int(switch(kind, "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i), length(from@i))
+            else as.vector(from@x, typeof(to@x))
+    to
+}
+
 .V2v <- function(from) {
     if(.V.kind(from) != "n") {
         to <- vector(typeof(from@x), from@length)
@@ -256,9 +270,12 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to <- new(paste0(kind, "sparseVector"))
     to@length <- mn
     to@i <-
-        if(repr == "d")
-            to@i <- indDiag(n)
-        else if(is.integer(mn)) {
+        if(repr == "d") {
+            if(kind == "n" && from@diag == "N")
+                indDiag(n)[from@x | is.na(from@x)]
+            else
+                indDiag(n)
+        } else if(is.integer(mn)) {
             if(from@margin == 1L)
                 seq.int(to =   0L, by = 1L, length.out = m) +
                     from@perm * m
@@ -485,52 +502,15 @@ setAs("vector", "dsparseMatrix",
       function(from) .m2sparse(from, "dgC"))
 
 setAs("sparseVector", "nsparseVector",
-      function(from) {
-          to <- new("nsparseVector")
-          to@length <- from@length
-          to@i <- from@i
-          to
-      })
+      function(from) .V2kind(from, "n"))
 setAs("sparseVector", "lsparseVector",
-      function(from) {
-          to <- new("lsparseVector")
-          to@length <- from@length
-          to@i <- from@i
-          to@x <- if(.V.kind(from) == "n")
-                      rep.int(TRUE, length(from@i))
-                  else as.logical(from@x)
-          to
-      })
+      function(from) .V2kind(from, "l"))
 setAs("sparseVector", "isparseVector",
-      function(from) {
-          to <- new("isparseVector")
-          to@length <- from@length
-          to@i <- from@i
-          to@x <- if(.V.kind(from) == "n")
-                      rep.int(1L, length(from@i))
-                  else as.integer(from@x)
-          to
-      })
+      function(from) .V2kind(from, "i"))
 setAs("sparseVector", "dsparseVector",
-      function(from) {
-          to <- new("dsparseVector")
-          to@length <- from@length
-          to@i <- from@i
-          to@x <- if(.V.kind(from) == "n")
-                      rep.int(1, length(from@i))
-                  else as.double(from@x)
-          to
-      })
+      function(from) .V2kind(from, "d"))
 setAs("sparseVector", "zsparseVector",
-      function(from) {
-          to <- new("zsparseVector")
-          to@length <- from@length
-          to@i <- from@i
-          to@x <- if(.V.kind(from) == "n")
-                      rep.int(1+0i, length(from@i))
-                  else as.complex(from@x)
-          to
-      })
+      function(from) .V2kind(from, "z"))
 
 setAs("vector", "nsparseVector",
       function(from) .m2V(from, "n"))
