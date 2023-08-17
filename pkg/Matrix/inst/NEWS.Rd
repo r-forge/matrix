@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-17 r4266)}{
+\section{Changes in version 1.6-2 (2023-08-18 r4269)}{
   \subsection{New Features}{
     \itemize{
       \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
@@ -32,6 +32,10 @@
 
       \item Methods for \code{length} now return \code{integer} rather
       than \code{double} if the result does not exceed \code{INT_MAX}.
+
+      \item Methods for subscripting \code{sparseVector} did not behave
+      compatibly with \pkg{base} when supplied with fractional, \code{NA},
+      or out-of-bounds subscripts.
     }
   }
   \subsection{Misc}{

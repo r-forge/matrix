@@ -8,8 +8,8 @@
 }
 
 .subscript.recycle <- function(i, mn, pattern) {
-    ## Return integer vector corresponding to [nl]sparseVector 'i'
-    ## recycled to length 'mn' :
+    ## Return integer or double vector corresponding
+    ## to [nl]sparseVector 'i' recycled to length 'mn' :
     if(length(i.i <- i@i) == 0L)
         integer(0L)
     else if((i.length <- i@length) >= mn) {
@@ -33,8 +33,7 @@
                                 by = as.integer(i.length),
                                 length.out = r),
                         each = length(i.i))
-            else if(i.i[length(i.i)] + (r - 1) * i.length <=
-                    0x1p+53)
+            else if(i.i[length(i.i)] + (r - 1) * i.length <= 0x1p+53)
                 rep.int(as.double(i.i), r) +
                     rep(seq.int(from = 0,
                                 by = as.double(i.length),
@@ -88,10 +87,9 @@
                {
                    if(length(i) && !is.na(a <- all(i)) && a) {
                        if((len <- length(i)) <= mn)
-                           return(as.vector(x))
-                       else return(c(as.vector(x), rep.int(NA, len - mn)))
-                   }
-                   .subscript.1ary(x, as(i, "sparseVector")) # recursively
+                           as.vector(x)
+                       else c(as.vector(x), rep.int(NA, len - mn))
+                   } else .subscript.1ary(x, .m2V(i)) # recursively
                },
            character =
                {
@@ -168,8 +166,8 @@
                     return(x)
                 else return(c(x, rep.int(NA, len - mn)))
             }
-            v <- if(.isDense(i)) "vector" else "sparseVector"
-            return(.subscript.1ary(x, as(i, v)))
+            i <- if(.isDense(i)) .M2v(i) else .M2V(i)
+            return(.subscript.1ary(x, i))
         }
         i <- as(i, "matrix")
     } else if(is.logical(i) || length(di <- dim(i)) != 2L || di[2L] != 2L)
@@ -512,79 +510,119 @@ setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
               callGeneric()
           })
 
-if(FALSE) {
-## MJ: unfinished
 setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              mn <- x@length
+              mn <- length(x)
+              pattern <- .V.kind(x) == "n"
               switch(typeof(i),
-                     double = {
-                         . # TODO
-                     },
-                     integer = {
-                         . # TODO
-                     },
-                     logical = {
-                         if(length(i) && !is.na(a <- all(i)) && a) {
-                             if((len <- length(i)) <= mn)
-                                 return(x)
-                             else return(c(x, rep.int(NA, len - mn)))
-                         }
-                         x[.subscript.recycle(as(i, "sparseVector"), mn, FALSE)] # recursively
-                     },
+                     double =
+                         {
+                             r <- min(1, i, na.rm = TRUE)
+                             if(r <= -1) {
+                                 if(r <= -mn - 1)
+                                     i <- i[i > -mn - 1]
+                                 r <- max(-1, i)
+                                 if(is.na(r) || r >= 1)
+                                     stop("only zeros may be mixed with negative subscripts")
+                                 if(r > -1)
+                                     i <- i[i <= -1]
+                                 d <- unique.default(sort.int(-trunc(i)))
+                                 k <- match(x@i, d, 0L) == 0L
+                                 x@length <- x@length - length(d)
+                                 x@i <-
+                                     {
+                                         tmp <- x@i[k]
+                                         tmp - findInterval(tmp, d) # !!
+                                     }
+                                 if(!pattern)
+                                     x@x <- x@x[k]
+                             } else {
+                                 if(r < 1)
+                                     i <- i[i >= 1]
+                                 if(max(0, i, na.rm = TRUE) >= mn + 1)
+                                     i[i >= mn + 1] <- NA
+                                 if((a <- anyNA(i)) && pattern) {
+                                     x <- as(x, "lsparseVector")
+                                     pattern <- FALSE
+                                 }
+                                 j <- match(trunc(i), x@i, 0L)
+                                 x@length <- length(i)
+                                 x@i <-
+                                     if(!a)
+                                         which(j != 0L)
+                                     else {
+                                         i. <- is.na(i)
+                                         j[i.] <- NA
+                                         which(j != 0L | i.)
+                                     }
+                                 if(!pattern)
+                                     x@x <- x@x[j]
+                             }
+                             x
+                         },
+                     integer =
+                         {
+                             r <- min(1L, i, na.rm = TRUE)
+                             if(r <= -1L) {
+                                 if(r < -mn)
+                                     i <- i[i >= -mn]
+                                 r <- max(-1L, i)
+                                 if(is.na(r) || r >= 1L)
+                                     stop("only zeros may be mixed with negative subscripts")
+                                 if(r > -1L)
+                                     i <- i[i <= -1L]
+                                 d <- unique.default(sort.int(-i))
+                                 k <- is.na(match(x@i, d))
+                                 x@length <- x@length - length(d)
+                                 x@i <-
+                                     {
+                                         tmp <- x@i[k]
+                                         tmp - findInterval(tmp, d) # !!
+                                     }
+                                 if(!pattern)
+                                     x@x <- x@x[k]
+                             } else {
+                                 if(r < 1L)
+                                     i <- i[i >= 1L]
+                                 if(max(0L, i, na.rm = TRUE) > mn)
+                                     i[i > mn] <- NA
+                                 if((a <- anyNA(i)) && pattern) {
+                                     x <- as(x, "lsparseVector")
+                                     pattern <- FALSE
+                                 }
+                                 j <- match(i, x@i, 0L)
+                                 x@length <- length(i)
+                                 x@i <-
+                                     if(!a)
+                                         which(j != 0L)
+                                     else {
+                                         i. <- is.na(i)
+                                         j[i.] <- NA
+                                         which(j != 0L | i.)
+                                     }
+                                 if(!pattern)
+                                     x@x <- x@x[j]
+                             }
+                             x
+                         },
+                     logical =
+                         {
+                             if(length(i) && !is.na(a <- all(i)) && a) {
+                                 if((len <- length(i)) > mn) {
+                                     if(pattern)
+                                         x <- as(x, "lsparseVector")
+                                     x@length <- len
+                                     x@i <- c(x@i, (mn + 1):len)
+                                     x@x <- c(x@x, rep.int(NA, len - mn))
+                                 }
+                                 x
+                             } else x[.m2V(i)] # recursively
+                         },
                      stop(.subscript.error.ist(i), domain = NA))
           })
-} else {
-setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
-                         drop = "missing"),
-          function (x, i, j, ..., drop) {
-              has.x <- .hasSlot(x, "x") ## has "x" slot
-              n <- x@length
-              if(extends(cl.i <- getClass(class(i)), "numeric") && any(i < 0)) {
-                  if(any(i > 0))
-                      stop("you cannot mix negative and positive indices")
-                  if(any(z <- i == 0))
-                      i <- i[!z]
-                  ## all (i < 0), negative indices:
-                  ## want to remain sparse --> *not* using intIv()
-                  ##
-                  ## TODO: more efficient solution would use C ..
-                  i <- unique(sort(-i)) # so we need to drop the 'i's
-                  nom <- is.na(m <- match(x@i, i))
-                  ## eliminate those non-0 which do match:
-                  x@i <- x@i[nom]
-                  if(has.x)
-                      x@x <- x@x[nom]
-                  ## now all x@i "appear in 'i' but must be adjusted
-                  ## for the removals:
-                  x@i <- x@i - findInterval(x@i, i)
-                  x@length <- n - length(i)
-              } else { ## i >= 0  or  non-numeric  'i'
-                  ii <- intIv(i, n, cl.i=cl.i)
-                  m <- match(x@i, ii, nomatch = 0)
-                  sel <- m > 0L
-                  x@length <- length(ii)
-                  x@i <- m[sel]
-                  if(any(iDup <- duplicated(ii))) {
-                      i.i <- match(ii[iDup], ii)
-                      jm <- lapply(i.i, function(.) which(. == m))
-                      if (has.x)
-                          sel <- c(which(sel), unlist(jm))
-                      x@i <- c(x@i, rep.int(which(iDup), lengths(jm)))
-                  }
-                  if(doSort <- is.unsorted(x@i)) {
-                      io <- order(x@i, method="radix")
-                      x@i <- x@i[io]
-                  }
-                  if (has.x)
-                      x@x <- if(doSort) x@x[sel][io] else x@x[sel]
-              }
-              x
-          })
-}
 
 setMethod("[", signature(x = "sparseVector", i = "sparseVector", j = "missing",
                          drop = "missing"),
@@ -614,21 +652,22 @@ setMethod("head", signature(x = "Matrix"),
 setMethod("head", signature(x = "sparseVector"),
           function(x, n = 6L, ...) {
               stopifnot(is.numeric(n), length(n) == 1L, !is.na(n))
-              len <- x@length
+              len <- length(x)
               n <- if(n < 0L) max(len + n, 0L) else min(n, len)
               if(n >= len)
                   return(x)
               nnz <- length(i <- x@i)
               x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
               if(nnz > 0L && i[nnz] > n) {
+                  pattern <- .V.kind(x) == "n"
                   if(i[1L] > n) {
                       x@i <- integer(0L)
-                      if(.hasSlot(x, "x"))
-                          x@x <- vector(typeof(x@x), 0L)
+                      if(!pattern)
+                          x@x <- x@x[0L]
                   } else {
                       ii <- 1L:(which.max(i > n) - 1L)
                       x@i <- i[ii]
-                      if(.hasSlot(x, "x"))
+                      if(!pattern)
                           x@x <- x@x[ii]
                   }
               }
@@ -645,21 +684,22 @@ setMethod("tail", signature(x = "Matrix"),
 setMethod("tail", signature(x = "sparseVector"),
           function(x, n = 6L, ...) {
               stopifnot(is.numeric(n), length(n) == 1L, !is.na(n))
-              len <- x@length
+              len <- length(x)
               n <- if(n < 0L) max(len + n, 0L) else min(n, len)
               if(n >= len)
                   return(x)
               nnz <- length(i <- x@i)
               x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
               if(nnz > 0L && i[1L] <= (k <- len - n)) {
+                  pattern <- .V.kind(x) == "n"
                   if(i[nnz] <= k) {
                       x@i <- integer(0L)
-                      if(.hasSlot(x, "x"))
-                          x@x <- vector(typeof(x@x), 0L)
+                      if(!pattern)
+                          x@x <- x@x[0L]
                   } else {
                       ii <- which.min(i <= k):nnz
                       x@i <- i[ii] - k
-                      if(.hasSlot(x, "x"))
+                      if(!pattern)
                           x@x <- x@x[ii]
                   }
               }

@@ -131,7 +131,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 }
 
 .V2v <- function(from) {
-    if(.hasSlot(from, "x")) {
+    if(.V.kind(from) != "n") {
         to <- vector(typeof(from@x), from@length)
         to[from@i] <- from@x
     } else {
@@ -496,9 +496,9 @@ setAs("sparseVector", "lsparseVector",
           to <- new("lsparseVector")
           to@length <- from@length
           to@i <- from@i
-          to@x <- if(.hasSlot(from, "x"))
-                      as.logical(from@x)
-                  else rep.int(TRUE, length(from@i))
+          to@x <- if(.V.kind(from) == "n")
+                      rep.int(TRUE, length(from@i))
+                  else as.logical(from@x)
           to
       })
 setAs("sparseVector", "isparseVector",
@@ -506,9 +506,9 @@ setAs("sparseVector", "isparseVector",
           to <- new("isparseVector")
           to@length <- from@length
           to@i <- from@i
-          to@x <- if(.hasSlot(from, "x"))
-                      as.integer(from@x)
-                  else rep.int(1L, length(from@i))
+          to@x <- if(.V.kind(from) == "n")
+                      rep.int(1L, length(from@i))
+                  else as.integer(from@x)
           to
       })
 setAs("sparseVector", "dsparseVector",
@@ -516,9 +516,9 @@ setAs("sparseVector", "dsparseVector",
           to <- new("dsparseVector")
           to@length <- from@length
           to@i <- from@i
-          to@x <- if(.hasSlot(from, "x"))
-                      as.double(from@x)
-                  else rep.int(1, length(from@i))
+          to@x <- if(.V.kind(from) == "n")
+                      rep.int(1, length(from@i))
+                  else as.double(from@x)
           to
       })
 setAs("sparseVector", "zsparseVector",
@@ -526,9 +526,9 @@ setAs("sparseVector", "zsparseVector",
           to <- new("zsparseVector")
           to@length <- from@length
           to@i <- from@i
-          to@x <- if(.hasSlot(from, "x"))
-                      as.complex(from@x)
-                  else rep.int(1+0i, length(from@i))
+          to@x <- if(.V.kind(from) == "n")
+                      rep.int(1+0i, length(from@i))
+                  else as.complex(from@x)
           to
       })
 
