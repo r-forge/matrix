@@ -57,6 +57,7 @@
 \alias{coerce,vector,nsparseVector-method}
 \alias{coerce,vector,sparseVector-method}
 \alias{coerce,vector,zsparseVector-method}
+\alias{diff,sparseVector-method}
 \alias{dim<-,sparseVector-method}
 \alias{head,sparseVector-method}
 \alias{initialize,sparseVector-method}
@@ -65,6 +66,7 @@
 \alias{mean,sparseVector-method}
 \alias{rep,sparseVector-method}
 \alias{show,sparseVector-method}
+\alias{sort,sparseVector-method}
 \alias{t,sparseVector-method}
 \alias{tail,sparseVector-method}
 \alias{toeplitz,sparseVector-method}

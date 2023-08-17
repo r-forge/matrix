@@ -148,7 +148,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
         stop("use Diagonal() to construct diagonal (symmetric && triangular) sparse matrices")
     index1 <- as.logical(index1) # allowing {0,1}
 
-    repr <-
+    repr <- # keep in sync with toeplitz(<sparseVector>)
         ## NB: prior to 2020-05, we had 'giveCsparse' {T->"C" [default], F->"T"}
         ##     but no 'repr' ... the following is to remain backwards compatible
         if(missing(giveCsparse))
