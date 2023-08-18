@@ -104,31 +104,31 @@
     \code{\linkS4class{generalMatrix}} (and so on).}
   \item{repr}{a string (\code{"."}, \code{"C"}, \code{"R"}, or
     \code{"T"}) specifying the sparse representation of the result.
-	\code{"."} is accepted only by \code{.ind2sparse} and indicates
-	the most efficient representation,
-	which is \code{"C"} (\code{"R"}) for \code{margin = 2} (\code{1}).
-	\code{"C"} indicates that the result should inherit from
-	\code{\linkS4class{CsparseMatrix}} (and so on).}
+    \code{"."} is accepted only by \code{.ind2sparse} and indicates
+    the most efficient representation,
+    which is \code{"C"} (\code{"R"}) for \code{margin = 2} (\code{1}).
+    \code{"C"} indicates that the result should inherit from
+    \code{\linkS4class{CsparseMatrix}} (and so on).}
   \item{packed}{a logical indicating if the result should
-	inherit from \code{\linkS4class{packedMatrix}}
-	rather than from \code{\linkS4class{unpackedMatrix}}.
-	It is ignored for \code{from} inheriting from
-	\code{\linkS4class{generalMatrix}}.}
+    inherit from \code{\linkS4class{packedMatrix}}
+    rather than from \code{\linkS4class{unpackedMatrix}}.
+    It is ignored for \code{from} inheriting from
+    \code{\linkS4class{generalMatrix}}.}
   \item{sparse}{a logical indicating if the result should inherit
-	from \code{\linkS4class{sparseMatrix}} rather than from
-	\code{\linkS4class{denseMatrix}}.  If \code{NA}, then the result
-	will be formally sparse if and only if \code{from} is.}
+    from \code{\linkS4class{sparseMatrix}} rather than from
+    \code{\linkS4class{denseMatrix}}.  If \code{NA}, then the result
+    will be formally sparse if and only if \code{from} is.}
   \item{uplo}{a string (\code{"U"} or \code{"L"}) indicating whether
-	the result (if symmetric or triangular) should store the upper or
-	lower triangle of \code{from}.  The elements of \code{from} in the
-	opposite triangle are ignored.}
+    the result (if symmetric or triangular) should store the upper or
+    lower triangle of \code{from}.  The elements of \code{from} in the
+    opposite triangle are ignored.}
   \item{diag}{a string (\code{"N"} or \code{"U"}) indicating whether
-	the result (if triangular) should be formally nonunit or unit
+    the result (if triangular) should be formally nonunit or unit
     triangular.  In the unit triangular case, the diagonal elements
-	of \code{from} are ignored.}
+    of \code{from} are ignored.}
   \item{trans}{a logical indicating if the result should be a 1-row
-	matrix rather than a 1-column matrix where \code{from} is a vector
-	but not a matrix.}
+    matrix rather than a 1-column matrix where \code{from} is a vector
+    but not a matrix.}
   \item{class}{a string whose first three characters specify the class
     of the result.  It should match the pattern
     \code{"^[.nld](ge|sy|tr|sp|tp)"} for \code{.m2dense} and
@@ -139,20 +139,20 @@
     or \code{\link{isTriangular}}.}
   %% .tCRT :
   \item{lazy}{a logical indicating if the transpose should be
-	constructed with minimal allocation, but possibly \emph{without}
-	preserving representation.}
+    constructed with minimal allocation, but possibly \emph{without}
+    preserving representation.}
   %% .diag.dsC :
   \item{Chx}{optionally, the \code{\link{Cholesky}(x, \dots)}
-	factorization of \code{x}.  If supplied, then \code{x} is unused.}
+    factorization of \code{x}.  If supplied, then \code{x} is unused.}
   \item{res.kind}{a string in \code{c("trace", "sumLog", "prod", "min",
       "max", "range", "diag", "diagBack")}.}
   %% .solve.dgC.* :
   \item{tol}{see \code{\link{lu-methods}}.}
   \item{order}{see \code{\link{qr-methods}}.}
   \item{check}{a logical indicating if the first argument should be
-	tested for inheritance from \code{\linkS4class{dgCMatrix}} and
-	coerced if necessary.   Set to \code{FALSE} for speed only if it
-	is known to already inherit from \code{\linkS4class{dgCMatrix}}.}
+    tested for inheritance from \code{\linkS4class{dgCMatrix}} and
+    coerced if necessary.   Set to \code{FALSE} for speed only if it
+    is known to already inherit from \code{\linkS4class{dgCMatrix}}.}
   %% .updateCHMfactor :
   \item{object}{a Cholesky factorization inheriting from virtual class
     \code{CHMfactor}, almost always the result of a call to generic
@@ -171,56 +171,56 @@
     \item{\code{M}}{\code{\linkS4class{Matrix}}}
     \item{\code{m}}{matrix or vector}
     \item{\code{v}}{vector}
-	\item{\code{dense}}{\code{\linkS4class{denseMatrix}}}
+    \item{\code{dense}}{\code{\linkS4class{denseMatrix}}}
     \item{\code{unpacked}}{\code{\linkS4class{unpackedMatrix}}}
     \item{\code{packed}}{\code{\linkS4class{packedMatrix}}}
     \item{\code{sparse}}{%
-	  \code{\linkS4class{CsparseMatrix}},
+      \code{\linkS4class{CsparseMatrix}},
       \code{\linkS4class{RsparseMatrix}}, or
       \code{\linkS4class{TsparseMatrix}}}
-	\item{\code{C}}{\code{\linkS4class{CsparseMatrix}}}
+    \item{\code{C}}{\code{\linkS4class{CsparseMatrix}}}
     \item{\code{R}}{\code{\linkS4class{RsparseMatrix}}}
     \item{\code{T}}{\code{\linkS4class{TsparseMatrix}}}
     \item{\code{gen}}{\code{\linkS4class{generalMatrix}}}
     \item{\code{sym}}{\code{\linkS4class{symmetricMatrix}}}
     \item{\code{tri}}{\code{\linkS4class{triangularMatrix}}}
     \item{\code{diag}}{\code{\linkS4class{diagonalMatrix}}}
-	\item{\code{ind}}{\code{\linkS4class{indMatrix}}}
+    \item{\code{ind}}{\code{\linkS4class{indMatrix}}}
   }
 
   Abbreviations should be seen as a guide, rather than as an
   exact description of behaviour.  For example, \code{.m2dense}
   and \code{.m2sparse} accept vectors in addition to matrices.
-  
+
   \subsection{\code{.tCRT(x)}}{
-	If \code{lazy = TRUE}, then \code{.tCRT} constructs the transpose
-	of \code{x} using the most efficient representation,
-	which for \samp{CRT} is \samp{RCT}.  If \code{lazy = FALSE},
-	then \code{.tCRT} preserves the representation of \code{x},
-	behaving as the corresponding methods for generic function \code{t}.
+    If \code{lazy = TRUE}, then \code{.tCRT} constructs the transpose
+    of \code{x} using the most efficient representation,
+    which for \samp{CRT} is \samp{RCT}.  If \code{lazy = FALSE},
+    then \code{.tCRT} preserves the representation of \code{x},
+    behaving as the corresponding methods for generic function \code{t}.
   }
   \subsection{\code{.diag.dsC(x)}}{
     \code{.diag.dsC} computes (or uses if \code{Chx} is supplied)
-	the Cholesky factorization of \code{x} as \eqn{L D L'} in order
-	to calculate one of several possible statistics from the diagonal
-	entries of \eqn{D}.  See \code{res.kind} under \sQuote{Arguments}.
+    the Cholesky factorization of \code{x} as \eqn{L D L'} in order
+    to calculate one of several possible statistics from the diagonal
+    entries of \eqn{D}.  See \code{res.kind} under \sQuote{Arguments}.
   }
   \subsection{\code{.solve.dgC.*(a, b)}}{
     \code{.solve.dgC.lu(a, b)} needs a square matrix \code{a}.
     \code{.solve.dgC.qr(a, b)} needs a \dQuote{long} matrix \code{a},
     with \code{nrow(a) >= ncol(a)}.
     \code{.solve.dgC.chol(a, b)} needs a \dQuote{wide} matrix \code{a},
-	with \code{nrow(a) <= ncol(a)}.
-    
+    with \code{nrow(a) <= ncol(a)}.
+
     All three may be used to solve sparse linear systems directly.
     Only \code{.solve.dgC.qr} and \code{.solve.dgC.chol} be used
     to solve sparse \emph{least squares} problems.
   }
   \subsection{\code{.updateCHMfactor(object, parent, mult)}}{
     \code{.updateCHMfactor} updates \code{object} with the result
-	of Cholesky factorizing
-	\code{F(parent) + mult[1] * diag(nrow(parent))},
-	i.e., \code{F(parent)} plus \code{mult[1]} times the identity matrix,
+    of Cholesky factorizing
+    \code{F(parent) + mult[1] * diag(nrow(parent))},
+    i.e., \code{F(parent)} plus \code{mult[1]} times the identity matrix,
     where \code{F = identity} if \code{parent} is a \code{dsCMatrix}
     and \code{F = tcrossprod} if \code{parent} is a \code{dgCMatrix}.
     The nonzero pattern of \code{F(parent)} must match
