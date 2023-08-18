@@ -526,7 +526,7 @@ setAs("vector", "zsparseVector",
 
 ## ==== To "shape" =====================================================
 
-..m2gen <- function(from) .Call(R_matrix_as_dense, from, ".ge", NULL, NULL)
+..m2gen <- function(from) .m2dense(from, ".ge")
 
 setAs(      "Matrix", "generalMatrix", ..M2gen)
 setAs(      "matrix", "generalMatrix", ..m2gen)
