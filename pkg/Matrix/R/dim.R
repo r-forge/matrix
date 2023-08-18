@@ -100,8 +100,7 @@ setMethod("dim<-", signature(x = "sparseMatrix"),
                   stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
                                 pv, pd),
                        domain = NA)
-              r <- spV2M(as(x, "sparseVector"),
-                         nrow = value[1L], ncol = value[2L])
+              r <- spV2M(.M2V(x), nrow = value[1L], ncol = value[2L])
               switch(.M.repr(x), "C" = .M2C(r), "R" = .M2R(r), r)
           })
 
@@ -226,4 +225,4 @@ setMethod("unname", signature(obj = "MatrixFactorization"),
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("drop", signature(x = "Matrix"),
-          function(x) if(any(x@Dim == 1L)) drop(as(x, "matrix")) else x)
+          function(x) if(any(x@Dim == 1L)) drop(.M2m(x)) else x)
