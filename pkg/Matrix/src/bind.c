@@ -26,7 +26,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			++nS4;
 			ivalid = R_check_class_etc(s, valid);
 			if (ivalid < 0) {
-				if (margin == 1)
+				if (margin)
 					ERROR_INVALID_CLASS(s, "cbind.Matrix");
 				else
 					ERROR_INVALID_CLASS(s, "rbind.Matrix");
@@ -38,7 +38,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			if (rdim[!margin] < 0)
 				rdim[!margin] = sdim[!margin];
 			else if (sdim[!margin] != rdim[!margin]) {
-				if (margin == 1)
+				if (margin)
 					error(_("number of rows of matrices must match"));
 				else
 					error(_("number of columns of matrices must match"));
@@ -108,7 +108,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			case 'd':
 				if (INTEGER(GET_SLOT(s, Matrix_marginSym))[0] - 1 != margin) {
 					anyN = 1;
-					if (margin == 1)
+					if (margin)
 						anyCsparse = 1;
 					else
 						anyRsparse = 1;
@@ -132,7 +132,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				anyZ = 1;
 				break;
 			default:
-				if (margin == 1)
+				if (margin)
 					ERROR_INVALID_TYPE(s, "cbind.Matrix");
 				else
 					ERROR_INVALID_TYPE(s, "rbind.Matrix");
@@ -145,7 +145,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				if (rdim[!margin] < 0)
 					rdim[!margin] = sdim[!margin];
 				else if (rdim[!margin] != sdim[!margin]) {
-					if (margin == 1)
+					if (margin)
 						error(_("number of rows of matrices must match"));
 					else
 						error(_("number of columns of matrices must match"));
@@ -202,7 +202,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				error(_("dimensions cannot exceed %s"), "2^31-1");
 			rdim[margin] += 1;
 			if (slen > rdim[!margin] || rdim[!margin] % (int) slen) {
-				if (margin == 1)
+				if (margin)
 					warning(_("number of rows of result is not a multiple of vector length"));
 				else
 					warning(_("number of columns of result is not a multiple of vector length"));
@@ -245,7 +245,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		*repr = 'e';
 	else if (nDense == 0) {
 		if (anyCsparse && anyRsparse)
-			*repr = (margin == 1) ? 'C' : 'R';
+			*repr = (margin) ? 'C' : 'R';
 		else if (anyCsparse)
 			*repr = 'C';
 		else if (anyRsparse)
@@ -253,7 +253,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		else if (anyTsparse)
 			*repr = 'T';
 		else if (anyDiagonal)
-			*repr = (margin == 1) ? 'C' : 'R';
+			*repr = (margin) ? 'C' : 'R';
 		else
 			*repr = '\0';
 	} else {
@@ -342,7 +342,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		if (nnz > INT_MAX || nnz > len / 2)
 			*repr = 'e';
 		else if (anyCsparse && anyRsparse)
-			*repr = (margin == 1) ? 'C' : 'R';
+			*repr = (margin) ? 'C' : 'R';
 		else if (anyCsparse)
 			*repr = 'C';
 		else if (anyRsparse)
@@ -350,7 +350,7 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		else if (anyTsparse)
 			*repr = 'T';
 		else
-			*repr = (margin == 1) ? 'C' : 'R';
+			*repr = (margin) ? 'C' : 'R';
 	}
 
 	return;
@@ -536,7 +536,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 				} \
 				mn = XLENGTH(s); \
 				ps = _PTR_(s); \
-				if (margin == 1) { \
+				if (margin) { \
 				if (!tmp || (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)) { \
 					Matrix_memcpy(px, ps, mn, sizeof(_CTYPE_)); \
 					px += mn; \
@@ -594,7 +594,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_CASES(BIND_E);
 		UNPROTECT(1);
 
-	} else if ((repr == 'C' && margin == 1) || (repr == 'R' && margin == 0)) {
+	} else if ((repr == 'C' && margin) || (repr == 'R' && !margin)) {
 
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1));
 		int *pp = INTEGER(p);
@@ -660,7 +660,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		}
 		UNPROTECT(2);
 
-	} else if ((repr == 'C' && margin == 0) || (repr == 'R' && margin == 1)) {
+	} else if ((repr == 'C' && !margin) || (repr == 'R' && margin)) {
 
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
 		int *pp = INTEGER(p);
@@ -773,16 +773,16 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 				psj = INTEGER(sj); \
 				_MASK_(psx = _PTR_(sx)); \
 				k = XLENGTH(si); \
-				if (margin == 0) { \
+				if (margin) { \
 					while (k--) { \
-						*(pi++) = *(psi++) + pos; \
-						*(pj++) = *(psj++); \
+						*(pi++) = *(psi++); \
+						*(pj++) = *(psj++) + pos; \
 						_MASK_(*(px++) = *(psx++)); \
 					} \
 				} else { \
 					while (k--) { \
-						*(pi++) = *(psi++); \
-						*(pj++) = *(psj++) + pos; \
+						*(pi++) = *(psi++) + pos; \
+						*(pj++) = *(psj++); \
 						_MASK_(*(px++) = *(psx++)); \
 					} \
 				} \
@@ -816,7 +816,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		}
 		SET_SLOT(res, Matrix_permSym, p);
 		UNPROTECT(1);
-		if (margin == 1)
+		if (margin)
 			INTEGER(GET_SLOT(res, Matrix_marginSym))[0] = 2;
 
 	}
