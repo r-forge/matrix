@@ -191,4 +191,4 @@ setMethod("writeMM", "CsparseMatrix",
 
 setMethod("writeMM",  "sparseMatrix",
           function(obj, file, ...)
-              writeMM(as(obj, "CsparseMatrix"), file, ...))
+              writeMM(.M2C(obj), file, ...))

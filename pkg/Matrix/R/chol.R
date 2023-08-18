@@ -19,7 +19,7 @@ setMethod("chol", signature(x = "triangularMatrix"),
 
 setMethod("chol", signature(x = "symmetricMatrix"),
           function(x, ...)
-              chol(as(x, "dMatrix"), ...))
+              chol(.M2kind(x, "d"), ...))
 
 setMethod("chol", signature(x = "diagonalMatrix"),
           function(x, ...)
@@ -78,7 +78,7 @@ setMethod("Cholesky", signature(A = "triangularMatrix"),
 
 setMethod("Cholesky", signature(A = "symmetricMatrix"),
           function(A, ...)
-              Cholesky(as(A, "dMatrix"), ...))
+              Cholesky(.M2kind(A, "d"), ...))
 
 setMethod("Cholesky", signature(A = "diagonalMatrix"),
           function(A, ...)
@@ -149,7 +149,7 @@ setMethod("chol2inv", signature(x = "symmetricMatrix"),
 
 setMethod("chol2inv", signature(x = "triangularMatrix"),
           function(x, ...)
-              chol2inv(as(x, "dMatrix"), ...))
+              chol2inv(.M2kind(x, "d"), ...))
 
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
           function(x, ...)
@@ -547,38 +547,27 @@ setMethod("expand", signature(x = "CHMfactor"),
 
 setMethod("update", signature(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
-              s <- .M.repr(parent)
-              if(!nzchar(s))
-                  stop("'parent' is not formally sparse")
-              if(s != "C")
-                  parent <- as(parent, "CsparseMatrix")
-              s <- .M.shape(parent)
-              if(s != "s") {
+              parent <- .M2kind(.M2C(parent), "d")
+              if((shape <- .M.shape(parent)) != "s") {
                   Matrix.msg("'parent' is not formally symmetric; factorizing tcrossprod(parent)")
-                  if(s == "t" && parent@diag != "N")
+                  if(shape == "t" && parent@diag != "N")
                       parent <- ..diagU2N(parent)
               }
-              s <- .M.kind(parent)
-              if(s != "d")
-                  parent <- .M2kind(parent, "d")
               .updateCHMfactor(object, parent, mult)
           })
 
 .updownCHMfactor <- function(update, C, L)
     .Call(CHMfactor_updown, L, C, update)
 
-for(.cl in c("Matrix", "matrix")) {
 setMethod("updown",
-          signature(update = "character", C = .cl, L = "CHMfactor"),
+          signature(update = "character", C = "ANY", L = "ANY"),
           function(update, C, L)
-              updown(!identical(update, "-"), C, L))
+              updown(identical(update, "+"), C, L))
 
 setMethod("updown",
-          signature(update = "logical", C = .cl, L = "CHMfactor"),
+          signature(update = "logical", C = "Matrix", L = "CHMfactor"),
           function(update, C, L)
-              updown(update, as(as(C, "CsparseMatrix"), "dMatrix"), L))
-}
-rm(.cl)
+              updown(update, .M2kind(.M2C(C), "d"), L))
 
 for(.cl in c("dgCMatrix", "dsCMatrix"))
 setMethod("updown",
@@ -599,3 +588,8 @@ setMethod("updown",
                   C <- C[perm + 1L, , drop = FALSE]
               .updownCHMfactor(update, C, L)
           })
+
+setMethod("updown",
+          signature(update = "logical", C = "matrix", L = "CHMfactor"),
+          function(update, C, L)
+              updown(update, .m2sparse(C, "dgC"), L))

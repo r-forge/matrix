@@ -32,9 +32,8 @@ setMethod("Schur", signature(x = "dsyMatrix"),
 
 setMethod("Schur", signature(x = "matrix"),
           function(x, vectors = TRUE, ...) {
-              ## MJ: breaks package 'control' ?!
-              ## if(is.complex(x))
-              ##     stop("Schur(x) not yet supported for 'x' of type \"complex\"")
+              if(is.complex(x))
+                  stop("Schur(x) not yet supported for 'x' of type \"complex\"")
               storage.mode(x) <- "double"
               if(length(x) && !all(is.finite(range(x))))
                   stop("'x' has non-finite values")
@@ -51,31 +50,12 @@ setMethod("Schur", signature(x = "matrix"),
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "generalMatrix"),
           function(x, vectors = TRUE, ...)
-              Schur(as(as(x, "dMatrix"), "unpackedMatrix"), vectors, ...))
+              Schur(.M2unpacked(.M2kind(x, "d")), vectors, ...))
 
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "symmetricMatrix"),
           function(x, vectors = TRUE, ...)
-              Schur(as(as(x, "dMatrix"), "unpackedMatrix"), vectors, ...))
-
-setMethod("Schur", signature(x = "diagonalMatrix"),
-          function(x, vectors = TRUE, ...) {
-              d <- x@Dim
-              if(x@diag != "N") {
-                  vals <- rep.int(1, d[1L])
-                  T <- new("ddiMatrix", Dim = d, diag = "U")
-              } else {
-                  vals <- x@x
-                  if(length(vals) && !all(is.finite(range(vals))))
-                      stop("'x' has non-finite values")
-                  T <- new("ddiMatrix", Dim = d, x = vals)
-              }
-              if(vectors) {
-                  Q <- new("ddiMatrix", Dim = d, diag = "U")
-                  new("Schur", Dim = d, Dimnames = x@Dimnames,
-                      Q = Q, T = T, EValues = vals)
-              } else list(T = T, EValues = vals)
-          })
+              Schur(.M2unpacked(.M2kind(x, "d")), vectors, ...))
 
 setMethod("Schur", signature(x = "triangularMatrix"),
           function(x, vectors = TRUE, ...) {
@@ -101,6 +81,25 @@ setMethod("Schur", signature(x = "triangularMatrix"),
                           Q = Q, T = T, EValues = vals)
                   } else list(T = x, EValues = vals)
               }
+          })
+
+setMethod("Schur", signature(x = "diagonalMatrix"),
+          function(x, vectors = TRUE, ...) {
+              d <- x@Dim
+              if(x@diag != "N") {
+                  vals <- rep.int(1, d[1L])
+                  T <- new("ddiMatrix", Dim = d, diag = "U")
+              } else {
+                  vals <- x@x
+                  if(length(vals) && !all(is.finite(range(vals))))
+                      stop("'x' has non-finite values")
+                  T <- new("ddiMatrix", Dim = d, x = vals)
+              }
+              if(vectors) {
+                  Q <- new("ddiMatrix", Dim = d, diag = "U")
+                  new("Schur", Dim = d, Dimnames = x@Dimnames,
+                      Q = Q, T = T, EValues = vals)
+              } else list(T = T, EValues = vals)
           })
 
 

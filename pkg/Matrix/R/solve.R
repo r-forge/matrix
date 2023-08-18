@@ -77,7 +77,7 @@ function(perm, margin, n) {
 
 for(.cl in c("MatrixFactorization", "triangularMatrix")) {
 
-setMethod("solve", signature(a = .cl, b = "numLike"),
+setMethod("solve", signature(a = .cl, b = "vector"),
           function(a, b, ...)
               drop(solve(a, .m2dense(b, "dge"), ...)))
 
@@ -107,7 +107,7 @@ setMethod("solve", signature(a = .cl, b = "diagonalMatrix"),
 
 setMethod("solve", signature(a = .cl, b = "indMatrix"),
           function(a, b, ...)
-              solve(a, as(b, "dMatrix"), ...))
+              solve(a, .ind2sparse(b, "d"), ...))
 
 setMethod("solve", signature(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
@@ -287,7 +287,7 @@ setMethod("solve", signature(a = "dtCMatrix", b = "dgCMatrix"),
 for(.cl in c("dtrMatrix", "dtpMatrix", "dtCMatrix"))
 setMethod("solve", signature(a = .cl, b = "triangularMatrix"),
           function(a, b, ...) {
-              r <- solve(a, as(b, "generalMatrix"), ...)
+              r <- solve(a, .M2gen(b), ...)
               if(a@uplo == b@uplo) {
                   r <- if(a@uplo == "U") triu(r) else tril(r)
                   if(a@diag != "N" && b@diag != "N")
@@ -371,7 +371,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "missing"),
               solve(trf, sparse = sparse, ...)
           })
 
-setMethod("solve", signature(a = "dgCMatrix", b = "numLike"),
+setMethod("solve", signature(a = "dgCMatrix", b = "vector"),
           function(a, b, ...) {
               trf <- lu(a, errSing = TRUE)
               solve(trf, b, ...)
@@ -389,7 +389,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "denseMatrix"),
           function(a, b, sparse = FALSE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(is.na(sparse) || sparse)
-                  b <- as(b, "CsparseMatrix")
+                  b <- .M2C(b)
               solve(trf, b, ...)
           })
 
@@ -397,7 +397,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "sparseMatrix"),
           function(a, b, sparse = TRUE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(!(is.na(sparse) || sparse))
-                  b <- as(b, "unpackedMatrix")
+                  b <- .M2unpacked(b)
               solve(trf, b, ...)
           })
 
@@ -409,7 +409,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "missing"),
               solve(trf, sparse = sparse, ...)
           })
 
-setMethod("solve", signature(a = "dsCMatrix", b = "numLike"),
+setMethod("solve", signature(a = "dsCMatrix", b = "vector"),
           function(a, b, ...) {
               trf <- tryCatch(
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
@@ -433,7 +433,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "denseMatrix"),
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
               if(is.na(sparse) || sparse)
-                  b <- as(b, "CsparseMatrix")
+                  b <- .M2C(b)
               solve(trf, b, ...)
           })
 
@@ -443,7 +443,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
               if(!(is.na(sparse) || sparse))
-                  b <- as(b, "unpackedMatrix")
+                  b <- .M2unpacked(b)
               solve(trf, b, ...)
           })
 
@@ -498,7 +498,7 @@ setMethod("solve", signature(a = "ddiMatrix", b = "missing"),
               a
           })
 
-setMethod("solve", signature(a = "ddiMatrix", b = "numLike"),
+setMethod("solve", signature(a = "ddiMatrix", b = "vector"),
           function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
@@ -569,7 +569,7 @@ setMethod("solve", signature(a = "pMatrix", b = "missing"),
               a
           })
 
-setMethod("solve", signature(a = "pMatrix", b = "numLike"),
+setMethod("solve", signature(a = "pMatrix", b = "vector"),
           function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
