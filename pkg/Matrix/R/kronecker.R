@@ -675,17 +675,16 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
 
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "indMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, as(Y, "nsparseMatrix"), FUN, make.dimnames, ...))
+              kronecker(X, .M2kind(Y, "n"), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(as(X, "nsparseMatrix"), Y, FUN, make.dimnames, ...))
+              kronecker(.M2kind(X, "n"), Y, FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if((margin <- X@margin) != Y@margin)
-                  kronecker(as(X, "CsparseMatrix"), as(Y, "CsparseMatrix"),
-                            FUN, make.dimnames, ...)
+                  kronecker(.M2C(X), .M2C(Y), FUN, make.dimnames, ...)
               if(!(missing(FUN) || identical(FUN, "*")))
                   stop("method for kronecker() must use default FUN=\"*\"")
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
@@ -711,42 +710,37 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 
 ## Catch everything else with these:
 
-setMethod("kronecker", signature(X = "Matrix", Y = "matrix"),
+for(.cl in c("vector", "matrix")) {
+setMethod("kronecker", signature(X = "Matrix", Y = .cl),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
               kronecker(X, .m2dense(Y, "dge"), FUN, make.dimnames, ...))
 
-setMethod("kronecker", signature(X = "Matrix", Y = "vector"),
-          function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, .m2dense(Y, "dge"), FUN, make.dimnames, ...))
-
-setMethod("kronecker", signature(X = "matrix", Y = "Matrix"),
+setMethod("kronecker", signature(X = .cl, Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
               kronecker(.m2dense(X, "dge"), Y, FUN, make.dimnames, ...))
-
-setMethod("kronecker", signature(X = "vector", Y = "Matrix"),
-          function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.m2dense(X, "dge"), Y, FUN, make.dimnames, ...))
+}
+rm(.cl)
 
 setMethod("kronecker", signature(X = "denseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(as(X, "CsparseMatrix"), Y, FUN, make.dimnames, ...))
+              kronecker(.M2C(X), Y, FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "CsparseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, as(Y, "CsparseMatrix"), FUN, make.dimnames, ...))
+              kronecker(X, .M2C(Y), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "RsparseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, as(Y, "RsparseMatrix"), FUN, make.dimnames, ...))
+              kronecker(X, .M2R(Y), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "TsparseMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, as(Y, "TsparseMatrix"), FUN, make.dimnames, ...))
+              kronecker(X, .M2T(Y), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, as(Y, "CsparseMatrix"), FUN, make.dimnames, ...))
+              kronecker(X, .M2C(Y), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = "indMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(as(X, "CsparseMatrix"), Y, FUN, make.dimnames, ...))
+              kronecker(.M2kind(X, "n"), Y, FUN, make.dimnames, ...))
