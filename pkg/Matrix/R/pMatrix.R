@@ -38,14 +38,14 @@ setAs("nsparseMatrix", "pMatrix",
           J <- new("pMatrix")
           J@Dim <- d
           J@Dimnames <- from@Dimnames
-          from. <- as(from, "RsparseMatrix")
+          from. <- .M2R(from)
           p <- from.@p
           m <- length(p) - 1L
           if(all(p == 0:m) && !anyDuplicated.default(j <- from.@j)) {
               J@perm <- j + 1L
               return(J)
           }
-          from. <- as(from, "CsparseMatrix")
+          from. <- .M2C(from)
           p <- from.@p
           n <- length(p) - 1L
           if(all(p == 0:n) && !anyDuplicated.default(i <- from.@i)) {
@@ -140,7 +140,7 @@ setMethod("%*%", signature(x = "pMatrix", y = "Matrix"),
           function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- as(y[perm, , drop = FALSE], "dMatrix")
+              r <- .M2kind(y[perm, , drop = FALSE], "d")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -149,7 +149,7 @@ setMethod("%*%", signature(x = "Matrix", y = "pMatrix"),
           function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- as(x[, perm, drop = FALSE], "dMatrix")
+              r <- .M2kind(x[, perm, drop = FALSE], "d")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -176,7 +176,7 @@ setMethod("%&%", signature(x = "pMatrix", y = "Matrix"),
           function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- as(y[perm, , drop = FALSE], "nMatrix")
+              r <- .M2kind(y[perm, , drop = FALSE], "n")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
               r
           })
@@ -185,7 +185,7 @@ setMethod("%&%", signature(x = "Matrix", y = "pMatrix"),
           function(x, y) {
               mmultDim(x@Dim, y@Dim, type = 1L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- as(x[, perm, drop = FALSE], "nMatrix")
+              r <- .M2kind(x[, perm, drop = FALSE], "n")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
               r
           })
@@ -213,8 +213,8 @@ setMethod("crossprod", signature(x = "Matrix", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 2L)
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- as(t(x)[, perm, drop = FALSE],
-                      if(isTRUE(boolArith)) "nMatrix" else "dMatrix")
+              r <- .M2kind(t(x)[, perm, drop = FALSE],
+                           if(isTRUE(boolArith)) "n" else "d")
               r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
               r
           })
@@ -242,8 +242,8 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "Matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               mmultDim(x@Dim, y@Dim, type = 3L)
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- as(t(y)[perm, , drop = FALSE],
-                      if(isTRUE(boolArith)) "nMatrix" else "dMatrix")
+              r <- .M2kind(t(y)[perm, , drop = FALSE],
+                           if(isTRUE(boolArith)) "n" else "d")
               r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
               r
           })
