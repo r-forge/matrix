@@ -4,9 +4,10 @@
 #include "Mutils.h"
 
 SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
-                     int transpose_if_vector, int new);
+                     int trans, int new);
 
-SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag);
+SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                       SEXP trans);
 
 SEXP sparse_as_dense(SEXP from, const char *class, int packed);
 
@@ -22,9 +23,10 @@ SEXP index_as_dense(SEXP from, const char *class, char kind);
 SEXP R_index_as_dense(SEXP from, SEXP kind);
 
 SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
-                      int transpose_if_vector);
+                      int trans);
 
-SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag);
+SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                        SEXP trans);
 
 SEXP dense_as_sparse(SEXP from, const char *class, char repr);
 
