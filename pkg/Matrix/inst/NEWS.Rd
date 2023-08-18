@@ -17,6 +17,10 @@
 
       \item \code{rep(<sparseVector>, each=)} now works efficiently,
       avoiding \code{rep(., times = rep(each, times = length(.)))}.
+
+      \item \code{.m2dense} and \code{.m2sparse} gain an argument
+      \code{trans} indicating if vectors that are not matrices should
+      be coerced to 1-row matrices rather than 1-column matrices.
     }
   }
   \subsection{Bug Fixes}{

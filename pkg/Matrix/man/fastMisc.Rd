@@ -73,12 +73,12 @@
 .sparse2dense(from, packed = FALSE)
 .diag2dense(from, shape = "t", packed = FALSE, uplo = "U")
 .ind2dense(from, kind = "n")
-.m2dense(from, class, uplo = "U", diag = "N")
+.m2dense(from, class, uplo = "U", diag = "N", trans = FALSE)
 
 .dense2sparse(from, repr = "C")
 .diag2sparse(from, shape = "t", repr = "C", uplo = "U")
 .ind2sparse(from, kind = "n", repr = ".")
-.m2sparse(from, class, uplo = "U", diag = "N")
+.m2sparse(from, class, uplo = "U", diag = "N", trans = FALSE)
 
 .tCRT(x, lazy = TRUE)
 
@@ -126,6 +126,9 @@
 	the result (if triangular) should be formally nonunit or unit
     triangular.  In the unit triangular case, the diagonal elements
 	of \code{from} are ignored.}
+  \item{trans}{a logical indicating if the result should be a 1-row
+	matrix rather than a 1-column matrix where \code{from} is a vector
+	but not a matrix.}
   \item{class}{a string whose first three characters specify the class
     of the result.  It should match the pattern
     \code{"^[.nld](ge|sy|tr|sp|tp)"} for \code{.m2dense} and

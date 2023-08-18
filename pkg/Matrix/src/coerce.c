@@ -1,7 +1,7 @@
 #include "coerce.h"
 
 SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
-                     int transpose_if_vector, int new)
+                     int trans, int new)
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
@@ -37,7 +37,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 			error(_("dimensions cannot exceed %s"), "2^31-1");
 		dim = GET_SLOT(to, Matrix_DimSym);
 		pdim = INTEGER(dim);
-		if (transpose_if_vector) {
+		if (trans) {
 			pdim[0] = m = 1;
 			pdim[1] = n = (int) len;
 		} else {
@@ -51,7 +51,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		if (doDN) {
 			PROTECT(dimnames = allocVector(VECSXP, 2));
 			++nprotect;
-			SET_VECTOR_ELT(dimnames, transpose_if_vector ? 1 : 0, nms);
+			SET_VECTOR_ELT(dimnames, trans ? 1 : 0, nms);
 		}
 
 	}
@@ -147,7 +147,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix|vector>, ".(ge|sy|sp|tr|tp)Matrix") */
-SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag)
+SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                       SEXP trans)
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
@@ -193,7 +194,12 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag)
 		}
 	}
 
-	return matrix_as_dense(from, zzz, ul, di, 0, 1);
+	int trans_;
+	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
+	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
+		error(_("invalid '%s' to %s()"), "trans", __func__);
+
+	return matrix_as_dense(from, zzz, ul, di, trans_, 1);
 }
 
 SEXP sparse_as_dense(SEXP from, const char *class, int packed)
@@ -700,7 +706,7 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 }
 
 SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
-                      int transpose_if_vector)
+                      int trans)
 {
 	char cl[] = "...Matrix";
 	cl[0] = type2kind(TYPEOF(from));
@@ -708,7 +714,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : 'r');
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
-	REPROTECT(from = matrix_as_dense(from, cl, ul, di, transpose_if_vector, 1), pid);
+	REPROTECT(from = matrix_as_dense(from, cl, ul, di, trans, 1), pid);
 	REPROTECT(from = dense_as_sparse(from, cl, zzz[2]), pid);
 	cl[2] = zzz[2];
 	REPROTECT(from = sparse_as_kind(from, cl, zzz[0]), pid);
@@ -717,7 +723,8 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix|vector>, ".[gst][CRT]Matrix") */
-SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag)
+SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                        SEXP trans)
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
@@ -761,7 +768,12 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag)
 		}
 	}
 
-	return matrix_as_sparse(from, zzz, ul, di, 0);
+	int trans_;
+	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
+	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
+		error(_("invalid '%s' to %s()"), "trans", __func__);
+
+	return matrix_as_sparse(from, zzz, ul, di, trans_);
 }
 
 SEXP dense_as_sparse(SEXP from, const char *class, char repr)

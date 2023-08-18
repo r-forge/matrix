@@ -78,8 +78,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .ind2sparse <- function(from, kind = "n", repr = ".")
     .Call(R_index_as_sparse, from, kind, repr)
 
-.m2dense <- function(from, class, uplo = "U", diag = "N")
-    .Call(R_matrix_as_dense, from, class, uplo, diag)
+.m2dense <- function(from, class, uplo = "U", diag = "N", trans = FALSE)
+    .Call(R_matrix_as_dense, from, class, uplo, diag, trans)
 
 .m2dense.checking <- function(from, kind = ".", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
@@ -104,8 +104,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
         .m2dense(from, paste0(kind, "ge"), NULL, NULL)
 }
 
-.m2sparse <- function(from, class, uplo = "U", diag = "N")
-    .Call(R_matrix_as_sparse, from, class, uplo, diag)
+.m2sparse <- function(from, class, uplo = "U", diag = "N", trans = FALSE)
+    .Call(R_matrix_as_sparse, from, class, uplo, diag, trans)
 
 .m2sparse.checking <- function(from, kind = ".", repr = "C", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
