@@ -3,6 +3,8 @@
 
 static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
 
+static SEXP tagWasVector = NULL;
+
 static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
                      int *rdim, int *rdimnames, char *kind, char *repr)
 {
@@ -359,13 +361,15 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 static void coerceArgs(SEXP args, int margin,
                        int *rdim, char kind, char repr)
 {
-	SEXP a, s, tmp;
+	SEXP a, s, t, tmp;
 	int ivalid, isM;
 	char scl_[] = "...Matrix";
 	const char *scl;
 
 	for (a = args; a != R_NilValue; a = CDR(a)) {
 		s = CAR(a);
+		t = TAG(a);
+		SET_TAG(a, R_NilValue); /* to be replaced only if 's' is a vector */
 		if (s == R_NilValue)
 			continue;
 		PROTECT_INDEX pid;
@@ -458,9 +462,12 @@ static void coerceArgs(SEXP args, int margin,
 		} else {
 			tmp = getAttrib(s, R_DimSymbol);
 			isM = TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2;
-			if (!isM && rdim[!margin] > 0 && XLENGTH(s) == 0) {
-				UNPROTECT(1);
-				continue;
+			if (!isM) {
+				if (rdim[!margin] > 0 && XLENGTH(s) == 0) {
+					UNPROTECT(1);
+					continue;
+				}
+				SET_TAG(a, (t != R_NilValue) ? t : tagWasVector);
 			}
 			if (TYPEOF(s) != kind2type(kind))
 				REPROTECT(s = coerceVector(s, kind2type(kind)), pid);
@@ -832,6 +839,9 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 
 static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 {
+	if (!tagWasVector)
+		tagWasVector = install(".__WAS_VECTOR__."); /* for now, a hack */
+
 	int rdim[2], rdimnames[2];
 	char kind = '\0', repr = '\0';
 	scanArgs(args, exprs, margin, level,
@@ -903,23 +913,24 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 					r = 1;
 					if (rdim[!margin] > 0 && XLENGTH(s) == rdim[!margin])
 						nms[!margin] = getAttrib(s, R_NamesSymbol);
-					if (TAG(a) != R_NilValue)
-						nms[margin] = coerceVector(TAG(a), STRSXP);
-					else if (level == 2) {
-						PROTECT(nms_ = allocVector(EXPRSXP, 1));
-						SET_VECTOR_ELT(nms_, 0, CAR(e));
-						nms[margin] = coerceVector(nms_, STRSXP);
-						UNPROTECT(1);
-					} else if (level == 1 && TYPEOF(CAR(e)) == SYMSXP)
-						nms[margin] = coerceVector(CAR(e), STRSXP);
-				} else
-					continue;
+				}
+			}
+			if (TAG(a) != R_NilValue) { /* only if 's' is or was a vector */
+				if (TAG(a) != tagWasVector)
+					nms[margin] = coerceVector(TAG(a), STRSXP);
+				else if (level == 2) {
+					PROTECT(nms_ = allocVector(EXPRSXP, 1));
+					SET_VECTOR_ELT(nms_, 0, CAR(e));
+					nms[margin] = coerceVector(nms_, STRSXP);
+					UNPROTECT(1);
+				} else if (level == 1 && TYPEOF(CAR(e)) == SYMSXP)
+					nms[margin] = coerceVector(CAR(e), STRSXP);
 			}
 			if (rdimnames[!margin] && nms[!margin] != R_NilValue) {
 				SET_VECTOR_ELT(dimnames, !margin, nms[!margin]);
+				rdimnames[!margin] = 0;
 				if (!rdimnames[margin])
 					break;
-				rdimnames[!margin] = 1;
 			}
 			if (rdimnames[ margin] && nms[ margin] != R_NilValue)
 				for (i = 0; i < r; ++i)
