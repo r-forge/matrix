@@ -714,7 +714,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : 'r');
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
-	REPROTECT(from = matrix_as_dense(from, cl, ul, di, trans, 1), pid);
+	REPROTECT(from = matrix_as_dense(from, cl, ul, di, trans, 0), pid);
 	REPROTECT(from = dense_as_sparse(from, cl, zzz[2]), pid);
 	cl[2] = zzz[2];
 	REPROTECT(from = sparse_as_kind(from, cl, zzz[0]), pid);
@@ -1150,10 +1150,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 
 	if (class[0] == 'n')
 		DAS_SUBCASES(int, LOGICAL, HIDE, ISNZ_LOGICAL);
-	else if (cl[2] != 'R' && nnz == XLENGTH(x0)) {
-		SET_SLOT(to, Matrix_xSym, x0);
-		DAS_CASES(HIDE);
-	} else {
+	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
 		SET_SLOT(to, Matrix_xSym, x1);
 		DAS_CASES(SHOW);
