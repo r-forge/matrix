@@ -139,15 +139,15 @@ setAs("graphNEL", "TsparseMatrix",
       function(from) graph2T(from))
 
 setAs("graph", "CsparseMatrix",
-      function(from) .M2C(as(from, "TsparseMatrix")))
+      function(from) .M2C(graph2T(as(from, "graphNEL"))))
 setAs("graph", "RsparseMatrix",
-      function(from) .M2R(as(from, "TsparseMatrix")))
+      function(from) .M2R(graph2T(as(from, "graphNEL"))))
 setAs("graph", "TsparseMatrix",
-      function(from) graph2T(as(from, "graphNEL")))
+      function(from)      graph2T(as(from, "graphNEL")) )
 setAs("graph", "sparseMatrix",
-      function(from) as(from, "CsparseMatrix"))
+      function(from) .M2C(graph2T(as(from, "graphNEL"))))
 setAs("graph", "Matrix",
-      function(from) as(from, "CsparseMatrix"))
+      function(from) .M2C(graph2T(as(from, "graphNEL"))))
 
 
 ## ~~~~ COERCIONS FROM Matrix TO graph ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,8 +156,8 @@ setAs("graph", "Matrix",
 ##     for Matrix can assume that 'from' is _not_ a TsparseMatrix,
 ##     and therefore expect that as(from, "TsparseMatrix") is "unique"
 setAs("TsparseMatrix", "graphNEL",
-      function(from) T2graph(from))
+      function(from) T2graph(     from                    ))
 setAs("Matrix", "graphNEL",
-      function(from) T2graph(as(from, "TsparseMatrix"), need.uniq = FALSE))
+      function(from) T2graph(.M2T(from), need.uniq = FALSE))
 setAs("Matrix", "graph",
-      function(from) as(from, "graphNEL"))
+      function(from) T2graph(.M2T(from), need.uniq = FALSE))

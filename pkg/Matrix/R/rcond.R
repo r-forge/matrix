@@ -16,7 +16,7 @@ setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
                       1 / (norm(x, type = norm) * norm(useInv, type = norm))
                   } else {
                       warning("'rcond' via sparse -> dense coercion")
-                      rcond(as(x, "denseMatrix"), norm = norm, ...)
+                      rcond(.M2unpacked(x), norm = norm, ...)
                   }
               } else {
                   ## MJ: norm(A = P1' Q R P2') = norm(R) holds in general

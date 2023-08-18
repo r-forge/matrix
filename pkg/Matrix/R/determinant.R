@@ -93,7 +93,7 @@ setMethod("determinant", signature(x = "Matrix", logarithm = "missing"),
 
 setMethod("determinant", signature(x = "Matrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              determinant(as(x, "dMatrix"), logarithm, ...))
+              determinant(.M2kind(x, "d"), logarithm, ...))
 
 ## .... GENERAL ........................................................
 
