@@ -26,7 +26,7 @@
 \alias{.ind2sparse}
 \alias{.m2sparse}
 \alias{.tCRT}
-% coercions, predating API finalization, hence no longer documented
+% coercions, predating API finalization, hence no longer documented:
 \alias{.CR2RC}
 \alias{.CR2T}
 \alias{.T2CR}
@@ -70,15 +70,18 @@
 .M2R(from)
 .M2T(from)
 
+.M2V(from)
+.m2V(from, kind = ".")
+
 .sparse2dense(from, packed = FALSE)
 .diag2dense(from, shape = "t", packed = FALSE, uplo = "U")
 .ind2dense(from, kind = "n")
-.m2dense(from, class, uplo = "U", diag = "N", trans = FALSE)
+.m2dense(from, class = ".ge", uplo = "U", diag = "N", trans = FALSE)
 
 .dense2sparse(from, repr = "C")
 .diag2sparse(from, shape = "t", repr = "C", uplo = "U")
 .ind2sparse(from, kind = "n", repr = ".")
-.m2sparse(from, class, uplo = "U", diag = "N", trans = FALSE)
+.m2sparse(from, class = ".gC", uplo = "U", diag = "N", trans = FALSE)
 
 .tCRT(x, lazy = TRUE)
 
@@ -96,7 +99,8 @@
     \code{"d"}) specifying the \dQuote{kind} of the result.  \code{"."}
     indicates that the kind of \code{from} should be preserved.
     \code{"n"} indicates that the result should inherit from
-    \code{\linkS4class{nMatrix}} (and so on).}
+    \code{\linkS4class{nMatrix}} or \code{\linkS4class{nsparseVector}}
+    (and so on).}
   \item{shape}{a string (\code{"."}, \code{"g"}, \code{"s"}, or
     \code{"t"}) specifying the \dQuote{shape} of the result.  \code{"."}
     indicates that the shape of \code{from} should be preserved.
@@ -169,7 +173,8 @@
 
   \describe{
     \item{\code{M}}{\code{\linkS4class{Matrix}}}
-    \item{\code{m}}{matrix or vector}
+    \item{\code{V}}{\code{\linkS4class{sparseVector}}}
+    \item{\code{m}}{matrix}
     \item{\code{v}}{vector}
     \item{\code{dense}}{\code{\linkS4class{denseMatrix}}}
     \item{\code{unpacked}}{\code{\linkS4class{unpackedMatrix}}}
@@ -189,8 +194,9 @@
   }
 
   Abbreviations should be seen as a guide, rather than as an
-  exact description of behaviour.  For example, \code{.m2dense}
-  and \code{.m2sparse} accept vectors in addition to matrices.
+  exact description of behaviour.  Notably, \code{.m2dense},
+  \code{.m2sparse}, and \code{.m2V} accept vectors that are
+  not matrices.
 
   \subsection{\code{.tCRT(x)}}{
     If \code{lazy = TRUE}, then \code{.tCRT} constructs the transpose
