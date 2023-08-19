@@ -43,6 +43,7 @@ importFrom("utils", capture.output, head, head.matrix, str, tail, tail.matrix)
 export(.M2C,
        .M2R,
        .M2T,
+       .M2V,
        .M2diag,
        .M2gen,
        .M2kind,
@@ -63,6 +64,7 @@ export(.M2C,
        .ind2dense,
        .ind2sparse,
        .formatSparseSimple,
+       .m2V,
        .m2dense,
        .m2sparse,
        .sparse2dense,
@@ -87,7 +89,8 @@ export(.M2C,
        asPerm,
        bandSparse,
        bdiag,
-       c.sparseVector, # c() dispatches on first argument only => allow method to be called explicitly if that argument may not be a sparseVector
+       c.Matrix,
+       c.sparseVector,
        colScale,
        condest,
        det,
@@ -146,19 +149,15 @@ export(.CR2RC, .CR2T, .T2CR, .dense2g, .dense2kind, .dense2m, .dense2v,
 
 ## ---- S3 methods -----------------------------------------------------
 
-## So that dispatch also happens inside of 'base' functions:
 S3method(as.matrix, Matrix)
 S3method(as.matrix, sparseVector)
 S3method(as.array, Matrix)
 S3method(as.array, sparseVector)
-
-## Because S4 dispatch is "hard" for c():
-S3method(c, abIndex)
+S3method(c, Matrix)
 S3method(c, sparseVector)
-
-## For printing return values of our summary() methods:
-S3method(print, sparseSummary)
+S3method(c, abIndex)
 S3method(print, diagSummary)
+S3method(print, sparseSummary)
 
 
 ## ---- S4 generic functions, methods ----------------------------------
