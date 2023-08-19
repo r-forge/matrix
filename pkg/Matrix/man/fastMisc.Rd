@@ -17,6 +17,8 @@
 \alias{.M2C}
 \alias{.M2R}
 \alias{.M2T}
+\alias{.M2V}
+\alias{.m2V}
 \alias{.sparse2dense}
 \alias{.diag2dense}
 \alias{.ind2dense}
