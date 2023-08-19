@@ -84,6 +84,8 @@
 \alias{tail,Matrix-method}
 \alias{unname,Matrix-method}
 %
+\alias{c.Matrix}
+%
 \alias{det} % for our copy of base::det
 %
 \description{
