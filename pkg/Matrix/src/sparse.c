@@ -2887,8 +2887,11 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 
 		SEXP x1 = res;
 		int *pi1;
-		if (narm_)
+		if (narm_) {
 			Matrix_Calloc(pi1, m, int);
+			for (i = 0; i < m; ++i)
+				pi1[i] = n;
+		}
 		SUM_CASES(NOMAP);
 		if (narm_)
 			Matrix_Free(pi1, m);
