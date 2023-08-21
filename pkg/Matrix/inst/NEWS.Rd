@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-18 r4283)}{
+\section{Changes in version 1.6-2 (2023-08-21 r4289)}{
   \subsection{New Features}{
     \itemize{
       \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
@@ -22,7 +22,7 @@
       \code{trans} indicating if vectors that are not matrices should
       be coerced to 1-row matrices rather than 1-column matrices.
 
-	  \item \code{.m2dense} and \code{.m2sparse} can be called
+     \item \code{.m2dense} and \code{.m2sparse} can be called
       with one argument.  Their \code{class} arguments admit new
       default values \code{".ge"} and \code{".gC"}.
 
@@ -35,6 +35,20 @@
     \itemize{
       \item Methods for \code{cbind2} and \code{rbind2} did not in all
       cases handle vectors as 1-column and 1-row matrices, respectively.
+
+      \item Methods for \code{cbind2} and \code{rbind2} did not handle
+      0-length vectors (including \code{NULL}) correctly where the result
+      would have 0 rows and columns, respectively.
+
+      \item Methods for \code{cbind2} and \code{rbind2} did not handle
+      \code{NA} in the \code{x} slot of \code{ndenseMatrix} correctly
+      (i.e., as \code{TRUE}).
+
+      \item \code{cbind2(<ndenseMatrix>, <ldenseMatrix>)} gave
+      \code{ngeMatrix} instead of \code{lgeMatrix}.
+      \code{cbind2(<lsparseMatrix>, <lsparseMatrix>)} gave
+      \code{dgCMatrix} instead of \code{lgCMatrix}.
+      Methods for \code{rbind2} had similar problems.
 
       \item \code{rcond(<0-by-0>)} now returns \code{Inf}; see \PR{18543}.
 

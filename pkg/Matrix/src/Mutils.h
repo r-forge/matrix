@@ -79,7 +79,6 @@ SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
 SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds);
 SEXP Mmatrix(SEXP args);
 
-SEXP R_rbind2_vector(SEXP a, SEXP b);
 SEXP R_all0(SEXP x);
 SEXP R_any0(SEXP x);
 
