@@ -40,7 +40,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Csparse_crossprod, 3),
 	CALLDEF(Csparse_dense_crossprod, 3),
 	CALLDEF(Csparse_dense_prod, 3),
-	CALLDEF(Csparse_horzcat, 2),
 
 	CALLDEF(dCsparse_subassign, 4),
 	CALLDEF(lCsparse_subassign, 4),
@@ -49,12 +48,10 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(zCsparse_subassign, 4),
 
 	CALLDEF(Csparse_validate2, 2),
-	CALLDEF(Csparse_vertcat, 2),
 	CALLDEF(Csparse_dmperm, 3),
 	CALLDEF(diag_tC, 2),
 
 	CALLDEF(Matrix_expand_pointers, 1),
-	CALLDEF(R_rbind2_vector, 2),
 	CALLDEF(R_all0, 1),
 	CALLDEF(R_any0, 1),
 
