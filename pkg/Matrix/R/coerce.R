@@ -384,7 +384,7 @@ setAs("vector", "Matrix",
           else .m2dense(from, ".ge")
       })
 setAs(   "ANY", "Matrix",
-      function(from) as(as.matrix(from), "Matrix"))
+      function(from) as(as(from, "matrix"), "Matrix"))
 
 if(FALSE) {
 ## MJ: not yet ... existing as(<CHMfactor>, "Matrix") must become defunct first
@@ -608,9 +608,9 @@ setAs("vector",  "TsparseMatrix",
       function(from) .m2sparse(from, ".gT"))
 
 setAs("ANY",  "denseMatrix",
-      function(from) as(as.matrix(from),  "denseMatrix"))
+      function(from) as(as(from, "matrix"),  "denseMatrix"))
 setAs("ANY", "sparseMatrix",
-      function(from) as(as.matrix(from), "sparseMatrix"))
+      function(from) as(as(from, "matrix"), "sparseMatrix"))
 
 setAs("sparseVector",    "denseMatrix", .V2unpacked)
 setAs("sparseVector", "unpackedMatrix", .V2unpacked)
