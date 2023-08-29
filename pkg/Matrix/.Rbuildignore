@@ -59,6 +59,7 @@ R/Hilbert\.R$
 R/Matrix\.R$
 R/MatrixFactorization\.R$
 R/[CRT]sparse\.R$
+R/bandSparse\.R$
 R/corMatrix\.R$
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|po|pp|di|[gts][CRT])Matrix\.R$
