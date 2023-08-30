@@ -417,23 +417,6 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 .set.factor <- function(x, name, value, warn.no.slot = FALSE)
     .Call(R_set_factor, x, name, value, warn.no.slot)
 
-## Empties 'factors' slot of 'x' { NOT a copy of 'x' ! }
-## and returns TRUE if 'x' was modified and FALSE if not
-.empty.factors <- function(x, warn.no.slot = FALSE)
-    .Call(R_empty_factors, x, warn.no.slot)
-
-## all-0 matrix from 'x' which must inherit from Matrix
-.setZero <- function(x, kind = .M.kind(x)) {
-    cl <- if(.hasSlot(x, "diag"))
-              ".tCMatrix"
-          else if(.hasSlot(x, "uplo"))
-              ".sCMatrix"
-          else ".gCMatrix"
-    substr(cl, 1L, 1L) <- kind
-    d <- x@Dim
-    new(cl, Dim = d, Dimnames = x@Dimnames, p = rep.int(0L, d[2L] + 1))
-}
-
 ##' Compute the three "parts" of two sets:
 .setparts <- function(x, y) {
     n1 <- length(m1 <- match(x, y, 0L))

@@ -1375,7 +1375,7 @@ stopifnot(is(`dim<-`(.dgR, c(4L, 1L)), "RsparseMatrix")) # was TsparseMatrix
 .ldi.sp <- symmpart(new("ldiMatrix", Dim = c(1L, 1L), Dimnames = list("a", "b"),
                         x = TRUE))
 stopifnot(is(.ldi.sp, "dMatrix"),
-          is(.ldi.sp, "symmetricMatrix"),
+          is(.ldi.sp, "diagonalMatrix"),
           Matrix:::isSymmetricDN(.ldi.sp@Dimnames))
 
 ## as.vector(<ndenseMatrix>), etc. must do NA->TRUE

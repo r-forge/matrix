@@ -28,12 +28,13 @@ SEXP R_revDN(SEXP dn);
 SEXP get_reversed_DimNames(SEXP obj);
 void set_reversed_DimNames(SEXP obj, SEXP dn);
 
+void mmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi);
+
 void set_DimNames(SEXP obj, SEXP dn);
 
 SEXP get_factor(SEXP obj, const char *nm);
 void set_factor(SEXP obj, const char *nm, SEXP val);
 SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn);
-SEXP R_empty_factors(SEXP obj, SEXP warn);
 
 void rowPerm(double *x, int m, int n, int *p, int off, int invert);
 void symPerm(double *x, int n, char uplo, int *p, int off, int invert);
