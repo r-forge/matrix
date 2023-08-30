@@ -326,9 +326,6 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 ".", ".", ".", na),
-                         .M.level = 2)
               if(na == 2L) {
                   ## x[]
                   x
@@ -345,9 +342,6 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 ".", ".", "l", na),
-                         .M.level = 2)
               if(na < 4L) {
                   ## x[drop=], x[, drop=], x[drop=, ]
                   x
@@ -364,9 +358,6 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 "i", ".", ".", na),
-                         .M.level = 2)
               if(na == 2L) {
                   ## x[i=]
                   .subscript.1ary(x, i)
@@ -383,9 +374,6 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 "i", ".", "l", na),
-                         .M.level = 2)
               if(na == 3L) {
                   ## x[i=, drop=]
                   .subscript.1ary(x, i)
@@ -402,9 +390,6 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 ".", "i", ".", na),
-                         .M.level = 2)
               if(na == 2L) {
                   ## x[j=]
                   .subscript.1ary(x, j)
@@ -421,9 +406,6 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 ".", "i", "l", na),
-                         .M.level = 2)
               if(na == 3L) {
                   ## x[j=, drop=]
                   .subscript.1ary(x, j)
@@ -440,9 +422,6 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 "i", "i", ".", na),
-                         .M.level = 2)
               if(na == 3L) {
                   ## x[i=, j=], x[j=, i=]
                   .subscript.2ary(x, i, j, drop = TRUE)
@@ -456,9 +435,6 @@ setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 "i", "i", "l", na),
-                         .M.level = 2)
               if(na == 4L) {
                   ## x[i=, j=, drop=], x[j=, i=, drop=]
                   .subscript.2ary(x, i, j, drop = drop)
@@ -473,9 +449,6 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              Matrix.msg(sprintf("M[%s%s%s] : nargs() = %d",
-                                 "m", ".", ".", na),
-                         .M.level = 2)
               if(na == 2L) {
                   ## x[i=]
                   .subscript.1ary.mat(x, i)

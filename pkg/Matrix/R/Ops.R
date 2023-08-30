@@ -310,7 +310,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
             lClass <- if(extends(cl1, "symmetricMatrix"))
                           "lsyMatrix"
                       else "lgeMatrix"
-            Matrix.msg(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
+            Matrix.message(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
                                lClass, .Generic, "Cmp.Mat.atomic"),
                        .M.level = 2)
             rx <- rep_len(r0, n1)
@@ -927,7 +927,7 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
             ## non sparse result
             lClass <- if(extends(cl1, "symmetricMatrix"))
                 "lsyMatrix" else "lgeMatrix"
-            Matrix.msg(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
+            Matrix.message(sprintf("sparse to dense (%s) coercion in '%s' -> %s",
                                lClass, .Generic, "Logic.Mat.atomic"),
                        .M.level = 2)
             rx <- rep_len(r0, n1)
@@ -1166,7 +1166,7 @@ setMethod("Logic", signature(e1="lsparseMatrix", e2="lsparseMatrix"),
 ## -----
 setMethod("Arith", signature(e1 = "dsCMatrix", e2 = "dsCMatrix"),
           function(e1, e2) {
-              Matrix.msg("suboptimal 'Arith' implementation of  'dsC*  o  dsC*'")
+              Matrix.message("suboptimal 'Arith' implementation of  'dsC*  o  dsC*'")
               forceSymmetric(callGeneric(.M2gen(e1), .M2gen(e2)))
           })
 
@@ -1475,7 +1475,7 @@ setMethod("Compare", signature(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 
               cD1 <- getClassDef(class(e1))
               cD2 <- getClassDef(class(e2))
-              Matrix.msg(sprintf("Compare <Csparse> -- \"%s\" %s \"%s\" :\n",
+              Matrix.message(sprintf("Compare <Csparse> -- \"%s\" %s \"%s\" :\n",
                                  cD1@className, .Generic, cD2@className),
                          .M.level = 2)
 

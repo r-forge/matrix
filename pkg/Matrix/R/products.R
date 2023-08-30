@@ -635,18 +635,18 @@ rm(mClass)
 ## cheap fallbacks
 setMethod("crossprod", signature(x = "Matrix", y = "Matrix"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(sprintf(
+	      Matrix.message(sprintf(
 	  "potentially suboptimal crossprod(\"%s\",\"%s\") as t(.) %s y",
 		  class(x), class(y), "%*%"))
 	      if(isTRUE(boolArith)) t(x) %&% y else t(x) %*% y })
 setMethod("crossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(paste0(
+	      Matrix.message(paste0(
 	  "potentially suboptimal crossprod(<",class(x),">) as t(.) %*% . "))
 	      if(isTRUE(boolArith)) t(x) %&% x else t(x) %*% x })
 setMethod("crossprod", signature(x = "Matrix", y = "ANY"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(sprintf(
+	      Matrix.message(sprintf(
 	  "potentially suboptimal crossprod(\"%s\", <%s>[=<ANY>]) as t(.) %s y",
 		  class(x), class(y), "%*%"))
 	      if(isTRUE(boolArith)) t(x) %&% y else t(x) %*% y })
@@ -945,14 +945,14 @@ setMethod("tcrossprod", signature(x = "ANY",    y = "symmetricMatrix"),
 ## cheap fallbacks
 setMethod("tcrossprod", signature(x = "Matrix", y = "Matrix"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(sprintf(
+	      Matrix.message(sprintf(
 	  "potentially suboptimal tcrossprod(\"%s\",\"%s\") as  x %s t(y)",
 		  class(x), class(y), "%*%"))
               if(isTRUE(boolArith)) x %&% t(y) else
 	      x %*% t(y) })
 setMethod("tcrossprod", signature(x = "Matrix", y = "missing"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(paste0(
+	      Matrix.message(paste0(
 	  "potentially suboptimal tcrossprod(<",class(x), ">) as  . %*% t(.)"))
               if(isTRUE(boolArith)) x %&% t(x) else
 	      x %*% t(x) })
@@ -961,7 +961,7 @@ setMethod("tcrossprod", signature(x = "Matrix", y = "ANY"),
               if(isTRUE(boolArith)) x %&% t(y) else x %*% t(y))
 setMethod("tcrossprod", signature(x = "ANY", y = "Matrix"),
 	  function(x, y=NULL, boolArith=NA, ...) {
-	      Matrix.msg(sprintf(
+	      Matrix.message(sprintf(
 	  "potentially suboptimal tcrossprod(<%s>[=<ANY>], \"%s\") as  x %s t(y)",
 		  class(x), class(y), "%*%"))
               if(isTRUE(boolArith)) x %&% t(y) else x %*% t(y) })
