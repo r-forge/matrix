@@ -2,6 +2,137 @@
 #include "chm_common.h"
 #include "coerce.h"
 
+#if 0 /* unfinished refactoring */
+
+/*
+  dge * dge: dgemm
+  dge * dsy: dsymm
+  dge * dsp: dsymm ... b->dsy
+  dge * dtr: dtrmm
+  dge * dtp: dtrmm ... b->dtr
+
+  dsy * dge: dsymm
+  dsy * dsy: dsymm ... b->dge
+  dsy * dsp: dsymm ... b->dge
+  dsy * dtr: dtrmm ... a->dge
+  dsy * dtp: dtrmm ... a->dge, b->dtr
+
+  dsp * dge: dspmv
+  dsp * dsy: dspmv ... b->dge
+  dsp * dsp: dspmv ... b->dge
+  dsp * dtr: dtrmm ... a->dge
+  dsp * dtp: dtrmm ... a->dge, b->dtr
+
+  dtr * dge: dtrmm
+  dtr * dsy: dtrmm ... b->dge
+  dtr * dsp: dtrmm ... b->dge
+  dtr * dtr: dtrmm ... b->dge if uplo mismatch
+  dtr * dtp: dtrmm ... b->dge if uplo mismatch, else b->dtr
+
+  dtp * dge: dtpmv
+  dtp * dsy: dtpmv ... b->dge
+  dtp * dsp: dtpmv ... b->dge
+  dtp * dtr: dtpmv ... b->dge if uplo mismatch
+  dtp * dtp: dtpmv ... b->dge if uplo mismatch, else b->dtr
+*/
+
+SEXP dgeMatrix_prod(SEXP a, SEXP b, SEXP transa, SEXP transb)
+{
+	int at = asLogical(transa), bt = asLogical(transb);
+
+	SEXP r,
+		adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
+		adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
+		ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	int *padim = INTEGER(adim), am = padim[0], an = padim[1],
+		rm = (at) ? an : am, rk = (at) ? am : an;
+	double *pax = REAL(ax), zero = 0.0, one = 1.0;
+
+	if (a == b && at != bt) {
+
+		PROTECT(r = NEW_OBJECT_OF_CLASS("dpoMatrix"));
+
+		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		int *prdim = INTEGER(rdim);
+		prdim[0] = prdim[1] = rm;
+		UNPROTECT(1); /* rdim */
+
+		SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
+		symmDN(rdimnames, adimnames, (at) ? 1 : 0);
+		UNPROTECT(1); /* rdimnames */
+
+		if ((Matrix_int_fast64_t) rm * rm > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
+
+		SEXP rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rm));
+		double *prx = REAL(rx);
+
+		F77_CALL(dsyrk)("U", (at) ? "T" : "N", &rm, &rk,
+		                &one, pax, &am, &zero, prx, &rm FCONE, FCONE);
+
+		SET_SLOT(r, Matrix_xSym, rx);
+		UNPROTECT(1); /* rx */
+
+	} else {
+
+		PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+
+		SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym)),
+			rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
+			rn = (bt) ? bm : bn;
+		UNPROTECT(1); /* bdim */
+		if (((bt) ? bn : bm) != rk)
+			error(_("non-conformable arguments"));
+
+		SEXP bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+			rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
+		mmultDN(rdimnames, adimnames, (at) ? 1 : 0, bdimnames, (bt) ? 0 : 1);
+		UNPROTECT(2); /* rdimnames, bdimnames */
+
+		if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
+
+		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
+			rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+		double *pbx = REAL(bx), *prx = REAL(rx);
+
+		F77_CALL(dgemm)((at) ? "T" : "N", (bt) ? "T" : "N", &rm, &rn, &rk,
+		                &one, pax, &am, pbx, &bm, &zero, prx, &rm FCONE, FCONE);
+
+		SET_SLOT(r, Matrix_xSym, rx);
+		UNPROTECT(2); /* rx, bx */
+
+	}
+
+	UNPROTECT(4); /* r, ax, adimnames, adim */
+	return r;
+}
+
+SEXP dsyMatrix_prod(SEXP a, SEXP b, SEXP transa, SEXP transb)
+{
+	
+}
+
+SEXP dtrMatrix_prod(SEXP a, SEXP b, SEXP transa, SEXP transb)
+{
+
+}
+
+SEXP dspMatrix_prod(SEXP a, SEXP b, SEXP transa, SEXP transb)
+{
+
+}
+
+SEXP dtpMatrix_prod(SEXP a, SEXP b, SEXP transa, SEXP transb)
+{
+
+}
+
+#endif
+
 /* Given a denseMatrix, diagonalMatrix, matrix, or vector,
    return a newly allocated dgeMatrix with newly allocated 'x'
    and 'Dimnames' slots and an empty 'factors' slot; the 'Dim'

@@ -70,7 +70,7 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax);
 void conjugate(SEXP x);
 void zeroRe(SEXP x);
 void zeroIm(SEXP x);
-void na2one(SEXP x);
+void naToOne(SEXP x);
 
 Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
