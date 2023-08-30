@@ -294,7 +294,7 @@ Cmp.Mat.atomic <- function(e1, e2) { ## result will inherit from "lMatrix"
                         r@p <- rep.int(0L, 1+nrow(r))
                 }
             } else {  # some TRUE, FALSE, NA : go via unique 'Tsparse'
-                M <- asTuniq(e1)
+                M <- asUniqueT(e1)
                 nCl <- class2(class(M), 'l') # logical Tsparse
                 sN <- slotNames(nCl)
                 ## copy "the other slots" (important for "tr"/"sym"):
@@ -911,7 +911,7 @@ Logic.Mat.atomic <- function(e1, e2) { ## result will typically be "like" e1:
                         r@p <- rep.int(0L, 1+nrow(r))
                 }
             } else {  # some TRUE, FALSE, NA : go via unique 'Tsparse'
-                M <- asTuniq(e1)
+                M <- asUniqueT(e1)
                 nCl <- class2(class(M), 'l') # logical Tsparse
                 sN <- slotNames(nCl)
                 ## copy "the other slots" (important for "tr"/"sym"):

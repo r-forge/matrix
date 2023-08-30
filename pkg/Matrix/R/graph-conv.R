@@ -90,7 +90,7 @@ graph2T <- function(from, use.weights =
     }
 }
 
-T2graph <- function(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
+T2graph <- function(from, need.uniq = !isUniqueT(from), edgemode = NULL)
 {
     d <- dim(from)
     if((n <- d[1L]) != d[2L])
@@ -100,7 +100,7 @@ T2graph <- function(from, need.uniq = is_not_uniqT(from), edgemode = NULL)
     if(is.null(rn <- dimnames(from)[[1]]))
         rn <- as.character(1:n)
     if(need.uniq) ## Need to 'uniquify' the triplets!
-        from <- uniqTsparse(from)
+        from <- .M2T(.M2C(from))
 
     if(is.null(edgemode))
         edgemode <-

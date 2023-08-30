@@ -81,7 +81,7 @@
   \dQuote{added} as well if the addition is defined as logical \eqn{or},
   i.e., \dQuote{\code{TRUE + TRUE  |->  TRUE}} and
   \dQuote{\code{TRUE + FALSE  |->  TRUE}}.
-  Note the use of \code{\link{uniqTsparse}()} for getting an internally
+  Note the use of \code{\link{asUniqueT}()} for getting an internally
   unique representation without duplicated \eqn{(i,j)} entries.
 }
 \section{Slots}{

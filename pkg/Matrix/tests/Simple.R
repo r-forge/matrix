@@ -284,8 +284,8 @@ ttdm <- as(tt, "denseMatrix")
 stopifnot(identical(dmat, ttdm),
           identical(dimnames(cc), dimnames(dmat)),
           ## coercing back should give original :
-	  identical(cc,              as(dmat, "sparseMatrix")),
-	  identical(uniqTsparse(tt), as(ttdm, "TsparseMatrix")))
+	  identical(cc,            as(dmat,  "sparseMatrix")),
+	  identical(asUniqueT(tt), as(ttdm, "TsparseMatrix")))
 
 ## MM: now *if* cc is "truly symmetric", these dimnames should be, too:
 d5 <- cn[1:5]; dnm5 <- list(d5,d5)

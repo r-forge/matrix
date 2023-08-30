@@ -27,27 +27,28 @@ allTrue  <- function(x) all(x) && !anyNA(x)
 
 ## Note that mode(<integer>) = "numeric" -- as0(), as1() return "double"
 ## which is good *AS LONG AS* we do not really have i..Matrix integer matrices
-as1 <- function(x, mod=mode(x))
-    switch(mod, "integer"= 1L, "double"=, "numeric"= 1, "logical"= TRUE,
-	   "complex"= 1+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
-as0 <- function(x, mod=mode(x))
-    switch(mod, "integer"= 0L, "double"=, "numeric"= 0, "logical"= FALSE,
-	   "complex"= 0+0i, stop(gettextf("invalid 'mod': %s", mod), domain = NA))
+as1 <- function(x, mode. = mode(x))
+    switch(mode.,
+           "logical" = TRUE,
+           "integer" =   1L,
+           "double"  =     ,
+           "numeric" =    1,
+           "complex" = 1+0i,
+           stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
 
-## MJ: no longer used
-if(FALSE) {
-.bail.out.1 <- function(fun, cl) {
-    stop(gettextf(
-     'not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.',
-		  fun, cl[1L]), call. = FALSE, domain=NA)
-}
-} ## MJ
+as0 <- function(x, mode. = mode(x))
+    switch(mode.,
+           "logical" = FALSE,
+           "integer" =    0L,
+           "double"  =      ,
+           "numeric" =     0,
+           "complex" =  0+0i,
+           stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
 
-.bail.out.2 <- function(fun, cl1, cl2) {
-    stop(gettextf(
-     'not-yet-implemented method for %s(<%s>, <%s>).\n ->>  Ask the package authors to implement the missing feature.',
-		  fun, cl1[1L], cl2[1L]), call. = FALSE, domain=NA)
-}
+.bail.out.2 <- function(fun, cl1, cl2)
+    stop(gettextf("%s(<%s>, <%s>) is not yet implemented; ask the maintainer to implement the missing method",
+                  fun, cl1[1L], cl2[1L]),
+         call. = FALSE, domain = NA)
 
 Matrix.verbose <- function()
     getOption("Matrix.verbose", .MatrixEnv[["verbose"]])
@@ -103,29 +104,44 @@ mmultDimnames <- function(dn.a, dn.b, type = 1L) {
 forceDiagonal <- function(x, diag = NA_character_) {
     y <- diag(x, names = FALSE) # FIXME? don't allocate if diag == "U"
     cl <- switch(typeof(y),
-                 logical = {
-                     if(is.na(diag))
-                         diag <- if(allTrue(y)) "U" else "N"
-                     "ldiMatrix" },
-                 integer = {
-                     if(is.na(diag))
-                         diag <- if(allTrue(y == 1L)) "U" else "N"
-                     storage.mode(y) <- "double"
-                     "ddiMatrix" },
-                 ## integer = {
-                 ##     if(is.na(diag))
-                 ##         diag <- if(allTrue(y == 1L)) "U" else "N"
-                 ##     "idiMatrix" },
-                 double = {
-                     if(is.na(diag))
-                         diag <- if(allTrue(y == 1)) "U" else "N"
-                     "ddiMatrix" },
+                 logical =
+                     {
+                         if(is.na(diag))
+                             diag <-
+                             if(!is.na(a <- all(y        )) && a) "U" else "N"
+                         "ldiMatrix"
+                     },
+                 integer =
+                     {
+                         if(is.na(diag))
+                             diag <-
+                             if(!is.na(a <- all(y == 1L  )) && a) "U" else "N"
+                         storage.mode(y) <- "double"
+                         "ddiMatrix"
+                     },
+              ## integer =
+              ##     {
+              ##         if(is.na(diag))
+              ##             diag <-
+              ##             if(!is.na(a <- all(y == 1L  )) && a) "U" else "N"
+              ##         "idiMatrix"
+              ##     },
+                 double =
+                     {
+                         if(is.na(diag))
+                             diag <-
+                             if(!is.na(a <- all(y == 1   )) && a) "U" else "N"
+                         "ddiMatrix"
+                     },
                  complex =
                      stop("complex \"diagonalMatrix\" not yet implemented"),
-                 ## complex = {
-                 ##     if(is.na(diag))
-                 ##         diag <- if(allTrue(y == 1+0i)) "U" else "N"
-                 ##     "zdiMatrix" },
+              ## complex =
+              ##     {
+              ##         if(is.na(diag))
+              ##             diag <-
+              ##             if(!is.na(a <- all(y == 1+0i)) && a) "U" else "N"
+              ##         "zdiMatrix"
+              ##     },
                  stop(gettextf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\"",
                                typeof(y)),
                       domain = NA))
@@ -179,7 +195,7 @@ non0.i <- function(M, cM = class(M), uniqT = TRUE) {
     else if(extends(cld, "RsparseMatrix"))
         .Call(compressed_non_0_ij, M, FALSE)
     else if(extends(cld, "TsparseMatrix")) {
-        if(uniqT && is_not_uniqT(M))
+        if(uniqT && !isUniqueT(M))
 	    .Call(compressed_non_0_ij, .M2C(M), TRUE)
 	else cbind(M@i, M@j, deparse.level = 0L)
     } else if(extends(cld, "diagonalMatrix")) {
@@ -254,42 +270,28 @@ WhichintersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
     list(which(ni), m1[ni])
 }
 
-### There is a test on this in ../tests/dgTMatrix.R !
-
-uniqTsparse <- function(x, class.x = c(class(x))) {
-    ## Purpose: produce a *unique* triplet representation:
-    ##		by having (i,j) sorted and unique
-    ## -----------------------------------------------------------
-    ## The following is not quite efficient, but easy to program,
-    ## and much based on C code
-    ##
-    ## TODO: faster for the case where 'x' is already 'uniq'?  if(anyDuplicatedT(.))
-    if(!extends(class.x, "TsparseMatrix"))
-	stop(gettextf("not yet implemented for class \"%s\"", dQuote(class.x)),
-	     domain = NA)
-    .M2T(.M2C(x))
+anyDuplicatedT <- function(x, dim. = dim(x)) {
+    mn <- prod(dim.)
+    if(mn <= .Machine$integer.max)
+        anyDuplicated.default(          x@j  * dim.[1L] + x@i)
+    else if(mn <= 0x1p+53)
+        anyDuplicated.default(as.double(x@j) * dim.[1L] + x@i)
+    else anyDuplicated.default(.mapply(c, list(x@i, x@j), NULL))
 }
 
-##' non-exported version with*OUT* check -- called often only  if(anyDuplicatedT(.))
-.uniqTsparse <- function(x) .M2T(.M2C(x))
+isUniqueT <- function(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
+    isT && !is.unsorted(if(byrow) order(x@i, x@j) else order(x@j, x@i),
+                        strictly = TRUE)
 
-asTuniq <- function(x) {
-    if(is(x, "TsparseMatrix"))
-        uniqTsparse(x)
-    else as(x, "TsparseMatrix")
-}
+asUniqueT <- function(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
+    if(isUniqueT(x, byrow, isT)) x else .M2T(if(byrow) .M2R(x) else .M2C(x))
 
-## is 'x' a uniq Tsparse Matrix ?
-is_not_uniqT <- function(x, di = dim(x))
-    is.unsorted(x@j) || anyDuplicatedT(x, di)
-
-## is 'x' a TsparseMatrix with duplicated entries (to be *added* for uniq):
-anyDuplicatedT <- function(x, di = dim(x))
-    anyDuplicated(.Call(m_encodeInd2, x@i, x@j, di, FALSE, FALSE))
+aggregateT <- function(x) .Call(Tsparse_aggregate, x)
 
 mat2triplet <- function(x, uniqT = FALSE) {
     T <- as(x, "TsparseMatrix")
-    if(uniqT && anyDuplicatedT(T)) T <- .uniqTsparse(T)
+    if(uniqT)
+        T <- asUniqueT(x)
     if(is(T, "nsparseMatrix"))
          list(i = T@i + 1L, j = T@j + 1L)
     else list(i = T@i + 1L, j = T@j + 1L, x = T@x)

@@ -712,7 +712,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	else if(extends(cld, "lMatrix")) { ## should fulfill even with NA:
 	    stopifnot(all(m | !m | ina), !any(!m & m & !ina))
 	    if(isTsp) # allow modify, since at end here
-		m <- uniqTsparse(m, clNam)
+		m <- asUniqueT(m, isT = TRUE)
 	    stopifnot(identical(m, m & TRUE),
 		      identical(m, FALSE | m))
 	    ## also check the  coercions to [dln]Matrix
