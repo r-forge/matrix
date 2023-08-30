@@ -270,13 +270,13 @@ WhichintersectInd <- function(ij1, ij2, di, orig1=FALSE, checkBnds=FALSE) {
     list(which(ni), m1[ni])
 }
 
-anyDuplicatedT <- function(x, dim. = dim(x)) {
-    mn <- prod(dim.)
+anyDuplicatedT <- function(x, ...) {
+    mn <- prod(d <- x@Dim)
     if(mn <= .Machine$integer.max)
-        anyDuplicated.default(          x@j  * dim.[1L] + x@i)
+        anyDuplicated.default(          x@j  * d[1L] + x@i, ...)
     else if(mn <= 0x1p+53)
-        anyDuplicated.default(as.double(x@j) * dim.[1L] + x@i)
-    else anyDuplicated.default(.mapply(c, list(x@i, x@j), NULL))
+        anyDuplicated.default(as.double(x@j) * d[1L] + x@i, ...)
+    else anyDuplicated.default(.mapply(c, list(x@i, x@j), NULL), ...)
 }
 
 isUniqueT <- function(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
@@ -291,7 +291,7 @@ aggregateT <- function(x) .Call(Tsparse_aggregate, x)
 mat2triplet <- function(x, uniqT = FALSE) {
     T <- as(x, "TsparseMatrix")
     if(uniqT)
-        T <- asUniqueT(x)
+        T <- asUniqueT(x, isT = TRUE)
     if(is(T, "nsparseMatrix"))
          list(i = T@i + 1L, j = T@j + 1L)
     else list(i = T@i + 1L, j = T@j + 1L, x = T@x)

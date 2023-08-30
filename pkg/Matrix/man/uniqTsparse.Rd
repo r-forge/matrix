@@ -18,7 +18,7 @@
   unsorted or duplicated \eqn{(i,j)} pairs.
 }
 \usage{
-anyDuplicatedT(x, dim. = dim(x))
+anyDuplicatedT(x, \dots)
 isUniqueT(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
 asUniqueT(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
 aggregateT(x)
@@ -29,7 +29,8 @@ aggregateT(x)
     \code{asUniqueT} requires \code{x} inheriting from
     \code{\linkS4class{Matrix}} and coerces \code{x}
     to \code{\linkS4class{TsparseMatrix}} if necessary.}
-  \item{dim.}{the dimensions of \code{x}.}
+  \item{\dots}{optional arguments passed to the default method for
+    generic function \code{\link{anyDuplicated}}.}
   \item{byrow}{a logical indicating if \code{x} should be sorted
     by row then by column.}
   \item{isT}{a logical indicating if \code{x} inherits from virtual
