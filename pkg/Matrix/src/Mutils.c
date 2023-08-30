@@ -1132,7 +1132,7 @@ void zeroIm(SEXP x)
 	return;
 }
 
-void na2one(SEXP x)
+void naToOne(SEXP x)
 {
 	R_xlen_t i, n = XLENGTH(x);
 	switch (TYPEOF(x)) {
