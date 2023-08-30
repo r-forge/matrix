@@ -665,11 +665,8 @@ replTmat <- function (x, i, j, ..., value) {
 		       cl," to ",class(x))
 	}
 	nr <- di[1]
+    x <- aggregateT(x)
 	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
-	if(anyDuplicated(x.i)) { ## == if(anyDuplicatedT(x, di = di))
-	    x <- uniqTsparse(x)
-	    x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
-	}
 
         n <- prod(di)
 	i <- if(is.logical(i)) { # full-size logical indexing
@@ -822,8 +819,7 @@ replTmat <- function (x, i, j, ..., value) {
     clDx <- getClassDef(clx) # extends() , is() etc all use the class definition
     stopifnot(extends(clDx, "TsparseMatrix"))
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(anyDuplicatedT(x, di = di))
-	x <- uniqTsparse(x)
+    x <- aggregateT(x)
 
     toGeneral <- r.sym <- FALSE
     if(extends(clDx, "symmetricMatrix")) {
@@ -1062,8 +1058,7 @@ replTmat <- function (x, i, j, ..., value) {
     if(any(i2 > nc)) stop(gettextf("column indices must be <= ncol(.) which is %d", nc), domain=NA)
 
     ## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-    if(anyDuplicatedT(x, di = di))
-	x <- uniqTsparse(x)
+    x <- aggregateT(x)
 
     toGeneral <- FALSE
     isN <- extends(clDx, "nMatrix")

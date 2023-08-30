@@ -29,6 +29,14 @@
       \item New exports \code{.M2V} and \code{.m2V}, for coercing
       \code{Matrix} and \code{matrix} (and in fact \code{vector})
       to \code{sparseVector}.
+
+      \item New exports \code{isUniqueT} and \code{asUniqueT}, with
+      optional argument \code{byrow} allowing for row-major ordering
+      of entries.  \code{asUniqueT} supercedes \code{uniqTsparse},
+      which is no longer documented.
+
+      \item New export \code{aggregateT}, for aggregating
+      \code{TsparseMatrix} \emph{without} sorting.
     }
   }
   \subsection{Bug Fixes}{

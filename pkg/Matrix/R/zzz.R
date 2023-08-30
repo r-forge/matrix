@@ -264,6 +264,13 @@
     .tCRT(from)
 }
 
+uniqTsparse <- function(x, class.x = class(x)) {
+    if(FALSE) {
+    .Deprecated(new = "asUniqueT", package = "Matrix")
+    }
+    asUniqueT(x, isT = extends(class.x, "TsparseMatrix"))
+}
+
 ## Utility for Matrix.DeprecatedCoerce(); see below
 .as.via.virtual <- function(Class1, Class2, from = quote(from)) {
     if(!isClassDef(Class1))

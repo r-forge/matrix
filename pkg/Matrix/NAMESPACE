@@ -85,8 +85,10 @@ export(.M2C,
        T2graph,
        abIseq,
        abIseq1,
+       aggregateT,
        anyDuplicatedT,
        asPerm,
+       asUniqueT,
        bandSparse,
        bdiag,
        c.Matrix,
@@ -109,6 +111,7 @@ export(.M2C,
        is.null.DN,
        isLDL,
        isPerm,
+       isUniqueT,
        mat2triplet,
        nearPD,
        onenormest,
@@ -126,8 +129,7 @@ export(.M2C,
        spMatrix,
        sparse.model.matrix,
        sparseMatrix,
-       sparseVector,
-       uniqTsparse)
+       sparseVector)
 
 ## Deprecated since Matrix 1.5-4 {Apr 2023}
 export(..2dge, .C2nC, .T2Cmat, .asmatrix, .dense2sy,
@@ -139,7 +141,7 @@ export(cBind, rBind)
 
 ## Redundant now but not yet deprecated ...
 export(.CR2RC, .CR2T, .T2CR, .dense2g, .dense2kind, .dense2m, .dense2v,
-       .sparse2g, .sparse2kind, .sparse2m, .sparse2v, .tCR2RC)
+       .sparse2g, .sparse2kind, .sparse2m, .sparse2v, .tCR2RC, uniqTsparse)
 
 
 ## ---- S3 generic functions -------------------------------------------

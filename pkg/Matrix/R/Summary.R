@@ -53,7 +53,7 @@ setMethod("Summary", "dsparseMatrix",
 	  n <- d[1]
 	  clx <- getClassDef(class(x))
 	  isTri <- extends(clx, "triangularMatrix")
-	  if(extends(clx, "TsparseMatrix") && anyDuplicatedT(x, di = d))
+	  if(extends(clx, "TsparseMatrix") && anyDuplicatedT(x))
 	      x <- .M2C(x) # = as(x, "Csparsematrix")
 	  l.x <- length(x@x)
 	  if(l.x == ne) ## fully non-zero (and "general") - very rare but quick
