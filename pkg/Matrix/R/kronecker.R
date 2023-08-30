@@ -520,7 +520,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
               }
               if(all(dr)) {
                   if(any((kind <- .M.kind(Y)) == c("n", "l")))
-                      Y <- .Call(Tsparse_aggregate, Y)
+                      Y <- aggregateT(Y)
                   if(!uX && uY)
                       Y <- ..diagU2N(Y)
                   nX <- dX[1L]
@@ -573,7 +573,7 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
               }
               if(all(dr)) {
                   if(any((kind <- .M.kind(X)) == c("n", "l")))
-                      X <- .Call(Tsparse_aggregate, X)
+                      X <- aggregateT(X)
                   if(uX && !uY)
                       X <- ..diagU2N(X)
                   nX <- length(X@i)

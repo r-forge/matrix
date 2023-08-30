@@ -55,7 +55,7 @@ setMethod("nnzero", "sparseMatrix",
               N <- switch(.M.repr(x),
                           "C" = x@p[d[2L]+1L],
                           "R" = x@p[d[1L]+1L],
-                          "T" = length((x <- .Call(Tsparse_aggregate, x))@i))
+                          "T" = length((x <- aggregateT(x))@i))
               if(.M.kind(x) != "n")
                   N <- .nnzero(x@x, na.counted, N)
               switch(.M.shape(x),
