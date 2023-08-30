@@ -55,16 +55,18 @@ skewpart(x)
   non-\code{NULL} (see also the examples).
 }
 \value{
-  \code{symmpart()} returns a symmetric matrix, inheriting from
-  \code{\linkS4class{symmetricMatrix}} iff \code{x} inherited from
-  \code{Matrix}.
+  \code{symmpart(x)} returns a symmetric matrix,
+  inheriting from \code{\linkS4class{symmetricMatrix}}
+  or \code{\linkS4class{diagonalMatrix}} if \code{x}
+  inherits from \code{Matrix}.
 
-  \code{skewpart()} returns a skew-symmetric matrix,
-  typically of the same class as \code{x} (or the closest
-  \dQuote{general} one, see \code{\linkS4class{generalMatrix}}).
+  \code{skewpart(x)} returns a skew-symmetric matrix,
+  inheriting from \code{\linkS4class{generalMatrix}},
+  \code{\linkS4class{symmetricMatrix}} or
+  \code{\linkS4class{diagonalMatrix}} if \code{x}
+  inherits from \code{Matrix}.
 }
-\seealso{
-  \code{\link{isSymmetric}}.}
+\seealso{\code{\link{isSymmetric}}.}
 \examples{
 m <- Matrix(1:4, 2,2)
 symmpart(m)

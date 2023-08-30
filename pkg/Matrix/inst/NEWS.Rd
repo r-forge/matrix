@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-29 r4290)}{
+\section{Changes in version 1.6-2 (2023-08-30 r4292)}{
   \subsection{New Features}{
     \itemize{
       \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
@@ -62,6 +62,11 @@
       \item Methods for subscripting \code{sparseVector} did not behave
       compatibly with \pkg{base} when supplied with fractional, \code{NA},
       or out-of-bounds subscripts.
+
+      \item \code{symmpart(x)}, \code{skewpart(x)},
+      \code{band(x, k1, k2)}, \code{triu(x, k)}, and
+      \code{tril(x, k)} now always return a \code{.diMatrix}
+      for \code{x} inheriting from \code{diagonalMatrix}.
     }
   }
   \subsection{Misc}{

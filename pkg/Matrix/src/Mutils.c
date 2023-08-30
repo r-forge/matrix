@@ -265,6 +265,27 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
+void mmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
+	SEXP s;
+	if (!isNull(s = VECTOR_ELT(asrc, ai)))
+		SET_VECTOR_ELT(dest, 0, s);
+	if (!isNull(s = VECTOR_ELT(bsrc, bi)))
+		SET_VECTOR_ELT(dest, 1, s);
+	PROTECT(asrc = getAttrib(asrc, R_NamesSymbol));
+	PROTECT(bsrc = getAttrib(bsrc, R_NamesSymbol));
+	if (!isNull(asrc) || !isNull(bsrc)) {
+		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
+		if (!isNull(asrc) && *CHAR(s = STRING_ELT(asrc, ai)) != '\0')
+			SET_STRING_ELT(destnms, 0, s);
+		if (!isNull(bsrc) && *CHAR(s = STRING_ELT(bsrc, bi)) != '\0')
+			SET_STRING_ELT(destnms, 1, s);
+		setAttrib(dest, R_NamesSymbol, destnms);
+		UNPROTECT(1);
+	}
+	UNPROTECT(2);
+	return;
+}
+
 SEXP R_symmDN(SEXP dn)
 {
 	/* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
@@ -414,38 +435,6 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 		warning(_("attempt to set factor on %s without '%s' slot"),
 		        "Matrix", "factors");
 	return val;
-}
-
-/**
- * @brief Empty the 'factors' slot of a 'compMatrix'.
- *
- * Like `obj\@factors <- list()`, but modifying `obj` (rather than a copy)
- * _even if_ `obj` is referenced elsewhere, supporting "automagic" clearing
- * of the `factors` slot by R functions taking `compMatrix` as an argument.
- * _Use with care!_
- *
- * @param obj A `compMatrix`.
- * @param warn A length-1 LGLSXP. Warn if `obj` has no `factors` slot
- *     (in which case `obj` is untouched)?
- *
- * @return `TRUE` if `obj` has a nonempty `factors` slot, `FALSE` otherwise.
- */
-SEXP R_empty_factors(SEXP obj, SEXP warn)
-{
-	/* If there is a nonempty 'factors' slot, then replace it with list() */
-	if (HAS_SLOT(obj, Matrix_factorsSym)) {
-		SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym));
-		if (LENGTH(factors) > 0) {
-			PROTECT(factors = allocVector(VECSXP, 0));
-			SET_SLOT(obj, Matrix_factorsSym, factors);
-			UNPROTECT(2);
-			return ScalarLogical(1); /* slot was reset */
-		}
-		UNPROTECT(1);
-	} else if (asLogical(warn) != 0)
-		warning(_("attempt to discard factors from %s without '%s' slot"),
-		        "Matrix", "factors");
-	return ScalarLogical(0); /* no-op */
 }
 
 
