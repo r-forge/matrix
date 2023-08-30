@@ -254,7 +254,7 @@ replCmat <- function (x, i, j, ..., value) {
     iMi <- missing(i)
     jMi <- missing(j)
     na <- nargs()
-    Matrix.msg("replCmat[x,i,j,..,val] : nargs()=", na, "; ",
+    Matrix.message("replCmat[x,i,j,..,val] : nargs()=", na, "; ",
 	       if(iMi || jMi) sprintf("missing (i,j) = (%d,%d)", iMi, jMi),
 	       .M.level = 2)
     if(na == 3L) { ## vector (or 2-col) indexing M[i] <- v : includes M[TRUE] <- v or M[] <- v !
@@ -413,7 +413,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	## and inside  Tsparse... the above i1, i2,..., sel  are *all* redone!
 	## Happens too often {not anymore, I hope!}
 	##
-	Matrix.msg("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
+	Matrix.message("wasteful C -> T -> C in replCmat(x,i,j,v) for <sparse>[i,j] <- v")
 	x <- as(x, "TsparseMatrix")
 	if(iMi)
 	    x[ ,i2+1L] <- value
@@ -648,7 +648,7 @@ replTmat <- function (x, i, j, ..., value) {
                   }))
     na <- nargs()
     if(na == 3) { ## i = vector indexing  M[i] <- v,  e.g.,  M[TRUE] <- v or M[] <- v !
-	Matrix.msg("diagnosing replTmat(x,i,j,v): nargs()= 3; ",
+	Matrix.message("diagnosing replTmat(x,i,j,v): nargs()= 3; ",
 		   if(iMi | jMi) sprintf("missing (i,j) = (%d,%d)", iMi,jMi))
 	if(iMi) stop("internal bug: missing 'i' in replTmat(): please report")
 	if(is.character(i))
@@ -661,7 +661,7 @@ replTmat <- function (x, i, j, ..., value) {
 	if(!is(x,"generalMatrix")) {
 	    cl <- class(x)
 	    x <- .M2gen(x)
-	    Matrix.msg("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
+	    Matrix.message("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
 		       cl," to ",class(x))
 	}
 	nr <- di[1]
@@ -770,7 +770,7 @@ replTmat <- function (x, i, j, ..., value) {
     ## nargs() == 4 :  x[i,j] <- value
     ## --------------------------------------------------------------------------
     lenV <- length(value)
-    Matrix.msg(".. replTmat(x,i,j,v): nargs()= 4; cl.(x)=",
+    Matrix.message(".. replTmat(x,i,j,v): nargs()= 4; cl.(x)=",
 	       class(x),"; len.(value)=", lenV,"; ",
 	       if(iMi | jMi) sprintf("missing (i,j) = (%d,%d)", iMi,jMi),
 	       .M.level = 2)# level 1  gives too many messages
@@ -846,7 +846,7 @@ replTmat <- function (x, i, j, ..., value) {
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
-        Matrix.msg("M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
+        Matrix.message("M[i,j] <- v :  coercing symmetric M[] into non-symmetric")
         x <- .M2gen(x)
         clDx <- getClassDef(clx <- class(x))
     }
@@ -1009,12 +1009,12 @@ replTmat <- function (x, i, j, ..., value) {
 
     ## else: nA == 3  i.e.,  M [ cbind(ii,jj) ] <- value or M [ Lmat ] <- value
     if(is.logical(i)) {
-	Matrix.msg(".TM.repl.i.mat(): drop 'matrix' case ...", .M.level=2)
+	Matrix.message(".TM.repl.i.mat(): drop 'matrix' case ...", .M.level=2)
 	## c(i) : drop "matrix" to logical vector
 	x[as.vector(i)] <- value
 	return(x)
     } else if(extends1of(cli <- getClassDef(class(i)), c("lMatrix", "nMatrix"))) {
-	Matrix.msg(".TM.repl.i.mat(): \"lMatrix\" case ...", .M.level=2)
+	Matrix.message(".TM.repl.i.mat(): \"lMatrix\" case ...", .M.level=2)
 	i <- which(as(i, if(extends(cli, "sparseMatrix")) "sparseVector" else "vector"))
 	## x[i] <- value ; return(x)
 	return(`[<-`(x,i, value=value))
@@ -1102,14 +1102,14 @@ replTmat <- function (x, i, j, ..., value) {
 	else toGeneral <- TRUE
     }
     if(toGeneral) { # go to "generalMatrix" and continue
-	Matrix.msg("M[ij] <- v :  coercing symmetric M[] into non-symmetric")
+	Matrix.message("M[ij] <- v :  coercing symmetric M[] into non-symmetric")
 	x <- .M2gen(x)
 	clDx <- getClassDef(clx <- class(x))
     }
 
     ii.v <- .Call(m_encodeInd, i, di, orig1=TRUE, checkBounds = TRUE)
     if(id <- anyDuplicated(ii.v, fromLast=TRUE)) {
-        Matrix.msg("M[ij] <- v :  duplicate ij-entries; using last")
+        Matrix.message("M[ij] <- v :  duplicate ij-entries; using last")
         ii.v  <- ii.v [-id]
 	value <- value[-id]
         if(any(id <- duplicated(ii.v, fromLast=TRUE))) {

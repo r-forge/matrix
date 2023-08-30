@@ -110,7 +110,7 @@ function(x,
                         else if(p1 > 3) 0.5
                         else 0.2
                     ## browser()
-                    Matrix.msg("rectangle size ",
+                    Matrix.message("rectangle size ",
                                paste(round(pSize, 1L), collapse = " x "),
                                " [pixels];  --> lwd :", formatC(lwd))
                 } else stopifnot(is.numeric(lwd), all(lwd >= 0)) # allow 0

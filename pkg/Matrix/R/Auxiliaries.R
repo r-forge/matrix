@@ -5,28 +5,21 @@
 
 is0  <- function(x) !(is.na(x) | x)
 isN0 <- function(x)   is.na(x) | x
-is1  <- function(x)  !is.na(x) & x == 1
-isN1 <- function(x)   is.na(x) | x != 1
-isT  <- function(x)  !is.na(x) &  x
-isNT <- function(x)   is.na(x) | !x
+is1  <- function(x)  !is.na(x) & x == 1L
+isN1 <- function(x)   is.na(x) | x != 1L
 
-##allFalse <- function(x) !any(x) && !any(is.na(x))## ~= all0, but allFalse(NULL) = TRUE w/warning
-##all0 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
-allFalse <- function(x) if(is.atomic(x)) .Call(R_all0, x) else !any(x) && !any(is.na(x))
-all0     <- function(x) if(is.atomic(x)) .Call(R_all0, x) else all(!x) && !any(is.na(x))
+allTrue  <- function(x)
+                                           !is.na(a <- all( x)) &&  a
+allFalse <- function(x)
+    if(is.atomic(x)) .Call(R_all0, x) else !is.na(a <- any( x)) && !a
+all0     <- function(x)
+    if(is.atomic(x)) .Call(R_all0, x) else !is.na(a <- all(!x)) &&  a
+anyFalse <- function(x)
+    if(is.atomic(x)) .Call(R_any0, x) else !is.na(a <- all( x)) && !a
+any0     <- function(x)
+    if(is.atomic(x)) .Call(R_any0, x) else !is.na(a <- any(!x)) &&  a
 
-##anyFalse <- function(x) isTRUE(any(!x))		 ## ~= any0
-## any0 <- function(x) isTRUE(any(x == 0))	      ## ~= anyFalse
-anyFalse <-
-any0 <- function(x) if(is.atomic(x)) .Call(R_any0, x) else isTRUE(any(!x))
-
-## These work "identically" for  1 ('==' TRUE)  and 0 ('==' FALSE)
-##	(but give a warning for "double"  1 or 0)
-## TODO: C versions of these would be faster
-allTrue  <- function(x) all(x) && !anyNA(x)
-
-## Note that mode(<integer>) = "numeric" -- as0(), as1() return "double"
-## which is good *AS LONG AS* we do not really have i..Matrix integer matrices
+## NB: change to using 'typeof' when we define iMatrix
 as1 <- function(x, mode. = mode(x))
     switch(mode.,
            "logical" = TRUE,
@@ -36,6 +29,7 @@ as1 <- function(x, mode. = mode(x))
            "complex" = 1+0i,
            stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
 
+## NB: change to using 'typeof' when we define iMatrix
 as0 <- function(x, mode. = mode(x))
     switch(mode.,
            "logical" = FALSE,
@@ -45,9 +39,9 @@ as0 <- function(x, mode. = mode(x))
            "complex" =  0+0i,
            stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
 
-.bail.out.2 <- function(fun, cl1, cl2)
-    stop(gettextf("%s(<%s>, <%s>) is not yet implemented; ask the maintainer to implement the missing method",
-                  fun, cl1[1L], cl2[1L]),
+.bail.out.2 <- function(name, cl1, cl2)
+    stop(gettextf("%s(<%s>, <%s>) is not yet implemented; ask maintainer(\"%s\") to implement the missing method",
+                  name, cl1[1L], cl2[1L], "Matrix"),
          call. = FALSE, domain = NA)
 
 Matrix.verbose <- function()
@@ -62,7 +56,7 @@ Matrix.getOption <- function(x, default = .Matrix.Env[[x]])
     getOption(paste0("Matrix.", x), default)
 } ## MJ
 
-Matrix.msg <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
+Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     if(Matrix.verbose() >= .M.level) {
         m <-
             if((w <- Matrix.warn()) < 1)
@@ -92,7 +86,7 @@ mmultDim <- function(d.a, d.b, type = 1L) {
 mmultDimnames <- function(dn.a, dn.b, type = 1L) {
     ## Return the 'dimnames' of the product indicated by 'type':
     ##     type 1:    a  %*%   b
-    ##          2:  t(a) %*%   b    {crossprod}
+    ##          2:  t(a) %*%   b   { crossprod}
     ##          3:    a  %*% t(b)  {tcrossprod}
     c(if(is.null(dn.a)) list(NULL) else dn.a[2L - (type != 2L)],
       if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
@@ -442,9 +436,6 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 	   ">"	= e2 <	e1,
 	   ">=" = e2 <= e1)
 }
-
-### These two are very similar, the first one has the advantage
-### to be applicable to 'Chx' directly:
 
 ## FIXME:  kind = "diagBack" is not yet implemented
 ##	would be much more efficient, but there's no CHOLMOD UI (?)

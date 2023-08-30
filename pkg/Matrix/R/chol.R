@@ -549,7 +549,7 @@ setMethod("update", signature(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
               parent <- .M2kind(.M2C(parent), "d")
               if((shape <- .M.shape(parent)) != "s") {
-                  Matrix.msg("'parent' is not formally symmetric; factorizing tcrossprod(parent)")
+                  Matrix.message("'parent' is not formally symmetric; factorizing tcrossprod(parent)")
                   if(shape == "t" && parent@diag != "N")
                       parent <- ..diagU2N(parent)
               }

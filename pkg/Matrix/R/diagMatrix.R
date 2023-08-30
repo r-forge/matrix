@@ -908,7 +908,7 @@ diagOdiag <- function(e1,e2) {
         ## e.g., m == m
         isNum <- (is.numeric(r) || is.numeric(r00))
         isLog <- (is.logical(r) || is.logical(r00))
-        Matrix.msg("exploding <diag> o <diag> into dense matrix", .M.level = 2)
+        Matrix.message("exploding <diag> o <diag> into dense matrix", .M.level = 2)
         d <- e1@Dim
         n <- d[1L]
         stopifnot(length(r) == n)
