@@ -181,6 +181,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 {
 	if (!IS_S4_OBJECT(from)) {
+		/* defined in ./coerce.c : */
 		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
 		from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 0);
 	}
@@ -521,8 +522,8 @@ SEXP dense_transpose(SEXP from, const char *class)
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		if (class[2] != 'p') { \
-			R_xlen_t len1s = XLENGTH(x0) - 1; \
-			for (j = 0; j < m; ++j, px0 -= len1s) \
+			R_xlen_t mn1s = XLENGTH(x0) - 1; \
+			for (j = 0; j < m; ++j, px0 -= mn1s) \
 				for (i = 0; i < n; ++i, px0 += m) \
 					*(px1++) = *px0; \
 		} else if (ul == 'U') { \
@@ -1088,6 +1089,7 @@ int dense_is_symmetric(SEXP obj, const char *class, int checkDN)
 SEXP R_dense_is_symmetric(SEXP obj, SEXP checkDN)
 {
 	if (!IS_S4_OBJECT(obj)) {
+		/* defined in ./coerce.c : */
 		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
@@ -1220,6 +1222,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 SEXP R_dense_is_triangular(SEXP obj, SEXP upper)
 {
 	if (!IS_S4_OBJECT(obj)) {
+		/* defined in ./coerce.c : */
 		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
@@ -1357,6 +1360,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 SEXP R_dense_is_diagonal(SEXP obj)
 {
 	if (!IS_S4_OBJECT(obj)) {
+		/* defined in ./coerce.c : */
 		SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
