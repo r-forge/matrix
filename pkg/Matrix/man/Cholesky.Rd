@@ -305,9 +305,9 @@ s(rapply2(m.ch.A4, object.size))
 inm <- c("pivoted", "unpivoted")
 jnm <- c("simpl1", "simpl0", "super0")
 for(i in 1:2)
-for(j in 1:3)
-print(image(m.ch.A4[[c(i, j)]], main = paste(inm[i], jnm[j])),
-            split = c(j, i, 3L, 2L), more = i * j < 6L)
+  for(j in 1:3)
+    print(image(m.ch.A4[[c(i, j)]], main = paste(inm[i], jnm[j])),
+          split = c(j, i, 3L, 2L), more = i * j < 6L)
 
 simpl1 <- ch.A4[[c("pivoted", "simpl1")]]
 stopifnot(exprs = {
