@@ -41,36 +41,39 @@ static SEXP cs2dgC(const cs *A, const char *cl)
 	return obj;
 }
 
-static cholmod_sparse *dgC2cholmod(SEXP obj)
+cholmod_sparse *dgC2cholmod(SEXP obj, int values)
 {
 	cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse));
 	memset(A, 0, sizeof(cholmod_sparse));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
 	A->nrow = (size_t) INTEGER(dim)[0];
 	A->ncol = (size_t) INTEGER(dim)[1];
 	A->p = INTEGER(p);
 	A->i = INTEGER(i);
-	A->x = REAL(x);
+	if (values) {
+		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		A->x = REAL(x);
+		UNPROTECT(1);
+	}
 	A->nzmax = (size_t) ((int *) A->p)[A->ncol];
 	A->stype = 0;
 	A->itype = CHOLMOD_INT;
-	A->xtype = CHOLMOD_REAL;
+	A->xtype = (values) ? CHOLMOD_REAL : CHOLMOD_PATTERN;
 	A->dtype = CHOLMOD_DOUBLE;
 	A->sorted = 1;
 	A->packed = 1;
-	UNPROTECT(4);
+	UNPROTECT(3);
 	return A;
 }
 
-static SEXP cholmod2dgC(cholmod_sparse *A, const char *cl)
+SEXP cholmod2dgC(cholmod_sparse *A, const char *cl, int values)
 {
-	if (A->itype != CHOLMOD_INT ||
-	    A->xtype != CHOLMOD_REAL ||
-	    A->dtype != CHOLMOD_DOUBLE)
-		error(_("wrong '%s' or '%s' or '%s'"), "itype", "xtype", "dtype");
+	if (A->itype != CHOLMOD_INT)
+		error(_("wrong '%s'"), "itype");
+	if (values && (A->xtype != CHOLMOD_REAL || A->dtype != CHOLMOD_DOUBLE))
+	    error(_("wrong '%s' or '%s'"), "xtype", "dtype");
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
 		error(_("dimensions cannot exceed %s"), "2^31-1");
 	if (!A->sorted || !A->packed || A->stype != 0)
@@ -81,65 +84,84 @@ static SEXP cholmod2dgC(cholmod_sparse *A, const char *cl)
 	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(allocVector(INTSXP, n1a)),
-		i = PROTECT(allocVector(INTSXP, nnz)),
-		x = PROTECT(allocVector(REALSXP, nnz));
+		i = PROTECT(allocVector(INTSXP, nnz));
 	INTEGER(dim)[0] = m;
 	INTEGER(dim)[1] = n;
 	Matrix_memcpy(INTEGER(p), A->p, n1a, sizeof(int));
 	Matrix_memcpy(INTEGER(i), A->i, nnz, sizeof(int));
-	Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
 	SET_SLOT(obj, Matrix_pSym, p);
 	SET_SLOT(obj, Matrix_iSym, i);
-	SET_SLOT(obj, Matrix_xSym, x);
-	UNPROTECT(5);
+	if (values) {
+		SEXP x = PROTECT(allocVector(REALSXP, nnz));
+		Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
+		SET_SLOT(obj, Matrix_xSym, x);
+		UNPROTECT(1);
+	}
+	UNPROTECT(4);
 	return obj;
 }
 
-static cholmod_dense *dge2cholmod(SEXP obj)
+cholmod_dense *dge2cholmod(SEXP obj, int trans)
 {
-	cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
-	memset(A, 0, sizeof(cholmod_dense));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	A->nzmax = (size_t) XLENGTH(x);
-	A->nrow = (size_t) INTEGER(dim)[0];
-	A->ncol = (size_t) INTEGER(dim)[1];
+	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
+	double *px = REAL(x);
+	cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
+	memset(A, 0, sizeof(cholmod_dense));
+	A->nrow = (size_t) ((trans) ? n : m);
+	A->ncol = (size_t) ((trans) ? m : n);
 	A->d = A->nrow;
-	A->x = REAL(x);
+	A->nzmax = A->nrow * A->ncol;
 	A->xtype = CHOLMOD_REAL;
 	A->dtype = CHOLMOD_DOUBLE;
+	if (!trans)
+		A->x = px;
+	else {
+		double *py = R_Calloc(A->nzmax, double);
+		A->x = py; /* NB: caller must do R_Free(A->x) */
+		int i, j;
+		size_t mn1s = A->nrow * A->ncol - 1;
+		for (j = 0; j < m; ++j, px -= mn1s)
+			for (i = 0; i < n; ++i, px += m)
+				*(py++) = *px;
+	}
 	UNPROTECT(2);
 	return A;
 }
 
-static SEXP cholmod2dge(const cholmod_dense *A, const char *cl)
+SEXP cholmod2dge(const cholmod_dense *A, const char *cl, int trans)
 {
 	if (A->xtype != CHOLMOD_REAL || A->dtype != CHOLMOD_DOUBLE)
 		error(_("wrong '%s' or '%s'"), "xtype", "dtype");
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
 		error(_("dimensions cannot exceed %s"), "2^31-1");
 	int m = (int) A->nrow, n = (int) A->ncol;
-	if ((double) m * n > R_XLEN_T_MAX)
+	size_t d = A->d;
+	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	size_t d = A->d;
-	R_xlen_t mn = (R_xlen_t) m * n;
 	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		x = PROTECT(allocVector(REALSXP, mn));
+		x = PROTECT(allocVector(REALSXP, (R_xlen_t) m * n));
 	double *px = REAL(x), *py = (double *) A->x;
-	INTEGER(dim)[0] = m;
-	INTEGER(dim)[1] = n;
-	if (d == m)
-		Matrix_memcpy(px, py, mn, sizeof(double));
-	else {
+	INTEGER(dim)[0] = (trans) ? n : m;
+	INTEGER(dim)[1] = (trans) ? m : n;
+	if (trans) {
+		int i, j;
+		size_t dn1s = d * n - 1;
+		for (j = 0; j < m; ++j, py -= dn1s)
+			for (i = 0; i < n; ++i, py += d)
+				*(px++) = *py;
+	} else if (d > m) {
 		int j;
 		for (j = 0; j < n; ++j) {
 			Matrix_memcpy(px, py, m, sizeof(double));
 			px += m;
 			py += d;
 		}
-	}
+	} else
+		Matrix_memcpy(px, py, (R_xlen_t) m * n, sizeof(double));
 	SET_SLOT(obj, Matrix_xSym, x);
 	UNPROTECT(3);
 	return obj;
@@ -889,7 +911,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(trf, &pid);
-	cholmod_sparse *A = dgC2cholmod(obj);
+	cholmod_sparse *A = dgC2cholmod(obj, 1);
 	cholmod_factor *L = NULL;
 
 	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -1809,13 +1831,13 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			cholmod_free_dense(&B, &c);
 			const char *cl = (ivalid < 2) ? "dpoMatrix" :
 				((ivalid < 7) ? "dtrMatrix" : "dgeMatrix");
-			PROTECT(r = cholmod2dge(X, cl));
+			PROTECT(r = cholmod2dge(X, cl, 0));
 		} else {
-			B = dge2cholmod(b);
+			B = dge2cholmod(b, 0);
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
-			PROTECT(r = cholmod2dge(X, "dgeMatrix"));
+			PROTECT(r = cholmod2dge(X, "dgeMatrix", 0));
 		}
 		cholmod_free_dense(&X, &c);
 	} else {
@@ -1844,13 +1866,13 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			}
 			const char *cl = (ivalid < 2) ? "dsCMatrix" :
 				((ivalid < 7) ? "dtCMatrix" : "dgCMatrix");
-			PROTECT(r = cholmod2dgC(X, cl));
+			PROTECT(r = cholmod2dgC(X, cl, 1));
 		} else {
-			B = dgC2cholmod(b);
+			B = dgC2cholmod(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
-			PROTECT(r = cholmod2dgC(X, "dgCMatrix"));
+			PROTECT(r = cholmod2dgC(X, "dgCMatrix", 1));
 		}
 		cholmod_free_sparse(&X, &c);
 	}
@@ -2223,7 +2245,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 		error(_("'%s' is not a number or not finite"), "mult");
 
 	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
-	cholmod_sparse *A = dgC2cholmod(parent);
+	cholmod_sparse *A = dgC2cholmod(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
 		char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -2246,7 +2268,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 {
 	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
-	cholmod_sparse *A = dgC2cholmod(parent);
+	cholmod_sparse *A = dgC2cholmod(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
 		char ul = *CHAR(STRING_ELT(uplo, 0));
