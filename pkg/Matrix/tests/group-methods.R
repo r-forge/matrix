@@ -240,7 +240,7 @@ stopifnot(validObject(lm1), validObject(lm2),
           identical(dsc, dsc * as(lm1, "dMatrix")))
 
 crossprod(lm1) # lm1: "lsC*"
-cnm1 <- crossprod(nm1)
+cnm1 <- crossprod(nm1, boolArith = FALSE)
 stopifnot(is(cnm1, "symmetricMatrix"), ## whereas the %*% is not:
 	  Q.eq(cnm1, nm1 %*% nm1))
 dn1 <- as(nm1, "denseMatrix")

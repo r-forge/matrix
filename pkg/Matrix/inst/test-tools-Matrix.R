@@ -519,8 +519,8 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 
 	## crossprod()	%*%  etc
 	if(do.prod) {
-	    c.m <-  crossprod(m)
-	    tcm <- tcrossprod(m)
+	    c.m <-  crossprod(m, boolArith = FALSE)
+	    tcm <- tcrossprod(m, boolArith = FALSE)
             tolQ <- if(isSparse) NA else eps16
 	    stopifnot(dim(c.m) == rep.int(ncol(m), 2),
 		      dim(tcm) == rep.int(nrow(m), 2),

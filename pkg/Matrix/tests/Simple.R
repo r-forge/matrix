@@ -635,7 +635,7 @@ stopifnot(identical(ncu, as(lcu,"nsparseMatrix")),
 	  Q.eq(ncn, ncu),
 	  Q.eq(crossprod(drop0(lcu)), crossprod(lcu)),# crossprod works -> "dsCMatrix"
 	  identical(crossprod(ncu), cncn),
-	  Q.eq(cncn, t(ncu) %*% ncu)) #used to seg.fault
+	  Q.eq(cncn, t(ncu) %&% ncu)) #used to seg.fault
 
 U <- new("dtCMatrix", Dim = c(6L, 6L),
 	 i = c(0:1, 0L, 2:3, 1L, 4L),

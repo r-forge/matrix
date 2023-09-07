@@ -68,30 +68,6 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     }
 }
 
-mmultDim <- function(d.a, d.b, type = 1L) {
-    ## Return the 'dim' of the product indicated by 'type':
-    ##     type 1:    a  %*%   b
-    ##          2:  t(a) %*%   b    {crossprod}
-    ##          3:    a  %*% t(b)  {tcrossprod}
-    ## after asserting that ncol(<left operand>) == nrow(<right operand>)
-    i.a <- 1L + (type != 2L)
-    i.b <- 1L + (type == 3L)
-    if(d.a[i.a] != d.b[i.b])
-        stop(gettextf("non-conformable matrix dimensions in %s",
-                      deparse(sys.call(sys.parent()))),
-             call. = FALSE, domain = NA)
-    c(d.a[-i.a], d.b[-i.b])
-}
-
-mmultDimnames <- function(dn.a, dn.b, type = 1L) {
-    ## Return the 'dimnames' of the product indicated by 'type':
-    ##     type 1:    a  %*%   b
-    ##          2:  t(a) %*%   b   { crossprod}
-    ##          3:    a  %*% t(b)  {tcrossprod}
-    c(if(is.null(dn.a)) list(NULL) else dn.a[2L - (type != 2L)],
-      if(is.null(dn.b)) list(NULL) else dn.b[2L - (type == 3L)])
-}
-
 ## MJ: Implement forceTriangular() and export this and that?
 ## MJ: Notably this provides a model for (maybe, in the future) allowing
 ## forceSymmetric(<non-square>) ... by truncating the "too long" dimension.
@@ -154,9 +130,20 @@ forceDiagonal <- function(x, diag = NA_character_) {
 
 .tCRT <- function(x, lazy = TRUE) .Call(R_sparse_transpose, x, lazy)
 
-
-.drop0 <- function(x, tol = 0)
-    .Call(R_sparse_drop0, x, tol)
+.drop0 <- function(x, tol = 0, isM = TRUE) {
+    if(isM)
+        return(.Call(R_sparse_drop0, x, tol))
+    ## TODO: write sparseVector code in C and respecting 'tol'
+    if(.V.kind(x) == "n")
+        return(x)
+    x.x <- x@x
+    k <- which(is.na(x.x) | x.x)
+    if(length(k)) {
+        x@i <- x@i[k]
+        x@x <- x.x[k]
+    }
+    x
+}
 
 drop0 <- function(x, tol = 0, is.Csparse = NA, give.Csparse = TRUE) {
     tryCoerce <-
