@@ -1872,7 +1872,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 		      "R_XLEN_T_MAX");
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
 	int nprotect = 2;
-	if (class[2] == 'p' || new > 0) {
+	if (class[2] == 'p' || new) {
 		PROTECT(x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 		++nprotect;
 	}
@@ -1883,7 +1883,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		if (class[2] == 'p') \
 			_PREFIX_ ## dense_unpack(px1, px0, n, ul, di); \
-		else if (new > 0) \
+		else if (new) \
 			Matrix_memcpy(px1, px0, (R_xlen_t) n * n, sizeof(_CTYPE_)); \
 		if (class[1] == 's') \
 			_PREFIX_ ## dense_unpacked_make_symmetric(px1, n, ul); \
