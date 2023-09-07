@@ -58,6 +58,7 @@
 \alias{\%&\%,indMatrix,indMatrix-method}
 \alias{\%&\%,indMatrix,matrix-method}
 \alias{\%&\%,indMatrix,pMatrix-method}
+\alias{\%&\%,indMatrix,vector-method}
 \alias{\%&\%,matrix,ANY-method}
 \alias{\%&\%,matrix,CsparseMatrix-method}
 \alias{\%&\%,matrix,RsparseMatrix-method}
@@ -73,6 +74,7 @@
 \alias{\%&\%,pMatrix,indMatrix-method}
 \alias{\%&\%,pMatrix,matrix-method}
 \alias{\%&\%,pMatrix,pMatrix-method}
+\alias{\%&\%,pMatrix,vector-method}
 \alias{\%&\%,sparseVector,ANY-method}
 \alias{\%&\%,sparseVector,Matrix-method}
 \alias{\%&\%,sparseVector,matrix-method}
@@ -83,7 +85,9 @@
 \alias{\%&\%,vector,RsparseMatrix-method}
 \alias{\%&\%,vector,TsparseMatrix-method}
 \alias{\%&\%,vector,denseMatrix-method}
+\alias{\%&\%,vector,indMatrix-method}
 \alias{\%&\%,vector,matrix-method}
+\alias{\%&\%,vector,pMatrix-method}
 \alias{\%&\%,vector,sparseVector-method}
 \alias{\%&\%,vector,vector-method}
 %
