@@ -9,7 +9,8 @@ cholmod_dense  *dge2cholmod(SEXP, int);
 SEXP cholmod2dge(const cholmod_dense  *, const char *, int);
 
 /* op(<dge>) * op(<dge>) */
-static SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
+static
+SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym));
 	int *padim = INTEGER(adim), am = padim[0], an = padim[1],
@@ -109,7 +110,8 @@ static SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
 }
 
 /* <dsy> * op(<dge>)  or  op(<dge>) * <dsy> */
-static SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
+static
+SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -173,8 +175,9 @@ static SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 }
 
 /* op(<dtr>) * op(<dge>)  or  op(<dge>) * op(<dtr>) */
-static SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
-                           int triangular)
+static
+SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+                    int triangular)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -252,7 +255,8 @@ static SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 }
 
 /* <dsp> * op(<dge>)  or  op(<dge>) * <dsp> */
-static SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
+static
+SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -310,8 +314,9 @@ static SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 }
 
 /* op(<dtp>) * op(<dge>)  or  op(<dge>) * op(<dtp>) */
-static SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
-                           int triangular)
+static
+SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+                    int triangular)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -535,8 +540,11 @@ SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	return x;
 }
 
-static SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
-                                     int ztrans, int triangular, int boolean)
+/* boolean: op(op(<.gC>) * op(<.gC>)) */
+/* numeric: op(op(<dgC>) * op(<dgC>)) */
+static
+SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
+                              int ztrans, int triangular, int boolean)
 {
 	PROTECT_INDEX zpid;
 	SEXP z;
@@ -602,8 +610,10 @@ static SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 	return z;
 }
 
-static SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
-                                     int ztrans, int triangular, int symmetric)
+/* op(op(<d[gs]C>) * op(<dge>)) */
+static
+SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
+                              int ztrans, int triangular, int symmetric)
 {
 	SEXP z;
 	char zcl[] = "d..Matrix";

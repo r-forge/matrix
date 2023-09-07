@@ -63,6 +63,7 @@ R/bandSparse\.R$
 R/corMatrix\.R$
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|po|pp|di|[gts][CRT])Matrix\.R$
+R/pMatrix\.R$
 R/packedMatrix\.R$
 R/sparseQR\.R$
 R/symmetricMatrix\.R$
