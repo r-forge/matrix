@@ -34,20 +34,13 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Matrix_rle_i, 2),
 	CALLDEF(Matrix_rle_d, 2),
 
-	CALLDEF(Csparse_Csparse_prod, 3),
-	CALLDEF(Csparse_Csparse_crossprod, 4),
-	CALLDEF(Csparse_MatrixMarket, 2),
-	CALLDEF(Csparse_crossprod, 3),
-	CALLDEF(Csparse_dense_crossprod, 3),
-	CALLDEF(Csparse_dense_prod, 3),
-
+	CALLDEF(Csparse_validate2, 2),
 	CALLDEF(dCsparse_subassign, 4),
 	CALLDEF(lCsparse_subassign, 4),
 	CALLDEF(iCsparse_subassign, 4),
 	CALLDEF(nCsparse_subassign, 4),
 	CALLDEF(zCsparse_subassign, 4),
-
-	CALLDEF(Csparse_validate2, 2),
+	CALLDEF(Csparse_MatrixMarket, 2),
 	CALLDEF(Csparse_dmperm, 3),
 	CALLDEF(diag_tC, 2),
 
@@ -62,21 +55,6 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(dgeMatrix_Schur, 3),
 	CALLDEF(dgeMatrix_exp, 1),
-
-	CALLDEF(dgeMatrix_crossprod, 2),
-	CALLDEF (geMatrix_crossprod, 2),
-	CALLDEF(dgeMatrix_dgeMatrix_crossprod, 3),
-	CALLDEF (geMatrix_geMatrix_crossprod, 3),
-	CALLDEF(dgeMatrix_matrix_crossprod, 3),
-	CALLDEF (geMatrix_matrix_crossprod, 3),
-	CALLDEF(dgeMatrix_matrix_mm, 3),
-	CALLDEF (geMatrix_matrix_mm, 3),
-	CALLDEF(dtrMatrix_dtrMatrix_mm, 4),
-	CALLDEF(dtrMatrix_matrix_mm, 4),
-	CALLDEF(dtpMatrix_matrix_mm, 4),
-	CALLDEF(dgeMatrix_dtpMatrix_mm, 2),
-	CALLDEF(dsyMatrix_matrix_mm, 3),
-	CALLDEF(dspMatrix_matrix_mm, 2),
 
 	CALLDEF(Matrix_validate, 1),
 	CALLDEF(MatrixFactorization_validate, 1),
@@ -162,6 +140,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_subscript_1ary_mat, 2),
 	CALLDEF(R_subscript_2ary, 3),
 
+	CALLDEF(R_sparse_prod, 6),
 	CALLDEF(R_sparse_drop0, 2),
 	CALLDEF(R_sparse_diag_U2N, 1),
 	CALLDEF(R_sparse_diag_N2U, 1),
@@ -178,6 +157,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_marginsum, 5),
 	CALLDEF(Tsparse_aggregate, 1),
 
+	CALLDEF(R_dense_prod, 4),
 	CALLDEF(R_dense_band, 3),
 	CALLDEF(R_dense_diag_get, 2),
 	CALLDEF(R_dense_diag_set, 2),

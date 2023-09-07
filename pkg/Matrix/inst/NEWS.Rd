@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-08-30 r4297)}{
+\section{Changes in version 1.6-2 (2023-09-07 r4303)}{
   \subsection{New Features}{
     \itemize{
       \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
