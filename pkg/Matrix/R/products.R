@@ -1089,7 +1089,7 @@ setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
 
 setMethod("crossprod", signature(x = "vector", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              if((d <- y@Dim)[1L] != length(x))
+              if(y@Dim[1L] != length(x))
                   stop("non-conformable arguments")
               k <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin == 1L)
@@ -1151,7 +1151,7 @@ setMethod("crossprod", signature(x = "matrix", y = "pMatrix"),
 
 setMethod("crossprod", signature(x = "vector", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              if((d <- y@Dim)[1L] != length(x))
+              if(y@Dim[1L] != length(x))
                   stop("non-conformable arguments")
               k <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
