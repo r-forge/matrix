@@ -4,16 +4,11 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-07 r4304)}{
+\section{Changes in version 1.6-2 (2023-09-08 r4310)}{
   \subsection{New Features}{
     \itemize{
-      \item \code{sort(<sparseVector>, na.last=, decreasing=)} now works.
-      Non-structural zeros are sorted as \dQuote{greater than} structural
-      zeros.
-
       \item \code{mean(<sparseVector>, trim=)} now works efficiently
-      for nonzero values of \code{trim}, thanks in part to the above
-      mentioned \code{sort} method.
+      for nonzero values of \code{trim}.
 
       \item \code{rep(<sparseVector>, each=)} now works efficiently,
       avoiding \code{rep(., times = rep(each, times = length(.)))}.
@@ -22,7 +17,7 @@
       \code{trans} indicating if vectors that are not matrices should
       be coerced to 1-row matrices rather than 1-column matrices.
 
-     \item \code{.m2dense} and \code{.m2sparse} can be called
+      \item \code{.m2dense} and \code{.m2sparse} can be called
       with one argument.  Their \code{class} arguments admit new
       default values \code{".ge"} and \code{".gC"}.
 
