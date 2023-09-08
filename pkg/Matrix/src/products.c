@@ -398,8 +398,7 @@ SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 
 SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
 		ivalid;
 
@@ -692,8 +691,7 @@ SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 		error(_("invalid '%s' to %s()"), "boolean", __func__);
 
 	static const char *valid[] = {
-		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE,
-		VALID_DDENSE , VALID_LDENSE , VALID_NDENSE , "" };
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" }
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
 		ztrans_ = LOGICAL(ztrans)[0], boolean_ = LOGICAL(boolean)[0],
 		ivalid, triangular = 0;

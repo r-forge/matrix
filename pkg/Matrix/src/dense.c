@@ -186,8 +186,7 @@ SEXP R_dense_band(SEXP from, SEXP k1, SEXP k2)
 		from = matrix_as_dense(from, ".ge", '\0', '\0', 0, 0);
 	}
 	PROTECT(from);
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -304,8 +303,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 
 SEXP R_dense_diag_get(SEXP obj, SEXP names)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
@@ -404,8 +402,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 
 SEXP R_dense_diag_set(SEXP from, SEXP value)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -566,7 +563,7 @@ SEXP R_dense_transpose(SEXP from)
 {
 	static const char *valid[] = {
 		"corMatrix", "pcorMatrix", "dpoMatrix", "dppMatrix",
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+		VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -683,8 +680,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 
 SEXP R_dense_force_symmetric(SEXP from, SEXP uplo)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -844,8 +840,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 
 SEXP R_dense_symmpart(SEXP from)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -1012,8 +1007,7 @@ SEXP dense_skewpart(SEXP from, const char *class)
 
 SEXP R_dense_skewpart(SEXP from)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -1094,8 +1088,7 @@ SEXP R_dense_is_symmetric(SEXP obj, SEXP checkDN)
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
 	PROTECT(obj);
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
@@ -1227,8 +1220,7 @@ SEXP R_dense_is_triangular(SEXP obj, SEXP upper)
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
 	PROTECT(obj);
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
@@ -1365,8 +1357,7 @@ SEXP R_dense_is_diagonal(SEXP obj)
 		obj = matrix_as_dense(obj, ".ge", '\0', '\0', 0, 0);
 	}
 	PROTECT(obj);
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
@@ -1752,8 +1743,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int margin,
 SEXP R_dense_marginsum(SEXP obj, SEXP margin,
                        SEXP narm, SEXP mean)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);

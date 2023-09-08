@@ -1181,8 +1181,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 /* as(<denseMatrix>, "[CRT]sparseMatrix") */
 SEXP R_dense_as_sparse(SEXP from, SEXP repr)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -1588,8 +1587,7 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind)
 /* as(<denseMatrix>, "[nlidz]Matrix") */
 SEXP R_dense_as_kind(SEXP from, SEXP kind)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -1919,8 +1917,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 /* as(<denseMatrix>, "generaMatrix") */
 SEXP R_dense_as_general(SEXP from)
 {
-	static const char *valid[] = {
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+	static const char *valid[] = { VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -2289,7 +2286,7 @@ SEXP R_dense_as_unpacked(SEXP from)
 {
 	static const char *valid[] = {
 		"dpoMatrix", "dppMatrix", "corMatrix", "pcorMatrix",
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+		VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
@@ -2407,7 +2404,7 @@ SEXP R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 {
 	static const char *valid[] = {
 		"dpoMatrix", "dppMatrix", "corMatrix", "pcorMatrix",
-		VALID_DDENSE, VALID_LDENSE, VALID_NDENSE, "" };
+		VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
