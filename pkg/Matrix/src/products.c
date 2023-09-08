@@ -691,7 +691,7 @@ SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 		error(_("invalid '%s' to %s()"), "boolean", __func__);
 
 	static const char *valid[] = {
-		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" }
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
 		ztrans_ = LOGICAL(ztrans)[0], boolean_ = LOGICAL(boolean)[0],
 		ivalid, triangular = 0;
