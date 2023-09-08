@@ -91,6 +91,7 @@ export(.M2C,
        asUniqueT,
        bandSparse,
        bdiag,
+       ## c() dispatches on 1st arg => allow method to be called explicitly:
        c.Matrix,
        c.sparseVector,
        colScale,
@@ -151,18 +152,25 @@ export(.CR2RC, .CR2T, .T2CR, .dense2g, .dense2kind, .dense2m, .dense2v,
 
 ## ---- S3 methods -----------------------------------------------------
 
+## So that dispatch also happens inside of 'base' functions:
 S3method(as.matrix, Matrix)
 S3method(as.matrix, sparseVector)
 S3method(as.array, Matrix)
 S3method(as.array, sparseVector)
+
+## Because S4 dispatch is "hard" for c():
 S3method(c, Matrix)
 S3method(c, sparseVector)
 S3method(c, abIndex)
+
+## For printing return values of our summary() methods:
 S3method(print, diagSummary)
 S3method(print, sparseSummary)
 
 
 ## ---- S4 generic functions, methods ----------------------------------
+
+export(crossprod, tcrossprod) ## *necessary* (once .Primitive in base)
 
 ## From 'Matrix' {no need to also export(); see WRE}
 exportMethods("%&%",
