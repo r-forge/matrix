@@ -92,7 +92,7 @@ export(.M2C,
        bandSparse,
        bdiag,
        ## c() dispatches on 1st arg => allow method to be called explicitly:
-       c.Matrix,
+       ## c.Matrix, # not yet (see below)
        c.sparseVector,
        colScale,
        condest,
@@ -159,7 +159,7 @@ S3method(as.array, Matrix)
 S3method(as.array, sparseVector)
 
 ## Because S4 dispatch is "hard" for c():
-S3method(c, Matrix)
+## S3method(c, Matrix) # breaks 7 rev. dep. {2023-09-08}
 S3method(c, sparseVector)
 S3method(c, abIndex)
 
@@ -170,7 +170,8 @@ S3method(print, sparseSummary)
 
 ## ---- S4 generic functions, methods ----------------------------------
 
-export(crossprod, tcrossprod) ## *necessary* (once .Primitive in base)
+export(crossprod, tcrossprod) # *necessary* (once .Primitive in base)
+## MJ: why these and not also export(dim, ...) which are also primitive ??
 
 ## From 'Matrix' {no need to also export(); see WRE}
 exportMethods("%&%",
@@ -249,7 +250,6 @@ exportMethods("!",
               rowMeans,
               rowSums,
               solve,
-              sort,
               summary,
               t,
               tcrossprod,

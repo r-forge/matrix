@@ -79,11 +79,6 @@ setGeneric("skewpart",
            function(x)
                standardGeneric("skewpart"))
 
-setGeneric("sort",
-           function(x, decreasing = FALSE, ...)
-               standardGeneric("sort"),
-           signature = "x")
-
 setGeneric("symmpart",
            function(x)
                standardGeneric("symmpart"))
