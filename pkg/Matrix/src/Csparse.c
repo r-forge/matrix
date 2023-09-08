@@ -1,11 +1,9 @@
-/** @file Csparse.c
- * The "CsparseMatrix" class from R package Matrix:
- *
- * Sparse matrices in compressed column-oriented form
- */
 #include "Csparse.h"
+#include "cs.h"
 #include "chm_common.h"
-#include "cs_utils.h" /* -> ./cs.h  for cs_dmperm() */
+
+/* defined in factorizations.c : */
+cs *dgC2cs(SEXP, int);
 
 #define _t_Csparse_validate
 #include "t_Csparse_validate.c"
@@ -78,7 +76,7 @@ SEXP Csparse_MatrixMarket(SEXP x, SEXP fname)
 static csd* Csparse_dmperm_raw(SEXP mat, SEXP seed)
 {
     mat = PROTECT(duplicate(mat));
-    CSP matx = AS_CSP__(mat); /* m x n ; compressed column, *double* 'x' or none */
+    cs *matx = dgC2cs(mat, HAS_SLOT(mat, Matrix_xSym));
     int iseed = asInteger(seed);
     R_CheckStack();
     UNPROTECT(1);

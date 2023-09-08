@@ -284,18 +284,14 @@ mat2triplet <- function(x, uniqT = FALSE) {
 dmperm <- function(x, nAns = 6L, seed = 0L) {
     stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
               length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
-    if(isS4(x)) {
-        cld <- getClassDef(class(x))
-        if(!extends(cld, "CsparseMatrix"))
-            cld <- getClassDef(class(x <- as(x, "CsparseMatrix")))
-        if(extends(cld, "symmetricMatrix"))
-            cld <- getClassDef(class(x <- .M2gen(x)))
-        if(!(extends(cld, "dMatrix") || extends(cld, "nMatrix")))
-            x <- .M2kind(x, "d")
-    } else { # typically a traditional matrix
+    if(!isS4(x))
         x <- .m2sparse(x, "dgC", NULL, NULL)
+    else {
+        x <- .M2gen(.M2C(x))
+        if(.M.kind(x) != "n")
+            x <- .M2kind(x, "d")
     }
-    .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [dn][gt]CMatrix 'x'
+    .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [nd]gCMatrix 'x'
 }
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"

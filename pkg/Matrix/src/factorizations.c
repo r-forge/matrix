@@ -1,26 +1,29 @@
 #include <Rmath.h> /* math.h, logspace_add, logspace_sub */
 #include "factorizations.h"
 
-static cs *dgC2cs(SEXP obj)
+cs *dgC2cs(SEXP obj, int values)
 {
 	cs *A = (cs *) R_alloc(1, sizeof(cs));
 	memset(A, 0, sizeof(cs));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
 	A->nzmax = LENGTH(i);
 	A->m = INTEGER(dim)[0];
 	A->n = INTEGER(dim)[1];
 	A->p = INTEGER(p);
 	A->i = INTEGER(i);
-	A->x = REAL(x);
+	if (values) {
+		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		A->x = REAL(x);
+		UNPROTECT(1);
+	}
 	A->nz = -1;
-	UNPROTECT(4);
+	UNPROTECT(3);
 	return A;
 }
 
-static SEXP cs2dgC(const cs *A, const char *cl)
+SEXP cs2dgC(const cs *A, const char *cl)
 {
 	int nnz = ((int *) A->p)[A->n];
 	R_xlen_t np1 = (R_xlen_t) A->n + 1;
@@ -679,7 +682,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 		return val;
 	PROTECT(val = NEW_OBJECT_OF_CLASS("sparseLU"));
 
-	const cs *A = dgC2cs(obj);
+	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
 	csn *N = NULL;
 	int *pp = NULL;
@@ -778,7 +781,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 		return val;
 	PROTECT(val = NEW_OBJECT_OF_CLASS("sparseQR"));
 
-	const cs *A = dgC2cs(obj);
+	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
 	csn *N = NULL;
 	int *pp = NULL;
@@ -1643,7 +1646,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		*pap = INTEGER(ap),
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : (int *) NULL;
 	double *work = (double *) R_alloc((size_t) m, sizeof(double));
-	cs *L = dgC2cs(aL), *U = dgC2cs(aU);
+	cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
 	if (!asLogical(sparse)) {
 		PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
 		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
@@ -1697,7 +1700,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			X = cs_permute(        B, papinv, (int *) NULL, 1);
 			B = cs_spfree(B);
 		} else
-			X = cs_permute(dgC2cs(b), papinv, (int *) NULL, 1);
+			X = cs_permute(dgC2cs(b, 1), papinv, (int *) NULL, 1);
 		papinv = cs_free(papinv);
 		if (!X)
 			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
@@ -1956,7 +1959,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int j;
-	cs *A = dgC2cs(a);
+	cs *A = dgC2cs(a, 1);
 	if (!asLogical(sparse)) {
 		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
 		PROTECT(r = NEW_OBJECT_OF_CLASS(cl));
@@ -2010,7 +2013,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			}
 			B->p[n] = n;
 		} else
-			B = dgC2cs(b);
+			B = dgC2cs(b, 1);
 
 		int i, k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
@@ -2044,7 +2047,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym)),
 		beta = PROTECT(GET_SLOT(qr, Matrix_betaSym)),
 		p = PROTECT(GET_SLOT(qr, Matrix_pSym));
-	const cs *V_ = dgC2cs(V);
+	const cs *V_ = dgC2cs(V, 1);
 	double *pbeta = REAL(beta);
 	int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
 		*pp = INTEGER(p), nprotect = 6;
@@ -2105,7 +2108,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	{
 		SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)),
 			q = PROTECT(GET_SLOT(qr, Matrix_qSym));
-		const cs *R_ = dgC2cs(R);
+		const cs *R_ = dgC2cs(R, 1);
 		int *pq = (LENGTH(q)) ? INTEGER(q) : (int *) NULL;
 
 		for (j = 0; j < n; ++j) {

@@ -7,7 +7,6 @@ SOURCES_C = \
 	chm_common.c \
 	coerce.c \
 	cs.c \
-	cs_utils.c \
 	dense.c \
 	dgCMatrix.c \
 	dgeMatrix.c \

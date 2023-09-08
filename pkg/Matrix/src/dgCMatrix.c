@@ -1,6 +1,9 @@
 #include "dgCMatrix.h"
-#include "cs_utils.h"
+#include "cs.h"
 #include "chm_common.h"
+
+/* defined in factorizations.c : */
+cs *dgC2cs(SEXP, int);
 
 /** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
  *  which entirely correspond to the (i,j) slots of
@@ -36,7 +39,7 @@ SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
     SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
 		       duplicate(y) : coerceVector(y, REALSXP));
-    CSP xc = AS_CSP__(x);
+    cs *xc = dgC2cs(x, 1);
     R_CheckStack();
 
     if (xc->m != xc->n || xc->m <= 0)
@@ -56,7 +59,7 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
     /* FIXME: extend this to work in multivariate case, i.e. y a matrix with > 1 column ! */
     SEXP ycp = PROTECT((TYPEOF(y) == REALSXP) ?
 		       duplicate(y) : coerceVector(y, REALSXP));
-    CSP xc = AS_CSP(x); /* <--> x  may be  dgC* or dtC* */
+    cs *xc = dgC2cs(x, 1);
     int order = asInteger(ord);
 #ifdef _not_yet_do_FIXME__
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};

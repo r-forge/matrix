@@ -74,6 +74,7 @@ R/unpackedMatrix\.R$
 # from '-Wpedantic' :
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
+src/cs_utils\.[ch]$
 src/dgTMatrix\.[ch]$
 src/dpoMatrix\.[ch]$
 src/dppMatrix\.[ch]$

@@ -17,7 +17,7 @@ Csparse.o: Csparse.c Csparse.h Mutils.h Mdefines.h Syms.h Minlines.h \
   CHOLMOD/Include/cholmod_partition.h CHOLMOD/Include/cholmod_camd.h \
   CHOLMOD/Include/cholmod_supernodal.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
-  cs_utils.h cs.h t_Csparse_validate.c t_Csparse_subassign.c
+  cs.h t_Csparse_validate.c t_Csparse_subassign.c
 Mutils.o: Mutils.c Mutils.h Mdefines.h Syms.h Minlines.h
 abIndex.o: abIndex.c abIndex.h Mutils.h Mdefines.h Syms.h Minlines.h \
   t_Matrix_rle.c
@@ -34,10 +34,9 @@ chm_common.o: chm_common.c chm_common.h \
 coerce.o: coerce.c coerce.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 cs.o: cs.c cs.h
-cs_utils.o: cs_utils.c cs_utils.h cs.h Mutils.h Mdefines.h Syms.h Minlines.h
 dense.o: dense.c dense.h Lapack-etc.h Mutils.h Mdefines.h Syms.h Minlines.h
 dgCMatrix.o: dgCMatrix.c dgCMatrix.h Mutils.h Mdefines.h Syms.h Minlines.h \
-  cs_utils.h cs.h chm_common.h \
+  chm_common.h \
   SuiteSparse_config/SuiteSparse_config.h CHOLMOD/Include/cholmod.h \
   CHOLMOD/Include/cholmod_io64.h CHOLMOD/Include/cholmod_config.h \
   CHOLMOD/Include/cholmod_core.h CHOLMOD/Include/cholmod_check.h \
@@ -58,7 +57,7 @@ init.o: init.c abIndex.h \
   CHOLMOD/Include/cholmod_supernodal.h \
   CHOLMOD/Include/cholmod_matrixops.h CHOLMOD/Include/cholmod_modify.h \
   CHMfactor.h Csparse.h dense.h Lapack-etc.h \
-  dgCMatrix.h cs_utils.h cs.h dgeMatrix.h \
+  dgCMatrix.h cs.h dgeMatrix.h \
   factorizations.h products.h \
   sparse.h sparseVector.h subscript.h validity.h
 kappa.o: kappa.c kappa.h Lapack-etc.h \
