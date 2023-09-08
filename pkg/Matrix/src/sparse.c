@@ -2380,7 +2380,7 @@ int sparse_is_symmetric(SEXP obj, const char *class, int checkDN)
 
 #undef NOTCONJ_PATTERN
 #define NOTCONJ_PATTERN(_X_, _Y_) 0
-	
+
 	/* For all X[i,j], i >= j, we require:
 	     o  that X[j,i] exists
 	     o  that X[j,i] == Conj(X[i,j])
@@ -2574,7 +2574,7 @@ SEXP R_sparse_is_triangular(SEXP obj, SEXP upper)
 	if (TYPEOF(upper) != LGLSXP || LENGTH(upper) < 1)
 		error(_("'%s' must be %s or %s or %s"), "upper", "TRUE", "FALSE", "NA");
 	int upper_ = LOGICAL(upper)[0];
-	
+
 	int ans_ = sparse_is_triangular(obj, valid[ivalid], upper_);
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
@@ -2648,40 +2648,50 @@ SEXP R_sparse_is_diagonal(SEXP obj)
 #define   MAP(_I_) work[_I_]
 #define NOMAP(_I_)      _I_
 
-#define CAST_PATTERN(_X_)           1.0
-#define CAST_LOGICAL(_X_) (double) (_X_ != 0)
-#define CAST_INTEGER(_X_) (double)  _X_
-#define CAST_REAL(_X_)              _X_
-#define CAST_COMPLEX(_X_)           _X_
+#define CAST_PATTERN(_X_)   1
+#define CAST_LOGICAL(_X_) (_X_ != 0)
+#define CAST_INTEGER(_X_)  _X_
+#define CAST_REAL(_X_)     _X_
+#define CAST_COMPLEX(_X_)  _X_
 
 #define SUM_CASES(_MAP_) \
 do { \
-	if (class[0] == 'n') \
+	if (class[0] == 'n') { \
+		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, HIDE, \
-				0.0, 1.0, NA_REAL, ISNA_PATTERN, \
-				_MAP_, CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
-	else { \
+		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
+		         _MAP_, CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
+		else \
+		SUM_LOOP(int, LOGICAL, int, INTEGER, HIDE, \
+		         0, 1, NA_INTEGER, ISNA_PATTERN, \
+		         _MAP_, CAST_PATTERN, INCREMENT_INTEGER, DIVIDE_REAL); \
+	} else { \
 		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)); \
 		switch (class[0]) { \
 		case 'l': \
+			if (mean) \
 			SUM_LOOP(int, LOGICAL, double, REAL, SHOW, \
-					0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
-					_MAP_, CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+			         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
+			         _MAP_, CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+			else \
+			SUM_LOOP(int, LOGICAL, int, INTEGER, SHOW, \
+			         0, 1, NA_INTEGER, ISNA_LOGICAL, \
+			         _MAP_, CAST_LOGICAL, INCREMENT_INTEGER, DIVIDE_REAL); \
 			break; \
 		case 'i': \
 			SUM_LOOP(int, INTEGER, double, REAL, SHOW, \
-					0.0, 1.0, NA_REAL, ISNA_INTEGER, \
-					_MAP_, CAST_INTEGER, INCREMENT_REAL, DIVIDE_REAL); \
+			         0.0, 1.0, NA_REAL, ISNA_INTEGER, \
+			         _MAP_, CAST_INTEGER, INCREMENT_REAL, DIVIDE_REAL); \
 			break; \
 		case 'd': \
 			SUM_LOOP(double, REAL, double, REAL, SHOW, \
-					0.0, 1.0, NA_REAL, ISNA_REAL, \
-					_MAP_, CAST_REAL, INCREMENT_REAL, DIVIDE_REAL); \
+			         0.0, 1.0, NA_REAL, ISNA_REAL, \
+			         _MAP_, CAST_REAL, INCREMENT_REAL, DIVIDE_REAL); \
 			break; \
 		case 'z': \
 			SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, SHOW, \
-					Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
-					_MAP_, CAST_COMPLEX, INCREMENT_COMPLEX, DIVIDE_COMPLEX); \
+			         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
+			         _MAP_, CAST_COMPLEX, INCREMENT_COMPLEX, DIVIDE_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -2689,6 +2699,8 @@ do { \
 		UNPROTECT(1); /* x0 */ \
 	} \
 } while (0)
+
+#define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
 static void Csparse_colsum(SEXP obj, const char *class,
                            int m, int n, char di, int narm, int mean,
@@ -2710,7 +2722,7 @@ static void Csparse_colsum(SEXP obj, const char *class,
 
 		SEXP
 		j1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector((class[0] != 'z') ? REALSXP : CPLXSXP, nnz1));
+		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
 		SET_SLOT(res, Matrix_iSym, j1);
 		SET_SLOT(res, Matrix_xSym, x1);
 
@@ -2723,7 +2735,6 @@ static void Csparse_colsum(SEXP obj, const char *class,
 				if (pp0[j - 1] < pp0[j])
 					*(pj1++) = j + 1;
 
-#undef SUM_LOOP
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
 		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
@@ -2765,6 +2776,8 @@ static void Csparse_colsum(SEXP obj, const char *class,
 		SUM_CASES(NOMAP);
 
 	}
+
+#undef SUM_LOOP
 
 	UNPROTECT(1); /* p0 */
 	return;
@@ -2810,7 +2823,7 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 
 		SEXP
 		i1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector((class[0] != 'z') ? REALSXP : CPLXSXP, nnz1));
+		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
 		SET_SLOT(res, Matrix_iSym, i1);
 		SET_SLOT(res, Matrix_xSym, x1);
 		int *pi1 = INTEGER(i1);
@@ -2818,7 +2831,6 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 			for (i = 0; i < nnz1; ++i)
 				pi1[i] = n;
 
-#undef SUM_LOOP
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
 		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
@@ -2898,6 +2910,8 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 
 	}
 
+#undef SUM_LOOP
+
 	UNPROTECT(2); /* i0, p0 */
 	return;
 }
@@ -2941,7 +2955,7 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 
 		SEXP
 		j1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector((class[0] != 'z') ? REALSXP : CPLXSXP, nnz1));
+		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
 		SET_SLOT(res, Matrix_iSym, j1);
 		SET_SLOT(res, Matrix_xSym, x1);
 		int *pj1 = INTEGER(j1);
@@ -2949,7 +2963,6 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 			for (j = 0; j < nnz1; ++j)
 				pj1[j] = m;
 
-#undef SUM_LOOP
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
 		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
@@ -3022,7 +3035,6 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 
 	}
 
-#undef SUM_CASES
 #undef SUM_LOOP
 
 	UNPROTECT(3); /* j0, i0, obj */
@@ -3038,15 +3050,15 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 
 	SEXP res;
 	if (sparse) {
-		const char *cl = (class[0] != 'z') ? "dsparseVector" : "zsparseVector";
+		char cl[] = ".sparseVector";
+		cl[0] = type2kind(SUM_TYPEOF(class[0]));
 		PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
 
 		SEXP length = PROTECT(ScalarInteger(r));
 		SET_SLOT(res, Matrix_lengthSym, length);
 		UNPROTECT(1); /* length */
 	} else {
-		SEXPTYPE type = (class[0] != 'z') ? REALSXP : CPLXSXP;
-		PROTECT(res = allocVector(type, r));
+		PROTECT(res = allocVector(SUM_TYPEOF(class[0]), r));
 
 		SEXP dimnames = (class[1] != 's')
 			? GET_SLOT(obj, Matrix_DimNamesSym)
@@ -3098,6 +3110,9 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 	UNPROTECT(1); /* res */
 	return res;
 }
+
+#undef SUM_CASES
+#undef SUM_TYPEOF
 
 /* (row|col)(Sums|Means)(<[CRT]sparseMatrix>) */
 SEXP R_sparse_marginsum(SEXP obj, SEXP margin,

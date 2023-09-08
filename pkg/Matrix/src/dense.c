@@ -1367,24 +1367,34 @@ SEXP R_dense_is_diagonal(SEXP obj)
 	return ans;
 }
 
-#define CAST_PATTERN(_X_) (double) (_X_ != 0)
-#define CAST_LOGICAL(_X_) (double) (_X_ != 0)
-#define CAST_INTEGER(_X_) (double)  _X_
-#define CAST_REAL(_X_)              _X_
-#define CAST_COMPLEX(_X_)           _X_
+#define CAST_PATTERN(_X_) (_X_ != 0)
+#define CAST_LOGICAL(_X_) (_X_ != 0)
+#define CAST_INTEGER(_X_)  _X_
+#define CAST_REAL(_X_)     _X_
+#define CAST_COMPLEX(_X_)  _X_
 
 #define SUM_CASES \
 do { \
 	switch (class[0]) { \
 	case 'n': \
+		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
 		         CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
+		else \
+		SUM_LOOP(int, LOGICAL, int, INTEGER, \
+		         0, 1, NA_INTEGER, ISNA_PATTERN, \
+		         CAST_PATTERN, INCREMENT_INTEGER, DIVIDE_REAL); \
 		break; \
 	case 'l': \
+		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
 		         CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+		else \
+		SUM_LOOP(int, LOGICAL, int, INTEGER, \
+		         0, 1, NA_INTEGER, ISNA_LOGICAL, \
+		         CAST_LOGICAL, INCREMENT_INTEGER, DIVIDE_REAL); \
 		break; \
 	case 'i': \
 		SUM_LOOP(int, INTEGER, double, REAL, \
@@ -1405,6 +1415,8 @@ do { \
 		break; \
 	} \
 } while (0)
+
+#define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
 static void dense_colsum(SEXP x, const char *class,
                          int m, int n, char ul, char di, int narm, int mean,
@@ -1432,10 +1444,9 @@ static void dense_colsum(SEXP x, const char *class,
 			_DIVIDE_((*px1), count); \
 	} while (0)
 
-#undef SUM_LOOP
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
-		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _CAST_, _INCREMENT_, _DIVIDE_) \
+	             _ZERO_, _ONE_, _NA_, _ISNA_, \
+	             _CAST_, _INCREMENT_, _DIVIDE_) \
 	do { \
 		_CTYPE0_ *px0 = _PTR0_(  x); \
 		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
@@ -1524,6 +1535,10 @@ static void dense_colsum(SEXP x, const char *class,
 	} while (0)
 
 	SUM_CASES;
+
+#undef SUM_LOOP
+#undef SUM_KERNEL
+
 	return;
 }
 
@@ -1578,7 +1593,6 @@ static void dense_rowsum(SEXP x, const char *class,
 		} \
 	} while (0)
 
-#undef SUM_LOOP
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
 		         _CAST_, _INCREMENT_, _DIVIDE_) \
@@ -1668,11 +1682,11 @@ static void dense_rowsum(SEXP x, const char *class,
 						SUM_KERNEL1(for (i = j; i < n; ++i), _NA_, _ISNA_, \
 						            _CAST_, _INCREMENT_); \
 					} else { \
-						for (i = j = 0; j < n; ++j, i = j) { \
+					for (i = j = 0; j < n; ++j, i = j) { \
 						px0 += 1; \
 						SUM_KERNEL1(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
 						            _CAST_, _INCREMENT_); \
-						} \
+					} \
 					} \
 				} \
 			} \
@@ -1689,7 +1703,6 @@ static void dense_rowsum(SEXP x, const char *class,
 
 	SUM_CASES;
 
-#undef SUM_CASES
 #undef SUM_LOOP
 #undef SUM_KERNEL1
 #undef SUM_KERNEL2
@@ -1706,8 +1719,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int margin,
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1],
 		r = (margin == 0) ? m : n;
 
-	SEXPTYPE type = (class[0] != 'z') ? REALSXP : CPLXSXP;
-	SEXP res = PROTECT(allocVector(type, r)),
+	SEXP res = PROTECT(allocVector(SUM_TYPEOF(class[0]), r)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 
 	SEXP dimnames = (class[1] != 's')
@@ -1738,6 +1750,9 @@ SEXP dense_marginsum(SEXP obj, const char *class, int margin,
 	UNPROTECT(2); /* x, res */
 	return res;
 }
+
+#undef SUM_CASES
+#undef SUM_TYPEOF
 
 /* (row|col)(Sums|Means)(<denseMatrix>) */
 SEXP R_dense_marginsum(SEXP obj, SEXP margin,

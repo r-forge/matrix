@@ -631,7 +631,7 @@ stopifnot(identical3(rowSums(lcu), rowSums(lTu), rowSums(drop0(lcu))))
 ncn <- diagU2N(ncu)
 (cncn <- crossprod(ncn))# works -> "nsCMatrix"
 stopifnot(identical(ncu, as(lcu,"nsparseMatrix")),
-	  identical(rowSums(ncu), as.double(c(3:1, 1L))),
+	  identical(rowSums(ncu), c(3:1, 1L)),
 	  Q.eq(ncn, ncu),
 	  Q.eq(crossprod(drop0(lcu)), crossprod(lcu)),# crossprod works -> "dsCMatrix"
 	  identical(crossprod(ncu), cncn),

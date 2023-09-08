@@ -1590,3 +1590,5 @@ setMethod("tcrossprod", signature(x = "vector", y = "sparseVector"),
                   x %&% .tCRT(.V2C(y))
               else
                   x %*% .tCRT(.V2C(y)))
+
+rm(.cl)

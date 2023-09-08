@@ -215,6 +215,7 @@ setMethod("rep", signature(x = "sparseVector"),
 if(FALSE) {
 ## MJ: once 'sort' becomes implicit generic in package 'methods' :
 setMethod("sort", signature(x = "sparseVector"), .V.sort)
+## TODO: parallel method for internal generic 'xtfrm'
 }
 
 setMethod("t", signature(x = "sparseVector"),
