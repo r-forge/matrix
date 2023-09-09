@@ -78,12 +78,23 @@
       \code{band(x, k1, k2)}, \code{triu(x, k)}, and
       \code{tril(x, k)} now always return a \code{.diMatrix}
       for \code{x} inheriting from \code{diagonalMatrix}.
+
+      \item \code{colSums(<(n|l|ind)Matrix>)} and
+      \code{rowSums(<(n|l|ind)Matrix>)} now always give a result
+      of type \code{"integer"}.  Methods differed previously,
+      some giving \code{"double"} (as \pkg{base} does, suboptimally,
+      traditional matrices of type \code{"logical"}).
     }
   }
   \subsection{Misc}{
     \itemize{
       \item C code now refers to the symbol \code{factors} as
       \code{Matrix_factorsSym}, rather than \code{Matrix_factorSym}.
+
+      \item Certain never or seldom used class unions are removed.
+
+      \item Most matrix product code has been migrated to
+      \file{products.[Rch]} from elsewhere.
     }
   }
 }
