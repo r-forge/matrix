@@ -3049,16 +3049,17 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 		r = (margin == 0) ? m : n;
 
 	SEXP res;
+	SEXPTYPE type = SUM_TYPEOF(class[0]);
 	if (sparse) {
 		char cl[] = ".sparseVector";
-		cl[0] = type2kind(SUM_TYPEOF(class[0]));
+		cl[0] = (type == CPLXSXP) ? 'z' : ((type == REALSXP) ? 'd' : 'i');
 		PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
 
 		SEXP length = PROTECT(ScalarInteger(r));
 		SET_SLOT(res, Matrix_lengthSym, length);
 		UNPROTECT(1); /* length */
 	} else {
-		PROTECT(res = allocVector(SUM_TYPEOF(class[0]), r));
+		PROTECT(res = allocVector(type, r));
 
 		SEXP dimnames = (class[1] != 's')
 			? GET_SLOT(obj, Matrix_DimNamesSym)

@@ -125,7 +125,7 @@ setClass("packedMatrix", contains = c("denseMatrix", "VIRTUAL"),
 ## Virtual class of dense, _n_onzero pattern matrices
 setClass("ndenseMatrix", contains = c("nMatrix", "denseMatrix", "VIRTUAL"),
          slots = c(x = "logical"),
-         validity = function(object) .Call(ndenseMatrix_validate, object))
+         validity = function(object) .Call(nMatrix_validate, object))
 
 ## Virtual class of dense, logical matrices
 setClass("ldenseMatrix", contains = c("lMatrix", "denseMatrix", "VIRTUAL"))
@@ -323,11 +323,6 @@ setClass("pcorMatrix", contains = "dppMatrix",
 
 ## ------ Non-Virtual Sparse -------------------------------------------
 
-## NB: We should _not_ have .t[CRT]Matrix inherit from .g[CRT]Matrix,
-##     because a .t[CRT]Matrix could be less than fully stored if diag = "U".
-##     Methods for .g[CRT]Matrix applied to such .t[CRT]Matrix" could produce
-##     incorrect results, even though all slots are present.
-
 ## ...... Sparse, nonzero pattern ......................................
 
 ## NB: Unlike [^n]sparseMatrix (below), there is no 'x' slot to validate here.
@@ -373,6 +368,13 @@ setClass("ntTMatrix",
 setClass("nsTMatrix",
          contains = c("TsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
          validity = function(object) .Call(sTMatrix_validate, object))
+
+if(FALSE) { # TODO
+## Diagonal
+setClass("ndiMatrix", contains = c("diagonalMatrix", "nMatrix"),
+         slots = c(x = "logical"),
+         validity = function(object) .Call(nMatrix_validate, object))
+} # TODO
 
 
 ## ...... Sparse, logical ..............................................
@@ -476,15 +478,18 @@ setClass("dsTMatrix",
 ## Diagonal
 setClass("ddiMatrix", contains = c("diagonalMatrix", "dMatrix"))
 
-if (FALSE) { # TODO
+if(FALSE) { # TODO
 ## CSC, symmetic, positive semidefinite
 setClass("dpCMatrix", contains = "dsCMatrix",
-         validity = function(object) TODO("test that 'object' is positive semidefinite"))
+         validity = function(object) TODO("test positive semidefiniteness"))
 
-## Indicator matrix of a factor
-setClass("indicator", contains = "dgCMatrix",
-         slots = c(levels = "character"),
-         validity = function(object) TODO("test that there exists a factor 'g' such that identical(object, as(g, \"sparseMatrix\")) is TRUE"))
+## CSR, symmetic, positive semidefinite
+setClass("dpRMatrix", contains = "dsRMatrix",
+         validity = function(object) TODO("test positive semidefiniteness"))
+
+## Triplet, symmetic, positive semidefinite
+setClass("dpTMatrix", contains = "dsTMatrix",
+         validity = function(object) TODO("test positive semidefiniteness"))
 } # TODO
 
 
@@ -698,35 +703,7 @@ setClass("Schur", contains = "SchurFactorization",
 setClass("sparseVector", contains = "VIRTUAL",
          slots = c(length = "numeric", i = "numeric"), # 1-based index!
          prototype = list(length = 0),
-         validity = function(object) {
-             len <- object@length
-             if(length(len) != 1L)
-                 return("'length' slot does not have length 1")
-             if(!is.finite(len))
-                 return("'length' slot is not finite")
-             if(len < 0)
-                 return("'length' slot is negative")
-             i <- object@i
-             i.len <- length(i)
-             if(i.len == 0L)
-                 return(TRUE)
-             if(i.len > len)
-                 return("'i' slot has length greater than 'length' slot")
-             i.num <- is.double(i)
-             if(i.num)
-                 i <- trunc(i)
-             i.uns <- is.unsorted(i, strictly = TRUE)
-             if(is.na(i.uns))
-                 "'i' slot contains NA"
-             else if(i.uns || i[1L] < 1 || i[i.len] > len) {
-                 m <- if(i.uns)
-                          "'i' slot is not strictly increasing"
-                      else "'i' slot has elements not in 1:<'length' slot>"
-                 if(i.num)
-                     paste0(m, " after truncation towards zero")
-                 else m
-             } else TRUE
-         })
+         validity = function(object) .Call(sparseVector_validate, object))
 
 ## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
 setMethod("initialize", "sparseVector",
@@ -756,32 +733,23 @@ setMethod("initialize", "sparseVector",
 
 ## ------ Non-Virtual Subclasses ---------------------------------------
 
-.valid.xsparseVector <- function(object) {
-    if(length(object@x) != length(object@i))
-        "'i' and 'x' slots do not have equal length"
-    else TRUE
-}
-
-## No 'x' slot, hence nothing more to validate:
 setClass("nsparseVector", contains = "sparseVector")
 
 setClass("lsparseVector", contains = "sparseVector",
          slots = c(x = "logical"),
-         validity = .valid.xsparseVector)
+         validity = function(object) .Call(lsparseVector_validate, object))
 
 setClass("isparseVector", contains = "sparseVector",
          slots = c(x = "integer"),
-         validity = .valid.xsparseVector)
+         validity = function(object) .Call(isparseVector_validate, object))
 
 setClass("dsparseVector", contains = "sparseVector",
          slots = c(x = "numeric"),
-         validity = .valid.xsparseVector)
+         validity = function(object) .Call(dsparseVector_validate, object))
 
 setClass("zsparseVector", contains = "sparseVector",
          slots = c(x = "complex"),
-         validity = .valid.xsparseVector)
-
-rm(.valid.xsparseVector)
+         validity = function(object) .Call(zsparseVector_validate, object))
 
 
 ########################################################################

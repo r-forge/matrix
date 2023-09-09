@@ -1,3 +1,4 @@
+#include <math.h> /* floor */
 #include "validity.h"
 
 static char *Matrix_sprintf(const char *format, ...)
@@ -189,15 +190,13 @@ SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
 	SEXP x = GET_SLOT(obj, Matrix_xSym); \
 	if (TYPEOF(x) != _SEXPTYPE_) \
 		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
-	 \
 	return ScalarLogical(1); \
 }
-/* NB: "nsparseMatrix" has no 'x' slot, only "ndenseMatrix" ... */
-KINDMATRIX_VALIDATE(ndense,  LGLSXP)
-KINDMATRIX_VALIDATE(     l,  LGLSXP)
-KINDMATRIX_VALIDATE(     i,  INTSXP)
-KINDMATRIX_VALIDATE(     d, REALSXP)
-KINDMATRIX_VALIDATE(     z, CPLXSXP)
+KINDMATRIX_VALIDATE(n,  LGLSXP)
+KINDMATRIX_VALIDATE(l,  LGLSXP)
+KINDMATRIX_VALIDATE(i,  INTSXP)
+KINDMATRIX_VALIDATE(d, REALSXP)
+KINDMATRIX_VALIDATE(z, CPLXSXP)
 #undef KINDMATRIX_VALIDATE
 
 SEXP compMatrix_validate(SEXP obj)
@@ -1010,6 +1009,88 @@ SEXP pcorMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
+SEXP sparseVector_validate(SEXP obj)
+{
+	SEXP length = GET_SLOT(obj, Matrix_lengthSym);
+	if (TYPEOF(length) != INTSXP && TYPEOF(length) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "length", "integer", "double");
+	if (XLENGTH(length) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "length", 1);
+	Matrix_int_fast64_t n;
+	if (TYPEOF(length) == INTSXP) {
+		int n_ = INTEGER(length)[0];
+		if (n_ == NA_INTEGER)
+			RMKMS(_("'%s' slot is NA"), "length");
+		if (n_ < 0)
+			RMKMS(_("'%s' slot is negative"), "length");
+		n = (Matrix_int_fast64_t) n_;
+	} else {
+		double n_ = REAL(length)[0];
+		if (ISNAN(n_))
+			RMKMS(_("'%s' slot is NA"), "length");
+		if (n_ < 0.0)
+			RMKMS(_("'%s' slot is negative"), "length");
+		if (n_ > 0x1.0p+53)
+			RMKMS(_("'%s' slot exceeds %s"), "length", "2^53");
+		n = (Matrix_int_fast64_t) n_;
+	}
+
+	SEXP i = GET_SLOT(obj, Matrix_iSym);
+	if (TYPEOF(i) != INTSXP && TYPEOF(i) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "i", "integer", "double");
+	R_xlen_t nnz = XLENGTH(i);
+	if (nnz > n)
+		RMKMS(_("'%s' slot has length greater than '%s' slot"), "i", "length");
+	if (TYPEOF(i) == INTSXP) {
+		int *pi = INTEGER(i), max = (n > INT_MAX) ? INT_MAX : (int) n, last = 0;
+		while (nnz--) {
+			if (*pi == NA_INTEGER)
+				RMKMS(_("'%s' slot contains NA"), "i");
+			if (*pi < 1 || *pi > max)
+				RMKMS(_("'%s' slot has elements not in {%s}"),
+					  "i", "1,...,length");
+			if (*pi <= last)
+				RMKMS(_("'%s' slot is not increasing"), "i");
+			last = *(pi++);
+		}
+	} else {
+		double *pi = REAL(i), max = (double) n, last = 0.0, tmp;
+		while (nnz--) {
+			if (ISNAN(*pi))
+				RMKMS(_("'%s' slot contains NA"), "i");
+			tmp = floor(*(pi++));
+			if (tmp < 1.0 || tmp > max)
+				RMKMS(_("'%s' slot has elements not in {%s} after truncation towards zero"),
+					  "i", "1,...,length");
+			if (tmp <= last)
+				RMKMS(_("'%s' slot is not increasing after truncation towards zero"), "i");
+			last = tmp;
+		}
+	}
+
+	return ScalarLogical(1);
+}
+
+#define KINDVECTOR_VALIDATE(_PREFIX_, _SEXPTYPE_) \
+SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
+{ \
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)), \
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)); \
+	UNPROTECT(2); /* i, x */ \
+	if (TYPEOF(x) != _SEXPTYPE_) \
+		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
+	if (XLENGTH(x) != XLENGTH(i)) \
+		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x"); \
+	return ScalarLogical(1); \
+}
+KINDVECTOR_VALIDATE(l,  LGLSXP)
+KINDVECTOR_VALIDATE(i,  INTSXP)
+KINDVECTOR_VALIDATE(d, REALSXP)
+KINDVECTOR_VALIDATE(z, CPLXSXP)
+#undef KINDVECTOR_VALIDATE
+
 SEXP denseLU_validate(SEXP obj)
 {
 	/* In R, we start by checking that 'obj' would be a valid dgeMatrix */
@@ -1814,7 +1895,7 @@ void validObject(SEXP obj, const char *cl)
 		cl = "dppMatrix";
 
 	if (cl[0] == 'n' && cl[2] != 'C' && cl[2] != 'R' && cl[2] != 'T')
-		IS_VALID(ndenseMatrix);
+		IS_VALID(nMatrix);
 	else if (cl[0] == 'l')
 		IS_VALID(lMatrix);
 	else if (cl[0] == 'i')
