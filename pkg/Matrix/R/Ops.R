@@ -115,33 +115,16 @@ setMethod("Ops", signature(e1 = "Matrix", e2 = "NULL"),
 setMethod("Ops", signature(e1 = "NULL", e2 = "Matrix"),
           function(e1, e2) callGeneric(logical(), e2))
 
-## bail-outs -- on highest possible level, hence "Ops", not "Compare"/"Arith" :
-.bail.out.Ops <- function(e1, e2) {
-    if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-        .Ops.checkDim(dim(e1), dim(e2))
-    .bail.out.2(.Generic, class(e1), class(e2))
-}
 setMethod("Ops", signature(e1 = "Matrix", e2 = "ANY"),
-          function(e1, e2) {
-              if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-                  .Ops.checkDim(dim(e1), dim(e2))
-              if(is.matrix(e2) && identical(e2, as.matrix(e2)) &&
-                 is.object(e2) && !isS4(e2)) # e.g. for "table"
-                  callGeneric(e1, unclass(e2))
-              else
-                  .bail.out.2(.Generic, class(e1), class(e2))
-          })
+          function(e1, e2)
+              if(is.object(e2) && is.matrix(e2))
+                  callGeneric(e1, unclass(e2)) # e.g., for "table"
+              else .bail.out.2(.Generic, class(e1), class(e2)))
 setMethod("Ops", signature(e1 = "ANY", e2 = "Matrix"),
-          function(e1, e2) {
-              if(is(e1, "mMatrix") && is(e2, "mMatrix"))
-                  .Ops.checkDim(dim(e1), dim(e2))
-              if(is.matrix(e1) && identical(e1, as.matrix(e1)) &&
-                 is.object(e1) && !isS4(e1)) # e.g. for "table"
-                  callGeneric(unclass(e1), e2)
-              else
-                  .bail.out.2(.Generic, class(e1), class(e2))
-          })
-rm(.bail.out.Ops)
+          function(e1, e2)
+              if(is.object(e1) && is.matrix(e1))
+                  callGeneric(unclass(e1), e2) # e.g., for "table"
+              else .bail.out.2(.Generic, class(e1), class(e2)))
 
 ## "General principle"
 ##  - - - - - - - - -

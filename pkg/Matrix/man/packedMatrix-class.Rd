@@ -33,7 +33,6 @@
   Class \code{"\linkS4class{denseMatrix}"}, directly.
   Class \code{"\linkS4class{Matrix}"}, by class \code{"denseMatrix"},
   distance 2.
-  Class \code{"mMatrix"}, by class \code{"Matrix"}, distance 3.
   Class \code{"replValueSp"}, by class \code{"Matrix"}, distance 3.
 }
 \section{Methods}{

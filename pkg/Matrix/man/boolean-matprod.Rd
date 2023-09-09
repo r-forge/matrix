@@ -108,13 +108,10 @@
     \item{\code{signature(x = "ANY", y = "ANY")}}{ }
     \item{\code{signature(x = "ANY", y = "Matrix")}}{ }
     \item{\code{signature(x = "Matrix", y = "ANY")}}{ }
-    \item{\code{signature(x = "mMatrix", y = "mMatrix")}}{ }
     \item{\code{signature(x = "nMatrix", y = "nMatrix")}}{ }
     \item{\code{signature(x = "nMatrix", y = "nsparseMatrix")}}{ }
     \item{\code{signature(x = "nsparseMatrix", y = "nMatrix")}}{ }
     \item{\code{signature(x = "nsparseMatrix", y = "nsparseMatrix")}}{ }
-    \item{\code{signature(x = "sparseVector", y = "mMatrix")}}{ }
-    \item{\code{signature(x = "mMatrix", y = "sparseVector")}}{ }
     \item{\code{signature(x = "sparseVector", y = "sparseVector")}}{ }
   }% {describe}
 }% {Methods}
