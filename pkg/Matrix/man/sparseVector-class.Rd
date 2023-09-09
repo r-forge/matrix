@@ -11,7 +11,6 @@
 \alias{isparseVector-class}
 \alias{dsparseVector-class}
 \alias{zsparseVector-class}
-\alias{xsparseVector-class}
 % sparse
 \alias{!,sparseVector-method}
 \alias{Arith,sparseVector,ddenseMatrix-method}
@@ -111,13 +110,7 @@
     \item{\code{x}:}{(for all but \code{"nsparseVector"}):
       the non-zero entries.  This is of class \code{"numeric"} for class
       \code{"dsparseVector"},  \code{"logical"} for class
-      \code{"lsparseVector"}, etc.
-
-      Note that \code{"nsparseVector"}s have no \code{x} slot.
-      Further, mainly for ease of method definitions, we've defined the
-      class union (see \code{\link{setClassUnion}}) of all sparse vector
-      classes which \emph{have} an \code{x} slot, as class \code{"xsparseVector"}.
-      }
+      \code{"lsparseVector"}, etc.}
   }
 }
 \section{Methods}{
@@ -194,7 +187,6 @@ library(utils, pos = "package:base", verbose = FALSE)
 }
 getClass("sparseVector")
 getClass("dsparseVector")
-getClass("xsparseVector")# those with an 'x' slot
 
 sx <- c(0,0,3, 3.2, 0,0,0,-3:1,0,0,2,0,0,5,0,0)
 (ss <- as(sx, "sparseVector"))

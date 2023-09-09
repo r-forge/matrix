@@ -1307,8 +1307,7 @@ showProc.time()
 dn4 <- list(letters[1:4], LETTERS[1:4])
 (D4n <- `dimnames<-`(D4, dn4))
 m4 <- as(D4n, "matrix")
-stopifnot(identical(dimnames(m4), dn4),
-          Q.eq(D4n, m4, superclasses = "mMatrix"))
+stopifnot(identical(dimnames(m4), dn4), Q.eq(D4n, m4, superclasses=NULL))
 ## as(<ddi>, "matrix")  had lost dimnames before
 
 s24 <- new("dgCMatrix", Dim = c(2L, 4L), p = integer(5L))

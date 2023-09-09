@@ -446,7 +446,6 @@ exportClasses(Matrix, # and its subclasses .............................
               index,
               number,
               replValue, # dispatch fails when not exported
-              xsparseVector,
 
               ## "Other" non-virtual {for now just experimental index classes}:
               abIndex,
