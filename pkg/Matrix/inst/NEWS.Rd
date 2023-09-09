@@ -4,9 +4,14 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-08 r4310)}{
+\section{Changes in version 1.6-2 (2023-09-09 r4314)}{
   \subsection{New Features}{
     \itemize{
+      \item New C-level validity methods for \code{sparseVector} and
+      \code{[nlidz]sparseVector}, now requiring \code{length} not
+      exceeding \code{2^53}, which on most platforms is the maximum
+      integer representable exactly as \code{double}.
+
       \item \code{mean(<sparseVector>, trim=)} now works efficiently
       for nonzero values of \code{trim}.
 
@@ -61,6 +66,9 @@
 
       \item Methods for \code{length} now return \code{integer} rather
       than \code{double} if the result does not exceed \code{INT_MAX}.
+
+      \item \code{dsparseVector} with \code{x} slot of type
+      \code{integer} are now formally invalid, as always intended.
 
       \item Methods for subscripting \code{sparseVector} did not behave
       compatibly with \pkg{base} when supplied with fractional, \code{NA},

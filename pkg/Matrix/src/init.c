@@ -59,10 +59,10 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Matrix_validate, 1),
 	CALLDEF(MatrixFactorization_validate, 1),
 
-	CALLDEF(dMatrix_validate, 1),
+	CALLDEF(nMatrix_validate, 1),
 	CALLDEF(lMatrix_validate, 1),
-	CALLDEF(ndenseMatrix_validate, 1),
 	CALLDEF(iMatrix_validate, 1),
+	CALLDEF(dMatrix_validate, 1),
 	CALLDEF(zMatrix_validate, 1),
 
 	CALLDEF(compMatrix_validate, 1),
@@ -101,6 +101,12 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dppMatrix_validate, 1),
 	CALLDEF(corMatrix_validate, 1),
 	CALLDEF(pcorMatrix_validate, 1),
+
+	CALLDEF(sparseVector_validate, 1),
+	CALLDEF(lsparseVector_validate, 1),
+	CALLDEF(isparseVector_validate, 1),
+	CALLDEF(dsparseVector_validate, 1),
+	CALLDEF(zsparseVector_validate, 1),
 
 	CALLDEF(denseLU_validate, 1),
 	CALLDEF(sparseLU_validate, 1),
