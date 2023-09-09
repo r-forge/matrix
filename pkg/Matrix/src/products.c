@@ -38,9 +38,8 @@ SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
 		if (rm > 0) {
 		SEXP rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rm));
 		double *prx = REAL(rx);
-		if (rk == 0)
-			Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(double));
-		else {
+		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(double));
+		if (rk > 0) {
 			SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 			double *pax = REAL(ax), zero = 0.0, one = 1.0;
 			F77_CALL(dsyrk)(
