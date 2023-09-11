@@ -54,6 +54,7 @@
 \alias{\%&\%,diagonalMatrix,denseMatrix-method}
 \alias{\%&\%,diagonalMatrix,diagonalMatrix-method}
 \alias{\%&\%,diagonalMatrix,matrix-method}
+\alias{\%&\%,diagonalMatrix,vector-method}
 \alias{\%&\%,indMatrix,Matrix-method}
 \alias{\%&\%,indMatrix,indMatrix-method}
 \alias{\%&\%,indMatrix,matrix-method}
@@ -85,6 +86,7 @@
 \alias{\%&\%,vector,RsparseMatrix-method}
 \alias{\%&\%,vector,TsparseMatrix-method}
 \alias{\%&\%,vector,denseMatrix-method}
+\alias{\%&\%,vector,diagonalMatrix-method}
 \alias{\%&\%,vector,indMatrix-method}
 \alias{\%&\%,vector,matrix-method}
 \alias{\%&\%,vector,pMatrix-method}

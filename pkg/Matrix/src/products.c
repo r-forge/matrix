@@ -1,6 +1,7 @@
 #include "products.h"
 #include "coerce.h"
 #include "sparse.h"
+#include "dense.h"
 
 /* defined in ./factorizations.c : */
 cholmod_sparse *dgC2cholmod(SEXP, int);
@@ -8,9 +9,107 @@ SEXP cholmod2dgC(      cholmod_sparse *, const char *, int);
 cholmod_dense  *dge2cholmod(SEXP, int);
 SEXP cholmod2dge(const cholmod_dense  *, const char *, int);
 
+static
+void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
+                int *m, int *n, int *v)
+{
+	/* MJ: All of this would be _much_ less ugly if we did not
+	   have to emulate the various "asymmetries" in R's do_matprod
+	*/
+	int x4 = IS_S4_OBJECT(x), y4 = IS_S4_OBJECT(y);
+	if (y == R_NilValue) {
+		if (!x4)
+			error(_("should never happen ..."));
+		*v = 0;
+		*m = *n = INTEGER(GET_SLOT(x, Matrix_DimSym))[(*xtrans) ? 1 : 0];
+		*ytrans = (*xtrans) ? 0 : 1;
+	} else {
+		if (!x4 && !y4)
+			error(_("should never happen ..."));
+		*v = 0;
+		int xm, xn, ym, yn;
+		xm = xn = ym = yn = -1;
+		if (x4) {
+			SEXP xdim = GET_SLOT(x, Matrix_DimSym);
+			int *pxdim = INTEGER(xdim);
+			xm = pxdim[0];
+			xn = pxdim[1];
+		}
+		if (y4) {
+			SEXP ydim = GET_SLOT(y, Matrix_DimSym);
+			int *pydim = INTEGER(ydim);
+			ym = pydim[0];
+			yn = pydim[1];
+		}
+		if (!x4) {
+			SEXP xdim = getAttrib(x, R_DimSymbol);
+			if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
+				int *pxdim = INTEGER(xdim);
+				xm = pxdim[0];
+				xn = pxdim[1];
+			} else {
+				*v = 1;
+				R_xlen_t xl = XLENGTH(x);
+				if (xl > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				int k = (*ytrans) ? yn : ym;
+				if (xl == k) {
+					xm = (int) xl;
+					xn = 1;
+					*xtrans = 1; /* => vector as 1-row    matrix */
+				} else if (k == 1) {
+					xm = (int) xl;
+					xn = 1;
+					*xtrans = 0; /* => vector as 1-column matrix */
+				}
+			}
+		}
+		if (!y4) {
+			SEXP ydim = getAttrib(y, R_DimSymbol);
+			if (TYPEOF(ydim) == INTSXP && LENGTH(ydim) == 2) {
+				int *pydim = INTEGER(ydim);
+				ym = pydim[0];
+				yn = pydim[1];
+			} else {
+				*v = 2;
+				R_xlen_t yl = XLENGTH(y);
+				if (yl > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				if (*ytrans && !(*ztrans)) {
+				if (((*xtrans) ? xn : xm) == 1) {
+					ym = (int) yl;
+					yn = 1;
+					*ytrans = 0; /* => vector as 1-column matrix */
+				} else if (((*xtrans) ? xm : xn) == 1) {
+					ym = (int) yl;
+					yn = 1;
+					*ytrans = 1; /* => vector as 1-row    matrix */
+				}
+				} else {
+				int k = (*xtrans) ? xm : xn;
+				if (yl == k) {
+					ym = (int) yl;
+					yn = 1;
+					*ytrans = 0; /* => vector as 1-column matrix */
+				} else if (k == 1) {
+					ym = (int) yl;
+					yn = 1;
+					*ytrans = 1; /* => vector as 1-row    matrix */
+				}
+				}
+			}
+		}
+		if (((*xtrans) ? xm : xn) != ((*ytrans) ? yn : ym))
+			error(_("non-conformable arguments"));
+		*m = (*xtrans) ? xn : xm;
+		*n = (*ytrans) ? ym : yn;
+	}
+	return;
+}
+
 /* op(<dge>) * op(<dge>) */
 static
-SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
+SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym));
 	int *padim = INTEGER(adim), am = padim[0], an = padim[1],
@@ -78,9 +177,9 @@ SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
 		SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 			bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
 			rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
-		mmultDN(rdimnames,
-		        adimnames, (atrans) ? 1 : 0,
-		        bdimnames, (btrans) ? 0 : 1);
+		matmultDN(rdimnames,
+		          adimnames, (atrans) ? 1 : 0,
+		          bdimnames, (btrans) ? 0 : 1);
 		UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 		if (rm > 0 && rn > 0) {
@@ -110,7 +209,7 @@ SEXP dgeMatrix_prod(SEXP a, SEXP b, int atrans, int btrans)
 
 /* <dsy> * op(<dge>)  or  op(<dge>) * <dsy> */
 static
-SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
+SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -137,9 +236,9 @@ SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
 		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
 	if (aleft)
-	mmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
+	matmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
 	else
-	mmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
+	matmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 	if (rm > 0 && rn > 0) {
@@ -175,8 +274,8 @@ SEXP dsyMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 
 /* op(<dtr>) * op(<dge>)  or  op(<dge>) * op(<dtr>) */
 static
-SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
-                    int triangular)
+SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+                       int triangular)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -204,9 +303,9 @@ SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
 		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
 	if (aleft)
-	mmultDN(rdimnames, adimnames, atrans, bdimnames, !btrans);
+	matmultDN(rdimnames, adimnames, atrans, bdimnames, !btrans);
 	else
-	mmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
+	matmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
@@ -255,7 +354,7 @@ SEXP dtrMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 
 /* <dsp> * op(<dge>)  or  op(<dge>) * <dsp> */
 static
-SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
+SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -282,9 +381,9 @@ SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
 		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
 	if (aleft)
-	mmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
+	matmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
 	else
-	mmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
+	matmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 	if (rm > 0 && rn > 0) {
@@ -314,8 +413,8 @@ SEXP dspMatrix_prod(SEXP a, SEXP b, int aleft, int btrans)
 
 /* op(<dtp>) * op(<dge>)  or  op(<dge>) * op(<dtp>) */
 static
-SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
-                    int triangular)
+SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+                       int triangular)
 {
 	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
@@ -343,9 +442,9 @@ SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
 		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
 	if (aleft)
-	mmultDN(rdimnames, adimnames, atrans, bdimnames, !btrans);
+	matmultDN(rdimnames, adimnames, atrans, bdimnames, !btrans);
 	else
-	mmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
+	matmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
@@ -395,49 +494,38 @@ SEXP dtpMatrix_prod(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	return r;
 }
 
-SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
+SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
-		ivalid;
+		ztrans_ = 0, m, n, v;
+	matmultDim(x, y, &xtrans_, &ytrans_, &ztrans_, &m, &n, &v);
 
 	PROTECT_INDEX xpid, ypid;
 	PROTECT_WITH_INDEX(x, &xpid);
 	PROTECT_WITH_INDEX(y, &ypid);
 
 	if (!IS_S4_OBJECT(x)) {
-		int isM = isMatrix(x), trans = 0;
-		if (!isM) {
-			int k = INTEGER(GET_SLOT(y, Matrix_DimSym))[(ytrans_) ? 1 : 0];
-			if (k != 1) {
-				trans = 1;
-				if (XLENGTH(x) != k)
-					error(_("non-conformable arguments"));
-			}
+		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 0), xpid);
+		if (v == 1) {
+			/* Vector: discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
+			               (xtrans_) ? 1 : 0, R_NilValue);
 			xtrans_ = 0;
 		}
-		REPROTECT(x = matrix_as_dense(x, ".ge", '\0', '\0', trans, 0), xpid);
-		if (!isM)
-			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
-			               (trans) ? 1 : 0, R_NilValue);
 	}
 	if (!IS_S4_OBJECT(y) && y != R_NilValue) {
-		int isM = isMatrix(y), trans = 0;
-		if (!isM) {
-			int k = INTEGER(GET_SLOT(x, Matrix_DimSym))[(xtrans_) ? 0 : 1];
-			if (k == 1)
-				trans = 1;
-			else if (XLENGTH(y) != k)
-				error(_("non-conformable arguments"));
+		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 0), ypid);
+		if (v == 2) {
+			/* Vector: discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
+			               (ytrans_) ? 1 : 0, R_NilValue);
 			ytrans_ = 0;
 		}
-		REPROTECT(y = matrix_as_dense(y, ".ge", '\0', '\0', trans, 0), ypid);
-		if (!isM)
-			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
-			               (trans) ? 1 : 0, R_NilValue);
 	}
 
+	static const char *valid[] = { VALID_DENSE, "" };
 	const char *xcl = NULL, *ycl = NULL;
+	int ivalid;
 	ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
@@ -462,47 +550,47 @@ SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 
 	if (y == R_NilValue) {
 		REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-		x = dgeMatrix_prod(x, y, xtrans_, !xtrans_);
+		x = dgeMatrix_matmult(x, y, xtrans_, !xtrans_);
 	} else if (xcl[1] == 'g' && ycl[1] == 'g') {
-		x = dgeMatrix_prod(x, y, xtrans_, ytrans_);
+		x = dgeMatrix_matmult(x, y, xtrans_, ytrans_);
 	} else if (xcl[1] == 'g' || ycl[1] == 'g') {
 		x = (xcl[1] == 'g')
 			? ((ycl[1] == 's')
 			   ? ((ycl[2] != 'p')
-			      ? dsyMatrix_prod(y, x, 0, xtrans_)
-			      : dspMatrix_prod(y, x, 0, xtrans_))
+			      ? dsyMatrix_matmult(y, x, 0, xtrans_)
+			      : dspMatrix_matmult(y, x, 0, xtrans_))
 			   : ((ycl[2] != 'p')
-			      ? dtrMatrix_prod(y, x, 0, ytrans_, xtrans_, 0)
-			      : dtpMatrix_prod(y, x, 0, ytrans_, xtrans_, 0)))
+			      ? dtrMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)
+			      : dtpMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)))
 			: ((xcl[1] == 's')
 			   ? ((xcl[2] != 'p')
-			      ? dsyMatrix_prod(x, y, 1, ytrans_)
-			      : dspMatrix_prod(x, y, 1, ytrans_))
+			      ? dsyMatrix_matmult(x, y, 1, ytrans_)
+			      : dspMatrix_matmult(x, y, 1, ytrans_))
 			   : ((xcl[2] != 'p')
-			      ? dtrMatrix_prod(x, y, 1, xtrans_, ytrans_, 0)
-			      : dtpMatrix_prod(x, y, 1, xtrans_, ytrans_, 0)));
+			      ? dtrMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)
+			      : dtpMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)));
 	} else if (xcl[1] == 's' && ycl[1] == 's') {
 		if (xcl[2] == 'p' && ycl[2] == 'p') {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dspMatrix_prod(x, y, 1, ytrans_);
+			x = dspMatrix_matmult(x, y, 1, ytrans_);
 		} else if (xcl[2] == 'p') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-			x = dsyMatrix_prod(y, x, 0, xtrans_);
+			x = dsyMatrix_matmult(y, x, 0, xtrans_);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dsyMatrix_prod(x, y, 1, ytrans_);
+			x = dsyMatrix_matmult(x, y, 1, ytrans_);
 		}
 	} else if (xcl[1] == 's' || ycl[1] == 's') {
 		if (xcl[1] == 's') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
 			x = (ycl[2] != 'p')
-				? dtrMatrix_prod(y, x, 0, ytrans_, 0, 0)
-				: dtpMatrix_prod(y, x, 0, ytrans_, 0, 0);
+				? dtrMatrix_matmult(y, x, 0, ytrans_, 0, 0)
+				: dtpMatrix_matmult(y, x, 0, ytrans_, 0, 0);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
 			x = (xcl[2] != 'p')
-				? dtrMatrix_prod(x, y, 1, xtrans_, 0, 0)
-				: dtpMatrix_prod(x, y, 1, xtrans_, 0, 0);
+				? dtrMatrix_matmult(x, y, 1, xtrans_, 0, 0)
+				: dtpMatrix_matmult(x, y, 1, xtrans_, 0, 0);
 		}
 	} else {
 		SEXP
@@ -524,13 +612,13 @@ SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 
 		if (xcl[2] == 'p' && ycl[2] == 'p') {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dtpMatrix_prod(x, y, 1, xtrans_, ytrans_, triangular);
+			x = dtpMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
 		} else if (xcl[2] == 'p') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-			x = dtrMatrix_prod(y, x, 0, ytrans_, xtrans_, triangular);
+			x = dtrMatrix_matmult(y, x, 0, ytrans_, xtrans_, triangular);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dtrMatrix_prod(x, y, 1, xtrans_, ytrans_, triangular);
+			x = dtrMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
 		}
 	}
 
@@ -541,8 +629,8 @@ SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 /* boolean: op(op(<.gC>) * op(<.gC>)) */
 /* numeric: op(op(<dgC>) * op(<dgC>)) */
 static
-SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
-                              int ztrans, int triangular, int boolean)
+SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
+                                 int ztrans, int triangular, int boolean)
 {
 	PROTECT_INDEX zpid;
 	SEXP z;
@@ -590,9 +678,9 @@ SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
-		mmultDN(zdimnames,
-		        xdimnames, (xtrans) ? 1 : 0,
-		        ydimnames, (ytrans) ? 0 : 1);
+		matmultDN(zdimnames,
+		          xdimnames, (xtrans) ? 1 : 0,
+		          ydimnames, (ytrans) ? 0 : 1);
 		UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
 		if (triangular < 0) {
 			SEXP uplo = PROTECT(mkString("L"));
@@ -610,17 +698,21 @@ SEXP dgCMatrix_dgCMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 
 /* op(op(<d[gs]C>) * op(<dge>)) */
 static
-SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
-                              int ztrans, int triangular, int symmetric)
+SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
+                                 int ztrans, int triangular, int symmetric)
 {
 	SEXP z;
 	char zcl[] = "d..Matrix";
 	zcl[1] = (triangular) ? 't' : 'g';
 	zcl[2] = (triangular) ? 'r' : 'e';
-	double alpha[2] = { 1.0, 0.0 }, beta[2] = { 0.0, 0.0 };
 	cholmod_sparse *X = dgC2cholmod(x, 1);
-	cholmod_dense *Y = dge2cholmod(y, ytrans);
+	cholmod_dense  *Y = dge2cholmod(y, ytrans);
 	X->stype = (symmetric) ? 1 : 0;
+	if (((xtrans) ? X->nrow : X->ncol) != Y->nrow) {
+		if (ytrans)
+			R_Free(Y->x);
+		error(_("non-conformable arguments"));
+	}
 	int m = (int) ((xtrans) ? X->ncol : X->nrow), n = (int) Y->ncol;
 	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX) {
 		if (ytrans)
@@ -636,6 +728,7 @@ SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 	Z->nzmax = Z->nrow * Z->ncol;
 	Z->xtype = CHOLMOD_REAL;
 	Z->dtype = CHOLMOD_DOUBLE;
+	double alpha[2] = { 1.0, 0.0 }, beta[2] = { 0.0, 0.0 };
 	if (ztrans) {
 		Z->x = R_Calloc(Z->nzmax, double);
 		cholmod_sdmult(X, xtrans, alpha, beta, Y, Z, &c);
@@ -661,13 +754,13 @@ SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 		ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
 		zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
 	if (ztrans)
-	mmultDN(zdimnames,
-			ydimnames, (ytrans) ? 0 : 1,
-			xdimnames, (xtrans) ? 1 : 0);
+	matmultDN(zdimnames,
+	          ydimnames, (ytrans) ? 0 : 1,
+	          xdimnames, (xtrans) ? 1 : 0);
 	else
-	mmultDN(zdimnames,
-			xdimnames, (xtrans) ? 1 : 0,
-			ydimnames, (ytrans) ? 0 : 1);
+	matmultDN(zdimnames,
+	          xdimnames, (xtrans) ? 1 : 0,
+	          ydimnames, (ytrans) ? 0 : 1);
 	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
 	if (triangular != 0 && ztrans == (triangular > 0)) {
 		SEXP uplo = PROTECT(mkString("L"));
@@ -683,65 +776,54 @@ SEXP dgCMatrix_dgeMatrix_prod(SEXP x, SEXP y, int xtrans, int ytrans,
 	return z;
 }
 
-SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
-                   SEXP boolean)
+SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
+                      SEXP boolean)
 {
 	if (TYPEOF(boolean) != LGLSXP || LENGTH(boolean) < 1)
 		error(_("invalid '%s' to %s()"), "boolean", __func__);
+	int boolean_ = LOGICAL(boolean)[0];
 
-	static const char *valid[] = {
-		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
-		ztrans_ = LOGICAL(ztrans)[0], boolean_ = LOGICAL(boolean)[0],
-		ivalid, triangular = 0;
+		ztrans_ = LOGICAL(ztrans)[0], m, n, v;
+	matmultDim(x, y, &xtrans_, &ytrans_, &ztrans_, &m, &n, &v);
 
 	PROTECT_INDEX xpid, ypid;
 	PROTECT_WITH_INDEX(x, &xpid);
 	PROTECT_WITH_INDEX(y, &ypid);
 
 	if (!IS_S4_OBJECT(x)) {
-		int isM = isMatrix(x), trans = 0;
-		if (!isM) {
-			int k = INTEGER(GET_SLOT(y, Matrix_DimSym))[(ytrans_) ? 1 : 0];
-			if (k != 1) {
-				trans = 1;
-				if (XLENGTH(x) != k)
-					error(_("non-conformable arguments"));
-			}
+		if (boolean_ == NA_LOGICAL || !boolean_)
+		REPROTECT(x = matrix_as_dense( x, "dge", '\0', '\0', xtrans_, 0), xpid);
+		else if (!xtrans_)
+		REPROTECT(x = matrix_as_sparse(x, "ngC", '\0', '\0', xtrans_   ), xpid);
+		else
+		REPROTECT(x = matrix_as_sparse(x, "ngR", '\0', '\0', xtrans_   ), xpid);
+		if (v == 1) {
+			/* Discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
+			               (xtrans_) ? 1 : 0, R_NilValue);
 			xtrans_ = 0;
 		}
-		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(x = matrix_as_dense( x, ".ge", '\0', '\0', trans, 0), xpid);
-		else if (!xtrans_)
-		REPROTECT(x = matrix_as_sparse(x, "ngC", '\0', '\0', trans   ), xpid);
-		else
-		REPROTECT(x = matrix_as_sparse(x, "ngR", '\0', '\0', trans   ), xpid);
-		if (!isM)
-			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
-			               (trans) ? 1 : 0, R_NilValue);
 	}
 	if (!IS_S4_OBJECT(y) && y != R_NilValue) {
-		int isM = isMatrix(y), trans = 0;
-		if (!isM) {
-			int k = INTEGER(GET_SLOT(x, Matrix_DimSym))[(xtrans_) ? 0 : 1];
-			if (k == 1)
-				trans = 1;
-			else if (XLENGTH(y) != k)
-				error(_("non-conformable arguments"));
+		if (boolean_ == NA_LOGICAL || !boolean_)
+		REPROTECT(y = matrix_as_dense( y, "dge", '\0', '\0', ytrans_, 0), ypid);
+		else if (!ytrans_)
+		REPROTECT(y = matrix_as_sparse(y, "ngC", '\0', '\0', ytrans_   ), ypid);
+		else
+		REPROTECT(y = matrix_as_sparse(y, "ngR", '\0', '\0', ytrans_   ), ypid);
+		if (v == 2) {
+			/* Discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
+			               (ytrans_) ? 1 : 0, R_NilValue);
 			ytrans_ = 0;
 		}
-		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(y = matrix_as_dense( y, ".ge", '\0', '\0', trans, 0), ypid);
-		else if (!ytrans_)
-		REPROTECT(y = matrix_as_sparse(y, "ngC", '\0', '\0', trans   ), ypid);
-		else
-		REPROTECT(y = matrix_as_sparse(y, "ngR", '\0', '\0', trans   ), ypid);
-		if (!isM)
-			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
-			               (trans) ? 1 : 0, R_NilValue);
 	}
 
+	static const char *valid[] = {
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
 	const char *xcl = NULL, *ycl = NULL;
+	int ivalid;
 	ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
@@ -786,12 +868,13 @@ SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (y == R_NilValue) {
 		REPROTECT(x = sparse_as_general(x, xcl), xpid);
-		x = dgCMatrix_dgCMatrix_prod(
-			x, y, xtrans_, !xtrans_, ztrans_, triangular, boolean_);
+		x = dgCMatrix_dgCMatrix_matmult(
+			x, y, xtrans_, !xtrans_, ztrans_, 0, boolean_);
 		UNPROTECT(2); /* y, x */
 		return x;
 	}
 
+	int triangular = 0;
 	if (xcl[1] == 't' && ycl[1] == 't') {
 		SEXP
 			xuplo = PROTECT(GET_SLOT(x, Matrix_uploSym)),
@@ -821,7 +904,7 @@ SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 		if (xcl[1] == 't')
 			REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
 		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-		x = dgCMatrix_dgeMatrix_prod(
+		x = dgCMatrix_dgeMatrix_matmult(
 			x, y, xtrans_, ytrans_, ztrans_, triangular, xcl[1] == 's');
 		UNPROTECT(2); /* y, x */
 		return x;
@@ -858,7 +941,7 @@ SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	REPROTECT(x = sparse_as_general(x, xcl), xpid);
 	REPROTECT(y = sparse_as_general(y, ycl), ypid);
-	x = dgCMatrix_dgCMatrix_prod(
+	x = dgCMatrix_dgCMatrix_matmult(
 		x, y, xtrans_, ytrans_, ztrans_, triangular, boolean_);
 	UNPROTECT(2); /* y, x */
 	return x;
