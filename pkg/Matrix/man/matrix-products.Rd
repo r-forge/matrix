@@ -54,6 +54,7 @@
 \alias{\%*\%,diagonalMatrix,denseMatrix-method}
 \alias{\%*\%,diagonalMatrix,diagonalMatrix-method}
 \alias{\%*\%,diagonalMatrix,matrix-method}
+\alias{\%*\%,diagonalMatrix,vector-method}
 \alias{\%*\%,indMatrix,Matrix-method}
 \alias{\%*\%,indMatrix,indMatrix-method}
 \alias{\%*\%,indMatrix,matrix-method}
@@ -81,6 +82,7 @@
 \alias{\%*\%,vector,RsparseMatrix-method}
 \alias{\%*\%,vector,TsparseMatrix-method}
 \alias{\%*\%,vector,denseMatrix-method}
+\alias{\%*\%,vector,diagonalMatrix-method}
 \alias{\%*\%,vector,indMatrix-method}
 \alias{\%*\%,vector,pMatrix-method}
 \alias{\%*\%,vector,sparseVector-method}
@@ -130,6 +132,7 @@
 \alias{crossprod,diagonalMatrix,diagonalMatrix-method}
 \alias{crossprod,diagonalMatrix,matrix-method}
 \alias{crossprod,diagonalMatrix,missing-method}
+\alias{crossprod,diagonalMatrix,vector-method}
 \alias{crossprod,indMatrix,Matrix-method}
 \alias{crossprod,indMatrix,matrix-method}
 \alias{crossprod,indMatrix,missing-method}
@@ -154,6 +157,7 @@
 \alias{crossprod,vector,RsparseMatrix-method}
 \alias{crossprod,vector,TsparseMatrix-method}
 \alias{crossprod,vector,denseMatrix-method}
+\alias{crossprod,vector,diagonalMatrix-method}
 \alias{crossprod,vector,indMatrix-method}
 \alias{crossprod,vector,pMatrix-method}
 \alias{crossprod,vector,sparseVector-method}
@@ -202,6 +206,7 @@
 \alias{tcrossprod,diagonalMatrix,diagonalMatrix-method}
 \alias{tcrossprod,diagonalMatrix,matrix-method}
 \alias{tcrossprod,diagonalMatrix,missing-method}
+\alias{tcrossprod,diagonalMatrix,vector-method}
 \alias{tcrossprod,indMatrix,Matrix-method}
 \alias{tcrossprod,indMatrix,matrix-method}
 \alias{tcrossprod,indMatrix,missing-method}
@@ -228,6 +233,7 @@
 \alias{tcrossprod,vector,RsparseMatrix-method}
 \alias{tcrossprod,vector,TsparseMatrix-method}
 \alias{tcrossprod,vector,denseMatrix-method}
+\alias{tcrossprod,vector,diagonalMatrix-method}
 \alias{tcrossprod,vector,indMatrix-method}
 \alias{tcrossprod,vector,sparseVector-method}
 %

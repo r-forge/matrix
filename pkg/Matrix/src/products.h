@@ -5,9 +5,9 @@
 #include "Lapack-etc.h"
 #include "Mutils.h"
 
-SEXP R_dense_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans);
+SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans);
 
-SEXP R_sparse_prod(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
-                   SEXP doBool);
+SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
+                      SEXP boolean);
 
 #endif

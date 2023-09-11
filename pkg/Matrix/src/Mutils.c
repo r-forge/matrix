@@ -265,7 +265,7 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
-void mmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
+void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 	SEXP s;
 	if (!isNull(s = VECTOR_ELT(asrc, ai)))
 		SET_VECTOR_ELT(dest, 0, s);

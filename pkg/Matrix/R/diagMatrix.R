@@ -206,33 +206,33 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.diag(x, y, boolArith = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.diag(x, y, boolArith = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.diag.diag(x, y, boolArith = isTRUE(boolArith))
-              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.diag.diag(x, y, boolArith = isTRUE(boolArith))
-              r@Dimnames <- mmultDimnames(x@Dimnames, y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 3L)
               r
           })
 
@@ -254,35 +254,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "matrix"),
           function(x, y) {
-              mmultDim(x@Dim, dim(y), type = 1L)
+              matmultDim(x@Dim, dim(y), type = 1L)
               r <- .prod.diag.m(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "matrix"),
           function(x, y) {
-              mmultDim(x@Dim, dim(y), type = 1L)
+              matmultDim(x@Dim, dim(y), type = 1L)
               r <- .prod.diag.m(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, dim(y), type = 2L)
+              matmultDim(x@Dim, dim(y), type = 2L)
               r <- .prod.diag.m(x, y, boolArith = isTRUE(boolArith),
                                 trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, dim(y), type = 3L)
+              matmultDim(x@Dim, dim(y), type = 3L)
               r <- .prod.diag.m(x, y, boolArith = isTRUE(boolArith),
                                 trans = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
@@ -305,35 +305,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "matrix"),
 
 setMethod("%*%", signature(x = "matrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(dim(x), y@Dim, type = 1L)
+              matmultDim(dim(x), y@Dim, type = 1L)
               r <- .prod.m.diag(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "matrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(dim(x), y@Dim, type = 1L)
+              matmultDim(dim(x), y@Dim, type = 1L)
               r <- .prod.m.diag(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "matrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(dim(x), y@Dim, type = 2L)
+              matmultDim(dim(x), y@Dim, type = 2L)
               r <- .prod.m.diag(x, y, boolArith = isTRUE(boolArith),
                                 trans = TRUE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(dim(x), y@Dim, type = 3L)
+              matmultDim(dim(x), y@Dim, type = 3L)
               r <- .prod.m.diag(x, y, boolArith = isTRUE(boolArith),
                                 trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 3L)
               r
           })
 
@@ -385,35 +385,35 @@ setMethod("tcrossprod", signature(x = "matrix", y = "diagonalMatrix"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "denseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.dense(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "denseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.dense(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.diag.dense(x, y, boolArith = isTRUE(boolArith),
                                     trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.diag.dense(x, y, boolArith = isTRUE(boolArith),
                                     trans = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
@@ -462,35 +462,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "denseMatrix"),
 
 setMethod("%*%", signature(x = "denseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.dense.diag(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "denseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.dense.diag(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.dense.diag(x, y, boolArith = isTRUE(boolArith),
                                     trans = TRUE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.dense.diag(x, y, boolArith = isTRUE(boolArith),
                                     trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 3L)
               r
           })
 
@@ -525,35 +525,35 @@ setMethod("tcrossprod", signature(x = "denseMatrix", y = "diagonalMatrix"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Csparse(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Csparse(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.diag.Csparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.diag.Csparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
@@ -588,35 +588,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "CsparseMatrix"),
 
 setMethod("%*%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Csparse.diag(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Csparse.diag(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.Csparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.Csparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 3L)
               r
           })
 
@@ -651,35 +651,35 @@ setMethod("tcrossprod", signature(x = "CsparseMatrix", y = "diagonalMatrix"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Rsparse(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Rsparse(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.diag.Rsparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.diag.Rsparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
@@ -714,35 +714,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "RsparseMatrix"),
 
 setMethod("%*%", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Rsparse.diag(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Rsparse.diag(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.Rsparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.Rsparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 3L)
               r
           })
 
@@ -777,35 +777,35 @@ setMethod("tcrossprod", signature(x = "RsparseMatrix", y = "diagonalMatrix"),
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Tsparse(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.diag.Tsparse(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 1L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.diag.Tsparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 2L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.diag.Tsparse(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(x@Dimnames, dimnames(y), type = 3L)
+              r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
@@ -840,35 +840,35 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "TsparseMatrix"),
 
 setMethod("%*%", signature(x = "TsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Tsparse.diag(x, y, boolArith = FALSE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod("%&%", signature(x = "TsparseMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              mmultDim(x@Dim, y@Dim, type = 1L)
+              matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .prod.Tsparse.diag(x, y, boolArith = TRUE, trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 1L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
               r
           })
 
 setMethod( "crossprod", signature(x = "TsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 2L)
+              matmultDim(x@Dim, y@Dim, type = 2L)
               r <- .prod.Tsparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = TRUE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 2L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "TsparseMatrix", y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
-              mmultDim(x@Dim, y@Dim, type = 3L)
+              matmultDim(x@Dim, y@Dim, type = 3L)
               r <- .prod.Tsparse.diag(x, y, boolArith = isTRUE(boolArith),
                                       trans = FALSE)
-              r@Dimnames <- mmultDimnames(dimnames(x), y@Dimnames, type = 3L)
+              r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 3L)
               r
           })
 
