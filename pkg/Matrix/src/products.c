@@ -1302,7 +1302,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 
 	SEXP x0 = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_xSym));
 	if (unit || ((margin == 0) ? y != y_ : x != x_))
-		SET_SLOT(z, Matrix_xSym, x0);
+		SET_SLOT(z, Matrix_xSym, x0); /* FIXME */
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 		if(boolean_)
