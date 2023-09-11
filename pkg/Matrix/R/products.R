@@ -237,11 +237,11 @@ setMethod("%*%", signature(x = "indMatrix", y = "vector"),
                   return(.M2kind(x, "d") %*% y)
               k <- (d <- x@Dim)[2L]
               r <-
-                  if(k == length(y))
-                      .m2dense(y[x@perm], "dge")
-                  else if(k == 1L)
-                      .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "dge")
-                  else stop("non-conformable arguments")
+              if(k == length(y))
+                  .m2dense(y[x@perm], "dge")
+              else if(k == 1L)
+                  .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "dge")
+              else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
           })
@@ -252,11 +252,11 @@ setMethod("%*%", signature(x = "vector", y = "indMatrix"),
                   return(x %*% .M2kind(y, "d"))
               k <- (d <- y@Dim)[1L]
               r <-
-                  if(k == length(x))
-                      .m2dense(x[y@perm], "dge", trans = TRUE)
-                  else if(k == 1L)
-                      .m2dense(matrix(x, length(x), d[2L]), "dge")
-                  else stop("non-conformable arguments")
+              if(k == length(x))
+                  .m2dense(x[y@perm], "dge", trans = TRUE)
+              else if(k == 1L)
+                  .m2dense(matrix(x, length(x), d[2L]), "dge")
+              else stop("non-conformable arguments")
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
           })
@@ -270,12 +270,12 @@ setMethod("%*%", signature(x = "pMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
-                  }
+              if(y@margin == 1L)
+                  y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
+              }
               r
           })
 
@@ -285,12 +285,12 @@ setMethod("%*%", signature(x = "pMatrix", y = "indMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
-                  }
+              if(y@margin == 1L)
+                  y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
+              }
               r
           })
 
@@ -300,12 +300,12 @@ setMethod("%*%", signature(x = "indMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(x@margin == 1L)
-                      (if(y@margin == 1L) y@perm else invertPerm(y@perm))[x@perm]
-                  else {
-                      r@margin <- 2L
-                      x@perm[if(y@margin == 1L) invertPerm(x@perm) else y@perm]
-                  }
+              if(x@margin == 1L)
+                  (if(y@margin == 1L) y@perm else invertPerm(y@perm))[x@perm]
+              else {
+                  r@margin <- 2L
+                  x@perm[if(y@margin == 1L) invertPerm(x@perm) else y@perm]
+              }
               r
           })
 
@@ -706,12 +706,12 @@ setMethod("%&%", signature(x = "pMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
-                  }
+              if(y@margin == 1L)
+                  y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
+              }
               r
           })
 
@@ -721,12 +721,12 @@ setMethod("%&%", signature(x = "pMatrix", y = "indMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
-                  }
+              if(y@margin == 1L)
+                  y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
+              }
               r
           })
 
@@ -736,12 +736,12 @@ setMethod("%&%", signature(x = "indMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               r@perm <-
-                  if(x@margin == 1L)
-                      (if(y@margin == 1L) y@perm else invertPerm(y@perm))[x@perm]
-                  else {
-                      r@margin <- 2L
-                      x@perm[if(y@margin == 1L) invertPerm(x@perm) else y@perm]
-                  }
+              if(x@margin == 1L)
+                  (if(y@margin == 1L) y@perm else invertPerm(y@perm))[x@perm]
+              else {
+                  r@margin <- 2L
+                  x@perm[if(y@margin == 1L) invertPerm(x@perm) else y@perm]
+              }
               r
           })
 
@@ -1116,12 +1116,12 @@ setMethod("crossprod", signature(x = "pMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 2L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 2L)
               r@perm <-
-                  if(y@margin == 1L)
-                      y@perm[if(x@margin == 1L) invertPerm(x@perm) else x@perm]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) x@perm else invertPerm(x@perm))[y@perm]
-                  }
+              if(y@margin == 1L)
+                  y@perm[if(x@margin == 1L) invertPerm(x@perm) else x@perm]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) x@perm else invertPerm(x@perm))[y@perm]
+              }
               r
           })
 
@@ -1510,12 +1510,12 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "pMatrix"),
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 2L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 2L)
               r@perm <-
-                  if(y@margin != 1L)
-                      y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
-                  else {
-                      r@margin <- 2L
-                      (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
-                  }
+              if(y@margin != 1L)
+                  y@perm[if(x@margin == 1L) x@perm else invertPerm(x@perm)]
+              else {
+                  r@margin <- 2L
+                  (if(x@margin == 1L) invertPerm(x@perm) else x@perm)[y@perm]
+              }
               r
           })
 
