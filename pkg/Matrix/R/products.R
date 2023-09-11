@@ -1,3 +1,5 @@
+## FIXME: vector-vector methods probably not consistent with do_matprod
+
 matmultDim <- function(d.a, d.b, type = 1L) {
     ## Return the 'dim' of the product indicated by 'type':
     ##     type 1:    a  %*%   b
@@ -129,7 +131,6 @@ setMethod("%*%", signature(x = .cl, y = "TsparseMatrix"),
 }
 
 
-if(FALSE) {
 ## .... diagonalMatrix .................................................
 
 setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
@@ -143,11 +144,11 @@ setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
                   r@diag <- "U"
               else
                   r@x <-
-                      if(xdi == "N" && ydi == "N")
-                          as.double(x@x * y@x)
-                      else if(xdi == "N")
-                          as.double(x@x)
-                      else as.double(y@x)
+                  if(xdi == "N" && ydi == "N")
+                      as.double(x@x * y@x)
+                  else if(xdi == "N")
+                      as.double(x@x)
+                  else as.double(y@x)
               r
           })
 
@@ -160,7 +161,6 @@ setMethod("%*%", signature(x = "diagonalMatrix", y = .cl),
 setMethod("%*%", signature(x = .cl, y = "diagonalMatrix"),
           function(x, y)
               .Call(R_diagonal_matmult, x, y, FALSE, FALSE, FALSE))
-}
 }
 
 
@@ -237,10 +237,10 @@ setMethod("%*%", signature(x = "indMatrix", y = "vector"),
                   return(.M2kind(x, "d") %*% y)
               k <- (d <- x@Dim)[2L]
               r <-
-                  if(k == 1L)
-                      .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "dge")
-                  else if(k == length(y))
+                  if(k == length(y))
                       .m2dense(y[x@perm], "dge")
+                  else if(k == 1L)
+                      .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "dge")
                   else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -252,10 +252,10 @@ setMethod("%*%", signature(x = "vector", y = "indMatrix"),
                   return(x %*% .M2kind(y, "d"))
               k <- (d <- y@Dim)[1L]
               r <-
-                  if(k == 1L)
-                      .m2dense(matrix(x, length(x), d[2L]), "dge")
-                  else if(k == length(x))
+                  if(k == length(x))
                       .m2dense(x[y@perm], "dge", trans = TRUE)
+                  else if(k == 1L)
+                      .m2dense(matrix(x, length(x), d[2L]), "dge")
                   else stop("non-conformable arguments")
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
@@ -349,12 +349,12 @@ setMethod("%*%", signature(x = "pMatrix", y = "vector"),
           function(x, y) {
               k <- x@Dim[2L]
               r <-
-              if(k == 1L)
-                  .m2dense(y, "dge", trans = TRUE)
-              else if(k == length(y)) {
+              if(k == length(y)) {
                   perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
                   .m2dense(y[perm], "dge")
               }
+              else if(k == 1L)
+                  .m2dense(y, "dge", trans = TRUE)
               else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -364,12 +364,12 @@ setMethod("%*%", signature(x = "vector", y = "pMatrix"),
           function(x, y) {
               k <- y@Dim[1L]
               r <-
-              if(k == 1L)
-                  .m2dense(x, "dge")
-              else if(k == length(x)) {
+              if(k == length(x)) {
                   perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
                   .m2dense(x[perm], "dge", trans = TRUE)
               }
+              else if(k == 1L)
+                  .m2dense(x, "dge")
               else stop("non-conformable arguments")
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
@@ -568,7 +568,6 @@ setMethod("%&%", signature(x = .cl, y = "TsparseMatrix"),
 }
 
 
-if(FALSE) {
 ## .... diagonalMatrix .................................................
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
@@ -582,11 +581,11 @@ setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
                   r@diag <- "U"
               else
                   r@x <-
-                      if(xdi == "N" && ydi == "N")
-                          isN0(x@x & y@x)
-                      else if(xdi == "N")
-                          isN0(x@x)
-                      else isN0(y@x)
+                  if(xdi == "N" && ydi == "N")
+                      isN0(x@x & y@x)
+                  else if(xdi == "N")
+                      isN0(x@x)
+                  else isN0(y@x)
               r
           })
 
@@ -599,7 +598,6 @@ setMethod("%&%", signature(x = "diagonalMatrix", y = .cl),
 setMethod("%&%", signature(x = .cl, y = "diagonalMatrix"),
           function(x, y)
               .Call(R_diagonal_matmult, x, y, FALSE, FALSE,  TRUE))
-}
 }
 
 
@@ -675,10 +673,10 @@ setMethod("%&%", signature(x = "indMatrix", y = "vector"),
                   return(.M2kind(x, "n") %&% y)
               k <- (d <- x@Dim)[2L]
               r <-
-              if(k == 1L)
-                  .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "nge")
-              else if(k == length(y))
+              if(k == length(y))
                   .m2dense(y[x@perm], "nge")
+              else if(k == 1L)
+                  .m2dense(matrix(y, d[1L], length(y), byrow = TRUE), "nge")
               else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -690,10 +688,10 @@ setMethod("%&%", signature(x = "vector", y = "indMatrix"),
                   return(x %&% .M2kind(y, "n"))
               k <- (d <- y@Dim)[1L]
               r <-
-              if(k == 1L)
-                  .m2dense(matrix(x, length(x), d[2L]), "nge")
-              else if(k == length(x))
+              if(k == length(x))
                   .m2dense(x[y@perm], "nge", trans = TRUE)
+              else if(k == 1L)
+                  .m2dense(matrix(x, length(x), d[2L]), "nge")
               else stop("non-conformable arguments")
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
@@ -787,12 +785,12 @@ setMethod("%&%", signature(x = "pMatrix", y = "vector"),
           function(x, y) {
               k <- x@Dim[2L]
               r <-
-              if(k == 1L)
-                  .m2dense(y, "nge", trans = TRUE)
-              else if(k == length(y)) {
+              if(k == length(y)) {
                   perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
                   .m2dense(y[perm], "nge")
               }
+              else if(k == 1L)
+                  .m2dense(y, "nge", trans = TRUE)
               else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -802,12 +800,12 @@ setMethod("%&%", signature(x = "vector", y = "pMatrix"),
           function(x, y) {
               k <- y@Dim[1L]
               r <-
-              if(k == 1L)
-                  .m2dense(x, "nge")
-              else if(k == length(x)) {
+              if(k == length(x)) {
                   perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
                   .m2dense(x[perm], "nge", trans = TRUE)
               }
+              else if(k == 1L)
+                  .m2dense(x, "nge")
               else stop("non-conformable arguments")
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
@@ -1004,7 +1002,6 @@ setMethod("crossprod", signature(x = .cl, y = "TsparseMatrix"),
 }
 
 
-if(FALSE) {
 ## .... diagonalMatrix .................................................
 
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
@@ -1016,7 +1013,7 @@ setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
               if(x@diag != "N")
                   r@diag <- "U"
               else
-                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x)
+                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x * x@x)
               r
           })
 
@@ -1035,7 +1032,6 @@ setMethod("crossprod", signature(x = "diagonalMatrix", y = .cl),
 setMethod("crossprod", signature(x = .cl, y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               .Call(R_diagonal_matmult, x, y,  TRUE, FALSE, boolArith))
-}
 }
 
 
@@ -1064,11 +1060,11 @@ setMethod("crossprod", signature(x = "indMatrix", y = .cl),
 setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, y@Dim, type = 2L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, k), boolArith = boolArith, ...)
+                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
               else {
-                  r <- .M2kind(t(x)[, y@perm, drop = FALSE], k)
+                  r <- .M2kind(t(x)[, y@perm, drop = FALSE], l)
                   r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               }
               r
@@ -1077,11 +1073,11 @@ setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
 setMethod("crossprod", signature(x = "matrix", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(dim(x), y@Dim, type = 2L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, k), boolArith = boolArith, ...)
+                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
               else {
-                  r <- .m2dense(t(x)[, y@perm, drop = FALSE], paste0(k, "ge"))
+                  r <- .m2dense(t(x)[, y@perm, drop = FALSE], paste0(l, "ge"))
                   r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               }
               r
@@ -1091,11 +1087,11 @@ setMethod("crossprod", signature(x = "vector", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               if(y@Dim[1L] != length(x))
                   stop("non-conformable arguments")
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, k), boolArith = boolArith, ...)
+                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
               else {
-                  r <- .m2dense(x[y@perm], paste0(k, "ge"), trans = TRUE)
+                  r <- .m2dense(x[y@perm], paste0(l, "ge"), trans = TRUE)
                   r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               }
               r
@@ -1132,9 +1128,9 @@ setMethod("crossprod", signature(x = "pMatrix", y = "pMatrix"),
 setMethod("crossprod", signature(x = "Matrix", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, y@Dim, type = 2L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .M2kind(t(x)[, perm, drop = FALSE], k)
+              r <- .M2kind(t(x)[, perm, drop = FALSE], l)
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
@@ -1142,9 +1138,9 @@ setMethod("crossprod", signature(x = "Matrix", y = "pMatrix"),
 setMethod("crossprod", signature(x = "matrix", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(dim(x), y@Dim, type = 2L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2dense(t(x)[, perm, drop = FALSE], paste0(k, "ge"))
+              r <- .m2dense(t(x)[, perm, drop = FALSE], paste0(l, "ge"))
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
               r
           })
@@ -1153,9 +1149,9 @@ setMethod("crossprod", signature(x = "vector", y = "pMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               if(y@Dim[1L] != length(x))
                   stop("non-conformable arguments")
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2dense(x[perm], paste0(k, "ge"), trans = TRUE)
+              r <- .m2dense(x[perm], paste0(l, "ge"), trans = TRUE)
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
           })
@@ -1384,7 +1380,6 @@ setMethod("tcrossprod", signature(x = .cl, y = "TsparseMatrix"),
 }
 
 
-if(FALSE) {
 ## .... diagonalMatrix .................................................
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
@@ -1396,7 +1391,7 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
               if(x@diag != "N")
                   r@diag <- "U"
               else
-                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x)
+                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x * x@x)
               r
           })
 
@@ -1415,7 +1410,6 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = .cl),
 setMethod("tcrossprod", signature(x = .cl, y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               .Call(R_diagonal_matmult, x, y, FALSE,  TRUE, boolArith))
-}
 }
 
 
@@ -1444,11 +1438,11 @@ setMethod("tcrossprod", signature(x = .cl, y = "indMatrix"),
 setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, y@Dim, type = 3L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin != 1L)
-                  r <- tcrossprod(.M2kind(x, k), y, boolArith = boolArith, ...)
+                  r <- tcrossprod(.M2kind(x, l), y, boolArith = boolArith, ...)
               else {
-                  r <- .M2kind(t(y)[x@perm, , drop = FALSE], k)
+                  r <- .M2kind(t(y)[x@perm, , drop = FALSE], l)
                   r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               }
               r
@@ -1457,11 +1451,11 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
 setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, dim(y), type = 3L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               if(y@margin != 1L)
-                  r <- tcrossprod(.M2kind(x, k), y, boolArith = boolArith, ...)
+                  r <- tcrossprod(.M2kind(x, l), y, boolArith = boolArith, ...)
               else {
-                  r <- .m2dense(t(y)[x@perm, , drop = FALSE], paste0(k, "ge"))
+                  r <- .m2dense(t(y)[x@perm, , drop = FALSE], paste0(l, "ge"))
                   r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               }
               r
@@ -1469,22 +1463,31 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "matrix"),
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "vector"),
           function(x, y = NULL, boolArith = NA, ...) {
-              if((d <- x@Dim)[2L] != 1L)
+              d <- x@Dim
+              m <- d[1L]
+              k <- d[2L]
+              if(k != (if(m == 1L) length(y) else 1L))
                   stop("non-conformable arguments")
               boolArith <- !is.na(boolArith) && boolArith
+              h <- if(boolArith) isN0 else as.double
               r <- new(if(boolArith) "ngeMatrix" else "dgeMatrix")
-              r@Dim <- c(d[1L], length(y))
+              r@Dim <- d <- c(m, if(m == 1L) 1L else length(y))
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r@x <-
+              if(m == 1L) {
                   if(x@margin == 1L)
-                      as.vector(matrix(y, d[1L], length(y), byrow = TRUE))
+                      h(y[x@perm])
+                  else (if(boolArith) any else sum)(h(y))
+              } else {
+                  if(x@margin == 1L)
+                      as.vector(matrix(h(y), m, length(y), byrow = TRUE))
                   else {
-                      tmp <- matrix(if(boolArith) FALSE else 0, d[1L], length(y))
-                      tmp[y@perm, ] <- if(boolArith) isN0(y) else as.double(y)
+                      tmp <- array(if(boolArith) FALSE else 0, d)
+                      tmp[y@perm, ] <- h(y)
                       dim(tmp) <- NULL
                       tmp
                   }
-              r@Dimnames
+              }
               r
           })
 
@@ -1519,9 +1522,9 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "pMatrix"),
 setMethod("tcrossprod", signature(x = "pMatrix", y = "Matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, y@Dim, type = 3L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- .M2kind(t(y)[perm, , drop = FALSE], k)
+              r <- .M2kind(t(y)[perm, , drop = FALSE], l)
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
@@ -1529,19 +1532,19 @@ setMethod("tcrossprod", signature(x = "pMatrix", y = "Matrix"),
 setMethod("tcrossprod", signature(x = "pMatrix", y = "matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
               matmultDim(x@Dim, dim(y), type = 3L)
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
               perm <- if(x@margin == 1L) x@perm else invertPerm(x@perm)
-              r <- .m2dense(t(y)[perm, , drop = FALSE], paste0(k, "ge"))
+              r <- .m2dense(t(y)[perm, , drop = FALSE], paste0(l, "ge"))
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
               r
           })
 
 setMethod("tcrossprod", signature(x = "pMatrix", y = "vector"),
           function(x, y = NULL, boolArith = NA, ...) {
-              if(x@Dim[2L] != 1L)
+              if(x@Dim[2L] != 1L || length(y) != 1L)
                   stop("non-conformable arguments")
-              k <- if(!is.na(boolArith) && boolArith) "n" else "d"
-              r <- .m2dense(y, paste0(k, "ge"), trans = TRUE)
+              l <- if(!is.na(boolArith) && boolArith) "n" else "d"
+              r <- .m2dense(y, paste0(l, "ge"), trans = TRUE)
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
           })

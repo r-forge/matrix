@@ -176,6 +176,7 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(R_dense_matmult, 4),
 	CALLDEF(R_sparse_matmult, 6),
+	CALLDEF(R_diagonal_matmult, 5),
 
 	CALLDEF(dgeMatrix_trf, 2),
 	CALLDEF(dsyMatrix_trf, 2),
