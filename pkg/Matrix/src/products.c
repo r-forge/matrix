@@ -53,14 +53,10 @@ void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
 				if (xl > INT_MAX)
 					error(_("dimensions cannot exceed %s"), "2^31-1");
 				int k = (*ytrans) ? yn : ym;
-				if (xl == k) {
+				if (k == xl || (k == 1 && !(*xtrans))) {
 					xm = (int) xl;
 					xn = 1;
-					*xtrans = 1; /* => vector as 1-row    matrix */
-				} else if (k == 1) {
-					xm = (int) xl;
-					xn = 1;
-					*xtrans = 0; /* => vector as 1-column matrix */
+					*xtrans = (k == xl) ? 1 : 0;
 				}
 			}
 		}
@@ -75,26 +71,18 @@ void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
 				R_xlen_t yl = XLENGTH(y);
 				if (yl > INT_MAX)
 					error(_("dimensions cannot exceed %s"), "2^31-1");
-				if (*ytrans && !(*ztrans)) {
-				if (((*xtrans) ? xn : xm) == 1) {
+				if (!(*ytrans) || (*ztrans)) {
+				int k = (*xtrans) ? xm : xn;
+				if (k == yl || k == 1) {
 					ym = (int) yl;
 					yn = 1;
-					*ytrans = 0; /* => vector as 1-column matrix */
-				} else if (((*xtrans) ? xm : xn) == 1) {
-					ym = (int) yl;
-					yn = 1;
-					*ytrans = 1; /* => vector as 1-row    matrix */
+					*ytrans = (k == yl) ? 0 : 1;
 				}
 				} else {
-				int k = (*xtrans) ? xm : xn;
-				if (yl == k) {
+				if (xm == 1 || xn == 1) {
 					ym = (int) yl;
 					yn = 1;
-					*ytrans = 0; /* => vector as 1-column matrix */
-				} else if (k == 1) {
-					ym = (int) yl;
-					yn = 1;
-					*ytrans = 1; /* => vector as 1-row    matrix */
+					*ytrans = (((*xtrans) ? xn : xm) == 1) ? 0 : 1;
 				}
 				}
 			}
@@ -945,4 +933,424 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 		x, y, xtrans_, ytrans_, ztrans_, triangular, boolean_);
 	UNPROTECT(2); /* y, x */
 	return x;
+}
+
+static
+void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j, packed = XLENGTH(x) < (R_xlen_t) m * n;
+
+#define SCALE(_CTYPE_, _PTR_, _OP_, _J_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
+		if (uplo == '\0') { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < m; ++i) { \
+					*px = *px _OP_ pd[_J_]; \
+					++px; \
+				} \
+			} \
+		} else if (uplo == 'U') { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i <= j; ++i) { \
+					*px = *px _OP_ pd[_J_]; \
+					++px; \
+				} \
+				if (!packed) \
+					px += m - j - 1; \
+			} \
+		} else { \
+			for (j = 0; j < n; ++j) { \
+				if (!packed) \
+					px += j; \
+				for (i = j; i < m; ++i) { \
+					*px = *px _OP_ pd[_J_]; \
+					++px;					\
+				} \
+			} \
+		} \
+		if (diag != '\0' && diag != 'N') { \
+			px = _PTR_(x); \
+			if (!packed) { \
+				R_xlen_t m1a = (R_xlen_t) m + 1; \
+				for (j = 0; j < n; ++j, px += m1a, pd += 1) \
+					*px = *pd; \
+			} else if (uplo == 'U') { \
+				for (j = 0; j < n; px += (++j)+1, pd += 1) \
+					*px = *pd; \
+			} else { \
+				for (j = 0; j < n; px += m-(j++), pd += 1) \
+					*px = *pd; \
+			} \
+		} \
+	} while (0)
+
+	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
+		SCALE(int, LOGICAL, &&, j);
+	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
+		SCALE(double, REAL, *, j);
+	else
+		error(_("should never happen ..."));
+	return;
+}
+
+static
+void dense_rowscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j, packed = XLENGTH(x) < (R_xlen_t) m * n;
+	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
+		SCALE(int, LOGICAL, &&, i);
+	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
+		SCALE(double, REAL, *, i);
+	else
+		error(_("should never happen ..."));
+
+#undef SCALE
+
+	return;
+}
+
+static
+void Csparse_colscale(SEXP obj, SEXP d)
+{
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		p = PROTECT(GET_SLOT(obj, Matrix_pSym));
+	int *pp = INTEGER(p) + 1, n = (int) (XLENGTH(p) - 1), j, k = 0, kend;
+	UNPROTECT(2); /* p, x */
+
+#define SCALE(_CTYPE_, _PTR_, _OP_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
+		for (j = 0; j < n; ++j) { \
+			kend = pp[j]; \
+			while (k < kend) { \
+				*px = *px _OP_ *pd; \
+				++px; \
+				++k; \
+			} \
+			++pd; \
+		} \
+	} while (0)
+
+	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
+		SCALE(int, LOGICAL, &&);
+	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
+		SCALE(double, REAL, *);
+	else
+		error(_("should never happen ..."));
+
+#undef SCALE
+
+	return;
+}
+
+static
+void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
+{
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		i = PROTECT(GET_SLOT(obj, iSym));
+	int *pi = INTEGER(i), k, nnz = INTEGER(p)[XLENGTH(p) - 1];
+	UNPROTECT(3); /* i, p, x */
+
+#define SCALE(_CTYPE_, _PTR_, _OP_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
+		for (k = 0; k < nnz; ++k) { \
+			*px = *px _OP_ pd[*pi]; \
+			++px; \
+			++pi; \
+		} \
+	} while (0)
+
+	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
+		SCALE(int, LOGICAL, &&);
+	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
+		SCALE(double, REAL, *);
+	else
+		error(_("should never happen ..."));
+	return;
+}
+
+static
+void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
+{
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		i = PROTECT(GET_SLOT(obj, iSym));
+	int *pi = INTEGER(i);
+	R_xlen_t k, nnz = XLENGTH(i);
+	UNPROTECT(2); /* i, x */
+	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
+		SCALE(int, LOGICAL, &&);
+	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
+		SCALE(double, REAL, *);
+	else
+		error(_("should never happen ..."));
+
+#undef SCALE
+
+	return;
+}
+
+SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
+                        SEXP boolean)
+{
+	SEXP x_ = x, y_ = y; /* for later pointer comparison */
+
+	if (TYPEOF(boolean) != LGLSXP || LENGTH(boolean) < 1)
+		error(_("invalid '%s' to %s()"), "boolean", __func__);
+	int boolean_ = LOGICAL(boolean)[0];
+
+	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
+		ztrans_ = 0, m, n, v;
+	matmultDim(x, y, &xtrans_, &ytrans_, &ztrans_, &m, &n, &v);
+
+	PROTECT_INDEX xpid, ypid;
+	PROTECT_WITH_INDEX(x, &xpid);
+	PROTECT_WITH_INDEX(y, &ypid);
+
+	if (!IS_S4_OBJECT(x)) {
+		if (boolean_ == NA_LOGICAL || !boolean_)
+		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 1), xpid);
+		else
+		REPROTECT(x = matrix_as_dense(x, "nge", '\0', '\0', xtrans_, 1), xpid);
+		if (v == 1) {
+			/* Vector: discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
+			               (xtrans_) ? 1 : 0, R_NilValue);
+			xtrans_ = 0;
+		}
+	}
+	if (!IS_S4_OBJECT(y)) {
+		if (boolean_ == NA_LOGICAL || !boolean_)
+		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 1), ypid);
+		else
+		REPROTECT(y = matrix_as_dense(y, "nge", '\0', '\0', ytrans_, 1), ypid);
+		if (v == 2) {
+			/* Vector: discard names and don't transpose again */
+			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
+			               (ytrans_) ? 1 : 0, R_NilValue);
+			ytrans_ = 0;
+		}
+	}
+
+	static const char *valid[] = {
+		VALID_DIAGONAL,
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
+	const char *xcl = NULL, *ycl = NULL;
+	int ivalid;
+	ivalid = R_check_class_etc(x, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(x, __func__);
+	xcl = valid[ivalid];
+	if (xcl[1] == 's')
+		xtrans_ = 0;
+	ivalid = R_check_class_etc(y, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(y, __func__);
+	ycl = valid[ivalid];
+	if (ycl[1] == 's')
+		ytrans_ = 0;
+	if (boolean_ == NA_LOGICAL)
+		boolean_ = xcl[0] == 'n' && ycl[0] == 'n';
+
+	int margin = -1, unit = -1;
+	if (xcl[2] == 'i') {
+		margin = 0;
+		unit = *CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0)) != 'N';
+	} else if (ycl[2] == 'i') {
+		margin = 1;
+		unit = *CHAR(STRING_ELT(GET_SLOT(y, Matrix_diagSym), 0)) != 'N';
+	} else
+		error(_("should never happen ..."));
+
+	char ks = (boolean_) ? 'l' : 'd', kd = (boolean_) ? 'n' : 'd';
+	switch (xcl[2]) {
+	case 'i':
+		if (!unit && xcl[0] != ks) {
+			REPROTECT(x = diagonal_as_kind(x, xcl, ks), xpid);
+			xcl = valid[R_check_class_etc(x, valid)];
+		}
+		break;
+	case 'C':
+	case 'R':
+	case 'T':
+		if (xcl[0] != ks) {
+			REPROTECT(x = sparse_as_kind(x, xcl, ks), xpid);
+			xcl = valid[R_check_class_etc(x, valid)];
+		}
+		if (!unit && xcl[1] == 's') {
+			REPROTECT(x = sparse_as_general(x, xcl), xpid);
+			xcl = valid[R_check_class_etc(x, valid)];
+		} else if (!unit && xcl[1] == 't')
+			REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
+		if (xtrans_) {
+			REPROTECT(x = sparse_transpose(x, xcl, 0), xpid);
+			xtrans_ = 0;
+		}
+		break;
+	default:
+		if (xcl[0] != kd) {
+			REPROTECT(x = dense_as_kind(x, xcl, kd), xpid);
+			xcl = valid[R_check_class_etc(x, valid)];
+		}
+		if (!unit && xcl[1] == 's') {
+			REPROTECT(x = dense_as_general(x, xcl, x == x_), xpid);
+			xcl = valid[R_check_class_etc(x, valid)];
+		}
+		if (xtrans_) {
+			REPROTECT(x = dense_transpose(x, xcl), xpid);
+			xtrans_ = 0;
+		}
+		break;
+	}
+	switch (ycl[2]) {
+	case 'i':
+		if (!unit && ycl[0] != ks) {
+			REPROTECT(y = diagonal_as_kind(y, ycl, ks), ypid);
+			ycl = valid[R_check_class_etc(y, valid)];
+		}
+		break;
+	case 'C':
+	case 'R':
+	case 'T':
+		if (ycl[0] != ks) {
+			REPROTECT(y = sparse_as_kind(y, ycl, ks), ypid);
+			ycl = valid[R_check_class_etc(y, valid)];
+		}
+		if (!unit && ycl[1] == 's') {
+			REPROTECT(y = sparse_as_general(y, ycl), ypid);
+			ycl = valid[R_check_class_etc(y, valid)];
+		} else if (!unit && ycl[1] == 't')
+			REPROTECT(y = sparse_diag_U2N(y, ycl), ypid);
+		if (ytrans_) {
+			REPROTECT(y = sparse_transpose(y, ycl, 0), ypid);
+			ytrans_ = 0;
+		}
+		break;
+	default:
+		if (ycl[0] != kd) {
+			REPROTECT(y = dense_as_kind(y, ycl, kd), ypid);
+			ycl = valid[R_check_class_etc(y, valid)];
+		}
+		if (!unit && ycl[1] == 's') {
+			REPROTECT(y = dense_as_general(y, ycl, y == y_), ypid);
+			ycl = valid[R_check_class_etc(y, valid)];
+		}
+		if (ytrans_) {
+			REPROTECT(y = dense_transpose(y, ycl), ypid);
+			ytrans_ = 0;
+		}
+		break;
+	}
+
+	SEXP z;
+	PROTECT_INDEX zpid;
+	const char *zcl = (margin == 0) ? ycl : xcl;
+	PROTECT_WITH_INDEX(z = NEW_OBJECT_OF_CLASS(zcl), &zpid);
+
+	SEXP zdim = PROTECT(GET_SLOT(z, Matrix_DimSym));
+	int *pzdim = INTEGER(zdim);
+	pzdim[0] = m;
+	pzdim[1] = n;
+	UNPROTECT(1); /* zdim */
+
+	SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
+		ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
+		zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
+	matmultDN(zdimnames,
+	          xdimnames, (xtrans_) ? 1 : 0,
+	          ydimnames, (ytrans_) ? 0 : 1);
+	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
+
+	char ul = '\0', di = '\0';
+	if (zcl[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_uploSym));
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (ul != 'U')
+			SET_SLOT(z, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+
+		if (zcl[1] == 't') {
+		SEXP diag = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_diagSym));
+		di = *CHAR(STRING_ELT(diag, 0));
+		if (di != 'N' && unit)
+			SET_SLOT(z, Matrix_diagSym, diag);
+		UNPROTECT(1); /* diag */
+		}
+	}
+
+	if (zcl[2] == 'C' || zcl[2] == 'R' || zcl[2] == 'T') {
+		if (zcl[2] != 'T') {
+			SEXP p = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_pSym));
+			SET_SLOT(z, Matrix_pSym, p);
+			UNPROTECT(1); /* p */
+		}
+		if (zcl[2] != 'R') {
+			SEXP i = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_iSym));
+			SET_SLOT(z, Matrix_iSym, i);
+			UNPROTECT(1); /* i */
+		}
+		if (zcl[2] != 'C') {
+			SEXP j = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_jSym));
+			SET_SLOT(z, Matrix_jSym, j);
+			UNPROTECT(1); /* j */
+		}
+	}
+
+	SEXP x0 = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_xSym));
+	if (unit || ((margin == 0) ? y != y_ : x != x_))
+		SET_SLOT(z, Matrix_xSym, x0);
+	else {
+		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+		if(boolean_)
+		Matrix_memcpy(LOGICAL(x1), LOGICAL(x0), XLENGTH(x0), sizeof(   int));
+		else
+		Matrix_memcpy(   REAL(x1),    REAL(x0), XLENGTH(x0), sizeof(double));
+		SET_SLOT(z, Matrix_xSym, x1);
+		UNPROTECT(1); /* x1 */
+	}
+	UNPROTECT(1); /* x0 */
+
+	if (!unit) {
+		SEXP d = PROTECT(GET_SLOT((margin == 0) ? x : y, Matrix_xSym));
+		switch (zcl[2]) {
+		case 'C':
+			if (margin == 0)
+				Csparse_rowscale(z, d, Matrix_iSym);
+			else
+				Csparse_colscale(z, d);
+			break;
+		case 'R':
+			if (margin == 0)
+				Csparse_colscale(z, d);
+			else
+				Csparse_rowscale(z, d, Matrix_jSym);
+			break;
+		case 'T':
+			if (margin == 0)
+				Tsparse_rowscale(z, d, Matrix_iSym);
+			else
+				Tsparse_rowscale(z, d, Matrix_jSym);
+			break;
+		default:
+			if (margin == 0)
+				  dense_rowscale(z, d, m, n, ul, di);
+			else
+				  dense_colscale(z, d, m, n, ul, di);
+			break;
+		}
+		UNPROTECT(1); /* d */
+	}
+
+	if (zcl[2] == 'C' || zcl[2] == 'R' || zcl[2] == 'T') {
+		REPROTECT(z = sparse_drop0(z, zcl, 0.0), zpid);
+		if (boolean_)
+			REPROTECT(z = sparse_as_kind(z, zcl, 'n'), zpid);
+	}
+
+	UNPROTECT(3); /* z, y, x */
+	return z;
 }

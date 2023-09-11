@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-09 r4314)}{
+\section{Changes in version 1.6-2 (2023-09-11 r4317)}{
   \subsection{New Features}{
     \itemize{
       \item New C-level validity methods for \code{sparseVector} and
