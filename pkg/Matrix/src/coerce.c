@@ -1520,7 +1520,7 @@ SEXP R_index_as_sparse(SEXP from, SEXP kind, SEXP repr)
 	return index_as_sparse(from, valid[ivalid], kind_, repr_);
 }
 
-SEXP dense_as_kind(SEXP from, const char *class, char kind)
+SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 {
 	if (kind == '.' || kind == class[0])
 		return from;
@@ -1560,7 +1560,17 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind)
 	PROTECT_INDEX pid;
 	SEXP x;
 	PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pid);
-	if (TYPEOF(x) == tt) {
+	if (TYPEOF(x) != tt) {
+		REPROTECT(x = coerceVector(x, tt), pid);
+		if (class[0] == 'n')
+			/* n->[idz] */
+			naToOne(x);
+	} else if (new) {
+		REPROTECT(x = duplicate(x), pid);
+		if (class[0] == 'n')
+			/* n->l */
+			naToOne(x);
+	} else {
 		if (class[0] == 'n') {
 			/* n->l */
 			R_xlen_t i, len = XLENGTH(x);
@@ -1573,11 +1583,6 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind)
 				}
 			}
 		}
-	} else {
-		REPROTECT(x = coerceVector(x, tt), pid);
-		if (class[0] == 'n')
-			/* n->[idz] */
-			naToOne(x);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 	UNPROTECT(2); /* x, to */
@@ -1598,7 +1603,7 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 	    (kind_ = CHAR(kind)[0]) == '\0')
 		error(_("invalid '%s' to %s()"), "kind", __func__);
 
-	return dense_as_kind(from, valid[ivalid], kind_);
+	return dense_as_kind(from, valid[ivalid], kind_, 0);
 }
 
 SEXP sparse_as_kind(SEXP from, const char *class, char kind)
@@ -3407,7 +3412,7 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 	case 'r':
 	case 'p':
 		if (sparse_ == NA_LOGICAL || !sparse_)
-			from = dense_as_kind(from, cl, kind_);
+			from = dense_as_kind(from, cl, kind_, 0);
 		else {
 			from = dense_as_sparse(from, cl, 'C');
 			PROTECT(from);
@@ -3499,11 +3504,9 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 		cl_[0] = (kind_ == '.') ? cl[0] : kind_;
 		cl_[1] = cl[1];
 		cl_[2] = cl[2];
-		int new = (cl[0] == cl_[0]) || ((cl[0] == 'n' && cl_[0] == 'l') ||
-		                                (cl[0] == 'l' && cl_[0] == 'n'));
-		from = dense_as_kind(from, cl, kind_);
+		from = dense_as_kind(from, cl, kind_, 1);
 		PROTECT(from);
-		from = dense_as_general(from, cl_, new);
+		from = dense_as_general(from, cl_, cl[0] == cl_[0]);
 		UNPROTECT(1);
 		return from;
 	}

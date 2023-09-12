@@ -384,7 +384,7 @@ static void coerceArgs(SEXP args, int margin,
 			case 'p':
 				switch (repr) {
 				case 'e':
-					REPROTECT(s = dense_as_kind(s, scl, kind), pid);
+					REPROTECT(s = dense_as_kind(s, scl, kind, 0), pid);
 					scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
 					REPROTECT(s = dense_as_general(
 						s, scl_, kind2type(kind) == kind2type(scl[0])), pid);
