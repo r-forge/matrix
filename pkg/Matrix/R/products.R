@@ -1,5 +1,3 @@
-## FIXME: vector-vector methods probably not consistent with do_matprod
-
 matmultDim <- function(d.a, d.b, type = 1L) {
     ## Return the 'dim' of the product indicated by 'type':
     ##     type 1:    a  %*%   b
@@ -392,18 +390,18 @@ setMethod("%*%", signature(x = "sparseVector", y = "sparseVector"),
 for(.cl in c("Matrix", "matrix")) {
 setMethod("%*%", signature(x = "sparseVector", y = .cl),
           function(x, y)
-              if((k <- dim(y)[1L]) == 1L)
-                        .V2C(x)  %*% y
-              else if(length(x) == k)
+              if((k <- dim(y)[1L]) == length(x))
                   .tCRT(.V2C(x)) %*% y
+              else if(k == 1L)
+                        .V2C(x)  %*% y
               else stop("non-conformable arguments"))
 
 setMethod("%*%", signature(x = .cl, y = "sparseVector"),
           function(x, y)
-              if((k <- dim(x)[2L]) == 1L)
-                  x %*% .tCRT(.V2C(y))
-              else if(length(y) == k)
+              if((k <- dim(x)[2L]) == length(y))
                   x %*%       .V2C(y)
+              else if(k == 1L)
+                  x %*% .tCRT(.V2C(y))
               else stop("non-conformable arguments"))
 }
 
@@ -836,20 +834,20 @@ for(.cl in c("Matrix", "matrix")) {
 setMethod("%&%", signature(x = "sparseVector", y = .cl),
           function(x, y) {
               x <- .V2kind(.drop0(x, isM = FALSE), "n")
-              if((k <- dim(y)[1L]) == 1L)
-                        .V2C(x)  %&% y
-              else if(length(x) == k)
+              if((k <- dim(y)[1L]) == length(x))
                   .tCRT(.V2C(x)) %&% y
+              else if(k == 1L)
+                        .V2C(x)  %&% y
               else stop("non-conformable arguments")
           })
 
 setMethod("%&%", signature(x = .cl, y = "sparseVector"),
           function(x, y) {
               y <- .V2kind(.drop0(y, isM = FALSE), "n")
-              if((k <- dim(x)[2L]) == 1L)
-                  x %&% .tCRT(.V2C(y))
-              else if(length(y) == k)
+              if((k <- dim(x)[2L]) == length(y))
                   x %&%       .V2C(y)
+              else if(k == 1L)
+                  x %&% .tCRT(.V2C(y))
               else stop("non-conformable arguments")
           })
 }
@@ -869,16 +867,12 @@ setMethod("%&%", signature(x = "vector", y = "sparseVector"),
 
 for(.cl in c("Matrix", "sparseVector")) {
 setMethod("crossprod", signature(x = .cl, y = "ANY"),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) t(x) %&% y else t(x) %*% y
-          })
+          function(x, y = NULL, ...)
+              crossprod(x, (if(length(dim(y)) == 2L) as.matrix else as.vector)(y), ...))
 
 setMethod("crossprod", signature(x = "ANY", y = .cl),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) t(x) %&% y else t(x) %*% y
-          })
+          function(x, y = NULL, ...)
+              crossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...))
 }
 
 
@@ -1018,10 +1012,8 @@ setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
           })
 
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) t(x) %&% y else t(x) %*% y
-          })
+          function(x, y = NULL, boolArith = NA, ...)
+              (if(!is.na(boolArith) && boolArith) `%&%` else `%*%`)(t(x), y))
 
 for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
@@ -1052,10 +1044,8 @@ setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
 
 for(.cl in c("Matrix", "matrix", "vector"))
 setMethod("crossprod", signature(x = "indMatrix", y = .cl),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) t(x) %&% y else t(x) %*% y
-          })
+          function(x, y = NULL, boolArith = NA, ...)
+              (if(!is.na(boolArith) && boolArith) `%&%` else `%*%`)(t(x), y))
 
 setMethod("crossprod", signature(x = "Matrix", y = "indMatrix"),
           function(x, y = NULL, boolArith = NA, ...) {
@@ -1196,10 +1186,10 @@ setMethod("crossprod", signature(x = "sparseVector", y = .cl),
 
 setMethod("crossprod", signature(x = .cl, y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
-              if(dim(x)[1L] == 1L)
-              crossprod(x, .tCRT(.V2C(y)), boolArith = boolArith, ...)
+              if(dim(x)[1L] == length(y))
+              crossprod(x,       .V2C(y) , boolArith = boolArith, ...)
               else
-              crossprod(x,       .V2C(y) , boolArith = boolArith, ...))
+              crossprod(x, .tCRT(.V2C(y)), boolArith = boolArith, ...))
 }
 
 setMethod("crossprod", signature(x = "sparseVector", y = "vector"),
@@ -1214,12 +1204,13 @@ setMethod("crossprod", signature(x = "sparseVector", y = "vector"),
                   } else if(nx == length(y))
                       .m2sparse(any(match(x@i, y@i, 0L)), "ngR")
                   else stop("non-conformable arguments")
-              }
-              else if((nx <- length(x)) == 1L)
-                  .m2dense(.V2v(x * y), ".ge", trans = TRUE)
-              else if(nx == length(y))
-                  .m2dense(sum(x * y), ".ge")
-              else stop("non-conformable arguments"))
+              } else {
+                  if((nx <- length(x)) == 1L)
+                      .m2dense(.V2v(x * y), ".ge", trans = TRUE)
+                  else if(nx == length(y))
+                      .m2dense(sum(x * y), ".ge")
+                  else stop("non-conformable arguments")
+              })
 
 setMethod("crossprod", signature(x = "vector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
@@ -1233,12 +1224,13 @@ setMethod("crossprod", signature(x = "vector", y = "sparseVector"),
                   } else if(nx == length(y))
                       .m2sparse(any(match(x@i, y@i, 0L)), "ngR")
                   else stop("non-conformable arguments")
-              }
-              else if((nx <- length(x)) == 1L)
-                  .m2dense(.V2v(x * y), ".ge", trans = TRUE)
-              else if(nx == length(y))
-                  .m2dense(sum(x * y), ".ge")
-              else stop("non-conformable arguments"))
+              } else {
+                  if((nx <- length(x)) == 1L)
+                      .m2dense(.V2v(x * y), ".ge", trans = TRUE)
+                  else if(nx == length(y))
+                      .m2dense(sum(x * y), ".ge")
+                  else stop("non-conformable arguments")
+              })
 
 
 ## METHODS FOR GENERIC: tcrossprod
@@ -1247,16 +1239,12 @@ setMethod("crossprod", signature(x = "vector", y = "sparseVector"),
 
 for(.cl in c("Matrix", "sparseVector")) {
 setMethod("tcrossprod", signature(x = .cl, y = "ANY"),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) x %&% t(y) else x %*% t(y)
-          })
+          function(x, y = NULL, ...)
+              tcrossprod(x, (if(length(dim(y)) == 2L) as.matrix else as.vector)(y), ...))
 
 setMethod("tcrossprod", signature(x = "ANY", y = .cl),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) x %&% t(y) else x %*% t(y)
-          })
+          function(x, y = NULL, ...)
+              tcrossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...))
 }
 
 
@@ -1396,10 +1384,8 @@ setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
           })
 
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) x %&% t(y) else x %*% t(y)
-          })
+          function(x, y = NULL, boolArith = NA, ...)
+              (if(!is.na(boolArith) && boolArith) `%&%` else `%*%`)(x, t(y)))
 
 for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
@@ -1430,10 +1416,8 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "missing"),
 
 for(.cl in c("Matrix", "matrix", "vector"))
 setMethod("tcrossprod", signature(x = .cl, y = "indMatrix"),
-          function(x, y = NULL, boolArith = NA, ...) {
-              boolArith <- !is.na(boolArith) && boolArith
-              if(boolArith) x %&% t(y) else x %*% t(y)
-          })
+          function(x, y = NULL, boolArith = NA, ...)
+              (if(!is.na(boolArith) && boolArith) `%&%` else `%*%`)(x, t(y)))
 
 setMethod("tcrossprod", signature(x = "indMatrix", y = "Matrix"),
           function(x, y = NULL, boolArith = NA, ...) {
@@ -1558,22 +1542,20 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "sparseVector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
-              if(if(is.na(boolArith)) .V.kind(x) == "n" && .V.kind(y) == "n" else boolArith)
-                  x %&% .tCRT(.V2C(y))
-              else
-                  x %*% .tCRT(.V2C(y)))
+              (if(if(is.na(boolArith)) .V.kind(x) == "n" && .V.kind(y) == "n" else boolArith) `%&%` else `%*%`)(x, .tCRT(.V2C(y))))
 
 for(.cl in c("Matrix", "matrix")) {
 setMethod("tcrossprod", signature(x = "sparseVector", y = .cl),
-          function(x, y = NULL, boolArith = NA, ...)
-              if(dim(y)[2L] == 1L)
-              tcrossprod(      .V2C(x) , y, boolArith = boolArith, ...)
-              else
-              tcrossprod(.tCRT(.V2C(x)), y, boolArith = boolArith, ...))
+          function(x, y = NULL, boolArith = NA, ...) {
+              x <- if(dim(y)[2L] == length(x)) .tCRT(.V2C(x)) else .V2C(x)
+              tcrossprod(x, y, boolArith = boolArith, ...)
+          })
 
 setMethod("tcrossprod", signature(x = .cl, y = "sparseVector"),
-          function(x, y = NULL, boolArith = NA, ...)
-              tcrossprod(x, .tCRT(.V2C(y)), boolArith = boolArith, ...))
+          function(x, y = NULL, boolArith = NA, ...) {
+              y <- if(dim(x)[1L] == 1L) .tCRT(.V2C(y)) else .V2C(y)
+              tcrossprod(x, y, boolArith = boolArith, ...)
+          })
 }
 
 setMethod("tcrossprod", signature(x = "sparseVector", y = "vector"),
@@ -1589,9 +1571,6 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "vector"),
 
 setMethod("tcrossprod", signature(x = "vector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
-              if(!is.na(boolArith) && boolArith)
-                  x %&% .tCRT(.V2C(y))
-              else
-                  x %*% .tCRT(.V2C(y)))
+              (if(!is.na(boolArith) && boolArith) `%&%` else `%*%`)(x, .tCRT(.V2C(y))))
 
 rm(.cl)

@@ -83,8 +83,28 @@ void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
 					*ytrans = (k == yl) ? 0 : 1;
 				}
 			}
-		} else
+		} else {
 			*v = 3;
+			int xl = LENGTH(x), yl = LENGTH(y);
+			if (*xtrans) {
+				xm = xl;
+				xn = 1;
+				ym = yl;
+				yn = 1;
+				*ytrans = xl == 1;
+			} else if (*ytrans) {
+				xm = xl;
+				xn = 1;
+				ym = yl;
+				yn = 1;
+				/* *xtrans = 0; */
+			} else {
+				xm = 1;
+				xn = xl;
+				ym = (xl == 1) ? 1 : yl;
+				yn = (xl == 1) ? yl : 1;
+			}
+		}
 		if (((*xtrans) ? xm : xn) != ((*ytrans) ? yn : ym))
 			error(_("non-conformable arguments"));
 		*m = (*xtrans) ? xn : xm;
