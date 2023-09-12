@@ -147,6 +147,7 @@ setMethod("lu", signature(x = "dtTMatrix"),
 
 setMethod("lu", "diagonalMatrix",
           function(x, ...) {
+              x <- .M2kind(x, "d")
               n <- (d <- x@Dim)[1L]
               L <- new("dtCMatrix")
               r <- new("sparseLU")
@@ -158,7 +159,7 @@ setMethod("lu", "diagonalMatrix",
               if(x@diag == "N") {
                   L@diag <- "N"
                   L@p <- seq.int(from = 0L, length.out = n + 1L)
-                  L@x <- as.double(x@x)
+                  L@x <- x@x
               }
               r@U <- L
               r@Dim <- d
