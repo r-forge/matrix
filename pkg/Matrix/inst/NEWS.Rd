@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-12 r4321)}{
+\section{Changes in version 1.6-2 (2023-09-12 r4323)}{
   \subsection{New Features}{
     \itemize{
       \item New C-level validity methods for \code{sparseVector} and
@@ -84,6 +84,9 @@
       of type \code{"integer"}.  Methods differed previously,
       some giving \code{"double"} (as \pkg{base} does, suboptimally,
       traditional matrices of type \code{"logical"}).
+
+      \item Some methods for generic function \code{lu} did not transmit
+      \code{Dimnames} to the result.
     }
   }
   \subsection{Misc}{
