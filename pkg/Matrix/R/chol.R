@@ -8,6 +8,10 @@ setMethod("chol", signature(x = "generalMatrix"),
               ch
           })
 
+setMethod("chol", signature(x = "symmetricMatrix"),
+          function(x, ...)
+              chol(.M2kind(x, "d"), ...))
+
 setMethod("chol", signature(x = "triangularMatrix"),
           function(x, uplo = "U", ...) {
               if(identical(uplo, x@uplo)) {
@@ -16,10 +20,6 @@ setMethod("chol", signature(x = "triangularMatrix"),
                   ch
               } else chol(forceDiagonal(x, x@diag), ...)
           })
-
-setMethod("chol", signature(x = "symmetricMatrix"),
-          function(x, ...)
-              chol(.M2kind(x, "d"), ...))
 
 setMethod("chol", signature(x = "diagonalMatrix"),
           function(x, ...)
@@ -69,16 +69,16 @@ setMethod("Cholesky", signature(A = "generalMatrix"),
               ch
           })
 
+setMethod("Cholesky", signature(A = "symmetricMatrix"),
+          function(A, ...)
+              Cholesky(.M2kind(A, "d"), ...))
+
 setMethod("Cholesky", signature(A = "triangularMatrix"),
           function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
-
-setMethod("Cholesky", signature(A = "symmetricMatrix"),
-          function(A, ...)
-              Cholesky(.M2kind(A, "d"), ...))
 
 setMethod("Cholesky", signature(A = "diagonalMatrix"),
           function(A, ...)
