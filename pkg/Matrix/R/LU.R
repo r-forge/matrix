@@ -34,6 +34,7 @@ setMethod("lu", signature(x = .cl),
               if(x@uplo == "U" || x@diag == "U") {
                   r <- new("denseLU")
                   r@Dim <- d <- x@Dim
+                  r@Dimnames <- x@Dimnames
                   r@perm <- seq_len(d[1L])
                   r@x <- .M2gen(x)@x
                   r
@@ -63,10 +64,12 @@ setMethod("lu", "dtCMatrix",
                   n <- (d <- x@Dim)[1L]
                   r <- new("sparseLU")
                   y <- new("dtCMatrix")
-                  y@Dim <- r@Dim <- d
+                  y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
                   y@diag <- "U"
                   y@p <- integer(n + 1L)
+                  r@Dim <- d
+                  r@Dimnames <- x@Dimnames
                   r@L <- if(upper) y else x
                   r@U <- if(upper) x else y
                   r@p <- r@q <- seq.int(from = 0L, length.out = n)
@@ -95,10 +98,12 @@ setMethod("lu", signature(x = "dtRMatrix"),
                   n <- (d <- x@Dim)[1L]
                   r <- new("sparseLU")
                   y <- new("dtCMatrix")
-                  y@Dim <- r@Dim <- d
+                  y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
                   y@diag <- "U"
                   y@p <- integer(n + 1L)
+                  r@Dim <- d
+                  r@Dimnames <- x@Dimnames
                   r@L <- if(upper) y else .M2C(x)
                   r@U <- if(upper) .M2C(x) else y
                   r@p <- r@q <- seq.int(from = 0L, length.out = n)
@@ -127,10 +132,12 @@ setMethod("lu", signature(x = "dtTMatrix"),
                   n <- (d <- x@Dim)[1L]
                   r <- new("sparseLU")
                   y <- new("dtCMatrix")
-                  y@Dim <- r@Dim <- d
+                  y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
                   y@diag <- "U"
                   y@p <- integer(n + 1L)
+                  r@Dim <- d
+                  r@Dimnames <- x@Dimnames
                   r@L <- if(upper) y else .M2C(x)
                   r@U <- if(upper) .M2C(x) else y
                   r@p <- r@q <- seq.int(from = 0L, length.out = n)
@@ -143,7 +150,7 @@ setMethod("lu", "diagonalMatrix",
               n <- (d <- x@Dim)[1L]
               L <- new("dtCMatrix")
               r <- new("sparseLU")
-              L@Dim <- r@Dim <- d
+              L@Dim <- d
               L@uplo <- "L"
               L@diag <- "U"
               L@p <- integer(n + 1L)
@@ -154,6 +161,8 @@ setMethod("lu", "diagonalMatrix",
                   L@x <- as.double(x@x)
               }
               r@U <- L
+              r@Dim <- d
+              r@Dimnames <- x@Dimnames
               r@p <- r@q <- seq.int(from = 0L, length.out = n)
               r
           })
