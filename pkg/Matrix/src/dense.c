@@ -436,8 +436,8 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 		PROTECT(value = coerceVector(value, tx));
 	} else {
 		/* defined in ./coerce.c : */
-		SEXP dense_as_kind(SEXP, const char *, char);
-		PROTECT(from = dense_as_kind(from, class, type2kind(tv)));
+		SEXP dense_as_kind(SEXP, const char *, char, int);
+		PROTECT(from = dense_as_kind(from, class, type2kind(tv), 0));
 #ifndef MATRIX_ENABLE_IMATRIX
 		if (tv == INTSXP)
 			value = coerceVector(value, REALSXP);
@@ -700,8 +700,8 @@ SEXP dense_symmpart(SEXP from, const char *class)
 {
 	if (class[0] != 'z' && class[0] != 'd') {
 		/* defined in ./coerce.c : */
-		SEXP dense_as_kind(SEXP, const char *, char);
-		from = dense_as_kind(from, class, 'd');
+		SEXP dense_as_kind(SEXP, const char *, char, int);
+		from = dense_as_kind(from, class, 'd', 0);
 	}
 	if (class[0] != 'z' && class[1] == 's')
 		return from;
@@ -852,8 +852,8 @@ SEXP dense_skewpart(SEXP from, const char *class)
 {
 	if (class[0] != 'z' && class[0] != 'd') {
 		/* defined in ./coerce.c : */
-		SEXP dense_as_kind(SEXP, const char *, char);
-		from = dense_as_kind(from, class, 'd');
+		SEXP dense_as_kind(SEXP, const char *, char, int);
+		from = dense_as_kind(from, class, 'd', 0);
 	}
 	PROTECT(from);
 

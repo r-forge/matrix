@@ -13,84 +13,86 @@ static
 void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
                 int *m, int *n, int *v)
 {
-	/* MJ: All of this would be _much_ less ugly if we did not
-	   have to emulate the various "asymmetries" in R's do_matprod
-	*/
-	int x4 = IS_S4_OBJECT(x), y4 = IS_S4_OBJECT(y);
+	*xtrans = (*xtrans) ? 1 : 0;
+	*ytrans = (*ytrans) ? 1 : 0;
+	*ztrans = (*ztrans) ? 1 : 0;
 	if (y == R_NilValue) {
-		if (!x4)
-			error(_("should never happen ..."));
-		*v = 0;
-		*m = *n = INTEGER(GET_SLOT(x, Matrix_DimSym))[(*xtrans) ? 1 : 0];
+		SEXP
+			xdim = (IS_S4_OBJECT(x))
+			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol);
+		if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
+			*v = 0;
+			*m = *n = INTEGER(xdim)[(*xtrans) ? 1 : 0];
+		} else if (XLENGTH(x) <= INT_MAX) {
+			*v = 1;
+			*m = *n = (*xtrans) ? 1 : LENGTH(x);
+		} else
+			error(_("dimensions cannot exceed %s"), "2^31-1");
 		*ytrans = (*xtrans) ? 0 : 1;
 	} else {
-		if (!x4 && !y4)
-			error(_("should never happen ..."));
-		*v = 0;
-		int xm, xn, ym, yn;
+		/* MJ: So that I don't lose my mind ... : */
+		if (*ztrans) {
+			int tmp = !(*xtrans); *xtrans = !(*ytrans); *ytrans = tmp;
+			SEXP s = x; x = y; y = s;
+		}
+		SEXP
+			xdim = (IS_S4_OBJECT(x))
+			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol),
+			ydim = (IS_S4_OBJECT(y))
+			? GET_SLOT(y, Matrix_DimSym) : getAttrib(y, R_DimSymbol);
+		int xm, xn, ym, yn, x2, y2;
 		xm = xn = ym = yn = -1;
-		if (x4) {
-			SEXP xdim = GET_SLOT(x, Matrix_DimSym);
+		x2 = TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2;
+		y2 = TYPEOF(ydim) == INTSXP && LENGTH(ydim) == 2;
+		if (x2) {
 			int *pxdim = INTEGER(xdim);
 			xm = pxdim[0];
 			xn = pxdim[1];
-		}
-		if (y4) {
-			SEXP ydim = GET_SLOT(y, Matrix_DimSym);
+		} else if (XLENGTH(x) > INT_MAX)
+			error(_("dimensions cannot exceed %s"), "2^31-1");
+		if (y2) {
 			int *pydim = INTEGER(ydim);
 			ym = pydim[0];
 			yn = pydim[1];
-		}
-		if (!x4) {
-			SEXP xdim = getAttrib(x, R_DimSymbol);
-			if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
-				int *pxdim = INTEGER(xdim);
-				xm = pxdim[0];
-				xn = pxdim[1];
-			} else {
-				*v = 1;
-				R_xlen_t xl = XLENGTH(x);
-				if (xl > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
-				int k = (*ytrans) ? yn : ym;
-				if (k == xl || (k == 1 && !(*xtrans))) {
-					xm = (int) xl;
-					xn = 1;
-					*xtrans = (k == xl) ? 1 : 0;
-				}
+		} else if (XLENGTH(y) > INT_MAX)
+			error(_("dimensions cannot exceed %s"), "2^31-1");
+		/* MJ: R's do_matprod behaves quite asymmetrically ... what a pain */
+		if (x2 && y2)
+			*v = 0;
+		else if (y2) {
+			*v = (*ztrans) ? 2 : 1;
+			int k = (*ytrans) ? yn : ym, xl = LENGTH(x);
+			if (k == xl || (k == 1 && !(*xtrans))) {
+				xm = (int) xl;
+				xn = 1;
+				*xtrans = (k == xl) ? 1 : 0;
 			}
-		}
-		if (!y4) {
-			SEXP ydim = getAttrib(y, R_DimSymbol);
-			if (TYPEOF(ydim) == INTSXP && LENGTH(ydim) == 2) {
-				int *pydim = INTEGER(ydim);
-				ym = pydim[0];
-				yn = pydim[1];
-			} else {
-				*v = 2;
-				R_xlen_t yl = XLENGTH(y);
-				if (yl > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
-				if (!(*ytrans) || (*ztrans)) {
-				int k = (*xtrans) ? xm : xn;
-				if (k == yl || k == 1) {
-					ym = (int) yl;
-					yn = 1;
-					*ytrans = (k == yl) ? 0 : 1;
-				}
-				} else {
+		} else if (x2) {
+			*v = (*ztrans) ? 1 : 2;
+			int k = (*xtrans) ? xm : xn, yl = LENGTH(y);
+			if (*ytrans) {
 				if (xm == 1 || xn == 1) {
 					ym = (int) yl;
 					yn = 1;
 					*ytrans = (((*xtrans) ? xn : xm) == 1) ? 0 : 1;
 				}
+			} else {
+				if (k == yl || k == 1) {
+					ym = (int) yl;
+					yn = 1;
+					*ytrans = (k == yl) ? 0 : 1;
 				}
 			}
-		}
+		} else
+			*v = 3;
 		if (((*xtrans) ? xm : xn) != ((*ytrans) ? yn : ym))
 			error(_("non-conformable arguments"));
 		*m = (*xtrans) ? xn : xm;
 		*n = (*ytrans) ? ym : yn;
+		if (*ztrans) {
+			int tmp = !(*xtrans); *xtrans = !(*ytrans); *ytrans = tmp;
+			tmp = *m; *m = *n; *n = tmp;
+		}
 	}
 	return;
 }
@@ -526,12 +528,12 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	}
 
 	if (xcl[0] != 'd') {
-		REPROTECT(x = dense_as_kind(x, xcl, 'd'), xpid);
+		REPROTECT(x = dense_as_kind(x, xcl, 'd', 0), xpid);
 		xcl = valid[R_check_class_etc(x, valid)];
 	}
 	if (y != R_NilValue) {
 	if (ycl[0] != 'd') {
-		REPROTECT(y = dense_as_kind(y, ycl, 'd'), ypid);
+		REPROTECT(y = dense_as_kind(y, ycl, 'd', 0), ypid);
 		ycl = valid[R_check_class_etc(y, valid)];
 	}
 	}
@@ -614,7 +616,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	return x;
 }
 
-/* boolean: op(op(<.gC>) * op(<.gC>)) */
+/* boolean: op(op(<.gC>) & op(<.gC>)) */
 /* numeric: op(op(<dgC>) * op(<dgC>)) */
 static
 SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
@@ -886,7 +888,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (!boolean_ && ycl[2] != 'C' && ycl[2] != 'R' && ycl[2] != 'T') {
 		if (ycl[0] != 'd') {
-			REPROTECT(y = dense_as_kind(y, ycl, 'd'), ypid);
+			REPROTECT(y = dense_as_kind(y, ycl, 'd', 0), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
 		if (xcl[1] == 't')
@@ -1012,6 +1014,8 @@ void dense_rowscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 	return;
 }
 
+/* boolean: <lgC> & <ldi>  or  <ldi> & <dgR> */
+/* numeric: <dgC> * <ddi>  or  <ddi> * <dgR> */
 static
 void Csparse_colscale(SEXP obj, SEXP d)
 {
@@ -1046,6 +1050,8 @@ void Csparse_colscale(SEXP obj, SEXP d)
 	return;
 }
 
+/* boolean: <ldi> & <lgC>  or   <dgR> & <ldi> */
+/* numeric: <ddi> * <dgC>  or   <dgR> * <ddi> */
 static
 void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
@@ -1074,6 +1080,8 @@ void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	return;
 }
 
+/* boolean: <ldi> & <lgT>  or   <dgT> & <ldi> */
+/* numeric: <ddi> * <dgT>  or   <dgT> * <ddi> */
 static
 void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
@@ -1193,7 +1201,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 		break;
 	default:
 		if (xcl[0] != kd) {
-			REPROTECT(x = dense_as_kind(x, xcl, kd), xpid);
+			REPROTECT(x = dense_as_kind(x, xcl, kd, 1), xpid);
 			xcl = valid[R_check_class_etc(x, valid)];
 		}
 		if (!unit && xcl[1] == 's') {
@@ -1232,7 +1240,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 		break;
 	default:
 		if (ycl[0] != kd) {
-			REPROTECT(y = dense_as_kind(y, ycl, kd), ypid);
+			REPROTECT(y = dense_as_kind(y, ycl, kd, 1), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
 		if (!unit && ycl[1] == 's') {

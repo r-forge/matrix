@@ -41,7 +41,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr);
 
 SEXP R_index_as_sparse(SEXP from, SEXP kind, SEXP repr);
 
-SEXP dense_as_kind(SEXP from, const char *class, char kind);
+SEXP dense_as_kind(SEXP from, const char *class, char kind, int new);
 
 SEXP R_dense_as_kind(SEXP from, SEXP kind);
 
