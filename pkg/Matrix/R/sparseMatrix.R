@@ -1,5 +1,5 @@
-## METHODS FOR CLASS: sparseMatrix (virtual)
-## sparse matrices
+## METHODS FOR CLASS: sparseMatrix, [CRT]sparseMatrix (virtual)
+## sparse matrices, in some cases restricted to CSC, CSR, triplet
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .sparse.band <- function(x, k1, k2, ...)
@@ -45,7 +45,7 @@
         return(.Call(R_sparse_is_symmetric, object, checkDN))
     ## pretest: is it square?
     d <- object@Dim
-    if((n <- d[1L]) != d[2L])
+    if((n <- d[2L]) != d[1L])
         return(FALSE)
     ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
     if(checkDN && !isSymmetricDN(object@Dimnames))
@@ -89,7 +89,7 @@ setMethod("mean", signature(x = "sparseMatrix"),
 setMethod("rep", "sparseMatrix",
           function(x, ...)  rep(as(x, "sparseVector"), ...))
 
-for (.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
+for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
 setMethod("band"  , signature(x = .cl), .sparse.band)
 setMethod("triu"  , signature(x = .cl), .sparse.triu)
 setMethod("tril"  , signature(x = .cl), .sparse.tril)
@@ -106,7 +106,7 @@ setMethod("isDiagonal"  , signature(object = .cl), .sparse.is.di)
 }
 
 .sparse.subclasses <- names(getClassDef("sparseMatrix")@subclasses)
-for (.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
+for(.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
 setMethod("isSymmetric" , signature(object = .cl), .sparse.is.sy.dz)
 rm(.cl, .sparse.subclasses)
 

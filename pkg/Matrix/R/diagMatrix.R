@@ -50,7 +50,7 @@ setMethod("diag", signature(x = "diagonalMatrix"),
 
 setMethod("diag<-", signature(x = "diagonalMatrix"),
           function(x, value) {
-              n <- x@Dim[1L]
+              n <- x@Dim[2L]
               nv <- length(value)
               if(nv != 1L && nv != n)
                   stop("replacement diagonal has wrong length")

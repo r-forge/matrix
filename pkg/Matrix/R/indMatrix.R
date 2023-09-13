@@ -144,7 +144,7 @@ setMethod("skewpart", signature(x = "indMatrix"),
 setMethod("isDiagonal", signature(object = "indMatrix"),
           function(object) {
               d <- object@Dim
-              if((n <- d[1L]) != d[2L])
+              if((n <- d[2L]) != d[1L])
                   return(FALSE)
               all(object@perm == seq_len(n))
           })
@@ -152,7 +152,7 @@ setMethod("isDiagonal", signature(object = "indMatrix"),
 setMethod("isTriangular", signature(object = "indMatrix"),
           function(object, upper = NA, ...) {
               d <- object@Dim
-              if((n <- d[1L]) != d[2L])
+              if((n <- d[2L]) != d[1L])
                   return(FALSE)
               if(object@margin == 1L) {
                   i <- seq_len(n)
@@ -177,7 +177,7 @@ setMethod("isTriangular", signature(object = "indMatrix"),
 setMethod("isSymmetric", signature(object = "indMatrix"),
           function(object, checkDN = TRUE, ...) {
               d <- object@Dim
-              if((n <- d[1L]) != d[2L])
+              if((n <- d[2L]) != d[1L])
                   return(FALSE)
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...) check.attributes
