@@ -46,7 +46,7 @@
         return(.Call(R_dense_is_symmetric, object, checkDN))
     ## pretest: is it square?
     d <- object@Dim
-    if((n <- d[1L]) != d[2L])
+    if((n <- d[2L]) != d[1L])
         return(FALSE)
     ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
     if(checkDN && !isSymmetricDN(object@Dimnames))

@@ -1,4 +1,5 @@
 ## METHODS FOR CLASS: sparseVector (virtual)
+## sparse vectors
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("diff", signature(x = "sparseVector"),
