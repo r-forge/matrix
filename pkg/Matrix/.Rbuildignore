@@ -53,7 +53,8 @@ tests/performance\.R$
 tests/useRNG_files$
 vignettes/fullpage\.sty$
 
-# Currently "empty", not contributing to namespace :
+# Currently "empty", not contributing to package namespace :
+man/all-methods\.Rd$
 R/CHMfactor\.R$
 R/Hilbert\.R$
 R/Matrix\.R$
@@ -69,9 +70,6 @@ R/sparseQR\.R$
 R/symmetricMatrix\.R$
 R/triangularMatrix\.R$
 R/unpackedMatrix\.R$
-
-# These give warning "ISO C forbids an empty translation unit"
-# from '-Wpedantic' :
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
 src/cs_utils\.[ch]$

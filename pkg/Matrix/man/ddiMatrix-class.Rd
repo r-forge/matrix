@@ -23,7 +23,6 @@
 \alias{*,ddiMatrix,ddenseMatrix-method}
 \alias{*,ddiMatrix,ldenseMatrix-method}
 \alias{*,ddiMatrix,ndenseMatrix-method}
-\alias{-,ddiMatrix,missing-method}
 \alias{/,ddiMatrix,Matrix-method}
 \alias{/,ddiMatrix,ddenseMatrix-method}
 \alias{/,ddiMatrix,ldenseMatrix-method}
@@ -41,9 +40,6 @@
 \alias{Ops,ddiMatrix,logical-method}
 \alias{Ops,ddiMatrix,numeric-method}
 \alias{Ops,ddiMatrix,sparseMatrix-method}
-\alias{Summary,ddiMatrix-method}
-\alias{prod,ddiMatrix-method}
-\alias{sum,ddiMatrix-method}
 %
 \description{The class \code{"ddiMatrix"} of numerical diagonal matrices.
   %% FIXME add more

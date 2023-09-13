@@ -14,7 +14,6 @@
 \alias{*,ldenseMatrix,ldiMatrix-method}
 \alias{Logic,ldenseMatrix,lsparseMatrix-method}
 \alias{Ops,ldenseMatrix,ldenseMatrix-method}
-\alias{Summary,ldenseMatrix-method}
 \alias{^,ldenseMatrix,ddiMatrix-method}
 \alias{^,ldenseMatrix,ldiMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
