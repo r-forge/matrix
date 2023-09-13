@@ -24,7 +24,6 @@
 \alias{*,ldiMatrix,ddenseMatrix-method}
 \alias{*,ldiMatrix,ldenseMatrix-method}
 \alias{*,ldiMatrix,ndenseMatrix-method}
-\alias{-,ldiMatrix,missing-method}
 \alias{/,ldiMatrix,Matrix-method}
 \alias{/,ldiMatrix,ddenseMatrix-method}
 \alias{/,ldiMatrix,ldenseMatrix-method}
@@ -42,9 +41,6 @@
 \alias{Ops,ldiMatrix,logical-method}
 \alias{Ops,ldiMatrix,numeric-method}
 \alias{Ops,ldiMatrix,sparseMatrix-method}
-\alias{Summary,ldiMatrix-method}
-\alias{prod,ldiMatrix-method}
-\alias{sum,ldiMatrix-method}
 \alias{which,ldiMatrix-method}
 %
 \description{The class \code{"ldiMatrix"} of logical diagonal matrices.

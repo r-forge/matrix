@@ -13,7 +13,6 @@
 \alias{*,ndenseMatrix,ddiMatrix-method}
 \alias{*,ndenseMatrix,ldiMatrix-method}
 \alias{Ops,ndenseMatrix,ndenseMatrix-method}
-\alias{Summary,ndenseMatrix-method}
 \alias{^,ndenseMatrix,ddiMatrix-method}
 \alias{^,ndenseMatrix,ldiMatrix-method}
 \alias{coerce,matrix,ndenseMatrix-method}

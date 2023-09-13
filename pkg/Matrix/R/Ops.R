@@ -1,7 +1,14 @@
-####--- All "Ops" group methods for all Matrix classes (incl sparseVector) ---
-####         ===   but diagonalMatrix  -> ./diagMatrix.R and  abIndex.R
-####                                        ~~~~~~~~~~~~      ~~~~~~~~~
+## METHODS FOR GENERIC: Ops = {Arith, Compare, Logic} (group)
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## > getGroupMembers("Ops")
+## [1] "Arith"   "Compare" "Logic"
+## > getGroupMembers("Arith")
+## [1] "+"   "-"   "*"   "^"   "%%"  "%/%" "/"
+## > getGroupMembers("Compare")
+## [1] "==" ">"  "<"  "!=" "<=" ">="
+## > getGroupMembers("Logic") # excluding unary "!" -> ./not.R
+## [1] "&" "|"
 
 .Ops.checkDim <- function(d.a, d.b) {
     if(any(d.a != d.b))
@@ -39,23 +46,12 @@
     } else nullDN
 }
 
-### Note that the "Ops" group consists of
-### sub-groups   "Arith", "Compare", and "Logic"
-###               -----    -------        -----
-### where 'Arith'   :=  '"+"', '"-"', '"*"', '"^"', '"%%"', '"%/%"', '"/"'
-###       'Compare' := '"=="', '">"', '"<"', '"!="', '"<="', '">="'
-###       'Logic'   :=  '"&"', '"|"'
-###           but *not* '"!"' since that has only one argument : >>>>> ./not.R
-
 ## cache them [rather in package 'methods' ??]
 .ArithGenerics   <- getGroupMembers("Arith")
 if(FALSE) { # unused
 .CompareGenerics <- getGroupMembers("Compare")
 .LogicGenerics   <- getGroupMembers("Logic")
 }
-
-## find them with M-x grep -E 'Method\("(Ops|Compare|Arith|Logic)"' *.R
-##                --------
 
 ### Design decision for *sparseMatrix*:
 ### work via Csparse  since Tsparse are not-unique (<-> slots not compatible)

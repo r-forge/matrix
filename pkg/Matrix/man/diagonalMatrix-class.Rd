@@ -7,8 +7,10 @@
 %
 \alias{diagonalMatrix-class}
 %
+\alias{-,diagonalMatrix,missing-method}
 \alias{Math,diagonalMatrix-method}
 \alias{Ops,diagonalMatrix,triangularMatrix-method}
+\alias{Summary,diagonalMatrix-method}
 \alias{coerce,diagonalMatrix,symmetricMatrix-method}
 \alias{coerce,diagonalMatrix,triangularMatrix-method}
 \alias{coerce,matrix,diagonalMatrix-method}

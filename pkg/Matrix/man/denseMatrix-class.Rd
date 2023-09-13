@@ -9,6 +9,7 @@
 %
 \alias{-,denseMatrix,missing-method}
 \alias{Math,denseMatrix-method}
+\alias{Summary,denseMatrix-method}
 \alias{coerce,ANY,denseMatrix-method}
 \alias{coerce,matrix,denseMatrix-method}
 \alias{coerce,vector,denseMatrix-method}

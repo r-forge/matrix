@@ -9,6 +9,7 @@
 %
 \alias{!,indMatrix-method}
 \alias{-,indMatrix,missing-method}
+\alias{Math,indMatrix-method}
 \alias{Summary,indMatrix-method}
 \alias{coerce,indMatrix,pMatrix-method}
 \alias{coerce,list,indMatrix-method}
@@ -17,6 +18,7 @@
 \alias{determinant,indMatrix,logical-method}
 \alias{diag,indMatrix-method}
 \alias{diag<-,indMatrix-method}
+\alias{log,indMatrix-method}
 \alias{t,indMatrix-method}
 \alias{which,indMatrix-method}
 %

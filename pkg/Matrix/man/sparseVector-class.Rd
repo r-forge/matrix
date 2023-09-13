@@ -69,9 +69,9 @@
 \alias{t,sparseVector-method}
 \alias{tail,sparseVector-method}
 \alias{toeplitz,sparseVector-method}
+\alias{zapsmall,sparseVector-method}
 % nsparse
 \alias{!,nsparseVector-method}
-\alias{Summary,nsparseVector-method}
 \alias{which,nsparseVector-method}
 % lsparse
 \alias{!,lsparseVector-method}
@@ -81,7 +81,6 @@
 % dsparse
 \alias{-,dsparseVector,missing-method}
 \alias{Arith,dsparseVector,dsparseVector-method}
-\alias{Math2,dsparseVector-method}
 % zsparse
 %
 \alias{c.sparseVector}

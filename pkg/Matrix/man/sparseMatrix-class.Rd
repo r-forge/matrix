@@ -15,6 +15,7 @@
 \alias{Ops,sparseMatrix,nsparseMatrix-method}
 \alias{Ops,sparseMatrix,numeric-method}
 \alias{Ops,sparseMatrix,sparseMatrix-method}
+\alias{Summary,sparseMatrix-method}
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,matrix,sparseMatrix-method}

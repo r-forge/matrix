@@ -30,7 +30,6 @@
 \alias{Ops,Matrix,sparseVector-method}
 \alias{Ops,NULL,Matrix-method}
 \alias{Ops,matrix,Matrix-method}
-\alias{Summary,Matrix-method}
 \alias{^,Matrix,ddiMatrix-method}
 \alias{^,Matrix,ldiMatrix-method}
 \alias{as.array,Matrix-method}
@@ -83,6 +82,7 @@
 \alias{length,Matrix-method}
 \alias{tail,Matrix-method}
 \alias{unname,Matrix-method}
+\alias{zapsmall,Matrix-method}
 %
 \alias{c.Matrix}
 %
