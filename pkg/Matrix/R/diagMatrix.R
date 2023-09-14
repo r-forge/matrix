@@ -37,7 +37,15 @@ setMethod("tril", signature(x = "diagonalMatrix"),
 
 setMethod("diag", signature(x = "diagonalMatrix"),
           function(x, nrow, ncol, names = TRUE) {
-              r <- .diag.x(x)
+              kind <- .M.kind(x)
+              r <-
+                  if(x@diag != "N") {
+                      one <- switch(kind, "n" = , "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i)
+                      rep.int(one, x@Dim[1L])
+                  } else {
+                      y <- x@x
+                      if(kind == "n" && anyNA(y)) y | is.na(y) else y
+                  }
               if(names &&
                  !any(vapply(dn <- x@Dimnames, is.null, NA)) &&
                  {
@@ -94,13 +102,15 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
               r@Dimnames <- symmDN(x@Dimnames)
               if(x@diag != "N")
                   r@diag <- "U"
-              else
+              else {
+                  y <- x@x
                   r@x <- switch(kind,
-                                "n" = as.double(x@x | is.na(x@x)),
+                                "n" = as.double(y | is.na(y)),
                                 "l" = ,
                                 "i" = ,
-                                "d" = as.double(x@x),
-                                "z" = complex(real = Re(x@x), imaginary = 0))
+                                "d" = as.double(y),
+                                "z" = complex(real = Re(y), imaginary = 0))
+              }
               r
           })
 
@@ -110,11 +120,12 @@ setMethod("skewpart", signature(x = "diagonalMatrix"),
               r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- symmDN(x@Dimnames)
-              r@x <- if(kind != "z")
-                         double(d[1L])
-                     else if(x@diag != "N")
-                         complex(d[1L])
-                     else complex(real = 0, imaginary = Im(x@x))
+              r@x <-
+                  if(kind != "z")
+                      double(d[1L])
+                  else if(x@diag != "N")
+                      complex(d[1L])
+                  else complex(real = 0, imaginary = Im(x@x))
               r
           })
 

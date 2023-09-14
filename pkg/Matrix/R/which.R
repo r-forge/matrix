@@ -31,10 +31,9 @@ setMethod("which", signature(x = "lsparseMatrix"),
               else wh
            })
 
-if(FALSE)
 setMethod("which", signature(x = "ndiMatrix"),
           function(x, arr.ind = FALSE, useNames = TRUE) {
-              wh <- .M2v(x)@i
+              wh <- .M2V(x)@i
               if(arr.ind)
                   arrayInd(wh, x@Dim, x@Dimnames, useNames = useNames)
               else wh

@@ -633,7 +633,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	    stopifnot(Qidentical(as(m11, "generalMatrix"),
 				 as(m12, "generalMatrix")))
     }
-    if(isSparse && !is.n) {
+    if(isSparse && !isDiag && !is.n) {
 	## ensure that as(., "nMatrix") gives nz-pattern
 	CatF("as(., \"nMatrix\") giving full nonzero-pattern: ")
 	n1 <- as(m, "nMatrix")
@@ -642,7 +642,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
                   ## only testing [CR]sparseMatrix and indMatrix here ...
                   ## sum(<n.T>) excludes duplicated (i,j) pairs whereas
                   ## length(diagU2N(<[^n].T>)) includes them ...
-                  isDiag || isTsp ||
+                  isTsp ||
                   (if(isSym) length(if(.hasSlot(n1, "i")) n1@i else n1@j)
                    else sum(n1)) == length(if(isInd) m@perm else diagU2N(m)@x))
         Cat("ok\n")

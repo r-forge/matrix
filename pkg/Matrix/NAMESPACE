@@ -308,7 +308,7 @@ exportClasses(Matrix, # and its subclasses .............................
               nsRMatrix,
               nsTMatrix,
 
-              ## ndiMatrix,
+              ndiMatrix,
 
               lMatrix,
 

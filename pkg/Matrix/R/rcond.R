@@ -35,19 +35,24 @@ setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
           function(x, norm, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   return(Inf)
+              if(nonunit <- x@diag == "N") {
+                  y <- x@x
+                  if(.M.kind(x) == "n" && anyNA(y))
+                      y <- y | is.na(y)
+              }
               switch(EXPR = norm[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,
                      "M" = , "m" =
-                         if(x@diag == "N") {
-                             rx <- range(abs(x@x))
-                             rx[1L] / rx[2L]
+                         if(nonunit) {
+                             ry <- range(abs(y))
+                             ry[1L] / ry[2L]
                          } else 1,
                      "F" = , "f" = , "E" = , "e" =
-                         if(x@diag == "N") {
-                             xx <- x@x * x@x
-                             1 / sqrt(sum(xx) * sum(1 / xx))
+                         if(nonunit) {
+                             yy <- y * y
+                             1 / sqrt(sum(yy) * sum(1 / yy))
                          } else 1 / n,
                      stop("invalid 'norm'"))
           })

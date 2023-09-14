@@ -65,11 +65,20 @@ setMethod("nnzero", "sparseMatrix",
           })
 
 setMethod("nnzero", "diagonalMatrix",
-          function(x, na.counted = NA)
-              if(x@diag == "N") .nnzero(x@x, na.counted) else x@Dim[1L])
+          function(x, na.counted = NA) {
+              if(x@diag != "N")
+                  x@Dim[1L]
+              else {
+                  y <- x@x
+                  if(.M.kind(x) == "n" && anyNA(y))
+                      y <- y | is.na(y)
+                  .nnzero(y, na.counted)
+              }
+          })
 
 setMethod("nnzero", "indMatrix",
-          function(x, na.counted = NA) length(x@perm))
+          function(x, na.counted = NA)
+              length(x@perm))
 
 setMethod("nnzero", "CHMfactor",
           function(x, na.counted = NA)

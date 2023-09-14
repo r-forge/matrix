@@ -29,14 +29,19 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
           function(x, type, ...) {
               if((n <- x@Dim[1L]) == 0L)
                   return(0)
+              if(nonunit <- x@diag == "N") {
+                  y <- x@x
+                  if(.M.kind(x) == "n" && anyNA(y))
+                      y <- y | is.na(y)
+              }
               switch(EXPR = type[1L],
                      "O" = , "o" = , "1" = ,
                      "I" = , "i" = ,
                      "2" = ,
                      "M" = , "m" =
-                         if(x@diag == "N") max(abs(x@x)) else 1,
+                         if(nonunit) max(abs(y)) else 1,
                      "F" = , "f" = , "E" = , "e" =
-                         if(x@diag == "N") sqrt(sum(x@x * x@x)) else sqrt(n),
+                         if(nonunit) sqrt(sum(y * y)) else sqrt(n),
                      stop("invalid 'type'"))
           })
 

@@ -136,17 +136,28 @@ setMethod("%*%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
               r <- new("ddiMatrix")
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
-              xdi <- x@diag
-              ydi <- y@diag
-              if(xdi != "N" && ydi != "N")
+              xu <- x@diag != "N"
+              yu <- y@diag != "N"
+              if(xu && yu)
                   r@diag <- "U"
-              else
+              else {
+                  if(!xu) {
+                      xii <- x@x
+                      if(.M.kind(x) == "n" && anyNA(xii))
+                          xii <- xii | is.na(xii)
+                  }
+                  if(!yu) {
+                      yii <- y@x
+                      if(.M.kind(y) == "n" && anyNA(yii))
+                          yii <- yii | is.na(yii)
+                  }
                   r@x <-
-                  if(xdi == "N" && ydi == "N")
-                      as.double(x@x * y@x)
-                  else if(xdi == "N")
-                      as.double(x@x)
-                  else as.double(y@x)
+                      if(xu)
+                          as.double(yii)
+                      else if(yu)
+                          as.double(xii)
+                      else as.double(xii * yii)
+              }
               r
           })
 
@@ -570,20 +581,20 @@ setMethod("%&%", signature(x = .cl, y = "TsparseMatrix"),
 
 setMethod("%&%", signature(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              r <- new("ldiMatrix")
+              r <- new("ndiMatrix")
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
-              xdi <- x@diag
-              ydi <- y@diag
-              if(xdi != "N" && ydi != "N")
+              xu <- x@diag != "N"
+              yu <- y@diag != "N"
+              if(xu && yu)
                   r@diag <- "U"
               else
                   r@x <-
-                  if(xdi == "N" && ydi == "N")
-                      isN0(x@x & y@x)
-                  else if(xdi == "N")
-                      isN0(x@x)
-                  else isN0(y@x)
+                      if(xu)
+                          as.logical(y@x)
+                      else if(yu)
+                          as.logical(x@x)
+                      else x@x & y@x
               r
           })
 
@@ -1001,13 +1012,22 @@ setMethod("crossprod", signature(x = .cl, y = "TsparseMatrix"),
 setMethod("crossprod", signature(x = "diagonalMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ldiMatrix" else "ddiMatrix")
+              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(2L, 2L)]
               if(x@diag != "N")
                   r@diag <- "U"
-              else
-                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x * x@x)
+              else {
+                  xii <- x@x
+                  r@x <-
+                      if(boolArith)
+                          as.logical(xii)
+                      else {
+                          if(.M.kind(x) == "n" && anyNA(xii))
+                              xii <- xii | is.na(xii)
+                          as.double(xii * xii)
+                      }
+              }
               r
           })
 
@@ -1035,7 +1055,7 @@ setMethod("crossprod", signature(x = "indMatrix", y = "missing"),
                   return(tcrossprod(t(x), boolArith = boolArith, ...))
               boolArith <- !is.na(boolArith) && boolArith
               tt <- tabulate(x@perm, x@Dim[2L])
-              r <- new(if(boolArith) "ldiMatrix" else "ddiMatrix")
+              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim[c(2L, 2L)]
               r@Dimnames <- x@Dimnames[c(2L, 2L)]
               r@x <- if(boolArith) as.logical(tt) else as.double(tt)
@@ -1093,7 +1113,7 @@ setMethod("crossprod", signature(x = "vector", y = "indMatrix"),
 setMethod("crossprod", signature(x = "pMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ldiMatrix" else "ddiMatrix")
+              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(2L, 2L)]
               r@diag <- "U"
@@ -1373,13 +1393,22 @@ setMethod("tcrossprod", signature(x = .cl, y = "TsparseMatrix"),
 setMethod("tcrossprod", signature(x = "diagonalMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ldiMatrix" else "ddiMatrix")
+              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(1L, 1L)]
               if(x@diag != "N")
                   r@diag <- "U"
-              else
-                  r@x <- if(boolArith) isN0(x@x) else as.double(x@x * x@x)
+              else {
+                  xii <- x@x
+                  r@x <-
+                      if(boolArith)
+                          as.logical(xii)
+                      else {
+                          if(.M.kind(x) == "n" && anyNA(xii))
+                              xii <- xii | is.na(xii)
+                          as.double(xii * xii)
+                      }
+              }
               r
           })
 
@@ -1481,7 +1510,7 @@ setMethod("tcrossprod", signature(x = "indMatrix", y = "vector"),
 setMethod("tcrossprod", signature(x = "pMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ldiMatrix" else "ddiMatrix")
+              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(1L, 1L)]
               r@diag <- "U"

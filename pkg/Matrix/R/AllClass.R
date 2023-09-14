@@ -369,12 +369,10 @@ setClass("nsTMatrix",
          contains = c("TsparseMatrix", "nsparseMatrix", "symmetricMatrix"),
          validity = function(object) .Call(sTMatrix_validate, object))
 
-if(FALSE) { # TODO
 ## Diagonal
 setClass("ndiMatrix", contains = c("diagonalMatrix", "nMatrix"),
          slots = c(x = "logical"),
          validity = function(object) .Call(nMatrix_validate, object))
-} # TODO
 
 
 ## ...... Sparse, logical ..............................................

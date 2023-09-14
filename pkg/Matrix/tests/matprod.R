@@ -930,11 +930,11 @@ assert.EQ.Mat(XtY, XtY_ok) # not true, previously
 
 x5 <- c(2,0,0,1,4)
 D5 <- Diagonal(x=x5)
-L5 <- D5 != 0 ## an "ldiMatrix"  NB: have *no*  ndiMatrix class
+N5 <- as(D5 != 0, "nMatrix") ## an "ndiMatrix"
 D. <- Diagonal(x=c(TRUE,FALSE,TRUE,TRUE,TRUE))
-stopifnot(identical(D5 %&% D., L5))
+stopifnot(identical(D5 %&% D., N5))
 stopifnot(identical(D5 %&% as(D.,"CsparseMatrix"),
-                    as(as(L5, "nMatrix"),"CsparseMatrix")))
+                    as(N5,"CsparseMatrix")))
 
 set.seed(7)
 L <- Matrix(rnorm(20) > 1,    4,5)

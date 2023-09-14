@@ -2734,7 +2734,7 @@ void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
 					++kend_; \
 				} else { \
 					/* Have already seen this column index */ \
-					_MASK_(_INCREMENT_(px_[k], px_[workB[pj_[k]]])); \
+					_MASK_(_INCREMENT_(px_[workB[pj_[k]]], px_[k])); \
 				} \
 				++k; \
 			} \
@@ -3438,34 +3438,17 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 		}
 		return from;
 	case 'i':
-		/* Ugly because there is no ndiMatrix,
-		   and because [ld]diMatrix does not extend [ld]sparseMatrix
-		*/
-		if (kind_ != 'n') {
-			from = diagonal_as_kind(from, cl, kind_);
-			if (sparse_ != NA_LOGICAL) {
-				PROTECT(from);
-				char cl_[] = ".diMatrix";
-				cl_[0] = (kind_ == '.') ? cl[0] : kind_;
-				if (sparse_)
-					from = diagonal_as_sparse(from, cl_, 't', 'C', 'U');
-				else
-					from = diagonal_as_dense(from, cl_, 't', 0, 'U');
-				UNPROTECT(1);
-			}
-		} else {
-			from = diagonal_as_sparse(from, cl, 't', 'C', 'U');
+		from = diagonal_as_kind(from, cl, kind_);
+		if (sparse_ != NA_LOGICAL) {
+			/* Because [nlidz]diMatrix does not extend [nlidz]sparseMatrix : */
 			PROTECT(from);
-			char cl_[] = ".tCMatrix";
-			cl_[0] = cl[0];
-			from = sparse_as_kind(from, cl_, 'n');
+			char cl_[] = ".diMatrix";
+			cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+			if (sparse_)
+				from = diagonal_as_sparse(from, cl_, 't', 'C', 'U');
+			else
+				from = diagonal_as_dense(from, cl_, 't', 0, 'U');
 			UNPROTECT(1);
-			if (sparse_ != NA_LOGICAL && !sparse_) {
-				PROTECT(from);
-				cl_[0] = 'n';
-				from = sparse_as_dense(from, cl_, 0);
-				UNPROTECT(1);
-			}
 		}
 		return from;
 	case 'd':

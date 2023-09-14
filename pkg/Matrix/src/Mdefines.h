@@ -321,7 +321,7 @@ enum x_slot_kind {
 "ngTMatrix", "nsTMatrix", "ntTMatrix"
 
 #define VALID_DIAGONAL \
-"ddiMatrix", "ldiMatrix"
+"ddiMatrix", "ldiMatrix", "ndiMatrix"
 
 /* Older ones : */
 
