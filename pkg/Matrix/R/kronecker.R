@@ -1,9 +1,9 @@
 ## METHODS FOR GENERIC: kronecker
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.kroneckerDimnames <- function(dnX, dX = lengths(dnX, FALSE),
-                               dnY, dY = lengths(dnX, FALSE),
-                               sep = ":") {
+kroneckerDN <- function(dnX, dX = lengths(dnX, FALSE),
+                        dnY, dY = lengths(dnX, FALSE),
+                        sep = ":") {
     dnr <- list(NULL, NULL)
     if(identical(dnX, dnr) && identical(dnY, dnr))
         return(NULL)
@@ -42,8 +42,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "diagonalMatrix"),
                   r@x <- rep(as.double(X@x), each = dY[1L])
               else r@x <- rep(X@x, each = dY[1L]) * Y@x
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY)))
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY)))
                   r@Dimnames <- dnr
               r
           })
@@ -113,8 +112,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
                       r <- ..diagN2U(r, sparse = TRUE)
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -213,8 +211,7 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
                       r <- ..diagN2U(r, sparse = TRUE)
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -259,8 +256,7 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "denseMatrix"),
                       as.vector(Y[rep.int(seq_len(dY[1L]), dX[1L]), ])
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -318,8 +314,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
                   }
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -383,8 +378,7 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
                   }
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -480,8 +474,7 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
                       r <- .Call(R_sparse_force_symmetric, r, X@uplo)
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -545,8 +538,7 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
                       }
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -592,8 +584,7 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
                       }
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -664,8 +655,7 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
                       r <- .Call(R_sparse_force_symmetric, r, X@uplo)
               }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY))) {
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
                   if(shape == "s" && !isSymmetricDN(dnr))
                       r <- .M2gen(r)
                   r@Dimnames <- dnr
@@ -702,8 +692,7 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
                           rep.int(Y@perm, dX[2L])
                   }
               if(make.dimnames &&
-                 !is.null(dnr <- .kroneckerDimnames(dimnames(X), dX,
-                                                    dimnames(Y), dY)))
+                 !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY)))
                   r@Dimnames <- dnr
               r
           })
