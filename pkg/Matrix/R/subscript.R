@@ -1,9 +1,9 @@
 ## METHODS FOR GENERIC: [
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.subscript.error.ist <- function(i) {
-    if(isS4(i))
-        gettextf("invalid subscript class \"%s\"", class(i))
+.subscript.invalid <- function(i) {
+    if(is.object(i))
+        gettextf("invalid subscript class \"%s\"", class(i)[1L])
     else gettextf("invalid subscript type \"%s\"", typeof(i))
 }
 
@@ -55,7 +55,7 @@
         i <- integer(0L)
     else if(isS4(i)) {
         if(!.isVector(i))
-            stop(.subscript.error.ist(i), domain = NA)
+            stop(.subscript.invalid(i), domain = NA)
         kind <- .V.kind(i)
         if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
@@ -96,7 +96,7 @@
                    rep.int(if(.hasSlot(x, "x")) x@x[NA_integer_] else NA,
                            length(i))
                },
-           stop(.subscript.error.ist(i), domain = NA))
+           stop(.subscript.invalid(i), domain = NA))
 }
 
 ## x[i] where 'i' is vector of type "integer" or "double"
@@ -158,7 +158,7 @@
 .subscript.1ary.mat <- function(x, i) {
     if(isS4(i)) {
         if(!.isMatrix(i))
-            stop(.subscript.error.ist(i), domain = NA)
+            stop(.subscript.invalid(i), domain = NA)
         if((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
             if(logic && all(i@Dim) && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
@@ -212,7 +212,7 @@
                        stop("subscript out of bounds")
                    ..subscript.1ary.mat(x, m)
                },
-           stop(.subscript.error.ist(i), domain = NA))
+           stop(.subscript.invalid(i), domain = NA))
 }
 
 ## x[i] where 'i' is a 2-column matrix of type "integer"
@@ -296,7 +296,7 @@
                                    stop("subscript out of bounds")
                                else k
                            },
-                       stop(.subscript.error.ist(k), domain = NA)))
+                       stop(.subscript.invalid(k), domain = NA)))
         }
     }
     if(is.double(lengths(l, use.names = FALSE)))
@@ -594,7 +594,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                                  x
                              } else x[.m2V(i)] # recursively
                          },
-                     stop(.subscript.error.ist(i), domain = NA))
+                     stop(.subscript.invalid(i), domain = NA))
           })
 
 setMethod("[", signature(x = "sparseVector", i = "sparseVector", j = "missing",
