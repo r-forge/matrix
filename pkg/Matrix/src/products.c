@@ -18,7 +18,7 @@ void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
 	*ztrans = (*ztrans) ? 1 : 0;
 	if (y == R_NilValue) {
 		SEXP
-			xdim = (IS_S4_OBJECT(x))
+			xdim = (TYPEOF(x) == S4SXP)
 			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol);
 		if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
 			*v = 0;
@@ -36,9 +36,9 @@ void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
 			SEXP s = x; x = y; y = s;
 		}
 		SEXP
-			xdim = (IS_S4_OBJECT(x))
+			xdim = (TYPEOF(x) == S4SXP)
 			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol),
-			ydim = (IS_S4_OBJECT(y))
+			ydim = (TYPEOF(y) == S4SXP)
 			? GET_SLOT(y, Matrix_DimSym) : getAttrib(y, R_DimSymbol);
 		int xm, xn, ym, yn, x2, y2;
 		xm = xn = ym = yn = -1;
@@ -514,7 +514,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	PROTECT_WITH_INDEX(x, &xpid);
 	PROTECT_WITH_INDEX(y, &ypid);
 
-	if (!IS_S4_OBJECT(x)) {
+	if (TYPEOF(x) != S4SXP) {
 		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 0), xpid);
 		if (v == 1) {
 			/* Vector: discard names and don't transpose again */
@@ -523,7 +523,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 			xtrans_ = 0;
 		}
 	}
-	if (!IS_S4_OBJECT(y) && y != R_NilValue) {
+	if (TYPEOF(y) != S4SXP && y != R_NilValue) {
 		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 0), ypid);
 		if (v == 2) {
 			/* Vector: discard names and don't transpose again */
@@ -801,7 +801,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	PROTECT_WITH_INDEX(x, &xpid);
 	PROTECT_WITH_INDEX(y, &ypid);
 
-	if (!IS_S4_OBJECT(x)) {
+	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
 		REPROTECT(x = matrix_as_dense( x, "dge", '\0', '\0', xtrans_, 0), xpid);
 		else if (!xtrans_)
@@ -815,7 +815,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 			xtrans_ = 0;
 		}
 	}
-	if (!IS_S4_OBJECT(y) && y != R_NilValue) {
+	if (TYPEOF(y) != S4SXP && y != R_NilValue) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
 		REPROTECT(y = matrix_as_dense( y, "dge", '\0', '\0', ytrans_, 0), ypid);
 		else if (!ytrans_)
@@ -1139,7 +1139,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	PROTECT_WITH_INDEX(x, &xpid);
 	PROTECT_WITH_INDEX(y, &ypid);
 
-	if (!IS_S4_OBJECT(x)) {
+	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
 		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 1), xpid);
 		else
@@ -1151,7 +1151,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 			xtrans_ = 0;
 		}
 	}
-	if (!IS_S4_OBJECT(y)) {
+	if (TYPEOF(y) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
 		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 1), ypid);
 		else
