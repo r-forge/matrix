@@ -10,12 +10,15 @@
 \alias{!,ldenseMatrix-method}
 \alias{&,ldenseMatrix,ddiMatrix-method}
 \alias{&,ldenseMatrix,ldiMatrix-method}
+\alias{&,ldenseMatrix,ndiMatrix-method}
 \alias{*,ldenseMatrix,ddiMatrix-method}
 \alias{*,ldenseMatrix,ldiMatrix-method}
+\alias{*,ldenseMatrix,ndiMatrix-method}
 \alias{Logic,ldenseMatrix,lsparseMatrix-method}
 \alias{Ops,ldenseMatrix,ldenseMatrix-method}
 \alias{^,ldenseMatrix,ddiMatrix-method}
 \alias{^,ldenseMatrix,ldiMatrix-method}
+\alias{^,ldenseMatrix,ndiMatrix-method}
 \alias{coerce,matrix,ldenseMatrix-method}
 \alias{coerce,vector,ldenseMatrix-method}
 \alias{which,ldenseMatrix-method}

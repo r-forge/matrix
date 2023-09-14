@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-14 r4332)}{
+\section{Changes in version 1.6-2 (2023-09-14 r4335)}{
   \subsection{New Features}{
     \itemize{
       %% TODO: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'

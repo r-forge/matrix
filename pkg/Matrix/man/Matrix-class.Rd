@@ -10,8 +10,10 @@
 \alias{!,Matrix-method}
 \alias{&,Matrix,ddiMatrix-method}
 \alias{&,Matrix,ldiMatrix-method}
+\alias{&,Matrix,ndiMatrix-method}
 \alias{*,Matrix,ddiMatrix-method}
 \alias{*,Matrix,ldiMatrix-method}
+\alias{*,Matrix,ndiMatrix-method}
 \alias{+,Matrix,missing-method}
 \alias{-,Matrix,missing-method}
 \alias{Arith,Matrix,Matrix-method}
@@ -32,6 +34,7 @@
 \alias{Ops,matrix,Matrix-method}
 \alias{^,Matrix,ddiMatrix-method}
 \alias{^,Matrix,ldiMatrix-method}
+\alias{^,Matrix,ndiMatrix-method}
 \alias{as.array,Matrix-method}
 \alias{as.complex,Matrix-method}
 \alias{as.integer,Matrix-method}

@@ -37,6 +37,7 @@
 \alias{Ops,ddiMatrix,dMatrix-method}
 \alias{Ops,ddiMatrix,ddiMatrix-method}
 \alias{Ops,ddiMatrix,ldiMatrix-method}
+\alias{Ops,ddiMatrix,ndiMatrix-method}
 \alias{Ops,ddiMatrix,logical-method}
 \alias{Ops,ddiMatrix,numeric-method}
 \alias{Ops,ddiMatrix,sparseMatrix-method}

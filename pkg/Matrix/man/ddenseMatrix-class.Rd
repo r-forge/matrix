@@ -9,8 +9,10 @@
 %
 \alias{&,ddenseMatrix,ddiMatrix-method}
 \alias{&,ddenseMatrix,ldiMatrix-method}
+\alias{&,ddenseMatrix,ndiMatrix-method}
 \alias{*,ddenseMatrix,ddiMatrix-method}
 \alias{*,ddenseMatrix,ldiMatrix-method}
+\alias{*,ddenseMatrix,ndiMatrix-method}
 \alias{Arith,ddenseMatrix,logical-method}
 \alias{Arith,ddenseMatrix,numeric-method}
 \alias{Arith,ddenseMatrix,sparseVector-method}
@@ -18,6 +20,7 @@
 \alias{Arith,numeric,ddenseMatrix-method}
 \alias{^,ddenseMatrix,ddiMatrix-method}
 \alias{^,ddenseMatrix,ldiMatrix-method}
+\alias{^,ddenseMatrix,ndiMatrix-method}
 \alias{coerce,matrix,ddenseMatrix-method}
 \alias{coerce,vector,ddenseMatrix-method}
 %
