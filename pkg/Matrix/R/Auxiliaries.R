@@ -272,7 +272,7 @@ aggregateT <- function(x) .Call(Tsparse_aggregate, x)
 mat2triplet <- function(x, uniqT = FALSE) {
     T <- as(x, "TsparseMatrix")
     if(uniqT)
-        T <- asUniqueT(x, isT = TRUE)
+        T <- asUniqueT(T, isT = TRUE)
     if(is(T, "nsparseMatrix"))
          list(i = T@i + 1L, j = T@j + 1L)
     else list(i = T@i + 1L, j = T@j + 1L, x = T@x)
