@@ -10,6 +10,56 @@
 ## > getGroupMembers("Logic") # excluding unary "!" -> ./not.R
 ## [1] "&" "|"
 
+if(FALSE) {
+## vvvv MJ: for _after_ 1.6-2, ditto ./(Arith|Compare|Logic).R
+.Ops.invalid <- function(x) {
+    if(is.object(x))
+        gettextf("invalid class \"%s\" in '%s' method", class(x)[1L], "Ops")
+    else gettextf("invalid type \"%s\" in '%s' method", typeof(x), "Ops")
+}
+
+for(.cl in c("Matrix", "sparseVector")) {
+setMethod("Ops", signature(e1 = .cl, e2 = "ANY"),
+          function(e1, e2)
+              if(any(typeof(e2) == c("logical", "integer", "double"))) {
+                  if(is.matrix(e2))
+                      callGeneric(e1, unclass(e2))
+                  else callGeneric(e2, as.vector(e2))
+              } else stop(.Ops.invalid(e2), domain = NA))
+
+setMethod("Ops", signature(e1 = "ANY", e2 = .cl),
+          function(e1, e2)
+              if(any(typeof(e1) == c("logical", "integer", "double"))) {
+                  if(is.matrix(e1))
+                      callGeneric(unclass(e1), e2)
+                  else callGeneric(as.vector(e1), e2)
+              } else stop(.Ops.invalid(e1), domain = NA))
+
+setMethod("Ops", signature(e1 = .cl, e2 = "NULL"),
+          function(e1, e2) callGeneric(e1, logical(0L)))
+
+setMethod("Ops", signature(e1 = "NULL", e2 = .cl),
+          function(e1, e2) callGeneric(logical(0L), e2))
+
+## MJ: OK, but I'd prefer to handle all "matrix" as ".geMatrix"
+setMethod("Ops", signature(e1 = .cl, e2 = "matrix"),
+          function(e1, e2)
+              if(any(typeof(e2) == c("logical", "integer", "double")))
+                  callGeneric(e1, Matrix(e2))
+              else stop(.Ops.invalid(e2), domain = NA))
+
+## MJ: OK, but I'd prefer to handle all "matrix" as ".geMatrix"
+setMethod("Ops", signature(e1 = "matrix", e2 = .cl),
+          function(e1, e2)
+              if(any(typeof(e1) == c("logical", "integer", "double")))
+                  callGeneric(Matrix(e1), e2)
+              else stop(.Ops.invalid(e1), domain = NA))
+}
+rm(.cl)
+## ^^^^ MJ: for _after_ 1.6-2, ditto ./(Arith|Compare|Logic).R
+}
+
+
 .Ops.checkDim <- function(d.a, d.b) {
     if(any(d.a != d.b))
         stop(gettextf("non-conformable matrix dimensions in %s",
