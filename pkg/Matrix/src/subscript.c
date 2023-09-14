@@ -1829,11 +1829,12 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	cl_[0] = cl[0];
 	if (!(mi || mj) && ni == nj) {
 		keep = keep_di(pi, pj, ni, nonunit, 0, m);
-		if (keep) {
+		if (keep > 0) {
 			cl_[1] = 'd';
 			cl_[2] = 'i';
 		}
 	}
+
 	SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(cl_));
 
 	PROTECT(dim = GET_SLOT(res, Matrix_DimSym));
@@ -1849,7 +1850,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		SET_STRING_ELT(diag, 0, diag_);
 		UNPROTECT(2); /* diag_, diag */
 
-	} else if (keep) {
+	} else if (keep > 0) {
 
 		SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 			x1 = PROTECT(allocVector(TYPEOF(x0), ni));
@@ -1874,31 +1875,73 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 	} else {
 
+		SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym));
+		char *work;
+		int j_;
+
+		if (nonunit) {
+
+			Matrix_Calloc(work, n, char);
+
+#define SUB2_WORK(_CTYPE_, _PTR_, _ISNZ_) \
+			do { \
+				_CTYPE_ *px0 = _PTR_(x0); \
+				for (j_ = 0; j_ < n; ++j_) \
+					work[j_] = _ISNZ_(px0[j_]); \
+			} while (0)
+
+			switch (cl[0]) {
+			case 'n':
+				SUB2_WORK(int, LOGICAL, ISNZ_PATTERN);
+				break;
+			case 'l':
+				SUB2_WORK(int, LOGICAL, ISNZ_LOGICAL);
+				break;
+			case 'i':
+				SUB2_WORK(int, INTEGER, ISNZ_INTEGER);
+				break;
+			case 'd':
+				SUB2_WORK(double, REAL, ISNZ_REAL);
+				break;
+			case 'z':
+				SUB2_WORK(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+				break;
+			default:
+				break;
+			}
+
+#undef SUB2_WORK
+
+		}
+
 		SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
-		int *pp1 = INTEGER(p1), j_;
+		int *pp1 = INTEGER(p1);
 		*(pp1++) = 0;
 
 		for (kj = 0; kj < nj; ++kj) {
 			pp1[kj] = 0;
 			j_ = (mj) ? kj : pj[kj] - 1;
-			if (mi) {
-				for (ki = 0; ki < ni; ++ki)
-					if (ki == j_)
-						++pp1[kj];
-			} else {
-				for (ki = 0; ki < ni; ++ki)
-					if (pi[ki] - 1 == j_)
-						++pp1[kj];
+			if (!nonunit || work[j_]) {
+				if (mi) {
+					for (ki = 0; ki < ni; ++ki)
+						if (ki == j_)
+							++pp1[kj];
+				} else {
+					for (ki = 0; ki < ni; ++ki)
+						if (pi[ki] - 1 == j_)
+							++pp1[kj];
+				}
+				if (pp1[kj] > INT_MAX - pp1[kj - 1]) {
+					if (nonunit)
+						Matrix_Free(work, n);
+					error(_("%s too dense for %s; would have more than %s nonzero entries"),
+					      "x[i,j]", "[CR]sparseMatrix", "2^31-1");
+				}
 			}
-			if (pp1[kj] > INT_MAX - pp1[kj - 1])
-				error(_("%s too dense for %s; would have more than %s nonzero entries"), \
-				      "x[i,j]", "[CR]sparseMatrix", "2^31-1"); \
-
 			pp1[kj] += pp1[kj-1];
 		}
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj - 1])),
-			x0 = PROTECT(GET_SLOT(x, Matrix_xSym)),
 			x1 = PROTECT(allocVector(TYPEOF(x0), pp1[nj - 1]));
 		int *pi1 = INTEGER(i1);
 
@@ -1907,10 +1950,12 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			for (kj = 0; kj < nj; ++kj) { \
 				j_ = (mj) ? kj : pj[kj] - 1; \
-				for (ki = 0; ki < ni; ++ki) { \
-					if (((mi) ? ki : pi[ki] - 1) == j_) { \
-						*(pi1++) = ki; \
-						*(px1++) = (nonunit) ? px0[j_] : _ONE_; \
+				if (!nonunit || work[j_]) { \
+					for (ki = 0; ki < ni; ++ki) { \
+						if (((mi) ? ki : pi[ki] - 1) == j_) { \
+							*(pi1++) = ki; \
+							*(px1++) = (nonunit) ? px0[j_] : _ONE_; \
+						} \
 					} \
 				} \
 			} \
@@ -1924,6 +1969,9 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		SET_SLOT(res, Matrix_iSym, i1);
 		SET_SLOT(res, Matrix_xSym, x1);
 		UNPROTECT(4); /* x1, x0, i1, p1 */
+
+		if (nonunit)
+			Matrix_Free(work, n);
 
 	}
 

@@ -4,11 +4,10 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-14 r4331)}{
+\section{Changes in version 1.6-2 (2023-09-14 r4332)}{
   \subsection{New Features}{
     \itemize{
       %% TODO: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
-      %% TODO: 2-ary subscripts of ndiMatrix with zeros on diagonal
       \item New nonvirtual class \code{ndiMatrix}, extending virtual
       classes \code{diagonalMatrix} and \code{nMatrix}, for nonzero
       pattern diagonal matrices.  It is used to represent the result
