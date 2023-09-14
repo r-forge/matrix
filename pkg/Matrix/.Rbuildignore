@@ -91,4 +91,7 @@ src/t_matrix_to_Csp\.c$
 src/t_sparseVector\.c$
 
 # Work in progress :
+R/Arith\.R$
+R/Compare\.R$
+R/Logic\.R$
 src/subassign\.[ch]$
