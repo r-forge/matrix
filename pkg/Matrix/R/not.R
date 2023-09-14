@@ -35,7 +35,6 @@ setMethod("!", signature(x = "lsparseMatrix"),
               x
           })
 
-if(FALSE)
 setMethod("!", signature(x = "ndiMatrix"),
           function(x) {
               if(x@diag == "N" && anyNA(y <- x@x))

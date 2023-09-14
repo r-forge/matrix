@@ -77,21 +77,17 @@ setMethod("-", signature(e1 = "denseMatrix", e2 = "missing"),
               e1
           })
 
-## "diagonalMatrix" -- only two cases -- easiest to do both
-setMethod("-", signature(e1 = "ddiMatrix", e2 = "missing"),
+setMethod("-", signature(e1 = "diagonalMatrix", e2 = "missing"),
           function(e1, e2) {
-              if(e1@diag == "U") {
-                  e1@x <- rep.int(-1., e1@Dim[1])
-                  e1@diag <- "N"
-              } else ## diag == "N" -> using 'x' slot
-                  e1@x <- -e1@x
-              e1
-          })
-setMethod("-", signature(e1 = "ldiMatrix", e2 = "missing"),
-          function(e1, e2) {
-              d <- e1@Dim
-              new("ddiMatrix", Dim = d, Dimnames = e1@Dimnames, diag = "N",
-                  x = if(e1@diag == "U") rep.int(-1, d[1]) else -e1@x)
+              kind <- .M.kind(e1)
+              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
+              r@Dim <- d <- e1@Dim
+              r@Dimnames <- e1@Dimnames
+              r@x <-
+                  if(e1@diag != "N")
+                      rep.int(if(kind != "z") -1 else -1+0i, d[1L])
+                  else -(if(kind == "n") e1@x | is.na(e1@x) else e1@x)
+              r
           })
 
 

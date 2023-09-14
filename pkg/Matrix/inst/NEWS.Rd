@@ -7,6 +7,18 @@
 \section{Changes in version 1.6-2 (2023-09-12 r4323)}{
   \subsection{New Features}{
     \itemize{
+      %% TODO: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
+	  %% TODO: 2-ary subscripts of ndiMatrix with zeros on diagonal
+	  \item New nonvirtual class \code{ndiMatrix}, extending virtual
+      classes \code{diagonalMatrix} and \code{nMatrix}, for nonzero
+      pattern diagonal matrices.  It is used to represent the result
+      of \code{is.na}, \code{is.nan}, \code{is.infinite} applied to
+      \code{diagonalMatrix}, as well as diagonal boolean products.
+      Coercions \code{as(<diagonalMatrix>, "nMatrix")} now give
+      \code{ndiMatrix} instead of \code{ntCMatrix}.  The latter can
+      for now still be obtained by coercing to \code{nsparseMatrix}
+      instead of \code{nMatrix}.
+
       \item New C-level validity methods for \code{sparseVector} and
       \code{[nlidz]sparseVector}, now requiring \code{length} not
       exceeding \code{2^53}, which on most platforms is the maximum
@@ -87,6 +99,15 @@
 
       \item Some methods for generic function \code{lu} did not transmit
       \code{Dimnames} to the result.
+
+      \item Some methods for group generic function \code{Summary}
+      ignored arguments matching \code{\dots}.  Other methods did
+      not ignore the \dQuote{garbage} elements of the \code{x} slot
+      of dense, triangular matrices.
+
+      \item \code{kronecker(<n.TMatrix>, <diagonalMatrix>)} threw
+      an error for attempting to access the nonexistent \code{x} slot
+      of its first argument.
     }
   }
   \subsection{Misc}{

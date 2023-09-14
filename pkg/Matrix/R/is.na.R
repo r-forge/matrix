@@ -22,7 +22,7 @@ setMethod("anyNA", signature(x = "sparseMatrix"),
           function(x) .M.kind(x) != "n" && anyNA(x@x))
 
 setMethod("anyNA", signature(x = "diagonalMatrix"),
-          function(x) .M.kind(x) != "n" && length(x <- x@x) > 0L && anyNA(x))
+          function(x) .M.kind(x) != "n" && length(y <- x@x) > 0L && anyNA(y))
 
 setMethod("anyNA", signature(x = "indMatrix"),
           function(x) FALSE)
@@ -83,7 +83,7 @@ setMethod("is.na", signature(x = "sparseMatrix"),
 
 setMethod("is.na", signature(x = "diagonalMatrix"),
           function(x) {
-              r <- new("ldiMatrix") # new("ndiMatrix")
+              r <- new("ndiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- if(x@diag != "N" || .M.kind(x) == "n")
@@ -165,7 +165,7 @@ setMethod("is.nan", signature(x = "sparseMatrix"),
 
 setMethod("is.nan", signature(x = "diagonalMatrix"),
           function(x) {
-              r <- new("ldiMatrix") # new("ndiMatrix")
+              r <- new("ndiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- if(x@diag != "N")
@@ -247,7 +247,7 @@ setMethod("is.infinite", signature(x = "sparseMatrix"),
 
 setMethod("is.infinite", signature(x = "diagonalMatrix"),
           function(x) {
-              r <- new("ldiMatrix") # new("ndiMatrix")
+              r <- new("ndiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- if(x@diag != "N")

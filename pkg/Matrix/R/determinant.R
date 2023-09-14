@@ -140,23 +140,6 @@ setMethod("determinant", signature(x = "pMatrix", logarithm = "logical"),
               .mkDet(0, logarithm, signPerm(x@perm)))
 
 
-## .... TRIANGULAR .....................................................
-
-setMethod("determinant", signature(x = "triangularMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) {
-              if(x@diag == "N")
-                  .mkDet(x = diag(x, names = FALSE), logarithm = logarithm)
-              else .mkDet(0, logarithm, 1L)
-          })
-
-setMethod("determinant", signature(x = "diagonalMatrix", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...) {
-              if(x@diag == "N")
-                  .mkDet(x = x@x, logarithm = logarithm)
-              else .mkDet(0, logarithm, 1L)
-          })
-
-
 ## .... SYMMETRIC ......................................................
 
 for(.cl in c("dsyMatrix", "dspMatrix"))
@@ -194,6 +177,18 @@ setMethod("determinant", signature(x = "dsRMatrix", logarithm = "logical"),
 setMethod("determinant", signature(x = "dsTMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               determinant(.M2C(x), logarithm, ...))
+
+
+## .... TRIANGULAR .....................................................
+
+for(.cl in c("triangularMatrix", "diagonalMatrix"))
+setMethod("determinant", signature(x = .cl, logarithm = "logical"),
+          function(x, logarithm = TRUE, ...)
+              if(x@diag == "N")
+                  .mkDet(x = diag(x, names = FALSE), logarithm = logarithm)
+              else .mkDet(0, logarithm, 1L))
+rm(.cl)
+
 
 ## MJ: unused
 if(FALSE) {

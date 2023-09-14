@@ -79,7 +79,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
                          if(is.na(diag))
                              diag <-
                              if(!is.na(a <- all(y        )) && a) "U" else "N"
-                         "ldiMatrix"
+                         if(.M.kind(y) == "n") "ndiMatrix" else "ldiMatrix"
                      },
                  integer =
                      {

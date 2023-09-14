@@ -34,13 +34,28 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "diagonalMatrix"),
                   stop("dimensions cannot exceed 2^31-1")
               r <- new("ddiMatrix")
               r@Dim <- dX * dY
-              if((uX <- X@diag != "N") & (uY <- Y@diag != "N"))
+              uX <- X@diag != "N"
+              uY <- Y@diag != "N"
+              if(uX && uY)
                   r@diag <- "U"
-              else if(uX)
-                  r@x <- rep.int(as.double(Y@x), dX[1L])
-              else if(uY)
-                  r@x <- rep(as.double(X@x), each = dY[1L])
-              else r@x <- rep(X@x, each = dY[1L]) * Y@x
+              else {
+                  if(!uX) {
+                      X.ii <- X@x
+                      if(.M.kind(X) == "n" && anyNA(X.ii))
+                          X.ii <- X.ii | is.na(X.ii)
+                  }
+                  if(!uY) {
+                      Y.ii <- Y@x
+                      if(.M.kind(Y) == "n" && anyNA(Y.ii))
+                          Y.ii <- Y.ii | is.na(Y.ii)
+                  }
+                  r@x <-
+                      if(uX)
+                          rep.int(as.double(Y.ii), dX[1L])
+                      else if(uY)
+                          rep(as.double(X.ii), each = dY[1L])
+                      else rep(X.ii, each = dY[1L]) * Y.ii
+              }
               if(make.dimnames &&
                  !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY)))
                   r@Dimnames <- dnr
@@ -107,7 +122,12 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
                   r@x <-
                       if(uX)
                           rep.int(as.double(y), nX)
-                      else as.double(y) * rep(X@x, each = nY)
+                      else {
+                          X.ii <- X@x
+                          if(.M.kind(X) == "n" && anyNA(X.ii))
+                              X.ii <- X.ii | is.na(X.ii)
+                          as.double(y) * rep(X.ii, each = nY)
+                      }
                   if(uX && uY)
                       r <- ..diagN2U(r, sparse = TRUE)
               }
@@ -171,7 +191,12 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
                       r@x <-
                           if(uY)
                               x.()
-                          else x.() * rep(Y@x, each = m)
+                          else {
+                              Y.ii <- Y@x
+                              if(.M.kind(Y) == "n" && anyNA(Y.ii))
+                                  Y.ii <- Y.ii | is.na(Y.ii)
+                              x.() * rep(Y.ii, each = m)
+                          }
                   } else if(uplo == "U") {
                       rep.1.n <- rep(1:n, each = nY)
                       s <- sequence.default(
@@ -302,14 +327,17 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
                           head.(Y@i)
                       r@x <-
                           if(uX) {
-                              if(.M.kind(Y) != "n")
-                                  rep.int(as.double(head.(Y@x)), nX)
-                              else rep.int(1, nX * nY)
+                              if(.M.kind(Y) == "n")
+                                  rep.int(1, nX * nY)
+                              else rep.int(as.double(head.(Y@x)), nX)
                           } else {
-                              if(.M.kind(Y) != "n")
-                                  rep(as.double(X@x), each = nY) *
+                              X.ii <- X@x
+                              if(.M.kind(X) == "n" && anyNA(X.ii))
+                                  X.ii <- X.ii | is.na(X.ii)
+                              if(.M.kind(Y) == "n")
+                                  rep(as.double(X.ii), each = nY)
+                              else rep(as.double(X.ii), each = nY) *
                                       as.double(head.(Y@x))
-                              else rep(as.double(X@x), each = nY)
                           }
                   }
               }
@@ -364,16 +392,18 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
                           rep.int(rep.int(0:(nY-1L), nj.), rep.dp)
                       r@x <-
                           if(uY) {
-                              if(.M.kind(X) != "n")
-                                 as.double(X@x)[s.]
-                              else
+                              if(.M.kind(X) == "n")
                                  rep.int(1, nX * nY)
+                              else as.double(X@x)[s.]
                           } else {
-                              if(.M.kind(X) != "n")
-                                 rep.int(rep.int(as.double(Y@x), nj.), rep.dp) *
-                                     as.double(X@x)[s.]
-                              else
-                                 rep.int(rep.int(as.double(Y@x), nj.), rep.dp)
+                              Y.ii <- Y@x
+                              if(.M.kind(Y) == "n" && anyNA(Y.ii))
+                                  Y.ii <- Y.ii | is.na(Y.ii)
+                              if(.M.kind(X) == "n")
+                                  rep.int(rep.int(as.double(Y.ii), nj.), rep.dp)
+                              else rep.int(rep.int(as.double(Y.ii), nj.), rep.dp) *
+                                       as.double(X@x)[s.]
+
                           }
                   }
               }
@@ -453,17 +483,15 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
                       r@p <- c(0L, cumsum(rep.dpX * dpY))
                       r@i <- rep.int((dY[1L] * X@i)[s1], t1) + Y@i[s2]
                       r@x <-
-                          if(.M.kind(X) != "n") {
-                              if(.M.kind(Y) != "n")
-                                  rep.int(as.double(X@x)[s1], t1) *
-                                      as.double(Y@x)[s2]
-                              else
-                                  rep.int(as.double(X@x)[s1], t1)
-                          } else {
-                              if(.M.kind(Y) != "n")
-                                  as.double(Y@x)[s2]
-                              else
+                          if(.M.kind(X) == "n") {
+                              if(.M.kind(Y) == "n")
                                   rep.int(1, nX * nY)
+                              else as.double(Y@x)[s2]
+                          } else {
+                              if(.M.kind(Y) == "n")
+                                  rep.int(as.double(X@x)[s1], t1)
+                              else rep.int(as.double(X@x)[s1], t1) *
+                                       as.double(Y@x)[s2]
                           }
                   }
                   if(shape == "t") {
@@ -528,13 +556,16 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
                       Y@j
                   r@x <-
                       if(uX) {
-                          if(kind != "n")
-                              rep.int(as.double(Y@x), nX)
-                          else rep.int(1, as.double(nX) * nY)
+                          if(kind == "n")
+                              rep.int(1, as.double(nX) * nY)
+                          else rep.int(as.double(Y@x), nX)
                       } else {
-                          if(kind != "n")
-                              rep(as.double(X@x), each = nY) * as.double(Y@x)
-                          else rep(as.double(X@x), each = nY)
+                          X.ii <- X@x
+                          if(.M.kind(X) == "n" && anyNA(X.ii))
+                              X.ii <- X.ii | is.na(X.ii)
+                          if(kind == "n")
+                              rep(as.double(X.ii), each = nY)
+                          else rep(as.double(X.ii), each = nY) * as.double(Y@x)
                       }
               }
               if(make.dimnames &&
@@ -574,13 +605,16 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
                   r@j <- rep(nY * X@j, each = nY) + 0:(nY-1L)
                   r@x <-
                       if(uY) {
-                          if(kind != "n")
-                              rep.int(as.double(Y@x), nY)
-                          else rep.int(1, as.double(nX) * nY)
-                      } else {
-                          if(kind != "n")
-                              rep(as.double(X@x), each = nY) * as.double(Y@x)
+                          if(kind == "n")
+                              rep.int(1, as.double(nX) * nY)
                           else rep(as.double(X@x), each = nY)
+                      } else {
+                          Y.ii <- Y@x
+                          if(.M.kind(Y) == "n" && anyNA(Y.ii))
+                              Y.ii <- Y.ii | is.na(Y.ii)
+                          if(kind == "n")
+                              rep.int(as.double(Y.ii), nX)
+                          else rep(as.double(X@x), each = nY) * as.double(Y.ii)
                       }
               }
               if(make.dimnames &&
@@ -635,18 +669,15 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
                   r@i <- i. <- rep(dY[1L] * X@i, each = nY) + Y@i
                   r@j <-       rep(dY[2L] * X@j, each = nY) + Y@j
                   r@x <-
-                      if(.M.kind(X) != "n") {
-                          if(.M.kind(Y) != "n")
-                              rep(as.double(X@x), each = nY) * as.double(Y@x)
-                          else
-                              rep(as.double(X@x), each = nY)
-                      } else {
-                          if(.M.kind(Y) != "n")
-                              rep.int(as.double(X@x), nY)
-                          else
+                      if(.M.kind(X) == "n") {
+                          if(.M.kind(Y) == "n")
                               rep.int(1, length(i.))
+                          else rep.int(as.double(X@x), nY)
+                      } else {
+                          if(.M.kind(Y) == "n")
+                              rep(as.double(X@x), each = nY)
+                          else rep(as.double(X@x), each = nY) * as.double(Y@x)
                       }
-
                   if(shape == "t") {
                       r@uplo <- X@uplo
                       if(uX && uY)

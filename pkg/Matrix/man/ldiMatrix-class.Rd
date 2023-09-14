@@ -6,8 +6,10 @@
 \keyword{classes}
 %
 \alias{ldiMatrix-class}
+\alias{ndiMatrix-class} % for now
 %
 \alias{!,ldiMatrix-method}
+\alias{!,ndiMatrix-method}
 \alias{\%\%,ldiMatrix,Matrix-method}
 \alias{\%\%,ldiMatrix,ddenseMatrix-method}
 \alias{\%\%,ldiMatrix,ldenseMatrix-method}
@@ -42,6 +44,7 @@
 \alias{Ops,ldiMatrix,numeric-method}
 \alias{Ops,ldiMatrix,sparseMatrix-method}
 \alias{which,ldiMatrix-method}
+\alias{which,ndiMatrix-method}
 %
 \description{The class \code{"ldiMatrix"} of logical diagonal matrices.
 %% FIXME add more
@@ -82,6 +85,6 @@ library(utils, pos = "package:base", verbose = FALSE)
 str(lM)#> gory details (slots)
 
 crossprod(lM) # numeric
-(nM <- as(lM, "nMatrix"))# -> sparse (not formally ``diagonal'')
-crossprod(nM) # logical sparse
+(nM <- as(lM, "nMatrix"))
+crossprod(nM) # pattern sparse
 }
