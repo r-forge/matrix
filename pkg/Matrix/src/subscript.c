@@ -7,7 +7,8 @@
 #define AR21_UP(i, j, m) i + j + (        j * (    j - 1)) / 2
 #define AR21_LO(i, j, m) i +     (j * m + j * (m - j - 1)) / 2
 
-static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+static
+SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
 
 #define SUB1_START(_SEXPTYPE_) \
@@ -141,7 +142,8 @@ static SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+static
+SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START_EXTRA(kind2type(cl[0]));
 
@@ -196,7 +198,8 @@ static SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+static
+SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -262,7 +265,8 @@ static SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+static
+SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -328,7 +332,8 @@ static SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+static
+SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -360,7 +365,8 @@ static SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
+static
+SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 {
 	SUB1_START(LGLSXP);
 
@@ -451,7 +457,8 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 	}
 }
 
-static SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+static
+SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 
 #define SUB1_START(_SEXPTYPE_) \
@@ -528,7 +535,8 @@ static SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+static
+SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START_EXTRA(kind2type(cl[0]));
 
@@ -583,7 +591,8 @@ static SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+static
+SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -645,7 +654,8 @@ static SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+static
+SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -707,7 +717,8 @@ static SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+static
+SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START(kind2type(cl[0]));
 
@@ -737,7 +748,8 @@ static SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	return res;
 }
 
-static SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
+static
+SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 {
 	SUB1_START(LGLSXP);
 
@@ -826,7 +838,8 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 	}
 }
 
-static int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
+static
+int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
 {
 	int k, ident = memcmp(pi, pj, n * sizeof(int)) == 0;
 	if (checkNA) {
@@ -897,7 +910,8 @@ static int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
 	}
 }
 
-static int keep_sy(int *pi, int *pj, int n, int upper, int checkNA)
+static
+int keep_sy(int *pi, int *pj, int n, int upper, int checkNA)
 {
 	if (memcmp(pi, pj, n * sizeof(int)) != 0)
 		return 0;
@@ -927,7 +941,8 @@ static int keep_sy(int *pi, int *pj, int n, int upper, int checkNA)
 	return 2 * r;
 }
 
-static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
+static
+int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 {
 	int k, ident = memcmp(pi, pj, n * sizeof(int)) == 0;
 	if (checkNA) {
@@ -970,7 +985,8 @@ static int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 	}
 }
 
-static void sort_cr(SEXP obj, const char *cl)
+static
+void sort_cr(SEXP obj, const char *cl)
 {
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	int *pdim = INTEGER(dim),
@@ -1135,8 +1151,8 @@ static void sort_cr(SEXP obj, const char *cl)
 	 ? *(_X_ + AR21_LO(_I_, _J_, _M_)) \
 	 : *(_X_ + AR21_LO(_J_, _I_, _M_)))
 
-static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                          const char *cl)
+static
+SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 
 #define SUB2_START \
@@ -1389,8 +1405,8 @@ static SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	return res;
 }
 
-static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                        const char *cl)
+static
+SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 	SUB2_START_EXTRA('e', 'p', 'p', 1);
 
@@ -1498,8 +1514,8 @@ static SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	return res;
 }
 
-static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                         const char *cl)
+static
+SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 	SUB2_START_EXTRA('C', 'C', 'C', 0);
 
@@ -1651,8 +1667,8 @@ static SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	return res;
 }
 
-static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                         const char *cl)
+static
+SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 	SUB2_START_EXTRA('R', 'R', 'R', 0);
 
@@ -1799,8 +1815,8 @@ static SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	return res;
 }
 
-static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                          const char *cl)
+static
+SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 	SUB2_START;
 
@@ -1915,8 +1931,8 @@ static SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
 	return res;
 }
 
-static SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j,
-                                     const char *cl)
+static
+SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 {
 	PROTECT_INDEX pidA;
 	PROTECT_WITH_INDEX(x, &pidA);
