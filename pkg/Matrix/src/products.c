@@ -1373,10 +1373,9 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 		UNPROTECT(1); /* d */
 	}
 
-	if (zcl[2] == 'C' || zcl[2] == 'R' || zcl[2] == 'T') {
+	if (boolean_ && (zcl[2] == 'C' || zcl[2] == 'R' || zcl[2] == 'T')) {
 		REPROTECT(z = sparse_drop0(z, zcl, 0.0), zpid);
-		if (boolean_)
-			REPROTECT(z = sparse_as_kind(z, zcl, 'n'), zpid);
+		REPROTECT(z = sparse_as_kind(z, zcl, 'n'), zpid);
 	}
 
 	UNPROTECT(3); /* z, y, x */
