@@ -717,7 +717,7 @@ SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 	zcl[2] = (triangular) ? 'r' : 'e';
 	cholmod_sparse *X = dgC2cholmod(x, 1);
 	cholmod_dense  *Y = dge2cholmod(y, ytrans);
-	X->stype = (symmetric) ? 1 : 0;
+	X->stype = symmetric;
 	if (((xtrans) ? X->nrow : X->ncol) != Y->nrow) {
 		if (ytrans)
 			R_Free(Y->x);
@@ -907,15 +907,23 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 
 	if (!boolean_ && ycl[2] != 'C' && ycl[2] != 'R' && ycl[2] != 'T') {
+		int symmetric = xcl[1] == 's';
+		if (symmetric) {
+			SEXP xuplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
+			char xul = *CHAR(STRING_ELT(xuplo, 0));
+			if (xul != 'U')
+				symmetric = -1;
+			UNPROTECT(1); /* xuplo */
+		}
 		if (ycl[0] != 'd') {
 			REPROTECT(y = dense_as_kind(y, ycl, 'd', 0), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
+		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
 		if (xcl[1] == 't')
 			REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
-		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
 		x = dgCMatrix_dgeMatrix_matmult(
-			x, y, xtrans_, ytrans_, ztrans_, triangular, xcl[1] == 's');
+			x, y, xtrans_, ytrans_, ztrans_, triangular, symmetric);
 		UNPROTECT(2); /* y, x */
 		return x;
 	}
