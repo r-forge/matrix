@@ -4,10 +4,22 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-14 r4335)}{
+\section{Changes in version 1.6-2 (2023-09-16 r4340)}{
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item Methods for generic functions \code{rbind2}, \code{cbind2},
+      \code{\%*\%}, \code{\%&\%}, \code{crossprod}, and \code{tcrossprod}
+      determine the class of the result using more strict rules,
+      designed to avoid \dQuote{surprising} coercions where possible.
+      Notably, operations involving \code{RsparseMatrix} now return
+      an \code{RsparseMatrix} in more cases.  \code{TsparseMatrix} and
+      \code{diagonalMatrix} may be handled as \code{CsparseMatrix} or as
+      \code{RsparseMatrix}, depending on context.
+    }
+  }
   \subsection{New Features}{
     \itemize{
-      %% TODO: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
+      %% TODO {for 1.6-3}: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
       \item New nonvirtual class \code{ndiMatrix}, extending virtual
       classes \code{diagonalMatrix} and \code{nMatrix}, for nonzero
       pattern diagonal matrices.  It is used to represent the result
@@ -48,6 +60,9 @@
 
       \item New export \code{aggregateT}, for aggregating
       \code{TsparseMatrix} \emph{without} sorting.
+
+      \item Methods for \code{all.equal} now report the packages
+      where S4 classes are defined.
     }
   }
   \subsection{Bug Fixes}{
@@ -107,6 +122,17 @@
       \item \code{kronecker(<n.TMatrix>, <diagonalMatrix>)} threw
       an error for attempting to access the nonexistent \code{x} slot
       of its first argument.
+
+      \item Matrix products now behave exactly as \pkg{base} when
+      testing for conformable arguments.
+
+      \item Numeric products (\code{\%*\%}) did not always return a
+      \code{dMatrix}.
+
+      \item Methods for \code{all.equal} now \dQuote{see} attributes
+      of S4 objects that are not slots.  This can be disabled
+      by setting argument \code{check.attributes} to \code{NA},
+      which is otherwise equivalent to \code{TRUE}.
     }
   }
   \subsection{Misc}{
