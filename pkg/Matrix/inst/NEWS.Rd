@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-17 r4341)}{
+\section{Changes in version 1.6-2 (2023-09-17 r4342)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -133,6 +133,13 @@
       of S4 objects that are not slots.  This can be disabled
       by setting argument \code{check.attributes} to \code{NA},
       which is otherwise equivalent to \code{TRUE}.
+
+      \item \code{prod(x)} is computed more diligently for \code{x}
+      inheriting from \code{sparseMatrix}.  For \code{CsparseMatrix},
+      \code{RsparseMatrix}, and \code{diagonalMatrix}, multiplication
+      by zero occurs at the position of the first zero in the matrix
+      (when traversed by row in the case of \code{RsparseMatrix}).
+      For \code{TsparseMatrix}, multiplication by zero occurs first.
     }
   }
   \subsection{Misc}{

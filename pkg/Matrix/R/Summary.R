@@ -7,6 +7,7 @@
 ## NB: Summary depends on the existence, _not_ count, of zeros and ones.
 ##     The only exception is 'sum' which ignores zeros and counts ones.
 
+## FIXME: prod(<.t[rp]Matrix>) still susceptible to wrong overflow
 setMethod("Summary", signature(x = "denseMatrix"),
           function(x, ..., na.rm = FALSE) {
               cl <- .M.nonvirtual(x)
@@ -41,6 +42,8 @@ setMethod("Summary", signature(x = "denseMatrix"),
 
 setMethod("Summary", signature(x = "sparseMatrix"),
           function(x, ..., na.rm = FALSE) {
+              if(.Generic == "prod")
+                  return(.Call(R_sparse_prod, x, na.rm)) # avoid wrong overflow
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
@@ -51,7 +54,7 @@ setMethod("Summary", signature(x = "sparseMatrix"),
                      "i" = { zero <- 0L   ; one <- 1L   },
                      "d" = { zero <- 0    ; one <- 1    },
                      "z" = { zero <- 0+0i ; one <- 1+0i })
-              if(shape == "s" && any(.Generic == c("sum", "prod"))) {
+              if(shape == "s" && .Generic == "sum") {
                   x <- .M2gen(x)
                   shape <- "g"
               }
@@ -102,7 +105,12 @@ setMethod("Summary", signature(x = "diagonalMatrix"),
                      "z" = { zero <- 0+0i ; one <- 1+0i })
               n <- x@Dim[2L]
               y <- x@x
-              y1 <- if(kind != "n" || !anyNA(y))
+              y1 <- if(kind != "n") {
+                        if(.Generic == "prod" && n > 1L)
+                            c(y[1L], zero, y[-1L]) # avoid wrong overflow
+                        else y
+                    }
+                    else if(!anyNA(y))
                         y
                     else y | is.na(y)
               y2 <- if(n > 1L)

@@ -47,6 +47,9 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
                         SEXP narm, SEXP mean, SEXP sparse);
 
+SEXP sparse_prod(SEXP obj, const char *class, int narm);
+SEXP R_sparse_prod(SEXP obj, SEXP narm);
+
 SEXP Tsparse_aggregate(SEXP from);
 
 #endif /* MATRIX_SPARSE_H */

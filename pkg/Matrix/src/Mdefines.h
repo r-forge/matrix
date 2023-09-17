@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <limits.h>
+#include <float.h>
 
 #ifdef INT_FAST64_MAX
 typedef int_fast64_t Matrix_int_fast64_t;
