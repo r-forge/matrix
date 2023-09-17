@@ -105,24 +105,25 @@ setMethod("Summary", signature(x = "diagonalMatrix"),
                      "z" = { zero <- 0+0i ; one <- 1+0i })
               n <- x@Dim[2L]
               y <- x@x
-              y1 <- if(kind != "n") {
-                        if(.Generic == "prod" && n > 1L)
-                            c(y[1L], zero, y[-1L]) # avoid wrong overflow
-                        else y
-                    }
-                    else if(!anyNA(y))
-                        y
-                    else y | is.na(y)
-              y2 <- if(n > 1L)
-                        zero
-              y3 <- if(x@diag != "N") {
+              y1 <- if(x@diag == "N") {
+                        if(kind != "n") {
+                            if(.Generic == "prod" && n > 1L)
+                                c(y[1L], zero, y[-1L]) # avoid wrong overflow
+                            else y
+                        }
+                        else if(!anyNA(y))
+                            y
+                        else y | is.na(y)
+                    } else {
                         if(.Generic == "sum")
                             one * n
                         else if(n > 0L)
                             one
                         else one[0L]
                     }
-              get(.Generic, mode = "function")(y1, y2, y3, ..., na.rm = na.rm)
+              y2 <- if(n > 1L)
+                        zero
+              get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", signature(x = "indMatrix"),
