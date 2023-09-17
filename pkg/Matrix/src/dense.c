@@ -1422,7 +1422,7 @@ static void dense_colsum(SEXP x, const char *class,
                          int m, int n, char ul, char di, int narm, int mean,
                          SEXP res)
 {
-	int narm_ = narm && mean && class[0] != 'n', i, j, count;
+	int narm_ = narm && mean && class[0] != 'n', i, j, count = -1;
 
 #define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_, _DIVIDE_) \
 	do { \
@@ -1546,7 +1546,7 @@ static void dense_rowsum(SEXP x, const char *class,
                          int m, int n, char ul, char di, int narm, int mean,
                          SEXP res)
 {
-	int narm_ = narm && mean && class[0] != 'n', i, j, *count;
+	int narm_ = narm && mean && class[0] != 'n', i, j, *count = NULL;
 	if (narm_) {
 		Matrix_Calloc(count, m, int);
 		for (i = 0; i < m; ++i)

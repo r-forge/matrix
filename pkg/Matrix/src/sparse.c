@@ -2709,7 +2709,7 @@ static void Csparse_colsum(SEXP obj, const char *class,
 	int narm_ = narm && mean && class[0] != 'n', unit = di != 'N';
 
 	SEXP p0 = PROTECT(GET_SLOT(obj, Matrix_pSym));
-	int *pp0 = INTEGER(p0) + 1, j, k, kend, nnz1 = n, count;
+	int *pp0 = INTEGER(p0) + 1, j, k, kend, nnz1 = n, count = -1;
 
 	if (IS_S4_OBJECT(res)) {
 
@@ -2898,7 +2898,7 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 	} else {
 
 		SEXP x1 = res;
-		int *pi1;
+		int *pi1 = NULL;
 		if (narm_) {
 			Matrix_Calloc(pi1, m, int);
 			for (i = 0; i < m; ++i)
@@ -3026,7 +3026,7 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 	} else {
 
 		SEXP x1 = res;
-		int *pj1;
+		int *pj1 = NULL;
 		if (narm_)
 			Matrix_Calloc(pj1, n, int);
 		SUM_CASES(NOMAP);
