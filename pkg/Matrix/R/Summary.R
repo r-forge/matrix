@@ -42,7 +42,7 @@ setMethod("Summary", signature(x = "denseMatrix"),
 
 setMethod("Summary", signature(x = "sparseMatrix"),
           function(x, ..., na.rm = FALSE) {
-              if(.Generic == "prod") {
+              if(.Generic == "prod")
                   return(prod(.Call(R_sparse_prod, x, na.rm), ..., na.rm = na.rm)) # avoid wrong overflow
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
