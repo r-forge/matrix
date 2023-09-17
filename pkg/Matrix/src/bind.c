@@ -876,7 +876,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	if (rdimnames[0] || rdimnames[1]) {
 		SEXP dimnames = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)),
 			marnames = R_NilValue, nms[2], nms_, a, e, s, tmp;
-		int i, ivalid, r, pos = 0, nprotect = 1;
+		int i, ivalid, r = -1, pos = 0, nprotect = 1;
 		const char *scl;
 		if (rdimnames[margin]) {
 			PROTECT(marnames = allocVector(STRSXP, rdim[margin]));

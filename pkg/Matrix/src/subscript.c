@@ -1876,7 +1876,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	} else {
 
 		SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym));
-		char *work;
+		char *work = NULL;
 		int j_;
 
 		if (nonunit) {

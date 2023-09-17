@@ -867,7 +867,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (xcl[1] == 's')
 		xtrans_ = 0;
-	if (xcl[0] != (boolean_) ? 'n' : 'd') {
+	if (xcl[0] != ((boolean_) ? 'n' : 'd')) {
 		if (boolean_)
 			REPROTECT(x = sparse_drop0(x, xcl, 0.0), xpid);
 		else {
@@ -948,7 +948,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (ycl[1] == 's')
 		ytrans_ = 0;
-	if (ycl[0] != (boolean_) ? 'n' : 'd') {
+	if (ycl[0] != ((boolean_) ? 'n' : 'd')) {
 		if (boolean_)
 			REPROTECT(y = sparse_drop0(y, ycl, 0.0), ypid);
 		else {
