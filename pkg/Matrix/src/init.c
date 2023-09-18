@@ -157,7 +157,9 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_dense_is_triangular, 2),
 	CALLDEF(R_dense_is_diagonal, 1),
 	CALLDEF(R_dense_marginsum, 4),
-
+	CALLDEF(R_dense_sum, 2),
+	CALLDEF(R_dense_prod, 2),
+	
 	CALLDEF(R_sparse_drop0, 2),
 	CALLDEF(R_sparse_diag_U2N, 1),
 	CALLDEF(R_sparse_diag_N2U, 1),

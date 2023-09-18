@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-18 r4349)}{
+\section{Changes in version 1.6-2 (2023-09-18 r4350)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -65,11 +65,10 @@
       where S4 classes are defined.
 
       \item \code{sum(x)} and \code{prod(x)} no longer require a
-      coercion from symmetric to general for \code{x} inheriting
-      from \code{[CRT]sparseMatrix}.  Results where coercions are
-      now avoided may differ numerically due to reordering of adds
-      and multiplies, most commonly on systems where
-      \code{sizeof(long double) == sizeof(double)}.
+      coercion from \code{symmetricMatrix} to \code{generalMatrix}.
+      Results where coercions are now avoided may differ numerically
+      due to reordering of adds and multiplies, most commonly on
+      systems where \code{sizeof(long double) == sizeof(double)}.
     }
   }
   \subsection{Bug Fixes}{
@@ -142,13 +141,15 @@
       which is otherwise equivalent to \code{TRUE}.
 
       \item \code{prod(x)} is computed more diligently for \code{x}
-      inheriting from \code{sparseMatrix} or \code{sparseVector}.
-      Multiplication by zero occurs at the position of the first
-      structural zero in the matrix or vector (when traversed by
-      row in the case of \code{RsparseMatrix}).  An exception is
-      \code{TsparseMatrix}, multiplication by zero occurs before
-      multiplication by any stored entry, regardless of the position
-      of the first structural zero.
+      inheriting from \code{sparseMatrix}, \code{sparseVector}, or
+      \code{.t[rp]Matrix}, i.e., those \code{x} that can be understood
+      to have \dQuote{structural} zeros.  Now, multiplication by zero
+      occurs at the position of the first structural zero in the matrix
+      or vector (when traversed by row in the case of \code{RsparseMatrix}).
+      An exception is \code{TsparseMatrix}, for which multiplication
+      by zero occurs before multiplication by any stored entry,
+      regardless of the position of the first structural zero in the
+      corresponding sorted matrix (to avoid the cost of sorting).
     }
   }
   \subsection{Misc}{

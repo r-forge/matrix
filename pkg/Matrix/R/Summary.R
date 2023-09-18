@@ -11,6 +11,13 @@
 ##       avoiding wrong overflow, coercions
 setMethod("Summary", signature(x = "denseMatrix"),
           function(x, ..., na.rm = FALSE) {
+              ## Avoid wrong overflow :
+              if(.Generic == "sum")
+                  return(sum (.Call(R_dense_sum , x, na.rm),
+                              ..., na.rm = na.rm))
+              if(.Generic == "prod")
+                  return(prod(.Call(R_dense_prod, x, na.rm),
+                              ..., na.rm = na.rm))
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
@@ -21,15 +28,11 @@ setMethod("Summary", signature(x = "denseMatrix"),
                      "i" = { zero <- 0L   ; one <- 1L   },
                      "d" = { zero <- 0    ; one <- 1    },
                      "z" = { zero <- 0+0i ; one <- 1+0i })
-              if(shape == "s" && any(.Generic == c("sum", "prod"))) {
-                  x <- .M2gen(x)
-                  shape <- "g"
-              }
               if(shape != "g") {
                   if(repr != "p")
                       x <- .M2packed(x)
                   if(shape == "t" && x@diag != "N")
-                      diag(x) <- TRUE
+                      diag(x) <- TRUE # copying, sadly
               }
               n <- (d <- x@Dim)[2L]
               y <- x@x
