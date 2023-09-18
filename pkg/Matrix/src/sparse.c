@@ -3149,6 +3149,9 @@ SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
 	                        margin_, narm_, mean_, sparse_);
 }
 
+#define LONGDOUBLE_AS_DOUBLE(v) \
+	(v > DBL_MAX) ? R_PosInf : ((v < -DBL_MAX) ? R_NegInf : (double) v);
+
 SEXP sparse_prod(SEXP obj, const char *class, int narm)
 {
 	if (class[2] == 'T')
@@ -3180,7 +3183,9 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			m_ = (class[2] == 'C') ? m : n, n_ = (class[2] == 'C') ? n : m,
 			seen0 = 0;
 
-		nnz = (Matrix_int_fast64_t) pp[n_ - 1] + ((unit) ? n_ : 0);
+		nnz = pp[n_ - 1];
+		if (unit)
+			nnz += n;
 		if (class[0] == 'n') {
 			REAL(res)[0] = (nnz == nnzmax) ? 1.0 : 0.0;
 			UNPROTECT(4); /* i, p, res, obj */
@@ -3188,6 +3193,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		}
 
 		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+
 		if (class[0] == 'z') {
 			long double zr0, zi0;
 			Rcomplex *px = COMPLEX(x);
@@ -3264,7 +3270,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						if (px[k] != NA_INTEGER)
 							zr *= (symmetric && pi[k] != j_)
 								? (long double) px[k] * px[k] : px[k];
-						else if(!narm)
+						else if (!narm)
 							zr *= NA_REAL;
 						++k;
 					}
@@ -3276,7 +3282,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						if (px[k] != NA_INTEGER)
 							zr *= (symmetric && pi[k] != j_)
 								? (long double) px[k] * px[k] : px[k];
-						else if(!narm)
+						else if (!narm)
 							zr *= NA_REAL;
 						++k;
 						} else if (!unit || i_ != j_) {
@@ -3297,16 +3303,19 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		int *pi = INTEGER(i), *pj = INTEGER(j);
 		R_xlen_t k, kend = XLENGTH(i);
 
-		nnz = (Matrix_int_fast64_t) kend + ((unit) ? n : 0);
+		nnz = (Matrix_int_fast64_t) kend;
+		if (unit)
+			nnz += n;
 		if (class[0] == 'n') {
 			REAL(res)[0] = (nnz == nnzmax) ? 1.0 : 0.0;
 			UNPROTECT(4); /* j, i, res, obj */
 			return res;
 		}
-
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 		if (nnz < mn)
 			zr = 0.0;
+
+		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+
 		if (class[0] == 'z') {
 			long double zr0, zi0;
 			Rcomplex *px = COMPLEX(x);
@@ -3339,9 +3348,6 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		UNPROTECT(3); /* x, j, i */
 
 	}
-
-#define LONGDOUBLE_AS_DOUBLE(v) \
-	(v > DBL_MAX) ? R_PosInf : ((v < -DBL_MAX) ? R_NegInf : (double) v);
 
 	if (class[0] == 'z') {
 		COMPLEX(res)[0].r = LONGDOUBLE_AS_DOUBLE(zr);

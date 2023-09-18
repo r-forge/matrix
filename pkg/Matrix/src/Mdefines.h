@@ -22,9 +22,11 @@
 
 #ifdef INT_FAST64_MAX
 typedef int_fast64_t Matrix_int_fast64_t;
+# define MATRIX_INT_FAST64_MIN INT_FAST64_MIN
 # define MATRIX_INT_FAST64_MAX INT_FAST64_MAX
 #else
 typedef    long long Matrix_int_fast64_t;
+# define MATRIX_INT_FAST64_MIN      LLONG_MIN
 # define MATRIX_INT_FAST64_MAX      LLONG_MAX
 #endif
 

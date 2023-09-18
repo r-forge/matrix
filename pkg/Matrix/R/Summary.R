@@ -7,7 +7,8 @@
 ## NB: Summary depends on the existence, _not_ count, of zeros and ones.
 ##     The only exception is 'sum' which ignores zeros and counts ones.
 
-## FIXME: prod(<.t[rp]Matrix>) still susceptible to wrong overflow
+## TODO: sum(<denseMatrix>), prod(<denseMatrix>)
+##       avoiding wrong overflow, coercions
 setMethod("Summary", signature(x = "denseMatrix"),
           function(x, ..., na.rm = FALSE) {
               cl <- .M.nonvirtual(x)
@@ -42,8 +43,10 @@ setMethod("Summary", signature(x = "denseMatrix"),
 
 setMethod("Summary", signature(x = "sparseMatrix"),
           function(x, ..., na.rm = FALSE) {
+              ## Avoid wrong overflow :
               if(.Generic == "prod")
-                  return(prod(.Call(R_sparse_prod, x, na.rm), ..., na.rm = na.rm)) # avoid wrong overflow
+                  return(prod(.Call(R_sparse_prod, x, na.rm),
+                              ..., na.rm = na.rm))
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
@@ -62,6 +65,7 @@ setMethod("Summary", signature(x = "sparseMatrix"),
                   x <- aggregateT(x)
                   nnz <- length(x@i)
               } else {
+                  ## Overallocated (hopefully rare ...) :
                   nnz <- { p <- x@p; p[length(p)] }
                   if(length(if(repr == "C") x@i else x@j) > nnz) {
                       h <- seq_len(nnz)
@@ -104,26 +108,28 @@ setMethod("Summary", signature(x = "diagonalMatrix"),
                      "d" = { zero <- 0    ; one <- 1    },
                      "z" = { zero <- 0+0i ; one <- 1+0i })
               n <- x@Dim[2L]
-              y <- x@x
               y1 <- if(x@diag == "N") {
+                        y <- x@x
                         if(kind != "n") {
                             if(.Generic == "prod" && n > 1L)
-                                c(y[1L], zero, y[-1L]) # avoid wrong overflow
+                                ## Avoid wrong overflow :
+                                c(y[1L], zero, y[-1L])
                             else y
                         }
                         else if(!anyNA(y))
                             y
                         else y | is.na(y)
-                    } else {
+                    }
+              y2 <- if(n > 1L)
+                        zero
+              y3 <- if(x@diag != "N") {
                         if(.Generic == "sum")
                             one * n
                         else if(n > 0L)
                             one
                         else one[0L]
                     }
-              y2 <- if(n > 1L)
-                        zero
-              get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
+              get(.Generic, mode = "function")(y1, y2, y3, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", signature(x = "indMatrix"),
@@ -143,15 +149,26 @@ setMethod("Summary", signature(x = "sparseVector"),
           function(x, ..., na.rm = FALSE) {
               kind <- .M.kind(x)
               zero <- switch(kind, "n" = , "l" = FALSE, "i" = 0L, "d" = 0, "z" = 0+0i)
-              nnz <- length(x@i)
-              y1 <- if(kind != "n")
-                        x@x
+              nnz <- length(i <- x@i)
+              nnz.max <- length(x)
+              y1 <- if(kind != "n") {
+                        y <- x@x
+                        if(.Generic == "prod" && nnz > 0L && nnz < nnz.max) {
+                            ## Avoid wrong overflow :
+                            if(i[1L] > 1L)
+                                c(zero, y)
+                            else {
+                                q <- which.min(i == seq_along(i))
+                                c(y[1L:(q - 1L)], zero, if(nnz >= q) y[q:nnz])
+                            }
+                        } else y
+                    }
                     else if(.Generic == "sum")
                         nnz
                     else if(nnz > 0L)
                         TRUE
                     else logical(0L)
-              y2 <- if(nnz < length(x))
+              y2 <- if(nnz < nnz.max)
                         zero
               get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
           })
