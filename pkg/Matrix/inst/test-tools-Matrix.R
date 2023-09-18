@@ -550,12 +550,12 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	CatF(" Summary: ")
 	for(f in summList) {
 	    ## suppressWarnings():  e.g. any(<double>)	would warn here:
-	    r <- suppressWarnings(if(isCor) all.equal(f(m), f(m.m)) else
-				  identical(f(m), f(m.m)))
+	    r <- suppressWarnings(identical(f(m), f(m.m)))
 	    if(!isTRUE(r)) {
 		f.nam <- sub("..$", '', sub("^\\.Primitive..", '', format(f)))
-		## prod() is delicate: NA or NaN can both happen
-		(if(f.nam == "prod") message else stop)(
+		## sum() and prod() are sensitive to order of f. p. operations
+		## particularly on systems where sizeof(long double) == sizeof(double)
+		(if(any(f.nam == c("sum", "prod"))) message else stop)(
 		    sprintf("%s(m) [= %g] differs from %s(m.m) [= %g]",
 			    f.nam, f(m), f.nam, f(m.m)))
 	    }

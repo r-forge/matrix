@@ -44,6 +44,9 @@ setMethod("Summary", signature(x = "denseMatrix"),
 setMethod("Summary", signature(x = "sparseMatrix"),
           function(x, ..., na.rm = FALSE) {
               ## Avoid wrong overflow :
+              if(.Generic == "sum")
+                  return(sum (.Call(R_sparse_sum , x, na.rm),
+                              ..., na.rm = na.rm))
               if(.Generic == "prod")
                   return(prod(.Call(R_sparse_prod, x, na.rm),
                               ..., na.rm = na.rm))
@@ -57,10 +60,6 @@ setMethod("Summary", signature(x = "sparseMatrix"),
                      "i" = { zero <- 0L   ; one <- 1L   },
                      "d" = { zero <- 0    ; one <- 1    },
                      "z" = { zero <- 0+0i ; one <- 1+0i })
-              if(shape == "s" && .Generic == "sum") {
-                  x <- .M2gen(x)
-                  shape <- "g"
-              }
               ## Handle overallocation (hopefully rare ...) :
               if(repr == "T") {
                   x <- aggregateT(x)
@@ -81,20 +80,13 @@ setMethod("Summary", signature(x = "sparseMatrix"),
               nnz.max <- if(shape == "s") 0.5 * (prod(d) + n) else prod(d)
               y1 <- if(kind != "n")
                         x@x
-                    else if(.Generic == "sum")
-                        nnz
                     else if(nnz > 0L)
                         TRUE
                     else logical(0L)
               y2 <- if(nnz < nnz.max)
                         zero
-              y3 <- if(shape == "t" && x@diag != "N") {
-                        if(.Generic == "sum")
-                            one * n
-                        else if(n > 0L)
-                            one
-                        else one[0L]
-                    }
+              y3 <- if(n > 0L && shape == "t" && x@diag != "N")
+                        one
               get(.Generic, mode = "function")(y1, y2, y3, ..., na.rm = na.rm)
           })
 
@@ -157,10 +149,9 @@ setMethod("Summary", signature(x = "sparseVector"),
                             ## Avoid wrong overflow :
                             if(i[1L] > 1L)
                                 c(zero, y)
-                            else {
-                                q <- which.min(i == seq_along(i))
-                                c(y[1L:(q - 1L)], zero, if(nnz >= q) y[q:nnz])
-                            }
+                            else if(nnz >= (q <- which.min(i == seq_along(i))))
+                                c(y[1L:(q - 1L)], zero, y[q:nnz])
+                            else y
                         } else y
                     }
                     else if(.Generic == "sum")
