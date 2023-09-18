@@ -61,11 +61,11 @@ setMethod("Summary", signature(x = "sparseMatrix"),
                   x <- .M2gen(x)
                   shape <- "g"
               }
+              ## Handle overallocation (hopefully rare ...) :
               if(repr == "T") {
                   x <- aggregateT(x)
                   nnz <- length(x@i)
               } else {
-                  ## Overallocated (hopefully rare ...) :
                   nnz <- { p <- x@p; p[length(p)] }
                   if(length(if(repr == "C") x@i else x@j) > nnz) {
                       h <- seq_len(nnz)
