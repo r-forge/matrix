@@ -38,4 +38,10 @@ SEXP dense_marginsum(SEXP obj, const char *class, int margin,
 SEXP R_dense_marginsum(SEXP obj, SEXP margin,
                        SEXP narm, SEXP mean);
 
+SEXP dense_sum(SEXP obj, const char *class, int narm);
+SEXP R_dense_sum(SEXP obj, SEXP narm);
+
+SEXP dense_prod(SEXP obj, const char *class, int narm);
+SEXP R_dense_prod(SEXP obj, SEXP narm);
+
 #endif /* MATRIX_DENSE_H */

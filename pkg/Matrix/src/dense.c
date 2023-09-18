@@ -578,7 +578,6 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul0 = ul1 = *CHAR(STRING_ELT(uplo, 0));
 		UNPROTECT(1); /* uplo */
-
 		if (class[1] == 't') {
 			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
 			di = *CHAR(STRING_ELT(diag, 0));
@@ -1422,7 +1421,66 @@ static void dense_colsum(SEXP x, const char *class,
                          int m, int n, char ul, char di, int narm, int mean,
                          SEXP res)
 {
-	int narm_ = narm && mean && class[0] != 'n', i, j, count = -1;
+	int i, j, count = -1, narm_ = narm && mean && class[0] != 'n',
+		unpacked = class[2] != 'p';
+
+#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
+	             _ZERO_, _ONE_, _NA_, _ISNA_, \
+	             _CAST_, _INCREMENT_, _DIVIDE_) \
+	do { \
+		_CTYPE0_ *px0 = _PTR0_(  x); \
+		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) { \
+				*px1 = _ZERO_; \
+				SUM_KERNEL(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
+				           _CAST_, _INCREMENT_, _DIVIDE_); \
+				px1 += 1; \
+			} \
+		} else if (di == 'N') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					*px1 = _ZERO_; \
+					SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					if (unpacked) \
+						px0 += n - j - 1; \
+					px1 += 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px0 += j; \
+					*px1 = _ZERO_; \
+					SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					px1 += 1; \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					*px1 = _ONE_; \
+					SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					++px0; \
+					if (unpacked) \
+						px0 += n - j - 1; \
+					px1 += 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px0 += j; \
+					++px0; \
+					*px1 = _ONE_; \
+					SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					px1 += 1; \
+				} \
+			} \
+		} \
+	} while (0)
 
 #define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_, _DIVIDE_) \
 	do { \
@@ -1444,96 +1502,6 @@ static void dense_colsum(SEXP x, const char *class,
 			_DIVIDE_((*px1), count); \
 	} while (0)
 
-#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
-	             _ZERO_, _ONE_, _NA_, _ISNA_, \
-	             _CAST_, _INCREMENT_, _DIVIDE_) \
-	do { \
-		_CTYPE0_ *px0 = _PTR0_(  x); \
-		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
-		if (class[1] == 'g') { \
-			for (j = 0; j < n; ++j) { \
-				*px1 = _ZERO_; \
-				SUM_KERNEL(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
-				           _CAST_, _INCREMENT_, _DIVIDE_); \
-				px1 += 1; \
-			} \
-		} else if (class[2] != 'p') { \
-			if (ul == 'U') { \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						*px1 = _ZERO_; \
-						SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px0 += n - j - 1; \
-						px1 += 1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j) { \
-						*px1 = _ONE_; \
-						SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px0 += n - j - 1; \
-						px1 += 1; \
-					} \
-				} \
-			} else { \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						px0 += j; \
-						*px1 = _ZERO_; \
-						SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px1 += 1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j) { \
-						px0 += j + 1; \
-						*px1 = _ONE_; \
-						SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px1 += 1; \
-					} \
-				} \
-			} \
-		} else { \
-			if (ul == 'U') { \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						*px1 = _ZERO_; \
-						SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px1 += 1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j) { \
-						*px1 = _ONE_; \
-						SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px0 += 1; \
-						px1 += 1; \
-					} \
-				} \
-			} else { \
-				if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						*px1 = _ZERO_; \
-						SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px1 += 1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j) { \
-						px1 += 1; \
-						*px1 = _ZERO_; \
-						SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
-						           _CAST_, _INCREMENT_, _DIVIDE_); \
-						px1 += 1; \
-					} \
-				} \
-			} \
-		} \
-	} while (0)
-
 	SUM_CASES;
 
 #undef SUM_LOOP
@@ -1546,52 +1514,13 @@ static void dense_rowsum(SEXP x, const char *class,
                          int m, int n, char ul, char di, int narm, int mean,
                          SEXP res)
 {
-	int narm_ = narm && mean && class[0] != 'n', i, j, *count = NULL;
+	int i, j, *count = NULL, narm_ = narm && mean && class[0] != 'n',
+		unpacked = class[2] != 'p', symmetric = class[1] == 's';
 	if (narm_) {
 		Matrix_Calloc(count, m, int);
 		for (i = 0; i < m; ++i)
 			count[i] = n;
 	}
-
-#define SUM_KERNEL1(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_) \
-	do { \
-		_FOR_ { \
-			if (_ISNA_(*px0)) { \
-				if (!narm) \
-					px1[i] = _NA_; \
-				else if (narm_) \
-					--count; \
-			} else { \
-				tmp = _CAST_(*px0); \
-				_INCREMENT_(px1[i], tmp); \
-			} \
-			++px0; \
-		} \
-	} while (0)
-
-#define SUM_KERNEL2(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_) \
-	do { \
-		_FOR_ { \
-			off = i != j; \
-			if (_ISNA_(*px0)) { \
-				if (!narm) { \
-					px1[i] = _NA_; \
-					if (off) \
-					px1[j] = _NA_; \
-				} else if (narm_) { \
-					--count[i]; \
-					if (off) \
-					--count[j]; \
-				} \
-			} else { \
-				tmp = _CAST_(*px0); \
-				_INCREMENT_(px1[i], tmp); \
-				if (off) \
-				_INCREMENT_(px1[j], tmp); \
-			} \
-			++px0; \
-		} \
-	} while (0)
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
@@ -1603,91 +1532,40 @@ static void dense_rowsum(SEXP x, const char *class,
 			px1[i] = tmp; \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) \
-				SUM_KERNEL1(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
-				            _CAST_, _INCREMENT_); \
-		} else if (class[1] == 's') { \
-			int off; \
-			if (class[2] != 'p') { \
-				if (ul == 'U') { \
-					for (j = 0; j < n; ++j) { \
-						SUM_KERNEL2(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
+				SUM_KERNEL(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
+				           _CAST_, _INCREMENT_); \
+		} else if (class[1] == 's' || di == 'N') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_); \
+					if (unpacked) \
 						px0 += n - j - 1; \
-					} \
-				} else { \
-					for (j = 0; j < n; ++j) { \
-						px0 += j; \
-						SUM_KERNEL2(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} \
 				} \
 			} else { \
-				if (ul == 'U') { \
-					for (j = 0; j < n; ++j) \
-						SUM_KERNEL2(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-				} else { \
-					for (j = 0; j < n; ++j) \
-						SUM_KERNEL2(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px0 += j; \
+					SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_); \
 				} \
 			} \
 		} else { \
-			if (class[2] != 'p') { \
-				if (ul == 'U') { \
-					if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						SUM_KERNEL1(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_); \
+					++px0; \
+					if (unpacked) \
 						px0 += n - j - 1; \
-					} \
-					} else { \
-					for (j = 0; j < n; ++j) { \
-						SUM_KERNEL1(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-						px0 += n - j; \
-					} \
-					} \
-				} else { \
-					if (di == 'N') { \
-					for (j = 0; j < n; ++j) { \
-						px0 += j; \
-						SUM_KERNEL1(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} \
-					} else { \
-					for (j = 0; j < n; ++j) { \
-						px0 += j + 1; \
-						SUM_KERNEL1(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} \
-					} \
 				} \
 			} else { \
-				if (ul == 'U') { \
-					if (di == 'N') { \
-					for (j = 0; j < n; ++j) \
-						SUM_KERNEL1(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} else { \
-					for (j = 0; j < n; ++j) { \
-						SUM_KERNEL1(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-						px0 += 1; \
-					} \
-					} \
-				} else { \
-					if (di == 'N') { \
-					for (j = 0; j < n; ++j) \
-						SUM_KERNEL1(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} else { \
-					for (i = j = 0; j < n; ++j, i = j) { \
-						px0 += 1; \
-						SUM_KERNEL1(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
-						            _CAST_, _INCREMENT_); \
-					} \
-					} \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px0 += j; \
+					++px0; \
+					SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
+					           _CAST_, _INCREMENT_); \
 				} \
 			} \
 		} \
@@ -1701,11 +1579,34 @@ static void dense_rowsum(SEXP x, const char *class,
 		} \
 	} while (0)
 
+#define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_) \
+	do { \
+		_FOR_ { \
+			int again = symmetric && i != j; \
+			if (_ISNA_(*px0)) { \
+				if (!narm) { \
+					px1[i] = _NA_; \
+					if (again) \
+					px1[j] = _NA_; \
+				} else if (narm_) { \
+					--count[i]; \
+					if (again) \
+					--count[j]; \
+				} \
+			} else { \
+				tmp = _CAST_(*px0); \
+				_INCREMENT_(px1[i], tmp); \
+				if (again) \
+				_INCREMENT_(px1[j], tmp); \
+			} \
+			++px0; \
+		} \
+	} while (0)
+
 	SUM_CASES;
 
 #undef SUM_LOOP
-#undef SUM_KERNEL1
-#undef SUM_KERNEL2
+#undef SUM_KERNEL
 
 	if (narm_)
 		Matrix_Free(count, m);
@@ -1751,9 +1652,6 @@ SEXP dense_marginsum(SEXP obj, const char *class, int margin,
 	return res;
 }
 
-#undef SUM_CASES
-#undef SUM_TYPEOF
-
 /* (row|col)(Sums|Means)(<denseMatrix>) */
 SEXP R_dense_marginsum(SEXP obj, SEXP margin,
                        SEXP narm, SEXP mean)
@@ -1780,6 +1678,446 @@ SEXP R_dense_marginsum(SEXP obj, SEXP margin,
 
 	return dense_marginsum(obj, valid[ivalid], margin_, narm_, mean_);
 }
+
+#undef SUM_CASES
+#undef SUM_TYPEOF
+
+#define TRY_INCREMENT(_LABEL_) \
+	do { \
+		if ((s >= 0) \
+			? ( t <= MATRIX_INT_FAST64_MAX - s) \
+			: (-t <= s - MATRIX_INT_FAST64_MIN)) { \
+			s += t; \
+			t = 0; \
+			count = 0; \
+		} else { \
+			over = 1; \
+			goto _LABEL_; \
+		} \
+	} while (0)
+
+#define LONGDOUBLE_AS_DOUBLE(v) \
+	(v > DBL_MAX) ? R_PosInf : ((v < -DBL_MAX) ? R_NegInf : (double) v);
+
+SEXP dense_sum(SEXP obj, const char *class, int narm)
+{
+	SEXP res;
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	char ul = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (class[1] == 't') {
+			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+			di = *CHAR(STRING_ELT(diag, 0));
+		}
+	}
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j, unpacked = class[2] != 'p', symmetric = class[1] == 's';
+
+#define SUM_LOOP \
+	do { \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) \
+				SUM_KERNEL(for (i = 0; i < m; ++i)); \
+		} else if (class[1] == 's' || di == 'N') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					SUM_KERNEL(for (i = 0; i <= j; ++i)); \
+					if (unpacked) \
+						px += m - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px += j; \
+					SUM_KERNEL(for (i = j; i < m; ++i)); \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					SUM_KERNEL(for (i = 0; i < j; ++i)); \
+					++px; \
+					if (unpacked) \
+						px += m - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px += j; \
+					++px; \
+					SUM_KERNEL(for (i = j + 1; i < m; ++i)); \
+				} \
+			} \
+		} \
+	} while (0)
+
+	if (class[0] == 'n') {
+		int *px = LOGICAL(x);
+		Matrix_int_fast64_t s = (di == 'N') ? 0LL : n;
+
+#define SUM_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (*px != 0) \
+					s += (symmetric && i != j) ? 2 : 1; \
+				++px; \
+			} \
+		} while (0)
+
+		SUM_LOOP;
+
+#undef SUM_KERNEL
+
+		if (s <= INT_MAX) {
+			res = allocVector(INTSXP, 1);
+			INTEGER(res)[0] = (int) s;
+		} else {
+			res = allocVector(REALSXP, 1);
+			REAL(res)[0] = (double) s;
+		}
+		return res;
+	}
+
+	if (!narm && (class[0] == 'l' || class[0] == 'i')) {
+		int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
+
+#define SUM_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (*px == NA_INTEGER) { \
+					res = allocVector(INTSXP, 1); \
+					INTEGER(res)[0] = NA_INTEGER; \
+					return res; \
+				} \
+				++px; \
+			} \
+		} while (0)
+
+		SUM_LOOP;
+
+#undef SUM_KERNEL
+
+	}
+
+	if (class[0] == 'z') {
+		Rcomplex *px = COMPLEX(x);
+		long double zr = (di == 'N') ? 0.0L : n, zi = 0.0L;
+
+#define SUM_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (!(narm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
+					zr += (symmetric && i != j) \
+						? 2.0L * (*px).r : (*px).r; \
+					zi += (symmetric && i != j) \
+						? 2.0L * (*px).i : (*px).i; \
+				} \
+				++px; \
+			} \
+		} while (0)
+
+		SUM_LOOP;
+
+#undef SUM_KERNEL
+
+		res = allocVector(CPLXSXP, 1);
+		COMPLEX(res)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
+		COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
+	} else if (class[0] == 'd') {
+		double *px = REAL(x);
+		long double zr = (di == 'N') ? 0.0L : n;
+
+#define SUM_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (!(narm && ISNAN(*px))) \
+					zr += (symmetric && i != j) \
+						? 2.0L * *px : *px; \
+				++px; \
+			} \
+		} while (0)
+
+		SUM_LOOP;
+
+#undef SUM_KERNEL
+
+		res = allocVector(REALSXP, 1);
+		REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+	} else {
+		int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
+		Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+		unsigned int count = 0;
+		int over = 0;
+
+#define SUM_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (!(narm && *px == NA_INTEGER)) { \
+					int d = (symmetric && i != j) ? 2 : 1; \
+					if (count > UINT_MAX - d) \
+						TRY_INCREMENT(ifover); \
+					t += (d == 2) ? 2LL * *px : *px; \
+					count += d; \
+				} \
+				++px; \
+			} \
+		} while (0)
+
+		SUM_LOOP;
+
+#undef SUM_KERNEL
+
+		TRY_INCREMENT(ifover);
+	ifover:
+		if (over) {
+			long double zr = (di == 'N') ? 0.0L : n; /* FIXME: wasteful */
+			px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
+
+#define SUM_KERNEL(_FOR_) \
+			do { \
+				_FOR_ { \
+					if (!(narm && *px == NA_INTEGER)) \
+						zr += (symmetric && i != j) \
+							? 2.0L * *px : *px; \
+					++px; \
+				} \
+			} while (0)
+
+			SUM_LOOP;
+
+#undef SUM_KERNEL
+
+			res = allocVector(REALSXP, 1);
+			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+		} else if (s > INT_MIN && s <= INT_MAX) {
+			res = allocVector(INTSXP, 1);
+			INTEGER(res)[0] = (int) s;
+		} else {
+			res = allocVector(REALSXP, 1);
+			REAL(res)[0] = (double) s;
+		}
+	}
+
+#undef SUM_LOOP
+
+	return res;
+}
+
+/* sum(<denseMatrix>) */
+SEXP R_dense_sum(SEXP obj, SEXP narm)
+{
+	static const char *valid[] = { VALID_DENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	int narm_;
+	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
+	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
+
+	return dense_sum(obj, valid[ivalid], narm_);
+}
+
+SEXP dense_prod(SEXP obj, const char *class, int narm)
+{
+	SEXP res = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	char ul = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (class[1] == 't') {
+			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+			di = *CHAR(STRING_ELT(diag, 0));
+		}
+	}
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int i, j, unpacked = class[2] != 'p', symmetric = class[1] == 's';
+	long double zr = 1.0L, zi = 0.0L;
+
+#define PROD_LOOP \
+	do { \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) \
+				PROD_KERNEL(for (i = 0; i < m; ++i)); \
+		} else if (class[1] == 's') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					PROD_KERNEL(for (i = 0; i <= j; ++i)); \
+					if (unpacked) \
+						px += m - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (unpacked) \
+						px += j; \
+					PROD_KERNEL(for (i = j; i < m; ++i)); \
+				} \
+			} \
+		} else if (di == 'N') { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					if (j == 1) { zr *= 0.0L; zi *= 0.0L; } \
+					PROD_KERNEL(for (i = 0; i <= j; ++i)); \
+					if (unpacked) \
+						px += m - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (j == 1) { zr *= 0.0L; zi *= 0.0L; } \
+					if (unpacked) \
+						px += j; \
+					PROD_KERNEL(for (i = j; i < m; ++i)); \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				for (j = 0; j < n; ++j) { \
+					if (j == 1) { zr *= 0.0L; zi *= 0.0L; } \
+					PROD_KERNEL(for (i = 0; i < j; ++i)); \
+					++px; \
+					if (unpacked) \
+						px += m - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					if (j == 1) { zr *= 0.0L; zi *= 0.0L; } \
+					if (unpacked) \
+						px += j; \
+					++px; \
+					PROD_KERNEL(for (i = j + 1; i < m; ++i)); \
+				} \
+			} \
+		} \
+	} while (0)
+
+	if (class[0] == 'n') {
+		int *px = LOGICAL(x);
+
+#define PROD_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (*px == 0) { \
+					REAL(res)[0] = 0.0; \
+					UNPROTECT(1); /* res */ \
+					return res; \
+				} \
+				++px; \
+			} \
+		} while (0)
+
+		PROD_LOOP;
+
+#undef PROD_KERNEL
+
+		REAL(res)[0] = 1.0;
+		UNPROTECT(1); /* res */
+		return res;
+	}
+
+	if (class[0] == 'z') {
+		Rcomplex *px = COMPLEX(x);
+		long double zr0, zi0;
+
+#define PROD_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (!(narm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
+					zr0 = zr; zi0 = zi; \
+					zr = zr0 * (*px).r - zi0 * (*px).i; \
+					zi = zr0 * (*px).i + zi0 * (*px).r; \
+					if (symmetric && i != j) { \
+					zr0 = zr; zi0 = zi; \
+					zr = zr0 * (*px).r - zi0 * (*px).i; \
+					zi = zr0 * (*px).i + zi0 * (*px).r; \
+					} \
+				} \
+				++px; \
+			} \
+		} while (0)
+
+		PROD_LOOP;
+
+#undef PROD_KERNEL
+
+	} else if (class[0] == 'd') {
+		double *px = REAL(x);
+
+#define PROD_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (!(narm && ISNAN(*px))) \
+					zr *= (symmetric && i != j) \
+						? (long double) *px * *px : *px; \
+				++px; \
+			} \
+		} while (0)
+
+		PROD_LOOP;
+
+#undef PROD_KERNEL
+
+	} else {
+		int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
+
+#define PROD_KERNEL(_FOR_) \
+		do { \
+			_FOR_ { \
+				if (*px != NA_INTEGER) \
+					zr *= (symmetric && i != j) \
+						? (long double) *px * *px : *px; \
+				else if (!narm) \
+					zr *= NA_REAL; \
+				++px; \
+			} \
+		} while (0)
+
+		PROD_LOOP;
+
+#undef PROD_KERNEL
+
+	}
+
+#undef PROD_LOOP
+
+	if (class[0] == 'z') {
+		COMPLEX(res)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
+		COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
+	} else
+		   REAL(res)[0]   = LONGDOUBLE_AS_DOUBLE(zr);
+	UNPROTECT(1); /* res */
+	return res;
+}
+
+/* prod(<denseMatrix>) */
+SEXP R_dense_prod(SEXP obj, SEXP narm)
+{
+	static const char *valid[] = { VALID_DENSE, "" };
+	int ivalid = R_check_class_etc(obj, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(obj, __func__);
+
+	int narm_;
+	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
+	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
+
+	return dense_prod(obj, valid[ivalid], narm_);
+}
+
+#undef TRY_INCREMENT
+#undef LONGDOUBLE_AS_DOUBLE
 
 /* MJ: unused */
 #if 0

@@ -2706,14 +2706,14 @@ static void Csparse_colsum(SEXP obj, const char *class,
                            int m, int n, char di, int narm, int mean,
                            SEXP res)
 {
-	int narm_ = narm && mean && class[0] != 'n', unit = di != 'N';
+	int narm_ = narm && mean && class[0] != 'n';
 
 	SEXP p0 = PROTECT(GET_SLOT(obj, Matrix_pSym));
 	int *pp0 = INTEGER(p0) + 1, j, k, kend, nnz1 = n, count = -1;
 
 	if (IS_S4_OBJECT(res)) {
 
-		if (!unit) {
+		if (di == 'N') {
 			nnz1 = 0;
 			for (j = 0; j < n; ++j)
 				if (pp0[j - 1] < pp0[j])
@@ -2727,7 +2727,7 @@ static void Csparse_colsum(SEXP obj, const char *class,
 		SET_SLOT(res, Matrix_xSym, x1);
 
 		int *pj1 = INTEGER(j1);
-		if (unit)
+		if (di != 'N')
 			for (j = 0; j < n; ++j)
 				*(pj1++) = j + 1;
 		else
@@ -2744,7 +2744,7 @@ static void Csparse_colsum(SEXP obj, const char *class,
 			for (j = 0, k = 0; j < n; ++j) { \
 				kend = pp0[j]; \
 				if (k < kend || nnz1 == n) { \
-					*px1 = (unit) ? _ONE_ : _ZERO_; \
+					*px1 = (di != 'N') ? _ONE_ : _ZERO_; \
 					if (mean) \
 						count = m; \
 					while (k < kend) { \
@@ -2787,7 +2787,7 @@ static void Csparse_rowsum(SEXP obj, const char *class,
                            int m, int n, char di, int narm, int mean,
                            SEXP res, SEXP iSym)
 {
-	int narm_ = narm && mean && class[0] != 'n', unit = di != 'N';
+	int narm_ = narm && mean && class[0] != 'n';
 
 	SEXP p0 = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i0 = PROTECT(GET_SLOT(obj, iSym));
@@ -2798,7 +2798,7 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 
 		int *work;
 		Matrix_Calloc(work, m, int);
-		if (unit)
+		if (di != 'N')
 			for (i = 0; i < m; ++i)
 				work[i] = i;
 		else {
@@ -2837,7 +2837,7 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 		do { \
 			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
 			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
-			       _CTYPE1_  tmp = (unit) ? _ONE_ : _ZERO_; \
+			       _CTYPE1_  tmp = (di != 'N') ? _ONE_ : _ZERO_; \
 			for (i = 0; i < nnz1; ++i) \
 				px1[i] = tmp; \
 			if (class[1] != 's') { \
@@ -2920,7 +2920,7 @@ static void Tsparse_colsum(SEXP obj, const char *class,
                            int m, int n, char di, int narm, int mean,
                            SEXP res, SEXP iSym, SEXP jSym)
 {
-	int narm_ = narm && mean && class[0] != 'n', unit = di != 'N';
+	int narm_ = narm && mean && class[0] != 'n';
 	if (narm_)
 		obj = Tsparse_aggregate(obj);
 	PROTECT(obj);
@@ -2934,7 +2934,7 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 
 		int *work;
 		Matrix_Calloc(work, n, int);
-		if (unit)
+		if (di != 'N')
 			for (j = 0; j < n; ++j)
 				work[j] = j;
 		else {
@@ -2969,7 +2969,7 @@ static void Tsparse_colsum(SEXP obj, const char *class,
 		do { \
 			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
 			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
-			       _CTYPE1_  tmp = (unit) ? _ONE_ : _ZERO_; \
+			       _CTYPE1_  tmp = (di != 'N') ? _ONE_ : _ZERO_; \
 			for (j = 0; j < nnz1; ++j) \
 				px1[j] = tmp; \
 			if (class[1] != 's') { \
@@ -3112,9 +3112,6 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 	return res;
 }
 
-#undef SUM_CASES
-#undef SUM_TYPEOF
-
 /* (row|col)(Sums|Means)(<[CRT]sparseMatrix>) */
 SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
                         SEXP narm, SEXP mean, SEXP sparse)
@@ -3149,6 +3146,9 @@ SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
 	                        margin_, narm_, mean_, sparse_);
 }
 
+#undef SUM_CASES
+#undef SUM_TYPEOF
+
 #define TRY_INCREMENT(_LABEL_) \
 	do { \
 		if ((s >= 0) \
@@ -3172,18 +3172,33 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		obj = Tsparse_aggregate(obj);
 	PROTECT(obj);
 
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	UNPROTECT(1); /* dim */
+	SEXP res;
 
-	int symmetric = class[1] == 's', unit = 0;
-	if (class[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
-		unit = *CHAR(STRING_ELT(diag, 0)) != 'N';
-		UNPROTECT(1); /* diag */
+	if (!narm && (class[0] == 'l' || class[0] == 'i')) {
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
+		R_xlen_t nx = XLENGTH(x);
+		while (nx--) {
+			if (*px == NA_INTEGER) {
+				res = allocVector(INTSXP, 1);
+				INTEGER(res)[0] = NA_INTEGER;
+				UNPROTECT(1); /* obj */
+				return res;
+			}
+			++px;
+		}
 	}
 
-	SEXP res;
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	int symmetric = class[1] == 's';
+
+	char di = 'N';
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		di = *CHAR(STRING_ELT(diag, 0));
+	}
 
 	if (class[2] != 'T') {
 
@@ -3195,12 +3210,11 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 
 		if (class[0] == 'n') {
 			Matrix_int_fast64_t nnz = pp[n_ - 1];
-			if (unit)
+			if (di != 'N')
 				nnz += n;
 			if (symmetric) {
-				SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+				SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 				char ul = *CHAR(STRING_ELT(uplo, 0));
-				UNPROTECT(1); /* uplo */
 
 				nnz *= 2;
 				for (j_ = 0; j_ < n_; ++j_) {
@@ -3221,11 +3235,12 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			return res;
 		}
 
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		UNPROTECT(2); /* i, p */
 
 		if (class[0] == 'z') {
 			Rcomplex *px = COMPLEX(x);
-			long double zr = (unit) ? n : 0.0, zi = 0.0;
+			long double zr = (di == 'N') ? 0.0L : n, zi = 0.0L;
 			for (j_ = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				while (k < kend) {
@@ -3243,7 +3258,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
 		} else if (class[0] == 'd') {
 			double *px = REAL(x);
-			long double zr = (unit) ? n : 0.0;
+			long double zr = (di == 'N') ? 0.0L : n;
 			for (j_ = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				while (k < kend) {
@@ -3256,64 +3271,46 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			res = allocVector(REALSXP, 1);
 			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 		} else {
-			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x), anyNA = 0;
-			if (!narm) {
-				kend = pp[n_ - 1];
+			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
+			Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+			unsigned int count = 0;
+			int over = 0;
+			for (j_ = 0; j_ < n_; ++j_) {
+				kend = pp[j_];
 				while (k < kend) {
-					if (px[k] == NA_INTEGER) {
-						anyNA = 1;
-						break;
+					if (!narm || px[k] != NA_INTEGER) {
+						int d = (symmetric && pi[k] != j_) ? 2 : 1;
+						if (count > UINT_MAX - d)
+							TRY_INCREMENT(ifoverC);
+						t += (d == 2) ? 2LL * px[k] : px[k];
+						count += d;
 					}
 					++k;
 				}
-				k = 0;
 			}
-			if (anyNA) {
-				res = allocVector(INTSXP, 1);
-				INTEGER(res)[0] = NA_INTEGER;
-			} else {
-				Matrix_int_fast64_t s = (unit) ? n : 0, t = 0;
-				unsigned int count = 0;
-				int over = 0;
-				for (j_ = 0; j_ < n_; ++j_) {
+			TRY_INCREMENT(ifoverC);
+		ifoverC:
+			if (over) {
+				long double zr = (long double) s + (long double) t;
+				for (; j_ < n_; ++j_) {
 					kend = pp[j_];
 					while (k < kend) {
-						if (!narm || px[k] != NA_INTEGER) {
-							int d = (symmetric && pi[k] != j_) ? 2 : 1;
-							if (count > UINT_MAX - d)
-								TRY_INCREMENT(ifoverC);
-							t += (d == 2) ? 2LL * px[k] : px[k];
-							count += d;
-						}
+						if (!narm || px[k] != NA_INTEGER)
+							zr += (symmetric && pi[k] != j_)
+								? 2.0L * px[k] : px[k];
 						++k;
 					}
 				}
-				TRY_INCREMENT(ifoverC);
-			ifoverC:
-				if (over) {
-					long double zr = (long double) s + (long double) t;
-					for (; j_ < n_; ++j_) {
-						kend = pp[j_];
-						while (k < kend) {
-							if (!narm || px[k] != NA_INTEGER)
-								zr += (symmetric && pi[k] != j_)
-									? 2.0L * px[k] : px[k];
-							++k;
-						}
-					}
-					res = allocVector(REALSXP, 1);
-					REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
-				} else if (s > INT_MIN && s <= INT_MAX) {
-					res = allocVector(INTSXP, 1);
-					INTEGER(res)[0] = (int) s;
-				} else {
-					res = allocVector(REALSXP, 1);
-					REAL(res)[0] = (double) s;
-				}
+				res = allocVector(REALSXP, 1);
+				REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+			} else if (s > INT_MIN && s <= INT_MAX) {
+				res = allocVector(INTSXP, 1);
+				INTEGER(res)[0] = (int) s;
+			} else {
+				res = allocVector(REALSXP, 1);
+				REAL(res)[0] = (double) s;
 			}
 		}
-
-		UNPROTECT(3); /* x, i, p */
 
 	} else {
 
@@ -3324,7 +3321,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 
 		if (class[0] == 'n') {
 			Matrix_int_fast64_t nnz = (Matrix_int_fast64_t) kend;
-			if (unit)
+			if (di != 'N')
 				nnz += n;
 			if (symmetric) {
 				nnz *= 2;
@@ -3343,11 +3340,12 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			return res;
 		}
 
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		UNPROTECT(2); /* j, i */
 
 		if (class[0] == 'z') {
 			Rcomplex *px = COMPLEX(x);
-			long double zr = (unit) ? n : 0.0, zi = 0.0;
+			long double zr = (di == 'N') ? 0.0L : n, zi = 0.0L;
 			for (k = 0; k < kend; ++k)
 				if (!(narm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {
 					zr += (symmetric && pi[k] != pj[k])
@@ -3360,7 +3358,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
 		} else if (class[0] == 'd') {
 			double *px = REAL(x);
-			long double zr = (unit) ? n : 0.0;
+			long double zr = (di == 'N') ? 0.0L : n;
 			for (k = 0; k < kend; ++k)
 				if (!(narm && ISNAN(px[k])))
 					zr += (symmetric && pi[k] != pj[k])
@@ -3368,51 +3366,37 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			res = allocVector(REALSXP, 1);
 			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 		} else {
-			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x), anyNA = 0;
-			if (!narm) {
-				for (k = 0; k < kend; ++k)
-					if (px[k] == NA_INTEGER) {
-						anyNA = 1;
-						break;
-					}
+			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
+			Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+			unsigned int count = 0;
+			int over = 0;
+			for (k = 0; k < kend; ++k) {
+				if (!narm || px[k] != NA_INTEGER) {
+					int d = (symmetric && pi[k] != pj[k]) ? 2 : 1;
+					if (count > UINT_MAX - d)
+						TRY_INCREMENT(ifoverT);
+					t += (d == 2) ? 2LL * px[k] : px[k];
+					count += d;
+				}
 			}
-			if (anyNA) {
+			TRY_INCREMENT(ifoverT);
+		ifoverT:
+			if (over) {
+				long double zr = (long double) s + (long double) t;
+				for (; k < kend; ++k)
+					if (!(narm && px[k] == NA_INTEGER))
+						zr += (symmetric && pi[k] != pj[k])
+							? 2.0L * px[k] : px[k];
+				res = allocVector(REALSXP, 1);
+				REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+			} else if (s > INT_MIN && s <= INT_MAX) {
 				res = allocVector(INTSXP, 1);
-				INTEGER(res)[0] = NA_INTEGER;
+				INTEGER(res)[0] = (int) s;
 			} else {
-				Matrix_int_fast64_t s = (unit) ? n : 0, t = 0;
-				unsigned int count = 0;
-				int over = 0;
-				for (k = 0; k < kend; ++k) {
-					if (!narm || px[k] != NA_INTEGER) {
-						int d = (symmetric && pi[k] != pj[k]) ? 2 : 1;
-						if (count > UINT_MAX - d)
-							TRY_INCREMENT(ifoverT);
-						t += (d == 2) ? 2LL * px[k] : px[k];
-						count += d;
-					}
-				}
-				TRY_INCREMENT(ifoverT);
-			ifoverT:
-				if (over) {
-					long double zr = (long double) s + (long double) t;
-					for (; k < kend; ++k)
-						if (!narm || px[k] != NA_INTEGER)
-							zr += (symmetric && pi[k] != pj[k])
-								? 2.0L * px[k] : px[k];
-					res = allocVector(REALSXP, 1);
-					REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
-				} else if (s > INT_MIN && s <= INT_MAX) {
-					res = allocVector(INTSXP, 1);
-					INTEGER(res)[0] = (int) s;
-				} else {
-					res = allocVector(REALSXP, 1);
-					REAL(res)[0] = (double) s;
-				}
+				res = allocVector(REALSXP, 1);
+				REAL(res)[0] = (double) s;
 			}
 		}
-
-		UNPROTECT(3); /* x, j, i */
 
 	}
 
@@ -3443,21 +3427,22 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		obj = Tsparse_aggregate(obj);
 	PROTECT(obj);
 
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	UNPROTECT(1); /* dim */
+	SEXP res = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
 
-	int symmetric = class[1] == 's', unit = 0;
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	int symmetric = class[1] == 's';
+
+	char di = 'N';
 	if (class[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
-		unit = *CHAR(STRING_ELT(diag, 0)) != 'N';
-		UNPROTECT(1); /* diag */
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		di = *CHAR(STRING_ELT(diag, 0));
 	}
 
-	SEXP res = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
 	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n,
 		nnz, nnzmax = (symmetric) ? (mn + n) / 2 : mn;
-	long double zr = 1.0, zi = 0.0;
+	long double zr = 1.0L, zi = 0.0L;
 
 	if (class[2] != 'T') {
 
@@ -3469,7 +3454,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			seen0 = 0;
 
 		nnz = pp[n_ - 1];
-		if (unit)
+		if (di != 'N')
 			nnz += n;
 		if (class[0] == 'n') {
 			REAL(res)[0] = (nnz == nnzmax) ? 1.0 : 0.0;
@@ -3477,22 +3462,24 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			return res;
 		}
 
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		UNPROTECT(2); /* i, p */
 
 		if (class[0] == 'z') {
-			long double zr0, zi0;
 			Rcomplex *px = COMPLEX(x);
-			int t;
+			long double zr0, zi0;
 			for (j_ = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				if (seen0 || kend - k == m_) {
 					while (k < kend) {
 						if (!(narm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {
-							t = (symmetric && pi[k] != j_) ? 2 : 1;
-							while (t--) {
-								zr0 = zr; zi0 = zi;
-								zr = zr0 * px[k].r - zi0 * px[k].i;
-								zi = zr0 * px[k].i + zi0 * px[k].r;
+							zr0 = zr; zi0 = zi;
+							zr = zr0 * px[k].r - zi0 * px[k].i;
+							zi = zr0 * px[k].i + zi0 * px[k].r;
+							if (symmetric && pi[k] != j_) {
+							zr0 = zr; zi0 = zi;
+							zr = zr0 * px[k].r - zi0 * px[k].i;
+							zi = zr0 * px[k].i + zi0 * px[k].r;
 							}
 						}
 						++k;
@@ -3503,17 +3490,19 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						if (k >= kend)
 							break;
 						if (!(narm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {
-							t = (symmetric && pi[k] != j_) ? 2 : 1;
-							while (t--) {
-								zr0 = zr; zi0 = zi;
-								zr = zr0 * px[k].r - zi0 * px[k].i;
-								zi = zr0 * px[k].i + zi0 * px[k].r;
+							zr0 = zr; zi0 = zi;
+							zr = zr0 * px[k].r - zi0 * px[k].i;
+							zi = zr0 * px[k].i + zi0 * px[k].r;
+							if (symmetric && pi[k] != j_) {
+							zr0 = zr; zi0 = zi;
+							zr = zr0 * px[k].r - zi0 * px[k].i;
+							zi = zr0 * px[k].i + zi0 * px[k].r;
 							}
 						}
 						++k;
-						} else if (!unit || i_ != j_) {
-						zr *= 0.0;
-						zi *= 0.0;
+						} else if (di == 'N' || i_ != j_) {
+						zr *= 0.0L;
+						zi *= 0.0L;
 						seen0 = 1;
 						}
 					}
@@ -3527,7 +3516,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 					while (k < kend) {
 						if (!(narm && ISNAN(px[k])))
 							zr *= (symmetric && pi[k] != j_)
-								? px[k] * px[k] : px[k];
+								? (long double) px[k] * px[k] : px[k];
 						++k;
 					}
 				} else {
@@ -3537,17 +3526,17 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 							break;
 						if (!(narm && ISNAN(px[k])))
 							zr *= (symmetric && pi[k] != j_)
-								? px[k] * px[k] : px[k];
+								? (long double) px[k] * px[k] : px[k];
 						++k;
-						} else if (!unit || i_ != j_) {
-						zr *= 0.0;
+						} else if (di == 'N' || i_ != j_) {
+						zr *= 0.0L;
 						seen0 = 1;
 						}
 					}
 				}
 			}
 		} else {
-			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
+			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
 			for (j_ = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				if (seen0 || kend - k == m_) {
@@ -3570,16 +3559,14 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						else if (!narm)
 							zr *= NA_REAL;
 						++k;
-						} else if (!unit || i_ != j_) {
-						zr *= 0.0;
+						} else if (di == 'N' || i_ != j_) {
+						zr *= 0.0L;
 						seen0 = 1;
 						}
 					}
 				}
 			}
 		}
-
-		UNPROTECT(3); /* x, i, p */
 
 	} else {
 
@@ -3589,7 +3576,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		R_xlen_t k, kend = XLENGTH(i);
 
 		nnz = (Matrix_int_fast64_t) kend;
-		if (unit)
+		if (di != 'N')
 			nnz += n;
 		if (class[0] == 'n') {
 			REAL(res)[0] = (nnz == nnzmax) ? 1.0 : 0.0;
@@ -3599,19 +3586,21 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		if (nnz < mn)
 			zr = 0.0;
 
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		UNPROTECT(2); /* j, i */
 
 		if (class[0] == 'z') {
-			long double zr0, zi0;
 			Rcomplex *px = COMPLEX(x);
-			int t;
+			long double zr0, zi0;
 			for (k = 0; k < kend; ++k)
 				if (!(narm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {
-					t = (symmetric && pi[k] != pj[k]) ? 2 : 1;
-					while (t--) {
-						zr0 = zr; zi0 = zi;
-						zr = zr0 * px[k].r - zi0 * px[k].i;
-						zi = zr0 * px[k].i + zi0 * px[k].r;
+					zr0 = zr; zi0 = zi;
+					zr = zr0 * px[k].r - zi0 * px[k].i;
+					zi = zr0 * px[k].i + zi0 * px[k].r;
+					if (symmetric && pi[k] != pj[k]) {
+					zr0 = zr; zi0 = zi;
+					zr = zr0 * px[k].r - zi0 * px[k].i;
+					zi = zr0 * px[k].i + zi0 * px[k].r;
 					}
 				}
 		} else if (class[0] == 'd') {
@@ -3619,9 +3608,9 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			for (k = 0; k < kend; ++k)
 				if (!(narm && ISNAN(px[k])))
 					zr *= (symmetric && pi[k] != pj[k])
-						? px[k] * px[k] : px[k];
+						? (long double) px[k] * px[k] : px[k];
 		} else {
-			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
+			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
 			for (k = 0; k < kend; ++k)
 				if (px[k] != NA_INTEGER)
 					zr *= (symmetric && pi[k] != pj[k])
@@ -3630,8 +3619,6 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 					zr *= NA_REAL;
 		}
 
-		UNPROTECT(3); /* x, j, i */
-
 	}
 
 	if (class[0] == 'z') {
@@ -3639,9 +3626,6 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
 	} else
 		   REAL(res)[0]   = LONGDOUBLE_AS_DOUBLE(zr);
-
-#undef LONGDOUBLE_AS_DOUBLE
-
 	UNPROTECT(2); /* res, obj */
 	return res;
 }
@@ -3662,6 +3646,9 @@ SEXP R_sparse_prod(SEXP obj, SEXP narm)
 
 	return sparse_prod(obj, valid[ivalid], narm_);
 }
+
+#undef TRY_INCREMENT
+#undef LONGDOUBLE_AS_DOUBLE
 
 SEXP Tsparse_aggregate(SEXP from)
 {
