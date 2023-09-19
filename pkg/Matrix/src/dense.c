@@ -2003,17 +2003,17 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	} while (0)
 
 	if (class[0] == 'n') {
-		UNPROTECT(1); /* res */
-		if (class[1] == 't' && n > 1)
-			REAL(res)[0] = 0.0;
+		int *px = LOGICAL(x);
+		if (class[1] == 't')
+			REAL(res)[0] = (n > 1 || (n == 1 && *px == 0)) ? 0.0 : 1.0;
 		else {
-			int *px = LOGICAL(x);
 
 #define PROD_KERNEL(_FOR_) \
 			do { \
 				_FOR_ { \
 					if (*px == 0) { \
 						REAL(res)[0] = 0.0; \
+						UNPROTECT(1); /* res */ \
 						return res; \
 					} \
 					++px; \
@@ -2023,8 +2023,10 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 			PROD_LOOP;
 
 #undef PROD_KERNEL
+			
 			REAL(res)[0] = 1.0;
 		}
+		UNPROTECT(1); /* res */
 		return res;
 	}
 
