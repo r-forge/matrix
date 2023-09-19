@@ -72,14 +72,16 @@ setMethod("diag<-", signature(x = "diagonalMatrix"),
                                      x <- .M2kind(x, "d")
                                      rep_len(as.double(x), n)
                                  },
-                             stop(gettextf("replacement diagonal has incompatible type \"%s\"", typeof(value)),
+                             stop(gettextf("replacement diagonal has incompatible type \"%s\"",
+                                           typeof(value)),
                                   domain = NA))
                   else
                       switch(typeof(value),
                              logical =,
                              integer =,
                              double = rep_len(as.double(value), n),
-                             stop(gettextf("replacement diagonal has incompatible type \"%s\"", typeof(value)),
+                             stop(gettextf("replacement diagonal has incompatible type \"%s\"",
+                                           typeof(value)),
                                   domain = NA))
               x@diag <- "N"
               x

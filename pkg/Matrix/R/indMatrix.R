@@ -3,67 +3,66 @@
 ## for all rows _or_ all columns
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.perm2ind <- function(perm, n, margin = 1L, check.p = FALSE) {
-    perm.i <- perm
-    if(!is.numeric(perm))
-        stop("'perm' must be numeric")
-    else if(anyNA(r <- range(perm)) || r[1L] < 1L ||
-            (is.double(perm) && any(perm != (perm.i <- as.integer(perm)))))
-        stop("elements of 'perm' must be positive integers")
-    else if((m.i <- length(perm)) > (M <- .Machine$integer.max) || r[2L] > M)
-        stop("dimensions cannot exceed 2^31-1")
+.perm2ind <- function(perm, n, margin = 1L, check.p = 0L) {
+    if(mode(perm) != "numeric")
+        stop(gettextf("'%s' is not of type \"%s\" or \"%s\"",
+                      "perm", "integer", "double"),
+             domain = NA)
+    else if((m <- length(perm)) == 0L)
+        perm <- integer(0L)
+    else if(anyNA(r <- range(perm)))
+        stop(gettextf("'%s' contains NA", "perm"),
+             domain = NA)
+    else if(r[1L] < 1L)
+        stop(gettextf("'%s' has elements less than %d", "perm", 1L),
+             domain = NA)
+    else if(m > .Machine$integer.max ||
+            (is.double(perm) && trunc(r[2L]) > .Machine$integer.max))
+        stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+             domain = NA)
+    else { perm <- as.integer(perm); r <- as.integer(r) }
 
-    if(missing(n))
-        n.i <- as.integer(r[2L])
-    else {
-        n.i <- n
-        if(!is.numeric(n) || length(n) != 1L || is.na(n) || n < 0L ||
-           (is.double(n) && n != (n.i <- as.integer(n))))
-            stop("'n' must be a non-negative integer")
-        else if(n > M)
-            stop("dimensions cannot exceed 2^31-1")
-        else if(r[2L] > n)
-            stop("elements of 'perm' cannot exceed 'n'")
-    }
+    if(m.n <- missing(n))
+        n <- if(m == 0L) 0L else r[2L]
+    else if(mode(n) != "numeric" || length(n) != 1L || is.na(n) || n < 0L)
+        stop(gettextf("'%s' is not a non-negative number", "n"),
+             domain = NA)
+    else if(is.double(n) && trunc(n) > .Machine$integer.max)
+        stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+             domain = NA)
+    else if(r[2L] > as.integer(n))
+        stop(gettextf("'%s' has elements exceeding '%s'", "perm", "n"),
+             domain = NA)
+    else n <- as.integer(n)
 
-    if(!is.numeric(margin) || length(margin) != 1L || is.na(margin) ||
+    if(mode(margin) != "numeric" || length(margin) != 1L || is.na(margin) ||
        (margin != 1L && margin != 2L))
-        stop("'margin' must be 1 or 2")
-    margin.i <- as.integer(margin)
+        stop(gettextf("'%s' is not %d or %d", "margin", 1L, 2L),
+             domain = NA)
 
-    give.p <- check.p && m.i == n.i &&
-        (m.i == 0L || (all(r == c(1L, m.i)) && !anyDuplicated.default(perm.i)))
+    give.p <- check.p >= 1L && m == n &&
+        (m == 0L || (all(r == c(1L, m)) && !anyDuplicated.default(perm)))
+    if(check.p >= 2L && !give.p)
+        stop(gettextf("'%s' is not a permutation of seq_len(%s)",
+                      "perm", if(m.n) "max(perm, 0)" else "n"),
+             domain = NA)
 
     J <- new(if(give.p) "pMatrix" else "indMatrix")
     nms <- names(perm)
-    if(margin.i == 1L) {
-        J@Dim <- c(m.i, n.i)
+    if(margin == 1L) {
+        J@Dim <- c(m, n)
         J@Dimnames = list(nms, if(give.p) nms)
     } else {
-        J@Dim <- c(n.i, m.i)
+        J@Dim <- c(n, m)
         J@Dimnames = list(if(give.p) nms, nms)
         J@margin <- 2L
     }
-    J@perm <- perm.i
+    J@perm <- perm
     J
 }
 
 setAs("numeric", "indMatrix",
-      function(from) {
-          J <- new("indMatrix")
-          if((m <- length(from)) == 0L)
-              return(J)
-          from.i <- from
-          if(anyNA(r <- range(from)) || r[1L] < 1L ||
-             (is.double(from) && any(from != (from.i <- as.integer(from)))))
-              stop("elements of 'perm' slot must be positive integers")
-          if(m > (M <- .Machine$integer.max) || r[2L] > M)
-              stop("dimensions cannot exceed 2^31-1")
-          J@Dim <- c(m, as.integer(r[2L]))
-          J@Dimnames <- list(names(from), NULL)
-          J@perm <- from.i
-          J
-      })
+      function(from) .perm2ind(from))
 
 ## FIXME: deprecate this method and export more general function .perm2ind
 setAs("list", "indMatrix",
@@ -90,7 +89,7 @@ setAs("nsparseMatrix", "indMatrix",
               J@margin <- 2L
               return(J)
           }
-          stop("matrix must have exactly one nonzero element in each row or column")
+          stop("matrix must have exactly one entry in each row or column")
       })
 
 setMethod("band", signature(x = "indMatrix"),
@@ -203,29 +202,15 @@ setMethod("isSymmetric", signature(object = "indMatrix"),
 }
 
 setAs("numeric", "pMatrix",
-      function(from) {
-          J <- new("pMatrix")
-          if((m <- length(from)) == 0L)
-              return(J)
-          if(m > .Machine$integer.max)
-              stop("dimensions cannot exceed 2^31-1")
-          from.i <- from
-          if(anyNA(r <- range(from)) || any(r != c(1L, m)) ||
-             (is.double(from) && any(from != (from.i <- as.integer(from)))) ||
-             anyDuplicated.default(from.i))
-              stop("'perm' slot must be a permutation of seq_along(perm)")
-          nms <- names(from)
-          J@Dim <- c(m, m)
-          J@Dimnames <- list(nms, nms)
-          J@perm <- from.i
-          J
-      })
+      function(from) .perm2ind(from, check.p = 2L))
 
 setAs("nsparseMatrix", "pMatrix",
       function(from) {
           d <- from@Dim
           if((n <- d[1L]) != d[2L])
-              stop("attempt to coerce non-square matrix to pMatrix")
+              stop(gettextf("attempt to coerce non-square matrix to %s",
+                            "pMatrix"),
+                   domain = NA)
           from <- .M2gen(from)
           J <- new("pMatrix")
           J@Dim <- d
@@ -245,7 +230,7 @@ setAs("nsparseMatrix", "pMatrix",
               J@margin <- 2L
               return(J)
           }
-          stop("matrix must have exactly one nonzero element in each row and column")
+          stop("matrix must have exactly one entry in each row and column")
       })
 
 setAs("indMatrix", "pMatrix",

@@ -1,6 +1,24 @@
 validDim <- function(dim)
     .Call(R_Dim_validate, dim)
 
+validDimGetsValue <- function(value, mn) {
+    if(mode(value) != "numeric")
+        gettextf("assigned dimensions are not of type \"%s\" or \"%s\"",
+                 "integer", "double")
+    else if(length(value) != 2L)
+        gettextf("assigned dimensions do not have length %d", 2L)
+    else if(anyNA(value))
+        gettext("assigned dimensions are NA")
+    else if(any(value < 0L))
+        gettext("assigned dimensions are negative")
+    else if(is.double(value) && any(trunc(value) > .Machine$integer.max))
+        gettextf("assigned dimensions exceed %s", "2^31-1")
+    else if((p <- prod(value)) != mn)
+        gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
+                 p, as.double(mn))
+    else TRUE
+}
+
 validDN <- function(dn, dim)
     .Call(R_DimNames_validate, dn, dim)
 
@@ -55,24 +73,11 @@ setMethod("dim", signature(x = "MatrixFactorization"),
 
 setMethod("dim<-", signature(x = "denseMatrix"),
           function(x, value) {
-              if(is.double(value)) {
-                  if(any(value >= .Machine$integer.max + 1))
-                      stop("dimensions cannot exceed 2^31-1")
-              } else if(!is.integer(value))
-                  stop("dimensions must be numeric")
-              if(length(value) != 2L)
-                  stop("dimensions must have length 2")
+              if(is.character(s <- validDimGetsValue(value, prod(d <- x@Dim))))
+                 stop(s, domain = NA)
               value <- as.integer(value)
-              if(anyNA(value))
-                  stop("dimensions cannot contain NA")
-              if(any(value < 0L))
-                  stop("dimensions cannot be negative")
-              if(all(value == (d <- x@Dim)))
+              if(all(value == d))
                   return(x)
-              if((pv <- prod(value)) != (pd <- prod(d)))
-                  stop(gettextf("assigned dimensions [product %.0f] do not match Matrix length [%.0f]",
-                                pv, pd),
-                       domain = NA)
               r <- .M2gen(x)
               r@Dim <- value
               if(length(r@factors))
@@ -82,46 +87,20 @@ setMethod("dim<-", signature(x = "denseMatrix"),
 
 setMethod("dim<-", signature(x = "sparseMatrix"),
           function(x, value) {
-              if(is.double(value)) {
-                  if(any(value >= .Machine$integer.max + 1))
-                      stop("dimensions cannot exceed 2^31-1")
-              } else if(!is.integer(value))
-                  stop("dimensions must be numeric")
-              if(length(value) != 2L)
-                  stop("dimensions must have length 2")
+              if(is.character(s <- validDimGetsValue(value, prod(d <- x@Dim))))
+                 stop(s, domain = NA)
               value <- as.integer(value)
-              if(anyNA(value))
-                  stop("dimensions cannot contain NA")
-              if(any(value < 0L))
-                  stop("dimensions cannot be negative")
-              if(all(value == (d <- x@Dim)))
+              if(all(value == d))
                   return(x)
-              if((pv <- prod(value)) != (pd <- prod(d)))
-                  stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
-                                pv, pd),
-                       domain = NA)
               r <- spV2M(.M2V(x), nrow = value[1L], ncol = value[2L])
               switch(.M.repr(x), "C" = .M2C(r), "R" = .M2R(r), r)
           })
 
 setMethod("dim<-", signature(x = "sparseVector"),
           function(x, value) {
-              if(is.double(value)) {
-                  if(any(value >= .Machine$integer.max + 1))
-                      stop("dimensions cannot exceed 2^31-1")
-              } else if(!is.integer(value))
-                  stop("dimensions must be numeric")
-              if(length(value) != 2L)
-                  stop("dimensions must have length 2")
+              if(is.character(s <- validDimGetsValue(value, length(x))))
+                 stop(s, domain = NA)
               value <- as.integer(value)
-              if(anyNA(value))
-                  stop("dimensions cannot contain NA")
-              if(any(value < 0L))
-                  stop("dimensions cannot be negative")
-              if((pv <- prod(value)) != (pd <- x@length))
-                  stop(gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
-                                pv, pd),
-                       domain = NA)
               spV2M(x, nrow = value[1L], ncol = value[2L])
           })
 

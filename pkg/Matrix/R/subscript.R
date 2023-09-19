@@ -39,7 +39,9 @@
                                 by = as.double(i.length),
                                 length.out = r),
                         each = length(i.i))
-            else stop("recycled [nl]sparseVector would have maximal index exceeding 2^53")
+            else stop(gettextf("recycled %s would have maximal index exceeding %s",
+                               "[nl]sparseVector", "2^53"),
+                      domain = NA)
         if(pattern) {
             if(mn. > mn) i.i[      i.i <= mn] else i.i
         } else {
@@ -120,7 +122,8 @@
             if(r > 0x1p+53) {
                 if(any(i > 0x1p+53 && i <= mn, na.rm = TRUE))
                     ## could be avoided in C, which has 64-bit integers :
-                    warning("subscripts exceeding 2^53 replaced with NA")
+                    warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
+                            domain = NA)
                 i[i > 0x1p+53] <- NA
             }
         }
@@ -300,7 +303,7 @@
         }
     }
     if(is.double(lengths(l, use.names = FALSE)))
-        stop("dimensions cannot exceed 2^31-1")
+        stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
     ..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
 }
 

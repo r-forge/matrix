@@ -1833,7 +1833,7 @@ SEXP Schur_validate(SEXP obj)
 	SEXP v = GET_SLOT(obj, install("EValues"));
 	SEXPTYPE tv = TYPEOF(v);
 	if (tv != REALSXP && tv != CPLXSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\" or type \"%s\""),
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "EValues", "double", "complex");
 	if (XLENGTH(v) != n)
 		RMKMS(_("'%s' slot does not have length %s"), "EValues", "Dim[1]");

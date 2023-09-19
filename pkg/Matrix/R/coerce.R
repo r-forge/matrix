@@ -84,15 +84,15 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 
 .m2dense.checking <- function(from, kind = ".", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
-           stop(gettextf("matrix of invalid type \"%s\" to .m2dense.checking()",
-                         typeof(from)),
+           stop(gettextf("invalid type \"%s\" in '%s'",
+                         typeof(from), ".m2dense.checking"),
                 domain = NA))
     if(kind != ".") {
         ## These must happen before isSymmetric() call
         storage.mode(from) <-
             switch(kind, n =, l = "logical", d = "double",
-                   stop(gettextf("invalid kind \"%s\" to .m2dense.checking()",
-                                 kind),
+                   stop(gettextf("invalid %s=\"%s\" to '%s'",
+                                 "kind", kind, ".m2dense.checking"),
                         domain = NA))
         if(kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
@@ -111,15 +111,15 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 
 .m2sparse.checking <- function(from, kind = ".", repr = "C", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
-           stop(gettextf("matrix of invalid type \"%s\" to .m2sparse.checking()",
-                         typeof(from)),
+           stop(gettextf("invalid type \"%s\" in '%s'",
+                         typeof(from), ".m2sparse.checking"),
                 domain = NA))
     if(kind != ".") {
         ## These must happen before isSymmetric() call
         storage.mode(from) <-
             switch(kind, n =, l = "logical", d = "double",
-                   stop(gettextf("invalid kind \"%s\" to .m2sparse.checking()",
-                                 kind),
+                   stop(gettextf("invalid %s=\"%s\" to '%s'",
+                                 "kind", kind, ".m2sparse.checking"),
                         domain = NA))
         if(kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
@@ -160,7 +160,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2m <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     to <- .V2v(from)
@@ -171,7 +171,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2a <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     to <- .V2v(from)
@@ -182,7 +182,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2unpacked <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     kind <- .V.kind(from)
@@ -196,7 +196,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2C <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     kind <- .V.kind(from)
@@ -212,7 +212,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2R <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     kind <- .V.kind(from)
@@ -228,7 +228,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2T <- function(from) {
     if(is.double(m <- from@length)) {
         if(m > .Machine$integer.max)
-            stop("dimensions cannot exceed 2^31-1")
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
     kind <- .V.kind(from)
@@ -252,11 +252,11 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
         return(.Call(CR2spV, .M2C(from)))
     if(repr != "d" && repr != "i") {
         if(is.object(from))
-            stop(gettextf("invalid class \"%s\" in %s()",
+            stop(gettextf("invalid class \"%s\" in '%s'",
                           class(from)[1L], ".M2V"),
                  domain = NA)
         else
-            stop(gettextf("invalid type \"%s\" in %s()",
+            stop(gettextf("invalid type \"%s\" in '%s'",
                           typeof(from), ".M2V"),
                  domain = NA)
     }
@@ -267,7 +267,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     if(mn <= .Machine$integer.max)
         mn <- as.integer(mn)
     else if(mn > 0x1p+53)
-        stop("sparseVector length cannot exceed 2^53")
+        stop(gettextf("%s length cannot exceed %s", "sparseVector", "2^53"),
+             domain = NA)
     kind <- .M.kind(from)
     to <- new(paste0(kind, "sparseVector"))
     to@length <- mn

@@ -69,9 +69,11 @@
 setMethod("diff", signature(x = "sparseMatrix"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
-              if(length(lag) != 1L || length(differences) > 1L ||
+              if(length(lag) != 1L || length(differences) != 1L ||
                   lag < 1L || differences < 1L)
-                  stop("'lag' and 'differences' must be integers >= 1")
+                  stop(gettextf("'%s' and '%s' must be positive integers",
+                                "lag", "differences"),
+                       domain = NA)
               if(lag * differences >= x@Dim[1L])
                   return(x[0L])
               i1 <- -seq_len(lag)

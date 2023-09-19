@@ -52,7 +52,9 @@ setMethod("chol", signature(x = "ddiMatrix"),
           function(x, ...) {
               if(length(y <- x@x)) {
                   if(is.na(min.y <- min(y)) || min.y < 0)
-                      stop("chol(x) is undefined: 'x' is not positive semidefinite")
+                      stop(gettextf("%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite",
+                                    "chol", "x"),
+                           domain = NA)
                   x@x <- sqrt(y)
               }
               x
@@ -108,7 +110,9 @@ setMethod("Cholesky", signature(A = "dsTMatrix"),
 setMethod("Cholesky", signature(A = "ddiMatrix"),
           function(A, ...) {
               if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y < 0))
-                  stop("Cholesky(A) is undefined: 'A' is not positive semidefinite")
+                  stop(gettextf("%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite",
+                                "Cholesky", "x"),
+                       domain = NA)
               n <- (d <- A@Dim)[1L]
               r <- new("dCHMsimpl")
               r@Dim <- d
@@ -248,7 +252,9 @@ setMethod("diag", signature(x = "pCholesky"),
                r@x <- diag(x, names = FALSE)
                r
            },
-           stop("'which' is not \"P1\", \"P1.\", \"L\", \"L.\", \"L1\", \"L1.\", or \"D\""))
+           stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\"",
+                         "which", "P", "L", "D"),
+                domain = NA))
 }
 body(.def.unpacked) <-
     do.call(substitute,
@@ -333,7 +339,9 @@ rm(.def.unpacked, .def.packed)
 isLDL <- function(x) {
     if(is(x, "CHMfactor"))
         .CHM.is.LDL(x)
-    else stop("'x' does not inherit from virtual class CHMfactor")
+    else stop(gettextf("'%s' does not inherit from virtual class %s",
+                       "x", "CHMfactor"),
+              domain = NA)
 }
 
 setAs("CHMsimpl", "dtCMatrix",
@@ -417,7 +425,9 @@ setMethod("expand1", signature(x = "CHMsimpl"),
                          r@x <- diag(x, names = FALSE)
                          r
                      },
-                     stop("'which' is not \"P1\", \"P1.\", \"L\", \"L.\", \"L1\", \"L1.\", or \"D\""))
+                     stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\"",
+                                   "which", "P", "L", "D"),
+                          domain = NA))
           })
 
 setMethod("expand1", signature(x = "CHMsuper"),
@@ -449,7 +459,9 @@ setMethod("expand1", signature(x = "CHMsuper"),
                          r@x <- diag(x, names = FALSE)
                          r
                      },
-                     stop("'which' is not \"P1\", \"P1.\", \"L\", \"L.\", \"L1\", \"L1.\", or \"D\""))
+                     stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\"",
+                                   "which", "P", "L", "D"),
+                          domain = NA))
           })
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
@@ -549,7 +561,9 @@ setMethod("update", signature(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
               parent <- .M2kind(.M2C(parent), "d")
               if((shape <- .M.shape(parent)) != "s") {
-                  Matrix.message("'parent' is not formally symmetric; factorizing tcrossprod(parent)")
+                  Matrix.message(gettextf("'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)",
+                                          "parent"),
+                                 domain = NA)
                   if(shape == "t" && parent@diag != "N")
                       parent <- ..diagU2N(parent)
               }

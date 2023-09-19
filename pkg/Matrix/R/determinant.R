@@ -76,7 +76,9 @@ setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
                           oop <- options(warn = 2L)
                           on.exit(options(oop))
                       }
-                      warning("the default value of argument 'sqrt' of method 'determinant(<CHMfactor>, <logical>)' may change from TRUE to FALSE as soon as the next release of Matrix; set 'sqrt' when programming")
+                      warning(gettextf("the default value of argument '%s' of method '%s(<%s>, <%s>)' may change from %s to %s as soon as the next release of Matrix; set '%s' when programming",
+                                       "sqrt", "determinant", "CHMfactor", "logical", "TRUE", "FALSE", "sqrt"),
+                              domain = NA)
                   }
               }
               .Call(CHMfactor_determinant, x, logarithm, sqrt)

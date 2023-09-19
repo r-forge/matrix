@@ -7,9 +7,7 @@ matmultDim <- function(d.a, d.b, type = 1L) {
     i.a <- 1L + (type != 2L)
     i.b <- 1L + (type == 3L)
     if(d.a[i.a] != d.b[i.b])
-        stop(gettextf("non-conformable arguments in %s",
-                      deparse(sys.call(sys.parent()))),
-             call. = FALSE, domain = NA)
+        stop("non-conformable arguments")
     c(d.a[-i.a], d.b[-i.b])
 }
 

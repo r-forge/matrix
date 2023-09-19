@@ -159,19 +159,22 @@
 .m2ngC <- function(from) {
     .Deprecated(new = ".m2sparse", package = "Matrix")
     if(anyNA(from))
-        stop("attempt to coerce matrix with NA to ngCMatrix")
+        stop(gettextf("attempt to coerce matrix with NA to %s", "ngCMatrix"),
+             domain = NA)
     .m2sparse(from, "ngC")
 }
 .m2ngCn <- function(from, na.is.not.0 = FALSE) {
     .Deprecated(new = ".m2sparse", package = "Matrix")
     if(!na.is.not.0 && anyNA(from))
-        stop("attempt to coerce matrix with NA to ngCMatrix")
+        stop(gettextf("attempt to coerce matrix with NA to %s", "ngCMatrix"),
+             domain = NA)
     .m2sparse(from, "ngC")
 }
 .m2ngTn <- function(from, na.is.not.0 = FALSE) {
     .Deprecated(new = ".m2sparse", package = "Matrix")
     if(!na.is.not.0 && anyNA(from))
-        stop("attempt to coerce matrix with NA to ngCMatrix")
+        stop(gettextf("attempt to coerce matrix with NA to %s", "ngTMatrix"),
+             domain = NA)
     .m2sparse(from, "ngT")
 }
 .n2dgT <- function(from) {

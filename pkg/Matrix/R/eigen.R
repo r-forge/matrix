@@ -4,7 +4,7 @@
 setMethod("Schur", signature(x = "dgeMatrix"),
           function(x, vectors = TRUE, ...) {
               if(length(x.x <- x@x) && !all(is.finite(range(x.x))))
-                  stop("'x' has non-finite values")
+                  stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
               cl <- .Call(dgeMatrix_Schur, x, vectors, TRUE)
               if(all(cl$WI == 0)) {
                   vals <- cl$WR
@@ -34,7 +34,7 @@ setMethod("Schur", signature(x = "matrix"),
           function(x, vectors = TRUE, ...) {
               storage.mode(x) <- "double"
               if(length(x) && !all(is.finite(range(x))))
-                  stop("'x' has non-finite values")
+                  stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
               cl <- .Call(dgeMatrix_Schur, x, vectors, FALSE)
               vals <-
                   if(all(cl$WI == 0))
@@ -62,7 +62,7 @@ setMethod("Schur", signature(x = "triangularMatrix"),
               if(n == 0L)
                   x@uplo <- "U"
               else if(.M.kind(x) != "n" && !all(is.finite(range(x))))
-                  stop("'x' has non-finite values")
+                  stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
               vals <- diag(x, names = FALSE)
               if(x@uplo == "U") {
                   if(vectors) {
@@ -92,7 +92,7 @@ setMethod("Schur", signature(x = "diagonalMatrix"),
               } else {
                   vals <- x@x
                   if(length(vals) && !all(is.finite(range(vals))))
-                      stop("'x' has non-finite values")
+                      stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
                   T <- new("ddiMatrix", Dim = d, x = vals)
               }
               if(vectors) {
@@ -109,7 +109,9 @@ setMethod("Schur", signature(x = "diagonalMatrix"),
 setMethod("expand1", signature(x = "Schur"),
           function(x, which, ...)
               switch(which, "Q" = x@Q, "T" = x@T, "Q." = t(x@Q),
-                     stop("'which' is not \"Q\", \"T\", or \"Q.\"")))
+                     stop(gettextf("'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\"",
+                                   "which", "Q", "T"),
+                          domain = NA)))
 
 setMethod("expand2", signature(x = "Schur"),
           function(x, ...) {

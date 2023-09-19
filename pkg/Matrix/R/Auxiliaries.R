@@ -104,7 +104,9 @@ forceDiagonal <- function(x, diag = NA_character_) {
                          "ddiMatrix"
                      },
                  complex =
-                     stop("complex \"diagonalMatrix\" not yet implemented"),
+                     stop(gettextf("complex %s not yet implemented",
+                                   "diagonalMatrix"),
+                          domain = NA),
               ## complex =
               ##     {
               ##         if(is.na(diag))
@@ -112,8 +114,8 @@ forceDiagonal <- function(x, diag = NA_character_) {
               ##             if(!is.na(a <- all(y == 1+0i)) && a) "U" else "N"
               ##         "zdiMatrix"
               ##     },
-                 stop(gettextf("cannot coerce matrix of type \"%s\" to \"diagonalMatrix\"",
-                               typeof(y)),
+                 stop(gettextf("cannot coerce matrix of type \"%s\" to %s",
+                               typeof(y), "diagonalMatrix"),
                       domain = NA))
     n <- length(y)
     d <- dim(x)
@@ -385,8 +387,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(sparse && x@Dim[1L] > 0L)
         x <- switch(x@uplo,
                     U = .Call(R_sparse_band, x, 1L, NULL),
-                    L = .Call(R_sparse_band, x, NULL, -1L),
-                    stop("invalid 'uplo'"))
+                    L = .Call(R_sparse_band, x, NULL, -1L))
     x@diag <- "U"
     x
 }

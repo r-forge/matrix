@@ -142,12 +142,15 @@ setMethod("cov2cor", signature(V = "sparseMatrix"),
           function(V) {
               d <- V@Dim
               if (d[1L] != d[2L])
-                  stop("'V' is not a square matrix")
+                  stop(gettextf("'%s' is not a square matrix", "V"),
+                       domain = NA)
               dn <- symmDN(V@Dimnames)
               V <- .M2kind(V, "d")
               V.ii <- diag(V, names = FALSE)
               if(length(V.ii) > 0L && is.na(m <- min(V.ii)) || m <= 0)
-                  warning("diag(V) had non-positive or non-finite entries; finite result is doubtful")
+                  warning(gettextf("diag(%s) has non-positive or non-finite entries; finite result is doubtful",
+                                   "V"),
+                          domain = NA)
               D <- Diagonal(x = sqrt(1/V.ii))
               r <- forceSymmetric(D %*% V %*% D)
               diag(r) <- 1
