@@ -8,8 +8,8 @@
     switch(.Generic,
            "==" = e2 == e1, "<"  = e2 > e1, "<=" = e2 >= e1,
            "!=" = e2 != e1, ">"  = e2 < e1, ">=" = e2 <= e1,
-           stop(gettextf("unexpected .Generic=\"%s\" in '%s' method",
-                         .Generic, "Compare"),
+           stop(gettextf("unexpected %s=\"%s\" in '%s' method",
+                         ".Generic", .Generic, "Compare"),
                 domain = NA))
 
 

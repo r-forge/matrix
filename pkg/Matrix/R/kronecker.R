@@ -28,10 +28,13 @@ kroneckerDN <- function(dnX, dX = lengths(dnX, FALSE),
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               r <- new("ddiMatrix")
               r@Dim <- dX * dY
               uX <- X@diag != "N"
@@ -66,10 +69,13 @@ if(FALSE) { # --NOT YET--
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- X@diag != "N"
               uY <- FALSE
               shape <- .M.shape(Y)
@@ -93,7 +99,8 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
                       nY <- length(y <- Y@x)
                   }
                   if(as.double(nX) * nY > .Machine$integer.max)
-                      stop("number of nonzero entries cannot exceed 2^31-1")
+                      stop(gettextf("number of nonzero entries cannot exceed %s", "2^31-1"),
+                           domain = NA)
                   if(!uX && uY) {
                       diag(Y) <- TRUE
                       nY <- length(y <- Y@x)
@@ -143,10 +150,13 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "denseMatrix"),
 setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               shape <- .M.shape(X)
               uX <- FALSE
               uY <- Y@diag != "N"
@@ -171,7 +181,8 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
                       nX <- length(x <- X@x)
                   }
                   if(as.double(nX) * nY > .Machine$integer.max)
-                      stop("number of nonzero entries cannot exceed 2^31-1")
+                      stop(gettextf("number of nonzero entries cannot exceed %s", "2^31-1"),
+                           domain = NA)
                   if(uX && !uY) {
                       diag(X) <- TRUE
                       nX <- length(x <- X@x)
@@ -248,10 +259,13 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "diagonalMatrix"),
 setMethod("kronecker", signature(X = "denseMatrix", Y = "denseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               shape <- switch(.M.shape(X),
                               g = "g",
                               t = if(.M.shape(Y) == "t" && X@uplo == Y@uplo)
@@ -292,10 +306,13 @@ setMethod("kronecker", signature(X = "denseMatrix", Y = "denseMatrix"),
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- X@diag != "N"
               uY <- FALSE
               shape <- .M.shape(Y)
@@ -314,7 +331,8 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
                   if((nY <- (p <- Y@p)[length(p)]) == 0L)
                       r@p <- integer(dr[2L] + 1)
                   else if(as.double(nX <- dX[1L]) * nY > .Machine$integer.max)
-                      stop("number of nonzero entries cannot exceed 2^31-1")
+                      stop(gettextf("number of nonzero entries cannot exceed %s", "2^31-1"),
+                           domain = NA)
                   else {
                       head. <-
                           if(length(Y@i) > nY)
@@ -353,10 +371,13 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "CsparseMatrix"),
 setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- FALSE
               uY <- Y@diag != "N"
               shape <- .M.shape(X)
@@ -375,7 +396,8 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
                   if((nX <- (p <- X@p)[length(p)]) == 0L)
                       r@p <- integer(dr[2L] + 1)
                   else if(as.double(nY <- dY[1L]) * nX > .Machine$integer.max)
-                      stop("number of nonzero entries cannot exceed 2^31-1")
+                      stop(gettextf("number of nonzero entries cannot exceed %s", "2^31-1"),
+                           domain = NA)
                   else {
                       dp <- p[-1L] - p[-length(p)]
                       j. <- which(dp > 0L)
@@ -419,10 +441,13 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "diagonalMatrix"),
 setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- uY <- FALSE
               if((sX <- .M.shape(X)) == "t")
                   uX <- X@diag != "N"
@@ -460,7 +485,8 @@ setMethod("kronecker", signature(X = "CsparseMatrix", Y = "CsparseMatrix"),
                      (nY <- (pY <- Y@p)[length(pY)]) == 0L)
                       r@p <- integer(dr[2L] + 1)
                   else if(as.double(nX) * nY > .Machine$integer.max)
-                      stop("number of nonzero entries cannot exceed 2^31-1")
+                      stop(gettextf("number of nonzero entries cannot exceed %s", "2^31-1"),
+                           domain = NA)
                   else {
                       dpX <- pX[-1L] - (pX. <- pX[-length(pX)])
                       dpY <- pY[-1L] - (pY. <- pY[-length(pY)])
@@ -525,10 +551,13 @@ setMethod("kronecker", signature(X = "RsparseMatrix", Y = "RsparseMatrix"),
 setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- X@diag != "N"
               uY <- FALSE
               shape <- .M.shape(Y)
@@ -580,10 +609,13 @@ setMethod("kronecker", signature(X = "diagonalMatrix", Y = "TsparseMatrix"),
 setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- FALSE
               uY <- Y@diag != "N"
               shape <- .M.shape(X)
@@ -629,10 +661,13 @@ setMethod("kronecker", signature(X = "TsparseMatrix", Y = "diagonalMatrix"),
 setMethod("kronecker", signature(X = "TsparseMatrix", Y = "TsparseMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               uX <- uY <- FALSE
               if((sX <- .M.shape(X)) == "t")
                   uX <- X@diag != "N"
@@ -707,10 +742,13 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
               if((margin <- X@margin) != Y@margin)
                   kronecker(.M2C(X), .M2C(Y), FUN, make.dimnames, ...)
               if(!(missing(FUN) || identical(FUN, "*")))
-                  stop("method for kronecker() must use default FUN=\"*\"")
+                  stop(gettextf("'%s' method must use default %s=\"%s\"",
+                                "kronecker", "FUN", "*"),
+                       domain = NA)
               if(any(as.double(dX <- X@Dim) * (dY <- Y@Dim) >
                      .Machine$integer.max))
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               r <- new("indMatrix")
               r@Dim <- dX * dY
               r@perm <-

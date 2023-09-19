@@ -15,7 +15,9 @@ setMethod("rcond", signature(x = "sparseMatrix", norm = "character"),
                           useInv <- solve(x)
                       1 / (norm(x, type = norm) * norm(useInv, type = norm))
                   } else {
-                      warning("'rcond' via sparse -> dense coercion")
+                      warning(gettextf("'%s' via sparse -> dense coercion",
+                                       "rcond"),
+                              domain = NA)
                       rcond(.M2unpacked(x), norm = norm, ...)
                   }
               } else {
@@ -54,7 +56,8 @@ setMethod("rcond", signature(x = "diagonalMatrix", norm = "character"),
                              yy <- y * y
                              1 / sqrt(sum(yy) * sum(1 / yy))
                          } else 1 / n,
-                     stop("invalid 'norm'"))
+                     stop(gettext("invalid %s=\"%s\"", "norm", norm[1L]),
+                          domain = NA))
           })
 
 setMethod("rcond", signature(x = "indMatrix", norm = "character"),
@@ -73,7 +76,8 @@ setMethod("rcond", signature(x = "indMatrix", norm = "character"),
                              1,
                          "F" = , "f" = , "E" = , "e" =
                              1 / n,
-                         stop("invalid 'norm'"))
+                         stop(gettext("invalid %s=\"%s\"", "norm", norm[1L]),
+                              domain = NA))
               } else {
                   if(m < n) {
                       x <- t(x)
@@ -96,7 +100,8 @@ setMethod("rcond", signature(x = "pMatrix", norm = "character"),
                          1,
                      "F" = , "f" = , "E" = , "e" =
                          1 / n,
-                     stop("invalid 'norm'"))
+                     stop(gettext("invalid %s=\"%s\"", "norm", norm[1L]),
+                          domain = NA))
           })
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),

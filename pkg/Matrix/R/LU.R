@@ -253,7 +253,9 @@ setMethod("expand1", signature(x = "denseLU"),
                          r@x <- .mkU(x@x, m, n)
                          r
                      },
-                     stop("'which' is not \"P1\", \"P1.\", \"L\", or \"U\""))
+                     stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", or \"%4$s\"",
+                                   "which", "P", "L", "U"),
+                          domain = NA))
           })
 
 ## returning list(P1', L, U), where A = P1' L U
@@ -330,7 +332,9 @@ setMethod("expand1", signature(x = "sparseLU"),
                      },
                      "L" = x@L,
                      "U" = x@U,
-                     stop("'which' is not \"P1\", \"P1.\", \"P2\", \"P2.\", \"L\", or \"U\""))
+                     stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", or \"%4$s\"",
+                                   "which", "P", "L", "U"),
+                          domain = NA))
           })
 
 ## returning list(P1', L, U, P2'), where A = P1' L U P2'

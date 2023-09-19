@@ -6,8 +6,8 @@
 
 .Logic.swap <- function(e1, e2)
     switch(.Generic, "&" = e2 & e1, "|" = e2 | e1,
-           stop(gettextf("unexpected .Generic=\"%s\" in '%s' method",
-                         .Generic, "Logic"),
+           stop(gettextf("unexpected %s=\"%s\" in '%s' method",
+                         ".Generic", .Generic, "Logic"),
                 domain = NA))
 
 
@@ -117,8 +117,8 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
                           r@x <- x3
                       }
                   }
-              } else stop(gettextf("unexpected .Generic=\"%s\" in '%s' method",
-                                   .Generic, "Logic"),
+              } else stop(gettextf("unexpected %s=\"%s\" in '%s' method",
+                                   ".Generic", .Generic, "Logic"),
                           domain = NA)
               r
           })
@@ -149,8 +149,8 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "vector"),
                   r <- if(n == 0L) logical(0L) else as.logical(e2)
                   if(n > 0L && length(i1 <- e1@i))
                       r[i1] <- if(k1 == "n") TRUE else e1@x | r[i1]
-              } else stop(gettextf("unexpected .Generic=\"%s\" in '%s' method",
-                                   .Generic, "Logic"),
+              } else stop(gettextf("unexpected %s=\"%s\" in '%s' method",
+                                   ".Generic", .Generic, "Logic"),
                           domain = NA)
               r
           })

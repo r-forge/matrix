@@ -4,19 +4,22 @@
 .solve.checkDim1 <-
 function(nrow.a, ncol.a) {
     if(nrow.a != ncol.a)
-        stop("'a' is not square")
+        stop(gettextf("'%s' is not square", "a"),
+             domain = NA)
 }
 
 .solve.checkDim2 <-
 function(nrow.a, nrow.b) {
     if(nrow.a != nrow.b)
-        stop("dimensions of 'a' and 'b' are inconsistent")
+        stop(gettextf("dimensions of '%s' and '%s' are inconsistent", "a", "b"),
+             domain = NA)
 }
 
 .solve.checkCond <-
 function(a, tol, rcond.a = rcond(a)) {
     if(tol > 0 && a@Dim[1L] > 0L && rcond.a < tol)
-        stop(gettextf("'a' is computationally singular, rcond(a)=%g", rcond.a),
+        stop(gettextf("'%1$s' is computationally singular, rcond(%1$s)=%2$g",
+                      "a", rcond.a),
              domain = NA)
 }
 
@@ -42,8 +45,8 @@ function(u, tol, rad.u = range(abs(diag(u, names = FALSE)))) {
     if(tol > 0 && u@Dim[1L] > 0L) {
         r <- rad.u[1L] / rad.u[2L]
         if(r < tol)
-            stop(gettextf("'a' is computationally singular, min(d)/max(d)=%g, d=abs(diag(U))",
-                          r),
+            stop(gettextf("'%s' is computationally singular, min(d)/max(d)=%g, d=abs(diag(U))",
+                          "a", r),
                  domain = NA)
     }
 }
@@ -610,8 +613,9 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 ## for now ... fast for this special case ...
 .spV2dgC <- function(x) {
     if(is.double(m <- x@length)) {
-        if(m >= .Machine$integer.max + 1)
-            stop("dimensions cannot exceed 2^31-1")
+        if(trunc(m) > .Machine$integer.max)
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                 domain = NA)
         m <- as.integer(m)
     }
     i <- as.integer(x@i) - 1L
@@ -624,7 +628,8 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
         if(!.hasSlot(x, "x"))
             rep.int(1, nnz)
         else if(is.complex(y <- x@x))
-            stop("cannot coerce zsparseVector to dgCMatrix")
+            stop(gettextf("cannot coerce from %s to %s", "zsparseVector", "dgCMatrix"),
+                 domain = NA)
         else y
     r
 }
@@ -633,8 +638,9 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
 .spV2dge <- function(x) {
     m <- x@length
     if(is.double(m)) {
-        if(m >= .Machine$integer.max + 1)
-            stop("dimensions cannot exceed 2^31-1")
+        if(trunc(m) > .Machine$integer.max)
+            stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                 domain = NA)
         m <- as.integer(m)
     }
     r <- new("dgeMatrix")
@@ -643,7 +649,8 @@ setMethod("solve", signature(a = "pMatrix", b = "Matrix"),
         if(!.hasSlot(x, "x"))
             1
         else if(is.complex(y <- x@x))
-            stop("cannot coerce zsparseVector to dgeMatrix")
+            stop(gettextf("cannot coerce from %s to %s", "zsparseVector", "dgCMatrix"),
+                 domain = NA)
         else y)
     r
 }

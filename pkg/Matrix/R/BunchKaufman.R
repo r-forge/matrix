@@ -41,15 +41,15 @@ setAs("pBunchKaufman", "dtpMatrix",
     switch(which,
            "DU" =, "DL" = {
                if(!endsWith(which, x@uplo))
-                   stop(gettextf("which=\"%s\" invalid for x@uplo=\"%s\"",
-                                 which, x@uplo),
+                   stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
+                                 "which", which, "x", x@uplo),
                         domain = NA)
                r[[b + 1L]]
            },
            "U" =, "U." =, "L" =, "L." = {
                if(!startsWith(which, x@uplo))
-                   stop(gettextf("which=\"%s\" invalid for x@uplo=\"%s\"",
-                                 which, x@uplo),
+                   stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
+                                 "which", which, "x", x@uplo),
                         domain = NA)
                if(b > 0L) {
                    m <- r[[b]]
@@ -64,8 +64,8 @@ setAs("pBunchKaufman", "dtpMatrix",
                    m
                }
            },
-           stop(gettextf("'which' is not \"%1$s\", \"D%1$s\", or \"%1$s.\"",
-                         x@uplo),
+           stop(gettextf("'%s' is not \"%1$s\", \"D%1$s\", or \"%1$s.\"",
+                         "which", x@uplo),
                 domain = NA))
 }
 body(.def.unpacked) <-

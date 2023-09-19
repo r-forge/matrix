@@ -15,14 +15,17 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
                          max(rowSums(abs(x))),
                      "2" =
                          {
-                             warning("'norm' via sparse -> dense coercion")
+                             warning(gettextf("'%s' via sparse -> dense coercion",
+                                              "norm"),
+                                     domain = NA)
                              base::norm(.M2m(x), type = "2")
                          },
                      "M" = , "m" =
                          max(abs(x)),
                      "F" = , "f" = , "E" = , "e" =
                          sqrt(sum(x * x)),
-                     stop("invalid 'type'"))
+                     stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
+                          domain = NA))
           })
 
 setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
@@ -42,7 +45,8 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
                          if(nonunit) max(abs(y)) else 1,
                      "F" = , "f" = , "E" = , "e" =
                          if(nonunit) sqrt(sum(y * y)) else sqrt(n),
-                     stop("invalid 'type'"))
+                     stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
+                          domain = NA))
           })
 
 setMethod("norm", signature(x = "indMatrix", type = "character"),
@@ -61,7 +65,8 @@ setMethod("norm", signature(x = "indMatrix", type = "character"),
                          1,
                      "F" = , "f" = , "E" = , "e" =
                          if(x@margin == 1L) sqrt(m) else sqrt(n),
-                     stop("invalid 'type'"))
+                     stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
+                          domain = NA))
           })
 
 setMethod("norm", signature(x = "pMatrix", type = "character"),
@@ -76,7 +81,8 @@ setMethod("norm", signature(x = "pMatrix", type = "character"),
                          1,
                      "F" = , "f" = , "E" = , "e" =
                          sqrt(n),
-                     stop("invalid 'type'"))
+                     stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
+                          domain = NA))
           })
 
 setMethod("norm", signature(x = "denseMatrix", type = "character"),

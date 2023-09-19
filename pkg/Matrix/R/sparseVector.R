@@ -5,9 +5,11 @@
 setMethod("diff", signature(x = "sparseVector"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
-              if(length(lag) != 1L || length(differences) > 1L ||
+              if(length(lag) != 1L || length(differences) != 1L ||
                   lag < 1L || differences < 1L)
-                  stop("'lag' and 'differences' must be integers >= 1")
+                  stop(gettextf("'%s' and '%s' must be positive integers",
+                                "lag", "differences"),
+                       domain = NA)
               if(lag * differences >= length(x))
                   return(x[0L])
               i1 <- -seq_len(lag)
@@ -59,7 +61,8 @@ setMethod("mean", signature(x = "sparseVector"),
 .V.rep.each <- function(x, each) {
     each <- as.double(each)
     if(length(each) != 1L) {
-        warning("first element used of 'each' argument")
+        warning(gettextf("first element used of '%s' argument", "each"),
+                domain = NA)
         each <- each[1L]
     }
     if(!is.finite(each) || each <= -1)
@@ -71,7 +74,8 @@ setMethod("mean", signature(x = "sparseVector"),
     n <- length(x)
     each <- trunc(each)
     if(n * each > 0x1p+53)
-        stop("sparseVector length cannot exceed 2^53")
+        stop(gettextf("%s length cannot exceed %s", "sparseVector", "2^53"),
+             domain = NA)
     else if(n * each > .Machine$integer.max) {
         a <- as.double
         one <- 1
@@ -91,7 +95,8 @@ setMethod("mean", signature(x = "sparseVector"),
     times <- as.double(times)
     if(length(times) != 1L) {
         ## FIXME: support length(times) == length(x)
-        warning("first element used of 'times' argument")
+        warning(gettextf("first element used of '%s' argument", "times"),
+                domain = NA)
         times <- times[1L]
     }
     if(!is.finite(times) || times <= -1)
@@ -103,7 +108,8 @@ setMethod("mean", signature(x = "sparseVector"),
     n <- length(x)
     times <- trunc(times)
     if(n * times > 0x1p+53)
-        stop("sparseVector length cannot exceed 2^53")
+        stop(gettextf("%s length cannot exceed %s", "sparseVector", "2^53"),
+             domain = NA)
     else if(n * times > .Machine$integer.max) {
         a <- as.double
         zero <- 0
@@ -123,13 +129,15 @@ setMethod("mean", signature(x = "sparseVector"),
 .V.rep.len  <- function(x, length.out) {
     length.out <- as.double(length.out)
     if(length(length.out) != 1L) {
-        warning("first element used of 'length.out' argument")
+        warning(gettextf("first element used of '%s' argument", "length.out"),
+                domain = NA)
         length.out <- length.out[1L]
     }
     if(!is.finite(length.out) || length.out <= -1)
-        stop("invalid 'length.out' argument")
+        stop(gettextf("invalid '%s' argument", "length.out"), domain = NA)
     if(length.out > 0x1p+53)
-        stop("sparseVector length cannot exceed 2^53")
+        stop(gettextf("%s length cannot exceed %s", "sparseVector", "2^53"),
+             domain = NA)
     n <- length(x)
     length.out <-
         if(length.out - 1 < .Machine$integer.max)
@@ -227,7 +235,8 @@ setMethod("toeplitz", signature(x = "sparseVector"),
                    giveCsparse, ...) {
               n <- length(x)
               if(n > .Machine$integer.max)
-                  stop("dimensions cannot exceed 2^31-1")
+                  stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+                       domain = NA)
               nn <- c(n, n)
               r <- spV2M(x[as.integer(abs(.col(nn) - .row(nn))) + 1L],
                          nrow = n, ncol = n, symmetric = symmetric,
@@ -236,12 +245,16 @@ setMethod("toeplitz", signature(x = "sparseVector"),
                   if(missing(giveCsparse))
                       match.arg(repr)
                   else if(!missing(repr)) {
-                      warning("'giveCsparse' is deprecated; using 'repr' instead")
+                      warning(gettextf("'%s' is deprecated; using '%s' instead",
+                                       "giveCsparse", "repr"),
+                              domain = NA)
                       match.arg(repr)
                   } else if(giveCsparse) {
                       "C"
                   } else {
-                      warning("'giveCsparse' is deprecated; setting repr=\"T\" for you")
+                      warning(gettextf("'%s' is deprecated; setting %s=\"%s\"",
+                                       "giveCsparse", "repr", "T"),
+                              domain = NA)
                       "T"
                   }
               switch(repr, "C" = .M2C(r), "R" = .M2R(r), "T" = r)
