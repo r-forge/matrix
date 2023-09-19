@@ -3192,13 +3192,13 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
-	int symmetric = class[1] == 's';
-
 	char di = 'N';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
 		di = *CHAR(STRING_ELT(diag, 0));
 	}
+
+	int symmetric = class[1] == 's';
 
 	if (class[2] != 'T') {
 
@@ -3432,17 +3432,22 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
-	int symmetric = class[1] == 's';
-
-	char di = 'N';
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = *CHAR(STRING_ELT(diag, 0));
+	char ul = 'U', di = 'N';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = *CHAR(STRING_ELT(uplo, 0));
+		if (class[1] == 't') {
+			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+			di = *CHAR(STRING_ELT(diag, 0));
+		}
 	}
+
+	int symmetric = (class[1] != 's')
+		? 0 : (((class[2] == 'C') == (ul == 'U')) ? 1 : -1);
+	long double zr = 1.0L, zi = 0.0L;
 
 	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n,
 		nnz, nnzmax = (symmetric) ? (mn + n) / 2 : mn;
-	long double zr = 1.0L, zi = 0.0L;
 
 	if (class[2] != 'T') {
 
@@ -3485,7 +3490,9 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						++k;
 					}
 				} else {
-					for (i_ = 0; i_ < m_; ++i_) {
+					int i0 = (symmetric >= 0) ? 0 : j_,
+						i1 = (symmetric <= 0) ? m_ : j_ + 1;
+					for (i_ = i0; i_ < i1; ++i_) {
 						if (seen0 || (k < kend && pi[k] == i_)) {
 						if (k >= kend)
 							break;
@@ -3520,7 +3527,9 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						++k;
 					}
 				} else {
-					for (i_ = 0; i_ < m_; ++i_) {
+					int i0 = (symmetric >= 0) ? 0 : j_,
+						i1 = (symmetric <= 0) ? m_ : j_ + 1;
+					for (i_ = i0; i_ < i1; ++i_) {
 						if (seen0 || (k < kend && pi[k] == i_)) {
 						if (k >= kend)
 							break;
@@ -3549,7 +3558,9 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						++k;
 					}
 				} else {
-					for (i_ = 0; i_ < m_; ++i_) {
+					int i0 = (symmetric >= 0) ? 0 : j_,
+						i1 = (symmetric <= 0) ? m_ : j_ + 1;
+					for (i_ = i0; i_ < i1; ++i_) {
 						if (seen0 || (k < kend && pi[k] == i_)) {
 						if (k >= kend)
 							break;
@@ -3583,7 +3594,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			UNPROTECT(4); /* j, i, res, obj */
 			return res;
 		}
-		if (nnz < mn)
+		if (nnz < nnzmax)
 			zr = 0.0;
 
 		SEXP x = GET_SLOT(obj, Matrix_xSym);
