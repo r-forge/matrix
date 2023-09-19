@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-03 13:30-0400\n"
+"POT-Creation-Date: 2023-09-19 17:28-0400\n"
 "PO-Revision-Date: 2021-04-12 18:57+0200\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -31,177 +31,157 @@ msgstr "cholmod_factorize_p a échoué : statut %d, mineur %d de ncol %d"
 msgid "cholmod_change_factor failed"
 msgstr "cholmod_change_factor a échoué"
 
-#: Csparse.c:24
-msgid "Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"
-msgstr ""
-"Csparse_sort(x) : x est une CsparseMatrix incorrecte (au delà d'un problème "
-"de tri)"
-
-#: Csparse.c:81
-#, c-format
-msgid "Impossible Rk_x/Rk_y in Csparse_%s(), please report"
-msgstr "Rk_x/Rk_y impossible dans Csparse_%s(), veuillez reporter l’erreur"
-
-#: Csparse.c:83
-#, c-format
-msgid "chm_MOD_xtype() was not successful in Csparse_%s(), please report"
-msgstr "chm_MOD_xtype() a échoué dans Csparse_%s(), veuillez reporter l’erreur"
-
-#: Csparse.c:145
+#: Csparse.c:66
 #, c-format
 msgid "failure to open file \"%s\" for writing"
 msgstr "erreur lors de l'ouverture en écriture du fichier \"%s\""
 
-#: Csparse.c:149
+#: Csparse.c:70
 msgid "cholmod_write_sparse returned error code"
 msgstr "cholmod_write_sparse a renvoyé le code d'erreur"
 
-#: Csparse.c:331
+#: Csparse.c:252
 #, c-format
 msgid "%s = '%s' (back-permuted) is experimental"
 msgstr "%s = '%s' (back-permuted) est expérimental"
 
-#: Csparse.c:341
+#: Csparse.c:262
 msgid "diag_tC(): invalid 'resultKind'"
 msgstr "diag_tC() : 'resultKind' incorrect"
 
-#: Mutils.c:410
+#: Mutils.c:431
 #, fuzzy
 msgid "invalid factor name"
 msgstr "argument '%s' incorrect"
 
-#: Mutils.c:414
+#: Mutils.c:435
 #, c-format
 msgid "attempt to set factor on %s without '%s' slot"
 msgstr ""
 
-#: Mutils.c:446
-#, c-format
-msgid "attempt to discard factors from %s without '%s' slot"
-msgstr ""
-
-#: Mutils.c:594 Mutils.c:674
+#: Mutils.c:583 Mutils.c:663
 msgid "attempt to get sign of non-permutation"
 msgstr ""
 
-#: Mutils.c:619 Mutils.c:691
+#: Mutils.c:608 Mutils.c:680
 msgid "attempt to invert non-permutation"
 msgstr ""
 
-#: Mutils.c:634
+#: Mutils.c:623
 #, fuzzy
 msgid "invalid transposition vector"
 msgstr "indices de lignes erronés à la position %d"
 
-#: Mutils.c:647 Mutils.c:649 Mutils.c:664 Mutils.c:666 Mutils.c:681
-#: Mutils.c:701 Mutils.c:713
+#: Mutils.c:636 Mutils.c:638 Mutils.c:653 Mutils.c:655 Mutils.c:670
+#: Mutils.c:690 Mutils.c:702
 #, fuzzy, c-format
 msgid "'%s' is not of type \"%s\""
 msgstr "Le slot Dim n’est pas un entier"
 
-#: Mutils.c:651 Mutils.c:668 Mutils.c:715
+#: Mutils.c:640 Mutils.c:657 Mutils.c:704
 #, fuzzy, c-format
 msgid "'%s' does not have length %d"
 msgstr "le slot '%s' doit avoir une longueur de 1"
 
-#: Mutils.c:654 Mutils.c:671
+#: Mutils.c:643 Mutils.c:660
 #, c-format
 msgid "'%s' is NA"
 msgstr ""
 
-#: Mutils.c:683 Mutils.c:706
+#: Mutils.c:672 Mutils.c:695
 #, fuzzy, c-format
 msgid "'%s' or '%s' is not of type \"%s\""
 msgstr "Le slot Dim n’est pas un entier"
 
-#: Mutils.c:685 Mutils.c:708
+#: Mutils.c:674 Mutils.c:697
 #, fuzzy, c-format
 msgid "'%s' or '%s' does not have length %d"
 msgstr "le slot '%s' doit avoir une longueur de 1"
 
-#: Mutils.c:688 Mutils.c:711
+#: Mutils.c:677 Mutils.c:700
 #, c-format
 msgid "'%s' or '%s' is NA"
 msgstr ""
 
-#: Mutils.c:704
+#: Mutils.c:693
 #, c-format
 msgid "'%s' has length exceeding %s"
 msgstr ""
 
-#: Mutils.c:718
+#: Mutils.c:707
 #, c-format
 msgid "'%s' is NA or less than %s"
 msgstr ""
 
-#: Mutils.c:744
+#: Mutils.c:733
 #, c-format
 msgid "unexpected type \"%s\" in %s()"
 msgstr ""
 
-#: Mutils.c:766 Mutils.c:787
+#: Mutils.c:755 Mutils.c:776
 #, c-format
 msgid "unexpected kind \"%c\" in %s()"
 msgstr ""
 
-#: Mutils.c:920 Mutils.c:1005
+#: Mutils.c:909 Mutils.c:994
 #, c-format
 msgid "indices would exceed %s"
 msgstr ""
 
-#: Mutils.c:922 bind.c:750 bind.c:843 coerce.c:216 coerce.c:509 coerce.c:627
-#: coerce.c:1860 coerce.c:2116 coerce.c:2204 factorizations.c:123
-#: packedMatrix.c:953 subscript.c:1215 subscript.c:1400
+#: Mutils.c:911 bind.c:757 bind.c:853 coerce.c:222 coerce.c:515 coerce.c:633
+#: coerce.c:1874 coerce.c:2129 coerce.c:2217 dense.c:915 factorizations.c:145
+#: products.c:132 products.c:176 products.c:234 products.c:300 products.c:379
+#: products.c:439 products.c:730 subscript.c:1231 subscript.c:1416
 #, c-format
 msgid "attempt to allocate vector of length exceeding %s"
 msgstr ""
 
-#: Mutils.c:1272
+#: Mutils.c:1261
 msgid "Argument ij must be 2-column integer matrix"
 msgstr "L'argument ij doit être une matrice d'entiers à 2 colonnes"
 
-#: Mutils.c:1297
+#: Mutils.c:1286
 msgid "subscript 'i' out of bounds in M[ij]"
 msgstr "indice 'i' hors plage dans M[ij]"
 
-#: Mutils.c:1299
+#: Mutils.c:1288
 msgid "subscript 'j' out of bounds in M[ij]"
 msgstr "indice 'j' hors plage dans M[ij]"
 
-#: Mutils.c:1353
+#: Mutils.c:1342
 msgid "i and j must be integer vectors of the same length"
 msgstr "i et j doivent être des vecteurs d'entiers de même longueur"
 
-#: Mutils.c:1399
+#: Mutils.c:1388
 msgid "'data' must be of a vector type"
 msgstr "'data' doit être de type vecteur"
 
-#: Mutils.c:1406
+#: Mutils.c:1395
 #, c-format
 msgid "invalid '%s' argument"
 msgstr "argument '%s' incorrect"
 
-#: Mutils.c:1413 Mutils.c:1421
+#: Mutils.c:1402 Mutils.c:1410
 msgid "non-numeric matrix extent"
 msgstr "étendue de matrice non numérique"
 
-#: Mutils.c:1416
+#: Mutils.c:1405
 msgid "invalid 'nrow' value (too large or NA)"
 msgstr "valeur 'nrow' incorrecte (trop large ou NA)"
 
-#: Mutils.c:1418
+#: Mutils.c:1407
 msgid "invalid 'nrow' value (< 0)"
 msgstr "valeur 'nrow' incorrecte (< 0)"
 
-#: Mutils.c:1424
+#: Mutils.c:1413
 msgid "invalid 'ncol' value (too large or NA)"
 msgstr "valeur 'ncol' incorrecte (trop large ou NA)"
 
-#: Mutils.c:1426
+#: Mutils.c:1415
 msgid "invalid 'ncol' value (< 0)"
 msgstr "valeur 'ncol' incorrecte (< 0)"
 
-#: Mutils.c:1444
+#: Mutils.c:1433
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of rows [%d]"
@@ -209,7 +189,7 @@ msgstr ""
 "la longueur des données [%d] n'est pas un sous-multiple ni un multiple du "
 "nombre de lignes [%d]"
 
-#: Mutils.c:1449
+#: Mutils.c:1438
 #, c-format
 msgid ""
 "data length [%d] is not a sub-multiple or multiple of the number of columns "
@@ -218,58 +198,55 @@ msgstr ""
 "la longueur des données [%d] n'est pas un sous-multiple ni un multiple du "
 "nombre de colonnes [%d]"
 
-#: Mutils.c:1453
+#: Mutils.c:1442
 msgid "data length exceeds size of matrix"
 msgstr "la longueur des données excède la taille de la matrice"
 
-#: Mutils.c:1458
+#: Mutils.c:1447
 msgid "too many elements specified"
 msgstr "trop d'éléments sont spécifiés"
 
-#: Mutils.c:1530
-#, c-format
-msgid "the number of columns differ in R_rbind2_vector: %d != %d"
-msgstr "le nombre de colonnes diffère dans R_rbind2_vector: %d != %d"
-
-#: Mutils.c:1589 Mutils.c:1624 Mutils.c:1635 Mutils.c:1666
+#: Mutils.c:1510 Mutils.c:1545 Mutils.c:1556 Mutils.c:1587
 msgid "Argument must be numeric-like atomic vector"
 msgstr ""
 "L'argument doit être un vecteur atomique de type numérique ou convertible en "
 "nombres"
 
-#: bind.c:42 bind.c:149
+#: bind.c:44 bind.c:151
 msgid "number of rows of matrices must match"
 msgstr ""
 
-#: bind.c:44 bind.c:151
+#: bind.c:46 bind.c:153
 msgid "number of columns of matrices must match"
 msgstr ""
 
-#: bind.c:47 bind.c:154 bind.c:178 bind.c:202 coerce.c:37 factorizations.c:75
-#: factorizations.c:120 factorizations.c:233
+#: bind.c:49 bind.c:156 bind.c:180 bind.c:204 coerce.c:37 factorizations.c:81
+#: factorizations.c:141 factorizations.c:258 products.c:30 products.c:52
+#: products.c:58
 #, c-format
 msgid "dimensions cannot exceed %s"
 msgstr ""
 
-#: bind.c:206
+#: bind.c:208
 msgid "number of rows of result is not a multiple of vector length"
 msgstr ""
 
-#: bind.c:208
+#: bind.c:210
 msgid "number of columns of result is not a multiple of vector length"
 msgstr ""
 
-#: bind.c:227
+#: bind.c:229
 #, fuzzy
 msgid "complex matrices are not yet supported"
 msgstr "le code n'est pas encore écrit pour les matrices éparses complexes"
 
-#: bind.c:620 bind.c:685 sparse.c:830 sparse.c:911
+#: bind.c:627 bind.c:692 sparse.c:911 sparse.c:992
 #, c-format
 msgid "%s cannot exceed %s"
 msgstr ""
 
-#: bind.c:848
+#: bind.c:858 products.c:1024 products.c:1038 products.c:1074 products.c:1107
+#: products.c:1126 products.c:1203
 msgid "should never happen ..."
 msgstr ""
 
@@ -398,208 +375,215 @@ msgstr "chm_diagN2U(x, uploT = %d): uploT doit être +- 1"
 msgid "attempt to construct %s or %s from non-square matrix"
 msgstr "Determinant nécessite une matrice carrée"
 
-#: coerce.c:180 coerce.c:187 coerce.c:192 coerce.c:491 coerce.c:593
-#: coerce.c:599 coerce.c:607 coerce.c:697 coerce.c:748 coerce.c:755
-#: coerce.c:760 coerce.c:1185 coerce.c:1366 coerce.c:1372 coerce.c:1379
-#: coerce.c:1501 coerce.c:1508 coerce.c:1590 coerce.c:1721 coerce.c:1795
-#: coerce.c:1817 coerce.c:2409 coerce.c:2413 coerce.c:3418 coerce.c:3421
-#: coerce.c:3510 factorizations.c:1788 factorizations.c:2053
-#: factorizations.c:2169 packedMatrix.c:335 sparse.c:1226 sparse.c:1618
-#: unpackedMatrix.c:474
+#: coerce.c:181 coerce.c:188 coerce.c:193 coerce.c:200 coerce.c:497
+#: coerce.c:599 coerce.c:605 coerce.c:613 coerce.c:703 coerce.c:755
+#: coerce.c:762 coerce.c:767 coerce.c:774 coerce.c:1193 coerce.c:1376
+#: coerce.c:1382 coerce.c:1389 coerce.c:1511 coerce.c:1518 coerce.c:1604
+#: coerce.c:1735 coerce.c:1809 coerce.c:1831 coerce.c:2422 coerce.c:2426
+#: coerce.c:3403 coerce.c:3406 coerce.c:3478 dense.c:692 factorizations.c:1813
+#: factorizations.c:2078 factorizations.c:2194 products.c:793 products.c:1139
+#: sparse.c:1229 sparse.c:1621
 #, fuzzy, c-format
 msgid "invalid '%s' to %s()"
 msgstr "argument '%s' incorrect"
 
-#: coerce.c:219
+#: coerce.c:225
 #, c-format
 msgid "coercing n-by-n %s to %s is not supported for n*n exceeding %s"
 msgstr ""
 
-#: coerce.c:223 coerce.c:513 coerce.c:631
+#: coerce.c:229 coerce.c:519 coerce.c:637
 #, c-format
 msgid "sparse->dense coercion: allocating vector of size %0.1f GiB"
 msgstr ""
 
-#: coerce.c:1061 coerce.c:2007 coerce.c:2013
+#: coerce.c:1073 coerce.c:2020 coerce.c:2026
 #, c-format
 msgid "attempt to construct %s with more than %s nonzero entries"
 msgstr ""
 
-#: coerce.c:2311
+#: coerce.c:2324
 #, fuzzy
 msgid "attempt to pack non-square matrix"
 msgstr "Determinant nécessite une matrice carrée"
 
-#: coerce.c:2483 coerce.c:2681
+#: coerce.c:2496 coerce.c:2666
 #, c-format
 msgid "unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"
 msgstr ""
 
-#: coerce.c:2644
-msgid "NAs produced by integer overflow"
-msgstr ""
-
-#: coerce.c:3302
+#: coerce.c:3287
 #, fuzzy, c-format
 msgid "attempt to pack a %s"
 msgstr "Determinant nécessite une matrice carrée"
 
-#: cs_utils.c:37
-msgid "csp_eye argument n must be positive"
-msgstr "l'argument n de csp_eye doit être positif"
-
-#: cs_utils.c:71
-msgid "invalid class of 'x' in Matrix_as_cs(a, x)"
-msgstr "classe incorrecte de 'x' dans Matrix_as_cs(a, x)"
-
-#: cs_utils.c:133 cs_utils.c:179 cs_utils.c:194 cs_utils.c:214 cs_utils.c:227
-#, c-format
-msgid "invalid class of object to %s"
-msgstr "classe incorrecte d'objet à %s"
-
-#: cs_utils.c:147
-#, c-format
-msgid "cs matrix not compatible with class '%s'"
-msgstr "matrice cs incompatible avec la classe '%s'"
-
-#: cs_utils.c:251 cs_utils.c:270
-#, c-format
-msgid "Inappropriate class cl='%s' in Matrix_css_to_SEXP(S, cl, ..)"
-msgstr "Classe inappropriée cl='%s' dans Matrix_css_to_SEXP(S, cl, ..)"
-
-#: cs_utils.c:297 cs_utils.c:316
-#, c-format
-msgid "Inappropriate class cl='%s' in Matrix_csn_to_SEXP(S, cl, ..)"
-msgstr "Classe inappropriée cl='%s' dans Matrix_csn_to_SEXP(S, cl, ..)"
-
-#: dense.c:199 dense.c:204 sparse.c:508 sparse.c:513
+#: dense.c:202 dense.c:207 sparse.c:589 sparse.c:594
 #, fuzzy, c-format
 msgid "'%s' must be an integer from %s to %s"
 msgstr "'%s' doit être compris dans '%s'"
 
-#: dense.c:207 sparse.c:516
+#: dense.c:210 sparse.c:597
 #, fuzzy, c-format
 msgid "'%s' must be less than or equal to '%s'"
 msgstr "'%s' doit être compris dans '%s'"
 
-#: dense.c:832
+#: dense.c:314 dense.c:1098 dense.c:1672 dense.c:1677 dense.c:1923 dense.c:2118
+#: sparse.c:782 sparse.c:2444 sparse.c:3133 sparse.c:3138 sparse.c:3143
+#: sparse.c:3419 sparse.c:3656
+#, fuzzy, c-format
+msgid "'%s' must be %s or %s"
+msgstr "'%s' doit être compris dans '%s'"
+
+#: dense.c:422 sparse.c:1070
+#, fuzzy, c-format
+msgid "replacement diagonal has incompatible type \"%s\""
+msgstr "la diagonale de remplacement a une longueur incorrecte"
+
+#: dense.c:431 sparse.c:1079
+msgid "replacement diagonal has wrong length"
+msgstr "la diagonale de remplacement a une longueur incorrecte"
+
+#: dense.c:616 sparse.c:1270
+#, fuzzy
+msgid "attempt to symmetrize a non-square matrix"
+msgstr "Determinant nécessite une matrice carrée"
+
+#: dense.c:717 sparse.c:1648
+msgid "attempt to get symmetric part of non-square matrix"
+msgstr ""
+
+#: dense.c:869 sparse.c:2078
+msgid "attempt to get skew-symmetric part of non-square matrix"
+msgstr ""
+
+#: dense.c:1228 sparse.c:2575
+#, fuzzy, c-format
+msgid "'%s' must be %s or %s or %s"
+msgstr "'%s' doit être compris dans '%s'"
+
+#: dense.c:1667 sparse.c:3128
+#, fuzzy, c-format
+msgid "'%s' must be %d or %d"
+msgstr "'%s' doit être compris dans '%s'"
+
+#: dense.c:2150
 #, c-format
 msgid "incorrect left cyclic shift, j (%d) < 0"
 msgstr "décalage cyclique à gauche incorrect, j (%d) < 0"
 
-#: dense.c:835
+#: dense.c:2153
 #, c-format
 msgid "incorrect left cyclic shift, j (%d) >= k (%d)"
 msgstr "décalage cyclique à gauche incorrect, j (%d) >= k (%d)"
 
-#: dense.c:838
+#: dense.c:2156
 #, c-format
 msgid "incorrect left cyclic shift, k (%d) > ldx (%d)"
 msgstr "décalage cyclique à gauche incorrect, k (%d) > ldx (%d)"
 
-#: dense.c:891
+#: dense.c:2209
 #, fuzzy
 msgid "unknown error in getGivens"
 msgstr "Erreur inconnue dans getGivens"
 
-#: dense.c:900 dense.c:914 dense.c:944
+#: dense.c:2218 dense.c:2232 dense.c:2262
 msgid "X must be a numeric (double precision) matrix"
 msgstr "X doit être une matrice numérique (double précision)"
 
-#: dense.c:916 dense.c:946
+#: dense.c:2234 dense.c:2264
 msgid "y must be a numeric (double precision) matrix"
 msgstr "y doit être une matrice numérique (double précision)"
 
-#: dense.c:920 dense.c:950
+#: dense.c:2238 dense.c:2268
 #, c-format
 msgid "number of rows in y (%d) does not match number of rows in X (%d)"
 msgstr ""
 "le nombre de lignes de y (%d) ne correspond pas au nombre de lignes de X (%d)"
 
-#: dense.c:936
+#: dense.c:2254
 #, fuzzy, c-format
 msgid "LAPACK dposv returned error code %d"
 msgstr "La routine Lapack dposv a renvoyé le code d'erreur %d"
 
-#: dense.c:964 dense.c:970
+#: dense.c:2282 dense.c:2288
 #, fuzzy, c-format
 msgid "LAPACK dgels returned error code %d"
 msgstr "La routine Lapack %s a renvoyé le code d'erreur %d"
 
-#: dense.c:989
+#: dense.c:2307
 msgid "X must be a real (numeric) matrix"
 msgstr "X doit être une matrice (numérique) de réels"
 
-#: dense.c:992
+#: dense.c:2310
 #, fuzzy, c-format
 msgid "tol, given as %g, must be >= 0"
 msgstr "tol, donné comme %g, doit être <= 1"
 
-#: dense.c:994
+#: dense.c:2312
 #, c-format
 msgid "tol, given as %g, must be <= 1"
 msgstr "tol, donné comme %g, doit être <= 1"
 
-#: dense.c:1023 dense.c:1031
+#: dense.c:2341 dense.c:2349
 #, fuzzy, c-format
 msgid "LAPACK dgeqrf returned error code %d"
 msgstr "Le premier appel à dgeqrf a renvoyé le code d'erreur %d"
 
-#: dense.c:1036 dense.c:1059
+#: dense.c:2354 dense.c:2377
 #, fuzzy, c-format
 msgid "LAPACK dtrcon returned error code %d"
 msgstr "La routine Lapack dtrcon a renvoyé le code d'erreur %d"
 
-#: dgCMatrix.c:43
+#: dgCMatrix.c:46
 msgid "dgCMatrix_lusol requires a square, non-empty matrix"
 msgstr "dgCMatrix_lusol nécessite une matrice carrée non vide"
 
-#: dgCMatrix.c:45 dgCMatrix.c:71 dgCMatrix.c:118
+#: dgCMatrix.c:48 dgCMatrix.c:74 dgCMatrix.c:121
 msgid "Dimensions of system to be solved are inconsistent"
 msgstr "Les dimensions du système à résoudre sont incohérentes"
 
-#: dgCMatrix.c:47
+#: dgCMatrix.c:50
 msgid "cs_lusol failed"
 msgstr "cs_lusol a échoué"
 
-#: dgCMatrix.c:68
+#: dgCMatrix.c:71
 msgid "dgCMatrix_qrsol(., order) needs order in {0,..,3}"
 msgstr "dgCMatrix_qrsol(., order) nécessite un ordre compris entre {0,..,3}"
 
-#: dgCMatrix.c:77
+#: dgCMatrix.c:80
 #, c-format
 msgid "dgCMatrix_qrsol(<%d x %d>-matrix) requires a 'tall' rectangular matrix"
 msgstr ""
 "dgCMatrix_qrsol(<%d x %d>-matrix) nécessite une matrice rectangulaire haute "
 "('tall')"
 
-#: dgCMatrix.c:88
+#: dgCMatrix.c:91
 msgid "cs_qrsol() failed inside dgCMatrix_qrsol()"
 msgstr "cs_qrsol() a échoué à l'intérieur de dgCMatrix_qrsol()"
 
-#: dgCMatrix.c:116
+#: dgCMatrix.c:119
 msgid "dgCMatrix_cholsol requires a 'short, wide' rectangular matrix"
 msgstr "dgCMatrix_cholsol nécessite une matrice rectangulaire en longueur"
 
-#: dgCMatrix.c:124
+#: dgCMatrix.c:127
 msgid "cholmod_sdmult error (rhs)"
 msgstr "erreur cholmod_sdmult (partie droite de l'équation)"
 
-#: dgCMatrix.c:127
+#: dgCMatrix.c:130
 #, c-format
 msgid "cholmod_factorize failed: status %d, minor %d from ncol %d"
 msgstr "cholmod_factorize a échoué : statut %d, mineur %d pour ncol %d"
 
-#: dgCMatrix.c:131
+#: dgCMatrix.c:134
 #, c-format
 msgid "cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"
 msgstr "cholmod_solve (CHOLMOD_A) a échoué : statut %d, mineur %d pour ncol %d"
 
-#: dgCMatrix.c:148
+#: dgCMatrix.c:151
 msgid "cholmod_sdmult error (resid)"
 msgstr "erreur cholmod_sdmult (resid)"
 
-#: dgCMatrix.c:196
+#: dgCMatrix.c:199
 msgid "SuiteSparseQR_C_QR returned an error code"
 msgstr "SuiteSparseQR_C_QR a renvoyé un code d'erreur"
 
@@ -640,137 +624,137 @@ msgstr "dgeMatrix_Schur : le premier appel à dgees a échoué"
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr "dgeMatrix_Schur : dgees a renvoyé le code d'erreur %d"
 
-#: factorizations.c:73
+#: factorizations.c:77
 #, c-format
-msgid "wrong '%s' or '%s' or '%s'"
+msgid "wrong '%s'"
 msgstr ""
 
-#: factorizations.c:118
+#: factorizations.c:79 factorizations.c:139
 #, c-format
 msgid "wrong '%s' or '%s'"
 msgstr ""
 
-#: factorizations.c:153
+#: factorizations.c:178
 #, c-format
 msgid "expected %s or %s"
 msgstr ""
 
-#: factorizations.c:231
+#: factorizations.c:256
 #, c-format
 msgid "wrong '%s' or '%s' or '%s"
 msgstr ""
 
-#: factorizations.c:236
+#: factorizations.c:261
 #, c-format
 msgid "'%s' would overflow \"%s\""
 msgstr ""
 
-#: factorizations.c:239
+#: factorizations.c:264
 #, c-format
 msgid "n+1 would overflow \"%s\""
 msgstr ""
 
-#: factorizations.c:243
+#: factorizations.c:268
 #, fuzzy, c-format
 msgid "leading principal minor of order %d is not positive"
 msgstr "le 'leading minor of order' %d n'est pas un entier fini"
 
-#: factorizations.c:246
+#: factorizations.c:271
 #, fuzzy, c-format
 msgid "leading principal minor of order %d is zero"
 msgstr "le 'leading minor of order' %d n'est pas un entier fini"
 
-#: factorizations.c:317
+#: factorizations.c:342
 #, c-format
 msgid "LAPACK routine '%s': argument %d had illegal value"
 msgstr ""
 
-#: factorizations.c:326 factorizations.c:329
+#: factorizations.c:351 factorizations.c:354
 #, fuzzy, c-format
 msgid "LAPACK routine '%s': matrix is exactly singular, %s[i,i]=0, i=%d"
 msgstr "Routine Lapack dgetrs : le système est exactement singulier"
 
-#: factorizations.c:339 factorizations.c:342
+#: factorizations.c:364 factorizations.c:367
 #, fuzzy, c-format
 msgid ""
 "LAPACK routine '%s': leading principal minor of order %d is not positive"
 msgstr "le 'leading minor of order' %d n'est pas un entier fini"
 
-#: factorizations.c:355 factorizations.c:358
+#: factorizations.c:380 factorizations.c:383
 #, c-format
 msgid ""
 "LAPACK routine '%s': matrix is rank deficient or not positive definite, the "
 "_computed_ rank is %d"
 msgstr ""
 
-#: factorizations.c:647 sparse.c:195
+#: factorizations.c:672 sparse.c:195
 #, fuzzy, c-format
 msgid "'%s' is not a number"
 msgstr "%s n’est pas une liste"
 
-#: factorizations.c:665
+#: factorizations.c:690
 #, c-format
 msgid "LU factorization of m-by-n %s requires m == n"
 msgstr ""
 
-#: factorizations.c:674
+#: factorizations.c:699
 #, c-format
 msgid "LU factorization of %s failed: out of memory or near-singular"
 msgstr ""
 
-#: factorizations.c:764
+#: factorizations.c:789
 #, c-format
 msgid "QR factorization of m-by-n %s requires m >= n"
 msgstr ""
 
-#: factorizations.c:773
+#: factorizations.c:798
 #, c-format
 msgid "QR factorization of %s failed: out of memory"
 msgstr ""
 
-#: factorizations.c:867 factorizations.c:2223
+#: factorizations.c:892 factorizations.c:2248
 #, c-format
 msgid "'%s' is not a number or not finite"
 msgstr ""
 
-#: factorizations.c:1124
+#: factorizations.c:1149
 #, fuzzy
 msgid "determinant of non-square matrix is undefined"
 msgstr "Determinant nécessite une matrice carrée"
 
-#: factorizations.c:1290
+#: factorizations.c:1315
 #, fuzzy, c-format
 msgid "%s(<%s>) does not support structurally rank deficient case"
 msgstr ""
 "%s() : cas structurellement déficient de rang : probablement des zéros "
 "ERRONES"
 
-#: factorizations.c:1412
+#: factorizations.c:1437
 #, fuzzy, c-format
 msgid "'%s' is not square"
 msgstr "Matrix n'est pas carrée"
 
-#: factorizations.c:1418 factorizations.c:2058
+#: factorizations.c:1443 factorizations.c:2083
 #, fuzzy, c-format
 msgid "dimensions of '%s' and '%s' are inconsistent"
 msgstr "Les dimensions du système à résoudre sont incohérentes"
 
-#: factorizations.c:1612
+#: factorizations.c:1637
 #, c-format
 msgid "%s(<%s>, <%s>) failed: out of memory"
 msgstr ""
 
-#: factorizations.c:1703
+#: factorizations.c:1728
 #, c-format
 msgid "attempt to construct sparse matrix with more than %s nonzero elements"
 msgstr ""
 
-#: init.c:421
+#: init.c:381
 #, fuzzy
 msgid "missing 'Matrix' namespace; should never happen"
 msgstr "espace de noms 'Matrix' manquant : ceci ne devrait jamais se produire"
 
-#: init.c:431
+#: init.c:391
 #, fuzzy
 msgid "'Matrix' namespace not determined correctly"
 msgstr "L’espace de noms Matrix n'est pas correctement déterminé"
@@ -808,93 +792,27 @@ msgstr "'%s' doit avoir une longueur de chaîne de caractères de 1"
 msgid "%s(%s) is undefined: '%s' is not square"
 msgstr ""
 
-#: kappa.c:109 kappa.c:160 kappa.c:213 kappa.c:264 kappa.c:319 kappa.c:349
-#: kappa.c:377
-#, c-format
-msgid "%s(%s) is undefined: '%s' has length %d"
-msgstr ""
-
 #: packedMatrix.c:186 unpackedMatrix.c:228
 #, c-format
 msgid "incompatible '%s' and '%s' in %s()"
 msgstr ""
 
-#: packedMatrix.c:620 sparse.c:701 unpackedMatrix.c:956
-#, fuzzy, c-format
-msgid "'%s' must be %s or %s"
-msgstr "'%s' doit être compris dans '%s'"
+#: products.c:109 products.c:174 products.c:232 products.c:298 products.c:377
+#: products.c:437 products.c:676 products.c:724
+msgid "non-conformable arguments"
+msgstr ""
 
-#: packedMatrix.c:717 sparse.c:989 unpackedMatrix.c:1056
-#, fuzzy, c-format
-msgid "replacement diagonal has incompatible type \"%s\""
-msgstr "la diagonale de remplacement a une longueur incorrecte"
-
-#: packedMatrix.c:722 sparse.c:998 unpackedMatrix.c:1061
-msgid "replacement diagonal has wrong length"
-msgstr "la diagonale de remplacement a une longueur incorrecte"
-
-#: products.c:155 products.c:248
+#: sparseVector.c:89
 #, c-format
-msgid "Dimensions of x and y are not compatible for %s"
-msgstr "Les dimensions de x et y ne sont pas compatibles pour %s"
-
-#: products.c:227
-msgid "Argument y must be numeric, integer or logical"
-msgstr "L'argument y doit être un nombre réel, un entier ou un booléen"
-
-#: products.c:311 products.c:315 products.c:488 products.c:579 products.c:605
-msgid "Matrices are not conformable for multiplication"
-msgstr "Les matrices sont incohérentes pour la multiplication"
-
-#: products.c:408
-#, c-format
-msgid "dimension mismatch in matrix multiplication of \"dtrMatrix\": %d != %d"
-msgstr ""
-"dimensions incompatibles pour la multiplication matricielle avec "
-"\"dtrMatrix\" : %d != %d"
-
-#: products.c:486
-msgid "dtrMatrix must be square"
-msgstr "dtrMatrix doit être carrée"
-
-#: products.c:528 products.c:559
-#, c-format
-msgid "Dimensions of a (%d,%d) and b (%d,%d) do not conform"
-msgstr "Les dimensions de a (%d,%d) et b (%d,%d) ne sont pas conformes"
-
-#: products.c:535
-msgid "right=TRUE is not yet implemented __ FIXME"
-msgstr "right=TRUE n'est pas encore implémenté __ FIXME"
-
-#: products.c:668
-msgid ""
-"cholmod_sdmult() not yet implemented for pattern matrices -> coercing to "
-"double"
+msgid "%s length cannot exceed %s"
 msgstr ""
 
-#: sparse.c:1267 unpackedMatrix.c:501
-#, fuzzy
-msgid "attempt to symmetrize a non-square matrix"
-msgstr "Determinant nécessite une matrice carrée"
-
-#: sparse.c:1645 unpackedMatrix.c:1160 unpackedMatrix.c:1287
-msgid "attempt to get symmetric part of non-square matrix"
-msgstr ""
-
-#: sparse.c:2092 unpackedMatrix.c:1365 unpackedMatrix.c:1510
-msgid "attempt to get skew-symmetric part of non-square matrix"
-msgstr ""
-
-#: sparse.c:2743 sparse.c:3020
-msgid "sparseResult=TRUE inefficient for unit triangular 'x'"
-msgstr ""
-
-#: subscript.c:1525 subscript.c:1679 subscript.c:1880 subscript.c:2059
+#: subscript.c:1541 subscript.c:1694 subscript.c:1937 subscript.c:2121
 #, c-format
 msgid "%s too dense for %s; would have more than %s nonzero entries"
 msgstr ""
 
-#: subscript.c:2146
+#: subscript.c:2208
 #, c-format
 msgid "NA subscripts in %s not supported for '%s' inheriting from %s"
 msgstr ""
@@ -929,41 +847,44 @@ msgstr ""
 "erreur de programmation dans Csparse_subassign() qui ne devrait jamais se "
 "produire"
 
-#: validity.c:47 validity.c:192 validity.c:273 validity.c:292 validity.c:301
-#: validity.c:320 validity.c:346 validity.c:366 validity.c:416 validity.c:433
-#: validity.c:467 validity.c:484 validity.c:518 validity.c:520 validity.c:970
-#: validity.c:1003 validity.c:1023 validity.c:1089 validity.c:1091
-#: validity.c:1139 validity.c:1203 validity.c:1205 validity.c:1251
-#: validity.c:1298 validity.c:1347 validity.c:1380 validity.c:1390
-#: validity.c:1403 validity.c:1457 validity.c:1459 validity.c:1491
-#: validity.c:1503 validity.c:1526 validity.c:1589 validity.c:1608
-#: validity.c:1610 validity.c:1642 validity.c:1677 validity.c:1705
+#: validity.c:47 validity.c:192 validity.c:271 validity.c:290 validity.c:299
+#: validity.c:318 validity.c:344 validity.c:364 validity.c:414 validity.c:431
+#: validity.c:465 validity.c:482 validity.c:516 validity.c:518 validity.c:968
+#: validity.c:1001 validity.c:1083 validity.c:1103 validity.c:1169
+#: validity.c:1171 validity.c:1219 validity.c:1283 validity.c:1285
+#: validity.c:1331 validity.c:1378 validity.c:1427 validity.c:1460
+#: validity.c:1470 validity.c:1483 validity.c:1537 validity.c:1539
+#: validity.c:1571 validity.c:1583 validity.c:1606 validity.c:1669
+#: validity.c:1688 validity.c:1690 validity.c:1722 validity.c:1757
+#: validity.c:1785
 #, fuzzy, c-format
 msgid "'%s' slot is not of type \"%s\""
 msgstr "Le slot Dim n’est pas un entier"
 
-#: validity.c:49 validity.c:82 validity.c:275 validity.c:294 validity.c:303
-#: validity.c:322 validity.c:348 validity.c:1382 validity.c:1406
+#: validity.c:49 validity.c:82 validity.c:273 validity.c:292 validity.c:301
+#: validity.c:320 validity.c:346 validity.c:1019 validity.c:1462
+#: validity.c:1486
 #, fuzzy, c-format
 msgid "'%s' slot does not have length %d"
 msgstr "Le slot Dim doit avoir une longueur de 2"
 
-#: validity.c:52 validity.c:372 validity.c:425 validity.c:443 validity.c:476
-#: validity.c:494 validity.c:530 validity.c:532 validity.c:1029 validity.c:1102
-#: validity.c:1114 validity.c:1216 validity.c:1228 validity.c:1257
-#: validity.c:1308 validity.c:1357 validity.c:1396 validity.c:1416
-#: validity.c:1497 validity.c:1513 validity.c:1538 validity.c:1602
-#: validity.c:1622 validity.c:1624 validity.c:1651
+#: validity.c:52 validity.c:370 validity.c:423 validity.c:441 validity.c:474
+#: validity.c:492 validity.c:528 validity.c:530 validity.c:1050 validity.c:1062
+#: validity.c:1109 validity.c:1182 validity.c:1194 validity.c:1296
+#: validity.c:1308 validity.c:1337 validity.c:1388 validity.c:1437
+#: validity.c:1476 validity.c:1496 validity.c:1577 validity.c:1593
+#: validity.c:1618 validity.c:1682 validity.c:1702 validity.c:1704
+#: validity.c:1731
 #, c-format
 msgid "'%s' slot contains NA"
 msgstr ""
 
-#: validity.c:54 validity.c:976 validity.c:1009
+#: validity.c:54 validity.c:974 validity.c:1007
 #, fuzzy, c-format
 msgid "'%s' slot has negative elements"
 msgstr "le slot 'Dim' a une longueur inférieure à deux"
 
-#: validity.c:80 validity.c:208
+#: validity.c:80 validity.c:206
 #, fuzzy, c-format
 msgid "'%s' slot is not a list"
 msgstr "Le slot Dim n’est pas un entier"
@@ -978,354 +899,451 @@ msgstr "Dimnames[%d] n’est pas un vecteur de chaînes de caractères"
 msgid "length of %s[[%d]] (%lld) is not equal to %s[%d] (%d)"
 msgstr "length(Dimnames[%d]) diffère de Dim[%d] qui est %d"
 
-#: validity.c:214
+#: validity.c:212
 #, c-format
 msgid "'%s' slot has no '%s' attribute"
 msgstr ""
 
-#: validity.c:225 validity.c:288 validity.c:316 validity.c:387 validity.c:1044
-#: validity.c:1376 validity.c:1737
+#: validity.c:223 validity.c:286 validity.c:314 validity.c:385 validity.c:1124
+#: validity.c:1456 validity.c:1817
 #, c-format
 msgid "%s[1] != %s[2] (matrix is not square)"
 msgstr ""
 
-#: validity.c:250 validity.c:263
+#: validity.c:248 validity.c:261
 #, c-format
 msgid "%s[1] differs from %s[2]"
 msgstr ""
 
-#: validity.c:278 validity.c:297 validity.c:306 validity.c:325
+#: validity.c:276 validity.c:295 validity.c:304 validity.c:323
 #, fuzzy, c-format
 msgid "'%s' slot is not \"%s\" or \"%s\""
 msgstr "le slot x n’est pas un nombre \"double\""
 
-#: validity.c:331 validity.c:335
+#: validity.c:329 validity.c:333
 #, fuzzy, c-format
 msgid "'%s' slot is \"%s\" but '%s' slot does not have length %s"
 msgstr "Le slot Dim doit avoir une longueur de 2"
 
-#: validity.c:351
+#: validity.c:349
 #, fuzzy, c-format
 msgid "'%s' slot is not %d or %d"
 msgstr "le slot x n’est pas un nombre \"double\""
 
-#: validity.c:357 validity.c:360
+#: validity.c:355 validity.c:358
 #, c-format
 msgid "%s-by-%s %s invalid for positive '%s' when %s=%d"
 msgstr ""
 
-#: validity.c:368 validity.c:418 validity.c:469 validity.c:891 validity.c:902
-#: validity.c:972 validity.c:1005 validity.c:1025 validity.c:1093
-#: validity.c:1141 validity.c:1207 validity.c:1253 validity.c:1392
-#: validity.c:1409 validity.c:1461 validity.c:1463 validity.c:1493
-#: validity.c:1505 validity.c:1528 validity.c:1644 validity.c:1681
-#: validity.c:1709 validity.c:1759
+#: validity.c:366 validity.c:416 validity.c:467 validity.c:889 validity.c:900
+#: validity.c:970 validity.c:1003 validity.c:1105 validity.c:1173
+#: validity.c:1221 validity.c:1287 validity.c:1333 validity.c:1472
+#: validity.c:1489 validity.c:1541 validity.c:1543 validity.c:1573
+#: validity.c:1585 validity.c:1608 validity.c:1724 validity.c:1761
+#: validity.c:1789 validity.c:1839
 #, fuzzy, c-format
 msgid "'%s' slot does not have length %s"
 msgstr "Le slot Dim doit avoir une longueur de 2"
 
-#: validity.c:374 validity.c:445 validity.c:496 validity.c:534 validity.c:537
-#: validity.c:1031 validity.c:1104 validity.c:1116 validity.c:1218
-#: validity.c:1230 validity.c:1310 validity.c:1359 validity.c:1418
-#: validity.c:1540 validity.c:1653
+#: validity.c:372 validity.c:443 validity.c:494 validity.c:532 validity.c:535
+#: validity.c:1052 validity.c:1111 validity.c:1184 validity.c:1196
+#: validity.c:1298 validity.c:1310 validity.c:1390 validity.c:1439
+#: validity.c:1498 validity.c:1620 validity.c:1733
 #, fuzzy, c-format
 msgid "'%s' slot has elements not in {%s}"
 msgstr "le slot 'Dim' a une longueur inférieure à deux"
 
-#: validity.c:397 validity.c:1107 validity.c:1119 validity.c:1221
-#: validity.c:1233 validity.c:1313 validity.c:1362 validity.c:1421
+#: validity.c:395 validity.c:1187 validity.c:1199 validity.c:1301
+#: validity.c:1313 validity.c:1393 validity.c:1442 validity.c:1501
 #, c-format
 msgid "'%s' slot contains duplicates"
 msgstr ""
 
-#: validity.c:421 validity.c:472 validity.c:1597 validity.c:1617
-#: validity.c:1619
+#: validity.c:419 validity.c:470 validity.c:1677 validity.c:1697
+#: validity.c:1699
 #, fuzzy, c-format
 msgid "first element of '%s' slot is not 0"
 msgstr "le premier élément du slot p doit être à zéro"
 
-#: validity.c:427 validity.c:478
+#: validity.c:425 validity.c:476
 #, fuzzy, c-format
 msgid "'%s' slot is not nondecreasing"
 msgstr "le slot p ne peut contenir de valeurs décroissantes"
 
-#: validity.c:429 validity.c:480
+#: validity.c:427 validity.c:478
 #, c-format
 msgid "first differences of '%s' slot exceed %s"
 msgstr ""
 
-#: validity.c:435 validity.c:486
+#: validity.c:433 validity.c:484
 #, fuzzy, c-format
 msgid "'%s' slot has length less than %s"
 msgstr "le slot 'Dim' a une longueur inférieure à deux"
 
-#: validity.c:448 validity.c:1543
+#: validity.c:446 validity.c:1623
 #, fuzzy, c-format
 msgid "'%s' slot is not increasing within columns"
 msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 
-#: validity.c:499
+#: validity.c:497
 #, fuzzy, c-format
 msgid "'%s' slot is not increasing within rows"
 msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 
-#: validity.c:523 validity.c:812 validity.c:838 validity.c:864 validity.c:1612
-#: validity.c:1614
+#: validity.c:521 validity.c:810 validity.c:836 validity.c:862 validity.c:1085
+#: validity.c:1692 validity.c:1694
 #, fuzzy, c-format
 msgid "'%s' and '%s' slots do not have equal length"
 msgstr "Le slot Dim doit avoir une longueur de 2"
 
-#: validity.c:526
+#: validity.c:524
 #, c-format
 msgid "'%s' slot has nonzero length but %s is 0"
 msgstr ""
 
-#: validity.c:566 validity.c:611 validity.c:657 validity.c:702 validity.c:746
-#: validity.c:781
+#: validity.c:564 validity.c:609 validity.c:655 validity.c:700 validity.c:744
+#: validity.c:779
 #, fuzzy, c-format
 msgid "%s=\"%s\" but there are entries below the diagonal"
 msgstr "uplo='U' ne peut avoir des entrées éparses en dessous de la diagonale"
 
-#: validity.c:576 validity.c:624 validity.c:667 validity.c:715 validity.c:751
-#: validity.c:792
+#: validity.c:574 validity.c:622 validity.c:665 validity.c:713 validity.c:749
+#: validity.c:790
 #, fuzzy, c-format
 msgid "%s=\"%s\" but there are entries above the diagonal"
 msgstr "uplo='L' ne peut avoir des entrées éparses au dessus de la diagonale"
 
-#: validity.c:614 validity.c:627 validity.c:705 validity.c:718 validity.c:784
-#: validity.c:795
+#: validity.c:612 validity.c:625 validity.c:703 validity.c:716 validity.c:782
+#: validity.c:793
 #, fuzzy, c-format
 msgid "%s=\"%s\" but there are entries on the diagonal"
 msgstr "uplo='U' ne peut avoir des entrées éparses en dessous de la diagonale"
 
-#: validity.c:922 validity.c:946 validity.c:950
+#: validity.c:920 validity.c:944 validity.c:948
 msgid "matrix has negative diagonal elements"
 msgstr ""
 
-#: validity.c:966 validity.c:994 validity.c:998
+#: validity.c:964 validity.c:992 validity.c:996
 msgid "matrix has nonunit diagonal elements"
 msgstr ""
 
-#: validity.c:1054 validity.c:1081 validity.c:1744 validity.c:1751
+#: validity.c:1016 validity.c:1041 validity.c:1836
 #, fuzzy, c-format
-msgid "dimensions of '%s' slot are not identical to '%s'"
-msgstr "Les dimensions de x et y ne sont pas compatibles pour %s"
+msgid "'%s' slot is not of type \"%s\" or \"%s\""
+msgstr "Le slot Dim n’est pas un entier"
 
-#: validity.c:1056
-#, c-format
-msgid "'%s' slot is upper (not lower) triangular"
-msgstr ""
-
-#: validity.c:1069
-#, c-format
-msgid "'%s' slot has nonunit diagonal elements"
-msgstr ""
-
-#: validity.c:1083
-#, c-format
-msgid "'%s' slot is lower (not upper) triangular"
-msgstr ""
-
-#: validity.c:1095 validity.c:1209 validity.c:1300 validity.c:1349
+#: validity.c:1024 validity.c:1031
 #, fuzzy, c-format
-msgid "'%s' slot does not have length %s or length %s"
-msgstr "Le slot Dim doit avoir une longueur de 2"
+msgid "'%s' slot is NA"
+msgstr "Le slot Dim n’est pas un entier"
 
-#: validity.c:1135
-msgid "matrix has more columns than rows"
-msgstr ""
-
-#: validity.c:1156
+#: validity.c:1026 validity.c:1033
 #, fuzzy, c-format
-msgid "'%s' slot has fewer than %s rows"
+msgid "'%s' slot is negative"
 msgstr "le slot 'Dim' a une longueur inférieure à deux"
 
-#: validity.c:1158
+#: validity.c:1035
 #, fuzzy, c-format
-msgid "'%s' slot has more than %s rows"
+msgid "'%s' slot exceeds %s"
+msgstr "'%s' doit être compris dans '%s'"
+
+#: validity.c:1045
+#, fuzzy, c-format
+msgid "'%s' slot has length greater than '%s' slot"
 msgstr "le slot 'Dim' a une longueur inférieure à deux"
 
-#: validity.c:1160 validity.c:1183
-#, fuzzy, c-format
-msgid "'%s' slot does not have %s columns"
-msgstr "Le slot Dim doit avoir une longueur de 2"
-
-#: validity.c:1167
-#, fuzzy, c-format
-msgid "'%s' slot must be lower trapezoidal but has entries above the diagonal"
-msgstr "uplo='L' ne peut avoir des entrées éparses au dessus de la diagonale"
-
-#: validity.c:1181
-#, fuzzy, c-format
-msgid "'%s' slot does not have %s row"
-msgstr "Le slot Dim doit avoir une longueur de 2"
-
-#: validity.c:1191
-#, fuzzy, c-format
-msgid "'%s' slot must be upper trapezoidal but has entries below the diagonal"
-msgstr "uplo='U' ne peut avoir des entrées éparses en dessous de la diagonale"
-
-#: validity.c:1194
-#, c-format
-msgid "'%s' slot has negative diagonal elements"
-msgstr ""
-
-#: validity.c:1259
-#, c-format
-msgid "'%s' slot has elements not in {%s}\\{%s}"
-msgstr ""
-
-#: validity.c:1268
-#, c-format
-msgid "'%s' slot has unpaired negative elements"
-msgstr ""
-
-#: validity.c:1294 validity.c:1338 validity.c:1342 validity.c:1690
-#: validity.c:1722
-msgid "Cholesky factor has negative diagonal elements"
-msgstr ""
-
-#: validity.c:1385
-#, fuzzy, c-format
-msgid "%s[%d] (%s) is not in %s"
-msgstr "%s n’est pas une liste"
-
-#: validity.c:1398 validity.c:1499
-#, fuzzy, c-format
-msgid "%s is not in {%s}"
-msgstr "%s n’est pas une liste"
-
-#: validity.c:1435
-#, c-format
-msgid "%s is not representable as \"%s\""
-msgstr ""
-
-#: validity.c:1440 validity.c:1446
-#, c-format
-msgid "%s[%d] (%s) is not %d or %d"
-msgstr ""
-
-#: validity.c:1443 validity.c:1559 validity.c:1562 validity.c:1565
-#, c-format
-msgid "%s[%d] (%s) is not %d"
-msgstr ""
-
-#: validity.c:1468
-#, c-format
-msgid "%s has elements not in {%s}"
-msgstr ""
-
-#: validity.c:1471
-#, c-format
-msgid "%s has elements not in {%s}\\{%s}"
-msgstr ""
-
-#: validity.c:1474
-#, c-format
-msgid "%s is %d but columns are not stored in increasing order"
-msgstr ""
-
-#: validity.c:1477 validity.c:1480
-#, c-format
-msgid "traversal of '%s' slot does not complete in exactly %s steps"
-msgstr ""
-
-#: validity.c:1486 validity.c:1488
-#, fuzzy, c-format
-msgid "%s is not %d"
-msgstr "%s n’est pas une liste"
-
-#: validity.c:1509
-#, c-format
-msgid "column '%s' is stored first but %s is not 0"
-msgstr ""
-
-#: validity.c:1515
-#, fuzzy, c-format
-msgid "'%s' slot is not increasing when traversed in stored column order"
-msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
-
-#: validity.c:1517
-#, c-format
-msgid "'%s' slot allocates fewer than %s elements for column '%s'"
-msgstr ""
-
-#: validity.c:1520
-#, c-format
-msgid "'%s' slot allocates more than %s elements for column '%s'"
-msgstr ""
-
-#: validity.c:1534
-#, c-format
-msgid "first entry in column '%s' does not have row index '%s'"
-msgstr ""
-
-#: validity.c:1568 validity.c:1571
-#, c-format
-msgid "%s[%d] (%s) is negative"
-msgstr ""
-
-#: validity.c:1574
-#, c-format
-msgid "%s[%d] (%s) is not less than %s"
-msgstr ""
-
-#: validity.c:1592
-#, fuzzy, c-format
-msgid "'%s' slot has length less than %d"
-msgstr "le slot 'Dim' a une longueur inférieure à deux"
-
-#: validity.c:1594
-#, fuzzy, c-format
-msgid "'%s' slot has length greater than %s"
-msgstr "le slot 'Dim' a une longueur inférieure à deux"
-
-#: validity.c:1599
-#, fuzzy, c-format
-msgid "last element of '%s' slot is not %s"
-msgstr "le premier élément du slot p doit être à zéro"
-
-#: validity.c:1604 validity.c:1626 validity.c:1628
+#: validity.c:1055 validity.c:1684 validity.c:1706 validity.c:1708
 #, fuzzy, c-format
 msgid "'%s' slot is not increasing"
 msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 
-#: validity.c:1632
+#: validity.c:1065
+#, fuzzy, c-format
+msgid "'%s' slot has elements not in {%s} after truncation towards zero"
+msgstr "le slot 'Dim' a une longueur inférieure à deux"
+
+#: validity.c:1068
+#, fuzzy, c-format
+msgid "'%s' slot is not increasing after truncation towards zero"
+msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
+
+#: validity.c:1134 validity.c:1161 validity.c:1824 validity.c:1831
+#, fuzzy, c-format
+msgid "dimensions of '%s' slot are not identical to '%s'"
+msgstr "Les dimensions de x et y ne sont pas compatibles pour %s"
+
+#: validity.c:1136
+#, c-format
+msgid "'%s' slot is upper (not lower) triangular"
+msgstr ""
+
+#: validity.c:1149
+#, c-format
+msgid "'%s' slot has nonunit diagonal elements"
+msgstr ""
+
+#: validity.c:1163
+#, c-format
+msgid "'%s' slot is lower (not upper) triangular"
+msgstr ""
+
+#: validity.c:1175 validity.c:1289 validity.c:1380 validity.c:1429
+#, fuzzy, c-format
+msgid "'%s' slot does not have length %s or length %s"
+msgstr "Le slot Dim doit avoir une longueur de 2"
+
+#: validity.c:1215
+msgid "matrix has more columns than rows"
+msgstr ""
+
+#: validity.c:1236
+#, fuzzy, c-format
+msgid "'%s' slot has fewer than %s rows"
+msgstr "le slot 'Dim' a une longueur inférieure à deux"
+
+#: validity.c:1238
+#, fuzzy, c-format
+msgid "'%s' slot has more than %s rows"
+msgstr "le slot 'Dim' a une longueur inférieure à deux"
+
+#: validity.c:1240 validity.c:1263
+#, fuzzy, c-format
+msgid "'%s' slot does not have %s columns"
+msgstr "Le slot Dim doit avoir une longueur de 2"
+
+#: validity.c:1247
+#, fuzzy, c-format
+msgid "'%s' slot must be lower trapezoidal but has entries above the diagonal"
+msgstr "uplo='L' ne peut avoir des entrées éparses au dessus de la diagonale"
+
+#: validity.c:1261
+#, fuzzy, c-format
+msgid "'%s' slot does not have %s row"
+msgstr "Le slot Dim doit avoir une longueur de 2"
+
+#: validity.c:1271
+#, fuzzy, c-format
+msgid "'%s' slot must be upper trapezoidal but has entries below the diagonal"
+msgstr "uplo='U' ne peut avoir des entrées éparses en dessous de la diagonale"
+
+#: validity.c:1274
+#, c-format
+msgid "'%s' slot has negative diagonal elements"
+msgstr ""
+
+#: validity.c:1339
+#, c-format
+msgid "'%s' slot has elements not in {%s}\\{%s}"
+msgstr ""
+
+#: validity.c:1348
+#, c-format
+msgid "'%s' slot has unpaired negative elements"
+msgstr ""
+
+#: validity.c:1374 validity.c:1418 validity.c:1422 validity.c:1770
+#: validity.c:1802
+msgid "Cholesky factor has negative diagonal elements"
+msgstr ""
+
+#: validity.c:1465
+#, fuzzy, c-format
+msgid "%s[%d] (%s) is not in %s"
+msgstr "%s n’est pas une liste"
+
+#: validity.c:1478 validity.c:1579
+#, fuzzy, c-format
+msgid "%s is not in {%s}"
+msgstr "%s n’est pas une liste"
+
+#: validity.c:1515
+#, c-format
+msgid "%s is not representable as \"%s\""
+msgstr ""
+
+#: validity.c:1520 validity.c:1526
+#, c-format
+msgid "%s[%d] (%s) is not %d or %d"
+msgstr ""
+
+#: validity.c:1523 validity.c:1639 validity.c:1642 validity.c:1645
+#, c-format
+msgid "%s[%d] (%s) is not %d"
+msgstr ""
+
+#: validity.c:1548
+#, c-format
+msgid "%s has elements not in {%s}"
+msgstr ""
+
+#: validity.c:1551
+#, c-format
+msgid "%s has elements not in {%s}\\{%s}"
+msgstr ""
+
+#: validity.c:1554
+#, c-format
+msgid "%s is %d but columns are not stored in increasing order"
+msgstr ""
+
+#: validity.c:1557 validity.c:1560
+#, c-format
+msgid "traversal of '%s' slot does not complete in exactly %s steps"
+msgstr ""
+
+#: validity.c:1566 validity.c:1568
+#, fuzzy, c-format
+msgid "%s is not %d"
+msgstr "%s n’est pas une liste"
+
+#: validity.c:1589
+#, c-format
+msgid "column '%s' is stored first but %s is not 0"
+msgstr ""
+
+#: validity.c:1595
+#, fuzzy, c-format
+msgid "'%s' slot is not increasing when traversed in stored column order"
+msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
+
+#: validity.c:1597
+#, c-format
+msgid "'%s' slot allocates fewer than %s elements for column '%s'"
+msgstr ""
+
+#: validity.c:1600
+#, c-format
+msgid "'%s' slot allocates more than %s elements for column '%s'"
+msgstr ""
+
+#: validity.c:1614
+#, c-format
+msgid "first entry in column '%s' does not have row index '%s'"
+msgstr ""
+
+#: validity.c:1648 validity.c:1651
+#, c-format
+msgid "%s[%d] (%s) is negative"
+msgstr ""
+
+#: validity.c:1654
+#, c-format
+msgid "%s[%d] (%s) is not less than %s"
+msgstr ""
+
+#: validity.c:1672
+#, fuzzy, c-format
+msgid "'%s' slot has length less than %d"
+msgstr "le slot 'Dim' a une longueur inférieure à deux"
+
+#: validity.c:1674
+#, fuzzy, c-format
+msgid "'%s' slot has length greater than %s"
+msgstr "le slot 'Dim' a une longueur inférieure à deux"
+
+#: validity.c:1679
+#, fuzzy, c-format
+msgid "last element of '%s' slot is not %s"
+msgstr "le premier élément du slot p doit être à zéro"
+
+#: validity.c:1712
 #, c-format
 msgid "first differences of '%s' slot are less than those of '%s' slot"
 msgstr ""
 
-#: validity.c:1635
+#: validity.c:1715
 #, c-format
 msgid "supernode lengths exceed %s"
 msgstr ""
 
-#: validity.c:1637
+#: validity.c:1717
 #, c-format
 msgid "first differences of '%s' slot are not equal to supernode lengths"
 msgstr ""
 
-#: validity.c:1657
+#: validity.c:1737
 #, c-format
 msgid ""
 "'%s' slot is wrong within diagonal blocks (row and column indices do not "
 "coincide)"
 msgstr ""
 
-#: validity.c:1660
+#: validity.c:1740
 #, fuzzy, c-format
 msgid "'%s' slot is not increasing within supernodes"
 msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 
-#: validity.c:1756
-#, fuzzy, c-format
-msgid "'%s' slot is not of type \"%s\" or type \"%s\""
-msgstr "Le slot Dim n’est pas un entier"
-
-#: validity.c:1775
+#: validity.c:1855
 #, fuzzy, c-format
 msgid "invalid class \"%s\" object: %s"
 msgstr "classe incorrecte d'objet à %s"
+
+#~ msgid "Csparse_sort(x): x is not a valid (apart from sorting) CsparseMatrix"
+#~ msgstr ""
+#~ "Csparse_sort(x) : x est une CsparseMatrix incorrecte (au delà d'un "
+#~ "problème de tri)"
+
+#, c-format
+#~ msgid "Impossible Rk_x/Rk_y in Csparse_%s(), please report"
+#~ msgstr "Rk_x/Rk_y impossible dans Csparse_%s(), veuillez reporter l’erreur"
+
+#, c-format
+#~ msgid "chm_MOD_xtype() was not successful in Csparse_%s(), please report"
+#~ msgstr ""
+#~ "chm_MOD_xtype() a échoué dans Csparse_%s(), veuillez reporter l’erreur"
+
+#, c-format
+#~ msgid "the number of columns differ in R_rbind2_vector: %d != %d"
+#~ msgstr "le nombre de colonnes diffère dans R_rbind2_vector: %d != %d"
+
+#~ msgid "csp_eye argument n must be positive"
+#~ msgstr "l'argument n de csp_eye doit être positif"
+
+#~ msgid "invalid class of 'x' in Matrix_as_cs(a, x)"
+#~ msgstr "classe incorrecte de 'x' dans Matrix_as_cs(a, x)"
+
+#, c-format
+#~ msgid "invalid class of object to %s"
+#~ msgstr "classe incorrecte d'objet à %s"
+
+#, c-format
+#~ msgid "cs matrix not compatible with class '%s'"
+#~ msgstr "matrice cs incompatible avec la classe '%s'"
+
+#, c-format
+#~ msgid "Inappropriate class cl='%s' in Matrix_css_to_SEXP(S, cl, ..)"
+#~ msgstr "Classe inappropriée cl='%s' dans Matrix_css_to_SEXP(S, cl, ..)"
+
+#, c-format
+#~ msgid "Inappropriate class cl='%s' in Matrix_csn_to_SEXP(S, cl, ..)"
+#~ msgstr "Classe inappropriée cl='%s' dans Matrix_csn_to_SEXP(S, cl, ..)"
+
+#, c-format
+#~ msgid "Dimensions of x and y are not compatible for %s"
+#~ msgstr "Les dimensions de x et y ne sont pas compatibles pour %s"
+
+#~ msgid "Argument y must be numeric, integer or logical"
+#~ msgstr "L'argument y doit être un nombre réel, un entier ou un booléen"
+
+#~ msgid "Matrices are not conformable for multiplication"
+#~ msgstr "Les matrices sont incohérentes pour la multiplication"
+
+#, c-format
+#~ msgid ""
+#~ "dimension mismatch in matrix multiplication of \"dtrMatrix\": %d != %d"
+#~ msgstr ""
+#~ "dimensions incompatibles pour la multiplication matricielle avec "
+#~ "\"dtrMatrix\" : %d != %d"
+
+#~ msgid "dtrMatrix must be square"
+#~ msgstr "dtrMatrix doit être carrée"
+
+#, c-format
+#~ msgid "Dimensions of a (%d,%d) and b (%d,%d) do not conform"
+#~ msgstr "Les dimensions de a (%d,%d) et b (%d,%d) ne sont pas conformes"
+
+#~ msgid "right=TRUE is not yet implemented __ FIXME"
+#~ msgstr "right=TRUE n'est pas encore implémenté __ FIXME"
 
 #, c-format
 #~ msgid "cholmod_change_factor failed with status %d"
