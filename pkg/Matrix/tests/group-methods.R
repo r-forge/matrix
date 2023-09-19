@@ -372,7 +372,7 @@ stopifnot(exprs = {
 
 options(op)
 
-if(!doExtras && !interactive()) q("no") ## (saving testing time)
+if(doExtras || interactive()) { # save testing time
 
 ### Systematically look at all "Ops" group generics for "all" Matrix classes
 ### -------------- Main issue: Detect infinite recursion problems
@@ -457,6 +457,8 @@ for(gr in getGroupMembers("Ops")) {
 }
 if(length(warnings())) print(summary(warnings()))
 showProc.time()
+options(op) # reset 'warn'
+} # doExtras
 
 ###---- Now checking 0-length / 0-dim cases  <==> to R >= 3.4.0 !
 
@@ -504,7 +506,7 @@ stopifnot(identical(Matrix(3,1,1) > NULL, T[0]))
 stopifnot(identical(Matrix(3,1,1) & NULL, T[0]))
 ## in R >= 3.4.0: logical(0) # with *no* warning and that's correct!
 
-options(op)# reset 'warn'
+if(doExtras || interactive()) { # save testing time
 mStop <- function(...) stop(..., call. = FALSE)
 ##
 cat("Checking the Math (+ Math2) group generics for a set of arguments:\n",
@@ -559,6 +561,7 @@ for(f in getGroupMembers("Summary")) {
   cat("\n")
   if(length(warnings())) print(summary(warnings()))
 }
+} # doExtras
 
 ## <Math>(x) behaved incorrectly in Matrix <= 1.4-1
 ## for unit diagonal 'x' when f(0) == 0 and f(1) != 1
