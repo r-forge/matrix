@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-20 r4355)}{
+\section{Changes in version 1.6-2 (2023-09-20 r4356)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -161,6 +161,9 @@
 
       \item Most matrix product code has been migrated to
       \file{products.[Rch]} from elsewhere.
+
+	  \item Files in \file{po/} and \file{inst/po/} have been updated
+      due to more frequent use of \code{gettextf} in \file{R/*.R}.
     }
   }
 }
@@ -246,7 +249,7 @@
       (not counting deprecated ones), partly as a result of efforts to
       do more fine-grained dispatch in C code.
 
-      \item Files in \file{po/} and \code{inst/po/} have been updated
+      \item Files in \file{po/} and \file{inst/po/} have been updated
       (again), as many more C level messages now use format strings
       as a result of \code{vsnprintf} usage in \file{src/validity.c}.
     }
