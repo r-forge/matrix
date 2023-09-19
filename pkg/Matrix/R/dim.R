@@ -9,7 +9,7 @@ fixupDN <- function(dn)
 
 fixupDN.if.valid <- function(dn, dim) {
     if(is.character(s <- validDim(dim)) || is.character(s <- validDN(dn, dim)))
-        stop(s)
+        stop(s, domain = NA)
     fixupDN(dn)
 }
 
