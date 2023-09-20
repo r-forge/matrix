@@ -219,18 +219,18 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(CHMfactor_updown, 3),
 
 	CALLDEF(dgeMatrix_norm, 2),
-	CALLDEF(dtrMatrix_norm, 2),
-	CALLDEF(dtpMatrix_norm, 2),
 	CALLDEF(dsyMatrix_norm, 2),
 	CALLDEF(dspMatrix_norm, 2),
+	CALLDEF(dtrMatrix_norm, 2),
+	CALLDEF(dtpMatrix_norm, 2),
 
 	CALLDEF(dgeMatrix_rcond, 3),
-	CALLDEF(dtrMatrix_rcond, 2),
-	CALLDEF(dtpMatrix_rcond, 2),
 	CALLDEF(dsyMatrix_rcond, 3),
 	CALLDEF(dspMatrix_rcond, 3),
 	CALLDEF(dpoMatrix_rcond, 3),
 	CALLDEF(dppMatrix_rcond, 3),
+	CALLDEF(dtrMatrix_rcond, 2),
+	CALLDEF(dtpMatrix_rcond, 2),
 
 	CALLDEF(v2spV, 1),
 	CALLDEF(CR2spV, 1),

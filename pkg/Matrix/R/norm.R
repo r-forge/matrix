@@ -4,6 +4,21 @@
 setMethod("norm", signature(x = "ANY", type = "missing"),
           function(x, type, ...) norm(x, type = "O", ...))
 
+setMethod("norm", signature(x = "denseMatrix", type = "character"),
+          function(x, type, ...) {
+              if(identical(type, "2"))
+                  return(base::norm(.M2m(x), type = "2"))
+              cl <- .M.nonvirtual(x)
+              if(any(substr(cl, 1L, 1L) == c("n", "l", "i")))
+                  x <- .M2kind(x, "d")
+              switch(substr(cl, 2L, 3L),
+                     "ge" = .Call(dgeMatrix_norm, x, type),
+                     "sy" = .Call(dsyMatrix_norm, x, type),
+                     "sp" = .Call(dspMatrix_norm, x, type),
+                     "tr" = .Call(dtrMatrix_norm, x, type),
+                     "tp" = .Call(dtpMatrix_norm, x, type))
+          })
+
 setMethod("norm", signature(x = "sparseMatrix", type = "character"),
           function(x, type, ...) {
               if(any(x@Dim == 0L))
@@ -23,7 +38,11 @@ setMethod("norm", signature(x = "sparseMatrix", type = "character"),
                      "M" = , "m" =
                          max(abs(x)),
                      "F" = , "f" = , "E" = , "e" =
-                         sqrt(sum(x * x)),
+                         {
+                             if(.M.kind(x) == "z")
+                                 x <- abs(x)
+                             sqrt(sum(x * x))
+                         },
                      stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
                           domain = NA))
           })
@@ -44,7 +63,11 @@ setMethod("norm", signature(x = "diagonalMatrix", type = "character"),
                      "M" = , "m" =
                          if(nonunit) max(abs(y)) else 1,
                      "F" = , "f" = , "E" = , "e" =
-                         if(nonunit) sqrt(sum(y * y)) else sqrt(n),
+                         if(nonunit) {
+                             if(is.complex(y))
+                                 y <- abs(y)
+                             sqrt(sum(y * y))
+                         } else sqrt(n),
                      stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
                           domain = NA))
           })
@@ -84,37 +107,3 @@ setMethod("norm", signature(x = "pMatrix", type = "character"),
                      stop(gettextf("invalid %s=\"%s\"", "type", type[1L]),
                           domain = NA))
           })
-
-setMethod("norm", signature(x = "denseMatrix", type = "character"),
-          function(x, type, ...) norm(.M2kind(x, "d"), type = type, ...))
-
-setMethod("norm", signature(x = "dgeMatrix", type = "character"),
-          function(x, type, ...)
-              if(identical(type, "2"))
-                  base::norm(.M2m(x), type = "2")
-              else .Call(dgeMatrix_norm, x, type))
-
-setMethod("norm", signature(x = "dtrMatrix", type = "character"),
-          function(x, type, ...) {
-              if(identical(type, "2"))
-                  base::norm(.M2m(x), type = "2")
-              else .Call(dtrMatrix_norm, x, type)
-          })
-
-setMethod("norm", signature(x = "dtpMatrix", type = "character"),
-          function(x, type, ...)
-              if(identical(type, "2"))
-                  base::norm(.M2m(x), type = "2")
-              else .Call(dtpMatrix_norm, x, type))
-
-setMethod("norm", signature(x = "dsyMatrix", type = "character"),
-          function(x, type, ...)
-              if(identical(type, "2"))
-                  base::norm(.M2m(x), type = "2")
-              else .Call(dsyMatrix_norm, x, type))
-
-setMethod("norm", signature(x = "dspMatrix", type = "character"),
-          function(x, type, ...)
-              if(identical(type, "2"))
-                  base::norm(.M2m(x), type = "2")
-              else .Call(dspMatrix_norm, x, type))
