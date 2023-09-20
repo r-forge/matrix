@@ -50,10 +50,10 @@
     ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
     if(checkDN && !isSymmetricDN(object@Dimnames))
         return(FALSE)
-    if(n <= 1L)
+    if(n == 0L)
         return(TRUE)
 
-    ## now handling an n-by-n [dz]g[CRT]Matrix, n >= 2:
+    ## now handling an n-by-n [dz]g[CRT]Matrix, n >= 1:
 
     Cj <- if(is.complex(object@x)) Conj else identity
     ae <- function(check.attributes, ...) {
@@ -61,8 +61,8 @@
         all.equal(..., check.attributes = FALSE)
     }
 
-    isTRUE(ae(target    = as(     object  , "sparseVector"),
-              current   = as(Cj(t(object)), "sparseVector"),
+    isTRUE(ae(target    = .M2V(     object  ),
+              current   = .M2V(Cj(t(object))),
               tolerance = tol, ...))
 }
 

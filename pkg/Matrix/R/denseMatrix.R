@@ -51,22 +51,22 @@
     ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
     if(checkDN && !isSymmetricDN(object@Dimnames))
         return(FALSE)
-    if(n <= 1L)
+    if(n == 0L)
         return(TRUE)
     object <- .M2gen(object)
 
-    ## now handling n-by-n [dz]geMatrix, n >= 2:
+    ## now handling n-by-n [dz]geMatrix, n >= 1:
 
     Cj <- if(is.complex(object@x)) Conj else identity
     ae <- function(check.attributes, ...) {
         ## discarding possible user-supplied check.attributes
-        all.equal(..., check.attributes = FALSE)
+        all.equal.numeric(..., check.attributes = FALSE)
     }
 
     ## pretest: outermost rows ~= outermost columns?
     ## (fast for large asymmetric)
     if(length(tol1)) {
-        i. <- if (n <= 4L) 1L:n else c(1L, 2L, n - 1L, n)
+        i. <- if(n <= 4L) 1L:n else c(1L, 2L, n - 1L, n)
         for(i in i.)
             if(!isTRUE(ae(target = object[i, ], current = Cj(object[, i]),
                           tolerance = tol1, ...)))
