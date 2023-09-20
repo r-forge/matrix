@@ -50,7 +50,6 @@ setMethod("mean", signature(x = "sparseVector"),
                   }
               } else {
                   if(trim <= 0)
-                      ## FIXME? not computing in long double
                       return(sum(x@x, na.rm = na.rm) / n)
                   ntrim <- trunc(n * min(trim, 0.5))
                   x <- .V.sort(x, na.last = NA)[(ntrim + 1):(n - ntrim)]
@@ -66,7 +65,7 @@ setMethod("mean", signature(x = "sparseVector"),
         each <- each[1L]
     }
     if(!is.finite(each) || each <= -1)
-        stop("invalid 'each' argument")
+        stop(gettextf("invalid '%s' argument", "each"), domain = NA)
     if(each < 1)
         return(x[0L])
     if(each < 2)
@@ -100,7 +99,7 @@ setMethod("mean", signature(x = "sparseVector"),
         times <- times[1L]
     }
     if(!is.finite(times) || times <= -1)
-        stop("invalid 'times' argument")
+        stop(gettextf("invalid '%s' argument", "times"), domain = NA)
     if(times < 1)
         return(x[0L])
     if(times < 2)
