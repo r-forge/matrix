@@ -146,5 +146,6 @@ setMethod("isSymmetric", signature(object = "diagonalMatrix"),
                   if(ca(...) && !isSymmetricDN(object@Dimnames))
                       return(FALSE)
               }
-              TRUE
+              .M.kind(object) != "z" || object@diag != "N" ||
+                  { x <- object@x; isTRUE(all.equal.numeric(x, Conj(x), ...)) }
           })
