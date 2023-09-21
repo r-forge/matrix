@@ -1023,26 +1023,26 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 	if (!ISNAN(n_) && n_ >= 0.0 && n_ < (double) n)
 		n = (R_xlen_t) n_;
 
-#define DO_NNZ(_CTYPE_, _PTR_, _NA_, _NZ_, _STRICTLY_NZ_) \
+#define DO_NNZ(_CTYPE_, _PTR_, _ISNA_, _ISNZ_, _STRICTLY_ISNZ_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
 		if (do_countNA == NA_LOGICAL) { \
 			while (n-- > 0) { \
-				if (_NA_(*px)) \
+				if (_ISNA_(*px)) \
 					return ScalarInteger(NA_INTEGER); \
-				if (_NZ_(*px)) \
+				if (_ISNZ_(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else if (do_countNA != 0) { \
 			while (n-- > 0) { \
-				if (_NZ_(*px)) \
+				if (_ISNZ_(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else { \
 			while (n-- > 0) { \
-				if (_STRICTLY_NZ_(*px)) \
+				if (_STRICTLY_ISNZ_(*px)) \
 					++nnz; \
 				++px; \
 			} \
