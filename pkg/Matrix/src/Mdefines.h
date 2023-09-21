@@ -5,9 +5,6 @@
 #define Matrix_CallocThreshold    10000
 #define Matrix_ErrorBufferSize     4096
 
-/* Eventually these will no longer be needed : */
-#undef Matrix_WithSPQR
-
 /* NB: system headers should come before R headers */
 
 #ifdef __GLIBC__
@@ -98,23 +95,6 @@ extern
 /* Often used numbers, defined in ./init.c */
 extern
 Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
-
-/* To become deprecated ... defensive code should PROTECT() more */
-#define class_P(x) CHAR(asChar(getAttrib(x, R_ClassSymbol)))
-#define  uplo_P(x) CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))
-#define  Uplo_P(x) (R_has_slot(x, Matrix_uploSym) ? uplo_P(x) : " ")
-#define  diag_P(x) CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))
-#define  Diag_P(x) (R_has_slot(x, Matrix_diagSym) ? diag_P(x) : " ")
-
-/* Ditto */
-#define slot_dup(dest, src, sym) \
-	SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
-#define slot_dup_if_has(dest, src, sym) \
-	if (R_has_slot(src, sym)) \
-		SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
-#define slot_dup_if_not_null(dest, src, sym) \
-	if (!isNull(GET_SLOT(src, sym))) \
-		SET_SLOT(dest, sym, duplicate(GET_SLOT(src, sym)))
 
 #define    MINOF(x, y) ((x < y) ? x : y)
 #define    MAXOF(x, y) ((x < y) ? y : x)
@@ -239,39 +219,8 @@ do { \
 	} \
 } while (0)
 
-/* For C-level isTriangular() : */
-#define RETURN_TRUE_OF_KIND(_KIND_) \
-do { \
-	SEXP ans = PROTECT(allocVector(LGLSXP, 1)), \
-		val = PROTECT(mkString(_KIND_)); \
-	static SEXP sym = NULL; \
-	if (!sym) \
-		sym = install("kind"); \
-	LOGICAL(ans)[0] = 1; \
-	setAttrib(ans, sym, val); \
-	UNPROTECT(2); /* val, ans */ \
-	return ans; \
-} while (0)
-
-/* Define this to be CHOLMOD-compatible to some degree : */
-enum x_slot_kind {
-	x_unknown = -2,  /* NA */
-	x_pattern = -1,  /*  n */
-	x_double  =  0,  /*  d */
-	x_logical =  1,  /*  l */
-	x_integer =  2,  /*  i */
-	x_complex =  3}; /*  z */
-
-#define Real_kind_(_x_) \
-	(isReal(_x_) ? x_double : (isLogical(_x_) ? x_logical : x_pattern))
-
-/* Requires 'x' slot, hence not for nsparseMatrix or indMatrix : */
-#define Real_kind(_x_) \
-	(Real_kind_(GET_SLOT(_x_, Matrix_xSym)))
-
 
 /* ==== CLASS LISTS ================================================= */
-/* Keep synchronized with ../inst/include/Matrix.h !                  */
 
 /* dpoMatrix->dsyMatrix, etc. */
 #define VALID_NONVIRTUAL_SHIFT(i, p2ind) \
@@ -325,64 +274,5 @@ enum x_slot_kind {
 
 #define VALID_DIAGONAL \
 "ddiMatrix", "ldiMatrix", "ndiMatrix"
-
-/* Older ones : */
-
-#define MATRIX_VALID_ge_dense \
-"dmatrix", "dgeMatrix", \
-"lmatrix", "lgeMatrix", \
-"nmatrix", "ngeMatrix", \
-"zmatrix", "zgeMatrix"
-
-#define MATRIX_VALID_ddense \
-"dgeMatrix", "dtrMatrix", \
-"dsyMatrix", "dpoMatrix", "ddiMatrix", \
-"dtpMatrix", "dspMatrix", "dppMatrix", \
-/* subclasses of the above : */ \
-/* dtr */ "Cholesky", "LDL", "BunchKaufman", \
-/* dtp */ "pCholesky", "pBunchKaufman", \
-/* dpo */ "corMatrix"
-
-#define MATRIX_VALID_ldense \
-"lgeMatrix", \
-"ltrMatrix", "lsyMatrix", "ldiMatrix", \
-"ltpMatrix", "lspMatrix"
-
-#define MATRIX_VALID_ndense \
-"ngeMatrix", \
-"ntrMatrix", "nsyMatrix", \
-"ntpMatrix", "nspMatrix"
-
-#define MATRIX_VALID_dCsparse \
-"dgCMatrix", "dsCMatrix", "dtCMatrix"
-#define MATRIX_VALID_nCsparse \
-"ngCMatrix", "nsCMatrix", "ntCMatrix"
-
-#define MATRIX_VALID_Csparse \
-MATRIX_VALID_dCsparse, \
-"lgCMatrix", "lsCMatrix", "ltCMatrix", \
-MATRIX_VALID_nCsparse, \
-"zgCMatrix", "zsCMatrix", "ztCMatrix"
-
-#define MATRIX_VALID_Tsparse \
-"dgTMatrix", "dsTMatrix", "dtTMatrix", \
-"lgTMatrix", "lsTMatrix", "ltTMatrix", \
-"ngTMatrix", "nsTMatrix", "ntTMatrix", \
-"zgTMatrix", "zsTMatrix", "ztTMatrix"
-
-#define MATRIX_VALID_Rsparse \
-"dgRMatrix", "dsRMatrix", "dtRMatrix", \
-"lgRMatrix", "lsRMatrix", "ltRMatrix", \
-"ngRMatrix", "nsRMatrix", "ntRMatrix", \
-"zgRMatrix", "zsRMatrix", "ztRMatrix"
-
-#define MATRIX_VALID_tri_Csparse \
-"dtCMatrix", "ltCMatrix", "ntCMatrix", "ztCMatrix"
-
-#define MATRIX_VALID_sym_Csparse \
-"dsCMatrix", "lsCMatrix", "nsCMatrix", "zsCMatrix"
-
-#define MATRIX_VALID_CHMfactor \
-"dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl"
 
 #endif /* MATRIX_MDEFINES_H */

@@ -4,11 +4,6 @@
 #include "SuiteSparse_config/SuiteSparse_config.h"
 #include "CHOLMOD/Include/cholmod.h"
 #include "Mutils.h"
-// -> R_check_class()  et al
-
-#ifdef Matrix_WithSPQR
-#  include "SPQR/Include/SuiteSparseQR_C.h"
-#endif
 
 /*
 typedef struct cholmod_common_struct  *CHM_CM ;

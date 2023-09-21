@@ -198,7 +198,7 @@ SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
 				   A, &Q, &R, &E, &cl)) == -1)
 	error(_("SuiteSparseQR_C_QR returned an error code"));
 
-    slot_dup(ans, Ap, Matrix_DimSym);
+    SET_SLOT(ans, Matrix_DimSym, duplicate(GET_SLOT(Ap, Matrix_DimSym)));
 /*     SET_VECTOR_ELT(ans, 0, */
 /* 		   chm_sparse_to_SEXP(Q, 0, 0, 0, "", R_NilValue)); */
     SET_SLOT(ans, Matrix_QSym,

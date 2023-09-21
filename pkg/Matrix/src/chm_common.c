@@ -2,6 +2,12 @@
  */
 #include "chm_common.h"
 
+/* MJ: I'd like to stop using these eventually : */
+#define uplo_P(x) \
+	CHAR(STRING_ELT(GET_SLOT(x, Matrix_uploSym), 0))
+#define diag_P(x) \
+	CHAR(STRING_ELT(GET_SLOT(x, Matrix_diagSym), 0))
+
 /* defined in Csparse.c : */
 Rboolean isValid_Csparse(SEXP);
 
@@ -254,7 +260,7 @@ static void chTr2Ralloc(CHM_TR dest, CHM_TR src)
 CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 			 Rboolean check_Udiag, Rboolean sort_in_place)
 {
-    static const char *valid[] = { MATRIX_VALID_Csparse, ""};
+    static const char *valid[] = { VALID_CSPARSE, ""};
     int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
 	ctype = R_check_class_etc(x, valid);
     SEXP islot = GET_SLOT(x, Matrix_iSym);
@@ -499,7 +505,7 @@ Rboolean chm_MOD_xtype(int to_xtype, cholmod_sparse *A, CHM_CM Common) {
  */
 CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 {
-    static const char *valid[] = { MATRIX_VALID_Tsparse, ""};
+    static const char *valid[] = { VALID_TSPARSE, ""};
     int ctype = R_check_class_etc(x, valid),
 	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
     SEXP islot = GET_SLOT(x, Matrix_iSym);
@@ -692,7 +698,7 @@ SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
 CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 {
 #define _AS_cholmod_dense_1						\
-    static const char *valid[] = { MATRIX_VALID_ge_dense, ""};		\
+    static const char *valid[] = { "dgeMatrix", "lgeMatrix", "ngeMatrix", ""}; \
     int dims[2], ctype = R_check_class_etc(x, valid), nprot = 0;	\
 									\
     if (ctype < 0) {		/* not a classed matrix */		\
@@ -1051,7 +1057,8 @@ CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
  */
 CHM_FR as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
 {
-    static const char *valid[] = { MATRIX_VALID_CHMfactor, ""};
+    static const char *valid[] = {
+		"dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl", ""};
     int ctype = R_check_class_etc(x, valid);
     if (ctype < 0)
 	error(_("object of invalid class to 'as_cholmod_factor()'"));
