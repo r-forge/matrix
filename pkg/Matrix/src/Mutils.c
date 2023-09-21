@@ -265,27 +265,6 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
-void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
-	SEXP s;
-	if (!isNull(s = VECTOR_ELT(asrc, ai)))
-		SET_VECTOR_ELT(dest, 0, s);
-	if (!isNull(s = VECTOR_ELT(bsrc, bi)))
-		SET_VECTOR_ELT(dest, 1, s);
-	PROTECT(asrc = getAttrib(asrc, R_NamesSymbol));
-	PROTECT(bsrc = getAttrib(bsrc, R_NamesSymbol));
-	if (!isNull(asrc) || !isNull(bsrc)) {
-		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
-		if (!isNull(asrc) && *CHAR(s = STRING_ELT(asrc, ai)) != '\0')
-			SET_STRING_ELT(destnms, 0, s);
-		if (!isNull(bsrc) && *CHAR(s = STRING_ELT(bsrc, bi)) != '\0')
-			SET_STRING_ELT(destnms, 1, s);
-		setAttrib(dest, R_NamesSymbol, destnms);
-		UNPROTECT(1);
-	}
-	UNPROTECT(2);
-	return;
-}
-
 SEXP R_symmDN(SEXP dn)
 {
 	/* Be fast (do nothing!) when dimnames = list(NULL, NULL) */

@@ -28,8 +28,6 @@ SEXP R_revDN(SEXP dn);
 SEXP get_reversed_DimNames(SEXP obj);
 void set_reversed_DimNames(SEXP obj, SEXP dn);
 
-void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi);
-
 void set_DimNames(SEXP obj, SEXP dn);
 
 SEXP get_factor(SEXP obj, const char *nm);
