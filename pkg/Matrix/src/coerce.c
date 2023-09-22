@@ -5,7 +5,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? type2kind(tf) : zzz[0];
+	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : zzz[0];
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
 	SEXP to = PROTECT(newObject(cl)),
@@ -79,7 +79,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		UNPROTECT(1); /* diag */
 	}
 
-	SEXPTYPE tt = kind2type(cl[0]);
+	SEXPTYPE tt = kindToType(cl[0]);
 	if (tf != tt) {
 		PROTECT(from = coerceVector(from, tt));
 		++nprotect;
@@ -224,7 +224,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	if (class[2] != 'C' && packed && len > R_XLEN_T_MAX)
 		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
 		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
-	double bytes = (double) len * kind2size(cl[0]);
+	double bytes = (double) len * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -255,7 +255,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 
 	/* It remains to fill 'x' ... */
 
-	SEXP x1 = PROTECT(allocVector(kind2type(class[0]), (R_xlen_t) len)),
+	SEXP x1 = PROTECT(allocVector(kindToType(class[0]), (R_xlen_t) len)),
 		p0, i0, j0;
 	int *pp, *pi, *pj, nprotect = 2;
 	p0 = i0 = j0 = NULL;
@@ -514,7 +514,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	if (len > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) len * kind2size(cl[0]);
+	double bytes = (double) len * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -632,7 +632,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	if (len > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) len * kind2size(cl[0]);
+	double bytes = (double) len * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -647,7 +647,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
 	int *pperm = INTEGER(perm);
 
-	SEXP x = PROTECT(allocVector(kind2type(cl[0]), (R_xlen_t) len));
+	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) len));
 	SET_SLOT(to, Matrix_xSym, x);
 
 #define IAD_SUBCASES(_CTYPE_, _PTR_, _ONE_) \
@@ -709,7 +709,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
                       int trans)
 {
 	char cl[] = "...Matrix";
-	cl[0] = type2kind(TYPEOF(from));
+	cl[0] = typeToKind(TYPEOF(from));
 	cl[1] = zzz[1];
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : 'r');
 	PROTECT_INDEX pid;
@@ -1461,7 +1461,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	UNPROTECT(2);
 
 	if (cl[0] != 'n') {
-		SEXP x = PROTECT(allocVector(kind2type(cl[0]), r));
+		SEXP x = PROTECT(allocVector(kindToType(cl[0]), r));
 		SET_SLOT(to, Matrix_xSym, x);
 
 #define IAS_SUBCASES(_CTYPE_, _PTR_, _ONE_) \
@@ -1524,7 +1524,7 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 {
 	if (kind == '.' || kind == class[0])
 		return from;
-	SEXPTYPE tt = kind2type(kind);
+	SEXPTYPE tt = kindToType(kind);
 
 	char cl[] = "...Matrix";
 	cl[0] = kind;
@@ -1610,7 +1610,7 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 {
 	if (kind == '.' || kind == class[0])
 		return from;
-	SEXPTYPE tt = kind2type(kind);
+	SEXPTYPE tt = kindToType(kind);
 
 	if (class[2] == 'T' && (class[0] == 'n' || class[0] == 'l') &&
 	    kind != 'n' && kind != 'l') {
@@ -1741,7 +1741,7 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 {
 	if (kind == '.' || kind == class[0])
 		return from;
-	SEXPTYPE tt = kind2type(kind);
+	SEXPTYPE tt = kindToType(kind);
 
 	char cl[] = ".diMatrix";
 	cl[0] = kind;

@@ -408,7 +408,7 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 		ERROR_INVALID_CLASS(from, __func__);
 	const char *class = valid[ivalid];
 
-	SEXPTYPE tx = kind2type(class[0]), tv = TYPEOF(value);
+	SEXPTYPE tx = kindToType(class[0]), tv = TYPEOF(value);
 
 	switch (tv) {
 	case LGLSXP:
@@ -437,7 +437,7 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP dense_as_kind(SEXP, const char *, char, int);
-		PROTECT(from = dense_as_kind(from, class, type2kind(tv), 0));
+		PROTECT(from = dense_as_kind(from, class, typeToKind(tv), 0));
 #ifndef MATRIX_ENABLE_IMATRIX
 		if (tv == INTSXP)
 			value = coerceVector(value, REALSXP);

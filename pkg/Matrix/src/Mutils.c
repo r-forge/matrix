@@ -693,7 +693,7 @@ SEXP R_asPerm(SEXP p, SEXP off, SEXP ioff, SEXP n)
 
 /* For inheritance ================================================== */
 
-char type2kind(SEXPTYPE type)
+char typeToKind(SEXPTYPE type)
 {
 	switch (type) {
 	case LGLSXP:
@@ -714,7 +714,7 @@ char type2kind(SEXPTYPE type)
 	}
 }
 
-SEXPTYPE kind2type(char kind)
+SEXPTYPE kindToType(char kind)
 {
 	switch (kind) {
 	case 'n':
@@ -736,7 +736,7 @@ SEXPTYPE kind2type(char kind)
 	}
 }
 
-size_t kind2size(char kind)
+size_t kindToSize(char kind)
 {
 	switch (kind) {
 	case 'n':

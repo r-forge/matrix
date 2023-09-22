@@ -387,7 +387,7 @@ static void coerceArgs(SEXP args, int margin,
 					REPROTECT(s = dense_as_kind(s, scl, kind, 0), pid);
 					scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
 					REPROTECT(s = dense_as_general(
-						s, scl_, kind2type(kind) == kind2type(scl[0])), pid);
+						s, scl_, kindToType(kind) == kindToType(scl[0])), pid);
 					break;
 				case 'C':
 				case 'R':
@@ -469,8 +469,8 @@ static void coerceArgs(SEXP args, int margin,
 				}
 				SET_TAG(a, (t != R_NilValue) ? t : tagWasVector);
 			}
-			if (TYPEOF(s) != kind2type(kind))
-				REPROTECT(s = coerceVector(s, kind2type(kind)), pid);
+			if (TYPEOF(s) != kindToType(kind))
+				REPROTECT(s = coerceVector(s, kindToType(kind)), pid);
 			if (repr != 'e') {
 				if (!isM && XLENGTH(s) != rdim[!margin]) {
 					static SEXP replen = NULL;
@@ -525,7 +525,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP x = PROTECT(allocVector(kind2type(kind), mn)), tmp;
+		SEXP x = PROTECT(allocVector(kindToType(kind), mn)), tmp;
 		SET_SLOT(res, Matrix_xSym, x);
 
 #define BIND_E(_CTYPE_, _PTR_, _MASK_) \
@@ -660,7 +660,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		if (kind == 'n')
 			BIND_C1R0(int, LOGICAL, HIDE);
 		else {
-			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
+			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
 			SET_SLOT(res, Matrix_xSym, x);
 			BIND_CASES(BIND_C1R0);
 			UNPROTECT(1);
@@ -734,7 +734,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		if (kind == 'n')
 			BIND_C0R1(int, LOGICAL, HIDE);
 		else {
-			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
+			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
 			SET_SLOT(res, Matrix_xSym, x);
 			BIND_CASES(BIND_C0R1);
 			UNPROTECT(1);
@@ -802,7 +802,7 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 		if (kind == 'n')
 			BIND_T(int, LOGICAL, HIDE);
 		else {
-			SEXP x = PROTECT(allocVector(kind2type(kind), nnz)), sx;
+			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
 			SET_SLOT(res, Matrix_xSym, x);
 			BIND_CASES(BIND_T);
 			UNPROTECT(1);

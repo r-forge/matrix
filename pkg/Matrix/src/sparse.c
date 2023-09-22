@@ -618,7 +618,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 		}
 	}
 
-	SEXP res = PROTECT(allocVector(kind2type(class[0]), r));
+	SEXP res = PROTECT(allocVector(kindToType(class[0]), r));
 
 #define DG_CASES \
 	do { \
@@ -1056,7 +1056,7 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 		ERROR_INVALID_CLASS(from, __func__);
 	const char *class = valid[ivalid];
 
-	SEXPTYPE tx = kind2type(class[0]), tv = TYPEOF(value);
+	SEXPTYPE tx = kindToType(class[0]), tv = TYPEOF(value);
 
 	switch (tv) {
 	case LGLSXP:
@@ -1084,7 +1084,7 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_kind(SEXP, const char *, char);
-		PROTECT(from = sparse_as_kind(from, class, type2kind(tv)));
+		PROTECT(from = sparse_as_kind(from, class, typeToKind(tv)));
 #ifndef MATRIX_ENABLE_IMATRIX
 		if (tv == INTSXP)
 			value = coerceVector(value, REALSXP);
@@ -1727,7 +1727,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 			}
 
 			SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n - 1])),
-				x1 = PROTECT(allocVector(kind2type(cl[0]), pp1[n - 1]));
+				x1 = PROTECT(allocVector(kindToType(cl[0]), pp1[n - 1]));
 			int *pi1 = INTEGER(i1);
 
 #undef SP_LOOP
@@ -1784,7 +1784,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 
 			if (di == 'N') {
 
-				SEXP x1 = PROTECT(allocVector(kind2type(cl[0]), nnz));
+				SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
 
 #undef SP_LOOP
 #define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
@@ -1838,7 +1838,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				nnz += n;
 				SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 					i1 = PROTECT(allocVector(INTSXP, nnz)),
-					x1 = PROTECT(allocVector(kind2type(cl[0]), nnz));
+					x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
 				int *pp1 = INTEGER(p1), *pi1 = INTEGER(i1);
 				*(pp1++) = 0;
 
@@ -1918,7 +1918,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 
 			SEXP i1 = PROTECT(allocVector(INTSXP, nnz)),
 				j1 = PROTECT(allocVector(INTSXP, nnz)),
-				x1 = PROTECT(allocVector(kind2type(cl[0]), nnz));
+				x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
 			int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 
 #undef SP_LOOP
@@ -1957,7 +1957,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 
 			if (di == 'N') {
 
-				SEXP x1 = PROTECT(allocVector(kind2type(cl[0]), nnz));
+				SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
 
 #undef SP_LOOP
 #define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
@@ -1986,7 +1986,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 
 				SEXP i1 = PROTECT(allocVector(INTSXP, nnz + n)),
 					j1 = PROTECT(allocVector(INTSXP, nnz + n)),
-					x1 = PROTECT(allocVector(kind2type(cl[0]), nnz + n));
+					x1 = PROTECT(allocVector(kindToType(cl[0]), nnz + n));
 				int j, *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 
 #undef SP_LOOP
@@ -2184,7 +2184,7 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 		}
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n - 1])),
-			x1 = PROTECT(allocVector(kind2type(cl[0]), pp1[n - 1]));
+			x1 = PROTECT(allocVector(kindToType(cl[0]), pp1[n - 1]));
 		int *pi1 = INTEGER(i1);
 
 #undef SP_LOOP
@@ -2263,7 +2263,7 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 
 		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
 			j1 = PROTECT(allocVector(INTSXP, nnz1)),
-			x1 = PROTECT(allocVector(kind2type(cl[0]), nnz1));
+			x1 = PROTECT(allocVector(kindToType(cl[0]), nnz1));
 		int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 
 #undef SP_LOOP
