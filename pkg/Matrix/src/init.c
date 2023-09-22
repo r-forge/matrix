@@ -1,6 +1,6 @@
-#include <Rinternals.h> /* SEXP, Rcomplex */
-#include "Csparse.h"
 #include "CHMfactor.h"
+#include "Csparse.h"
+#include "Mutils.h"
 #include "abIndex.h"
 #include "bind.h"
 #include "chm_common.h"
@@ -159,7 +159,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_dense_marginsum, 4),
 	CALLDEF(R_dense_sum, 2),
 	CALLDEF(R_dense_prod, 2),
-	
+
 	CALLDEF(R_sparse_drop0, 2),
 	CALLDEF(R_sparse_diag_U2N, 1),
 	CALLDEF(R_sparse_diag_N2U, 1),
@@ -201,15 +201,11 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(CHMfactor_determinant, 3),
 
 	CALLDEF(denseLU_solve, 2),
-	CALLDEF(BunchKaufman_solve, 3),
-	CALLDEF(Cholesky_solve, 3),
+	CALLDEF(BunchKaufman_solve, 2),
+	CALLDEF(Cholesky_solve, 2),
+	CALLDEF(dtrMatrix_solve, 2),
 	CALLDEF(sparseLU_solve, 3),
-/* MJ: not needed since we have 'sparseQR_matmult' : */
-#if 0
-	CALLDEF(sparseQR_solve, 3),
-#endif
 	CALLDEF(CHMfactor_solve, 4),
-	CALLDEF(dtrMatrix_solve, 3),
 	CALLDEF(dtCMatrix_solve, 3),
 
 	CALLDEF(sparseQR_matmult, 5),

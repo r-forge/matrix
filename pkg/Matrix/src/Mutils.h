@@ -86,9 +86,6 @@ SEXP R_any0(SEXP x);
 
 #include "idz.h"
 
-SEXP unpacked_force(SEXP, int, char, char);
-SEXP packed_transpose(SEXP, int, char);
-
 void validObject(SEXP, const char *);
 
 #ifdef __cplusplus

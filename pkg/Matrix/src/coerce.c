@@ -1,3 +1,5 @@
+#include "Mutils.h"
+#include "idz.h"
 #include "coerce.h"
 
 SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
@@ -545,33 +547,31 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) len));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define DAD_SUBCASES(_CTYPE_, _PTR_, _PREFIX_) \
+#define DAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, (R_xlen_t) len, sizeof(_CTYPE_)); \
 		if (di == 'N' || cl[1] != 't') { \
 			if (cl[2] != 'p') \
-				_PREFIX_ ## dcpy2( \
-					px1, px0, n, n,     ul, di); \
+				_PREFIX_ ## dcpy2(px1, px0, n, n,     ul, di); \
 			else \
-				_PREFIX_ ## dcpy1( \
-					px1, px0, n, n, ul, ul, di); \
+				_PREFIX_ ## dcpy1(px1, px0, n, n, ul, ul, di); \
 		} \
 	} while (0)
 
 	switch (class[0]) {
 	case 'n':
 	case 'l':
-		DAD_SUBCASES(int, LOGICAL, i);
+		DAD_SUBCASES(i, int, LOGICAL);
 		break;
 	case 'i':
-		DAD_SUBCASES(int, INTEGER, i);
+		DAD_SUBCASES(i, int, INTEGER);
 		break;
 	case 'd':
-		DAD_SUBCASES(double, REAL, d);
+		DAD_SUBCASES(d, double, REAL);
 		break;
 	case 'z':
-		DAD_SUBCASES(Rcomplex, COMPLEX, z);
+		DAD_SUBCASES(z, Rcomplex, COMPLEX);
 		break;
 	default:
 		break;
@@ -1881,7 +1881,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	}
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define DAG_SUBCASES(_CTYPE_, _PTR_, _PREFIX_) \
+#define DAG_SUBCASES(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		if (class[2] == 'p') \
@@ -1897,16 +1897,16 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	switch (class[0]) {
 	case 'n':
 	case 'l':
-		DAG_SUBCASES(int, LOGICAL, i);
+		DAG_SUBCASES(i, int, LOGICAL);
 		break;
 	case 'i':
-		DAG_SUBCASES(int, INTEGER, i);
+		DAG_SUBCASES(i, int, INTEGER);
 		break;
 	case 'd':
-		DAG_SUBCASES(double, REAL, d);
+		DAG_SUBCASES(d, double, REAL);
 		break;
 	case 'z':
-		DAG_SUBCASES(Rcomplex, COMPLEX, z);
+		DAG_SUBCASES(z, Rcomplex, COMPLEX);
 		break;
 	default:
 		break;
@@ -2278,7 +2278,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define UNPACK(_CTYPE_, _PTR_, _PREFIX_) \
+#define UNPACK(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, (R_xlen_t) n * n, sizeof(_CTYPE_)); \
@@ -2288,17 +2288,17 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	switch (cl[0]) {
 	case 'n':
 	case 'l':
-		UNPACK(int, LOGICAL, i);
+		UNPACK(i, int, LOGICAL);
 		break;
 	case 'i':
-		UNPACK(int, INTEGER, i);
+		UNPACK(i, int, INTEGER);
 		break;
 	case 'c':
 	case 'd':
-		UNPACK(double, REAL, d);
+		UNPACK(d, double, REAL);
 		break;
 	case 'z':
-		UNPACK(Rcomplex, COMPLEX, z);
+		UNPACK(z, Rcomplex, COMPLEX);
 		break;
 	default:
 		break;
@@ -2397,7 +2397,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 		x1 = PROTECT(allocVector(TYPEOF(x0), PACKED_LENGTH(n)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define PACK(_CTYPE_, _PTR_, _PREFIX_) \
+#define PACK(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		_PREFIX_ ## pack2(px1, px0, n, ul, 'N'); \
@@ -2406,17 +2406,17 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 	switch (cl[0]) {
 	case 'n':
 	case 'l':
-		PACK(int, LOGICAL, i);
+		PACK(i, int, LOGICAL);
 		break;
 	case 'i':
-		PACK(int, INTEGER, i);
+		PACK(i, int, INTEGER);
 		break;
 	case 'c':
 	case 'd':
-		PACK(double, REAL, d);
+		PACK(d, double, REAL);
 		break;
 	case 'z':
-		PACK(Rcomplex, COMPLEX, z);
+		PACK(z, Rcomplex, COMPLEX);
 		break;
 	default:
 		break;

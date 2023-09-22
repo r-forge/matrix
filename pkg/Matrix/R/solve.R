@@ -121,6 +121,7 @@ setMethod("solve", signature(a = .cl, b = "dgCMatrix"),
               solve(a, .sparse2dense(b, FALSE), ...))
 
 }
+rm(.cl)
 
 setMethod("solve", signature(a = "denseLU", b = "missing"),
           function(a, b, ...)
@@ -130,45 +131,27 @@ setMethod("solve", signature(a = "denseLU", b = "dgeMatrix"),
           function(a, b, ...)
               .Call(denseLU_solve, a, b))
 
-setMethod("solve", signature(a = "BunchKaufman", b = "missing"),
+for(.cl in c("BunchKaufman", "pBunchKaufman")) {
+setMethod("solve", signature(a = .cl, b = "missing"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, NULL, FALSE))
+              .Call(BunchKaufman_solve, a, NULL))
 
-setMethod("solve", signature(a = "BunchKaufman", b = "dgeMatrix"),
+setMethod("solve", signature(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, b, FALSE))
+              .Call(BunchKaufman_solve, a, b))
+}
+rm(.cl)
 
-setMethod("solve", signature(a = "pBunchKaufman", b = "missing"),
+for(.cl in c("Cholesky", "pCholesky")) {
+setMethod("solve", signature(a = .cl, b = "missing"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, NULL, TRUE))
+              .Call(Cholesky_solve, a, NULL))
 
-setMethod("solve", signature(a = "pBunchKaufman", b = "dgeMatrix"),
+setMethod("solve", signature(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, b, TRUE))
-
-setMethod("solve", signature(a = "Cholesky", b = "missing"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, NULL, FALSE))
-
-setMethod("solve", signature(a = "Cholesky", b = "dgeMatrix"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, b, FALSE))
-
-setMethod("solve", signature(a = "pCholesky", b = "missing"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, NULL, TRUE))
-
-setMethod("solve", signature(a = "pCholesky", b = "dgeMatrix"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, b, TRUE))
-
-setMethod("solve", signature(a = "pCholesky", b = "missing"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, NULL, TRUE))
-
-setMethod("solve", signature(a = "pCholesky", b = "dgeMatrix"),
-          function(a, b, ...)
-              .Call(Cholesky_solve, a, b, TRUE))
+              .Call(Cholesky_solve, a, b))
+}
+rm(.cl)
 
 setMethod("solve", signature(a = "sparseLU", b = "missing"),
           function(a, b, tol = .Machine$double.eps, sparse = TRUE, ...) {
@@ -238,29 +221,20 @@ setMethod("solve", signature(a = "CHMfactor", b = "dgCMatrix"),
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...)
               .Call(CHMfactor_solve, a, b, TRUE, system))
 
-setMethod("solve", signature(a = "dtrMatrix", b = "missing"),
+for(.cl in c("dtrMatrix", "dtpMatrix")) {
+setMethod("solve", signature(a = .cl, b = "missing"),
           function(a, b, tol = .Machine$double.eps, ...) {
               .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, NULL, FALSE)
+              .Call(dtrMatrix_solve, a, NULL)
           })
 
-setMethod("solve", signature(a = "dtrMatrix", b = "dgeMatrix"),
+setMethod("solve", signature(a = .cl, b = "dgeMatrix"),
           function(a, b, tol = .Machine$double.eps, ...) {
               .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, b, FALSE)
+              .Call(dtrMatrix_solve, a, b)
           })
-
-setMethod("solve", signature(a = "dtpMatrix", b = "missing"),
-          function(a, b, tol = .Machine$double.eps, ...) {
-              .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, NULL, TRUE)
-          })
-
-setMethod("solve", signature(a = "dtpMatrix", b = "dgeMatrix"),
-          function(a, b, tol = .Machine$double.eps, ...) {
-              .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, b, TRUE)
-          })
+}
+rm(.cl)
 
 setMethod("solve", signature(a = "dtCMatrix", b = "missing"),
           function(a, b, sparse = TRUE, ...) {
