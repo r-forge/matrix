@@ -1,4 +1,10 @@
-#include <Rmath.h> /* math.h, logspace_add, logspace_sub */
+#include <math.h> /* fabs, log */
+#include <Rmath.h> /* logspace_add, logspace_sub */
+#include "Lapack-etc.h"
+#include "Mutils.h"
+#include "cs.h"
+#include "chm_common.h"
+#include "idz.h"
 #include "factorizations.h"
 
 cs *dgC2cs(SEXP obj, int values)
@@ -170,7 +176,8 @@ SEXP cholmod2dge(const cholmod_dense *A, const char *cl, int trans)
 	return obj;
 }
 
-static cholmod_factor *mf2cholmod(SEXP obj)
+static
+cholmod_factor *mf2cholmod(SEXP obj)
 {
 	static const char *valid[] = { "dCHMsimpl", "dCHMsuper", "" };
 	int ivalid = R_check_class_etc(obj, valid);
@@ -248,7 +255,8 @@ static cholmod_factor *mf2cholmod(SEXP obj)
 	return L;
 }
 
-static SEXP cholmod2mf(const cholmod_factor *L)
+static
+SEXP cholmod2mf(const cholmod_factor *L)
 {
 	if (L->itype != CHOLMOD_INT ||
 	    L->xtype != CHOLMOD_REAL ||
@@ -385,6 +393,7 @@ do { \
 		} \
 	} while (0)
 
+static
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
 	SEXP val = PROTECT(newObject("denseLU")),
@@ -413,6 +422,7 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 	return val;
 }
 
+static
 SEXP dsyMatrix_trf_(SEXP obj, int warn)
 {
 	SEXP val = PROTECT(newObject("BunchKaufman")),
@@ -450,6 +460,7 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 	return val;
 }
 
+static
 SEXP dspMatrix_trf_(SEXP obj, int warn)
 {
 	SEXP val = PROTECT(newObject("pBunchKaufman")),
@@ -481,6 +492,7 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 	return val;
 }
 
+static
 SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
 	SEXP val = PROTECT(newObject("Cholesky")),
@@ -538,6 +550,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	return val;
 }
 
+static
 SEXP dppMatrix_trf_(SEXP obj, int warn)
 {
 	SEXP val = PROTECT(newObject("pCholesky")),
@@ -624,6 +637,7 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 	return val;
 }
 
+static
 int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
 {
 	cs *T = NULL;
@@ -740,6 +754,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	return val;
 }
 
+static
 int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order)
 {
 	cs *T = NULL;
@@ -843,6 +858,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	return val;
 }
 
+static
 int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
                    int perm, int ldl, int super, double mult)
 {
@@ -1120,7 +1136,8 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 	return res;
 }
 
-static SEXP mkDet(double modulus, int logarithm, int sign)
+static
+SEXP mkDet(double modulus, int logarithm, int sign)
 {
 	SEXP nms = PROTECT(allocVector(STRSXP, 2)),
 		cl = PROTECT(mkString("det")),
@@ -1405,7 +1422,8 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt)
 	return mkDet(modulus, givelog, sign);
 }
 
-static void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
+static
+void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
 {
 	SEXP s;
 	if (!isNull(s = VECTOR_ELT(adn, 1)))
@@ -1430,25 +1448,23 @@ static void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
 SEXP denseLU_solve(SEXP a, SEXP b)
 {
 
-#define SOLVE_START(_MAYBE_NOT_SQUARE_) \
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)); \
-	int *padim = INTEGER(adim), m = padim[0], n = m; \
-	if ((_MAYBE_NOT_SQUARE_) && padim[1] != m) \
+#define SOLVE_START \
+	SEXP adim = GET_SLOT(a, Matrix_DimSym); \
+	int *padim = INTEGER(adim), m = padim[0], n = padim[1]; \
+	if (m != n) \
 		error(_("'%s' is not square"), "a"); \
-	UNPROTECT(1); /* adim */ \
 	if (!isNull(b)) { \
-	SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym)); \
+	SEXP bdim = GET_SLOT(b, Matrix_DimSym); \
 	int *pbdim = INTEGER(bdim); \
 	if (pbdim[0] != m) \
 		error(_("dimensions of '%s' and '%s' are inconsistent"), \
 		      "a", "b"); \
 	n = pbdim[1]; \
-	UNPROTECT(1); /* bdim */ \
 	}
 
 #define SOLVE_FINISH \
-	SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)), \
-	adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)); \
+	SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),	\
+		adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)); \
 	if (isNull(b)) \
 		revDN(rdimnames, adimnames); \
 	else { \
@@ -1458,119 +1474,220 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	} \
 	UNPROTECT(2); /* adimnames, rdimnames */
 
-	SOLVE_START(1);
-	SEXP r = PROTECT(newObject("dgeMatrix")),
-		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	SOLVE_START;
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+
+	char cl[] = ".geMatrix";
+	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	SEXP r = PROTECT(newObject(cl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = m;
 	prdim[1] = n;
+
 	if (m > 0) {
-		SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-			apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
+		SEXP apivot = PROTECT(GET_SLOT(a, Matrix_permSym)), rx;
 		int info;
 		if (isNull(b)) {
-			PROTECT(rx = duplicate(ax));
+			rx = duplicate(ax);
+			PROTECT(rx);
 			int lwork = -1;
-			double work0, *work = &work0;
-			F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
+			Rcomplex work0, *work = &work0;
+			F77_CALL(zgetri)(&m, COMPLEX(rx), &m, INTEGER(apivot),
+			                 work, &lwork, &info);
+			ERROR_LAPACK_1(zgetri, info);
+			lwork = (int) work0.r;
+			work = (Rcomplex *) R_alloc((size_t) lwork, sizeof(Rcomplex));
+			F77_CALL(zgetri)(&m, COMPLEX(rx), &m, INTEGER(apivot),
+			                 work, &lwork, &info);
+			ERROR_LAPACK_2(zgetri, info, 2, U);
+			} else {
+#endif
+			double   work0, *work = &work0;
+			F77_CALL(dgetri)(&m,    REAL(rx), &m, INTEGER(apivot),
 			                 work, &lwork, &info);
 			ERROR_LAPACK_1(dgetri, info);
 			lwork = (int) work0;
-			work = (double *) R_alloc((size_t) lwork, sizeof(double));
-			F77_CALL(dgetri)(&m, REAL(rx), &m, INTEGER(apivot),
+			work = (double   *) R_alloc((size_t) lwork, sizeof(double  ));
+			F77_CALL(dgetri)(&m,    REAL(rx), &m, INTEGER(apivot),
 			                 work, &lwork, &info);
 			ERROR_LAPACK_2(dgetri, info, 2, U);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
-			F77_CALL(dgetrs)("N", &m, &n, REAL(ax), &m, INTEGER(apivot),
-			                 REAL(rx), &m, &info FCONE);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
+			F77_CALL(zgetrs)("N", &m, &n, COMPLEX(ax), &m, INTEGER(apivot),
+			                 COMPLEX(rx), &m, &info FCONE);
+			ERROR_LAPACK_1(zgetrs, info);
+			} else {
+#endif
+			F77_CALL(dgetrs)("N", &m, &n,    REAL(ax), &m, INTEGER(apivot),
+			                    REAL(rx), &m, &info FCONE);
 			ERROR_LAPACK_1(dgetrs, info);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
-		UNPROTECT(3); /* rx, apivot, ax */
+		UNPROTECT(2); /* rx, apivot */
 	}
+
 	SOLVE_FINISH;
-	UNPROTECT(2); /* rdim, r */
+
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
-SEXP BunchKaufman_solve(SEXP a, SEXP b, SEXP packed)
+SEXP BunchKaufman_solve(SEXP a, SEXP b)
 {
-	SOLVE_START(0);
-	int unpacked = !asLogical(packed);
-	const char *cl = (!isNull(b)) ? "dgeMatrix" :
-		((unpacked) ? "dsyMatrix" : "dspMatrix");
-	SEXP r = PROTECT(newObject(cl)),
-		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
+	SOLVE_START;
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
+		XLENGTH(ax) == (R_xlen_t) m * m;
+
+	char cl[] = "...Matrix";
+	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	if (!isNull(b)) {
+		cl[1] = 'g';
+		cl[2] = 'e';
+	} else {
+		cl[1] = 's';
+		cl[2] = (unpacked) ? 'y' : 'p';
+	}
+
+	SEXP r = PROTECT(newObject(cl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = m;
 	prdim[1] = n;
-	if (isNull(b))
+
+	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
+	char aul = CHAR(STRING_ELT(auplo, 0))[0];
+	if (isNull(b) && aul != 'U') {
+		PROTECT(auplo);
 		SET_SLOT(r, Matrix_uploSym, auplo);
+		UNPROTECT(1); /* auplo */
+	}
+
 	if (m > 0) {
-		SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-			apivot = PROTECT(GET_SLOT(a, Matrix_permSym));
-		char ul = *CHAR(STRING_ELT(auplo, 0));
+		SEXP apivot = PROTECT(GET_SLOT(a, Matrix_permSym)), rx;
 		int info;
 		if (isNull(b)) {
-			PROTECT(rx = duplicate(ax));
-			double *work = (double *) R_alloc((size_t) m, sizeof(double));
+			rx = duplicate(ax);
+			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
+			Rcomplex *work = (Rcomplex *) R_alloc((size_t) m, sizeof(Rcomplex));
 			if (unpacked) {
-				F77_CALL(dsytri)(&ul, &m, REAL(rx), &m, INTEGER(apivot),
+				F77_CALL(zsytri)(&aul, &m, COMPLEX(rx), &m, INTEGER(apivot),
+				                 work, &info FCONE);
+				ERROR_LAPACK_2(zsytri, info, 2, D);
+			} else {
+				F77_CALL(zsptri)(&aul, &m, COMPLEX(rx),     INTEGER(apivot),
+				                 work, &info FCONE);
+				ERROR_LAPACK_2(zsptri, info, 2, D);
+			}
+			} else {
+#endif
+			double   *work = (double   *) R_alloc((size_t) m, sizeof(double  ));
+			if (unpacked) {
+				F77_CALL(dsytri)(&aul, &m, REAL(rx), &m, INTEGER(apivot),
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(dsytri, info, 2, D);
 			} else {
-				F77_CALL(dsptri)(&ul, &m, REAL(rx),     INTEGER(apivot),
+				F77_CALL(dsptri)(&aul, &m, REAL(rx),     INTEGER(apivot),
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(dsptri, info, 2, D);
 			}
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
 			if (unpacked) {
-				F77_CALL(dsytrs)(&ul, &m, &n, REAL(ax), &m,
-				                 INTEGER(apivot),
-				                 REAL(rx), &m, &info FCONE);
+				F77_CALL(zsytrs)(&aul, &m, &n, COMPLEX(ax), &m, INTEGER(apivot),
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zsytrs, info);
+			} else {
+				F77_CALL(zsptrs)(&aul, &m, &n, COMPLEX(ax),     INTEGER(apivot),
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zsptrs, info);
+			}
+			} else {
+#endif
+			if (unpacked) {
+				F77_CALL(dsytrs)(&aul, &m, &n,    REAL(ax), &m, INTEGER(apivot),
+				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dsytrs, info);
 			} else {
-				F77_CALL(dsptrs)(&ul, &m, &n, REAL(ax),
-				                 INTEGER(apivot),
-				                 REAL(rx), &m, &info FCONE);
+				F77_CALL(dsptrs)(&aul, &m, &n,    REAL(ax),    INTEGER(apivot),
+				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dsptrs, info);
 			}
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
-		UNPROTECT(3); /* rx, apivot, ax */
+		UNPROTECT(2); /* rx, apivot */
 	}
+
 	SOLVE_FINISH;
-	UNPROTECT(3); /* auplo, rdim, r */
+
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
-SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
+SEXP Cholesky_solve(SEXP a, SEXP b)
 {
-	SOLVE_START(0);
-	int unpacked = !asLogical(packed);
-	const char *cl = (!isNull(b)) ? "dgeMatrix" :
-		((unpacked) ? "dpoMatrix" : "dppMatrix");
-	SEXP r = PROTECT(newObject(cl)),
-		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
+	SOLVE_START;
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
+		XLENGTH(ax) == (R_xlen_t) m * m;
+
+	char cl[] = "...Matrix";
+	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	if (!isNull(b)) {
+		cl[1] = 'g';
+		cl[2] = 'e';
+	} else {
+		cl[1] = 'p';
+		cl[2] = (unpacked) ? 'o' : 'p';
+	}
+
+	SEXP r = PROTECT(newObject(cl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = m;
 	prdim[1] = n;
-	if (isNull(b))
+
+	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
+	char aul = CHAR(STRING_ELT(auplo, 0))[0];
+	if (isNull(b) && aul != 'U') {
+		PROTECT(auplo);
 		SET_SLOT(r, Matrix_uploSym, auplo);
+		UNPROTECT(1); /* auplo */
+	}
+
 	if (m > 0) {
-		SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-		char ul = *CHAR(STRING_ELT(auplo, 0));
-		int info, nprotect = 2;
+		SEXP rx;
+		int info, nprotect = 1;
 
 		SEXP aperm = NULL;
 		if (HAS_SLOT(a, Matrix_permSym)) {
@@ -1582,51 +1699,218 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 		} /* else 'a' is a dtrMatrix or dtpMatrix, as in chol2inv */
 
 		if (isNull(b)) {
-			PROTECT(rx = duplicate(ax));
-			SET_SLOT(r, Matrix_uploSym, auplo);
+			rx = duplicate(ax);
+			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
 			if (unpacked) {
-				F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
+				F77_CALL(zpotri)(&aul, &m, COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_2(zpotri, info, 2, L);
+				if (aperm)
+					zsymperm2(COMPLEX(rx), n, aul, INTEGER(aperm), 1, 1);
+			} else {
+				F77_CALL(zpptri)(&aul, &m, COMPLEX(rx),     &info FCONE);
+				ERROR_LAPACK_2(zpptri, info, 2, L);
+				if (aperm) {
+					/* FIXME: zsymperm2 supporting packed matrices */
+					double *work;
+					size_t lwork = (size_t) n * n;
+					Matrix_Calloc(work, lwork, Rcomplex);
+					zunpack1 (work, COMPLEX(rx), n, aul, 'N');
+					zsymperm2(work, n, aul, INTEGER(aperm), 1, 1);
+					zpack2   (COMPLEX(rx), work, n, aul, 'N');
+					Matrix_Free(work, lwork);
+				}
+			}
+			} else {
+#endif
+			if (unpacked) {
+				F77_CALL(dpotri)(&aul, &m,    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
 				if (aperm)
-					dsymperm2(REAL(rx), n, ul, INTEGER(aperm), 1, 1);
+					dsymperm2(   REAL(rx), n, aul, INTEGER(aperm), 1, 1);
 			} else {
-				F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
+				F77_CALL(dpptri)(&aul, &m,    REAL(rx),     &info FCONE);
 				ERROR_LAPACK_2(dpptri, info, 2, L);
 				if (aperm) {
 					/* FIXME: dsymperm2 supporting packed matrices */
 					double *work;
 					size_t lwork = (size_t) n * n;
 					Matrix_Calloc(work, lwork, double);
-					dunpack1 (work, REAL(rx), n, ul, 'N');
-					dsymperm2(work, n, ul, INTEGER(aperm), 1, 1);
-					dpack2   (REAL(rx), work, n, ul, 'N');
+					dunpack1 (work,    REAL(rx), n, aul, 'N');
+					dsymperm2(work, n, aul, INTEGER(aperm), 1, 1);
+					dpack2   (   REAL(rx), work, n, aul, 'N');
 					Matrix_Free(work, lwork);
 				}
 			}
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
 			if (aperm)
-				drowperm2(REAL(rx), m, n, INTEGER(aperm), 1, 0);
+				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 0);
 			if (unpacked) {
-				F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
-				                 REAL(rx), &m, &info FCONE);
+				F77_CALL(zpotrs)(&aul, &m, &n, COMPLEX(ax), &m,
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zpotrs, info);
+			} else {
+				F77_CALL(zpptrs)(&aul, &m, &n, COMPLEX(ax),
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zpptrs, info);
+			}
+			if (aperm)
+				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 1);
+			} else {
+#endif
+			if (aperm)
+				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 0);
+			if (unpacked) {
+				F77_CALL(dpotrs)(&aul, &m, &n,    REAL(ax), &m,
+				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dpotrs, info);
 			} else {
-				F77_CALL(dpptrs)(&ul, &m, &n, REAL(ax),
-				                 REAL(rx), &m, &info FCONE);
+				F77_CALL(dpptrs)(&aul, &m, &n,    REAL(ax),
+				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dpptrs, info);
 			}
 			if (aperm)
-				drowperm2(REAL(rx), m, n, INTEGER(aperm), 1, 1);
+				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 1);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
-		UNPROTECT(nprotect); /* rx, aperm, ax */
+		UNPROTECT(nprotect); /* rx, aperm */
 	}
+
 	SOLVE_FINISH;
-	UNPROTECT(3); /* auplo, rdim, r */
+
+	UNPROTECT(2); /* r, ax */
+	return r;
+}
+
+SEXP dtrMatrix_solve(SEXP a, SEXP b)
+{
+	SOLVE_START;
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
+		XLENGTH(ax) == (R_xlen_t) m * m;
+
+	char cl[] = "...Matrix";
+	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	if (!isNull(b)) {
+		cl[1] = 'g';
+		cl[2] = 'e';
+	} else {
+		cl[1] = 't';
+		cl[2] = (unpacked) ? 'r' : 'p';
+	}
+
+	SEXP r = PROTECT(newObject(cl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
+	int *prdim = INTEGER(rdim);
+	prdim[0] = m;
+	prdim[1] = n;
+
+	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
+	char aul = CHAR(STRING_ELT(auplo, 0))[0];
+	if (isNull(b) && aul != 'U') {
+		PROTECT(auplo);
+		SET_SLOT(r, Matrix_uploSym, auplo);
+		UNPROTECT(1); /* auplo */
+	}
+
+	SEXP adiag = GET_SLOT(a, Matrix_diagSym);
+	char adi = CHAR(STRING_ELT(adiag, 0))[0];
+	if (isNull(b) && adi != 'N') {
+		PROTECT(adiag);
+		SET_SLOT(r, Matrix_diagSym, adiag);
+		UNPROTECT(1); /* adiag */
+	}
+
+	if (m > 0) {
+		SEXP rx;
+		int info;
+		if (isNull(b)) {
+			rx = duplicate(ax);
+			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
+			if (unpacked) {
+				F77_CALL(ztrtri)(&aul, &adi, &m, COMPLEX(rx), &m,
+				                 &info FCONE FCONE);
+				ERROR_LAPACK_2(ztrtri, info, 2, A);
+			} else {
+				F77_CALL(ztptri)(&aul, &adi, &m, COMPLEX(rx),
+				                 &info FCONE FCONE);
+				ERROR_LAPACK_2(ztptri, info, 2, A);
+			}
+			} else {
+#endif
+			if (unpacked) {
+				F77_CALL(dtrtri)(&aul, &adi, &m,    REAL(rx), &m,
+				                 &info FCONE FCONE);
+				ERROR_LAPACK_2(dtrtri, info, 2, A);
+			} else {
+				F77_CALL(dtptri)(&aul, &adi, &m,    REAL(rx),
+				                 &info FCONE FCONE);
+				ERROR_LAPACK_2(dtptri, info, 2, A);
+			}
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
+		} else {
+			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+			rx = duplicate(bx);
+			UNPROTECT(1); /* bx */
+			PROTECT(rx);
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (TYPEOF(ax) == CPLXSXP) {
+			if (unpacked) {
+				F77_CALL(ztrtrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax), &m,
+				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
+				ERROR_LAPACK_1(ztrtrs, info);
+			} else {
+				// https://bugs.r-project.org/show_bug.cgi?id=18534
+				F77_CALL(ztptrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax),
+				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
+				ERROR_LAPACK_1(ztptrs, info);
+			}
+			} else {
+#endif
+			if (unpacked) {
+				F77_CALL(dtrtrs)(&aul, "N", &adi, &m, &n,    REAL(ax), &m,
+				                    REAL(rx), &m, &info FCONE FCONE FCONE);
+				ERROR_LAPACK_1(dtrtrs, info);
+			} else {
+				// https://bugs.r-project.org/show_bug.cgi?id=18534
+				F77_CALL(dtptrs)(&aul, "N", &adi, &m, &n,    REAL(ax),
+				                    REAL(rx), &m, &info
+# ifdef usePR18534fix
+				                 FCONE FCONE FCONE);
+# else
+				                 FCONE FCONE);
+# endif
+				ERROR_LAPACK_1(dtptrs, info);
+			}
+#ifdef MATRIX_ENABLE_ZMATRIX
+			}
+#endif
+		}
+		SET_SLOT(r, Matrix_xSym, rx);
+		UNPROTECT(1); /* rx */
+	}
+
+	SOLVE_FINISH;
+
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
@@ -1636,7 +1920,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 #define ERROR_SOLVE_OOM(_A_, _B_) \
 	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", #_A_, #_B_)
 
-	SOLVE_START(0);
+	SOLVE_START;
 	SEXP r,
 	aL = PROTECT(GET_SLOT(a, Matrix_LSym)),
 	aU = PROTECT(GET_SLOT(a, Matrix_USym)),
@@ -1649,11 +1933,10 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
 	if (!asLogical(sparse)) {
 		PROTECT(r = newObject("dgeMatrix"));
-		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
-		UNPROTECT(1); /* rdim */
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP rx = PROTECT(allocVector(REALSXP, mn));
 		double *prx = REAL(rx);
@@ -1788,16 +2071,6 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	return r;
 }
 
-/* MJ: not needed since we have 'sparseQR_matmult' : */
-#if 0
-
-SEXP sparseQR_solve(SEXP a, SEXP b, SEXP sparse)
-{
-	return R_NilValue;
-}
-
-#endif /* MJ */
-
 SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 {
 	/* see top of :
@@ -1811,7 +2084,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	    (system = STRING_ELT(system, 0)) == NA_STRING ||
 	    (ivalid = strmatch(CHAR(system), valid)) < 0)
 		error(_("invalid '%s' to %s()"), "system", __func__);
-	SOLVE_START(0);
+	SOLVE_START;
 	SEXP r;
 	int j;
 	cholmod_factor *L = mf2cholmod(a);
@@ -1889,73 +2162,9 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	return r;
 }
 
-SEXP dtrMatrix_solve(SEXP a, SEXP b, SEXP packed)
-{
-	SOLVE_START(0);
-	int unpacked = !asLogical(packed);
-	const char *cl = (!isNull(b)) ? "dgeMatrix" :
-		((unpacked) ? "dtrMatrix" : "dtpMatrix");
-	SEXP r = PROTECT(newObject(cl)),
-		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
-		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-		adiag = PROTECT(GET_SLOT(a, Matrix_diagSym));
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
-	if (isNull(b)) {
-		SET_SLOT(r, Matrix_uploSym, auplo);
-		SET_SLOT(r, Matrix_diagSym, adiag);
-	}
-	if (m > 0) {
-		SEXP rx, ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-		char ul = *CHAR(STRING_ELT(auplo, 0)),
-			di = *CHAR(STRING_ELT(adiag, 0));
-		int info;
-		if (isNull(b)) {
-			PROTECT(rx = duplicate(ax));
-			SET_SLOT(r, Matrix_uploSym, auplo);
-			SET_SLOT(r, Matrix_diagSym, adiag);
-			if (unpacked) {
-				F77_CALL(dtrtri)(&ul, &di, &m, REAL(rx), &m,
-				                 &info FCONE FCONE);
-				ERROR_LAPACK_2(dtrtri, info, 2, A);
-			} else {
-				F77_CALL(dtptri)(&ul, &di, &m, REAL(rx),
-				                 &info FCONE FCONE);
-				ERROR_LAPACK_2(dtptri, info, 2, A);
-			}
-		} else {
-			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-			rx = duplicate(bx);
-			UNPROTECT(1); /* bx */
-			PROTECT(rx);
-			if (unpacked) {
-				F77_CALL(dtrtrs)(&ul, "N", &di, &m, &n, REAL(ax), &m,
-				                 REAL(rx), &m, &info FCONE FCONE FCONE);
-				ERROR_LAPACK_1(dtrtrs, info);
-			} else {
-				// https://bugs.r-project.org/show_bug.cgi?id=18534
-				F77_CALL(dtptrs)(&ul, "N", &di, &m, &n, REAL(ax),
-				                 REAL(rx), &m, &info
-#ifdef usePR18534fix
-				                 FCONE FCONE FCONE);
-#else
-				                 FCONE FCONE);
-#endif
-				ERROR_LAPACK_1(dtptrs, info);
-			}
-		}
-		SET_SLOT(r, Matrix_xSym, rx);
-		UNPROTECT(2); /* rx, ax */
-	}
-	SOLVE_FINISH;
-	UNPROTECT(4); /* adiag, auplo, rdim, r */
-	return r;
-}
-
 SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 {
-	SOLVE_START(0);
+	SOLVE_START;
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int j;
@@ -1964,11 +2173,10 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
 		PROTECT(r = newObject(cl));
 
-		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
-		UNPROTECT(1); /* rdim */
 
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP rx = PROTECT(allocVector(REALSXP, mn));

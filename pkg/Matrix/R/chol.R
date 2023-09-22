@@ -47,6 +47,7 @@ setMethod("chol", signature(x = .cl),
               ch@Dimnames <- dimnames(x)
               ch
           })
+rm(.cl)
 
 setMethod("chol", signature(x = "ddiMatrix"),
           function(x, ...) {
@@ -159,30 +160,23 @@ setMethod("chol2inv", signature(x = "diagonalMatrix"),
           function(x, ...)
               chol2inv(.M2kind(x, "d"), ...))
 
-setMethod("chol2inv", signature(x = "dtrMatrix"),
+for(.cl in paste0("dt", c("r", "p"), "Matrix"))
+setMethod("chol2inv", signature(x = .cl),
           function(x, ...) {
               if(x@diag != "N")
                   x <- ..diagU2N(x)
-              r <- .Call(Cholesky_solve, x, NULL, FALSE)
+              r <- .Call(Cholesky_solve, x, NULL)
               i <- if(x@uplo == "U") 2L else 1L
               r@Dimnames <- x@Dimnames[c(i, i)]
               r
           })
-
-setMethod("chol2inv", signature(x = "dtpMatrix"),
-          function(x, ...) {
-              if(x@diag != "N")
-                  x <- ..diagU2N(x)
-              r <- .Call(Cholesky_solve, x, NULL, TRUE)
-              i <- if(x@uplo == "U") 2L else 1L
-              r@Dimnames <- x@Dimnames[c(i, i)]
-              r
-          })
+rm(.cl)
 
 for(.cl in paste0("dt", c("C", "R", "T"), "Matrix"))
 setMethod("chol2inv", signature(x = .cl),
           function(x, ...)
               (if(x@uplo == "U") tcrossprod else crossprod)(solve(x)))
+rm(.cl)
 
 ## 'uplo' can affect the 'Dimnames' of the result here :
 setMethod("chol2inv", signature(x = "ddiMatrix"),

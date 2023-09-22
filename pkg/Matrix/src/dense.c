@@ -1,7 +1,12 @@
+#include "Mutils.h"
+#include "idz.h"
 #include "dense.h"
 
 SEXP dense_band(SEXP from, const char *class, int a, int b)
 {
+	/* defined in ./coerce.c : */
+	SEXP dense_as_general(SEXP, const char *, int);
+
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	UNPROTECT(1); /* dim */
@@ -20,54 +25,52 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		switch (class[0]) { \
 		case 'n': \
 		case 'l': \
-			_DO_(int, LOGICAL, i); \
+			_DO_(i, int, LOGICAL); \
 			break; \
 		case 'i': \
-			_DO_(int, INTEGER, i); \
+			_DO_(i, int, INTEGER); \
 			break; \
 		case 'd': \
-			_DO_(double, REAL, d); \
+			_DO_(d, double, REAL); \
 			break; \
 		case 'z': \
-			_DO_(Rcomplex, COMPLEX, z); \
+			_DO_(z, Rcomplex, COMPLEX); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define UNPACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
+#define BAND2(_PREFIX_, _CTYPE_, _PTR_) \
 	_PREFIX_ ## band2(_PTR_(x1), m, n, a, b, di)
 
-#define PACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
+#define BAND1(_PREFIX_, _CTYPE_, _PTR_) \
 	_PREFIX_ ## band1(_PTR_(x1), n, a, b, ul1, di)
 
-#define UNPACKED_COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_) \
+#define DCPY2(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
-		Matrix_memset(_PTR_(x1), 0, len, sizeof(_CTYPE_)); \
+		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcpy2( \
-				_PTR_(x1), _PTR_(x0), n, len, 'U', di); \
+			_PREFIX_ ## dcpy2(px1, px0, n, XLENGTH(x1),      'U', di); \
 	} while (0)
 
-#define PACKED_COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_)\
+#define DCPY1(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
-		Matrix_memset(_PTR_(x1), 0, len, sizeof(_CTYPE_)); \
+		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcpy1( \
-				_PTR_(x1), _PTR_(x0), n, len, ul1, ul0, di); \
+			_PREFIX_ ## dcpy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
 	} while (0)
 
 	char ul0 = 'U', ul1 = 'U', di = 'N';
 	if (class[1] != 'g') {
 		if (ge) {
-			/* defined in ./coerce.c : */
-			SEXP dense_as_general(SEXP, const char *, int);
-			SEXP to = PROTECT(dense_as_general(from, class, 1)),
-				x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
-			BAND_CASES(UNPACKED_MAKE_BANDED);
-			UNPROTECT(2);
-			return to;
+			PROTECT(from = dense_as_general(from, class, 1));
+			SEXP x1 = PROTECT(GET_SLOT(from, Matrix_xSym));
+			BAND_CASES(BAND2);
+			UNPROTECT(2); /* x1, from */
+			return from;
 		}
 
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
@@ -105,19 +108,18 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1;
+
 	if (ge) {
-		SEXP x1 = PROTECT(GET_SLOT(from, Matrix_xSym));
-		x1 = duplicate(x1);
-		UNPROTECT(1);
-		PROTECT(x1);
+		PROTECT(x1 = duplicate(x0));
 		if (ATTRIB(x1) != R_NilValue) {
 			SET_ATTRIB(x1, R_NilValue);
 			if (OBJECT(x1))
 				SET_OBJECT(x1, 0);
 		}
 		SET_SLOT(to, Matrix_xSym, x1);
-		BAND_CASES(UNPACKED_MAKE_BANDED);
-		UNPROTECT(2); /* x, to */
+		BAND_CASES(BAND2);
+		UNPROTECT(3); /* x1, x0, to */
 		return to;
 	}
 
@@ -135,16 +137,21 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		UNPROTECT(1); /* diag */
 	}
 
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1;
-
 	if (tr && class[1] == 't') {
-		/* Result is either a diagonal matrix or a zero matrix */
-		R_xlen_t len = XLENGTH(x0);
-		PROTECT(x1 = allocVector(TYPEOF(x0), len));
-		if (class[2] != 'p')
-			BAND_CASES(UNPACKED_COPY_DIAGONAL);
-		else
-			BAND_CASES(  PACKED_COPY_DIAGONAL);
+		if ((ul0 == 'U') ? (b <= 0) : (a >= 0)) {
+			/* Result is either a diagonal matrix or a zero matrix : */
+			PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
+			if (class[2] != 'p')
+				BAND_CASES(DCPY2);
+			else
+				BAND_CASES(DCPY1);
+		} else {
+			PROTECT(x1 = duplicate(x0));
+			if (class[2] != 'p')
+				BAND_CASES(BAND2);
+			else
+				BAND_CASES(BAND1);
+		}
 	} else {
 		if (sy || (tr && (class[1] == 'g' || ul0 == ul1 || n <= 1))) {
 			PROTECT(x1 = duplicate(x0));
@@ -153,24 +160,25 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 				if (OBJECT(x1))
 					SET_OBJECT(x1, 0);
 			}
-		} else if (class[2] != 'p')
-			/* band is "opposite" the stored triangle: */
-			PROTECT(x1 = unpacked_force(x0, n, ul0, '\0'));
-		else
-			/* band is "opposite" the stored triangle: */
-			PROTECT(x1 = packed_transpose(x0, n, ul0));
+		} else {
+			/* Band is "opposite" the stored triangle : */
+			PROTECT(from = dense_transpose(from, class));
+			x1 = GET_SLOT(from, Matrix_xSym);
+			UNPROTECT(1);
+			PROTECT(x1);
+		}
 		if (class[2] != 'p')
-			BAND_CASES(UNPACKED_MAKE_BANDED);
+			BAND_CASES(BAND2);
 		else
-			BAND_CASES(  PACKED_MAKE_BANDED);
+			BAND_CASES(BAND1);
 	}
 	SET_SLOT(to, Matrix_xSym, x1);
 
 #undef BAND_CASES
-#undef UNPACKED_MAKE_BANDED
-#undef   PACKED_MAKE_BANDED
-#undef UNPACKED_COPY_DIAGONAL
-#undef   PACKED_COPY_DIAGONAL
+#undef BAND2
+#undef BAND1
+#undef DCPY2
+#undef DCPY1
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -638,37 +646,35 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 
 		R_xlen_t len = XLENGTH(x1);
 
-#define COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_) \
+#define DCPY(_PREFIX_, _CTYPE_, _PTR_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
 			if (class[2] != 'p') \
-				_PREFIX_ ## dcpy2( \
-					px1, px0, n, len, '\0' /* not used */, di); \
+				_PREFIX_ ## dcpy2(px1, px0, n, len,     '\0', di); \
 			else \
-				_PREFIX_ ## dcpy1( \
-					px1, px0, n, len, ul1, ul0, di); \
+				_PREFIX_ ## dcpy1(px1, px0, n, len, ul1, ul0, di); \
 		} while (0)
 
 		switch (class[0]) {
 		case 'n':
 		case 'l':
-			COPY_DIAGONAL(int, LOGICAL, i);
+			DCPY(i, int, LOGICAL);
 			break;
 		case 'i':
-			COPY_DIAGONAL(int, INTEGER, i);
+			DCPY(i, int, INTEGER);
 			break;
 		case 'd':
-			COPY_DIAGONAL(double, REAL, d);
+			DCPY(d, double, REAL);
 			break;
 		case 'z':
-			COPY_DIAGONAL(Rcomplex, COMPLEX, z);
+			DCPY(z, Rcomplex, COMPLEX);
 			break;
 		default:
 			break;
 		}
 
-#undef COPY_DIAGONAL
+#undef DCPY
 
 		UNPROTECT(1); /* x1 */
 	}
@@ -1417,9 +1423,10 @@ do { \
 
 #define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
-static void dense_colsum(SEXP x, const char *class,
-                         int m, int n, char ul, char di, int narm, int mean,
-                         SEXP res)
+static
+void dense_colsum(SEXP x, const char *class,
+                  int m, int n, char ul, char di, int narm, int mean,
+                  SEXP res)
 {
 	int i, j, count = -1, narm_ = narm && mean && class[0] != 'n',
 		unpacked = class[2] != 'p';
@@ -1510,9 +1517,10 @@ static void dense_colsum(SEXP x, const char *class,
 	return;
 }
 
-static void dense_rowsum(SEXP x, const char *class,
-                         int m, int n, char ul, char di, int narm, int mean,
-                         SEXP res)
+static
+void dense_rowsum(SEXP x, const char *class,
+                  int m, int n, char ul, char di, int narm, int mean,
+                  SEXP res)
 {
 	int i, j, *count = NULL, narm_ = narm && mean && class[0] != 'n',
 		unpacked = class[2] != 'p', symmetric = class[1] == 's';
@@ -2023,7 +2031,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 			PROD_LOOP;
 
 #undef PROD_KERNEL
-			
+
 			REAL(res)[0] = 1.0;
 		}
 		UNPROTECT(1); /* res */
