@@ -62,8 +62,6 @@ init.o: init.c abIndex.h \
   sparse.h sparseVector.h subscript.h validity.h
 kappa.o: kappa.c kappa.h Lapack-etc.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
-packedMatrix.o: packedMatrix.c packedMatrix.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
 products.o: products.c products.h Lapack-etc.h \
   Mutils.h Mdefines.h Syms.h Minlines.h \
   chm_common.h SuiteSparse_config/SuiteSparse_config.h \
@@ -77,8 +75,6 @@ sparse.o: sparse.c sparse.h Mutils.h Mdefines.h Syms.h Minlines.h
 sparseVector.o: sparseVector.c sparseVector.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 subscript.o: subscript.c subscript.h \
-  Mutils.h Mdefines.h Syms.h Minlines.h
-unpackedMatrix.o: unpackedMatrix.c unpackedMatrix.h \
   Mutils.h Mdefines.h Syms.h Minlines.h
 validity.o: validity.c validity.h \
   Mutils.h Mdefines.h Syms.h Minlines.h

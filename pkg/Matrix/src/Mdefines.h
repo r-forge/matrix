@@ -193,11 +193,11 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define DIVIDE_COMPLEX(_X_, _A_) \
 	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
-#define PM_AR21_UP(i, j) \
+#define PACKED_AR21_UP(i, j) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))
-#define PM_AR21_LO(i, j, m2) \
+#define PACKED_AR21_LO(i, j, m2) \
 	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
-#define PM_LENGTH(m) \
+#define PACKED_LENGTH(m) \
 	((R_xlen_t) ((m) + ((Matrix_int_fast64_t) (m) * (       (m) - 1)) / 2))
 
 #define SHOW(...) __VA_ARGS__

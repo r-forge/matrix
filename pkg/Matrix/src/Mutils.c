@@ -419,124 +419,6 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 
 /* For permutations ================================================= */
 
-/* Poor man's C translation of LAPACK dswap */
-static void dswap(int n, double *x, int incx, double *y, int incy)
-{
-	double tmp;
-	while (n--) {
-		tmp = *x;
-		*x = *y;
-		*y = tmp;
-		x += incx;
-		y += incy;
-	}
-	return;
-}
-
-/* Poor man's C translation of LAPACK dsyswapr */
-static void dsyswapr(char uplo, int n, double *x, int k0, int k1)
-{
-	double tmp, *x0 = x + (R_xlen_t) k0 * n, *x1 = x + (R_xlen_t) k1 * n;
-	if (uplo == 'U') {
-		dswap(k0, x0, 1, x1, 1);
-		tmp = x0[k0];
-		x0[k0] = x1[k1];
-		x1[k1] = tmp;
-		dswap(k1 - k0 - 1, x0 + k0 + n, n, x1 + k0 + 1, 1);
-		dswap(n - k1 - 1, x1 + k0 + n, n, x1 + k1 + n, n);
-	} else {
-		dswap(k0, x + k0, n, x + k1, n);
-		tmp = x0[k0];
-		x0[k0] = x1[k1];
-		x1[k1] = tmp;
-		dswap(k1 - k0 - 1, x0 + k0 + 1, 1, x0 + k1 + n, n);
-		dswap(n - k1 - 1, x0 + k1 + 1, 1, x1 + k1 + 1, 1);
-	}
-	return;
-}
-
-void rowPerm(double *x, int m, int n, int *p, int off, int invert)
-{
-	int i, k0, k1;
-	for (i = 0; i < m; ++i)
-		p[i] = -(p[i] - off + 1);
-	if (!invert) {
-		for (i = 0; i < m; ++i) {
-			if (p[i] > 0)
-				continue;
-			k0 = i;
-			p[k0] = -p[k0];
-			k1 = p[k0] - 1;
-			while (p[k1] < 0) {
-				dswap(n, x + k0, m, x + k1, m);
-				k0 = k1;
-				p[k0] = -p[k0];
-				k1 = p[k0] - 1;
-			}
-		}
-	} else {
-		for (i = 0; i < m; ++i) {
-			if (p[i] > 0)
-				continue;
-			k0 = i;
-			p[k0] = -p[k0];
-			k1 = p[k0] - 1;
-			while (k1 != k0) {
-				dswap(n, x + k0, m, x + k1, m);
-				p[k1] = -p[k1];
-				k1 = p[k1] - 1;
-			}
-		}
-	}
-	for (i = 0; i < m; ++i)
-		p[i] = p[i] + off - 1;
-	return;
-}
-
-void symPerm(double *x, int n, char uplo, int *p, int off, int invert)
-{
-	int i, k0, k1;
-	for (i = 0; i < n; ++i)
-		p[i] = -(p[i] - off + 1);
-	if (!invert) {
-		for (i = 0; i < n; ++i) {
-			if (p[i] > 0)
-				continue;
-			k0 = i;
-			p[k0] = -p[k0];
-			k1 = p[k0] - 1;
-			while (p[k1] < 0) {
-				if (k0 < k1)
-					dsyswapr(uplo, n, x, k0, k1);
-				else
-					dsyswapr(uplo, n, x, k1, k0);
-				k0 = k1;
-				p[k0] = -p[k0];
-				k1 = p[k0] - 1;
-			}
-		}
-	} else {
-		for (i = 0; i < n; ++i) {
-			if (p[i] > 0)
-				continue;
-			k0 = i;
-			p[k0] = -p[k0];
-			k1 = p[k0] - 1;
-			while (k1 != k0) {
-				if (k0 < k1)
-					dsyswapr(uplo, n, x, k0, k1);
-				else
-					dsyswapr(uplo, n, x, k1, k0);
-				p[k1] = -p[k1];
-				k1 = p[k1] - 1;
-			}
-		}
-	}
-	for (i = 0; i < n; ++i)
-		p[i] = p[i] + off - 1;
-	return;
-}
-
 int isPerm(const int *p, int n, int off)
 {
 	int res = 1;
@@ -1599,3 +1481,113 @@ SEXP R_any0(SEXP x) {
 
 #undef TRUE_
 #undef FALSE_
+
+SEXP unpacked_force(SEXP x, int n, char uplo, char diag)
+{
+	SEXPTYPE tx = TYPEOF(x);
+	if (tx < LGLSXP || tx > CPLXSXP)
+		ERROR_INVALID_TYPE(x, __func__);
+	R_xlen_t nx = XLENGTH(x);
+	SEXP y = PROTECT(allocVector(tx, nx));
+
+	if (diag == '\0') {
+
+#define FORCE_SYMMETRIC(_PREFIX_, _CTYPE_, _PTR_) \
+	do { \
+		_CTYPE_ *px = _PTR_(x), *py = _PTR_(y); \
+		Matrix_memcpy(py, px, nx, sizeof(_CTYPE_)); \
+		_PREFIX_ ## syforce2(py, n, uplo); \
+	} while (0)
+
+	switch (tx) {
+	case LGLSXP:
+		FORCE_SYMMETRIC(i, int, LOGICAL);
+		break;
+	case INTSXP:
+		FORCE_SYMMETRIC(i, int, INTEGER);
+		break;
+	case REALSXP:
+		FORCE_SYMMETRIC(d, double, REAL);
+		break;
+	case CPLXSXP:
+		FORCE_SYMMETRIC(z, Rcomplex, COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef FORCE_SYMMETRIC
+
+	} else {
+
+#define FORCE_TRIANGULAR(_PREFIX_, _CTYPE_, _PTR_, _ONE_) \
+		do { \
+			_CTYPE_ *px = _PTR_(x), *py = _PTR_(y); \
+			Matrix_memcpy(py, px, nx, sizeof(_CTYPE_)); \
+			_PREFIX_ ## trforce2( \
+				py, n, n, uplo, diag); \
+			if (diag != 'N') { \
+				R_xlen_t n1a = (R_xlen_t) n + 1; \
+				for (int j = 0; j < n; ++j, py += n1a) \
+					*py = _ONE_; \
+			} \
+		} while (0)
+
+		switch (tx) {
+		case LGLSXP:
+			FORCE_TRIANGULAR(i, int, LOGICAL, 1);
+			break;
+		case INTSXP:
+			FORCE_TRIANGULAR(i, int, INTEGER, 1);
+			break;
+		case REALSXP:
+			FORCE_TRIANGULAR(d, double, REAL, 1.0);
+			break;
+		case CPLXSXP:
+			FORCE_TRIANGULAR(z, Rcomplex, COMPLEX, Matrix_zone);
+			break;
+		default:
+			break;
+		}
+
+#undef FORCE_TRIANGULAR
+
+	}
+
+	UNPROTECT(1);
+	return y;
+}
+
+SEXP packed_transpose(SEXP x, int n, char uplo)
+{
+	SEXPTYPE tx = TYPEOF(x);
+	if (tx < LGLSXP || tx > CPLXSXP)
+		ERROR_INVALID_TYPE(x, __func__);
+	R_xlen_t nx = XLENGTH(x);
+	SEXP y = PROTECT(allocVector(tx, nx));
+
+#define TRANSPOSE(_PREFIX_, _PTR_) \
+	_PREFIX_ ## transpose1(_PTR_(y), _PTR_(x), n, uplo)
+
+	switch (tx) {
+	case LGLSXP:
+		TRANSPOSE(i, LOGICAL);
+		break;
+	case INTSXP:
+		TRANSPOSE(i, INTEGER);
+		break;
+	case REALSXP:
+		TRANSPOSE(d, REAL);
+		break;
+	case CPLXSXP:
+		TRANSPOSE(z, COMPLEX);
+		break;
+	default:
+		break;
+	}
+
+#undef TRANSPOSE
+
+	UNPROTECT(1);
+	return y;
+}

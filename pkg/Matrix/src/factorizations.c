@@ -1588,18 +1588,18 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 				F77_CALL(dpotri)(&ul, &m, REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
 				if (aperm)
-					symPerm(REAL(rx), n, ul, INTEGER(aperm), 1, 1);
+					dsymperm2(REAL(rx), n, ul, INTEGER(aperm), 1, 1);
 			} else {
 				F77_CALL(dpptri)(&ul, &m, REAL(rx),     &info FCONE);
 				ERROR_LAPACK_2(dpptri, info, 2, L);
 				if (aperm) {
-					/* FIXME: symPerm() supporting packed matrices */
+					/* FIXME: dsymperm2 supporting packed matrices */
 					double *work;
 					size_t lwork = (size_t) n * n;
 					Matrix_Calloc(work, lwork, double);
-					ddense_unpack(work, REAL(rx), n, ul, 'N');
-					symPerm(work, n, ul, INTEGER(aperm), 1, 1);
-					ddense_pack  (REAL(rx), work, n, ul, 'N');
+					dunpack1 (work, REAL(rx), n, ul, 'N');
+					dsymperm2(work, n, ul, INTEGER(aperm), 1, 1);
+					dpack2   (REAL(rx), work, n, ul, 'N');
 					Matrix_Free(work, lwork);
 				}
 			}
@@ -1609,7 +1609,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
 			if (aperm)
-				rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 0);
+				drowperm2(REAL(rx), m, n, INTEGER(aperm), 1, 0);
 			if (unpacked) {
 				F77_CALL(dpotrs)(&ul, &m, &n, REAL(ax), &m,
 				                 REAL(rx), &m, &info FCONE);
@@ -1620,7 +1620,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 				ERROR_LAPACK_1(dpptrs, info);
 			}
 			if (aperm)
-				rowPerm(REAL(rx), m, n, INTEGER(aperm), 1, 1);
+				drowperm2(REAL(rx), m, n, INTEGER(aperm), 1, 1);
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(nprotect); /* rx, aperm, ax */

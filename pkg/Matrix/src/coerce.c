@@ -119,20 +119,20 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 
 	} else {
 
-		PROTECT(x = allocVector(tt, PM_LENGTH(n)));
+		PROTECT(x = allocVector(tt, PACKED_LENGTH(n)));
 		++nprotect;
 		switch (tt) {
 		case LGLSXP:
-			idense_pack(LOGICAL(x), LOGICAL(from), n, ul, di);
+			ipack2(LOGICAL(x), LOGICAL(from), n, ul, di);
 			break;
 		case INTSXP:
-			idense_pack(INTEGER(x), INTEGER(from), n, ul, di);
+			ipack2(INTEGER(x), INTEGER(from), n, ul, di);
 			break;
 		case REALSXP:
-			ddense_pack(REAL(x), REAL(from), n, ul, di);
+			dpack2(REAL(x), REAL(from), n, ul, di);
 			break;
 		case CPLXSXP:
-			zdense_pack(COMPLEX(x), COMPLEX(from), n, ul, di);
+			zpack2(COMPLEX(x), COMPLEX(from), n, ul, di);
 			break;
 		default:
 			break;
@@ -410,7 +410,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		for (i = 0, k = 0; i < n; ++i) { \
 			kend = pp[i]; \
 			while (k < kend) { \
-				px1[PM_AR21_UP(i, *pj)] = _REPLACE_(*px0, 1); \
+				px1[PACKED_AR21_UP(i, *pj)] = _REPLACE_(*px0, 1); \
 				++k; ++pj; _MASK_(++px0); \
 			} \
 		} \
@@ -422,7 +422,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		for (i = 0, k = 0; i < n; ++i) { \
 			kend = pp[i]; \
 			while (k < kend) { \
-				px1[PM_AR21_LO(i, *pj, n2)] = _REPLACE_(*px0, 1); \
+				px1[PACKED_AR21_LO(i, *pj, n2)] = _REPLACE_(*px0, 1); \
 				++k; ++pj; _MASK_(++px0); \
 			} \
 		} \
@@ -441,7 +441,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 #define SAD_LOOP_T2UP(_MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		for (k = 0; k < nnz; ++k) { \
-			index = PM_AR21_UP(*pi, *pj); \
+			index = PACKED_AR21_UP(*pi, *pj); \
 			_INCREMENT_(px1[index], (*px0)); \
 			++pi; ++pj; _MASK_(++px0); \
 		} \
@@ -451,7 +451,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	do { \
 		R_xlen_t n2 = (R_xlen_t) n * 2; \
 		for (k = 0; k < nnz; ++k) { \
-			index = PM_AR21_LO(*pi, *pj, n2); \
+			index = PACKED_AR21_LO(*pi, *pj, n2); \
 			_INCREMENT_(px1[index], (*px0)); \
 			++pi; ++pj; _MASK_(++px0); \
 		} \
@@ -551,10 +551,10 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		Matrix_memset(px1, 0, (R_xlen_t) len, sizeof(_CTYPE_)); \
 		if (di == 'N' || cl[1] != 't') { \
 			if (cl[2] != 'p') \
-				_PREFIX_ ## dense_unpacked_copy_diagonal( \
+				_PREFIX_ ## dcpy2( \
 					px1, px0, n, n,     ul, di); \
 			else \
-				_PREFIX_ ## dense_packed_copy_diagonal( \
+				_PREFIX_ ## dcpy1( \
 					px1, px0, n, n, ul, ul, di); \
 		} \
 	} while (0)
@@ -1006,7 +1006,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
-			d = PM_LENGTH(n) - 1; \
+			d = PACKED_LENGTH(n) - 1; \
 			for (i = 0; i < n; px0 -= (d -= (++i))) { \
 				for (j = i; j < n; px0 += (++j)) \
 					if (_ISNZ_(*px0)) _DO_INNER_; \
@@ -1045,7 +1045,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
-			d = PM_LENGTH(n - 1) - 1; \
+			d = PACKED_LENGTH(n - 1) - 1; \
 			for (i = 0; i < n; ++i) { \
 				for (j = i + 1; j < n; ++j) { \
 					px0 += j; \
@@ -1885,13 +1885,13 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		if (class[2] == 'p') \
-			_PREFIX_ ## dense_unpack(px1, px0, n, ul, di); \
+			_PREFIX_ ## unpack1(px1, px0, n, ul, di); \
 		else if (new) \
 			Matrix_memcpy(px1, px0, (R_xlen_t) n * n, sizeof(_CTYPE_)); \
 		if (class[1] == 's') \
-			_PREFIX_ ## dense_unpacked_make_symmetric(px1, n, ul); \
+			_PREFIX_ ## syforce2(px1, n, ul); \
 		else \
-			_PREFIX_ ## dense_unpacked_make_triangular(px1, n, n, ul, di); \
+			_PREFIX_ ## trforce2(px1, n, n, ul, di); \
 	} while (0)
 
 	switch (class[0]) {
@@ -2282,7 +2282,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, (R_xlen_t) n * n, sizeof(_CTYPE_)); \
-		_PREFIX_ ## dense_unpack(px1, px0, n, ul, 'N'); \
+		_PREFIX_ ## unpack1(px1, px0, n, ul, 'N'); \
 	} while (0)
 
 	switch (cl[0]) {
@@ -2394,13 +2394,13 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), PM_LENGTH(n)));
+		x1 = PROTECT(allocVector(TYPEOF(x0), PACKED_LENGTH(n)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
 #define PACK(_CTYPE_, _PTR_, _PREFIX_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-		_PREFIX_ ## dense_pack(px1, px0, n, ul, 'N'); \
+		_PREFIX_ ## pack2(px1, px0, n, ul, 'N'); \
 	} while (0)
 
 	switch (cl[0]) {
