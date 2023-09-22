@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-20 r4356)}{
+\section{Changes in version 1.6-2 (2023-09-22 r4369)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -150,6 +150,9 @@
       by zero occurs before multiplication by any stored entry,
       regardless of the position of the first structural zero in the
       corresponding sorted matrix (to avoid the cost of sorting).
+
+      \code{tri[ul](<.t[rp]Matrix>, k)} was often wrong for nonzero
+      \code{k}, setting too many bands to zero.
     }
   }
   \subsection{Misc}{
@@ -159,10 +162,14 @@
 
       \item Certain never or seldom used class unions are removed.
 
+      \item The content of \file{src/Mutils.[ch]} has been migrated
+      to more transparently named files: \file{src/attrib.[ch]},
+      \file{src/objects.[ch]}, etc.
+
       \item Most matrix product code has been migrated to
       \file{products.[Rch]} from elsewhere.
 
-	  \item Files in \file{po/} and \file{inst/po/} have been updated
+      \item Files in \file{po/} and \file{inst/po/} have been updated
       due to more frequent use of \code{gettextf} in \file{R/*.R}.
     }
   }

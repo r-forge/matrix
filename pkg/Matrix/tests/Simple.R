@@ -1544,6 +1544,9 @@ stopifnot(identical(as(data.frame(a = 1:2, b = 3:4), "Matrix"),
                     new("dgeMatrix", x = as.double(1:4),
                         Dim = c(2L, 2L), Dimnames = list(NULL, c("a", "b")))))
 
+## tri[ul](<.t[rp]Matrix>) was often wrong at least in 1.6-1
+u <- new("dtrMatrix", Dim = c(8L, 8L), x = as.double(seq_len(64L)))
+stopifnot(identical(triu(u, 1L), triu(as(u, "generalMatrix"), 1L)))
 
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
