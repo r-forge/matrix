@@ -286,13 +286,9 @@ mat2triplet <- function(x, uniqT = FALSE) {
 dmperm <- function(x, nAns = 6L, seed = 0L) {
     stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
               length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
-    if(!isS4(x))
-        x <- .m2sparse(x, "dgC", NULL, NULL)
-    else {
-        x <- .M2gen(.M2C(x))
-        if(.M.kind(x) != "n")
-            x <- .M2kind(x, "d")
-    }
+    x <- if(isS4(x))
+             .M2gen(.M2C(x), if(.M.kind(x) == "n") "n" else "d")
+         else .m2sparse(x, "dgC")
     .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [nd]gCMatrix 'x'
 }
 

@@ -254,9 +254,7 @@ setMethod("log", signature(x = "sparseVector"),
 
 setMethod("Math2", signature(x = "Matrix"),
           function(x, digits) {
-              x <- if(any(.M.kind(x) == c("n", "l", "i")))
-                       .M2kind(x, "d")
-                   else .indefinite(x)
+              x <- .indefinite(.M2kind(x, ","))
               x@x <- get(.Generic, mode = "function")(x@x, digits = digits)
               if(.hasSlot(x, "factors") && length(x@factors) > 0L)
                   x@factors <- list()
@@ -265,8 +263,7 @@ setMethod("Math2", signature(x = "Matrix"),
 
 setMethod("Math2", signature(x = "sparseVector"),
           function(x, digits) {
-              if(any(.V.kind(x) == c("n", "l", "i")))
-                  x <- .V2kind(x, "d")
+              x <- .V2kind(x, ",")
               x@x <- get(.Generic, mode = "function")(x@x, digits = digits)
               x
           })
@@ -277,9 +274,7 @@ setMethod("Math2", signature(x = "sparseVector"),
 
 setMethod("zapsmall", signature(x = "Matrix"),
           function(x, digits = getOption("digits")) {
-              x <- if(any(.M.kind(x) == c("n", "l", "i")))
-                       .M2kind(x, "d")
-                   else .indefinite(x)
+              x <- .indefinite(.M2kind(x, ","))
               x@x <- zapsmall(x@x, digits = digits)
               if(.hasSlot(x, "factors") && length(x@factors) > 0L)
                   x@factors <- list()
@@ -288,8 +283,7 @@ setMethod("zapsmall", signature(x = "Matrix"),
 
 setMethod("zapsmall", signature(x = "sparseVector"),
           function(x, digits = getOption("digits")) {
-              if(any(.V.kind(x) == c("n", "l", "i")))
-                  x <- .V2kind(x, "d")
+              x <- .V2kind(x, ",")
               x@x <- zapsmall(x@x, digits = digits)
               x
           })

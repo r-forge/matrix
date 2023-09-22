@@ -133,16 +133,28 @@ setAs("matrix", "pcorMatrix",
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("cov2cor", signature(V = "unpackedMatrix"),
-          function(V) as(forceSymmetric(V), "corMatrix"))
+          function(V) {
+              d <- V@Dim
+              if(d[1L] != d[2L] || .M.kind(V) == "z")
+                  stop(gettextf("'%s' is not a square numeric matrix", "V"),
+                       domain = NA)
+              as(forceSymmetric(V), "corMatrix")
+          })
 
 setMethod("cov2cor", signature(V = "packedMatrix"),
-          function(V) as(forceSymmetric(V), "pcorMatrix"))
+          function(V) {
+              d <- V@Dim
+              if(d[1L] != d[2L] || .M.kind(V) == "z")
+                  stop(gettextf("'%s' is not a square numeric matrix", "V"),
+                       domain = NA)
+              as(forceSymmetric(V), "pcorMatrix")
+          })
 
 setMethod("cov2cor", signature(V = "sparseMatrix"),
           function(V) {
               d <- V@Dim
-              if (d[1L] != d[2L])
-                  stop(gettextf("'%s' is not a square matrix", "V"),
+              if(d[1L] != d[2L] || .M.kind(V) == "z")
+                  stop(gettextf("'%s' is not a square numeric matrix", "V"),
                        domain = NA)
               dn <- symDN(V@Dimnames)
               V <- .M2kind(V, "d")

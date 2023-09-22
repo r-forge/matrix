@@ -16,7 +16,7 @@
 
 setMethod("qr", signature(x = "sparseMatrix"),
           function(x, ...)
-              qr(.M2gen(.M2C(x), "d"), ...))
+              qr(.M2gen(.M2C(x), ","), ...))
 
 setMethod("qr", signature(x = "dgCMatrix"),
           function(x, order = 3L, ...) {
@@ -243,15 +243,15 @@ setMethod("qr.coef", signature(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.coef(qr, .m2dense(y, "dge"))))
+              drop(qr.coef(qr, .m2dense(y, ",ge"))))
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.coef(qr, .m2dense(y, "dge")))
+              qr.coef(qr, .m2dense(y, ",ge")))
 
 setMethod("qr.coef", signature(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.coef(qr, .m2dense(.M2m(y), "dge")))
+              qr.coef(qr, .m2dense(.M2m(y), ",ge")))
 
 setMethod("qr.fitted", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y, k = qr$rank) {
@@ -266,15 +266,15 @@ setMethod("qr.fitted", signature(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.fitted", signature(qr = "sparseQR", y = "vector"),
           function(qr, y, k = qr$rank)
-              drop(qr.fitted(qr, .m2dense(y, "dge"))))
+              drop(qr.fitted(qr, .m2dense(y, ",ge"))))
 
 setMethod("qr.fitted", signature(qr = "sparseQR", y = "matrix"),
           function(qr, y, k = qr$rank)
-              qr.fitted(qr, .m2dense(y, "dge")))
+              qr.fitted(qr, .m2dense(y, ",ge")))
 
 setMethod("qr.fitted", signature(qr = "sparseQR", y = "Matrix"),
           function(qr, y, k = qr$rank)
-              qr.fitted(qr, .m2dense(.M2m(y), "dge")))
+              qr.fitted(qr, .m2dense(.M2m(y), ",ge")))
 
 setMethod("qr.resid", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y) {
@@ -289,15 +289,15 @@ setMethod("qr.resid", signature(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.resid", signature(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.resid(qr, .m2dense(y, "dge"))))
+              drop(qr.resid(qr, .m2dense(y, ",ge"))))
 
 setMethod("qr.resid", signature(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.resid(qr, .m2dense(y, "dge")))
+              qr.resid(qr, .m2dense(y, ",ge")))
 
 setMethod("qr.resid", signature(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.resid(qr, .m2dense(.M2m(y), "dge")))
+              qr.resid(qr, .m2dense(.M2m(y), ",ge")))
 
 setMethod("qr.qty", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y) {
@@ -312,15 +312,15 @@ setMethod("qr.qty", signature(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.qty", signature(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.qty(qr, .m2dense(y, "dge"))))
+              drop(qr.qty(qr, .m2dense(y, ",ge"))))
 
 setMethod("qr.qty", signature(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.qty(qr, .m2dense(y, "dge")))
+              qr.qty(qr, .m2dense(y, ",ge")))
 
 setMethod("qr.qty", signature(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.qty(qr, .m2dense(.M2m(y), "dge")))
+              qr.qty(qr, .m2dense(.M2m(y), ",ge")))
 
 setMethod("qr.qy", signature(qr = "sparseQR", y = "dgeMatrix"),
           function(qr, y) {
@@ -343,12 +343,12 @@ setMethod("qr.qy", signature(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.qy", signature(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.qy(qr, .m2dense(y, "dge"))))
+              drop(qr.qy(qr, .m2dense(y, ",ge"))))
 
 setMethod("qr.qy", signature(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.qy(qr, .m2dense(y, "dge")))
+              qr.qy(qr, .m2dense(y, ",ge")))
 
 setMethod("qr.qy", signature(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.qy(qr, .m2dense(.M2m(y), "dge")))
+              qr.qy(qr, .m2dense(.M2m(y), ",ge")))

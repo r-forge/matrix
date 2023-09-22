@@ -143,8 +143,13 @@ function(x,
 setMethod("image", "dgTMatrix", .image.dgT)
 
 setMethod("image", "Matrix",
-          function(x, ...)
-              image(.M2kind(.M2gen(.M2T(x)), "d"), ...))
+          function(x, ...) {
+              if(.M.kind(x) == "z")
+                  stop(gettextf("%s(<%s>) is not yet implemented",
+                                "image", "zMatrix"),
+                       domain = NA)
+              image(.M2kind(.M2gen(.M2T(x)), "d"), ...)
+          })
 
 setMethod("image", "CHMfactor",
           function(x, ...)

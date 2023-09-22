@@ -8,10 +8,8 @@ setMethod("norm", signature(x = "denseMatrix", type = "character"),
           function(x, type, ...) {
               if(identical(type, "2"))
                   return(base::norm(.M2m(x), type = "2"))
-              cl <- .M.nonvirtual(x)
-              if(any(substr(cl, 1L, 1L) == c("n", "l", "i")))
-                  x <- .M2kind(x, "d")
-              switch(substr(cl, 2L, 3L),
+              x <- .M2kind(x, ",")
+              switch(substr(.M.nonvirtual(x), 2L, 3L),
                      "ge" = .Call(dgeMatrix_norm, x, type),
                      "sy" = .Call(dsyMatrix_norm, x, type),
                      "sp" = .Call(dspMatrix_norm, x, type),

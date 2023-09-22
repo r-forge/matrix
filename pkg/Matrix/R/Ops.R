@@ -130,12 +130,12 @@ setMethod("-", signature(e1 = "denseMatrix", e2 = "missing"),
 setMethod("-", signature(e1 = "diagonalMatrix", e2 = "missing"),
           function(e1, e2) {
               kind <- .M.kind(e1)
-              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
+              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
               r@Dim <- d <- e1@Dim
               r@Dimnames <- e1@Dimnames
               r@x <-
                   if(e1@diag != "N")
-                      rep.int(if(kind != "z") -1 else -1+0i, d[1L])
+                      rep.int(if(kind == "z") -1+0i else -1, d[1L])
                   else -(if(kind == "n") e1@x | is.na(e1@x) else e1@x)
               r
           })

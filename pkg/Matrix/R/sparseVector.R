@@ -30,7 +30,7 @@ setMethod("mean", signature(x = "sparseVector"),
                   n <- n - sum(is.na(x@x))
               }
               if(n == 0L)
-                  return(if(kind != "z") NaN else NaN * 0i)
+                  return(if(kind == "z") NaN * 0i else NaN)
               if(kind == "n") {
                   nnz <- length(x@i)
                   if(trim <= 0)

@@ -11,11 +11,11 @@ setMethod("Schur", signature(x = "dgeMatrix"),
                   T <- triu(cl$T)
               } else {
                   vals <- complex(real = cl$WR, imaginary = cl$WI)
-                  T <- .m2dense(cl$T, ".ge")
+                  T <- .m2dense(cl$T, ",ge")
               }
               if(vectors)
                   new("Schur", Dim = x@Dim, Dimnames = x@Dimnames,
-                      Q = .m2dense(cl$Z, ".ge"), T = T, EValues = vals)
+                      Q = .m2dense(cl$Z, ",ge"), T = T, EValues = vals)
               else list(T = T, EValues = vals)
           })
 
@@ -26,12 +26,14 @@ setMethod("Schur", signature(x = "dsyMatrix"),
               T <- new("ddiMatrix", Dim = x@Dim, x = vals)
               if(vectors)
                   new("Schur", Dim = x@Dim, Dimnames = symDN(x@Dimnames),
-                      Q = .m2dense(e$vectors, ".ge"), T = T, EValues = vals)
+                      Q = .m2dense(e$vectors, ",ge"), T = T, EValues = vals)
               else list(T = T, EValues = vals)
           })
 
 setMethod("Schur", signature(x = "matrix"),
           function(x, vectors = TRUE, ...) {
+              ## FIXME: wrong for complex, but package 'control' seems to
+              ##        rely on the complex->double coercion (!?)
               storage.mode(x) <- "double"
               if(length(x) && !all(is.finite(range(x))))
                   stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
@@ -48,16 +50,16 @@ setMethod("Schur", signature(x = "matrix"),
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "generalMatrix"),
           function(x, vectors = TRUE, ...)
-              Schur(.M2unpacked(.M2kind(x, "d")), vectors, ...))
+              Schur(.M2unpacked(.M2kind(x, ",")), vectors, ...))
 
 ## FIXME: don't coerce from sparse to dense
 setMethod("Schur", signature(x = "symmetricMatrix"),
           function(x, vectors = TRUE, ...)
-              Schur(.M2unpacked(.M2kind(x, "d")), vectors, ...))
+              Schur(.M2unpacked(.M2kind(x, ",")), vectors, ...))
 
 setMethod("Schur", signature(x = "triangularMatrix"),
           function(x, vectors = TRUE, ...) {
-              x <- .M2kind(x, "d")
+              x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]
               if(n == 0L)
                   x@uplo <- "U"
@@ -84,7 +86,7 @@ setMethod("Schur", signature(x = "triangularMatrix"),
 
 setMethod("Schur", signature(x = "diagonalMatrix"),
           function(x, vectors = TRUE, ...) {
-              x <- .M2kind(x, "d")
+              x <- .M2kind(x, ",")
               d <- x@Dim
               if(x@diag != "N") {
                   vals <- rep.int(1, d[1L])

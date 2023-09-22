@@ -11,7 +11,7 @@ setMethod("BunchKaufman", signature(x = "dspMatrix"),
 
 setMethod("BunchKaufman", signature(x = "matrix"),
           function(x, uplo = "U", ...)
-              BunchKaufman(.m2dense(x, "dsy", uplo), ...))
+              BunchKaufman(.m2dense(x, ",sy", uplo), ...))
 
 
 ## METHODS FOR CLASS: p?BunchKaufman

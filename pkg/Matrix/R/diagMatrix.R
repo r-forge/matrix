@@ -99,7 +99,7 @@ setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
 setMethod("symmpart", signature(x = "diagonalMatrix"),
           function(x) {
               kind <- .M.kind(x)
-              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
+              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- symDN(x@Dimnames)
               if(x@diag != "N")
@@ -119,15 +119,15 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
 setMethod("skewpart", signature(x = "diagonalMatrix"),
           function(x) {
               kind <- .M.kind(x)
-              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
+              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- symDN(x@Dimnames)
               r@x <-
-                  if(kind != "z")
-                      double(d[1L])
-                  else if(x@diag != "N")
-                      complex(d[1L])
-                  else complex(real = 0, imaginary = Im(x@x))
+                  if(kind == "z") {
+                      if(x@diag != "N")
+                          complex(d[1L])
+                      else complex(real = 0, imaginary = Im(x@x))
+                  } else double(d[1L])
               r
           })
 
