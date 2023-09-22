@@ -6,10 +6,8 @@ setMethod("rcond", signature(x = "ANY", norm = "missing"),
 
 setMethod("rcond", signature(x = "denseMatrix", norm = "character"),
           function(x, norm, ...) {
-              cl <- .M.nonvirtual(x, strict = TRUE)
-              if(any(substr(cl, 1L, 1L) == c("n", "l", "i")))
-                  x <- .M2kind(x, "d")
-              switch(substr(cl, 2L, 3L),
+              x <- .M2kind(x, ",")
+              switch(substr(.M.nonvirtual(x, strict = TRUE), 2L, 3L),
                      "ge" =
                          {
                              d <- x@Dim

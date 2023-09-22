@@ -3,10 +3,10 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("lu", signature(x = "matrix"),
-          function(x, ...) lu(.m2dense(x, "dge"), ...))
+          function(x, ...) lu(.m2dense(x, ",ge"), ...))
 
 setMethod("lu", signature(x = "denseMatrix"),
-          function(x, ...) lu(.M2kind(x, "d"), ...))
+          function(x, ...) lu(.M2kind(x, ","), ...))
 
 setMethod("lu", signature(x = "dgeMatrix"),
           function(x, warnSing = TRUE, ...)
@@ -44,7 +44,7 @@ rm(.cl)
 
 setMethod("lu", signature(x = "sparseMatrix"),
           function(x, ...)
-              lu(.M2kind(.M2C(x), "d"), ...))
+              lu(.M2kind(.M2C(x), ","), ...))
 
 setMethod("lu", signature(x = "dgCMatrix"),
           function(x, errSing = TRUE, order = NA_integer_, tol = 1, ...)
@@ -147,7 +147,7 @@ setMethod("lu", signature(x = "dtTMatrix"),
 
 setMethod("lu", "diagonalMatrix",
           function(x, ...) {
-              x <- .M2kind(x, "d")
+              x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]
               L <- new("dtCMatrix")
               r <- new("sparseLU")

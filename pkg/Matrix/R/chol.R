@@ -10,7 +10,7 @@ setMethod("chol", signature(x = "generalMatrix"),
 
 setMethod("chol", signature(x = "symmetricMatrix"),
           function(x, ...)
-              chol(.M2kind(x, "d"), ...))
+              chol(.M2kind(x, ","), ...))
 
 setMethod("chol", signature(x = "triangularMatrix"),
           function(x, uplo = "U", ...) {
@@ -23,7 +23,7 @@ setMethod("chol", signature(x = "triangularMatrix"),
 
 setMethod("chol", signature(x = "diagonalMatrix"),
           function(x, ...)
-              chol(.M2kind(x, "d"), ...))
+              chol(.M2kind(x, ","), ...))
 
 setMethod("chol", signature(x = "dsyMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
@@ -74,7 +74,7 @@ setMethod("Cholesky", signature(A = "generalMatrix"),
 
 setMethod("Cholesky", signature(A = "symmetricMatrix"),
           function(A, ...)
-              Cholesky(.M2kind(A, "d"), ...))
+              Cholesky(.M2kind(A, ","), ...))
 
 setMethod("Cholesky", signature(A = "triangularMatrix"),
           function(A, uplo = "U", ...) {
@@ -85,7 +85,7 @@ setMethod("Cholesky", signature(A = "triangularMatrix"),
 
 setMethod("Cholesky", signature(A = "diagonalMatrix"),
           function(A, ...)
-              Cholesky(.M2kind(A, "d"), ...))
+              Cholesky(.M2kind(A, ","), ...))
 
 setMethod("Cholesky", signature(A = "dsyMatrix"),
           function(A, perm = TRUE, tol = -1, ...)
@@ -154,11 +154,11 @@ setMethod("chol2inv", signature(x = "symmetricMatrix"),
 
 setMethod("chol2inv", signature(x = "triangularMatrix"),
           function(x, ...)
-              chol2inv(.M2kind(x, "d"), ...))
+              chol2inv(.M2kind(x, ","), ...))
 
 setMethod("chol2inv", signature(x = "diagonalMatrix"),
           function(x, ...)
-              chol2inv(.M2kind(x, "d"), ...))
+              chol2inv(.M2kind(x, ","), ...))
 
 for(.cl in paste0("dt", c("r", "p"), "Matrix"))
 setMethod("chol2inv", signature(x = .cl),
@@ -553,7 +553,7 @@ setMethod("expand", signature(x = "CHMfactor"),
 
 setMethod("update", signature(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
-              parent <- .M2kind(.M2C(parent), "d")
+              parent <- .M2kind(.M2C(parent), ",")
               if((shape <- .M.shape(parent)) != "s") {
                   Matrix.message(gettextf("'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)",
                                           "parent"),
@@ -575,7 +575,7 @@ setMethod("updown",
 setMethod("updown",
           signature(update = "logical", C = "Matrix", L = "CHMfactor"),
           function(update, C, L)
-              updown(update, .M2kind(.M2C(C), "d"), L))
+              updown(update, .M2kind(.M2C(C), ","), L))
 
 for(.cl in c("dgCMatrix", "dsCMatrix"))
 setMethod("updown",
@@ -600,4 +600,4 @@ setMethod("updown",
 setMethod("updown",
           signature(update = "logical", C = "matrix", L = "CHMfactor"),
           function(update, C, L)
-              updown(update, .m2sparse(C, "dgC"), L))
+              updown(update, .m2sparse(C, ",gC"), L))

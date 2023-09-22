@@ -82,35 +82,35 @@ for(.cl in c("MatrixFactorization", "triangularMatrix")) {
 
 setMethod("solve", signature(a = .cl, b = "vector"),
           function(a, b, ...)
-              drop(solve(a, .m2dense(b, "dge"), ...)))
+         drop(solve(a, .m2dense(b, ",ge"), ...)))
 
 setMethod("solve", signature(a = .cl, b = "matrix"),
           function(a, b, ...)
-              solve(a, .m2dense(b, "dge"), ...))
+              solve(a, .m2dense(b, ",ge"), ...))
 
 setMethod("solve", signature(a = .cl, b = "denseMatrix"),
           function(a, b, ...)
-              solve(a, .M2gen(b, "d"), ...))
+              solve(a, .M2gen(b, ","), ...))
 
 setMethod("solve", signature(a = .cl, b = "CsparseMatrix"),
           function(a, b, ...)
-              solve(a, .M2gen(b, "d"), ...))
+              solve(a, .M2gen(b, ","), ...))
 
 setMethod("solve", signature(a = .cl, b = "RsparseMatrix"),
           function(a, b, ...)
-              solve(a, .M2gen(.M2C(b), "d"), ...))
+              solve(a, .M2gen(.M2C(b), ","), ...))
 
 setMethod("solve", signature(a = .cl, b = "TsparseMatrix"),
           function(a, b, ...)
-              solve(a, .M2gen(.M2C(b), "d"), ...))
+              solve(a, .M2gen(.M2C(b), ","), ...))
 
 setMethod("solve", signature(a = .cl, b = "diagonalMatrix"),
           function(a, b, ...)
-              solve(a, .diag2sparse(b, "d", "g", "C"), ...))
+              solve(a, .diag2sparse(b, ",", "g", "C"), ...))
 
 setMethod("solve", signature(a = .cl, b = "indMatrix"),
           function(a, b, ...)
-              solve(a, .ind2sparse(b, "d"), ...))
+              solve(a, .ind2sparse(b, ","), ...))
 
 setMethod("solve", signature(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
@@ -300,7 +300,7 @@ setMethod("solve", signature(a = "Schur", b = "ANY"),
 
 setMethod("solve", signature(a = "denseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- .M2kind(a, "d")
+              a <- .M2kind(a, ",")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -338,7 +338,7 @@ rm(.cl)
 
 setMethod("solve", signature(a = "CsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- .M2kind(a, "d")
+              a <- .M2kind(a, ",")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -358,7 +358,7 @@ setMethod("solve", signature(a = "dgCMatrix", b = "matrix"),
           function(a, b, sparse = FALSE, ...) {
               trf <- lu(a, errSing = TRUE)
               if(is.na(sparse) || sparse)
-                  b <- .m2sparse(b, "dgC")
+                  b <- .m2sparse(b, ",gC")
               solve(trf, b, ...)
           })
 
@@ -400,7 +400,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "matrix"),
                   Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                   error = function(e) lu(a, errSing = TRUE))
               if(is.na(sparse) || sparse)
-                  b <- .m2sparse(b, "dgC")
+                  b <- .m2sparse(b, ",gC")
               solve(trf, b, ...)
           })
 
@@ -438,7 +438,7 @@ setMethod("solve", signature(a = "dsCMatrix", b = "sparseMatrix"),
 
 setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- .M2kind(.M2C(a), "d")
+              a <- .M2kind(.M2C(a), ",")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -449,7 +449,7 @@ setMethod("solve", signature(a = "RsparseMatrix", b = "ANY"),
 
 setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- .M2kind(.M2C(a), "d")
+              a <- .M2kind(.M2C(a), ",")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -460,7 +460,7 @@ setMethod("solve", signature(a = "TsparseMatrix", b = "ANY"),
 
 setMethod("solve", signature(a = "diagonalMatrix", b = "ANY"),
           function(a, b, ...) {
-              a <- .M2kind(a, "d")
+              a <- .M2kind(a, ",")
               if(missing(b)) solve(a, ...) else solve(a, b, ...)
           })
 
@@ -639,11 +639,11 @@ setMethod("solve", signature(a = "MatrixFactorization", b = "sparseVector"),
 
 setMethod("solve", signature(a = "matrix", b = "Matrix"),
           function(a, b, ...)
-              solve(.m2dense(a, "dge"), b, ...))
+              solve(.m2dense(a, ",ge"), b, ...))
 
 setMethod("solve", signature(a = "matrix", b = "sparseVector"),
           function(a, b, ...)
-              solve(.m2dense(a, "dge"), .spV2dge(b), ...)) # FIXME? drop(.)?
+              solve(.m2dense(a, ",ge"), .spV2dge(b), ...)) # FIXME? drop(.)?
 
 
 ########################################################################

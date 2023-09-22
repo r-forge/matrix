@@ -771,11 +771,11 @@ setMethod("kronecker", signature(X = "indMatrix", Y = "indMatrix"),
 for(.cl in c("vector", "matrix")) {
 setMethod("kronecker", signature(X = "Matrix", Y = .cl),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, .m2dense(Y, "dge"), FUN, make.dimnames, ...))
+              kronecker(X, .m2dense(Y, ",ge"), FUN, make.dimnames, ...))
 
 setMethod("kronecker", signature(X = .cl, Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.m2dense(X, "dge"), Y, FUN, make.dimnames, ...))
+              kronecker(.m2dense(X, ",ge"), Y, FUN, make.dimnames, ...))
 }
 rm(.cl)
 
