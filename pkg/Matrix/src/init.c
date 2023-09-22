@@ -237,11 +237,11 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(R_matrix_as_dense, 5),
 	CALLDEF(R_sparse_as_dense, 2),
-	CALLDEF(R_diagonal_as_dense, 4),
+	CALLDEF(R_diagonal_as_dense, 5),
 	CALLDEF(R_index_as_dense, 2),
 	CALLDEF(R_matrix_as_sparse, 5),
 	CALLDEF(R_dense_as_sparse, 2),
-	CALLDEF(R_diagonal_as_sparse, 4),
+	CALLDEF(R_diagonal_as_sparse, 5),
 	CALLDEF(R_index_as_sparse, 3),
 	CALLDEF(R_dense_as_kind, 2),
 	CALLDEF(R_sparse_as_kind, 2),

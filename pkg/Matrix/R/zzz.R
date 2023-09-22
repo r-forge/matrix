@@ -117,18 +117,14 @@
 }
 .diag2sT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
     .Deprecated(new = ".diag2sparse", package = "Matrix")
-    r <- .diag2sparse(from, "s", "T", uplo)
-    if(kind != ".")
-        r <- .M2kind(r, kind)
+    r <- .diag2sparse(from, kind, "s", "T", uplo)
     if(drop0)
         r <- .drop0(r)
     r
 }
 .diag2tT <- function(from, uplo = "U", kind = ".", drop0 = TRUE) {
     .Deprecated(new = ".diag2sparse", package = "Matrix")
-    to <- .diag2sparse(from, "t", "T", uplo)
-    if(kind != ".")
-        to <- .M2kind(to, kind)
+    to <- .diag2sparse(from, kind, "t", "T", uplo)
     if(drop0)
         to <- .drop0(to)
     to

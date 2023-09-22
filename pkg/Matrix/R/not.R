@@ -39,13 +39,13 @@ setMethod("!", signature(x = "ndiMatrix"),
           function(x) {
               if(x@diag == "N" && anyNA(y <- x@x))
                   x@x <- y | is.na(y)
-              x <- .diag2dense(x, "s")
+              x <- .diag2dense(x, ".", "g")
               x@x <- !x@x
               x
           })
 setMethod("!", signature(x = "ldiMatrix"),
           function(x) {
-              x <- .diag2dense(x, "s")
+              x <- .diag2dense(x, ".", "g")
               x@x <- !x@x
               x
           })

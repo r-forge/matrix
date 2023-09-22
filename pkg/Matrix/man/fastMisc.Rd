@@ -76,12 +76,12 @@
 .m2V(from, kind = ".")
 
 .sparse2dense(from, packed = FALSE)
-.diag2dense(from, shape = "t", packed = FALSE, uplo = "U")
+.diag2dense(from, kind = ".", shape = "t", packed = FALSE, uplo = "U")
 .ind2dense(from, kind = "n")
 .m2dense(from, class = ".ge", uplo = "U", diag = "N", trans = FALSE)
 
 .dense2sparse(from, repr = "C")
-.diag2sparse(from, shape = "t", repr = "C", uplo = "U")
+.diag2sparse(from, kind = ".", shape = "t", repr = "C", uplo = "U")
 .ind2sparse(from, kind = "n", repr = ".")
 .m2sparse(from, class = ".gC", uplo = "U", diag = "N", trans = FALSE)
 
@@ -253,10 +253,10 @@ stopifnot(exprs = {
               as(C., "lMatrix"))
     identical(.M2kind(.sparse2dense(C.), "l"),
               as(as(C., "denseMatrix"), "lMatrix"))
-    identical(.diag2sparse(D.0, "t", "C"),
-              .dense2sparse(.diag2dense(D.0, "t", TRUE), "C"))
-    identical(.M2gen(.diag2dense(D.0, "s", FALSE)),
-              .sparse2dense(.M2gen(.diag2sparse(D.0, "s", "T"))))
+    identical(.diag2sparse(D.0, ".", "t", "C"),
+              .dense2sparse(.diag2dense(D.0, ".", "t", TRUE), "C"))
+    identical(.M2gen(.diag2dense(D.0, ".", "s", FALSE)),
+              .sparse2dense(.M2gen(.diag2sparse(D.0, ".", "s", "T"))))
     identical(S.,
               .M2m(.m2sparse(S., ".sR")))
     identical(S. * lower.tri(S.) + diag(1, 6L),
