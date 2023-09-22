@@ -211,7 +211,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     SEXP ans;
     /* Instead of simple "duplicate": PROTECT(ans = duplicate(x)) , build up: */
     // Assuming that ans will have the same basic Matrix type as x :
-    ans = PROTECT(NEW_OBJECT_OF_CLASS(valid_cM[ctype_x]));
+    ans = PROTECT(newObject(valid_cM[ctype_x]));
     SET_SLOT(ans, Matrix_DimSym,      duplicate(dimslot));
     SET_SLOT(ans, Matrix_DimNamesSym, duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
     SET_SLOT(ans, Matrix_pSym,        duplicate(GET_SLOT(x, Matrix_pSym)));

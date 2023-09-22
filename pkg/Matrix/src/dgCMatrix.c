@@ -187,7 +187,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 SEXP dgCMatrix_SPQR(SEXP Ap, SEXP ordering, SEXP econ, SEXP tol)
 {
 /* SEXP ans = PROTECT(allocVector(VECSXP, 4)); */
-    SEXP ans = PROTECT(NEW_OBJECT_OF_CLASS("SPQR"));
+    SEXP ans = PROTECT(newObject("SPQR"));
 
     CHM_SP A = AS_CHM_SP(Ap), Q, R;
     SuiteSparse_long *E, rank;/* not always = int   FIXME  (Windows_64 ?) */

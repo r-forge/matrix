@@ -9,7 +9,7 @@ SEXP v2spV(SEXP from)
 	          _CTYPE1_, _SEXPTYPE1_, _PTR1_, \
 	          _CTYPE2_, _SEXPTYPE2_, _PTR2_) \
 	do { \
-		PROTECT(to = NEW_OBJECT_OF_CLASS(#_KIND_ "sparseVector")); \
+		PROTECT(to = newObject(#_KIND_ "sparseVector")); \
 		_CTYPE1_ *py = _PTR1_(from); \
 		for (k = 0; k < n; ++k) \
 			if (_NZ_(py[k])) \
@@ -94,7 +94,7 @@ SEXP CR2spV(SEXP from)
 
 	char vcl[] = ".sparseVector";
 	vcl[0] = cl[0];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(vcl));
+	SEXP to = PROTECT(newObject(vcl));
 
 	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym));
 	int *pp = INTEGER(p), nnz = (cl[2] == 'C') ? pp[n] : pp[m];

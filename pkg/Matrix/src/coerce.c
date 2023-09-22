@@ -8,7 +8,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	cl[0] = (zzz[0] == '.') ? type2kind(tf) : zzz[0];
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP to = PROTECT(newObject(cl)),
 		dim = getAttrib(from, R_DimSymbol),
 		dimnames;
 	int *pdim, m, n, isM, doDN, nprotect = 1;
@@ -211,7 +211,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	cl[1] = class[1];
 	cl[2] = (packed) ? 'p' :
 		((class[1] == 'g') ? 'e' : ((class[1] == 's') ? 'y' : 'r'));
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -506,7 +506,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	cl[0] = class[0];
 	cl[1] = shape;
 	cl[2] = (cl[1] == 'g') ? 'e' : ((packed) ? 'p' : ((cl[1] == 's') ? 'y' : 'r'));
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -624,7 +624,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 
 	char cl[] = ".geMatrix";
 	cl[0] = (kind != '.') ? kind : 'n';
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -782,7 +782,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	cl[0] = class[0];
 	cl[1] = class[1];
 	cl[2] = repr;
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -1202,7 +1202,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	cl[0] = class[0];
 	cl[1] = shape;
 	cl[2] = repr;
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -1401,7 +1401,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	char cl[] = ".g.Matrix";
 	cl[0] = (kind != '.') ? kind : 'n';
 	cl[2] = (repr != '.') ? repr : ((mg == 0) ? 'R' : 'C');
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1],
@@ -1530,7 +1530,7 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 	cl[0] = kind;
 	cl[1] = class[1];
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -1624,7 +1624,7 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 	cl[0] = kind;
 	cl[1] = class[1];
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -1745,7 +1745,7 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 
 	char cl[] = ".diMatrix";
 	cl[0] = kind;
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -1840,7 +1840,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 
 	char cl[] = ".geMatrix";
 	cl[0] = class[0];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -1938,7 +1938,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 	char cl[] = ".g.Matrix";
 	cl[0] = class[0];
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -2233,7 +2233,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 		cl[1] = class[1];
 		cl[2] = (class[1] == 's') ? 'y' : 'r';
 	}
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
@@ -2340,7 +2340,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 		cl[1] = (!ge) ? class[1] : ((di == '\0') ? 's' : 't');
 		cl[2] = 'p';
 	}
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS((class[0] == 'c') ? cl - 1 : cl));
+	SEXP to = PROTECT(newObject((class[0] == 'c') ? cl - 1 : cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -2826,7 +2826,7 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 	char cl[] = "..CMatrix";
 	cl[0] = class[0];
 	cl[1] = class[1];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -2925,7 +2925,7 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 	char cl[] = "..RMatrix";
 	cl[0] = class[0];
 	cl[1] = class[1];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -3024,7 +3024,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 	char cl[] = "..TMatrix";
 	cl[0] = class[0];
 	cl[1] = class[1];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];

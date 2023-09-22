@@ -25,7 +25,7 @@ setMethod("Schur", signature(x = "dsyMatrix"),
               vals <- as.double(e$values)
               T <- new("ddiMatrix", Dim = x@Dim, x = vals)
               if(vectors)
-                  new("Schur", Dim = x@Dim, Dimnames = symmDN(x@Dimnames),
+                  new("Schur", Dim = x@Dim, Dimnames = symDN(x@Dimnames),
                       Q = .m2dense(e$vectors, ".ge"), T = T, EValues = vals)
               else list(T = T, EValues = vals)
           })

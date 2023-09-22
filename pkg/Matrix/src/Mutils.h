@@ -9,7 +9,7 @@ extern "C" {
 /* NB: this block must not include system or R headers */
 #endif
 
-SEXP NEW_OBJECT_OF_CLASS(const char *what);
+SEXP newObject(const char *what);
 
 void *Matrix_memset(void *dest,        int   ch, R_xlen_t length, size_t size);
 void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size);
@@ -18,8 +18,8 @@ Rboolean DimNames_is_trivial(SEXP dn);
 Rboolean DimNames_is_symmetric(SEXP dn);
 SEXP R_DimNames_is_symmetric(SEXP dn);
 
-void symmDN(SEXP dest, SEXP src, int J);
-SEXP R_symmDN(SEXP dn);
+void symDN(SEXP dest, SEXP src, int J);
+SEXP R_symDN(SEXP dn);
 SEXP get_symmetrized_DimNames(SEXP obj, int J);
 void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J);
 

@@ -31,14 +31,14 @@ fixupDN.if.valid <- function(dn, dim) {
     fixupDN(dn)
 }
 
-symmDN <- function(dn)
-    .Call(R_symmDN, dn)
+symDN <- function(dn)
+    .Call(R_symDN, dn)
 
 symmetrizeDN <- function(x) {
     if(isS4(x)) # assuming is(x, "Matrix")
-        `dimnames<-`(x, symmDN(x@Dimnames))
+        `dimnames<-`(x, symDN(x@Dimnames))
     else if(!is.null(dn <- dimnames(x))) # assuming list of length 2
-        `dimnames<-`(x, symmDN(dn))
+        `dimnames<-`(x, symDN(dn))
     else x
 }
 
@@ -134,7 +134,7 @@ setMethod("dimnames", signature(x = "Matrix"),
           function(x) x@Dimnames)
 
 setMethod("dimnames", signature(x = "symmetricMatrix"),
-          function(x) symmDN(x@Dimnames))
+          function(x) symDN(x@Dimnames))
 
 setMethod("dimnames", signature(x = "MatrixFactorization"),
           function(x) x@Dimnames)
