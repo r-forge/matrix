@@ -9,8 +9,8 @@ SEXP R_matrix_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP sparse_as_dense(SEXP, const char *, int);
 SEXP R_sparse_as_dense(SEXP, SEXP);
 
-SEXP diagonal_as_dense(SEXP, const char *, char, int, char);
-SEXP R_diagonal_as_dense(SEXP, SEXP, SEXP, SEXP);
+SEXP diagonal_as_dense(SEXP, const char *, char, char, int, char);
+SEXP R_diagonal_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP index_as_dense(SEXP, const char *, char);
 SEXP R_index_as_dense(SEXP, SEXP);
@@ -21,8 +21,8 @@ SEXP R_matrix_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP dense_as_sparse(SEXP, const char *, char);
 SEXP R_dense_as_sparse(SEXP, SEXP);
 
-SEXP diagonal_as_sparse(SEXP, const char *, char, char, char);
-SEXP R_diagonal_as_sparse(SEXP, SEXP, SEXP, SEXP);
+SEXP diagonal_as_sparse(SEXP, const char *, char, char, char, char);
+SEXP R_diagonal_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP index_as_sparse(SEXP, const char *, char, char);
 SEXP R_index_as_sparse(SEXP, SEXP, SEXP);

@@ -544,7 +544,7 @@ assert.EQ.mat(D4m, diag(x=c(4,6,6,4)))
 assert.EQ.mat(Lg1, diag(x= c(FALSE, rep(TRUE,3))))
 stopifnot(is(Lg1, "diagonalMatrix"), is(D4m, "diagonalMatrix"),
 	  is(D4., "diagonalMatrix"),
-          is(nLg, "symmetricMatrix"), is(nnLg, "symmetricMatrix"),
+          is(nLg, "generalMatrix"), is(nnLg, "generalMatrix"),
           identical3(Lg1,
                      Matrix(nnLg, forceCheck = TRUE),
                      as(nnLg, "diagonalMatrix")),

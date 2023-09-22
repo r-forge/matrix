@@ -106,7 +106,7 @@ setMethod("solve", signature(a = .cl, b = "TsparseMatrix"),
 
 setMethod("solve", signature(a = .cl, b = "diagonalMatrix"),
           function(a, b, ...)
-              solve(a, .diag2sparse(.M2kind(b, "d"), "g", "C"), ...))
+              solve(a, .diag2sparse(b, "d", "g", "C"), ...))
 
 setMethod("solve", signature(a = .cl, b = "indMatrix"),
           function(a, b, ...)

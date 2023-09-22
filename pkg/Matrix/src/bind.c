@@ -430,16 +430,14 @@ void coerceArgs(SEXP args, int margin,
 				}
 				break;
 			case 'i':
-				REPROTECT(s = diagonal_as_kind(s, scl, kind), pid);
-				scl_[0] = kind; scl_[1] = scl[1]; scl_[2] = scl[2];
 				switch (repr) {
 				case 'e':
-					REPROTECT(s = diagonal_as_dense(s, scl_, 'g', 0, '\0'), pid);
+					REPROTECT(s = diagonal_as_dense(s, scl_, kind, 'g', 0, '\0'), pid);
 					break;
 				case 'C':
 				case 'R':
 				case 'T':
-					REPROTECT(s = diagonal_as_sparse(s, scl_, 'g', repr, '\0'), pid);
+					REPROTECT(s = diagonal_as_sparse(s, scl_, kind, 'g', repr, '\0'), pid);
 					break;
 				default:
 					break;

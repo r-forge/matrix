@@ -91,10 +91,10 @@ setMethod("t", signature(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
-          function(x, uplo) .diag2sparse(x, "s", "C",  "U"))
+          function(x, uplo) .diag2sparse(x, ".", "s", "C",  "U"))
 
 setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
-          function(x, uplo) .diag2sparse(x, "s", "C", uplo))
+          function(x, uplo) .diag2sparse(x, ".", "s", "C", uplo))
 
 setMethod("symmpart", signature(x = "diagonalMatrix"),
           function(x) {

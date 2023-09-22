@@ -63,8 +63,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .sparse2dense <- function(from, packed = FALSE)
     .Call(R_sparse_as_dense, from, packed)
 
-.diag2dense <- function(from, shape = "t", packed = FALSE, uplo = "U")
-    .Call(R_diagonal_as_dense, from, shape, packed, uplo)
+.diag2dense <- function(from, kind = ".", shape = "t", packed = FALSE, uplo = "U")
+    .Call(R_diagonal_as_dense, from, kind, shape, packed, uplo)
 
 .ind2dense <- function(from, kind = "n")
     .Call(R_index_as_dense, from, kind)
@@ -72,8 +72,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .dense2sparse <- function(from, repr = "C")
     .Call(R_dense_as_sparse, from, repr)
 
-.diag2sparse <- function(from, shape = "t", repr = "C", uplo = "U")
-    .Call(R_diagonal_as_sparse, from, shape, repr, uplo)
+.diag2sparse <- function(from, kind = ".", shape = "t", repr = "C", uplo = "U")
+    .Call(R_diagonal_as_sparse, from, kind, shape, repr, uplo)
 
 .ind2sparse <- function(from, kind = "n", repr = ".")
     .Call(R_index_as_sparse, from, kind, repr)
@@ -548,12 +548,12 @@ setAs("diagonalMatrix",  "symmetricMatrix",
       function(from) {
           if(!isSymmetricDN(from@Dimnames))
               stop("matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)")
-          .diag2sparse(from, "s", "C", "U")
+          .diag2sparse(from, ".", "s", "C", "U")
       })
 
 setAs("diagonalMatrix", "triangularMatrix",
       function(from)
-          .diag2sparse(from, "t", "C", "U"))
+          .diag2sparse(from, ".", "t", "C", "U"))
 
 
 ## ==== To "representation" ============================================

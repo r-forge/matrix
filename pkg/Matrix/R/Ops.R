@@ -1118,7 +1118,8 @@ setMethod("Logic", signature(e1 = "ltCMatrix", e2 = "ltCMatrix"),
                       d <- .Ops.checkDim(dim(e1), dim(e2))
                       .diag2sparse(new("ldiMatrix", Dim = d,
                                        x = get(.Generic)(diag(e1), diag(e2))),
-                                   shape = "t", repr = "C", uplo = e1@uplo)
+                                   kind = ".", shape = "t", repr = "C",
+                                   uplo = e1@uplo)
                   }
               }
           })
@@ -1929,12 +1930,12 @@ rm(Ops.M.spV, Ops.spV.M)
 .diag2tT.smart <- function(from, x, kind = ".") {
     shape <- .M.shape(x)
     uplo <- if(shape == "t") x@uplo else "U"
-    .diag2sparse(.M2kind(from, kind), "t", "T", uplo)
+    .diag2sparse(from, kind, "t", "T", uplo)
 }
 .diag2T.smart <- function(from, x, kind = ".") {
     shape <- .M.shape(x)
     uplo <- if(shape == "s" || shape == "t") x@uplo else "U"
-    .diag2sparse(.M2kind(from, kind), if(shape == "s") "s" else "t", "T", uplo)
+    .diag2sparse(from, kind, if(shape == "s") "s" else "t", "T", uplo)
 }
 
  .diag.x <- function(m) if(m@diag != "N") rep.int(as1(m@x), m@Dim[1L]) else m@x
@@ -2056,7 +2057,7 @@ setMethod("Arith", signature(e1 = "triangularMatrix", e2 = "diagonalMatrix"),
                          e2
                      },
                      "^" = { ## will be dense ( as  <ANY> ^ 0 == 1 ):
-                         e1 ^ .diag2dense(e2, "g", FALSE)
+                         e1 ^ .diag2dense(e2, ".", "g", FALSE)
                      },
                      ## otherwise:
                      callGeneric(e1, .diag2T.smart(e2, e1)))

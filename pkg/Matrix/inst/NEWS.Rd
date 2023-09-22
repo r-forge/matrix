@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-22 r4369)}{
+\section{Changes in version 1.6-2 (2023-09-22 r4370)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -48,6 +48,10 @@
       \item \code{.m2dense} and \code{.m2sparse} can be called
       with one argument.  Their \code{class} arguments admit new
       default values \code{".ge"} and \code{".gC"}.
+
+      \item \code{.diag2dense} and \code{.diag2sparse} gain an
+      argument \code{kind} indicating the \dQuote{kind} of the
+      result.
 
       \item New exports \code{.M2V} and \code{.m2V}, for coercing
       \code{Matrix} and \code{matrix} (and in fact \code{vector})

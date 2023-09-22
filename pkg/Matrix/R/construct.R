@@ -55,8 +55,8 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                 return(if(doDiag)
                            data
                        else if(sparse)
-                           .diag2sparse(data, "s", "C", "U")
-                       else .diag2dense(data, "s", FALSE, "U"))
+                           .diag2sparse(data, ".", "s", "C", "U")
+                       else .diag2dense(data, ".", "s", FALSE, "U"))
             if(!forceCheck)
                 return(if(i.sM == sparse)
                            data

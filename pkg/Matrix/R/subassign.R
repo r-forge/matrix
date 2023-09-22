@@ -1193,7 +1193,7 @@ setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
 ## diagonal or sparse ---
 replDiag <- function(x, i, j, ..., value) {
 ## FIXME: if   (i == j)  &&  isSymmetric(value) then -- want symmetricMatrix result! -- or diagMatrix
-    x <- .diag2sparse(x, "g", "C") # was ->TsparseMatrix till 2012-07
+    x <- .diag2sparse(x, ".", "g", "C") # was ->TsparseMatrix till 2012-07
     if(missing(i))
         x[, j] <- value
     else if(missing(j)) { ##  x[i , ] <- v  *OR*   x[i] <- v
@@ -1274,7 +1274,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 ### FIXME:  use  uplo="U" or uplo="L"  (or *not* "triangularMatrix")
 ### depending on LE <- i <= j
 ### all(LE) //  all(!LE) // remaining cases
-                             x <- .diag2sparse(x, "t", "C") # was ->TsparseMatrix
+                             x <- .diag2sparse(x, ".", "t", "C") # was ->TsparseMatrix
                              x[i] <- value
                              x
                          }

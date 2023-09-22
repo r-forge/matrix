@@ -502,10 +502,10 @@ SEXP R_sparse_as_dense(SEXP from, SEXP packed)
 }
 
 SEXP diagonal_as_dense(SEXP from, const char *class,
-                       char shape, int packed, char ul)
+                       char kind, char shape, int packed, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = class[0];
+	cl[0] = (kind != '.') ? kind : class[0];
 	cl[1] = shape;
 	cl[2] = (cl[1] == 'g') ? 'e' : ((packed) ? 'p' : ((cl[1] == 's') ? 'y' : 'r'));
 	SEXP to = PROTECT(newObject(cl));
@@ -543,8 +543,19 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) len));
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+	if (class[0] != cl[0]) {
+		if (class[0] == 'n' && cl[0] == 'l')
+			x0 = duplicate(x0);
+		else
+			x0 = coerceVector(x0, kindToType(cl[0]));
+		if (class[0] == 'n')
+			naToOne(x0);
+		UNPROTECT(1); /* x0 */
+		PROTECT(x0);
+	}
+
+	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) len));
 	SET_SLOT(to, Matrix_xSym, x1);
 
 #define DAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_) \
@@ -559,7 +570,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		} \
 	} while (0)
 
-	switch (class[0]) {
+	switch (cl[0]) {
 	case 'n':
 	case 'l':
 		DAD_SUBCASES(i, int, LOGICAL);
@@ -585,12 +596,19 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 }
 
 /* as(<diagonalMatrix>, ".(ge|sy|sp|tr|tp)Matrix") */
-SEXP R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
+SEXP R_diagonal_as_dense(SEXP from,
+                         SEXP kind, SEXP shape, SEXP packed, SEXP uplo)
 {
 	static const char *valid[] = { VALID_DIAGONAL, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
+
+	char kind_;
+	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	    (kind_ = CHAR(kind)[0]) == '\0')
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	char shape_;
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
@@ -613,7 +631,7 @@ SEXP R_diagonal_as_dense(SEXP from, SEXP shape, SEXP packed, SEXP uplo)
 			error(_("invalid '%s' to %s()"), "uplo", __func__);
 	}
 
-	return diagonal_as_dense(from, valid[ivalid], shape_, packed_, ul);
+	return diagonal_as_dense(from, valid[ivalid], kind_, shape_, packed_, ul);
 }
 
 SEXP index_as_dense(SEXP from, const char *class, char kind)
@@ -1196,10 +1214,10 @@ SEXP R_dense_as_sparse(SEXP from, SEXP repr)
 }
 
 SEXP diagonal_as_sparse(SEXP from, const char *class,
-                           char shape, char repr, char ul)
+                        char kind, char shape, char repr, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = class[0];
+	cl[0] = (kind != '.') ? kind : class[0];
 	cl[1] = shape;
 	cl[2] = repr;
 	SEXP to = PROTECT(newObject(cl));
@@ -1242,7 +1260,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 
 #define DAS_CASES(_MASK_) \
 	do { \
-		switch (class[0]) { \
+		switch (cl[0]) { \
 		case 'l': \
 			DAS_LOOP(int, LOGICAL, _MASK_, ISNZ_LOGICAL, 1); \
 			break; \
@@ -1261,6 +1279,17 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	} while (0)
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+	if (class[0] != cl[0]) {
+		if (class[0] == 'n' && cl[0] == 'l')
+			x0 = duplicate(x0);
+		else
+			x0 = coerceVector(x0, kindToType(cl[0]));
+		if (class[0] == 'n')
+			naToOne(x0);
+		UNPROTECT(1); /* x0 */
+		PROTECT(x0);
+	}
+
 	int d, nnz;
 	if (cl[2] != 'T') {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
@@ -1282,7 +1311,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				} \
 			} while (0)
 
-			if (class[0] == 'n')
+			if (cl[0] == 'n')
 				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
@@ -1307,7 +1336,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 				} \
 			} while (0)
 
-			if (class[0] == 'n')
+			if (cl[0] == 'n')
 				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
@@ -1345,7 +1374,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		} \
 	} while (0)
 
-	if (class[0] == 'n')
+	if (cl[0] == 'n')
 		DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
 	else if (di == 'N' && nnz == n) {
 		SET_SLOT(to, Matrix_xSym, x0);
@@ -1362,12 +1391,19 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 }
 
 /* as(<diagonalMatrix>, ".[gst][CRT]Matrix") */
-SEXP R_diagonal_as_sparse(SEXP from, SEXP shape, SEXP repr, SEXP uplo)
+SEXP R_diagonal_as_sparse(SEXP from,
+                          SEXP kind, SEXP shape, SEXP repr, SEXP uplo)
 {
 	static const char *valid[] = { VALID_DIAGONAL, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
+
+	char kind_;
+	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
+	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
+	    (kind_ = CHAR(kind)[0]) == '\0')
+		error(_("invalid '%s' to %s()"), "kind", __func__);
 
 	char shape_;
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
@@ -1389,7 +1425,7 @@ SEXP R_diagonal_as_sparse(SEXP from, SEXP shape, SEXP repr, SEXP uplo)
 			error(_("invalid '%s' to %s()"), "uplo", __func__);
 	}
 
-	return diagonal_as_sparse(from, valid[ivalid], shape_, repr_, ul);
+	return diagonal_as_sparse(from, valid[ivalid], kind_, shape_, repr_, ul);
 }
 
 SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
@@ -3167,7 +3203,7 @@ SEXP R_Matrix_as_vector(SEXP from)
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(from = diagonal_as_dense(from, cl, 'g', 0, '\0'), pid);
+		REPROTECT(from = diagonal_as_dense(from, cl, '.', 'g', 0, '\0'), pid);
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'd':
@@ -3231,7 +3267,7 @@ SEXP R_Matrix_as_matrix(SEXP from)
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(from = diagonal_as_dense(from, cl, 'g', 0, '\0'), pid);
+		REPROTECT(from = diagonal_as_dense(from, cl, '.', 'g', 0, '\0'), pid);
 		to = GET_SLOT(from, Matrix_xSym);
 		break;
 	case 'd':
@@ -3290,7 +3326,7 @@ SEXP R_Matrix_as_unpacked(SEXP from)
 	case 'T':
 		return sparse_as_dense(from, cl, 0);
 	case 'i':
-		return diagonal_as_dense(from, cl, 't', 0, 'U');
+		return diagonal_as_dense(from, cl, '.', 't', 0, 'U');
 	case 'd':
 		return index_as_dense(from, cl, 'n');
 	default:
@@ -3321,7 +3357,7 @@ SEXP R_Matrix_as_packed(SEXP from)
 	case 'T':
 		return sparse_as_dense(from, cl, 1);
 	case 'i':
-		return diagonal_as_dense(from, cl, 't', 1, 'U');
+		return diagonal_as_dense(from, cl, '.', 't', 1, 'U');
 	default:
 		return R_NilValue;
 	}
@@ -3347,7 +3383,7 @@ SEXP R_Matrix_as_Csparse(SEXP from)
 	case 'T':
 		return sparse_as_Csparse(from, cl);
 	case 'i':
-		return diagonal_as_sparse(from, cl, 't', 'C', 'U');
+		return diagonal_as_sparse(from, cl, '.', 't', 'C', 'U');
 	case 'd':
 		return index_as_sparse(from, cl, 'n', 'C');
 	default:
@@ -3375,7 +3411,7 @@ SEXP R_Matrix_as_Rsparse(SEXP from)
 	case 'T':
 		return sparse_as_Rsparse(from, cl);
 	case 'i':
-		return diagonal_as_sparse(from, cl, 't', 'R', 'U');
+		return diagonal_as_sparse(from, cl, '.', 't', 'R', 'U');
 	case 'd':
 		return index_as_sparse(from, cl, 'n', 'R');
 	default:
@@ -3403,7 +3439,7 @@ SEXP R_Matrix_as_Tsparse(SEXP from)
 	case 'T':
 		return sparse_as_Tsparse(from, cl);
 	case 'i':
-		return diagonal_as_sparse(from, cl, 't', 'T', 'U');
+		return diagonal_as_sparse(from, cl, '.', 't', 'T', 'U');
 	case 'd':
 		return index_as_sparse(from, cl, 'n', 'T');
 	default:
@@ -3462,18 +3498,12 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 		}
 		return from;
 	case 'i':
-		from = diagonal_as_kind(from, cl, kind_);
-		if (sparse_ != NA_LOGICAL) {
-			/* Because [nlidz]diMatrix does not extend [nlidz]sparseMatrix : */
-			PROTECT(from);
-			char cl_[] = ".diMatrix";
-			cl_[0] = (kind_ == '.') ? cl[0] : kind_;
-			if (sparse_)
-				from = diagonal_as_sparse(from, cl_, 't', 'C', 'U');
-			else
-				from = diagonal_as_dense(from, cl_, 't', 0, 'U');
-			UNPROTECT(1);
-		}
+		if (sparse_ == NA_LOGICAL)
+			from = diagonal_as_kind(from, cl, kind_);
+		else if (sparse_)
+			from = diagonal_as_sparse(from, cl, kind_, 't', 'C', 'U');
+		else
+			from = diagonal_as_dense(from, cl, kind_, 't', 0, 'U');
 		return from;
 	case 'd':
 		if (sparse_ == NA_LOGICAL || sparse_)
@@ -3532,16 +3562,7 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 		return from;
 	}
 	case 'i':
-	{
-		/* As there is no ndiMatrix, we cannot use diagonal_as_kind here: */
-		char cl_[] = ".gCMatrix";
-		cl_[0] = cl[0];
-		from = diagonal_as_sparse(from, cl, 'g', 'C', '\0');
-		PROTECT(from);
-		from = sparse_as_kind(from, cl_, kind_);
-		UNPROTECT(1);
-		return from;
-	}
+		return diagonal_as_sparse(from, cl, kind_, 'g', 'C', '\0');
 	case 'd':
 		/* indMatrix extends generalMatrix, but we typically do want this: */
 		return index_as_sparse(from, cl, kind_, '.');
