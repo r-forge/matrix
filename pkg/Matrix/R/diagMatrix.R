@@ -101,7 +101,7 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
               kind <- .M.kind(x)
               r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
               r@Dim <- x@Dim
-              r@Dimnames <- symmDN(x@Dimnames)
+              r@Dimnames <- symDN(x@Dimnames)
               if(x@diag != "N")
                   r@diag <- "U"
               else {
@@ -121,7 +121,7 @@ setMethod("skewpart", signature(x = "diagonalMatrix"),
               kind <- .M.kind(x)
               r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
               r@Dim <- d <- x@Dim
-              r@Dimnames <- symmDN(x@Dimnames)
+              r@Dimnames <- symDN(x@Dimnames)
               r@x <-
                   if(kind != "z")
                       double(d[1L])

@@ -1203,7 +1203,7 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			} \
 		} \
 	} \
-	SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(cl_)); \
+	SEXP res = PROTECT(newObject(cl_)); \
 	 \
 	PROTECT(dim = GET_SLOT(res, Matrix_DimSym)); \
 	pdim = INTEGER(dim); \
@@ -1835,7 +1835,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		}
 	}
 
-	SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(cl_));
+	SEXP res = PROTECT(newObject(cl_));
 
 	PROTECT(dim = GET_SLOT(res, Matrix_DimSym));
 	pdim = INTEGER(dim);
@@ -2029,7 +2029,7 @@ SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			Matrix_Free(work, m);
 		}
 
-		x = NEW_OBJECT_OF_CLASS((isP) ? "pMatrix" : "indMatrix");
+		x = newObject((isP) ? "pMatrix" : "indMatrix");
 		REPROTECT(x, pidA);
 
 		PROTECT(dim = GET_SLOT(x, Matrix_DimSym));
@@ -2073,7 +2073,7 @@ SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			Matrix_Free(work, nj);
 		}
 
-		x = NEW_OBJECT_OF_CLASS((isP)
+		x = newObject((isP)
 		                        ? "pMatrix"
 		                        : ((!mg) ? "ngCMatrix" : "ngRMatrix"));
 		REPROTECT(x, pidA);

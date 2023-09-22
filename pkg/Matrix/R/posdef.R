@@ -144,7 +144,7 @@ setMethod("cov2cor", signature(V = "sparseMatrix"),
               if (d[1L] != d[2L])
                   stop(gettextf("'%s' is not a square matrix", "V"),
                        domain = NA)
-              dn <- symmDN(V@Dimnames)
+              dn <- symDN(V@Dimnames)
               V <- .M2kind(V, "d")
               V.ii <- diag(V, names = FALSE)
               if(length(V.ii) > 0L && is.na(m <- min(V.ii)) || m <= 0)

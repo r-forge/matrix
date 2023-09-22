@@ -187,7 +187,7 @@ testDenseMatrix <- function(Class, ...) {
 
     if (is.sy) {
         tri0(m2, diag = TRUE) <- tri0(t(m2), diag = TRUE)
-        dimnames(m2) <- Matrix:::symmDN(M@Dimnames)
+        dimnames(m2) <- Matrix:::symDN(M@Dimnames)
     }
     if (is.tr && M@diag == "U") {
         diag(m2) <- .ONE

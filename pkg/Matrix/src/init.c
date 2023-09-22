@@ -127,7 +127,7 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(R_DimNames_fixup, 1),
 	CALLDEF(R_DimNames_is_symmetric, 1),
-	CALLDEF(R_symmDN, 1),
+	CALLDEF(R_symDN, 1),
 	CALLDEF(R_revDN, 1),
 	CALLDEF(R_Matrix_nonvirtual, 2),
 	CALLDEF(R_Matrix_kind, 2),

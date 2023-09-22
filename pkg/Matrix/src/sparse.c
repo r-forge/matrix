@@ -62,7 +62,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 			UNPROTECT(2); /* p0, x0 */
 			return from;
 		}
-		PROTECT(to = NEW_OBJECT_OF_CLASS(class));
+		PROTECT(to = newObject(class));
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			i0 = PROTECT(GET_SLOT(from, iSym)),
@@ -106,7 +106,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 			UNPROTECT(1); /* x0 */
 			return from;
 		}
-		PROTECT(to = NEW_OBJECT_OF_CLASS(class));
+		PROTECT(to = newObject(class));
 
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
@@ -325,7 +325,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 	cl[0] = class[0];
 	cl[1] = (ge) ? 'g' : ((tr) ? 't' : 's');
 	cl[2] = (class[2] == 'R') ? 'C' : class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	dim = GET_SLOT(to, Matrix_DimSym);
 	pdim = INTEGER(dim);
@@ -786,7 +786,7 @@ SEXP R_sparse_diag_get(SEXP obj, SEXP names)
 
 SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 {
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class));
+	SEXP to = PROTECT(newObject(class));
 	int v = LENGTH(value) != 1, full = 0;
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -1102,13 +1102,13 @@ SEXP sparse_transpose(SEXP from, const char *class, int lazy)
 {
 	SEXP to;
 	if (class[2] == 'T' || !lazy)
-		PROTECT(to = NEW_OBJECT_OF_CLASS(class));
+		PROTECT(to = newObject(class));
 	else {
 		char cl[] = "...Matrix";
 		cl[0] = class[0];
 		cl[1] = class[1];
 		cl[2] = (class[2] == 'C') ? 'R' : 'C';
-		PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
+		PROTECT(to = newObject(cl));
 	}
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -1262,7 +1262,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul)
 	char cl[] = ".s.Matrix";
 	cl[0] = class[0];
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -1640,7 +1640,7 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 	char cl[] = ".s.Matrix";
 	cl[0] = (class[0] != 'z') ? 'd' : 'z';
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -2070,7 +2070,7 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 	cl[0] = (class[0] != 'z') ? 'd' : 'z';
 	cl[1] = (class[1] != 's') ? 'g' : 's';
 	cl[2] = class[2];
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -3053,7 +3053,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 	if (sparse) {
 		char cl[] = ".sparseVector";
 		cl[0] = (type == CPLXSXP) ? 'z' : ((type == REALSXP) ? 'd' : 'i');
-		PROTECT(res = NEW_OBJECT_OF_CLASS(cl));
+		PROTECT(res = newObject(cl));
 
 		SEXP length = PROTECT(ScalarInteger(r));
 		SET_SLOT(res, Matrix_lengthSym, length);
@@ -3689,7 +3689,7 @@ SEXP Tsparse_aggregate(SEXP from)
 		}
 		PROTECT(i1);
 		PROTECT(j1);
-		PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
+		PROTECT(to = newObject(cl));
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 		UNPROTECT(5); /* to, j1, i1, j0, i0 */
@@ -3704,7 +3704,7 @@ SEXP Tsparse_aggregate(SEXP from)
 		PROTECT(i1);
 		PROTECT(j1);
 		PROTECT(x1);
-		PROTECT(to = NEW_OBJECT_OF_CLASS(cl));
+		PROTECT(to = newObject(cl));
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 		SET_SLOT(to, Matrix_xSym, x1);

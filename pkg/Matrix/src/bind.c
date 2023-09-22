@@ -865,7 +865,7 @@ static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 		rcl[2] = repr;
 		coerceArgs(args, margin, rdim, kind, repr);
 	}
-	SEXP res = PROTECT(NEW_OBJECT_OF_CLASS(rcl));
+	SEXP res = PROTECT(newObject(rcl));
 	bindArgs(args, margin, res, rdim, kind, repr);
 
 	SEXP dim = PROTECT(GET_SLOT(res, Matrix_DimSym));

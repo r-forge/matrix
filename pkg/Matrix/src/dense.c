@@ -91,7 +91,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	cl[0] = class[0];
 	cl[1] = (ge) ? 'g' :                      ((sy) ? 's' : 't')       ;
 	cl[2] = (ge) ? 'e' : ((class[2] != 'p') ? ((sy) ? 'y' : 'r') : 'p');
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	dim = GET_SLOT(to, Matrix_DimSym);
 	pdim = INTEGER(dim);
@@ -318,7 +318,7 @@ SEXP R_dense_diag_get(SEXP obj, SEXP names)
 
 SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 {
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class));
+	SEXP to = PROTECT(newObject(class));
 	int v = LENGTH(value) != 1;
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -454,7 +454,7 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 
 SEXP dense_transpose(SEXP from, const char *class)
 {
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(class));
+	SEXP to = PROTECT(newObject(class));
 
 	int isCor = class[0] == 'c' || (class[0] == 'p' && class[1] == 'c');
 	if (isCor)
@@ -608,7 +608,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 	char cl[] = ".s.Matrix";
 	cl[0] = class[0];
 	cl[2] = (class[2] != 'p') ? 'y' : 'p';
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -709,7 +709,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 	char cl[] = ".s.Matrix";
 	cl[0] = (class[0] != 'z') ? 'd' : 'z';
 	cl[2] = (class[2] != 'p') ? 'y' : 'p';
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -861,7 +861,7 @@ SEXP dense_skewpart(SEXP from, const char *class)
 	cl[1] = (class[1] != 's') ? 'g' : 's';
 	cl[2] = (class[1] != 's') ? 'e' :
 		((class[0] != 'z') ? 'C' : ((class[2] != 'p') ? 'y' : 'p'));
-	SEXP to = PROTECT(NEW_OBJECT_OF_CLASS(cl));
+	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];

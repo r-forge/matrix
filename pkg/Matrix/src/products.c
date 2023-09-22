@@ -154,7 +154,7 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
-		SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dpoMatrix"));
+		SEXP r = PROTECT(newObject("dpoMatrix"));
 
 		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 		int *prdim = INTEGER(rdim);
@@ -163,7 +163,7 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 
 		SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 			rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
-		symmDN(rdimnames, adimnames, (atrans) ? 1 : 0);
+		symDN(rdimnames, adimnames, (atrans) ? 1 : 0);
 		UNPROTECT(2); /* rdimnames, adimnames */
 
 		if (rm > 0) {
@@ -198,7 +198,7 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
-		SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
+		SEXP r = PROTECT(newObject("dgeMatrix"));
 
 		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 		int *prdim = INTEGER(rdim);
@@ -256,7 +256,7 @@ SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	SEXP r = PROTECT(newObject("dgeMatrix"));
 
 	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 	int *prdim = INTEGER(rdim);
@@ -322,7 +322,7 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(
+	SEXP r = PROTECT(newObject(
 		(triangular > 0) ? "dtrMatrix" : "dgeMatrix"));
 
 	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
@@ -401,7 +401,7 @@ SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix"));
+	SEXP r = PROTECT(newObject("dgeMatrix"));
 
 	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 	int *prdim = INTEGER(rdim);
@@ -461,7 +461,7 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(
+	SEXP r = PROTECT(newObject(
 		(triangular > 0) ? "dtrMatrix" : "dgeMatrix"));
 
 	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
@@ -682,7 +682,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
-		symmDN(zdimnames, xdimnames, (xtrans) ? 1 : 0);
+		symDN(zdimnames, xdimnames, (xtrans) ? 1 : 0);
 		UNPROTECT(2); /* zdimnames, xdimnames */
 		if (ztrans) {
 			SEXP uplo = PROTECT(mkString("L"));
@@ -767,7 +767,7 @@ SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		PROTECT(z = cholmod2dge(Z, zcl, ztrans));
 		R_Free(Z->x);
 	} else {
-		PROTECT(z = NEW_OBJECT_OF_CLASS(zcl));
+		PROTECT(z = newObject(zcl));
 		SEXP zdim = PROTECT(GET_SLOT(z, Matrix_DimSym));
 		INTEGER(zdim)[0] = m;
 		INTEGER(zdim)[1] = n;
@@ -1307,7 +1307,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	SEXP z;
 	PROTECT_INDEX zpid;
 	const char *zcl = (margin == 0) ? ycl : xcl;
-	PROTECT_WITH_INDEX(z = NEW_OBJECT_OF_CLASS(zcl), &zpid);
+	PROTECT_WITH_INDEX(z = newObject(zcl), &zpid);
 
 	SEXP zdim = PROTECT(GET_SLOT(z, Matrix_DimSym));
 	int *pzdim = INTEGER(zdim);

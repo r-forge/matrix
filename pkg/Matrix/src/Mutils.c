@@ -7,7 +7,7 @@
  *
  * @param A string specifying the name of a defined S4 class.
  */
-SEXP NEW_OBJECT_OF_CLASS(const char *what)
+SEXP newObject(const char *what)
 {
 	SEXP class = PROTECT(MAKE_CLASS(what)), obj = NEW_OBJECT(class);
 	UNPROTECT(1);
@@ -204,7 +204,7 @@ SEXP R_DimNames_is_symmetric(SEXP dn)
  *     of two square `Matrix` of equal size.
  * @param J An integer, one of -1, 0, and 1.
  */
-void symmDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
+void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 {
 	SEXP s;
 	if (J < 0) {
@@ -265,13 +265,13 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
-SEXP R_symmDN(SEXP dn)
+SEXP R_symDN(SEXP dn)
 {
 	/* Be fast (do nothing!) when dimnames = list(NULL, NULL) */
 	if (DimNames_is_trivial(dn))
 		return dn;
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
-	symmDN(newdn, dn, -1);
+	symDN(newdn, dn, -1);
 	UNPROTECT(1);
 	return newdn;
 }
@@ -294,7 +294,7 @@ SEXP get_symmetrized_DimNames(SEXP obj, int J) {
 		return dn;
 	}
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
-	symmDN(newdn, dn, J);
+	symDN(newdn, dn, J);
 	UNPROTECT(2);
 	return newdn;
 }
@@ -314,7 +314,7 @@ SEXP get_reversed_DimNames(SEXP obj) {
 void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
 	if (!DimNames_is_trivial(dn)) {
 		SEXP newdn = PROTECT(allocVector(VECSXP, 2));
-		symmDN(newdn, dn, J);
+		symDN(newdn, dn, J);
 		SET_SLOT(obj, Matrix_DimNamesSym, newdn);
 		UNPROTECT(1);
 	}

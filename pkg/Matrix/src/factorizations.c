@@ -27,7 +27,7 @@ SEXP cs2dgC(const cs *A, const char *cl)
 {
 	int nnz = ((int *) A->p)[A->n];
 	R_xlen_t np1 = (R_xlen_t) A->n + 1;
-	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP obj = PROTECT(newObject(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(allocVector(INTSXP, np1)),
 		i = PROTECT(allocVector(INTSXP, nnz)),
@@ -84,7 +84,7 @@ SEXP cholmod2dgC(cholmod_sparse *A, const char *cl, int values)
 	int m = (int) A->nrow, n = (int) A->ncol,
 		nnz = ((int *) A->p)[A->ncol];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
-	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP obj = PROTECT(newObject(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(allocVector(INTSXP, n1a)),
 		i = PROTECT(allocVector(INTSXP, nnz));
@@ -144,7 +144,7 @@ SEXP cholmod2dge(const cholmod_dense *A, const char *cl, int trans)
 	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP obj = PROTECT(newObject(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		x = PROTECT(allocVector(REALSXP, (R_xlen_t) m * n));
 	double *px = REAL(x), *py = (double *) A->x;
@@ -272,7 +272,7 @@ static SEXP cholmod2mf(const cholmod_factor *L)
 			      (int) L->minor + 1);
 	}
 
-	SEXP obj = PROTECT(NEW_OBJECT_OF_CLASS((L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
+	SEXP obj = PROTECT(newObject((L->is_super) ? "dCHMsuper" : "dCHMsimpl")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		type = PROTECT(allocVector(INTSXP, 6)),
 		colcount = PROTECT(allocVector(INTSXP, L->n)),
@@ -387,7 +387,7 @@ do { \
 
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("denseLU")),
+	SEXP val = PROTECT(newObject("denseLU")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	int *pdim = INTEGER(dim), r = (pdim[0] < pdim[1]) ? pdim[0] : pdim[1];
@@ -415,7 +415,7 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 
 SEXP dsyMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("BunchKaufman")),
+	SEXP val = PROTECT(newObject("BunchKaufman")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -452,7 +452,7 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 
 SEXP dspMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("pBunchKaufman")),
+	SEXP val = PROTECT(newObject("pBunchKaufman")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -483,7 +483,7 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 
 SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
-	SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("Cholesky")),
+	SEXP val = PROTECT(newObject("Cholesky")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -540,7 +540,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 
 SEXP dppMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP val = PROTECT(NEW_OBJECT_OF_CLASS("pCholesky")),
+	SEXP val = PROTECT(newObject("pCholesky")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
@@ -680,7 +680,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	SEXP val = get_factor(obj, (order_) ? "sparseLU~" : "sparseLU");
 	if (!isNull(val))
 		return val;
-	PROTECT(val = NEW_OBJECT_OF_CLASS("sparseLU"));
+	PROTECT(val = newObject("sparseLU"));
 
 	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
@@ -779,7 +779,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	SEXP val = get_factor(obj, (order_) ? "sparseQR~" : "sparseQR");
 	if (!isNull(val))
 		return val;
-	PROTECT(val = NEW_OBJECT_OF_CLASS("sparseQR"));
+	PROTECT(val = newObject("sparseQR"));
 
 	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
@@ -948,9 +948,9 @@ SEXP dpCMatrix_trf(SEXP obj,
 
 SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 {
-	SEXP P_ = PROTECT(NEW_OBJECT_OF_CLASS("pMatrix")),
-		T_ = PROTECT(NEW_OBJECT_OF_CLASS("dtCMatrix")),
-		D_ = PROTECT(NEW_OBJECT_OF_CLASS("dsCMatrix")),
+	SEXP P_ = PROTECT(newObject("pMatrix")),
+		T_ = PROTECT(newObject("dtCMatrix")),
+		D_ = PROTECT(newObject("dsCMatrix")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	int i, j, s, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -1459,7 +1459,7 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	UNPROTECT(2); /* adimnames, rdimnames */
 
 	SOLVE_START(1);
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
+	SEXP r = PROTECT(newObject("dgeMatrix")),
 		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 	int *prdim = INTEGER(rdim);
 	prdim[0] = m;
@@ -1503,7 +1503,7 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b, SEXP packed)
 	int unpacked = !asLogical(packed);
 	const char *cl = (!isNull(b)) ? "dgeMatrix" :
 		((unpacked) ? "dsyMatrix" : "dspMatrix");
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP r = PROTECT(newObject(cl)),
 		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
 		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	int *prdim = INTEGER(rdim);
@@ -1559,7 +1559,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b, SEXP packed)
 	int unpacked = !asLogical(packed);
 	const char *cl = (!isNull(b)) ? "dgeMatrix" :
 		((unpacked) ? "dpoMatrix" : "dppMatrix");
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP r = PROTECT(newObject(cl)),
 		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
 		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	int *prdim = INTEGER(rdim);
@@ -1648,7 +1648,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	double *work = (double *) R_alloc((size_t) m, sizeof(double));
 	cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
 	if (!asLogical(sparse)) {
-		PROTECT(r = NEW_OBJECT_OF_CLASS("dgeMatrix"));
+		PROTECT(r = newObject("dgeMatrix"));
 		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
@@ -1895,7 +1895,7 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b, SEXP packed)
 	int unpacked = !asLogical(packed);
 	const char *cl = (!isNull(b)) ? "dgeMatrix" :
 		((unpacked) ? "dtrMatrix" : "dtpMatrix");
-	SEXP r = PROTECT(NEW_OBJECT_OF_CLASS(cl)),
+	SEXP r = PROTECT(newObject(cl)),
 		rdim = PROTECT(GET_SLOT(r, Matrix_DimSym)),
 		auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
 		adiag = PROTECT(GET_SLOT(a, Matrix_diagSym));
@@ -1962,7 +1962,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	cs *A = dgC2cs(a, 1);
 	if (!asLogical(sparse)) {
 		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
-		PROTECT(r = NEW_OBJECT_OF_CLASS(cl));
+		PROTECT(r = newObject(cl));
 
 		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
 		int *prdim = INTEGER(rdim);
@@ -2089,7 +2089,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	}
 	pyx = REAL(yx);
 
-	SEXP a = PROTECT(NEW_OBJECT_OF_CLASS("dgeMatrix")),
+	SEXP a = PROTECT(newObject("dgeMatrix")),
 		adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
 		ax = yx;
 	int *padim = INTEGER(adim);
