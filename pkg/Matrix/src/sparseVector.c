@@ -1,3 +1,4 @@
+#include "Mutils.h"
 #include "sparseVector.h"
 
 SEXP v2spV(SEXP from)

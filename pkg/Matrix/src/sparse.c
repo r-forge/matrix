@@ -1,4 +1,5 @@
 #include <math.h> /* fabs, hypot */
+#include "Mutils.h"
 #include "sparse.h"
 
 SEXP sparse_drop0(SEXP from, const char *class, double tol)
@@ -757,7 +758,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 			if (class[1] == 's')
 				setAttrib(res, R_NamesSymbol, cn);
 			else if (rn != R_NilValue &&
-			         (rn == cn || equal_string_vectors(rn, cn, r)))
+			         (rn == cn || equal_character_vectors(rn, cn, r)))
 				setAttrib(res, R_NamesSymbol, (r == m) ? rn : cn);
 		}
 		UNPROTECT(1); /* dn */
@@ -2702,9 +2703,10 @@ do { \
 
 #define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
-static void Csparse_colsum(SEXP obj, const char *class,
-                           int m, int n, char di, int narm, int mean,
-                           SEXP res)
+static
+void Csparse_colsum(SEXP obj, const char *class,
+                    int m, int n, char di, int narm, int mean,
+                    SEXP res)
 {
 	int narm_ = narm && mean && class[0] != 'n';
 
@@ -2783,9 +2785,10 @@ static void Csparse_colsum(SEXP obj, const char *class,
 	return;
 }
 
-static void Csparse_rowsum(SEXP obj, const char *class,
-                           int m, int n, char di, int narm, int mean,
-                           SEXP res, SEXP iSym)
+static
+void Csparse_rowsum(SEXP obj, const char *class,
+                    int m, int n, char di, int narm, int mean,
+                    SEXP res, SEXP iSym)
 {
 	int narm_ = narm && mean && class[0] != 'n';
 
@@ -2916,9 +2919,10 @@ static void Csparse_rowsum(SEXP obj, const char *class,
 	return;
 }
 
-static void Tsparse_colsum(SEXP obj, const char *class,
-                           int m, int n, char di, int narm, int mean,
-                           SEXP res, SEXP iSym, SEXP jSym)
+static
+void Tsparse_colsum(SEXP obj, const char *class,
+                    int m, int n, char di, int narm, int mean,
+                    SEXP res, SEXP iSym, SEXP jSym)
 {
 	int narm_ = narm && mean && class[0] != 'n';
 	if (narm_)

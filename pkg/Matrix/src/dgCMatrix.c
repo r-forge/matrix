@@ -1,39 +1,10 @@
-#include "dgCMatrix.h"
+#include "Mutils.h"
 #include "cs.h"
 #include "chm_common.h"
+#include "dgCMatrix.h"
 
 /* defined in factorizations.c : */
 cs *dgC2cs(SEXP, int);
-
-/** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
- *  which entirely correspond to the (i,j) slots of
- *  as(x, "TsparseMatrix") :
- */
-SEXP compressed_non_0_ij(SEXP x, SEXP colP)
-{
-    int col = asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
-    SEXP ans, indSym = col ? Matrix_iSym : Matrix_jSym;
-    SEXP indP = PROTECT(GET_SLOT(x, indSym)),
-	 pP   = PROTECT(GET_SLOT(x, Matrix_pSym));
-    int i, *ij;
-    int nouter = INTEGER(GET_SLOT(x, Matrix_DimSym))[col ? 1 : 0],
-	n_el   = INTEGER(pP)[nouter]; /* is only == length(indP), if the
-				     inner slot is not over-allocated */
-
-    ij = INTEGER(ans = PROTECT(allocMatrix(INTSXP, n_el, 2)));
-    /* expand the compressed margin to 'i' or 'j' : */
-    expand_cmprPt(nouter, INTEGER(pP), &ij[col ? n_el : 0]);
-    /* and copy the other one: */
-    if (col)
-	for(i = 0; i < n_el; i++)
-	    ij[i] = INTEGER(indP)[i];
-    else /* row compressed */
-	for(i = 0; i < n_el; i++)
-	    ij[i + n_el] = INTEGER(indP)[i];
-
-    UNPROTECT(3);
-    return ans;
-}
 
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {

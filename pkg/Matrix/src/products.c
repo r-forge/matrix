@@ -1,7 +1,10 @@
-#include "products.h"
+#include "Lapack-etc.h"
+#include "Mutils.h"
+#include "chm_common.h"
 #include "coerce.h"
-#include "sparse.h"
 #include "dense.h"
+#include "sparse.h"
+#include "products.h"
 
 /* defined in ./factorizations.c : */
 cholmod_sparse *dgC2cholmod(SEXP, int);

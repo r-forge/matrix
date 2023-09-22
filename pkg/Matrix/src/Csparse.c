@@ -1,6 +1,8 @@
-#include "Csparse.h"
+#include "Mutils.h"
+#include "Minlines.h"
 #include "cs.h"
 #include "chm_common.h"
+#include "Csparse.h"
 
 /* defined in factorizations.c : */
 cs *dgC2cs(SEXP, int);

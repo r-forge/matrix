@@ -1,16 +1,10 @@
 #ifndef MATRIX_PRODUCTS_H
 #define MATRIX_PRODUCTS_H
 
-#include "chm_common.h"
-#include "Lapack-etc.h"
-#include "Mutils.h"
+#include <Rinternals.h>
 
-SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans);
+SEXP R_dense_matmult(SEXP, SEXP, SEXP, SEXP);
+SEXP R_sparse_matmult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_diagonal_matmult(SEXP, SEXP, SEXP, SEXP, SEXP);
 
-SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
-                      SEXP boolean);
-
-SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
-                        SEXP boolean);
-
-#endif
+#endif /* MATRIX_PRODUCTS_H */

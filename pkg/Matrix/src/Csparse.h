@@ -1,19 +1,19 @@
 #ifndef MATRIX_CSPARSE_H
 #define MATRIX_CSPARSE_H
 
-#include "Mutils.h"
+#include <Rinternals.h>
 
-SEXP Csparse_validate2(SEXP x, SEXP maybe_modify);
+SEXP Csparse_validate2(SEXP, SEXP);
 
-SEXP dCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
-SEXP lCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
-SEXP iCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
-SEXP nCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
-SEXP zCsparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value);
+SEXP dCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
+SEXP lCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
+SEXP iCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
+SEXP nCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
+SEXP zCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
 
-SEXP Csparse_MatrixMarket(SEXP x, SEXP fname);
-SEXP Csparse_dmperm(SEXP mat, SEXP seed, SEXP nAns);
+SEXP Csparse_MatrixMarket(SEXP, SEXP);
+SEXP Csparse_dmperm(SEXP, SEXP, SEXP);
 
-SEXP diag_tC(SEXP obj, SEXP resultKind);
+SEXP diag_tC(SEXP, SEXP);
 
-#endif
+#endif /* MATRIX_CSPARSE_H */

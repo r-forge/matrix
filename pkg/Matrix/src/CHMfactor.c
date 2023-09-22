@@ -1,4 +1,5 @@
-				/* CHOLMOD factors */
+#include "Mutils.h"
+#include "chm_common.h"
 #include "CHMfactor.h"
 
 /**
