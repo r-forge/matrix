@@ -83,8 +83,6 @@ do { \
 #ifndef R_DEFINES_H
 # define GET_SLOT(x, what)        R_do_slot(x, what)
 # define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
-# define MAKE_CLASS(what)         R_do_MAKE_CLASS(what)
-# define NEW_OBJECT(class_def)    R_do_new_object(class_def)
 #endif
 #define HAS_SLOT(obj, name)       R_has_slot(obj, name)
 
@@ -219,13 +217,6 @@ do { \
 	} \
 } while (0)
 
-
-/* ==== CLASS LISTS ================================================= */
-
-/* dpoMatrix->dsyMatrix, etc. */
-#define VALID_NONVIRTUAL_SHIFT(i, p2ind) \
-	((i >= 5) ? 0 : ((i >= 4) ? p2ind != 0 : ((i >= 2) ? 12 : 14)))
-
 #define VALID_NONVIRTUAL_MATRIX \
 /*  0 */ "dpoMatrix", "dppMatrix", \
 /*  2 */ "corMatrix", "pcorMatrix", \
@@ -252,6 +243,10 @@ do { \
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 
+/* dpoMatrix->dsyMatrix, etc. */
+#define VALID_NONVIRTUAL_SHIFT(i, p2ind) \
+	((i >= 5) ? 0 : ((i >= 4) ? p2ind != 0 : ((i >= 2) ? 12 : 14)))
+
 #define VALID_DENSE \
 "dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix", \
 "lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix", \
@@ -274,5 +269,29 @@ do { \
 
 #define VALID_DIAGONAL \
 "ddiMatrix", "ldiMatrix", "ndiMatrix"
+
+
+/* What we want declared "everywhere" : */
+
+#include "utils.h"
+
+SEXP newObject(const char *);
+void validObject(SEXP, const char *);
+
+char typeToKind(SEXPTYPE);
+SEXPTYPE kindToType(char);
+size_t kindToSize(char);
+
+int DimNames_is_trivial(SEXP);
+int DimNames_is_symmetric(SEXP);
+
+void symDN(SEXP, SEXP, int);
+void revDN(SEXP, SEXP);
+
+SEXP get_symmetrized_DimNames(SEXP, int);
+SEXP get_reversed_DimNames(SEXP);
+
+void set_symmetrized_DimNames(SEXP, SEXP, int);
+void set_reversed_DimNames(SEXP, SEXP);
 
 #endif /* MATRIX_MDEFINES_H */

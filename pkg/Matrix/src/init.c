@@ -1,7 +1,8 @@
+#include "Mdefines.h"
 #include "CHMfactor.h"
 #include "Csparse.h"
-#include "Mutils.h"
 #include "abIndex.h"
+#include "attrib.h"
 #include "bind.h"
 #include "chm_common.h"
 #include "coerce.h"
@@ -10,10 +11,13 @@
 #include "dgeMatrix.h"
 #include "factorizations.h"
 #include "kappa.h"
+#include "objects.h"
+#include "perm.h"
 #include "products.h"
 #include "sparse.h"
 #include "sparseVector.h"
 #include "subscript.h"
+#include "utils-R.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>

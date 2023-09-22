@@ -1,5 +1,5 @@
-/** @file chm_common.c
- */
+#include "Mdefines.h"
+#include "Minlines.h"
 #include "chm_common.h"
 
 /* MJ: I'd like to stop using these eventually : */
@@ -11,11 +11,17 @@
 /* defined in Csparse.c : */
 Rboolean isValid_Csparse(SEXP);
 
-SEXP get_SuiteSparse_version(void) {
+SEXP get_SuiteSparse_version(void)
+{
     SEXP ans = allocVector(INTSXP, 3);
     int* version = INTEGER(ans);
     SuiteSparse_version(version);
     return ans;
+}
+
+static R_INLINE Rboolean chm_factor_ok(CHM_FR f)
+{
+    return (Rboolean) (f->minor >= f->n);
 }
 
 cholmod_common c; // for cholmod_<method>  (..)
@@ -269,7 +275,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 	error(_("invalid class of object to as_cholmod_sparse"));
     if (!isValid_Csparse(x))
 	error(_("invalid object passed to as_cholmod_sparse"));
-    
+
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
 
     ans->itype = CHOLMOD_INT;	/* characteristics of the system */
@@ -1092,7 +1098,7 @@ CHM_FR as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
 	ans->xtype = CHOLMOD_REAL;
 	ans->x = REAL(GET_SLOT(x, Matrix_xSym));
     }
-    
+
     if (ans->is_super) {
 	tmp = GET_SLOT(x, install("super"));
 	ans->nsuper = LENGTH(tmp) - 1;

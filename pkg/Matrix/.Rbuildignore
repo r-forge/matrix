@@ -70,6 +70,7 @@ R/sparseQR\.R$
 R/symmetricMatrix\.R$
 R/triangularMatrix\.R$
 R/unpackedMatrix\.R$
+src/Mutils\.[ch]$
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
 src/cs_utils\.[ch]$
