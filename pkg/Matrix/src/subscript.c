@@ -39,7 +39,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 		} \
 	}
 
-	SUB1_START_EXTRA(kind2type(cl[0]));
+	SUB1_START_EXTRA(kindToType(cl[0]));
 
 #define SUB1_CASES(_SUB1_N_, _SUB1_X_, _F_N_, _F_X_) \
 	do { \
@@ -145,7 +145,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 static
 SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START_EXTRA(kind2type(cl[0]));
+	SUB1_START_EXTRA(kindToType(cl[0]));
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
 	do { \
@@ -201,7 +201,7 @@ SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 static
 SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym));
@@ -268,7 +268,7 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 static
 SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(x, Matrix_jSym));
@@ -335,7 +335,7 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 static
 SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
 	int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
@@ -489,7 +489,7 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 		} \
 	}
 
-	SUB1_START_EXTRA(kind2type(cl[0]));
+	SUB1_START_EXTRA(kindToType(cl[0]));
 
 	Matrix_int_fast64_t i_, j_;
 
@@ -538,7 +538,7 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 static
 SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START_EXTRA(kind2type(cl[0]));
+	SUB1_START_EXTRA(kindToType(cl[0]));
 
 	Matrix_int_fast64_t i_, j_;
 
@@ -594,7 +594,7 @@ SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 static
 SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym));
@@ -657,7 +657,7 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 static
 SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(x, Matrix_jSym));
@@ -720,7 +720,7 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 static
 SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
-	SUB1_START(kind2type(cl[0]));
+	SUB1_START(kindToType(cl[0]));
 
 	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
 	int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';

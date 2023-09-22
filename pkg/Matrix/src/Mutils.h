@@ -47,9 +47,9 @@ SEXP R_signPerm(SEXP p, SEXP off);
 SEXP R_invertPerm(SEXP p, SEXP off, SEXP ioff);
 SEXP R_asPerm(SEXP p, SEXP off, SEXP ioff, SEXP n);
 
-char type2kind(SEXPTYPE type);
-SEXPTYPE kind2type(char kind);
-size_t kind2size(char kind);
+char typeToKind(SEXPTYPE type);
+SEXPTYPE kindToType(char kind);
+size_t kindToSize(char kind);
 
 const char *Matrix_nonvirtual(SEXP obj, int strict);
 SEXP R_Matrix_nonvirtual(SEXP obj, SEXP strict);
