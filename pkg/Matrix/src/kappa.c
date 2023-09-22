@@ -1,6 +1,9 @@
+#include "Lapack-etc.h"
+#include "Mutils.h"
 #include "kappa.h"
 
-static char La_norm_type(SEXP s)
+static
+char La_norm_type(SEXP s)
 {
 #define ARGNAME "type"
 	if (TYPEOF(s) != STRSXP)
@@ -43,7 +46,8 @@ static char La_norm_type(SEXP s)
 #undef ARGNAME
 }
 
-static char La_rcond_type(SEXP s)
+static
+char La_rcond_type(SEXP s)
 {
 #define ARGNAME "norm"
 	if (TYPEOF(s) != STRSXP)

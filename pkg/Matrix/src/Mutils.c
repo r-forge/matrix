@@ -172,7 +172,7 @@ Rboolean DimNames_is_symmetric(SEXP dn)
 	if (!isNull(rn = VECTOR_ELT(dn, 0)) &&
 	    !isNull(cn = VECTOR_ELT(dn, 1)) &&
 	    rn != cn &&
-	    ((n = LENGTH(rn)) != LENGTH(cn) || !equal_string_vectors(rn, cn, n)))
+	    ((n = LENGTH(rn)) != LENGTH(cn) || !equal_character_vectors(rn, cn, n)))
 		return FALSE;
 	Rboolean res = TRUE;
 	SEXP ndn = PROTECT(getAttrib(dn, R_NamesSymbol));
@@ -1157,7 +1157,7 @@ void naToOne(SEXP x)
 /* That both 's1' and 's2' are STRSXP of length at least 'n' must be
    checked by the caller ... see, e.g., symmetricMatrix_validate() above
 */
-Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n)
+Rboolean equal_character_vectors(SEXP s1, SEXP s2, int n)
 {
 	/* Only check the first 'n' elements, even if 's1' or 's2' is longer ...
 
@@ -1210,6 +1210,36 @@ SEXP Matrix_expand_pointers(SEXP pP)
 	expand_cmprPt(n, p, INTEGER(ans));
 	UNPROTECT(1);
 	return ans;
+}
+
+/** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
+ *  which entirely correspond to the (i,j) slots of
+ *  as(x, "TsparseMatrix") :
+ */
+SEXP compressed_non_0_ij(SEXP x, SEXP colP)
+{
+    int col = asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
+    SEXP ans, indSym = col ? Matrix_iSym : Matrix_jSym;
+    SEXP indP = PROTECT(GET_SLOT(x, indSym)),
+	 pP   = PROTECT(GET_SLOT(x, Matrix_pSym));
+    int i, *ij;
+    int nouter = INTEGER(GET_SLOT(x, Matrix_DimSym))[col ? 1 : 0],
+	n_el   = INTEGER(pP)[nouter]; /* is only == length(indP), if the
+				     inner slot is not over-allocated */
+
+    ij = INTEGER(ans = PROTECT(allocMatrix(INTSXP, n_el, 2)));
+    /* expand the compressed margin to 'i' or 'j' : */
+    expand_cmprPt(nouter, INTEGER(pP), &ij[col ? n_el : 0]);
+    /* and copy the other one: */
+    if (col)
+	for(i = 0; i < n_el; i++)
+	    ij[i] = INTEGER(indP)[i];
+    else /* row compressed */
+	for(i = 0; i < n_el; i++)
+	    ij[i + n_el] = INTEGER(indP)[i];
+
+    UNPROTECT(3);
+    return ans;
 }
 
 /**

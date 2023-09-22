@@ -70,10 +70,11 @@ void zeroRe(SEXP x);
 void zeroIm(SEXP x);
 void naToOne(SEXP x);
 
-Rboolean equal_string_vectors(SEXP s1, SEXP s2, int n);
+Rboolean equal_character_vectors(SEXP s1, SEXP s2, int n);
 SEXP append_to_named_list(SEXP x, const char *nm, SEXP val);
 
 SEXP Matrix_expand_pointers(SEXP pP);
+SEXP compressed_non_0_ij(SEXP x, SEXP colP);
 SEXP m_encodeInd (SEXP ij,        SEXP di, SEXP orig_1, SEXP chk_bnds);
 SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds);
 SEXP Mmatrix(SEXP args);

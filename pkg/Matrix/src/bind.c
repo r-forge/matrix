@@ -1,12 +1,14 @@
-#include "bind.h"
+#include "Mutils.h"
 #include "coerce.h"
+#include "bind.h"
 
 static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
 
 static SEXP tagWasVector = NULL;
 
-static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
-                     int *rdim, int *rdimnames, char *kind, char *repr)
+static
+void scanArgs(SEXP args, SEXP exprs, int margin, int level,
+              int *rdim, int *rdimnames, char *kind, char *repr)
 {
 	SEXP a, e, s, tmp;
 	int nS4 = 0, nDense = 0,
@@ -358,8 +360,9 @@ static void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 	return;
 }
 
-static void coerceArgs(SEXP args, int margin,
-                       int *rdim, char kind, char repr)
+static
+void coerceArgs(SEXP args, int margin,
+                int *rdim, char kind, char repr)
 {
 	SEXP a, s, t, tmp;
 	int ivalid, isM;
@@ -493,8 +496,9 @@ static void coerceArgs(SEXP args, int margin,
 	return;
 }
 
-static void bindArgs(SEXP args, int margin, SEXP res,
-                     int *rdim, char kind, char repr)
+static
+void bindArgs(SEXP args, int margin, SEXP res,
+              int *rdim, char kind, char repr)
 {
 	SEXP a, s;
 
@@ -837,7 +841,8 @@ static void bindArgs(SEXP args, int margin, SEXP res,
 	return;
 }
 
-static SEXP bind(SEXP args, SEXP exprs, int margin, int level)
+static
+SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 {
 	if (!tagWasVector)
 		tagWasVector = install(".__WAS_VECTOR__."); /* for now, a hack */

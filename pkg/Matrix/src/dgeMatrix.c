@@ -1,3 +1,5 @@
+#include "Lapack-etc.h"
+#include "Mutils.h"
 #include "dgeMatrix.h"
 
 /* MJ: unused */

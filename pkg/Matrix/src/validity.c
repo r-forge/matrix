@@ -1,7 +1,10 @@
 #include <math.h> /* floor */
+#include <stdio.h> /* vsnprintf */
+#include "Mutils.h"
 #include "validity.h"
 
-static char *Matrix_sprintf(const char *format, ...)
+static
+char *Matrix_sprintf(const char *format, ...)
 {
 	char *buf = R_alloc(Matrix_ErrorBufferSize, sizeof(char));
 	va_list args;
@@ -257,7 +260,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 			PROTECT(rn = ANY_TO_STRING(rn));
 			PROTECT(cn = ANY_TO_STRING(cn));
 			UNPROTECT(4); /* cn, rn */
-			if (!equal_string_vectors(rn, cn, n))
+			if (!equal_character_vectors(rn, cn, n))
 				RMKMS(_("%s[1] differs from %s[2]"), "Dimnames", "Dimnames");
 		}
 	}
