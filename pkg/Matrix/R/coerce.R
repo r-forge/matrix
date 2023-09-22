@@ -133,7 +133,12 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 }
 
 .V2kind <- function(from, kind = ".") {
-    if(kind == "." || (kind. <- .V.kind(from)) == kind)
+    if(kind == ".")
+        return(from)
+    kind. <- .V.kind(from)
+    if(kind == ",")
+        kind <- if(kind. == "z") "z" else "d"
+    if(kind == kind.)
         return(from)
     to <- new(paste0(kind, "sparseVector"))
     to@length <- from@length

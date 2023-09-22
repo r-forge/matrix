@@ -97,9 +97,11 @@
 }
 \arguments{
   \item{from, x, a, b}{a \code{\linkS4class{Matrix}}, matrix, or vector.}
-  \item{kind}{a string (\code{"."}, \code{"n"}, \code{"l"}, or
-    \code{"d"}) specifying the \dQuote{kind} of the result.  \code{"."}
-    indicates that the kind of \code{from} should be preserved.
+  \item{kind}{a string (\code{"."}, \code{","}, \code{"n"}, \code{"l"},
+    or \code{"d"}) specifying the \dQuote{kind} of the result.
+    \code{"."} indicates that the kind of \code{from} should be preserved.
+    \code{","} is equivalent to \code{"z"} if \code{from} is complex
+    and to \code{"d"} otherwise.
     \code{"n"} indicates that the result should inherit from
     \code{\linkS4class{nMatrix}} or \code{\linkS4class{nsparseVector}}
     (and so on).}

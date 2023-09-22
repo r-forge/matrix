@@ -7,7 +7,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : zzz[0];
+	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
 	SEXP to = PROTECT(newObject(cl)),
@@ -505,7 +505,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
                        char kind, char shape, int packed, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = (kind != '.') ? kind : class[0];
+	cl[0] = (kind == '.') ? class[0] : ((kind == ',') ? ((class[0] == 'z') ? 'z' : 'd') : kind);
 	cl[1] = shape;
 	cl[2] = (cl[1] == 'g') ? 'e' : ((packed) ? 'p' : ((cl[1] == 's') ? 'y' : 'r'));
 	SEXP to = PROTECT(newObject(cl));
@@ -641,7 +641,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	UNPROTECT(1); /* margin */
 
 	char cl[] = ".geMatrix";
-	cl[0] = (kind != '.') ? kind : 'n';
+	cl[0] = (kind == '.') ? 'n' : ((kind == ',') ? 'd' : kind);
 	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -1217,7 +1217,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
                         char kind, char shape, char repr, char ul)
 {
 	char cl[] = "...Matrix";
-	cl[0] = (kind != '.') ? kind : class[0];
+	cl[0] = (kind == '.') ? class[0] : ((kind == ',') ? ((class[0] == 'z') ? 'z' : 'd') : kind);
 	cl[1] = shape;
 	cl[2] = repr;
 	SEXP to = PROTECT(newObject(cl));
@@ -1435,8 +1435,8 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	UNPROTECT(1); /* margin */
 
 	char cl[] = ".g.Matrix";
-	cl[0] = (kind != '.') ? kind : 'n';
-	cl[2] = (repr != '.') ? repr : ((mg == 0) ? 'R' : 'C');
+	cl[0] = (kind == '.') ? 'n' : ((kind == ',') ? 'd' : kind);
+	cl[2] = (repr == '.') ? ((mg == 0) ? 'R' : 'C') : repr;
 	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -1558,7 +1558,11 @@ SEXP R_index_as_sparse(SEXP from, SEXP kind, SEXP repr)
 
 SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 {
-	if (kind == '.' || kind == class[0])
+	if (kind == '.')
+		kind = class[0];
+	else if (kind == ',')
+		kind = (class[0] == 'z') ? 'z' : 'd';
+	if (kind == class[0])
 		return from;
 	SEXPTYPE tt = kindToType(kind);
 
@@ -1644,7 +1648,11 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 
 SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 {
-	if (kind == '.' || kind == class[0])
+	if (kind == '.')
+		kind = class[0];
+	else if (kind == ',')
+		kind = (class[0] == 'z') ? 'z' : 'd';
+	if (kind == class[0])
 		return from;
 	SEXPTYPE tt = kindToType(kind);
 
@@ -1775,7 +1783,11 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 
 SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 {
-	if (kind == '.' || kind == class[0])
+	if (kind == '.')
+		kind = class[0];
+	else if (kind == ',')
+		kind = (class[0] == 'z') ? 'z' : 'd';
+	if (kind == class[0])
 		return from;
 	SEXPTYPE tt = kindToType(kind);
 
@@ -3490,7 +3502,7 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 		if (sparse_ != NA_LOGICAL && !sparse_) {
 			PROTECT(from);
 			char cl_[] = "...Matrix";
-			cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+			cl_[0] = (kind_ == '.') ? cl[0] : ((kind_ == ',') ? ((cl[0] == 'z') ? 'z' : 'd') : kind_);
 			cl_[1] = cl[1];
 			cl_[2] = cl[2];
 			from = sparse_as_dense(from, cl_, 0);
@@ -3538,10 +3550,10 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 	case 'p':
 	{
 		char cl_[] = "...Matrix";
-		cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+		cl_[0] = (kind_ == '.') ? cl[0] : ((kind_ == ',') ? ((cl[0] == 'z') ? 'z' : 'd') : kind_);
 		cl_[1] = cl[1];
 		cl_[2] = cl[2];
-		from = dense_as_kind(from, cl, kind_, 1);
+		from = dense_as_kind(from, cl, cl_[0], 1);
 		PROTECT(from);
 		from = dense_as_general(from, cl_, cl[0] == cl_[0]);
 		UNPROTECT(1);
@@ -3552,10 +3564,10 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 	case 'T':
 	{
 		char cl_[] = "...Matrix";
-		cl_[0] = (kind_ == '.') ? cl[0] : kind_;
+		cl_[0] = (kind_ == '.') ? cl[0] : ((kind_ == ',') ? ((cl[0] == 'z') ? 'z' : 'd') : kind_);
 		cl_[1] = cl[1];
 		cl_[2] = cl[2];
-		from = sparse_as_kind(from, cl, kind_);
+		from = sparse_as_kind(from, cl, cl_[0]);
 		PROTECT(from);
 		from = sparse_as_general(from, cl_);
 		UNPROTECT(1);
