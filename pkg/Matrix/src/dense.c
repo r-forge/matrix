@@ -37,16 +37,16 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	} while (0)
 
 #define UNPACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
-	_PREFIX_ ## dense_unpacked_make_banded(_PTR_(x1), m, n, a, b, di)
+	_PREFIX_ ## band2(_PTR_(x1), m, n, a, b, di)
 
 #define PACKED_MAKE_BANDED(_CTYPE_, _PTR_, _PREFIX_) \
-	_PREFIX_ ## dense_packed_make_banded(_PTR_(x1), n, a, b, ul1, di)
+	_PREFIX_ ## band1(_PTR_(x1), n, a, b, ul1, di)
 
 #define UNPACKED_COPY_DIAGONAL(_CTYPE_, _PTR_, _PREFIX_) \
 	do { \
 		Matrix_memset(_PTR_(x1), 0, len, sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dense_unpacked_copy_diagonal( \
+			_PREFIX_ ## dcpy2( \
 				_PTR_(x1), _PTR_(x0), n, len, 'U', di); \
 	} while (0)
 
@@ -54,7 +54,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	do { \
 		Matrix_memset(_PTR_(x1), 0, len, sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dense_packed_copy_diagonal( \
+			_PREFIX_ ## dcpy1( \
 				_PTR_(x1), _PTR_(x0), n, len, ul1, ul0, di); \
 	} while (0)
 
@@ -526,12 +526,12 @@ SEXP dense_transpose(SEXP from, const char *class)
 		} else if (ul == 'U') { \
 			for (j = 0; j < n; ++j) \
 				for (i = j; i < n; ++i) \
-					*(px1++) = *(px0 + PM_AR21_UP(j, i)); \
+					*(px1++) = *(px0 + PACKED_AR21_UP(j, i)); \
 		} else { \
 			R_xlen_t n2 = (R_xlen_t) n * 2; \
 			for (j = 0; j < n; ++j) \
 				for (i = 0; i <= j; ++i) \
-					*(px1++) = *(px0 + PM_AR21_LO(j, i, n2)); \
+					*(px1++) = *(px0 + PACKED_AR21_LO(j, i, n2)); \
 		} \
 	} while (0)
 
@@ -643,10 +643,10 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
 			if (class[2] != 'p') \
-				_PREFIX_ ## dense_unpacked_copy_diagonal( \
+				_PREFIX_ ## dcpy2( \
 					px1, px0, n, len, '\0' /* not used */, di); \
 			else \
-				_PREFIX_ ## dense_packed_copy_diagonal( \
+				_PREFIX_ ## dcpy1( \
 					px1, px0, n, len, ul1, ul0, di); \
 		} while (0)
 

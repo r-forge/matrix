@@ -1,6 +1,1 @@
-#ifndef MATRIX_UNPACKEDMATRIX_H
-#define MATRIX_UNPACKEDMATRIX_H
-
-#include "Mutils.h"
-
-#endif /* MATRIX_UNPACKEDMATRIX_H */
+/* in .Rbuildignore since r4366, empty since r4366 */
