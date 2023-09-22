@@ -1,8 +1,8 @@
 SOURCES_C = \
 	CHMfactor.c \
 	Csparse.c \
-	Mutils.c \
 	abIndex.c \
+	attrib.c \
 	bind.c \
 	chm_common.c \
 	coerce.c \
@@ -14,8 +14,12 @@ SOURCES_C = \
 	idz.c \
 	init.c \
 	kappa.c \
+	objects.c \
+	perm.c \
 	products.c \
 	sparse.c \
 	sparseVector.c \
 	subscript.c \
+	utils-R.c \
+	utils.c \
 	validity.c

@@ -22,54 +22,10 @@
 static R_INLINE
 SEXP ALLOC_SLOT(SEXP obj, SEXP nm, SEXPTYPE type, R_xlen_t length)
 {
-	SEXP val = allocVector(type, length);
-
+	SEXP val = PROTECT(allocVector(type, length));
 	SET_SLOT(obj, nm, val);
+	UNPROTECT(1);
 	return val;
-}
-
-/**
- * Expand compressed pointers in the array mp into a full set of indices
- * in the array mj.
- *
- * @param ncol number of columns (or rows)
- * @param mp column pointer vector of length ncol + 1
- * @param mj vector of length mp[ncol] to hold the result
- *
- * @return mj
- */
-static R_INLINE
-int *expand_cmprPt(int ncol, const int mp[], int mj[])
-{
-	int j;
-	for (j = 0; j < ncol; j++) {
-		int j2 = mp[j+1], jj;
-		for (jj = mp[j]; jj < j2; jj++)
-			mj[jj] = j;
-	}
-	return mj;
-}
-
-static R_INLINE
-int strmatch(const char *x, const char **valid)
-{
-	int i = 0;
-	while (valid[i][0] != '\0') {
-		if (strcmp(x, valid[i]) == 0)
-			return i;
-		++i;
-	}
-	return -1;
-}
-
-static R_INLINE
-int strmatch2(const char *x, SEXP valid)
-{
-	int i, n = LENGTH(valid);
-	for (i = 0; i < n; ++i)
-		if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
-			return i;
-	return -1;
 }
 
 #endif /* MATRIX_MINLINES_H */

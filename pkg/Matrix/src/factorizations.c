@@ -1,11 +1,21 @@
 #include <math.h> /* fabs, log */
 #include <Rmath.h> /* logspace_add, logspace_sub */
 #include "Lapack-etc.h"
-#include "Mutils.h"
+#include "Mdefines.h"
 #include "cs.h"
 #include "chm_common.h"
 #include "idz.h"
 #include "factorizations.h"
+
+/* defined in ./attrib.c : */
+SEXP get_factor(SEXP, const char *);
+void set_factor(SEXP, const char *, SEXP);
+
+/* defined in ./objects.c : */
+char Matrix_shape(SEXP);
+
+/* defined in ./perm.c : */
+int signPerm(const int *, int, int);
 
 cs *dgC2cs(SEXP obj, int values)
 {
@@ -2069,6 +2079,18 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	SOLVE_FINISH;
 	UNPROTECT(5); /* r, aq, ap, aU, aL */
 	return r;
+}
+
+static
+int strmatch(const char *x, const char **valid)
+{
+	int i = 0;
+	while (valid[i][0] != '\0') {
+		if (strcmp(x, valid[i]) == 0)
+			return i;
+		++i;
+	}
+	return -1;
 }
 
 SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)

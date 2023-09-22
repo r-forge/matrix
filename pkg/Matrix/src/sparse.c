@@ -1,5 +1,5 @@
 #include <math.h> /* fabs, hypot */
-#include "Mutils.h"
+#include "Mdefines.h"
 #include "sparse.h"
 
 SEXP sparse_drop0(SEXP from, const char *class, double tol)
