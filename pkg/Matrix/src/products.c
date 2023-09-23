@@ -12,6 +12,10 @@ SEXP cholmod2dgC(      cholmod_sparse *, const char *, int);
 cholmod_dense  *dge2cholmod(SEXP, int);
 SEXP cholmod2dge(const cholmod_dense  *, const char *, int);
 
+/* defined in ./idz.c : */
+void dtranspose2(  double *,   double *, int, int);
+void ztranspose2(Rcomplex *, Rcomplex *, int, int);
+
 static
 void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
                 int *m, int *n, int *v)
@@ -146,10 +150,9 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 static
 SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 {
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym));
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int *padim = INTEGER(adim), am = padim[0], an = padim[1],
 		rm = (atrans) ? an : am, rk = (atrans) ? am : an;
-	UNPROTECT(1); /* adim */
 
 	if (b == R_NilValue) {
 
@@ -157,12 +160,15 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
-		SEXP r = PROTECT(newObject("dpoMatrix"));
+		SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		char rcl[] = ".poMatrix";
+		rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+		SEXP r = PROTECT(newObject(rcl));
+
+		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = prdim[1] = rm;
-		UNPROTECT(1); /* rdim */
 
 		SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 			rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
@@ -170,30 +176,44 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 		UNPROTECT(2); /* rdimnames, adimnames */
 
 		if (rm > 0) {
-		SEXP rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rm));
+		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rm));
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(ax) == CPLXSXP) {
+		Rcomplex *prx = COMPLEX(rx);
+		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(Rcomplex));
+		if (rk > 0) {
+			Rcomplex *pax = COMPLEX(ax),
+				zero = Matrix_zzero, one = Matrix_zone;
+			F77_CALL(zsyrk)(
+				"U", (atrans) ? "T" : "N", &rm, &rk,
+				&one, pax, &am, &zero, prx, &rm FCONE FCONE);
+		}
+		} else {
+#endif
 		double *prx = REAL(rx);
 		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(double));
 		if (rk > 0) {
-			SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-			double *pax = REAL(ax), zero = 0.0, one = 1.0;
+			double *pax = REAL(ax),
+				zero = 0.0, one = 1.0;
 			F77_CALL(dsyrk)(
 				"U", (atrans) ? "T" : "N", &rm, &rk,
 				&one, pax, &am, &zero, prx, &rm FCONE FCONE);
-			UNPROTECT(1); /* ax */
 		}
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 		}
 
-		UNPROTECT(1); /* r */
+		UNPROTECT(2); /* r, ax */
 		return r;
 
 	} else {
 
-		SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
+		SEXP bdim = GET_SLOT(b, Matrix_DimSym);
 		int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
 			rn = (btrans) ? bm : bn;
-		UNPROTECT(1); /* bdim */
 
 		if (rk != ((btrans) ? bn : bm))
 			error(_("non-conformable arguments"));
@@ -201,13 +221,16 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
-		SEXP r = PROTECT(newObject("dgeMatrix"));
+		SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-		SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+		char rcl[] = ".geMatrix";
+		rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+		SEXP r = PROTECT(newObject(rcl));
+
+		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = rm;
 		prdim[1] = rn;
-		UNPROTECT(1); /* rdim */
 
 		SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 			bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
@@ -218,25 +241,43 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 		UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 		if (rm > 0 && rn > 0) {
-		SEXP rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(ax) == CPLXSXP) {
+		Rcomplex *prx = COMPLEX(rx);
+		if (rk == 0)
+			Matrix_memset(prx, 0, (R_xlen_t) rm * rn, sizeof(Rcomplex));
+		else {
+			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+			Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx),
+				zero = Matrix_zzero, one = Matrix_zone;
+			F77_CALL(zgemm)(
+				(atrans) ? "T" : "N", (btrans) ? "T" : "N", &rm, &rn, &rk,
+				&one, pax, &am, pbx, &bm, &zero, prx, &rm FCONE FCONE);
+			UNPROTECT(1); /* bx */
+		}
+		} else {
+#endif
 		double *prx = REAL(rx);
 		if (rk == 0)
 			Matrix_memset(prx, 0, (R_xlen_t) rm * rn, sizeof(double));
 		else {
-			SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-				bx = PROTECT(GET_SLOT(b, Matrix_xSym));
+			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			double *pax = REAL(ax), *pbx = REAL(bx),
 				zero = 0.0, one = 1.0;
 			F77_CALL(dgemm)(
 				(atrans) ? "T" : "N", (btrans) ? "T" : "N", &rm, &rn, &rk,
 				&one, pax, &am, pbx, &bm, &zero, prx, &rm FCONE FCONE);
-			UNPROTECT(2); /* bx, ax */
+			UNPROTECT(1); /* bx */
 		}
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 		}
 
-		UNPROTECT(1); /* r */
+		UNPROTECT(2); /* r, ax */
 		return r;
 
 	}
@@ -246,12 +287,12 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 static
 SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 {
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
+	int rk = INTEGER(adim)[0];
+
+	SEXP bdim = GET_SLOT(b, Matrix_DimSym);
 	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
-		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn,
-		rk = INTEGER(adim)[0];
-	UNPROTECT(2); /* bdim, adim */
+		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn;
 
 	if (rk != ((aleft == btrans) ? bn : bm))
 		error(_("non-conformable arguments"));
@@ -259,13 +300,16 @@ SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(newObject("dgeMatrix"));
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	char rcl[] = ".geMatrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	SEXP r = PROTECT(newObject(rcl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = rm;
 	prdim[1] = rn;
-	UNPROTECT(1); /* rdim */
 
 	SEXP adimnames = PROTECT(get_symmetrized_DimNames(a, -1)),
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
@@ -277,33 +321,129 @@ SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 	if (rm > 0 && rn > 0) {
-	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-		ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
+	SEXP auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
 		bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
-	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
-		zero = 0.0, one = 1.0;
-	char ul = *CHAR(STRING_ELT(uplo, 0));
+		rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+	char aul = *CHAR(STRING_ELT(auplo, 0));
+	int i, d = (aleft) ? rn : rm,
+		binc = (aleft) ? bm : 1, bincp = (aleft) ? 1 : bm,
+		rinc = (aleft) ? 1 : rm, rincp = (aleft) ? rm : 1;
+#ifdef MATRIX_ENABLE_ZMATRIX
+	if (TYPEOF(ax) == CPLXSXP) {
+	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
+		zero = Matrix_zero, one = Matrix_zone;
 	if (!btrans)
-		F77_CALL(dsymm)(
-			(aleft) ? "L" : "R", &ul, &rm, &rn,
+		F77_CALL(zsymm)(
+			(aleft) ? "L" : "R", &aul, &rm, &rn,
 			&one, pax, &rk, pbx, &bm, &zero, prx, &rm FCONE FCONE);
 	else {
-		int i, d = (aleft) ? rn : rm,
-			binc = (aleft) ? bm : 1, bincp = (aleft) ? 1 : bm,
-			rinc = (aleft) ? 1 : rm, rincp = (aleft) ? rm : 1;
 		for (i = 0; i < d; ++i) {
-			F77_CALL(dsymv)(
-				&ul, &rk, &one, pax, &rk, pbx, &binc, &zero, prx, &rinc FCONE);
+			F77_CALL(zsymv)(
+				&aul, &rk, &one, pax, &rk, pbx, &binc, &zero, prx, &rinc FCONE);
 			pbx += bincp;
 			prx += rincp;
 		}
 	}
+	} else {
+#endif
+	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
+		zero = 0.0, one = 1.0;
+	if (!btrans)
+		F77_CALL(dsymm)(
+			(aleft) ? "L" : "R", &aul, &rm, &rn,
+			&one, pax, &rk, pbx, &bm, &zero, prx, &rm FCONE FCONE);
+	else {
+		for (i = 0; i < d; ++i) {
+			F77_CALL(dsymv)(
+				&aul, &rk, &one, pax, &rk, pbx, &binc, &zero, prx, &rinc FCONE);
+			pbx += bincp;
+			prx += rincp;
+		}
+	}
+#ifdef MATRIX_ENABLE_ZMATRIX
+	}
+#endif
 	SET_SLOT(r, Matrix_xSym, rx);
-	UNPROTECT(4); /* rx, bx, ax, uplo */
+	UNPROTECT(3); /* rx, bx, auplo */
 	}
 
-	UNPROTECT(1); /* r */
+	UNPROTECT(2); /* r, ax */
+	return r;
+}
+
+/* <dsp> * op(<dge>)  or  op(<dge>) * <dsp> */
+static
+SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
+{
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
+	int rk = INTEGER(adim)[0];
+
+	SEXP bdim = GET_SLOT(b, Matrix_DimSym);
+	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
+		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn;
+
+	if (rk != ((aleft == btrans) ? bn : bm))
+		error(_("non-conformable arguments"));
+	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
+
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
+
+	char rcl[] = ".geMatrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	SEXP r = PROTECT(newObject(rcl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
+	int *prdim = INTEGER(rdim);
+	prdim[0] = rm;
+	prdim[1] = rn;
+
+	SEXP adimnames = PROTECT(get_symmetrized_DimNames(a, -1)),
+		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
+		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
+	if (aleft)
+	matmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
+	else
+	matmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
+	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
+
+	if (rm > 0 && rn > 0) {
+	SEXP auplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
+		bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
+		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+	char aul = *CHAR(STRING_ELT(auplo, 0));
+	int i, d = (aleft) ? rn : rm,
+		binc = (aleft == btrans) ? bm : 1, bincp = (aleft == btrans) ? 1 : bm,
+		rinc = (aleft          ) ? 1 : rm, rincp = (aleft          ) ? rm : 1;
+#ifdef MATRIX_ENABLE_ZMATRIX
+	if (TYPEOF(ax) == CPLXSXP) {
+	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
+		zero = Matrix_zzero, one = Matrix_zone;
+	for (i = 0; i < d; ++i) {
+		F77_CALL(zspmv)(
+			&aul, &rk, &one, pax, pbx, &binc, &zero, prx, &rinc FCONE);
+		pbx += bincp;
+		prx += rincp;
+	}
+	} else {
+#endif
+	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
+		zero = 0.0, one = 1.0;
+	for (i = 0; i < d; ++i) {
+		F77_CALL(dspmv)(
+			&aul, &rk, &one, pax, pbx, &binc, &zero, prx, &rinc FCONE);
+		pbx += bincp;
+		prx += rincp;
+	}
+#ifdef MATRIX_ENABLE_ZMATRIX
+	}
+#endif
+	SET_SLOT(r, Matrix_xSym, rx);
+	UNPROTECT(3); /* rx, bx, auplo */
+	}
+
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
@@ -312,12 +452,12 @@ static
 SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
                        int triangular)
 {
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
+	int rk = INTEGER(adim)[0];
+
+	SEXP bdim = GET_SLOT(b, Matrix_DimSym);
 	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
-		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn,
-		rk = INTEGER(adim)[0];
-	UNPROTECT(2); /* bdim, adim */
+		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn;
 
 	if (rk != ((aleft == btrans) ? bn : bm))
 		error(_("non-conformable arguments"));
@@ -325,14 +465,18 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(newObject(
-		(triangular > 0) ? "dtrMatrix" : "dgeMatrix"));
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	char rcl[] = "...Matrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	rcl[1] = (triangular > 0) ? 't' : 'g';
+	rcl[2] = (triangular > 0) ? 'r' : 'e';
+	SEXP r = PROTECT(newObject(rcl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = rm;
 	prdim[1] = rn;
-	UNPROTECT(1); /* rdim */
 
 	SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
@@ -343,106 +487,57 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	matmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
-	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-	if (triangular > 0 && ((atrans) ? ul == 'U' : ul != 'U')) {
-		if (atrans) {
-			UNPROTECT(1); /* uplo */
-			PROTECT(uplo = mkString("L"));
-		}
-		SET_SLOT(r, Matrix_uploSym, uplo);
+	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
+	char aul = *CHAR(STRING_ELT(auplo, 0));
+	if (triangular > 0 && ((atrans) ? aul == 'U' : aul != 'U')) {
+		if (atrans)
+			auplo = mkString("L");
+		PROTECT(auplo);
+		SET_SLOT(r, Matrix_uploSym, auplo);
+		UNPROTECT(1); /* auplo */
 	}
-	UNPROTECT(1); /* uplo */
 
-	SEXP diag = PROTECT(GET_SLOT(a, Matrix_diagSym));
-	char di = *CHAR(STRING_ELT(diag, 0));
-	if (triangular > 1 && di != 'N')
-		SET_SLOT(r, Matrix_diagSym, diag);
-	UNPROTECT(1); /* diag */
+	SEXP adiag = GET_SLOT(a, Matrix_diagSym);
+	char adi = *CHAR(STRING_ELT(adiag, 0));
+	if (triangular > 1 && adi != 'N') {
+		PROTECT(adiag);
+		SET_SLOT(r, Matrix_diagSym, adiag);
+		UNPROTECT(1); /* adiag */
+	}
 
 	if (rm > 0 && rn > 0) {
-	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-		bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
+		rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+#ifdef MATRIX_ENABLE_ZMATRIX
+	if (TYPEOF(ax) == CPLXSXP) {
+	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
+		one = Matrix_zone;
+	if (!btrans)
+		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(Rcomplex));
+	else
+		ztranspose2(prx, pbx, bm, bn);
+	F77_CALL(ztrmm)(
+		(aleft) ? "L" : "R", &aul, (atrans) ? "T" : "N", &adi, &rm, &rn,
+		&one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
+	} else {
+#endif
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
 		one = 1.0;
 	if (!btrans)
-		Matrix_memcpy(prx, pbx, (R_xlen_t) rm * rn, sizeof(double));
-	else {
-		int i, j;
-		R_xlen_t mn1s = (R_xlen_t) bm * bn - 1;
-		for (j = 0; j < bm; ++j, pbx -= mn1s)
-			for (i = 0; i < bn; ++i, pbx += bm)
-				*(prx++) = *pbx;
-		prx -= mn1s + 1;
-	}
-	F77_CALL(dtrmm)(
-		(aleft) ? "L" : "R", &ul, (atrans) ? "T" : "N", &di, &rm, &rn,
-		&one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
-	SET_SLOT(r, Matrix_xSym, rx);
-	UNPROTECT(3); /* rx, bx, ax */
-	}
-
-	UNPROTECT(1); /* r */
-	return r;
-}
-
-/* <dsp> * op(<dge>)  or  op(<dge>) * <dsp> */
-static
-SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
-{
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
-	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
-		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn,
-		rk = INTEGER(adim)[0];
-	UNPROTECT(2); /* bdim, adim */
-
-	if (rk != ((aleft == btrans) ? bn : bm))
-		error(_("non-conformable arguments"));
-	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
-
-	SEXP r = PROTECT(newObject("dgeMatrix"));
-
-	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
-	int *prdim = INTEGER(rdim);
-	prdim[0] = rm;
-	prdim[1] = rn;
-	UNPROTECT(1); /* rdim */
-
-	SEXP adimnames = PROTECT(get_symmetrized_DimNames(a, -1)),
-		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
-		rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym));
-	if (aleft)
-	matmultDN(rdimnames, adimnames,      0, bdimnames, !btrans);
+		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(double));
 	else
-	matmultDN(rdimnames, bdimnames, btrans, adimnames,       1);
-	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
-
-	if (rm > 0 && rn > 0) {
-	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym)),
-		ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-		bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
-	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
-		zero = 0.0, one = 1.0;
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-	int i, d = (aleft) ? rn : rm,
-		binc = (aleft == btrans) ? bm : 1, bincp = (aleft == btrans) ? 1 : bm,
-		rinc = (aleft          ) ? 1 : rm, rincp = (aleft          ) ? rm : 1;
-	for (i = 0; i < d; ++i) {
-		F77_CALL(dspmv)(
-			&ul, &rk, &one, pax, pbx, &binc, &zero, prx, &rinc FCONE);
-		pbx += bincp;
-		prx += rincp;
+		dtranspose2(prx, pbx, bm, bn);
+	F77_CALL(dtrmm)(
+		(aleft) ? "L" : "R", &aul, (atrans) ? "T" : "N", &adi, &rm, &rn,
+		&one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
+#ifdef MATRIX_ENABLE_ZMATRIX
 	}
+#endif
 	SET_SLOT(r, Matrix_xSym, rx);
-	UNPROTECT(4); /* rx, bx, ax, uplo */
+	UNPROTECT(2); /* rx, bx */
 	}
 
-	UNPROTECT(1); /* r */
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
@@ -451,12 +546,12 @@ static
 SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
                        int triangular)
 {
-	SEXP adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-		bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
+	int rk = INTEGER(adim)[0];
+
+	SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
 	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
-		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn,
-		rk = INTEGER(adim)[0];
-	UNPROTECT(2); /* bdim, adim */
+		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn;
 
 	if (rk != ((aleft == btrans) ? bn : bm))
 		error(_("non-conformable arguments"));
@@ -464,14 +559,18 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
-	SEXP r = PROTECT(newObject(
-		(triangular > 0) ? "dtrMatrix" : "dgeMatrix"));
+	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-	SEXP rdim = PROTECT(GET_SLOT(r, Matrix_DimSym));
+	char rcl[] = "...Matrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	rcl[1] = (triangular > 0) ? 't' : 'g';
+	rcl[2] = (triangular > 0) ? 'r' : 'e';
+	SEXP r = PROTECT(newObject(rcl));
+
+	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
 	prdim[0] = rm;
 	prdim[1] = rn;
-	UNPROTECT(1); /* rdim */
 
 	SEXP adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)),
 		bdimnames = PROTECT(GET_SLOT(b, Matrix_DimNamesSym)),
@@ -482,50 +581,62 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	matmultDN(rdimnames, bdimnames, btrans, adimnames, !atrans);
 	UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
-	SEXP uplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-	if (triangular > 0 && ((atrans) ? ul == 'U' : ul != 'U')) {
-		if (atrans) {
-			UNPROTECT(1); /* uplo */
-			PROTECT(uplo = mkString("L"));
-		}
-		SET_SLOT(r, Matrix_uploSym, uplo);
+	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
+	char aul = *CHAR(STRING_ELT(auplo, 0));
+	if (triangular > 0 && ((atrans) ? aul == 'U' : aul != 'U')) {
+		if (atrans)
+			auplo = mkString("L");
+		PROTECT(auplo);
+		SET_SLOT(r, Matrix_uploSym, auplo);
+		UNPROTECT(1); /* auplo */
 	}
-	UNPROTECT(1); /* uplo */
 
-	SEXP diag = PROTECT(GET_SLOT(a, Matrix_diagSym));
-	char di = *CHAR(STRING_ELT(diag, 0));
-	if (triangular > 1 && di != 'N')
-		SET_SLOT(r, Matrix_diagSym, diag);
-	UNPROTECT(1); /* diag */
+	SEXP adiag = GET_SLOT(a, Matrix_diagSym);
+	char adi = *CHAR(STRING_ELT(adiag, 0));
+	if (triangular > 1 && adi != 'N') {
+		PROTECT(adiag);
+		SET_SLOT(r, Matrix_diagSym, adiag);
+		UNPROTECT(1); /* adiag */
+	}
 
 	if (rm > 0 && rn > 0) {
-	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym)),
-		bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
+	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
 		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
-	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx);
-	if (!btrans)
-		Matrix_memcpy(prx, pbx, (R_xlen_t) rm * rn, sizeof(double));
-	else {
-		int i, j;
-		R_xlen_t mn1s = (R_xlen_t) bm * bn - 1;
-		for (j = 0; j < bm; ++j, pbx -= mn1s)
-			for (i = 0; i < bn; ++i, pbx += bm)
-				*(prx++) = *pbx;
-		prx -= mn1s + 1;
-	}
 	int i, rinc = (aleft) ? 1 : rm, rincp = (aleft) ? rm : 1;
+#ifdef MATRIX_ENABLE_ZMATRIX
+	if (TYPEOF(ax) == CPLXSXP) {
+	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx);
+	if (!btrans)
+		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(Rcomplex));
+	else
+		ztranspose2(prx, pbx, bm, bn);
 	for (i = 0; i < rn; ++i) {
-		F77_CALL(dtpmv)(
-			&ul, (aleft == atrans) ? "T" : "N", &di, &rk,
+		F77_CALL(ztpmv)(
+			&aul, (aleft == atrans) ? "T" : "N", &adi, &rk,
 			pax, prx, &rinc FCONE FCONE FCONE);
 		prx += rincp;
 	}
+	} else {
+#endif
+	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx);
+	if (!btrans)
+		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(double));
+	else
+		dtranspose2(prx, pbx, bm, bn);
+	for (i = 0; i < rn; ++i) {
+		F77_CALL(dtpmv)(
+			&aul, (aleft == atrans) ? "T" : "N", &adi, &rk,
+			pax, prx, &rinc FCONE FCONE FCONE);
+		prx += rincp;
+	}
+#ifdef MATRIX_ENABLE_ZMATRIX
+	}
+#endif
 	SET_SLOT(r, Matrix_xSym, rx);
-	UNPROTECT(3); /* rx, bx, ax */
+	UNPROTECT(2); /* rx, bx */
 	}
 
-	UNPROTECT(1); /* r */
+	UNPROTECT(2); /* r, ax */
 	return r;
 }
 
@@ -540,7 +651,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	PROTECT_WITH_INDEX(y, &ypid);
 
 	if (TYPEOF(x) != S4SXP) {
-		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 0), xpid);
+		REPROTECT(x = matrix_as_dense(x, ",ge", '\0', '\0', xtrans_, 0), xpid);
 		if (v == 1) {
 			/* Vector: discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
@@ -549,7 +660,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 		}
 	}
 	if (TYPEOF(y) != S4SXP && y != R_NilValue) {
-		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 0), ypid);
+		REPROTECT(y = matrix_as_dense(y, ",ge", '\0', '\0', ytrans_, 0), ypid);
 		if (v == 2) {
 			/* Vector: discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
@@ -572,13 +683,14 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 	ycl = valid[ivalid];
 	}
 
-	if (xcl[0] != 'd') {
-		REPROTECT(x = dense_as_kind(x, xcl, 'd', 0), xpid);
+	char kind = (xcl[0] == 'z' || (y != R_NilValue && ycl[0] == 'z')) ? 'z' : 'd';
+	if (xcl[0] != kind) {
+		REPROTECT(x = dense_as_kind(x, xcl, kind, 0), xpid);
 		xcl = valid[R_check_class_etc(x, valid)];
 	}
 	if (y != R_NilValue) {
-	if (ycl[0] != 'd') {
-		REPROTECT(y = dense_as_kind(y, ycl, 'd', 0), ypid);
+	if (ycl[0] != kind) {
+		REPROTECT(y = dense_as_kind(y, ycl, kind, 0), ypid);
 		ycl = valid[R_check_class_etc(y, valid)];
 	}
 	}
