@@ -7,6 +7,8 @@
 #include "idz.h"
 #include "factorizations.h"
 
+/* GOAL: move from CSparse to CXSparse to support complex LU and QR */
+
 /* defined in ./attrib.c : */
 SEXP get_factor(SEXP, const char *);
 void set_factor(SEXP, const char *, SEXP);
@@ -31,9 +33,8 @@ cs *dgC2cs(SEXP obj, int values)
 	A->nzmax = LENGTH(i);
 	A->nz = -1;
 	if (values) {
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		A->x = REAL(x);
-		UNPROTECT(1);
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		A->x = (TYPEOF(x) == CPLXSXP) ? (double *) COMPLEX(x) : REAL(x);
 	}
 	UNPROTECT(3);
 	return A;
@@ -54,8 +55,14 @@ SEXP cs2dgC(const cs *A, const char *class, int values)
 	SET_SLOT(obj, Matrix_pSym, p);
 	SET_SLOT(obj, Matrix_iSym, i);
 	if (values && A->x) {
-		SEXP x = PROTECT(allocVector(REALSXP, nnz));
-		Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
+		SEXP x;
+		if (A->nz == -2) {
+			PROTECT(x = allocVector(CPLXSXP, nnz));
+			Matrix_memcpy(COMPLEX(x), A->x, nnz, sizeof(Rcomplex));
+		} else {
+			PROTECT(x = allocVector(REALSXP, nnz));
+			Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
+		}
 		SET_SLOT(obj, Matrix_xSym, x);
 		UNPROTECT(1);
 	}
@@ -437,24 +444,32 @@ SEXP dgeMatrix_trf_(SEXP obj, int warn)
 	SEXP val = PROTECT(newObject("denseLU")),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	int *pdim = INTEGER(dim), r = (pdim[0] < pdim[1]) ? pdim[0] : pdim[1];
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 	SET_SLOT(val, Matrix_DimSym, dim);
 	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
 	if (r > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, r)),
-			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		x = duplicate(x);
-		UNPROTECT(1); /* x */
-		PROTECT(x);
+			x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int *pperm = INTEGER(perm), info;
-		double *px = REAL(x);
-
-		F77_CALL(dgetrf)(pdim, pdim + 1, px, pdim, pperm, &info);
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
+		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		F77_CALL(zgetrf)(&m, &n, py, &m, pperm, &info);
+		ERROR_LAPACK_2(zgetrf, info, warn, U);
+		} else {
+#endif
+		double *px = REAL(x), *py = REAL(y);
+		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		F77_CALL(dgetrf)(&m, &n, py, &m, pperm, &info);
 		ERROR_LAPACK_2(dgetrf, info, warn, U);
-
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(val, Matrix_permSym, perm);
-		SET_SLOT(val, Matrix_xSym, x);
-		UNPROTECT(2); /* x, perm */
+		SET_SLOT(val, Matrix_xSym, y);
+		UNPROTECT(3); /* y, x, perm */
 	}
 	UNPROTECT(3); /* dimnames, dim, val */
 	return val;
@@ -467,29 +482,41 @@ SEXP dsyMatrix_trf_(SEXP obj, int warn)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
+	int n = INTEGER(dim)[1];
+	char ul = *CHAR(STRING_ELT(uplo, 0));
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (n > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, n)),
 			x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-			y = PROTECT(allocVector(REALSXP, XLENGTH(x)));
-		char ul = *CHAR(STRING_ELT(uplo, 0));
-		int *pperm = INTEGER(perm), lwork = -1, info;
+			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		int *pperm = INTEGER(perm), info, lwork = -1;
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), tmp, *work;
+		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
+		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
+		F77_CALL(zsytrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
+		lwork = (int) tmp.r;
+		Matrix_Calloc(work, lwork, Rcomplex);
+		F77_CALL(zsytrf)(&ul, &n, py, &n, pperm, work, &lwork, &info FCONE);
+		Matrix_Free(work, lwork);
+		ERROR_LAPACK_2(zsytrf, info, warn, D);
+		} else {
+#endif
 		double *px = REAL(x), *py = REAL(y), tmp, *work;
-
 		Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
-		F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
-		F77_CALL(dsytrf)(&ul, pdim, py, pdim, pperm, &tmp, &lwork,
-		                 &info FCONE);
+		F77_CALL(dlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
+		F77_CALL(dsytrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
 		lwork = (int) tmp;
 		Matrix_Calloc(work, lwork, double);
-		F77_CALL(dsytrf)(&ul, pdim, py, pdim, pperm, work, &lwork,
-		                 &info FCONE);
+		F77_CALL(dsytrf)(&ul, &n, py, &n, pperm, work, &lwork, &info FCONE);
 		Matrix_Free(work, lwork);
 		ERROR_LAPACK_2(dsytrf, info, warn, D);
-
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(val, Matrix_permSym, perm);
 		SET_SLOT(val, Matrix_xSym, y);
 		UNPROTECT(3); /* y, x, perm */
@@ -505,26 +532,34 @@ SEXP dspMatrix_trf_(SEXP obj, int warn)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
+	int n = INTEGER(dim)[1];
+	char ul = *CHAR(STRING_ELT(uplo, 0));
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (n > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, n)),
-			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		x = duplicate(x);
-		UNPROTECT(1); /* x */
-		PROTECT(x);
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+			x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int *pperm = INTEGER(perm), info;
-		double *px = REAL(x);
-
-		F77_CALL(dsptrf)(&ul, pdim, px, pperm, &info FCONE);
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
+		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		F77_CALL(zsptrf)(&ul, &n, py, pperm, &info FCONE);
+		ERROR_LAPACK_2(zsptrf, info, warn, D);
+		} else {
+#endif
+		double *px = REAL(x), *py = REAL(y);
+		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		F77_CALL(dsptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(dsptrf, info, warn, D);
-
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(val, Matrix_permSym, perm);
-		SET_SLOT(val, Matrix_xSym, x);
-		UNPROTECT(2); /* x, perm */
+		SET_SLOT(val, Matrix_xSym, y);
+		UNPROTECT(3); /* y, x, perm */
 	}
 	UNPROTECT(4); /* uplo, dimnames, dim, val */
 	return val;
@@ -537,50 +572,68 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
+	int n = INTEGER(dim)[1];
+	char ul = *CHAR(STRING_ELT(uplo, 0));
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (n > 0) {
 		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-			y = PROTECT(allocVector(REALSXP, XLENGTH(x)));
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
-		double *px = REAL(x), *py = REAL(y);
-
-		Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
-		F77_CALL(dlacpy)(&ul, pdim, pdim, px, pdim, py, pdim FCONE);
-
-		if (pivot) {
-			SEXP perm = PROTECT(allocVector(INTSXP, n));
-			int *pperm = INTEGER(perm), rank;
-			double *work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
-
-			F77_CALL(dpstrf)(&ul, pdim, py, pdim,
-			                 pperm, &rank, &tol, work, &info FCONE);
-			ERROR_LAPACK_4(dpstrf, info, rank, warn);
-
-			if (info > 0) {
-				/* Zero the trailing (n-rank)-by-(n-rank) principal
-				   submatrix to guarantee that the result is valid
-				   under the assumption that the factorized matrix
-				   is positive semidefinite */
-				int j;
-				R_xlen_t len = (R_xlen_t) (n - rank);
-				py += (R_xlen_t) rank * n + rank;
-				for (j = rank; j < n; ++j) {
-					Matrix_memset(py, 0, len, sizeof(double));
-					py += n;
-				}
-			}
-
-			SET_SLOT(val, Matrix_permSym, perm);
-			UNPROTECT(1); /* perm */
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
+		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
+		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
+		if (!pivot) {
+		F77_CALL(zpotrf)(&ul, &n, py, &n, &info FCONE);
+		ERROR_LAPACK_3(zpotrf, info, warn, 6);
 		} else {
-			F77_CALL(dpotrf)(&ul, pdim, py, pdim, &info FCONE);
-			ERROR_LAPACK_3(dpotrf, info, warn, 6);
+		SEXP perm = PROTECT(allocVector(INTSXP, n));
+		int *pperm = INTEGER(perm), rank;
+		Rcomplex *work = (Rcomplex *) R_alloc((size_t) 2 * n, sizeof(Rcomplex));
+		F77_CALL(zpstrf)(&ul, &n, py, &n, pperm, &rank, &tol, work, &info FCONE);
+		ERROR_LAPACK_4(zpstrf, info, rank, warn);
+		if (info > 0) {
+			int j, d = n - rank;
+			py += (R_xlen_t) rank * n + rank;
+			for (j = rank; j < n; ++j) {
+				Matrix_memset(py, 0, d, sizeof(Rcomplex));
+				py += n;
+			}
 		}
-
+		SET_SLOT(val, Matrix_permSym, perm);
+		UNPROTECT(1); /* perm */
+		}		
+		} else {
+#endif
+		double *px = REAL(x), *py = REAL(y);
+		Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
+		F77_CALL(dlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
+		if (!pivot) {
+		F77_CALL(dpotrf)(&ul, &n, py, &n, &info FCONE);
+		ERROR_LAPACK_3(dpotrf, info, warn, 6);
+		} else {
+		SEXP perm = PROTECT(allocVector(INTSXP, n));
+		int *pperm = INTEGER(perm), rank;
+		double *work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
+		F77_CALL(dpstrf)(&ul, &n, py, &n, pperm, &rank, &tol, work, &info FCONE);
+		ERROR_LAPACK_4(dpstrf, info, rank, warn);
+		if (info > 0) {
+			int j, d = n - rank;
+			py += (R_xlen_t) rank * n + rank;
+			for (j = rank; j < n; ++j) {
+				Matrix_memset(py, 0, d, sizeof(double));
+				py += n;
+			}
+		}
+		SET_SLOT(val, Matrix_permSym, perm);
+		UNPROTECT(1); /* perm */
+		}
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
 		SET_SLOT(val, Matrix_xSym, y);
 		UNPROTECT(2); /* y, x */
 	}
@@ -595,24 +648,32 @@ SEXP dppMatrix_trf_(SEXP obj, int warn)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
+	int n = INTEGER(dim)[1];
+	char ul = *CHAR(STRING_ELT(uplo, 0));
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (n > 0) {
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		x = duplicate(x);
-		UNPROTECT(1); /* x */
-		PROTECT(x);
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
-		double *px = REAL(x);
-
-		F77_CALL(dpptrf)(&ul, pdim, px, &info FCONE);
-		ERROR_LAPACK_3(dpptrf, info, warn, 5);
-
-		SET_SLOT(val, Matrix_xSym, x);
-		UNPROTECT(1); /* x */
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (TYPEOF(x) == CPLXSXP) {
+			Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
+			Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+			F77_CALL(zpptrf)(&ul, &n, py, &info FCONE);
+			ERROR_LAPACK_3(zpptrf, info, warn, 5);
+		} else {
+#endif
+			double *px = REAL(x), *py = REAL(y);
+			Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+			F77_CALL(dpptrf)(&ul, &n, py, &info FCONE);
+			ERROR_LAPACK_3(dpptrf, info, warn, 5);
+#ifdef MATRIX_ENABLE_ZMATRIX
+		}
+#endif
+		SET_SLOT(val, Matrix_xSym, y);
+		UNPROTECT(2); /* y, x */
 	}
 	UNPROTECT(4); /* uplo, dimnames, dim, val */
 	return val;
@@ -765,7 +826,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 
 	SEXP L = PROTECT(cs2dgC(N->L, "dtCMatrix", 1)),
 		U = PROTECT(cs2dgC(N->U, "dtCMatrix", 1)),
-	uplo = PROTECT(mkString("L"));
+		uplo = PROTECT(mkString("L"));
 	SET_SLOT(L, Matrix_uploSym, uplo);
 	SET_SLOT(val, Matrix_LSym, L);
 	SET_SLOT(val, Matrix_USym, U);
@@ -971,9 +1032,8 @@ SEXP dpCMatrix_trf(SEXP obj,
 	cholmod_sparse *A = dgC2cholmod(obj, 1);
 	cholmod_factor *L = NULL;
 
-	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
-	UNPROTECT(1); /* uplo */
 	A->stype = (ul == 'U') ? 1 : -1;
 
 	if (cached) {
