@@ -9,8 +9,8 @@
 /* defined in ./factorizations.c : */
 cholmod_sparse *dgC2cholmod(SEXP, int);
 cholmod_dense  *dge2cholmod(SEXP, int);
-SEXP cholmod2dgC(      cholmod_sparse *, const char *, int);
-SEXP cholmod2dge(const cholmod_dense  *, const char *, int);
+SEXP cholmod2dgC(cholmod_sparse *, int, char);
+SEXP cholmod2dge(cholmod_dense  *, int, char);
 
 /* defined in ./idz.c : */
 void dtranspose2(  double *,   double *, int, int);
@@ -796,7 +796,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 			cholmod_free_sparse(&X, &c);
 		Z->stype = (ztrans) ? -1 : 1;
 		cholmod_sort(Z, &c);
-		PROTECT_WITH_INDEX(z = cholmod2dgC(Z, zcl, !boolean), &zpid);
+		PROTECT_WITH_INDEX(z = cholmod2dgC(Z, !boolean, zcl[1]), &zpid);
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
@@ -825,7 +825,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 			cholmod_free_sparse(&X, &c);
 		if (ytrans)
 			cholmod_free_sparse(&Y, &c);
-		PROTECT_WITH_INDEX(z = cholmod2dgC(Z, zcl, !boolean), &zpid);
+		PROTECT_WITH_INDEX(z = cholmod2dgC(Z, !boolean, zcl[1]), &zpid);
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
@@ -889,7 +889,7 @@ SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		else
 			Z->x = R_Calloc(Z->nzmax, double);
 		cholmod_sdmult(X, xtrans, alpha, beta, Y, Z, &c);
-		PROTECT(z = cholmod2dge(Z, zcl, ztrans));
+		PROTECT(z = cholmod2dge(Z, ztrans, zcl[1]));
 		R_Free(Z->x);
 	} else {
 		PROTECT(z = newObject(zcl));
