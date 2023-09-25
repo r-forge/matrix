@@ -813,13 +813,14 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
 	csn *N = NULL;
-	int *pp = NULL;
+	int *P = NULL;
+
 	if (A->m != A->n)
 		error(_("LU factorization of m-by-n %s requires m == n"),
 		      ".gCMatrix");
 	if (!dgCMatrix_trf_(A, &S, &N, order_, tol_) ||
-	    !(pp = cs_pinv(N->pinv, A->m))) {
-		if (!pp) {
+	    !(P = cs_pinv(N->pinv, A->m))) {
+		if (!P) {
 			S = cs_sfree(S);
 			N = cs_nfree(N);
 		}
@@ -848,20 +849,19 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	UNPROTECT(3); /* uplo, U, L */
 
 	SEXP p = PROTECT(allocVector(INTSXP, A->m));
-	Matrix_memcpy(INTEGER(p), pp, A->m, sizeof(int));
+	Matrix_memcpy(INTEGER(p), P, A->m, sizeof(int));
 	SET_SLOT(val, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 	if (order_ > 0) {
 		SEXP q = PROTECT(allocVector(INTSXP, A->n));
-		int *pq = S->q;
-		Matrix_memcpy(INTEGER(q), pq, A->n, sizeof(int));
+		Matrix_memcpy(INTEGER(q), S->q, A->n, sizeof(int));
 		SET_SLOT(val, Matrix_qSym, q);
 		UNPROTECT(1); /* q */
 	}
 
 	S = cs_sfree(S);
 	N = cs_nfree(N);
-	pp = cs_free(pp);
+	P = cs_free(P);
 
 	set_factor(obj, (order_) ? "sparseLU~" : "sparseLU", val);
 	UNPROTECT(1); /* val */
@@ -896,13 +896,14 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	const cs *A = dgC2cs(obj, 1);
 	css *S = NULL;
 	csn *N = NULL;
-	int *pp = NULL;
+	int *P = NULL;
+
 	if (A->m < A->n)
 		error(_("QR factorization of m-by-n %s requires m >= n"),
 		      ".gCMatrix");
 	if (!dgCMatrix_orf_(A, &S, &N, order_) ||
-	    !(pp = cs_pinv(S->pinv, S->m2))) {
-		if (!pp) {
+	    !(P = cs_pinv(S->pinv, S->m2))) {
+		if (!P) {
 			S = cs_sfree(S);
 			N = cs_nfree(N);
 		}
@@ -935,20 +936,19 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	UNPROTECT(1); /* beta */
 
 	SEXP p = PROTECT(allocVector(INTSXP, S->m2));
-	Matrix_memcpy(INTEGER(p), pp, S->m2, sizeof(int));
+	Matrix_memcpy(INTEGER(p), P, S->m2, sizeof(int));
 	SET_SLOT(val, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 	if (order_ > 0) {
 		SEXP q = PROTECT(allocVector(INTSXP, A->n));
-		int *pq = S->q;
-		Matrix_memcpy(INTEGER(q), pq, A->n, sizeof(int));
+		Matrix_memcpy(INTEGER(q), S->q, A->n, sizeof(int));
 		SET_SLOT(val, Matrix_qSym, q);
 		UNPROTECT(1); /* q */
 	}
 
 	S = cs_sfree(S);
 	N = cs_nfree(N);
-	pp = cs_free(pp);
+	P = cs_free(P);
 
 	set_factor(obj, (order_) ? "sparseQR~" : "sparseQR", val);
 	UNPROTECT(1); /* val */
@@ -1562,7 +1562,7 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	}
 
 #define SOLVE_FINISH \
-	SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)),	\
+	SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)), \
 		adimnames = PROTECT(GET_SLOT(a, Matrix_DimNamesSym)); \
 	if (isNull(b)) \
 		revDN(rdimnames, adimnames); \
@@ -1978,7 +1978,6 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(ztrtrs, info);
 			} else {
-				// https://bugs.r-project.org/show_bug.cgi?id=18534
 				F77_CALL(ztptrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax),
 				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(ztptrs, info);
