@@ -752,45 +752,44 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 	return val;
 }
 
+#define DO_FREE(_A_, _S_, _N_) \
+do { \
+	if (_A_) \
+		_A_ = cs_spfree(_A_); \
+	if (_S_) \
+		_S_ = cs_sfree(_S_); \
+	if (_N_) \
+		_N_ = cs_nfree(_N_); \
+} while (0)
+
+#define DO_SORT(_X_) \
+do { \
+	cs_dropzeros(_X_); \
+	T = cs_transpose(_X_, 1); \
+	if (!T) { \
+		DO_FREE(T, *S, *N); \
+		return 0; \
+	} \
+	_X_ = cs_spfree(_X_); \
+	_X_ = cs_transpose(T, 1); \
+	if (!(_X_)) { \
+		DO_FREE(T, *S, *N); \
+		return 0; \
+	} \
+	T = cs_spfree(T); \
+} while (0)
+
 static
 int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
 {
 	cs *T = NULL;
-
-#define FREE_AND_RETURN_ZERO \
-	do { \
-		if (*S) \
-			*S = cs_sfree(*S); \
-		if (*N) \
-			*N = cs_nfree(*N); \
-		if (T) \
-			T = cs_spfree(T); \
-		return 0; \
-	} while (0)
-
-	/* Symbolic analysis and numeric factorization : */
 	if (!(*S = cs_sqr(order, A, 0)) ||
-	    !(*N = cs_lu(A, *S, tol)))
-		FREE_AND_RETURN_ZERO;
-	/* Drop zeros from L and sort it : */
-	cs_dropzeros((*N)->L);
-	T = cs_transpose((*N)->L, 1);
-	if (!T)
-		FREE_AND_RETURN_ZERO;
-	(*N)->L = cs_spfree((*N)->L);
-	(*N)->L = cs_transpose(T, 1);
-	if (!(*N)->L)
-		FREE_AND_RETURN_ZERO;
-	T = cs_spfree(T);
-	/* Drop zeros from U and sort it : */
-	T = cs_transpose((*N)->U, 1);
-	if (!T)
-		FREE_AND_RETURN_ZERO;
-	(*N)->U = cs_spfree((*N)->U);
-	(*N)->U = cs_transpose(T, 1);
-	if (!(*N)->U)
-		FREE_AND_RETURN_ZERO;
-	T = cs_spfree(T);
+	    !(*N = cs_lu(A, *S, tol))) {
+		DO_FREE(T, *S, *N);
+		return 0;
+	}
+	DO_SORT((*N)->L);
+	DO_SORT((*N)->U);
 	return 1;
 }
 
@@ -817,7 +816,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	int *pp = NULL;
 	if (A->m != A->n)
 		error(_("LU factorization of m-by-n %s requires m == n"),
-		      "dgCMatrix");
+		      ".gCMatrix");
 	if (!dgCMatrix_trf_(A, &S, &N, order_, tol_) ||
 	    !(pp = cs_pinv(N->pinv, A->m))) {
 		if (!pp) {
@@ -826,7 +825,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 		}
 		if (asLogical(doError))
 			error(_("LU factorization of %s failed: out of memory or near-singular"),
-			      "dgCMatrix");
+			      ".gCMatrix");
 		/* Defensive code will check with is(., "sparseLU") : */
 		UNPROTECT(1); /* val */
 		return ScalarLogical(NA_LOGICAL);
@@ -873,30 +872,13 @@ static
 int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order)
 {
 	cs *T = NULL;
-
-	/* Symbolic analysis and numeric factorization : */
 	if (!(*S = cs_sqr(order, A, 1)) ||
-	    !(*N = cs_qr(A, *S)))
-		FREE_AND_RETURN_ZERO;
-	/* Drop zeros from V and sort it : */
-	cs_dropzeros((*N)->L);
-	T = cs_transpose((*N)->L, 1);
-	if (!T)
-		FREE_AND_RETURN_ZERO;
-	(*N)->L = cs_spfree((*N)->L);
-	(*N)->L = cs_transpose(T, 1);
-	if (!(*N)->L)
-		FREE_AND_RETURN_ZERO;
-	T = cs_spfree(T);
-	/* Drop zeros from R and sort it : */
-	T = cs_transpose((*N)->U, 1);
-	if (!T)
-		FREE_AND_RETURN_ZERO;
-	(*N)->U = cs_spfree((*N)->U);
-	(*N)->U = cs_transpose(T, 1);
-	if (!(*N)->U)
-		FREE_AND_RETURN_ZERO;
-	T = cs_spfree(T);
+	    !(*N = cs_qr(A, *S))) {
+		DO_FREE(T, *S, *N);
+		return 0;
+	}
+	DO_SORT((*N)->L);
+	DO_SORT((*N)->U);
 	return 1;
 }
 
@@ -917,7 +899,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	int *pp = NULL;
 	if (A->m < A->n)
 		error(_("QR factorization of m-by-n %s requires m >= n"),
-		      "dgCMatrix");
+		      ".gCMatrix");
 	if (!dgCMatrix_orf_(A, &S, &N, order_) ||
 	    !(pp = cs_pinv(S->pinv, S->m2))) {
 		if (!pp) {
@@ -926,7 +908,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 		}
 		if (asLogical(doError))
 			error(_("QR factorization of %s failed: out of memory"),
-			      "dgCMatrix");
+			      ".gCMatrix");
 		/* Defensive code will check with is(., "sparseQR") : */
 		UNPROTECT(1); /* val */
 		return ScalarLogical(NA_LOGICAL);
@@ -972,6 +954,9 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	UNPROTECT(1); /* val */
 	return val;
 }
+
+#undef DO_FREE
+#undef DO_SORT
 
 static
 int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
@@ -2032,8 +2017,8 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 {
 
-#define ERROR_SOLVE_OOM(_A_, _B_) \
-	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", #_A_, #_B_)
+#define ERROR_SOLVE_OOM(_ACL_, _BCL_) \
+	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", _ACL_, _BCL_)
 
 	SOLVE_START;
 
@@ -2085,11 +2070,11 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		cs *B, *X;
 		int *papinv = cs_pinv(pap, m);
 		if (!papinv)
-			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 		if (isNull(b)) {
 			B = cs_spalloc(m, n, n, 1, 0);
 			if (!B)
-				ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 			for (j = 0; j < n; ++j) {
 				B->p[j] = j;
 				B->i[j] = j;
@@ -2102,26 +2087,26 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			X = cs_permute(dgC2cs(b, 1), papinv, (int *) NULL, 1);
 		papinv = cs_free(papinv);
 		if (!X)
-			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 		B = X;
 
 		int i, k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
 
-#define DO_TRIANGULAR_SOLVE(_A_, _LOA_, _FRB_, _CLA_, _CLB_) \
+#define DO_TRIANGULAR_SOLVE(_A_, _ALO_, _BFR_, _ACL_, _BCL_) \
 		do { \
 			X = cs_spalloc(m, n, B->nzmax, 1, 0); \
 			if (!X) { \
-				if (_FRB_) \
+				if (_BFR_) \
 					B = cs_spfree(B); \
-				ERROR_SOLVE_OOM(_CLA_, _CLB_); \
+				ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 			} \
 			X->p[0] = nz = 0; \
 			nzmax = X->nzmax; \
 			for (j = 0, k = 0; j < n; ++j) { \
-				top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _LOA_); \
+				top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _ALO_); \
 				if (m - top > INT_MAX - nz) { \
-					if (_FRB_) \
+					if (_BFR_) \
 						B = cs_spfree(B); \
 					X = cs_spfree(X); \
 					error(_("attempt to construct sparse matrix with more than %s nonzero elements"), \
@@ -2131,15 +2116,15 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 				if (nz > nzmax) { \
 					nzmax = (nz <= INT_MAX / 2) ? 2 * nz : INT_MAX; \
 					if (!cs_sprealloc(X, nzmax)) { \
-						if (_FRB_) \
+						if (_BFR_) \
 							B = cs_spfree(B); \
 						X = cs_spfree(X); \
-						ERROR_SOLVE_OOM(_CLA_, _CLB_); \
+						ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 					} \
 				} \
 				X->p[j + 1] = nz; \
-				if (_LOA_) { \
-					for (i = top; i <    m; ++i) { \
+				if (_ALO_) { \
+					for (i = top; i < m; ++i) { \
 						X->i[k] =      iwork[i]; \
 						X->x[k] = work[iwork[i]]; \
 						++k; \
@@ -2152,19 +2137,19 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 					} \
 				} \
 			} \
-			if (_FRB_) \
+			if (_BFR_) \
 				B = cs_spfree(B); \
 			B = X; \
 		} while (0)
 
-		DO_TRIANGULAR_SOLVE(L, 1, 1, sparseLU, dgCMatrix);
-		DO_TRIANGULAR_SOLVE(U, 0, 1, sparseLU, dgCMatrix);
+		DO_TRIANGULAR_SOLVE(L, 1, 1, "sparseLU", ".gCMatrix");
+		DO_TRIANGULAR_SOLVE(U, 0, 1, "sparseLU", ".gCMatrix");
 
 		if (paq) {
 			X = cs_permute(B, paq, (int *) NULL, 1);
 			B = cs_spfree(B);
 			if (!X)
-				ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 			B = X;
 		}
 
@@ -2173,11 +2158,11 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		X = cs_transpose(B, 1);
 		B = cs_spfree(B);
 		if (!X)
-			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 		B = cs_transpose(X, 1);
 		X = cs_spfree(X);
 		if (!B)
-			ERROR_SOLVE_OOM(sparseLU, dgCMatrix);
+			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
 		PROTECT(r = cs2dgC(B, "dgCMatrix", 1));
 		B = cs_spfree(B);
@@ -2213,7 +2198,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	if (TYPEOF(system) != STRSXP || LENGTH(system) < 1 ||
 	    (system = STRING_ELT(system, 0)) == NA_STRING ||
 	    (ivalid = strmatch(CHAR(system), valid)) < 0)
-		error(_("invalid '%s' to %s()"), "system", __func__);
+		error(_("invalid '%s' to '%s'"), "system", __func__);
 
 	SOLVE_START;
 
@@ -2225,7 +2210,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		if (isNull(b)) {
 			B = cholmod_allocate_dense(m, n, m, CHOLMOD_REAL, &c);
 			if (!B)
-				ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
 			R_xlen_t m1a = (R_xlen_t) m + 1;
 			double *px = (double *) B->x;
 			Matrix_memset(px, 0, (R_xlen_t) m * n, sizeof(double));
@@ -2235,7 +2220,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			}
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
 			cholmod_free_dense(&B, &c);
 			PROTECT(r = cholmod2dge(X, 0,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
@@ -2243,7 +2228,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			B = dge2cholmod(b, 0);
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM(CHMfactor, dgeMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
 			PROTECT(r = cholmod2dge(X, 0, 'g'));
 		}
 		cholmod_free_dense(&X, &c);
@@ -2252,7 +2237,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		if (isNull(b)) {
 			B = cholmod_allocate_sparse(m, n, n, 1, 1, 0, CHOLMOD_REAL, &c);
 			if (!B)
-				ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			int *pp = (int *) B->p, *pi = (int *) B->i;
 			double *px = (double *) B->x;
 			for (j = 0; j < n; ++j) {
@@ -2263,13 +2248,13 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			pp[n] = n;
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			cholmod_free_sparse(&B, &c);
 			if (ivalid < 7) {
 				X->stype = (ivalid == 2 || ivalid == 4) ? -1 : 1;
 				cholmod_sort(X, &c);
 				if (!X)
-					ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+					ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			}
 			PROTECT(r = cholmod2dgC(X, 1,
 				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
@@ -2277,7 +2262,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			B = dgC2cholmod(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM(CHMfactor, dgCMatrix);
+				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			PROTECT(r = cholmod2dgC(X, 1, 'g'));
 		}
 		cholmod_free_sparse(&X, &c);
@@ -2346,7 +2331,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		if (isNull(b)) {
 			B = cs_spalloc(m, n, n, 1, 0);
 			if (!B)
-				ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+				ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
 			for (j = 0; j < n; ++j) {
 				B->p[j] = j;
 				B->i[j] = j;
@@ -2360,18 +2345,18 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
 		double *work = (double *) R_alloc((size_t) m, sizeof(double));
 
-		DO_TRIANGULAR_SOLVE(A, ul != 'U', isNull(b), dtCMatrix, dgCMatrix);
+		DO_TRIANGULAR_SOLVE(A, ul != 'U', isNull(b), ".tCMatrix", ".gCMatrix");
 
 		/* Drop zeros from B and sort it : */
 		cs_dropzeros(B);
 		X = cs_transpose(B, 1);
 		B = cs_spfree(B);
 		if (!X)
-			ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
 		B = cs_transpose(X, 1);
 		X = cs_spfree(X);
 		if (!B)
-			ERROR_SOLVE_OOM(dtCMatrix, dgCMatrix);
+			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
 
 		PROTECT(r = cs2dgC(B, cl, 1));
 		B = cs_spfree(B);
