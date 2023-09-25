@@ -930,8 +930,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	UNPROTECT(2); /* R, V */
 
 	SEXP beta = PROTECT(allocVector(REALSXP, A->n));
-	double *pbeta = N->B;
-	Matrix_memcpy(REAL(beta), pbeta, A->n, sizeof(double));
+	Matrix_memcpy(REAL(beta), N->B, A->n, sizeof(double));
 	SET_SLOT(val, Matrix_betaSym, beta);
 	UNPROTECT(1); /* beta */
 
