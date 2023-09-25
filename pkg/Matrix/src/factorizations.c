@@ -621,7 +621,7 @@ SEXP dpoMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		}
 		SET_SLOT(val, Matrix_permSym, perm);
 		UNPROTECT(1); /* perm */
-		}		
+		}
 		} else {
 #endif
 		double *px = REAL(x), *py = REAL(y);
@@ -1589,11 +1589,12 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	UNPROTECT(2); /* adimnames, rdimnames */
 
 	SOLVE_START;
+
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
-	char cl[] = ".geMatrix";
-	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
-	SEXP r = PROTECT(newObject(cl));
+	char rcl[] = ".geMatrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	SEXP r = PROTECT(newObject(rcl));
 
 	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
@@ -1664,21 +1665,21 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 SEXP BunchKaufman_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
+
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
 		XLENGTH(ax) == (R_xlen_t) m * m;
 
-	char cl[] = "...Matrix";
-	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	char rcl[] = "...Matrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
 	if (!isNull(b)) {
-		cl[1] = 'g';
-		cl[2] = 'e';
+		rcl[1] = 'g';
+		rcl[2] = 'e';
 	} else {
-		cl[1] = 's';
-		cl[2] = (unpacked) ? 'y' : 'p';
+		rcl[1] = 's';
+		rcl[2] = (unpacked) ? 'y' : 'p';
 	}
-
-	SEXP r = PROTECT(newObject(cl));
+	SEXP r = PROTECT(newObject(rcl));
 
 	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
@@ -1770,21 +1771,21 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 SEXP Cholesky_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
+
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
 		XLENGTH(ax) == (R_xlen_t) m * m;
 
-	char cl[] = "...Matrix";
-	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	char rcl[] = "...Matrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
 	if (!isNull(b)) {
-		cl[1] = 'g';
-		cl[2] = 'e';
+		rcl[1] = 'g';
+		rcl[2] = 'e';
 	} else {
-		cl[1] = 'p';
-		cl[2] = (unpacked) ? 'o' : 'p';
+		rcl[1] = 'p';
+		rcl[2] = (unpacked) ? 'o' : 'p';
 	}
-
-	SEXP r = PROTECT(newObject(cl));
+	SEXP r = PROTECT(newObject(rcl));
 
 	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
@@ -1912,21 +1913,21 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 SEXP dtrMatrix_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
+
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
 		XLENGTH(ax) == (R_xlen_t) m * m;
 
-	char cl[] = "...Matrix";
-	cl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
+	char rcl[] = "...Matrix";
+	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
 	if (!isNull(b)) {
-		cl[1] = 'g';
-		cl[2] = 'e';
+		rcl[1] = 'g';
+		rcl[2] = 'e';
 	} else {
-		cl[1] = 't';
-		cl[2] = (unpacked) ? 'r' : 'p';
+		rcl[1] = 't';
+		rcl[2] = (unpacked) ? 'r' : 'p';
 	}
-
-	SEXP r = PROTECT(newObject(cl));
+	SEXP r = PROTECT(newObject(rcl));
 
 	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 	int *prdim = INTEGER(rdim);
@@ -2035,11 +2036,12 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", #_A_, #_B_)
 
 	SOLVE_START;
+
 	SEXP r,
-	aL = PROTECT(GET_SLOT(a, Matrix_LSym)),
-	aU = PROTECT(GET_SLOT(a, Matrix_USym)),
-	ap = PROTECT(GET_SLOT(a, Matrix_pSym)),
-	aq = PROTECT(GET_SLOT(a, Matrix_qSym));
+		aL = PROTECT(GET_SLOT(a, Matrix_LSym)),
+		aU = PROTECT(GET_SLOT(a, Matrix_USym)),
+		ap = PROTECT(GET_SLOT(a, Matrix_pSym)),
+		aq = PROTECT(GET_SLOT(a, Matrix_qSym));
 	int j,
 		*pap = INTEGER(ap),
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : (int *) NULL;
@@ -2180,7 +2182,9 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		PROTECT(r = cs2dgC(B, "dgCMatrix", 1));
 		B = cs_spfree(B);
 	}
+
 	SOLVE_FINISH;
+
 	UNPROTECT(5); /* r, aq, ap, aU, aL */
 	return r;
 }
@@ -2210,7 +2214,9 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	    (system = STRING_ELT(system, 0)) == NA_STRING ||
 	    (ivalid = strmatch(CHAR(system), valid)) < 0)
 		error(_("invalid '%s' to %s()"), "system", __func__);
+
 	SOLVE_START;
+
 	SEXP r;
 	int j;
 	cholmod_factor *L = mf2cholmod(a);
@@ -2281,7 +2287,9 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		SET_SLOT(r, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
+
 	SOLVE_FINISH;
+
 	UNPROTECT(1); /* r */
 	return r;
 }
@@ -2289,6 +2297,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 {
 	SOLVE_START;
+
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int j;
@@ -2369,7 +2378,9 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	}
 	if (isNull(b))
 		SET_SLOT(r, Matrix_uploSym, auplo);
+
 	SOLVE_FINISH;
+
 	UNPROTECT(2); /* r, auplo */
 	return r;
 }
