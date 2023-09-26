@@ -662,19 +662,18 @@ setMethod("solve", signature(a = "matrix", b = "sparseVector"),
 
 ## a=dgCMatrix
 ## b=vector or 1-column matrix
+## x=double vector
+.solve.dgC.qr <- function(a, b, order = 3L, check = TRUE) { # -> MatrixModels
+    if(check && !is(a, "dgCMatrix"))
+        a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
+    .Call(dgCMatrix_qrsol, a, b, order) # calls cs_qrsol
+}
+
+## a=dgCMatrix
+## b=vector or 1-column matrix
 ## x=list(L, coef, Xty, resid)
 .solve.dgC.chol <- function(a, b, check = TRUE) { # -> MatrixModels
     if(check && !is(a, "dgCMatrix"))
         a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
     .Call(dgCMatrix_cholsol, a, b)
-}
-
-## *The* interface to cs_qrsol()
-## a=dgCMatrix
-## b=vector or 1-column matrix  {FIXME in ../src/dgCMatrix.c}
-## x=double vector
-.solve.dgC.qr <- function(a, b, order = 3L, check = TRUE) { # -> MatrixModels
-    if(check && !is(a, "dgCMatrix"))
-        a <- as(as(as(a, "CsparseMatrix"), "generalMatrix"), "dMatrix")
-    .Call(dgCMatrix_qrsol, a, b, order)
 }
