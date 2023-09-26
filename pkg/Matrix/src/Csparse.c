@@ -1,48 +1,64 @@
 #include "Mdefines.h"
 #include "Minlines.h"
-#include "cs.h"
-#include "chm_common.h"
+#include "cs-etc.h"
+#include "cholmod-etc.h"
 #include "Csparse.h"
-
-/* defined in factorizations.c : */
-cs *dgC2cs(SEXP, int);
-
-#define _t_Csparse_validate
-#include "t_Csparse_validate.c"
 
 // R: .validateCsparse(x, sort.if.needed = FALSE) :
 SEXP Csparse_validate2(SEXP x, SEXP maybe_modify)
 {
-    return Csparse_validate_(x, asLogical(maybe_modify));
-}
+	/* NB: we do *NOT* check a potential 'x' slot here, at all */
+	SEXP pslot = GET_SLOT(x, Matrix_pSym),
+		islot = GET_SLOT(x, Matrix_iSym);
+	Rboolean sorted, strictly;
+	int j, k,
+		*dims = INTEGER(GET_SLOT(x, Matrix_DimSym)),
+		nrow = dims[0],
+		ncol = dims[1],
+		*xp = INTEGER(pslot),
+		*xi = INTEGER(islot);
 
-/** "Cheap" C version of  Csparse_validate() - *not* sorting : */
-Rboolean isValid_Csparse(SEXP x)
-{
-    /* NB: we do *NOT* check a potential 'x' slot here, at all */
-    SEXP pslot = GET_SLOT(x, Matrix_pSym),
-	islot = GET_SLOT(x, Matrix_iSym);
-    int *dims = INTEGER(GET_SLOT(x, Matrix_DimSym)), j,
-	nrow = dims[0],
-	ncol = dims[1],
-	*xp = INTEGER(pslot),
-	*xi = INTEGER(islot);
-
-    if (length(pslot) != dims[1] + 1)
-	return FALSE;
-    if (xp[0] != 0)
-	return FALSE;
-    if (length(islot) < xp[ncol]) /* allow larger slots from over-allocation!*/
-	return FALSE;
-    for (j = 0; j < xp[ncol]; j++) {
-	if (xi[j] < 0 || xi[j] >= nrow)
-	    return FALSE;
-    }
-    for (j = 0; j < ncol; j++) {
-	if (xp[j] > xp[j + 1])
-	    return FALSE;
-    }
-    return TRUE;
+	if (length(pslot) != dims[1] + 1)
+		return mkString(_("slot p must have length = ncol(.) + 1"));
+	if (xp[0] != 0)
+		return mkString(_("first element of slot p must be zero"));
+	if (length(islot) < xp[ncol]) /* allow over-allocation ! */
+		mkString(_("last element of slot p must match length of slots i and x"));
+	for (j = 0; j < xp[ncol]; j++)
+		if (xi[j] < 0 || xi[j] >= nrow)
+			return mkString(_("all row indices must be between 0 and nrow-1"));
+	sorted = TRUE; strictly = TRUE;
+	for (j = 0; j < ncol; j++) {
+		if (xp[j] > xp[j + 1])
+			return mkString(_("slot p must be non-decreasing"));
+		if (sorted) /* only act if >= 2 entries in column j : */
+			for (k = xp[j] + 1; k < xp[j + 1]; k++) {
+				if (xi[k] < xi[k - 1])
+					sorted = FALSE;
+				else if (xi[k] == xi[k - 1])
+					strictly = FALSE;
+			}
+	}
+	if (sorted) {
+		if (!strictly)
+			return mkString(_("slot i is not *strictly* increasing inside a column"));
+	}
+	else if (!asLogical(maybe_modify))
+		return mkString(_("row indices are not sorted within columns"));
+	else {
+		cholmod_sparse *A = dgC2cholmod(x, 1);
+		A->sorted = 0;
+		if (!cholmod_sort(A, &c)) /* sorting in place !! */
+			error(_("'%s' returned error code"), "cholmod_sort");
+		/* Now re-check that row indices are strictly increasing */
+		/* (and not just increasing) within each column :        */
+		for (j = 0; j < ncol; j++) {
+			for (k = xp[j] + 1; k < xp[j + 1]; k++)
+				if (xi[k] == xi[k - 1])
+					return mkString(_("slot i is not *strictly* increasing inside a column (even after cholmod_l_sort)"));
+		}
+	}
+	return ScalarLogical(1);
 }
 
 enum x_slot_kind {
@@ -70,42 +86,53 @@ enum x_slot_kind {
 
 SEXP Csparse_MatrixMarket(SEXP x, SEXP fname)
 {
-    FILE *f = fopen(CHAR(asChar(fname)), "w");
+	static const char *valid[] = { VALID_CSPARSE, "" };
+	int ivalid = R_check_class_etc(x, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(x, __func__);
+	const char *class = valid[ivalid];
 
-    if (!f)
-	error(_("failure to open file \"%s\" for writing"),
-	      CHAR(asChar(fname)));
-    if (!cholmod_write_sparse(f, AS_CHM_SP(x),
-			      (CHM_SP)NULL, (char*) NULL, &c))
-	error(_("cholmod_write_sparse returned error code"));
-    fclose(f);
-    return R_NilValue;
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(x, &pid);
+	if (class[0] == 'l' || class[1] == 'i') {
+		/* defined in ./coerce.c : */
+		SEXP sparse_as_kind(SEXP, const char *, char);
+		REPROTECT(x = sparse_as_kind(x, class, 'd'), pid);
+		class = valid[R_check_class_etc(x, valid)];
+	}
+	if (class[1] == 't') {
+		/* defined in ./coerce.c : */
+		SEXP sparse_as_general(SEXP, const char *);
+		REPROTECT(x = sparse_as_general(x, class), pid);
+		class = valid[R_check_class_etc(x, valid)];
+	}
+
+	cholmod_sparse *A = dgC2cholmod(x, 1);
+	if (class[1] == 's') {
+		SEXP uplo = GET_SLOT(x, Matrix_uploSym);
+		char ul = *CHAR(STRING_ELT(uplo, 0));
+		A->stype = (ul == 'U') ? 1 : -1;
+	}
+
+	const char *fname_ = CHAR(asChar(fname));
+	FILE *f = fopen(fname_, "w");
+	if (!f)
+		error(_("failure to open file \"%s\" for writing"), fname_);
+	if (!cholmod_write_sparse(f, A, (cholmod_sparse *) NULL, (char *) NULL, &c))
+		error(_("'%s' returned error code"), "cholmod_write_sparse");
+	fclose(f);
+	return R_NilValue;
 }
 
 // seed will *not* be used unless it's -1 (inverse perm.) or  0 ("no" / identity) perm.
 static csd* Csparse_dmperm_raw(SEXP mat, SEXP seed)
 {
-    mat = PROTECT(duplicate(mat));
+    PROTECT(mat = duplicate(mat));
     cs *matx = dgC2cs(mat, HAS_SLOT(mat, Matrix_xSym));
     int iseed = asInteger(seed);
-    R_CheckStack();
     UNPROTECT(1);
     return cs_dmperm(matx, iseed); // -> ./cs.c
 }
-
-/* NB:  cs.h  defines the 'csd' struct as  (NB: csi :== int in  Matrix, for now)
-
-   typedef struct cs_dmperm_results    // cs_dmperm or cs_scc output
-   {
-   csi *p ;        // size m, row permutation
-   csi *q ;        // size n, column permutation
-   csi *r ;        // size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q)
-   csi *s ;        // size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
-   csi nb ;        // # of blocks in fine dmperm decomposition
-   csi rr [5] ;    // coarse row decomposition
-   csi cc [5] ;    // coarse column decomposition
-   } csd ;
-*/
 
 /* MM: should allow to return the full info above
    (Timothy Davis, p.126, explains why it's interesting ..) */

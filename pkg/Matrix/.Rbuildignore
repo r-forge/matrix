@@ -64,12 +64,15 @@ R/bandSparse\.R$
 R/corMatrix\.R$
 R/[dln](dense|sparse)?Matrix\.R$
 R/[dln](ge|tr|tp|sy|sp|po|pp|di|[gts][CRT])Matrix\.R$
+R/norm\.R$
 R/pMatrix\.R$
 R/packedMatrix\.R$
+R/rcond\.R$
 R/sparseQR\.R$
 R/symmetricMatrix\.R$
 R/triangularMatrix\.R$
 R/unpackedMatrix\.R$
+src/CHMfactor\.[ch]$
 src/Mutils\.[ch]$
 src/TMatrix_as\.[ch]$
 src/Tsparse\.[ch]$
@@ -88,6 +91,7 @@ src/ldense\.[ch]$
 src/lgCMatrix\.[ch]$
 src/packedMatrix\.[ch]$
 src/sparseQR\.[ch]$
+src/t_Csparse_validate\.c$
 src/t_gCMatrix_colSums\.c$
 src/t_matrix_to_Csp\.c$
 src/t_sparseVector\.c$

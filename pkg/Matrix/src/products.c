@@ -1,20 +1,11 @@
 #include "Lapack-etc.h"
+#include "cholmod-etc.h"
 #include "Mdefines.h"
-#include "chm_common.h"
+#include "idz.h"
 #include "coerce.h"
 #include "dense.h"
 #include "sparse.h"
 #include "products.h"
-
-/* defined in ./factorizations.c : */
-cholmod_sparse *dgC2cholmod(SEXP, int);
-cholmod_dense  *dge2cholmod(SEXP, int);
-SEXP cholmod2dgC(cholmod_sparse *, int, char);
-SEXP cholmod2dge(cholmod_dense  *, int, char);
-
-/* defined in ./idz.c : */
-void dtranspose2(  double *,   double *, int, int);
-void ztranspose2(Rcomplex *, Rcomplex *, int, int);
 
 static
 void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,

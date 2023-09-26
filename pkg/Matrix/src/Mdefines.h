@@ -202,7 +202,7 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define HIDE(...)
 
 #define ERROR_INVALID_TYPE(_X_, _FUNC_) \
-	error(_("invalid type \"%s\" in %s()"), \
+	error(_("invalid type \"%s\" in '%s'"), \
 	      type2char(TYPEOF(_X_)), _FUNC_)
 
 #define ERROR_INVALID_CLASS(_X_, _FUNC_) \
@@ -211,7 +211,7 @@ do { \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else { \
 		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
-		error(_("invalid class \"%s\" in %s()"), \
+		error(_("invalid class \"%s\" in '%s'"), \
 		      CHAR(STRING_ELT(class, 0)), _FUNC_); \
 		UNPROTECT(1); \
 	} \
