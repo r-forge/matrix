@@ -11,15 +11,15 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 #define RMKMS(_FORMAT_, ...) \
 	return mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
 
-	/* NB: below is mostly copied from CsparseMatrix_validate in ./validity.c */
-	
+	/* NB: below mostly copied from CsparseMatrix_validate in ./validity.c */
+
 	SEXP dim = GET_SLOT(x, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym));
 	UNPROTECT(2); /* i, p */
-	
+
 	if (TYPEOF(p) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
 	if (XLENGTH(p) - 1 != n)
@@ -226,9 +226,9 @@ SEXP tCsparse_diag(SEXP obj, SEXP op)
 	default:
 		break;
 	}
-	
+
 	UNPROTECT(3);
-    return ans;
+	return ans;
 }
 
 enum x_slot_kind {
@@ -259,7 +259,7 @@ enum x_slot_kind {
 SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
 	cs  *A = dgC2cs(x, 0);
-    csd *D = cs_dmperm(A, asInteger(seed));
+	csd *D = cs_dmperm(A, asInteger(seed));
 	if (!D)
 		return R_NilValue; /* MJ: why not an error ... ? */
 	int len = asInteger(nans);
@@ -312,10 +312,10 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 	default:
 		break;
 	}
-    D = cs_dfree(D);
-    setAttrib(ans, R_NamesSymbol, nms);
-    UNPROTECT(2);
-    return ans;
+	D = cs_dfree(D);
+	setAttrib(ans, R_NamesSymbol, nms);
+	UNPROTECT(2);
+	return ans;
 }
 
 /* writeMM(obj, file) */
