@@ -280,16 +280,18 @@ mat2triplet <- function(x, uniqT = FALSE) {
     else list(i = T@i + 1L, j = T@j + 1L, x = T@x)
 }
 
-.validateCsparse <- function(x, sort.if.needed = FALSE)
-    .Call(Csparse_validate2, x, sort.if.needed)
+.validateCsparse <- function(x, sort.if.needed = FALSE) {
+    if(sort.if.needed)
+        .Call(CsparseMatrix_validate_maybe_sorting, x)
+    else .Call(CsparseMatrix_validate, x)
+}
 
 dmperm <- function(x, nAns = 6L, seed = 0L) {
-    stopifnot(length(nAns <- as.integer(nAns)) == 1L, nAns %in% c(2L, 4L, 6L),
-              length(seed <- as.integer(seed)) == 1L, seed %in% -1:1)
-    x <- if(isS4(x))
-             .M2gen(.M2C(x), if(.M.kind(x) == "n") "n" else "d")
-         else .m2sparse(x, "dgC")
-    .Call(Csparse_dmperm, x, seed, nAns) # tolerating only [nd]gCMatrix 'x'
+    ## NB: result is determined entirely by nonzero pattern of 'x'
+    stopifnot(length(nAns <- as.integer(nAns)) == 1L, any(nAns == 2L * (1L:3L)),
+              length(seed <- as.integer(seed)) == 1L, any(seed == -1L:1L))
+    x <- if(isS4(x)) .M2gen(.M2C(x), "n") else .m2sparse(x, "ngC")
+    .Call(Csparse_dmperm, x, nAns, seed)
 }
 
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
@@ -417,16 +419,11 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 	   ">=" = e2 <= e1)
 }
 
-## FIXME:  kind = "diagBack" is not yet implemented
-##	would be much more efficient, but there's no CHOLMOD UI (?)
-
 .diag.dsC <- function(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag") {
-    force(Chx)
     if(!missing(Chx))
         stopifnot(.CHM.is.LDL(Chx), is.integer(Chx@p), is.double(Chx@x))
-    .Call(diag_tC, Chx, res.kind)
-    ##    ^^^^^^^ from ../src/Csparse.c
-    ## => res.kind in ("trace", "sumLog", "prod", "min", "max", "range", "diag", "diagBack")
+    .Call(tCsparse_diag, Chx, res.kind)
+    ##    ^^^^^^^^^^^^^ in ../src/Csparse.c
 }
 
 dimScale <- function(x, d1 = sqrt(1/diag(x, names = FALSE)), d2 = d1) {

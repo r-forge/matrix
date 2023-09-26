@@ -39,15 +39,16 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Matrix_rle_i, 2),
 	CALLDEF(Matrix_rle_d, 2),
 
-	CALLDEF(Csparse_validate2, 2),
-	CALLDEF(dCsparse_subassign, 4),
+	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
+	
+	CALLDEF(tCsparse_diag, 2),
+	CALLDEF(nCsparse_subassign, 4),
 	CALLDEF(lCsparse_subassign, 4),
 	CALLDEF(iCsparse_subassign, 4),
-	CALLDEF(nCsparse_subassign, 4),
+	CALLDEF(dCsparse_subassign, 4),
 	CALLDEF(zCsparse_subassign, 4),
-	CALLDEF(Csparse_MatrixMarket, 2),
 	CALLDEF(Csparse_dmperm, 3),
-	CALLDEF(diag_tC, 2),
+	CALLDEF(Csparse_MatrixMarket, 2),
 
 	CALLDEF(Matrix_expand_pointers, 1),
 	CALLDEF(R_all0, 1),
