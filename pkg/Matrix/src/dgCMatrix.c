@@ -1,10 +1,7 @@
 #include "Mdefines.h"
-#include "cs.h"
-#include "chm_common.h"
+#include "cs-etc.h"
+#include "cholmod-etc.h"
 #include "dgCMatrix.h"
-
-/* defined in factorizations.c : */
-cs *dgC2cs(SEXP, int);
 
 SEXP dgCMatrix_lusol(SEXP x, SEXP y)
 {
@@ -36,7 +33,6 @@ SEXP dgCMatrix_qrsol(SEXP x, SEXP y, SEXP ord)
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
     SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
 #endif
-    R_CheckStack();
 
     if (order < 0 || order > 3)
 	error(_("dgCMatrix_qrsol(., order) needs order in {0,..,3}"));
@@ -75,15 +71,20 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
      * where X = t(x) i.e. we pass  x = t(X)  as argument,
      * via  "Cholesky(X'X)" .. well not really:
      * cholmod_factorize("x", ..) finds L in  X'X = L'L directly */
-    CHM_SP cx = AS_CHM_SP(x);
-    /* FIXME: extend this to work in multivariate case, i.e. y a matrix with > 1 column ! */
-    SEXP y_ = PROTECT(coerceVector(y, REALSXP));
-    CHM_DN cy = AS_CHM_DN(y_), rhs, cAns, resid;
+	PROTECT(y = coerceVector(y, REALSXP));
+    cholmod_sparse *cx = dgC2cholmod(x, 1);
+    cholmod_dense *cy = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense)),
+		*rhs, *cAns, *resid;
+	memset(cy, 0, sizeof(cholmod_dense));
+	cy->nrow = cy->d = cy->nzmax = LENGTH(y);
+	cy->ncol = 1;
+	cy->x = REAL(y);
+	cy->dtype = CHOLMOD_DOUBLE;
+	cy->xtype = CHOLMOD_REAL;
     /* const -- but do not fit when used in calls: */
     double one[] = {1,0}, zero[] = {0,0}, neg1[] = {-1,0};
     const char *nms[] = {"L", "coef", "Xty", "resid", ""};
     SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms));
-    R_CheckStack();
 
     size_t n = cx->ncol;/* #{obs.} {x = t(X) !} */
     if (n < cx->nrow || n <= 0)
@@ -96,7 +97,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
      * here: rhs := 1 * x %*% y + 0 =  x %*% y =  X'y  */
     if (!(cholmod_sdmult(cx, 0 /* trans */, one, zero, cy, rhs, &c)))
 	error(_("cholmod_sdmult error (rhs)"));
-    CHM_FR L = cholmod_analyze(cx, &c);
+    cholmod_factor *L = cholmod_analyze(cx, &c);
     if (!cholmod_factorize(cx, L, &c))
 	error(_("cholmod_factorize failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
@@ -105,7 +106,7 @@ SEXP dgCMatrix_cholsol(SEXP x, SEXP y)
 	error(_("cholmod_solve (CHOLMOD_A) failed: status %d, minor %d from ncol %d"),
 	      c.status, L->minor, L->n);
     /* L : */
-    SET_VECTOR_ELT(ans, 0, chm_factor_to_SEXP(L, 0));
+    SET_VECTOR_ELT(ans, 0, cholmod2mf(L));
     /* coef : */
             SET_VECTOR_ELT(ans, 1, allocVector(REALSXP,  cx->nrow));
     Memcpy(REAL(VECTOR_ELT(ans, 1)), (double*)(cAns->x), cx->nrow);
