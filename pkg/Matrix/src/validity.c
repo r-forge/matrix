@@ -1,18 +1,6 @@
-#include <math.h> /* floor */
-#include <stdio.h> /* vsnprintf */
+#include <math.h> /* trunc */
 #include "Mdefines.h"
 #include "validity.h"
-
-static
-char *Matrix_sprintf(const char *format, ...)
-{
-	char *buf = R_alloc(Matrix_ErrorBufferSize, sizeof(char));
-	va_list args;
-	va_start(args, format);
-	vsnprintf(buf, Matrix_ErrorBufferSize, format, args);
-	va_end(args);
-	return buf;
-}
 
 #define     MK(_FORMAT_     )       mkString(_FORMAT_             )
 #define     MS(_FORMAT_, ...) Matrix_sprintf(_FORMAT_, __VA_ARGS__)
@@ -1063,7 +1051,7 @@ SEXP sparseVector_validate(SEXP obj)
 		while (nnz--) {
 			if (ISNAN(*pi))
 				RMKMS(_("'%s' slot contains NA"), "i");
-			tmp = floor(*(pi++));
+			tmp = trunc(*(pi++));
 			if (tmp < 1.0 || tmp > max)
 				RMKMS(_("'%s' slot has elements not in {%s} after truncation towards zero"),
 					  "i", "1,...,length");

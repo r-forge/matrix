@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-09-26 r4382)}{
+\section{Changes in version 1.6-2 (2023-09-26 r4383)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -157,6 +157,10 @@
 
       \code{tri[ul](<.t[rp]Matrix>, k)} was often wrong for nonzero
       \code{k}, setting too many bands to zero.
+
+      C-level \code{tCsparse_diag} (formerly \code{diag_tC}) now handles
+      structural zeros and \code{NaN} on the main diagonal correctly.
+      Option \code{"diagBack"} now works correctly.
     }
   }
   \subsection{Misc}{

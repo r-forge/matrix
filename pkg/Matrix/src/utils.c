@@ -1,3 +1,4 @@
+#include <stdio.h> /* vsnprintf */
 #include "Mdefines.h"
 #include "utils.h"
 
@@ -127,6 +128,16 @@ void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size)
 	}
 
 	return dest;
+}
+
+char *Matrix_sprintf(const char *format, ...)
+{
+	char *buf = R_alloc(Matrix_ErrorBufferSize, sizeof(char));
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buf, Matrix_ErrorBufferSize, format, args);
+	va_end(args);
+	return buf;
 }
 
 int equal_character_vectors(SEXP s1, SEXP s2, int n)

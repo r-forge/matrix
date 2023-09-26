@@ -200,7 +200,7 @@ ldet1.dsC <- function(x, ...)
 ## ~3% faster than ldet1:
 ldet2.dsC <- function(x, ...) {
     Ch <- Cholesky(x, super = FALSE, ...)
-    .Call(diag_tC, Ch, "sumLog")
+    .Call(tCsparse_diag, Ch, "sumLog")
 }
 
 ## <1% faster than ldet2:
