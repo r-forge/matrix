@@ -97,6 +97,7 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 				px += (unpacked) ? n1a : ((ul == 'U') ? j + 2 : n - j);
 				j += 1;
 			} else {
+				a = *px;
 				if (ul == 'U') {
 					px += (unpacked) ? n1a : j + 2;
 					b = *px;
