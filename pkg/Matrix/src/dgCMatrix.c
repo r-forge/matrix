@@ -6,14 +6,15 @@
 /* TODO: support NCOL(b) > 1                   */
 SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 {
-	cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = dgC2cs(a, 1);
+	SET_MCS_XTYPE(A->xtype);
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
 		duplicate(b) : coerceVector(b, REALSXP));
 	if (A->m != A->n || A->m <= 0)
 		error(_("'%s' is empty or not square"), "a");
 	if (LENGTH(b) != A->m)
 		error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
-	if (!cs_lusol(1, A, REAL(b), 1e-07))
+	if (!Matrix_cs_lusol(1, A, REAL(b), 1e-07))
 		error(_("'%s' failed"), "cs_lusol");
 	UNPROTECT(1);
 	return b;
@@ -29,7 +30,8 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	int order_ = asInteger(order);
 	if (order_ < 0 || order_ > 3)
 		order_ = 0;
-	cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = dgC2cs(a, 1);
+	SET_MCS_XTYPE(A->xtype);
 	PROTECT(b = (TYPEOF(b) == REALSXP)
 		? duplicate(b) : coerceVector(b, REALSXP));
 	if (LENGTH(b) != A->m)
@@ -37,7 +39,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	if (A->n <= 0 || A->n > A->m)
 		error(_("%s(%s, %s) requires m-by-n '%s' with m >= n > 0"),
 		      "dgCMatrix_qrsol", "a", "b", "a");
-	if (!cs_qrsol(order_, A, REAL(b)))
+	if (!Matrix_cs_qrsol(order_, A, REAL(b)))
 		error(_("'%s' failed"), "cs_qrsol");
 	if (A->n < A->m) {
 		SEXP tmp = allocVector(REALSXP, A->n);

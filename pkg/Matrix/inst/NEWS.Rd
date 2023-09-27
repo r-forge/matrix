@@ -173,12 +173,20 @@
       \item The content of \file{src/Mutils.[ch]} has been migrated
       to more transparently named files: \file{src/attrib.[ch]},
       \file{src/objects.[ch]}, etc.
+      Similarly, much of \file{src/factorizations.[ch]} have been
+      migrated to \file{src/solve.[ch]} and \file{src/determinant.[ch]}.
 
-      \item Most matrix product code has been migrated to
-      \file{products.[Rch]} from elsewhere.
+      \item All matrix product code has been migrated to
+      \file{products.[Rch]}.
 
       \item Files in \file{po/} and \file{inst/po/} have been updated
       due to more frequent use of \code{gettextf} in \file{R/*.R}.
+
+      \item C code becomes more prepared to handle complex matrices
+      and their factorizations.  Notably, new machinery in
+      \file{src/cs-etc.[ch]} will enable linking the CXSparse library
+      instead of the CSparse library, the latter supporting numeric
+      types but not complex ones.
     }
   }
 }

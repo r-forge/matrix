@@ -258,8 +258,9 @@ enum x_slot_kind {
 /* dmperm(x, nAns, seed) */
 SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
-	cs  *A = dgC2cs(x, 0);
-	csd *D = cs_dmperm(A, asInteger(seed));
+	Matrix_cs *A = dgC2cs(x, 0);
+	SET_MCS_XTYPE(A->xtype);
+	Matrix_csd *D = Matrix_cs_dmperm(A, asInteger(seed));
 	if (!D)
 		return R_NilValue; /* MJ: why not an error ... ? */
 	int len = asInteger(nans);
@@ -312,7 +313,7 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 	default:
 		break;
 	}
-	D = cs_dfree(D);
+	D = Matrix_cs_dfree(D);
 	setAttrib(ans, R_NamesSymbol, nms);
 	UNPROTECT(2);
 	return ans;
