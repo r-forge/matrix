@@ -200,8 +200,8 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(BunchKaufman_expand, 2),
 
 	CALLDEF(denseLU_determinant, 2),
-	CALLDEF(BunchKaufman_determinant, 3),
-	CALLDEF(Cholesky_determinant, 3),
+	CALLDEF(BunchKaufman_determinant, 2),
+	CALLDEF(Cholesky_determinant, 2),
 	CALLDEF(sparseLU_determinant, 2),
 	CALLDEF(sparseQR_determinant, 2),
 	CALLDEF(CHMfactor_determinant, 3),
