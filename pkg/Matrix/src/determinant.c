@@ -3,9 +3,6 @@
 #include "cholmod-etc.h"
 #include "determinant.h"
 
-/* defined in ./perm.c : */
-int signPerm(const int *, int, int);
-
 static
 SEXP mkDet(double modulus, int logarithm, int sign)
 {
@@ -34,62 +31,105 @@ SEXP denseLU_determinant(SEXP obj, SEXP logarithm)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
 	if (m != n) \
 		error(_("determinant of non-square matrix is undefined")); \
-	int givelog = asLogical(logarithm) != 0, sign = 1; \
+	int givelog = asLogical(logarithm) != 0; \
 	double modulus = 0.0; /* result for n == 0 */
 
 	DETERMINANT_START;
-	if (n > 0) {
-		SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		int j, *ppivot = INTEGER(pivot);
-		R_xlen_t n1a = (R_xlen_t) n + 1;
-		double *px = REAL(x);
 
-		for (j = 0; j < n; ++j, px += n1a, ++ppivot) {
-			if (*px < 0.0) {
-				modulus += log(-(*px));
-				if (*ppivot == j + 1)
-					sign = -sign;
-			} else {
-				/* incl. 0, NaN cases */
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	if (n > 0) {
+	int j;
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x);
+		for (j = 0; j < n; ++j) {
+			modulus += log(hypot((*px).r, (*px).i));
+			px += n1a;
+		}
+	} else {
+		SEXP pivot = GET_SLOT(obj, Matrix_permSym);
+		int *ppivot = INTEGER(pivot);
+			double *px = REAL(x);
+		for (j = 0; j < n; ++j) {
+			if (ISNAN(*px) || *px >= 0.0) {
 				modulus += log(*px);
 				if (*ppivot != j + 1)
 					sign = -sign;
+			} else {
+				modulus += log(-(*px));
+				if (*ppivot == j + 1)
+					sign = -sign;
 			}
+			px += n1a;
+			ppivot += 1;
 		}
-		UNPROTECT(2); /* x, pivot */
 	}
+	}
+
+	UNPROTECT(1); /* x */
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm, SEXP packed)
+SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm)
 {
 	DETERMINANT_START;
-	if (n > 0) {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-		int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
-		UNPROTECT(1); /* uplo */
 
-		SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		int j = 0, unpacked = !asLogical(packed),
-			*ppivot = INTEGER(pivot);
-		R_xlen_t n1a = (R_xlen_t) n + 1;
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	if (n > 0) {
+	SEXP pivot = GET_SLOT(obj, Matrix_permSym);
+	int *ppivot = INTEGER(pivot);
+
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+
+	int j = 0, unpacked = (Matrix_int_fast64_t) n * n <= R_XLEN_T_MAX &&
+		XLENGTH(x) == (R_xlen_t) m * m;
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x), a, b, c;
+		while (j < n) {
+			if (ppivot[j] > 0) {
+				modulus += log(hypot((*px).r, (*px).i));
+				px += (unpacked) ? n1a : ((ul == 'U') ? j + 2 : n - j);
+				j += 1;
+			} else {
+				if (ul == 'U') {
+					px += (unpacked) ? n1a : j + 2;
+					b = *px;
+					c = *(px - 1);
+					px += (unpacked) ? n1a : j + 3;
+				} else {
+					c = *(px + 1);
+					px += (unpacked) ? n1a : n - j;
+					b = *px;
+					px += (unpacked) ? n1a : n - j - 1;
+				}
+				modulus += log(hypot(a.r * b.r - a.i * b.i -
+									 c.r * c.r + c.i * c.i,
+									 a.r * b.i + a.i * b.r -
+									 2.0 * c.r * c.i));
+				j += 2;
+			}
+		}
+	} else {
 		double *px = REAL(x), a, b, c, logab, logcc;
 		while (j < n) {
 			if (ppivot[j] > 0) {
-				if (*px < 0.0) {
+				if (*px >= 0.0)
+					modulus += log(*px);
+				else {
 					modulus += log(-(*px));
 					sign = -sign;
-				} else {
-					/* incl. 0, NaN cases */
-					modulus += log(*px);
 				}
-				px += (unpacked) ? n1a : ((upper) ? j + 2 : n - j);
+				px += (unpacked) ? n1a : ((ul == 'U') ? j + 2 : n - j);
 				j += 1;
 			} else {
 				a = *px;
-				if (upper) {
+				if (ul == 'U') {
 					px += (unpacked) ? n1a : j + 2;
 					b = *px;
 					c = *(px - 1);
@@ -117,155 +157,226 @@ SEXP BunchKaufman_determinant(SEXP obj, SEXP logarithm, SEXP packed)
 				j += 2;
 			}
 		}
-		UNPROTECT(2); /* x, pivot */
 	}
+	}
+
+	UNPROTECT(1); /* x */
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP Cholesky_determinant(SEXP obj, SEXP logarithm, SEXP packed)
+SEXP Cholesky_determinant(SEXP obj, SEXP logarithm)
 {
 	DETERMINANT_START;
-	if (n > 0) {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
-		int upper = *CHAR(STRING_ELT(uplo, 0)) == 'U';
-		UNPROTECT(1); /* uplo */
 
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-		int j, unpacked = !asLogical(packed);
-		R_xlen_t n1a = (R_xlen_t) n + 1;
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	if (n > 0) {
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+
+	int j, unpacked = (Matrix_int_fast64_t) n * n <= R_XLEN_T_MAX &&
+		XLENGTH(x) == (R_xlen_t) m * m;
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x);
+		for (j = 0; j < n; ++j) {
+			modulus += log(hypot((*px).r, (*px).i));
+			px += (unpacked) ? n1a : ((ul == 'U') ? j + 2 : n - j);
+		}
+	} else {
 		double *px = REAL(x);
 		for (j = 0; j < n; ++j) {
-			if (*px < 0.0) {
+			if (ISNAN(*px) || *px >= 0.0)
+				modulus += log(*px);
+			else {
 				modulus += log(-(*px));
 				sign = -sign;
-			} else {
-				/* incl. 0, NaN cases */
-				modulus += log(*px);
 			}
-			px += (unpacked) ? n1a : ((upper) ? j + 2 : n - j);
+			px += (unpacked) ? n1a : ((ul == 'U') ? j + 2 : n - j);
 		}
-		modulus *= 2.0;
-		UNPROTECT(1); /* x */
 	}
+	modulus *= 2.0;
+	}
+
+	UNPROTECT(1); /* x */
 	return mkDet(modulus, givelog, sign);
 }
 
 SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
 {
 	DETERMINANT_START;
-	if (n > 0) {
-		SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
-			p = PROTECT(GET_SLOT(U, Matrix_pSym)),
-			i = PROTECT(GET_SLOT(U, Matrix_iSym)),
-			x = PROTECT(GET_SLOT(U, Matrix_xSym));
-		int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
-		double *px = REAL(x);
 
+	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
+		x = PROTECT(GET_SLOT(U, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	if (n > 0) {
+	SEXP p = PROTECT(GET_SLOT(U, Matrix_pSym)),
+		i = PROTECT(GET_SLOT(U, Matrix_iSym));
+	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x);
 		for (j = 0; j < n; ++j) {
-			kend = *(++pp);
-			if (kend > k && pi[kend - 1] == j) {
-				if (px[kend - 1] < 0.0) {
-					modulus += log(-px[kend - 1]);
-					sign = -sign;
-				} else {
-					/* incl. 0, NaN cases */
-					modulus += log(px[kend - 1]);
-				}
-			} else {
-				UNPROTECT(4); /* x, i, p, U */
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j)
+				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
+			else {
+				UNPROTECT(4); /* i, p, x, U */
 				return mkDet(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
-		UNPROTECT(4); /* x, i, p, U */
+	} else {
+		double *px = REAL(x);
+		for (j = 0; j < n; ++j) {
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j) {
+				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)
+					modulus += log(px[kend - 1]);
+				else {
+					modulus += log(-px[kend - 1]);
+					sign = -sign;
+				}
+			} else {
+				UNPROTECT(4); /* i, p, x, U */
+				return mkDet(R_NegInf, givelog, 1);
+			}
+			k = kend;
+		}
 
-		PROTECT(p = GET_SLOT(obj, Matrix_pSym));
+		/* defined in ./perm.c : */
+		int signPerm(const int *, int, int);
+
+		p = GET_SLOT(obj, Matrix_pSym);
 		if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 			sign = -sign;
-		UNPROTECT(1); /* p */
-		PROTECT(p = GET_SLOT(obj, Matrix_qSym));
+		p = GET_SLOT(obj, Matrix_qSym);
 		if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 			sign = -sign;
-		UNPROTECT(1); /* p */
 	}
+	UNPROTECT(2); /* i, p */
+	}
+
+	UNPROTECT(2); /* x, U */
 	return mkDet(modulus, givelog, sign);
 }
 
 SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 {
 	DETERMINANT_START;
+
+	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym)),
+		x = PROTECT(GET_SLOT(R, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	dim = GET_SLOT(R, Matrix_DimSym);
+	if (INTEGER(dim)[0] > n)
+		error(_("%s(<%s>) does not support structurally rank deficient case"),
+			  "determinant", "sparseQR");
+
 	if (n > 0) {
-		SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
-		PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
-		if (INTEGER(dim)[0] > n)
-			error(_("%s(<%s>) does not support structurally rank deficient case"),
-			      "determinant", "sparseQR");
-		UNPROTECT(1); /* dim */
-
-		SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),
-			i = PROTECT(GET_SLOT(R, Matrix_iSym)),
-			x = PROTECT(GET_SLOT(R, Matrix_xSym));
-		int *pp = INTEGER(p), *pi = INTEGER(i), j, k = 0, kend;
-		double *px = REAL(x);
-
+	SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),
+		i = PROTECT(GET_SLOT(R, Matrix_iSym));
+	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x);
 		for (j = 0; j < n; ++j) {
-			kend = *(++pp);
-			if (kend > k && pi[kend - 1] == j) {
-				if (px[kend - 1] < 0.0) {
-					modulus += log(-px[kend - 1]);
-					sign = -sign;
-				} else {
-					/* incl. 0, NaN cases */
-					modulus += log(px[kend - 1]);
-				}
-			} else {
-				UNPROTECT(4); /* x, i, p, R */
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j)
+				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
+			else {
+				UNPROTECT(4); /* i, p, x, U */
 				return mkDet(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
-		UNPROTECT(4); /* x, i, p, U */
+	} else {
+		double *px = REAL(x);
+		for (j = 0; j < n; ++j) {
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j) {
+				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)
+					modulus += log(px[kend - 1]);
+				else {
+					modulus += log(-px[kend - 1]);
+					sign = -sign;
+				}
+			} else {
+				UNPROTECT(4); /* i, p, x, R */
+				return mkDet(R_NegInf, givelog, 1);
+			}
+			k = kend;
+		}
 
-		PROTECT(p = GET_SLOT(obj, Matrix_pSym));
+		/* defined in ./perm.c : */
+		int signPerm(const int *, int, int);
+
+		p = GET_SLOT(obj, Matrix_pSym);
 		if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 			sign = -sign;
-		UNPROTECT(1); /* p */
-		PROTECT(p = GET_SLOT(obj, Matrix_qSym));
+		p = GET_SLOT(obj, Matrix_qSym);
 		if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 			sign = -sign;
-		UNPROTECT(1); /* p */
 		if (n % 2)
 			sign = -sign;
 	}
+	UNPROTECT(2); /* i, p */
+	}
+
+	UNPROTECT(2); /* x, R */
 	return mkDet(modulus, givelog, sign);
 }
 
 SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt)
 {
 	DETERMINANT_START;
+
+	cholmod_factor *L = mf2cholmod(obj);
+	int sign = (L->xtype == CHOLMOD_COMPLEX) ? NA_INTEGER : 1;
+
 	if (n > 0) {
-		int sqrt_ = asLogical(sqrt);
-		cholmod_factor *L = mf2cholmod(obj);
-		if (L->is_super) {
-			int k, j, nc,
-				nsuper = (int) L->nsuper,
-				*psuper = (int *) L->super,
-				*ppi = (int *) L->pi,
-				*ppx = (int *) L->px;
-			double *px = (double *) L->x, *px_;
-			R_xlen_t nr1a;
+	int j, sqrt_ = asLogical(sqrt);
+	if (L->is_super) {
+		int k, nc,
+			nsuper = (int) L->nsuper,
+			*psuper = (int *) L->super,
+			*ppi = (int *) L->pi,
+			*ppx = (int *) L->px;
+		R_xlen_t nr1a;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *px = (Rcomplex *) L->x, *px_;
 			for (k = 0; k < nsuper; ++k) {
-				nc = psuper[k+1] - psuper[k];
-				nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
+				px_ = px + ppx[k];
+				for (j = 0; j < nc; ++j) {
+					modulus += log(hypot((*px_).r, (*px_).i));
+					px_ += nr1a;
+				}
+			}
+		} else {
+			double *px = (double *) L->x, *px_;
+			for (k = 0; k < nsuper; ++k) {
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
 				px_ = px + ppx[k];
 				for (j = 0; j < nc; ++j) {
 					modulus += log(*px_);
 					px_ += nr1a;
 				}
 			}
-			modulus *= 2.0;
+		}
+		modulus *= 2.0;
+	} else {
+		int *pp = (int *) L->p;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *px = (Rcomplex *) L->x;
+			for (j = 0; j < n; ++j)
+				modulus += log(hypot(px[pp[j]].r, px[pp[j]].i));
+			if (L->is_ll)
+				modulus *= 2.0;
 		} else {
-			int j, *pp = (int *) L->p;
 			double *px = (double *) L->x;
 			if (L->is_ll) {
 				for (j = 0; j < n; ++j)
@@ -273,20 +384,21 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt)
 				modulus *= 2.0;
 			} else {
 				for (j = 0; j < n; ++j) {
-					if (px[pp[j]] < 0.0) {
+					if (ISNAN(px[pp[j]]) || px[pp[j]] >= 0.0)
+						modulus += log(px[pp[j]]);
+					else {
 						if (sqrt_)
 							return mkDet(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]]);
 						sign = -sign;
-					} else {
-						/* incl. 0, NaN cases */
-						modulus += log(px[pp[j]]);
 					}
 				}
 			}
 		}
-		if (sqrt_)
-			modulus *= 0.5;
 	}
+	if (sqrt_)
+		modulus *= 0.5;
+	}
+
 	return mkDet(modulus, givelog, sign);
 }

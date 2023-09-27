@@ -47,21 +47,17 @@ setMethod("determinant", signature(x = "sparseQR", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               .Call(sparseQR_determinant, x, logarithm))
 
-setMethod("determinant", signature(x = "BunchKaufman", logarithm = "logical"),
+for(.cl in c("BunchKaufman", "pBunchKaufman"))
+setMethod("determinant", signature(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(BunchKaufman_determinant, x, logarithm, FALSE))
+              .Call(BunchKaufman_determinant, x, logarithm))
+rm(.cl)
 
-setMethod("determinant", signature(x = "pBunchKaufman", logarithm = "logical"),
+for(.cl in c("Cholesky", "pCholesky"))
+setMethod("determinant", signature(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(BunchKaufman_determinant, x, logarithm, TRUE))
-
-setMethod("determinant", signature(x = "Cholesky", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-              .Call(Cholesky_determinant, x, logarithm, FALSE))
-
-setMethod("determinant", signature(x = "pCholesky", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-              .Call(Cholesky_determinant, x, logarithm, TRUE))
+              .Call(Cholesky_determinant, x, logarithm))
+rm(.cl)
 
 setMethod("determinant", signature(x = "CHMfactor", logarithm = "logical"),
           function(x, logarithm = TRUE, sqrt = TRUE, ...) {
