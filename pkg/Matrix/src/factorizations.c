@@ -8,10 +8,6 @@
 SEXP get_factor(SEXP, const char *);
 void set_factor(SEXP, const char *, SEXP);
 
-/* defined in ./chm_common.c : */
-void CHM_store_common(void);
-void CHM_restore_common(void);
-
 static
 SEXP dgeMatrix_trf_(SEXP obj, int warn)
 {
@@ -312,37 +308,38 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 
 #define DO_FREE(_A_, _S_, _N_) \
 do { \
-	if (_A_) \
-		_A_ = cs_spfree(_A_); \
-	if (_S_) \
-		_S_ = cs_sfree(_S_); \
-	if (_N_) \
-		_N_ = cs_nfree(_N_); \
+	if (!(_A_)) \
+		_A_ = Matrix_cs_spfree(_A_); \
+	if (!(_S_)) \
+		_S_ = Matrix_cs_sfree (_S_); \
+	if (!(_N_)) \
+		_N_ = Matrix_cs_nfree (_N_); \
 } while (0)
 
-#define DO_SORT(_X_) \
+#define DO_SORT(_A_) \
 do { \
-	cs_dropzeros(_X_); \
-	T = cs_transpose(_X_, 1); \
+	Matrix_cs_dropzeros(_A_); \
+	T = Matrix_cs_transpose(_A_, 1); \
 	if (!T) { \
 		DO_FREE(T, *S, *N); \
 		return 0; \
 	} \
-	_X_ = cs_spfree(_X_); \
-	_X_ = cs_transpose(T, 1); \
-	if (!(_X_)) { \
+	_A_ = Matrix_cs_spfree(_A_); \
+	_A_ = Matrix_cs_transpose(T, 1); \
+	if (!(_A_)) { \
 		DO_FREE(T, *S, *N); \
 		return 0; \
 	} \
-	T = cs_spfree(T); \
+	T = Matrix_cs_spfree(T); \
 } while (0)
 
 static
-int dgCMatrix_trf_(const cs *A, css **S, csn **N, int order, double tol)
+int dgCMatrix_trf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
+                   int order, double tol)
 {
-	cs *T = NULL;
-	if (!(*S = cs_sqr(order, A, 0)) ||
-	    !(*N = cs_lu(A, *S, tol))) {
+	Matrix_cs *T = NULL;
+	if (!(*S = Matrix_cs_sqr(order, A, 0)) ||
+	    !(*N = Matrix_cs_lu(A, *S, tol))) {
 		DO_FREE(T, *S, *N);
 		return 0;
 	}
@@ -368,19 +365,21 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 		return val;
 	PROTECT(val = newObject("sparseLU"));
 
-	const cs *A = dgC2cs(obj, 1);
-	css *S = NULL;
-	csn *N = NULL;
+	Matrix_cs *A = dgC2cs(obj, 1);
+	SET_MCS_XTYPE(A->xtype);
+
+	Matrix_css *S = NULL;
+	Matrix_csn *N = NULL;
 	int *P = NULL;
 
 	if (A->m != A->n)
 		error(_("LU factorization of m-by-n %s requires m == n"),
 		      ".gCMatrix");
 	if (!dgCMatrix_trf_(A, &S, &N, order_, tol_) ||
-	    !(P = cs_pinv(N->pinv, A->m))) {
+	    !(P = Matrix_cs_pinv(N->pinv, A->m))) {
 		if (!P) {
-			S = cs_sfree(S);
-			N = cs_nfree(N);
+			S = Matrix_cs_sfree(S);
+			N = Matrix_cs_nfree(N);
 		}
 		if (asLogical(doError))
 			error(_("LU factorization of %s failed: out of memory or near-singular"),
@@ -398,8 +397,8 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	SEXP L = PROTECT(cs2dgC(N->L, "dtCMatrix", 1)),
-		U = PROTECT(cs2dgC(N->U, "dtCMatrix", 1)),
+	SEXP L = PROTECT(cs2dgC(N->L, 1, 't')),
+		U = PROTECT(cs2dgC(N->U, 1, 't')),
 		uplo = PROTECT(mkString("L"));
 	SET_SLOT(L, Matrix_uploSym, uplo);
 	SET_SLOT(val, Matrix_LSym, L);
@@ -417,9 +416,9 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 		UNPROTECT(1); /* q */
 	}
 
-	S = cs_sfree(S);
-	N = cs_nfree(N);
-	P = cs_free(P);
+	S = Matrix_cs_sfree(S);
+	N = Matrix_cs_nfree(N);
+	P = Matrix_cs_free(P);
 
 	set_factor(obj, (order_) ? "sparseLU~" : "sparseLU", val);
 	UNPROTECT(1); /* val */
@@ -427,11 +426,12 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 }
 
 static
-int dgCMatrix_orf_(const cs *A, css **S, csn **N, int order)
+int dgCMatrix_orf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
+                   int order)
 {
-	cs *T = NULL;
-	if (!(*S = cs_sqr(order, A, 1)) ||
-	    !(*N = cs_qr(A, *S))) {
+	Matrix_cs *T = NULL;
+	if (!(*S = Matrix_cs_sqr(order, A, 1)) ||
+	    !(*N = Matrix_cs_qr(A, *S))) {
 		DO_FREE(T, *S, *N);
 		return 0;
 	}
@@ -451,19 +451,21 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 		return val;
 	PROTECT(val = newObject("sparseQR"));
 
-	const cs *A = dgC2cs(obj, 1);
-	css *S = NULL;
-	csn *N = NULL;
+	Matrix_cs *A = dgC2cs(obj, 1);
+	SET_MCS_XTYPE(A->xtype);
+
+	Matrix_css *S = NULL;
+	Matrix_csn *N = NULL;
 	int *P = NULL;
 
 	if (A->m < A->n)
 		error(_("QR factorization of m-by-n %s requires m >= n"),
 		      ".gCMatrix");
 	if (!dgCMatrix_orf_(A, &S, &N, order_) ||
-	    !(P = cs_pinv(S->pinv, S->m2))) {
+	    !(P = Matrix_cs_pinv(S->pinv, S->m2))) {
 		if (!P) {
-			S = cs_sfree(S);
-			N = cs_nfree(N);
+			S = Matrix_cs_sfree(S);
+			N = Matrix_cs_nfree(N);
 		}
 		if (asLogical(doError))
 			error(_("QR factorization of %s failed: out of memory"),
@@ -481,8 +483,8 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	SEXP V = PROTECT(cs2dgC(N->L, "dgCMatrix", 1)),
-		R = PROTECT(cs2dgC(N->U, "dgCMatrix", 1));
+	SEXP V = PROTECT(cs2dgC(N->L, 1, 'g')),
+		R = PROTECT(cs2dgC(N->U, 1, 'g'));
 	SET_SLOT(val, Matrix_VSym, V);
 	SET_SLOT(val, Matrix_RSym, R);
 	UNPROTECT(2); /* R, V */
@@ -503,9 +505,9 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 		UNPROTECT(1); /* q */
 	}
 
-	S = cs_sfree(S);
-	N = cs_nfree(N);
-	P = cs_free(P);
+	S = Matrix_cs_sfree(S);
+	N = Matrix_cs_nfree(N);
+	P = Matrix_cs_free(P);
 
 	set_factor(obj, (order_) ? "sparseQR~" : "sparseQR", val);
 	UNPROTECT(1); /* val */
@@ -519,6 +521,10 @@ static
 int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
                    int perm, int ldl, int super, double mult)
 {
+	/* defined in ./chm_common.c : */
+	void CHM_store_common(void);
+	void CHM_restore_common(void);
+
 	CHM_store_common();
 
 	if (*L == NULL) {
@@ -548,7 +554,7 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
 	double beta[2];
 	beta[0] = mult;
 	beta[1] = 0.0;
-	int res = cholmod_factorize_p(A, beta, (int *) NULL, 0, *L, &c);
+	int res = cholmod_factorize_p(A, beta, NULL, 0, *L, &c);
 
 	CHM_restore_common();
 
@@ -845,10 +851,9 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
 	cholmod_sparse *A = dgC2cholmod(parent, 1);
 	if (Matrix_shape(parent) == 's') {
-		SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
+		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 		A->stype = (ul == 'U') ? 1 : -1;
-		UNPROTECT(1);
 	}
 
 	dpCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
@@ -858,8 +863,9 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1);
 
-	UNPROTECT(2);
+	UNPROTECT(1);
 	return res;
 }
 
@@ -871,10 +877,9 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
 	cholmod_sparse *A = dgC2cholmod(parent, 1);
 	if (Matrix_shape(parent) == 's') {
-		SEXP uplo = PROTECT(GET_SLOT(parent, Matrix_uploSym));
+		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
 		A->stype = (ul == 'U') ? 1 : -1;
-		UNPROTECT(1);
 	}
 
 	cholmod_updown(asLogical(update) != 0, A, L, &c);
@@ -884,7 +889,8 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	SET_SLOT(res, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1);
 
-	UNPROTECT(2);
+	UNPROTECT(1);
 	return res;
 }

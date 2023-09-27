@@ -512,9 +512,13 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		aq = PROTECT(GET_SLOT(a, Matrix_qSym));
 	int j,
 		*pap = INTEGER(ap),
-		*paq = (LENGTH(aq)) ? INTEGER(aq) : (int *) NULL;
+		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
 	double *work = (double *) R_alloc((size_t) m, sizeof(double));
-	cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
+	Matrix_cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
+	if (L->xtype != U->xtype)
+		error(_("'%s' and '%s' slots have different '%s'"),
+		      "L", "U", "xtype");
+	SET_MCS_XTYPE(L->xtype);
 	if (!asLogical(sparse)) {
 		PROTECT(r = newObject("dgeMatrix"));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
@@ -528,20 +532,20 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			Matrix_memset(prx, 0, mn, sizeof(double));
 			for (j = 0; j < n; ++j) {
 				prx[j] = 1.0;
-				cs_pvec(pap, prx, work, m);
-				cs_lsolve(L, work);
-				cs_usolve(U, work);
-				cs_ipvec(paq, work, prx, m);
+				Matrix_cs_pvec(pap, prx, work, m);
+				Matrix_cs_lsolve(L, work);
+				Matrix_cs_usolve(U, work);
+				Matrix_cs_ipvec(paq, work, prx, m);
 				prx += m;
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			double *pbx = REAL(bx);
 			for (j = 0; j < n; ++j) {
-				cs_pvec(pap, pbx, work, m);
-				cs_lsolve(L, work);
-				cs_usolve(U, work);
-				cs_ipvec(paq, work, prx, m);
+				Matrix_cs_pvec(pap, pbx, work, m);
+				Matrix_cs_lsolve(L, work);
+				Matrix_cs_usolve(U, work);
+				Matrix_cs_ipvec(paq, work, prx, m);
 				prx += m;
 				pbx += m;
 			}
@@ -550,25 +554,26 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 	} else {
-		cs *B, *X;
-		int *papinv = cs_pinv(pap, m);
+		Matrix_cs *B, *X;
+		int *papinv = Matrix_cs_pinv(pap, m);
 		if (!papinv)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 		if (isNull(b)) {
-			B = cs_spalloc(m, n, n, 1, 0);
+			B = Matrix_cs_spalloc(m, n, n, 1, 0);
 			if (!B)
 				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+			double *B__x = (double *) B->x;
 			for (j = 0; j < n; ++j) {
 				B->p[j] = j;
 				B->i[j] = j;
-				B->x[j] = 1.0;
+				B__x[j] = 1.0;
 			}
 			B->p[n] = n;
-			X = cs_permute(        B, papinv, (int *) NULL, 1);
-			B = cs_spfree(B);
+			X = Matrix_cs_permute(B, papinv, NULL, 1);
+			B = Matrix_cs_spfree(B);
 		} else
-			X = cs_permute(dgC2cs(b, 1), papinv, (int *) NULL, 1);
-		papinv = cs_free(papinv);
+			X = Matrix_cs_permute(dgC2cs(b, 1), papinv, NULL, 1);
+		papinv = Matrix_cs_free(papinv);
 		if (!X)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 		B = X;
@@ -578,50 +583,52 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 
 #define DO_TRIANGULAR_SOLVE(_A_, _ALO_, _BFR_, _ACL_, _BCL_) \
 		do { \
-			X = cs_spalloc(m, n, B->nzmax, 1, 0); \
+			X = Matrix_cs_spalloc(m, n, B->nzmax, 1, 0); \
+			double *X__x = (double *) X->x; \
 			if (!X) { \
 				if (_BFR_) \
-					B = cs_spfree(B); \
+					B = Matrix_cs_spfree(B); \
 				ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 			} \
 			X->p[0] = nz = 0; \
 			nzmax = X->nzmax; \
 			for (j = 0, k = 0; j < n; ++j) { \
-				top = cs_spsolve(_A_, B, j, iwork, work, (int *) NULL, _ALO_); \
+				top = Matrix_cs_spsolve(_A_, B, j, iwork, work, NULL, _ALO_); \
 				if (m - top > INT_MAX - nz) { \
 					if (_BFR_) \
-						B = cs_spfree(B); \
-					X = cs_spfree(X); \
+						B = Matrix_cs_spfree(B); \
+					X = Matrix_cs_spfree(X); \
 					error(_("attempt to construct sparse matrix with more than %s nonzero elements"), \
 					      "2^31-1"); \
 				} \
 				nz += m - top; \
 				if (nz > nzmax) { \
 					nzmax = (nz <= INT_MAX / 2) ? 2 * nz : INT_MAX; \
-					if (!cs_sprealloc(X, nzmax)) { \
+					if (!Matrix_cs_sprealloc(X, nzmax)) { \
 						if (_BFR_) \
-							B = cs_spfree(B); \
-						X = cs_spfree(X); \
+							B = Matrix_cs_spfree(B); \
+						X = Matrix_cs_spfree(X); \
 						ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 					} \
+					X__x = (double *) X->x; \
 				} \
 				X->p[j + 1] = nz; \
 				if (_ALO_) { \
 					for (i = top; i < m; ++i) { \
 						X->i[k] =      iwork[i]; \
-						X->x[k] = work[iwork[i]]; \
+						X__x[k] = work[iwork[i]]; \
 						++k; \
 					} \
 				} else { \
 					for (i = m - 1; i >= top; --i) { \
 						X->i[k] =      iwork[i]; \
-						X->x[k] = work[iwork[i]]; \
+						X__x[k] = work[iwork[i]]; \
 						++k; \
 					} \
 				} \
 			} \
 			if (_BFR_) \
-				B = cs_spfree(B); \
+				B = Matrix_cs_spfree(B); \
 			B = X; \
 		} while (0)
 
@@ -629,26 +636,26 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		DO_TRIANGULAR_SOLVE(U, 0, 1, "sparseLU", ".gCMatrix");
 
 		if (paq) {
-			X = cs_permute(B, paq, (int *) NULL, 1);
-			B = cs_spfree(B);
+			X = Matrix_cs_permute(B, paq, NULL, 1);
+			B = Matrix_cs_spfree(B);
 			if (!X)
 				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 			B = X;
 		}
 
 		/* Drop zeros from B and sort it : */
-		cs_dropzeros(B);
-		X = cs_transpose(B, 1);
-		B = cs_spfree(B);
+		Matrix_cs_dropzeros(B);
+		X = Matrix_cs_transpose(B, 1);
+		B = Matrix_cs_spfree(B);
 		if (!X)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
-		B = cs_transpose(X, 1);
-		X = cs_spfree(X);
+		B = Matrix_cs_transpose(X, 1);
+		X = Matrix_cs_spfree(X);
 		if (!B)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
-		PROTECT(r = cs2dgC(B, "dgCMatrix", 1));
-		B = cs_spfree(B);
+		PROTECT(r = cs2dgC(B, 1, 'g'));
+		B = Matrix_cs_spfree(B);
 	}
 
 	SOLVE_FINISH;
@@ -769,7 +776,8 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int j;
-	cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = dgC2cs(a, 1);
+	SET_MCS_XTYPE(A->xtype);
 	if (!asLogical(sparse)) {
 		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
 		PROTECT(r = newObject(cl));
@@ -787,9 +795,9 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			for (j = 0; j < n; ++j) {
 				prx[j] = 1.0;
 				if (ul == 'U')
-					cs_usolve(A, prx);
+					Matrix_cs_usolve(A, prx);
 				else
-					cs_lsolve(A, prx);
+					Matrix_cs_lsolve(A, prx);
 				prx += m;
 			}
 		} else {
@@ -799,26 +807,26 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			UNPROTECT(1); /* bx */
 			for (j = 0; j < n; ++j) {
 				if (ul == 'U')
-					cs_usolve(A, prx);
+					Matrix_cs_usolve(A, prx);
 				else
-					cs_lsolve(A, prx);
+					Matrix_cs_lsolve(A, prx);
 				prx += m;
 			}
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 	} else {
-		const char *cl = (isNull(b)) ? "dtCMatrix" : "dgCMatrix";
-		cs *B, *X;
+		Matrix_cs *B, *X;
 
 		if (isNull(b)) {
-			B = cs_spalloc(m, n, n, 1, 0);
+			B = Matrix_cs_spalloc(m, n, n, 1, 0);
 			if (!B)
 				ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
+			double *B__x = (double *) B->x;
 			for (j = 0; j < n; ++j) {
 				B->p[j] = j;
 				B->i[j] = j;
-				B->x[j] = 1.0;
+				B__x[j] = 1.0;
 			}
 			B->p[n] = n;
 		} else
@@ -831,18 +839,18 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		DO_TRIANGULAR_SOLVE(A, ul != 'U', isNull(b), ".tCMatrix", ".gCMatrix");
 
 		/* Drop zeros from B and sort it : */
-		cs_dropzeros(B);
-		X = cs_transpose(B, 1);
-		B = cs_spfree(B);
+		Matrix_cs_dropzeros(B);
+		X = Matrix_cs_transpose(B, 1);
+		B = Matrix_cs_spfree(B);
 		if (!X)
 			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
-		B = cs_transpose(X, 1);
-		X = cs_spfree(X);
+		B = Matrix_cs_transpose(X, 1);
+		X = Matrix_cs_spfree(X);
 		if (!B)
 			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
 
-		PROTECT(r = cs2dgC(B, cl, 1));
-		B = cs_spfree(B);
+		PROTECT(r = cs2dgC(B, 1, (isNull(b)) ? 't' : 'g'));
+		B = Matrix_cs_spfree(B);
 	}
 	if (isNull(b))
 		SET_SLOT(r, Matrix_uploSym, auplo);
@@ -858,7 +866,8 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym)),
 		beta = PROTECT(GET_SLOT(qr, Matrix_betaSym)),
 		p = PROTECT(GET_SLOT(qr, Matrix_pSym));
-	const cs *V_ = dgC2cs(V, 1);
+	Matrix_cs *V_ = dgC2cs(V, 1);
+	SET_MCS_XTYPE(V_->xtype);
 	double *pbeta = REAL(beta);
 	int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
 		*pp = INTEGER(p), nprotect = 6;
@@ -873,20 +882,20 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		pyx = REAL(yx);
 		Matrix_memset(pyx, 0, mn, sizeof(double));
 
-	if (isNull(yxjj)) {
-		for (j = 0; j < n; ++j) {
-			*pyx = 1.0;
-			pyx += m1a;
-		}
-	} else if (TYPEOF(yxjj) == REALSXP && XLENGTH(yxjj) >= n) {
-		double *pyxjj = REAL(yxjj);
-		for (j = 0; j < n; ++j) {
-			*pyx = *pyxjj;
-			pyx += m1a;
-			pyxjj += 1;
-		}
-	} else
-		error(_("invalid '%s' to %s()"), "yxjj", __func__);
+		if (isNull(yxjj)) {
+			for (j = 0; j < n; ++j) {
+				*pyx = 1.0;
+				pyx += m1a;
+			}
+		} else if (TYPEOF(yxjj) == REALSXP && XLENGTH(yxjj) >= n) {
+			double *pyxjj = REAL(yxjj);
+			for (j = 0; j < n; ++j) {
+				*pyx = *pyxjj;
+				pyx += m1a;
+				pyxjj += 1;
+			}
+		} else
+			error(_("invalid '%s' to '%s'"), "yxjj", __func__);
 	} else {
 		SEXP ydim = PROTECT(GET_SLOT(y, Matrix_DimSym));
 		int *pydim = INTEGER(ydim);
@@ -919,15 +928,18 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	{
 		SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)),
 			q = PROTECT(GET_SLOT(qr, Matrix_qSym));
-		const cs *R_ = dgC2cs(R, 1);
-		int *pq = (LENGTH(q)) ? INTEGER(q) : (int *) NULL;
+		Matrix_cs *R_ = dgC2cs(R, 1);
+		if (V_->xtype != R_->xtype)
+			error(_("'%s' and '%s' slots have different '%s'"),
+			      "V", "R", "xtype");
+		int *pq = (LENGTH(q)) ? INTEGER(q) : NULL;
 
 		for (j = 0; j < n; ++j) {
-			cs_pvec(pp, pyx, work, m);
+			Matrix_cs_pvec(pp, pyx, work, m);
 			for (i = 0; i < r; ++i)
-				cs_happly(V_, i, pbeta[i], work);
-			cs_usolve(R_, work);
-			cs_ipvec(pq, work, pax, r);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
+			Matrix_cs_usolve(R_, work);
+			Matrix_cs_ipvec(pq, work, pax, r);
 			pyx += m;
 			pax += r;
 		}
@@ -937,38 +949,38 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	}
 	case 1: /* qr.fitted : A = P1' Q1 Q1' P1 y */
 		for (j = 0; j < n; ++j) {
-			cs_pvec(pp, pyx, work, m);
+			Matrix_cs_pvec(pp, pyx, work, m);
 			for (i = 0; i < r; ++i)
-				cs_happly(V_, i, pbeta[i], work);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
 			if (r < m)
 				Matrix_memset(work + r, 0, m - r, sizeof(double));
 			for (i = r - 1; i >= 0; --i)
-				cs_happly(V_, i, pbeta[i], work);
-			cs_ipvec(pp, work, pax, m);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
+			Matrix_cs_ipvec(pp, work, pax, m);
 			pyx += m;
 			pax += m;
 		}
 		break;
 	case 2: /* qr.resid : A = P1' Q2 Q2' P1 y */
 		for (j = 0; j < n; ++j) {
-			cs_pvec(pp, pyx, work, m);
+			Matrix_cs_pvec(pp, pyx, work, m);
 			for (i = 0; i < r; ++i)
-				cs_happly(V_, i, pbeta[i], work);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
 			if (r > 0)
 				Matrix_memset(work, 0, r, sizeof(double));
 			for (i = r - 1; i >= 0; --i)
-				cs_happly(V_, i, pbeta[i], work);
-			cs_ipvec(pp, work, pax, m);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
+			Matrix_cs_ipvec(pp, work, pax, m);
 			pyx += m;
 			pax += m;
 		}
 		break;
 	case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */
 		for (j = 0; j < n; ++j) {
-			cs_pvec(pp, pyx, work, m);
+			Matrix_cs_pvec(pp, pyx, work, m);
 			Matrix_memcpy(pax, work, m, sizeof(double));
 			for (i = 0; i < r; ++i)
-				cs_happly(V_, i, pbeta[i], pax);
+				Matrix_cs_happly(V_, i, pbeta[i], pax);
 			pyx += m;
 			pax += m;
 		}
@@ -977,8 +989,8 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		for (j = 0; j < n; ++j) {
 			Matrix_memcpy(work, pyx, m, sizeof(double));
 			for (i = r - 1; i >= 0; --i)
-				cs_happly(V_, i, pbeta[i], work);
-			cs_ipvec(pp, work, pax, m);
+				Matrix_cs_happly(V_, i, pbeta[i], work);
+			Matrix_cs_ipvec(pp, work, pax, m);
 			pyx += m;
 			pax += m;
 		}
@@ -988,7 +1000,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 			Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
 		for (j = 0; j < n; ++j) {
 			for (i = 0; i < r; ++i)
-				cs_happly(V_, i, pbeta[i], pax);
+				Matrix_cs_happly(V_, i, pbeta[i], pax);
 			pax += m;
 		}
 	break;
@@ -997,12 +1009,12 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 			Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
 		for (j = 0; j < n; ++j) {
 			for (i = r - 1; i >= 0; --i)
-				cs_happly(V_, i, pbeta[i], pax);
+				Matrix_cs_happly(V_, i, pbeta[i], pax);
 			pax += m;
 		}
 	break;
 	default:
-		error(_("invalid '%s' to %s()"), "op", __func__);
+		error(_("invalid '%s' to '%s'"), "op", __func__);
 		break;
 	}
 
