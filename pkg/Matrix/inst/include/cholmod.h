@@ -1088,8 +1088,13 @@ int     M_cholmod_free_sparse      (CHM_SP *, CHM_CM);
 int     M_cholmod_free_triplet     (CHM_TR *, CHM_CM);
 int     M_cholmod_nnz              (CHM_SP, CHM_CM);
 int     M_cholmod_scale            (CHM_DN, int, CHM_SP, CHM_CM);
+#if 0 /* give PRIMME, robustlmm more time to adjust their code */
 int     M_cholmod_sdmult           (CHM_SP, int, double[2], double[2],
                                     CHM_DN, CHM_DN, CHM_CM);
+#else
+int     M_cholmod_sdmult           (const CHM_SP, int, const double *, const double *,
+                                    const CHM_DN, CHM_DN, CHM_CM);
+#endif
 CHM_DN  M_cholmod_solve            (int, CHM_FR, CHM_DN, CHM_CM);
 int     M_cholmod_solve2           (int, CHM_FR, CHM_DN,
                                     CHM_DN *, CHM_DN *, CHM_DN *, CHM_CM);
