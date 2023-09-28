@@ -28,6 +28,7 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 #define  EXTDEF(name, n)  {#name, (DL_FUNC) &name, n}
+#define RREGDEF(name   )  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
 static R_CallMethodDef CallEntries[] = {
 	CALLDEF(CHM_set_common_env, 1),
@@ -40,7 +41,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(Matrix_rle_d, 2),
 
 	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
-	
+
 	CALLDEF(tCsparse_diag, 2),
 	CALLDEF(nCsparse_subassign, 4),
 	CALLDEF(lCsparse_subassign, 4),
@@ -275,39 +276,12 @@ static const R_ExternalMethodDef ExtEntries[] = {
 	{NULL, NULL, 0}
 };
 
-void attribute_visible R_init_Matrix(DllInfo *dll)
+void attribute_visible R_init_Matrix(DllInfo *info)
 {
-	R_registerRoutines(dll, NULL, CallEntries, NULL, ExtEntries);
-	R_useDynamicSymbols(dll, FALSE);
+	R_registerRoutines(info, NULL, CallEntries, NULL, ExtEntries);
+	R_useDynamicSymbols(info, FALSE);
 
 /* These are callable from other packages' C code: */
-
-#define RREGDEF(name)  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
-
-	/* Matrix: SEXP -> CHOLMOD */
-	RREGDEF(as_cholmod_dense);
-	RREGDEF(as_cholmod_factor);
-	RREGDEF(as_cholmod_sparse);
-	RREGDEF(as_cholmod_triplet);
-
-	/* Matrix: CHOLMOD -> SEXP */
-	RREGDEF(chm_factor_to_SEXP);
-	RREGDEF(chm_sparse_to_SEXP);
-	RREGDEF(chm_triplet_to_SEXP);
-
-	/* Matrix: miscellaneous */
-	RREGDEF(chm_factor_ldetL2);
-	RREGDEF(chm_factor_update);
-	RREGDEF(numeric_as_chm_dense);
-#if 0
-	RREGDEF(Csparse_diagU2N);
-	RREGDEF(dpoMatrix_chol);
-#else
-	R_RegisterCCallable(
-	"Matrix", "Csparse_diagU2N", (DL_FUNC) R_sparse_diag_U2N);
-	R_RegisterCCallable(
-	"Matrix", "dpoMatrix_chol", (DL_FUNC) dpoMatrix_trf);
-#endif
 
 	/* CHOLMOD: */
 	RREGDEF(cholmod_aat);
@@ -349,6 +323,20 @@ void attribute_visible R_init_Matrix(DllInfo *dll)
 	RREGDEF(cholmod_triplet_to_sparse);
 	RREGDEF(cholmod_vertcat);
 	RREGDEF(cholmod_updown);
+
+	/* Matrix: SEXP -> CHOLMOD */
+	RREGDEF(as_cholmod_factor);
+	RREGDEF(as_cholmod_sparse);
+	RREGDEF(as_cholmod_dense);
+
+	/* Matrix: CHOLMOD -> SEXP */
+	RREGDEF(chm_factor_to_SEXP);
+	RREGDEF(chm_sparse_to_SEXP);
+
+	/* Matrix: miscellaneous */
+	RREGDEF(chm_factor_ldetL2);
+	RREGDEF(chm_factor_update);
+	RREGDEF(numeric_as_chm_dense);
 
 	R_cholmod_start(&c);
 #if 0
@@ -394,9 +382,11 @@ void attribute_visible R_init_Matrix(DllInfo *dll)
 
 	Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
 	Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
+	return;
 }
 
-void R_unload_Matrix(DllInfo *dll)
+void R_unload_Matrix(DllInfo *info)
 {
 	cholmod_finish(&c);
+	return;
 }
