@@ -1,6 +1,5 @@
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
-#include <Rversion.h>
 #include "Matrix.h"
 
 #ifdef __cplusplus
@@ -439,7 +438,7 @@ M_R_cholmod_printf(const char *fmt, ...)
 }
 #endif
 
-static void attribute_hidden
+void attribute_hidden
 M_R_cholmod_error(int status, const char *file, int line, const char *message)
 {
 	/* NB: Matrix itself uses CHM_set_common_env, CHM_store_common, and
