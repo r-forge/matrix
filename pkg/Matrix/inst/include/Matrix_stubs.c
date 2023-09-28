@@ -287,7 +287,7 @@ M_cholmod_sdmult(CHM_SP A, int transpose,
 #else
 int attribute_hidden
 M_cholmod_sdmult(const CHM_SP A, int transpose,
-                 const double *, const double *,
+                 const double *alpha, const double *beta,
                  const CHM_DN X, CHM_DN Y, CHM_CM Common)
 {
 	static int(*fun)(const CHM_SP, int, const double *, const double *,
