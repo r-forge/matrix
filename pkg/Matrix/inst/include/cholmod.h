@@ -1,55 +1,67 @@
 #ifndef MATRIX_CHOLMOD_H
 #define MATRIX_CHOLMOD_H
 
-#include <stddef.h>
-#include <limits.h>
+#include <stddef.h> /* size_t */
+#include <limits.h> /* LONG_MAX */
+#include <inttypes.h> /* PRI */
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-// synced from >>>> ../../src/SuiteSparse_config/SuiteSparse_config.h :
-
-// Rather use C99 -- which we require in R anyway
-#include <inttypes.h>
-
+/* <<<< from ../../src/SuiteSparse_config/SuiteSparse_config.h <<<<<< */
 #ifndef SuiteSparse_long
 
-#if !defined(_WIN64) || defined(_UCRT)
+# if !defined(_WIN64) || defined(_UCRT)
 
-#define SuiteSparse_long long
-#define SuiteSparse_long_max LONG_MAX
-#define SuiteSparse_long_idd "ld"
+#  define SuiteSparse_long         long
+#  define SuiteSparse_long_max LONG_MAX
+#  define SuiteSparse_long_idd     "ld"
 
-#else // _WIN64 but not _UCRT
+# else // defined(_WIN64) && !defined(_UCRT)
 
-#define SuiteSparse_long __int64
-#define SuiteSparse_long_max _I64_MAX
-#define SuiteSparse_long_idd PRId64
+#  define SuiteSparse_long      __int64
+#  define SuiteSparse_long_max _I64_MAX
+#  define SuiteSparse_long_idd   PRId64
 
-#endif
+# endif
 
 /* #define SuiteSparse_long int64_t */
 /*     // typically long (but on WIN64) */
 /* #define SuiteSparse_long_max 9223372036854775801 */
 /*     // typically LONG_MAX (but ..) */
 /* #define SuiteSparse_long_idd PRId64 */
-    // typically "ld"
+/*     // typically "ld" */
 
-#define SuiteSparse_long_id "%" SuiteSparse_long_idd
+# define SuiteSparse_long_id "%" SuiteSparse_long_idd
 #endif
 
-
-// from ../../src/CHOLMOD/Include/cholmod_core.h : <<<<<
+/* <<<< from ../../src/CHOLMOD/Include/cholmod_core.h:244 <<<<<<<<<<< */
 #define CHOLMOD_HAS_VERSION_FUNCTION
-
 #define CHOLMOD_DATE "Oct 22, 2019"
 #define CHOLMOD_VER_CODE(main,sub) ((main) * 1000 + (sub))
 #define CHOLMOD_MAIN_VERSION 3
 #define CHOLMOD_SUB_VERSION 0
 #define CHOLMOD_SUBSUB_VERSION 14
 #define CHOLMOD_VERSION \
-    CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
+	CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
+
+/* <<<< from ../../src/CHOLMOD/Include/cholmod_cholesky.h:178 <<<<<<< */
+#define CHOLMOD_A    0		/* solve Ax=b */
+#define CHOLMOD_LDLt 1		/* solve LDL'x=b */
+#define CHOLMOD_LD   2		/* solve LDx=b */
+#define CHOLMOD_DLt  3		/* solve DL'x=b */
+#define CHOLMOD_L    4		/* solve Lx=b */
+#define CHOLMOD_Lt   5		/* solve L'x=b */
+#define CHOLMOD_D    6		/* solve Dx=b */
+#define CHOLMOD_P    7		/* permute x=Px */
+#define CHOLMOD_Pt   8		/* permute x=P'x */
+
+/* from ../../src/CHOLMOD/Include/cholmod_matrixops.h:104 <<<<<<<<<<< */
+#define CHOLMOD_SCALAR 0	/* A = s*A */
+#define CHOLMOD_ROW 1		/* A = diag(s)*A */
+#define CHOLMOD_COL 2		/* A = A*diag(s) */
+#define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
 
 
 /* ========================================================================== */
@@ -1033,101 +1045,74 @@ typedef struct cholmod_triplet_struct
 
 } cholmod_triplet ;
 
-// -------- our (Matrix)  short and const_ forms of of the pointers :
-typedef       cholmod_common*        CHM_CM;
-typedef       cholmod_dense*         CHM_DN;
-typedef const cholmod_dense*   const_CHM_DN;
-typedef       cholmod_factor*        CHM_FR;
-typedef const cholmod_factor*  const_CHM_FR;
-typedef       cholmod_sparse*        CHM_SP;
-typedef const cholmod_sparse*  const_CHM_SP;
-typedef       cholmod_triplet*       CHM_TR;
-typedef const cholmod_triplet* const_CHM_TR;
 
+/* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
-// --------- Matrix ("M_") R ("R_") pkg  routines "re-exported": ---------------
+typedef cholmod_common * CHM_CM;
+typedef cholmod_factor * CHM_FR;
+typedef cholmod_sparse * CHM_SP;
+typedef cholmod_triplet* CHM_TR;
+typedef cholmod_dense  * CHM_DN;
 
-// "Implementation" of these in ./Matrix_stubs.c
-int M_R_cholmod_start(CHM_CM);
-void M_R_cholmod_error(int status, const char *file, int line, const char *message);
-int M_cholmod_finish(CHM_CM);
+/* Some reverse LinkingTo still use these (they should stop) : */
+#define const_CHM_FR CHM_FR
+#define const_CHM_SP CHM_SP
+#define const_CHM_TR CHM_TR
+#define const_CHM_DN CHM_DN
 
-CHM_SP M_cholmod_allocate_sparse(size_t nrow, size_t ncol,
-				 size_t nzmax, int sorted,
-				 int packed, int stype, int xtype,
-				 CHM_CM);
-int M_cholmod_free_factor(CHM_FR *L, CHM_CM);
-int M_cholmod_free_dense(CHM_DN *A, CHM_CM);
-int M_cholmod_free_sparse(CHM_SP *A, CHM_CM);
-int M_cholmod_free_triplet(CHM_TR *T, CHM_CM);
+CHM_SP  M_cholmod_aat              (CHM_SP, int *, size_t, int, CHM_CM);
+CHM_SP  M_cholmod_add              (CHM_SP, CHM_SP, double[2], double[2],
+                                    int, int, CHM_CM);
+CHM_DN  M_cholmod_allocate_dense   (size_t, size_t, size_t, int, CHM_CM);
+CHM_SP  M_cholmod_allocate_sparse  (size_t, size_t, size_t, int, int, int, int,
+                                    CHM_CM);
+CHM_TR  M_cholmod_allocate_triplet (size_t, size_t, size_t, int, int, CHM_CM);
+CHM_FR  M_cholmod_analyze          (CHM_SP, CHM_CM);
+CHM_FR  M_cholmod_analyze_p        (CHM_SP, int *, int *, size_t, CHM_CM);
+int     M_cholmod_band_inplace     (int, int, int, CHM_SP, CHM_CM);
+int     M_cholmod_change_factor    (int, int, int, int, int, CHM_FR, CHM_CM);
+CHM_SP  M_cholmod_copy             (CHM_SP, int, int, CHM_CM);
+CHM_DN  M_cholmod_copy_dense       (CHM_DN, CHM_CM);
+CHM_FR  M_cholmod_copy_factor      (CHM_FR, CHM_CM);
+CHM_SP  M_cholmod_copy_sparse      (CHM_SP, CHM_CM);
+int     M_cholmod_defaults         (CHM_CM);
+CHM_SP  M_cholmod_dense_to_sparse  (CHM_DN, int, CHM_CM);
+CHM_SP  M_cholmod_factor_to_sparse (CHM_FR, CHM_CM);
+int     M_cholmod_factorize        (CHM_SP, CHM_FR, CHM_CM);
+int     M_cholmod_factorize_p      (CHM_SP, double[2], int *, size_t, CHM_FR,
+                                    CHM_CM);
+int     M_cholmod_finish           (CHM_CM);
+int     M_cholmod_free_dense       (CHM_DN *, CHM_CM);
+int     M_cholmod_free_factor      (CHM_FR *, CHM_CM);
+int     M_cholmod_free_sparse      (CHM_SP *, CHM_CM);
+int     M_cholmod_free_triplet     (CHM_TR *, CHM_CM);
+int     M_cholmod_nnz              (CHM_SP, CHM_CM);
+int     M_cholmod_scale            (CHM_DN, int, CHM_SP, CHM_CM);
+int     M_cholmod_sdmult           (CHM_SP, int, double[2], double[2],
+                                    CHM_DN, CHM_DN, CHM_CM);
+CHM_DN  M_cholmod_solve            (int, CHM_FR, CHM_DN, CHM_CM);
+int     M_cholmod_solve2           (int, CHM_FR, CHM_DN,
+                                    CHM_DN *, CHM_DN *, CHM_DN *, CHM_CM);
+int     M_cholmod_sort             (CHM_SP, CHM_CM);
+CHM_DN  M_cholmod_sparse_to_dense  (CHM_SP, CHM_CM);
+CHM_TR  M_cholmod_sparse_to_triplet(CHM_SP, CHM_CM);
+CHM_SP  M_cholmod_speye            (size_t, size_t, int, CHM_CM);
+CHM_SP  M_cholmod_spsolve          (int, CHM_FR, CHM_SP, CHM_CM);
+CHM_SP  M_cholmod_ssmult           (CHM_SP, CHM_SP,
+                                    int, int, int, CHM_CM);
+CHM_SP  M_cholmod_submatrix        (CHM_SP, int *, int, int *, int, int, int,
+                                    CHM_CM);
+CHM_SP  M_cholmod_transpose        (CHM_SP, int, CHM_CM);
+CHM_SP  M_cholmod_triplet_to_sparse(CHM_TR, int, CHM_CM);
+int     M_cholmod_updown           (int, CHM_SP, CHM_FR, CHM_CM);
+CHM_SP  M_cholmod_vertcat          (CHM_SP, CHM_SP, int, CHM_CM);
 
-long M_cholmod_nnz(const_CHM_SP, CHM_CM);
-CHM_SP M_cholmod_speye(size_t nrow, size_t ncol, int xtype, CHM_CM);
-CHM_SP M_cholmod_transpose(const_CHM_SP, int values, CHM_CM);
-int M_cholmod_sort(CHM_SP A, CHM_CM);
-CHM_SP M_cholmod_vertcat(const_CHM_SP, const_CHM_SP, int values, CHM_CM);
-CHM_SP M_cholmod_copy(const_CHM_SP, int stype, int mode, CHM_CM);
-CHM_SP M_cholmod_add(const_CHM_SP, const_CHM_SP, double alpha [2], double beta [2],
-		     int values, int sorted, CHM_CM);
+void M_R_cholmod_error(int, const char *, int, const char *);
+int  M_R_cholmod_start(CHM_CM);
 
-// from ../../src/CHOLMOD/Include/cholmod_cholesky.h - line 178 :  <<<<<
-#define CHOLMOD_A    0		/* solve Ax=b */
-#define CHOLMOD_LDLt 1		/* solve LDL'x=b */
-#define CHOLMOD_LD   2		/* solve LDx=b */
-#define CHOLMOD_DLt  3		/* solve DL'x=b */
-#define CHOLMOD_L    4		/* solve Lx=b */
-#define CHOLMOD_Lt   5		/* solve L'x=b */
-#define CHOLMOD_D    6		/* solve Dx=b */
-#define CHOLMOD_P    7		/* permute x=Px */
-#define CHOLMOD_Pt   8		/* permute x=P'x */
+/* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
-CHM_DN M_cholmod_solve(int, const_CHM_FR, const_CHM_DN, CHM_CM);
-CHM_SP M_cholmod_spsolve(int, const_CHM_FR, const_CHM_SP, CHM_CM);
-int M_cholmod_sdmult(const_CHM_SP, int, const double*, const double*,
-		     const_CHM_DN, CHM_DN Y, CHM_CM);
-CHM_SP M_cholmod_ssmult(const_CHM_SP, const_CHM_SP, int, int, int,
-			CHM_CM);
-int M_cholmod_factorize(const_CHM_SP, CHM_FR L, CHM_CM);
-int M_cholmod_factorize_p(const_CHM_SP, double *beta, int *fset,
-			  size_t fsize, CHM_FR L, CHM_CM);
-CHM_SP M_cholmod_copy_sparse(const_CHM_SP, CHM_CM);
-CHM_DN M_cholmod_copy_dense(const_CHM_DN, CHM_CM);
-CHM_SP M_cholmod_aat(const_CHM_SP, int *fset, size_t fsize, int mode,
-		     CHM_CM);
-int M_cholmod_band_inplace(CHM_SP A, int k1, int k2, int mode, CHM_CM);
-CHM_SP M_cholmod_add(const_CHM_SP, const_CHM_SP, double alpha[2], double beta[2],
-		     int values, int sorted, CHM_CM);
-CHM_DN M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
-				int xtype, CHM_CM);
-CHM_FR M_cholmod_analyze(const_CHM_SP, CHM_CM);
-CHM_FR M_cholmod_analyze_p(const_CHM_SP, int *Perm, int *fset,
-				    size_t fsize, CHM_CM);
-int M_cholmod_change_factor(int to_xtype, int to_ll, int to_super,
-			    int to_packed, int to_monotonic,
-			    CHM_FR L, CHM_CM);
-CHM_FR M_cholmod_copy_factor(const_CHM_FR, CHM_CM);
-CHM_SP M_cholmod_factor_to_sparse(const_CHM_FR, CHM_CM);
-CHM_SP M_cholmod_dense_to_sparse(const_CHM_DN, int values, CHM_CM);
-int M_cholmod_defaults (CHM_CM);
-CHM_SP M_cholmod_triplet_to_sparse(const cholmod_triplet*, int nzmax, CHM_CM);
-CHM_SP M_cholmod_submatrix(const_CHM_SP, int *rset, int rsize, int *cset,
-			   int csize, int values, int sorted,
-			   CHM_CM);
-CHM_TR M_cholmod_sparse_to_triplet(const_CHM_SP, CHM_CM);
-CHM_DN M_cholmod_sparse_to_dense(const_CHM_SP, CHM_CM);
-CHM_TR M_cholmod_allocate_triplet (size_t nrow, size_t ncol, size_t nzmax,
-				   int stype, int xtype, CHM_CM);
-
-// from ../../src/CHOLMOD/Include/cholmod_matrixops.h - line 104 :  <<<<<
-/* scaling modes, selected by the scale input parameter: */
-#define CHOLMOD_SCALAR 0	/* A = s*A */
-#define CHOLMOD_ROW 1		/* A = diag(s)*A */
-#define CHOLMOD_COL 2		/* A = A*diag(s) */
-#define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
-
-int M_cholmod_scale(const_CHM_DN, int scale, CHM_SP, CHM_CM);
-
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 

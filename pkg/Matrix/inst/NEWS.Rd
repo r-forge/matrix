@@ -155,12 +155,21 @@
       regardless of the position of the first structural zero in the
       corresponding sorted matrix (to avoid the cost of sorting).
 
-      \code{tri[ul](<.t[rp]Matrix>, k)} was often wrong for nonzero
-      \code{k}, setting too many bands to zero.
+      \item \code{tri[ul](<.t[rp]Matrix>, k)} was often wrong for
+      nonzero \code{k}, setting too many bands to zero.
 
-      C-level \code{tCsparse_diag} (formerly \code{diag_tC}) now handles
-      structural zeros and \code{NaN} on the main diagonal correctly.
-      Option \code{"diagBack"} now works correctly.
+      \item C-level \code{tCsparse_diag} (formerly \code{diag_tC})
+      now handles structural zeros and \code{NaN} on the main diagonal
+      correctly.  Option \code{"diagBack"} now works correctly.
+
+      \item The prototype of API function \code{M_cholmod_band_inplace}
+      was wrongly copied from \code{cholmod_band},
+      instead of from \code{cholmod_band_inplace}.
+
+      \item Many API function prototypes wrongly used \code{const}
+      qualifiers where the registered routines do not.  A corollary
+      is that types \code{const_CHM_*} are now simple aliases for
+      \code{CHM_*}, i.e., the unqualified analogues.
     }
   }
   \subsection{Misc}{
@@ -187,6 +196,9 @@
       \file{src/cs-etc.[ch]} will enable linking the CXSparse library
       instead of the CSparse library, the latter supporting numeric
       types but not complex ones.
+
+      \item Some API declarations and macros not used by \emph{any}
+      (recursive) reverse \code{LinkingTo} are removed.
     }
   }
 }
