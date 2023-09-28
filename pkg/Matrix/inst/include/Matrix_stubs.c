@@ -270,6 +270,7 @@ M_cholmod_scale(CHM_DN S, int scale, CHM_SP A, CHM_CM Common)
 	return fun(S, scale, A, Common);
 }
 
+#if 0 /* give PRIMME, robustlmm more time to adjust their code */
 int attribute_hidden
 M_cholmod_sdmult(CHM_SP A, int transpose,
                  double alpha[2], double beta[2],
@@ -283,6 +284,21 @@ M_cholmod_sdmult(CHM_SP A, int transpose,
 			R_GetCCallable("Matrix", "cholmod_sdmult");
 	return fun(A, transpose, alpha, beta, X, Y, Common);
 }
+#else
+int attribute_hidden
+M_cholmod_sdmult(const CHM_SP A, int transpose,
+                 const double *, const double *,
+                 const CHM_DN X, CHM_DN Y, CHM_CM Common)
+{
+	static int(*fun)(const CHM_SP, int, const double *, const double *,
+	                 const CHM_DN, CHM_DN, CHM_CM) = NULL;
+	if (fun == NULL)
+		fun = (int(*)(const CHM_SP, int, const double *, const double *,
+		              const CHM_DN, CHM_DN, CHM_CM))
+			R_GetCCallable("Matrix", "cholmod_sdmult");
+	return fun(A, transpose, alpha, beta, X, Y, Common);
+}
+#endif
 
 CHM_DN attribute_hidden
 M_cholmod_solve(int sys, CHM_FR L, CHM_DN B, CHM_CM Common)

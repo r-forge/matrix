@@ -37,16 +37,12 @@ extern void *alloca(size_t);
 #endif
 
 #define MATRIX_VALID_ge_dense \
-"dmatrix", "dgeMatrix", \
-"lmatrix", "lgeMatrix", \
-"nmatrix", "ngeMatrix", \
-"zmatrix", "zgeMatrix"
+"ngeMatrix", "lgeMatrix", "dgeMatrix"
 
 #define MATRIX_VALID_Csparse \
-"dgCMatrix", "dsCMatrix", "dtCMatrix", \
-"lgCMatrix", "lsCMatrix", "ltCMatrix", \
-"ngCMatrix", "nsCMatrix", "ntCMatrix", \
-"zgCMatrix", "zsCMatrix", "ztCMatrix"
+"ngCMatrix", "lgCMatrix", "dgCMatrix", \
+"nsCMatrix", "lsCMatrix", "dsCMatrix", \
+"ntCMatrix", "ltCMatrix", "dtCMatrix"
 
 bool Matrix_isclass_ge_dense(SEXP);
 bool Matrix_isclass_Csparse (SEXP);
