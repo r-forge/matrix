@@ -4,7 +4,7 @@
 .MatrixEnv <- new.env(parent = emptyenv(), hash = FALSE)
 
 ## Storing settings from 'cholmod_common'
-.chm_common <- new.env(parent = emptyenv())
+.CholmodCommonEnv <- new.env(parent = emptyenv())
 
 
 ## ~~~~ NAMESPACE HOOKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +75,7 @@
     wSD <- as.integer(Sys.getenv("R_MATRIX_WARN_SQRT_DEFAULT", NA))
     assign("warnSqrtDefault", wDC, envir = .MatrixEnv)
 
-    .Call(CHM_set_common_env, .chm_common)
+    .Call(R_cholmod_common_envini, .CholmodCommonEnv)
     NULL
 }
 
