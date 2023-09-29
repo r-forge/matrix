@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "Minlines.h"
 #include "chm_common.h"
 
 /* NB: mostly parallel to CsparseMatrix_validate in ./validity.c */

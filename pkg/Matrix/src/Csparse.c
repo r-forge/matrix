@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "Minlines.h"
 #include "cs-etc.h"
 #include "cholmod-etc.h"
 #include "Csparse.h"
