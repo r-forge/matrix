@@ -455,7 +455,8 @@ M_R_cholmod_printf(const char *fmt, ...)
 #endif
 
 void attribute_hidden
-M_R_cholmod_error(int status, const char *file, int line, const char *message)
+M_R_cholmod_error(int status, const char *file, int line,
+                  const char *message)
 {
 	/* NB: Matrix itself uses CHM_set_common_env, CHM_store_common, and
 	       CHM_restore_common to preserve settings through error calls.
@@ -470,13 +471,13 @@ M_R_cholmod_error(int status, const char *file, int line, const char *message)
 }
 
 int attribute_hidden
-M_R_cholmod_start(CHM_CM Common)
+M_R_cholmod_common_start(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)
 		fun = (int(*)(CHM_CM))
 			R_GetCCallable("Matrix", "cholmod_start");
-	int val = fun(Common);
+	int ans = fun(Common);
 #if 0
 	/* No longer, with SuiteSparse 5.7.1 : */
 	Common->print_function =
@@ -487,7 +488,17 @@ M_R_cholmod_start(CHM_CM Common)
 # endif
 #endif
 	Common->error_handler = M_R_cholmod_error;
-	return val;
+	return ans;
+}
+
+int attribute_hidden
+M_R_cholmod_common_finish(CHM_CM Common)
+{
+	static int(*fun)(CHM_CM) = NULL;
+	if (fun == NULL)
+		fun = (int(*)(CHM_CM))
+			R_GetCCallable("Matrix", "cholmod_finish");
+	return fun(Common);
 }
 
 
@@ -504,85 +515,86 @@ bool Matrix_isclass_Csparse(SEXP x) {
 }
 
 CHM_FR attribute_hidden
-M_as_cholmod_factor(CHM_FR ans, SEXP x)
+M_sexp_as_cholmod_factor(CHM_FR L, SEXP from)
 {
 	static CHM_FR(*fun)(CHM_FR, SEXP) = NULL;
 	if(fun == NULL)
 		fun = (CHM_FR(*)(CHM_FR, SEXP))
-			R_GetCCallable("Matrix", "as_cholmod_factor");
-	return fun(ans, x);
+			R_GetCCallable("Matrix", "sexp_as_cholmod_factor");
+	return fun(L, from);
 }
 
 CHM_SP attribute_hidden
-M_as_cholmod_sparse(CHM_SP ans, SEXP x,
-                    Rboolean check_Udiag, Rboolean sort_in_place)
+M_sexp_as_cholmod_sparse(CHM_SP A, SEXP from,
+                         Rboolean checkUnit, Rboolean sortInPlace)
 {
 	static CHM_SP(*fun)(CHM_SP, SEXP, Rboolean, Rboolean)= NULL;
 	if(fun == NULL)
 		fun = (CHM_SP(*)(CHM_SP, SEXP, Rboolean, Rboolean))
-			R_GetCCallable("Matrix", "as_cholmod_sparse");
-	return fun(ans, x, check_Udiag, sort_in_place);
+			R_GetCCallable("Matrix", "sexp_as_cholmod_sparse");
+	return fun(A, from, checkUnit, sortInPlace);
 }
 
 CHM_DN attribute_hidden
-M_as_cholmod_dense(CHM_DN ans, SEXP x)
+M_sexp_as_cholmod_dense(CHM_DN A, SEXP from)
 {
 	static CHM_DN(*fun)(CHM_DN, SEXP) = NULL;
 	if(fun == NULL)
 		fun = (CHM_DN(*)(CHM_DN, SEXP))
-			R_GetCCallable("Matrix", "as_cholmod_dense");
-	return fun(ans, x);
-}
-
-SEXP attribute_hidden
-M_chm_factor_to_SEXP(CHM_FR f, int dofree)
-{
-	static SEXP(*fun)(CHM_FR, int) = NULL;
-	if(fun == NULL)
-		fun = (SEXP(*)(CHM_FR, int))
-			R_GetCCallable("Matrix", "chm_factor_to_SEXP");
-	return fun(f, dofree);
-}
-
-SEXP attribute_hidden
-M_chm_sparse_to_SEXP(CHM_SP a, int dofree,
-                     int uploT, int Rkind, const char *diag, SEXP dn)
-{
-	static SEXP(*fun)(CHM_SP, int, int, int, const char *, SEXP) = NULL;
-	if (fun == NULL)
-		fun = (SEXP(*)(CHM_SP, int, int, int, const char *, SEXP))
-			R_GetCCallable("Matrix", "chm_sparse_to_SEXP");
-	return fun(a, dofree, uploT, Rkind, diag, dn);
-}
-
-double attribute_hidden
-M_chm_factor_ldetL2(CHM_FR f)
-{
-	static double(*fun)(CHM_FR) = NULL;
-	if (fun == NULL)
-		fun = (double(*)(CHM_FR))
-			R_GetCCallable("Matrix", "chm_factor_ldetL2");
-	return fun(f);
-}
-
-CHM_FR attribute_hidden
-M_chm_factor_update(CHM_FR f, CHM_SP A, double mult)
-{
-	static CHM_FR(*fun)(CHM_FR, CHM_SP, double) = NULL;
-	if (fun == NULL)
-		fun = (CHM_FR(*)(CHM_FR, CHM_SP, double))
-			R_GetCCallable("Matrix", "chm_factor_update");
-	return fun(f, A, mult);
+			R_GetCCallable("Matrix", "sexp_as_cholmod_dense");
+	return fun(A, from);
 }
 
 CHM_DN attribute_hidden
-M_numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
+M_numeric_as_cholmod_dense(CHM_DN A, double *from, int m, int n)
 {
 	static CHM_DN(*fun)(CHM_DN, double *, int, int) = NULL;
 	if (fun == NULL)
 		fun = (CHM_DN(*)(CHM_DN, double *, int, int))
 			R_GetCCallable("Matrix", "numeric_as_chm_dense");
-	return fun(ans, v, nr, nc);
+	return fun(A, from, m, n);
+}
+
+SEXP attribute_hidden
+M_cholmod_factor_as_sexp(CHM_FR L, int doFree)
+{
+	static SEXP(*fun)(CHM_FR, int) = NULL;
+	if(fun == NULL)
+		fun = (SEXP(*)(CHM_FR, int))
+			R_GetCCallable("Matrix", "cholmod_factor_as_sexp");
+	return fun(L, doFree);
+}
+
+SEXP attribute_hidden
+M_cholmod_sparse_as_sexp(CHM_SP A, int doFree,
+                         int ttype, int doLogic, const char *diag,
+                         SEXP dimnames)
+{
+	static SEXP(*fun)(CHM_SP, int, int, int, const char *, SEXP) = NULL;
+	if (fun == NULL)
+		fun = (SEXP(*)(CHM_SP, int, int, int, const char *, SEXP))
+			R_GetCCallable("Matrix", "cholmod_sparse_as_sexp");
+	return fun(A, doFree, ttype, doLogic, diag, dimnames);
+}
+
+double attribute_hidden
+M_cholmod_factor_ldetL2(CHM_FR L)
+{
+	static double(*fun)(CHM_FR) = NULL;
+	if (fun == NULL)
+		fun = (double(*)(CHM_FR))
+			R_GetCCallable("Matrix", "cholmod_factor_ldetL2");
+	return fun(L);
+}
+
+CHM_FR attribute_hidden
+M_cholmod_factor_update(CHM_FR L, CHM_SP A, double mult)
+{
+	static CHM_FR(*fun)(CHM_FR, CHM_SP, double) = NULL;
+	if (fun == NULL)
+		fun = (CHM_FR(*)(CHM_FR, CHM_SP, double))
+			R_GetCCallable("Matrix", "cholmod_factor_update");
+	return fun(L, A, mult);
 }
 
 #ifdef	__cplusplus

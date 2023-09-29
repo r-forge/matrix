@@ -47,32 +47,34 @@ extern void *alloca(size_t);
 bool Matrix_isclass_ge_dense(SEXP);
 bool Matrix_isclass_Csparse (SEXP);
 
-CHM_FR M_as_cholmod_factor(CHM_FR, SEXP);
-CHM_SP M_as_cholmod_sparse(CHM_SP, SEXP, Rboolean, Rboolean);
-CHM_DN M_as_cholmod_dense (CHM_DN, SEXP);
+CHM_FR M_sexp_as_cholmod_factor(CHM_FR, SEXP);
+CHM_SP M_sexp_as_cholmod_sparse(CHM_SP, SEXP, Rboolean, Rboolean);
+CHM_DN M_sexp_as_cholmod_dense (CHM_DN, SEXP);
+CHM_DN M_numeric_as_cholmod_dense(CHM_DN, double *, int, int);
 
-SEXP M_chm_factor_to_SEXP(const_CHM_FR, int);
-SEXP M_chm_sparse_to_SEXP(const_CHM_SP, int, int, int, const char *, SEXP);
+SEXP M_cholmod_factor_as_sexp(CHM_FR, int);
+SEXP M_cholmod_sparse_as_sexp(CHM_SP, int, int, int, const char *, SEXP);
 
-double M_chm_factor_ldetL2(const_CHM_FR);
-CHM_FR M_chm_factor_update(CHM_FR, const_CHM_SP, double);
-CHM_DN M_numeric_as_chm_dense(CHM_DN, double *, int, int);
+double M_cholmod_factor_ldetL2(CHM_FR);
+CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 
 #define AS_CHM_FR(x) \
-	M_as_cholmod_factor((CHM_FR) alloca(sizeof(cholmod_factor)), x)
+	M_sexp_as_cholmod_factor((CHM_FR) alloca(sizeof(cholmod_factor)), x)
+
 #define AS_CHM_DN(x) \
-	M_as_cholmod_dense ((CHM_DN) alloca(sizeof(cholmod_dense )), x)
+	M_sexp_as_cholmod_dense ((CHM_DN) alloca(sizeof(cholmod_dense )), x)
+
 #define AS_CHM_SP(x) \
-	M_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
-	                    (Rboolean)  TRUE, (Rboolean) FALSE)
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
+	                         (Rboolean) 1, (Rboolean) 0)
+
 /* Non-(diag == "U")-checking version : */
 #define AS_CHM_SP__(x) \
-	M_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
-	                    (Rboolean) FALSE, (Rboolean) FALSE)
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
+	                         (Rboolean) 0, (Rboolean) 0)
 
-#define N_AS_CHM_DN(x, nr, nc) \
-	M_numeric_as_chm_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x , nr, nc)
-
+#define N_AS_CHM_DN(x, m, n) \
+	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
 #ifdef __cplusplus
 }
 #endif
