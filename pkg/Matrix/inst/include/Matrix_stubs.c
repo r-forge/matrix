@@ -286,15 +286,15 @@ M_cholmod_sdmult(CHM_SP A, int transpose,
 }
 #else
 int attribute_hidden
-M_cholmod_sdmult(const CHM_SP A, int transpose,
+M_cholmod_sdmult(const cholmod_sparse *A, int transpose,
                  const double *alpha, const double *beta,
-                 const CHM_DN X, CHM_DN Y, CHM_CM Common)
+                 const cholmod_dense *X, cholmod_dense *Y, cholmod_common *Common)
 {
-	static int(*fun)(const CHM_SP, int, const double *, const double *,
-	                 const CHM_DN, CHM_DN, CHM_CM) = NULL;
+	static int(*fun)(const cholmod_sparse *, int, const double *, const double *,
+	                 const cholmod_dense *, cholmod_dense *, cholmod_common *) = NULL;
 	if (fun == NULL)
-		fun = (int(*)(const CHM_SP, int, const double *, const double *,
-		              const CHM_DN, CHM_DN, CHM_CM))
+		fun = (int(*)(const cholmod_sparse *, int, const double *, const double *,
+		              const cholmod_dense *, cholmod_dense *, cholmod_common *))
 			R_GetCCallable("Matrix", "cholmod_sdmult");
 	return fun(A, transpose, alpha, beta, X, Y, Common);
 }
