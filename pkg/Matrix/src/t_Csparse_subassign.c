@@ -421,9 +421,15 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	SET_SLOT(ans, Matrix_diagSym, duplicate(GET_SLOT(x, Matrix_diagSym)));
     }
     // now assign the i- and x- slots,  free memory and return :
-    Memcpy(INTEGER(ALLOC_SLOT(ans, Matrix_iSym,  INTSXP, nnz)), ri, nnz);
+	PROTECT(islot = allocVector(INTSXP, nnz));
+	Memcpy(INTEGER(islot), ri, nnz);
+	SET_SLOT(ans, Matrix_iSym, islot);
+	UNPROTECT(1);
 #ifdef _has_x_slot_
-    Memcpy( STYP_x(ALLOC_SLOT(ans, Matrix_xSym,   SXP_x, nnz)), rx, nnz);
+	PROTECT(islot = allocVector(SXP_x, nnz));
+	Memcpy(STYP_x(islot), rx, nnz);
+	SET_SLOT(ans, Matrix_xSym, islot);
+	UNPROTECT(1);
     R_Free(rx);
 #endif
     R_Free(ri);
