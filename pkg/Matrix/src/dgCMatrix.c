@@ -55,7 +55,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 {
 	/* Find least squares solution of A * X = B, given A' and B : */
-	cholmod_sparse *At = dgC2cholmod(at, 1);
+	cholmod_sparse *At = M2CS(at, 1);
 	PROTECT(b = coerceVector(b, REALSXP));
 	if (LENGTH(b) != At->ncol)
 		error(_("dimensions of '%s' and '%s' are inconsistent"), "at", "b");
@@ -96,7 +96,7 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
 	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
 	/* L : */
-	PROTECT(tmp = cholmod2mf(L));
+	PROTECT(tmp = CF2M(L));
 	SET_VECTOR_ELT(ans, 0, tmp);
 	/* coef : */
 	PROTECT(tmp = allocVector(REALSXP, At->nrow));

@@ -593,7 +593,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(trf, &pid);
-	cholmod_sparse *A = dgC2cholmod(obj, 1);
+	cholmod_sparse *A = M2CS(obj, 1);
 	cholmod_factor *L = NULL;
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -601,7 +601,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 	A->stype = (ul == 'U') ? 1 : -1;
 
 	if (cached) {
-		L = mf2cholmod(trf);
+		L = M2CF(trf);
 		L = cholmod_copy_factor(L, &c);
 		dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
 	} else {
@@ -611,7 +611,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 			nm[2] = (L->is_ll   ) ? 'd' : 'D';
 		}
 	}
-	REPROTECT(trf = cholmod2mf(L), pid);
+	REPROTECT(trf = CF2M(L), pid);
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
@@ -800,7 +800,7 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 
 SEXP CHMfactor_diag_get(SEXP obj, SEXP square)
 {
-	cholmod_factor *L = mf2cholmod(obj);
+	cholmod_factor *L = M2CF(obj);
 	int n = (int) L->n, square_ = asLogical(square);
 	SEXP y = PROTECT(allocVector(REALSXP, n));
 	double *py = REAL(y);
@@ -848,8 +848,8 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 	if (!R_FINITE(mult_))
 		error(_("'%s' is not a number or not finite"), "mult");
 
-	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
-	cholmod_sparse *A = dgC2cholmod(parent, 1);
+	cholmod_factor *L = cholmod_copy_factor(M2CF(obj), &c);
+	cholmod_sparse *A = M2CS(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -858,7 +858,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 
 	dpCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
 
-	SEXP res = PROTECT(cholmod2mf(L));
+	SEXP res = PROTECT(CF2M(L));
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
@@ -874,8 +874,8 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
 
-	cholmod_factor *L = cholmod_copy_factor(mf2cholmod(obj), &c);
-	cholmod_sparse *A = dgC2cholmod(parent, 1);
+	cholmod_factor *L = cholmod_copy_factor(M2CF(obj), &c);
+	cholmod_sparse *A = M2CS(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -884,7 +884,7 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 
 	cholmod_updown(asLogical(update) != 0, A, L, &c);
 
-	SEXP res = PROTECT(cholmod2mf(L));
+	SEXP res = PROTECT(CF2M(L));
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));

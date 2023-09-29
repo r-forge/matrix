@@ -5,7 +5,7 @@
 cholmod_common c ;
 cholmod_common cl;
 
-cholmod_sparse *dgC2cholmod(SEXP obj, int values)
+cholmod_sparse *M2CS(SEXP obj, int values)
 {
 	cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse));
 	memset(A, 0, sizeof(cholmod_sparse));
@@ -43,7 +43,7 @@ cholmod_sparse *dgC2cholmod(SEXP obj, int values)
 	return A;
 }
 
-cholmod_dense *dge2cholmod(SEXP obj, int trans)
+cholmod_dense *M2CD(SEXP obj, int trans)
 {
 	cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(A, 0, sizeof(cholmod_dense));
@@ -90,7 +90,7 @@ cholmod_dense *dge2cholmod(SEXP obj, int trans)
 	return A;
 }
 
-cholmod_factor *mf2cholmod(SEXP obj)
+cholmod_factor *M2CF(SEXP obj)
 {
 	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
 	memset(L, 0, sizeof(cholmod_factor));
@@ -167,7 +167,7 @@ cholmod_factor *mf2cholmod(SEXP obj)
 	return L;
 }
 
-SEXP cholmod2dgC(cholmod_sparse *A, int values, char shape)
+SEXP CS2M(cholmod_sparse *A, int values, char shape)
 {
 	if (A->itype != CHOLMOD_INT)
 		error(_("wrong '%s'"), "itype");
@@ -211,7 +211,7 @@ SEXP cholmod2dgC(cholmod_sparse *A, int values, char shape)
 	return obj;
 }
 
-SEXP cholmod2dge(cholmod_dense *A, int trans, char shape)
+SEXP CD2M(cholmod_dense *A, int trans, char shape)
 {
 	if (A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
 		error(_("wrong '%s'"), "xtype");
@@ -255,7 +255,7 @@ SEXP cholmod2dge(cholmod_dense *A, int trans, char shape)
 	return obj;
 }
 
-SEXP cholmod2mf(cholmod_factor *L)
+SEXP CF2M(cholmod_factor *L)
 {
 	if (L->itype != CHOLMOD_INT)
 		error(_("wrong '%s'"), "itype");
