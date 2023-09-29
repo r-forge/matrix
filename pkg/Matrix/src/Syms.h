@@ -19,6 +19,4 @@ SEXP
 	Matrix_qSym,
 	Matrix_sdSym,
 	Matrix_uploSym,
-	Matrix_xSym,
-
-	MatrixNamespace;
+	Matrix_xSym;

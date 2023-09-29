@@ -31,16 +31,11 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 #define RREGDEF(name   )  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
 static R_CallMethodDef CallEntries[] = {
-	CALLDEF(R_cholmod_common_envini, 1),
-	CALLDEF(get_SuiteSparse_version, 0),
-
 	CALLDEF(m_encodeInd,  4),
 	CALLDEF(m_encodeInd2, 5),
 
 	CALLDEF(Matrix_rle_i, 2),
 	CALLDEF(Matrix_rle_d, 2),
-
-	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
 
 	CALLDEF(tCsparse_diag, 2),
 	CALLDEF(nCsparse_subassign, 4),
@@ -62,6 +57,8 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(dgeMatrix_Schur, 3),
 	CALLDEF(dgeMatrix_exp, 1),
+
+	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
 
 	CALLDEF(Matrix_validate, 1),
 	CALLDEF(MatrixFactorization_validate, 1),
@@ -267,6 +264,9 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_Matrix_as_kind, 3),
 	CALLDEF(R_Matrix_as_general, 2),
 
+	CALLDEF(R_cholmod_common_envini, 1),
+	CALLDEF(get_SuiteSparse_version, 0),
+
 	{NULL, NULL, 0}
 };
 
@@ -323,26 +323,15 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	RREGDEF(cholmod_triplet_to_sparse);
 	RREGDEF(cholmod_vertcat);
 	RREGDEF(cholmod_updown);
-
-	/* Matrix: SEXP -> CHOLMOD */
+	/* Matrix: */
 	RREGDEF(sexp_as_cholmod_factor);
 	RREGDEF(sexp_as_cholmod_sparse);
 	RREGDEF(sexp_as_cholmod_dense);
-
-	/* Matrix: CHOLMOD -> SEXP */
+	RREGDEF(numeric_as_cholmod_dense);
 	RREGDEF(cholmod_factor_as_sexp);
 	RREGDEF(cholmod_sparse_as_sexp);
-
-	/* Matrix: miscellaneous */
-	RREGDEF(chm_factor_ldetL2);
-	RREGDEF(chm_factor_update);
-	RREGDEF(numeric_as_chm_dense);
-
-	R_cholmod_start(&c);
-#if 0
-	/* TODO: needs more work in ./chm_common.c, etc. */
-	R_cholmod_start(&cl);
-#endif
+	RREGDEF(cholmod_factor_ldetL2);
+	RREGDEF(cholmod_factor_update);
 
 	Matrix_DimNamesSym = install("Dimnames");
 	Matrix_DimSym      = install("Dim");
@@ -366,27 +355,15 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_uploSym     = install("uplo");
 	Matrix_xSym        = install("x");
 
-	MatrixNamespace = R_FindNamespace(mkString("Matrix"));
-	if (MatrixNamespace == R_UnboundValue)
-		error(_("missing 'Matrix' namespace; should never happen"));
-#ifdef Matrix_Debug
-	if(isEnvironment(MatrixNamespace))
-		Rprintf("MatrixNamespace: %s\n",
-		        CHAR(asChar(eval(lang2(install("format"), MatrixNamespace),
-		                         R_GlobalEnv))));
-	else
-#else
-	if (!isEnvironment(MatrixNamespace))
-#endif
-		error(_("'Matrix' namespace not determined correctly"));
-
 	Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
 	Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
+
+	R_cholmod_common_start(&c);
 	return;
 }
 
 void R_unload_Matrix(DllInfo *info)
 {
-	cholmod_finish(&c);
+	R_cholmod_common_finish(&c);
 	return;
 }
