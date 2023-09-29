@@ -8,12 +8,12 @@
 extern cholmod_common c ;
 extern cholmod_common cl;
 
-cholmod_sparse *M2CS(SEXP obj, int values);
-cholmod_dense  *M2CD(SEXP obj, int  trans);
-cholmod_factor *M2CF(SEXP obj);
+cholmod_factor *M2CF(SEXP, int);
+cholmod_sparse *M2CS(SEXP, int);
+cholmod_dense  *M2CD(SEXP, int);
 
-SEXP CS2M(cholmod_sparse *A, int values, char shape);
-SEXP CD2M(cholmod_dense  *A, int  trans, char shape);
-SEXP CF2M(cholmod_factor *L);
+SEXP CF2M(cholmod_factor *, int);
+SEXP CS2M(cholmod_sparse *, int, char);
+SEXP CD2M(cholmod_dense  *, int, char);
 
 #endif /* MATRIX_CHOLMOD_ETC_H */

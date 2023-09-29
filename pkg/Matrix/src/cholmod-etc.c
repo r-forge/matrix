@@ -5,6 +5,88 @@
 cholmod_common c ;
 cholmod_common cl;
 
+cholmod_factor *M2CF(SEXP obj, int values)
+{
+	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
+	memset(L, 0, sizeof(cholmod_factor));
+	values = values && HAS_SLOT(obj, Matrix_xSym);
+	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
+		type = PROTECT(GET_SLOT(obj, install("type"))),
+		perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+		colcount = PROTECT(GET_SLOT(obj, install("colcount")));
+	L->n = INTEGER(dim)[0];
+	L->minor = L->n; /* FIXME: could be wrong for obj <- new(...) */
+	L->ordering = INTEGER(type)[0];
+	if (L->ordering != CHOLMOD_NATURAL)
+		L->Perm = INTEGER(perm);
+	else {
+		/* cholmod_check_factor allows L->Perm == NULL,
+		   but cholmod_copy_factor does not test, so it segfaults ...
+		*/
+		int j, n = (int) L->n, *Perm = (int *) R_alloc(L->n, sizeof(int));
+		for (j = 0; j < n; ++j)
+			Perm[j] = j;
+		L->Perm = Perm;
+	}
+	L->ColCount = INTEGER(colcount);
+	L->is_super = INTEGER(type)[2];
+	if (L->is_super) {
+		L->is_ll = 1;
+		L->is_monotonic = 1;
+		SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
+			pi = PROTECT(GET_SLOT(obj, install("pi"))),
+			px = PROTECT(GET_SLOT(obj, install("px"))),
+			s = PROTECT(GET_SLOT(obj, install("s")));
+		L->super = INTEGER(super);
+		L->pi = INTEGER(pi);
+		L->px = INTEGER(px);
+		L->s = INTEGER(s);
+		L->nsuper = LENGTH(super) - 1;
+		L->ssize = ((int *) L->pi)[L->nsuper];
+		L->xsize = ((int *) L->px)[L->nsuper];
+		L->maxcsize = INTEGER(type)[4];
+		L->maxesize = INTEGER(type)[5];
+		UNPROTECT(4);
+	} else {
+		L->is_ll = INTEGER(type)[1];
+		L->is_monotonic = INTEGER(type)[3];
+		if (values) {
+			SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+				i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+				nz = PROTECT(GET_SLOT(obj, install("nz"))),
+				nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
+				prv = PROTECT(GET_SLOT(obj, install("prv")));
+			L->p = INTEGER(p);
+			L->i = INTEGER(i);
+			L->nz = INTEGER(nz);
+			L->next = INTEGER(nxt);
+			L->prev = INTEGER(prv);
+			L->nzmax = ((int *) L->p)[L->n];
+			UNPROTECT(5);
+		}
+	}
+	L->itype = CHOLMOD_INT;
+	L->dtype = CHOLMOD_DOUBLE;
+	if (values) {
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		switch (TYPEOF(x)) {
+		case CPLXSXP:
+			L->x = COMPLEX(x);
+			L->xtype = CHOLMOD_COMPLEX;
+			break;
+		case REALSXP:
+			L->x = REAL(x);
+			L->xtype = CHOLMOD_REAL;
+			break;
+		default:
+			ERROR_INVALID_TYPE(x, __func__);
+			break;
+		}
+	}
+	UNPROTECT(4);
+	return L;
+}
+
 cholmod_sparse *M2CS(SEXP obj, int values)
 {
 	cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse));
@@ -52,8 +134,8 @@ cholmod_dense *M2CD(SEXP obj, int trans)
 	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
 	A->nrow = ((trans) ? n : m);
 	A->ncol = ((trans) ? m : n);
-	A->d = A->nrow;
 	A->nzmax = A->nrow * A->ncol;
+	A->d = A->nrow;
 	A->dtype = CHOLMOD_DOUBLE;
 	switch (TYPEOF(x)) {
 	case CPLXSXP:
@@ -90,81 +172,103 @@ cholmod_dense *M2CD(SEXP obj, int trans)
 	return A;
 }
 
-cholmod_factor *M2CF(SEXP obj)
+SEXP CF2M(cholmod_factor *L, int values)
 {
-	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
-	memset(L, 0, sizeof(cholmod_factor));
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		type = PROTECT(GET_SLOT(obj, install("type"))),
-		perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-		colcount = PROTECT(GET_SLOT(obj, install("colcount"))),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	L->n = INTEGER(dim)[0];
-	L->minor = L->n; /* FIXME: could be wrong for obj <- new(...) */
-	L->ordering = INTEGER(type)[0];
-	if (L->ordering != CHOLMOD_NATURAL)
-		L->Perm = INTEGER(perm);
-	else {
-		/* cholmod_check_factor allows L->Perm == NULL,
-		   but cholmod_copy_factor does not test, so it segfaults ...
-		*/
-		int j, n = (int) L->n, *Perm = (int *) R_alloc(L->n, sizeof(int));
-		for (j = 0; j < n; ++j)
-			Perm[j] = j;
-		L->Perm = Perm;
-	}
-	L->ColCount = INTEGER(colcount);
-	L->is_super = INTEGER(type)[2];
-	if (L->is_super) {
-		SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
-			pi = PROTECT(GET_SLOT(obj, install("pi"))),
-			px = PROTECT(GET_SLOT(obj, install("px"))),
-			s = PROTECT(GET_SLOT(obj, install("s")));
-		L->super = INTEGER(super);
-		L->pi = INTEGER(pi);
-		L->px = INTEGER(px);
-		L->s = INTEGER(s);
-		L->nsuper = LENGTH(super) - 1;
-		L->ssize = ((int *) L->pi)[L->nsuper];
-		L->xsize = ((int *) L->px)[L->nsuper];
-		L->maxcsize = INTEGER(type)[4];
-		L->maxesize = INTEGER(type)[5];
-		L->is_ll = 1;
-		L->is_monotonic = 1;
-		UNPROTECT(4);
+	if (L->itype != CHOLMOD_INT)
+		error(_("wrong '%s'"), "itype");
+	if (values && L->xtype != CHOLMOD_REAL && L->xtype != CHOLMOD_COMPLEX)
+		error(_("wrong '%s'"), "xtype");
+	if (values && L->dtype != CHOLMOD_DOUBLE)
+		error(_("wrong '%s'"), "dtype");
+	if (L->n > INT_MAX)
+		error(_("dimensions cannot exceed %s"), "2^31-1");
+	if (L->super) {
+		if (L->maxcsize > INT_MAX)
+			error(_("'%s' would overflow type \"%s\""),
+			      "maxcsize", "integer");
 	} else {
-		SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-			i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-			nz = PROTECT(GET_SLOT(obj, install("nz"))),
-			nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
-			prv = PROTECT(GET_SLOT(obj, install("prv")));
-		L->p = INTEGER(p);
-		L->i = INTEGER(i);
-		L->nz = INTEGER(nz);
-		L->next = INTEGER(nxt);
-		L->prev = INTEGER(prv);
-		L->nzmax = ((int *) L->p)[L->n];
-		L->is_ll = INTEGER(type)[1];
-		L->is_monotonic = INTEGER(type)[3];
+		if (L->n == INT_MAX)
+			error(_("n+1 would overflow type \"%s\""),
+			      "integer");
+	}
+	if (L->minor < L->n) {
+		if (L->is_ll)
+			error(_("leading principal minor of order %d is not positive"),
+			      (int) L->minor + 1);
+		else
+			error(_("leading principal minor of order %d is zero"),
+			      (int) L->minor + 1);
+	}
+	char cl[] = ".CHM.....";
+	cl[0] = (!values) ? 'n' : ((L->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd');
+	memcpy(cl + 4, (L->is_super) ? "super" : "simpl", 5);
+	SEXP obj = PROTECT(newObject(cl)),
+		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+	INTEGER(dim)[0] = INTEGER(dim)[1] = (int) L->n;
+	if (L->ordering != CHOLMOD_NATURAL) {
+		SEXP perm = PROTECT(allocVector(INTSXP, L->n));
+		Matrix_memcpy(INTEGER(perm), L->Perm, L->n, sizeof(int));
+		SET_SLOT(obj, Matrix_permSym, perm);
+		UNPROTECT(1);
+	}
+	SEXP type = PROTECT(allocVector(INTSXP, 6)),
+		colcount = PROTECT(allocVector(INTSXP, L->n));
+	INTEGER(type)[0] = L->ordering;
+	INTEGER(type)[1] = (L->is_super) ? 1 : L->is_ll;
+	INTEGER(type)[2] = (L->is_super) ? 1 : 0;
+	INTEGER(type)[3] = (L->is_super) ? 1 : L->is_monotonic;
+	INTEGER(type)[4] = (L->is_super) ? (int) L->maxcsize : 0;
+	INTEGER(type)[5] = (L->is_super) ? (int) L->maxesize : 0;
+	Matrix_memcpy(INTEGER(colcount), L->ColCount, L->n, sizeof(int));
+	SET_SLOT(obj, install("type"), type);
+	SET_SLOT(obj, install("colcount"), colcount);
+	if (L->is_super) {
+		SEXP super = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+			pi = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+			px = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
+			s = PROTECT(allocVector(INTSXP, L->ssize));
+		Matrix_memcpy(INTEGER(super), L->super, L->nsuper + 1, sizeof(int));
+		Matrix_memcpy(INTEGER(pi), L->pi, L->nsuper + 1, sizeof(int));
+		Matrix_memcpy(INTEGER(px), L->px, L->nsuper + 1, sizeof(int));
+		Matrix_memcpy(INTEGER(s), L->s, L->ssize, sizeof(int));
+		SET_SLOT(obj, install("super"), super);
+		SET_SLOT(obj, install("pi"), pi);
+		SET_SLOT(obj, install("px"), px);
+		SET_SLOT(obj, install("s"), s);
+		UNPROTECT(4);
+	} else if (values) {
+		SEXP p = PROTECT(allocVector(INTSXP, L->n + 1)),
+			i = PROTECT(allocVector(INTSXP, L->nzmax)),
+			nz = PROTECT(allocVector(INTSXP, L->n)),
+			nxt = PROTECT(allocVector(INTSXP, L->n + 2)),
+			prv = PROTECT(allocVector(INTSXP, L->n + 2));
+		Matrix_memcpy(INTEGER(p), L->p, L->n + 1, sizeof(int));
+		Matrix_memcpy(INTEGER(i), L->i, L->nzmax, sizeof(int));
+		Matrix_memcpy(INTEGER(nz), L->nz, L->n, sizeof(int));
+		Matrix_memcpy(INTEGER(nxt), L->next, L->n + 2, sizeof(int));
+		Matrix_memcpy(INTEGER(prv), L->prev, L->n + 2, sizeof(int));
+		SET_SLOT(obj, Matrix_pSym, p);
+		SET_SLOT(obj, Matrix_iSym, i);
+		SET_SLOT(obj, install("nz"), nz);
+		SET_SLOT(obj, install("nxt"), nxt);
+		SET_SLOT(obj, install("prv"), prv);
 		UNPROTECT(5);
 	}
-	L->itype = CHOLMOD_INT;
-	L->dtype = CHOLMOD_DOUBLE;
-	switch (TYPEOF(x)) {
-	case CPLXSXP:
-		L->x = COMPLEX(x);
-		L->xtype = CHOLMOD_COMPLEX;
-		break;
-	case REALSXP:
-		L->x = REAL(x);
-		L->xtype = CHOLMOD_REAL;
-		break;
-	default:
-		ERROR_INVALID_TYPE(x, __func__);
-		break;
+	if (values) {
+		SEXP x;
+		R_xlen_t nx = (R_xlen_t) ((L->is_super) ? L->xsize : L->nzmax);
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			PROTECT(x = allocVector(CPLXSXP, nx));
+			Matrix_memcpy(COMPLEX(x), L->x, nx, sizeof(Rcomplex));
+		} else {
+			PROTECT(x = allocVector(REALSXP, nx));
+			Matrix_memcpy(REAL(x), L->x, nx, sizeof(double));
+		}
+		SET_SLOT(obj, Matrix_xSym, x);
+		UNPROTECT(1);
 	}
-	UNPROTECT(5);
-	return L;
+	UNPROTECT(4);
+	return obj;
 }
 
 SEXP CS2M(cholmod_sparse *A, int values, char shape)
@@ -180,8 +284,7 @@ SEXP CS2M(cholmod_sparse *A, int values, char shape)
 	if (A->stype != 0 || !A->sorted || !A->packed)
 		cholmod_sort(A, &c);
 	char cl[] = "..CMatrix";
-	cl[0] = (!values || A->xtype == CHOLMOD_PATTERN)
-		? 'n' : ((A->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd');
+	cl[0] = (!values) ? 'n' : ((A->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd');
 	cl[1] = shape;
 	int m = (int) A->nrow, n = (int) A->ncol, nnz = ((int *) A->p)[A->ncol];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -252,98 +355,5 @@ SEXP CD2M(cholmod_dense *A, int trans, char shape)
 	}
 	SET_SLOT(obj, Matrix_xSym, x);
 	UNPROTECT(3);
-	return obj;
-}
-
-SEXP CF2M(cholmod_factor *L)
-{
-	if (L->itype != CHOLMOD_INT)
-		error(_("wrong '%s'"), "itype");
-	if (L->xtype != CHOLMOD_REAL && L->xtype != CHOLMOD_COMPLEX)
-		error(_("wrong '%s'"), "xtype");
-	if (L->dtype != CHOLMOD_DOUBLE)
-		error(_("wrong '%s'"), "dtype");
-	if (L->n > INT_MAX)
-		error(_("dimensions cannot exceed %s"), "2^31-1");
-	if (L->super) {
-		if (L->maxcsize > INT_MAX)
-			error(_("'%s' would overflow \"%s\""), "maxcsize", "integer");
-	} else {
-		if (L->n == INT_MAX)
-			error(_("n+1 would overflow \"%s\""), "integer");
-	}
-	if (L->minor < L->n) {
-		if (L->is_ll)
-			error(_("leading principal minor of order %d is not positive"),
-			      (int) L->minor + 1);
-		else
-			error(_("leading principal minor of order %d is zero"),
-			      (int) L->minor + 1);
-	}
-	char cl[] = ".CHM.....";
-	cl[0] = (L->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd';
-	memcpy(cl + 4, (L->is_super) ? "super" : "simpl", 5);
-	SEXP obj = PROTECT(newObject(cl)),
-		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	INTEGER(dim)[0] = INTEGER(dim)[1] = (int) L->n;
-	if (L->ordering != CHOLMOD_NATURAL) {
-		SEXP perm = PROTECT(allocVector(INTSXP, L->n));
-		Matrix_memcpy(INTEGER(perm), L->Perm, L->n, sizeof(int));
-		SET_SLOT(obj, Matrix_permSym, perm);
-		UNPROTECT(1);
-	}
-	SEXP type = PROTECT(allocVector(INTSXP, 6)),
-		colcount = PROTECT(allocVector(INTSXP, L->n));
-	INTEGER(type)[0] = L->ordering;
-	INTEGER(type)[1] = L->is_ll;
-	INTEGER(type)[2] = L->is_super;
-	INTEGER(type)[3] = L->is_monotonic;
-	INTEGER(type)[4] = (int) L->maxcsize;
-	INTEGER(type)[5] = (int) L->maxesize;
-	Matrix_memcpy(INTEGER(colcount), L->ColCount, L->n, sizeof(int));
-	SET_SLOT(obj, install("type"), type);
-	SET_SLOT(obj, install("colcount"), colcount);
-	if (L->is_super) {
-		SEXP super = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
-			pi = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
-			px = PROTECT(allocVector(INTSXP, L->nsuper + 1)),
-			s = PROTECT(allocVector(INTSXP, L->ssize));
-		Matrix_memcpy(INTEGER(super), L->super, L->nsuper + 1, sizeof(int));
-		Matrix_memcpy(INTEGER(pi), L->pi, L->nsuper + 1, sizeof(int));
-		Matrix_memcpy(INTEGER(px), L->px, L->nsuper + 1, sizeof(int));
-		Matrix_memcpy(INTEGER(s), L->s, L->ssize, sizeof(int));
-		SET_SLOT(obj, install("super"), super);
-		SET_SLOT(obj, install("pi"), pi);
-		SET_SLOT(obj, install("px"), px);
-		SET_SLOT(obj, install("s"), s);
-		UNPROTECT(4);
-	} else {
-		SEXP p = PROTECT(allocVector(INTSXP, L->n + 1)),
-			i = PROTECT(allocVector(INTSXP, L->nzmax)),
-			nz = PROTECT(allocVector(INTSXP, L->n)),
-			nxt = PROTECT(allocVector(INTSXP, L->n + 2)),
-			prv = PROTECT(allocVector(INTSXP, L->n + 2));
-		Matrix_memcpy(INTEGER(p), L->p, L->n + 1, sizeof(int));
-		Matrix_memcpy(INTEGER(i), L->i, L->nzmax, sizeof(int));
-		Matrix_memcpy(INTEGER(nz), L->nz, L->n, sizeof(int));
-		Matrix_memcpy(INTEGER(nxt), L->next, L->n + 2, sizeof(int));
-		Matrix_memcpy(INTEGER(prv), L->prev, L->n + 2, sizeof(int));
-		SET_SLOT(obj, Matrix_pSym, p);
-		SET_SLOT(obj, Matrix_iSym, i);
-		SET_SLOT(obj, install("nz"), nz);
-		SET_SLOT(obj, install("nxt"), nxt);
-		SET_SLOT(obj, install("prv"), prv);
-		UNPROTECT(5);
-	}
-	SEXP x;
-	if (L->xtype == CHOLMOD_COMPLEX) {
-		PROTECT(x = allocVector(CPLXSXP, (L->is_super) ? L->xsize : L->nzmax));
-		Matrix_memcpy(COMPLEX(x), L->x, XLENGTH(x), sizeof(Rcomplex));
-	} else {
-		PROTECT(x = allocVector(REALSXP, (L->is_super) ? L->xsize : L->nzmax));
-		Matrix_memcpy(REAL(x), L->x, XLENGTH(x), sizeof(double));
-	}
-	SET_SLOT(obj, Matrix_xSym, x);
-	UNPROTECT(5);
 	return obj;
 }

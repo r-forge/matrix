@@ -694,7 +694,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 
 	SEXP r;
 	int j;
-	cholmod_factor *L = M2CF(a);
+	cholmod_factor *L = M2CF(a, 1);
 	if (!asLogical(sparse)) {
 		cholmod_dense *B, *X;
 		if (isNull(b)) {

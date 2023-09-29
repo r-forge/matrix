@@ -333,7 +333,7 @@ SEXP CHMfactor_determinant(SEXP obj, SEXP logarithm, SEXP sqrt)
 {
 	DETERMINANT_START;
 
-	cholmod_factor *L = M2CF(obj);
+	cholmod_factor *L = M2CF(obj, 1);
 	int sign = (L->xtype == CHOLMOD_COMPLEX) ? NA_INTEGER : 1;
 
 	if (n > 0) {
