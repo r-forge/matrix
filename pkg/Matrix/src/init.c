@@ -325,13 +325,13 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	RREGDEF(cholmod_updown);
 
 	/* Matrix: SEXP -> CHOLMOD */
-	RREGDEF(as_cholmod_factor);
-	RREGDEF(as_cholmod_sparse);
-	RREGDEF(as_cholmod_dense);
+	RREGDEF(sexp_as_cholmod_factor);
+	RREGDEF(sexp_as_cholmod_sparse);
+	RREGDEF(sexp_as_cholmod_dense);
 
 	/* Matrix: CHOLMOD -> SEXP */
-	RREGDEF(chm_factor_to_SEXP);
-	RREGDEF(chm_sparse_to_SEXP);
+	RREGDEF(cholmod_factor_as_sexp);
+	RREGDEF(cholmod_sparse_as_sexp);
 
 	/* Matrix: miscellaneous */
 	RREGDEF(chm_factor_ldetL2);

@@ -278,10 +278,10 @@ static Rboolean isValid_Csparse(SEXP x)
  * @return ans containing pointers to the slots of x, *unless*
  *	check_Udiag and x is unitriangular.
  */
-/* AS_CHM_SP  (x) := as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x, TRUE,  FALSE)
- * AS_CHM_SP__(x) := as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x, FALSE, FALSE)
+/* AS_CHM_SP  (x) := sexp_as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x, TRUE,  FALSE)
+ * AS_CHM_SP__(x) := sexp_as_cholmod_sparse((CHM_SP)alloca(sizeof(cholmod_sparse)), x, FALSE, FALSE)
  */
-CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
+CHM_SP sexp_as_cholmod_sparse(CHM_SP ans, SEXP x,
 			 Rboolean check_Udiag, Rboolean sort_in_place)
 {
     static const char *valid[] = { VALID_CSPARSE, ""};
@@ -290,9 +290,9 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
     SEXP islot = GET_SLOT(x, Matrix_iSym);
 
     if (ctype < 0)
-	error(_("invalid class of object to as_cholmod_sparse"));
+	error(_("invalid class of object to sexp_as_cholmod_sparse"));
     if (!isValid_Csparse(x))
-	error(_("invalid object passed to as_cholmod_sparse"));
+	error(_("invalid object passed to sexp_as_cholmod_sparse"));
 
     memset(ans, 0, sizeof(cholmod_sparse)); /* zero the struct */
 
@@ -331,7 +331,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 #ifdef DEBUG_Matrix
 	    /* This "triggers" exactly for return values of dtCMatrix_sparse_solve():*/
 	    /* Don't want to translate this: want it report */
-	    Rprintf("Note: as_cholmod_sparse() needed cholmod_sort()ing\n");
+	    Rprintf("Note: sexp_as_cholmod_sparse() needed cholmod_sort()ing\n");
 #endif
 	    chm2Ralloc(ans, tmp);
 	    cholmod_free_sparse(&tmp, &c);
@@ -345,7 +345,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
 	CHM_SP tmp = cholmod_add(ans, eye, one, one, TRUE, TRUE, &c);
 
 #ifdef DEBUG_Matrix_verbose /* happens quite often, e.g. in ../tests/indexing.R : */
-	Rprintf("Note: as_cholmod_sparse(<ctype=%d>) - diagU2N\n", ctype);
+	Rprintf("Note: sexp_as_cholmod_sparse(<ctype=%d>) - diagU2N\n", ctype);
 #endif
 	chm2Ralloc(ans, tmp);
 	cholmod_free_sparse(&tmp, &c);
@@ -373,7 +373,7 @@ CHM_SP as_cholmod_sparse(CHM_SP ans, SEXP x,
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
+SEXP cholmod_sparse_as_sexp(CHM_SP a, int dofree, int uploT, int Rkind,
 			const char* diag, SEXP dn)
 {
     PROTECT(dn); /* dn is usually UNPROTECTed before the call */
@@ -417,7 +417,7 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
 	    break;
 	default:
 	    DOFREE_MAYBE;
-	    error(_("chm_sparse_to_SEXP(<real>, *): invalid 'Rkind' (real kind code)"));
+	    error(_("cholmod_sparse_as_sexp(<real>, *): invalid 'Rkind' (real kind code)"));
 	}
 	break;
     case CHOLMOD_COMPLEX:
@@ -491,7 +491,7 @@ SEXP chm_sparse_to_SEXP(CHM_SP a, int dofree, int uploT, int Rkind,
  * @return ans containing pointers to the slots of x, *unless*
  *	check_Udiag and x is unitriangular.
  */
-CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
+CHM_TR sexp_as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 {
     static const char *valid[] = { VALID_TSPARSE, ""};
     int ctype = R_check_class_etc(x, valid),
@@ -499,7 +499,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
     SEXP islot = GET_SLOT(x, Matrix_iSym);
     int m = LENGTH(islot);
     Rboolean do_Udiag = (check_Udiag && ctype % 3 == 2 && (*diag_P(x) == 'U'));
-    if (ctype < 0) error(_("invalid class of object to as_cholmod_triplet"));
+    if (ctype < 0) error(_("invalid class of object to sexp_as_cholmod_triplet"));
 
     memset(ans, 0, sizeof(cholmod_triplet)); /* zero the struct */
 
@@ -523,7 +523,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
 	int *a_i, *a_j;
 
 	if(!cholmod_reallocate_triplet((size_t) k, tmp, &cl))
-	    error(_("as_cholmod_triplet(): could not reallocate for internal diagU2N()"
+	    error(_("sexp_as_cholmod_triplet(): could not reallocate for internal diagU2N()"
 		      ));
 
 	/* TODO? instead of copy_triplet() & reallocate_triplet()
@@ -584,7 +584,7 @@ CHM_TR as_cholmod_triplet(CHM_TR ans, SEXP x, Rboolean check_Udiag)
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
+SEXP cholmod_triplet_as_sexp(CHM_TR a, int dofree, int uploT, int Rkind,
 			 const char* diag, SEXP dn)
 {
     SEXP ans;
@@ -683,7 +683,7 @@ SEXP chm_triplet_to_SEXP(CHM_TR a, int dofree, int uploT, int Rkind,
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
+CHM_DN sexp_as_cholmod_dense(CHM_DN ans, SEXP x)
 {
 #define _AS_cholmod_dense_1						\
     static const char *valid[] = { "dgeMatrix", "lgeMatrix", "ngeMatrix", ""}; \
@@ -700,7 +700,7 @@ CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 		 (isLogical(x) ? 2 : /* logical -> default to "l", not "n" */ \
 		  (isComplex(x) ? 6 : -1)));				\
     } else Memcpy(dims, INTEGER(GET_SLOT(x, Matrix_DimSym)), 2);	\
-    if (ctype < 0) error(_("invalid class of object to as_cholmod_dense")); \
+    if (ctype < 0) error(_("invalid class of object to sexp_as_cholmod_dense")); \
     memset(ans, 0, sizeof(cholmod_dense)); /* zero the struct */        \
                                                                         \
     ans->dtype = CHOLMOD_DOUBLE; /* characteristics of the system */	\
@@ -821,13 +821,13 @@ CHM_DN numeric_as_chm_dense(CHM_DN ans, double *v, int nr, int nc)
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_FR as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
+CHM_FR sexp_as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
 {
     static const char *valid[] = {
 		"dCHMsuper", "dCHMsimpl", "nCHMsuper", "nCHMsimpl", ""};
     int ctype = R_check_class_etc(x, valid);
     if (ctype < 0)
-	error(_("object of invalid class to 'as_cholmod_factor()'"));
+	error(_("object of invalid class to 'sexp_as_cholmod_factor()'"));
     memset(ans, 0, sizeof(cholmod_factor));
 
     SEXP tmp = GET_SLOT(x, install("type"));
@@ -884,7 +884,7 @@ CHM_FR as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
     }
 
     if (do_check && !cholmod_check_factor(ans, &c))
-	error(_("failure in as_cholmod_factor"));
+	error(_("failure in sexp_as_cholmod_factor"));
     return ans;
 }
 
@@ -902,8 +902,8 @@ CHM_FR as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
  *
  * @return ans containing pointers to the slots of x.
  */
-CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x) {
-    return as_cholmod_factor3(ans, x, /* do_check = */ TRUE);
+CHM_FR sexp_as_cholmod_factor(CHM_FR ans, SEXP x) {
+    return sexp_as_cholmod_factor3(ans, x, /* do_check = */ TRUE);
 }
 
 
@@ -916,7 +916,7 @@ CHM_FR as_cholmod_factor(CHM_FR ans, SEXP x) {
  *
  * @return SEXP containing a copy of a
  */
-SEXP chm_factor_to_SEXP(CHM_FR f, int dofree)
+SEXP cholmod_factor_as_sexp(CHM_FR f, int dofree)
 {
     SEXP ans;
     int *dims, *type;
