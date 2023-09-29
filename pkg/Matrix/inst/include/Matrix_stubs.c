@@ -567,14 +567,14 @@ M_cholmod_factor_as_sexp(CHM_FR L, int doFree)
 
 SEXP attribute_hidden
 M_cholmod_sparse_as_sexp(CHM_SP A, int doFree,
-                         int ttype, int doLogic, const char *diag,
+                         int ttype, int doLogic, const char *diagString,
                          SEXP dimnames)
 {
 	static SEXP(*fun)(CHM_SP, int, int, int, const char *, SEXP) = NULL;
 	if (fun == NULL)
 		fun = (SEXP(*)(CHM_SP, int, int, int, const char *, SEXP))
 			R_GetCCallable("Matrix", "cholmod_sparse_as_sexp");
-	return fun(A, doFree, ttype, doLogic, diag, dimnames);
+	return fun(A, doFree, ttype, doLogic, diagString, dimnames);
 }
 
 double attribute_hidden
