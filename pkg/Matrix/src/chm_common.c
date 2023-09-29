@@ -499,7 +499,7 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 
 /* NB: mostly parallel to CS2M in ./cholmod-etc.c */
 SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
-                            int ttype, int doLogic, const char *diag,
+                            int ttype, int doLogic, const char *diagString,
                             SEXP dimnames)
 {
 
@@ -561,22 +561,22 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 		SET_SLOT(to, Matrix_xSym, x);
 		UNPROTECT(1);
 	}
-	FREE_THEN();
-
-#undef FREE_THEN
-
 	if (ttype < 0 || A->stype < 0) {
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1);
 	}
-	if (ttype != 0 && diag[0] != 'N') {
+	if (ttype != 0 && diagString && diagString[0] != 'N') {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1);
 	}
 	if (TYPEOF(dimnames) == VECSXP && LENGTH(dimnames) == 2)
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	FREE_THEN();
+
+#undef FREE_THEN
+
 	UNPROTECT(4);
 	return to;
 }
