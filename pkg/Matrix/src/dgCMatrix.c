@@ -96,7 +96,7 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
 	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
 	/* L : */
-	PROTECT(tmp = CF2M(L));
+	PROTECT(tmp = CF2M(L, 1));
 	SET_VECTOR_ELT(ans, 0, tmp);
 	/* coef : */
 	PROTECT(tmp = allocVector(REALSXP, At->nrow));
