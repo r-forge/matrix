@@ -358,12 +358,12 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
 	Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
 
-	R_cholmod_common_start(&c);
+	R_cholmod_start(&c);
 	return;
 }
 
 void R_unload_Matrix(DllInfo *info)
 {
-	R_cholmod_common_finish(&c);
+	R_cholmod_finish(&c);
 	return;
 }

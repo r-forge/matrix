@@ -471,7 +471,7 @@ M_R_cholmod_error(int status, const char *file, int line,
 }
 
 int attribute_hidden
-M_R_cholmod_common_start(CHM_CM Common)
+M_R_cholmod_start(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)
@@ -492,7 +492,7 @@ M_R_cholmod_common_start(CHM_CM Common)
 }
 
 int attribute_hidden
-M_R_cholmod_common_finish(CHM_CM Common)
+M_R_cholmod_finish(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)

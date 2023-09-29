@@ -650,7 +650,7 @@ void R_cholmod_error(int status, const char *file, int line,
 		warning("CHOLMOD warning '%s' at file '%s', line %d", message, file, line);
 }
 
-int R_cholmod_common_start(cholmod_common *Common)
+int R_cholmod_start(cholmod_common *Common)
 {
 	int ans = cholmod_start(Common);
 	if (!ans)
@@ -668,7 +668,7 @@ int R_cholmod_common_start(cholmod_common *Common)
 	return ans;
 }
 
-int R_cholmod_common_finish(cholmod_common *Common)
+int R_cholmod_finish(cholmod_common *Common)
 {
 	int ans = cholmod_finish(Common);
 	if (!ans)
