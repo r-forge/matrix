@@ -694,7 +694,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 
 	SEXP r;
 	int j;
-	cholmod_factor *L = mf2cholmod(a);
+	cholmod_factor *L = M2CF(a);
 	if (!asLogical(sparse)) {
 		cholmod_dense *B, *X;
 		if (isNull(b)) {
@@ -712,14 +712,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
 			cholmod_free_dense(&B, &c);
-			PROTECT(r = cholmod2dge(X, 0,
+			PROTECT(r = CD2M(X, 0,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
-			B = dge2cholmod(b, 0);
+			B = M2CD(b, 0);
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
-			PROTECT(r = cholmod2dge(X, 0, 'g'));
+			PROTECT(r = CD2M(X, 0, 'g'));
 		}
 		cholmod_free_dense(&X, &c);
 	} else {
@@ -746,14 +746,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 				if (!X)
 					ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			}
-			PROTECT(r = cholmod2dgC(X, 1,
+			PROTECT(r = CS2M(X, 1,
 				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
-			B = dgC2cholmod(b, 1);
+			B = M2CS(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
-			PROTECT(r = cholmod2dgC(X, 1, 'g'));
+			PROTECT(r = CS2M(X, 1, 'g'));
 		}
 		cholmod_free_sparse(&X, &c);
 	}

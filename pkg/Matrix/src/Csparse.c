@@ -62,7 +62,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 		}
 	}
 	if (!sorted) {
-	cholmod_sparse *A = dgC2cholmod(x, 1);
+	cholmod_sparse *A = M2CS(x, 1);
 	A->sorted = 0;
 	if (!cholmod_sort(A, &c)) /* sorting in place !! */
 		error(_("'%s' failed"), "cholmod_sort");
@@ -343,7 +343,7 @@ SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
 		class = valid[R_check_class_etc(obj, valid)];
 	}
 
-	cholmod_sparse *A = dgC2cholmod(obj, 1);
+	cholmod_sparse *A = M2CS(obj, 1);
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
