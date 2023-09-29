@@ -1048,11 +1048,11 @@ typedef struct cholmod_triplet_struct
 
 /* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
-typedef cholmod_common * CHM_CM;
-typedef cholmod_factor * CHM_FR;
-typedef cholmod_sparse * CHM_SP;
-typedef cholmod_triplet* CHM_TR;
-typedef cholmod_dense  * CHM_DN;
+#define CHM_CM cholmod_common  *
+#define CHM_FR cholmod_factor  *
+#define CHM_SP cholmod_sparse  *
+#define CHM_TR cholmod_triplet *
+#define CHM_DN cholmod_dense   *
 
 /* Some reverse LinkingTo still use these (they should stop) : */
 #define const_CHM_FR CHM_FR
@@ -1113,7 +1113,8 @@ int     M_cholmod_updown           (int, CHM_SP, CHM_FR, CHM_CM);
 CHM_SP  M_cholmod_vertcat          (CHM_SP, CHM_SP, int, CHM_CM);
 
 void M_R_cholmod_error(int, const char *, int, const char *);
-int  M_R_cholmod_start(CHM_CM);
+int  M_R_cholmod_common_start (CHM_CM);
+int  M_R_cholmod_common_finish(CHM_CM);
 
 /* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
