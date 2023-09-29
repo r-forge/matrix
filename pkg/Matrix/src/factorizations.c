@@ -522,8 +522,8 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
                    int perm, int ldl, int super, double mult)
 {
 	/* defined in ./chm_common.c : */
-	void R_cholmod_common_envset(void);
 	void R_cholmod_common_envget(void);
+	void R_cholmod_common_envset(void);
 
 	R_cholmod_common_envset();
 
