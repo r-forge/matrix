@@ -551,7 +551,7 @@ M_numeric_as_cholmod_dense(CHM_DN A, double *from, int m, int n)
 	static CHM_DN(*fun)(CHM_DN, double *, int, int) = NULL;
 	if (fun == NULL)
 		fun = (CHM_DN(*)(CHM_DN, double *, int, int))
-			R_GetCCallable("Matrix", "numeric_as_chm_dense");
+			R_GetCCallable("Matrix", "numeric_as_cholmod_dense");
 	return fun(A, from, m, n);
 }
 
