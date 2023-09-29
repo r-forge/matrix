@@ -522,10 +522,10 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
                    int perm, int ldl, int super, double mult)
 {
 	/* defined in ./chm_common.c : */
-	void CHM_store_common(void);
-	void CHM_restore_common(void);
+	void R_cholmod_common_envset(void);
+	void R_cholmod_common_envget(void);
 
-	CHM_store_common();
+	R_cholmod_common_envset();
 
 	if (*L == NULL) {
 		if (perm == 0) {
@@ -556,7 +556,7 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
 	beta[1] = 0.0;
 	int res = cholmod_factorize_p(A, beta, NULL, 0, *L, &c);
 
-	CHM_restore_common();
+	R_cholmod_common_envget();
 
 	return res;
 }

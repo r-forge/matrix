@@ -31,7 +31,7 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 #define RREGDEF(name   )  R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
 static R_CallMethodDef CallEntries[] = {
-	CALLDEF(CHM_set_common_env, 1),
+	CALLDEF(R_cholmod_common_envini, 1),
 	CALLDEF(get_SuiteSparse_version, 0),
 
 	CALLDEF(m_encodeInd,  4),
