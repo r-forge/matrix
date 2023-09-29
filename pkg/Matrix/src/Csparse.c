@@ -8,81 +8,41 @@
 SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 {
 
-#define RMKMS(_FORMAT_, ...) \
-	return mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
+#define MKMS(_FORMAT_, ...) mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
 
-	/* NB: below mostly copied from CsparseMatrix_validate in ./validity.c */
-
+	/* defined in ./chm_common.c : */
+	SEXP checkpi(SEXP p, SEXP i, int m, int n);
+	
 	SEXP dim = GET_SLOT(x, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(x, Matrix_iSym));
-	UNPROTECT(2); /* i, p */
+		i = PROTECT(GET_SLOT(x, Matrix_iSym)),
+		cpi = PROTECT(checkpi(p, i, m, n));
 
-	if (TYPEOF(p) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
-	if (XLENGTH(p) - 1 != n)
-		RMKMS(_("'%s' slot does not have length %s"), "p", "Dim[2]+1");
-	int *pp = INTEGER(p);
-	if (pp[0] != 0)
-		RMKMS(_("first element of '%s' slot is not 0"), "p");
-	int j;
-	for (j = 1; j <= n; ++j) {
-		if (pp[j] == NA_INTEGER)
-			RMKMS(_("'%s' slot contains NA"), "p");
-		if (pp[j] < pp[j - 1])
-			RMKMS(_("'%s' slot is not nondecreasing"), "p");
-		if (pp[j] - pp[j - 1] > m)
-			RMKMS(_("first differences of '%s' slot exceed %s"), "p", "Dim[1]");
-	}
-
-	if (TYPEOF(i) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "i", "integer");
-	if (XLENGTH(i) < pp[n])
-		RMKMS(_("'%s' slot has length less than %s"), "i", "p[length(p)]");
-	int *pi = INTEGER(i), k, kend, ik, i0, sorted = 1;
-	for (j = 1, k = 0; j <= n; ++j) {
-		kend = pp[j];
-		i0 = -1;
-		while (k < kend) {
-			ik = pi[k];
-			if (ik == NA_INTEGER)
-				RMKMS(_("'%s' slot contains NA"), "i");
-			if (ik < 0 || ik >= m)
-				RMKMS(_("'%s' slot has elements not in {%s}"),
-				      "i", "0,...,Dim[1]-1");
-			if (ik < i0)
-				sorted = 0;
-			else if (ik == i0)
-				RMKMS(_("'%s' slot is not increasing within columns after sorting"),
-				      "i");
-			i0 = ik;
-			++k;
+	if (TYPEOF(cpi) == LGLSXP && !LOGICAL(cpi)[0]) {
+		cholmod_sparse *A = M2CS(x, 1);
+		A->sorted = 0;
+		if (!cholmod_sort(A, &c))
+			error(_("'%s' failed"), "cholmod_sort");
+		int *pp = (int *) A->p, *pi = (int *) A->i, i0, ik, j, k, kend;
+		for (j = 1, k = 0; j <= n; ++j) {
+			kend = pp[j];
+			i0 = -1;
+			while (k < kend) {
+				ik = pi[k];
+				if (ik <= i0)
+					return MKMS(_("'%s' slot is not increasing within columns after sorting"),
+					            "i");
+				i0 = ik;
+				++k;
+			}
 		}
-	}
-	if (!sorted) {
-	cholmod_sparse *A = M2CS(x, 1);
-	A->sorted = 0;
-	if (!cholmod_sort(A, &c)) /* sorting in place !! */
-		error(_("'%s' failed"), "cholmod_sort");
-	pp = (int *) A->p;
-	pi = (int *) A->i;
-	for (j = 1, k = 0; j <= n; ++j) {
-		kend = pp[j];
-		i0 = -1;
-		while (k < kend) {
-			ik = pi[k];
-			if (ik <= i0)
-				RMKMS(_("'%s' slot is not increasing within columns after sorting"),
-				      "i");
-			i0 = ik;
-			++k;
-		}
-	}
+		LOGICAL(cpi)[0] = 1;
 	}
 
-	return ScalarLogical(1);
+	UNPROTECT(3); /* cpi, i, p */
+	return cpi;
 }
 
 static

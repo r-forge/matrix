@@ -3,28 +3,27 @@
 
 #include "cholmod-etc.h"
 
-typedef cholmod_common  * CHM_CM;
-typedef cholmod_factor  * CHM_FR;
-typedef cholmod_sparse  * CHM_SP;
-typedef cholmod_triplet * CHM_TR;
-typedef cholmod_dense   * CHM_DN;
+cholmod_factor *   sexp_as_cholmod_factor(cholmod_factor *, SEXP);
+cholmod_sparse *   sexp_as_cholmod_sparse(cholmod_sparse *, SEXP,
+                                          Rboolean, Rboolean);
+cholmod_dense  *   sexp_as_cholmod_dense (cholmod_dense  *, SEXP);
+cholmod_dense  *numeric_as_cholmod_dense (cholmod_dense  *, double *,
+                                          int, int);
 
-SEXP get_SuiteSparse_version(void);
+SEXP cholmod_factor_as_sexp(cholmod_factor *, int);
+SEXP cholmod_sparse_as_sexp(cholmod_sparse *, int,
+                            int, int, const char *, SEXP);
 
-int R_cholmod_start(CHM_CM);
+double          cholmod_factor_ldetL2(cholmod_factor *);
+cholmod_factor *cholmod_factor_update(cholmod_factor *, cholmod_sparse *,
+                                      double);
+
+int  R_cholmod_common_start (cholmod_common *);
+int  R_cholmod_common_finish(cholmod_common *);
 SEXP R_cholmod_common_envini(SEXP);
 void R_cholmod_common_envset(void);
 void R_cholmod_common_envget(void);
 
-CHM_FR sexp_as_cholmod_factor   (CHM_FR, SEXP);
-CHM_SP sexp_as_cholmod_sparse   (CHM_SP, SEXP, Rboolean, Rboolean);
-CHM_DN sexp_as_cholmod_dense    (CHM_DN, SEXP);
-
-SEXP cholmod_factor_as_sexp (CHM_FR, int);
-SEXP cholmod_sparse_as_sexp (CHM_SP, int, int, int, const char *, SEXP);
-
-double chm_factor_ldetL2(CHM_FR);
-CHM_FR chm_factor_update(CHM_FR, CHM_SP, double);
-CHM_DN numeric_as_chm_dense(CHM_DN, double *, int, int);
+SEXP get_SuiteSparse_version(void);
 
 #endif /* MATRIX_CHM_COMMON_H */
