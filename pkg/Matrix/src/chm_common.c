@@ -23,7 +23,7 @@ static SEXP dboundSym, grow0Sym, grow1Sym, grow2Sym, maxrankSym,
     prefer_zomplexSym, prefer_upperSym, quick_return_if_not_posdefSym,
     nmethodsSym, m0_ordSym, postorderSym;
 
-void CHM_store_common(void) {
+void R_cholmod_common_envset(void) {
     SEXP rho = chm_common_env;
     defineVar(dboundSym, ScalarReal(c.dbound), rho);
     defineVar(grow0Sym, ScalarReal(c.grow0), rho);
@@ -48,7 +48,7 @@ void CHM_store_common(void) {
     defineVar(postorderSym, ScalarLogical(c.postorder), rho);
 }
 
-void CHM_restore_common(void) {
+void R_cholmod_common_envget(void) {
     SEXP rho = chm_common_env, var;
 
 #define SET_AS_FROM_FRAME(_V_, _KIND_, _SYM_)	\
@@ -78,7 +78,7 @@ void CHM_restore_common(void) {
     SET_AS_FROM_FRAME(c.postorder,          asLogical, postorderSym);
 }
 
-SEXP CHM_set_common_env(SEXP rho) {
+SEXP R_cholmod_common_envini(SEXP rho) {
     if (!isEnvironment(rho))
 	error(_("Argument rho must be an environment"));
     chm_common_env = rho;
@@ -101,7 +101,7 @@ SEXP CHM_set_common_env(SEXP rho) {
     nmethodsSym = install("nmethods");
     m0_ordSym = install("m0.ord");
     postorderSym = install("postorder");
-    CHM_store_common();
+    R_cholmod_common_envset();
     return R_NilValue;
 }
 
@@ -744,7 +744,7 @@ CHM_DN as_cholmod_dense(CHM_DN ans, SEXP x)
 
 void R_cholmod_error(int status, const char *file, int line, const char *message)
 {
-    CHM_restore_common(); /* restore any setting that may have been changed */
+    R_cholmod_common_envget(); /* restore any setting that may have been changed */
 
 /* NB: keep in sync with M_R_cholmod_error(), ../inst/include/Matrix_stubs.c */
 

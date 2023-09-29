@@ -12,9 +12,9 @@ typedef cholmod_dense   * CHM_DN;
 SEXP get_SuiteSparse_version(void);
 
 int R_cholmod_start(CHM_CM);
-SEXP CHM_set_common_env(SEXP);
-void CHM_store_common(void);
-void CHM_restore_common(void);
+SEXP R_cholmod_common_envini(SEXP);
+void R_cholmod_common_envset(void);
+void R_cholmod_common_envget(void);
 
 CHM_FR as_cholmod_factor   (CHM_FR, SEXP);
 CHM_SP as_cholmod_sparse   (CHM_SP, SEXP, Rboolean, Rboolean);
