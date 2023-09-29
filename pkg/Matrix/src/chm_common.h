@@ -16,12 +16,12 @@ SEXP R_cholmod_common_envini(SEXP);
 void R_cholmod_common_envset(void);
 void R_cholmod_common_envget(void);
 
-CHM_FR as_cholmod_factor   (CHM_FR, SEXP);
-CHM_SP as_cholmod_sparse   (CHM_SP, SEXP, Rboolean, Rboolean);
-CHM_DN as_cholmod_dense    (CHM_DN, SEXP);
+CHM_FR sexp_as_cholmod_factor   (CHM_FR, SEXP);
+CHM_SP sexp_as_cholmod_sparse   (CHM_SP, SEXP, Rboolean, Rboolean);
+CHM_DN sexp_as_cholmod_dense    (CHM_DN, SEXP);
 
-SEXP chm_factor_to_SEXP (CHM_FR, int);
-SEXP chm_sparse_to_SEXP (CHM_SP, int, int, int, const char *, SEXP);
+SEXP cholmod_factor_as_sexp (CHM_FR, int);
+SEXP cholmod_sparse_as_sexp (CHM_SP, int, int, int, const char *, SEXP);
 
 double chm_factor_ldetL2(CHM_FR);
 CHM_FR chm_factor_update(CHM_FR, CHM_SP, double);
