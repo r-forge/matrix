@@ -51,7 +51,8 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 	M_sexp_as_cholmod_factor((CHM_FR) alloca(sizeof(cholmod_factor)), x)
 
 #define AS_CHM_SP(x) \
-	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, 1, 0)
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
+	                         (Rboolean) 1, (Rboolean) 0)
 
 #define AS_CHM_DN(x) \
 	M_sexp_as_cholmod_dense ((CHM_DN) alloca(sizeof(cholmod_dense )), x)
@@ -67,7 +68,8 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 #define M_chm_factor_update  M_cholmod_factor_update
 
 #define AS_CHM_SP__(x) \
-	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, 0, 0)
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
+	                         (Rboolean) 0, (Rboolean) 0)
 
 #define N_AS_CHM_DN(x, m, n) \
 	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
