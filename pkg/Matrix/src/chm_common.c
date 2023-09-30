@@ -184,7 +184,7 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
                                        Rboolean checkUnit, Rboolean sortInPlace)
 {
-	/* MJ: Do we or our users really ever pass invalid 'from' ... ?
+	/* MJ: Do users really ever pass invalid 'from' ... ?
 	       If not, then the code here could be simplified tremendously ...
 	*/
 
