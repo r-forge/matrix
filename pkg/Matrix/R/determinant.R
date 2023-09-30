@@ -186,20 +186,3 @@ setMethod("determinant", signature(x = .cl, logarithm = "logical"),
                   .mkDet(x = diag(x, names = FALSE), logarithm = logarithm)
               else .mkDet(0, logarithm, 1L))
 rm(.cl)
-
-
-## MJ: unused
-if(FALSE) {
-ldet1.dsC <- function(x, ...)
-    .Call(CHMfactor_ldetL2, Cholesky(x, ...))
-
-## ~3% faster than ldet1:
-ldet2.dsC <- function(x, ...) {
-    Ch <- Cholesky(x, super = FALSE, ...)
-    .Call(tCsparse_diag, Ch, "sumLog")
-}
-
-## <1% faster than ldet2:
-ldet3.dsC <- function(x, perm = TRUE)
-    .Call(dsCMatrix_LDL_D, x, perm = perm, "sumLog")
-} ## MJ

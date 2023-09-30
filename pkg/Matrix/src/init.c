@@ -330,7 +330,7 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	RREGDEF(numeric_as_cholmod_dense);
 	RREGDEF(cholmod_factor_as_sexp);
 	RREGDEF(cholmod_sparse_as_sexp);
-	RREGDEF(cholmod_factor_ldetL2);
+	RREGDEF(cholmod_factor_ldetA);
 	RREGDEF(cholmod_factor_update);
 
 	Matrix_DimNamesSym = install("Dimnames");

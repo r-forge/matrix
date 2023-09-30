@@ -546,13 +546,13 @@ M_sexp_as_cholmod_dense(CHM_DN A, SEXP from)
 }
 
 CHM_DN attribute_hidden
-M_numeric_as_cholmod_dense(CHM_DN A, double *from, int m, int n)
+M_numeric_as_cholmod_dense(CHM_DN A, double *data, int nrow, int ncol)
 {
 	static CHM_DN(*fun)(CHM_DN, double *, int, int) = NULL;
 	if (fun == NULL)
 		fun = (CHM_DN(*)(CHM_DN, double *, int, int))
 			R_GetCCallable("Matrix", "numeric_as_cholmod_dense");
-	return fun(A, from, m, n);
+	return fun(A, data, nrow, ncol);
 }
 
 SEXP attribute_hidden
@@ -578,23 +578,23 @@ M_cholmod_sparse_as_sexp(CHM_SP A, int doFree,
 }
 
 double attribute_hidden
-M_cholmod_factor_ldetL2(CHM_FR L)
+M_cholmod_factor_ldetA(CHM_FR L)
 {
 	static double(*fun)(CHM_FR) = NULL;
 	if (fun == NULL)
 		fun = (double(*)(CHM_FR))
-			R_GetCCallable("Matrix", "cholmod_factor_ldetL2");
+			R_GetCCallable("Matrix", "cholmod_factor_ldetA");
 	return fun(L);
 }
 
 CHM_FR attribute_hidden
-M_cholmod_factor_update(CHM_FR L, CHM_SP A, double mult)
+M_cholmod_factor_update(CHM_FR L, CHM_SP A, double beta)
 {
 	static CHM_FR(*fun)(CHM_FR, CHM_SP, double) = NULL;
 	if (fun == NULL)
 		fun = (CHM_FR(*)(CHM_FR, CHM_SP, double))
 			R_GetCCallable("Matrix", "cholmod_factor_update");
-	return fun(L, A, mult);
+	return fun(L, A, beta);
 }
 
 #ifdef	__cplusplus
