@@ -36,9 +36,6 @@ extern void *alloca(size_t);
 # define attribute_hidden
 #endif
 
-bool Matrix_isclass_ge_dense(SEXP);
-bool Matrix_isclass_Csparse (SEXP);
-
 CHM_FR M_sexp_as_cholmod_factor(CHM_FR, SEXP);
 CHM_SP M_sexp_as_cholmod_sparse(CHM_SP, SEXP, Rboolean, Rboolean);
 CHM_DN M_sexp_as_cholmod_dense (CHM_DN, SEXP);
@@ -54,14 +51,13 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 	M_sexp_as_cholmod_factor((CHM_FR) alloca(sizeof(cholmod_factor)), x)
 
 #define AS_CHM_SP(x) \
-	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
-	                         (Rboolean) 1, (Rboolean) 0)
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, 1, 0)
 
 #define AS_CHM_DN(x) \
 	M_sexp_as_cholmod_dense ((CHM_DN) alloca(sizeof(cholmod_dense )), x)
 
 
-/* Below macros will be removed eventually, should not be used in new code : */
+/* Below are liable to be removed, should not be used in new code : */
 
 #define M_as_cholmod_sparse  M_sexp_as_cholmod_sparse
 #define M_as_cholmod_dense   M_sexp_as_cholmod_dense
@@ -69,6 +65,12 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 #define M_chm_sparse_to_SEXP M_cholmod_sparse_as_sexp
 #define M_chm_factor_ldetL2  M_cholmod_factor_ldetA
 #define M_chm_factor_update  M_cholmod_factor_update
+
+#define AS_CHM_SP__(x) \
+	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, 0, 0)
+
+#define N_AS_CHM_DN(x, m, n) \
+	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
 
 #define MATRIX_VALID_ge_dense \
 "ngeMatrix", "lgeMatrix", "dgeMatrix"
@@ -78,12 +80,8 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 "nsCMatrix", "lsCMatrix", "dsCMatrix", \
 "ntCMatrix", "ltCMatrix", "dtCMatrix"
 
-#define AS_CHM_SP__(x) \
-	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
-	                         (Rboolean) 0, (Rboolean) 0)
-
-#define N_AS_CHM_DN(x, m, n) \
-	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
+bool Matrix_isclass_ge_dense(SEXP);
+bool Matrix_isclass_Csparse (SEXP);
 
 #ifdef __cplusplus
 }
