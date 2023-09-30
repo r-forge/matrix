@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-R=R
+R=${R:-R-patched}
 if [ x$R_HOME = x ] ; then R_HOME=`$R RHOME`; fi
 RINC=${R_HOME}/include
 # For consistency of *.c below: set locale to simple C
