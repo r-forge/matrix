@@ -518,7 +518,7 @@ CHM_FR attribute_hidden
 M_sexp_as_cholmod_factor(CHM_FR L, SEXP from)
 {
 	static CHM_FR(*fun)(CHM_FR, SEXP) = NULL;
-	if(fun == NULL)
+	if (fun == NULL)
 		fun = (CHM_FR(*)(CHM_FR, SEXP))
 			R_GetCCallable("Matrix", "sexp_as_cholmod_factor");
 	return fun(L, from);
@@ -529,7 +529,7 @@ M_sexp_as_cholmod_sparse(CHM_SP A, SEXP from,
                          Rboolean checkUnit, Rboolean sortInPlace)
 {
 	static CHM_SP(*fun)(CHM_SP, SEXP, Rboolean, Rboolean)= NULL;
-	if(fun == NULL)
+	if (fun == NULL)
 		fun = (CHM_SP(*)(CHM_SP, SEXP, Rboolean, Rboolean))
 			R_GetCCallable("Matrix", "sexp_as_cholmod_sparse");
 	return fun(A, from, checkUnit, sortInPlace);
@@ -539,7 +539,7 @@ CHM_DN attribute_hidden
 M_sexp_as_cholmod_dense(CHM_DN A, SEXP from)
 {
 	static CHM_DN(*fun)(CHM_DN, SEXP) = NULL;
-	if(fun == NULL)
+	if (fun == NULL)
 		fun = (CHM_DN(*)(CHM_DN, SEXP))
 			R_GetCCallable("Matrix", "sexp_as_cholmod_dense");
 	return fun(A, from);
@@ -559,7 +559,7 @@ SEXP attribute_hidden
 M_cholmod_factor_as_sexp(CHM_FR L, int doFree)
 {
 	static SEXP(*fun)(CHM_FR, int) = NULL;
-	if(fun == NULL)
+	if (fun == NULL)
 		fun = (SEXP(*)(CHM_FR, int))
 			R_GetCCallable("Matrix", "cholmod_factor_as_sexp");
 	return fun(L, doFree);
