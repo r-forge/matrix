@@ -63,6 +63,19 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 	return ans;
 }
 
+/**
+ * Coerce from CHMfactor to (cholmod_factor *)
+ *
+ * Sets the members of a pointed-to cholmod_factor struct, using "data"
+ * obtained from slots of a CHMfactor.  The result should _not_ be
+ * freed using cholmod_free_factor, as the resulting members point to
+ * memory controlled by R, not by CHOLMOD.
+ * 
+ * @param L a pointer to a cholmod_factor struct, to be modified in-place.
+ * @param from an S4 object inheriting from virtual class CHMfactor.
+ *
+ * @return L.
+ */
 /* NB: mostly parallel to M2CF in ./cholmod-etc.c */
 cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 {
@@ -154,6 +167,19 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 	return L;
 }
 
+/**
+ * Coerce from CsparseMatrix to (cholmod_sparse *)
+ *
+ * Sets the members of a pointed-to cholmod_sparse struct, using "data"
+ * obtained from slots of a CsparseMatrix.  The result should _not_ be
+ * freed using cholmod_free_sparse, as the resulting members point to
+ * memory controlled by R, not by CHOLMOD.
+ * 
+ * @param A a pointer to a cholmod_sparse struct, to be modified in-place.
+ * @param from an S4 object inheriting from virtual class CsparseMatrix.
+ *
+ * @return A.
+ */
 /* NB: mostly parallel to M2CS in ./cholmod-etc.c */
 cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
                                        Rboolean checkUnit, Rboolean sortInPlace)
@@ -291,6 +317,21 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	return A;
 }
 
+/**
+ * Coerce from [nlidz]geMatrix or vector to (cholmod_dense *)
+ *
+ * Sets the members of a pointed-to cholmod_dense struct, using "data"
+ * obtained from slots of a [nlidz]geMatrix.  The result should _not_ be
+ * freed using cholmod_free_dense, as the resulting members point to
+ * memory controlled by R, not by CHOLMOD.
+ * 
+ * @param A a pointer to a cholmod_dense struct, to be modified in-place.
+ * @param from an S4 object inheriting from class [nlidz]geMatrix _or_
+ *     a traditional vector of type "logical", "integer", "double", or
+ *     "complex" (to be handled as a 1-column matrix if not a matrix).
+ *
+ * @return A.
+ */
 /* NB: mostly parallel to M2CD in ./cholmod-etc.c */
 cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 {
@@ -363,20 +404,48 @@ cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 	return A;
 }
 
-cholmod_dense *numeric_as_cholmod_dense(cholmod_dense *A, double *from,
-                                        int m, int n)
+/**
+ * Coerce from (double *) to (cholmod_dense *) with given dimensions
+ *
+ * An analogue of base::matrix(data, nrow, ncol),
+ * where typeof(data)=="double" and length(data)==nrow*ncol.
+ * 
+ * @param A a pointer to a cholmod_dense struct, to be modified in-place.
+ * @param data a pointer to an nrow*ncol*sizeof(double) block of memory.
+ * @param nrow the desired number of rows.
+ * @param ncol the desired number of columns.
+ *
+ * @return A.
+ */
+cholmod_dense *numeric_as_cholmod_dense(cholmod_dense *A,
+                                        double *data, int nrow, int ncol)
 {
 	memset(A, 0, sizeof(cholmod_dense));
-	A->nrow = m;
-	A->ncol = n;
+	A->nrow = nrow;
+	A->ncol = ncol;
 	A->nzmax = A->nrow * A->ncol;
 	A->d = A->nrow;
-	A->x = from;
+	A->x = data;
 	A->xtype = CHOLMOD_REAL;
 	A->dtype = CHOLMOD_DOUBLE;
 	return A;
 }
 
+/**
+ * Coerce from (cholmod_factor *) to CHMfactor
+ *
+ * Allocates an S4 object inheriting from virtual class CHMfactor
+ * and copies into the slots from members of a pointed-to cholmod_factor
+ * struct.  The specific class of the result is determined by members
+ * xtype and is_super of the struct.
+ * 
+ * @param L a pointer to a cholmod_factor struct.
+ * @param doFree a flag indicating if and how to free L before returning.
+ *     (0) don't free, (>0) free with cholmod_free_factor, (<0) free with
+ *     R_Free.
+ *
+ * @return A CHMfactor.
+ */
 /* NB: mostly parallel to CF2M in ./cholmod-etc.c */
 SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 {
@@ -497,6 +566,33 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 	return to;
 }
 
+/**
+ * Coerce from (cholmod_sparse *) to CsparseMatrix
+ *
+ * Allocates an S4 object inheriting from virtual class CsparseMatrix
+ * and copies into the slots from members of a pointed-to cholmod_sparse
+ * struct.  The specific class of the result is determined by members
+ * xtype and stype of the struct and by arguments ttype and doLogic.
+ * 
+ * @param A a pointer to a cholmod_sparse struct.
+ * @param doFree a flag indicating if and how to free A before returning.
+ *     (0) don't free, (>0) free with cholmod_free_sparse, (<0) free with
+ *     R_Free.
+ * @param ttype a flag indicating if the result should be a .tCMatrix.
+ *     (0) not .tCMatrix, (>0) .tCMatrix with uplo="U", (<0) .tCMatrix
+ *     with uplo="L".  If ttype=0, then the result is a .gCMatrix or
+ *     .sCMatrix depending on stype.  (0) .gCMatrix, (>0) .sCMatrix with
+ *     uplo="U", (<0) .sCMatrix with uplo="L".
+ * @param doLogic a flag indicating if the result should be a l.CMatrix
+ *     if xtype=CHOLMOD_REAL.
+ * @param diagString a null-terminated string or NULL.  The diag slot
+ *     of a .tCMatrix result is "N" if and only if diagString is NULL
+ *     or diagString[0] is 'N'.
+ * @param dimnames an R object specifying the Dimnames slot of the result,
+ *     unused if not a list of length 2.
+ *
+ * @return A CsparseMatrix.
+ */
 /* NB: mostly parallel to CS2M in ./cholmod-etc.c */
 SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
                             int ttype, int doLogic, const char *diagString,
@@ -581,7 +677,20 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 	return to;
 }
 
-double cholmod_factor_ldetL2(cholmod_factor *L)
+/**
+ * Log determinant from Cholesky factorization
+ *
+ * Computes log(det(A)) given the Cholesky factorization of A as
+ * P1 * A * P1' = L1 * D * L1' = L * L', L = L1 * sqrt(D).  The
+ * result is computed as sum(log(diag(D))) or 2*sum(log(diag(L))),
+ * depending on members is_super and is_ll of the supplied struct.
+ * Note that CHOLMOD does not require diag(D) to be positive and
+ * that this routine does not check (FIXME).
+ * 
+ * @param L a pointer to a cholmod_factor struct.  It is assumed that
+ *     L->xtype=CHOLMOD_REAL.
+ */
+double cholmod_factor_ldetA(cholmod_factor *L)
 {
 	int i, j, p;
 	double ans = 0;
@@ -601,7 +710,7 @@ double cholmod_factor_ldetL2(cholmod_factor *L)
 			for (p = lp[j]; li[p] != j && p < lp[j + 1]; p++)
 				;
 			if (li[p] != j) {
-				error(_("diagonal element %d of Cholesky factor is missing"),
+				error(_("invalid simplicial Cholesky factorization: structural zero on main diagonal in column %d"),
 				      j);
 				break;
 			}
@@ -611,14 +720,31 @@ double cholmod_factor_ldetL2(cholmod_factor *L)
 	return ans;
 }
 
+/**
+ * Update a Cholesky factorization
+ *
+ * Updates in-place the Cholesky factorization of a symmetric matrix
+ * X+alpha*I with the Cholesky factorization of
+ * (1) A+beta*I, where A is a symmetric matrix sharing the nonzero pattern
+ * of X, or
+ * (2) A*A'+beta*I, where A is a general matrix sharing the nonzero pattern
+ * of Y, assuming that X = Y*Y'.
+ * 
+ * @param L a pointer to a cholmod_factor struct, to be modified in-place.
+ * @param A a pointer to a cholmod_sparse struct.
+ * @param beta a multiplier, typically positive, to guarantee strict
+ *     diagonal dominance.
+ *
+ * @return L.
+ */
 cholmod_factor *cholmod_factor_update(cholmod_factor *L, cholmod_sparse *A,
-                                      double mult)
+                                      double beta)
 {
 	int ll = L->is_ll;
-	double beta[2];
-	beta[0] = mult;
-	beta[1] = 0.0;
-	if (!cholmod_factorize_p(A, beta, NULL, 0, L, &c))
+	double z[2];
+	z[0] = beta;
+	z[1] = 0.0;
+	if (!cholmod_factorize_p(A, z, NULL, 0, L, &c))
 		error(_("'%s' failed"), "cholmod_factorize_p");
 	if (L->is_ll != ll &&
 	    !cholmod_change_factor(L->xtype, ll, L->is_super, 1, 1, L, &c))

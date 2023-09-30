@@ -47,7 +47,7 @@ CHM_DN M_numeric_as_cholmod_dense(CHM_DN, double *, int, int);
 SEXP M_cholmod_factor_as_sexp(CHM_FR, int);
 SEXP M_cholmod_sparse_as_sexp(CHM_SP, int, int, int, const char *, SEXP);
 
-double M_cholmod_factor_ldetL2(CHM_FR);
+double M_cholmod_factor_ldetA (CHM_FR);
 CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 
 #define AS_CHM_FR(x) \
@@ -67,7 +67,7 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 #define M_as_cholmod_dense   M_sexp_as_cholmod_dense
 #define M_chm_factor_to_SEXP M_cholmod_factor_as_sexp
 #define M_chm_sparse_to_SEXP M_cholmod_sparse_as_sexp
-#define M_chm_factor_ldetL2  M_cholmod_factor_ldetL2
+#define M_chm_factor_ldetL2  M_cholmod_factor_ldetA
 #define M_chm_factor_update  M_cholmod_factor_update
 
 #define MATRIX_VALID_ge_dense \
@@ -84,6 +84,7 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 
 #define N_AS_CHM_DN(x, m, n) \
 	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
+
 #ifdef __cplusplus
 }
 #endif

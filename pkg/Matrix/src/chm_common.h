@@ -14,7 +14,7 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *, int);
 SEXP cholmod_sparse_as_sexp(cholmod_sparse *, int,
                             int, int, const char *, SEXP);
 
-double          cholmod_factor_ldetL2(cholmod_factor *);
+double          cholmod_factor_ldetA (cholmod_factor *);
 cholmod_factor *cholmod_factor_update(cholmod_factor *, cholmod_sparse *,
                                       double);
 
