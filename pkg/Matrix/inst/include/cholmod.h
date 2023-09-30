@@ -1112,7 +1112,7 @@ CHM_SP  M_cholmod_triplet_to_sparse(CHM_TR, int, CHM_CM);
 int     M_cholmod_updown           (int, CHM_SP, CHM_FR, CHM_CM);
 CHM_SP  M_cholmod_vertcat          (CHM_SP, CHM_SP, int, CHM_CM);
 
-void M_R_cholmod_error(int, const char *, int, const char *);
+void M_R_cholmod_error (int, const char *, int, const char *);
 int  M_R_cholmod_start (CHM_CM);
 int  M_R_cholmod_finish(CHM_CM);
 
