@@ -232,13 +232,13 @@ SEXP dppMatrix_trf_(SEXP obj, int warn)
 			Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
 			Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
 			F77_CALL(zpptrf)(&ul, &n, py, &info FCONE);
-			ERROR_LAPACK_3(zpptrf, info, warn, 5);
+			ERROR_LAPACK_3(zpptrf, info, warn, 6);
 		} else {
 #endif
 			double *px = REAL(x), *py = REAL(y);
 			Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
 			F77_CALL(dpptrf)(&ul, &n, py, &info FCONE);
-			ERROR_LAPACK_3(dpptrf, info, warn, 5);
+			ERROR_LAPACK_3(dpptrf, info, warn, 6);
 #ifdef MATRIX_ENABLE_ZMATRIX
 		}
 #endif

@@ -30,9 +30,11 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 			i0 = -1;
 			while (k < kend) {
 				ik = pi[k];
-				if (ik <= i0)
+				if (ik <= i0) {
+					UNPROTECT(3); /* cpi, i, p */
 					return MKMS(_("'%s' slot is not increasing within columns after sorting"),
 					            "i");
+				}
 				i0 = ik;
 				++k;
 			}
@@ -312,9 +314,11 @@ SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
 	const char *path_ = CHAR(asChar(path));
 	FILE *f = fopen(path_, "w");
 	if (!f)
-		error(_("failure to open file \"%s\" for writing"), path_);
+		error(_("failed to open file \"%s\" for writing"), path_);
 	if (!cholmod_write_sparse(f, A, (cholmod_sparse *) NULL, (char *) NULL, &c))
 		error(_("'%s' failed"), "cholmod_write_sparse");
 	fclose(f);
+	
+	UNPROTECT(1);
 	return R_NilValue;
 }
