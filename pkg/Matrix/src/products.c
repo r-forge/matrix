@@ -540,7 +540,7 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int rk = INTEGER(adim)[0];
 
-	SEXP bdim = PROTECT(GET_SLOT(b, Matrix_DimSym));
+	SEXP bdim = GET_SLOT(b, Matrix_DimSym);
 	int *pbdim = INTEGER(bdim), bm = pbdim[0], bn = pbdim[1],
 		rm = (btrans) ? bn : bm, rn = (btrans) ? bm : bn;
 
