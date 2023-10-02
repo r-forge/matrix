@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-01 r4413)}{
+\section{Changes in version 1.6-2 (2023-10-02 r4414)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -167,9 +167,7 @@
       instead of from \code{cholmod_band_inplace}.
 
       \item Many API function prototypes wrongly used \code{const}
-      qualifiers where the registered routines do not.  A corollary
-      is that types \code{const_CHM_*} are now simple aliases for
-      \code{CHM_*}, i.e., the unqualified analogues.
+      qualifiers where the registered routines do not.
     }
   }
   \subsection{Misc}{

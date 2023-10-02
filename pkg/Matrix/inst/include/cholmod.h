@@ -1054,12 +1054,6 @@ typedef cholmod_sparse * CHM_SP;
 typedef cholmod_triplet* CHM_TR;
 typedef cholmod_dense  * CHM_DN;
 
-/* Some reverse LinkingTo still use these (they should stop) : */
-#define const_CHM_FR CHM_FR
-#define const_CHM_SP CHM_SP
-#define const_CHM_TR CHM_TR
-#define const_CHM_DN CHM_DN
-
 CHM_SP  M_cholmod_aat              (CHM_SP, int *, size_t, int, CHM_CM);
 CHM_SP  M_cholmod_add              (CHM_SP, CHM_SP, double[2], double[2],
                                     int, int, CHM_CM);
