@@ -44,7 +44,7 @@ setMethod("expm", signature(x = "dtpMatrix"),
           function(x) {
               r <- .Call(dgeMatrix_exp, .M2gen(x))
               ## Pack without checking:
-              .Call(R_dense_as_packed, x, x@uplo, "N")
+              .Call(R_dense_as_packed, r, x@uplo, "N")
           })
 
 setMethod("expm", signature(x = "dsyMatrix"),
@@ -57,7 +57,7 @@ setMethod("expm", signature(x = "dspMatrix"),
           function(x) {
               r <- .Call(dgeMatrix_exp, .M2gen(x))
               ## Pack without checking:
-              .Call(R_dense_as_packed, x, x@uplo, "")
+              .Call(R_dense_as_packed, r, x@uplo, "")
           })
 
 ## Until R supports it:
