@@ -44,15 +44,15 @@
 %
 \description{
   \itemize{
-    \item{The \code{"dpoMatrix"} class is the class of
-      positive-semidefinite symmetric matrices in nonpacked storage.}
-    \item{The \code{"dppMatrix"} class is the same except in packed
+    \item The \code{"dpoMatrix"} class is the class of
+      positive-semidefinite symmetric matrices in nonpacked storage.
+    \item The \code{"dppMatrix"} class is the same except in packed
       storage.  Only the upper triangle or the lower triangle is
-      required to be available.}
-    \item{The \code{"corMatrix"} and \code{"pcorMatrix"} classes
+      required to be available.
+    \item The \code{"corMatrix"} and \code{"pcorMatrix"} classes
       represent correlation matrices.  They extend \code{"dpoMatrix"}
       and \code{"dppMatrix"}, respectively, with an additional slot
-      \code{sd} allowing restoration of the original covariance matrix.}
+      \code{sd} allowing restoration of the original covariance matrix.
   }
 }
 \section{Objects from the Class}{Objects can be created by calls of the
@@ -95,8 +95,8 @@
       \code{x}.  The \code{norm} can be \code{"O"} for the
       one-norm (the default) or \code{"I"} for the infinity-norm.  For
       symmetric matrices the result does not depend on the norm.}
-    \item{solve}{\code{signature(a = "dpoMatrix", b = "....")}}{, and}
-    \item{solve}{\code{signature(a = "dppMatrix", b = "....")}}{work
+    \item{solve}{\code{signature(a = "dpoMatrix", b = "....")}, and}
+    \item{solve}{\code{signature(a = "dppMatrix", b = "....")}  work
       via the Cholesky composition, see also the Matrix \code{\link{solve-methods}}.}
     \item{Arith}{\code{signature(e1 = "dpoMatrix", e2 = "numeric")} (and
       quite a few other signatures): The result of (\dQuote{elementwise}

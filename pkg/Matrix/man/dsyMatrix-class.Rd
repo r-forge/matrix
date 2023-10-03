@@ -18,11 +18,11 @@
 %
 \description{
   \itemize{
-    \item{The \code{"dsyMatrix"} class is the class of symmetric, dense matrices
-      in \emph{non-packed} storage and}
-    \item{\code{"dspMatrix"} is the class of symmetric dense matrices in
+    \item The \code{"dsyMatrix"} class is the class of symmetric, dense matrices
+      in \emph{non-packed} storage and
+    \item \code{"dspMatrix"} is the class of symmetric dense matrices in
       \emph{packed} storage, see \code{\link{pack}()}.  Only the upper
-      triangle or the lower triangle is stored.}
+      triangle or the lower triangle is stored.
   }
 }
 \section{Objects from the Class}{

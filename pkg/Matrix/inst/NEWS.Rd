@@ -1210,7 +1210,7 @@
       \item \code{!<ndenseMatrix>} and \code{which(<ndenseMatrix>)}
       now correctly handle \code{NA} as \code{TRUE}.
 
-      \item{anyNA(<denseMatrix>)} had incorrectly returned
+      \item \code{anyNA(<denseMatrix>)} had incorrectly returned
       \code{anyNA(.@x)} in many cases, giving false positives
       for some \code{.(tr|sy)Matrix} and \code{ndenseMatrix}.
       Now methods respect the \dQuote{rules} of these classes.
@@ -1835,8 +1835,8 @@
       \item regression tests depending on \code{sample()} now are future
       proof reproducible, via \code{RNGversion(.)}.
 
-      \item give information about #{rows} and #{columns} that are
-      suppressed in print()ing if the matrix is larger than `max.print`.
+      \item give information about #\{rows\} and #\{columns\} that are
+      suppressed in print()ing if the matrix is larger than \code{max.print}.
     }
   }
   \subsection{Bug Fixes}{

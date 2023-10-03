@@ -24,17 +24,17 @@ setMethod("Summary", signature(x = "denseMatrix"),
               repr <- substr(cl, 3L, 3L)
               switch(kind,
                      "n" = ,
-                     "l" = { zero <- FALSE; one <- TRUE },
-                     "i" = { zero <- 0L   ; one <- 1L   },
-                     "d" = { zero <- 0    ; one <- 1    },
-                     "z" = { zero <- 0+0i ; one <- 1+0i })
+                     "l" = { zero <- FALSE }, # one <- TRUE
+                     "i" = { zero <- 0L    }, # one <- 1L  
+                     "d" = { zero <- 0     }, # one <- 1   
+                     "z" = { zero <- 0+0i  }) # one <- 1+0i
               if(shape != "g") {
                   if(repr != "p")
                       x <- .M2packed(x)
                   if(shape == "t" && x@diag != "N")
                       diag(x) <- TRUE # copying, sadly
               }
-              n <- (d <- x@Dim)[2L]
+              n <- x@Dim[2L]
               y <- x@x
               y1 <- if(kind != "n" || !anyNA(y))
                         y
