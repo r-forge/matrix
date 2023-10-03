@@ -107,7 +107,7 @@ setMethod("determinant", signature(x = "dgeMatrix", logarithm = "logical"),
 setMethod("determinant", signature(x = "dgCMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               d <- x@Dim
-              if((n <- d[1L]) != d[2L])
+              if(d[1L] != d[2L])
                   stop("determinant of non-square matrix is undefined")
               trf <- lu(x, errSing = FALSE)
               if(isS4(trf))
@@ -126,7 +126,7 @@ setMethod("determinant", signature(x = "dgTMatrix", logarithm = "logical"),
 setMethod("determinant", signature(x = "indMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               d <- x@Dim
-              if((n <- d[1L]) != d[2L])
+              if(d[1L] != d[2L])
                   stop("determinant of non-square matrix is undefined")
               if(anyDuplicated.default(perm <- x@perm))
                   .mkDet(-Inf, logarithm, 1L)
