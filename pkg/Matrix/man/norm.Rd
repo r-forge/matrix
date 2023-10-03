@@ -42,7 +42,7 @@ norm(x, type, \dots)
 	Euclidean norm of \code{x} treated as if it were a vector);}
       \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of
 	all the elements in \code{x}; and}
-      \item{\code{"2"}}{specifies the \dQuote{spectral norm} or {2-norm}, which
+      \item{\code{"2"}}{specifies the \dQuote{spectral norm} aka \dQuote{2-norm}, which
 	is the largest singular value (\code{\link{svd}}) of \code{x}.}
     }
     The default is \code{"O"}.  Only the first character of

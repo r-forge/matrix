@@ -50,9 +50,9 @@ setMethod("log", signature(x = "denseMatrix"),
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               if(kind == "z") {
-                  zero <- 0+0i; one <- 1+0i
+                  ## zero <- 0+0i; one <- 1+0i
               } else {
-                  zero <- 0   ; one <- 1
+                  ## zero <- 0   ; one <- 1
                   substr(cl, 1L, 1L) <- "d"
               }
               if(shape == "t") {
@@ -87,7 +87,7 @@ setMethod("Math", signature(x = "sparseMatrix"),
               if(!stay0)
                   substr(cl, 2L, 3L) <- if(shape == "s") "sy" else "ge"
               r <- new(cl)
-              r@Dim <- d <- x@Dim
+              r@Dim      <- x@Dim
               r@Dimnames <- x@Dimnames
               if(shape == "s" || (shape == "t" && stay0))
                   r@uplo <- x@uplo
@@ -126,7 +126,7 @@ setMethod("log", signature(x = "sparseMatrix"),
               }
               substr(cl, 2L, 3L) <- if(shape == "s") "sy" else "ge"
               r <- new(cl)
-              r@Dim <- d <- x@Dim
+              r@Dim      <- x@Dim
               r@Dimnames <- x@Dimnames
               if(shape == "s")
                   r@uplo <- x@uplo
@@ -240,7 +240,7 @@ setMethod("log", signature(x = "sparseVector"),
                   zero <- 0   ; one <- 1
               }
               r <- rep.int(log(zero, ...), x@length)
-              if((nnz <- length(x@i)) > 0L)
+              if(length(x@i) > 0L)
                   r[x@i] <- log(if(kind == "n") one else x@x, ...)
               r
           })
