@@ -73,7 +73,7 @@
     ## >=2 ... persistent error
     ##  NA ... one-time warning
     wSD <- as.integer(Sys.getenv("R_MATRIX_WARN_SQRT_DEFAULT", NA))
-    assign("warnSqrtDefault", wDC, envir = .MatrixEnv)
+    assign("warnSqrtDefault", wSD, envir = .MatrixEnv)
 
     .Call(R_cholmod_common_envini, .CholmodCommonEnv)
     NULL
