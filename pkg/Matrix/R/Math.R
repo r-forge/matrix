@@ -49,12 +49,8 @@ setMethod("log", signature(x = "denseMatrix"),
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
-              if(kind == "z") {
-                  ## zero <- 0+0i; one <- 1+0i
-              } else {
-                  ## zero <- 0   ; one <- 1
+              if(kind != "z")
                   substr(cl, 1L, 1L) <- "d"
-              }
               if(shape == "t") {
                   x <- .M2gen(x)
                   substr(cl, 2L, 3L) <- "ge"

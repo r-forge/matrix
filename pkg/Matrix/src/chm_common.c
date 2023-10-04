@@ -70,7 +70,7 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
  * obtained from slots of a CHMfactor.  The result should _not_ be
  * freed using cholmod_free_factor, as the resulting members point to
  * memory controlled by R, not by CHOLMOD.
- * 
+ *
  * @param L a pointer to a cholmod_factor struct, to be modified in-place.
  * @param from an S4 object inheriting from virtual class CHMfactor.
  *
@@ -174,7 +174,7 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
  * obtained from slots of a CsparseMatrix.  The result should _not_ be
  * freed using cholmod_free_sparse, as the resulting members point to
  * memory controlled by R, not by CHOLMOD.
- * 
+ *
  * @param A a pointer to a cholmod_sparse struct, to be modified in-place.
  * @param from an S4 object inheriting from virtual class CsparseMatrix.
  *
@@ -324,7 +324,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
  * obtained from slots of a [nlidz]geMatrix.  The result should _not_ be
  * freed using cholmod_free_dense, as the resulting members point to
  * memory controlled by R, not by CHOLMOD.
- * 
+ *
  * @param A a pointer to a cholmod_dense struct, to be modified in-place.
  * @param from an S4 object inheriting from class [nlidz]geMatrix _or_
  *     a traditional vector of type "logical", "integer", "double", or
@@ -409,7 +409,7 @@ cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
  *
  * An analogue of base::matrix(data, nrow, ncol),
  * where typeof(data)=="double" and length(data)==nrow*ncol.
- * 
+ *
  * @param A a pointer to a cholmod_dense struct, to be modified in-place.
  * @param data a pointer to an nrow*ncol*sizeof(double) block of memory.
  * @param nrow the desired number of rows.
@@ -438,7 +438,7 @@ cholmod_dense *numeric_as_cholmod_dense(cholmod_dense *A,
  * and copies into the slots from members of a pointed-to cholmod_factor
  * struct.  The specific class of the result is determined by members
  * xtype and is_super of the struct.
- * 
+ *
  * @param L a pointer to a cholmod_factor struct.
  * @param doFree a flag indicating if and how to free L before returning.
  *     (0) don't free, (>0) free with cholmod_free_factor, (<0) free with
@@ -573,7 +573,7 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
  * and copies into the slots from members of a pointed-to cholmod_sparse
  * struct.  The specific class of the result is determined by members
  * xtype and stype of the struct and by arguments ttype and doLogic.
- * 
+ *
  * @param A a pointer to a cholmod_sparse struct.
  * @param doFree a flag indicating if and how to free A before returning.
  *     (0) don't free, (>0) free with cholmod_free_sparse, (<0) free with
@@ -686,7 +686,7 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
  * depending on members is_super and is_ll of the supplied struct.
  * Note that CHOLMOD does not require diag(D) to be positive and
  * that this routine does not check (FIXME).
- * 
+ *
  * @param L a pointer to a cholmod_factor struct.  It is assumed that
  *     L->xtype=CHOLMOD_REAL.
  */
@@ -729,7 +729,7 @@ double cholmod_factor_ldetA(cholmod_factor *L)
  * of X, or
  * (2) A*A'+beta*I, where A is a general matrix sharing the nonzero pattern
  * of Y, assuming that X = Y*Y'.
- * 
+ *
  * @param L a pointer to a cholmod_factor struct, to be modified in-place.
  * @param A a pointer to a cholmod_sparse struct.
  * @param beta a multiplier, typically positive, to guarantee strict
