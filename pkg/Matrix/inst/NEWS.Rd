@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-03 r4415)}{
+\section{Changes in version 1.6-2 (2023-10-04 r4420)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -169,7 +169,7 @@
       \item Many API function prototypes wrongly used \code{const}
       qualifiers where the registered routines do not.
 
-      \item \code{expm(x)} failedin Matrix 1.6.1 when the methods for
+      \item \code{expm(x)} failed in Matrix 1.6.1 when the methods for
       \code{"dtpMatrix"} or \code{"dspMatrix"} where used.
     }
   }

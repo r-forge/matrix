@@ -7,8 +7,6 @@
 ## NB: Summary depends on the existence, _not_ count, of zeros and ones.
 ##     The only exception is 'sum' which ignores zeros and counts ones.
 
-## TODO: sum(<denseMatrix>), prod(<denseMatrix>)
-##       avoiding wrong overflow, coercions
 setMethod("Summary", signature(x = "denseMatrix"),
           function(x, ..., na.rm = FALSE) {
               ## Avoid wrong overflow :
@@ -22,12 +20,7 @@ setMethod("Summary", signature(x = "denseMatrix"),
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
-              switch(kind,
-                     "n" = ,
-                     "l" = { zero <- FALSE }, # one <- TRUE
-                     "i" = { zero <- 0L    }, # one <- 1L  
-                     "d" = { zero <- 0     }, # one <- 1   
-                     "z" = { zero <- 0+0i  }) # one <- 1+0i
+              zero <- switch(kind, "n" = , "l" = FALSE, "i" = 0L, "d" = 0, "z" = 0+0i)
               if(shape != "g") {
                   if(repr != "p")
                       x <- .M2packed(x)
