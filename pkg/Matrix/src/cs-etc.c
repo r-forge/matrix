@@ -73,7 +73,7 @@ SEXP cs2dgC(Matrix_cs *A, int values, char shape)
 	return obj;
 }
 
-/* Wrappers for the functions that we actually use : */
+/* Wrappers for the functions that we use at least once : */
 
 Matrix_csd *Matrix_cs_dfree(Matrix_csd *D)
 {

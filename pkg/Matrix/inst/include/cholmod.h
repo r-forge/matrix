@@ -1054,61 +1054,96 @@ typedef cholmod_sparse * CHM_SP;
 typedef cholmod_triplet* CHM_TR;
 typedef cholmod_dense  * CHM_DN;
 
-CHM_SP  M_cholmod_aat              (CHM_SP, int *, size_t, int, CHM_CM);
-CHM_SP  M_cholmod_add              (CHM_SP, CHM_SP, double[2], double[2],
-                                    int, int, CHM_CM);
-CHM_DN  M_cholmod_allocate_dense   (size_t, size_t, size_t, int, CHM_CM);
-CHM_SP  M_cholmod_allocate_sparse  (size_t, size_t, size_t, int, int, int, int,
-                                    CHM_CM);
-CHM_TR  M_cholmod_allocate_triplet (size_t, size_t, size_t, int, int, CHM_CM);
-CHM_FR  M_cholmod_analyze          (CHM_SP, CHM_CM);
-CHM_FR  M_cholmod_analyze_p        (CHM_SP, int *, int *, size_t, CHM_CM);
-int     M_cholmod_band_inplace     (int, int, int, CHM_SP, CHM_CM);
-int     M_cholmod_change_factor    (int, int, int, int, int, CHM_FR, CHM_CM);
-CHM_SP  M_cholmod_copy             (CHM_SP, int, int, CHM_CM);
-CHM_DN  M_cholmod_copy_dense       (CHM_DN, CHM_CM);
-CHM_FR  M_cholmod_copy_factor      (CHM_FR, CHM_CM);
-CHM_SP  M_cholmod_copy_sparse      (CHM_SP, CHM_CM);
-int     M_cholmod_defaults         (CHM_CM);
-CHM_SP  M_cholmod_dense_to_sparse  (CHM_DN, int, CHM_CM);
-CHM_SP  M_cholmod_factor_to_sparse (CHM_FR, CHM_CM);
-int     M_cholmod_factorize        (CHM_SP, CHM_FR, CHM_CM);
-int     M_cholmod_factorize_p      (CHM_SP, double[2], int *, size_t, CHM_FR,
-                                    CHM_CM);
-int     M_cholmod_finish           (CHM_CM);
-int     M_cholmod_free_dense       (CHM_DN *, CHM_CM);
-int     M_cholmod_free_factor      (CHM_FR *, CHM_CM);
-int     M_cholmod_free_sparse      (CHM_SP *, CHM_CM);
-int     M_cholmod_free_triplet     (CHM_TR *, CHM_CM);
-int     M_cholmod_nnz              (CHM_SP, CHM_CM);
-int     M_cholmod_scale            (CHM_DN, int, CHM_SP, CHM_CM);
-#if 0 /* give PRIMME, robustlmm more time to adjust their code */
-int     M_cholmod_sdmult           (CHM_SP, int, double[2], double[2],
-                                    CHM_DN, CHM_DN, CHM_CM);
-#else
-int     M_cholmod_sdmult           (const cholmod_sparse *, int, const double *, const double *,
-                                    const cholmod_dense *, cholmod_dense *, cholmod_common *);
-#endif
-CHM_DN  M_cholmod_solve            (int, CHM_FR, CHM_DN, CHM_CM);
-int     M_cholmod_solve2           (int, CHM_FR, CHM_DN,
-                                    CHM_DN *, CHM_DN *, CHM_DN *, CHM_CM);
-int     M_cholmod_sort             (CHM_SP, CHM_CM);
-CHM_DN  M_cholmod_sparse_to_dense  (CHM_SP, CHM_CM);
-CHM_TR  M_cholmod_sparse_to_triplet(CHM_SP, CHM_CM);
-CHM_SP  M_cholmod_speye            (size_t, size_t, int, CHM_CM);
-CHM_SP  M_cholmod_spsolve          (int, CHM_FR, CHM_SP, CHM_CM);
-CHM_SP  M_cholmod_ssmult           (CHM_SP, CHM_SP,
-                                    int, int, int, CHM_CM);
-CHM_SP  M_cholmod_submatrix        (CHM_SP, int *, int, int *, int, int, int,
-                                    CHM_CM);
-CHM_SP  M_cholmod_transpose        (CHM_SP, int, CHM_CM);
-CHM_SP  M_cholmod_triplet_to_sparse(CHM_TR, int, CHM_CM);
-int     M_cholmod_updown           (int, CHM_SP, CHM_FR, CHM_CM);
-CHM_SP  M_cholmod_vertcat          (CHM_SP, CHM_SP, int, CHM_CM);
+#define R_MATRIX_CHOLMOD(_NAME_) M_cholmod_ ## _NAME_
 
-void M_R_cholmod_error (int, const char *, int, const char *);
-int  M_R_cholmod_start (CHM_CM);
-int  M_R_cholmod_finish(CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(aat)(
+	CHM_SP, int *, size_t, int, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(add)(
+	CHM_SP, CHM_SP, double[2], double[2], int, int, CHM_CM);
+CHM_DN R_MATRIX_CHOLMOD(allocate_dense)(
+	size_t, size_t, size_t, int, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(allocate_sparse)(
+	size_t, size_t, size_t, int, int, int, int, CHM_CM);
+CHM_TR R_MATRIX_CHOLMOD(allocate_triplet)(
+	size_t, size_t, size_t, int, int, CHM_CM);
+CHM_FR R_MATRIX_CHOLMOD(analyze)(
+	CHM_SP, CHM_CM);
+CHM_FR R_MATRIX_CHOLMOD(analyze_p)(
+	CHM_SP, int *, int *, size_t, CHM_CM);
+int    R_MATRIX_CHOLMOD(band_inplace)(
+	int, int, int, CHM_SP, CHM_CM);
+int    R_MATRIX_CHOLMOD(change_factor)(
+	int, int, int, int, int, CHM_FR, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(copy)(
+	CHM_SP, int, int, CHM_CM);
+CHM_DN R_MATRIX_CHOLMOD(copy_dense)(
+	CHM_DN, CHM_CM);
+CHM_FR R_MATRIX_CHOLMOD(copy_factor)(
+	CHM_FR, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(copy_sparse)(
+	CHM_SP, CHM_CM);
+int    R_MATRIX_CHOLMOD(defaults)(
+	CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(dense_to_sparse)(
+	CHM_DN, int, CHM_CM);
+void   R_MATRIX_CHOLMOD(error_handler)(
+	int, const char *, int, const char *);
+CHM_SP R_MATRIX_CHOLMOD(factor_to_sparse )(
+	CHM_FR, CHM_CM);
+int    R_MATRIX_CHOLMOD(factorize)(
+	CHM_SP, CHM_FR, CHM_CM);
+int    R_MATRIX_CHOLMOD(factorize_p)(
+	CHM_SP, double[2], int *, size_t, CHM_FR, CHM_CM);
+int    R_MATRIX_CHOLMOD(finish)(
+	CHM_CM);
+int    R_MATRIX_CHOLMOD(free_dense)(
+	CHM_DN *, CHM_CM);
+int    R_MATRIX_CHOLMOD(free_factor)(
+	CHM_FR *, CHM_CM);
+int    R_MATRIX_CHOLMOD(free_sparse)(
+	CHM_SP *, CHM_CM);
+int    R_MATRIX_CHOLMOD(free_triplet)(
+	CHM_TR *, CHM_CM);
+int    R_MATRIX_CHOLMOD(nnz)(
+	CHM_SP, CHM_CM);
+int    R_MATRIX_CHOLMOD(scale)(
+	CHM_DN, int, CHM_SP, CHM_CM);
+#if 0 /* give PRIMME, robustlmm more time to adjust their code */
+int    R_MATRIX_CHOLMOD(sdmult)(
+	CHM_SP, int, double[2], double[2], CHM_DN, CHM_DN, CHM_CM);
+#else
+int    R_MATRIX_CHOLMOD(sdmult)(
+	const cholmod_sparse *, int, const double *, const double *,
+	const cholmod_dense *, cholmod_dense *, cholmod_common *);
+#endif
+CHM_DN R_MATRIX_CHOLMOD(solve)(
+	int, CHM_FR, CHM_DN, CHM_CM);
+int    R_MATRIX_CHOLMOD(solve2)(
+	int, CHM_FR, CHM_DN, CHM_DN *, CHM_DN *, CHM_DN *, CHM_CM);
+int    R_MATRIX_CHOLMOD(sort)(
+	CHM_SP, CHM_CM);
+CHM_DN R_MATRIX_CHOLMOD(sparse_to_dense)(
+	CHM_SP, CHM_CM);
+CHM_TR R_MATRIX_CHOLMOD(sparse_to_triplet)(
+	CHM_SP, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(speye)(
+	size_t, size_t, int, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(spsolve)(
+	int, CHM_FR, CHM_SP, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(ssmult)(
+	CHM_SP, CHM_SP, int, int, int, CHM_CM);
+int    R_MATRIX_CHOLMOD(start)(
+	CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(submatrix)(
+	CHM_SP, int *, int, int *, int, int, int, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(transpose)(
+	CHM_SP, int, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(triplet_to_sparse)(
+	CHM_TR, int, CHM_CM);
+int    R_MATRIX_CHOLMOD(updown)(
+	int, CHM_SP, CHM_FR, CHM_CM);
+CHM_SP R_MATRIX_CHOLMOD(vertcat)(
+	CHM_SP, CHM_SP, int, CHM_CM);
 
 /* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 

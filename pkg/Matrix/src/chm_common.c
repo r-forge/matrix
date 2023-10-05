@@ -754,7 +754,7 @@ cholmod_factor *cholmod_factor_update(cholmod_factor *L, cholmod_sparse *A,
 
 #if 0
 static
-int R_cholmod_printf(const char *fmt, ...)
+int R_cholmod_print_function(const char *fmt, ...)
 {
 	va_list(ap);
 	va_start(ap, fmt);
@@ -765,14 +765,16 @@ int R_cholmod_printf(const char *fmt, ...)
 #endif
 
 static
-void R_cholmod_error(int status, const char *file, int line,
-                     const char *message)
+void R_cholmod_error_handler(int status, const char *file, int line,
+                             const char *message)
 {
 	R_cholmod_common_envget();
 	if (status < 0)
-		error(    "CHOLMOD error '%s' at file '%s', line %d", message, file, line);
+		error(_("CHOLMOD error '%s' at file '%s', line %d"),
+		      message, file, line);
 	else
-		warning("CHOLMOD warning '%s' at file '%s', line %d", message, file, line);
+		warning(_("CHOLMOD warning '%s' at file '%s', line %d"),
+		        message, file, line);
 }
 
 int R_cholmod_start(cholmod_common *Common)
@@ -784,12 +786,12 @@ int R_cholmod_start(cholmod_common *Common)
 	/* No longer, with SuiteSparse 5.7.1 : */
 	Common->print_function =
 # if 0
-		R_cholmod_printf;
+		R_cholmod_print_function;
 # else
 		NULL;
 # endif
 #endif
-	Common->error_handler = R_cholmod_error;
+	Common->error_handler = R_cholmod_error_handler;
 	return ans;
 }
 
