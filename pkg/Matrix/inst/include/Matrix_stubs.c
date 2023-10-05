@@ -1,4 +1,5 @@
 #include <Rinternals.h>
+#include <R_ext/Error.h>
 #include <R_ext/Rdynload.h>
 #include "Matrix.h"
 
