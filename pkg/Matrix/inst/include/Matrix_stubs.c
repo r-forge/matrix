@@ -468,11 +468,11 @@ R_MATRIX_CHOLMOD(error_handler)(int status, const char *file, int line,
 	*/
 
 	if (status < 0)
-		error("CHOLMOD error '%s' at file '%s', line %d",
-		      message, file, line);
+		Rf_error("CHOLMOD error '%s' at file '%s', line %d",
+		         message, file, line);
 	else
-		warning("CHOLMOD warning '%s' at file '%s', line %d",
-		        message, file, line);
+		Rf_warning("CHOLMOD warning '%s' at file '%s', line %d",
+		           message, file, line);
 }
 
 int attribute_hidden
