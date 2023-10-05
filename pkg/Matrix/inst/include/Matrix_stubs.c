@@ -9,7 +9,8 @@ extern "C" {
 /* ==== CHOLMOD stubs =============================================== */
 
 CHM_SP attribute_hidden
-M_cholmod_aat(CHM_SP A, int *fset, size_t fsize,int mode, CHM_CM Common)
+R_MATRIX_CHOLMOD(aat)(CHM_SP A, int *fset, size_t fsize, int mode,
+                      CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, int *, size_t, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -19,8 +20,8 @@ M_cholmod_aat(CHM_SP A, int *fset, size_t fsize,int mode, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_add(CHM_SP A, CHM_SP B, double alpha[2], double beta[2],
-              int values, int sorted, CHM_CM Common)
+R_MATRIX_CHOLMOD(add)(CHM_SP A, CHM_SP B, double alpha[2], double beta[2],
+                      int values, int sorted, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, CHM_SP, double[2], double[2],
 	                    int, int, CHM_CM) = NULL;
@@ -32,8 +33,8 @@ M_cholmod_add(CHM_SP A, CHM_SP B, double alpha[2], double beta[2],
 }
 
 CHM_DN attribute_hidden
-M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
-                         int xtype, CHM_CM Common)
+R_MATRIX_CHOLMOD(allocate_dense)(size_t nrow, size_t ncol, size_t d, int xtype,
+                                 CHM_CM Common)
 {
 	static CHM_DN(*fun)(size_t, size_t, size_t, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -43,9 +44,9 @@ M_cholmod_allocate_dense(size_t nrow, size_t ncol, size_t d,
 }
 
 CHM_SP attribute_hidden
-M_cholmod_allocate_sparse(size_t nrow, size_t ncol, size_t nzmax,
-                          int sorted, int packed, int stype, int xtype,
-                          CHM_CM Common)
+R_MATRIX_CHOLMOD(allocate_sparse)(size_t nrow, size_t ncol, size_t nzmax,
+                                  int sorted, int packed, int stype, int xtype,
+                                  CHM_CM Common)
 {
 	static CHM_SP(*fun)(size_t, size_t, size_t, int, int, int, int,
 	                    CHM_CM) = NULL;
@@ -57,8 +58,8 @@ M_cholmod_allocate_sparse(size_t nrow, size_t ncol, size_t nzmax,
 }
 
 CHM_TR attribute_hidden
-M_cholmod_allocate_triplet(size_t nrow, size_t ncol, size_t nzmax,
-                           int stype, int xtype, CHM_CM Common)
+R_MATRIX_CHOLMOD(allocate_triplet)(size_t nrow, size_t ncol, size_t nzmax,
+                                   int stype, int xtype, CHM_CM Common)
 {
 	static CHM_TR(*fun)(size_t, size_t, size_t, int, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -68,7 +69,7 @@ M_cholmod_allocate_triplet(size_t nrow, size_t ncol, size_t nzmax,
 }
 
 CHM_FR attribute_hidden
-M_cholmod_analyze(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(analyze)(CHM_SP A, CHM_CM Common)
 {
 	static CHM_FR(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -78,8 +79,8 @@ M_cholmod_analyze(CHM_SP A, CHM_CM Common)
 }
 
 CHM_FR attribute_hidden
-M_cholmod_analyze_p(CHM_SP A, int *Perm, int *fset, size_t fsize,
-                    CHM_CM Common)
+R_MATRIX_CHOLMOD(analyze_p)(CHM_SP A, int *Perm, int *fset, size_t fsize,
+                            CHM_CM Common)
 {
 	static CHM_FR(*fun)(CHM_SP, int *, int *, size_t, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -89,7 +90,8 @@ M_cholmod_analyze_p(CHM_SP A, int *Perm, int *fset, size_t fsize,
 }
 
 int attribute_hidden
-M_cholmod_band_inplace(int k1, int k2, int mode, CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(band_inplace)(int k1, int k2, int mode, CHM_SP A,
+                               CHM_CM Common)
 {
 	static int(*fun)(int, int, int, CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -99,8 +101,9 @@ M_cholmod_band_inplace(int k1, int k2, int mode, CHM_SP A, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_change_factor(int to_xtype, int to_ll, int to_super, int to_packed,
-                        int to_monotonic, CHM_FR L, CHM_CM Common)
+R_MATRIX_CHOLMOD(change_factor)(int to_xtype, int to_ll, int to_super,
+                                int to_packed, int to_monotonic,
+                                CHM_FR L, CHM_CM Common)
 {
 	static int(*fun)(int, int, int, int, int, CHM_FR, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -110,7 +113,7 @@ M_cholmod_change_factor(int to_xtype, int to_ll, int to_super, int to_packed,
 }
 
 CHM_SP attribute_hidden
-M_cholmod_copy(CHM_SP A, int stype, int mode, CHM_CM Common)
+R_MATRIX_CHOLMOD(copy)(CHM_SP A, int stype, int mode, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, int, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -120,7 +123,7 @@ M_cholmod_copy(CHM_SP A, int stype, int mode, CHM_CM Common)
 }
 
 CHM_DN attribute_hidden
-M_cholmod_copy_dense(CHM_DN  A, CHM_CM Common)
+R_MATRIX_CHOLMOD(copy_dense)(CHM_DN  A, CHM_CM Common)
 {
 	static CHM_DN(*fun)(CHM_DN, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -130,7 +133,7 @@ M_cholmod_copy_dense(CHM_DN  A, CHM_CM Common)
 }
 
 CHM_FR attribute_hidden
-M_cholmod_copy_factor(CHM_FR L, CHM_CM Common)
+R_MATRIX_CHOLMOD(copy_factor)(CHM_FR L, CHM_CM Common)
 {
 	static CHM_FR(*fun)(CHM_FR, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -140,7 +143,7 @@ M_cholmod_copy_factor(CHM_FR L, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_copy_sparse(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(copy_sparse)(CHM_SP A, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -150,7 +153,7 @@ M_cholmod_copy_sparse(CHM_SP A, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_defaults(CHM_CM Common)
+R_MATRIX_CHOLMOD(defaults)(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)
@@ -160,7 +163,7 @@ M_cholmod_defaults(CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_dense_to_sparse(CHM_DN X, int values, CHM_CM Common)
+R_MATRIX_CHOLMOD(dense_to_sparse)(CHM_DN X, int values, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_DN, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -170,7 +173,7 @@ M_cholmod_dense_to_sparse(CHM_DN X, int values, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_factor_to_sparse(CHM_FR L, CHM_CM Common)
+R_MATRIX_CHOLMOD(factor_to_sparse)(CHM_FR L, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_FR, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -180,7 +183,7 @@ M_cholmod_factor_to_sparse(CHM_FR L, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_factorize(CHM_SP A, CHM_FR L, CHM_CM Common)
+R_MATRIX_CHOLMOD(factorize)(CHM_SP A, CHM_FR L, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP, CHM_FR, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -190,7 +193,7 @@ M_cholmod_factorize(CHM_SP A, CHM_FR L, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_factorize_p(CHM_SP A, double beta[2], int *fset,
+R_MATRIX_CHOLMOD(factorize_p)(CHM_SP A, double beta[2], int *fset,
                       size_t fsize, CHM_FR L, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP, double[2], int *, size_t, CHM_FR, CHM_CM) = NULL;
@@ -201,7 +204,7 @@ M_cholmod_factorize_p(CHM_SP A, double beta[2], int *fset,
 }
 
 int attribute_hidden
-M_cholmod_finish(CHM_CM Common)
+R_MATRIX_CHOLMOD(finish)(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)
@@ -211,7 +214,7 @@ M_cholmod_finish(CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_free_dense(CHM_DN *A, CHM_CM Common)
+R_MATRIX_CHOLMOD(free_dense)(CHM_DN *A, CHM_CM Common)
 {
 	static int(*fun)(CHM_DN *, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -221,7 +224,7 @@ M_cholmod_free_dense(CHM_DN *A, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_free_factor(CHM_FR *L, CHM_CM Common)
+R_MATRIX_CHOLMOD(free_factor)(CHM_FR *L, CHM_CM Common)
 {
 	static int(*fun)(CHM_FR *,CHM_CM) = NULL;
 	if (fun == NULL)
@@ -231,7 +234,7 @@ M_cholmod_free_factor(CHM_FR *L, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_free_sparse(CHM_SP *A, CHM_CM Common)
+R_MATRIX_CHOLMOD(free_sparse)(CHM_SP *A, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP *, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -241,7 +244,7 @@ M_cholmod_free_sparse(CHM_SP *A, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_free_triplet(CHM_TR *T, CHM_CM Common)
+R_MATRIX_CHOLMOD(free_triplet)(CHM_TR *T, CHM_CM Common)
 {
 	static int(*fun)(CHM_TR *, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -251,7 +254,7 @@ M_cholmod_free_triplet(CHM_TR *T, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_nnz(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(nnz)(CHM_SP A, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -261,7 +264,7 @@ M_cholmod_nnz(CHM_SP A, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_scale(CHM_DN S, int scale, CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(scale)(CHM_DN S, int scale, CHM_SP A, CHM_CM Common)
 {
 	static int(*fun)(CHM_DN, int, CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -272,9 +275,9 @@ M_cholmod_scale(CHM_DN S, int scale, CHM_SP A, CHM_CM Common)
 
 #if 0 /* give PRIMME, robustlmm more time to adjust their code */
 int attribute_hidden
-M_cholmod_sdmult(CHM_SP A, int transpose,
-                 double alpha[2], double beta[2],
-                 CHM_DN X, CHM_DN Y, CHM_CM Common)
+R_MATRIX_CHOLMOD(sdmult)(CHM_SP A, int transpose,
+                         double alpha[2], double beta[2],
+                         CHM_DN X, CHM_DN Y, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP, int, double[2], double[2],
 	                 CHM_DN, CHM_DN, CHM_CM) = NULL;
@@ -286,9 +289,9 @@ M_cholmod_sdmult(CHM_SP A, int transpose,
 }
 #else
 int attribute_hidden
-M_cholmod_sdmult(const cholmod_sparse *A, int transpose,
-                 const double *alpha, const double *beta,
-                 const cholmod_dense *X, cholmod_dense *Y, cholmod_common *Common)
+R_MATRIX_CHOLMOD(sdmult)(const cholmod_sparse *A, int transpose,
+                         const double *alpha, const double *beta,
+                         const cholmod_dense *X, cholmod_dense *Y, cholmod_common *Common)
 {
 	static int(*fun)(const cholmod_sparse *, int, const double *, const double *,
 	                 const cholmod_dense *, cholmod_dense *, cholmod_common *) = NULL;
@@ -301,7 +304,7 @@ M_cholmod_sdmult(const cholmod_sparse *A, int transpose,
 #endif
 
 CHM_DN attribute_hidden
-M_cholmod_solve(int sys, CHM_FR L, CHM_DN B, CHM_CM Common)
+R_MATRIX_CHOLMOD(solve)(int sys, CHM_FR L, CHM_DN B, CHM_CM Common)
 {
 	static CHM_DN(*fun)(int, CHM_FR, CHM_DN, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -311,9 +314,9 @@ M_cholmod_solve(int sys, CHM_FR L, CHM_DN B, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_solve2(int sys, CHM_FR L, CHM_DN B,
-                 CHM_DN *X_Handle, CHM_DN *Y_Handle, CHM_DN *E_Handle,
-                 CHM_CM Common)
+R_MATRIX_CHOLMOD(solve2)(int sys, CHM_FR L, CHM_DN B,
+                         CHM_DN *X_Handle, CHM_DN *Y_Handle, CHM_DN *E_Handle,
+                         CHM_CM Common)
 {
 	static int(*fun)(int, CHM_FR, CHM_DN, CHM_SP,
 	                 CHM_DN *, CHM_SP *, CHM_DN *, CHM_DN *, CHM_CM) = NULL;
@@ -325,7 +328,7 @@ M_cholmod_solve2(int sys, CHM_FR L, CHM_DN B,
 }
 
 int attribute_hidden
-M_cholmod_sort(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(sort)(CHM_SP A, CHM_CM Common)
 {
 	static int(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -335,7 +338,7 @@ M_cholmod_sort(CHM_SP A, CHM_CM Common)
 }
 
 CHM_DN attribute_hidden
-M_cholmod_sparse_to_dense(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(sparse_to_dense)(CHM_SP A, CHM_CM Common)
 {
 	static CHM_DN(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -345,7 +348,7 @@ M_cholmod_sparse_to_dense(CHM_SP A, CHM_CM Common)
 }
 
 CHM_TR attribute_hidden
-M_cholmod_sparse_to_triplet(CHM_SP A, CHM_CM Common)
+R_MATRIX_CHOLMOD(sparse_to_triplet)(CHM_SP A, CHM_CM Common)
 {
 	static CHM_TR(*fun)(CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -355,7 +358,7 @@ M_cholmod_sparse_to_triplet(CHM_SP A, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_speye(size_t nrow, size_t ncol, int xtype, CHM_CM Common)
+R_MATRIX_CHOLMOD(speye)(size_t nrow, size_t ncol, int xtype, CHM_CM Common)
 {
 	static CHM_SP(*fun)(size_t, size_t, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -365,7 +368,7 @@ M_cholmod_speye(size_t nrow, size_t ncol, int xtype, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_spsolve(int sys, CHM_FR L, CHM_SP B, CHM_CM Common)
+R_MATRIX_CHOLMOD(spsolve)(int sys, CHM_FR L, CHM_SP B, CHM_CM Common)
 {
 	static CHM_SP(*fun)(int, CHM_FR, CHM_SP, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -375,7 +378,7 @@ M_cholmod_spsolve(int sys, CHM_FR L, CHM_SP B, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_ssmult(CHM_SP A, CHM_SP B,
+R_MATRIX_CHOLMOD(ssmult)(CHM_SP A, CHM_SP B,
                  int stype, int values, int sorted, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, CHM_SP, int, int, int, CHM_CM) = NULL;
@@ -386,8 +389,8 @@ M_cholmod_ssmult(CHM_SP A, CHM_SP B,
 }
 
 CHM_SP attribute_hidden
-M_cholmod_submatrix(CHM_SP A, int *rset, int rsize, int *cset,
-                    int csize, int values, int sorted, CHM_CM Common)
+R_MATRIX_CHOLMOD(submatrix)(CHM_SP A, int *rset, int rsize, int *cset,
+                            int csize, int values, int sorted, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, int *, int, int *,
 	                    int, int, int, CHM_CM) = NULL;
@@ -399,7 +402,7 @@ M_cholmod_submatrix(CHM_SP A, int *rset, int rsize, int *cset,
 }
 
 CHM_SP attribute_hidden
-M_cholmod_transpose(CHM_SP A, int values, CHM_CM Common)
+R_MATRIX_CHOLMOD(transpose)(CHM_SP A, int values, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -409,7 +412,7 @@ M_cholmod_transpose(CHM_SP A, int values, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_triplet_to_sparse(CHM_TR T, int nzmax, CHM_CM Common)
+R_MATRIX_CHOLMOD(triplet_to_sparse)(CHM_TR T, int nzmax, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_TR, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -419,7 +422,7 @@ M_cholmod_triplet_to_sparse(CHM_TR T, int nzmax, CHM_CM Common)
 }
 
 int attribute_hidden
-M_cholmod_updown(int update, CHM_SP C, CHM_FR L, CHM_CM Common)
+R_MATRIX_CHOLMOD(updown)(int update, CHM_SP C, CHM_FR L, CHM_CM Common)
 {
 	static int(*fun)(int, CHM_SP, CHM_FR, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -429,7 +432,7 @@ M_cholmod_updown(int update, CHM_SP C, CHM_FR L, CHM_CM Common)
 }
 
 CHM_SP attribute_hidden
-M_cholmod_vertcat(CHM_SP A, CHM_SP B, int values, CHM_CM Common)
+R_MATRIX_CHOLMOD(vertcat)(CHM_SP A, CHM_SP B, int values, CHM_CM Common)
 {
 	static CHM_SP(*fun)(CHM_SP, CHM_SP, int, CHM_CM) = NULL;
 	if (fun == NULL)
@@ -444,7 +447,7 @@ M_cholmod_vertcat(CHM_SP A, CHM_SP B, int values, CHM_CM Common)
 
 #if 0
 static int attribute_hidden
-M_R_cholmod_printf(const char *fmt, ...)
+R_MATRIX_CHOLMOD(print_function)(const char *fmt, ...)
 {
 	va_list(ap);
 	va_start(ap, fmt);
@@ -455,23 +458,24 @@ M_R_cholmod_printf(const char *fmt, ...)
 #endif
 
 void attribute_hidden
-M_R_cholmod_error(int status, const char *file, int line,
-                  const char *message)
+R_MATRIX_CHOLMOD(error_handler)(int status, const char *file, int line,
+                                const char *message)
 {
-	/* NB: Matrix itself uses CHM_set_common_env, CHM_store_common, and
-	       CHM_restore_common to preserve settings through error calls.
-	       Consider defining *your* own error handler and restoring the
-	       instance of cholmod_common that *you* use.
+	/* NB: Matrix itself uses cholmod_common_env(ini|set|get) to preserve
+	   settings through error calls.  Consider defining *your* own error
+	   handler and restoring the instance of cholmod_common that *you* use.
 	*/
 
 	if (status < 0)
-		error(    "Cholmod error '%s' at file '%s', line %d", message, file, line);
+		error("CHOLMOD error '%s' at file '%s', line %d",
+		      message, file, line);
 	else
-		warning("Cholmod warning '%s' at file '%s', line %d", message, file, line);
+		warning("CHOLMOD warning '%s' at file '%s', line %d",
+		        message, file, line);
 }
 
 int attribute_hidden
-M_R_cholmod_start(CHM_CM Common)
+R_MATRIX_CHOLMOD(start)(CHM_CM Common)
 {
 	static int(*fun)(CHM_CM) = NULL;
 	if (fun == NULL)
@@ -482,23 +486,13 @@ M_R_cholmod_start(CHM_CM Common)
 	/* No longer, with SuiteSparse 5.7.1 : */
 	Common->print_function =
 # if 0
-		M_R_cholmod_printf;
+		R_MATRIX_CHOLMOD(print_function);
 # else
 		NULL;
 # endif
 #endif
-	Common->error_handler = M_R_cholmod_error;
+	Common->error_handler = R_MATRIX_CHOLMOD(error_handler);
 	return ans;
-}
-
-int attribute_hidden
-M_R_cholmod_finish(CHM_CM Common)
-{
-	static int(*fun)(CHM_CM) = NULL;
-	if (fun == NULL)
-		fun = (int(*)(CHM_CM))
-			R_GetCCallable("Matrix", "cholmod_finish");
-	return fun(Common);
 }
 
 

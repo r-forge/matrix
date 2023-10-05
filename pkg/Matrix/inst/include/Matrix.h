@@ -66,6 +66,8 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 #define M_chm_sparse_to_SEXP M_cholmod_sparse_as_sexp
 #define M_chm_factor_ldetL2  M_cholmod_factor_ldetA
 #define M_chm_factor_update  M_cholmod_factor_update
+#define M_R_cholmod_error    M_cholmod_error_handler
+#define M_R_cholmod_start    M_cholmod_start
 
 #define AS_CHM_SP__(x) \
 	M_sexp_as_cholmod_sparse((CHM_SP) alloca(sizeof(cholmod_sparse)), x, \
