@@ -1108,14 +1108,8 @@ int    R_MATRIX_CHOLMOD(nnz)(
 	CHM_SP, CHM_CM);
 int    R_MATRIX_CHOLMOD(scale)(
 	CHM_DN, int, CHM_SP, CHM_CM);
-#if 0 /* give PRIMME, robustlmm more time to adjust their code */
 int    R_MATRIX_CHOLMOD(sdmult)(
 	CHM_SP, int, double[2], double[2], CHM_DN, CHM_DN, CHM_CM);
-#else
-int    R_MATRIX_CHOLMOD(sdmult)(
-	const cholmod_sparse *, int, const double *, const double *,
-	const cholmod_dense *, cholmod_dense *, cholmod_common *);
-#endif
 CHM_DN R_MATRIX_CHOLMOD(solve)(
 	int, CHM_FR, CHM_DN, CHM_CM);
 int    R_MATRIX_CHOLMOD(solve2)(
@@ -1151,4 +1145,4 @@ CHM_SP R_MATRIX_CHOLMOD(vertcat)(
 }
 #endif
 
-#endif  /* MATRIX_CHOLMOD_H */
+#endif /* MATRIX_CHOLMOD_H */
