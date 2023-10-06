@@ -436,8 +436,8 @@ cholmod_dense *numeric_as_cholmod_dense(cholmod_dense *A,
  *
  * Allocates an S4 object inheriting from virtual class CHMfactor
  * and copies into the slots from members of a pointed-to cholmod_factor
- * struct.  The specific class of the result is determined by members
- * xtype and is_super of the struct.
+ * struct.  The specific class of the result is determined by struct
+ * members xtype and is_super.
  *
  * @param L a pointer to a cholmod_factor struct.
  * @param doFree a flag indicating if and how to free L before returning.
@@ -571,8 +571,8 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
  *
  * Allocates an S4 object inheriting from virtual class CsparseMatrix
  * and copies into the slots from members of a pointed-to cholmod_sparse
- * struct.  The specific class of the result is determined by members
- * xtype and stype of the struct and by arguments ttype and doLogic.
+ * struct.  The specific class of the result is determined by struct
+ * members xtype and stype and by arguments ttype and doLogic.
  *
  * @param A a pointer to a cholmod_sparse struct.
  * @param doFree a flag indicating if and how to free A before returning.
@@ -623,12 +623,12 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 		FREE_THEN(error(_("dimensions cannot exceed %s"), "2^31-1"));
 	if (A->stype != 0 || !A->sorted || !A->packed)
 		cholmod_sort(A, &c);
+	int m = (int) A->nrow, n = (int) A->ncol, nnz = ((int *) A->p)[A->ncol];
+	R_xlen_t n1a = (R_xlen_t) n + 1;
 	char class[] = "..CMatrix";
 	class[0] = (A->xtype == CHOLMOD_PATTERN)
 		? 'n' : ((A->xtype == CHOLMOD_COMPLEX) ? 'z' : ((doLogic) ? 'l' : 'd'));
 	class[1] = (ttype != 0) ? 't' : ((A->stype != 0) ? 's' : 'g');
-	int m = (int) A->nrow, n = (int) A->ncol, nnz = ((int *) A->p)[A->ncol];
-	R_xlen_t n1a = (R_xlen_t) n + 1;
 	SEXP to = PROTECT(newObject(class)),
 		dim = PROTECT(GET_SLOT(to, Matrix_DimSym)),
 		p = PROTECT(allocVector(INTSXP, n1a)),
@@ -674,6 +674,71 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 #undef FREE_THEN
 
 	UNPROTECT(4);
+	return to;
+}
+
+/**
+ * Coerce from (cholmod_dense *) to [dz]geMatrix
+ *
+ * Allocates an S4 object of class [dz]geMatrix
+ * and copies into the slots from members of a pointed-to cholmod_dense
+ * struct.  The specific class of the result is determined by struct
+ * member xtype.
+ *
+ * @param A a pointer to a cholmod_dense struct.
+ * @param doFree a flag indicating if and how to free A before returning.
+ *     (0) don't free, (>0) free with cholmod_free_dense, (<0) free with
+ *     R_Free.
+ *
+ * @return A [dz]geMatrix.
+ */
+/* NB: mostly parallel to CD2M in ./cholmod-etc.c */
+SEXP cholmod_dense_as_sexp(cholmod_dense *A, int doFree)
+{
+
+#define FREE_THEN(_EXPR_) \
+	do { \
+		if (doFree != 0) { \
+			if (doFree < 0) \
+				R_Free(A); \
+			else \
+				cholmod_free_dense(&A, &c); \
+			_EXPR_; \
+		} \
+	} while (0)
+
+	if (A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
+		FREE_THEN(error(_("wrong '%s'"), "xtype"));
+	if (A->dtype != CHOLMOD_DOUBLE)
+		FREE_THEN(error(_("wrong '%s'"), "dtype"));
+	if (A->d != A->nrow) /* MJ: currently no need to support this case */
+		FREE_THEN(error(_("leading dimension not equal to number of rows")));
+	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
+		FREE_THEN(error(_("dimensions cannot exceed %s"), "2^31-1"));
+	int m = (int) A->nrow, n = (int) A->ncol;
+	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
+		FREE_THEN(error(_("attempt to allocate vector of length exceeding %s"),
+		                "R_XLEN_T_MAX"));
+	char class[] = ".geMatrix";
+	class[0] = (A->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd';
+	SEXP to = PROTECT(newObject(class)),
+		dim = PROTECT(GET_SLOT(to, Matrix_DimSym));
+	INTEGER(dim)[0] = m;
+	INTEGER(dim)[1] = n;
+	SEXP x;
+	if (A->xtype == CHOLMOD_COMPLEX) {
+		PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) m * n));
+		memcpy(COMPLEX(x), A->x, (size_t) m * n * sizeof(Rcomplex));
+	} else {
+		PROTECT(x = allocVector(REALSXP, (R_xlen_t) m * n));
+		memcpy(REAL(x), A->x, (size_t) m * n * sizeof(double));
+	}
+	SET_SLOT(to, Matrix_xSym, x);
+	FREE_THEN();
+
+#undef FREE_THEN
+
+	UNPROTECT(3);
 	return to;
 }
 

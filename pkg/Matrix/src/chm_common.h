@@ -13,6 +13,7 @@ cholmod_dense  *numeric_as_cholmod_dense (cholmod_dense  *, double *,
 SEXP cholmod_factor_as_sexp(cholmod_factor *, int);
 SEXP cholmod_sparse_as_sexp(cholmod_sparse *, int,
                             int, int, const char *, SEXP);
+SEXP cholmod_dense_as_sexp (cholmod_dense  *, int);
 
 double          cholmod_factor_ldetA (cholmod_factor *);
 cholmod_factor *cholmod_factor_update(cholmod_factor *, cholmod_sparse *,

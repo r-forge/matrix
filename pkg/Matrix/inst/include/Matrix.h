@@ -35,6 +35,7 @@ CHM_DN M_numeric_as_cholmod_dense(CHM_DN, double *, int, int);
 
 SEXP M_cholmod_factor_as_sexp(CHM_FR, int);
 SEXP M_cholmod_sparse_as_sexp(CHM_SP, int, int, int, const char *, SEXP);
+SEXP M_cholmod_dense_as_sexp (CHM_DN, int);
 
 double M_cholmod_factor_ldetA (CHM_FR);
 CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);

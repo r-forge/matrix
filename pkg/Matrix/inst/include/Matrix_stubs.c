@@ -547,6 +547,16 @@ M_cholmod_sparse_as_sexp(CHM_SP A, int doFree,
 	return fun(A, doFree, ttype, doLogic, diagString, dimnames);
 }
 
+SEXP attribute_hidden
+M_cholmod_dense_as_sexp(CHM_DN A, int doFree)
+{
+	static SEXP(*fun)(CHM_DN, int) = NULL;
+	if (fun == NULL)
+		fun = (SEXP(*)(CHM_DN, int))
+			R_GetCCallable("Matrix", "cholmod_dense_as_sexp");
+	return fun(A, doFree);
+}
+
 double attribute_hidden
 M_cholmod_factor_ldetA(CHM_FR L)
 {
