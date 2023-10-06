@@ -1,6 +1,7 @@
 #include <Rinternals.h>
 #include <R_ext/Error.h>
 #include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
 #include "Matrix.h"
 
 #ifdef __cplusplus
@@ -274,7 +275,6 @@ R_MATRIX_CHOLMOD(scale)(CHM_DN S, int scale, CHM_SP A, CHM_CM Common)
 	return fun(S, scale, A, Common);
 }
 
-#if 0 /* give PRIMME, robustlmm more time to adjust their code */
 int attribute_hidden
 R_MATRIX_CHOLMOD(sdmult)(CHM_SP A, int transpose,
                          double alpha[2], double beta[2],
@@ -288,21 +288,6 @@ R_MATRIX_CHOLMOD(sdmult)(CHM_SP A, int transpose,
 			R_GetCCallable("Matrix", "cholmod_sdmult");
 	return fun(A, transpose, alpha, beta, X, Y, Common);
 }
-#else
-int attribute_hidden
-R_MATRIX_CHOLMOD(sdmult)(const cholmod_sparse *A, int transpose,
-                         const double *alpha, const double *beta,
-                         const cholmod_dense *X, cholmod_dense *Y, cholmod_common *Common)
-{
-	static int(*fun)(const cholmod_sparse *, int, const double *, const double *,
-	                 const cholmod_dense *, cholmod_dense *, cholmod_common *) = NULL;
-	if (fun == NULL)
-		fun = (int(*)(const cholmod_sparse *, int, const double *, const double *,
-		              const cholmod_dense *, cholmod_dense *, cholmod_common *))
-			R_GetCCallable("Matrix", "cholmod_sdmult");
-	return fun(A, transpose, alpha, beta, X, Y, Common);
-}
-#endif
 
 CHM_DN attribute_hidden
 R_MATRIX_CHOLMOD(solve)(int sys, CHM_FR L, CHM_DN B, CHM_CM Common)
@@ -498,16 +483,6 @@ R_MATRIX_CHOLMOD(start)(CHM_CM Common)
 
 
 /* ==== Matrix stubs ================================================ */
-
-bool Matrix_isclass_ge_dense(SEXP x) {
-	static const char *valid[] = { MATRIX_VALID_ge_dense, ""};
-	return R_check_class_etc(x, valid) >= 0;
-}
-
-bool Matrix_isclass_Csparse(SEXP x) {
-	static const char *valid[] = { MATRIX_VALID_Csparse , ""};
-	return R_check_class_etc(x, valid) >= 0;
-}
 
 CHM_FR attribute_hidden
 M_sexp_as_cholmod_factor(CHM_FR L, SEXP from)

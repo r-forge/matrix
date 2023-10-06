@@ -1,13 +1,7 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef MATRIX_MATRIX_H
+#define MATRIX_MATRIX_H
 
 #include <Rinternals.h>
-
-#ifdef __cplusplus
-extern "C" {
-#else
-# define bool Rboolean
-#endif
 
 /* Copy and paste from Defn.h : */
 /* 'alloca' is neither C99 nor POSIX */
@@ -30,10 +24,8 @@ extern void *alloca(size_t);
 /* Declarations of M_cholmod_*(), which are implemented in ./Matrix_stubs.c : */
 #include "cholmod.h"
 
-#ifdef HAVE_VISIBILITY_ATTRIBUTE
-# define attribute_hidden __attribute__ ((visibility ("hidden")))
-#else
-# define attribute_hidden
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 CHM_FR M_sexp_as_cholmod_factor(CHM_FR, SEXP);
@@ -46,6 +38,10 @@ SEXP M_cholmod_sparse_as_sexp(CHM_SP, int, int, int, const char *, SEXP);
 
 double M_cholmod_factor_ldetA (CHM_FR);
 CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define AS_CHM_FR(x) \
 	M_sexp_as_cholmod_factor((CHM_FR) alloca(sizeof(cholmod_factor)), x)
@@ -76,19 +72,4 @@ CHM_FR M_cholmod_factor_update(CHM_FR, CHM_SP, double);
 #define N_AS_CHM_DN(x, m, n) \
 	M_numeric_as_cholmod_dense((CHM_DN) alloca(sizeof(cholmod_dense)), x, m, n)
 
-#define MATRIX_VALID_ge_dense \
-"ngeMatrix", "lgeMatrix", "dgeMatrix"
-
-#define MATRIX_VALID_Csparse \
-"ngCMatrix", "lgCMatrix", "dgCMatrix", \
-"nsCMatrix", "lsCMatrix", "dsCMatrix", \
-"ntCMatrix", "ltCMatrix", "dtCMatrix"
-
-bool Matrix_isclass_ge_dense(SEXP);
-bool Matrix_isclass_Csparse (SEXP);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* MATRIX_H */
+#endif /* MATRIX_MATRIX_H */
