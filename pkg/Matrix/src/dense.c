@@ -763,7 +763,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 
 	int i, j;
 
-#define SP_LOOP(_CTYPE_, _PTR_, _INCREMENT_, _MULTIPLY_, _ONE_) \
+#define SP_LOOP(_CTYPE_, _PTR_, _INCREMENT_, _SCALE1_, _ONE_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
 		if (class[1] == 'g') { \
@@ -773,7 +773,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 					px += n; \
 					py += 1; \
 					_INCREMENT_((*px), (*py)); \
-					_MULTIPLY_((*px), 0.5); \
+					_SCALE1_((*px), 0.5); \
 				} \
 				px = (py += j + 2); \
 			} \
@@ -781,7 +781,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						_MULTIPLY_((*px), 0.5); \
+						_SCALE1_((*px), 0.5); \
 						px += 1; \
 					} \
 					px += n - j; \
@@ -790,7 +790,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += j + 1; \
 					for (i = j + 1; i < n; ++i) { \
-						_MULTIPLY_((*px), 0.5); \
+						_SCALE1_((*px), 0.5); \
 						px += 1; \
 					} \
 				} \
@@ -805,7 +805,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						_MULTIPLY_((*px), 0.5); \
+						_SCALE1_((*px), 0.5); \
 						px += 1; \
 					} \
 					px += 1; \
@@ -819,7 +819,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += 1; \
 					for (i = j + 1; i < n; ++i) { \
-						_MULTIPLY_((*px), 0.5); \
+						_SCALE1_((*px), 0.5); \
 						px += 1; \
 					} \
 				} \
@@ -833,9 +833,9 @@ SEXP dense_symmpart(SEXP from, const char *class)
 	} while (0)
 
 	if (cl[0] == 'd')
-		SP_LOOP(double, REAL, INCREMENT_REAL, MULTIPLY_REAL, 1.0);
+		SP_LOOP(double, REAL, INCREMENT_REAL, SCALE1_REAL, 1.0);
 	else
-		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, MULTIPLY_COMPLEX, Matrix_zone);
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, SCALE1_COMPLEX, Matrix_zone);
 
 #undef SP_LOOP
 
@@ -1385,36 +1385,36 @@ do { \
 		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
-		         CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
+		         CAST_PATTERN, INCREMENT_REAL, SCALE2_REAL); \
 		else \
 		SUM_LOOP(int, LOGICAL, int, INTEGER, \
 		         0, 1, NA_INTEGER, ISNA_PATTERN, \
-		         CAST_PATTERN, INCREMENT_INTEGER, DIVIDE_REAL); \
+		         CAST_PATTERN, INCREMENT_INTEGER, SCALE2_REAL); \
 		break; \
 	case 'l': \
 		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
-		         CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+		         CAST_LOGICAL, INCREMENT_REAL, SCALE2_REAL); \
 		else \
 		SUM_LOOP(int, LOGICAL, int, INTEGER, \
 		         0, 1, NA_INTEGER, ISNA_LOGICAL, \
-		         CAST_LOGICAL, INCREMENT_INTEGER, DIVIDE_REAL); \
+		         CAST_LOGICAL, INCREMENT_INTEGER, SCALE2_REAL); \
 		break; \
 	case 'i': \
 		SUM_LOOP(int, INTEGER, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_INTEGER, \
-		         CAST_INTEGER, INCREMENT_REAL, DIVIDE_REAL); \
+		         CAST_INTEGER, INCREMENT_REAL, SCALE2_REAL); \
 		break; \
 	case 'd': \
 		SUM_LOOP(double, REAL, double, REAL, \
 		         0.0, 1.0, NA_REAL, ISNA_REAL, \
-		         CAST_REAL, INCREMENT_REAL, DIVIDE_REAL); \
+		         CAST_REAL, INCREMENT_REAL, SCALE2_REAL); \
 		break; \
 	case 'z': \
 		SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, \
 		         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
-		         CAST_COMPLEX, INCREMENT_COMPLEX, DIVIDE_COMPLEX); \
+		         CAST_COMPLEX, INCREMENT_COMPLEX, SCALE2_COMPLEX); \
 		break; \
 	default: \
 		break; \
@@ -1433,7 +1433,7 @@ void dense_colsum(SEXP x, const char *class,
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
 	             _ZERO_, _ONE_, _NA_, _ISNA_, \
-	             _CAST_, _INCREMENT_, _DIVIDE_) \
+	             _CAST_, _INCREMENT_, _SCALE2_) \
 	do { \
 		_CTYPE0_ *px0 = _PTR0_(  x); \
 		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
@@ -1441,7 +1441,7 @@ void dense_colsum(SEXP x, const char *class,
 			for (j = 0; j < n; ++j) { \
 				*px1 = _ZERO_; \
 				SUM_KERNEL(for (i = 0; i < m; ++i), _NA_, _ISNA_, \
-				           _CAST_, _INCREMENT_, _DIVIDE_); \
+				           _CAST_, _INCREMENT_, _SCALE2_); \
 				px1 += 1; \
 			} \
 		} else if (di == 'N') { \
@@ -1449,7 +1449,7 @@ void dense_colsum(SEXP x, const char *class,
 				for (j = 0; j < n; ++j) { \
 					*px1 = _ZERO_; \
 					SUM_KERNEL(for (i = 0; i <= j; ++i), _NA_, _ISNA_, \
-					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					           _CAST_, _INCREMENT_, _SCALE2_); \
 					if (unpacked) \
 						px0 += n - j - 1; \
 					px1 += 1; \
@@ -1460,7 +1460,7 @@ void dense_colsum(SEXP x, const char *class,
 						px0 += j; \
 					*px1 = _ZERO_; \
 					SUM_KERNEL(for (i = j; i < n; ++i), _NA_, _ISNA_, \
-					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					           _CAST_, _INCREMENT_, _SCALE2_); \
 					px1 += 1; \
 				} \
 			} \
@@ -1469,7 +1469,7 @@ void dense_colsum(SEXP x, const char *class,
 				for (j = 0; j < n; ++j) { \
 					*px1 = _ONE_; \
 					SUM_KERNEL(for (i = 0; i < j; ++i), _NA_, _ISNA_, \
-					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					           _CAST_, _INCREMENT_, _SCALE2_); \
 					++px0; \
 					if (unpacked) \
 						px0 += n - j - 1; \
@@ -1482,14 +1482,14 @@ void dense_colsum(SEXP x, const char *class,
 					++px0; \
 					*px1 = _ONE_; \
 					SUM_KERNEL(for (i = j + 1; i < n; ++i), _NA_, _ISNA_, \
-					           _CAST_, _INCREMENT_, _DIVIDE_); \
+					           _CAST_, _INCREMENT_, _SCALE2_); \
 					px1 += 1; \
 				} \
 			} \
 		} \
 	} while (0)
 
-#define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_, _DIVIDE_) \
+#define SUM_KERNEL(_FOR_, _NA_, _ISNA_, _CAST_, _INCREMENT_, _SCALE2_) \
 	do { \
 		if (mean) \
 			count = m; \
@@ -1506,7 +1506,7 @@ void dense_colsum(SEXP x, const char *class,
 			++px0; \
 		} \
 		if (mean) \
-			_DIVIDE_((*px1), count); \
+			_SCALE2_((*px1), count); \
 	} while (0)
 
 	SUM_CASES;
@@ -1532,7 +1532,7 @@ void dense_rowsum(SEXP x, const char *class,
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _CAST_, _INCREMENT_, _DIVIDE_) \
+		         _CAST_, _INCREMENT_, _SCALE2_) \
 	do { \
 		_CTYPE0_ *px0 = _PTR0_(  x); \
 		_CTYPE1_ *px1 = _PTR1_(res), tmp = (di == 'N') ? _ZERO_ : _ONE_; \
@@ -1580,10 +1580,10 @@ void dense_rowsum(SEXP x, const char *class,
 		if (mean) { \
 			if (narm_) \
 				for (i = 0; i < m; ++i) \
-					_DIVIDE_(px1[i], count[i]); \
+					_SCALE2_(px1[i], count[i]); \
 			else \
 				for (i = 0; i < m; ++i) \
-					_DIVIDE_(px1[i], n); \
+					_SCALE2_(px1[i], n); \
 		} \
 	} while (0)
 

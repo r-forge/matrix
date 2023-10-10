@@ -181,14 +181,14 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define ASSIGN_COMPLEX(_X_, _Y_) \
 	do { _X_.r = _Y_.r; _X_.i = _Y_.i; } while (0)
 
-#define MULTIPLY_REAL(_X_, _A_) \
+#define SCALE1_REAL(_X_, _A_) \
 	do { _X_   *= _A_;               } while (0)
-#define MULTIPLY_COMPLEX(_X_, _A_) \
+#define SCALE1_COMPLEX(_X_, _A_) \
 	do { _X_.r *= _A_; _X_.i *= _A_; } while (0)
 
-#define DIVIDE_REAL(_X_, _A_) \
+#define SCALE2_REAL(_X_, _A_) \
 	do { _X_   /= _A_;               } while (0)
-#define DIVIDE_COMPLEX(_X_, _A_) \
+#define SCALE2_COMPLEX(_X_, _A_) \
 	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
 #define PACKED_AR21_UP(i, j) \

@@ -697,14 +697,15 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			B = cholmod_allocate_dense(m, n, m, L->xtype, &c);
 			if (!B)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
+			R_xlen_t m1a = (R_xlen_t) m + 1;
 
 #define EYE(_CTYPE_, _ONE_) \
 			do { \
 				_CTYPE_ *B__x = (_CTYPE_ *) B->x; \
 				Matrix_memset(B__x, 0, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
 				for (j = 0; j < n; ++j) { \
-					*(B__x++) = _ONE_; \
-					B__x += m; \
+					*B__x = _ONE_; \
+					B__x += m1a; \
 				} \
 			} while (0)
 
