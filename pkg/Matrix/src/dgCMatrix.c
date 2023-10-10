@@ -6,7 +6,7 @@
 /* TODO: support NCOL(b) > 1                   */
 SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 {
-	Matrix_cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = M2CXS(a, 1);
 	MCS_XTYPE_SET(MCS_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
 		duplicate(b) : coerceVector(b, REALSXP));
@@ -30,7 +30,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	int order_ = asInteger(order);
 	if (order_ < 0 || order_ > 3)
 		order_ = 0;
-	Matrix_cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = M2CXS(a, 1);
 	MCS_XTYPE_SET(MCS_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP)
 		? duplicate(b) : coerceVector(b, REALSXP));
@@ -55,7 +55,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 {
 	/* Find least squares solution of A * X = B, given A' and B : */
-	cholmod_sparse *At = M2CS(at, 1);
+	cholmod_sparse *At = M2CHS(at, 1);
 	PROTECT(b = coerceVector(b, REALSXP));
 	if (LENGTH(b) != At->ncol)
 		error(_("dimensions of '%s' and '%s' are inconsistent"), "at", "b");
@@ -96,7 +96,7 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
 	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
 	/* L : */
-	PROTECT(tmp = CF2M(L, 1));
+	PROTECT(tmp = CHF2M(L, 1));
 	SET_VECTOR_ELT(ans, 0, tmp);
 	/* coef : */
 	PROTECT(tmp = allocVector(REALSXP, At->nrow));

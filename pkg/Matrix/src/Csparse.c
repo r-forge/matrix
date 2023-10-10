@@ -20,7 +20,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 		cpi = PROTECT(checkpi(p, i, m, n));
 
 	if (TYPEOF(cpi) == LGLSXP && !LOGICAL(cpi)[0]) {
-		cholmod_sparse *A = M2CS(x, 1);
+		cholmod_sparse *A = M2CHS(x, 1);
 		A->sorted = 0;
 		if (!cholmod_sort(A, &c))
 			error(_("'%s' failed"), "cholmod_sort");
@@ -219,7 +219,7 @@ enum x_slot_kind {
 /* dmperm(x, nAns, seed) */
 SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
-	Matrix_cs *A = dgC2cs(x, 0);
+	Matrix_cs *A = M2CXS(x, 0);
 	MCS_XTYPE_SET(A->xtype);
 	Matrix_csd *D = Matrix_cs_dmperm(A, asInteger(seed));
 	if (!D)
@@ -304,7 +304,7 @@ SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
 		class = valid[R_check_class_etc(obj, valid)];
 	}
 
-	cholmod_sparse *A = M2CS(obj, 1);
+	cholmod_sparse *A = M2CHS(obj, 1);
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));

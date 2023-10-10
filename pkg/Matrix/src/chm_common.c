@@ -76,7 +76,7 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
  *
  * @return L.
  */
-/* NB: mostly parallel to M2CF in ./cholmod-etc.c */
+/* NB: mostly parallel to M2CHF in ./cholmod-etc.c */
 cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 {
 	static const char *valid[] = {
@@ -180,7 +180,7 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
  *
  * @return A.
  */
-/* NB: mostly parallel to M2CS in ./cholmod-etc.c */
+/* NB: mostly parallel to M2CHS in ./cholmod-etc.c */
 cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
                                        Rboolean checkUnit, Rboolean sortInPlace)
 {
@@ -332,7 +332,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
  *
  * @return A.
  */
-/* NB: mostly parallel to M2CD in ./cholmod-etc.c */
+/* NB: mostly parallel to M2CHD in ./cholmod-etc.c */
 cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 {
 	static const char *valid[] = {
@@ -446,7 +446,7 @@ cholmod_dense *numeric_as_cholmod_dense(cholmod_dense *A,
  *
  * @return A CHMfactor.
  */
-/* NB: mostly parallel to CF2M in ./cholmod-etc.c */
+/* NB: mostly parallel to CHF2M in ./cholmod-etc.c */
 SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 {
 
@@ -593,7 +593,7 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
  *
  * @return A CsparseMatrix.
  */
-/* NB: mostly parallel to CS2M in ./cholmod-etc.c */
+/* NB: mostly parallel to CHS2M in ./cholmod-etc.c */
 SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
                             int ttype, int doLogic, const char *diagString,
                             SEXP dimnames)
@@ -692,7 +692,7 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
  *
  * @return A [dz]geMatrix.
  */
-/* NB: mostly parallel to CD2M in ./cholmod-etc.c */
+/* NB: mostly parallel to CHD2M in ./cholmod-etc.c */
 SEXP cholmod_dense_as_sexp(cholmod_dense *A, int doFree)
 {
 

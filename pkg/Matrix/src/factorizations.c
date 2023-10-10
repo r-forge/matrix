@@ -365,7 +365,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 		return val;
 	PROTECT(val = newObject("sparseLU"));
 
-	Matrix_cs *A = dgC2cs(obj, 1);
+	Matrix_cs *A = M2CXS(obj, 1);
 	MCS_XTYPE_SET(A->xtype);
 
 	Matrix_css *S = NULL;
@@ -397,8 +397,8 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	SEXP L = PROTECT(cs2dgC(N->L, 1, 't')),
-		U = PROTECT(cs2dgC(N->U, 1, 't')),
+	SEXP L = PROTECT(CXS2M(N->L, 1, 't')),
+		U = PROTECT(CXS2M(N->U, 1, 't')),
 		uplo = PROTECT(mkString("L"));
 	SET_SLOT(L, Matrix_uploSym, uplo);
 	SET_SLOT(val, Matrix_LSym, L);
@@ -451,7 +451,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 		return val;
 	PROTECT(val = newObject("sparseQR"));
 
-	Matrix_cs *A = dgC2cs(obj, 1);
+	Matrix_cs *A = M2CXS(obj, 1);
 	MCS_XTYPE_SET(A->xtype);
 
 	Matrix_css *S = NULL;
@@ -483,8 +483,8 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	SEXP V = PROTECT(cs2dgC(N->L, 1, 'g')),
-		R = PROTECT(cs2dgC(N->U, 1, 'g'));
+	SEXP V = PROTECT(CXS2M(N->L, 1, 'g')),
+		R = PROTECT(CXS2M(N->U, 1, 'g'));
 	SET_SLOT(val, Matrix_VSym, V);
 	SET_SLOT(val, Matrix_RSym, R);
 	UNPROTECT(2); /* R, V */
@@ -593,7 +593,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(trf, &pid);
-	cholmod_sparse *A = M2CS(obj, 1);
+	cholmod_sparse *A = M2CHS(obj, 1);
 	cholmod_factor *L = NULL;
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -601,7 +601,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 	A->stype = (ul == 'U') ? 1 : -1;
 
 	if (cached) {
-		L = M2CF(trf, 1);
+		L = M2CHF(trf, 1);
 		L = cholmod_copy_factor(L, &c);
 		dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
 	} else {
@@ -611,7 +611,7 @@ SEXP dpCMatrix_trf(SEXP obj,
 			nm[2] = (L->is_ll   ) ? 'd' : 'D';
 		}
 	}
-	REPROTECT(trf = CF2M(L, 1), pid);
+	REPROTECT(trf = CHF2M(L, 1), pid);
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
@@ -800,7 +800,7 @@ SEXP BunchKaufman_expand(SEXP obj, SEXP packed)
 
 SEXP CHMfactor_diag_get(SEXP obj, SEXP square)
 {
-	cholmod_factor *L = M2CF(obj, 1);
+	cholmod_factor *L = M2CHF(obj, 1);
 	int n = (int) L->n, square_ = asLogical(square);
 	SEXP y = PROTECT(allocVector(REALSXP, n));
 	double *py = REAL(y);
@@ -848,8 +848,8 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 	if (!R_FINITE(mult_))
 		error(_("'%s' is not a number or not finite"), "mult");
 
-	cholmod_factor *L = cholmod_copy_factor(M2CF(obj, 1), &c);
-	cholmod_sparse *A = M2CS(parent, 1);
+	cholmod_factor *L = cholmod_copy_factor(M2CHF(obj, 1), &c);
+	cholmod_sparse *A = M2CHS(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -858,7 +858,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 
 	dpCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
 
-	SEXP res = PROTECT(CF2M(L, 1));
+	SEXP res = PROTECT(CHF2M(L, 1));
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
@@ -874,8 +874,8 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
 
-	cholmod_factor *L = cholmod_copy_factor(M2CF(obj, 1), &c);
-	cholmod_sparse *A = M2CS(parent, 1);
+	cholmod_factor *L = cholmod_copy_factor(M2CHF(obj, 1), &c);
+	cholmod_sparse *A = M2CHS(parent, 1);
 	if (Matrix_shape(parent) == 's') {
 		SEXP uplo = GET_SLOT(parent, Matrix_uploSym);
 		char ul = *CHAR(STRING_ELT(uplo, 0));
@@ -884,7 +884,7 @@ SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
 
 	cholmod_updown(asLogical(update) != 0, A, L, &c);
 
-	SEXP res = PROTECT(CF2M(L, 1));
+	SEXP res = PROTECT(CHF2M(L, 1));
 	cholmod_free_factor(&L, &c);
 
 	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));

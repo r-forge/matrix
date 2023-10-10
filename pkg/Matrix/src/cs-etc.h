@@ -60,8 +60,8 @@ typedef struct Matrix_cs_dmperm_results
 	int cc[5];
 } Matrix_csd;
 
-Matrix_cs *dgC2cs(SEXP, int);
-SEXP cs2dgC(Matrix_cs *, int, char);
+Matrix_cs *M2CXS(SEXP, int);
+SEXP CXS2M(Matrix_cs *, int, char);
 
 /* Wrappers for the functions that we use at least once : */
 
