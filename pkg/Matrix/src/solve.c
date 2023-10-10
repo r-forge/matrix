@@ -518,7 +518,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	if (L->xtype != U->xtype)
 		error(_("'%s' and '%s' slots have different '%s'"),
 		      "L", "U", "xtype");
-	SET_MCS_XTYPE(L->xtype);
+	MCS_SET_XTYPE(L->xtype);
 	if (!asLogical(sparse)) {
 		PROTECT(r = newObject("dgeMatrix"));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
@@ -777,7 +777,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	char ul = *CHAR(STRING_ELT(auplo, 0));
 	int j;
 	Matrix_cs *A = dgC2cs(a, 1);
-	SET_MCS_XTYPE(A->xtype);
+	MCS_SET_XTYPE(A->xtype);
 	if (!asLogical(sparse)) {
 		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
 		PROTECT(r = newObject(cl));
@@ -867,7 +867,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		beta = PROTECT(GET_SLOT(qr, Matrix_betaSym)),
 		p = PROTECT(GET_SLOT(qr, Matrix_pSym));
 	Matrix_cs *V_ = dgC2cs(V, 1);
-	SET_MCS_XTYPE(V_->xtype);
+	MCS_SET_XTYPE(V_->xtype);
 	double *pbeta = REAL(beta);
 	int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
 		*pp = INTEGER(p), nprotect = 6;
