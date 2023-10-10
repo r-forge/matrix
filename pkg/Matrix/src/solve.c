@@ -516,7 +516,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	int i, j,
 		*pap = (LENGTH(ap)) ? INTEGER(ap) : NULL,
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
-	Matrix_cs *L = M2CXS(aL, 1), *U = dgC2cs(aU, 1);
+	Matrix_cs *L = M2CXS(aL, 1), *U = M2CXS(aU, 1);
 	MCS_XTYPE_SET(L->xtype);
 	if (!asLogical(sparse)) {
 		char rcl[] = ".geMatrix";
