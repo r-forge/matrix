@@ -516,7 +516,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 	int i, j,
 		*pap = (LENGTH(ap)) ? INTEGER(ap) : NULL,
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
-	Matrix_cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
+	Matrix_cs *L = M2CXS(aL, 1), *U = dgC2cs(aU, 1);
 	MCS_XTYPE_SET(L->xtype);
 	if (!asLogical(sparse)) {
 		char rcl[] = ".geMatrix";
@@ -592,7 +592,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 				for (i = 0; i < m; ++i)
 					B->i[pap[i]] = i;
 		} else {
-			B = dgC2cs(b, 1);
+			B = M2CXS(b, 1);
 			if (B && pap) {
 				int *papinv = Matrix_cs_pinv(pap, m);
 				if (!papinv)
@@ -696,7 +696,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		if (!B)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
-		PROTECT(r = cs2dgC(B, 1, 'g'));
+		PROTECT(r = CXS2M(B, 1, 'g'));
 		B = Matrix_cs_spfree(B);
 	}
 
@@ -732,7 +732,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 
 	SEXP r;
 	int j;
-	cholmod_factor *L = M2CF(a, 1);
+	cholmod_factor *L = M2CHF(a, 1);
 	if (!asLogical(sparse)) {
 		cholmod_dense *B = NULL, *X = NULL;
 		if (isNull(b)) {
@@ -764,14 +764,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			cholmod_free_dense(&B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
-			PROTECT(r = CD2M(X, 0,
+			PROTECT(r = CHD2M(X, 0,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
-			B = M2CD(b, 0);
+			B = M2CHD(b, 0);
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
-			PROTECT(r = CD2M(X, 0, 'g'));
+			PROTECT(r = CHD2M(X, 0, 'g'));
 		}
 		cholmod_free_dense(&X, &c);
 	} else {
@@ -788,14 +788,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			}
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
-			PROTECT(r = CS2M(X, 1,
+			PROTECT(r = CHS2M(X, 1,
 				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
-			B = M2CS(b, 1);
+			B = M2CHS(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
-			PROTECT(r = CS2M(X, 1, 'g'));
+			PROTECT(r = CHS2M(X, 1, 'g'));
 		}
 		cholmod_free_sparse(&X, &c);
 	}
@@ -818,7 +818,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
 	char aul = *CHAR(STRING_ELT(auplo, 0));
 	int i, j;
-	Matrix_cs *A = dgC2cs(a, 1);
+	Matrix_cs *A = M2CXS(a, 1);
 	MCS_XTYPE_SET(A->xtype);
 	if (!asLogical(sparse)) {
 		char rcl[] = "...Matrix";
@@ -891,7 +891,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		if (isNull(b))
 			B = Matrix_cs_speye(m, m, 1, 0);
 		else
-			B = dgC2cs(b, 1);
+			B = M2CXS(b, 1);
 		if (!B)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
@@ -925,7 +925,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		if (!B)
 			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
 
-		PROTECT(r = cs2dgC(B, 1, (isNull(b)) ? 't' : 'g'));
+		PROTECT(r = CXS2M(B, 1, (isNull(b)) ? 't' : 'g'));
 		B = Matrix_cs_spfree(B);
 	}
 	if (isNull(b))
@@ -940,7 +940,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 {
 	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym));
-	Matrix_cs *V_ = dgC2cs(V, 1);
+	Matrix_cs *V_ = M2CXS(V, 1);
 	MCS_XTYPE_SET(V_->xtype);
 
 	SEXP beta = PROTECT(GET_SLOT(qr, Matrix_betaSym));
@@ -1026,7 +1026,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		{ \
 			SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)), \
 				q = PROTECT(GET_SLOT(qr, Matrix_qSym)); \
-			Matrix_cs *R_ = dgC2cs(R, 1); \
+			Matrix_cs *R_ = M2CXS(R, 1); \
 			int *pq = (LENGTH(q) > 0) ? INTEGER(q) : NULL; \
 			for (j = 0; j < n; ++j) { \
 				Matrix_cs_pvec(pp, pyx, work, m); \

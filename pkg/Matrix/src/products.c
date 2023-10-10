@@ -777,7 +777,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 	zcl[0] = (boolean) ? 'n' : 'd';
 	if (y == R_NilValue) {
 		zcl[1] = 's';
-		cholmod_sparse *X = M2CS(x, !boolean);
+		cholmod_sparse *X = M2CHS(x, !boolean);
 		if (X->xtype == CHOLMOD_COMPLEX)
 			error(_("'%s' does not support complex matrices"), "cholmod_aat");
 		if (xtrans)
@@ -787,7 +787,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 			cholmod_free_sparse(&X, &c);
 		Z->stype = (ztrans) ? -1 : 1;
 		cholmod_sort(Z, &c);
-		PROTECT_WITH_INDEX(z = CS2M(Z, !boolean, zcl[1]), &zpid);
+		PROTECT_WITH_INDEX(z = CHS2M(Z, !boolean, zcl[1]), &zpid);
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
@@ -801,8 +801,8 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 	} else {
 		zcl[1] = (triangular != 0) ? 't' : 'g';
 		cholmod_sparse
-			*X = M2CS(x, !boolean),
-			*Y = M2CS(y, !boolean);
+			*X = M2CHS(x, !boolean),
+			*Y = M2CHS(y, !boolean);
 		if (X->xtype == CHOLMOD_COMPLEX || Y->xtype == CHOLMOD_COMPLEX)
 			error(_("'%s' does not support complex matrices"), "cholmod_ssmult");
 		if (((xtrans) ? X->nrow : X->ncol) != ((ytrans) ? Y->ncol : Y->nrow))
@@ -816,7 +816,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 			cholmod_free_sparse(&X, &c);
 		if (ytrans)
 			cholmod_free_sparse(&Y, &c);
-		PROTECT_WITH_INDEX(z = CS2M(Z, !boolean, zcl[1]), &zpid);
+		PROTECT_WITH_INDEX(z = CHS2M(Z, !boolean, zcl[1]), &zpid);
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
@@ -846,8 +846,8 @@ SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 {
 	SEXP z;
 	char zcl[] = "...Matrix";
-	cholmod_sparse *X = M2CS(x, 1);
-	cholmod_dense  *Y = M2CD(y, ytrans);
+	cholmod_sparse *X = M2CHS(x, 1);
+	cholmod_dense  *Y = M2CHD(y, ytrans);
 	zcl[0] = (X->xtype == CHOLMOD_COMPLEX || Y->xtype == CHOLMOD_COMPLEX)
 		? 'z' : 'd';
 	zcl[1] = (triangular) ? 't' : 'g';
@@ -880,7 +880,7 @@ SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		else
 			Z->x = R_Calloc(Z->nzmax, double);
 		cholmod_sdmult(X, xtrans, alpha, beta, Y, Z, &c);
-		PROTECT(z = CD2M(Z, ztrans, zcl[1]));
+		PROTECT(z = CHD2M(Z, ztrans, zcl[1]));
 		R_Free(Z->x);
 	} else {
 		PROTECT(z = newObject(zcl));

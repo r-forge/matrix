@@ -3,7 +3,7 @@
 
 int Matrix_cs_xtype; /* flag indicating use of cs_di_*() or cs_ci_*() */
 
-Matrix_cs *dgC2cs(SEXP obj, int values)
+Matrix_cs *M2CXS(SEXP obj, int values)
 {
 	Matrix_cs *A = (Matrix_cs *) R_alloc(1, sizeof(Matrix_cs));
 	memset(A, 0, sizeof(Matrix_cs));
@@ -37,7 +37,7 @@ Matrix_cs *dgC2cs(SEXP obj, int values)
 	return A;
 }
 
-SEXP cs2dgC(Matrix_cs *A, int values, char shape)
+SEXP CXS2M(Matrix_cs *A, int values, char shape)
 {
 	if (values && A->xtype != MCS_REAL && A->xtype != MCS_COMPLEX)
 		error(_("wrong '%s'"), "xtype");
