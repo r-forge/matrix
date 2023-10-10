@@ -939,162 +939,187 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 
 SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 {
-	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym)),
-		beta = PROTECT(GET_SLOT(qr, Matrix_betaSym)),
-		p = PROTECT(GET_SLOT(qr, Matrix_pSym));
+	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym));
 	Matrix_cs *V_ = dgC2cs(V, 1);
 	MCS_SET_XTYPE(V_->xtype);
+
+	SEXP beta = PROTECT(GET_SLOT(qr, Matrix_betaSym));
 	double *pbeta = REAL(beta);
-	int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op),
-		*pp = INTEGER(p), nprotect = 6;
+
+	SEXP p = PROTECT(GET_SLOT(qr, Matrix_pSym));
+	int *pp = (LENGTH(p) > 0) ? INTEGER(p) : NULL;
+
+	int m = V_->m, r = V_->n, n, i, j, op_ = asInteger(op), nprotect = 5;
 
 	SEXP yx;
-	double *pyx;
 	if (isNull(y)) {
 		n = (asLogical(complete)) ? m : r;
 
 		R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
-		PROTECT(yx = allocVector(REALSXP, mn));
-		pyx = REAL(yx);
-		Matrix_memset(pyx, 0, mn, sizeof(double));
+		PROTECT(yx = allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
 
-		if (isNull(yxjj)) {
-			for (j = 0; j < n; ++j) {
-				*pyx = 1.0;
-				pyx += m1a;
-			}
-		} else if (TYPEOF(yxjj) == REALSXP && XLENGTH(yxjj) >= n) {
-			double *pyxjj = REAL(yxjj);
-			for (j = 0; j < n; ++j) {
-				*pyx = *pyxjj;
-				pyx += m1a;
-				pyxjj += 1;
-			}
-		} else
-			error(_("invalid '%s' to '%s'"), "yxjj", __func__);
+#define EYE(_CTYPE_, _PTR_, _ONE_) \
+		do { \
+			_CTYPE_ *pyx = _PTR_(yx); \
+			Matrix_memset(pyx, 0, mn, sizeof(_CTYPE_)); \
+			if (isNull(yxjj)) { \
+				for (j = 0; j < n; ++j) { \
+					*pyx = _ONE_; \
+					pyx += m1a; \
+				} \
+			} else if (TYPEOF(yxjj) == TYPEOF(yx) && XLENGTH(yxjj) >= n) { \
+				_CTYPE_ *pyxjj = _PTR_(yxjj); \
+				for (j = 0; j < n; ++j) { \
+					*pyx = *pyxjj; \
+					pyx += m1a; \
+					pyxjj += 1; \
+				} \
+			} else \
+				error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
+		} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (MCS_GET_XTYPE() == MCS_COMPLEX)
+		EYE(Rcomplex, COMPLEX, Matrix_zone);
+		else
+#endif
+		EYE(double, REAL, 1.0);
+
+#undef EYE
+
 	} else {
-		SEXP ydim = PROTECT(GET_SLOT(y, Matrix_DimSym));
+		SEXP ydim = GET_SLOT(y, Matrix_DimSym);
 		int *pydim = INTEGER(ydim);
 		if (pydim[0] != m)
 			error(_("dimensions of '%s' and '%s' are inconsistent"),
-			     "qr", "y");
+			      "qr", "y");
 		n = pydim[1];
-		UNPROTECT(1); /* ydim */
 
 		PROTECT(yx = GET_SLOT(y, Matrix_xSym));
 	}
-	pyx = REAL(yx);
 
-	SEXP a = PROTECT(newObject("dgeMatrix")),
-		adim = PROTECT(GET_SLOT(a, Matrix_DimSym)),
-		ax = yx;
+	char acl[] = ".geMatrix";
+	acl[0] = IF_COMPLEX('z', 'd');
+	SEXP a = PROTECT(newObject(acl));
+
+	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int *padim = INTEGER(adim);
 	padim[0] = (op_ != 0) ? m : r;
 	padim[1] = n;
-	if (!isNull(y) || padim[0] != m) {
-		PROTECT(ax = allocVector(REALSXP, (R_xlen_t) padim[0] * padim[1]));
+
+	SEXP ax;
+	if (isNull(y) && padim[0] == m)
+		ax = yx;
+	else {
+		R_xlen_t mn = (R_xlen_t) padim[0] * padim[1];
+		PROTECT(ax = allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
 		++nprotect;
 	}
-	double *pax = REAL(ax), *work = NULL;
-	if (op_ < 5)
-		work = (double *) R_alloc((size_t) m, sizeof(double));
 
-	switch (op_) {
-	case 0: /* qr.coef : A = P2 R1^{-1} Q1' P1 y */
-	{
-		SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)),
-			q = PROTECT(GET_SLOT(qr, Matrix_qSym));
-		Matrix_cs *R_ = dgC2cs(R, 1);
-		if (V_->xtype != R_->xtype)
-			error(_("'%s' and '%s' slots have different '%s'"),
-			      "V", "R", "xtype");
-		int *pq = (LENGTH(q)) ? INTEGER(q) : NULL;
+#define MATMULT(_CTYPE_, _PTR_) \
+	do { \
+		_CTYPE_ *pyx = _PTR_(yx), *pax = _PTR_(ax), *work = NULL; \
+		if (op_ < 5) \
+			work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+		switch (op_) { \
+		case 0: /* qr.coef : A = P2 R1^{-1} Q1' P1 y */ \
+		{ \
+			SEXP R = PROTECT(GET_SLOT(qr, Matrix_RSym)), \
+				q = PROTECT(GET_SLOT(qr, Matrix_qSym)); \
+			Matrix_cs *R_ = dgC2cs(R, 1); \
+			int *pq = (LENGTH(q) > 0) ? INTEGER(q) : NULL; \
+			for (j = 0; j < n; ++j) { \
+				Matrix_cs_pvec(pp, pyx, work, m); \
+				for (i = 0; i < r; ++i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				Matrix_cs_usolve(R_, work); \
+				Matrix_cs_ipvec(pq, work, pax, r); \
+				pyx += m; \
+				pax += r; \
+			} \
+			UNPROTECT(2); /* q, R */ \
+			break; \
+		} \
+		case 1: /* qr.fitted : A = P1' Q1 Q1' P1 y */ \
+			for (j = 0; j < n; ++j) { \
+				Matrix_cs_pvec(pp, pyx, work, m); \
+				for (i = 0; i < r; ++i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				if (r < m) \
+					Matrix_memset(work + r, 0, m - r, sizeof(_CTYPE_)); \
+				for (i = r - 1; i >= 0; --i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				Matrix_cs_ipvec(pp, work, pax, m); \
+				pyx += m; \
+				pax += m; \
+			} \
+			break; \
+		case 2: /* qr.resid : A = P1' Q2 Q2' P1 y */ \
+			for (j = 0; j < n; ++j) { \
+				Matrix_cs_pvec(pp, pyx, work, m); \
+				for (i = 0; i < r; ++i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				if (r > 0) \
+					Matrix_memset(work, 0, r, sizeof(_CTYPE_)); \
+				for (i = r - 1; i >= 0; --i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				Matrix_cs_ipvec(pp, work, pax, m); \
+				pyx += m; \
+				pax += m; \
+			} \
+			break; \
+		case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */ \
+			for (j = 0; j < n; ++j) { \
+				Matrix_cs_pvec(pp, pyx, work, m); \
+				Matrix_memcpy(pax, work, m, sizeof(_CTYPE_)); \
+				for (i = 0; i < r; ++i) \
+					Matrix_cs_happly(V_, i, pbeta[i], pax); \
+				pyx += m; \
+				pax += m; \
+			} \
+			break; \
+		case 4: /* qr.qy {w/ perm.} : A = P1' Q y */ \
+			for (j = 0; j < n; ++j) { \
+				Matrix_memcpy(work, pyx, m, sizeof(_CTYPE_)); \
+				for (i = r - 1; i >= 0; --i) \
+					Matrix_cs_happly(V_, i, pbeta[i], work); \
+				Matrix_cs_ipvec(pp, work, pax, m); \
+				pyx += m; \
+				pax += m; \
+			} \
+		break; \
+		case 5: /* qr.qty {w/o perm.} : A = Q' y */ \
+			if (ax != yx) \
+				Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < r; ++i) \
+					Matrix_cs_happly(V_, i, pbeta[i], pax); \
+				pax += m; \
+			} \
+		break; \
+		case 6: /* qr.qy {w/o perm.} : A = Q y */ \
+			if (ax != yx) \
+				Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+			for (j = 0; j < n; ++j) { \
+				for (i = r - 1; i >= 0; --i) \
+					Matrix_cs_happly(V_, i, pbeta[i], pax); \
+				pax += m; \
+			} \
+		break; \
+		default: \
+			error(_("invalid '%s' to '%s'"), "op", __func__); \
+			break; \
+		} \
+	} while (0)
 
-		for (j = 0; j < n; ++j) {
-			Matrix_cs_pvec(pp, pyx, work, m);
-			for (i = 0; i < r; ++i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			Matrix_cs_usolve(R_, work);
-			Matrix_cs_ipvec(pq, work, pax, r);
-			pyx += m;
-			pax += r;
-		}
-
-		UNPROTECT(2); /* q, R */
-		break;
-	}
-	case 1: /* qr.fitted : A = P1' Q1 Q1' P1 y */
-		for (j = 0; j < n; ++j) {
-			Matrix_cs_pvec(pp, pyx, work, m);
-			for (i = 0; i < r; ++i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			if (r < m)
-				Matrix_memset(work + r, 0, m - r, sizeof(double));
-			for (i = r - 1; i >= 0; --i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			Matrix_cs_ipvec(pp, work, pax, m);
-			pyx += m;
-			pax += m;
-		}
-		break;
-	case 2: /* qr.resid : A = P1' Q2 Q2' P1 y */
-		for (j = 0; j < n; ++j) {
-			Matrix_cs_pvec(pp, pyx, work, m);
-			for (i = 0; i < r; ++i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			if (r > 0)
-				Matrix_memset(work, 0, r, sizeof(double));
-			for (i = r - 1; i >= 0; --i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			Matrix_cs_ipvec(pp, work, pax, m);
-			pyx += m;
-			pax += m;
-		}
-		break;
-	case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */
-		for (j = 0; j < n; ++j) {
-			Matrix_cs_pvec(pp, pyx, work, m);
-			Matrix_memcpy(pax, work, m, sizeof(double));
-			for (i = 0; i < r; ++i)
-				Matrix_cs_happly(V_, i, pbeta[i], pax);
-			pyx += m;
-			pax += m;
-		}
-		break;
-	case 4: /* qr.qy {w/ perm.} : A = P1' Q y */
-		for (j = 0; j < n; ++j) {
-			Matrix_memcpy(work, pyx, m, sizeof(double));
-			for (i = r - 1; i >= 0; --i)
-				Matrix_cs_happly(V_, i, pbeta[i], work);
-			Matrix_cs_ipvec(pp, work, pax, m);
-			pyx += m;
-			pax += m;
-		}
-	break;
-	case 5: /* qr.qty {w/o perm.} : A = Q' y */
-		if (ax != yx)
-			Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
-		for (j = 0; j < n; ++j) {
-			for (i = 0; i < r; ++i)
-				Matrix_cs_happly(V_, i, pbeta[i], pax);
-			pax += m;
-		}
-	break;
-	case 6: /* qr.qy {w/o perm.} : A = Q y */
-		if (ax != yx)
-			Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(double));
-		for (j = 0; j < n; ++j) {
-			for (i = r - 1; i >= 0; --i)
-				Matrix_cs_happly(V_, i, pbeta[i], pax);
-			pax += m;
-		}
-	break;
-	default:
-		error(_("invalid '%s' to '%s'"), "op", __func__);
-		break;
-	}
-
+#ifdef MATRIX_ENABLE_ZMATRIX
+	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	MATMULT(Rcomplex, COMPLEX);
+	else
+#endif
+	MATMULT(double, REAL);
 	SET_SLOT(a, Matrix_xSym, ax);
-	UNPROTECT(nprotect); /* ax, adim, a, yx, p, beta, V */
+
+	UNPROTECT(nprotect); /* ax, a, yx, p, beta, V */
 	return a;
 }
