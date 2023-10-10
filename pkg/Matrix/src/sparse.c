@@ -2661,11 +2661,11 @@ do { \
 		if (mean) \
 		SUM_LOOP(int, LOGICAL, double, REAL, HIDE, \
 		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
-		         _MAP_, CAST_PATTERN, INCREMENT_REAL, DIVIDE_REAL); \
+		         _MAP_, CAST_PATTERN, INCREMENT_REAL, SCALE2_REAL); \
 		else \
 		SUM_LOOP(int, LOGICAL, int, INTEGER, HIDE, \
 		         0, 1, NA_INTEGER, ISNA_PATTERN, \
-		         _MAP_, CAST_PATTERN, INCREMENT_INTEGER, DIVIDE_REAL); \
+		         _MAP_, CAST_PATTERN, INCREMENT_INTEGER, SCALE2_REAL); \
 	} else { \
 		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)); \
 		switch (class[0]) { \
@@ -2673,26 +2673,26 @@ do { \
 			if (mean) \
 			SUM_LOOP(int, LOGICAL, double, REAL, SHOW, \
 			         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
-			         _MAP_, CAST_LOGICAL, INCREMENT_REAL, DIVIDE_REAL); \
+			         _MAP_, CAST_LOGICAL, INCREMENT_REAL, SCALE2_REAL); \
 			else \
 			SUM_LOOP(int, LOGICAL, int, INTEGER, SHOW, \
 			         0, 1, NA_INTEGER, ISNA_LOGICAL, \
-			         _MAP_, CAST_LOGICAL, INCREMENT_INTEGER, DIVIDE_REAL); \
+			         _MAP_, CAST_LOGICAL, INCREMENT_INTEGER, SCALE2_REAL); \
 			break; \
 		case 'i': \
 			SUM_LOOP(int, INTEGER, double, REAL, SHOW, \
 			         0.0, 1.0, NA_REAL, ISNA_INTEGER, \
-			         _MAP_, CAST_INTEGER, INCREMENT_REAL, DIVIDE_REAL); \
+			         _MAP_, CAST_INTEGER, INCREMENT_REAL, SCALE2_REAL); \
 			break; \
 		case 'd': \
 			SUM_LOOP(double, REAL, double, REAL, SHOW, \
 			         0.0, 1.0, NA_REAL, ISNA_REAL, \
-			         _MAP_, CAST_REAL, INCREMENT_REAL, DIVIDE_REAL); \
+			         _MAP_, CAST_REAL, INCREMENT_REAL, SCALE2_REAL); \
 			break; \
 		case 'z': \
 			SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, SHOW, \
 			         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
-			         _MAP_, CAST_COMPLEX, INCREMENT_COMPLEX, DIVIDE_COMPLEX); \
+			         _MAP_, CAST_COMPLEX, INCREMENT_COMPLEX, SCALE2_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -2739,7 +2739,7 @@ void Csparse_colsum(SEXP obj, const char *class,
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
+		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
 		do { \
 			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
 			       _CTYPE1_ *px1 = _PTR1_(x1) , tmp; \
@@ -2763,7 +2763,7 @@ void Csparse_colsum(SEXP obj, const char *class,
 						++k; \
 					} \
 					if (mean) \
-						_DIVIDE_((*px1), count); \
+						_SCALE2_((*px1), count); \
 					++px1; \
 				} \
 			} \
@@ -2836,7 +2836,7 @@ void Csparse_rowsum(SEXP obj, const char *class,
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
+		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
 		do { \
 			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
 			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
@@ -2884,10 +2884,10 @@ void Csparse_rowsum(SEXP obj, const char *class,
 			if (mean) { \
 				if (narm_) \
 					for (i = 0; i < nnz1; ++i) \
-						_DIVIDE_(px1[i], pi1[i]); \
+						_SCALE2_(px1[i], pi1[i]); \
 				else \
 					for (i = 0; i < nnz1; ++i) \
-						_DIVIDE_(px1[i], n); \
+						_SCALE2_(px1[i], n); \
 			} \
 		} while (0)
 
@@ -2969,7 +2969,7 @@ void Tsparse_colsum(SEXP obj, const char *class,
 
 #define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
 		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _DIVIDE_) \
+		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
 		do { \
 			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
 			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
@@ -3013,10 +3013,10 @@ void Tsparse_colsum(SEXP obj, const char *class,
 			if (mean) { \
 				if (narm_) \
 					for (j = 0; j < nnz1; ++j) \
-						_DIVIDE_(px1[j], pj1[j]); \
+						_SCALE2_(px1[j], pj1[j]); \
 				else \
 					for (j = 0; j < nnz1; ++j) \
-						_DIVIDE_(px1[j], m); \
+						_SCALE2_(px1[j], m); \
 			} \
 		} while (0)
 
