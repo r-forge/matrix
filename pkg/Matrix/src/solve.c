@@ -497,6 +497,9 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 	return r;
 }
 
+#define IF_COMPLEX(_IF_, _ELSE_) \
+	((MCS_GET_XTYPE() == MCS_COMPLEX) ? (_IF_) : (_ELSE_))
+
 SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 {
 
@@ -510,86 +513,110 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		aU = PROTECT(GET_SLOT(a, Matrix_USym)),
 		ap = PROTECT(GET_SLOT(a, Matrix_pSym)),
 		aq = PROTECT(GET_SLOT(a, Matrix_qSym));
-	int j,
-		*pap = INTEGER(ap),
+	int i, j,
+		*pap = (LENGTH(ap)) ? INTEGER(ap) : NULL,
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
-	double *work = (double *) R_alloc((size_t) m, sizeof(double));
 	Matrix_cs *L = dgC2cs(aL, 1), *U = dgC2cs(aU, 1);
-	if (L->xtype != U->xtype)
-		error(_("'%s' and '%s' slots have different '%s'"),
-		      "L", "U", "xtype");
 	MCS_SET_XTYPE(L->xtype);
 	if (!asLogical(sparse)) {
-		PROTECT(r = newObject("dgeMatrix"));
+		char rcl[] = ".geMatrix";
+		rcl[0] = IF_COMPLEX('z', 'd');
+		PROTECT(r = newObject(rcl));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(REALSXP, mn));
-		double *prx = REAL(rx);
+		SEXP rx = PROTECT(allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
 		if (isNull(b)) {
-			Matrix_memset(prx, 0, mn, sizeof(double));
-			for (j = 0; j < n; ++j) {
-				prx[j] = 1.0;
-				Matrix_cs_pvec(pap, prx, work, m);
-				Matrix_cs_lsolve(L, work);
-				Matrix_cs_usolve(U, work);
-				Matrix_cs_ipvec(paq, work, prx, m);
-				prx += m;
-			}
+
+#define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
+			do { \
+				_CTYPE_ *prx = _PTR_(rx), \
+					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+				Matrix_memset(prx, 0, mn, sizeof(_CTYPE_)); \
+				for (j = 0; j < n; ++j) { \
+					prx[j] = _ONE_; \
+					Matrix_cs_pvec(pap, prx, work, m); \
+					Matrix_cs_lsolve(L, work); \
+					Matrix_cs_usolve(U, work); \
+					Matrix_cs_ipvec(paq, work, prx, m); \
+					prx += m; \
+				} \
+			} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (MCS_GET_XTYPE() == MCS_COMPLEX)
+			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
+			else
+#endif
+			SOLVE_DENSE_1(double, REAL, 1.0);
+
+#undef SOLVE_DENSE_1
+
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-			double *pbx = REAL(bx);
-			for (j = 0; j < n; ++j) {
-				Matrix_cs_pvec(pap, pbx, work, m);
-				Matrix_cs_lsolve(L, work);
-				Matrix_cs_usolve(U, work);
-				Matrix_cs_ipvec(paq, work, prx, m);
-				prx += m;
-				pbx += m;
-			}
+
+#define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
+			do { \
+				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx), \
+					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+				for (j = 0; j < n; ++j) { \
+					Matrix_cs_pvec(pap, pbx, work, m); \
+					Matrix_cs_lsolve(L, work); \
+					Matrix_cs_usolve(U, work); \
+					Matrix_cs_ipvec(paq, work, prx, m); \
+					prx += m; \
+					pbx += m; \
+				} \
+			} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (MCS_GET_XTYPE() == MCS_COMPLEX)
+			SOLVE_DENSE_2(Rcomplex, COMPLEX);
+			else
+#endif
+			SOLVE_DENSE_2(double, REAL);
+
+#undef SOLVE_DENSE_2
+
 			UNPROTECT(1); /* bx */
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 	} else {
-		Matrix_cs *B, *X;
-		int *papinv = Matrix_cs_pinv(pap, m);
-		if (!papinv)
-			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+		Matrix_cs *B = NULL, *X = NULL;
 		if (isNull(b)) {
-			B = Matrix_cs_spalloc(m, n, n, 1, 0);
-			if (!B)
-				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
-			double *B__x = (double *) B->x;
-			for (j = 0; j < n; ++j) {
-				B->p[j] = j;
-				B->i[j] = j;
-				B__x[j] = 1.0;
+			B = Matrix_cs_speye(m, m, 1, 0);
+			if (B && pap)
+				for (i = 0; i < m; ++i)
+					B->i[pap[i]] = i;
+		} else {
+			B = dgC2cs(b, 1);
+			if (B && pap) {
+				int *papinv = Matrix_cs_pinv(pap, m);
+				if (!papinv)
+					ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+				B = Matrix_cs_permute(B, papinv, NULL, 1);
+				papinv = Matrix_cs_free(papinv);
 			}
-			B->p[n] = n;
-			X = Matrix_cs_permute(B, papinv, NULL, 1);
-			B = Matrix_cs_spfree(B);
-		} else
-			X = Matrix_cs_permute(dgC2cs(b, 1), papinv, NULL, 1);
-		papinv = Matrix_cs_free(papinv);
-		if (!X)
+		}
+		if (!B)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
-		B = X;
+		int Bfr = isNull(b) || pap;
 
-		int i, k, top, nz, nzmax,
+		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
 
-#define DO_TRIANGULAR_SOLVE(_A_, _ALO_, _BFR_, _ACL_, _BCL_) \
+#define SOLVE_SPARSE_TRIANGULAR(_CTYPE_, _A_, _ALO_, _BFR_, _ACL_, _BCL_) \
 		do { \
 			X = Matrix_cs_spalloc(m, n, B->nzmax, 1, 0); \
-			double *X__x = (double *) X->x; \
 			if (!X) { \
 				if (_BFR_) \
 					B = Matrix_cs_spfree(B); \
 				ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 			} \
+			_CTYPE_ *X__x = (_CTYPE_ *) X->x; \
 			X->p[0] = nz = 0; \
 			nzmax = X->nzmax; \
 			for (j = 0, k = 0; j < n; ++j) { \
@@ -598,8 +625,8 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 					if (_BFR_) \
 						B = Matrix_cs_spfree(B); \
 					X = Matrix_cs_spfree(X); \
-					error(_("attempt to construct sparse matrix with more than %s nonzero elements"), \
-					      "2^31-1"); \
+					error(_("attempt to construct %s with more than %s nonzero elements"), \
+					      "sparseMatrix", "2^31-1"); \
 				} \
 				nz += m - top; \
 				if (nz > nzmax) { \
@@ -610,18 +637,18 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 						X = Matrix_cs_spfree(X); \
 						ERROR_SOLVE_OOM(_ACL_, _BCL_); \
 					} \
-					X__x = (double *) X->x; \
+					X__x = (_CTYPE_ *) X->x; \
 				} \
 				X->p[j + 1] = nz; \
 				if (_ALO_) { \
 					for (i = top; i < m; ++i) { \
-						X->i[k] =      iwork[i]; \
+						X->i[k] =      iwork[i] ; \
 						X__x[k] = work[iwork[i]]; \
 						++k; \
 					} \
 				} else { \
 					for (i = m - 1; i >= top; --i) { \
-						X->i[k] =      iwork[i]; \
+						X->i[k] =      iwork[i] ; \
 						X__x[k] = work[iwork[i]]; \
 						++k; \
 					} \
@@ -632,8 +659,23 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			B = X; \
 		} while (0)
 
-		DO_TRIANGULAR_SOLVE(L, 1, 1, "sparseLU", ".gCMatrix");
-		DO_TRIANGULAR_SOLVE(U, 0, 1, "sparseLU", ".gCMatrix");
+#define SOLVE_SPARSE(_CTYPE_) \
+		do { \
+			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, L, 1, Bfr, \
+			                        "sparseLU", ".gCMatrix"); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, U, 0,   1, \
+			                        "sparseLU", ".gCMatrix"); \
+		} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (MCS_GET_XTYPE() == MCS_COMPLEX)
+		SOLVE_SPARSE(Rcomplex);
+		else
+#endif
+		SOLVE_SPARSE(double);
+
+#undef SOLVE_SPARSE
 
 		if (paq) {
 			X = Matrix_cs_permute(B, paq, NULL, 1);
@@ -774,69 +816,103 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	SOLVE_START;
 
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
-	char ul = *CHAR(STRING_ELT(auplo, 0));
-	int j;
+	char aul = *CHAR(STRING_ELT(auplo, 0));
+	int i, j;
 	Matrix_cs *A = dgC2cs(a, 1);
 	MCS_SET_XTYPE(A->xtype);
 	if (!asLogical(sparse)) {
-		const char *cl = (isNull(b)) ? "dtrMatrix" : "dgeMatrix";
-		PROTECT(r = newObject(cl));
-
+		char rcl[] = "...Matrix";
+		rcl[0] = IF_COMPLEX('z', 'd');
+		rcl[1] = (isNull(b)) ? 't' : 'g';
+		rcl[2] = (isNull(b)) ? 'r' : 'e';
+		PROTECT(r = newObject(rcl));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
-
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(REALSXP, mn));
-		double *prx = REAL(rx);
+		SEXP rx = PROTECT(allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
 		if (isNull(b)) {
-			Matrix_memset(prx, 0, mn, sizeof(double));
-			for (j = 0; j < n; ++j) {
-				prx[j] = 1.0;
-				if (ul == 'U')
-					Matrix_cs_usolve(A, prx);
-				else
-					Matrix_cs_lsolve(A, prx);
-				prx += m;
-			}
+
+#define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
+			do { \
+				_CTYPE_ *prx = _PTR_(rx); \
+				Matrix_memset(prx, 0, mn, sizeof(_CTYPE_)); \
+				for (j = 0; j < n; ++j) { \
+					prx[j] = _ONE_; \
+					if (aul == 'U') \
+						Matrix_cs_usolve(A, prx); \
+					else \
+						Matrix_cs_lsolve(A, prx); \
+					prx += m; \
+				} \
+			} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (MCS_GET_XTYPE() == MCS_COMPLEX)
+			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
+			else
+#endif
+			SOLVE_DENSE_1(double, REAL, 1.0);
+
+#undef SOLVE_DENSE_1
+
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
-			double *pbx = REAL(bx);
-			Matrix_memcpy(prx, pbx, mn, sizeof(double));
+
+#define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
+			do { \
+				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx); \
+				Matrix_memcpy(prx, pbx, mn, sizeof(_CTYPE_)); \
+				for (j = 0; j < n; ++j) { \
+					if (aul == 'U') \
+						Matrix_cs_usolve(A, prx); \
+					else \
+						Matrix_cs_lsolve(A, prx); \
+					prx += m; \
+				} \
+			} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (MCS_GET_XTYPE() == MCS_COMPLEX)
+			SOLVE_DENSE_2(Rcomplex, COMPLEX);
+			else
+#endif
+			SOLVE_DENSE_2(double, REAL);
+
+#undef SOLVE_DENSE_2
+
 			UNPROTECT(1); /* bx */
-			for (j = 0; j < n; ++j) {
-				if (ul == 'U')
-					Matrix_cs_usolve(A, prx);
-				else
-					Matrix_cs_lsolve(A, prx);
-				prx += m;
-			}
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
 	} else {
-		Matrix_cs *B, *X;
-
-		if (isNull(b)) {
-			B = Matrix_cs_spalloc(m, n, n, 1, 0);
-			if (!B)
-				ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
-			double *B__x = (double *) B->x;
-			for (j = 0; j < n; ++j) {
-				B->p[j] = j;
-				B->i[j] = j;
-				B__x[j] = 1.0;
-			}
-			B->p[n] = n;
-		} else
+		Matrix_cs *B = NULL, *X = NULL;
+		if (isNull(b))
+			B = Matrix_cs_speye(m, m, 1, 0);
+		else
 			B = dgC2cs(b, 1);
+		if (!B)
+			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
-		int i, k, top, nz, nzmax,
+		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
-		double *work = (double *) R_alloc((size_t) m, sizeof(double));
 
-		DO_TRIANGULAR_SOLVE(A, ul != 'U', isNull(b), ".tCMatrix", ".gCMatrix");
+#define SOLVE_SPARSE(_CTYPE_) \
+		do { \
+			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, A, aul != 'U', isNull(b), \
+			                        ".tCMatrix", ".gCMatrix"); \
+		} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+		if (MCS_GET_XTYPE() == MCS_COMPLEX)
+		SOLVE_SPARSE(Rcomplex);
+		else
+#endif
+		SOLVE_SPARSE(double);
+
+#undef SOLVE_SPARSE
 
 		/* Drop zeros from B and sort it : */
 		Matrix_cs_dropzeros(B);
