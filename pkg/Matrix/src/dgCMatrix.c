@@ -7,7 +7,7 @@
 SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 {
 	Matrix_cs *A = dgC2cs(a, 1);
-	MCS_SET_XTYPE(A->xtype);
+	MCS_XTYPE_SET(MCS_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
 		duplicate(b) : coerceVector(b, REALSXP));
 	if (A->m != A->n || A->m <= 0)
@@ -31,7 +31,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	if (order_ < 0 || order_ > 3)
 		order_ = 0;
 	Matrix_cs *A = dgC2cs(a, 1);
-	MCS_SET_XTYPE(A->xtype);
+	MCS_XTYPE_SET(MCS_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP)
 		? duplicate(b) : coerceVector(b, REALSXP));
 	if (LENGTH(b) != A->m)
