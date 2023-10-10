@@ -779,7 +779,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		zcl[1] = 's';
 		cholmod_sparse *X = M2CS(x, !boolean);
 		if (X->xtype == CHOLMOD_COMPLEX)
-			error(_("'%s' does not support complex types"), "cholmod_aat");
+			error(_("'%s' does not support complex matrices"), "cholmod_aat");
 		if (xtrans)
 			X = cholmod_transpose(X, !boolean, &c);
 		cholmod_sparse *Z = cholmod_aat(X, (int *) NULL, 0, !boolean, &c);
@@ -804,7 +804,7 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 			*X = M2CS(x, !boolean),
 			*Y = M2CS(y, !boolean);
 		if (X->xtype == CHOLMOD_COMPLEX || Y->xtype == CHOLMOD_COMPLEX)
-			error(_("'%s' does not support complex types"), "cholmod_ssmult");
+			error(_("'%s' does not support complex matrices"), "cholmod_ssmult");
 		if (((xtrans) ? X->nrow : X->ncol) != ((ytrans) ? Y->ncol : Y->nrow))
 			error(_("non-conformable arguments"));
 		if (xtrans)
@@ -946,7 +946,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(x = matrix_as_dense( x, "dge", '\0', '\0', xtrans_, 0), xpid);
+		REPROTECT(x = matrix_as_dense( x, ",ge", '\0', '\0', xtrans_, 0), xpid);
 		else if (!xtrans_)
 		REPROTECT(x = matrix_as_sparse(x, "ngC", '\0', '\0', xtrans_   ), xpid);
 		else
@@ -960,7 +960,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (TYPEOF(y) != S4SXP && y != R_NilValue) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(y = matrix_as_dense( y, "dge", '\0', '\0', ytrans_, 0), ypid);
+		REPROTECT(y = matrix_as_dense( y, ",ge", '\0', '\0', ytrans_, 0), ypid);
 		else if (!ytrans_)
 		REPROTECT(y = matrix_as_sparse(y, "ngC", '\0', '\0', ytrans_   ), ypid);
 		else
@@ -989,6 +989,8 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (boolean_ == NA_LOGICAL)
 		boolean_ = xcl[0] == 'n' && (y == R_NilValue || ycl[0] == 'n');
+	char kind = (boolean_) ? 'n' :
+		((xcl[0] == 'z' || (y != R_NilValue && ycl[0] == 'z')) ? 'z' : 'd');
 
 	if (xcl[2] != 'C' && xtrans_) {
 		if (xcl[2] != 'R' && xcl[2] != 'T') {
@@ -1010,11 +1012,11 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (xcl[1] == 's')
 		xtrans_ = 0;
-	if (xcl[0] != ((boolean_) ? 'n' : 'd')) {
+	if (xcl[0] != kind) {
 		if (boolean_)
 			REPROTECT(x = sparse_drop0(x, xcl, 0.0), xpid);
 		else {
-			REPROTECT(x = sparse_as_kind(x, xcl, 'd'), xpid);
+			REPROTECT(x = sparse_as_kind(x, xcl, kind), xpid);
 			xcl = valid[R_check_class_etc(x, valid)];
 		}
 	}
@@ -1058,8 +1060,8 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 				symmetric = -1;
 			UNPROTECT(1); /* xuplo */
 		}
-		if (ycl[0] != 'd') {
-			REPROTECT(y = dense_as_kind(y, ycl, 'd', 0), ypid);
+		if (ycl[0] != kind) {
+			REPROTECT(y = dense_as_kind(y, ycl, kind, 0), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
 		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
@@ -1091,11 +1093,11 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 	if (ycl[1] == 's')
 		ytrans_ = 0;
-	if (ycl[0] != ((boolean_) ? 'n' : 'd')) {
+	if (ycl[0] != kind) {
 		if (boolean_)
 			REPROTECT(y = sparse_drop0(y, ycl, 0.0), ypid);
 		else {
-			REPROTECT(y = sparse_as_kind(y, ycl, 'd'), ypid);
+			REPROTECT(y = sparse_as_kind(y, ycl, kind), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
 	}
@@ -1107,6 +1109,35 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	UNPROTECT(2); /* y, x */
 	return x;
 }
+
+#define MULTIPLY_COMPLEX(_X_, _D_) \
+	do { \
+		tmp = (_X_); \
+		(_X_).r = tmp.r * (_D_).r - tmp.i * (_D_).i; \
+		(_X_).i = tmp.r * (_D_).i + tmp.i * (_D_).r; \
+	} while (0)
+#define MULTIPLY_REAL(_X_, _D_) \
+	(_X_) = (_X_)  * (_D_)
+#define MULTIPLY_LOGICAL(_X_, _D_) \
+	(_X_) = (_X_) && (_D_)
+
+#define SCALE_CASES(_J_) \
+	do { \
+		switch (TYPEOF(d)) { \
+		case CPLXSXP: \
+		{ \
+			Rcomplex tmp; \
+			SCALE(Rcomplex, COMPLEX, MULTIPLY_COMPLEX, _J_); \
+			break; \
+		} \
+		case REALSXP: \
+			SCALE(double, REAL, MULTIPLY_REAL, _J_); \
+			break; \
+		default: \
+			SCALE(int, LOGICAL, MULTIPLY_LOGICAL, _J_); \
+			break; \
+		} \
+	} while (0)
 
 static
 void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
@@ -1120,14 +1151,14 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 		if (uplo == '\0') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < m; ++i) { \
-					*px = *px _OP_ pd[_J_]; \
+					_OP_(*px, pd[_J_]); \
 					++px; \
 				} \
 			} \
 		} else if (uplo == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i <= j; ++i) { \
-					*px = *px _OP_ pd[_J_]; \
+					_OP_(*px, pd[_J_]); \
 					++px; \
 				} \
 				if (!packed) \
@@ -1138,7 +1169,7 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 				if (!packed) \
 					px += j; \
 				for (i = j; i < m; ++i) { \
-					*px = *px _OP_ pd[_J_]; \
+					_OP_(*px, pd[_J_]); \
 					++px;					\
 				} \
 			} \
@@ -1159,12 +1190,7 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 		} \
 	} while (0)
 
-	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
-		SCALE(int, LOGICAL, &&, j);
-	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
-		SCALE(double, REAL, *, j);
-	else
-		error(_("should never happen ..."));
+	SCALE_CASES(j);
 	return;
 }
 
@@ -1173,12 +1199,7 @@ void dense_rowscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = XLENGTH(x) < (R_xlen_t) m * n;
-	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
-		SCALE(int, LOGICAL, &&, i);
-	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
-		SCALE(double, REAL, *, i);
-	else
-		error(_("should never happen ..."));
+	SCALE_CASES(i);
 
 #undef SCALE
 
@@ -1195,13 +1216,13 @@ void Csparse_colscale(SEXP obj, SEXP d)
 	int *pp = INTEGER(p) + 1, n = (int) (XLENGTH(p) - 1), j, k = 0, kend;
 	UNPROTECT(2); /* p, x */
 
-#define SCALE(_CTYPE_, _PTR_, _OP_) \
+#define SCALE(_CTYPE_, _PTR_, _OP_, _J_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
 		for (j = 0; j < n; ++j) { \
 			kend = pp[j]; \
 			while (k < kend) { \
-				*px = *px _OP_ *pd; \
+				_OP_(*px, *pd); \
 				++px; \
 				++k; \
 			} \
@@ -1209,20 +1230,15 @@ void Csparse_colscale(SEXP obj, SEXP d)
 		} \
 	} while (0)
 
-	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
-		SCALE(int, LOGICAL, &&);
-	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
-		SCALE(double, REAL, *);
-	else
-		error(_("should never happen ..."));
+	SCALE_CASES();
 
 #undef SCALE
 
 	return;
 }
 
-/* boolean: <ldi> & <lgC>  or   <dgR> & <ldi> */
-/* numeric: <ddi> * <dgC>  or   <dgR> * <ddi> */
+/* boolean: <ldi> & <lgC>  or  <lgR> & <ldi> */
+/* numeric: <ddi> * <dgC>  or  <dgR> * <ddi> */
 static
 void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
@@ -1232,27 +1248,22 @@ void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	int *pi = INTEGER(i), k, nnz = INTEGER(p)[XLENGTH(p) - 1];
 	UNPROTECT(3); /* i, p, x */
 
-#define SCALE(_CTYPE_, _PTR_, _OP_) \
+#define SCALE(_CTYPE_, _PTR_, _OP_, _J_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
 		for (k = 0; k < nnz; ++k) { \
-			*px = *px _OP_ pd[*pi]; \
+			_OP_(*px, pd[*pi]); \
 			++px; \
 			++pi; \
 		} \
 	} while (0)
 
-	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
-		SCALE(int, LOGICAL, &&);
-	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
-		SCALE(double, REAL, *);
-	else
-		error(_("should never happen ..."));
+	SCALE_CASES();
 	return;
 }
 
-/* boolean: <ldi> & <lgT>  or   <dgT> & <ldi> */
-/* numeric: <ddi> * <dgT>  or   <dgT> * <ddi> */
+/* boolean: <ldi> & <lgT>  or  <lgT> & <ldi> */
+/* numeric: <ddi> * <dgT>  or  <dgT> * <ddi> */
 static
 void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
@@ -1261,12 +1272,7 @@ void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	int *pi = INTEGER(i);
 	R_xlen_t k, nnz = XLENGTH(i);
 	UNPROTECT(2); /* i, x */
-	if (TYPEOF(x) == LGLSXP && TYPEOF(d) == LGLSXP)
-		SCALE(int, LOGICAL, &&);
-	else if (TYPEOF(x) == REALSXP && TYPEOF(d) == REALSXP)
-		SCALE(double, REAL, *);
-	else
-		error(_("should never happen ..."));
+	SCALE_CASES();
 
 #undef SCALE
 
@@ -1292,7 +1298,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 
 	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(x = matrix_as_dense(x, "dge", '\0', '\0', xtrans_, 1), xpid);
+		REPROTECT(x = matrix_as_dense(x, ",ge", '\0', '\0', xtrans_, 1), xpid);
 		else
 		REPROTECT(x = matrix_as_dense(x, "nge", '\0', '\0', xtrans_, 1), xpid);
 		if (v == 1) {
@@ -1304,7 +1310,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	}
 	if (TYPEOF(y) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(y = matrix_as_dense(y, "dge", '\0', '\0', ytrans_, 1), ypid);
+		REPROTECT(y = matrix_as_dense(y, ",ge", '\0', '\0', ytrans_, 1), ypid);
 		else
 		REPROTECT(y = matrix_as_dense(y, "nge", '\0', '\0', ytrans_, 1), ypid);
 		if (v == 2) {
@@ -1334,6 +1340,8 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 		ytrans_ = 0;
 	if (boolean_ == NA_LOGICAL)
 		boolean_ = xcl[0] == 'n' && ycl[0] == 'n';
+	char kind = (boolean_) ? 'n' :
+		((xcl[0] == 'z' || ycl[0] == 'z') ? 'z' : 'd');
 
 	int margin = -1, unit = -1;
 	if (xcl[2] == 'i') {
@@ -1345,7 +1353,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	} else
 		error(_("should never happen ..."));
 
-	char ks = (boolean_) ? 'l' : 'd', kd = (boolean_) ? 'n' : 'd';
+	char ks = (boolean_) ? 'l' : kind, kd = kind;
 	switch (xcl[2]) {
 	case 'i':
 		if (!unit && xcl[0] != ks) {
@@ -1481,13 +1489,20 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 
 	SEXP x0 = PROTECT(GET_SLOT((margin == 0) ? y : x, Matrix_xSym));
 	if (unit || ((margin == 0) ? y != y_ : x != x_))
-		SET_SLOT(z, Matrix_xSym, x0); /* FIXME */
+		SET_SLOT(z, Matrix_xSym, x0);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
-		if(boolean_)
-		Matrix_memcpy(LOGICAL(x1), LOGICAL(x0), XLENGTH(x0), sizeof(   int));
-		else
-		Matrix_memcpy(   REAL(x1),    REAL(x0), XLENGTH(x0), sizeof(double));
+		switch (kind) {
+		case 'z':
+			Matrix_memcpy(COMPLEX(x1), COMPLEX(x0), XLENGTH(x0), sizeof(Rcomplex));
+			break;
+		case 'd':
+			Matrix_memcpy(   REAL(x1),    REAL(x0), XLENGTH(x0), sizeof(  double));
+			break;
+		default:
+			Matrix_memcpy(LOGICAL(x1), LOGICAL(x0), XLENGTH(x0), sizeof(     int));
+			break;
+		}
 		SET_SLOT(z, Matrix_xSym, x1);
 		UNPROTECT(1); /* x1 */
 	}
