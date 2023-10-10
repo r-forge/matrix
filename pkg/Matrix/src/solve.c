@@ -678,10 +678,6 @@ int strmatch(const char *x, const char **valid)
 
 SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 {
-	/* see top of :
-	   ./CHOLMOD/Cholesky/cholmod_solve.c
-	   ./CHOLMOD/Cholesky/cholmod_spsolve.c
-	*/
 	static const char *valid[] = {
 		"A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt", "" };
 	int ivalid = -1;
@@ -696,22 +692,35 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	int j;
 	cholmod_factor *L = M2CF(a, 1);
 	if (!asLogical(sparse)) {
-		cholmod_dense *B, *X;
+		cholmod_dense *B = NULL, *X = NULL;
 		if (isNull(b)) {
-			B = cholmod_allocate_dense(m, n, m, CHOLMOD_REAL, &c);
+			B = cholmod_allocate_dense(m, n, m, L->xtype, &c);
 			if (!B)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
-			R_xlen_t m1a = (R_xlen_t) m + 1;
-			double *px = (double *) B->x;
-			Matrix_memset(px, 0, (R_xlen_t) m * n, sizeof(double));
-			for (j = 0; j < n; ++j) {
-				*px = 1.0;
-				px += m1a;
-			}
+
+#define EYE(_CTYPE_, _ONE_) \
+			do { \
+				_CTYPE_ *B__x = (_CTYPE_ *) B->x; \
+				Matrix_memset(B__x, 0, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+				for (j = 0; j < n; ++j) { \
+					*(B__x++) = _ONE_; \
+					B__x += m; \
+				} \
+			} while (0)
+
+#ifdef MATRIX_ENABLE_ZMATRIX
+			if (L->xtype == CHOLMOD_COMPLEX)
+			EYE(Rcomplex, Matrix_zone);
+			else
+#endif
+			EYE(double, 1.0);
+
+#undef EYE
+
 			X = cholmod_solve(ivalid, L, B, &c);
+			cholmod_free_dense(&B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
-			cholmod_free_dense(&B, &c);
 			PROTECT(r = CD2M(X, 0,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
@@ -723,29 +732,19 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		}
 		cholmod_free_dense(&X, &c);
 	} else {
-		cholmod_sparse *B, *X;
+		cholmod_sparse *B = NULL, *X = NULL;
 		if (isNull(b)) {
-			B = cholmod_allocate_sparse(m, n, n, 1, 1, 0, CHOLMOD_REAL, &c);
+			B = cholmod_speye(m, n, L->xtype, &c);
 			if (!B)
 				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
-			int *pp = (int *) B->p, *pi = (int *) B->i;
-			double *px = (double *) B->x;
-			for (j = 0; j < n; ++j) {
-				pp[j] = j;
-				pi[j] = j;
-				px[j] = 1.0;
-			}
-			pp[n] = n;
 			X = cholmod_spsolve(ivalid, L, B, &c);
-			if (!X)
-				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			cholmod_free_sparse(&B, &c);
-			if (ivalid < 7) {
+			if (X && ivalid < 7) {
 				X->stype = (ivalid == 2 || ivalid == 4) ? -1 : 1;
 				cholmod_sort(X, &c);
-				if (!X)
-					ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			}
+			if (!X)
+				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
 			PROTECT(r = CS2M(X, 1,
 				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
