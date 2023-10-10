@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-06 r4424)}{
+\section{Changes in version 1.6-2 (2023-10-10 r4439)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -169,8 +169,8 @@
       \item Many API function prototypes wrongly used \code{const}
       qualifiers where the registered routines do not.
 
-      \item \code{expm(x)} failed in Matrix 1.6.1 when the methods for
-      \code{"dtpMatrix"} or \code{"dspMatrix"} where used.
+      \item \code{expm(x)} failed for \code{x} of class \code{dtpMatrix}
+      or \code{dspMatrix}, since \pkg{Matrix} version 1.6-1.
     }
   }
   \subsection{Misc}{
@@ -192,14 +192,23 @@
       \item Files in \file{po/} and \file{inst/po/} have been updated
       due to more frequent use of \code{gettextf} in \file{R/*.R}.
 
-      \item C code becomes more prepared to handle complex matrices
-      and their factorizations.  Notably, new machinery in
-      \file{src/cs-etc.[ch]} will enable linking the CXSparse library
-      instead of the CSparse library, the latter supporting numeric
-      types but not complex ones.
+      \item C code is prepared to handle complex matrices and their
+      factorizations.  Notably, new machinery in \file{src/cs-etc.[ch]}
+      will enable linking the CXSparse library instead of the CSparse
+      library, the latter supporting numeric types but not complex ones.
 
       \item Some API declarations and macros not used by \emph{any}
       (recursive) reverse \code{LinkingTo} are removed.
+
+      \item API headers are now nested under \file{inst/include/Matrix/}
+      for better namespacing.  Where possible, packages should start to
+      use \code{LinkingTo: Matrix (>= 1.6-2)} and include files from the
+      new subdirectory, e.g., with \code{#include <Matrix/Matrix.h>}.
+
+      \item Users including API headers can define macro
+      \code{R_MATRIX_INLINE},
+      typically with \code{#define R_MATRIX_INLINE inline},
+      to allow the compiler to inline stubs for registered routines.
     }
   }
 }
