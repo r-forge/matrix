@@ -78,7 +78,7 @@ SEXP cs2dgC(Matrix_cs *A, int values, char shape)
 Matrix_csd *Matrix_cs_dfree(Matrix_csd *D)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_csd *) cs_ci_dfree((cs_cid *) D);
 	else
 	return (Matrix_csd *) cs_di_dfree((cs_did *) D);
@@ -90,7 +90,7 @@ Matrix_csd *Matrix_cs_dfree(Matrix_csd *D)
 Matrix_csd *Matrix_cs_dmperm(const Matrix_cs *A, int seed)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_csd *) cs_ci_dmperm((cs_ci *) A, seed);
 	else
 	return (Matrix_csd *) cs_di_dmperm((cs_di *) A, seed);
@@ -102,7 +102,7 @@ Matrix_csd *Matrix_cs_dmperm(const Matrix_cs *A, int seed)
 int Matrix_cs_dropzeros(Matrix_cs *A)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_dropzeros((cs_ci *) A);
 	else
 	return cs_di_dropzeros((cs_di *) A);
@@ -114,7 +114,7 @@ int Matrix_cs_dropzeros(Matrix_cs *A)
 void *Matrix_cs_free(void *p)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_free(p);
 	else
 	return cs_di_free(p);
@@ -126,7 +126,7 @@ void *Matrix_cs_free(void *p)
 int Matrix_cs_happly(const Matrix_cs *V, int i, double beta, void *x)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_happly((cs_ci *) V, i, beta, (double _Complex *) x);
 	else
 	return cs_di_happly((cs_di *) V, i, beta, (double          *) x);
@@ -138,7 +138,7 @@ int Matrix_cs_happly(const Matrix_cs *V, int i, double beta, void *x)
 int Matrix_cs_ipvec(const int *p, const void *b, void *x, int n)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_ipvec(p, (double _Complex *) b, (double _Complex *) x, n);
 	else
 	return cs_di_ipvec(p, (double          *) b, (double          *) x, n);
@@ -150,7 +150,7 @@ int Matrix_cs_ipvec(const int *p, const void *b, void *x, int n)
 int Matrix_cs_lsolve(const Matrix_cs *L, void *x)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_lsolve((cs_ci *) L, (double _Complex *) x);
 	else
 	return cs_di_lsolve((cs_di *) L, (double          *) x);
@@ -162,7 +162,7 @@ int Matrix_cs_lsolve(const Matrix_cs *L, void *x)
 Matrix_csn *Matrix_cs_lu(const Matrix_cs *A, const Matrix_css *S, double tol)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_csn *) cs_ci_lu((cs_ci *) A, (cs_cis *) S, tol);
 	else
 	return (Matrix_csn *) cs_di_lu((cs_di *) A, (cs_dis *) S, tol);
@@ -174,7 +174,7 @@ Matrix_csn *Matrix_cs_lu(const Matrix_cs *A, const Matrix_css *S, double tol)
 int Matrix_cs_lusol(int order, const Matrix_cs *A, void *b, double tol)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_lusol(order, (cs_ci *) A, (double _Complex *) b, tol);
 	else
 	return cs_di_lusol(order, (cs_di *) A, (double          *) b, tol);
@@ -186,7 +186,7 @@ int Matrix_cs_lusol(int order, const Matrix_cs *A, void *b, double tol)
 Matrix_csn *Matrix_cs_nfree(Matrix_csn *N)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_csn *) cs_ci_nfree((cs_cin *) N);
 	else
 	return (Matrix_csn *) cs_di_nfree((cs_din *) N);
@@ -199,7 +199,7 @@ Matrix_cs *Matrix_cs_permute(const Matrix_cs *A, const int *pinv, const int *q, 
 {
 	Matrix_cs *B = NULL;
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX) {
+	if (MCS_XTYPE_GET() == MCS_COMPLEX) {
 	cs_ci *tmp = cs_ci_permute((cs_ci *) A, pinv, q, values);
 	B = (Matrix_cs *) cs_ci_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs_ci));
@@ -216,14 +216,14 @@ Matrix_cs *Matrix_cs_permute(const Matrix_cs *A, const int *pinv, const int *q, 
 	memcpy(B, tmp, sizeof(cs   ));
 	tmp =    cs_free(tmp);
 #endif
-	B->xtype = MCS_GET_XTYPE();
+	B->xtype = MCS_XTYPE_GET();
 	return B;
 }
 
 int *Matrix_cs_pinv(const int *p, int n)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_pinv(p, n);
 	else
 	return cs_di_pinv(p, n);
@@ -235,7 +235,7 @@ int *Matrix_cs_pinv(const int *p, int n)
 int Matrix_cs_pvec(const int *p, const void *b, void *x, int n)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_pvec(p, (double _Complex *) b, (double _Complex *) x, n);
 	else
 	return cs_di_pvec(p, (double          *) b, (double          *) x, n);
@@ -247,7 +247,7 @@ int Matrix_cs_pvec(const int *p, const void *b, void *x, int n)
 Matrix_csn *Matrix_cs_qr(const Matrix_cs *A, const Matrix_css *S)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_csn *) cs_ci_qr((cs_ci *) A, (cs_cis *) S);
 	else
 	return (Matrix_csn *) cs_di_qr((cs_di *) A, (cs_dis *) S);
@@ -259,7 +259,7 @@ Matrix_csn *Matrix_cs_qr(const Matrix_cs *A, const Matrix_css *S)
 int Matrix_cs_qrsol(int order, const Matrix_cs *A, void *b)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_qrsol(order, (cs_ci *) A, (double _Complex *) b);
 	else
 	return cs_di_qrsol(order, (cs_di *) A, (double          *) b);
@@ -271,7 +271,7 @@ int Matrix_cs_qrsol(int order, const Matrix_cs *A, void *b)
 Matrix_css *Matrix_cs_sfree(Matrix_css *S)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_css *) cs_ci_sfree((cs_cis *) S);
 	else
 	return (Matrix_css *) cs_di_sfree((cs_dis *) S);
@@ -284,7 +284,7 @@ Matrix_cs *Matrix_cs_spalloc(int m, int n, int nzmax, int values, int triplet)
 {
 	Matrix_cs *B = NULL;
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX) {
+	if (MCS_XTYPE_GET() == MCS_COMPLEX) {
 	cs_ci *tmp = cs_ci_spalloc(m, n, nzmax, values, triplet);
 	B = (Matrix_cs *) cs_ci_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs_ci));
@@ -301,7 +301,7 @@ Matrix_cs *Matrix_cs_spalloc(int m, int n, int nzmax, int values, int triplet)
 	memcpy(B, tmp, sizeof(cs   ));
 	tmp =    cs_free(tmp);
 #endif
-	B->xtype = MCS_GET_XTYPE();
+	B->xtype = MCS_XTYPE_GET();
 	return B;
 }
 
@@ -319,7 +319,7 @@ Matrix_cs *Matrix_cs_speye(int m, int n, int values, int triplet)
 			B__p[k] = d;
 	if (values) {
 #ifdef CXSPARSE
-		if (MCS_GET_XTYPE() == MCS_COMPLEX) {
+		if (MCS_XTYPE_GET() == MCS_COMPLEX) {
 		double _Complex *B__x = (double _Complex *) B->x;
 		for (k = 0; k < d; ++k)
 			B__x[k] = 1.0;
@@ -338,7 +338,7 @@ Matrix_cs *Matrix_cs_speye(int m, int n, int values, int triplet)
 Matrix_cs *Matrix_cs_spfree(Matrix_cs *A)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_cs *) cs_ci_spfree((cs_ci *) A);
 	else
 	return (Matrix_cs *) cs_di_spfree((cs_di *) A);
@@ -350,7 +350,7 @@ Matrix_cs *Matrix_cs_spfree(Matrix_cs *A)
 int Matrix_cs_sprealloc(Matrix_cs *A, int nzmax)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_sprealloc((cs_ci *) A, nzmax);
 	else
 	return cs_di_sprealloc((cs_di *) A, nzmax);
@@ -362,7 +362,7 @@ int Matrix_cs_sprealloc(Matrix_cs *A, int nzmax)
 int Matrix_cs_spsolve(Matrix_cs *L, const Matrix_cs *B, int k, int *xi, void *x, const int *pinv, int lo)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_spsolve((cs_ci *) L, (cs_ci *) B, k, xi, (double _Complex *) x, pinv, lo);
 	else
 	return cs_di_spsolve((cs_di *) L, (cs_di *) B, k, xi, (double          *) x, pinv, lo);
@@ -374,7 +374,7 @@ int Matrix_cs_spsolve(Matrix_cs *L, const Matrix_cs *B, int k, int *xi, void *x,
 Matrix_css *Matrix_cs_sqr(int order, const Matrix_cs *A, int qr)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return (Matrix_css *) cs_ci_sqr(order, (cs_ci *) A, qr);
 	else
 	return (Matrix_css *) cs_di_sqr(order, (cs_di *) A, qr);
@@ -387,7 +387,7 @@ Matrix_cs *Matrix_cs_transpose(const Matrix_cs *A, int values)
 {
 	Matrix_cs *B = NULL;
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX) {
+	if (MCS_XTYPE_GET() == MCS_COMPLEX) {
 	cs_ci *tmp = cs_ci_transpose((cs_ci *) A, values);
 	B = (Matrix_cs *) cs_ci_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs_ci));
@@ -404,14 +404,14 @@ Matrix_cs *Matrix_cs_transpose(const Matrix_cs *A, int values)
 	memcpy(B, tmp, sizeof(cs   ));
 	tmp =    cs_free(tmp);
 #endif
-	B->xtype = MCS_GET_XTYPE();
+	B->xtype = MCS_XTYPE_GET();
 	return B;
 }
 
 int Matrix_cs_usolve(const Matrix_cs *U, void *x)
 {
 #ifdef CXSPARSE
-	if (MCS_GET_XTYPE() == MCS_COMPLEX)
+	if (MCS_XTYPE_GET() == MCS_COMPLEX)
 	return cs_ci_usolve((cs_ci *) U, (double _Complex *) x);
 	else
 	return cs_di_usolve((cs_di *) U, (double          *) x);

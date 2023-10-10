@@ -220,7 +220,7 @@ enum x_slot_kind {
 SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
 	Matrix_cs *A = dgC2cs(x, 0);
-	MCS_SET_XTYPE(A->xtype);
+	MCS_XTYPE_SET(A->xtype);
 	Matrix_csd *D = Matrix_cs_dmperm(A, asInteger(seed));
 	if (!D)
 		return R_NilValue; /* MJ: why not an error ... ? */

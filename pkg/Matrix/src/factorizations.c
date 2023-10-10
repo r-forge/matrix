@@ -366,7 +366,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	PROTECT(val = newObject("sparseLU"));
 
 	Matrix_cs *A = dgC2cs(obj, 1);
-	MCS_SET_XTYPE(A->xtype);
+	MCS_XTYPE_SET(A->xtype);
 
 	Matrix_css *S = NULL;
 	Matrix_csn *N = NULL;
@@ -452,7 +452,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	PROTECT(val = newObject("sparseQR"));
 
 	Matrix_cs *A = dgC2cs(obj, 1);
-	MCS_SET_XTYPE(A->xtype);
+	MCS_XTYPE_SET(A->xtype);
 
 	Matrix_css *S = NULL;
 	Matrix_csn *N = NULL;
