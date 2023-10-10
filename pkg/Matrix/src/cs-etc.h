@@ -12,8 +12,8 @@
 #define MCS_REAL    1
 #define MCS_COMPLEX 2
 
-#define GET_MCS_XTYPE(       ) Matrix_cs_xtype
-#define SET_MCS_XTYPE(_VALUE_) Matrix_cs_xtype = _VALUE_
+#define MCS_GET_XTYPE(       ) Matrix_cs_xtype
+#define MCS_SET_XTYPE(_VALUE_) Matrix_cs_xtype = _VALUE_
 
 extern int Matrix_cs_xtype; /* flag indicating use of cs_di_*() or cs_ci_*() */
 
