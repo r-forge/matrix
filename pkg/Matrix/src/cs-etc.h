@@ -82,6 +82,7 @@ Matrix_csn *Matrix_cs_qr        (const Matrix_cs *, const Matrix_css *);
 int         Matrix_cs_qrsol     (int, const Matrix_cs *, void *);
 Matrix_css *Matrix_cs_sfree     (Matrix_css *);
 Matrix_cs  *Matrix_cs_spalloc   (int, int, int, int, int);
+Matrix_cs  *Matrix_cs_speye     (int, int, int, int);
 Matrix_cs  *Matrix_cs_spfree    (Matrix_cs *);
 int         Matrix_cs_sprealloc (Matrix_cs *, int);
 int         Matrix_cs_spsolve   (Matrix_cs *, const Matrix_cs *, int, int *, void *, const int *, int);

@@ -280,28 +280,58 @@ Matrix_css *Matrix_cs_sfree(Matrix_css *S)
 #endif
 }
 
-Matrix_cs *Matrix_cs_spalloc(int m, int n, int nzmax, int values, int t)
+Matrix_cs *Matrix_cs_spalloc(int m, int n, int nzmax, int values, int triplet)
 {
 	Matrix_cs *B = NULL;
 #ifdef CXSPARSE
 	if (MCS_GET_XTYPE() == MCS_COMPLEX) {
-	cs_ci *tmp = cs_ci_spalloc(m, n, nzmax, values, t);
+	cs_ci *tmp = cs_ci_spalloc(m, n, nzmax, values, triplet);
 	B = (Matrix_cs *) cs_ci_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs_ci));
 	tmp = cs_ci_free(tmp);
 	} else {
-	cs_di *tmp = cs_di_spalloc(m, n, nzmax, values, t);
+	cs_di *tmp = cs_di_spalloc(m, n, nzmax, values, triplet);
 	B = (Matrix_cs *) cs_di_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs_di));
 	tmp = cs_di_free(tmp);
 	}
 #else
-	cs    *tmp =    cs_spalloc(m, n, nzmax, values, t);
+	cs    *tmp =    cs_spalloc(m, n, nzmax, values, triplet);
 	B = (Matrix_cs *)    cs_calloc(1, sizeof(Matrix_cs));
 	memcpy(B, tmp, sizeof(cs   ));
 	tmp =    cs_free(tmp);
 #endif
 	B->xtype = MCS_GET_XTYPE();
+	return B;
+}
+
+Matrix_cs *Matrix_cs_speye(int m, int n, int values, int triplet)
+{
+	int k, d = (m < n) ? m : n;
+	Matrix_cs *B = Matrix_cs_spalloc(m, n, d, values, triplet);
+	if (!B)
+		return NULL;
+	int *B__p = B->p, *B__i = B->i;
+	for (k = 0; k < d; ++k)
+		B__p[k] = B__i[k] = k;
+	if (!triplet)
+		for (k = d; k <= n; ++k)
+			B__p[k] = d;
+	if (values) {
+#ifdef CXSPARSE
+		if (MCS_GET_XTYPE() == MCS_COMPLEX) {
+		double _Complex *B__x = (double _Complex *) B->x;
+		for (k = 0; k < d; ++k)
+			B__x[k] = 1.0;
+		} else {
+#endif
+		double          *B__x = (double          *) B->x;
+		for (k = 0; k < d; ++k)
+			B__x[k] = 1.0;
+#ifdef CXSPARSE
+		}
+#endif
+	}
 	return B;
 }
 
