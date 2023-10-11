@@ -1722,7 +1722,7 @@ setMethod("Ops", signature(e1 = "sparseVector", e2 = "atomicVector"),
                               e1@x <- r
                               e1
                           } else {
-                              newSpVec(paste0(.V.kind(r), "sparseVector"),
+                              newSpVec(paste0(.M.kind(r), "sparseVector"),
                                        x = r, e1)
                           }
                       }
@@ -1756,7 +1756,7 @@ setMethod("Ops", signature(e1 = "atomicVector", e2 = "sparseVector"),
                               e2@x <- r
                               e2
                           } else {
-                              newSpVec(paste0(.V.kind(r), "sparseVector"),
+                              newSpVec(paste0(.M.kind(r), "sparseVector"),
                                        x = r, e2)
                           }
                       }

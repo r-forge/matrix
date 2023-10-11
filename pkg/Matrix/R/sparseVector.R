@@ -20,7 +20,7 @@ setMethod("diff", signature(x = "sparseVector"),
 
 setMethod("mean", signature(x = "sparseVector"),
           function(x, trim = 0, na.rm = FALSE, ...) {
-              kind <- .V.kind(x)
+              kind <- .M.kind(x)
               if(kind == "z" && trim > 0)
                   stop("trimmed means are not defined for complex data")
               n <- length(x)
@@ -85,7 +85,7 @@ setMethod("mean", signature(x = "sparseVector"),
     }
     x@length <- n * each
     x@i <- rep(each * (a(x@i) - one), each = each) + seq_len(each)
-    if(.V.kind(x) != "n")
+    if(.M.kind(x) != "n")
         x@x <- rep(x@x, each = each)
     x
 }
@@ -120,7 +120,7 @@ setMethod("mean", signature(x = "sparseVector"),
     x@length <- n * times
     x@i <- rep(a(seq.int(from = zero, by = n, length.out = times)),
                each = length(x@i)) + x@i
-    if(.V.kind(x) != "n")
+    if(.M.kind(x) != "n")
         x@x <- rep.int(x@x, times)
     x
 }
@@ -150,11 +150,11 @@ setMethod("mean", signature(x = "sparseVector"),
     if(length.out < n) {
         head <- x@i <= length.out
         x@i <- x@i[head]
-        if(.V.kind(x) != "n")
+        if(.M.kind(x) != "n")
             x@x <- x@x[head]
     } else if(length.out > n && n == 0L) {
         x@i <- seq_len(length.out)
-        if(.V.kind(x) != "n")
+        if(.M.kind(x) != "n")
             x@x <- rep.int(x@x[NA_integer_], length.out)
     }
     x
@@ -176,7 +176,7 @@ setMethod("rep", signature(x = "sparseVector"),
     if(nnz == 0L)
         return(x)
     n <- length(x)
-    kind <- .V.kind(x)
+    kind <- .M.kind(x)
     if(kind == "n") {
         x@i <- if(decreasing)
                    seq_len(nnz)

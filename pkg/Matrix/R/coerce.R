@@ -135,7 +135,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .V2kind <- function(from, kind = ".") {
     if(kind == ".")
         return(from)
-    kind. <- .V.kind(from)
+    kind. <- .M.kind(from)
     if(kind == ",")
         kind <- if(kind. == "z") "z" else "d"
     if(kind == kind.)
@@ -152,7 +152,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 }
 
 .V2v <- function(from) {
-    if(.V.kind(from) != "n") {
+    if(.M.kind(from) != "n") {
         to <- vector(typeof(from@x), from@length)
         to[from@i] <- from@x
     } else {
@@ -190,7 +190,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
-    kind <- .V.kind(from)
+    kind <- .M.kind(from)
     to <- new(paste0(if(kind == "i") "d" else kind, "geMatrix"))
     to@Dim <- c(m, 1L)
     to@x <- replace(vector(typeof(to@x), m), from@i,
@@ -204,7 +204,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
-    kind <- .V.kind(from)
+    kind <- .M.kind(from)
     to <- new(paste0(if(kind == "i") "d" else kind, "gCMatrix"))
     to@Dim <- c(m, 1L)
     to@p <- c(0L, length(from@i))
@@ -220,7 +220,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
-    kind <- .V.kind(from)
+    kind <- .M.kind(from)
     to <- new(paste0(if(kind == "i") "d" else kind, "gRMatrix"))
     to@Dim <- c(m, 1L)
     to@p <- c(0L, cumsum(replace(logical(m), from@i, TRUE)))
@@ -236,7 +236,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
         m <- as.integer(m)
     }
-    kind <- .V.kind(from)
+    kind <- .M.kind(from)
     to <- new(paste0(if(kind == "i") "d" else kind, "gTMatrix"))
     to@Dim <- c(m, 1L)
     to@i <- as.integer(from@i) - 1L

@@ -14,15 +14,11 @@ char typeToKind(SEXPTYPE type)
 	case LGLSXP:
 		return 'l';
 	case INTSXP:
-#ifdef MATRIX_ENABLE_IMATRIX
 		return 'i';
-#endif
 	case REALSXP:
 		return 'd';
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
 		return 'z';
-#endif
 	default:
 		error(_("unexpected type \"%s\" in '%s'"), type2char(type), __func__);
 		return '\0';
@@ -35,16 +31,12 @@ SEXPTYPE kindToType(char kind)
 	case 'n':
 	case 'l':
 		return LGLSXP;
-#ifdef MATRIX_ENABLE_IMATRIX
 	case 'i':
 		return INTSXP;
-#endif
 	case 'd':
 		return REALSXP;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case 'z':
 		return CPLXSXP;
-#endif
 	default:
 		error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
 		return NILSXP;
@@ -56,16 +48,12 @@ size_t kindToSize(char kind)
 	switch (kind) {
 	case 'n':
 	case 'l':
-#ifdef MATRIX_ENABLE_IMATRIX
 	case 'i':
-#endif
 		return sizeof(int);
 	case 'd':
 		return sizeof(double);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case 'z':
 		return sizeof(Rcomplex);
-#endif
 	default:
 		error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
 		return 0;
@@ -85,7 +73,7 @@ const char *Matrix_nonvirtual(SEXP obj, int strict)
 	return valid[ivalid];
 }
 
-char Matrix_kind(SEXP obj, int i2d)
+char Matrix_kind(SEXP obj)
 {
 	if (IS_S4_OBJECT(obj)) {
 		static const char *valid[] = { VALID_NONVIRTUAL, "" };
@@ -100,7 +88,7 @@ char Matrix_kind(SEXP obj, int i2d)
 		case LGLSXP:
 			return 'l';
 		case INTSXP:
-			return (i2d) ? 'd' : 'i';
+			return 'i';
 		case REALSXP:
 			return 'd';
 		case CPLXSXP:
@@ -136,8 +124,8 @@ char Matrix_repr(SEXP obj)
 	const char *cl = valid[ivalid];
 	switch (cl[2]) {
 	case 'e':
-	case 'r':
 	case 'y':
+	case 'r':
 		return 'u'; /* unpackedMatrix */
 	case 'p':
 		return 'p'; /* packedMatrix */
@@ -170,9 +158,9 @@ do { \
 	} \
 } while (0)
 
-SEXP R_Matrix_kind(SEXP obj, SEXP i2d)
+SEXP R_Matrix_kind(SEXP obj)
 {
-	RETURN_AS_STRSXP(Matrix_kind(obj, asLogical(i2d)));
+	RETURN_AS_STRSXP(Matrix_kind (obj));
 }
 
 SEXP R_Matrix_shape(SEXP obj)
@@ -182,5 +170,5 @@ SEXP R_Matrix_shape(SEXP obj)
 
 SEXP R_Matrix_repr(SEXP obj)
 {
-	RETURN_AS_STRSXP(Matrix_repr(obj));
+	RETURN_AS_STRSXP(Matrix_repr (obj));
 }

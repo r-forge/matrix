@@ -422,9 +422,7 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 	case LGLSXP:
 	case INTSXP:
 	case REALSXP:
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
-#endif
 		break;
 	default:
 		error(_("replacement diagonal has incompatible type \"%s\""),
@@ -445,12 +443,17 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP dense_as_kind(SEXP, const char *, char, int);
-		PROTECT(from = dense_as_kind(from, class, typeToKind(tv), 0));
 #ifndef MATRIX_ENABLE_IMATRIX
-		if (tv == INTSXP)
-			value = coerceVector(value, REALSXP);
+		if (tv == INTSXP) {
+		PROTECT(from = dense_as_kind(from, class, 'd', 0));
+		PROTECT(value = coerceVector(value, REALSXP));
+		} else {
 #endif
+		PROTECT(from = dense_as_kind(from, class, typeToKind(tv), 0));
 		PROTECT(value);
+#ifndef MATRIX_ENABLE_IMATRIX
+		}
+#endif
 		class = valid[R_check_class_etc(from, valid)];
 		new = 0;
 	}

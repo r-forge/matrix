@@ -58,7 +58,7 @@
     else if(isS4(i)) {
         if(!.isVector(i))
             stop(.subscript.invalid(i), domain = NA)
-        kind <- .V.kind(i)
+        kind <- .M.kind(i)
         if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
             i <- .subscript.recycle(i, mn, pattern)
@@ -492,7 +492,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
               mn <- length(x)
-              pattern <- .V.kind(x) == "n"
+              pattern <- .M.kind(x) == "n"
               switch(typeof(i),
                      double =
                          {
@@ -605,7 +605,7 @@ setMethod("[", signature(x = "sparseVector", i = "sparseVector", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              kind <- .V.kind(i)
+              kind <- .M.kind(i)
               if((pattern <- kind == "n") || kind == "l")
                   x[.subscript.recycle(i, x@length, pattern)]
               else x[i@x]
@@ -635,7 +635,7 @@ setMethod("head", signature(x = "sparseVector"),
               nnz <- length(i <- x@i)
               x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
               if(nnz > 0L && i[nnz] > n) {
-                  pattern <- .V.kind(x) == "n"
+                  pattern <- .M.kind(x) == "n"
                   if(i[1L] > n) {
                       x@i <- integer(0L)
                       if(!pattern)
@@ -667,7 +667,7 @@ setMethod("tail", signature(x = "sparseVector"),
               nnz <- length(i <- x@i)
               x@length <- n <- if(is.integer(i)) as.integer(n) else trunc(n)
               if(nnz > 0L && i[1L] <= (k <- len - n)) {
-                  pattern <- .V.kind(x) == "n"
+                  pattern <- .M.kind(x) == "n"
                   if(i[nnz] <= k) {
                       x@i <- integer(0L)
                       if(!pattern)

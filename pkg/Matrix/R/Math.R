@@ -205,7 +205,7 @@ setMethod("Math", signature(x = "sparseVector"),
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
                   return(g(.V2v(x)))
-              kind <- .V.kind(x)
+              kind <- .M.kind(x)
               if(kind == "z") {
                   zero <- 0+0i; one <- 1+0i; l <- "z"
               } else if(kind == "d" || .Generic != "abs") {

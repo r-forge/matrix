@@ -126,7 +126,7 @@ function(x, exclude.informal) {
         return(NULL)
     exclude <-
     if(.isVector(x))
-        c("class", "length", "i", if(.V.kind(x) != "n") "x")
+        c("class", "length", "i", if(.M.kind(x) != "n") "x")
     else "class"
     nms <- names(a)
     i <- match(nms, exclude, 0L) == 0L

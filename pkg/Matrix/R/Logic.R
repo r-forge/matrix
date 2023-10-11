@@ -76,8 +76,8 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
                       e2 <- rep(e2, length.out = N)
                   else e1 <- rep(e1, length.out = N)
               }
-              k1 <- .V.kind(e1)
-              k2 <- .V.kind(e2)
+              k1 <- .M.kind(e1)
+              k2 <- .M.kind(e2)
               pattern <- k1 == "n" && k2 == "n"
               r <- new(if(pattern) "nsparseVector" else "lsparseVector")
               r@length <- if(n == 0L) n else N
@@ -137,7 +137,7 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "vector"),
                       e2 <- rep(e2, length.out = N)
                   else e1 <- rep(e1, length.out = N)
               }
-              k1 <- .V.kind(e1)
+              k1 <- .M.kind(e1)
               if(.Generic == "&") {
                   r <- new("lsparseVector")
                   r@length <- if(n == 0L) n else N

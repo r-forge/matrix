@@ -6,8 +6,7 @@
 
 ## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
 ## otherwise ""
-.M.kind  <- function(x) .Call(R_Matrix_kind, x,  TRUE) # integer -> "d"
-.V.kind  <- function(x) .Call(R_Matrix_kind, x, FALSE) # integer -> "i"
+.M.kind  <- function(x) .Call(R_Matrix_kind, x)
 
 ## "[gstd]" for Matrix, sparseVector 'x';
 ## otherwise ""
