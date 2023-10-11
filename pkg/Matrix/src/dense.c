@@ -695,7 +695,7 @@ SEXP R_dense_force_symmetric(SEXP from, SEXP uplo)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
 
 	return dense_force_symmetric(from, valid[ivalid], ul);

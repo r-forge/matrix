@@ -1227,7 +1227,7 @@ SEXP R_sparse_transpose(SEXP from, SEXP lazy)
 	int lazy_;
 	if (TYPEOF(lazy) != LGLSXP || LENGTH(lazy) < 1 ||
 	    (lazy_ = LOGICAL(lazy)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to %s()"), "lazy", __func__);
+		error(_("invalid '%s' to '%s'"), "lazy", __func__);
 
 	return sparse_transpose(from, valid[ivalid], lazy_);
 }
@@ -1619,7 +1619,7 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
 
 	return sparse_force_symmetric(from, valid[ivalid], ul);
