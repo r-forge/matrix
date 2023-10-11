@@ -167,7 +167,7 @@ SEXP dspMatrix_norm(SEXP obj, SEXP type)
 SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -199,7 +199,7 @@ SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 SEXP dtpMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -231,7 +231,7 @@ SEXP dtpMatrix_norm(SEXP obj, SEXP type)
 SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (m != n)
@@ -269,7 +269,7 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -309,7 +309,7 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -349,7 +349,7 @@ SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -389,7 +389,7 @@ SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -429,7 +429,7 @@ SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
@@ -467,7 +467,7 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
 {
 	char t = La_rcond_type(type);
-	
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
