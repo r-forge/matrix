@@ -425,9 +425,9 @@ Ops.x.x <- function(e1, e2)
         ## now, in all cases @x should be matching & correct
         ## {only "uplo" part is used}
         r <- callGeneric(e1@x, e2@x)
-        kr <- .M.kind(r)
-        if(kr == "d" && !is.double(r)) ## as "igeMatrix" does not yet exist!
+        if(is.integer(r)) ## as "igeMatrix" does not yet exist!
             r <- as.double(r)
+        kr <- .M.kind(r)
         if(geM)
             new(paste0(kr, "geMatrix"), x = r, Dim = d, Dimnames = e1@Dimnames)
         else
