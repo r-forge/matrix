@@ -10,6 +10,10 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
+#ifndef MATRIX_ENABLE_IMATRIX
+	if (cl[0] == 'i')
+		cl[0] = 'd';
+#endif
 	SEXP to = PROTECT(newObject(cl)),
 		dim = getAttrib(from, R_DimSymbol),
 		dimnames;
@@ -154,19 +158,10 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
-#ifdef MATRIX_ENABLE_IMATRIX
 	case INTSXP:
-#endif
 	case REALSXP:
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
-#endif
 		break;
-#ifndef MATRIX_ENABLE_IMATRIX
-	case INTSXP:
-		if (!inherits(from, "factor"))
-			break;
-#endif
 	default:
 		ERROR_INVALID_CLASS(from, __func__);
 		break;
@@ -180,26 +175,26 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
 	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
 	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("invalid '%s' to %s()"), "class", __func__);
+		error(_("invalid '%s' to '%s'"), "class", __func__);
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 		if (zzz[1] == 't') {
 			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to %s()"), "diag", __func__);
+				error(_("invalid '%s' to '%s'"), "diag", __func__);
 		}
 	}
 
 	int trans_;
 	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to %s()"), "trans", __func__);
+		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	return matrix_as_dense(from, zzz, ul, di, trans_, 1);
 }
@@ -496,7 +491,7 @@ SEXP R_sparse_as_dense(SEXP from, SEXP packed)
 	int packed_;
 	if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 	    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to %s()"), "packed", __func__);
+		error(_("invalid '%s' to '%s'"), "packed", __func__);
 
 	return sparse_as_dense(from, valid[ivalid], packed_);
 }
@@ -608,19 +603,19 @@ SEXP R_diagonal_as_dense(SEXP from,
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	char shape_;
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
 	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
 	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
-		error(_("invalid '%s' to %s()"), "shape", __func__);
+		error(_("invalid '%s' to '%s'"), "shape", __func__);
 
 	int packed_ = 0;
 	if (shape_ != 'g') {
 		if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 		    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-			error(_("invalid '%s' to %s()"), "packed", __func__);
+			error(_("invalid '%s' to '%s'"), "packed", __func__);
 	}
 
 	char ul = 'U';
@@ -628,7 +623,7 @@ SEXP R_diagonal_as_dense(SEXP from,
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
 
 	return diagonal_as_dense(from, valid[ivalid], kind_, shape_, packed_, ul);
@@ -718,7 +713,7 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	return index_as_dense(from, valid[ivalid], kind_);
 }
@@ -730,6 +725,10 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	cl[0] = typeToKind(TYPEOF(from));
 	cl[1] = zzz[1];
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : 'r');
+#ifndef MATRIX_ENABLE_IMATRIX
+	if (cl[0] == 'i')
+		cl[0] = 'd';
+#endif
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
 	REPROTECT(from = matrix_as_dense(from, cl, ul, di, trans, 0), pid);
@@ -746,19 +745,10 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
-#ifdef MATRIX_ENABLE_IMATRIX
 	case INTSXP:
-#endif
 	case REALSXP:
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
-#endif
 		break;
-#ifndef MATRIX_ENABLE_IMATRIX
-	case INTSXP:
-		if (!inherits(from, "factor"))
-			break;
-#endif
 	default:
 		ERROR_INVALID_CLASS(from, __func__);
 		break;
@@ -770,26 +760,26 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    (zzz = CHAR(class))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("invalid '%s' to %s()"), "class", __func__);
+		error(_("invalid '%s' to '%s'"), "class", __func__);
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 		if (zzz[1] == 't') {
 			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to %s()"), "diag", __func__);
+				error(_("invalid '%s' to '%s'"), "diag", __func__);
 		}
 	}
 
 	int trans_;
 	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to %s()"), "trans", __func__);
+		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	return matrix_as_sparse(from, zzz, ul, di, trans_);
 }
@@ -1208,7 +1198,7 @@ SEXP R_dense_as_sparse(SEXP from, SEXP repr)
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to %s()"), "repr", __func__);
+		error(_("invalid '%s' to '%s'"), "repr", __func__);
 
 	return dense_as_sparse(from, valid[ivalid], repr_);
 }
@@ -1403,26 +1393,26 @@ SEXP R_diagonal_as_sparse(SEXP from,
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	char shape_;
 	if (TYPEOF(shape) != STRSXP || LENGTH(shape) < 1 ||
 	    (shape = STRING_ELT(shape, 0)) == NA_STRING ||
 	    ((shape_ = CHAR(shape)[0]) != 'g' && shape_ != 's' && shape_ != 't'))
-		error(_("invalid '%s' to %s()"), "shape", __func__);
+		error(_("invalid '%s' to '%s'"), "shape", __func__);
 
 	char repr_;
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to %s()"), "repr", __func__);
+		error(_("invalid '%s' to '%s'"), "repr", __func__);
 
 	char ul = 'U';
 	if (shape_ != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
 
 	return diagonal_as_sparse(from, valid[ivalid], kind_, shape_, repr_, ul);
@@ -1544,14 +1534,14 @@ SEXP R_index_as_sparse(SEXP from, SEXP kind, SEXP repr)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	char repr_;
 	if (TYPEOF(repr) != STRSXP || LENGTH(repr) < 1 ||
 	    (repr = STRING_ELT(repr, 0)) == NA_STRING ||
 	    ((repr_ = CHAR(repr)[0]) != '.' &&
 	     repr_ != 'C' && repr_ != 'R' && repr_ != 'T'))
-		error(_("invalid '%s' to %s()"), "repr", __func__);
+		error(_("invalid '%s' to '%s'"), "repr", __func__);
 
 	return index_as_sparse(from, valid[ivalid], kind_, repr_);
 }
@@ -1641,7 +1631,7 @@ SEXP R_dense_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	return dense_as_kind(from, valid[ivalid], kind_, 0);
 }
@@ -1776,7 +1766,7 @@ SEXP R_sparse_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	return sparse_as_kind(from, valid[ivalid], kind_);
 }
@@ -1854,7 +1844,7 @@ SEXP R_diagonal_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	return diagonal_as_kind(from, valid[ivalid], kind_);
 }
@@ -1876,7 +1866,7 @@ SEXP R_index_as_kind(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	return index_as_kind(from, valid[ivalid], kind_);
 }
@@ -2491,11 +2481,11 @@ SEXP R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to %s()"), "uplo", __func__);
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    ((diag = STRING_ELT(diag, 0)) != NA_STRING &&
 		     (di = *CHAR(diag)) != '\0' && di != 'N' && di != 'U'))
-			error(_("invalid '%s' to %s()"), "diag", __func__);
+			error(_("invalid '%s' to '%s'"), "diag", __func__);
 	}
 
 	return dense_as_packed(from, valid[ivalid], ul, di);
@@ -3472,10 +3462,10 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	if (TYPEOF(sparse) != LGLSXP || LENGTH(sparse) < 1)
-		error(_("invalid '%s' to %s()"), "sparse", __func__);
+		error(_("invalid '%s' to '%s'"), "sparse", __func__);
 	int sparse_ = LOGICAL(sparse)[0];
 
 	switch (cl[2]) {
@@ -3541,7 +3531,7 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
 	    (kind = STRING_ELT(kind, 0)) == NA_STRING ||
 	    (kind_ = CHAR(kind)[0]) == '\0')
-		error(_("invalid '%s' to %s()"), "kind", __func__);
+		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	switch (cl[2]) {
 	case 'e':

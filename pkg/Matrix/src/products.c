@@ -933,7 +933,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
                       SEXP boolean)
 {
 	if (TYPEOF(boolean) != LGLSXP || LENGTH(boolean) < 1)
-		error(_("invalid '%s' to %s()"), "boolean", __func__);
+		error(_("invalid '%s' to '%s'"), "boolean", __func__);
 	int boolean_ = LOGICAL(boolean)[0];
 
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
@@ -1285,7 +1285,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	SEXP x_ = x, y_ = y; /* for later pointer comparison */
 
 	if (TYPEOF(boolean) != LGLSXP || LENGTH(boolean) < 1)
-		error(_("invalid '%s' to %s()"), "boolean", __func__);
+		error(_("invalid '%s' to '%s'"), "boolean", __func__);
 	int boolean_ = LOGICAL(boolean)[0];
 
 	int xtrans_ = LOGICAL(xtrans)[0], ytrans_ = LOGICAL(ytrans)[0],
