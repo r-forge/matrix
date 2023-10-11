@@ -28,7 +28,7 @@ setMethod("anyNA", signature(x = "indMatrix"),
           function(x) FALSE)
 
 setMethod("anyNA", signature(x = "sparseVector"),
-          function(x) .V.kind(x) != "n" && anyNA(x@x))
+          function(x) .M.kind(x) != "n" && anyNA(x@x))
 
 
 ## METHODS FOR GENERIC: is.na
@@ -106,7 +106,7 @@ setMethod("is.na", signature(x = "sparseVector"),
           function(x) {
               r <- new("nsparseVector")
               r@length <- x@length
-              if(.V.kind(x) != "n")
+              if(.M.kind(x) != "n")
                   r@i <- x@i[is.na(x@x)]
               r
           })
@@ -189,7 +189,7 @@ setMethod("is.nan", signature(x = "sparseVector"),
           function(x) {
               r <- new("nsparseVector")
               r@length <- x@length
-              switch(.V.kind(x), "d" = , "z" = { r@i <- x@i[is.nan(x@x)] })
+              switch(.M.kind(x), "d" = , "z" = { r@i <- x@i[is.nan(x@x)] })
               r
           })
 
@@ -271,7 +271,7 @@ setMethod("is.infinite", signature(x = "sparseVector"),
           function(x) {
               r <- new("nsparseVector")
               r@length <- x@length
-              switch(.V.kind(x), "d" = , "z" = { r@i <- x@i[is.infinite(x@x)] })
+              switch(.M.kind(x), "d" = , "z" = { r@i <- x@i[is.infinite(x@x)] })
               r
           })
 
@@ -376,7 +376,7 @@ setMethod("is.finite", signature(x = "indMatrix"),
 setMethod("is.finite", signature(x = "sparseVector"),
           function(x)  {
               r <- rep.int(TRUE, x@length)
-              if(.V.kind(x) != "n")
+              if(.M.kind(x) != "n")
                   r[x@i[!is.finite(x@x)]] <- FALSE
               r
           })

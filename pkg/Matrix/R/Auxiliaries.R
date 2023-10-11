@@ -79,7 +79,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
                          if(is.na(diag))
                              diag <-
                              if(!is.na(a <- all(y        )) && a) "U" else "N"
-                         if(.M.kind(y) == "n") "ndiMatrix" else "ldiMatrix"
+                         if(.M.kind(x) == "n") "ndiMatrix" else "ldiMatrix"
                      },
                  integer =
                      {
@@ -136,7 +136,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
     if(isM)
         return(.Call(R_sparse_drop0, x, tol))
     ## TODO: write sparseVector code in C and respecting 'tol'
-    if(.V.kind(x) == "n")
+    if(.M.kind(x) == "n")
         return(x)
     x.x <- x@x
     k <- which(is.na(x.x) | x.x)

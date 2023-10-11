@@ -1063,9 +1063,7 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 	case LGLSXP:
 	case INTSXP:
 	case REALSXP:
-#ifdef MATRIX_ENABLE_ZMATRIX
 	case CPLXSXP:
-#endif
 		break;
 	default:
 		error(_("replacement diagonal has incompatible type \"%s\""),
@@ -1085,12 +1083,17 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_kind(SEXP, const char *, char);
-		PROTECT(from = sparse_as_kind(from, class, typeToKind(tv)));
 #ifndef MATRIX_ENABLE_IMATRIX
-		if (tv == INTSXP)
-			value = coerceVector(value, REALSXP);
+		if (tv == INTSXP) {
+		PROTECT(from = sparse_as_kind(from, class, 'd'));
+		PROTECT(value = coerceVector(value, REALSXP));
+		} else {
 #endif
+		PROTECT(from = sparse_as_kind(from, class, typeToKind(tv)));
 		PROTECT(value);
+#ifndef MATRIX_ENABLE_IMATRIX
+		}
+#endif
 		class = valid[R_check_class_etc(from, valid)];
 	}
 

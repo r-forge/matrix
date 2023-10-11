@@ -205,7 +205,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
             rep.int(max(rij), 2L) + 1L
         else rij[2L, ] + 1L
 
-    kind <- if(m.x <- missing(x)) "n" else .M.kind(x)
+    kind <- if(m.x <- missing(x)) "n" else if(is.integer(x)) "d" else .M.kind(x)
     shape <-
         if(symmetric) {
             if(dims[1L] != dims[2L])
@@ -262,7 +262,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 
 spMatrix <- function(nrow, ncol,
                      i = integer(0L), j = integer(0L), x = double(0L))
-    new(paste0(.M.kind(x), "gTMatrix"),
+    new(paste0(if(is.integer(x)) "d" else .M.kind(x), "gTMatrix"),
         Dim = c(as.integer(nrow), as.integer(ncol)),
         i = as.integer(i) - 1L,
         j = as.integer(j) - 1L,
@@ -760,5 +760,5 @@ newSpVec <- function(class, x, prev)
     newSpV(class = class, x = x, i = prev@i, length = prev@length)
 
 sparseVector <- function(x, i, length)
-    newSpV(class = paste0(if(missing(x)) "n" else .V.kind(x), "sparseVector"),
+    newSpV(class = paste0(if(missing(x)) "n" else .M.kind(x), "sparseVector"),
            x = x, i = i, length = length)

@@ -18,7 +18,7 @@ c.sparseVector <- function(...) {
     args.nnz    <- lengths(args.i, FALSE)
 
     s <- c("n", "l", "i", "d", "z")
-    i <- match(vapply(args, .V.kind, ""), s)
+    i <- match(vapply(args, .M.kind, ""), s)
     k <- range(i)
     n <- sum(args.length)
     a <- if(n <= .Machine$integer.max) as.integer else as.double

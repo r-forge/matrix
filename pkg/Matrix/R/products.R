@@ -1169,7 +1169,7 @@ setMethod("crossprod", signature(x = "vector", y = "pMatrix"),
 
 setMethod("crossprod", signature(x = "sparseVector", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              if(if(is.na(boolArith)) .V.kind(x) == "n" else boolArith) {
+              if(if(is.na(boolArith)) .M.kind(x) == "n" else boolArith) {
                   if(!is.na(boolArith))
                       x <- .V2kind(.drop0(x, isM = FALSE), "n")
                   .m2sparse(length(x@i) > 0L, "nsR")
@@ -1177,7 +1177,7 @@ setMethod("crossprod", signature(x = "sparseVector", y = "missing"),
 
 setMethod("crossprod", signature(x = "sparseVector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
-              if(if(is.na(boolArith)) .V.kind(x) == "n" && .V.kind(y) == "n" else boolArith) {
+              if(if(is.na(boolArith)) .M.kind(x) == "n" && .M.kind(y) == "n" else boolArith) {
                   if(!is.na(boolArith)) {
                       x <- .V2kind(.drop0(x, isM = FALSE), "n")
                       y <- .V2kind(.drop0(y, isM = FALSE), "n")
@@ -1569,7 +1569,7 @@ setMethod("tcrossprod", signature(x = "sparseVector", y = "missing"),
 
 setMethod("tcrossprod", signature(x = "sparseVector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)
-              (if(if(is.na(boolArith)) .V.kind(x) == "n" && .V.kind(y) == "n" else boolArith) `%&%` else `%*%`)(x, .tCRT(.V2C(y))))
+              (if(if(is.na(boolArith)) .M.kind(x) == "n" && .M.kind(y) == "n" else boolArith) `%&%` else `%*%`)(x, .tCRT(.V2C(y))))
 
 for(.cl in c("Matrix", "matrix")) {
 setMethod("tcrossprod", signature(x = "sparseVector", y = .cl),
