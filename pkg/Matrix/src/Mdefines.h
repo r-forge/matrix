@@ -221,54 +221,62 @@ do { \
 /*  0 */ "dpoMatrix", "dppMatrix", \
 /*  2 */ "corMatrix", "pcorMatrix", \
 /*  4 */ "pMatrix", "indMatrix", \
-/*  6 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
-/* 11 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
-/* 16 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
+/*  6 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
+/* 11 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
+/* 16 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
 /* 21 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
 /* 26 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
 /* 31 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
-/* 36 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
-/* 41 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
-/* 46 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
-/* 51 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
-/* 56 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
-/* 61 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
+/* 36 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
+/* 41 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
+/* 46 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
+/* 51 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
+/* 56 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
+/* 61 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
 /* 66 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
 /* 71 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
 /* 76 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_NONVIRTUAL_VECTOR \
-/* 81 */ "dsparseVector", "lsparseVector", "nsparseVector", \
-         "isparseVector", "zsparseVector"
+/* 81 */ "nsparseVector", "lsparseVector", "isparseVector", \
+         "dsparseVector", "zsparseVector"
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 
 /* dpoMatrix->dsyMatrix, etc. */
-#define VALID_NONVIRTUAL_SHIFT(i, p2ind) \
-	((i >= 5) ? 0 : ((i >= 4) ? p2ind != 0 : ((i >= 2) ? 12 : 14)))
+#define VALID_NONVIRTUAL_SHIFT(i, pToInd) \
+	((i >= 5) ? 0 : ((i >= 4) ? pToInd != 0 : ((i >= 2) ? 57 : 59)))
 
 #define VALID_DENSE \
-"dgeMatrix", "dtrMatrix", "dsyMatrix", "dtpMatrix", "dspMatrix", \
-"lgeMatrix", "ltrMatrix", "lsyMatrix", "ltpMatrix", "lspMatrix", \
-"ngeMatrix", "ntrMatrix", "nsyMatrix", "ntpMatrix", "nspMatrix"
+"ngeMatrix", "nsyMatrix", "nspMatrix", "ntrMatrix", "ntpMatrix", \
+"lgeMatrix", "lsyMatrix", "lspMatrix", "ltrMatrix", "ltpMatrix", \
+"igeMatrix", "isyMatrix", "ispMatrix", "itrMatrix", "itpMatrix", \
+"dgeMatrix", "dsyMatrix", "dspMatrix", "dtrMatrix", "dtpMatrix", \
+"zgeMatrix", "zsyMatrix", "zspMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_CSPARSE \
-"dgCMatrix", "dsCMatrix", "dtCMatrix", \
+"ngCMatrix", "nsCMatrix", "ntCMatrix", \
 "lgCMatrix", "lsCMatrix", "ltCMatrix", \
-"ngCMatrix", "nsCMatrix", "ntCMatrix"
+"igCMatrix", "isCMatrix", "itCMatrix", \
+"dgCMatrix", "dsCMatrix", "dtCMatrix", \
+"zgCMatrix", "zsCMatrix", "ztCMatrix"
 
 #define VALID_RSPARSE \
-"dgRMatrix", "dsRMatrix", "dtRMatrix", \
+"ngRMatrix", "nsRMatrix", "ntRMatrix", \
 "lgRMatrix", "lsRMatrix", "ltRMatrix", \
-"ngRMatrix", "nsRMatrix", "ntRMatrix"
+"igRMatrix", "isRMatrix", "itRMatrix", \
+"dgRMatrix", "dsRMatrix", "dtRMatrix", \
+"zgRMatrix", "zsRMatrix", "ztRMatrix"
 
 #define VALID_TSPARSE \
-"dgTMatrix", "dsTMatrix", "dtTMatrix", \
+"ngTMatrix", "nsTMatrix", "ntTMatrix", \
 "lgTMatrix", "lsTMatrix", "ltTMatrix", \
-"ngTMatrix", "nsTMatrix", "ntTMatrix"
+"igTMatrix", "isTMatrix", "itTMatrix", \
+"dgTMatrix", "dsTMatrix", "dtTMatrix", \
+"zgTMatrix", "zsTMatrix", "ztTMatrix"
 
 #define VALID_DIAGONAL \
-"ddiMatrix", "ldiMatrix", "ndiMatrix"
+"ndiMatrix", "ldiMatrix", "idiMatrix", "ddiMatrix", "zdiMatrix"
 
 
 /* What we want declared "everywhere" : */
