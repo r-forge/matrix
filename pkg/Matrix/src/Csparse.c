@@ -11,7 +11,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 
 	/* defined in ./chm_common.c : */
 	SEXP checkpi(SEXP p, SEXP i, int m, int n);
-	
+
 	SEXP dim = GET_SLOT(x, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
@@ -318,7 +318,7 @@ SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
 	if (!cholmod_write_sparse(f, A, (cholmod_sparse *) NULL, (char *) NULL, &c))
 		error(_("'%s' failed"), "cholmod_write_sparse");
 	fclose(f);
-	
+
 	UNPROTECT(1);
 	return R_NilValue;
 }
