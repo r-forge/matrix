@@ -1176,7 +1176,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			return 0; \
 		} else if (upper != 0) { \
 			px = _PTR_(x); \
-			for (j = 0; j < n; px += (++j)) {	\
+			for (j = 0; j < n; px += (++j)) { \
 				px += 1; \
 				for (i = j + 1; i < n; ++i, px += 1) \
 					if (_ISNZ_(*px)) \
