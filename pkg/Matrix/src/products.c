@@ -1170,7 +1170,7 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 					px += j; \
 				for (i = j; i < m; ++i) { \
 					_OP_(*px, pd[_J_]); \
-					++px;					\
+					++px; \
 				} \
 			} \
 		} \
