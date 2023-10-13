@@ -1,6 +1,296 @@
+#include <math.h> /* trunc */
 #include "Mdefines.h"
 #include "idz.h"
 #include "coerce.h"
+
+SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
+                     int m, int n, int byrow, SEXP dimnames)
+{
+	SEXPTYPE tf = TYPEOF(from);
+	char cl[] = "...Matrix";
+	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
+	cl[1] = zzz[1];
+	cl[2] = zzz[2];
+#ifndef MATRIX_ENABLE_IMATRIX
+	if (cl[0] == 'i')
+		cl[0] = 'd';
+#endif
+
+	if (cl[1] != 'g' && m != n)
+		error(_("attempt to construct non-square %s"),
+		      (cl[1] == 's') ? "symmetricMatrix" : "triangularMatrix");
+
+	Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
+	if (((cl[2] != 'p') ? mn64 : (mn64 - n) / 2 + n) > R_XLEN_T_MAX)
+		error(_("attempt to allocate vector of length exceeding %s"),
+		      "R_XLEN_T_MAX");
+	R_xlen_t mn = (R_xlen_t) mn64;
+
+	SEXPTYPE tt = kindToType(cl[0]);
+	PROTECT(from = coerceVector(from, tt));
+
+	SEXP to = PROTECT(newObject(cl));
+
+	SEXP dim = GET_SLOT(to, Matrix_DimSym);
+	int *pdim = INTEGER(dim);
+	pdim[0] = m;
+	pdim[1] = n;
+
+	if (cl[1] != 's')
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
+
+	if (cl[1] != 'g' && ul != 'U') {
+		SEXP uplo = PROTECT(mkString("L"));
+		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1);
+	}
+
+	if (cl[1] == 't' && di != 'N') {
+		SEXP diag = PROTECT(mkString("U"));
+		SET_SLOT(to, Matrix_diagSym, diag);
+		UNPROTECT(1);
+	}
+
+	SEXP x = PROTECT(allocVector(tt, (cl[2] != 'p') ? mn : (mn - n) / 2 + n));
+	R_xlen_t k, r = XLENGTH(from);
+	int i, j, recycle = r < mn;
+
+#define VAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_, _NA_) \
+	do { \
+		_CTYPE_ *dest = _PTR_(x), *src = _PTR_(from); \
+		if (r == 0) { \
+			while (mn-- > 0) \
+				*(dest++) = _NA_; \
+		} else if (r == 1) { \
+			while (mn-- > 0) \
+				*(dest++) = *src; \
+		} else if (cl[2] != 'p') { \
+			if (!recycle) { \
+				if (!byrow) \
+					Matrix_memcpy(dest, src, mn, sizeof(_CTYPE_)); \
+				else \
+					_PREFIX_ ## transpose2(dest, src, n, m); \
+			} else { \
+				if (!byrow) { \
+					k = 0; \
+					while (mn-- > 0) { \
+						if (k == r) k = 0; \
+						*(dest++) = src[k++]; \
+					} \
+				} else { \
+					for (j = 0; j < n; ++j) { \
+						k = j; \
+						for (i = 0; i < m; ++i) { \
+							k %= r; \
+							*(dest++) = src[k]; \
+							k += n; \
+						} \
+					} \
+				} \
+			} \
+		} else if (ul == 'U') { \
+			if (!byrow) { \
+				k = 0; \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i <= j; ++i) { \
+						if (recycle) k %= r; \
+						*(dest++) = src[k++]; \
+					} \
+					k += n - j - 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					k = j; \
+					for (i = 0; i <= j; ++i) { \
+						if (recycle) k %= r; \
+						*(dest++) = src[k]; \
+						k += n; \
+					} \
+				} \
+			} \
+		} else { \
+			if (!byrow) { \
+				k = 0; \
+				for (j = 0; j < n; ++j) { \
+					for (i = j; i < n; ++i) { \
+						if (recycle) k %= r; \
+						*(dest++) = src[k++]; \
+					} \
+					k += j + 1; \
+				} \
+			} else { \
+				R_xlen_t d = 0; \
+				for (j = 0; j < n; ++j) { \
+					k = j + d; \
+					for (i = 0; i <= j; ++i) { \
+						if (recycle) k %= r; \
+						*(dest++) = src[k]; \
+						k += n; \
+					} \
+					d += n; \
+				} \
+			} \
+		} \
+	} while (0)
+
+	switch (tt) {
+	case LGLSXP:
+		VAD_SUBCASES(i, int, LOGICAL, NA_LOGICAL);
+		break;
+	case INTSXP:
+		VAD_SUBCASES(i, int, INTEGER, NA_INTEGER);
+		break;
+	case REALSXP:
+		VAD_SUBCASES(d, double, REAL, NA_REAL);
+		break;
+	case CPLXSXP:
+		VAD_SUBCASES(z, Rcomplex, COMPLEX, Matrix_zna);
+		break;
+	default:
+		break;
+	}
+
+#undef VAD_SUBCASES
+
+	SET_SLOT(to, Matrix_xSym, x);
+
+	UNPROTECT(3);
+	return to;
+}
+
+SEXP R_vector_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                       SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
+{
+	switch (TYPEOF(from)) {
+	case LGLSXP:
+	case INTSXP:
+	case REALSXP:
+	case CPLXSXP:
+		break;
+	default:
+		ERROR_INVALID_TYPE(from, __func__);
+		break;
+	}
+
+	const char *zzz;
+	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
+	    (class = STRING_ELT(class, 0)) == NA_STRING ||
+	    (zzz = CHAR(class))[0] == '\0' ||
+	    (zzz              )[1] == '\0' ||
+	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
+	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
+	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
+		error(_("invalid '%s' to '%s'"), "class", __func__);
+
+	char ul = 'U', di = 'N';
+	if (zzz[1] != 'g') {
+		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
+		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
+		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
+		if (zzz[1] == 't') {
+			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+				error(_("invalid '%s' to '%s'"), "diag", __func__);
+		}
+	}
+
+	int m_ = -1;
+	if (m != R_NilValue) {
+		if (TYPEOF(m) == INTSXP) {
+			int tmp;
+			if (LENGTH(m) >= 1 && (tmp = INTEGER(m)[0]) != NA_INTEGER &&
+			    tmp >= 0)
+				m_ = tmp;
+		} else if (TYPEOF(m) == REALSXP) {
+			double tmp;
+			if (LENGTH(m) >= 1 && !ISNAN(tmp = REAL(m)[0]) &&
+			    tmp >= 0.0) {
+				if (trunc(tmp) > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				m_ = (int) tmp;
+			}
+		}
+		if (m_ < 0)
+			error(_("invalid '%s' to '%s'"), "m", __func__);
+	}
+
+	int n_ = -1;
+	if (n != R_NilValue) {
+		if (TYPEOF(n) == INTSXP) {
+			int tmp;
+			if (LENGTH(n) >= 1 && (tmp = INTEGER(n)[0]) != NA_INTEGER &&
+			    tmp >= 0)
+				n_ = tmp;
+		} else if (TYPEOF(n) == REALSXP) {
+			double tmp;
+			if (LENGTH(n) >= 1 && !ISNAN(tmp = REAL(n)[0]) &&
+			    tmp >= 0.0) {
+				if (trunc(tmp) > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				n_ = (int) tmp;
+			}
+		}
+		if (n_ < 0)
+			error(_("invalid '%s' to '%s'"), "n", __func__);
+	}
+
+	int byrow_;
+	if (TYPEOF(byrow) != LGLSXP || LENGTH(byrow) < 1 ||
+	    (byrow_ = LOGICAL(byrow)[0]) == NA_LOGICAL)
+		error(_("invalid '%s' to '%s'"), "byrow", __func__);
+
+	if (dimnames != R_NilValue)
+		if (TYPEOF(dimnames) != VECSXP || LENGTH(dimnames) != 2)
+			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
+
+	R_xlen_t vlen_ = XLENGTH(from);
+	if (zzz[1] != 'g' && (m_ < 0) != (n_ < 0)) {
+		if (m_ < 0)
+			m_ = n_;
+		else
+			n_ = m_;
+	} else if (m_ < 0 && n_ < 0) {
+		if (vlen_ > INT_MAX)
+			error(_("dimensions cannot exceed %s"), "2^31-1");
+		m_ = (int) vlen_;
+		n_ = 1;
+	} else if (m_ < 0) {
+		if (vlen_ > (Matrix_int_fast64_t) INT_MAX * n_) {
+			if (n_ == 0)
+				error(_("nonempty vector supplied for empty matrix"));
+			else
+				error(_("dimensions cannot exceed %s"), "2^31-1");
+		}
+		m_ = (n_ == 0) ? 0 : vlen_ / n_ + (vlen_ % n_ != 0);
+	} else if (n_ < 0) {
+		if (vlen_ > (Matrix_int_fast64_t) m_ * INT_MAX) {
+			if (m_ == 0)
+				error(_("nonempty vector supplied for empty matrix"));
+			else
+				error(_("dimensions cannot exceed %s"), "2^31-1");
+		}
+		n_ = (m_ == 0) ? 0 : vlen_ / m_ + (vlen_ % m_ != 0);
+	}
+
+	Matrix_int_fast64_t mlen_ = (Matrix_int_fast64_t) m_ * n_;
+	if (vlen_ <= 1)
+		/* do nothing */ ;
+	else if (mlen_ == 0)
+		warning(_("nonempty vector supplied for empty matrix"));
+	else if (vlen_ > mlen_)
+		warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
+		        (long long) vlen_, m_, n_);
+	else if (mlen_ % vlen_ != 0)
+		warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
+		        m_, n_, (long long) vlen_);
+
+	return
+	vector_as_dense(from, zzz, ul, di, m_, n_, byrow_, dimnames);
+}
 
 SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
                      int trans, int new)
@@ -14,11 +304,16 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	if (cl[0] == 'i')
 		cl[0] = 'd';
 #endif
-	SEXP to = PROTECT(newObject(cl)),
-		dim = getAttrib(from, R_DimSymbol),
-		dimnames;
-	int *pdim, m, n, isM, doDN, nprotect = 1;
-	R_xlen_t len = XLENGTH(from);
+
+	SEXPTYPE tt = kindToType(cl[0]);
+	PROTECT(from = coerceVector(from, tt));
+
+	SEXP to = PROTECT(newObject(cl));
+	int nprotect = 2;
+
+	SEXP dim = getAttrib(from, R_DimSymbol), dimnames;
+	int *pdim, isM, m, n, doDN;
+	R_xlen_t mn = XLENGTH(from);
 
 	isM = TYPEOF(dim) == INTSXP && LENGTH(dim) == 2;
 	if (isM) {
@@ -39,15 +334,15 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 
 	} else {
 
-		if (len > INT_MAX)
+		if (mn > INT_MAX)
 			error(_("dimensions cannot exceed %s"), "2^31-1");
 		dim = GET_SLOT(to, Matrix_DimSym);
 		pdim = INTEGER(dim);
 		if (trans) {
 			pdim[0] = m = 1;
-			pdim[1] = n = (int) len;
+			pdim[1] = n = (int) mn;
 		} else {
-			pdim[0] = m = (int) len;
+			pdim[0] = m = (int) mn;
 			pdim[1] = n = 1;
 		}
 
@@ -63,8 +358,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	}
 
 	if (cl[1] != 'g' && m != n)
-		error(_("attempt to construct %s or %s from non-square matrix"),
-		      "symmetricMatrix", "triangularMatrix");
+		error(_("attempt to construct non-square %s"),
+		      (cl[1] == 's') ? "symmetricMatrix" : "triangularMatrix");
 
 	if (doDN) {
 		if (cl[1] != 's')
@@ -85,47 +380,45 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		UNPROTECT(1); /* diag */
 	}
 
-	SEXPTYPE tt = kindToType(cl[0]);
-	if (tf != tt) {
-		PROTECT(from = coerceVector(from, tt));
-		++nprotect;
-	}
-
 	SEXP x;
 
 	if (cl[2] != 'p') {
 
-		if (!new || tf != tt || !MAYBE_REFERENCED(from)) {
-			x = from;
-			if (new && ATTRIB(x) != R_NilValue) {
-				SET_ATTRIB(x, R_NilValue);
-				if (OBJECT(x))
-					SET_OBJECT(x, 0);
+		if (!new || !MAYBE_REFERENCED(from) || ATTRIB(from) == R_NilValue) {
+
+			if (!MAYBE_REFERENCED(from) && ATTRIB(from) != R_NilValue) {
+				SET_ATTRIB(from, R_NilValue);
+				if (OBJECT(from))
+					SET_OBJECT(from, 0);
 			}
+			x = from;
+
 		} else {
-			PROTECT(x = allocVector(tt, len));
+
+			PROTECT(x = allocVector(tt, mn));
 			++nprotect;
 			switch (tt) {
 			case LGLSXP:
-				Matrix_memcpy(LOGICAL(x), LOGICAL(from), len, sizeof(int));
+				Matrix_memcpy(LOGICAL(x), LOGICAL(from), mn, sizeof(int));
 				break;
 			case INTSXP:
-				Matrix_memcpy(INTEGER(x), INTEGER(from), len, sizeof(int));
+				Matrix_memcpy(INTEGER(x), INTEGER(from), mn, sizeof(int));
 				break;
 			case REALSXP:
-				Matrix_memcpy(REAL(x), REAL(from), len, sizeof(double));
+				Matrix_memcpy(REAL(x), REAL(from), mn, sizeof(double));
 				break;
 			case CPLXSXP:
-				Matrix_memcpy(COMPLEX(x), COMPLEX(from), len, sizeof(Rcomplex));
+				Matrix_memcpy(COMPLEX(x), COMPLEX(from), mn, sizeof(Rcomplex));
 				break;
 			default:
 				break;
 			}
+
 		}
 
 	} else {
 
-		PROTECT(x = allocVector(tt, PACKED_LENGTH(n)));
+		PROTECT(x = allocVector(tt, (mn - n) / 2 + n));
 		++nprotect;
 		switch (tt) {
 		case LGLSXP:
@@ -152,7 +445,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	return to;
 }
 
-/* as(<matrix|vector>, ".(ge|sy|sp|tr|tp)Matrix") */
+/* as(<matrix>, ".(ge|sy|sp|tr|tp)Matrix") */
 SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
                        SEXP trans)
 {
@@ -163,7 +456,7 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	case CPLXSXP:
 		break;
 	default:
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_TYPE(from, __func__);
 		break;
 	}
 
@@ -718,6 +1011,138 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 	return index_as_dense(from, valid[ivalid], kind_);
 }
 
+SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
+                      int m, int n, int byrow, SEXP dimnames)
+{
+	return R_NilValue; /* TODO */
+}
+
+SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+                        SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
+{
+	static const char *valid[] = { VALID_NONVIRTUAL_VECTOR, "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+
+	const char *zzz;
+	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
+	    (class = STRING_ELT(class, 0)) == NA_STRING ||
+	    (zzz = CHAR(class))[0] == '\0' ||
+	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
+	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
+		error(_("invalid '%s' to '%s'"), "class", __func__);
+
+	char ul = 'U', di = 'N';
+	if (zzz[1] != 'g') {
+		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
+		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
+		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+			error(_("invalid '%s' to '%s'"), "uplo", __func__);
+		if (zzz[1] == 't') {
+			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+				error(_("invalid '%s' to '%s'"), "diag", __func__);
+		}
+	}
+
+	int m_ = -1;
+	if (m != R_NilValue) {
+		if (TYPEOF(m) == INTSXP) {
+			int tmp;
+			if (LENGTH(m) >= 1 && (tmp = INTEGER(m)[0]) != NA_INTEGER &&
+			    tmp >= 0)
+				m_ = tmp;
+		} else if (TYPEOF(m) == REALSXP) {
+			double tmp;
+			if (LENGTH(m) >= 1 && !ISNAN(tmp = REAL(m)[0]) &&
+			    tmp >= 0.0) {
+				if (trunc(tmp) > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				m_ = (int) tmp;
+			}
+		}
+		if (m_ < 0)
+			error(_("invalid '%s' to '%s'"), "m", __func__);
+	}
+
+	int n_ = -1;
+	if (n != R_NilValue) {
+		if (TYPEOF(n) == INTSXP) {
+			int tmp;
+			if (LENGTH(n) >= 1 && (tmp = INTEGER(n)[0]) != NA_INTEGER &&
+			    tmp >= 0)
+				n_ = tmp;
+		} else if (TYPEOF(n) == REALSXP) {
+			double tmp;
+			if (LENGTH(n) >= 1 && !ISNAN(tmp = REAL(n)[0]) &&
+			    tmp >= 0.0) {
+				if (trunc(tmp) > INT_MAX)
+					error(_("dimensions cannot exceed %s"), "2^31-1");
+				n_ = (int) tmp;
+			}
+		}
+		if (n_ < 0)
+			error(_("invalid '%s' to '%s'"), "n", __func__);
+	}
+
+	int byrow_;
+	if (TYPEOF(byrow) != LGLSXP || LENGTH(byrow) < 1 ||
+	    (byrow_ = LOGICAL(byrow)[0]) == NA_LOGICAL)
+		error(_("invalid '%s' to '%s'"), "byrow", __func__);
+
+	if (dimnames != R_NilValue)
+		if (TYPEOF(dimnames) != VECSXP || LENGTH(dimnames) != 2)
+			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
+
+	SEXP tmp = GET_SLOT(from, Matrix_lengthSym);
+	Matrix_int_fast64_t vlen_ = (Matrix_int_fast64_t)
+		((TYPEOF(tmp) == INTSXP) ? INTEGER(tmp)[0] : REAL(tmp)[0]);
+	if (zzz[1] != 'g' && (m_ < 0) != (n_ < 0)) {
+		if (m_ < 0)
+			m_ = n_;
+		else
+			n_ = m_;
+	} else if (m_ < 0 && n_ < 0) {
+		if (vlen_ > INT_MAX)
+			error(_("dimensions cannot exceed %s"), "2^31-1");
+		m_ = (int) vlen_;
+		n_ = 1;
+	} else if (m_ < 0) {
+		if (vlen_ > (Matrix_int_fast64_t) INT_MAX * n_) {
+			if (n_ == 0)
+				error(_("nonempty vector supplied for empty matrix"));
+			else
+				error(_("dimensions cannot exceed %s"), "2^31-1");
+		}
+		m_ = (n_ == 0) ? 0 : vlen_ / n_ + (vlen_ % n_ != 0);
+	} else if (n_ < 0) {
+		if (vlen_ > (Matrix_int_fast64_t) m_ * INT_MAX) {
+			if (m_ == 0)
+				error(_("nonempty vector supplied for empty matrix"));
+			else
+				error(_("dimensions cannot exceed %s"), "2^31-1");
+		}
+		n_ = (m_ == 0) ? 0 : vlen_ / m_ + (vlen_ % m_ != 0);
+	}
+
+	Matrix_int_fast64_t mlen_ = (Matrix_int_fast64_t) m_ * n_;
+	if (vlen_ <= 1)
+		/* do nothing */ ;
+	else if (mlen_ == 0)
+		warning(_("nonempty vector supplied for empty matrix"));
+	else if (vlen_ > mlen_)
+		warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
+		        (long long) vlen_, m_, n_);
+	else if (mlen_ % vlen_ != 0)
+		warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
+		        m_, n_, (long long) vlen_);
+
+	return
+	vector_as_sparse(from, zzz, ul, di, m_, n_, byrow_, dimnames);
+}
+
 SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
                       int trans)
 {
@@ -739,7 +1164,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	return from;
 }
 
-/* as(<matrix|vector>, ".[gst][CRT]Matrix") */
+/* as(<matrix>, ".[gst][CRT]Matrix") */
 SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
                         SEXP trans)
 {
@@ -750,7 +1175,7 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	case CPLXSXP:
 		break;
 	default:
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_TYPE(from, __func__);
 		break;
 	}
 
