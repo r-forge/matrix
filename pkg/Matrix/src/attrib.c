@@ -227,7 +227,7 @@ SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
 	if (TYPEOF(nm) != STRSXP || LENGTH(nm) < 1 ||
 	    (nm = STRING_ELT(nm, 0)) == NA_STRING)
 		error(_("invalid factor name"));
-	else if (HAS_SLOT(obj, Matrix_factorsSym))
+	else if (TYPEOF(getAttrib(obj, Matrix_factorsSym)) == VECSXP)
 		set_factor(obj, CHAR(nm), val);
 	else if (asLogical(warn) != 0)
 		warning(_("attempt to set factor on %s without '%s' slot"),

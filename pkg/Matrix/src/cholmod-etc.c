@@ -9,11 +9,11 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 {
 	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
 	memset(L, 0, sizeof(cholmod_factor));
-	values = values && HAS_SLOT(obj, Matrix_xSym);
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		type = PROTECT(GET_SLOT(obj, install("type"))),
 		perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
-		colcount = PROTECT(GET_SLOT(obj, install("colcount")));
+		colcount = PROTECT(GET_SLOT(obj, install("colcount"))),
+		x = PROTECT(getAttrib(obj, Matrix_xSym));
 	L->n = INTEGER(dim)[0];
 	L->minor = L->n; /* FIXME: could be wrong for obj <- new(...) */
 	L->ordering = INTEGER(type)[0];
@@ -50,7 +50,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 	} else {
 		L->is_ll = INTEGER(type)[1];
 		L->is_monotonic = INTEGER(type)[3];
-		if (values) {
+		if (values && x != R_NilValue) {
 			SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 				i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
 				nz = PROTECT(GET_SLOT(obj, install("nz"))),
@@ -67,8 +67,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 	}
 	L->itype = CHOLMOD_INT;
 	L->dtype = CHOLMOD_DOUBLE;
-	if (values) {
-		SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (values && x != R_NilValue) {
 		switch (TYPEOF(x)) {
 		case CPLXSXP:
 			L->x = COMPLEX(x);
@@ -83,7 +82,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 			break;
 		}
 	}
-	UNPROTECT(4);
+	UNPROTECT(5);
 	return L;
 }
 
@@ -93,7 +92,8 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	memset(A, 0, sizeof(cholmod_sparse));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(getAttrib(obj, Matrix_xSym));
 	A->nrow = INTEGER(dim)[0];
 	A->ncol = INTEGER(dim)[1];
 	A->p = INTEGER(p);
@@ -105,8 +105,7 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	A->dtype = CHOLMOD_DOUBLE;
 	A->sorted = 1;
 	A->packed = 1;
-	if (values && HAS_SLOT(obj, Matrix_xSym)) {
-		SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (values && x != R_NilValue) {
 		switch (TYPEOF(x)) {
 		case CPLXSXP:
 			A->x = COMPLEX(x);
@@ -121,7 +120,7 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 			break;
 		}
 	}
-	UNPROTECT(3);
+	UNPROTECT(4);
 	return A;
 }
 

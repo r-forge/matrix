@@ -9,7 +9,8 @@ Matrix_cs *M2CXS(SEXP obj, int values)
 	memset(A, 0, sizeof(Matrix_cs));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(getAttrib(obj, Matrix_xSym));
 	A->m = INTEGER(dim)[0];
 	A->n = INTEGER(dim)[1];
 	A->p = INTEGER(p);
@@ -17,8 +18,7 @@ Matrix_cs *M2CXS(SEXP obj, int values)
 	A->nzmax = LENGTH(i);
 	A->nz = -1;
 	A->xtype = MCS_PATTERN;
-	if (values && HAS_SLOT(obj, Matrix_xSym)) {
-		SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (values && x != R_NilValue) {
 		switch (TYPEOF(x)) {
 		case CPLXSXP:
 			A->xtype = MCS_COMPLEX;
@@ -33,7 +33,7 @@ Matrix_cs *M2CXS(SEXP obj, int values)
 			break;
 		}
 	}
-	UNPROTECT(3);
+	UNPROTECT(4);
 	return A;
 }
 

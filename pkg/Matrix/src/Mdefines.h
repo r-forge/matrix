@@ -84,7 +84,6 @@ do { \
 # define GET_SLOT(x, what)        R_do_slot(x, what)
 # define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
 #endif
-#define HAS_SLOT(obj, name)       R_has_slot(obj, name)
 
 /* Often used symbols, defined in ./init.c */
 extern
