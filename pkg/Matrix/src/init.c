@@ -235,6 +235,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(v2spV, 1),
 	CALLDEF(CR2spV, 1),
 
+	CALLDEF(R_vector_as_dense, 8),
 	CALLDEF(R_matrix_as_dense, 5),
 	CALLDEF(R_sparse_as_dense, 2),
 	CALLDEF(R_diagonal_as_dense, 5),
