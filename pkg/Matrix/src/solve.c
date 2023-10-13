@@ -270,18 +270,8 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 	}
 
 	if (m > 0) {
-		SEXP rx;
-		int info, nprotect = 1;
-
-		SEXP aperm = NULL;
-		if (HAS_SLOT(a, Matrix_permSym)) {
-			SEXP tmp = GET_SLOT(a, Matrix_permSym);
-			if (LENGTH(tmp) > 0) {
-				PROTECT(aperm = tmp);
-				++nprotect;
-			}
-		} /* else 'a' is a dtrMatrix or dtpMatrix, as in chol2inv */
-
+		SEXP rx, aperm = PROTECT(getAttrib(a, Matrix_permSym));
+		int info, pivoted = TYPEOF(aperm) == INTSXP && LENGTH(aperm) > 0;
 		if (isNull(b)) {
 			rx = duplicate(ax);
 			PROTECT(rx);
@@ -290,12 +280,12 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 			if (unpacked) {
 				F77_CALL(zpotri)(&aul, &m, COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(zpotri, info, 2, L);
-				if (aperm)
+				if (pivoted)
 					zsymperm2(COMPLEX(rx), n, aul, INTEGER(aperm), 1, 1);
 			} else {
 				F77_CALL(zpptri)(&aul, &m, COMPLEX(rx),     &info FCONE);
 				ERROR_LAPACK_2(zpptri, info, 2, L);
-				if (aperm) {
+				if (pivoted) {
 					/* FIXME: zsymperm2 supporting packed matrices */
 					double *work;
 					size_t lwork = (size_t) n * n;
@@ -311,12 +301,12 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 			if (unpacked) {
 				F77_CALL(dpotri)(&aul, &m,    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
-				if (aperm)
+				if (pivoted)
 					dsymperm2(   REAL(rx), n, aul, INTEGER(aperm), 1, 1);
 			} else {
 				F77_CALL(dpptri)(&aul, &m,    REAL(rx),     &info FCONE);
 				ERROR_LAPACK_2(dpptri, info, 2, L);
-				if (aperm) {
+				if (pivoted) {
 					/* FIXME: dsymperm2 supporting packed matrices */
 					double *work;
 					size_t lwork = (size_t) n * n;
@@ -337,7 +327,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 			PROTECT(rx);
 #ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (aperm)
+			if (pivoted)
 				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 0);
 			if (unpacked) {
 				F77_CALL(zpotrs)(&aul, &m, &n, COMPLEX(ax), &m,
@@ -348,11 +338,11 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 				                 COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(zpptrs, info);
 			}
-			if (aperm)
+			if (pivoted)
 				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 1);
 			} else {
 #endif
-			if (aperm)
+			if (pivoted)
 				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 0);
 			if (unpacked) {
 				F77_CALL(dpotrs)(&aul, &m, &n,    REAL(ax), &m,
@@ -363,14 +353,14 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dpptrs, info);
 			}
-			if (aperm)
+			if (pivoted)
 				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 1);
 #ifdef MATRIX_ENABLE_ZMATRIX
 			}
 #endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
-		UNPROTECT(nprotect); /* rx, aperm */
+		UNPROTECT(2); /* rx, aperm */
 	}
 
 	SOLVE_FINISH;

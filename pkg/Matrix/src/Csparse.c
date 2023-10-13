@@ -76,11 +76,9 @@ SEXP tCsparse_diag(SEXP obj, SEXP op)
 	    (ivalid = strmatch(CHAR(op), valid)) < 0)
 		error(_("invalid '%s' to '%s'"), "op", __func__);
 
-	char ul = 'L';
-	if (HAS_SLOT(obj, Matrix_uploSym)) {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
-	}
+	SEXP uplo = getAttrib(obj, Matrix_uploSym);
+	char ul = (TYPEOF(uplo) == STRSXP && LENGTH(uplo) > 0)
+		? *CHAR(STRING_ELT(uplo, 0)) : 'L';
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
 	int *pp = INTEGER(p) + 1, j, k = 0, kend, n = (int) (XLENGTH(p) - 1),
@@ -170,11 +168,12 @@ SEXP tCsparse_diag(SEXP obj, SEXP op)
 	case 6: /*     diag */
 	case 7: /* diagBack */
 	{
+		
 		int *pperm = NULL;
-		if (ivalid == 7 && HAS_SLOT(obj, Matrix_permSym)) {
-			SEXP perm = GET_SLOT(obj, Matrix_permSym);
-			if (LENGTH(perm) == n)
-				pperm = INTEGER(perm); /* 0-based by assumption */
+		if (ivalid == 7) {
+			SEXP perm = getAttrib(obj, Matrix_permSym);
+			if (TYPEOF(perm) == INTSXP && LENGTH(perm) == n)
+				pperm = INTEGER(perm);
 		}
 		for (j = 0; j < n; ++j) {
 			kend = pp[j];
