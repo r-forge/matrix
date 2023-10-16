@@ -160,7 +160,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 	return to;
 }
 
-SEXP R_vector_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
                        SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
 {
 	switch (TYPEOF(from)) {
@@ -174,28 +174,29 @@ SEXP R_vector_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 		break;
 	}
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz              )[1] == '\0' ||
-	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
-	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
-	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("invalid '%s' to '%s'"), "class", __func__);
+	const char *zzz_;
+	if (TYPEOF(zzz) != STRSXP || LENGTH(zzz) < 1 ||
+	    (zzz = STRING_ELT(zzz, 0)) == NA_STRING ||
+	    (zzz_ = CHAR(zzz))[0] == '\0' ||
+	    (zzz_            )[1] == '\0' ||
+	    !((zzz_[1] == 'g' && (zzz_[2] == 'e'                  )) ||
+	      (zzz_[1] == 's' && (zzz_[2] == 'y' || zzz_[2] == 'p')) ||
+	      (zzz_[1] == 't' && (zzz_[2] == 'r' || zzz_[2] == 'p'))))
+		error(_("second argument of '%s' does not specify a subclass of %s"),
+		      __func__, "denseMatrix");
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
-		if (zzz[1] == 't') {
-			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
-			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
-			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s'"), "diag", __func__);
-		}
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz[1] == 't') {
+		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
 	int m_ = -1;
@@ -241,7 +242,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	int byrow_;
 	if (TYPEOF(byrow) != LGLSXP || LENGTH(byrow) < 1 ||
 	    (byrow_ = LOGICAL(byrow)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s'"), "byrow", __func__);
+		error(_("'%s' must be %s or %s"), "byrow", "TRUE", "FALSE");
 
 	if (dimnames != R_NilValue)
 		if (TYPEOF(dimnames) != VECSXP || LENGTH(dimnames) != 2)
@@ -469,26 +470,27 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
 	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
 	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("invalid '%s' to '%s'"), "class", __func__);
+		error(_("second argument of '%s' does not specify a subclass of %s"),
+		      __func__, "denseMatrix");
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
-		if (zzz[1] == 't') {
-			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
-			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
-			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s'"), "diag", __func__);
-		}
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz[1] == 't') {
+		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
 	int trans_;
 	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s'"), "trans", __func__);
+		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
 
 	return matrix_as_dense(from, zzz, ul, di, trans_, 1);
 }
@@ -785,7 +787,7 @@ SEXP R_sparse_as_dense(SEXP from, SEXP packed)
 	int packed_;
 	if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 	    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s'"), "packed", __func__);
+		error(_("'%s' must be %s or %s"), "packed", "TRUE", "FALSE");
 
 	return sparse_as_dense(from, valid[ivalid], packed_);
 }
@@ -909,7 +911,7 @@ SEXP R_diagonal_as_dense(SEXP from,
 	if (shape_ != 'g') {
 		if (TYPEOF(packed) != LGLSXP || LENGTH(packed) < 1 ||
 		    (packed_ = LOGICAL(packed)[0]) == NA_LOGICAL)
-			error(_("invalid '%s' to '%s'"), "packed", __func__);
+			error(_("'%s' must be %s or %s"), "packed", "TRUE", "FALSE");
 	}
 
 	char ul = 'U';
@@ -917,7 +919,7 @@ SEXP R_diagonal_as_dense(SEXP from,
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
 
 	return diagonal_as_dense(from, valid[ivalid], kind_, shape_, packed_, ul);
@@ -1459,20 +1461,21 @@ SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    (zzz = CHAR(class))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("invalid '%s' to '%s'"), "class", __func__);
+		error(_("second argument of '%s' does not specify a subclass of %s"),
+		      __func__, "[CRT]sparseMatrix");
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
-		if (zzz[1] == 't') {
-			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
-			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
-			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s'"), "diag", __func__);
-		}
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz[1] == 't') {
+		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
 	int m_ = -1;
@@ -1518,7 +1521,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	int byrow_;
 	if (TYPEOF(byrow) != LGLSXP || LENGTH(byrow) < 1 ||
 	    (byrow_ = LOGICAL(byrow)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s'"), "byrow", __func__);
+		error(_("'%s' must be %s or %s"), "byrow", "TRUE", "FALSE");
 
 	if (dimnames != R_NilValue)
 		if (TYPEOF(dimnames) != VECSXP || LENGTH(dimnames) != 2)
@@ -1613,26 +1616,27 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    (zzz = CHAR(class))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("invalid '%s' to '%s'"), "class", __func__);
+		error(_("second argument of '%s' does not specify a subclass of %s"),
+		      __func__, "[CRT]sparseMatrix");
 
 	char ul = 'U', di = 'N';
 	if (zzz[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
-		if (zzz[1] == 't') {
-			if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
-			    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
-			    ((di = *CHAR(diag)) != 'N' && di != 'U'))
-				error(_("invalid '%s' to '%s'"), "diag", __func__);
-		}
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz[1] == 't') {
+		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
+		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
 	int trans_;
 	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("invalid '%s' to '%s'"), "trans", __func__);
+		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
 
 	return matrix_as_sparse(from, zzz, ul, di, trans_);
 }
@@ -2265,7 +2269,7 @@ SEXP R_diagonal_as_sparse(SEXP from,
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
 
 	return diagonal_as_sparse(from, valid[ivalid], kind_, shape_, repr_, ul);
@@ -3334,11 +3338,13 @@ SEXP R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
-			error(_("invalid '%s' to '%s'"), "uplo", __func__);
+			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+		if (diag != R_NilValue) {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
-		    ((diag = STRING_ELT(diag, 0)) != NA_STRING &&
-		     (di = *CHAR(diag)) != '\0' && di != 'N' && di != 'U'))
-			error(_("invalid '%s' to '%s'"), "diag", __func__);
+		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
+		    ((di = *CHAR(diag)) != 'N' && ul != 'U'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
+		}
 	}
 
 	return dense_as_packed(from, valid[ivalid], ul, di);
@@ -4318,7 +4324,7 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
 	if (TYPEOF(sparse) != LGLSXP || LENGTH(sparse) < 1)
-		error(_("invalid '%s' to '%s'"), "sparse", __func__);
+		error(_("'%s' must be %s or %s or %s"), "sparse", "TRUE", "FALSE", "NA");
 	int sparse_ = LOGICAL(sparse)[0];
 
 	switch (cl[2]) {
