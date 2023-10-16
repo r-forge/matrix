@@ -155,7 +155,7 @@ function(x, ...) .Call(R_dense_as_packed, x, NULL, NULL)
 .uM.pack.ge <-
 function(x, symmetric = NA, upperTri = NA, ...) {
     if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...))
-        .Call(R_dense_as_packed, x, "U", "")
+        .Call(R_dense_as_packed, x, "U", NULL)
     else if((sna || !symmetric) &&
             (it <- isTriangular(x, upper = upperTri))) {
         uplo <-
