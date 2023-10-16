@@ -8,26 +8,26 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
+	cl[0] = (zzz[0] == '.')
+		? typeToKind(tf)
+		: ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
 #ifndef MATRIX_ENABLE_IMATRIX
 	if (cl[0] == 'i')
 		cl[0] = 'd';
 #endif
+	SEXPTYPE tt = kindToType(cl[0]);
+	PROTECT(from = coerceVector(from, tt));
 
 	if (cl[1] != 'g' && m != n)
 		error(_("attempt to construct non-square %s"),
 		      (cl[1] == 's') ? "symmetricMatrix" : "triangularMatrix");
 
-	Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n;
-	if (((cl[2] != 'p') ? mn64 : (mn64 - n) / 2 + n) > R_XLEN_T_MAX)
+	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n;
+	if (((cl[2] != 'p') ? mn : (mn + n) / 2) > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	R_xlen_t mn = (R_xlen_t) mn64;
-
-	SEXPTYPE tt = kindToType(cl[0]);
-	PROTECT(from = coerceVector(from, tt));
 
 	SEXP to = PROTECT(newObject(cl));
 
@@ -53,7 +53,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 		UNPROTECT(1);
 	}
 
-	SEXP x = PROTECT(allocVector(tt, (cl[2] != 'p') ? mn : (mn - n) / 2 + n));
+	SEXP x = PROTECT(allocVector(tt, (cl[2] != 'p') ? mn : (mn + n) / 2));
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
 
@@ -297,14 +297,15 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
-	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
+	cl[0] = (zzz[0] == '.')
+		? typeToKind(tf)
+		: ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
 #ifndef MATRIX_ENABLE_IMATRIX
 	if (cl[0] == 'i')
 		cl[0] = 'd';
 #endif
-
 	SEXPTYPE tt = kindToType(cl[0]);
 	PROTECT(from = coerceVector(from, tt));
 
@@ -1014,7 +1015,434 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
                       int m, int n, int byrow, SEXP dimnames)
 {
-	return R_NilValue; /* TODO */
+	SEXP length0 = GET_SLOT(from, Matrix_lengthSym);
+	Matrix_int_fast64_t r = (Matrix_int_fast64_t)
+		((TYPEOF(length0) == INTSXP) ? INTEGER(length0)[0] : REAL(length0)[0]);
+
+	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
+		x0 = getAttrib(from, Matrix_xSym);
+
+	SEXPTYPE tf = TYPEOF(x0);
+	char cl[] = "...Matrix";
+	cl[0] = (zzz[0] == '.')
+		? ((x0 == R_NilValue) ? 'n' : typeToKind(tf))
+		: ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
+	cl[1] = zzz[1];
+	cl[2] = (byrow) ? 'R' : 'C';
+#ifndef MATRIX_ENABLE_IMATRIX
+	if (cl[0] == 'i')
+		cl[0] = 'd';
+#endif
+	SEXPTYPE tt = kindToType(cl[0]);
+	if (x0 != R_NilValue) {
+		PROTECT(x0);
+		x0 = coerceVector(x0, tt);
+		UNPROTECT(1); /* x0 */
+	}
+	PROTECT(x0);
+
+	if (cl[1] != 'g' && m != n)
+		error(_("attempt to construct non-square %s"),
+		      (cl[1] == 's') ? "symmetricMatrix" : "triangularMatrix");
+
+	SEXP to = PROTECT(newObject(cl));
+
+	SEXP dim = GET_SLOT(to, Matrix_DimSym);
+	int *pdim = INTEGER(dim);
+	pdim[0] = m;
+	pdim[1] = n;
+
+	if (cl[1] != 's')
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	else
+		set_symmetrized_DimNames(to, dimnames, -1);
+
+	if (cl[1] != 'g' && ul != 'U') {
+		SEXP uplo = PROTECT(mkString("L"));
+		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
+
+	if (cl[1] == 't' && di != 'N') {
+		SEXP diag = PROTECT(mkString("U"));
+		SET_SLOT(to, Matrix_diagSym, diag);
+		UNPROTECT(1); /* diag */
+	}
+
+	Matrix_int_fast64_t pos, mn = (Matrix_int_fast64_t) m * n, nnz1 = 0;
+	R_xlen_t k = 0, nnz0 = XLENGTH(i0);
+
+#define VAS_SUBCASES(...) \
+	do { \
+		switch (TYPEOF(i0)) { \
+		case INTSXP: \
+		{ \
+			int *pi0 = INTEGER(i0); \
+			VAS_SUBSUBCASES(__VA_ARGS__); \
+			break; \
+		} \
+		case REALSXP: \
+		{ \
+			double *pi0 = REAL(i0); \
+			VAS_SUBSUBCASES(__VA_ARGS__); \
+			break; \
+		} \
+		default: \
+			break; \
+		} \
+	} while (0)
+
+#define VAS_SUBSUBCASES() \
+	do { \
+		if (nnz0 == 0) \
+			/* do nothing */ ; \
+		else if (cl[1] == 'g') { \
+			if (r == 0) \
+				nnz1 = mn; \
+			else if (r == mn) \
+				nnz1 = nnz0; \
+			else if (r > mn) \
+				while (k < nnz0 && (Matrix_int_fast64_t) pi0[k++] <= mn) \
+					nnz1++; \
+			else { \
+				Matrix_int_fast64_t mn_mod_r = mn % r; \
+				nnz1 = nnz0 * (mn / r); \
+				while (k < nnz0 && (Matrix_int_fast64_t) pi0[k++] <= mn_mod_r) \
+					nnz1++; \
+			} \
+		} \
+		else if (cl[1] == 's' || di == 'N') { \
+			if (r == 0) \
+				nnz1 = (mn + n) / 2; \
+			else if (r >= mn) { \
+				if ((ul == 'U') == !byrow) { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n <= pos / n) \
+						++nnz1; \
+				} else { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n >= pos / n) \
+						++nnz1; \
+				} \
+			} \
+			else { \
+				Matrix_int_fast64_t a = 0; \
+				if ((ul == 'U') == !byrow) { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
+						if (pos % n <= pos / n) \
+							++nnz1; \
+					a += r; \
+				} \
+				} else { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
+						if (pos % n >= pos / n) \
+							++nnz1; \
+					a += r; \
+				} \
+				} \
+			} \
+		} \
+		else { \
+			if (r == 0) \
+				nnz1 = (mn - n) / 2; \
+			else if (r >= mn) { \
+				if ((ul == 'U') == !byrow) { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n < pos / n) \
+						++nnz1; \
+				} else { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n > pos / n) \
+						++nnz1; \
+				} \
+			} \
+			else { \
+				Matrix_int_fast64_t a = 0; \
+				if ((ul == 'U') == !byrow) { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
+						if (pos % n < pos / n) \
+							++nnz1; \
+					a += r; \
+				} \
+				} else { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
+						if (pos % n > pos / n) \
+							++nnz1; \
+					a += r; \
+				} \
+				} \
+			} \
+		} \
+	} while (0)
+
+	VAS_SUBCASES();
+
+#undef VAS_SUBSUBCASES
+
+	if (nnz1 > INT_MAX)
+		error(_("attempt to construct %s with more than %s nonzero entries"),
+		      "sparseMatrix", "2^31-1");
+
+	int i_, j_, m_ = (byrow) ? n : m, n_ = (byrow) ? m : n;
+	SEXP iSym = (byrow) ? Matrix_jSym : Matrix_iSym,
+		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n_ + 1)),
+		i1 = PROTECT(allocVector(INTSXP, nnz1));
+	SET_SLOT(to, Matrix_pSym, p1);
+	SET_SLOT(to,        iSym, i1);
+	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1);
+	Matrix_memset(pp1 - 1, 0, (R_xlen_t) n + 1, sizeof(int));
+	k = 0;
+
+#define VAS_SUBSUBCASES(_MASK0_, _MASK1_, _REPLACE_, _CTYPE_, _PTR_, _ONE_, _NA_) \
+	do { \
+		_MASK0_(_CTYPE_ *px0 = _PTR_(x0)); \
+		_MASK1_(_CTYPE_ *px1 = _PTR_(x1)); \
+		if (nnz1 == 0) \
+			/* do nothing */ ; \
+		else if (cl[1] == 'g') { \
+			if (r == 0) { \
+				for (j_ = 0; j_ < n_; ++j_) { \
+					pp1[j_] = m; \
+					for (i_ = 0; i_ < m_; ++i_) { \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _NA_); \
+					} \
+				} \
+			} \
+			else if (r >= mn) { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+					++pp1[pos / m_]; \
+					*(pi1++) = pos % m_; \
+					_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					++k; \
+				} \
+			} \
+			else { \
+				Matrix_int_fast64_t a = 0; \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
+						++pp1[pos / m_]; \
+						*(pi1++) = pos % m_; \
+						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						++k; \
+					} \
+					a += r; \
+				} \
+			} \
+		} \
+		else if (cl[1] == 's' || di == 'N') { \
+			if (r == 0) { \
+				if ((ul == 'U') == !byrow) { \
+				for (j_ = 0; j_ < n_; ++j_) { \
+					pp1[j_] = j_ + 1; \
+					for (i_ = 0; i_ <= j_; ++i_) { \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _NA_); \
+					} \
+				} \
+				} else { \
+				for (j_ = 0; j_ < n_; ++j_) { \
+					pp1[j_] = n_ - j_; \
+					for (i_ = j_; i_ < n_; ++i_) { \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _NA_); \
+					} \
+				} \
+				} \
+			} \
+			else if (r >= mn) { \
+				if ((ul == 'U') == !byrow) { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = pos % n_) <= (j_ = pos / n_)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					} \
+					++k; \
+				} \
+				} else { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = pos % n_) >= (j_ = pos / n_)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					} \
+					++k; \
+				} \
+				} \
+			} \
+			else { \
+				Matrix_int_fast64_t a = 0; \
+				if ((ul == 'U') == !byrow) { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
+						if ((i_ = pos % n) <= (j_ = pos / n)) { \
+							++pp1[j_]; \
+							*(pi1++) = i_; \
+							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						} \
+						++k; \
+					} \
+					a += r; \
+				} \
+				} else { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
+						if ((i_ = pos % n) >= (j_ = pos / n)) { \
+							++pp1[j_]; \
+							*(pi1++) = i_; \
+							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						} \
+						++k; \
+					} \
+					a += r; \
+				} \
+				} \
+			} \
+		} \
+		else { \
+			if (r == 0) { \
+				if ((ul == 'U') == !byrow) { \
+				for (j_ = 0; j_ < n_; ++j_) { \
+					pp1[j_] = j_; \
+					for (i_ = 0; i_ < j_; ++i_) { \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _NA_); \
+					} \
+				} \
+				} else { \
+				for (j_ = 0; j_ < n_; ++j_) { \
+					pp1[j_] = n_ - j_ - 1; \
+					for (i_ = j_ + 1; i_ < n_; ++i_) { \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _NA_); \
+					} \
+				} \
+				} \
+			} \
+			else if (r >= mn) { \
+				if ((ul == 'U') == !byrow) { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = pos % n_) < (j_ = pos / n_)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					} \
+					++k; \
+				} \
+				} else { \
+				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = pos % n_) > (j_ = pos / n_)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					} \
+					++k; \
+				} \
+				} \
+			} \
+			else { \
+				Matrix_int_fast64_t a = 0; \
+				if ((ul == 'U') == !byrow) { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
+						if ((i_ = pos % n) < (j_ = pos / n)) { \
+							++pp1[j_]; \
+							*(pi1++) = i_; \
+							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						} \
+						++k; \
+					} \
+					a += r; \
+				} \
+				} else { \
+				while (a < mn) { \
+					k = 0; \
+					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
+						if ((i_ = pos % n) > (j_ = pos / n)) { \
+							++pp1[j_]; \
+							*(pi1++) = i_; \
+							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						} \
+						++k; \
+					} \
+					a += r; \
+				} \
+				} \
+			} \
+		} \
+	} while (0)
+
+	if (cl[0] == 'n')
+		VAS_SUBCASES(HIDE, HIDE, , , , , );
+	else {
+		SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz1));
+		switch (cl[0]) {
+		case 'l':
+			if (x0 == R_NilValue)
+			VAS_SUBCASES(HIDE, SHOW, SECONDOF, int, LOGICAL, 1, NA_LOGICAL);
+			else
+			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, int, LOGICAL, 1, NA_LOGICAL);
+			break;
+		case 'i':
+			if (x0 == R_NilValue)
+			VAS_SUBCASES(HIDE, SHOW, SECONDOF, int, INTEGER, 1, NA_INTEGER);
+			else
+			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, int, INTEGER, 1, NA_INTEGER);
+			break;
+		case 'd':
+			if (x0 == R_NilValue)
+			VAS_SUBCASES(HIDE, SHOW, SECONDOF, double, REAL, 1.0, NA_REAL);
+			else
+			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, double, REAL, 1.0, NA_REAL);
+			break;
+		case 'z':
+			if (x0 == R_NilValue)
+			VAS_SUBCASES(HIDE, SHOW, SECONDOF, Rcomplex, COMPLEX, Matrix_zone, Matrix_zna);
+			else
+			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, Rcomplex, COMPLEX, Matrix_zone, Matrix_zna);
+			break;
+		default:
+			break;
+		}
+		SET_SLOT(to, Matrix_xSym, x1);
+		UNPROTECT(1); /* x1 */
+	}
+
+#undef VAS_SUBCASES
+#undef VAS_SUBSUBCASES
+
+	for (j_ = 0; j_ < n_; ++j_)
+		pp1[j_] += pp1[j_ - 1];
+
+	switch (zzz[2]) {
+	case 'C':
+		to = sparse_as_Csparse(to, cl);
+		break;
+	case 'R':
+		to = sparse_as_Rsparse(to, cl);
+		break;
+	case 'T':
+		to = sparse_as_Tsparse(to, cl);
+		break;
+	default:
+		break;
+	}
+
+	UNPROTECT(5); /* i1, p1, to, x0, i0 */
+	return to;
 }
 
 SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
