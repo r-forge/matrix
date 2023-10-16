@@ -186,13 +186,13 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		      __func__, "denseMatrix");
 
 	char ul = 'U', di = 'N';
-	if (zzz[1] != 'g') {
+	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
-	if (zzz[1] == 't') {
+	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
@@ -249,7 +249,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
 
 	R_xlen_t vlen_ = XLENGTH(from);
-	if (zzz[1] != 'g' && (m_ < 0) != (n_ < 0)) {
+	if (zzz_[1] != 'g' && (m_ < 0) != (n_ < 0)) {
 		if (m_ < 0)
 			m_ = n_;
 		else
@@ -290,7 +290,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		        m_, n_, (long long) vlen_);
 
 	return
-	vector_as_dense(from, zzz, ul, di, m_, n_, byrow_, dimnames);
+	vector_as_dense(from, zzz_, ul, di, m_, n_, byrow_, dimnames);
 }
 
 SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
@@ -448,7 +448,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix>, ".(ge|sy|sp|tr|tp)Matrix") */
-SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+SEXP R_matrix_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
                        SEXP trans)
 {
 	switch (TYPEOF(from)) {
@@ -462,25 +462,25 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 		break;
 	}
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz              )[1] == '\0' ||
-	    !((zzz[1] == 'g' && (zzz[2] == 'e'                 )) ||
-	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
-	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
+	const char *zzz_;
+	if (TYPEOF(zzz) != STRSXP || LENGTH(zzz) < 1 ||
+	    (zzz = STRING_ELT(zzz, 0)) == NA_STRING ||
+	    (zzz_ = CHAR(zzz))[0] == '\0' ||
+	    (zzz_            )[1] == '\0' ||
+	    !((zzz_[1] == 'g' && (zzz_[2] == 'e'                  )) ||
+	      (zzz_[1] == 's' && (zzz_[2] == 'y' || zzz_[2] == 'p')) ||
+	      (zzz_[1] == 't' && (zzz_[2] == 'r' || zzz_[2] == 'p'))))
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "denseMatrix");
 
 	char ul = 'U', di = 'N';
-	if (zzz[1] != 'g') {
+	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
-	if (zzz[1] == 't') {
+	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
@@ -492,7 +492,7 @@ SEXP R_matrix_as_dense(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
 
-	return matrix_as_dense(from, zzz, ul, di, trans_, 1);
+	return matrix_as_dense(from, zzz_, ul, di, trans_, 1);
 }
 
 SEXP sparse_as_dense(SEXP from, const char *class, int packed)
@@ -1447,7 +1447,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	return to;
 }
 
-SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+SEXP R_vector_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
                         SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
 {
 	static const char *valid[] = { VALID_NONVIRTUAL_VECTOR, "" };
@@ -1455,23 +1455,23 @@ SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
-	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
+	const char *zzz_;
+	if (TYPEOF(zzz) != STRSXP || LENGTH(zzz) < 1 ||
+	    (zzz = STRING_ELT(zzz, 0)) == NA_STRING ||
+	    (zzz_ = CHAR(zzz))[0] == '\0' ||
+	    (zzz_[1] != 'g' && zzz_[1] != 's' && zzz_[1] != 't') ||
+	    (zzz_[2] != 'C' && zzz_[2] != 'R' && zzz_[2] != 'T'))
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
 	char ul = 'U', di = 'N';
-	if (zzz[1] != 'g') {
+	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
-	if (zzz[1] == 't') {
+	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
@@ -1530,7 +1530,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	SEXP tmp = GET_SLOT(from, Matrix_lengthSym);
 	Matrix_int_fast64_t vlen_ = (Matrix_int_fast64_t)
 		((TYPEOF(tmp) == INTSXP) ? INTEGER(tmp)[0] : REAL(tmp)[0]);
-	if (zzz[1] != 'g' && (m_ < 0) != (n_ < 0)) {
+	if (zzz_[1] != 'g' && (m_ < 0) != (n_ < 0)) {
 		if (m_ < 0)
 			m_ = n_;
 		else
@@ -1571,7 +1571,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 		        m_, n_, (long long) vlen_);
 
 	return
-	vector_as_sparse(from, zzz, ul, di, m_, n_, byrow_, dimnames);
+	vector_as_sparse(from, zzz_, ul, di, m_, n_, byrow_, dimnames);
 }
 
 SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
@@ -1596,7 +1596,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix>, ".[gst][CRT]Matrix") */
-SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
+SEXP R_matrix_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
                         SEXP trans)
 {
 	switch (TYPEOF(from)) {
@@ -1610,23 +1610,23 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 		break;
 	}
 
-	const char *zzz;
-	if (TYPEOF(class) != STRSXP || LENGTH(class) < 1 ||
-	    (class = STRING_ELT(class, 0)) == NA_STRING ||
-	    (zzz = CHAR(class))[0] == '\0' ||
-	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 't') ||
-	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
+	const char *zzz_;
+	if (TYPEOF(zzz) != STRSXP || LENGTH(zzz) < 1 ||
+	    (zzz = STRING_ELT(zzz, 0)) == NA_STRING ||
+	    (zzz_ = CHAR(zzz))[0] == '\0' ||
+	    (zzz_[1] != 'g' && zzz_[1] != 's' && zzz_[1] != 't') ||
+	    (zzz_[2] != 'C' && zzz_[2] != 'R' && zzz_[2] != 'T'))
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
 	char ul = 'U', di = 'N';
-	if (zzz[1] != 'g') {
+	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
 	}
-	if (zzz[1] == 't') {
+	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
 		    (diag = STRING_ELT(diag, 0)) == NA_STRING ||
 		    ((di = *CHAR(diag)) != 'N' && di != 'U'))
@@ -1638,7 +1638,7 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP class, SEXP uplo, SEXP diag,
 	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
 
-	return matrix_as_sparse(from, zzz, ul, di, trans_);
+	return matrix_as_sparse(from, zzz_, ul, di, trans_);
 }
 
 SEXP dense_as_sparse(SEXP from, const char *class, char repr)
