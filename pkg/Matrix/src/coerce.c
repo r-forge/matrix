@@ -386,9 +386,11 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 
 	if (cl[2] != 'p') {
 
-		if (!new || !MAYBE_REFERENCED(from) || ATTRIB(from) == R_NilValue) {
+		if (new <= 0 || (new <= 1 && ATTRIB(from) == R_NilValue) ||
+		    !MAYBE_REFERENCED(from))
 
-			if (!MAYBE_REFERENCED(from) && ATTRIB(from) != R_NilValue) {
+			if (ATTRIB(from) != R_NilValue && new > 1) {
+				/* 'from' has attributes and no references : */ 
 				SET_ATTRIB(from, R_NilValue);
 				if (OBJECT(from))
 					SET_OBJECT(from, 0);
