@@ -266,8 +266,8 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_Matrix_as_kind, 3),
 	CALLDEF(R_Matrix_as_general, 2),
 
+	CALLDEF(R_Matrix_version, 0),
 	CALLDEF(R_cholmod_common_envini, 1),
-	CALLDEF(get_SuiteSparse_version, 0),
 
 	{NULL, NULL, 0}
 };

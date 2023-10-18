@@ -1,6 +1,22 @@
 #include "Mdefines.h"
 #include "utils-R.h"
 
+SEXP R_Matrix_version(void)
+{
+	SEXP ans, nms;
+	PROTECT(ans = allocVector(INTSXP, 3));
+	INTEGER(ans)[0] = MATRIX_PACKAGE_VERSION;
+	INTEGER(ans)[1] = MATRIX_ABI_VERSION;
+	INTEGER(ans)[2] = MATRIX_SUITESPARSE_VERSION;
+	PROTECT(nms = allocVector(STRSXP, 3));
+	SET_STRING_ELT(nms, 0, mkChar("Package"));
+	SET_STRING_ELT(nms, 1, mkChar("ABI"));
+	SET_STRING_ELT(nms, 2, mkChar("SuiteSparse"));
+	setAttrib(ans, R_NamesSymbol, nms);
+	UNPROTECT(2);
+	return ans;
+}
+
 SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
 {
 	SEXP r;

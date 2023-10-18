@@ -89,7 +89,8 @@
 %
 \alias{c.Matrix}
 %
-\alias{det} % for our copy of base::det
+\alias{Matrix.Version} % FIXME: belongs in non-existent Matrix-package.Rd
+\alias{det}            % FIXME: ditto
 %
 \description{
   The \code{Matrix} class is a class contained by all actual

@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-18 r4460)}{
+\section{Changes in version 1.6-2 (2023-10-18 r4462)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -19,6 +19,14 @@
   }
   \subsection{New Features}{
     \itemize{
+      \item New \R{} function \code{Matrix.Version}, taking no
+      arguments and returning \code{list(Package, ABI, SuiteSparse)}
+      giving the numeric versions of each.  ABI versioning is new:
+      the ABI version is 1 in this release and will be incremented
+      by 1 in each future release that changes the ABI.
+      Versions and their components are defined for packages with
+      \code{LinkingTo: Matrix}.  See \file{inst/include/Matrix/Matrix.h}.
+
       %% TODO {for 1.6-3}: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
       \item New nonvirtual class \code{ndiMatrix}, extending virtual
       classes \code{diagonalMatrix} and \code{nMatrix}, for nonzero

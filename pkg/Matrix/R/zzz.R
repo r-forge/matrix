@@ -1,3 +1,26 @@
+## ~~~~ VERSION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Matrix.Version <- function() {
+    n <- .Call(R_Matrix_version)
+    v <- .mapply(function(n, p, b, class) {
+                     r <- integer(p)
+                     while (p > 0L) {
+                         r[p] <- tmp <- n %% b
+                         n <- (n - tmp) %/% b
+                         p <- p - 1L
+                     }
+                     v <- list(r)
+                     class(v) <- c(class, "numeric_version")
+                     v
+                 },
+                 list(n = n, p = c(3L, 1L, 3L), b = c(256L, 10L, 256L),
+                      class = list("package_version", NULL, NULL)),
+                 NULL)
+    names(v) <- names(n)
+    v
+}
+
+
 ## ~~~~ PACKAGE ENVIRONMENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Recording default values of Matrix.* options
@@ -268,6 +291,13 @@ uniqTsparse <- function(x, class.x = class(x)) {
     .Deprecated(new = "asUniqueT", package = "Matrix")
     }
     asUniqueT(x, isT = extends(class.x, "TsparseMatrix"))
+}
+
+.SuiteSparse_version <- function() {
+    if(FALSE) {
+    .Deprecated(new = "Matrix.Version", package = "Matrix")
+    }
+    Matrix.version()[[3L]]
 }
 
 ## Utility for Matrix.DeprecatedCoerce(); see below
@@ -566,11 +596,3 @@ cBind <- function(..., deparse.level = 1)
     .Defunct(new = "cbind", package = "Matrix")
 rBind <- function(..., deparse.level = 1)
     .Defunct(msg = "rbind", package = "Matrix")
-
-
-## ~~~~ "MISCELLANEOUS" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.SuiteSparse_version <- function() {
-    v <- .Call(get_SuiteSparse_version)
-    package_version(list(major = v[1L], minor = paste(v[2:3], collapse = ".")))
-}

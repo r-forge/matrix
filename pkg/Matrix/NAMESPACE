@@ -49,7 +49,6 @@ export(.M2C,
        .M2tri,
        .M2unpacked,
        .M2v,
-       .SuiteSparse_version,
        .bdiag,
        .dense2sparse,
        .diag.dsC,
@@ -77,6 +76,7 @@ export(.M2C,
        Hilbert,
        KhatriRao,
        Matrix,
+       Matrix.Version,
        MatrixClass,
        T2graph,
        abIseq,
@@ -137,8 +137,9 @@ export(..2dge, .C2nC, .T2Cmat, .asmatrix, .dense2sy,
 export(cBind, rBind)
 
 ## Redundant now but not yet deprecated ...
-export(.CR2RC, .CR2T, .T2CR, .dense2g, .dense2kind, .dense2m, .dense2v,
-       .sparse2g, .sparse2kind, .sparse2m, .sparse2v, .tCR2RC, uniqTsparse)
+export(.CR2RC, .CR2T, .SuiteSparse_version, .T2CR, .dense2g, .dense2kind,
+       .dense2m, .dense2v, .sparse2g, .sparse2kind, .sparse2m, .sparse2v,
+       .tCR2RC, uniqTsparse)
 
 
 ## ---- S3 generic functions -------------------------------------------

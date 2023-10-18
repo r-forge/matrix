@@ -1,9 +1,23 @@
 #ifndef MATRIX_MDEFINES_H
 #define MATRIX_MDEFINES_H
 
-#define Matrix_Domain          "Matrix"
-#define Matrix_CallocThreshold    10000
-#define Matrix_ErrorBufferSize     4096
+/* (version)_{10} = (major minor patch)_{256} */
+#define MATRIX_PACKAGE_VERSION 67074
+#define MATRIX_PACKAGE_MAJOR 1
+#define MATRIX_PACKAGE_MINOR 6
+#define MATRIX_PACKAGE_PATCH 2
+
+#define MATRIX_ABI_VERSION 1
+
+/* (version)_{10} = (major minor patch)_{256} */
+#define MATRIX_SUITESPARSE_VERSION 330241
+#define MATRIX_SUITESPARSE_MAJOR 5
+#define MATRIX_SUITESPARSE_MINOR 10
+#define MATRIX_SUITESPARSE_PATCH 1
+
+#define Matrix_Domain "Matrix"
+#define Matrix_CallocThreshold 8192
+#define Matrix_ErrorBufferSize 4096
 
 /* NB: system headers should come before R headers */
 

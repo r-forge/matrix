@@ -990,10 +990,3 @@ void R_cholmod_common_envget(void) {
 
 	return;
 }
-
-SEXP get_SuiteSparse_version(void)
-{
-	SEXP ans = allocVector(INTSXP, 3);
-	SuiteSparse_version(INTEGER(ans));
-	return ans;
-}
