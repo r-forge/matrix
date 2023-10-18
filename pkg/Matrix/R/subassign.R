@@ -1330,7 +1330,7 @@ rm(.indMatrix.sub, .i, .j)
 ## ==== sparseVector ===================================================
 
 ## This is a simplified intI() -- for sparseVector indexing:
-intIv <- function(i, n, cl.i = getClass(class(i))) {
+intIv <- function(i, n, cl.i = getClassDef(class(i))) {
 ### Note: undesirable to use this for negative indices;
 ### ----  using seq_len(n) below means we are  NON-sparse ...
 ### Fixed, for "x[i] with negative i" at least.
