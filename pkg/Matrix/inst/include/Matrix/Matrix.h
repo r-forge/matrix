@@ -18,8 +18,6 @@
 #define R_MATRIX_SUITESPARSE_MINOR 10
 #define R_MATRIX_SUITESPARSE_PATCH 1
 
-#define 
-
 #include "cholmod.h"
 
 #ifndef R_MATRIX_NO_CHOLMOD_UTILS
