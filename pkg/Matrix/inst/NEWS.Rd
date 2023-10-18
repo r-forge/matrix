@@ -198,7 +198,7 @@
       library, the latter supporting numeric types but not complex ones.
 
       \item Some API declarations and macros not used by \emph{any}
-      (recursive) reverse \code{LinkingTo} are removed.
+      reverse \code{LinkingTo} are removed or remapped.
 
       \item API headers are now nested under \file{inst/include/Matrix/}
       for better namespacing.  Where possible, packages should start to
