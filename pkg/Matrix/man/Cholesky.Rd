@@ -378,5 +378,6 @@ str(e.ch.A5 <- expand2(ch.A5, LDL = TRUE), max.level = 2L)
 stopifnot(all.equal(A5, as(Reduce(`\%*\%`, e.ch.A5), "symmetricMatrix")))
 
 ## Version of the SuiteSparse library, which includes CHOLMOD
-Matrix.Version()$SuiteSparse
+Mv <- Matrix.Version()
+Mv[["SuiteSparse"]]
 }
