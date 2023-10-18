@@ -3,6 +3,8 @@
 
 #include <Rinternals.h>
 
+SEXP R_Matrix_version(void);
+
 SEXP R_index_triangle(SEXP, SEXP, SEXP, SEXP);
 SEXP R_index_diagonal(SEXP, SEXP, SEXP);
 

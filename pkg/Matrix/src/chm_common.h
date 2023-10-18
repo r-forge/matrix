@@ -26,6 +26,4 @@ SEXP R_cholmod_common_envini(SEXP);
 void R_cholmod_common_envset(void);
 void R_cholmod_common_envget(void);
 
-SEXP get_SuiteSparse_version(void);
-
 #endif /* MATRIX_CHM_COMMON_H */

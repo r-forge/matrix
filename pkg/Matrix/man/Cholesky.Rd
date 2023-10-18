@@ -22,8 +22,6 @@
 \alias{Cholesky,symmetricMatrix-method}
 \alias{Cholesky,triangularMatrix-method}
 %
-\alias{.SuiteSparse_version}
-%
 \description{
   Computes the pivoted Cholesky factorization of an
   \eqn{n \times n}{n-by-n} real, symmetric matrix \eqn{A},
@@ -380,5 +378,5 @@ str(e.ch.A5 <- expand2(ch.A5, LDL = TRUE), max.level = 2L)
 stopifnot(all.equal(A5, as(Reduce(`\%*\%`, e.ch.A5), "symmetricMatrix")))
 
 ## Version of the SuiteSparse library, which includes CHOLMOD
-.SuiteSparse_version()
+Matrix.Version()$SuiteSparse
 }
