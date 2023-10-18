@@ -53,6 +53,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 		UNPROTECT(1);
 	}
 
+	/* FIXME: add argument 'new' and conditionally avoid allocation */
 	SEXP x = PROTECT(allocVector(tt, (cl[2] != 'p') ? mn : (mn + n) / 2));
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
@@ -389,7 +390,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		if (new <= 0 || (new <= 1 && ATTRIB(from) == R_NilValue) ||
 		    !MAYBE_REFERENCED(from)) {
 
-			if (ATTRIB(from) != R_NilValue && new > 1) {
+			if (ATTRIB(from) != R_NilValue && new >= 1) {
 				/* 'from' has attributes and no references : */ 
 				SET_ATTRIB(from, R_NilValue);
 				if (OBJECT(from))
