@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-16 r4455)}{
+\section{Changes in version 1.6-2 (2023-10-18 r4458)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -171,6 +171,9 @@
 
       \item \code{expm(x)} failed for \code{x} of class \code{dtpMatrix}
       or \code{dspMatrix}, since \pkg{Matrix} version 1.6-1.
+
+      \item \code{.m2dense{x, ".ge")} allocated unnecessarily
+      for \code{x} without attributes.
     }
   }
   \subsection{Misc}{

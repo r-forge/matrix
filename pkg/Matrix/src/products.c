@@ -1298,9 +1298,9 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 
 	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(x = matrix_as_dense(x, ",ge", '\0', '\0', xtrans_, 1), xpid);
+		REPROTECT(x = matrix_as_dense(x, ",ge", '\0', '\0', xtrans_, 2), xpid);
 		else
-		REPROTECT(x = matrix_as_dense(x, "nge", '\0', '\0', xtrans_, 1), xpid);
+		REPROTECT(x = matrix_as_dense(x, "nge", '\0', '\0', xtrans_, 2), xpid);
 		if (v == 1) {
 			/* Vector: discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
@@ -1310,9 +1310,9 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 	}
 	if (TYPEOF(y) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(y = matrix_as_dense(y, ",ge", '\0', '\0', ytrans_, 1), ypid);
+		REPROTECT(y = matrix_as_dense(y, ",ge", '\0', '\0', ytrans_, 2), ypid);
 		else
-		REPROTECT(y = matrix_as_dense(y, "nge", '\0', '\0', ytrans_, 1), ypid);
+		REPROTECT(y = matrix_as_dense(y, "nge", '\0', '\0', ytrans_, 2), ypid);
 		if (v == 2) {
 			/* Vector: discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
