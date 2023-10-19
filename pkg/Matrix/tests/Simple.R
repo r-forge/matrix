@@ -35,7 +35,7 @@ if(interactive()) {
                                         #   ^^^^^^ to show Matrix.msg()s
 
 (Mv <- Matrix.Version())
-stopifnot(identical(packageVersion("Matrix"), Mv[["Package"]]))
+stopifnot(identical(packageVersion("Matrix"), Mv[["package"]]))
 
 ### Matrix() ''smartness''
 (d40 <- Matrix( diag(4)))
