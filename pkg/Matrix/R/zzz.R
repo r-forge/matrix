@@ -297,7 +297,7 @@ uniqTsparse <- function(x, class.x = class(x)) {
     if(FALSE) {
     .Deprecated(new = "Matrix.Version", package = "Matrix")
     }
-    Matrix.version()[[3L]]
+    Matrix.Version()[["suitesparse"]]
 }
 
 ## Utility for Matrix.DeprecatedCoerce(); see below
