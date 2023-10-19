@@ -19,13 +19,14 @@
   }
   \subsection{New Features}{
     \itemize{
-      \item New \R{} function \code{Matrix.Version}, taking no
-      arguments and returning \code{list(Package, ABI, SuiteSparse)}
-      giving the numeric versions of each.  ABI versioning is new:
-      the ABI version is 1 in this release and will be incremented
-      by 1 in each future release that changes the ABI.
-      Versions and their components are defined for packages with
-      \code{LinkingTo: Matrix}.  See \file{inst/include/Matrix/Matrix.h}.
+      \item New \R{} function \code{Matrix.Version}, taking no arguments
+      and returning \code{list(package, abi, suitesparse)}, a list
+      containing the numeric versions of the package, its ABI, and the
+      internal SuiteSparse library.  ABI versioning is new: the version
+      is 1 in this release and will be incremented by 1 in each future
+      release that changes the ABI. Versions and their components are
+      defined in a header for use by packages with \code{LinkingTo: Matrix}
+      in \file{DESCRIPTION}.  See \file{inst/include/Matrix/Matrix.h}.
 
       %% TODO {for 1.6-3}: Ops using (x@x | is.na(x@x)) for ndiMatrix 'x'
       \item New nonvirtual class \code{ndiMatrix}, extending virtual

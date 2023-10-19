@@ -9,9 +9,9 @@ SEXP R_Matrix_version(void)
 	INTEGER(ans)[1] = MATRIX_ABI_VERSION;
 	INTEGER(ans)[2] = MATRIX_SUITESPARSE_VERSION;
 	PROTECT(nms = allocVector(STRSXP, 3));
-	SET_STRING_ELT(nms, 0, mkChar("Package"));
-	SET_STRING_ELT(nms, 1, mkChar("ABI"));
-	SET_STRING_ELT(nms, 2, mkChar("SuiteSparse"));
+	SET_STRING_ELT(nms, 0, mkChar("package"));
+	SET_STRING_ELT(nms, 1, mkChar("abi"));
+	SET_STRING_ELT(nms, 2, mkChar("suitesparse"));
 	setAttrib(ans, R_NamesSymbol, nms);
 	UNPROTECT(2);
 	return ans;
