@@ -1,19 +1,7 @@
 #ifndef MATRIX_MDEFINES_H
 #define MATRIX_MDEFINES_H
 
-/* (version)_{10} = (major minor patch)_{256} */
-#define MATRIX_PACKAGE_VERSION 67074
-#define MATRIX_PACKAGE_MAJOR 1
-#define MATRIX_PACKAGE_MINOR 6
-#define MATRIX_PACKAGE_PATCH 2
-
-#define MATRIX_ABI_VERSION 1
-
-/* (version)_{10} = (major minor patch)_{256} */
-#define MATRIX_SUITESPARSE_VERSION 330241
-#define MATRIX_SUITESPARSE_MAJOR 5
-#define MATRIX_SUITESPARSE_MINOR 10
-#define MATRIX_SUITESPARSE_PATCH 1
+#include "version.h"
 
 #define Matrix_Domain "Matrix"
 #define Matrix_CallocThreshold 8192
@@ -47,7 +35,6 @@ typedef    long long Matrix_int_fast64_t;
 
 #include <R.h>
 #include <Rinternals.h>
-#include <Rversion.h>
 
 /* Copy and paste from WRE : */
 #ifdef ENABLE_NLS
