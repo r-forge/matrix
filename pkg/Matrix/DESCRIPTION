@@ -1,7 +1,7 @@
 Package: Matrix
 Version: 1.6-2
 VersionNote: do also bump src/Mdefines.c, inst/include/Matrix/Matrix.h
-Date: 2023-10-20
+Date: 2023-10-24
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,
@@ -35,7 +35,7 @@ Authors@R:
 	         comment = "base R's matrix implementation"))
 Depends: R (>= 3.5.0), methods
 Imports: grDevices, graphics, grid, lattice, stats, utils
-Suggests: MASS, datasets, sfsmisc
+Suggests: MASS, datasets, sfsmisc, tools
 Enhances: SparseM, graph
 LazyData: no
 LazyDataNote: not possible, since we use data/*.R and our S4 classes
