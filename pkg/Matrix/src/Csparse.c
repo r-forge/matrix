@@ -168,7 +168,7 @@ SEXP tCsparse_diag(SEXP obj, SEXP op)
 	case 6: /*     diag */
 	case 7: /* diagBack */
 	{
-		
+
 		int *pperm = NULL;
 		if (ivalid == 7) {
 			SEXP perm = getAttrib(obj, Matrix_permSym);

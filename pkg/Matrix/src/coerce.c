@@ -391,7 +391,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		    !MAYBE_REFERENCED(from)) {
 
 			if (ATTRIB(from) != R_NilValue && new >= 1) {
-				/* 'from' has attributes and no references : */ 
+				/* 'from' has attributes and no references : */
 				SET_ATTRIB(from, R_NilValue);
 				if (OBJECT(from))
 					SET_OBJECT(from, 0);
