@@ -1211,9 +1211,8 @@ SEXP sparseQR_validate(SEXP obj)
 	if (XLENGTH(beta) != n)
 		RMKMS(_("'%s' slot does not have length %s"), "beta", "Dim[2]");
 
-	SEXP p, i, x, q;
+	SEXP p, i, q;
 	int *pp, *pi, *pq, j, k, kend;
-	double *px;
 
 	SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
 	PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
@@ -1244,8 +1243,7 @@ SEXP sparseQR_validate(SEXP obj)
 	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
 	PROTECT(p = GET_SLOT(R, Matrix_pSym));
 	PROTECT(i = GET_SLOT(R, Matrix_iSym));
-	PROTECT(x = GET_SLOT(R, Matrix_xSym));
-	UNPROTECT(5); /* x, i, p, dim, R */
+	UNPROTECT(4); /* i, p, dim, R */
 
 	pdim = INTEGER(dim);
 	if (pdim[0] != m0)
@@ -1254,15 +1252,16 @@ SEXP sparseQR_validate(SEXP obj)
 		RMKMS(_("'%s' slot does not have %s columns"), "R", "Dim[2]");
 	pp = INTEGER(p);
 	pi = INTEGER(i);
-	px = REAL(x);
 	for (j = 0, k = 0; j < n; ++j) {
 		kend = pp[j + 1];
 		if (k < kend) {
 			if (pi[kend - 1] > j)
 				RMKMS(_("'%s' slot must be upper trapezoidal but has entries below the diagonal"), "R");
+#if 0 /* cs_house imposes diag(R) >= 0 in CSparse but not in CXSparse */
 			if (pi[kend - 1] == j &&
 			    !ISNAN(px[kend - 1]) && px[kend - 1] < 0.0)
 				RMKMS(_("'%s' slot has negative diagonal elements"), "R");
+#endif
 		}
 		k = kend;
 	}
@@ -1647,7 +1646,7 @@ SEXP CHMsuper_validate(SEXP obj)
 
 	/* FIXME: maxcsize and maxesize are well-defined properties of the
 	   factorization, so we should also test that the values are
-	   _correct_ ... see ./CHOLMOD/Supernodal/cholmod_super_symbolic.c
+	   _correct_ ... see CHOLMOD/Supernodal/cholmod_super_symbolic.c
 	*/
 
 	SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
