@@ -123,7 +123,7 @@ eps <- .Machine$double.eps
 
 stopifnot(exprs = {
     rankMatrix(A1) == ncol(A1)
-    { d1 <- diag(qr.A1@R); sum(d1 < max(d1) * eps) == 0L }
+    { d1 <- abs(diag(qr.A1@R)); sum(d1 < max(d1) * eps) == 0L }
     rcond(crossprod(A1)) >= eps
     all.equal(qr.coef(qr.A1, b), drop(solve(crossprod(A1), crossprod(A1, b))))
     all.equal(qr.fitted(qr.A1, b) + qr.resid(qr.A1, b), b)
@@ -138,7 +138,7 @@ stopifnot(exprs = {
 
 stopifnot(exprs = {
     rankMatrix(A2) == ncol(A2) - 2L
-    { d2 <- diag(qr.A2@R); sum(d2 < max(d2) * eps) == 2L }
+    { d2 <- abs(diag(qr.A2@R)); sum(d2 < max(d2) * eps) == 2L }
     rcond(crossprod(A2)) < eps
 
     ## 'qr.coef' computes unique least squares solution of "nearby" problem
@@ -167,7 +167,7 @@ stopifnot(exprs = {
 
     ## The augmented matrix remains numerically rank deficient
     rankMatrix(A3) == ncol(A3) - 2L
-    { d3 <- diag(qr.A3@R); sum(d3 < max(d3) * eps) == 2L }
+    { d3 <- abs(diag(qr.A3@R)); sum(d3 < max(d3) * eps) == 2L }
     rcond(crossprod(A3)) < eps
 })
 

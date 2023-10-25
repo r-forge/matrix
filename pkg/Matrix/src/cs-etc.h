@@ -1,12 +1,8 @@
 #ifndef MATRIX_CS_ETC_H
 #define MATRIX_CS_ETC_H
 
-/* GOAL: move from CSparse to CXSparse to support complex LU and QR */
-
 #include <Rinternals.h>
 #include "cs.h"
-
-/* NB: below assumes int == csi {CSparse} == int32_t {CXSparse} : */
 
 #define MCS_PATTERN 0
 #define MCS_REAL    1
@@ -15,7 +11,7 @@
 #define MCS_XTYPE_GET(       ) Matrix_cs_xtype
 #define MCS_XTYPE_SET(_VALUE_) Matrix_cs_xtype = _VALUE_
 
-extern int Matrix_cs_xtype; /* flag indicating use of cs_di_*() or cs_ci_*() */
+extern int Matrix_cs_xtype;
 
 typedef struct Matrix_cs_sparse
 {
@@ -24,7 +20,7 @@ typedef struct Matrix_cs_sparse
 	int n;
 	int *p;
 	int *i;
-	void *x; /* (double *) in CSparse; (double *) or (double _Complex *) in CXSparse */
+	void *x; /* (double *) or (double _Complex *) */
 	int nz;
 	int xtype; /* Matrix-only */
 } Matrix_cs;
@@ -43,8 +39,8 @@ typedef struct Matrix_cs_symbolic
 
 typedef struct Matrix_cs_numeric
 {
-	Matrix_cs *L; /* (cs *) in CSparse; (cs_di *) or (cs_ci *) in CXSparse */
-	Matrix_cs *U; /* (cs *) in CSparse; (cs_di *) or (cs_ci *) in CXSparse */
+	Matrix_cs *L; /* (cs_di *) or (cs_ci *) */
+	Matrix_cs *U; /* (cs_di *) or (cs_ci *) */
 	int *pinv;
 	double *B;
 } Matrix_csn;

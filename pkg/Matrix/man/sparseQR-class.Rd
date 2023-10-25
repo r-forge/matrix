@@ -55,7 +55,7 @@
   equal to the product of \eqn{n} Householder matrices \eqn{H_j}{Hj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix
   (\eqn{R_1}{R1} contains the first \eqn{n} row vectors and is
-  upper \emph{triangular}) with non-negative diagonal elements.
+  upper \emph{triangular}).
 }
 \usage{
 qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
@@ -87,8 +87,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       \code{diag(Dim[1]) - beta[j] * tcrossprod(V[, j])}.}
     \item{\code{R}}{an object of class \code{\linkS4class{dgCMatrix}}
       with \code{nrow(V)} rows and \code{Dim[2]} columns.
-      \code{R} is the upper trapezoidal \eqn{R} factor with
-      non-negative diagonal elements.}
+      \code{R} is the upper trapezoidal \eqn{R} factor.}
     \item{\code{p}, \code{q}}{0-based integer vectors of length
       \code{nrow(V)} and \code{Dim[2]}, respectively,
       specifying the permutations applied to the rows and columns of

@@ -1,7 +1,7 @@
 #include "Mdefines.h"
 #include "cs-etc.h"
 
-int Matrix_cs_xtype; /* flag indicating use of cs_di_*() or cs_ci_*() */
+int Matrix_cs_xtype; /* flag indicating use of cs_di_* or cs_ci_* */
 
 Matrix_cs *M2CXS(SEXP obj, int values)
 {
