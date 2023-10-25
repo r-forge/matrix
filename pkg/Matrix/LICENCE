@@ -12,7 +12,7 @@ two components:
 
 2. Matrix contains patched versions of external libraries CSparse, AMD,
    COLAMD, and CHOLMOD, all from the SuiteSparse collection of Timothy
-   A. Davis.  AMD and COLAMD use the BSD 3-clause licence.  CXSparse and
+   A. Davis.  AMD and COLAMD use the BSD 3-clause licence.  CSparse and
    modules Check, Cholesky, and Core of CHOLMOD use the GNU LGPL licence,
    version 2.1 or greater.  Modules MatrixOps, Modify, and Supernodal of
    CHOLMOD use the GNU GPL licence, version 2 or greater.  Licence files
