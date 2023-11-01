@@ -26,9 +26,11 @@
   Computes the pivoted Cholesky factorization of an
   \eqn{n \times n}{n-by-n} real, symmetric matrix \eqn{A},
   which has the general form
-  \deqn{P_1 A P_1' = L_1 D L_1' \overset{D_{jj} \ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
+  \Sdeqn{P_1 A P_1' = L_1 D L_1' \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} L L'}{%
+    P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \deqn{A = P_1' L_1 D L_1' P_1 \overset{D_{jj} \ge 0}{=} P_1' L L' P_1}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
+  \Sdeqn{A = P_1' L_1 D L_1' P_1 \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} P_1' L L' P_1}{%
+    A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
   \eqn{P_1}{P1} is a permutation matrix,
   \eqn{L_1}{L1} is a unit lower triangular matrix,
@@ -37,7 +39,7 @@
   The second equalities hold only for positive semidefinite \eqn{A},
   for which the diagonal entries of \eqn{D} are non-negative
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
-  
+
   Methods for \code{\linkS4class{denseMatrix}} are built on
   LAPACK routines \code{dpstrf}, \code{dpotrf}, and \code{dpptrf}.
   The latter two do not permute rows or columns,
@@ -152,7 +154,7 @@ Cholesky(A, \dots)
   semidefinite even if \eqn{A} is not.  It follows that one way to
   test for positive semidefiniteness of \eqn{A} in the event of a
   warning is to analyze the error
-  \deqn{\frac{\lVert A - P' L L' P \rVert}{\lVert A \rVert}\,.}{
+  \Sdeqn{\\\\\\\\frac{\\\\\\\\lVert A - P' L L' P \\\\\\\\rVert}{\\\\\\\\lVert A \\\\\\\\rVert}\\\\\\\\,.}{%
     norm(A - P' * L * L' * P) / norm(A).}
   See the examples and LAPACK Working Note (\dQuote{LAWN}) 161
   for details.
@@ -191,7 +193,7 @@ Cholesky(A, \dots)
   \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
   LAPACK Working Note, Number 161.
   \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
-  
+
   Chen, Y., Davis, T. A., Hager, W. W., & Rajamanickam, S. (2008).
   Algorithm 887: CHOLMOD, supernodal sparse Cholesky factorization
   and update/downdate.

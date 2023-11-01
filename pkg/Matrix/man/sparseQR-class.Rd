@@ -40,13 +40,11 @@
   \code{sparseQR} is the class of sparse, row- and column-pivoted
   QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
   real matrices, having the general form
-  \deqn{P_1 A P_2 = Q R = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} 
-    \begin{bmatrix} R_1 \\ 0 \end{bmatrix} = Q_1 R_1}{%
+  \Sdeqn{P_1 A P_2 = Q R = \\\\\\\\begin{bmatrix} Q_1 & Q_2 \\\\\\\\end{bmatrix} \\\\\\\\begin{bmatrix} R_1 \\\\\\\\\\\\\\\\ 0 \\\\\\\\end{bmatrix} = Q_1 R_1}{%
     P1 * A * P2 = Q * R = [Q1, Q2] * [R1; 0] = Q1 * R1}
   or (equivalently)
-  \deqn{A = P_1' Q R P_2' = P_1' \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} 
-    \begin{bmatrix} R_1 \\ 0 \end{bmatrix} P_2' = P_1' Q_1 R_1 P_2'}{%
-        A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
+  \Sdeqn{A = P_1' Q R P_2' = P_1' \\\\\\\\begin{bmatrix} Q_1 & Q_2 \\\\\\\\end{bmatrix} \\\\\\\\begin{bmatrix} R_1 \\\\\\\\\\\\\\\\ 0 \\\\\\\\end{bmatrix} P_2' = P_1' Q_1 R_1 P_2'}{%
+    A = P1' * Q * R * P2' = P1' * [Q1, Q2] * [R1; 0] * P2' = P1' * Q1 * R1 * P2'}
   where
   \eqn{P_1}{P1} and \eqn{P_2}{P2} are permutation matrices,
   \eqn{Q = \prod_{j = 1}^{n} H_j}{Q = prod(Hj : j = 1,...,n)}
