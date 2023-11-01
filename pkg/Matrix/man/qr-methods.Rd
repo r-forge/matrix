@@ -67,8 +67,8 @@ qr(x, \dots)
   \eqn{(n-r)} rows of (partly non-structural) zeros, such that
   the augmented matrix has structural rank \eqn{n}.
   This augmented matrix is factorized as described above:
-  \deqn{P_1 A P_2 = P_1 \begin{bmatrix} A_{0} \\ 0 \end{bmatrix} P_2 = Q R}{%
-      P1 * A * P2 = P1 * [A0; 0] * P2 = Q * R}
+  \Sdeqn{P_1 A P_2 = P_1 \\\\\\\\begin{bmatrix} A_{0} \\\\\\\\\\\\\\\\ 0 \\\\\\\\end{bmatrix} P_2 = Q R}{%
+    P1 * A * P2 = P1 * [A0; 0] * P2 = Q * R}
   where \eqn{A_0}{A0} denotes the original, user-supplied
   \eqn{(m-(n-r)) \times n}{(m-(n-r))-by-n} matrix.
 }
