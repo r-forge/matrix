@@ -76,8 +76,11 @@ norm(x)# = "O" = "1"
 stopifnot(identical(norm(x), norm(x, "1")))
 norm(x, "I")# the same, because 'x' is symmetric
 
-allnorms <- function(d) vapply(c("1","I","F","M","2"),
-                               norm, x = d, double(1))
+allnorms <- function(x) {
+    ## norm(NA, "2") did not work until R 4.0.0
+    do2 <- getRversion() >= "4.0.0" || !anyNA(d)
+    vapply(c("1", "I", "F", "M", if(do2) "2"), norm, 0, x = d)
+}
 allnorms(x)
 allnorms(Hilbert(10))
 
