@@ -26,11 +26,9 @@
   Computes the pivoted Cholesky factorization of an
   \eqn{n \times n}{n-by-n} real, symmetric matrix \eqn{A},
   which has the general form
-  \Sdeqn{P_1 A P_1' = L_1 D L_1' \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} L L'}{%
-    P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
+  \Sdeqn{P_1 A P_1' = L_1 D L_1' \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} L L'}{P1 * A * P1' = L1 * D * L1' [ = L * L' ]}
   or (equivalently)
-  \Sdeqn{A = P_1' L_1 D L_1' P_1 \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} P_1' L L' P_1}{%
-    A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
+  \Sdeqn{A = P_1' L_1 D L_1' P_1 \\\\\\\\overset{D_{jj} \\\\\\\\ge 0}{=} P_1' L L' P_1}{A = P1' L1 * D * L1' * P1 [ = P1' * L * L' * P1 ]}
   where
   \eqn{P_1}{P1} is a permutation matrix,
   \eqn{L_1}{L1} is a unit lower triangular matrix,
@@ -154,8 +152,7 @@ Cholesky(A, \dots)
   semidefinite even if \eqn{A} is not.  It follows that one way to
   test for positive semidefiniteness of \eqn{A} in the event of a
   warning is to analyze the error
-  \Sdeqn{\\\\\\\\frac{\\\\\\\\lVert A - P' L L' P \\\\\\\\rVert}{\\\\\\\\lVert A \\\\\\\\rVert}\\\\\\\\,.}{%
-    norm(A - P' * L * L' * P) / norm(A).}
+  \Sdeqn{\\\\\\\\frac{\\\\\\\\lVert A - P' L L' P \\\\\\\\rVert}{\\\\\\\\lVert A \\\\\\\\rVert}\\\\\\\\,.}{norm(A - P' * L * L' * P) / norm(A).}
   See the examples and LAPACK Working Note (\dQuote{LAWN}) 161
   for details.
 }
