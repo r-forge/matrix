@@ -46,13 +46,20 @@ Matrix.Version <- function() {
                        paste(deparse(expr, width.cutoff, ...),
                              collapse = collapse))
             assign("sequence.default", envir = Mns, inherits = FALSE,
-                   function(nvec, from = 1L, by = 1L, ...)
+                   function(nvec, from = 1L, by = 1L, ...) {
+                       if(length(nvec) == 0L)
+                           return(integer(0L))
+                       else if(length(from) == 0L || length(by) == 0L)
+                           stop(gettextf("'%s' has length 0 but '%s' does not",
+                                         if(length(from) == 0L) "from" else "by", "nvec"),
+                                domain = NA)
                        unlist(.mapply(seq.int,
                                       list(from = as.integer(from),
                                            by = as.integer(by),
                                            length.out = as.integer(nvec)),
                                       NULL),
-                              recursive = FALSE, use.names = FALSE))
+                              recursive = FALSE, use.names = FALSE)
+                   })
             assign("tryInvokeRestart", envir = Mns, inherits = FALSE,
                    function(r, ...)
                        tryCatch(invokeRestart(r, ...),
