@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-2 (2023-10-25 r4475)}{
+\section{Changes in version 1.6-2 (2023-11-02 r4483)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -221,6 +221,10 @@
       \code{R_MATRIX_INLINE},
       typically with \code{#define R_MATRIX_INLINE inline},
       to allow the compiler to inline stubs for registered routines.
+
+      \item \pkg{Matrix} did not pass its checks under \R{} 3.5.0,
+      implicitly violating \code{Depends: R (>= 3.5.0)}.  This release
+      restores compatibility.
     }
   }
 }
