@@ -117,7 +117,7 @@ mlp <- matrix(.leap.seconds)## 27 x 1 numeric matrix
 Mlp <- Matrix(.leap.seconds)
 stopifnot(identical(dim(Mlp), c(n.lsec, 1L)))
 assert.EQ.mat(Mlp, mlp)
-lt.leap.seconds <- .LS <- as.POSIXlt(.leap.seconds)
+lt.leap.seconds <- .LS <- as.POSIXlt(.leap.seconds, tz = "GMT") # GMT => sparse HMS
 .LS <- unclass(.LS); .LS <- .LS[setdiff(names(.LS), "zone")]
                      # "zone" is character (not there for GMT/UTC in R <= 4.2.x)
 (matLS <- data.matrix(data.frame(.LS)))
