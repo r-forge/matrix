@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.6-2\n"
-"POT-Creation-Date: 2023-09-19 17:28\n"
+"POT-Creation-Date: 2023-11-02 21:33\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -472,6 +472,9 @@ msgstr ""
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr ""
 
+msgid "%s(<%s>) is not yet implemented"
+msgstr ""
+
 msgid "'%s' is not of type \"%s\" or \"%s\""
 msgstr ""
 
@@ -502,6 +505,15 @@ msgstr ""
 msgid "matrix must have exactly one entry in each row and column"
 msgstr ""
 
+msgid "'%s' via sparse -> dense coercion"
+msgstr ""
+
+msgid "invalid %s=\"%s\""
+msgstr ""
+
+msgid "norm"
+msgstr ""
+
 msgid "'%s' method must use default %s=\"%s\""
 msgstr ""
 
@@ -514,19 +526,13 @@ msgstr ""
 msgid "'nearPD()' did not converge in %d iterations"
 msgstr ""
 
-msgid "'%s' via sparse -> dense coercion"
-msgstr ""
-
-msgid "invalid %s=\"%s\""
-msgstr ""
-
 msgid "'cl' is not a character string"
 msgstr ""
 
 msgid "not a positive definite matrix (and positive semidefiniteness is not checked)"
 msgstr ""
 
-msgid "'%s' is not a square matrix"
+msgid "'%s' is not a square numeric matrix"
 msgstr ""
 
 msgid "diag(%s) has non-positive or non-finite entries; finite result is doubtful"
@@ -553,16 +559,10 @@ msgstr ""
 msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
 msgstr ""
 
-msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
-msgstr ""
-
 msgid "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n Probably should rather use method = 'qr' !?"
 msgstr ""
 
 msgid "rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"
-msgstr ""
-
-msgid "norm"
 msgstr ""
 
 msgid "[[ suppressing %d column name%s %s ... ]]"
@@ -641,12 +641,6 @@ msgid "trimmed means are not defined for complex data"
 msgstr ""
 
 msgid "first element used of '%s' argument"
-msgstr ""
-
-msgid "invalid 'each' argument"
-msgstr ""
-
-msgid "invalid 'times' argument"
 msgstr ""
 
 msgid "invalid '%s' argument"
@@ -788,6 +782,9 @@ msgid "incorrect number of dimensions"
 msgstr ""
 
 msgid "only zeros may be mixed with negative subscripts"
+msgstr ""
+
+msgid "'%s' has length 0 but '%s' does not"
 msgstr ""
 
 msgid "attempt to coerce matrix with NA to %s"

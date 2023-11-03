@@ -14,7 +14,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-3\n"
-"POT-Creation-Date: 2023-09-19 17:28\n"
+"POT-Creation-Date: 2023-11-02 21:33\n"
 "PO-Revision-Date: 2015-07-15 17:14-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -565,6 +565,10 @@ msgstr ""
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr "'lwd'는 반드시 NULL 또는 음이 아닌 수 이어야 합니다."
 
+#, fuzzy
+msgid "%s(<%s>) is not yet implemented"
+msgstr "클래스 %s는 아직 구현되지 않았습니다."
+
 msgid "'%s' is not of type \"%s\" or \"%s\""
 msgstr ""
 
@@ -603,6 +607,17 @@ msgid "matrix must have exactly one entry in each row and column"
 msgstr "각 행마다 반드시 정확히 하나의 영이 아닌 항목을 가지고 있어야 합니다."
 
 #, fuzzy
+msgid "'%s' via sparse -> dense coercion"
+msgstr "rcond(.) via sparse -> dense coercion"
+
+#, fuzzy
+msgid "invalid %s=\"%s\""
+msgstr "nargs()= %d의 값이 올바르지 않습니다."
+
+msgid "norm"
+msgstr ""
+
+#, fuzzy
 msgid "'%s' method must use default %s=\"%s\""
 msgstr ""
 "크로넥커 메소드(kronecker method)는 반드시 기본 'FUN'을 사용해야 합니다."
@@ -618,14 +633,6 @@ msgid "'nearPD()' did not converge in %d iterations"
 msgstr "'nearPD()'는 %d 번째 반복에서도 수렴하지 않았습니다."
 
 #, fuzzy
-msgid "'%s' via sparse -> dense coercion"
-msgstr "rcond(.) via sparse -> dense coercion"
-
-#, fuzzy
-msgid "invalid %s=\"%s\""
-msgstr "nargs()= %d의 값이 올바르지 않습니다."
-
-#, fuzzy
 msgid "'cl' is not a character string"
 msgstr "'V'는 정방행렬(square matrix)이 아닙니다."
 
@@ -634,7 +641,7 @@ msgid ""
 msgstr ""
 
 #, fuzzy
-msgid "'%s' is not a square matrix"
+msgid "'%s' is not a square numeric matrix"
 msgstr "'V'는 정방행렬(square matrix)이 아닙니다."
 
 #, fuzzy
@@ -671,9 +678,6 @@ msgstr ""
 msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
 msgstr ""
 
-msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
-msgstr ""
-
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
 " Probably should rather use method = 'qr' !?"
@@ -681,9 +685,6 @@ msgstr ""
 
 msgid "rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"
 msgstr "rankMatrix(x, method='qr'): nrow(x) < ncol(x)이므로 t(x)를 계산합니다."
-
-msgid "norm"
-msgstr ""
 
 #, fuzzy
 msgid "[[ suppressing %d column name%s %s ... ]]"
@@ -776,14 +777,6 @@ msgstr ""
 
 msgid "first element used of '%s' argument"
 msgstr ""
-
-#, fuzzy
-msgid "invalid 'each' argument"
-msgstr "'by' 인자에 사용된 부호(sign)가 올바르지 않습니다."
-
-#, fuzzy
-msgid "invalid 'times' argument"
-msgstr "입력된 'data'는 올바르지 않습니다."
 
 #, fuzzy
 msgid "invalid '%s' argument"
@@ -968,6 +961,9 @@ msgstr "차원(dimensions) 정보가 일치하지 않습니다."
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""
 
+msgid "'%s' has length 0 but '%s' does not"
+msgstr ""
+
 #, fuzzy
 msgid "attempt to coerce matrix with NA to %s"
 msgstr ""
@@ -977,6 +973,14 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "입력된 'data'는 올바르지 않습니다."
+
+#, fuzzy
+#~ msgid "invalid 'each' argument"
+#~ msgstr "'by' 인자에 사용된 부호(sign)가 올바르지 않습니다."
+
+#, fuzzy
+#~ msgid "invalid 'times' argument"
+#~ msgstr "입력된 'data'는 올바르지 않습니다."
 
 #~ msgid ""
 #~ "not-yet-implemented method for %s(<%s>).\n"

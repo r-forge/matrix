@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2023-09-19 17:28\n"
+"POT-Creation-Date: 2023-11-02 21:33\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -799,6 +799,12 @@ msgstr ""
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr "'lwd' musi mieć wartość NULL lub być nieujemną liczbą"
 
+# Matrix/R/sparseVector.R: 278
+# stop(gettextf("Class %s is not yet implemented", dQuote(cNam)), domain = "R-Matrix")
+#, fuzzy
+msgid "%s(<%s>) is not yet implemented"
+msgstr "Klasa %s nie jest jeszcze zaimplementowana"
+
 msgid "'%s' is not of type \"%s\" or \"%s\""
 msgstr ""
 
@@ -850,6 +856,23 @@ msgstr ""
 msgid "matrix must have exactly one entry in each row and column"
 msgstr "potrzeba mieć dokładnie jeden niezerowy wpis na wiersz"
 
+# Matrix/R/sparseMatrix.R: 748
+# warning("rcond(.) via sparse -> dense coercion")
+#, fuzzy
+msgid "'%s' via sparse -> dense coercion"
+msgstr "'rcond(.)' poprzez przekształcenie rzadkie -> gęste"
+
+# Matrix/R/denseMatrix.R: 101
+# stop(gettextf("invalid nargs()= %d", na), domain = "R-Matrix")
+# Matrix/R/denseMatrix.R: 164
+# stop(gettextf("invalid nargs()= %d", na), domain = "R-Matrix")
+#, fuzzy
+msgid "invalid %s=\"%s\""
+msgstr "niepoprawne nargs()=%d"
+
+msgid "norm"
+msgstr ""
+
 # Matrix/R/indMatrix.R: 133
 # stop("kronecker method must use default 'FUN'")
 # Matrix/R/kronecker.R: 33
@@ -876,20 +899,6 @@ msgstr "Macierz wydaje się być ujemnie określona"
 msgid "'nearPD()' did not converge in %d iterations"
 msgstr "funkcja 'nearPD()' nie uzbieżniła się w %d iteracjach"
 
-# Matrix/R/sparseMatrix.R: 748
-# warning("rcond(.) via sparse -> dense coercion")
-#, fuzzy
-msgid "'%s' via sparse -> dense coercion"
-msgstr "'rcond(.)' poprzez przekształcenie rzadkie -> gęste"
-
-# Matrix/R/denseMatrix.R: 101
-# stop(gettextf("invalid nargs()= %d", na), domain = "R-Matrix")
-# Matrix/R/denseMatrix.R: 164
-# stop(gettextf("invalid nargs()= %d", na), domain = "R-Matrix")
-#, fuzzy
-msgid "invalid %s=\"%s\""
-msgstr "niepoprawne nargs()=%d"
-
 # Matrix/R/sparseMatrix.R: 759
 # stop("'V' is not a *square* matrix")
 #, fuzzy
@@ -903,7 +912,7 @@ msgstr ""
 # Matrix/R/sparseMatrix.R: 759
 # stop("'V' is not a *square* matrix")
 #, fuzzy
-msgid "'%s' is not a square matrix"
+msgid "'%s' is not a square numeric matrix"
 msgstr "'V' nie jest macierzą *kwadratową*"
 
 # Matrix/R/Matrix.R: 94
@@ -946,9 +955,6 @@ msgstr ""
 msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
 msgstr ""
 
-msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
-msgstr ""
-
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
 " Probably should rather use method = 'qr' !?"
@@ -961,9 +967,6 @@ msgstr ""
 # warning(gettextf("rankMatrix(x, method='qrLINPACK'): computing t(x) as nrow(x) < ncol(x)"))
 msgid "rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"
 msgstr "rankMatrix(x, method='qr'): obliczanie t(x) jako nrow(x) < ncol(x)"
-
-msgid "norm"
-msgstr ""
 
 # Matrix/R/Auxiliaries.R: 373
 # message(sprintf(gettext("   [[ suppressing %d column names %s... ]]", domain = "R-Matrix"), nc, paste(sQuote(cn[1:3]), collapse = ", ")), domain = NA)
@@ -1082,18 +1085,6 @@ msgstr ""
 
 msgid "first element used of '%s' argument"
 msgstr ""
-
-# Matrix/R/abIndex.R: 165
-# stop("wrong sign in 'by' argument")
-#, fuzzy
-msgid "invalid 'each' argument"
-msgstr "niepoprawny znak w argumencie 'by'"
-
-# Matrix/R/Matrix.R: 206
-# stop("invalid 'data'")
-#, fuzzy
-msgid "invalid 'times' argument"
-msgstr "niepoprawne 'data'"
 
 # Matrix/R/Matrix.R: 206
 # stop("invalid 'data'")
@@ -1398,6 +1389,9 @@ msgstr "niezgodne wymiary macierzy"
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""
 
+msgid "'%s' has length 0 but '%s' does not"
+msgstr ""
+
 # Matrix/R/dgTMatrix.R: 20
 # stop("cannot coerce non-symmetric \"dgTMatrix\" to \"dsCMatrix\" class")
 #, fuzzy
@@ -1411,6 +1405,18 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "niepoprawne 'data'"
+
+# Matrix/R/abIndex.R: 165
+# stop("wrong sign in 'by' argument")
+#, fuzzy
+#~ msgid "invalid 'each' argument"
+#~ msgstr "niepoprawny znak w argumencie 'by'"
+
+# Matrix/R/Matrix.R: 206
+# stop("invalid 'data'")
+#, fuzzy
+#~ msgid "invalid 'times' argument"
+#~ msgstr "niepoprawne 'data'"
 
 # Matrix/R/Auxiliaries.R: 65
 # stop(gettextf("not-yet-implemented method for %s(<%s>).\n ->>  Ask the package authors to implement the missing feature.", fun, cl), call. = FALSE, domain = "R-Matrix")

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2023-09-19 17:28\n"
+"POT-Creation-Date: 2023-11-02 21:33\n"
 "PO-Revision-Date: 2021-02-11 11:04+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -554,6 +554,10 @@ msgstr ""
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr "'lwd' doit être un nombre non négatif ou NULL"
 
+#, fuzzy
+msgid "%s(<%s>) is not yet implemented"
+msgstr "La classe %s n'est pas encore implémentée"
+
 msgid "'%s' is not of type \"%s\" or \"%s\""
 msgstr ""
 
@@ -592,6 +596,17 @@ msgid "matrix must have exactly one entry in each row and column"
 msgstr "doit avoir exactement une entrée non zéro par ligne"
 
 #, fuzzy
+msgid "'%s' via sparse -> dense coercion"
+msgstr "conversion automatique rcond(.) via sparse -> dense"
+
+#, fuzzy
+msgid "invalid %s=\"%s\""
+msgstr "nargs()= %d incorrect"
+
+msgid "norm"
+msgstr ""
+
+#, fuzzy
 msgid "'%s' method must use default %s=\"%s\""
 msgstr "méthode kronecker doit utiliser une 'FUN' par défaut"
 
@@ -606,14 +621,6 @@ msgid "'nearPD()' did not converge in %d iterations"
 msgstr "'nearPD()' n'a pas converti en %d itérations"
 
 #, fuzzy
-msgid "'%s' via sparse -> dense coercion"
-msgstr "conversion automatique rcond(.) via sparse -> dense"
-
-#, fuzzy
-msgid "invalid %s=\"%s\""
-msgstr "nargs()= %d incorrect"
-
-#, fuzzy
 msgid "'cl' is not a character string"
 msgstr "'V' n'est pas une matrice *carrée*"
 
@@ -622,7 +629,7 @@ msgid ""
 msgstr ""
 
 #, fuzzy
-msgid "'%s' is not a square matrix"
+msgid "'%s' is not a square numeric matrix"
 msgstr "'V' n'est pas une matrice *carrée*"
 
 #, fuzzy
@@ -657,9 +664,6 @@ msgstr ""
 msgid "qr2rankMatrix(.): QR with only %d out of %d finite diag(R) entries"
 msgstr "qr2rankMatrix(.): QR avec seulement %d de %d entrées finies de diag(R)"
 
-msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
-msgstr "qr2rankMatrix(.): QR a des entrées négatives dans diag(R)"
-
 msgid ""
 "rankMatrix(<large sparse Matrix>, method = '%s') coerces to dense matrix.\n"
 " Probably should rather use method = 'qr' !?"
@@ -670,9 +674,6 @@ msgstr ""
 
 msgid "rankMatrix(x, method='qr'): computing t(x) as nrow(x) < ncol(x)"
 msgstr "rankMatrix(x, method='qr') : calcul de t(x) comme nrow(x) < ncol(x)"
-
-msgid "norm"
-msgstr ""
 
 #, fuzzy
 msgid "[[ suppressing %d column name%s %s ... ]]"
@@ -762,14 +763,6 @@ msgstr ""
 
 msgid "first element used of '%s' argument"
 msgstr ""
-
-#, fuzzy
-msgid "invalid 'each' argument"
-msgstr "signe incorrect dans l'argument 'by'"
-
-#, fuzzy
-msgid "invalid 'times' argument"
-msgstr "'data' incorrect"
 
 #, fuzzy
 msgid "invalid '%s' argument"
@@ -956,6 +949,9 @@ msgstr "dimensions incompatibles des matrices"
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""
 
+msgid "'%s' has length 0 but '%s' does not"
+msgstr ""
+
 #, fuzzy
 msgid "attempt to coerce matrix with NA to %s"
 msgstr ""
@@ -965,6 +961,17 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "'data' incorrect"
+
+#~ msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
+#~ msgstr "qr2rankMatrix(.): QR a des entrées négatives dans diag(R)"
+
+#, fuzzy
+#~ msgid "invalid 'each' argument"
+#~ msgstr "signe incorrect dans l'argument 'by'"
+
+#, fuzzy
+#~ msgid "invalid 'times' argument"
+#~ msgstr "'data' incorrect"
 
 #~ msgid ""
 #~ "not-yet-implemented method for %s(<%s>).\n"
