@@ -44,7 +44,6 @@ _?svn-?
 [.]log$
 [.]orig$
 [.]out$
-[.]patch$
 [.]rej$
 [.]tar[.]gz$
 [.]tex$
@@ -66,8 +65,6 @@ _?svn-?
 ^Done$
 ^TODO$
 ^po/update-me[.]sh$
-^src/scripts/.*[.]R$
-^src/scripts/.*[.]patch2$
 ^src/scripts/.*[.]sh$
 ^tests/performance[.]R$
 ^tests/useRNG_files$

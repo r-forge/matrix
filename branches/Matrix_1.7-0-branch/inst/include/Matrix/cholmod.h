@@ -1,92 +1,370 @@
+//------------------------------------------------------------------------------
+// CHOLMOD/Include/cholmod.h: include file for CHOLMOD
+//------------------------------------------------------------------------------
+
+// CHOLMOD/Include/cholmod.h.  Copyright (C) 2005-2022, Timothy A. Davis.
+// All Rights Reserved.
+
+// Each Module of CHOLMOD has its own license, and a shared cholmod.h file.
+
+// CHOLMOD/Check:      SPDX-License-Identifier: LGPL-2.1+
+// CHOLMOD/Cholesky:   SPDX-License-Identifier: LGPL-2.1+
+// CHOLMOD/Core:       SPDX-License-Identifier: LGPL-2.1+
+// CHOLMOD/Partition:  SPDX-License-Identifier: LGPL-2.1+
+
+// CHOLMOD/Demo:       SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/GPU:        SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/MATLAB:     SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/MatrixOps:  SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/Modify:     SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/Supernodal: SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/Tcov:       SPDX-License-Identifier: GPL-2.0+
+// CHOLMOD/Valgrind:   SPDX-License-Identifier: GPL-2.0+
+
+//------------------------------------------------------------------------------
+
+/* CHOLMOD consists of a set of Modules, each with their own license: either
+ * LGPL-2.1+ or GPL-2.0+.  This cholmod.h file includes defintions of the
+ * CHOLMOD API for all Modules, and this cholmod.h file itself is provided to
+ * you with a permissive license (Apache-2.0).  You are permitted to provide
+ * the hooks for an optional interface to CHOLMOD in a non-GPL/non-LGPL code,
+ * without requiring you to agree to the GPL/LGPL license of the Modules, as
+ * long as you don't use the *.c files in the relevant Modules.  The Modules
+ * themselves can only be functional if their GPL or LGPL licenses are used.
+ *
+ * Portions of CHOLMOD (the Core and Partition Modules) are copyrighted by the
+ * University of Florida.  The Modify Module is co-authored by William W.
+ * Hager, Univ. of Florida.
+ *
+ * Acknowledgements:  this work was supported in part by the National Science
+ * Foundation (NFS CCR-0203270 and DMS-9803599), and a grant from Sandia
+ * National Laboratories (Dept. of Energy) which supported the development of
+ * CHOLMOD's Partition Module.
+ * -------------------------------------------------------------------------- */
+
+/* CHOLMOD include file, for inclusion user programs.
+ *
+ * The include files listed below include a short description of each user-
+ * callable routine.  Each routine in CHOLMOD has a consistent interface.
+ * More details about the CHOLMOD data types is in the cholmod_core.h file.
+ *
+ * Naming convention:
+ * ------------------
+ *
+ *	All routine names, data types, and CHOLMOD library files use the
+ *	cholmod_ prefix.  All macros and other #define's use the CHOLMOD
+ *	prefix.
+ * 
+ * Return value:
+ * -------------
+ *
+ *	Most CHOLMOD routines return an int (TRUE (1) if successful, or FALSE
+ *	(0) otherwise.  An int32_t, int64_t, or double return value is >= 0 if
+ *	successful, or -1 otherwise.  A size_t return value is > 0 if
+ *	successful, or 0 otherwise.
+ *
+ *	If a routine returns a pointer, it is a pointer to a newly allocated
+ *	object or NULL if a failure occured, with one exception.  cholmod_free
+ *	always returns NULL.
+ *
+ * "Common" parameter:
+ * ------------------
+ *
+ *	The last parameter in all CHOLMOD routines is a pointer to the CHOLMOD
+ *	"Common" object.  This contains control parameters, statistics, and
+ *	workspace used between calls to CHOLMOD.  It is always an input/output
+ *	parameter.
+ *
+ * Input, Output, and Input/Output parameters:
+ * -------------------------------------------
+ *
+ *	Input parameters are listed first.  They are not modified by CHOLMOD.
+ *
+ *	Input/output are listed next.  They must be defined on input, and
+ *	are modified on output.
+ *
+ *	Output parameters are listed next.  If they are pointers, they must
+ *	point to allocated space on input, but their contents are not defined
+ *	on input.
+ *
+ *	Workspace parameters appear next.  They are used in only two routines
+ *	in the Supernodal module.
+ *
+ *	The cholmod_common *Common parameter always appears as the last
+ *	parameter.  It is always an input/output parameter.
+ */
+
 #ifndef R_MATRIX_CHOLMOD_H
 #define R_MATRIX_CHOLMOD_H
 
-#include <stddef.h> /* size_t */
-#include <limits.h> /* LONG_MAX */
-#include <inttypes.h> /* PRI */
+#define CHOLMOD_DATE "Oct 15, 2023"
+#define CHOLMOD_MAIN_VERSION   4
+#define CHOLMOD_SUB_VERSION    2
+#define CHOLMOD_SUBSUB_VERSION 2
+
+
+/* ========================================================================== */
+/* === SuiteSparse_config.h ================================================= */
+/* ========================================================================== */
+
+#ifndef R_MATRIX_CHOLMOD_H
+#include "SuiteSparse_config.h"
+#else
+#include <stdint.h>
+#include <stddef.h>
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* <<<< from ../../src/SuiteSparse_config/SuiteSparse_config.h <<<<<< */
-#ifndef SuiteSparse_long
+/* ========================================================================== */
+/* === Include/cholmod_core.h =============================================== */
+/* ========================================================================== */
 
-# if !defined(_WIN64) || defined(_UCRT)
+/* CHOLMOD Core module: basic CHOLMOD objects and routines.
+ * Required by all CHOLMOD modules.  Requires no other module or package.
+ *
+ * The CHOLMOD modules are:
+ *
+ * Core		basic data structures and definitions
+ * Check	check/print the 5 CHOLMOD objects, & 3 types of integer vectors
+ * Cholesky	sparse Cholesky factorization
+ * Modify	sparse Cholesky update/downdate/row-add/row-delete
+ * MatrixOps	sparse matrix functions (add, multiply, norm, ...)
+ * Supernodal	supernodal sparse Cholesky factorization
+ * Partition	graph-partitioning based orderings
+ *
+ * The CHOLMOD objects:
+ * --------------------
+ *
+ * cholmod_common   parameters, statistics, and workspace
+ * cholmod_sparse   a sparse matrix in compressed column form
+ * cholmod_factor   an LL' or LDL' factorization
+ * cholmod_dense    a dense matrix
+ * cholmod_triplet  a sparse matrix in "triplet" form
+ *
+ * The Core module described here defines the CHOLMOD data structures, and
+ * basic operations on them.  To create and solve a sparse linear system Ax=b,
+ * the user must create A and b, populate them with values, and then pass them
+ * to the routines in the CHOLMOD Cholesky module.  There are two primary
+ * methods for creating A: (1) allocate space for a column-oriented sparse
+ * matrix and fill it with pattern and values, or (2) create a triplet form
+ * matrix and convert it to a sparse matrix.  The latter option is simpler.
+ *
+ * The matrices b and x are typically dense matrices, but can also be sparse.
+ * You can allocate and free them as dense matrices with the
+ * cholmod_allocate_dense and cholmod_free_dense routines.
+ *
+ * The cholmod_factor object contains the symbolic and numeric LL' or LDL'
+ * factorization of sparse symmetric matrix.  The matrix must be positive
+ * definite for an LL' factorization.  It need only be symmetric and have well-
+ * conditioned leading submatrices for it to have an LDL' factorization
+ * (CHOLMOD does not pivot for numerical stability).  It is typically created
+ * with the cholmod_factorize routine in the Cholesky module, but can also
+ * be initialized to L=D=I in the Core module and then modified by the Modify
+ * module.  It must be freed with cholmod_free_factor, defined below.
+ *
+ * The Core routines for each object are described below.  Each list is split
+ * into two parts: the primary routines and secondary routines.
+ *
+ * ============================================================================
+ * === cholmod_common =========================================================
+ * ============================================================================
+ *
+ * The Common object contains control parameters, statistics, and
+ * You must call cholmod_start before calling any other CHOLMOD routine, and
+ * must call cholmod_finish as your last call to CHOLMOD, with two exceptions:
+ * you may call cholmod_print_common and cholmod_check_common in the Check
+ * module after calling cholmod_finish.
+ *
+ * cholmod_start		first call to CHOLMOD
+ * cholmod_finish		last call to CHOLMOD
+ * -----------------------------
+ * cholmod_defaults		restore default parameters
+ * cholmod_maxrank		maximum rank for update/downdate
+ * cholmod_allocate_work	allocate workspace in Common
+ * cholmod_free_work		free workspace in Common
+ * cholmod_clear_flag		clear Flag workspace in Common
+ * cholmod_error		called when CHOLMOD encounters an error
+ * cholmod_dbound		for internal use in CHOLMOD only
+ * cholmod_hypot		compute sqrt (x*x + y*y) accurately
+ * cholmod_divcomplex		complex division, c = a/b
+ *
+ * ============================================================================
+ * === cholmod_sparse =========================================================
+ * ============================================================================
+ *
+ * A sparse matrix is held in compressed column form.  In the basic type
+ * ("packed", which corresponds to a MATLAB sparse matrix), an n-by-n matrix
+ * with nz entries is held in three arrays: p of size n+1, i of size nz, and x
+ * of size nz.  Row indices of column j are held in i [p [j] ... p [j+1]-1] and
+ * in the same locations in x.  There may be no duplicate entries in a column.
+ * Row indices in each column may be sorted or unsorted (CHOLMOD keeps track).
+ * A->stype determines the storage mode: 0 if both upper/lower parts are stored,
+ * -1 if A is symmetric and just tril(A) is stored, +1 if symmetric and triu(A)
+ * is stored.
+ *
+ * cholmod_allocate_sparse	allocate a sparse matrix
+ * cholmod_free_sparse		free a sparse matrix
+ * -----------------------------
+ * cholmod_reallocate_sparse	change the size (# entries) of sparse matrix
+ * cholmod_nnz			number of nonzeros in a sparse matrix
+ * cholmod_speye		sparse identity matrix
+ * cholmod_spzeros		sparse zero matrix
+ * cholmod_transpose		transpose a sparse matrix
+ * cholmod_ptranspose		transpose/permute a sparse matrix
+ * cholmod_transpose_unsym	transpose/permute an unsymmetric sparse matrix
+ * cholmod_transpose_sym	transpose/permute a symmetric sparse matrix
+ * cholmod_sort			sort row indices in each column of sparse matrix
+ * cholmod_band			C = tril (triu (A,k1), k2)
+ * cholmod_band_inplace		A = tril (triu (A,k1), k2)
+ * cholmod_aat			C = A*A'
+ * cholmod_copy_sparse		C = A, create an exact copy of a sparse matrix
+ * cholmod_copy			C = A, with possible change of stype
+ * cholmod_add			C = alpha*A + beta*B
+ * cholmod_sparse_xtype		change the xtype of a sparse matrix
+ *
+ * ============================================================================
+ * === cholmod_factor =========================================================
+ * ============================================================================
+ *
+ * The data structure for an LL' or LDL' factorization is too complex to
+ * describe in one sentence.  This object can hold the symbolic analysis alone,
+ * or in combination with a "simplicial" (similar to a sparse matrix) or
+ * "supernodal" form of the numerical factorization.  Only the routine to free
+ * a factor is primary, since a factor object is created by the factorization
+ * routine (cholmod_factorize).  It must be freed with cholmod_free_factor.
+ *
+ * cholmod_free_factor		free a factor
+ * -----------------------------
+ * cholmod_allocate_factor	allocate a factor (LL' or LDL')
+ * cholmod_reallocate_factor	change the # entries in a factor
+ * cholmod_change_factor	change the type of factor (e.g., LDL' to LL')
+ * cholmod_pack_factor		pack the columns of a factor
+ * cholmod_reallocate_column	resize a single column of a factor
+ * cholmod_factor_to_sparse	create a sparse matrix copy of a factor
+ * cholmod_copy_factor		create a copy of a factor
+ * cholmod_factor_xtype		change the xtype of a factor
+ *
+ * Note that there is no cholmod_sparse_to_factor routine to create a factor
+ * as a copy of a sparse matrix.  It could be done, after a fashion, but a
+ * lower triangular sparse matrix would not necessarily have a chordal graph,
+ * which would break the many CHOLMOD routines that rely on this property.
+ *
+ * ============================================================================
+ * === cholmod_dense ==========================================================
+ * ============================================================================
+ *
+ * The solve routines and some of the MatrixOps and Modify routines use dense
+ * matrices as inputs.  These are held in column-major order.  With a leading
+ * dimension of d, the entry in row i and column j is held in x [i+j*d].
+ *
+ * cholmod_allocate_dense	allocate a dense matrix
+ * cholmod_free_dense		free a dense matrix
+ * -----------------------------
+ * cholmod_zeros		allocate a dense matrix of all zeros
+ * cholmod_ones			allocate a dense matrix of all ones
+ * cholmod_eye			allocate a dense identity matrix
+ * cholmod_sparse_to_dense	create a dense matrix copy of a sparse matrix
+ * cholmod_dense_to_sparse	create a sparse matrix copy of a dense matrix
+ * cholmod_copy_dense		create a copy of a dense matrix
+ * cholmod_copy_dense2		copy a dense matrix (pre-allocated)
+ * cholmod_dense_xtype		change the xtype of a dense matrix
+ * cholmod_ensure_dense  	ensure a dense matrix has a given size and type
+ *
+ * ============================================================================
+ * === cholmod_triplet ========================================================
+ * ============================================================================
+ *
+ * A sparse matrix held in triplet form is the simplest one for a user to
+ * create.  It consists of a list of nz entries in arbitrary order, held in
+ * three arrays: i, j, and x, each of length nk.  The kth entry is in row i[k],
+ * column j[k], with value x[k].  There may be duplicate values; if A(i,j)
+ * appears more than once, its value is the sum of the entries with those row
+ * and column indices.
+ *
+ * cholmod_allocate_triplet	allocate a triplet matrix
+ * cholmod_triplet_to_sparse	create a sparse matrix copy of a triplet matrix
+ * cholmod_free_triplet		free a triplet matrix
+ * -----------------------------
+ * cholmod_reallocate_triplet	change the # of entries in a triplet matrix
+ * cholmod_sparse_to_triplet	create a triplet matrix copy of a sparse matrix
+ * cholmod_copy_triplet		create a copy of a triplet matrix
+ * cholmod_triplet_xtype	change the xtype of a triplet matrix
+ *
+ * ============================================================================
+ * === memory management ======================================================
+ * ============================================================================
+ *
+ * cholmod_malloc		malloc wrapper
+ * cholmod_calloc		calloc wrapper
+ * cholmod_free			free wrapper
+ * cholmod_realloc		realloc wrapper
+ * cholmod_realloc_multiple	realloc wrapper for multiple objects
+ *
+ * ============================================================================
+ * === Core CHOLMOD prototypes ================================================
+ * ============================================================================
+ *
+ * All CHOLMOD routines (in all modules) use the following protocol for return
+ * values, with one exception:
+ *
+ * int			TRUE (1) if successful, or FALSE (0) otherwise.
+ *			(exception: cholmod_divcomplex)
+ * int32_t              a value >= 0 if successful, or -1 otherwise.
+ * int64_t              a value >= 0 if successful, or -1 otherwise.
+ * double		a value >= 0 if successful, or -1 otherwise.
+ * size_t		a value > 0 if successful, or 0 otherwise.
+ * void *		a non-NULL pointer to newly allocated memory if
+ *			successful, or NULL otherwise.
+ * cholmod_sparse *	a non-NULL pointer to a newly allocated matrix
+ *			if successful, or NULL otherwise.
+ * cholmod_factor *	a non-NULL pointer to a newly allocated factor
+ *			if successful, or NULL otherwise.
+ * cholmod_triplet *	a non-NULL pointer to a newly allocated triplet
+ *			matrix if successful, or NULL otherwise.
+ * cholmod_dense *	a non-NULL pointer to a newly allocated triplet
+ *			matrix if successful, or NULL otherwise.
+ *
+ * The last parameter to all routines is always a pointer to the CHOLMOD
+ * Common object.
+ *
+ * TRUE and FALSE are not defined here, since they may conflict with the user
+ * program.  A routine that described here returning TRUE or FALSE returns 1
+ * or 0, respectively.  Any TRUE/FALSE parameter is true if nonzero, false if
+ * zero.
+ */
 
-#  define SuiteSparse_long         long
-#  define SuiteSparse_long_max LONG_MAX
-#  define SuiteSparse_long_idd     "ld"
+/* ========================================================================== */
+/* === CHOLMOD version ====================================================== */
+/* ========================================================================== */
 
-# else // defined(_WIN64) && !defined(_UCRT)
+/* All versions of CHOLMOD will include the following definitions.
+ * As an example, to test if the version you are using is 1.3 or later:
+ *
+ *	if (CHOLMOD_VERSION >= CHOLMOD_VER_CODE (1,3)) ...
+ *
+ * This also works during compile-time:
+ *
+ *	#if CHOLMOD_VERSION >= CHOLMOD_VER_CODE (1,3)
+ *	    printf ("This is version 1.3 or later\n") ;
+ *	#else
+ *	    printf ("This is version is earlier than 1.3\n") ;
+ *	#endif
+ */
 
-#  define SuiteSparse_long      __int64
-#  define SuiteSparse_long_max _I64_MAX
-#  define SuiteSparse_long_idd   PRId64
-
-# endif
-
-/* #define SuiteSparse_long int64_t */
-/*     // typically long (but on WIN64) */
-/* #define SuiteSparse_long_max 9223372036854775801 */
-/*     // typically LONG_MAX (but ..) */
-/* #define SuiteSparse_long_idd PRId64 */
-/*     // typically "ld" */
-
-# define SuiteSparse_long_id "%" SuiteSparse_long_idd
-#endif
-
-/* <<<< from ../../src/CHOLMOD/Include/cholmod_core.h:244 <<<<<<<<<<< */
 #define CHOLMOD_HAS_VERSION_FUNCTION
-#define CHOLMOD_DATE "Oct 22, 2019"
 #define CHOLMOD_VER_CODE(main,sub) ((main) * 1000 + (sub))
-#define CHOLMOD_MAIN_VERSION 3
-#define CHOLMOD_SUB_VERSION 0
-#define CHOLMOD_SUBSUB_VERSION 14
 #define CHOLMOD_VERSION \
-	CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
-
-/* <<<< from ../../src/CHOLMOD/Include/cholmod_cholesky.h:178 <<<<<<< */
-#define CHOLMOD_A    0		/* solve Ax=b */
-#define CHOLMOD_LDLt 1		/* solve LDL'x=b */
-#define CHOLMOD_LD   2		/* solve LDx=b */
-#define CHOLMOD_DLt  3		/* solve DL'x=b */
-#define CHOLMOD_L    4		/* solve Lx=b */
-#define CHOLMOD_Lt   5		/* solve L'x=b */
-#define CHOLMOD_D    6		/* solve Dx=b */
-#define CHOLMOD_P    7		/* permute x=Px */
-#define CHOLMOD_Pt   8		/* permute x=P'x */
-
-/* from ../../src/CHOLMOD/Include/cholmod_matrixops.h:104 <<<<<<<<<<< */
-#define CHOLMOD_SCALAR 0	/* A = s*A */
-#define CHOLMOD_ROW 1		/* A = diag(s)*A */
-#define CHOLMOD_COL 2		/* A = A*diag(s) */
-#define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
+    CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
 
 
 /* ========================================================================== */
-/* === CUDA BLAS for the GPU ================================================ */
+/* === CHOLMOD objects ====================================================== */
 /* ========================================================================== */
 
-/* The number of OMP threads should typically be set to the number of cores   */
-/* per socket inthe machine being used.  This maximizes memory performance.   */
-#ifndef CHOLMOD_OMP_NUM_THREADS
-#define CHOLMOD_OMP_NUM_THREADS 4
-#endif
-
-/* Define buffering parameters for GPU processing */
-#ifndef SUITESPARSE_GPU_EXTERN_ON
-#ifdef GPU_BLAS
-#include <cublas_v2.h>
-#endif
-#endif
-
-#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
-#define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
-#define CHOLMOD_DEVICE_STREAMS 2
-
-
-// from ../../src/CHOLMOD/Include/cholmod_core.h - line 295 :  <<<<<
 /* Each CHOLMOD object has its own type code. */
 
 #define CHOLMOD_COMMON 0
@@ -100,9 +378,9 @@ extern "C" {
 /* ========================================================================== */
 
 /* itype defines the types of integer used: */
-#define CHOLMOD_INT 0		/* all integer arrays are int */
-#define CHOLMOD_INTLONG 1	/* most are int, some are SuiteSparse_long */
-#define CHOLMOD_LONG 2		/* all integer arrays are SuiteSparse_long */
+#define CHOLMOD_INT 0		/* all integer arrays are int32_t */
+#define CHOLMOD_INTLONG 1	/* most are int32_t, some are int64_t */
+#define CHOLMOD_LONG 2		/* all integer arrays are int64_t */
 
 /* The itype of all parameters for all CHOLMOD routines must match.
  * FUTURE WORK: CHOLMOD_INTLONG is not yet supported.
@@ -124,6 +402,51 @@ extern "C" {
 #define CHOLMOD_REAL 1		/* a real matrix */
 #define CHOLMOD_COMPLEX 2	/* a complex matrix (ANSI C99 compatible) */
 #define CHOLMOD_ZOMPLEX 3	/* a complex matrix (MATLAB compatible) */
+
+/* The xtype of all parameters for all CHOLMOD routines must match.
+ *
+ * CHOLMOD_PATTERN: x and z are ignored.
+ * CHOLMOD_DOUBLE:  x is non-null of size nzmax, z is ignored.
+ * CHOLMOD_COMPLEX: x is non-null of size 2*nzmax doubles, z is ignored.
+ * CHOLMOD_ZOMPLEX: x and z are non-null of size nzmax
+ *
+ * In the real case, z is ignored.  The kth entry in the matrix is x [k].
+ * There are two methods for the complex case.  In the ANSI C99-compatible
+ * CHOLMOD_COMPLEX case, the real and imaginary parts of the kth entry
+ * are in x [2*k] and x [2*k+1], respectively.  z is ignored.  In the
+ * MATLAB-compatible CHOLMOD_ZOMPLEX case, the real and imaginary
+ * parts of the kth entry are in x [k] and z [k].
+ *
+ * Scalar floating-point values are always passed as double arrays of size 2
+ * (real and imaginary parts).  The imaginary part of a scalar is ignored if
+ * the routine operates on a real matrix.
+ *
+ * These Modules support complex and zomplex matrices, with a few exceptions:
+ *
+ *	Check	    all routines
+ *	Cholesky    all routines
+ *	Core	    all except cholmod_aat, add, band, copy
+ *	Demo	    all routines
+ *	Partition   all routines
+ *	Supernodal  all routines support any real, complex, or zomplex input.
+ *			There will never be a supernodal zomplex L; a complex
+ *			supernodal L is created if A is zomplex.
+ *	Tcov	    all routines
+ *	Valgrind    all routines
+ *
+ * These Modules provide partial support for complex and zomplex matrices:
+ *
+ *	MATLAB	    all routines support real and zomplex only, not complex,
+ *			with the exception of ldlupdate, which supports
+ *			real matrices only.  This is a minor constraint since
+ *			MATLAB's matrices are all real or zomplex.
+ *	MatrixOps   only norm_dense, norm_sparse, and sdmult support complex
+ *			and zomplex
+ *
+ * These Modules do not support complex and zomplex matrices at all:
+ *
+ *	Modify	    all routines support real matrices only
+ */
 
 /* Definitions for cholmod_common: */
 #define CHOLMOD_MAXMETHODS 9	/* maximum number of different methods that */
@@ -306,7 +629,7 @@ typedef struct cholmod_common_struct
     int print ;		/* print level. Default: 3 */
     int precise ;	/* if TRUE, print 16 digits.  Otherwise print 5 */
 
-    /* CHOLMOD print_function replaced with SuiteSparse_config.print_func */
+    /* CHOLMOD print_function replaced with SuiteSparse_config print_func */
 
     int try_catch ;	/* if TRUE, then ignore errors; CHOLMOD is in the middle
 			 * of a try/catch block.  No error message is printed
@@ -591,7 +914,7 @@ typedef struct cholmod_common_struct
      */
 
     size_t nrow ;	/* size of Flag and Head */
-    SuiteSparse_long mark ;	/* mark value for Flag array */
+    int64_t mark ;	/* mark value for Flag array */
     size_t iworksize ;	/* size of Iwork.  Upper bound: 6*nrow+ncol */
     size_t xworksize ;	/* size of Xwork,  in bytes.
 			 * maxrank*nrow*sizeof(double) for update/downdate.
@@ -617,7 +940,7 @@ typedef struct cholmod_common_struct
 			 * up to 6*nrow+ncol for cholmod_analyze. */
 
     int itype ;		/* If CHOLMOD_LONG, Flag, Head, and Iwork are
-                         * SuiteSparse_long.  Otherwise all three are int. */
+                         * int64_t.  Otherwise all three are int. */
 
     int dtype ;		/* double or float */
 
@@ -661,7 +984,8 @@ typedef struct cholmod_common_struct
 
     int called_nd ;	    /* TRUE if the last call to
 			     * cholmod_analyze called NESDIS or METIS. */
-    int blas_ok ;           /* FALSE if BLAS int overflow; TRUE otherwise */
+    int blas_ok ;           /* FALSE if SUITESPARSE_BLAS_INT overflow; 
+                               TRUE otherwise */
 
     /* ---------------------------------------------------------------------- */
     /* SuiteSparseQR control parameters: */
@@ -688,7 +1012,7 @@ typedef struct cholmod_common_struct
     double SPQR_norm_E_fro ;        /* Frobenius norm of dropped entries */
 
     /* was SPQR_istat [0:9] */
-    SuiteSparse_long SPQR_istat [10] ;
+    int64_t SPQR_istat [10] ;
 
     /* ---------------------------------------------------------------------- */
     /* GPU configuration and statistics */
@@ -708,7 +1032,7 @@ typedef struct cholmod_common_struct
     /* for SPQR: */
     size_t gpuMemorySize;       /* Amount of memory in bytes on the GPU */
     double gpuKernelTime;       /* Time taken by GPU kernels */
-    SuiteSparse_long gpuFlops;  /* Number of flops performed by the GPU */
+    int64_t gpuFlops;           /* Number of flops performed by the GPU */
     int gpuNumKernelLaunches;   /* Number of GPU kernel launches */
 
     /* If not using the GPU, these items are not used, but they should be
@@ -717,7 +1041,7 @@ typedef struct cholmod_common_struct
        the CHOLMOD Common, regardless of whether or not they are compiled
        with the GPU libraries or not */
 
-#ifdef GPU_BLAS
+#if defined(SUITESPARSE_CUDA) && !defined(R_MATRIX_CHOLMOD_H)
     /* in CUDA, these three types are pointers */
     #define CHOLMOD_CUBLAS_HANDLE cublasHandle_t
     #define CHOLMOD_CUDASTREAM    cudaStream_t
@@ -771,9 +1095,204 @@ typedef struct cholmod_common_struct
     size_t cholmod_gpu_trsm_calls ;
     size_t cholmod_gpu_potrf_calls ;
 
+    double chunk ;      // chunksize for computing # of threads to use.
+                        // Given nwork work to do, # of threads is
+                        // max (1, min (floor (work / chunk), nthreads_max))
+    int nthreads_max ;  // max # of threads to use in CHOLMOD.  Defaults to
+                        // SUITESPARSE_OPENMP_MAX_THREADS.
+
 } cholmod_common ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1212 :  <<<<<
+/* size_t BLAS statistcs in Common: */
+#define CHOLMOD_CPU_GEMM_CALLS      cholmod_cpu_gemm_calls
+#define CHOLMOD_CPU_SYRK_CALLS      cholmod_cpu_syrk_calls
+#define CHOLMOD_CPU_TRSM_CALLS      cholmod_cpu_trsm_calls
+#define CHOLMOD_CPU_POTRF_CALLS     cholmod_cpu_potrf_calls
+#define CHOLMOD_GPU_GEMM_CALLS      cholmod_gpu_gemm_calls
+#define CHOLMOD_GPU_SYRK_CALLS      cholmod_gpu_syrk_calls
+#define CHOLMOD_GPU_TRSM_CALLS      cholmod_gpu_trsm_calls
+#define CHOLMOD_GPU_POTRF_CALLS     cholmod_gpu_potrf_calls
+
+/* double BLAS statistics in Common: */
+#define CHOLMOD_CPU_GEMM_TIME       cholmod_cpu_gemm_time
+#define CHOLMOD_CPU_SYRK_TIME       cholmod_cpu_syrk_time
+#define CHOLMOD_CPU_TRSM_TIME       cholmod_cpu_trsm_time
+#define CHOLMOD_CPU_POTRF_TIME      cholmod_cpu_potrf_time
+#define CHOLMOD_GPU_GEMM_TIME       cholmod_gpu_gemm_time
+#define CHOLMOD_GPU_SYRK_TIME       cholmod_gpu_syrk_time
+#define CHOLMOD_GPU_TRSM_TIME       cholmod_gpu_trsm_time
+#define CHOLMOD_GPU_POTRF_TIME      cholmod_gpu_potrf_time
+#define CHOLMOD_ASSEMBLE_TIME       cholmod_assemble_time
+#define CHOLMOD_ASSEMBLE_TIME2      cholmod_assemble_time2
+
+/* for supernodal analysis */
+#define CHOLMOD_ANALYZE_FOR_SPQR     0
+#define CHOLMOD_ANALYZE_FOR_CHOLESKY 1
+#define CHOLMOD_ANALYZE_FOR_SPQRGPU  2
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_start:  first call to CHOLMOD */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_start
+(
+    cholmod_common *Common
+) ;
+
+int cholmod_l_start (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_finish:  last call to CHOLMOD */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_finish
+(
+    cholmod_common *Common
+) ;
+
+int cholmod_l_finish (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_defaults:  restore default parameters */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_defaults
+(
+    cholmod_common *Common
+) ;
+
+int cholmod_l_defaults (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_maxrank:  return valid maximum rank for update/downdate */
+/* -------------------------------------------------------------------------- */
+
+size_t cholmod_maxrank	/* returns validated value of Common->maxrank */
+(
+    /* ---- input ---- */
+    size_t n,		/* A and L will have n rows */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+size_t cholmod_l_maxrank (size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_allocate_work:  allocate workspace in Common */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_allocate_work
+(
+    /* ---- input ---- */
+    size_t nrow,	/* size: Common->Flag (nrow), Common->Head (nrow+1) */
+    size_t iworksize,	/* size of Common->Iwork */
+    size_t xworksize,	/* size of Common->Xwork */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_allocate_work (size_t, size_t, size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_free_work:  free workspace in Common */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_free_work
+(
+    cholmod_common *Common
+) ;
+
+int cholmod_l_free_work (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_clear_flag:  clear Flag workspace in Common */
+/* -------------------------------------------------------------------------- */
+
+/* use a macro for speed */
+#define CHOLMOD_CLEAR_FLAG(Common) \
+{ \
+    Common->mark++ ; \
+    if (Common->mark <= 0) \
+    { \
+	Common->mark = EMPTY ; \
+	CHOLMOD (clear_flag) (Common) ; \
+    } \
+}
+
+int64_t cholmod_clear_flag
+(
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_clear_flag (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_error:  called when CHOLMOD encounters an error */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_error
+(
+    /* ---- input ---- */
+    int status,		/* error status */
+    const char *file,	/* name of source code file where error occured */
+    int line,		/* line number in source code file where error occured*/
+    const char *message,/* error message */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_error (int, const char *, int, const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_dbound:  for internal use in CHOLMOD only */
+/* -------------------------------------------------------------------------- */
+
+double cholmod_dbound	/* returns modified diagonal entry of D or L */
+(
+    /* ---- input ---- */
+    double dj,		/* diagonal entry of D for LDL' or L for LL' */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+double cholmod_l_dbound (double, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_hypot:  compute sqrt (x*x + y*y) accurately */
+/* -------------------------------------------------------------------------- */
+
+double cholmod_hypot
+(
+    /* ---- input ---- */
+    double x, double y
+) ;
+
+double cholmod_l_hypot (double, double) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_divcomplex:  complex division, c = a/b */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_divcomplex		/* return 1 if divide-by-zero, 0 otherise */
+(
+    /* ---- input ---- */
+    double ar, double ai,	/* real and imaginary parts of a */
+    double br, double bi,	/* real and imaginary parts of b */
+    /* ---- output --- */
+    double *cr, double *ci	/* real and imaginary parts of c */
+) ;
+
+int cholmod_l_divcomplex (double, double, double, double, double *, double *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Core/cholmod_sparse ================================================== */
+/* ========================================================================== */
+
 /* A sparse matrix stored in compressed-column form. */
 
 typedef struct cholmod_sparse_struct
@@ -782,7 +1301,7 @@ typedef struct cholmod_sparse_struct
     size_t ncol ;
     size_t nzmax ;	/* maximum number of entries in the matrix */
 
-    /* pointers to int or SuiteSparse_long: */
+    /* pointers to int32_t or int64_t: */
     void *p ;		/* p [0..ncol], the column pointers */
     void *i ;		/* i [0..nzmax-1], the row indices */
 
@@ -814,10 +1333,10 @@ typedef struct cholmod_sparse_struct
 	* details.
 	*/
 
-    int itype ;		/* CHOLMOD_INT:     p, i, and nz are int.
-			 * CHOLMOD_INTLONG: p is SuiteSparse_long,
-			 *                  i and nz are int.
-			 * CHOLMOD_LONG:    p, i, and nz are SuiteSparse_long */
+    int itype ;		/* CHOLMOD_INT:     p, i, and nz are int32_t.
+			 * CHOLMOD_INTLONG: p is int64_t,
+                         *                  i and nz are int32_t.
+			 * CHOLMOD_LONG:    p, i, and nz are int64_t */
 
     int xtype ;		/* pattern, real, complex, or zomplex */
     int dtype ;		/* x and z are double or float */
@@ -827,7 +1346,352 @@ typedef struct cholmod_sparse_struct
 
 } cholmod_sparse ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1606 :  <<<<<
+#ifndef R_MATRIX_CHOLMOD_H
+
+typedef struct cholmod_descendant_score_t
+{
+    double score ;
+    int64_t d ;
+}
+descendantScore ;
+
+/* For sorting descendant supernodes with qsort */
+int cholmod_score_comp (struct cholmod_descendant_score_t *i,
+			struct cholmod_descendant_score_t *j) ;
+
+int cholmod_l_score_comp (struct cholmod_descendant_score_t *i,
+			  struct cholmod_descendant_score_t *j) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_allocate_sparse:  allocate a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_allocate_sparse
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of A */
+    size_t ncol,	/* # of columns of A */
+    size_t nzmax,	/* max # of nonzeros of A */
+    int sorted,		/* TRUE if columns of A sorted, FALSE otherwise */
+    int packed,		/* TRUE if A will be packed, FALSE otherwise */
+    int stype,		/* stype of A */
+    int xtype,		/* CHOLMOD_PATTERN, _REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_allocate_sparse (size_t, size_t, size_t, int, int,
+    int, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_free_sparse:  free a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_free_sparse
+(
+    /* ---- in/out --- */
+    cholmod_sparse **A,	/* matrix to deallocate, NULL on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_free_sparse (cholmod_sparse **, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_reallocate_sparse:  change the size (# entries) of sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_reallocate_sparse
+(
+    /* ---- input ---- */
+    size_t nznew,	/* new # of entries in A */
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* matrix to reallocate */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_reallocate_sparse ( size_t, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_nnz:  return number of nonzeros in a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int64_t cholmod_nnz
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_nnz (cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_speye:  sparse identity matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_speye
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of A */
+    size_t ncol,	/* # of columns of A */
+    int xtype,		/* CHOLMOD_PATTERN, _REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_speye (size_t, size_t, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_spzeros:  sparse zero matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_spzeros
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of A */
+    size_t ncol,	/* # of columns of A */
+    size_t nzmax,	/* max # of nonzeros of A */
+    int xtype,		/* CHOLMOD_PATTERN, _REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_spzeros (size_t, size_t, size_t, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_transpose:  transpose a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+/* Return A' or A.'  The "values" parameter is 0, 1, or 2 to denote the pattern
+ * transpose, the array transpose (A.'), and the complex conjugate transpose
+ * (A').
+ */
+
+cholmod_sparse *cholmod_transpose
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to transpose */
+    int values,		/* 0: pattern, 1: array transpose, 2: conj. transpose */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_transpose (cholmod_sparse *, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_transpose_unsym:  transpose an unsymmetric sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+/* Compute F = A', A (:,f)', or A (p,f)', where A is unsymmetric and F is
+ * already allocated.  See cholmod_transpose for a simpler routine. */
+
+int cholmod_transpose_unsym
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to transpose */
+    int values,		/* 0: pattern, 1: array transpose, 2: conj. transpose */
+    int32_t *Perm,	/* size nrow, if present (can be NULL) */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- output --- */
+    cholmod_sparse *F,	/* F = A', A(:,f)', or A(p,f)' */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_transpose_unsym (cholmod_sparse *, int, int64_t *,
+    int64_t *, size_t, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_transpose_sym:  transpose a symmetric sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+/* Compute F = A' or A (p,p)', where A is symmetric and F is already allocated.
+ * See cholmod_transpose for a simpler routine. */
+
+int cholmod_transpose_sym
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to transpose */
+    int values,		/* 0: pattern, 1: array transpose, 2: conj. transpose */
+    int32_t *Perm,	/* size nrow, if present (can be NULL) */
+    /* ---- output --- */
+    cholmod_sparse *F,	/* F = A' or A(p,p)' */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_transpose_sym (cholmod_sparse *, int, int64_t *,
+    cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_ptranspose:  transpose a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+/* Return A' or A(p,p)' if A is symmetric.  Return A', A(:,f)', or A(p,f)' if
+ * A is unsymmetric. */
+
+cholmod_sparse *cholmod_ptranspose
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to transpose */
+    int values,		/* 0: pattern, 1: array transpose, 2: conj. transpose */
+    int32_t *Perm,	/* if non-NULL, F = A(p,f) or A(p,p) */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_ptranspose (cholmod_sparse *, int, int64_t *,
+    int64_t *, size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_sort:  sort row indices in each column of sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_sort
+(
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* matrix to sort */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_sort (cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_band:  C = tril (triu (A,k1), k2) */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_band
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to extract band matrix from */
+    int64_t k1,         /* ignore entries below the k1-st diagonal */
+    int64_t k2,         /* ignore entries above the k2-nd diagonal */
+    int mode,		/* >0: numerical, 0: pattern, <0: pattern (no diag) */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_band (cholmod_sparse *, int64_t,
+    int64_t, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_band_inplace:  A = tril (triu (A,k1), k2) */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_band_inplace
+(
+    /* ---- input ---- */
+    int64_t k1,         /* ignore entries below the k1-st diagonal */
+    int64_t k2,         /* ignore entries above the k2-nd diagonal */
+    int mode,		/* >0: numerical, 0: pattern, <0: pattern (no diag) */
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* matrix from which entries not in band are removed */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_band_inplace (int64_t, int64_t, int,
+    cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_aat:  C = A*A' or A(:,f)*A(:,f)' */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_aat
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* input matrix; C=A*A' is constructed */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int mode,		/* >0: numerical, 0: pattern, <0: pattern (no diag),
+			 * -2: pattern only, no diagonal, add 50%+n extra
+			 * space to C */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_aat (cholmod_sparse *, int64_t *, size_t,
+    int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy_sparse:  C = A, create an exact copy of a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_copy_sparse
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_copy_sparse (cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy:  C = A, with possible change of stype */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_copy
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to copy */
+    int stype,		/* requested stype of C */
+    int mode,		/* >0: numerical, 0: pattern, <0: pattern (no diag) */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_copy (cholmod_sparse *, int, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_add: C = alpha*A + beta*B */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_add
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	    /* matrix to add */
+    cholmod_sparse *B,	    /* matrix to add */
+    double alpha [2],	    /* scale factor for A */
+    double beta [2],	    /* scale factor for B */
+    int values,		    /* if TRUE compute the numerical values of C */
+    int sorted,		    /* if TRUE, sort columns of C */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_add (cholmod_sparse *, cholmod_sparse *, double [2],
+    double [2], int, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_sparse_xtype: change the xtype of a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_sparse_xtype
+(
+    /* ---- input ---- */
+    int to_xtype,	/* requested xtype (pattern, real, complex, zomplex) */
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* sparse matrix to change */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_sparse_xtype (int, cholmod_sparse *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Core/cholmod_factor ================================================== */
+/* ========================================================================== */
 
 /* A symbolic and numeric factorization, either simplicial or supernodal.
  * In all cases, the row indices in the columns of L are kept sorted. */
@@ -949,8 +1813,8 @@ typedef struct cholmod_factor_struct
     int itype ; /* The integer arrays are Perm, ColCount, p, i, nz,
                  * next, prev, super, pi, px, and s.  If itype is
 		 * CHOLMOD_INT, all of these are int arrays.
-		 * CHOLMOD_INTLONG: p, pi, px are SuiteSparse_long, others int.
-		 * CHOLMOD_LONG:    all integer arrays are SuiteSparse_long. */
+		 * CHOLMOD_INTLONG: p, pi, px are int64_t, others int.
+		 * CHOLMOD_LONG:    all integer arrays are int64_t. */
     int xtype ; /* pattern, real, complex, or zomplex */
     int dtype ; /* x and z double or float */
 
@@ -959,7 +1823,162 @@ typedef struct cholmod_factor_struct
 
 } cholmod_factor ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 1890 :  <<<<<
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_allocate_factor: allocate a factor (symbolic LL' or LDL') */
+/* -------------------------------------------------------------------------- */
+
+cholmod_factor *cholmod_allocate_factor
+(
+    /* ---- input ---- */
+    size_t n,		/* L is n-by-n */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_factor *cholmod_l_allocate_factor (size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_free_factor:  free a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_free_factor
+(
+    /* ---- in/out --- */
+    cholmod_factor **L,	/* factor to free, NULL on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_free_factor (cholmod_factor **, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_reallocate_factor:  change the # entries in a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_reallocate_factor
+(
+    /* ---- input ---- */
+    size_t nznew,	/* new # of entries in L */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_reallocate_factor (size_t, cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_change_factor:  change the type of factor (e.g., LDL' to LL') */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_change_factor
+(
+    /* ---- input ---- */
+    int to_xtype,	/* to CHOLMOD_PATTERN, _REAL, _COMPLEX, _ZOMPLEX */
+    int to_ll,		/* TRUE: convert to LL', FALSE: LDL' */
+    int to_super,	/* TRUE: convert to supernodal, FALSE: simplicial */
+    int to_packed,	/* TRUE: pack simplicial columns, FALSE: do not pack */
+    int to_monotonic,	/* TRUE: put simplicial columns in order, FALSE: not */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_change_factor ( int, int, int, int, int, cholmod_factor *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_pack_factor:  pack the columns of a factor */
+/* -------------------------------------------------------------------------- */
+
+/* Pack the columns of a simplicial factor.  Unlike cholmod_change_factor,
+ * it can pack the columns of a factor even if they are not stored in their
+ * natural order (non-monotonic). */
+
+int cholmod_pack_factor
+(
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_pack_factor (cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_reallocate_column:  resize a single column of a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_reallocate_column
+(
+    /* ---- input ---- */
+    size_t j,		/* the column to reallocate */
+    size_t need,	/* required size of column j */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_reallocate_column (size_t, size_t, cholmod_factor *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_factor_to_sparse:  create a sparse matrix copy of a factor */
+/* -------------------------------------------------------------------------- */
+
+/* Only operates on numeric factors, not symbolic ones */
+
+cholmod_sparse *cholmod_factor_to_sparse
+(
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to copy, converted to symbolic on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_factor_to_sparse (cholmod_factor *,
+	cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy_factor:  create a copy of a factor */
+/* -------------------------------------------------------------------------- */
+
+cholmod_factor *cholmod_copy_factor
+(
+    /* ---- input ---- */
+    cholmod_factor *L,	/* factor to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_factor *cholmod_l_copy_factor (cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_factor_xtype: change the xtype of a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_factor_xtype
+(
+    /* ---- input ---- */
+    int to_xtype,	/* requested xtype (real, complex, or zomplex) */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to change */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_factor_xtype (int, cholmod_factor *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Core/cholmod_dense =================================================== */
+/* ========================================================================== */
 
 /* A dense matrix in column-oriented form.  It has no itype since it contains
  * no integers.  Entry in row i and column j is located in x [i+j*d].
@@ -978,7 +1997,191 @@ typedef struct cholmod_dense_struct
 
 } cholmod_dense ;
 
-// in ../../src/CHOLMOD/Include/cholmod_core.h  skip forward to - line 2089 :  <<<<<
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_allocate_dense:  allocate a dense matrix (contents uninitialized) */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_allocate_dense
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of matrix */
+    size_t ncol,	/* # of columns of matrix */
+    size_t d,		/* leading dimension */
+    int xtype,		/* CHOLMOD_REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_allocate_dense (size_t, size_t, size_t, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_zeros: allocate a dense matrix and set it to zero */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_zeros
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of matrix */
+    size_t ncol,	/* # of columns of matrix */
+    int xtype,		/* CHOLMOD_REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_zeros (size_t, size_t, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_ones: allocate a dense matrix and set it to all ones */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_ones
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of matrix */
+    size_t ncol,	/* # of columns of matrix */
+    int xtype,		/* CHOLMOD_REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_ones (size_t, size_t, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_eye: allocate a dense matrix and set it to the identity matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_eye
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of matrix */
+    size_t ncol,	/* # of columns of matrix */
+    int xtype,		/* CHOLMOD_REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_eye (size_t, size_t, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_free_dense:  free a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_free_dense
+(
+    /* ---- in/out --- */
+    cholmod_dense **X,	/* dense matrix to deallocate, NULL on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_free_dense (cholmod_dense **, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_ensure_dense:  ensure a dense matrix has a given size and type */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_ensure_dense
+(
+    /* ---- input/output ---- */
+    cholmod_dense **XHandle,    /* matrix handle to check */
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of matrix */
+    size_t ncol,	/* # of columns of matrix */
+    size_t d,		/* leading dimension */
+    int xtype,		/* CHOLMOD_REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_ensure_dense (cholmod_dense **, size_t, size_t, size_t,
+    int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_sparse_to_dense:  create a dense matrix copy of a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_sparse_to_dense
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_sparse_to_dense (cholmod_sparse *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_dense_to_sparse:  create a sparse matrix copy of a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_dense_to_sparse
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* matrix to copy */
+    int values,		/* TRUE if values to be copied, FALSE otherwise */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_dense_to_sparse (cholmod_dense *, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy_dense:  create a copy of a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_copy_dense
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* matrix to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_copy_dense (cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy_dense2:  copy a dense matrix (pre-allocated) */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_copy_dense2
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* matrix to copy */
+    /* ---- output --- */
+    cholmod_dense *Y,	/* copy of matrix X */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_copy_dense2 (cholmod_dense *, cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_dense_xtype: change the xtype of a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_dense_xtype
+(
+    /* ---- input ---- */
+    int to_xtype,	/* requested xtype (real, complex,or zomplex) */
+    /* ---- in/out --- */
+    cholmod_dense *X,	/* dense matrix to change */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_dense_xtype (int, cholmod_dense *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Core/cholmod_triplet ================================================= */
+/* ========================================================================== */
 
 /* A sparse matrix stored in triplet form. */
 
@@ -1039,14 +2242,2245 @@ typedef struct cholmod_triplet_struct
 	* no entry in a triplet matrix is ever ignored.
 	*/
 
-    int itype ; /* CHOLMOD_LONG: i and j are SuiteSparse_long.  Otherwise int */
+    int itype ; /* CHOLMOD_LONG: i and j are int64_t.  Otherwise int */
     int xtype ; /* pattern, real, complex, or zomplex */
     int dtype ; /* x and z are double or float */
 
 } cholmod_triplet ;
 
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_allocate_triplet:  allocate a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_triplet *cholmod_allocate_triplet
+(
+    /* ---- input ---- */
+    size_t nrow,	/* # of rows of T */
+    size_t ncol,	/* # of columns of T */
+    size_t nzmax,	/* max # of nonzeros of T */
+    int stype,		/* stype of T */
+    int xtype,		/* CHOLMOD_PATTERN, _REAL, _COMPLEX, or _ZOMPLEX */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_triplet *cholmod_l_allocate_triplet (size_t, size_t, size_t, int, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_free_triplet:  free a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_free_triplet
+(
+    /* ---- in/out --- */
+    cholmod_triplet **T,    /* triplet matrix to deallocate, NULL on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_free_triplet (cholmod_triplet **, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_reallocate_triplet:  change the # of entries in a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_reallocate_triplet
+(
+    /* ---- input ---- */
+    size_t nznew,	/* new # of entries in T */
+    /* ---- in/out --- */
+    cholmod_triplet *T,	/* triplet matrix to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_reallocate_triplet (size_t, cholmod_triplet *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_sparse_to_triplet:  create a triplet matrix copy of a sparse matrix*/
+/* -------------------------------------------------------------------------- */
+
+cholmod_triplet *cholmod_sparse_to_triplet
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_triplet *cholmod_l_sparse_to_triplet (cholmod_sparse *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_triplet_to_sparse:  create a sparse matrix copy of a triplet matrix*/
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_triplet_to_sparse
+(
+    /* ---- input ---- */
+    cholmod_triplet *T,	/* matrix to copy */
+    size_t nzmax,	/* allocate at least this much space in output matrix */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_triplet_to_sparse (cholmod_triplet *, size_t,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_copy_triplet:  create a copy of a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+cholmod_triplet *cholmod_copy_triplet
+(
+    /* ---- input ---- */
+    cholmod_triplet *T,	/* matrix to copy */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_triplet *cholmod_l_copy_triplet (cholmod_triplet *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_triplet_xtype: change the xtype of a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_triplet_xtype
+(
+    /* ---- input ---- */
+    int to_xtype,	/* requested xtype (pattern, real, complex,or zomplex)*/
+    /* ---- in/out --- */
+    cholmod_triplet *T,	/* triplet matrix to change */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_triplet_xtype (int, cholmod_triplet *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Core/cholmod_memory ================================================== */
+/* ========================================================================== */
+
+/* The user may make use of these, just like malloc and free.  You can even
+ * malloc an object and safely free it with cholmod_free, and visa versa
+ * (except that the memory usage statistics will be corrupted).  These routines
+ * do differ from malloc and free.  If cholmod_free is given a NULL pointer,
+ * for example, it does nothing (unlike the ANSI free).  cholmod_realloc does
+ * not return NULL if given a non-NULL pointer and a nonzero size, even if it
+ * fails (it returns the original pointer and sets an error code in
+ * Common->status instead).
+ *
+ * CHOLMOD keeps track of the amount of memory it has allocated, and so the
+ * cholmod_free routine also takes the size of the object being freed.  This
+ * is only used for statistics.  If you, the user of CHOLMOD, pass the wrong
+ * size, the only consequence is that the memory usage statistics will be
+ * corrupted.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+void *cholmod_malloc	/* returns pointer to the newly malloc'd block */
+(
+    /* ---- input ---- */
+    size_t n,		/* number of items */
+    size_t size,	/* size of each item */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+void *cholmod_l_malloc (size_t, size_t, cholmod_common *) ;
+
+void *cholmod_calloc	/* returns pointer to the newly calloc'd block */
+(
+    /* ---- input ---- */
+    size_t n,		/* number of items */
+    size_t size,	/* size of each item */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+void *cholmod_l_calloc (size_t, size_t, cholmod_common *) ;
+
+void *cholmod_free	/* always returns NULL */
+(
+    /* ---- input ---- */
+    size_t n,		/* number of items */
+    size_t size,	/* size of each item */
+    /* ---- in/out --- */
+    void *p,		/* block of memory to free */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+void *cholmod_l_free (size_t, size_t, void *, cholmod_common *) ;
+
+void *cholmod_realloc	/* returns pointer to reallocated block */
+(
+    /* ---- input ---- */
+    size_t nnew,	/* requested # of items in reallocated block */
+    size_t size,	/* size of each item */
+    /* ---- in/out --- */
+    void *p,		/* block of memory to realloc */
+    size_t *n,		/* current size on input, nnew on output if successful*/
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+void *cholmod_l_realloc (size_t, size_t, void *, size_t *, cholmod_common *) ;
+
+int cholmod_realloc_multiple
+(
+    /* ---- input ---- */
+    size_t nnew,	/* requested # of items in reallocated blocks */
+    int nint,		/* number of int32_t/int64_t blocks */
+    int xtype,		/* CHOLMOD_PATTERN, _REAL, _COMPLEX, or _ZOMPLEX */
+    /* ---- in/out --- */
+    void **Iblock,	/* int32_t or int64_t block */
+    void **Jblock,	/* int32_t or int64_t block */
+    void **Xblock,	/* complex, double, or float block */
+    void **Zblock,	/* zomplex case only: double or float block */
+    size_t *n,		/* current size of the I,J,X,Z blocks on input,
+			 * nnew on output if successful */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_realloc_multiple (size_t, int, int, void **, void **, void **,
+    void **, size_t *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === version control ====================================================== */
+/* ========================================================================== */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+int cholmod_version     /* returns CHOLMOD_VERSION */
+(
+    /* output, contents not defined on input.  Not used if NULL.
+        version [0] = CHOLMOD_MAIN_VERSION
+        version [1] = CHOLMOD_SUB_VERSION
+        version [2] = CHOLMOD_SUBSUB_VERSION
+    */
+    int version [3]
+) ;
+
+int cholmod_l_version (int version [3]) ;
+
+/* Versions prior to 2.1.1 do not have the above function.  The following
+   code fragment will work with any version of CHOLMOD:
+   #ifdef CHOLMOD_HAS_VERSION_FUNCTION
+   v = cholmod_version (NULL) ;
+   #else
+   v = CHOLMOD_VERSION ;
+   #endif
+*/
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === symmetry types ======================================================= */
+/* ========================================================================== */
+
+#define CHOLMOD_MM_RECTANGULAR 1
+#define CHOLMOD_MM_UNSYMMETRIC 2
+#define CHOLMOD_MM_SYMMETRIC 3
+#define CHOLMOD_MM_HERMITIAN 4
+#define CHOLMOD_MM_SKEW_SYMMETRIC 5
+#define CHOLMOD_MM_SYMMETRIC_POSDIAG 6
+#define CHOLMOD_MM_HERMITIAN_POSDIAG 7
+
+
+/* ========================================================================== */
+/* === Include/cholmod_check.h ============================================== */
+/* ========================================================================== */
+
+/* CHOLMOD Check module.
+ *
+ * Routines that check and print the 5 basic data types in CHOLMOD, and 3 kinds
+ * of integer vectors (subset, perm, and parent), and read in matrices from a
+ * file:
+ *
+ * cholmod_check_common	    check/print the Common object
+ * cholmod_print_common
+ *
+ * cholmod_check_sparse	    check/print a sparse matrix in column-oriented form
+ * cholmod_print_sparse
+ *
+ * cholmod_check_dense	    check/print a dense matrix
+ * cholmod_print_dense
+ *
+ * cholmod_check_factor	    check/print a Cholesky factorization
+ * cholmod_print_factor
+ *
+ * cholmod_check_triplet    check/print a sparse matrix in triplet form
+ * cholmod_print_triplet
+ *
+ * cholmod_check_subset	    check/print a subset (integer vector in given range)
+ * cholmod_print_subset
+ *
+ * cholmod_check_perm	    check/print a permutation (an integer vector)
+ * cholmod_print_perm
+ *
+ * cholmod_check_parent	    check/print an elimination tree (an integer vector)
+ * cholmod_print_parent
+ *
+ * cholmod_read_triplet	    read a matrix in triplet form (any Matrix Market
+ *			    "coordinate" format, or a generic triplet format).
+ *
+ * cholmod_read_sparse	    read a matrix in sparse form (same file format as
+ *			    cholmod_read_triplet).
+ *
+ * cholmod_read_dense	    read a dense matrix (any Matrix Market "array"
+ *			    format, or a generic dense format).
+ *
+ * cholmod_write_sparse	    write a sparse matrix to a Matrix Market file.
+ *
+ * cholmod_write_dense	    write a dense matrix to a Matrix Market file.
+ *
+ * cholmod_print_common and cholmod_check_common are the only two routines that
+ * you may call after calling cholmod_finish.
+ *
+ * Requires the Core module.  Not required by any CHOLMOD module, except when
+ * debugging is enabled (in which case all modules require the Check module).
+ *
+ * See cholmod_read.c for a description of the file formats supported by the
+ * cholmod_read_* routines.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_common:  check the Common object */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_common
+(
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_common (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_common:  print the Common object */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_common
+(
+    /* ---- input ---- */
+    const char *name,	/* printed name of Common object */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_common (const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_gpu_stats:  print the GPU / CPU statistics */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_gpu_stats   (cholmod_common *) ;
+int cholmod_l_gpu_stats (cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_sparse:  check a sparse matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_sparse
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* sparse matrix to check */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_sparse (cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_sparse */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_sparse
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* sparse matrix to print */
+    const char *name,	/* printed name of sparse matrix */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_sparse (cholmod_sparse *, const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_dense:  check a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_dense
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* dense matrix to check */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_dense (cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_dense:  print a dense matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_dense
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* dense matrix to print */
+    const char *name,	/* printed name of dense matrix */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_dense (cholmod_dense *, const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_factor:  check a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_factor
+(
+    /* ---- input ---- */
+    cholmod_factor *L,	/* factor to check */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_factor (cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_factor:  print a factor */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_factor
+(
+    /* ---- input ---- */
+    cholmod_factor *L,	/* factor to print */
+    const char *name,	/* printed name of factor */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_factor (cholmod_factor *, const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_triplet:  check a sparse matrix in triplet form */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_triplet
+(
+    /* ---- input ---- */
+    cholmod_triplet *T,	/* triplet matrix to check */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_triplet (cholmod_triplet *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_triplet:  print a triplet matrix */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_triplet
+(
+    /* ---- input ---- */
+    cholmod_triplet *T,	/* triplet matrix to print */
+    const char *name,	/* printed name of triplet matrix */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_triplet (cholmod_triplet *, const char *, cholmod_common *);
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_subset:  check a subset */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_subset
+(
+    /* ---- input ---- */
+    int32_t *Set,	/* Set [0:len-1] is a subset of 0:n-1.  Duplicates OK */
+    int64_t len,        /* size of Set (an integer array) */
+    size_t n,		/* 0:n-1 is valid range */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_subset (int64_t *, int64_t, size_t,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_subset:  print a subset */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_subset
+(
+    /* ---- input ---- */
+    int32_t *Set,	/* Set [0:len-1] is a subset of 0:n-1.  Duplicates OK */
+    int64_t len,        /* size of Set (an integer array) */
+    size_t n,		/* 0:n-1 is valid range */
+    const char *name,	/* printed name of Set */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_subset (int64_t *, int64_t, size_t,
+    const char *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_perm:  check a permutation */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_perm
+(
+    /* ---- input ---- */
+    int32_t *Perm,	/* Perm [0:len-1] is a permutation of subset of 0:n-1 */
+    size_t len,		/* size of Perm (an integer array) */
+    size_t n,		/* 0:n-1 is valid range */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_perm (int64_t *, size_t, size_t, cholmod_common *);
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_perm:  print a permutation vector */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_perm
+(
+    /* ---- input ---- */
+    int32_t *Perm,	/* Perm [0:len-1] is a permutation of subset of 0:n-1 */
+    size_t len,		/* size of Perm (an integer array) */
+    size_t n,		/* 0:n-1 is valid range */
+    const char *name,	/* printed name of Perm */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_perm (int64_t *, size_t, size_t, const char *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_check_parent:  check an elimination tree */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_check_parent
+(
+    /* ---- input ---- */
+    int32_t *Parent,	/* Parent [0:n-1] is an elimination tree */
+    size_t n,		/* size of Parent */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_check_parent (int64_t *, size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_print_parent */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_print_parent
+(
+    /* ---- input ---- */
+    int32_t *Parent,	/* Parent [0:n-1] is an elimination tree */
+    size_t n,		/* size of Parent */
+    const char *name,	/* printed name of Parent */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_print_parent (int64_t *, size_t, const char *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_read_sparse: read a sparse matrix from a file */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_read_sparse
+(
+    /* ---- input ---- */
+    FILE *f,		/* file to read from, must already be open */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_read_sparse (FILE *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_read_triplet: read a triplet matrix from a file */
+/* -------------------------------------------------------------------------- */
+
+cholmod_triplet *cholmod_read_triplet
+(
+    /* ---- input ---- */
+    FILE *f,		/* file to read from, must already be open */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_triplet *cholmod_l_read_triplet (FILE *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_read_dense: read a dense matrix from a file */
+/* -------------------------------------------------------------------------- */
+
+cholmod_dense *cholmod_read_dense
+(
+    /* ---- input ---- */
+    FILE *f,		/* file to read from, must already be open */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_read_dense (FILE *, cholmod_common *) ; 
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_read_matrix: read a sparse or dense matrix from a file */
+/* -------------------------------------------------------------------------- */
+
+void *cholmod_read_matrix
+(
+    /* ---- input ---- */
+    FILE *f,		/* file to read from, must already be open */
+    int prefer,		/* If 0, a sparse matrix is always return as a
+			 *	cholmod_triplet form.  It can have any stype
+			 *	(symmetric-lower, unsymmetric, or
+			 *	symmetric-upper).
+			 * If 1, a sparse matrix is returned as an unsymmetric
+			 *	cholmod_sparse form (A->stype == 0), with both
+			 *	upper and lower triangular parts present.
+			 *	This is what the MATLAB mread mexFunction does,
+			 *	since MATLAB does not have an stype.
+			 * If 2, a sparse matrix is returned with an stype of 0
+			 *	or 1 (unsymmetric, or symmetric with upper part
+			 *	stored).
+			 * This argument has no effect for dense matrices.
+			 */
+    /* ---- output---- */
+    int *mtype,		/* CHOLMOD_TRIPLET, CHOLMOD_SPARSE or CHOLMOD_DENSE */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+void *cholmod_l_read_matrix (FILE *, int, int *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_write_sparse: write a sparse matrix to a file */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_write_sparse
+(
+    /* ---- input ---- */
+    FILE *f,		    /* file to write to, must already be open */
+    cholmod_sparse *A,	    /* matrix to print */
+    cholmod_sparse *Z,	    /* optional matrix with pattern of explicit zeros */
+    const char *comments,   /* optional filename of comments to include */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_write_sparse (FILE *, cholmod_sparse *, cholmod_sparse *,
+    const char *c, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_write_dense: write a dense matrix to a file */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_write_dense
+(
+    /* ---- input ---- */
+    FILE *f,		    /* file to write to, must already be open */
+    cholmod_dense *X,	    /* matrix to print */
+    const char *comments,   /* optional filename of comments to include */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_write_dense (FILE *, cholmod_dense *, const char *,
+    cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_cholesky.h =========================================== */
+/* ========================================================================== */
+
+/* CHOLMOD Cholesky module.
+ *
+ * Sparse Cholesky routines: analysis, factorization, and solve.
+ *
+ * The primary routines are all that a user requires to order, analyze, and
+ * factorize a sparse symmetric positive definite matrix A (or A*A'), and
+ * to solve Ax=b (or A*A'x=b).  The primary routines rely on the secondary
+ * routines, the CHOLMOD Core module, and the AMD and COLAMD packages.  They
+ * make optional use of the CHOLMOD Supernodal and Partition modules, the
+ * METIS package, and the CCOLAMD package.
+ *
+ * Primary routines:
+ * -----------------
+ *
+ * cholmod_analyze		order and analyze (simplicial or supernodal)
+ * cholmod_factorize		simplicial or supernodal Cholesky factorization
+ * cholmod_solve		solve a linear system (simplicial or supernodal)
+ * cholmod_solve2		like cholmod_solve, but reuse workspace
+ * cholmod_spsolve		solve a linear system (sparse x and b)
+ *
+ * Secondary routines:
+ * ------------------
+ *
+ * cholmod_analyze_p		analyze, with user-provided permutation or f set
+ * cholmod_factorize_p		factorize, with user-provided permutation or f
+ * cholmod_analyze_ordering	analyze a fill-reducing ordering
+ * cholmod_etree		find the elimination tree
+ * cholmod_rowcolcounts		compute the row/column counts of L
+ * cholmod_amd			order using AMD
+ * cholmod_colamd		order using COLAMD
+ * cholmod_rowfac		incremental simplicial factorization
+ * cholmod_rowfac_mask		rowfac, specific to LPDASA
+ * cholmod_rowfac_mask2         rowfac, specific to LPDASA
+ * cholmod_row_subtree		find the nonzero pattern of a row of L
+ * cholmod_resymbol		recompute the symbolic pattern of L
+ * cholmod_resymbol_noperm	recompute the symbolic pattern of L, no L->Perm
+ * cholmod_postorder		postorder a tree
+ *
+ * Requires the Core module, and two packages: AMD and COLAMD.
+ * Optionally uses the Supernodal and Partition modules.
+ * Required by the Partition module.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_analyze:  order and analyze (simplicial or supernodal) */
+/* -------------------------------------------------------------------------- */
+
+/* Orders and analyzes A, AA', PAP', or PAA'P' and returns a symbolic factor
+ * that can later be passed to cholmod_factorize. */
+
+cholmod_factor *cholmod_analyze 
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order and analyze */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_factor *cholmod_l_analyze (cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_analyze_p:  analyze, with user-provided permutation or f set */
+/* -------------------------------------------------------------------------- */
+
+/* Orders and analyzes A, AA', PAP', PAA'P', FF', or PFF'P and returns a
+ * symbolic factor that can later be passed to cholmod_factorize, where
+ * F = A(:,fset) if fset is not NULL and A->stype is zero.
+ * UserPerm is tried if non-NULL.  */
+
+cholmod_factor *cholmod_analyze_p
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order and analyze */
+    int32_t *UserPerm,	/* user-provided permutation, size A->nrow */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_factor *cholmod_l_analyze_p (cholmod_sparse *, int64_t *,
+    int64_t *, size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_analyze_p2:  analyze for sparse Cholesky or sparse QR */
+/* -------------------------------------------------------------------------- */
+
+cholmod_factor *cholmod_analyze_p2
+(
+    /* ---- input ---- */
+    int for_whom,       /* FOR_SPQR     (0): for SPQR but not GPU-accelerated
+                           FOR_CHOLESKY (1): for Cholesky (GPU or not)
+                           FOR_SPQRGPU  (2): for SPQR with GPU acceleration */
+    cholmod_sparse *A,	/* matrix to order and analyze */
+    int32_t *UserPerm,	/* user-provided permutation, size A->nrow */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_factor *cholmod_l_analyze_p2 (int, cholmod_sparse *, int64_t *,
+    int64_t *, size_t, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_factorize:  simplicial or supernodal Cholesky factorization */
+/* -------------------------------------------------------------------------- */
+
+/* Factorizes PAP' (or PAA'P' if A->stype is 0), using a factor obtained
+ * from cholmod_analyze.  The analysis can be re-used simply by calling this
+ * routine a second time with another matrix.  A must have the same nonzero
+ * pattern as that passed to cholmod_analyze. */
+
+int cholmod_factorize 
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* resulting factorization */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_factorize (cholmod_sparse *, cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_factorize_p:  factorize, with user-provided permutation or fset */
+/* -------------------------------------------------------------------------- */
+
+/* Same as cholmod_factorize, but with more options. */
+
+int cholmod_factorize_p
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    double beta [2],	/* factorize beta*I+A or beta*I+A'*A */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* resulting factorization */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_factorize_p (cholmod_sparse *, double [2], int64_t *,
+    size_t, cholmod_factor *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_solve:  solve a linear system (simplicial or supernodal) */
+/* -------------------------------------------------------------------------- */
+
+/* Solves one of many linear systems with a dense right-hand-side, using the
+ * factorization from cholmod_factorize (or as modified by any other CHOLMOD
+ * routine).  D is identity for LL' factorizations. */
+
+#define CHOLMOD_A    0		/* solve Ax=b */
+#define CHOLMOD_LDLt 1		/* solve LDL'x=b */
+#define CHOLMOD_LD   2		/* solve LDx=b */
+#define CHOLMOD_DLt  3		/* solve DL'x=b */
+#define CHOLMOD_L    4		/* solve Lx=b */
+#define CHOLMOD_Lt   5		/* solve L'x=b */
+#define CHOLMOD_D    6		/* solve Dx=b */
+#define CHOLMOD_P    7		/* permute x=Px */
+#define CHOLMOD_Pt   8		/* permute x=P'x */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+cholmod_dense *cholmod_solve	/* returns the solution X */
+(
+    /* ---- input ---- */
+    int sys,		/* system to solve */
+    cholmod_factor *L,	/* factorization to use */
+    cholmod_dense *B,	/* right-hand-side */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_dense *cholmod_l_solve (int, cholmod_factor *, cholmod_dense *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_solve2:  like cholmod_solve, but with reusable workspace */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_solve2     /* returns TRUE on success, FALSE on failure */
+(
+    /* ---- input ---- */
+    int sys,		            /* system to solve */
+    cholmod_factor *L,	            /* factorization to use */
+    cholmod_dense *B,               /* right-hand-side */
+    cholmod_sparse *Bset,
+    /* ---- output --- */
+    cholmod_dense **X_Handle,       /* solution, allocated if need be */
+    cholmod_sparse **Xset_Handle,
+    /* ---- workspace  */
+    cholmod_dense **Y_Handle,       /* workspace, or NULL */
+    cholmod_dense **E_Handle,       /* workspace, or NULL */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_solve2 (int, cholmod_factor *, cholmod_dense *, cholmod_sparse *,
+    cholmod_dense **, cholmod_sparse **, cholmod_dense **, cholmod_dense **,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_spsolve:  solve a linear system with a sparse right-hand-side */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_spsolve
+(
+    /* ---- input ---- */
+    int sys,		/* system to solve */
+    cholmod_factor *L,	/* factorization to use */
+    cholmod_sparse *B,	/* right-hand-side */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_spsolve (int, cholmod_factor *, cholmod_sparse *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_etree: find the elimination tree of A or A'*A */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_etree
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,
+    /* ---- output --- */
+    int32_t *Parent,	/* size ncol.  Parent [j] = p if p is the parent of j */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_etree (cholmod_sparse *, int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowcolcounts: compute the row/column counts of L */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_rowcolcounts
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int32_t *Parent,	/* size nrow.  Parent [i] = p if p is the parent of i */
+    int32_t *Post,	/* size nrow.  Post [k] = i if i is the kth node in
+			 * the postordered etree. */
+    /* ---- output --- */
+    int32_t *RowCount,	/* size nrow. RowCount [i] = # entries in the ith row of
+			 * L, including the diagonal. */
+    int32_t *ColCount,	/* size nrow. ColCount [i] = # entries in the ith
+			 * column of L, including the diagonal. */
+    int32_t *First,	/* size nrow.  First [i] = k is the least postordering
+			 * of any descendant of i. */
+    int32_t *Level,	/* size nrow.  Level [i] is the length of the path from
+			 * i to the root, with Level [root] = 0. */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowcolcounts (cholmod_sparse *, int64_t *, size_t,
+    int64_t *, int64_t *, int64_t *,
+    int64_t *, int64_t *, int64_t *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_analyze_ordering:  analyze a fill-reducing ordering */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_analyze_ordering
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    int ordering,	/* ordering method used */
+    int32_t *Perm,	/* size n, fill-reducing permutation to analyze */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- output --- */
+    int32_t *Parent,	/* size n, elimination tree */
+    int32_t *Post,	/* size n, postordering of elimination tree */
+    int32_t *ColCount,	/* size n, nnz in each column of L */
+    /* ---- workspace  */
+    int32_t *First,	/* size nworkspace for cholmod_postorder */
+    int32_t *Level,	/* size n workspace for cholmod_postorder */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_analyze_ordering (cholmod_sparse *, int, int64_t *,
+    int64_t *, size_t, int64_t *, int64_t *, int64_t *, int64_t *, int64_t *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_amd:  order using AMD */
+/* -------------------------------------------------------------------------- */
+
+/* Finds a permutation P to reduce fill-in in the factorization of P*A*P'
+ * or P*A*A'P' */
+
+int cholmod_amd
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- output --- */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_amd (cholmod_sparse *, int64_t *, size_t,
+    int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_colamd:  order using COLAMD */
+/* -------------------------------------------------------------------------- */
+
+/* Finds a permutation P to reduce fill-in in the factorization of P*A*A'*P'.
+ * Orders F*F' where F = A (:,fset) if fset is not NULL */
+
+int cholmod_colamd
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int postorder,	/* if TRUE, follow with a coletree postorder */
+    /* ---- output --- */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_colamd (cholmod_sparse *, int64_t *, size_t, int,
+    int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowfac:  incremental simplicial factorization */
+/* -------------------------------------------------------------------------- */
+
+/* Partial or complete simplicial factorization.  Rows and columns kstart:kend-1
+ * of L and D must be initially equal to rows/columns kstart:kend-1 of the
+ * identity matrix.   Row k can only be factorized if all descendants of node
+ * k in the elimination tree have been factorized. */
+
+int cholmod_rowfac
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    cholmod_sparse *F,	/* used for A*A' case only. F=A' or A(:,fset)' */
+    double beta [2],	/* factorize beta*I+A or beta*I+A'*A */
+    size_t kstart,	/* first row to factorize */
+    size_t kend,	/* last row to factorize is kend-1 */
+    /* ---- in/out --- */
+    cholmod_factor *L,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowfac (cholmod_sparse *, cholmod_sparse *, double [2], size_t,
+    size_t, cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowfac_mask:  incremental simplicial factorization */
+/* -------------------------------------------------------------------------- */
+
+/* cholmod_rowfac_mask is a version of cholmod_rowfac that is specific to
+ * LPDASA.  It is unlikely to be needed by any other application. */
+
+int cholmod_rowfac_mask
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    cholmod_sparse *F,	/* used for A*A' case only. F=A' or A(:,fset)' */
+    double beta [2],	/* factorize beta*I+A or beta*I+A'*A */
+    size_t kstart,	/* first row to factorize */
+    size_t kend,	/* last row to factorize is kend-1 */
+    int32_t *mask,	/* if mask[i] >= 0, then set row i to zero */
+    int32_t *RLinkUp,	/* link list of rows to compute */
+    /* ---- in/out --- */
+    cholmod_factor *L,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowfac_mask (cholmod_sparse *, cholmod_sparse *, double [2], size_t,
+    size_t, int64_t *, int64_t *, cholmod_factor *,
+    cholmod_common *) ;
+
+int cholmod_rowfac_mask2
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    cholmod_sparse *F,	/* used for A*A' case only. F=A' or A(:,fset)' */
+    double beta [2],	/* factorize beta*I+A or beta*I+A'*A */
+    size_t kstart,	/* first row to factorize */
+    size_t kend,	/* last row to factorize is kend-1 */
+    int32_t *mask,	/* if mask[i] >= maskmark, then set row i to zero */
+    int32_t maskmark,
+    int32_t *RLinkUp,	/* link list of rows to compute */
+    /* ---- in/out --- */
+    cholmod_factor *L,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowfac_mask2 (cholmod_sparse *, cholmod_sparse *, double [2],
+    size_t, size_t, int64_t *, int64_t, int64_t *,
+    cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_row_subtree:  find the nonzero pattern of a row of L */
+/* -------------------------------------------------------------------------- */
+
+/* Find the nonzero pattern of x for the system Lx=b where L = (0:k-1,0:k-1)
+ * and b = kth column of A or A*A' (rows 0 to k-1 only) */
+
+int cholmod_row_subtree
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    cholmod_sparse *F,	/* used for A*A' case only. F=A' or A(:,fset)' */
+    size_t k,		/* row k of L */
+    int32_t *Parent,	/* elimination tree */
+    /* ---- output --- */
+    cholmod_sparse *R,	/* pattern of L(k,:), n-by-1 with R->nzmax >= n */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_row_subtree (cholmod_sparse *, cholmod_sparse *, size_t,
+    int64_t *, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_lsolve_pattern: find the nonzero pattern of x=L\b */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_lsolve_pattern
+(
+    /* ---- input ---- */
+    cholmod_sparse *B,	/* sparse right-hand-side (a single sparse column) */
+    cholmod_factor *L,	/* the factor L from which parent(i) is derived */
+    /* ---- output --- */
+    cholmod_sparse *X,	/* pattern of X=L\B, n-by-1 with X->nzmax >= n */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_lsolve_pattern (cholmod_sparse *, cholmod_factor *,
+    cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_row_lsubtree:  find the nonzero pattern of a row of L */
+/* -------------------------------------------------------------------------- */
+
+/* Identical to cholmod_row_subtree, except that it finds the elimination tree
+ * from L itself. */
+
+int cholmod_row_lsubtree
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    int32_t *Fi, size_t fnz, /* nonzero pattern of kth row of A', not required
+			      * for the symmetric case.  Need not be sorted. */
+    size_t k,		/* row k of L */
+    cholmod_factor *L,	/* the factor L from which parent(i) is derived */
+    /* ---- output --- */
+    cholmod_sparse *R,	/* pattern of L(k,:), n-by-1 with R->nzmax >= n */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_row_lsubtree (cholmod_sparse *, int64_t *, size_t,
+    size_t, cholmod_factor *, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_resymbol:  recompute the symbolic pattern of L */
+/* -------------------------------------------------------------------------- */
+
+/* Remove entries from L that are not in the factorization of P*A*P', P*A*A'*P',
+ * or P*F*F'*P' (depending on A->stype and whether fset is NULL or not).
+ *
+ * cholmod_resymbol is the same as cholmod_resymbol_noperm, except that it
+ * first permutes A according to L->Perm.  A can be upper/lower/unsymmetric,
+ * in contrast to cholmod_resymbol_noperm (which can be lower or unsym). */
+
+int cholmod_resymbol 
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int pack,		/* if TRUE, pack the columns of L */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factorization, entries pruned on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_resymbol (cholmod_sparse *, int64_t *, size_t, int,
+    cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_resymbol_noperm:  recompute the symbolic pattern of L, no L->Perm */
+/* -------------------------------------------------------------------------- */
+
+/* Remove entries from L that are not in the factorization of A, A*A',
+ * or F*F' (depending on A->stype and whether fset is NULL or not). */
+
+int cholmod_resymbol_noperm
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int pack,		/* if TRUE, pack the columns of L */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factorization, entries pruned on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_resymbol_noperm (cholmod_sparse *, int64_t *, size_t, int,
+    cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rcond:  compute rough estimate of reciprocal of condition number */
+/* -------------------------------------------------------------------------- */
+
+double cholmod_rcond	    /* return min(diag(L)) / max(diag(L)) */
+(
+    /* ---- input ---- */
+    cholmod_factor *L,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+double cholmod_l_rcond (cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_postorder: Compute the postorder of a tree */
+/* -------------------------------------------------------------------------- */
+
+int32_t cholmod_postorder	/* return # of nodes postordered */
+(
+    /* ---- input ---- */
+    int32_t *Parent,	/* size n. Parent [j] = p if p is the parent of j */
+    size_t n,
+    int32_t *Weight_p,	/* size n, optional. Weight [j] is weight of node j */
+    /* ---- output --- */
+    int32_t *Post,	/* size n. Post [k] = j is kth in postordered tree */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_postorder (int64_t *, size_t,
+    int64_t *, int64_t *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_matrixops.h ========================================== */
+/* ========================================================================== */
+
+/* CHOLMOD MatrixOps module.
+ *
+ * Basic operations on sparse and dense matrices.
+ *
+ * cholmod_drop		    A = entries in A with abs. value >= tol
+ * cholmod_norm_dense	    s = norm (X), 1-norm, inf-norm, or 2-norm
+ * cholmod_norm_sparse	    s = norm (A), 1-norm or inf-norm
+ * cholmod_horzcat	    C = [A,B]
+ * cholmod_scale	    A = diag(s)*A, A*diag(s), s*A or diag(s)*A*diag(s)
+ * cholmod_sdmult	    Y = alpha*(A*X) + beta*Y or alpha*(A'*X) + beta*Y
+ * cholmod_ssmult	    C = A*B
+ * cholmod_submatrix	    C = A (i,j), where i and j are arbitrary vectors
+ * cholmod_vertcat	    C = [A ; B]
+ *
+ * A, B, C: sparse matrices (cholmod_sparse)
+ * X, Y: dense matrices (cholmod_dense)
+ * s: scalar or vector
+ *
+ * Requires the Core module.  Not required by any other CHOLMOD module.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_drop:  drop entries with small absolute value */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_drop
+(
+    /* ---- input ---- */
+    double tol,		/* keep entries with absolute value > tol */
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* matrix to drop entries from */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_drop (double, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_norm_dense:  s = norm (X), 1-norm, inf-norm, or 2-norm */
+/* -------------------------------------------------------------------------- */
+
+double cholmod_norm_dense
+(
+    /* ---- input ---- */
+    cholmod_dense *X,	/* matrix to compute the norm of */
+    int norm,		/* type of norm: 0: inf. norm, 1: 1-norm, 2: 2-norm */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+double cholmod_l_norm_dense (cholmod_dense *, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_norm_sparse:  s = norm (A), 1-norm or inf-norm */
+/* -------------------------------------------------------------------------- */
+
+double cholmod_norm_sparse
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to compute the norm of */
+    int norm,		/* type of norm: 0: inf. norm, 1: 1-norm */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+double cholmod_l_norm_sparse (cholmod_sparse *, int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_horzcat:  C = [A,B] */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_horzcat
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* left matrix to concatenate */
+    cholmod_sparse *B,	/* right matrix to concatenate */
+    int values,		/* if TRUE compute the numerical values of C */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_horzcat (cholmod_sparse *, cholmod_sparse *, int,
+    cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_scale:  A = diag(s)*A, A*diag(s), s*A or diag(s)*A*diag(s) */
+/* -------------------------------------------------------------------------- */
+
+/* scaling modes, selected by the scale input parameter: */
+#define CHOLMOD_SCALAR 0	/* A = s*A */
+#define CHOLMOD_ROW 1		/* A = diag(s)*A */
+#define CHOLMOD_COL 2		/* A = A*diag(s) */
+#define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+int cholmod_scale
+(
+    /* ---- input ---- */
+    cholmod_dense *S,	/* scale factors (scalar or vector) */
+    int scale,		/* type of scaling to compute */
+    /* ---- in/out --- */
+    cholmod_sparse *A,	/* matrix to scale */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_scale (cholmod_dense *, int, cholmod_sparse *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_sdmult:  Y = alpha*(A*X) + beta*Y or alpha*(A'*X) + beta*Y */
+/* -------------------------------------------------------------------------- */
+
+/* Sparse matrix times dense matrix */
+
+int cholmod_sdmult
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* sparse matrix to multiply */
+    int transpose,	/* use A if 0, or A' otherwise */
+    double alpha [2],   /* scale factor for A */
+    double beta [2],    /* scale factor for Y */
+    cholmod_dense *X,	/* dense matrix to multiply */
+    /* ---- in/out --- */
+    cholmod_dense *Y,	/* resulting dense matrix */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_sdmult (cholmod_sparse *, int, double [2], double [2],
+    cholmod_dense *, cholmod_dense *Y, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_ssmult:  C = A*B */
+/* -------------------------------------------------------------------------- */
+
+/* Sparse matrix times sparse matrix */
+
+cholmod_sparse *cholmod_ssmult
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* left matrix to multiply */
+    cholmod_sparse *B,	/* right matrix to multiply */
+    int stype,		/* requested stype of C */
+    int values,		/* TRUE: do numerical values, FALSE: pattern only */
+    int sorted,		/* if TRUE then return C with sorted columns */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_ssmult (cholmod_sparse *, cholmod_sparse *, int, int,
+    int, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_submatrix:  C = A (r,c), where i and j are arbitrary vectors */
+/* -------------------------------------------------------------------------- */
+
+/* rsize < 0 denotes ":" in MATLAB notation, or more precisely 0:(A->nrow)-1.
+ * In this case, r can be NULL.  An rsize of zero, or r = NULL and rsize >= 0,
+ * denotes "[ ]" in MATLAB notation (the empty set).
+ * Similar rules hold for csize.
+ */
+
+cholmod_sparse *cholmod_submatrix
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to subreference */
+    int32_t *rset,	/* set of row indices, duplicates OK */
+    int64_t rsize,	/* size of r; rsize < 0 denotes ":" */
+    int32_t *cset,	/* set of column indices, duplicates OK */
+    int64_t csize,	/* size of c; csize < 0 denotes ":" */
+    int values,		/* if TRUE compute the numerical values of C */
+    int sorted,		/* if TRUE then return C with sorted columns */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_submatrix (cholmod_sparse *, int64_t *,
+    int64_t, int64_t *, int64_t, int, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_vertcat:  C = [A ; B] */
+/* -------------------------------------------------------------------------- */
+
+cholmod_sparse *cholmod_vertcat
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* left matrix to concatenate */
+    cholmod_sparse *B,	/* right matrix to concatenate */
+    int values,		/* if TRUE compute the numerical values of C */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+cholmod_sparse *cholmod_l_vertcat (cholmod_sparse *, cholmod_sparse *, int,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_symmetry: determine if a sparse matrix is symmetric */
+/* -------------------------------------------------------------------------- */
+
+int cholmod_symmetry
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,
+    int option,
+    /* ---- output ---- */
+    int32_t *xmatched,
+    int32_t *pmatched,
+    int32_t *nzoffdiag,
+    int32_t *nzdiag,
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_symmetry (cholmod_sparse *, int, int64_t *,
+    int64_t *, int64_t *, int64_t *,
+    cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_modify.h ============================================= */
+/* ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+ * CHOLMOD/Include/cholmod_modify.h.
+ * Copyright (C) 2005-2006, Timothy A. Davis and William W. Hager
+ * http://www.suitesparse.com
+ * -------------------------------------------------------------------------- */
+
+/* CHOLMOD Modify module.
+ *
+ * Sparse Cholesky modification routines: update / downdate / rowadd / rowdel.
+ * Can also modify a corresponding solution to Lx=b when L is modified.  This
+ * module is most useful when applied on a Cholesky factorization computed by
+ * the Cholesky module, but it does not actually require the Cholesky module.
+ * The Core module can create an identity Cholesky factorization (LDL' where
+ * L=D=I) that can then by modified by these routines.
+ *
+ * Primary routines:
+ * -----------------
+ *
+ * cholmod_updown	    multiple rank update/downdate
+ * cholmod_rowadd	    add a row to an LDL' factorization
+ * cholmod_rowdel	    delete a row from an LDL' factorization
+ *
+ * Secondary routines:
+ * -------------------
+ *
+ * cholmod_updown_solve	    update/downdate, and modify solution to Lx=b
+ * cholmod_updown_mark	    update/downdate, and modify solution to partial Lx=b
+ * cholmod_updown_mask	    update/downdate for LPDASA
+ * cholmod_updown_mask2     update/downdate for LPDASA
+ * cholmod_rowadd_solve	    add a row, and update solution to Lx=b
+ * cholmod_rowadd_mark	    add a row, and update solution to partial Lx=b
+ * cholmod_rowdel_solve	    delete a row, and downdate Lx=b
+ * cholmod_rowdel_mark	    delete a row, and downdate solution to partial Lx=b
+ *
+ * Requires the Core module.  Not required by any other CHOLMOD module.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_updown:  multiple rank update/downdate */
+/* -------------------------------------------------------------------------- */
+
+/* Compute the new LDL' factorization of LDL'+CC' (an update) or LDL'-CC'
+ * (a downdate).  The factor object L need not be an LDL' factorization; it
+ * is converted to one if it isn't. */
+
+int cholmod_updown 
+(
+    /* ---- input ---- */
+    int update,		/* TRUE for update, FALSE for downdate */
+    cholmod_sparse *C,	/* the incoming sparse update */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_updown (int, cholmod_sparse *, cholmod_factor *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_updown_solve:  update/downdate, and modify solution to Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_updown, except that it also updates/downdates the
+ * solution to Lx=b+DeltaB.  x and b must be n-by-1 dense matrices.  b is not
+ * need as input to this routine, but a sparse change to b is (DeltaB).  Only
+ * entries in DeltaB corresponding to columns modified in L are accessed; the
+ * rest must be zero. */
+
+int cholmod_updown_solve
+(
+    /* ---- input ---- */
+    int update,		/* TRUE for update, FALSE for downdate */
+    cholmod_sparse *C,	/* the incoming sparse update */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_updown_solve (int, cholmod_sparse *, cholmod_factor *,
+    cholmod_dense *, cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_updown_mark:  update/downdate, and modify solution to partial Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_updown_solve, except only part of L is used in
+ * the update/downdate of the solution to Lx=b.  This routine is an "expert"
+ * routine.  It is meant for use in LPDASA only.  See cholmod_updown.c for
+ * a description of colmark. */
+
+int cholmod_updown_mark
+(
+    /* ---- input ---- */
+    int update,		/* TRUE for update, FALSE for downdate */
+    cholmod_sparse *C,	/* the incoming sparse update */
+    int32_t *colmark,	/* array of size n.  See cholmod_updown.c */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_updown_mark (int, cholmod_sparse *, int64_t *,
+    cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_updown_mask:  update/downdate, for LPDASA */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_updown_mark, except has an additional "mask"
+ * argument.  This routine is an "expert" routine.  It is meant for use in
+ * LPDASA only.  See cholmod_updown.c for a description of mask. */
+
+int cholmod_updown_mask
+(
+    /* ---- input ---- */
+    int update,		/* TRUE for update, FALSE for downdate */
+    cholmod_sparse *C,	/* the incoming sparse update */
+    int32_t *colmark,	/* array of size n.  See cholmod_updown.c */
+    int32_t *mask,	/* size n */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_updown_mask (int, cholmod_sparse *, int64_t *,
+    int64_t *, cholmod_factor *, cholmod_dense *, cholmod_dense *,
+    cholmod_common *) ;
+
+int cholmod_updown_mask2
+(
+    /* ---- input ---- */
+    int update,		/* TRUE for update, FALSE for downdate */
+    cholmod_sparse *C,	/* the incoming sparse update */
+    int32_t *colmark,	/* array of size n.  See cholmod_updown.c */
+    int32_t *mask,	/* size n */
+    int32_t maskmark,
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_updown_mask2 (int, cholmod_sparse *, int64_t *,
+    int64_t *, int64_t, cholmod_factor *, cholmod_dense *,
+    cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowadd:  add a row to an LDL' factorization (a rank-2 update) */
+/* -------------------------------------------------------------------------- */
+
+/* cholmod_rowadd adds a row to the LDL' factorization.  It computes the kth
+ * row and kth column of L, and then updates the submatrix L (k+1:n,k+1:n)
+ * accordingly.  The kth row and column of L must originally be equal to the
+ * kth row and column of the identity matrix.  The kth row/column of L is
+ * computed as the factorization of the kth row/column of the matrix to
+ * factorize, which is provided as a single n-by-1 sparse matrix R. */
+
+int cholmod_rowadd 
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to add */
+    cholmod_sparse *R,	/* row/column of matrix to factorize (n-by-1) */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowadd (size_t, cholmod_sparse *, cholmod_factor *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowadd_solve:  add a row, and update solution to Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_rowadd, and also updates the solution to Lx=b
+ * See cholmod_updown for a description of how Lx=b is updated.  There is on
+ * additional parameter:  bk specifies the new kth entry of b. */
+
+int cholmod_rowadd_solve
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to add */
+    cholmod_sparse *R,	/* row/column of matrix to factorize (n-by-1) */
+    double bk [2],	/* kth entry of the right-hand-side b */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowadd_solve (size_t, cholmod_sparse *, double [2],
+    cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowadd_mark:  add a row, and update solution to partial Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_rowadd_solve, except only part of L is used in
+ * the update/downdate of the solution to Lx=b.  This routine is an "expert"
+ * routine.  It is meant for use in LPDASA only.  */
+
+int cholmod_rowadd_mark
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to add */
+    cholmod_sparse *R,	/* row/column of matrix to factorize (n-by-1) */
+    double bk [2],	/* kth entry of the right hand side, b */
+    int32_t *colmark,	/* array of size n.  See cholmod_updown.c */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowadd_mark (size_t, cholmod_sparse *, double [2],
+    int64_t *, cholmod_factor *, cholmod_dense *, cholmod_dense *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowdel:  delete a row from an LDL' factorization (a rank-2 update) */
+/* -------------------------------------------------------------------------- */
+
+/* Sets the kth row and column of L to be the kth row and column of the identity
+ * matrix, and updates L(k+1:n,k+1:n) accordingly.   To reduce the running time,
+ * the caller can optionally provide the nonzero pattern (or an upper bound) of
+ * kth row of L, as the sparse n-by-1 vector R.  Provide R as NULL if you want
+ * CHOLMOD to determine this itself, which is easier for the caller, but takes
+ * a little more time.
+ */
+
+int cholmod_rowdel 
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to delete */
+    cholmod_sparse *R,	/* NULL, or the nonzero pattern of kth row of L */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowdel (size_t, cholmod_sparse *, cholmod_factor *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowdel_solve:  delete a row, and downdate Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_rowdel, but also downdates the solution to Lx=b.
+ * When row/column k of A is "deleted" from the system A*y=b, this can induce
+ * a change to x, in addition to changes arising when L and b are modified.
+ * If this is the case, the kth entry of y is required as input (yk) */
+
+int cholmod_rowdel_solve
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to delete */
+    cholmod_sparse *R,	/* NULL, or the nonzero pattern of kth row of L */
+    double yk [2],	/* kth entry in the solution to A*y=b */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowdel_solve (size_t, cholmod_sparse *, double [2],
+    cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_rowdel_mark:  delete a row, and downdate solution to partial Lx=b */
+/* -------------------------------------------------------------------------- */
+
+/* Does the same as cholmod_rowdel_solve, except only part of L is used in
+ * the update/downdate of the solution to Lx=b.  This routine is an "expert"
+ * routine.  It is meant for use in LPDASA only.  */
+
+int cholmod_rowdel_mark
+(
+    /* ---- input ---- */
+    size_t k,		/* row/column index to delete */
+    cholmod_sparse *R,	/* NULL, or the nonzero pattern of kth row of L */
+    double yk [2],	/* kth entry in the solution to A*y=b */
+    int32_t *colmark,	/* array of size n.  See cholmod_updown.c */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factor to modify */
+    cholmod_dense *X,	/* solution to Lx=b (size n-by-1) */
+    cholmod_dense *DeltaB,  /* change in b, zero on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_rowdel_mark (size_t, cholmod_sparse *, double [2],
+    int64_t *, cholmod_factor *, cholmod_dense *, cholmod_dense *,
+    cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_camd.h =============================================== */
+/* ========================================================================== */
+
+/* CHOLMOD Partition module, interface to CAMD, CCOLAMD, and CSYMAMD
+ *
+ * An interface to CCOLAMD and CSYMAMD, constrained minimum degree ordering
+ * methods which order a matrix following constraints determined via nested
+ * dissection.
+ *
+ * These functions do not require METIS.  They are installed unless NCAMD
+ * is defined:
+ * cholmod_ccolamd		interface to CCOLAMD ordering
+ * cholmod_csymamd		interface to CSYMAMD ordering
+ * cholmod_camd			interface to CAMD ordering
+ *
+ * Requires the Core and Cholesky modules, and two packages: CAMD,
+ * and CCOLAMD.  Used by functions in the Partition Module.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_ccolamd */
+/* -------------------------------------------------------------------------- */
+
+/* Order AA' or A(:,f)*A(:,f)' using CCOLAMD. */
+
+int cholmod_ccolamd
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int32_t *Cmember,	/* size A->nrow.  Cmember [i] = c if row i is in the
+			 * constraint set c.  c must be >= 0.  The # of
+			 * constraint sets is max (Cmember) + 1.  If Cmember is
+			 * NULL, then it is interpretted as Cmember [i] = 0 for
+			 * all i */
+    /* ---- output --- */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_ccolamd (cholmod_sparse *, int64_t *, size_t,
+    int64_t *, int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_csymamd */
+/* -------------------------------------------------------------------------- */
+
+/* Order A using CSYMAMD. */
+
+int cholmod_csymamd
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    /* ---- output --- */
+    int32_t *Cmember,	/* size nrow.  see cholmod_ccolamd above */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_csymamd (cholmod_sparse *, int64_t *,
+    int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_camd */
+/* -------------------------------------------------------------------------- */
+
+/* Order A using CAMD. */
+
+int cholmod_camd
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- output --- */
+    int32_t *Cmember,	/* size nrow.  see cholmod_ccolamd above */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_camd (cholmod_sparse *, int64_t *, size_t,
+    int64_t *, int64_t *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_partition.h ========================================== */
+/* ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+ * CHOLMOD/Include/cholmod_partition.h.
+ * Copyright (C) 2005-2013, Univ. of Florida.  Author: Timothy A. Davis
+ * -------------------------------------------------------------------------- */
+
+/* CHOLMOD Partition module.
+ *
+ * Graph partitioning and graph-partition-based orderings.  Includes an
+ * interface to CCOLAMD and CSYMAMD, constrained minimum degree ordering
+ * methods which order a matrix following constraints determined via nested
+ * dissection.
+ *
+ * These functions require METIS:
+ * cholmod_nested_dissection	CHOLMOD nested dissection ordering
+ * cholmod_metis		METIS nested dissection ordering (METIS_NodeND)
+ * cholmod_bisect		graph partitioner (currently based on METIS)
+ * cholmod_metis_bisector	direct interface to METIS_ComputeVertexSeparator
+ *
+ * Requires the Core and Cholesky modules, and three packages: METIS, CAMD,
+ * and CCOLAMD.  Optionally used by the Cholesky module.
+ *
+ * Note that METIS does not have a version that uses int64_t integers.  If you
+ * try to use cholmod_nested_dissection, cholmod_metis, cholmod_bisect, or
+ * cholmod_metis_bisector on a matrix that is too large, an error code will be
+ * returned.  METIS does have an "idxtype", which could be redefined as
+ * int64_t, if you wish to edit METIS or use compile-time flags to redefine
+ * idxtype.
+ */
+
+// These routines still exist if CHOLMOD is compiled with -DNPARTITION,
+// but they return Common->status = CHOLMOD_NOT_INSTALLED.
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_nested_dissection */
+/* -------------------------------------------------------------------------- */
+
+/* Order A, AA', or A(:,f)*A(:,f)' using CHOLMOD's nested dissection method
+ * (METIS's node bisector applied recursively to compute the separator tree
+ * and constraint sets, followed by CCOLAMD using the constraints).  Usually
+ * finds better orderings than METIS_NodeND, but takes longer.
+ */
+
+int64_t cholmod_nested_dissection	/* returns # of components */
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    /* ---- output --- */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    int32_t *CParent,	/* size A->nrow.  On output, CParent [c] is the parent
+			 * of component c, or EMPTY if c is a root, and where
+			 * c is in the range 0 to # of components minus 1 */
+    int32_t *Cmember,	/* size A->nrow.  Cmember [j] = c if node j of A is
+			 * in component c */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_nested_dissection (cholmod_sparse *,
+    int64_t *, size_t, int64_t *, int64_t *,
+    int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_metis */
+/* -------------------------------------------------------------------------- */
+
+/* Order A, AA', or A(:,f)*A(:,f)' using METIS_NodeND. */
+
+int cholmod_metis
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to order */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int postorder,	/* if TRUE, follow with etree or coletree postorder */
+    /* ---- output --- */
+    int32_t *Perm,	/* size A->nrow, output permutation */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_metis (cholmod_sparse *, int64_t *, size_t, int,
+    int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_bisect */
+/* -------------------------------------------------------------------------- */
+
+/* Finds a node bisector of A, A*A', A(:,f)*A(:,f)'. */
+
+int64_t cholmod_bisect	/* returns # of nodes in separator */
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to bisect */
+    int32_t *fset,	/* subset of 0:(A->ncol)-1 */
+    size_t fsize,	/* size of fset */
+    int compress,	/* if TRUE, compress the graph first */
+    /* ---- output --- */
+    int32_t *Partition,	/* size A->nrow.  Node i is in the left graph if
+			 * Partition [i] = 0, the right graph if 1, and in the
+			 * separator if 2. */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_bisect (cholmod_sparse *, int64_t *,
+    size_t, int, int64_t *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_metis_bisector */
+/* -------------------------------------------------------------------------- */
+
+/* Find a set of nodes that bisects the graph of A or AA' (direct interface
+ * to METIS_ComputeVertexSeperator). */
+
+int64_t cholmod_metis_bisector	/* returns separator size */
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to bisect */
+    int32_t *Anw,	/* size A->nrow, node weights, can be NULL, */
+                        /* which means the graph is unweighted. */ 
+    int32_t *Aew,	/* size nz, edge weights (silently ignored). */
+                        /* This option was available with METIS 4, but not */
+                        /* in METIS 5.  This argument is now unused, but */
+                        /* it remains for backward compatibilty, so as not */
+                        /* to change the API for cholmod_metis_bisector. */
+    /* ---- output --- */
+    int32_t *Partition,	/* size A->nrow */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_metis_bisector (cholmod_sparse *,
+    int64_t *, int64_t *, int64_t *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_collapse_septree */
+/* -------------------------------------------------------------------------- */
+
+/* Collapse nodes in a separator tree. */
+
+int64_t cholmod_collapse_septree
+(
+    /* ---- input ---- */
+    size_t n,		/* # of nodes in the graph */
+    size_t ncomponents,	/* # of nodes in the separator tree (must be <= n) */
+    double nd_oksep,    /* collapse if #sep >= nd_oksep * #nodes in subtree */
+    size_t nd_small,    /* collapse if #nodes in subtree < nd_small */
+    /* ---- in/out --- */
+    int32_t *CParent,	/* size ncomponents; from cholmod_nested_dissection */
+    int32_t *Cmember,	/* size n; from cholmod_nested_dissection */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int64_t cholmod_l_collapse_septree (size_t, size_t, double, size_t,
+    int64_t *, int64_t *, cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+
+/* ========================================================================== */
+/* === Include/cholmod_supernodal.h ========================================= */
+/* ========================================================================== */
+
+/* CHOLMOD Supernodal module.
+ *
+ * Supernodal analysis, factorization, and solve.  The simplest way to use
+ * these routines is via the Cholesky module.  It does not provide any
+ * fill-reducing orderings, but does accept the orderings computed by the
+ * Cholesky module.  It does not require the Cholesky module itself, however.
+ *
+ * Primary routines:
+ * -----------------
+ * cholmod_super_symbolic	supernodal symbolic analysis
+ * cholmod_super_numeric	supernodal numeric factorization
+ * cholmod_super_lsolve		supernodal Lx=b solve
+ * cholmod_super_ltsolve	supernodal L'x=b solve
+ *
+ * Prototypes for the BLAS and LAPACK routines that CHOLMOD uses are listed
+ * below, including how they are used in CHOLMOD.
+ *
+ * BLAS routines:
+ * --------------
+ * dtrsv	solve Lx=b or L'x=b, L non-unit diagonal, x and b stride-1
+ * dtrsm	solve LX=B or L'X=b, L non-unit diagonal
+ * dgemv	y=y-A*x or y=y-A'*x (x and y stride-1)
+ * dgemm	C=A*B', C=C-A*B, or C=C-A'*B
+ * dsyrk	C=tril(A*A')
+ *
+ * LAPACK routines:
+ * ----------------
+ * dpotrf	LAPACK: A=chol(tril(A))
+ *
+ * Requires the Core module, and two external packages: LAPACK and the BLAS.
+ * Optionally used by the Cholesky module.
+ */
+
+#ifndef R_MATRIX_CHOLMOD_H
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_super_symbolic */
+/* -------------------------------------------------------------------------- */
+
+/* Analyzes A, AA', or A(:,f)*A(:,f)' in preparation for a supernodal numeric
+ * factorization.  The user need not call this directly; cholmod_analyze is
+ * a "simple" wrapper for this routine.
+ */
+
+int cholmod_super_symbolic
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to analyze */
+    cholmod_sparse *F,	/* F = A' or A(:,f)' */
+    int32_t *Parent,	/* elimination tree */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* simplicial symbolic on input,
+			 * supernodal symbolic on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_super_symbolic (cholmod_sparse *, cholmod_sparse *,
+    int64_t *, cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_super_symbolic2 */
+/* -------------------------------------------------------------------------- */
+
+/* Analyze for supernodal Cholesky or multifrontal QR */
+
+int cholmod_super_symbolic2
+(
+    /* ---- input ---- */
+    int for_whom,       /* FOR_SPQR     (0): for SPQR but not GPU-accelerated
+                           FOR_CHOLESKY (1): for Cholesky (GPU or not)
+                           FOR_SPQRGPU  (2): for SPQR with GPU acceleration */
+    cholmod_sparse *A,	/* matrix to analyze */
+    cholmod_sparse *F,	/* F = A' or A(:,f)' */
+    int32_t *Parent,	/* elimination tree */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* simplicial symbolic on input,
+			 * supernodal symbolic on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_super_symbolic2 (int, cholmod_sparse *, cholmod_sparse *,
+    int64_t *, cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_super_numeric */
+/* -------------------------------------------------------------------------- */
+
+/* Computes the numeric LL' factorization of A, AA', or A(:,f)*A(:,f)' using
+ * a BLAS-based supernodal method.  The user need not call this directly;
+ * cholmod_factorize is a "simple" wrapper for this routine.
+ */
+
+int cholmod_super_numeric
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    cholmod_sparse *F,	/* F = A' or A(:,f)' */
+    double beta [2],	/* beta*I is added to diagonal of matrix to factorize */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factorization */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_super_numeric (cholmod_sparse *, cholmod_sparse *, double [2],
+    cholmod_factor *, cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_super_lsolve */
+/* -------------------------------------------------------------------------- */
+
+/* Solve Lx=b where L is from a supernodal numeric factorization.  The user
+ * need not call this routine directly.  cholmod_solve is a "simple" wrapper
+ * for this routine. */
+
+int cholmod_super_lsolve
+(
+    /* ---- input ---- */
+    cholmod_factor *L,	/* factor to use for the forward solve */
+    /* ---- output ---- */
+    cholmod_dense *X,	/* b on input, solution to Lx=b on output */
+    /* ---- workspace   */
+    cholmod_dense *E,	/* workspace of size nrhs*(L->maxesize) */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_super_lsolve (cholmod_factor *, cholmod_dense *, cholmod_dense *,
+    cholmod_common *) ;
+
+/* -------------------------------------------------------------------------- */
+/* cholmod_super_ltsolve */
+/* -------------------------------------------------------------------------- */
+
+/* Solve L'x=b where L is from a supernodal numeric factorization.  The user
+ * need not call this routine directly.  cholmod_solve is a "simple" wrapper
+ * for this routine. */
+
+int cholmod_super_ltsolve
+(
+    /* ---- input ---- */
+    cholmod_factor *L,	/* factor to use for the backsolve */
+    /* ---- output ---- */
+    cholmod_dense *X,	/* b on input, solution to L'x=b on output */
+    /* ---- workspace   */
+    cholmod_dense *E,	/* workspace of size nrhs*(L->maxesize) */
+    /* --------------- */
+    cholmod_common *Common
+) ;
+
+int cholmod_l_super_ltsolve (cholmod_factor *, cholmod_dense *, cholmod_dense *,
+    cholmod_common *) ;
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */
+
+#ifdef __cplusplus
+}
+#endif
+
 
 /* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
+
+/* We declare a minimal subset of the above as "API" : */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef cholmod_common  * CHM_CM;
 typedef cholmod_factor  * CHM_FR;
@@ -1143,10 +4577,10 @@ R_MATRIX_INLINE    int R_MATRIX_CHOLMOD(updown)(
 R_MATRIX_INLINE CHM_SP R_MATRIX_CHOLMOD(vertcat)(
 	CHM_SP, CHM_SP, int, CHM_CM);
 
-/* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* R_MATRIX_CHOLMOD_H */
+/* >>>> Matrix >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+
+#endif /* !defined(R_MATRIX_CHOLMOD_H) */

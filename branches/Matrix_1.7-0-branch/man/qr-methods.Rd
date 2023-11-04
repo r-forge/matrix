@@ -31,7 +31,7 @@
   do not pivot rows, so that \eqn{P_{1}}{P1} is an identity matrix.
   
   Methods for \code{\linkS4class{sparseMatrix}} are built on
-  CSparse routines \code{cs_sqr} and \code{cs_qr}, which require
+  CXSparse routines \code{cs_sqr} and \code{cs_qr}, which require
   \eqn{m \ge n}{m >= n}.
 }
 \usage{
@@ -42,7 +42,7 @@ qr(x, \dots)
   \item{x}{a \link[=is.finite]{finite} matrix or
     \code{\linkS4class{Matrix}} to be factorized,
     satisfying \code{nrow(x) >= ncol(x)} if sparse.}
-  \item{order}{an integer in \code{0:3} passed to CSparse routine
+  \item{order}{an integer in \code{0:3} passed to CXSparse routine
     \code{cs_sqr}, indicating a strategy for choosing the column
     permutation \eqn{P_{2}}{P2}.  0 means no column permutation.
     1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
