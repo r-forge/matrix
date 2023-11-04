@@ -1,0 +1,75 @@
+--- SuiteSparse-5.10.1/CSparse/Source/cs.c	2022-08-31 09:47:35.659536660 +0200
++++ cs.c	2022-08-31 09:52:39.553932000 +0200
+@@ -1251,6 +1251,13 @@
+     for (i = 0 ; i < m ; i++) if (jmatch [i] >= 0) imatch [jmatch [i]] = i ;
+     return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 1)) ;
+ }
++
++#if csi == int
++# define csi_MAX INT_MAX
++#else
++# error "Need INT_MAX analogue of  csi type"
++#endif
++
+ /* C = A*B */
+ cs *cs_multiply (const cs *A, const cs *B)
+ {
+@@ -1269,8 +1276,10 @@
+     Cp = C->p ;
+     for (j = 0 ; j < n ; j++)
+     {
+-        if (nz + m > C->nzmax && !cs_sprealloc (C, 2*(C->nzmax)+m))
++        if (C->nzmax > (csi_MAX - m)/2 || // 2*C->nzmax + m  overflows
++            (nz + m > C->nzmax && !cs_sprealloc (C, 2*(C->nzmax)+m)))
+         {
++            warning("Too many non-zeros in sparse product: Out of memory");
+             return (cs_done (C, w, x, 0)) ;             /* out of memory */
+         } 
+         Ci = C->i ; Cx = C->x ;         /* C->i and C->x may be reallocated */
+@@ -1406,12 +1415,12 @@
+ csn *cs_qr (const cs *A, const css *S)
+ {
+     double *Rx, *Vx, *Ax, *x,  *Beta ;
+-    csi i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
++    csi i, k, p, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
+         *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
+     cs *R, *V ;
+-    csn *N ;
++    csn *N ; // the result
+     if (!CS_CSC (A) || !S) return (NULL) ;
+-    m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
++    n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
+     q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
+     vnz = S->lnz ; rnz = S->unz ; leftmost = S->leftmost ;
+     w = cs_malloc (m2+n, sizeof (csi)) ;            /* get csi workspace */
+@@ -1529,6 +1538,11 @@
+ /* return a random permutation vector, the identity perm, or p = n-1:-1:0.
+  * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.  otherwise
+  * p = random permutation.  */
++/*
++ * NB: We use R's RNG *and* its state; i.e., if seed is not -1 or 0,
++ * ==  'seed' is *not* used at all in this version of cs_randperm() !
++*/
++
+ csi *cs_randperm (csi n, csi seed)
+ {
+     csi *p, k, j, t ;
+@@ -1537,14 +1551,16 @@
+     if (!p) return (NULL) ;             /* out of memory */
+     for (k = 0 ; k < n ; k++) p [k] = n-k-1 ;
+     if (seed == -1) return (p) ;        /* return reverse permutation */
+-    srand (seed) ;                      /* get new random number seed */
++    GetRNGstate();/* <- for R package Matrix
++    srand (seed) ;                      .* get new random number seed */
+     for (k = 0 ; k < n ; k++)
+     {
+-        j = k + (rand ( ) % (n-k)) ;    /* j = rand integer in range k to n-1 */
++        j = k + (int)(unif_rand() * (n-k)); // j = rand integer in range k to n-1
+         t = p [j] ;                     /* swap p[k] and p[j] */
+         p [j] = p [k] ;
+         p [k] = t ;
+     }
++    PutRNGstate(); // <- R package Matrix
+     return (p) ;
+ }
+ /* xi [top...n-1] = nodes reachable from graph of G*P' via nodes in B(:,k).
