@@ -1,7 +1,7 @@
 Package: Matrix
-Version: 1.6-2
+Version: 1.7-0
 VersionNote: do also bump src/version.h, inst/include/Matrix/version.h
-Date: 2023-11-03
+Date: 2023-11-04
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,
@@ -17,20 +17,24 @@ Authors@R:
 	c(person("Douglas", "Bates", role = "aut",
 	         comment = c(ORCID = "0000-0001-8316-9503")),
 	  person("Martin", "Maechler", role = c("aut", "cre"),
-	         email = "mmaechler+Matrix@gmail.com",
+	         email = "jaganmn2@gmail.com",
 	         comment = c(ORCID = "0000-0002-8685-9910")),
 	  person("Mikael", "Jagan", role = "aut",
 	         comment = c(ORCID = "0000-0002-3542-2938")),
 	  person("Timothy A.", "Davis", role = "ctb",
 	         comment = c(ORCID = "0000-0001-7614-6899",
-	                     "SuiteSparse libraries, notably CHOLMOD and AMD",
-	                     "collaborators listed in dir(pattern=\"^[A-Z]+[.]txt$\", full.names=TRUE, system.file(\"doc\", \"SuiteSparse\", package=\"Matrix\"))")),
-	  person("Jens", "Oehlschlägel", role = "ctb",
-	         comment = "initial nearPD()"),
+	                     "SuiteSparse libraries",
+	                     "collaborators listed in dir(system.file(\"doc\", \"SuiteSparse\", package=\"Matrix\"), pattern=\"License\", full.names=TRUE, recursive=TRUE)")),
+	  person("George", "Karypis", role = "ctb",
+	         comment = c(ORCID = "0000-0003-2753-1437",
+	                     "METIS library",
+	                     "Copyright: Regents of the University of Minnesota")),
 	  person("Jason", "Riedy", role = "ctb",
 	         comment = c(ORCID = "0000-0002-4345-4200",
 	                     "GNU Octave's condest() and onenormest()",
 	                     "Copyright: Regents of the University of California")),
+	  person("Jens", "Oehlschlägel", role = "ctb",
+	         comment = "initial nearPD()"),
 	  person("R Core Team", role = "ctb",
 	         comment = "base R's matrix implementation"))
 Depends: R (>= 3.5.0), methods
