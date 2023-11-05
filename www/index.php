@@ -60,9 +60,6 @@ In addition, we provide <strong><a href="./slides">slides</a></strong> of presen
 
 <p> <strong>Doxygen</strong> documentation of the underlying C functions is <a href="./doxygen/"><strong>here</strong></a>. </p>
 
-<p> <strong>Do read</strong> on <strong><a href="./programming/">compatibility</a></strong> changes  in connection with <code>Matrix</code>.
-</p>
-
 
 <p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.
   <ul>
