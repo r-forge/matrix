@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['v2spv_0',['v2spv',['../sparseVector_8h.html#ab70285d8e82d2649e127630c4ee89a93',1,'v2spV(SEXP):&#160;sparseVector.c'],['../sparseVector_8c.html#a078a5b1a325ddc6d4c6d92196e5e32b3',1,'v2spV(SEXP from):&#160;sparseVector.c'],['../sparseVector_8c.html#a7c1a515a7f8f0fc0ef3da8d23f384496',1,'V2SPV:&#160;sparseVector.c']]],
+  ['v2spv_0',['v2spv',['../sparseVector_8c.html#a7c1a515a7f8f0fc0ef3da8d23f384496',1,'V2SPV:&#160;sparseVector.c'],['../sparseVector_8h.html#ab70285d8e82d2649e127630c4ee89a93',1,'v2spV(SEXP):&#160;sparseVector.c'],['../sparseVector_8c.html#a078a5b1a325ddc6d4c6d92196e5e32b3',1,'v2spV(SEXP from):&#160;sparseVector.c']]],
   ['v2spv_5fcases_1',['V2SPV_CASES',['../sparseVector_8c.html#a186100c626350471957f079aefcf16a7',1,'sparseVector.c']]],
   ['vad_5fsubcases_2',['VAD_SUBCASES',['../coerce_8c.html#a68f7dec7e998ab54cb7d44c5827a56ad',1,'coerce.c']]],
   ['valid_3',['valid',['../bind_8c.html#a3b7be34b2a983a1bf0baddc7215bd2d4',1,'bind.c']]],

@@ -48,7 +48,7 @@ PROJECT_NAME           = Matrix
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = r4500
+PROJECT_NUMBER         = r4503
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -997,6 +997,8 @@ EXCLUDE                = src/CHMfactor.c \
                          src/TMatrix_as.h \
                          src/Tsparse.c \
                          src/Tsparse.h \
+                         src/cs.c \
+                         src/cs.h \
                          src/cs_utils.c \
                          src/cs_utils.h \
                          src/dgTMatrix.c \

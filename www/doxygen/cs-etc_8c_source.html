@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4500</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4503</span>
    </div>
   </td>
  </tr>
@@ -171,7 +171,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *) cs_di_dfree((cs_did *) D);</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *)    <a class="code hl_function" href="cs_8c.html#a30f07e6f09ffa0de8a961de63e624c8e">cs_dfree</a>((<a class="code hl_struct" href="structcs__dmperm__results.html">csd</a>    *) D);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *)    cs_dfree((csd    *) D);</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>}</div>
 </div>
@@ -185,7 +185,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *) cs_di_dmperm((cs_di *) A, seed);</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *)    <a class="code hl_function" href="cs_8c.html#a0a3ca56d66f3f3c350e90f560f593f68">cs_dmperm</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, seed);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__dmperm__results.html">Matrix_csd</a> *)    cs_dmperm((cs    *) A, seed);</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>}</div>
 </div>
@@ -199,7 +199,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordflow">return</span> cs_di_dropzeros((cs_di *) A);</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a038d56f7a15bb02c3b8309f3eff78d59">cs_dropzeros</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordflow">return</span>    cs_dropzeros((cs    *) A);</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>}</div>
 </div>
@@ -213,7 +213,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">return</span> cs_di_free(p);</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#adfe5c16cc6d8a8b545b35940a0702be1">cs_free</a>(p);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keywordflow">return</span>    cs_free(p);</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>}</div>
 </div>
@@ -227,7 +227,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keywordflow">return</span> cs_di_happly((cs_di *) V, i, beta, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a88a82fabd191059a8db610fbfe6b008a">cs_happly</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) V, i, beta, (<span class="keywordtype">double</span>          *) x);</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keywordflow">return</span>    cs_happly((cs    *) V, i, beta, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>}</div>
 </div>
@@ -241,7 +241,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordflow">return</span> cs_di_ipvec(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a0938ec08825dc07a2dab8f9477ab053b">cs_ipvec</a>(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keywordflow">return</span>    cs_ipvec(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>}</div>
 </div>
@@ -255,7 +255,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="keywordflow">return</span> cs_di_lsolve((cs_di *) L, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#adefe244fe8757d1d7b4de55e0c81561f">cs_lsolve</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) L, (<span class="keywordtype">double</span>          *) x);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">return</span>    cs_lsolve((cs    *) L, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>}</div>
 </div>
@@ -269,7 +269,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *) cs_di_lu((cs_di *) A, (cs_dis *) S, tol);</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    <a class="code hl_function" href="cs_8c.html#ad63cba2834ab7aa01a015a7b0e28eb19">cs_lu</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, (<a class="code hl_struct" href="structcs__symbolic.html">css</a>    *) S, tol);</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    cs_lu((cs    *) A, (css    *) S, tol);</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>}</div>
 </div>
@@ -283,7 +283,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    <span class="keywordflow">return</span> cs_di_lusol(order, (cs_di *) A, (<span class="keywordtype">double</span>          *) b, tol);</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a99ff84a3be540f3237c33a873064e1e5">cs_lusol</a>(order, (<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, (<span class="keywordtype">double</span>          *) b, tol);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <span class="keywordflow">return</span>    cs_lusol(order, (cs    *) A, (<span class="keywordtype">double</span>          *) b, tol);</div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>}</div>
 </div>
@@ -297,7 +297,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *) cs_di_nfree((cs_din *) N);</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    <a class="code hl_function" href="cs_8c.html#adabc8e810cec49307537b5e3368d53aa">cs_nfree</a>((<a class="code hl_struct" href="structcs__numeric.html">csn</a>    *) N);</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    cs_nfree((csn    *) N);</div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>}</div>
 </div>
@@ -319,10 +319,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    tmp = cs_di_free(tmp);</div>
 <div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    }</div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <a class="code hl_struct" href="structcs__sparse.html">cs</a>    *tmp =    <a class="code hl_function" href="cs_8c.html#aa09de703c0e946fe0d8a61dacbd78aa4">cs_permute</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, pinv, q, values);</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    <a class="code hl_function" href="cs_8c.html#a071e69dcb222391d3add6c5220a79f51">cs_calloc</a>(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structcs__sparse.html">cs</a>   ));</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    tmp =    <a class="code hl_function" href="cs_8c.html#adfe5c16cc6d8a8b545b35940a0702be1">cs_free</a>(tmp);</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    cs    *tmp =    cs_permute((cs    *) A, pinv, q, values);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    cs_calloc(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(cs   ));</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    tmp =    cs_free(tmp);</div>
 <div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    B-&gt;<a class="code hl_variable" href="structMatrix__cs__sparse.html#afc4a09b8722e9a99eb860aa422962175">xtype</a> = <a class="code hl_define" href="cs-etc_8h.html#a8888a14932f18c2d6143edfd4e022eda">MCS_XTYPE_GET</a>();</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    <span class="keywordflow">return</span> B;</div>
@@ -338,7 +338,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    <span class="keywordflow">return</span> cs_di_pinv(p, n);</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#ae8aefba6d94d832505cc7ed4b0d78548">cs_pinv</a>(p, n);</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <span class="keywordflow">return</span>    cs_pinv(p, n);</div>
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>}</div>
 </div>
@@ -352,7 +352,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>    <span class="keywordflow">return</span> cs_di_pvec(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a79d20fcd31c30d118075e08087127c4e">cs_pvec</a>(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <span class="keywordflow">return</span>    cs_pvec(p, (<span class="keywordtype">double</span>          *) b, (<span class="keywordtype">double</span>          *) x, n);</div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>}</div>
 </div>
@@ -366,7 +366,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *) cs_di_qr((cs_di *) A, (cs_dis *) S);</div>
 <div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    <a class="code hl_function" href="cs_8c.html#ad50e945d7db927c8731fff2bcc962eea">cs_qr</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, (<a class="code hl_struct" href="structcs__symbolic.html">css</a>    *) S);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__numeric.html">Matrix_csn</a> *)    cs_qr((cs    *) A, (css    *) S);</div>
 <div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>}</div>
 </div>
@@ -380,7 +380,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    <span class="keywordflow">return</span> cs_di_qrsol(order, (cs_di *) A, (<span class="keywordtype">double</span>          *) b);</div>
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a136e729a618c610422377201351db105">cs_qrsol</a>(order, (<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, (<span class="keywordtype">double</span>          *) b);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordflow">return</span>    cs_qrsol(order, (cs    *) A, (<span class="keywordtype">double</span>          *) b);</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>}</div>
 </div>
@@ -394,7 +394,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *) cs_di_sfree((cs_dis *) S);</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *)    <a class="code hl_function" href="cs_8c.html#a2eebf0dae1d9ee505a016630e4fa5748">cs_sfree</a>((<a class="code hl_struct" href="structcs__symbolic.html">css</a>    *) S);</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *)    cs_sfree((css    *) S);</div>
 <div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>}</div>
 </div>
@@ -416,10 +416,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    tmp = cs_di_free(tmp);</div>
 <div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    }</div>
 <div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    <a class="code hl_struct" href="structcs__sparse.html">cs</a>    *tmp =    <a class="code hl_function" href="cs_8c.html#af3ed6e2936760b1b53b79fe3ed5cc8b6">cs_spalloc</a>(m, n, nzmax, values, triplet);</div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    <a class="code hl_function" href="cs_8c.html#a071e69dcb222391d3add6c5220a79f51">cs_calloc</a>(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structcs__sparse.html">cs</a>   ));</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    tmp =    <a class="code hl_function" href="cs_8c.html#adfe5c16cc6d8a8b545b35940a0702be1">cs_free</a>(tmp);</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    cs    *tmp =    cs_spalloc(m, n, nzmax, values, triplet);</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    cs_calloc(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(cs   ));</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    tmp =    cs_free(tmp);</div>
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    B-&gt;<a class="code hl_variable" href="structMatrix__cs__sparse.html#afc4a09b8722e9a99eb860aa422962175">xtype</a> = <a class="code hl_define" href="cs-etc_8h.html#a8888a14932f18c2d6143edfd4e022eda">MCS_XTYPE_GET</a>();</div>
 <div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    <span class="keywordflow">return</span> B;</div>
@@ -467,7 +467,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *) cs_di_spfree((cs_di *) A);</div>
 <div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    <a class="code hl_function" href="cs_8c.html#a01a74117bb6004b0b844de5940ddee0a">cs_spfree</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A);</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    cs_spfree((cs    *) A);</div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>}</div>
 </div>
@@ -481,7 +481,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="keywordflow">return</span> cs_di_sprealloc((cs_di *) A, nzmax);</div>
 <div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a4f6f6d0b8acba23772fd254ec794e966">cs_sprealloc</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, nzmax);</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="keywordflow">return</span>    cs_sprealloc((cs    *) A, nzmax);</div>
 <div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>}</div>
 </div>
@@ -495,7 +495,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>    <span class="keywordflow">return</span> cs_di_spsolve((cs_di *) L, (cs_di *) B, k, xi, (<span class="keywordtype">double</span>          *) x, pinv, lo);</div>
 <div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#a772ba477fdc1f6499735635e037b0c6d">cs_spsolve</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) L, (<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) B, k, xi, (<span class="keywordtype">double</span>          *) x, pinv, lo);</div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>    <span class="keywordflow">return</span>    cs_spsolve((cs    *) L, (cs    *) B, k, xi, (<span class="keywordtype">double</span>          *) x, pinv, lo);</div>
 <div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>}</div>
 </div>
@@ -509,7 +509,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *) cs_di_sqr(order, (cs_di *) A, qr);</div>
 <div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *)    <a class="code hl_function" href="cs_8c.html#a7cb77fc595740853b9d5f49df6d5f64c">cs_sqr</a>(order, (<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, qr);</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <span class="keywordflow">return</span> (<a class="code hl_struct" href="structMatrix__cs__symbolic.html">Matrix_css</a> *)    cs_sqr(order, (cs    *) A, qr);</div>
 <div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>}</div>
 </div>
@@ -531,10 +531,10 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>    tmp = cs_di_free(tmp);</div>
 <div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>    }</div>
 <div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    <a class="code hl_struct" href="structcs__sparse.html">cs</a>    *tmp =    <a class="code hl_function" href="cs_8c.html#a838dfaabdae54c408a4a696dfffa3dea">cs_transpose</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) A, values);</div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    <a class="code hl_function" href="cs_8c.html#a071e69dcb222391d3add6c5220a79f51">cs_calloc</a>(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structcs__sparse.html">cs</a>   ));</div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    tmp =    <a class="code hl_function" href="cs_8c.html#adfe5c16cc6d8a8b545b35940a0702be1">cs_free</a>(tmp);</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    cs    *tmp =    cs_transpose((cs    *) A, values);</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    B = (<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a> *)    cs_calloc(1, <span class="keyword">sizeof</span>(<a class="code hl_struct" href="structMatrix__cs__sparse.html">Matrix_cs</a>));</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    memcpy(B, tmp, <span class="keyword">sizeof</span>(cs   ));</div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    tmp =    cs_free(tmp);</div>
 <div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    B-&gt;<a class="code hl_variable" href="structMatrix__cs__sparse.html#afc4a09b8722e9a99eb860aa422962175">xtype</a> = <a class="code hl_define" href="cs-etc_8h.html#a8888a14932f18c2d6143edfd4e022eda">MCS_XTYPE_GET</a>();</div>
 <div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>    <span class="keywordflow">return</span> B;</div>
@@ -550,7 +550,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>    <span class="keywordflow">return</span> cs_di_usolve((cs_di *) U, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    <span class="keywordflow">return</span>    <a class="code hl_function" href="cs_8c.html#aace9cc447db7e3e293431a31f6965730">cs_usolve</a>((<a class="code hl_struct" href="structcs__sparse.html">cs</a>    *) U, (<span class="keywordtype">double</span>          *) x);</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>    <span class="keywordflow">return</span>    cs_usolve((cs    *) U, (<span class="keywordtype">double</span>          *) x);</div>
 <div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>}</div>
 </div>
@@ -597,30 +597,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="acs-etc_8h_html_a650db0833c3cf912e5ab31bb148af7e6"><div class="ttname"><a href="cs-etc_8h.html#a650db0833c3cf912e5ab31bb148af7e6">MCS_COMPLEX</a></div><div class="ttdeci">#define MCS_COMPLEX</div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00009">cs-etc.h:9</a></div></div>
 <div class="ttc" id="acs-etc_8h_html_a8888a14932f18c2d6143edfd4e022eda"><div class="ttname"><a href="cs-etc_8h.html#a8888a14932f18c2d6143edfd4e022eda">MCS_XTYPE_GET</a></div><div class="ttdeci">#define MCS_XTYPE_GET()</div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00011">cs-etc.h:11</a></div></div>
 <div class="ttc" id="acs-etc_8h_html_adebaf816c183d4ab5a92540a023cfb02"><div class="ttname"><a href="cs-etc_8h.html#adebaf816c183d4ab5a92540a023cfb02">MCS_PATTERN</a></div><div class="ttdeci">#define MCS_PATTERN</div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00007">cs-etc.h:7</a></div></div>
-<div class="ttc" id="acs_8c_html_a01a74117bb6004b0b844de5940ddee0a"><div class="ttname"><a href="cs_8c.html#a01a74117bb6004b0b844de5940ddee0a">cs_spfree</a></div><div class="ttdeci">cs * cs_spfree(cs *A)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01952">cs.c:1952</a></div></div>
-<div class="ttc" id="acs_8c_html_a038d56f7a15bb02c3b8309f3eff78d59"><div class="ttname"><a href="cs_8c.html#a038d56f7a15bb02c3b8309f3eff78d59">cs_dropzeros</a></div><div class="ttdeci">csi cs_dropzeros(cs *A)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l00761">cs.c:761</a></div></div>
-<div class="ttc" id="acs_8c_html_a071e69dcb222391d3add6c5220a79f51"><div class="ttname"><a href="cs_8c.html#a071e69dcb222391d3add6c5220a79f51">cs_calloc</a></div><div class="ttdeci">void * cs_calloc(csi n, size_t size)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01143">cs.c:1143</a></div></div>
-<div class="ttc" id="acs_8c_html_a0938ec08825dc07a2dab8f9477ab053b"><div class="ttname"><a href="cs_8c.html#a0938ec08825dc07a2dab8f9477ab053b">cs_ipvec</a></div><div class="ttdeci">csi cs_ipvec(const csi *p, const double *b, double *x, csi n)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l00942">cs.c:942</a></div></div>
-<div class="ttc" id="acs_8c_html_a0a3ca56d66f3f3c350e90f560f593f68"><div class="ttname"><a href="cs_8c.html#a0a3ca56d66f3f3c350e90f560f593f68">cs_dmperm</a></div><div class="ttdeci">csd * cs_dmperm(const cs *A, csi seed)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l00672">cs.c:672</a></div></div>
-<div class="ttc" id="acs_8c_html_a136e729a618c610422377201351db105"><div class="ttname"><a href="cs_8c.html#a136e729a618c610422377201351db105">cs_qrsol</a></div><div class="ttdeci">csi cs_qrsol(csi order, const cs *A, double *b)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01487">cs.c:1487</a></div></div>
-<div class="ttc" id="acs_8c_html_a2eebf0dae1d9ee505a016630e4fa5748"><div class="ttname"><a href="cs_8c.html#a2eebf0dae1d9ee505a016630e4fa5748">cs_sfree</a></div><div class="ttdeci">css * cs_sfree(css *S)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01973">cs.c:1973</a></div></div>
-<div class="ttc" id="acs_8c_html_a30f07e6f09ffa0de8a961de63e624c8e"><div class="ttname"><a href="cs_8c.html#a30f07e6f09ffa0de8a961de63e624c8e">cs_dfree</a></div><div class="ttdeci">csd * cs_dfree(csd *D)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01998">cs.c:1998</a></div></div>
-<div class="ttc" id="acs_8c_html_a4f6f6d0b8acba23772fd254ec794e966"><div class="ttname"><a href="cs_8c.html#a4f6f6d0b8acba23772fd254ec794e966">cs_sprealloc</a></div><div class="ttdeci">csi cs_sprealloc(cs *A, csi nzmax)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01937">cs.c:1937</a></div></div>
-<div class="ttc" id="acs_8c_html_a772ba477fdc1f6499735635e037b0c6d"><div class="ttname"><a href="cs_8c.html#a772ba477fdc1f6499735635e037b0c6d">cs_spsolve</a></div><div class="ttdeci">csi cs_spsolve(cs *G, const cs *B, csi k, csi *xi, double *x, const csi *pinv, csi lo)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01671">cs.c:1671</a></div></div>
-<div class="ttc" id="acs_8c_html_a79d20fcd31c30d118075e08087127c4e"><div class="ttname"><a href="cs_8c.html#a79d20fcd31c30d118075e08087127c4e">cs_pvec</a></div><div class="ttdeci">csi cs_pvec(const csi *p, const double *b, double *x, csi n)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01407">cs.c:1407</a></div></div>
-<div class="ttc" id="acs_8c_html_a7cb77fc595740853b9d5f49df6d5f64c"><div class="ttname"><a href="cs_8c.html#a7cb77fc595740853b9d5f49df6d5f64c">cs_sqr</a></div><div class="ttdeci">css * cs_sqr(csi order, const cs *A, csi qr)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01755">cs.c:1755</a></div></div>
-<div class="ttc" id="acs_8c_html_a838dfaabdae54c408a4a696dfffa3dea"><div class="ttname"><a href="cs_8c.html#a838dfaabdae54c408a4a696dfffa3dea">cs_transpose</a></div><div class="ttdeci">cs * cs_transpose(const cs *A, csi values)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01845">cs.c:1845</a></div></div>
-<div class="ttc" id="acs_8c_html_a88a82fabd191059a8db610fbfe6b008a"><div class="ttname"><a href="cs_8c.html#a88a82fabd191059a8db610fbfe6b008a">cs_happly</a></div><div class="ttdeci">csi cs_happly(const cs *V, csi i, double beta, double *x)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l00902">cs.c:902</a></div></div>
-<div class="ttc" id="acs_8c_html_a99ff84a3be540f3237c33a873064e1e5"><div class="ttname"><a href="cs_8c.html#a99ff84a3be540f3237c33a873064e1e5">cs_lusol</a></div><div class="ttdeci">csi cs_lusol(csi order, const cs *A, double *b, double tol)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01105">cs.c:1105</a></div></div>
-<div class="ttc" id="acs_8c_html_aa09de703c0e946fe0d8a61dacbd78aa4"><div class="ttname"><a href="cs_8c.html#aa09de703c0e946fe0d8a61dacbd78aa4">cs_permute</a></div><div class="ttdeci">cs * cs_permute(const cs *A, const csi *pinv, const csi *q, csi values)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01312">cs.c:1312</a></div></div>
-<div class="ttc" id="acs_8c_html_aace9cc447db7e3e293431a31f6965730"><div class="ttname"><a href="cs_8c.html#aace9cc447db7e3e293431a31f6965730">cs_usolve</a></div><div class="ttdeci">csi cs_usolve(const cs *U, double *x)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01905">cs.c:1905</a></div></div>
-<div class="ttc" id="acs_8c_html_ad50e945d7db927c8731fff2bcc962eea"><div class="ttname"><a href="cs_8c.html#ad50e945d7db927c8731fff2bcc962eea">cs_qr</a></div><div class="ttdeci">csn * cs_qr(const cs *A, const css *S)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01415">cs.c:1415</a></div></div>
-<div class="ttc" id="acs_8c_html_ad63cba2834ab7aa01a015a7b0e28eb19"><div class="ttname"><a href="cs_8c.html#ad63cba2834ab7aa01a015a7b0e28eb19">cs_lu</a></div><div class="ttdeci">csn * cs_lu(const cs *A, const css *S, double tol)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01019">cs.c:1019</a></div></div>
-<div class="ttc" id="acs_8c_html_adabc8e810cec49307537b5e3368d53aa"><div class="ttname"><a href="cs_8c.html#adabc8e810cec49307537b5e3368d53aa">cs_nfree</a></div><div class="ttdeci">csn * cs_nfree(csn *N)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01962">cs.c:1962</a></div></div>
-<div class="ttc" id="acs_8c_html_adefe244fe8757d1d7b4de55e0c81561f"><div class="ttname"><a href="cs_8c.html#adefe244fe8757d1d7b4de55e0c81561f">cs_lsolve</a></div><div class="ttdeci">csi cs_lsolve(const cs *L, double *x)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l00985">cs.c:985</a></div></div>
-<div class="ttc" id="acs_8c_html_adfe5c16cc6d8a8b545b35940a0702be1"><div class="ttname"><a href="cs_8c.html#adfe5c16cc6d8a8b545b35940a0702be1">cs_free</a></div><div class="ttdeci">void * cs_free(void *p)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01149">cs.c:1149</a></div></div>
-<div class="ttc" id="acs_8c_html_ae8aefba6d94d832505cc7ed4b0d78548"><div class="ttname"><a href="cs_8c.html#ae8aefba6d94d832505cc7ed4b0d78548">cs_pinv</a></div><div class="ttdeci">csi * cs_pinv(csi const *p, csi n)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01336">cs.c:1336</a></div></div>
-<div class="ttc" id="acs_8c_html_af3ed6e2936760b1b53b79fe3ed5cc8b6"><div class="ttname"><a href="cs_8c.html#af3ed6e2936760b1b53b79fe3ed5cc8b6">cs_spalloc</a></div><div class="ttdeci">cs * cs_spalloc(csi m, csi n, csi nzmax, csi values, csi triplet)</div><div class="ttdef"><b>Definition</b> <a href="cs_8c_source.html#l01922">cs.c:1922</a></div></div>
 <div class="ttc" id="astructMatrix__cs__dmperm__results_html"><div class="ttname"><a href="structMatrix__cs__dmperm__results.html">Matrix_cs_dmperm_results</a></div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00048">cs-etc.h:49</a></div></div>
 <div class="ttc" id="astructMatrix__cs__numeric_html"><div class="ttname"><a href="structMatrix__cs__numeric.html">Matrix_cs_numeric</a></div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00040">cs-etc.h:41</a></div></div>
 <div class="ttc" id="astructMatrix__cs__sparse_html"><div class="ttname"><a href="structMatrix__cs__sparse.html">Matrix_cs_sparse</a></div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00016">cs-etc.h:17</a></div></div>
@@ -633,10 +609,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="astructMatrix__cs__sparse_html_ae142b02df585ebd0c87ce297db7c0fa1"><div class="ttname"><a href="structMatrix__cs__sparse.html#ae142b02df585ebd0c87ce297db7c0fa1">Matrix_cs_sparse::m</a></div><div class="ttdeci">int m</div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00019">cs-etc.h:19</a></div></div>
 <div class="ttc" id="astructMatrix__cs__sparse_html_afc4a09b8722e9a99eb860aa422962175"><div class="ttname"><a href="structMatrix__cs__sparse.html#afc4a09b8722e9a99eb860aa422962175">Matrix_cs_sparse::xtype</a></div><div class="ttdeci">int xtype</div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00025">cs-etc.h:25</a></div></div>
 <div class="ttc" id="astructMatrix__cs__symbolic_html"><div class="ttname"><a href="structMatrix__cs__symbolic.html">Matrix_cs_symbolic</a></div><div class="ttdef"><b>Definition</b> <a href="cs-etc_8h_source.html#l00028">cs-etc.h:29</a></div></div>
-<div class="ttc" id="astructcs__dmperm__results_html"><div class="ttname"><a href="structcs__dmperm__results.html">cs_dmperm_results</a></div><div class="ttdef"><b>Definition</b> <a href="cs_8h_source.html#l00089">cs.h:90</a></div></div>
-<div class="ttc" id="astructcs__numeric_html"><div class="ttname"><a href="structcs__numeric.html">cs_numeric</a></div><div class="ttdef"><b>Definition</b> <a href="cs_8h_source.html#l00081">cs.h:82</a></div></div>
-<div class="ttc" id="astructcs__sparse_html"><div class="ttname"><a href="structcs__sparse.html">cs_sparse</a></div><div class="ttdef"><b>Definition</b> <a href="cs_8h_source.html#l00035">cs.h:36</a></div></div>
-<div class="ttc" id="astructcs__symbolic_html"><div class="ttname"><a href="structcs__symbolic.html">cs_symbolic</a></div><div class="ttdef"><b>Definition</b> <a href="cs_8h_source.html#l00069">cs.h:70</a></div></div>
 <div class="ttc" id="autils_8c_html_ab7f6f090a75f9bd43cdade23d42dcaf3"><div class="ttname"><a href="utils_8c.html#ab7f6f090a75f9bd43cdade23d42dcaf3">Matrix_memcpy</a></div><div class="ttdeci">void * Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size)</div><div class="ttdef"><b>Definition</b> <a href="utils_8c_source.html#l00070">utils.c:70</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
