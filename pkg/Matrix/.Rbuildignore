@@ -56,7 +56,6 @@ _?svn-?
 
 ## Historical
 ^ChangeLog$
-^inst/doc/Announce[.]txt$
 ^po/translators[.]txt$
 
 ## Private
