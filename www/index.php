@@ -34,42 +34,79 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <!-- get project title  -->
 <!-- own website starts here, the following may be changed as you like -->
 
-<?php if ($handle=fopen('http://'.$domain.'/export/projtitl.php?group_name='.$group_name,'r')){
-$contents = '';
-while (!feof($handle)) {
-	$contents .= fread($handle, 8192);
-}
-fclose($handle);
-echo $contents; } ?>
-
-// The R-forge project description (pulled above) is limited to 255 characters
-// (in theory; in practice even a bit less).
-
-// Currently it shows this:
-
-// R package Matrix provides a hierarchy of matrix classes, both dense & sparse. Numerous methods & operations on these matrices using BLAS & Lapack; further CHOLMOD and other libraries from the SuiteSparse collection.
+<h1>The Matrix project</h1>
 
 <p>
-<code>Matrix</code> has been a "recommended" R package since R version 2.9.0 (October 2008). This means that it is now part of every regular installation of R.
+This is the "front page" for <a href="https://r-forge.r-project.org/projects/matrix/">the Matrix project</a> on R-Forge, which is the home of R packages <a href="https://cran.r-project.org/package=Matrix"><b>Matrix</b></a> and <a href="https://cran.r-project.org/package=MatrixModels"><b>MatrixModels</b></a>.  These provide S4 classes and methods for representing, operating on, and modelling with sparse and dense matrices.
+</p>
+
+<h2>Installation</h2>
+
+<p>
+The latest release and development versions of <b>Matrix</b> can be installed from CRAN and R-Forge, respectively, with:
+</p>
+
+<pre>
+> install.packages("Matrix")
+> install.packages("Matrix", repos = "http://R-Forge.R-project.org")
+</pre>
+
+<p>
+Older release versions are preserved in the CRAN <a href="https://cran.r-project.org/src/contrib/Archive/Matrix/">archive</a>.
 </p>
 
 <p>
-The <code>Matrix</code> package comes with several vignettes describing its functionality.
-In addition, we provide <strong><a href="./slides">slides</a></strong> of presentations or talks about the subject.
+Since R version 2.9.0, <b>Matrix</b> has belonged to a list of "recommended" packages bundled in standard installations of R, so that <code>library(Matrix)</code> works out of the box.  Still, one often installs <b>Matrix</b> from CRAN into a user library if the version in the default library is out of date.
 </p>
 
-<p> <strong>Doxygen</strong> documentation of the underlying C functions is <a href="./doxygen/"><strong>here</strong></a>. </p>
-
-
-<p> The <strong>project summary page</strong> is <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.
-  <ul>
-    <li> From there you can browse the source via viewVC, for the Matrix package more directly
-    <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/Matrix/?root=matrix"><strong>here</strong></a>,
-    </li>
-    <li> or look at the <code>R CMD build</code> and <code>R CMD check</code> status and also download the result,
-    <a href="https://r-forge.r-project.org/R/?group_id=61" <strong>here</strong></a>.</li>
-  </ul>
+<p>
+Note that <em>source</em> installation (as opposed to <em>binary</em> installation) requires compilers and additional tools; see the <a href="https://stat.ethz.ch/R-manual/R-patched/doc/manual/R-admin.html#Installing-packages"><i>R Installation and Administration</i></a> manual for platform-specific details.
 </p>
+
+<h2>Documentation</h2>
+
+<p>
+Indices of available help topics, data sets, and vignettes can be accessed with:
+</p>
+
+<pre>
+> help(package = "Matrix")
+> data(package = "Matrix")
+> vignette(package = "Matrix")
+</pre>
+
+<p>
+Passing <code>help_type="html"</code> to <code>help</code> renders a hyperlinked version of the index in your browser.  Because <b>Matrix</b> is "recommended", its index is also hosted <a href="https://stat.ethz.ch/R-manual/R-patched/library/Matrix/html/00Index.html">here</a>.  (The version is that which is bundled in the latest release of R, which will be recent but need not be current.)
+</p>
+
+<p>
+Doxygen-generated documentation for the C sources of <b>Matrix</b> is hosted <a href="./doxygen">here</a>.  Do nudge <code>maintainer("Matrix")</code> if it seems to be severely out of date.
+</p>
+
+Slides for past talks about the Matrix project are hosted <a href="./slides">here</a>.
+
+<h2>Accessing the source code</h2>
+
+<p>
+The Matrix project is maintained in a Subversion ("SVN") repository.  If you have installed Subversion, then you can check out the latest development versions of <b>Matrix</b> with:
+</p>
+
+<pre>
+$ svn checkout [-r REV] svn://svn.r-forge.r-project.org/svnroot/matrix/pkg/Matrix [DEST]
+</pre>
+
+<p>
+where <code>REV</code> and <code>DEST</code> optionally specify a revision number and destination path.  Without Subversion, one can browse the repository using R-Forge's <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/?root=matrix">ViewVC interface</a> or download a tarball produced by <code>R CMD build</code> from CRAN or R-Forge:
+</p>
+
+<pre>
+> download.packages("Matrix", ".", type = "source")
+> download.packages("Matrix", ".", type = "source", repos = "http://R-Forge.R-project.org")
+</pre>
+
+<h2>Bug reports and feature requests</h2>
+
+The Matrix project uses <a href="https://r-forge.r-project.org/tracker/?group_id=61">trackers</a> provided by R-Forge to manage bug reports and feature requests.  An R-Forge user account is required to post.  Once logged in, select an appropriate tracker and click "Submit New".  Before posting, <em>do</em> verify that your issue exists under the latest development version of the relevant package.
 
 </body>
 </html>
