@@ -18,7 +18,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
   <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title><?php echo $group_name; ?></title>
+	<title><The Matrix Project></title>
 	<link href="<?php echo $themeroot; ?>styles/estilo1.css" rel="stylesheet" type="text/css" />
   </head>
 
@@ -34,10 +34,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <!-- get project title  -->
 <!-- own website starts here, the following may be changed as you like -->
 
-<h1>The Matrix project</h1>
+<h1>The Matrix Project</h1>
 
 <p>
-This is the "front page" for <a href="https://r-forge.r-project.org/projects/matrix/">the Matrix project</a> on R-Forge, which is the home of R packages <a href="https://cran.r-project.org/package=Matrix"><b>Matrix</b></a> and <a href="https://cran.r-project.org/package=MatrixModels"><b>MatrixModels</b></a>.  These provide S4 classes and methods for representing, operating on, and modelling with sparse and dense matrices.
+This is the front page of <a href="https://r-forge.r-project.org/projects/matrix/">the Matrix project</a> on R-Forge, which is the home of R packages <a href="https://cran.r-project.org/package=Matrix"><b>Matrix</b></a> and <a href="https://cran.r-project.org/package=MatrixModels"><b>MatrixModels</b></a>.  These provide S4 classes and methods for representing, operating on, and modelling with sparse and dense matrices.
 </p>
 
 <h2>Installation</h2>
@@ -76,7 +76,7 @@ Indices of available help topics, data sets, and vignettes can be accessed with:
 </pre>
 
 <p>
-Passing <code>help_type="html"</code> to <code>help</code> renders a hyperlinked version of the index in your browser.  Because <b>Matrix</b> is "recommended", its index is also hosted <a href="https://stat.ethz.ch/R-manual/R-patched/library/Matrix/html/00Index.html">here</a>.  (The version is that which is bundled in the latest release of R, which will be recent but need not be current.)
+Passing <code>help_type = "html"</code> to <code>help</code> renders a hyperlinked version of the index in your browser.  Because <b>Matrix</b> is "recommended", its index is also hosted <a href="https://stat.ethz.ch/R-manual/R-patched/library/Matrix/html/00Index.html">here</a>.  (The version is that which is bundled in the latest release of R, which will be recent but need not be current.)
 </p>
 
 <p>
@@ -88,7 +88,7 @@ Slides for past talks about the Matrix project are hosted <a href="./slides">her
 <h2>Accessing the source code</h2>
 
 <p>
-The Matrix project is maintained in a Subversion ("SVN") repository.  If you have installed Subversion, then you can check out the latest development versions of <b>Matrix</b> with:
+The Matrix project is maintained in a Subversion ("SVN") repository.  If you have installed Subversion, then you can check out the latest development version of <b>Matrix</b> with:
 </p>
 
 <pre>
