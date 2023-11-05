@@ -1,8 +1,0 @@
-<map id="Matrix_check_class" name="Matrix_check_class">
-<area shape="rect" id="node1" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string." alt="" coords="561,31,700,57"/>
-<area shape="rect" id="node2" href="$cs__utils_8c.html#a59f855a125252528fc15e1d269d3e250" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="373,31,513,57"/>
-<area shape="rect" id="node3" href="$dgCMatrix_8c.html#aa7a73c816cd343a9d7f4fd0170f4358f" title=" " alt="" coords="216,5,325,32"/>
-<area shape="rect" id="node4" href="$dgCMatrix_8c.html#a96ad800167bbc6769dd31e97c38f3690" title=" " alt="" coords="234,56,307,83"/>
-<area shape="rect" id="node5" href="$dgCMatrix_8c.html#aa0183ea2cfb3994e02d6a467a91de60a" title=" " alt="" coords="33,31,140,57"/>
-<area shape="rect" id="node6" href="$dgCMatrix_8c.html#a8da09e04827a1e22e332cf647b34428d" title=" " alt="" coords="5,81,168,108"/>
-</map>

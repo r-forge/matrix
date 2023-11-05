@@ -1,9 +1,0 @@
-<map id="dtrMatrix_dtrMatrix_mm" name="dtrMatrix_dtrMatrix_mm">
-<area shape="rect" id="node1" title="Matrix products of dense triangular Matrices." alt="" coords="5,107,165,133"/>
-<area shape="rect" id="node2" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="251,5,358,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title=" " alt="" coords="213,56,396,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="681,81,871,108"/>
-<area shape="rect" id="node6" href="$Mutils_8c.html#ab609d2e948284c5416568f8f41eb8731" title=" " alt="" coords="219,157,390,184"/>
-<area shape="rect" id="node7" href="$Mutils_8h.html#aeb40b76e760863cfc4e4009cf04e39e6" title=" " alt="" coords="244,208,365,235"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title=" " alt="" coords="444,56,633,83"/>
-</map>

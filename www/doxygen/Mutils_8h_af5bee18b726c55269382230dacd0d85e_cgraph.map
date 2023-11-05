@@ -1,4 +1,0 @@
-<map id="dimNames_validate" name="dimNames_validate">
-<area shape="rect" id="node1" title="Check R (Matrix&#45;like) object: must have @Dim and @Dimnames." alt="" coords="5,5,141,32"/>
-<area shape="rect" id="node2" href="$Mutils_8c.html#a6671e1ae9c8155daaf3bb76a479f13b3" title="Validate dimnames (the @Dim slot typically), assuming that &#39;dims&#39; is already checked." alt="" coords="189,5,340,32"/>
-</map>

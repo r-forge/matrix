@@ -1,5 +1,0 @@
-<map id="chm_diagN2U" name="chm_diagN2U">
-<area shape="rect" id="node1" title="Drop the (unit) diagonal entries from a cholmod_sparse matrix." alt="" coords="244,31,349,57"/>
-<area shape="rect" id="node2" href="$Csparse_8c.html#a86239e094c5ee16dfc9892f09e8077d9" title="[t]crossprod (&lt;Csparse&gt;, &lt;Csparse&gt;)" alt="" coords="5,5,196,32"/>
-<area shape="rect" id="node3" href="$Csparse_8c.html#a78b6af142e571556b5b698785211d1d9" title="A %*% B &#45; for matrices of class CsparseMatrix (R package &quot;Matrix&quot;)" alt="" coords="21,56,180,83"/>
-</map>

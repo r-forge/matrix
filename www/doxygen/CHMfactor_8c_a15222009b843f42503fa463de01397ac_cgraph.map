@@ -1,8 +1,0 @@
-<map id="CHMfactor_solve" name="CHMfactor_solve">
-<area shape="rect" id="node1" title=" " alt="" coords="5,81,128,108"/>
-<area shape="rect" id="node2" href="$chm__common_8c.html#ad8cdbb3c526b503d3620b16e2cf522ad" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="192,56,343,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title=" " alt="" coords="176,107,359,133"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="448,5,555,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="644,81,833,108"/>
-<area shape="rect" id="node6" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title=" " alt="" coords="407,107,596,133"/>
-</map>

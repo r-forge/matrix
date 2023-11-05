@@ -1,8 +1,0 @@
-<map id="dgeMatrix_LU" name="dgeMatrix_LU">
-<area shape="rect" id="node1" title=" " alt="" coords="5,81,108,108"/>
-<area shape="rect" id="node2" href="$dgeMatrix_8c.html#a25fac53ee67024e89f6240deaa4c7ca3" title=" " alt="" coords="156,81,267,108"/>
-<area shape="rect" id="node3" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="356,5,463,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#ac8a9910ab35d85d32c6801477c2e6622" title=" " alt="" coords="365,56,453,83"/>
-<area shape="rect" id="node5" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="315,107,504,133"/>
-<area shape="rect" id="node6" href="$Mutils_8c.html#acb9e30480c757f0c780a5d94853b7284" title="Caches &#39;val&#39; in the &#39;factors&#39; slot of obj, i.e." alt="" coords="365,157,453,184"/>
-</map>

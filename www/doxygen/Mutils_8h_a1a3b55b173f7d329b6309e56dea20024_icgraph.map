@@ -1,8 +1,0 @@
-<map id="expand_cmprPt" name="expand_cmprPt">
-<area shape="rect" id="node1" title="Expand compressed pointers in the array mp into a full set of indices in the array mj." alt="" coords="216,107,329,133"/>
-<area shape="rect" id="node2" href="$dgCMatrix_8c.html#a5a606c1716b4105aa8658ec849d36f43" title="Return a 2 column matrix &#39;&#39; cbind(i, j) &#39;&#39; of 0&#45;origin index vectors (i,j) which entirely correspond ..." alt="" coords="13,5,161,32"/>
-<area shape="rect" id="node3" href="$dgCMatrix_8c.html#ad3b5c3bc224c09316427f7e86e4e8a86" title=" " alt="" coords="5,56,168,83"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#af9c3d821b08775115572c042d9e61a28" title=" " alt="" coords="6,107,167,133"/>
-<area shape="rect" id="node5" href="$dtCMatrix_8c.html#a1b4cdbc0242e2aea3bf00cc3d6bff77c" title=" " alt="" coords="25,157,148,184"/>
-<area shape="rect" id="node6" href="$dtCMatrix_8c.html#aae01bf51a4b00f0bf789e70bbde33244" title=" " alt="" coords="25,208,148,235"/>
-</map>
