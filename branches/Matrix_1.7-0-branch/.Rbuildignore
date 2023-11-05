@@ -55,12 +55,12 @@ _?svn-?
 
 ## Historical
 ^ChangeLog$
-^inst/Doxyfile$
 ^inst/doc/Announce[.]txt$
 ^po/translators[.]txt$
 
 ## Private
 ^Done$
+^Doxyfile$
 ^TODO$
 ^po/update-me[.]sh$
 ^src/scripts/.*[.]sh$
