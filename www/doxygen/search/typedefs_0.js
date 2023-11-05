@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['cs_0',['cs',['../cs_8h.html#ab684df486f6679bc11bc980c789c04a4',1,'cs.h']]],
-  ['csd_1',['csd',['../cs_8h.html#aeab9af24928684690bf568c4bc3b43f3',1,'cs.h']]],
-  ['csn_2',['csn',['../cs_8h.html#a5c6209c1d43f317aa26e54f2dc1123a5',1,'cs.h']]],
-  ['css_3',['css',['../cs_8h.html#a665db6e495baeaa6b3a2a3072cf7f4b4',1,'cs.h']]]
+  ['matrix_5fcs_0',['Matrix_cs',['../cs-etc_8h.html#a9bcd85f1900b4f5c50894057d541d358',1,'cs-etc.h']]],
+  ['matrix_5fcsd_1',['Matrix_csd',['../cs-etc_8h.html#ad93b9060bcfc3660371ac199f529b2f5',1,'cs-etc.h']]],
+  ['matrix_5fcsn_2',['Matrix_csn',['../cs-etc_8h.html#aa4a98443a944bcd44b116626a65f52dc',1,'cs-etc.h']]],
+  ['matrix_5fcss_3',['Matrix_css',['../cs-etc_8h.html#a19e9b3370d7b744c1a1a0d05e3e52f37',1,'cs-etc.h']]],
+  ['matrix_5fint_5ffast64_5ft_4',['Matrix_int_fast64_t',['../Mdefines_8h.html#a05f16f2c08ac3083a9ed1be99da30d73',1,'Mdefines.h']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['s_0',['s',['../structcs__dmperm__results.html#a6dd273f5ba6466e85e5ac158703911d0',1,'cs_dmperm_results::s'],['../structMatrix__cs__dmperm__results.html#a6c117047e4e08d410e50cc1ea8f63c7d',1,'Matrix_cs_dmperm_results::s']]],
+  ['s_0',['s',['../structMatrix__cs__dmperm__results.html#a6c117047e4e08d410e50cc1ea8f63c7d',1,'Matrix_cs_dmperm_results']]],
   ['sad_5fcases_1',['SAD_CASES',['../coerce_8c.html#a8074bbbd768cae17c7c8b8aa906698c2',1,'coerce.c']]],
   ['sad_5floop_5fc2lp_2',['SAD_LOOP_C2LP',['../coerce_8c.html#ae0f780a3de3c167eae8a11405b4104ac',1,'coerce.c']]],
   ['sad_5floop_5fc2np_3',['SAD_LOOP_C2NP',['../coerce_8c.html#a59d34c81a9c7cf642327d8a75e91bc51',1,'coerce.c']]],

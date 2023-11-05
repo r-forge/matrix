@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['m_0',['m',['../structMatrix__cs__sparse.html#ae142b02df585ebd0c87ce297db7c0fa1',1,'Matrix_cs_sparse::m'],['../structcs__sparse.html#a8dab81f7d781bd65c7cb4f103db87ade',1,'cs_sparse::m']]],
+  ['m_0',['m',['../structMatrix__cs__sparse.html#ae142b02df585ebd0c87ce297db7c0fa1',1,'Matrix_cs_sparse']]],
   ['m0_5fordsym_1',['m0_ordSym',['../chm__common_8c.html#aedb78be9c3c529fa5f13f1e3c460261e',1,'chm_common.c']]],
-  ['m2_2',['m2',['../structMatrix__cs__symbolic.html#a7ef729ca0a6147b4454851ae694079c5',1,'Matrix_cs_symbolic::m2'],['../structcs__symbolic.html#aa0227f03661c17f047757cad80d6f4d9',1,'cs_symbolic::m2']]],
+  ['m2_2',['m2',['../structMatrix__cs__symbolic.html#a7ef729ca0a6147b4454851ae694079c5',1,'Matrix_cs_symbolic']]],
   ['matrix_5fbetasym_3',['Matrix_betaSym',['../Syms_8h.html#a326ab3950ce69144afd6da6003e50157',1,'Syms.h']]],
   ['matrix_5fcs_5fxtype_4',['matrix_cs_xtype',['../cs-etc_8c.html#abd8956da89df1bd636ee1b52df794ea6',1,'Matrix_cs_xtype:&#160;cs-etc.c'],['../cs-etc_8h.html#abd8956da89df1bd636ee1b52df794ea6',1,'Matrix_cs_xtype:&#160;cs-etc.c']]],
   ['matrix_5fdiagsym_5',['Matrix_diagSym',['../Syms_8h.html#aaaa2d2105381747118da72d6f1aba4e9',1,'Syms.h']]],
@@ -16,7 +16,7 @@ var searchData=
   ['matrix_5fmarginsym_13',['Matrix_marginSym',['../Syms_8h.html#a5834920c52b687e9cddbec8ae0cb127a',1,'Syms.h']]],
   ['matrix_5fpermsym_14',['Matrix_permSym',['../Syms_8h.html#a1e4c56ea9d2e084e0cb7154bcc13e196',1,'Syms.h']]],
   ['matrix_5fpsym_15',['Matrix_pSym',['../Syms_8h.html#af08cd6c75b2da4b71c2eb605e00e94ab',1,'Syms.h']]],
-  ['matrix_5fqsym_16',['matrix_qsym',['../Syms_8h.html#ad586fdbea11a9c3622770727ba1302b4',1,'Matrix_qSym:&#160;Syms.h'],['../Syms_8h.html#a7426f5b9a9d45ee3371c60d1501ccf45',1,'Matrix_QSym:&#160;Syms.h']]],
+  ['matrix_5fqsym_16',['matrix_qsym',['../Syms_8h.html#a7426f5b9a9d45ee3371c60d1501ccf45',1,'Matrix_QSym:&#160;Syms.h'],['../Syms_8h.html#ad586fdbea11a9c3622770727ba1302b4',1,'Matrix_qSym:&#160;Syms.h']]],
   ['matrix_5frsym_17',['Matrix_RSym',['../Syms_8h.html#a83e2c364ecd0a12a9812564b234399e9',1,'Syms.h']]],
   ['matrix_5fsdsym_18',['Matrix_sdSym',['../Syms_8h.html#a1520d9422561030d0797f706cdb06509',1,'Syms.h']]],
   ['matrix_5ftsym_19',['Matrix_TSym',['../Syms_8h.html#a35bb40d02954d2abd74b1d511e5aa12a',1,'Syms.h']]],

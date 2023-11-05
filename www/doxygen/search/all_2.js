@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['b_0',['b',['../structMatrix__cs__numeric.html#a09b6c7d62ef884bbc61abda9502a10b8',1,'Matrix_cs_numeric::B'],['../structcs__numeric.html#ad81bc354670c58c7e715293e98316152',1,'cs_numeric::B']]],
+  ['b_0',['B',['../structMatrix__cs__numeric.html#a09b6c7d62ef884bbc61abda9502a10b8',1,'Matrix_cs_numeric']]],
   ['band1_1',['BAND1',['../dense_8c.html#a72623b165d4ed06f2d12e1ef53f12b6e',1,'dense.c']]],
   ['band2_2',['BAND2',['../dense_8c.html#a65be52561e4edc509446a33e7e70d617',1,'dense.c']]],
   ['band_5fcases_3',['band_cases',['../dense_8c.html#a8f3137942c8fff13590f2817908d26f0',1,'BAND_CASES:&#160;dense.c'],['../sparse_8c.html#ad48ddaf383d0d30b784432e8c629c3fc',1,'BAND_CASES:&#160;sparse.c']]],

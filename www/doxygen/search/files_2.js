@@ -8,8 +8,6 @@ var searchData=
   ['coerce_2eh_5',['coerce.h',['../coerce_8h.html',1,'']]],
   ['cs_2detc_2ec_6',['cs-etc.c',['../cs-etc_8c.html',1,'']]],
   ['cs_2detc_2eh_7',['cs-etc.h',['../cs-etc_8h.html',1,'']]],
-  ['cs_2ec_8',['cs.c',['../cs_8c.html',1,'']]],
-  ['cs_2eh_9',['cs.h',['../cs_8h.html',1,'']]],
-  ['csparse_2ec_10',['Csparse.c',['../Csparse_8c.html',1,'']]],
-  ['csparse_2eh_11',['Csparse.h',['../Csparse_8h.html',1,'']]]
+  ['csparse_2ec_8',['Csparse.c',['../Csparse_8c.html',1,'']]],
+  ['csparse_2eh_9',['Csparse.h',['../Csparse_8h.html',1,'']]]
 ];
