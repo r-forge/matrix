@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2023-11-04 r4491)}{
+\section{Changes in version 1.7-0 (2023-11-05 r4500)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -27,7 +27,7 @@
   }
 }
 
-\section{Changes in version 1.6-2 (2023-11-03 r4486)}{
+\section{Changes in version 1.6-2 (2023-11-05 r4500)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
