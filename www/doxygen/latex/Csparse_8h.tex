@@ -1,0 +1,113 @@
+\doxysection{Csparse.\+h File Reference}
+\hypertarget{Csparse_8h}{}\label{Csparse_8h}\index{Csparse.h@{Csparse.h}}
+{\ttfamily \#include $<$Rinternals.\+h$>$}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_aff3f7e90b1f3c1431882d3c15810b911}{Csparse\+Matrix\+\_\+validate\+\_\+maybe\+\_\+sorting}} (SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_aa77dc185a25df5e1911c2ca921849fe9}{t\+Csparse\+\_\+diag}} (SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_a99f5d3ee7a174be061bca76768d8a571}{n\+Csparse\+\_\+subassign}} (SEXP, SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_a1f44896ffadd7b74752e2446f3d6927d}{l\+Csparse\+\_\+subassign}} (SEXP, SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_ab7e6e5212adc046eda028d3b9fbb6162}{i\+Csparse\+\_\+subassign}} (SEXP, SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_a0c1c873eb38e2b1983106a2cb74d74d2}{d\+Csparse\+\_\+subassign}} (SEXP, SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_a995b564fbfb0b40f8aeaa82d3de2c736}{z\+Csparse\+\_\+subassign}} (SEXP, SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_af1d97e3975c7b37da225f72e91e17503}{Csparse\+\_\+dmperm}} (SEXP, SEXP, SEXP)
+\item 
+SEXP \mbox{\hyperlink{Csparse_8h_af16506fe554b252a8f605fd553086c33}{Csparse\+\_\+\+Matrix\+Market}} (SEXP, SEXP)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{Csparse_8h_af1d97e3975c7b37da225f72e91e17503}\label{Csparse_8h_af1d97e3975c7b37da225f72e91e17503} 
+\index{Csparse.h@{Csparse.h}!Csparse\_dmperm@{Csparse\_dmperm}}
+\index{Csparse\_dmperm@{Csparse\_dmperm}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{Csparse\_dmperm()}{Csparse\_dmperm()}}
+{\footnotesize\ttfamily SEXP Csparse\+\_\+dmperm (\begin{DoxyParamCaption}\item[{SEXP}]{x,  }\item[{SEXP}]{nans,  }\item[{SEXP}]{seed }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Csparse_8c_source_l00219}{219}} of file \mbox{\hyperlink{Csparse_8c_source}{Csparse.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00056}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::cc}}, \mbox{\hyperlink{cs-etc_8h_source_l00019}{Matrix\+\_\+cs\+\_\+sparse\+::m}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{cs-etc_8c_source_l00078}{Matrix\+\_\+cs\+\_\+dfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00090}{Matrix\+\_\+cs\+\_\+dmperm()}}, \mbox{\hyperlink{cs-etc_8h_source_l00012}{MCS\+\_\+\+XTYPE\+\_\+\+SET}}, \mbox{\hyperlink{cs-etc_8h_source_l00020}{Matrix\+\_\+cs\+\_\+sparse\+::n}}, \mbox{\hyperlink{cs-etc_8h_source_l00054}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::nb}}, \mbox{\hyperlink{cs-etc_8h_source_l00050}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::p}}, \mbox{\hyperlink{cs-etc_8h_source_l00051}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::q}}, \mbox{\hyperlink{cs-etc_8h_source_l00052}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::r}}, \mbox{\hyperlink{cs-etc_8h_source_l00055}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::rr}}, \mbox{\hyperlink{cs-etc_8h_source_l00053}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results\+::s}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+\Hypertarget{Csparse_8h_af16506fe554b252a8f605fd553086c33}\label{Csparse_8h_af16506fe554b252a8f605fd553086c33} 
+\index{Csparse.h@{Csparse.h}!Csparse\_MatrixMarket@{Csparse\_MatrixMarket}}
+\index{Csparse\_MatrixMarket@{Csparse\_MatrixMarket}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{Csparse\_MatrixMarket()}{Csparse\_MatrixMarket()}}
+{\footnotesize\ttfamily SEXP Csparse\+\_\+\+Matrix\+Market (\begin{DoxyParamCaption}\item[{SEXP}]{obj,  }\item[{SEXP}]{path }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Csparse_8c_source_l00283}{283}} of file \mbox{\hyperlink{Csparse_8c_source}{Csparse.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00089}{M2\+CHS()}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{coerce_8c_source_l02831}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02499}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, and \mbox{\hyperlink{Mdefines_8h_source_l00257}{VALID\+\_\+\+CSPARSE}}.
+
+\Hypertarget{Csparse_8h_aff3f7e90b1f3c1431882d3c15810b911}\label{Csparse_8h_aff3f7e90b1f3c1431882d3c15810b911} 
+\index{Csparse.h@{Csparse.h}!CsparseMatrix\_validate\_maybe\_sorting@{CsparseMatrix\_validate\_maybe\_sorting}}
+\index{CsparseMatrix\_validate\_maybe\_sorting@{CsparseMatrix\_validate\_maybe\_sorting}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{CsparseMatrix\_validate\_maybe\_sorting()}{CsparseMatrix\_validate\_maybe\_sorting()}}
+{\footnotesize\ttfamily SEXP Csparse\+Matrix\+\_\+validate\+\_\+maybe\+\_\+sorting (\begin{DoxyParamCaption}\item[{SEXP}]{x }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Csparse_8c_source_l00007}{7}} of file \mbox{\hyperlink{Csparse_8c_source}{Csparse.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{chm__common_8c_source_l00005}{checkpi()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00089}{M2\+CHS()}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{Csparse_8c_af72cb5f85c4491241fc250802d7f7b48}{MKMS}}.
+
+\Hypertarget{Csparse_8h_a0c1c873eb38e2b1983106a2cb74d74d2}\label{Csparse_8h_a0c1c873eb38e2b1983106a2cb74d74d2} 
+\index{Csparse.h@{Csparse.h}!dCsparse\_subassign@{dCsparse\_subassign}}
+\index{dCsparse\_subassign@{dCsparse\_subassign}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{dCsparse\_subassign()}{dCsparse\_subassign()}}
+{\footnotesize\ttfamily SEXP d\+Csparse\+\_\+subassign (\begin{DoxyParamCaption}\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{Csparse_8h_ab7e6e5212adc046eda028d3b9fbb6162}\label{Csparse_8h_ab7e6e5212adc046eda028d3b9fbb6162} 
+\index{Csparse.h@{Csparse.h}!iCsparse\_subassign@{iCsparse\_subassign}}
+\index{iCsparse\_subassign@{iCsparse\_subassign}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{iCsparse\_subassign()}{iCsparse\_subassign()}}
+{\footnotesize\ttfamily SEXP i\+Csparse\+\_\+subassign (\begin{DoxyParamCaption}\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{Csparse_8h_a1f44896ffadd7b74752e2446f3d6927d}\label{Csparse_8h_a1f44896ffadd7b74752e2446f3d6927d} 
+\index{Csparse.h@{Csparse.h}!lCsparse\_subassign@{lCsparse\_subassign}}
+\index{lCsparse\_subassign@{lCsparse\_subassign}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{lCsparse\_subassign()}{lCsparse\_subassign()}}
+{\footnotesize\ttfamily SEXP l\+Csparse\+\_\+subassign (\begin{DoxyParamCaption}\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{Csparse_8h_a99f5d3ee7a174be061bca76768d8a571}\label{Csparse_8h_a99f5d3ee7a174be061bca76768d8a571} 
+\index{Csparse.h@{Csparse.h}!nCsparse\_subassign@{nCsparse\_subassign}}
+\index{nCsparse\_subassign@{nCsparse\_subassign}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{nCsparse\_subassign()}{nCsparse\_subassign()}}
+{\footnotesize\ttfamily SEXP n\+Csparse\+\_\+subassign (\begin{DoxyParamCaption}\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{Csparse_8h_aa77dc185a25df5e1911c2ca921849fe9}\label{Csparse_8h_aa77dc185a25df5e1911c2ca921849fe9} 
+\index{Csparse.h@{Csparse.h}!tCsparse\_diag@{tCsparse\_diag}}
+\index{tCsparse\_diag@{tCsparse\_diag}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{tCsparse\_diag()}{tCsparse\_diag()}}
+{\footnotesize\ttfamily SEXP t\+Csparse\+\_\+diag (\begin{DoxyParamCaption}\item[{SEXP}]{obj,  }\item[{SEXP}]{op }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Csparse_8c_source_l00062}{62}} of file \mbox{\hyperlink{Csparse_8c_source}{Csparse.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Csparse_8c_source_l00050}{strmatch()}}, and \mbox{\hyperlink{bind_8c_source_l00005}{valid}}.
+
+\Hypertarget{Csparse_8h_a995b564fbfb0b40f8aeaa82d3de2c736}\label{Csparse_8h_a995b564fbfb0b40f8aeaa82d3de2c736} 
+\index{Csparse.h@{Csparse.h}!zCsparse\_subassign@{zCsparse\_subassign}}
+\index{zCsparse\_subassign@{zCsparse\_subassign}!Csparse.h@{Csparse.h}}
+\doxysubsubsection{\texorpdfstring{zCsparse\_subassign()}{zCsparse\_subassign()}}
+{\footnotesize\ttfamily SEXP z\+Csparse\+\_\+subassign (\begin{DoxyParamCaption}\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{,  }\item[{SEXP}]{ }\end{DoxyParamCaption})}
+

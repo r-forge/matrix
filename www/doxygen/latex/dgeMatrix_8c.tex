@@ -1,0 +1,129 @@
+\doxysection{dge\+Matrix.\+c File Reference}
+\hypertarget{dgeMatrix_8c}{}\label{dgeMatrix_8c}\index{dgeMatrix.c@{dgeMatrix.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}dge\+Matrix.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{dgeMatrix_8c_a143a3b92384b532b88755349f12b074a}{SWAP\+\_\+\+ROW}}(I,  J)~F77\+\_\+\+CALL(dswap)(\&n, \&v\mbox{[}(I)\mbox{]}, \&n, \&v\mbox{[}(J)\mbox{]}, \&n)
+\item 
+\#define \mbox{\hyperlink{dgeMatrix_8c_a67a47ed323a810b0302db34d30891931}{SWAP\+\_\+\+COL}}(I,  J)~F77\+\_\+\+CALL(dswap)(\&n, \&v\mbox{[}(I)\texorpdfstring{$\ast$}{*}n\+\_\+\mbox{]}, \&i1, \&v\mbox{[}(J)\texorpdfstring{$\ast$}{*}n\+\_\+\mbox{]}, \&i1)
+\item 
+\#define \mbox{\hyperlink{dgeMatrix_8c_a4d96109456cb4306feff10cde2588833}{RE\+\_\+\+PERMUTE}}(I)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{dgeMatrix_8c_a8bb1459b2c5c175a2aba80bb94202a35}{dge\+Matrix\+\_\+exp}} (SEXP x)
+\begin{DoxyCompactList}\small\item\em Matrix exponential -\/ based on the {\itshape corrected} code for Octave\textquotesingle{}s expm function. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{dgeMatrix_8c_a234f38e33e209bc00614f2d7b61748d0}{dge\+Matrix\+\_\+\+Schur}} (SEXP x, SEXP vectors, SEXP is\+DGE)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const double \mbox{\hyperlink{dgeMatrix_8c_a1e92887dad9596ede92506cbef17b506}{padec}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{dgeMatrix_8c_a4d96109456cb4306feff10cde2588833}\label{dgeMatrix_8c_a4d96109456cb4306feff10cde2588833} 
+\index{dgeMatrix.c@{dgeMatrix.c}!RE\_PERMUTE@{RE\_PERMUTE}}
+\index{RE\_PERMUTE@{RE\_PERMUTE}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{RE\_PERMUTE}{RE\_PERMUTE}}
+{\footnotesize\ttfamily \#define RE\+\_\+\+PERMUTE(\begin{DoxyParamCaption}\item[{}]{I }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ p\_I\ =\ (int)\ (perm[I])\ -\/\ 1;\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SWAP\_COL(I,\ p\_I);\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SWAP\_ROW(I,\ p\_I)}
+
+\end{DoxyCode}
+\Hypertarget{dgeMatrix_8c_a67a47ed323a810b0302db34d30891931}\label{dgeMatrix_8c_a67a47ed323a810b0302db34d30891931} 
+\index{dgeMatrix.c@{dgeMatrix.c}!SWAP\_COL@{SWAP\_COL}}
+\index{SWAP\_COL@{SWAP\_COL}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{SWAP\_COL}{SWAP\_COL}}
+{\footnotesize\ttfamily \#define SWAP\+\_\+\+COL(\begin{DoxyParamCaption}\item[{}]{I,  }\item[{}]{J }\end{DoxyParamCaption})~F77\+\_\+\+CALL(dswap)(\&n, \&v\mbox{[}(I)\texorpdfstring{$\ast$}{*}n\+\_\+\mbox{]}, \&i1, \&v\mbox{[}(J)\texorpdfstring{$\ast$}{*}n\+\_\+\mbox{]}, \&i1)}
+
+\Hypertarget{dgeMatrix_8c_a143a3b92384b532b88755349f12b074a}\label{dgeMatrix_8c_a143a3b92384b532b88755349f12b074a} 
+\index{dgeMatrix.c@{dgeMatrix.c}!SWAP\_ROW@{SWAP\_ROW}}
+\index{SWAP\_ROW@{SWAP\_ROW}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{SWAP\_ROW}{SWAP\_ROW}}
+{\footnotesize\ttfamily \#define SWAP\+\_\+\+ROW(\begin{DoxyParamCaption}\item[{}]{I,  }\item[{}]{J }\end{DoxyParamCaption})~F77\+\_\+\+CALL(dswap)(\&n, \&v\mbox{[}(I)\mbox{]}, \&n, \&v\mbox{[}(J)\mbox{]}, \&n)}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dgeMatrix_8c_a8bb1459b2c5c175a2aba80bb94202a35}\label{dgeMatrix_8c_a8bb1459b2c5c175a2aba80bb94202a35} 
+\index{dgeMatrix.c@{dgeMatrix.c}!dgeMatrix\_exp@{dgeMatrix\_exp}}
+\index{dgeMatrix\_exp@{dgeMatrix\_exp}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{dgeMatrix\_exp()}{dgeMatrix\_exp()}}
+{\footnotesize\ttfamily SEXP dge\+Matrix\+\_\+exp (\begin{DoxyParamCaption}\item[{SEXP}]{x }\end{DoxyParamCaption})}
+
+
+
+Matrix exponential -\/ based on the {\itshape corrected} code for Octave\textquotesingle{}s expm function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & real square matrix to exponentiate\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+matrix exponential of x 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{dgeMatrix_8c_source_l00070}{70}} of file \mbox{\hyperlink{dgeMatrix_8c_source}{dge\+Matrix.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{utils_8c_source_l00008}{Matrix\+\_\+memset()}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{dgeMatrix_8c_source_l00051}{padec}}, and \mbox{\hyperlink{dgeMatrix_8c_a4d96109456cb4306feff10cde2588833}{RE\+\_\+\+PERMUTE}}.
+
+\Hypertarget{dgeMatrix_8c_a234f38e33e209bc00614f2d7b61748d0}\label{dgeMatrix_8c_a234f38e33e209bc00614f2d7b61748d0} 
+\index{dgeMatrix.c@{dgeMatrix.c}!dgeMatrix\_Schur@{dgeMatrix\_Schur}}
+\index{dgeMatrix\_Schur@{dgeMatrix\_Schur}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{dgeMatrix\_Schur()}{dgeMatrix\_Schur()}}
+{\footnotesize\ttfamily SEXP dge\+Matrix\+\_\+\+Schur (\begin{DoxyParamCaption}\item[{SEXP}]{x,  }\item[{SEXP}]{vectors,  }\item[{SEXP}]{is\+DGE }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dgeMatrix_8c_source_l00203}{203}} of file \mbox{\hyperlink{dgeMatrix_8c_source}{dge\+Matrix.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, and \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{dgeMatrix_8c_a1e92887dad9596ede92506cbef17b506}\label{dgeMatrix_8c_a1e92887dad9596ede92506cbef17b506} 
+\index{dgeMatrix.c@{dgeMatrix.c}!padec@{padec}}
+\index{padec@{padec}!dgeMatrix.c@{dgeMatrix.c}}
+\doxysubsubsection{\texorpdfstring{padec}{padec}}
+{\footnotesize\ttfamily const double padec\mbox{[}$\,$\mbox{]}\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ }
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ 5.0000000000000000e-\/1,}
+\DoxyCodeLine{\ \ 1.1666666666666667e-\/1,}
+\DoxyCodeLine{\ \ 1.6666666666666667e-\/2,}
+\DoxyCodeLine{\ \ 1.6025641025641026e-\/3,}
+\DoxyCodeLine{\ \ 1.0683760683760684e-\/4,}
+\DoxyCodeLine{\ \ 4.8562548562548563e-\/6,}
+\DoxyCodeLine{\ \ 1.3875013875013875e-\/7,}
+\DoxyCodeLine{\ \ 1.9270852604185938e-\/9,}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{dgeMatrix_8c_source_l00051}{51}} of file \mbox{\hyperlink{dgeMatrix_8c_source}{dge\+Matrix.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{dgeMatrix_8c_source_l00070}{dge\+Matrix\+\_\+exp()}}.
+
