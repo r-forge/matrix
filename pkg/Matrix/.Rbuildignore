@@ -58,8 +58,6 @@ _?svn-?
 ^ChangeLog$
 ^inst/Doxyfile$
 ^inst/doc/Announce[.]txt$
-^inst/doc/DSC2009_abstract[.]pdf$
-^inst/doc/DSC2009_abstract[.]txt$
 ^po/translators[.]txt$
 
 ## Private
