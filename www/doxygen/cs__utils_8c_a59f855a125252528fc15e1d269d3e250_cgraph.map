@@ -1,9 +1,0 @@
-<map id="Matrix_cs_to_SEXP" name="Matrix_cs_to_SEXP">
-<area shape="rect" id="node1" title="Copy the contents of a to an appropriate CsparseMatrix object and, optionally, free a or free both a ..." alt="" coords="5,107,145,133"/>
-<area shape="rect" id="node2" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="235,5,341,32"/>
-<area shape="rect" id="node3" href="$cs_8c.html#a6d705e404a7831ccf01bc0ea064215b9" title=" " alt="" coords="249,56,327,83"/>
-<area shape="rect" id="node5" href="$cs__utils_8c.html#a0b2592041f5b822459b7052a451c07a5" title=" " alt="" coords="257,107,319,133"/>
-<area shape="rect" id="node6" href="$Mutils_8h.html#a952a7277ea90f8560245dc16801da86b" title="Return the 0&#45;based index of a string match in a vector of strings terminated by an empty string." alt="" coords="219,157,357,184"/>
-<area shape="rect" id="node7" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="193,208,383,235"/>
-<area shape="rect" id="node4" href="$cs_8c.html#a78c1d1194aacc65212bb0d2b03643ac7" title=" " alt="" coords="431,56,496,83"/>
-</map>

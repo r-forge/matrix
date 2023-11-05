@@ -1,6 +1,0 @@
-<map id="R_cholmod_start" name="R_cholmod_start">
-<area shape="rect" id="node1" title="Initialize the CHOLMOD library and replace the print and error functions by R&#45;specific versions." alt="" coords="5,31,128,57"/>
-<area shape="rect" id="node2" href="$chm__common_8c.html#ae04b1e8dfd9eb1c7b23c07c95e25d482" title=" " alt="" coords="177,5,299,32"/>
-<area shape="rect" id="node4" href="$chm__common_8c.html#a1a8132e21c478997e6e8c7b8d7d93973" title=" " alt="" coords="176,56,300,83"/>
-<area shape="rect" id="node3" href="$chm__common_8c.html#a9ca1fded97b51a281e6ef9f76a12c788" title=" " alt="" coords="348,5,504,32"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="dtpMatrix_matrix_mm" name="dtpMatrix_matrix_mm">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,153,32"/>
-<area shape="rect" id="node2" href="$Mutils_8c.html#a574d0797f3bfb4cb555038c8d90cceb8" title=" " alt="" coords="201,5,384,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#ac7bfe157b527715287335783f004ca8c" title=" " alt="" coords="432,5,621,32"/>
-<area shape="rect" id="node4" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="669,5,859,32"/>
-</map>

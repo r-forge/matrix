@@ -1,5 +1,0 @@
-<map id="LU_validate" name="LU_validate">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,96,32"/>
-<area shape="rect" id="node2" href="$Mutils_8c.html#af5bee18b726c55269382230dacd0d85e" title="Check R (Matrix&#45;like) object: must have @Dim and @Dimnames." alt="" coords="144,5,280,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#a6671e1ae9c8155daaf3bb76a479f13b3" title="Validate dimnames (the @Dim slot typically), assuming that &#39;dims&#39; is already checked." alt="" coords="328,5,479,32"/>
-</map>

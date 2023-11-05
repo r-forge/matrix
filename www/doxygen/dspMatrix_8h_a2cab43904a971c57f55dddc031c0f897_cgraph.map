@@ -1,5 +1,0 @@
-<map id="dspMatrix_as_dsyMatrix" name="dspMatrix_as_dsyMatrix">
-<area shape="rect" id="node1" title=" " alt="" coords="5,31,168,57"/>
-<area shape="rect" id="node2" href="$Mutils_8h.html#a5b947aafb2d3cebd6ab10ed78af74b4a" title="Allocate an SEXP of given type and length, assign it as slot nm in the object, and return the SEXP." alt="" coords="257,5,364,32"/>
-<area shape="rect" id="node3" href="$Mutils_8c.html#a6ae1b19a8224de1b3a8770a760d65722" title="A safe NEW_OBJECT(MAKE_CLASS(cls)), where the caller must protect the return value of this function." alt="" coords="216,56,405,83"/>
-</map>

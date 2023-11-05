@@ -1,6 +1,0 @@
-<map id="chm_dense_to_SEXP" name="chm_dense_to_SEXP">
-<area shape="rect" id="node1" title="Copy the contents of a to an appropriate denseMatrix object and, optionally, free a or free both a an..." alt="" coords="216,56,367,83"/>
-<area shape="rect" id="node2" href="$CHMfactor_8c.html#a15222009b843f42503fa463de01397ac" title=" " alt="" coords="25,5,148,32"/>
-<area shape="rect" id="node3" href="$Csparse_8c.html#af4beac0a5fdb698d99feaf1fb8da7b03" title="From a CsparseMatrix, produce a dense one." alt="" coords="21,56,152,83"/>
-<area shape="rect" id="node4" href="$dsCMatrix_8c.html#a2b40f2a78566d1c13864187d2ab964af" title=" " alt="" coords="5,107,168,133"/>
-</map>

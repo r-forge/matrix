@@ -1,7 +1,0 @@
-<map id="chm_factor_update" name="chm_factor_update">
-<area shape="rect" id="node1" title="Update the numerical values in the factor f as A + mult * I, if A is symmetric, otherwise AA&#39; + mult ..." alt="" coords="221,81,355,108"/>
-<area shape="rect" id="node2" href="$CHMfactor_8c.html#abb40b3666ce7a47edddf74ed8299939d" title=" " alt="" coords="19,5,160,32"/>
-<area shape="rect" id="node3" href="$CHMfactor_8c.html#aafc574f19837b7c6879c395a382444b0" title=" " alt="" coords="24,56,155,83"/>
-<area shape="rect" id="node4" href="$CHMfactor_8c.html#a5b0d200f2e7a1d06d1c353d826af0d70" title=" " alt="" coords="5,107,173,133"/>
-<area shape="rect" id="node5" href="$init_8c.html#a3c984b3c92aeb789d5679e2aae8b8eac" title=" " alt="" coords="40,157,139,184"/>
-</map>
