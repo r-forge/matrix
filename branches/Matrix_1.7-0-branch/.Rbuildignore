@@ -59,7 +59,7 @@ _?svn-?
 ^po/translators[.]txt$
 
 ## Private
-^Done$
+^DONE$
 ^Doxyfile$
 ^TODO$
 ^po/update-me[.]sh$
