@@ -112,6 +112,7 @@
 #else
 #include <stdint.h>
 #include <stddef.h>
+#undef SUITESPARSE_CUDA
 #endif /* !defined(R_MATRIX_CHOLMOD_H) */
 
 
@@ -360,6 +361,21 @@ extern "C" {
 #define CHOLMOD_VERSION \
     CHOLMOD_VER_CODE(CHOLMOD_MAIN_VERSION,CHOLMOD_SUB_VERSION)
 
+
+/* ========================================================================== */
+/* === CUDA BLAS for the GPU ================================================ */
+/* ========================================================================== */
+
+/* Define buffering parameters for GPU processing */
+#ifndef SUITESPARSE_GPU_EXTERN_ON
+#ifdef SUITESPARSE_CUDA
+#include <cublas_v2.h>
+#endif
+#endif
+
+#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
+#define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
+#define CHOLMOD_DEVICE_STREAMS 2
 
 /* ========================================================================== */
 /* === CHOLMOD objects ====================================================== */
@@ -1041,7 +1057,7 @@ typedef struct cholmod_common_struct
        the CHOLMOD Common, regardless of whether or not they are compiled
        with the GPU libraries or not */
 
-#if defined(SUITESPARSE_CUDA) && !defined(R_MATRIX_CHOLMOD_H)
+#ifdef SUITESPARSE_CUDA
     /* in CUDA, these three types are pointers */
     #define CHOLMOD_CUBLAS_HANDLE cublasHandle_t
     #define CHOLMOD_CUDASTREAM    cudaStream_t

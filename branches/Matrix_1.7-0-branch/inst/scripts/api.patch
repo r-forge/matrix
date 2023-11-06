@@ -1,6 +1,6 @@
---- src/SuiteSparse/CHOLMOD/Include/cholmod.h	2023-11-03 19:07:14
-+++ inst/include/Matrix/cholmod.h	2023-11-03 19:33:59
-@@ -94,111 +94,31 @@
+--- src/SuiteSparse/CHOLMOD/Include/cholmod.h	2023-11-04 11:22:48
++++ inst/include/Matrix/cholmod.h	2023-11-06 00:19:41
+@@ -94,111 +94,32 @@
   *	parameter.  It is always an input/output parameter.
   */
  
@@ -57,6 +57,7 @@
 +#else
 +#include <stdint.h>
 +#include <stddef.h>
++#undef SUITESPARSE_CUDA
 +#endif /* !defined(R_MATRIX_CHOLMOD_H) */
  
 -/* ========================================================================== */
@@ -121,29 +122,7 @@
  /* ========================================================================== */
  /* === Include/cholmod_core.h =============================================== */
  /* ========================================================================== */
-@@ -442,21 +362,6 @@
- 
- 
- /* ========================================================================== */
--/* === CUDA BLAS for the GPU ================================================ */
--/* ========================================================================== */
--
--/* Define buffering parameters for GPU processing */
--#ifndef SUITESPARSE_GPU_EXTERN_ON
--#ifdef SUITESPARSE_CUDA
--#include <cublas_v2.h>
--#endif
--#endif
--
--#define CHOLMOD_DEVICE_SUPERNODE_BUFFERS 6
--#define CHOLMOD_HOST_SUPERNODE_BUFFERS 8
--#define CHOLMOD_DEVICE_STREAMS 2
--
--/* ========================================================================== */
- /* === CHOLMOD objects ====================================================== */
- /* ========================================================================== */
- 
-@@ -578,11 +483,6 @@
+@@ -578,11 +499,6 @@
  #define CHOLMOD_SIMPLICIAL 0	/* always do simplicial */
  #define CHOLMOD_AUTO 1		/* select simpl/super depending on matrix */
  #define CHOLMOD_SUPERNODAL 2	/* always do supernodal */
@@ -155,16 +134,7 @@
  
  typedef struct cholmod_common_struct
  {
-@@ -1141,7 +1041,7 @@
-        the CHOLMOD Common, regardless of whether or not they are compiled
-        with the GPU libraries or not */
- 
--#ifdef SUITESPARSE_CUDA
-+#if defined(SUITESPARSE_CUDA) && !defined(R_MATRIX_CHOLMOD_H)
-     /* in CUDA, these three types are pointers */
-     #define CHOLMOD_CUBLAS_HANDLE cublasHandle_t
-     #define CHOLMOD_CUDASTREAM    cudaStream_t
-@@ -1230,6 +1130,8 @@
+@@ -1230,6 +1146,8 @@
  #define CHOLMOD_ANALYZE_FOR_CHOLESKY 1
  #define CHOLMOD_ANALYZE_FOR_SPQRGPU  2
  
@@ -173,7 +143,7 @@
  /* -------------------------------------------------------------------------- */
  /* cholmod_start:  first call to CHOLMOD */
  /* -------------------------------------------------------------------------- */
-@@ -1384,7 +1286,9 @@
+@@ -1384,7 +1302,9 @@
  
  int cholmod_l_divcomplex (double, double, double, double, double *, double *) ;
  
@@ -183,7 +153,7 @@
  /* ========================================================================== */
  /* === Core/cholmod_sparse ================================================== */
  /* ========================================================================== */
-@@ -1441,6 +1345,8 @@
+@@ -1441,6 +1361,8 @@
  			 * (nz is required) */
  
  } cholmod_sparse ;
@@ -192,16 +162,17 @@
  
  typedef struct cholmod_descendant_score_t
  {
-@@ -1779,6 +1685,8 @@
- ) ;
+@@ -1780,7 +1702,9 @@
  
  int cholmod_l_sparse_xtype (int, cholmod_sparse *, cholmod_common *) ;
-+
+ 
 +#endif /* !defined(R_MATRIX_CHOLMOD_H) */
  
- 
++
  /* ========================================================================== */
-@@ -1915,6 +1823,7 @@
+ /* === Core/cholmod_factor ================================================== */
+ /* ========================================================================== */
+@@ -1915,6 +1839,7 @@
  
  } cholmod_factor ;
  
@@ -209,7 +180,7 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_allocate_factor: allocate a factor (symbolic LL' or LDL') */
-@@ -2064,7 +1973,9 @@
+@@ -2064,7 +1989,9 @@
  
  int cholmod_l_factor_xtype (int, cholmod_factor *, cholmod_common *) ;
  
@@ -219,16 +190,16 @@
  /* ========================================================================== */
  /* === Core/cholmod_dense =================================================== */
  /* ========================================================================== */
-@@ -2086,6 +1997,8 @@
+@@ -2085,6 +2012,8 @@
+     int dtype ;		/* x and z double or float */
  
  } cholmod_dense ;
- 
-+#ifndef R_MATRIX_CHOLMOD_H
 +
++#ifndef R_MATRIX_CHOLMOD_H
+ 
  /* -------------------------------------------------------------------------- */
  /* cholmod_allocate_dense:  allocate a dense matrix (contents uninitialized) */
- /* -------------------------------------------------------------------------- */
-@@ -2263,7 +2176,9 @@
+@@ -2263,7 +2192,9 @@
  
  int cholmod_l_dense_xtype (int, cholmod_dense *, cholmod_common *) ;
  
@@ -238,16 +209,16 @@
  /* ========================================================================== */
  /* === Core/cholmod_triplet ================================================= */
  /* ========================================================================== */
-@@ -2333,6 +2248,8 @@
+@@ -2332,6 +2263,8 @@
+     int dtype ; /* x and z are double or float */
  
  } cholmod_triplet ;
- 
-+#ifndef R_MATRIX_CHOLMOD_H
 +
++#ifndef R_MATRIX_CHOLMOD_H
+ 
  /* -------------------------------------------------------------------------- */
  /* cholmod_allocate_triplet:  allocate a triplet matrix */
- /* -------------------------------------------------------------------------- */
-@@ -2443,7 +2360,9 @@
+@@ -2443,7 +2376,9 @@
  
  int cholmod_l_triplet_xtype (int, cholmod_triplet *, cholmod_common *) ;
  
@@ -257,7 +228,7 @@
  /* ========================================================================== */
  /* === Core/cholmod_memory ================================================== */
  /* ========================================================================== */
-@@ -2464,6 +2383,8 @@
+@@ -2464,6 +2399,8 @@
   * corrupted.
   */
  
@@ -266,7 +237,7 @@
  void *cholmod_malloc	/* returns pointer to the newly malloc'd block */
  (
      /* ---- input ---- */
-@@ -2533,10 +2454,15 @@
+@@ -2533,10 +2470,15 @@
  int cholmod_l_realloc_multiple (size_t, int, int, void **, void **, void **,
      void **, size_t *, cholmod_common *) ;
  
@@ -282,7 +253,7 @@
  int cholmod_version     /* returns CHOLMOD_VERSION */
  (
      /* output, contents not defined on input.  Not used if NULL.
-@@ -2558,6 +2484,9 @@
+@@ -2558,6 +2500,9 @@
     #endif
  */
  
@@ -292,7 +263,7 @@
  /* ========================================================================== */
  /* === symmetry types ======================================================= */
  /* ========================================================================== */
-@@ -2569,69 +2498,6 @@
+@@ -2569,71 +2514,8 @@
  #define CHOLMOD_MM_SKEW_SYMMETRIC 5
  #define CHOLMOD_MM_SYMMETRIC_POSDIAG 6
  #define CHOLMOD_MM_HERMITIAN_POSDIAG 7
@@ -355,14 +326,16 @@
 -#define CHOLMOD_IS_LT_ZERO(x)	((x) < 0.)
 -#define CHOLMOD_IS_GT_ZERO(x)	((x) > 0.)
 -#define CHOLMOD_IS_LE_ZERO(x)	((x) <= 0.)
--
+ 
 -#endif
+ 
 -
 -
- 
- 
+-
  /* ========================================================================== */
-@@ -2691,7 +2557,7 @@
+ /* === Include/cholmod_check.h ============================================== */
+ /* ========================================================================== */
+@@ -2691,7 +2573,7 @@
   * cholmod_read_* routines.
   */
  
@@ -371,23 +344,22 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_check_common:  check the Common object */
-@@ -3048,13 +2914,10 @@
+@@ -3048,13 +2930,10 @@
  
  int cholmod_l_write_dense (FILE *, cholmod_dense *, const char *,
      cholmod_common *) ;
 -#endif
-+
+ 
+-
 +#endif /* !defined(R_MATRIX_CHOLMOD_H) */
  
  
 -
 -
--
--
  /* ========================================================================== */
  /* === Include/cholmod_cholesky.h =========================================== */
  /* ========================================================================== */
-@@ -3102,7 +2965,7 @@
+@@ -3102,7 +2981,7 @@
   * Required by the Partition module.
   */
  
@@ -396,7 +368,7 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_analyze:  order and analyze (simplicial or supernodal) */
-@@ -3208,6 +3071,8 @@
+@@ -3208,6 +3087,8 @@
  int cholmod_l_factorize_p (cholmod_sparse *, double [2], int64_t *,
      size_t, cholmod_factor *, cholmod_common *) ;
  
@@ -405,7 +377,7 @@
  /* -------------------------------------------------------------------------- */
  /* cholmod_solve:  solve a linear system (simplicial or supernodal) */
  /* -------------------------------------------------------------------------- */
-@@ -3226,6 +3091,8 @@
+@@ -3226,6 +3107,8 @@
  #define CHOLMOD_P    7		/* permute x=Px */
  #define CHOLMOD_Pt   8		/* permute x=P'x */
  
@@ -414,7 +386,7 @@
  cholmod_dense *cholmod_solve	/* returns the solution X */
  (
      /* ---- input ---- */
-@@ -3622,7 +3489,7 @@
+@@ -3622,7 +3505,7 @@
  int64_t cholmod_l_postorder (int64_t *, size_t,
      int64_t *, int64_t *, cholmod_common *) ;
  
@@ -423,7 +395,7 @@
  
  
  /* ========================================================================== */
-@@ -3650,7 +3517,7 @@
+@@ -3650,7 +3533,7 @@
   * Requires the Core module.  Not required by any other CHOLMOD module.
   */
  
@@ -432,7 +404,7 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_drop:  drop entries with small absolute value */
-@@ -3715,6 +3582,8 @@
+@@ -3715,6 +3598,8 @@
  cholmod_sparse *cholmod_l_horzcat (cholmod_sparse *, cholmod_sparse *, int,
      cholmod_common *) ;
  
@@ -441,7 +413,7 @@
  /* -------------------------------------------------------------------------- */
  /* cholmod_scale:  A = diag(s)*A, A*diag(s), s*A or diag(s)*A*diag(s) */
  /* -------------------------------------------------------------------------- */
-@@ -3725,6 +3594,8 @@
+@@ -3725,6 +3610,8 @@
  #define CHOLMOD_COL 2		/* A = A*diag(s) */
  #define CHOLMOD_SYM 3		/* A = diag(s)*A*diag(s) */
  
@@ -450,7 +422,7 @@
  int cholmod_scale
  (
      /* ---- input ---- */
-@@ -3849,11 +3720,9 @@
+@@ -3849,11 +3736,9 @@
      int64_t *, int64_t *, int64_t *,
      cholmod_common *) ;
  
@@ -463,18 +435,17 @@
  /* ========================================================================== */
  /* === Include/cholmod_modify.h ============================================= */
  /* ========================================================================== */
-@@ -3895,9 +3764,8 @@
+@@ -3895,8 +3780,7 @@
   * Requires the Core module.  Not required by any other CHOLMOD module.
   */
  
+-
+-#ifndef NMODIFY
 +#ifndef R_MATRIX_CHOLMOD_H
  
--#ifndef NMODIFY
--
  /* -------------------------------------------------------------------------- */
  /* cholmod_updown:  multiple rank update/downdate */
- /* -------------------------------------------------------------------------- */
-@@ -4175,10 +4043,9 @@
+@@ -4175,10 +4059,9 @@
      int64_t *, cholmod_factor *, cholmod_dense *, cholmod_dense *,
      cholmod_common *) ;
  
@@ -486,7 +457,7 @@
  /* ========================================================================== */
  /* === Include/cholmod_camd.h =============================================== */
  /* ========================================================================== */
-@@ -4199,7 +4066,7 @@
+@@ -4199,7 +4082,7 @@
   * and CCOLAMD.  Used by functions in the Partition Module.
   */
  
@@ -495,7 +466,7 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_ccolamd */
-@@ -4269,8 +4136,9 @@
+@@ -4269,8 +4152,9 @@
  int cholmod_l_camd (cholmod_sparse *, int64_t *, size_t,
      int64_t *, int64_t *, cholmod_common *) ;
  
@@ -506,7 +477,7 @@
  /* ========================================================================== */
  /* === Include/cholmod_partition.h ========================================== */
  /* ========================================================================== */
-@@ -4307,6 +4175,8 @@
+@@ -4307,6 +4191,8 @@
  // These routines still exist if CHOLMOD is compiled with -DNPARTITION,
  // but they return Common->status = CHOLMOD_NOT_INSTALLED.
  
@@ -515,17 +486,17 @@
  /* -------------------------------------------------------------------------- */
  /* cholmod_nested_dissection */
  /* -------------------------------------------------------------------------- */
-@@ -4435,6 +4305,9 @@
+@@ -4434,6 +4320,9 @@
+ 
  int64_t cholmod_l_collapse_septree (size_t, size_t, double, size_t,
      int64_t *, int64_t *, cholmod_common *) ;
- 
++
 +#endif /* !defined(R_MATRIX_CHOLMOD_H) */
 +
-+
+ 
  /* ========================================================================== */
  /* === Include/cholmod_supernodal.h ========================================= */
- /* ========================================================================== */
-@@ -4472,7 +4345,7 @@
+@@ -4472,7 +4361,7 @@
   * Optionally used by the Cholesky module.
   */
  
@@ -534,7 +505,7 @@
  
  /* -------------------------------------------------------------------------- */
  /* cholmod_super_symbolic */
-@@ -4594,98 +4467,120 @@
+@@ -4594,98 +4483,120 @@
  int cholmod_l_super_ltsolve (cholmod_factor *, cholmod_dense *, cholmod_dense *,
      cholmod_common *) ;
  
@@ -549,8 +520,7 @@
 -/* ========================================================================== */
 -/* === Include/cholmod_gpu.h ================================================ */
 -/* ========================================================================== */
-+/* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
- 
+-
 -/* -----------------------------------------------------------------------------
 - * CHOLMOD/Include/cholmod_gpu.h.
 - * Copyright (C) 2014, Timothy A. Davis
@@ -568,14 +538,15 @@
 -#include <cuda.h>
 -#include <cuda_runtime.h>
 -#endif
-+/* We declare a minimal subset of the above as "API" : */
++/* <<<< Matrix <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
  
 -/* CHOLMOD_GPU_PRINTF: for printing GPU debug error messages */
 -/*
 -#define CHOLMOD_GPU_PRINTF(args) printf args
 -*/
 -#define CHOLMOD_GPU_PRINTF(args)
--
++/* We declare a minimal subset of the above as "API" : */
+ 
 -/* define supernode requirements for processing on GPU */
 -#define CHOLMOD_ND_ROW_LIMIT 256 /* required descendant rows */
 -#define CHOLMOD_ND_COL_LIMIT 32  /* required descendnat cols */
