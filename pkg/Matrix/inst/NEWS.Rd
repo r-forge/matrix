@@ -4,12 +4,15 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-3 (2023-11-09 r4512)}{
+\section{Changes in version 1.6-3 (2023-11-13 r4513)}{
   \subsection{Misc}{
     \itemize{
       \item With an \R built with \command{configure} option
       \option{--disable-long-double}, \code{prod(M)} now very slightly
       differs for two differently classed versions of \code{M}.
+
+      \item \code{checkMatrix()} from \file{test-tools-Matrix.R} gets
+      optional \code{MSG} argument for suppressing \code{prod()} differences.
     }
   }
 }
