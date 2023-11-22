@@ -1,0 +1,3 @@
+Some "historical" branches were renamed by MJ in r4516 using 'svn move'.
+A corollary is that 'svn log --stop-on-copy' stops at r4516.  To get the
+"original" branch points, add '-r 4515:1' to the command line.
