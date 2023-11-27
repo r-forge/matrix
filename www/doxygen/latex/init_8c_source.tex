@@ -332,50 +332,49 @@
 \DoxyCodeLine{\Hypertarget{init_8c_source_l00328}00328\ \ \ \ \ \textcolor{comment}{/*\ Matrix:\ */}}
 \DoxyCodeLine{\Hypertarget{init_8c_source_l00329}00329\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a484a65e3dbc1c2980f8e076fe2f291b3}{sexp\_as\_cholmod\_factor}});}
 \DoxyCodeLine{\Hypertarget{init_8c_source_l00330}00330\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_ae7f1778c59e005f6e727050e9c8d595b}{sexp\_as\_cholmod\_sparse}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00331}00331\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aa6e58886972e9cbd14da633efd6a9aa5}{sexp\_as\_cholmod\_dense}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00332}00332\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a0cdf271d5ba16cf4cd804de00e3f4066}{numeric\_as\_cholmod\_dense}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00333}00333\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aebdb504ff9deeb9ef54c2404ef736fd3}{cholmod\_factor\_as\_sexp}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00334}00334\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a196af9ea34e5a610730f446bd6b6e8b8}{cholmod\_sparse\_as\_sexp}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00335}00335\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a533909ccb6b4d1115e8a60048e7a09bd}{cholmod\_dense\_as\_sexp}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00336}00336\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_ac0ebd6a60421616f812c3b1eb2a9a1fa}{cholmod\_factor\_ldetA}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00337}00337\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aead551449d3659637091947c854c07f9}{cholmod\_factor\_update}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00338}00338\ \ \ \ \ \textcolor{comment}{/*\ Because\ lme4\ inexplicably\ does\ not\ use\ \_our\_\ headers:\ */}}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00339}00339\ \ \ \ \ R\_RegisterCCallable(\textcolor{stringliteral}{"{}Matrix"{}},\ \textcolor{stringliteral}{"{}chm\_factor\_ldetL2"{}},}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (DL\_FUNC)\ \mbox{\hyperlink{chm__common_8c_ac0ebd6a60421616f812c3b1eb2a9a1fa}{cholmod\_factor\_ldetA}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00341}00341\ }
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00342}00342\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a93d8b8a3cd9c897599b3e2d996821a0b}{Matrix\_DimNamesSym}}\ =\ install(\textcolor{stringliteral}{"{}Dimnames"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00343}00343\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}\ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}Dim"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00344}00344\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aa870ae8471642f097a4e3ad317d486cc}{Matrix\_LSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}L"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00345}00345\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a7426f5b9a9d45ee3371c60d1501ccf45}{Matrix\_QSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}Q"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00346}00346\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a83e2c364ecd0a12a9812564b234399e9}{Matrix\_RSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}R"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00347}00347\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a35bb40d02954d2abd74b1d511e5aa12a}{Matrix\_TSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}T"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00348}00348\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aeb964248a8c8272cc7e9b06ee383c264}{Matrix\_USym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}U"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00349}00349\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a9a8c0e1cbc843555762f54c35bdd6325}{Matrix\_VSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}V"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00350}00350\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a326ab3950ce69144afd6da6003e50157}{Matrix\_betaSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}beta"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00351}00351\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}diag"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00352}00352\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}}\ \ =\ install(\textcolor{stringliteral}{"{}factors"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00353}00353\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}i"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00354}00354\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}j"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a8f4aeebfa616945baf197391d7a5fca9}{Matrix\_lengthSym}}\ \ \ =\ install(\textcolor{stringliteral}{"{}length"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00356}00356\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a5834920c52b687e9cddbec8ae0cb127a}{Matrix\_marginSym}}\ \ \ =\ install(\textcolor{stringliteral}{"{}margin"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00357}00357\ \ \ \ \ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}p"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00358}00358\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}perm"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00359}00359\ \ \ \ \ \mbox{\hyperlink{Syms_8h_ad586fdbea11a9c3622770727ba1302b4}{Matrix\_qSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}q"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a1520d9422561030d0797f706cdb06509}{Matrix\_sdSym}}\ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}sd"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00361}00361\ \ \ \ \ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}uplo"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00362}00362\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}x"{}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00363}00363\ }
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}}.r\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a91ee1431d809747b3dc95398f485e91b}{Matrix\_zone}}.r\ =\ 1.0;\ \mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\_zna}}.r\ =\ NA\_REAL;}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00365}00365\ \ \ \ \ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}}.i\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a91ee1431d809747b3dc95398f485e91b}{Matrix\_zone}}.i\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\_zna}}.i\ =\ NA\_REAL;}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00366}00366\ }
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{chm__common_8c_a290b6ca7fd11d97d15613b2f5baf24a5}{R\_cholmod\_start}}(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00368}00368\ \ \ \ \ \textcolor{keywordflow}{return};}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00369}00369\ \}}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00370}00370\ }
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00371}\mbox{\hyperlink{init_8c_ae4046714849384524993564acd67fcf0}{00371}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{init_8c_ae4046714849384524993564acd67fcf0}{R\_unload\_Matrix}}(DllInfo\ *info)}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00372}00372\ \{}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00373}00373\ \ \ \ \ \mbox{\hyperlink{chm__common_8c_a582c73ffb2cc1deb84c8790c0aa15448}{R\_cholmod\_finish}}(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00374}00374\ \ \ \ \ \textcolor{keywordflow}{return};}
-\DoxyCodeLine{\Hypertarget{init_8c_source_l00375}00375\ \}}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00331}00331\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a97351040c150398985353f72c797647a}{sexp\_as\_cholmod\_triplet}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00332}00332\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aa6e58886972e9cbd14da633efd6a9aa5}{sexp\_as\_cholmod\_dense}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00333}00333\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a0cdf271d5ba16cf4cd804de00e3f4066}{numeric\_as\_cholmod\_dense}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00334}00334\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aebdb504ff9deeb9ef54c2404ef736fd3}{cholmod\_factor\_as\_sexp}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00335}00335\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a196af9ea34e5a610730f446bd6b6e8b8}{cholmod\_sparse\_as\_sexp}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00336}00336\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aac8d789ff299dc565d30c291b604eb2c}{cholmod\_triplet\_as\_sexp}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00337}00337\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_a533909ccb6b4d1115e8a60048e7a09bd}{cholmod\_dense\_as\_sexp}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00338}00338\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_ac0ebd6a60421616f812c3b1eb2a9a1fa}{cholmod\_factor\_ldetA}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00339}00339\ \ \ \ \ \mbox{\hyperlink{init_8c_aaa40088bca4e3054609a798b8c9761e7}{RREGDEF}}(\mbox{\hyperlink{chm__common_8c_aead551449d3659637091947c854c07f9}{cholmod\_factor\_update}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00341}00341\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a93d8b8a3cd9c897599b3e2d996821a0b}{Matrix\_DimNamesSym}}\ =\ install(\textcolor{stringliteral}{"{}Dimnames"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00342}00342\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}\ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}Dim"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00343}00343\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aa870ae8471642f097a4e3ad317d486cc}{Matrix\_LSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}L"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00344}00344\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a7426f5b9a9d45ee3371c60d1501ccf45}{Matrix\_QSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}Q"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00345}00345\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a83e2c364ecd0a12a9812564b234399e9}{Matrix\_RSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}R"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00346}00346\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a35bb40d02954d2abd74b1d511e5aa12a}{Matrix\_TSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}T"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00347}00347\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aeb964248a8c8272cc7e9b06ee383c264}{Matrix\_USym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}U"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00348}00348\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a9a8c0e1cbc843555762f54c35bdd6325}{Matrix\_VSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}V"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00349}00349\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a326ab3950ce69144afd6da6003e50157}{Matrix\_betaSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}beta"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00350}00350\ \ \ \ \ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}diag"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00351}00351\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}}\ \ =\ install(\textcolor{stringliteral}{"{}factors"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00352}00352\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}i"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00353}00353\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}j"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00354}00354\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a8f4aeebfa616945baf197391d7a5fca9}{Matrix\_lengthSym}}\ \ \ =\ install(\textcolor{stringliteral}{"{}length"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a5834920c52b687e9cddbec8ae0cb127a}{Matrix\_marginSym}}\ \ \ =\ install(\textcolor{stringliteral}{"{}margin"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00356}00356\ \ \ \ \ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}p"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00357}00357\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}perm"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00358}00358\ \ \ \ \ \mbox{\hyperlink{Syms_8h_ad586fdbea11a9c3622770727ba1302b4}{Matrix\_qSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}q"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00359}00359\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a1520d9422561030d0797f706cdb06509}{Matrix\_sdSym}}\ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}sd"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}\ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}uplo"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00361}00361\ \ \ \ \ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}\ \ \ \ \ \ \ \ =\ install(\textcolor{stringliteral}{"{}x"{}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00363}00363\ \ \ \ \ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}}.r\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a91ee1431d809747b3dc95398f485e91b}{Matrix\_zone}}.r\ =\ 1.0;\ \mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\_zna}}.r\ =\ NA\_REAL;}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}}.i\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a91ee1431d809747b3dc95398f485e91b}{Matrix\_zone}}.i\ =\ 0.0;\ \mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\_zna}}.i\ =\ NA\_REAL;}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00366}00366\ \ \ \ \ \mbox{\hyperlink{chm__common_8c_a290b6ca7fd11d97d15613b2f5baf24a5}{R\_cholmod\_start}}(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00367}00367\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00368}00368\ \}}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00370}\mbox{\hyperlink{init_8c_ae4046714849384524993564acd67fcf0}{00370}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{init_8c_ae4046714849384524993564acd67fcf0}{R\_unload\_Matrix}}(DllInfo\ *info)}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00371}00371\ \{}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00372}00372\ \ \ \ \ \mbox{\hyperlink{chm__common_8c_a582c73ffb2cc1deb84c8790c0aa15448}{R\_cholmod\_finish}}(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00373}00373\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{init_8c_source_l00374}00374\ \}}
 
 \end{DoxyCode}

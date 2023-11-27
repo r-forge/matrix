@@ -78,7 +78,7 @@ var searchData=
   ['matrix_5fpackage_5fversion_75',['MATRIX_PACKAGE_VERSION',['../version_8h.html#a3ea7a6d562d1e0a3a081721a990397b0',1,'version.h']]],
   ['matrix_5fpermsym_76',['Matrix_permSym',['../Syms_8h.html#a1e4c56ea9d2e084e0cb7154bcc13e196',1,'Syms.h']]],
   ['matrix_5fpsym_77',['Matrix_pSym',['../Syms_8h.html#af08cd6c75b2da4b71c2eb605e00e94ab',1,'Syms.h']]],
-  ['matrix_5fqsym_78',['matrix_qsym',['../Syms_8h.html#a7426f5b9a9d45ee3371c60d1501ccf45',1,'Matrix_QSym:&#160;Syms.h'],['../Syms_8h.html#ad586fdbea11a9c3622770727ba1302b4',1,'Matrix_qSym:&#160;Syms.h']]],
+  ['matrix_5fqsym_78',['matrix_qsym',['../Syms_8h.html#ad586fdbea11a9c3622770727ba1302b4',1,'Matrix_qSym:&#160;Syms.h'],['../Syms_8h.html#a7426f5b9a9d45ee3371c60d1501ccf45',1,'Matrix_QSym:&#160;Syms.h']]],
   ['matrix_5frepr_79',['Matrix_repr',['../objects_8c.html#a87cdbaca5af8823dfab3b849c6d7bd51',1,'objects.c']]],
   ['matrix_5frle_5f_80',['Matrix_RLE_',['../t__Matrix__rle_8c.html#a846ddc6554134fb4f45e1185514b60da',1,'t_Matrix_rle.c']]],
   ['matrix_5frle_5fd_81',['Matrix_rle_d',['../abIndex_8h.html#af46f173279626e9568c00e7209efd540',1,'abIndex.h']]],
