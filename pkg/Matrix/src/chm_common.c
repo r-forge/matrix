@@ -263,7 +263,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 			double *px = REAL(x);
 			if (!sorted && !sortInPlace) {
 				double *rtmp = (double *) R_alloc(nx + 1, sizeof(double));
-				memcpy(rtmp, px, (nx + 1) * sizeof(double));
+				memcpy(rtmp, px, nx * sizeof(double));
 				px = rtmp;
 			}
 			A->x = px;
@@ -275,7 +275,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 			Rcomplex *px = COMPLEX(x);
 			if (!sorted && !sortInPlace) {
 				Rcomplex *rtmp = (Rcomplex *) R_alloc(nx + 1, sizeof(Rcomplex));
-				memcpy(rtmp, px, (nx + 1) * sizeof(Rcomplex));
+				memcpy(rtmp, px, nx * sizeof(Rcomplex));
 				px = rtmp;
 			}
 			A->x = px;
@@ -314,6 +314,126 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	}
 
 	UNPROTECT(3); /* cpi, i, p */
+	return A;
+}
+
+/**
+ * Coerce from TsparseMatrix to (cholmod_triplet *)
+ *
+ * Sets the members of a pointed-to cholmod_triplet struct, using "data"
+ * obtained from slots of a TsparseMatrix.  The result should _not_ be
+ * freed using cholmod_free_sparse, as the resulting members point to
+ * memory controlled by R, not by CHOLMOD.
+ *
+ * @param A a pointer to a cholmod_triplet struct, to be modified in-place.
+ * @param from an S4 object inheriting from virtual class TsparseMatrix.
+ *
+ * @return A.
+ */
+cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
+                                         Rboolean checkUnit)
+{
+	static const char *valid[] = {
+		"dgTMatrix", "dsTMatrix", "dtTMatrix",
+		"lgTMatrix", "lsTMatrix", "ltTMatrix",
+		"ngTMatrix", "nsTMatrix", "ntTMatrix", "" };
+	int ivalid = R_check_class_etc(from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(from, __func__);
+	const char *class = valid[ivalid];
+	memset(A, 0, sizeof(cholmod_triplet));
+
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	SEXP i = PROTECT(GET_SLOT(from, Matrix_pSym)),
+		j = PROTECT(GET_SLOT(from, Matrix_iSym));
+	int *pi = INTEGER(i), *pj = INTEGER(j);
+	size_t nnz0 = (size_t) XLENGTH(i), nnz1 = nnz0;
+
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(from, Matrix_diagSym);
+		char di = *CHAR(STRING_ELT(diag, 0));
+		if (di != 'N')
+			nnz1 += n;
+	}
+
+	int *tmp;
+	tmp = (int *) R_alloc(nnz1, sizeof(int));
+	memcpy(tmp, pi, nnz1 * sizeof(int));
+	pi = tmp;
+	tmp = (int *) R_alloc(nnz1, sizeof(int));
+	memcpy(tmp, pj, nnz1 * sizeof(int));
+	pj = tmp;
+	if (nnz1 > nnz0) {
+		pi += nnz0; pj += nnz0;
+		for (int d = 0; d < n; ++d)
+			*(pi++) = *(pj++) = d;
+		pi -= nnz1; pj -= nnz1;
+	}
+
+	A->nrow = m;
+	A->ncol = n;
+	A->i = pi;
+	A->j = pj;
+	A->nzmax = (size_t) nnz1;
+	A->nnz = (size_t) nnz1;
+	A->stype = 0;
+	A->itype = CHOLMOD_INT;
+	A->xtype = CHOLMOD_PATTERN;
+	A->dtype = CHOLMOD_DOUBLE;
+
+	if (class[1] == 's') {
+		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
+		char ul = *CHAR(STRING_ELT(uplo, 0));
+		A->stype = (ul == 'U') ? 1 : -1;
+	}
+	if (class[0] != 'n') {
+		SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
+		switch (class[0]) {
+		case 'l':
+		case 'i':
+		{
+			int *px = (TYPEOF(x) == LGLSXP) ? LOGICAL(x) : INTEGER(x);
+			double *rtmp = (double *) R_alloc(nnz1 + 1, sizeof(double));
+			for (size_t k =    0; k < nnz0; ++k)
+				rtmp[k] = (px[k] == NA_INTEGER)
+					? NA_REAL : (double) px[k];
+			for (size_t k = nnz0; k < nnz1; ++k)
+				rtmp[k] = 1.0;
+			A->x = rtmp;
+			A->xtype = CHOLMOD_REAL;
+			break;
+		}
+		case 'd':
+		{
+			double *px = REAL(x);
+			double *rtmp = (double *) R_alloc(nnz1 + 1, sizeof(double));
+			memcpy(rtmp, px, nnz0 * sizeof(double));
+			for (size_t k = nnz0; k < nnz1; ++k)
+				rtmp[k] = 1.0;
+			A->x = rtmp;
+			A->xtype = CHOLMOD_REAL;
+			break;
+		}
+		case 'z':
+		{
+			Rcomplex *px = COMPLEX(x);
+			Rcomplex *rtmp = (Rcomplex *) R_alloc(nnz1 + 1, sizeof(Rcomplex));
+			memcpy(rtmp, px, nnz0 * sizeof(Rcomplex));
+			for (size_t k = nnz0; k < nnz1; ++k)
+				rtmp[k] = Matrix_zone;
+			A->x = rtmp;
+			A->xtype = CHOLMOD_COMPLEX;
+			break;
+		}
+		default:
+			break;
+		}
+		UNPROTECT(1); /* x */
+	}
+
+	UNPROTECT(2); /* j, i */
 	return A;
 }
 
@@ -639,6 +759,114 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 	memcpy(INTEGER(i), A->i, (size_t) nnz * sizeof(int));
 	SET_SLOT(to, Matrix_pSym, p);
 	SET_SLOT(to, Matrix_iSym, i);
+	if (A->xtype != CHOLMOD_PATTERN) {
+		SEXP x;
+		if (A->xtype == CHOLMOD_COMPLEX) {
+			PROTECT(x = allocVector(CPLXSXP, nnz));
+			memcpy(COMPLEX(x), A->x, (size_t) nnz * sizeof(Rcomplex));
+		} else if (!doLogic) {
+			PROTECT(x = allocVector(REALSXP, nnz));
+			memcpy(REAL(x), A->x, (size_t) nnz * sizeof(double));
+		} else {
+			PROTECT(x = allocVector(LGLSXP, nnz));
+			int k, *px = LOGICAL(x);
+			double *py = (double *) A->x;
+			for (k = 0; k < nnz; ++k)
+				px[k] = (ISNAN(py[k])) ? NA_LOGICAL : (py[k] != 0.0);
+		}
+		SET_SLOT(to, Matrix_xSym, x);
+		UNPROTECT(1);
+	}
+	if (ttype < 0 || A->stype < 0) {
+		SEXP uplo = PROTECT(mkString("L"));
+		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1);
+	}
+	if (ttype != 0 && diagString && diagString[0] != 'N') {
+		SEXP diag = PROTECT(mkString("U"));
+		SET_SLOT(to, Matrix_diagSym, diag);
+		UNPROTECT(1);
+	}
+	if (TYPEOF(dimnames) == VECSXP && LENGTH(dimnames) == 2)
+		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	FREE_THEN();
+
+#undef FREE_THEN
+
+	UNPROTECT(4);
+	return to;
+}
+
+/**
+ * Coerce from (cholmod_triplet *) to TsparseMatrix
+ *
+ * Allocates an S4 object inheriting from virtual class TsparseMatrix
+ * and copies into the slots from members of a pointed-to cholmod_triplet
+ * struct.  The specific class of the result is determined by struct
+ * members xtype and stype and by arguments ttype and doLogic.
+ *
+ * @param A a pointer to a cholmod_triplet struct.
+ * @param doFree a flag indicating if and how to free A before returning.
+ *     (0) don't free, (>0) free with cholmod_free_triplet, (<0) free with
+ *     R_Free.
+ * @param ttype a flag indicating if the result should be a .tTMatrix.
+ *     (0) not .tTMatrix, (>0) .tTMatrix with uplo="U", (<0) .tTMatrix
+ *     with uplo="L".  If ttype=0, then the result is a .gTMatrix or
+ *     .sTMatrix depending on stype.  (0) .gTMatrix, (>0) .sTMatrix with
+ *     uplo="U", (<0) .sTMatrix with uplo="L".
+ * @param doLogic a flag indicating if the result should be an l.TMatrix
+ *     if xtype=CHOLMOD_REAL.
+ * @param diagString a null-terminated string or NULL.  The diag slot
+ *     of a .tTMatrix result is "N" if and only if diagString is NULL
+ *     or diagString[0] is 'N'.
+ * @param dimnames an R object specifying the Dimnames slot of the result,
+ *     unused if not a list of length 2.
+ *
+ * @return A TsparseMatrix.
+ */
+SEXP cholmod_triplet_as_sexp(cholmod_triplet *A, int doFree,
+                             int ttype, int doLogic, const char *diagString,
+                             SEXP dimnames)
+{
+
+#define FREE_THEN(_EXPR_) \
+	do { \
+		if (doFree != 0) { \
+			if (doFree < 0) \
+				R_Free(A); \
+			else if (A->itype == CHOLMOD_INT) \
+				cholmod_free_triplet(&A, &c); \
+			else \
+				cholmod_l_free_triplet(&A, &cl); \
+			_EXPR_; \
+		} \
+	} while (0)
+
+	if (A->itype != CHOLMOD_INT)
+		FREE_THEN(error(_("wrong '%s'"), "itype"));
+	if (A->xtype != CHOLMOD_PATTERN &&
+	    A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
+		FREE_THEN(error(_("wrong '%s'"), "xtype"));
+	if (A->dtype != CHOLMOD_DOUBLE)
+		FREE_THEN(error(_("wrong '%s'"), "dtype"));
+	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
+		FREE_THEN(error(_("dimensions cannot exceed %s"), "2^31-1"));
+	int m = (int) A->nrow, n = (int) A->ncol;
+	R_xlen_t nnz = (R_xlen_t) A->nnz;
+	char class[] = "..TMatrix";
+	class[0] = (A->xtype == CHOLMOD_PATTERN)
+		? 'n' : ((A->xtype == CHOLMOD_COMPLEX) ? 'z' : ((doLogic) ? 'l' : 'd'));
+	class[1] = (ttype != 0) ? 't' : ((A->stype != 0) ? 's' : 'g');
+	SEXP to = PROTECT(newObject(class)),
+		dim = PROTECT(GET_SLOT(to, Matrix_DimSym)),
+		i = PROTECT(allocVector(INTSXP, nnz)),
+		j = PROTECT(allocVector(INTSXP, nnz));
+	INTEGER(dim)[0] = m;
+	INTEGER(dim)[1] = n;
+	memcpy(INTEGER(i), A->i, (size_t) nnz * sizeof(int));
+	memcpy(INTEGER(j), A->j, (size_t) nnz * sizeof(int));
+	SET_SLOT(to, Matrix_iSym, i);
+	SET_SLOT(to, Matrix_jSym, j);
 	if (A->xtype != CHOLMOD_PATTERN) {
 		SEXP x;
 		if (A->xtype == CHOLMOD_COMPLEX) {

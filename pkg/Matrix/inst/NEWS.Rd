@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-4 (2023-11-16 r4514)}{
+\section{Changes in version 1.6-4 (2023-11-27 r4518)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -22,7 +22,9 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item Entry point \code{M_chm_triplet_to_SEXP}, removed
+      in \pkg{Matrix} version 1.6-2, is restored (as a macro).
+      It was \dQuote{covertly} used by package \pkg{Rmosek}.
     }
   }
 }
