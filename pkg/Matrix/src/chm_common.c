@@ -177,6 +177,10 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
  *
  * @param A a pointer to a cholmod_sparse struct, to be modified in-place.
  * @param from an S4 object inheriting from virtual class CsparseMatrix.
+ * @param checkUnit a boolean indicating if the unit diagonal of formally
+ *     unit triangular CsparseMatrix should be allocated.
+ * @param sortInPlace a boolean indicating if unsorted CsparseMatrix
+ *     should be sorted in place to avoid an allocation.
  *
  * @return A.
  */
@@ -207,14 +211,14 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	if (TYPEOF(cpi) != LGLSXP)
 		error(CHAR(STRING_ELT(cpi, 0)));
 	int *pp = INTEGER(p), *pi = INTEGER(i), sorted = LOGICAL(cpi)[0];
-	R_xlen_t np = XLENGTH(p), ni = XLENGTH(i);
+	size_t np = (size_t) XLENGTH(p), ni = (size_t) XLENGTH(i);
 	if (!sorted && !sortInPlace) {
 		int *tmp;
-		tmp = (int *) R_alloc((size_t) np, sizeof(int));
-		memcpy(tmp, pp, (size_t) np * sizeof(int));
+		tmp = (int *) R_alloc(np, sizeof(int));
+		memcpy(tmp, pp, np * sizeof(int));
 		pp = tmp;
-		tmp = (int *) R_alloc((size_t) ni, sizeof(int));
-		memcpy(tmp, pi, (size_t) ni * sizeof(int));
+		tmp = (int *) R_alloc(ni, sizeof(int));
+		memcpy(tmp, pi, ni * sizeof(int));
 		pi = tmp;
 	}
 
@@ -222,7 +226,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	A->ncol = n;
 	A->p = pp;
 	A->i = pi;
-	A->nzmax = (size_t) ni;
+	A->nzmax = ni;
 	A->stype = 0;
 	A->itype = CHOLMOD_INT;
 	A->xtype = CHOLMOD_PATTERN;
@@ -250,7 +254,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		case 'i':
 		{
 			int *px = (TYPEOF(x) == LGLSXP) ? LOGICAL(x) : INTEGER(x);
-			double *rtmp = (double *) R_alloc(nx + 1, sizeof(double));
+			double *rtmp = (double *) R_alloc(nx, sizeof(double));
 			for (size_t ix = 0; ix < nx; ++ix)
 				rtmp[ix] = (px[ix] == NA_INTEGER)
 					? NA_REAL : (double) px[ix];
@@ -262,7 +266,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		{
 			double *px = REAL(x);
 			if (!sorted && !sortInPlace) {
-				double *rtmp = (double *) R_alloc(nx + 1, sizeof(double));
+				double *rtmp = (double *) R_alloc(nx, sizeof(double));
 				memcpy(rtmp, px, nx * sizeof(double));
 				px = rtmp;
 			}
@@ -274,7 +278,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		{
 			Rcomplex *px = COMPLEX(x);
 			if (!sorted && !sortInPlace) {
-				Rcomplex *rtmp = (Rcomplex *) R_alloc(nx + 1, sizeof(Rcomplex));
+				Rcomplex *rtmp = (Rcomplex *) R_alloc(nx, sizeof(Rcomplex));
 				memcpy(rtmp, px, nx * sizeof(Rcomplex));
 				px = rtmp;
 			}
@@ -327,6 +331,8 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
  *
  * @param A a pointer to a cholmod_triplet struct, to be modified in-place.
  * @param from an S4 object inheriting from virtual class TsparseMatrix.
+ * @param checkUnit a boolean indicating if the unit diagonal of formally
+ *     unit triangular TsparseMatrix should be allocated.
  *
  * @return A.
  */
@@ -351,21 +357,22 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 	int *pi = INTEGER(i), *pj = INTEGER(j);
 	size_t nnz0 = (size_t) XLENGTH(i), nnz1 = nnz0;
 
-	if (class[1] == 't') {
+	if (checkUnit && class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		char di = *CHAR(STRING_ELT(diag, 0));
 		if (di != 'N')
 			nnz1 += n;
 	}
 
-	int *tmp;
-	tmp = (int *) R_alloc(nnz1, sizeof(int));
-	memcpy(tmp, pi, nnz1 * sizeof(int));
-	pi = tmp;
-	tmp = (int *) R_alloc(nnz1, sizeof(int));
-	memcpy(tmp, pj, nnz1 * sizeof(int));
-	pj = tmp;
-	if (nnz1 > nnz0) {
+	if (nnz0 < nnz1) {
+		int *tmp;
+		tmp = (int *) R_alloc(nnz1, sizeof(int));
+		memcpy(tmp, pi, nnz1 * sizeof(int));
+		pi = tmp;
+		tmp = (int *) R_alloc(nnz1, sizeof(int));
+		memcpy(tmp, pj, nnz1 * sizeof(int));
+		pj = tmp;
+
 		pi += nnz0; pj += nnz0;
 		for (int d = 0; d < n; ++d)
 			*(pi++) = *(pj++) = d;
@@ -376,8 +383,8 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 	A->ncol = n;
 	A->i = pi;
 	A->j = pj;
-	A->nzmax = (size_t) nnz1;
-	A->nnz = (size_t) nnz1;
+	A->nzmax = nnz1;
+	A->nnz = nnz1;
 	A->stype = 0;
 	A->itype = CHOLMOD_INT;
 	A->xtype = CHOLMOD_PATTERN;
@@ -395,7 +402,7 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 		case 'i':
 		{
 			int *px = (TYPEOF(x) == LGLSXP) ? LOGICAL(x) : INTEGER(x);
-			double *rtmp = (double *) R_alloc(nnz1 + 1, sizeof(double));
+			double *rtmp = (double *) R_alloc(nnz1, sizeof(double));
 			for (size_t k =    0; k < nnz0; ++k)
 				rtmp[k] = (px[k] == NA_INTEGER)
 					? NA_REAL : (double) px[k];
@@ -408,22 +415,28 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 		case 'd':
 		{
 			double *px = REAL(x);
-			double *rtmp = (double *) R_alloc(nnz1 + 1, sizeof(double));
-			memcpy(rtmp, px, nnz0 * sizeof(double));
-			for (size_t k = nnz0; k < nnz1; ++k)
-				rtmp[k] = 1.0;
-			A->x = rtmp;
+			if (nnz0 < nnz1) {
+				double *rtmp = (double *) R_alloc(nnz1, sizeof(double));
+				memcpy(rtmp, px, nnz0 * sizeof(double));
+				for (size_t k = nnz0; k < nnz1; ++k)
+					rtmp[k] = 1.0;
+				px = rtmp;
+			}
+			A->x = px;
 			A->xtype = CHOLMOD_REAL;
 			break;
 		}
 		case 'z':
 		{
 			Rcomplex *px = COMPLEX(x);
-			Rcomplex *rtmp = (Rcomplex *) R_alloc(nnz1 + 1, sizeof(Rcomplex));
-			memcpy(rtmp, px, nnz0 * sizeof(Rcomplex));
-			for (size_t k = nnz0; k < nnz1; ++k)
-				rtmp[k] = Matrix_zone;
-			A->x = rtmp;
+			if (nnz0 < nnz1) {
+				Rcomplex *rtmp = (Rcomplex *) R_alloc(nnz1, sizeof(Rcomplex));
+				memcpy(rtmp, px, nnz0 * sizeof(Rcomplex));
+				for (size_t k = nnz0; k < nnz1; ++k)
+					rtmp[k] = Matrix_zone;
+				px = rtmp;
+			}
+			A->x = px;
 			A->xtype = CHOLMOD_COMPLEX;
 			break;
 		}

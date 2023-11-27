@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-4 (2023-11-27 r4518)}{
+\section{Changes in version 1.6-4 (2023-11-27 r4519)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
