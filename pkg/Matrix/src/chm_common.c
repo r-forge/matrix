@@ -162,7 +162,7 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 	}
 
 	if (!cholmod_check_factor(L, &c))
-		error(_("'%s' failed"), "cholmod_check_factor");
+		error(_("'%s' failed in '%s'"), "cholmod_check_factor", __func__);
 	UNPROTECT(4);
 	return L;
 }
@@ -209,7 +209,8 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	     i = PROTECT(GET_SLOT(from, Matrix_iSym)),
 	   cpi = PROTECT(checkpi(p, i, m, n));
 	if (TYPEOF(cpi) != LGLSXP)
-	    error(_("checkpi() failed in sexp_as_cholmod_sparse(): %s"), CHAR(STRING_ELT(cpi, 0)));
+		error(_("'%s' failed in '%s': %s"),
+		      "checkpi", __func__, CHAR(STRING_ELT(cpi, 0)));
 	int *pp = INTEGER(p), *pi = INTEGER(i), sorted = LOGICAL(cpi)[0];
 	size_t np = (size_t) XLENGTH(p), ni = (size_t) XLENGTH(i);
 	if (!sorted && !sortInPlace) {
@@ -292,7 +293,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		UNPROTECT(1); /* x */
 	}
 	if (!sorted && !cholmod_sort(A, &c))
-		error(_("'%s' failed"), "cholmod_sort");
+		error(_("'%s' failed in '%s'"), "cholmod_sort", __func__);
 	if (checkUnit && class[1] == 't' && n > 0) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		char di = *CHAR(STRING_ELT(diag, 0));
@@ -1051,10 +1052,10 @@ cholmod_factor *cholmod_factor_update(cholmod_factor *L, cholmod_sparse *A,
 	z[0] = beta;
 	z[1] = 0.0;
 	if (!cholmod_factorize_p(A, z, NULL, 0, L, &c))
-		error(_("'%s' failed"), "cholmod_factorize_p");
+		error(_("'%s' failed in '%s'"), "cholmod_factorize_p", __func__);
 	if (L->is_ll != ll &&
 	    !cholmod_change_factor(L->xtype, ll, L->is_super, 1, 1, L, &c))
-		error(_("'%s' failed"), "cholmod_change_factor");
+		error(_("'%s' failed in '%s'"), "cholmod_change_factor", __func__);
 	return L;
 }
 
@@ -1087,7 +1088,7 @@ int R_cholmod_start(cholmod_common *Common)
 {
 	int ans = cholmod_start(Common);
 	if (!ans)
-		error(_("'%s' failed"), "cholmod_start");
+		error(_("'%s' failed in '%s'"), "cholmod_start", __func__);
 #if 0
 	/* No longer, with SuiteSparse 5.7.1 : */
 	Common->print_function =
@@ -1105,7 +1106,7 @@ int R_cholmod_finish(cholmod_common *Common)
 {
 	int ans = cholmod_finish(Common);
 	if (!ans)
-		error(_("'%s' failed"), "cholmod_finish");
+		error(_("'%s' failed in '%s'"), "cholmod_finish", __func__);
 	return ans;
 }
 
