@@ -4,11 +4,12 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-4 (2023-11-28 r4522)}{
+\section{Changes in version 1.6-4 (2023-11-29 r4523)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{printf} format mismatches detected by R-devel
       are fixed in 3 \file{src/*.c}.
+      \item better deprecation message for \code{..2dge()}.
     }
   }
   \subsection{Misc}{
