@@ -329,122 +329,114 @@ setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 2L) {
+              if(na == 2L)
                   ## x[]
                   x
-              } else if(na == 3L) {
+              else if(na == 3L)
                   ## x[, ]
                   drop(x)
-              } else {
+              else
                   ## x[, , ], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "missing",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na < 4L) {
+              if(na < 4L)
                   ## x[drop=], x[, drop=], x[drop=, ]
                   x
-              } else if(na == 4L) {
+              else if(na == 4L)
                   ## x[, , drop=], x[, drop=, ], x[drop=, , ]
                   if(is.na(drop <- drop[1L]) || drop) drop(x) else x
-              } else {
+              else
                   ## x[, , , drop=], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 2L) {
+              if(na == 2L)
                   ## x[i=]
                   .subscript.1ary(x, i)
-              } else if(na == 3L) {
+              else if(na == 3L)
                   ## x[i=, ], x[, i=]
                   .subscript.2ary(x, i, , drop = TRUE)
-              } else {
+              else
                   ## x[i=, , ], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "missing",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 3L) {
+              if(na == 3L)
                   ## x[i=, drop=]
                   .subscript.1ary(x, i)
-              } else if(na == 4L) {
+              else if(na == 4L)
                   ## x[i=, , drop=], x[, i=, drop=]
                   .subscript.2ary(x, i, , drop = drop)
-              } else {
+              else
                   ## x[i=, , , drop=], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 2L) {
+              if(na == 2L)
                   ## x[j=]
                   .subscript.1ary(x, j)
-              } else if(na == 3L) {
+              else if(na == 3L)
                   ## x[j=, ], x[, j=]
                   .subscript.2ary(x, , j, drop = TRUE)
-              } else {
+              else
                   ## x[, j=, ], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "missing", j = "index",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 3L) {
+              if(na == 3L)
                   ## x[j=, drop=]
                   .subscript.1ary(x, j)
-              } else if(na == 4L) {
+              else if(na == 4L)
                   ## x[j=, , drop=], x[, j=, drop=]
                   .subscript.2ary(x, , j, drop = drop)
-              } else {
+              else
                   ## x[, j=, , drop=], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 3L) {
+              if(na == 3L)
                   ## x[i=, j=], x[j=, i=]
                   .subscript.2ary(x, i, j, drop = TRUE)
-              } else {
+              else
                   ## x[i=, j=, ], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 setMethod("[", signature(x = "Matrix", i = "index", j = "index",
                          drop = "logical"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 4L) {
+              if(na == 4L)
                   ## x[i=, j=, drop=], x[j=, i=, drop=]
                   .subscript.2ary(x, i, j, drop = drop)
-              } else {
+              else
                   ## x[i=, j=, , drop=], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 
 for(.cl in c("matrix", "nMatrix", "lMatrix"))
@@ -452,16 +444,15 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               na <- nargs()
-              if(na == 2L) {
+              if(na == 2L)
                   ## x[i=]
                   .subscript.1ary.mat(x, i)
-              } else if(na == 3L) {
+              else if(na == 3L)
                   ## x[i=, ], x[, i=]
                   .subscript.2ary(x, i, , drop = TRUE)
-              } else {
+              else
                   ## x[i=, , ], etc.
                   stop("incorrect number of dimensions")
-              }
           })
 rm(.cl)
 
@@ -490,14 +481,9 @@ setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
 setMethod("[", signature(x = "sparseVector", i = "missing", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
-              na <- nargs()
-              if(na == 2L) {
-                  ## x[]
-                  x
-              } else {
-                  ## x[, ], etc.
+              if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              }
+              x
           })
 
 setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
