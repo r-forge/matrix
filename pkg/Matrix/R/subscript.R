@@ -463,6 +463,7 @@ setMethod("[", signature(x = "Matrix", i = .cl, j = "missing",
                   stop("incorrect number of dimensions")
               }
           })
+rm(.cl)
 
 setMethod("[", signature(x = "Matrix", i = "NULL", j = "ANY",
                          drop = "ANY"),
@@ -484,6 +485,19 @@ setMethod("[", signature(x = "Matrix", i = "NULL", j = "NULL",
               i <- integer(0L)
               j <- integer(0L)
               callGeneric()
+          })
+
+setMethod("[", signature(x = "sparseVector", i = "missing", j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop = TRUE) {
+              na <- nargs()
+              if(na == 2L) {
+                  ## x[]
+                  x
+              } else {
+                  ## x[, ], etc.
+                  stop("incorrect number of dimensions")
+              }
           })
 
 setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
@@ -600,15 +614,20 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                      stop(.subscript.invalid(i), domain = NA))
           })
 
-setMethod("[", signature(x = "sparseVector", i = "sparseVector", j = "missing",
+setMethod("[", signature(x = "sparseVector", i = "nsparseVector", j = "missing",
                          drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              kind <- .M.kind(i)
-              if((pattern <- kind == "n") || kind == "l")
-                  x[.subscript.recycle(i, x@length, pattern)]
-              else x[i@x]
+              x[.subscript.recycle(i, x@length, TRUE)]
+          })
+
+setMethod("[", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
+                         drop = "missing"),
+          function(x, i, j, ..., drop = TRUE) {
+              if(nargs() != 2L)
+                  stop("incorrect number of dimensions")
+              x[.subscript.recycle(i, x@length, FALSE)]
           })
 
 setMethod("[", signature(x = "sparseVector", i = "NULL", j = "ANY",

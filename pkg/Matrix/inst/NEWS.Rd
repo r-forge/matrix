@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-5 (2023-12-04 r4526)}{
+\section{Changes in version 1.6-5 (2023-12-05 r4529)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -17,12 +17,14 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item \code{x[]} works for \code{x} inheriting from virtual class
+      \code{sparseVector}.
     }
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item \code{\%||\%} is defined in the \pkg{Matrix} namespace
+      only for \R{} versions less than 4.4.0.
     }
   }
 }
