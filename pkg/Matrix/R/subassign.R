@@ -15,6 +15,12 @@
 ##               diagonalMatrix,indMatrix
 
 if(FALSE) { # TODO
+.subassign.invalid <- function(value) {
+    if(is.object(i))
+        gettextf("invalid subassignment value class \"%s\"", class(i)[1L])
+    else gettextf("invalid subassignment value type \"%s\"", typeof(i))
+}
+
 .subassign.1ary <- function(x, i, value) {
 
 }
@@ -144,12 +150,37 @@ setMethod("[<-", signature(x = "Matrix", i = "NULL", j = "NULL",
 
 setMethod("[<-", signature(x = "sparseVector", i = "missing", j = "missing",
                            value = "ANY"),
-          function(x, i, j, ..., drop = TRUE) {
+          function(x, i, j, ..., value) {
               if(missing(value))
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              TODO(x, , value)
+              if(isS4(value)) {
+                  if(!.isVector(value))
+                      stop(.subassign.invalid(value), domain = NA)
+              } else
+                  value <- switch(typeof(value),
+                                  "logical" =,
+                                  "integer" =,
+                                  "double" =,
+                                  "complex" = .m2V(value),
+                                  stop(.subassign.invalid(value), domain = NA))
+              n.x <- length(x)
+              n.value <- length(value)
+              if(n.x > 0L && n.value == 0L)
+                  stop("replacement has length zero")
+              k.x <- .M2kind(x)
+              k.value <- .M2kind(value)
+              if(k.x != k.value) {
+                  map <- `names<-`(1:5, c("n", "l", "i", "d", "z"))
+                  if(map[[k.value]] < map[[k.x]])
+                      value <- .V2kind(value, k.x)
+              }
+              if(n.value == 0L)
+                  return(value)
+              if(n.x %% n.value != 0L)
+                  warning("number of items to replace is not a multiple of replacement length")
+              .V.rep.len(value, n.x)
           })
 
 setMethod("[<-", signature(x = "sparseVector", i = "index", j = "missing",
@@ -159,7 +190,29 @@ setMethod("[<-", signature(x = "sparseVector", i = "index", j = "missing",
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              TODO(x, i, value)
+              if(isS4(value)) {
+                  if(!.isVector(value))
+                      stop(.subassign.invalid(value), domain = NA)
+              } else
+                  value <- switch(typeof(value),
+                                  "logical" =,
+                                  "integer" =,
+                                  "double" =,
+                                  "complex" = .m2V(value),
+                                  stop(.subassign.invalid(value), domain = NA))
+              switch(typeof(i),
+                     "logical" = {},
+                     "integer" = {},
+                     "double" = {},
+                     stop(.subscript.invalid(value), domain = NA))
+              k.x <- .M2kind(x)
+              k.value <- .M2kind(value)
+              if(k.x != k.value) {
+                  map <- `names<-`(1:5, c("n", "l", "i", "d", "z"))
+                  if(map[[k.x]] < map[[k.value]])
+                      x <- .V2kind(x, k.value)
+              }
+              ## TODO
           })
 
 setMethod("[<-", signature(x = "sparseVector", i = "nsparseVector", j = "missing",
@@ -169,7 +222,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "nsparseVector", j = "missing
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, x@length, TRUE)] <- value
+              x[.subscript.recycle(i, length(x), TRUE)] <- value
               x
           })
 
@@ -180,7 +233,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "lsparseVector", j = "missing
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, x@length, FALSE)] <- value
+              x[.subscript.recycle(i, length(x), FALSE)] <- value
               x
           })
 
