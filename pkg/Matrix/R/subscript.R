@@ -12,7 +12,7 @@
     ## to [nl]sparseVector 'i' recycled to length 'mn' :
     if(length(i.i <- i@i) == 0L)
         integer(0L)
-    else if((i.length <- i@length) >= mn) {
+    else if((i.length <- length(i)) >= mn) {
         if(i.length > mn) {
             if(mn < 0x1p+53) {
                 if(i.i[length(i.i)] >= mn + 1)
@@ -507,7 +507,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                                      i <- i[i <= -1]
                                  d <- unique.default(sort.int(-trunc(i)))
                                  k <- match(x@i, d, 0L) == 0L
-                                 x@length <- x@length - length(d)
+                                 x@length <- length(x) - length(d)
                                  x@i <-
                                      {
                                          tmp <- x@i[k]
@@ -552,7 +552,7 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                                      i <- i[i <= -1L]
                                  d <- unique.default(sort.int(-i))
                                  k <- is.na(match(x@i, d))
-                                 x@length <- x@length - length(d)
+                                 x@length <- length(x) - length(d)
                                  x@i <-
                                      {
                                          tmp <- x@i[k]
@@ -605,7 +605,7 @@ setMethod("[", signature(x = "sparseVector", i = "nsparseVector", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, x@length, TRUE)]
+              x[.subscript.recycle(i, length(x), TRUE)]
           })
 
 setMethod("[", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
@@ -613,7 +613,7 @@ setMethod("[", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, x@length, FALSE)]
+              x[.subscript.recycle(i, length(x), FALSE)]
           })
 
 setMethod("[", signature(x = "sparseVector", i = "NULL", j = "ANY",

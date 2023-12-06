@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-5 (2023-12-05 r4530)}{
+\section{Changes in version 1.6-5 (2023-12-06 r4531)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -19,6 +19,11 @@
     \itemize{
       \item \code{x[]} works for \code{x} inheriting from virtual class
       \code{sparseVector}.
+
+      \item \code{length(x)} is always an integer for \code{x}
+      inheriting from virtual class \code{sparseVector}.  Truncation
+      did not occur for \code{x@length} of type \code{"double"}
+      equal to or greater than \code{.Machine[["integer.max"]] + 1}. 
     }
   }
   \subsection{Misc}{
