@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-5 (2023-12-06 r4533)}{
+\section{Changes in version 1.6-5 (2023-12-09 r4534)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -23,7 +23,12 @@
       \item \code{length(x)} is always an integer for \code{x}
       inheriting from virtual class \code{sparseVector}.  Truncation
       did not occur for \code{x@length} of type \code{"double"}
-      equal to or greater than \code{.Machine[["integer.max"]] + 1}. 
+      equal to or greater than \code{.Machine[["integer.max"]] + 1}.
+
+      \item \code{tril(<nxn>, -n)} now works again.
+
+      \item \code{tril(indM, k)}, \code{triu(indM, k)} work correctly now,
+      for \code{k != 0}.
     }
   }
   \subsection{Misc}{
