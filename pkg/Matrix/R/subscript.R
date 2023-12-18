@@ -7,27 +7,27 @@
     else gettextf("invalid subscript type \"%s\"", typeof(i))
 }
 
-.subscript.recycle <- function(i, mn, pattern) {
+.subscript.recycle <- function(i, n, pattern) {
     ## Return integer or double vector corresponding
-    ## to [nl]sparseVector 'i' recycled to length 'mn' :
+    ## to [nl]sparseVector 'i' recycled to length 'n' :
     if(length(i.i <- i@i) == 0L)
         integer(0L)
-    else if((i.length <- length(i)) >= mn) {
-        if(i.length > mn) {
-            if(mn < 0x1p+53) {
-                if(i.i[length(i.i)] >= mn + 1)
-                    i.i[i.i >= mn + 1] <- NA
+    else if((i.length <- length(i)) >= n) {
+        if(i.length > n) {
+            if(n < 0x1p+53) {
+                if(i.i[length(i.i)] >= n + 1)
+                    i.i[i.i >= n + 1] <- NA
             } else {
-                if(i.i[length(i.i)] > mn)
-                    i.i[i.i > mn] <- NA
+                if(i.i[length(i.i)] > n)
+                    i.i[i.i > n] <- NA
             }
         }
         if(pattern) i.i else i.i[i@x]
     } else {
-        r <- ceiling(mn / i.length)
-        mn. <- r * i.length
+        r <- ceiling(n / i.length)
+        n. <- r * i.length
         i.i <-
-            if(mn. <= .Machine$integer.max)
+            if(n. <= .Machine$integer.max)
                 rep.int(as.integer(i.i), r) +
                     rep(seq.int(from = 0L,
                                 by = as.integer(i.length),
@@ -43,9 +43,9 @@
                                "[nl]sparseVector", "2^53"),
                       domain = NA)
         if(pattern) {
-            if(mn. > mn) i.i[      i.i <= mn] else i.i
+            if(n. > n) i.i[      i.i <= n] else i.i
         } else {
-            if(mn. > mn) i.i[i@x & i.i <= mn] else i.i[i@x]
+            if(n. > n) i.i[i@x & i.i <= n] else i.i[i@x]
         }
     }
 }
