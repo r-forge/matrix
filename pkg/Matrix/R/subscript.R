@@ -87,10 +87,10 @@
                },
            logical =
                {
-                   if(length(i) && !is.na(a <- all(i)) && a) {
-                       if((len <- length(i)) <= mn)
+                   if((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
+                       if(i.length <= mn)
                            as.vector(x)
-                       else c(as.vector(x), rep.int(NA, len - mn))
+                       else c(as.vector(x), rep.int(NA, i.length - mn))
                    } else .subscript.1ary(x, .m2V(i)) # recursively
                },
            character =
@@ -165,9 +165,9 @@
         if((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
             if(logic && all(i@Dim) && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
-                if((len <- prod(i@Dim)) <= (mn <- length(x)))
+                if((i.length <- length(i)) <= (mn <- length(x)))
                     return(x)
-                else return(c(x, rep.int(NA, len - mn)))
+                else return(c(x, rep.int(NA, i.length - mn)))
             }
             i <- if(.isDense(i)) .M2v(i) else .M2V(i)
             return(.subscript.1ary(x, i))
@@ -586,13 +586,13 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                          },
                      logical =
                          {
-                             if(length(i) && !is.na(a <- all(i)) && a) {
-                                 if((len <- length(i)) > mn) {
+                             if((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
+                                 if(i.length > mn) {
                                      if(pattern)
                                          x <- .V2kind(x, "l")
-                                     x@length <- len
-                                     x@i <- c(x@i, (mn + 1):len)
-                                     x@x <- c(x@x, rep.int(NA, len - mn))
+                                     x@length <- i.length
+                                     x@i <- c(x@i, (mn + 1):i.length)
+                                     x@x <- c(x@x, rep.int(NA, i.length - mn))
                                  }
                                  x
                              } else x[.m2V(i)] # recursively
