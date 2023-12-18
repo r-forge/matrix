@@ -52,7 +52,7 @@
 
 ## x[i] where 'i' is NULL or any vector or sparseVector
 .subscript.1ary <- function(x, i) {
-    mn <- prod(x@Dim)
+    x.length <- prod(x@Dim)
     if(is.null(i))
         i <- integer(0L)
     else if(isS4(i)) {
@@ -61,7 +61,7 @@
         kind <- .M.kind(i)
         if((pattern <- kind == "n") || kind == "l") {
             ## [nl]sparseVector
-            i <- .subscript.recycle(i, mn, pattern)
+            i <- .subscript.recycle(i, x.length, pattern)
             return(..subscript.1ary(x, i, unsorted = !pattern && anyNA(i)))
         }
         i <- i@x
@@ -72,7 +72,7 @@
                    r <- min(1, i, na.rm = TRUE)
                    if(r < 1)
                        i <- if(r <= -1)
-                                seq_len(mn)[i] # FIXME
+                                seq_len(x.length)[i] # FIXME
                             else i[i >= 1]
                    ..subscript.1ary(x, i)
                },
@@ -81,16 +81,16 @@
                    r <- min(1L, i, na.rm = TRUE)
                    if(r < 1L)
                        i <- if(r <= -1L)
-                                seq_len(mn)[i] # FIXME
+                                seq_len(x.length)[i] # FIXME
                             else i[i >= 1L]
                    ..subscript.1ary(x, i)
                },
            logical =
                {
                    if((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
-                       if(i.length <= mn)
+                       if(i.length <= x.length)
                            as.vector(x)
-                       else c(as.vector(x), rep.int(NA, i.length - mn))
+                       else c(as.vector(x), rep.int(NA, i.length - x.length))
                    } else .subscript.1ary(x, .m2V(i)) # recursively
                },
            character =
@@ -112,15 +112,15 @@
     if(shape == "t" && x@diag != "N")
         x <- ..diagU2N(x)
     if(shape == "s" || repr == "R") {
-        mn <- prod(d <- x@Dim)
-        if(mn < 0x1p+53) {
-            r <- max(mn, i, na.rm = TRUE)
-            if(r >= mn + 1)
-                i[i >= mn + 1] <- NA
+        x.length <- prod(d <- x@Dim)
+        if(x.length < 0x1p+53) {
+            r <- max(x.length, i, na.rm = TRUE)
+            if(r >= x.length + 1)
+                i[i >= x.length + 1] <- NA
         } else if(is.double(i)) {
             r <- max(0x1p+53, i, na.rm = TRUE)
             if(r > 0x1p+53) {
-                if(any(i > 0x1p+53 && i <= mn, na.rm = TRUE))
+                if(any(i > 0x1p+53 && i <= x.length, na.rm = TRUE))
                     ## could be avoided in C, which has 64-bit integers :
                     warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
                             domain = NA)
@@ -138,7 +138,7 @@
                 j.. <- j.[w]
                 if(repr == "R")
                     i.[w] <- j..
-                if(mn > .Machine$integer.max)
+                if(x.length > .Machine$integer.max)
                     m <- as.double(m)
                 i[w] <- m * i.. + j.. + 1L
             }
@@ -165,9 +165,9 @@
         if((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
             if(logic && all(i@Dim) && !is.na(a <- all(i)) && a) {
                 x <- as.vector(x)
-                if((i.length <- length(i)) <= (mn <- length(x)))
+                if((i.length <- length(i)) <= (x.length <- length(x)))
                     return(x)
-                else return(c(x, rep.int(NA, i.length - mn)))
+                else return(c(x, rep.int(NA, i.length - x.length)))
             }
             i <- if(.isDense(i)) .M2v(i) else .M2V(i)
             return(.subscript.1ary(x, i))
@@ -491,15 +491,15 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              mn <- length(x)
+              x.length <- length(x)
               pattern <- .M.kind(x) == "n"
               switch(typeof(i),
                      double =
                          {
                              r <- min(1, i, na.rm = TRUE)
                              if(r <= -1) {
-                                 if(r <= -mn - 1)
-                                     i <- i[i > -mn - 1]
+                                 if(r <= -x.length - 1)
+                                     i <- i[i > -x.length - 1]
                                  r <- max(-1, i)
                                  if(is.na(r) || r >= 1)
                                      stop("only zeros may be mixed with negative subscripts")
@@ -518,8 +518,8 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                              } else {
                                  if(r < 1)
                                      i <- i[i >= 1]
-                                 if(max(0, i, na.rm = TRUE) >= mn + 1)
-                                     i[i >= mn + 1] <- NA
+                                 if(max(0, i, na.rm = TRUE) >= x.length + 1)
+                                     i[i >= x.length + 1] <- NA
                                  if((a <- anyNA(i)) && pattern) {
                                      x <- .V2kind(x, "l")
                                      pattern <- FALSE
@@ -543,8 +543,8 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                          {
                              r <- min(1L, i, na.rm = TRUE)
                              if(r <= -1L) {
-                                 if(r < -mn)
-                                     i <- i[i >= -mn]
+                                 if(r < -x.length)
+                                     i <- i[i >= -x.length]
                                  r <- max(-1L, i)
                                  if(is.na(r) || r >= 1L)
                                      stop("only zeros may be mixed with negative subscripts")
@@ -563,8 +563,8 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                              } else {
                                  if(r < 1L)
                                      i <- i[i >= 1L]
-                                 if(max(0L, i, na.rm = TRUE) > mn)
-                                     i[i > mn] <- NA
+                                 if(max(0L, i, na.rm = TRUE) > x.length)
+                                     i[i > x.length] <- NA
                                  if((a <- anyNA(i)) && pattern) {
                                      x <- .V2kind(x, "l")
                                      pattern <- FALSE
@@ -587,12 +587,12 @@ setMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
                      logical =
                          {
                              if((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
-                                 if(i.length > mn) {
+                                 if(i.length > x.length) {
                                      if(pattern)
                                          x <- .V2kind(x, "l")
                                      x@length <- i.length
-                                     x@i <- c(x@i, (mn + 1):i.length)
-                                     x@x <- c(x@x, rep.int(NA, i.length - mn))
+                                     x@i <- c(x@i, (x.length + 1):i.length)
+                                     x@x <- c(x@x, rep.int(NA, i.length - x.length))
                                  }
                                  x
                              } else x[.m2V(i)] # recursively
