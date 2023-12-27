@@ -200,10 +200,34 @@ setMethod("[<-", signature(x = "sparseVector", i = "index", j = "missing",
                                   "double" =,
                                   "complex" = .m2V(value),
                                   stop(.subassign.invalid(value), domain = NA))
+              n.x <- length(x)
+              n.value <- length(value)
+              k.x <- .M.kind(x)
+              k.value <- .M.kind(value)
+              pattern <- k.x == "n"
               switch(typeof(i),
-                     "logical" = {},
-                     "integer" = {},
-                     "double" = {},
+                     "logical" =
+                         {
+                             if((n.i <- length(i)) && !is.na(a <- all(i)) && a) {
+                                 if(n.i > n.x) {
+                                     if(pattern)
+                                         x <- .V2kind(x, "l")
+                                     x@length <- n.i
+                                     x@i <- c(x@i, (n.x + 1):n.i)
+                                     x@x <- c(x@x, rep.int(NA, n.i - n.x))
+                                 }
+                                 x[] <- value # recursively
+                             } else x[.m2V(i)] <- value # recursively
+                             x
+                         },
+                     "integer" =
+                         {
+
+                         },
+                     "double" =
+                         {
+
+                         },
                      stop(.subscript.invalid(value), domain = NA))
               k.x <- .M2kind(x)
               k.value <- .M2kind(value)
@@ -222,7 +246,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "nsparseVector", j = "missing
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, length(x), TRUE)] <- value
+              x[.subscript.recycle(i, length(x), TRUE)] <- value # recursively
               x
           })
 
@@ -233,7 +257,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "lsparseVector", j = "missing
                   stop("missing subassignment value")
               if(nargs() > 3L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, length(x), FALSE)] <- value
+              x[.subscript.recycle(i, length(x), FALSE)] <- value # recursively
               x
           })
 
