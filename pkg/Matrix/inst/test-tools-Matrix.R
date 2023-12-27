@@ -832,6 +832,6 @@ triuChk <- function(x, k) {
 trilChk <- function(x, k) {
     ans <- tril(x, k)
     ij <- non0.ij(ans)
-    stopifnot(identical(dim(x), dim(ans)), (ij %*% c(-1,1)) >= k)
+    stopifnot(identical(dim(x), dim(ans)), (ij %*% c(-1,1)) <= k)
     ans
 }
