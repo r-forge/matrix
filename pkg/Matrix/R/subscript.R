@@ -605,7 +605,7 @@ setMethod("[", signature(x = "sparseVector", i = "nsparseVector", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, length(x), TRUE)]
+              x[.subscript.recycle(i, length(x), TRUE)] # recursively
           })
 
 setMethod("[", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
@@ -613,7 +613,7 @@ setMethod("[", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
-              x[.subscript.recycle(i, length(x), FALSE)]
+              x[.subscript.recycle(i, length(x), FALSE)] # recursively
           })
 
 setMethod("[", signature(x = "sparseVector", i = "NULL", j = "ANY",

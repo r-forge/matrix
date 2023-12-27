@@ -820,7 +820,7 @@ checkQR.DS.both <- function(A, Qinv.chk, QtQ.chk=NA,
     invisible(list(qA=qA, qa=qa))
 }
 
-non0.ij <- function(M) Matrix:::non0.i(as(x, "sparseMatrix"))
+non0.ij <- function(M) Matrix:::non0.i(as(M, "sparseMatrix"))
 
 triuChk <- function(x, k) {
     ans <- triu(x, k)
