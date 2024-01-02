@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2023-12-04 r4527)}{
+\section{Changes in version 1.6-5 (2024-01-02 r4544)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -17,35 +17,24 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
-    }
-  }
-  \subsection{Misc}{
-    \itemize{
-      \item .
-    }
-  }
-}
+      \item \code{x[]} works for \code{x} inheriting from virtual class
+      \code{sparseVector}.
 
-\section{Changes in version 1.6-5 (2023-12-04 r4526)}{
-  \subsection{Significant User-Visible Changes}{
-    \itemize{
-      \item .
-    }
-  }
-  \subsection{New Features}{
-    \itemize{
-      \item .
-    }
-  }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item .
+      \item \code{length(x)} is always an integer for \code{x}
+      inheriting from virtual class \code{sparseVector}.  Truncation
+      did not occur for \code{x@length} of type \code{"double"}
+      equal to or greater than \code{.Machine[["integer.max"]] + 1}.
+
+      \item \code{tril(<n-by-n>, -n)} now works again.
+
+      \item \code{tri[ul](<indMatrix>, k)} now works correctly for
+      \code{k != 0}.
     }
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item \code{\%||\%} is defined in the \pkg{Matrix} namespace
+      only for \R{} versions less than 4.4.0.
     }
   }
 }
