@@ -14,7 +14,7 @@ if [ -f ${sstgz} ]; then
 	echo "Using existing ${sstgz}"
 else
 	echo "Downloading ${sstgz} from GitHub ..."
-	wget --no-check-certificate ${ssurl} -O ${sstgz} || exit 1
+	wget ${ssurl} -O ${sstgz} || exit 1
 	echo "done"
 fi
 echo "Extracting files under inst/doc and src ..."
@@ -116,7 +116,7 @@ for sslib in SuiteSparse_config CXSparse AMD COLAMD CAMD CCOLAMD CHOLMOD; do
 	fi
 done
 # patch -p0 < inst/scripts/wall.patch
-# echo "done"
+echo "done"
 inc=inst/include/Matrix
 h=cholmod.h
 echo "Copying ${h} into ${inc} ..."
