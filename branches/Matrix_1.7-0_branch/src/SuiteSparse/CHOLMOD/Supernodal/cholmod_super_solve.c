@@ -30,13 +30,6 @@
 #define COMPLEX
 #include "t_cholmod_super_solve_worker.c"
 
-#undef  DOUBLE
-#define SINGLE
-#define REAL
-#include "t_cholmod_super_solve_worker.c"
-#define COMPLEX
-#include "t_cholmod_super_solve_worker.c"
-
 //------------------------------------------------------------------------------
 // cholmod_super_lsolve: solve x=L\b
 //------------------------------------------------------------------------------
@@ -114,11 +107,11 @@ int CHOLMOD(super_lsolve)   // TRUE if OK, FALSE if BLAS overflow occured
     switch ((L->xtype + L->dtype) % 8)
     {
         case CHOLMOD_REAL    + CHOLMOD_SINGLE:
-            rs_cholmod_super_lsolve_worker (L, X, E, Common) ;
+            return FALSE ;
             break ;
 
         case CHOLMOD_COMPLEX + CHOLMOD_SINGLE:
-            cs_cholmod_super_lsolve_worker (L, X, E, Common) ;
+            return FALSE ;
             break ;
 
         case CHOLMOD_REAL    + CHOLMOD_DOUBLE:
@@ -215,11 +208,11 @@ int CHOLMOD(super_ltsolve)  // TRUE if OK, FALSE if BLAS overflow occured
     switch ((L->xtype + L->dtype) % 8)
     {
         case CHOLMOD_REAL    + CHOLMOD_SINGLE:
-            rs_cholmod_super_ltsolve_worker (L, X, E, Common) ;
+            return FALSE ;
             break ;
 
         case CHOLMOD_COMPLEX + CHOLMOD_SINGLE:
-            cs_cholmod_super_ltsolve_worker (L, X, E, Common) ;
+            return FALSE ;
             break ;
 
         case CHOLMOD_REAL    + CHOLMOD_DOUBLE:
