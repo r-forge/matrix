@@ -82,15 +82,6 @@
 #define ZOMPLEX
 #include "t_cholmod_super_numeric_worker.c"
 
-#undef  DOUBLE
-#define SINGLE
-#define REAL
-#include "t_cholmod_super_numeric_worker.c"
-#define COMPLEX
-#include "t_cholmod_super_numeric_worker.c"
-#define ZOMPLEX
-#include "t_cholmod_super_numeric_worker.c"
-
 //------------------------------------------------------------------------------
 // cholmod_super_numeric
 //------------------------------------------------------------------------------
@@ -297,16 +288,16 @@ int CHOLMOD(super_numeric)
     switch ((A->xtype + A->dtype) % 8)
     {
         case CHOLMOD_REAL    + CHOLMOD_SINGLE:
-            ok = rs_cholmod_super_numeric_worker (A, F, s_beta, L, C, Common) ;
+            ok = FALSE ;
             break ;
 
         case CHOLMOD_COMPLEX + CHOLMOD_SINGLE:
-            ok = cs_cholmod_super_numeric_worker (A, F, s_beta, L, C, Common) ;
+            ok = FALSE ;
             break ;
 
         case CHOLMOD_ZOMPLEX + CHOLMOD_SINGLE:
             // A is zomplex, but L is complex
-            ok = zs_cholmod_super_numeric_worker (A, F, s_beta, L, C, Common) ;
+            ok = FALSE ;
             break ;
 
         case CHOLMOD_REAL    + CHOLMOD_DOUBLE:
