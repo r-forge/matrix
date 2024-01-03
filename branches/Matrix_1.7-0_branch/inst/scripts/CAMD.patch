@@ -1,7 +1,7 @@
 diff -ruN src/SuiteSparse/CAMD/Makefile src/SuiteSparse-patched/CAMD/Makefile
 --- src/SuiteSparse/CAMD/Makefile	1969-12-31 19:00:00
-+++ src/SuiteSparse-patched/CAMD/Makefile	2023-11-03 13:50:03
-@@ -0,0 +1,29 @@
++++ src/SuiteSparse-patched/CAMD/Makefile	2024-01-02 17:08:10
+@@ -0,0 +1,30 @@
 +sources = \
 +	Source/camd_1.c          Source/camd_l1.c \
 +	Source/camd_2.c          Source/camd_l2.c \
@@ -13,7 +13,8 @@ diff -ruN src/SuiteSparse/CAMD/Makefile src/SuiteSparse-patched/CAMD/Makefile
 +	Source/camd_order.c      Source/camd_l_order.c \
 +	Source/camd_postorder.c  Source/camd_l_postorder.c \
 +	Source/camd_preprocess.c Source/camd_l_preprocess.c \
-+	Source/camd_valid.c      Source/camd_l_valid.c
++	Source/camd_valid.c      Source/camd_l_valid.c \
++	Source/camd_version.c
 +objects = $(sources:.c=.o)
 +archive = CAMD.a
 +

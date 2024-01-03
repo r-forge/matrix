@@ -48,6 +48,7 @@ int METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
   graph_t *graph=NULL;
   ctrl_t *ctrl;
   idx_t *cptr, *cind, *piperm;
+  int numflag = 0;
 
   /* set up malloc cleaning code and signal catchers */
   if (!gk_malloc_init()) 
@@ -182,9 +183,11 @@ SIGTHROW:
 void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
          idx_t lastvtx)
 {
-  idx_t i, nbnd;
+  idx_t i, j, nvtxs, nbnd;
   idx_t *label, *bndind;
   graph_t *lgraph, *rgraph;
+
+  nvtxs = graph->nvtxs;
 
   MlevelNodeBisectionMultiple(ctrl, graph);
 
@@ -233,7 +236,7 @@ void MlevelNestedDissection(ctrl_t *ctrl, graph_t *graph, idx_t *order,
 void MlevelNestedDissectionCC(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
          idx_t lastvtx)
 {
-  idx_t i, nvtxs, nbnd, ncmps, rnvtxs, snvtxs;
+  idx_t i, j, nvtxs, nbnd, ncmps, rnvtxs, snvtxs;
   idx_t *label, *bndind;
   idx_t *cptr, *cind;
   graph_t **sgraphs;
@@ -420,7 +423,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
          graph_t **r_rgraph)
 {
   idx_t i, ii, j, k, l, istart, iend, mypart, nvtxs, snvtxs[3], snedges[3];
-  idx_t *xadj, *vwgt, *adjncy, *label, *where, *bndptr, *bndind;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *label, *where, *bndptr, *bndind;
   idx_t *sxadj[2], *svwgt[2], *sadjncy[2], *sadjwgt[2], *slabel[2];
   idx_t *rename;
   idx_t *auxadjncy;
@@ -434,6 +437,7 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
   xadj    = graph->xadj;
   vwgt    = graph->vwgt;
   adjncy  = graph->adjncy;
+  adjwgt  = graph->adjwgt;
   label   = graph->label;
   where   = graph->where;
   bndptr  = graph->bndptr;
@@ -548,8 +552,8 @@ void SplitGraphOrder(ctrl_t *ctrl, graph_t *graph, graph_t **r_lgraph,
 graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps, 
               idx_t *cptr, idx_t *cind)
 {
-  idx_t i, ii, iii, j, k, l, istart, iend, nvtxs, snvtxs, snedges;
-  idx_t *xadj, *vwgt, *adjncy, *label, *where, *bndptr, *bndind;
+  idx_t i, ii, iii, j, k, l, istart, iend, mypart, nvtxs, snvtxs, snedges;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *label, *where, *bndptr, *bndind;
   idx_t *sxadj, *svwgt, *sadjncy, *sadjwgt, *slabel;
   idx_t *rename;
   idx_t *auxadjncy;
@@ -563,6 +567,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
   xadj    = graph->xadj;
   vwgt    = graph->vwgt;
   adjncy  = graph->adjncy;
+  adjwgt  = graph->adjwgt;
   label   = graph->label;
   where   = graph->where;
   bndptr  = graph->bndptr;
@@ -649,7 +654,7 @@ graph_t **SplitGraphOrderCC(ctrl_t *ctrl, graph_t *graph, idx_t ncmps,
 /*************************************************************************/
 void MMDOrder(ctrl_t *ctrl, graph_t *graph, idx_t *order, idx_t lastvtx)
 {
-  idx_t i, k, nvtxs, nofsub, firstvtx;
+  idx_t i, j, k, nvtxs, nofsub, firstvtx;
   idx_t *xadj, *adjncy, *label;
   idx_t *perm, *iperm, *head, *qsize, *list, *marker;
 

@@ -17,7 +17,8 @@
 graph_t *SetupGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t ncon, idx_t *xadj, 
              idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt) 
 {
-  idx_t i, j;
+  idx_t i, j, k, sum;
+  real_t *nvwgt;
   graph_t *graph;
 
   /* allocate the graph and fill in the fields */

@@ -9,7 +9,8 @@ sources = \
 	Source/camd_order.c      Source/camd_l_order.c \
 	Source/camd_postorder.c  Source/camd_l_postorder.c \
 	Source/camd_preprocess.c Source/camd_l_preprocess.c \
-	Source/camd_valid.c      Source/camd_l_valid.c
+	Source/camd_valid.c      Source/camd_l_valid.c \
+	Source/camd_version.c
 objects = $(sources:.c=.o)
 archive = CAMD.a
 

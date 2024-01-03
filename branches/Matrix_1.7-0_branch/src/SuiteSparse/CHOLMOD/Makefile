@@ -14,21 +14,21 @@ sources = \
 	Cholesky/cholmod_rowfac.c       Cholesky/cholmod_l_rowfac.c \
 	Cholesky/cholmod_solve.c        Cholesky/cholmod_l_solve.c \
 	Cholesky/cholmod_spsolve.c      Cholesky/cholmod_l_spsolve.c \
-	Core/cholmod_aat.c           Core/cholmod_l_aat.c \
-	Core/cholmod_add.c           Core/cholmod_l_add.c \
-	Core/cholmod_band.c          Core/cholmod_l_band.c \
-	Core/cholmod_change_factor.c Core/cholmod_l_change_factor.c \
-	Core/cholmod_common.c        Core/cholmod_l_common.c \
-	Core/cholmod_complex.c       Core/cholmod_l_complex.c \
-	Core/cholmod_copy.c          Core/cholmod_l_copy.c \
-	Core/cholmod_dense.c         Core/cholmod_l_dense.c \
-	Core/cholmod_error.c         Core/cholmod_l_error.c \
-	Core/cholmod_factor.c        Core/cholmod_l_factor.c \
-	Core/cholmod_memory.c        Core/cholmod_l_memory.c \
-	Core/cholmod_sparse.c        Core/cholmod_l_sparse.c \
-	Core/cholmod_transpose.c     Core/cholmod_l_transpose.c \
-	Core/cholmod_triplet.c       Core/cholmod_l_triplet.c \
-	Core/cholmod_version.c       Core/cholmod_l_version.c \
+	Utility/cholmod_aat.c           Utility/cholmod_l_aat.c \
+	Utility/cholmod_add.c           Utility/cholmod_l_add.c \
+	Utility/cholmod_band.c          Utility/cholmod_l_band.c \
+	Utility/cholmod_change_factor.c Utility/cholmod_l_change_factor.c \
+	Utility/cholmod_common.c        Utility/cholmod_l_common.c \
+	Utility/cholmod_complex.c       Utility/cholmod_l_complex.c \
+	Utility/cholmod_copy.c          Utility/cholmod_l_copy.c \
+	Utility/cholmod_dense.c         Utility/cholmod_l_dense.c \
+	Utility/cholmod_error.c         Utility/cholmod_l_error.c \
+	Utility/cholmod_factor.c        Utility/cholmod_l_factor.c \
+	Utility/cholmod_memory.c        Utility/cholmod_l_memory.c \
+	Utility/cholmod_sparse.c        Utility/cholmod_l_sparse.c \
+	Utility/cholmod_transpose.c     Utility/cholmod_l_transpose.c \
+	Utility/cholmod_triplet.c       Utility/cholmod_l_triplet.c \
+	Utility/cholmod_version.c       Utility/cholmod_l_version.c \
 	MatrixOps/cholmod_drop.c      MatrixOps/cholmod_l_drop.c \
 	MatrixOps/cholmod_horzcat.c   MatrixOps/cholmod_l_horzcat.c \
 	MatrixOps/cholmod_norm.c      MatrixOps/cholmod_l_norm.c \
