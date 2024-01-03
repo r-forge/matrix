@@ -10,7 +10,8 @@ sources = \
 	Source/amd_post_tree.c  Source/amd_l_post_tree.c \
 	Source/amd_postorder.c  Source/amd_l_postorder.c \
 	Source/amd_preprocess.c Source/amd_l_preprocess.c \
-	Source/amd_valid.c      Source/amd_l_valid.c
+	Source/amd_valid.c      Source/amd_l_valid.c \
+	Source/amd_version.c
 objects = $(sources:.c=.o)
 archive = AMD.a
 

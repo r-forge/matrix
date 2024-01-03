@@ -50,7 +50,8 @@ sources = \
 	Source/cs_updown.c    Source/cs_dl_updown.c    Source/cs_ci_updown.c    Source/cs_cl_updown.c \
 	Source/cs_usolve.c    Source/cs_dl_usolve.c    Source/cs_ci_usolve.c    Source/cs_cl_usolve.c \
 	Source/cs_util.c      Source/cs_dl_util.c      Source/cs_ci_util.c      Source/cs_cl_util.c \
-	Source/cs_utsolve.c   Source/cs_dl_utsolve.c   Source/cs_ci_utsolve.c   Source/cs_cl_utsolve.c
+	Source/cs_utsolve.c   Source/cs_dl_utsolve.c   Source/cs_ci_utsolve.c   Source/cs_cl_utsolve.c \
+	Source/cxsparse_version.c
 objects = $(sources:.c=.o)
 archive = CXSparse.a
 

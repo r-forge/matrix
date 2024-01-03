@@ -1,4 +1,4 @@
-sources = Source/colamd.c Source/colamd_l.c
+sources = Source/colamd.c Source/colamd_l.c Source/colamd_version.c
 objects = $(sources:.c=.o)
 archive = COLAMD.a
 

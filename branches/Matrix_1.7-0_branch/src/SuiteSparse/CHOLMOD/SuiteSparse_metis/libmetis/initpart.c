@@ -114,15 +114,18 @@ void InitSeparator(ctrl_t *ctrl, graph_t *graph, idx_t niparts)
 void RandomBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
          idx_t niparts)
 {
-  idx_t i, ii, nvtxs, pwgts[2], zeromaxpwgt, 
-        bestcut=0, inbfs;
-  idx_t *vwgt, *where;
+  idx_t i, ii, j, k, nvtxs, pwgts[2], zeromaxpwgt, from, me, 
+        bestcut=0, icut, mincut, inbfs;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *where;
   idx_t *perm, *bestwhere;
 
   WCOREPUSH;
 
   nvtxs  = graph->nvtxs;
+  xadj   = graph->xadj;
   vwgt   = graph->vwgt;
+  adjncy = graph->adjncy;
+  adjwgt = graph->adjwgt;
 
   Allocate2WayPartitionMemory(ctrl, graph);
   where = graph->where;
@@ -188,9 +191,9 @@ void GrowBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
 {
   idx_t i, j, k, nvtxs, drain, nleft, first, last, 
         pwgts[2], oneminpwgt, onemaxpwgt, 
-        bestcut=0, inbfs;
-  idx_t *xadj, *vwgt, *adjncy, *where;
-  idx_t *queue, *touched, *bestwhere;
+        from, me, bestcut=0, icut, mincut, inbfs;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *where;
+  idx_t *queue, *touched, *gain, *bestwhere;
 
   WCOREPUSH;
 
@@ -198,6 +201,7 @@ void GrowBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
   xadj   = graph->xadj;
   vwgt   = graph->vwgt;
   adjncy = graph->adjncy;
+  adjwgt = graph->adjwgt;
 
   Allocate2WayPartitionMemory(ctrl, graph);
   where = graph->where;
@@ -321,7 +325,7 @@ void GrowBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
 void McRandomBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
          idx_t niparts)
 {
-  idx_t i, ii, nvtxs, ncon, bestcut=0, inbfs, qnum;
+  idx_t i, ii, j, k, nvtxs, ncon, from, bestcut=0, mincut, inbfs, qnum;
   idx_t *bestwhere, *where, *perm, *counts;
   idx_t *vwgt;
 
@@ -381,7 +385,7 @@ void McRandomBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
 void McGrowBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
          idx_t niparts)
 {
-  idx_t nvtxs, bestcut=0, inbfs;
+  idx_t i, j, k, nvtxs, ncon, from, bestcut=0, mincut, inbfs;
   idx_t *bestwhere, *where;
 
   WCOREPUSH;
@@ -430,9 +434,9 @@ void GrowBisectionNode(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
          idx_t niparts)
 {
   idx_t i, j, k, nvtxs, drain, nleft, first, last, pwgts[2], oneminpwgt, 
-        onemaxpwgt, bestcut=0, inbfs;
-  idx_t *xadj, *vwgt, *adjncy, *where, *bndind;
-  idx_t *queue, *touched, *bestwhere;
+        onemaxpwgt, from, me, bestcut=0, icut, mincut, inbfs;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *where, *bndind;
+  idx_t *queue, *touched, *gain, *bestwhere;
 
   WCOREPUSH;
 
@@ -440,6 +444,7 @@ void GrowBisectionNode(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
   xadj   = graph->xadj;
   vwgt   = graph->vwgt;
   adjncy = graph->adjncy;
+  adjwgt = graph->adjwgt;
 
   bestwhere = iwspacemalloc(ctrl, nvtxs);
   queue     = iwspacemalloc(ctrl, nvtxs);
@@ -565,7 +570,7 @@ void GrowBisectionNode(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts,
 void GrowBisectionNode2(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
          idx_t niparts)
 {
-  idx_t i, j, nvtxs, bestcut=0, inbfs;
+  idx_t i, j, k, nvtxs, bestcut=0, mincut, inbfs;
   idx_t *xadj, *where, *bndind, *bestwhere;
 
   WCOREPUSH;

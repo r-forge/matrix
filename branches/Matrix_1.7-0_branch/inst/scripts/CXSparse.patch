@@ -1,7 +1,7 @@
 diff -ruN src/SuiteSparse/CXSparse/Makefile src/SuiteSparse-patched/CXSparse/Makefile
 --- src/SuiteSparse/CXSparse/Makefile	1969-12-31 19:00:00
-+++ src/SuiteSparse-patched/CXSparse/Makefile	2023-11-03 13:50:01
-@@ -0,0 +1,70 @@
++++ src/SuiteSparse-patched/CXSparse/Makefile	2024-01-02 17:19:45
+@@ -0,0 +1,71 @@
 +sources = \
 +	Source/cs_add.c       Source/cs_dl_add.c       Source/cs_ci_add.c       Source/cs_cl_add.c \
 +	Source/cs_amd.c       Source/cs_dl_amd.c       Source/cs_ci_amd.c       Source/cs_cl_amd.c \
@@ -54,7 +54,8 @@ diff -ruN src/SuiteSparse/CXSparse/Makefile src/SuiteSparse-patched/CXSparse/Mak
 +	Source/cs_updown.c    Source/cs_dl_updown.c    Source/cs_ci_updown.c    Source/cs_cl_updown.c \
 +	Source/cs_usolve.c    Source/cs_dl_usolve.c    Source/cs_ci_usolve.c    Source/cs_cl_usolve.c \
 +	Source/cs_util.c      Source/cs_dl_util.c      Source/cs_ci_util.c      Source/cs_cl_util.c \
-+	Source/cs_utsolve.c   Source/cs_dl_utsolve.c   Source/cs_ci_utsolve.c   Source/cs_cl_utsolve.c
++	Source/cs_utsolve.c   Source/cs_dl_utsolve.c   Source/cs_ci_utsolve.c   Source/cs_cl_utsolve.c \
++	Source/cxsparse_version.c
 +objects = $(sources:.c=.o)
 +archive = CXSparse.a
 +
@@ -73,8 +74,8 @@ diff -ruN src/SuiteSparse/CXSparse/Makefile src/SuiteSparse-patched/CXSparse/Mak
 +clean :
 +	@rm -f $(objects) $(archive)
 diff -ruN src/SuiteSparse/CXSparse/Source/cs_multiply.c src/SuiteSparse-patched/CXSparse/Source/cs_multiply.c
---- src/SuiteSparse/CXSparse/Source/cs_multiply.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CXSparse/Source/cs_multiply.c	2023-11-03 13:50:01
+--- src/SuiteSparse/CXSparse/Source/cs_multiply.c	2024-01-02 16:25:19
++++ src/SuiteSparse-patched/CXSparse/Source/cs_multiply.c	2024-01-02 17:11:13
 @@ -20,7 +20,8 @@
      Cp = C->p ;
      for (j = 0 ; j < n ; j++)
@@ -86,8 +87,8 @@ diff -ruN src/SuiteSparse/CXSparse/Source/cs_multiply.c src/SuiteSparse-patched/
              return (cs_done (C, w, x, 0)) ;             /* out of memory */
          } 
 diff -ruN src/SuiteSparse/CXSparse/Source/cs_print.c src/SuiteSparse-patched/CXSparse/Source/cs_print.c
---- src/SuiteSparse/CXSparse/Source/cs_print.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CXSparse/Source/cs_print.c	2023-11-03 13:50:01
+--- src/SuiteSparse/CXSparse/Source/cs_print.c	2024-01-02 16:25:19
++++ src/SuiteSparse-patched/CXSparse/Source/cs_print.c	2024-01-02 17:11:13
 @@ -2,52 +2,54 @@
  // CXSparse, Copyright (c) 2006-2022, Timothy A. Davis. All Rights Reserved.
  // SPDX-License-Identifier: LGPL-2.1+
@@ -157,8 +158,8 @@ diff -ruN src/SuiteSparse/CXSparse/Source/cs_print.c src/SuiteSparse-patched/CXS
      }
      return (1) ;
 diff -ruN src/SuiteSparse/CXSparse/Source/cs_randperm.c src/SuiteSparse-patched/CXSparse/Source/cs_randperm.c
---- src/SuiteSparse/CXSparse/Source/cs_randperm.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CXSparse/Source/cs_randperm.c	2023-11-03 13:50:01
+--- src/SuiteSparse/CXSparse/Source/cs_randperm.c	2024-01-02 16:25:19
++++ src/SuiteSparse-patched/CXSparse/Source/cs_randperm.c	2024-01-02 17:11:13
 @@ -2,6 +2,8 @@
  // CXSparse, Copyright (c) 2006-2022, Timothy A. Davis. All Rights Reserved.
  // SPDX-License-Identifier: LGPL-2.1+

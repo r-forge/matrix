@@ -6,7 +6,7 @@ if [ ! -f DESCRIPTION -o -z "$(grep "^Package: ${pkg}$" DESCRIPTION)" ]; then
 	exit 1
 fi
 ssdir=SuiteSparse
-ssver=7.2.2
+ssver=7.4.0
 sspfx=${ssdir}-${ssver}
 sstgz=${sspfx}.tar.gz
 ssurl=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${ssver}.tar.gz
@@ -14,7 +14,7 @@ if [ -f ${sstgz} ]; then
 	echo "Using existing ${sstgz}"
 else
 	echo "Downloading ${sstgz} from GitHub ..."
-	wget ${ssurl} -O ${sstgz} || exit 1
+	wget --no-check-certificate ${ssurl} -O ${sstgz} || exit 1
 	echo "done"
 fi
 echo "Extracting files under inst/doc and src ..."
@@ -89,14 +89,14 @@ tar -zxvf ${sstgz} -C inst/doc \
 	${sspfx}/${sslib}/README.txt \
 	${sspfx}/${sslib}/Doc/ChangeLog \
 	${sspfx}/${sslib}/Doc/License.txt \
-	${sspfx}/${sslib}/SuiteSparse_metis/Changelog.txt \
+	${sspfx}/${sslib}/SuiteSparse_metis/Changelog \
 	${sspfx}/${sslib}/SuiteSparse_metis/LICENSE.txt \
 	${sspfx}/${sslib}/SuiteSparse_metis/README.txt
 tar -zxvf ${sstgz} -C src \
 	${sspfx}/${sslib}/Include/*.h \
 	${sspfx}/${sslib}/Check/*.[ch] \
 	${sspfx}/${sslib}/Cholesky/*.[ch] \
-	${sspfx}/${sslib}/Core/*.[ch] \
+	${sspfx}/${sslib}/Utility/*.[ch] \
 	${sspfx}/${sslib}/MatrixOps/*.[ch] \
 	${sspfx}/${sslib}/Modify/*.[ch] \
 	${sspfx}/${sslib}/Partition/*.[ch] \
@@ -115,8 +115,8 @@ for sslib in SuiteSparse_config CXSparse AMD COLAMD CAMD CCOLAMD CHOLMOD; do
 		patch -p0 < inst/scripts/${sslib}.patch
 	fi
 done
-patch -p0 < inst/scripts/wall.patch
-echo "done"
+# patch -p0 < inst/scripts/wall.patch
+# echo "done"
 inc=inst/include/Matrix
 h=cholmod.h
 echo "Copying ${h} into ${inc} ..."

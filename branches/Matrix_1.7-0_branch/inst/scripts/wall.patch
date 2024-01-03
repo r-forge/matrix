@@ -341,9 +341,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve.c src/SuiteSparse-pat
      kkiters = Yseti ? ysetlen : n ;
      for (kk = 0 ; kk < kkiters ; kk++)
      {
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_change_factor.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_change_factor.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_change_factor.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_change_factor.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_change_factor.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_change_factor.c	2023-11-03 18:58:08
 @@ -259,13 +259,18 @@
      cholmod_common *Common
  )
@@ -407,9 +407,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_change_factor.c src/SuiteSparse-p
      Super = L->super ;
  
      /* Int overflow cannot occur since supernodal L already exists */
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_copy.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_copy.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_copy.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_copy.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_copy.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_copy.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_copy.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_copy.c	2023-11-03 18:58:08
 @@ -271,7 +271,7 @@
  )
  {
@@ -428,9 +428,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_copy.c src/SuiteSparse-patched/CH
  
      /* ---------------------------------------------------------------------- */
      /* copy the matrix */
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_dense.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_dense.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_dense.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_dense.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_dense.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_dense.c	2023-11-03 18:58:08
 @@ -297,8 +297,8 @@
  )
  {
@@ -452,9 +452,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_dense.c src/SuiteSparse-patched/C
  
      n = MIN (nrow, ncol) ;
  
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_memory.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_memory.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_memory.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_memory.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_memory.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_memory.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_memory.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_memory.c	2023-11-03 18:58:08
 @@ -118,7 +118,6 @@
  )
  {
@@ -471,9 +471,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_memory.c src/SuiteSparse-patched/
      int ok = TRUE ;
  
      RETURN_IF_NULL_COMMON (NULL) ;
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_sparse.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_sparse.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_sparse.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_sparse.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_sparse.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_sparse.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_sparse.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_sparse.c	2023-11-03 18:58:08
 @@ -483,7 +483,7 @@
      double *Ax, *Cx, *Az, *Cz ;
      Int *Ap, *Ai, *Anz, *Cp, *Ci, *Cnz ;
@@ -491,9 +491,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_sparse.c src/SuiteSparse-patched/
      packed = A->packed ;
      Ap = A->p ;
      Ai = A->i ;
-diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Core/cholmod_triplet.c
---- src/SuiteSparse/CHOLMOD/Core/cholmod_triplet.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/cholmod_triplet.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_triplet.c
+--- src/SuiteSparse/CHOLMOD/Utility/cholmod_triplet.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_triplet.c	2023-11-03 18:58:08
 @@ -338,8 +338,8 @@
  )
  {
@@ -527,9 +527,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/cholmod_triplet.c src/SuiteSparse-patched
      }
  
      CHOLMOD(free_sparse) (&R, Common) ;
-diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_change_factor.c
---- src/SuiteSparse/CHOLMOD/Core/t_cholmod_change_factor.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_change_factor.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c	2023-11-03 18:58:08
 @@ -35,7 +35,10 @@
  )
  {
@@ -552,9 +552,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_change_factor.c src/SuiteSparse
      Lnz = L->nz ;
  
      if (make_ll)
-diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_dense.c
---- src/SuiteSparse/CHOLMOD/Core/t_cholmod_dense.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_dense.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense.c	2023-11-03 18:58:08
 @@ -25,7 +25,13 @@
      cholmod_common *Common
  )
@@ -651,9 +651,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_dense.c src/SuiteSparse-patched
      dx = X->d ;
      dy = Y->d ;
      nrow = X->nrow ;
-diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_transpose.c src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_transpose.c
---- src/SuiteSparse/CHOLMOD/Core/t_cholmod_transpose.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_transpose.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose.c	2023-11-03 18:58:08
 @@ -40,9 +40,18 @@
      cholmod_common *Common
  )
@@ -755,9 +755,9 @@ diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_transpose.c src/SuiteSparse-pat
  
      /* ---------------------------------------------------------------------- */
      /* get workspace */
-diff -ruN src/SuiteSparse/CHOLMOD/Core/t_cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_triplet.c
---- src/SuiteSparse/CHOLMOD/Core/t_cholmod_triplet.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Core/t_cholmod_triplet.c	2023-11-03 18:58:08
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet.c	2023-10-16 14:57:34
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet.c	2023-11-03 18:58:08
 @@ -26,7 +26,12 @@
      cholmod_common *Common
  )
