@@ -4,17 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-5 (2024-01-02 r4544)}{
-  \subsection{Significant User-Visible Changes}{
-    \itemize{
-      \item .
-    }
-  }
-  \subsection{New Features}{
-    \itemize{
-      \item .
-    }
-  }
+\section{Changes in version 1.6-5 (2024-01-03 r4545)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{x[]} works for \code{x} inheriting from virtual class
