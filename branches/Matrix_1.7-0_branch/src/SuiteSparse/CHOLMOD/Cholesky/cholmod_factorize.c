@@ -104,7 +104,7 @@ int CHOLMOD(factorize_p)
 {
 
     cholmod_sparse *S, *F, *A1, *A2 ;
-    Int nrow, ncol, stype, convert, n, grow2, status ;
+    Int nrow, ncol, stype, convert, grow2, status ;
     int ok = TRUE ;
 
     //--------------------------------------------------------------------------
@@ -118,7 +118,6 @@ int CHOLMOD(factorize_p)
     RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_ZOMPLEX, FALSE) ;
     nrow = A->nrow ;
     ncol = A->ncol ;
-    n = L->n ;
     stype = A->stype ;
     if (L->n != A->nrow)
     {

@@ -1545,7 +1545,9 @@ int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
     Int *dead_cols ;
     Int set1 ;
     Int set2 ;
+#ifndef NDEBUG
     Int cs ;
+#endif
 
     int ok ;
 
@@ -1894,7 +1896,9 @@ int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
             p [k] = col ;
             ASSERT (A [col] == EMPTY) ;
 
+#ifndef NDEBUG
 	    cs = CMEMBER (col) ;
+#endif
             ASSERT (k >= cset_start [cs] && k < cset_start [cs+1]) ;
 
             A [col] = k ;
@@ -1911,8 +1915,8 @@ int CCOLAMD_2	    /* returns TRUE if successful, FALSE otherwise */
             if (A [col] == EMPTY)
             {
                 k = Col [col].shared2.order ;
-		cs = CMEMBER (col) ;
 #ifndef NDEBUG
+		cs = CMEMBER (col) ;
                 dead_cols [cs]-- ;
 #endif
                 ASSERT (k >= cset_start [cs] && k < cset_start [cs+1]) ;

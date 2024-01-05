@@ -122,7 +122,6 @@ int CHOLMOD(rowdel_mark)
     RETURN_IF_NULL_COMMON (FALSE) ;
     RETURN_IF_NULL (L, FALSE) ;
     RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_REAL, FALSE) ;
-    Int n = L->n ;
     Int k = kdel ;
     if (kdel >= L->n || k < 0)
     {

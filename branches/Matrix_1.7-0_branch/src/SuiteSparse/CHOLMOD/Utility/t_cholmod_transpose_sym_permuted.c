@@ -44,8 +44,9 @@
             #endif
             {
                 // C(jnew,inew) = conj (A(iold,jold))
-                Int pc = Wi [inew]++ ;
+                Wi [inew]++ ;
                 #ifdef NUMERIC
+                Int pc = Wi [inew] ;
                 ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, pa) ;
                 Ci [pc] = jnew ;
                 #endif
@@ -53,8 +54,9 @@
             else
             {
                 // C(inew,jnew) = A(iold,jold)
-                Int pc = Wi [jnew]++ ;
+                Wi [jnew]++ ;
                 #ifdef NUMERIC
+                Int pc = Wi [jnew] ;
                 ASSIGN (Cx, Cz, pc, Ax, Az, pa) ;
                 Ci [pc] = inew ;
                 #endif

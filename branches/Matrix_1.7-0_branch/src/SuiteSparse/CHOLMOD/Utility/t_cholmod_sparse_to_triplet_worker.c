@@ -21,19 +21,26 @@ static void TEMPLATE (cholmod_sparse_to_triplet_worker)
     // get inputs
     //--------------------------------------------------------------------------
 
-    Int nrow = A->nrow ;
     Int ncol = A->ncol ;
     bool packed = (bool) A->packed ;
     Int  *Ap = (Int  *) A->p ;
     Int  *Ai = (Int  *) A->i ;
+#ifndef PATTERN
     Real *Ax = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az = (Real *) A->z ;
+#endif
+#endif
     Int *Anz = (Int  *) A->nz ;
 
     Int  *Ti = (Int  *) T->i ;
     Int  *Tj = (Int  *) T->j ;
+#ifndef PATTERN
     Real *Tx = (Real *) T->x ;
+#ifdef ZOMPLEX
     Real *Tz = (Real *) T->z ;
+#endif
+#endif
 
     Int k = 0 ;
 

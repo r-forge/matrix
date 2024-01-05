@@ -25,13 +25,21 @@ static size_t TEMPLATE (cholmod_triplet_to_sparse_worker)   // return nnz(R)
     Int  *Rp  = (Int  *) R->p ;
     Int  *Ri  = (Int  *) R->i ;
     Int  *Rnz = (Int  *) R->nz ;
+#ifndef PATTERN
     Real *Rx  = (Real *) R->x ;
+#ifdef ZOMPLEX
     Real *Rz  = (Real *) R->z ;
+#endif
+#endif
 
     Int  *Ti = (Int *) T->i ;
     Int  *Tj = (Int *) T->j ;
+#ifndef PATTERN
     Real *Tx = (Real *) T->x ;
+#ifdef ZOMPLEX
     Real *Tz = (Real *) T->z ;
+#endif
+#endif
     size_t nrow = T->nrow ;
     size_t ncol = T->ncol ;
     Int nz = T->nnz ;

@@ -118,12 +118,6 @@ cholmod_sparse *CHOLMOD(add)    // return C = alpha*A + beta*B
     // get the sizes of the entries of C, A, and B
     //--------------------------------------------------------------------------
 
-    size_t ei = sizeof (Int) ;
-    size_t e = (dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
-    size_t ex = e * ((xtype == CHOLMOD_PATTERN) ? 0 :
-                    ((xtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
-    size_t ez = e * ((xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
-
     //--------------------------------------------------------------------------
     // convert/sort A and/or B, if needed
     //--------------------------------------------------------------------------

@@ -214,7 +214,7 @@ int CHOLMOD(factor_xtype)
     int output_dtype = to_xdtype & 4 ;  // double or single
 
     if (output_xtype <= CHOLMOD_PATTERN ||
-        L->is_super && output_xtype == CHOLMOD_ZOMPLEX)
+        (L->is_super && output_xtype == CHOLMOD_ZOMPLEX))
     {
         // output_xtype not supported
         ERROR (CHOLMOD_INVALID, "invalid xtype") ;

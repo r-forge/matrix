@@ -29,14 +29,22 @@ static void TEMPLATE (cholmod_submatrix_worker)
     Int *Ap = A->p ;
     Int *Ai = A->i ;
     Int *Anz = A->nz ;
+#ifndef PATTERN
     Real *Ax = A->x ;
+#ifdef ZOMPLEX
     Real *Az = A->z ;
+#endif
+#endif
     bool packed = A->packed ;
 
     Int *Cp = C->p ;
     Int *Ci = C->i ;
+#ifndef PATTERN
     Real *Cx = C->x ;
+#ifdef ZOMPLEX
     Real *Cz = C->z ;
+#endif
+#endif
     Int cncol = C->ncol ;
 
     //--------------------------------------------------------------------------

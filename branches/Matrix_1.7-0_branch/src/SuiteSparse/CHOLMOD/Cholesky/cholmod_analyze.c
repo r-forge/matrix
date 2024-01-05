@@ -399,7 +399,7 @@ cholmod_factor *CHOLMOD(analyze_p2)
     Int *First, *Level, *Work4n, *Cmember, *CParent, *ColCount, *Lperm, *Parent,
         *Post, *Perm, *Lparent, *Lcolcount ;
     cholmod_factor *L ;
-    Int k, n, method, nmethods, status, default_strategy, ncol,
+    Int k, n, method, nmethods, status, default_strategy,
         skip_analysis, skip_best ;
     Int amd_backup ;
     int ok = TRUE ;
@@ -421,7 +421,6 @@ cholmod_factor *CHOLMOD(analyze_p2)
     //--------------------------------------------------------------------------
 
     n = A->nrow ;
-    ncol = A->ncol ;
 
     //--------------------------------------------------------------------------
     // set the default strategy

@@ -216,7 +216,6 @@ static int check_common
     //--------------------------------------------------------------------------
 
     RETURN_IF_NULL_COMMON (FALSE) ;
-    int init_print = print ;
 
     P2 ("%s", "\n") ;
 
@@ -965,7 +964,7 @@ static int check_dense
 )
 {
     void *Xx, *Xz ;
-    Int i, j, d, nrow, ncol, nzmax, nz, init_print, count ;
+    Int i, j, d, nrow, ncol, nzmax, init_print, count ;
     const char *type = "dense" ;
 
     //--------------------------------------------------------------------------
@@ -1034,7 +1033,6 @@ static int check_dense
     {
         init_print = print ;
         ETC_START (count, 9) ;
-        nz = nrow * ncol ;
         for (j = 0 ; j < ncol ; j++)
         {
             ETC (j == ncol-1, count, 5) ;
@@ -1487,10 +1485,10 @@ static int check_factor
     void *Lx, *Lz ;
     Int *Lp, *Li, *Lnz, *Lnext, *Lprev, *Perm, *ColCount, *Lpi, *Lpx, *Super,
         *Ls ;
-    Int n, nzmax, j, p, pend, i, nz, ordering, space, is_monotonic, minor,
-        count, precise, init_print, ilast, lnz, head, tail, jprev, plast,
-        jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx, nsrow, nscol,
-        ps2, psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii ;
+    Int n, nzmax, j, p, pend, i, nz, space, is_monotonic, minor,
+        count, init_print, ilast, lnz, head, tail, jprev, plast,
+        jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx = 0, nsrow, nscol,
+        psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii ;
     Int check_Lpx ;
     const char *type = "factor" ;
 
@@ -1512,15 +1510,12 @@ static int check_factor
 
     n = L->n ;
     minor = L->minor ;
-    ordering = L->ordering ;
     int xtype = L->xtype ;
     int dtype = L->dtype ;
 
     Perm = L->Perm ;
     ColCount = L->ColCount ;
     lnz = 0 ;
-
-    precise = Common->precise ;
 
     P3 (" "ID"", n) ;
     P3 ("-by-"ID"", n) ;
@@ -1896,7 +1891,6 @@ static int check_factor
                 nsrow = psend - psi ;
                 nscol = k2 - k1 ;
                 nsrow2 = nsrow - nscol ;
-                ps2 = psi + nscol ;
 
                 if (check_Lpx)
                 {

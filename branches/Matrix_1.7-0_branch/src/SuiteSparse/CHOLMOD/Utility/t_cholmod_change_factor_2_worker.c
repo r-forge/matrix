@@ -50,7 +50,9 @@ static void TEMPLATE (cholmod_change_factor_2_worker)
     Int  *Lp  = (Int  *) L->p ;
     Int  *Li  = (Int  *) L->i ;
     Real *Lx  = (Real *) L->x ;
+#ifdef ZOMPLEX
     Real *Lz  = (Real *) L->z ;
+#endif
     Int  *Lnz = (Int  *) L->nz ;
 
     //--------------------------------------------------------------------------

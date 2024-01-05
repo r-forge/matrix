@@ -59,7 +59,9 @@ static void TEMPLATE (cholmod_drop_worker)
     Int *Ap = A->p ;
     Int *Ai = A->i ;
     Real *Ax = A->x ;
+#ifdef ZOMPLEX
     Real *Az = A->z ;
+#endif
     Int *Anz = A->nz ;
     bool packed = A->packed ;
     Int ncol = A->ncol ;

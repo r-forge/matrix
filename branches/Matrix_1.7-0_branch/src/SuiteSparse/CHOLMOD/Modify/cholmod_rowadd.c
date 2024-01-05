@@ -136,7 +136,6 @@ int CHOLMOD(rowadd_mark)
     RETURN_IF_NULL (R, FALSE) ;
     RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_REAL, FALSE) ;
     RETURN_IF_XTYPE_INVALID (R, CHOLMOD_REAL, CHOLMOD_REAL, FALSE) ;
-    Int n = L->n ;
     Int k = kadd ;
     if (kadd >= L->n || k < 0)
     {

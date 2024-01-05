@@ -34,7 +34,9 @@ void *CHOLMOD(realloc)  // return newly reallocated block of memory
 
     int ok ;
     bool newly_allocated = (p == NULL) ;
+#ifndef NDEBUG
     void *pold = p ;
+#endif
     size_t nold = (*n) ;
 
     p = SuiteSparse_realloc (nnew, *n, size, p, &ok) ;

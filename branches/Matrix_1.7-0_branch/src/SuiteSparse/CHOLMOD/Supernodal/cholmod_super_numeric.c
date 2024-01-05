@@ -281,10 +281,6 @@ int CHOLMOD(super_numeric)
     // supernodal numerical factorization, using template routine
     //--------------------------------------------------------------------------
 
-    float s_beta [2] ;
-    s_beta [0] = (float) beta [0] ;
-    s_beta [1] = (float) beta [1] ;
-
     switch ((A->xtype + A->dtype) % 8)
     {
         case CHOLMOD_REAL    + CHOLMOD_SINGLE:

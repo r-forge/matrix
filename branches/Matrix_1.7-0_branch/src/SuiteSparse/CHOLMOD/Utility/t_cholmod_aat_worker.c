@@ -35,20 +35,32 @@ static void TEMPLATE (cholmod_aat_worker)
     Int  *Ap  = (Int  *) A->p ;
     Int  *Anz = (Int  *) A->nz ;
     Int  *Ai  = (Int  *) A->i ;
+#ifndef PATTERN
     Real *Ax  = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az  = (Real *) A->z ;
+#endif
+#endif
     bool packed = A->packed ;
 
     Int  *Fp  = (Int  *) F->p ;
     Int  *Fi  = (Int  *) F->i ;
+#ifndef PATTERN
     Real *Fx  = (Real *) F->x ;
+#ifdef ZOMPLEX
     Real *Fz  = (Real *) F->z ;
+#endif
+#endif
     ASSERT (F->packed) ;
 
     Int  *Cp = (Int  *) C->p ;
     Int  *Ci = (Int  *) C->i ;
+#ifndef PATTERN
     Real *Cx = (Real *) C->x ;
+#ifdef ZOMPLEX
     Real *Cz = (Real *) C->z ;
+#endif
+#endif
     ASSERT (C->packed) ;
 
     //--------------------------------------------------------------------------
@@ -93,8 +105,12 @@ static void TEMPLATE (cholmod_aat_worker)
             //------------------------------------------------------------------
 
             Int t = Fi [pf] ;
+#ifndef PATTERN
             Real fx [2] = {0,0} ;
+#ifdef ZOMPLEX
             Real fz [1] = {0} ;
+#endif
+#endif
             ASSIGN (fx, fz, 0, Fx, Fz, pf) ;
 
             //------------------------------------------------------------------

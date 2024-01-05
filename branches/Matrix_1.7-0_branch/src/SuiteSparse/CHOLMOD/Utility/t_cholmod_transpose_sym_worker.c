@@ -28,13 +28,20 @@ static void TEMPLATE (cholmod_transpose_sym_worker)
     Int  *Ap  = (Int  *) A->p ;
     Int  *Ai  = (Int  *) A->i ;
     Int  *Anz = (Int  *) A->nz ;
+#ifndef PATTERN
     Real *Ax  = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az  = (Real *) A->z ;
+#endif
+#endif
 
-    Int  *Cp  = (Int  *) C->p ;
     Int  *Ci  = (Int  *) C->i ;
+#ifndef PATTERN
     Real *Cx  = (Real *) C->x ;
+#ifdef ZOMPLEX
     Real *Cz  = (Real *) C->z ;
+#endif
+#endif
 
     //--------------------------------------------------------------------------
     // compute pattern and values of C

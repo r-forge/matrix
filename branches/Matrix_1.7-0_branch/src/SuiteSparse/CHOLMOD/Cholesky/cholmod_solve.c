@@ -203,8 +203,8 @@ int CHOLMOD(solve2)         // returns TRUE on success, FALSE on failure
     cholmod_dense *Y = NULL, *X = NULL ;
     cholmod_sparse *C, *Yset, C_header, Yset_header, *Xset ;
     Int *Perm = NULL, *IPerm = NULL ;
-    Int n, nrhs, ncols, k1, nr, ytype, k, blen, p, i, d, nrow ;
-    Int Cp [2], Ysetp [2], *Ci, *Yseti, ysetlen ;
+    Int n, nrhs, ncols, k1, nr, ytype, k, blen, p, d, nrow ;
+    Int Cp [2], Ysetp [2], *Ci, *Yseti ;
 
     RETURN_IF_NULL_COMMON (FALSE) ;
     RETURN_IF_NULL (L, FALSE) ;

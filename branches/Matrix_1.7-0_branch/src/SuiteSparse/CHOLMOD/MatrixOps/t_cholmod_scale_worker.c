@@ -28,12 +28,16 @@ static void TEMPLATE (cholmod_scale_worker)
     Int  *Anz = A->nz ;
     Int  *Ai  = A->i ;
     Real *Ax  = A->x ;
+#ifdef ZOMPLEX
     Real *Az  = A->z ;
+#endif
     bool packed = A->packed ;
     Int ncol = A->ncol ;
 
     Real *Sx = S->x ;
+#ifdef ZOMPLEX
     Real *Sz = S->z ;
+#endif
 
     //--------------------------------------------------------------------------
     // scale the matrix
@@ -55,7 +59,9 @@ static void TEMPLATE (cholmod_scale_worker)
                 Int i = Ai [p] ;
                 // t = S (i) * A (i,j)
                 Real tx [2] ;
+#ifdef ZOMPLEX
                 Real tz [1] ;
+#endif
                 MULT (tx, tz, 0, Sx, Sz, i, Ax, Az, p) ;
                 // A (i,j) = t
                 ASSIGN (Ax, Az, p, tx, tz, 0) ;
@@ -74,7 +80,9 @@ static void TEMPLATE (cholmod_scale_worker)
         {
             // s = S (j)
             Real sx [2] ;
+#ifdef ZOMPLEX
             Real sz [1] ;
+#endif
             ASSIGN (sx, sz, 0, Sx, Sz, j) ;
 
             Int p = Ap [j] ;
@@ -83,7 +91,9 @@ static void TEMPLATE (cholmod_scale_worker)
             {
                 // t = A (i,j) * s
                 Real tx [2] ;
+#ifdef ZOMPLEX
                 Real tz [1] ;
+#endif
                 MULT (tx, tz, 0, Ax, Az, p, sx, sz, 0) ;
                 // A (i,j) = t
                 ASSIGN (Ax, Az, p, tx, tz, 0) ;
@@ -102,7 +112,9 @@ static void TEMPLATE (cholmod_scale_worker)
         {
             // s = S (j)
             Real sx [2] ;
+#ifdef ZOMPLEX
             Real sz [1] ;
+#endif
             ASSIGN (sx, sz, 0, Sx, Sz, j) ;
 
             Int p = Ap [j] ;
@@ -112,7 +124,9 @@ static void TEMPLATE (cholmod_scale_worker)
                 Int i = Ai [p] ;
                 // t = A (i,j) * S (i)
                 Real tx [2] ;
+#ifdef ZOMPLEX
                 Real tz [1] ;
+#endif
                 MULT (tx, tz, 0, Ax, Az, p, Sx, Sz, i) ;
                 // A (i,j) = s * t
                 MULT (Ax, Az, p, sx, sz, 0, tx, tz, 0) ;
@@ -129,7 +143,9 @@ static void TEMPLATE (cholmod_scale_worker)
 
         // s = S (0)
         Real sx [2] ;
+#ifdef ZOMPLEX
         Real sz [1] ;
+#endif
         ASSIGN (sx, sz, 0, Sx, Sz, 0) ;
 
         for (Int j = 0 ; j < ncol ; j++)
@@ -140,7 +156,9 @@ static void TEMPLATE (cholmod_scale_worker)
             {
                 // t = s * A (i,j)
                 Real tx [2] ;
+#ifdef ZOMPLEX
                 Real tz [1] ;
+#endif
                 MULT (tx, tz, 0, sx, sz, 0, Ax, Az, p) ;
                 // A (i,j) = t
                 ASSIGN (Ax, Az, p, tx, tz, 0) ;

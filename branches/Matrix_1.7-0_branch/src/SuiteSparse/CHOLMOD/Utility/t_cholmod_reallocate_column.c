@@ -84,7 +84,6 @@ int CHOLMOD(reallocate_column)
     need = MAX (need, 1) ;
     double slack = MAX (Common->grow1, 1.0) * ((double) need) + Common->grow2 ;
     slack = MIN (slack, (double) (n-j)) ;
-    size_t nslack = (size_t) floor (slack) ;
     need = MAX (need, slack) ;
     need = MAX (need, 1) ;
     need = MIN (need, n-j) ;

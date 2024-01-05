@@ -354,7 +354,7 @@ int CHOLMOD(write_sparse)
     double x = 0, z = 0 ;
     void *Ax, *Az ;
     Int *Ap, *Ai, *Anz, *Zp, *Zi, *Znz ;
-    Int nrow, ncol, is_complex, symmetry, i, j, q, iz, p, nz, is_binary, stype,
+    Int nrow, ncol, is_complex, i, j, q, iz, p, nz, is_binary, stype,
         is_integer, asym, is_sym, apacked, zpacked, pend, qend, zsym ;
     int ok, xtype, dtype ;
 
@@ -527,7 +527,6 @@ int CHOLMOD(write_sparse)
             // A is rectangular or unsymmetric
             ok = ok && (fprintf (f, " general\n") > 0) ;
             is_sym = FALSE ;
-            symmetry = CHOLMOD_MM_UNSYMMETRIC ;
             break ;
 
         case CHOLMOD_MM_SYMMETRIC:
@@ -535,7 +534,6 @@ int CHOLMOD(write_sparse)
             // A is symmetric
             ok = ok && (fprintf (f, " symmetric\n") > 0) ;
             is_sym = TRUE ;
-            symmetry = CHOLMOD_MM_SYMMETRIC ;
             break ;
 
         case CHOLMOD_MM_HERMITIAN:
@@ -543,14 +541,12 @@ int CHOLMOD(write_sparse)
             // A is Hermitian
             ok = ok && (fprintf (f, " Hermitian\n") > 0) ;
             is_sym = TRUE ;
-            symmetry = CHOLMOD_MM_HERMITIAN ;
             break ;
 
         case CHOLMOD_MM_SKEW_SYMMETRIC:
             // A is skew symmetric
             ok = ok && (fprintf (f, " skew-symmetric\n") > 0) ;
             is_sym = TRUE ;
-            symmetry = CHOLMOD_MM_SKEW_SYMMETRIC ;
             break ;
     }
 

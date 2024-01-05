@@ -47,7 +47,7 @@ idx_t ComputeCut(graph_t *graph, idx_t *where)
 /*************************************************************************/
 idx_t ComputeVolume(graph_t *graph, idx_t *where)
 {
-  idx_t i, j, k, me, nvtxs, nparts, totalv;
+  idx_t i, j, k, nvtxs, nparts, totalv;
   idx_t *xadj, *adjncy, *vsize, *marker;
 
 
@@ -120,6 +120,7 @@ idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
 /*************************************************************************/
 idx_t CheckBnd(graph_t *graph) 
 {
+#ifndef NDEBUG
   idx_t i, j, nvtxs, nbnd;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
 
@@ -145,6 +146,7 @@ idx_t CheckBnd(graph_t *graph)
   }
 
   ASSERTP(nbnd == graph->nbnd, ("%"PRIDX" %"PRIDX"\n", nbnd, graph->nbnd));
+#endif
 
   return 1;
 }
@@ -157,6 +159,7 @@ idx_t CheckBnd(graph_t *graph)
 /*************************************************************************/
 idx_t CheckBnd2(graph_t *graph) 
 {
+#ifndef NDEBUG
   idx_t i, j, nvtxs, nbnd, id, ed;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
 
@@ -183,6 +186,7 @@ idx_t CheckBnd2(graph_t *graph)
   }
 
   ASSERTP(nbnd == graph->nbnd, ("%"PRIDX" %"PRIDX"\n", nbnd, graph->nbnd));
+#endif
 
   return 1;
 }
@@ -194,6 +198,7 @@ idx_t CheckBnd2(graph_t *graph)
 /*************************************************************************/
 idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd) 
 {
+#ifndef NDEBUG
   idx_t i, j, nvtxs, nbnd;
   idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
 
@@ -219,6 +224,7 @@ idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd)
       ASSERTP(bndptr[i] != -1, ("%"PRIDX" %"PRIDX"\n", i, bndptr[i]));
     }
   }
+#endif
 
   return 1;
 }
@@ -231,6 +237,7 @@ idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd)
 /*************************************************************************/
 idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
 {
+#ifndef NDEBUG
   idx_t i, j;
   cnbr_t *nbrs;
 
@@ -242,6 +249,7 @@ idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
           ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
            i, j, nbrs[i].pid, nbrs[j].pid));
   }
+#endif
 
   return 1;
 }
@@ -254,15 +262,14 @@ idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
 /*************************************************************************/
 idx_t CheckNodePartitionParams(graph_t *graph)
 {
-  idx_t i, j, k, l, nvtxs, me, other;
-  idx_t *xadj, *adjncy, *adjwgt, *vwgt, *where;
+  idx_t i, j, nvtxs, me, other;
+  idx_t *xadj, *adjncy, *vwgt, *where;
   idx_t edegrees[2], pwgts[3];
 
   nvtxs  = graph->nvtxs;
   xadj   = graph->xadj;
   vwgt   = graph->vwgt;
   adjncy = graph->adjncy;
-  adjwgt = graph->adjwgt;
   where  = graph->where;
 
   /*------------------------------------------------------------
@@ -308,6 +315,7 @@ idx_t CheckNodePartitionParams(graph_t *graph)
 /*************************************************************************/
 idx_t IsSeparable(graph_t *graph)
 {
+#ifndef NDEBUG
   idx_t i, j, nvtxs, other;
   idx_t *xadj, *adjncy, *where;
 
@@ -327,6 +335,7 @@ idx_t IsSeparable(graph_t *graph)
            xadj[adjncy[j]+1]-xadj[adjncy[j]]));
     }
   }
+#endif
 
   return 1;
 }
@@ -338,8 +347,8 @@ idx_t IsSeparable(graph_t *graph)
 /*************************************************************************/
 void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
 {
-  idx_t i, ii, j, k, kk, l, nvtxs, nbnd, mincut, minvol, me, other, pid;
-  idx_t *xadj, *vsize, *adjncy, *pwgts, *where, *bndind, *bndptr;
+  idx_t i, ii, j, k, kk, nvtxs, me, other, pid;
+  idx_t *xadj, *vsize, *adjncy, *where;
   vkrinfo_t *rinfo, *myrinfo, *orinfo, tmprinfo;
   vnbr_t *mynbrs, *onbrs, *tmpnbrs;
 

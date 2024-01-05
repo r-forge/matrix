@@ -173,11 +173,13 @@ int CHOLMOD(super_symbolic2)
         csize, maxcsize, ss, nscol0, nscol1, ns, nfsuper, newzeros, totzeros,
         merge, snext, esize, maxesize, nrelax0, nrelax1, nrelax2, Asorted ;
     int find_xsize ;
+#if (defined(CHOLMOD_HAS_CUDA) && defined(CHOLMOD_INT64))
     const char* env_use_gpu;
     const char* env_max_bytes;
     size_t max_bytes;
     const char* env_max_fraction;
     double max_fraction ;
+#endif
 
     RETURN_IF_NULL_COMMON (FALSE) ;
     RETURN_IF_NULL (A, FALSE) ;
@@ -243,10 +245,11 @@ int CHOLMOD(super_symbolic2)
         // real/complex/zomples only), and only when the GPU is requested and
         // available.
 
+        #ifdef CHOLMOD_INT64
+
         max_bytes = 0;
         max_fraction = 0;
 
-        #ifdef CHOLMOD_INT64
         if ( Common->useGPU == EMPTY )
         {
             // useGPU not explicitly requested by the user, but not explicitly
@@ -552,9 +555,6 @@ int CHOLMOD(super_symbolic2)
                 double xns = (double) ns ;
                 double xtotsize  = (xns * (xns+1) / 2) + xns * (lnz1 - nscol1) ;
                 double z = xtotzeros / xtotsize ;
-
-                Int totsize ;
-                totsize  = (ns * (ns+1) / 2) + ns * (Snz [s+1] - nscol1) ;
 
                 PRINT2 (("oldzeros "ID" newzeros "ID" xtotsize %g z %g\n",
                             Zeros [s+1], newzeros, xtotsize, z)) ;

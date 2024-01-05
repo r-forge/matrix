@@ -152,15 +152,21 @@ static int TEMPLATE (cholmod_super_numeric_worker)
     #ifdef BLAS_TIMER
     double tstart, blas_time ;
     #endif
-    Real *Lx, *Ax, *Fx, *Az, *Fz, *C ;
+    Real *Lx, *Ax, *Fx, *C ;
+#ifdef ZOMPLEX
+    Real *Az, *Fz ;
+#endif
     Int *Super, *Head, *Ls, *Lpi, *Lpx, *Map, *SuperMap, *RelativeMap, *Next,
-        *Lpos, *Fp, *Fi, *Fnz, *Ap, *Ai, *Anz, *Iwork, *Next_save, *Lpos_save,
-        *Previous;
+        *Lpos, *Fp, *Fi, *Fnz, *Ap, *Ai, *Anz, *Iwork, *Next_save, *Lpos_save;
     Int nsuper, n, s, k1, k2, nscol, psi, psx, psend, nsrow,
-        pj, d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi1, pdi2,
+        d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi2,
         ndrow1, ndrow2, dancestor, sparent, dnext, nsrow2, ndrow3,
         stype, Apacked, Fpacked, repeat_supernode, nscol2, ss,
-        tail, nscol_new = 0;
+        nscol_new = 0;
+#if (defined (CHOLMOD_HAS_CUDA) && defined (DOUBLE))
+    Int *Previous ;
+    Int tail ;
+#endif
     info = 0 ;
 
     ASSERT (L->dtype == A->dtype) ;
@@ -215,7 +221,9 @@ static int TEMPLATE (cholmod_super_numeric_worker)
     Lpos        = Iwork + 2*((size_t) n) + nsuper ;         // size nsuper
     Next_save   = Iwork + 2*((size_t) n) + 2*((size_t) nsuper) ;// size nsuper
     Lpos_save   = Iwork + 2*((size_t) n) + 3*((size_t) nsuper) ;// size nsuper
+#if (defined (CHOLMOD_HAS_CUDA) && defined (DOUBLE))
     Previous    = Iwork + 2*((size_t) n) + 4*((size_t) nsuper) ;// size nsuper
+#endif
 
     Map  = Common->Flag ;   // size n, use Flag as workspace for Map array
     Head = Common->Head ;   // size n+1, only Head [0..nsuper-1] used
@@ -273,7 +281,9 @@ static int TEMPLATE (cholmod_super_numeric_worker)
         Fp = NULL ;
         Fi = NULL ;
         Fx = NULL ;
+#ifdef ZOMPLEX
         Fz = NULL ;
+#endif
         Fnz = NULL ;
         Fpacked = TRUE ;
     }
@@ -284,7 +294,9 @@ static int TEMPLATE (cholmod_super_numeric_worker)
         Fp = F->p ;
         Fi = F->i ;
         Fx = F->x ;
+#ifdef ZOMPLEX
         Fz = F->z ;
+#endif
         Fnz = F->nz ;
         Fpacked = F->packed ;
     }
@@ -292,7 +304,9 @@ static int TEMPLATE (cholmod_super_numeric_worker)
     Ap = A->p ;
     Ai = A->i ;
     Ax = A->x ;
+#ifdef ZOMPLEX
     Az = A->z ;
+#endif
     Anz = A->nz ;
     Apacked = A->packed ;
 
@@ -303,8 +317,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
     #endif
 
     Int ii ;
+#ifdef _OPENMP
     #pragma omp parallel for num_threads(nthreads) \
         if ( n > 128 ) schedule (static)
+#endif
     for (ii = 0 ; ii < n ; ii++)
     {
         Map [ii] = EMPTY ;
@@ -370,8 +386,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
             #endif
 
             Int p ;
+#ifdef _OPENMP
             #pragma omp parallel for num_threads(nthreads)   \
                 schedule (static) if ( pend - psx > 1024 )
+#endif
             for (p = psx ; p < pend ; p++)
             {
                 L_CLEAR (Lx,p) ;
@@ -390,8 +408,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
         #endif
 
         Int k ;
+#ifdef _OPENMP
         #pragma omp parallel for num_threads(nthreads)  \
             if ( nsrow > 128 )
+#endif
         for (k = 0 ; k < nsrow ; k++)
         {
             PRINT1 (("  "ID" map "ID"\n", Ls [psi+k], k)) ;
@@ -416,8 +436,6 @@ static int TEMPLATE (cholmod_super_numeric_worker)
         // copy matrix into supernode s (lower triangular part only)
         //----------------------------------------------------------------------
 
-        Int pk = psx ;
-
         #ifdef _OPENMP
         double work ;
         if (stype != 0)
@@ -435,8 +453,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
         nthreads = cholmod_nthreads (work, Common) ;
         #endif
 
+#ifdef _OPENMP
         #pragma omp parallel for num_threads(nthreads) \
             if ( k2-k1 > 64 )
+#endif
         for (k = k1 ; k < k2 ; k++)
         {
             if (stype != 0)
@@ -894,8 +914,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
                 #endif
 
                 Int i ;
+#ifdef _OPENMP
                 #pragma omp parallel for num_threads(nthreads)   \
                     if ( ndrow2 > 64 )
+#endif
                 for (i = 0 ; i < ndrow2 ; i++)
                 {
                     RelativeMap [i] = Map [Ls [pdi1 + i]] ;
@@ -912,8 +934,10 @@ static int TEMPLATE (cholmod_super_numeric_worker)
                 #endif
 
                 Int j ;
+#ifdef _OPENMP
                 #pragma omp parallel for num_threads(nthreads) \
                     if (ndrow1 > 64 )
+#endif
                 for (j = 0 ; j < ndrow1 ; j++)              // cols k1:k2-1
                 {
                     ASSERT (RelativeMap [j] == Map [Ls [pdi1 + j]]) ;

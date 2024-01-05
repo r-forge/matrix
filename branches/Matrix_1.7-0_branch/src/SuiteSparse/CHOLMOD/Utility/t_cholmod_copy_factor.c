@@ -69,7 +69,6 @@ cholmod_factor *CHOLMOD(copy_factor)    // return a copy of the factor
     size_t e = (L->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
     size_t ex = e * ((L->xtype == CHOLMOD_PATTERN) ? 0 :
                     ((L->xtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
-    size_t ez = e * ((L->xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
 
     //--------------------------------------------------------------------------
     // allocate the new factor H, H->Perm, and H->ColCount

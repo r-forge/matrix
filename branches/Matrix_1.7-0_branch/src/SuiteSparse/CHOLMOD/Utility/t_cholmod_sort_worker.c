@@ -185,8 +185,12 @@ static void TEMPLATE (cholmod_sort_worker)
     Int  *Ap  = (Int  *) A->p ;
     Int  *Ai  = (Int  *) A->i ;
     Int  *Anz = (Int  *) A->nz ;
+#ifndef PATTERN
     Real *Ax  = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az  = (Real *) A->z ;
+#endif
+#endif
     Int ncol = A->ncol ;
     bool packed = A->packed ;
     uint64_t seed = 42 ;
@@ -207,7 +211,6 @@ static void TEMPLATE (cholmod_sort_worker)
             if (i < ilast)
             {
                 // sort Ai, Ax, Ax [pa:pend-1] according to row index Ai
-                Int jnz = pend - pa ;
                 CM_QSRT (Ai, Ax, Az, pa, pend - pa, &seed) ;
                 break ;
             }

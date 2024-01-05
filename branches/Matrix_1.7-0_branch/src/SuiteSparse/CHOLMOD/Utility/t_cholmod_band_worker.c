@@ -30,14 +30,22 @@ static void TEMPLATE (cholmod_band_worker)
     Int  *Ap  = (Int  *) A->p ;
     Int  *Anz = (Int  *) A->nz ;
     Int  *Ai  = (Int  *) A->i ;
+#ifndef PATTERN
     Real *Ax  = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az  = (Real *) A->z ;
+#endif
+#endif
     bool packed = A->packed ;
 
     Int  *Cp = (Int  *) C->p ;
     Int  *Ci = (Int  *) C->i ;
+#ifndef PATTERN
     Real *Cx = (Real *) C->x ;
+#ifdef ZOMPLEX
     Real *Cz = (Real *) C->z ;
+#endif
+#endif
 
     // columns outside of j1:j2 have no entries in diagonals k1:k2
     Int j1 = MAX (k1, 0) ;

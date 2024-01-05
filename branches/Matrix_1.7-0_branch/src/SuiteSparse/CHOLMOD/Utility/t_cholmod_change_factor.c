@@ -698,8 +698,6 @@ static void change_simplicial_num
     bool make_ldl = (!to_ll && L->is_ll) ;
 
     Int n = L->n ;
-    Int *Lp  = (Int *) L->p ;
-    Int *Li  = (Int *) L->i ;
     Int *Lnz = (Int *) L->nz ;
 
     bool grow = false ;
@@ -900,11 +898,8 @@ static void super_num_to_simplicial_num
     // get inputs
     //--------------------------------------------------------------------------
 
-    Int n = L->n ;
     Int nsuper = L->nsuper ;
     Int *Lpi   = (Int *) L->pi ;
-    Int *Lpx   = (Int *) L->px ;
-    Int *Ls    = (Int *) L->s ;
     Int *Super = (Int *) L->super ;
 
     size_t ei = sizeof (Int) ;
@@ -1088,7 +1083,6 @@ static int super_sym_to_super_num
     // get the sizes of the entries
     //--------------------------------------------------------------------------
 
-    size_t ei = sizeof (Int) ;
     size_t e = (L->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
     size_t ex = e * ((to_xtype == CHOLMOD_COMPLEX) ? 2 : 1) ;
     size_t xs = L->xsize ;

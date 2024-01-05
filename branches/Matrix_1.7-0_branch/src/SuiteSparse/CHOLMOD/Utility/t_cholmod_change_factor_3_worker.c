@@ -100,7 +100,6 @@ static void TEMPLATE (cholmod_change_factor_3_worker)
     Int  *Lp  = (Int  *) L->p ;     // simplicial col pointers
     Int  *Li  = (Int  *) L->i ;     // simplicial row indices
     Int  *Lnz = (Int  *) L->nz ;    // simplicial column counts
-    Int lnz = L->nzmax ;            // size of Li, Lp, and Lx
 
     //----------------------------------------------------------------------
     // convert supernodal LL' to simplicial LL' or LDL' (packed/unpacked)
