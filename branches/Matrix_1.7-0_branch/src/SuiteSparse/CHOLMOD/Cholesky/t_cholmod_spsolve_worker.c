@@ -30,12 +30,16 @@ static void TEMPLATE (cholmod_spsolve_B_scatter_worker)
     Int *Bp = B->p ;
     Int *Bi = B->i ;
     Real *Bx = B->x ;
+#ifdef ZOMPLEX
     Real *Bz = B->z ;
+#endif
     Int *Bnz = B->nz ;
     bool packed = B->packed ;
 
     Real *B4x = B4->x ;
+#ifdef ZOMPLEX
     Real *B4z = B4->z ;
+#endif
 
     Int n = B4->nrow ;
 
@@ -78,13 +82,17 @@ static bool TEMPLATE (cholmod_spsolve_X_worker)
     Int *Xp = X->p ;
     Int *Xi = X->i ;
     Real *Xx = X->x ;
+#ifdef ZOMPLEX
     Real *Xz = X->z ;
+#endif
     size_t px = (*xnz) ;
 
     size_t nzmax = X->nzmax ;
 
     Real *X4x = X4->x ;
+#ifdef ZOMPLEX
     Real *X4z = X4->z ;
+#endif
     Int n = X4->nrow ;
 
     //--------------------------------------------------------------------------
@@ -139,7 +147,9 @@ static bool TEMPLATE (cholmod_spsolve_X_worker)
                         }
                         Xi = X->i ;
                         Xx = X->x ;
+#ifdef ZOMPLEX
                         Xz = X->z ;
+#endif
                     }
                     Xi [px] = i ;
                     ASSIGN (Xx, Xz, px, X4x, X4z, p) ;
@@ -180,7 +190,9 @@ static void TEMPLATE (cholmod_spsolve_B_clear_worker)
     bool packed = B->packed ;
 
     Real *B4x = B4->x ;
+#ifdef ZOMPLEX
     Real *B4z = B4->z ;
+#endif
 
     Int n = B4->nrow ;
 

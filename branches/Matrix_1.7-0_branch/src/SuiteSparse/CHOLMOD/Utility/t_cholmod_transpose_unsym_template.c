@@ -59,8 +59,9 @@
         for ( ; p < pend ; p++)
         {
             // get A(i,j) and count it or get its place in C
-            Int pc = Wi [Ai [p]]++ ;
+            Wi [Ai [p]]++ ;
             #ifdef NUMERIC
+            Int pc = Wi [Ai [p]] ;
             // C(j,i) = conj (A(i,j))
             ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, p) ;
             Ci [pc] = j ;

@@ -106,7 +106,6 @@ cholmod_sparse *CHOLMOD(aat)
     bool ignore_diag = (mode < 0) ;
     bool values = (mode > 0) && (A->xtype != CHOLMOD_PATTERN) ;
     int axtype = (values) ? A->xtype : CHOLMOD_PATTERN ;
-    bool conj = (mode >= 2) ;
 
     Int nrow = A->nrow ;
     Int ncol = A->ncol ;
@@ -121,12 +120,8 @@ cholmod_sparse *CHOLMOD(aat)
     // get the sizes of the entries of C and A
     //--------------------------------------------------------------------------
 
-    size_t ei = sizeof (Int) ;
-    size_t e = (A->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
     size_t ew =  ((axtype == CHOLMOD_PATTERN) ? 0 :
                  ((axtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
-    size_t ex = e * ew ;
-    size_t ez = e * ((axtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
 
     //--------------------------------------------------------------------------
     // allocate workspace

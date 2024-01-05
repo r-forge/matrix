@@ -36,7 +36,9 @@ static double TEMPLATE (cholmod_norm_dense_worker)     // return norm
     Int nrow = X->nrow ;
     Int d = X->d ;
     Real *Xx = X->x ;
+#ifdef ZOMPLEX
     Real *Xz = X->z ;
+#endif
 
     double xnorm = 0 ;
 
@@ -158,8 +160,12 @@ static double TEMPLATE (cholmod_norm_sparse_worker)     // return norm
     Int *Ap = A->p ;
     Int *Ai = A->i ;
     Int *Anz = A->nz ;
+#ifndef PATTERN
     Real *Ax = A->x ;
+#ifdef ZOMPLEX
     Real *Az = A->z ;
+#endif
+#endif
     Int ncol = A->ncol ;
     Int nrow = A->nrow ;
     bool packed = A->packed ;

@@ -49,11 +49,14 @@ static int TEMPLATE (cholmod_rowfac_worker)
     #ifdef ZOMPLEX
     Real yz [1], lz [1], fz [1] ;
     #endif
-    Real *Ax, *Az, *Lx, *Lz, *Wx, *Wz, *Fx, *Fz ;
+    Real *Ax, *Lx, *Wx, *Fx ;
+#ifdef ZOMPLEX
+    Real *Az, *Lz, *Wz, *Fz ;
+#endif
     Int *Ap, *Anz, *Ai, *Lp, *Lnz, *Li, *Lnext, *Flag, *Stack, *Fp, *Fi, *Fnz,
         *Iwork ;
     Int i, p, k, t, pf, pfend, top, s, mark, pend, n, lnz, is_ll, multadds,
-        use_bound, packed, stype, Fpacked, sorted, nzmax, len, parent ;
+        use_bound, packed, stype, Fpacked, sorted, len, parent ;
     #ifndef REAL
     Int dk_imaginary ;
     #endif
@@ -71,7 +74,9 @@ static int TEMPLATE (cholmod_rowfac_worker)
         Fp = NULL ;
         Fi = NULL ;
         Fx = NULL ;
+#ifdef ZOMPLEX
         Fz = NULL ;
+#endif
         Fnz = NULL ;
         Fpacked = TRUE ;
     }
@@ -81,7 +86,9 @@ static int TEMPLATE (cholmod_rowfac_worker)
         Fp = F->p ;
         Fi = F->i ;
         Fx = F->x ;
+#ifdef ZOMPLEX
         Fz = F->z ;
+#endif
         Fnz = F->nz ;
         Fpacked = F->packed ;
     }
@@ -89,7 +96,9 @@ static int TEMPLATE (cholmod_rowfac_worker)
     Ap = A->p ;         // size A->ncol+1, column pointers of A
     Ai = A->i ;         // size nz = Ap [A->ncol], row indices of A
     Ax = A->x ;         // size nz, numeric values of A
+#ifdef ZOMPLEX
     Az = A->z ;
+#endif
     Anz = A->nz ;
     packed = A->packed ;
     sorted = A->sorted ;
@@ -153,8 +162,9 @@ static int TEMPLATE (cholmod_rowfac_worker)
     Lnext = L->next ;   // size n+2
     Li = L->i ;         // size L->nzmax, can change in size
     Lx = L->x ;         // size L->nzmax or 2*L->nzmax, can change in size
+#ifdef ZOMPLEX
     Lz = L->z ;         // size L->nzmax for zomplex case, can change in size
-    nzmax = L->nzmax ;
+#endif
     ASSERT (Lnz != NULL && Li != NULL && Lx != NULL) ;
 
     //--------------------------------------------------------------------------
@@ -166,9 +176,13 @@ static int TEMPLATE (cholmod_rowfac_worker)
     Flag = Common->Flag ;       // size n, Flag [i] < mark must hold
     Wx = Common->Xwork ;        // size n if real, 2*n if complex or
                                 // zomplex.  Xwork [i] == 0 must hold.
+#ifdef ZOMPLEX
     Wz = Wx + n ;               // size n for zomplex case only
+#endif
     mark = Common->mark ;
+#ifndef NDEBUG
     size_t wsize = (L->xtype == CHOLMOD_REAL ? 1:2) * ((size_t) n) ;
+#endif
     ASSERT (Common->xworkbytes >= wsize * sizeof (Real)) ;
 
     //--------------------------------------------------------------------------
@@ -388,7 +402,9 @@ static int TEMPLATE (cholmod_rowfac_worker)
                 }
                 Li = L->i ;             // L->i, L->x, L->z may have moved
                 Lx = L->x ;
+#ifdef ZOMPLEX
                 Lz = L->z ;
+#endif
                 p = Lp [i] + lnz ;      // contents of L->p changed
                 ASSERT (p < Lp [Lnext [i]]) ;
             }

@@ -1,7 +1,7 @@
 diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c
---- src/SuiteSparse/CCOLAMD/Source/ccolamd.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c	2023-11-03 18:58:08
-@@ -1546,7 +1546,9 @@
+--- src/SuiteSparse/CCOLAMD/Source/ccolamd.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c	2024-01-05 00:15:30
+@@ -1545,7 +1545,9 @@
      Int *dead_cols ;
      Int set1 ;
      Int set2 ;
@@ -11,7 +11,7 @@ diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLA
  
      int ok ;
  
-@@ -1895,7 +1897,9 @@
+@@ -1894,7 +1896,9 @@
              p [k] = col ;
              ASSERT (A [col] == EMPTY) ;
  
@@ -21,7 +21,7 @@ diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLA
              ASSERT (k >= cset_start [cs] && k < cset_start [cs+1]) ;
  
              A [col] = k ;
-@@ -1912,8 +1916,8 @@
+@@ -1911,8 +1915,8 @@
              if (A [col] == EMPTY)
              {
                  k = Col [col].shared2.order ;
@@ -32,67 +32,57 @@ diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLA
  #endif
                  ASSERT (k >= cset_start [cs] && k < cset_start [cs+1]) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_check.c src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c
---- src/SuiteSparse/CHOLMOD/Check/cholmod_check.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c	2023-11-03 18:58:08
-@@ -207,7 +207,7 @@
-     double *Xwork ;
-     Int *Flag, *Head ;
-     int64_t mark ;
--    Int i, nrow, nmethods, ordering, xworksize, amd_backup, init_print ;
-+    Int i, nrow, nmethods, ordering, xworksize, amd_backup ;
-     const char *type = "common" ;
- 
-     /* ---------------------------------------------------------------------- */
-@@ -215,8 +215,7 @@
-     /* ---------------------------------------------------------------------- */
+--- src/SuiteSparse/CHOLMOD/Check/cholmod_check.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c	2024-01-05 00:15:30
+@@ -216,7 +216,6 @@
+     //--------------------------------------------------------------------------
  
      RETURN_IF_NULL_COMMON (FALSE) ;
--    init_print = print ;
--
-+    
+-    int init_print = print ;
+ 
      P2 ("%s", "\n") ;
  
-     P1 ("CHOLMOD version %d", CHOLMOD_MAIN_VERSION) ;
-@@ -953,7 +952,7 @@
+@@ -965,7 +964,7 @@
  )
  {
-     double *Xx, *Xz ;
--    Int i, j, d, nrow, ncol, nzmax, nz, init_print, count, xtype ;
-+    Int i, j, d, nrow, ncol, nzmax, init_print, count, xtype ;
+     void *Xx, *Xz ;
+-    Int i, j, d, nrow, ncol, nzmax, nz, init_print, count ;
++    Int i, j, d, nrow, ncol, nzmax, init_print, count ;
      const char *type = "dense" ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -1021,7 +1020,6 @@
+     //--------------------------------------------------------------------------
+@@ -1034,7 +1033,6 @@
      {
- 	init_print = print ;
- 	ETC_START (count, 9) ;
--	nz = nrow * ncol ;
- 	for (j = 0 ; j < ncol ; j++)
- 	{
- 	    ETC (j == ncol-1, count, 5) ;
-@@ -1497,10 +1495,10 @@
-     double *Lx, *Lz ;
+         init_print = print ;
+         ETC_START (count, 9) ;
+-        nz = nrow * ncol ;
+         for (j = 0 ; j < ncol ; j++)
+         {
+             ETC (j == ncol-1, count, 5) ;
+@@ -1487,10 +1485,10 @@
+     void *Lx, *Lz ;
      Int *Lp, *Li, *Lnz, *Lnext, *Lprev, *Perm, *ColCount, *Lpi, *Lpx, *Super,
- 	*Ls ;
+         *Ls ;
 -    Int n, nzmax, j, p, pend, i, nz, ordering, space, is_monotonic, minor,
--	count, precise, init_print, ilast, lnz, head, tail, jprev, plast,
--	jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx, nsrow, nscol,
--	ps2, psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii, xtype ;
+-        count, precise, init_print, ilast, lnz, head, tail, jprev, plast,
+-        jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx, nsrow, nscol,
+-        ps2, psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii ;
 +    Int n, nzmax, j, p, pend, i, nz, space, is_monotonic, minor,
-+	count, init_print, ilast, lnz, head, tail, jprev, plast,
-+	jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx = 0, nsrow, nscol,
-+	psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii, xtype ;
++        count, init_print, ilast, lnz, head, tail, jprev, plast,
++        jnext, examine_super, nsuper, s, k1, k2, psi, psend, psx = 0, nsrow, nscol,
++        psxend, ssize, xsize, maxcsize, maxesize, nsrow2, jj, ii ;
      Int check_Lpx ;
      const char *type = "factor" ;
  
-@@ -1522,15 +1520,12 @@
+@@ -1512,7 +1510,6 @@
  
      n = L->n ;
      minor = L->minor ;
 -    ordering = L->ordering ;
-     xtype = L->xtype ;
+     int xtype = L->xtype ;
+     int dtype = L->dtype ;
  
-     Perm = L->Perm ;
+@@ -1520,8 +1517,6 @@
      ColCount = L->ColCount ;
      lnz = 0 ;
  
@@ -101,107 +91,90 @@ diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_check.c src/SuiteSparse-patched/
      P3 (" "ID"", n) ;
      P3 ("-by-"ID"", n) ;
  
-@@ -1907,7 +1902,6 @@
- 		nsrow = psend - psi ;
- 		nscol = k2 - k1 ;
- 		nsrow2 = nsrow - nscol ;
--		ps2 = psi + nscol ;
+@@ -1896,7 +1891,6 @@
+                 nsrow = psend - psi ;
+                 nscol = k2 - k1 ;
+                 nsrow2 = nsrow - nscol ;
+-                ps2 = psi + nscol ;
  
                  if (check_Lpx)
                  {
 diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_write.c src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c
---- src/SuiteSparse/CHOLMOD/Check/cholmod_write.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c	2023-11-03 18:58:08
-@@ -364,7 +364,7 @@
+--- src/SuiteSparse/CHOLMOD/Check/cholmod_write.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c	2024-01-05 00:15:30
+@@ -354,7 +354,7 @@
      double x = 0, z = 0 ;
-     double *Ax, *Az ;
+     void *Ax, *Az ;
      Int *Ap, *Ai, *Anz, *Zp, *Zi, *Znz ;
 -    Int nrow, ncol, is_complex, symmetry, i, j, q, iz, p, nz, is_binary, stype,
 +    Int nrow, ncol, is_complex, i, j, q, iz, p, nz, is_binary, stype,
- 	is_integer, asym, is_sym, xtype, apacked, zpacked, pend, qend, zsym ;
-     int ok ;
+         is_integer, asym, is_sym, apacked, zpacked, pend, qend, zsym ;
+     int ok, xtype, dtype ;
  
-@@ -536,7 +536,6 @@
- 	    /* A is rectangular or unsymmetric */
- 	    ok = ok && (fprintf (f, " general\n") > 0) ;
- 	    is_sym = FALSE ;
--	    symmetry = CHOLMOD_MM_UNSYMMETRIC ;
- 	    break ;
+@@ -527,7 +527,6 @@
+             // A is rectangular or unsymmetric
+             ok = ok && (fprintf (f, " general\n") > 0) ;
+             is_sym = FALSE ;
+-            symmetry = CHOLMOD_MM_UNSYMMETRIC ;
+             break ;
  
- 	case CHOLMOD_MM_SYMMETRIC:
-@@ -544,7 +543,6 @@
- 	    /* A is symmetric */
- 	    ok = ok && (fprintf (f, " symmetric\n") > 0) ;
- 	    is_sym = TRUE ;
--	    symmetry = CHOLMOD_MM_SYMMETRIC ;
- 	    break ;
+         case CHOLMOD_MM_SYMMETRIC:
+@@ -535,7 +534,6 @@
+             // A is symmetric
+             ok = ok && (fprintf (f, " symmetric\n") > 0) ;
+             is_sym = TRUE ;
+-            symmetry = CHOLMOD_MM_SYMMETRIC ;
+             break ;
  
- 	case CHOLMOD_MM_HERMITIAN:
-@@ -552,14 +550,12 @@
- 	    /* A is Hermitian */
- 	    ok = ok && (fprintf (f, " Hermitian\n") > 0) ;
- 	    is_sym = TRUE ;
--	    symmetry = CHOLMOD_MM_HERMITIAN ;
- 	    break ;
+         case CHOLMOD_MM_HERMITIAN:
+@@ -543,14 +541,12 @@
+             // A is Hermitian
+             ok = ok && (fprintf (f, " Hermitian\n") > 0) ;
+             is_sym = TRUE ;
+-            symmetry = CHOLMOD_MM_HERMITIAN ;
+             break ;
  
- 	case CHOLMOD_MM_SKEW_SYMMETRIC:
- 	    /* A is skew symmetric */
- 	    ok = ok && (fprintf (f, " skew-symmetric\n") > 0) ;
- 	    is_sym = TRUE ;
--	    symmetry = CHOLMOD_MM_SKEW_SYMMETRIC ;
- 	    break ;
+         case CHOLMOD_MM_SKEW_SYMMETRIC:
+             // A is skew symmetric
+             ok = ok && (fprintf (f, " skew-symmetric\n") > 0) ;
+             is_sym = TRUE ;
+-            symmetry = CHOLMOD_MM_SKEW_SYMMETRIC ;
+             break ;
      }
  
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c	2023-11-03 18:58:08
-@@ -405,10 +405,10 @@
- )
- {
-     double lnz_best ;
--    Int *First, *Level, *Work4n, *Cmember, *CParent, *ColCount, *Lperm, *Parent,
-+    Int *First, *Level, *Work4n, *ColCount, *Lperm, *Parent,
- 	*Post, *Perm, *Lparent, *Lcolcount ;
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c	2024-01-05 00:15:30
+@@ -399,7 +399,7 @@
+     Int *First, *Level, *Work4n, *Cmember, *CParent, *ColCount, *Lperm, *Parent,
+         *Post, *Perm, *Lparent, *Lcolcount ;
      cholmod_factor *L ;
--    Int k, n, ordering, method, nmethods, status, default_strategy, ncol, uncol,
-+    Int k, n, ordering, method, nmethods, status, default_strategy, uncol,
- 	skip_analysis, skip_best ;
+-    Int k, n, method, nmethods, status, default_strategy, ncol,
++    Int k, n, method, nmethods, status, default_strategy,
+         skip_analysis, skip_best ;
      Int amd_backup ;
-     size_t s ;
-@@ -431,7 +431,6 @@
-     /* ---------------------------------------------------------------------- */
+     int ok = TRUE ;
+@@ -421,7 +421,6 @@
+     //--------------------------------------------------------------------------
  
      n = A->nrow ;
 -    ncol = A->ncol ;
-     uncol = (A->stype == 0) ? (A->ncol) : 0 ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -531,8 +530,10 @@
-     /* note that this assignment means that cholmod_nested_dissection,
-      * cholmod_ccolamd, and cholmod_camd can use only the first 4n+uncol
-      * space in Common->Iwork */
--    Cmember = Post ;
--    CParent = Level ;
-+#ifndef NPARTITION
-+    Int *Cmember = Post ;
-+    Int *CParent = Level ;
-+#endif
- 
-     /* ---------------------------------------------------------------------- */
-     /* allocate more workspace, and an empty simplicial symbolic factor */
+     //--------------------------------------------------------------------------
+     // set the default strategy
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c	2024-01-05 00:15:30
 @@ -104,7 +104,7 @@
- )
  {
+ 
      cholmod_sparse *S, *F, *A1, *A2 ;
--    Int nrow, ncol, stype, convert, n, nsuper, grow2, status ;
-+    Int nrow, ncol, stype, convert, nsuper, grow2, status ;
-     size_t s, t, uncol ;
+-    Int nrow, ncol, stype, convert, n, grow2, status ;
++    Int nrow, ncol, stype, convert, grow2, status ;
      int ok = TRUE ;
  
-@@ -119,7 +119,6 @@
+     //--------------------------------------------------------------------------
+@@ -118,7 +118,6 @@
      RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_ZOMPLEX, FALSE) ;
      nrow = A->nrow ;
      ncol = A->ncol ;
@@ -209,22 +182,45 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c src/SuiteSparse-p
      stype = A->stype ;
      if (L->n != A->nrow)
      {
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_resymbol.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_resymbol.c	2024-01-05 00:15:30
+@@ -102,8 +102,6 @@
+     //--------------------------------------------------------------------------
+ 
+     Int stype = A->stype ;
+-    Int nrow = A->nrow ;
+-    Int ncol = A->ncol ;
+ 
+     // s = 2*nrow + (stype ? 0 : ncol)
+     int ok = TRUE ;
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c	2023-11-03 18:58:08
-@@ -327,7 +327,10 @@
- )
- {
-     double *Yx, *Yz, *Xx, *Xz ;
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c	2024-01-05 00:15:30
+@@ -203,8 +203,8 @@
+     cholmod_dense *Y = NULL, *X = NULL ;
+     cholmod_sparse *C, *Yset, C_header, Yset_header, *Xset ;
+     Int *Perm = NULL, *IPerm = NULL ;
+-    Int n, nrhs, ncols, k1, nr, ytype, k, blen, p, i, d, nrow ;
+-    Int Cp [2], Ysetp [2], *Ci, *Yseti, ysetlen ;
++    Int n, nrhs, ncols, k1, nr, ytype, k, blen, p, d, nrow ;
++    Int Cp [2], Ysetp [2], *Ci, *Yseti ;
+ 
+     RETURN_IF_NULL_COMMON (FALSE) ;
+     RETURN_IF_NULL (L, FALSE) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2024-01-05 00:15:30
+@@ -265,12 +265,17 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Yx, *Yz, *Xx, *Xz ;
 -    Int k2, nk, p, k, j, nrow, ncol, d, dj, j2 ;
 +    Int k2, p, k, j, nrow, ncol, d, dj, j2 ;
 +#ifndef NDEBUG
 +    Int nk ;
 +#endif
  
-     /* ---------------------------------------------------------------------- */
-     /* get inputs */
-@@ -336,7 +339,9 @@
      ncol = X->ncol ;
      nrow = X->nrow ;
      k2 = MIN (k1+ncols, ncol) ;
@@ -234,707 +230,665 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c src/SuiteSparse-patch
      d = X->d ;
      Xx = X->x ;
      Xz = X->z ;
-diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac.c	2023-11-03 18:58:08
-@@ -45,11 +45,14 @@
- #ifdef ZOMPLEX
-     double yz [1], lz [1], fz [1] ;
- #endif
--    double *Ax, *Az, *Lx, *Lz, *Wx, *Wz, *Fx, *Fz ;
-+    double *Ax, *Lx, *Wx, *Fx ;
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2024-01-05 00:15:30
+@@ -29,12 +29,13 @@
+     Int *Ap = A->p ;
+     Int *Anz = A->nz ;
+     bool apacked = A->packed ;
+-    bool sorted = A->sorted ;
+     int stype = A->stype ;
+ 
+     Int  *Li = L->i ;
+     Real *Lx = L->x ;
 +#ifdef ZOMPLEX
-+    double *Az, *Lz, *Wz, *Fz ;
+     Real *Lz = L->z ;
++#endif
+     Int  *Lp = L->p ;
+     Int  *Lnz = L->nz ;
+ 
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2024-01-05 00:15:30
+@@ -49,11 +49,14 @@
+     #ifdef ZOMPLEX
+     Real yz [1], lz [1], fz [1] ;
+     #endif
+-    Real *Ax, *Az, *Lx, *Lz, *Wx, *Wz, *Fx, *Fz ;
++    Real *Ax, *Lx, *Wx, *Fx ;
++#ifdef ZOMPLEX
++    Real *Az, *Lz, *Wz, *Fz ;
 +#endif
      Int *Ap, *Anz, *Ai, *Lp, *Lnz, *Li, *Lnext, *Flag, *Stack, *Fp, *Fi, *Fnz,
- 	*Iwork ;
+         *Iwork ;
      Int i, p, k, t, pf, pfend, top, s, mark, pend, n, lnz, is_ll, multadds,
--	use_dbound, packed, stype, Fpacked, sorted, nzmax, len, parent ;
-+	use_dbound, packed, stype, Fpacked, sorted, len, parent ;
- #ifndef REAL
+-        use_bound, packed, stype, Fpacked, sorted, nzmax, len, parent ;
++        use_bound, packed, stype, Fpacked, sorted, len, parent ;
+     #ifndef REAL
      Int dk_imaginary ;
- #endif
+     #endif
 @@ -71,7 +74,9 @@
- 	Fp = NULL ;
- 	Fi = NULL ;
- 	Fx = NULL ;
+         Fp = NULL ;
+         Fi = NULL ;
+         Fx = NULL ;
 +#ifdef ZOMPLEX
- 	Fz = NULL ;
+         Fz = NULL ;
 +#endif
- 	Fnz = NULL ;
- 	Fpacked = TRUE ;
+         Fnz = NULL ;
+         Fpacked = TRUE ;
      }
 @@ -81,7 +86,9 @@
- 	Fp = F->p ;
- 	Fi = F->i ;
- 	Fx = F->x ;
+         Fp = F->p ;
+         Fi = F->i ;
+         Fx = F->x ;
 +#ifdef ZOMPLEX
- 	Fz = F->z ;
+         Fz = F->z ;
 +#endif
- 	Fnz = F->nz ;
- 	Fpacked = F->packed ;
+         Fnz = F->nz ;
+         Fpacked = F->packed ;
      }
 @@ -89,7 +96,9 @@
-     Ap = A->p ;		/* size A->ncol+1, column pointers of A */
-     Ai = A->i ;		/* size nz = Ap [A->ncol], row indices of A */
-     Ax = A->x ;		/* size nz, numeric values of A */
+     Ap = A->p ;         // size A->ncol+1, column pointers of A
+     Ai = A->i ;         // size nz = Ap [A->ncol], row indices of A
+     Ax = A->x ;         // size nz, numeric values of A
 +#ifdef ZOMPLEX
      Az = A->z ;
 +#endif
      Anz = A->nz ;
      packed = A->packed ;
      sorted = A->sorted ;
-@@ -142,8 +151,9 @@
-     Lnext = L->next ;	/* size n+2 */
-     Li = L->i ;		/* size L->nzmax, can change in size */
-     Lx = L->x ;		/* size L->nzmax or 2*L->nzmax, can change in size */
--    Lz = L->z ;		/* size L->nzmax for zomplex case, can change in size */
--    nzmax = L->nzmax ;
+@@ -153,8 +162,9 @@
+     Lnext = L->next ;   // size n+2
+     Li = L->i ;         // size L->nzmax, can change in size
+     Lx = L->x ;         // size L->nzmax or 2*L->nzmax, can change in size
 +#ifdef ZOMPLEX
-+	Lz = L->z ;		/* size L->nzmax for zomplex case, can change in size */
+     Lz = L->z ;         // size L->nzmax for zomplex case, can change in size
+-    nzmax = L->nzmax ;
 +#endif
      ASSERT (Lnz != NULL && Li != NULL && Lx != NULL) ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -155,7 +165,9 @@
-     Flag = Common->Flag ;	/* size n, Flag [i] < mark must hold */
-     Wx = Common->Xwork ;	/* size n if real, 2*n if complex or 
- 				 * zomplex.  Xwork [i] == 0 must hold. */
+     //--------------------------------------------------------------------------
+@@ -166,9 +176,13 @@
+     Flag = Common->Flag ;       // size n, Flag [i] < mark must hold
+     Wx = Common->Xwork ;        // size n if real, 2*n if complex or
+                                 // zomplex.  Xwork [i] == 0 must hold.
 +#ifdef ZOMPLEX
-     Wz = Wx + n ;		/* size n for zomplex case only */
+     Wz = Wx + n ;               // size n for zomplex case only
 +#endif
      mark = Common->mark ;
-     ASSERT ((Int) Common->xworksize >= (L->xtype == CHOLMOD_REAL ? 1:2)*n) ;
++#ifndef NDEBUG
+     size_t wsize = (L->xtype == CHOLMOD_REAL ? 1:2) * ((size_t) n) ;
++#endif
+     ASSERT (Common->xworkbytes >= wsize * sizeof (Real)) ;
  
-@@ -391,7 +403,9 @@
- 		}
- 		Li = L->i ;		/* L->i, L->x, L->z may have moved */
- 		Lx = L->x ;
+     //--------------------------------------------------------------------------
+@@ -388,7 +402,9 @@
+                 }
+                 Li = L->i ;             // L->i, L->x, L->z may have moved
+                 Lx = L->x ;
 +#ifdef ZOMPLEX
- 		Lz = L->z ;
+                 Lz = L->z ;
 +#endif
- 		p = Lp [i] + lnz ;	/* contents of L->p changed */
- 		ASSERT (p < Lp [Lnext [i]]) ;
- 	    }
-diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve.c	2023-11-03 18:58:08
-@@ -60,7 +60,10 @@
- )
- {
-     double d [1] ;
--    double *Lx, *Yx, *Yz ;
-+    double *Lx, *Yx ;
+                 p = Lp [i] + lnz ;      // contents of L->p changed
+                 ASSERT (p < Lp [Lnext [i]]) ;
+             }
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve_worker.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2024-01-05 00:15:30
+@@ -70,7 +70,9 @@
+     Int *Lp = L->p ;
+     Real *Lx = L->x ;
+     Real *Yx = Y->x ;
 +#ifdef ZOMPLEX
-+	double *Yz ;
+     Real *Yz = Y->z ;
 +#endif
-     Int *Lp ;
-     Int n, nrhs, k, p, k1, k2, kk, kkiters ;
  
-@@ -75,7 +78,9 @@
-     Lp = L->p ;
-     Lx = L->x ;
-     Yx = Y->x ;
-+#ifdef ZOMPLEX
-     Yz = Y->z ;
-+#endif
-     kkiters = Yseti ? ysetlen : n ;
-     for (kk = 0 ; kk < kkiters ; kk++)
+     if (Yset)
      {
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_change_factor.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_change_factor.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_change_factor.c	2023-11-03 18:58:08
-@@ -259,13 +259,18 @@
-     cholmod_common *Common
- )
- {
--    Int nsuper, xsize, ssize ;
-+    Int nsuper, ssize ;
-+#ifndef NDEBUG
-+    Int xsize ;
+@@ -209,7 +211,9 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Yx = Y->x ;
++#ifdef ZOMPLEX
+     Real *Yz = Y->z ;
 +#endif
-     Int *Lsuper, *Lpi, *Lpx, *Ls ;
-     size_t nsuper1 ;
+     Int *Ysetp = Yset->p ;
+     Int *Yseti = Yset->i ;
+     Int ysetlen = Ysetp [1] ;
+@@ -227,7 +231,9 @@
  
-     ASSERT (L->xtype == CHOLMOD_PATTERN && !(L->is_super)) ;
- 
-+#ifndef NDEBUG
-     xsize  = L->xsize ;
+     // Y (C) = B (Bset)
+     Real *Bx = B->x ;
++#ifdef ZOMPLEX
+     Real *Bz = B->z ;
 +#endif
-     ssize  = L->ssize ;
-     nsuper = L->nsuper ;
-     nsuper1 = ((size_t) nsuper) + 1 ;
-@@ -673,8 +678,7 @@
+     Int *Bsetp = Bset->p ;
+     Int *Bseti = Bset->i ;
+     Int *Bsetnz = Bset->nz ;
+@@ -262,12 +268,16 @@
  {
-     double grow0, grow1, xlen, xlnz ;
-     void *newLi, *newLx, *newLz ;
--    double *Lx, *Lz ;
--    Int *Lp, *Li, *Lnz ;
-+    Int *Lnz ;
-     Int make_monotonic, grow2, n, j, lnz, len, grow, ok, make_ll, make_ldl ;
-     size_t nzmax0 ;
  
-@@ -688,10 +692,6 @@
-     make_ldl = (!to_ll && L->is_ll) ;
+     Real *Xx = X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = X->z ;
++#endif
+     Int *Xseti = Xset->i ;
+     Int *Xsetp = Xset->p ;
  
-     n = L->n ;
--    Lp = L->p ;
--    Li = L->i ;
--    Lx = L->x ;
--    Lz = L->z ;
-     Lnz = L->nz ;
+     Real *Yx = Y->x ;
++#ifdef ZOMPLEX
+     Real *Yz = Y->z ;
++#endif
  
-     grow = FALSE ;
-@@ -820,19 +820,16 @@
-     cholmod_common *Common
- )
- {
--    Int *Ls, *Lpi, *Lpx, *Super, *Li ;
--    Int n, lnz, s, nsuper, psi, psend, nsrow, nscol, k1, k2, erows ;
-+    Int *Lpi, *Super, *Li ;
-+    Int lnz, s, nsuper, psi, psend, nsrow, nscol, k1, k2, erows ;
+     Int *Ysetp = Yset->p ;
+     Int *Yseti = Yset->i ;
+diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2024-01-05 00:15:30
+@@ -30,12 +30,16 @@
+     Int *Bp = B->p ;
+     Int *Bi = B->i ;
+     Real *Bx = B->x ;
++#ifdef ZOMPLEX
+     Real *Bz = B->z ;
++#endif
+     Int *Bnz = B->nz ;
+     bool packed = B->packed ;
  
-     DEBUG (CHOLMOD(dump_factor) (L, "start LL super to simplicial", Common)) ;
-     PRINT1 (("super -> simplicial (%d %d)\n", to_packed, to_ll)) ;
-     ASSERT (L->xtype != CHOLMOD_PATTERN && L->is_ll && L->is_super) ;
-     ASSERT (L->x != NULL && L->i == NULL) ;
+     Real *B4x = B4->x ;
++#ifdef ZOMPLEX
+     Real *B4z = B4->z ;
++#endif
  
--    n = L->n ;
-     nsuper = L->nsuper ;
-     Lpi = L->pi ;
--    Lpx = L->px ;
--    Ls = L->s ;
-     Super = L->super ;
+     Int n = B4->nrow ;
  
-     /* Int overflow cannot occur since supernodal L already exists */
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_copy.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_copy.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_copy.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_copy.c	2023-11-03 18:58:08
-@@ -271,7 +271,7 @@
- )
- {
-     cholmod_sparse *C ;
--    Int nrow, ncol, up, lo, values, diag, astype ;
-+    Int nrow, ncol, values, diag, astype ;
+@@ -78,13 +82,17 @@
+     Int *Xp = X->p ;
+     Int *Xi = X->i ;
+     Real *Xx = X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = X->z ;
++#endif
+     size_t px = (*xnz) ;
  
-     /* ---------------------------------------------------------------------- */
-     /* check inputs */
-@@ -310,8 +310,6 @@
-     diag = (mode >= 0) ;
-     astype = SIGN (A->stype) ;
-     stype = SIGN (stype) ;
--    up = (astype > 0) ;
--    lo = (astype < 0) ;
+     size_t nzmax = X->nzmax ;
  
-     /* ---------------------------------------------------------------------- */
-     /* copy the matrix */
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_dense.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_dense.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_dense.c	2023-11-03 18:58:08
-@@ -297,8 +297,8 @@
- )
- {
-     cholmod_dense *X ;
--    double *Xx, *Xz ;
--    Int i, n, nz ;
-+    double *Xx ;
-+    Int i, n ;
+     Real *X4x = X4->x ;
++#ifdef ZOMPLEX
+     Real *X4z = X4->z ;
++#endif
+     Int n = X4->nrow ;
  
-     /* ---------------------------------------------------------------------- */
-     /* allocate a dense matrix and set it to the identity matrix */
-@@ -311,9 +311,7 @@
- 	return (NULL) ;	    /* NULL Common, out of memory, or inputs invalid */
-     }
+     //--------------------------------------------------------------------------
+@@ -139,7 +147,9 @@
+                         }
+                         Xi = X->i ;
+                         Xx = X->x ;
++#ifdef ZOMPLEX
+                         Xz = X->z ;
++#endif
+                     }
+                     Xi [px] = i ;
+                     ASSIGN (Xx, Xz, px, X4x, X4z, p) ;
+@@ -180,7 +190,9 @@
+     bool packed = B->packed ;
  
--    nz = MAX (1, nrow*ncol) ;
-     Xx = X->x ;
--    Xz = X->z ;
+     Real *B4x = B4->x ;
++#ifdef ZOMPLEX
+     Real *B4z = B4->z ;
++#endif
  
-     n = MIN (nrow, ncol) ;
+     Int n = B4->nrow ;
  
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_memory.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_memory.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_memory.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_memory.c	2023-11-03 18:58:08
-@@ -118,7 +118,6 @@
- )
- {
-     void *p ;
--    size_t s ;
-     /*
-     int ok = TRUE ;
-     */
-@@ -308,7 +307,6 @@
- {
-     size_t nold = (*n) ;
-     void *pnew ;
--    size_t s ;
-     int ok = TRUE ;
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/cholmod_ssmult.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/cholmod_ssmult.c	2024-01-05 10:40:18
+@@ -84,7 +84,7 @@
+     // check inputs
+     //--------------------------------------------------------------------------
+ 
+-    cholmod_sparse *C = NULL, *A2 = NULL, *B2 = NULL, *C2 = NULL ;
++    cholmod_sparse *C = NULL, *A2 = NULL, *B2 = NULL ;
  
      RETURN_IF_NULL_COMMON (NULL) ;
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_sparse.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_sparse.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_sparse.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_sparse.c	2023-11-03 18:58:08
-@@ -483,7 +483,7 @@
-     double *Ax, *Cx, *Az, *Cz ;
-     Int *Ap, *Ai, *Anz, *Cp, *Ci, *Cnz ;
-     cholmod_sparse *C ;
--    Int p, pend, j, ncol, packed, nzmax, nz, xtype ;
-+    Int p, pend, j, ncol, packed, nz, xtype ;
+     RETURN_IF_NULL (A, NULL) ;
+@@ -196,7 +196,6 @@
+     Int ncol = B->ncol ;
  
-     /* ---------------------------------------------------------------------- */
-     /* check inputs */
-@@ -505,7 +505,6 @@
-     /* ---------------------------------------------------------------------- */
+     // get workspace
+-    void *W = Common->Xwork ;   // size nrow, unused if values is false
+     Int *Flag = Common->Flag ;  // size nrow, Flag [0..nrow-1] < mark on input
  
-     ncol = A->ncol ;
--    nzmax = A->nzmax ;
-     packed = A->packed ;
-     Ap = A->p ;
-     Ai = A->i ;
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_triplet.c
---- src/SuiteSparse/CHOLMOD/Utility/cholmod_triplet.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/cholmod_triplet.c	2023-11-03 18:58:08
-@@ -338,8 +338,8 @@
- )
- {
-     cholmod_sparse *R, *A = NULL ;
--    Int *Wj, *Rp, *Ri, *Rnz, *Ti, *Tj ;
--    Int i, j, p, k, stype, nrow, ncol, nz, ok ;
-+    Int *Wj, *Rp, *Rnz, *Ti, *Tj ;
-+    Int i, j, p, k, stype, nrow, ncol, nz ;
-     size_t anz = 0 ;
- 
-     /* ---------------------------------------------------------------------- */
-@@ -394,7 +394,6 @@
-     }
- 
-     Rp = R->p ;
--    Ri = R->i ;
-     Rnz = R->nz ;
- 
-     /* ---------------------------------------------------------------------- */
-@@ -518,11 +517,11 @@
- 
-     if (stype)
-     {
--	ok = CHOLMOD(transpose_sym) (R, 1, NULL, A, Common) ;
-+	CHOLMOD(transpose_sym) (R, 1, NULL, A, Common) ;
-     }
-     else
-     {
--	ok = CHOLMOD(transpose_unsym) (R, 1, NULL, NULL, 0, A, Common) ; 
-+	CHOLMOD(transpose_unsym) (R, 1, NULL, NULL, 0, A, Common) ; 
-     }
- 
-     CHOLMOD(free_sparse) (&R, Common) ;
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c	2023-11-03 18:58:08
-@@ -35,7 +35,10 @@
- )
- {
-     double xlen, dj [1], ljj [1], lj2 [1] ;
--    double *Lx, *Lz ;
-+    double *Lx ;
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2024-01-05 00:15:30
+@@ -59,7 +59,9 @@
+     Int *Ap = A->p ;
+     Int *Ai = A->i ;
+     Real *Ax = A->x ;
 +#ifdef ZOMPLEX
-+	double *Lz ;
+     Real *Az = A->z ;
 +#endif
-     Int *Lp, *Li, *Lnz ;
-     Int n, j, len, pnew, pold, k, p, pend ;
- 
-@@ -43,7 +46,9 @@
-     Lp = L->p ;
-     Li = L->i ;
-     Lx = L->x ;
-+#ifdef ZOMPLEX
-     Lz = L->z ;
-+#endif
-     Lnz = L->nz ;
- 
-     if (make_ll)
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense.c	2023-11-03 18:58:08
-@@ -25,7 +25,13 @@
-     cholmod_common *Common
- )
- {
--    double *Ax, *Xx, *Az, *Xz ;
-+    double *Xx ;
+     Int *Anz = A->nz ;
+     bool packed = A->packed ;
+     Int ncol = A->ncol ;
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2024-01-05 00:15:30
+@@ -25,23 +25,35 @@
+     Int *Ap  = A->p ;
+     Int *Anz = A->nz ;
+     Int *Ai  = A->i ;
 +#ifndef PATTERN
-+    double *Ax ;
-+#endif
+     Real *Ax  = A->x ;
 +#ifdef ZOMPLEX
-+    double *Az, *Xz ;
+     Real *Az  = A->z ;
 +#endif
-     Int *Ap, *Ai, *Anz ;
-     cholmod_dense *X ;
-     Int i, j, p, pend, nrow, ncol, packed ;
-@@ -39,8 +45,12 @@
-     packed = A->packed ;
-     Ap = A->p ;
-     Ai = A->i ;
++#endif
+     bool apacked = A->packed ;
+     Int ancol = A->ncol ;
+ 
+     Int *Bp  = B->p ;
+     Int *Bnz = B->nz ;
+     Int *Bi  = B->i ;
 +#ifndef PATTERN
-     Ax = A->x ;
-+#endif
+     Real *Bx  = B->x ;
 +#ifdef ZOMPLEX
-     Az = A->z ;
+     Real *Bz  = B->z ;
 +#endif
-     Anz = A->nz ;
++#endif
+     bool bpacked = B->packed ;
+     Int bncol = B->ncol ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -53,7 +63,9 @@
- 	return (NULL) ;	    /* out of memory */
-     }
-     Xx = X->x ;
+     Int *Cp = C->p ;
+     Int *Ci = C->i ;
++#ifndef PATTERN
+     Real *Cx = C->x ;
 +#ifdef ZOMPLEX
-     Xz = X->z ;
+     Real *Cz = C->z ;
 +#endif
++#endif
+     Int ncol = C->ncol ;
  
-     /* ---------------------------------------------------------------------- */
-     /* copy into dense matrix */
-@@ -131,7 +143,10 @@
-     cholmod_common *Common
- )
- {
--    double *Xx, *Cx, *Xz, *Cz ;
-+    double *Xx, *Cx ;
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2024-01-05 00:15:30
+@@ -36,7 +36,9 @@
+     Int nrow = X->nrow ;
+     Int d = X->d ;
+     Real *Xx = X->x ;
 +#ifdef ZOMPLEX
-+    double *Xz, *Cz ;
-+#endif
-     Int *Ci, *Cp ;
-     cholmod_sparse *C ;
-     Int i, j, p, d, nrow, ncol, nz ;
-@@ -144,7 +159,9 @@
-     ncol = X->ncol ;
-     d = X->d ;
-     Xx = X->x ;
-+#ifdef ZOMPLEX
-     Xz = X->z ;
+     Real *Xz = X->z ;
 +#endif
  
-     /* ---------------------------------------------------------------------- */
-     /* count the number of nonzeros in the result */
-@@ -175,7 +192,9 @@
-     Cp = C->p ;
-     Ci = C->i ;
-     Cx = C->x ;
+     double xnorm = 0 ;
+ 
+@@ -158,8 +160,12 @@
+     Int *Ap = A->p ;
+     Int *Ai = A->i ;
+     Int *Anz = A->nz ;
++#ifndef PATTERN
+     Real *Ax = A->x ;
 +#ifdef ZOMPLEX
-     Cz = C->z ;
+     Real *Az = A->z ;
++#endif
++#endif
+     Int ncol = A->ncol ;
+     Int nrow = A->nrow ;
+     bool packed = A->packed ;
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2024-01-05 00:17:57
+@@ -28,12 +28,16 @@
+     Int  *Anz = A->nz ;
+     Int  *Ai  = A->i ;
+     Real *Ax  = A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = A->z ;
++#endif
+     bool packed = A->packed ;
+     Int ncol = A->ncol ;
+ 
+     Real *Sx = S->x ;
++#ifdef ZOMPLEX
+     Real *Sz = S->z ;
 +#endif
  
-     /* ---------------------------------------------------------------------- */
-     /* copy the dense matrix X into the sparse matrix C */
-@@ -224,7 +243,10 @@
-     cholmod_dense *Y	/* copy of matrix X */
- )
- {
--    double *Xx, *Xz, *Yx, *Yz ;
-+    double *Xx, *Yx ;
+     //--------------------------------------------------------------------------
+     // scale the matrix
+@@ -55,7 +59,9 @@
+                 Int i = Ai [p] ;
+                 // t = S (i) * A (i,j)
+                 Real tx [2] ;
 +#ifdef ZOMPLEX
-+    double *Xz, *Yz ;
+                 Real tz [1] ;
 +#endif
-     Int i, j, nrow, ncol, dy, dx ;
- 
-     /* ---------------------------------------------------------------------- */
-@@ -232,9 +254,13 @@
-     /* ---------------------------------------------------------------------- */
- 
-     Xx = X->x ;
+                 MULT (tx, tz, 0, Sx, Sz, i, Ax, Az, p) ;
+                 // A (i,j) = t
+                 ASSIGN (Ax, Az, p, tx, tz, 0) ;
+@@ -74,7 +80,9 @@
+         {
+             // s = S (j)
+             Real sx [2] ;
 +#ifdef ZOMPLEX
-     Xz = X->z ;
+             Real sz [1] ;
 +#endif
+             ASSIGN (sx, sz, 0, Sx, Sz, j) ;
+ 
+             Int p = Ap [j] ;
+@@ -83,7 +91,9 @@
+             {
+                 // t = A (i,j) * s
+                 Real tx [2] ;
++#ifdef ZOMPLEX
+                 Real tz [1] ;
++#endif
+                 MULT (tx, tz, 0, Ax, Az, p, sx, sz, 0) ;
+                 // A (i,j) = t
+                 ASSIGN (Ax, Az, p, tx, tz, 0) ;
+@@ -102,7 +112,9 @@
+         {
+             // s = S (j)
+             Real sx [2] ;
++#ifdef ZOMPLEX
+             Real sz [1] ;
++#endif
+             ASSIGN (sx, sz, 0, Sx, Sz, j) ;
+ 
+             Int p = Ap [j] ;
+@@ -112,7 +124,9 @@
+                 Int i = Ai [p] ;
+                 // t = A (i,j) * S (i)
+                 Real tx [2] ;
++#ifdef ZOMPLEX
+                 Real tz [1] ;
++#endif
+                 MULT (tx, tz, 0, Ax, Az, p, Sx, Sz, i) ;
+                 // A (i,j) = s * t
+                 MULT (Ax, Az, p, sx, sz, 0, tx, tz, 0) ;
+@@ -129,7 +143,9 @@
+ 
+         // s = S (0)
+         Real sx [2] ;
++#ifdef ZOMPLEX
+         Real sz [1] ;
++#endif
+         ASSIGN (sx, sz, 0, Sx, Sz, 0) ;
+ 
+         for (Int j = 0 ; j < ncol ; j++)
+@@ -140,7 +156,9 @@
+             {
+                 // t = s * A (i,j)
+                 Real tx [2] ;
++#ifdef ZOMPLEX
+                 Real tz [1] ;
++#endif
+                 MULT (tx, tz, 0, sx, sz, 0, Ax, Az, p) ;
+                 // A (i,j) = t
+                 ASSIGN (Ax, Az, p, tx, tz, 0) ;
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-05 10:48:14
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-05 10:36:42
+@@ -55,28 +55,37 @@
+     #endif
+ 
+     size_t ny = transpose ? A->ncol : A->nrow ;        // required length of Y
++#ifdef ZOMPLEX
+     size_t nx = transpose ? A->nrow : A->ncol ;        // required length of X
++#endif
+ 
+-    Int nrow = A->nrow ;
+     Int ncol = A->ncol ;
+ 
+     Int *Ap  = A->p ;
+     Int *Anz = A->nz ;
+     Int *Ai  = A->i ;
+     Real *Ax = A->x ;
++#ifdef ZOMPLEX
+     Real *Az = A->z ;
++#endif
+     bool packed = A->packed ;
+ 
+     Real *Xx = X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = X->z ;
++#endif
+     Real *Yx = Y->x ;
++#ifdef ZOMPLEX
+     Real *Yz = Y->z ;
++#endif
+ 
+     Int kcol = X->ncol ;
+     size_t dy = Y->d ;
+     size_t dx = X->d ;
+     Real *w = W ;
++#ifdef ZOMPLEX
+     Real *Wz = (W) ? W + 4*nx : W ;
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // Y = beta * Y
+@@ -120,7 +129,9 @@
+     //--------------------------------------------------------------------------
+ 
      Yx = Y->x ;
 +#ifdef ZOMPLEX
      Yz = Y->z ;
 +#endif
-     dx = X->d ;
-     dy = Y->d ;
-     nrow = X->nrow ;
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose.c	2023-11-03 18:58:08
-@@ -40,9 +40,18 @@
-     cholmod_common *Common
- )
- {
--    double *Ax, *Az, *Fx, *Fz ;
--    Int *Ap, *Anz, *Ai, *Fp, *Fnz, *Fj, *Wi, *Iwork ;
--    Int j, p, pend, nrow, ncol, Apacked, use_fset, fp, Fpacked, jj, permute ;
-+#ifndef PATTERN
-+    double *Ax, *Fx ;
-+#endif
-+#ifdef ZOMPLEX
-+    double *Az, *Fz ;
-+#endif
-+    Int *Ap, *Anz, *Ai, *Fj, *Wi, *Iwork ;
-+    Int j, p, pend, ncol, Apacked, use_fset, fp, jj ;
-+#ifndef NDEBUG
-+    Int *Fnz ;
-+    Int Fpacked ;
-+#endif
+     Int k = 0 ;
  
-     /* ---------------------------------------------------------------------- */
-     /* check inputs */
-@@ -60,25 +69,31 @@
-     /* ---------------------------------------------------------------------- */
+     if (A->stype == 0)
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2024-01-05 10:39:01
+@@ -23,35 +23,51 @@
+     // get inputs
+     //--------------------------------------------------------------------------
  
-     use_fset = (fset != NULL) ;
--    nrow = A->nrow ;
-     ncol = A->ncol ;
- 
-     Ap = A->p ;		/* size A->ncol+1, column pointers of A */
-     Ai = A->i ;		/* size nz = Ap [A->ncol], row indices of A */
-+#ifndef PATTERN
-     Ax = A->x ;		/* size nz, real values of A */
-+#endif
-+#ifdef ZOMPLEX
-     Az = A->z ;		/* size nz, imag values of A */
-+#endif
-     Anz = A->nz ;
-     Apacked = A->packed ;
-     ASSERT (IMPLIES (!Apacked, Anz != NULL)) ;
- 
--    permute = (Perm != NULL) ;
+-    Real *W = Common->Xwork ;
 -
--    Fp = F->p ;		/* size A->nrow+1, row pointers of F */
-     Fj = F->i ;		/* size nz, column indices of F */
--    Fx = F->x ;		/* size nz, real values of F */
+     Int *Ap  = A->p ;
+     Int *Anz = A->nz ;
+     Int *Ai  = A->i ;
 +#ifndef PATTERN
-+	Fx = F->x ;		/* size nz, real values of F */
-+#endif
+     Real *Ax  = A->x ;
 +#ifdef ZOMPLEX
-     Fz = F->z ;		/* size nz, imag values of F */
+     Real *Az  = A->z ;
 +#endif
-+#ifndef NDEBUG
-     Fnz = F->nz ;
-     Fpacked = F->packed ;
 +#endif
-     ASSERT (IMPLIES (!Fpacked, Fnz != NULL)) ;
+     bool apacked = A->packed ;
  
-     nf = (use_fset) ? nf : ncol ;
-@@ -137,8 +152,13 @@
-     cholmod_common *Common
- )
- {
--    double *Ax, *Az, *Fx, *Fz ;
--    Int *Ap, *Anz, *Ai, *Fp, *Fj, *Wi, *Pinv, *Iwork ;
+     Int *Bp  = B->p ;
+     Int *Bnz = B->nz ;
+     Int *Bi  = B->i ;
 +#ifndef PATTERN
-+    double *Ax, *Fx ;
-+#endif
+     Real *Bx  = B->x ;
 +#ifdef ZOMPLEX
-+    double *Az, *Fz ;
+     Real *Bz  = B->z ;
 +#endif
-+    Int *Ap, *Anz, *Ai, *Fj, *Wi, *Pinv, *Iwork ;
-     Int p, pend, packed, fp, upper, permute, jold, n, i, j, iold ;
++#endif
+     bool bpacked = B->packed ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -160,17 +180,24 @@
-     n = A->nrow ;
-     Ap = A->p ;		/* size A->ncol+1, column pointers of A */
-     Ai = A->i ;		/* size nz = Ap [A->ncol], row indices of A */
+     // get the size of C
++#ifdef ZOMPLEX
+     Int nrow = A->nrow ;
++#endif
+     Int ncol = B->ncol ;
+ 
+     // get workspace
 +#ifndef PATTERN
-     Ax = A->x ;		/* size nz, real values of A */
-+#endif
+     Real *Wx = Common->Xwork ;  // size nrow, unused if C is pattern
 +#ifdef ZOMPLEX
-     Az = A->z ;		/* size nz, imag values of A */
+     Real *Wz = Wx + nrow ;      // only used for the zomplex case
 +#endif
-     Anz = A->nz ;
-     packed = A->packed ;
-     ASSERT (IMPLIES (!packed, Anz != NULL)) ;
-     upper = (A->stype > 0) ;
++#endif
+     Int *Flag = Common->Flag ;  // size nrow, Flag [0..nrow-1] < mark on input
  
--    Fp = F->p ;		/* size A->nrow+1, row pointers of F */
-     Fj = F->i ;		/* size nz, column indices of F */
+     Int *Cp = C->p ;
+     Int *Ci = C->i ;
 +#ifndef PATTERN
-     Fx = F->x ;		/* size nz, real values of F */
-+#endif
+     Real *Cx = C->x ;
 +#ifdef ZOMPLEX
-     Fz = F->z ;		/* size nz, imag values of F */
+     Real *Cz = C->z ;
++#endif
 +#endif
  
-     /* ---------------------------------------------------------------------- */
-     /* get workspace */
-diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet.c	2023-11-03 18:58:08
-@@ -26,7 +26,12 @@
-     cholmod_common *Common
- )
- {
--    double *Rx, *Rz, *Tx, *Tz ;
+     //--------------------------------------------------------------------------
+     // C = A*B
+@@ -77,8 +93,12 @@
+             Int k = Bi [pb] ;
+ 
+             // b = Bx [pb] ;
 +#ifndef PATTERN
-+    double *Rx, *Tx ;
-+#endif
+             Real bx [2] ;
 +#ifdef ZOMPLEX
-+    double *Rz, *Tz ;
+             Real bz [1] ;
 +#endif
-     Int *Wj, *Rp, *Ri, *Rnz, *Ti, *Tj  ;
-     Int i, j, p, p1, p2, pdest, pj, k, stype, nrow, ncol, nz ;
-     size_t anz ;
-@@ -41,13 +46,21 @@
-     Rp = R->p ;
-     Ri = R->i ;
-     Rnz = R->nz ;
++#endif
+             ASSIGN (bx, bz, 0, Bx, Bz, pb) ;
+ 
+             // add the nonzero pattern of A(:,k) to the pattern of C(:,j)
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2024-01-05 00:15:30
+@@ -29,14 +29,22 @@
+     Int *Ap = A->p ;
+     Int *Ai = A->i ;
+     Int *Anz = A->nz ;
 +#ifndef PATTERN
-     Rx = R->x ;
-+#endif
+     Real *Ax = A->x ;
 +#ifdef ZOMPLEX
-     Rz = R->z ;
+     Real *Az = A->z ;
 +#endif
++#endif
+     bool packed = A->packed ;
  
-     Ti = T->i ;
-     Tj = T->j ;
+     Int *Cp = C->p ;
+     Int *Ci = C->i ;
 +#ifndef PATTERN
-     Tx = T->x ;
-+#endif
+     Real *Cx = C->x ;
 +#ifdef ZOMPLEX
-     Tz = T->z ;
+     Real *Cz = C->z ;
 +#endif
-     nz = T->nnz ;
-     nrow = T->nrow ;
-     ncol = T->ncol ;
-diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult.c	2023-11-03 19:05:53
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult.c	2023-11-03 18:58:08
-@@ -47,10 +47,16 @@
-     double betaz [1], alphaz [1] ;
- #endif
++#endif
+     Int cncol = C->ncol ;
  
--    double *Ax, *Az, *Xx, *Xz, *Yx, *Yz, *w, *Wz ;
-+    double *Ax, *Xx, *Yx, *w ;
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2024-01-05 00:15:30
+@@ -25,22 +25,34 @@
+     Int *Ap  = A->p ;
+     Int *Anz = A->nz ;
+     Int *Ai  = A->i ;
++#ifndef PATTERN
+     Real *Ax  = A->x ;
 +#ifdef ZOMPLEX
-+    double *Az, *Xz, *Yz, *Wz ;
+     Real *Az  = A->z ;
 +#endif
-     Int *Ap, *Ai, *Anz ;
--    size_t nx, ny, dx, dy ;
--    Int packed, nrow, ncol, j, k, p, pend, kcol, i ;
-+    size_t ny, dx, dy ;
-+#ifdef ZOMPLEX
-+    size_t nx ;
 +#endif
-+    Int packed, ncol, j, k, p, pend, kcol, i ;
+     bool apacked = A->packed ;
+     Int anrow = A->nrow ;
  
-     /* ---------------------------------------------------------------------- */
-     /* get inputs */
-@@ -62,30 +68,41 @@
- #endif
- 
-     ny = transpose ? A->ncol : A->nrow ;	/* required length of Y */
+     Int *Bp  = B->p ;
+     Int *Bnz = B->nz ;
+     Int *Bi  = B->i ;
++#ifndef PATTERN
+     Real *Bx  = B->x ;
 +#ifdef ZOMPLEX
-     nx = transpose ? A->nrow : A->ncol ;	/* required length of X */
+     Real *Bz  = B->z ;
 +#endif
++#endif
+     bool bpacked = B->packed ;
  
--    nrow = A->nrow ;
-     ncol = A->ncol ;
+     Int *Cp = C->p ;
+     Int *Ci = C->i ;
++#ifndef PATTERN
+     Real *Cx = C->x ;
++#ifdef ZOMPLEX
+     Real *Cz = C->z ;
++#endif
++#endif
+     Int ncol = C->ncol ;
  
-     Ap  = A->p ;
-     Anz = A->nz ;
-     Ai  = A->i ;
-     Ax  = A->x ;
-+#ifdef ZOMPLEX
-     Az  = A->z ;
-+#endif
-     packed = A->packed ;
-     Xx = X->x ;
-+#ifdef ZOMPLEX
-     Xz = X->z ;
-+#endif
-     Yx = Y->x ;
-+#ifdef ZOMPLEX
-     Yz = Y->z ;
-+#endif
-     kcol = X->ncol ;
-     dy = Y->d ;
-     dx = X->d ;
-     if (A->stype != 0 && kcol >= 4) {
-     w = W ;
-+#ifdef ZOMPLEX
-     Wz = W + 4*nx ;
-+#endif
-     } else {
-     w = NULL ;
-+#ifdef ZOMPLEX
-     Wz = NULL ;
-+#endif
-     }
- 
-     /* ---------------------------------------------------------------------- */
-@@ -130,7 +147,9 @@
-     /* ---------------------------------------------------------------------- */
- 
-     Yx = Y->x ;
-+#ifdef ZOMPLEX
-     Yz = Y->z ;
-+#endif
- 
-     k = 0 ;
- 
-diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_updown.c src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_updown.c
---- src/SuiteSparse/CHOLMOD/Modify/cholmod_updown.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_updown.c	2023-11-03 18:58:08
-@@ -428,7 +428,10 @@
-     double xj, fl ;
-     double *Lx, *W, *Xx, *Nx ;
-     Int *Li, *Lp, *Lnz, *Cp, *Ci, *Cnz, *Head, *Flag, *Stack, *Lnext, *Iwork,
--	*Set_ps1 [32], *Set_ps2 [32], *ps1, *ps2 ;
-+	*Set_ps1 [32], *Set_ps2 [32], *ps2 ;
-+#ifndef NDEBUG
-+	Int *ps1 ;
-+#endif
-     size_t maxrank ;
-     Path_type OrderedPath [32], Path [32] ;
-     Int n, wdim, k1, k2, npaths, i, j, row, packed, ccol, p, cncol, do_solve,
-@@ -591,7 +594,9 @@
-     /* entire rank-cncol update, done as a sequence of rank-k updates */
-     /* ---------------------------------------------------------------------- */
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowadd.c
+--- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowadd.c	2024-01-05 00:15:30
+@@ -136,7 +136,6 @@
+     RETURN_IF_NULL (R, FALSE) ;
+     RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_REAL, FALSE) ;
+     RETURN_IF_XTYPE_INVALID (R, CHOLMOD_REAL, CHOLMOD_REAL, FALSE) ;
+-    Int n = L->n ;
+     Int k = kadd ;
+     if (kadd >= L->n || k < 0)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowdel.c
+--- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowdel.c	2024-01-05 00:15:30
+@@ -122,7 +122,6 @@
+     RETURN_IF_NULL_COMMON (FALSE) ;
+     RETURN_IF_NULL (L, FALSE) ;
+     RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_REAL, FALSE) ;
+-    Int n = L->n ;
+     Int k = kdel ;
+     if (kdel >= L->n || k < 0)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c src/SuiteSparse-patched/CHOLMOD/Modify/t_cholmod_updown_worker.c
+--- src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Modify/t_cholmod_updown_worker.c	2024-01-05 00:15:30
+@@ -148,7 +148,9 @@
+     double fl = 0 ;
+     bool use_colmark = (colmark != NULL) ;
  
 +#ifndef NDEBUG
-     ps1 = NULL ;
+     Int *ps1 = NULL ;
 +#endif
-     ps2 = NULL ;
+     Int *ps2 = NULL ;
  
-     for (k1 = 0 ; k1 < cncol ; k1 += k)
-@@ -1125,7 +1130,9 @@
+     //--------------------------------------------------------------------------
+@@ -699,7 +701,9 @@
  
- 	    if (nsets > 0)
- 	    {
+             if (nsets > 0)
+             {
 +#ifndef NDEBUG
- 		ps1 = Set_ps1 [0] ;
+                 ps1 = Set_ps1 [0] ;
 +#endif
- 		ps2 = Set_ps2 [0] ;
- 	    }
+                 ps2 = Set_ps2 [0] ;
+             }
  
 diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c
---- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c	2023-11-03 18:58:08
-@@ -590,7 +590,7 @@
+--- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c	2024-01-05 00:15:30
+@@ -578,7 +578,7 @@
      idx_t *Mp, *Mi, *Mperm, *Miperm ;
      cholmod_sparse *B ;
-     Int i, j, n, nz, p, identity, uncol ;
+     Int i, j, n, nz, p, identity ;
 -    idx_t nn, zero = 0 ;
 +    idx_t nn ;
-     size_t n1, s ;
-     int ok = TRUE ;
  
+     RETURN_IF_NULL_COMMON (FALSE) ;
+     RETURN_IF_NULL (A, FALSE) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c
---- src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c	2023-11-03 18:58:08
-@@ -686,9 +686,12 @@
-     cholmod_common *Common
+--- src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c	2024-01-05 00:15:30
+@@ -681,8 +681,11 @@
  )
  {
+ 
 -    Int n, mark, cj, j, sj, sn, p, i, snode, pstart, pdest, pend, nd_components,
 +    Int mark, cj, j, sj, sn, p, i, snode, pstart, pdest, pend, nd_components,
- 	part, first, save_mark ;
-     Int *Bp, *Bi, *Flag ;
+         part, first, save_mark ;
 +#ifndef NDEBUG
 +    Int n ;
 +#endif
+     Int *Bp, *Bi, *Flag ;
  
-     /* ---------------------------------------------------------------------- */
-     /* get workspace */
-@@ -707,7 +710,9 @@
+     //--------------------------------------------------------------------------
+@@ -702,7 +705,9 @@
  
      Bp = B->p ;
      Bi = B->i ;
@@ -945,8 +899,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c src/SuiteSparse-pat
      ASSERT (IMPLIES (cnode >= 0, Flag [cnode] < EMPTY)) ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2023-11-03 19:02:06
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2024-01-05 10:30:31
 @@ -11,6 +11,38 @@
  #ifndef _GK_MKPQUEUE_H
  #define _GK_MKPQUEUE_H
@@ -959,7 +913,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/Suit
 +  gk_idx_t *locator;\
 +  KVT *heap;\
 +\
-+  heap    = queue->heap;\
++  heap = queue->heap;\
 +  locator = queue->locator;\
 +  nnodes  = queue->nnodes;\
 +\
@@ -974,7 +928,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/Suit
 +  for (i=1; i<nnodes; i++)\
 +    ASSERT(!KEY_LT(heap[i].key, heap[0].key));\
 +\
-+  for (i=0; i<queue->maxnodes; i++) {\
++  for (j=i=0; i<queue->maxnodes; i++) {\
 +    if (locator[i] != -1)\
 +      j++;\
 +  }\
@@ -1021,8 +975,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/Suit
  }\
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2024-01-05 00:15:30
 @@ -40,7 +40,7 @@
  **************************************************************************/
  void Bnd2WayBalance(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts)
@@ -1053,8 +1007,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c src/Suite
    idx_t *moved, *swaps, *perm, *qnum, *qsizes;
    idx_t higain, mincut, newcut, mincutorder;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2024-01-05 10:32:27
 @@ -21,7 +21,7 @@
  /*************************************************************************/
  graph_t *CoarsenGraph(ctrl_t *ctrl, graph_t *graph)
@@ -1137,8 +1091,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c src/Suite
    idx_t *xadj, *vwgt, *vsize, *adjncy, *adjwgt;
    idx_t *cmap, *htable;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2024-01-05 00:15:30
 @@ -151,7 +151,7 @@
               idx_t *vwgt, idx_t *iperm, real_t factor)
  {
@@ -1149,8 +1103,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c src/Suit
    graph_t *graph=NULL;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2024-01-05 10:33:32
 @@ -32,7 +32,7 @@
  idx_t FindPartitionInducedComponents(graph_t *graph, idx_t *where, 
            idx_t *cptr, idx_t *cind)
@@ -1174,7 +1128,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c src/SuiteS
  void EliminateComponents(ctrl_t *ctrl, graph_t *graph)
  {
 -  idx_t i, ii, j, jj, k, me, nparts, nvtxs, ncon, ncmps, other, 
-+  idx_t i, ii, j, jj, me, nparts, nvtxs, ncon, ncmps, 
++  idx_t i, ii, j, jj, me, nparts, nvtxs, ncon, ncmps,
          ncand, target;
    idx_t *xadj, *adjncy, *vwgt, *adjwgt, *where, *pwgts;
    idx_t *cptr, *cind, *cpvec, *pcptr, *pcind, *cwhere;
@@ -1222,8 +1176,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c src/SuiteS
    vsize  = graph->vsize;
    adjncy = graph->adjncy;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2024-01-05 00:15:30
 @@ -47,7 +47,7 @@
  /*************************************************************************/
  idx_t ComputeVolume(graph_t *graph, idx_t *where)
@@ -1265,16 +1219,14 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -194,7 +198,8 @@
+@@ -194,6 +198,7 @@
  /*************************************************************************/
  idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd) 
  {
--  idx_t i, j, nvtxs, nbnd;
 +#ifndef NDEBUG
-+  idx_t i, nvtxs, nbnd;
+   idx_t i, j, nvtxs, nbnd;
    idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
  
-   nvtxs = graph->nvtxs;
 @@ -219,6 +224,7 @@
        ASSERTP(bndptr[i] != -1, ("%"PRIDX" %"PRIDX"\n", i, bndptr[i]));
      }
@@ -1345,8 +1297,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    vnbr_t *mynbrs, *onbrs, *tmpnbrs;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2024-01-05 00:15:30
 @@ -28,7 +28,7 @@
  /*************************************************************************/
  void FM_2WayCutRefine(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, idx_t niter)
@@ -1366,8 +1318,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c src/SuiteSpars
          *bndptr, *bndind;
    idx_t *moved, *swaps, *perm, *qnum;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2024-01-05 00:15:30
 @@ -17,8 +17,7 @@
  graph_t *SetupGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t ncon, idx_t *xadj, 
               idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt) 
@@ -1379,8 +1331,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c src/SuiteSp
  
    /* allocate the graph and fill in the fields */
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2024-01-05 00:15:30
 @@ -114,18 +114,15 @@
  void RandomBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
           idx_t niparts)
@@ -1388,7 +1340,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c src/Suit
 -  idx_t i, ii, j, k, nvtxs, pwgts[2], zeromaxpwgt, from, me, 
 -        bestcut=0, icut, mincut, inbfs;
 -  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *where;
-+  idx_t i, ii, nvtxs, pwgts[2], zeromaxpwgt, 
++  idx_t i, ii, nvtxs, pwgts[2], zeromaxpwgt,
 +        bestcut=0, inbfs;
 +  idx_t *vwgt, *where;
    idx_t *perm, *bestwhere;
@@ -1473,8 +1425,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c src/Suit
  
    WCOREPUSH;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2024-01-05 00:15:30
 @@ -102,10 +102,9 @@
  /*************************************************************************/
  idx_t MlevelKWayPartitioning(ctrl_t *ctrl, graph_t *graph, idx_t *part)
@@ -1487,18 +1439,21 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c src/SuiteS
  
  
    for (i=0; i<ctrl->ncuts; i++) {
-@@ -171,7 +170,7 @@
+@@ -171,7 +170,10 @@
  /*************************************************************************/
  void InitKWayPartitioning(ctrl_t *ctrl, graph_t *graph)
  {
 -  idx_t i, ntrials, options[METIS_NOPTIONS], curobj=0, bestobj=0;
 +  idx_t i, options[METIS_NOPTIONS], curobj=0;
++#ifdef XXX
++  idx_t ntrials, bestobj=0;
++#endif
    idx_t *bestwhere=NULL;
    real_t *ubvec=NULL;
    int status;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2024-01-05 00:15:30
 @@ -61,12 +61,12 @@
           real_t ffactor, idx_t omode)
  {
@@ -1619,8 +1574,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c src/SuiteS
    vkrinfo_t *myrinfo, *orinfo;
    vnbr_t *mynbrs, *onbrs;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2024-01-05 00:15:30
 @@ -148,7 +148,7 @@
  /**************************************************************************/
  void ComputeKWayPartitionParams(ctrl_t *ctrl, graph_t *graph)
@@ -1636,7 +1591,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c src/Su
  {
 -  idx_t i, ii, j, k, l, nvtxs, nparts, me, other, pid; 
 -  idx_t *xadj, *vsize, *adjncy, *adjwgt, *where, 
-+  idx_t i, ii, j, k, nvtxs, nparts, me, other; 
++  idx_t i, ii, j, k, nvtxs, nparts, me, other;
 +  idx_t *xadj, *vsize, *adjncy, *where, 
          *bndind, *bndptr, *ophtable;
    vkrinfo_t *myrinfo, *orinfo;
@@ -1650,8 +1605,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c src/Su
    where  = graph->where;
    bndind = graph->bndind;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2024-01-05 00:15:30
 @@ -18,16 +18,13 @@
  void ComputeSubDomainGraph(ctrl_t *ctrl, graph_t *graph)
  {
@@ -1699,8 +1654,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/Suite
    vsize  = graph->vsize;
    adjncy = graph->adjncy;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2024-01-05 00:15:30
 @@ -48,7 +48,6 @@
    graph_t *graph=NULL;
    ctrl_t *ctrl;
@@ -1778,8 +1733,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c src/SuiteS
    idx_t *perm, *iperm, *head, *qsize, *list, *marker;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2024-01-05 00:15:30
 @@ -105,7 +105,7 @@
  void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
           idx_t lastvtx, idx_t npes, idx_t cpos, idx_t *sizes)
@@ -1798,8 +1753,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c src/Suit
    ctrl_t *ctrl;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2024-01-05 00:15:30
 @@ -157,7 +157,7 @@
  idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts, 
            idx_t *part, real_t *tpwgts, idx_t fpart)
@@ -1810,8 +1765,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c src/SuiteS
    graph_t *lgraph, *rgraph;
    real_t wsum, *tpwgts2;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2024-01-05 00:15:30
 @@ -20,7 +20,7 @@
  **************************************************************************/
  void ConstructSeparator(ctrl_t *ctrl, graph_t *graph)
@@ -1844,8 +1799,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c src/Sui
  
    vmap  = iwspacemalloc(ctrl, nvtxs);
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2024-01-05 00:15:30
 @@ -476,7 +476,7 @@
  void FM_2WayNodeBalance(ctrl_t *ctrl, graph_t *graph)
  {
@@ -1856,8 +1811,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c src/SuiteSpar
    idx_t *perm, *moved;
    rpq_t *queue; 
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2024-01-05 00:15:30
 @@ -136,7 +136,7 @@
  /*************************************************************************/
  void Project2WayNodePartition(ctrl_t *ctrl, graph_t *graph)
@@ -1868,8 +1823,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c src/Suite
    graph_t *cgraph;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2023-11-03 18:58:08
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2024-01-05 00:15:30
 @@ -20,8 +20,8 @@
  **************************************************************************/
  void ComputePartitionInfoBipartite(graph_t *graph, idx_t nparts, idx_t *where)
@@ -1889,110 +1844,101 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c src/SuiteSpa
  
    nvtxs = graph->nvtxs;
    ncon = graph->ncon;
+diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-05 10:48:14
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-05 00:15:30
+@@ -281,10 +281,6 @@
+     // supernodal numerical factorization, using template routine
+     //--------------------------------------------------------------------------
+ 
+-    float s_beta [2] ;
+-    s_beta [0] = (float) beta [0] ;
+-    s_beta [1] = (float) beta [1] ;
+-
+     switch ((A->xtype + A->dtype) % 8)
+     {
+         case CHOLMOD_REAL    + CHOLMOD_SINGLE:
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c
---- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2023-11-03 18:58:08
-@@ -174,11 +174,6 @@
- 	merge, snext, esize, maxesize, nrelax0, nrelax1, nrelax2, Asorted ;
-     size_t w ;
-     int ok = TRUE, find_xsize ;
--    const char* env_use_gpu;
--    const char* env_max_bytes;
--    size_t max_bytes;
--    const char* env_max_fraction;
--    double max_fraction;
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2024-01-05 00:15:30
+@@ -173,11 +173,13 @@
+         csize, maxcsize, ss, nscol0, nscol1, ns, nfsuper, newzeros, totzeros,
+         merge, snext, esize, maxesize, nrelax0, nrelax1, nrelax2, Asorted ;
+     int find_xsize ;
++#if (defined(CHOLMOD_HAS_CUDA) && defined(CHOLMOD_INT64))
+     const char* env_use_gpu;
+     const char* env_max_bytes;
+     size_t max_bytes;
+     const char* env_max_fraction;
+     double max_fraction ;
++#endif
  
-     /* ---------------------------------------------------------------------- */
-     /* check inputs */
-@@ -246,15 +241,15 @@
-         /* only allocate GPU workspace for supernodal Cholesky, and only when
-            the GPU is requested and available. */
+     RETURN_IF_NULL_COMMON (FALSE) ;
+     RETURN_IF_NULL (A, FALSE) ;
+@@ -243,10 +245,11 @@
+         // real/complex/zomples only), and only when the GPU is requested and
+         // available.
  
--        max_bytes = 0;
--        max_fraction = 0;
-+        size_t max_bytes = 0;
-+        double max_fraction = 0;
++        #ifdef CHOLMOD_INT64
++
+         max_bytes = 0;
+         max_fraction = 0;
  
- #ifdef DLONG
+-        #ifdef CHOLMOD_INT64
          if ( Common->useGPU == EMPTY )
          {
-             /* useGPU not explicity requested by the user, but not explicitly
-              * prohibited either.  Query OS environment variables for request.*/
--            env_use_gpu  = getenv("CHOLMOD_USE_GPU");
-+            const char *env_use_gpu = getenv("CHOLMOD_USE_GPU");
- 
-             if ( env_use_gpu )
-             {
-@@ -266,8 +261,8 @@
-                 else
-                 {
-                     Common->useGPU = 1; /* use the gpu */
--                    env_max_bytes = getenv("CHOLMOD_GPU_MEM_BYTES");
--                    env_max_fraction = getenv("CHOLMOD_GPU_MEM_FRACTION");
-+                    const char *env_max_bytes = getenv("CHOLMOD_GPU_MEM_BYTES");
-+                    const char *env_max_fraction = getenv("CHOLMOD_GPU_MEM_FRACTION");
-                     if ( env_max_bytes )
-                     {
-                         max_bytes = atol(env_max_bytes);
-@@ -554,9 +549,6 @@
- 		double xns = (double) ns ;
- 		double xtotsize  = (xns * (xns+1) / 2) + xns * (lnz1 - nscol1) ;
- 		double z = xtotzeros / xtotsize ;
+             // useGPU not explicitly requested by the user, but not explicitly
+@@ -552,9 +555,6 @@
+                 double xns = (double) ns ;
+                 double xtotsize  = (xns * (xns+1) / 2) + xns * (lnz1 - nscol1) ;
+                 double z = xtotzeros / xtotsize ;
 -
--		Int totsize ;
--		totsize  = (ns * (ns+1) / 2) + ns * (Snz [s+1] - nscol1) ;
+-                Int totsize ;
+-                totsize  = (ns * (ns+1) / 2) + ns * (Snz [s+1] - nscol1) ;
  
- 		PRINT2 (("oldzeros "ID" newzeros "ID" xtotsize %g z %g\n",
- 			    Zeros [s+1], newzeros, xtotsize, z)) ;
-diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric.c
---- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric.c	2023-11-03 18:58:08
-@@ -105,16 +105,27 @@
-     cholmod_common *Common
-     )
- {
--    double one [2], zero [2], tstart ;
--    double *Lx, *Ax, *Fx, *Az, *Fz, *C ;
-+    double one [2], zero [2] ;
-+#ifndef NTIMER
-+    double tstart ;
-+#endif
-+    double *Lx, *Ax, *Fx, *C ;
+                 PRINT2 (("oldzeros "ID" newzeros "ID" xtotsize %g z %g\n",
+                             Zeros [s+1], newzeros, xtotsize, z)) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c
+--- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2024-01-05 10:42:15
+@@ -152,15 +152,21 @@
+     #ifdef BLAS_TIMER
+     double tstart, blas_time ;
+     #endif
+-    Real *Lx, *Ax, *Fx, *Az, *Fz, *C ;
++    Real *Lx, *Ax, *Fx, *C ;
 +#ifdef ZOMPLEX
-+    double *Az, *Fz ;
++    Real *Az, *Fz ;
 +#endif
      Int *Super, *Head, *Ls, *Lpi, *Lpx, *Map, *SuperMap, *RelativeMap, *Next,
 -        *Lpos, *Fp, *Fi, *Fnz, *Ap, *Ai, *Anz, *Iwork, *Next_save, *Lpos_save,
 -        *Previous;
 +        *Lpos, *Fp, *Fi, *Fnz, *Ap, *Ai, *Anz, *Iwork, *Next_save, *Lpos_save;
-+#ifdef SUITESPARSE_CUDA
-+    Int *Previous;
-+#endif
-     Int nsuper, n, j, i, k, s, p, pend, k1, k2, nscol, psi, psx, psend, nsrow,
--        pj, d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi1, pdi2, pdx1,
-+        d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi1, pdi2, pdx1,
-         ndrow1, ndrow2, px, dancestor, sparent, dnext, nsrow2, ndrow3, pk, pf,
-         pfend, stype, Apacked, Fpacked, q, imap, repeat_supernode, nscol2, ss,
+     Int nsuper, n, s, k1, k2, nscol, psi, psx, psend, nsrow,
+-        pj, d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi1, pdi2,
++        d, kd1, kd2, info, ndcol, ndrow, pdi, pdx, pdend, pdi2,
+         ndrow1, ndrow2, dancestor, sparent, dnext, nsrow2, ndrow3,
+         stype, Apacked, Fpacked, repeat_supernode, nscol2, ss,
 -        tail, nscol_new = 0;
 +        nscol_new = 0;
-+#ifdef SUITESPARSE_CUDA
-+    Int tail;
++#if (defined (CHOLMOD_HAS_CUDA) && defined (DOUBLE))
++    Int *Previous ;
++    Int tail ;
 +#endif
      info = 0 ;
  
-     /* ---------------------------------------------------------------------- */
-@@ -167,7 +178,9 @@
-     Lpos        = Iwork + 2*((size_t) n) + nsuper ;         /* size nsuper*/
-     Next_save   = Iwork + 2*((size_t) n) + 2*((size_t) nsuper) ;/* size nsuper*/
-     Lpos_save   = Iwork + 2*((size_t) n) + 3*((size_t) nsuper) ;/* size nsuper*/
--    Previous    = Iwork + 2*((size_t) n) + 4*((size_t) nsuper) ;/* size nsuper*/
-+#ifdef SUITESPARSE_CUDA
-+	Previous    = Iwork + 2*((size_t) n) + 4*((size_t) nsuper) ;/* size nsuper*/
+     ASSERT (L->dtype == A->dtype) ;
+@@ -215,7 +221,9 @@
+     Lpos        = Iwork + 2*((size_t) n) + nsuper ;         // size nsuper
+     Next_save   = Iwork + 2*((size_t) n) + 2*((size_t) nsuper) ;// size nsuper
+     Lpos_save   = Iwork + 2*((size_t) n) + 3*((size_t) nsuper) ;// size nsuper
++#if (defined (CHOLMOD_HAS_CUDA) && defined (DOUBLE))
+     Previous    = Iwork + 2*((size_t) n) + 4*((size_t) nsuper) ;// size nsuper
 +#endif
  
-     Map  = Common->Flag ;   /* size n, use Flag as workspace for Map array */
-     Head = Common->Head ;   /* size n+1, only Head [0..nsuper-1] used */
-@@ -225,7 +238,9 @@
+     Map  = Common->Flag ;   // size n, use Flag as workspace for Map array
+     Head = Common->Head ;   // size n+1, only Head [0..nsuper-1] used
+@@ -273,7 +281,9 @@
          Fp = NULL ;
          Fi = NULL ;
          Fx = NULL ;
@@ -2002,18 +1948,17 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric.c src/Suite
          Fnz = NULL ;
          Fpacked = TRUE ;
      }
-@@ -234,7 +249,9 @@
+@@ -284,7 +294,9 @@
          Fp = F->p ;
          Fi = F->i ;
          Fx = F->x ;
--        Fz = F->z ;
 +#ifdef ZOMPLEX
-+		Fz = F->z ;
+         Fz = F->z ;
 +#endif
          Fnz = F->nz ;
          Fpacked = F->packed ;
      }
-@@ -242,18 +259,19 @@
+@@ -292,7 +304,9 @@
      Ap = A->p ;
      Ai = A->i ;
      Ax = A->x ;
@@ -2023,139 +1968,801 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric.c src/Suite
      Anz = A->nz ;
      Apacked = A->packed ;
  
-     /* clear the Map so that changes in the pattern of A can be detected */
+@@ -303,8 +317,10 @@
+     #endif
  
--    #ifdef _OPENMP
+     Int ii ;
 +#ifdef _OPENMP
-     int nthreads = cholmod_nthreads ((double) n, Common) ;
--    #endif
--
- #pragma omp parallel for num_threads(nthreads) \
-     if ( n > 128 ) schedule (static)
+     #pragma omp parallel for num_threads(nthreads) \
+         if ( n > 128 ) schedule (static)
 +#endif
- 
-     for (i = 0 ; i < n ; i++)
+     for (ii = 0 ; ii < n ; ii++)
      {
-@@ -314,13 +332,12 @@
-         {
-             /* Case of no GPU, zero individual supernodes */
+         Map [ii] = EMPTY ;
+@@ -370,8 +386,10 @@
+             #endif
  
--            #ifdef _OPENMP
+             Int p ;
 +#ifdef _OPENMP
-             double work = (double) (pend - psx) * L_ENTRY ;
-             int nthreads = cholmod_nthreads (work, Common) ;
--            #endif
--
--#pragma omp parallel for num_threads(nthreads)   \
-+#pragma omp parallel for num_threads(nthreads) \
-     schedule (static) if ( pend - psx > 1024 )
+             #pragma omp parallel for num_threads(nthreads)   \
+                 schedule (static) if ( pend - psx > 1024 )
 +#endif
+             for (p = psx ; p < pend ; p++)
+             {
+                 L_CLEAR (Lx,p) ;
+@@ -390,8 +408,10 @@
+         #endif
  
-             for (p = psx ; p < pend ; p++) {
-                 L_CLEAR (Lx,p);
-@@ -334,12 +351,11 @@
-         /* If row i is the kth row in s, then Map [i] = k.  Similarly, if
-          * column j is the kth column in s, then  Map [j] = k. */
- 
--        #ifdef _OPENMP
+         Int k ;
 +#ifdef _OPENMP
-         int nthreads = cholmod_nthreads ((double) nsrow, Common) ;
--        #endif
--
--#pragma omp parallel for num_threads(nthreads)   \
-+#pragma omp parallel for num_threads(nthreads) \
-     if ( nsrow > 128 )
+         #pragma omp parallel for num_threads(nthreads)  \
+             if ( nsrow > 128 )
 +#endif
- 
          for (k = 0 ; k < nsrow ; k++)
          {
-@@ -367,7 +383,7 @@
+             PRINT1 (("  "ID" map "ID"\n", Ls [psi+k], k)) ;
+@@ -416,8 +436,6 @@
+         // copy matrix into supernode s (lower triangular part only)
+         //----------------------------------------------------------------------
  
-         pk = psx ;
- 
--        #ifdef _OPENMP
-+#ifdef _OPENMP
+-        Int pk = psx ;
+-
+         #ifdef _OPENMP
          double work ;
          if (stype != 0)
-         {
-@@ -382,10 +398,9 @@
-             work = (double) (plast - pfirst) ;
-         }
+@@ -435,8 +453,10 @@
          nthreads = cholmod_nthreads (work, Common) ;
--        #endif
--
- #pragma omp parallel for num_threads(nthreads) \
-     private ( p, pend, pfend, pf, i, j, imap, q ) if ( k2-k1 > 64 )
-+#endif
+         #endif
  
++#ifdef _OPENMP
+         #pragma omp parallel for num_threads(nthreads) \
+             if ( k2-k1 > 64 )
++#endif
          for (k = k1 ; k < k2 ; k++)
          {
-@@ -780,12 +795,11 @@
-                 DEBUG (CHOLMOD(dump_real) ("C", C, ndrow2, ndrow1, TRUE,
-                                            L_ENTRY, Common)) ;
+             if (stype != 0)
+@@ -894,8 +914,10 @@
+                 #endif
  
--                #ifdef _OPENMP
+                 Int i ;
 +#ifdef _OPENMP
-                 int nthreads = cholmod_nthreads ((double) ndrow2, Common) ;
--                #endif
--
--#pragma omp parallel for num_threads(nthreads)   \
-+#pragma omp parallel for num_threads(nthreads) \
-     if ( ndrow2 > 64 )
+                 #pragma omp parallel for num_threads(nthreads)   \
+                     if ( ndrow2 > 64 )
 +#endif
- 
                  for (i = 0 ; i < ndrow2 ; i++)
                  {
-@@ -797,13 +811,12 @@
-                 /* assemble C into supernode s using the relative map */
-                 /* ---------------------------------------------------------- */
+                     RelativeMap [i] = Map [Ls [pdi1 + i]] ;
+@@ -912,8 +934,10 @@
+                 #endif
  
--                #ifdef _OPENMP
+                 Int j ;
 +#ifdef _OPENMP
-                 double work = (double) ndcol * (double) ndrow2 * L_ENTRY ;
-                 nthreads = cholmod_nthreads (work, Common) ;
--                #endif
+                 #pragma omp parallel for num_threads(nthreads) \
+                     if (ndrow1 > 64 )
++#endif
+                 for (j = 0 ; j < ndrow1 ; j++)              // cols k1:k2-1
+                 {
+                     ASSERT (RelativeMap [j] == Map [Ls [pdi1 + j]]) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c
+--- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2024-01-05 00:15:30
+@@ -37,12 +37,11 @@
+     Real minus_one [2], one [2] ;
+     Int *Lpi, *Lpx, *Ls, *Super ;
+     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
+-        nsrow2, n, ps2, j, i, d, nrhs ;
++        nsrow2, ps2, j, i, d, nrhs ;
+ 
+     nrhs = X->ncol ;
+     Ex = E->x ;
+     Xx = X->x ;
+-    n = L->n ;
+     d = X->d ;
+ 
+     nsuper = L->nsuper ;
+@@ -326,12 +325,11 @@
+     Real minus_one [2], one [2] ;
+     Int *Lpi, *Lpx, *Ls, *Super ;
+     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
+-        nsrow2, n, ps2, j, i, d, nrhs ;
++        nsrow2, ps2, j, i, d, nrhs ;
+ 
+     nrhs = X->ncol ;
+     Ex = E->x ;
+     Xx = X->x ;
+-    n = L->n ;
+     d = X->d ;
+ 
+     nsuper = L->nsuper ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat.c	2024-01-05 00:15:30
+@@ -106,7 +106,6 @@
+     bool ignore_diag = (mode < 0) ;
+     bool values = (mode > 0) && (A->xtype != CHOLMOD_PATTERN) ;
+     int axtype = (values) ? A->xtype : CHOLMOD_PATTERN ;
+-    bool conj = (mode >= 2) ;
+ 
+     Int nrow = A->nrow ;
+     Int ncol = A->ncol ;
+@@ -121,12 +120,8 @@
+     // get the sizes of the entries of C and A
+     //--------------------------------------------------------------------------
+ 
+-    size_t ei = sizeof (Int) ;
+-    size_t e = (A->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
+     size_t ew =  ((axtype == CHOLMOD_PATTERN) ? 0 :
+                  ((axtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
+-    size_t ex = e * ew ;
+-    size_t ez = e * ((axtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
+ 
+     //--------------------------------------------------------------------------
+     // allocate workspace
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat_worker.c	2024-01-05 00:15:30
+@@ -35,20 +35,32 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Anz = (Int  *) A->nz ;
+     Int  *Ai  = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     bool packed = A->packed ;
+ 
+     Int  *Fp  = (Int  *) F->p ;
+     Int  *Fi  = (Int  *) F->i ;
++#ifndef PATTERN
+     Real *Fx  = (Real *) F->x ;
++#ifdef ZOMPLEX
+     Real *Fz  = (Real *) F->z ;
++#endif
++#endif
+     ASSERT (F->packed) ;
+ 
+     Int  *Cp = (Int  *) C->p ;
+     Int  *Ci = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz = (Real *) C->z ;
++#endif
++#endif
+     ASSERT (C->packed) ;
+ 
+     //--------------------------------------------------------------------------
+@@ -93,8 +105,12 @@
+             //------------------------------------------------------------------
+ 
+             Int t = Fi [pf] ;
++#ifndef PATTERN
+             Real fx [2] = {0,0} ;
++#ifdef ZOMPLEX
+             Real fz [1] = {0} ;
++#endif
++#endif
+             ASSIGN (fx, fz, 0, Fx, Fz, pf) ;
+ 
+             //------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_add.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_add.c	2024-01-05 00:15:30
+@@ -118,12 +118,6 @@
+     // get the sizes of the entries of C, A, and B
+     //--------------------------------------------------------------------------
+ 
+-    size_t ei = sizeof (Int) ;
+-    size_t e = (dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
+-    size_t ex = e * ((xtype == CHOLMOD_PATTERN) ? 0 :
+-                    ((xtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
+-    size_t ez = e * ((xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
 -
- #pragma omp parallel for num_threads(nthreads) \
-     private ( j, i, px, q ) if (ndrow1 > 64 )
+     //--------------------------------------------------------------------------
+     // convert/sort A and/or B, if needed
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_band_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_band_worker.c	2024-01-05 00:15:30
+@@ -30,14 +30,22 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Anz = (Int  *) A->nz ;
+     Int  *Ai  = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     bool packed = A->packed ;
+ 
+     Int  *Cp = (Int  *) C->p ;
+     Int  *Ci = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz = (Real *) C->z ;
++#endif
 +#endif
  
-                 for (j = 0 ; j < ndrow1 ; j++)              /* cols k1:k2-1 */
-                 {
-diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve.c
---- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve.c	2023-10-16 14:57:34
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve.c	2023-11-03 18:58:08
-@@ -28,7 +28,7 @@
-     double minus_one [2], one [2] ;
-     Int *Lpi, *Lpx, *Ls, *Super ;
-     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
--	nsrow2, n, ps2, j, i, d, nrhs ;
-+	nsrow2, ps2, j, i, d, nrhs ;
+     // columns outside of j1:j2 have no entries in diagonals k1:k2
+     Int j1 = MAX (k1, 0) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c	2024-01-05 00:15:30
+@@ -698,8 +698,6 @@
+     bool make_ldl = (!to_ll && L->is_ll) ;
  
-     /* ---------------------------------------------------------------------- */
-     /* get inputs */
-@@ -37,7 +37,6 @@
-     nrhs = X->ncol ;
-     Ex = E->x ;
-     Xx = X->x ;
--    n = L->n ;
-     d = X->d ;
+     Int n = L->n ;
+-    Int *Lp  = (Int *) L->p ;
+-    Int *Li  = (Int *) L->i ;
+     Int *Lnz = (Int *) L->nz ;
  
-     nsuper = L->nsuper ;
-@@ -244,7 +243,7 @@
-     double minus_one [2], one [2] ;
-     Int *Lpi, *Lpx, *Ls, *Super ;
-     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
--	nsrow2, n, ps2, j, i, d, nrhs ;
-+	nsrow2, ps2, j, i, d, nrhs ;
+     bool grow = false ;
+@@ -900,11 +898,8 @@
+     // get inputs
+     //--------------------------------------------------------------------------
  
-     /* ---------------------------------------------------------------------- */
-     /* get inputs */
-@@ -253,7 +252,6 @@
-     nrhs = X->ncol ;
-     Ex = E->x ;
-     Xx = X->x ;
--    n = L->n ;
-     d = X->d ;
+-    Int n = L->n ;
+     Int nsuper = L->nsuper ;
+     Int *Lpi   = (Int *) L->pi ;
+-    Int *Lpx   = (Int *) L->px ;
+-    Int *Ls    = (Int *) L->s ;
+     Int *Super = (Int *) L->super ;
  
-     nsuper = L->nsuper ;
+     size_t ei = sizeof (Int) ;
+@@ -1088,7 +1083,6 @@
+     // get the sizes of the entries
+     //--------------------------------------------------------------------------
+ 
+-    size_t ei = sizeof (Int) ;
+     size_t e = (L->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
+     size_t ex = e * ((to_xtype == CHOLMOD_COMPLEX) ? 2 : 1) ;
+     size_t xs = L->xsize ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2024-01-05 00:15:30
+@@ -36,7 +36,9 @@
+     Int  *Lp = (Int  *) L->p ;
+     Int  *Li = (Int  *) L->i ;
+     Real *Lx = (Real *) L->x ;
++#ifdef ZOMPLEX
+     Real *Lz = (Real *) L->z ;
++#endif
+     Int n = L->n ;
+ 
+     //--------------------------------------------------------------------------
+@@ -44,7 +46,9 @@
+     //--------------------------------------------------------------------------
+ 
+     Real onex [2] = {1,0} ;
++#ifdef ZOMPLEX
+     Real onez [1] = {0} ;
++#endif
+ 
+     for (Int j = 0 ; j < n ; j++)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2024-01-05 00:15:30
+@@ -34,7 +34,9 @@
+ //------------------------------------------------------------------------------
+ 
+ {
++#ifndef IN_PLACE
+     Int pnew = 0 ;
++#endif
+ 
+     if (make_ll)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2024-01-05 00:15:30
+@@ -50,7 +50,9 @@
+     Int  *Lp  = (Int  *) L->p ;
+     Int  *Li  = (Int  *) L->i ;
+     Real *Lx  = (Real *) L->x ;
++#ifdef ZOMPLEX
+     Real *Lz  = (Real *) L->z ;
++#endif
+     Int  *Lnz = (Int  *) L->nz ;
+ 
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2024-01-05 00:15:30
+@@ -100,7 +100,6 @@
+     Int  *Lp  = (Int  *) L->p ;     // simplicial col pointers
+     Int  *Li  = (Int  *) L->i ;     // simplicial row indices
+     Int  *Lnz = (Int  *) L->nz ;    // simplicial column counts
+-    Int lnz = L->nzmax ;            // size of Li, Lp, and Lx
+ 
+     //----------------------------------------------------------------------
+     // convert supernodal LL' to simplicial LL' or LDL' (packed/unpacked)
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_xdtype.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2024-01-05 00:15:30
+@@ -214,7 +214,7 @@
+     int output_dtype = to_xdtype & 4 ;  // double or single
+ 
+     if (output_xtype <= CHOLMOD_PATTERN ||
+-        L->is_super && output_xtype == CHOLMOD_ZOMPLEX)
++        (L->is_super && output_xtype == CHOLMOD_ZOMPLEX))
+     {
+         // output_xtype not supported
+         ERROR (CHOLMOD_INVALID, "invalid xtype") ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2024-01-05 00:15:30
+@@ -36,9 +36,13 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+     Real *Yx = (Real *) Y->x ;
++#ifdef ZOMPLEX
+     Real *Yz = (Real *) Y->z ;
++#endif
+     size_t nrow = X->nrow ;
+     size_t ncol = X->ncol ;
+     size_t xd = X->d ;
+@@ -50,9 +54,13 @@
+ 
+     size_t e = (X->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
+     size_t fx = ((X->xtype == CHOLMOD_COMPLEX) ? 2 : 1) ;
++#ifdef ZOMPLEX
+     size_t fz = ((X->xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
++#endif
+     size_t e_fx_nrow = e * fx * nrow ;
++#ifdef ZOMPLEX
+     size_t e_fz_nrow = e * fz * nrow ;
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // copy X = Y
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor.c	2024-01-05 00:15:30
+@@ -69,7 +69,6 @@
+     size_t e = (L->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
+     size_t ex = e * ((L->xtype == CHOLMOD_PATTERN) ? 0 :
+                     ((L->xtype == CHOLMOD_COMPLEX) ? 2 : 1)) ;
+-    size_t ez = e * ((L->xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
+ 
+     //--------------------------------------------------------------------------
+     // allocate the new factor H, H->Perm, and H->ColCount
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2024-01-05 00:15:30
+@@ -29,11 +29,15 @@
+     Int  *Li  = (Int  *) L->i ;
+     Int  *Lnz = (Int  *) L->nz ;
+     Real *Lx  = (Real *) L->x ;
++#ifdef ZOMPLEX
+     Real *Lz  = (Real *) L->z ;
++#endif
+ 
+     Int  *Hi  = (Int  *) H->i ;
+     Real *Hx  = (Real *) H->x ;
++#ifdef ZOMPLEX
+     Real *Hz  = (Real *) H->z ;
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // copy each column
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2024-01-05 00:15:30
+@@ -31,13 +31,21 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Anz = (Int  *) A->nz ;
+     Int  *Ai  = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     size_t ncol = A->ncol ;
+ 
+     Int  *Ci  = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx  = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz  = (Real *) C->z ;
++#endif
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // copy the contents from A to C
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_worker.c	2024-01-05 00:15:30
+@@ -45,14 +45,21 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Anz = (Int  *) A->nz ;
+     Int  *Ai  = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     bool packed = A->packed ;
+ 
+-    Int  *Cp = (Int  *) C->p ;
+     Int  *Ci = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz = (Real *) C->z ;
++#endif
++#endif
+     bool keep_diag = !ignore_diag ;
+ 
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2024-01-05 00:15:30
+@@ -21,7 +21,9 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+ 
+     Int nrow = (Int) X->nrow ;
+     Int ncol = (Int) X->ncol ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2024-01-05 00:15:30
+@@ -34,7 +34,9 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+     Int nrow = X->nrow ;
+     Int ncol = X->ncol ;
+     Int d = X->d ;
+@@ -42,7 +44,9 @@
+     Int  *Cp  = (Int  *) C->p ;
+     Int  *Ci  = (Int  *) C->i ;
+     Real *Cx  = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz  = (Real *) C->z ;
++#endif
+     bool pattern = (C->xtype == CHOLMOD_PATTERN) ;
+ 
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_eye_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_eye_worker.c	2024-01-05 00:15:30
+@@ -21,14 +21,18 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+ 
+     Int nrow = (Int) X->nrow ;
+     Int ncol = (Int) X->ncol ;
+     Int n = MIN (nrow, ncol) ;
+ 
+     Real onex [2] = {1,0} ;
++#ifdef ZOMPLEX
+     Real onez [1] = {0} ;
++#endif
+ 
+     for (Int k = 0 ; k < n ; k++)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_ones_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_ones_worker.c	2024-01-05 00:15:30
+@@ -21,11 +21,15 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+     size_t nzmax = X->nzmax ;
+ 
+     Real onex [2] = {1,0} ;
++#ifdef ZOMPLEX
+     Real onez [1] = {0} ;
++#endif
+ 
+     for (Int k = 0 ; k < nzmax ; k++)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2024-01-05 00:15:30
+@@ -29,7 +29,9 @@
+     Int  *Lp    = (Int  *) L->p ;
+     Int  *Li    = (Int  *) L->i ;
+     Real *Lx    = (Real *) L->x ;
++#ifdef ZOMPLEX
+     Real *Lz    = (Real *) L->z ;
++#endif
+     Int  *Lnz   = (Int  *) L->nz ;
+     Int  *Lnext = (Int  *) L->next ;
+ 
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_realloc.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_realloc.c	2024-01-05 00:15:30
+@@ -34,7 +34,9 @@
+ 
+     int ok ;
+     bool newly_allocated = (p == NULL) ;
++#ifndef NDEBUG
+     void *pold = p ;
++#endif
+     size_t nold = (*n) ;
+ 
+     p = SuiteSparse_realloc (nnew, *n, size, p, &ok) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2024-01-05 00:15:30
+@@ -84,7 +84,6 @@
+     need = MAX (need, 1) ;
+     double slack = MAX (Common->grow1, 1.0) * ((double) need) + Common->grow2 ;
+     slack = MIN (slack, (double) (n-j)) ;
+-    size_t nslack = (size_t) floor (slack) ;
+     need = MAX (need, slack) ;
+     need = MAX (need, 1) ;
+     need = MIN (need, n-j) ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2024-01-05 00:15:30
+@@ -26,7 +26,9 @@
+     Int  *Lnz = (Int  *) L->nz ;
+     Int  *Li  = (Int  *) L->i ;
+     Real *Lx  = (Real *) L->x ;
++#ifdef ZOMPLEX
+     Real *Lz  = (Real *) L->z ;
++#endif
+     Int len = Lnz [j] ;
+ 
+     //--------------------------------------------------------------------------
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sort_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sort_worker.c	2024-01-05 00:15:30
+@@ -185,8 +185,12 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Ai  = (Int  *) A->i ;
+     Int  *Anz = (Int  *) A->nz ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     Int ncol = A->ncol ;
+     bool packed = A->packed ;
+     uint64_t seed = 42 ;
+@@ -207,7 +211,6 @@
+             if (i < ilast)
+             {
+                 // sort Ai, Ax, Ax [pa:pend-1] according to row index Ai
+-                Int jnz = pend - pa ;
+                 CM_QSRT (Ai, Ax, Az, pa, pend - pa, &seed) ;
+                 break ;
+             }
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2024-01-05 00:15:30
+@@ -30,13 +30,19 @@
+     //--------------------------------------------------------------------------
+ 
+     Real *Xx = (Real *) X->x ;
++#ifdef ZOMPLEX
+     Real *Xz = (Real *) X->z ;
++#endif
+ 
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Ai  = (Int  *) A->i ;
+     Int  *Anz = (Int  *) A->nz ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+ 
+     Int nrow = (Int) A->nrow ;
+     Int ncol = (Int) A->ncol ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2024-01-05 00:15:30
+@@ -21,19 +21,26 @@
+     // get inputs
+     //--------------------------------------------------------------------------
+ 
+-    Int nrow = A->nrow ;
+     Int ncol = A->ncol ;
+     bool packed = (bool) A->packed ;
+     Int  *Ap = (Int  *) A->p ;
+     Int  *Ai = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az = (Real *) A->z ;
++#endif
++#endif
+     Int *Anz = (Int  *) A->nz ;
+ 
+     Int  *Ti = (Int  *) T->i ;
+     Int  *Tj = (Int  *) T->j ;
++#ifndef PATTERN
+     Real *Tx = (Real *) T->x ;
++#ifdef ZOMPLEX
+     Real *Tz = (Real *) T->z ;
++#endif
++#endif
+ 
+     Int k = 0 ;
+ 
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_speye_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_speye_worker.c	2024-01-05 00:15:30
+@@ -22,15 +22,23 @@
+ 
+     Int  *Ap = (Int  *) A->p ;
+     Int  *Ai = (Int  *) A->i ;
++#ifndef PATTERN
+     Real *Ax = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az = (Real *) A->z ;
++#endif
++#endif
+ 
+     Int ncol = (Int) A->ncol ;
+     Int nrow = (Int) A->nrow ;
+     Int n = MIN (nrow, ncol) ;
+ 
++#ifndef PATTERN
+     Real onex [2] = {1,0} ;
++#ifdef ZOMPLEX
+     Real onez [1] = {0} ;
++#endif
++#endif
+ 
+     for (Int k = 0 ; k < n ; k++)
+     {
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2024-01-05 00:15:30
+@@ -44,8 +44,9 @@
+             #endif
+             {
+                 // C(jnew,inew) = conj (A(iold,jold))
+-                Int pc = Wi [inew]++ ;
++                Wi [inew]++ ;
+                 #ifdef NUMERIC
++                Int pc = Wi [inew] ;
+                 ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, pa) ;
+                 Ci [pc] = jnew ;
+                 #endif
+@@ -53,8 +54,9 @@
+             else
+             {
+                 // C(inew,jnew) = A(iold,jold)
+-                Int pc = Wi [jnew]++ ;
++                Wi [jnew]++ ;
+                 #ifdef NUMERIC
++                Int pc = Wi [jnew] ;
+                 ASSIGN (Cx, Cz, pc, Ax, Az, pa) ;
+                 Ci [pc] = inew ;
+                 #endif
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2024-01-05 00:15:30
+@@ -40,8 +40,9 @@
+             if (i > j) continue ;
+             #endif
+             // C(j,i) = conj (A(i,j))
+-            Int pc = Wi [i]++ ;
++            Wi [i]++ ;
+             #ifdef NUMERIC
++            Int pc = Wi [i];
+             ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, pa) ;
+             Ci [pc] = j ;
+             #endif
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2024-01-05 00:15:30
+@@ -28,13 +28,20 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Ai  = (Int  *) A->i ;
+     Int  *Anz = (Int  *) A->nz ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+ 
+-    Int  *Cp  = (Int  *) C->p ;
+     Int  *Ci  = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx  = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz  = (Real *) C->z ;
++#endif
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // compute pattern and values of C
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2024-01-05 00:15:30
+@@ -59,8 +59,9 @@
+         for ( ; p < pend ; p++)
+         {
+             // get A(i,j) and count it or get its place in C
+-            Int pc = Wi [Ai [p]]++ ;
++            Wi [Ai [p]]++ ;
+             #ifdef NUMERIC
++            Int pc = Wi [Ai [p]] ;
+             // C(j,i) = conj (A(i,j))
+             ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, p) ;
+             Ci [pc] = j ;
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2024-01-05 00:15:30
+@@ -27,14 +27,21 @@
+     Int  *Ap  = (Int  *) A->p ;
+     Int  *Ai  = (Int  *) A->i ;
+     Int  *Anz = (Int  *) A->nz ;
++#ifndef PATTERN
+     Real *Ax  = (Real *) A->x ;
++#ifdef ZOMPLEX
+     Real *Az  = (Real *) A->z ;
++#endif
++#endif
+     Int ncol = A->ncol ;
+ 
+-    Int  *Cp  = (Int  *) C->p ;
+     Int  *Ci  = (Int  *) C->i ;
++#ifndef PATTERN
+     Real *Cx  = (Real *) C->x ;
++#ifdef ZOMPLEX
+     Real *Cz  = (Real *) C->z ;
++#endif
++#endif
+ 
+     //--------------------------------------------------------------------------
+     // compute the pattern and values of C
+diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2023-12-29 19:18:23
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2024-01-05 00:15:30
+@@ -25,13 +25,21 @@
+     Int  *Rp  = (Int  *) R->p ;
+     Int  *Ri  = (Int  *) R->i ;
+     Int  *Rnz = (Int  *) R->nz ;
++#ifndef PATTERN
+     Real *Rx  = (Real *) R->x ;
++#ifdef ZOMPLEX
+     Real *Rz  = (Real *) R->z ;
++#endif
++#endif
+ 
+     Int  *Ti = (Int *) T->i ;
+     Int  *Tj = (Int *) T->j ;
++#ifndef PATTERN
+     Real *Tx = (Real *) T->x ;
++#ifdef ZOMPLEX
+     Real *Tz = (Real *) T->z ;
++#endif
++#endif
+     size_t nrow = T->nrow ;
+     size_t ncol = T->ncol ;
+     Int nz = T->nnz ;

@@ -70,7 +70,9 @@ static void TEMPLATE (ldl_dsolve)
     Int *Lp = L->p ;
     Real *Lx = L->x ;
     Real *Yx = Y->x ;
+#ifdef ZOMPLEX
     Real *Yz = Y->z ;
+#endif
 
     if (Yset)
     {
@@ -209,7 +211,9 @@ static void TEMPLATE (bset_perm)
     //--------------------------------------------------------------------------
 
     Real *Yx = Y->x ;
+#ifdef ZOMPLEX
     Real *Yz = Y->z ;
+#endif
     Int *Ysetp = Yset->p ;
     Int *Yseti = Yset->i ;
     Int ysetlen = Ysetp [1] ;
@@ -227,7 +231,9 @@ static void TEMPLATE (bset_perm)
 
     // Y (C) = B (Bset)
     Real *Bx = B->x ;
+#ifdef ZOMPLEX
     Real *Bz = B->z ;
+#endif
     Int *Bsetp = Bset->p ;
     Int *Bseti = Bset->i ;
     Int *Bsetnz = Bset->nz ;
@@ -262,12 +268,16 @@ static void TEMPLATE (bset_iperm)
 {
 
     Real *Xx = X->x ;
+#ifdef ZOMPLEX
     Real *Xz = X->z ;
+#endif
     Int *Xseti = Xset->i ;
     Int *Xsetp = Xset->p ;
 
     Real *Yx = Y->x ;
+#ifdef ZOMPLEX
     Real *Yz = Y->z ;
+#endif
 
     Int *Ysetp = Yset->p ;
     Int *Yseti = Yset->i ;

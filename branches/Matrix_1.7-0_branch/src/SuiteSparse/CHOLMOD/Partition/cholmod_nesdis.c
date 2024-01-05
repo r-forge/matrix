@@ -681,8 +681,11 @@ static void find_components
 )
 {
 
-    Int n, mark, cj, j, sj, sn, p, i, snode, pstart, pdest, pend, nd_components,
+    Int mark, cj, j, sj, sn, p, i, snode, pstart, pdest, pend, nd_components,
         part, first, save_mark ;
+#ifndef NDEBUG
+    Int n ;
+#endif
     Int *Bp, *Bi, *Flag ;
 
     //--------------------------------------------------------------------------
@@ -702,7 +705,9 @@ static void find_components
 
     Bp = B->p ;
     Bi = B->i ;
+#ifndef NDEBUG
     n = B->nrow ;
+#endif
     ASSERT (cnode >= EMPTY && cnode < n) ;
     ASSERT (IMPLIES (cnode >= 0, Flag [cnode] < EMPTY)) ;
 

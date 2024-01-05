@@ -11,6 +11,38 @@
 #ifndef _GK_MKPQUEUE_H
 #define _GK_MKPQUEUE_H
 
+#ifndef NDEBUG
+#define DO_CHECKHEAP\
+do {\
+  gk_idx_t i, j;\
+  size_t nnodes;\
+  gk_idx_t *locator;\
+  KVT *heap;\
+\
+  heap = queue->heap;\
+  locator = queue->locator;\
+  nnodes  = queue->nnodes;\
+\
+  if (nnodes == 0)\
+    return 1;\
+\
+  ASSERT(locator[heap[0].val] == 0);\
+  for (i=1; i<nnodes; i++) {\
+    ASSERT(locator[heap[i].val] == i);\
+    ASSERT(!KEY_LT(heap[i].key, heap[(i-1)/2].key));\
+  }\
+  for (i=1; i<nnodes; i++)\
+    ASSERT(!KEY_LT(heap[i].key, heap[0].key));\
+\
+  for (j=i=0; i<queue->maxnodes; i++) {\
+    if (locator[i] != -1)\
+      j++;\
+  }\
+  ASSERTP(j == nnodes, ("%jd %jd\n", (intmax_t)j, (intmax_t)nnodes));\
+} while (0)
+#else
+#define DO_CHECKHEAP
+#endif
 
 #define GK_MKPQUEUE(FPRFX, PQT, KVT, KT, VT, KVMALLOC, KMAX, KEY_LT)\
 /*************************************************************************/\
@@ -380,32 +412,7 @@ VT FPRFX ## SeeConstraintTop(PQT *queue, KT maxwgt, KT *wgts)\
 /**************************************************************************/\
 int FPRFX ## CheckHeap(PQT *queue)\
 {\
-  gk_idx_t i, j;\
-  size_t nnodes;\
-  gk_idx_t *locator;\
-  KVT *heap;\
-\
-  heap    = queue->heap;\
-  locator = queue->locator;\
-  nnodes  = queue->nnodes;\
-\
-  if (nnodes == 0)\
-    return 1;\
-\
-  ASSERT(locator[heap[0].val] == 0);\
-  for (i=1; i<nnodes; i++) {\
-    ASSERT(locator[heap[i].val] == i);\
-    ASSERT(!KEY_LT(heap[i].key, heap[(i-1)/2].key));\
-  }\
-  for (i=1; i<nnodes; i++)\
-    ASSERT(!KEY_LT(heap[i].key, heap[0].key));\
-\
-  for (j=i=0; i<queue->maxnodes; i++) {\
-    if (locator[i] != -1)\
-      j++;\
-  }\
-  ASSERTP(j == nnodes, ("%jd %jd\n", (intmax_t)j, (intmax_t)nnodes));\
-\
+  DO_CHECKHEAP;\
   return 1;\
 }\
 

@@ -34,7 +34,9 @@ static void TEMPLATE (cholmod_dense_to_sparse_worker)
     //--------------------------------------------------------------------------
 
     Real *Xx = (Real *) X->x ;
+#ifdef ZOMPLEX
     Real *Xz = (Real *) X->z ;
+#endif
     Int nrow = X->nrow ;
     Int ncol = X->ncol ;
     Int d = X->d ;
@@ -42,7 +44,9 @@ static void TEMPLATE (cholmod_dense_to_sparse_worker)
     Int  *Cp  = (Int  *) C->p ;
     Int  *Ci  = (Int  *) C->i ;
     Real *Cx  = (Real *) C->x ;
+#ifdef ZOMPLEX
     Real *Cz  = (Real *) C->z ;
+#endif
     bool pattern = (C->xtype == CHOLMOD_PATTERN) ;
 
     //--------------------------------------------------------------------------

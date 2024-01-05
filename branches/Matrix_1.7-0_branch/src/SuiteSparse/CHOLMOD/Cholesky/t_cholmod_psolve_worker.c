@@ -265,12 +265,17 @@ static void TEMPLATE_DTYPE (iperm)
     //--------------------------------------------------------------------------
 
     Real *Yx, *Yz, *Xx, *Xz ;
-    Int k2, nk, p, k, j, nrow, ncol, d, dj, j2 ;
+    Int k2, p, k, j, nrow, ncol, d, dj, j2 ;
+#ifndef NDEBUG
+    Int nk ;
+#endif
 
     ncol = X->ncol ;
     nrow = X->nrow ;
     k2 = MIN (k1+ncols, ncol) ;
+#ifndef NDEBUG
     nk = MAX (k2 - k1, 0) ;
+#endif
     d = X->d ;
     Xx = X->x ;
     Xz = X->z ;

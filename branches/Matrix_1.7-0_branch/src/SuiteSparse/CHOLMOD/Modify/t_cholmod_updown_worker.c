@@ -148,7 +148,9 @@ static int TEMPLATE (cholmod_updown_worker)
     double fl = 0 ;
     bool use_colmark = (colmark != NULL) ;
 
+#ifndef NDEBUG
     Int *ps1 = NULL ;
+#endif
     Int *ps2 = NULL ;
 
     //--------------------------------------------------------------------------
@@ -699,7 +701,9 @@ static int TEMPLATE (cholmod_updown_worker)
 
             if (nsets > 0)
             {
+#ifndef NDEBUG
                 ps1 = Set_ps1 [0] ;
+#endif
                 ps2 = Set_ps2 [0] ;
             }
 

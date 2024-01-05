@@ -578,7 +578,7 @@ int CHOLMOD(metis)
     idx_t *Mp, *Mi, *Mperm, *Miperm ;
     cholmod_sparse *B ;
     Int i, j, n, nz, p, identity ;
-    idx_t nn, zero = 0 ;
+    idx_t nn ;
 
     RETURN_IF_NULL_COMMON (FALSE) ;
     RETURN_IF_NULL (A, FALSE) ;

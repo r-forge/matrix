@@ -29,7 +29,9 @@ static void TEMPLATE (cholmod_pack_factor_worker)
     Int  *Lp    = (Int  *) L->p ;
     Int  *Li    = (Int  *) L->i ;
     Real *Lx    = (Real *) L->x ;
+#ifdef ZOMPLEX
     Real *Lz    = (Real *) L->z ;
+#endif
     Int  *Lnz   = (Int  *) L->nz ;
     Int  *Lnext = (Int  *) L->next ;
 

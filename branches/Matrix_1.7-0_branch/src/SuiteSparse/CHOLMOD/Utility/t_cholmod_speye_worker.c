@@ -22,15 +22,23 @@ static void TEMPLATE (cholmod_speye_worker)
 
     Int  *Ap = (Int  *) A->p ;
     Int  *Ai = (Int  *) A->i ;
+#ifndef PATTERN
     Real *Ax = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az = (Real *) A->z ;
+#endif
+#endif
 
     Int ncol = (Int) A->ncol ;
     Int nrow = (Int) A->nrow ;
     Int n = MIN (nrow, ncol) ;
 
+#ifndef PATTERN
     Real onex [2] = {1,0} ;
+#ifdef ZOMPLEX
     Real onez [1] = {0} ;
+#endif
+#endif
 
     for (Int k = 0 ; k < n ; k++)
     {

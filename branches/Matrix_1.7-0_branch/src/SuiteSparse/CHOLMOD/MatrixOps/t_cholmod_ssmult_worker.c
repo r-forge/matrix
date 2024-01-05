@@ -23,35 +23,51 @@ static void TEMPLATE (cholmod_ssmult_worker)
     // get inputs
     //--------------------------------------------------------------------------
 
-    Real *W = Common->Xwork ;
-
     Int *Ap  = A->p ;
     Int *Anz = A->nz ;
     Int *Ai  = A->i ;
+#ifndef PATTERN
     Real *Ax  = A->x ;
+#ifdef ZOMPLEX
     Real *Az  = A->z ;
+#endif
+#endif
     bool apacked = A->packed ;
 
     Int *Bp  = B->p ;
     Int *Bnz = B->nz ;
     Int *Bi  = B->i ;
+#ifndef PATTERN
     Real *Bx  = B->x ;
+#ifdef ZOMPLEX
     Real *Bz  = B->z ;
+#endif
+#endif
     bool bpacked = B->packed ;
 
     // get the size of C
+#ifdef ZOMPLEX
     Int nrow = A->nrow ;
+#endif
     Int ncol = B->ncol ;
 
     // get workspace
+#ifndef PATTERN
     Real *Wx = Common->Xwork ;  // size nrow, unused if C is pattern
+#ifdef ZOMPLEX
     Real *Wz = Wx + nrow ;      // only used for the zomplex case
+#endif
+#endif
     Int *Flag = Common->Flag ;  // size nrow, Flag [0..nrow-1] < mark on input
 
     Int *Cp = C->p ;
     Int *Ci = C->i ;
+#ifndef PATTERN
     Real *Cx = C->x ;
+#ifdef ZOMPLEX
     Real *Cz = C->z ;
+#endif
+#endif
 
     //--------------------------------------------------------------------------
     // C = A*B
@@ -77,8 +93,12 @@ static void TEMPLATE (cholmod_ssmult_worker)
             Int k = Bi [pb] ;
 
             // b = Bx [pb] ;
+#ifndef PATTERN
             Real bx [2] ;
+#ifdef ZOMPLEX
             Real bz [1] ;
+#endif
+#endif
             ASSIGN (bx, bz, 0, Bx, Bz, pb) ;
 
             // add the nonzero pattern of A(:,k) to the pattern of C(:,j)

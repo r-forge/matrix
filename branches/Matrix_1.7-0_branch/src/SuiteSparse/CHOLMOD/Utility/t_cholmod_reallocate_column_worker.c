@@ -26,7 +26,9 @@ static void TEMPLATE (cholmod_reallocate_column_worker)
     Int  *Lnz = (Int  *) L->nz ;
     Int  *Li  = (Int  *) L->i ;
     Real *Lx  = (Real *) L->x ;
+#ifdef ZOMPLEX
     Real *Lz  = (Real *) L->z ;
+#endif
     Int len = Lnz [j] ;
 
     //--------------------------------------------------------------------------

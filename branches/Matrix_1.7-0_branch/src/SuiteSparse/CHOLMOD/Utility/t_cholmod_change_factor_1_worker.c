@@ -36,7 +36,9 @@ static void TEMPLATE (cholmod_change_factor_1_worker)
     Int  *Lp = (Int  *) L->p ;
     Int  *Li = (Int  *) L->i ;
     Real *Lx = (Real *) L->x ;
+#ifdef ZOMPLEX
     Real *Lz = (Real *) L->z ;
+#endif
     Int n = L->n ;
 
     //--------------------------------------------------------------------------
@@ -44,7 +46,9 @@ static void TEMPLATE (cholmod_change_factor_1_worker)
     //--------------------------------------------------------------------------
 
     Real onex [2] = {1,0} ;
+#ifdef ZOMPLEX
     Real onez [1] = {0} ;
+#endif
 
     for (Int j = 0 ; j < n ; j++)
     {

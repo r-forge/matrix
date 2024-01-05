@@ -40,8 +40,9 @@
             if (i > j) continue ;
             #endif
             // C(j,i) = conj (A(i,j))
-            Int pc = Wi [i]++ ;
+            Wi [i]++ ;
             #ifdef NUMERIC
+            Int pc = Wi [i];
             ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, pa) ;
             Ci [pc] = j ;
             #endif

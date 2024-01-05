@@ -55,28 +55,37 @@ static void TEMPLATE (cholmod_sdmult_worker)
     #endif
 
     size_t ny = transpose ? A->ncol : A->nrow ;        // required length of Y
+#ifdef ZOMPLEX
     size_t nx = transpose ? A->nrow : A->ncol ;        // required length of X
+#endif
 
-    Int nrow = A->nrow ;
     Int ncol = A->ncol ;
 
     Int *Ap  = A->p ;
     Int *Anz = A->nz ;
     Int *Ai  = A->i ;
     Real *Ax = A->x ;
+#ifdef ZOMPLEX
     Real *Az = A->z ;
+#endif
     bool packed = A->packed ;
 
     Real *Xx = X->x ;
+#ifdef ZOMPLEX
     Real *Xz = X->z ;
+#endif
     Real *Yx = Y->x ;
+#ifdef ZOMPLEX
     Real *Yz = Y->z ;
+#endif
 
     Int kcol = X->ncol ;
     size_t dy = Y->d ;
     size_t dx = X->d ;
     Real *w = W ;
+#ifdef ZOMPLEX
     Real *Wz = (W) ? W + 4*nx : W ;
+#endif
 
     //--------------------------------------------------------------------------
     // Y = beta * Y
@@ -120,7 +129,9 @@ static void TEMPLATE (cholmod_sdmult_worker)
     //--------------------------------------------------------------------------
 
     Yx = Y->x ;
+#ifdef ZOMPLEX
     Yz = Y->z ;
+#endif
     Int k = 0 ;
 
     if (A->stype == 0)

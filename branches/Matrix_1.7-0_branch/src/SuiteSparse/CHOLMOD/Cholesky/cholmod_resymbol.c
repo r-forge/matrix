@@ -102,8 +102,6 @@ int CHOLMOD(resymbol)   // recompute symbolic pattern of L
     //--------------------------------------------------------------------------
 
     Int stype = A->stype ;
-    Int nrow = A->nrow ;
-    Int ncol = A->ncol ;
 
     // s = 2*nrow + (stype ? 0 : ncol)
     int ok = TRUE ;

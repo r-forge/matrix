@@ -84,7 +84,7 @@ cholmod_sparse *CHOLMOD(ssmult)     // return C=A*B
     // check inputs
     //--------------------------------------------------------------------------
 
-    cholmod_sparse *C = NULL, *A2 = NULL, *B2 = NULL, *C2 = NULL ;
+    cholmod_sparse *C = NULL, *A2 = NULL, *B2 = NULL ;
 
     RETURN_IF_NULL_COMMON (NULL) ;
     RETURN_IF_NULL (A, NULL) ;
@@ -196,7 +196,6 @@ cholmod_sparse *CHOLMOD(ssmult)     // return C=A*B
     Int ncol = B->ncol ;
 
     // get workspace
-    void *W = Common->Xwork ;   // size nrow, unused if values is false
     Int *Flag = Common->Flag ;  // size nrow, Flag [0..nrow-1] < mark on input
 
     //--------------------------------------------------------------------------

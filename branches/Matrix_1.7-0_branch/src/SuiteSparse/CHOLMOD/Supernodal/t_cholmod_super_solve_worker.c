@@ -37,12 +37,11 @@ static void TEMPLATE (cholmod_super_lsolve_worker)
     Real minus_one [2], one [2] ;
     Int *Lpi, *Lpx, *Ls, *Super ;
     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
-        nsrow2, n, ps2, j, i, d, nrhs ;
+        nsrow2, ps2, j, i, d, nrhs ;
 
     nrhs = X->ncol ;
     Ex = E->x ;
     Xx = X->x ;
-    n = L->n ;
     d = X->d ;
 
     nsuper = L->nsuper ;
@@ -326,12 +325,11 @@ static void TEMPLATE (cholmod_super_ltsolve_worker)
     Real minus_one [2], one [2] ;
     Int *Lpi, *Lpx, *Ls, *Super ;
     Int nsuper, k1, k2, psi, psend, psx, nsrow, nscol, ii, s,
-        nsrow2, n, ps2, j, i, d, nrhs ;
+        nsrow2, ps2, j, i, d, nrhs ;
 
     nrhs = X->ncol ;
     Ex = E->x ;
     Xx = X->x ;
-    n = L->n ;
     d = X->d ;
 
     nsuper = L->nsuper ;

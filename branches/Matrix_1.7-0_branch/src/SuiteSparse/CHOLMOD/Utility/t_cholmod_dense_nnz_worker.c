@@ -21,7 +21,9 @@ static int64_t TEMPLATE (cholmod_dense_nnz_worker)
     //--------------------------------------------------------------------------
 
     Real *Xx = (Real *) X->x ;
+#ifdef ZOMPLEX
     Real *Xz = (Real *) X->z ;
+#endif
 
     Int nrow = (Int) X->nrow ;
     Int ncol = (Int) X->ncol ;

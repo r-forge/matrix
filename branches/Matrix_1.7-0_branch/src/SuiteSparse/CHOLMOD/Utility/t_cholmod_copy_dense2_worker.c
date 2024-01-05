@@ -36,9 +36,13 @@ static void TEMPLATE (cholmod_copy_dense2_worker)
     //--------------------------------------------------------------------------
 
     Real *Xx = (Real *) X->x ;
+#ifdef ZOMPLEX
     Real *Xz = (Real *) X->z ;
+#endif
     Real *Yx = (Real *) Y->x ;
+#ifdef ZOMPLEX
     Real *Yz = (Real *) Y->z ;
+#endif
     size_t nrow = X->nrow ;
     size_t ncol = X->ncol ;
     size_t xd = X->d ;
@@ -50,9 +54,13 @@ static void TEMPLATE (cholmod_copy_dense2_worker)
 
     size_t e = (X->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
     size_t fx = ((X->xtype == CHOLMOD_COMPLEX) ? 2 : 1) ;
+#ifdef ZOMPLEX
     size_t fz = ((X->xtype == CHOLMOD_ZOMPLEX) ? 1 : 0) ;
+#endif
     size_t e_fx_nrow = e * fx * nrow ;
+#ifdef ZOMPLEX
     size_t e_fz_nrow = e * fz * nrow ;
+#endif
 
     //--------------------------------------------------------------------------
     // copy X = Y

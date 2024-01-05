@@ -31,13 +31,21 @@ static void TEMPLATE (cholmod_copy_sparse_worker)
     Int  *Ap  = (Int  *) A->p ;
     Int  *Anz = (Int  *) A->nz ;
     Int  *Ai  = (Int  *) A->i ;
+#ifndef PATTERN
     Real *Ax  = (Real *) A->x ;
+#ifdef ZOMPLEX
     Real *Az  = (Real *) A->z ;
+#endif
+#endif
     size_t ncol = A->ncol ;
 
     Int  *Ci  = (Int  *) C->i ;
+#ifndef PATTERN
     Real *Cx  = (Real *) C->x ;
+#ifdef ZOMPLEX
     Real *Cz  = (Real *) C->z ;
+#endif
+#endif
 
     //--------------------------------------------------------------------------
     // copy the contents from A to C

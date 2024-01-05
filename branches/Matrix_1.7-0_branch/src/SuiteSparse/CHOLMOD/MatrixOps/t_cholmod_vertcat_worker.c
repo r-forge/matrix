@@ -25,22 +25,34 @@ static void TEMPLATE (cholmod_vertcat_worker)
     Int *Ap  = A->p ;
     Int *Anz = A->nz ;
     Int *Ai  = A->i ;
+#ifndef PATTERN
     Real *Ax  = A->x ;
+#ifdef ZOMPLEX
     Real *Az  = A->z ;
+#endif
+#endif
     bool apacked = A->packed ;
     Int anrow = A->nrow ;
 
     Int *Bp  = B->p ;
     Int *Bnz = B->nz ;
     Int *Bi  = B->i ;
+#ifndef PATTERN
     Real *Bx  = B->x ;
+#ifdef ZOMPLEX
     Real *Bz  = B->z ;
+#endif
+#endif
     bool bpacked = B->packed ;
 
     Int *Cp = C->p ;
     Int *Ci = C->i ;
+#ifndef PATTERN
     Real *Cx = C->x ;
+#ifdef ZOMPLEX
     Real *Cz = C->z ;
+#endif
+#endif
     Int ncol = C->ncol ;
 
     //--------------------------------------------------------------------------

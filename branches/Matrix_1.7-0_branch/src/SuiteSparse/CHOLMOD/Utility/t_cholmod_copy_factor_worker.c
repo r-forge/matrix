@@ -29,11 +29,15 @@ static void TEMPLATE (cholmod_copy_factor_worker)
     Int  *Li  = (Int  *) L->i ;
     Int  *Lnz = (Int  *) L->nz ;
     Real *Lx  = (Real *) L->x ;
+#ifdef ZOMPLEX
     Real *Lz  = (Real *) L->z ;
+#endif
 
     Int  *Hi  = (Int  *) H->i ;
     Real *Hx  = (Real *) H->x ;
+#ifdef ZOMPLEX
     Real *Hz  = (Real *) H->z ;
+#endif
 
     //--------------------------------------------------------------------------
     // copy each column

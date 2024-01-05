@@ -115,7 +115,7 @@ for sslib in SuiteSparse_config CXSparse AMD COLAMD CAMD CCOLAMD CHOLMOD; do
 		patch -p0 < inst/scripts/${sslib}.patch
 	fi
 done
-# patch -p0 < inst/scripts/wall.patch
+patch -p0 < inst/scripts/wall.patch
 echo "done"
 inc=inst/include/Matrix
 h=cholmod.h

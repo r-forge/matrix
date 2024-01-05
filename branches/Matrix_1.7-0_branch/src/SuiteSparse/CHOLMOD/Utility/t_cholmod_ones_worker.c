@@ -21,11 +21,15 @@ static void TEMPLATE (cholmod_ones_worker)
     //--------------------------------------------------------------------------
 
     Real *Xx = (Real *) X->x ;
+#ifdef ZOMPLEX
     Real *Xz = (Real *) X->z ;
+#endif
     size_t nzmax = X->nzmax ;
 
     Real onex [2] = {1,0} ;
+#ifdef ZOMPLEX
     Real onez [1] = {0} ;
+#endif
 
     for (Int k = 0 ; k < nzmax ; k++)
     {
