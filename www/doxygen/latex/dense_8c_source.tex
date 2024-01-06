@@ -208,19 +208,19 @@
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00204}00204\ \ \ \ \ UNPROTECT(1);}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00205}00205\ }
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00206}00206\ \ \ \ \ \textcolor{keywordtype}{int}\ a,\ b;}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{if}\ (k1\ ==\ R\_NilValue)}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ a\ =\ (m\ >\ 0)\ ?\ 1\ -\/\ m\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{if}\ (k1\ ==\ R\_NilValue)\ \textcolor{comment}{//\ tril()}}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ a\ =\ -\/m\ ;\ \textcolor{comment}{//\ was\ (m\ >\ 0)\ ?\ 1\ -\/\ m\ :\ 0;}}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00209}00209\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((a\ =\ asInteger(k1))\ ==\ NA\_INTEGER\ ||\ a\ <\ -\/m\ ||\ a\ >\ n)}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ must\ be\ an\ integer\ from\ \%s\ to\ \%s"{}}),}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k1"{}},\ \textcolor{stringliteral}{"{}-\/Dim[1]"{}},\ \textcolor{stringliteral}{"{}Dim[2]"{}});}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00212}00212\ \ \ \ \ \textcolor{keywordflow}{if}\ (k2\ ==\ R\_NilValue)}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00213}00213\ \ \ \ \ \ \ \ \ b\ =\ (n\ >\ 0)\ ?\ n\ -\/\ 1\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ (\%d)\ must\ be\ an\ integer\ from\ \%s\ (\%d)\ to\ \%s\ (\%d)"{}}),}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k1"{}},\ a,\ \textcolor{stringliteral}{"{}-\/Dim[1]"{}},\ -\/m,\ \textcolor{stringliteral}{"{}Dim[2]"{}},\ n);}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00212}00212\ \ \ \ \ \textcolor{keywordflow}{if}\ (k2\ ==\ R\_NilValue)\ \textcolor{comment}{//\ triu()}}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00213}00213\ \ \ \ \ \ \ \ \ b\ =\ n;\ \textcolor{comment}{//\ was\ (n\ >\ 0)\ ?\ n\ -\/\ 1\ :\ 0;}}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00214}00214\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((b\ =\ asInteger(k2))\ ==\ NA\_INTEGER\ ||\ b\ <\ -\/m\ ||\ b\ >\ n)}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00215}00215\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ must\ be\ an\ integer\ from\ \%s\ to\ \%s"{}}),}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k2"{}},\ \textcolor{stringliteral}{"{}-\/Dim[1]"{}},\ \textcolor{stringliteral}{"{}Dim[2]"{}});}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00215}00215\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ (\%d)\ must\ be\ an\ integer\ from\ \%s\ (\%d)\ to\ \%s\ (\%d)"{}}),}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k2"{}},\ b,\ \textcolor{stringliteral}{"{}-\/Dim[1]"{}},\ -\/m,\ \textcolor{stringliteral}{"{}Dim[2]"{}},\ n);}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (b\ <\ a)}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00218}00218\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ must\ be\ less\ than\ or\ equal\ to\ '\%s'"{}}),}
-\DoxyCodeLine{\Hypertarget{dense_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k1"{}},\ \textcolor{stringliteral}{"{}k2"{}});}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00218}00218\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ (\%d)\ must\ be\ less\ than\ or\ equal\ to\ '\%s'\ (\%d)"{}}),}
+\DoxyCodeLine{\Hypertarget{dense_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}k1"{}},\ a,\ \textcolor{stringliteral}{"{}k2"{}},\ b);}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00220}00220\ }
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00221}00221\ \ \ \ \ from\ =\ \mbox{\hyperlink{dense_8c_a3e90a4a27a4ababadb02e2a001411052}{dense\_band}}(from,\ \mbox{\hyperlink{bind_8c_a3b7be34b2a983a1bf0baddc7215bd2d4}{valid}}[ivalid],\ a,\ b);}
 \DoxyCodeLine{\Hypertarget{dense_8c_source_l00222}00222\ \ \ \ \ UNPROTECT(1);}

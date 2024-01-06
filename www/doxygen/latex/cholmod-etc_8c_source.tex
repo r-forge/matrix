@@ -27,8 +27,8 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ cholmod\_check\_factor\ allows\ L-\/>Perm\ ==\ NULL,}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00024}00024\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ but\ cholmod\_copy\_factor\ does\ not\ test,\ so\ it\ segfaults\ ...}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00025}00025\ \textcolor{comment}{\ \ \ \ \ \ \ \ */}}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ j,\ n\ =\ (int)\ L-\/>n,\ *Perm\ =\ (\textcolor{keywordtype}{int}\ *)\ R\_alloc(L-\/>n,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ (int)\ L-\/>n,\ *Perm\ =\ (\textcolor{keywordtype}{int}\ *)\ R\_alloc(L-\/>n,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ j\ =\ 0;\ j\ <\ n;\ ++j)}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ Perm[j]\ =\ j;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ L-\/>Perm\ =\ Perm;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00030}00030\ \ \ \ \ \}}

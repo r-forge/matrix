@@ -389,17 +389,17 @@
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00385}00385\ \ \ \ \ \textcolor{keywordflow}{if}\ (lendat\ >\ 0)\ \{}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00386}00386\ \ \ \ \ \ \ \ \ R\_xlen\_t\ nrc\ =\ (R\_xlen\_t)\ nr\ *\ nc;}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00387}00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lendat\ >\ 1\ \&\&\ nrc\ \%\ lendat\ !=\ 0)\ \{}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (((lendat\ >\ nr)\ \&\&\ (lendat\ /\ nr)\ *\ nr\ !=\ lendat)\ ||}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((lendat\ <\ nr)\ \&\&\ (nr\ /\ lendat)\ *\ lendat\ !=\ nr))}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}data\ length\ [\%d]\ is\ not\ a\ sub-\/multiple\ "{}}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((lendat\ >\ nr\ \&\&\ (lendat\ /\ nr)\ *\ nr\ !=\ lendat)\ ||}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lendat\ <\ nr\ \&\&\ (nr\ /\ lendat)\ *\ lendat\ !=\ nr))}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}data\ length\ [\%lld]\ is\ not\ a\ sub-\/multiple\ "{}}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}or\ multiple\ of\ the\ number\ of\ rows\ [\%d]"{}}),}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lendat,\ nr);}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (((lendat\ >\ nc)\ \&\&\ (lendat\ /\ nc)\ *\ nc\ !=\ lendat)\ ||}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((lendat\ <\ nc)\ \&\&\ (nc\ /\ lendat)\ *\ lendat\ !=\ nc))}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}data\ length\ [\%d]\ is\ not\ a\ sub-\/multiple\ "{}}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long})lendat,\ nr);}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((lendat\ >\ nc\ \&\&\ (lendat\ /\ nc)\ *\ nc\ !=\ lendat)\ ||}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lendat\ <\ nc\ \&\&\ (nc\ /\ lendat)\ *\ lendat\ !=\ nc))}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}data\ length\ [\%lld]\ is\ not\ a\ sub-\/multiple\ "{}}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}or\ multiple\ of\ the\ number\ of\ columns\ [\%d]"{}}),}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lendat,\ nc);}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00398}00398\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((lendat\ >\ 1)\ \&\&\ (nrc\ ==\ 0))}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long})lendat,\ nc);}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00398}00398\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (lendat\ >\ 1\ \&\&\ nrc\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}data\ length\ exceeds\ size\ of\ matrix"{}}));}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00400}00400\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00401}00401\ }

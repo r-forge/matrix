@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4520</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4562</span>
    </div>
   </td>
  </tr>
@@ -297,17 +297,17 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
 <div class="line">        IS_VALID(_C_ ## sparseMatrix); \</div>
 <div class="line">        if (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[0] == <span class="charliteral">&#39;n&#39;</span>) { \</div>
-<div class="line">            if (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;t&#39;</span>) \</div>
-<div class="line">                IS_VALID(t ## _C_ ## Matrix); \</div>
-<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;s&#39;</span>) \</div>
+<div class="line">            if (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;s&#39;</span>) \</div>
 <div class="line">                IS_VALID(s ## _C_ ## Matrix); \</div>
+<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;t&#39;</span>) \</div>
+<div class="line">                IS_VALID(t ## _C_ ## Matrix); \</div>
 <div class="line">        } <span class="keywordflow">else</span> { \</div>
 <div class="line">            if (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;g&#39;</span>) \</div>
 <div class="line">                IS_VALID(xg ## _C_ ## Matrix); \</div>
-<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;t&#39;</span>) \</div>
-<div class="line">                IS_VALID(xt ## _C_ ## Matrix); \</div>
 <div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;s&#39;</span>) \</div>
 <div class="line">                IS_VALID(xs ## _C_ ## Matrix); \</div>
+<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>[1] == <span class="charliteral">&#39;t&#39;</span>) \</div>
+<div class="line">                IS_VALID(xt ## _C_ ## Matrix); \</div>
 <div class="line">        } \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
