@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4520</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4562</span>
    </div>
   </td>
  </tr>
@@ -341,8 +341,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            v = (value_is_nsp) ? one_ans : val_x[j_val];</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            j_val++;<span class="comment">// from now on, look at the next non-zero entry</span></div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>        } <span class="keywordflow">else</span> { <span class="comment">//  ii_v1 &gt; val_i[j_val]</span></div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            REprintf(<span class="stringliteral">&quot;programming thinko in Csparse_subassign(*, i=%d,j=%d): ii_v=%d, v@i[j_val=%ld]=%g\n&quot;</span>,</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>                 i__,j__, ii_v1, j_val, val_i[j_val]);</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            REprintf(<span class="stringliteral">&quot;programming thinko in Csparse_subassign(*, i=%d,j=%d): ii_v=%lld, v@i[j_val=%d]=%g\n&quot;</span>,</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>                 i__,j__, (<span class="keywordtype">long</span> <span class="keywordtype">long</span>)ii_v1, j_val, val_i[j_val]);</div>
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            j_val++;<span class="comment">// from now on, look at the next non-zero entry</span></div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        }</div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        }</div>
