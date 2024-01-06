@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.6-5 (2024-01-06 r4556)}{
+\section{Changes in version 1.6-5 (2024-01-06 r4560)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{x[]} works for \code{x} inheriting from virtual class
@@ -23,6 +23,9 @@
       \item \proglang{C} API function \code{cholmod_triplet_as_sexp}
       transposes entries \dQuote{opposite} the \code{stype} when that
       is nonzero, following CHOLMOD.
+
+      \item \code{R_init_Matrix} did not register \code{cholmod_defaults},
+      so calls to the corresponding stub did not work.
     }
   }
   \subsection{Misc}{
