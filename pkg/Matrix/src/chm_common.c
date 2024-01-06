@@ -206,8 +206,8 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
 	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym)),
-	     i = PROTECT(GET_SLOT(from, Matrix_iSym)),
-	   cpi = PROTECT(checkpi(p, i, m, n));
+		i = PROTECT(GET_SLOT(from, Matrix_iSym)),
+		cpi = PROTECT(checkpi(p, i, m, n));
 	if (TYPEOF(cpi) != LGLSXP)
 		error(_("'%s' failed in '%s': %s"),
 		      "checkpi", __func__, CHAR(STRING_ELT(cpi, 0)));
