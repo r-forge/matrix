@@ -8,7 +8,7 @@ two components:
    by Douglas Bates, Martin Maechler, and Mikael Jagan, hence they are:
 
    Copyright (C) 1999-2020 Douglas Bates, Martin Maechler
-   Copyright (C) 2021-2023 Douglas Bates, Martin Maechler, Mikael Jagan
+   Copyright (C) 2021-2024 Douglas Bates, Martin Maechler, Mikael Jagan
 
 2. Matrix contains patched versions of external libraries CXSparse,
    AMD, COLAMD, CCAMD, CCOLAMD, and CHOLMOD, all from the SuiteSparse

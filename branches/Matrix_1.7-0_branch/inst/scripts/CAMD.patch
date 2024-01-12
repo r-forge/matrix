@@ -1,6 +1,6 @@
 diff -ruN src/SuiteSparse/CAMD/Makefile src/SuiteSparse-patched/CAMD/Makefile
 --- src/SuiteSparse/CAMD/Makefile	1969-12-31 19:00:00
-+++ src/SuiteSparse-patched/CAMD/Makefile	2024-01-02 17:08:10
++++ src/SuiteSparse-patched/CAMD/Makefile	2024-01-12 11:54:13
 @@ -0,0 +1,30 @@
 +sources = \
 +	Source/camd_1.c          Source/camd_l1.c \
