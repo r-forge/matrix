@@ -1,7 +1,7 @@
 diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOLMOD/Include/cholmod.h
---- src/SuiteSparse/CHOLMOD/Include/cholmod.h	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/Include/cholmod.h	2024-01-03 17:12:47
-@@ -1413,8 +1413,8 @@
+--- src/SuiteSparse/CHOLMOD/Include/cholmod.h	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/Include/cholmod.h	2024-01-12 11:54:13
+@@ -1419,8 +1419,8 @@
      int sorted,         // ignored; C is now always returned as sorted
      cholmod_common *Common
  ) ;
@@ -12,7 +12,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
  
  //------------------------------------------------------------------------------
  // cholmod_sparse_xtype: change the xtype and/or dtype of a sparse matrix
-@@ -2689,7 +2689,7 @@
+@@ -2695,7 +2695,7 @@
      cholmod_factor *L,  // resulting factorization
      cholmod_common *Common
  ) ;
@@ -21,7 +21,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_factor *, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -2887,7 +2887,7 @@
+@@ -2893,7 +2893,7 @@
      cholmod_factor *L,
      cholmod_common *Common
  ) ;
@@ -30,7 +30,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      size_t, cholmod_factor *, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -2912,7 +2912,7 @@
+@@ -2918,7 +2918,7 @@
      cholmod_factor *L,
      cholmod_common *Common
  ) ;
@@ -39,7 +39,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      size_t, size_t, int64_t *, int64_t *, cholmod_factor *, cholmod_common *) ;
  
  int cholmod_rowfac_mask2
-@@ -2931,7 +2931,7 @@
+@@ -2937,7 +2937,7 @@
      cholmod_factor *L,
      cholmod_common *Common
  ) ;
@@ -48,7 +48,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      size_t, size_t, int64_t *, int64_t, int64_t *, cholmod_factor *,
      cholmod_common *) ;
  
-@@ -3196,7 +3196,7 @@
+@@ -3202,7 +3202,7 @@
      cholmod_dense *Y,   // resulting dense matrix
      cholmod_common *Common
  ) ;
@@ -57,7 +57,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_dense *, cholmod_dense *Y, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -3496,7 +3496,7 @@
+@@ -3502,7 +3502,7 @@
      cholmod_dense *DeltaB,  // change in b, zero on output
      cholmod_common *Common
  ) ;
@@ -66,7 +66,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -3520,7 +3520,7 @@
+@@ -3526,7 +3526,7 @@
      cholmod_dense *DeltaB,  // change in b, zero on output
      cholmod_common *Common
  ) ;
@@ -75,7 +75,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -3567,7 +3567,7 @@
+@@ -3573,7 +3573,7 @@
      cholmod_dense *DeltaB,  // change in b, zero on output
      cholmod_common *Common
  ) ;
@@ -84,7 +84,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
  
  //------------------------------------------------------------------------------
-@@ -3591,7 +3591,7 @@
+@@ -3597,7 +3597,7 @@
      cholmod_dense *DeltaB,  // change in b, zero on output
      cholmod_common *Common
  ) ;
@@ -93,7 +93,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
      cholmod_factor *, cholmod_dense *, cholmod_dense *, cholmod_common *) ;
  
  #endif
-@@ -3921,7 +3921,7 @@
+@@ -3927,7 +3927,7 @@
      cholmod_factor *L,  // factorization
      cholmod_common *Common
  ) ;
@@ -104,7 +104,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/Include/cholmod.h src/SuiteSparse-patched/CHOL
  //------------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Makefile src/SuiteSparse-patched/CHOLMOD/Makefile
 --- src/SuiteSparse/CHOLMOD/Makefile	1969-12-31 19:00:00
-+++ src/SuiteSparse-patched/CHOLMOD/Makefile	2024-01-03 17:12:47
++++ src/SuiteSparse-patched/CHOLMOD/Makefile	2024-01-12 11:54:13
 @@ -0,0 +1,128 @@
 +sources = \
 +	Check/cholmod_check.c Check/cholmod_l_check.c \
@@ -235,8 +235,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Makefile src/SuiteSparse-patched/CHOLMOD/Makef
 +clean :
 +	@rm -f $(objects) $(archive)
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-12 11:54:13
 @@ -76,7 +76,7 @@
      size_t dy = Y->d ;
      size_t dx = X->d ;
@@ -247,8 +247,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c src/SuiteS
      //--------------------------------------------------------------------------
      // Y = beta * Y
 diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_metis_wrapper.h src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis_wrapper.h
---- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis_wrapper.h	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis_wrapper.h	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis_wrapper.h	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis_wrapper.h	2024-01-12 11:54:13
 @@ -16,15 +16,6 @@
  #define USE_GKRAND
  #endif
@@ -266,8 +266,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_metis_wrapper.h src/SuiteSpa
      #undef  __thread
      #define __thread __declspec(thread)
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/csr.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/csr.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/csr.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/csr.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/csr.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/csr.c	2024-01-12 11:54:13
 @@ -16,7 +16,7 @@
      \returns the allocated matrix. The various fields are set to NULL.
  */
@@ -278,8 +278,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/csr.c src/SuiteSparse-
    gk_csr_t *mat;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/error.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/error.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/error.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/error.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/error.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/error.c	2024-01-12 11:54:13
 @@ -95,7 +95,7 @@
      of a longjmp
  */
@@ -326,8 +326,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/error.c src/SuiteSpars
  #ifdef HAVE_EXECINFO_H
    void *array[10];
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h	2024-01-12 11:54:13
 @@ -52,11 +52,9 @@
  
  
@@ -344,8 +344,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_getopt.h src/SuiteS
  
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h	2024-01-12 11:54:13
 @@ -33,7 +33,7 @@
  /*************************************************************************/\
  /*! Returns a random number */ \
@@ -356,8 +356,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkrandom.h src/Suit
    if (sizeof(RNGT) <= sizeof(int32_t)) \
      return (RNGT)gk_randint32(); \
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c	2024-01-12 11:54:13
 @@ -19,7 +19,7 @@
     02111-1307 USA.  */
  
@@ -368,8 +368,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gkregex.c src/SuiteSpa
  #ifdef USE_GKREGEX
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/graph.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/graph.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/graph.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/graph.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/graph.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/graph.c	2024-01-12 11:54:13
 @@ -16,7 +16,7 @@
      \returns the allocated graph. The various fields are set to NULL.
  */
@@ -380,8 +380,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/graph.c src/SuiteSpars
    gk_graph_t *graph;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2024-01-12 11:54:13
 @@ -40,7 +40,7 @@
  /*! This function creates an mcore. This version is used for gkmcore.
   */
@@ -392,8 +392,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c src/SuiteSpars
    gk_mcore_t *mcore;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/memory.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2024-01-12 11:54:13
 @@ -96,7 +96,7 @@
  /*! This function initializes tracking of heap allocations. 
  */
@@ -422,8 +422,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c src/SuiteSpar
    if (gkmcore == NULL)
      return 0;
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c
---- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-03 17:12:47
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-12 11:54:13
 @@ -82,15 +82,6 @@
  #define ZOMPLEX
  #include "t_cholmod_super_numeric_worker.c"
@@ -461,8 +461,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c src/SuiteSp
  
          case CHOLMOD_REAL    + CHOLMOD_DOUBLE:
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_solve.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_solve.c
---- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_solve.c	2023-12-29 19:18:23
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_solve.c	2024-01-03 17:26:44
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_solve.c	2024-01-10 19:08:51
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_solve.c	2024-01-12 11:54:13
 @@ -30,13 +30,6 @@
  #define COMPLEX
  #include "t_cholmod_super_solve_worker.c"
