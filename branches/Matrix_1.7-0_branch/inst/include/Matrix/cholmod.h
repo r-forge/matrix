@@ -317,18 +317,18 @@ int cholmod_l_version (int version [3]) ;
 
 #include "SuiteSparse_config.h"
 
+#define CHOLMOD__VERSION SUITESPARSE__VERCODE(5,1,1)
+#if !defined (SUITESPARSE__VERSION) || \
+    (SUITESPARSE__VERSION < SUITESPARSE__VERCODE(7,5,0))
+#error "CHOLMOD 5.1.1 requires SuiteSparse_config 7.5.0 or later"
+#endif
+
 #else
 
 #include <stdint.h>
 #include <stddef.h>
 
 #endif /* !defined(R_MATRIX_CHOLMOD_H) */
-
-#define CHOLMOD__VERSION SUITESPARSE__VERCODE(5,1,1)
-#if !defined (SUITESPARSE__VERSION) || \
-    (SUITESPARSE__VERSION < SUITESPARSE__VERCODE(7,5,0))
-#error "CHOLMOD 5.1.1 requires SuiteSparse_config 7.5.0 or later"
-#endif
 
 //------------------------------------------------------------------------------
 // CHOLMOD configuration
