@@ -4,14 +4,14 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-01-17 r4571)}{
+\section{Changes in version 1.7-0 (2024-01-17 r4572)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
-      \item The internal SuiteSparse library is updated from version
-      5.10.1 to version 7.5.0.  Hence the \pkg{Matrix} ABI version is
-      incremented from 1 to 2.  Reverse \code{LinkingTo} built under
-      earlier versions of \pkg{Matrix} should be rebuilt from sources
-      by users and maintainers of binary repositories.\cr
+      \item The internal collection of SuiteSparse libraries is updated
+      from version 5.10.1 to version 7.5.0.  Hence the \pkg{Matrix} ABI
+      version is incremented from 1 to 2.  Reverse \code{LinkingTo}
+      built under earlier versions of \pkg{Matrix} should be rebuilt
+      from sources by users and maintainers of binary repositories.\cr
       \cr
       We have so far identified one backwards incompatible change:
       since SuiteSparse version 7.3.0, \code{cholmod_sort(A)} sorts
@@ -21,16 +21,27 @@
       This change affects only reverse \code{LinkingTo} relying on
       the old behaviour.  (It seems that currently there are no such
       packages on CRAN or Bioconductor.)
+
+      \item The diagonal elements of the \code{R} factor computed by
+      \code{qr(<sparseMatrix>)} are no longer constrained to be
+      non-negative, due to differences in the implementation of function
+      \code{cs_house} between SuiteSparse libraries CSparse and
+      CXSparse.  Accordingly, the validity method for class
+      \code{sparseQR} no longer complains about negative \code{diag(R)}.
     }
   }
   \subsection{New Features}{
     \itemize{
-      \item .
+      \item CHOLMOD component Partition is now compiled along with
+      its dependencies (METIS, CAMD, CCOLAMD).
+
+      \item CXSparse is now compiled instead of CSparse, which did
+      not support complex matrices.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item The SuiteSparse sources are patched to address the significant
+      \item CHOLMOD sources are patched to address the significant
       number of compiler warnings surfaced by \option{-Wall}.
     }
   }
