@@ -4,6 +4,43 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
+\section{Changes in version 1.7-0 (2024-01-17 r4571)}{
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item The internal SuiteSparse library is updated from version
+      5.10.1 to version 7.5.0.  Hence the \pkg{Matrix} ABI version is
+      incremented from 1 to 2.  Reverse \code{LinkingTo} built under
+      earlier versions of \pkg{Matrix} should be rebuilt from sources
+      by users and maintainers of binary repositories.\cr
+      \cr
+      We have so far identified one backwards incompatible change:
+      since SuiteSparse version 7.3.0, \code{cholmod_sort(A)} sorts
+      but \emph{does not pack} the matrix \code{A}.  It seems that
+      now \code{cholmod_sort} and \code{cholmod_copy} must be used
+      in conjuction if a sorted \emph{and packed} result is desired.
+      This change affects only reverse \code{LinkingTo} relying on
+      the old behaviour.  (It seems that currently there are no such
+      packages on CRAN or Bioconductor.)
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item The SuiteSparse sources are patched to address the significant
+      number of compiler warnings surfaced by \option{-Wall}.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
 \section{Changes in version 1.6-5 (2024-01-06 r4560)}{
   \subsection{Bug Fixes}{
     \itemize{
