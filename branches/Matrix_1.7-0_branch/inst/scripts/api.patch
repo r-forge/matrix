@@ -1,5 +1,5 @@
---- inst/include/Matrix/cholmod.h	2024-01-12 12:08:34
-+++ inst/include/Matrix/cholmod.h-patched.h	2024-01-12 12:08:08
+--- inst/include/Matrix/cholmod.h	2024-01-17 13:47:18
++++ inst/include/Matrix/cholmod.h-patched.h	2024-01-17 02:18:32
 @@ -46,8 +46,8 @@
  // CHOLMOD's Partition Module.
  // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@
  // skip all of this if NLARGEFILE is defined at the compiler command line
  #ifndef NLARGEFILE
      #if defined(MATLAB_MEX_FILE) || defined(MATHWORKS)
-@@ -301,12 +307,23 @@
+@@ -301,10 +307,14 @@
      #endif
  #endif
  
@@ -52,6 +52,11 @@
 +
  #include "SuiteSparse_config.h"
  
+ #define CHOLMOD__VERSION SUITESPARSE__VERCODE(5,1,1)
+@@ -313,6 +323,13 @@
+ #error "CHOLMOD 5.1.1 requires SuiteSparse_config 7.5.0 or later"
+ #endif
+ 
 +#else
 +
 +#include <stdint.h>
@@ -59,9 +64,9 @@
 +
 +#endif /* !defined(R_MATRIX_CHOLMOD_H) */
 +
- #define CHOLMOD__VERSION SUITESPARSE__VERCODE(5,1,1)
- #if !defined (SUITESPARSE__VERSION) || \
-     (SUITESPARSE__VERSION < SUITESPARSE__VERCODE(7,5,0))
+ //------------------------------------------------------------------------------
+ // CHOLMOD configuration
+ //------------------------------------------------------------------------------
 @@ -353,6 +370,8 @@
  //  existence of this #define here, and its use in these 3 modules, does not
  //  affect the license itself; see CHOLMOD/Doc/License.txt for your actual
