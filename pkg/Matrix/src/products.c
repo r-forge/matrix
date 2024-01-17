@@ -785,8 +785,11 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 		cholmod_sparse *Z = cholmod_aat(X, (int *) NULL, 0, !boolean, &c);
 		if (xtrans)
 			cholmod_free_sparse(&X, &c);
-		Z->stype = (ztrans) ? -1 : 1;
-		cholmod_sort(Z, &c);
+		if (!Z->sorted)
+			cholmod_sort(Z, &c);
+		X = cholmod_copy(Z, (ztrans) ? -1 : 1, 1, &c);
+		cholmod_free_sparse(&Z, &c);
+		Z = X;
 		PROTECT_WITH_INDEX(z = CHS2M(Z, !boolean, zcl[1]), &zpid);
 		cholmod_free_sparse(&Z, &c);
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),

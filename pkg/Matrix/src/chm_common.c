@@ -738,15 +738,16 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 	do { \
 		if (doFree != 0) { \
 			if (doFree < 0) \
-				R_Free(A); \
-			else if (A->itype == CHOLMOD_INT) \
-				cholmod_free_sparse(&A, &c); \
+				R_Free(A_); \
+			else if (A_->itype == CHOLMOD_INT) \
+				cholmod_free_sparse(&A_, &c); \
 			else \
-				cholmod_l_free_sparse(&A, &cl); \
+				cholmod_l_free_sparse(&A_, &cl); \
 			_EXPR_; \
 		} \
 	} while (0)
 
+	cholmod_sparse *A_ = A;
 	if (A->itype != CHOLMOD_INT)
 		FREE_THEN(error(_("wrong '%s'"), "itype"));
 	if (A->xtype != CHOLMOD_PATTERN &&
@@ -756,8 +757,10 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 		FREE_THEN(error(_("wrong '%s'"), "dtype"));
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
 		FREE_THEN(error(_("dimensions cannot exceed %s"), "2^31-1"));
-	if (A->stype != 0 || !A->sorted || !A->packed)
+	if (!A->sorted)
 		cholmod_sort(A, &c);
+	if (!A->packed || A->stype != 0)
+		A = cholmod_copy(A, A->stype, 1, &c);
 	int m = (int) A->nrow, n = (int) A->ncol, nnz = ((int *) A->p)[A->ncol];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 	char class[] = "..CMatrix";
@@ -805,6 +808,8 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 	if (TYPEOF(dimnames) == VECSXP && LENGTH(dimnames) == 2)
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 
+	if (A != A_)
+		cholmod_free_sparse(&A, &c);
 	FREE_THEN();
 
 #undef FREE_THEN
