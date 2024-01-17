@@ -47,7 +47,7 @@
   so that \eqn{P_{2}}{P2} is an identity matrix.
 
   Methods for \code{\linkS4class{sparseMatrix}} are built on
-  CSparse routine \code{cs_lu}, which requires \eqn{m = n},
+  CXSparse routine \code{cs_lu}, which requires \eqn{m = n},
   so that \eqn{L} and \eqn{U} are triangular matrices.
 }
 \usage{
@@ -69,7 +69,7 @@ lu(x, \dots)
   \item{errSing}{a logical indicating if an \link[=stop]{error} should
     be signaled for singular \code{x}.  Used only by methods for
     sparse matrices.}
-  \item{order}{an integer in \code{0:3} passed to CSparse routine
+  \item{order}{an integer in \code{0:3} passed to CXSparse routine
     \code{cs_sqr}, indicating a strategy for choosing the column
     permutation \eqn{P_{2}}{P2}.  0 means no column permutation.
     1, 2, and 3 indicate a fill-reducing ordering of \eqn{A + A'},
