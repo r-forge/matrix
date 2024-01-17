@@ -1,9 +1,0 @@
-#!/bin/sh
-
-## INSTALL does not clean up after ./configure or in subdirectories of src/;
-## we do not have a ./configure, hence we only need the following:
-
-sslib="SuiteSparse_config AMD COLAMD CHOLMOD"
-for d in ${sslib}; do
-	(cd src/${d} && make clean)
-done
