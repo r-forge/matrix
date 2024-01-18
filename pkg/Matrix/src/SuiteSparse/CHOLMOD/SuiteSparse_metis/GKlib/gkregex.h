@@ -1,3 +1,11 @@
+/* Subsequent to changes made for SuiteSparse by Timothy A. Davis,           */
+/* which are documented in the file                                          */
+/* ../../../../../inst/doc/SuiteSparse/CHOLMOD/SuiteSparse_metis/README.txt, */
+/* the METIS library sources, which include this file, have been patched     */
+/* for R package Matrix by its authors to resolve warnings issued by GCC     */
+/* and Clang with options -Wall and -Wextra.  See the files ssget.sh and     */
+/* *.patch below ../../../../../inst/scripts for details.                    */
+
 /* Definitions for data structures and routines for the regular
    expression library.
    Copyright (C) 1985,1989-93,1995-98,2000,2001,2002,2003,2005,2006
