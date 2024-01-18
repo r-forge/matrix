@@ -117,6 +117,14 @@ for sslib in SuiteSparse_config CXSparse AMD COLAMD CAMD CCOLAMD CHOLMOD; do
 done
 patch -p0 < inst/scripts/wall.patch
 echo "done"
+metis=src/${ssdir}/CHOLMOD/SuiteSparse_metis
+echo "Adding disclaimer to comply with Apache-2.0 ..."
+for f in $(find ${metis} \( ! -path "${metis}/*/*" -o -prune \) -type f); do
+	mv ${f} ${f}.bak
+	cat inst/scripts/disclaimer.txt ${f}.bak > ${f}
+	rm ${f}.bak
+done
+echo "done"
 inc=inst/include/Matrix
 h=cholmod.h
 echo "Copying ${h} into ${inc} ..."

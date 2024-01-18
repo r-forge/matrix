@@ -1,3 +1,11 @@
+/* Subsequent to changes made for SuiteSparse by Timothy A. Davis,           */
+/* which are documented in the file                                          */
+/* ../../../../../inst/doc/SuiteSparse/CHOLMOD/SuiteSparse_metis/README.txt, */
+/* the METIS library sources, which include this file, have been patched     */
+/* for R package Matrix by its authors to resolve warnings issued by GCC     */
+/* and Clang with options -Wall and -Wextra.  See the files ssget.sh and     */
+/* *.patch below ../../../../../inst/scripts for details.                    */
+
 /*!
 \file  gk_mkpqueue2.h
 \brief Templates for priority queues that do not utilize locators and as such
