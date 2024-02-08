@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.7-0\n"
-"POT-Creation-Date: 2023-11-04 10:47\n"
+"POT-Creation-Date: 2024-02-08 02:53\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -655,6 +655,24 @@ msgstr ""
 msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
+msgid "invalid subassignment value class \"%s\""
+msgstr ""
+
+msgid "invalid subassignment value type \"%s\""
+msgstr ""
+
+msgid "missing subassignment value"
+msgstr ""
+
+msgid "incorrect number of dimensions"
+msgstr ""
+
+msgid "replacement has length zero"
+msgstr ""
+
+msgid "number of items to replace is not a multiple of replacement length"
+msgstr ""
+
 msgid ".M.repl.i.2col(): 'i' has no integer column number;\n should never happen; please report"
 msgstr ""
 
@@ -668,9 +686,6 @@ msgid "negative values are not allowed in a matrix subscript"
 msgstr ""
 
 msgid "NAs are not allowed in subscripted assignments"
-msgstr ""
-
-msgid "number of items to replace is not a multiple of replacement length"
 msgstr ""
 
 msgid "m[ <ij-matrix> ] <- v: inefficiently treating single elements"
@@ -776,9 +791,6 @@ msgid "subscript out of bounds"
 msgstr ""
 
 msgid "logical subscript too long"
-msgstr ""
-
-msgid "incorrect number of dimensions"
 msgstr ""
 
 msgid "only zeros may be mixed with negative subscripts"

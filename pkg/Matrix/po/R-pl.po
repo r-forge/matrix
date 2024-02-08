@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2023-11-02 21:33\n"
+"POT-Creation-Date: 2024-02-08 02:53\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -1101,6 +1101,49 @@ msgstr ""
 msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
+# Matrix/R/Rsparse.R: 32
+# stop(gettextf("invalid class: %s", dQuote(cl)), domain = "R-Matrix")
+# Matrix/R/Rsparse.R: 59
+# stop(gettextf("invalid class: %s", dQuote(cl)), domain = "R-Matrix")
+#, fuzzy
+msgid "invalid subassignment value class \"%s\""
+msgstr "niepoprawna klasa: %s"
+
+# Matrix/R/HBMM.R: 47
+# stop(gettextf("Invalid storage type: %s", t1), domain = "R-Matrix")
+#, fuzzy
+msgid "invalid subassignment value type \"%s\""
+msgstr "Niepoprawny typ przechowywania: %s"
+
+msgid "missing subassignment value"
+msgstr ""
+
+# Matrix/R/diagMatrix.R: 744
+# stop("incompatible matrix dimensions")
+#, fuzzy
+msgid "incorrect number of dimensions"
+msgstr "niezgodne wymiary macierzy"
+
+msgid "replacement has length zero"
+msgstr ""
+
+# Matrix/R/Matrix.R: 713
+# warning("number of items to replace is not a multiple of replacement length")
+# Matrix/R/Csparse.R: 245
+# stop("number of items to replace is not a multiple of replacement length")
+# Matrix/R/Tsparse.R: 366
+# warning("number of items to replace is not a multiple of replacement length")
+# Matrix/R/Tsparse.R: 405
+# stop("number of items to replace is not a multiple of replacement length")
+# Matrix/R/Tsparse.R: 657
+# warning("number of items to replace is not a multiple of replacement length")
+# Matrix/R/sparseVector.R: 530
+# stop("number of items to replace is not a multiple of replacement length")
+msgid "number of items to replace is not a multiple of replacement length"
+msgstr ""
+"liczba pozycji do zastąpienia nie jest wielokrotnością długości elementu "
+"zastępującego"
+
 # Matrix/R/Matrix.R: 694
 # stop(".M.repl.i.2col(): 'i' has no integer column number;\n should never happen; please report")
 msgid ""
@@ -1139,23 +1182,6 @@ msgstr "ujemne wartości nie są dozwolone w indeksach macierzy"
 # stop("NAs are not allowed in subscripted assignments")
 msgid "NAs are not allowed in subscripted assignments"
 msgstr "wartości NA nie są dozwolone w indeksowanych przypisaniach"
-
-# Matrix/R/Matrix.R: 713
-# warning("number of items to replace is not a multiple of replacement length")
-# Matrix/R/Csparse.R: 245
-# stop("number of items to replace is not a multiple of replacement length")
-# Matrix/R/Tsparse.R: 366
-# warning("number of items to replace is not a multiple of replacement length")
-# Matrix/R/Tsparse.R: 405
-# stop("number of items to replace is not a multiple of replacement length")
-# Matrix/R/Tsparse.R: 657
-# warning("number of items to replace is not a multiple of replacement length")
-# Matrix/R/sparseVector.R: 530
-# stop("number of items to replace is not a multiple of replacement length")
-msgid "number of items to replace is not a multiple of replacement length"
-msgstr ""
-"liczba pozycji do zastąpienia nie jest wielokrotnością długości elementu "
-"zastępującego"
 
 # Matrix/R/Matrix.R: 719
 # message("m[ <ij-matrix> ] <- v: inefficiently treating single elements")
@@ -1379,12 +1405,6 @@ msgstr ""
 #, fuzzy
 msgid "logical subscript too long"
 msgstr "indeks logiczny jest zbyt długi (%d, powinien być %d)"
-
-# Matrix/R/diagMatrix.R: 744
-# stop("incompatible matrix dimensions")
-#, fuzzy
-msgid "incorrect number of dimensions"
-msgstr "niezgodne wymiary macierzy"
 
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""

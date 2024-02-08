@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.3-3\n"
-"POT-Creation-Date: 2023-11-02 21:33\n"
+"POT-Creation-Date: 2024-02-08 02:53\n"
 "PO-Revision-Date: 2021-03-01 20:55+0200\n"
 "Last-Translator: Gabrielė Stupurienė <gabriele.stupuriene@mif.vu.lt>\n"
 "Language-Team: none\n"
@@ -752,6 +752,27 @@ msgstr "'giveCsparse' nebenaudojamas; vietoj to naudos 'repr'"
 msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr "'giveCsparse' nebenaudojamas; nustatymas 'repr = \"T\"' jums"
 
+#, fuzzy
+msgid "invalid subassignment value class \"%s\""
+msgstr "netinkama klasė: %s"
+
+#, fuzzy
+msgid "invalid subassignment value type \"%s\""
+msgstr "Netinkamas saugyklos tipas: %s"
+
+msgid "missing subassignment value"
+msgstr ""
+
+#, fuzzy
+msgid "incorrect number of dimensions"
+msgstr "nesuderinamos matricos dimensijos"
+
+msgid "replacement has length zero"
+msgstr ""
+
+msgid "number of items to replace is not a multiple of replacement length"
+msgstr "keičiamų elementų skaičius nėra keičiamo ilgio kartotinis"
+
 msgid ""
 ".M.repl.i.2col(): 'i' has no integer column number;\n"
 " should never happen; please report"
@@ -770,9 +791,6 @@ msgstr "matricos apatiniame indekse neigiamos reikšmės neleidžiamos"
 
 msgid "NAs are not allowed in subscripted assignments"
 msgstr "NA neleidžiamos apatinio indekso priskyrimuose"
-
-msgid "number of items to replace is not a multiple of replacement length"
-msgstr "keičiamų elementų skaičius nėra keičiamo ilgio kartotinis"
 
 msgid "m[ <ij-matrix> ] <- v: inefficiently treating single elements"
 msgstr "m[ <ij-matrix> ] <- v: neefektyviai apdorojant pavienius elementus"
@@ -896,10 +914,6 @@ msgstr ""
 #, fuzzy
 msgid "logical subscript too long"
 msgstr "loginis apatinis indeksas per ilgas (%d, turėtų būti %d)"
-
-#, fuzzy
-msgid "incorrect number of dimensions"
-msgstr "nesuderinamos matricos dimensijos"
 
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""
