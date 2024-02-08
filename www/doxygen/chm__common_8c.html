@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4562</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
    </div>
   </td>
  </tr>
@@ -245,11 +245,11 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
 <div class="line">        if (doFree != 0) { \</div>
 <div class="line">            if (doFree &lt; 0) \</div>
-<div class="line">                R_Free(A); \</div>
-<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (A-&gt;itype == CHOLMOD_INT) \</div>
-<div class="line">                cholmod_free_sparse(&amp;A, &amp;<a class="code hl_variable" href="cholmod-etc_8c.html#ac2b5dcf1f18e620b15b2e284dd9f6bd4">c</a>); \</div>
+<div class="line">                R_Free(A_); \</div>
+<div class="line">            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (A_-&gt;itype == CHOLMOD_INT) \</div>
+<div class="line">                cholmod_free_sparse(&amp;A_, &amp;<a class="code hl_variable" href="cholmod-etc_8c.html#ac2b5dcf1f18e620b15b2e284dd9f6bd4">c</a>); \</div>
 <div class="line">            else \</div>
-<div class="line">                cholmod_l_free_sparse(&amp;A, &amp;<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>); \</div>
+<div class="line">                cholmod_l_free_sparse(&amp;A_, &amp;<a class="code hl_variable" href="cholmod-etc_8c.html#ac49bea018a4b4cb10cd713589039cdda">cl</a>); \</div>
 <div class="line">            _EXPR_; \</div>
 <div class="line">        } \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0)</div>
@@ -490,7 +490,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A [dz]geMatrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l00949">949</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l00954">954</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
 <p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="chm__common_8c.html#ac922ed603e26e6b51dfef25c53dca7d9">FREE_THEN</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="objects_8c_source.html#l00004">newObject()</a>, and <a class="el" href="Mdefines_8h_source.html#l00086">SET_SLOT</a>.</p>
 
@@ -568,7 +568,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01012">1012</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01017">1017</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
 <p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>.</p>
 
@@ -620,7 +620,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>L. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01059">1059</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01064">1064</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
 <p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, and <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>.</p>
 
@@ -766,7 +766,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A TsparseMatrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l00843">843</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l00848">848</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
 <p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="chm__common_8c.html#ac922ed603e26e6b51dfef25c53dca7d9">FREE_THEN</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00011">Matrix_diagSym</a>, <a class="el" href="Syms_8h_source.html#l00002">Matrix_DimNamesSym</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00014">Matrix_jSym</a>, <a class="el" href="Syms_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="objects_8c_source.html#l00004">newObject()</a>, and <a class="el" href="Mdefines_8h_source.html#l00086">SET_SLOT</a>.</p>
 
@@ -847,11 +847,11 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01212">1212</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01217">1217</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="chm__common_8c_source.html#l01125">cholmod_common_env</a>, <a class="el" href="chm__common_8c.html#ad30350b29d9e22b87707de0e8af2d65a">GET_MEMBER_FROM_FRAME</a>, and <a class="el" href="chm__common_8c_source.html#l01147">m0_ordSym</a>.</p>
+<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="chm__common_8c_source.html#l01130">cholmod_common_env</a>, <a class="el" href="chm__common_8c.html#ad30350b29d9e22b87707de0e8af2d65a">GET_MEMBER_FROM_FRAME</a>, and <a class="el" href="chm__common_8c_source.html#l01152">m0_ordSym</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="factorizations_8c_source.html#l00521">dpCMatrix_trf_()</a>, and <a class="el" href="chm__common_8c_source.html#l01087">R_cholmod_error_handler()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="factorizations_8c_source.html#l00521">dpCMatrix_trf_()</a>, and <a class="el" href="chm__common_8c_source.html#l01092">R_cholmod_error_handler()</a>.</p>
 
 </div>
 </div>
@@ -871,9 +871,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01149">1149</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01154">1154</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">References <a class="el" href="chm__common_8c_source.html#l01125">cholmod_common_env</a>, <a class="el" href="chm__common_8c_source.html#l01129">dboundSym</a>, <a class="el" href="Mdefines_8h_source.html#l00204">ERROR_INVALID_TYPE</a>, <a class="el" href="chm__common_8c_source.html#l01136">final_asisSym</a>, <a class="el" href="chm__common_8c_source.html#l01138">final_llSym</a>, <a class="el" href="chm__common_8c_source.html#l01140">final_monotonicSym</a>, <a class="el" href="chm__common_8c_source.html#l01139">final_packSym</a>, <a class="el" href="chm__common_8c_source.html#l01141">final_resymbolSym</a>, <a class="el" href="chm__common_8c_source.html#l01137">final_superSym</a>, <a class="el" href="chm__common_8c_source.html#l01130">grow0Sym</a>, <a class="el" href="chm__common_8c_source.html#l01131">grow1Sym</a>, <a class="el" href="chm__common_8c_source.html#l01132">grow2Sym</a>, <a class="el" href="chm__common_8c_source.html#l01147">m0_ordSym</a>, <a class="el" href="chm__common_8c_source.html#l01133">maxrankSym</a>, <a class="el" href="chm__common_8c_source.html#l01145">nmethodsSym</a>, <a class="el" href="chm__common_8c_source.html#l01146">postorderSym</a>, <a class="el" href="chm__common_8c_source.html#l01143">prefer_upperSym</a>, <a class="el" href="chm__common_8c_source.html#l01142">prefer_zomplexSym</a>, <a class="el" href="chm__common_8c_source.html#l01144">quick_return_if_not_posdefSym</a>, <a class="el" href="chm__common_8c_source.html#l01176">R_cholmod_common_envset()</a>, <a class="el" href="chm__common_8c_source.html#l01134">supernodal_switchSym</a>, and <a class="el" href="chm__common_8c_source.html#l01135">supernodalSym</a>.</p>
+<p class="reference">References <a class="el" href="chm__common_8c_source.html#l01130">cholmod_common_env</a>, <a class="el" href="chm__common_8c_source.html#l01134">dboundSym</a>, <a class="el" href="Mdefines_8h_source.html#l00204">ERROR_INVALID_TYPE</a>, <a class="el" href="chm__common_8c_source.html#l01141">final_asisSym</a>, <a class="el" href="chm__common_8c_source.html#l01143">final_llSym</a>, <a class="el" href="chm__common_8c_source.html#l01145">final_monotonicSym</a>, <a class="el" href="chm__common_8c_source.html#l01144">final_packSym</a>, <a class="el" href="chm__common_8c_source.html#l01146">final_resymbolSym</a>, <a class="el" href="chm__common_8c_source.html#l01142">final_superSym</a>, <a class="el" href="chm__common_8c_source.html#l01135">grow0Sym</a>, <a class="el" href="chm__common_8c_source.html#l01136">grow1Sym</a>, <a class="el" href="chm__common_8c_source.html#l01137">grow2Sym</a>, <a class="el" href="chm__common_8c_source.html#l01152">m0_ordSym</a>, <a class="el" href="chm__common_8c_source.html#l01138">maxrankSym</a>, <a class="el" href="chm__common_8c_source.html#l01150">nmethodsSym</a>, <a class="el" href="chm__common_8c_source.html#l01151">postorderSym</a>, <a class="el" href="chm__common_8c_source.html#l01148">prefer_upperSym</a>, <a class="el" href="chm__common_8c_source.html#l01147">prefer_zomplexSym</a>, <a class="el" href="chm__common_8c_source.html#l01149">quick_return_if_not_posdefSym</a>, <a class="el" href="chm__common_8c_source.html#l01181">R_cholmod_common_envset()</a>, <a class="el" href="chm__common_8c_source.html#l01139">supernodal_switchSym</a>, and <a class="el" href="chm__common_8c_source.html#l01140">supernodalSym</a>.</p>
 
 </div>
 </div>
@@ -893,11 +893,11 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01176">1176</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01181">1181</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="chm__common_8c_source.html#l01125">cholmod_common_env</a>, <a class="el" href="chm__common_8c_source.html#l01147">m0_ordSym</a>, and <a class="el" href="chm__common_8c.html#a365f4fd283144b0bacc8ecac256c1eaf">SET_FRAME_FROM_MEMBER</a>.</p>
+<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="chm__common_8c_source.html#l01130">cholmod_common_env</a>, <a class="el" href="chm__common_8c_source.html#l01152">m0_ordSym</a>, and <a class="el" href="chm__common_8c.html#a365f4fd283144b0bacc8ecac256c1eaf">SET_FRAME_FROM_MEMBER</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="factorizations_8c_source.html#l00521">dpCMatrix_trf_()</a>, and <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="factorizations_8c_source.html#l00521">dpCMatrix_trf_()</a>, and <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -947,11 +947,11 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01087">1087</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01092">1092</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, and <a class="el" href="chm__common_8c_source.html#l01212">R_cholmod_common_envget()</a>.</p>
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, and <a class="el" href="chm__common_8c_source.html#l01217">R_cholmod_common_envget()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01099">R_cholmod_start()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01104">R_cholmod_start()</a>.</p>
 
 </div>
 </div>
@@ -971,7 +971,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01117">1117</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01122">1122</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
 <p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>.</p>
 
@@ -995,9 +995,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01099">1099</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01104">1104</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, and <a class="el" href="chm__common_8c_source.html#l01087">R_cholmod_error_handler()</a>.</p>
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, and <a class="el" href="chm__common_8c_source.html#l01092">R_cholmod_error_handler()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="init_8c_source.html#l00281">R_init_Matrix()</a>.</p>
 
@@ -1217,9 +1217,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01125">1125</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01130">1130</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01212">R_cholmod_common_envget()</a>, <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>, and <a class="el" href="chm__common_8c_source.html#l01176">R_cholmod_common_envset()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01217">R_cholmod_common_envget()</a>, <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>, and <a class="el" href="chm__common_8c_source.html#l01181">R_cholmod_common_envset()</a>.</p>
 
 </div>
 </div>
@@ -1243,9 +1243,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01129">1129</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01134">1134</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1269,9 +1269,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01136">1136</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01141">1141</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1295,9 +1295,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01138">1138</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01143">1143</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1321,9 +1321,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01140">1140</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01145">1145</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1347,9 +1347,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01139">1139</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01144">1144</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1373,9 +1373,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01141">1141</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01146">1146</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1399,9 +1399,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01137">1137</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01142">1142</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1425,9 +1425,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01130">1130</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01135">1135</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1451,9 +1451,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01131">1131</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01136">1136</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1477,9 +1477,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01132">1132</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01137">1137</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1503,9 +1503,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01147">1147</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01152">1152</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01212">R_cholmod_common_envget()</a>, <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>, and <a class="el" href="chm__common_8c_source.html#l01176">R_cholmod_common_envset()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01217">R_cholmod_common_envget()</a>, <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>, and <a class="el" href="chm__common_8c_source.html#l01181">R_cholmod_common_envset()</a>.</p>
 
 </div>
 </div>
@@ -1529,9 +1529,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01133">1133</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01138">1138</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1555,9 +1555,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01145">1145</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01150">1150</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1581,9 +1581,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01146">1146</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01151">1151</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1607,9 +1607,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01143">1143</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01148">1148</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1633,9 +1633,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01142">1142</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01147">1147</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1659,9 +1659,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01144">1144</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01149">1149</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1685,9 +1685,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01134">1134</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01139">1139</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
@@ -1711,9 +1711,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01135">1135</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="chm__common_8c_source.html#l01140">1140</a> of file <a class="el" href="chm__common_8c_source.html">chm_common.c</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01149">R_cholmod_common_envini()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="chm__common_8c_source.html#l01154">R_cholmod_common_envini()</a>.</p>
 
 </div>
 </div>
