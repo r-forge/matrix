@@ -62,7 +62,6 @@ _?svn-?
 ^Doxyfile$
 ^TODO$
 ^po/update-me[.]sh$
-^src/scripts/.*[.]sh$
 ^tests/performance[.]R$
 ^tests/useRNG_files$
 
