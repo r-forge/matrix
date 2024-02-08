@@ -6,7 +6,7 @@ if [ ! -f DESCRIPTION -o -z "$(grep "^Package: ${pkg}$" DESCRIPTION)" ]; then
 	exit 1
 fi
 ssdir=SuiteSparse
-ssver=7.5.0
+ssver=7.6.0
 sspfx=${ssdir}-${ssver}
 sstgz=${sspfx}.tar.gz
 ssurl=https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${ssver}.tar.gz

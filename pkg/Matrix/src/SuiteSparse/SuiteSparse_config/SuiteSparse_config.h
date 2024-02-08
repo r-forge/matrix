@@ -372,14 +372,13 @@ int SuiteSparse_divcomplex
     // but other packages can themselves use OpenMP.  In this case,
     // those packages should use omp_get_wtime() directly.  This can
     // be done via the SUITESPARSE_TIME macro, defined below:
+    #define SUITESPARSE_HAVE_CLOCK_GETTIME
     #if defined ( _OPENMP )
         #define SUITESPARSE_TIMER_ENABLED
         #define SUITESPARSE_TIME (omp_get_wtime ( ))
-    #elif defined ( _POSIX_C_SOURCE )
-        #if _POSIX_C_SOURCE >= 199309L
+    #elif defined ( SUITESPARSE_HAVE_CLOCK_GETTIME )
         #define SUITESPARSE_TIMER_ENABLED
         #define SUITESPARSE_TIME (SuiteSparse_time ( ))
-        #endif
     #else
         // No timer is available
         #define SUITESPARSE_TIME (0)
@@ -421,19 +420,19 @@ int SuiteSparse_version     // returns SUITESPARSE_VERSION
 
 #define SUITESPARSE_HAS_VERSION_FUNCTION
 
-#define SUITESPARSE_DATE "Jan 10, 2024"
+#define SUITESPARSE_DATE "Jan 20, 2024"
 #define SUITESPARSE_MAIN_VERSION    7
-#define SUITESPARSE_SUB_VERSION     5
+#define SUITESPARSE_SUB_VERSION     6
 #define SUITESPARSE_SUBSUB_VERSION  0
 
 // version format x.y
 #define SUITESPARSE_VER_CODE(main,sub) ((main) * 1000 + (sub))
-#define SUITESPARSE_VERSION SUITESPARSE_VER_CODE(7, 5)
+#define SUITESPARSE_VERSION SUITESPARSE_VER_CODE(7, 6)
 
 // version format x.y.z
 #define SUITESPARSE__VERCODE(main,sub,patch) \
-    (((major)*1000ULL + (minor))*1000ULL + (patch))
-#define SUITESPARSE__VERSION SUITESPARSE__VERCODE(7,5,0)
+    (((main)*1000ULL + (sub))*1000ULL + (patch))
+#define SUITESPARSE__VERSION SUITESPARSE__VERCODE(7,6,0)
 
 //==============================================================================
 // SuiteSparse interface to the BLAS and LAPACK libraries
@@ -546,12 +545,12 @@ int SuiteSparse_version     // returns SUITESPARSE_VERSION
 
 // If the suffix does not contain "_", use (Sun Perf., for example):
 
-//     cd build ; cmake -DBLAS64_SUFFIX="64" ..
+//     cd build && cmake -DBLAS64_SUFFIX="64" ..
 
 // If the suffix contains "_" (OpenBLAS in spack for example), use the
 // following:
 
-//     cd build ; cmake -DBLAS64_SUFFIX="_64" ..
+//     cd build && cmake -DBLAS64_SUFFIX="_64" ..
 
 // This setting could be used by the spack packaging of SuiteSparse when linked
 // with the spack-installed OpenBLAS with 64-bit integers.  See

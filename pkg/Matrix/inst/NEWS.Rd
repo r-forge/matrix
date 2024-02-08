@@ -4,11 +4,11 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-01-17 r4572)}{
+\section{Changes in version 1.7-0 (2024-02-08 r4575)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
-      from version 5.10.1 to version 7.5.0.  Hence the \pkg{Matrix} ABI
+      from version 5.10.1 to version 7.6.0.  Hence the \pkg{Matrix} ABI
       version is incremented from 1 to 2.  Reverse \code{LinkingTo}
       built under earlier versions of \pkg{Matrix} should be rebuilt
       from sources by users and maintainers of binary repositories.\cr
