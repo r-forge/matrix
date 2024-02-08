@@ -14,7 +14,7 @@ two components:
    AMD, COLAMD, CCAMD, CCOLAMD, and CHOLMOD, all from the SuiteSparse
    collection of Timothy A. Davis.  AMD, COLAMD, CAMD, and CCOLAMD
    use the BSD 3-clause licence.  CXSparse and CHOLMOD modules Check,
-   Cholesky, Utility, and Partition use the GNU LGPL licence, version
+   Cholesky, Partition, and Utility use the GNU LGPL licence, version
    2.1 or greater.  CHOLMOD modules MatrixOps, Modify, and Supernodal
    use the GNU GPL licence, version 2 or greater.  Compiled into CHOLMOD
    is the METIS library, which uses the Apache licence, version 2.0.
