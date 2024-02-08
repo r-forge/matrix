@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 4.0.0 / matrix 1.3-0\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2023-11-02 21:33\n"
+"POT-Creation-Date: 2024-02-08 02:53\n"
 "PO-Revision-Date: 2020-04-01 16:01+0200\n"
 "Last-Translator: Detlef Steuer <steuer@hsu-hh.de>\n"
 "Language-Team: R-Core <r-core@r-project.org>\n"
@@ -763,6 +763,28 @@ msgstr ""
 msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
+#, fuzzy
+msgid "invalid subassignment value class \"%s\""
+msgstr "ungültige Klasse: %s"
+
+#, fuzzy
+msgid "invalid subassignment value type \"%s\""
+msgstr "Ungültiger Speichertyp: %s"
+
+msgid "missing subassignment value"
+msgstr ""
+
+#, fuzzy
+msgid "incorrect number of dimensions"
+msgstr "inkompatible Matrixdimensionen"
+
+msgid "replacement has length zero"
+msgstr ""
+
+msgid "number of items to replace is not a multiple of replacement length"
+msgstr ""
+"Anzahl der zu ersetzenden Elemente ist kein Vielfaches der Austauschlänge"
+
 msgid ""
 ".M.repl.i.2col(): 'i' has no integer column number;\n"
 " should never happen; please report"
@@ -782,10 +804,6 @@ msgstr "negative Werte sind in einer Matrix-Subskript nicht erlaubt"
 
 msgid "NAs are not allowed in subscripted assignments"
 msgstr "NAs sind in indexierten Anweisungen nicht erlaubt"
-
-msgid "number of items to replace is not a multiple of replacement length"
-msgstr ""
-"Anzahl der zu ersetzenden Elemente ist kein Vielfaches der Austauschlänge"
 
 msgid "m[ <ij-matrix> ] <- v: inefficiently treating single elements"
 msgstr "m[ <ij-matrix> ] <- v: Einzelne Elemente ineffizient behandelt"
@@ -909,10 +927,6 @@ msgstr ""
 #, fuzzy
 msgid "logical subscript too long"
 msgstr "logisches Subskript zu lang (%d, sollte %d sein)"
-
-#, fuzzy
-msgid "incorrect number of dimensions"
-msgstr "inkompatible Matrixdimensionen"
 
 msgid "only zeros may be mixed with negative subscripts"
 msgstr ""
