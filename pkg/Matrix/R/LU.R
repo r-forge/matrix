@@ -2,17 +2,17 @@
 ## pivoted LU factorization, returning denseLU or sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("lu", signature(x = "matrix"),
+setMethod("lu", c(x = "matrix"),
           function(x, ...) lu(.m2dense(x, ",ge"), ...))
 
-setMethod("lu", signature(x = "denseMatrix"),
+setMethod("lu", c(x = "denseMatrix"),
           function(x, ...) lu(.M2kind(x, ","), ...))
 
-setMethod("lu", signature(x = "dgeMatrix"),
+setMethod("lu", c(x = "dgeMatrix"),
           function(x, warnSing = TRUE, ...)
               .Call(dgeMatrix_trf, x, as.logical(warnSing)))
 
-setMethod("lu", signature(x = "dsyMatrix"),
+setMethod("lu", c(x = "dsyMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["denseLU"]]))
                   return(ch)
@@ -20,7 +20,7 @@ setMethod("lu", signature(x = "dsyMatrix"),
               if(cache) .set.factor(x, "denseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dspMatrix"),
+setMethod("lu", c(x = "dspMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["denseLU"]]))
                   return(ch)
@@ -29,7 +29,7 @@ setMethod("lu", signature(x = "dspMatrix"),
           })
 
 for(.cl in c("dtrMatrix", "dtpMatrix"))
-setMethod("lu", signature(x = .cl),
+setMethod("lu", c(x = .cl),
           function(x, ...) {
               if(x@uplo == "U" || x@diag == "U") {
                   r <- new("denseLU")
@@ -42,15 +42,15 @@ setMethod("lu", signature(x = .cl),
           })
 rm(.cl)
 
-setMethod("lu", signature(x = "sparseMatrix"),
+setMethod("lu", c(x = "sparseMatrix"),
           function(x, ...)
               lu(.M2kind(.M2C(x), ","), ...))
 
-setMethod("lu", signature(x = "dgCMatrix"),
+setMethod("lu", c(x = "dgCMatrix"),
           function(x, errSing = TRUE, order = NA_integer_, tol = 1, ...)
               .Call(dgCMatrix_trf, x, order, tol, errSing))
 
-setMethod("lu", signature(x = "dsCMatrix"),
+setMethod("lu", c(x = "dsCMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["sparseLU"]]))
                   return(ch)
@@ -58,7 +58,7 @@ setMethod("lu", signature(x = "dsCMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dtCMatrix"),
+setMethod("lu", c(x = "dtCMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
@@ -76,7 +76,7 @@ setMethod("lu", signature(x = "dtCMatrix"),
               } else lu(.M2gen(x), ...)
           })
 
-setMethod("lu", signature(x = "dgRMatrix"),
+setMethod("lu", c(x = "dgRMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["sparseLU"]]))
                   return(ch)
@@ -84,7 +84,7 @@ setMethod("lu", signature(x = "dgRMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dsRMatrix"),
+setMethod("lu", c(x = "dsRMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["sparseLU"]]))
                   return(ch)
@@ -92,7 +92,7 @@ setMethod("lu", signature(x = "dsRMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dtRMatrix"),
+setMethod("lu", c(x = "dtRMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
@@ -110,7 +110,7 @@ setMethod("lu", signature(x = "dtRMatrix"),
               } else lu(.M2gen(.M2C(x)), ...)
           })
 
-setMethod("lu", signature(x = "dgTMatrix"),
+setMethod("lu", c(x = "dgTMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["sparseLU"]]))
                   return(ch)
@@ -118,7 +118,7 @@ setMethod("lu", signature(x = "dgTMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dsTMatrix"),
+setMethod("lu", c(x = "dsTMatrix"),
           function(x, cache = TRUE, ...) {
               if(!is.null(ch <- x@factors[["sparseLU"]]))
                   return(ch)
@@ -126,7 +126,7 @@ setMethod("lu", signature(x = "dsTMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", signature(x = "dtTMatrix"),
+setMethod("lu", c(x = "dtTMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
@@ -145,7 +145,7 @@ setMethod("lu", signature(x = "dtTMatrix"),
               } else lu(.M2gen(.M2C(x)), ...)
           })
 
-setMethod("lu", signature(x = "diagonalMatrix"),
+setMethod("lu", c(x = "diagonalMatrix"),
           function(x, ...) {
               x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]
@@ -215,7 +215,7 @@ setAs("denseLU", "dgeMatrix",
           to
       })
 
-setMethod("expand1", signature(x = "denseLU"),
+setMethod("expand1", c(x = "denseLU"),
           function(x, which, ...) {
               d <- x@Dim
               m <- d[1L]
@@ -259,7 +259,7 @@ setMethod("expand1", signature(x = "denseLU"),
           })
 
 ## returning list(P1', L, U), where A = P1' L U
-setMethod("expand2", signature(x = "denseLU"),
+setMethod("expand2", c(x = "denseLU"),
           function(x, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -297,7 +297,7 @@ setMethod("expand2", signature(x = "denseLU"),
 
 ## returning list(L, U, P), where A = P L U
 ## MJ: for backwards compatibility
-setMethod("expand", signature(x = "denseLU"),
+setMethod("expand", c(x = "denseLU"),
           function(x, ...) {
               r <- expand2(x)[c(2L, 3L, 1L)]
               names(r) <- c("L", "U", "P")
@@ -311,7 +311,7 @@ setMethod("expand", signature(x = "denseLU"),
 ## METHODS FOR CLASS: sparseLU
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("expand1", signature(x = "sparseLU"),
+setMethod("expand1", c(x = "sparseLU"),
           function(x, which, ...) {
               switch(which,
                      "P1" =, "P1." = {
@@ -338,7 +338,7 @@ setMethod("expand1", signature(x = "sparseLU"),
           })
 
 ## returning list(P1', L, U, P2'), where A = P1' L U P2'
-setMethod("expand2", signature(x = "sparseLU"),
+setMethod("expand2", c(x = "sparseLU"),
           function(x, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -364,7 +364,7 @@ setMethod("expand2", signature(x = "sparseLU"),
 
 ## returning list(P, L, U, Q), where A = P' L U Q
 ## MJ: for backwards compatibility
-setMethod("expand", signature(x = "sparseLU"),
+setMethod("expand", c(x = "sparseLU"),
           function(x, ...) {
               d <- x@Dim
               dn <- x@Dimnames

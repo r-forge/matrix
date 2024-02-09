@@ -43,7 +43,7 @@ setClass("Matrix",
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object) .Call(Matrix_validate, object))
 
-setMethod("initialize", signature(.Object = "Matrix"),
+setMethod("initialize", c(.Object = "Matrix"),
           .initialize)
 
 
@@ -205,7 +205,7 @@ if(FALSE) { # --NOT YET--
 ## as in the call new("dgCMatrix", Dim = c(6L, 6L)).  However, they would
 ## also incur a small performance penalty on all other new("..[CR]Matrix")
 ## calls.
-setMethod("initialize", signature(.Object = "CsparseMatrix"),
+setMethod("initialize", c(.Object = "CsparseMatrix"),
           function(.Object, ...) {
               ## Suboptimal if ...names() is NULL or if 'Dim' is missing
               ## but that will "never" happen if ...length() is nonzero:
@@ -217,7 +217,7 @@ setMethod("initialize", signature(.Object = "CsparseMatrix"),
               else callNextMethod()
           })
 
-setMethod("initialize", signature(.Object = "RsparseMatrix"),
+setMethod("initialize", c(.Object = "RsparseMatrix"),
           function(.Object, ...) {
               ## Suboptimal if ...names() is NULL or if 'Dim' is missing
               ## but that will "never" happen if ...length() is nonzero:
@@ -557,7 +557,7 @@ setClass("MatrixFactorization",
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object).Call(MatrixFactorization_validate, object))
 
-setMethod("initialize", signature(.Object = "MatrixFactorization"),
+setMethod("initialize", c(.Object = "MatrixFactorization"),
           .initialize)
 
 
@@ -767,7 +767,7 @@ setClass("sparseVector",
          validity = function(object) .Call(sparseVector_validate, object))
 
 ## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
-setMethod("initialize", signature(.Object = "sparseVector"),
+setMethod("initialize", c(.Object = "sparseVector"),
           function(.Object, i, x, ...) {
               if(has.x <- !missing(x))
                   x <- x # MJ: why is this necessary?

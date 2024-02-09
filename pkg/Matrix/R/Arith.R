@@ -7,16 +7,16 @@
 
 ## .... unary ..........................................................
 
-setMethod("+", signature(e1 = "Matrix", e2 = "missing"),
+setMethod("+", c(e1 = "Matrix", e2 = "missing"),
           function(e1, e2)
               if(any(.M.kind(e1) == c("n", "l"))) .M2kind(e1, "d") else e1)
 
-setMethod("+", signature(e1 = "sparseVector", e2 = "missing"),
+setMethod("+", c(e1 = "sparseVector", e2 = "missing"),
           function(e1, e2)
               if(any(.M.kind(e1) == c("n", "l"))) .V2kind(e1, "i") else e1)
 
 for(.cl in c("generalMatrix", "symmetricMatrix"))
-setMethod("-", signature(e1 = .cl, e2 = "missing"),
+setMethod("-", c(e1 = .cl, e2 = "missing"),
           function(e1, e2) {
               if(any(.M.kind(e1) == c("n", "l")))
                   e1 <- .M2kind(e1, "d")
@@ -27,7 +27,7 @@ setMethod("-", signature(e1 = .cl, e2 = "missing"),
           })
 
 for(.cl in c("triangularMatrix", "diagonalMatrix"))
-setMethod("-", signature(e1 = .cl, e2 = "missing"),
+setMethod("-", c(e1 = .cl, e2 = "missing"),
           function(e1, e2) {
               if(any(.M.kind(e1) == c("n", "l")))
                   e1 <- .M2kind(e1, "d")
@@ -37,7 +37,7 @@ setMethod("-", signature(e1 = .cl, e2 = "missing"),
               e1
           })
 
-setMethod("-", signature(e1 = "sparseVector", e2 = "missing"),
+setMethod("-", c(e1 = "sparseVector", e2 = "missing"),
           function(e1, e2) {
               if(any(.M.kind(e1) == c("n", "l")))
                   e1 <- .V2kind(e1, "i")
@@ -48,22 +48,22 @@ setMethod("-", signature(e1 = "sparseVector", e2 = "missing"),
 
 ## .... denseMatrix ....................................................
 
-setMethod("Arith", signature(e1 = "denseMatrix", e2 = "denseMatrix"),
+setMethod("Arith", c(e1 = "denseMatrix", e2 = "denseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "denseMatrix", e2 = "sparseMatrix"),
+setMethod("Arith", c(e1 = "denseMatrix", e2 = "sparseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "denseMatrix", e2 = "sparseVector"),
+setMethod("Arith", c(e1 = "denseMatrix", e2 = "sparseVector"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "denseMatrix", e2 = "vector"),
+setMethod("Arith", c(e1 = "denseMatrix", e2 = "vector"),
           function(e1, e2) {
               if(all(typeof(e2) != c("logical", "integer", "double")))
                   stop(.Ops.invalid(e2), domain = NA)
@@ -73,22 +73,22 @@ setMethod("Arith", signature(e1 = "denseMatrix", e2 = "vector"),
 
 ## .... sparseMatrix ...................................................
 
-setMethod("Arith", signature(e1 = "sparseMatrix", e2 = "denseMatrix"),
+setMethod("Arith", c(e1 = "sparseMatrix", e2 = "denseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
+setMethod("Arith", c(e1 = "sparseMatrix", e2 = "sparseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "sparseMatrix", e2 = "sparseVector"),
+setMethod("Arith", c(e1 = "sparseMatrix", e2 = "sparseVector"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "sparseMatrix", e2 = "vector"),
+setMethod("Arith", c(e1 = "sparseMatrix", e2 = "vector"),
           function(e1, e2) {
               if(all(typeof(e2) != c("logical", "integer", "double")))
                   stop(.Ops.invalid(e2), domain = NA)
@@ -98,17 +98,17 @@ setMethod("Arith", signature(e1 = "sparseMatrix", e2 = "vector"),
 
 ## .... sparseVector ...................................................
 
-setMethod("Arith", signature(e1 = "sparseVector", e2 = "Matrix"),
+setMethod("Arith", c(e1 = "sparseVector", e2 = "Matrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "sparseVector", e2 = "sparseVector"),
+setMethod("Arith", c(e1 = "sparseVector", e2 = "sparseVector"),
           function(e1, e2) {
 
           })
 
-setMethod("Arith", signature(e1 = "sparseVector", e2 = "vector"),
+setMethod("Arith", c(e1 = "sparseVector", e2 = "vector"),
           function(e1, e2) {
               if(all(typeof(e2) != c("logical", "integer", "double", "complex")))
                   stop(.Ops.invalid(e2), domain = NA)
@@ -118,21 +118,21 @@ setMethod("Arith", signature(e1 = "sparseVector", e2 = "vector"),
 
 ## .... vector .........................................................
 
-setMethod("Arith", signature(e1 = "vector", e2 = "denseMatrix"),
+setMethod("Arith", c(e1 = "vector", e2 = "denseMatrix"),
           function(e1, e2) {
               if(all(typeof(e1) != c("logical", "integer", "double")))
                   stop(.Ops.invalid(e1), domain = NA)
 
           })
 
-setMethod("Arith", signature(e1 = "vector", e2 = "sparseMatrix"),
+setMethod("Arith", c(e1 = "vector", e2 = "sparseMatrix"),
           function(e1, e2) {
               if(all(typeof(e1) != c("logical", "integer", "double")))
                   stop(.Ops.invalid(e1), domain = NA)
 
           })
 
-setMethod("Arith", signature(e1 = "vector", e2 = "sparseVector"),
+setMethod("Arith", c(e1 = "vector", e2 = "sparseVector"),
           function(e1, e2) {
               if(all(typeof(e1) != c("logical", "integer", "double", "complex")))
                   stop(.Ops.invalid(e1), domain = NA)

@@ -77,7 +77,7 @@
               tolerance = tol, ...))
 }
 
-setMethod("diff", signature(x = "denseMatrix"),
+setMethod("diff", c(x = "denseMatrix"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
               if(length(lag) != 1L || length(differences) != 1L ||
@@ -96,41 +96,41 @@ setMethod("diff", signature(x = "denseMatrix"),
               x
           })
 
-setMethod("mean", signature(x = "denseMatrix"),
+setMethod("mean", c(x = "denseMatrix"),
           function(x, ...) mean.default(.M2v(x), ...))
 
-setMethod("rep", signature(x = "denseMatrix"),
+setMethod("rep", c(x = "denseMatrix"),
           function(x, ...)          rep(.M2v(x), ...))
 
-setMethod("band"  , signature(x = "denseMatrix"), .dense.band)
+setMethod("band"  , c(x = "denseMatrix"), .dense.band)
 
-setMethod("triu"  , signature(x = "denseMatrix"), .dense.triu)
+setMethod("triu"  , c(x = "denseMatrix"), .dense.triu)
 
-setMethod("tril"  , signature(x = "denseMatrix"), .dense.tril)
+setMethod("tril"  , c(x = "denseMatrix"), .dense.tril)
 
-setMethod("diag"  , signature(x = "denseMatrix"), .dense.diag.get)
+setMethod("diag"  , c(x = "denseMatrix"), .dense.diag.get)
 
-setMethod("diag<-", signature(x = "denseMatrix"), .dense.diag.set)
+setMethod("diag<-", c(x = "denseMatrix"), .dense.diag.set)
 
-setMethod("t"     , signature(x = "denseMatrix"), .dense.t)
+setMethod("t"     , c(x = "denseMatrix"), .dense.t)
 
-setMethod("forceSymmetric", signature(x = "denseMatrix", uplo =   "missing"), .dense.fS1)
+setMethod("forceSymmetric", c(x = "denseMatrix", uplo =   "missing"), .dense.fS1)
 
-setMethod("forceSymmetric", signature(x = "denseMatrix", uplo = "character"), .dense.fS2)
+setMethod("forceSymmetric", c(x = "denseMatrix", uplo = "character"), .dense.fS2)
 
-setMethod("symmpart", signature(x = "denseMatrix"), .dense.symmpart)
+setMethod("symmpart", c(x = "denseMatrix"), .dense.symmpart)
 
-setMethod("skewpart", signature(x = "denseMatrix"), .dense.skewpart)
+setMethod("skewpart", c(x = "denseMatrix"), .dense.skewpart)
 
-setMethod("isSymmetric" , signature(object = "denseMatrix"), .dense.is.sy)
+setMethod("isSymmetric" , c(object = "denseMatrix"), .dense.is.sy)
 
-setMethod("isTriangular", signature(object = "denseMatrix"), .dense.is.tr)
+setMethod("isTriangular", c(object = "denseMatrix"), .dense.is.tr)
 
-setMethod("isDiagonal"  , signature(object = "denseMatrix"), .dense.is.di)
+setMethod("isDiagonal"  , c(object = "denseMatrix"), .dense.is.di)
 
 .dense.subclasses <- names(getClassDef("denseMatrix")@subclasses)
 for (.cl in grep("^[dz](ge|tr|tp)Matrix$", .dense.subclasses, value = TRUE))
-setMethod("isSymmetric" , signature(object = .cl), .dense.is.sy.dz)
+setMethod("isSymmetric" , c(object = .cl), .dense.is.sy.dz)
 rm(.cl, .dense.subclasses)
 
 
@@ -138,10 +138,10 @@ rm(.cl, .dense.subclasses)
 ## dense matrices with unpacked storage
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("unpack", signature(x = "packedMatrix"),
+setMethod("unpack", c(x = "packedMatrix"),
           function(x, ...) .Call(R_dense_as_unpacked, x))
 
-setMethod("pack", signature(x = "packedMatrix"),
+setMethod("pack", c(x = "packedMatrix"),
           function(x, ...) x)
 
 
@@ -174,14 +174,14 @@ function(x, symmetric = NA, upperTri = NA, ...) {
     }
 }
 
-setMethod("unpack", signature(x = "unpackedMatrix"),
+setMethod("unpack", c(x = "unpackedMatrix"),
           function(x, ...) x)
 
-setMethod("pack", signature(x = "unpackedMatrix"), .uM.pack)
+setMethod("pack", c(x = "unpackedMatrix"), .uM.pack)
 
 .uM.subclasses <- names(getClassDef("unpackedMatrix")@subclasses)
 for(.cl in grep("^.geMatrix$", .uM.subclasses, value = TRUE))
-setMethod("pack", signature(x = .cl), .uM.pack.ge)
+setMethod("pack", c(x = .cl), .uM.pack.ge)
 rm(.cl, .uM.subclasses)
 
 
@@ -193,22 +193,22 @@ rm(.cl, .uM.subclasses)
 body(.m.pack)[[2L]][[3L]]             <-  quote(.m2dense(x, ".sp",  "U"))
 body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-  quote(.m2dense(x, ".tp", uplo))
 
-setMethod("unpack", signature(x = "matrix"),
+setMethod("unpack", c(x = "matrix"),
           function(x, ...) .m2dense.checking(x, "."))
-setMethod("pack", signature(x = "matrix"), .m.pack)
-setMethod("band", signature(x = "matrix"), .dense.band)
-setMethod("triu", signature(x = "matrix"), .dense.triu)
-setMethod("tril", signature(x = "matrix"), .dense.tril)
-setMethod("forceSymmetric", signature(x = "matrix", uplo = "missing"),
+setMethod("pack", c(x = "matrix"), .m.pack)
+setMethod("band", c(x = "matrix"), .dense.band)
+setMethod("triu", c(x = "matrix"), .dense.triu)
+setMethod("tril", c(x = "matrix"), .dense.tril)
+setMethod("forceSymmetric", c(x = "matrix", uplo = "missing"),
           function(x, uplo) .m2dense(x, ".sy",  "U"))
-setMethod("forceSymmetric", signature(x = "matrix", uplo = "character"),
+setMethod("forceSymmetric", c(x = "matrix", uplo = "character"),
           function(x, uplo) .m2dense(x, ".sy", uplo))
-setMethod("symmpart", signature(x = "matrix"),
+setMethod("symmpart", c(x = "matrix"),
           function(x) symmetrizeDN(0.5 * (x + t(x))))
-setMethod("skewpart", signature(x = "matrix"),
+setMethod("skewpart", c(x = "matrix"),
           function(x) symmetrizeDN(0.5 * (x - t(x))))
-setMethod("isTriangular", signature(object = "matrix"), .dense.is.tr)
-setMethod("isDiagonal"  , signature(object = "matrix"), .dense.is.di)
+setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
+setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
    list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|t|fS[12]|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",

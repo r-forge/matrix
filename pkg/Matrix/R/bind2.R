@@ -44,9 +44,9 @@ c.sparseVector <- function(...) {
 ## These are insufficient as dispatch only consides the first argument,
 ## which need not be a Matrix or sparseVector:
 if(FALSE) {
-setMethod("c", signature(x = "Matrix"),
+setMethod("c", c(x = "Matrix"),
           function(x, ...) c.Matrix      (x, ...))
-setMethod("c", signature(x = "sparseVector"),
+setMethod("c", c(x = "sparseVector"),
           function(x, ...) c.sparseVector(x, ...))
 }
 
@@ -67,27 +67,27 @@ rbind.Matrix <- function(..., deparse.level = 1)
 .cbind2 <- function(x, y, ...) cbind.Matrix(x, y, deparse.level = 0L)
 .rbind2 <- function(x, y, ...) rbind.Matrix(x, y, deparse.level = 0L)
 
-setMethod("cbind2", signature(x = "Matrix", y = "missing"),
+setMethod("cbind2", c(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
-setMethod("rbind2", signature(x = "Matrix", y = "missing"),
+setMethod("rbind2", c(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
 
-setMethod("cbind2", signature(x = "Matrix", y = "NULL"), .cbind2)
-setMethod("cbind2", signature(x = "NULL", y = "Matrix"), .cbind2)
-setMethod("rbind2", signature(x = "Matrix", y = "NULL"), .rbind2)
-setMethod("rbind2", signature(x = "NULL", y = "Matrix"), .rbind2)
+setMethod("cbind2", c(x = "Matrix", y = "NULL"), .cbind2)
+setMethod("cbind2", c(x = "NULL", y = "Matrix"), .cbind2)
+setMethod("rbind2", c(x = "Matrix", y = "NULL"), .rbind2)
+setMethod("rbind2", c(x = "NULL", y = "Matrix"), .rbind2)
 
-setMethod("cbind2", signature(x = "Matrix", y = "vector"), .cbind2)
-setMethod("cbind2", signature(x = "vector", y = "Matrix"), .cbind2)
-setMethod("rbind2", signature(x = "Matrix", y = "vector"), .rbind2)
-setMethod("rbind2", signature(x = "vector", y = "Matrix"), .rbind2)
+setMethod("cbind2", c(x = "Matrix", y = "vector"), .cbind2)
+setMethod("cbind2", c(x = "vector", y = "Matrix"), .cbind2)
+setMethod("rbind2", c(x = "Matrix", y = "vector"), .rbind2)
+setMethod("rbind2", c(x = "vector", y = "Matrix"), .rbind2)
 
-setMethod("cbind2", signature(x = "Matrix", y = "matrix"), .cbind2)
-setMethod("cbind2", signature(x = "matrix", y = "Matrix"), .cbind2)
-setMethod("rbind2", signature(x = "Matrix", y = "matrix"), .rbind2)
-setMethod("rbind2", signature(x = "matrix", y = "Matrix"), .rbind2)
+setMethod("cbind2", c(x = "Matrix", y = "matrix"), .cbind2)
+setMethod("cbind2", c(x = "matrix", y = "Matrix"), .cbind2)
+setMethod("rbind2", c(x = "Matrix", y = "matrix"), .rbind2)
+setMethod("rbind2", c(x = "matrix", y = "Matrix"), .rbind2)
 
-setMethod("cbind2", signature(x = "Matrix", y = "Matrix"), .cbind2)
-setMethod("rbind2", signature(x = "Matrix", y = "Matrix"), .rbind2)
+setMethod("cbind2", c(x = "Matrix", y = "Matrix"), .cbind2)
+setMethod("rbind2", c(x = "Matrix", y = "Matrix"), .rbind2)
 
 rm(.cbind2, .rbind2)

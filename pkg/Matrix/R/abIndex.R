@@ -98,7 +98,7 @@ abIindTri <- function(n, upper = TRUE, diag = FALSE) {
 setAs("numeric", "abIndex", function(from) vec2abI(from))
 setAs("logical", "abIndex", function(from) vec2abI(from))
 
-setMethod("show", signature(object = "rleDiff"),
+setMethod("show", c(object = "rleDiff"),
 	  function(object) {
 	      cat(sprintf(## first can be 'NULL' --> cannot use %g
 	" RLE difference (class 'rleDiff'): first = %s, \"rle\":%s",
@@ -108,7 +108,7 @@ setMethod("show", signature(object = "rleDiff"),
 	      invisible(object)
 	  })
 
-setMethod("show", signature(object = "abIndex"),
+setMethod("show", c(object = "abIndex"),
 	  function(object) {
 	      knd <- object@kind
 	      cat(sprintf(
@@ -306,7 +306,7 @@ c.abIndex <- function(...)
 	   })
 }
 
-setMethod("length", signature(x = "abIndex"), function(x)
+setMethod("length", c(x = "abIndex"), function(x)
 	  if(identical(x@kind, "rleDiff"))
 	  sum(x@rleD@rle$lengths)+ 1L else length(x@x))
 
@@ -323,11 +323,11 @@ setAs("abIndex", "numeric", abI2num)
 setAs("abIndex", "vector",  abI2num)
 setAs("abIndex", "integer", function(from) as.integer(abI2num(from)))
 ## for S3 lovers and back-compatibility:
-setMethod("as.integer", signature(x = "abIndex"),
+setMethod("as.integer", c(x = "abIndex"),
           function(x, ...) as.integer(abI2num(x)))
-setMethod("as.numeric", signature(x = "abIndex"),
+setMethod("as.numeric", c(x = "abIndex"),
           function(x, ...) abI2num(x))
-setMethod("as.vector" , signature(x = "abIndex"),
+setMethod("as.vector" , c(x = "abIndex"),
           function(x, mode = "any") as.vector(abI2num(x), mode))
 
 ## Need   max(<i>), min(<i>),   all(<i> == <j>)   any(<i> == <j>)
@@ -336,7 +336,7 @@ setMethod("as.vector" , signature(x = "abIndex"),
 
 ## For that, we really  need  "[" and/or  "rep"() methods -- TODO --
 ##
-setMethod("[", signature(x = "abIndex", i = "index"),
+setMethod("[", c(x = "abIndex", i = "index"),
 	  function (x, i, j, ..., drop)
       {
           switch(x@kind,
@@ -400,7 +400,7 @@ rleCollapse <- function(x)
     x
 } ## {rleCollapse}
 
-setMethod("drop", signature(x = "abIndex"),
+setMethod("drop", c(x = "abIndex"),
 	  function(x) {
 	      if(x@kind == "rleDiff")
 		  x@rleD@rle <- rleCollapse(x@rleD@rle)
@@ -411,7 +411,7 @@ setMethod("drop", signature(x = "abIndex"),
 ## Summary: { max, min, range, prod, sum, any, all } :
 ## have  'summGener1' := those without prod, sum
 
-setMethod("Summary", signature(x = "abIndex"),
+setMethod("Summary", c(x = "abIndex"),
           function(x, ..., na.rm)
       {
           switch(x@kind,
@@ -450,14 +450,14 @@ setMethod("Summary", signature(x = "abIndex"),
 ## --> keep "Ops" undefined and define "Arith" :
 ## ----
 ## (*) :  TODO: logical <-> abIndex --> "Compare" etc as well
-setMethod("Ops", signature(e1 = "abIndex", e2 = "abIndex"),
+setMethod("Ops", c(e1 = "abIndex", e2 = "abIndex"),
 	  function(e1, e2) { .bail.out.2(.Generic, class(e1), class(e2)) })
-setMethod("Ops", signature(e1 = "abIndex", e2 = "ANY"),
+setMethod("Ops", c(e1 = "abIndex", e2 = "ANY"),
 	  function(e1, e2) { .bail.out.2(.Generic, class(e1), class(e2)) })
-setMethod("Ops", signature(e1 = "ANY", e2 = "abIndex"),
+setMethod("Ops", c(e1 = "ANY", e2 = "abIndex"),
 	  function(e1, e2) { .bail.out.2(.Generic, class(e1), class(e2)) })
 
-setMethod("Arith", signature(e1 = "abIndex", e2 = "abIndex"),
+setMethod("Arith", c(e1 = "abIndex", e2 = "abIndex"),
 	  function(e1, e2)
       {
           l1 <- length(e1)
@@ -487,7 +487,7 @@ setMethod("Arith", signature(e1 = "abIndex", e2 = "abIndex"),
 
 
 ## numLike = {numeric, logical}:
-setMethod("Arith", signature(e1 = "abIndex", e2 = "numLike"),
+setMethod("Arith", c(e1 = "abIndex", e2 = "numLike"),
 	  function(e1, e2)
       {
 	  if(!length(e1)) return(e1)
@@ -538,7 +538,7 @@ setMethod("Arith", signature(e1 = "abIndex", e2 = "numLike"),
 	      callGeneric(e1, as(e2, "abIndex"))
       })
 
-setMethod("Arith", signature(e1 = "numLike", e2 = "abIndex"),
+setMethod("Arith", c(e1 = "numLike", e2 = "abIndex"),
 	  function(e1, e2)
       {
 	  if(!length(e2)) return(e2)
@@ -581,7 +581,7 @@ setMethod("Arith", signature(e1 = "numLike", e2 = "abIndex"),
 	      callGeneric(as(e1, "abIndex"), e2)
       })
 
-setMethod("is.na", signature(x = "abIndex"),
+setMethod("is.na", c(x = "abIndex"),
 	  function(x) {
 	      if(x@kind != "rleDiff") is.na(x@x)
 	      else {
@@ -603,7 +603,7 @@ setMethod("is.na", signature(x = "abIndex"),
 	  })
 ## TODO ??   "is.nan"  analogously ??
 ##
-setMethod("is.finite", signature(x = "abIndex"),
+setMethod("is.finite", c(x = "abIndex"),
 	  function(x) {
 	      if(x@kind != "rleDiff") is.finite(x@x)
 	      else {
@@ -623,7 +623,7 @@ setMethod("is.finite", signature(x = "abIndex"),
                   }
 	      }
 	  })
-setMethod("is.infinite", signature(x = "abIndex"),
+setMethod("is.infinite", c(x = "abIndex"),
 	  function(x) {
 	      if(x@kind != "rleDiff") is.infinite(x@x)
 	      else {
@@ -661,12 +661,12 @@ all.equal.abI <- function(target, current, ...)
 	all.equal(abI2num(target), abI2num(current), ...)
 } ## {all.equal.abI}
 
-setMethod("all.equal", signature(target = "abIndex", current = "abIndex"),
+setMethod("all.equal", c(target = "abIndex", current = "abIndex"),
 	  all.equal.abI)
-setMethod("all.equal", signature(target = "abIndex", current = "numLike"),
+setMethod("all.equal", c(target = "abIndex", current = "numLike"),
 	  function(target, current, ...)
 	  all.equal.abI(target, as(current, "abIndex"), ...))
-setMethod("all.equal", signature(target = "numLike", current = "abIndex"),
+setMethod("all.equal", c(target = "numLike", current = "abIndex"),
 	  function(target, current, ...)
 	  all.equal.abI(as(target, "abIndex"), current, ...))
 
