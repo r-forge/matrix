@@ -98,7 +98,7 @@ abIindTri <- function(n, upper = TRUE, diag = FALSE) {
 setAs("numeric", "abIndex", function(from) vec2abI(from))
 setAs("logical", "abIndex", function(from) vec2abI(from))
 
-setMethod("show", "rleDiff",
+setMethod("show", signature(object = "rleDiff"),
 	  function(object) {
 	      cat(sprintf(## first can be 'NULL' --> cannot use %g
 	" RLE difference (class 'rleDiff'): first = %s, \"rle\":%s",
@@ -108,7 +108,7 @@ setMethod("show", "rleDiff",
 	      invisible(object)
 	  })
 
-setMethod("show", "abIndex",
+setMethod("show", signature(object = "abIndex"),
 	  function(object) {
 	      knd <- object@kind
 	      cat(sprintf(
@@ -306,7 +306,7 @@ c.abIndex <- function(...)
 	   })
 }
 
-setMethod("length", "abIndex", function(x)
+setMethod("length", signature(x = "abIndex"), function(x)
 	  if(identical(x@kind, "rleDiff"))
 	  sum(x@rleD@rle$lengths)+ 1L else length(x@x))
 
@@ -323,10 +323,12 @@ setAs("abIndex", "numeric", abI2num)
 setAs("abIndex", "vector",  abI2num)
 setAs("abIndex", "integer", function(from) as.integer(abI2num(from)))
 ## for S3 lovers and back-compatibility:
-setMethod("as.integer", "abIndex", function(x) as.integer(abI2num(x)))
-setMethod("as.numeric", "abIndex", function(x) abI2num(x))
-setMethod("as.vector", "abIndex",
-	  function(x, mode) as.vector(abI2num(x), mode))
+setMethod("as.integer", signature(x = "abIndex"),
+          function(x, ...) as.integer(abI2num(x)))
+setMethod("as.numeric", signature(x = "abIndex"),
+          function(x, ...) abI2num(x))
+setMethod("as.vector" , signature(x = "abIndex"),
+          function(x, mode = "any") as.vector(abI2num(x), mode))
 
 ## Need   max(<i>), min(<i>),   all(<i> == <j>)   any(<i> == <j>)
 
@@ -398,7 +400,7 @@ rleCollapse <- function(x)
     x
 } ## {rleCollapse}
 
-setMethod("drop", "abIndex",
+setMethod("drop", signature(x = "abIndex"),
 	  function(x) {
 	      if(x@kind == "rleDiff")
 		  x@rleD@rle <- rleCollapse(x@rleD@rle)
@@ -409,7 +411,7 @@ setMethod("drop", "abIndex",
 ## Summary: { max, min, range, prod, sum, any, all } :
 ## have  'summGener1' := those without prod, sum
 
-setMethod("Summary", signature(x = "abIndex", na.rm = "ANY"),
+setMethod("Summary", signature(x = "abIndex"),
           function(x, ..., na.rm)
       {
           switch(x@kind,
@@ -659,12 +661,12 @@ all.equal.abI <- function(target, current, ...)
 	all.equal(abI2num(target), abI2num(current), ...)
 } ## {all.equal.abI}
 
-setMethod("all.equal", c(target = "abIndex", current = "abIndex"),
+setMethod("all.equal", signature(target = "abIndex", current = "abIndex"),
 	  all.equal.abI)
-setMethod("all.equal", c(target = "abIndex", current = "numLike"),
+setMethod("all.equal", signature(target = "abIndex", current = "numLike"),
 	  function(target, current, ...)
 	  all.equal.abI(target, as(current, "abIndex"), ...))
-setMethod("all.equal", c(target = "numLike", current = "abIndex"),
+setMethod("all.equal", signature(target = "numLike", current = "abIndex"),
 	  function(target, current, ...)
 	  all.equal.abI(as(target, "abIndex"), current, ...))
 

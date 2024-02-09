@@ -58,7 +58,7 @@ setMethod("lu", signature(x = "dsCMatrix"),
               if(cache) .set.factor(x, "sparseLU", r) else r
           })
 
-setMethod("lu", "dtCMatrix",
+setMethod("lu", signature(x = "dtCMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
@@ -145,7 +145,7 @@ setMethod("lu", signature(x = "dtTMatrix"),
               } else lu(.M2gen(.M2C(x)), ...)
           })
 
-setMethod("lu", "diagonalMatrix",
+setMethod("lu", signature(x = "diagonalMatrix"),
           function(x, ...) {
               x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]

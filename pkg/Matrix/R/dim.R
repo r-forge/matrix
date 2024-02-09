@@ -108,19 +108,19 @@ setMethod("dim<-", signature(x = "sparseVector"),
 ## METHODS FOR GENERIC: length
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("length", "Matrix",
+setMethod("length", signature(x = "Matrix"),
           function(x)
               if((r <- prod(x@Dim)) > .Machine$integer.max)
                   r
               else as.integer(r))
 
-setMethod("length", "MatrixFactorization",
+setMethod("length", signature(x = "MatrixFactorization"),
           function(x)
               if((r <- prod(x@Dim)) > .Machine$integer.max)
                   r
               else as.integer(r))
 
-setMethod("length", "sparseVector",
+setMethod("length", signature(x = "sparseVector"),
           function(x)
               if(is.integer(r <- x@length))
                   r
