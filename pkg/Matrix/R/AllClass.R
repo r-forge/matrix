@@ -60,19 +60,19 @@ setClass("compMatrix",
 setClass("generalMatrix",
          contains = c("VIRTUAL", "compMatrix"))
 
-## Virtual class of triangular matrices
-setClass("triangularMatrix",
-         contains = c("VIRTUAL", "Matrix"),
-         slots = c(uplo = "character", diag = "character"),
-         prototype = list(uplo = "U", diag = "N"),
-         validity = function(object) .Call(triangularMatrix_validate, object))
-
 ## Virtual class of symmetric matrices
 setClass("symmetricMatrix",
          contains = c("VIRTUAL", "compMatrix"),
          slots = c(uplo = "character"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(symmetricMatrix_validate, object))
+
+## Virtual class of triangular matrices
+setClass("triangularMatrix",
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(uplo = "character", diag = "character"),
+         prototype = list(uplo = "U", diag = "N"),
+         validity = function(object) .Call(triangularMatrix_validate, object))
 
 
 ## ------ Virtual by kind ----------------------------------------------
