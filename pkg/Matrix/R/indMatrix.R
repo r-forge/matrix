@@ -92,16 +92,16 @@ setAs("nsparseMatrix", "indMatrix",
           stop("matrix must have exactly one entry in each row or column")
       })
 
-setMethod("band", signature(x = "indMatrix"),
+setMethod("band", c(x = "indMatrix"),
           function(x, k1, k2, ...) band(.M2kind(x, "n"), k1, k2, ...))
 
-setMethod("triu", signature(x = "indMatrix"),
+setMethod("triu", c(x = "indMatrix"),
           function(x, k = 0L, ...) triu(.M2kind(x, "n"), k, ...))
 
-setMethod("tril", signature(x = "indMatrix"),
+setMethod("tril", c(x = "indMatrix"),
           function(x, k = 0L, ...) tril(.M2kind(x, "n"), k, ...))
 
-setMethod("diag", signature(x = "indMatrix"),
+setMethod("diag", c(x = "indMatrix"),
           function(x = 1, nrow, ncol, names = TRUE) {
               if((m <- min(x@Dim)) == 0L)
                   return(logical(0L))
@@ -114,10 +114,10 @@ setMethod("diag", signature(x = "indMatrix"),
               r
           })
 
-setMethod("diag<-", signature(x = "indMatrix"),
+setMethod("diag<-", c(x = "indMatrix"),
           function(x, value) `diag<-`(.M2kind(x, "n"), value))
 
-setMethod("t", signature(x = "indMatrix"),
+setMethod("t", c(x = "indMatrix"),
           function(x) {
               r <- new("indMatrix")
               r@Dim <- x@Dim[2:1]
@@ -128,19 +128,19 @@ setMethod("t", signature(x = "indMatrix"),
               r
           })
 
-setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "missing"),
+setMethod("forceSymmetric", c(x = "indMatrix", uplo = "missing"),
           function(x, uplo) forceSymmetric(.M2kind(x, "n")))
 
-setMethod("forceSymmetric", signature(x = "indMatrix", uplo = "character"),
+setMethod("forceSymmetric", c(x = "indMatrix", uplo = "character"),
           function(x, uplo) forceSymmetric(.M2kind(x, "n"), uplo))
 
-setMethod("symmpart", signature(x = "indMatrix"),
+setMethod("symmpart", c(x = "indMatrix"),
           function(x) symmpart(.M2kind(x, "d")))
 
-setMethod("skewpart", signature(x = "indMatrix"),
+setMethod("skewpart", c(x = "indMatrix"),
           function(x) skewpart(.M2kind(x, "d")))
 
-setMethod("isDiagonal", signature(object = "indMatrix"),
+setMethod("isDiagonal", c(object = "indMatrix"),
           function(object) {
               d <- object@Dim
               if((n <- d[2L]) != d[1L])
@@ -148,7 +148,7 @@ setMethod("isDiagonal", signature(object = "indMatrix"),
               all(object@perm == seq_len(n))
           })
 
-setMethod("isTriangular", signature(object = "indMatrix"),
+setMethod("isTriangular", c(object = "indMatrix"),
           function(object, upper = NA, ...) {
               d <- object@Dim
               if((n <- d[2L]) != d[1L])
@@ -173,7 +173,7 @@ setMethod("isTriangular", signature(object = "indMatrix"),
               }
           })
 
-setMethod("isSymmetric", signature(object = "indMatrix"),
+setMethod("isSymmetric", c(object = "indMatrix"),
           function(object, checkDN = TRUE, ...) {
               d <- object@Dim
               if((n <- d[2L]) != d[1L])
@@ -236,7 +236,7 @@ setAs("nsparseMatrix", "pMatrix",
 setAs("indMatrix", "pMatrix",
       function(from) new("pMatrix", from))
 
-setMethod("t", signature(x = "pMatrix"),
+setMethod("t", c(x = "pMatrix"),
           function(x) {
               r <- new("pMatrix")
               r@Dim <- x@Dim

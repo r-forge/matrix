@@ -1,7 +1,7 @@
 ## METHODS FOR GENERIC: Schur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("Schur", signature(x = "dgeMatrix"),
+setMethod("Schur", c(x = "dgeMatrix"),
           function(x, vectors = TRUE, ...) {
               if(length(x.x <- x@x) && !all(is.finite(range(x.x))))
                   stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
@@ -19,7 +19,7 @@ setMethod("Schur", signature(x = "dgeMatrix"),
               else list(T = T, EValues = vals)
           })
 
-setMethod("Schur", signature(x = "dsyMatrix"),
+setMethod("Schur", c(x = "dsyMatrix"),
           function(x, vectors = TRUE, ...) {
               e <- eigen(x, symmetric = TRUE, only.values = !vectors)
               vals <- as.double(e$values)
@@ -30,7 +30,7 @@ setMethod("Schur", signature(x = "dsyMatrix"),
               else list(T = T, EValues = vals)
           })
 
-setMethod("Schur", signature(x = "matrix"),
+setMethod("Schur", c(x = "matrix"),
           function(x, vectors = TRUE, ...) {
               ## FIXME: wrong for complex, but package 'control' seems to
               ##        rely on the complex->double coercion (!?)
@@ -48,16 +48,16 @@ setMethod("Schur", signature(x = "matrix"),
           })
 
 ## FIXME: don't coerce from sparse to dense
-setMethod("Schur", signature(x = "generalMatrix"),
+setMethod("Schur", c(x = "generalMatrix"),
           function(x, vectors = TRUE, ...)
               Schur(.M2unpacked(.M2kind(x, ",")), vectors, ...))
 
 ## FIXME: don't coerce from sparse to dense
-setMethod("Schur", signature(x = "symmetricMatrix"),
+setMethod("Schur", c(x = "symmetricMatrix"),
           function(x, vectors = TRUE, ...)
               Schur(.M2unpacked(.M2kind(x, ",")), vectors, ...))
 
-setMethod("Schur", signature(x = "triangularMatrix"),
+setMethod("Schur", c(x = "triangularMatrix"),
           function(x, vectors = TRUE, ...) {
               x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]
@@ -84,7 +84,7 @@ setMethod("Schur", signature(x = "triangularMatrix"),
               }
           })
 
-setMethod("Schur", signature(x = "diagonalMatrix"),
+setMethod("Schur", c(x = "diagonalMatrix"),
           function(x, vectors = TRUE, ...) {
               x <- .M2kind(x, ",")
               d <- x@Dim
@@ -108,14 +108,14 @@ setMethod("Schur", signature(x = "diagonalMatrix"),
 ## METHODS FOR CLASS: Schur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("expand1", signature(x = "Schur"),
+setMethod("expand1", c(x = "Schur"),
           function(x, which, ...)
               switch(which, "Q" = x@Q, "T" = x@T, "Q." = t(x@Q),
                      stop(gettextf("'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\"",
                                    "which", "Q", "T"),
                           domain = NA)))
 
-setMethod("expand2", signature(x = "Schur"),
+setMethod("expand2", c(x = "Schur"),
           function(x, ...) {
               Q  <- x@Q
               Q. <- t(Q)

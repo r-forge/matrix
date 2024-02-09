@@ -1,18 +1,18 @@
 ## METHODS FOR GENERIC: chol
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol", signature(x = "generalMatrix"),
+setMethod("chol", c(x = "generalMatrix"),
           function(x, uplo = "U", ...) {
               ch <- chol(forceSymmetric(x, uplo), ...)
               ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
-setMethod("chol", signature(x = "symmetricMatrix"),
+setMethod("chol", c(x = "symmetricMatrix"),
           function(x, ...)
               chol(.M2kind(x, ","), ...))
 
-setMethod("chol", signature(x = "triangularMatrix"),
+setMethod("chol", c(x = "triangularMatrix"),
           function(x, uplo = "U", ...) {
               if(identical(uplo, x@uplo)) {
                   ch <- chol(forceSymmetric(x, uplo), ...)
@@ -21,18 +21,18 @@ setMethod("chol", signature(x = "triangularMatrix"),
               } else chol(forceDiagonal(x, x@diag), ...)
           })
 
-setMethod("chol", signature(x = "diagonalMatrix"),
+setMethod("chol", c(x = "diagonalMatrix"),
           function(x, ...)
               chol(.M2kind(x, ","), ...))
 
-setMethod("chol", signature(x = "dsyMatrix"),
+setMethod("chol", c(x = "dsyMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
               ch <- as(Cholesky(x, perm = pivot, tol = tol), "dtrMatrix")
               ch@Dimnames <- dimnames(x)
               if(ch@uplo != "U") t(ch) else ch
           })
 
-setMethod("chol", signature(x = "dspMatrix"),
+setMethod("chol", c(x = "dspMatrix"),
           function(x, ...) {
               ch <- as(Cholesky(x), "dtpMatrix")
               ch@Dimnames <- dimnames(x)
@@ -40,7 +40,7 @@ setMethod("chol", signature(x = "dspMatrix"),
           })
 
 for(.cl in paste0("ds", c("C", "R", "T"), "Matrix"))
-setMethod("chol", signature(x = .cl),
+setMethod("chol", c(x = .cl),
           function(x, pivot = FALSE, ...) {
               ch <- t(as(Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE),
                          "dtCMatrix")) # FIXME? give dtRMatrix, dtTMatrix?
@@ -49,7 +49,7 @@ setMethod("chol", signature(x = .cl),
           })
 rm(.cl)
 
-setMethod("chol", signature(x = "ddiMatrix"),
+setMethod("chol", c(x = "ddiMatrix"),
           function(x, ...) {
               if(length(y <- x@x)) {
                   if(is.na(min.y <- min(y)) || min.y < 0)
@@ -65,50 +65,50 @@ setMethod("chol", signature(x = "ddiMatrix"),
 ## METHODS FOR GENERIC: Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("Cholesky", signature(A = "generalMatrix"),
+setMethod("Cholesky", c(A = "generalMatrix"),
           function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
-setMethod("Cholesky", signature(A = "symmetricMatrix"),
+setMethod("Cholesky", c(A = "symmetricMatrix"),
           function(A, ...)
               Cholesky(.M2kind(A, ","), ...))
 
-setMethod("Cholesky", signature(A = "triangularMatrix"),
+setMethod("Cholesky", c(A = "triangularMatrix"),
           function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               ch@Dimnames <- A@Dimnames # restore asymmetric 'Dimnames'
               ch
           })
 
-setMethod("Cholesky", signature(A = "diagonalMatrix"),
+setMethod("Cholesky", c(A = "diagonalMatrix"),
           function(A, ...)
               Cholesky(.M2kind(A, ","), ...))
 
-setMethod("Cholesky", signature(A = "dsyMatrix"),
+setMethod("Cholesky", c(A = "dsyMatrix"),
           function(A, perm = TRUE, tol = -1, ...)
               .Call(dpoMatrix_trf, A, if(perm) 1L else 2L, perm, tol))
 
-setMethod("Cholesky", signature(A = "dspMatrix"),
+setMethod("Cholesky", c(A = "dspMatrix"),
           function(A, ...)
               .Call(dppMatrix_trf, A, 2L))
 
-setMethod("Cholesky", signature(A = "dsCMatrix"),
+setMethod("Cholesky", c(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,
                    Imult = 0, ...)
               .Call(dpCMatrix_trf, A, perm, LDL, super, Imult))
 
-setMethod("Cholesky", signature(A = "dsRMatrix"),
+setMethod("Cholesky", c(A = "dsRMatrix"),
           function(A, ...)
               Cholesky(.tCRT(A), ...))
 
-setMethod("Cholesky", signature(A = "dsTMatrix"),
+setMethod("Cholesky", c(A = "dsTMatrix"),
           function(A, ...)
               Cholesky(.M2C(A), ...))
 
-setMethod("Cholesky", signature(A = "ddiMatrix"),
+setMethod("Cholesky", c(A = "ddiMatrix"),
           function(A, ...) {
               if(length(y <- A@x) && (is.na(min.y <- min(y)) || min.y < 0))
                   stop(gettextf("%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite",
@@ -128,7 +128,7 @@ setMethod("Cholesky", signature(A = "ddiMatrix"),
               r
           })
 
-setMethod("Cholesky", signature(A = "matrix"),
+setMethod("Cholesky", c(A = "matrix"),
           function(A, uplo = "U", ...) {
               ch <- Cholesky(forceSymmetric(A, uplo), ...)
               if(!is.null(dn <- dimnames(A)))
@@ -140,7 +140,7 @@ setMethod("Cholesky", signature(A = "matrix"),
 ## METHODS FOR GENERIC: chol2inv
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol2inv", signature(x = "generalMatrix"),
+setMethod("chol2inv", c(x = "generalMatrix"),
           function(x, uplo = "U", ...) {
               d <- x@Dim
               if(d[1L] != d[2L])
@@ -148,20 +148,20 @@ setMethod("chol2inv", signature(x = "generalMatrix"),
               chol2inv((if(  uplo == "U") triu else tril)(x), ...)
           })
 
-setMethod("chol2inv", signature(x = "symmetricMatrix"),
+setMethod("chol2inv", c(x = "symmetricMatrix"),
           function(x, ...)
               chol2inv((if(x@uplo == "U") triu else tril)(x), ...))
 
-setMethod("chol2inv", signature(x = "triangularMatrix"),
+setMethod("chol2inv", c(x = "triangularMatrix"),
           function(x, ...)
               chol2inv(.M2kind(x, ","), ...))
 
-setMethod("chol2inv", signature(x = "diagonalMatrix"),
+setMethod("chol2inv", c(x = "diagonalMatrix"),
           function(x, ...)
               chol2inv(.M2kind(x, ","), ...))
 
 for(.cl in paste0("dt", c("r", "p"), "Matrix"))
-setMethod("chol2inv", signature(x = .cl),
+setMethod("chol2inv", c(x = .cl),
           function(x, ...) {
               if(x@diag != "N")
                   x <- ..diagU2N(x)
@@ -173,13 +173,13 @@ setMethod("chol2inv", signature(x = .cl),
 rm(.cl)
 
 for(.cl in paste0("dt", c("C", "R", "T"), "Matrix"))
-setMethod("chol2inv", signature(x = .cl),
+setMethod("chol2inv", c(x = .cl),
           function(x, ...)
               (if(x@uplo == "U") tcrossprod else crossprod)(solve(x)))
 rm(.cl)
 
 ## 'uplo' can affect the 'Dimnames' of the result here :
-setMethod("chol2inv", signature(x = "ddiMatrix"),
+setMethod("chol2inv", c(x = "ddiMatrix"),
           function(x, uplo = "U", ...)
               (if(  uplo == "U") tcrossprod else crossprod)(solve(x)))
 
@@ -205,13 +205,13 @@ setAs("pCholesky", "dtpMatrix",
           to
       })
 
-setMethod("diag", signature(x = "Cholesky"),
+setMethod("diag", c(x = "Cholesky"),
           function(x = 1, nrow, ncol, names = TRUE) {
               d <- diag(as(x, "dtrMatrix"), names = FALSE)
               d * d
           })
 
-setMethod("diag", signature(x = "pCholesky"),
+setMethod("diag", c(x = "pCholesky"),
           function(x = 1, nrow, ncol, names = TRUE) {
               d <- diag(as(x, "dtpMatrix"), names = FALSE)
               d * d
@@ -263,8 +263,8 @@ body(.def.packed) <-
                       .UP = quote(r.ii[sequence.default(seq_len(d[1L]))]),
                       .LO = quote(rep.int(r.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))))))
 
-setMethod("expand1", signature(x =  "Cholesky"), .def.unpacked)
-setMethod("expand1", signature(x = "pCholesky"), .def.packed)
+setMethod("expand1", c(x =  "Cholesky"), .def.unpacked)
+setMethod("expand1", c(x = "pCholesky"), .def.packed)
 rm(.def.unpacked, .def.packed)
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
@@ -314,8 +314,8 @@ body(.def.packed) <-
                       .LO = quote(rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))))))
 
 ## returning list(L1, D, L1') or list(L, L'), where A = L1 D L1' = L L'
-setMethod("expand2", signature(x =  "Cholesky"), .def.unpacked)
-setMethod("expand2", signature(x = "pCholesky"), .def.packed)
+setMethod("expand2", c(x =  "Cholesky"), .def.unpacked)
+setMethod("expand2", c(x = "pCholesky"), .def.packed)
 rm(.def.unpacked, .def.packed)
 
 
@@ -370,11 +370,11 @@ setAs("CHMsuper", "dgCMatrix",
           to
       })
 
-setMethod("diag", signature(x = "CHMfactor"),
+setMethod("diag", c(x = "CHMfactor"),
           function(x = 1, nrow, ncol, names = TRUE)
               .Call(CHMfactor_diag_get, x, TRUE))
 
-setMethod("expand1", signature(x = "CHMsimpl"),
+setMethod("expand1", c(x = "CHMsimpl"),
           function(x, which, ...) {
               switch(which,
                      "P1" =, "P1." = {
@@ -424,7 +424,7 @@ setMethod("expand1", signature(x = "CHMsimpl"),
                           domain = NA))
           })
 
-setMethod("expand1", signature(x = "CHMsuper"),
+setMethod("expand1", c(x = "CHMsuper"),
           function(x, which, ...) {
               switch(which,
                      "P1" =, "P1." = {
@@ -460,7 +460,7 @@ setMethod("expand1", signature(x = "CHMsuper"),
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
 ## where  A = P1' L1 D L1' P1 = P1' L L' P1  and  L = L1 sqrt(D)
-setMethod("expand2", signature(x = "CHMsimpl"),
+setMethod("expand2", c(x = "CHMsimpl"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -511,7 +511,7 @@ setMethod("expand2", signature(x = "CHMsimpl"),
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
 ## where  A = P1' L1 D L1' P1 = P1' L L' P1  and  L = L1 sqrt(D)
-setMethod("expand2", signature(x = "CHMsuper"),
+setMethod("expand2", c(x = "CHMsuper"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -544,14 +544,14 @@ setMethod("expand2", signature(x = "CHMsuper"),
 
 ## returning list(P, L), where A = P' L L' P
 ## MJ: for backwards compatibility
-setMethod("expand", signature(x = "CHMfactor"),
+setMethod("expand", c(x = "CHMfactor"),
           function(x, ...)
               list(P = expand1(x, "P1"), L = expand1(x, "L")))
 
 .updateCHMfactor <- function(object, parent, mult = 0)
     .Call(CHMfactor_update, object, parent, mult)
 
-setMethod("update", signature(object = "CHMfactor"),
+setMethod("update", c(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
               parent <- .M2kind(.M2C(parent), ",")
               if((shape <- .M.shape(parent)) != "s") {
@@ -568,18 +568,18 @@ setMethod("update", signature(object = "CHMfactor"),
     .Call(CHMfactor_updown, L, C, update)
 
 setMethod("updown",
-          signature(update = "character", C = "ANY", L = "ANY"),
+          c(update = "character", C = "ANY", L = "ANY"),
           function(update, C, L)
               updown(identical(update, "+"), C, L))
 
 setMethod("updown",
-          signature(update = "logical", C = "Matrix", L = "CHMfactor"),
+          c(update = "logical", C = "Matrix", L = "CHMfactor"),
           function(update, C, L)
               updown(update, .M2kind(.M2C(C), ","), L))
 
 for(.cl in c("dgCMatrix", "dsCMatrix"))
 setMethod("updown",
-          signature(update = "logical", C = .cl, L = "CHMfactor"),
+          c(update = "logical", C = .cl, L = "CHMfactor"),
           function(update, C, L) {
               if(length(perm <- L@perm))
                   C <- C[perm + 1L, , drop = FALSE]
@@ -588,7 +588,7 @@ setMethod("updown",
 rm(.cl)
 
 setMethod("updown",
-          signature(update = "logical", C = "dtCMatrix", L = "CHMfactor"),
+          c(update = "logical", C = "dtCMatrix", L = "CHMfactor"),
           function(update, C, L) {
               if(C@diag != "N")
                   C <- ..diagU2N(C)
@@ -598,6 +598,6 @@ setMethod("updown",
           })
 
 setMethod("updown",
-          signature(update = "logical", C = "matrix", L = "CHMfactor"),
+          c(update = "logical", C = "matrix", L = "CHMfactor"),
           function(update, C, L)
               updown(update, .m2sparse(C, ",gC"), L))

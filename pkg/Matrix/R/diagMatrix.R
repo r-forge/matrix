@@ -2,7 +2,7 @@
 ## diagonal matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("band", signature(x = "diagonalMatrix"),
+setMethod("band", c(x = "diagonalMatrix"),
           function(x, k1, k2, ...) {
               if(k1 <= 0L && k2 >= 0L)
                   return(x)
@@ -13,7 +13,7 @@ setMethod("band", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("triu", signature(x = "diagonalMatrix"),
+setMethod("triu", c(x = "diagonalMatrix"),
           function(x, k = 0L, ...) {
               if(k <= 0L)
                   return(x)
@@ -24,7 +24,7 @@ setMethod("triu", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("tril", signature(x = "diagonalMatrix"),
+setMethod("tril", c(x = "diagonalMatrix"),
           function(x, k = 0L, ...) {
               if(k >= 0L)
                   return(x)
@@ -35,7 +35,7 @@ setMethod("tril", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("diag", signature(x = "diagonalMatrix"),
+setMethod("diag", c(x = "diagonalMatrix"),
           function(x = 1, nrow, ncol, names = TRUE) {
               kind <- .M.kind(x)
               r <-
@@ -56,7 +56,7 @@ setMethod("diag", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("diag<-", signature(x = "diagonalMatrix"),
+setMethod("diag<-", c(x = "diagonalMatrix"),
           function(x, value) {
               n <- x@Dim[2L]
               nv <- length(value)
@@ -87,16 +87,16 @@ setMethod("diag<-", signature(x = "diagonalMatrix"),
               x
           })
 
-setMethod("t", signature(x = "diagonalMatrix"),
+setMethod("t", c(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
 
-setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "missing"),
+setMethod("forceSymmetric", c(x = "diagonalMatrix", uplo = "missing"),
           function(x, uplo) .diag2sparse(x, ".", "s", "C",  "U"))
 
-setMethod("forceSymmetric", signature(x = "diagonalMatrix", uplo = "character"),
+setMethod("forceSymmetric", c(x = "diagonalMatrix", uplo = "character"),
           function(x, uplo) .diag2sparse(x, ".", "s", "C", uplo))
 
-setMethod("symmpart", signature(x = "diagonalMatrix"),
+setMethod("symmpart", c(x = "diagonalMatrix"),
           function(x) {
               kind <- .M.kind(x)
               r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
@@ -116,7 +116,7 @@ setMethod("symmpart", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("skewpart", signature(x = "diagonalMatrix"),
+setMethod("skewpart", c(x = "diagonalMatrix"),
           function(x) {
               kind <- .M.kind(x)
               r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
@@ -131,14 +131,14 @@ setMethod("skewpart", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("isDiagonal", signature(object = "diagonalMatrix"),
+setMethod("isDiagonal", c(object = "diagonalMatrix"),
           function(object) TRUE)
 
-setMethod("isTriangular", signature(object = "diagonalMatrix"),
+setMethod("isTriangular", c(object = "diagonalMatrix"),
           function(object, upper = NA, ...)
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
-setMethod("isSymmetric", signature(object = "diagonalMatrix"),
+setMethod("isSymmetric", c(object = "diagonalMatrix"),
           function(object, checkDN = TRUE, ...) {
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...)

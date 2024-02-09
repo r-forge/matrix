@@ -45,7 +45,7 @@ if(FALSE) { # TODO
 
 }
 
-setMethod("[<-", signature(x = "Matrix", i = "missing", j = "missing",
+setMethod("[<-", c(x = "Matrix", i = "missing", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -59,7 +59,7 @@ setMethod("[<-", signature(x = "Matrix", i = "missing", j = "missing",
                   stop("incorrect number of dimensions")
           })
 
-setMethod("[<-", signature(x = "Matrix", i = "index", j = "missing",
+setMethod("[<-", c(x = "Matrix", i = "index", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -76,7 +76,7 @@ setMethod("[<-", signature(x = "Matrix", i = "index", j = "missing",
                   stop("incorrect number of dimensions")
           })
 
-setMethod("[<-", signature(x = "Matrix", i = "missing", j = "index",
+setMethod("[<-", c(x = "Matrix", i = "missing", j = "index",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -93,7 +93,7 @@ setMethod("[<-", signature(x = "Matrix", i = "missing", j = "index",
                   stop("incorrect number of dimensions")
           })
 
-setMethod("[<-", signature(x = "Matrix", i = "index", j = "index",
+setMethod("[<-", c(x = "Matrix", i = "index", j = "index",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -108,7 +108,7 @@ setMethod("[<-", signature(x = "Matrix", i = "index", j = "index",
           })
 
 for(.cl in c("matrix", "nMatrix", "lMatrix"))
-setMethod("[<-", signature(x = "Matrix", i = .cl, j = "missing",
+setMethod("[<-", c(x = "Matrix", i = .cl, j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -126,21 +126,21 @@ setMethod("[<-", signature(x = "Matrix", i = .cl, j = "missing",
           })
 rm(.cl)
 
-setMethod("[<-", signature(x = "Matrix", i = "NULL", j = "ANY",
+setMethod("[<-", c(x = "Matrix", i = "NULL", j = "ANY",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               i <- integer(0L)
               callGeneric()
           })
 
-setMethod("[<-", signature(x = "Matrix", i = "ANY", j = "NULL",
+setMethod("[<-", c(x = "Matrix", i = "ANY", j = "NULL",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               j <- integer(0L)
               callGeneric()
           })
 
-setMethod("[<-", signature(x = "Matrix", i = "NULL", j = "NULL",
+setMethod("[<-", c(x = "Matrix", i = "NULL", j = "NULL",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               i <- integer(0L)
@@ -148,7 +148,7 @@ setMethod("[<-", signature(x = "Matrix", i = "NULL", j = "NULL",
               callGeneric()
           })
 
-setMethod("[<-", signature(x = "sparseVector", i = "missing", j = "missing",
+setMethod("[<-", c(x = "sparseVector", i = "missing", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -183,7 +183,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "missing", j = "missing",
               .V.rep.len(value, n.x)
           })
 
-setMethod("[<-", signature(x = "sparseVector", i = "index", j = "missing",
+setMethod("[<-", c(x = "sparseVector", i = "index", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               if(missing(value))
@@ -215,7 +215,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "index", j = "missing",
               ## TODO
           })
 
-setMethod("[<-", signature(x = "sparseVector", i = "nsparseVector", j = "missing",
+setMethod("[<-", c(x = "sparseVector", i = "nsparseVector", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., drop = TRUE) {
               if(missing(value))
@@ -226,7 +226,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "nsparseVector", j = "missing
               x
           })
 
-setMethod("[<-", signature(x = "sparseVector", i = "lsparseVector", j = "missing",
+setMethod("[<-", c(x = "sparseVector", i = "lsparseVector", j = "missing",
                            value = "ANY"),
           function(x, i, j, ..., drop = TRUE) {
               if(missing(value))
@@ -237,7 +237,7 @@ setMethod("[<-", signature(x = "sparseVector", i = "lsparseVector", j = "missing
               x
           })
 
-setMethod("[<-", signature(x = "sparseVector", i = "NULL", j = "ANY",
+setMethod("[<-", c(x = "sparseVector", i = "NULL", j = "ANY",
                            value = "ANY"),
           function(x, i, j, ..., value) {
               i <- integer(0L)
@@ -294,20 +294,20 @@ setMethod("[<-", signature(x = "sparseVector", i = "NULL", j = "ANY",
 }
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "matrix", j = "missing",
+                 c(x = "Matrix", i = "matrix", j = "missing",
                            value = "replValue"),
                  .M.repl.i.2col)
 
 ## Three catch-all methods ... would be very inefficient for sparse*
 ## --> extra methods in ./sparseMatrix.R
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "missing", j = "ANY",
+                 c(x = "Matrix", i = "missing", j = "ANY",
                            value = "Matrix"),
                  function(x, i, j, ..., value)
                      callGeneric(x=x, , j=j, value = as.vector(value)))
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ANY", j = "missing",
+                 c(x = "Matrix", i = "ANY", j = "missing",
                            value = "Matrix"),
                  function(x, i, j, ..., value)
                      if(nargs() == 3)
@@ -316,20 +316,20 @@ setReplaceMethod("[",
                          callGeneric(x=x, i=i, , value = as.vector(value)))
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ANY", j = "ANY",
+                 c(x = "Matrix", i = "ANY", j = "ANY",
                            value = "Matrix"),
                  function(x, i, j, ..., value)
                      callGeneric(x=x, i=i, j=j, value = as.vector(value)))
 
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "missing", j = "ANY",
+                 c(x = "Matrix", i = "missing", j = "ANY",
                            value = "matrix"),
                  function(x, i, j, ..., value)
                      callGeneric(x=x, , j=j, value = c(value)))
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ANY", j = "missing",
+                 c(x = "Matrix", i = "ANY", j = "missing",
                            value = "matrix"),
                  function(x, i, j, ..., value)
                      if(nargs() == 3)
@@ -338,7 +338,7 @@ setReplaceMethod("[",
                          callGeneric(x=x, i=i, , value = c(value)))
 
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ANY", j = "ANY",
+                 c(x = "Matrix", i = "ANY", j = "ANY",
                            value = "matrix"),
                  function(x, i, j, value)
                      callGeneric(x=x, i=i, j=j, value = c(value)))
@@ -348,11 +348,11 @@ setReplaceMethod("[",
 .repl.i.lDMat <- function (x, i, j, ..., value)
     `[<-`(x, i=which(as.vector(i)), value=value)
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ldenseMatrix", j = "missing",
+                 c(x = "Matrix", i = "ldenseMatrix", j = "missing",
                            value = "replValue"),
                  .repl.i.lDMat)
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "ndenseMatrix", j = "missing",
+                 c(x = "Matrix", i = "ndenseMatrix", j = "missing",
                            value = "replValue"),
                  .repl.i.lDMat)
 rm(.repl.i.lDMat)
@@ -360,17 +360,17 @@ rm(.repl.i.lDMat)
 .repl.i.lSMat <- function (x, i, j, ..., value)
     `[<-`(x, i=which(as(i, "sparseVector")), value=value)
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "lsparseMatrix", j = "missing",
+                 c(x = "Matrix", i = "lsparseMatrix", j = "missing",
                            value = "replValue"),
                  .repl.i.lSMat)
 setReplaceMethod("[",
-                 signature(x = "Matrix", i = "nsparseMatrix", j = "missing",
+                 c(x = "Matrix", i = "nsparseMatrix", j = "missing",
                            value = "replValue"),
                  .repl.i.lSMat)
 rm(.repl.i.lSMat)
 
 ## (ANY,ANY,ANY) is used when no `real method' is implemented :
-setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
+setReplaceMethod("[", c(x = "Matrix", i = "ANY", j = "ANY",
                                 value = "ANY"),
                  function (x, i, j, value) {
                      if(!is.atomic(value))
@@ -384,7 +384,7 @@ setReplaceMethod("[", signature(x = "Matrix", i = "ANY", j = "ANY",
 ## ==== denseMatrix ====================================================
 
 ## x[] <- value :
-setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "missing",
+setReplaceMethod("[", c(x = "denseMatrix", i = "missing", j = "missing",
                                 value = "ANY"),## double/logical/...
                  function (x, value) {
                      x <- .M2gen(x)
@@ -395,7 +395,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "missing",
 
 ## FIXME: 1) These are far from efficient
 ## -----
-setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "denseMatrix", i = "index", j = "missing",
                                 value = "replValue"),
                  function (x, i, j, ..., value) {
                      r <- as(x, "matrix")
@@ -408,7 +408,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "missing",
                      .m2dense(r, paste0(.M.kind(x), "ge"))
                  })
 
-setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "denseMatrix", i = "missing", j = "index",
                                 value = "replValue"),
                  function (x, i, j, ..., value) {
                      r <- as(x, "matrix")
@@ -416,7 +416,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "missing", j = "index",
                      .m2dense(r, paste0(.M.kind(x), "ge"))
                  })
 
-setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "denseMatrix", i = "index", j = "index",
                                 value = "replValue"),
                  function (x, i, j, ..., value) {
                      r <- as(x, "matrix")
@@ -424,7 +424,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "index", j = "index",
                      as_denseClass(r, class(x)) ## was as(r, class(x))
                  })
 
-setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
+setReplaceMethod("[", c(x = "denseMatrix", i = "matrix",  # 2-col.matrix
                                 j = "missing", value = "replValue"),
                  function(x, i, j, ..., value) {
                      r <- as(x, "matrix")
@@ -436,7 +436,7 @@ setReplaceMethod("[", signature(x = "denseMatrix", i = "matrix",  # 2-col.matrix
 ## ==== sparseMatrix ===================================================
 
 ## x[] <- value :
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing",
+setReplaceMethod("[", c(x = "sparseMatrix", i = "missing", j = "missing",
                                 value = "ANY"),## double/logical/...
                  function (x, i, j,..., value) {
                      if(all0(value)) { # be faster
@@ -455,12 +455,12 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "missing"
                  })
 
 ## Do not use as.vector() (see ./Matrix.R ) for sparse matrices :
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "missing", j = "ANY",
+setReplaceMethod("[", c(x = "sparseMatrix", i = "missing", j = "ANY",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      callGeneric(x=x, , j=j, value=as(value, "sparseVector")))
 
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
+setReplaceMethod("[", c(x = "sparseMatrix", i = "ANY", j = "missing",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      if(nargs() == 3)
@@ -468,7 +468,7 @@ setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "missing",
                      else
                          callGeneric(x=x, i=i, , value=as(value, "sparseVector")))
 
-setReplaceMethod("[", signature(x = "sparseMatrix", i = "ANY", j = "ANY",
+setReplaceMethod("[", c(x = "sparseMatrix", i = "ANY", j = "ANY",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      callGeneric(x=x, i=i, j=j, value=as(value, "sparseVector")))
@@ -659,34 +659,34 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
     else as_CspClass(x, clx)
 } ## replCmat4
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "index", j = "missing",
                                 value = "replValue"),
                  replCmat)
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "missing", j = "index",
                                 value = "replValue"),
                  replCmat)
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
                  replCmat)
 
 ### When the RHS 'value' is  a sparseVector, now can use  replCmat  as well
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "missing", j = "index",
 				value = "sparseVector"),
 		 replCmat)
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "index", j = "missing",
 				value = "sparseVector"),
 		 replCmat)
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 replCmat)
 rm(replCmat)
 
 ## A[ ij ] <- value,  where ij is (i,j) 2-column matrix
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),
 		 function(x, i, j, ..., value)
 		 ## goto Tsparse modify and convert back:
@@ -694,7 +694,7 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "matrix", j = "missing"
 		    "CsparseMatrix"))
 ## more in ./sparseMatrix.R (and ./Matrix.R )
 
-setReplaceMethod("[", signature(x = "CsparseMatrix", i = "Matrix", j = "missing",
+setReplaceMethod("[", c(x = "CsparseMatrix", i = "Matrix", j = "missing",
 				value = "replValue"),
 		 function(x, i, j, ..., value)
 		 ## goto Tsparse modify and convert back:
@@ -704,22 +704,22 @@ setReplaceMethod("[", signature(x = "CsparseMatrix", i = "Matrix", j = "missing"
 
 ## ==== RsparseMatrix ==================================================
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
 		 replTmat(.M2T(x), i=i, , value=value))
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "missing", j = "index",
 				value = "replValue"),
 		 function (x, i, j, ..., value)# extra " , ": want nargs() == 4
 		 replTmat(.M2T(x), , j=j, value=value))
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
 		 replTmat(.M2T(x), i=i, j=j, value=value))
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value) {
                      if(nargs() == 3L)
@@ -727,18 +727,18 @@ setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "missing",
                      else replTmat(.M2T(x), i=i, , value=value) # x[i, ] <- v
                  })
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "missing", j = "index",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value)# extra " , ": want nargs() == 4
 		 replTmat(.M2T(x), , j=j, value=value))
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 function (x, i, j, ..., value)
 		 replTmat(.M2T(x), i=i, j=j, value=value))
 
 
-setReplaceMethod("[", signature(x = "RsparseMatrix", i = "matrix", j = "missing",
+setReplaceMethod("[", c(x = "RsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),
                  function (x, i, j, ..., value) {
                      if(nargs() == 3L)
@@ -1383,36 +1383,36 @@ replTmat <- function (x, i, j, ..., value) {
     x
 } ## end{.TM.repl.i.mat}
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "index", j = "missing",
 				value = "replValue"),
 		 replTmat)
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "missing", j = "index",
 				value = "replValue"),
 		 replTmat)
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
 		 replTmat)
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "matrix", j = "missing",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "matrix", j = "missing",
 				value = "replValue"),
 		 .TM.repl.i.mat)
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "Matrix", j = "missing",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "Matrix", j = "missing",
 				value = "replValue"),
 		 .TM.repl.i.mat)
 
 
 ### When the RHS 'value' is  a sparseVector, now can use  replTmat  as well
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "missing", j = "index",
 				value = "sparseVector"),
 		 replTmat)
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "index", j = "missing",
 				value = "sparseVector"),
 		 replTmat)
 
-setReplaceMethod("[", signature(x = "TsparseMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "TsparseMatrix", i = "index", j = "index",
 				value = "sparseVector"),
 		 replTmat)
 
@@ -1450,10 +1450,10 @@ replDiag <- function(x, i, j, ..., value) {
     else tril(x)
 }
 
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index",
                                 j = "index", value = "replValue"), replDiag)
 
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index",
                                 j = "missing", value = "replValue"),
                  function(x,i,j, ..., value) {
                      ## message("before replDiag() -- nargs()= ", nargs())
@@ -1463,12 +1463,12 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index",
                          replDiag(x, i=i, , value=value)
                  })
 
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "missing",
                                 j = "index", value = "replValue"),
                  function(x,i,j, ..., value) replDiag(x, j=j, value=value))
 
 ## x[] <- value :
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "missing",
                                 j = "missing", value = "ANY"),
                  function(x,i,j, ..., value) {
                      if(all0(value)) { # be faster
@@ -1484,7 +1484,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing",
                  })
 
 
-setReplaceMethod("[", signature(x = "diagonalMatrix",
+setReplaceMethod("[", c(x = "diagonalMatrix",
                                 i = "matrix", # 2-col.matrix
                                 j = "missing", value = "replValue"),
                  function(x,i,j, ..., value) {
@@ -1518,28 +1518,28 @@ setReplaceMethod("[", signature(x = "diagonalMatrix",
 
 
 ## value = "sparseMatrix":
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "missing", j = "index",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      callGeneric(x=x, , j=j, value=as(value, "sparseVector")))
 
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index", j = "missing",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      callGeneric(x=x, i=i, , value=as(value, "sparseVector")))
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index", j = "index",
                                 value = "sparseMatrix"),
                  function (x, i, j, ..., value)
                      callGeneric(x=x, i=i, j=j, value=as(value, "sparseVector")))
 
 ## value = "sparseVector":
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "missing", j = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "missing", j = "index",
                                 value = "sparseVector"),
                  replDiag)
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index", j = "missing",
                                 value = "sparseVector"),
                  replDiag)
-setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
+setReplaceMethod("[", c(x = "diagonalMatrix", i = "index", j = "index",
                                 value = "sparseVector"),
                  replDiag)
 
@@ -1552,7 +1552,7 @@ setReplaceMethod("[", signature(x = "diagonalMatrix", i = "index", j = "index",
 }
 for (.i in c("missing", "index"))
 for (.j in c("missing", "index"))
-setReplaceMethod("[", signature(x = "indMatrix", i = .i, j = .j, value = "ANY"),
+setReplaceMethod("[", c(x = "indMatrix", i = .i, j = .j, value = "ANY"),
                  .indMatrix.sub)
 rm(.indMatrix.sub, .i, .j)
 
@@ -1668,11 +1668,11 @@ replSPvec <- function (x, i, value) {
     x
 }
 
-setReplaceMethod("[", signature(x = "sparseVector", i = "index", j = "missing",
+setReplaceMethod("[", c(x = "sparseVector", i = "index", j = "missing",
 				value = "replValueSp"),
 		 replSPvec)
 
-setReplaceMethod("[", signature(x = "sparseVector",
+setReplaceMethod("[", c(x = "sparseVector",
                                 i = "sparseVector", j = "missing",
 				value = "replValueSp"),
                  ## BTW, the important case: 'i' a *logical* sparseVector

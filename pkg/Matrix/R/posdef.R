@@ -132,7 +132,7 @@ setAs("matrix", "pcorMatrix",
 ## METHODS FOR GENERIC: cov2cor
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("cov2cor", signature(V = "unpackedMatrix"),
+setMethod("cov2cor", c(V = "unpackedMatrix"),
           function(V) {
               d <- V@Dim
               if(d[1L] != d[2L] || .M.kind(V) == "z")
@@ -141,7 +141,7 @@ setMethod("cov2cor", signature(V = "unpackedMatrix"),
               as(forceSymmetric(V), "corMatrix")
           })
 
-setMethod("cov2cor", signature(V = "packedMatrix"),
+setMethod("cov2cor", c(V = "packedMatrix"),
           function(V) {
               d <- V@Dim
               if(d[1L] != d[2L] || .M.kind(V) == "z")
@@ -150,7 +150,7 @@ setMethod("cov2cor", signature(V = "packedMatrix"),
               as(forceSymmetric(V), "pcorMatrix")
           })
 
-setMethod("cov2cor", signature(V = "sparseMatrix"),
+setMethod("cov2cor", c(V = "sparseMatrix"),
           function(V) {
               d <- V@Dim
               if(d[1L] != d[2L] || .M.kind(V) == "z")

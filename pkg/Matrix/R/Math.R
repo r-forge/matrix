@@ -9,7 +9,7 @@
 ## [25] "asin"     "asinh"    "atan"     "atanh"    "cospi"    "sinpi"
 ## [31] "tanpi"    "gamma"    "lgamma"   "digamma"  "trigamma"
 
-setMethod("Math", signature(x = "denseMatrix"),
+setMethod("Math", c(x = "denseMatrix"),
           function(x) {
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
@@ -44,7 +44,7 @@ setMethod("Math", signature(x = "denseMatrix"),
               r
           })
 
-setMethod("log", signature(x = "denseMatrix"),
+setMethod("log", c(x = "denseMatrix"),
           function(x, ...) {
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
@@ -64,7 +64,7 @@ setMethod("log", signature(x = "denseMatrix"),
               r
           })
 
-setMethod("Math", signature(x = "sparseMatrix"),
+setMethod("Math", c(x = "sparseMatrix"),
           function(x) {
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
@@ -108,7 +108,7 @@ setMethod("Math", signature(x = "sparseMatrix"),
               r
           })
 
-setMethod("log", signature(x = "sparseMatrix"),
+setMethod("log", c(x = "sparseMatrix"),
           function(x, ...) {
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
@@ -133,7 +133,7 @@ setMethod("log", signature(x = "sparseMatrix"),
               r
           })
 
-setMethod("Math", signature(x = "diagonalMatrix"),
+setMethod("Math", c(x = "diagonalMatrix"),
           function(x) {
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
@@ -169,7 +169,7 @@ setMethod("Math", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("log", signature(x = "diagonalMatrix"),
+setMethod("log", c(x = "diagonalMatrix"),
           function(x, ...) {
               cl <- .M.nonvirtual(x)
               kind <- substr(cl, 1L, 1L)
@@ -192,15 +192,15 @@ setMethod("log", signature(x = "diagonalMatrix"),
               r
           })
 
-setMethod("Math", signature(x = "indMatrix"),
+setMethod("Math", c(x = "indMatrix"),
           function(x)
               get(.Generic, mode = "function")(.M2kind(x, "n")))
 
-setMethod("log", signature(x = "indMatrix"),
+setMethod("log", c(x = "indMatrix"),
           function(x, ...)
               log(.M2kind(x, "n"), ...))
 
-setMethod("Math", signature(x = "sparseVector"),
+setMethod("Math", c(x = "sparseVector"),
           function(x) {
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
@@ -227,7 +227,7 @@ setMethod("Math", signature(x = "sparseVector"),
               r
           })
 
-setMethod("log", signature(x = "sparseVector"),
+setMethod("log", c(x = "sparseVector"),
           function(x, ...) {
               kind <- .M.kind(x)
               if(kind == "z") {
@@ -248,7 +248,7 @@ setMethod("log", signature(x = "sparseVector"),
 ## > getGroupMembers("Math2")
 ## [1] "round"  "signif"
 
-setMethod("Math2", signature(x = "Matrix"),
+setMethod("Math2", c(x = "Matrix"),
           function(x, digits) {
               x <- .indefinite(.M2kind(x, ","))
               x@x <- get(.Generic, mode = "function")(x@x, digits = digits)
@@ -257,7 +257,7 @@ setMethod("Math2", signature(x = "Matrix"),
               x
           })
 
-setMethod("Math2", signature(x = "sparseVector"),
+setMethod("Math2", c(x = "sparseVector"),
           function(x, digits) {
               x <- .V2kind(x, ",")
               x@x <- get(.Generic, mode = "function")(x@x, digits = digits)
@@ -268,7 +268,7 @@ setMethod("Math2", signature(x = "sparseVector"),
 ## METHODS FOR GENERIC: zapsmall
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("zapsmall", signature(x = "Matrix"),
+setMethod("zapsmall", c(x = "Matrix"),
           function(x, digits = getOption("digits")) {
               x <- .indefinite(.M2kind(x, ","))
               x@x <- zapsmall(x@x, digits = digits)
@@ -277,7 +277,7 @@ setMethod("zapsmall", signature(x = "Matrix"),
               x
           })
 
-setMethod("zapsmall", signature(x = "sparseVector"),
+setMethod("zapsmall", c(x = "sparseVector"),
           function(x, digits = getOption("digits")) {
               x <- .V2kind(x, ",")
               x@x <- zapsmall(x@x, digits = digits)

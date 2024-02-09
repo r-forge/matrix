@@ -140,9 +140,9 @@ function(x,
               ...)
 }
 
-setMethod("image", signature(x = "dgTMatrix"), .image.dgT)
+setMethod("image", c(x = "dgTMatrix"), .image.dgT)
 
-setMethod("image", signature(x = "Matrix"),
+setMethod("image", c(x = "Matrix"),
           function(x, ...) {
               if(.M.kind(x) == "z")
                   stop(gettextf("%s(<%s>) is not yet implemented",
@@ -151,7 +151,7 @@ setMethod("image", signature(x = "Matrix"),
               image(.M2kind(.M2gen(.M2T(x)), "d"), ...)
           })
 
-setMethod("image", signature(x = "CHMfactor"),
+setMethod("image", c(x = "CHMfactor"),
           function(x, ...)
               image(.M2gen(.M2T(expand1(x, "L"))), ...))
 

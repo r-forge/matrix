@@ -13,22 +13,22 @@
 
 ## .... denseMatrix ....................................................
 
-setMethod("Logic", signature(e1 = "denseMatrix", e2 = "denseMatrix"),
+setMethod("Logic", c(e1 = "denseMatrix", e2 = "denseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "denseMatrix", e2 = "sparseMatrix"),
+setMethod("Logic", c(e1 = "denseMatrix", e2 = "sparseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "denseMatrix", e2 = "sparseVector"),
+setMethod("Logic", c(e1 = "denseMatrix", e2 = "sparseVector"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "denseMatrix", e2 = "vector"),
+setMethod("Logic", c(e1 = "denseMatrix", e2 = "vector"),
           function(e1, e2) {
 
           })
@@ -36,22 +36,22 @@ setMethod("Logic", signature(e1 = "denseMatrix", e2 = "vector"),
 
 ## .... sparseMatrix ...................................................
 
-setMethod("Logic", signature(e1 = "sparseMatrix", e2 = "denseMatrix"),
+setMethod("Logic", c(e1 = "sparseMatrix", e2 = "denseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "sparseMatrix", e2 = "sparseMatrix"),
+setMethod("Logic", c(e1 = "sparseMatrix", e2 = "sparseMatrix"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "sparseMatrix", e2 = "sparseVector"),
+setMethod("Logic", c(e1 = "sparseMatrix", e2 = "sparseVector"),
           function(e1, e2) {
 
           })
 
-setMethod("Logic", signature(e1 = "sparseMatrix", e2 = "vector"),
+setMethod("Logic", c(e1 = "sparseMatrix", e2 = "vector"),
           function(e1, e2) {
 
           })
@@ -59,10 +59,10 @@ setMethod("Logic", signature(e1 = "sparseMatrix", e2 = "vector"),
 
 ## .... sparseVector ...................................................
 
-setMethod("Logic", signature(e1 = "sparseVector", e2 = "Matrix"),
+setMethod("Logic", c(e1 = "sparseVector", e2 = "Matrix"),
           .Logic.swap)
 
-setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
+setMethod("Logic", c(e1 = "sparseVector", e2 = "sparseVector"),
           function(e1, e2) {
               if(e1.longer <- (n <- length(e1)) > (N <- length(e2))) {
                   tmp <- n
@@ -123,7 +123,7 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "sparseVector"),
               r
           })
 
-setMethod("Logic", signature(e1 = "sparseVector", e2 = "vector"),
+setMethod("Logic", c(e1 = "sparseVector", e2 = "vector"),
           function(e1, e2) {
               if(e1.longer <- (n <- length(e1)) > (N <- length(e2))) {
                   tmp <- n
@@ -158,8 +158,8 @@ setMethod("Logic", signature(e1 = "sparseVector", e2 = "vector"),
 
 ## .... vector .........................................................
 
-setMethod("Logic", signature(e1 = "vector", e2 = "Matrix"),
+setMethod("Logic", c(e1 = "vector", e2 = "Matrix"),
           .Logic.swap)
 
-setMethod("Logic", signature(e1 = "vector", e2 = "sparseVector"),
+setMethod("Logic", c(e1 = "vector", e2 = "sparseVector"),
           .Logic.swap)

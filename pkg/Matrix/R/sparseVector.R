@@ -2,7 +2,7 @@
 ## sparse vectors
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("diff", signature(x = "sparseVector"),
+setMethod("diff", c(x = "sparseVector"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
               if(length(lag) != 1L || length(differences) != 1L ||
@@ -18,7 +18,7 @@ setMethod("diff", signature(x = "sparseVector"),
               x
           })
 
-setMethod("mean", signature(x = "sparseVector"),
+setMethod("mean", c(x = "sparseVector"),
           function(x, trim = 0, na.rm = FALSE, ...) {
               kind <- .M.kind(x)
               if(kind == "z" && trim > 0)
@@ -160,7 +160,7 @@ setMethod("mean", signature(x = "sparseVector"),
     x
 }
 
-setMethod("rep", signature(x = "sparseVector"),
+setMethod("rep", c(x = "sparseVector"),
           function(x, times, length.out, each, ...) {
               if(!missing(each))
                   x <- .V.rep.each(x, each)
@@ -222,14 +222,14 @@ setMethod("rep", signature(x = "sparseVector"),
 
 if(FALSE) {
 ## MJ: once 'sort' becomes implicit generic in package 'methods' :
-setMethod("sort", signature(x = "sparseVector"), .V.sort)
+setMethod("sort", c(x = "sparseVector"), .V.sort)
 ## TODO: parallel method for internal generic 'xtfrm'
 }
 
-setMethod("t", signature(x = "sparseVector"),
+setMethod("t", c(x = "sparseVector"),
           function(x) .tCRT(.V2C(x)))
 
-setMethod("toeplitz", signature(x = "sparseVector"),
+setMethod("toeplitz", c(x = "sparseVector"),
           function(x, symmetric = TRUE, repr = c("C", "R", "T"),
                    giveCsparse, ...) {
               n <- length(x)
