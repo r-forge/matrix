@@ -102,7 +102,7 @@ setMethod("tril", signature(x = "indMatrix"),
           function(x, k = 0L, ...) tril(.M2kind(x, "n"), k, ...))
 
 setMethod("diag", signature(x = "indMatrix"),
-          function(x, nrow, ncol, names = TRUE) {
+          function(x = 1, nrow, ncol, names = TRUE) {
               if((m <- min(x@Dim)) == 0L)
                   return(logical(0L))
               i <- seq_len(m)

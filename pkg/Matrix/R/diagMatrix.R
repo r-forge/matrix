@@ -36,7 +36,7 @@ setMethod("tril", signature(x = "diagonalMatrix"),
           })
 
 setMethod("diag", signature(x = "diagonalMatrix"),
-          function(x, nrow, ncol, names = TRUE) {
+          function(x = 1, nrow, ncol, names = TRUE) {
               kind <- .M.kind(x)
               r <-
                   if(x@diag != "N") {

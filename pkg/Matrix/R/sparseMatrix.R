@@ -8,7 +8,7 @@
     .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0L, ...)
     .Call(R_sparse_band, x, NULL, k)
-.sparse.diag.get <- function(x, nrow, ncol, names = TRUE)
+.sparse.diag.get <- function(x = 1, nrow, ncol, names = TRUE)
     .Call(R_sparse_diag_get, x, names)
 .sparse.diag.set <- function(x, value)
     .Call(R_sparse_diag_set, x, value)
