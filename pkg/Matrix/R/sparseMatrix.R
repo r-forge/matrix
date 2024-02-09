@@ -88,7 +88,7 @@ setMethod("diff", signature(x = "sparseMatrix"),
 setMethod("mean", signature(x = "sparseMatrix"),
           function(x, ...) mean(as(x, "sparseVector"), ...))
 
-setMethod("rep", "sparseMatrix",
+setMethod("rep", signature(x = "sparseMatrix"),
           function(x, ...)  rep(as(x, "sparseVector"), ...))
 
 for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {

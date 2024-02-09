@@ -488,37 +488,37 @@ setMethod("show", signature(object = "diagonalMatrix"),
               }
           })
 
-setMethod("show", "MatrixFactorization",
+setMethod("show", signature(object = "MatrixFactorization"),
           function(object) {
               cat("matrix factorization of ")
               str(object)
           })
 
-setMethod("show", "CholeskyFactorization",
+setMethod("show", signature(object = "CholeskyFactorization"),
           function(object) {
               cat("Cholesky factorization of ")
               str(object)
           })
 
-setMethod("show", "BunchKaufmanFactorization",
+setMethod("show", signature(object = "BunchKaufmanFactorization"),
           function(object) {
               cat("Bunch-Kaufman factorization of ")
               str(object)
           })
 
-setMethod("show", "SchurFactorization",
+setMethod("show", signature(object = "SchurFactorization"),
           function(object) {
               cat("Schur factorization of ")
               str(object)
           })
 
-setMethod("show", "LU",
+setMethod("show", signature(object = "LU"),
           function(object) {
               cat("LU factorization of ")
               str(object)
           })
 
-setMethod("show", "QR",
+setMethod("show", signature(object = "QR"),
           function(object) {
               cat("QR factorization of ")
               str(object)

@@ -43,7 +43,8 @@ setClass("Matrix",
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object) .Call(Matrix_validate, object))
 
-setMethod("initialize", "Matrix", .initialize)
+setMethod("initialize", signature(.Object = "Matrix"),
+          .initialize)
 
 
 ## ------ Virtual by structure -----------------------------------------
@@ -204,7 +205,7 @@ if(FALSE) { # --NOT YET--
 ## as in the call new("dgCMatrix", Dim = c(6L, 6L)).  However, they would
 ## also incur a small performance penalty on all other new("..[CR]Matrix")
 ## calls.
-setMethod("initialize", "CsparseMatrix",
+setMethod("initialize", signature(.Object = "CsparseMatrix"),
           function(.Object, ...) {
               ## Suboptimal if ...names() is NULL or if 'Dim' is missing
               ## but that will "never" happen if ...length() is nonzero:
@@ -216,7 +217,7 @@ setMethod("initialize", "CsparseMatrix",
               else callNextMethod()
           })
 
-setMethod("initialize", "RsparseMatrix",
+setMethod("initialize", signature(.Object = "RsparseMatrix"),
           function(.Object, ...) {
               ## Suboptimal if ...names() is NULL or if 'Dim' is missing
               ## but that will "never" happen if ...length() is nonzero:
@@ -556,7 +557,8 @@ setClass("MatrixFactorization",
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object).Call(MatrixFactorization_validate, object))
 
-setMethod("initialize", "MatrixFactorization", .initialize)
+setMethod("initialize", signature(.Object = "MatrixFactorization"),
+          .initialize)
 
 
 ## ------ LU -----------------------------------------------------------
@@ -765,7 +767,7 @@ setClass("sparseVector",
          validity = function(object) .Call(sparseVector_validate, object))
 
 ## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
-setMethod("initialize", "sparseVector",
+setMethod("initialize", signature(.Object = "sparseVector"),
           function(.Object, i, x, ...) {
               if(has.x <- !missing(x))
                   x <- x # MJ: why is this necessary?

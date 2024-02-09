@@ -44,8 +44,10 @@ c.sparseVector <- function(...) {
 ## These are insufficient as dispatch only consides the first argument,
 ## which need not be a Matrix or sparseVector:
 if(FALSE) {
-setMethod("c",       "Matrix", function(x, ...) c.Matrix      (x, ...))
-setMethod("c", "sparseVector", function(x, ...) c.sparseVector(x, ...))
+setMethod("c", signature(x = "Matrix"),
+          function(x, ...) c.Matrix      (x, ...))
+setMethod("c", signature(x = "sparseVector"),
+          function(x, ...) c.sparseVector(x, ...))
 }
 
 
