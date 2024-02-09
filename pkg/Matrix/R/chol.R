@@ -206,13 +206,13 @@ setAs("pCholesky", "dtpMatrix",
       })
 
 setMethod("diag", signature(x = "Cholesky"),
-          function(x, nrow, ncol, names = TRUE) {
+          function(x = 1, nrow, ncol, names = TRUE) {
               d <- diag(as(x, "dtrMatrix"), names = FALSE)
               d * d
           })
 
 setMethod("diag", signature(x = "pCholesky"),
-          function(x, nrow, ncol, names = TRUE) {
+          function(x = 1, nrow, ncol, names = TRUE) {
               d <- diag(as(x, "dtpMatrix"), names = FALSE)
               d * d
           })
@@ -371,7 +371,7 @@ setAs("CHMsuper", "dgCMatrix",
       })
 
 setMethod("diag", signature(x = "CHMfactor"),
-          function(x, nrow, ncol, names = TRUE)
+          function(x = 1, nrow, ncol, names = TRUE)
               .Call(CHMfactor_diag_get, x, TRUE))
 
 setMethod("expand1", signature(x = "CHMsimpl"),

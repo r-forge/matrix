@@ -8,7 +8,7 @@
     .Call(R_dense_band, x, k, NULL)
 .dense.tril <- function(x, k = 0L, ...)
     .Call(R_dense_band, x, NULL, k)
-.dense.diag.get <- function(x, nrow, ncol, names = TRUE)
+.dense.diag.get <- function(x = 1, nrow, ncol, names = TRUE)
     .Call(R_dense_diag_get, x, names)
 .dense.diag.set <- function(x, value)
     .Call(R_dense_diag_set, x, value)

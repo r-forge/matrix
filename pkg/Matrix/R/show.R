@@ -1,6 +1,7 @@
 prMatrix <- function(x,
                      digits = getOption("digits"),
-                     maxp = getOption("max.print")) {
+                     maxp = getOption("max.print"),
+                     ...) {
     d <- dim(x)
     cl <- class(x) ## cld <- getClassDef(cl)
     tri <- extends(cl, "triangularMatrix")
@@ -30,7 +31,9 @@ prMatrix <- function(x,
 prTriang <- function(x,
                      digits = getOption("digits"),
                      maxp = getOption("max.print"),
-                     justify = "none", right = TRUE) {
+                     justify = "none",
+                     right = TRUE,
+                     ...) {
     ## modeled along stats:::print.dist
     upper <- x@uplo == "U"
     m <- as(x, "matrix")
@@ -41,8 +44,11 @@ prTriang <- function(x,
     invisible(x)
 }
 
-prDiag <- function(x, digits = getOption("digits"),
-                   justify = "none", right = TRUE) {
+prDiag <- function(x,
+                   digits = getOption("digits"),
+                   justify = "none",
+                   right = TRUE,
+                   ...) {
     cf <- array(".", dim = x@Dim, dimnames = x@Dimnames)
     cf[row(cf) == col(cf)] <-
         vapply(diag(x), format, "", digits = digits, justify = justify)
@@ -222,7 +228,8 @@ formatSpMatrix <- function(x,
                            col.names,
                            note.dropping.colnames = TRUE,
                            uniDiag = TRUE,
-                           align = c("fancy", "right")) {
+                           align = c("fancy", "right"),
+                           ...) {
     stopifnot(extends(cld, "sparseMatrix"))
     validObject(x) # have seen seg.faults for invalid objects
     d <- dim(x)
@@ -279,7 +286,8 @@ printSpMatrix <- function(x,
                           note.dropping.colnames = TRUE,
                           uniDiag = TRUE,
                           col.trailer = "",
-                          align = c("fancy", "right")) {
+                          align = c("fancy", "right"),
+                          ...) {
     stopifnot(extends(cld, "sparseMatrix"))
     cx <- formatSpMatrix(x, digits=digits, maxp=maxp, cld=cld,
                          zero.print=zero.print, col.names=col.names,
@@ -305,7 +313,8 @@ printSpMatrix2 <- function(x,
                            col.trailer = if(suppCols) "......" else "",
                            align = c("fancy", "right"),
                            width = getOption("width"),
-                           fitWidth = TRUE) {
+                           fitWidth = TRUE,
+                           ...) {
     d <- dim(x)
     cl <- class(x)
     cld <- getClassDef(cl)
@@ -418,7 +427,8 @@ printSpMatrix2 <- function(x,
 prSpVector <- function(x,
                        digits = getOption("digits"),
                        maxp = getOption("max.print"),
-                       zero.print = ".")
+                       zero.print = ".",
+                       ...)
 {
     cld <- getClassDef(class(x))
     stopifnot(extends(cld, "sparseVector"), maxp >= 1)
@@ -581,7 +591,8 @@ setMethod("summary", signature(object = "diagonalMatrix"),
               r
           })
 
-print.sparseSummary <- print.diagSummary <- function (x, ...) {
+print.sparseSummary <- print.diagSummary <-
+function (x, ...) {
     cat(attr(x, "header"), "\n", sep = "")
     NextMethod()
     invisible(x)

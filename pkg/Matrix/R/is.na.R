@@ -2,7 +2,7 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("anyNA", signature(x = "denseMatrix"),
-          function(x) {
+          function(x, recursive = FALSE) {
               cl <- .M.nonvirtual(x)
               if(substr(cl, 1L, 1L)  == "n")
                   return(FALSE)
@@ -19,16 +19,20 @@ setMethod("anyNA", signature(x = "denseMatrix"),
           })
 
 setMethod("anyNA", signature(x = "sparseMatrix"),
-          function(x) .M.kind(x) != "n" && anyNA(x@x))
+          function(x, recursive = FALSE)
+              .M.kind(x) != "n" && anyNA(x@x))
 
 setMethod("anyNA", signature(x = "diagonalMatrix"),
-          function(x) .M.kind(x) != "n" && length(y <- x@x) > 0L && anyNA(y))
+          function(x, recursive = FALSE)
+              .M.kind(x) != "n" && length(y <- x@x) > 0L && anyNA(y))
 
 setMethod("anyNA", signature(x = "indMatrix"),
-          function(x) FALSE)
+          function(x, recursive = FALSE)
+              FALSE)
 
 setMethod("anyNA", signature(x = "sparseVector"),
-          function(x) .M.kind(x) != "n" && anyNA(x@x))
+          function(x, recursive = FALSE)
+              .M.kind(x) != "n" && anyNA(x@x))
 
 
 ## METHODS FOR GENERIC: is.na
