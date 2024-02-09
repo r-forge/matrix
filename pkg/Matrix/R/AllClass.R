@@ -138,28 +138,28 @@ setClass("packedMatrix",
 
 ## Virtual class of dense, nonzero pattern matrices
 setClass("ndenseMatrix",
-         contains = c("VIRTUAL", "denseMatrix", "nMatrix"),
+         contains = c("VIRTUAL", "nMatrix", "denseMatrix"),
          slots = c(x = "logical"),
          validity = function(object) .Call(nMatrix_validate, object))
 
 ## Virtual class of dense, logical matrices
 setClass("ldenseMatrix",
-         contains = c("VIRTUAL", "denseMatrix", "lMatrix"))
+         contains = c("VIRTUAL", "lMatrix", "denseMatrix"))
 
 if(FALSE) { # --NOT YET--
 ## Virtual class of dense, integer matrices
 setClass("idenseMatrix",
-         contains = c("VIRTUAL", "denseMatrix", "iMatrix"))
+         contains = c("VIRTUAL", "iMatrix", "denseMatrix"))
 } # --NOT YET--
 
 ## Virtual class of dense, double matrices
 setClass("ddenseMatrix",
-         contains = c("VIRTUAL", "denseMatrix", "dMatrix"))
+         contains = c("VIRTUAL", "dMatrix", "denseMatrix"))
 
 if(FALSE) { # --NOT YET--
 ## Virtual class of dense, complex matrices
 setClass("zdenseMatrix",
-         contains = c("VIRTUAL", "denseMatrix", "zMatrix"))
+         contains = c("VIRTUAL", "zMatrix", "denseMatrix"))
 } # --NOT YET--
 
 
@@ -236,26 +236,26 @@ setMethod("initialize", c(.Object = "RsparseMatrix"),
 ## Virtual class of sparse, nonzero pattern matrices
 ## * these are the "pattern" matrices from "symbolic analysis" of sparse OPs
 setClass("nsparseMatrix",
-         contains = c("VIRTUAL", "sparseMatrix", "nMatrix"))
+         contains = c("VIRTUAL", "nMatrix", "sparseMatrix"))
 
 ## Virtual class of sparse, logical matrices
 setClass("lsparseMatrix",
-         contains = c("VIRTUAL", "sparseMatrix", "lMatrix"))
+         contains = c("VIRTUAL", "lMatrix", "sparseMatrix"))
 
 if(FALSE) { # --NOT YET--
 ## Virtual class of sparse, integer matrices
 setClass("isparseMatrix",
-         contains = c("VIRTUAL", "sparseMatrix", "iMatrix"))
+         contains = c("VIRTUAL", "iMatrix", "sparseMatrix"))
 } # --NOT YET--
 
 ## Virtual class of sparse, double matrices
 setClass("dsparseMatrix",
-         contains = c("VIRTUAL", "sparseMatrix", "dMatrix"))
+         contains = c("VIRTUAL", "dMatrix", "sparseMatrix"))
 
 if(FALSE) { # --NOT YET--
 ## Virtual class of sparse, complex matrices
 setClass("zsparseMatrix",
-         contains = c("VIRTUAL", "sparseMatrix", "zMatrix"))
+         contains = c("VIRTUAL", "zMatrix", "sparseMatrix"))
 } # --NOT YET--
 
 
