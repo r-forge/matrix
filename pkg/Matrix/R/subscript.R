@@ -141,6 +141,7 @@
                 if(x.length > .Machine$integer.max)
                     m <- as.double(m)
                 i[w] <- m * i.. + j.. + 1L
+                unsorted <- TRUE # Bug #6839
             }
         }
     }
