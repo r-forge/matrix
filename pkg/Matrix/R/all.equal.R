@@ -43,7 +43,8 @@ function(x, exclude.informal, exclude.factors) {
                  "g" = if(exclude.factors) "factors",
                  "s" = c("uplo", if(exclude.factors) "factors"),
                  "t" = c("uplo", "diag"),
-                 "d" = "diag"))
+                 "d" = "diag",
+                 "i" = if(exclude.factors) "factors"))
     else "class"
     nms <- names(a)
     i <- match(nms, exclude, 0L) == 0L
