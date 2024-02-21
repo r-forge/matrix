@@ -378,5 +378,5 @@ stopifnot(all.equal(A5, as(Reduce(`\%*\%`, e.ch.A5), "symmetricMatrix")))
 
 ## Version of the SuiteSparse library, which includes CHOLMOD
 Mv <- Matrix.Version()
-Mv[["SuiteSparse"]]
+Mv[["suitesparse"]]
 }
