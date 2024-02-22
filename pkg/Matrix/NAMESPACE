@@ -360,7 +360,7 @@ exportClasses(Matrix, # and its subclasses .............................
               dpoMatrix,
               dppMatrix,
               corMatrix,
-              pcorMatrix,
+              copMatrix,
 
               dsparseMatrix,
               dgCMatrix,

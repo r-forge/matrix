@@ -55,7 +55,7 @@ SEXP packedMatrix_validate(SEXP);
 SEXP dpoMatrix_validate(SEXP);
 SEXP dppMatrix_validate(SEXP);
 SEXP corMatrix_validate(SEXP);
-SEXP pcorMatrix_validate(SEXP);
+SEXP copMatrix_validate(SEXP);
 
 SEXP sparseVector_validate(SEXP);
 SEXP lsparseVector_validate(SEXP);

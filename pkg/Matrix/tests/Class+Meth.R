@@ -13,7 +13,7 @@ stopifnot(exprs = {
     MatrixClass( "dpoMatrix") == "dsyMatrix"
     MatrixClass( "dppMatrix") == "dspMatrix"
     MatrixClass( "corMatrix") == "dsyMatrix"
-    MatrixClass("pcorMatrix") == "dspMatrix"
+    MatrixClass( "copMatrix") == "dspMatrix"
     identical(MatrixClass("indMatrix"), character(0L))
     identical(MatrixClass(  "pMatrix"), character(0L))
 })
@@ -255,7 +255,7 @@ tstMatrixClass <-
 		stopifnot(Qidentical(m, m0.)); cat("ok; ")
 	    }
             is_p <- extends(clD, "indMatrix")
-            is_cor <- extends(clD, "corMatrix") || extends(clD, "pcorMatrix")
+            is_cor <- extends(clD, "corMatrix") || extends(clD, "copMatrix")
             ## ^^^ has diagonal divided out
 	    if(canCoerce(mm, clNam)) { ## replace 'm' by `non-empty' version
 		cat("canCoerce(mm, *) ")
