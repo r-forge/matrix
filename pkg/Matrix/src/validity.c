@@ -23,15 +23,6 @@
    Called by various class validity methods (see below).
 */
 
-/**
- * Test that `dim` is a length-2, non-negative integer vector.
- *
- * @param dim A `SEXP`,
- *     typically the `Dim` slot of a (to be validated) `Matrix`.
- *
- * @return A string containing an error message, empty if `dim`
- *     is valid.
- */
 char *Dim_validate(SEXP dim)
 {
 	if (TYPEOF(dim) != INTSXP)
@@ -53,18 +44,6 @@ SEXP R_Dim_validate(SEXP dim)
 	return (msg) ? mkString(msg) : ScalarLogical(1);
 }
 
-/**
- * Test that `dimnames` is a valid length-2 list.
- *
- * @param dimnames A `SEXP`,
- *     typically the `Dimnames` slot of a (to be validated) `Matrix`.
- * @param pdim Pointer to a length-2, non-negative `int` array,
- *     typically from the `Dim` slot of a (to be validated) `Matrix`.
- *     Array validity _must_ be checked by the caller.
- *
- * @return A string containing an error message, empty if `dimnames`
- *     is valid.
- */
 char *DimNames_validate(SEXP dimnames, int *pdim)
 {
 	if (TYPEOF(dimnames) != VECSXP)
@@ -103,18 +82,6 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 	return (msg) ? mkString(msg) : ScalarLogical(1);
 }
 
-/**
- * @brief Sanitize user-supplied `[dD]imnames`.
- *
- * Replaces length-0 vectors with `NULL` and non-character vectors
- * with the result of coercing to character. Intended to emulate the
- * behaviour of `do_matrix()` from `src/main/array.c`.
- *
- * @param dn A list of length 2 passing `DimNames_validate()`.
- *
- * @return A modified copy of `dn`, or `dn` if no modification is
- *    necessary.
- */
 SEXP R_DimNames_fixup(SEXP dn)
 {
 	SEXP s;
