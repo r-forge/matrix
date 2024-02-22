@@ -286,37 +286,6 @@ SEXP packedMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP diagonalMatrix_validate(SEXP obj)
-{
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
-		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
-
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	if (TYPEOF(diag) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
-	if (XLENGTH(diag) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
-	const char *di = CHAR(STRING_ELT(diag, 0));
-	if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
-	int nonunit = di[0] == 'N';
-
-	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (nonunit) {
-		if (XLENGTH(x) != n)
-			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			      "diag", "N", "x", "Dim[1]");
-	} else {
-		if (XLENGTH(x) != 0)
-			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			      "diag", "U", "x",      "0");
-	}
-
-	return ScalarLogical(1);
-}
-
 SEXP CsparseMatrix_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -453,6 +422,37 @@ SEXP TsparseMatrix_validate(SEXP obj)
 			++pi;
 			++pj;
 		}
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP diagonalMatrix_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+
+	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	if (TYPEOF(diag) != STRSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
+	if (XLENGTH(diag) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
+	const char *di = CHAR(STRING_ELT(diag, 0));
+	if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
+		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
+	int nonunit = di[0] == 'N';
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (nonunit) {
+		if (XLENGTH(x) != n)
+			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
+			      "diag", "N", "x", "Dim[1]");
+	} else {
+		if (XLENGTH(x) != 0)
+			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
+			      "diag", "U", "x",      "0");
 	}
 
 	return ScalarLogical(1);
