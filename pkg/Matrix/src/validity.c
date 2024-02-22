@@ -82,19 +82,19 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 	return (msg) ? mkString(msg) : ScalarLogical(1);
 }
 
-SEXP R_DimNames_fixup(SEXP dn)
+SEXP R_DimNames_fixup(SEXP dimnames)
 {
 	SEXP s;
 	int i, fixup = 0;
 	for (i = 0; i < 2 && !fixup; ++i)
 		fixup =
-			(s = VECTOR_ELT(dn, i)) != R_NilValue &&
+			(s = VECTOR_ELT(dimnames, i)) != R_NilValue &&
 			(LENGTH(s) == 0 || TYPEOF(s) != STRSXP);
 	if (!fixup)
-		return dn;
-	SEXP dn_ = PROTECT(allocVector(VECSXP, 2));
+		return dimnames;
+	SEXP dimnames_ = PROTECT(allocVector(VECSXP, 2));
 	for (i = 0; i < 2; ++i) {
-		if ((s = VECTOR_ELT(dn, i)) == R_NilValue || LENGTH(s) == 0)
+		if ((s = VECTOR_ELT(dimnames, i)) == R_NilValue || LENGTH(s) == 0)
 			continue;
 		if (TYPEOF(s) == STRSXP)
 			PROTECT(s);
@@ -105,17 +105,17 @@ SEXP R_DimNames_fixup(SEXP dn)
 			SET_ATTRIB(s, R_NilValue);
 			SET_OBJECT(s, 0);
 		}
-		SET_VECTOR_ELT(dn_, i, s);
+		SET_VECTOR_ELT(dimnames_, i, s);
 		UNPROTECT(1); /* s */
 	}
-	s = getAttrib(dn, R_NamesSymbol);
+	s = getAttrib(dimnames, R_NamesSymbol);
 	if (s != R_NilValue) {
 		PROTECT(s);
-		setAttrib(dn_, R_NamesSymbol, s);
+		setAttrib(dimnames_, R_NamesSymbol, s);
 		UNPROTECT(1); /* s */
 	}
-	UNPROTECT(1); /* dn_ */
-	return dn_;
+	UNPROTECT(1); /* dimnames_ */
+	return dimnames_;
 }
 
 
