@@ -264,6 +264,28 @@ SEXP triangularMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
+SEXP unpackedMatrix_validate(SEXP obj)
+{
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+	UNPROTECT(2); /* dim, x */
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
+	return ScalarLogical(1);
+}
+
+SEXP packedMatrix_validate(SEXP obj)
+{
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+	UNPROTECT(2); /* dim, x */
+	int n = INTEGER(dim)[0];
+	if (XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+		RMKMS(_("'%s' slot does not have length %s"), "x", "Dim[1]*(Dim[1]+1)/2");
+	return ScalarLogical(1);
+}
+
 SEXP diagonalMatrix_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -290,70 +312,6 @@ SEXP diagonalMatrix_validate(SEXP obj)
 		if (XLENGTH(x) != 0)
 			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
 			      "diag", "U", "x",      "0");
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP indMatrix_validate(SEXP obj)
-{
-	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
-	if (TYPEOF(margin) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "margin", "integer");
-	if (XLENGTH(margin) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "margin", 1);
-	int mg = INTEGER(margin)[0] - 1;
-	if (mg != 0 && mg != 1)
-		RMKMS(_("'%s' slot is not %d or %d"), "margin", 1, 2);
-
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
-	if (m > 0 && n == 0) {
-		if (mg == 0)
-			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
-			      "m", "0", "indMatrix", "m", "margin", 1);
-		else
-			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
-			      "0", "n", "indMatrix", "n", "margin", 2);
-	}
-
-	SEXP perm = GET_SLOT(obj, Matrix_permSym);
-	if (TYPEOF(perm) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
-	if (XLENGTH(perm) != m)
-		RMKMS(_("'%s' slot does not have length %s"), "perm", "Dim[margin]");
-	int *pperm = INTEGER(perm);
-	while (m--) {
-		if (*pperm == NA_INTEGER)
-			RMKMS(_("'%s' slot contains NA"), "perm");
-		if (*pperm < 1 || *pperm > n)
-			RMKMS(_("'%s' slot has elements not in {%s}"),
-			      "perm", "1,...,Dim[1+margin%%2]");
-		++pperm;
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP pMatrix_validate(SEXP obj)
-{
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
-		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
-
-	if (n > 1) {
-		SEXP perm = GET_SLOT(obj, Matrix_permSym);
-		char *work;
-		int lwork = n;
-		Matrix_Calloc(work, lwork, char);
-		int j, *pperm = INTEGER(perm);
-		for (j = 0; j < n; ++j) {
-			if (work[*pperm - 1])
-				FRMKMS(_("'%s' slot contains duplicates"), "perm");
-			work[*(pperm++) - 1] = 1;
-		}
-		Matrix_Free(work, lwork);
 	}
 
 	return ScalarLogical(1);
@@ -495,6 +453,70 @@ SEXP TsparseMatrix_validate(SEXP obj)
 			++pi;
 			++pj;
 		}
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP indMatrix_validate(SEXP obj)
+{
+	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
+	if (TYPEOF(margin) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "margin", "integer");
+	if (XLENGTH(margin) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "margin", 1);
+	int mg = INTEGER(margin)[0] - 1;
+	if (mg != 0 && mg != 1)
+		RMKMS(_("'%s' slot is not %d or %d"), "margin", 1, 2);
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
+	if (m > 0 && n == 0) {
+		if (mg == 0)
+			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
+			      "m", "0", "indMatrix", "m", "margin", 1);
+		else
+			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
+			      "0", "n", "indMatrix", "n", "margin", 2);
+	}
+
+	SEXP perm = GET_SLOT(obj, Matrix_permSym);
+	if (TYPEOF(perm) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
+	if (XLENGTH(perm) != m)
+		RMKMS(_("'%s' slot does not have length %s"), "perm", "Dim[margin]");
+	int *pperm = INTEGER(perm);
+	while (m--) {
+		if (*pperm == NA_INTEGER)
+			RMKMS(_("'%s' slot contains NA"), "perm");
+		if (*pperm < 1 || *pperm > n)
+			RMKMS(_("'%s' slot has elements not in {%s}"),
+			      "perm", "1,...,Dim[1+margin%%2]");
+		++pperm;
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP pMatrix_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+
+	if (n > 1) {
+		SEXP perm = GET_SLOT(obj, Matrix_permSym);
+		char *work;
+		int lwork = n;
+		Matrix_Calloc(work, lwork, char);
+		int j, *pperm = INTEGER(perm);
+		for (j = 0; j < n; ++j) {
+			if (work[*pperm - 1])
+				FRMKMS(_("'%s' slot contains duplicates"), "perm");
+			work[*(pperm++) - 1] = 1;
+		}
+		Matrix_Free(work, lwork);
 	}
 
 	return ScalarLogical(1);
@@ -835,28 +857,6 @@ SEXP xtTMatrix_validate(SEXP obj)
 	if (TYPEOF(val) != STRSXP)
 		val = tTMatrix_validate(obj);
 	return val;
-}
-
-SEXP unpackedMatrix_validate(SEXP obj)
-{
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	UNPROTECT(2); /* dim, x */
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
-		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
-	return ScalarLogical(1);
-}
-
-SEXP packedMatrix_validate(SEXP obj)
-{
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	UNPROTECT(2); /* dim, x */
-	int n = INTEGER(dim)[0];
-	if (XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
-		RMKMS(_("'%s' slot does not have length %s"), "x", "Dim[1]*(Dim[1]+1)/2");
-	return ScalarLogical(1);
 }
 
 SEXP dpoMatrix_validate(SEXP obj)
