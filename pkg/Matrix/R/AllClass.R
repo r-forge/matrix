@@ -534,7 +534,7 @@ setClass("dpTMatrix",
 
 ## Row or column index
 setClass("indMatrix",
-         contains = c("sparseMatrix", "generalMatrix"),
+         contains = "sparseMatrix",
          slots = c(perm = "integer", margin = "integer"),
          prototype = list(margin = 1L), # to be valid
          validity = function(object) .Call(indMatrix_validate, object))

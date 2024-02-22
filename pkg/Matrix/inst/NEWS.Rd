@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-02-21 r4587)}{
+\section{Changes in version 1.7-0 (2024-02-22 r4598)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -28,6 +28,13 @@
       \code{cs_house} between SuiteSparse libraries CSparse and
       CXSparse.  Accordingly, the validity method for class
       \code{sparseQR} no longer complains about negative \code{diag(R)}.
+
+      \item \code{indMatrix} no longer extends virtual class
+      \code{compMatrix} and so no longer inherits a (never used)
+      \code{factors} slot.
+      Objects serialized under \pkg{Matrix} \code{< 1.7-0} and
+      unserialized under \pkg{Matrix} \code{>= 1.7-0} remain valid,
+      retaining a harmless \code{factors} \emph{attribute}.
     }
   }
   \subsection{New Features}{
