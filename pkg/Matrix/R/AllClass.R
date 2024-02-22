@@ -344,10 +344,10 @@ setClass("dppMatrix",
          validity = function(object) .Call(dppMatrix_validate, object))
 
 ## Packed, symmetric, positive semidefinite, correlation
-setClass("pcorMatrix",
+setClass("copMatrix",
          contains = "dppMatrix",
          slots = c(sd = "numeric"),
-         validity = function(object) .Call(pcorMatrix_validate, object))
+         validity = function(object) .Call(copMatrix_validate, object))
 
 ## Packed, triangular
 setClass("dtpMatrix",

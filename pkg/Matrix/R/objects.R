@@ -1,6 +1,6 @@
 ## if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
 ## if strict= TRUE then may also give one of these:
-## "dpoMatrix", "dppMatrix", "corMatrix", "pcorMatrix", "pMatrix"
+## "dpoMatrix", "dppMatrix", "corMatrix", "copMatrix", "pMatrix"
 .M.nonvirtual <- function(x, strict = FALSE)
     .Call(R_Matrix_nonvirtual, x, strict)
 

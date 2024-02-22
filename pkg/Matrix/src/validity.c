@@ -934,7 +934,7 @@ SEXP corMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP pcorMatrix_validate(SEXP obj)
+SEXP copMatrix_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
@@ -1884,8 +1884,8 @@ void validObject(SEXP obj, const char *cl)
 		IS_VALID(packedMatrix);
 		if (cl[1] == 'p') {
 			IS_VALID(dppMatrix);
-			if (cl_[0] == 'p' && cl_[1] == 'c')
-				IS_VALID(pcorMatrix);
+			if (cl_[0] == 'c')
+				IS_VALID(copMatrix);
 		}
 	}
 

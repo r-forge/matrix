@@ -163,7 +163,7 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                              else .Call(dsyMatrix_rcond, x, trf, norm)
                          },
                      "pp" = ,
-                     "co" = # pcorMatrix
+                     "op" = # copMatrix
                          {
                              ok <- TRUE
                              trf <- tryCatch(
