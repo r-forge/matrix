@@ -124,12 +124,13 @@ setClass("denseMatrix",
 ## Virtual class of dense, "unpacked" matrices, s.t. length(.@x) == m*n
 setClass("unpackedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
+         slots = c(x = "vector"),
          validity = function(object) .Call(unpackedMatrix_validate, object))
 
 ## Virtual class of dense, "packed" matrices, s.t. length(.@x) == n*(n+1)/2
 setClass("packedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
-         slots = c(uplo = "character"),
+         slots = c(x = "vector", uplo = "character"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(packedMatrix_validate, object))
 
@@ -196,7 +197,7 @@ setClass("TsparseMatrix",
 ## Virtual class of diagonal matrices
 setClass("diagonalMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
-         slots = c(diag = "character"),
+         slots = c(x = "vector", diag = "character"),
          prototype = list(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
