@@ -859,7 +859,7 @@ SEXP xtTMatrix_validate(SEXP obj)
 	return val;
 }
 
-SEXP dpoMatrix_validate(SEXP obj)
+SEXP xpoMatrix_validate(SEXP obj)
 {
 	/* NB: Non-finite entries are "valid" because we consider
 	   crossprod(x) and tcrossprod(x) to be positive semidefinite
@@ -880,7 +880,7 @@ SEXP dpoMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP dppMatrix_validate(SEXP obj)
+SEXP xppMatrix_validate(SEXP obj)
 {
 	/* NB: Non-finite entries are "valid" because we consider
 	   crossprod(x) and tcrossprod(x) to be positive semidefinite
@@ -1876,14 +1876,14 @@ void validObject(SEXP obj, const char *cl)
 	else if (cl[2] != 'p') {
 		IS_VALID(unpackedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(dpoMatrix);
+			IS_VALID(xpoMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(corMatrix);
 		}
 	} else {
 		IS_VALID(packedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(dppMatrix);
+			IS_VALID(xppMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(copMatrix);
 		}
