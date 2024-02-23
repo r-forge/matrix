@@ -101,8 +101,8 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(unpackedMatrix_validate, 1),
 	CALLDEF(packedMatrix_validate, 1),
 
-	CALLDEF(dpoMatrix_validate, 1),
-	CALLDEF(dppMatrix_validate, 1),
+	CALLDEF(xpoMatrix_validate, 1),
+	CALLDEF(xppMatrix_validate, 1),
 	CALLDEF(corMatrix_validate, 1),
 	CALLDEF(copMatrix_validate, 1),
 

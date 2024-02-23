@@ -322,7 +322,7 @@ setClass("dsyMatrix",
 ## Unpacked, symmetric, positive semidefinite
 setClass("dpoMatrix",
          contains = "dsyMatrix",
-         validity = function(object) .Call(dpoMatrix_validate, object))
+         validity = function(object) .Call(xpoMatrix_validate, object))
 
 ## Unpacked, symmetric, positive semidefinite, correlation
 setClass("corMatrix",
@@ -341,7 +341,7 @@ setClass("dspMatrix",
 ## Packed, symmetric, positive semidefinite
 setClass("dppMatrix",
          contains = "dspMatrix",
-         validity = function(object) .Call(dppMatrix_validate, object))
+         validity = function(object) .Call(xppMatrix_validate, object))
 
 ## Packed, symmetric, positive semidefinite, correlation
 setClass("copMatrix",

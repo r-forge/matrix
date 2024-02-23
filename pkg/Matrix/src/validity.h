@@ -52,8 +52,8 @@ SEXP xtTMatrix_validate(SEXP);
 SEXP unpackedMatrix_validate(SEXP);
 SEXP packedMatrix_validate(SEXP);
 
-SEXP dpoMatrix_validate(SEXP);
-SEXP dppMatrix_validate(SEXP);
+SEXP xpoMatrix_validate(SEXP);
+SEXP xppMatrix_validate(SEXP);
 SEXP corMatrix_validate(SEXP);
 SEXP copMatrix_validate(SEXP);
 
