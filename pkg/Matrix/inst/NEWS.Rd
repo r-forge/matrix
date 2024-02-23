@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-02-22 r4598)}{
+\section{Changes in version 1.7-0 (2024-02-23 r4600)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -54,6 +54,11 @@
       \item The unary subscript \code{x[i]} is correct again for
       \code{x} of class \code{.s[CT]Matrix} and logical \code{i}
       indexing entries outside of the stored triangle.
+
+      \item Virtual classes \code{unpackedMatrix}, \code{packedMatrix},
+      and \code{diagonalMatrix} now formally require an \code{x} slot
+      inheriting from virtual class \code{vector}, as validity methods
+      expect the slot to exist and have a length.
     }
   }
   \subsection{Misc}{
