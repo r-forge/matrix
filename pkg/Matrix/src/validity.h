@@ -22,38 +22,47 @@ SEXP zMatrix_validate(SEXP);
 
 SEXP compMatrix_validate(SEXP);
 SEXP symmetricMatrix_validate(SEXP);
+SEXP HermitianMatrix_validate(SEXP);
 SEXP triangularMatrix_validate(SEXP);
 
+SEXP unpackedMatrix_validate(SEXP);
+SEXP packedMatrix_validate(SEXP);
+SEXP CsparseMatrix_validate(SEXP);
+SEXP RsparseMatrix_validate(SEXP);
+SEXP TsparseMatrix_validate(SEXP);
 SEXP diagonalMatrix_validate(SEXP);
 SEXP indMatrix_validate(SEXP);
 SEXP pMatrix_validate(SEXP);
 
-SEXP CsparseMatrix_validate(SEXP);
-SEXP RsparseMatrix_validate(SEXP);
-SEXP TsparseMatrix_validate(SEXP);
-
 SEXP sCMatrix_validate(SEXP);
+SEXP hCMatrix_validate(SEXP);
 SEXP tCMatrix_validate(SEXP);
 SEXP sRMatrix_validate(SEXP);
+SEXP hRMatrix_validate(SEXP);
 SEXP tRMatrix_validate(SEXP);
 SEXP sTMatrix_validate(SEXP);
+SEXP hTMatrix_validate(SEXP);
 SEXP tTMatrix_validate(SEXP);
 
 SEXP xgCMatrix_validate(SEXP);
 SEXP xsCMatrix_validate(SEXP);
+SEXP xhCMatrix_validate(SEXP);
 SEXP xtCMatrix_validate(SEXP);
 SEXP xgRMatrix_validate(SEXP);
 SEXP xsRMatrix_validate(SEXP);
+SEXP xhRMatrix_validate(SEXP);
 SEXP xtRMatrix_validate(SEXP);
 SEXP xgTMatrix_validate(SEXP);
 SEXP xsTMatrix_validate(SEXP);
+SEXP xhTMatrix_validate(SEXP);
 SEXP xtTMatrix_validate(SEXP);
-
-SEXP unpackedMatrix_validate(SEXP);
-SEXP packedMatrix_validate(SEXP);
 
 SEXP xpoMatrix_validate(SEXP);
 SEXP xppMatrix_validate(SEXP);
+SEXP xpCMatrix_validate(SEXP);
+SEXP xpRMatrix_validate(SEXP);
+SEXP xpTMatrix_validate(SEXP);
+
 SEXP corMatrix_validate(SEXP);
 SEXP copMatrix_validate(SEXP);
 
