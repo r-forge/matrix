@@ -414,8 +414,7 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
-	const char *cl = valid[ivalid];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 	validObject(x, cl);
 
 	switch (cl[2]) {
@@ -795,8 +794,7 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
-	const char *cl = valid[ivalid];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 	validObject(x, cl);
 
 	switch (cl[2]) {
@@ -2180,8 +2178,7 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 0);
-	const char *cl = valid[ivalid];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 0)];
 	validObject(x, cl);
 
 	switch (cl[2]) {
