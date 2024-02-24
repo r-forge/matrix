@@ -15,9 +15,9 @@
 #define   FRMK(_FORMAT_     ) \
 	do { \
 		Matrix_Free(work, lwork); \
-		RMK  (_FORMAT_, __VA_ARGS__); \
+		RMK  (_FORMAT_             ); \
 	} while (0)
-#define   FRMS(_FORMAT_     ) \
+#define   FRMS(_FORMAT_, ...) \
 	do { \
 		Matrix_Free(work, lwork); \
 		RMS  (_FORMAT_, __VA_ARGS__); \
@@ -675,7 +675,7 @@ SEXP sRMatrix_validate(SEXP obj)
 
 SEXP hRMatrix_validate(SEXP obj)
 {
-	return hRMatrix_validate(obj);
+	return sRMatrix_validate(obj);
 }
 
 SEXP tRMatrix_validate(SEXP obj)
@@ -1032,7 +1032,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	UNPROTECT(3); /* x, j, p */
-	int *pp = INTEGER(p), *pi = INTEGER(i);
+	int *pp = INTEGER(p), *pj = INTEGER(j);
 	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
 	if (ul == 'U') {
@@ -1056,7 +1056,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 	} else {
 	for (i = 0; i < m; ++i)
 		if (pp[i + 1] - pp[i] > 0 && pj[pp[i + 1] - 1] == i &&
-		    !ISNAN(px[pp[j + 1] - 1].r) && px[pp[i + 1] - 1].r < 0.0)
+		    !ISNAN(px[pp[i + 1] - 1].r) && px[pp[i + 1] - 1].r < 0.0)
 			RMK(_("matrix has negative diagonal elements"));
 	}
 	}
@@ -2024,7 +2024,7 @@ void validObject(SEXP obj, const char *cl)
 			else if (cl[1] == 't') \
 				IS_VALID(xt ## _C_ ## Matrix); \
 			if (cl[1] == 'p') \
-				IS_VALID(xp ## _C_ Matrix); \
+				IS_VALID(xp ## _C_ ## Matrix); \
 		} \
 	} while (0)
 
