@@ -4032,7 +4032,7 @@ SEXP R_Matrix_as_vector(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	SEXP to = NULL;
 	PROTECT_INDEX pid;
@@ -4105,7 +4105,7 @@ SEXP R_Matrix_as_matrix(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	SEXP to = NULL;
 	PROTECT_INDEX pid;
@@ -4176,7 +4176,7 @@ SEXP R_Matrix_as_unpacked(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	switch (cl[2]) {
 	case 'e':
@@ -4205,7 +4205,7 @@ SEXP R_Matrix_as_packed(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	if (cl[1] == 'g' || cl[2] == 'd')
 		error(_("attempt to pack a %s"), "generalMatrix");
@@ -4234,7 +4234,7 @@ SEXP R_Matrix_as_Csparse(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	switch (cl[2]) {
 	case 'e':
@@ -4262,7 +4262,7 @@ SEXP R_Matrix_as_Rsparse(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	switch (cl[2]) {
 	case 'e':
@@ -4290,7 +4290,7 @@ SEXP R_Matrix_as_Tsparse(SEXP from)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	switch (cl[2]) {
 	case 'e':
@@ -4318,7 +4318,7 @@ SEXP R_Matrix_as_kind(SEXP from, SEXP kind, SEXP sparse)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	char kind_;
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
@@ -4387,7 +4387,7 @@ SEXP R_Matrix_as_general(SEXP from, SEXP kind)
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
-	const char *cl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 	char kind_;
 	if (TYPEOF(kind) != STRSXP || LENGTH(kind) < 1 ||
