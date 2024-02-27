@@ -229,23 +229,51 @@ transpose1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo) \
 IDZ
 #undef TEMPLATE
 
-#define ASSIGN_JJ_i(_X_)
-#define ASSIGN_JJ_d(_X_)
-#define ASSIGN_JJ_z(_X_) \
-	_X_.i = 0.0
-#define ASSIGN_JI_i(_X_, _Y_) \
-	_X_ = _Y_
-#define ASSIGN_JI_d(_X_, _Y_) \
-	_X_ = _Y_
-#define ASSIGN_JI_z(_X_, _Y_) \
-	do { \
-		_X_.r =  _Y_.r; \
-		_X_.i = -_Y_.i; \
-	} while (0)
-
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
 syforce2(_CTYPE_ *x, int n, char uplo) \
+{ \
+	_CTYPE_ *y = x; \
+	int i, j; \
+	if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			x += 1; \
+			y += n; \
+			for (i = j + 1; i < n; ++i) { \
+				*x = *y; \
+				x += 1; \
+				y += n; \
+			} \
+			x = y = x + j + 1; \
+		} \
+	} else { \
+		for (j = 0; j < n; ++j) { \
+			x += 1; \
+			y += n; \
+			for (i = j + 1; i < n; ++i) { \
+				*y = *x; \
+				x += 1; \
+				y += n; \
+			} \
+			x = y = x + j + 1; \
+		} \
+	} \
+	return; \
+}
+IDZ
+#undef TEMPLATE
+
+#define ASSIGN_JJ_i(_X_)
+#define ASSIGN_JJ_d(_X_)
+#define ASSIGN_JJ_z(_X_) _X_.i = 0.0
+
+#define ASSIGN_JI_i(_X_, _Y_) ASSIGN_REAL      (_X_, _Y_)
+#define ASSIGN_JI_d(_X_, _Y_) ASSIGN_REAL      (_X_, _Y_)
+#define ASSIGN_JI_z(_X_, _Y_) ASSIGN_COMPLEX_CJ(_X_, _Y_)
+
+#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+void _PREFIX_ ## \
+heforce2(_CTYPE_ *x, int n, char uplo) \
 { \
 	_CTYPE_ *y = x; \
 	int i, j; \

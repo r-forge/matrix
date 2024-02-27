@@ -52,6 +52,12 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
+heforce2(_CTYPE_ *, int, char)
+IDZ
+#undef TEMPLATE
+
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
+void _PREFIX_ ## \
 trforce2(_CTYPE_ *, int, int, char, char)
 IDZ
 #undef TEMPLATE

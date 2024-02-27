@@ -177,9 +177,15 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	} while (0)
 
 #define ASSIGN_REAL(_X_, _Y_) \
-	do { _X_   = _Y_  ;                } while (0)
+	do { _X_ = _Y_; } while (0)
 #define ASSIGN_COMPLEX(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i = _Y_.i; } while (0)
+	do { _X_.r = _Y_.r; _X_.i =  _Y_.i; } while (0)
+#define ASSIGN_COMPLEX_RE(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i =    0.0; } while (0)
+#define ASSIGN_COMPLEX_IM(_X_, _Y_) \
+	do { _X_.r =   0.0; _X_.i =  _Y_.i; } while (0)
+#define ASSIGN_COMPLEX_CJ(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i = -_Y_.i; } while (0)
 
 #define SCALE1_REAL(_X_, _A_) \
 	do { _X_   *= _A_;               } while (0)
