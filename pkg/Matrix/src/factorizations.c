@@ -3,7 +3,6 @@
 #include "cholmod-etc.h"
 #include "Mdefines.h"
 #include "factorizations.h"
-#include "version.h"
 
 /* defined in ./attrib.c : */
 SEXP get_factor(SEXP, const char *);
