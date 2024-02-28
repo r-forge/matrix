@@ -1,7 +1,6 @@
 #include "Mdefines.h"
 #include "coerce.h"
 #include "bind.h"
-#include "version.h"
 
 static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
 

@@ -2,7 +2,6 @@
 #include "Mdefines.h"
 #include "idz.h"
 #include "coerce.h"
-#include "version.h"
 
 SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
                      int m, int n, int byrow, SEXP dimnames)

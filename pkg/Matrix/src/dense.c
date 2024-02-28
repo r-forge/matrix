@@ -1,7 +1,6 @@
 #include "Mdefines.h"
 #include "idz.h"
 #include "dense.h"
-#include "version.h"
 
 SEXP dense_band(SEXP from, const char *class, int a, int b)
 {
