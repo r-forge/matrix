@@ -60,7 +60,7 @@ size_t kindToSize(char kind)
 	}
 }
 
-const char *Matrix_nonvirtual(SEXP obj, int strict)
+const char *Matrix_nonvirtual(SEXP obj, int mode)
 {
 	if (!IS_S4_OBJECT(obj))
 		return "";
@@ -68,7 +68,7 @@ const char *Matrix_nonvirtual(SEXP obj, int strict)
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		return "";
-	return valid[(strict) ? ivalid : VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	return valid[VALID_NONVIRTUAL_SHIFT(ivalid, mode)];
 }
 
 char Matrix_kind(SEXP obj)
@@ -78,7 +78,7 @@ char Matrix_kind(SEXP obj)
 		int ivalid = R_check_class_etc(obj, valid);
 		if (ivalid < 0)
 			return '\0';
-		const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+		const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 		return (cl[2] == 'd') ? 'n' : cl[0];
 	} else {
 		switch (TYPEOF(obj)) {
@@ -104,7 +104,7 @@ char Matrix_shape(SEXP obj)
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		return '\0';
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 	return (cl[2] == 'd') ? 'i' : cl[1];
 }
 
@@ -116,7 +116,7 @@ char Matrix_repr(SEXP obj)
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		return '\0';
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
@@ -139,9 +139,9 @@ char Matrix_repr(SEXP obj)
 	}
 }
 
-SEXP R_Matrix_nonvirtual(SEXP obj, SEXP strict)
+SEXP R_Matrix_nonvirtual(SEXP obj, SEXP mode)
 {
-	return mkString(Matrix_nonvirtual(obj, asLogical(strict)));
+	return mkString(Matrix_nonvirtual(obj, asInteger(mode)));
 }
 
 #define RETURN_AS_STRSXP(_C_) \

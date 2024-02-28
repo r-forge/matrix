@@ -4,14 +4,7 @@
 
 ## Operations such as rounding can lose positive semidefiniteness
 ## but not symmetry, hence:
-.indefinite <- function(x) {
-    cl <- .M.nonvirtual(x, TRUE)
-    if(any(cl == c("dpoMatrix", "corMatrix")))
-        as(x, "dsyMatrix")
-    else if(any(cl == c("dppMatrix", "copMatrix")))
-        as(x, "dspMatrix")
-    else x
-}
+.indefinite <- function(x) as(x, .M.nonvirtual(x, 5L))
 
 .dsy2dpo <- .dsp2dpp <- function(from) {
     if(is.null(tryCatch(Cholesky(from, perm = FALSE),

@@ -1,8 +1,10 @@
-## if strict=FALSE then gives "...Matrix" or ".sparseVector" or ""
-## if strict= TRUE then may also give one of these:
-## "dpoMatrix", "dppMatrix", "corMatrix", "copMatrix", "pMatrix"
-.M.nonvirtual <- function(x, strict = FALSE)
-    .Call(R_Matrix_nonvirtual, x, strict)
+## "...Matrix" or ".sparseVector" or "", mapping:
+##     "pMatrix" -> "indMatrix"  if  mode %% 2L
+##   "co.Matrix" -> "dp.Matrix"  if  mode >= 2L
+##   "dp.Matrix" -> "ds.Matrix"  if  mode >= 4L
+##   "zp.Matrix" -> "zh.Matrix"  if  mode >= 4L
+.M.nonvirtual <- function(x, mode = 5L)
+    .Call(R_Matrix_nonvirtual, x, mode) # for 'mode' in 0:5
 
 ## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
 ## otherwise ""
