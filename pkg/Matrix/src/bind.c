@@ -35,7 +35,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				else
 					ERROR_INVALID_CLASS(s, "rbind.Matrix");
 			}
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 
 			tmp = GET_SLOT(s, Matrix_DimSym);
 			sdim = INTEGER(tmp);
@@ -268,7 +268,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			if (TYPEOF(s) != S4SXP)
 				continue;
 			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 
 			PROTECT(tmp = GET_SLOT(s, Matrix_DimSym));
 			sdim = INTEGER(tmp);
@@ -376,7 +376,7 @@ void coerceArgs(SEXP args, int margin,
 		PROTECT_WITH_INDEX(s, &pid);
 		if (TYPEOF(s) == S4SXP) {
 			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 			switch (scl[2]) {
 			case 'e':
 			case 'y':
@@ -890,7 +890,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 			nms[0] = nms[1] = R_NilValue;
 			if (TYPEOF(s) == S4SXP) {
 				ivalid = R_check_class_etc(s, valid);
-				scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+				scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 				tmp = GET_SLOT(s, Matrix_DimSym);
 				r = INTEGER(tmp)[margin];
 				tmp = GET_SLOT(s, Matrix_DimNamesSym);

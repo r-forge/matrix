@@ -226,9 +226,9 @@ do { \
 /* FIXME: use bit masks intead ?? */
 
 #define VALID_NONVIRTUAL_MATRIX \
-/*  0 */ "dpCMatrix", "dpRMatrix", "dpTMatrix", "dpoMatrix", "dppMatrix", \
-/*  5 */ "zpCMatrix", "zpRMatrix", "zpTMatrix", "zpoMatrix", "zppMatrix", \
-/* 10 */ "corMatrix", "copMatrix", \
+/*  0 */ "corMatrix", "copMatrix", \
+/*  2 */ "dpCMatrix", "dpRMatrix", "dpTMatrix", "dpoMatrix", "dppMatrix", \
+/*  7 */ "zpCMatrix", "zpRMatrix", "zpTMatrix", "zpoMatrix", "zppMatrix", \
 /* 12 */   "pMatrix", \
 /* 13 */ "indMatrix", \
 /* 14 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
@@ -254,9 +254,10 @@ do { \
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 
-/* dpoMatrix->dsyMatrix, etc. */
-#define VALID_NONVIRTUAL_SHIFT(i, pToInd) \
-	(i + ((i >= 13) ? 0 : ((i >= 12) ? pToInd != 0 : ((i >= 10) ? 57 : ((i >= 5) ? 79 : ((i >= 0) ? 64 : 0))))))
+/* mode % 2: p -> ind                          */
+/* mode / 2: co. -> (dp.)|(zp.) -> (ds.)|(zh.) */
+#define VALID_NONVIRTUAL_SHIFT(i, mode) \
+	(i + ((i >= 13) ? 0 : ((i >= 12) ? (mode % 2 != 0) : ((i >= 7) ? (mode >= 4) * 77 : ((i >= 2) ? (mode >= 4) * 62 : ((i >= 0) ? (mode >= 2) * 5 + (mode >= 4) * 62 : 0))))))
 
 #define VALID_DENSE \
 "ngeMatrix", "nsyMatrix", "nspMatrix", "ntrMatrix", "ntpMatrix", \
