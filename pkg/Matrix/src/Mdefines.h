@@ -3,6 +3,12 @@
 
 #include "version.h"
 
+#if MATRIX_PACKAGE_MAJOR >= 2
+# define MATRIX_ENABLE_IMATRIX
+# define MATRIX_ENABLE_ZMATRIX
+# define MATRIX_ENABLE_POSDEF
+#endif
+
 #define Matrix_Domain "Matrix"
 #define Matrix_CallocThreshold 8192
 #define Matrix_ErrorBufferSize 4096
