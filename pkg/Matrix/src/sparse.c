@@ -1,6 +1,7 @@
 #include <math.h> /* fabs, hypot */
 #include "Mdefines.h"
 #include "sparse.h"
+#include "version.h"
 
 SEXP sparse_drop0(SEXP from, const char *class, double tol)
 {
