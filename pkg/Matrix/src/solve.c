@@ -4,6 +4,7 @@
 #include "Mdefines.h"
 #include "idz.h"
 #include "solve.h"
+#include "version.h"
 
 static
 void solveDN(SEXP rdn, SEXP adn, SEXP bdn)

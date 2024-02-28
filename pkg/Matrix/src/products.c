@@ -6,6 +6,7 @@
 #include "dense.h"
 #include "sparse.h"
 #include "products.h"
+#include "version.h"
 
 static
 void matmultDim(SEXP x, SEXP y, int *xtrans, int *ytrans, int *ztrans,
