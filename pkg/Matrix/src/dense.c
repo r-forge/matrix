@@ -47,20 +47,20 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 #define BAND1(_PREFIX_, _CTYPE_, _PTR_) \
 	_PREFIX_ ## band1(_PTR_(x1), n, a, b, ul1, di)
 
-#define DCPY2(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCOPY2(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcpy2(px1, px0, n, XLENGTH(x1),      'U', di); \
+			_PREFIX_ ## dcopy2(px1, px0, n, XLENGTH(x1),      'U', di); \
 	} while (0)
 
-#define DCPY1(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCOPY1(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcpy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
+			_PREFIX_ ## dcopy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
 	} while (0)
 
 	char ul0 = 'U', ul1 = 'U', di = 'N';
@@ -142,9 +142,9 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 			/* Result is either a diagonal matrix or a zero matrix : */
 			PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
 			if (class[2] != 'p')
-				BAND_CASES(DCPY2);
+				BAND_CASES(DCOPY2);
 			else
-				BAND_CASES(DCPY1);
+				BAND_CASES(DCOPY1);
 		} else {
 			PROTECT(x1 = duplicate(x0));
 			if (class[2] != 'p')
@@ -177,8 +177,8 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 #undef BAND_CASES
 #undef BAND2
 #undef BAND1
-#undef DCPY2
-#undef DCPY1
+#undef DCOPY2
+#undef DCOPY1
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -644,35 +644,35 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 
 		R_xlen_t len = XLENGTH(x1);
 
-#define DCPY(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCOPY(_PREFIX_, _CTYPE_, _PTR_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
 			if (class[2] != 'p') \
-				_PREFIX_ ## dcpy2(px1, px0, n, len,     '\0', di); \
+				_PREFIX_ ## dcopy2(px1, px0, n, len,     '\0', di); \
 			else \
-				_PREFIX_ ## dcpy1(px1, px0, n, len, ul1, ul0, di); \
+				_PREFIX_ ## dcopy1(px1, px0, n, len, ul1, ul0, di); \
 		} while (0)
 
 		switch (class[0]) {
 		case 'n':
 		case 'l':
-			DCPY(i, int, LOGICAL);
+			DCOPY(i, int, LOGICAL);
 			break;
 		case 'i':
-			DCPY(i, int, INTEGER);
+			DCOPY(i, int, INTEGER);
 			break;
 		case 'd':
-			DCPY(d, double, REAL);
+			DCOPY(d, double, REAL);
 			break;
 		case 'z':
-			DCPY(z, Rcomplex, COMPLEX);
+			DCOPY(z, Rcomplex, COMPLEX);
 			break;
 		default:
 			break;
 		}
 
-#undef DCPY
+#undef DCOPY
 
 		UNPROTECT(1); /* x1 */
 	}

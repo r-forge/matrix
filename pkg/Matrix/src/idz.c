@@ -466,8 +466,8 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-dcpy2(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-      char uplo, char diag) \
+dcopy2(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
+       char uplo, char diag) \
 { \
 	int j; \
 	R_xlen_t n1a = (R_xlen_t) n + 1; \
@@ -502,8 +502,8 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-dcpy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-      char uplo_dest, char uplo_src, char diag) \
+dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
+       char uplo_dest, char uplo_src, char diag) \
 { \
 	int j; \
 	if (diag != 'N') { \
