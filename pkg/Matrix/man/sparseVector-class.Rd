@@ -169,6 +169,9 @@
       length as \code{x}, indicating if/where \code{x} is
       \code{\link{NA}} (or \code{NaN}), finite or infinite, entirely
       analogously to the corresponding base \R functions.}
+    \item{zapsmall}{\code{signature(x = "sparseVectors")}: typically used for
+      numeric sparse vector: \code{\link{round}()} entries
+      such that (relatively) very small entries become zero exactly.}
   }
   \code{c.sparseVector()} is an S3 method for all
   \code{"sparseVector"}s, but automatic dispatch only happens for the
