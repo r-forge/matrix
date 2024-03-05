@@ -37,7 +37,7 @@ Authors@R:
 	         comment = "initial nearPD()"),
 	  person("R Core Team", role = "ctb",
 	         comment = "base R's matrix implementation"))
-Depends: R (>= 3.5.0), methods
+Depends: R (>= 4.4.0), methods
 Imports: grDevices, graphics, grid, lattice, stats, utils
 Suggests: MASS, datasets, sfsmisc, tools
 Enhances: SparseM, graph
