@@ -856,9 +856,9 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		Matrix_memset(px1, 0, (R_xlen_t) len, sizeof(_CTYPE_)); \
 		if (cl[1] != 't' || di == 'N') { \
 			if (cl[2] != 'p') \
-				_PREFIX_ ## dcpy2(px1, px0, n, n,     ul, di); \
+				_PREFIX_ ## dcopy2(px1, px0, n, n,     ul, di); \
 			else \
-				_PREFIX_ ## dcpy1(px1, px0, n, n, ul, ul, di); \
+				_PREFIX_ ## dcopy1(px1, px0, n, n, ul, ul, di); \
 		} \
 	} while (0)
 

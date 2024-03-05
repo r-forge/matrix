@@ -76,13 +76,13 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcpy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
+dcopy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcpy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
+dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
 IDZ
 #undef TEMPLATE
 
