@@ -574,55 +574,44 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	do { \
 		switch (class[0]) { \
 		case 'l': \
-			SAD_SUBCASES(int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL, 1); \
+			SAD_SUBCASES(i, int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL); \
 			break; \
 		case 'i': \
-			SAD_SUBCASES(int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER, 1); \
+			SAD_SUBCASES(i, int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER); \
 			break; \
 		case 'd': \
-			SAD_SUBCASES(double, REAL, SHOW, FIRSTOF, INCREMENT_REAL, 1.0); \
+			SAD_SUBCASES(d, double, REAL, SHOW, FIRSTOF, INCREMENT_REAL); \
 			break; \
 		case 'z': \
-			SAD_SUBCASES(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX, Matrix_zone); \
+			SAD_SUBCASES(z, Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define SAD_SUBCASES(_CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_, _ONE_) \
+#define SAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 		       _CTYPE_ *px1 = _PTR_(x1) ; \
 		Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
-		if (!packed) { \
+		if (!packed) \
 			/* .(ge|sy|he|po|tr)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2NP, SAD_LOOP_R2NP, SAD_LOOP_T2NP, \
 			                _MASK_, _REPLACE_, _INCREMENT_); \
-			if (class[1] == 't' && di != 'N') { \
-				px1 = _PTR_(x1); \
-				R_xlen_t n1a = (R_xlen_t) n + 1; \
-				for (int d = 0; d < n; ++d, px1 += n1a) \
-					*px1 = _ONE_; \
-			} \
-		} else if (ul == 'U') { \
+		else if (ul == 'U') \
 			/* upper triangular .(sp|hp|pp|tp)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2UP, SAD_LOOP_R2UP, SAD_LOOP_T2UP, \
 			                _MASK_, _REPLACE_, _INCREMENT_); \
-			if (class[1] == 't' && di != 'N') { \
-				px1 = _PTR_(x1); \
-				for (int d = 0; d < n; px1 += (++d) + 1) \
-					*px1 = _ONE_; \
-			} \
-		} else { \
+		else \
 			/* lower triangular .(sp|hp|pp|tp)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2LP, SAD_LOOP_R2LP, SAD_LOOP_T2LP, \
 			                _MASK_, _REPLACE_, _INCREMENT_); \
-			if (class[1] == 't' && di != 'N') { \
-				px1 = _PTR_(x1); \
-				for (int d = 0; d < n; px1 += n - (d++)) \
-					*px1 = _ONE_; \
-			} \
+		if (class[1] == 't' && di != 'N') { \
+		if (!packed) \
+			_PREFIX_ ## dcopy2(px1, NULL, n, -1,      'U', di); \
+		else \
+			_PREFIX_ ## dcopy1(px1, NULL, n, -1,  ul, 'U', di); \
 		} \
 	} while (0)
 
@@ -3265,9 +3254,9 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 SEXP R_dense_as_unpacked(SEXP from)
 {
 	static const char *valid[] = {
+		"corMatrix", "copMatrix",
 		"dpoMatrix", "dppMatrix",
 		"zpoMatrix", "zppMatrix",
-		"corMatrix", "copMatrix",
 		VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
@@ -3380,9 +3369,9 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 SEXP R_dense_as_packed(SEXP from, SEXP uplo, SEXP diag)
 {
 	static const char *valid[] = {
+		"corMatrix", "copMatrix",
 		"dpoMatrix", "dppMatrix",
 		"zpoMatrix", "zppMatrix",
-		"corMatrix", "copMatrix",
 		VALID_DENSE, "" };
 	int ivalid = R_check_class_etc(from, valid);
 	if (ivalid < 0)
