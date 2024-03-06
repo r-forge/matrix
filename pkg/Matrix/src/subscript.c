@@ -1882,28 +1882,28 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 			Matrix_Calloc(work, n, char);
 
-#define SUB2_WORK(_CTYPE_, _PTR_, _ISNZ_) \
+#define SUB2_WORK(_CTYPE_, _PTR_, _NOTZERO_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (j_ = 0; j_ < n; ++j_) \
-					work[j_] = _ISNZ_(px0[j_]); \
+					work[j_] = _NOTZERO_(px0[j_]); \
 			} while (0)
 
 			switch (cl[0]) {
 			case 'n':
-				SUB2_WORK(int, LOGICAL, ISNZ_PATTERN);
+				SUB2_WORK(int, LOGICAL, NOTZERO_PATTERN);
 				break;
 			case 'l':
-				SUB2_WORK(int, LOGICAL, ISNZ_LOGICAL);
+				SUB2_WORK(int, LOGICAL, NOTZERO_LOGICAL);
 				break;
 			case 'i':
-				SUB2_WORK(int, INTEGER, ISNZ_INTEGER);
+				SUB2_WORK(int, INTEGER, NOTZERO_INTEGER);
 				break;
 			case 'd':
-				SUB2_WORK(double, REAL, ISNZ_REAL);
+				SUB2_WORK(double, REAL, NOTZERO_REAL);
 				break;
 			case 'z':
-				SUB2_WORK(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+				SUB2_WORK(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
 				break;
 			default:
 				break;

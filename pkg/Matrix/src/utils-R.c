@@ -164,26 +164,26 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 	if (!ISNAN(n_) && n_ >= 0.0 && n_ < (double) n)
 		n = (R_xlen_t) n_;
 
-#define DO_NNZ(_CTYPE_, _PTR_, _ISNA_, _ISNZ_, _STRICTLY_ISNZ_) \
+#define DO_NNZ(_CTYPE_, _PTR_, _ISNA_, _NOTZERO_, _STRICTLY_NOTZERO_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
 		if (do_countNA == NA_LOGICAL) { \
 			while (n-- > 0) { \
 				if (_ISNA_(*px)) \
 					return ScalarInteger(NA_INTEGER); \
-				if (_ISNZ_(*px)) \
+				if (_NOTZERO_(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else if (do_countNA != 0) { \
 			while (n-- > 0) { \
-				if (_ISNZ_(*px)) \
+				if (_NOTZERO_(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else { \
 			while (n-- > 0) { \
-				if (_STRICTLY_ISNZ_(*px)) \
+				if (_STRICTLY_NOTZERO_(*px)) \
 					++nnz; \
 				++px; \
 			} \
@@ -193,19 +193,19 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 	switch (TYPEOF(x)) {
 	case LGLSXP:
 		DO_NNZ(int, LOGICAL,
-		       ISNA_LOGICAL, ISNZ_LOGICAL, STRICTLY_ISNZ_LOGICAL);
+		       ISNA_LOGICAL, NOTZERO_LOGICAL, STRICTLY_NOTZERO_LOGICAL);
 		break;
 	case INTSXP:
 		DO_NNZ(int, INTEGER,
-		       ISNA_INTEGER, ISNZ_INTEGER, STRICTLY_ISNZ_INTEGER);
+		       ISNA_INTEGER, NOTZERO_INTEGER, STRICTLY_NOTZERO_INTEGER);
 	break;
 	case REALSXP:
 		DO_NNZ(double, REAL,
-		       ISNA_REAL, ISNZ_REAL, STRICTLY_ISNZ_REAL);
+		       ISNA_REAL, NOTZERO_REAL, STRICTLY_NOTZERO_REAL);
 	break;
 	case CPLXSXP:
 		DO_NNZ(Rcomplex, COMPLEX,
-		       ISNA_COMPLEX, ISNZ_COMPLEX, STRICTLY_ISNZ_COMPLEX);
+		       ISNA_COMPLEX, NOTZERO_COMPLEX, STRICTLY_NOTZERO_COMPLEX);
 	break;
 	default:
 		ERROR_INVALID_TYPE(x, __func__);
