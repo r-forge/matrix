@@ -574,23 +574,23 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	do { \
 		switch (class[0]) { \
 		case 'l': \
-			SAD_SUBCASES(i, int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL); \
+			SAD_SUBCASES(int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL); \
 			break; \
 		case 'i': \
-			SAD_SUBCASES(i, int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER); \
+			SAD_SUBCASES(int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER); \
 			break; \
 		case 'd': \
-			SAD_SUBCASES(d, double, REAL, SHOW, FIRSTOF, INCREMENT_REAL); \
+			SAD_SUBCASES(double, REAL, SHOW, FIRSTOF, INCREMENT_REAL); \
 			break; \
 		case 'z': \
-			SAD_SUBCASES(z, Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX); \
+			SAD_SUBCASES(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define SAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_) \
+#define SAD_SUBCASES(_CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_) \
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 		       _CTYPE_ *px1 = _PTR_(x1) ; \
@@ -607,12 +607,6 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 			/* lower triangular .(sp|hp|pp|tp)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2LP, SAD_LOOP_R2LP, SAD_LOOP_T2LP, \
 			                _MASK_, _REPLACE_, _INCREMENT_); \
-		if (class[1] == 't' && di != 'N') { \
-		if (!packed) \
-			_PREFIX_ ## dcopy2(px1, NULL, n, -1,      'U', di); \
-		else \
-			_PREFIX_ ## dcopy1(px1, NULL, n, -1,  ul, 'U', di); \
-		} \
 	} while (0)
 
 #define SAD_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _REPLACE_, _INCREMENT_) \
@@ -739,7 +733,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	} while (0)
 
 	if (class[0] == 'n')
-		SAD_SUBCASES(int, LOGICAL, HIDE, SECONDOF, INCREMENT_PATTERN, 1);
+		SAD_SUBCASES(int, LOGICAL, HIDE, SECONDOF, INCREMENT_PATTERN);
 	else {
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 		SAD_CASES;
@@ -845,9 +839,9 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		Matrix_memset(px1, 0, (R_xlen_t) len, sizeof(_CTYPE_)); \
 		if (cl[1] != 't' || di == 'N') { \
 			if (cl[2] != 'p') \
-				_PREFIX_ ## dcopy2(px1, px0, n, n,     ul, di); \
+				_PREFIX_ ## dcopy2(px1, px0, n, n,     'U', di); \
 			else \
-				_PREFIX_ ## dcopy1(px1, px0, n, n, ul, ul, di); \
+				_PREFIX_ ## dcopy1(px1, px0, n, n, ul, 'U', di); \
 		} \
 	} while (0)
 
