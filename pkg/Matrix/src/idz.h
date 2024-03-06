@@ -86,7 +86,9 @@ dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
 IDZ
 #undef TEMPLATE
 
+void
 zdreal2(Rcomplex *, int);
+void
 zdreal1(Rcomplex *, int, char);
 
 #undef IDZ

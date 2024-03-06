@@ -649,7 +649,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
 			if (class[2] != 'p') \
-				_PREFIX_ ## dcopy2(px1, px0, n, len,     '\0', di); \
+				_PREFIX_ ## dcopy2(px1, px0, n, len,      'U', di); \
 			else \
 				_PREFIX_ ## dcopy1(px1, px0, n, len, ul1, ul0, di); \
 		} while (0)
