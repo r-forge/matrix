@@ -1679,129 +1679,129 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	do { \
 		switch (class[0]) { \
 		case 'l': \
-			DAS_SUBCASES(int, LOGICAL, _MASK_, ISNZ_LOGICAL); \
+			DAS_SUBCASES(int, LOGICAL, _MASK_, NOTZERO_LOGICAL); \
 			break; \
 		case 'i': \
-			DAS_SUBCASES(int, INTEGER, _MASK_, ISNZ_INTEGER); \
+			DAS_SUBCASES(int, INTEGER, _MASK_, NOTZERO_INTEGER); \
 			break; \
 		case 'd': \
-			DAS_SUBCASES(double, REAL, _MASK_, ISNZ_REAL); \
+			DAS_SUBCASES(double, REAL, _MASK_, NOTZERO_REAL); \
 			break; \
 		case 'z': \
-			DAS_SUBCASES(Rcomplex, COMPLEX, _MASK_, ISNZ_COMPLEX); \
+			DAS_SUBCASES(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
+#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
 	do { \
 		       _CTYPE_ *px0 = _PTR_(x0) ; \
 		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
 		if (class[1] == 'g') \
 			/* .geMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_GEN2C, DAS_LOOP_GEN2R, DAS_LOOP_GEN2C, \
-			                _MASK_, _ISNZ_);	 \
+			                _MASK_, _NOTZERO_);	 \
 		else if (class[2] != 'p' && di == 'N') \
 			/* .(sy|he|po)Matrix, non-unit diagonal .trMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TRN2C, DAS_LOOP_TRN2R, DAS_LOOP_TRN2C, \
-			                _MASK_, _ISNZ_); \
+			                _MASK_, _NOTZERO_); \
 		else if (class[2] != 'p') \
 			/* unit diagonal .trMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TRU2C, DAS_LOOP_TRU2R, DAS_LOOP_TRU2C, \
-			                _MASK_, _ISNZ_); \
+			                _MASK_, _NOTZERO_); \
 		else if (di == 'N') \
 			/* .(sp|hp|pp)Matrix, non-unit diagonal .tpMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TPN2C, DAS_LOOP_TPN2R, DAS_LOOP_TPN2C, \
-			                _MASK_, _ISNZ_); \
+			                _MASK_, _NOTZERO_); \
 		else \
 			/* unit diagonal .tpMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TPU2C, DAS_LOOP_TPU2R, DAS_LOOP_TPU2C, \
-			                _MASK_, _ISNZ_); \
+			                _MASK_, _NOTZERO_); \
 	} while (0)
 
 #undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _ISNZ_) \
+#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NOTZERO_) \
 	do { \
 		switch (cl[2]) { \
 		case 'C': \
-			_LOOP_C_(_ISNZ_, ++nnz, DAS_VALID2C); \
+			_LOOP_C_(_NOTZERO_, ++nnz, DAS_VALID2C); \
 			break; \
 		case 'R': \
-			_LOOP_R_(_ISNZ_, ++nnz, DAS_VALID2R); \
+			_LOOP_R_(_NOTZERO_, ++nnz, DAS_VALID2R); \
 			break; \
 		case 'T': \
-			_LOOP_T_(_ISNZ_, ++nnz, DAS_VALID2T); \
+			_LOOP_T_(_NOTZERO_, ++nnz, DAS_VALID2T); \
 			break; \
 		default: \
 			break; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_GEN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_GEN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		for (j = 0; j < n; ++j) { \
 			for (i = 0; i < m; ++i, ++px0) \
-				if (_ISNZ_(*px0)) _DO_INNER_; \
+				if (_NOTZERO_(*px0)) _DO_INNER_; \
 			_DO_OUTER_; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_GEN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_GEN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
 		for (i = 0; i < m; ++i, px0 -= mn1s) { \
 			for (j = 0; j < n; ++j, px0 += m) \
-				if (_ISNZ_(*px0)) _DO_INNER_; \
+				if (_NOTZERO_(*px0)) _DO_INNER_; \
 			_DO_OUTER_; \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 0; j < n; px0 += n - (++j)) { \
 				for (i = 0; i <= j; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; px0 += (++j)) { \
 				for (i = j; i < n; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
 			d = (R_xlen_t) n * n - 1; \
 			for (i = 0; i < n; ++i, px0 -= (d -= n)) { \
 				for (j = i; j < n; ++j, px0 += n) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			d = -1; \
 			for (i = 0; i < n; ++i, px0 -= (d += n)) { \
 				for (j = 0; j <= i; ++j, px0 += n) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRU2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRU2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			px0 += n; \
 			for (j = 1; j < n; ++j) { \
 				for (i = 0; i < j; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 				px0 += n - j; \
 			} \
@@ -1809,13 +1809,13 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (j = 0; j < n; ++j) { \
 				px0 += j + 1; \
 				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TRU2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TRU2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
@@ -1823,7 +1823,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (i = 0; i < n; ++i) { \
 				for (j = i + 1; j < n; ++j) { \
 					px0 += n; \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				} \
 				_DO_OUTER_; \
 				px0 -= (d -= n); \
@@ -1833,7 +1833,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			d = -1; \
 			for (i = 1; i < n; ++i) { \
 				for (j = 0; j < i; ++j) { \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 					px0 += n; \
 				} \
 				_DO_OUTER_; \
@@ -1842,63 +1842,63 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPN2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i <= j; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; ++j) { \
 				for (i = j; i < n; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPN2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
 			d = PACKED_LENGTH(n) - 1; \
 			for (i = 0; i < n; px0 -= (d -= (++i))) { \
 				for (j = i; j < n; px0 += (++j)) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			d = -1; \
 			for (i = 0; i < n; px0 -= (d += n - (++i))) { \
 				for (j = 0; j <= i; px0 += n - (++j)) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPU2C(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPU2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		if (ul == 'U') { \
 			for (j = 1; j < n; ++j) { \
 				++px0; \
 				for (i = 0; i < j; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} else { \
 			for (j = 0; j < n; ++j) { \
 				++px0; \
 				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				_DO_OUTER_; \
 			} \
 		} \
 	} while (0)
 
-#define DAS_LOOP_TPU2R(_ISNZ_, _DO_INNER_, _DO_OUTER_) \
+#define DAS_LOOP_TPU2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
 	do { \
 		R_xlen_t d; \
 		if (ul == 'U') { \
@@ -1906,7 +1906,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			for (i = 0; i < n; ++i) { \
 				for (j = i + 1; j < n; ++j) { \
 					px0 += j; \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 				} \
 				_DO_OUTER_; \
 				px0 -= (d -= i + 1); \
@@ -1916,7 +1916,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			d = -1; \
 			for (i = 1; i < n; ++i) { \
 				for (j = 0; j < i; ++j) { \
-					if (_ISNZ_(*px0)) _DO_INNER_; \
+					if (_NOTZERO_(*px0)) _DO_INNER_; \
 					px0 += n - j - 1; \
 				} \
 				_DO_OUTER_; \
@@ -1954,7 +1954,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			*(pp++) = 0; /* first row or column skipped in these loops */
 	}
 	if (class[0] == 'n')
-		DAS_SUBCASES(int, LOGICAL, HIDE, ISNZ_LOGICAL);
+		DAS_SUBCASES(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
 	else
 		DAS_CASES(HIDE);
 	if (cl[2] != 'R') {
@@ -1971,25 +1971,25 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	}
 
 #undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _ISNZ_) \
+#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NOTZERO_) \
 	do { \
 		switch (repr) { \
 		case 'C': \
-			_LOOP_C_(_ISNZ_, \
+			_LOOP_C_(_NOTZERO_, \
 			         do { \
 			             *(pi++) = i; \
 			             _MASK_(*(px1++) = *px0); \
 			         } while (0), ); \
 			break; \
 		case 'R': \
-			_LOOP_R_(_ISNZ_, \
+			_LOOP_R_(_NOTZERO_, \
 			         do { \
 			             *(pj++) = j; \
 			             _MASK_(*(px1++) = *px0); \
 			         } while (0), ); \
 			break; \
 		case 'T': \
-			_LOOP_T_(_ISNZ_, \
+			_LOOP_T_(_NOTZERO_, \
 			         do { \
 			             *(pi++) = i; \
 			             *(pj++) = j; \
@@ -2006,7 +2006,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	*/
 
 	if (class[0] == 'n')
-		DAS_SUBCASES(int, LOGICAL, HIDE, ISNZ_LOGICAL);
+		DAS_SUBCASES(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
 		SET_SLOT(to, Matrix_xSym, x1);
@@ -2104,16 +2104,16 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	do { \
 		switch (cl[0]) { \
 		case 'l': \
-			DAS_LOOP(int, LOGICAL, _MASK_, ISNZ_LOGICAL, 1); \
+			DAS_LOOP(int, LOGICAL, _MASK_, NOTZERO_LOGICAL, 1); \
 			break; \
 		case 'i': \
-			DAS_LOOP(int, INTEGER, _MASK_, ISNZ_INTEGER, 1); \
+			DAS_LOOP(int, INTEGER, _MASK_, NOTZERO_INTEGER, 1); \
 			break; \
 		case 'd': \
-			DAS_LOOP(double, REAL, _MASK_, ISNZ_REAL, 1.0); \
+			DAS_LOOP(double, REAL, _MASK_, NOTZERO_REAL, 1.0); \
 			break; \
 		case 'z': \
-			DAS_LOOP(Rcomplex, COMPLEX, _MASK_, ISNZ_COMPLEX, Matrix_zone); \
+			DAS_LOOP(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX, Matrix_zone); \
 			break; \
 		default: \
 			break; \
@@ -2142,11 +2142,11 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			nnz = 0;
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (d = 0; d < n; ++d) { \
-					if (_ISNZ_(*px0)) \
+					if (_NOTZERO_(*px0)) \
 						++nnz; \
 					*(pp++) = nnz; \
 					++px0; \
@@ -2154,7 +2154,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			} while (0)
 
 			if (cl[0] == 'n')
-				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
+				DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
 		} else {
@@ -2168,18 +2168,18 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			nnz = 0;
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (d = 0; d < n; ++d) { \
-					if (_ISNZ_(*px0)) \
+					if (_NOTZERO_(*px0)) \
 						++nnz; \
 					++px0; \
 				} \
 			} while (0)
 
 			if (cl[0] == 'n')
-				DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
+				DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
 			else
 				DAS_CASES(SHOW);
 		} else
@@ -2196,13 +2196,13 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	int *pi1 = INTEGER(i1);
 
 #undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_, _ONE_) \
+#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
 	do { \
 		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
 		if (di == 'N') { \
 			_CTYPE_ *px0 = _PTR_(x0); \
 			for (d = 0; d < n; ++d) { \
-				if (_ISNZ_(*px0)) { \
+				if (_NOTZERO_(*px0)) { \
 					*(pi1++) = d; \
 					_MASK_(*(px1++) = *px0); \
 				} \
@@ -2217,7 +2217,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	} while (0)
 
 	if (cl[0] == 'n')
-		DAS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL, 1);
+		DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
 	else if (di == 'N' && nnz == n) {
 		SET_SLOT(to, Matrix_xSym, x0);
 		DAS_CASES(HIDE);
