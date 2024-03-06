@@ -2915,19 +2915,19 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		switch (class[0]) { \
 		case 'l': \
 			SAG_SUBCASES(int, LOGICAL, SHOW, 1, \
-			             ASSIGN_REAL, ASSIGN_REAL, ASSIGN_REAL); \
+			             ASSIGN2_RE_REAL, ASSIGN2_ID_REAL, ASSIGN2_CJ_REAL); \
 			break; \
 		case 'i': \
 			SAG_SUBCASES(int, INTEGER, SHOW, 1, \
-			             ASSIGN_REAL, ASSIGN_REAL, ASSIGN_REAL); \
+			             ASSIGN2_RE_REAL, ASSIGN2_ID_REAL, ASSIGN2_CJ_REAL); \
 			break; \
 		case 'd': \
 			SAG_SUBCASES(double, REAL, SHOW, 1.0, \
-			             ASSIGN_REAL, ASSIGN_REAL, ASSIGN_REAL); \
+			             ASSIGN2_RE_REAL, ASSIGN2_ID_REAL, ASSIGN2_CJ_REAL); \
 			break; \
 		case 'z': \
 			SAG_SUBCASES(Rcomplex, COMPLEX, SHOW, Matrix_zone, \
-			             ASSIGN_COMPLEX, ASSIGN_COMPLEX_RE, ASSIGN_COMPLEX_CJ); \
+			             ASSIGN2_RE_COMPLEX, ASSIGN2_ID_COMPLEX, ASSIGN2_CJ_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -2976,7 +2976,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 #undef SAG_SUBCASES
 #define SAG_SUBCASES(_CTYPE_, _PTR_, _MASK_, _ONE_, \
-		             _ASSIGN_IJ_, _ASSIGN_JJ_, _ASSIGN_JI_) \
+		             _ASSIGN2_RE_, _ASSIGN2_ID_, _ASSIGN2_CJ_) \
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			if (class[1] == 's' || class[1] == 'h' || class[1] == 'p') { \
@@ -2989,14 +2989,14 @@ SEXP sparse_as_general(SEXP from, const char *class)
 					while (k < kend) { \
 						if (pi0[k] == j) { \
 							pi1[pp1_[j]] = pi0[k]; \
-							_MASK_(_ASSIGN_IJ_(px1[pp1_[j]], px0[k])); \
+							_MASK_(_ASSIGN2_ID_(px1[pp1_[j]], px0[k])); \
 							++pp1_[j]; \
 						} else { \
 							pi1[pp1_[j]] = pi0[k]; \
-							_MASK_(_ASSIGN_IJ_(px1[pp1_[j]], px0[k])); \
+							_MASK_(_ASSIGN2_ID_(px1[pp1_[j]], px0[k])); \
 							++pp1_[j]; \
 							pi1[pp1_[pi0[k]]] = j; \
-							_MASK_(_ASSIGN_IJ_(px1[pp1_[pi0[k]]], px0[k])); \
+							_MASK_(_ASSIGN2_ID_(px1[pp1_[pi0[k]]], px0[k])); \
 							++pp1_[pi0[k]]; \
 						} \
 						++k; \
@@ -3008,14 +3008,14 @@ SEXP sparse_as_general(SEXP from, const char *class)
 					while (k < kend) { \
 						if (pi0[k] == j) { \
 							pi1[pp1_[j]] = pi0[k]; \
-							_MASK_(_ASSIGN_JJ_(px1[pp1_[j]], px0[k])); \
+							_MASK_(_ASSIGN2_RE_(px1[pp1_[j]], px0[k])); \
 							++pp1_[j]; \
 						} else { \
 							pi1[pp1_[j]] = pi0[k]; \
-							_MASK_(_ASSIGN_IJ_(px1[pp1_[j]], px0[k])); \
+							_MASK_(_ASSIGN2_ID_(px1[pp1_[j]], px0[k])); \
 							++pp1_[j]; \
 							pi1[pp1_[pi0[k]]] = j; \
-							_MASK_(_ASSIGN_JI_(px1[pp1_[pi0[k]]], px0[k])); \
+							_MASK_(_ASSIGN2_CJ_(px1[pp1_[pi0[k]]], px0[k])); \
 							++pp1_[pi0[k]]; \
 						} \
 						++k; \
@@ -3050,7 +3050,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 		if (class[0] == 'n')
 			SAG_SUBCASES(int, LOGICAL, HIDE, 1,
-			             ASSIGN_REAL, ASSIGN_REAL, ASSIGN_REAL);
+			             ASSIGN2_RE_REAL, ASSIGN2_ID_REAL, ASSIGN2_CJ_REAL);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), pp1[n - 1]));
@@ -3086,7 +3086,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 #undef SAG_SUBCASES
 #define SAG_SUBCASES(_CTYPE_, _PTR_, _MASK_, _ONE_, \
-		             _ASSIGN_IJ_, _ASSIGN_JJ_, _ASSIGN_JI_) \
+		             _ASSIGN2_RE_, _ASSIGN2_ID_, _ASSIGN2_CJ_) \
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			if (class[1] == 's') { \
@@ -3094,16 +3094,16 @@ SEXP sparse_as_general(SEXP from, const char *class)
 					if (*pi0 == *pj0) { \
 						*(pi1++) = *pi0; \
 						*(pj1++) = *pj0; \
-						_MASK_(_ASSIGN_IJ_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_ID_((*px1), (*px0))); \
 						_MASK_(px1++); \
 					} else { \
 						*(pi1++) = *pi0; \
 						*(pj1++) = *pj0; \
-						_MASK_(_ASSIGN_IJ_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_ID_((*px1), (*px0))); \
 						_MASK_(px1++); \
 						*(pi1++) = *pj0; \
 						*(pj1++) = *pi0; \
-						_MASK_(_ASSIGN_IJ_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_ID_((*px1), (*px0))); \
 						_MASK_(px1++); \
 					} \
 					++pi0; ++pj0; _MASK_(++px0); \
@@ -3113,16 +3113,16 @@ SEXP sparse_as_general(SEXP from, const char *class)
 					if (*pi0 == *pj0) { \
 						*(pi1++) = *pi0; \
 						*(pj1++) = *pj0; \
-						_MASK_(_ASSIGN_JJ_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_RE_((*px1), (*px0))); \
 						_MASK_(px1++); \
 					} else { \
 						*(pi1++) = *pi0; \
 						*(pj1++) = *pj0; \
-						_MASK_(_ASSIGN_IJ_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_ID_((*px1), (*px0))); \
 						_MASK_(px1++); \
 						*(pi1++) = *pj0; \
 						*(pj1++) = *pi0; \
-						_MASK_(_ASSIGN_JI_((*px1), (*px0))); \
+						_MASK_(_ASSIGN2_CJ_((*px1), (*px0))); \
 						_MASK_(px1++); \
 					} \
 					++pi0; ++pj0; _MASK_(++px0); \
@@ -3143,7 +3143,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 		if (class[0] == 'n')
 			SAG_SUBCASES(int, LOGICAL, HIDE, 1,
-			             ASSIGN_REAL, ASSIGN_REAL, ASSIGN_REAL);
+			             ASSIGN2_RE_REAL, ASSIGN2_ID_REAL, ASSIGN2_CJ_REAL);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));

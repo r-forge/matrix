@@ -263,13 +263,13 @@ syforce2(_CTYPE_ *x, int n, char uplo) \
 IDZ
 #undef TEMPLATE
 
-#define ASSIGN_JJ_i(_X_)
-#define ASSIGN_JJ_d(_X_)
-#define ASSIGN_JJ_z(_X_) _X_.i = 0.0
+#define ASSIGN_JJ_i(_X_) ASSIGN1_IM_REAL   (_X_, 0.0)
+#define ASSIGN_JJ_d(_X_) ASSIGN1_IM_REAL   (_X_, 0.0)
+#define ASSIGN_JJ_z(_X_) ASSIGN1_IM_COMPLEX(_X_, 0.0)
 
-#define ASSIGN_JI_i(_X_, _Y_) ASSIGN_REAL      (_X_, _Y_)
-#define ASSIGN_JI_d(_X_, _Y_) ASSIGN_REAL      (_X_, _Y_)
-#define ASSIGN_JI_z(_X_, _Y_) ASSIGN_COMPLEX_CJ(_X_, _Y_)
+#define ASSIGN_JI_i(_X_, _Y_) ASSIGN2_CJ_REAL   (_X_, _Y_)
+#define ASSIGN_JI_d(_X_, _Y_) ASSIGN2_CJ_REAL   (_X_, _Y_)
+#define ASSIGN_JI_z(_X_, _Y_) ASSIGN2_CJ_COMPLEX(_X_, _Y_)
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \

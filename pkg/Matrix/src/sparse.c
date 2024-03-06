@@ -1774,9 +1774,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 			} while (0)
 
 			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN_REAL, INCREMENT_REAL);
+				SP_LOOP(double, REAL, ASSIGN2_ID_REAL, INCREMENT_REAL);
 			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, INCREMENT_COMPLEX);
+				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, INCREMENT_COMPLEX);
 
 			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to,        iSym, i1);
@@ -1829,9 +1829,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN_REAL);
+					SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
 
 				SET_SLOT(to, Matrix_pSym, p0);
 				SET_SLOT(to,        iSym, i0);
@@ -1881,9 +1881,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN_REAL, 1.0);
+					SP_LOOP(double, REAL, ASSIGN2_ID_REAL, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zone);
 
 				SET_SLOT(to, Matrix_pSym, p1);
 				SET_SLOT(to,        iSym, i1);
@@ -1949,9 +1949,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 			} while (0)
 
 			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN_REAL);
+				SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
 			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
+				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
 
 			SET_SLOT(to, Matrix_iSym, i1);
 			SET_SLOT(to, Matrix_jSym, j1);
@@ -1978,9 +1978,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN_REAL);
+					SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
 
 				SET_SLOT(to, Matrix_iSym, i0);
 				SET_SLOT(to, Matrix_jSym, j0);
@@ -2012,9 +2012,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN_REAL, 1.0);
+					SP_LOOP(double, REAL, ASSIGN2_ID_REAL, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zone);
 
 				SET_SLOT(to, Matrix_iSym, i1);
 				SET_SLOT(to, Matrix_jSym, j1);
@@ -2243,9 +2243,9 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 		} while (0)
 
 		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN_REAL, INCREMENT_REAL);
+			SP_LOOP(double, REAL, ASSIGN2_ID_REAL, INCREMENT_REAL);
 		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, INCREMENT_COMPLEX);
+			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, INCREMENT_COMPLEX);
 
 		Matrix_Free(pp1_, n);
 		SET_SLOT(to, Matrix_pSym, p1);
@@ -2291,9 +2291,9 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 		} while (0)
 
 		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN_REAL);
+			SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
 		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
+			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
 
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
