@@ -561,4 +561,27 @@ dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
 IDZ
 #undef TEMPLATE
 
+void
+zdreal2(Rcomplex *x, int n)
+{
+	int j;
+	R_xlen_t n1a = (R_xlen_t) n + 1;
+	for (j = 0; j < n; ++j, x += n1a)
+		(*x).i = 0.0;
+	return;
+}
+
+void
+zdreal1(Rcomplex *x, int n, char uplo)
+{
+	int j;
+	if (uplo == 'U')
+		for (j = 0; j < n; x += (++j)+1)
+			(*x).i = 0.0;
+	else
+		for (j = 0; j < n; x += n-(j++))
+			(*x).i = 0.0;
+	return;
+}
+
 #undef IDZ

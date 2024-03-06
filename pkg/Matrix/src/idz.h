@@ -86,6 +86,9 @@ dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
 IDZ
 #undef TEMPLATE
 
+zdreal2(Rcomplex *, int);
+zdreal1(Rcomplex *, int, char);
+
 #undef IDZ
 
 #endif /* MATRIX_IDZ_H */
