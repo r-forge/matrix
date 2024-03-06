@@ -998,9 +998,9 @@ SEXP dense_skewpart(SEXP from, const char *class)
 	} while (0)
 
 	if (cl[0] == 'd')
-		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN_REAL, 0.0);
+		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN2_ID_REAL, 0.0);
 	else
-		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN_COMPLEX, Matrix_zzero);
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zzero);
 
 #undef SP_LOOP
 

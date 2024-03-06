@@ -182,16 +182,25 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 		_X_.i += _Y_.i; \
 	} while (0)
 
-#define ASSIGN_REAL(_X_, _Y_) \
-	do { _X_ = _Y_; } while (0)
-#define ASSIGN_COMPLEX(_X_, _Y_) \
+#define ASSIGN1_RE_REAL(_X_, _Y_) _X_ = _Y_
+#define ASSIGN1_IM_REAL(_X_, _Y_)
+
+#define ASSIGN1_RE_COMPLEX(_X_, _Y_) _X_.r = _Y_
+#define ASSIGN1_IM_COMPLEX(_X_, _Y_) _X_.i = _Y_
+
+#define ASSIGN2_ID_REAL(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_CJ_REAL(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_RE_REAL(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_IM_REAL(_X_, _Y_) _X_ = 0.0
+
+#define ASSIGN2_ID_COMPLEX(_X_, _Y_) \
 	do { _X_.r = _Y_.r; _X_.i =  _Y_.i; } while (0)
-#define ASSIGN_COMPLEX_RE(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i =    0.0; } while (0)
-#define ASSIGN_COMPLEX_IM(_X_, _Y_) \
-	do { _X_.r =   0.0; _X_.i =  _Y_.i; } while (0)
-#define ASSIGN_COMPLEX_CJ(_X_, _Y_) \
+#define ASSIGN2_CJ_COMPLEX(_X_, _Y_) \
 	do { _X_.r = _Y_.r; _X_.i = -_Y_.i; } while (0)
+#define ASSIGN2_RE_COMPLEX(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i =  0.0  ; } while (0) 
+#define ASSIGN2_IM_COMPLEX(_X_, _Y_) \
+	do { _X_.r = 0.0  ; _X_.i =  _Y_.i; } while (0)
 
 #define SCALE1_REAL(_X_, _A_) \
 	do { _X_   *= _A_;               } while (0)
