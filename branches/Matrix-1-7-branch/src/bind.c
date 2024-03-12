@@ -35,7 +35,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				else
 					ERROR_INVALID_CLASS(s, "rbind.Matrix");
 			}
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 			tmp = GET_SLOT(s, Matrix_DimSym);
 			sdim = INTEGER(tmp);
@@ -53,7 +53,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 
 			if (!rdimnames[0] || !rdimnames[1]) {
 				tmp = GET_SLOT(s, Matrix_DimNamesSym);
-				if (scl[1] == 's' || scl[1] == 'h') {
+				if (scl[1] == 's') {
 					if (VECTOR_ELT(tmp, 0) != R_NilValue ||
 					    VECTOR_ELT(tmp, 1) != R_NilValue)
 						rdimnames[0] = rdimnames[1] = 1;
@@ -268,7 +268,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			if (TYPEOF(s) != S4SXP)
 				continue;
 			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
 			PROTECT(tmp = GET_SLOT(s, Matrix_DimSym));
 			sdim = INTEGER(tmp);
@@ -287,7 +287,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				SEXP p = PROTECT(GET_SLOT(s, Matrix_pSym));
 				int *pp = INTEGER(p), n = sdim[(scl[2] == 'C') ? 1 : 0];
 				snnz = pp[n];
-				if (scl[1] == 's' || scl[1] == 'h') {
+				if (scl[1] == 's') {
 					SEXP iSym = (scl[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 						i = PROTECT(GET_SLOT(s, iSym));
 					int *pi = INTEGER(i), j;
@@ -302,10 +302,8 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 								--snnz;
 					}
 					UNPROTECT(1);
-				} else if (scl[1] == 't') {
-					if (*CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
-						snnz += sdim[0];
-				}
+				} else if (scl[1] == 't' && *CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
+					snnz += sdim[0];
 				UNPROTECT(1);
 				break;
 			}
@@ -313,7 +311,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			{
 				SEXP i = PROTECT(GET_SLOT(s, Matrix_iSym));
 				snnz = XLENGTH(i);
-				if (scl[1] == 's' || scl[1] == 'h') {
+				if (scl[1] == 's') {
 					SEXP j = PROTECT(GET_SLOT(s, Matrix_jSym));
 					int *pi = INTEGER(i), *pj = INTEGER(j);
 					R_xlen_t k = XLENGTH(i);
@@ -322,10 +320,8 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 						if (*(pi++) == *(pj++))
 							--snnz;
 					UNPROTECT(1);
-				} else if (scl[1] == 't') {
-					if (*CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
-						snnz += sdim[0];
-				}
+				} else if (scl[1] == 't' && *CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
+					snnz += sdim[0];
 				UNPROTECT(1);
 				break;
 			}
@@ -380,7 +376,7 @@ void coerceArgs(SEXP args, int margin,
 		PROTECT_WITH_INDEX(s, &pid);
 		if (TYPEOF(s) == S4SXP) {
 			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 			switch (scl[2]) {
 			case 'e':
 			case 'y':
@@ -894,11 +890,11 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 			nms[0] = nms[1] = R_NilValue;
 			if (TYPEOF(s) == S4SXP) {
 				ivalid = R_check_class_etc(s, valid);
-				scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+				scl = valid[ivalid + VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 				tmp = GET_SLOT(s, Matrix_DimSym);
 				r = INTEGER(tmp)[margin];
 				tmp = GET_SLOT(s, Matrix_DimNamesSym);
-				if (scl[1] == 's' || scl[1] == 'h') {
+				if (scl[1] == 's') {
 					if ((nms_ = VECTOR_ELT(tmp, 1)) != R_NilValue ||
 					    (nms_ = VECTOR_ELT(tmp, 0)) != R_NilValue)
 						nms[0] = nms[1] = nms_;

@@ -12,16 +12,6 @@
 #define  RMKMS(_FORMAT_, ...) \
 	return MK(MS(_FORMAT_, __VA_ARGS__))
 
-#define   FRMK(_FORMAT_     ) \
-	do { \
-		Matrix_Free(work, lwork); \
-		RMK  (_FORMAT_             ); \
-	} while (0)
-#define   FRMS(_FORMAT_, ...) \
-	do { \
-		Matrix_Free(work, lwork); \
-		RMS  (_FORMAT_, __VA_ARGS__); \
-	} while (0)
 #define FRMKMS(_FORMAT_, ...) \
 	do { \
 		Matrix_Free(work, lwork); \
@@ -244,11 +234,6 @@ SEXP symmetricMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
 
 	return ScalarLogical(1);
-}
-
-SEXP HermitianMatrix_validate(SEXP obj)
-{
-	return symmetricMatrix_validate(obj);
 }
 
 SEXP triangularMatrix_validate(SEXP obj)
@@ -577,11 +562,6 @@ SEXP sCMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP hCMatrix_validate(SEXP obj)
-{
-	return sCMatrix_validate(obj);
-}
-
 SEXP tCMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
@@ -673,11 +653,6 @@ SEXP sRMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP hRMatrix_validate(SEXP obj)
-{
-	return sRMatrix_validate(obj);
-}
-
 SEXP tRMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
@@ -759,11 +734,6 @@ SEXP sTMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP hTMatrix_validate(SEXP obj)
-{
-	return sTMatrix_validate(obj);
-}
-
 SEXP tTMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
@@ -829,14 +799,6 @@ SEXP xsCMatrix_validate(SEXP obj)
 	return val;
 }
 
-SEXP xhCMatrix_validate(SEXP obj)
-{
-	SEXP val = xgCMatrix_validate(obj);
-	if (TYPEOF(val) != STRSXP)
-		val = hCMatrix_validate(obj);
-	return val;
-}
-
 SEXP xtCMatrix_validate(SEXP obj)
 {
 	SEXP val = xgCMatrix_validate(obj);
@@ -860,14 +822,6 @@ SEXP xsRMatrix_validate(SEXP obj)
 	SEXP val = xgRMatrix_validate(obj);
 	if (TYPEOF(val) != STRSXP)
 		val = sRMatrix_validate(obj);
-	return val;
-}
-
-SEXP xhRMatrix_validate(SEXP obj)
-{
-	SEXP val = xgRMatrix_validate(obj);
-	if (TYPEOF(val) != STRSXP)
-		val = hRMatrix_validate(obj);
 	return val;
 }
 
@@ -897,14 +851,6 @@ SEXP xsTMatrix_validate(SEXP obj)
 	return val;
 }
 
-SEXP xhTMatrix_validate(SEXP obj)
-{
-	SEXP val = xgTMatrix_validate(obj);
-	if (TYPEOF(val) != STRSXP)
-		val = hTMatrix_validate(obj);
-	return val;
-}
-
 SEXP xtTMatrix_validate(SEXP obj)
 {
 	SEXP val = xgTMatrix_validate(obj);
@@ -913,191 +859,52 @@ SEXP xtTMatrix_validate(SEXP obj)
 	return val;
 }
 
-/* NB: Non-finite entries are "valid" because we consider
-   crossprod(x) and tcrossprod(x) to be positive semidefinite
-   even if 'x' contains non-finite entries (for speed) ...
-*/
-
-SEXP xpoMatrix_validate(SEXP obj)
+SEXP dpoMatrix_validate(SEXP obj)
 {
+	/* NB: Non-finite entries are "valid" because we consider
+	   crossprod(x) and tcrossprod(x) to be positive semidefinite
+	   even if 'x' contains non-finite entries (for speed) ...
+	*/
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
+	/* Non-negative diagonal elements are necessary but _not_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
 	for (j = 0; j < n; ++j, px += n1a)
 		if (!ISNAN(*px) && *px < 0.0)
 			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	Rcomplex *px = COMPLEX(x);
-	for (j = 0; j < n; ++j, px += n1a)
-		if (!ISNAN((*px).r) && (*px).r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
 
 	return ScalarLogical(1);
 }
 
-SEXP xppMatrix_validate(SEXP obj)
+SEXP dppMatrix_validate(SEXP obj)
 {
+	/* NB: Non-finite entries are "valid" because we consider
+	   crossprod(x) and tcrossprod(x) to be positive semidefinite
+	   even if 'x' contains non-finite entries (for speed) ...
+	*/
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 
+	/* Non-negative diagonal elements are necessary but _not_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
 	if (ul == 'U') {
-	for (j = 0; j < n; px += (++j)+1)
-		if (!ISNAN(*px) && *px < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
+		for (j = 0; j < n; px += (++j)+1)
+			if (!ISNAN(*px) && *px < 0.0)
+				RMK(_("matrix has negative diagonal elements"));
 	} else {
-	for (j = 0; j < n; px += n-(j++))
-		if (!ISNAN(*px) && *px < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
+		for (j = 0; j < n; px += n-(j++))
+			if (!ISNAN(*px) && *px < 0.0)
+				RMK(_("matrix has negative diagonal elements"));
 	}
-	} else {
-	Rcomplex *px = COMPLEX(x);
-	if (ul == 'U') {
-	for (j = 0; j < n; px += (++j)+1)
-		if (!ISNAN((*px).r) && (*px).r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	for (j = 0; j < n; px += n-(j++))
-		if (!ISNAN((*px).r) && (*px).r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP xpCMatrix_validate(SEXP obj)
-{
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-
-	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	UNPROTECT(3); /* x, i, p */
-	int *pp = INTEGER(p), *pi = INTEGER(i);
-	if (TYPEOF(x) == REALSXP) {
-	double *px = REAL(x);
-	if (ul == 'U') {
-	for (j = 0; j < n; ++j)
-		if (pp[j + 1] - pp[j] > 0 && pi[pp[j + 1] - 1] == j &&
-		    !ISNAN(px[pp[j + 1] - 1]) && px[pp[j + 1] - 1] < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	for (j = 0; j < n; ++j)
-		if (pp[j + 1] - pp[j] > 0 && pi[pp[j]] == j &&
-		    !ISNAN(px[pp[j]]) && px[pp[j]] < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
-	} else {
-	Rcomplex *px = COMPLEX(x);
-	if (ul == 'U') {
-	for (j = 0; j < n; ++j)
-		if (pp[j + 1] - pp[j] > 0 && pi[pp[j + 1] - 1] == j &&
-		    !ISNAN(px[pp[j + 1] - 1].r) && px[pp[j + 1] - 1].r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	for (j = 0; j < n; ++j)
-		if (pp[j + 1] - pp[j] > 0 && pi[pp[j]] == j &&
-		    !ISNAN(px[pp[j]].r) && px[pp[j]].r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP xpRMatrix_validate(SEXP obj)
-{
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int i, m = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-
-	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	UNPROTECT(3); /* x, j, p */
-	int *pp = INTEGER(p), *pj = INTEGER(j);
-	if (TYPEOF(x) == REALSXP) {
-	double *px = REAL(x);
-	if (ul == 'U') {
-	for (i = 0; i < m; ++i)
-		if (pp[i + 1] - pp[i] > 0 && pj[pp[i]] == i &&
-		    !ISNAN(px[pp[i]]) && px[pp[i]] < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	for (i = 0; i < m; ++i)
-		if (pp[i + 1] - pp[i] > 0 && pj[pp[i + 1] - 1] == i &&
-		    !ISNAN(px[pp[i + 1] - 1]) && px[pp[i + 1] - 1] < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
-	} else {
-	Rcomplex *px = COMPLEX(x);
-	if (ul == 'U') {
-	for (i = 0; i < m; ++i)
-		if (pp[i + 1] - pp[i] > 0 && pj[pp[i]] == i &&
-		    !ISNAN(px[pp[i]].r) && px[pp[i]].r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	} else {
-	for (i = 0; i < m; ++i)
-		if (pp[i + 1] - pp[i] > 0 && pj[pp[i + 1] - 1] == i &&
-		    !ISNAN(px[pp[i + 1] - 1].r) && px[pp[i + 1] - 1].r < 0.0)
-			RMK(_("matrix has negative diagonal elements"));
-	}
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP xpTMatrix_validate(SEXP obj)
-{
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
-
-	double *work;
-	int lwork = n;
-	Matrix_Calloc(work, lwork, double);
-
-	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int *pi = INTEGER(i), *pj = INTEGER(j);
-	R_xlen_t nnz = XLENGTH(x);
-
-	if (TYPEOF(x) == REALSXP) {
-	double *px = REAL(x);
-	while (nnz--) {
-		if (*pi == *pj)
-			work[*pi] += *px;
-		++pi; ++pj; ++px;
-	}
-	} else {
-	Rcomplex *px = COMPLEX(x);
-	while (nnz--) {
-		if (*pi == *pj)
-			work[*pi] += (*px).r;
-		++pi; ++pj; ++px;
-	}
-	}
-	while (n--)
-		if (!ISNAN(work[n]) && work[n] < 0.0)
-			FRMK(_("matrix has negative diagonal elements"));
-	Matrix_Free(work, lwork);
 
 	return ScalarLogical(1);
 }
@@ -1138,13 +945,13 @@ SEXP copMatrix_validate(SEXP obj)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	double *px = REAL(x);
 	if (ul == 'U') {
-	for (j = 0; j < n; px += (++j)+1)
-		if (ISNAN(*px) || *px != 1.0)
-			RMK(_("matrix has nonunit diagonal elements"));
+		for (j = 0; j < n; px += (++j)+1)
+			if (ISNAN(*px) || *px != 1.0)
+				RMK(_("matrix has nonunit diagonal elements"));
 	} else {
-	for (j = 0; j < n; px += n-(j++))
-		if (ISNAN(*px) || *px != 1.0)
-			RMK(_("matrix has nonunit diagonal elements"));
+		for (j = 0; j < n; px += n-(j++))
+			if (ISNAN(*px) || *px != 1.0)
+				RMK(_("matrix has nonunit diagonal elements"));
 	}
 
 	SEXP sd = GET_SLOT(obj, Matrix_sdSym);
@@ -2017,31 +1824,28 @@ void validObject(SEXP obj, const char *cl)
 		} else { \
 			if (cl[1] == 'g') \
 				IS_VALID(xg ## _C_ ## Matrix); \
-			else if (cl[1] == 's' || (cl[1] == 'p' && cl[0] != 'z')) \
+			else if (cl[1] == 's') \
 				IS_VALID(xs ## _C_ ## Matrix); \
-			else if (cl[1] == 'h' || (cl[1] == 'p' && cl[0] == 'z')) \
-				IS_VALID(xh ## _C_ ## Matrix); \
 			else if (cl[1] == 't') \
 				IS_VALID(xt ## _C_ ## Matrix); \
-			if (cl[1] == 'p') \
-				IS_VALID(xp ## _C_ ## Matrix); \
 		} \
 	} while (0)
 
 	IS_VALID(Matrix);
 
-	const char *cl_ = cl;
-	if (cl[0] == 'c')
-		cl = (cl[2] != 'p') ? "dpoMatrix" : "dppMatrix";
-	else if (cl[0] == 'p')
-		cl = "indMatrix";
-
-	if (cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') {
+	if ((cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') ||
+		(cl[0] == 'p' && cl[1] != 'c')) {
 		IS_VALID(indMatrix);
-		if (cl_[0] == 'p')
+		if (cl[0] == 'p')
 			IS_VALID(pMatrix);
 		return;
 	}
+
+	const char *cl_ = cl;
+	if (cl[0] == 'c')
+		cl = "dpoMatrix";
+	else if (cl[0] == 'p' && cl[1] == 'c')
+		cl = "dppMatrix";
 
 	if (cl[0] == 'n' && cl[2] != 'C' && cl[2] != 'R' && cl[2] != 'T')
 		IS_VALID(nMatrix);
@@ -2054,10 +1858,8 @@ void validObject(SEXP obj, const char *cl)
 	else if (cl[0] == 'z')
 		IS_VALID(zMatrix);
 
-	if (cl[1] == 's' || (cl[1] == 'p' && cl[0] != 'z'))
+	if (cl[1] == 's' || cl[1] == 'p')
 		IS_VALID(symmetricMatrix);
-	else if (cl[1] == 'h' || (cl[1] == 'p' && cl[0] == 'z'))
-		IS_VALID(HermitianMatrix);
 	else if (cl[1] == 't')
 		IS_VALID(triangularMatrix);
 	else if (cl[1] == 'd') {
@@ -2074,14 +1876,14 @@ void validObject(SEXP obj, const char *cl)
 	else if (cl[2] != 'p') {
 		IS_VALID(unpackedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(xpoMatrix);
+			IS_VALID(dpoMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(corMatrix);
 		}
 	} else {
 		IS_VALID(packedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(xppMatrix);
+			IS_VALID(dppMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(copMatrix);
 		}

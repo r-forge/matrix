@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-03-04 r4611)}{
+\section{Changes in version 1.7-0 (2024-02-22 r4598)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -35,9 +35,6 @@
       Objects serialized under \pkg{Matrix} \code{< 1.7-0} and
       unserialized under \pkg{Matrix} \code{>= 1.7-0} remain valid,
       retaining a harmless \code{factors} \emph{attribute}.
-
-      \item \code{Matrix} version 1.7-0 and higher strictly depend on
-      \R \eqn{\ge 4.4.0}.
     }
   }
   \subsection{New Features}{

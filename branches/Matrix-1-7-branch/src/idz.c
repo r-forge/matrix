@@ -229,51 +229,23 @@ transpose1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo) \
 IDZ
 #undef TEMPLATE
 
+#define ASSIGN_JJ_i(_X_)
+#define ASSIGN_JJ_d(_X_)
+#define ASSIGN_JJ_z(_X_) \
+	_X_.i = 0.0
+#define ASSIGN_JI_i(_X_, _Y_) \
+	_X_ = _Y_
+#define ASSIGN_JI_d(_X_, _Y_) \
+	_X_ = _Y_
+#define ASSIGN_JI_z(_X_, _Y_) \
+	do { \
+		_X_.r =  _Y_.r; \
+		_X_.i = -_Y_.i; \
+	} while (0)
+
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
 syforce2(_CTYPE_ *x, int n, char uplo) \
-{ \
-	_CTYPE_ *y = x; \
-	int i, j; \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; ++j) { \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				*x = *y; \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} else { \
-		for (j = 0; j < n; ++j) { \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				*y = *x; \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define ASSIGN_JJ_i(_X_) ASSIGN1_IM_REAL   (_X_, 0.0)
-#define ASSIGN_JJ_d(_X_) ASSIGN1_IM_REAL   (_X_, 0.0)
-#define ASSIGN_JJ_z(_X_) ASSIGN1_IM_COMPLEX(_X_, 0.0)
-
-#define ASSIGN_JI_i(_X_, _Y_) ASSIGN2_CJ_REAL   (_X_, _Y_)
-#define ASSIGN_JI_d(_X_, _Y_) ASSIGN2_CJ_REAL   (_X_, _Y_)
-#define ASSIGN_JI_z(_X_, _Y_) ASSIGN2_CJ_COMPLEX(_X_, _Y_)
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-heforce2(_CTYPE_ *x, int n, char uplo) \
 { \
 	_CTYPE_ *y = x; \
 	int i, j; \
@@ -466,8 +438,8 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-dcopy2(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-       char uplo, char diag) \
+dcpy2(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
+      char uplo, char diag) \
 { \
 	int j; \
 	R_xlen_t n1a = (R_xlen_t) n + 1; \
@@ -502,8 +474,8 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-       char uplo_dest, char uplo_src, char diag) \
+dcpy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
+      char uplo_dest, char uplo_src, char diag) \
 { \
 	int j; \
 	if (diag != 'N') { \
@@ -560,28 +532,5 @@ dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
 }
 IDZ
 #undef TEMPLATE
-
-void
-zdreal2(Rcomplex *x, int n)
-{
-	int j;
-	R_xlen_t n1a = (R_xlen_t) n + 1;
-	for (j = 0; j < n; ++j, x += n1a)
-		(*x).i = 0.0;
-	return;
-}
-
-void
-zdreal1(Rcomplex *x, int n, char uplo)
-{
-	int j;
-	if (uplo == 'U')
-		for (j = 0; j < n; x += (++j)+1)
-			(*x).i = 0.0;
-	else
-		for (j = 0; j < n; x += n-(j++))
-			(*x).i = 0.0;
-	return;
-}
 
 #undef IDZ

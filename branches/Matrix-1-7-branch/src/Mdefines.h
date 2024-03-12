@@ -3,12 +3,6 @@
 
 #include "version.h"
 
-#if MATRIX_PACKAGE_MAJOR >= 2
-# define MATRIX_ENABLE_IMATRIX
-# define MATRIX_ENABLE_ZMATRIX
-# define MATRIX_ENABLE_POSDEF
-#endif
-
 #define Matrix_Domain "Matrix"
 #define Matrix_CallocThreshold 8192
 #define Matrix_ErrorBufferSize 4096
@@ -111,22 +105,22 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define ISNA_REAL(_X_)    (ISNAN(_X_))
 #define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
 
-#define NOTZERO_PATTERN(_X_) ((_X_) != 0)
-#define NOTZERO_LOGICAL(_X_) ((_X_) != 0)
-#define NOTZERO_INTEGER(_X_) ((_X_) != 0)
-#define NOTZERO_REAL(_X_)    ((_X_) != 0.0)
-#define NOTZERO_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
+#define ISNZ_PATTERN(_X_) ((_X_) != 0)
+#define ISNZ_LOGICAL(_X_) ((_X_) != 0)
+#define ISNZ_INTEGER(_X_) ((_X_) != 0)
+#define ISNZ_REAL(_X_)    ((_X_) != 0.0)
+#define ISNZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
 
-#define STRICTLY_NOTZERO_PATTERN(_X_) \
-	(                      NOTZERO_PATTERN(_X_))
-#define STRICTLY_NOTZERO_LOGICAL(_X_) \
-	(!ISNA_LOGICAL(_X_) && NOTZERO_LOGICAL(_X_))
-#define STRICTLY_NOTZERO_INTEGER(_X_) \
-	(!ISNA_INTEGER(_X_) && NOTZERO_INTEGER(_X_))
-#define STRICTLY_NOTZERO_REAL(_X_) \
-	(!ISNA_REAL(   _X_) && NOTZERO_REAL(   _X_))
-#define STRICTLY_NOTZERO_COMPLEX(_X_) \
-	(!ISNA_COMPLEX(_X_) && NOTZERO_COMPLEX(_X_))
+#define STRICTLY_ISNZ_PATTERN(_X_) \
+	(                      ISNZ_PATTERN(_X_))
+#define STRICTLY_ISNZ_LOGICAL(_X_) \
+	(!ISNA_LOGICAL(_X_) && ISNZ_LOGICAL(_X_))
+#define STRICTLY_ISNZ_INTEGER(_X_) \
+	(!ISNA_INTEGER(_X_) && ISNZ_INTEGER(_X_))
+#define STRICTLY_ISNZ_REAL(_X_) \
+	(!ISNA_REAL(   _X_) && ISNZ_REAL(   _X_))
+#define STRICTLY_ISNZ_COMPLEX(_X_) \
+	(!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
 
 #define NOTREAL_PATTERN(_X_) 0
 #define NOTREAL_LOGICAL(_X_) 0
@@ -182,25 +176,10 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 		_X_.i += _Y_.i; \
 	} while (0)
 
-#define ASSIGN1_RE_REAL(_X_, _Y_) _X_ = _Y_
-#define ASSIGN1_IM_REAL(_X_, _Y_)
-
-#define ASSIGN1_RE_COMPLEX(_X_, _Y_) _X_.r = _Y_
-#define ASSIGN1_IM_COMPLEX(_X_, _Y_) _X_.i = _Y_
-
-#define ASSIGN2_ID_REAL(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_CJ_REAL(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_RE_REAL(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_IM_REAL(_X_, _Y_) _X_ = 0.0
-
-#define ASSIGN2_ID_COMPLEX(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i =  _Y_.i; } while (0)
-#define ASSIGN2_CJ_COMPLEX(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i = -_Y_.i; } while (0)
-#define ASSIGN2_RE_COMPLEX(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i =  0.0  ; } while (0) 
-#define ASSIGN2_IM_COMPLEX(_X_, _Y_) \
-	do { _X_.r = 0.0  ; _X_.i =  _Y_.i; } while (0)
+#define ASSIGN_REAL(_X_, _Y_) \
+	do { _X_   = _Y_  ;                } while (0)
+#define ASSIGN_COMPLEX(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i = _Y_.i; } while (0)
 
 #define SCALE1_REAL(_X_, _A_) \
 	do { _X_   *= _A_;               } while (0)
@@ -238,70 +217,63 @@ do { \
 	} \
 } while (0)
 
-/* FIXME: use bit masks intead ?? */
-
 #define VALID_NONVIRTUAL_MATRIX \
-/*  0 */ "corMatrix", "copMatrix", \
-/*  2 */ "dpCMatrix", "dpRMatrix", "dpTMatrix", "dpoMatrix", "dppMatrix", \
-/*  7 */ "zpCMatrix", "zpRMatrix", "zpTMatrix", "zpoMatrix", "zppMatrix", \
-/* 12 */   "pMatrix", \
-/* 13 */ "indMatrix", \
-/* 14 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
-/* 19 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
-/* 24 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
-/* 29 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
-/* 34 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
-/* 39 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
-/* 44 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
-/* 49 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
-/* 54 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
-/* 59 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
-/* 64 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
-/* 69 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
-/* 74 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
-/* 79 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
-/* 84 */ "zhCMatrix", "zhRMatrix", "zhTMatrix", "zheMatrix", "zhpMatrix", \
-/* 89 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
+/*  0 */ "dpoMatrix", "dppMatrix", \
+/*  2 */ "corMatrix", "copMatrix", \
+/*  4 */   "pMatrix", "indMatrix", \
+/*  6 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
+/* 11 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
+/* 16 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
+/* 21 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
+/* 26 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
+/* 31 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
+/* 36 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
+/* 41 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
+/* 46 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
+/* 51 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
+/* 56 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
+/* 61 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
+/* 66 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
+/* 71 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
+/* 76 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_NONVIRTUAL_VECTOR \
-/* 94 */ "nsparseVector", "lsparseVector", "isparseVector", \
+/* 81 */ "nsparseVector", "lsparseVector", "isparseVector", \
          "dsparseVector", "zsparseVector"
 
 #define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
 
-/* mode % 2: p -> ind                          */
-/* mode / 2: co. -> (dp.)|(zp.) -> (ds.)|(zh.) */
-#define VALID_NONVIRTUAL_SHIFT(i, mode) \
-	(i + ((i >= 13) ? 0 : ((i >= 12) ? (mode % 2 != 0) : ((i >= 7) ? (mode >= 4) * 77 : ((i >= 2) ? (mode >= 4) * 62 : ((i >= 0) ? (mode >= 2) * 5 + (mode >= 4) * 62 : 0))))))
+/* dpoMatrix->dsyMatrix, etc. */
+#define VALID_NONVIRTUAL_SHIFT(i, pToInd) \
+	((i >= 5) ? 0 : ((i >= 4) ? pToInd != 0 : ((i >= 2) ? 57 : 59)))
 
 #define VALID_DENSE \
 "ngeMatrix", "nsyMatrix", "nspMatrix", "ntrMatrix", "ntpMatrix", \
 "lgeMatrix", "lsyMatrix", "lspMatrix", "ltrMatrix", "ltpMatrix", \
 "igeMatrix", "isyMatrix", "ispMatrix", "itrMatrix", "itpMatrix", \
 "dgeMatrix", "dsyMatrix", "dspMatrix", "dtrMatrix", "dtpMatrix", \
-"zgeMatrix", "zsyMatrix", "zspMatrix", \
-             "zheMatrix", "zhpMatrix", "ztrMatrix", "ztpMatrix"
+"zgeMatrix", "zsyMatrix", "zspMatrix", "ztrMatrix", "ztpMatrix"
 
 #define VALID_CSPARSE \
-"ngCMatrix", "nsCMatrix",              "ntCMatrix", \
-"lgCMatrix", "lsCMatrix",              "ltCMatrix", \
-"igCMatrix", "isCMatrix",              "itCMatrix", \
-"dgCMatrix", "dsCMatrix",              "dtCMatrix", \
-"zgCMatrix", "zsCMatrix", "zhCMatrix", "ztCMatrix"
+"ngCMatrix", "nsCMatrix", "ntCMatrix", \
+"lgCMatrix", "lsCMatrix", "ltCMatrix", \
+"igCMatrix", "isCMatrix", "itCMatrix", \
+"dgCMatrix", "dsCMatrix", "dtCMatrix", \
+"zgCMatrix", "zsCMatrix", "ztCMatrix"
 
 #define VALID_RSPARSE \
-"ngRMatrix", "nsRMatrix",              "ntRMatrix", \
-"lgRMatrix", "lsRMatrix",              "ltRMatrix", \
-"igRMatrix", "isRMatrix",              "itRMatrix", \
-"dgRMatrix", "dsRMatrix",              "dtRMatrix", \
-"zgRMatrix", "zsRMatrix", "zhRMatrix", "ztRMatrix"
+"ngRMatrix", "nsRMatrix", "ntRMatrix", \
+"lgRMatrix", "lsRMatrix", "ltRMatrix", \
+"igRMatrix", "isRMatrix", "itRMatrix", \
+"dgRMatrix", "dsRMatrix", "dtRMatrix", \
+"zgRMatrix", "zsRMatrix", "ztRMatrix"
 
 #define VALID_TSPARSE \
-"ngTMatrix", "nsTMatrix",              "ntTMatrix", \
-"lgTMatrix", "lsTMatrix",              "ltTMatrix", \
-"igTMatrix", "isTMatrix",              "itTMatrix", \
-"dgTMatrix", "dsTMatrix",              "dtTMatrix", \
-"zgTMatrix", "zsTMatrix", "zhTMatrix", "ztTMatrix"
+"ngTMatrix", "nsTMatrix", "ntTMatrix", \
+"lgTMatrix", "lsTMatrix", "ltTMatrix", \
+"igTMatrix", "isTMatrix", "itTMatrix", \
+"dgTMatrix", "dsTMatrix", "dtTMatrix", \
+"zgTMatrix", "zsTMatrix", "ztTMatrix"
 
 #define VALID_DIAGONAL \
 "ndiMatrix", "ldiMatrix", "idiMatrix", "ddiMatrix", "zdiMatrix"
