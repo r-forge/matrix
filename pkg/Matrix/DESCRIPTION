@@ -1,5 +1,5 @@
 Package: Matrix
-Version: 1.7-0
+Version: 1.8-0
 VersionNote: do also bump src/version.h, inst/include/Matrix/version.h
 Date: 2024-03-12
 Priority: recommended
