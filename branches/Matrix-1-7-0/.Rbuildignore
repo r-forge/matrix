@@ -1,0 +1,72 @@
+## NB: patterns are matched case insensitively
+
+## ~~~~ Not under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Unwanted by DB or MM (still?)
+2copy
+^[A-Za-z0-9][-_A-Za-z0-9]*[.]R$
+auto$
+-log-
+-[a-zA-Z0-9]*$
+[-._]mail
+_check_
+[.]MM$
+[.]li?st$
+[A-Za-z][+]$
+[A-Za-z][+][A-Za-z0-9]$
+/0.*[.]R$
+Jagan[_-]
+M1mac
+Matrix_[1-9][0-9]*[.][0-9]
+jss.submit
+.*_results
+TAGS
+_no_UFlong
+_?svn-?
+^R/.*[.]R_+$
+^misc$
+^old$
+^src/SuiteSparse-.*$
+^tests/.*[.]Rout.*[24]b$
+^tests/.*_(doExtra|nX)$
+^vignettes/fullpage[.]sty$
+
+## Unwanted by everyone
+[.]Rhistory$
+[.]Rout$
+[.]aux$
+[.]bbl$
+[.]blg$
+[.]diff$
+[.]eml$
+[.]grep$
+[.]html$
+[.]log$
+[.]orig$
+[.]out$
+[.]rej$
+[.]tar[.]gz$
+[.]tex$
+[.]tgz$
+[.]zip$
+
+
+## ~~~~ Under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Historical
+^ChangeLog$
+^po/translators[.]txt$
+
+## Private
+^DONE$
+^Doxyfile$
+^TODO$
+^po/update-me[.]sh$
+^tests/performance[.]R$
+^tests/useRNG_files$
+
+## Work in progress
+^R/Arith[.]R$
+^R/Compare[.]R$
+^R/Logic[.]R$
+^src/subassign[.][ch]$
