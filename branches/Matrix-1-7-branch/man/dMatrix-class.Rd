@@ -88,6 +88,7 @@
   \describe{
     \item{expm}{\code{signature(x = "dMatrix")}: computes the
       \emph{\dQuote{Matrix Exponential}}, see \code{\link{expm}}.}
+    \item{zapsmall}{\code{signature(x = "dMatrix")}: ... }
   }
   The following methods are defined for all logical matrices:
   \describe{

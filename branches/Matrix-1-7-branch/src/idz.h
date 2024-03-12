@@ -52,12 +52,6 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-heforce2(_CTYPE_ *, int, char)
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
 trforce2(_CTYPE_ *, int, int, char, char)
 IDZ
 #undef TEMPLATE
@@ -76,20 +70,15 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcopy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
+dcpy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
+dcpy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
 IDZ
 #undef TEMPLATE
-
-void
-zdreal2(Rcomplex *, int);
-void
-zdreal1(Rcomplex *, int, char);
 
 #undef IDZ
 
