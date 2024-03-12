@@ -35,6 +35,9 @@
       Objects serialized under \pkg{Matrix} \code{< 1.7-0} and
       unserialized under \pkg{Matrix} \code{>= 1.7-0} remain valid,
       retaining a harmless \code{factors} \emph{attribute}.
+
+      \item \code{Matrix} version 1.7-0 and higher strictly depend on
+      \R \eqn{\ge 4.4.0}.
     }
   }
   \subsection{New Features}{

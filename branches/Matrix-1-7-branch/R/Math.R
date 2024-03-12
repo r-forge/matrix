@@ -268,18 +268,20 @@ setMethod("Math2", c(x = "sparseVector"),
 ## METHODS FOR GENERIC: zapsmall
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("zapsmall", c(x = "Matrix"),
-          function(x, digits = getOption("digits")) {
+setMethod("zapsmall", signature(x = "Matrix"),
+          function(x, digits = getOption("digits"),
+                   mFUN = function(x, ina) max(abs(x[!ina])), min.d = 0L, ...) {
               x <- .indefinite(.M2kind(x, ","))
-              x@x <- zapsmall(x@x, digits = digits)
+              x@x <- zapsmall(x@x, digits=digits, mFUN=mFUN, min.d=min.d, ...)
               if(.hasSlot(x, "factors") && length(x@factors) > 0L)
                   x@factors <- list()
               x
           })
 
-setMethod("zapsmall", c(x = "sparseVector"),
-          function(x, digits = getOption("digits")) {
+setMethod("zapsmall", signature(x = "sparseVector"),
+          function(x, digits = getOption("digits"),
+                   mFUN = function(x, ina) max(abs(x[!ina])), min.d = 0L, ...) {
               x <- .V2kind(x, ",")
-              x@x <- zapsmall(x@x, digits = digits)
+              x@x <- zapsmall(x@x, digits=digits, mFUN=mFUN, min.d=min.d, ...)
               x
           })
