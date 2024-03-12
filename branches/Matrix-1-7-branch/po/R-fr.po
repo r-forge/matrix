@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2024-02-08 02:53\n"
+"POT-Creation-Date: 2024-03-12 11:27\n"
 "PO-Revision-Date: 2021-02-11 11:04+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -185,6 +185,12 @@ msgstr "le 'r' intermédiaire est de type %s"
 msgid "not yet implemented .. please report"
 msgstr "pas encore implémenté .. veuillez reporter ceci"
 
+msgid "'%s' has non-finite values"
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
+msgstr ""
+
 msgid "'force' must be (coercable to) TRUE or FALSE"
 msgstr "'force' doit être (convertible en) TRUE ou FALSE"
 
@@ -262,6 +268,12 @@ msgstr ""
 
 msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
 msgstr ""
+
+#, fuzzy
+msgid "only square matrices can be used as graph incidence matrices"
+msgstr ""
+"seules des matrices carrées peuvent être utilisées comme matrices "
+"d'incidence pour les graphiques"
 
 #, fuzzy
 msgid "matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)"
@@ -538,18 +550,6 @@ msgstr ""
 #, fuzzy
 msgid "assigned dimensions [product %.0f] do not match object length [%.0f]"
 msgstr "dim [product %d] ne correspond pas à la longueur de l'objet [%d]"
-
-msgid "'%s' has non-finite values"
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
-msgstr ""
-
-#, fuzzy
-msgid "only square matrices can be used as graph incidence matrices"
-msgstr ""
-"seules des matrices carrées peuvent être utilisées comme matrices "
-"d'incidence pour les graphiques"
 
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr "'lwd' doit être un nombre non négatif ou NULL"
