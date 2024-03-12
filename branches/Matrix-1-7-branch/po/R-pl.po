@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2024-02-08 02:53\n"
+"POT-Creation-Date: 2024-03-12 11:27\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -298,6 +298,12 @@ msgstr "pośrednie 'r' jest typu %s"
 msgid "not yet implemented .. please report"
 msgstr "jeszcze niezaimplementowane .. proszę zgłosić raport"
 
+msgid "'%s' has non-finite values"
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
+msgstr ""
+
 # Matrix/R/abIndex.R: 13
 # stop("'force' must be (coercable to) TRUE or FALSE")
 msgid "'force' must be (coercable to) TRUE or FALSE"
@@ -412,6 +418,14 @@ msgstr ""
 
 msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
 msgstr ""
+
+# Matrix/R/sparseMatrix.R: 198
+# stop("only square matrices can be used as incidence matrices for graphs")
+#, fuzzy
+msgid "only square matrices can be used as graph incidence matrices"
+msgstr ""
+"jedynie kwadratowe macierze mogą zostać użyte jako macierz incydencji dla "
+"grafów"
 
 # Matrix/R/ndenseMatrix.R: 77
 # stop("not a symmetric matrix; consider forceSymmetric() or symmpart()")
@@ -779,20 +793,6 @@ msgstr ""
 #, fuzzy
 msgid "assigned dimensions [product %.0f] do not match object length [%.0f]"
 msgstr "wymiar [produkt %d] nie zgadza się z długością obiektu [%d]"
-
-msgid "'%s' has non-finite values"
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
-msgstr ""
-
-# Matrix/R/sparseMatrix.R: 198
-# stop("only square matrices can be used as incidence matrices for graphs")
-#, fuzzy
-msgid "only square matrices can be used as graph incidence matrices"
-msgstr ""
-"jedynie kwadratowe macierze mogą zostać użyte jako macierz incydencji dla "
-"grafów"
 
 # Matrix/R/dgTMatrix.R: 106
 # stop("'lwd' must be NULL or non-negative numeric")
