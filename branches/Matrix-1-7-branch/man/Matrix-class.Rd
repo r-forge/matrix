@@ -134,6 +134,9 @@
     \item{show}{\code{signature(object = "Matrix")}: \code{\link{show}}
       method for \code{\link{print}}ing.  For printing \emph{sparse}
       matrices, see \code{\link{printSpMatrix}}.}
+    \item{zapsmall}{\code{signature(x = "Matrix")}: typically used for
+      \code{"\linkS4class{dMatrix}"}: \code{\link{round}()} matrix entries
+      such that (relatively) very small entries become zero exactly.}
     \item{image}{\code{signature(object = "Matrix")}: draws an
       \code{\link{image}} of the matrix entries, using
       \code{\link[lattice]{levelplot}()} from package \pkg{lattice}.}
@@ -158,6 +161,7 @@
   principal argument), e.g., \code{\link{apply}}, \code{\link{eigen}},
   \code{\link{svd}} or \code{\link{kappa}} all do work via coercion to a
   \dQuote{traditional} (dense) \code{\link{matrix}}.
+
   %% --> ../tests/base-matrix-fun.R
 }
 \note{
