@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 11:27-0400\n"
+"POT-Creation-Date: 2024-03-14 15:47-0400\n"
 "PO-Revision-Date: 2021-04-12 18:57+0200\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: Csparse.c:26 Csparse.c:318 dgCMatrix.c:18 dgCMatrix.c:43 dgCMatrix.c:70
-#: dgCMatrix.c:84 dgCMatrix.c:89 dgCMatrix.c:94
+#: Csparse.c:26 Csparse.c:61 Csparse.c:86 Csparse.c:113 Csparse.c:127
+#: Csparse.c:132 Csparse.c:137 Csparse.c:411
 #, fuzzy, c-format
 msgid "'%s' failed"
 msgstr "cs_qr a échoué"
@@ -28,7 +28,27 @@ msgstr "cs_qr a échoué"
 msgid "'%s' slot is not increasing within columns after sorting"
 msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 
-#: Csparse.c:77 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
+#: Csparse.c:57
+#, fuzzy, c-format
+msgid "'%s' is empty or not square"
+msgstr "Matrix n'est pas carrée"
+
+#: Csparse.c:59 Csparse.c:81 Csparse.c:104 solve.c:43 solve.c:988
+#, fuzzy, c-format
+msgid "dimensions of '%s' and '%s' are inconsistent"
+msgstr "Les dimensions du système à résoudre sont incohérentes"
+
+#: Csparse.c:83
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
+msgstr ""
+
+#: Csparse.c:106
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
+msgstr ""
+
+#: Csparse.c:194 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
 #: coerce.c:911 coerce.c:1015 coerce.c:1501 coerce.c:1521 coerce.c:1531
 #: coerce.c:2061 coerce.c:2256 coerce.c:2262 coerce.c:2268 coerce.c:2397
 #: coerce.c:2404 coerce.c:2494 coerce.c:2629 coerce.c:2707 coerce.c:2729
@@ -38,7 +58,7 @@ msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 msgid "invalid '%s' to '%s'"
 msgstr "argument '%s' incorrect"
 
-#: Csparse.c:316
+#: Csparse.c:409
 #, fuzzy, c-format
 msgid "failed to open file \"%s\" for writing"
 msgstr "erreur lors de l'ouverture en écriture du fichier \"%s\""
@@ -413,89 +433,64 @@ msgstr ""
 "%s() : cas structurellement déficient de rang : probablement des zéros "
 "ERRONES"
 
-#: dgCMatrix.c:14
-#, fuzzy, c-format
-msgid "'%s' is empty or not square"
-msgstr "Matrix n'est pas carrée"
-
-#: dgCMatrix.c:16 dgCMatrix.c:38 dgCMatrix.c:61 solve.c:43 solve.c:988
-#, fuzzy, c-format
-msgid "dimensions of '%s' and '%s' are inconsistent"
-msgstr "Les dimensions du système à résoudre sont incohérentes"
-
-#: dgCMatrix.c:40
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
-msgstr ""
-
-#: dgCMatrix.c:63
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
-msgstr ""
-
-#: dgeMatrix.c:22
-#, fuzzy, c-format
-msgid "dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"
-msgstr "La dimension de l’objet Matrix %d x %d (= %g) est trop large"
-
-#: dgeMatrix.c:90
+#: expm.c:39
 msgid "Matrix exponential requires square, non-null matrix"
 msgstr "L'exponentiation de matrice nécessite une matrice carrée non nulle"
 
-#: dgeMatrix.c:107 dgeMatrix.c:109
+#: expm.c:56 expm.c:58
 #, c-format
 msgid "dgeMatrix_exp: LAPACK routine dgebal returned %d"
 msgstr "dgeMatrix_exp : la routine LAPACK dgebal a renvoyé %d"
 
-#: dgeMatrix.c:147
+#: expm.c:96
 #, c-format
 msgid "dgeMatrix_exp: dgetrf returned error code %d"
 msgstr "dgeMatrix_exp : dgetrf a renvoyé le code d'erreur %d"
 
-#: dgeMatrix.c:149
+#: expm.c:98
 #, c-format
 msgid "dgeMatrix_exp: dgetrs returned error code %d"
 msgstr "dgeMatrix_exp : dgetrs a renvoyé le code d'erreur %d"
 
-#: dgeMatrix.c:224
+#: factorizations.c:330
 msgid "dgeMatrix_Schur: argument x must be a non-null square matrix"
 msgstr "dgeMatrix_Schur : l'argument x doit être une matrice carrée non nulle"
 
-#: dgeMatrix.c:237
+#: factorizations.c:343
 msgid "dgeMatrix_Schur: first call to dgees failed"
 msgstr "dgeMatrix_Schur : le premier appel à dgees a échoué"
 
-#: dgeMatrix.c:246
+#: factorizations.c:352
 #, c-format
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr "dgeMatrix_Schur : dgees a renvoyé le code d'erreur %d"
 
-#: factorizations.c:355 sparse.c:196
+#: factorizations.c:403 sparse.c:196
 #, fuzzy, c-format
 msgid "'%s' is not a number"
 msgstr "%s n’est pas une liste"
 
-#: factorizations.c:376
+#: factorizations.c:424
 #, c-format
 msgid "LU factorization of m-by-n %s requires m == n"
 msgstr ""
 
-#: factorizations.c:385
+#: factorizations.c:433
 #, c-format
 msgid "LU factorization of %s failed: out of memory or near-singular"
 msgstr ""
 
-#: factorizations.c:462
+#: factorizations.c:510
 #, c-format
 msgid "QR factorization of m-by-n %s requires m >= n"
 msgstr ""
 
-#: factorizations.c:471
+#: factorizations.c:519
 #, c-format
 msgid "QR factorization of %s failed: out of memory"
 msgstr ""
 
-#: factorizations.c:571 factorizations.c:849
+#: factorizations.c:619 factorizations.c:897
 #, c-format
 msgid "'%s' is not a number or not finite"
 msgstr ""
@@ -1118,6 +1113,10 @@ msgstr "le slot j ne contient pas de valeurs croissantes au sein d'une colonne"
 #, fuzzy, c-format
 msgid "invalid class \"%s\" object: %s"
 msgstr "classe incorrecte d'objet à %s"
+
+#, fuzzy, c-format
+#~ msgid "dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"
+#~ msgstr "La dimension de l’objet Matrix %d x %d (= %g) est trop large"
 
 #, c-format
 #~ msgid "diagonal element %d of Cholesky factor is missing"
