@@ -1,6 +1,5 @@
 sources = \
 	Csparse.c \
-	abIndex.c \
 	attrib.c \
 	bind.c \
 	chm_common.c \
@@ -9,8 +8,7 @@ sources = \
 	cs-etc.c \
 	dense.c \
 	determinant.c \
-	dgCMatrix.c \
-	dgeMatrix.c \
+	expm.c \
 	factorizations.c \
 	idz.c \
 	init.c \
@@ -21,6 +19,7 @@ sources = \
 	solve.c \
 	sparse.c \
 	sparseVector.c \
+	subassign.c \
 	subscript.c \
 	utils-R.c \
 	utils.c \

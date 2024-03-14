@@ -5,7 +5,7 @@ setMethod("Schur", c(x = "dgeMatrix"),
           function(x, vectors = TRUE, ...) {
               if(length(x.x <- x@x) && !all(is.finite(range(x.x))))
                   stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
-              cl <- .Call(dgeMatrix_Schur, x, vectors, TRUE)
+              cl <- .Call(dgeMatrix_sch, x, vectors, TRUE)
               if(all(cl$WI == 0)) {
                   vals <- cl$WR
                   T <- triu(cl$T)
@@ -37,7 +37,7 @@ setMethod("Schur", c(x = "matrix"),
               storage.mode(x) <- "double"
               if(length(x) && !all(is.finite(range(x))))
                   stop(gettextf("'%s' has non-finite values", "x"), domain = NA)
-              cl <- .Call(dgeMatrix_Schur, x, vectors, FALSE)
+              cl <- .Call(dgeMatrix_sch, x, vectors, FALSE)
               vals <-
                   if(all(cl$WI == 0))
                       cl$WR

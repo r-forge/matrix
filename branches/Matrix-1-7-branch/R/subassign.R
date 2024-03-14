@@ -1669,11 +1669,11 @@ replSPvec <- function (x, i, value) {
 }
 
 setMethod("[<-", c(x = "sparseVector", i = "index", j = "missing",
-				value = "replValueSp"),
+				value = "ANY"),
 		 replSPvec)
 
 setMethod("[<-", c(x = "sparseVector",
                                 i = "sparseVector", j = "missing",
-				value = "replValueSp"),
+				value = "ANY"),
                  ## BTW, the important case: 'i' a *logical* sparseVector
 		 replSPvec)
