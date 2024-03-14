@@ -4,9 +4,6 @@ Csparse.o: Csparse.c Mdefines.h version.h \
   SuiteSparse/CXSparse/Include/cs.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Csparse.h
-abIndex.o: abIndex.c Mdefines.h version.h \
-  Msymbols.h utils.h abIndex.h \
-  t_Matrix_rle.c
 attrib.o: attrib.c Mdefines.h version.h \
   Msymbols.h utils.h attrib.h
 bind.o: bind.c Mdefines.h version.h \
@@ -50,7 +47,7 @@ idz.o: idz.c Mdefines.h version.h \
   Msymbols.h utils.h idz.h
 init.o: init.c Mdefines.h version.h \
   Msymbols.h utils.h Csparse.h \
-  abIndex.h attrib.h bind.h chm_common.h cholmod-etc.h \
+  attrib.h bind.h chm_common.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
   dgCMatrix.h expm.h factorizations.h kappa.h objects.h perm.h \
@@ -85,7 +82,8 @@ subassign.o: subassign.c Mdefines.h version.h \
 subscript.o: subscript.c Mdefines.h version.h \
   Msymbols.h utils.h subscript.h
 utils-R.o: utils-R.c Mdefines.h version.h \
-  Msymbols.h utils.h utils-R.h
+  Msymbols.h utils.h utils-R.h \
+  t_Matrix_rle.c
 utils.o: utils.c Mdefines.h version.h \
   Msymbols.h utils.h
 validity.o: validity.c Mdefines.h version.h \
