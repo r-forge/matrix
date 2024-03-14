@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.7-0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 11:27-0400\n"
+"POT-Creation-Date: 2024-03-14 15:49-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Csparse.c:26 Csparse.c:318 dgCMatrix.c:18 dgCMatrix.c:43 dgCMatrix.c:70
-#: dgCMatrix.c:84 dgCMatrix.c:89 dgCMatrix.c:94
+#: Csparse.c:26 Csparse.c:61 Csparse.c:86 Csparse.c:113 Csparse.c:127
+#: Csparse.c:132 Csparse.c:137 Csparse.c:411
 #, c-format
 msgid "'%s' failed"
 msgstr ""
@@ -28,7 +28,27 @@ msgstr ""
 msgid "'%s' slot is not increasing within columns after sorting"
 msgstr ""
 
-#: Csparse.c:77 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
+#: Csparse.c:57
+#, c-format
+msgid "'%s' is empty or not square"
+msgstr ""
+
+#: Csparse.c:59 Csparse.c:81 Csparse.c:104 solve.c:43 solve.c:988
+#, c-format
+msgid "dimensions of '%s' and '%s' are inconsistent"
+msgstr ""
+
+#: Csparse.c:83
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
+msgstr ""
+
+#: Csparse.c:106
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
+msgstr ""
+
+#: Csparse.c:194 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
 #: coerce.c:911 coerce.c:1015 coerce.c:1501 coerce.c:1521 coerce.c:1531
 #: coerce.c:2061 coerce.c:2256 coerce.c:2262 coerce.c:2268 coerce.c:2397
 #: coerce.c:2404 coerce.c:2494 coerce.c:2629 coerce.c:2707 coerce.c:2729
@@ -38,7 +58,7 @@ msgstr ""
 msgid "invalid '%s' to '%s'"
 msgstr ""
 
-#: Csparse.c:316
+#: Csparse.c:409
 #, c-format
 msgid "failed to open file \"%s\" for writing"
 msgstr ""
@@ -405,89 +425,64 @@ msgstr ""
 msgid "%s(<%s>) does not support structurally rank deficient case"
 msgstr ""
 
-#: dgCMatrix.c:14
-#, c-format
-msgid "'%s' is empty or not square"
-msgstr ""
-
-#: dgCMatrix.c:16 dgCMatrix.c:38 dgCMatrix.c:61 solve.c:43 solve.c:988
-#, c-format
-msgid "dimensions of '%s' and '%s' are inconsistent"
-msgstr ""
-
-#: dgCMatrix.c:40
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
-msgstr ""
-
-#: dgCMatrix.c:63
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
-msgstr ""
-
-#: dgeMatrix.c:22
-#, c-format
-msgid "dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"
-msgstr ""
-
-#: dgeMatrix.c:90
+#: expm.c:39
 msgid "Matrix exponential requires square, non-null matrix"
 msgstr ""
 
-#: dgeMatrix.c:107 dgeMatrix.c:109
+#: expm.c:56 expm.c:58
 #, c-format
 msgid "dgeMatrix_exp: LAPACK routine dgebal returned %d"
 msgstr ""
 
-#: dgeMatrix.c:147
+#: expm.c:96
 #, c-format
 msgid "dgeMatrix_exp: dgetrf returned error code %d"
 msgstr ""
 
-#: dgeMatrix.c:149
+#: expm.c:98
 #, c-format
 msgid "dgeMatrix_exp: dgetrs returned error code %d"
 msgstr ""
 
-#: dgeMatrix.c:224
+#: factorizations.c:330
 msgid "dgeMatrix_Schur: argument x must be a non-null square matrix"
 msgstr ""
 
-#: dgeMatrix.c:237
+#: factorizations.c:343
 msgid "dgeMatrix_Schur: first call to dgees failed"
 msgstr ""
 
-#: dgeMatrix.c:246
+#: factorizations.c:352
 #, c-format
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr ""
 
-#: factorizations.c:355 sparse.c:196
+#: factorizations.c:403 sparse.c:196
 #, c-format
 msgid "'%s' is not a number"
 msgstr ""
 
-#: factorizations.c:376
+#: factorizations.c:424
 #, c-format
 msgid "LU factorization of m-by-n %s requires m == n"
 msgstr ""
 
-#: factorizations.c:385
+#: factorizations.c:433
 #, c-format
 msgid "LU factorization of %s failed: out of memory or near-singular"
 msgstr ""
 
-#: factorizations.c:462
+#: factorizations.c:510
 #, c-format
 msgid "QR factorization of m-by-n %s requires m >= n"
 msgstr ""
 
-#: factorizations.c:471
+#: factorizations.c:519
 #, c-format
 msgid "QR factorization of %s failed: out of memory"
 msgstr ""
 
-#: factorizations.c:571 factorizations.c:849
+#: factorizations.c:619 factorizations.c:897
 #, c-format
 msgid "'%s' is not a number or not finite"
 msgstr ""
