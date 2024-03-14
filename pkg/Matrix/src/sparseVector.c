@@ -31,19 +31,19 @@ SEXP v2spV(SEXP from)
 	do { \
 		switch (TYPEOF(from)) { \
 		case LGLSXP: \
-			V2SPV(l, NOTZERO_LOGICAL, int, LGLSXP, LOGICAL, \
+			V2SPV(l, ISNZ_LOGICAL, int, LGLSXP, LOGICAL, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		case INTSXP: \
-			V2SPV(i, NOTZERO_INTEGER, int, INTSXP, INTEGER, \
+			V2SPV(i, ISNZ_INTEGER, int, INTSXP, INTEGER, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		case REALSXP: \
-			V2SPV(d, NOTZERO_REAL, double, REALSXP, REAL, \
+			V2SPV(d, ISNZ_REAL, double, REALSXP, REAL, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		case CPLXSXP: \
-			V2SPV(z, NOTZERO_COMPLEX, Rcomplex, CPLXSXP, COMPLEX, \
+			V2SPV(z, ISNZ_COMPLEX, Rcomplex, CPLXSXP, COMPLEX, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		default: \

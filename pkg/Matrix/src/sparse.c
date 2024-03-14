@@ -9,32 +9,32 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 
 	SEXP to, x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 
-#define TOLBASED_NOTZERO_REAL(_X_) \
+#define TOLBASED_ISNZ_REAL(_X_) \
 	(ISNA_REAL(_X_) || fabs(_X_) > tol)
 
-#define TOLBASED_NOTZERO_COMPLEX(_X_) \
+#define TOLBASED_ISNZ_COMPLEX(_X_) \
 	(ISNA_COMPLEX(_X_) || hypot((_X_).r, (_X_).i) > tol)
 
 #define DROP0_CASES(_DO_) \
 	do { \
 		switch (class[0]) { \
 		case 'l': \
-			_DO_(int, LOGICAL, NOTZERO_LOGICAL); \
+			_DO_(int, LOGICAL, ISNZ_LOGICAL); \
 			break; \
 		case 'i': \
-			_DO_(int, INTEGER, NOTZERO_INTEGER); \
+			_DO_(int, INTEGER, ISNZ_INTEGER); \
 			break; \
 		case 'd': \
 			if (tol > 0.0) \
-				_DO_(double, REAL, TOLBASED_NOTZERO_REAL); \
+				_DO_(double, REAL, TOLBASED_ISNZ_REAL); \
 			else \
-				_DO_(double, REAL,          NOTZERO_REAL); \
+				_DO_(double, REAL,          ISNZ_REAL); \
 			break; \
 		case 'z': \
 			if (tol > 0.0) \
-				_DO_(Rcomplex, COMPLEX, TOLBASED_NOTZERO_COMPLEX); \
+				_DO_(Rcomplex, COMPLEX, TOLBASED_ISNZ_COMPLEX); \
 			else \
-				_DO_(Rcomplex, COMPLEX,          NOTZERO_COMPLEX); \
+				_DO_(Rcomplex, COMPLEX,          ISNZ_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -48,11 +48,11 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 			nnz0 = pp0[n], nnz1 = 0;
 
 #undef DROP0_LOOP1
-#define DROP0_LOOP1(_CTYPE_, _PTR_, _NOTZERO_) \
+#define DROP0_LOOP1(_CTYPE_, _PTR_, _ISNZ_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0); \
 			for (k = 0; k < nnz0; ++k) { \
-				if (_NOTZERO_(*px0)) \
+				if (_ISNZ_(*px0)) \
 					++nnz1; \
 				++px0; \
 			} \
@@ -78,14 +78,14 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 		SET_SLOT(to, Matrix_xSym, x1);
 
 #undef DROP0_LOOP2
-#define DROP0_LOOP2(_CTYPE_, _PTR_, _NOTZERO_) \
+#define DROP0_LOOP2(_CTYPE_, _PTR_, _ISNZ_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			for (j = 0, k = 0; j < n; ++j) { \
 				pp1[j] = pp1[j - 1]; \
 				kend = pp0[j]; \
 				while (k < kend) { \
-					if (_NOTZERO_(*px0)) { \
+					if (_ISNZ_(*px0)) { \
 						++pp1[j]; \
 						*(pi1++) = *pi0; \
 						*(px1++) = *px0; \
@@ -121,11 +121,11 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 		SET_SLOT(to, Matrix_xSym, x1);
 
 #undef DROP0_LOOP2
-#define DROP0_LOOP2(_CTYPE_, _PTR_, _NOTZERO_) \
+#define DROP0_LOOP2(_CTYPE_, _PTR_, _ISNZ_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			for (k = 0; k < nnz0; ++k) { \
-				if (_NOTZERO_(*px0)) { \
+				if (_ISNZ_(*px0)) { \
 					*(pi1++) = *pi0; \
 					*(pj1++) = *pj0; \
 					*(px1++) = *px0; \
@@ -171,8 +171,8 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 		UNPROTECT(1); /* factors */
 	}
 
-#undef TOLBASED_NOTZERO_REAL
-#undef TOLBASED_NOTZERO_COMPLEX
+#undef TOLBASED_ISNZ_REAL
+#undef TOLBASED_ISNZ_COMPLEX
 #undef DROP0_CASES
 #undef DROP0_LOOP1
 #undef DROP0_LOOP2
@@ -821,16 +821,16 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		switch (class[0]) { \
 		case 'n': \
 		case 'l': \
-			DS_LOOP(int, LOGICAL, SHOW, NOTZERO_LOGICAL); \
+			DS_LOOP(int, LOGICAL, SHOW, ISNZ_LOGICAL); \
 			break; \
 		case 'i': \
-			DS_LOOP(int, INTEGER, SHOW, NOTZERO_INTEGER); \
+			DS_LOOP(int, INTEGER, SHOW, ISNZ_INTEGER); \
 			break; \
 		case 'd': \
-			DS_LOOP(double, REAL, SHOW, NOTZERO_REAL); \
+			DS_LOOP(double, REAL, SHOW, ISNZ_REAL); \
 			break; \
 		case 'z': \
-			DS_LOOP(Rcomplex, COMPLEX, SHOW, NOTZERO_COMPLEX); \
+			DS_LOOP(Rcomplex, COMPLEX, SHOW, ISNZ_COMPLEX); \
 			break; \
 		default: \
 			break; \
@@ -887,18 +887,18 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		}
 
 #undef DS_LOOP
-#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
+#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
 		do { \
 			_CTYPE_ *pvalue = _PTR_(value); \
 			if (v) { \
 				for (j = 0; j < r; ++j) { \
-					if (_NOTZERO_(pvalue[j])) \
+					if (_ISNZ_(pvalue[j])) \
 						++nd1; \
 					pp1[j] += nd1; \
 				} \
 				for (j = r; j < n_; ++j) \
 					pp1[j] += nd1; \
-			} else if (_NOTZERO_(pvalue[0])) { \
+			} else if (_ISNZ_(pvalue[0])) { \
 				full = 1; \
 				for (j = 0; j < r; ++j) \
 					pp1[j] += ++nd1; \
@@ -917,7 +917,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		int *pi1 = INTEGER(i1);
 
 #undef DS_LOOP
-#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
+#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			_CTYPE_ *pvalue = _PTR_(value); \
@@ -930,7 +930,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 				} \
 				if (k < kend && pi0[k] == j) \
 					++k; \
-				if ((v) ? _NOTZERO_(pvalue[j]) : full) { \
+				if ((v) ? _ISNZ_(pvalue[j]) : full) { \
 					       *(pi1++) = j                           ; \
 					_MASK_(*(px1++) = (v) ? pvalue[j] : pvalue[0]); \
 				} \
@@ -951,7 +951,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		} while (0)
 
 		if (class[0] == 'n')
-			DS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
+			DS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), pp1[n_ - 1]));
@@ -975,14 +975,14 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 					++nd0;
 
 #undef DS_LOOP
-#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
+#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
 		do { \
 			_CTYPE_ *pvalue = _PTR_(value); \
 			if (v) { \
 				for (j = 0; j < r; ++j) \
-					if (_NOTZERO_(pvalue[j])) \
+					if (_ISNZ_(pvalue[j])) \
 						++nd1; \
-			} else if (_NOTZERO_(pvalue[0])) { \
+			} else if (_ISNZ_(pvalue[0])) { \
 				full = 1; \
 				nd1 = r; \
 			} \
@@ -1001,7 +1001,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 
 #undef DS_LOOP
-#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
+#define DS_LOOP(_CTYPE_, _PTR_, _MASK_, _ISNZ_) \
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			_CTYPE_ *pvalue = _PTR_(value); \
@@ -1014,7 +1014,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			} \
 			if (v) { \
 				for (j = 0; j < r; ++j) { \
-					if (_NOTZERO_(pvalue[j])) { \
+					if (_ISNZ_(pvalue[j])) { \
 						*(pi1++) = *(pj1++) = j; \
 						_MASK_(*(px1++) = pvalue[j]); \
 					} \
@@ -1028,7 +1028,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		} while (0)
 
 		if (class[0] == 'n')
-			DS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
+			DS_LOOP(int, LOGICAL, HIDE, ISNZ_LOGICAL);
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
@@ -1774,9 +1774,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 			} while (0)
 
 			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN2_ID_REAL, INCREMENT_REAL);
+				SP_LOOP(double, REAL, ASSIGN_REAL, INCREMENT_REAL);
 			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, INCREMENT_COMPLEX);
+				SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, INCREMENT_COMPLEX);
 
 			SET_SLOT(to, Matrix_pSym, p1);
 			SET_SLOT(to,        iSym, i1);
@@ -1829,9 +1829,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
+					SP_LOOP(double, REAL, ASSIGN_REAL);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
 
 				SET_SLOT(to, Matrix_pSym, p0);
 				SET_SLOT(to,        iSym, i0);
@@ -1881,9 +1881,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_ID_REAL, 1.0);
+					SP_LOOP(double, REAL, ASSIGN_REAL, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, Matrix_zone);
 
 				SET_SLOT(to, Matrix_pSym, p1);
 				SET_SLOT(to,        iSym, i1);
@@ -1949,9 +1949,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 			} while (0)
 
 			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
+				SP_LOOP(double, REAL, ASSIGN_REAL);
 			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
+				SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
 
 			SET_SLOT(to, Matrix_iSym, i1);
 			SET_SLOT(to, Matrix_jSym, j1);
@@ -1978,9 +1978,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
+					SP_LOOP(double, REAL, ASSIGN_REAL);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
 
 				SET_SLOT(to, Matrix_iSym, i0);
 				SET_SLOT(to, Matrix_jSym, j0);
@@ -2012,9 +2012,9 @@ SEXP sparse_symmpart(SEXP from, const char *class)
 				} while (0)
 
 				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_ID_REAL, 1.0);
+					SP_LOOP(double, REAL, ASSIGN_REAL, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, Matrix_zone);
 
 				SET_SLOT(to, Matrix_iSym, i1);
 				SET_SLOT(to, Matrix_jSym, j1);
@@ -2243,9 +2243,9 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 		} while (0)
 
 		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN2_ID_REAL, INCREMENT_REAL);
+			SP_LOOP(double, REAL, ASSIGN_REAL, INCREMENT_REAL);
 		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX, INCREMENT_COMPLEX);
+			SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX, INCREMENT_COMPLEX);
 
 		Matrix_Free(pp1_, n);
 		SET_SLOT(to, Matrix_pSym, p1);
@@ -2291,9 +2291,9 @@ SEXP sparse_skewpart(SEXP from, const char *class)
 		} while (0)
 
 		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN2_ID_REAL);
+			SP_LOOP(double, REAL, ASSIGN_REAL);
 		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_ID_COMPLEX);
+			SP_LOOP(Rcomplex, COMPLEX, ASSIGN_COMPLEX);
 
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);

@@ -47,20 +47,20 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 #define BAND1(_PREFIX_, _CTYPE_, _PTR_) \
 	_PREFIX_ ## band1(_PTR_(x1), n, a, b, ul1, di)
 
-#define DCOPY2(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCPY2(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcopy2(px1, px0, n, XLENGTH(x1),      'U', di); \
+			_PREFIX_ ## dcpy2(px1, px0, n, XLENGTH(x1),      'U', di); \
 	} while (0)
 
-#define DCOPY1(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCPY1(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
 		if (a <= 0 && b >= 0) \
-			_PREFIX_ ## dcopy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
+			_PREFIX_ ## dcpy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
 	} while (0)
 
 	char ul0 = 'U', ul1 = 'U', di = 'N';
@@ -142,9 +142,9 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 			/* Result is either a diagonal matrix or a zero matrix : */
 			PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
 			if (class[2] != 'p')
-				BAND_CASES(DCOPY2);
+				BAND_CASES(DCPY2);
 			else
-				BAND_CASES(DCOPY1);
+				BAND_CASES(DCPY1);
 		} else {
 			PROTECT(x1 = duplicate(x0));
 			if (class[2] != 'p')
@@ -177,8 +177,8 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 #undef BAND_CASES
 #undef BAND2
 #undef BAND1
-#undef DCOPY2
-#undef DCOPY1
+#undef DCPY2
+#undef DCPY1
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -644,35 +644,35 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul)
 
 		R_xlen_t len = XLENGTH(x1);
 
-#define DCOPY(_PREFIX_, _CTYPE_, _PTR_) \
+#define DCPY(_PREFIX_, _CTYPE_, _PTR_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 			Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
 			if (class[2] != 'p') \
-				_PREFIX_ ## dcopy2(px1, px0, n, len,      'U', di); \
+				_PREFIX_ ## dcpy2(px1, px0, n, len,     '\0', di); \
 			else \
-				_PREFIX_ ## dcopy1(px1, px0, n, len, ul1, ul0, di); \
+				_PREFIX_ ## dcpy1(px1, px0, n, len, ul1, ul0, di); \
 		} while (0)
 
 		switch (class[0]) {
 		case 'n':
 		case 'l':
-			DCOPY(i, int, LOGICAL);
+			DCPY(i, int, LOGICAL);
 			break;
 		case 'i':
-			DCOPY(i, int, INTEGER);
+			DCPY(i, int, INTEGER);
 			break;
 		case 'd':
-			DCOPY(d, double, REAL);
+			DCPY(d, double, REAL);
 			break;
 		case 'z':
-			DCOPY(z, Rcomplex, COMPLEX);
+			DCPY(z, Rcomplex, COMPLEX);
 			break;
 		default:
 			break;
 		}
 
-#undef DCOPY
+#undef DCPY
 
 		UNPROTECT(1); /* x1 */
 	}
@@ -998,9 +998,9 @@ SEXP dense_skewpart(SEXP from, const char *class)
 	} while (0)
 
 	if (cl[0] == 'd')
-		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN2_ID_REAL, 0.0);
+		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN_REAL, 0.0);
 	else
-		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN2_ID_COMPLEX, Matrix_zzero);
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN_COMPLEX, Matrix_zzero);
 
 #undef SP_LOOP
 
@@ -1140,7 +1140,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-#define IT_LOOP(_CTYPE_, _PTR_, _NOTZERO_) \
+#define IT_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
 	do { \
 		_CTYPE_ *px; \
 		if (upper == NA_LOGICAL) { \
@@ -1148,7 +1148,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			for (j = 0; j < n; px += (++j)) { \
 				px += 1; \
 				for (i = j + 1; i < n; ++i, px += 1) { \
-					if (_NOTZERO_(*px)) { \
+					if (_ISNZ_(*px)) { \
 						j = n; \
 						break; \
 					} \
@@ -1159,7 +1159,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			px = _PTR_(x); \
 			for (j = 0; j < n; px += n - (++j)) { \
 				for (i = 0; i < j; ++i, px += 1) { \
-					if (_NOTZERO_(*px)) { \
+					if (_ISNZ_(*px)) { \
 						j = n; \
 						break; \
 					} \
@@ -1174,7 +1174,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			for (j = 0; j < n; px += (++j)) { \
 				px += 1; \
 				for (i = j + 1; i < n; ++i, px += 1) \
-					if (_NOTZERO_(*px)) \
+					if (_ISNZ_(*px)) \
 						return 0; \
 			} \
 			return  1; \
@@ -1182,7 +1182,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			px = _PTR_(x); \
 			for (j = 0; j < n; px += n - (++j)) { \
 				for (i = 0; i < j; ++i, px += 1) \
-					if (_NOTZERO_(*px)) \
+					if (_ISNZ_(*px)) \
 						return 0; \
 				px += 1; \
 			} \
@@ -1192,19 +1192,19 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 
 	switch (class[0]) {
 	case 'n':
-		IT_LOOP(int, LOGICAL, NOTZERO_PATTERN);
+		IT_LOOP(int, LOGICAL, ISNZ_PATTERN);
 		break;
 	case 'l':
-		IT_LOOP(int, LOGICAL, NOTZERO_LOGICAL);
+		IT_LOOP(int, LOGICAL, ISNZ_LOGICAL);
 		break;
 	case 'i':
-		IT_LOOP(int, INTEGER, NOTZERO_INTEGER);
+		IT_LOOP(int, INTEGER, ISNZ_INTEGER);
 		break;
 	case 'd':
-		IT_LOOP(double, REAL, NOTZERO_REAL);
+		IT_LOOP(double, REAL, ISNZ_REAL);
 		break;
 	case 'z':
-		IT_LOOP(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
+		IT_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
 		break;
 	default:
 		break;
@@ -1266,19 +1266,19 @@ int dense_is_diagonal(SEXP obj, const char *class)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-#define ID_LOOP(_CTYPE_, _PTR_, _NOTZERO_) \
+#define ID_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < j; ++i) { \
-					if (_NOTZERO_(*px)) \
+					if (_ISNZ_(*px)) \
 						return 0; \
 					px += 1; \
 				} \
 				px += 1; \
 				for (i = j + 1; i < n; ++i) { \
-					if (_NOTZERO_(*px)) \
+					if (_ISNZ_(*px)) \
 						return 0; \
 					px += 1; \
 				} \
@@ -1287,7 +1287,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						if (_NOTZERO_(*px)) \
+						if (_ISNZ_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1297,7 +1297,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += j + 1; \
 					for (i = j + 1; i < n; ++i) { \
-						if (_NOTZERO_(*px)) \
+						if (_ISNZ_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1307,7 +1307,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						if (_NOTZERO_(*px)) \
+						if (_ISNZ_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1317,7 +1317,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += 1; \
 					for (i = j + 1; i < n; ++i) { \
-						if (_NOTZERO_(*px)) \
+						if (_ISNZ_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1329,19 +1329,19 @@ int dense_is_diagonal(SEXP obj, const char *class)
 
 	switch (class[0]) {
 	case 'n':
-		ID_LOOP(int, LOGICAL, NOTZERO_PATTERN);
+		ID_LOOP(int, LOGICAL, ISNZ_PATTERN);
 		break;
 	case 'l':
-		ID_LOOP(int, LOGICAL, NOTZERO_LOGICAL);
+		ID_LOOP(int, LOGICAL, ISNZ_LOGICAL);
 		break;
 	case 'i':
-		ID_LOOP(int, INTEGER, NOTZERO_INTEGER);
+		ID_LOOP(int, INTEGER, ISNZ_INTEGER);
 		break;
 	case 'd':
-		ID_LOOP(double, REAL, NOTZERO_REAL);
+		ID_LOOP(double, REAL, ISNZ_REAL);
 		break;
 	case 'z':
-		ID_LOOP(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
+		ID_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
 		break;
 	default:
 		break;

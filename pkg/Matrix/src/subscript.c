@@ -414,7 +414,8 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
+	const char *cl = valid[ivalid];
 	validObject(x, cl);
 
 	switch (cl[2]) {
@@ -794,7 +795,8 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
+	const char *cl = valid[ivalid];
 	validObject(x, cl);
 
 	switch (cl[2]) {
@@ -1882,28 +1884,28 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 			Matrix_Calloc(work, n, char);
 
-#define SUB2_WORK(_CTYPE_, _PTR_, _NOTZERO_) \
+#define SUB2_WORK(_CTYPE_, _PTR_, _ISNZ_) \
 			do { \
 				_CTYPE_ *px0 = _PTR_(x0); \
 				for (j_ = 0; j_ < n; ++j_) \
-					work[j_] = _NOTZERO_(px0[j_]); \
+					work[j_] = _ISNZ_(px0[j_]); \
 			} while (0)
 
 			switch (cl[0]) {
 			case 'n':
-				SUB2_WORK(int, LOGICAL, NOTZERO_PATTERN);
+				SUB2_WORK(int, LOGICAL, ISNZ_PATTERN);
 				break;
 			case 'l':
-				SUB2_WORK(int, LOGICAL, NOTZERO_LOGICAL);
+				SUB2_WORK(int, LOGICAL, ISNZ_LOGICAL);
 				break;
 			case 'i':
-				SUB2_WORK(int, INTEGER, NOTZERO_INTEGER);
+				SUB2_WORK(int, INTEGER, ISNZ_INTEGER);
 				break;
 			case 'd':
-				SUB2_WORK(double, REAL, NOTZERO_REAL);
+				SUB2_WORK(double, REAL, ISNZ_REAL);
 				break;
 			case 'z':
-				SUB2_WORK(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
+				SUB2_WORK(Rcomplex, COMPLEX, ISNZ_COMPLEX);
 				break;
 			default:
 				break;
@@ -2178,7 +2180,8 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 	int ivalid = R_check_class_etc(x, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 4)];
+	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 0);
+	const char *cl = valid[ivalid];
 	validObject(x, cl);
 
 	switch (cl[2]) {

@@ -116,7 +116,7 @@ setMethod("rcond", c(x = "ANY", norm = "missing"),
 setMethod("rcond", c(x = "denseMatrix", norm = "character"),
           function(x, norm, ...) {
               x <- .M2kind(x, ",")
-              switch(substr(.M.nonvirtual(x, 3L), 2L, 3L),
+              switch(substr(.M.nonvirtual(x, strict = TRUE), 2L, 3L),
                      "ge" =
                          {
                              d <- x@Dim
@@ -148,7 +148,8 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                              trf <- BunchKaufman(x, warnSing = FALSE)
                              .Call(dspMatrix_rcond, x, trf, norm)
                          },
-                     "po" =
+                     "po" = ,
+                     "or" = # corMatrix
                          {
                              ok <- TRUE
                              trf <- tryCatch(
@@ -161,7 +162,8 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                                  .Call(dpoMatrix_rcond, x, trf, norm)
                              else .Call(dsyMatrix_rcond, x, trf, norm)
                          },
-                     "pp" =
+                     "pp" = ,
+                     "op" = # copMatrix
                          {
                              ok <- TRUE
                              trf <- tryCatch(
