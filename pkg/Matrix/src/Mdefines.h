@@ -88,7 +88,7 @@ do { \
 
 /* Often used symbols, defined in ./init.c */
 extern
-#include "Syms.h"
+#include "Msymbols.h"
 
 /* Often used numbers, defined in ./init.c */
 extern
