@@ -8,7 +8,7 @@
 #include "dense.h"
 #include "determinant.h"
 #include "dgCMatrix.h"
-#include "dgeMatrix.h"
+#include "expm.h"
 #include "factorizations.h"
 #include "kappa.h"
 #include "objects.h"
@@ -54,8 +54,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dgCMatrix_lusol, 2),
 	CALLDEF(dgCMatrix_qrsol, 3),
 	CALLDEF(dgCMatrix_cholsol, 2),
-
-	CALLDEF(dgeMatrix_exp, 1),
 
 	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
 
@@ -185,12 +183,15 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_matmult, 6),
 	CALLDEF(R_diagonal_matmult, 5),
 
+	CALLDEF(dgeMatrix_expm, 1),
+
 	CALLDEF(dgeMatrix_trf, 2),
 	CALLDEF(dsyMatrix_trf, 2),
 	CALLDEF(dspMatrix_trf, 2),
 	CALLDEF(dpoMatrix_trf, 4),
 	CALLDEF(dppMatrix_trf, 2),
 	CALLDEF(dgeMatrix_sch, 3),
+
 	CALLDEF(dgCMatrix_trf, 4),
 	CALLDEF(dgCMatrix_orf, 3),
 	CALLDEF(dpCMatrix_trf, 5),

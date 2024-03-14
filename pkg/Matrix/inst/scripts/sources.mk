@@ -10,7 +10,7 @@ sources = \
 	dense.c \
 	determinant.c \
 	dgCMatrix.c \
-	dgeMatrix.c \
+	expm.c \
 	factorizations.c \
 	idz.c \
 	init.c \
