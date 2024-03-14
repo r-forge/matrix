@@ -8,8 +8,7 @@ SEXP dsyMatrix_trf(SEXP, SEXP);
 SEXP dspMatrix_trf(SEXP, SEXP);
 SEXP dpoMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP dppMatrix_trf(SEXP, SEXP);
-
-SEXP dgeMatrix_Schur(SEXP, SEXP, SEXP);
+SEXP dgeMatrix_sch(SEXP, SEXP, SEXP);
 
 SEXP dgCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP dgCMatrix_orf(SEXP, SEXP, SEXP);

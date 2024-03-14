@@ -55,7 +55,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dgCMatrix_qrsol, 3),
 	CALLDEF(dgCMatrix_cholsol, 2),
 
-	CALLDEF(dgeMatrix_Schur, 3),
 	CALLDEF(dgeMatrix_exp, 1),
 
 	CALLDEF(CsparseMatrix_validate_maybe_sorting, 1),
@@ -191,6 +190,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dspMatrix_trf, 2),
 	CALLDEF(dpoMatrix_trf, 4),
 	CALLDEF(dppMatrix_trf, 2),
+	CALLDEF(dgeMatrix_sch, 3),
 	CALLDEF(dgCMatrix_trf, 4),
 	CALLDEF(dgCMatrix_orf, 3),
 	CALLDEF(dpCMatrix_trf, 5),

@@ -306,7 +306,7 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 	return val;
 }
 
-SEXP dgeMatrix_Schur(SEXP x, SEXP vectors, SEXP isDGE)
+SEXP dgeMatrix_sch(SEXP x, SEXP vectors, SEXP isDGE)
 {
 // 'x' is either a traditional matrix or a  dgeMatrix, as indicated by isDGE.
     int *dims, n, vecs = asLogical(vectors), is_dge = asLogical(isDGE),
