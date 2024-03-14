@@ -176,7 +176,7 @@ int strmatch(const char *x, const char **valid)
 }
 
 /* <op>(diag(obj))  where  obj=dCHMsimpl (LDLt)  or  obj=dtCMatrix (nonunit) */
-SEXP tCsparse_diag(SEXP obj, SEXP op)
+SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 {
 	static const char *valid[] = {
 		/* 0 */    "trace",
@@ -373,7 +373,7 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 }
 
 /* writeMM(obj, file) */
-SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
+SEXP Csparse_writeMM(SEXP obj, SEXP file)
 {
 	static const char *valid[] = { VALID_CSPARSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
@@ -403,10 +403,10 @@ SEXP Csparse_MatrixMarket(SEXP obj, SEXP path)
 		A->stype = (ul == 'U') ? 1 : -1;
 	}
 
-	const char *path_ = CHAR(asChar(path));
-	FILE *f = fopen(path_, "w");
+	const char *filename = CHAR(asChar(file));
+	FILE *f = fopen(filename, "w");
 	if (!f)
-		error(_("failed to open file \"%s\" for writing"), path_);
+		error(_("failed to open file \"%s\" for writing"), filename);
 	if (!cholmod_write_sparse(f, A, (cholmod_sparse *) NULL, (char *) NULL, &c))
 		error(_("'%s' failed"), "cholmod_write_sparse");
 	fclose(f);
