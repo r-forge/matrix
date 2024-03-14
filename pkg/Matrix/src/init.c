@@ -6,7 +6,6 @@
 #include "coerce.h"
 #include "dense.h"
 #include "determinant.h"
-#include "dgCMatrix.h"
 #include "expm.h"
 #include "factorizations.h"
 #include "kappa.h"

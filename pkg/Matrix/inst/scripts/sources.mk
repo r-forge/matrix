@@ -8,7 +8,6 @@ sources = \
 	cs-etc.c \
 	dense.c \
 	determinant.c \
-	dgCMatrix.c \
 	expm.c \
 	factorizations.c \
 	idz.c \
