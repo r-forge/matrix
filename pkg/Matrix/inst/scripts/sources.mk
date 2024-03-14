@@ -21,6 +21,7 @@ sources = \
 	solve.c \
 	sparse.c \
 	sparseVector.c \
+	subassign.c \
 	subscript.c \
 	utils-R.c \
 	utils.c \

@@ -17,6 +17,7 @@
 #include "solve.h"
 #include "sparse.h"
 #include "sparseVector.h"
+#include "subassign.h"
 #include "subscript.h"
 #include "utils-R.h"
 #include "validity.h"

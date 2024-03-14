@@ -3,7 +3,7 @@ Csparse.o: Csparse.c Mdefines.h version.h \
   Msymbols.h utils.h cs-etc.h \
   SuiteSparse/CXSparse/Include/cs.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
-  SuiteSparse/CHOLMOD/Include/cholmod.h Csparse.h t_Csparse_subassign.c
+  SuiteSparse/CHOLMOD/Include/cholmod.h Csparse.h
 abIndex.o: abIndex.c Mdefines.h version.h \
   Msymbols.h utils.h abIndex.h \
   t_Matrix_rle.c
@@ -54,8 +54,8 @@ init.o: init.c Mdefines.h version.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
   dgCMatrix.h expm.h factorizations.h kappa.h objects.h perm.h \
-  products.h solve.h sparse.h sparseVector.h subscript.h utils-R.h \
-  validity.h 
+  products.h solve.h sparse.h sparseVector.h subassign.h subscript.h \
+  utils-R.h validity.h 
 kappa.o: kappa.c Lapack-etc.h \
   Mdefines.h version.h \
   Msymbols.h utils.h kappa.h
@@ -79,6 +79,9 @@ sparse.o: sparse.c Mdefines.h version.h \
   Msymbols.h utils.h sparse.h
 sparseVector.o: sparseVector.c Mdefines.h version.h \
   Msymbols.h utils.h sparseVector.h
+subassign.o: subassign.c Mdefines.h version.h \
+  Msymbols.h utils.h subassign.h \
+  t_Csparse_subassign.c
 subscript.o: subscript.c Mdefines.h version.h \
   Msymbols.h utils.h subscript.h
 utils-R.o: utils-R.c Mdefines.h version.h \
