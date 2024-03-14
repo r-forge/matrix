@@ -306,6 +306,54 @@ SEXP dppMatrix_trf(SEXP obj, SEXP warn)
 	return val;
 }
 
+SEXP dgeMatrix_sch(SEXP x, SEXP vectors, SEXP isDGE)
+{
+// 'x' is either a traditional matrix or a  dgeMatrix, as indicated by isDGE.
+    int *dims, n, vecs = asLogical(vectors), is_dge = asLogical(isDGE),
+	info, izero = 0, lwork = -1, nprot = 1;
+
+    if(is_dge) {
+	dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
+    } else { // traditional matrix
+	dims = INTEGER(getAttrib(x, R_DimSymbol));
+	if(!isReal(x)) { // may not be "numeric" ..
+	    x = PROTECT(coerceVector(x, REALSXP)); // -> maybe error
+	    nprot++;
+	}
+    }
+    double *work, tmp;
+    const char *nms[] = {"WR", "WI", "T", "Z", ""};
+    SEXP val = PROTECT(Rf_mkNamed(VECSXP, nms));
+
+    n = dims[0];
+    if (n != dims[1] || n < 1)
+	error(_("dgeMatrix_Schur: argument x must be a non-null square matrix"));
+    const R_xlen_t n2 = ((R_xlen_t)n) * n; // = n^2
+
+    SET_VECTOR_ELT(val, 0, allocVector(REALSXP, n));
+    SET_VECTOR_ELT(val, 1, allocVector(REALSXP, n));
+    SET_VECTOR_ELT(val, 2, allocMatrix(REALSXP, n, n));
+    Memcpy(REAL(VECTOR_ELT(val, 2)),
+	   REAL(is_dge ? GET_SLOT(x, Matrix_xSym) : x),
+	   n2);
+    SET_VECTOR_ELT(val, 3, allocMatrix(REALSXP, vecs ? n : 0, vecs ? n : 0));
+    F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, (double *) NULL, dims, &izero,
+		    (double *) NULL, (double *) NULL, (double *) NULL, dims,
+		    &tmp, &lwork, (int *) NULL, &info FCONE FCONE);
+    if (info) error(_("dgeMatrix_Schur: first call to dgees failed"));
+    lwork = (int) tmp;
+    Matrix_Calloc(work, lwork, double);
+
+    F77_CALL(dgees)(vecs ? "V" : "N", "N", NULL, dims, REAL(VECTOR_ELT(val, 2)), dims,
+		    &izero, REAL(VECTOR_ELT(val, 0)), REAL(VECTOR_ELT(val, 1)),
+		    REAL(VECTOR_ELT(val, 3)), dims, work, &lwork,
+		    (int *) NULL, &info FCONE FCONE);
+    Matrix_Free(work, lwork);
+    if (info) error(_("dgeMatrix_Schur: dgees returned code %d"), info);
+    UNPROTECT(nprot);
+    return val;
+}
+
 #define DO_FREE(_A_, _S_, _N_) \
 do { \
 	if (!(_A_)) \
