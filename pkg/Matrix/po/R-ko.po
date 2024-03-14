@@ -14,7 +14,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-3\n"
-"POT-Creation-Date: 2024-02-08 02:53\n"
+"POT-Creation-Date: 2024-03-12 11:27\n"
 "PO-Revision-Date: 2015-07-15 17:14-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -204,6 +204,12 @@ msgstr "intermediate 'r' is of type %s"
 msgid "not yet implemented .. please report"
 msgstr "아직 구현되지 않았습니다.  보고를 부탁드립니다."
 
+msgid "'%s' has non-finite values"
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
+msgstr ""
+
 msgid "'force' must be (coercable to) TRUE or FALSE"
 msgstr "'force'는 반드시 (강제변환될 수 있는) TRUE 또는 FALSE 이어야 합니다."
 
@@ -278,6 +284,12 @@ msgstr ""
 
 msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
 msgstr ""
+
+#, fuzzy
+msgid "only square matrices can be used as graph incidence matrices"
+msgstr ""
+"오로지 정방(square) 행렬만이 그래프를 위한 접속행렬(incidence matrices)로서 "
+"사용할 수 있습니다."
 
 #, fuzzy
 msgid "matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)"
@@ -549,18 +561,6 @@ msgstr ""
 #, fuzzy
 msgid "assigned dimensions [product %.0f] do not match object length [%.0f]"
 msgstr "dim [product %d]의 값이 객체 [%d]의 길이와 일치하지 않습니다."
-
-msgid "'%s' has non-finite values"
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
-msgstr ""
-
-#, fuzzy
-msgid "only square matrices can be used as graph incidence matrices"
-msgstr ""
-"오로지 정방(square) 행렬만이 그래프를 위한 접속행렬(incidence matrices)로서 "
-"사용할 수 있습니다."
 
 msgid "'lwd' must be NULL or non-negative numeric"
 msgstr "'lwd'는 반드시 NULL 또는 음이 아닌 수 이어야 합니다."

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.7-0\n"
-"POT-Creation-Date: 2024-02-08 02:53\n"
+"POT-Creation-Date: 2024-03-12 11:27\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,6 +157,12 @@ msgstr ""
 msgid "not yet implemented .. please report"
 msgstr ""
 
+msgid "'%s' has non-finite values"
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
+msgstr ""
+
 msgid "'force' must be (coercable to) TRUE or FALSE"
 msgstr ""
 
@@ -221,6 +227,9 @@ msgid "D[i,i] is negative, i=%d"
 msgstr ""
 
 msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
+msgstr ""
+
+msgid "only square matrices can be used as graph incidence matrices"
 msgstr ""
 
 msgid "matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)"
@@ -458,15 +467,6 @@ msgid "assigned dimensions exceed %s"
 msgstr ""
 
 msgid "assigned dimensions [product %.0f] do not match object length [%.0f]"
-msgstr ""
-
-msgid "'%s' has non-finite values"
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
-msgstr ""
-
-msgid "only square matrices can be used as graph incidence matrices"
 msgstr ""
 
 msgid "'lwd' must be NULL or non-negative numeric"
