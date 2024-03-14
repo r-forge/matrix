@@ -1,6 +1,5 @@
 sources = \
 	Csparse.c \
-	abIndex.c \
 	attrib.c \
 	bind.c \
 	chm_common.c \

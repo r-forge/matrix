@@ -1,6 +1,5 @@
 #include "Mdefines.h"
 #include "Csparse.h"
-#include "abIndex.h"
 #include "attrib.h"
 #include "bind.h"
 #include "chm_common.h"
