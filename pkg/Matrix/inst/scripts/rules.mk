@@ -29,11 +29,6 @@ determinant.o: determinant.c \
   Msymbols.h utils.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h determinant.h
-dgCMatrix.o: dgCMatrix.c Mdefines.h version.h \
-  Msymbols.h utils.h cs-etc.h \
-  SuiteSparse/CXSparse/Include/cs.h \
-  SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
-  SuiteSparse/CHOLMOD/Include/cholmod.h dgCMatrix.h
 expm.o: expm.c Lapack-etc.h \
   Mdefines.h version.h \
   Msymbols.h utils.h expm.h
@@ -50,9 +45,9 @@ init.o: init.c Mdefines.h version.h \
   attrib.h bind.h chm_common.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
-  dgCMatrix.h expm.h factorizations.h kappa.h objects.h perm.h \
-  products.h solve.h sparse.h sparseVector.h subassign.h subscript.h \
-  utils-R.h validity.h 
+  expm.h factorizations.h kappa.h objects.h perm.h products.h solve.h \
+  sparse.h sparseVector.h subassign.h subscript.h utils-R.h validity.h \
+  
 kappa.o: kappa.c Lapack-etc.h \
   Mdefines.h version.h \
   Msymbols.h utils.h kappa.h
