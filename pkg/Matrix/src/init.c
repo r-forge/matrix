@@ -23,7 +23,7 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
-#include "Syms.h"
+#include "Msymbols.h"
 Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
