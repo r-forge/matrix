@@ -37,9 +37,9 @@ dgCMatrix.o: dgCMatrix.c Mdefines.h version.h \
   SuiteSparse/CXSparse/Include/cs.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h dgCMatrix.h
-dgeMatrix.o: dgeMatrix.c Lapack-etc.h \
+expm.o: expm.c Lapack-etc.h \
   Mdefines.h version.h \
-  Msymbols.h utils.h dgeMatrix.h
+  Msymbols.h utils.h expm.h
 factorizations.o: factorizations.c Lapack-etc.h \
   cs-etc.h \
   SuiteSparse/CXSparse/Include/cs.h \
@@ -53,7 +53,7 @@ init.o: init.c Mdefines.h version.h \
   abIndex.h attrib.h bind.h chm_common.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
-  dgCMatrix.h dgeMatrix.h factorizations.h kappa.h objects.h perm.h \
+  dgCMatrix.h expm.h factorizations.h kappa.h objects.h perm.h \
   products.h solve.h sparse.h sparseVector.h subscript.h utils-R.h \
   validity.h 
 kappa.o: kappa.c Lapack-etc.h \

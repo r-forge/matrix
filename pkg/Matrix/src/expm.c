@@ -1,54 +1,9 @@
 #include "Lapack-etc.h"
 #include "Mdefines.h"
-#include "dgeMatrix.h"
+#include "expm.h"
 
-/* MJ: unused */
-#if 0
-
-SEXP dgeMatrix_svd(SEXP x, SEXP nnu, SEXP nnv)
-{
-    int /* nu = asInteger(nnu),
-	   nv = asInteger(nnv), */
-	*dims = INTEGER(GET_SLOT(x, Matrix_DimSym));
-    double *xx = REAL(GET_SLOT(x, Matrix_xSym));
-    SEXP val = PROTECT(allocVector(VECSXP, 3));
-
-    if (dims[0] && dims[1]) {
-	int m = dims[0], n = dims[1], mm = (m < n)?m:n,
-	    lwork = -1, info;
-	double tmp, *work;
-	int *iwork, n_iw = 8 * mm;
-	if(8 * (double)mm != n_iw) // integer overflow
-	    error(_("dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"), mm);
-	Matrix_Calloc(iwork, n_iw, int);
-
-	SET_VECTOR_ELT(val, 0, allocVector(REALSXP, mm));
-	SET_VECTOR_ELT(val, 1, allocMatrix(REALSXP, m, mm));
-	SET_VECTOR_ELT(val, 2, allocMatrix(REALSXP, mm, n));
-	F77_CALL(dgesdd)("S", &m, &n, xx, &m,
-			 REAL(VECTOR_ELT(val, 0)),
-			 REAL(VECTOR_ELT(val, 1)), &m,
-			 REAL(VECTOR_ELT(val, 2)), &mm,
-			 &tmp, &lwork, iwork, &info FCONE);
-	lwork = (int) tmp;
-	Matrix_Calloc(work, lwork, double);
-
-	F77_CALL(dgesdd)("S", &m, &n, xx, &m,
-			 REAL(VECTOR_ELT(val, 0)),
-			 REAL(VECTOR_ELT(val, 1)), &m,
-			 REAL(VECTOR_ELT(val, 2)), &mm,
-			 work, &lwork, iwork, &info FCONE);
-
-	Matrix_Free(iwork, n_iw);
-	Matrix_Free(work, lwork);
-    }
-    UNPROTECT(1);
-    return val;
-}
-
-#endif /* MJ */
-
-const static double padec [] = /* for matrix exponential calculation. */
+/* For matrix exponential calculation : */
+const static double padec [] =
 {
   5.0000000000000000e-1,
   1.1666666666666667e-1,
@@ -60,14 +15,8 @@ const static double padec [] = /* for matrix exponential calculation. */
   1.9270852604185938e-9,
 };
 
-/**
- * Matrix exponential - based on the _corrected_ code for Octave's expm function.
- *
- * @param x real square matrix to exponentiate
- *
- * @return matrix exponential of x
- */
-SEXP dgeMatrix_exp(SEXP x)
+/* Based on _corrected_ code for Octave function 'expm' : */
+SEXP dgeMatrix_expm(SEXP x)
 {
     const double one = 1.0, zero = 0.0;
     const int i1 = 1;
