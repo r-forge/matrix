@@ -946,7 +946,5 @@ setClassUnion("index",
 ## * for 'value' in x[i, j] <- value
 setClassUnion("replValue",
               members = c("raw", "logical", "numeric", "complex"))
-setClassUnion("replValueSp",
-              members = c("replValue", "sparseVector", "matrix", "Matrix"))
 
 rm(.new, .initialize)
