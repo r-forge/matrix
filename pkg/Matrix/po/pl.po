@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 11:27-0400\n"
+"POT-Creation-Date: 2024-03-14 15:47-0400\n"
 "PO-Revision-Date: 2014-03-24 17:53+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -17,8 +17,8 @@ msgstr ""
 
 # Matrix/src/dgCMatrix.c: 160
 # error(_("cs_lusol failed"))
-#: Csparse.c:26 Csparse.c:318 dgCMatrix.c:18 dgCMatrix.c:43 dgCMatrix.c:70
-#: dgCMatrix.c:84 dgCMatrix.c:89 dgCMatrix.c:94
+#: Csparse.c:26 Csparse.c:61 Csparse.c:86 Csparse.c:113 Csparse.c:127
+#: Csparse.c:132 Csparse.c:137 Csparse.c:411
 #, fuzzy, c-format
 msgid "'%s' failed"
 msgstr "funkcja 'cs_qr' nie powiodła się "
@@ -30,9 +30,59 @@ msgstr "funkcja 'cs_qr' nie powiodła się "
 msgid "'%s' slot is not increasing within columns after sorting"
 msgstr "gniazdo 'j' nie jest rosnące wewnątrz kolumny"
 
+# Matrix/src/dsyMatrix.c: 9
+# (_("Matrix is not square"))
+# Matrix/src/dtrMatrix.c: 13
+# (_("Matrix is not square"))
+#: Csparse.c:57
+#, fuzzy, c-format
+msgid "'%s' is empty or not square"
+msgstr "Macierz nie jest kwadratowa"
+
+# Matrix/src/dppMatrix.c: 81
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dpoMatrix.c: 92
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dpoMatrix.c: 117
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dsyMatrix.c: 85
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dtCMatrix.c: 90
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dtCMatrix.c: 106
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dgCMatrix.c: 158
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dgCMatrix.c: 184
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dgCMatrix.c: 438
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dgCMatrix.c: 471
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dtrMatrix.c: 99
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dgeMatrix.c: 423
+# error(_("Dimensions of system to be solved are inconsistent"))
+# Matrix/src/dspMatrix.c: 79
+# error(_("Dimensions of system to be solved are inconsistent"))
+#: Csparse.c:59 Csparse.c:81 Csparse.c:104 solve.c:43 solve.c:988
+#, fuzzy, c-format
+msgid "dimensions of '%s' and '%s' are inconsistent"
+msgstr "Wymiary systemu, który ma być rozwiązany, są niespójne"
+
+#: Csparse.c:83
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
+msgstr ""
+
+#: Csparse.c:106
+#, c-format
+msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
+msgstr ""
+
 # Matrix/src/Mutils.c: 990
 # error(_("invalid '%s' argument"), "byrow")
-#: Csparse.c:77 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
+#: Csparse.c:194 coerce.c:220 coerce.c:240 coerce.c:250 coerce.c:905
 #: coerce.c:911 coerce.c:1015 coerce.c:1501 coerce.c:1521 coerce.c:1531
 #: coerce.c:2061 coerce.c:2256 coerce.c:2262 coerce.c:2268 coerce.c:2397
 #: coerce.c:2404 coerce.c:2494 coerce.c:2629 coerce.c:2707 coerce.c:2729
@@ -45,7 +95,7 @@ msgstr "niepoprawny argument '%s'"
 # Matrix/src/Csparse.c: 612
 # error(_("failure to open file \"%s\" for writing"),
 # 	      CHAR(asChar(fname)))
-#: Csparse.c:316
+#: Csparse.c:409
 #, fuzzy, c-format
 msgid "failed to open file \"%s\" for writing"
 msgstr "nie udało się otworzyć pliku '%s' do zapisu"
@@ -534,64 +584,9 @@ msgid "%s(<%s>) does not support structurally rank deficient case"
 msgstr ""
 "%s(): przypadek strukturalnie z niedoborem rang: prawdopodobnie BŁĘDNE zera"
 
-# Matrix/src/dsyMatrix.c: 9
-# (_("Matrix is not square"))
-# Matrix/src/dtrMatrix.c: 13
-# (_("Matrix is not square"))
-#: dgCMatrix.c:14
-#, fuzzy, c-format
-msgid "'%s' is empty or not square"
-msgstr "Macierz nie jest kwadratowa"
-
-# Matrix/src/dppMatrix.c: 81
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dpoMatrix.c: 92
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dpoMatrix.c: 117
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dsyMatrix.c: 85
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dtCMatrix.c: 90
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dtCMatrix.c: 106
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dgCMatrix.c: 158
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dgCMatrix.c: 184
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dgCMatrix.c: 438
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dgCMatrix.c: 471
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dtrMatrix.c: 99
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dgeMatrix.c: 423
-# error(_("Dimensions of system to be solved are inconsistent"))
-# Matrix/src/dspMatrix.c: 79
-# error(_("Dimensions of system to be solved are inconsistent"))
-#: dgCMatrix.c:16 dgCMatrix.c:38 dgCMatrix.c:61 solve.c:43 solve.c:988
-#, fuzzy, c-format
-msgid "dimensions of '%s' and '%s' are inconsistent"
-msgstr "Wymiary systemu, który ma być rozwiązany, są niespójne"
-
-#: dgCMatrix.c:40
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with m >= n > 0"
-msgstr ""
-
-#: dgCMatrix.c:63
-#, c-format
-msgid "%s(%s, %s) requires m-by-n '%s' with n >= m > 0"
-msgstr ""
-
-#: dgeMatrix.c:22
-#, c-format
-msgid "dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"
-msgstr ""
-
 # Matrix/src/dgeMatrix.c: 570
 # error(_("Matrix exponential requires square, non-null matrix"))
-#: dgeMatrix.c:90
+#: expm.c:39
 msgid "Matrix exponential requires square, non-null matrix"
 msgstr "Eksponencjowanie macierzy wymaga kwadratowej, niepustej macierzy"
 
@@ -599,40 +594,40 @@ msgstr "Eksponencjowanie macierzy wymaga kwadratowej, niepustej macierzy"
 # error(_("dgeMatrix_exp: LAPACK routine 'dgebal()' returned %d"), j)
 # Matrix/src/dgeMatrix.c: 589
 # error(_("dgeMatrix_exp: LAPACK routine 'dgebal()' returned %d"), j)
-#: dgeMatrix.c:107 dgeMatrix.c:109
+#: expm.c:56 expm.c:58
 #, c-format
 msgid "dgeMatrix_exp: LAPACK routine dgebal returned %d"
 msgstr "dgeMatrix_exp: procedura LAPACK 'dgebal()' zwróciła %d"
 
 # Matrix/src/dgeMatrix.c: 627
 # error(_("dgeMatrix_exp: 'dgetrf()' returned error code %d"), j)
-#: dgeMatrix.c:147
+#: expm.c:96
 #, c-format
 msgid "dgeMatrix_exp: dgetrf returned error code %d"
 msgstr "dgeMatrix_exp: funkcja 'dgetrf()' zwróciła kod błędu %d"
 
 # Matrix/src/dgeMatrix.c: 629
 # error(_("dgeMatrix_exp: 'dgetrs()' returned error code %d"), j)
-#: dgeMatrix.c:149
+#: expm.c:98
 #, c-format
 msgid "dgeMatrix_exp: dgetrs returned error code %d"
 msgstr "dgeMatrix_exp: funkcja 'dgetrs()' zwróciła kod błędu %d"
 
 # Matrix/src/dgeMatrix.c: 702
 # error(_("dgeMatrix_Schur: 'x' argument must be a non-null square matrix"))
-#: dgeMatrix.c:224
+#: factorizations.c:330
 msgid "dgeMatrix_Schur: argument x must be a non-null square matrix"
 msgstr "dgeMatrix_Schur: argument 'x' musi być niepustą macierzą kwadratową"
 
 # Matrix/src/dgeMatrix.c: 713
 # error(_("dgeMatrix_Schur: first call to 'dgees()' function failed"))
-#: dgeMatrix.c:237
+#: factorizations.c:343
 msgid "dgeMatrix_Schur: first call to dgees failed"
 msgstr "dgeMatrix_Schur: pierwsze wywołanie funkcji 'dgees()' nie powiodło się"
 
 # Matrix/src/dgeMatrix.c: 721
 # error(_("dgeMatrix_Schur: 'dgees()' function returned code %d"), info)
-#: dgeMatrix.c:246
+#: factorizations.c:352
 #, c-format
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr "dgeMatrix_Schur: funkcja 'dgees()' zwróciła kod %d"
@@ -641,32 +636,32 @@ msgstr "dgeMatrix_Schur: funkcja 'dgees()' zwróciła kod %d"
 # (_("Matrix is not square"))
 # Matrix/src/dtrMatrix.c: 13
 # (_("Matrix is not square"))
-#: factorizations.c:355 sparse.c:196
+#: factorizations.c:403 sparse.c:196
 #, fuzzy, c-format
 msgid "'%s' is not a number"
 msgstr "Macierz nie jest kwadratowa"
 
-#: factorizations.c:376
+#: factorizations.c:424
 #, c-format
 msgid "LU factorization of m-by-n %s requires m == n"
 msgstr ""
 
-#: factorizations.c:385
+#: factorizations.c:433
 #, c-format
 msgid "LU factorization of %s failed: out of memory or near-singular"
 msgstr ""
 
-#: factorizations.c:462
+#: factorizations.c:510
 #, c-format
 msgid "QR factorization of m-by-n %s requires m >= n"
 msgstr ""
 
-#: factorizations.c:471
+#: factorizations.c:519
 #, c-format
 msgid "QR factorization of %s failed: out of memory"
 msgstr ""
 
-#: factorizations.c:571 factorizations.c:849
+#: factorizations.c:619 factorizations.c:897
 #, c-format
 msgid "'%s' is not a number or not finite"
 msgstr ""
