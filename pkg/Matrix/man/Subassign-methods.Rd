@@ -68,8 +68,8 @@
 \alias{[<-,sparseMatrix,ANY,missing,sparseMatrix-method}
 \alias{[<-,sparseMatrix,missing,ANY,sparseMatrix-method}
 \alias{[<-,sparseMatrix,missing,missing,ANY-method}
-\alias{[<-,sparseVector,index,missing,replValueSp-method}
-\alias{[<-,sparseVector,sparseVector,missing,replValueSp-method}
+\alias{[<-,sparseVector,index,missing,ANY-method}
+\alias{[<-,sparseVector,sparseVector,missing,ANY-method}
 %
 \description{
   Methods for \code{"[<-"}, i.e., extraction or subsetting mostly of

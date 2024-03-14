@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-03-12 r4623)}{
+\section{Changes in version 1.7-0 (2024-03-14 r4639)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -57,6 +57,11 @@
       \item The unary subscript \code{x[i]} is correct again for
       \code{x} of class \code{.s[CT]Matrix} and logical \code{i}
       indexing entries outside of the stored triangle.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item Unexported class union \code{replValueSp} is removed.
     }
   }
 }
