@@ -3,7 +3,6 @@
 
 #include <Rinternals.h>
 
-SEXP dgeMatrix_Schur(SEXP, SEXP, SEXP);
 SEXP dgeMatrix_exp(SEXP);
 
 #endif /* MATRIX_DGEMATRIX_H */
