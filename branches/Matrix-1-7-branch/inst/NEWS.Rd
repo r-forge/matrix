@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-0 (2024-03-14 r4639)}{
+\section{Changes in version 1.7-0 (2024-03-15 r4646)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -61,7 +61,10 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item Unexported class union \code{replValueSp} is removed.
+      \item Unexported class union \code{replValueSp} is effectively
+      removed, now having zero members.  Actual removal is delayed
+      until package binaries caching the old definition are rebuilt
+      under \pkg{Matrix} 1.7-0.
     }
   }
 }
