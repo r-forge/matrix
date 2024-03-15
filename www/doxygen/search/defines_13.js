@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['v2spv_0',['V2SPV',['../sparseVector_8c.html#a7c1a515a7f8f0fc0ef3da8d23f384496',1,'sparseVector.c']]],
-  ['v2spv_5fcases_1',['V2SPV_CASES',['../sparseVector_8c.html#a186100c626350471957f079aefcf16a7',1,'sparseVector.c']]],
+  ['v2spv_0',['V2SPV',['../vector_8c.html#a7c1a515a7f8f0fc0ef3da8d23f384496',1,'vector.c']]],
+  ['v2spv_5fcases_1',['V2SPV_CASES',['../vector_8c.html#a186100c626350471957f079aefcf16a7',1,'vector.c']]],
   ['vad_5fsubcases_2',['VAD_SUBCASES',['../coerce_8c.html#a68f7dec7e998ab54cb7d44c5827a56ad',1,'coerce.c']]],
   ['valid_5fcsparse_3',['VALID_CSPARSE',['../Mdefines_8h.html#aa1ec5266ad356c554fb5fb1cc5728ed3',1,'Mdefines.h']]],
   ['valid_5fdense_4',['VALID_DENSE',['../Mdefines_8h.html#a2453fa4ee6e6093eb045822cf12482c3',1,'Mdefines.h']]],

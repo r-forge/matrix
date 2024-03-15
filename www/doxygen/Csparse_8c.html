@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4655</span>
    </div>
   </td>
  </tr>
@@ -75,7 +75,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">Csparse.c File Reference</div></div>
 </div><!--header-->
@@ -84,7 +83,6 @@ $(function() {
 <code>#include &quot;<a class="el" href="cs-etc_8h_source.html">cs-etc.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="cholmod-etc_8h_source.html">cholmod-etc.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Csparse_8h_source.html">Csparse.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="t__Csparse__subassign_8c_source.html">t_Csparse_subassign.c</a>&quot;</code><br />
 </div>
 <p><a href="Csparse_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -92,125 +90,27 @@ $(function() {
 Macros</h2></td></tr>
 <tr class="memitem:af72cb5f85c4491241fc250802d7f7b48" id="r_af72cb5f85c4491241fc250802d7f7b48"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#af72cb5f85c4491241fc250802d7f7b48">MKMS</a>(_FORMAT_, ...)&#160;&#160;&#160;mkString(<a class="el" href="utils_8c.html#ac3ce944ada4f0182687b9ba6eb1e398e">Matrix_sprintf</a>(_FORMAT_, __VA_ARGS__))</td></tr>
 <tr class="separator:af72cb5f85c4491241fc250802d7f7b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe03a861173e7764481f79e69396cf31" id="r_abe03a861173e7764481f79e69396cf31"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#abe03a861173e7764481f79e69396cf31">_n_Csp_</a></td></tr>
-<tr class="separator:abe03a861173e7764481f79e69396cf31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae825742c64426a7cbf67b81144b1c397" id="r_ae825742c64426a7cbf67b81144b1c397"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#ae825742c64426a7cbf67b81144b1c397">_l_Csp_</a></td></tr>
-<tr class="separator:ae825742c64426a7cbf67b81144b1c397"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ae815a4041ab9a08ff7eaae2041f6cc" id="r_a2ae815a4041ab9a08ff7eaae2041f6cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a2ae815a4041ab9a08ff7eaae2041f6cc">_i_Csp_</a></td></tr>
-<tr class="separator:a2ae815a4041ab9a08ff7eaae2041f6cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a014a43e4629043b80e41593a639197b4" id="r_a014a43e4629043b80e41593a639197b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a014a43e4629043b80e41593a639197b4">_d_Csp_</a></td></tr>
-<tr class="separator:a014a43e4629043b80e41593a639197b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03a243f33f234ef06c6aa20085a1a52a" id="r_a03a243f33f234ef06c6aa20085a1a52a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a03a243f33f234ef06c6aa20085a1a52a">_z_Csp_</a></td></tr>
-<tr class="separator:a03a243f33f234ef06c6aa20085a1a52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:a0513d8a9f2e4f454f1fc3a59c4a6f181" id="r_a0513d8a9f2e4f454f1fc3a59c4a6f181"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181">x_slot_kind</a> { <br />
-&#160;&#160;<a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a5b79f2665ffefd7ad7338c962314c2d4">x_unknown</a> = -2
-, <a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181af08efd0da3716cb69cc8dc3a5ca6b76f">x_pattern</a> = -1
-, <a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a2a95e471311414715f5477d7a4f11564">x_double</a> = 0
-, <a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181ab3a3051968f4171a6f035164412f68a5">x_logical</a> = 1
-, <br />
-&#160;&#160;<a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181aae6c99602d8ebd0046fe45aab166d0f0">x_integer</a> = 2
-, <a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a3ec540f6985f1adf7e7363ff1589a42b">x_complex</a> = 3
-<br />
- }</td></tr>
-<tr class="separator:a0513d8a9f2e4f454f1fc3a59c4a6f181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aa7547e3320c64687e2cbd737669fbd7c" id="r_aa7547e3320c64687e2cbd737669fbd7c"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#aa7547e3320c64687e2cbd737669fbd7c">CsparseMatrix_validate_maybe_sorting</a> (SEXP x)</td></tr>
 <tr class="separator:aa7547e3320c64687e2cbd737669fbd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a889411b1a682b5d687bafd64999e75d2" id="r_a889411b1a682b5d687bafd64999e75d2"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a889411b1a682b5d687bafd64999e75d2">dgCMatrix_lusol</a> (SEXP a, SEXP b)</td></tr>
+<tr class="separator:a889411b1a682b5d687bafd64999e75d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77b1152c706477d2540c02ae1ba67013" id="r_a77b1152c706477d2540c02ae1ba67013"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a77b1152c706477d2540c02ae1ba67013">dgCMatrix_qrsol</a> (SEXP a, SEXP b, SEXP order)</td></tr>
+<tr class="separator:a77b1152c706477d2540c02ae1ba67013"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf2ce248860075eac3c5a061abb65004" id="r_adf2ce248860075eac3c5a061abb65004"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#adf2ce248860075eac3c5a061abb65004">dgCMatrix_cholsol</a> (SEXP at, SEXP b)</td></tr>
+<tr class="separator:adf2ce248860075eac3c5a061abb65004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06ab3fcb5c8e4a18136f9317e38a795f" id="r_a06ab3fcb5c8e4a18136f9317e38a795f"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a06ab3fcb5c8e4a18136f9317e38a795f">strmatch</a> (const char *x, const char **<a class="el" href="bind_8c.html#a3b7be34b2a983a1bf0baddc7215bd2d4">valid</a>)</td></tr>
 <tr class="separator:a06ab3fcb5c8e4a18136f9317e38a795f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb53c61413f59192752651165b0cc650" id="r_adb53c61413f59192752651165b0cc650"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#adb53c61413f59192752651165b0cc650">tCsparse_diag</a> (SEXP obj, SEXP op)</td></tr>
-<tr class="separator:adb53c61413f59192752651165b0cc650"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f68f24a5ebf97f1ec0eb0fcbce581bc" id="r_a0f68f24a5ebf97f1ec0eb0fcbce581bc"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a0f68f24a5ebf97f1ec0eb0fcbce581bc">dtCMatrix_diag</a> (SEXP obj, SEXP op)</td></tr>
+<tr class="separator:a0f68f24a5ebf97f1ec0eb0fcbce581bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5942d781aca0aa1f0121ed8ddb0979fd" id="r_a5942d781aca0aa1f0121ed8ddb0979fd"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a5942d781aca0aa1f0121ed8ddb0979fd">Csparse_dmperm</a> (SEXP x, SEXP nans, SEXP seed)</td></tr>
 <tr class="separator:a5942d781aca0aa1f0121ed8ddb0979fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af07aa22ee52bc990f7e45be5117bc0eb" id="r_af07aa22ee52bc990f7e45be5117bc0eb"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#af07aa22ee52bc990f7e45be5117bc0eb">Csparse_MatrixMarket</a> (SEXP obj, SEXP path)</td></tr>
-<tr class="separator:af07aa22ee52bc990f7e45be5117bc0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9796f4e83fb5bb82ca1bc3125d97233b" id="r_a9796f4e83fb5bb82ca1bc3125d97233b"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Csparse_8c.html#a9796f4e83fb5bb82ca1bc3125d97233b">Csparse_writeMM</a> (SEXP obj, SEXP file)</td></tr>
+<tr class="separator:a9796f4e83fb5bb82ca1bc3125d97233b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a014a43e4629043b80e41593a639197b4" name="a014a43e4629043b80e41593a639197b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a014a43e4629043b80e41593a639197b4">&#9670;&#160;</a></span>_d_Csp_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _d_Csp_</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00212">212</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-</div>
-</div>
-<a id="a2ae815a4041ab9a08ff7eaae2041f6cc" name="a2ae815a4041ab9a08ff7eaae2041f6cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ae815a4041ab9a08ff7eaae2041f6cc">&#9670;&#160;</a></span>_i_Csp_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _i_Csp_</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00209">209</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-</div>
-</div>
-<a id="ae825742c64426a7cbf67b81144b1c397" name="ae825742c64426a7cbf67b81144b1c397"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae825742c64426a7cbf67b81144b1c397">&#9670;&#160;</a></span>_l_Csp_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _l_Csp_</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00206">206</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-</div>
-</div>
-<a id="abe03a861173e7764481f79e69396cf31" name="abe03a861173e7764481f79e69396cf31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe03a861173e7764481f79e69396cf31">&#9670;&#160;</a></span>_n_Csp_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _n_Csp_</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00203">203</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-</div>
-</div>
-<a id="a03a243f33f234ef06c6aa20085a1a52a" name="a03a243f33f234ef06c6aa20085a1a52a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03a243f33f234ef06c6aa20085a1a52a">&#9670;&#160;</a></span>_z_Csp_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _z_Csp_</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00215">215</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-</div>
-</div>
 <a id="af72cb5f85c4491241fc250802d7f7b48" name="af72cb5f85c4491241fc250802d7f7b48"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af72cb5f85c4491241fc250802d7f7b48">&#9670;&#160;</a></span>MKMS</h2>
 
@@ -236,31 +136,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a0513d8a9f2e4f454f1fc3a59c4a6f181" name="a0513d8a9f2e4f454f1fc3a59c4a6f181"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0513d8a9f2e4f454f1fc3a59c4a6f181">&#9670;&#160;</a></span>x_slot_kind</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="Csparse_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181">x_slot_kind</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181a5b79f2665ffefd7ad7338c962314c2d4" name="a0513d8a9f2e4f454f1fc3a59c4a6f181a5b79f2665ffefd7ad7338c962314c2d4"></a>x_unknown&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181af08efd0da3716cb69cc8dc3a5ca6b76f" name="a0513d8a9f2e4f454f1fc3a59c4a6f181af08efd0da3716cb69cc8dc3a5ca6b76f"></a>x_pattern&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181a2a95e471311414715f5477d7a4f11564" name="a0513d8a9f2e4f454f1fc3a59c4a6f181a2a95e471311414715f5477d7a4f11564"></a>x_double&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181ab3a3051968f4171a6f035164412f68a5" name="a0513d8a9f2e4f454f1fc3a59c4a6f181ab3a3051968f4171a6f035164412f68a5"></a>x_logical&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181aae6c99602d8ebd0046fe45aab166d0f0" name="a0513d8a9f2e4f454f1fc3a59c4a6f181aae6c99602d8ebd0046fe45aab166d0f0"></a>x_integer&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a0513d8a9f2e4f454f1fc3a59c4a6f181a3ec540f6985f1adf7e7363ff1589a42b" name="a0513d8a9f2e4f454f1fc3a59c4a6f181a3ec540f6985f1adf7e7363ff1589a42b"></a>x_complex&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00194">194</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
 </div>
 </div>
@@ -297,20 +172,20 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00219">219</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00312">312</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
 <p class="reference">References <a class="el" href="cs-etc_8h_source.html#l00056">Matrix_cs_dmperm_results::cc</a>, <a class="el" href="cs-etc_8h_source.html#l00019">Matrix_cs_sparse::m</a>, <a class="el" href="cs-etc_8c_source.html#l00006">M2CXS()</a>, <a class="el" href="cs-etc_8c_source.html#l00078">Matrix_cs_dfree()</a>, <a class="el" href="cs-etc_8c_source.html#l00090">Matrix_cs_dmperm()</a>, <a class="el" href="cs-etc_8h_source.html#l00012">MCS_XTYPE_SET</a>, <a class="el" href="cs-etc_8h_source.html#l00020">Matrix_cs_sparse::n</a>, <a class="el" href="cs-etc_8h_source.html#l00054">Matrix_cs_dmperm_results::nb</a>, <a class="el" href="cs-etc_8h_source.html#l00050">Matrix_cs_dmperm_results::p</a>, <a class="el" href="cs-etc_8h_source.html#l00051">Matrix_cs_dmperm_results::q</a>, <a class="el" href="cs-etc_8h_source.html#l00052">Matrix_cs_dmperm_results::r</a>, <a class="el" href="cs-etc_8h_source.html#l00055">Matrix_cs_dmperm_results::rr</a>, <a class="el" href="cs-etc_8h_source.html#l00053">Matrix_cs_dmperm_results::s</a>, and <a class="el" href="cs-etc_8h_source.html#l00025">Matrix_cs_sparse::xtype</a>.</p>
 
 </div>
 </div>
-<a id="af07aa22ee52bc990f7e45be5117bc0eb" name="af07aa22ee52bc990f7e45be5117bc0eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af07aa22ee52bc990f7e45be5117bc0eb">&#9670;&#160;</a></span>Csparse_MatrixMarket()</h2>
+<a id="a9796f4e83fb5bb82ca1bc3125d97233b" name="a9796f4e83fb5bb82ca1bc3125d97233b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9796f4e83fb5bb82ca1bc3125d97233b">&#9670;&#160;</a></span>Csparse_writeMM()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SEXP Csparse_MatrixMarket </td>
+          <td class="memname">SEXP Csparse_writeMM </td>
           <td>(</td>
           <td class="paramtype">SEXP&#160;</td>
           <td class="paramname"><em>obj</em>, </td>
@@ -319,7 +194,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>path</em>&#160;</td>
+          <td class="paramname"><em>file</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -329,9 +204,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00283">283</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00376">376</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="Mdefines_8h_source.html#l00208">ERROR_INVALID_CLASS</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="cholmod-etc_8c_source.html#l00089">M2CHS()</a>, <a class="el" href="Syms_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="coerce_8c_source.html#l02831">sparse_as_general()</a>, <a class="el" href="coerce_8c_source.html#l02499">sparse_as_kind()</a>, <a class="el" href="bind_8c_source.html#l00005">valid</a>, and <a class="el" href="Mdefines_8h_source.html#l00257">VALID_CSPARSE</a>.</p>
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="Mdefines_8h_source.html#l00208">ERROR_INVALID_CLASS</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="cholmod-etc_8c_source.html#l00089">M2CHS()</a>, <a class="el" href="Msymbols_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="coerce_8c_source.html#l02831">sparse_as_general()</a>, <a class="el" href="coerce_8c_source.html#l02499">sparse_as_kind()</a>, <a class="el" href="bind_8c_source.html#l00005">valid</a>, and <a class="el" href="Mdefines_8h_source.html#l00257">VALID_CSPARSE</a>.</p>
 
 </div>
 </div>
@@ -353,7 +228,141 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00007">7</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="chm__common_8c_source.html#l00005">checkpi()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="cholmod-etc_8c_source.html#l00089">M2CHS()</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>, and <a class="el" href="Csparse_8c.html#af72cb5f85c4491241fc250802d7f7b48">MKMS</a>.</p>
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="cholmod-common_8c_source.html#l00005">checkpi()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="cholmod-etc_8c_source.html#l00089">M2CHS()</a>, <a class="el" href="Msymbols_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Msymbols_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>, and <a class="el" href="Csparse_8c.html#af72cb5f85c4491241fc250802d7f7b48">MKMS</a>.</p>
+
+</div>
+</div>
+<a id="adf2ce248860075eac3c5a061abb65004" name="adf2ce248860075eac3c5a061abb65004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf2ce248860075eac3c5a061abb65004">&#9670;&#160;</a></span>dgCMatrix_cholsol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP dgCMatrix_cholsol </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>at</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00098">98</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="cholmod-etc_8c_source.html#l00174">CHF2M()</a>, <a class="el" href="cholmod-etc_8c_source.html#l00089">M2CHS()</a>, and <a class="el" href="utils_8c_source.html#l00070">Matrix_memcpy()</a>.</p>
+
+</div>
+</div>
+<a id="a889411b1a682b5d687bafd64999e75d2" name="a889411b1a682b5d687bafd64999e75d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a889411b1a682b5d687bafd64999e75d2">&#9670;&#160;</a></span>dgCMatrix_lusol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP dgCMatrix_lusol </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00050">50</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cs-etc_8h_source.html#l00019">Matrix_cs_sparse::m</a>, <a class="el" href="cs-etc_8c_source.html#l00006">M2CXS()</a>, <a class="el" href="cs-etc_8c_source.html#l00174">Matrix_cs_lusol()</a>, <a class="el" href="cs-etc_8h_source.html#l00008">MCS_REAL</a>, <a class="el" href="cs-etc_8h_source.html#l00012">MCS_XTYPE_SET</a>, and <a class="el" href="cs-etc_8h_source.html#l00020">Matrix_cs_sparse::n</a>.</p>
+
+</div>
+</div>
+<a id="a77b1152c706477d2540c02ae1ba67013" name="a77b1152c706477d2540c02ae1ba67013"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77b1152c706477d2540c02ae1ba67013">&#9670;&#160;</a></span>dgCMatrix_qrsol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP dgCMatrix_qrsol </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>order</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00069">69</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="cs-etc_8h_source.html#l00019">Matrix_cs_sparse::m</a>, <a class="el" href="cs-etc_8c_source.html#l00006">M2CXS()</a>, <a class="el" href="cs-etc_8c_source.html#l00259">Matrix_cs_qrsol()</a>, <a class="el" href="utils_8c_source.html#l00070">Matrix_memcpy()</a>, <a class="el" href="cs-etc_8h_source.html#l00008">MCS_REAL</a>, <a class="el" href="cs-etc_8h_source.html#l00012">MCS_XTYPE_SET</a>, and <a class="el" href="cs-etc_8h_source.html#l00020">Matrix_cs_sparse::n</a>.</p>
+
+</div>
+</div>
+<a id="a0f68f24a5ebf97f1ec0eb0fcbce581bc" name="a0f68f24a5ebf97f1ec0eb0fcbce581bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f68f24a5ebf97f1ec0eb0fcbce581bc">&#9670;&#160;</a></span>dtCMatrix_diag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP dtCMatrix_diag </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname"><em>op</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00179">179</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Msymbols_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="Csparse_8c_source.html#l00167">strmatch()</a>, and <a class="el" href="bind_8c_source.html#l00005">valid</a>.</p>
 
 </div>
 </div>
@@ -391,43 +400,11 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00050">50</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00167">167</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
 
 <p class="reference">References <a class="el" href="bind_8c_source.html#l00005">valid</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="Csparse_8c_source.html#l00062">tCsparse_diag()</a>.</p>
-
-</div>
-</div>
-<a id="adb53c61413f59192752651165b0cc650" name="adb53c61413f59192752651165b0cc650"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb53c61413f59192752651165b0cc650">&#9670;&#160;</a></span>tCsparse_diag()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">SEXP tCsparse_diag </td>
-          <td>(</td>
-          <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>obj</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">SEXP&#160;</td>
-          <td class="paramname"><em>op</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Csparse_8c_source.html#l00062">62</a> of file <a class="el" href="Csparse_8c_source.html">Csparse.c</a>.</p>
-
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="Csparse_8c_source.html#l00050">strmatch()</a>, and <a class="el" href="bind_8c_source.html#l00005">valid</a>.</p>
+<p class="reference">Referenced by <a class="el" href="Csparse_8c_source.html#l00179">dtCMatrix_diag()</a>.</p>
 
 </div>
 </div>

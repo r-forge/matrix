@@ -567,7 +567,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ PROTECT(res);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ INTEGER(dim),\ m\ =\ pdim[0],\ n\ =\ pdim[1];\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{Mdefines_8h_a05f16f2c08ac3083a9ed1be99da30d73}{Matrix\_int\_fast64\_t}}\ mn64\ =\ (\mbox{\hyperlink{Mdefines_8h_a05f16f2c08ac3083a9ed1be99da30d73}{Matrix\_int\_fast64\_t}})\ m\ *\ n;\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ UNPROTECT(1);}
@@ -602,11 +602,11 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 \DoxyCodeLine{\ \ \ \ \ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ ge\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'g'},\ tr\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'t'},\ upper\ =\ 1,\ nonunit\ =\ 1;\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ if\ (!ge)\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ uplo\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ uplo\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ upper\ =\ *CHAR(STRING\_ELT(uplo,\ 0))\ ==\ \textcolor{charliteral}{'U'};\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (tr)\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ diag\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ diag\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ nonunit\ =\ *CHAR(STRING\_ELT(diag,\ 0))\ ==\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
@@ -623,17 +623,17 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\_START}}(\_SEXPTYPE\_);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ m\ =\ INTEGER(dim)[0];\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ UNPROTECT(1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ ge\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'g'},\ tr\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'t'},\ upper\ =\ 1,\ nonunit\ =\ 1;\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ if\ (!ge)\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ uplo\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ uplo\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ upper\ =\ *CHAR(STRING\_ELT(uplo,\ 0))\ ==\ \textcolor{charliteral}{'U'};\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (tr)\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ diag\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ diag\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ nonunit\ =\ *CHAR(STRING\_ELT(diag,\ 0))\ ==\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
@@ -649,7 +649,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ PROTECT(x\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ PROTECT(x\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \_CTYPE\_\ *px\ =\ \_PTR\_(x);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ SUB1\_N(\_CTYPE\_,\ \_PTR\_,\ \_NA\_,\ \_ZERO\_,\ \_ONE\_,\ \_F\_);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(1);\ \(\backslash\)}
@@ -772,10 +772,10 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 \DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ ==\ \textcolor{charliteral}{'n'})\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ SUB2\_LOOP(\mbox{\hyperlink{Mdefines_8h_a775faf03c5dabde8696f5cde3c335d3d}{HIDE}});\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(allocVector(TYPEOF(x0),\ (R\_xlen\_t)\ nnz));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ SUB2\_CASES(\mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}});\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_SLOT(res,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_SLOT(res,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x1,\ x0\ */}\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \}}
 
@@ -798,10 +798,10 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 \DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ ==\ \textcolor{charliteral}{'n'})\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ SUB2\_LOOP(\mbox{\hyperlink{Mdefines_8h_a775faf03c5dabde8696f5cde3c335d3d}{HIDE}});\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(allocVector(TYPEOF(x0),\ (R\_xlen\_t)\ nnz));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ SUB2\_CASES(\mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}});\ \(\backslash\)}
-\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_SLOT(res,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_SLOT(res,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x1,\ x0\ */}\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \}}
 
@@ -922,7 +922,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00004}{4}} of file \mbo
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ INTEGER(dim),\ m\ =\ pdim[0],\ n\ =\ pdim[1];\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ dim\ */}\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \(\backslash\)}
@@ -1185,7 +1185,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00203}{203}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1203,7 +1203,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00596}{596}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1221,7 +1221,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01519}{1519}} of file \
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_source_l00990}{sort\+\_\+cr()}}, \mbox{\hyperlink{coerce_8c_source_l02831}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{sparse_8c_source_l01239}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_a60c87bdd34593c78a45178e8541b9fa7}{SUB2\+\_\+\+FINISH}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_source_l00990}{sort\+\_\+cr()}}, \mbox{\hyperlink{coerce_8c_source_l02831}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{sparse_8c_source_l01239}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_a60c87bdd34593c78a45178e8541b9fa7}{SUB2\+\_\+\+FINISH}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
 
 
 
@@ -1239,7 +1239,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00337}{337}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00005}{F\+\_\+\+ND}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00005}{F\+\_\+\+ND}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1257,7 +1257,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00722}{722}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00005}{F\+\_\+\+ND}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00005}{F\+\_\+\+ND}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1275,7 +1275,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01820}{1820}} of file \
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00112}{ISNZ\+\_\+\+COMPLEX}}, \mbox{\hyperlink{Mdefines_8h_source_l00110}{ISNZ\+\_\+\+INTEGER}}, \mbox{\hyperlink{Mdefines_8h_source_l00109}{ISNZ\+\_\+\+LOGICAL}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{ISNZ\+\_\+\+PATTERN}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{ISNZ\+\_\+\+REAL}}, \mbox{\hyperlink{subscript_8c_source_l00946}{keep\+\_\+di()}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00004}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a235756155176adc6057ef7e29c0b9092}{SUB2\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_a624c522b9df166731192626e90b3aed3}{SUB2\+\_\+\+WORK}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00112}{ISNZ\+\_\+\+COMPLEX}}, \mbox{\hyperlink{Mdefines_8h_source_l00110}{ISNZ\+\_\+\+INTEGER}}, \mbox{\hyperlink{Mdefines_8h_source_l00109}{ISNZ\+\_\+\+LOGICAL}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{ISNZ\+\_\+\+PATTERN}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{ISNZ\+\_\+\+REAL}}, \mbox{\hyperlink{subscript_8c_source_l00946}{keep\+\_\+di()}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00004}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a235756155176adc6057ef7e29c0b9092}{SUB2\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_a624c522b9df166731192626e90b3aed3}{SUB2\+\_\+\+WORK}}.
 
 
 
@@ -1293,7 +1293,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00370}{370}} of file \m
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, and \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, and \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}.
 
 
 
@@ -1311,7 +1311,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00753}{753}} of file \m
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, and \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, and \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}.
 
 
 
@@ -1329,7 +1329,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01984}{1984}} of file \
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00004}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00004}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}.
 
 
 
@@ -1421,7 +1421,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01410}{1410}} of file \
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
 
 
 
@@ -1439,7 +1439,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00411}{411}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00203}{Csparse\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00337}{diagonal\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l00370}{ind\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00147}{packed\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00270}{Rsparse\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00012}{unpacked\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01835}{valid\+Object()}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00203}{Csparse\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00337}{diagonal\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l00370}{ind\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00147}{packed\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00270}{Rsparse\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00012}{unpacked\+Matrix\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01802}{valid\+Object()}}.
 
 \Hypertarget{subscript_8c_ab6dc24cc79cb48ddea028a9dc8100283}\label{subscript_8c_ab6dc24cc79cb48ddea028a9dc8100283} 
 \index{subscript.c@{subscript.c}!R\_subscript\_1ary\_mat@{R\_subscript\_1ary\_mat}}
@@ -1453,7 +1453,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00792}{792}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00596}{Csparse\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00722}{diagonal\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l00753}{ind\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00540}{packed\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00659}{Rsparse\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00462}{unpacked\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01835}{valid\+Object()}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00596}{Csparse\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00722}{diagonal\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l00753}{ind\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00540}{packed\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{subscript_8c_source_l00659}{Rsparse\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00462}{unpacked\+Matrix\+\_\+subscript\+\_\+1ary\+\_\+mat()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01802}{valid\+Object()}}.
 
 \Hypertarget{subscript_8c_a488cb07ff6c35eaf72f74d8bf3e2db26}\label{subscript_8c_a488cb07ff6c35eaf72f74d8bf3e2db26} 
 \index{subscript.c@{subscript.c}!R\_subscript\_2ary@{R\_subscript\_2ary}}
@@ -1467,7 +1467,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l02174}{2174}} of file \
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l01519}{Csparse\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01820}{diagonal\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_a8bd3f45932c86dd96530c4033b42ff4e}{ERROR\+\_\+\+IF\+\_\+\+ANYNA}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l01984}{ind\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01410}{packed\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01672}{Rsparse\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l03919}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{subscript_8c_source_l01156}{unpacked\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01835}{valid\+Object()}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l01519}{Csparse\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01820}{diagonal\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_a8bd3f45932c86dd96530c4033b42ff4e}{ERROR\+\_\+\+IF\+\_\+\+ANYNA}}, \mbox{\hyperlink{Mdefines_8h_source_l00208}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, \mbox{\hyperlink{subscript_8c_source_l01984}{ind\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01410}{packed\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01672}{Rsparse\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l03721}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l03919}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{subscript_8c_source_l01156}{unpacked\+Matrix\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{bind_8c_source_l00005}{valid}}, \mbox{\hyperlink{Mdefines_8h_source_l00220}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+MATRIX}}, \mbox{\hyperlink{Mdefines_8h_source_l00247}{VALID\+\_\+\+NONVIRTUAL\+\_\+\+SHIFT}}, and \mbox{\hyperlink{validity_8c_source_l01802}{valid\+Object()}}.
 
 \Hypertarget{subscript_8c_aabf5aa497200931ffb5cf0dc98c46e3d}\label{subscript_8c_aabf5aa497200931ffb5cf0dc98c46e3d} 
 \index{subscript.c@{subscript.c}!RsparseMatrix\_subscript\_1ary@{RsparseMatrix\_subscript\_1ary}}
@@ -1481,7 +1481,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00270}{270}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1499,7 +1499,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00659}{659}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{subscript_8c_source_l00006}{F\+\_\+\+NS}}, \mbox{\hyperlink{subscript_8c_source_l00004}{F\+\_\+X}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00028}{kind\+To\+Type()}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{subscript_8c_a783cabab108759b2d17c620d7e10f784}{SUB1\+\_\+\+CASES}}, \mbox{\hyperlink{subscript_8c_a5e57b3ac66f3e26fdecd8d51beea25da}{SUB1\+\_\+N}}, \mbox{\hyperlink{subscript_8c_a56f6a359a8514a2031b14141c8c58b21}{SUB1\+\_\+\+START}}, and \mbox{\hyperlink{subscript_8c_adc2dfd6d3b2de09df08f8fadb5e87047}{SUB1\+\_\+X}}.
 
 
 
@@ -1517,7 +1517,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01672}{1672}} of file \
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_source_l00990}{sort\+\_\+cr()}}, \mbox{\hyperlink{coerce_8c_source_l02831}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{sparse_8c_source_l01239}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_a60c87bdd34593c78a45178e8541b9fa7}{SUB2\+\_\+\+FINISH}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_source_l00990}{sort\+\_\+cr()}}, \mbox{\hyperlink{coerce_8c_source_l02831}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{sparse_8c_source_l01239}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_a60c87bdd34593c78a45178e8541b9fa7}{SUB2\+\_\+\+FINISH}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
 
 
 
@@ -1535,7 +1535,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l00990}{990}} of file \m
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00202}{HIDE}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_a14b14eedd0dac623c14df3d4be8b9f66}{SORT}}, and \mbox{\hyperlink{subscript_8c_a83a7236ff6af7a7dedd752294662b76f}{SORT\+\_\+\+LOOP}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00202}{HIDE}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_a14b14eedd0dac623c14df3d4be8b9f66}{SORT}}, and \mbox{\hyperlink{subscript_8c_a83a7236ff6af7a7dedd752294662b76f}{SORT\+\_\+\+LOOP}}.
 
 
 
@@ -1589,7 +1589,7 @@ Definition at line \mbox{\hyperlink{subscript_8c_source_l01156}{1156}} of file \
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00086}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_a29dc025da5c1d16bf489aada5676d5e4}{SUB2}}, \mbox{\hyperlink{subscript_8c_a7677f746ab7c703d0b9e90f24069e1a6}{SUB2\+\_\+\+CASES}}, and \mbox{\hyperlink{subscript_8c_a8569db483e5a7d9ae048ca2840d6a1cc}{SUB2\+\_\+\+START\+\_\+\+EXTRA}}.
 
 
 

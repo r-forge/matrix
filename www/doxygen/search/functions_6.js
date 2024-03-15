@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['icsparse_5fsubassign_0',['iCsparse_subassign',['../Csparse_8h.html#ab7e6e5212adc046eda028d3b9fbb6162',1,'Csparse.h']]],
+  ['icsparse_5fsubassign_0',['iCsparse_subassign',['../subassign_8h.html#ab7e6e5212adc046eda028d3b9fbb6162',1,'subassign.h']]],
   ['imatrix_5fvalidate_1',['iMatrix_validate',['../validity_8h.html#accdc32659be3732fbed38522284c2662',1,'validity.h']]],
   ['index_5fas_5fdense_2',['index_as_dense',['../coerce_8c.html#a6ac5d28089866452281994bda3f244a9',1,'index_as_dense(SEXP from, const char *class, char kind):&#160;coerce.c'],['../coerce_8h.html#a6871e5c638c6c374af2c8b0b85f3393d',1,'index_as_dense(SEXP, const char *, char):&#160;coerce.c']]],
   ['index_5fas_5fkind_3',['index_as_kind',['../coerce_8c.html#aef3e9e4024e96a4bcb65a40c1d854aac',1,'index_as_kind(SEXP from, const char *class, char kind):&#160;coerce.c'],['../coerce_8h.html#aa4ddfcf5fb14dbea7fe165ccdbfc5f3e',1,'index_as_kind(SEXP, const char *, char):&#160;coerce.c']]],

@@ -88,12 +88,12 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00084}00084\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00085}00085\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_a527c38797a584c76cb22ffdcec790420}{La\_norm\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00086}00086\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00087}00087\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00087}00087\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00088}00088\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ INTEGER(dim),\ m\ =\ pdim[0],\ n\ =\ pdim[1];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ ==\ 0\ ||\ n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ScalarReal(0.0);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00091}00091\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00092}00092\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00092}00092\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00093}00093\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ *work\ =\ NULL;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ ==\ \textcolor{charliteral}{'I'})}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ m,\ \textcolor{keyword}{sizeof}(double));}
@@ -114,15 +114,15 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00110}00110\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00111}00111\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_a527c38797a584c76cb22ffdcec790420}{La\_norm\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00112}00112\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00113}00113\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00113}00113\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00114}00114\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[1];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ScalarReal(0.0);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00117}00117\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00118}00118\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00118}00118\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00119}00119\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ *CHAR(STRING\_ELT(uplo,\ 0));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00120}00120\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00121}00121\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00121}00121\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00122}00122\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ *work\ =\ NULL;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00123}00123\ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ ==\ \textcolor{charliteral}{'O'}\ ||\ t\ ==\ \textcolor{charliteral}{'I'})}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00124}00124\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{keyword}{sizeof}(double));}
@@ -143,15 +143,15 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00139}00139\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00140}00140\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_a527c38797a584c76cb22ffdcec790420}{La\_norm\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00141}00141\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00142}00142\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00142}00142\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00143}00143\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[1];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00144}00144\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ScalarReal(0.0);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00146}00146\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00147}00147\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00147}00147\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00148}00148\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00149}00149\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00150}00150\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00150}00150\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00151}00151\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ *work\ =\ NULL;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00152}00152\ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ ==\ \textcolor{charliteral}{'O'}\ ||\ t\ ==\ \textcolor{charliteral}{'I'})}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00153}00153\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{keyword}{sizeof}(double));}
@@ -172,18 +172,18 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00168}00168\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00169}00169\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_a527c38797a584c76cb22ffdcec790420}{La\_norm\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00170}00170\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00171}00171\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00171}00171\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00172}00172\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00173}00173\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ScalarReal(0.0);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00175}00175\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00176}00176\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00176}00176\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00177}00177\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00178}00178\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00179}00179\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00179}00179\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00180}00180\ \ \ \ \ \textcolor{keywordtype}{char}\ di\ =\ CHAR(STRING\_ELT(diag,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00181}00181\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00182}00182\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00182}00182\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00183}00183\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ *work\ =\ NULL;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00184}00184\ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ ==\ \textcolor{charliteral}{'I'})}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00185}00185\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{keyword}{sizeof}(double));}
@@ -204,18 +204,18 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00200}00200\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00201}00201\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_a527c38797a584c76cb22ffdcec790420}{La\_norm\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00202}00202\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00203}00203\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00203}00203\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00204}00204\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ScalarReal(0.0);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00207}00207\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00208}00208\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00208}00208\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00209}00209\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00210}00210\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00211}00211\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00211}00211\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00212}00212\ \ \ \ \ \textcolor{keywordtype}{char}\ di\ =\ CHAR(STRING\_ELT(diag,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00213}00213\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00214}00214\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00214}00214\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00215}00215\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ *work\ =\ NULL;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00216}00216\ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ ==\ \textcolor{charliteral}{'I'})}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00217}00217\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{keyword}{sizeof}(double));}
@@ -236,15 +236,15 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00232}00232\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00233}00233\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00234}00234\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00235}00235\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00235}00235\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00236}00236\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ INTEGER(dim),\ m\ =\ pdim[0],\ n\ =\ pdim[1];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00237}00237\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ !=\ n)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00238}00238\ \ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}\%s(\%s)\ is\ undefined:\ '\%s'\ is\ not\ square"{}}),\ \textcolor{stringliteral}{"{}rcond"{}},\ \textcolor{stringliteral}{"{}x"{}},\ \textcolor{stringliteral}{"{}x"{}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00239}00239\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00240}00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00241}00241\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00242}00242\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00243}00243\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00242}00242\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00243}00243\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00244}00244\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00245}00245\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00246}00246\ \ \ \ \ \textcolor{keywordtype}{double}\ *\ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ 4\ *\ n,\ \textcolor{keyword}{sizeof}(double));}
@@ -274,17 +274,17 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00270}00270\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00271}00271\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00272}00272\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00273}00273\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00273}00273\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00274}00274\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00275}00275\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00277}00277\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00278}00278\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00278}00278\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00279}00279\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00280}00280\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00281}00281\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00282}00282\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00283}00283\ \ \ \ \ \ \ \ \ pivot\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00281}00281\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00282}00282\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00283}00283\ \ \ \ \ \ \ \ \ pivot\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00284}00284\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00285}00285\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00286}00286\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}
@@ -314,17 +314,17 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00310}00310\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00311}00311\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00312}00312\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00313}00313\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00313}00313\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00314}00314\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00315}00315\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00316}00316\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00317}00317\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00318}00318\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00318}00318\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00319}00319\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00320}00320\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00321}00321\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00322}00322\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00323}00323\ \ \ \ \ \ \ \ \ pivot\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00321}00321\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00322}00322\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00323}00323\ \ \ \ \ \ \ \ \ pivot\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00324}00324\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00325}00325\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00326}00326\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}
@@ -354,16 +354,16 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00350}00350\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00351}00351\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00352}00352\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00353}00353\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00353}00353\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00354}00354\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00355}00355\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00356}00356\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00357}00357\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00358}00358\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00358}00358\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00359}00359\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00360}00360\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00361}00361\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00362}00362\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00361}00361\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00362}00362\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00363}00363\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00364}00364\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00365}00365\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}
@@ -394,16 +394,16 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00390}00390\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00391}00391\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00392}00392\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00393}00393\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00393}00393\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00394}00394\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00395}00395\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00397}00397\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00398}00398\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00398}00398\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00399}00399\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00400}00400\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00401}00401\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00402}00402\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00401}00401\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00402}00402\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(trf,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00403}00403\ \ \ \ \ \textcolor{keywordtype}{double}\ norm,\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00404}00404\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00405}00405\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}
@@ -434,18 +434,18 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00430}00430\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00431}00431\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00432}00432\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00433}00433\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00433}00433\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00434}00434\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00435}00435\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00436}00436\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00437}00437\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00438}00438\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00438}00438\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00439}00439\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00440}00440\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00441}00441\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00441}00441\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00442}00442\ \ \ \ \ \textcolor{keywordtype}{char}\ di\ =\ CHAR(STRING\_ELT(diag,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00443}00443\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00444}00444\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00444}00444\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00445}00445\ \ \ \ \ \textcolor{keywordtype}{double}\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00446}00446\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00447}00447\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}
@@ -472,18 +472,18 @@
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00468}00468\ \{}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00469}00469\ \ \ \ \ \textcolor{keywordtype}{char}\ t\ =\ \mbox{\hyperlink{kappa_8c_ae14a8f7ee04570112f094bee3278e300}{La\_rcond\_type}}(type);}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00470}00470\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00471}00471\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00471}00471\ \ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00472}00472\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00473}00473\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ 0)}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00474}00474\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}(ScalarReal(R\_PosInf));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00475}00475\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00476}00476\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00476}00476\ \ \ \ \ SEXP\ uplo\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_ac4fa9962123be6abbeaf9c7219b62644}{Matrix\_uploSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00477}00477\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ CHAR(STRING\_ELT(uplo,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00478}00478\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00479}00479\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00479}00479\ \ \ \ \ SEXP\ diag\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_aaaa2d2105381747118da72d6f1aba4e9}{Matrix\_diagSym}});}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00480}00480\ \ \ \ \ \textcolor{keywordtype}{char}\ di\ =\ CHAR(STRING\_ELT(diag,\ 0))[0];}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00481}00481\ }
-\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00482}00482\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{kappa_8c_source_l00482}00482\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00483}00483\ \ \ \ \ \textcolor{keywordtype}{double}\ rcond;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00484}00484\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
 \DoxyCodeLine{\Hypertarget{kappa_8c_source_l00485}00485\ \textcolor{preprocessor}{\#ifdef\ MATRIX\_ENABLE\_ZMATRIX}}

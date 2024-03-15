@@ -5,7 +5,7 @@
 \begin{DoxyCompactItemize}
 \item 
 char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{validity_8h_a006e253d94ad6fc003b7058e00258c12}{Dim\+\_\+validate}} (SEXP)
-\begin{DoxyCompactList}\small\item\em Test that {\ttfamily dim} is a length-\/2, non-\/negative integer vector. \end{DoxyCompactList}\item 
+\item 
 SEXP \mbox{\hyperlink{validity_8h_ab6933c72ac7b2b5261b21a5e6b9f8a44}{R\+\_\+\+Dim\+\_\+validate}} (SEXP)
 \item 
 char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{validity_8h_afbc4d8fb4b35f22ba791a00b04d55509}{Dim\+Names\+\_\+validate}} (SEXP, int\mbox{[}$\,$\mbox{]})
@@ -13,7 +13,7 @@ char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{validity_8h_afbc4d8fb4b35f22ba7
 SEXP \mbox{\hyperlink{validity_8h_a704905413ee5be35e6ca039f15b314a7}{R\+\_\+\+Dim\+Names\+\_\+validate}} (SEXP, SEXP)
 \item 
 SEXP \mbox{\hyperlink{validity_8h_add2d2f5f164e84ae197fe4a09ea4e2b3}{R\+\_\+\+Dim\+Names\+\_\+fixup}} (SEXP)
-\begin{DoxyCompactList}\small\item\em Sanitize user-\/supplied {\ttfamily \mbox{[}dD\mbox{]}imnames}. \end{DoxyCompactList}\item 
+\item 
 SEXP \mbox{\hyperlink{validity_8h_aa23cd51516a886c0b827edc57734db20}{Matrix\+\_\+validate}} (SEXP)
 \item 
 SEXP \mbox{\hyperlink{validity_8h_a66fe2d3f707f48c96c35432da65a0ccf}{Matrix\+Factorization\+\_\+validate}} (SEXP)
@@ -28,7 +28,7 @@ SEXP \mbox{\hyperlink{validity_8h_aa4d7db6f924e09efc8d60f490eee0a9e}{d\+Matrix\+
 \item 
 SEXP \mbox{\hyperlink{validity_8h_a2fd2bf4677d7741e1102db23be112b6c}{z\+Matrix\+\_\+validate}} (SEXP)
 \item 
-SEXP \mbox{\hyperlink{validity_8h_a60903281209a0577dbed13cc58ff4271}{comp\+Matrix\+\_\+validate}} (SEXP)
+SEXP \mbox{\hyperlink{validity_8h_a5f7ae23b4596d069d076a85efed3a0b9}{general\+Matrix\+\_\+validate}} (SEXP)
 \item 
 SEXP \mbox{\hyperlink{validity_8h_a04770b8379bf3a575f49679b7778fa36}{symmetric\+Matrix\+\_\+validate}} (SEXP)
 \item 
@@ -86,7 +86,7 @@ SEXP \mbox{\hyperlink{validity_8h_afe7f00c30ece60386882c656d39ad7dd}{dpp\+Matrix
 \item 
 SEXP \mbox{\hyperlink{validity_8h_aa3fc41cde4a3a1b30fbf38dd7801d23a}{cor\+Matrix\+\_\+validate}} (SEXP)
 \item 
-SEXP \mbox{\hyperlink{validity_8h_a0416ea0c4094689461ade4edb77e2a94}{pcor\+Matrix\+\_\+validate}} (SEXP)
+SEXP \mbox{\hyperlink{validity_8h_ac269aed0d7d1b61fc75ed57d0837aa22}{cop\+Matrix\+\_\+validate}} (SEXP)
 \item 
 SEXP \mbox{\hyperlink{validity_8h_a3f02a749306faa50d48917b85ba99e33}{sparse\+Vector\+\_\+validate}} (SEXP)
 \item 
@@ -137,15 +137,15 @@ void \mbox{\hyperlink{validity_8h_ad789d3a0b71cc1a3cce7c7ca304d5650}{valid\+Obje
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01312}{1312}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01279}{1279}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l01344}{p\+Bunch\+Kaufman\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l01311}{p\+Bunch\+Kaufman\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_aa49f27d7e9fbe033b426226d1c39a9a7}\label{validity_8h_aa49f27d7e9fbe033b426226d1c39a9a7} 
 \index{validity.h@{validity.h}!CHMfactor\_validate@{CHMfactor\_validate}}
@@ -155,11 +155,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l01344}{p\+Bunch\+Kaufman\+\_\
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01441}{1441}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01408}{1408}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a90dcdced7bf6ca438f7920efdc644397}\label{validity_8h_a90dcdced7bf6ca438f7920efdc644397} 
 \index{validity.h@{validity.h}!CHMsimpl\_validate@{CHMsimpl\_validate}}
@@ -169,11 +169,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01500}{1500}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01467}{1467}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ad04c8070574503f7abc370de2a4f9abd}\label{validity_8h_ad04c8070574503f7abc370de2a4f9abd} 
 \index{validity.h@{validity.h}!CHMsuper\_validate@{CHMsuper\_validate}}
@@ -183,11 +183,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01621}{1621}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01588}{1588}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ac5bdfd05b0d6a84a6ae6e3f0e02c4132}\label{validity_8h_ac5bdfd05b0d6a84a6ae6e3f0e02c4132} 
 \index{validity.h@{validity.h}!Cholesky\_validate@{Cholesky\_validate}}
@@ -197,25 +197,25 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01351}{1351}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01318}{1318}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
-\Hypertarget{validity_8h_a60903281209a0577dbed13cc58ff4271}\label{validity_8h_a60903281209a0577dbed13cc58ff4271} 
-\index{validity.h@{validity.h}!compMatrix\_validate@{compMatrix\_validate}}
-\index{compMatrix\_validate@{compMatrix\_validate}!validity.h@{validity.h}}
-\doxysubsubsection{\texorpdfstring{compMatrix\_validate()}{compMatrix\_validate()}}
-{\footnotesize\ttfamily SEXP comp\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj }\end{DoxyParamCaption})}
-
-
-
-Definition at line \mbox{\hyperlink{validity_8c_source_l00193}{193}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+\Hypertarget{validity_8h_ac269aed0d7d1b61fc75ed57d0837aa22}\label{validity_8h_ac269aed0d7d1b61fc75ed57d0837aa22} 
+\index{validity.h@{validity.h}!copMatrix\_validate@{copMatrix\_validate}}
+\index{copMatrix\_validate@{copMatrix\_validate}!validity.h@{validity.h}}
+\doxysubsubsection{\texorpdfstring{copMatrix\_validate()}{copMatrix\_validate()}}
+{\footnotesize\ttfamily SEXP cop\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj }\end{DoxyParamCaption})}
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00012}{Matrix\+\_\+factors\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00937}{937}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00020}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_aa3fc41cde4a3a1b30fbf38dd7801d23a}\label{validity_8h_aa3fc41cde4a3a1b30fbf38dd7801d23a} 
 \index{validity.h@{validity.h}!corMatrix\_validate@{corMatrix\_validate}}
@@ -225,11 +225,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00945}{945}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00912}{912}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00020}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00020}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a1cfae53794a55dcf8996a5486c9f65dd}\label{validity_8h_a1cfae53794a55dcf8996a5486c9f65dd} 
 \index{validity.h@{validity.h}!CsparseMatrix\_validate@{CsparseMatrix\_validate}}
@@ -239,11 +239,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00395}{395}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00289}{289}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a1e948fc490c19fa24fb1c0008f867fea}\label{validity_8h_a1e948fc490c19fa24fb1c0008f867fea} 
 \index{validity.h@{validity.h}!dCHMsimpl\_validate@{dCHMsimpl\_validate}}
@@ -253,11 +253,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01739}{1739}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01706}{1706}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ab9d20e73e568711e6e6b2aa845e8b029}\label{validity_8h_ab9d20e73e568711e6e6b2aa845e8b029} 
 \index{validity.h@{validity.h}!dCHMsuper\_validate@{dCHMsuper\_validate}}
@@ -267,11 +267,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01766}{1766}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01733}{1733}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a3e3f9c2f82e7e7b0bab071836e8fc25d}\label{validity_8h_a3e3f9c2f82e7e7b0bab071836e8fc25d} 
 \index{validity.h@{validity.h}!denseLU\_validate@{denseLU\_validate}}
@@ -281,11 +281,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01085}{1085}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01052}{1052}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a295f930006c53418972cc3dd63498cd7}\label{validity_8h_a295f930006c53418972cc3dd63498cd7} 
 \index{validity.h@{validity.h}!diagonalMatrix\_validate@{diagonalMatrix\_validate}}
@@ -295,11 +295,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00300}{300}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00430}{430}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a006e253d94ad6fc003b7058e00258c12}\label{validity_8h_a006e253d94ad6fc003b7058e00258c12} 
 \index{validity.h@{validity.h}!Dim\_validate@{Dim\_validate}}
@@ -309,19 +309,7 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Test that {\ttfamily dim} is a length-\/2, non-\/negative integer vector. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em dim} & A {\ttfamily SEXP}, typically the {\ttfamily Dim} slot of a (to be validated) {\ttfamily Matrix}.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-A string containing an error message, empty if {\ttfamily dim} is valid. 
-\end{DoxyReturn}
-
-
-Definition at line \mbox{\hyperlink{validity_8c_source_l00035}{35}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00026}{26}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
@@ -329,7 +317,7 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, and \mbox{\hype
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00160}{Matrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00050}{R\+\_\+\+Dim\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00127}{Matrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00041}{R\+\_\+\+Dim\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_afbc4d8fb4b35f22ba791a00b04d55509}\label{validity_8h_afbc4d8fb4b35f22ba791a00b04d55509} 
 \index{validity.h@{validity.h}!DimNames\_validate@{DimNames\_validate}}
@@ -351,11 +339,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00160}{Matrix\+\_\+validate()
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00895}{895}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00862}{862}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}.
 
 \Hypertarget{validity_8h_afe7f00c30ece60386882c656d39ad7dd}\label{validity_8h_afe7f00c30ece60386882c656d39ad7dd} 
 \index{validity.h@{validity.h}!dppMatrix\_validate@{dppMatrix\_validate}}
@@ -365,17 +353,35 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00916}{916}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00883}{883}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}.
 
 \Hypertarget{validity_8h_ae7e2a16bb4e555e1ffbfa2c85ff8b123}\label{validity_8h_ae7e2a16bb4e555e1ffbfa2c85ff8b123} 
 \index{validity.h@{validity.h}!dsparseVector\_validate@{dsparseVector\_validate}}
 \index{dsparseVector\_validate@{dsparseVector\_validate}!validity.h@{validity.h}}
 \doxysubsubsection{\texorpdfstring{dsparseVector\_validate()}{dsparseVector\_validate()}}
 {\footnotesize\ttfamily SEXP dsparse\+Vector\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{validity_8h_a5f7ae23b4596d069d076a85efed3a0b9}\label{validity_8h_a5f7ae23b4596d069d076a85efed3a0b9} 
+\index{validity.h@{validity.h}!generalMatrix\_validate@{generalMatrix\_validate}}
+\index{generalMatrix\_validate@{generalMatrix\_validate}!validity.h@{validity.h}}
+\doxysubsubsection{\texorpdfstring{generalMatrix\_validate()}{generalMatrix\_validate()}}
+{\footnotesize\ttfamily SEXP general\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00160}{160}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00012}{Matrix\+\_\+factors\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00176}{symmetric\+Matrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_accdc32659be3732fbed38522284c2662}\label{validity_8h_accdc32659be3732fbed38522284c2662} 
 \index{validity.h@{validity.h}!iMatrix\_validate@{iMatrix\_validate}}
@@ -391,11 +397,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00331}{331}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00461}{461}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00016}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a86fc63cf5e3310c7d553229ff6d6e477}\label{validity_8h_a86fc63cf5e3310c7d553229ff6d6e477} 
 \index{validity.h@{validity.h}!isparseVector\_validate@{isparseVector\_validate}}
@@ -423,15 +429,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00160}{160}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00127}{127}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00035}{Dim\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00068}{Dim\+Names\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00002}{Matrix\+\_\+\+Dim\+Names\+Sym}}, and \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}.
+References \mbox{\hyperlink{validity_8c_source_l00026}{Dim\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00047}{Dim\+Names\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00002}{Matrix\+\_\+\+Dim\+Names\+Sym}}, and \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00173}{Matrix\+Factorization\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00140}{Matrix\+Factorization\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a66fe2d3f707f48c96c35432da65a0ccf}\label{validity_8h_a66fe2d3f707f48c96c35432da65a0ccf} 
 \index{validity.h@{validity.h}!MatrixFactorization\_validate@{MatrixFactorization\_validate}}
@@ -441,11 +447,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00173}{Matrix\+Factorization\
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00173}{173}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00140}{140}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00160}{Matrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00127}{Matrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_ab6b320bc297ffea978fb74daa1242633}\label{validity_8h_ab6b320bc297ffea978fb74daa1242633} 
 \index{validity.h@{validity.h}!nMatrix\_validate@{nMatrix\_validate}}
@@ -461,11 +467,11 @@ References \mbox{\hyperlink{validity_8c_source_l00160}{Matrix\+\_\+validate()}}.
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00884}{884}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00278}{278}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a55cb2ab0413ff6c8b7e04d8ef9c13e2a}\label{validity_8h_a55cb2ab0413ff6c8b7e04d8ef9c13e2a} 
 \index{validity.h@{validity.h}!pBunchKaufman\_validate@{pBunchKaufman\_validate}}
@@ -475,11 +481,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01344}{1344}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01311}{1311}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l01312}{Bunch\+Kaufman\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l01279}{Bunch\+Kaufman\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_afcb649b1a38c373ecaea9bc982a836c8}\label{validity_8h_afcb649b1a38c373ecaea9bc982a836c8} 
 \index{validity.h@{validity.h}!pCholesky\_validate@{pCholesky\_validate}}
@@ -489,25 +495,11 @@ References \mbox{\hyperlink{validity_8c_source_l01312}{Bunch\+Kaufman\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01392}{1392}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01359}{1359}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
-
-\Hypertarget{validity_8h_a0416ea0c4094689461ade4edb77e2a94}\label{validity_8h_a0416ea0c4094689461ade4edb77e2a94} 
-\index{validity.h@{validity.h}!pcorMatrix\_validate@{pcorMatrix\_validate}}
-\index{pcorMatrix\_validate@{pcorMatrix\_validate}!validity.h@{validity.h}}
-\doxysubsubsection{\texorpdfstring{pcorMatrix\_validate()}{pcorMatrix\_validate()}}
-{\footnotesize\ttfamily SEXP pcor\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj }\end{DoxyParamCaption})}
-
-
-
-Definition at line \mbox{\hyperlink{validity_8c_source_l00970}{970}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
-
-
-
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00020}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a682e51414c37b1b6379dba4f28b865ee}\label{validity_8h_a682e51414c37b1b6379dba4f28b865ee} 
 \index{validity.h@{validity.h}!pMatrix\_validate@{pMatrix\_validate}}
@@ -517,11 +509,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00371}{371}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00501}{501}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ab6933c72ac7b2b5261b21a5e6b9f8a44}\label{validity_8h_ab6933c72ac7b2b5261b21a5e6b9f8a44} 
 \index{validity.h@{validity.h}!R\_Dim\_validate@{R\_Dim\_validate}}
@@ -531,35 +523,21 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00050}{50}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00041}{41}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00035}{Dim\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00026}{Dim\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_add2d2f5f164e84ae197fe4a09ea4e2b3}\label{validity_8h_add2d2f5f164e84ae197fe4a09ea4e2b3} 
 \index{validity.h@{validity.h}!R\_DimNames\_fixup@{R\_DimNames\_fixup}}
 \index{R\_DimNames\_fixup@{R\_DimNames\_fixup}!validity.h@{validity.h}}
 \doxysubsubsection{\texorpdfstring{R\_DimNames\_fixup()}{R\_DimNames\_fixup()}}
-{\footnotesize\ttfamily SEXP R\+\_\+\+Dim\+Names\+\_\+fixup (\begin{DoxyParamCaption}\item[{SEXP}]{dn }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily SEXP R\+\_\+\+Dim\+Names\+\_\+fixup (\begin{DoxyParamCaption}\item[{SEXP}]{dimnames }\end{DoxyParamCaption})}
 
 
 
-Sanitize user-\/supplied {\ttfamily \mbox{[}dD\mbox{]}imnames}. 
-
-Replaces length-\/0 vectors with {\ttfamily NULL} and non-\/character vectors with the result of coercing to character. Intended to emulate the behaviour of {\ttfamily do\+\_\+matrix()} from {\ttfamily src/main/array.\+c}.
-
-
-\begin{DoxyParams}{Parameters}
-{\em dn} & A list of length 2 passing {\ttfamily \doxylink{validity_8c_a2f3cc32c91655ba47cac9045448595ad}{Dim\+Names\+\_\+validate()}}.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-A modified copy of {\ttfamily dn}, or {\ttfamily dn} if no modification is necessary. 
-\end{DoxyReturn}
-
-
-Definition at line \mbox{\hyperlink{validity_8c_source_l00118}{118}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00085}{85}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 \Hypertarget{validity_8h_a704905413ee5be35e6ca039f15b314a7}\label{validity_8h_a704905413ee5be35e6ca039f15b314a7} 
 \index{validity.h@{validity.h}!R\_DimNames\_validate@{R\_DimNames\_validate}}
@@ -569,11 +547,11 @@ Definition at line \mbox{\hyperlink{validity_8c_source_l00118}{118}} of file \mb
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00100}{100}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00079}{79}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00068}{Dim\+Names\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00047}{Dim\+Names\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_aa4402320b8383fc0f42e3942b4eeb44f}\label{validity_8h_aa4402320b8383fc0f42e3942b4eeb44f} 
 \index{validity.h@{validity.h}!RsparseMatrix\_validate@{RsparseMatrix\_validate}}
@@ -583,11 +561,11 @@ References \mbox{\hyperlink{validity_8c_source_l00068}{Dim\+Names\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00446}{446}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00340}{340}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a5d98e9a213facae945dcf5c2da668f07}\label{validity_8h_a5d98e9a213facae945dcf5c2da668f07} 
 \index{validity.h@{validity.h}!Schur\_validate@{Schur\_validate}}
@@ -597,11 +575,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01800}{1800}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01767}{1767}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00005}{Matrix\+\_\+\+QSym}}, \mbox{\hyperlink{Syms_8h_source_l00007}{Matrix\+\_\+\+TSym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00005}{Matrix\+\_\+\+QSym}}, \mbox{\hyperlink{Msymbols_8h_source_l00007}{Matrix\+\_\+\+TSym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a77c4f224aac3d40dd7c9ad9b995f518d}\label{validity_8h_a77c4f224aac3d40dd7c9ad9b995f518d} 
 \index{validity.h@{validity.h}!sCMatrix\_validate@{sCMatrix\_validate}}
@@ -611,15 +589,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00536}{536}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00525}{525}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00576}{t\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00805}{xs\+CMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00565}{t\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00794}{xs\+CMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_afc1616dafc10384bb629c5239d1a0126}\label{validity_8h_afc1616dafc10384bb629c5239d1a0126} 
 \index{validity.h@{validity.h}!sparseLU\_validate@{sparseLU\_validate}}
@@ -629,11 +607,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00576}{t\+CMatrix\+\_\+valida
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01110}{1110}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01077}{1077}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00004}{Matrix\+\_\+\+LSym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00008}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00004}{Matrix\+\_\+\+LSym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00008}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_af7392baeb9c08f417e9d1487080de55d}\label{validity_8h_af7392baeb9c08f417e9d1487080de55d} 
 \index{validity.h@{validity.h}!sparseQR\_validate@{sparseQR\_validate}}
@@ -643,11 +621,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01199}{1199}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01166}{1166}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00010}{Matrix\+\_\+beta\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00006}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{Syms_8h_source_l00009}{Matrix\+\_\+\+VSym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00015}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00010}{Matrix\+\_\+beta\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00066}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00077}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00006}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{Msymbols_8h_source_l00009}{Matrix\+\_\+\+VSym}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMK}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a3f02a749306faa50d48917b85ba99e33}\label{validity_8h_a3f02a749306faa50d48917b85ba99e33} 
 \index{validity.h@{validity.h}!sparseVector\_validate@{sparseVector\_validate}}
@@ -657,11 +635,11 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01003}{1003}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00970}{970}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00015}{Matrix\+\_\+length\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00015}{Matrix\+\_\+length\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a2a8a8859e26abde9741dd52b5beac5ba}\label{validity_8h_a2a8a8859e26abde9741dd52b5beac5ba} 
 \index{validity.h@{validity.h}!sRMatrix\_validate@{sRMatrix\_validate}}
@@ -671,15 +649,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00627}{627}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00616}{616}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00667}{t\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00831}{xs\+RMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00656}{t\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00820}{xs\+RMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a937c9e8e15d29c05bcad2d65a4edbca8}\label{validity_8h_a937c9e8e15d29c05bcad2d65a4edbca8} 
 \index{validity.h@{validity.h}!sTMatrix\_validate@{sTMatrix\_validate}}
@@ -689,15 +667,15 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00667}{t\+RMatrix\+\_\+valida
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00718}{718}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00707}{707}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00748}{t\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00857}{xs\+TMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00737}{t\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00846}{xs\+TMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a04770b8379bf3a575f49679b7778fa36}\label{validity_8h_a04770b8379bf3a575f49679b7778fa36} 
 \index{validity.h@{validity.h}!symmetricMatrix\_validate@{symmetricMatrix\_validate}}
@@ -707,11 +685,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00748}{t\+TMatrix\+\_\+valida
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00209}{209}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00176}{176}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{utils_8c_source_l00143}{equal\+\_\+character\+\_\+vectors()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00002}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{utils_8c_source_l00143}{equal\+\_\+character\+\_\+vectors()}}, \mbox{\hyperlink{validity_8c_source_l00160}{general\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00002}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ac397ea27472b892cc90432e18637b086}\label{validity_8h_ac397ea27472b892cc90432e18637b086} 
 \index{validity.h@{validity.h}!tCMatrix\_validate@{tCMatrix\_validate}}
@@ -721,15 +699,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00576}{576}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00565}{565}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00536}{s\+CMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00525}{s\+CMatrix\+\_\+validate()}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00813}{xt\+CMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00802}{xt\+CMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a552b23b658357adaec0869c66b554646}\label{validity_8h_a552b23b658357adaec0869c66b554646} 
 \index{validity.h@{validity.h}!triangularMatrix\_validate@{triangularMatrix\_validate}}
@@ -739,11 +717,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00813}{xt\+CMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00272}{272}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00239}{239}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_acacbbb74ca15c40b7106b83dd1a26782}\label{validity_8h_acacbbb74ca15c40b7106b83dd1a26782} 
 \index{validity.h@{validity.h}!tRMatrix\_validate@{tRMatrix\_validate}}
@@ -753,15 +731,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00667}{667}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00656}{656}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00627}{s\+RMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00616}{s\+RMatrix\+\_\+validate()}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00839}{xt\+RMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00828}{xt\+RMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a1e94fac533f53fdcf5a9fab304eb732f}\label{validity_8h_a1e94fac533f53fdcf5a9fab304eb732f} 
 \index{validity.h@{validity.h}!TsparseMatrix\_validate@{TsparseMatrix\_validate}}
@@ -771,11 +749,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00839}{xt\+RMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00497}{497}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00391}{391}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_a687aed150779c0da5708be7302acea19}\label{validity_8h_a687aed150779c0da5708be7302acea19} 
 \index{validity.h@{validity.h}!tTMatrix\_validate@{tTMatrix\_validate}}
@@ -785,15 +763,15 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00748}{748}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00737}{737}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00718}{s\+TMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00011}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}, and \mbox{\hyperlink{validity_8c_source_l00707}{s\+TMatrix\+\_\+validate()}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00865}{xt\+TMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00854}{xt\+TMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a51747d682b7a30c5458997c5f229991c}\label{validity_8h_a51747d682b7a30c5458997c5f229991c} 
 \index{validity.h@{validity.h}!unpackedMatrix\_validate@{unpackedMatrix\_validate}}
@@ -803,11 +781,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00865}{xt\+TMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00873}{873}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00267}{267}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 \Hypertarget{validity_8h_ad789d3a0b71cc1a3cce7c7ca304d5650}\label{validity_8h_ad789d3a0b71cc1a3cce7c7ca304d5650} 
 \index{validity.h@{validity.h}!validObject@{validObject}}
@@ -817,7 +795,7 @@ References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlin
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l01835}{1835}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l01802}{1802}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 \Hypertarget{validity_8h_ab6a60731ab898a5054c1459cd16f7df9}\label{validity_8h_ab6a60731ab898a5054c1459cd16f7df9} 
 \index{validity.h@{validity.h}!xgCMatrix\_validate@{xgCMatrix\_validate}}
@@ -827,15 +805,15 @@ Definition at line \mbox{\hyperlink{validity_8c_source_l01835}{1835}} of file \m
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00795}{795}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00784}{784}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00805}{xs\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00813}{xt\+CMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00794}{xs\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00802}{xt\+CMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_acd88fb796c15f26fec9efa344a8ba682}\label{validity_8h_acd88fb796c15f26fec9efa344a8ba682} 
 \index{validity.h@{validity.h}!xgRMatrix\_validate@{xgRMatrix\_validate}}
@@ -845,15 +823,15 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00805}{xs\+CMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00821}{821}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00810}{810}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00014}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00831}{xs\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00839}{xt\+RMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00820}{xs\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00828}{xt\+RMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_ada7774c0e20b7dc1ba71cddc2069e4dd}\label{validity_8h_ada7774c0e20b7dc1ba71cddc2069e4dd} 
 \index{validity.h@{validity.h}!xgTMatrix\_validate@{xgTMatrix\_validate}}
@@ -863,15 +841,15 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00831}{xs\+RMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00847}{847}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00836}{836}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00012}{RMKMS}}.
 
 
 
-Referenced by \mbox{\hyperlink{validity_8c_source_l00857}{xs\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00865}{xt\+TMatrix\+\_\+validate()}}.
+Referenced by \mbox{\hyperlink{validity_8c_source_l00846}{xs\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00854}{xt\+TMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a481fe4b5af127f68c77843e8c9ff547c}\label{validity_8h_a481fe4b5af127f68c77843e8c9ff547c} 
 \index{validity.h@{validity.h}!xsCMatrix\_validate@{xsCMatrix\_validate}}
@@ -881,11 +859,11 @@ Referenced by \mbox{\hyperlink{validity_8c_source_l00857}{xs\+TMatrix\+\_\+valid
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00805}{805}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00794}{794}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00536}{s\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00795}{xg\+CMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00525}{s\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00784}{xg\+CMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a547f28b248cb8c67ec04b51b98e9eba0}\label{validity_8h_a547f28b248cb8c67ec04b51b98e9eba0} 
 \index{validity.h@{validity.h}!xsRMatrix\_validate@{xsRMatrix\_validate}}
@@ -895,11 +873,11 @@ References \mbox{\hyperlink{validity_8c_source_l00536}{s\+CMatrix\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00831}{831}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00820}{820}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00627}{s\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00821}{xg\+RMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00616}{s\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00810}{xg\+RMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a5e4d3ed1dfee5f462a5e556852df4ec4}\label{validity_8h_a5e4d3ed1dfee5f462a5e556852df4ec4} 
 \index{validity.h@{validity.h}!xsTMatrix\_validate@{xsTMatrix\_validate}}
@@ -909,11 +887,11 @@ References \mbox{\hyperlink{validity_8c_source_l00627}{s\+RMatrix\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00857}{857}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00846}{846}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00718}{s\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00847}{xg\+TMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00707}{s\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00836}{xg\+TMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a9e4a810994df59fce78c6393dfd016dd}\label{validity_8h_a9e4a810994df59fce78c6393dfd016dd} 
 \index{validity.h@{validity.h}!xtCMatrix\_validate@{xtCMatrix\_validate}}
@@ -923,11 +901,11 @@ References \mbox{\hyperlink{validity_8c_source_l00718}{s\+TMatrix\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00813}{813}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00802}{802}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00576}{t\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00795}{xg\+CMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00565}{t\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00784}{xg\+CMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a429b9277a4e462d3736ae960798c7123}\label{validity_8h_a429b9277a4e462d3736ae960798c7123} 
 \index{validity.h@{validity.h}!xtRMatrix\_validate@{xtRMatrix\_validate}}
@@ -937,11 +915,11 @@ References \mbox{\hyperlink{validity_8c_source_l00576}{t\+CMatrix\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00839}{839}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00828}{828}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00667}{t\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00821}{xg\+RMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00656}{t\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00810}{xg\+RMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_af18775e3c6e460ff2fe4851b72719896}\label{validity_8h_af18775e3c6e460ff2fe4851b72719896} 
 \index{validity.h@{validity.h}!xtTMatrix\_validate@{xtTMatrix\_validate}}
@@ -951,11 +929,11 @@ References \mbox{\hyperlink{validity_8c_source_l00667}{t\+RMatrix\+\_\+validate(
 
 
 
-Definition at line \mbox{\hyperlink{validity_8c_source_l00865}{865}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+Definition at line \mbox{\hyperlink{validity_8c_source_l00854}{854}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
 
 
 
-References \mbox{\hyperlink{validity_8c_source_l00748}{t\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00847}{xg\+TMatrix\+\_\+validate()}}.
+References \mbox{\hyperlink{validity_8c_source_l00737}{t\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00836}{xg\+TMatrix\+\_\+validate()}}.
 
 \Hypertarget{validity_8h_a2fd2bf4677d7741e1102db23be112b6c}\label{validity_8h_a2fd2bf4677d7741e1102db23be112b6c} 
 \index{validity.h@{validity.h}!zMatrix\_validate@{zMatrix\_validate}}

@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['chm_5fcommon_2ec_0',['chm_common.c',['../chm__common_8c.html',1,'']]],
-  ['chm_5fcommon_2eh_1',['chm_common.h',['../chm__common_8h.html',1,'']]],
+  ['cholmod_2dcommon_2ec_0',['cholmod-common.c',['../cholmod-common_8c.html',1,'']]],
+  ['cholmod_2dcommon_2eh_1',['cholmod-common.h',['../cholmod-common_8h.html',1,'']]],
   ['cholmod_2detc_2ec_2',['cholmod-etc.c',['../cholmod-etc_8c.html',1,'']]],
   ['cholmod_2detc_2eh_3',['cholmod-etc.h',['../cholmod-etc_8h.html',1,'']]],
   ['coerce_2ec_4',['coerce.c',['../coerce_8c.html',1,'']]],

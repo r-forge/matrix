@@ -14,14 +14,14 @@ var searchData=
   ['sad_5fsubsubcases_11',['SAD_SUBSUBCASES',['../coerce_8c.html#ae1438cb2be565af1897267e1b2e6ef3e',1,'coerce.c']]],
   ['sag_5fcases_12',['SAG_CASES',['../coerce_8c.html#a2524fb048145a3d9e460b0e7562b9726',1,'coerce.c']]],
   ['sag_5fsubcases_13',['sag_subcases',['../coerce_8c.html#aaca1d7be71a9c6bd17576384bed55df5',1,'SAG_SUBCASES:&#160;coerce.c'],['../coerce_8c.html#aaca1d7be71a9c6bd17576384bed55df5',1,'SAG_SUBCASES:&#160;coerce.c']]],
-  ['scale_14',['scale',['../products_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;products.c'],['../products_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;products.c'],['../products_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;products.c']]],
+  ['scale_14',['scale',['../matmult_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;matmult.c'],['../matmult_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;matmult.c'],['../matmult_8c.html#ac3838a4c157fe9a7a3024058d5acf33c',1,'SCALE:&#160;matmult.c']]],
   ['scale1_5fcomplex_15',['SCALE1_COMPLEX',['../Mdefines_8h.html#ad406a779fb4aec6cb161dc4010dfcf59',1,'Mdefines.h']]],
   ['scale1_5freal_16',['SCALE1_REAL',['../Mdefines_8h.html#a04ac739d1593c91d817b09bf8a95eae8',1,'Mdefines.h']]],
   ['scale2_5fcomplex_17',['SCALE2_COMPLEX',['../Mdefines_8h.html#a0b9dee1f60432b22fc01ae3b8dea9479',1,'Mdefines.h']]],
   ['scale2_5freal_18',['SCALE2_REAL',['../Mdefines_8h.html#a1d4eac21ced165bb30d0b6397fec5fcd',1,'Mdefines.h']]],
-  ['scale_5fcases_19',['SCALE_CASES',['../products_8c.html#a85b1cca37332bd5f71bfe8a87faa0368',1,'products.c']]],
+  ['scale_5fcases_19',['SCALE_CASES',['../matmult_8c.html#a85b1cca37332bd5f71bfe8a87faa0368',1,'matmult.c']]],
   ['secondof_20',['SECONDOF',['../Mdefines_8h.html#addd80827f92b7217d781227e3e5f8c2a',1,'Mdefines.h']]],
-  ['set_5fframe_5ffrom_5fmember_21',['SET_FRAME_FROM_MEMBER',['../chm__common_8c.html#a365f4fd283144b0bacc8ecac256c1eaf',1,'chm_common.c']]],
+  ['set_5fframe_5ffrom_5fmember_21',['SET_FRAME_FROM_MEMBER',['../cholmod-common_8c.html#a365f4fd283144b0bacc8ecac256c1eaf',1,'cholmod-common.c']]],
   ['set_5fslot_22',['SET_SLOT',['../Mdefines_8h.html#ab3823fd9b99edc7fc5cf632c697ec560',1,'Mdefines.h']]],
   ['show_23',['SHOW',['../Mdefines_8h.html#a9739f480990ca670f89755f0cdd694ed',1,'Mdefines.h']]],
   ['solve_5fdense_5f1_24',['solve_dense_1',['../solve_8c.html#ac4a54f1cde542badabb1a37c974a04fa',1,'SOLVE_DENSE_1:&#160;solve.c'],['../solve_8c.html#ac4a54f1cde542badabb1a37c974a04fa',1,'SOLVE_DENSE_1:&#160;solve.c']]],
@@ -56,6 +56,6 @@ var searchData=
   ['sum_5fkernel_53',['sum_kernel',['../dense_8c.html#a628fb5527291f092640bb0e88ced397c',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ab5a005205fdb89a020c5a14b697a8e77',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c'],['../dense_8c.html#ac8858177745cb0558895362af01bddd8',1,'SUM_KERNEL:&#160;dense.c']]],
   ['sum_5floop_54',['sum_loop',['../dense_8c.html#aa66e46ad0a5d90505a7ccdae34a7bd75',1,'SUM_LOOP:&#160;dense.c'],['../dense_8c.html#aa66e46ad0a5d90505a7ccdae34a7bd75',1,'SUM_LOOP:&#160;dense.c'],['../dense_8c.html#aa7cfc91855c65071d630bbd23dd4ff20',1,'SUM_LOOP:&#160;dense.c'],['../sparse_8c.html#af88e52854d097966ae50785d9e45de3a',1,'SUM_LOOP:&#160;sparse.c'],['../sparse_8c.html#af88e52854d097966ae50785d9e45de3a',1,'SUM_LOOP:&#160;sparse.c'],['../sparse_8c.html#af88e52854d097966ae50785d9e45de3a',1,'SUM_LOOP:&#160;sparse.c']]],
   ['sum_5ftypeof_55',['sum_typeof',['../dense_8c.html#a3e39b0ea9afebadaba32b8ae1eb419ea',1,'SUM_TYPEOF:&#160;dense.c'],['../sparse_8c.html#a3e39b0ea9afebadaba32b8ae1eb419ea',1,'SUM_TYPEOF:&#160;sparse.c']]],
-  ['swap_5fcol_56',['SWAP_COL',['../dgeMatrix_8c.html#a67a47ed323a810b0302db34d30891931',1,'dgeMatrix.c']]],
-  ['swap_5frow_57',['SWAP_ROW',['../dgeMatrix_8c.html#a143a3b92384b532b88755349f12b074a',1,'dgeMatrix.c']]]
+  ['swap_5fcol_56',['SWAP_COL',['../expm_8c.html#a67a47ed323a810b0302db34d30891931',1,'expm.c']]],
+  ['swap_5frow_57',['SWAP_ROW',['../expm_8c.html#a143a3b92384b532b88755349f12b074a',1,'expm.c']]]
 ];

@@ -13,11 +13,11 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00009}00009\ \{}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00010}00010\ \ \ \ \ cholmod\_factor\ *L\ =\ (cholmod\_factor\ *)\ R\_alloc(1,\ \textcolor{keyword}{sizeof}(cholmod\_factor));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00011}00011\ \ \ \ \ memset(L,\ 0,\ \textcolor{keyword}{sizeof}(cholmod\_factor));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00012}00012\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00012}00012\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ type\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}type"{}}))),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ perm\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ perm\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}})),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ colcount\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}colcount"{}}))),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00017}00017\ \ \ \ \ L-\/>n\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00018}00018\ \ \ \ \ L-\/>minor\ =\ L-\/>n;\ \textcolor{comment}{/*\ FIXME:\ could\ be\ wrong\ for\ obj\ <-\/\ new(...)\ */}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00019}00019\ \ \ \ \ L-\/>ordering\ =\ INTEGER(type)[0];}
@@ -55,8 +55,8 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ L-\/>is\_ll\ =\ INTEGER(type)[1];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ L-\/>is\_monotonic\ =\ INTEGER(type)[3];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (values\ \&\&\ x\ !=\ R\_NilValue)\ \{}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nz\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}nz"{}}))),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nxt\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}nxt"{}}))),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prv\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}prv"{}})));}
@@ -94,10 +94,10 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00090}00090\ \{}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00091}00091\ \ \ \ \ cholmod\_sparse\ *A\ =\ (cholmod\_sparse\ *)\ R\_alloc(1,\ \textcolor{keyword}{sizeof}(cholmod\_sparse));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00092}00092\ \ \ \ \ memset(A,\ 0,\ \textcolor{keyword}{sizeof}(cholmod\_sparse));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00093}00093\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00093}00093\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00097}00097\ \ \ \ \ A-\/>nrow\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00098}00098\ \ \ \ \ A-\/>ncol\ =\ INTEGER(dim)[1];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00099}00099\ \ \ \ \ A-\/>p\ =\ INTEGER(p);}
@@ -132,8 +132,8 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00128}00128\ \{}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00129}00129\ \ \ \ \ cholmod\_dense\ *A\ =\ (cholmod\_dense\ *)\ R\_alloc(1,\ \textcolor{keyword}{sizeof}(cholmod\_dense));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00130}00130\ \ \ \ \ memset(A,\ 0,\ \textcolor{keyword}{sizeof}(cholmod\_dense));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00131}00131\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00131}00131\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00133}00133\ \ \ \ \ \textcolor{keywordtype}{int}\ m\ =\ INTEGER(dim)[0],\ n\ =\ INTEGER(dim)[1];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00134}00134\ \ \ \ \ A-\/>nrow\ =\ ((\mbox{\hyperlink{coerce_8c_ab14fafdda39a6e989a83a1518c0fde26}{trans}})\ ?\ n\ :\ m);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00135}00135\ \ \ \ \ A-\/>ncol\ =\ ((\mbox{\hyperlink{coerce_8c_ab14fafdda39a6e989a83a1518c0fde26}{trans}})\ ?\ m\ :\ n);}
@@ -206,12 +206,12 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00202}00202\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ =\ (!values)\ ?\ \textcolor{charliteral}{'n'}\ :\ ((L-\/>xtype\ ==\ CHOLMOD\_COMPLEX)\ ?\ \textcolor{charliteral}{'z'}\ :\ \textcolor{charliteral}{'d'});}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00203}00203\ \ \ \ \ memcpy(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}\ +\ 4,\ (L-\/>is\_super)\ ?\ \textcolor{stringliteral}{"{}super"{}}\ :\ \textcolor{stringliteral}{"{}simpl"{}},\ 5);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00204}00204\ \ \ \ \ SEXP\ obj\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00205}00205\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00205}00205\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00206}00206\ \ \ \ \ INTEGER(dim)[0]\ =\ INTEGER(dim)[1]\ =\ (int)\ L-\/>n;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>ordering\ !=\ CHOLMOD\_NATURAL)\ \{}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ SEXP\ perm\ =\ PROTECT(allocVector(INTSXP,\ L-\/>n));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00209}00209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(perm),\ L-\/>Perm,\ L-\/>n,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}},\ perm);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}},\ perm);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00212}00212\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00213}00213\ \ \ \ \ SEXP\ type\ =\ PROTECT(allocVector(INTSXP,\ 6)),}
@@ -250,8 +250,8 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00246}00246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(nz),\ L-\/>nz,\ L-\/>n,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00247}00247\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(nxt),\ L-\/>next,\ L-\/>n\ +\ 2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00248}00248\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(prv),\ L-\/>prev,\ L-\/>n\ +\ 2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00249}00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00250}00250\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00249}00249\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00250}00250\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00251}00251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}nz"{}}),\ nz);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00252}00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}nxt"{}}),\ nxt);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00253}00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ install(\textcolor{stringliteral}{"{}prv"{}}),\ prv);}
@@ -267,7 +267,7 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(x\ =\ allocVector(REALSXP,\ nx));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(REAL(x),\ L-\/>x,\ nx,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00265}00265\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00266}00266\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00266}00266\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00267}00267\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00268}00268\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00269}00269\ \ \ \ \ UNPROTECT(4);}
@@ -295,15 +295,15 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00291}00291\ \ \ \ \ \textcolor{keywordtype}{int}\ m\ =\ (int)\ A-\/>nrow,\ n\ =\ (\textcolor{keywordtype}{int})\ A-\/>ncol,\ nnz\ =\ ((\textcolor{keywordtype}{int}\ *)\ A-\/>p)[A-\/>ncol];}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00292}00292\ \ \ \ \ R\_xlen\_t\ n1a\ =\ (R\_xlen\_t)\ n\ +\ 1;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00293}00293\ \ \ \ \ SEXP\ obj\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00294}00294\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00294}00294\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00295}00295\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(allocVector(INTSXP,\ n1a)),}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00296}00296\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(allocVector(INTSXP,\ nnz));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00297}00297\ \ \ \ \ INTEGER(dim)[0]\ =\ m;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00298}00298\ \ \ \ \ INTEGER(dim)[1]\ =\ n;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00299}00299\ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(p),\ A-\/>p,\ n1a,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00300}00300\ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(i),\ A-\/>i,\ nnz,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00301}00301\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00302}00302\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00301}00301\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00302}00302\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00303}00303\ \ \ \ \ \textcolor{keywordflow}{if}\ (values)\ \{}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00304}00304\ \ \ \ \ \ \ \ \ SEXP\ x;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (A-\/>xtype\ ==\ CHOLMOD\_COMPLEX)\ \{}
@@ -313,7 +313,7 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(x\ =\ allocVector(REALSXP,\ nnz));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(REAL(x),\ A-\/>x,\ nnz,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00311}00311\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00312}00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00312}00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00313}00313\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00314}00314\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00315}00315\ \ \ \ \ \textcolor{keywordflow}{if}\ (A\ !=\ A\_)}
@@ -342,7 +342,7 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00338}00338\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[2]\ =\ (shape\ ==\ \textcolor{charliteral}{'g'})}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00339}00339\ \ \ \ \ \ \ \ \ ?\ \textcolor{charliteral}{'e'}\ :\ ((shape\ ==\ \textcolor{charliteral}{'s'})\ ?\ \textcolor{charliteral}{'y'}\ :\ ((shape\ ==\ \textcolor{charliteral}{'p'})\ ?\ \textcolor{charliteral}{'o'}\ :\ \textcolor{charliteral}{'r'}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00340}00340\ \ \ \ \ SEXP\ obj\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}})),}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00341}00341\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00341}00341\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}));}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00342}00342\ \ \ \ \ INTEGER(dim)[0]\ =\ (\mbox{\hyperlink{coerce_8c_ab14fafdda39a6e989a83a1518c0fde26}{trans}})\ ?\ n\ :\ m;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00343}00343\ \ \ \ \ INTEGER(dim)[1]\ =\ (\mbox{\hyperlink{coerce_8c_ab14fafdda39a6e989a83a1518c0fde26}{trans}})\ ?\ m\ :\ n;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00344}00344\ \ \ \ \ SEXP\ x;}
@@ -361,7 +361,7 @@
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00357}00357\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ dtranspose2(px,\ py,\ m,\ n);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00359}00359\ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00361}00361\ \ \ \ \ UNPROTECT(3);}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00362}00362\ \ \ \ \ \textcolor{keywordflow}{return}\ obj;}
 \DoxyCodeLine{\Hypertarget{cholmod-etc_8c_source_l00363}00363\ \}}

@@ -14,7 +14,7 @@ var searchData=
   ['matrix_5fpackage_5fminor_11',['MATRIX_PACKAGE_MINOR',['../version_8h.html#a04baa3cccc3e7ba9292a692f3f900050',1,'version.h']]],
   ['matrix_5fpackage_5fpatch_12',['MATRIX_PACKAGE_PATCH',['../version_8h.html#a624dddd16ca64f82378267c2ccdc3d3e',1,'version.h']]],
   ['matrix_5fpackage_5fversion_13',['MATRIX_PACKAGE_VERSION',['../version_8h.html#a3ea7a6d562d1e0a3a081721a990397b0',1,'version.h']]],
-  ['matrix_5fsubassign_5fverbose_14',['MATRIX_SUBASSIGN_VERBOSE',['../t__Csparse__subassign_8c.html#a49853d67ccb741322719a474b2a1e1d5',1,'t_Csparse_subassign.c']]],
+  ['matrix_5fsubassign_5fverbose_14',['MATRIX_SUBASSIGN_VERBOSE',['../t__subassign_8c.html#a49853d67ccb741322719a474b2a1e1d5',1,'t_subassign.c']]],
   ['matrix_5fsuitesparse_5fmajor_15',['MATRIX_SUITESPARSE_MAJOR',['../version_8h.html#aaa7d877a42a6a5927517be6a50a92d9c',1,'version.h']]],
   ['matrix_5fsuitesparse_5fminor_16',['MATRIX_SUITESPARSE_MINOR',['../version_8h.html#a97802536abaeda9ce03ba46288a77a87',1,'version.h']]],
   ['matrix_5fsuitesparse_5fpatch_17',['MATRIX_SUITESPARSE_PATCH',['../version_8h.html#ab938e108824294348da0aaf62210d52e',1,'version.h']]],
@@ -27,9 +27,9 @@ var searchData=
   ['mcs_5fxtype_5fset_24',['MCS_XTYPE_SET',['../cs-etc_8h.html#a3cc51db007a18d58d4f8387ef7b745fb',1,'cs-etc.h']]],
   ['minof_25',['MINOF',['../Mdefines_8h.html#a72efe589bf03634708c2ba3e15ca56a7',1,'Mdefines.h']]],
   ['mk_26',['MK',['../validity_8c.html#ab97282eb01138daf0133e13a83966b54',1,'validity.c']]],
-  ['mkms_27',['mkms',['../chm__common_8c.html#af72cb5f85c4491241fc250802d7f7b48',1,'MKMS:&#160;chm_common.c'],['../Csparse_8c.html#af72cb5f85c4491241fc250802d7f7b48',1,'MKMS:&#160;Csparse.c']]],
+  ['mkms_27',['mkms',['../cholmod-common_8c.html#af72cb5f85c4491241fc250802d7f7b48',1,'MKMS:&#160;cholmod-common.c'],['../Csparse_8c.html#af72cb5f85c4491241fc250802d7f7b48',1,'MKMS:&#160;Csparse.c']]],
   ['ms_28',['MS',['../validity_8c.html#aff3d55e38915c95b343e9a7f8355fa40',1,'validity.c']]],
-  ['multiply_5fcomplex_29',['MULTIPLY_COMPLEX',['../products_8c.html#a06892d513dd7f15930e4bb73d29f3ed5',1,'products.c']]],
-  ['multiply_5flogical_30',['MULTIPLY_LOGICAL',['../products_8c.html#aaa28724d4ef72e7084dff72aa2b4b56e',1,'products.c']]],
-  ['multiply_5freal_31',['MULTIPLY_REAL',['../products_8c.html#a63b55484306803ffec85a386ec5fef67',1,'products.c']]]
+  ['multiply_5fcomplex_29',['MULTIPLY_COMPLEX',['../matmult_8c.html#a06892d513dd7f15930e4bb73d29f3ed5',1,'matmult.c']]],
+  ['multiply_5flogical_30',['MULTIPLY_LOGICAL',['../matmult_8c.html#aaa28724d4ef72e7084dff72aa2b4b56e',1,'matmult.c']]],
+  ['multiply_5freal_31',['MULTIPLY_REAL',['../matmult_8c.html#a63b55484306803ffec85a386ec5fef67',1,'matmult.c']]]
 ];
