@@ -741,15 +741,12 @@ setClass("dCHMsuper",
 
 ## ------ Schur --------------------------------------------------------
 
-## For eigenvalues:
-setClassUnion("number", members = c("numeric", "complex"))
-
 setClass("SchurFactorization",
          contains = c("VIRTUAL", "MatrixFactorization"))
 
 setClass("Schur",
          contains = "SchurFactorization",
-         slots = c(Q = "Matrix", T = "Matrix", EValues = "number"),
+         slots = c(Q = "Matrix", T = "Matrix", EValues = "vector"),
          prototype = list(Q = .new("dgeMatrix"), T = .new("dgeMatrix")),
          validity = function(object) .Call(Schur_validate, object))
 
@@ -922,29 +919,38 @@ setClass("abIndex",
 ##  5. Class unions
 ########################################################################
 
-## NB: these exist mainly to reduce duplication of methods
-## NB: numeric = { integer, double }
+## MJ: aim to deprecate and eventually remove these
 
-## Atomic vectors:
-## * note that is(<atomic matrix>, "atomicVector") is FALSE
-##   even though is.atomic(<atomic matrix>) is TRUE
 setClassUnion("atomicVector",
               members = c("raw", "logical", "numeric", "complex", "character"))
-
-## Numeric-like vectors:
-## * for methods handling logical and integer as double
-setClassUnion("numLike",
-              members = c("logical", "numeric"))
-
-## Index vectors:
-## * for 'i' in x[i], x[i, ], x[, i], etc.
-## * TODO: include rleDiff
 setClassUnion("index",
-              members = c("logical", "numeric", "character"))
-
-## Subassignment values:
-## * for 'value' in x[i, j] <- value
+              members = c(       "logical", "numeric",            "character"))
+setClassUnion("numLike",
+              members = c(       "logical", "numeric"                        ))
+setClassUnion("number",
+              members = c(                  "numeric", "complex"             ))
 setClassUnion("replValue",
-              members = c("raw", "logical", "numeric", "complex"))
+              members = c("raw", "logical", "numeric", "complex"             ))
+
+setClass("pcorMatrix")
+setClassUnion("replValueSp")
+## Removing these entirely in Matrix 1.7-0 invalidates class definitions
+## serialized in existing installations of the following packages:
+##
+##  [1] CVXR                 FinNet               GENLIB
+##  [4] MSnbase              MachineShop          MatrixModels
+##  [7] SeuratObject         SingleCellExperiment WoodburyMatrix
+## [10] apcluster            arules               chromVAR
+## [13] conText              copula               destiny
+## [16] distrom              genomation           hypr
+## [19] iGraphMatch          kebabs               mcompanion
+## [22] pcts                 podkat               qpgraph
+## [25] quadrupen            quanteda             quanteda.textstats
+## [28] saeRobust            scuttle              snpStats
+## [31] softImpute           spflow               xcms
+##
+## Define stubs so that the serialized class definitions do not cause S4
+## machinery to throw warnings or errors.  Remove the stubs once binaries
+## in most repositories seem to have been rebuilt under Matrix 1.7-0.
 
 rm(.new, .initialize)

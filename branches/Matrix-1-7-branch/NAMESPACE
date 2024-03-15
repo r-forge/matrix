@@ -271,8 +271,8 @@ exportClasses(Matrix, # and its subclasses .............................
 
               compMatrix,
               generalMatrix,
-              triangularMatrix,
               symmetricMatrix,
+              triangularMatrix,
               diagonalMatrix,
 
               denseMatrix,
@@ -288,21 +288,21 @@ exportClasses(Matrix, # and its subclasses .............................
 
               ndenseMatrix,
               ngeMatrix,
-              ntrMatrix,
-              ntpMatrix,
               nsyMatrix,
               nspMatrix,
+              ntrMatrix,
+              ntpMatrix,
 
               nsparseMatrix,
               ngCMatrix,
               ngRMatrix,
               ngTMatrix,
-              ntCMatrix,
-              ntRMatrix,
-              ntTMatrix,
               nsCMatrix,
               nsRMatrix,
               nsTMatrix,
+              ntCMatrix,
+              ntRMatrix,
+              ntTMatrix,
 
               ndiMatrix,
 
@@ -310,21 +310,21 @@ exportClasses(Matrix, # and its subclasses .............................
 
               ldenseMatrix,
               lgeMatrix,
-              ltrMatrix,
-              ltpMatrix,
               lsyMatrix,
               lspMatrix,
+              ltrMatrix,
+              ltpMatrix,
 
               lsparseMatrix,
               lgCMatrix,
               lgRMatrix,
               lgTMatrix,
-              ltCMatrix,
-              ltRMatrix,
-              ltTMatrix,
               lsCMatrix,
               lsRMatrix,
               lsTMatrix,
+              ltCMatrix,
+              ltRMatrix,
+              ltTMatrix,
 
               ldiMatrix,
 
@@ -332,46 +332,47 @@ exportClasses(Matrix, # and its subclasses .............................
 
               ## idenseMatrix,
               ## igeMatrix,
-              ## itrMatrix,
-              ## itpMatrix,
               ## isyMatrix,
               ## ispMatrix,
+              ## itrMatrix,
+              ## itpMatrix,
 
               ## isparseMatrix,
               ## igCMatrix,
               ## igRMatrix,
               ## igTMatrix,
-              ## itCMatrix,
-              ## itRMatrix,
-              ## itTMatrix,
               ## isCMatrix,
               ## isRMatrix,
               ## isTMatrix,
+              ## itCMatrix,
+              ## itRMatrix,
+              ## itTMatrix,
+
               ## idiMatrix,
 
               dMatrix,
 
               ddenseMatrix,
               dgeMatrix,
-              dtrMatrix,
-              dtpMatrix,
               dsyMatrix,
               dspMatrix,
               dpoMatrix,
               dppMatrix,
               corMatrix,
               copMatrix,
+              dtrMatrix,
+              dtpMatrix,
 
               dsparseMatrix,
               dgCMatrix,
               dgRMatrix,
               dgTMatrix,
-              dtCMatrix,
-              dtRMatrix,
-              dtTMatrix,
               dsCMatrix,
               dsRMatrix,
               dsTMatrix,
+              dtCMatrix,
+              dtRMatrix,
+              dtTMatrix,
 
               ddiMatrix,
 
@@ -379,21 +380,21 @@ exportClasses(Matrix, # and its subclasses .............................
 
               ## zdenseMatrix,
               ## zgeMatrix,
-              ## ztrMatrix,
-              ## ztpMatrix,
               ## zsyMatrix,
               ## zspMatrix,
+              ## ztrMatrix,
+              ## ztpMatrix,
 
               ## zsparseMatrix,
               ## zgCMatrix,
               ## zgRMatrix,
               ## zgTMatrix,
-              ## ztCMatrix,
-              ## ztRMatrix,
-              ## ztTMatrix,
               ## zsCMatrix,
               ## zsRMatrix,
               ## zsTMatrix,
+              ## ztCMatrix,
+              ## ztRMatrix,
+              ## ztTMatrix,
 
               ## zdiMatrix,
 
@@ -435,12 +436,10 @@ exportClasses(Matrix, # and its subclasses .............................
               dsparseVector,
               zsparseVector,
 
-              ## "Other" virtual {for now just unions}:
+              ## MJ: aim to deprecate and eventually remove these
+              abIndex,
               atomicVector,
               index,
               number,
-              replValue, # dispatch fails when not exported
-
-              ## "Other" non-virtual {for now just experimental index classes}:
-              abIndex,
+              replValue,
               rleDiff)
