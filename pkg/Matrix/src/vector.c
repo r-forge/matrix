@@ -1,5 +1,5 @@
 #include "Mdefines.h"
-#include "sparseVector.h"
+#include "vector.h"
 
 SEXP v2spV(SEXP from)
 {

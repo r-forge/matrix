@@ -11,16 +11,16 @@ enum x_slot_kind {
 
 /* x[i, j] <- value  where  x=<.[gt]CMatrix>  and  value=<.sparseVector> */
 #define _n_Csp_
-#include "t_Csparse_subassign.c"
+#include "t_subassign.c"
 
 #define _l_Csp_
-#include "t_Csparse_subassign.c"
+#include "t_subassign.c"
 
 #define _i_Csp_
-#include "t_Csparse_subassign.c"
+#include "t_subassign.c"
 
 #define _d_Csp_
-#include "t_Csparse_subassign.c"
+#include "t_subassign.c"
 
 #define _z_Csp_
-#include "t_Csparse_subassign.c"
+#include "t_subassign.c"

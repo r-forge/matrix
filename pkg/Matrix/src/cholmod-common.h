@@ -1,5 +1,5 @@
-#ifndef MATRIX_CHM_COMMON_H
-#define MATRIX_CHM_COMMON_H
+#ifndef MATRIX_CHOLMOD_COMMON_H
+#define MATRIX_CHOLMOD_COMMON_H
 
 #include "cholmod-etc.h"
 
@@ -30,4 +30,4 @@ SEXP R_cholmod_common_envini(SEXP);
 void R_cholmod_common_envset(void);
 void R_cholmod_common_envget(void);
 
-#endif /* MATRIX_CHM_COMMON_H */
+#endif /* MATRIX_CHOLMOD_COMMON_H */
