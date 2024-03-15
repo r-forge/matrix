@@ -932,4 +932,25 @@ setClassUnion("number",
 setClassUnion("replValue",
               members = c("raw", "logical", "numeric", "complex"             ))
 
+setClass("pcorMatrix")
+setClassUnion("replValueSp")
+## Removing these entirely in Matrix 1.7-0 invalidates class definitions
+## serialized in existing installations of the following packages:
+##
+##  [1] CVXR                 FinNet               GENLIB
+##  [4] MSnbase              MachineShop          MatrixModels
+##  [7] SeuratObject         SingleCellExperiment WoodburyMatrix
+## [10] apcluster            arules               chromVAR
+## [13] conText              copula               destiny
+## [16] distrom              genomation           hypr
+## [19] iGraphMatch          kebabs               mcompanion
+## [22] pcts                 podkat               qpgraph
+## [25] quadrupen            quanteda             quanteda.textstats
+## [28] saeRobust            scuttle              snpStats
+## [31] softImpute           spflow               xcms
+##
+## Define stubs so that the serialized class definitions do not cause S4
+## machinery to throw warnings or errors.  Remove the stubs once binaries
+## in most repositories seem to have been rebuilt under Matrix 1.7-0.
+
 rm(.new, .initialize)
