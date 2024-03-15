@@ -741,15 +741,12 @@ setClass("dCHMsuper",
 
 ## ------ Schur --------------------------------------------------------
 
-## For eigenvalues:
-setClassUnion("number", members = c("numeric", "complex"))
-
 setClass("SchurFactorization",
          contains = c("VIRTUAL", "MatrixFactorization"))
 
 setClass("Schur",
          contains = "SchurFactorization",
-         slots = c(Q = "Matrix", T = "Matrix", EValues = "number"),
+         slots = c(Q = "Matrix", T = "Matrix", EValues = "vector"),
          prototype = list(Q = .new("dgeMatrix"), T = .new("dgeMatrix")),
          validity = function(object) .Call(Schur_validate, object))
 
@@ -930,6 +927,10 @@ setClass("abIndex",
 ##   even though is.atomic(<atomic matrix>) is TRUE
 setClassUnion("atomicVector",
               members = c("raw", "logical", "numeric", "complex", "character"))
+
+## For eigenvalues:
+setClassUnion("number",
+              members = c("numeric", "complex"))
 
 ## Numeric-like vectors:
 ## * for methods handling logical and integer as double
