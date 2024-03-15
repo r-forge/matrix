@@ -1,4 +1,4 @@
-\name{Subscript-methods}
+\name{subscript-methods}
 \title{Methods for "[": Extraction or Subsetting in Package 'Matrix'}
 %
 \docType{methods}
@@ -7,7 +7,7 @@
 %
 \alias{[}
 \alias{[-methods}
-\alias{Subscript-methods}
+\alias{subscript-methods}
 %
 \alias{[,Matrix,ANY,NULL,ANY-method}
 \alias{[,Matrix,NULL,ANY,ANY-method}
