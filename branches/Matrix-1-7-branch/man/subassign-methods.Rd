@@ -1,4 +1,4 @@
-\name{Subassign-methods}
+\name{subassign-methods}
 \title{Methods for "[<-" - Assigning to Subsets for 'Matrix'}
 %
 \docType{methods}
@@ -7,7 +7,7 @@
 %
 \alias{[<-}
 \alias{[<--methods}
-\alias{Subassign-methods}
+\alias{subassign-methods}
 %
 \alias{[<-,CsparseMatrix,Matrix,missing,replValue-method}
 \alias{[<-,CsparseMatrix,index,index,replValue-method}

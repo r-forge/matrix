@@ -2,23 +2,23 @@
 #include "Csparse.h"
 #include "attrib.h"
 #include "bind.h"
-#include "chm_common.h"
+#include "cholmod-common.h"
 #include "coerce.h"
 #include "dense.h"
 #include "determinant.h"
 #include "expm.h"
-#include "factorizations.h"
+#include "factor.h"
 #include "kappa.h"
+#include "matmult.h"
 #include "objects.h"
 #include "perm.h"
-#include "products.h"
 #include "solve.h"
 #include "sparse.h"
-#include "sparseVector.h"
 #include "subassign.h"
 #include "subscript.h"
 #include "utils-R.h"
 #include "validity.h"
+#include "vector.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
@@ -66,10 +66,9 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dMatrix_validate, 1),
 	CALLDEF(zMatrix_validate, 1),
 
-	CALLDEF(compMatrix_validate, 1),
+	CALLDEF(generalMatrix_validate, 1),
 	CALLDEF(symmetricMatrix_validate, 1),
 	CALLDEF(triangularMatrix_validate, 1),
-
 	CALLDEF(diagonalMatrix_validate, 1),
 	CALLDEF(indMatrix_validate, 1),
 	CALLDEF(pMatrix_validate, 1),

@@ -23,7 +23,7 @@ msgstr ""
 msgid "'%s' failed"
 msgstr "cs_qr fehlgeschlagen"
 
-#: Csparse.c:35 chm_common.c:54
+#: Csparse.c:35 cholmod-common.c:54
 #, fuzzy, c-format
 msgid "'%s' slot is not increasing within columns after sorting"
 msgstr "Slot j ist nicht zunehmend innerhalb einer Spalte"
@@ -52,7 +52,7 @@ msgstr ""
 #: coerce.c:911 coerce.c:1015 coerce.c:1501 coerce.c:1521 coerce.c:1531
 #: coerce.c:2061 coerce.c:2256 coerce.c:2262 coerce.c:2268 coerce.c:2397
 #: coerce.c:2404 coerce.c:2494 coerce.c:2629 coerce.c:2707 coerce.c:2729
-#: coerce.c:4327 coerce.c:4396 dense.c:696 products.c:939 products.c:1291
+#: coerce.c:4327 coerce.c:4396 dense.c:696 matmult.c:939 matmult.c:1291
 #: solve.c:719 solve.c:972 solve.c:1104 sparse.c:1234 sparse.c:1626
 #, fuzzy, c-format
 msgid "invalid '%s' to '%s'"
@@ -81,11 +81,12 @@ msgstr ""
 msgid "number of columns of matrices must match"
 msgstr ""
 
-#: bind.c:51 bind.c:158 bind.c:182 bind.c:206 chm_common.c:608 chm_common.c:759
-#: chm_common.c:874 chm_common.c:975 cholmod-etc.c:183 cholmod-etc.c:283
-#: cholmod-etc.c:330 coerce.c:215 coerce.c:235 coerce.c:260 coerce.c:268
-#: coerce.c:276 coerce.c:341 coerce.c:1496 coerce.c:1516 coerce.c:1543
-#: coerce.c:1551 coerce.c:1559 products.c:28 products.c:50 products.c:56
+#: bind.c:51 bind.c:158 bind.c:182 bind.c:206 cholmod-common.c:608
+#: cholmod-common.c:759 cholmod-common.c:874 cholmod-common.c:975
+#: cholmod-etc.c:183 cholmod-etc.c:283 cholmod-etc.c:330 coerce.c:215
+#: coerce.c:235 coerce.c:260 coerce.c:268 coerce.c:276 coerce.c:341
+#: coerce.c:1496 coerce.c:1516 coerce.c:1543 coerce.c:1551 coerce.c:1559
+#: matmult.c:28 matmult.c:50 matmult.c:56
 #, c-format
 msgid "dimensions cannot exceed %s"
 msgstr ""
@@ -103,140 +104,142 @@ msgstr ""
 msgid "%s cannot exceed %s"
 msgstr ""
 
-#: bind.c:756 bind.c:853 chm_common.c:978 cholmod-etc.c:333 coerce.c:29
+#: bind.c:756 bind.c:853 cholmod-common.c:978 cholmod-etc.c:333 coerce.c:29
 #: coerce.c:518 coerce.c:811 coerce.c:945 coerce.c:2772 coerce.c:3041
-#: coerce.c:3146 dense.c:919 products.c:151 products.c:212 products.c:291
-#: products.c:379 products.c:456 products.c:550 products.c:868 subscript.c:1232
+#: coerce.c:3146 dense.c:919 matmult.c:151 matmult.c:212 matmult.c:291
+#: matmult.c:379 matmult.c:456 matmult.c:550 matmult.c:868 subscript.c:1232
 #: subscript.c:1417 utils-R.c:32
 #, c-format
 msgid "attempt to allocate vector of length exceeding %s"
 msgstr ""
 
-#: bind.c:858 products.c:1357
+#: bind.c:858 matmult.c:1357
 msgid "should never happen ..."
 msgstr ""
 
-#: chm_common.c:11 chm_common.c:34 validity.c:29 validity.c:150 validity.c:229
-#: validity.c:248 validity.c:257 validity.c:299 validity.c:316 validity.c:350
-#: validity.c:367 validity.c:401 validity.c:403 validity.c:439 validity.c:465
-#: validity.c:485 validity.c:926 validity.c:959 validity.c:1041 validity.c:1061
-#: validity.c:1127 validity.c:1129 validity.c:1177 validity.c:1240
-#: validity.c:1242 validity.c:1288 validity.c:1335 validity.c:1384
-#: validity.c:1417 validity.c:1427 validity.c:1440 validity.c:1494
-#: validity.c:1496 validity.c:1528 validity.c:1540 validity.c:1563
-#: validity.c:1626 validity.c:1645 validity.c:1647 validity.c:1679
-#: validity.c:1714 validity.c:1742
+#: cholmod-common.c:11 cholmod-common.c:34 validity.c:29 validity.c:150
+#: validity.c:229 validity.c:248 validity.c:257 validity.c:299 validity.c:316
+#: validity.c:350 validity.c:367 validity.c:401 validity.c:403 validity.c:439
+#: validity.c:465 validity.c:485 validity.c:926 validity.c:959 validity.c:1041
+#: validity.c:1061 validity.c:1127 validity.c:1129 validity.c:1177
+#: validity.c:1240 validity.c:1242 validity.c:1288 validity.c:1335
+#: validity.c:1384 validity.c:1417 validity.c:1427 validity.c:1440
+#: validity.c:1494 validity.c:1496 validity.c:1528 validity.c:1540
+#: validity.c:1563 validity.c:1626 validity.c:1645 validity.c:1647
+#: validity.c:1679 validity.c:1714 validity.c:1742
 #, fuzzy, c-format
 msgid "'%s' slot is not of type \"%s\""
 msgstr "Dim-Slot ist nicht ganzzahlig"
 
-#: chm_common.c:14 validity.c:274 validity.c:285 validity.c:301 validity.c:352
-#: validity.c:487 validity.c:928 validity.c:961 validity.c:1063 validity.c:1131
-#: validity.c:1179 validity.c:1244 validity.c:1290 validity.c:1429
-#: validity.c:1446 validity.c:1498 validity.c:1500 validity.c:1530
-#: validity.c:1542 validity.c:1565 validity.c:1681 validity.c:1718
-#: validity.c:1746 validity.c:1796
+#: cholmod-common.c:14 validity.c:274 validity.c:285 validity.c:301
+#: validity.c:352 validity.c:487 validity.c:928 validity.c:961 validity.c:1063
+#: validity.c:1131 validity.c:1179 validity.c:1244 validity.c:1290
+#: validity.c:1429 validity.c:1446 validity.c:1498 validity.c:1500
+#: validity.c:1530 validity.c:1542 validity.c:1565 validity.c:1681
+#: validity.c:1718 validity.c:1746 validity.c:1796
 #, fuzzy, c-format
 msgid "'%s' slot does not have length %s"
 msgstr "Dim-Slot muss die Länge 2 haben"
 
-#: chm_common.c:18 validity.c:304 validity.c:355 validity.c:1634
+#: cholmod-common.c:18 validity.c:304 validity.c:355 validity.c:1634
 #: validity.c:1654 validity.c:1656
 #, fuzzy, c-format
 msgid "first element of '%s' slot is not 0"
 msgstr "erstes Element von Slot p muss Null sein"
 
-#: chm_common.c:23 chm_common.c:46 validity.c:34 validity.c:308 validity.c:326
-#: validity.c:359 validity.c:377 validity.c:413 validity.c:415 validity.c:491
-#: validity.c:1008 validity.c:1020 validity.c:1067 validity.c:1140
-#: validity.c:1152 validity.c:1253 validity.c:1265 validity.c:1294
-#: validity.c:1345 validity.c:1394 validity.c:1433 validity.c:1453
-#: validity.c:1534 validity.c:1550 validity.c:1575 validity.c:1639
-#: validity.c:1659 validity.c:1661 validity.c:1688
+#: cholmod-common.c:23 cholmod-common.c:46 validity.c:34 validity.c:308
+#: validity.c:326 validity.c:359 validity.c:377 validity.c:413 validity.c:415
+#: validity.c:491 validity.c:1008 validity.c:1020 validity.c:1067
+#: validity.c:1140 validity.c:1152 validity.c:1253 validity.c:1265
+#: validity.c:1294 validity.c:1345 validity.c:1394 validity.c:1433
+#: validity.c:1453 validity.c:1534 validity.c:1550 validity.c:1575
+#: validity.c:1639 validity.c:1659 validity.c:1661 validity.c:1688
 #, c-format
 msgid "'%s' slot contains NA"
 msgstr ""
 
-#: chm_common.c:26 validity.c:310 validity.c:361
+#: cholmod-common.c:26 validity.c:310 validity.c:361
 #, fuzzy, c-format
 msgid "'%s' slot is not nondecreasing"
 msgstr "Slot p darf nicht abnehmend sein"
 
-#: chm_common.c:29 validity.c:312 validity.c:363
+#: cholmod-common.c:29 validity.c:312 validity.c:363
 #, c-format
 msgid "first differences of '%s' slot exceed %s"
 msgstr ""
 
-#: chm_common.c:37 validity.c:318 validity.c:369
+#: cholmod-common.c:37 validity.c:318 validity.c:369
 #, fuzzy, c-format
 msgid "'%s' slot has length less than %s"
 msgstr "'Dim'-Slot hat eine Länge kleiner zwei"
 
-#: chm_common.c:49 validity.c:328 validity.c:379 validity.c:417 validity.c:420
-#: validity.c:493 validity.c:1010 validity.c:1069 validity.c:1142
-#: validity.c:1154 validity.c:1255 validity.c:1267 validity.c:1347
-#: validity.c:1396 validity.c:1455 validity.c:1577 validity.c:1690
+#: cholmod-common.c:49 validity.c:328 validity.c:379 validity.c:417
+#: validity.c:420 validity.c:493 validity.c:1010 validity.c:1069
+#: validity.c:1142 validity.c:1154 validity.c:1255 validity.c:1267
+#: validity.c:1347 validity.c:1396 validity.c:1455 validity.c:1577
+#: validity.c:1690
 #, fuzzy, c-format
 msgid "'%s' slot has elements not in {%s}"
 msgstr "'Dim'-Slot hat eine Länge kleiner zwei"
 
-#: chm_common.c:165 chm_common.c:296 chm_common.c:1072 chm_common.c:1075
-#: chm_common.c:1108 chm_common.c:1126
+#: cholmod-common.c:165 cholmod-common.c:296 cholmod-common.c:1072
+#: cholmod-common.c:1075 cholmod-common.c:1108 cholmod-common.c:1126
 #, fuzzy, c-format
 msgid "'%s' failed in '%s'"
 msgstr "cs_qr fehlgeschlagen"
 
-#: chm_common.c:212
+#: cholmod-common.c:212
 #, fuzzy, c-format
 msgid "'%s' failed in '%s': %s"
 msgstr "cs_qr fehlgeschlagen"
 
-#: chm_common.c:601 chm_common.c:604 chm_common.c:606 chm_common.c:752
-#: chm_common.c:755 chm_common.c:757 chm_common.c:867 chm_common.c:870
-#: chm_common.c:872 chm_common.c:969 chm_common.c:971 cholmod-etc.c:177
+#: cholmod-common.c:601 cholmod-common.c:604 cholmod-common.c:606
+#: cholmod-common.c:752 cholmod-common.c:755 cholmod-common.c:757
+#: cholmod-common.c:867 cholmod-common.c:870 cholmod-common.c:872
+#: cholmod-common.c:969 cholmod-common.c:971 cholmod-etc.c:177
 #: cholmod-etc.c:179 cholmod-etc.c:181 cholmod-etc.c:277 cholmod-etc.c:279
 #: cholmod-etc.c:281 cholmod-etc.c:324 cholmod-etc.c:326 cs-etc.c:43
 #, c-format
 msgid "wrong '%s'"
 msgstr ""
 
-#: chm_common.c:611 cholmod-etc.c:186
+#: cholmod-common.c:611 cholmod-etc.c:186
 #, fuzzy, c-format
 msgid "'%s' would overflow type \"%s\""
 msgstr "Dim-Slot ist nicht ganzzahlig"
 
-#: chm_common.c:615 cholmod-etc.c:190
+#: cholmod-common.c:615 cholmod-etc.c:190
 #, c-format
 msgid "n+1 would overflow type \"%s\""
 msgstr ""
 
-#: chm_common.c:620 cholmod-etc.c:195
+#: cholmod-common.c:620 cholmod-etc.c:195
 #, fuzzy, c-format
 msgid "leading principal minor of order %d is not positive"
 msgstr "der führende Minor der Ordnung %d ist nicht positiv definit"
 
-#: chm_common.c:623 cholmod-etc.c:198
+#: cholmod-common.c:623 cholmod-etc.c:198
 #, fuzzy, c-format
 msgid "leading principal minor of order %d is zero"
 msgstr "der führende Minor der Ordnung %d ist nicht positiv definit"
 
-#: chm_common.c:973 cholmod-etc.c:328
+#: cholmod-common.c:973 cholmod-etc.c:328
 msgid "leading dimension not equal to number of rows"
 msgstr ""
 
-#: chm_common.c:1037
+#: cholmod-common.c:1037
 #, c-format
 msgid ""
 "invalid simplicial Cholesky factorization: structural zero on main diagonal "
 "in column %d"
 msgstr ""
 
-#: chm_common.c:1097
+#: cholmod-common.c:1097
 #, fuzzy, c-format
 msgid "CHOLMOD error '%s' at file '%s', line %d"
 msgstr "Cholmod-Fehler '%s' bei Datei %s, Zeile %d"
 
-#: chm_common.c:1100
+#: cholmod-common.c:1100
 #, fuzzy, c-format
 msgid "CHOLMOD warning '%s' at file '%s', line %d"
 msgstr "Cholmod-Warnung '%s' bei Datei %s, Zeile %d"
@@ -451,46 +454,46 @@ msgstr "dgeMatrix_exp: dgetrf gab Fehlerkode %d zurück"
 msgid "dgeMatrix_exp: dgetrs returned error code %d"
 msgstr "dgeMatrix_exp: dgetrs gab Fehlerkode %d zurück"
 
-#: factorizations.c:330
+#: factor.c:330
 msgid "dgeMatrix_Schur: argument x must be a non-null square matrix"
 msgstr ""
 "dgeMatrix_Schur: Argument x muss eine quadratische Matrix ungleich Null sein"
 
-#: factorizations.c:343
+#: factor.c:343
 msgid "dgeMatrix_Schur: first call to dgees failed"
 msgstr "dgeMatrix_Schur: Erster Aufruf von dgees fehlgeschlagen"
 
-#: factorizations.c:352
+#: factor.c:352
 #, c-format
 msgid "dgeMatrix_Schur: dgees returned code %d"
 msgstr "dgeMatrix_Schur: dgees gab Fehlerkode %d zurück"
 
-#: factorizations.c:403 sparse.c:196
+#: factor.c:403 sparse.c:196
 #, fuzzy, c-format
 msgid "'%s' is not a number"
 msgstr "%s ist keine Liste"
 
-#: factorizations.c:424
+#: factor.c:424
 #, c-format
 msgid "LU factorization of m-by-n %s requires m == n"
 msgstr ""
 
-#: factorizations.c:433
+#: factor.c:433
 #, c-format
 msgid "LU factorization of %s failed: out of memory or near-singular"
 msgstr ""
 
-#: factorizations.c:510
+#: factor.c:510
 #, c-format
 msgid "QR factorization of m-by-n %s requires m >= n"
 msgstr ""
 
-#: factorizations.c:519
+#: factor.c:519
 #, c-format
 msgid "QR factorization of %s failed: out of memory"
 msgstr ""
 
-#: factorizations.c:619 factorizations.c:897
+#: factor.c:619 factor.c:897
 #, c-format
 msgid "'%s' is not a number or not finite"
 msgstr ""
@@ -530,6 +533,16 @@ msgstr "'%s' muss die Zeichenkettenlänge 1 haben"
 #: kappa.c:238
 #, c-format
 msgid "%s(%s) is undefined: '%s' is not square"
+msgstr ""
+
+#: matmult.c:107 matmult.c:210 matmult.c:289 matmult.c:377 matmult.c:454
+#: matmult.c:548 matmult.c:812 matmult.c:862
+msgid "non-conformable arguments"
+msgstr ""
+
+#: matmult.c:782 matmult.c:810
+#, c-format
+msgid "'%s' does not support complex matrices"
 msgstr ""
 
 #: objects.c:23
@@ -595,16 +608,6 @@ msgstr ""
 msgid "'%s' is NA or less than %s"
 msgstr ""
 
-#: products.c:107 products.c:210 products.c:289 products.c:377 products.c:454
-#: products.c:548 products.c:812 products.c:862
-msgid "non-conformable arguments"
-msgstr ""
-
-#: products.c:782 products.c:810
-#, c-format
-msgid "'%s' does not support complex matrices"
-msgstr ""
-
 #: solve.c:38
 #, fuzzy, c-format
 msgid "'%s' is not square"
@@ -620,11 +623,6 @@ msgstr ""
 msgid "attempt to construct %s with more than %s nonzero elements"
 msgstr "Determinante benötigt eine quadratische Matrix"
 
-#: sparseVector.c:90
-#, c-format
-msgid "%s length cannot exceed %s"
-msgstr ""
-
 #: subscript.c:1542 subscript.c:1695 subscript.c:1938 subscript.c:2122
 #, c-format
 msgid "%s too dense for %s; would have more than %s nonzero entries"
@@ -635,20 +633,20 @@ msgstr ""
 msgid "NA subscripts in %s not supported for '%s' inheriting from %s"
 msgstr ""
 
-#: t_Csparse_subassign.c:142
+#: t_subassign.c:141
 msgid "invalid class of 'x' in Csparse_subassign()"
 msgstr "ungültige Klasse von 'x' in Csparse_subassign()"
 
-#: t_Csparse_subassign.c:144
+#: t_subassign.c:143
 msgid "invalid class of 'value' in Csparse_subassign()"
 msgstr "ungültige Klasse von 'value' in Csparse_subassign()"
 
-#: t_Csparse_subassign.c:187
+#: t_subassign.c:186
 #, c-format
 msgid "x[] <- val: val is coerced to logical for \"%s\" x"
 msgstr "x[] <- val: val in booleschen Wert umgewandelt für \"%s\" x"
 
-#: t_Csparse_subassign.c:192
+#: t_subassign.c:191
 #, c-format
 msgid ""
 "x[] <- val: val should be integer or logical, is coerced to integer, for "
@@ -657,7 +655,7 @@ msgstr ""
 "x[] <- val: val sollte ganzzahlig oder logisch sein, wird in ganze Zahl "
 "umgewandelt für \"%s\" x"
 
-#: t_Csparse_subassign.c:199
+#: t_subassign.c:198
 msgid "programming error in Csparse_subassign() should never happen"
 msgstr "Fehler in Csparse_subassign(); sollte niemals vorkommen"
 
@@ -1111,6 +1109,11 @@ msgstr "Slot j ist nicht zunehmend innerhalb einer Spalte"
 #, fuzzy, c-format
 msgid "invalid class \"%s\" object: %s"
 msgstr "ungültige Klasse des Objektes zu %s"
+
+#: vector.c:90
+#, c-format
+msgid "%s length cannot exceed %s"
+msgstr ""
 
 #, fuzzy, c-format
 #~ msgid "dgeMatrix_svd(x,*): dim(x)[j] = %d is too large"

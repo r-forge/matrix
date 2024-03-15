@@ -1,5 +1,5 @@
 #include "Mdefines.h"
-#include "chm_common.h"
+#include "cholmod-common.h"
 
 /* NB: mostly parallel to CsparseMatrix_validate in ./validity.c */
 SEXP checkpi(SEXP p, SEXP i, int m, int n)

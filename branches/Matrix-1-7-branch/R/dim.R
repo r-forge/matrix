@@ -151,13 +151,15 @@ setMethod("dimnames<-", c(x = "Matrix", value = "NULL"),
               x
           })
 
-setMethod("dimnames<-", c(x = "compMatrix", value = "NULL"),
+for(.cl in c("generalMatrix", "symmetricMatrix"))
+setMethod("dimnames<-", c(x = .cl, value = "NULL"),
           function(x, value) {
               if(length(x@factors))
                   x@factors <- list()
               x@Dimnames <- list(NULL, NULL)
               x
           })
+rm(.cl)
 
 setMethod("dimnames<-", c(x = "MatrixFactorization", value = "NULL"),
           function(x, value) {
@@ -171,13 +173,15 @@ setMethod("dimnames<-", c(x = "Matrix", value = "list"),
               x
           })
 
-setMethod("dimnames<-", c(x = "compMatrix", value = "list"),
+for(.cl in c("generalMatrix", "symmetricMatrix"))
+setMethod("dimnames<-", c(x = .cl, value = "list"),
           function(x, value) {
               if(length(x@factors))
                   x@factors <- list()
               x@Dimnames <- fixupDN.if.valid(value, x@Dim)
               x
           })
+rm(.cl)
 
 setMethod("dimnames<-", c(x = "MatrixFactorization", value = "list"),
           function(x, value) {

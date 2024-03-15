@@ -269,7 +269,6 @@ exportMethods(head, tail)
 
 exportClasses(Matrix, # and its subclasses .............................
 
-              compMatrix,
               generalMatrix,
               symmetricMatrix,
               triangularMatrix,
@@ -437,8 +436,10 @@ exportClasses(Matrix, # and its subclasses .............................
               zsparseVector,
 
               ## MJ: aim to deprecate and eventually remove these
+              ##     (except perhaps 'index')
               abIndex,
               atomicVector,
+              compMatrix,
               index,
               number,
               replValue,

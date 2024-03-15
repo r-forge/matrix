@@ -1,4 +1,4 @@
-\name{lsparseMatrix-classes}
+\name{lsparseMatrix-class}
 \title{Sparse logical matrices}
 %
 \docType{class}

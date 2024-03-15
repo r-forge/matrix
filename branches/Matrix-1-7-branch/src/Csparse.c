@@ -9,7 +9,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 
 #define MKMS(_FORMAT_, ...) mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
 
-	/* defined in ./chm_common.c : */
+	/* defined in ./cholmod-common.c : */
 	SEXP checkpi(SEXP p, SEXP i, int m, int n);
 
 	SEXP dim = GET_SLOT(x, Matrix_DimSym);

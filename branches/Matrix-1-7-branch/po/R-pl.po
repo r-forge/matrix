@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2024-03-12 11:27\n"
+"POT-Creation-Date: 2024-03-15 17:22\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -50,6 +50,39 @@ msgid "%s=\"%s\" invalid for %s@uplo=\"%s\""
 msgstr ""
 
 msgid "'%s' is not \"%1$s\", \"D%1$s\", or \"%1$s.\""
+msgstr ""
+
+# Matrix/R/diagMatrix.R: 528
+# stop("chol() is undefined for diagonal matrix with negative entries")
+#, fuzzy
+msgid "%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite"
+msgstr ""
+"'chol()' jest nieokreślona dla macierzy diagonalnych z ujemnymi wpisami"
+
+# Matrix/R/diagMatrix.R: 358
+# stop("matrix is not diagonal")
+#, fuzzy
+msgid "matrix is not square"
+msgstr "macierz nie jest diagonalna"
+
+msgid ""
+"'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1."
+"\", or \"%4$s\""
+msgstr ""
+
+# Matrix/R/sparseVector.R: 235
+# stop("'x' must inherit from \"sparseVector\"")
+#, fuzzy
+msgid "'%s' does not inherit from virtual class %s"
+msgstr "argument 'x' musi być obiektem klasy \"sparseVector\""
+
+msgid "D[i,i] is NA, i=%d"
+msgstr ""
+
+msgid "D[i,i] is negative, i=%d"
+msgstr ""
+
+msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
 msgstr ""
 
 msgid "unexpected %s=\"%s\" in '%s' method"
@@ -164,14 +197,6 @@ msgstr "'%s()' nie jest jeszcze zaimplementowany dla typu '%s' elementu"
 # stop(sprintf(gettext("'%s()' is not yet implemented for representation '%s'", domain = "R-Matrix"), "readMM", repr), domain = NA)
 msgid "'%s()' is not yet implemented for  representation '%s'"
 msgstr "'%s()' nie jest jeszcze zaimplementowane dla reprezentacji '%s'"
-
-msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", or \"%4$s\""
-msgstr ""
-
-msgid ""
-"'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", or "
-"\"%4$s\""
-msgstr ""
 
 # Matrix/R/Ops.R: 1117
 # warning("longer object length\n\tis not a multiple of shorter object length")
@@ -288,6 +313,12 @@ msgstr ""
 "długość dłuższego obiektu\n"
 "\tnie jest wielokrotnością długości krótszego obiektu"
 
+# Matrix/R/sparseMatrix.R: 372
+# stop(gettextf("invalid 'col.names' string: %s", cn), domain = "R-Matrix")
+#, fuzzy
+msgid "invalid class \"%s\" object in '%s' method"
+msgstr "niepoprawny łańcuch 'col.names': %s"
+
 # Matrix/R/diagMatrix.R: 779
 # stop(gettextf("intermediate 'r' is of type %s", typeof(r)), domain = "R-Matrix")
 msgid "intermediate 'r' is of type %s"
@@ -385,39 +416,6 @@ msgstr "<abIndex>  -->  <seqMat> nie jest jeszcze zaimplementowane"
 # stop("<seqMat>  -->  <abIndex> is not yet implemented")
 msgid "<seqMat>  -->  <abIndex>  is not yet implemented"
 msgstr "<seqMat>  -->  <abIndex> nie jest jeszcze zaimplementowane"
-
-# Matrix/R/diagMatrix.R: 528
-# stop("chol() is undefined for diagonal matrix with negative entries")
-#, fuzzy
-msgid "%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite"
-msgstr ""
-"'chol()' jest nieokreślona dla macierzy diagonalnych z ujemnymi wpisami"
-
-# Matrix/R/diagMatrix.R: 358
-# stop("matrix is not diagonal")
-#, fuzzy
-msgid "matrix is not square"
-msgstr "macierz nie jest diagonalna"
-
-msgid ""
-"'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1."
-"\", or \"%4$s\""
-msgstr ""
-
-# Matrix/R/sparseVector.R: 235
-# stop("'x' must inherit from \"sparseVector\"")
-#, fuzzy
-msgid "'%s' does not inherit from virtual class %s"
-msgstr "argument 'x' musi być obiektem klasy \"sparseVector\""
-
-msgid "D[i,i] is NA, i=%d"
-msgstr ""
-
-msgid "D[i,i] is negative, i=%d"
-msgstr ""
-
-msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
-msgstr ""
 
 # Matrix/R/sparseMatrix.R: 198
 # stop("only square matrices can be used as incidence matrices for graphs")
@@ -889,6 +887,43 @@ msgstr "metoda kroneckera musi użyć domyślnej 'FUN'"
 msgid "number of nonzero entries cannot exceed %s"
 msgstr "liczba wierszy nie jest zgodna dla %s"
 
+msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", or \"%4$s\""
+msgstr ""
+
+msgid ""
+"'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", or "
+"\"%4$s\""
+msgstr ""
+
+# Matrix/R/Auxiliaries.R: 273
+# stop(gettextf("non-conformable matrix dimensions in %s", deparse(sys.call(sys.parent()))), call. = FALSE, domain = "R-Matrix")
+#, fuzzy
+msgid "non-conformable arguments"
+msgstr "niezgodne wymiary macierzy w %s"
+
+# Matrix/R/spModels.R: 113
+# stop("model frame and formula mismatch in model.matrix()")
+#, fuzzy
+msgid "model frame and formula mismatch in sparse.model.matrix()"
+msgstr "niezgodność ramki modelu oraz formuły w 'model.matrix()'"
+
+# Matrix/R/spModels.R: 137
+# stop("invalid 'contrasts.arg' argument")
+#, fuzzy
+msgid "non-list contrasts argument ignored"
+msgstr "niepoprawny argument 'contrasts.arg'"
+
+# Matrix/R/spModels.R: 137
+# stop("invalid 'contrasts.arg' argument")
+#, fuzzy
+msgid "'contrasts.arg' argument must be named"
+msgstr "niepoprawny argument 'contrasts.arg'"
+
+# Matrix/R/spModels.R: 140
+# warning(gettextf("variable '%s' is absent, its contrast will be ignored", nn), domain = "R-Matrix")
+msgid "variable '%s' is absent, its contrast will be ignored"
+msgstr "zmienna '%s' jest nieobecna, jej kontrast zostanie zignorowany"
+
 # Matrix/R/nearPD.R: 52
 # stop("Matrix seems negative semi-definite")
 msgid "Matrix seems negative semi-definite"
@@ -923,12 +958,6 @@ msgstr "'V' nie jest macierzą *kwadratową*"
 msgid ""
 "diag(%s) has non-positive or non-finite entries; finite result is doubtful"
 msgstr "'diag(.)' posiadało wpisy 0 lub NA; nieskończony wynik jest wątpliwy"
-
-# Matrix/R/Auxiliaries.R: 273
-# stop(gettextf("non-conformable matrix dimensions in %s", deparse(sys.call(sys.parent()))), call. = FALSE, domain = "R-Matrix")
-#, fuzzy
-msgid "non-conformable arguments"
-msgstr "niezgodne wymiary macierzy w %s"
 
 msgid ""
 "matrix is structurally rank deficient; using augmented matrix with "
@@ -1038,29 +1067,6 @@ msgstr ""
 msgid "cannot coerce from %s to %s"
 msgstr ""
 
-# Matrix/R/spModels.R: 113
-# stop("model frame and formula mismatch in model.matrix()")
-#, fuzzy
-msgid "model frame and formula mismatch in sparse.model.matrix()"
-msgstr "niezgodność ramki modelu oraz formuły w 'model.matrix()'"
-
-# Matrix/R/spModels.R: 137
-# stop("invalid 'contrasts.arg' argument")
-#, fuzzy
-msgid "non-list contrasts argument ignored"
-msgstr "niepoprawny argument 'contrasts.arg'"
-
-# Matrix/R/spModels.R: 137
-# stop("invalid 'contrasts.arg' argument")
-#, fuzzy
-msgid "'contrasts.arg' argument must be named"
-msgstr "niepoprawny argument 'contrasts.arg'"
-
-# Matrix/R/spModels.R: 140
-# warning(gettextf("variable '%s' is absent, its contrast will be ignored", nn), domain = "R-Matrix")
-msgid "variable '%s' is absent, its contrast will be ignored"
-msgstr "zmienna '%s' jest nieobecna, jej kontrast zostanie zignorowany"
-
 msgid "a sparseMatrix should rarely be centered: will not be sparse anymore"
 msgstr ""
 
@@ -1079,27 +1085,6 @@ msgstr "Macierze muszą mieć tę samą liczbę kolumn w %s"
 #, fuzzy
 msgid "length of 'scale' must equal the number of columns of 'x'"
 msgstr "Macierze muszą mieć tę samą liczbę kolumn w %s"
-
-msgid "trimmed means are not defined for complex data"
-msgstr ""
-
-msgid "first element used of '%s' argument"
-msgstr ""
-
-# Matrix/R/Matrix.R: 206
-# stop("invalid 'data'")
-#, fuzzy
-msgid "invalid '%s' argument"
-msgstr "niepoprawne 'data'"
-
-msgid "should never happen ..."
-msgstr ""
-
-msgid "'%s' is deprecated; using '%s' instead"
-msgstr ""
-
-msgid "'%s' is deprecated; setting %s=\"%s\""
-msgstr ""
 
 # Matrix/R/Rsparse.R: 32
 # stop(gettextf("invalid class: %s", dQuote(cl)), domain = "R-Matrix")
@@ -1407,6 +1392,27 @@ msgid "logical subscript too long"
 msgstr "indeks logiczny jest zbyt długi (%d, powinien być %d)"
 
 msgid "only zeros may be mixed with negative subscripts"
+msgstr ""
+
+msgid "trimmed means are not defined for complex data"
+msgstr ""
+
+msgid "first element used of '%s' argument"
+msgstr ""
+
+# Matrix/R/Matrix.R: 206
+# stop("invalid 'data'")
+#, fuzzy
+msgid "invalid '%s' argument"
+msgstr "niepoprawne 'data'"
+
+msgid "should never happen ..."
+msgstr ""
+
+msgid "'%s' is deprecated; using '%s' instead"
+msgstr ""
+
+msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
 msgid "'%s' has length 0 but '%s' does not"
