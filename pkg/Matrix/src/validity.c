@@ -157,7 +157,7 @@ KINDMATRIX_VALIDATE(d, REALSXP)
 KINDMATRIX_VALIDATE(z, CPLXSXP)
 #undef KINDMATRIX_VALIDATE
 
-SEXP compMatrix_validate(SEXP obj)
+SEXP generalMatrix_validate(SEXP obj)
 {
 	SEXP factors = GET_SLOT(obj, Matrix_factorsSym);
 	if (TYPEOF(factors) != VECSXP)
@@ -233,7 +233,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
 
-	return ScalarLogical(1);
+	return generalMatrix_validate(obj);
 }
 
 SEXP triangularMatrix_validate(SEXP obj)

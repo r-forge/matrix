@@ -49,21 +49,16 @@ setMethod("initialize", c(.Object = "Matrix"),
 
 ## ------ Virtual by structure -----------------------------------------
 
-## Virtual class of composite matrices,
-## i.e., those for which it makes sense to define a factorization
-setClass("compMatrix",
+## Virtual class of general matrices
+setClass("generalMatrix",
          contains = c("VIRTUAL", "Matrix"),
          slots = c(factors = "list"),
-         validity = function(object) .Call(compMatrix_validate, object))
-
-## Virtual class of matrices that are not symmetric, triangular, _or diagonal_
-setClass("generalMatrix",
-         contains = c("VIRTUAL", "compMatrix"))
+         validity = function(object) .Call(generalMatrix_validate, object))
 
 ## Virtual class of symmetric matrices
 setClass("symmetricMatrix",
-         contains = c("VIRTUAL", "compMatrix"),
-         slots = c(uplo = "character"),
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(uplo = "character", factors = "list"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(symmetricMatrix_validate, object))
 
@@ -921,6 +916,7 @@ setClass("abIndex",
 ########################################################################
 
 ## MJ: aim to deprecate and eventually remove these
+##     (except perhaps 'index')
 
 setClassUnion("atomicVector",
               members = c("raw", "logical", "numeric", "complex", "character"))
@@ -933,8 +929,6 @@ setClassUnion("number",
 setClassUnion("replValue",
               members = c("raw", "logical", "numeric", "complex"             ))
 
-setClass("pcorMatrix")
-setClassUnion("replValueSp")
 ## Removing these entirely in Matrix 1.7-0 invalidates class definitions
 ## serialized in existing installations of the following packages:
 ##
@@ -953,5 +947,8 @@ setClassUnion("replValueSp")
 ## Define stubs so that the serialized class definitions do not cause S4
 ## machinery to throw warnings or errors.  Remove the stubs once binaries
 ## in most repositories seem to have been rebuilt under Matrix 1.7-0.
+setClass("compMatrix")
+setClass("pcorMatrix")
+setClassUnion("replValueSp")
 
 rm(.new, .initialize)

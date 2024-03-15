@@ -27,6 +27,11 @@
 \alias{.nC2d}
 \alias{.nC2l}
 %
+\alias{atomicVector-class}
+\alias{compMatrix-class}
+\alias{number-class}
+\alias{replValue-class}
+%
 \alias{chol2inv,CHMfactor-method}
 \alias{coerce,CHMfactor,Matrix-method}
 \alias{coerce,CHMfactor,CsparseMatrix-method}

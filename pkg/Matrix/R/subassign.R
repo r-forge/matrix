@@ -633,7 +633,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	    ##-	 --> ./Tsparse.R	and its	 replTmat()
 	    ## x@x[sel[!v0]] <- value[!v0]
 	    x@x[sel] <- as.vector(value[iN0])
-	    if(extends(clDx, "compMatrix") && length(x@factors)) # drop cached ones
+	    if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 		x@factors <- list()
 	    if(has0) x <- .drop0(x)
 
@@ -651,7 +651,7 @@ replCmat4 <- function(x, i1, i2, iMi, jMi, value,
 	    x[i1+1L, ] <- value
 	else
 	    x[i1+1L,i2+1L] <- value
-	if(extends(clDx, "compMatrix") && length(x@factors)) # drop cached ones
+	if(.hasSlot(x, "factors") && length(x@factors)) # drop cached ones
 	    x@factors <- list()
     }# else{ not using new memory-sparse  code
     if(has.x && any0(x@x)) ## drop all values that "happen to be 0"

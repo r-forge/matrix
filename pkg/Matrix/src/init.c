@@ -66,10 +66,9 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(dMatrix_validate, 1),
 	CALLDEF(zMatrix_validate, 1),
 
-	CALLDEF(compMatrix_validate, 1),
+	CALLDEF(generalMatrix_validate, 1),
 	CALLDEF(symmetricMatrix_validate, 1),
 	CALLDEF(triangularMatrix_validate, 1),
-
 	CALLDEF(diagonalMatrix_validate, 1),
 	CALLDEF(indMatrix_validate, 1),
 	CALLDEF(pMatrix_validate, 1),
