@@ -919,33 +919,17 @@ setClass("abIndex",
 ##  5. Class unions
 ########################################################################
 
-## NB: these exist mainly to reduce duplication of methods
-## NB: numeric = { integer, double }
+## MJ: aim to deprecate and eventually remove these
 
-## Atomic vectors:
-## * note that is(<atomic matrix>, "atomicVector") is FALSE
-##   even though is.atomic(<atomic matrix>) is TRUE
 setClassUnion("atomicVector",
               members = c("raw", "logical", "numeric", "complex", "character"))
-
-## For eigenvalues:
-setClassUnion("number",
-              members = c("numeric", "complex"))
-
-## Numeric-like vectors:
-## * for methods handling logical and integer as double
-setClassUnion("numLike",
-              members = c("logical", "numeric"))
-
-## Index vectors:
-## * for 'i' in x[i], x[i, ], x[, i], etc.
-## * TODO: include rleDiff
 setClassUnion("index",
-              members = c("logical", "numeric", "character"))
-
-## Subassignment values:
-## * for 'value' in x[i, j] <- value
+              members = c(       "logical", "numeric",            "character"))
+setClassUnion("numLike",
+              members = c(       "logical", "numeric"                        ))
+setClassUnion("number",
+              members = c(                  "numeric", "complex"             ))
 setClassUnion("replValue",
-              members = c("raw", "logical", "numeric", "complex"))
+              members = c("raw", "logical", "numeric", "complex"             ))
 
 rm(.new, .initialize)
