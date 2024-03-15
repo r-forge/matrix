@@ -322,7 +322,8 @@ tstMatrixClass <-
 ### 1) produce 'mM'  and 'mm' for the other cases,
 ### 2) use identical code for all cases
 
-            if(is(m, "dMatrix") && is(m, "compMatrix")) {
+            if(is(m, "dMatrix") &&
+               (is(m, "generalMatrix") || is(m, "symmetricMatrix"))) {
                 if(any(clNam == not.coerce1))
                     cat.("not coercable_1\n")
                 else if(canCoerce(mM, clNam)) {

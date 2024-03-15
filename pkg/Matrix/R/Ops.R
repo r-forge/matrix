@@ -1700,8 +1700,12 @@ setMethod("Ops", c(e1 = "ANY", e2 = "sparseVector"),
 ##   2. <spVec>  o  <non-NA numeric>  should also happen directly and
 ##                               |-> sparse for o = {'*', "/", '&&', '==', ...
 
-setMethod("Ops", c(e1 = "sparseVector", e2 = "atomicVector"),
+setMethod("Ops", c(e1 = "sparseVector", e2 = "vector"),
           function(e1, e2) {
+              if(is.object(e2) || is.array(e2) || is.recursive(e2))
+                  stop(gettextf("invalid class \"%s\" object in '%s' method",
+                                data.class(e2), "Ops"),
+                       domain = NA)
               if(length(e2) == 1) { ## scalar ------ special case - "fast"
                   if(all0(callGeneric(FALSE, e2))) { # result remains sparse
                       if(is(e1, "nsparseVector")) { # no 'x' slot, i.e. all TRUE
@@ -1734,8 +1738,12 @@ setMethod("Ops", c(e1 = "sparseVector", e2 = "atomicVector"),
                   callGeneric(e1, as(e2, "sparseVector"))
           })
 
-setMethod("Ops", c(e1 = "atomicVector", e2 = "sparseVector"),
+setMethod("Ops", c(e1 = "vector", e2 = "sparseVector"),
           function(e1, e2) {
+              if(is.object(e1) || is.array(e1) || is.recursive(e1))
+                  stop(gettextf("invalid class \"%s\" object in '%s' method",
+                                data.class(e1), "Ops"),
+                       domain = NA)
               if(length(e1) == 1) { ## scalar ------ special case - "fast"
                   if(all0(callGeneric(e1, FALSE))) { # result remains sparse
                       if(is(e2, "nsparseVector")) { # no 'x' slot, i.e. all TRUE

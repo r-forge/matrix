@@ -198,9 +198,6 @@ expand (x, \dots)
   }
 }
 \seealso{
-  The virtual class \code{\linkS4class{compMatrix}}
-  of \emph{factorizable} matrices.
-
   The virtual class \code{\linkS4class{MatrixFactorization}}
   of matrix factorizations.
   
