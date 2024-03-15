@@ -747,7 +747,8 @@ setClass("SchurFactorization",
 setClass("Schur",
          contains = "SchurFactorization",
          slots = c(Q = "Matrix", T = "Matrix", EValues = "vector"),
-         prototype = list(Q = .new("dgeMatrix"), T = .new("dgeMatrix")),
+         prototype = list(Q = .new("dgeMatrix"), T = .new("dgeMatrix"),
+                          EValues = double(0L)),
          validity = function(object) .Call(Schur_validate, object))
 
 

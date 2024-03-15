@@ -109,7 +109,7 @@ char Matrix_shape(SEXP obj)
 		return '\0';
 	ivalid += VALID_NONVIRTUAL_SHIFT(ivalid, 1);
 	const char *cl = valid[ivalid];
-	return (cl[2] == 'd') ? 'i' : cl[1];
+	return (cl[3] != 'M') ? 'g' : ((cl[2] == 'd') ? 'i' : cl[1]);
 }
 
 char Matrix_repr(SEXP obj)
