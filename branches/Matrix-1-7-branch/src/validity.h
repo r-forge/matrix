@@ -20,10 +20,9 @@ SEXP iMatrix_validate(SEXP);
 SEXP dMatrix_validate(SEXP);
 SEXP zMatrix_validate(SEXP);
 
-SEXP compMatrix_validate(SEXP);
+SEXP generalMatrix_validate(SEXP);
 SEXP symmetricMatrix_validate(SEXP);
 SEXP triangularMatrix_validate(SEXP);
-
 SEXP diagonalMatrix_validate(SEXP);
 SEXP indMatrix_validate(SEXP);
 SEXP pMatrix_validate(SEXP);

@@ -1,5 +1,5 @@
-#ifndef MATRIX_FACTORIZATIONS_H
-#define MATRIX_FACTORIZATIONS_H
+#ifndef MATRIX_FACTOR_H
+#define MATRIX_FACTOR_H
 
 #include <Rinternals.h>
 
@@ -20,4 +20,4 @@ SEXP CHMfactor_diag_get(SEXP, SEXP);
 SEXP CHMfactor_update(SEXP, SEXP, SEXP);
 SEXP CHMfactor_updown(SEXP, SEXP, SEXP);
 
-#endif /* MATRIX_FACTORIZATIONS_H */
+#endif /* MATRIX_FACTOR_H */

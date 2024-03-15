@@ -88,8 +88,8 @@ lu(x, \dots)
   \item{cache}{a logical indicating if the result should be
     cached in \code{x@factors[["LU"]]}.  Note that
     caching is experimental and that only methods for classes
-    extending \code{\linkS4class{compMatrix}} will have this
-    argument.}
+    extending \code{\linkS4class{generalMatrix}} or
+    \code{\linkS4class{symmetricMatrix}} will have this argument.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{

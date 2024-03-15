@@ -2,7 +2,7 @@
 #include "cs-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
-#include "factorizations.h"
+#include "factor.h"
 
 /* defined in ./attrib.c : */
 SEXP get_factor(SEXP, const char *);
@@ -569,7 +569,7 @@ static
 int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
                    int perm, int ldl, int super, double mult)
 {
-	/* defined in ./chm_common.c : */
+	/* defined in ./cholmod-common.c : */
 	void R_cholmod_common_envget(void);
 	void R_cholmod_common_envset(void);
 

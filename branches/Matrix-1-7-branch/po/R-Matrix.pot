@@ -31,6 +31,27 @@ msgstr ""
 msgid "'%s' is not \"%1$s\", \"D%1$s\", or \"%1$s.\""
 msgstr ""
 
+msgid "%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite"
+msgstr ""
+
+msgid "matrix is not square"
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\""
+msgstr ""
+
+msgid "'%s' does not inherit from virtual class %s"
+msgstr ""
+
+msgid "D[i,i] is NA, i=%d"
+msgstr ""
+
+msgid "D[i,i] is negative, i=%d"
+msgstr ""
+
+msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
+msgstr ""
+
 msgid "unexpected %s=\"%s\" in '%s' method"
 msgstr ""
 
@@ -94,12 +115,6 @@ msgstr ""
 msgid "'%s()' is not yet implemented for  representation '%s'"
 msgstr ""
 
-msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", or \"%4$s\""
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", or \"%4$s\""
-msgstr ""
-
 msgid "longer object length is not a multiple of shorter object length"
 msgstr ""
 
@@ -149,6 +164,9 @@ msgid "vector too long in Matrix - vector operation"
 msgstr ""
 
 msgid "longer object length\n\tis not a multiple of shorter object length"
+msgstr ""
+
+msgid "invalid class \"%s\" object in '%s' method"
 msgstr ""
 
 msgid "intermediate 'r' is of type %s"
@@ -206,27 +224,6 @@ msgid "<abIndex>  -->  <seqMat>  is not yet implemented"
 msgstr ""
 
 msgid "<seqMat>  -->  <abIndex>  is not yet implemented"
-msgstr ""
-
-msgid "%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite"
-msgstr ""
-
-msgid "matrix is not square"
-msgstr ""
-
-msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\""
-msgstr ""
-
-msgid "'%s' does not inherit from virtual class %s"
-msgstr ""
-
-msgid "D[i,i] is NA, i=%d"
-msgstr ""
-
-msgid "D[i,i] is negative, i=%d"
-msgstr ""
-
-msgid "'%1$s' is not formally symmetric; factorizing tcrossprod(%1$s)"
 msgstr ""
 
 msgid "only square matrices can be used as graph incidence matrices"
@@ -520,6 +517,27 @@ msgstr ""
 msgid "number of nonzero entries cannot exceed %s"
 msgstr ""
 
+msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", or \"%4$s\""
+msgstr ""
+
+msgid "'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", or \"%4$s\""
+msgstr ""
+
+msgid "non-conformable arguments"
+msgstr ""
+
+msgid "model frame and formula mismatch in sparse.model.matrix()"
+msgstr ""
+
+msgid "non-list contrasts argument ignored"
+msgstr ""
+
+msgid "'contrasts.arg' argument must be named"
+msgstr ""
+
+msgid "variable '%s' is absent, its contrast will be ignored"
+msgstr ""
+
 msgid "Matrix seems negative semi-definite"
 msgstr ""
 
@@ -536,9 +554,6 @@ msgid "'%s' is not a square numeric matrix"
 msgstr ""
 
 msgid "diag(%s) has non-positive or non-finite entries; finite result is doubtful"
-msgstr ""
-
-msgid "non-conformable arguments"
 msgstr ""
 
 msgid "matrix is structurally rank deficient; using augmented matrix with additional %d row(s) of zeros"
@@ -616,18 +631,6 @@ msgstr ""
 msgid "cannot coerce from %s to %s"
 msgstr ""
 
-msgid "model frame and formula mismatch in sparse.model.matrix()"
-msgstr ""
-
-msgid "non-list contrasts argument ignored"
-msgstr ""
-
-msgid "'contrasts.arg' argument must be named"
-msgstr ""
-
-msgid "variable '%s' is absent, its contrast will be ignored"
-msgstr ""
-
 msgid "a sparseMatrix should rarely be centered: will not be sparse anymore"
 msgstr ""
 
@@ -635,24 +638,6 @@ msgid "length of 'center' must equal the number of columns of 'x'"
 msgstr ""
 
 msgid "length of 'scale' must equal the number of columns of 'x'"
-msgstr ""
-
-msgid "trimmed means are not defined for complex data"
-msgstr ""
-
-msgid "first element used of '%s' argument"
-msgstr ""
-
-msgid "invalid '%s' argument"
-msgstr ""
-
-msgid "should never happen ..."
-msgstr ""
-
-msgid "'%s' is deprecated; using '%s' instead"
-msgstr ""
-
-msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
 msgid "invalid subassignment value class \"%s\""
@@ -794,6 +779,24 @@ msgid "logical subscript too long"
 msgstr ""
 
 msgid "only zeros may be mixed with negative subscripts"
+msgstr ""
+
+msgid "trimmed means are not defined for complex data"
+msgstr ""
+
+msgid "first element used of '%s' argument"
+msgstr ""
+
+msgid "invalid '%s' argument"
+msgstr ""
+
+msgid "should never happen ..."
+msgstr ""
+
+msgid "'%s' is deprecated; using '%s' instead"
+msgstr ""
+
+msgid "'%s' is deprecated; setting %s=\"%s\""
 msgstr ""
 
 msgid "'%s' has length 0 but '%s' does not"
