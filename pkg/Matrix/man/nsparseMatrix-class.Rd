@@ -1,4 +1,4 @@
-\name{nsparseMatrix-classes}
+\name{nsparseMatrix-class}
 \title{Sparse "pattern" Matrices}
 %
 \docType{class}

@@ -1,4 +1,4 @@
-\name{pack}
+\name{pack-methods}
 \title{Representation of Packed and Unpacked Dense Matrices}
 %
 \docType{methods}
