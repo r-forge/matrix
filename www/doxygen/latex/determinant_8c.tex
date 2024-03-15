@@ -37,7 +37,7 @@ SEXP \mbox{\hyperlink{determinant_8c_aab2fe6290a33cb0a7e938a3ff14f4101}{CHMfacto
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ dim\ =\ \mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}});\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ INTEGER(dim),\ m\ =\ pdim[0],\ n\ =\ pdim[1];\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ if\ (m\ !=\ n)\ \(\backslash\)}
 \DoxyCodeLine{\ \ \ \ \ \ \ \ error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}determinant\ of\ non-\/square\ matrix\ is\ undefined"{}}));\ \(\backslash\)}
@@ -60,7 +60,7 @@ Definition at line \mbox{\hyperlink{determinant_8c_source_l00075}{75}} of file \
 
 
 
-References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
 
 \Hypertarget{determinant_8c_aab2fe6290a33cb0a7e938a3ff14f4101}\label{determinant_8c_aab2fe6290a33cb0a7e938a3ff14f4101} 
 \index{determinant.c@{determinant.c}!CHMfactor\_determinant@{CHMfactor\_determinant}}
@@ -88,7 +88,7 @@ Definition at line \mbox{\hyperlink{determinant_8c_source_l00168}{168}} of file 
 
 
 
-References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
+References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00021}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
 
 \Hypertarget{determinant_8c_a1da987d3216d23c38ef153b0cf6039f4}\label{determinant_8c_a1da987d3216d23c38ef153b0cf6039f4} 
 \index{determinant.c@{determinant.c}!denseLU\_determinant@{denseLU\_determinant}}
@@ -102,7 +102,7 @@ Definition at line \mbox{\hyperlink{determinant_8c_source_l00026}{26}} of file \
 
 
 
-References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
+References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00018}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}.
 
 \Hypertarget{determinant_8c_a49672ec2f519f21bd1f70b07bf185454}\label{determinant_8c_a49672ec2f519f21bd1f70b07bf185454} 
 \index{determinant.c@{determinant.c}!mkDet@{mkDet}}
@@ -134,7 +134,7 @@ Definition at line \mbox{\hyperlink{determinant_8c_source_l00207}{207}} of file 
 
 
 
-References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00008}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}, and \mbox{\hyperlink{perm_8c_source_l00023}{sign\+Perm()}}.
+References \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00008}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}, and \mbox{\hyperlink{perm_8c_source_l00023}{sign\+Perm()}}.
 
 \Hypertarget{determinant_8c_a2d2fdad8539a116de0ca465630a01704}\label{determinant_8c_a2d2fdad8539a116de0ca465630a01704} 
 \index{determinant.c@{determinant.c}!sparseQR\_determinant@{sparseQR\_determinant}}
@@ -148,5 +148,5 @@ Definition at line \mbox{\hyperlink{determinant_8c_source_l00266}{266}} of file 
 
 
 
-References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Syms_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Syms_8h_source_l00006}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{Syms_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}, and \mbox{\hyperlink{perm_8c_source_l00023}{sign\+Perm()}}.
+References \mbox{\hyperlink{Mdefines_8h_source_l00044}{\+\_\+}}, \mbox{\hyperlink{determinant_8c_a3706034a476a157ba157872af6a49d87}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Msymbols_8h_source_l00003}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00013}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00017}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00019}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{Msymbols_8h_source_l00006}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{Msymbols_8h_source_l00022}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{determinant_8c_source_l00007}{mk\+Det()}}, and \mbox{\hyperlink{perm_8c_source_l00023}{sign\+Perm()}}.
 

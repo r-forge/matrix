@@ -11,10 +11,10 @@
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00007}00007\ \{}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00008}00008\ \ \ \ \ \mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\_cs}}\ *A\ =\ (\mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\_cs}}\ *)\ R\_alloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\_cs}}));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00009}00009\ \ \ \ \ memset(A,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\_cs}}));}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00010}00010\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00011}00011\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00012}00012\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00010}00010\ \ \ \ \ SEXP\ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00011}00011\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00012}00012\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(getAttrib(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00014}00014\ \ \ \ \ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_ae142b02df585ebd0c87ce297db7c0fa1}{m}}\ =\ INTEGER(dim)[0];}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00015}00015\ \ \ \ \ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_adc98a33f5b967b77082124d355a76292}{n}}\ =\ INTEGER(dim)[1];}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00016}00016\ \ \ \ \ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_a91c1dfcc39312b3ccba6cf4a8f36e408}{p}}\ =\ INTEGER(p);}
@@ -52,15 +52,15 @@
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00048}00048\ \ \ \ \ \textcolor{keywordtype}{int}\ nnz\ =\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_a91c1dfcc39312b3ccba6cf4a8f36e408}{p}}[A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_adc98a33f5b967b77082124d355a76292}{n}}];}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00049}00049\ \ \ \ \ R\_xlen\_t\ np1\ =\ (R\_xlen\_t)\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_adc98a33f5b967b77082124d355a76292}{n}}\ +\ 1;}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00050}00050\ \ \ \ \ SEXP\ obj\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}})),}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ dim\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}})),}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ p\ =\ PROTECT(allocVector(INTSXP,\ np1)),}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(allocVector(INTSXP,\ nnz));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00054}00054\ \ \ \ \ INTEGER(dim)[0]\ =\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_ae142b02df585ebd0c87ce297db7c0fa1}{m}};}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00055}00055\ \ \ \ \ INTEGER(dim)[1]\ =\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_adc98a33f5b967b77082124d355a76292}{n}};}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(p),\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_a91c1dfcc39312b3ccba6cf4a8f36e408}{p}},\ np1,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(INTEGER(i),\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_a4271affaa25a308485b07c1fc3914c93}{i}},\ nnz,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ !=\ \textcolor{charliteral}{'n'})\ \{}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ SEXP\ x;}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ ==\ \textcolor{charliteral}{'z'})\ \{}
@@ -70,7 +70,7 @@
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(x\ =\ allocVector(REALSXP,\ nnz));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{utils_8c_ab7f6f090a75f9bd43cdade23d42dcaf3}{Matrix\_memcpy}}(REAL(x),\ A-\/>\mbox{\hyperlink{structMatrix__cs__sparse_ac3e4cdbf468ce9e39efed12ff3397dc8}{x}},\ nnz,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Syms_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
+\DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab3823fd9b99edc7fc5cf632c697ec560}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{Msymbols_8h_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x);}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00071}00071\ \ \ \ \ \}}
 \DoxyCodeLine{\Hypertarget{cs-etc_8c_source_l00072}00072\ \ \ \ \ UNPROTECT(4);}

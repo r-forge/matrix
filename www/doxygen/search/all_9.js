@@ -3,7 +3,7 @@ var searchData=
   ['i_0',['i',['../structMatrix__cs__sparse.html#a4271affaa25a308485b07c1fc3914c93',1,'Matrix_cs_sparse']]],
   ['iad_5fsubcases_1',['IAD_SUBCASES',['../coerce_8c.html#acc2ca51de59af4cf5bb5fee549f5f8de',1,'coerce.c']]],
   ['ias_5fsubcases_2',['IAS_SUBCASES',['../coerce_8c.html#a4b64da6aa9386656eee7f51fec0d511d',1,'coerce.c']]],
-  ['icsparse_5fsubassign_3',['iCsparse_subassign',['../Csparse_8h.html#ab7e6e5212adc046eda028d3b9fbb6162',1,'Csparse.h']]],
+  ['icsparse_5fsubassign_3',['iCsparse_subassign',['../subassign_8h.html#ab7e6e5212adc046eda028d3b9fbb6162',1,'subassign.h']]],
   ['id_5floop_4',['ID_LOOP',['../dense_8c.html#a037651bebc892fe37c16afd8402f60f1',1,'dense.c']]],
   ['idz_5',['idz',['../idz_8h.html#ab028a4e79e06330af7d656cfb2bfbcf3',1,'IDZ:&#160;idz.h'],['../idz_8c.html#ab028a4e79e06330af7d656cfb2bfbcf3',1,'IDZ:&#160;idz.c']]],
   ['idz_2ec_6',['idz.c',['../idz_8c.html',1,'']]],

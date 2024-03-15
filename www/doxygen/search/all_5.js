@@ -10,7 +10,9 @@ var searchData=
   ['error_5flapack_5f4_7',['ERROR_LAPACK_4',['../Lapack-etc_8h.html#a032140360b8c94f848847a72e0e23f7a',1,'Lapack-etc.h']]],
   ['error_5fsolve_5foom_8',['ERROR_SOLVE_OOM',['../solve_8c.html#a6c4b8a6b94bd39343ec0bb1630678fa3',1,'solve.c']]],
   ['expand_5fcmprpt_9',['expand_cmprPt',['../utils-R_8c.html#a5e73311cf4dfab0cb80f191a748f5080',1,'utils-R.c']]],
-  ['extdef_10',['EXTDEF',['../init_8c.html#a1180c3eed47124a6ca1e1e11992e09b9',1,'init.c']]],
-  ['extentries_11',['ExtEntries',['../init_8c.html#a5ed16f8576b11971ca143fd1df7766e0',1,'init.c']]],
-  ['eye_12',['eye',['../solve_8c.html#aa4dff9d62e1925cf95893a156e672308',1,'EYE:&#160;solve.c'],['../solve_8c.html#a2ee0dd14c8970e606395a62576aa2213',1,'EYE:&#160;solve.c']]]
+  ['expm_2ec_10',['expm.c',['../expm_8c.html',1,'']]],
+  ['expm_2eh_11',['expm.h',['../expm_8h.html',1,'']]],
+  ['extdef_12',['EXTDEF',['../init_8c.html#a1180c3eed47124a6ca1e1e11992e09b9',1,'init.c']]],
+  ['extentries_13',['ExtEntries',['../init_8c.html#a5ed16f8576b11971ca143fd1df7766e0',1,'init.c']]],
+  ['eye_14',['eye',['../solve_8c.html#aa4dff9d62e1925cf95893a156e672308',1,'EYE:&#160;solve.c'],['../solve_8c.html#a2ee0dd14c8970e606395a62576aa2213',1,'EYE:&#160;solve.c']]]
 ];

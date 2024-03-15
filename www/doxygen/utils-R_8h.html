@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4655</span>
    </div>
   </td>
  </tr>
@@ -109,6 +109,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a5d5d9d192b1dd927d5e9d4c341052364" id="r_a5d5d9d192b1dd927d5e9d4c341052364"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8h.html#a5d5d9d192b1dd927d5e9d4c341052364">m_encodeInd2</a> (SEXP, SEXP, SEXP, SEXP, SEXP)</td></tr>
 <tr class="memdesc:a5d5d9d192b1dd927d5e9d4c341052364"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode Matrix index (i,j) |--&gt; i + j * nrow {i,j : 0-origin}.  <br /></td></tr>
 <tr class="separator:a5d5d9d192b1dd927d5e9d4c341052364"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ce794d2b960d23686f24e40bf4e6b0" id="r_a54ce794d2b960d23686f24e40bf4e6b0"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8h.html#a54ce794d2b960d23686f24e40bf4e6b0">Matrix_rle_i</a> (SEXP, SEXP)</td></tr>
+<tr class="separator:a54ce794d2b960d23686f24e40bf4e6b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af46f173279626e9568c00e7209efd540" id="r_af46f173279626e9568c00e7209efd540"><td class="memItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8h.html#af46f173279626e9568c00e7209efd540">Matrix_rle_d</a> (SEXP, SEXP)</td></tr>
+<tr class="separator:af46f173279626e9568c00e7209efd540"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a154fd63882a0c278611fdf2678acd405" name="a154fd63882a0c278611fdf2678acd405"></a>
@@ -141,7 +145,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="utils-R_8c_source.html#l00483">483</a> of file <a class="el" href="utils-R_8c_source.html">utils-R.c</a>.</p>
 
-<p class="reference">References <a class="el" href="utils-R_8c_source.html#l00468">expand_cmprPt()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00014">Matrix_jSym</a>, and <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>.</p>
+<p class="reference">References <a class="el" href="utils-R_8c_source.html#l00468">expand_cmprPt()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Msymbols_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Msymbols_8h_source.html#l00014">Matrix_jSym</a>, and <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>.</p>
 
 </div>
 </div>
@@ -282,6 +286,62 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="utils-R_8c_source.html#l00509">509</a> of file <a class="el" href="utils-R_8c_source.html">utils-R.c</a>.</p>
 
 <p class="reference">References <a class="el" href="utils-R_8c_source.html#l00468">expand_cmprPt()</a>.</p>
+
+</div>
+</div>
+<a id="af46f173279626e9568c00e7209efd540" name="af46f173279626e9568c00e7209efd540"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af46f173279626e9568c00e7209efd540">&#9670;&#160;</a></span>Matrix_rle_d()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP Matrix_rle_d </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a54ce794d2b960d23686f24e40bf4e6b0" name="a54ce794d2b960d23686f24e40bf4e6b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54ce794d2b960d23686f24e40bf4e6b0">&#9670;&#160;</a></span>Matrix_rle_i()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP Matrix_rle_i </td>
+          <td>(</td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SEXP&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

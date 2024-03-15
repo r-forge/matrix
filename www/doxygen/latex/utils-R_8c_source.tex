@@ -473,11 +473,11 @@
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00483}\mbox{\hyperlink{utils-R_8c_a5a606c1716b4105aa8658ec849d36f43}{00483}}\ SEXP\ \mbox{\hyperlink{utils-R_8c_a5a606c1716b4105aa8658ec849d36f43}{compressed\_non\_0\_ij}}(SEXP\ x,\ SEXP\ colP)}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00484}00484\ \{}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00485}00485\ \ \ \ \ \textcolor{keywordtype}{int}\ col\ =\ asLogical(colP);\ \textcolor{comment}{/*\ 1\ if\ "{}C"{}olumn\ compressed;\ \ 0\ if\ "{}R"{}ow\ */}}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00486}00486\ \ \ \ \ SEXP\ ans,\ indSym\ =\ col\ ?\ \mbox{\hyperlink{Syms_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ :\ \mbox{\hyperlink{Syms_8h_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}};}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00486}00486\ \ \ \ \ SEXP\ ans,\ indSym\ =\ col\ ?\ \mbox{\hyperlink{Msymbols_8h_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ :\ \mbox{\hyperlink{Msymbols_8h_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}};}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00487}00487\ \ \ \ \ SEXP\ indP\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ indSym)),}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00488}00488\ \ \ \ \ \ pP\ \ \ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}}));}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00488}00488\ \ \ \ \ \ pP\ \ \ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}}));}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00489}00489\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ *ij;}
-\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00490}00490\ \ \ \ \ \textcolor{keywordtype}{int}\ nouter\ =\ INTEGER(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Syms_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}))[col\ ?\ 1\ :\ 0],}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00490}00490\ \ \ \ \ \textcolor{keywordtype}{int}\ nouter\ =\ INTEGER(\mbox{\hyperlink{Mdefines_8h_ac794f0561bb73d07f1c84dd76e81d34f}{GET\_SLOT}}(x,\ \mbox{\hyperlink{Msymbols_8h_a2b91d011a529c5665e032a6565275374}{Matrix\_DimSym}}))[col\ ?\ 1\ :\ 0],}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00491}00491\ \ \ \ \ n\_el\ \ \ =\ INTEGER(pP)[nouter];\ \textcolor{comment}{/*\ is\ only\ ==\ length(indP),\ if\ the}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00492}00492\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ inner\ slot\ is\ not\ over-\/allocated\ */}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00493}00493\ }
@@ -612,5 +612,13 @@
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00642}00642\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00643}00643\ \}}
 \DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00644}00644\ \textcolor{preprocessor}{\#undef\ do\_ii\_FILL}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00646}\mbox{\hyperlink{utils-R_8c_ad6f267b86c16da93e3305859b7ed90bc}{00646}}\ \textcolor{preprocessor}{\#define\ \_rle\_d\_}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00647}00647\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{t__rle_8c}{t\_rle.c}}"{}}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00648}00648\ \textcolor{preprocessor}{\#undef\ \_rle\_d\_}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00650}\mbox{\hyperlink{utils-R_8c_a0788b4232615e4ae1a4693518e312e36}{00650}}\ \textcolor{preprocessor}{\#define\ \_rle\_i\_}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00651}00651\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{t__rle_8c}{t\_rle.c}}"{}}}
+\DoxyCodeLine{\Hypertarget{utils-R_8c_source_l00652}00652\ \textcolor{preprocessor}{\#undef\ \_rle\_i\_}}
 
 \end{DoxyCode}

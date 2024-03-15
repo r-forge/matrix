@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4655</span>
    </div>
   </td>
  </tr>
@@ -81,6 +81,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="Mdefines_8h_source.html">Mdefines.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="utils-R_8h_source.html">utils-R.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="t__rle_8c_source.html">t_rle.c</a>&quot;</code><br />
 </div>
 <p><a href="utils-R_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -98,6 +99,10 @@ Macros</h2></td></tr>
 <tr class="separator:ad4986ecbba005b963f63a85f7c8c281d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ff3b1a7feee493bc441c202122efacb" id="r_a6ff3b1a7feee493bc441c202122efacb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8c.html#a6ff3b1a7feee493bc441c202122efacb">do_ii_FILL</a>(_i_,  _j_)</td></tr>
 <tr class="separator:a6ff3b1a7feee493bc441c202122efacb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6f267b86c16da93e3305859b7ed90bc" id="r_ad6f267b86c16da93e3305859b7ed90bc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8c.html#ad6f267b86c16da93e3305859b7ed90bc">_rle_d_</a></td></tr>
+<tr class="separator:ad6f267b86c16da93e3305859b7ed90bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0788b4232615e4ae1a4693518e312e36" id="r_a0788b4232615e4ae1a4693518e312e36"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils-R_8c.html#a0788b4232615e4ae1a4693518e312e36">_rle_i_</a></td></tr>
+<tr class="separator:a0788b4232615e4ae1a4693518e312e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -131,6 +136,38 @@ Functions</h2></td></tr>
 <tr class="separator:a2252c3ef876063ac45ad7b4af54cd070"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ad6f267b86c16da93e3305859b7ed90bc" name="ad6f267b86c16da93e3305859b7ed90bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6f267b86c16da93e3305859b7ed90bc">&#9670;&#160;</a></span>_rle_d_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _rle_d_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="utils-R_8c_source.html#l00646">646</a> of file <a class="el" href="utils-R_8c_source.html">utils-R.c</a>.</p>
+
+</div>
+</div>
+<a id="a0788b4232615e4ae1a4693518e312e36" name="a0788b4232615e4ae1a4693518e312e36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0788b4232615e4ae1a4693518e312e36">&#9670;&#160;</a></span>_rle_i_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _rle_i_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="utils-R_8c_source.html#l00650">650</a> of file <a class="el" href="utils-R_8c_source.html">utils-R.c</a>.</p>
+
+</div>
+</div>
 <a id="a6ff3b1a7feee493bc441c202122efacb" name="a6ff3b1a7feee493bc441c202122efacb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ff3b1a7feee493bc441c202122efacb">&#9670;&#160;</a></span>do_ii_FILL</h2>
 
@@ -368,7 +405,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="utils-R_8c_source.html#l00483">483</a> of file <a class="el" href="utils-R_8c_source.html">utils-R.c</a>.</p>
 
-<p class="reference">References <a class="el" href="utils-R_8c_source.html#l00468">expand_cmprPt()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00014">Matrix_jSym</a>, and <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>.</p>
+<p class="reference">References <a class="el" href="utils-R_8c_source.html#l00468">expand_cmprPt()</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Msymbols_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Msymbols_8h_source.html#l00014">Matrix_jSym</a>, and <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>.</p>
 
 </div>
 </div>

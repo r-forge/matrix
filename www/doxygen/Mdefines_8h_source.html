@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4655</span>
    </div>
   </td>
  </tr>
@@ -175,7 +175,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment">/* Often used symbols, defined in ./init.c */</span></div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="keyword">extern</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#include &quot;<a class="code" href="Syms_8h.html">Syms.h</a>&quot;</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="preprocessor">#include &quot;<a class="code" href="Msymbols_8h.html">Msymbols.h</a>&quot;</span></div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="comment">/* Often used numbers, defined in ./init.c */</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="keyword">extern</span></div>
@@ -359,8 +359,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="foldopen" id="foldopen00220" data-start="" data-end="">
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno"><a class="line" href="Mdefines_8h.html#a6317b87fedfe18cc09e13d986051957d">  220</a></span><span class="preprocessor">#define VALID_NONVIRTUAL_MATRIX \</span></div>
 <div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><span class="preprocessor"></span><span class="comment">/*  0 */</span><span class="preprocessor"> &quot;dpoMatrix&quot;, &quot;dppMatrix&quot;, \</span></div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="preprocessor"></span><span class="comment">/*  2 */</span><span class="preprocessor"> &quot;corMatrix&quot;, &quot;pcorMatrix&quot;, \</span></div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="preprocessor"></span><span class="comment">/*  4 */</span><span class="preprocessor"> &quot;pMatrix&quot;, &quot;indMatrix&quot;, \</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span><span class="preprocessor"></span><span class="comment">/*  2 */</span><span class="preprocessor"> &quot;corMatrix&quot;, &quot;copMatrix&quot;, \</span></div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span><span class="preprocessor"></span><span class="comment">/*  4 */</span><span class="preprocessor">   &quot;pMatrix&quot;, &quot;indMatrix&quot;, \</span></div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span><span class="preprocessor"></span><span class="comment">/*  6 */</span><span class="preprocessor"> &quot;ngCMatrix&quot;, &quot;ngRMatrix&quot;, &quot;ngTMatrix&quot;, &quot;ngeMatrix&quot;, &quot;ndiMatrix&quot;, \</span></div>
 <div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="preprocessor"></span><span class="comment">/* 11 */</span><span class="preprocessor"> &quot;nsCMatrix&quot;, &quot;nsRMatrix&quot;, &quot;nsTMatrix&quot;, &quot;nsyMatrix&quot;, &quot;nspMatrix&quot;, \</span></div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span><span class="preprocessor"></span><span class="comment">/* 16 */</span><span class="preprocessor"> &quot;ntCMatrix&quot;, &quot;ntRMatrix&quot;, &quot;ntTMatrix&quot;, &quot;ntrMatrix&quot;, &quot;ntpMatrix&quot;, \</span></div>
@@ -468,15 +468,15 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aMdefines_8h_html_a7e6e03d95275a06e8729b0f5fcefb360"><div class="ttname"><a href="Mdefines_8h.html#a7e6e03d95275a06e8729b0f5fcefb360">set_symmetrized_DimNames</a></div><div class="ttdeci">void set_symmetrized_DimNames(SEXP, SEXP, int)</div><div class="ttdef"><b>Definition</b> <a href="attrib_8c_source.html#l00132">attrib.c:132</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_a8c55f744d0000faee99c13bf98e33022"><div class="ttname"><a href="Mdefines_8h.html#a8c55f744d0000faee99c13bf98e33022">Matrix_zna</a></div><div class="ttdeci">Rcomplex Matrix_zna</div><div class="ttdef"><b>Definition</b> <a href="Mdefines_8h_source.html#l00095">Mdefines.h:95</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_a91ee1431d809747b3dc95398f485e91b"><div class="ttname"><a href="Mdefines_8h.html#a91ee1431d809747b3dc95398f485e91b">Matrix_zone</a></div><div class="ttdeci">Rcomplex Matrix_zone</div><div class="ttdef"><b>Definition</b> <a href="Mdefines_8h_source.html#l00095">Mdefines.h:95</a></div></div>
-<div class="ttc" id="aMdefines_8h_html_ab8af4c7a5d3132fbaa6618a928ad1a62"><div class="ttname"><a href="Mdefines_8h.html#ab8af4c7a5d3132fbaa6618a928ad1a62">Matrix_zzero</a></div><div class="ttdeci">Rcomplex Matrix_zzero</div><div class="ttdef"><b>Definition</b> <a href="init_8c_source.html#l00027">init.c:27</a></div></div>
+<div class="ttc" id="aMdefines_8h_html_ab8af4c7a5d3132fbaa6618a928ad1a62"><div class="ttname"><a href="Mdefines_8h.html#ab8af4c7a5d3132fbaa6618a928ad1a62">Matrix_zzero</a></div><div class="ttdeci">Rcomplex Matrix_zzero</div><div class="ttdef"><b>Definition</b> <a href="init_8c_source.html#l00026">init.c:26</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_abf15380695c4a73f01f916db37bf8557"><div class="ttname"><a href="Mdefines_8h.html#abf15380695c4a73f01f916db37bf8557">revDN</a></div><div class="ttdeci">void revDN(SEXP, SEXP)</div><div class="ttdef"><b>Definition</b> <a href="attrib_8c_source.html#l00068">attrib.c:68</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ac2698f6a0f543d0c1ba8eb61da0811a9"><div class="ttname"><a href="Mdefines_8h.html#ac2698f6a0f543d0c1ba8eb61da0811a9">get_reversed_DimNames</a></div><div class="ttdeci">SEXP get_reversed_DimNames(SEXP)</div><div class="ttdef"><b>Definition</b> <a href="attrib_8c_source.html#l00120">attrib.c:120</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ad6c12366f159242093bdd95acde25f75"><div class="ttname"><a href="Mdefines_8h.html#ad6c12366f159242093bdd95acde25f75">DimNames_is_trivial</a></div><div class="ttdeci">int DimNames_is_trivial(SEXP)</div><div class="ttdef"><b>Definition</b> <a href="attrib_8c_source.html#l00006">attrib.c:6</a></div></div>
-<div class="ttc" id="aMdefines_8h_html_ad789d3a0b71cc1a3cce7c7ca304d5650"><div class="ttname"><a href="Mdefines_8h.html#ad789d3a0b71cc1a3cce7c7ca304d5650">validObject</a></div><div class="ttdeci">void validObject(SEXP, const char *)</div><div class="ttdef"><b>Definition</b> <a href="validity_8c_source.html#l01835">validity.c:1835</a></div></div>
+<div class="ttc" id="aMdefines_8h_html_ad789d3a0b71cc1a3cce7c7ca304d5650"><div class="ttname"><a href="Mdefines_8h.html#ad789d3a0b71cc1a3cce7c7ca304d5650">validObject</a></div><div class="ttdeci">void validObject(SEXP, const char *)</div><div class="ttdef"><b>Definition</b> <a href="validity_8c_source.html#l01802">validity.c:1802</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ad794d2d904f14e22e2e24c4bed786708"><div class="ttname"><a href="Mdefines_8h.html#ad794d2d904f14e22e2e24c4bed786708">newObject</a></div><div class="ttdeci">SEXP newObject(const char *)</div><div class="ttdef"><b>Definition</b> <a href="objects_8c_source.html#l00004">objects.c:4</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ad7ddf7865215afc82cf42651eecc6df6"><div class="ttname"><a href="Mdefines_8h.html#ad7ddf7865215afc82cf42651eecc6df6">get_symmetrized_DimNames</a></div><div class="ttdeci">SEXP get_symmetrized_DimNames(SEXP, int)</div><div class="ttdef"><b>Definition</b> <a href="attrib_8c_source.html#l00108">attrib.c:108</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ad9fb3afe8ec66e6c6f0247af32df1910"><div class="ttname"><a href="Mdefines_8h.html#ad9fb3afe8ec66e6c6f0247af32df1910">kindToSize</a></div><div class="ttdeci">size_t kindToSize(char)</div><div class="ttdef"><b>Definition</b> <a href="objects_8c_source.html#l00046">objects.c:46</a></div></div>
-<div class="ttc" id="aSyms_8h_html"><div class="ttname"><a href="Syms_8h.html">Syms.h</a></div></div>
+<div class="ttc" id="aMsymbols_8h_html"><div class="ttname"><a href="Msymbols_8h.html">Msymbols.h</a></div></div>
 <div class="ttc" id="autils_8h_html"><div class="ttname"><a href="utils_8h.html">utils.h</a></div></div>
 <div class="ttc" id="aversion_8h_html"><div class="ttname"><a href="version_8h.html">version.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

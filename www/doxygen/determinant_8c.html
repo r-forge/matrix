@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Matrix<span id="projectnumber">&#160;r4577</span>
+   <div id="projectname">Matrix<span id="projectnumber">&#160;r4655</span>
    </div>
   </td>
  </tr>
@@ -120,7 +120,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    SEXP dim = <a class="code hl_define" href="Mdefines_8h.html#ac794f0561bb73d07f1c84dd76e81d34f">GET_SLOT</a>(obj, <a class="code hl_variable" href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>); \</div>
+<b>Value:</b><div class="fragment"><div class="line">    SEXP dim = <a class="code hl_define" href="Mdefines_8h.html#ac794f0561bb73d07f1c84dd76e81d34f">GET_SLOT</a>(obj, <a class="code hl_variable" href="Msymbols_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a>); \</div>
 <div class="line">    <span class="keywordtype">int</span> *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \</div>
 <div class="line">    if (m != n) \</div>
 <div class="line">        error(<a class="code hl_define" href="Mdefines_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a>(<span class="stringliteral">&quot;determinant of non-square matrix is undefined&quot;</span>)); \</div>
@@ -128,7 +128,7 @@ Functions</h2></td></tr>
 <div class="line">    <span class="keywordtype">double</span> modulus = 0.0; <span class="comment">/* result for n == 0 */</span></div>
 <div class="ttc" id="aMdefines_8h_html_a32a3cf3d9dd914f5aeeca5423c157934"><div class="ttname"><a href="Mdefines_8h.html#a32a3cf3d9dd914f5aeeca5423c157934">_</a></div><div class="ttdeci">#define _(String)</div><div class="ttdef"><b>Definition</b> <a href="Mdefines_8h_source.html#l00044">Mdefines.h:44</a></div></div>
 <div class="ttc" id="aMdefines_8h_html_ac794f0561bb73d07f1c84dd76e81d34f"><div class="ttname"><a href="Mdefines_8h.html#ac794f0561bb73d07f1c84dd76e81d34f">GET_SLOT</a></div><div class="ttdeci">#define GET_SLOT(x, what)</div><div class="ttdef"><b>Definition</b> <a href="Mdefines_8h_source.html#l00085">Mdefines.h:85</a></div></div>
-<div class="ttc" id="aSyms_8h_html_a2b91d011a529c5665e032a6565275374"><div class="ttname"><a href="Syms_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a></div><div class="ttdeci">SEXP Matrix_DimSym</div><div class="ttdef"><b>Definition</b> <a href="Syms_8h_source.html#l00003">Syms.h:3</a></div></div>
+<div class="ttc" id="aMsymbols_8h_html_a2b91d011a529c5665e032a6565275374"><div class="ttname"><a href="Msymbols_8h.html#a2b91d011a529c5665e032a6565275374">Matrix_DimSym</a></div><div class="ttdeci">SEXP Matrix_DimSym</div><div class="ttdef"><b>Definition</b> <a href="Msymbols_8h_source.html#l00003">Msymbols.h:3</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -161,7 +161,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="determinant_8c_source.html#l00075">75</a> of file <a class="el" href="determinant_8c_source.html">determinant.c</a>.</p>
 
-<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Syms_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
+<p class="reference">References <a class="el" href="cholmod-etc_8c_source.html#l00005">c</a>, <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Msymbols_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
 
 </div>
 </div>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="determinant_8c_source.html#l00168">168</a> of file <a class="el" href="determinant_8c_source.html">determinant.c</a>.</p>
 
-<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
+<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00021">Matrix_uploSym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
 
 </div>
 </div>
@@ -263,7 +263,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="determinant_8c_source.html#l00026">26</a> of file <a class="el" href="determinant_8c_source.html">determinant.c</a>.</p>
 
-<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
+<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00018">Matrix_permSym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, and <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>.</p>
 
 </div>
 </div>
@@ -343,7 +343,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="determinant_8c_source.html#l00207">207</a> of file <a class="el" href="determinant_8c_source.html">determinant.c</a>.</p>
 
-<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00019">Matrix_qSym</a>, <a class="el" href="Syms_8h_source.html#l00008">Matrix_USym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>, and <a class="el" href="perm_8c_source.html#l00023">signPerm()</a>.</p>
+<p class="reference">References <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Msymbols_8h_source.html#l00019">Matrix_qSym</a>, <a class="el" href="Msymbols_8h_source.html#l00008">Matrix_USym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>, and <a class="el" href="perm_8c_source.html#l00023">signPerm()</a>.</p>
 
 </div>
 </div>
@@ -375,7 +375,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="determinant_8c_source.html#l00266">266</a> of file <a class="el" href="determinant_8c_source.html">determinant.c</a>.</p>
 
-<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Syms_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Syms_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Syms_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Syms_8h_source.html#l00019">Matrix_qSym</a>, <a class="el" href="Syms_8h_source.html#l00006">Matrix_RSym</a>, <a class="el" href="Syms_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>, and <a class="el" href="perm_8c_source.html#l00023">signPerm()</a>.</p>
+<p class="reference">References <a class="el" href="Mdefines_8h_source.html#l00044">_</a>, <a class="el" href="determinant_8c.html#a3706034a476a157ba157872af6a49d87">DETERMINANT_START</a>, <a class="el" href="Mdefines_8h_source.html#l00085">GET_SLOT</a>, <a class="el" href="Msymbols_8h_source.html#l00003">Matrix_DimSym</a>, <a class="el" href="Msymbols_8h_source.html#l00013">Matrix_iSym</a>, <a class="el" href="Msymbols_8h_source.html#l00017">Matrix_pSym</a>, <a class="el" href="Msymbols_8h_source.html#l00019">Matrix_qSym</a>, <a class="el" href="Msymbols_8h_source.html#l00006">Matrix_RSym</a>, <a class="el" href="Msymbols_8h_source.html#l00022">Matrix_xSym</a>, <a class="el" href="determinant_8c_source.html#l00007">mkDet()</a>, and <a class="el" href="perm_8c_source.html#l00023">signPerm()</a>.</p>
 
 </div>
 </div>

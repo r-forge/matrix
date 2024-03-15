@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['lapack_2detc_2eh_0',['Lapack-etc.h',['../Lapack-etc_8h.html',1,'']]]
+  ['kappa_2ec_0',['kappa.c',['../kappa_8c.html',1,'']]],
+  ['kappa_2eh_1',['kappa.h',['../kappa_8h.html',1,'']]]
 ];
