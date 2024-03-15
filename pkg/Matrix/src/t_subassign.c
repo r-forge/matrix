@@ -121,7 +121,6 @@
  */
 SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 {
-    // TODO: for other classes consider using a trick as  RallocedReal() in ./chm_common.c
     static const char
 	*valid_cM [] = { // the only ones, for "the moment". FIXME: extend (!)
 	x_CLASSES,
