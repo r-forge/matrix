@@ -6,6 +6,7 @@
 \keyword{classes}
 %
 \alias{nsparseMatrix-class}
+\alias{nsparseMatrix-classes} % used by package 'arules'
 \alias{ngCMatrix-class}
 \alias{ngRMatrix-class}
 \alias{ngTMatrix-class}
