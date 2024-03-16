@@ -41,6 +41,33 @@ extern "C"
 #include <stdarg.h>
 #include <ctype.h>
 
+#ifndef INT32_MAX
+# define int32_t   long
+# define INT32_MIN LONG_MIN
+# define INT32_MAX LONG_MAX
+# define PRId32    "ld"
+# define SCNd32    "ld"
+#endif
+#ifndef INT64_MAX
+# define int64_t   long long
+# define INT64_MIN LLONG_MIN
+# define INT64_MAX LLONG_MAX
+# define PRId64    "lld"
+# define SCNd64    "lld"
+#endif
+#ifndef UINT32_MAX
+# define uint32_t   unsigned long
+# define UINT32_MAX ULONG_MAX
+# define PRIu32     "lu"
+# define SCNu32     "lu"
+#endif
+#ifndef UINT64_MAX
+# define uint64_t   unsigned long long
+# define UINT64_MAX ULLONG_MAX
+# define PRIu64     "llu"
+# define SCNu64     "llu"
+#endif
+
 //------------------------------------------------------------------------------
 // SuiteSparse_long is now int64_t in SuiteSparse v6.0.0 and later
 //------------------------------------------------------------------------------
