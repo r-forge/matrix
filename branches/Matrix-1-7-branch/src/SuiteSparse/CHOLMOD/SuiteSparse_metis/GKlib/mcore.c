@@ -79,6 +79,7 @@ void gk_mcoreDestroy(gk_mcore_t **r_mcore, int showstats)
   if (mcore == NULL)
     return;
 
+#ifndef NDEBUG
   if (showstats)
     printf("\n gk_mcore statistics\n" 
            "           coresize: %12zu         nmops: %12zu  cmop: %6zu\n"
@@ -97,6 +98,7 @@ void gk_mcoreDestroy(gk_mcore_t **r_mcore, int showstats)
            " cur_callocs: %6zu  cur_hallocs: %6zu cmop: %6zu\n",
            mcore->cur_callocs,  mcore->cur_hallocs, mcore->cmop);
   }
+#endif
 
   gk_free((void **)&mcore->core, &mcore->mops, &mcore, LTERM);
 
@@ -115,6 +117,7 @@ void gk_gkmcoreDestroy(gk_mcore_t **r_mcore, int showstats)
   if (mcore == NULL)
     return;
 
+#ifndef NDEBUG
   if (showstats)
     printf("\n gk_mcore statistics\n" 
            "         nmops: %12zu  cmop: %6zu\n"
@@ -133,6 +136,7 @@ void gk_gkmcoreDestroy(gk_mcore_t **r_mcore, int showstats)
            " cur_hallocs: %6zu cmop: %6zu\n",
            mcore->cur_hallocs, mcore->cmop);
   }
+#endif
 
   free(mcore->mops);
   free(mcore);
