@@ -89,12 +89,14 @@ void FreeWorkSpace(ctrl_t *ctrl)
 {
   gk_mcoreDestroy(&ctrl->mcore, ctrl->dbglvl&METIS_DBG_INFO);
 
+#ifndef NDEBUG
   IFSET(ctrl->dbglvl, METIS_DBG_INFO,
       printf(" nbrpool statistics\n" 
              "        nbrpoolsize: %12zu   nbrpoolcpos: %12zu\n"
              "    nbrpoolreallocs: %12zu\n\n",
              ctrl->nbrpoolsize,  ctrl->nbrpoolcpos, 
              ctrl->nbrpoolreallocs));
+#endif
 
   gk_free((void **)&ctrl->cnbrpool, &ctrl->vnbrpool, LTERM);
   ctrl->nbrpoolsize = 0;

@@ -269,10 +269,12 @@ void EliminateSubDomainEdges(ctrl_t *ctrl, graph_t *graph)
     avg   = total/nparts;
     max   = nads[iargmax(nparts, nads)];
 
+#ifndef NDEBUG
     IFSET(ctrl->dbglvl, METIS_DBG_CONNINFO, 
           printf("Adjacent Subdomain Stats: Total: %3"PRIDX", "
                  "Max: %3"PRIDX"[%zu], Avg: %3"PRIDX"\n", 
                  total, max, iargmax(nparts, nads), avg)); 
+#endif
 
     if (max < badfactor*avg)
       break;
