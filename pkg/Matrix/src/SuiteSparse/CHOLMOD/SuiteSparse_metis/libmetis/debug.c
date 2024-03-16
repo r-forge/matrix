@@ -114,7 +114,9 @@ idx_t ComputeMaxCut(graph_t *graph, idx_t nparts, idx_t *where)
 
   maxcut = cuts[iargmax(nparts, cuts)];
 
+#ifndef NDEBUG
   printf("%zu => %"PRIDX"\n", iargmax(nparts, cuts), maxcut);
+#endif
 
   gk_free((void **)&cuts, LTERM);
 

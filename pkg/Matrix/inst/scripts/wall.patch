@@ -1,6 +1,6 @@
 diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c
---- src/SuiteSparse/CCOLAMD/Source/ccolamd.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CCOLAMD/Source/ccolamd.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CCOLAMD/Source/ccolamd.c	2024-03-16 01:25:07
 @@ -1545,7 +1545,9 @@
      Int *dead_cols ;
      Int set1 ;
@@ -32,8 +32,8 @@ diff -ruN src/SuiteSparse/CCOLAMD/Source/ccolamd.c src/SuiteSparse-patched/CCOLA
  #endif
                  ASSERT (k >= cset_start [cs] && k < cset_start [cs+1]) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_check.c src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c
---- src/SuiteSparse/CHOLMOD/Check/cholmod_check.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Check/cholmod_check.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_check.c	2024-03-16 01:25:07
 @@ -216,7 +216,6 @@
      //--------------------------------------------------------------------------
  
@@ -100,8 +100,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_check.c src/SuiteSparse-patched/
                  if (check_Lpx)
                  {
 diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_write.c src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c
---- src/SuiteSparse/CHOLMOD/Check/cholmod_write.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Check/cholmod_write.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Check/cholmod_write.c	2024-03-16 01:25:07
 @@ -354,7 +354,7 @@
      double x = 0, z = 0 ;
      void *Ax, *Az ;
@@ -143,8 +143,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Check/cholmod_write.c src/SuiteSparse-patched/
      }
  
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_analyze.c	2024-03-16 01:25:07
 @@ -399,7 +399,7 @@
      Int *First, *Level, *Work4n, *Cmember, *CParent, *ColCount, *Lperm, *Parent,
          *Post, *Perm, *Lparent, *Lcolcount ;
@@ -163,8 +163,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_analyze.c src/SuiteSparse-pat
      //--------------------------------------------------------------------------
      // set the default strategy
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_factorize.c	2024-03-16 01:25:07
 @@ -104,7 +104,7 @@
  {
  
@@ -183,8 +183,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_factorize.c src/SuiteSparse-p
      if (L->n != A->nrow)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_resymbol.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_resymbol.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_resymbol.c	2024-03-16 01:25:07
 @@ -102,8 +102,6 @@
      //--------------------------------------------------------------------------
  
@@ -195,8 +195,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_resymbol.c src/SuiteSparse-pa
      // s = 2*nrow + (stype ? 0 : ncol)
      int ok = TRUE ;
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c
---- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/cholmod_solve.c	2024-03-16 01:25:07
 @@ -203,8 +203,8 @@
      cholmod_dense *Y = NULL, *X = NULL ;
      cholmod_sparse *C, *Yset, C_header, Yset_header, *Xset ;
@@ -209,8 +209,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/cholmod_solve.c src/SuiteSparse-patch
      RETURN_IF_NULL_COMMON (FALSE) ;
      RETURN_IF_NULL (L, FALSE) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c	2024-03-16 01:25:07
 @@ -265,12 +265,17 @@
      //--------------------------------------------------------------------------
  
@@ -231,8 +231,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_psolve_worker.c src/SuiteSp
      Xx = X->x ;
      Xz = X->z ;
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c	2024-03-16 01:25:07
 @@ -29,12 +29,13 @@
      Int *Ap = A->p ;
      Int *Anz = A->nz ;
@@ -249,8 +249,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_resymbol_worker.c src/Suite
      Int  *Lnz = L->nz ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c	2024-03-16 01:25:07
 @@ -49,11 +49,14 @@
      #ifdef ZOMPLEX
      Real yz [1], lz [1], fz [1] ;
@@ -334,8 +334,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_rowfac_worker.c src/SuiteSp
                  ASSERT (p < Lp [Lnext [i]]) ;
              }
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve_worker.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_solve_worker.c	2024-03-16 01:25:07
 @@ -70,7 +70,9 @@
      Int *Lp = L->p ;
      Real *Lx = L->x ;
@@ -384,8 +384,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_solve_worker.c src/SuiteSpa
      Int *Ysetp = Yset->p ;
      Int *Yseti = Yset->i ;
 diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c
---- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c	2024-03-16 01:25:07
 @@ -30,12 +30,16 @@
      Int *Bp = B->p ;
      Int *Bi = B->i ;
@@ -442,8 +442,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Cholesky/t_cholmod_spsolve_worker.c src/SuiteS
      Int n = B4->nrow ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/cholmod_ssmult.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/cholmod_ssmult.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/cholmod_ssmult.c	2024-03-16 01:25:07
 @@ -84,7 +84,7 @@
      // check inputs
      //--------------------------------------------------------------------------
@@ -462,8 +462,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/cholmod_ssmult.c src/SuiteSparse-pat
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c	2024-03-16 01:25:07
 @@ -59,7 +59,9 @@
      Int *Ap = A->p ;
      Int *Ai = A->i ;
@@ -475,8 +475,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_drop_worker.c src/SuiteSpa
      bool packed = A->packed ;
      Int ncol = A->ncol ;
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c	2024-03-16 01:25:07
 @@ -25,23 +25,35 @@
      Int *Ap  = A->p ;
      Int *Anz = A->nz ;
@@ -514,8 +514,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_horzcat_worker.c src/Suite
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c	2024-03-16 01:25:07
 @@ -36,7 +36,9 @@
      Int nrow = X->nrow ;
      Int d = X->d ;
@@ -540,8 +540,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_norm_worker.c src/SuiteSpa
      Int nrow = A->nrow ;
      bool packed = A->packed ;
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c	2024-03-16 01:25:07
 @@ -28,12 +28,16 @@
      Int  *Anz = A->nz ;
      Int  *Ai  = A->i ;
@@ -630,8 +630,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_scale_worker.c src/SuiteSp
                  // A (i,j) = t
                  ASSIGN (Ax, Az, p, tx, tz, 0) ;
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-12 12:04:50
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-03-16 01:30:04
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c	2024-03-16 01:25:07
 @@ -55,28 +55,37 @@
      #endif
  
@@ -682,8 +682,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_sdmult_worker.c src/SuiteS
  
      if (A->stype == 0)
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c	2024-03-16 01:25:07
 @@ -23,35 +23,51 @@
      // get inputs
      //--------------------------------------------------------------------------
@@ -752,8 +752,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_ssmult_worker.c src/SuiteS
  
              // add the nonzero pattern of A(:,k) to the pattern of C(:,j)
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c	2024-03-16 01:25:07
 @@ -29,14 +29,22 @@
      Int *Ap = A->p ;
      Int *Ai = A->i ;
@@ -778,8 +778,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_submatrix_worker.c src/Sui
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c
---- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c	2024-03-16 01:25:07
 @@ -25,22 +25,34 @@
      Int *Ap  = A->p ;
      Int *Anz = A->nz ;
@@ -816,8 +816,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/MatrixOps/t_cholmod_vertcat_worker.c src/Suite
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowadd.c
---- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowadd.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowadd.c	2024-03-16 01:25:07
 @@ -136,7 +136,6 @@
      RETURN_IF_NULL (R, FALSE) ;
      RETURN_IF_XTYPE_INVALID (L, CHOLMOD_PATTERN, CHOLMOD_REAL, FALSE) ;
@@ -827,8 +827,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowadd.c src/SuiteSparse-patche
      if (kadd >= L->n || k < 0)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowdel.c
---- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowdel.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Modify/cholmod_rowdel.c	2024-03-16 01:25:07
 @@ -122,7 +122,6 @@
      RETURN_IF_NULL_COMMON (FALSE) ;
      RETURN_IF_NULL (L, FALSE) ;
@@ -838,8 +838,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Modify/cholmod_rowdel.c src/SuiteSparse-patche
      if (kdel >= L->n || k < 0)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c src/SuiteSparse-patched/CHOLMOD/Modify/t_cholmod_updown_worker.c
---- src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Modify/t_cholmod_updown_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Modify/t_cholmod_updown_worker.c	2024-03-16 01:25:07
 @@ -148,7 +148,9 @@
      double fl = 0 ;
      bool use_colmark = (colmark != NULL) ;
@@ -861,8 +861,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Modify/t_cholmod_updown_worker.c src/SuiteSpar
              }
  
 diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c
---- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_metis.c	2024-03-16 01:25:07
 @@ -578,7 +578,7 @@
      idx_t *Mp, *Mi, *Mperm, *Miperm ;
      cholmod_sparse *B ;
@@ -873,8 +873,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_metis.c src/SuiteSparse-patc
      RETURN_IF_NULL_COMMON (FALSE) ;
      RETURN_IF_NULL (A, FALSE) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c
---- src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Partition/cholmod_nesdis.c	2024-03-16 01:25:07
 @@ -681,8 +681,11 @@
  )
  {
@@ -899,8 +899,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Partition/cholmod_nesdis.c src/SuiteSparse-pat
      ASSERT (IMPLIES (cnode >= 0, Flag [cnode] < EMPTY)) ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h	2024-03-16 01:25:07
 @@ -11,6 +11,38 @@
  #ifndef _GK_MKPQUEUE_H
  #define _GK_MKPQUEUE_H
@@ -974,9 +974,69 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/gk_mkpqueue.h src/Suit
    return 1;\
  }\
  
+diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2024-03-16 01:30:04
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/mcore.c	2024-03-16 01:28:20
+@@ -71,6 +71,7 @@
+   if (mcore == NULL)
+     return;
+ 
++#ifndef NDEBUG
+   if (showstats)
+     printf("\n gk_mcore statistics\n" 
+            "           coresize: %12zu         nmops: %12zu  cmop: %6zu\n"
+@@ -89,6 +90,7 @@
+            " cur_callocs: %6zu  cur_hallocs: %6zu cmop: %6zu\n",
+            mcore->cur_callocs,  mcore->cur_hallocs, mcore->cmop);
+   }
++#endif
+ 
+   gk_free((void **)&mcore->core, &mcore->mops, &mcore, LTERM);
+ 
+@@ -107,6 +109,7 @@
+   if (mcore == NULL)
+     return;
+ 
++#ifndef NDEBUG
+   if (showstats)
+     printf("\n gk_mcore statistics\n" 
+            "         nmops: %12zu  cmop: %6zu\n"
+@@ -125,6 +128,7 @@
+            " cur_hallocs: %6zu cmop: %6zu\n",
+            mcore->cur_hallocs, mcore->cmop);
+   }
++#endif
+ 
+   free(mcore->mops);
+   free(mcore);
+diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/memory.c
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2024-03-16 01:30:04
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/GKlib/memory.c	2024-03-16 01:28:20
+@@ -152,8 +152,10 @@
+   ptr = (void *)malloc(nbytes);
+ 
+   if (ptr == NULL) {
++#ifndef NDEBUG
+     fprintf(stderr, "   Current memory used:  %10zu bytes\n", gk_GetCurMemoryUsed());
+     fprintf(stderr, "   Maximum memory used:  %10zu bytes\n", gk_GetMaxMemoryUsed());
++#endif
+     gk_errexit(SIGMEM, "***Memory allocation failed for %s. Requested size: %zu bytes", 
+         msg, nbytes);
+     return NULL;
+@@ -187,8 +189,10 @@
+   ptr = (void *)realloc(oldptr, nbytes);
+ 
+   if (ptr == NULL) {
++#ifndef NDEBUG
+     fprintf(stderr, "   Maximum memory used: %10zu bytes\n", gk_GetMaxMemoryUsed());
+     fprintf(stderr, "   Current memory used: %10zu bytes\n", gk_GetCurMemoryUsed());
++#endif
+     gk_errexit(SIGMEM, "***Memory realloc failed for %s. " "Requested size: %zu bytes", 
+         msg, nbytes);
+     return NULL;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/balance.c	2024-03-16 01:25:07
 @@ -40,7 +40,7 @@
  **************************************************************************/
  void Bnd2WayBalance(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts)
@@ -1007,8 +1067,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/balance.c src/Suite
    idx_t *moved, *swaps, *perm, *qnum, *qsizes;
    idx_t higain, mincut, newcut, mincutorder;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c	2024-03-16 01:25:07
 @@ -21,7 +21,7 @@
  /*************************************************************************/
  graph_t *CoarsenGraph(ctrl_t *ctrl, graph_t *graph)
@@ -1091,8 +1151,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/coarsen.c src/Suite
    idx_t *xadj, *vwgt, *vsize, *adjncy, *adjwgt;
    idx_t *cmap, *htable;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/compress.c	2024-03-16 01:25:07
 @@ -151,7 +151,7 @@
               idx_t *vwgt, idx_t *iperm, real_t factor)
  {
@@ -1103,8 +1163,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/compress.c src/Suit
    graph_t *graph=NULL;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/contig.c	2024-03-16 01:25:07
 @@ -32,7 +32,7 @@
  idx_t FindPartitionInducedComponents(graph_t *graph, idx_t *where, 
            idx_t *cptr, idx_t *cind)
@@ -1176,8 +1236,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/contig.c src/SuiteS
    vsize  = graph->vsize;
    adjncy = graph->adjncy;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/debug.c	2024-03-16 01:28:20
 @@ -47,7 +47,7 @@
  /*************************************************************************/
  idx_t ComputeVolume(graph_t *graph, idx_t *where)
@@ -1187,7 +1247,17 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t *xadj, *adjncy, *vsize, *marker;
  
  
-@@ -120,6 +120,7 @@
+@@ -106,7 +106,9 @@
+ 
+   maxcut = cuts[iargmax(nparts, cuts)];
+ 
++#ifndef NDEBUG
+   printf("%zu => %"PRIDX"\n", iargmax(nparts, cuts), maxcut);
++#endif
+ 
+   gk_free((void **)&cuts, LTERM);
+ 
+@@ -120,6 +122,7 @@
  /*************************************************************************/
  idx_t CheckBnd(graph_t *graph) 
  {
@@ -1195,7 +1265,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t i, j, nvtxs, nbnd;
    idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
  
-@@ -145,6 +146,7 @@
+@@ -145,6 +148,7 @@
    }
  
    ASSERTP(nbnd == graph->nbnd, ("%"PRIDX" %"PRIDX"\n", nbnd, graph->nbnd));
@@ -1203,7 +1273,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -157,6 +159,7 @@
+@@ -157,6 +161,7 @@
  /*************************************************************************/
  idx_t CheckBnd2(graph_t *graph) 
  {
@@ -1211,7 +1281,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t i, j, nvtxs, nbnd, id, ed;
    idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
  
-@@ -183,6 +186,7 @@
+@@ -183,6 +188,7 @@
    }
  
    ASSERTP(nbnd == graph->nbnd, ("%"PRIDX" %"PRIDX"\n", nbnd, graph->nbnd));
@@ -1219,7 +1289,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -194,6 +198,7 @@
+@@ -194,6 +200,7 @@
  /*************************************************************************/
  idx_t CheckNodeBnd(graph_t *graph, idx_t onbnd) 
  {
@@ -1227,7 +1297,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t i, j, nvtxs, nbnd;
    idx_t *xadj, *adjncy, *where, *bndptr, *bndind;
  
-@@ -219,6 +224,7 @@
+@@ -219,6 +226,7 @@
        ASSERTP(bndptr[i] != -1, ("%"PRIDX" %"PRIDX"\n", i, bndptr[i]));
      }
    }
@@ -1235,7 +1305,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -231,6 +237,7 @@
+@@ -231,6 +239,7 @@
  /*************************************************************************/
  idx_t CheckRInfo(ctrl_t *ctrl, ckrinfo_t *rinfo)
  {
@@ -1243,7 +1313,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t i, j;
    cnbr_t *nbrs;
  
-@@ -242,6 +249,7 @@
+@@ -242,6 +251,7 @@
            ("%"PRIDX" %"PRIDX" %"PRIDX" %"PRIDX"\n", 
             i, j, nbrs[i].pid, nbrs[j].pid));
    }
@@ -1251,7 +1321,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -254,15 +262,14 @@
+@@ -254,15 +264,14 @@
  /*************************************************************************/
  idx_t CheckNodePartitionParams(graph_t *graph)
  {
@@ -1269,7 +1339,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    where  = graph->where;
  
    /*------------------------------------------------------------
-@@ -308,6 +315,7 @@
+@@ -308,6 +317,7 @@
  /*************************************************************************/
  idx_t IsSeparable(graph_t *graph)
  {
@@ -1277,7 +1347,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    idx_t i, j, nvtxs, other;
    idx_t *xadj, *adjncy, *where;
  
-@@ -327,6 +335,7 @@
+@@ -327,6 +337,7 @@
             xadj[adjncy[j]+1]-xadj[adjncy[j]]));
      }
    }
@@ -1285,7 +1355,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
  
    return 1;
  }
-@@ -338,8 +347,8 @@
+@@ -338,8 +349,8 @@
  /*************************************************************************/
  void CheckKWayVolPartitionParams(ctrl_t *ctrl, graph_t *graph)
  {
@@ -1297,8 +1367,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/debug.c src/SuiteSp
    vnbr_t *mynbrs, *onbrs, *tmpnbrs;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/fm.c	2024-03-16 01:25:07
 @@ -28,7 +28,7 @@
  /*************************************************************************/
  void FM_2WayCutRefine(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, idx_t niter)
@@ -1318,8 +1388,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/fm.c src/SuiteSpars
          *bndptr, *bndind;
    idx_t *moved, *swaps, *perm, *qnum;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/graph.c	2024-03-16 01:25:07
 @@ -17,8 +17,7 @@
  graph_t *SetupGraph(ctrl_t *ctrl, idx_t nvtxs, idx_t ncon, idx_t *xadj, 
               idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt) 
@@ -1331,8 +1401,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/graph.c src/SuiteSp
  
    /* allocate the graph and fill in the fields */
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c	2024-03-16 01:25:07
 @@ -114,18 +114,15 @@
  void RandomBisection(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts, 
           idx_t niparts)
@@ -1425,8 +1495,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/initpart.c src/Suit
  
    WCOREPUSH;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c	2024-03-16 01:25:07
 @@ -102,10 +102,9 @@
  /*************************************************************************/
  idx_t MlevelKWayPartitioning(ctrl_t *ctrl, graph_t *graph, idx_t *part)
@@ -1452,8 +1522,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kmetis.c src/SuiteS
    real_t *ubvec=NULL;
    int status;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c	2024-03-16 01:25:07
 @@ -61,12 +61,12 @@
           real_t ffactor, idx_t omode)
  {
@@ -1574,8 +1644,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayfm.c src/SuiteS
    vkrinfo_t *myrinfo, *orinfo;
    vnbr_t *mynbrs, *onbrs;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c	2024-03-16 01:25:07
 @@ -148,7 +148,7 @@
  /**************************************************************************/
  void ComputeKWayPartitionParams(ctrl_t *ctrl, graph_t *graph)
@@ -1605,8 +1675,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/kwayrefine.c src/Su
    where  = graph->where;
    bndind = graph->bndind;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c	2024-03-16 01:28:20
 @@ -18,16 +18,13 @@
  void ComputeSubDomainGraph(ctrl_t *ctrl, graph_t *graph)
  {
@@ -1625,7 +1695,20 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/Suite
    where  = graph->where;
  
    nparts = ctrl->nparts; 
-@@ -477,12 +474,11 @@
+@@ -264,10 +261,12 @@
+     avg   = total/nparts;
+     max   = nads[iargmax(nparts, nads)];
+ 
++#ifndef NDEBUG
+     IFSET(ctrl->dbglvl, METIS_DBG_CONNINFO, 
+           printf("Adjacent Subdomain Stats: Total: %3"PRIDX", "
+                  "Max: %3"PRIDX"[%zu], Avg: %3"PRIDX"\n", 
+                  total, max, iargmax(nparts, nads), avg)); 
++#endif
+ 
+     if (max < badfactor*avg)
+       break;
+@@ -477,12 +476,11 @@
  void MoveGroupMinConnForCut(ctrl_t *ctrl, graph_t *graph, idx_t to, idx_t nind, 
           idx_t *ind)
  {
@@ -1639,7 +1722,7 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/Suite
    xadj   = graph->xadj;
    adjncy = graph->adjncy;
    adjwgt = graph->adjwgt;
-@@ -561,12 +557,11 @@
+@@ -561,12 +559,11 @@
  void MoveGroupMinConnForVol(ctrl_t *ctrl, graph_t *graph, idx_t to, idx_t nind, 
           idx_t *ind, idx_t *vmarker, idx_t *pmarker, idx_t *modind)
  {
@@ -1654,8 +1737,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/minconn.c src/Suite
    vsize  = graph->vsize;
    adjncy = graph->adjncy;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c	2024-03-16 01:25:07
 @@ -48,7 +48,6 @@
    graph_t *graph=NULL;
    ctrl_t *ctrl;
@@ -1733,8 +1816,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/ometis.c src/SuiteS
    idx_t *perm, *iperm, *head, *qsize, *list, *marker;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c	2024-03-16 01:25:07
 @@ -105,7 +105,7 @@
  void MlevelNestedDissectionP(ctrl_t *ctrl, graph_t *graph, idx_t *order, 
           idx_t lastvtx, idx_t npes, idx_t cpos, idx_t *sizes)
@@ -1753,8 +1836,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/parmetis.c src/Suit
    ctrl_t *ctrl;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c	2024-03-16 01:25:07
 @@ -157,7 +157,7 @@
  idx_t MlevelRecursiveBisection(ctrl_t *ctrl, graph_t *graph, idx_t nparts, 
            idx_t *part, real_t *tpwgts, idx_t fpart)
@@ -1765,8 +1848,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/pmetis.c src/SuiteS
    graph_t *lgraph, *rgraph;
    real_t wsum, *tpwgts2;
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/separator.c	2024-03-16 01:25:07
 @@ -20,7 +20,7 @@
  **************************************************************************/
  void ConstructSeparator(ctrl_t *ctrl, graph_t *graph)
@@ -1799,8 +1882,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/separator.c src/Sui
  
    vmap  = iwspacemalloc(ctrl, nvtxs);
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c	2024-03-16 01:25:07
 @@ -476,7 +476,7 @@
  void FM_2WayNodeBalance(ctrl_t *ctrl, graph_t *graph)
  {
@@ -1811,8 +1894,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/sfm.c src/SuiteSpar
    idx_t *perm, *moved;
    rpq_t *queue; 
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c	2024-03-16 01:25:07
 @@ -136,7 +136,7 @@
  /*************************************************************************/
  void Project2WayNodePartition(ctrl_t *ctrl, graph_t *graph)
@@ -1823,8 +1906,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/srefine.c src/Suite
    graph_t *cgraph;
  
 diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c
---- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/stat.c	2024-03-16 01:25:07
 @@ -20,8 +20,8 @@
  **************************************************************************/
  void ComputePartitionInfoBipartite(graph_t *graph, idx_t nparts, idx_t *where)
@@ -1844,9 +1927,27 @@ diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/stat.c src/SuiteSpa
  
    nvtxs = graph->nvtxs;
    ncon = graph->ncon;
+diff -ruN src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/wspace.c src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/wspace.c
+--- src/SuiteSparse/CHOLMOD/SuiteSparse_metis/libmetis/wspace.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/SuiteSparse_metis/libmetis/wspace.c	2024-03-16 01:28:20
+@@ -81,12 +81,14 @@
+ {
+   gk_mcoreDestroy(&ctrl->mcore, ctrl->dbglvl&METIS_DBG_INFO);
+ 
++#ifndef NDEBUG
+   IFSET(ctrl->dbglvl, METIS_DBG_INFO,
+       printf(" nbrpool statistics\n" 
+              "        nbrpoolsize: %12zu   nbrpoolcpos: %12zu\n"
+              "    nbrpoolreallocs: %12zu\n\n",
+              ctrl->nbrpoolsize,  ctrl->nbrpoolcpos, 
+              ctrl->nbrpoolreallocs));
++#endif
+ 
+   gk_free((void **)&ctrl->cnbrpool, &ctrl->vnbrpool, LTERM);
+   ctrl->nbrpoolsize = 0;
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c
---- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-12 12:04:50
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-03-16 01:30:04
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_numeric.c	2024-03-16 01:25:07
 @@ -281,10 +281,6 @@
      // supernodal numerical factorization, using template routine
      //--------------------------------------------------------------------------
@@ -1859,8 +1960,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_numeric.c src/SuiteSp
      {
          case CHOLMOD_REAL    + CHOLMOD_SINGLE:
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c
---- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/cholmod_super_symbolic.c	2024-03-16 01:25:07
 @@ -173,11 +173,13 @@
          csize, maxcsize, ss, nscol0, nscol1, ns, nfsuper, newzeros, totzeros,
          merge, snext, esize, maxesize, nrelax0, nrelax1, nrelax2, Asorted ;
@@ -1899,8 +2000,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/cholmod_super_symbolic.c src/SuiteS
                  PRINT2 (("oldzeros "ID" newzeros "ID" xtotsize %g z %g\n",
                              Zeros [s+1], newzeros, xtotsize, z)) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c
---- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c	2024-03-16 01:25:07
 @@ -152,15 +152,21 @@
      #ifdef BLAS_TIMER
      double tstart, blas_time ;
@@ -2044,8 +2145,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_numeric_worker.c sr
                  {
                      ASSERT (RelativeMap [j] == Map [Ls [pdi1 + j]]) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c
---- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c	2024-03-16 01:25:07
 @@ -37,12 +37,11 @@
      Real minus_one [2], one [2] ;
      Int *Lpi, *Lpx, *Ls, *Super ;
@@ -2075,8 +2176,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Supernodal/t_cholmod_super_solve_worker.c src/
  
      nsuper = L->nsuper ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat.c	2024-03-16 01:25:07
 @@ -106,7 +106,6 @@
      bool ignore_diag = (mode < 0) ;
      bool values = (mode > 0) && (A->xtype != CHOLMOD_PATTERN) ;
@@ -2099,8 +2200,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat.c src/SuiteSparse-patche
      //--------------------------------------------------------------------------
      // allocate workspace
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_aat_worker.c	2024-03-16 01:25:07
 @@ -35,20 +35,32 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Anz = (Int  *) A->nz ;
@@ -2148,8 +2249,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_aat_worker.c src/SuiteSparse
  
              //------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_add.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_add.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_add.c	2024-03-16 01:25:07
 @@ -118,12 +118,6 @@
      // get the sizes of the entries of C, A, and B
      //--------------------------------------------------------------------------
@@ -2164,8 +2265,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_add.c src/SuiteSparse-patche
      // convert/sort A and/or B, if needed
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_band_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_band_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_band_worker.c	2024-03-16 01:25:07
 @@ -30,14 +30,22 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Anz = (Int  *) A->nz ;
@@ -2190,8 +2291,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_band_worker.c src/SuiteSpars
      // columns outside of j1:j2 have no entries in diagonals k1:k2
      Int j1 = MAX (k1, 0) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor.c	2024-03-16 01:25:07
 @@ -698,8 +698,6 @@
      bool make_ldl = (!to_ll && L->is_ll) ;
  
@@ -2222,8 +2323,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor.c src/SuiteSpa
      size_t ex = e * ((to_xtype == CHOLMOD_COMPLEX) ? 2 : 1) ;
      size_t xs = L->xsize ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c	2024-03-16 01:25:07
 @@ -36,7 +36,9 @@
      Int  *Lp = (Int  *) L->p ;
      Int  *Li = (Int  *) L->i ;
@@ -2245,8 +2346,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_1_worker.c src
      for (Int j = 0 ; j < n ; j++)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c	2024-03-16 01:25:07
 @@ -34,7 +34,9 @@
  //------------------------------------------------------------------------------
  
@@ -2258,8 +2359,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_template.c s
      if (make_ll)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c	2024-03-16 01:25:07
 @@ -50,7 +50,9 @@
      Int  *Lp  = (Int  *) L->p ;
      Int  *Li  = (Int  *) L->i ;
@@ -2271,8 +2372,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_2_worker.c src
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c	2024-03-16 01:25:07
 @@ -100,7 +100,6 @@
      Int  *Lp  = (Int  *) L->p ;     // simplicial col pointers
      Int  *Li  = (Int  *) L->i ;     // simplicial row indices
@@ -2282,8 +2383,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_factor_3_worker.c src
      //----------------------------------------------------------------------
      // convert supernodal LL' to simplicial LL' or LDL' (packed/unpacked)
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_xdtype.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_change_xdtype.c	2024-03-16 01:25:07
 @@ -214,7 +214,7 @@
      int output_dtype = to_xdtype & 4 ;  // double or single
  
@@ -2294,8 +2395,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_change_xdtype.c src/SuiteSpa
          // output_xtype not supported
          ERROR (CHOLMOD_INVALID, "invalid xtype") ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c	2024-03-16 01:25:07
 @@ -36,9 +36,13 @@
      //--------------------------------------------------------------------------
  
@@ -2325,8 +2426,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_dense2_worker.c src/Sui
      //--------------------------------------------------------------------------
      // copy X = Y
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor.c	2024-03-16 01:25:07
 @@ -69,7 +69,6 @@
      size_t e = (L->dtype == CHOLMOD_SINGLE) ? sizeof (float) : sizeof (double) ;
      size_t ex = e * ((L->xtype == CHOLMOD_PATTERN) ? 0 :
@@ -2336,8 +2437,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor.c src/SuiteSpars
      //--------------------------------------------------------------------------
      // allocate the new factor H, H->Perm, and H->ColCount
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c	2024-03-16 01:25:07
 @@ -29,11 +29,15 @@
      Int  *Li  = (Int  *) L->i ;
      Int  *Lnz = (Int  *) L->nz ;
@@ -2355,8 +2456,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_factor_worker.c src/Sui
      //--------------------------------------------------------------------------
      // copy each column
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c	2024-03-16 01:25:07
 @@ -31,13 +31,21 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Anz = (Int  *) A->nz ;
@@ -2380,8 +2481,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_sparse_worker.c src/Sui
      //--------------------------------------------------------------------------
      // copy the contents from A to C
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_copy_worker.c	2024-03-16 01:25:07
 @@ -45,14 +45,21 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Anz = (Int  *) A->nz ;
@@ -2406,8 +2507,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_copy_worker.c src/SuiteSpars
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c	2024-03-16 01:25:07
 @@ -21,7 +21,9 @@
      //--------------------------------------------------------------------------
  
@@ -2419,8 +2520,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_nnz_worker.c src/Suite
      Int nrow = (Int) X->nrow ;
      Int ncol = (Int) X->ncol ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c	2024-03-16 01:25:07
 @@ -34,7 +34,9 @@
      //--------------------------------------------------------------------------
  
@@ -2442,8 +2543,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_dense_to_sparse_worker.c src
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_eye_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_eye_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_eye_worker.c	2024-03-16 01:25:07
 @@ -21,14 +21,18 @@
      //--------------------------------------------------------------------------
  
@@ -2464,8 +2565,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_eye_worker.c src/SuiteSparse
      for (Int k = 0 ; k < n ; k++)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_ones_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_ones_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_ones_worker.c	2024-03-16 01:25:07
 @@ -21,11 +21,15 @@
      //--------------------------------------------------------------------------
  
@@ -2483,8 +2584,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_ones_worker.c src/SuiteSpars
      for (Int k = 0 ; k < nzmax ; k++)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c	2024-03-16 01:25:07
 @@ -29,7 +29,9 @@
      Int  *Lp    = (Int  *) L->p ;
      Int  *Li    = (Int  *) L->i ;
@@ -2496,8 +2597,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_pack_factor_worker.c src/Sui
      Int  *Lnext = (Int  *) L->next ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_realloc.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_realloc.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_realloc.c	2024-03-16 01:25:07
 @@ -34,7 +34,9 @@
  
      int ok ;
@@ -2509,8 +2610,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_realloc.c src/SuiteSparse-pa
  
      p = SuiteSparse_realloc (nnew, *n, size, p, &ok) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column.c	2024-03-16 01:25:07
 @@ -84,7 +84,6 @@
      need = MAX (need, 1) ;
      double slack = MAX (Common->grow1, 1.0) * ((double) need) + Common->grow2 ;
@@ -2520,8 +2621,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column.c src/Suit
      need = MAX (need, 1) ;
      need = MIN (need, n-j) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c	2024-03-16 01:25:07
 @@ -26,7 +26,9 @@
      Int  *Lnz = (Int  *) L->nz ;
      Int  *Li  = (Int  *) L->i ;
@@ -2533,8 +2634,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_reallocate_column_worker.c s
  
      //--------------------------------------------------------------------------
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sort_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sort_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sort_worker.c	2024-03-16 01:25:07
 @@ -185,8 +185,12 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Ai  = (Int  *) A->i ;
@@ -2557,8 +2658,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sort_worker.c src/SuiteSpars
                  break ;
              }
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c	2024-03-16 01:25:07
 @@ -30,13 +30,19 @@
      //--------------------------------------------------------------------------
  
@@ -2580,8 +2681,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_dense_worker.c src
      Int nrow = (Int) A->nrow ;
      Int ncol = (Int) A->ncol ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c	2024-03-16 01:25:07
 @@ -21,19 +21,26 @@
      // get inputs
      //--------------------------------------------------------------------------
@@ -2611,8 +2712,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_sparse_to_triplet_worker.c s
      Int k = 0 ;
  
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_speye_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_speye_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_speye_worker.c	2024-03-16 01:25:07
 @@ -22,15 +22,23 @@
  
      Int  *Ap = (Int  *) A->p ;
@@ -2638,8 +2739,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_speye_worker.c src/SuiteSpar
      for (Int k = 0 ; k < n ; k++)
      {
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c	2024-03-16 01:25:07
 @@ -44,7 +44,10 @@
              #endif
              {
@@ -2665,8 +2766,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_permuted.c src
                  ASSIGN (Cx, Cz, pc, Ax, Az, pa) ;
                  Ci [pc] = inew ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c	2024-03-16 01:25:07
 @@ -40,7 +40,10 @@
              if (i > j) continue ;
              #endif
@@ -2680,8 +2781,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_unpermuted.c s
              ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, pa) ;
              Ci [pc] = j ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c	2024-03-16 01:25:07
 @@ -28,13 +28,20 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Ai  = (Int  *) A->i ;
@@ -2705,8 +2806,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_sym_worker.c src/S
      //--------------------------------------------------------------------------
      // compute pattern and values of C
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c	2024-03-16 01:25:07
 @@ -59,7 +59,10 @@
          for ( ; p < pend ; p++)
          {
@@ -2720,8 +2821,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_template.c s
              // C(j,i) = conj (A(i,j))
              ASSIGN_CONJ_OR_NCONJ (Cx, Cz, pc, Ax, Az, p) ;
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c	2024-03-16 01:25:07
 @@ -27,14 +27,21 @@
      Int  *Ap  = (Int  *) A->p ;
      Int  *Ai  = (Int  *) A->i ;
@@ -2746,8 +2847,8 @@ diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_transpose_unsym_worker.c src
      //--------------------------------------------------------------------------
      // compute the pattern and values of C
 diff -ruN src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c
---- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2024-01-10 19:08:51
-+++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2024-01-12 12:03:46
+--- src/SuiteSparse/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2024-01-24 19:45:24
++++ src/SuiteSparse-patched/CHOLMOD/Utility/t_cholmod_triplet_to_sparse_worker.c	2024-03-16 01:25:07
 @@ -25,13 +25,21 @@
      Int  *Rp  = (Int  *) R->p ;
      Int  *Ri  = (Int  *) R->i ;
