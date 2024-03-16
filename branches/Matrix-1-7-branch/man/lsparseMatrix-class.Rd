@@ -6,6 +6,7 @@
 \keyword{classes}
 %
 \alias{lsparseMatrix-class}
+\alias{lsparseMatrix-classes} % used by package 'enhancerHomologSearch'
 \alias{lgCMatrix-class}
 \alias{lgRMatrix-class}
 \alias{lgTMatrix-class}
