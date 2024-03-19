@@ -1,9 +1,5 @@
 \name{Matrix-deprecated}
 \title{Deprecated Functions in Package \pkg{Matrix}}
-%
-\keyword{internal}
-\keyword{misc}
-%
 \alias{Matrix-deprecated}
 %
 \alias{..2dge}
@@ -460,3 +456,5 @@
   \code{\link{base-deprecated}},
   \code{\link{Matrix-defunct}}
 }
+\keyword{internal}
+\keyword{misc}
