@@ -1773,14 +1773,14 @@ SEXP Schur_validate(SEXP obj)
 	if (pdim[1] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
-	SEXP Q = PROTECT(GET_SLOT(obj, Matrix_QSym));
+	SEXP Q = PROTECT(GET_SLOT(obj, install("Q")));
 	dim = GET_SLOT(Q, Matrix_DimSym);
 	pdim = INTEGER(dim);
 	UNPROTECT(1); /* Q */
 	if (pdim[0] != n || pdim[1] != n)
 		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "Q", "Dim");
 
-	SEXP T = PROTECT(GET_SLOT(obj, Matrix_TSym));
+	SEXP T = PROTECT(GET_SLOT(obj, install("T")));
 	dim = GET_SLOT(T, Matrix_DimSym);
 	pdim = INTEGER(dim);
 	UNPROTECT(1); /* T */
