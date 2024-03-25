@@ -214,8 +214,8 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(denseLU_determinant, 2),
 	CALLDEF(denseBunchKaufman_determinant, 2),
 	CALLDEF(denseCholesky_determinant, 2),
-	CALLDEF(sparseLU_determinant, 2),
 	CALLDEF(sparseQR_determinant, 2),
+	CALLDEF(sparseLU_determinant, 2),
 	CALLDEF(sparseCholesky_determinant, 3),
 
 	CALLDEF(geMatrix_norm, 2),
