@@ -10,11 +10,11 @@ setMethod("norm", c(x = "denseMatrix", type = "character"),
                   return(base::norm(.M2m(x), type = "2"))
               x <- .M2kind(x, ",")
               switch(substr(.M.nonvirtual(x), 2L, 3L),
-                     "ge" = .Call(dgeMatrix_norm, x, type),
-                     "sy" = .Call(dsyMatrix_norm, x, type),
-                     "sp" = .Call(dspMatrix_norm, x, type),
-                     "tr" = .Call(dtrMatrix_norm, x, type),
-                     "tp" = .Call(dtpMatrix_norm, x, type))
+                     "ge" = .Call(geMatrix_norm, x, type),
+                     "sy" = .Call(syMatrix_norm, x, type),
+                     "sp" = .Call(spMatrix_norm, x, type),
+                     "tr" = .Call(trMatrix_norm, x, type),
+                     "tp" = .Call(tpMatrix_norm, x, type))
           })
 
 setMethod("norm", c(x = "sparseMatrix", type = "character"),
@@ -124,7 +124,7 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                              n <- d[2L]
                              if(m == n) {
                                  trf <- lu(x, warnSing = FALSE)
-                                 .Call(dgeMatrix_rcond, x, trf, norm)
+                                 .Call(geMatrix_rcond, x, trf, norm)
                              } else {
                                  ## MJ: norm(A = P1' Q R P2') = norm(R) holds
                                  ##     in general only for norm == "2", but
@@ -141,12 +141,12 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                      "sy" =
                          {
                              trf <- BunchKaufman(x, warnSing = FALSE)
-                             .Call(dsyMatrix_rcond, x, trf, norm)
+                             .Call(syMatrix_rcond, x, trf, norm)
                          },
                      "sp" =
                          {
                              trf <- BunchKaufman(x, warnSing = FALSE)
-                             .Call(dspMatrix_rcond, x, trf, norm)
+                             .Call(spMatrix_rcond, x, trf, norm)
                          },
                      "po" = ,
                      "or" = # corMatrix
@@ -159,8 +159,8 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                                      BunchKaufman(x, warnSing = FALSE)
                                  })
                              if(ok)
-                                 .Call(dpoMatrix_rcond, x, trf, norm)
-                             else .Call(dsyMatrix_rcond, x, trf, norm)
+                                 .Call(poMatrix_rcond, x, trf, norm)
+                             else .Call(syMatrix_rcond, x, trf, norm)
                          },
                      "pp" = ,
                      "op" = # copMatrix
@@ -173,11 +173,11 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                                      BunchKaufman(x, warnSing = FALSE)
                                  })
                              if(ok)
-                                 .Call(dppMatrix_rcond, x, trf, norm)
-                             else .Call(dspMatrix_rcond, x, trf, norm)
+                                 .Call(ppMatrix_rcond, x, trf, norm)
+                             else .Call(spMatrix_rcond, x, trf, norm)
                          },
-                     "tr" = .Call(dtrMatrix_rcond, x, norm),
-                     "tp" = .Call(dtpMatrix_rcond, x, norm))
+                     "tr" = .Call(trMatrix_rcond, x, norm),
+                     "tp" = .Call(tpMatrix_rcond, x, norm))
           })
 
 setMethod("rcond", c(x = "sparseMatrix", norm = "character"),
