@@ -50,13 +50,13 @@ setMethod("determinant", c(x = "sparseQR", logarithm = "logical"),
 for(.cl in c("BunchKaufman", "pBunchKaufman"))
 setMethod("determinant", c(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(BunchKaufman_determinant, x, logarithm))
+              .Call(denseBunchKaufman_determinant, x, logarithm))
 rm(.cl)
 
 for(.cl in c("Cholesky", "pCholesky"))
 setMethod("determinant", c(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .Call(Cholesky_determinant, x, logarithm))
+              .Call(denseCholesky_determinant, x, logarithm))
 rm(.cl)
 
 setMethod("determinant", c(x = "CHMfactor", logarithm = "logical"),
@@ -77,7 +77,7 @@ setMethod("determinant", c(x = "CHMfactor", logarithm = "logical"),
                               domain = NA)
                   }
               }
-              .Call(CHMfactor_determinant, x, logarithm, sqrt)
+              .Call(sparseCholesky_determinant, x, logarithm, sqrt)
           })
 
 
