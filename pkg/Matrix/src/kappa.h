@@ -3,18 +3,18 @@
 
 #include <Rinternals.h>
 
-SEXP dgeMatrix_norm(SEXP, SEXP);
-SEXP dsyMatrix_norm(SEXP, SEXP);
-SEXP dspMatrix_norm(SEXP, SEXP);
-SEXP dtrMatrix_norm(SEXP, SEXP);
-SEXP dtpMatrix_norm(SEXP, SEXP);
+SEXP geMatrix_norm(SEXP, SEXP);
+SEXP syMatrix_norm(SEXP, SEXP);
+SEXP spMatrix_norm(SEXP, SEXP);
+SEXP trMatrix_norm(SEXP, SEXP);
+SEXP tpMatrix_norm(SEXP, SEXP);
 
-SEXP dgeMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP dsyMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP dspMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP dpoMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP dppMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP dtrMatrix_rcond(SEXP, SEXP);
-SEXP dtpMatrix_rcond(SEXP, SEXP);
+SEXP geMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP syMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP spMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP poMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP ppMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP trMatrix_rcond(SEXP, SEXP);
+SEXP tpMatrix_rcond(SEXP, SEXP);
 
 #endif /* MATRIX_KAPPA_H */

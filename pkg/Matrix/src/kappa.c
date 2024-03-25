@@ -80,7 +80,7 @@ char La_rcond_type(SEXP s)
 #undef ARGNAME
 }
 
-SEXP dgeMatrix_norm(SEXP obj, SEXP type)
+SEXP geMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
 
@@ -93,12 +93,10 @@ SEXP dgeMatrix_norm(SEXP obj, SEXP type)
 	double norm, *work = NULL;
 	if (t == 'I')
 		work = (double *) R_alloc((size_t) m, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
 	F77_CALL(zlange)(&t, &m, &n, COMPLEX(x), &m, work FCONE);
 	else
-#endif
 	norm =
 	F77_CALL(dlange)(&t, &m, &n,    REAL(x), &m, work FCONE);
 	UNPROTECT(1); /* x */
@@ -106,7 +104,7 @@ SEXP dgeMatrix_norm(SEXP obj, SEXP type)
 	return ScalarReal(norm);
 }
 
-SEXP dsyMatrix_norm(SEXP obj, SEXP type)
+SEXP syMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
 
@@ -122,12 +120,17 @@ SEXP dsyMatrix_norm(SEXP obj, SEXP type)
 	double norm, *work = NULL;
 	if (t == 'O' || t == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
-	if (TYPEOF(x) == CPLXSXP)
+	if (TYPEOF(x) == CPLXSXP) {
+	SEXP herm = GET_SLOT(obj, Matrix_hermSym);
+	int he = LOGICAL(herm)[0] != 0;
+	if (he)
+	norm =
+	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	else
 	norm =
 	F77_CALL(zlansy)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	}
 	else
-#endif
 	norm =
 	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	UNPROTECT(1); /* x */
@@ -135,7 +138,7 @@ SEXP dsyMatrix_norm(SEXP obj, SEXP type)
 	return ScalarReal(norm);
 }
 
-SEXP dspMatrix_norm(SEXP obj, SEXP type)
+SEXP spMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
 
@@ -151,12 +154,17 @@ SEXP dspMatrix_norm(SEXP obj, SEXP type)
 	double norm, *work = NULL;
 	if (t == 'O' || t == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
-	if (TYPEOF(x) == CPLXSXP)
+	if (TYPEOF(x) == CPLXSXP) {
+	SEXP herm = GET_SLOT(obj, Matrix_hermSym);
+	int he = LOGICAL(herm)[0] != 0;
+	if (he)
+	norm =
+	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	else
 	norm =
 	F77_CALL(zlansp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	}
 	else
-#endif
 	norm =
 	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
 	UNPROTECT(1); /* x */
@@ -164,7 +172,7 @@ SEXP dspMatrix_norm(SEXP obj, SEXP type)
 	return ScalarReal(norm);
 }
 
-SEXP dtrMatrix_norm(SEXP obj, SEXP type)
+SEXP trMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
 
@@ -183,12 +191,10 @@ SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 	double norm, *work = NULL;
 	if (t == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
 	F77_CALL(zlantr)(&t, &ul, &di, &n, &n, COMPLEX(x), &n, work FCONE FCONE FCONE);
 	else
-#endif
 	norm =
 	F77_CALL(dlantr)(&t, &ul, &di, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
@@ -196,7 +202,7 @@ SEXP dtrMatrix_norm(SEXP obj, SEXP type)
 	return ScalarReal(norm);
 }
 
-SEXP dtpMatrix_norm(SEXP obj, SEXP type)
+SEXP tpMatrix_norm(SEXP obj, SEXP type)
 {
 	char t = La_norm_type(type);
 
@@ -215,12 +221,10 @@ SEXP dtpMatrix_norm(SEXP obj, SEXP type)
 	double norm, *work = NULL;
 	if (t == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
 	F77_CALL(zlantp)(&t, &ul, &di, &n, COMPLEX(x), work FCONE FCONE FCONE);
 	else
-#endif
 	norm =
 	F77_CALL(dlantp)(&t, &ul, &di, &n,    REAL(x), work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
@@ -228,7 +232,7 @@ SEXP dtpMatrix_norm(SEXP obj, SEXP type)
 	return ScalarReal(norm);
 }
 
-SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP geMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -244,7 +248,6 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	double norm, rcond;
 	int info;
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double *rwork = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	norm =
@@ -252,21 +255,18 @@ SEXP dgeMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	F77_CALL(zgecon)(&t, &n,     COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-#endif
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
 	F77_CALL(dlange)(&t, &n, &n,    REAL(x), &n, work FCONE);
 	F77_CALL(dgecon)(&t, &n,        REAL(y), &n, &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(2); /* x, y */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP syMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -283,30 +283,35 @@ SEXP dsyMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 		pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
 	double norm, rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+	SEXP herm = GET_SLOT(obj, Matrix_hermSym);
+	int he = LOGICAL(herm)[0] != 0;
+	if (he) {
+	norm =
+	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zhecon)(    &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
+	                 (Rcomplex *) work,        &info FCONE);
+	} else {
 	norm =
 	F77_CALL(zlansy)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	F77_CALL(zsycon)(    &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
+	}
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
 	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	F77_CALL(dsycon)(    &ul, &n,    REAL(y), &n, INTEGER(pivot), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(3); /* x, y, pivot */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP spMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -323,30 +328,35 @@ SEXP dspMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 		pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
 	double norm, rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+	SEXP herm = GET_SLOT(obj, Matrix_hermSym);
+	int he = LOGICAL(herm)[0] != 0;
+	if (he) {
+	norm =
+	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zhpcon)(    &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
+	                 (Rcomplex *) work,        &info FCONE);
+	} else {
 	norm =
 	F77_CALL(zlansp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	F77_CALL(zspcon)(    &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
+	}
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
 	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
 	F77_CALL(dspcon)(    &ul, &n,    REAL(y), INTEGER(pivot), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(3); /* x, y, pivot */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP poMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -362,7 +372,6 @@ SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
@@ -371,22 +380,19 @@ SEXP dpoMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	F77_CALL(zpocon)(    &ul, &n, COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
 	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	F77_CALL(dpocon)(    &ul, &n, REAL(y), &n, &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(2); /* x, y */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP ppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -402,7 +408,6 @@ SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
@@ -411,22 +416,19 @@ SEXP dppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	F77_CALL(zppcon)(    &ul, &n, COMPLEX(y), &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
 	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
 	F77_CALL(dppcon)(    &ul, &n,    REAL(y), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(2); /* x, y */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
+SEXP trMatrix_rcond(SEXP obj, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -444,27 +446,23 @@ SEXP dtrMatrix_rcond(SEXP obj, SEXP type)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	double rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
 	F77_CALL(ztrcon)(&t, &ul, &di, &n, COMPLEX(x), &n, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	F77_CALL(dtrcon)(&t, &ul, &di, &n,    REAL(x), &n, &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(rcond);
 }
 
-SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
+SEXP tpMatrix_rcond(SEXP obj, SEXP type)
 {
 	char t = La_rcond_type(type);
 
@@ -482,21 +480,17 @@ SEXP dtpMatrix_rcond(SEXP obj, SEXP type)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	double rcond;
 	int info;
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
 	F77_CALL(ztpcon)(&t, &ul, &di, &n, COMPLEX(x), &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
-#endif
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	F77_CALL(dtpcon)(&t, &ul, &di, &n,    REAL(x), &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
-#ifdef MATRIX_ENABLE_ZMATRIX
 	}
-#endif
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(rcond);
