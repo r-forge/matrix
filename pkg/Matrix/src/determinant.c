@@ -233,67 +233,6 @@ SEXP denseCholesky_determinant(SEXP obj, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
-{
-	DETERMINANT_START;
-
-	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
-		x = PROTECT(GET_SLOT(U, Matrix_xSym));
-	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
-
-	if (n > 0) {
-	SEXP p = PROTECT(GET_SLOT(U, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(U, Matrix_iSym));
-	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
-	if (TYPEOF(x) == CPLXSXP) {
-		Rcomplex *px = COMPLEX(x);
-		for (j = 0; j < n; ++j) {
-			kend = pp[j];
-			if (k < kend && pi[kend - 1] == j)
-				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
-			else {
-				UNPROTECT(4); /* i, p, x, U */
-				return mkDet(R_NegInf, givelog, 1);
-			}
-			k = kend;
-		}
-	} else {
-		double *px = REAL(x);
-		for (j = 0; j < n; ++j) {
-			kend = pp[j];
-			if (k < kend && pi[kend - 1] == j) {
-				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)
-					modulus += log(px[kend - 1]);
-				else {
-					modulus += log(-px[kend - 1]);
-					sign = -sign;
-				}
-			} else {
-				UNPROTECT(4); /* i, p, x, U */
-				return mkDet(R_NegInf, givelog, 1);
-			}
-			k = kend;
-		}
-	}
-	UNPROTECT(2); /* i, p */
-
-	if (TYPEOF(x) != CPLXSXP) {
-	/* defined in ./perm.c : */
-	int signPerm(const int *, int, int);
-
-	p = GET_SLOT(obj, Matrix_pSym);
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-		sign = -sign;
-	p = GET_SLOT(obj, Matrix_qSym);
-	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
-		sign = -sign;
-	}
-	}
-
-	UNPROTECT(2); /* x, U */
-	return mkDet(modulus, givelog, sign);
-}
-
 SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 {
 	DETERMINANT_START;
@@ -362,6 +301,67 @@ SEXP sparseQR_determinant(SEXP obj, SEXP logarithm)
 	}
 
 	UNPROTECT(2); /* x, R */
+	return mkDet(modulus, givelog, sign);
+}
+
+SEXP sparseLU_determinant(SEXP obj, SEXP logarithm)
+{
+	DETERMINANT_START;
+
+	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym)),
+		x = PROTECT(GET_SLOT(U, Matrix_xSym));
+	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
+
+	if (n > 0) {
+	SEXP p = PROTECT(GET_SLOT(U, Matrix_pSym)),
+		i = PROTECT(GET_SLOT(U, Matrix_iSym));
+	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *px = COMPLEX(x);
+		for (j = 0; j < n; ++j) {
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j)
+				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
+			else {
+				UNPROTECT(4); /* i, p, x, U */
+				return mkDet(R_NegInf, givelog, 1);
+			}
+			k = kend;
+		}
+	} else {
+		double *px = REAL(x);
+		for (j = 0; j < n; ++j) {
+			kend = pp[j];
+			if (k < kend && pi[kend - 1] == j) {
+				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)
+					modulus += log(px[kend - 1]);
+				else {
+					modulus += log(-px[kend - 1]);
+					sign = -sign;
+				}
+			} else {
+				UNPROTECT(4); /* i, p, x, U */
+				return mkDet(R_NegInf, givelog, 1);
+			}
+			k = kend;
+		}
+	}
+	UNPROTECT(2); /* i, p */
+
+	if (TYPEOF(x) != CPLXSXP) {
+	/* defined in ./perm.c : */
+	int signPerm(const int *, int, int);
+
+	p = GET_SLOT(obj, Matrix_pSym);
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+		sign = -sign;
+	p = GET_SLOT(obj, Matrix_qSym);
+	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
+		sign = -sign;
+	}
+	}
+
+	UNPROTECT(2); /* x, U */
 	return mkDet(modulus, givelog, sign);
 }
 
