@@ -2588,7 +2588,8 @@ SEXP R_sparse_is_triangular(SEXP obj, SEXP upper)
 		static
 		SEXP kindSym = NULL;
 		SEXP kindVal = PROTECT(mkString((ans_ > 0) ? "U" : "L"));
-		if (!kindSym) kindSym = install("kind");
+		if (!kindSym)
+			kindSym = install("kind");
 		setAttrib(ans, kindSym, kindVal);
 		UNPROTECT(2);
 	}
