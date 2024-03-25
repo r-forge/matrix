@@ -168,8 +168,8 @@ SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
 	PROTECT(val);
 	R_xlen_t n = XLENGTH(x);
 	SEXP y = PROTECT(allocVector(VECSXP, n + 1)),
-	ny = PROTECT(allocVector(STRSXP, n + 1)),
-	nval = PROTECT(mkChar(nm));
+		ny = PROTECT(allocVector(STRSXP, n + 1)),
+		nval = PROTECT(mkChar(nm));
 	if (n > 0) {
 		SEXP nx = PROTECT(getAttrib(x, R_NamesSymbol));
 		R_xlen_t i;
