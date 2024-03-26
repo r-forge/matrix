@@ -34,19 +34,19 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-transpose2(_CTYPE_ *, const _CTYPE_ *, int, int)
+trans2(_CTYPE_ *, const _CTYPE_ *, int, int, int)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-transpose1(_CTYPE_ *, const _CTYPE_ *, int, char)
+trans1(_CTYPE_ *, const _CTYPE_ *, int, char, int)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-syforce2(_CTYPE_ *, int, char)
+syforce2(_CTYPE_ *, int, char, int)
 IDZ
 #undef TEMPLATE
 
@@ -70,15 +70,20 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcpy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
+dcopy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-dcpy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
+dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
 IDZ
 #undef TEMPLATE
+
+void zdreal2(Rcomplex *, int);
+void zdreal1(Rcomplex *, int, char);
+
+void zvconj(Rcomplex *, const Rcomplex *, R_xlen_t);
 
 #undef IDZ
 
