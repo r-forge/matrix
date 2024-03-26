@@ -78,12 +78,14 @@
 .sparse2dense(from, packed = FALSE)
 .diag2dense(from, kind = ".", shape = "t", packed = FALSE, uplo = "U")
 .ind2dense(from, kind = "n")
-.m2dense(from, class = ".ge", uplo = "U", diag = "N", trans = FALSE)
+.m2dense(from, class = ".ge", uplo = "U", trans = "C", diag = "N",
+         margin = 2L)
 
 .dense2sparse(from, repr = "C")
 .diag2sparse(from, kind = ".", shape = "t", repr = "C", uplo = "U")
 .ind2sparse(from, kind = "n", repr = ".")
-.m2sparse(from, class = ".gC", uplo = "U", diag = "N", trans = FALSE)
+.m2sparse(from, class = ".gC", uplo = "U", trans = "C", diag = "N",
+          margin = 2L)
 
 .tCRT(x, lazy = TRUE)
 
@@ -130,13 +132,16 @@
     the result (if symmetric or triangular) should store the upper or
     lower triangle of \code{from}.  The elements of \code{from} in the
     opposite triangle are ignored.}
+  \item{trans}{a string (\code{"C"} or \code{"T"}) indicating whether
+    the result (if symmetric) should formally equal its conjugate
+    transpose or transpose.  It matters only in the complex case.}
   \item{diag}{a string (\code{"N"} or \code{"U"}) indicating whether
     the result (if triangular) should be formally nonunit or unit
     triangular.  In the unit triangular case, the diagonal elements
     of \code{from} are ignored.}
-  \item{trans}{a logical indicating if the result should be a 1-row
-    matrix rather than a 1-column matrix where \code{from} is a vector
-    but not a matrix.}
+  \item{margin}{an integer (1 or 2) indicating if the result should
+    be a 1-row matrix or a 1-column matrix in the case where \code{from}
+    is a vector but not a matrix.}
   \item{class}{a string whose first three characters specify the class
     of the result.  It should match the pattern
     \code{"^[.nld](ge|sy|tr|sp|tp)"} for \code{.m2dense} and
@@ -248,8 +253,8 @@ C. <- new("dgCMatrix", Dim = c(3L, 4L),
           p = c(0L, 1L, 1L, 1L, 3L), i = c(1L, 0L, 2L), x = c(-8, 2, 3))
 
 stopifnot(exprs = {
-    identical(.M2tri (D.), as(D., "triangularMatrix"))
     identical(.M2sym (D.), as(D.,  "symmetricMatrix"))
+    identical(.M2tri (D.), as(D., "triangularMatrix"))
     identical(.M2diag(D.), as(D.,   "diagonalMatrix"))
     identical(.M2kind(C., "l"),
               as(C., "lMatrix"))
@@ -260,9 +265,9 @@ stopifnot(exprs = {
     identical(.M2gen(.diag2dense(D.0, ".", "s", FALSE)),
               .sparse2dense(.M2gen(.diag2sparse(D.0, ".", "s", "T"))))
     identical(S.,
-              .M2m(.m2sparse(S., ".sR")))
+              .M2m(.m2sparse(S., ".sR", uplo = "U", trans = "C")))
     identical(S. * lower.tri(S.) + diag(1, 6L),
-              .M2m(.m2dense (S., ".tr", "L", "U")))
+              .M2m(.m2dense (S., ".tr", uplo = "L", diag = "U")))
     identical(.M2R(C.), .M2R(.M2T(C.)))
     identical(.tCRT(C.), .M2R(t(C.)))
 })

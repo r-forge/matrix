@@ -190,8 +190,10 @@ rm(.cl, .uM.subclasses)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .m.pack <- .uM.pack.ge
-body(.m.pack)[[2L]][[3L]]             <-  quote(.m2dense(x, ".sp",  "U"))
-body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-  quote(.m2dense(x, ".tp", uplo))
+body(.m.pack)[[2L]][[3L]] <-
+    quote(.m2dense(x, ".sp", uplo = "U", trans = "C"))
+body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-
+    quote(.m2dense(x, ".tp", uplo = uplo, diag = "N"))
 
 setMethod("unpack", c(x = "matrix"),
           function(x, ...) .m2dense.checking(x, "."))
@@ -200,9 +202,9 @@ setMethod("band", c(x = "matrix"), .dense.band)
 setMethod("triu", c(x = "matrix"), .dense.triu)
 setMethod("tril", c(x = "matrix"), .dense.tril)
 setMethod("forceSymmetric", c(x = "matrix", uplo = "missing"),
-          function(x, uplo) .m2dense(x, ".sy",  "U"))
+          function(x, uplo) .m2dense(x, ".sy", uplo = "U", trans = "C"))
 setMethod("forceSymmetric", c(x = "matrix", uplo = "character"),
-          function(x, uplo) .m2dense(x, ".sy", uplo))
+          function(x, uplo) .m2dense(x, ".sy", uplo = uplo, trans = "C"))
 setMethod("symmpart", c(x = "matrix"),
           function(x) symmetrizeDN(0.5 * (x + t(x))))
 setMethod("skewpart", c(x = "matrix"),

@@ -481,7 +481,7 @@ void coerceArgs(SEXP args, int margin,
 				}
 				scl_[1] = 'g';
 				scl_[2] = repr;
-				REPROTECT(s = matrix_as_sparse(s, scl_, '\0', '\0', !margin), pid);
+				REPROTECT(s = matrix_as_sparse(s, scl_, '\0', '\0', '\0', margin), pid);
 			}
 		}
 		SETCAR(a, s);

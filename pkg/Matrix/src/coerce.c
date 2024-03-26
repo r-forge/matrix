@@ -3,7 +3,7 @@
 #include "idz.h"
 #include "coerce.h"
 
-SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
+SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char tc, char di,
                      int m, int n, int byrow, SEXP dimnames)
 {
 	SEXPTYPE tf = TYPEOF(from);
@@ -44,6 +44,12 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 	if (cl[1] != 'g' && ul != 'U') {
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1);
+	}
+
+	if (cl[1] == 's' && tc != 'C' && cl[0] == 'z') {
+		SEXP trans = PROTECT(mkString("T"));
+		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1);
 	}
 
@@ -161,7 +167,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 	return to;
 }
 
-SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
+SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP trans, SEXP diag,
                        SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
 {
 	switch (TYPEOF(from)) {
@@ -186,12 +192,18 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "denseMatrix");
 
-	char ul = 'U', di = 'N';
+	char ul = 'U', tc = 'C', di = 'N';
 	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz_[1] == 's') {
+		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+		    ((tc = *CHAR(trans)) != 'C' && di != 'T'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
@@ -291,11 +303,11 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		        m_, n_, (long long) vlen_);
 
 	return
-	vector_as_dense(from, zzz_, ul, di, m_, n_, byrow_, dimnames);
+	vector_as_dense(from, zzz_, ul, tc, di, m_, n_, byrow_, dimnames);
 }
 
-SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
-                     int trans, int new)
+SEXP matrix_as_dense(SEXP from, const char *zzz,
+                     char ul, char tc, char di, int mg, int new)
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
@@ -341,7 +353,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 			error(_("dimensions cannot exceed %s"), "2^31-1");
 		dim = GET_SLOT(to, Matrix_DimSym);
 		pdim = INTEGER(dim);
-		if (trans) {
+		if (mg == 0) {
 			pdim[0] = m = 1;
 			pdim[1] = n = (int) mn;
 		} else {
@@ -355,7 +367,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 		if (doDN) {
 			PROTECT(dimnames = allocVector(VECSXP, 2));
 			++nprotect;
-			SET_VECTOR_ELT(dimnames, trans ? 1 : 0, nms);
+			SET_VECTOR_ELT(dimnames, (mg == 0) ? 1 : 0, nms);
 		}
 
 	}
@@ -374,13 +386,19 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 	if (cl[1] != 'g' && ul != 'U') {
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
+		UNPROTECT(1);
+	}
+
+	if (cl[1] == 's' && tc != 'C' && cl[0] == 'z') {
+		SEXP trans = PROTECT(mkString("T"));
+		SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1);
 	}
 
 	if (cl[1] == 't' && di != 'N') {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
+		UNPROTECT(1);
 	}
 
 	SEXP x;
@@ -451,8 +469,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix>, ".(ge|sy|sp|tr|tp)Matrix") */
-SEXP R_matrix_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
-                       SEXP trans)
+SEXP R_matrix_as_dense(SEXP from, SEXP zzz,
+                       SEXP uplo, SEXP trans, SEXP diag, SEXP margin)
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
@@ -476,12 +494,18 @@ SEXP R_matrix_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "denseMatrix");
 
-	char ul = 'U', di = 'N';
+	char ul = 'U', tc = 'C', di = 'N';
 	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz_[1] == 's') {
+		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+		    ((tc = *CHAR(trans)) != 'C' && di != 'T'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
@@ -490,12 +514,12 @@ SEXP R_matrix_as_dense(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
-	int trans_;
-	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
-	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
+	int mg = 2;
+	if (TYPEOF(margin) != INTSXP || LENGTH(margin) < 1 ||
+	    ((mg = INTEGER(margin)[0]) != 1 && mg != 2))
+		error(_("'%s' must be %d or %d"), "margin", 1, 2);
 
-	return matrix_as_dense(from, zzz_, ul, di, trans_, 1);
+	return matrix_as_dense(from, zzz_, ul, tc, di, mg - 1, 1);
 }
 
 SEXP sparse_as_dense(SEXP from, const char *class, int packed)
@@ -1017,7 +1041,7 @@ SEXP R_index_as_dense(SEXP from, SEXP kind)
 	return index_as_dense(from, valid[ivalid], kind_);
 }
 
-SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
+SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char tc, char di,
                       int m, int n, int byrow, SEXP dimnames)
 {
 	SEXP length0 = GET_SLOT(from, Matrix_lengthSym);
@@ -1066,6 +1090,12 @@ SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
+	}
+
+	if (cl[1] == 's' && tc != 'C' && cl[0] == 'z') {
+		SEXP trans = PROTECT(mkString("T"));
+		SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1);
 	}
 
 	if (cl[1] == 't' && di != 'N') {
@@ -1450,7 +1480,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz, char ul, char di,
 	return to;
 }
 
-SEXP R_vector_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
+SEXP R_vector_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP trans, SEXP diag,
                         SEXP m, SEXP n, SEXP byrow, SEXP dimnames)
 {
 	static const char *valid[] = { VALID_NONVIRTUAL_VECTOR, "" };
@@ -1467,12 +1497,18 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
-	char ul = 'U', di = 'N';
+	char ul = 'U', tc = 'C', di = 'N';
 	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz_[1] == 's') {
+		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+		    ((tc = *CHAR(trans)) != 'C' && di != 'T'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
@@ -1574,11 +1610,11 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		        m_, n_, (long long) vlen_);
 
 	return
-	vector_as_sparse(from, zzz_, ul, di, m_, n_, byrow_, dimnames);
+	vector_as_sparse(from, zzz_, ul, tc, di, m_, n_, byrow_, dimnames);
 }
 
-SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
-                      int trans)
+SEXP matrix_as_sparse(SEXP from, const char *zzz,
+                      char ul, char tc, char di, int mg)
 {
 	char cl[] = "...Matrix";
 	cl[0] = typeToKind(TYPEOF(from));
@@ -1590,7 +1626,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 #endif
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
-	REPROTECT(from = matrix_as_dense(from, cl, ul, di, trans, 0), pid);
+	REPROTECT(from = matrix_as_dense(from, cl, ul, tc, di, mg, 0), pid);
 	REPROTECT(from = dense_as_sparse(from, cl, zzz[2]), pid);
 	cl[2] = zzz[2];
 	REPROTECT(from = sparse_as_kind(from, cl, zzz[0]), pid);
@@ -1599,8 +1635,8 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz, char ul, char di,
 }
 
 /* as(<matrix>, ".[gst][CRT]Matrix") */
-SEXP R_matrix_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
-                        SEXP trans)
+SEXP R_matrix_as_sparse(SEXP from, SEXP zzz,
+                        SEXP uplo, SEXP trans, SEXP diag, SEXP margin)
 {
 	switch (TYPEOF(from)) {
 	case LGLSXP:
@@ -1622,12 +1658,18 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
-	char ul = 'U', di = 'N';
+	char ul = 'U', tc = 'C', di = 'N';
 	if (zzz_[1] != 'g') {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
 			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+	}
+	if (zzz_[1] == 's') {
+		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+		    ((tc = *CHAR(trans)) != 'C' && di != 'T'))
+			error(_("'%s' must be \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 	if (zzz_[1] == 't') {
 		if (TYPEOF(diag) != STRSXP || LENGTH(diag) < 1 ||
@@ -1636,12 +1678,12 @@ SEXP R_matrix_as_sparse(SEXP from, SEXP zzz, SEXP uplo, SEXP diag,
 			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 	}
 
-	int trans_;
-	if (TYPEOF(trans) != LGLSXP || LENGTH(trans) < 1 ||
-	    (trans_ = LOGICAL(trans)[0]) == NA_LOGICAL)
-		error(_("'%s' must be %s or %s"), "trans", "TRUE", "FALSE");
+	int mg = 2;
+	if (TYPEOF(margin) != INTSXP || LENGTH(margin) < 1 ||
+	    ((mg = INTEGER(margin)[0]) != 1 && mg != 2))
+		error(_("'%s' must be %d or %d"), "margin", 1, 2);
 
-	return matrix_as_sparse(from, zzz_, ul, di, trans_);
+	return matrix_as_sparse(from, zzz_, ul, tc, di, mg - 1);
 }
 
 SEXP dense_as_sparse(SEXP from, const char *class, char repr)

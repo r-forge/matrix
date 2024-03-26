@@ -78,9 +78,9 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .ind2sparse <- function(from, kind = "n", repr = ".")
     .Call(R_index_as_sparse, from, kind, repr)
 
-.m2dense <- function(from, class = ".ge", uplo = "U", diag = "N",
-                     trans = FALSE)
-    .Call(R_matrix_as_dense, from, class, uplo, diag, trans)
+.m2dense <- function(from, class = ".ge",
+                     uplo = "U", trans = "C", diag = "N", margin = 2L)
+    .Call(R_matrix_as_dense, from, class, uplo, trans, diag, margin)
 
 .m2dense.checking <- function(from, kind = ".", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
@@ -98,16 +98,18 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             from[is.na(from)] <- TRUE
     }
     if(isSymmetric(from, ...))
-        .m2dense(from, paste0(kind, "sy"), "U", NULL)
+        .m2dense(from, paste0(kind, "sy"),
+                 uplo = "U", trans = "C")
     else if(it <- isTriangular(from))
-        .m2dense(from, paste0(kind, "tr"), attr(it, "kind"), "N")
+        .m2dense(from, paste0(kind, "tr"),
+                 uplo = attr(it, "kind"), diag = "N")
     else
-        .m2dense(from, paste0(kind, "ge"), NULL, NULL)
+        .m2dense(from, paste0(kind, "ge"))
 }
 
-.m2sparse <- function(from, class = ".gC", uplo = "U", diag = "N",
-                      trans = FALSE)
-    .Call(R_matrix_as_sparse, from, class, uplo, diag, trans)
+.m2sparse <- function(from, class = ".gC",
+                      uplo = "U", trans = "C", diag = "N", margin = 2L)
+    .Call(R_matrix_as_sparse, from, class, uplo, trans, diag, margin)
 
 .m2sparse.checking <- function(from, kind = ".", repr = "C", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
@@ -125,11 +127,13 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
             from[is.na(from)] <- TRUE
     }
     if(isSymmetric(from, ...))
-        .m2sparse(from, paste0(kind, "s", repr), "U", NULL)
+        .m2sparse(from, paste0(kind, "s", repr),
+                  uplo = "U", trans = "C")
     else if(it <- isTriangular(from))
-        .m2sparse(from, paste0(kind, "t", repr), attr(it, "kind"), "N")
+        .m2sparse(from, paste0(kind, "t", repr),
+                  uplo = attr(it, "kind"), diag = "N")
     else
-        .m2sparse(from, paste0(kind, "g", repr), NULL, NULL)
+        .m2sparse(from, paste0(kind, "g", repr))
 }
 
 .V2kind <- function(from, kind = ".") {

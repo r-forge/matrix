@@ -1270,8 +1270,8 @@ setMethod("Arith", c(e1 = "dsCMatrix", e2 = "dsCMatrix"),
                e1@x[ii[[1]]] ^ e2@x[ii[[2]]] ## 3)
            r[Yis0] <- 1                      ## 1)
            if(triangular)
-               .m2dense(r, "dtr", e1@uplo, "N")
-           else .m2dense(r, "dge", NULL, NULL)
+               .m2dense(r, "dtr", uplo = e1@uplo, diag = "N")
+           else .m2dense(r, "dge")
        },
 
        "%%" = , "%/%" = , "/" = ## 0 op 0	 |-> NaN => dense
@@ -1384,9 +1384,9 @@ A.M.n <- function(e1, e2) {
             r[] <- f0
             r[non0ind(e1, getClassDef("dgCMatrix")) + 1L] <-
                 callGeneric(e1@x, e2)
-            .m2dense(r, "dge", NULL, NULL)
+            .m2dense(r, "dge")
         } else {
-            .m2dense(callGeneric(r, e2), "dge", NULL, NULL)
+            .m2dense(callGeneric(r, e2), "dge")
         }
     }
 }
@@ -1426,9 +1426,9 @@ A.n.M <- function(e1, e2) {
             r[] <- f0
             r[non0ind(e2, getClassDef("dgCMatrix")) + 1L] <-
                 callGeneric(e1, e2@x)
-            .m2dense(r, "dge", NULL, NULL)
+            .m2dense(r, "dge")
         } else {
-            .m2dense(callGeneric(e1, r), "dge", NULL, NULL)
+            .m2dense(callGeneric(e1, r), "dge")
         }
     }
 }

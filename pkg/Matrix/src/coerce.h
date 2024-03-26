@@ -3,11 +3,11 @@
 
 #include <Rinternals.h>
 
-SEXP vector_as_dense(SEXP, const char *, char, char, int, int, int, SEXP);
-SEXP R_vector_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP vector_as_dense(SEXP, const char *, char, char, char, int, int, int, SEXP);
+SEXP R_vector_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
-SEXP matrix_as_dense(SEXP, const char *, char, char, int, int);
-SEXP R_matrix_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP matrix_as_dense(SEXP, const char *, char, char, char, int, int);
+SEXP R_matrix_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP sparse_as_dense(SEXP, const char *, int);
 SEXP R_sparse_as_dense(SEXP, SEXP);
@@ -18,11 +18,11 @@ SEXP R_diagonal_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP index_as_dense(SEXP, const char *, char);
 SEXP R_index_as_dense(SEXP, SEXP);
 
-SEXP vector_as_sparse(SEXP, const char *, char, char, int, int, int, SEXP);
-SEXP R_vector_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP vector_as_sparse(SEXP, const char *, char, char, char, int, int, int, SEXP);
+SEXP R_vector_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
-SEXP matrix_as_sparse(SEXP, const char *, char, char, int);
-SEXP R_matrix_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP matrix_as_sparse(SEXP, const char *, char, char, char, int);
+SEXP R_matrix_as_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP dense_as_sparse(SEXP, const char *, char);
 SEXP R_dense_as_sparse(SEXP, SEXP);
