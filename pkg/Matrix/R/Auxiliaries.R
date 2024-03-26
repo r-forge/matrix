@@ -314,9 +314,11 @@ as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
         if(packed) pack(r) else r
     }
     else if(symmetric)
-        .m2dense(x, paste0(kind, "s", if(packed) "p" else "y"), "U", NULL)
+        .m2dense(x, paste0(kind, "s", if(packed) "p" else "y"),
+                 uplo = "U", trans = "C")
     else if(triangular)
-        .m2dense(x, paste0(kind, "t", if(packed) "p" else "r"), attr(it, "kind"), "N")
+        .m2dense(x, paste0(kind, "t", if(packed) "p" else "r"),
+                 uplo = attr(it, "kind"), diag = "N")
     else .m2dense(x, paste0(kind, "ge"))
 }
 
@@ -341,9 +343,11 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
         .M2C(r)
     }
     else if(symmetric)
-        .m2sparse(x, paste0(kind, "sC"), "U", NULL)
+        .m2sparse(x, paste0(kind, "sC"),
+                  uplo = "U", trans = "C")
     else if(triangular)
-        .m2sparse(x, paste0(kind, "tC"), attr(it, "kind"), "N")
+        .m2sparse(x, paste0(kind, "tC"),
+                  uplo = attr(it, "kind"), diag = "N")
     else .m2sparse(x, paste0(kind, "gC"))
 }
 

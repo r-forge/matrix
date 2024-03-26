@@ -260,7 +260,7 @@ setMethod("%*%", c(x = "vector", y = "indMatrix"),
               k <- (d <- y@Dim)[1L]
               r <-
               if(k == length(x))
-                  .m2dense(x[y@perm], ",ge", trans = TRUE)
+                  .m2dense(x[y@perm], ",ge", margin = 1L)
               else if(k == 1L)
                   .m2dense(matrix(x, length(x), d[2L]), ",ge")
               else stop("non-conformable arguments")
@@ -361,7 +361,7 @@ setMethod("%*%", c(x = "pMatrix", y = "vector"),
                   .m2dense(y[perm], ",ge")
               }
               else if(k == 1L)
-                  .m2dense(y, ",ge", trans = TRUE)
+                  .m2dense(y, ",ge", margin = 1L)
               else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -373,7 +373,7 @@ setMethod("%*%", c(x = "vector", y = "pMatrix"),
               r <-
               if(k == length(x)) {
                   perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-                  .m2dense(x[perm], ",ge", trans = TRUE)
+                  .m2dense(x[perm], ",ge", margin = 1L)
               }
               else if(k == 1L)
                   .m2dense(x, ",ge")
@@ -417,7 +417,7 @@ setMethod("%*%", c(x = .cl, y = "sparseVector"),
 setMethod("%*%", c(x = "sparseVector", y = "vector"),
           function(x, y)
               if((nx <- length(x)) == 1L)
-                  .m2dense(.V2v(x * y), ",ge", trans = TRUE)
+                  .m2dense(.V2v(x * y), ",ge", margin = 1L)
               else if(nx == length(y))
            ## else if((ny <- length(y)) == 1L)
            ##     .m2dense(.V2v(x * y), ",ge")
@@ -428,7 +428,7 @@ setMethod("%*%", c(x = "sparseVector", y = "vector"),
 setMethod("%*%", c(x = "vector", y = "sparseVector"),
           function(x, y)
               if((nx <- length(x)) == 1L)
-                  .m2dense(.V2v(x * y), ",ge", trans = TRUE)
+                  .m2dense(.V2v(x * y), ",ge", margin = 1L)
               else if(nx == length(y))
            ## else if((ny <- length(y)) == 1L)
            ##     .m2dense(.V2v(x * y), ",ge")
@@ -473,10 +473,10 @@ setMethod("%&%", c(x = "vector", y = "vector"),
           function(x, y) {
               r <-
               if((nx <- length(x)) == 1L)
-                  .m2sparse(x, "ngC") %&% .m2sparse(y, "ngR", trans = TRUE)
+                  .m2sparse(x, "ngC") %&% .m2sparse(y, "ngR", margin = 1L)
               else if(nx == length(y))
            ## else if((ny <- length(y)) == 1L || nx == ny)
-                  .m2sparse(x, "ngR", trans = TRUE) %&% .m2sparse(y, "ngC")
+                  .m2sparse(x, "ngR", margin = 1L) %&% .m2sparse(y, "ngC")
               else stop("non-conformable arguments")
               r@Dimnames <- list(NULL, NULL)
               r
@@ -696,7 +696,7 @@ setMethod("%&%", c(x = "vector", y = "indMatrix"),
               k <- (d <- y@Dim)[1L]
               r <-
               if(k == length(x))
-                  .m2dense(x[y@perm], "nge", trans = TRUE)
+                  .m2dense(x[y@perm], "nge", margin = 1L)
               else if(k == 1L)
                   .m2dense(matrix(x, length(x), d[2L]), "nge")
               else stop("non-conformable arguments")
@@ -797,7 +797,7 @@ setMethod("%&%", c(x = "pMatrix", y = "vector"),
                   .m2dense(y[perm], "nge")
               }
               else if(k == 1L)
-                  .m2dense(y, "nge", trans = TRUE)
+                  .m2dense(y, "nge", margin = 1L)
               else stop("non-conformable arguments")
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
@@ -809,7 +809,7 @@ setMethod("%&%", c(x = "vector", y = "pMatrix"),
               r <-
               if(k == length(x)) {
                   perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-                  .m2dense(x[perm], "nge", trans = TRUE)
+                  .m2dense(x[perm], "nge", margin = 1L)
               }
               else if(k == 1L)
                   .m2dense(x, "nge")
@@ -1099,7 +1099,7 @@ setMethod("crossprod", c(x = "vector", y = "indMatrix"),
               if(y@margin == 1L)
                   r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
               else {
-                  r <- .m2dense(x[y@perm], paste0(l, "ge"), trans = TRUE)
+                  r <- .m2dense(x[y@perm], paste0(l, "ge"), margin = 1L)
                   r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               }
               r
@@ -1159,7 +1159,7 @@ setMethod("crossprod", c(x = "vector", y = "pMatrix"),
                   stop("non-conformable arguments")
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               perm <- if(y@margin == 1L) invertPerm(y@perm) else y@perm
-              r <- .m2dense(x[perm], paste0(l, "ge"), trans = TRUE)
+              r <- .m2dense(x[perm], paste0(l, "ge"), margin = 1L)
               r@Dimnames <- c(list(NULL), y@Dimnames[2L])
               r
           })
@@ -1224,7 +1224,7 @@ setMethod("crossprod", c(x = "sparseVector", y = "vector"),
                   else stop("non-conformable arguments")
               } else {
                   if((nx <- length(x)) == 1L)
-                      .m2dense(.V2v(x * y), ",ge", trans = TRUE)
+                      .m2dense(.V2v(x * y), ",ge", margin = 1L)
                   else if(nx == length(y))
                       .m2dense(sum(x * y), ",ge")
                   else stop("non-conformable arguments")
@@ -1244,7 +1244,7 @@ setMethod("crossprod", c(x = "vector", y = "sparseVector"),
                   else stop("non-conformable arguments")
               } else {
                   if((nx <- length(x)) == 1L)
-                      .m2dense(.V2v(x * y), ",ge", trans = TRUE)
+                      .m2dense(.V2v(x * y), ",ge", margin = 1L)
                   else if(nx == length(y))
                       .m2dense(sum(x * y), ",ge")
                   else stop("non-conformable arguments")
@@ -1555,7 +1555,7 @@ setMethod("tcrossprod", c(x = "pMatrix", y = "vector"),
               if(x@Dim[2L] != 1L || length(y) != 1L)
                   stop("non-conformable arguments")
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
-              r <- .m2dense(y, paste0(l, "ge"), trans = TRUE)
+              r <- .m2dense(y, paste0(l, "ge"), margin = 1L)
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
               r
           })
@@ -1589,9 +1589,9 @@ setMethod("tcrossprod", c(x = "sparseVector", y = "vector"),
           function(x, y = NULL, boolArith = NA, ...) {
               r <-
               if(!is.na(boolArith) && boolArith)
-                  x %&% .m2sparse(y, "ngR", trans = TRUE)
+                  x %&% .m2sparse(y, "ngR", margin = 1L)
               else
-                  x %*% .m2dense (y, ",ge", trans = TRUE)
+                  x %*% .m2dense (y, ",ge", margin = 1L)
               r@Dimnames <- list(NULL, NULL)
               r
           })
