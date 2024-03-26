@@ -89,8 +89,8 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		char tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C') {
+		char ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C') {
 			/* defined in ./coerce.c : */
 			SEXP dense_as_general(SEXP, const char *, int);
 			PROTECT(obj = dense_as_general(obj, "zsyMatrix", 1));
@@ -156,8 +156,8 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		char tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C') {
+		char ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C') {
 			/* defined in ./coerce.c : */
 			SEXP dense_as_general(SEXP, const char *, int);
 			PROTECT(obj = dense_as_general(obj, "zspMatrix", 1));
@@ -259,7 +259,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = *CHAR(STRING_ELT(uplo, 0)), tc = 'C';
+	char ul = *CHAR(STRING_ELT(uplo, 0)), ct = 'C';
 #if MATRIX_PACKAGE_MAJOR >= 2
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
@@ -272,8 +272,8 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C')
+		ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C')
 			SET_SLOT(val, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
@@ -285,7 +285,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), tmp, *work;
 		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
 		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
-		if (tc == 'C') {
+		if (ct == 'C') {
 		F77_CALL(zhetrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
 		lwork = (int) tmp.r;
 		work = (Rcomplex *) R_alloc((size_t) lwork, sizeof(Rcomplex));
@@ -324,7 +324,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = *CHAR(STRING_ELT(uplo, 0)), tc = 'C';
+	char ul = *CHAR(STRING_ELT(uplo, 0)), ct = 'C';
 #if MATRIX_PACKAGE_MAJOR >= 2
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
@@ -337,8 +337,8 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_uploSym, uplo);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C')
+		ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C')
 			SET_SLOT(val, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
@@ -349,7 +349,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
 		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
-		if (tc == 'C') {
+		if (ct == 'C') {
 		F77_CALL(zhptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(zhptrf, info, warn, D);
 		} else {
@@ -994,8 +994,8 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		char tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C')
+		char ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C')
 			SET_SLOT(D_, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
