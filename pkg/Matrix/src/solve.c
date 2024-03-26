@@ -488,7 +488,7 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 }
 
 #define IF_COMPLEX(_IF_, _ELSE_) \
-	((MCS_XTYPE_GET() == MCS_COMPLEX) ? (_IF_) : (_ELSE_))
+	((CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? (_IF_) : (_ELSE_))
 
 SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 {
@@ -507,7 +507,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		*pap = (LENGTH(ap)) ? INTEGER(ap) : NULL,
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
 	Matrix_cs *L = M2CXS(aL, 1), *U = M2CXS(aU, 1);
-	MCS_XTYPE_SET(L->xtype);
+	CXSPARSE_XTYPE_SET(L->xtype);
 	if (!asLogical(sparse)) {
 		char rcl[] = ".geMatrix";
 		rcl[0] = IF_COMPLEX('z', 'd');
@@ -536,7 +536,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-			if (MCS_XTYPE_GET() == MCS_COMPLEX)
+			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
 			else
 #endif
@@ -562,7 +562,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-			if (MCS_XTYPE_GET() == MCS_COMPLEX)
+			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_2(Rcomplex, COMPLEX);
 			else
 #endif
@@ -659,7 +659,7 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 		} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-		if (MCS_XTYPE_GET() == MCS_COMPLEX)
+		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		SOLVE_SPARSE(Rcomplex);
 		else
 #endif
@@ -813,7 +813,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	char aul = *CHAR(STRING_ELT(auplo, 0));
 	int i, j;
 	Matrix_cs *A = M2CXS(a, 1);
-	MCS_XTYPE_SET(A->xtype);
+	CXSPARSE_XTYPE_SET(A->xtype);
 	if (!asLogical(sparse)) {
 		char rcl[] = "...Matrix";
 		rcl[0] = IF_COMPLEX('z', 'd');
@@ -843,7 +843,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-			if (MCS_XTYPE_GET() == MCS_COMPLEX)
+			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
 			else
 #endif
@@ -868,7 +868,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-			if (MCS_XTYPE_GET() == MCS_COMPLEX)
+			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_2(Rcomplex, COMPLEX);
 			else
 #endif
@@ -900,7 +900,7 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 		} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-		if (MCS_XTYPE_GET() == MCS_COMPLEX)
+		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		SOLVE_SPARSE(Rcomplex);
 		else
 #endif
@@ -935,7 +935,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 {
 	SEXP V = PROTECT(GET_SLOT(qr, Matrix_VSym));
 	Matrix_cs *V_ = M2CXS(V, 1);
-	MCS_XTYPE_SET(V_->xtype);
+	CXSPARSE_XTYPE_SET(V_->xtype);
 
 	SEXP beta = PROTECT(GET_SLOT(qr, Matrix_betaSym));
 	double *pbeta = REAL(beta);
@@ -973,7 +973,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-		if (MCS_XTYPE_GET() == MCS_COMPLEX)
+		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		EYE(Rcomplex, COMPLEX, Matrix_zone);
 		else
 #endif
@@ -1107,7 +1107,7 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 	} while (0)
 
 #ifdef MATRIX_ENABLE_ZMATRIX
-	if (MCS_XTYPE_GET() == MCS_COMPLEX)
+	if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 	MATMULT(Rcomplex, COMPLEX);
 	else
 #endif

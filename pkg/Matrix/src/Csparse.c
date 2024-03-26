@@ -50,7 +50,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 {
 	Matrix_cs *A = M2CXS(a, 1);
-	MCS_XTYPE_SET(MCS_REAL);
+	CXSPARSE_XTYPE_SET(CXSPARSE_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
 		duplicate(b) : coerceVector(b, REALSXP));
 	if (A->m != A->n || A->m <= 0)
@@ -74,7 +74,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	if (order_ < 0 || order_ > 3)
 		order_ = 0;
 	Matrix_cs *A = M2CXS(a, 1);
-	MCS_XTYPE_SET(MCS_REAL);
+	CXSPARSE_XTYPE_SET(CXSPARSE_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP)
 		? duplicate(b) : coerceVector(b, REALSXP));
 	if (LENGTH(b) != A->m)
@@ -312,7 +312,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
 	Matrix_cs *A = M2CXS(x, 0);
-	MCS_XTYPE_SET(A->xtype);
+	CXSPARSE_XTYPE_SET(A->xtype);
 	Matrix_csd *D = Matrix_cs_dmperm(A, asInteger(seed));
 	if (!D)
 		return R_NilValue; /* MJ: why not an error ... ? */
