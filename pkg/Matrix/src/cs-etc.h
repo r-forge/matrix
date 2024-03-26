@@ -4,12 +4,12 @@
 #include <Rinternals.h>
 #include "SuiteSparse/CXSparse/Include/cs.h"
 
-#define MCS_PATTERN 0
-#define MCS_REAL    1
-#define MCS_COMPLEX 2
+#define CXSPARSE_PATTERN 0
+#define CXSPARSE_REAL    1
+#define CXSPARSE_COMPLEX 2
 
-#define MCS_XTYPE_GET(       ) Matrix_cs_xtype
-#define MCS_XTYPE_SET(_VALUE_) Matrix_cs_xtype = _VALUE_
+#define CXSPARSE_XTYPE_GET(       ) Matrix_cs_xtype
+#define CXSPARSE_XTYPE_SET(_VALUE_) Matrix_cs_xtype = _VALUE_
 
 extern int Matrix_cs_xtype;
 
