@@ -994,7 +994,7 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		tc = *CHAR(STRING_ELT(trans, 0));
+		char tc = *CHAR(STRING_ELT(trans, 0));
 		if (tc != 'C')
 			SET_SLOT(D_, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
