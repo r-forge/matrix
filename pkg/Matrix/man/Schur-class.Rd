@@ -31,15 +31,18 @@
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class
       \code{\linkS4class{MatrixFactorization}}.}
-    \item{\code{Q}}{an orthogonal matrix,
-      inheriting from virtual class \code{\linkS4class{Matrix}}.}
-    \item{\code{T}}{a block upper triangular matrix,
-      inheriting from virtual class \code{\linkS4class{Matrix}}.
-      The diagonal blocks have dimensions 1-by-1 or 2-by-2.}
-    \item{\code{EValues}}{a numeric or complex vector containing
-      the eigenvalues of the diagonal blocks of \code{T}, which are
-      the eigenvalues of \code{T} and consequently of the factorized
-      matrix.}
+    \item{\code{x}}{a numeric vector of length \code{prod(Dim)}
+      storing the entries of \eqn{T} in column-major order.
+      \code{x} of length 0 is value and indicates that
+      \eqn{T} is diagonal with diagonal entries given by \code{values}.}
+    \item{\code{vectors}}{a numeric vector of length \code{prod(Dim)}
+      storing the entries of \eqn{Q} in column-major order.
+      \code{vectors} of length 0 is valid and indicates that
+      the factorization was computed without the Schur vectors.}
+    \item{\code{values}}{a numeric or complex vector of length \code{Dim[1]}
+      storing the eigenvalues of the diagonal blocks of \eqn{T},
+      which are the eigenvalues of \eqn{T} and consequently of the
+      factorized matrix \eqn{A}.}
   }
 }
 \section{Extends}{
@@ -73,7 +76,7 @@
 }
 \seealso{
   Class \code{\linkS4class{dgeMatrix}}.
-  
+
   Generic functions \code{\link{Schur}},
   \code{\link{expand1}} and \code{\link{expand2}}.
 }
@@ -114,7 +117,4 @@ stopifnot(exprs = {
 b <- rnorm(n)
 stopifnot(all.equal(det(A), det(sch.A)),
           all.equal(solve(A, b), solve(sch.A, b)))
-
-## One of the non-general cases:
-Schur(Diagonal(6L))
 }

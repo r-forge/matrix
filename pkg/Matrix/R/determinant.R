@@ -2,9 +2,9 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Constructor for "det" objects, used liberally below
-.mkDet <- function(modulus = sum(log(abs(x))),
+.mkDet <- function(modulus = sum(log(Mod(x))),
                    logarithm = TRUE,
-                   sign = if(prod(base::sign(x)) < 0) -1L else 1L,
+                   sign = if(is.complex(x)) NA_integer_ else if(prod(x) < 0) -1L else 1L,
                    x) {
     if(!logarithm)
         modulus <- exp(modulus)
@@ -28,12 +28,15 @@ setMethod("determinant", c(x = "MatrixFactorization", logarithm = "missing"),
           function(x, logarithm = TRUE, ...)
               determinant(x, TRUE, ...))
 
-## FIXME: if we knew the specific class of 'T', then we could optimize
-## knowing that 'T' is block upper triangular with 1-by-1 and 2-by-2
-## diagonal blocks
 setMethod("determinant", c(x = "Schur", logarithm = "logical"),
-          function(x, logarithm = TRUE, ...)
-              determinant(x@T, logarithm, ...))
+          function(x, logarithm = TRUE, ...) {
+              if(is.complex(values <- x@values) == is.complex(x@x))
+                  .mkDet(x = values, logarithm = logarithm)
+              else if(is.complex(values))
+                  .mkDet(x = values, logarithm = logarithm,
+                         sign = if(Re(prod(values)) < 0) -1L else 1L)
+              else stop("should never happen")
+          })
 
 setMethod("determinant", c(x = "denseLU", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)

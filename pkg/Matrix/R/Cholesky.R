@@ -89,11 +89,11 @@ setMethod("Cholesky", c(A = "diagonalMatrix"),
 
 setMethod("Cholesky", c(A = "dsyMatrix"),
           function(A, perm = TRUE, tol = -1, ...)
-              .Call(dpoMatrix_trf, A, if(perm) 1L else 2L, perm, tol))
+              .Call(poMatrix_trf, A, if(perm) 1L else 2L, perm, tol))
 
 setMethod("Cholesky", c(A = "dspMatrix"),
           function(A, ...)
-              .Call(dppMatrix_trf, A, 2L))
+              .Call(ppMatrix_trf, A, 2L))
 
 setMethod("Cholesky", c(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,

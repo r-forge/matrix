@@ -9,17 +9,13 @@
 \alias{Schur}
 \alias{Schur-methods}
 %
-\alias{Schur,dgeMatrix-method}
-\alias{Schur,diagonalMatrix-method}
-\alias{Schur,dsyMatrix-method}
-\alias{Schur,generalMatrix-method}
+\alias{Schur,denseMatrix-method}
 \alias{Schur,matrix-method}
-\alias{Schur,symmetricMatrix-method}
-\alias{Schur,triangularMatrix-method}
+\alias{Schur,sparseMatrix-method}
 %
 \description{
   Computes the Schur factorization of an \eqn{n \times n}{n-by-n}
-  real matrix \eqn{A}, which has the general form 
+  real matrix \eqn{A}, which has the general form
   \deqn{A = Q T Q'}{A = Q * T * Q'}
   where
   \eqn{Q} is an orthogonal matrix and
@@ -28,7 +24,7 @@
   specifying the real and complex conjugate eigenvalues of \eqn{A}.
   The column vectors of \eqn{Q} are the Schur vectors of \eqn{A},
   and \eqn{T} is the Schur form of \eqn{A}.
-  
+
   Methods are built on LAPACK routine \code{dgees}.
 }
 \usage{
@@ -43,17 +39,8 @@ Schur(x, vectors = TRUE, \dots)
 }
 \value{
   An object representing the factorization, inheriting
-  from virtual class \code{\linkS4class{SchurFactorization}}
-  if \code{vectors = TRUE}.  Currently, the specific class
-  is always \code{\linkS4class{Schur}} in that case.
-  %% FIXME? no other factorization behaves this way:
-  An exception is if \code{x} is a traditional matrix,
-  in which case the result is a named list containing
-  \code{Q}, \code{T}, and \code{EValues} slots of the
-  \code{\linkS4class{Schur}} object.
-  
-  If \code{vectors = FALSE}, then the result is the same
-  named list but without \code{Q}.
+  from virtual class \code{\linkS4class{SchurFactorization}}.
+  Currently, the specific class is always \code{\linkS4class{Schur}}.
 }
 \seealso{
   Class \code{\linkS4class{Schur}} and its methods.
@@ -62,7 +49,7 @@ Schur(x, vectors = TRUE, \dots)
 
   Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
   \code{\link{lu}}, and \code{\link{qr}},
   for computing other factorizations.
@@ -86,24 +73,22 @@ set.seed(0)
 
 Schur(Hilbert(9L)) # real eigenvalues
 
-(A <- Matrix(round(rnorm(25L, sd = 100)), 5L, 5L))
+n <- 5L
+(A <- Matrix(round(rnorm(n * n, sd = 100)), n, n))
 (sch.A <- Schur(A)) # complex eigenvalues
 
 ## A ~ Q T Q' in floating point
 str(e.sch.A <- expand2(sch.A), max.level = 2L)
 stopifnot(all.equal(A, Reduce(`\%*\%`, e.sch.A)))
 
-(e1 <- eigen(sch.A@T, only.values = TRUE)$values)
-(e2 <- eigen(    A  , only.values = TRUE)$values)
-(e3 <- sch.A@EValues)
+(e1 <- eigen(matrix(sch.A@x, n, n), only.values = TRUE)$values)
+(e2 <- eigen(           A         , only.values = TRUE)$values)
+(e3 <- sch.A@values)
 
 stopifnot(exprs = {
     all.equal(e1, e2, tolerance = 1e-13)
-    all.equal(e1, e3[order(Mod(e3), decreasing = TRUE)], tolerance = 1e-13) 
+    all.equal(e1, e3[order(Mod(e3), decreasing = TRUE)], tolerance = 1e-13)
     identical(Schur(A, vectors = FALSE),
-              list(T = sch.A@T, EValues = e3))    
-    identical(Schur(as(A, "matrix")),
-              list(Q = as(sch.A@Q, "matrix"),
-                   T = as(sch.A@T, "matrix"), EValues = e3))
+              `slot<-`(sch.A, "vectors", TRUE, double(0L)))
 })
 }

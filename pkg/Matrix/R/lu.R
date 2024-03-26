@@ -10,7 +10,7 @@ setMethod("lu", c(x = "denseMatrix"),
 
 setMethod("lu", c(x = "dgeMatrix"),
           function(x, warnSing = TRUE, ...)
-              .Call(dgeMatrix_trf, x, as.logical(warnSing)))
+              .Call(geMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("lu", c(x = "dsyMatrix"),
           function(x, cache = TRUE, ...) {

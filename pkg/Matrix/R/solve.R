@@ -277,17 +277,21 @@ rm(.cl)
 ## MJ: truly an exceptional case ...
 setMethod("solve", c(a = "Schur", b = "ANY"),
           function(a, b, ...) {
-              Q <- a@Q
-              T <- a@T
+              da <- a@Dim
+              dna <- a@Dimnames
+              if(da[1L] > 0L && length(a@vectors) == 0L)
+                  stop("missing requisite Schur vectors")
+              Q <- expand1(a, "Q")
+              T <- expand1(a, "T")
               if(missing(b)) {
                   r <- Q %*% solve(T, t(Q))
-                  r@Dimnames <- a@Dimnames[2:1]
+                  r@Dimnames <- dna[2:1]
                   r
               } else {
                   db <- dim(b)
                   dnb <- dimnames(b)
                   r <- Q %*% solve(T, crossprod(Q, b))
-                  r@Dimnames <- c(a@Dimnames[2L],
+                  r@Dimnames <- c(dna[2L],
                                   if(is.null(dnb)) list(NULL) else dnb[2L])
                   if(is.null(db)) drop(r) else r
               }
