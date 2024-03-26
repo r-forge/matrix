@@ -34,19 +34,19 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-trans2(_CTYPE_ *, const _CTYPE_ *, int, int, int)
+trans2(_CTYPE_ *, const _CTYPE_ *, int, int, char)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-trans1(_CTYPE_ *, const _CTYPE_ *, int, char, int)
+trans1(_CTYPE_ *, const _CTYPE_ *, int, char, char)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-syforce2(_CTYPE_ *, int, char, int)
+syforce2(_CTYPE_ *, int, char, char)
 IDZ
 #undef TEMPLATE
 
