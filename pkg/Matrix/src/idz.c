@@ -209,11 +209,11 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-trans2(_CTYPE_ *dest, const _CTYPE_ *src, int m, int n, int herm) \
+trans2(_CTYPE_ *dest, const _CTYPE_ *src, int m, int n, char trans) \
 { \
 	R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
 	int i, j; \
-	if (herm) \
+	if (trans == 'C') \
 	for (j = 0; j < m; ++j, src -= mn1s) \
 		for (i = 0; i < n; ++i, src += m, dest += 1) \
 			ASSIGN_JI_ ## _PREFIX_((*dest), (*src)); \
@@ -228,11 +228,11 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-trans1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, int herm) \
+trans1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans) \
 { \
 	_CTYPE_ tmp; \
 	int i, j; \
-	if (herm) { \
+	if (trans == 'C') { \
 	if (uplo == 'U') { \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
@@ -278,11 +278,11 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-syforce2(_CTYPE_ *x, int n, char uplo, int herm) \
+syforce2(_CTYPE_ *x, int n, char uplo, char trans) \
 { \
 	_CTYPE_ *y = x; \
 	int i, j; \
-	if (herm) { \
+	if (trans == 'C') { \
 	if (uplo == 'U') { \
 		for (j = 0; j < n; ++j) { \
 			ASSIGN_JJ_ ## _PREFIX_((*x)); \

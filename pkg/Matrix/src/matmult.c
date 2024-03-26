@@ -506,7 +506,7 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	if (!btrans)
 		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(Rcomplex));
 	else
-		ztrans2(prx, pbx, bm, bn, 0);
+		ztrans2(prx, pbx, bm, bn, 'T');
 	F77_CALL(ztrmm)(
 		(aleft) ? "L" : "R", &aul, (atrans) ? "T" : "N", &adi, &rm, &rn,
 		&one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
@@ -517,7 +517,7 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	if (!btrans)
 		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(double));
 	else
-		dtrans2(prx, pbx, bm, bn, 0);
+		dtrans2(prx, pbx, bm, bn, 'T');
 	F77_CALL(dtrmm)(
 		(aleft) ? "L" : "R", &aul, (atrans) ? "T" : "N", &adi, &rm, &rn,
 		&one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
@@ -600,7 +600,7 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	if (!btrans)
 		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(Rcomplex));
 	else
-		ztrans2(prx, pbx, bm, bn, 0);
+		ztrans2(prx, pbx, bm, bn, 'T');
 	for (i = 0; i < rn; ++i) {
 		F77_CALL(ztpmv)(
 			&aul, (aleft == atrans) ? "T" : "N", &adi, &rk,
@@ -613,7 +613,7 @@ SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	if (!btrans)
 		Matrix_memcpy(prx, pbx, (R_xlen_t) bm * bn, sizeof(double));
 	else
-		dtrans2(prx, pbx, bm, bn, 0);
+		dtrans2(prx, pbx, bm, bn, 'T');
 	for (i = 0; i < rn; ++i) {
 		F77_CALL(dtpmv)(
 			&aul, (aleft == atrans) ? "T" : "N", &adi, &rk,

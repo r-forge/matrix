@@ -72,7 +72,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz, char ul, char di,
 				if (!byrow) \
 					Matrix_memcpy(dest, src, mn, sizeof(_CTYPE_)); \
 				else \
-					_PREFIX_ ## trans2(dest, src, n, m, 0); \
+					_PREFIX_ ## trans2(dest, src, n, m, 'T'); \
 			} else { \
 				if (!byrow) { \
 					k = 0; \
@@ -2787,7 +2787,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 		else if (new) \
 			Matrix_memcpy(px1, px0, (R_xlen_t) n * n, sizeof(_CTYPE_)); \
 		if (class[1] == 's') \
-			_PREFIX_ ## syforce2(px1, n, ul, 1); \
+			_PREFIX_ ## syforce2(px1, n, ul, 'C'); \
 		else \
 			_PREFIX_ ## trforce2(px1, n, n, ul, di); \
 	} while (0)

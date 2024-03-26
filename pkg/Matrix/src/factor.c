@@ -88,12 +88,11 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP herm = GET_SLOT(obj, Matrix_hermSym);
-		int he = LOGICAL(herm)[0] != 0;
-		if (!he) {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		char tc = *CHAR(STRING_ELT(trans, 0));
+		if (tc != 'C') {
 			/* defined in ./coerce.c : */
 			SEXP dense_as_general(SEXP, const char *, int);
-
 			PROTECT(obj = dense_as_general(obj, "zsyMatrix", 1));
 			obj = geMatrix_scf_(obj, warn, vectors);
 			UNPROTECT(1);
@@ -156,12 +155,11 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP herm = GET_SLOT(obj, Matrix_hermSym);
-		int he = LOGICAL(herm)[0] != 0;
-		if (!he) {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		char tc = *CHAR(STRING_ELT(trans, 0));
+		if (tc != 'C') {
 			/* defined in ./coerce.c : */
 			SEXP dense_as_general(SEXP, const char *, int);
-
 			PROTECT(obj = dense_as_general(obj, "zspMatrix", 1));
 			obj = geMatrix_scf_(obj, warn, vectors);
 			UNPROTECT(1);
@@ -261,7 +259,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = *CHAR(STRING_ELT(uplo, 0));
+	char ul = *CHAR(STRING_ELT(uplo, 0)), tc = 'C';
 #if MATRIX_PACKAGE_MAJOR >= 2
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
@@ -272,13 +270,12 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
-	int he = 1;
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP herm = PROTECT(GET_SLOT(obj, Matrix_hermSym));
-		he = LOGICAL(herm)[0] != 0;
-		if (!he)
-			SET_SLOT(val, Matrix_hermSym, herm);
-		UNPROTECT(1); /* herm */
+		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+		tc = *CHAR(STRING_ELT(trans, 0));
+		if (tc != 'C')
+			SET_SLOT(val, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, n)),
@@ -288,7 +285,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), tmp, *work;
 		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
 		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
-		if (he) {
+		if (tc == 'C') {
 		F77_CALL(zhetrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
 		lwork = (int) tmp.r;
 		work = (Rcomplex *) R_alloc((size_t) lwork, sizeof(Rcomplex));
@@ -327,7 +324,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = *CHAR(STRING_ELT(uplo, 0));
+	char ul = *CHAR(STRING_ELT(uplo, 0)), tc = 'C';
 #if MATRIX_PACKAGE_MAJOR >= 2
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
@@ -338,13 +335,12 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(val, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(val, dimnames, -1);
 	SET_SLOT(val, Matrix_uploSym, uplo);
-	int he = 1;
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP herm = PROTECT(GET_SLOT(obj, Matrix_hermSym));
-		he = LOGICAL(herm)[0] != 0;
-		if (!he)
-			SET_SLOT(val, Matrix_hermSym, herm);
-		UNPROTECT(1); /* herm */
+		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+		tc = *CHAR(STRING_ELT(trans, 0));
+		if (tc != 'C')
+			SET_SLOT(val, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, n)),
@@ -353,7 +349,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
 		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
-		if (he) {
+		if (tc == 'C') {
 		F77_CALL(zhptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(zhptrf, info, warn, D);
 		} else {
@@ -997,11 +993,11 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 	UNPROTECT(1); /* diag */
 
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP herm = PROTECT(GET_SLOT(obj, Matrix_hermSym));
-		int he = LOGICAL(herm)[0] != 0;
-		if (!he)
-			SET_SLOT(D_, Matrix_hermSym, herm);
-		UNPROTECT(1); /* herm */
+		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+		tc = *CHAR(STRING_ELT(trans, 0));
+		if (tc != 'C')
+			SET_SLOT(D_, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
 	}
 
 	int i, j, s;

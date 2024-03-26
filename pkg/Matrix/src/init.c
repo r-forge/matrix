@@ -351,7 +351,6 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_colcountSym = install("colcount");
 	Matrix_diagSym     = install("diag");
 	Matrix_factorsSym  = install("factors");
-	Matrix_hermSym     = install("herm");
 	Matrix_iSym        = install("i");
 	Matrix_isllSym     = install("is.ll");
 	Matrix_ismtSym     = install("is.monotonic");
@@ -371,6 +370,7 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_qSym        = install("q");
 	Matrix_sdSym       = install("sd");
 	Matrix_superSym    = install("super");
+	Matrix_transSym    = install("trans");
 	Matrix_uploSym     = install("uplo");
 	Matrix_valuesSym   = install("values");
 	Matrix_vectorsSym  = install("vectors");
