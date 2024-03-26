@@ -561,9 +561,9 @@ for(i in 1:120) {
 ## Schur() ----------------------
 checkSchur <- function(A, SchurA = Schur(A), tol = 1e-14) {
     stopifnot(is(SchurA, "Schur"),
-              isOrthogonal(Q <- SchurA@Q),
-              all.equal(as.mat(A),
-                        as.mat(Q %*% SchurA@T %*% t(Q)), tolerance = tol))
+              isOrthogonal(Q <- expand1(SchurA, "Q")),
+              all.equal(as.mat(A), as.mat(Q %*% expand1(SchurA, "T") %*% t(Q)),
+                        tolerance = tol))
 }
 
 SH <- Schur(H5 <- Hilbert(5))
@@ -581,16 +581,16 @@ Stg <- Schur(t(gT));checkSchur(t(gT), Stg)
 Stu <- Schur(t(uT));checkSchur(t(uT), Stu)
 
 stopifnot(exprs = {
-    identical3(Sg@T, uT, Su@T)
-    identical(Sg@Q, as(diag(p), "generalMatrix"))
+    identical3(expand1(Sg, "T"), uT, expand1(Su, "T"))
+    identical(expand1(Sg, "Q"), as(diag(p), "generalMatrix"))
     ## LaPck 3.12.0: these must be more careful (Q is *different* permutation):
-    is.integer(print(ip <- invPerm(pp <- as(Stg@Q, "pMatrix")@perm)))
-    identical(Stg@T, as(t(gT[,ip])[,ip], "triangularMatrix"))
-    identical(Stg@Q, as(   diag(p)[,ip], "generalMatrix"))
+    is.integer(print(ip <- invPerm(pp <- as(expand1(Stg, "Q"), "pMatrix")@perm)))
+    identical(expand1(Stg, "T"), as(t(gT[,ip])[,ip], "triangularMatrix"))
+    identical(expand1(Stg, "Q"), as(   diag(p)[,ip], "generalMatrix"))
     ## Stu still has p:1 permutation, but should not rely on it
-    is.integer(print(i2 <- invPerm(as(Stu@Q, "pMatrix")@perm)))
-    identical(Stu@T, as(t(uT[,i2])[,i2], "triangularMatrix"))
-    identical(Stu@Q, as(   diag(p)[,i2], "pMatrix")) # Schur(<triangular>) ==> 'Q' is pMatrix
+    is.integer(print(i2 <- invPerm(as(expand1(Stu, "Q"), "pMatrix")@perm)))
+    identical(expand1(Stu, "T"), as(t(uT[,i2])[,i2], "triangularMatrix"))
+    identical(expand1(Stu, "Q"), as(   diag(p)[,i2], "generalMatrix"))
 })
 
 

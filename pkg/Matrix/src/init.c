@@ -184,18 +184,20 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(dgeMatrix_expm, 1),
 
-	CALLDEF(dgeMatrix_trf, 2),
-	CALLDEF(dsyMatrix_trf, 2),
-	CALLDEF(dspMatrix_trf, 2),
-	CALLDEF(dpoMatrix_trf, 4),
-	CALLDEF(dppMatrix_trf, 2),
-	CALLDEF(dgeMatrix_sch, 3),
+	CALLDEF(geMatrix_scf, 3),
+	CALLDEF(syMatrix_scf, 3),
+	CALLDEF(spMatrix_scf, 3),
+	CALLDEF(geMatrix_trf, 2),
+	CALLDEF(syMatrix_trf, 2),
+	CALLDEF(spMatrix_trf, 2),
+	CALLDEF(poMatrix_trf, 4),
+	CALLDEF(ppMatrix_trf, 2),
 
-	CALLDEF(dgCMatrix_trf, 4),
 	CALLDEF(dgCMatrix_orf, 3),
+	CALLDEF(dgCMatrix_trf, 4),
 	CALLDEF(dpCMatrix_trf, 5),
 
-	CALLDEF(BunchKaufman_expand, 2),
+	CALLDEF(denseBunchKaufman_expand, 2),
 
 	CALLDEF(denseLU_solve, 2),
 	CALLDEF(BunchKaufman_solve, 2),

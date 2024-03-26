@@ -1766,34 +1766,40 @@ SEXP dCHMsuper_validate(SEXP obj)
 
 SEXP Schur_validate(SEXP obj)
 {
-	/* MJ: assuming for simplicity that 'Q' and 'T' slots are formally valid */
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	Matrix_int_fast64_t nn = (Matrix_int_fast64_t) n * n;
 
-	SEXP Q = PROTECT(GET_SLOT(obj, install("Q")));
-	dim = GET_SLOT(Q, Matrix_DimSym);
-	pdim = INTEGER(dim);
-	UNPROTECT(1); /* Q */
-	if (pdim[0] != n || pdim[1] != n)
-		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "Q", "Dim");
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "double");
+	if (XLENGTH(x) != nn && XLENGTH(x) != 0)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "x", "prod(Dim)", "0");
+	int normal = n > 0 && XLENGTH(x) == 0;
 
-	SEXP T = PROTECT(GET_SLOT(obj, install("T")));
-	dim = GET_SLOT(T, Matrix_DimSym);
-	pdim = INTEGER(dim);
-	UNPROTECT(1); /* T */
-	if (pdim[0] != n || pdim[1] != n)
-		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "T", "Dim");
+	SEXP vectors = GET_SLOT(obj, Matrix_vectorsSym);
+	if (TYPEOF(vectors) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "vectors", "double");
+	if (XLENGTH(vectors) != nn && XLENGTH(vectors) != 0)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "vectors", "prod(Dim)", "0");
 
-	SEXP v = GET_SLOT(obj, install("EValues"));
-	SEXPTYPE tv = TYPEOF(v);
-	if (tv != REALSXP && tv != CPLXSXP)
+	SEXP values = GET_SLOT(obj, Matrix_valuesSym);
+	if (TYPEOF(values) != REALSXP) {
+		if (normal)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "values", "double");
+		else if (TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
-		      "EValues", "double", "complex");
-	if (XLENGTH(v) != n)
-		RMKMS(_("'%s' slot does not have length %s"), "EValues", "Dim[1]");
+		      "values", "double", "complex");
+	}
+	if (XLENGTH(values) != n)
+		RMKMS(_("'%s' slot does not have length %s"), "values", "Dim[1]");
 
 	return ScalarLogical(1);
 }

@@ -3,11 +3,11 @@
 
 setMethod("BunchKaufman", c(x = "dsyMatrix"),
           function(x, warnSing = TRUE, ...)
-              .Call(dsyMatrix_trf, x, as.logical(warnSing)))
+              .Call(syMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("BunchKaufman", c(x = "dspMatrix"),
           function(x, warnSing = TRUE, ...)
-              .Call(dspMatrix_trf, x, as.logical(warnSing)))
+              .Call(spMatrix_trf, x, as.logical(warnSing)))
 
 setMethod("BunchKaufman", c(x = "matrix"),
           function(x, uplo = "U", ...)
@@ -36,7 +36,7 @@ setAs("pBunchKaufman", "dtpMatrix",
       })
 
 .def.unpacked <- .def.packed <- function(x, which, ...) {
-    r <- .Call(BunchKaufman_expand, x, .PACKED)
+    r <- .Call(denseBunchKaufman_expand, x, .PACKED)
     b <- length(r) - 1L
     switch(which,
            "DU" =, "DL" = {
@@ -78,7 +78,7 @@ setMethod("expand1", c(x = "pBunchKaufman"), .def.packed)
 rm(.def.unpacked, .def.packed)
 
 .def.unpacked <- .def.packed <- function(x, complete = FALSE, ...) {
-    r <- .Call(BunchKaufman_expand, x, .PACKED)
+    r <- .Call(denseBunchKaufman_expand, x, .PACKED)
     b <- length(r) - 1L
     if(complete) {
         if(b > 0L)

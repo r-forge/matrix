@@ -54,7 +54,7 @@ do { \
 	} \
 } while (0)
 
-#define ERROR_LAPACK_4(_ROUTINE_, _INFO_, _RANK_, _WARN_) \
+#define ERROR_LAPACK_4(_ROUTINE_, _INFO_, _WARN_, _RANK_) \
 	do { \
 		ERROR_LAPACK_1(_ROUTINE_, _INFO_); \
 		if ((_INFO_) > 0 && (_WARN_) > 0) { \
@@ -64,6 +64,19 @@ do { \
 			else \
 				warning(_("LAPACK routine '%s': matrix is rank deficient or not positive definite, the _computed_ rank is %d"), \
 				        #_ROUTINE_, (_RANK_)); \
+		} \
+	} while (0)
+
+#define ERROR_LAPACK_5(_ROUTINE_, _INFO_, _WARN_) \
+	do { \
+		ERROR_LAPACK_1(_ROUTINE_, _INFO_); \
+		if ((_INFO_) > 0 && (_WARN_) > 0) { \
+			if (_WARN_ > 1) \
+				error  (_("LAPACK routine '%s': failed to compute all eigenvalues"), \
+				        #_ROUTINE_); \
+			else \
+				warning(_("LAPACK routine '%s': failed to compute all eigenvalues"), \
+				        #_ROUTINE_); \
 		} \
 	} while (0)
 
