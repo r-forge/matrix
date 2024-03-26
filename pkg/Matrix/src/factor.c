@@ -988,10 +988,6 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 	}
 	UNPROTECT(1); /* uplo */
 
-	SEXP diag = PROTECT(mkString("U"));
-	SET_SLOT(T_, Matrix_diagSym, diag);
-	UNPROTECT(1); /* diag */
-
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
 		char ct = *CHAR(STRING_ELT(trans, 0));
@@ -999,6 +995,10 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 			SET_SLOT(D_, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
+
+	SEXP diag = PROTECT(mkString("U"));
+	SET_SLOT(T_, Matrix_diagSym, diag);
+	UNPROTECT(1); /* diag */
 
 	int i, j, s;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
