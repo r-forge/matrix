@@ -82,11 +82,11 @@ SEXP denseBunchKaufman_determinant(SEXP obj, SEXP logarithm)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int sign = 1;
 
-	char tc = 'C';
+	char ct = 'C';
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		tc = *CHAR(STRING_ELT(trans, 0));
-		if (tc != 'C')
+		ct = *CHAR(STRING_ELT(trans, 0));
+		if (ct != 'C')
 			sign = NA_INTEGER;
 	}
 
@@ -105,7 +105,7 @@ SEXP denseBunchKaufman_determinant(SEXP obj, SEXP logarithm)
 		while (j < n) {
 			a = *px;
 			if (ppivot[j] > 0) {
-				if (tc != 'C')
+				if (ct != 'C')
 					modulus += log(hypot(a.r, a.i));
 				else if (ISNAN(a.r) || a.r >= 0.0)
 					modulus += log(a.r);
@@ -127,7 +127,7 @@ SEXP denseBunchKaufman_determinant(SEXP obj, SEXP logarithm)
 					b = *px;
 					px += (!packed) ? n1a : n - j - 1;
 				}
-				if (tc != 'C')
+				if (ct != 'C')
 					modulus += log(hypot(a.r * b.r - a.i * b.i -
 					                     c.r * c.r + c.i * c.i,
 					                     a.r * b.i + a.i * b.r -

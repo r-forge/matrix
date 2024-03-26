@@ -122,8 +122,8 @@ SEXP syMatrix_norm(SEXP obj, SEXP type)
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP) {
 	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	char tc = *CHAR(STRING_ELT(trans, 0));
-	if (tc == 'C')
+	char ct = *CHAR(STRING_ELT(trans, 0));
+	if (ct == 'C')
 	norm =
 	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	else
@@ -156,8 +156,8 @@ SEXP spMatrix_norm(SEXP obj, SEXP type)
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP) {
 	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	char tc = *CHAR(STRING_ELT(trans, 0));
-	if (tc == 'C')
+	char ct = *CHAR(STRING_ELT(trans, 0));
+	if (ct == 'C')
 	norm =
 	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	else
@@ -286,8 +286,8 @@ SEXP syMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	char tc = *CHAR(STRING_ELT(trans, 0));
-	if (tc == 'C') {
+	char ct = *CHAR(STRING_ELT(trans, 0));
+	if (ct == 'C') {
 	norm =
 	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	F77_CALL(zhecon)(    &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
@@ -331,8 +331,8 @@ SEXP spMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	char tc = *CHAR(STRING_ELT(trans, 0));
-	if (tc == 'C') {
+	char ct = *CHAR(STRING_ELT(trans, 0));
+	if (ct == 'C') {
 	norm =
 	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	F77_CALL(zhpcon)(    &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
