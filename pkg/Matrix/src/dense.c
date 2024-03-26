@@ -833,7 +833,7 @@ SEXP dense_symmpart(SEXP from, const char *class)
 	if (cl[0] == 'd')
 		SP_LOOP(double, REAL, INCREMENT_REAL, SCALE1_REAL, 1.0);
 	else
-		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, SCALE1_COMPLEX, Matrix_zone);
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX_ID, SCALE1_COMPLEX, Matrix_zone);
 
 #undef SP_LOOP
 
@@ -998,9 +998,9 @@ SEXP dense_skewpart(SEXP from, const char *class)
 	} while (0)
 
 	if (cl[0] == 'd')
-		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN_REAL, 0.0);
+		SP_LOOP(double, REAL, INCREMENT_REAL, ASSIGN2_REAL_ID, 0.0);
 	else
-		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX, ASSIGN_COMPLEX, Matrix_zzero);
+		SP_LOOP(Rcomplex, COMPLEX, INCREMENT_COMPLEX_ID, ASSIGN2_COMPLEX_ID, Matrix_zzero);
 
 #undef SP_LOOP
 
@@ -1140,7 +1140,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-#define IT_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
+#define IT_LOOP(_CTYPE_, _PTR_, _NOTZERO_) \
 	do { \
 		_CTYPE_ *px; \
 		if (upper == NA_LOGICAL) { \
@@ -1148,7 +1148,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			for (j = 0; j < n; px += (++j)) { \
 				px += 1; \
 				for (i = j + 1; i < n; ++i, px += 1) { \
-					if (_ISNZ_(*px)) { \
+					if (_NOTZERO_(*px)) { \
 						j = n; \
 						break; \
 					} \
@@ -1159,7 +1159,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			px = _PTR_(x); \
 			for (j = 0; j < n; px += n - (++j)) { \
 				for (i = 0; i < j; ++i, px += 1) { \
-					if (_ISNZ_(*px)) { \
+					if (_NOTZERO_(*px)) { \
 						j = n; \
 						break; \
 					} \
@@ -1174,7 +1174,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			for (j = 0; j < n; px += (++j)) { \
 				px += 1; \
 				for (i = j + 1; i < n; ++i, px += 1) \
-					if (_ISNZ_(*px)) \
+					if (_NOTZERO_(*px)) \
 						return 0; \
 			} \
 			return  1; \
@@ -1182,7 +1182,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			px = _PTR_(x); \
 			for (j = 0; j < n; px += n - (++j)) { \
 				for (i = 0; i < j; ++i, px += 1) \
-					if (_ISNZ_(*px)) \
+					if (_NOTZERO_(*px)) \
 						return 0; \
 				px += 1; \
 			} \
@@ -1192,19 +1192,19 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 
 	switch (class[0]) {
 	case 'n':
-		IT_LOOP(int, LOGICAL, ISNZ_PATTERN);
+		IT_LOOP(int, LOGICAL, NOTZERO_PATTERN);
 		break;
 	case 'l':
-		IT_LOOP(int, LOGICAL, ISNZ_LOGICAL);
+		IT_LOOP(int, LOGICAL, NOTZERO_LOGICAL);
 		break;
 	case 'i':
-		IT_LOOP(int, INTEGER, ISNZ_INTEGER);
+		IT_LOOP(int, INTEGER, NOTZERO_INTEGER);
 		break;
 	case 'd':
-		IT_LOOP(double, REAL, ISNZ_REAL);
+		IT_LOOP(double, REAL, NOTZERO_REAL);
 		break;
 	case 'z':
-		IT_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+		IT_LOOP(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
 		break;
 	default:
 		break;
@@ -1267,19 +1267,19 @@ int dense_is_diagonal(SEXP obj, const char *class)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-#define ID_LOOP(_CTYPE_, _PTR_, _ISNZ_) \
+#define ID_LOOP(_CTYPE_, _PTR_, _NOTZERO_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < j; ++i) { \
-					if (_ISNZ_(*px)) \
+					if (_NOTZERO_(*px)) \
 						return 0; \
 					px += 1; \
 				} \
 				px += 1; \
 				for (i = j + 1; i < n; ++i) { \
-					if (_ISNZ_(*px)) \
+					if (_NOTZERO_(*px)) \
 						return 0; \
 					px += 1; \
 				} \
@@ -1288,7 +1288,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						if (_ISNZ_(*px)) \
+						if (_NOTZERO_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1298,7 +1298,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += j + 1; \
 					for (i = j + 1; i < n; ++i) { \
-						if (_ISNZ_(*px)) \
+						if (_NOTZERO_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1308,7 +1308,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 			if (ul == 'U') { \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
-						if (_ISNZ_(*px)) \
+						if (_NOTZERO_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1318,7 +1318,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 				for (j = 0; j < n; ++j) { \
 					px += 1; \
 					for (i = j + 1; i < n; ++i) { \
-						if (_ISNZ_(*px)) \
+						if (_NOTZERO_(*px)) \
 							return 0; \
 						px += 1; \
 					} \
@@ -1330,19 +1330,19 @@ int dense_is_diagonal(SEXP obj, const char *class)
 
 	switch (class[0]) {
 	case 'n':
-		ID_LOOP(int, LOGICAL, ISNZ_PATTERN);
+		ID_LOOP(int, LOGICAL, NOTZERO_PATTERN);
 		break;
 	case 'l':
-		ID_LOOP(int, LOGICAL, ISNZ_LOGICAL);
+		ID_LOOP(int, LOGICAL, NOTZERO_LOGICAL);
 		break;
 	case 'i':
-		ID_LOOP(int, INTEGER, ISNZ_INTEGER);
+		ID_LOOP(int, INTEGER, NOTZERO_INTEGER);
 		break;
 	case 'd':
-		ID_LOOP(double, REAL, ISNZ_REAL);
+		ID_LOOP(double, REAL, NOTZERO_REAL);
 		break;
 	case 'z':
-		ID_LOOP(Rcomplex, COMPLEX, ISNZ_COMPLEX);
+		ID_LOOP(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
 		break;
 	default:
 		break;
@@ -1413,7 +1413,7 @@ do { \
 	case 'z': \
 		SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, \
 		         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
-		         CAST_COMPLEX, INCREMENT_COMPLEX, SCALE2_COMPLEX); \
+		         CAST_COMPLEX, INCREMENT_COMPLEX_ID, SCALE2_COMPLEX); \
 		break; \
 	default: \
 		break; \
