@@ -105,28 +105,40 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define ISNA_REAL(_X_)    (ISNAN(_X_))
 #define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
 
-#define ISNZ_PATTERN(_X_) ((_X_) != 0)
-#define ISNZ_LOGICAL(_X_) ((_X_) != 0)
-#define ISNZ_INTEGER(_X_) ((_X_) != 0)
-#define ISNZ_REAL(_X_)    ((_X_) != 0.0)
-#define ISNZ_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
+#define NOTZERO_PATTERN(_X_) ((_X_) != 0)
+#define NOTZERO_LOGICAL(_X_) ((_X_) != 0)
+#define NOTZERO_INTEGER(_X_) ((_X_) != 0)
+#define NOTZERO_REAL(_X_)    ((_X_) != 0.0)
+#define NOTZERO_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
 
-#define STRICTLY_ISNZ_PATTERN(_X_) \
-	(                      ISNZ_PATTERN(_X_))
-#define STRICTLY_ISNZ_LOGICAL(_X_) \
-	(!ISNA_LOGICAL(_X_) && ISNZ_LOGICAL(_X_))
-#define STRICTLY_ISNZ_INTEGER(_X_) \
-	(!ISNA_INTEGER(_X_) && ISNZ_INTEGER(_X_))
-#define STRICTLY_ISNZ_REAL(_X_) \
-	(!ISNA_REAL(   _X_) && ISNZ_REAL(   _X_))
-#define STRICTLY_ISNZ_COMPLEX(_X_) \
-	(!ISNA_COMPLEX(_X_) && ISNZ_COMPLEX(_X_))
+#define STRICTLY_NOTZERO_PATTERN(_X_) \
+	(                      NOTZERO_PATTERN(_X_))
+#define STRICTLY_NOTZERO_LOGICAL(_X_) \
+	(!ISNA_LOGICAL(_X_) && NOTZERO_LOGICAL(_X_))
+#define STRICTLY_NOTZERO_INTEGER(_X_) \
+	(!ISNA_INTEGER(_X_) && NOTZERO_INTEGER(_X_))
+#define STRICTLY_NOTZERO_REAL(_X_) \
+	(!ISNA_REAL   (_X_) && NOTZERO_REAL   (_X_))
+#define STRICTLY_NOTZERO_COMPLEX(_X_) \
+	(!ISNA_COMPLEX(_X_) && NOTZERO_COMPLEX(_X_))
 
 #define NOTREAL_PATTERN(_X_) 0
 #define NOTREAL_LOGICAL(_X_) 0
 #define NOTREAL_INTEGER(_X_) 0
 #define NOTREAL_REAL(_X_)    0
 #define NOTREAL_COMPLEX(_X_) (_X_.i != 0.0)
+
+#define NOTEQUAL_PATTERN(_X_, _Y_) \
+	((_X_ != 0) != (_Y_ != 0))
+#define NOTEQUAL_LOGICAL(_X_, _Y_) \
+	(_X_ != _Y_)
+#define NOTEQUAL_INTEGER(_X_, _Y_) \
+	(_X_ != _Y_)
+#define NOTEQUAL_REAL(_X_, _Y_) \
+	((ISNAN(_X_)) ? !ISNAN(_Y_) : ISNAN(_Y_) || _X_ != _Y_)
+#define NOTEQUAL_COMPLEX(_X_, _Y_) \
+	(((ISNAN(_X_.r)) ? !ISNAN(_Y_.r) : ISNAN(_Y_.r) || _X_.r != _Y_.r) || \
+	 ((ISNAN(_X_.i)) ? !ISNAN(_Y_.i) : ISNAN(_Y_.i) || _X_.i != _Y_.i))
 
 #define NOTCONJ_PATTERN(_X_, _Y_) \
 	((_X_ != 0) != (_Y_ != 0))
@@ -170,16 +182,36 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	do { \
 		_X_ += _Y_; \
 	} while (0)
-#define INCREMENT_COMPLEX(_X_, _Y_) \
+#define INCREMENT_COMPLEX_ID(_X_, _Y_) \
 	do { \
 		_X_.r += _Y_.r; \
 		_X_.i += _Y_.i; \
 	} while (0)
+#define INCREMENT_COMPLEX_CJ(_X_, _Y_) \
+	do { \
+		_X_.r += _Y_.r; \
+		_X_.i -= _Y_.i; \
+	} while (0)
 
-#define ASSIGN_REAL(_X_, _Y_) \
-	do { _X_   = _Y_  ;                } while (0)
-#define ASSIGN_COMPLEX(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i = _Y_.i; } while (0)
+#define ASSIGN1_REAL_RE(_X_, _Y_) _X_ = _Y_
+#define ASSIGN1_REAL_IM(_X_, _Y_)
+
+#define ASSIGN1_COMPLEX_RE(_X_, _Y_) _X_.r = _Y_
+#define ASSIGN1_COMPLEX_IM(_X_, _Y_) _X_.i = _Y_
+
+#define ASSIGN2_REAL_ID(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_REAL_CJ(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_REAL_RE(_X_, _Y_) _X_ = _Y_
+#define ASSIGN2_REAL_IM(_X_, _Y_) _X_ = 0.0
+
+#define ASSIGN2_COMPLEX_ID(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i =  _Y_.i; } while (0)
+#define ASSIGN2_COMPLEX_CJ(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i = -_Y_.i; } while (0)
+#define ASSIGN2_COMPLEX_RE(_X_, _Y_) \
+	do { _X_.r = _Y_.r; _X_.i =    0.0; } while (0)
+#define ASSIGN2_COMPLEX_IM(_X_, _Y_) \
+	do { _X_.r =   0.0; _X_.i =  _Y_.i; } while (0)
 
 #define SCALE1_REAL(_X_, _A_) \
 	do { _X_   *= _A_;               } while (0)
