@@ -134,22 +134,22 @@ setMethod("solve", c(a = "denseLU", b = "dgeMatrix"),
 for(.cl in c("BunchKaufman", "pBunchKaufman")) {
 setMethod("solve", c(a = .cl, b = "missing"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, NULL))
+              .Call(denseBunchKaufman_solve, a, NULL))
 
 setMethod("solve", c(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
-              .Call(BunchKaufman_solve, a, b))
+              .Call(denseBunchKaufman_solve, a, b))
 }
 rm(.cl)
 
 for(.cl in c("Cholesky", "pCholesky")) {
 setMethod("solve", c(a = .cl, b = "missing"),
           function(a, b, ...)
-              .Call(Cholesky_solve, a, NULL))
+              .Call(denseCholesky_solve, a, NULL))
 
 setMethod("solve", c(a = .cl, b = "dgeMatrix"),
           function(a, b, ...)
-              .Call(Cholesky_solve, a, b))
+              .Call(denseCholesky_solve, a, b))
 }
 rm(.cl)
 
@@ -208,30 +208,30 @@ setMethod("solve", c(a = "CHMfactor", b = "missing"),
                       return(r)
                   }
               }
-              .Call(CHMfactor_solve, a, NULL, sparse, system)
+              .Call(sparseCholesky_solve, a, NULL, sparse, system)
           })
 
 setMethod("solve", c(a = "CHMfactor", b = "dgeMatrix"),
           function(a, b,
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...)
-              .Call(CHMfactor_solve, a, b, FALSE, system))
+              .Call(sparseCholesky_solve, a, b, FALSE, system))
 
 setMethod("solve", c(a = "CHMfactor", b = "dgCMatrix"),
           function(a, b,
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...)
-              .Call(CHMfactor_solve, a, b, TRUE, system))
+              .Call(sparseCholesky_solve, a, b, TRUE, system))
 
 for(.cl in c("dtrMatrix", "dtpMatrix")) {
 setMethod("solve", c(a = .cl, b = "missing"),
           function(a, b, tol = .Machine$double.eps, ...) {
               .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, NULL)
+              .Call(trMatrix_solve, a, NULL)
           })
 
 setMethod("solve", c(a = .cl, b = "dgeMatrix"),
           function(a, b, tol = .Machine$double.eps, ...) {
               .solve.checkCond(a, tol)
-              .Call(dtrMatrix_solve, a, b)
+              .Call(trMatrix_solve, a, b)
           })
 }
 rm(.cl)
@@ -240,7 +240,7 @@ setMethod("solve", c(a = "dtCMatrix", b = "missing"),
           function(a, b, sparse = TRUE, ...) {
               if(a@diag != "N")
                   a <- ..diagU2N(a)
-              .Call(dtCMatrix_solve, a, NULL, sparse)
+              .Call(tCMatrix_solve, a, NULL, sparse)
           })
 
 setMethod("solve", c(a = "dtCMatrix", b = "dgeMatrix"),
@@ -249,7 +249,7 @@ setMethod("solve", c(a = "dtCMatrix", b = "dgeMatrix"),
                   a <- ..diagU2N(a)
               if(is.na(sparse) || sparse)
                   b <- .dense2sparse(b, "C")
-              .Call(dtCMatrix_solve, a, b, sparse)
+              .Call(tCMatrix_solve, a, b, sparse)
           })
 
 setMethod("solve", c(a = "dtCMatrix", b = "dgCMatrix"),
@@ -258,7 +258,7 @@ setMethod("solve", c(a = "dtCMatrix", b = "dgCMatrix"),
                   a <- ..diagU2N(a)
               if(!(is.na(sparse) || sparse))
                   b <- .sparse2dense(b, FALSE)
-              .Call(dtCMatrix_solve, a, b, sparse)
+              .Call(tCMatrix_solve, a, b, sparse)
           })
 
 for(.cl in c("dtrMatrix", "dtpMatrix", "dtCMatrix"))
