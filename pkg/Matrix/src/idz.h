@@ -58,13 +58,13 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-band2(_CTYPE_ *, int, int, int, int, char)
+band2(_CTYPE_ *, int, int, int, int)
 IDZ
 #undef TEMPLATE
 
 #define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-band1(_CTYPE_ *, int, int, int, char, char)
+band1(_CTYPE_ *, int, int, int, char)
 IDZ
 #undef TEMPLATE
 

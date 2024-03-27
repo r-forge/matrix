@@ -381,7 +381,7 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-band2(_CTYPE_ *x, int m, int n, int a, int b, char diag) \
+band2(_CTYPE_ *x, int m, int n, int a, int b) \
 { \
 	if (m == 0 || n == 0) \
 		return; \
@@ -411,12 +411,6 @@ band2(_CTYPE_ *x, int m, int n, int a, int b, char diag) \
 	} \
 	if (j1 < n) \
 		Matrix_memset(x, 0, (R_xlen_t) m * (n - j1), sizeof(_CTYPE_)); \
-	if (diag != 'N' && a <= 0 && b >= 0) { \
-		x -= m * (R_xlen_t) j; \
-		R_xlen_t m1a = (R_xlen_t) m + 1; \
-		for (j = 0; j < n; ++j, x += m1a) \
-			*x = _ONE_; \
-	} \
 	return; \
 }
 IDZ
@@ -424,7 +418,7 @@ IDZ
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
-band1(_CTYPE_ *x, int n, int a, int b, char uplo, char diag) \
+band1(_CTYPE_ *x, int n, int a, int b, char uplo) \
 { \
 	if (n == 0) \
 		return; \
@@ -462,11 +456,6 @@ band1(_CTYPE_ *x, int n, int a, int b, char uplo, char diag) \
 		if (j1 < n) \
 			Matrix_memset(x, 0, PACKED_LENGTH(n) - PACKED_LENGTH(j1), \
 			              sizeof(_CTYPE_)); \
-		if (diag != 'N' && a == 0) { \
-			x -= PACKED_LENGTH(j); \
-			for (j = 0; j < n; x += (++j)+1) \
-				*x = _ONE_; \
-		} \
 	} else { \
 		if (j0 > 0) { \
 			R_xlen_t dx = PACKED_LENGTH(n) - PACKED_LENGTH(j0); \
@@ -484,11 +473,6 @@ band1(_CTYPE_ *x, int n, int a, int b, char uplo, char diag) \
 		if (j1 < n) \
 			Matrix_memset(x, 0, PACKED_LENGTH(n - j1), \
 			              sizeof(_CTYPE_)); \
-		if (diag != 'N' && b == 0) { \
-			x -= PACKED_LENGTH(n) - PACKED_LENGTH(j); \
-			for (j = 0; j < n; x += n-(j++)) \
-				*x = _ONE_; \
-		} \
 	} \
 	return; \
 }
