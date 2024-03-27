@@ -137,9 +137,9 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 	return;
 }
 
-/* op(<dge>) * op(<dge>) */
+/* op(<,ge>) * op(<,ge>) */
 static
-SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
+SEXP geMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 {
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int *padim = INTEGER(adim), am = padim[0], an = padim[1],
@@ -274,9 +274,9 @@ SEXP dgeMatrix_matmult(SEXP a, SEXP b, int atrans, int btrans)
 	}
 }
 
-/* <dsy> * op(<dge>)  or  op(<dge>) * <dsy> */
+/* <,sy> * op(<,ge>)  or  op(<,ge>) * <,sy> */
 static
-SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
+SEXP syMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int rk = INTEGER(adim)[0];
@@ -362,9 +362,9 @@ SEXP dsyMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 	return r;
 }
 
-/* <dsp> * op(<dge>)  or  op(<dge>) * <dsp> */
+/* <,sp> * op(<,ge>)  or  op(<,ge>) * <,sp> */
 static
-SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
+SEXP spMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 {
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
 	int rk = INTEGER(adim)[0];
@@ -438,9 +438,9 @@ SEXP dspMatrix_matmult(SEXP a, SEXP b, int aleft, int btrans)
 	return r;
 }
 
-/* op(<dtr>) * op(<dge>)  or  op(<dge>) * op(<dtr>) */
+/* op(<,tr>) * op(<,ge>)  or  op(<,ge>) * op(<,tr>) */
 static
-SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+SEXP trMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
                        int triangular)
 {
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
@@ -532,9 +532,9 @@ SEXP dtrMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
 	return r;
 }
 
-/* op(<dtp>) * op(<dge>)  or  op(<dge>) * op(<dtp>) */
+/* op(<,tp>) * op(<,ge>)  or  op(<,ge>) * op(<,tp>) */
 static
-SEXP dtpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
+SEXP tpMatrix_matmult(SEXP a, SEXP b, int aleft, int atrans, int btrans,
                        int triangular)
 {
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
@@ -689,47 +689,47 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 
 	if (y == R_NilValue) {
 		REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-		x = dgeMatrix_matmult(x, y, xtrans_, !xtrans_);
+		x = geMatrix_matmult(x, y, xtrans_, !xtrans_);
 	} else if (xcl[1] == 'g' && ycl[1] == 'g') {
-		x = dgeMatrix_matmult(x, y, xtrans_, ytrans_);
+		x = geMatrix_matmult(x, y, xtrans_, ytrans_);
 	} else if (xcl[1] == 'g' || ycl[1] == 'g') {
 		x = (xcl[1] == 'g')
 			? ((ycl[1] == 's')
 			   ? ((ycl[2] != 'p')
-			      ? dsyMatrix_matmult(y, x, 0, xtrans_)
-			      : dspMatrix_matmult(y, x, 0, xtrans_))
+			      ? syMatrix_matmult(y, x, 0, xtrans_)
+			      : spMatrix_matmult(y, x, 0, xtrans_))
 			   : ((ycl[2] != 'p')
-			      ? dtrMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)
-			      : dtpMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)))
+			      ? trMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)
+			      : tpMatrix_matmult(y, x, 0, ytrans_, xtrans_, 0)))
 			: ((xcl[1] == 's')
 			   ? ((xcl[2] != 'p')
-			      ? dsyMatrix_matmult(x, y, 1, ytrans_)
-			      : dspMatrix_matmult(x, y, 1, ytrans_))
+			      ? syMatrix_matmult(x, y, 1, ytrans_)
+			      : spMatrix_matmult(x, y, 1, ytrans_))
 			   : ((xcl[2] != 'p')
-			      ? dtrMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)
-			      : dtpMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)));
+			      ? trMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)
+			      : tpMatrix_matmult(x, y, 1, xtrans_, ytrans_, 0)));
 	} else if (xcl[1] == 's' && ycl[1] == 's') {
 		if (xcl[2] == 'p' && ycl[2] == 'p') {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dspMatrix_matmult(x, y, 1, ytrans_);
+			x = spMatrix_matmult(x, y, 1, ytrans_);
 		} else if (xcl[2] == 'p') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-			x = dsyMatrix_matmult(y, x, 0, xtrans_);
+			x = syMatrix_matmult(y, x, 0, xtrans_);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dsyMatrix_matmult(x, y, 1, ytrans_);
+			x = syMatrix_matmult(x, y, 1, ytrans_);
 		}
 	} else if (xcl[1] == 's' || ycl[1] == 's') {
 		if (xcl[1] == 's') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
 			x = (ycl[2] != 'p')
-				? dtrMatrix_matmult(y, x, 0, ytrans_, 0, 0)
-				: dtpMatrix_matmult(y, x, 0, ytrans_, 0, 0);
+				? trMatrix_matmult(y, x, 0, ytrans_, 0, 0)
+				: tpMatrix_matmult(y, x, 0, ytrans_, 0, 0);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
 			x = (xcl[2] != 'p')
-				? dtrMatrix_matmult(x, y, 1, xtrans_, 0, 0)
-				: dtpMatrix_matmult(x, y, 1, xtrans_, 0, 0);
+				? trMatrix_matmult(x, y, 1, xtrans_, 0, 0)
+				: tpMatrix_matmult(x, y, 1, xtrans_, 0, 0);
 		}
 	} else {
 		SEXP
@@ -751,13 +751,13 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 
 		if (xcl[2] == 'p' && ycl[2] == 'p') {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dtpMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
+			x = tpMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
 		} else if (xcl[2] == 'p') {
 			REPROTECT(x = dense_as_general(x, xcl, 1), xpid);
-			x = dtrMatrix_matmult(y, x, 0, ytrans_, xtrans_, triangular);
+			x = trMatrix_matmult(y, x, 0, ytrans_, xtrans_, triangular);
 		} else {
 			REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-			x = dtrMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
+			x = trMatrix_matmult(x, y, 1, xtrans_, ytrans_, triangular);
 		}
 	}
 
@@ -766,10 +766,10 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 }
 
 /* boolean: op(op(<.gC>) & op(<.gC>)) */
-/* numeric: op(op(<dgC>) * op(<dgC>)) */
+/* numeric: op(op(<,gC>) * op(<,gC>)) */
 static
-SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
-                                 int ztrans, int triangular, int boolean)
+SEXP gCMatrix_gCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
+                               int ztrans, int triangular, int boolean)
 {
 	PROTECT_INDEX zpid;
 	SEXP z;
@@ -842,10 +842,10 @@ SEXP dgCMatrix_dgCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
 	return z;
 }
 
-/* op(op(<d[gs]C>) * op(<dge>)) */
+/* op(op(<,[gs]C>) * op(<,ge>)) */
 static
-SEXP dgCMatrix_dgeMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
-                                 int ztrans, int triangular, int symmetric)
+SEXP gCMatrix_geMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
+                               int ztrans, int triangular, int symmetric)
 {
 	SEXP z;
 	char zcl[] = "...Matrix";
@@ -1026,7 +1026,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (y == R_NilValue) {
 		REPROTECT(x = sparse_as_general(x, xcl), xpid);
-		x = dgCMatrix_dgCMatrix_matmult(
+		x = gCMatrix_gCMatrix_matmult(
 			x, y, xtrans_, !xtrans_, ztrans_, 0, boolean_);
 		UNPROTECT(2); /* y, x */
 		return x;
@@ -1070,7 +1070,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
 		if (xcl[1] == 't')
 			REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
-		x = dgCMatrix_dgeMatrix_matmult(
+		x = gCMatrix_geMatrix_matmult(
 			x, y, xtrans_, ytrans_, ztrans_, triangular, symmetric);
 		UNPROTECT(2); /* y, x */
 		return x;
@@ -1107,7 +1107,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	REPROTECT(x = sparse_as_general(x, xcl), xpid);
 	REPROTECT(y = sparse_as_general(y, ycl), ypid);
-	x = dgCMatrix_dgCMatrix_matmult(
+	x = gCMatrix_gCMatrix_matmult(
 		x, y, xtrans_, ytrans_, ztrans_, triangular, boolean_);
 	UNPROTECT(2); /* y, x */
 	return x;
@@ -1209,8 +1209,8 @@ void dense_rowscale(SEXP obj, SEXP d, int m, int n, char uplo, char diag)
 	return;
 }
 
-/* boolean: <lgC> & <ldi>  or  <ldi> & <dgR> */
-/* numeric: <dgC> * <ddi>  or  <ddi> * <dgR> */
+/* boolean: <lgC> & <ldi>  or  <ldi> & <lgR> */
+/* numeric: <,gC> * <,di>  or  <,di> * <,gR> */
 static
 void Csparse_colscale(SEXP obj, SEXP d)
 {
@@ -1241,7 +1241,7 @@ void Csparse_colscale(SEXP obj, SEXP d)
 }
 
 /* boolean: <ldi> & <lgC>  or  <lgR> & <ldi> */
-/* numeric: <ddi> * <dgC>  or  <dgR> * <ddi> */
+/* numeric: <,di> * <,gC>  or  <,gR> * <,di> */
 static
 void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
@@ -1266,7 +1266,7 @@ void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 }
 
 /* boolean: <ldi> & <lgT>  or  <lgT> & <ldi> */
-/* numeric: <ddi> * <dgT>  or  <dgT> * <ddi> */
+/* numeric: <,di> * <,gT>  or  <,gT> * <,di> */
 static
 void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 {
