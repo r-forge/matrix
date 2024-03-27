@@ -10,9 +10,6 @@ char *Matrix_sprintf(const char *, ...);
 
 int equal_character_vectors(SEXP, SEXP, int);
 
-void conjugate(SEXP);
-void zeroRe(SEXP);
-void zeroIm(SEXP);
 void naToOne(SEXP);
 
 #endif /* MATRIX_UTILS_H */

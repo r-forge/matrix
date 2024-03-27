@@ -83,7 +83,9 @@ IDZ
 void zdreal2(Rcomplex *, int);
 void zdreal1(Rcomplex *, int, char);
 
-void zvconj(Rcomplex *, const Rcomplex *, R_xlen_t);
+void zvreal(Rcomplex *, R_xlen_t);
+void zvimag(Rcomplex *, R_xlen_t);
+void zvconj(Rcomplex *, R_xlen_t);
 
 #undef IDZ
 
