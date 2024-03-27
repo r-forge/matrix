@@ -3,6 +3,6 @@
 
 #include <Rinternals.h>
 
-SEXP dgeMatrix_expm(SEXP);
+SEXP geMatrix_expm(SEXP);
 
 #endif /* MATRIX_EXPM_H */

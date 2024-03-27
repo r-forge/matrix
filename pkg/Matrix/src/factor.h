@@ -12,14 +12,14 @@ SEXP spMatrix_trf(SEXP, SEXP);
 SEXP poMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP ppMatrix_trf(SEXP, SEXP);
 
-SEXP dgCMatrix_orf(SEXP, SEXP, SEXP);
-SEXP dgCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
-SEXP dpCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP gCMatrix_orf(SEXP, SEXP, SEXP);
+SEXP gCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
+SEXP pCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP denseBunchKaufman_expand(SEXP);
 
-SEXP CHMfactor_diag_get(SEXP, SEXP);
-SEXP CHMfactor_update(SEXP, SEXP, SEXP);
-SEXP CHMfactor_updown(SEXP, SEXP, SEXP);
+SEXP sparseCholesky_diag_get(SEXP, SEXP);
+SEXP sparseCholesky_update(SEXP, SEXP, SEXP);
+SEXP sparseCholesky_updown(SEXP, SEXP, SEXP);
 
 #endif /* MATRIX_FACTOR_H */

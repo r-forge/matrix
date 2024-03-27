@@ -16,7 +16,7 @@ const static double padec [] =
 };
 
 /* Based on _corrected_ code for Octave function 'expm' : */
-SEXP dgeMatrix_expm(SEXP x)
+SEXP geMatrix_expm(SEXP x)
 {
     const double one = 1.0, zero = 0.0;
     const int i1 = 1;
@@ -53,9 +53,9 @@ SEXP dgeMatrix_expm(SEXP x)
 
     /* Preconditioning 2. Balancing with dgebal. */
     F77_CALL(dgebal)("P", &n, v, &n, &ilo, &ihi, perm, &j FCONE);
-    if (j) error(_("dgeMatrix_exp: LAPACK routine dgebal returned %d"), j);
+    if (j) error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
     F77_CALL(dgebal)("S", &n, v, &n, &ilos, &ihis, scale, &j FCONE);
-    if (j) error(_("dgeMatrix_exp: LAPACK routine dgebal returned %d"), j);
+    if (j) error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
 
     /* Preconditioning 3. Scaling according to infinity norm */
     inf_norm = F77_CALL(dlange)("I", &n, &n, v, &n, work FCONE);
@@ -93,9 +93,9 @@ SEXP dgeMatrix_expm(SEXP x)
 
     /* Pade' approximation is solve(dpp, npp) */
     F77_CALL(dgetrf)(&n, &n, dpp, &n, pivot, &j);
-    if (j) error(_("dgeMatrix_exp: dgetrf returned error code %d"), j);
+    if (j) error(_("geMatrix_expm: dgetrf returned error code %d"), j);
     F77_CALL(dgetrs)("N", &n, &n, dpp, &n, pivot, npp, &n, &j FCONE);
-    if (j) error(_("dgeMatrix_exp: dgetrs returned error code %d"), j);
+    if (j) error(_("geMatrix_expm: dgetrs returned error code %d"), j);
     Memcpy(v, npp, nsqr);
 
     /* Now undo all of the preconditioning */
