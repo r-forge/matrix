@@ -597,11 +597,25 @@ void zdreal1(Rcomplex *x, int n, char uplo)
 	return;
 }
 
-void zvconj(Rcomplex *dest, const Rcomplex *src, R_xlen_t n)
+void zvreal(Rcomplex *x, R_xlen_t n)
+{
+	while (n--)
+		(*(x++)).i = 0.0;
+	return;
+}
+
+void zvimag(Rcomplex *x, R_xlen_t n)
+{
+	while (n--)
+		(*(x++)).r = 0.0;
+	return;
+}
+
+void zvconj(Rcomplex *x, R_xlen_t n)
 {
 	while (n--) {
-		(*(dest  )).r =  (*(src  )).r;
-		(*(dest++)).i = -(*(src++)).i;
+		(*x).i = -(*x).i;
+		++x;
 	}
 	return;
 }

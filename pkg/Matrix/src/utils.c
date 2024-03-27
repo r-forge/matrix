@@ -149,39 +149,6 @@ int equal_character_vectors(SEXP s1, SEXP s2, int n)
 	return 1;
 }
 
-void conjugate(SEXP x)
-{
-	Rcomplex *px = COMPLEX(x);
-	R_xlen_t nx = XLENGTH(x);
-	while (nx--) {
-		(*px).i = -(*px).i;
-		++px;
-	}
-	return;
-}
-
-void zeroRe(SEXP x)
-{
-	Rcomplex *px = COMPLEX(x);
-	R_xlen_t nx = XLENGTH(x);
-	while (nx--) {
-		(*px).r = 0.0;
-		++px;
-	}
-	return;
-}
-
-void zeroIm(SEXP x)
-{
-	Rcomplex *px = COMPLEX(x);
-	R_xlen_t nx = XLENGTH(x);
-	while (nx--) {
-		(*px).i = 0.0;
-		++px;
-	}
-	return;
-}
-
 void naToOne(SEXP x)
 {
 	R_xlen_t i, n = XLENGTH(x);
