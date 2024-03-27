@@ -77,7 +77,6 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 			rx = duplicate(ax);
 			PROTECT(rx);
 			int lwork = -1;
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
 			Rcomplex work0, *work = &work0;
 			F77_CALL(zgetri)(&m, COMPLEX(rx), &m, INTEGER(apivot),
@@ -89,7 +88,6 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 			                 work, &lwork, &info);
 			ERROR_LAPACK_2(zgetri, info, 2, U);
 			} else {
-#endif
 			double   work0, *work = &work0;
 			F77_CALL(dgetri)(&m,    REAL(rx), &m, INTEGER(apivot),
 			                 work, &lwork, &info);
@@ -99,27 +97,21 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 			F77_CALL(dgetri)(&m,    REAL(rx), &m, INTEGER(apivot),
 			                 work, &lwork, &info);
 			ERROR_LAPACK_2(dgetri, info, 2, U);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
 			F77_CALL(zgetrs)("N", &m, &n, COMPLEX(ax), &m, INTEGER(apivot),
 			                 COMPLEX(rx), &m, &info FCONE);
 			ERROR_LAPACK_1(zgetrs, info);
 			} else {
-#endif
 			F77_CALL(dgetrs)("N", &m, &n,    REAL(ax), &m, INTEGER(apivot),
 			                    REAL(rx), &m, &info FCONE);
 			ERROR_LAPACK_1(dgetrs, info);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(2); /* rx, apivot */
@@ -131,13 +123,12 @@ SEXP denseLU_solve(SEXP a, SEXP b)
 	return r;
 }
 
-SEXP BunchKaufman_solve(SEXP a, SEXP b)
+SEXP denseBunchKaufman_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
-		XLENGTH(ax) == (R_xlen_t) m * m;
+	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
@@ -146,7 +137,7 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 		rcl[2] = 'e';
 	} else {
 		rcl[1] = 's';
-		rcl[2] = (unpacked) ? 'y' : 'p';
+		rcl[2] = (packed) ? 'p' : 'y';
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
@@ -163,16 +154,37 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 		UNPROTECT(1); /* auplo */
 	}
 
+	char act = 'C';
+	if (TYPEOF(ax) == CPLXSXP) {
+	SEXP atrans = GET_SLOT(a, Matrix_transSym);
+	act = CHAR(STRING_ELT(atrans, 0))[0];
+	if (isNull(b) && act != 'C') {
+		PROTECT(atrans);
+		SET_SLOT(r, Matrix_transSym, atrans);
+		UNPROTECT(1); /* atrans */
+	}
+	}
+
 	if (m > 0) {
 		SEXP apivot = PROTECT(GET_SLOT(a, Matrix_permSym)), rx;
 		int info;
 		if (isNull(b)) {
 			rx = duplicate(ax);
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
 			Rcomplex *work = (Rcomplex *) R_alloc((size_t) m, sizeof(Rcomplex));
-			if (unpacked) {
+			if (act == 'C') {
+			if (!packed) {
+				F77_CALL(zhetri)(&aul, &m, COMPLEX(rx), &m, INTEGER(apivot),
+				                 work, &info FCONE);
+				ERROR_LAPACK_2(zhetri, info, 2, D);
+			} else {
+				F77_CALL(zhptri)(&aul, &m, COMPLEX(rx),     INTEGER(apivot),
+				                 work, &info FCONE);
+				ERROR_LAPACK_2(zhptri, info, 2, D);
+			}
+			} else {
+			if (!packed) {
 				F77_CALL(zsytri)(&aul, &m, COMPLEX(rx), &m, INTEGER(apivot),
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(zsytri, info, 2, D);
@@ -181,10 +193,10 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(zsptri, info, 2, D);
 			}
+			}
 			} else {
-#endif
 			double   *work = (double   *) R_alloc((size_t) m, sizeof(double  ));
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dsytri)(&aul, &m, REAL(rx), &m, INTEGER(apivot),
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(dsytri, info, 2, D);
@@ -193,17 +205,25 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 				                 work, &info FCONE);
 				ERROR_LAPACK_2(dsptri, info, 2, D);
 			}
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (unpacked) {
+			if (act == 'C') {
+			if (!packed) {
+				F77_CALL(zhetrs)(&aul, &m, &n, COMPLEX(ax), &m, INTEGER(apivot),
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zhetrs, info);
+			} else {
+				F77_CALL(zhptrs)(&aul, &m, &n, COMPLEX(ax),     INTEGER(apivot),
+				                 COMPLEX(rx), &m, &info FCONE);
+				ERROR_LAPACK_1(zhptrs, info);
+			}
+			} else {
+			if (!packed) {
 				F77_CALL(zsytrs)(&aul, &m, &n, COMPLEX(ax), &m, INTEGER(apivot),
 				                 COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(zsytrs, info);
@@ -212,9 +232,9 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 				                 COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(zsptrs, info);
 			}
+			}
 			} else {
-#endif
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dsytrs)(&aul, &m, &n,    REAL(ax), &m, INTEGER(apivot),
 				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dsytrs, info);
@@ -223,9 +243,7 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dsptrs, info);
 			}
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(2); /* rx, apivot */
@@ -237,13 +255,12 @@ SEXP BunchKaufman_solve(SEXP a, SEXP b)
 	return r;
 }
 
-SEXP Cholesky_solve(SEXP a, SEXP b)
+SEXP denseCholesky_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
-		XLENGTH(ax) == (R_xlen_t) m * m;
+	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
@@ -252,7 +269,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 		rcl[2] = 'e';
 	} else {
 		rcl[1] = 'p';
-		rcl[2] = (unpacked) ? 'o' : 'p';
+		rcl[2] = (packed) ? 'p' : 'o';
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
@@ -275,9 +292,8 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 		if (isNull(b)) {
 			rx = duplicate(ax);
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(zpotri)(&aul, &m, COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(zpotri, info, 2, L);
 				if (pivoted)
@@ -287,7 +303,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 				ERROR_LAPACK_2(zpptri, info, 2, L);
 				if (pivoted) {
 					/* FIXME: zsymperm2 supporting packed matrices */
-					double *work;
+					Rcomplex *work;
 					size_t lwork = (size_t) n * n;
 					Matrix_Calloc(work, lwork, Rcomplex);
 					zunpack1 (work, COMPLEX(rx), n, aul, 'N');
@@ -297,8 +313,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 				}
 			}
 			} else {
-#endif
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dpotri)(&aul, &m,    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
 				if (pivoted)
@@ -317,19 +332,16 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 					Matrix_Free(work, lwork);
 				}
 			}
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
 			if (pivoted)
 				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 0);
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(zpotrs)(&aul, &m, &n, COMPLEX(ax), &m,
 				                 COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(zpotrs, info);
@@ -341,10 +353,9 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 			if (pivoted)
 				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 1);
 			} else {
-#endif
 			if (pivoted)
 				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 0);
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dpotrs)(&aul, &m, &n,    REAL(ax), &m,
 				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dpotrs, info);
@@ -355,9 +366,7 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 			}
 			if (pivoted)
 				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 1);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(2); /* rx, aperm */
@@ -369,13 +378,12 @@ SEXP Cholesky_solve(SEXP a, SEXP b)
 	return r;
 }
 
-SEXP dtrMatrix_solve(SEXP a, SEXP b)
+SEXP trMatrix_solve(SEXP a, SEXP b)
 {
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int unpacked = (Matrix_int_fast64_t) m * m <= R_XLEN_T_MAX &&
-		XLENGTH(ax) == (R_xlen_t) m * m;
+	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
@@ -384,7 +392,7 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 		rcl[2] = 'e';
 	} else {
 		rcl[1] = 't';
-		rcl[2] = (unpacked) ? 'r' : 'p';
+		rcl[2] = (packed) ? 'p' : 'r';
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
@@ -415,9 +423,8 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 		if (isNull(b)) {
 			rx = duplicate(ax);
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(ztrtri)(&aul, &adi, &m, COMPLEX(rx), &m,
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(ztrtri, info, 2, A);
@@ -427,8 +434,7 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 				ERROR_LAPACK_2(ztptri, info, 2, A);
 			}
 			} else {
-#endif
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dtrtri)(&aul, &adi, &m,    REAL(rx), &m,
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(dtrtri, info, 2, A);
@@ -437,17 +443,14 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(dtptri, info, 2, A);
 			}
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 			rx = duplicate(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(ztrtrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax), &m,
 				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(ztrtrs, info);
@@ -457,25 +460,16 @@ SEXP dtrMatrix_solve(SEXP a, SEXP b)
 				ERROR_LAPACK_1(ztptrs, info);
 			}
 			} else {
-#endif
-			if (unpacked) {
+			if (!packed) {
 				F77_CALL(dtrtrs)(&aul, "N", &adi, &m, &n,    REAL(ax), &m,
 				                    REAL(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(dtrtrs, info);
 			} else {
-				// https://bugs.r-project.org/show_bug.cgi?id=18534
 				F77_CALL(dtptrs)(&aul, "N", &adi, &m, &n,    REAL(ax),
-				                    REAL(rx), &m, &info
-# ifdef usePR18534fix
-				                 FCONE FCONE FCONE);
-# else
-				                 FCONE FCONE);
-# endif
+				                    REAL(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(dtptrs, info);
 			}
-#ifdef MATRIX_ENABLE_ZMATRIX
 			}
-#endif
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(1); /* rx */
@@ -535,11 +529,9 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 				} \
 			} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
 			else
-#endif
 			SOLVE_DENSE_1(double, REAL, 1.0);
 
 #undef SOLVE_DENSE_1
@@ -561,11 +553,9 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 				} \
 			} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_2(Rcomplex, COMPLEX);
 			else
-#endif
 			SOLVE_DENSE_2(double, REAL);
 
 #undef SOLVE_DENSE_2
@@ -658,11 +648,9 @@ SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 			                        "sparseLU", ".gCMatrix"); \
 		} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		SOLVE_SPARSE(Rcomplex);
 		else
-#endif
 		SOLVE_SPARSE(double);
 
 #undef SOLVE_SPARSE
@@ -708,7 +696,7 @@ int strmatch(const char *x, const char **valid)
 	return -1;
 }
 
-SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
+SEXP sparseCholesky_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 {
 	static const char *valid[] = {
 		"A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt", "" };
@@ -728,7 +716,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		if (isNull(b)) {
 			B = cholmod_allocate_dense(m, n, m, L->xtype, &c);
 			if (!B)
-				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
 			R_xlen_t m1a = (R_xlen_t) m + 1;
 
 #define EYE(_CTYPE_, _ONE_) \
@@ -741,11 +729,9 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 				} \
 			} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (L->xtype == CHOLMOD_COMPLEX)
 			EYE(Rcomplex, Matrix_zone);
 			else
-#endif
 			EYE(double, 1.0);
 
 #undef EYE
@@ -753,14 +739,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			X = cholmod_solve(ivalid, L, B, &c);
 			cholmod_free_dense(&B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
 			PROTECT(r = CHD2M(X, 0,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHD(b, 0);
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("CHMfactor", ".geMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
 			PROTECT(r = CHD2M(X, 0, 'g'));
 		}
 		cholmod_free_dense(&X, &c);
@@ -769,7 +755,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 		if (isNull(b)) {
 			B = cholmod_speye(m, n, L->xtype, &c);
 			if (!B)
-				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			cholmod_free_sparse(&B, &c);
 			if (X && ivalid < 7) {
@@ -781,14 +767,14 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 				X = B;
 			}
 			if (!X)
-				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
 			PROTECT(r = CHS2M(X, 1,
 				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHS(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("CHMfactor", ".gCMatrix");
+				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
 			PROTECT(r = CHS2M(X, 1, 'g'));
 		}
 		cholmod_free_sparse(&X, &c);
@@ -805,7 +791,7 @@ SEXP CHMfactor_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 	return r;
 }
 
-SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
+SEXP tCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 {
 	SOLVE_START;
 
@@ -842,11 +828,9 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 				} \
 			} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
 			else
-#endif
 			SOLVE_DENSE_1(double, REAL, 1.0);
 
 #undef SOLVE_DENSE_1
@@ -867,11 +851,9 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 				} \
 			} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 			SOLVE_DENSE_2(Rcomplex, COMPLEX);
 			else
-#endif
 			SOLVE_DENSE_2(double, REAL);
 
 #undef SOLVE_DENSE_2
@@ -899,11 +881,9 @@ SEXP dtCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 			                        ".tCMatrix", ".gCMatrix"); \
 		} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		SOLVE_SPARSE(Rcomplex);
 		else
-#endif
 		SOLVE_SPARSE(double);
 
 #undef SOLVE_SPARSE
@@ -972,11 +952,9 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 				error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
 		} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 		EYE(Rcomplex, COMPLEX, Matrix_zone);
 		else
-#endif
 		EYE(double, REAL, 1.0);
 
 #undef EYE
@@ -1106,11 +1084,9 @@ SEXP sparseQR_matmult(SEXP qr, SEXP y, SEXP op, SEXP complete, SEXP yxjj)
 		} \
 	} while (0)
 
-#ifdef MATRIX_ENABLE_ZMATRIX
 	if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
 	MATMULT(Rcomplex, COMPLEX);
 	else
-#endif
 	MATMULT(double, REAL);
 	SET_SLOT(a, Matrix_xSym, ax);
 

@@ -165,7 +165,7 @@ setMethod("chol2inv", c(x = .cl),
           function(x, ...) {
               if(x@diag != "N")
                   x <- ..diagU2N(x)
-              r <- .Call(Cholesky_solve, x, NULL)
+              r <- .Call(denseCholesky_solve, x, NULL)
               i <- if(x@uplo == "U") 2L else 1L
               r@Dimnames <- x@Dimnames[c(i, i)]
               r
