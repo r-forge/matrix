@@ -13,15 +13,15 @@
 .dense.diag.set <- function(x, value)
     .Call(R_dense_diag_set, x, value)
 .dense.t <- function(x)
-    .Call(R_dense_transpose, x)
+    .Call(R_dense_transpose, x, "T")
 .dense.fS1  <- function(x, uplo)
-    .Call(R_dense_force_symmetric, x, NULL)
+    .Call(R_dense_force_symmetric, x, NULL, "C")
 .dense.fS2  <- function(x, uplo)
-    .Call(R_dense_force_symmetric, x, uplo)
+    .Call(R_dense_force_symmetric, x, uplo, "C")
 .dense.symmpart <- function(x)
-    .Call(R_dense_symmpart, x)
+    .Call(R_dense_symmpart, x, "C")
 .dense.skewpart <- function(x)
-    .Call(R_dense_skewpart, x)
+    .Call(R_dense_skewpart, x, "C")
 .dense.is.di <- function(object)
     .Call(R_dense_is_diagonal, object)
 .dense.is.tr <- function(object, upper = NA, ...)
@@ -31,7 +31,7 @@
         ca <- function(check.attributes = TRUE, ...) check.attributes
         checkDN <- ca(...)
     }
-    .Call(R_dense_is_symmetric, object, checkDN)
+    .Call(R_dense_is_symmetric, object, "C", checkDN)
 }
 .dense.is.sy.dz <- function(object, checkDN = TRUE,
                             tol = 100 * .Machine$double.eps,
@@ -43,7 +43,7 @@
     }
     ## be very fast when requiring exact symmetry
     if(tol <= 0)
-        return(.Call(R_dense_is_symmetric, object, checkDN))
+        return(.Call(R_dense_is_symmetric, object, "C", checkDN))
     ## pretest: is it square?
     d <- object@Dim
     if((n <- d[2L]) != d[1L])
@@ -206,9 +206,15 @@ setMethod("forceSymmetric", c(x = "matrix", uplo = "missing"),
 setMethod("forceSymmetric", c(x = "matrix", uplo = "character"),
           function(x, uplo) .m2dense(x, ".sy", uplo = uplo, trans = "C"))
 setMethod("symmpart", c(x = "matrix"),
-          function(x) symmetrizeDN(0.5 * (x + t(x))))
+          function(x) {
+              Cj <- if(is.complex(x)) Conj else identity
+              symmetrizeDN(0.5 * (x + Cj(t(x))))
+          })
 setMethod("skewpart", c(x = "matrix"),
-          function(x) symmetrizeDN(0.5 * (x - t(x))))
+          function(x) {
+              Cj <- if(is.complex(x)) Conj else identity
+              symmetrizeDN(0.5 * (x - Cj(t(x))))
+          })
 setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
 setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
