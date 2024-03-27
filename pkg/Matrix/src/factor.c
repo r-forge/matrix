@@ -668,8 +668,8 @@ do { \
 } while (0)
 
 static
-int dgCMatrix_orf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
-                   int order)
+int gCMatrix_orf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
+                  int order)
 {
 	Matrix_cs *T = NULL;
 	if (!(*S = Matrix_cs_sqr(order, A, 1)) ||
@@ -682,7 +682,7 @@ int dgCMatrix_orf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
 	return 1;
 }
 
-SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
+SEXP gCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 {
 	int order_ = asInteger(order);
 	if (order_ < 0 || order_ > 3)
@@ -703,7 +703,7 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 	if (A->m < A->n)
 		error(_("QR factorization of m-by-n %s requires m >= n"),
 		      ".gCMatrix");
-	if (!dgCMatrix_orf_(A, &S, &N, order_) ||
+	if (!gCMatrix_orf_(A, &S, &N, order_) ||
 	    !(P = Matrix_cs_pinv(S->pinv, S->m2))) {
 		if (!P) {
 			S = Matrix_cs_sfree(S);
@@ -757,8 +757,8 @@ SEXP dgCMatrix_orf(SEXP obj, SEXP order, SEXP doError)
 }
 
 static
-int dgCMatrix_trf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
-                   int order, double tol)
+int gCMatrix_trf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
+                  int order, double tol)
 {
 	Matrix_cs *T = NULL;
 	if (!(*S = Matrix_cs_sqr(order, A, 0)) ||
@@ -771,7 +771,7 @@ int dgCMatrix_trf_(const Matrix_cs *A, Matrix_css **S, Matrix_csn **N,
 	return 1;
 }
 
-SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
+SEXP gCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 {
 	double tol_ = asReal(tol);
 	if (ISNAN(tol_))
@@ -798,7 +798,7 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 	if (A->m != A->n)
 		error(_("LU factorization of m-by-n %s requires m == n"),
 		      ".gCMatrix");
-	if (!dgCMatrix_trf_(A, &S, &N, order_, tol_) ||
+	if (!gCMatrix_trf_(A, &S, &N, order_, tol_) ||
 	    !(P = Matrix_cs_pinv(N->pinv, A->m))) {
 		if (!P) {
 			S = Matrix_cs_sfree(S);
@@ -852,8 +852,8 @@ SEXP dgCMatrix_trf(SEXP obj, SEXP order, SEXP tol, SEXP doError)
 #undef DO_SORT
 
 static
-int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
-                   int perm, int ldl, int super, double mult)
+int pCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
+                  int perm, int ldl, int super, double mult)
 {
 	/* defined in ./chm_common.c : */
 	void R_cholmod_common_envget(void);
@@ -895,8 +895,8 @@ int dpCMatrix_trf_(cholmod_sparse *A, cholmod_factor **L,
 	return res;
 }
 
-SEXP dpCMatrix_trf(SEXP obj,
-                   SEXP perm, SEXP ldl, SEXP super, SEXP mult)
+SEXP pCMatrix_trf(SEXP obj,
+                  SEXP perm, SEXP ldl, SEXP super, SEXP mult)
 {
 	int perm_ = asLogical(perm), ldl_ = asLogical(ldl),
 		super_ = asLogical(super);
@@ -937,9 +937,9 @@ SEXP dpCMatrix_trf(SEXP obj,
 	if (cached) {
 		L = M2CHF(trf, 1);
 		L = cholmod_copy_factor(L, &c);
-		dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
+		pCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
 	} else {
-		dpCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
+		pCMatrix_trf_(A, &L, perm_, ldl_, super_, mult_);
 		if (super_ == NA_LOGICAL) {
 			nm[0] = (L->is_super) ? 'S' : 's';
 			nm[2] = (L->is_ll   ) ? 'd' : 'D';
@@ -1156,7 +1156,7 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 	return ans;
 }
 
-SEXP CHMfactor_diag_get(SEXP obj, SEXP square)
+SEXP sparseCholesky_diag_get(SEXP obj, SEXP square)
 {
 	cholmod_factor *L = M2CHF(obj, 1);
 	int n = (int) L->n, square_ = asLogical(square);
@@ -1197,7 +1197,7 @@ SEXP CHMfactor_diag_get(SEXP obj, SEXP square)
 	return y;
 }
 
-SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
+SEXP sparseCholesky_update(SEXP obj, SEXP parent, SEXP mult)
 {
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
@@ -1214,7 +1214,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 		A->stype = (ul == 'U') ? 1 : -1;
 	}
 
-	dpCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
+	pCMatrix_trf_(A, &L, 0, !L->is_ll, L->is_super, mult_);
 
 	SEXP res = PROTECT(CHF2M(L, 1));
 	cholmod_free_factor(&L, &c);
@@ -1227,7 +1227,7 @@ SEXP CHMfactor_update(SEXP obj, SEXP parent, SEXP mult)
 	return res;
 }
 
-SEXP CHMfactor_updown(SEXP obj, SEXP parent, SEXP update)
+SEXP sparseCholesky_updown(SEXP obj, SEXP parent, SEXP update)
 {
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);

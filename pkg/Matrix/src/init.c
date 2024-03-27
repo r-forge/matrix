@@ -182,7 +182,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_matmult, 6),
 	CALLDEF(R_diagonal_matmult, 5),
 
-	CALLDEF(dgeMatrix_expm, 1),
+	CALLDEF(geMatrix_expm, 1),
 
 	CALLDEF(geMatrix_scf, 3),
 	CALLDEF(syMatrix_scf, 3),
@@ -193,9 +193,9 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(poMatrix_trf, 4),
 	CALLDEF(ppMatrix_trf, 2),
 
-	CALLDEF(dgCMatrix_orf, 3),
-	CALLDEF(dgCMatrix_trf, 4),
-	CALLDEF(dpCMatrix_trf, 5),
+	CALLDEF(gCMatrix_orf, 3),
+	CALLDEF(gCMatrix_trf, 4),
+	CALLDEF(pCMatrix_trf, 5),
 
 	CALLDEF(denseBunchKaufman_expand, 2),
 
@@ -209,9 +209,9 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(sparseQR_matmult, 5),
 
-	CALLDEF(CHMfactor_diag_get, 2),
-	CALLDEF(CHMfactor_update, 3),
-	CALLDEF(CHMfactor_updown, 3),
+	CALLDEF(sparseCholesky_diag_get, 2),
+	CALLDEF(sparseCholesky_update, 3),
+	CALLDEF(sparseCholesky_updown, 3),
 
 	CALLDEF(denseLU_determinant, 2),
 	CALLDEF(denseBunchKaufman_determinant, 2),

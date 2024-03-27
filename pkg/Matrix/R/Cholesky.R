@@ -98,7 +98,7 @@ setMethod("Cholesky", c(A = "dspMatrix"),
 setMethod("Cholesky", c(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,
                    Imult = 0, ...)
-              .Call(dpCMatrix_trf, A, perm, LDL, super, Imult))
+              .Call(pCMatrix_trf, A, perm, LDL, super, Imult))
 
 setMethod("Cholesky", c(A = "dsRMatrix"),
           function(A, ...)
@@ -372,7 +372,7 @@ setAs("CHMsuper", "dgCMatrix",
 
 setMethod("diag", c(x = "CHMfactor"),
           function(x = 1, nrow, ncol, names = TRUE)
-              .Call(CHMfactor_diag_get, x, TRUE))
+              .Call(sparseCholesky_diag_get, x, TRUE))
 
 setMethod("expand1", c(x = "CHMsimpl"),
           function(x, which, ...) {
@@ -549,7 +549,7 @@ setMethod("expand", c(x = "CHMfactor"),
               list(P = expand1(x, "P1"), L = expand1(x, "L")))
 
 .updateCHMfactor <- function(object, parent, mult = 0)
-    .Call(CHMfactor_update, object, parent, mult)
+    .Call(sparseCholesky_update, object, parent, mult)
 
 setMethod("update", c(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
@@ -565,7 +565,7 @@ setMethod("update", c(object = "CHMfactor"),
           })
 
 .updownCHMfactor <- function(update, C, L)
-    .Call(CHMfactor_updown, L, C, update)
+    .Call(sparseCholesky_updown, L, C, update)
 
 setMethod("updown",
           c(update = "character", C = "ANY", L = "ANY"),
