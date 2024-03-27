@@ -12,20 +12,20 @@ SEXP R_dense_diag_get(SEXP, SEXP);
 SEXP dense_diag_set(SEXP, const char *, SEXP, int);
 SEXP R_dense_diag_set(SEXP, SEXP);
 
-SEXP dense_transpose(SEXP, const char *);
-SEXP R_dense_transpose(SEXP);
+SEXP dense_transpose(SEXP, const char *, char);
+SEXP R_dense_transpose(SEXP, SEXP);
 
-SEXP dense_force_symmetric(SEXP, const char *, char);
-SEXP R_dense_force_symmetric(SEXP, SEXP);
+SEXP dense_force_symmetric(SEXP, const char *, char, char);
+SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
 
-SEXP dense_symmpart(SEXP, const char *);
-SEXP R_dense_symmpart(SEXP);
+SEXP dense_symmpart(SEXP, const char *, char);
+SEXP R_dense_symmpart(SEXP, SEXP);
 
-SEXP dense_skewpart(SEXP, const char *);
-SEXP R_dense_skewpart(SEXP);
+SEXP dense_skewpart(SEXP, const char *, char);
+SEXP R_dense_skewpart(SEXP, SEXP);
 
-int dense_is_symmetric(SEXP, const char *, int);
-SEXP R_dense_is_symmetric(SEXP, SEXP);
+int dense_is_symmetric(SEXP, const char *, char, int);
+SEXP R_dense_is_symmetric(SEXP, SEXP, SEXP);
 
 int dense_is_triangular(SEXP, const char *, int);
 SEXP R_dense_is_triangular(SEXP, SEXP);

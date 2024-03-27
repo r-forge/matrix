@@ -1391,7 +1391,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 			xcl = valid[R_check_class_etc(x, valid)];
 		}
 		if (xtrans_) {
-			REPROTECT(x = dense_transpose(x, xcl), xpid);
+			REPROTECT(x = dense_transpose(x, xcl, 'T'), xpid);
 			xtrans_ = 0;
 		}
 		break;
@@ -1430,7 +1430,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
 		if (ytrans_) {
-			REPROTECT(y = dense_transpose(y, ycl), ypid);
+			REPROTECT(y = dense_transpose(y, ycl, 'T'), ypid);
 			ytrans_ = 0;
 		}
 		break;
