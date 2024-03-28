@@ -72,12 +72,9 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 			while (mn-- > 0) \
 				*(dest++) = *src; \
 		} else if (!packed) { \
-			if (!recycle) { \
-				if (!byrow) \
-					Matrix_memcpy(dest, src, mn, sizeof(_CTYPE_)); \
-				else \
-					_PREFIX_ ## trans2(dest, src, n, m, 'T'); \
-			} else { \
+			if (!recycle) \
+				_PREFIX_ ## trans2(dest, src, n, m, (!byrow) ? 'N' : 'T'); \
+			else { \
 				if (!byrow) { \
 					k = 0; \
 					while (mn-- > 0) { \

@@ -217,10 +217,12 @@ trans2(_CTYPE_ *dest, const _CTYPE_ *src, int m, int n, char trans) \
 	for (j = 0; j < m; ++j, src -= mn1s) \
 		for (i = 0; i < n; ++i, src += m, dest += 1) \
 			ASSIGN_JI_ ## _PREFIX_((*dest), (*src)); \
-	else \
+	else if (trans == 'T') \
 	for (j = 0; j < m; ++j, src -= mn1s) \
 		for (i = 0; i < n; ++i, src += m, dest += 1) \
 			ASSIGN_IJ_ ## _PREFIX_((*dest), (*src)); \
+	else \
+	Matrix_memcpy(dest, src, mn1s + 1, sizeof(_CTYPE_)); \
 	return; \
 }
 IDZ
@@ -251,7 +253,7 @@ trans1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans) \
 			} \
 		} \
 	} \
-	} else { \
+	} else if (trans == 'T') { \
 	if (uplo == 'U') { \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
@@ -270,7 +272,8 @@ trans1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans) \
 			} \
 		} \
 	} \
-	} \
+	} else \
+	Matrix_memcpy(dest, src, PACKED_LENGTH(n), sizeof(_CTYPE_)); \
 	return; \
 }
 IDZ
