@@ -39,16 +39,16 @@ setMethod("%*%", c(x = "ANY", y = .cl),
 
 setMethod("%*%", c(x = "denseMatrix", y = "denseMatrix"),
           function(x, y)
-              .Call(R_dense_matmult, x, y, FALSE, FALSE))
+              .Call(R_dense_matmult, x, y, "N", "N"))
 
 for(.cl in c("matrix", "vector")) {
 setMethod("%*%", c(x = "denseMatrix", y = .cl),
           function(x, y)
-              .Call(R_dense_matmult, x, y, FALSE, FALSE))
+              .Call(R_dense_matmult, x, y, "N", "N"))
 
 setMethod("%*%", c(x = .cl, y = "denseMatrix"),
           function(x, y)
-              .Call(R_dense_matmult, x, y, FALSE, FALSE))
+              .Call(R_dense_matmult, x, y, "N", "N"))
 }
 
 
@@ -56,24 +56,24 @@ setMethod("%*%", c(x = .cl, y = "denseMatrix"),
 
 setMethod("%*%", c(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = "CsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = "CsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%*%", c(x = "CsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = .cl, y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 }
 
 
@@ -81,24 +81,24 @@ setMethod("%*%", c(x = .cl, y = "CsparseMatrix"),
 
 setMethod("%*%", c(x = "RsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 
 setMethod("%*%", c(x = "RsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 
 setMethod("%*%", c(x = "RsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%*%", c(x = "RsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = .cl, y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 }
 
 
@@ -106,24 +106,24 @@ setMethod("%*%", c(x = .cl, y = "RsparseMatrix"),
 
 setMethod("%*%", c(x = "TsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = "TsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 
 setMethod("%*%", c(x = "TsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%*%", c(x = "TsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE, FALSE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", FALSE))
 
 setMethod("%*%", c(x = .cl, y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE, FALSE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", FALSE))
 }
 
 
@@ -163,11 +163,11 @@ for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
 setMethod("%*%", c(x = "diagonalMatrix", y = .cl),
           function(x, y)
-              .Call(R_diagonal_matmult, x, y, FALSE, FALSE, FALSE))
+              .Call(R_diagonal_matmult, x, y, "N", "N", FALSE))
 
 setMethod("%*%", c(x = .cl, y = "diagonalMatrix"),
           function(x, y)
-              .Call(R_diagonal_matmult, x, y, FALSE, FALSE, FALSE))
+              .Call(R_diagonal_matmult, x, y, "N", "N", FALSE))
 }
 
 
@@ -487,16 +487,16 @@ setMethod("%&%", c(x = "vector", y = "vector"),
 
 setMethod("%&%", c(x = "denseMatrix", y = "denseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 for(.cl in c("matrix", "vector")) {
 setMethod("%&%", c(x = "denseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = .cl, y = "denseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 }
 
 
@@ -504,24 +504,24 @@ setMethod("%&%", c(x = .cl, y = "denseMatrix"),
 
 setMethod("%&%", c(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = "CsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = "CsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%&%", c(x = "CsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = .cl, y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 }
 
 
@@ -529,24 +529,24 @@ setMethod("%&%", c(x = .cl, y = "CsparseMatrix"),
 
 setMethod("%&%", c(x = "RsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 
 setMethod("%&%", c(x = "RsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 
 setMethod("%&%", c(x = "RsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%&%", c(x = "RsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 
 setMethod("%&%", c(x = .cl, y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 }
 
 
@@ -554,24 +554,24 @@ setMethod("%&%", c(x = .cl, y = "RsparseMatrix"),
 
 setMethod("%&%", c(x = "TsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = "TsparseMatrix", y = "RsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, y, x,  TRUE,  TRUE,  TRUE,  TRUE))
+              .Call(R_sparse_matmult, y, x, "T", "T", "T", TRUE))
 
 setMethod("%&%", c(x = "TsparseMatrix", y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("%&%", c(x = "TsparseMatrix", y = .cl),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 
 setMethod("%&%", c(x = .cl, y = "TsparseMatrix"),
           function(x, y)
-              .Call(R_sparse_matmult, x, y, FALSE, FALSE, FALSE,  TRUE))
+              .Call(R_sparse_matmult, x, y, "N", "N", "N", TRUE))
 }
 
 
@@ -600,11 +600,11 @@ for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
 setMethod("%&%", c(x = "diagonalMatrix", y = .cl),
           function(x, y)
-              .Call(R_diagonal_matmult, x, y, FALSE, FALSE,  TRUE))
+              .Call(R_diagonal_matmult, x, y, "N", "N", TRUE))
 
 setMethod("%&%", c(x = .cl, y = "diagonalMatrix"),
           function(x, y)
-              .Call(R_diagonal_matmult, x, y, FALSE, FALSE,  TRUE))
+              .Call(R_diagonal_matmult, x, y, "N", "N", TRUE))
 }
 
 
@@ -890,31 +890,31 @@ setMethod("crossprod", c(x = "ANY", y = .cl),
 setMethod("crossprod", c(x = "denseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
               if(if(is.na(boolArith)) .M.kind(x) == "n" else boolArith)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y,  TRUE, FALSE))
+              .Call(R_dense_matmult , x, y, "T", "N"))
 
 setMethod("crossprod", c(x = "denseMatrix", y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               if(if(is.na(boolArith)) .M.kind(x) == "n" && .M.kind(y) == "n" else boolArith)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y,  TRUE, FALSE))
+              .Call(R_dense_matmult , x, y, "T", "N"))
 
 for(.cl in c("matrix", "vector")) {
 setMethod("crossprod", c(x = "denseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
               if(!is.na(boolArith) && boolArith)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y,  TRUE, FALSE))
+              .Call(R_dense_matmult , x, y, "T", "N"))
 
 setMethod("crossprod", c(x = .cl, y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               if(!is.na(boolArith) && boolArith)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y,  TRUE, FALSE))
+              .Call(R_dense_matmult , x, y, "T", "N"))
 }
 
 
@@ -922,28 +922,28 @@ setMethod("crossprod", c(x = .cl, y = "denseMatrix"),
 
 setMethod("crossprod", c(x = "CsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "CsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "CsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("crossprod", c(x = "CsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = .cl, y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 }
 
 
@@ -951,28 +951,28 @@ setMethod("crossprod", c(x = .cl, y = "CsparseMatrix"),
 
 setMethod("crossprod", c(x = "RsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "T", boolArith))
 
 setMethod("crossprod", c(x = "RsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 
 setMethod("crossprod", c(x = "RsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 
 setMethod("crossprod", c(x = "RsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("crossprod", c(x = "RsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = .cl, y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 }
 
 
@@ -980,28 +980,28 @@ setMethod("crossprod", c(x = .cl, y = "RsparseMatrix"),
 
 setMethod("crossprod", c(x = "TsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "TsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "TsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = "TsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("crossprod", c(x = "TsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  TRUE, FALSE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "T", "N", "N", boolArith))
 
 setMethod("crossprod", c(x = .cl, y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  TRUE, FALSE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "T", "N", "T", boolArith))
 }
 
 
@@ -1037,11 +1037,11 @@ for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
 setMethod("crossprod", c(x = "diagonalMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_diagonal_matmult, x, y,  TRUE, FALSE, boolArith))
+              .Call(R_diagonal_matmult, x, y, "T", "N", boolArith))
 
 setMethod("crossprod", c(x = .cl, y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_diagonal_matmult, x, y,  TRUE, FALSE, boolArith))
+              .Call(R_diagonal_matmult, x, y, "T", "N", boolArith))
 }
 
 
@@ -1271,31 +1271,31 @@ setMethod("tcrossprod", c(x = "ANY", y = .cl),
 setMethod("tcrossprod", c(x = "denseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
               if(if(is.na(boolArith)) .M.kind(x) == "n" else boolArith)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y, FALSE,  TRUE))
+              .Call(R_dense_matmult , x, y, "N", "T"))
 
 setMethod("tcrossprod", c(x = "denseMatrix", y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               if(if(is.na(boolArith)) .M.kind(x) == "n" && .M.kind(y) == "n" else boolArith)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y, FALSE,  TRUE))
+              .Call(R_dense_matmult , x, y, "N", "T"))
 
 for(.cl in c("matrix", "vector")) {
 setMethod("tcrossprod", c(x = "denseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
               if(!is.na(boolArith) && boolArith)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y, FALSE,  TRUE))
+              .Call(R_dense_matmult , x, y, "N", "T"))
 
 setMethod("tcrossprod", c(x = .cl, y = "denseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
               if(!is.na(boolArith) && boolArith)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE,  TRUE)
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", TRUE)
               else
-              .Call(R_dense_matmult, x, y, FALSE,  TRUE))
+              .Call(R_dense_matmult , x, y, "N", "T"))
 }
 
 
@@ -1303,28 +1303,28 @@ setMethod("tcrossprod", c(x = .cl, y = "denseMatrix"),
 
 setMethod("tcrossprod", c(x = "CsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "CsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "CsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("tcrossprod", c(x = "CsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = .cl, y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x, FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 }
 
 
@@ -1332,28 +1332,28 @@ setMethod("tcrossprod", c(x = .cl, y = "CsparseMatrix"),
 
 setMethod("tcrossprod", c(x = "RsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y,  FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "T", boolArith))
 
 setMethod("tcrossprod", c(x = "RsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 
 setMethod("tcrossprod", c(x = "RsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 
 setMethod("tcrossprod", c(x = "RsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x,  FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("tcrossprod", c(x = "RsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = .cl, y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x, FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 }
 
 
@@ -1361,28 +1361,28 @@ setMethod("tcrossprod", c(x = .cl, y = "RsparseMatrix"),
 
 setMethod("tcrossprod", c(x = "TsparseMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "TsparseMatrix", y = "CsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "TsparseMatrix", y = "RsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = "TsparseMatrix", y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 for(.cl in c("denseMatrix", "matrix", "vector")) {
 setMethod("tcrossprod", c(x = "TsparseMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, x, y, FALSE,  TRUE, FALSE, boolArith))
+              .Call(R_sparse_matmult, x, y, "N", "T", "N", boolArith))
 
 setMethod("tcrossprod", c(x = .cl, y = "TsparseMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_sparse_matmult, y, x, FALSE,  TRUE,  TRUE, boolArith))
+              .Call(R_sparse_matmult, y, x, "N", "T", "T", boolArith))
 }
 
 
@@ -1418,11 +1418,11 @@ for(.cl in c("CsparseMatrix", "RsparseMatrix", "TsparseMatrix",
              "denseMatrix", "matrix", "vector")) {
 setMethod("tcrossprod", c(x = "diagonalMatrix", y = .cl),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_diagonal_matmult, x, y, FALSE,  TRUE, boolArith))
+              .Call(R_diagonal_matmult, x, y, "N", "T", boolArith))
 
 setMethod("tcrossprod", c(x = .cl, y = "diagonalMatrix"),
           function(x, y = NULL, boolArith = NA, ...)
-              .Call(R_diagonal_matmult, x, y, FALSE,  TRUE, boolArith))
+              .Call(R_diagonal_matmult, x, y, "N", "T", boolArith))
 }
 
 
