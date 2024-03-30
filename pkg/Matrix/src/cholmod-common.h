@@ -23,11 +23,4 @@ double          cholmod_factor_ldetA (cholmod_factor *);
 cholmod_factor *cholmod_factor_update(cholmod_factor *, cholmod_sparse *,
                                       double);
 
-int  R_cholmod_start (cholmod_common *);
-int  R_cholmod_finish(cholmod_common *);
-
-SEXP R_cholmod_common_envini(SEXP);
-void R_cholmod_common_envset(void);
-void R_cholmod_common_envget(void);
-
 #endif /* MATRIX_CHOLMOD_COMMON_H */

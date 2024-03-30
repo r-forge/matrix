@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-03-29 r4689)}{
+\section{Changes in version 1.8-0 (2024-03-30 r4690)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -22,7 +22,10 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item .
+      \item \pkg{Matrix} now uses \code{cholmod_defaults} to reset
+      CHOLMOD parameters after modification, ensuring that the reset
+      happens fully and correctly even if CHOLMOD adds, removes, or
+      changes the default values of the parameters.
     }
   }
 }

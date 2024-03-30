@@ -379,6 +379,38 @@ R_MATRIX_CHOLMOD(ssmult)(CHM_SP A, CHM_SP B,
 	return fn(A, B, stype, values, sorted, Common);
 }
 
+R_MATRIX_INLINE void attribute_hidden
+R_MATRIX_CHOLMOD(error_handler)(int status, const char *file, int line,
+                                const char *message)
+{
+	/* NB: Matrix itself uses a handler that calls cholmod_defaults to
+	   reset parameters before signaling.  Consider defining _your_ own
+	   error handler restoring _your_ own instance of cholmod_common.
+
+	   ==> ../../src/cholmod-etc.c
+	*/
+
+	if (status < 0)
+		Rf_error("CHOLMOD error '%s' at file '%s', line %d",
+		         message, file, line);
+	else
+		Rf_warning("CHOLMOD warning '%s' at file '%s', line %d",
+		           message, file, line);
+	return;
+}
+
+R_MATRIX_INLINE int attribute_hidden
+R_MATRIX_CHOLMOD(start)(CHM_CM Common)
+{
+	static int (*fn)(CHM_CM) = NULL;
+	if (!fn)
+		fn = (int (*)(CHM_CM))
+			R_GetCCallable("Matrix", "cholmod_start");
+	int ans = fn(Common);
+	Common->error_handler = R_MATRIX_CHOLMOD(error_handler);
+	return ans;
+}
+
 R_MATRIX_INLINE CHM_SP attribute_hidden
 R_MATRIX_CHOLMOD(submatrix)(CHM_SP A, int *rset, int rsize, int *cset,
                             int csize, int values, int sorted, CHM_CM Common)
@@ -430,39 +462,6 @@ R_MATRIX_CHOLMOD(vertcat)(CHM_SP A, CHM_SP B, int values, CHM_CM Common)
 		fn = (CHM_SP (*)(CHM_SP, CHM_SP, int, CHM_CM))
 			R_GetCCallable("Matrix", "cholmod_vertcat");
 	return fn(A, B, values, Common);
-}
-
-
-/* ---- cholmod_start ----------------------------------------------- */
-/* NB: keep synchronized with analogues in ../../src/cholmod-common.c */
-
-R_MATRIX_INLINE void attribute_hidden
-R_MATRIX_CHOLMOD(error_handler)(int status, const char *file, int line,
-                                const char *message)
-{
-	/* NB: Matrix itself uses cholmod_common_env(ini|set|get) to preserve
-	   settings through error calls.  Consider defining *your* own error
-	   handler and restoring the instance of cholmod_common that *you* use.
-	*/
-
-	if (status < 0)
-		Rf_error("CHOLMOD error '%s' at file '%s', line %d",
-		         message, file, line);
-	else
-		Rf_warning("CHOLMOD warning '%s' at file '%s', line %d",
-		           message, file, line);
-}
-
-R_MATRIX_INLINE int attribute_hidden
-R_MATRIX_CHOLMOD(start)(CHM_CM Common)
-{
-	static int (*fn)(CHM_CM) = NULL;
-	if (!fn)
-		fn = (int (*)(CHM_CM))
-			R_GetCCallable("Matrix", "cholmod_start");
-	int ans = fn(Common);
-	Common->error_handler = R_MATRIX_CHOLMOD(error_handler);
-	return ans;
 }
 
 #ifdef	__cplusplus

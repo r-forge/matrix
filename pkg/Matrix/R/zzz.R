@@ -112,7 +112,6 @@ Matrix.Version <- function() {
     wSD <- as.integer(Sys.getenv("R_MATRIX_WARN_SQRT_DEFAULT", NA))
     assign("warnSqrtDefault", wSD, envir = .MatrixEnv)
 
-    .Call(R_cholmod_common_envini, .CholmodCommonEnv)
     NULL
 }
 
