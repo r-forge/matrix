@@ -408,14 +408,15 @@ data(KNex, package = "Matrix")
 mtm <- with(KNex, crossprod(mm))
 ld.3 <- determinant(Cholesky(mtm, perm = TRUE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
-                    "sPDCholesky"))
+                    "simplicialCholesky~"))
 ld.4 <- determinant(Cholesky(mtm, perm = FALSE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
-                    c("sPDCholesky", "spDCholesky")))
+                    c("simplicialCholesky~", "simplicialCholesky")))
 c2 <- Cholesky(mtm, super = TRUE)
 validObject(c2)
 stopifnot(identical(names(mtm@factors),
-                    c("sPDCholesky", "spDCholesky", "SPdCholesky")))
+                    c("simplicialCholesky~", "simplicialCholesky",
+                      "supernodalCholesky~")))
 
 r <- allCholesky(mtm)
 r[-1]

@@ -48,7 +48,7 @@ setMethod("lu", c(x = "sparseMatrix"),
 
 setMethod("lu", c(x = "dgCMatrix"),
           function(x, errSing = TRUE, order = NA_integer_, tol = 1, ...)
-              .Call(gCMatrix_trf, x, order, tol, errSing))
+              .Call(gCMatrix_trf, x, if(errSing) 2L else 0L, order, tol))
 
 setMethod("lu", c(x = "dsCMatrix"),
           function(x, cache = TRUE, ...) {

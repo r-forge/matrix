@@ -98,7 +98,7 @@ setMethod("Cholesky", c(A = "dspMatrix"),
 setMethod("Cholesky", c(A = "dsCMatrix"),
           function(A, perm = TRUE, LDL = !super, super = FALSE,
                    Imult = 0, ...)
-              .Call(pCMatrix_trf, A, perm, LDL, super, Imult))
+              .Call(pCMatrix_trf, A, 2L, perm, !LDL, super, Imult))
 
 setMethod("Cholesky", c(A = "dsRMatrix"),
           function(A, ...)

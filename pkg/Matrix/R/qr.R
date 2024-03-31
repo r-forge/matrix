@@ -20,7 +20,7 @@ setMethod("qr", c(x = "sparseMatrix"),
 
 setMethod("qr", c(x = "dgCMatrix"),
           function(x, order = 3L, ...) {
-              r <- .Call(gCMatrix_orf, x, order, TRUE)
+              r <- .Call(gCMatrix_orf, x, 2L, order)
               .qr.rank.def.warn(r)
               r
           })

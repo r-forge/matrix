@@ -38,19 +38,16 @@ do { \
 	} \
 } while (0)
 
-#define ERROR_LAPACK_3(_ROUTINE_, _INFO_, _WARN_, _NPROTECT_) \
+#define ERROR_LAPACK_3(_ROUTINE_, _INFO_, _WARN_) \
 do { \
 	ERROR_LAPACK_1(_ROUTINE_, _INFO_); \
 	if ((_INFO_) > 0 && (_WARN_) > 0) { \
 		if (_WARN_ > 1) \
 			error  (_("LAPACK routine '%s': leading principal minor of order %d is not positive"), \
 			        #_ROUTINE_, (_INFO_)); \
-		else { \
+		else \
 			warning(_("LAPACK routine '%s': leading principal minor of order %d is not positive"), \
 			        #_ROUTINE_, (_INFO_)); \
-			UNPROTECT(_NPROTECT_); \
-			return ScalarInteger(_INFO_); \
-		} \
 	} \
 } while (0)
 

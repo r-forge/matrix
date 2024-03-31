@@ -202,32 +202,34 @@ cholmod_dense *M2CHD(SEXP obj, int trans)
 	return A;
 }
 
+#define errorChar(...) mkChar(Matrix_sprintf(__VA_ARGS__))
+
 SEXP CHF2M(cholmod_factor *L, int values)
 {
 	if (L->itype != CHOLMOD_INT)
-		error(_("wrong '%s'"), "itype");
+		return errorChar(_("wrong '%s'"), "itype");
 	if (values && L->xtype != CHOLMOD_REAL && L->xtype != CHOLMOD_COMPLEX)
-		error(_("wrong '%s'"), "xtype");
+		return errorChar(_("wrong '%s'"), "xtype");
 	if (values && L->dtype != CHOLMOD_DOUBLE)
-		error(_("wrong '%s'"), "dtype");
+		return errorChar(_("wrong '%s'"), "dtype");
 	if (L->n > INT_MAX)
-		error(_("dimensions cannot exceed %s"), "2^31-1");
+		return errorChar(_("dimensions cannot exceed %s"), "2^31-1");
 	if (L->super) {
 		if (L->maxcsize > INT_MAX)
-			error(_("'%s' would overflow type \"%s\""),
-			      "maxcsize", "integer");
+		return errorChar(_("'%s' would overflow type \"%s\""),
+		                 "maxcsize", "integer");
 	} else {
 		if (L->n == INT_MAX)
-			error(_("n+1 would overflow type \"%s\""),
-			      "integer");
+		return errorChar(_("n+1 would overflow type \"%s\""),
+		                 "integer");
 	}
 	if (L->minor < L->n) {
 		if (L->is_ll)
-			error(_("leading principal minor of order %d is not positive"),
-			      (int) L->minor + 1);
+		return errorChar(_("leading principal minor of order %d is not positive"),
+		                 (int) L->minor + 1);
 		else
-			error(_("leading principal minor of order %d is zero"),
-			      (int) L->minor + 1);
+		return errorChar(_("leading principal minor of order %d is zero"),
+		                 (int) L->minor + 1);
 	}
 	char cl[] = ".CHM.....";
 	cl[0] = (!values) ? 'n' : ((L->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd');
@@ -305,13 +307,13 @@ SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 {
 	cholmod_sparse *A_ = A;
 	if (A->itype != CHOLMOD_INT)
-		error(_("wrong '%s'"), "itype");
+		return errorChar(_("wrong '%s'"), "itype");
 	if (values && A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
-		error(_("wrong '%s'"), "xtype");
+		return errorChar(_("wrong '%s'"), "xtype");
 	if (values && A->dtype != CHOLMOD_DOUBLE)
-		error(_("wrong '%s'"), "dtype");
+		return errorChar(_("wrong '%s'"), "dtype");
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
-		error(_("dimensions cannot exceed %s"), "2^31-1");
+		return errorChar(_("dimensions cannot exceed %s"), "2^31-1");
 	if (!A->sorted)
 		cholmod_sort(A, &c);
 	if (!A->packed || A->stype != 0)
@@ -352,17 +354,17 @@ SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 SEXP CHD2M(cholmod_dense *A, int trans, char shape)
 {
 	if (A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
-		error(_("wrong '%s'"), "xtype");
+		return errorChar(_("wrong '%s'"), "xtype");
 	if (A->dtype != CHOLMOD_DOUBLE)
-		error(_("wrong '%s'"), "dtype");
+		return errorChar(_("wrong '%s'"), "dtype");
 	if (A->d != A->nrow) /* MJ: currently no need to support this case */
-		error(_("leading dimension not equal to number of rows"));
+		return errorChar(_("leading dimension not equal to number of rows"));
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
-		error(_("dimensions cannot exceed %s"), "2^31-1");
+		return errorChar(_("dimensions cannot exceed %s"), "2^31-1");
 	int m = (int) A->nrow, n = (int) A->ncol;
 	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		return errorChar(_("attempt to allocate vector of length exceeding %s"),
+		                 "R_XLEN_T_MAX");
 	char cl[] = "...Matrix";
 	cl[0] = (A->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd';
 	cl[1] = shape;
