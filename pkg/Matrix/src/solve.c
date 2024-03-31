@@ -481,15 +481,14 @@ SEXP trMatrix_solve(SEXP a, SEXP b)
 	return r;
 }
 
+#define ERROR_SOLVE_OOM(_ACL_, _BCL_) \
+	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", _ACL_, _BCL_)
+
 #define IF_COMPLEX(_IF_, _ELSE_) \
 	((CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? (_IF_) : (_ELSE_))
 
 SEXP sparseLU_solve(SEXP a, SEXP b, SEXP sparse)
 {
-
-#define ERROR_SOLVE_OOM(_ACL_, _BCL_) \
-	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", _ACL_, _BCL_)
-
 	SOLVE_START;
 
 	SEXP r,
@@ -769,7 +768,7 @@ SEXP sparseCholesky_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			if (!X)
 				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
 			PROTECT(r = CHS2M(X, 1,
-				(ivalid < 2) ? 's' : ((ivalid < 7) ? 't' : 'g')));
+				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHS(b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);

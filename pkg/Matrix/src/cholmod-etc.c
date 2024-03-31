@@ -321,6 +321,10 @@ SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 	char cl[] = "..CMatrix";
 	cl[0] = (!values) ? 'n' : ((A->xtype == CHOLMOD_COMPLEX) ? 'z' : 'd');
 	cl[1] = shape;
+#ifndef MATRIX_ENABLE_POSDEF
+	if (cl[1] == 'p')
+		cl[1] = 's';
+#endif
 	int m = (int) A->nrow, n = (int) A->ncol, nnz = ((int *) A->p)[A->ncol];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 	SEXP obj = PROTECT(newObject(cl)),

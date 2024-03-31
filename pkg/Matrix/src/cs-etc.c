@@ -45,6 +45,10 @@ SEXP CXS2M(Matrix_cs *A, int values, char shape)
 	cl[0] = (!values || A->xtype == CXSPARSE_PATTERN)
 		? 'n' : ((A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd');
 	cl[1] = shape;
+#ifndef MATRIX_ENABLE_POSDEF
+	if (cl[1] == 'p')
+		cl[1] = 's';
+#endif
 	int nnz = A->p[A->n];
 	R_xlen_t np1 = (R_xlen_t) A->n + 1;
 	SEXP obj = PROTECT(newObject(cl)),
