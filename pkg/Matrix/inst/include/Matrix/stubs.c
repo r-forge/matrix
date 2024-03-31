@@ -201,7 +201,7 @@ R_MATRIX_CHOLMOD(factorize)(CHM_SP A, CHM_FR L, CHM_CM Common)
 
 R_MATRIX_INLINE int attribute_hidden
 R_MATRIX_CHOLMOD(factorize_p)(CHM_SP A, double beta[2], int *fset,
-                      size_t fsize, CHM_FR L, CHM_CM Common)
+                              size_t fsize, CHM_FR L, CHM_CM Common)
 {
 	static int (*fn)(CHM_SP, double[2], int *, size_t, CHM_FR, CHM_CM) = NULL;
 	if (!fn)
@@ -370,7 +370,7 @@ R_MATRIX_CHOLMOD(spsolve)(int sys, CHM_FR L, CHM_SP B, CHM_CM Common)
 
 R_MATRIX_INLINE CHM_SP attribute_hidden
 R_MATRIX_CHOLMOD(ssmult)(CHM_SP A, CHM_SP B,
-                 int stype, int values, int sorted, CHM_CM Common)
+                         int stype, int values, int sorted, CHM_CM Common)
 {
 	static CHM_SP (*fn)(CHM_SP, CHM_SP, int, int, int, CHM_CM) = NULL;
 	if (!fn)
