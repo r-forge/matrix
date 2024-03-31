@@ -24,9 +24,9 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 #else
 	char cl[] =       "Schur";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+	SEXP scf = PROTECT(newObject(cl));
+	SET_SLOT(scf, Matrix_DimSym, dim);
+	SET_SLOT(scf, Matrix_DimNamesSym, dimnames);
 	if (n > 0) {
 		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
 			v = PROTECT(allocVector(TYPEOF(x), (vectors) ? XLENGTH(x) : 0)),
@@ -74,13 +74,13 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 			}
 		}
 		}
-		SET_SLOT(val, Matrix_xSym, y);
-		SET_SLOT(val, Matrix_vectorsSym, v);
-		SET_SLOT(val, Matrix_valuesSym, w);
+		SET_SLOT(scf, Matrix_xSym, y);
+		SET_SLOT(scf, Matrix_vectorsSym, v);
+		SET_SLOT(scf, Matrix_valuesSym, w);
 		UNPROTECT(3); /* w, v, y */
 	}
-	UNPROTECT(4); /* val, x, dimnames, dim */
-	return val;
+	UNPROTECT(4); /* scf, x, dimnames, dim */
+	return scf;
 }
 
 static
@@ -109,9 +109,9 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 #else
 	char cl[] =       "Schur";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
+	SEXP scf = PROTECT(newObject(cl));
+	SET_SLOT(scf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(scf, dimnames, -1);
 	if (n > 0) {
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 			v = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
@@ -142,12 +142,12 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 		ERROR_LAPACK_5(dsyev, info, warn);
 		}
 		if (vectors)
-		SET_SLOT(val, Matrix_vectorsSym, v);
-		SET_SLOT(val, Matrix_valuesSym, w);
+		SET_SLOT(scf, Matrix_vectorsSym, v);
+		SET_SLOT(scf, Matrix_valuesSym, w);
 		UNPROTECT(3); /* w, v, uplo */
 	}
-	UNPROTECT(4); /* val, dimnames, dim, x */
-	return val;
+	UNPROTECT(4); /* scf, dimnames, dim, x */
+	return scf;
 }
 
 static
@@ -176,9 +176,9 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 #else
 	char cl[] =       "Schur";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
+	SEXP scf = PROTECT(newObject(cl));
+	SET_SLOT(scf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(scf, dimnames, -1);
 	if (n > 0) {
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
@@ -204,12 +204,12 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 		ERROR_LAPACK_5(dspev, info, warn);
 		}
 		if (vectors)
-		SET_SLOT(val, Matrix_vectorsSym, v);
-		SET_SLOT(val, Matrix_valuesSym, w);
+		SET_SLOT(scf, Matrix_vectorsSym, v);
+		SET_SLOT(scf, Matrix_valuesSym, w);
 		UNPROTECT(4); /* w, v, y, uplo */
 	}
-	UNPROTECT(4); /* val, dimnames, dim, x */
-	return val;
+	UNPROTECT(4); /* scf, dimnames, dim, x */
+	return scf;
 }
 
 static
@@ -225,9 +225,9 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 #else
 	char cl[] =  "denseLU";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	SET_SLOT(val, Matrix_DimNamesSym, dimnames);
+	SEXP trf = PROTECT(newObject(cl));
+	SET_SLOT(trf, Matrix_DimSym, dim);
+	SET_SLOT(trf, Matrix_DimNamesSym, dimnames);
 	if (r > 0) {
 		SEXP perm = PROTECT(allocVector(INTSXP, r)),
 			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
@@ -243,12 +243,12 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 		F77_CALL(dgetrf)(&m, &n, py, &m, pperm, &info);
 		ERROR_LAPACK_2(dgetrf, info, warn, U);
 		}
-		SET_SLOT(val, Matrix_permSym, perm);
-		SET_SLOT(val, Matrix_xSym, y);
+		SET_SLOT(trf, Matrix_permSym, perm);
+		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(4); /* val, x, dimnames, dim */
-	return val;
+	UNPROTECT(4); /* trf, x, dimnames, dim */
+	return trf;
 }
 
 static
@@ -266,15 +266,15 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 #else
 	char cl[] =       "BunchKaufman";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
-	SET_SLOT(val, Matrix_uploSym, uplo);
+	SEXP trf = PROTECT(newObject(cl));
+	SET_SLOT(trf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(trf, dimnames, -1);
+	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
 		ct = *CHAR(STRING_ELT(trans, 0));
 		if (ct != 'C')
-			SET_SLOT(val, Matrix_transSym, trans);
+			SET_SLOT(trf, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
@@ -308,12 +308,12 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		F77_CALL(dsytrf)(&ul, &n, py, &n, pperm, work, &lwork, &info FCONE);
 		ERROR_LAPACK_2(dsytrf, info, warn, D);
 		}
-		SET_SLOT(val, Matrix_permSym, perm);
-		SET_SLOT(val, Matrix_xSym, y);
+		SET_SLOT(trf, Matrix_permSym, perm);
+		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(5); /* val, x, uplo, dimnames, dim */
-	return val;
+	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	return trf;
 }
 
 static
@@ -331,15 +331,15 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 #else
 	char cl[] =      "pBunchKaufman";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
-	SET_SLOT(val, Matrix_uploSym, uplo);
+	SEXP trf = PROTECT(newObject(cl));
+	SET_SLOT(trf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(trf, dimnames, -1);
+	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
 		ct = *CHAR(STRING_ELT(trans, 0));
 		if (ct != 'C')
-			SET_SLOT(val, Matrix_transSym, trans);
+			SET_SLOT(trf, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
@@ -362,12 +362,12 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		F77_CALL(dsptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(dsptrf, info, warn, D);
 		}
-		SET_SLOT(val, Matrix_permSym, perm);
-		SET_SLOT(val, Matrix_xSym, y);
+		SET_SLOT(trf, Matrix_permSym, perm);
+		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(5); /* val, x, uplo, dimnames, dim */
-	return val;
+	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	return trf;
 }
 
 static
@@ -385,10 +385,10 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 #else
 	char cl[] =       "Cholesky";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
-	SET_SLOT(val, Matrix_uploSym, uplo);
+	SEXP trf = PROTECT(newObject(cl));
+	SET_SLOT(trf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(trf, dimnames, -1);
+	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (n > 0) {
 		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
@@ -413,7 +413,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 				py += n;
 			}
 		}
-		SET_SLOT(val, Matrix_permSym, perm);
+		SET_SLOT(trf, Matrix_permSym, perm);
 		UNPROTECT(1); /* perm */
 		}
 		} else {
@@ -437,15 +437,15 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 				py += n;
 			}
 		}
-		SET_SLOT(val, Matrix_permSym, perm);
+		SET_SLOT(trf, Matrix_permSym, perm);
 		UNPROTECT(1); /* perm */
 		}
 		}
-		SET_SLOT(val, Matrix_xSym, y);
+		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(1); /* y */
 	}
-	UNPROTECT(5); /* val, x, uplo, dimnames, dim */
-	return val;
+	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	return trf;
 }
 
 static
@@ -463,10 +463,10 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 #else
 	char cl[] =      "pCholesky";
 #endif
-	SEXP val = PROTECT(newObject(cl));
-	SET_SLOT(val, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(val, dimnames, -1);
-	SET_SLOT(val, Matrix_uploSym, uplo);
+	SEXP trf = PROTECT(newObject(cl));
+	SET_SLOT(trf, Matrix_DimSym, dim);
+	set_symmetrized_DimNames(trf, dimnames, -1);
+	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (n > 0) {
 		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
@@ -481,11 +481,11 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 			F77_CALL(dpptrf)(&ul, &n, py, &info FCONE);
 			ERROR_LAPACK_3(dpptrf, info, warn);
 		}
-		SET_SLOT(val, Matrix_xSym, y);
+		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(1); /* y */
 	}
-	UNPROTECT(5); /* val, x, uplo, dimnames, dim */
-	return val;
+	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	return trf;
 }
 
 SEXP geMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
@@ -498,16 +498,16 @@ SEXP geMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 		     "Schur"
 #endif
 		;
-	SEXP val = (vectors_) ? get_factor(obj, nm) : R_NilValue;
-	if (isNull(val)) {
-		val = geMatrix_scf_(obj, asInteger(warn), vectors_);
+	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	if (isNull(scf)) {
+		scf = geMatrix_scf_(obj, asInteger(warn), vectors_);
 		if (vectors_) {
-		PROTECT(val);
-		set_factor(obj, nm, val);
+		PROTECT(scf);
+		set_factor(obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
-	return val;
+	return scf;
 }
 
 SEXP syMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
@@ -520,16 +520,16 @@ SEXP syMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 		     "Schur"
 #endif
 		;
-	SEXP val = (vectors_) ? get_factor(obj, nm) : R_NilValue;
-	if (isNull(val)) {
-		val = syMatrix_scf_(obj, asInteger(warn), vectors_);
+	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	if (isNull(scf)) {
+		scf = syMatrix_scf_(obj, asInteger(warn), vectors_);
 		if (vectors_) {
-		PROTECT(val);
-		set_factor(obj, nm, val);
+		PROTECT(scf);
+		set_factor(obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
-	return val;
+	return scf;
 }
 
 SEXP spMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
@@ -542,28 +542,28 @@ SEXP spMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 		     "Schur"
 #endif
 		;
-	SEXP val = (vectors_) ? get_factor(obj, nm) : R_NilValue;
-	if (isNull(val)) {
-		val = spMatrix_scf_(obj, asInteger(warn), vectors_);
+	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	if (isNull(scf)) {
+		scf = spMatrix_scf_(obj, asInteger(warn), vectors_);
 		if (vectors_) {
-		PROTECT(val);
-		set_factor(obj, nm, val);
+		PROTECT(scf);
+		set_factor(obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
-	return val;
+	return scf;
 }
 
 SEXP geMatrix_trf(SEXP obj, SEXP warn)
 {
 	const char *nm = "denseLU";
-	SEXP val = get_factor(obj, nm);
-	if (isNull(val)) {
-		PROTECT(val = geMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, val);
+	SEXP trf = get_factor(obj, nm);
+	if (isNull(trf)) {
+		PROTECT(trf = geMatrix_trf_(obj, asInteger(warn)));
+		set_factor(obj, nm, trf);
 		UNPROTECT(1);
 	}
-	return val;
+	return trf;
 }
 
 SEXP syMatrix_trf(SEXP obj, SEXP warn)
@@ -575,13 +575,13 @@ SEXP syMatrix_trf(SEXP obj, SEXP warn)
 		     "BunchKaufman"
 #endif
 		;
-	SEXP val = get_factor(obj, nm);
-	if (isNull(val)) {
-		PROTECT(val = syMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, val);
+	SEXP trf = get_factor(obj, nm);
+	if (isNull(trf)) {
+		PROTECT(trf = syMatrix_trf_(obj, asInteger(warn)));
+		set_factor(obj, nm, trf);
 		UNPROTECT(1);
 	}
-	return val;
+	return trf;
 }
 
 SEXP spMatrix_trf(SEXP obj, SEXP warn)
@@ -593,13 +593,13 @@ SEXP spMatrix_trf(SEXP obj, SEXP warn)
 		    "pBunchKaufman"
 #endif
 		;
-	SEXP val = get_factor(obj, nm);
-	if (isNull(val)) {
-		PROTECT(val = spMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, val);
+	SEXP trf = get_factor(obj, nm);
+	if (isNull(trf)) {
+		PROTECT(trf = spMatrix_trf_(obj, asInteger(warn)));
+		set_factor(obj, nm, trf);
 		UNPROTECT(1);
 	}
-	return val;
+	return trf;
 }
 
 SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
@@ -612,14 +612,14 @@ SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 		(pivot_) ?      "Cholesky~" :      "Cholesky"
 #endif
 		;
-	SEXP val = get_factor(obj, nm);
-	if (isNull(val)) {
+	SEXP trf = get_factor(obj, nm);
+	if (isNull(trf)) {
 		double tol_ = asReal(tol);
-		PROTECT(val = poMatrix_trf_(obj, asInteger(warn), pivot_, tol_));
-		set_factor(obj, nm, val);
+		PROTECT(trf = poMatrix_trf_(obj, asInteger(warn), pivot_, tol_));
+		set_factor(obj, nm, trf);
 		UNPROTECT(1);
 	}
-	return val;
+	return trf;
 }
 
 SEXP ppMatrix_trf(SEXP obj, SEXP warn)
@@ -631,13 +631,13 @@ SEXP ppMatrix_trf(SEXP obj, SEXP warn)
 		    "pCholesky"
 #endif
 		;
-	SEXP val = get_factor(obj, nm);
-	if (isNull(val)) {
-		PROTECT(val = ppMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, val);
+	SEXP trf = get_factor(obj, nm);
+	if (isNull(trf)) {
+		PROTECT(trf = ppMatrix_trf_(obj, asInteger(warn)));
+		set_factor(obj, nm, trf);
 		UNPROTECT(1);
 	}
-	return val;
+	return trf;
 }
 
 #define DO_FREE(_T_, _S_, _N_, _P_) \
@@ -1076,12 +1076,12 @@ SEXP sparseCholesky_diag_get(SEXP trf, SEXP square)
 	return y;
 }
 
-SEXP denseBunchKaufman_expand(SEXP obj)
+SEXP denseBunchKaufman_expand(SEXP trf)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
+	SEXP dim = PROTECT(GET_SLOT(trf, Matrix_DimSym));
 	int n = INTEGER(dim)[1];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	int packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
 
 	SEXP P_ = PROTECT(newObject("pMatrix"));
@@ -1098,7 +1098,7 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 		SET_SLOT(D_, Matrix_DimSym, dim);
 	}
 
-	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	SEXP uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym));
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 	if (ul != 'U') {
 		SET_SLOT(T_, Matrix_uploSym, uplo);
@@ -1107,7 +1107,7 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 	UNPROTECT(1); /* uplo */
 
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+		SEXP trans = PROTECT(GET_SLOT(trf, Matrix_transSym));
 		char ct = *CHAR(STRING_ELT(trans, 0));
 		if (ct != 'C')
 			SET_SLOT(D_, Matrix_transSym, trans);
@@ -1121,7 +1121,7 @@ SEXP denseBunchKaufman_expand(SEXP obj)
 	int i, j, s;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
-	SEXP pivot = PROTECT(GET_SLOT(obj, Matrix_permSym)),
+	SEXP pivot = PROTECT(GET_SLOT(trf, Matrix_permSym)),
 		D_p = PROTECT(allocVector(INTSXP, n1a));
 	int *ppivot = INTEGER(pivot), *D_pp = INTEGER(D_p),
 		b = n, dp = (ul == 'U') ? 1 : 2;
