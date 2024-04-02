@@ -41,5 +41,5 @@ head(round(sparse.sol,3))
 system.time(
   sp.sol2 <- with(KNex, qr.coef(qr(mm), y) ))
 
-all.equal(sparse.sol, sp.sol2, tolerance = 1e-13) # TRUE
+all.equal(as.vector(sparse.sol), sp.sol2, tolerance = 1e-13) # TRUE
 }
