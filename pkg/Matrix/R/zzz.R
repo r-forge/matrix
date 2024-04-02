@@ -21,13 +21,10 @@ Matrix.Version <- function() {
 }
 
 
-## ~~~~ PACKAGE ENVIRONMENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~ ENVIRONMENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Recording default values of Matrix.* options
 .MatrixEnv <- new.env(parent = emptyenv(), hash = FALSE)
-
-## Storing settings from 'cholmod_common'
-.CholmodCommonEnv <- new.env(parent = emptyenv())
 
 
 ## ~~~~ NAMESPACE HOOKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
