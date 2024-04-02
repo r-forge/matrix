@@ -142,22 +142,24 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 
 #define CONJ2(_X_, _M_, _N_) \
 do { \
-	int m = _M_, n = _N_; \
+	int m = (int) _M_, n = (int) _N_; \
 	size_t mn = (size_t) m * n; \
-	Rcomplex *tmp = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	Rcomplex *dest = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	Rcomplex *src = (Rcomplex *) _X_; \
 	for (size_t k = 0; k < mn; ++k) \
-		ASSIGN2_COMPLEX_CJ(tmp[k], _X_[k]); \
-	_X_ = tmp; \
+		ASSIGN2_COMPLEX_CJ(dest[k], src[k]); \
+	_X_ = dest; \
 } while (0)
 
 #define CONJ1(_X_, _N_) \
 do { \
-	int n = _N_; \
+	int n = (int) _N_; \
 	size_t mn = (size_t) PACKED_LENGTH(n); \
-	Rcomplex *tmp = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	Rcomplex *dest = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	Rcomplex *src = (Rcomplex *) _X_; \
 	for (size_t k = 0; k < mn; ++k) \
-		ASSIGN2_COMPLEX_CJ(tmp[k], _X_[k]); \
-	_X_ = tmp; \
+		ASSIGN2_COMPLEX_CJ(dest[k], src[k]); \
+	_X_ = dest; \
 } while (0)
 
 /* op(<,ge>) * op(<,ge>) */
@@ -887,166 +889,202 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 /* boolean: op(op(<.gC>) & op(<.gC>)) */
 /* numeric: op(op(<,gC>) * op(<,gC>)) */
 static
-SEXP gCMatrix_gCMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
-                               int ztrans, int triangular, int boolean)
+SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
+                        int triangular, int boolean)
 {
-	PROTECT_INDEX zpid;
+
+#define ASMODE(_TRANS_) ((boolean) ? 0 : (((_TRANS_) != 'C') ? 1 : 2))
+
+	cholmod_sparse *X = M2CHS(x, !boolean), *Y = NULL, *Z = NULL;
+
 	SEXP z;
 	char zcl[] = "..CMatrix";
-	zcl[0] = (boolean) ? 'n' : 'd';
+
 	if (y == R_NilValue) {
-		zcl[1] = 's';
-		cholmod_sparse *X = M2CHS(x, !boolean);
-		if (X->xtype == CHOLMOD_COMPLEX)
-			error(_("'%s' does not support complex matrices"), "cholmod_aat");
-		if (xtrans)
-			X = cholmod_transpose(X, !boolean, &c);
-		cholmod_sparse *Z = cholmod_aat(X, (int *) NULL, 0, !boolean, &c);
-		if (xtrans)
+
+		zcl[0] = (boolean) ? 'n' : ((X->xtype != CHOLMOD_COMPLEX) ? 'd' : 'z');
+		zcl[1] = (boolean) ? 's' : ((X->xtype != CHOLMOD_COMPLEX) ? 'p' : ((((xtrans != 'N') ? xtrans : ytrans) == 'C') ? 'p' : 's'));
+#ifndef MATRIX_ENABLE_POSDEF
+		if (zcl[1] == 'p')
+			zcl[1] = 's';
+#endif
+
+		if (xtrans != 'N')
+			X = cholmod_transpose(X, ASMODE(xtrans), &c);
+		Z = cholmod_aat(X, NULL, 0, ASMODE((xtrans != 'N') ? xtrans : ytrans), &c);
+		if (xtrans != 'N')
 			cholmod_free_sparse(&X, &c);
 		if (!Z->sorted)
 			cholmod_sort(Z, &c);
-		X = cholmod_copy(Z, (ztrans) ? -1 : 1, 1, &c);
+		X = cholmod_copy(Z, (ztrans != 'N') ? -1 : 1, !boolean, &c);
 		cholmod_free_sparse(&Z, &c);
 		Z = X;
-		PROTECT_WITH_INDEX(z = CHS2M(Z, !boolean, zcl[1]), &zpid);
+		PROTECT(z = CHS2M(Z, !boolean, zcl[1]));
 		cholmod_free_sparse(&Z, &c);
+
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
-		symDN(zdimnames, xdimnames, (xtrans) ? 1 : 0);
+		symDN(zdimnames, xdimnames, (xtrans != 'N') ? 1 : 0);
 		UNPROTECT(2); /* zdimnames, xdimnames */
-		if (ztrans) {
-			SEXP uplo = PROTECT(mkString("L"));
-			SET_SLOT(z, Matrix_uploSym, uplo);
-			UNPROTECT(1); /* uplo */
+
+		if (ztrans != 'N') {
+			SEXP zuplo = PROTECT(mkString("L"));
+			SET_SLOT(z, Matrix_uploSym, zuplo);
+			UNPROTECT(1); /* zuplo */
 		}
+
+		if (zcl[1] == 's' && zcl[0] == 'z') {
+			SEXP ztrans = PROTECT(mkString("T"));
+			SET_SLOT(z, Matrix_transSym, ztrans);
+			UNPROTECT(1); /* ztrans */
+		}
+
 	} else {
-		zcl[1] = (triangular != 0) ? 't' : 'g';
-		cholmod_sparse
-			*X = M2CHS(x, !boolean),
-			*Y = M2CHS(y, !boolean);
-		if (X->xtype == CHOLMOD_COMPLEX || Y->xtype == CHOLMOD_COMPLEX)
-			error(_("'%s' does not support complex matrices"), "cholmod_ssmult");
-		if (((xtrans) ? X->nrow : X->ncol) != ((ytrans) ? Y->ncol : Y->nrow))
+
+		Y = M2CHS(y, !boolean);
+
+		if (((xtrans != 'N') ? X->nrow : X->ncol) !=
+		    ((ytrans != 'N') ? Y->ncol : Y->nrow))
 			error(_("non-conformable arguments"));
-		if (xtrans)
-			X = cholmod_transpose(X, !boolean, &c);
-		if (ytrans)
-			Y = cholmod_transpose(Y, !boolean, &c);
-		cholmod_sparse *Z = cholmod_ssmult(X, Y, 0, !boolean, 1, &c);
-		if (xtrans)
+
+		zcl[0] = (boolean) ? 'n' : ((X->xtype != CHOLMOD_COMPLEX && Y->xtype != CHOLMOD_COMPLEX) ? 'd' : 'z');
+		zcl[1] = (triangular != 0) ? 't' : 'g';
+
+		if (xtrans != 'N')
+			X = cholmod_transpose(X, ASMODE(xtrans), &c);
+		if (ytrans != 'N')
+			Y = cholmod_transpose(Y, ASMODE(ytrans), &c);
+		Z = cholmod_ssmult(X, Y, 0, !boolean, 1, &c);
+		if (xtrans != 'N')
 			cholmod_free_sparse(&X, &c);
-		if (ytrans)
+		if (ytrans != 'N')
 			cholmod_free_sparse(&Y, &c);
-		PROTECT_WITH_INDEX(z = CHS2M(Z, !boolean, zcl[1]), &zpid);
+		if (triangular < -1)
+			cholmod_band_inplace(-Z->nrow, -1, !boolean, Z, &c);
+		else if (triangular > 1)
+			cholmod_band_inplace( 1,  Z->ncol, !boolean, Z, &c);
+		PROTECT(z = CHS2M(Z, !boolean, zcl[1]));
 		cholmod_free_sparse(&Z, &c);
+
 		SEXP xdimnames = PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
 			ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
 		matmultDN(zdimnames,
-		          xdimnames, (xtrans) ? 1 : 0,
-		          ydimnames, (ytrans) ? 0 : 1);
+		          xdimnames, (xtrans != 'N') ? 1 : 0,
+		          ydimnames, (ytrans != 'N') ? 0 : 1);
 		UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
+
 		if (triangular < 0) {
 			SEXP uplo = PROTECT(mkString("L"));
 			SET_SLOT(z, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
-		if (triangular < -1 || triangular > 1)
-			REPROTECT(z = sparse_diag_N2U(z, zcl), zpid);
+
+		if (triangular < -1 || triangular > 1) {
+			SEXP diag = PROTECT(mkString("U"));
+			SET_SLOT(z, Matrix_diagSym, diag);
+			UNPROTECT(1); /* diag */
+		}
+
 	}
-	if (ztrans)
-		REPROTECT(z = sparse_transpose(z, zcl, 1), zpid);
+
+	if (ztrans != 'N')
+		z = sparse_transpose(z, zcl, 1);
+
 	UNPROTECT(1); /* z */
 	return z;
 }
 
 /* op(op(<,[gs]C>) * op(<,ge>)) */
+/* NB: currently, caller must coerce complex symmetric zsC to zgC */
 static
-SEXP gCMatrix_geMatrix_matmult(SEXP x, SEXP y, int xtrans, int ytrans,
-                               int ztrans, int triangular, int symmetric)
+SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
+                        int triangular, int symmetric)
 {
-	SEXP z;
-	char zcl[] = "...Matrix";
 	cholmod_sparse *X = M2CHS(x, 1);
-	cholmod_dense  *Y = M2CHD(y, ytrans);
-	zcl[0] = (X->xtype == CHOLMOD_COMPLEX || Y->xtype == CHOLMOD_COMPLEX)
-		? 'z' : 'd';
-	zcl[1] = (triangular) ? 't' : 'g';
-	zcl[2] = (triangular) ? 'r' : 'e';
 	X->stype = symmetric;
-	if (((xtrans) ? X->nrow : X->ncol) != Y->nrow) {
-		if (ytrans)
-			R_Free(Y->x);
+
+	cholmod_dense *Y = M2CHD(y, ytrans);
+
+	if (((xtrans != 'N') ? X->nrow : X->ncol) != Y->nrow)
 		error(_("non-conformable arguments"));
-	}
-	int m = (int) ((xtrans) ? X->ncol : X->nrow), n = (int) Y->ncol;
-	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX) {
-		if (ytrans)
-			R_Free(Y->x);
+	int m = (int) ((xtrans != 'N') ? X->ncol : X->nrow), n = (int) Y->ncol;
+	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
+
+	if (X->xtype == CHOLMOD_COMPLEX && xtrans == 'T')
+		CONJ2(X->x, X->nrow, X->ncol);
+
+	char zcl[] = "...Matrix";
+	zcl[0] = (X->xtype != CHOLMOD_COMPLEX && Y->xtype != CHOLMOD_COMPLEX) ? 'd' : 'z';
+	zcl[1] = (triangular != 0) ? 't' : 'g';
+	zcl[2] = (triangular != 0) ? 'r' : 'e';
+	SEXP z = PROTECT(newObject(zcl));
+
+	SEXP zdim = GET_SLOT(z, Matrix_DimSym);
+	INTEGER(zdim)[0] = (ztrans != 'N') ? n : m;
+	INTEGER(zdim)[1] = (ztrans != 'N') ? m : n;
+
+	SEXP xdimnames = (symmetric != 0)
+		? PROTECT(get_symmetrized_DimNames(x, -1))
+		: PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
+		ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
+		zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
+	if (ztrans != 'N')
+	matmultDN(zdimnames,
+	          ydimnames, (ytrans != 'N') ? 0 : 1,
+	          xdimnames, (xtrans != 'N') ? 1 : 0);
+	else
+	matmultDN(zdimnames,
+	          xdimnames, (xtrans != 'N') ? 1 : 0,
+	          ydimnames, (ytrans != 'N') ? 0 : 1);
+	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
+
+	if (triangular != 0 && (ztrans != 'N') == (triangular > 0)) {
+		SEXP zuplo = PROTECT(mkString("L"));
+		SET_SLOT(z, Matrix_uploSym, zuplo);
+		UNPROTECT(1); /* zuplo */
 	}
+
+	if (triangular < -1 || triangular > 1) {
+		SEXP zdiag = PROTECT(mkString("U"));
+		SET_SLOT(z, Matrix_diagSym, zdiag);
+		UNPROTECT(1); /* zdiag */
+	}
+
+	double alpha[2] = { 1.0, 0.0 }, beta[2] = { 0.0, 0.0 };
 	cholmod_dense *Z = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(Z, 0, sizeof(cholmod_dense));
 	Z->nrow = (size_t) m;
 	Z->ncol = (size_t) n;
 	Z->d = Z->nrow;
 	Z->nzmax = Z->nrow * Z->ncol;
-	Z->xtype = Y->xtype;
-	Z->dtype = Y->dtype;
-	double alpha[2] = { 1.0, 0.0 }, beta[2] = { 0.0, 0.0 };
-	if (ztrans) {
-		if (Z->xtype == CHOLMOD_COMPLEX)
-			Z->x = R_Calloc(Z->nzmax, Rcomplex);
-		else
-			Z->x = R_Calloc(Z->nzmax, double);
-		cholmod_sdmult(X, xtrans, alpha, beta, Y, Z, &c);
-		PROTECT(z = CHD2M(Z, ztrans, zcl[1]));
-		R_Free(Z->x);
+	Z->xtype = X->xtype;
+	Z->dtype = X->dtype;
+
+	SEXP zx;
+	if (zcl[0] == 'z') {
+	PROTECT(zx = allocVector(CPLXSXP, (R_xlen_t) m * n));
+	Z->x = (ztrans != 'N')
+		? (Rcomplex *) R_alloc((size_t) m * n, sizeof(Rcomplex))
+		: COMPLEX(zx);
 	} else {
-		PROTECT(z = newObject(zcl));
-		SEXP zdim = GET_SLOT(z, Matrix_DimSym);
-		INTEGER(zdim)[0] = m;
-		INTEGER(zdim)[1] = n;
-		SEXP zx;
-		if (Z->xtype == CHOLMOD_COMPLEX) {
-			PROTECT(zx = allocVector(CPLXSXP, (R_xlen_t) m * n));
-			Z->x = COMPLEX(zx);
-		} else {
-			PROTECT(zx = allocVector(REALSXP, (R_xlen_t) m * n));
-			Z->x = REAL(zx);
-		}
-		cholmod_sdmult(X, xtrans, alpha, beta, Y, Z, &c);
-		SET_SLOT(z, Matrix_xSym, zx);
-		UNPROTECT(1); /* zx */
+	PROTECT(zx = allocVector(REALSXP, (R_xlen_t) m * n));
+	Z->x = (ztrans != 'N')
+		? (double *) R_alloc((size_t) m * n, sizeof(double))
+		: REAL(zx);
 	}
-	if (ytrans)
-		R_Free(Y->x);
-	SEXP xdimnames = (symmetric)
-		? PROTECT(get_symmetrized_DimNames(x, -1))
-		: PROTECT(GET_SLOT(x, Matrix_DimNamesSym)),
-		ydimnames = PROTECT(GET_SLOT(y, Matrix_DimNamesSym)),
-		zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
-	if (ztrans)
-	matmultDN(zdimnames,
-	          ydimnames, (ytrans) ? 0 : 1,
-	          xdimnames, (xtrans) ? 1 : 0);
+	cholmod_sdmult(X, xtrans != 'N', alpha, beta, Y, Z, &c);
+	if (ztrans != 'N') {
+	if (zcl[0] == 'z')
+	ztrans2(COMPLEX(zx), (Rcomplex *) Z->x, m, n, ztrans);
 	else
-	matmultDN(zdimnames,
-	          xdimnames, (xtrans) ? 1 : 0,
-	          ydimnames, (ytrans) ? 0 : 1);
-	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
-	if (triangular != 0 && ztrans == (triangular > 0)) {
-		SEXP uplo = PROTECT(mkString("L"));
-		SET_SLOT(z, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
+	dtrans2(   REAL(zx), (  double *) Z->x, m, n, ztrans);
 	}
-	if (triangular < -1 || triangular > 1) {
-		SEXP diag = PROTECT(mkString("U"));
-		SET_SLOT(z, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	}
+	SET_SLOT(z, Matrix_xSym, zx);
+	UNPROTECT(1); /* zx */
+
 	UNPROTECT(1); /* z */
 	return z;
 }
@@ -1059,15 +1097,11 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	int boolean_ = LOGICAL(boolean)[0];
 
 	char
-		xtrans__ = *CHAR(STRING_ELT(xtrans, 0)),
-		ytrans__ = *CHAR(STRING_ELT(ytrans, 0)),
-		ztrans__ = *CHAR(STRING_ELT(ztrans, 0));
+		xtrans_ = *CHAR(STRING_ELT(xtrans, 0)),
+		ytrans_ = *CHAR(STRING_ELT(ytrans, 0)),
+		ztrans_ = *CHAR(STRING_ELT(ztrans, 0));
 	int m, n, v;
-	matmultDim(x, y, &xtrans__, &ytrans__, &ztrans__, &m, &n, &v);
-
-	int xtrans_ = xtrans__ != 'N',
-		ytrans_ = ytrans__ != 'N',
-		ztrans_ = ztrans__ != 'N';
+	matmultDim(x, y, &xtrans_, &ytrans_, &ztrans_, &m, &n, &v);
 
 	PROTECT_INDEX xpid, ypid;
 	PROTECT_WITH_INDEX(x, &xpid);
@@ -1075,30 +1109,30 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (TYPEOF(x) != S4SXP) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(x = matrix_as_dense (x, ",ge", '\0', '\0', '\0', (xtrans_) ? 0 : 1, 0), xpid);
-		else if (!xtrans_)
-		REPROTECT(x = matrix_as_sparse(x, "ngC", '\0', '\0', '\0', (xtrans_) ? 0 : 1   ), xpid);
+		REPROTECT(x = matrix_as_dense (x, ",ge", '\0', '\0', '\0', (xtrans_ != 'N') ? 0 : 1, 0), xpid);
+		else if (xtrans_ != 'N')
+		REPROTECT(x = matrix_as_sparse(x, "ngR", '\0', '\0', '\0', 0), xpid);
 		else
-		REPROTECT(x = matrix_as_sparse(x, "ngR", '\0', '\0', '\0', (xtrans_) ? 0 : 1   ), xpid);
-		if (v == 1) {
+		REPROTECT(x = matrix_as_sparse(x, "ngC", '\0', '\0', '\0', 0), xpid);
+		if (v % 2) {
 			/* Discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(x, Matrix_DimNamesSym),
-			               (xtrans_) ? 1 : 0, R_NilValue);
-			xtrans_ = 0;
+			               (xtrans_ != 'N') ? 1 : 0, R_NilValue);
+			xtrans_ = 'N';
 		}
 	}
 	if (TYPEOF(y) != S4SXP && y != R_NilValue) {
 		if (boolean_ == NA_LOGICAL || !boolean_)
-		REPROTECT(y = matrix_as_dense (y, ",ge", '\0', '\0', '\0', (ytrans_) ? 0 : 1, 0), ypid);
-		else if (!ytrans_)
-		REPROTECT(y = matrix_as_sparse(y, "ngC", '\0', '\0', '\0', (ytrans_) ? 0 : 1   ), ypid);
+		REPROTECT(y = matrix_as_dense (y, ",ge", '\0', '\0', '\0', (ytrans_ != 'N') ? 0 : 1, 0), ypid);
+		else if (ytrans_ != 'N')
+		REPROTECT(y = matrix_as_sparse(y, "ngR", '\0', '\0', '\0', 0), ypid);
 		else
-		REPROTECT(y = matrix_as_sparse(y, "ngR", '\0', '\0', '\0', (ytrans_) ? 0 : 1   ), ypid);
-		if (v == 2) {
+		REPROTECT(y = matrix_as_sparse(y, "ngC", '\0', '\0', '\0', 0), ypid);
+		if (v > 1) {
 			/* Discard names and don't transpose again */
 			SET_VECTOR_ELT(GET_SLOT(y, Matrix_DimNamesSym),
-			               (ytrans_) ? 1 : 0, R_NilValue);
-			ytrans_ = 0;
+			               (ytrans_ != 'N') ? 1 : 0, R_NilValue);
+			ytrans_ = 'N';
 		}
 	}
 
@@ -1119,18 +1153,16 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	if (boolean_ == NA_LOGICAL)
 		boolean_ = xcl[0] == 'n' && (y == R_NilValue || ycl[0] == 'n');
 	char kind = (boolean_) ? 'n' :
-		((xcl[0] == 'z' || (y != R_NilValue && ycl[0] == 'z')) ? 'z' : 'd');
+		((xcl[0] != 'z' && (y == R_NilValue || ycl[0] != 'z')) ? 'd' : 'z');
 
-	if (xcl[2] != 'C' && xtrans_) {
+	if (xcl[2] != 'C' && xtrans_ != 'N') {
 		if (xcl[2] != 'R' && xcl[2] != 'T') {
 			REPROTECT(x = dense_as_sparse(x, xcl, 'R'), xpid);
 			xcl = valid[R_check_class_etc(x, valid)];
 		}
-		if (xcl[1] != 's' || xcl[1] != 'T') {
-			REPROTECT(x = sparse_transpose(x, xcl, 1), xpid);
-			xcl = valid[R_check_class_etc(x, valid)];
-		}
-		xtrans_ = 0;
+		REPROTECT(x = sparse_transpose(x, xcl, 1), xpid);
+		xcl = valid[R_check_class_etc(x, valid)];
+		xtrans_ = 'N';
 	}
 	if (xcl[2] != 'C') {
 		if (xcl[2] != 'R' && xcl[2] != 'T')
@@ -1139,8 +1171,9 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 			REPROTECT(x = sparse_as_Csparse(x, xcl), xpid);
 		xcl = valid[R_check_class_etc(x, valid)];
 	}
-	if (xcl[1] == 's')
-		xtrans_ = 0;
+	if (xtrans_ != 'N' && xcl[1] == 's' &&
+	    (xcl[0] != 'z' || *CHAR(STRING_ELT(GET_SLOT(x, Matrix_transSym), 0)) == xtrans_))
+		xtrans_ = 'N';
 	if (xcl[0] != kind) {
 		if (boolean_)
 			REPROTECT(x = sparse_drop0(x, xcl, 0.0), xpid);
@@ -1152,8 +1185,8 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	if (y == R_NilValue) {
 		REPROTECT(x = sparse_as_general(x, xcl), xpid);
-		x = gCMatrix_gCMatrix_matmult(
-			x, y, xtrans_, !xtrans_, ztrans_, 0, boolean_);
+		x = gCgCMatrix_matmult(
+			x, y, xtrans_, ytrans_, ztrans_, 0, boolean_);
 		UNPROTECT(2); /* y, x */
 		return x;
 	}
@@ -1170,9 +1203,9 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 			yul = *CHAR(STRING_ELT(yuplo, 0)),
 			xdi = *CHAR(STRING_ELT(xdiag, 0)),
 			ydi = *CHAR(STRING_ELT(ydiag, 0));
-		if (xtrans_)
+		if (xtrans_ != 'N')
 			xul = (xul == 'U') ? 'L' : 'U';
-		if (ytrans_)
+		if (ytrans_ != 'N')
 			yul = (yul == 'U') ? 'L' : 'U';
 		triangular = (xul != yul) ? 0 : ((xdi != ydi || xdi == 'N') ? 1 : 2);
 		if (xul != 'U')
@@ -1181,37 +1214,41 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 	}
 
 	if (!boolean_ && ycl[2] != 'C' && ycl[2] != 'R' && ycl[2] != 'T') {
+		if (xcl[1] == 's' && xcl[0] == 'z') {
+			SEXP xtrans = GET_SLOT(x, Matrix_transSym);
+			char xct = *CHAR(STRING_ELT(xtrans, 0));
+			if (xct != 'C') {
+				REPROTECT(x = sparse_as_general(x, xcl), xpid);
+				xcl = valid[R_check_class_etc(x, valid)];
+			}
+		}
 		int symmetric = xcl[1] == 's';
 		if (symmetric) {
-			SEXP xuplo = PROTECT(GET_SLOT(x, Matrix_uploSym));
+			SEXP xuplo = GET_SLOT(x, Matrix_uploSym);
 			char xul = *CHAR(STRING_ELT(xuplo, 0));
 			if (xul != 'U')
-				symmetric = -1;
-			UNPROTECT(1); /* xuplo */
+				symmetric = -symmetric;
 		}
 		if (ycl[0] != kind) {
 			REPROTECT(y = dense_as_kind(y, ycl, kind, 0), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
+		REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
 		REPROTECT(y = dense_as_general(y, ycl, 1), ypid);
-		if (xcl[1] == 't')
-			REPROTECT(x = sparse_diag_U2N(x, xcl), xpid);
-		x = gCMatrix_geMatrix_matmult(
+		x = gCgeMatrix_matmult(
 			x, y, xtrans_, ytrans_, ztrans_, triangular, symmetric);
 		UNPROTECT(2); /* y, x */
 		return x;
 	}
 
-	if (ycl[2] != 'C' && ytrans_) {
+	if (ycl[2] != 'C' && ytrans_ != 'N') {
 		if (ycl[2] != 'R' && ycl[2] != 'T') {
 			REPROTECT(y = dense_as_sparse(y, ycl, 'R'), ypid);
 			ycl = valid[R_check_class_etc(y, valid)];
 		}
-		if (ycl[1] != 's' || ycl[1] != 'T') {
-			REPROTECT(y = sparse_transpose(y, ycl, 1), ypid);
-			ycl = valid[R_check_class_etc(y, valid)];
-		}
-		ytrans_ = 0;
+		REPROTECT(y = sparse_transpose(y, ycl, 1), ypid);
+		ycl = valid[R_check_class_etc(y, valid)];
+		ytrans_ = 'N';
 	}
 	if (ycl[2] != 'C') {
 		if (ycl[2] != 'R' && ycl[2] != 'T')
@@ -1220,8 +1257,9 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 			REPROTECT(y = sparse_as_Csparse(y, ycl), ypid);
 		ycl = valid[R_check_class_etc(y, valid)];
 	}
-	if (ycl[1] == 's')
-		ytrans_ = 0;
+	if (ytrans_ != 'N' && ycl[1] == 's' &&
+	    (ycl[0] != 'z' || *CHAR(STRING_ELT(GET_SLOT(y, Matrix_transSym), 0)) == ytrans_))
+		ytrans_ = 'N';
 	if (ycl[0] != kind) {
 		if (boolean_)
 			REPROTECT(y = sparse_drop0(y, ycl, 0.0), ypid);
@@ -1233,7 +1271,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 	REPROTECT(x = sparse_as_general(x, xcl), xpid);
 	REPROTECT(y = sparse_as_general(y, ycl), ypid);
-	x = gCMatrix_gCMatrix_matmult(
+	x = gCgCMatrix_matmult(
 		x, y, xtrans_, ytrans_, ztrans_, triangular, boolean_);
 	UNPROTECT(2); /* y, x */
 	return x;

@@ -155,15 +155,15 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	return A;
 }
 
-cholmod_dense *M2CHD(SEXP obj, int trans)
+cholmod_dense *M2CHD(SEXP obj, char trans)
 {
 	cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(A, 0, sizeof(cholmod_dense));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
-	A->nrow = ((trans) ? n : m);
-	A->ncol = ((trans) ? m : n);
+	A->nrow = ((trans != 'N') ? n : m);
+	A->ncol = ((trans != 'N') ? m : n);
 	A->nzmax = A->nrow * A->ncol;
 	A->d = A->nrow;
 	A->dtype = CHOLMOD_DOUBLE;
@@ -171,26 +171,24 @@ cholmod_dense *M2CHD(SEXP obj, int trans)
 	case CPLXSXP:
 	{
 		Rcomplex *px = COMPLEX(x);
-		if (!trans)
-			A->x = px;
-		else {
-			Rcomplex *py = R_Calloc(A->nzmax, Rcomplex);
-			ztrans2(py, px, m, n, 'T');
-			A->x = py; /* NB: caller must do R_Free(A->x) */
+		if (trans != 'N') {
+			Rcomplex *py = (Rcomplex *) R_alloc(A->nzmax, sizeof(Rcomplex));
+			ztrans2(py, px, m, n, trans);
+			px = py;
 		}
+		A->x = px;
 		A->xtype = CHOLMOD_COMPLEX;
 		break;
 	}
 	case REALSXP:
 	{
 		double *px = REAL(x);
-		if (!trans)
-			A->x = px;
-		else {
-			double *py = R_Calloc(A->nzmax, double);
-			dtrans2(py, px, m, n, 'T');
-			A->x = py; /* NB: caller must do R_Free(A->x) */
+		if (trans != 'N') {
+			double *py = (double *) R_alloc(A->nzmax, sizeof(double));
+			dtrans2(py, px, m, n, trans);
+			px = py;
 		}
+		A->x = px;
 		A->xtype = CHOLMOD_REAL;
 		break;
 	}
@@ -355,7 +353,7 @@ SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 	return obj;
 }
 
-SEXP CHD2M(cholmod_dense *A, int trans, char shape)
+SEXP CHD2M(cholmod_dense *A, char trans, char shape)
 {
 	if (A->xtype != CHOLMOD_REAL && A->xtype != CHOLMOD_COMPLEX)
 		return errorChar(_("wrong '%s'"), "xtype");
@@ -376,23 +374,17 @@ SEXP CHD2M(cholmod_dense *A, int trans, char shape)
 		? 'e' : ((shape == 's') ? 'y' : ((shape == 'p') ? 'o' : 'r'));
 	SEXP obj = PROTECT(newObject(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	INTEGER(dim)[0] = (trans) ? n : m;
-	INTEGER(dim)[1] = (trans) ? m : n;
+	INTEGER(dim)[0] = (trans != 'N') ? n : m;
+	INTEGER(dim)[1] = (trans != 'N') ? m : n;
 	SEXP x;
 	if (A->xtype == CHOLMOD_COMPLEX) {
 		PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) m * n));
 		Rcomplex *px = COMPLEX(x), *py = (Rcomplex *) A->x;
-		if (!trans)
-			Matrix_memcpy(px, py, (R_xlen_t) m * n, sizeof(Rcomplex));
-		else
-			ztrans2(px, py, m, n, 'T');
+		ztrans2(px, py, m, n, trans);
 	} else {
 		PROTECT(x = allocVector(REALSXP, (R_xlen_t) m * n));
 		double *px = REAL(x), *py = (double *) A->x;
-		if (!trans)
-			Matrix_memcpy(px, py, (R_xlen_t) m * n, sizeof(double));
-		else
-			dtrans2(px, py, m, n, 'T');
+		dtrans2(px, py, m, n, trans);
 	}
 	SET_SLOT(obj, Matrix_xSym, x);
 	UNPROTECT(3);

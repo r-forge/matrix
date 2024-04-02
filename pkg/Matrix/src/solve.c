@@ -739,14 +739,14 @@ SEXP sparseCholesky_solve(SEXP a, SEXP b, SEXP sparse, SEXP system)
 			cholmod_free_dense(&B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
-			PROTECT(r = CHD2M(X, 0,
+			PROTECT(r = CHD2M(X, 'N',
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
-			B = M2CHD(b, 0);
+			B = M2CHD(b, 'N');
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
 				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
-			PROTECT(r = CHD2M(X, 0, 'g'));
+			PROTECT(r = CHD2M(X, 'N', 'g'));
 		}
 		cholmod_free_dense(&X, &c);
 	} else {
