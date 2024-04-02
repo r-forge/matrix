@@ -521,7 +521,7 @@ IDZ
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 void _PREFIX_ ## \
 dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-       char uplo_dest, char uplo_src, char diag) \
+       char uplo_dest, char uplo, char diag) \
 { \
 	int j; \
 	if (diag != 'N') { \
@@ -544,7 +544,7 @@ dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
 	} else if (length == PACKED_LENGTH(n)) { \
 		/* copying from packedMatrix */ \
 		if (uplo_dest == 'U') { \
-			if (uplo_src == 'U') { \
+			if (uplo == 'U') { \
 				for (j = 0; j < n; src += (++j)+1, dest += j+1) \
 					*dest = *src; \
 			} else { \
@@ -552,7 +552,7 @@ dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
 					*dest = *src; \
 			} \
 		} else { \
-			if (uplo_src == 'U') { \
+			if (uplo == 'U') { \
 				for (j = 0; j < n; dest += n-(j++), src += j+1) \
 					*dest = *src; \
 			} else { \
