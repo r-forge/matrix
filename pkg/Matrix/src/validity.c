@@ -1347,7 +1347,7 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
 	}
-	
+
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
@@ -1679,38 +1679,25 @@ SEXP sparseLU_validate(SEXP obj)
 
 SEXP sparseCholesky_validate(SEXP obj)
 {
+#if 0
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
-	SEXP type = GET_SLOT(obj, install("type"));
-	if (TYPEOF(type) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "type", "integer");
-	if (XLENGTH(type) != 6)
-		RMKMS(_("'%s' slot does not have length %d"), "type", 6);
-	int order = INTEGER(type)[0];
-	if (order < 0 || order > 4)
-		RMKMS(_("%s[%d] (%s) is not in %s"),
-		      "type", 1, "cholmod_factor.ordering", "0:4");
-
-	SEXP colcount = GET_SLOT(obj, install("colcount"));
-	if (TYPEOF(colcount) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "colcount", "integer");
-	if (XLENGTH(colcount) != n)
-		RMKMS(_("'%s' slot does not have length %s"), "colcount", "Dim[2]");
-	int j, *pcolcount = INTEGER(colcount);
-	for (j = 0; j < n; ++j) {
-		if (pcolcount[j] == NA_INTEGER)
-			RMKMS(_("'%s' slot contains NA"), "colcount");
-		if (pcolcount[j] < 0 || pcolcount[j] > n - j)
-			RMKMS(_("%s is not in {%s}"), "colcount[j]", "0,...,Dim[1]-j+1");
-	}
+	SEXP ordering = GET_SLOT(obj, Matrix_orderingSym);
+	if (TYPEOF(ordering) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "ordering", "integer");
+	if (XLENGTH(ordering) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "ordering", 1);
+	int or = INTEGER(ordering)[0];
+	if (or < 0 || or >= 7)
+		RMKMS(_("'%s' is not in %d:%d"), "ordering", 0, 6);
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	if (TYPEOF(perm) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
-	if (order == 0) {
+	if (or == 0) {
 		if (XLENGTH(perm) != 0)
 			RMKMS(_("'%s' slot does not have length %d"), "perm", 0);
 	} else {
@@ -1733,68 +1720,99 @@ SEXP sparseCholesky_validate(SEXP obj)
 		Matrix_Free(work, lwork);
 	}
 
+	SEXP colcount = GET_SLOT(obj, Matrix_colcountSym);
+	if (TYPEOF(colcount) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "colcount", "integer");
+	if (XLENGTH(colcount) != n)
+		RMKMS(_("'%s' slot does not have length %s"), "colcount", "Dim[2]");
+	int j, *pcolcount = INTEGER(colcount);
+	for (j = 0; j < n; ++j) {
+		if (pcolcount[j] == NA_INTEGER)
+			RMKMS(_("'%s' slot contains NA"), "colcount");
+		if (pcolcount[j] < 0 || pcolcount[j] > n - j)
+			RMKMS(_("%s is not in {%s}"), "colcount[j]", "0,...,Dim[2]-j+1");
+	}
+
+	SEXP i = GET_SLOT(obj, Matrix_iSym);
+	if (TYPEOF(i) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "i", "integer");
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+#endif
+
 	return ScalarLogical(1);
 }
 
 SEXP simplicialCholesky_validate(SEXP obj)
 {
+#if 0
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == INT_MAX)
 		RMKMS(_("%s is not representable as \"%s\""), "Dim[1]+1", "integer");
 
-	SEXP type = GET_SLOT(obj, install("type"));
-	int *ptype = INTEGER(type), mono = ptype[3];
-	if (ptype[1] != 0 && ptype[1] != 1)
-		RMKMS(_("%s[%d] (%s) is not %d or %d"),
-		      "type", 2, "cholmod_factor.is_ll", 0, 1);
-	if (ptype[2] != 0)
-		RMKMS(_("%s[%d] (%s) is not %d"),
-		      "type", 3, "cholmod_factor.is_super", 0);
-	if (ptype[3] != 0 && ptype[3] != 1)
-		RMKMS(_("%s[%d] (%s) is not %d or %d"),
-		      "type", 4, "cholmod_factor.is_monotonic", 0, 1);
+	SEXP is_ll = GET_SLOT(obj, Matrix_isllSym);
+	if (TYPEOF(is_ll) != LGLSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "is.ll", "logical");
+	if (XLENGTH(is_ll) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "is.ll", 1);
+	int ll = LOGICAL(is_ll)[0];
+	if (ll == NA_LOGICAL)
+		RMKMS(_("'%s' slot is NA"), "is.ll");
 
-	SEXP nxt = PROTECT(GET_SLOT(obj, install("nxt"))),
-		prv = PROTECT(GET_SLOT(obj, install("prv"))),
+	SEXP is_monotonic = GET_SLOT(obj, Matrix_ismtSym);
+	if (TYPEOF(is_monotonic) != LGLSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "is.monotonic", "logical");
+	if (XLENGTH(is_monotonic) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "is.monotonic", 1);
+	int mt = LOGICAL(is_monotonic)[0]
+	if (mt == NA_LOGICAL)
+		RMKMS(_("'%s' slot is NA"), "is.monotonic");
+
+	SEXP next = PROTECT(GET_SLOT(obj, install("next."))),
+		prev = PROTECT(GET_SLOT(obj, install("prev."))),
 		nz = PROTECT(GET_SLOT(obj, install("nz"))),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
-	UNPROTECT(5); /* i, p, nz, prv, nxt */
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	UNPROTECT(6); /* x, i, p, nz, prev, next */
 
-	if (TYPEOF(nxt) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "nxt", "integer");
-	if (TYPEOF(prv) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "prv", "integer");
-	if (XLENGTH(nxt) - 2 != n)
-		RMKMS(_("'%s' slot does not have length %s"), "nxt", "Dim[2]+2");
-	if (XLENGTH(prv) - 2 != n)
-		RMKMS(_("'%s' slot does not have length %s"), "prv", "Dim[2]+2");
-	int *pnxt = INTEGER(nxt), *pprv = INTEGER(prv),
-		j1 = pnxt[n + 1], j2 = pprv[n], count = n + 1;
+	if (TYPEOF(next) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "next.", "integer");
+	if (TYPEOF(prev) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "prev.", "integer");
+	if (XLENGTH(next) - 2 != n)
+		RMKMS(_("'%s' slot does not have length %s"), "next.", "Dim[2]+2");
+	if (XLENGTH(prev) - 2 != n)
+		RMKMS(_("'%s' slot does not have length %s"), "prev.", "Dim[2]+2");
+	int *pnext = INTEGER(next), *pprev = INTEGER(prev),
+		j1 = pnext[n + 1], j2 = pprev[n], count = n + 1;
 	while (count--) {
 		if (j1 < 0 || j1 > n)
 			RMKMS(_("%s has elements not in {%s}"),
-			      "nxt[-(Dim[2]+1)]", "0,...,Dim[2]");
+			      "next.[-(Dim[2]+1)]", "0,...,Dim[2]");
 		if (j2 < 0 || j2 > n + 1 || j2 == n)
 			RMKMS(_("%s has elements not in {%s}\\{%s}"),
-			      "prv[-(Dim[2]+2)]", "0,...,Dim[2]+1", "Dim[2]");
-		if ((count >  1) && mono && (pnxt[j1] != j1 + 1 || pprv[j2] != j2 - 1))
-			RMKMS(_("%s is %d but columns are not stored in increasing order"),
-			      "type[4]", 1);
+			      "prev.[-(Dim[2]+2)]", "0,...,Dim[2]+1", "Dim[2]");
+		if ((count >  1) && mt && (pnext[j1] != j1 + 1 || pprev[j2] != j2 - 1))
+			RMKMS(_("'%s' slot is %s but columns are not stored in increasing order"),
+			      "is.monotonic", "TRUE");
 		if ((count >= 1) ? j1 == n : j1 != n)
 			RMKMS(_("traversal of '%s' slot does not complete in exactly %s steps"),
-			      "nxt", "length(nxt)");
+			      "next.", "length(next.)");
 		if ((count >= 1) ? j2 == n + 1 : j2 != n + 1)
 			RMKMS(_("traversal of '%s' slot does not complete in exactly %s steps"),
-			      "prv", "length(prv)");
-		j1 = pnxt[j1];
-		j2 = pprv[j2];
+			      "prev.", "length(prev.)");
+		j1 = pnext[j1];
+		j2 = pprev[j2];
 	}
 	if (j1 != -1)
-		RMKMS(_("%s is not %d"), "nxt[Dim[2]+1]", -1);
+		RMKMS(_("%s is not %d"), "next.[Dim[2]+1]", -1);
 	if (j2 != -1)
-		RMKMS(_("%s is not %d"), "prv[Dim[2]+2]", -1);
+		RMKMS(_("%s is not %d"), "prev.[Dim[2]+2]", -1);
 
 	if (TYPEOF(nz) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "nz", "integer");
@@ -1812,12 +1830,12 @@ SEXP simplicialCholesky_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
 	if (XLENGTH(p) - 1 != n)
 		RMKMS(_("'%s' slot does not have length %s"), "p", "Dim[2]+1");
-	j1 = pnxt[n + 1];
+	j1 = pnext[n + 1];
 	int *pp = INTEGER(p);
 	if (pp[j1] != 0)
 		RMKMS(_("column '%s' is stored first but %s is not 0"), "j", "p[j]");
 	for (j = 0; j < n; ++j) {
-		j2 = pnxt[j1];
+		j2 = pnext[j1];
 		if (pp[j2] == NA_INTEGER)
 			RMKMS(_("'%s' slot contains NA"), "p");
 		if (pp[j2] < pp[j1])
@@ -1836,7 +1854,7 @@ SEXP simplicialCholesky_validate(SEXP obj)
 	if (XLENGTH(i) != pp[n])
 		RMKMS(_("'%s' slot does not have length %s"), "i", "p[length(p)]");
 	int *pi = INTEGER(i), *pi_, k;
-	j1 = pnxt[n + 1];
+	j1 = pnext[n + 1];
 	for (j = 0; j < n; ++j) {
 		pi_ = pi + pp[j1];
 		if (pi_[0] != j1)
@@ -1851,48 +1869,46 @@ SEXP simplicialCholesky_validate(SEXP obj)
 			if (pi_[k] <= pi_[k - 1])
 				RMKMS(_("'%s' slot is not increasing within columns"), "i");
 		}
-		j1 = pnxt[j1];
+		j1 = pnext[j1];
 	}
+
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	if (XLENGTH(x) != pp[n])
+		RMKMS(_("'%s' slot does not have length %s"), "x", "p[length(p)]");
+
+	if (ll) {
+	/* Real, non-negative diagonal elements are necessary and sufficient */
+	if (TYPEOF(x) == REALSXP) {
+	double *px = REAL(x);
+	for (j = 0; j < n; ++j)
+		if (!ISNAN(px[pp[j]]) && px[pp[j]] < 0.0)
+			RMK(_("Cholesky factor has negative diagonal elements"));
+	} else {
+	Rcomplex *px = COMPLEX(x);
+	for (j = 0; j < n; ++j)
+		if (!ISNAN(px[pp[j]].r) && px[pp[j]].r < 0.0)
+			RMK(_("Cholesky factor has diagonal elements with negative real part"));
+	}
+	}
+#endif
 
 	return ScalarLogical(1);
 }
 
 SEXP supernodalCholesky_validate(SEXP obj)
 {
+#if 0
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 
-	SEXP type = GET_SLOT(obj, install("type"));
-	int *ptype = INTEGER(type);
-	if (ptype[1] != 1)
-		RMKMS(_("%s[%d] (%s) is not %d"),
-		      "type", 2, "cholmod_factor.is_ll", 1);
-	if (ptype[2] != 1)
-		RMKMS(_("%s[%d] (%s) is not %d"),
-		      "type", 3, "cholmod_factor.is_super", 1);
-	if (ptype[3] != 1)
-		RMKMS(_("%s[%d] (%s) is not %d"),
-		      "type", 4, "cholmod_factor.is_monotonic", 1);
-	if (ptype[4] < 0)
-		RMKMS(_("%s[%d] (%s) is negative"),
-		      "type", 5, "cholmod_factor.maxcsize");
-	if (ptype[5] < 0)
-		RMKMS(_("%s[%d] (%s) is negative"),
-		      "type", 6, "cholmod_factor.maxesize");
-	if (n > 0 && ptype[5] >= n)
-		RMKMS(_("%s[%d] (%s) is not less than %s"),
-		      "type", 6, "cholmod_factor.maxesize", "Dim[1]");
-
-	/* FIXME: maxcsize and maxesize are well-defined properties of the
-	   factorization, so we should also test that the values are
-	   _correct_ ... see CHOLMOD/Supernodal/cholmod_super_symbolic.c
-	*/
-
-	SEXP super = PROTECT(GET_SLOT(obj, install("super"))),
-		pi = PROTECT(GET_SLOT(obj, install("pi"))),
-		px = PROTECT(GET_SLOT(obj, install("px"))),
-		s = PROTECT(GET_SLOT(obj, install("s")));
-	UNPROTECT(4); /* s, px, pi, super */
+	SEXP super = PROTECT(GET_SLOT(obj, Matrix_superSym)),
+		pi = PROTECT(GET_SLOT(obj, Matrix_piSym)),
+		px = PROTECT(GET_SLOT(obj, Matrix_pxSym)),
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	UNPROTECT(5); /* x, i, px, pi, super */
 
 	if (TYPEOF(super) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "super", "integer");
@@ -1921,7 +1937,7 @@ SEXP supernodalCholesky_validate(SEXP obj)
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "pi", "super");
 	if (XLENGTH(px) != nsuper1a)
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "px", "super");
-	int *ppi = INTEGER(pi), *ppx = INTEGER(px), nr, nc;
+	int *ppi = INTEGER(pi), *ppx = INTEGER(px), nr, nc, l, ml = 0;
 	if (ppi[0] != 0)
 		RMKMS(_("first element of '%s' slot is not 0"), "pi");
 	if (ppx[0] != 0)
@@ -1942,9 +1958,12 @@ SEXP supernodalCholesky_validate(SEXP obj)
 			      "pi", "super");
 		if ((Matrix_int_fast64_t) nr * nc > INT_MAX)
 			RMKMS(_("supernode lengths exceed %s"), "2^31-1");
-		if (ppx[k] - ppx[k - 1] != nr * nc)
+		int l = nr * nc;
+		if (ppx[k] - ppx[k - 1] != l)
 			RMKMS(_("first differences of '%s' slot are not equal to supernode lengths"),
 			      "px");
+		if (l > ml)
+			ml = l;
 	}
 
 	if (TYPEOF(s) != INTSXP)
@@ -1971,6 +1990,58 @@ SEXP supernodalCholesky_validate(SEXP obj)
 		}
 		ps += nr;
 	}
+
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	if (XLENGTH(x) != ppx[nsuper])
+		RMKMS(_("'%s' slot does not have length %s"), "x", "px[length(px)]");
+
+	/* Real, non-negative diagonal elements are necessary and sufficient */
+	if (TYPEOF(x) == REALSXP) {
+	double *pu = REAL(x), *pv;
+	for (k = 0; k < nsuper; ++k) {
+		nr = ppi[k+1] - ppi[k];
+		nc = psuper[k+1] - psuper[k];
+		pv = pu + ppx[k];
+		for (j = 0; j < nc; ++j) {
+			if (!ISNAN(*pv) && *pv < 0.0)
+				RMK(_("Cholesky factor has diagonal elements with negative real part"));
+			pv += (R_xlen_t) nr + 1;
+		}
+	}
+	} else {
+	Rcomplex *pu = COMPLEX(x), *pv;
+	for (k = 0; k < nsuper; ++k) {
+		nr = ppi[k+1] - ppi[k];
+		nc = psuper[k+1] - psuper[k];
+		pv = pu + ppx[k];
+		for (j = 0; j < nc; ++j) {
+			if (!ISNAN((*pv).r) && (*pv).r < 0.0)
+				RMK(_("Cholesky factor has diagonal elements with negative real part"));
+			pv += (R_xlen_t) nr + 1;
+		}
+	}
+	}
+
+	SEXP maxcsize = GET_SLOT(obj, Matrix_maxcsizeSym);
+	if (TYPEOF(maxcsize) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "maxcsize", "integer");
+	if (XLENGTH(maxcsize) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "maxcsize", 1);
+	int mc = INTEGER(maxcsize)[0];
+	if (mc < 0 || mc > ml)
+		RMKMS(_("'%s' slot is negative or exceeds maximum supernode length"), "maxcsize");
+
+	SEXP maxesize = GET_SLOT(obj, Matrix_maxesizeSym);
+	if (TYPEOF(maxesize) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "maxesize", "integer");
+	if (XLENGTH(maxesize) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "maxesize", 1);
+	int me = INTEGER(maxesize)[0];
+	if (me < 0 || me > n)
+		RMKMS(_("'%s' slot is negative or exceeds %s"), "maxesize", "Dim[1]");
+#endif
 
 	return ScalarLogical(1);
 }
