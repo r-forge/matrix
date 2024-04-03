@@ -23,13 +23,15 @@ SEXP zMatrix_validate(SEXP);
 SEXP generalMatrix_validate(SEXP);
 SEXP symmetricMatrix_validate(SEXP);
 SEXP triangularMatrix_validate(SEXP);
-SEXP diagonalMatrix_validate(SEXP);
-SEXP indMatrix_validate(SEXP);
-SEXP pMatrix_validate(SEXP);
 
+SEXP unpackedMatrix_validate(SEXP);
+SEXP packedMatrix_validate(SEXP);
 SEXP CsparseMatrix_validate(SEXP);
 SEXP RsparseMatrix_validate(SEXP);
 SEXP TsparseMatrix_validate(SEXP);
+SEXP diagonalMatrix_validate(SEXP);
+SEXP indMatrix_validate(SEXP);
+SEXP pMatrix_validate(SEXP);
 
 SEXP sCMatrix_validate(SEXP);
 SEXP tCMatrix_validate(SEXP);
@@ -48,9 +50,6 @@ SEXP xgTMatrix_validate(SEXP);
 SEXP xsTMatrix_validate(SEXP);
 SEXP xtTMatrix_validate(SEXP);
 
-SEXP unpackedMatrix_validate(SEXP);
-SEXP packedMatrix_validate(SEXP);
-
 SEXP dpoMatrix_validate(SEXP);
 SEXP dppMatrix_validate(SEXP);
 SEXP corMatrix_validate(SEXP);
@@ -62,9 +61,10 @@ SEXP isparseVector_validate(SEXP);
 SEXP dsparseVector_validate(SEXP);
 SEXP zsparseVector_validate(SEXP);
 
+SEXP Schur_validate(SEXP);
+SEXP sparseQR_validate(SEXP);
 SEXP denseLU_validate(SEXP);
 SEXP sparseLU_validate(SEXP);
-SEXP sparseQR_validate(SEXP);
 SEXP BunchKaufman_validate(SEXP);
 SEXP pBunchKaufman_validate(SEXP);
 SEXP Cholesky_validate(SEXP);
@@ -74,7 +74,6 @@ SEXP CHMsimpl_validate(SEXP);
 SEXP CHMsuper_validate(SEXP);
 SEXP dCHMsimpl_validate(SEXP);
 SEXP dCHMsuper_validate(SEXP);
-SEXP Schur_validate(SEXP);
 
 void validObject(SEXP, const char *);
 

@@ -556,6 +556,42 @@ setMethod("initialize", c(.Object = "MatrixFactorization"),
           .initialize)
 
 
+## ------ Schur --------------------------------------------------------
+
+setClass("SchurFactorization",
+         contains = c("VIRTUAL", "MatrixFactorization"))
+
+setClass("Schur",
+         contains = "SchurFactorization",
+         slots = c(x = "numeric", vectors = "numeric", values = "vector"),
+         prototype = list(values = double(0L)),
+         validity = function(object) .Call(Schur_validate, object))
+
+
+## ------ QR -----------------------------------------------------------
+
+setClass("QR",
+         contains = c("VIRTUAL", "MatrixFactorization"))
+
+if(FALSE) {
+## MJ: It would nice to have symmetry with LU, but then we would need
+##     to define methods already available for S3 class 'qr'.  Still ...
+setClass("denseQR",
+         contains = "QR",
+         ## based on S3 class 'qr':
+         slots = c(qr = "numeric", qraux = "numeric",
+                   rank = "integer", pivot = "integer",
+                   useLAPACK = "logical"),
+         validity = function(object) .Call(denseQR_validate, object))
+}
+
+setClass("sparseQR",
+         contains = "QR",
+         slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
+                   p = "integer", q = "integer"),
+         validity = function(object) .Call(sparseQR_validate, object))
+
+
 ## ------ LU -----------------------------------------------------------
 
 setClass("LU",
@@ -582,30 +618,6 @@ setClass("sparseLU",
                    p = "integer", q = "integer"),
          prototype = list(L = .new("dtCMatrix", uplo = "L")),
          validity = function(object) .Call(sparseLU_validate, object))
-
-
-## ------ QR -----------------------------------------------------------
-
-setClass("QR",
-         contains = c("VIRTUAL", "MatrixFactorization"))
-
-if(FALSE) {
-## MJ: It would nice to have symmetry with LU, but then we would need
-##     to define methods already available for S3 class 'qr'.  Still ...
-setClass("denseQR",
-         contains = "QR",
-         ## based on S3 class 'qr':
-         slots = c(qr = "numeric", qraux = "numeric",
-                   rank = "integer", pivot = "integer",
-                   useLAPACK = "logical"),
-         validity = function(object) .Call(denseQR_validate, object))
-}
-
-setClass("sparseQR",
-         contains = "QR",
-         slots = c(beta = "numeric", V = "dgCMatrix", R = "dgCMatrix",
-                   p = "integer", q = "integer"),
-         validity = function(object) .Call(sparseQR_validate, object))
 
 
 ## ------ Bunch-Kaufman ------------------------------------------------
@@ -732,18 +744,6 @@ setClass("dCHMsuper",
          contains = "CHMsuper",
          slots = c(x = "numeric"),
          validity = function(object) .Call(dCHMsuper_validate, object))
-
-
-## ------ Schur --------------------------------------------------------
-
-setClass("SchurFactorization",
-         contains = c("VIRTUAL", "MatrixFactorization"))
-
-setClass("Schur",
-         contains = "SchurFactorization",
-         slots = c(x = "numeric", vectors = "numeric", values = "vector"),
-         prototype = list(values = double(0L)),
-         validity = function(object) .Call(Schur_validate, object))
 
 
 ########################################################################
