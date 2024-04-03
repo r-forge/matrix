@@ -35,7 +35,7 @@ setMethod("determinant", c(x = "Schur", logarithm = "logical"),
               else if(is.complex(values))
                   .mkDet(x = values, logarithm = logarithm,
                          sign = if(Re(prod(values)) < 0) -1L else 1L)
-              else stop("should never happen")
+              else stop("should never happen ...")
           })
 
 setMethod("determinant", c(x = "denseLU", logarithm = "logical"),
