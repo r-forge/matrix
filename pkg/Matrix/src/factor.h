@@ -11,7 +11,6 @@ SEXP syMatrix_trf(SEXP, SEXP);
 SEXP spMatrix_trf(SEXP, SEXP);
 SEXP poMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP ppMatrix_trf(SEXP, SEXP);
-
 SEXP gCMatrix_orf(SEXP, SEXP, SEXP);
 SEXP gCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP pCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);

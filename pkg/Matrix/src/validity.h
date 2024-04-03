@@ -68,11 +68,12 @@ SEXP MatrixFactorization_validate(SEXP);
 
 SEXP denseSchur_validate(SEXP);
 SEXP denseQR_validate(SEXP);
-SEXP sparseQR_validate(SEXP);
 SEXP denseLU_validate(SEXP);
-SEXP sparseLU_validate(SEXP);
 SEXP denseBunchKaufman_validate(SEXP);
 SEXP denseCholesky_validate(SEXP);
+
+SEXP sparseLU_validate(SEXP);
+SEXP sparseQR_validate(SEXP);
 SEXP sparseCholesky_validate(SEXP);
 SEXP simplicialCholesky_validate(SEXP);
 SEXP supernodalCholesky_validate(SEXP);

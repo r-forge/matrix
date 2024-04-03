@@ -1289,113 +1289,6 @@ SEXP denseQR_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP sparseQR_validate(SEXP obj)
-{
-	/* MJ: assuming for simplicity that 'V' and 'R' slots are formally valid */
-
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	if (m < n)
-		RMK(_("matrix has more columns than rows"));
-
-	SEXP beta = GET_SLOT(obj, Matrix_betaSym);
-	if (TYPEOF(beta) != REALSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "beta", "double");
-	if (XLENGTH(beta) != n)
-		RMKMS(_("'%s' slot does not have length %s"), "beta", "Dim[2]");
-
-	SEXP p, i, q;
-	int *pp, *pi, *pq, j, k, kend;
-
-	SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
-	PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
-	PROTECT(p = GET_SLOT(V, Matrix_pSym));
-	PROTECT(i = GET_SLOT(V, Matrix_iSym));
-	UNPROTECT(4); /* i, p, dim, V */
-
-	pdim = INTEGER(dim);
-	int m0 = pdim[0];
-	if (m0 < m)
-		RMKMS(_("'%s' slot has fewer than %s rows"), "V", "Dim[1]");
-	if (m0 > m + n)
-		RMKMS(_("'%s' slot has more than %s rows"), "V", "Dim[1]+Dim[2]");
-	if (pdim[1] != n)
-		RMKMS(_("'%s' slot does not have %s columns"), "V", "Dim[2]");
-	pp = INTEGER(p);
-	pi = INTEGER(i);
-	for (j = 0, k = 0; j < n; ++j) {
-		kend = pp[j + 1];
-		if (k < kend) {
-			if (pi[k] < j)
-				RMKMS(_("'%s' slot must be lower trapezoidal but has entries above the diagonal"), "V");
-		}
-		k = kend;
-	}
-
-	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
-	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
-	PROTECT(p = GET_SLOT(R, Matrix_pSym));
-	PROTECT(i = GET_SLOT(R, Matrix_iSym));
-	UNPROTECT(4); /* i, p, dim, R */
-
-	pdim = INTEGER(dim);
-	if (pdim[0] != m0)
-		RMKMS(_("'%s' slot does not have %s row"), "R", "nrow(V)");
-	if (pdim[1] != n)
-		RMKMS(_("'%s' slot does not have %s columns"), "R", "Dim[2]");
-	pp = INTEGER(p);
-	pi = INTEGER(i);
-	for (j = 0, k = 0; j < n; ++j) {
-		kend = pp[j + 1];
-		if (k < kend && pi[kend - 1] > j)
-			RMKMS(_("'%s' slot must be upper trapezoidal but has entries below the diagonal"), "R");
-		k = kend;
-	}
-
-	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
-	PROTECT(q = GET_SLOT(obj, Matrix_qSym));
-	UNPROTECT(2); /* q, p */
-	if (TYPEOF(p) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
-	if (TYPEOF(q) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "q", "integer");
-	if (XLENGTH(p) != m0)
-		RMKMS(_("'%s' slot does not have length %s"), "p", "nrow(V)");
-	if (XLENGTH(q) != n && XLENGTH(q) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"),
-		      "q", "Dim[2]", "0");
-	char *work;
-	int lwork = m0; /* n <= m <= m0 */
-	Matrix_Calloc(work, lwork, char);
-	pp = INTEGER(p);
-	for (j = 0; j < m0; ++j) {
-		if (*pp == NA_INTEGER)
-			FRMKMS(_("'%s' slot contains NA"), "p");
-		if (*pp < 0 || *pp >= m0)
-			FRMKMS(_("'%s' slot has elements not in {%s}"),
-			       "p", "0,...,nrow(V)-1");
-		if (work[*pp])
-			FRMKMS(_("'%s' slot contains duplicates"), "p");
-		work[*(pp++)] = 1;
-	}
-	if (LENGTH(q) == n) {
-	pq = INTEGER(q);
-	for (j = 0; j < n; ++j) {
-		if (*pq == NA_INTEGER)
-			FRMKMS(_("'%s' slot contains NA"), "q");
-		if (*pq < 0 || *pq >= n)
-			FRMKMS(_("'%s' slot has elements not in {%s}"),
-			       "q", "0,...,Dim[2]-1");
-		if (!work[*pq])
-			FRMKMS(_("'%s' slot contains duplicates"), "q");
-		work[*(pq++)] = 0;
-	}
-	}
-	Matrix_Free(work, lwork);
-
-	return ScalarLogical(1);
-}
-
 SEXP denseLU_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -1422,108 +1315,6 @@ SEXP denseLU_validate(SEXP obj)
 			      "perm", "1,...,Dim[1]");
 		++pperm;
 	}
-
-	return ScalarLogical(1);
-}
-
-SEXP sparseLU_validate(SEXP obj)
-{
-	/* MJ: assuming for simplicity that 'L' and 'U' slots are formally valid */
-
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym), uplo, diag;
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
-		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
-
-	SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym));
-	PROTECT(dim = GET_SLOT(L, Matrix_DimSym));
-	PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
-	PROTECT(diag = GET_SLOT(L, Matrix_diagSym));
-	UNPROTECT(4); /* diag, uplo, dim, L */
-
-	pdim = INTEGER(dim);
-	if (pdim[0] != n || pdim[1] != n)
-		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "L", "Dim");
-	if (*CHAR(STRING_ELT(uplo, 0)) == 'U')
-		RMKMS(_("'%s' slot is upper (not lower) triangular"), "L");
-	if (*CHAR(STRING_ELT(diag, 0)) == 'N') {
-		PROTECT(L);
-		SEXP p = PROTECT(GET_SLOT(L, Matrix_pSym)),
-			i = PROTECT(GET_SLOT(L, Matrix_iSym)),
-			x = PROTECT(GET_SLOT(L, Matrix_xSym));
-		UNPROTECT(4); /* x, i, p, L */
-
-		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
-		if (TYPEOF(x) == REALSXP) {
-		double *px = REAL(x);
-		for (j = 0, k = 0; j < n; ++j) {
-			kend = pp[j + 1];
-			if (kend == k || pi[k] != j || px[k] != 1.0)
-				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
-			k = kend;
-		}
-		} else {
-		Rcomplex *px = COMPLEX(x);
-		for (j = 0, k = 0; j < n; ++j) {
-			kend = pp[j + 1];
-			if (kend == k || pi[k] != j || px[k].r != 1.0 || px[k].i != 0.0)
-				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
-			k = kend;
-		}
-		}
-	}
-
-	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
-	PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
-	PROTECT(uplo = GET_SLOT(U, Matrix_uploSym));
-	UNPROTECT(3); /* uplo, dim, U */
-
-	pdim = INTEGER(dim);
-	if (pdim[0] != n || pdim[1] != n)
-		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "U", "Dim");
-	if (*CHAR(STRING_ELT(uplo, 0)) != 'U')
-		RMKMS(_("'%s' slot is lower (not upper) triangular"), "U");
-
-	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		q = PROTECT(GET_SLOT(obj, Matrix_qSym));
-	UNPROTECT(2); /* q, p */
-	if (TYPEOF(p) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
-	if (TYPEOF(q) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "q", "integer");
-	if (XLENGTH(p) != n)
-		RMKMS(_("'%s' slot does not have length %s"), "p", "Dim[1]");
-	if (XLENGTH(q) != n && XLENGTH(q) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"),
-		      "q", "Dim[2]", "0");
-	char *work;
-	int lwork = n;
-	Matrix_Calloc(work, lwork, char);
-	int j, *pp = INTEGER(p);
-	for (j = 0; j < n; ++j) {
-		if (*pp == NA_INTEGER)
-			FRMKMS(_("'%s' slot contains NA"), "p");
-		if (*pp < 0 || *pp >= n)
-			FRMKMS(_("'%s' slot has elements not in {%s}"),
-			       "p", "0,...,Dim[1]-1");
-		if (work[*pp])
-			FRMKMS(_("'%s' slot contains duplicates"), "p");
-		work[*(pp++)] = 1;
-	}
-	if (LENGTH(q) == n) {
-	int *pq = INTEGER(q);
-	for (j = 0; j < n; ++j) {
-		if (*pq == NA_INTEGER)
-			FRMKMS(_("'%s' slot contains NA"), "q");
-		if (*pq < 0 || *pq >= n)
-			FRMKMS(_("'%s' slot has elements not in {%s}"),
-			       "q", "0,...,Dim[2]-1");
-		if (!work[*pq])
-			FRMKMS(_("'%s' slot contains duplicates"), "q");
-		work[*(pq++)] = 0;
-	}
-	}
-	Matrix_Free(work, lwork);
 
 	return ScalarLogical(1);
 }
@@ -1673,6 +1464,215 @@ SEXP denseCholesky_validate(SEXP obj)
 		}
 		Matrix_Free(work, lwork);
 	}
+
+	return ScalarLogical(1);
+}
+
+SEXP sparseQR_validate(SEXP obj)
+{
+	/* MJ: assuming for simplicity that 'V' and 'R' slots are formally valid */
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	if (m < n)
+		RMK(_("matrix has more columns than rows"));
+
+	SEXP beta = GET_SLOT(obj, Matrix_betaSym);
+	if (TYPEOF(beta) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "beta", "double");
+	if (XLENGTH(beta) != n)
+		RMKMS(_("'%s' slot does not have length %s"), "beta", "Dim[2]");
+
+	SEXP p, i, q;
+	int *pp, *pi, *pq, j, k, kend;
+
+	SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
+	PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
+	PROTECT(p = GET_SLOT(V, Matrix_pSym));
+	PROTECT(i = GET_SLOT(V, Matrix_iSym));
+	UNPROTECT(4); /* i, p, dim, V */
+
+	pdim = INTEGER(dim);
+	int m0 = pdim[0];
+	if (m0 < m)
+		RMKMS(_("'%s' slot has fewer than %s rows"), "V", "Dim[1]");
+	if (m0 > m + n)
+		RMKMS(_("'%s' slot has more than %s rows"), "V", "Dim[1]+Dim[2]");
+	if (pdim[1] != n)
+		RMKMS(_("'%s' slot does not have %s columns"), "V", "Dim[2]");
+	pp = INTEGER(p);
+	pi = INTEGER(i);
+	for (j = 0, k = 0; j < n; ++j) {
+		kend = pp[j + 1];
+		if (k < kend) {
+			if (pi[k] < j)
+				RMKMS(_("'%s' slot must be lower trapezoidal but has entries above the diagonal"), "V");
+		}
+		k = kend;
+	}
+
+	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
+	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
+	PROTECT(p = GET_SLOT(R, Matrix_pSym));
+	PROTECT(i = GET_SLOT(R, Matrix_iSym));
+	UNPROTECT(4); /* i, p, dim, R */
+
+	pdim = INTEGER(dim);
+	if (pdim[0] != m0)
+		RMKMS(_("'%s' slot does not have %s row"), "R", "nrow(V)");
+	if (pdim[1] != n)
+		RMKMS(_("'%s' slot does not have %s columns"), "R", "Dim[2]");
+	pp = INTEGER(p);
+	pi = INTEGER(i);
+	for (j = 0, k = 0; j < n; ++j) {
+		kend = pp[j + 1];
+		if (k < kend && pi[kend - 1] > j)
+			RMKMS(_("'%s' slot must be upper trapezoidal but has entries below the diagonal"), "R");
+		k = kend;
+	}
+
+	PROTECT(p = GET_SLOT(obj, Matrix_pSym));
+	PROTECT(q = GET_SLOT(obj, Matrix_qSym));
+	UNPROTECT(2); /* q, p */
+	if (TYPEOF(p) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
+	if (TYPEOF(q) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "q", "integer");
+	if (XLENGTH(p) != m0)
+		RMKMS(_("'%s' slot does not have length %s"), "p", "nrow(V)");
+	if (XLENGTH(q) != n && XLENGTH(q) != 0)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "q", "Dim[2]", "0");
+	char *work;
+	int lwork = m0; /* n <= m <= m0 */
+	Matrix_Calloc(work, lwork, char);
+	pp = INTEGER(p);
+	for (j = 0; j < m0; ++j) {
+		if (*pp == NA_INTEGER)
+			FRMKMS(_("'%s' slot contains NA"), "p");
+		if (*pp < 0 || *pp >= m0)
+			FRMKMS(_("'%s' slot has elements not in {%s}"),
+			       "p", "0,...,nrow(V)-1");
+		if (work[*pp])
+			FRMKMS(_("'%s' slot contains duplicates"), "p");
+		work[*(pp++)] = 1;
+	}
+	if (LENGTH(q) == n) {
+	pq = INTEGER(q);
+	for (j = 0; j < n; ++j) {
+		if (*pq == NA_INTEGER)
+			FRMKMS(_("'%s' slot contains NA"), "q");
+		if (*pq < 0 || *pq >= n)
+			FRMKMS(_("'%s' slot has elements not in {%s}"),
+			       "q", "0,...,Dim[2]-1");
+		if (!work[*pq])
+			FRMKMS(_("'%s' slot contains duplicates"), "q");
+		work[*(pq++)] = 0;
+	}
+	}
+	Matrix_Free(work, lwork);
+
+	return ScalarLogical(1);
+}
+
+SEXP sparseLU_validate(SEXP obj)
+{
+	/* MJ: assuming for simplicity that 'L' and 'U' slots are formally valid */
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym), uplo, diag;
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+
+	SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym));
+	PROTECT(dim = GET_SLOT(L, Matrix_DimSym));
+	PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
+	PROTECT(diag = GET_SLOT(L, Matrix_diagSym));
+	UNPROTECT(4); /* diag, uplo, dim, L */
+
+	pdim = INTEGER(dim);
+	if (pdim[0] != n || pdim[1] != n)
+		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "L", "Dim");
+	if (*CHAR(STRING_ELT(uplo, 0)) == 'U')
+		RMKMS(_("'%s' slot is upper (not lower) triangular"), "L");
+	if (*CHAR(STRING_ELT(diag, 0)) == 'N') {
+		PROTECT(L);
+		SEXP p = PROTECT(GET_SLOT(L, Matrix_pSym)),
+			i = PROTECT(GET_SLOT(L, Matrix_iSym)),
+			x = PROTECT(GET_SLOT(L, Matrix_xSym));
+		UNPROTECT(4); /* x, i, p, L */
+
+		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
+		if (TYPEOF(x) == REALSXP) {
+		double *px = REAL(x);
+		for (j = 0, k = 0; j < n; ++j) {
+			kend = pp[j + 1];
+			if (kend == k || pi[k] != j || px[k] != 1.0)
+				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
+			k = kend;
+		}
+		} else {
+		Rcomplex *px = COMPLEX(x);
+		for (j = 0, k = 0; j < n; ++j) {
+			kend = pp[j + 1];
+			if (kend == k || pi[k] != j || px[k].r != 1.0 || px[k].i != 0.0)
+				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
+			k = kend;
+		}
+		}
+	}
+
+	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
+	PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
+	PROTECT(uplo = GET_SLOT(U, Matrix_uploSym));
+	UNPROTECT(3); /* uplo, dim, U */
+
+	pdim = INTEGER(dim);
+	if (pdim[0] != n || pdim[1] != n)
+		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "U", "Dim");
+	if (*CHAR(STRING_ELT(uplo, 0)) != 'U')
+		RMKMS(_("'%s' slot is lower (not upper) triangular"), "U");
+
+	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		q = PROTECT(GET_SLOT(obj, Matrix_qSym));
+	UNPROTECT(2); /* q, p */
+	if (TYPEOF(p) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "p", "integer");
+	if (TYPEOF(q) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "q", "integer");
+	if (XLENGTH(p) != n)
+		RMKMS(_("'%s' slot does not have length %s"), "p", "Dim[1]");
+	if (XLENGTH(q) != n && XLENGTH(q) != 0)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "q", "Dim[2]", "0");
+	char *work;
+	int lwork = n;
+	Matrix_Calloc(work, lwork, char);
+	int j, *pp = INTEGER(p);
+	for (j = 0; j < n; ++j) {
+		if (*pp == NA_INTEGER)
+			FRMKMS(_("'%s' slot contains NA"), "p");
+		if (*pp < 0 || *pp >= n)
+			FRMKMS(_("'%s' slot has elements not in {%s}"),
+			       "p", "0,...,Dim[1]-1");
+		if (work[*pp])
+			FRMKMS(_("'%s' slot contains duplicates"), "p");
+		work[*(pp++)] = 1;
+	}
+	if (LENGTH(q) == n) {
+	int *pq = INTEGER(q);
+	for (j = 0; j < n; ++j) {
+		if (*pq == NA_INTEGER)
+			FRMKMS(_("'%s' slot contains NA"), "q");
+		if (*pq < 0 || *pq >= n)
+			FRMKMS(_("'%s' slot has elements not in {%s}"),
+			       "q", "0,...,Dim[2]-1");
+		if (!work[*pq])
+			FRMKMS(_("'%s' slot contains duplicates"), "q");
+		work[*(pq++)] = 0;
+	}
+	}
+	Matrix_Free(work, lwork);
 
 	return ScalarLogical(1);
 }

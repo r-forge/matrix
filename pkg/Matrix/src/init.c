@@ -72,6 +72,8 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(indMatrix_validate, 1),
 	CALLDEF(pMatrix_validate, 1),
 
+	CALLDEF(unpackedMatrix_validate, 1),
+	CALLDEF(packedMatrix_validate, 1),
 	CALLDEF(CsparseMatrix_validate, 1),
 	CALLDEF(RsparseMatrix_validate, 1),
 	CALLDEF(TsparseMatrix_validate, 1),
@@ -93,9 +95,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(xsTMatrix_validate, 1),
 	CALLDEF(xtTMatrix_validate, 1),
 
-	CALLDEF(unpackedMatrix_validate, 1),
-	CALLDEF(packedMatrix_validate, 1),
-
 	CALLDEF(xpoMatrix_validate, 1),
 	CALLDEF(xppMatrix_validate, 1),
 	CALLDEF(xpCMatrix_validate, 1),
@@ -115,11 +114,12 @@ static R_CallMethodDef CallEntries[] = {
 
 	CALLDEF(denseSchur_validate, 1),
 	CALLDEF(denseQR_validate, 1),
-	CALLDEF(sparseQR_validate, 1),
 	CALLDEF(denseLU_validate, 1),
-	CALLDEF(sparseLU_validate, 1),
 	CALLDEF(denseBunchKaufman_validate, 1),
 	CALLDEF(denseCholesky_validate, 1),
+
+	CALLDEF(sparseQR_validate, 1),
+	CALLDEF(sparseLU_validate, 1),
 	CALLDEF(sparseCholesky_validate, 1),
 	CALLDEF(simplicialCholesky_validate, 1),
 	CALLDEF(supernodalCholesky_validate, 1),
@@ -194,7 +194,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(spMatrix_trf, 2),
 	CALLDEF(poMatrix_trf, 4),
 	CALLDEF(ppMatrix_trf, 2),
-
 	CALLDEF(gCMatrix_orf, 3),
 	CALLDEF(gCMatrix_trf, 4),
 	CALLDEF(pCMatrix_trf, 6),
@@ -202,7 +201,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(sparseCholesky_update, 3),
 	CALLDEF(sparseCholesky_updown, 3),
 	CALLDEF(sparseCholesky_diag_get, 2),
-
 	CALLDEF(denseBunchKaufman_expand, 2),
 
 	CALLDEF(denseLU_solve, 2),
@@ -212,7 +210,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(sparseLU_solve, 3),
 	CALLDEF(sparseCholesky_solve, 4),
 	CALLDEF(tCMatrix_solve, 3),
-
 	CALLDEF(sparseQR_matmult, 5),
 
 	CALLDEF(denseLU_determinant, 2),
