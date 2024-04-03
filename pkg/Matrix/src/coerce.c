@@ -1759,7 +1759,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		if (class[1] == 'g') \
 			/* .geMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_GEN2C, DAS_LOOP_GEN2R, DAS_LOOP_GEN2C, \
-			                _MASK_, _NOTZERO_);	 \
+			                _MASK_, _NOTZERO_); \
 		else if (!packed && di == 'N') \
 			/* .(sy|po)Matrix, non-unit diagonal .trMatrix */ \
 			DAS_SUBSUBCASES(DAS_LOOP_TRN2C, DAS_LOOP_TRN2R, DAS_LOOP_TRN2C, \

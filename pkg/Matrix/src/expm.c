@@ -121,9 +121,9 @@ SEXP geMatrix_expm(SEXP x)
 
 #define SWAP_COL(I,J) F77_CALL(dswap)(&n, &v[(I)*n_], &i1, &v[(J)*n_], &i1)
 
-#define RE_PERMUTE(I)				\
-	int p_I = (int) (perm[I]) - 1;		\
-	SWAP_COL(I, p_I);			\
+#define RE_PERMUTE(I) \
+	int p_I = (int) (perm[I]) - 1; \
+	SWAP_COL(I, p_I); \
 	SWAP_ROW(I, p_I)
 
 	/* reversion of "leading permutations" : in reverse order */

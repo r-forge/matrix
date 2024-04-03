@@ -127,7 +127,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		} \
 	} while (0)
 
-#define TRANS(_PREFIX_, _CTYPE_, _PTR_)	\
+#define TRANS(_PREFIX_, _CTYPE_, _PTR_) \
 	do { \
 		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
 		if (!packed) \
