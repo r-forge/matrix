@@ -317,7 +317,7 @@ setClass("dsyMatrix",
 ## Unpacked, symmetric, positive semidefinite
 setClass("dpoMatrix",
          contains = "dsyMatrix",
-         validity = function(object) .Call(dpoMatrix_validate, object))
+         validity = function(object) .Call(xpoMatrix_validate, object))
 
 ## Unpacked, symmetric, positive semidefinite, correlation
 setClass("corMatrix",
@@ -336,7 +336,7 @@ setClass("dspMatrix",
 ## Packed, symmetric, positive semidefinite
 setClass("dppMatrix",
          contains = "dspMatrix",
-         validity = function(object) .Call(dppMatrix_validate, object))
+         validity = function(object) .Call(xppMatrix_validate, object))
 
 ## Packed, symmetric, positive semidefinite, correlation
 setClass("copMatrix",
@@ -565,25 +565,13 @@ setClass("Schur",
          contains = "SchurFactorization",
          slots = c(x = "numeric", vectors = "numeric", values = "vector"),
          prototype = list(values = double(0L)),
-         validity = function(object) .Call(Schur_validate, object))
+         validity = function(object) .Call(denseSchur_validate, object))
 
 
 ## ------ QR -----------------------------------------------------------
 
 setClass("QR",
          contains = c("VIRTUAL", "MatrixFactorization"))
-
-if(FALSE) {
-## MJ: It would nice to have symmetry with LU, but then we would need
-##     to define methods already available for S3 class 'qr'.  Still ...
-setClass("denseQR",
-         contains = "QR",
-         ## based on S3 class 'qr':
-         slots = c(qr = "numeric", qraux = "numeric",
-                   rank = "integer", pivot = "integer",
-                   useLAPACK = "logical"),
-         validity = function(object) .Call(denseQR_validate, object))
-}
 
 setClass("sparseQR",
          contains = "QR",
@@ -597,20 +585,10 @@ setClass("sparseQR",
 setClass("LU",
          contains = c("VIRTUAL", "MatrixFactorization"))
 
-## Inherit most aspects of dgeMatrix without extending it
-
 setClass("denseLU",
          contains = "LU",
          slots = c(x = "numeric", perm = "integer"),
-         validity = function(object) {
-             object. <- new("dgeMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(denseLU_validate, object)
-         })
+         validity = function(object) .Call(denseLU_validate, object))
 
 setClass("sparseLU",
          contains = "LU",
@@ -625,37 +603,17 @@ setClass("sparseLU",
 setClass("BunchKaufmanFactorization",
          contains = c("VIRTUAL", "MatrixFactorization"))
 
-## Inherit most aspects of dt[rp]Matrix without extending them
-
 setClass("BunchKaufman",
          contains = "BunchKaufmanFactorization",
          slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
-         validity = function(object) {
-             object. <- new("dtrMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(BunchKaufman_validate, object)
-         })
+         validity = function(object) .Call(denseBunchKaufman_validate, object))
 
 setClass("pBunchKaufman",
          contains = "BunchKaufmanFactorization",
          slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
-         validity = function(object) {
-             object. <- new("dtpMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(pBunchKaufman_validate, object)
-         })
+         validity = function(object) .Call(denseBunchKaufman_validate, object))
 
 
 ## ------ Cholesky -----------------------------------------------------
@@ -666,37 +624,17 @@ setClass("CholeskyFactorization",
 
 ## ...... Dense ........................................................
 
-## Inherit most aspects of dt[rp]Matrix without extending them
-
 setClass("Cholesky",
          contains = "CholeskyFactorization",
          slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
-         validity = function(object) {
-             object. <- new("dtrMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(Cholesky_validate, object)
-         })
+         validity = function(object) .Call(denseCholesky_validate, object))
 
 setClass("pCholesky",
          contains = "CholeskyFactorization",
          slots = c(uplo = "character", x = "numeric", perm = "integer"),
          prototype = list(uplo = "U"),
-         validity = function(object) {
-             object. <- new("dtpMatrix")
-             object.@Dim <- object@Dim
-             object.@Dimnames <- object@Dimnames
-             object.@uplo <- object@uplo
-             object.@x <- object@x
-             if(is.character(valid <- validObject(object., test = TRUE)))
-                 valid
-             else .Call(pCholesky_validate, object)
-         })
+         validity = function(object) .Call(denseCholesky_validate, object))
 
 
 ## ...... Sparse .......................................................
@@ -711,7 +649,7 @@ setClass("pCholesky",
 setClass("CHMfactor",
          contains = c("VIRTUAL", "CholeskyFactorization"),
          slots = c(type = "integer", colcount = "integer", perm = "integer"),
-         validity = function(object) .Call(CHMfactor_validate, object))
+         validity = function(object) .Call(sparseCholesky_validate, object))
 
 ## Simplicial factorization
 setClass("CHMsimpl",
@@ -720,14 +658,13 @@ setClass("CHMsimpl",
                    nxt = "integer", prv = "integer"),
          prototype = list(type = c(0L, 1L, 0L, 1L, 0L, 0L),
                           p = 0L, nxt = c(-1L, 0L), prv = c(1L, -1L)),
-         validity = function(object) .Call(CHMsimpl_validate, object))
+         validity = function(object) .Call(simplicialCholesky_validate, object))
 
 setClass("nCHMsimpl",
          contains = "CHMsimpl")
 setClass("dCHMsimpl",
          contains = "CHMsimpl",
-         slots = c(x = "numeric"),
-         validity = function(object) .Call(dCHMsimpl_validate, object))
+         slots = c(x = "numeric"))
 
 ## Supernodal factorization
 setClass("CHMsuper",
@@ -736,14 +673,13 @@ setClass("CHMsuper",
                    s = "integer"),
          prototype = list(type = c(0L, 1L, 1L, 1L, 0L, 0L),
                           super = 0L, pi = 0L, px = 0L),
-         validity = function(object) .Call(CHMsuper_validate, object))
+         validity = function(object) .Call(supernodalCholesky_validate, object))
 
 setClass("nCHMsuper",
          contains = "CHMsuper")
 setClass("dCHMsuper",
          contains = "CHMsuper",
-         slots = c(x = "numeric"),
-         validity = function(object) .Call(dCHMsuper_validate, object))
+         slots = c(x = "numeric"))
 
 
 ########################################################################

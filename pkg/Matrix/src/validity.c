@@ -859,7 +859,7 @@ SEXP xtTMatrix_validate(SEXP obj)
 	return val;
 }
 
-SEXP dpoMatrix_validate(SEXP obj)
+SEXP xpoMatrix_validate(SEXP obj)
 {
 	/* NB: Non-finite entries are "valid" because we consider
 	   crossprod(x) and tcrossprod(x) to be positive semidefinite
@@ -880,7 +880,7 @@ SEXP dpoMatrix_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP dppMatrix_validate(SEXP obj)
+SEXP xppMatrix_validate(SEXP obj)
 {
 	/* NB: Non-finite entries are "valid" because we consider
 	   crossprod(x) and tcrossprod(x) to be positive semidefinite
@@ -1049,7 +1049,7 @@ KINDVECTOR_VALIDATE(d, REALSXP)
 KINDVECTOR_VALIDATE(z, CPLXSXP)
 #undef KINDVECTOR_VALIDATE
 
-SEXP Schur_validate(SEXP obj)
+SEXP denseSchur_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -1316,10 +1316,8 @@ SEXP sparseLU_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP BunchKaufman_validate(SEXP obj)
+SEXP denseBunchKaufman_validate(SEXP obj)
 {
-	/* In R, we start by checking that 'obj' would be a valid dtrMatrix */
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 
@@ -1348,17 +1346,8 @@ SEXP BunchKaufman_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP pBunchKaufman_validate(SEXP obj)
+SEXP denseCholesky_validate(SEXP obj)
 {
-	/* In R, we start by checking that 'obj' would be a valid dtpMatrix */
-
-	return BunchKaufman_validate(obj);
-}
-
-SEXP Cholesky_validate(SEXP obj)
-{
-	/* In R, we start by checking that 'obj' would be a valid dtrMatrix */
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -1396,56 +1385,7 @@ SEXP Cholesky_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP pCholesky_validate(SEXP obj)
-{
-	/* In R, we start by checking that 'obj' would be a valid dtpMatrix */
-
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = *CHAR(STRING_ELT(uplo, 0));
-
-	/* Non-negative diagonal elements are necessary _and_ sufficient */
-	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	double *px = REAL(x);
-	if (ul == 'U') {
-		for (j = 0; j < n; px += (++j)+1)
-			if (!ISNAN(*px) && *px < 0.0)
-				RMK(_("Cholesky factor has negative diagonal elements"));
-	} else {
-		for (j = 0; j < n; px += n-(j++))
-			if (!ISNAN(*px) && *px < 0.0)
-				RMK(_("Cholesky factor has negative diagonal elements"));
-	}
-
-	SEXP perm = GET_SLOT(obj, Matrix_permSym);
-	if (TYPEOF(perm) != INTSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
-	if (XLENGTH(perm) != n && XLENGTH(perm) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"), "perm", "Dim[1]", "0");
-	if (LENGTH(perm) == n) {
-		char *work;
-		int lwork = n;
-		Matrix_Calloc(work, lwork, char);
-		int *pperm = INTEGER(perm);
-		for (j = 0; j < n; ++j) {
-			if (*pperm == NA_INTEGER)
-				FRMKMS(_("'%s' slot contains NA"), "perm");
-			if (*pperm < 0 || *pperm >= n)
-				FRMKMS(_("'%s' slot has elements not in {%s}"),
-				       "perm", "0,...,Dim[1]-1");
-			if (work[*pperm])
-				FRMKMS(_("'%s' slot contains duplicates"), "perm");
-			work[*(pperm++)] = 1;
-		}
-		Matrix_Free(work, lwork);
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP CHMfactor_validate(SEXP obj)
+SEXP sparseCholesky_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
@@ -1504,7 +1444,7 @@ SEXP CHMfactor_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP CHMsimpl_validate(SEXP obj)
+SEXP simplicialCholesky_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
@@ -1625,7 +1565,7 @@ SEXP CHMsimpl_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP CHMsuper_validate(SEXP obj)
+SEXP supernodalCholesky_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
@@ -1743,67 +1683,6 @@ SEXP CHMsuper_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-SEXP dCHMsimpl_validate(SEXP obj)
-{
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		type = PROTECT(GET_SLOT(obj, install("type")));
-	UNPROTECT(3); /* type, p, x */
-
-	if (TYPEOF(x) != REALSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", "double");
-
-	int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
-	if (XLENGTH(x) != pp[n])
-		RMKMS(_("'%s' slot does not have length %s"), "x", "p[length(p)]");
-
-	if (INTEGER(type)[1]) {
-		int j;
-		double *px = REAL(x);
-
-		/* Non-negative diagonal elements are necessary _and_ sufficient */
-		for (j = 0; j < n; ++j)
-			if (!ISNAN(px[pp[j]]) && px[pp[j]] < 0.0)
-				RMK(_("Cholesky factor has negative diagonal elements"));
-	}
-
-	return ScalarLogical(1);
-}
-
-SEXP dCHMsuper_validate(SEXP obj)
-{
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		px = PROTECT(GET_SLOT(obj, install("px"))),
-		pi = PROTECT(GET_SLOT(obj, install("pi"))),
-		super = PROTECT(GET_SLOT(obj, install("super")));
-	UNPROTECT(4); /* super, pi, px, x */
-
-	if (TYPEOF(x) != REALSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", "double");
-
-	int *ppx = INTEGER(px), nsuper = (int) (XLENGTH(px) - 1);
-	if (XLENGTH(x) != ppx[nsuper])
-		RMKMS(_("'%s' slot does not have length %s"), "x", "px[length(px)]");
-
-	int *ppi = INTEGER(pi), *psuper = INTEGER(super), k, j, nc;
-	double *pu = REAL(x), *pv;
-	R_xlen_t nr1a;
-
-	/* Non-negative diagonal elements are necessary _and_ sufficient */
-	for (k = 0; k < nsuper; ++k) {
-		nc = psuper[k+1] - psuper[k];
-		nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
-		pv = pu + ppx[k];
-		for (j = 0; j < nc; ++j) {
-			if (!ISNAN(*pv) && *pv < 0.0)
-				RMK(_("Cholesky factor has negative diagonal elements"));
-			pv += nr1a;
-		}
-	}
-
-	return ScalarLogical(1);
-}
-
 /* where 'cl' must be an element of VALID_NONVIRTUAL_MATRIX */
 void validObject(SEXP obj, const char *cl)
 {
@@ -1882,14 +1761,14 @@ void validObject(SEXP obj, const char *cl)
 	else if (cl[2] != 'p') {
 		IS_VALID(unpackedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(dpoMatrix);
+			IS_VALID(xpoMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(corMatrix);
 		}
 	} else {
 		IS_VALID(packedMatrix);
 		if (cl[1] == 'p') {
-			IS_VALID(dppMatrix);
+			IS_VALID(xppMatrix);
 			if (cl_[0] == 'c')
 				IS_VALID(copMatrix);
 		}
