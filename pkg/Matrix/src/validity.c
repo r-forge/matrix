@@ -12,6 +12,16 @@
 #define  RMKMS(_FORMAT_, ...) \
 	return MK(MS(_FORMAT_, __VA_ARGS__))
 
+#define   FRMK(_FORMAT_     ) \
+	do { \
+		Matrix_Free(work, lwork); \
+		RMK  (_FORMAT_             ); \
+	} while (0)
+#define   FRMS(_FORMAT_, ...) \
+	do { \
+		Matrix_Free(work, lwork); \
+		RMS  (_FORMAT_, __VA_ARGS__); \
+	} while (0)
 #define FRMKMS(_FORMAT_, ...) \
 	do { \
 		Matrix_Free(work, lwork); \
@@ -137,11 +147,6 @@ SEXP Matrix_validate(SEXP obj)
 	return (msg) ? mkString(msg) : ScalarLogical(1);
 }
 
-SEXP MatrixFactorization_validate(SEXP obj)
-{
-	return Matrix_validate(obj);
-}
-
 #define KINDMATRIX_VALIDATE(_PREFIX_, _SEXPTYPE_) \
 SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
 { \
@@ -161,7 +166,7 @@ SEXP generalMatrix_validate(SEXP obj)
 {
 	SEXP factors = GET_SLOT(obj, Matrix_factorsSym);
 	if (TYPEOF(factors) != VECSXP)
-		RMKMS(_("'%s' slot is not a list"), "factors");
+		RMKMS(_("'%s' slot is not of type \"%s\""), "factors", "list");
 	if (XLENGTH(factors) > 0) {
 		PROTECT(factors);
 		SEXP nms = getAttrib(factors, R_NamesSymbol);
@@ -445,15 +450,9 @@ SEXP diagonalMatrix_validate(SEXP obj)
 	int nonunit = di[0] == 'N';
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (nonunit) {
-		if (XLENGTH(x) != n)
-			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			      "diag", "N", "x", "Dim[1]");
-	} else {
-		if (XLENGTH(x) != 0)
-			RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-			      "diag", "U", "x",      "0");
-	}
+	if (XLENGTH(x) != ((nonunit) ? n : 0))
+		RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
+		      "diag", (nonunit) ? "N" : "U", "x", (nonunit) ? "Dim[1]" : "0");
 
 	return ScalarLogical(1);
 }
@@ -471,14 +470,10 @@ SEXP indMatrix_validate(SEXP obj)
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
-	if (m > 0 && n == 0) {
-		if (mg == 0)
-			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
-			      "m", "0", "indMatrix", "m", "margin", 1);
-		else
-			RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
-			      "0", "n", "indMatrix", "n", "margin", 2);
-	}
+	if (m > 0 && n == 0)
+		RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
+		      (mg == 0) ? "m" : "0", (mg == 0) ? "0" : "n", "indMatrix",
+		      (mg == 0) ? "m" : "n", "margin", (mg == 0) ? 1 : 2);
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	if (TYPEOF(perm) != INTSXP)
@@ -859,52 +854,209 @@ SEXP xtTMatrix_validate(SEXP obj)
 	return val;
 }
 
+/* NB: Non-finite entries are "valid" because we consider
+   crossprod(x) and tcrossprod(x) to be positive semidefinite
+   even if 'x' contains non-finite entries (for speed) ...
+*/
+
 SEXP xpoMatrix_validate(SEXP obj)
 {
-	/* NB: Non-finite entries are "valid" because we consider
-	   crossprod(x) and tcrossprod(x) to be positive semidefinite
-	   even if 'x' contains non-finite entries (for speed) ...
-	*/
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
-	/* Non-negative diagonal elements are necessary but _not_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
 	for (j = 0; j < n; ++j, px += n1a)
 		if (!ISNAN(*px) && *px < 0.0)
 			RMK(_("matrix has negative diagonal elements"));
+	} else {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (*CHAR(STRING_ELT(trans, 0)) != 'C')
+		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
+	Rcomplex *px = COMPLEX(x);
+	for (j = 0; j < n; ++j, px += n1a)
+		if (!ISNAN((*px).r) && (*px).r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	}
 
 	return ScalarLogical(1);
 }
 
 SEXP xppMatrix_validate(SEXP obj)
 {
-	/* NB: Non-finite entries are "valid" because we consider
-	   crossprod(x) and tcrossprod(x) to be positive semidefinite
-	   even if 'x' contains non-finite entries (for speed) ...
-	*/
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int j, n = INTEGER(dim)[0];
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 	char ul = *CHAR(STRING_ELT(uplo, 0));
 
-	/* Non-negative diagonal elements are necessary but _not_ sufficient */
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
 	if (ul == 'U') {
-		for (j = 0; j < n; px += (++j)+1)
-			if (!ISNAN(*px) && *px < 0.0)
-				RMK(_("matrix has negative diagonal elements"));
+	for (j = 0; j < n; px += (++j)+1)
+		if (!ISNAN(*px) && *px < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
 	} else {
-		for (j = 0; j < n; px += n-(j++))
-			if (!ISNAN(*px) && *px < 0.0)
-				RMK(_("matrix has negative diagonal elements"));
+	for (j = 0; j < n; px += n-(j++))
+		if (!ISNAN(*px) && *px < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
 	}
+	} else {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (*CHAR(STRING_ELT(trans, 0)) != 'C')
+		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
+	Rcomplex *px = COMPLEX(x);
+	if (ul == 'U') {
+	for (j = 0; j < n; px += (++j)+1)
+		if (!ISNAN((*px).r) && (*px).r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	} else {
+	for (j = 0; j < n; px += n-(j++))
+		if (!ISNAN((*px).r) && (*px).r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	}
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP xpCMatrix_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int j, n = INTEGER(dim)[0];
+
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+
+	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	UNPROTECT(3); /* x, i, p */
+	int *pp = INTEGER(p), *pi = INTEGER(i);
+	if (TYPEOF(x) == REALSXP) {
+	double *px = REAL(x);
+	if (ul == 'U') {
+	for (j = 0; j < n; ++j)
+		if (pp[j + 1] - pp[j] > 0 && pi[pp[j + 1] - 1] == j &&
+		    !ISNAN(px[pp[j + 1] - 1]) && px[pp[j + 1] - 1] < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
+	} else {
+	for (j = 0; j < n; ++j)
+		if (pp[j + 1] - pp[j] > 0 && pi[pp[j]] == j &&
+		    !ISNAN(px[pp[j]]) && px[pp[j]] < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
+	}
+	} else {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (*CHAR(STRING_ELT(trans, 0)) != 'C')
+		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
+	Rcomplex *px = COMPLEX(x);
+	if (ul == 'U') {
+	for (j = 0; j < n; ++j)
+		if (pp[j + 1] - pp[j] > 0 && pi[pp[j + 1] - 1] == j &&
+		    !ISNAN(px[pp[j + 1] - 1].r) && px[pp[j + 1] - 1].r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	} else {
+	for (j = 0; j < n; ++j)
+		if (pp[j + 1] - pp[j] > 0 && pi[pp[j]] == j &&
+		    !ISNAN(px[pp[j]].r) && px[pp[j]].r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	}
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP xpRMatrix_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int i, m = INTEGER(dim)[0];
+
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	char ul = *CHAR(STRING_ELT(uplo, 0));
+
+	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	UNPROTECT(3); /* x, j, p */
+	int *pp = INTEGER(p), *pj = INTEGER(j);
+	if (TYPEOF(x) == REALSXP) {
+	double *px = REAL(x);
+	if (ul == 'U') {
+	for (i = 0; i < m; ++i)
+		if (pp[i + 1] - pp[i] > 0 && pj[pp[i]] == i &&
+		    !ISNAN(px[pp[i]]) && px[pp[i]] < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
+	} else {
+	for (i = 0; i < m; ++i)
+		if (pp[i + 1] - pp[i] > 0 && pj[pp[i + 1] - 1] == i &&
+		    !ISNAN(px[pp[i + 1] - 1]) && px[pp[i + 1] - 1] < 0.0)
+			RMK(_("matrix has negative diagonal elements"));
+	}
+	} else {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (*CHAR(STRING_ELT(trans, 0)) != 'C')
+		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
+	Rcomplex *px = COMPLEX(x);
+	if (ul == 'U') {
+	for (i = 0; i < m; ++i)
+		if (pp[i + 1] - pp[i] > 0 && pj[pp[i]] == i &&
+		    !ISNAN(px[pp[i]].r) && px[pp[i]].r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	} else {
+	for (i = 0; i < m; ++i)
+		if (pp[i + 1] - pp[i] > 0 && pj[pp[i + 1] - 1] == i &&
+		    !ISNAN(px[pp[i + 1] - 1].r) && px[pp[i + 1] - 1].r < 0.0)
+			RMK(_("matrix has diagonal elements with negative real part"));
+	}
+	}
+
+	return ScalarLogical(1);
+}
+
+SEXP xpTMatrix_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int n = INTEGER(dim)[0];
+
+	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	UNPROTECT(3); /* x, j, i */
+	int *pi = INTEGER(i), *pj = INTEGER(j);
+	R_xlen_t nnz = XLENGTH(x);
+
+	double *work;
+	int lwork = n;
+	Matrix_Calloc(work, lwork, double);
+	if (TYPEOF(x) == REALSXP) {
+	double *px = REAL(x);
+	while (nnz--) {
+		if (*pi == *pj)
+			work[*pi] += *px;
+		++pi; ++pj; ++px;
+	}
+	while (n--)
+		if (!ISNAN(work[n]) && work[n] < 0.0)
+			FRMK(_("matrix has negative diagonal elements"));
+	} else {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (*CHAR(STRING_ELT(trans, 0)) != 'C')
+		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
+	Rcomplex *px = COMPLEX(x);
+	while (nnz--) {
+		if (*pi == *pj)
+			work[*pi] += (*px).r;
+		++pi; ++pj; ++px;
+	}
+	while (n--)
+		if (!ISNAN(work[n]) && work[n] < 0.0)
+			FRMK(_("matrix has diagonal elements with negative real part"));
+	}
+	Matrix_Free(work, lwork);
 
 	return ScalarLogical(1);
 }
@@ -945,13 +1097,13 @@ SEXP copMatrix_validate(SEXP obj)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	double *px = REAL(x);
 	if (ul == 'U') {
-		for (j = 0; j < n; px += (++j)+1)
-			if (ISNAN(*px) || *px != 1.0)
-				RMK(_("matrix has nonunit diagonal elements"));
+	for (j = 0; j < n; px += (++j)+1)
+		if (ISNAN(*px) || *px != 1.0)
+			RMK(_("matrix has nonunit diagonal elements"));
 	} else {
-		for (j = 0; j < n; px += n-(j++))
-			if (ISNAN(*px) || *px != 1.0)
-				RMK(_("matrix has nonunit diagonal elements"));
+	for (j = 0; j < n; px += n-(j++))
+		if (ISNAN(*px) || *px != 1.0)
+			RMK(_("matrix has nonunit diagonal elements"));
 	}
 
 	SEXP sd = GET_SLOT(obj, Matrix_sdSym);
@@ -1038,7 +1190,7 @@ SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym)); \
 	UNPROTECT(2); /* i, x */ \
 	if (TYPEOF(x) != _SEXPTYPE_) \
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
+		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_));	 \
 	if (XLENGTH(x) != XLENGTH(i)) \
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x"); \
 	return ScalarLogical(1); \
@@ -1049,6 +1201,11 @@ KINDVECTOR_VALIDATE(d, REALSXP)
 KINDVECTOR_VALIDATE(z, CPLXSXP)
 #undef KINDVECTOR_VALIDATE
 
+SEXP MatrixFactorization_validate(SEXP obj)
+{
+	return Matrix_validate(obj);
+}
+
 SEXP denseSchur_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -1058,18 +1215,18 @@ SEXP denseSchur_validate(SEXP obj)
 	Matrix_int_fast64_t nn = (Matrix_int_fast64_t) n * n;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) != REALSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""),
-		      "x", "double");
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
 	if (XLENGTH(x) != nn && XLENGTH(x) != 0)
 		RMKMS(_("'%s' slot does not have length %s or length %s"),
 		      "x", "prod(Dim)", "0");
 	int normal = n > 0 && XLENGTH(x) == 0;
 
 	SEXP vectors = GET_SLOT(obj, Matrix_vectorsSym);
-	if (TYPEOF(vectors) != REALSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""),
-		      "vectors", "double");
+	if (TYPEOF(vectors) != TYPEOF(x))
+		RMKMS(_("'%s' and '%s' slots do not have the same type"),
+		      "x", "vectors");
 	if (XLENGTH(vectors) != nn && XLENGTH(vectors) != 0)
 		RMKMS(_("'%s' slot does not have length %s or length %s"),
 		      "vectors", "prod(Dim)", "0");
@@ -1085,6 +1242,49 @@ SEXP denseSchur_validate(SEXP obj)
 	}
 	if (XLENGTH(values) != n)
 		RMKMS(_("'%s' slot does not have length %s"), "values", "Dim[1]");
+
+	return ScalarLogical(1);
+}
+
+SEXP denseQR_validate(SEXP obj)
+{
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
+
+	SEXP beta = GET_SLOT(obj, Matrix_betaSym);
+	if (TYPEOF(beta) != REALSXP && TYPEOF(beta) != CPLXSXP)
+		RMKMS(_("'%s' and '%s' slots do not have the same type"),
+		      "x", "beta");
+	if (XLENGTH(beta) != r)
+		RMKMS(_("'%s' slot does not have length %s"), "beta", "min(Dim)");
+
+	SEXP perm = GET_SLOT(obj, Matrix_permSym);
+	if (TYPEOF(perm) != INTSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
+	if (XLENGTH(perm) != n)
+		RMKMS(_("'%s' slot does not have length %s"), "perm", "Dim[2]");
+	char *work;
+	int lwork = n;
+	Matrix_Calloc(work, lwork, char);
+	int j, *pperm = INTEGER(perm);
+	for (j = 0; j < n; ++j) {
+		if (*pperm == NA_INTEGER)
+			FRMKMS(_("'%s' slot contains NA"), "perm");
+		if (*pperm < 1 || *pperm > n)
+			FRMKMS(_("'%s' slot has elements not in {%s}"),
+			      "perm", "1,...,Dim[2]");
+		if (work[*pperm - 1])
+			FRMKMS(_("'%s' slot contains duplicates"), "perm");
+		work[*(pperm++)] = 1;
+	}
+	Matrix_Free(work, lwork);
 
 	return ScalarLogical(1);
 }
@@ -1147,15 +1347,8 @@ SEXP sparseQR_validate(SEXP obj)
 	pi = INTEGER(i);
 	for (j = 0, k = 0; j < n; ++j) {
 		kend = pp[j + 1];
-		if (k < kend) {
-			if (pi[kend - 1] > j)
-				RMKMS(_("'%s' slot must be upper trapezoidal but has entries below the diagonal"), "R");
-#if 0 /* cs_house imposes diag(R) >= 0 in CSparse but not in CXSparse */
-			if (pi[kend - 1] == j &&
-			    !ISNAN(px[kend - 1]) && px[kend - 1] < 0.0)
-				RMKMS(_("'%s' slot has negative diagonal elements"), "R");
-#endif
-		}
+		if (k < kend && pi[kend - 1] > j)
+			RMKMS(_("'%s' slot must be upper trapezoidal but has entries below the diagonal"), "R");
 		k = kend;
 	}
 
@@ -1169,7 +1362,8 @@ SEXP sparseQR_validate(SEXP obj)
 	if (XLENGTH(p) != m0)
 		RMKMS(_("'%s' slot does not have length %s"), "p", "nrow(V)");
 	if (XLENGTH(q) != n && XLENGTH(q) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"), "q", "Dim[2]", "0");
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "q", "Dim[2]", "0");
 	char *work;
 	int lwork = m0; /* n <= m <= m0 */
 	Matrix_Calloc(work, lwork, char);
@@ -1204,10 +1398,15 @@ SEXP sparseQR_validate(SEXP obj)
 
 SEXP denseLU_validate(SEXP obj)
 {
-	/* In R, we start by checking that 'obj' would be a valid dgeMatrix */
-
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	if (TYPEOF(perm) != INTSXP)
@@ -1229,6 +1428,8 @@ SEXP denseLU_validate(SEXP obj)
 
 SEXP sparseLU_validate(SEXP obj)
 {
+	/* MJ: assuming for simplicity that 'L' and 'U' slots are formally valid */
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym), uplo, diag;
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
@@ -1253,12 +1454,22 @@ SEXP sparseLU_validate(SEXP obj)
 		UNPROTECT(4); /* x, i, p, L */
 
 		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
+		if (TYPEOF(x) == REALSXP) {
 		double *px = REAL(x);
 		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j + 1];
 			if (kend == k || pi[k] != j || px[k] != 1.0)
 				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
 			k = kend;
+		}
+		} else {
+		Rcomplex *px = COMPLEX(x);
+		for (j = 0, k = 0; j < n; ++j) {
+			kend = pp[j + 1];
+			if (kend == k || pi[k] != j || px[k].r != 1.0 || px[k].i != 0.0)
+				RMKMS(_("'%s' slot has nonunit diagonal elements"), "L");
+			k = kend;
+		}
 		}
 	}
 
@@ -1283,7 +1494,8 @@ SEXP sparseLU_validate(SEXP obj)
 	if (XLENGTH(p) != n)
 		RMKMS(_("'%s' slot does not have length %s"), "p", "Dim[1]");
 	if (XLENGTH(q) != n && XLENGTH(q) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"), "q", "Dim[2]", "0");
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "q", "Dim[2]", "0");
 	char *work;
 	int lwork = n;
 	Matrix_Calloc(work, lwork, char);
@@ -1319,7 +1531,39 @@ SEXP sparseLU_validate(SEXP obj)
 SEXP denseBunchKaufman_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	if (TYPEOF(uplo) != STRSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
+	if (XLENGTH(uplo) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
+	const char *ul = CHAR(STRING_ELT(uplo, 0));
+	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
+		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+
+	if (TYPEOF(x) == CPLXSXP) {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (TYPEOF(trans) != STRSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
+	if (XLENGTH(trans) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "trans", 1);
+	const char *ct = CHAR(STRING_ELT(trans, 0));
+	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
+		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
+	}
+	
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	int packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
+	if (packed && XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "x", "prod(Dim)", "Dim[1]*(Dim[1]+1)/2");
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	if (TYPEOF(perm) != INTSXP)
@@ -1349,21 +1593,69 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 SEXP denseCholesky_validate(SEXP obj)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-	R_xlen_t n1a = (R_xlen_t) n + 1;
+	int *pdim = INTEGER(dim), n = pdim[0];
+	if (pdim[1] != n)
+		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
-	/* Non-negative diagonal elements are necessary _and_ sufficient */
+	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	if (TYPEOF(uplo) != STRSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
+	if (XLENGTH(uplo) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
+	const char *ul = CHAR(STRING_ELT(uplo, 0));
+	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
+		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
+		      "x", "double", "complex");
+	int j, packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
+	if (packed && XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "x", "prod(Dim)", "Dim[1]*(Dim[1]+1)/2");
+
+	/* Real, non-negative diagonal elements are necessary and sufficient */
+	if (TYPEOF(x) == REALSXP) {
 	double *px = REAL(x);
-	for (j = 0; j < n; ++j, px += n1a)
-		if (!ISNAN(*px) && *px < 0.0)
-			RMK(_("Cholesky factor has negative diagonal elements"));
+	if (!packed) {
+		R_xlen_t n1a = (R_xlen_t) n + 1;
+		for (j = 0; j < n; ++j, px += n1a)
+			if (!ISNAN(*px) && *px < 0.0)
+				RMK(_("Cholesky factor has negative diagonal elements"));
+	} else if (*ul == 'U') {
+		for (j = 0; j < n; ++j, px += (++j)+1)
+			if (!ISNAN(*px) && *px < 0.0)
+				RMK(_("Cholesky factor has negative diagonal elements"));
+	} else {
+		for (j = 0; j < n; ++j, px += n-(j++))
+			if (!ISNAN(*px) && *px < 0.0)
+				RMK(_("Cholesky factor has negative diagonal elements"));
+	}
+	} else {
+	Rcomplex *px = COMPLEX(x);
+	if (!packed) {
+		R_xlen_t n1a = (R_xlen_t) n + 1;
+		for (j = 0; j < n; ++j, px += n1a)
+			if (!ISNAN((*px).r) && (*px).r < 0.0)
+				RMK(_("Cholesky factor has diagonal elements with negative real part"));
+	} else if (*ul == 'U') {
+		for (j = 0; j < n; ++j, px += (++j)+1)
+			if (!ISNAN((*px).r) && (*px).r < 0.0)
+				RMK(_("Cholesky factor has diagonal elements with negative real part"));
+	} else {
+		for (j = 0; j < n; ++j, px += n-(j++))
+			if (!ISNAN((*px).r) && (*px).r < 0.0)
+				RMK(_("Cholesky factor has diagonal elements with negative real part"));
+	}
+	}
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	if (TYPEOF(perm) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "perm", "integer");
 	if (XLENGTH(perm) != n && XLENGTH(perm) != 0)
-		RMKMS(_("'%s' slot does not have length %s or length %s"), "perm", "Dim[1]", "0");
+		RMKMS(_("'%s' slot does not have length %s or length %s"),
+		      "perm", "Dim[1]", "0");
 	if (LENGTH(perm) == n) {
 		char *work;
 		int lwork = n;

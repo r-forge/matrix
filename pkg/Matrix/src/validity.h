@@ -12,7 +12,6 @@ SEXP R_DimNames_validate(SEXP, SEXP);
 SEXP R_DimNames_fixup(SEXP);
 
 SEXP Matrix_validate(SEXP);
-SEXP MatrixFactorization_validate(SEXP);
 
 SEXP nMatrix_validate(SEXP);
 SEXP lMatrix_validate(SEXP);
@@ -52,6 +51,10 @@ SEXP xtTMatrix_validate(SEXP);
 
 SEXP xpoMatrix_validate(SEXP);
 SEXP xppMatrix_validate(SEXP);
+SEXP xpCMatrix_validate(SEXP);
+SEXP xpRMatrix_validate(SEXP);
+SEXP xpTMatrix_validate(SEXP);
+
 SEXP corMatrix_validate(SEXP);
 SEXP copMatrix_validate(SEXP);
 
@@ -61,7 +64,10 @@ SEXP isparseVector_validate(SEXP);
 SEXP dsparseVector_validate(SEXP);
 SEXP zsparseVector_validate(SEXP);
 
+SEXP MatrixFactorization_validate(SEXP);
+
 SEXP denseSchur_validate(SEXP);
+SEXP denseQR_validate(SEXP);
 SEXP sparseQR_validate(SEXP);
 SEXP denseLU_validate(SEXP);
 SEXP sparseLU_validate(SEXP);
