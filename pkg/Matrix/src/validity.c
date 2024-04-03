@@ -2072,28 +2072,29 @@ void validObject(SEXP obj, const char *cl)
 		} else { \
 			if (cl[1] == 'g') \
 				IS_VALID(xg ## _C_ ## Matrix); \
-			else if (cl[1] == 's') \
+			else if (cl[1] == 's' || cl[1] == 'p') \
 				IS_VALID(xs ## _C_ ## Matrix); \
 			else if (cl[1] == 't') \
 				IS_VALID(xt ## _C_ ## Matrix); \
+			if (cl[1] == 'p') \
+				IS_VALID(xp ## _C_ ## Matrix); \
 		} \
 	} while (0)
 
 	IS_VALID(Matrix);
 
-	if ((cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') ||
-		(cl[0] == 'p' && cl[1] != 'c')) {
+	const char *cl_ = cl;
+	if (cl[0] == 'c')
+		cl = (cl[2] != 'p') ? "dpoMatrix" : "dppMatrix";
+	else if (cl[0] == 'p')
+		cl = "indMatrix";
+
+	if (cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') {
 		IS_VALID(indMatrix);
-		if (cl[0] == 'p')
+		if (cl_[0] == 'p')
 			IS_VALID(pMatrix);
 		return;
 	}
-
-	const char *cl_ = cl;
-	if (cl[0] == 'c')
-		cl = "dpoMatrix";
-	else if (cl[0] == 'p' && cl[1] == 'c')
-		cl = "dppMatrix";
 
 	if (cl[0] == 'n' && cl[2] != 'C' && cl[2] != 'R' && cl[2] != 'T')
 		IS_VALID(nMatrix);
@@ -2106,7 +2107,9 @@ void validObject(SEXP obj, const char *cl)
 	else if (cl[0] == 'z')
 		IS_VALID(zMatrix);
 
-	if (cl[1] == 's' || cl[1] == 'p')
+	if (cl[1] == 'g')
+		IS_VALID(generalMatrix);
+	else if (cl[1] == 's' || cl[1] == 'p')
 		IS_VALID(symmetricMatrix);
 	else if (cl[1] == 't')
 		IS_VALID(triangularMatrix);
