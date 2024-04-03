@@ -81,7 +81,7 @@ chol2inv(x, \dots)
 stopifnot(exprs = {
     all.equal(R2i, tcrossprod(solve(R)))
     all.equal(L2i,  crossprod(solve(L)))
-    all.equal(as(R2i \%*\% A, "matrix"), diag(3L)) # the identity 
+    all.equal(as(R2i \%*\% A, "matrix"), diag(3L)) # the identity
     all.equal(as(L2i \%*\% A, "matrix"), diag(3L)) # ditto
 })
 }

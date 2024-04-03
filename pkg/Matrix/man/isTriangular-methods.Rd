@@ -59,9 +59,9 @@ isDiagonal(object)
   (never \code{\link{NA}}).
 
   If \code{object} is triangular and \code{upper} is \code{NA}, then
-  \code{isTriangular} returns \code{TRUE} with an \link[=attr]{attribute} 
+  \code{isTriangular} returns \code{TRUE} with an \link[=attr]{attribute}
   \code{kind}, either \code{"U"} or \code{"L"}, indicating that
-  \code{object} is \bold{u}pper or \bold{l}ower triangular, respectively.  
+  \code{object} is \bold{u}pper or \bold{l}ower triangular, respectively.
   Users should not rely on how \code{kind} is determined for diagonal
   matrices, which are both upper and lower triangular.
 }

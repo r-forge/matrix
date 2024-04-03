@@ -39,7 +39,7 @@
   The second equalities hold only for positive semidefinite \eqn{A},
   for which the diagonal entries of \eqn{D} are non-negative
   and \eqn{\sqrt{D}}{sqrt(D)} is well-defined.
-  
+
   The implementation of class \code{CHMfactor} is based on
   CHOLMOD's C-level \code{cholmod_factor_struct}.  Virtual
   subclasses \code{CHMsimpl} and \code{CHMsuper} separate
@@ -154,7 +154,7 @@ isLDL(x)
   \code{\link{Cholesky}(x, ...)} for \code{x} inheriting from
   \code{\linkS4class{sparseMatrix}}
   (often \code{\linkS4class{dsCMatrix}}).
-  
+
   There is currently no API outside of calls to \code{\link{new}}
   for generating \code{nCHMsimpl} and \code{nCHMsuper}.  These
   classes are vestigial and may be formally deprecated in a future

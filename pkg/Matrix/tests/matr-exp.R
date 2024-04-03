@@ -26,7 +26,7 @@ m1 <- Matrix(c(1,0,1,1), ncol = 2)
 e1 <- expm(m1)
 assert.EQ.mat(e1, cbind(c(exp(1),0), exp(1)))
 (p1 <- pack(m1))
-stopifnot(exprs = { 
+stopifnot(exprs = {
     is(p1, "dtpMatrix")
     all.equal(pack(e1), expm(p1), tolerance = 2e-15)# failed in Matrix 1.6.1
 })

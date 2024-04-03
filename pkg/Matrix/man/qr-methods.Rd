@@ -24,12 +24,12 @@
   is an \eqn{m \times m}{m-by-m} orthogonal matrix
   equal to the product of \eqn{n} Householder matrices \eqn{H_{j}}{Hj}, and
   \eqn{R} is an \eqn{m \times n}{m-by-n} upper trapezoidal matrix.
-  
+
   \code{\linkS4class{denseMatrix}} use the default method implemented
   in \pkg{base}, namely \code{\link{qr.default}}.  It is built on
   LINPACK routine \code{dqrdc} and LAPACK routine \code{dgeqp3}, which
   do not pivot rows, so that \eqn{P_{1}}{P1} is an identity matrix.
-  
+
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CXSparse routines \code{cs_sqr} and \code{cs_qr}, which require
   \eqn{m \ge n}{m >= n}.
@@ -75,14 +75,14 @@ qr(x, \dots)
   Class \code{\linkS4class{sparseQR}} and its methods.
 
   Class \code{\linkS4class{dgCMatrix}}.
-  
+
   Generic function \code{\link[base]{qr}} from \pkg{base},
   whose default method \code{qr.default} \dQuote{defines}
   the S3 class \code{qr} of dense QR factorizations.
 
   Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
   \code{\link{Schur}}, and \code{\link{lu}},
   for computing other factorizations.

@@ -107,7 +107,7 @@ sparseMatrix(i, j, p, x, dims, dimnames,
   consistency with the definition of the
   \code{\linkS4class{TsparseMatrix}} class, unless \code{use.last.ij}
   is set to true.
-  
+
   By default, when \code{repr = "C"}, the \code{\linkS4class{CsparseMatrix}}
   derived from this triplet form is returned, where \code{repr = "R"} now
   allows to directly get an \code{\linkS4class{RsparseMatrix}} and

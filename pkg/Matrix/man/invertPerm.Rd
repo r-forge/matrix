@@ -48,13 +48,13 @@ invPerm(p, zero.p = FALSE, zero.res = FALSE)
   for all values of \code{off}.  For the default value
   \code{off=1}, it returns the value of \code{p} after
   \code{p[p] <- seq_along(p)}.
-  
+
   \code{invPerm} is a simple wrapper around \code{invertPerm},
   retained for backwards compatibility.
 }
 \value{
   By default, i.e., with \code{off=1} and \code{ioff=1}:
-  
+
   \code{invertPerm(p)} returns an integer vector of length
   \code{length(p)} such that \code{p[invertPerm(p)]}
   and \code{invertPerm(p)[p]} are both \code{seq_along(p)},

@@ -19,7 +19,7 @@
   standard unit vectors.  It follows that permutation matrices are
   a special case of \emph{index} matrices (hence \code{pMatrix}
   is defined as a direct subclass of \code{\linkS4class{indMatrix}}).
-  
+
   Multiplying a matrix on the left by a permutation matrix is
   equivalent to permuting its rows.  Analogously, multiplying a
   matrix on the right by a permutation matrix is equivalent to
@@ -65,7 +65,7 @@
       orthogonal.  See \code{showMethods("solve", classes = "pMatrix")}
       for more signatures.}
     \item{determinant}{\code{signature(x = "pMatrix", logarithm = "logical")}:
-      always returning 1 or -1, as permutation matrices are orthogonal.  
+      always returning 1 or -1, as permutation matrices are orthogonal.
       In fact, the result is exactly the \emph{sign} of the permutation.}
   }
 }

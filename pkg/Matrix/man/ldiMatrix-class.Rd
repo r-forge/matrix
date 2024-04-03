@@ -92,7 +92,7 @@
 \section{Extends}{
   Class \code{"\linkS4class{diagonalMatrix}"} and
   class \code{"\linkS4class{lMatrix}"}, directly.
-  
+
   Class \code{"\linkS4class{sparseMatrix}"}, by class \code{"diagonalMatrix"}.
 }
 % \section{Methods}{

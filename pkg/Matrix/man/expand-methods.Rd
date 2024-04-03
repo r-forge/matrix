@@ -77,7 +77,7 @@ expand (x, \dots)
   factors in the returned list should reproduce
   (within some tolerance) the factorized matrix,
   \emph{including} its \code{dimnames}.
-  
+
   Hence if \code{x} is a matrix and \code{y} is its factorization,
   then
   \preformatted{    all.equal(as(x, "matrix"), as(Reduce(`\%*\%`, expand2(y)), "matrix"))}
@@ -100,7 +100,7 @@ expand (x, \dots)
 
   Methods for \code{expand2} and \code{expand} are described
   below.  Factor names and classes apply also to \code{expand1}.
-  
+
   \describe{
     \item{\code{expand2}}{\code{signature(x = "CHMsimpl")}:
       expands the factorization
@@ -200,7 +200,7 @@ expand (x, \dots)
 \seealso{
   The virtual class \code{\linkS4class{MatrixFactorization}}
   of matrix factorizations.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
   \code{\link{Schur}}, \code{\link{lu}}, and \code{\link{qr}} for
   \emph{computing} factorizations.

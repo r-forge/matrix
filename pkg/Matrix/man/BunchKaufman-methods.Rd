@@ -28,7 +28,7 @@
   \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
   is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
   matrices, each having nonzero entries below the diagonal in 1 or 2 columns.
-  
+
   Methods are built on LAPACK routines \code{dsytrf} and \code{dsptrf}.
 }
 \usage{
@@ -59,13 +59,13 @@ BunchKaufman(x, \dots)
 \seealso{
   Classes \code{\linkS4class{BunchKaufman}} and
   \code{\linkS4class{pBunchKaufman}} and their methods.
-  
+
   Classes \code{\linkS4class{dsyMatrix}} and
   \code{\linkS4class{dspMatrix}}.
-  
+
   Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{Schur}},
   \code{\link{lu}}, and \code{\link{qr}},
   for computing other factorizations.

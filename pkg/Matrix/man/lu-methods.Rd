@@ -35,8 +35,8 @@
   or (equivalently)
   \deqn{A = P_{1}' L U P_{2}'}{A = P1' * L * U * P2'}
   where
-  \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix, 
-  \eqn{P_{2}}{P2} is an \eqn{n \times n}{n-by-n} permutation matrix, 
+  \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix,
+  \eqn{P_{2}}{P2} is an \eqn{n \times n}{n-by-n} permutation matrix,
   \eqn{L} is an \eqn{m \times \min(m,n)}{m-by-min(m,n)}
   unit lower trapezoidal matrix, and
   \eqn{U} is a  \eqn{\min(m,n) \times n}{min(m,n)-by-n}
@@ -122,7 +122,7 @@ lu(x, \dots)
 
   Generic functions \code{\link{expand1}} and \code{\link{expand2}},
   for constructing matrix factors from the result.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
   \code{\link{Schur}}, and \code{\link{qr}},
   for computing other factorizations.
@@ -130,7 +130,7 @@ lu(x, \dots)
 \references{
   The LAPACK source code, including documentation; see
   \url{https://netlib.org/lapack/double/dgetrf.f}.
-  
+
   Davis, T. A. (2006).
   \emph{Direct methods for sparse linear systems}.
   Society for Industrial and Applied Mathematics.

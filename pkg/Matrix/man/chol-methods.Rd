@@ -35,7 +35,7 @@
   LAPACK routines \code{dpstrf}, \code{dpotrf}, and \code{dpptrf},
   The latter two do not permute rows or columns,
   so that \eqn{P_{1}}{P1} is an identity matrix.
-  
+
   Methods for \code{\linkS4class{sparseMatrix}} are built on
   CHOLMOD routines \code{cholmod_analyze} and \code{cholmod_factorize_p}.
 }
@@ -86,7 +86,7 @@ chol(x, \dots)
   For \code{x} inheriting from \code{\linkS4class{diagonalMatrix}},
   the diagonal result is computed directly and without pivoting,
   i.e., bypassing CHOLMOD.
-  
+
   For all other \code{x}, \code{chol(x, pivot = value)} calls
   \code{\link{Cholesky}(x, perm = value, \dots)} under the hood.
   If you must know the permutation \eqn{P_{1}}{P1} in addition

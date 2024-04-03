@@ -101,11 +101,11 @@
   \code{\linkS4class{dtpMatrix}}, reflecting the fact that the factor
   \eqn{L} is indeed a triangular matrix.
   \pkg{Matrix} \code{1.6-0} removed these extensions so that methods
-  would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.  
+  would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.
   The availability of such methods gave the wrong impression that
   \code{Cholesky} and \code{pCholesky} represent a (singular)
   matrix, when in fact they represent an ordered set of matrix factors.
-  
+
   The coercions \code{as(., "dtrMatrix")} and \code{as(., "dtpMatrix")}
   are provided for users who understand the caveats.
 }
@@ -113,7 +113,7 @@
   Class \code{\linkS4class{CHMfactor}} for sparse Cholesky factorizations.
 
   Classes \code{\linkS4class{dpoMatrix}} and \code{\linkS4class{dppMatrix}}.
-  
+
   Generic functions \code{\link{Cholesky}},
   \code{\link{expand1}} and \code{\link{expand2}}.
 }
@@ -127,7 +127,7 @@
   \emph{LAPACK-style codes for level 2 and 3 pivoted Cholesky factorizations}.
   LAPACK Working Note, Number 161.
   \url{https://www.netlib.org/lapack/lawnspdf/lawn161.pdf}
-  
+
   Golub, G. H., & Van Loan, C. F. (2013).
   \emph{Matrix computations} (4th ed.).
   Johns Hopkins University Press.

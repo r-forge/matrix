@@ -49,7 +49,7 @@ aggregateT(x)
   sorted, nonduplicated \eqn{(i,j)} pairs.  Values corresponding to
   identical \eqn{(i,j)} pairs are aggregated by addition, where in the
   logical case \dQuote{addition} refers to logical OR.
-  
+
   \code{aggregateT(x)} aggregates without sorting.
 }
 \seealso{Virtual class \code{\linkS4class{TsparseMatrix}}.}

@@ -120,11 +120,11 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
       depending on optional argument \code{complete}.  The default
       is \code{FALSE}, indicating \eqn{P_1' Q_1}{P1' * Q1}.}
     \item{\code{qr.R}}{\code{signature(qr = "sparseQR")}:
-      \code{qrR} returns \eqn{R}, \eqn{R_1}{R1}, 
+      \code{qrR} returns \eqn{R}, \eqn{R_1}{R1},
       \eqn{R P2'}{R * P2'}, or \eqn{R_1 P2'}{R1 *  P2'},
       depending on optional arguments \code{complete} and
       \code{backPermute}.  The default in both cases is \code{FALSE},
-      indicating \eqn{R_1}{R1}, for compatibility with \pkg{base}.  
+      indicating \eqn{R_1}{R1}, for compatibility with \pkg{base}.
       The class of the result in that case is
       \code{\linkS4class{dtCMatrix}}.  In the other three cases,
       it is \code{\linkS4class{dgCMatrix}}.}
@@ -167,11 +167,11 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   \code{qr.default} in \pkg{base} does not pivot rows, constraining
   \eqn{P_1}{P1} to be an identity matrix.  It follows that
   \code{qr.Q(qr.default(x))} also returns \eqn{P_1' Q}{P1' * Q}.
-  
+
   Similarly, the methods for \code{qr.qy} and \code{qr.qty} multiply
   on the left by \eqn{P_1' Q}{P1' * Q} and \eqn{Q' P_1}{Q' * P1}
   rather than \eqn{Q} and \eqn{Q'}.
-  
+
   It is wrong to expect the values of \code{qr.Q} (or \code{qr.R},
   \code{qr.qy}, \code{qr.qty}) computed from \dQuote{equivalent}
   sparse and dense factorizations
@@ -181,7 +181,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
   notably as they employ different pivoting strategies,
   and in general the factorization is not unique even for fixed
   \eqn{P_1}{P1} and \eqn{P_2}{P2}.
-  
+
   On the other hand, the values of \code{qr.X}, \code{qr.coef},
   \code{qr.fitted}, and \code{qr.resid} are well-defined, and
   in those cases the sparse and dense computations \emph{should}
@@ -195,15 +195,15 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
 }
 \seealso{
   Class \code{\linkS4class{dgCMatrix}}.
-  
+
   Generic function \code{\link[base]{qr}} from \pkg{base},
   whose default method \code{qr.default} \dQuote{defines}
   the S3 class \code{qr} of dense QR factorizations.
 
   \code{\link{qr-methods}} for methods defined in \pkg{Matrix}.
-  
+
   Generic functions \code{\link{expand1}} and \code{\link{expand2}}.
-  
+
   The many auxiliary functions for QR factorizations:
   \code{\link{qr.Q}}, \code{\link{qr.R}}, \code{\link{qr.X}},
   \code{\link{qr.coef}}, \code{\link{qr.fitted}}, \code{\link{qr.resid}},

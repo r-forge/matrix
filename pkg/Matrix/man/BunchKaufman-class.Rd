@@ -30,7 +30,7 @@
   \eqn{L = \prod_{k = 1}^{b_{L}} P_{k} L_{k}}{L = prod(Pk * Lk : k = 1,...,bL)}
   is the product of \eqn{b_{L}}{bL} row-permuted unit lower triangular
   matrices, each having nonzero entries below the diagonal in 1 or 2 columns.
-  
+
   These classes store the nonzero entries of the
   \eqn{2 b_{U} + 1}{2*bU+1} or \eqn{2 b_{L} + 1}{2*bL+1} factors,
   which are individually sparse,
@@ -97,11 +97,11 @@
   can be arranged systematically to form an \eqn{n \times n}{n-by-n}
   triangular matrix.
   \pkg{Matrix} \code{1.6-0} removed these extensions so that methods
-  would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.  
+  would no longer be inherited from \code{dtrMatrix} and \code{dtpMatrix}.
   The availability of such methods gave the wrong impression that
   \code{BunchKaufman} and \code{pBunchKaufman} represent a (singular)
   matrix, when in fact they represent an ordered set of matrix factors.
-  
+
   The coercions \code{as(., "dtrMatrix")} and \code{as(., "dtpMatrix")}
   are provided for users who understand the caveats.
 }

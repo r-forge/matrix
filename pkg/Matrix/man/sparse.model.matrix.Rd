@@ -81,7 +81,7 @@ fac2Sparse(from, to = c("d", "l", "n"),
   For \code{fac2Sparse()}, a \code{\link{list}} of length two, both
   components with the corresponding transposed model matrix, where the
   corresponding \code{factorPatt12} is true.
-  
+
   \code{fac2sparse()}, the basic workhorse of
   \code{sparse.model.matrix()}, returns the \emph{transpose}
   (\code{\link{t}}) of the model matrix.
@@ -98,7 +98,7 @@ fac2Sparse(from, to = c("d", "l", "n"),
 }
 \seealso{
   \code{\link{model.matrix}} in package \pkg{stats}, part of base \R{}.
-  
+
   \code{model.Matrix} in package \CRANpkg{MatrixModels}; see \sQuote{Note}.
 
   \code{as(f, "sparseMatrix")} (see \code{coerce(from = "factor", ..)}

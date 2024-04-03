@@ -19,7 +19,7 @@
   or (equivalently)
   \deqn{A = P_{1}' L U}{A = P1' * L * U}
   where
-  \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix, 
+  \eqn{P_{1}}{P1} is an \eqn{m \times m}{m-by-m} permutation matrix,
   \eqn{L} is an \eqn{m \times \min(m,n)}{m-by-min(m,n)}
   unit lower trapezoidal matrix, and
   \eqn{U} is a  \eqn{\min(m,n) \times n}{min(m,n)-by-n}
@@ -72,7 +72,7 @@
 }
 \seealso{
   Class \code{\linkS4class{sparseLU}} for sparse LU factorizations.
-  
+
   Class \code{\linkS4class{dgeMatrix}}.
 
   Generic functions \code{\link{lu}},
@@ -81,7 +81,7 @@
 \references{
   The LAPACK source code, including documentation; see
   \url{https://netlib.org/lapack/double/dgetrf.f}.
-  
+
   Golub, G. H., & Van Loan, C. F. (2013).
   \emph{Matrix computations} (4th ed.).
   Johns Hopkins University Press.

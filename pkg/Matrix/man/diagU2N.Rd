@@ -17,7 +17,7 @@
   \dQuote{general} triangular (\code{diagU2N(x)}) or back (\code{diagN2U(x)}).
   Note that the latter, \code{diagN2U(x)}, also sets the diagonal to one
   in cases where \code{diag(x)} was not all one.
-  
+
   \code{.diagU2N(x)} and \code{.diagN2U(x)} assume \emph{without}
   checking that \code{x} is a \code{\linkS4class{triangularMatrix}} with
   suitable \code{diag} slot (\code{"U"} and \code{"N"}, respectively),

@@ -68,7 +68,7 @@
 }
 \seealso{
   Class \code{\linkS4class{denseLU}} for dense LU factorizations.
-  
+
   Class \code{\linkS4class{dgCMatrix}}.
 
   Generic functions \code{\link{lu}},

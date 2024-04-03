@@ -43,7 +43,7 @@
   \eqn{P_{1} = I_{m}}{P1 = Im} and \eqn{P_{2} = I_{n}}{P2 = In},
   where \eqn{I_{m}}{Im} and \eqn{I_{n}}{In} are the
   \eqn{m \times m}{m-by-m} and \eqn{n \times n}{n-by-n} identity matrices.
-  
+
   \code{CholeskyFactorization}, \code{BunchKaufmanFactorization},
   \code{SchurFactorization}, \code{LU}, and \code{QR} are the virtual
   subclasses of \code{MatrixFactorization} containing all Cholesky,
@@ -96,9 +96,9 @@
 
   Classes extending \code{LU}, namely
   \code{\linkS4class{denseLU}} and \code{\linkS4class{sparseLU}}.
-  
+
   Classes extending \code{QR}, namely \code{\linkS4class{sparseQR}}.
-  
+
   Generic functions \code{\link{Cholesky}}, \code{\link{BunchKaufman}},
   \code{\link{Schur}}, \code{\link{lu}}, and \code{\link{qr}} for
   \emph{computing} factorizations.
