@@ -4,10 +4,15 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-04-02 r4699)}{
+\section{Changes in version 1.8-0 (2024-04-04 r4726)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
-      \item .
+      \item This version will introduce integer matrices, complex
+      matrices, and complex factorizations.  Names and definitions of
+      factorization classes may change to support the generalization.
+      It is currently under active development and until it stabilizes
+      users should consider installing \pkg{Matrix} versions 1.7-z
+      instead.
     }
   }
   \subsection{New Features}{
