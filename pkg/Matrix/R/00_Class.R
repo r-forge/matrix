@@ -55,7 +55,7 @@ setClass("generalMatrix",
          slots = c(factors = "list"),
          validity = function(object) .Call(generalMatrix_validate, object))
 
-## Virtual class of symmetric or Hermitian matrices
+## Virtual class of symmetric matrices
 setClass("symmetricMatrix",
          contains = c("VIRTUAL", "Matrix"),
          slots = c(uplo = "character", factors = "list"),
@@ -375,6 +375,8 @@ setClass("zgeMatrix",
 
 ## Unpacked, Hermitian or symmetric
 setClass("zsyMatrix",
+         slots = c(trans = "character"),
+         prototype = list(trans = "C"),
          contains = c("unpackedMatrix", "zdenseMatrix", "symmetricMatrix"))
 
 ## Unpacked, Hermitian, positive semidefinite
@@ -388,6 +390,8 @@ setClass("ztrMatrix",
 
 ## Packed, Hermitian or symmetric
 setClass("zspMatrix",
+         slots = c(trans = "character"),
+         prototype = list(trans = "C"),
          contains = c("packedMatrix", "zdenseMatrix", "symmetricMatrix"))
 
 ## Packed, Hermitian, positive semidefinite
@@ -644,6 +648,8 @@ setClass("zgCMatrix",
 ## CSC, Hermitian or symmetric
 setClass("zsCMatrix",
          contains = c("CsparseMatrix", "zsparseMatrix", "symmetricMatrix"),
+         slots = c(trans = "character"),
+         prototype = list(trans = "C"),
          validity = function(object) .Call(xsCMatrix_validate, object))
 
 ## CSC, Hermitian, positive semidefinite
@@ -664,6 +670,8 @@ setClass("zgRMatrix",
 ## CSR, Hermitian or symmetric
 setClass("zsRMatrix",
          contains = c("RsparseMatrix", "zsparseMatrix", "symmetricMatrix"),
+         slots = c(trans = "character"),
+         prototype = list(trans = "C"),
          validity = function(object) .Call(xsRMatrix_validate, object))
 
 ## CSR, Hermitian, positive semidefinite
@@ -684,6 +692,8 @@ setClass("zgTMatrix",
 ## Triplet, Hermitian or symmetric
 setClass("zsTMatrix",
          contains = c("TsparseMatrix", "zsparseMatrix", "symmetricMatrix"),
+         slots = c(trans = "character"),
+         prototype = list(trans = "C"),
          validity = function(object) .Call(xsTMatrix_validate, object))
 
 ## Triplet, Hermitian, positive semidefinite

@@ -238,6 +238,17 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
 
+	if (HAS_SLOT(obj, Matrix_transSym)) {
+	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	if (TYPEOF(trans) != STRSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
+	if (XLENGTH(trans) != 1)
+		RMKMS(_("'%s' slot does not have length %d"), "trans", 1);
+	const char *ct = CHAR(STRING_ELT(trans, 0));
+	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
+		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
+	}
+
 	return generalMatrix_validate(obj);
 }
 
@@ -1335,9 +1346,7 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
 
-	SEXP x = GET_SLOT(obj, Matrix_xSym);
-
-	if (TYPEOF(x) == CPLXSXP) {
+	if (HAS_SLOT(obj, Matrix_transSym)) {
 	SEXP trans = GET_SLOT(obj, Matrix_transSym);
 	if (TYPEOF(trans) != STRSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
@@ -1348,6 +1357,7 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
