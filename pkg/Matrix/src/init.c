@@ -201,7 +201,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(sparseCholesky_update, 3),
 	CALLDEF(sparseCholesky_updown, 3),
 	CALLDEF(sparseCholesky_diag_get, 2),
-	CALLDEF(denseBunchKaufman_expand, 2),
+	CALLDEF(denseBunchKaufman_expand, 1),
 
 	CALLDEF(denseLU_solve, 2),
 	CALLDEF(denseBunchKaufman_solve, 2),
