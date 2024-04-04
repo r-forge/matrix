@@ -77,8 +77,8 @@ condest <- function(A, t = min (n, 5), normA = norm(A, "1"),
   i.n <- seq_len(n)
   isSparse <- is(A, "sparseMatrix")
   if(isSparse) {
-### FIXME: if A is not a Matrix, but already a "CHMfactor" as resulting from
-###        Cholesky() , then we can procede more efficiently , notably
+### FIXME: if A is not a Matrix, but already a "sparseCholesky" as resulting
+###        from Cholesky() , then we can procede more efficiently , notably
 ###        because of the  solve(A, b, system = ".*")  options !
 
       ## luA = "sparseLU": slots (L, U, p,q, Dim);

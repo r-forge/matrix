@@ -32,10 +32,18 @@ setMethod("Schur", c(x = "matrix"),
               Schur(.m2dense(x, ",ge"), vectors = vectors, ...))
 
 
-## METHODS FOR CLASS: Schur
+## METHODS FOR CLASS: denseSchur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("expand1", c(x = "Schur"),
+setAs("denseSchur", "dgeMatrix",
+      function(from) {
+          to <- new("dgeMatrix")
+          to@Dim <- from@Dim
+          to@x <- from@x
+          to
+      })
+
+setMethod("expand1", c(x = "denseSchur"),
           function(x, which, ...) {
               d <- x@Dim
               switch(which,
@@ -62,7 +70,7 @@ setMethod("expand1", c(x = "Schur"),
                           domain = NA))
           })
 
-setMethod("expand2", c(x = "Schur"),
+setMethod("expand2", c(x = "denseSchur"),
           function(x, ...) {
               T <- expand1(x, "T")
               Q <- expand1(x, "Q")

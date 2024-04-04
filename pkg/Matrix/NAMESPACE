@@ -402,31 +402,48 @@ exportClasses(Matrix, # and its subclasses .............................
 
               MatrixFactorization, # and its subclasses ................
 
-              LU,
-              denseLU,
-              sparseLU,
+              Schur,
+              denseSchur,
+              ddenseSchur,
+              ## zdenseSchur,
 
               QR,
               ## denseQR,
+              ## ddenseQR,
+              ## zdenseQR,
               sparseQR,
+              dsparseQR,
+              ## zsparseQR,
 
-              SchurFactorization,
-              Schur,
+              LU,
+              denseLU,
+              ddenseLU,
+              ## zdenseLU,
+              sparseLU,
+              dsparseLU,
+              ## zsparseLU,
 
-              BunchKaufmanFactorization,
               BunchKaufman,
-              pBunchKaufman,
+              denseBunchKaufman,
+              ddenseBunchKaufman,
+              ## zdenseBunchKaufman,
 
-              CholeskyFactorization,
               Cholesky,
-              pCholesky,
-              CHMfactor,
-              CHMsuper,
-              dCHMsuper,
-              nCHMsuper, # unused
-              CHMsimpl,
-              dCHMsimpl,
-              nCHMsimpl, # unused
+              denseCholesky,
+              ddenseCholesky,
+              ## zdenseCholesky,
+              sparseCholesky,
+              nsparseCholesky,
+              dsparseCholesky,
+              ## zsparseCholesky,
+              simplicialCholesky,
+              nsimplicialCholesky,
+              dsimplicialCholesky,
+              ## zsimplicialCholesky,
+              supernodalCholesky,
+              nsupernodalCholesky,
+              dsupernodalCholesky,
+              ## zsupernodalCholesky,
 
               sparseVector, # and its subclasses .......................
               nsparseVector,
@@ -437,6 +454,7 @@ exportClasses(Matrix, # and its subclasses .............................
 
               ## MJ: aim to deprecate and eventually remove these
               ##     (except perhaps 'index')
+
               abIndex,
               atomicVector,
               compMatrix,

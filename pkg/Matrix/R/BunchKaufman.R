@@ -14,71 +14,71 @@ setMethod("BunchKaufman", c(x = "matrix"),
               BunchKaufman(.m2dense(x, ",sy", uplo), ...))
 
 
-## METHODS FOR CLASS: p?BunchKaufman
+## METHODS FOR CLASS: denseBunchKaufman
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("BunchKaufman", "dtrMatrix",
+setAs("denseBunchKaufman", "dtrMatrix",
       function(from) {
-          to <- new("dtrMatrix")
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if(!packed) "dtrMatrix" else "dtpMatrix")
           to@Dim <- from@Dim
           to@uplo <- from@uplo
           to@x <- from@x
-          to
+          if(!packed) to else unpack(to)
       })
 
-setAs("pBunchKaufman", "dtpMatrix",
+setAs("denseBunchKaufman", "dtpMatrix",
       function(from) {
-          to <- new("dtpMatrix")
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if(!packed) "dtrMatrix" else "dtpMatrix")
           to@Dim <- from@Dim
           to@uplo <- from@uplo
           to@x <- from@x
-          to
+          if(!packed) pack(to) else to
       })
 
-.def.unpacked <- .def.packed <- function(x, which, ...) {
-    r <- .Call(denseBunchKaufman_expand, x, .PACKED)
+.f1 <- function(x, which, ...) {
+    r <- .Call(denseBunchKaufman_expand, x)
     b <- length(r) - 1L
     switch(which,
-           "DU" =, "DL" = {
-               if(!endsWith(which, x@uplo))
-                   stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
-                                 "which", which, "x", x@uplo),
-                        domain = NA)
-               r[[b + 1L]]
-           },
-           "U" =, "U." =, "L" =, "L." = {
-               if(!startsWith(which, x@uplo))
-                   stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
-                                 "which", which, "x", x@uplo),
-                        domain = NA)
-               if(b > 0L) {
-                   m <- r[[b]]
-                   if(b > 1L)
-                       for(i in (b - 1L):1L)
-                           m <- r[[i]] %*% m
-                   if(endsWith(which, ".")) t(m) else m
-               } else {
-                   m <- new("ddiMatrix")
-                   m@Dim <- x@Dim
-                   m@diag <- "U"
-                   m
-               }
-           },
+           "DU" =, "DL" =
+               {
+                   if(!endsWith(which, x@uplo))
+                       stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
+                                     "which", which, "x", x@uplo),
+                            domain = NA)
+                   r[[b + 1L]]
+               },
+           "U" =, "U." =, "L" =, "L." =
+               {
+                   if(!startsWith(which, x@uplo))
+                       stop(gettextf("%s=\"%s\" invalid for %s@uplo=\"%s\"",
+                                     "which", which, "x", x@uplo),
+                            domain = NA)
+                   if(b > 0L) {
+                       m <- r[[b]]
+                       if(b > 1L)
+                           for(i in (b - 1L):1L)
+                               m <- r[[i]] %*% m
+                       if(endsWith(which, ".")) t(m) else m
+                   } else {
+                       m <- new("ddiMatrix")
+                       m@Dim <- x@Dim
+                       m@diag <- "U"
+                       m
+                   }
+               },
            stop(gettextf("'%s' is not \"%1$s\", \"D%1$s\", or \"%1$s.\"",
                          "which", x@uplo),
                 domain = NA))
 }
-body(.def.unpacked) <-
-    do.call(substitute, list(body(.def.unpacked), list(.PACKED = FALSE)))
-body(.def.packed) <-
-    do.call(substitute, list(body(.def.packed  ), list(.PACKED =  TRUE)))
 
-setMethod("expand1", c(x =  "BunchKaufman"), .def.unpacked)
-setMethod("expand1", c(x = "pBunchKaufman"), .def.packed)
-rm(.def.unpacked, .def.packed)
-
-.def.unpacked <- .def.packed <- function(x, complete = FALSE, ...) {
-    r <- .Call(denseBunchKaufman_expand, x, .PACKED)
+## returning
+## list(U, DU, U') where A = U DU U' and U = P[b] U[b] ... P[1] U[1]
+## OR
+## list(L, DL, L') where A = L DL L' and L = P[1] L[1] ... P[b] L[b]
+.f2 <- function(x, complete = FALSE, ...) {
+    r <- .Call(denseBunchKaufman_expand, x)
     b <- length(r) - 1L
     if(complete) {
         if(b > 0L)
@@ -107,15 +107,8 @@ rm(.def.unpacked, .def.packed)
     }
     r
 }
-body(.def.unpacked) <-
-    do.call(substitute, list(body(.def.unpacked), list(.PACKED = FALSE)))
-body(.def.packed) <-
-    do.call(substitute, list(body(.def.packed  ), list(.PACKED =  TRUE)))
 
-## returning
-## list(U, DU, U') where A = U DU U' and U = P[b] U[b] ... P[1] U[1]
-## OR
-## list(L, DL, L') where A = L DL L' and L = P[1] L[1] ... P[b] L[b]
-setMethod("expand2", c(x =  "BunchKaufman"), .def.unpacked)
-setMethod("expand2", c(x = "pBunchKaufman"), .def.packed)
-rm(.def.unpacked, .def.packed)
+setMethod("expand1", c(x = "denseBunchKaufman"), .f1)
+setMethod("expand2", c(x = "denseBunchKaufman"), .f2)
+
+rm(.f1, .f2)

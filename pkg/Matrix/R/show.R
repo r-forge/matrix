@@ -488,42 +488,6 @@ setMethod("show", c(object = "diagonalMatrix"),
               }
           })
 
-setMethod("show", c(object = "MatrixFactorization"),
-          function(object) {
-              cat("matrix factorization of ")
-              str(object)
-          })
-
-setMethod("show", c(object = "CholeskyFactorization"),
-          function(object) {
-              cat("Cholesky factorization of ")
-              str(object)
-          })
-
-setMethod("show", c(object = "BunchKaufmanFactorization"),
-          function(object) {
-              cat("Bunch-Kaufman factorization of ")
-              str(object)
-          })
-
-setMethod("show", c(object = "SchurFactorization"),
-          function(object) {
-              cat("Schur factorization of ")
-              str(object)
-          })
-
-setMethod("show", c(object = "LU"),
-          function(object) {
-              cat("LU factorization of ")
-              str(object)
-          })
-
-setMethod("show", c(object = "QR"),
-          function(object) {
-              cat("QR factorization of ")
-              str(object)
-          })
-
 setMethod("show", c(object = "sparseVector"),
           function(object) {
               n <- object@length
@@ -545,6 +509,42 @@ setMethod("show", c(object = "sparseVector"),
                       sep = "")
               }
               invisible(object)
+          })
+
+setMethod("show", c(object = "MatrixFactorization"),
+          function(object) {
+              cat("matrix factorization of ")
+              str(object)
+          })
+
+setMethod("show", c(object = "Schur"),
+          function(object) {
+              cat("Schur factorization of ")
+              str(object)
+          })
+
+setMethod("show", c(object = "QR"),
+          function(object) {
+              cat("QR factorization of ")
+              str(object)
+          })
+
+setMethod("show", c(object = "LU"),
+          function(object) {
+              cat("LU factorization of ")
+              str(object)
+          })
+
+setMethod("show", c(object = "BunchKaufman"),
+          function(object) {
+              cat("Bunch-Kaufman factorization of ")
+              str(object)
+          })
+
+setMethod("show", c(object = "Cholesky"),
+          function(object) {
+              cat("Cholesky factorization of ")
+              str(object)
           })
 
 

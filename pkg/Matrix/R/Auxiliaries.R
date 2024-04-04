@@ -423,7 +423,7 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 
 .diag.dsC <- function(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag") {
     if(!missing(Chx))
-        stopifnot(.CHM.is.LDL(Chx), is.integer(Chx@p), is.double(Chx@x))
+        stopifnot(.CHF.is.LDL(Chx), is.integer(Chx@p), is.double(Chx@x))
     .Call(dtCMatrix_diag, Chx, res.kind)
     ##    ^^^^^^^^^^^^^^ in ../src/Csparse.c
 }

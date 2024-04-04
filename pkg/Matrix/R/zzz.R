@@ -499,100 +499,100 @@ for (.f.t in .from.to) {
 }
 rm(.from.to, .f.t, .f, .t, .def.template, .def, .env)
 
-setAs("CHMfactor", "Matrix",
+setAs("sparseCholesky", "Matrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"Matrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"Matrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
           }
           expand1(from, "L")
       })
 
-setAs("CHMfactor", "dMatrix",
+setAs("sparseCholesky", "dMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"dMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"dMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
           }
           expand1(from, "L")
       })
 
-setAs("CHMfactor", "dsparseMatrix",
+setAs("sparseCholesky", "dsparseMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"dsparseMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"dsparseMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
           }
           expand1(from, "L")
       })
 
-setAs("CHMfactor", "sparseMatrix",
+setAs("sparseCholesky", "sparseMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"sparseMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"sparseMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
           }
           expand1(from, "L")
       })
 
-setAs("CHMfactor", "CsparseMatrix",
+setAs("sparseCholesky", "CsparseMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"CsparseMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"CsparseMatrix\")",
                       new = "expand1(., \"L\")",
                       package = "Matrix")
           }
           expand1(from, "L")
       })
 
-setAs("CHMfactor", "RsparseMatrix",
+setAs("sparseCholesky", "RsparseMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"RsparseMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"RsparseMatrix\")",
                       new = "as(expand1(., \"L\"), \"RsparseMatrix\")",
                       package = "Matrix")
           }
           as(expand1(from, "L"), "RsparseMatrix")
       })
 
-setAs("CHMfactor", "TsparseMatrix",
+setAs("sparseCholesky", "TsparseMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"TsparseMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"TsparseMatrix\")",
                       new = "as(expand1(., \"L\"), \"TsparseMatrix\")",
                       package = "Matrix")
           }
           as(expand1(from, "L"), "TsparseMatrix")
       })
 
-setAs("CHMfactor", "triangularMatrix",
+setAs("sparseCholesky", "triangularMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"triangularMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"triangularMatrix\")",
                       new = "as(expand1(., \"L\"), \"triangularMatrix\")",
                       package = "Matrix")
           }
           as(expand1(from, "L"), "triangularMatrix")
       })
 
-setAs("CHMfactor", "pMatrix",
+setAs("sparseCholesky", "pMatrix",
       function(from) {
           if(FALSE) {
-          .Deprecated(old = "as(<CHMfactor>, \"pMatrix\")",
+          .Deprecated(old = "as(<sparseCholesky>, \"pMatrix\")",
                       new = "expand1(., \"P1\")",
                       package = "Matrix")
           }
           expand1(from, "P1")
       })
 
-setMethod("chol2inv", c(x = "CHMfactor"),
+setMethod("chol2inv", c(x = "sparseCholesky"),
           function(x, ...) {
               if(FALSE) {
-              .Deprecated(old = "chol2inv(<CHMfactor>)",
+              .Deprecated(old = "chol2inv(<sparseCholesky>)",
                           new = "solve(.)",
                           package = "Matrix")
               }
