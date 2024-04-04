@@ -518,7 +518,7 @@ SEXP geMatrix_trf(SEXP obj, SEXP warn)
 
 SEXP syMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseBunchKaufman";
+	const char *nm = "denseBunchKaufman+";
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = syMatrix_trf_(obj, asInteger(warn)));
@@ -530,7 +530,7 @@ SEXP syMatrix_trf(SEXP obj, SEXP warn)
 
 SEXP spMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseBunchKaufman";
+	const char *nm = "denseBunchKaufman-";
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = spMatrix_trf_(obj, asInteger(warn)));
@@ -543,7 +543,7 @@ SEXP spMatrix_trf(SEXP obj, SEXP warn)
 SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 {
 	int pivot_ = asLogical(pivot);
-	const char *nm = (pivot_) ? "denseCholesky~" : "denseCholesky";
+	const char *nm = (pivot_) ? "denseCholesky++" : "denseCholesky+-";
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		double tol_ = asReal(tol);
@@ -556,7 +556,7 @@ SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 
 SEXP ppMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseCholesky";
+	const char *nm = "denseCholesky--";
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = ppMatrix_trf_(obj, asInteger(warn)));
@@ -847,7 +847,7 @@ SEXP pCMatrix_trf(SEXP obj, SEXP warn, SEXP order,
 		error(_("'%s' is not a number or not finite"), "beta");
 	SEXP trf = R_NilValue;
 	char nm[] = "..........Cholesky.";
-	nm[18] = (order_ > 0) ? '~' : '\0';
+	nm[18] = (order_ > 0) ? '+' : '-';
 	if (super_ == NA_LOGICAL || super_ == 0) {
 		memcpy(nm, "simplicial", 10);
 		trf = get_factor(obj, nm);
