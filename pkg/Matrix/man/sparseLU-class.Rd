@@ -7,6 +7,7 @@
 \keyword{classes}
 %
 \alias{sparseLU-class}
+\alias{dsparseLU-class}
 %
 \alias{determinant,sparseLU,logical-method}
 %

@@ -8,6 +8,7 @@
 \keyword{utilities}
 %
 \alias{sparseQR-class}
+\alias{dsparseQR-class}
 %
 \alias{determinant,sparseQR,logical-method}
 \alias{qr.Q,sparseQR-method}

@@ -1,14 +1,16 @@
-\name{Schur-class}
-\title{Schur Factorizations}
+\name{denseSchur-class}
+\title{Dense Schur Factorizations}
 %
 \docType{class}
 \keyword{algebra}
 \keyword{array}
 \keyword{classes}
 %
-\alias{Schur-class}
+\alias{denseSchur-class}
+\alias{ddenseSchur-class}
 %
-\alias{determinant,Schur,logical-method}
+\alias{coerce,denseSchur,dgeMatrix-method}
+\alias{determinant,denseSchur,logical-method}
 %
 \description{
   \code{Schur} is the class of Schur factorizations of
@@ -94,7 +96,7 @@
 library(stats, pos = "package:base", verbose = FALSE)
 library(utils, pos = "package:base", verbose = FALSE)
 }
-showClass("Schur")
+showClass("denseSchur")
 set.seed(0)
 
 n <- 4L

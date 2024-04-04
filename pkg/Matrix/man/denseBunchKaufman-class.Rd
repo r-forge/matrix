@@ -1,4 +1,4 @@
-\name{BunchKaufman-class}
+\name{denseBunchKaufman-class}
 \title{Dense Bunch-Kaufman Factorizations}
 %
 \docType{class}
@@ -6,13 +6,12 @@
 \keyword{array}
 \keyword{classes}
 %
-\alias{BunchKaufman-class}
-\alias{pBunchKaufman-class}
+\alias{denseBunchKaufman-class}
+\alias{ddenseBunchKaufman-class}
 %
-\alias{coerce,BunchKaufman,dtrMatrix-method}
-\alias{coerce,pBunchKaufman,dtpMatrix-method}
-\alias{determinant,BunchKaufman,logical-method}
-\alias{determinant,pBunchKaufman,logical-method}
+\alias{coerce,denseBunchKaufman,dtpMatrix-method}
+\alias{coerce,denseBunchKaufman,dtrMatrix-method}
+\alias{determinant,denseBunchKaufman,logical-method}
 %
 \description{
   Classes \code{BunchKaufman} and \code{pBunchKaufman} represent
@@ -126,7 +125,7 @@
 library(stats, pos = "package:base", verbose = FALSE)
 library(utils, pos = "package:base", verbose = FALSE)
 }
-showClass("BunchKaufman")
+showClass("denseBunchKaufman")
 set.seed(1)
 
 n <- 6L

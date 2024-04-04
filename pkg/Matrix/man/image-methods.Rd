@@ -9,9 +9,9 @@
 \alias{image-methods}
 %
 \alias{image,ANY-method}
-\alias{image,CHMfactor-method}
 \alias{image,Matrix-method}
 \alias{image,dgTMatrix-method}
+\alias{image,sparseCholesky-method}
 %
 \description{
   Methods for function \code{\link[graphics]{image}} in package

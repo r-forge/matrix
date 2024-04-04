@@ -10,13 +10,6 @@
 \alias{solve-methods}
 %
 \alias{solve,ANY,ANY-method}
-\alias{solve,BunchKaufman,missing-method}
-\alias{solve,BunchKaufman,dgeMatrix-method}
-\alias{solve,CHMfactor,missing-method}
-\alias{solve,CHMfactor,dgeMatrix-method}
-\alias{solve,CHMfactor,dgCMatrix-method}
-\alias{solve,Cholesky,missing-method}
-\alias{solve,Cholesky,dgeMatrix-method}
 \alias{solve,CsparseMatrix,ANY-method}
 \alias{solve,Matrix,sparseVector-method}
 \alias{solve,MatrixFactorization,CsparseMatrix-method}
@@ -31,14 +24,19 @@
 \alias{solve,MatrixFactorization,sparseVector-method}
 \alias{solve,MatrixFactorization,vector-method}
 \alias{solve,RsparseMatrix,ANY-method}
-\alias{solve,Schur,ANY-method}
 \alias{solve,TsparseMatrix,ANY-method}
 \alias{solve,ddiMatrix,Matrix-method}
 \alias{solve,ddiMatrix,matrix-method}
 \alias{solve,ddiMatrix,missing-method}
 \alias{solve,ddiMatrix,vector-method}
+\alias{solve,denseBunchKaufman,missing-method}
+\alias{solve,denseBunchKaufman,dgeMatrix-method}
+\alias{solve,denseCholesky,missing-method}
+\alias{solve,denseCholesky,dgeMatrix-method}
 \alias{solve,denseLU,missing-method}
 \alias{solve,denseLU,dgeMatrix-method}
+\alias{solve,denseSchur,missing-method}
+\alias{solve,denseSchur,dgeMatrix-method}
 \alias{solve,denseMatrix,ANY-method}
 \alias{solve,dgCMatrix,denseMatrix-method}
 \alias{solve,dgCMatrix,matrix-method}
@@ -69,14 +67,13 @@
 \alias{solve,indMatrix,ANY-method}
 \alias{solve,matrix,Matrix-method}
 \alias{solve,matrix,sparseVector-method}
-\alias{solve,pBunchKaufman,missing-method}
-\alias{solve,pBunchKaufman,dgeMatrix-method}
-\alias{solve,pCholesky,missing-method}
-\alias{solve,pCholesky,dgeMatrix-method}
 \alias{solve,pMatrix,Matrix-method}
 \alias{solve,pMatrix,matrix-method}
 \alias{solve,pMatrix,missing-method}
 \alias{solve,pMatrix,vector-method}
+\alias{solve,sparseCholesky,missing-method}
+\alias{solve,sparseCholesky,dgeMatrix-method}
+\alias{solve,sparseCholesky,dgCMatrix-method}
 \alias{solve,sparseLU,missing-method}
 \alias{solve,sparseLU,dgeMatrix-method}
 \alias{solve,sparseLU,dgCMatrix-method}
@@ -112,11 +109,11 @@ solve(a, b, ...)
 \S4method{solve}{dgCMatrix,sparseMatrix}(a, b, sparse = TRUE, \dots)
 
 \S4method{solve}{denseLU,dgeMatrix}(a, b, \dots)
-\S4method{solve}{BunchKaufman,dgeMatrix}(a, b, \dots)
-\S4method{solve}{Cholesky,dgeMatrix}(a, b, \dots)
-\S4method{solve}{sparseLU,dgCMatrix}(a, b, tol = .Machine$double.eps, \dots)
+\S4method{solve}{denseBunchKaufman,dgeMatrix}(a, b, \dots)
+\S4method{solve}{denseCholesky,dgeMatrix}(a, b, \dots)
 \S4method{solve}{sparseQR,dgCMatrix}(a, b, \dots)
-\S4method{solve}{CHMfactor,dgCMatrix}(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
+\S4method{solve}{sparseLU,dgCMatrix}(a, b, tol = .Machine$double.eps, \dots)
+\S4method{solve}{sparseCholesky,dgCMatrix}(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 }
 \arguments{
   \item{a}{a \link[=is.finite]{finite} square matrix or

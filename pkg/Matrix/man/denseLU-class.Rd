@@ -7,6 +7,7 @@
 \keyword{classes}
 %
 \alias{denseLU-class}
+\alias{ddenseLU-class}
 %
 \alias{coerce,denseLU,dgeMatrix-method}
 \alias{determinant,denseLU,logical-method}

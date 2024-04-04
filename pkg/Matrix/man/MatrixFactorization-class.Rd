@@ -8,11 +8,11 @@
 %
 \alias{MatrixFactorization-class}
 %
-\alias{BunchKaufmanFactorization-class}
-\alias{CholeskyFactorization-class}
-\alias{SchurFactorization-class}
+\alias{BunchKaufman-class}
+\alias{Cholesky-class}
 \alias{LU-class}
 \alias{QR-class}
+\alias{Schur-class}
 %
 \alias{determinant,MatrixFactorization,missing-method}
 \alias{dim,MatrixFactorization-method}
@@ -23,11 +23,11 @@
 \alias{show,MatrixFactorization-method}
 \alias{unname,MatrixFactorization-method}
 %
-\alias{show,BunchKaufmanFactorization-method}
-\alias{show,CholeskyFactorization-method}
-\alias{show,SchurFactorization-method}
+\alias{show,BunchKaufman-method}
+\alias{show,Cholesky-method}
 \alias{show,LU-method}
 \alias{show,QR-method}
+\alias{show,Schur-method}
 %
 \description{
   \code{MatrixFactorization} is the virtual class of

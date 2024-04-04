@@ -10,11 +10,11 @@
 \alias{updown-methods}
 %
 \alias{updown,character,ANY,ANY-method}
-\alias{updown,logical,Matrix,CHMfactor-method}
-\alias{updown,logical,dgCMatrix,CHMfactor-method}
-\alias{updown,logical,dsCMatrix,CHMfactor-method}
-\alias{updown,logical,dtCMatrix,CHMfactor-method}
-\alias{updown,logical,matrix,CHMfactor-method}
+\alias{updown,logical,Matrix,sparseCholesky-method}
+\alias{updown,logical,dgCMatrix,sparseCholesky-method}
+\alias{updown,logical,dsCMatrix,sparseCholesky-method}
+\alias{updown,logical,dtCMatrix,sparseCholesky-method}
+\alias{updown,logical,matrix,sparseCholesky-method}
 %
 \description{
   Computes a rank-\eqn{k} update or downdate of a sparse Cholesky

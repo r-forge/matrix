@@ -1,4 +1,4 @@
-\name{CHMfactor-class}
+\name{sparseCholesky-class}
 \title{Sparse Cholesky Factorizations}
 %
 \docType{class}
@@ -8,19 +8,21 @@
 \keyword{programming}
 \keyword{utilities}
 %
-\alias{CHMfactor-class}
-\alias{CHMsimpl-class}
-\alias{CHMsuper-class}
-\alias{dCHMsimpl-class}
-\alias{dCHMsuper-class}
-\alias{nCHMsimpl-class}
-\alias{nCHMsuper-class}
+\alias{sparseCholesky-class}
+\alias{nsparseCholesky-class}
+\alias{dsparseCholesky-class}
+\alias{simplicialCholesky-class}
+\alias{nsimplicialCholesky-class}
+\alias{dsimplicialCholesky-class}
+\alias{supernodalCholesky-class}
+\alias{nsupernodalCholesky-class}
+\alias{dsupernodalCholesky-class}
 %
-\alias{coerce,CHMsimpl,dtCMatrix-method}
-\alias{coerce,CHMsuper,dgCMatrix-method}
-\alias{determinant,CHMfactor,logical-method}
-\alias{diag,CHMfactor-method}
-\alias{update,CHMfactor-method}
+\alias{coerce,simplicialCholesky,dtCMatrix-method}
+\alias{coerce,supernodalCholesky,dgCMatrix-method}
+\alias{determinant,sparseCholesky,logical-method}
+\alias{diag,sparseCholesky-method}
+\alias{update,sparseCholesky-method}
 %
 \alias{isLDL}
 %
@@ -264,8 +266,7 @@ isLDL(x)
 library(stats, pos = "package:base", verbose = FALSE)
 library(utils, pos = "package:base", verbose = FALSE)
 }
-showClass("dCHMsimpl")
-showClass("dCHMsuper")
+showClass("sparseCholesky")
 set.seed(2)
 
 m <- 1000L

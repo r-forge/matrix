@@ -1,4 +1,4 @@
-\name{Cholesky-class}
+\name{denseCholesky-class}
 \title{Dense Cholesky Factorizations}
 %
 \docType{class}
@@ -6,15 +6,13 @@
 \keyword{array}
 \keyword{classes}
 %
-\alias{Cholesky-class}
-\alias{pCholesky-class}
+\alias{denseCholesky-class}
+\alias{ddenseCholesky-class}
 %
-\alias{coerce,Cholesky,dtrMatrix-method}
-\alias{coerce,pCholesky,dtpMatrix-method}
-\alias{determinant,Cholesky,logical-method}
-\alias{determinant,pCholesky,logical-method}
-\alias{diag,Cholesky-method}
-\alias{diag,pCholesky-method}
+\alias{coerce,denseCholesky,dtpMatrix-method}
+\alias{coerce,denseCholesky,dtrMatrix-method}
+\alias{determinant,denseCholesky,logical-method}
+\alias{diag,denseCholesky-method}
 %
 \description{
   Classes \code{Cholesky} and \code{pCholesky} represent
@@ -138,7 +136,7 @@
 library(stats, pos = "package:base", verbose = FALSE)
 library(utils, pos = "package:base", verbose = FALSE)
 }
-showClass("Cholesky")
+showClass("denseCholesky")
 set.seed(1)
 
 m <- 30L

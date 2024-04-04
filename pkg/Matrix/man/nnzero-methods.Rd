@@ -10,10 +10,10 @@
 \alias{nnzero-methods}
 %
 \alias{nnzero,ANY-method}
-\alias{nnzero,CHMfactor-method}
 \alias{nnzero,denseMatrix-method}
 \alias{nnzero,diagonalMatrix-method}
 \alias{nnzero,indMatrix-method}
+\alias{nnzero,sparseCholesky-method}
 \alias{nnzero,sparseMatrix-method}
 \alias{nnzero,vector-method}
 %
