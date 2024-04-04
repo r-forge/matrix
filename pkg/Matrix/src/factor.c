@@ -18,8 +18,12 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 	int *pdim = INTEGER(dim), n = pdim[1];
 	if (pdim[0] != n)
 		error(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =       "Schur";
+#endif
 	SEXP scf = PROTECT(newObject(cl));
 	SET_SLOT(scf, Matrix_DimSym, dim);
 	SET_SLOT(scf, Matrix_DimNamesSym, dimnames);
@@ -99,8 +103,12 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	int n = INTEGER(dim)[1];
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =       "Schur";
+#endif
 	SEXP scf = PROTECT(newObject(cl));
 	SET_SLOT(scf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(scf, dimnames, -1);
@@ -162,8 +170,12 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
 	int n = INTEGER(dim)[1];
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =       "Schur";
+#endif
 	SEXP scf = PROTECT(newObject(cl));
 	SET_SLOT(scf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(scf, dimnames, -1);
@@ -207,8 +219,12 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseLU";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =  "denseLU";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	SET_SLOT(trf, Matrix_DimNamesSym, dimnames);
@@ -244,8 +260,12 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
 	char ul = *CHAR(STRING_ELT(uplo, 0)), ct = 'C';
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =       "BunchKaufman";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(trf, dimnames, -1);
@@ -305,8 +325,12 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
 	char ul = *CHAR(STRING_ELT(uplo, 0)), ct = 'C';
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =      "pBunchKaufman";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(trf, dimnames, -1);
@@ -355,8 +379,12 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
 	char ul = *CHAR(STRING_ELT(uplo, 0));
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseCholesky";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =       "Cholesky";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(trf, dimnames, -1);
@@ -429,8 +457,12 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
 	char ul = *CHAR(STRING_ELT(uplo, 0));
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".denseCholesky";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
+#else
+	char cl[] =      "pCholesky";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	set_symmetrized_DimNames(trf, dimnames, -1);
@@ -459,7 +491,13 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 SEXP geMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 {
 	int vectors_ = asLogical(vectors);
-	const char *nm = "denseSchur";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseSchur"
+#else
+		     "Schur"
+#endif
+		;
 	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
 	if (isNull(scf)) {
 		scf = geMatrix_scf_(obj, asInteger(warn), vectors_);
@@ -475,7 +513,13 @@ SEXP geMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 SEXP syMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 {
 	int vectors_ = asLogical(vectors);
-	const char *nm = "denseSchur";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseSchur"
+#else
+		     "Schur"
+#endif
+		;
 	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
 	if (isNull(scf)) {
 		scf = syMatrix_scf_(obj, asInteger(warn), vectors_);
@@ -491,7 +535,13 @@ SEXP syMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 SEXP spMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
 {
 	int vectors_ = asLogical(vectors);
-	const char *nm = "denseSchur";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseSchur"
+#else
+		     "Schur"
+#endif
+		;
 	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
 	if (isNull(scf)) {
 		scf = spMatrix_scf_(obj, asInteger(warn), vectors_);
@@ -518,7 +568,13 @@ SEXP geMatrix_trf(SEXP obj, SEXP warn)
 
 SEXP syMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseBunchKaufman";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseBunchKaufman"
+#else
+		     "BunchKaufman"
+#endif
+		;
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = syMatrix_trf_(obj, asInteger(warn)));
@@ -530,7 +586,13 @@ SEXP syMatrix_trf(SEXP obj, SEXP warn)
 
 SEXP spMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseBunchKaufman";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseBunchKaufman"
+#else
+		    "pBunchKaufman"
+#endif
+		;
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = spMatrix_trf_(obj, asInteger(warn)));
@@ -543,7 +605,13 @@ SEXP spMatrix_trf(SEXP obj, SEXP warn)
 SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 {
 	int pivot_ = asLogical(pivot);
-	const char *nm = (pivot_) ? "denseCholesky~" : "denseCholesky";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		(pivot_) ? "denseCholesky~" : "denseCholesky"
+#else
+		(pivot_) ?      "Cholesky~" :      "Cholesky"
+#endif
+		;
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		double tol_ = asReal(tol);
@@ -556,7 +624,13 @@ SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
 
 SEXP ppMatrix_trf(SEXP obj, SEXP warn)
 {
-	const char *nm = "denseCholesky";
+	const char *nm =
+#ifdef MATRIX_ENABLE_MFREMAP
+		"denseCholesky"
+#else
+		    "pCholesky"
+#endif
+		;
 	SEXP trf = get_factor(obj, nm);
 	if (isNull(trf)) {
 		PROTECT(trf = ppMatrix_trf_(obj, asInteger(warn)));
@@ -613,8 +687,12 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	DO_SORT(N->L, T);
 	DO_SORT(N->U, T);
 
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".sparseQR";
 	cl[0] = (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? 'z' : 'd';
+#else
+	char cl[] =  "sparseQR";
+#endif
 	SEXP orf = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
@@ -685,8 +763,12 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 	DO_SORT(N->L, T);
 	DO_SORT(N->U, T);
 
+#ifdef MATRIX_ENABLE_MFREMAP
 	char cl[] = ".sparseLU";
 	cl[0] = (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? 'z' : 'd';
+#else
+	char cl[] =  "sparseLU";
+#endif
 	SEXP trf = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));

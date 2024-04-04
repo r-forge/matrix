@@ -115,19 +115,16 @@ setMethod("Cholesky", c(A = "ddiMatrix"),
                                 "Cholesky", "x"),
                        domain = NA)
               n <- (d <- A@Dim)[1L]
-              r <- new("dsimplicialCholesky")
+              r <- new("dCHMsimpl")
               r@Dim <- d
               r@Dimnames <- A@Dimnames
-              r@minor <- n
               r@colcount <- r@nz <- rep.int(1L, n)
-              r@`next` <- c(seq_len(n), -1L, 0L)
-              r@ prev  <- c(n + 1L, s, -1L)
+              r@type <- c(0L, 0L, 0L, 1L, 0L, 0L)
               r@p <- 0:n
               r@i <- s <- seq.int(0L, length.out = n)
               r@x <- if(length(y)) y else rep.int(1, n)
-              r@ordering <- 0L
-              r@is_ll <- FALSE
-              r@is_monotonic <- TRUE
+              r@nxt <- c(seq_len(n), -1L, 0L)
+              r@prv <- c(n + 1L, s, -1L) # @<- will error if n + 1L overflows
               r
           })
 
@@ -187,88 +184,92 @@ setMethod("chol2inv", c(x = "ddiMatrix"),
               (if(  uplo == "U") tcrossprod else crossprod)(solve(x)))
 
 
-## METHODS FOR CLASS: denseCholesky
+## METHODS FOR CLASS: p?Cholesky
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setAs("denseCholesky", "dtrMatrix",
+setAs("Cholesky", "dtrMatrix",
       function(from) {
-          packed <- length(from@x) != prod(from@Dim)
-          to <- new(if(!packed) "dtrMatrix" else "dtpMatrix")
+          to <- new("dtrMatrix")
           to@Dim <- from@Dim
           to@uplo <- from@uplo
           to@x <- from@x
-          if(!packed) to else as(to, "unpackedMatrix")
+          to
       })
 
-setAs("denseCholesky", "dtpMatrix",
+setAs("pCholesky", "dtpMatrix",
       function(from) {
-          packed <- length(from@x) != prod(from@Dim)
-          to <- new(if(!packed) "dtrMatrix" else "dtpMatrix")
+          to <- new("dtpMatrix")
           to@Dim <- from@Dim
           to@uplo <- from@uplo
           to@x <- from@x
-          if(!packed) as(to, "packedMatrix") else to
+          to
       })
 
-setMethod("diag", c(x = "denseCholesky"),
+setMethod("diag", c(x = "Cholesky"),
           function(x = 1, nrow, ncol, names = TRUE) {
-              packed <- length(x@x) != prod(x@Dim)
-              d <- diag(as(x, if(!packed) "dtrMatrix" else "dtpMatrix"),
-                        names = FALSE)
+              d <- diag(as(x, "dtrMatrix"), names = FALSE)
               d * d
           })
 
-.f1 <- function(x, which, ...) {
+setMethod("diag", c(x = "pCholesky"),
+          function(x = 1, nrow, ncol, names = TRUE) {
+              d <- diag(as(x, "dtpMatrix"), names = FALSE)
+              d * d
+          })
+
+.def.unpacked <- .def.packed <- function(x, which, ...) {
     d <- x@Dim
     switch(which,
-           "P1" =, "P1." =
-               {
-                   r <- new("pMatrix")
-                   r@Dim <- d
-                   r@perm <- if(length(x@perm)) x@perm else seq_len(d[1L])
-                   if(which == "P1.")
-                       r@margin <- 2L
+           "P1" =, "P1." = {
+               r <- new("pMatrix")
+               r@Dim <- d
+               r@perm <- if(length(x@perm)) x@perm else seq_len(d[1L])
+               if(which == "P1.")
+                   r@margin <- 2L
+               r
+           },
+           "L" =, "L." =, "L1" =, "L1." = {
+               r <- as(x, .CL)
+               uplo <- x@uplo
+               if(which == "L1" || which == "L1.") {
+                   r.ii <- diag(r, names = FALSE)
+                   r@x <- r@x / if(uplo == "U") .UP else .LO
+                   r@diag <- "U"
+               }
+               if((which == "L." || which == "L1.") == (uplo == "U"))
                    r
-               },
-           "L" =, "L." =, "L1" =, "L1." =
-               {
-                   packed <- length(x@x) != prod(x@Dim)
-                   r <- as(x, if(!packed) "dtrMatrix" else "dtpMatrix")
-                   uplo <- x@uplo
-                   if(which == "L1" || which == "L1.") {
-                       r.ii <- diag(r, names = FALSE)
-                       r@x <- r@x /
-                           if(uplo == "U") {
-                               if(!packed)
-                                   r.ii
-                               else r.ii[sequence.default(seq_len(d[1L]))]
-                           } else {
-                               if(!packed)
-                                   rep(r.ii, each = d[1L])
-                               else rep.int(r.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))
-                           }
-                       r@diag <- "U"
-                   }
-                   if((which == "L." || which == "L1.") == (uplo == "U"))
-                       r
-                   else t(r)
-               },
-           "D" =
-               {
-                   r <- new("ddiMatrix")
-                   r@Dim <- d
-                   r@x <- diag(x, names = FALSE)
-                   r
-               },
+               else t(r)
+           },
+           "D" = {
+               r <- new("ddiMatrix")
+               r@Dim <- d
+               r@x <- diag(x, names = FALSE)
+               r
+           },
            stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%3$s\", \"%3$s.\", \"%3$s1\", \"%3$s1.\", or \"%4$s\"",
                          "which", "P", "L", "D"),
                 domain = NA))
 }
+body(.def.unpacked) <-
+    do.call(substitute,
+            list(body(.def.unpacked),
+                 list(.CL = "dtrMatrix",
+                      .UP = quote(r.ii),
+                      .LO = quote(rep(r.ii, each = d[1L])))))
+body(.def.packed) <-
+    do.call(substitute,
+            list(body(.def.packed),
+                 list(.CL = "dtpMatrix",
+                      .UP = quote(r.ii[sequence.default(seq_len(d[1L]))]),
+                      .LO = quote(rep.int(r.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))))))
+
+setMethod("expand1", c(x =  "Cholesky"), .def.unpacked)
+setMethod("expand1", c(x = "pCholesky"), .def.packed)
+rm(.def.unpacked, .def.packed)
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
 ## where  A = P1' L1 D L1' P1 = P1' L L' P1  and  L = L1 sqrt(D)
-.f2 <- function(x, LDL = TRUE, ...) {
-    packed <- length(x@x) != prod(x@Dim)
+.def.unpacked <- .def.packed <- function(x, LDL = TRUE, ...) {
     d <- x@Dim
     dn <- x@Dimnames
     uplo <- x@uplo
@@ -284,19 +285,10 @@ setMethod("diag", c(x = "denseCholesky"),
     P.@Dimnames <- c(dn[1L], list(NULL))
     P.@margin <- 1L
 
-    X <- as(x, if(!packed) "dtrMatrix" else "dtpMatrix")
+    X <- as(x, .CL)
     if(LDL) {
         L.ii <- diag(X, names = FALSE)
-        X@x <- X@x /
-            if(uplo == "U") {
-                if(!packed)
-                    L.ii
-                else L.ii[sequence.default(seq_len(d[1L]))]
-            } else {
-                if(!packed)
-                    rep(L.ii, each = d[1L])
-                else rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))
-            }
+        X@x <- X@x / if(uplo == "U") .UP else .LO
         X@diag <- "U"
     }
     L  <- if(uplo == "U") t(X) else   X
@@ -308,38 +300,45 @@ setMethod("diag", c(x = "denseCholesky"),
         list(P1. = P., L1 = L, D = D, L1. = L., P1 = P)
     } else list(P1. = P., L = L, L. = L., P1 = P)
 }
+body(.def.unpacked) <-
+    do.call(substitute,
+            list(body(.def.unpacked),
+                 list(.CL = "dtrMatrix",
+                      .UP = quote(L.ii),
+                      .LO = quote(rep(L.ii, each = d[1L])))))
+body(.def.packed) <-
+    do.call(substitute,
+            list(body(.def.packed),
+                 list(.CL = "dtpMatrix",
+                      .UP = quote(L.ii[sequence.default(seq_len(d[1L]))]),
+                      .LO = quote(rep.int(L.ii, seq.int(to = 1L, by = -1L, length.out = d[1L]))))))
+
+## returning list(L1, D, L1') or list(L, L'), where A = L1 D L1' = L L'
+setMethod("expand2", c(x =  "Cholesky"), .def.unpacked)
+setMethod("expand2", c(x = "pCholesky"), .def.packed)
+rm(.def.unpacked, .def.packed)
 
 
-setMethod("expand1", c(x = "denseCholesky"), .f1)
-setMethod("expand2", c(x = "denseCholesky"), .f2)
-
-rm(.f1, .f2)
-
-
-## METHODS FOR CLASS: sparseCholesky
+## METHODS FOR CLASS: CHMfactor
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.CHF.is.perm <- function(x)
-    x@ordering != 0L
-.CHF.is.LDL <- function(x)
-    .hasSlot(x, "is_ll") && !x@is_ll
-.CHF.is.super <- function(x)
-    .hasSlot(x, "super")
+.CHM.is.perm <- function(x)
+    !as.logical(x@type[1L])
+.CHM.is.LDL <- function(x)
+    !as.logical(x@type[2L])
+.CHM.is.super <- function(x)
+     as.logical(x@type[3L])
 
 # Exported:
 isLDL <- function(x) {
-    if(is(x, "sparseCholesky"))
-        .CHF.is.LDL(x)
+    if(is(x, "CHMfactor"))
+        .CHM.is.LDL(x)
     else stop(gettextf("'%s' does not inherit from virtual class %s",
-                       "x", "sparseCholesky"),
+                       "x", "CHMfactor"),
               domain = NA)
 }
 
-## Exported:
-.updateCHMfactor <- function(object, parent, mult = 0)
-    .Call(sparseCholesky_update, object, parent, mult)
-
-setAs("simplicialCholesky", "dtCMatrix",
+setAs("CHMsimpl", "dtCMatrix",
       function(from) {
           nz <- from@nz
           k <- sequence.default(nz, from@p[seq_along(nz)] + 1L)
@@ -353,7 +352,7 @@ setAs("simplicialCholesky", "dtCMatrix",
           to
       })
 
-setAs("supernodalCholesky", "dgCMatrix",
+setAs("CHMsuper", "dgCMatrix",
       function(from) {
           super <- from@super
           pi <- from@pi
@@ -371,11 +370,11 @@ setAs("supernodalCholesky", "dgCMatrix",
           to
       })
 
-setMethod("diag", c(x = "sparseCholesky"),
+setMethod("diag", c(x = "CHMfactor"),
           function(x = 1, nrow, ncol, names = TRUE)
               .Call(sparseCholesky_diag_get, x, TRUE))
 
-setMethod("expand1", c(x = "simplicialCholesky"),
+setMethod("expand1", c(x = "CHMsimpl"),
           function(x, which, ...) {
               switch(which,
                      "P1" =, "P1." = {
@@ -388,7 +387,7 @@ setMethod("expand1", c(x = "simplicialCholesky"),
                      },
                      "L" =, "L." =, "L1" =, "L1." = {
                          r <- as(x, "dtCMatrix")
-                         LDL. <- .CHF.is.LDL(x)
+                         LDL. <- .CHM.is.LDL(x)
                          if(which == "L1" || which == "L1.") {
                              if(!LDL.) {
                                  r.ii <- diag(r, names = FALSE)
@@ -425,7 +424,7 @@ setMethod("expand1", c(x = "simplicialCholesky"),
                           domain = NA))
           })
 
-setMethod("expand1", c(x = "supernodalCholesky"),
+setMethod("expand1", c(x = "CHMsuper"),
           function(x, which, ...) {
               switch(which,
                      "P1" =, "P1." = {
@@ -461,7 +460,7 @@ setMethod("expand1", c(x = "supernodalCholesky"),
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
 ## where  A = P1' L1 D L1' P1 = P1' L L' P1  and  L = L1 sqrt(D)
-setMethod("expand2", c(x = "simplicialCholesky"),
+setMethod("expand2", c(x = "CHMsimpl"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -480,7 +479,7 @@ setMethod("expand2", c(x = "simplicialCholesky"),
               P.@margin <- 1L
 
               L <- as(x, "dtCMatrix")
-              LDL. <- .CHF.is.LDL(x)
+              LDL. <- .CHM.is.LDL(x)
               if(!LDL && !LDL.)
                   return(list(P1. = P., L = L, L. = t(L), P1 = P))
               L.ii <- diag(L, names = FALSE)
@@ -512,7 +511,7 @@ setMethod("expand2", c(x = "simplicialCholesky"),
 
 ## returning list(P1', L1, D, L1', P1) or list(P1', L, L', P1),
 ## where  A = P1' L1 D L1' P1 = P1' L L' P1  and  L = L1 sqrt(D)
-setMethod("expand2", c(x = "supernodalCholesky"),
+setMethod("expand2", c(x = "CHMsuper"),
           function(x, LDL = TRUE, ...) {
               d <- x@Dim
               dn <- x@Dimnames
@@ -545,11 +544,14 @@ setMethod("expand2", c(x = "supernodalCholesky"),
 
 ## returning list(P, L), where A = P' L L' P
 ## MJ: for backwards compatibility
-setMethod("expand", c(x = "sparseCholesky"),
+setMethod("expand", c(x = "CHMfactor"),
           function(x, ...)
               list(P = expand1(x, "P1"), L = expand1(x, "L")))
 
-setMethod("update", c(object = "sparseCholesky"),
+.updateCHMfactor <- function(object, parent, mult = 0)
+    .Call(sparseCholesky_update, object, parent, mult)
+
+setMethod("update", c(object = "CHMfactor"),
           function(object, parent, mult = 0, ...) {
               parent <- .M2kind(.M2C(parent), ",")
               if((shape <- .M.shape(parent)) != "s") {
@@ -559,8 +561,11 @@ setMethod("update", c(object = "sparseCholesky"),
                   if(shape == "t" && parent@diag != "N")
                       parent <- ..diagU2N(parent)
               }
-              .Call(sparseCholesky_update, object, parent, mult)
+              .updateCHMfactor(object, parent, mult)
           })
+
+.updownCHMfactor <- function(update, C, L)
+    .Call(sparseCholesky_updown, L, C, update)
 
 setMethod("updown",
           c(update = "character", C = "ANY", L = "ANY"),
@@ -568,31 +573,31 @@ setMethod("updown",
               updown(identical(update, "+"), C, L))
 
 setMethod("updown",
-          c(update = "logical", C = "Matrix", L = "sparseCholesky"),
+          c(update = "logical", C = "Matrix", L = "CHMfactor"),
           function(update, C, L)
               updown(update, .M2kind(.M2C(C), ","), L))
 
-setMethod("updown",
-          c(update = "logical", C = "matrix", L = "sparseCholesky"),
-          function(update, C, L)
-              updown(update, .m2sparse(C, ",gC"), L))
-
 for(.cl in c("dgCMatrix", "dsCMatrix"))
 setMethod("updown",
-          c(update = "logical", C = .cl, L = "sparseCholesky"),
+          c(update = "logical", C = .cl, L = "CHMfactor"),
           function(update, C, L) {
               if(length(perm <- L@perm))
                   C <- C[perm + 1L, , drop = FALSE]
-              .Call(sparseCholesky_updown, L, C, update)
+              .updownCHMfactor(update, C, L)
           })
 rm(.cl)
 
 setMethod("updown",
-          c(update = "logical", C = "dtCMatrix", L = "sparseCholesky"),
+          c(update = "logical", C = "dtCMatrix", L = "CHMfactor"),
           function(update, C, L) {
               if(C@diag != "N")
                   C <- ..diagU2N(C)
               if(length(perm <- L@perm))
                   C <- C[perm + 1L, , drop = FALSE]
-              .Call(sparseCholesky_updown, L, C, update)
+              .updownCHMfactor(update, C, L)
           })
+
+setMethod("updown",
+          c(update = "logical", C = "matrix", L = "CHMfactor"),
+          function(update, C, L)
+              updown(update, .m2sparse(C, ",gC"), L))

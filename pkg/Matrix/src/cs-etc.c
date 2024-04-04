@@ -5,76 +5,73 @@ int Matrix_cs_xtype; /* flag indicating use of cs_di_* or cs_ci_* */
 
 Matrix_cs *M2CXS(SEXP obj, int values)
 {
-	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
-	values = values && (class[0] == 'd' || class[0] == 'z');
-	char trans = (class[2] == 'C') ? 'N' : 'C';
 	Matrix_cs *A = (Matrix_cs *) R_alloc(1, sizeof(Matrix_cs));
 	memset(A, 0, sizeof(Matrix_cs));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, (trans == 'N') ? Matrix_iSym : Matrix_jSym));
-	A->nzmax = LENGTH(i);
-	A->m = INTEGER(dim)[(trans == 'N') ? 0 : 1];
-	A->n = INTEGER(dim)[(trans == 'N') ? 1 : 1];
+		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+		x = PROTECT(getAttrib(obj, Matrix_xSym));
+	A->m = INTEGER(dim)[0];
+	A->n = INTEGER(dim)[1];
 	A->p = INTEGER(p);
 	A->i = INTEGER(i);
+	A->nzmax = LENGTH(i);
 	A->nz = -1;
 	A->xtype = CXSPARSE_PATTERN;
-	if (values) {
-	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	switch (class[0]) {
-	case 'd':
-		A->x = REAL(x);
-		A->xtype = CXSPARSE_REAL;
-		break;
-	case 'z':
-		A->x = COMPLEX(x);
-		A->xtype = CXSPARSE_COMPLEX;
-		break;
-	default:
-		break;
+	if (values && x != R_NilValue) {
+		switch (TYPEOF(x)) {
+		case CPLXSXP:
+			A->xtype = CXSPARSE_COMPLEX;
+			A->x = COMPLEX(x);
+			break;
+		case REALSXP:
+			A->xtype = CXSPARSE_REAL;
+			A->x = REAL(x);
+			break;
+		default:
+			ERROR_INVALID_TYPE(x, __func__);
+			break;
+		}
 	}
-	}
-	UNPROTECT(3);
+	UNPROTECT(4);
 	return A;
 }
 
 SEXP CXS2M(Matrix_cs *A, int values, char shape)
 {
-	values = values && (A->xtype == CXSPARSE_REAL || A->xtype == CXSPARSE_COMPLEX);
-	char class[] = "..CMatrix";
-	class[0] = (!values) ? 'n' : ((A->xtype == CXSPARSE_REAL) ? 'd' : 'z');
-	class[1] = shape;
+	if (values && A->xtype != CXSPARSE_REAL && A->xtype != CXSPARSE_COMPLEX)
+		error(_("wrong '%s'"), "xtype");
+	char cl[] = "..CMatrix";
+	cl[0] = (!values || A->xtype == CXSPARSE_PATTERN)
+		? 'n' : ((A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd');
+	cl[1] = shape;
 #ifndef MATRIX_ENABLE_POSDEF
-	if (class[1] == 'p')
-		class[1] = 's';
+	if (cl[1] == 'p')
+		cl[1] = 's';
 #endif
 	int nnz = A->p[A->n];
-	SEXP obj = PROTECT(newObject(class)),
+	R_xlen_t np1 = (R_xlen_t) A->n + 1;
+	SEXP obj = PROTECT(newObject(cl)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		p = PROTECT(allocVector(INTSXP, (R_xlen_t) A->n + 1)),
+		p = PROTECT(allocVector(INTSXP, np1)),
 		i = PROTECT(allocVector(INTSXP, nnz));
 	INTEGER(dim)[0] = A->m;
 	INTEGER(dim)[1] = A->n;
-	memcpy(INTEGER(p), A->p, ((size_t) A->n + 1) * sizeof(int));
-	memcpy(INTEGER(i), A->i, nnz * sizeof(int));
+	Matrix_memcpy(INTEGER(p), A->p, np1, sizeof(int));
+	Matrix_memcpy(INTEGER(i), A->i, nnz, sizeof(int));
 	SET_SLOT(obj, Matrix_pSym, p);
 	SET_SLOT(obj, Matrix_iSym, i);
-	if (values) {
-	SEXP x;
-	if (A->xtype == CXSPARSE_REAL) {
-		PROTECT(x = allocVector(REALSXP, nnz));
-		memcpy(REAL(x), A->x, nnz * sizeof(double));
-	} else {
-		PROTECT(x = allocVector(CPLXSXP, nnz));
-		memcpy(COMPLEX(x), A->x, nnz * sizeof(Rcomplex));
-	}
-	SET_SLOT(obj, Matrix_xSym, x);
-	UNPROTECT(1);
+	if (cl[0] != 'n') {
+		SEXP x;
+		if (cl[0] == 'z') {
+			PROTECT(x = allocVector(CPLXSXP, nnz));
+			Matrix_memcpy(COMPLEX(x), A->x, nnz, sizeof(Rcomplex));
+		} else {
+			PROTECT(x = allocVector(REALSXP, nnz));
+			Matrix_memcpy(REAL(x), A->x, nnz, sizeof(double));
+		}
+		SET_SLOT(obj, Matrix_xSym, x);
+		UNPROTECT(1);
 	}
 	UNPROTECT(4);
 	return obj;

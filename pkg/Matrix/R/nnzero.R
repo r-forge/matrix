@@ -80,7 +80,7 @@ setMethod("nnzero", c(x = "indMatrix"),
           function(x, na.counted = NA)
               length(x@perm))
 
-setMethod("nnzero", c(x = "sparseCholesky"),
+setMethod("nnzero", c(x = "CHMfactor"),
           function(x, na.counted = NA)
               nnzero(as(x, "CsparseMatrix"), na.counted))
 

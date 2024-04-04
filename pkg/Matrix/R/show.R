@@ -494,19 +494,19 @@ setMethod("show", c(object = "MatrixFactorization"),
               str(object)
           })
 
-setMethod("show", c(object = "Cholesky"),
+setMethod("show", c(object = "CholeskyFactorization"),
           function(object) {
               cat("Cholesky factorization of ")
               str(object)
           })
 
-setMethod("show", c(object = "BunchKaufman"),
+setMethod("show", c(object = "BunchKaufmanFactorization"),
           function(object) {
               cat("Bunch-Kaufman factorization of ")
               str(object)
           })
 
-setMethod("show", c(object = "Schur"),
+setMethod("show", c(object = "SchurFactorization"),
           function(object) {
               cat("Schur factorization of ")
               str(object)

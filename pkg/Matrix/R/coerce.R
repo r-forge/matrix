@@ -385,7 +385,7 @@ setAs(   "ANY", "Matrix",
       function(from) as(as(from, "matrix"), "Matrix"))
 
 if(FALSE) {
-## MJ: not yet ... must first make as(<sparseCholesky>, "Matrix") defunct
+## MJ: not yet ... existing as(<CHMfactor>, "Matrix") must become defunct first
 setAs("MatrixFactorization", "Matrix",
       function(from) {
           n <- length(x <- expand2(from))

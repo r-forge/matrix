@@ -32,10 +32,10 @@ setMethod("Schur", c(x = "matrix"),
               Schur(.m2dense(x, ",ge"), vectors = vectors, ...))
 
 
-## METHODS FOR CLASS: denseSchur
+## METHODS FOR CLASS: Schur
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("expand1", c(x = "denseSchur"),
+setMethod("expand1", c(x = "Schur"),
           function(x, which, ...) {
               d <- x@Dim
               switch(which,
@@ -62,7 +62,7 @@ setMethod("expand1", c(x = "denseSchur"),
                           domain = NA))
           })
 
-setMethod("expand2", c(x = "denseSchur"),
+setMethod("expand2", c(x = "Schur"),
           function(x, ...) {
               T <- expand1(x, "T")
               Q <- expand1(x, "Q")
