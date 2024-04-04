@@ -869,8 +869,8 @@ setClass("ddenseBunchKaufman",
 if(FALSE)
 setClass("zdenseBunchKaufman",
          contains = "denseBunchKaufman",
-         slots = c(x = "complex"),
-         prototype = list(x = complex(0L)))
+         slots = c(x = "complex", trans = "character"),
+         prototype = list(x = complex(0L), trans = "C"))
 
 
 ## ------ Cholesky -----------------------------------------------------
