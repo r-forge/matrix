@@ -123,6 +123,35 @@ setMethod("solve", c(a = .cl, b = "dgCMatrix"),
 }
 rm(.cl)
 
+setMethod("solve", c(a = "denseSchur", b = "missing"),
+          function(a, b, ...) {
+              da <- a@Dim
+              dna <- a@Dimnames
+              if(da[1L] > 0L && length(a@vectors) == 0L)
+                  stop("missing requisite Schur vectors")
+              Q <- expand1(a, "Q")
+              T <- expand1(a, "T")
+              r <- Q %*% solve(T, t(Q))
+              r@Dimnames <- dna[2:1]
+              r
+          })
+
+setMethod("solve", c(a = "denseSchur", b = "dgeMatrix"),
+          function(a, b, ...) {
+              da <- a@Dim
+              dna <- a@Dimnames
+              if(da[1L] > 0L && length(a@vectors) == 0L)
+                  stop("missing requisite Schur vectors")
+              Q <- expand1(a, "Q")
+              T <- expand1(a, "T")
+              db <- dim(b)
+              dnb <- dimnames(b)
+              r <- Q %*% solve(T, crossprod(Q, b))
+              r@Dimnames <- c(dna[2L],
+                              if(is.null(dnb)) list(NULL) else dnb[2L])
+              if(is.null(db)) drop(r) else r
+          })
+
 setMethod("solve", c(a = "denseLU", b = "missing"),
           function(a, b, ...)
               .Call(denseLU_solve, a, NULL))
@@ -131,27 +160,21 @@ setMethod("solve", c(a = "denseLU", b = "dgeMatrix"),
           function(a, b, ...)
               .Call(denseLU_solve, a, b))
 
-for(.cl in c("BunchKaufman", "pBunchKaufman")) {
-setMethod("solve", c(a = .cl, b = "missing"),
+setMethod("solve", c(a = "denseBunchKaufman", b = "missing"),
           function(a, b, ...)
               .Call(denseBunchKaufman_solve, a, NULL))
 
-setMethod("solve", c(a = .cl, b = "dgeMatrix"),
+setMethod("solve", c(a = "denseBunchKaufman", b = "dgeMatrix"),
           function(a, b, ...)
               .Call(denseBunchKaufman_solve, a, b))
-}
-rm(.cl)
 
-for(.cl in c("Cholesky", "pCholesky")) {
-setMethod("solve", c(a = .cl, b = "missing"),
+setMethod("solve", c(a = "denseCholesky", b = "missing"),
           function(a, b, ...)
               .Call(denseCholesky_solve, a, NULL))
 
-setMethod("solve", c(a = .cl, b = "dgeMatrix"),
+setMethod("solve", c(a = "denseCholesky", b = "dgeMatrix"),
           function(a, b, ...)
               .Call(denseCholesky_solve, a, b))
-}
-rm(.cl)
 
 setMethod("solve", c(a = "sparseLU", b = "missing"),
           function(a, b, tol = .Machine$double.eps, sparse = TRUE, ...) {
@@ -185,7 +208,7 @@ setMethod("solve", c(a = "sparseQR", b = "dgCMatrix"),
           function(a, b, ...)
               .dense2sparse(qr.coef(a, .sparse2dense(b, FALSE)), "C"))
 
-setMethod("solve", c(a = "CHMfactor", b = "missing"),
+setMethod("solve", c(a = "sparseCholesky", b = "missing"),
           function(a, b, sparse = TRUE,
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...) {
               if((is.na(sparse) || sparse) && !missing(system)) {
@@ -194,7 +217,7 @@ setMethod("solve", c(a = "CHMfactor", b = "missing"),
                       r <- new("ddiMatrix")
                       r@Dim <- a@Dim
                       r@Dimnames <- a@Dimnames[2:1]
-                      if(.CHM.is.LDL(a))
+                      if(.CHF.is.LDL(a))
                           r@x <- a@x[a@p + 1L]
                       else r@diag <- "U"
                       return(r)
@@ -211,12 +234,12 @@ setMethod("solve", c(a = "CHMfactor", b = "missing"),
               .Call(sparseCholesky_solve, a, NULL, sparse, system)
           })
 
-setMethod("solve", c(a = "CHMfactor", b = "dgeMatrix"),
+setMethod("solve", c(a = "sparseCholesky", b = "dgeMatrix"),
           function(a, b,
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...)
               .Call(sparseCholesky_solve, a, b, FALSE, system))
 
-setMethod("solve", c(a = "CHMfactor", b = "dgCMatrix"),
+setMethod("solve", c(a = "sparseCholesky", b = "dgCMatrix"),
           function(a, b,
                    system = c("A","LDLt","LD","DLt","L","Lt","D","P","Pt"), ...)
               .Call(sparseCholesky_solve, a, b, TRUE, system))
@@ -273,29 +296,6 @@ setMethod("solve", c(a = .cl, b = "triangularMatrix"),
               r
           })
 rm(.cl)
-
-## MJ: truly an exceptional case ...
-setMethod("solve", c(a = "Schur", b = "ANY"),
-          function(a, b, ...) {
-              da <- a@Dim
-              dna <- a@Dimnames
-              if(da[1L] > 0L && length(a@vectors) == 0L)
-                  stop("missing requisite Schur vectors")
-              Q <- expand1(a, "Q")
-              T <- expand1(a, "T")
-              if(missing(b)) {
-                  r <- Q %*% solve(T, t(Q))
-                  r@Dimnames <- dna[2:1]
-                  r
-              } else {
-                  db <- dim(b)
-                  dnb <- dimnames(b)
-                  r <- Q %*% solve(T, crossprod(Q, b))
-                  r@Dimnames <- c(dna[2L],
-                                  if(is.null(dnb)) list(NULL) else dnb[2L])
-                  if(is.null(db)) drop(r) else r
-              }
-          })
 
 
 ########################################################################

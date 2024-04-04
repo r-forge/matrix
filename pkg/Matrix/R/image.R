@@ -151,7 +151,7 @@ setMethod("image", c(x = "Matrix"),
               image(.M2kind(.M2gen(.M2T(x)), "d"), ...)
           })
 
-setMethod("image", c(x = "CHMfactor"),
+setMethod("image", c(x = "sparseCholesky"),
           function(x, ...)
               image(.M2gen(.M2T(expand1(x, "L"))), ...))
 

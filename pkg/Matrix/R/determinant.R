@@ -28,7 +28,7 @@ setMethod("determinant", c(x = "MatrixFactorization", logarithm = "missing"),
           function(x, logarithm = TRUE, ...)
               determinant(x, TRUE, ...))
 
-setMethod("determinant", c(x = "Schur", logarithm = "logical"),
+setMethod("determinant", c(x = "denseSchur", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               if(is.complex(values <- x@values) == is.complex(x@x))
                   .mkDet(x = values, logarithm = logarithm)
@@ -50,19 +50,15 @@ setMethod("determinant", c(x = "sparseQR", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               .Call(sparseQR_determinant, x, logarithm))
 
-for(.cl in c("BunchKaufman", "pBunchKaufman"))
-setMethod("determinant", c(x = .cl, logarithm = "logical"),
+setMethod("determinant", c(x = "denseBunchKaufman", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               .Call(denseBunchKaufman_determinant, x, logarithm))
-rm(.cl)
 
-for(.cl in c("Cholesky", "pCholesky"))
-setMethod("determinant", c(x = .cl, logarithm = "logical"),
+setMethod("determinant", c(x = "denseCholesky", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               .Call(denseCholesky_determinant, x, logarithm))
-rm(.cl)
 
-setMethod("determinant", c(x = "CHMfactor", logarithm = "logical"),
+setMethod("determinant", c(x = "sparseCholesky", logarithm = "logical"),
           function(x, logarithm = TRUE, sqrt = TRUE, ...) {
               if(missing(sqrt)) {
                   w <- getOption("Matrix.warnSqrtDefault",
@@ -76,7 +72,7 @@ setMethod("determinant", c(x = "CHMfactor", logarithm = "logical"),
                           on.exit(options(oop))
                       }
                       warning(gettextf("the default value of argument '%s' of method '%s(<%s>, <%s>)' may change from %s to %s as soon as the next release of Matrix; set '%s' when programming",
-                                       "sqrt", "determinant", "CHMfactor", "logical", "TRUE", "FALSE", "sqrt"),
+                                       "sqrt", "determinant", "sparseCholesky", "logical", "TRUE", "FALSE", "sqrt"),
                               domain = NA)
                   }
               }
