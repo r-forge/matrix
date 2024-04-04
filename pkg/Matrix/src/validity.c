@@ -1679,7 +1679,6 @@ SEXP sparseLU_validate(SEXP obj)
 
 SEXP sparseCholesky_validate(SEXP obj)
 {
-#if 0
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
@@ -1732,14 +1731,12 @@ SEXP sparseCholesky_validate(SEXP obj)
 		if (pcolcount[j] < 0 || pcolcount[j] > n - j)
 			RMKMS(_("%s is not in {%s}"), "colcount[j]", "0,...,Dim[2]-j+1");
 	}
-#endif
 
 	return ScalarLogical(1);
 }
 
 SEXP simplicialCholesky_validate(SEXP obj)
 {
-#if 0
 	int pattern = !HAS_SLOT(obj, Matrix_minorSym);	
 	if (pattern)
 		return ScalarLogical(1);
@@ -1892,14 +1889,12 @@ SEXP simplicialCholesky_validate(SEXP obj)
 			RMK(_("Cholesky factor has diagonal elements with negative real part"));
 	}
 	}
-#endif
 
 	return ScalarLogical(1);
 }
 
 SEXP supernodalCholesky_validate(SEXP obj)
 {
-#if 0
 	int pattern = !HAS_SLOT(obj, Matrix_minorSym);	
 	
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -2053,7 +2048,6 @@ SEXP supernodalCholesky_validate(SEXP obj)
 		}
 	}
 	}
-#endif
 
 	return ScalarLogical(1);
 }
