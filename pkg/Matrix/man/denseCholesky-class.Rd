@@ -54,9 +54,9 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{CholeskyFactorization}}, directly.
+  Class \code{CholeskyFactorization}, directly.
   Class \code{\linkS4class{MatrixFactorization}}, by class
-  \code{\linkS4class{CholeskyFactorization}}, distance 2.
+  \code{CholeskyFactorization}, distance 2.
 }
 \section{Instantiation}{
   Objects can be generated directly by calls of the form
@@ -108,7 +108,7 @@
   are provided for users who understand the caveats.
 }
 \seealso{
-  Class \code{\linkS4class{CHMfactor}} for sparse Cholesky factorizations.
+  Class \code{CHMfactor} for sparse Cholesky factorizations.
 
   Classes \code{\linkS4class{dpoMatrix}} and \code{\linkS4class{dppMatrix}}.
 

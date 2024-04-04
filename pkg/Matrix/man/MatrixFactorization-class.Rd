@@ -85,14 +85,14 @@
 }
 \seealso{
   Classes extending \code{CholeskyFactorization}, namely
-  \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
-  and \code{\linkS4class{CHMfactor}}.
+  \code{Cholesky}, \code{pCholesky},
+  and \code{CHMfactor}.
 
   Classes extending \code{BunchKaufmanFactorization}, namely
-  \code{\linkS4class{BunchKaufman}} and \code{\linkS4class{pBunchKaufman}}.
+  \code{BunchKaufman} and \code{pBunchKaufman}.
 
   Classes extending \code{SchurFactorization}, namely
-  \code{\linkS4class{Schur}}.
+  \code{Schur}.
 
   Classes extending \code{LU}, namely
   \code{\linkS4class{denseLU}} and \code{\linkS4class{sparseLU}}.

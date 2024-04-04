@@ -34,17 +34,17 @@ updown(update, C, L)
   \item{C}{a \link[=is.finite]{finite} matrix or
     \code{\linkS4class{Matrix}} such that
     \code{\link{tcrossprod}(C)} has the dimensions of \code{L}.}
-  \item{L}{an object of class \code{\linkS4class{dCHMsimpl}} or
-    \code{\linkS4class{dCHMsuper}} specifying a sparse Cholesky
+  \item{L}{an object of class \code{dCHMsimpl} or
+    \code{dCHMsuper} specifying a sparse Cholesky
     factorization.}
 }
 \value{
   A sparse Cholesky factorization with dimensions matching \code{L},
-  typically of class \code{\linkS4class{dCHMsimpl}}.
+  typically of class \code{dCHMsimpl}.
 }
 \seealso{
   Classes
-  \code{\linkS4class{dCHMsimpl}} and \code{\linkS4class{dCHMsuper}}
+  \code{dCHMsimpl} and \code{dCHMsuper}
   and their methods, notably for generic function \code{\link{update}},
   which is \emph{not} equivalent to \code{updown(update = TRUE)}.
 

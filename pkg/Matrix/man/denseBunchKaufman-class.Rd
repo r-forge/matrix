@@ -57,9 +57,9 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{BunchKaufmanFactorization}}, directly.
+  Class \code{BunchKaufmanFactorization}, directly.
   Class \code{\linkS4class{MatrixFactorization}}, by class
-  \code{\linkS4class{BunchKaufmanFactorization}}, distance 2.
+  \code{BunchKaufmanFactorization}, distance 2.
 }
 \section{Instantiation}{
   Objects can be generated directly by calls of the form

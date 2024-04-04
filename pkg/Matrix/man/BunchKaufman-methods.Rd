@@ -51,14 +51,14 @@ BunchKaufman(x, \dots)
 }
 \value{
   An object representing the factorization, inheriting from
-  virtual class \code{\linkS4class{BunchKaufmanFactorization}}.
-  The specific class is \code{\linkS4class{BunchKaufman}} unless
+  virtual class \code{BunchKaufmanFactorization}.
+  The specific class is \code{BunchKaufman} unless
   \code{x} inherits from virtual class \code{\linkS4class{packedMatrix}},
-  in which case it is \code{\linkS4class{pBunchKaufman}}.
+  in which case it is \code{pBunchKaufman}.
 }
 \seealso{
-  Classes \code{\linkS4class{BunchKaufman}} and
-  \code{\linkS4class{pBunchKaufman}} and their methods.
+  Classes \code{BunchKaufman} and
+  \code{pBunchKaufman} and their methods.
 
   Classes \code{\linkS4class{dsyMatrix}} and
   \code{\linkS4class{dspMatrix}}.

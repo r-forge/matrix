@@ -149,7 +149,7 @@ solve(a, b, ...)
     by default.}
   \item{system}{a string specifying a linear system to be solved.
     Only methods for \code{a}
-    inheriting from \code{\linkS4class{CHMfactor}} have this argument.
+    inheriting from \code{CHMfactor} have this argument.
     See \sQuote{Details}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
@@ -195,11 +195,11 @@ solve(a, b, ...)
   are simple wrappers around \code{\link{qr.coef}}, giving the
   \emph{least squares} solution in overdetermined cases.
 
-  Methods for \code{a} inheriting from \code{\linkS4class{CHMfactor}}
+  Methods for \code{a} inheriting from \code{CHMfactor}
   can solve systems other than the default one \eqn{A X = B}{A * X = B}.
   The correspondence between its \code{system} argument the system
   actually solved is outlined in the table below.
-  See \code{\link{CHMfactor-class}} for a definition of notation.
+  See \code{CHMfactor-class} for a definition of notation.
 
   \tabular{rrr}{
     \code{system} \tab \code{\link{isLDL}(a)=TRUE} \tab \code{\link{isLDL}(a)=FALSE}\cr

@@ -85,13 +85,13 @@ expand (x, \dots)
 
   \tabular{rl}{
     \code{class(x)} \tab \code{which}\cr
-    \code{\linkS4class{Schur}} \tab \code{c("Q", "T", "Q.")}\cr
+    \code{Schur} \tab \code{c("Q", "T", "Q.")}\cr
     \code{\linkS4class{denseLU}} \tab \code{c("P1", "P1.", "L", "U")}\cr
     \code{\linkS4class{sparseLU}} \tab \code{c("P1", "P1.", "P2", "P2.", "L", "U")}\cr
     \code{\linkS4class{sparseQR}} \tab \code{c("P1", "P1.", "P2", "P2.", "Q", "Q1", "R", "R1")}\cr
-    \code{\linkS4class{BunchKaufman}}, \code{\linkS4class{pBunchKaufman}} \tab \code{c("U", "DU", "U.", "L", "DL", "L.")}\cr
-    \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}\cr
-    \code{\linkS4class{CHMsimpl}}, \code{\linkS4class{CHMsimpl}} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}
+    \code{BunchKaufman}, \code{pBunchKaufman} \tab \code{c("U", "DU", "U.", "L", "DL", "L.")}\cr
+    \code{Cholesky}, \code{pCholesky} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}\cr
+    \code{CHMsimpl}, \code{CHMsimpl} \tab \code{c("P1", "P1.", "L1", "D", "L1.", "L", "L.")}
   }
 
   Methods for \code{expand2} and \code{expand} are described

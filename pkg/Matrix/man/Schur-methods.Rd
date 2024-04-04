@@ -39,11 +39,11 @@ Schur(x, vectors = TRUE, \dots)
 }
 \value{
   An object representing the factorization, inheriting
-  from virtual class \code{\linkS4class{SchurFactorization}}.
-  Currently, the specific class is always \code{\linkS4class{Schur}}.
+  from virtual class \code{SchurFactorization}.
+  Currently, the specific class is always \code{Schur}.
 }
 \seealso{
-  Class \code{\linkS4class{Schur}} and its methods.
+  Class \code{Schur} and its methods.
 
   Class \code{\linkS4class{dgeMatrix}}.
 

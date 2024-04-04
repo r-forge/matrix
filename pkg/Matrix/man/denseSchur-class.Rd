@@ -48,9 +48,9 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{SchurFactorization}}, directly.
+  Class \code{SchurFactorization}, directly.
   Class \code{\linkS4class{MatrixFactorization}}, by class
-  \code{\linkS4class{SchurFactorization}}, distance 2.
+  \code{SchurFactorization}, distance 2.
 }
 \section{Instantiation}{
   Objects can be generated directly by calls of the form

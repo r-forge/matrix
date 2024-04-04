@@ -114,22 +114,22 @@ Cholesky(A, \dots)
 }
 \value{
   An object representing the factorization, inheriting from
-  virtual class \code{\linkS4class{CholeskyFactorization}}.
+  virtual class \code{CholeskyFactorization}.
   For a traditional matrix \code{A}, the specific class is
-  \code{\linkS4class{Cholesky}}.
+  \code{Cholesky}.
   For \code{A} inheriting from
   \code{\linkS4class{unpackedMatrix}},
   \code{\linkS4class{packedMatrix}}, and
   \code{\linkS4class{sparseMatrix}},
   the specific class is
-  \code{\linkS4class{Cholesky}},
-  \code{\linkS4class{pCholesky}}, and
-  \code{\linkS4class{dCHMsimpl}} or \code{\linkS4class{dCHMsuper}},
+  \code{Cholesky},
+  \code{pCholesky}, and
+  \code{dCHMsimpl} or \code{dCHMsuper},
   respectively.
 }
 \details{
   Note that the result of a call to \code{Cholesky} inherits
-  from \code{\linkS4class{CholeskyFactorization}} but not
+  from \code{CholeskyFactorization} but not
   \code{\linkS4class{Matrix}}.  Users who just want a matrix
   should consider using \code{\link{chol}}, whose methods are
   simple wrappers around \code{Cholesky} returning just the
@@ -157,8 +157,8 @@ Cholesky(A, \dots)
   for details.
 }
 \seealso{
-  Classes \code{\linkS4class{Cholesky}}, \code{\linkS4class{pCholesky}},
-  \code{\linkS4class{dCHMsimpl}} and \code{\linkS4class{dCHMsuper}}
+  Classes \code{Cholesky}, \code{pCholesky},
+  \code{dCHMsimpl} and \code{dCHMsuper}
   and their methods.
 
   Classes \code{\linkS4class{dpoMatrix}}, \code{\linkS4class{dppMatrix}},
