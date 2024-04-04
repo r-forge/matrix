@@ -147,6 +147,6 @@ stopifnot(all.equal(as(h6 * 27720, "dsyMatrix"), round(27720 * h6),
           all.equal(ch6@sd^(-2), 2*(1:6)-1,
                     tolerance = 1e-12))
 chch <- Cholesky(ch6, perm = FALSE)
-stopifnot(identical(chch, ch6@factors$Cholesky),
+stopifnot(identical(chch, ch6@factors[["denseCholesky"]]),
           all(abs(crossprod(as(chch, "dtrMatrix")) - ch6) < 1e-10))
 }
