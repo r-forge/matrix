@@ -107,7 +107,7 @@ qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
 }
 \section{Methods}{
   \describe{
-    \item{\code{determinant}}{\code{signature(from = "sparseQR", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "sparseQR", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{expand1}}{\code{signature(x = "sparseQR")}:

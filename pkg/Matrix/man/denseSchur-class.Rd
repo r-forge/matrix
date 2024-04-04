@@ -58,7 +58,7 @@
 }
 \section{Methods}{
   \describe{
-    \item{\code{determinant}}{\code{signature(from = "Schur", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "Schur", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{expand1}}{\code{signature(x = "Schur")}:

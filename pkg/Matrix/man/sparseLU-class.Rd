@@ -53,7 +53,7 @@
 }
 \section{Methods}{
   \describe{
-    \item{\code{determinant}}{\code{signature(from = "sparseLU", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "sparseLU", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "sparseLU")}:

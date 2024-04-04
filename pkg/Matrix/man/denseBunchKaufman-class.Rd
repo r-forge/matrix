@@ -77,7 +77,7 @@
     \item{\code{coerce}}{\code{signature(from = "pBunchKaufman", to = "dtpMatrix")}:
       returns a \code{\linkS4class{dtpMatrix}}, useful for inspecting
       the internal representation of the factorization; see \sQuote{Note}.}
-    \item{\code{determinant}}{\code{signature(from = "p?BunchKaufman", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "p?BunchKaufman", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{expand1}}{\code{signature(x = "p?BunchKaufman")}:

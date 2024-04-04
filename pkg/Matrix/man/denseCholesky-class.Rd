@@ -80,7 +80,7 @@
       returns a \code{\linkS4class{dtpMatrix}} representing
       the Cholesky factor \eqn{L} or its transpose \eqn{L'};
       see \sQuote{Note}.}
-    \item{\code{determinant}}{\code{signature(from = "p?Cholesky", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "p?Cholesky", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{diag}}{\code{signature(x = "p?Cholesky")}:

@@ -175,7 +175,7 @@ isLDL(x)
       the main diagonal, hence \code{\linkS4class{dgCMatrix}} is
       indeed more appropriate than \code{\linkS4class{dtCMatrix}}
       as a coercion target.}
-    \item{\code{determinant}}{\code{signature(from = "CHMfactor", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "CHMfactor", logarithm = "logical")}:
       behaves according to an optional argument \code{sqrt}.
       If \code{sqrt = FALSE}, then this method computes the determinant
       of the factorized matrix \eqn{A} or its logarithm.

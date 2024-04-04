@@ -57,7 +57,7 @@
       returns a \code{\linkS4class{dgeMatrix}} with the dimensions
       of the factorized matrix \eqn{A}, equal to \eqn{L} below the
       diagonal and equal to \eqn{U} on and above the diagonal.}
-    \item{\code{determinant}}{\code{signature(from = "denseLU", logarithm = "logical")}:
+    \item{\code{determinant}}{\code{signature(x = "denseLU", logarithm = "logical")}:
       computes the determinant of the factorized matrix \eqn{A}
       or its logarithm.}
     \item{\code{expand}}{\code{signature(x = "denseLU")}:
