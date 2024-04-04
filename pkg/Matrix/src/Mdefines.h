@@ -80,11 +80,9 @@ do { \
 		R_Free(_VAR_); \
 } while (0)
 
-/* Copy and paste from now-deprecated Rdefines.h : */
-#ifndef R_DEFINES_H
-# define GET_SLOT(x, what)        R_do_slot(x, what)
-# define SET_SLOT(x, what, value) R_do_slot_assign(x, what, value)
-#endif
+#define HAS_SLOT(x, name)        R_has_slot      (x, name)
+#define GET_SLOT(x, name)        R_do_slot       (x, name)
+#define SET_SLOT(x, name, value) R_do_slot_assign(x, name, value)
 
 /* Often used symbols, defined in ./init.c */
 extern
