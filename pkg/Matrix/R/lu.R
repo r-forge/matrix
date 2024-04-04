@@ -32,7 +32,7 @@ for(.cl in c("dtrMatrix", "dtpMatrix"))
 setMethod("lu", c(x = .cl),
           function(x, ...) {
               if(x@uplo == "U" || x@diag == "U") {
-                  r <- new("denseLU")
+                  r <- new("ddenseLU")
                   r@Dim <- d <- x@Dim
                   r@Dimnames <- x@Dimnames
                   r@perm <- seq_len(d[1L])
@@ -62,7 +62,7 @@ setMethod("lu", c(x = "dtCMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
-                  r <- new("sparseLU")
+                  r <- new("dsparseLU")
                   y <- new("dtCMatrix")
                   y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
@@ -96,7 +96,7 @@ setMethod("lu", c(x = "dtRMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
-                  r <- new("sparseLU")
+                  r <- new("dsparseLU")
                   y <- new("dtCMatrix")
                   y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
@@ -130,7 +130,7 @@ setMethod("lu", c(x = "dtTMatrix"),
           function(x, ...) {
               if((upper <- x@uplo == "U") || x@diag == "U") {
                   n <- (d <- x@Dim)[1L]
-                  r <- new("sparseLU")
+                  r <- new("dsparseLU")
                   y <- new("dtCMatrix")
                   y@Dim <- d
                   y@uplo <- if(upper) "L" else "U"
@@ -150,7 +150,7 @@ setMethod("lu", c(x = "diagonalMatrix"),
               x <- .M2kind(x, ",")
               n <- (d <- x@Dim)[1L]
               L <- new("dtCMatrix")
-              r <- new("sparseLU")
+              r <- new("dsparseLU")
               L@Dim <- d
               L@uplo <- "L"
               L@diag <- "U"

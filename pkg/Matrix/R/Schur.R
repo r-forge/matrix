@@ -10,7 +10,7 @@ setMethod("Schur", c(x = "denseMatrix"),
                      "sp" = .Call(spMatrix_scf, x, TRUE, vectors),
                      "tr" = , "tp" =
                          {
-                             r <- new("Schur")
+                             r <- new("ddenseSchur")
                              r@Dim <- d <- x@Dim
                              r@Dimnames <- x@Dimnames
                              if((n <- d[1L]) > 0L) {
