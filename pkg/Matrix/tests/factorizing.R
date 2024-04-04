@@ -362,27 +362,22 @@ try(    tc <- Cholesky(nT.)  )
 
 for(p in c(FALSE,TRUE))
     for(L in c(FALSE,TRUE))
-        for(s in c(FALSE,TRUE, NA)) {
-            cat(sprintf("p,L,S = (%2d,%2d,%2d): ", p,L,s))
+        for(s in c(FALSE,TRUE,NA)) {
+            cat(sprintf("p,L,S = (%2d,%2d,%2d): ", p, L, s))
             r <- tryCatch(Cholesky(A., perm=p, LDL=L, super=s),
-                          error = function(e)e)
-            cat(if(inherits(r, "error")) " *** E ***" else
-                sprintf("%3d", r@type),"\n", sep="")
+                          error = function(e) e)
+            cat(if(!inherits(r, "error"))
+                    sprintf("(%2d,%2d,%2d)",
+                            r@ordering != 0L,
+                            .hasSlot(r, "is_ll") && !r@is_ll,
+                            .hasSlot(r, "super"))
+                else "*** E ***",
+                "\n", sep = "")
         }
 str(A., max.level=3) ## look at the 'factors'
 
-facs <- A.@factors
-names(facs) <- sub("Cholesky$", "", names(facs))
-facs <- facs[order(names(facs))]
-
-sapply(facs, class)
-str(lapply(facs, slot, "type"))
-## super = TRUE  currently always entails  LDL=FALSE :
-## hence isLDL is TRUE for ("D" and not "S"):
-sapply(facs, isLDL)
-
 chkCholesky <- function(chmf, A) {
-    stopifnot(is(chmf, "CHMfactor"),
+    stopifnot(is(chmf, "sparseCholesky"),
               validObject(chmf),
               is(A, "Matrix"), isSymmetric(A))
     if(!is(A, "dsCMatrix"))
@@ -408,15 +403,15 @@ data(KNex, package = "Matrix")
 mtm <- with(KNex, crossprod(mm))
 ld.3 <- determinant(Cholesky(mtm, perm = TRUE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
-                    "simplicialCholesky~"))
+                    "simplicialCholesky+"))
 ld.4 <- determinant(Cholesky(mtm, perm = FALSE), sqrt = FALSE)
 stopifnot(identical(names(mtm@factors),
-                    c("simplicialCholesky~", "simplicialCholesky")))
+                    c("simplicialCholesky+", "simplicialCholesky-")))
 c2 <- Cholesky(mtm, super = TRUE)
 validObject(c2)
 stopifnot(identical(names(mtm@factors),
-                    c("simplicialCholesky~", "simplicialCholesky",
-                      "supernodalCholesky~")))
+                    c("simplicialCholesky+", "simplicialCholesky-",
+                      "supernodalCholesky+")))
 
 r <- allCholesky(mtm)
 r[-1]
@@ -688,17 +683,17 @@ stopifnot(identical(cd1, cd2))
 
 ## lu(<m-by-0>), lu(<0-by-n>), BunchKaufman(<0-by-0>), chol(<0-by-0>)
 stopifnot(identical(lu(new("dgeMatrix", Dim = c(2L, 0L))),
-                    new("denseLU", Dim = c(2L, 0L))),
+                    new("ddenseLU", Dim = c(2L, 0L))),
           identical(lu(new("dgeMatrix", Dim = c(0L, 2L))),
-                    new("denseLU", Dim = c(0L, 2L))),
+                    new("ddenseLU", Dim = c(0L, 2L))),
           identical(BunchKaufman(new("dsyMatrix", uplo = "U")),
-                    new("BunchKaufman", uplo = "U")),
+                    new("ddenseBunchKaufman", uplo = "U")),
           identical(BunchKaufman(new("dspMatrix", uplo = "L")),
-                    new("pBunchKaufman", uplo = "L")),
+                    new("ddenseBunchKaufman", uplo = "L")),
           identical(Cholesky(new("dpoMatrix", uplo = "U")),
-                    new("Cholesky", uplo = "U")),
+                    new("ddenseCholesky", uplo = "U")),
           identical(Cholesky(new("dppMatrix", uplo = "L")),
-                    new("pCholesky", uplo = "L")))
+                    new("ddenseCholesky", uplo = "L")))
 
 ## determinant(<ds[yp]Matrix>) going via Bunch-Kaufman
 set.seed(15742)

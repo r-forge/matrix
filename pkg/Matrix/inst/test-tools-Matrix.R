@@ -355,15 +355,17 @@ allCholesky <- function(A, verbose = FALSE, silentTry = FALSE)
     ##'
     ##' @return an is(perm,LDL,super) matrix with interesting and *named* rownames
     CHM_to_pLs <- function(r) {
-        is.perm <- function(.)
-            if(inherits(., "try-error")) NA else .@type[1L] != 0L
-        is.LDL <- function(.)if(inherits(., "try-error")) NA else isLDL(.)
-	r.st <-
-	    cbind(perm	= sapply(r, is.perm),
-		  LDL	= sapply(r, is.LDL),
-		  super = sapply(r, class) == "dCHMsuper")
-	names(dimnames(r.st)) <- list("  p L s", "")
-	r.st
+        is.perm  <- function(.)
+            if(inherits(., "try-error")) NA else .@ordering != 0L
+        is.LDL   <- function(.)
+            if(inherits(., "try-error")) NA else .hasSlot(x, "is_ll") && !x@is_ll
+        is.super <- function(.)
+            if(inherits(., "try-error")) NA else .hasSlot(x, "super")
+        r.st <- cbind(perm  = sapply(r, is.perm),
+                      LDL   = sapply(r, is.LDL),
+                      super = sapply(r, is.super))
+        names(dimnames(r.st)) <- list("  p L s", "")
+        r.st
     }
 
     my.Cholesky <- {

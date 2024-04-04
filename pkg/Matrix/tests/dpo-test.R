@@ -17,8 +17,9 @@ assert.EQ.(c(determinant(h9)$modulus),	-96.7369487, tol = 8e-8)
 ##				64b:	-96.73695078	2.15e-8 then 6.469e-8
 
 ## determinant() now working via chol(): ==> h9 now has factorization
-stopifnot(names(h9@factors) == "Cholesky",
-          identical(ch9 <- Cholesky(h9, perm = FALSE), h9@factors$Cholesky))
+stopifnot(identical(names(h9@factors), "denseCholesky+-"))
+ch9 <- Cholesky(h9, perm = FALSE)
+stopifnot(identical(ch9, h9@factors[["denseCholesky+-"]]))
 str(f9 <- as(ch9, "dtrMatrix"))
 round(f9, 3) ## round() preserves 'triangular' !
 stopifnot(all.equal(rcond(h9), 9.0938e-13),
@@ -30,8 +31,8 @@ assert.EQ.mat(h9, as(cf9,"matrix"), tol=1e-15)
 h9. <- round(h9, 2) # dpo->dsy
 h9p <- pack(h9)
 ch9p <- Cholesky(h9p, perm = FALSE)
-stopifnot(identical(ch9p, h9p@factors$pCholesky),
-	  identical(names(h9p@factors), c("Cholesky", "pCholesky")))
+stopifnot(identical(ch9p, h9p@factors[["denseCholesky--"]]),
+          identical(names(h9p@factors), paste0("denseCholesky", c("+-", "--"))))
 h4  <- h9.[1:4, 1:4] # this and the next
 h9.[1,1] <- 10       # had failed in 0.995-14
 h9p[1,1] <- 10
@@ -46,19 +47,21 @@ str(h9p <- as(h9, "dppMatrix"))# {again}
 h6 <- h9[1:6,1:6]
 stopifnot(all(h6 == Hilbert(6)), length(h6@factors) == 0)
 stopifnotValid(th9p <- t(h9p), "dppMatrix")
-stopifnotValid(h9p@factors$Cholesky,"Cholesky")
+stopifnotValid(h9p@factors[["denseCholesky+-"]], "denseCholesky")
 H6  <- as(h6, "packedMatrix")
 pp6 <- as(H6, "dppMatrix")
 po6 <- as(pp6, "dpoMatrix")
 hs <- as(h9p, "dspMatrix")
-stopifnot(names(H6@factors)  == "pCholesky",
-          names(pp6@factors) == "pCholesky",
-          names(hs@factors)  == "Cholesky") # for now
+stopifnot(identical(names(H6 @factors), "denseCholesky--"),
+          identical(names(pp6@factors), "denseCholesky--"),
+          identical(names(hs @factors), "denseCholesky+-"))
 chol(hs) # and that is cached in 'hs' too :
-stopifnot(names(hs@factors) %in% c("Cholesky","pCholesky"),
-	  all.equal(h9, crossprod(as(hs@factors$pCholesky, "dtpMatrix")),
+stopifnot(identical(names(hs@factors), paste0("denseCholesky", c("+-", "--"))),
+          all.equal(h9,
+                    crossprod(as(hs@factors[["denseCholesky--"]], "dtpMatrix")),
                     tolerance = 1e-13),
-	  all.equal(h9, crossprod(as(hs@factors$ Cholesky, "dtrMatrix")),
+          all.equal(h9,
+                    crossprod(as(hs@factors[["denseCholesky+-"]], "dtrMatrix")),
                     tolerance = 1e-13))
 
 hs@x <- 1/h9p@x # is not pos.def. anymore
