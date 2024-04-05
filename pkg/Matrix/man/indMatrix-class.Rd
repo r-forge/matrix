@@ -6,6 +6,7 @@
 \keyword{classes}
 %
 \alias{indMatrix-class}
+\alias{pMatrix-class}
 %
 \alias{!,indMatrix-method}
 \alias{-,indMatrix,missing-method}
@@ -21,6 +22,11 @@
 \alias{log,indMatrix-method}
 \alias{t,indMatrix-method}
 \alias{which,indMatrix-method}
+%
+\alias{coerce,matrix,pMatrix-method}
+\alias{coerce,numeric,pMatrix-method}
+\alias{determinant,pMatrix,logical-method}
+\alias{t,pMatrix-method}
 %
 \description{
   The \code{indMatrix} class is the class of row and column
@@ -178,4 +184,28 @@ I2 <- as(7:1, "pMatrix")
 stopifnot(is(I12, "indMatrix"),
           identical(I12, rbind(I1, I2)),
 	  colSums(I12) == c(2L,2:4,4:2))
+
+%% moved from ./pMatrix-class.Rd :
+(pm1 <- as(as.integer(c(2,3,1)), "pMatrix"))
+t(pm1) # is the same as
+solve(pm1)
+pm1 \%*\% t(pm1) # check that the transpose is the inverse
+stopifnot(all(diag(3) == as(pm1 \%*\% t(pm1), "matrix")),
+          is.logical(as(pm1, "matrix")))
+
+set.seed(11)
+## random permutation matrix :
+(p10 <- as(sample(10),"pMatrix"))
+
+## Permute rows / columns of a numeric matrix :
+(mm <- round(array(rnorm(3 * 3), c(3, 3)), 2))
+mm \%*\% pm1
+pm1 \%*\% mm
+try(as(as.integer(c(3,3,1)), "pMatrix"))# Error: not a permutation
+
+as(pm1, "TsparseMatrix")
+p10[1:7, 1:4] # gives an "ngTMatrix" (most economic!)
+
+## row-indexing of a <pMatrix> keeps it as an <indMatrix>:
+p10[1:3, ]
 }

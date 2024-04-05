@@ -7,6 +7,12 @@
 %
 \alias{diagonalMatrix-class}
 %
+\alias{ndiMatrix-class}
+\alias{ldiMatrix-class}
+\alias{idiMatrix-class}
+\alias{ddiMatrix-class}
+\alias{zdiMatrix-class}
+%
 \alias{-,diagonalMatrix,missing-method}
 \alias{Math,diagonalMatrix-method}
 \alias{Ops,diagonalMatrix,triangularMatrix-method}
@@ -22,6 +28,105 @@
 \alias{show,diagonalMatrix-method}
 \alias{summary,diagonalMatrix-method}
 \alias{t,diagonalMatrix-method}
+%
+\alias{!,ndiMatrix-method}
+\alias{\%\%,ndiMatrix,Matrix-method}
+\alias{\%\%,ndiMatrix,ddenseMatrix-method}
+\alias{\%\%,ndiMatrix,ldenseMatrix-method}
+\alias{\%\%,ndiMatrix,ndenseMatrix-method}
+\alias{\%/\%,ndiMatrix,Matrix-method}
+\alias{\%/\%,ndiMatrix,ddenseMatrix-method}
+\alias{\%/\%,ndiMatrix,ldenseMatrix-method}
+\alias{\%/\%,ndiMatrix,ndenseMatrix-method}
+\alias{&,ndiMatrix,Matrix-method}
+\alias{&,ndiMatrix,ddenseMatrix-method}
+\alias{&,ndiMatrix,ldenseMatrix-method}
+\alias{&,ndiMatrix,ndenseMatrix-method}
+\alias{*,ndiMatrix,Matrix-method}
+\alias{*,ndiMatrix,Matrix-method}
+\alias{*,ndiMatrix,ddenseMatrix-method}
+\alias{*,ndiMatrix,ldenseMatrix-method}
+\alias{*,ndiMatrix,ndenseMatrix-method}
+\alias{/,ndiMatrix,Matrix-method}
+\alias{/,ndiMatrix,ddenseMatrix-method}
+\alias{/,ndiMatrix,ldenseMatrix-method}
+\alias{/,ndiMatrix,ndenseMatrix-method}
+\alias{Ops,ndiMatrix,ddiMatrix-method}
+\alias{Ops,ndiMatrix,ldiMatrix-method}
+\alias{Ops,ndiMatrix,ndiMatrix-method}
+\alias{which,ndiMatrix-method}
+%
+\alias{!,ldiMatrix-method}
+\alias{\%\%,ldiMatrix,Matrix-method}
+\alias{\%\%,ldiMatrix,ddenseMatrix-method}
+\alias{\%\%,ldiMatrix,ldenseMatrix-method}
+\alias{\%\%,ldiMatrix,ndenseMatrix-method}
+\alias{\%/\%,ldiMatrix,Matrix-method}
+\alias{\%/\%,ldiMatrix,ddenseMatrix-method}
+\alias{\%/\%,ldiMatrix,ldenseMatrix-method}
+\alias{\%/\%,ldiMatrix,ndenseMatrix-method}
+\alias{&,ldiMatrix,Matrix-method}
+\alias{&,ldiMatrix,ddenseMatrix-method}
+\alias{&,ldiMatrix,ldenseMatrix-method}
+\alias{&,ldiMatrix,ndenseMatrix-method}
+\alias{*,ldiMatrix,Matrix-method}
+\alias{*,ldiMatrix,ddenseMatrix-method}
+\alias{*,ldiMatrix,ldenseMatrix-method}
+\alias{*,ldiMatrix,ndenseMatrix-method}
+\alias{/,ldiMatrix,Matrix-method}
+\alias{/,ldiMatrix,ddenseMatrix-method}
+\alias{/,ldiMatrix,ldenseMatrix-method}
+\alias{/,ldiMatrix,ndenseMatrix-method}
+\alias{Arith,ldiMatrix,logical-method}
+\alias{Arith,ldiMatrix,numeric-method}
+\alias{Arith,logical,ldiMatrix-method}
+\alias{Arith,numeric,ldiMatrix-method}
+\alias{Ops,ANY,ldiMatrix-method}
+\alias{Ops,ldiMatrix,ANY-method}
+\alias{Ops,ldiMatrix,Matrix-method}
+\alias{Ops,ldiMatrix,dMatrix-method}
+\alias{Ops,ldiMatrix,ddiMatrix-method}
+\alias{Ops,ldiMatrix,ldiMatrix-method}
+\alias{Ops,ldiMatrix,ndiMatrix-method}
+\alias{Ops,ldiMatrix,logical-method}
+\alias{Ops,ldiMatrix,numeric-method}
+\alias{Ops,ldiMatrix,sparseMatrix-method}
+\alias{which,ldiMatrix-method}
+%
+\alias{\%\%,ddiMatrix,Matrix-method}
+\alias{\%\%,ddiMatrix,ddenseMatrix-method}
+\alias{\%\%,ddiMatrix,ldenseMatrix-method}
+\alias{\%\%,ddiMatrix,ndenseMatrix-method}
+\alias{\%/\%,ddiMatrix,Matrix-method}
+\alias{\%/\%,ddiMatrix,ddenseMatrix-method}
+\alias{\%/\%,ddiMatrix,ldenseMatrix-method}
+\alias{\%/\%,ddiMatrix,ndenseMatrix-method}
+\alias{&,ddiMatrix,Matrix-method}
+\alias{&,ddiMatrix,ddenseMatrix-method}
+\alias{&,ddiMatrix,ldenseMatrix-method}
+\alias{&,ddiMatrix,ndenseMatrix-method}
+\alias{*,ddiMatrix,Matrix-method}
+\alias{*,ddiMatrix,ddenseMatrix-method}
+\alias{*,ddiMatrix,ldenseMatrix-method}
+\alias{*,ddiMatrix,ndenseMatrix-method}
+\alias{/,ddiMatrix,Matrix-method}
+\alias{/,ddiMatrix,ddenseMatrix-method}
+\alias{/,ddiMatrix,ldenseMatrix-method}
+\alias{/,ddiMatrix,ndenseMatrix-method}
+\alias{Arith,ddiMatrix,logical-method}
+\alias{Arith,ddiMatrix,numeric-method}
+\alias{Arith,logical,ddiMatrix-method}
+\alias{Arith,numeric,ddiMatrix-method}
+\alias{Ops,ANY,ddiMatrix-method}
+\alias{Ops,ddiMatrix,ANY-method}
+\alias{Ops,ddiMatrix,Matrix-method}
+\alias{Ops,ddiMatrix,dMatrix-method}
+\alias{Ops,ddiMatrix,ddiMatrix-method}
+\alias{Ops,ddiMatrix,ldiMatrix-method}
+\alias{Ops,ddiMatrix,ndiMatrix-method}
+\alias{Ops,ddiMatrix,logical-method}
+\alias{Ops,ddiMatrix,numeric-method}
+\alias{Ops,ddiMatrix,sparseMatrix-method}
 %
 \description{
   Class "diagonalMatrix" is the virtual class of all diagonal matrices.
@@ -107,4 +212,25 @@ solve(D5)# efficient as is diagonal
 # an unusual way to construct a band matrix:
 rbind2(cbind2(I5, D5),
        cbind2(D5, I5))
+
+%% moved from ./ldiMatrix-class.Rd :
+(lM <- Diagonal(x = c(TRUE,FALSE,FALSE)))
+str(lM)#> gory details (slots)
+
+crossprod(lM) # numeric
+(nM <- as(lM, "nMatrix"))
+crossprod(nM) # pattern sparse
+
+%% moved from ./ddiMatrix-class.Rd :
+(d2 <- Diagonal(x = c(10,1)))
+str(d2)
+## slightly larger in internal size:
+str(as(d2, "sparseMatrix"))
+
+M <- Matrix(cbind(1,2:4))
+M \%*\% d2 #> `fast' multiplication
+
+chol(d2) # trivial
+stopifnot(is(cd2 <- chol(d2), "ddiMatrix"),
+          all.equal(cd2@x, c(sqrt(10),1)))
 }

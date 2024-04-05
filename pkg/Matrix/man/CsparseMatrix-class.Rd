@@ -7,6 +7,24 @@
 %
 \alias{CsparseMatrix-class}
 %
+\alias{ngCMatrix-class}
+\alias{lgCMatrix-class}
+\alias{igCMatrix-class}
+\alias{dgCMatrix-class}
+\alias{zgCMatrix-class}
+%
+\alias{nsCMatrix-class}
+\alias{lsCMatrix-class}
+\alias{isCMatrix-class}
+\alias{dsCMatrix-class}
+\alias{zsCMatrix-class}
+%
+\alias{ntCMatrix-class}
+\alias{ltCMatrix-class}
+\alias{itCMatrix-class}
+\alias{dtCMatrix-class}
+\alias{ztCMatrix-class}
+%
 \alias{Arith,CsparseMatrix,CsparseMatrix-method}
 \alias{Arith,CsparseMatrix,numeric-method}
 \alias{Arith,numeric,CsparseMatrix-method}
@@ -17,6 +35,26 @@
 \alias{diag,CsparseMatrix-method}
 \alias{diag<-,CsparseMatrix-method}
 \alias{t,CsparseMatrix-method}
+% lgC
+\alias{Arith,lgCMatrix,lgCMatrix-method}
+\alias{Logic,lgCMatrix,lgCMatrix-method}
+% dgC
+\alias{Arith,dgCMatrix,dgCMatrix-method}
+\alias{Arith,dgCMatrix,logical-method}
+\alias{Arith,dgCMatrix,numeric-method}
+\alias{Arith,logical,dgCMatrix-method}
+\alias{Arith,numeric,dgCMatrix-method}
+\alias{coerce,matrix,dgCMatrix-method}
+\alias{determinant,dgCMatrix,logical-method}
+% lsC
+\alias{Logic,lsCMatrix,lsCMatrix-method}
+% dsC
+\alias{Arith,dsCMatrix,dsCMatrix-method}
+\alias{determinant,dsCMatrix,logical-method}
+% ltC
+\alias{Logic,ltCMatrix,ltCMatrix-method}
+% dtC
+\alias{Arith,dtCMatrix,dtCMatrix-method}
 %
 \alias{.validateCsparse}
 %
@@ -109,4 +147,81 @@ getClass("CsparseMatrix")
 
 ## The common validity check function (based on C code):
 getValidity(getClass("CsparseMatrix"))
+
+%% moved from ./dgCMatrix-class.Rd :
+(m <- Matrix(c(0,0,2:0), 3,5))
+str(m)
+m[,1]
+\dontshow{## regression test: this must give a validity-check error:
+stopifnot(inherits(try(new("dgCMatrix", i = 0:1, p = 0:2,
+                           x = c(2,3), Dim = 3:4)),
+          "try-error"))
+}
+
+%% moved from ./dsCMatrix-class.Rd :
+mm <- Matrix(toeplitz(c(10, 0, 1, 0, 3)), sparse = TRUE)
+mm # automatically dsCMatrix
+str(mm)
+mT <- as(as(mm, "generalMatrix"), "TsparseMatrix")
+
+## Either
+(symM <- as(mT, "symmetricMatrix")) # dsT
+(symC <- as(symM, "CsparseMatrix")) # dsC
+## or
+sT <- Matrix(mT, sparse=TRUE, forceCheck=TRUE) # dsT
+
+sym2 <- as(symC, "TsparseMatrix")
+## --> the same as 'symM', a "dsTMatrix"
+\dontshow{
+stopifnot(identical(sT, symM), identical(sym2, symM),
+          class(sym2) == "dsTMatrix",
+	  identical(sym2[1,], sT[1,]),
+	  identical(sym2[,2], sT[,2]))
+}
+
+%% moved from ./dtCMatrix-class.Rd :
+showClass("dtCMatrix")
+showClass("dtTMatrix")
+t1 <- new("dtTMatrix", x= c(3,7), i= 0:1, j=3:2, Dim= as.integer(c(4,4)))
+t1
+## from  0-diagonal to unit-diagonal {low-level step}:
+tu <- t1 ; tu@diag <- "U"
+tu
+(cu <- as(tu, "CsparseMatrix"))
+str(cu)# only two entries in @i and @x
+stopifnot(cu@i == 1:0,
+          all(2 * symmpart(cu) == Diagonal(4) + forceSymmetric(cu)))
+
+t1[1,2:3] <- -1:-2
+diag(t1) <- 10*c(1:2,3:2)
+t1 # still triangular
+(it1 <- solve(t1))
+t1. <- solve(it1)
+all(abs(t1 - t1.) < 10 * .Machine$double.eps)
+
+## 2nd example
+U5 <- new("dtCMatrix", i= c(1L, 0:3), p=c(0L,0L,0:2, 5L), Dim = c(5L, 5L),
+          x = rep(1, 5), diag = "U")
+U5
+(iu <- solve(U5)) # contains one '0'
+validObject(iu2 <- solve(U5, Diagonal(5)))# failed in earlier versions
+
+I5 <- iu  \%*\% U5 # should equal the identity matrix
+i5 <- iu2 \%*\% U5
+m53 <- matrix(1:15, 5,3, dimnames=list(NULL,letters[1:3]))
+asDiag <- function(M) as(drop0(M), "diagonalMatrix")
+stopifnot(
+   all.equal(Diagonal(5), asDiag(I5), tolerance=1e-14) ,
+   all.equal(Diagonal(5), asDiag(i5), tolerance=1e-14) ,
+   identical(list(NULL, dimnames(m53)[[2]]), dimnames(solve(U5, m53)))
+)
+\dontshow{
+i5. <- I5; colnames(i5.) <- LETTERS[11:15]
+M53 <- as(m53, "denseMatrix")
+stopifnot(
+   identical((dns <- dimnames(solve(i5., M53))),
+             dimnames(solve(as.matrix(i5.), as.matrix(M53)))) ,
+   identical(dns, dimnames(solve(i5., as.matrix(M53))))
+)
+}
 }

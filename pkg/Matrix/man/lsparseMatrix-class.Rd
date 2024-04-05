@@ -7,16 +7,7 @@
 %
 \alias{lsparseMatrix-class}
 \alias{lsparseMatrix-classes} % used by package 'enhancerHomologSearch'
-\alias{lgCMatrix-class}
-\alias{lgRMatrix-class}
-\alias{lgTMatrix-class}
-\alias{ltCMatrix-class}
-\alias{ltRMatrix-class}
-\alias{ltTMatrix-class}
-\alias{lsCMatrix-class}
-\alias{lsRMatrix-class}
-\alias{lsTMatrix-class}
-% lsparse
+%
 \alias{!,lsparseMatrix-method}
 \alias{Arith,lsparseMatrix,Matrix-method}
 \alias{Logic,lsparseMatrix,ldenseMatrix-method}
@@ -26,21 +17,6 @@
 \alias{coerce,matrix,lsparseMatrix-method}
 \alias{coerce,vector,lsparseMatrix-method}
 \alias{which,lsparseMatrix-method}
-% lgC
-\alias{Arith,lgCMatrix,lgCMatrix-method}
-\alias{Logic,lgCMatrix,lgCMatrix-method}
-% lgR
-% lgT
-\alias{Arith,lgTMatrix,lgTMatrix-method}
-\alias{Logic,lgTMatrix,lgTMatrix-method}
-% ltC
-\alias{Logic,ltCMatrix,ltCMatrix-method}
-% ltR
-% ltT
-% lsC
-\alias{Logic,lsCMatrix,lsCMatrix-method}
-% lsR
-% lsT
 %
 \description{The \code{lsparseMatrix} class is a virtual class
   of logical sparse matrices, i.e., sparse matrices with entries

@@ -7,16 +7,7 @@
 %
 \alias{nsparseMatrix-class}
 \alias{nsparseMatrix-classes} % used by package 'arules'
-\alias{ngCMatrix-class}
-\alias{ngRMatrix-class}
-\alias{ngTMatrix-class}
-\alias{ntCMatrix-class}
-\alias{ntRMatrix-class}
-\alias{ntTMatrix-class}
-\alias{nsCMatrix-class}
-\alias{nsRMatrix-class}
-\alias{nsTMatrix-class}
-% nsparse
+%
 \alias{!,nsparseMatrix-method}
 \alias{-,nsparseMatrix,missing-method}
 \alias{Arith,nsparseMatrix,Matrix-method}
@@ -32,15 +23,6 @@
 \alias{coerce,nsparseMatrix,pMatrix-method}
 \alias{coerce,vector,nsparseMatrix-method}
 \alias{which,nsparseMatrix-method}
-% ngC
-% ngR
-% ngT
-% ntC
-% ntR
-% ntT
-% nsC
-% nsR
-% nsT
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse
   \emph{\dQuote{pattern}} matrices, i.e., binary matrices conceptually

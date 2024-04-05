@@ -7,11 +7,33 @@
 %
 \alias{RsparseMatrix-class}
 %
+\alias{ngRMatrix-class}
+\alias{lgRMatrix-class}
+\alias{igRMatrix-class}
+\alias{dgRMatrix-class}
+\alias{zgRMatrix-class}
+%
+\alias{nsRMatrix-class}
+\alias{lsRMatrix-class}
+\alias{isRMatrix-class}
+\alias{dsRMatrix-class}
+\alias{zsRMatrix-class}
+%
+\alias{ntRMatrix-class}
+\alias{ltRMatrix-class}
+\alias{itRMatrix-class}
+\alias{dtRMatrix-class}
+\alias{ztRMatrix-class}
+%
 \alias{coerce,matrix,RsparseMatrix-method}
 \alias{coerce,vector,RsparseMatrix-method}
 \alias{diag,RsparseMatrix-method}
 \alias{diag<-,RsparseMatrix-method}
 \alias{t,RsparseMatrix-method}
+% dgR
+\alias{determinant,dgRMatrix,logical-method}
+% dsR
+\alias{determinant,dsRMatrix,logical-method}
 %
 \description{The \code{"RsparseMatrix"} class is the virtual class of
   all sparse matrices coded in sorted compressed row-oriented form.
@@ -54,4 +76,22 @@
 }
 \examples{
 showClass("RsparseMatrix")
+
+%% moved from ./dsRMatrix-class.Rd :
+(m0 <- new("dsRMatrix"))
+m2 <- new("dsRMatrix", Dim = c(2L,2L),
+          x = c(3,1), j = c(1L,1L), p = 0:2)
+m2
+stopifnot(colSums(as(m2, "TsparseMatrix")) == 3:4)
+str(m2)
+(ds2 <- forceSymmetric(diag(2))) # dsy*
+dR <- as(ds2, "RsparseMatrix")
+dR # dsRMatrix
+
+%% moved from ./dtRMatrix-class.Rd :
+(m0 <- new("dtRMatrix"))
+(m2 <- new("dtRMatrix", Dim = c(2L,2L),
+                        x = c(5, 1:2), p = c(0L,2:3), j= c(0:1,1L)))
+str(m2)
+(m3 <- as(Diagonal(2), "RsparseMatrix"))# --> dtRMatrix
 }

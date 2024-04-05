@@ -1,4 +1,4 @@
-\name{dpoMatrix-class}
+\name{posdef-class}
 \title{Positive Semi-definite Dense (Packed | Non-packed) Numeric Matrices}
 %
 \docType{class}
@@ -7,6 +7,16 @@
 %
 \alias{dpoMatrix-class}
 \alias{dppMatrix-class}
+\alias{dpCMatrix-class}
+\alias{dpRMatrix-class}
+\alias{dpTMatrix-class}
+%
+\alias{zpoMatrix-class}
+\alias{zppMatrix-class}
+\alias{zpCMatrix-class}
+\alias{zpRMatrix-class}
+\alias{zpTMatrix-class}
+%
 \alias{corMatrix-class}
 \alias{copMatrix-class}
 %
