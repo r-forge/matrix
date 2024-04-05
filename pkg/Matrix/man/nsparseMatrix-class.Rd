@@ -56,27 +56,6 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{uplo}:}{Object of class \code{"character"}. Must be
-      either "U", for upper triangular, and "L", for lower
-      triangular. Present in the triangular and symmetric classes but not
-      in the general class.}
-    \item{\code{diag}:}{Object of class \code{"character"}. Must be
-      either \code{"U"}, for unit triangular (diagonal is all ones), or
-      \code{"N"} for non-unit.  The implicit diagonal elements are not
-      explicitly stored when \code{diag} is \code{"U"}.  Present in the
-      triangular classes only.}
-    \item{\code{p}:}{Object of class \code{"integer"} of pointers, one
-      for each column (row), to the initial (zero-based) index of elements in
-      the column.  Present in compressed column-oriented and compressed
-      row-oriented forms only.}
-    \item{\code{i}:}{Object of class \code{"integer"} of length nnzero
-      (number of non-zero elements).  These are the row numbers for
-      each TRUE element in the matrix.  All other elements are FALSE.
-      Present in triplet and compressed column-oriented forms only.}
-    \item{\code{j}:}{Object of class \code{"integer"} of length nnzero
-      (number of non-zero elements).  These are the column numbers for
-      each TRUE element in the matrix.  All other elements are FALSE.
-      Present in triplet and compressed row-oriented forms only.}
     \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
       of the matrix.}
   }
