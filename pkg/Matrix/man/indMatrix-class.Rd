@@ -8,25 +8,13 @@
 \alias{indMatrix-class}
 \alias{pMatrix-class}
 %
-\alias{!,indMatrix-method}
-\alias{-,indMatrix,missing-method}
-\alias{Math,indMatrix-method}
-\alias{Summary,indMatrix-method}
 \alias{coerce,indMatrix,pMatrix-method}
 \alias{coerce,list,indMatrix-method}
 \alias{coerce,matrix,indMatrix-method}
 \alias{coerce,numeric,indMatrix-method}
-\alias{determinant,indMatrix,logical-method}
-\alias{diag,indMatrix-method}
-\alias{diag<-,indMatrix-method}
-\alias{log,indMatrix-method}
-\alias{t,indMatrix-method}
-\alias{which,indMatrix-method}
 %
 \alias{coerce,matrix,pMatrix-method}
 \alias{coerce,numeric,pMatrix-method}
-\alias{determinant,pMatrix,logical-method}
-\alias{t,pMatrix-method}
 %
 \description{
   The \code{indMatrix} class is the class of row and column

@@ -25,36 +25,10 @@
 \alias{dtCMatrix-class}
 \alias{ztCMatrix-class}
 %
-\alias{Arith,CsparseMatrix,CsparseMatrix-method}
-\alias{Arith,CsparseMatrix,numeric-method}
-\alias{Arith,numeric,CsparseMatrix-method}
-\alias{Compare,CsparseMatrix,CsparseMatrix-method}
-\alias{Logic,CsparseMatrix,CsparseMatrix-method}
 \alias{coerce,matrix,CsparseMatrix-method}
 \alias{coerce,vector,CsparseMatrix-method}
-\alias{diag,CsparseMatrix-method}
-\alias{diag<-,CsparseMatrix-method}
-\alias{t,CsparseMatrix-method}
-% lgC
-\alias{Arith,lgCMatrix,lgCMatrix-method}
-\alias{Logic,lgCMatrix,lgCMatrix-method}
-% dgC
-\alias{Arith,dgCMatrix,dgCMatrix-method}
-\alias{Arith,dgCMatrix,logical-method}
-\alias{Arith,dgCMatrix,numeric-method}
-\alias{Arith,logical,dgCMatrix-method}
-\alias{Arith,numeric,dgCMatrix-method}
+%
 \alias{coerce,matrix,dgCMatrix-method}
-\alias{determinant,dgCMatrix,logical-method}
-% lsC
-\alias{Logic,lsCMatrix,lsCMatrix-method}
-% dsC
-\alias{Arith,dsCMatrix,dsCMatrix-method}
-\alias{determinant,dsCMatrix,logical-method}
-% ltC
-\alias{Logic,ltCMatrix,ltCMatrix-method}
-% dtC
-\alias{Arith,dtCMatrix,dtCMatrix-method}
 %
 \alias{.validateCsparse}
 %

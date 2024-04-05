@@ -27,27 +27,6 @@
 %
 \alias{coerce,matrix,unpackedMatrix-method}
 \alias{coerce,vector,unpackedMatrix-method}
-\alias{cov2cor,unpackedMatrix-method}
-% nge
-\alias{Arith,ngeMatrix,ngeMatrix-method}
-\alias{Compare,ngeMatrix,ngeMatrix-method}
-\alias{Logic,ngeMatrix,ngeMatrix-method}
-% lge
-\alias{Arith,lgeMatrix,lgeMatrix-method}
-\alias{Compare,lgeMatrix,lgeMatrix-method}
-\alias{Logic,lgeMatrix,lgeMatrix-method}
-% dge
-\alias{Arith,dgeMatrix,dgeMatrix-method}
-\alias{Arith,dgeMatrix,logical-method}
-\alias{Arith,dgeMatrix,numeric-method}
-\alias{Arith,dgeMatrix,sparseVector-method}
-\alias{Arith,logical,dgeMatrix-method}
-\alias{Arith,numeric,dgeMatrix-method}
-\alias{determinant,dgeMatrix,logical-method}
-% dsy
-\alias{coerce,dsyMatrix,corMatrix-method}
-\alias{coerce,dsyMatrix,dpoMatrix-method}
-\alias{determinant,dsyMatrix,logical-method}
 %
 \description{
   Class \code{"unpackedMatrix"} is the \emph{virtual} class of dense

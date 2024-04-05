@@ -20,9 +20,6 @@
 %
 \alias{coerce,simplicialCholesky,dtCMatrix-method}
 \alias{coerce,supernodalCholesky,dgCMatrix-method}
-\alias{determinant,sparseCholesky,logical-method}
-\alias{diag,sparseCholesky-method}
-\alias{update,sparseCholesky-method}
 %
 \alias{isLDL}
 %

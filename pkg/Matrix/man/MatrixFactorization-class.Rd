@@ -14,21 +14,6 @@
 \alias{QR-class}
 \alias{Schur-class}
 %
-\alias{determinant,MatrixFactorization,missing-method}
-\alias{dim,MatrixFactorization-method}
-\alias{dimnames,MatrixFactorization-method}
-\alias{dimnames<-,MatrixFactorization,NULL-method}
-\alias{dimnames<-,MatrixFactorization,list-method}
-\alias{length,MatrixFactorization-method}
-\alias{show,MatrixFactorization-method}
-\alias{unname,MatrixFactorization-method}
-%
-\alias{show,BunchKaufman-method}
-\alias{show,Cholesky-method}
-\alias{show,LU-method}
-\alias{show,QR-method}
-\alias{show,Schur-method}
-%
 \description{
   \code{MatrixFactorization} is the virtual class of
   factorizations of \eqn{m \times n}{m-by-n} matrices \eqn{A},

@@ -10,7 +10,6 @@
 \alias{ddenseSchur-class}
 %
 \alias{coerce,denseSchur,dgeMatrix-method}
-\alias{determinant,denseSchur,logical-method}
 %
 \description{
   \code{Schur} is the class of Schur factorizations of

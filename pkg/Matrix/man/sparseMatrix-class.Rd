@@ -7,31 +7,10 @@
 %
 \alias{sparseMatrix-class}
 %
-\alias{-,sparseMatrix,missing-method}
-\alias{Math,sparseMatrix-method}
-\alias{Ops,numeric,sparseMatrix-method}
-\alias{Ops,sparseMatrix,ddiMatrix-method}
-\alias{Ops,sparseMatrix,ldiMatrix-method}
-\alias{Ops,sparseMatrix,nsparseMatrix-method}
-\alias{Ops,sparseMatrix,numeric-method}
-\alias{Ops,sparseMatrix,sparseMatrix-method}
-\alias{Summary,sparseMatrix-method}
 \alias{coerce,ANY,sparseMatrix-method}
 \alias{coerce,factor,sparseMatrix-method}
 \alias{coerce,matrix,sparseMatrix-method}
 \alias{coerce,vector,sparseMatrix-method}
-\alias{cov2cor,sparseMatrix-method}
-\alias{diff,sparseMatrix-method}
-\alias{dim<-,sparseMatrix-method}
-\alias{format,sparseMatrix-method}
-\alias{log,sparseMatrix-method}
-\alias{mean,sparseMatrix-method}
-\alias{print,sparseMatrix-method}
-\alias{rep,sparseMatrix-method}
-\alias{show,sparseMatrix-method}
-\alias{summary,sparseMatrix-method}
-%
-\alias{print.sparseMatrix} % spoof, only so that users find this topic
 %
 \description{Virtual Mother Class of All Sparse Matrices}
 \section{Slots}{

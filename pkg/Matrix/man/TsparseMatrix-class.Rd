@@ -27,17 +27,6 @@
 %
 \alias{coerce,matrix,TsparseMatrix-method}
 \alias{coerce,vector,TsparseMatrix-method}
-\alias{diag,TsparseMatrix-method}
-\alias{diag<-,TsparseMatrix-method}
-\alias{t,TsparseMatrix-method}
-% lgT
-\alias{Arith,lgTMatrix,lgTMatrix-method}
-\alias{Logic,lgTMatrix,lgTMatrix-method}
-% dgT
-\alias{+,dgTMatrix,dgTMatrix-method}
-\alias{determinant,dgTMatrix,logical-method}
-% dsT
-\alias{determinant,dsTMatrix,logical-method}
 %
 \description{The \code{"TsparseMatrix"} class is the virtual class of
   all sparse matrices coded in triplet form.  Since it is a virtual class,

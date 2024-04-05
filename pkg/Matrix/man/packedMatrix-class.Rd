@@ -20,11 +20,6 @@
 \alias{ztpMatrix-class}
 %
 \alias{coerce,matrix,packedMatrix-method}
-\alias{cov2cor,packedMatrix-method}
-% dsp
-\alias{coerce,dspMatrix,copMatrix-method}
-\alias{coerce,dspMatrix,dppMatrix-method}
-\alias{determinant,dspMatrix,logical-method}
 %
 \description{
   Class \code{"packedMatrix"} is the \emph{virtual} class of dense

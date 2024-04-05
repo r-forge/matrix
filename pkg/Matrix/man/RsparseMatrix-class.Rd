@@ -27,13 +27,6 @@
 %
 \alias{coerce,matrix,RsparseMatrix-method}
 \alias{coerce,vector,RsparseMatrix-method}
-\alias{diag,RsparseMatrix-method}
-\alias{diag<-,RsparseMatrix-method}
-\alias{t,RsparseMatrix-method}
-% dgR
-\alias{determinant,dgRMatrix,logical-method}
-% dsR
-\alias{determinant,dsRMatrix,logical-method}
 %
 \description{The \code{"RsparseMatrix"} class is the virtual class of
   all sparse matrices coded in sorted compressed row-oriented form.

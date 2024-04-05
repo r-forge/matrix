@@ -9,8 +9,6 @@
 \alias{sparseLU-class}
 \alias{dsparseLU-class}
 %
-\alias{determinant,sparseLU,logical-method}
-%
 \description{
   \code{sparseLU} is the class of sparse, row- and column-pivoted
   LU factorizations of \eqn{n \times n}{n-by-n} real matrices \eqn{A},

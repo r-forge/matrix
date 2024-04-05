@@ -8,21 +8,10 @@
 \alias{nsparseMatrix-class}
 \alias{nsparseMatrix-classes} % used by package 'arules'
 %
-\alias{!,nsparseMatrix-method}
-\alias{-,nsparseMatrix,missing-method}
-\alias{Arith,nsparseMatrix,Matrix-method}
-\alias{Arith,dsparseMatrix,nsparseMatrix-method}
-\alias{Arith,lsparseMatrix,nsparseMatrix-method}
-\alias{Arith,nsparseMatrix,dsparseMatrix-method}
-\alias{Arith,nsparseMatrix,lsparseMatrix-method}
-\alias{Ops,nsparseMatrix,dsparseMatrix-method}
-\alias{Ops,nsparseMatrix,lsparseMatrix-method}
-\alias{Ops,nsparseMatrix,sparseMatrix-method}
 \alias{coerce,matrix,nsparseMatrix-method}
 \alias{coerce,nsparseMatrix,indMatrix-method}
 \alias{coerce,nsparseMatrix,pMatrix-method}
 \alias{coerce,vector,nsparseMatrix-method}
-\alias{which,nsparseMatrix-method}
 %
 \description{The \code{nsparseMatrix} class is a virtual class of sparse
   \emph{\dQuote{pattern}} matrices, i.e., binary matrices conceptually

@@ -29,6 +29,9 @@
 \alias{rbind2,matrix,Matrix-method}
 \alias{rbind2,vector,Matrix-method}
 %
+\alias{c.Matrix}
+\alias{c.sparseVector}
+%
 \description{
   The base functions \code{\link{cbind}} and \code{\link{rbind}} are
   defined for an arbitrary number of arguments and hence have the first

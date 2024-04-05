@@ -10,8 +10,6 @@
 \alias{coerce,generalMatrix,packedMatrix-method}
 \alias{coerce,matrix,generalMatrix-method}
 \alias{coerce,vector,generalMatrix-method}
-\alias{dimnames<-,generalMatrix,NULL-method}
-\alias{dimnames<-,generalMatrix,list-method}
 %
 \description{
   Virtual class of \dQuote{general} matrices; i.e., matrices

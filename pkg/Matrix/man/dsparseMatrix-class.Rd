@@ -7,11 +7,6 @@
 %
 \alias{dsparseMatrix-class}
 %
-\alias{Arith,dsparseMatrix,logical-method}
-\alias{Arith,dsparseMatrix,numeric-method}
-\alias{Arith,logical,dsparseMatrix-method}
-\alias{Arith,numeric,dsparseMatrix-method}
-\alias{Ops,dsparseMatrix,nsparseMatrix-method}
 \alias{coerce,matrix,dsparseMatrix-method}
 \alias{coerce,vector,dsparseMatrix-method}
 %

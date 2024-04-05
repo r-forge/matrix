@@ -7,20 +7,8 @@
 %
 \alias{ndenseMatrix-class}
 %
-\alias{!,ndenseMatrix-method}
-\alias{&,ndenseMatrix,ddiMatrix-method}
-\alias{&,ndenseMatrix,ldiMatrix-method}
-\alias{&,ndenseMatrix,ndiMatrix-method}
-\alias{*,ndenseMatrix,ddiMatrix-method}
-\alias{*,ndenseMatrix,ldiMatrix-method}
-\alias{*,ndenseMatrix,ndiMatrix-method}
-\alias{Ops,ndenseMatrix,ndenseMatrix-method}
-\alias{^,ndenseMatrix,ddiMatrix-method}
-\alias{^,ndenseMatrix,ldiMatrix-method}
-\alias{^,ndenseMatrix,ndiMatrix-method}
 \alias{coerce,matrix,ndenseMatrix-method}
 \alias{coerce,vector,ndenseMatrix-method}
-\alias{which,ndenseMatrix-method}
 %
 \description{
   \code{ndenseMatrix} is the virtual class of all dense \bold{l}ogical

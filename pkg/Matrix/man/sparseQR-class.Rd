@@ -10,33 +10,6 @@
 \alias{sparseQR-class}
 \alias{dsparseQR-class}
 %
-\alias{determinant,sparseQR,logical-method}
-\alias{qr.Q,sparseQR-method}
-\alias{qr.R,sparseQR-method}
-\alias{qr.X,sparseQR-method}
-\alias{qr.coef,sparseQR,Matrix-method}
-\alias{qr.coef,sparseQR,dgeMatrix-method}
-\alias{qr.coef,sparseQR,matrix-method}
-\alias{qr.coef,sparseQR,vector-method}
-\alias{qr.fitted,sparseQR,Matrix-method}
-\alias{qr.fitted,sparseQR,dgeMatrix-method}
-\alias{qr.fitted,sparseQR,matrix-method}
-\alias{qr.fitted,sparseQR,vector-method}
-\alias{qr.qty,sparseQR,Matrix-method}
-\alias{qr.qty,sparseQR,dgeMatrix-method}
-\alias{qr.qty,sparseQR,matrix-method}
-\alias{qr.qty,sparseQR,vector-method}
-\alias{qr.qy,sparseQR,Matrix-method}
-\alias{qr.qy,sparseQR,dgeMatrix-method}
-\alias{qr.qy,sparseQR,matrix-method}
-\alias{qr.qy,sparseQR,vector-method}
-\alias{qr.resid,sparseQR,Matrix-method}
-\alias{qr.resid,sparseQR,dgeMatrix-method}
-\alias{qr.resid,sparseQR,matrix-method}
-\alias{qr.resid,sparseQR,vector-method}
-%
-\alias{qrR}
-%
 \description{
   \code{sparseQR} is the class of sparse, row- and column-pivoted
   QR factorizations of \eqn{m \times n}{m-by-n} (\eqn{m \ge n}{m >= n})
@@ -54,21 +27,21 @@
   (\eqn{R_1}{R1} contains the first \eqn{n} row vectors and is
   upper \emph{triangular}).
 }
-\usage{
-qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
-}
-\arguments{
-  \item{qr}{an object of class \code{\linkS4class{sparseQR}},
-    almost always the result of a call to generic function \code{qr}
-    with sparse \code{x}.}
-  \item{complete}{a logical indicating if \eqn{R} should be returned
-    instead of \eqn{R_1}{R1}.}
-  \item{backPermute}{a logical indicating if \eqn{R} or \eqn{R_1}{R1}
-    should be multiplied on the right by \eqn{P_2'}{P2'}.}
-  \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
-    should be propagated unpermuted to the result.
-    If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
-}
+%% \usage{
+%% qrR(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE)
+%% }
+%% \arguments{
+%%   \item{qr}{an object of class \code{\linkS4class{sparseQR}},
+%%     almost always the result of a call to generic function \code{qr}
+%%     with sparse \code{x}.}
+%%   \item{complete}{a logical indicating if \eqn{R} should be returned
+%%     instead of \eqn{R_1}{R1}.}
+%%   \item{backPermute}{a logical indicating if \eqn{R} or \eqn{R_1}{R1}
+%%     should be multiplied on the right by \eqn{P_2'}{P2'}.}
+%%   \item{row.names}{a logical indicating if \code{dimnames(qr)[1]}
+%%     should be propagated unpermuted to the result.
+%%     If \code{complete = FALSE}, then only the first \eqn{n} names are kept.}
+%% }
 \section{Slots}{
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual class

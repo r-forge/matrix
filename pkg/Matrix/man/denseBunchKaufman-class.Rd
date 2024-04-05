@@ -11,7 +11,6 @@
 %
 \alias{coerce,denseBunchKaufman,dtpMatrix-method}
 \alias{coerce,denseBunchKaufman,dtrMatrix-method}
-\alias{determinant,denseBunchKaufman,logical-method}
 %
 \description{
   Classes \code{BunchKaufman} and \code{pBunchKaufman} represent

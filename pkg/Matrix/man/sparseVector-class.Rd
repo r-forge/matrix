@@ -11,24 +11,7 @@
 \alias{isparseVector-class}
 \alias{dsparseVector-class}
 \alias{zsparseVector-class}
-% sparse
-\alias{!,sparseVector-method}
-\alias{Arith,sparseVector,ddenseMatrix-method}
-\alias{Arith,sparseVector,dgeMatrix-method}
-\alias{Arith,sparseVector,sparseVector-method}
-\alias{Logic,sparseVector,dMatrix-method}
-\alias{Logic,sparseVector,lMatrix-method}
-\alias{Logic,sparseVector,nMatrix-method}
-\alias{Logic,sparseVector,sparseVector-method}
-\alias{Math,sparseVector-method}
-\alias{Math2,sparseVector-method}
-\alias{Ops,ANY,sparseVector-method}
-\alias{Ops,sparseVector,ANY-method}
-\alias{Ops,sparseVector,Matrix-method}
-\alias{Ops,sparseVector,sparseVector-method}
-\alias{Ops,sparseVector,vector-method}
-\alias{Ops,vector,sparseVector-method}
-\alias{Summary,sparseVector-method}
+%
 \alias{as.array,sparseVector-method}
 \alias{as.complex,sparseVector-method}
 \alias{as.integer,sparseVector-method}
@@ -57,34 +40,7 @@
 \alias{coerce,vector,nsparseVector-method}
 \alias{coerce,vector,sparseVector-method}
 \alias{coerce,vector,zsparseVector-method}
-\alias{diff,sparseVector-method}
-\alias{dim<-,sparseVector-method}
-\alias{head,sparseVector-method}
 \alias{initialize,sparseVector-method}
-\alias{length,sparseVector-method}
-\alias{log,sparseVector-method}
-\alias{mean,sparseVector-method}
-\alias{rep,sparseVector-method}
-\alias{show,sparseVector-method}
-\alias{sort,sparseVector-method}
-\alias{t,sparseVector-method}
-\alias{tail,sparseVector-method}
-\alias{toeplitz,sparseVector-method}
-\alias{zapsmall,sparseVector-method}
-% nsparse
-\alias{!,nsparseVector-method}
-\alias{which,nsparseVector-method}
-% lsparse
-\alias{!,lsparseVector-method}
-\alias{Logic,lsparseVector,lsparseVector-method}
-\alias{which,lsparseVector-method}
-% isparse
-% dsparse
-\alias{-,dsparseVector,missing-method}
-\alias{Arith,dsparseVector,dsparseVector-method}
-% zsparse
-%
-\alias{c.sparseVector}
 %
 \description{Sparse Vector Classes: The virtual mother class
   \code{"sparseVector"} has the five actual daughter classes

@@ -11,8 +11,6 @@
 %
 \alias{coerce,denseCholesky,dtpMatrix-method}
 \alias{coerce,denseCholesky,dtrMatrix-method}
-\alias{determinant,denseCholesky,logical-method}
-\alias{diag,denseCholesky-method}
 %
 \description{
   Classes \code{Cholesky} and \code{pCholesky} represent

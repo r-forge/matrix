@@ -8,9 +8,6 @@
 \alias{symmetricMatrix-class}
 %
 \alias{coerce,matrix,symmetricMatrix-method}
-\alias{dimnames,symmetricMatrix-method}
-\alias{dimnames<-,symmetricMatrix,NULL-method}
-\alias{dimnames<-,symmetricMatrix,list-method}
 %
 \description{
   The virtual class of symmetric matrices, \code{"symmetricMatrix"},
