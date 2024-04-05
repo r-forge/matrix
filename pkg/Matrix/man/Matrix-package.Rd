@@ -5,8 +5,12 @@
 \alias{Matrix-package}
 \alias{Matrix.Version}
 \description{TODO.}
+\usage{
+Matrix.Version()
+}
 %% \details{}
 %% \author{}
 \examples{
-Matrix.Version()
+(Mv <- Matrix.Version())
+stopifnot(identical(Mv[["package"]], utils::packageVersion("Matrix")))
 }
