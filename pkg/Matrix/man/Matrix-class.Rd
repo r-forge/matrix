@@ -47,9 +47,6 @@
 \alias{coerce,vector,Matrix-method}
 \alias{initialize,Matrix-method}
 %
-\alias{Matrix.Version} % FIXME: belongs in non-existent Matrix-package.Rd
-\alias{det}            % FIXME: ditto
-%
 \description{
   The \code{Matrix} class is a class contained by all actual
   classes in the \pkg{Matrix} package.  It is a \dQuote{virtual} class.

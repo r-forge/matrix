@@ -35,8 +35,11 @@
 \alias{determinant,sparseQR,logical-method}
 \alias{determinant,triangularMatrix,logical-method}
 %
+\alias{det}
+%
 \description{TODO.}
 \usage{
+det(x, \dots)
 determinant(x, logarithm = TRUE, \dots)
 }
 \arguments{
