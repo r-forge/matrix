@@ -259,10 +259,10 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			*repr = '\0';
 	} else {
 		/* The length of the result is at most INT_MAX * INT_MAX,
-		   which cannot overflow Matrix_int_fast64_t as long as R
+		   which cannot overflow int_fast64_t as long as R
 		   builds require sizeof(int) equal to 4
 		 */
-		Matrix_int_fast64_t nnz = 0, len = 0, snnz = 0, slen = 0;
+		int_fast64_t nnz = 0, len = 0, snnz = 0, slen = 0;
 		for (a = args; a != R_NilValue && nnz < INT_MAX; a = CDR(a)) {
 			s = CAR(a);
 			if (TYPEOF(s) != S4SXP)
@@ -272,7 +272,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 
 			PROTECT(tmp = GET_SLOT(s, Matrix_DimSym));
 			sdim = INTEGER(tmp);
-			slen = (Matrix_int_fast64_t) sdim[0] * sdim[1];
+			slen = (int_fast64_t) sdim[0] * sdim[1];
 
 			switch (scl[2]) {
 			case 'e':
@@ -849,7 +849,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	if (rdim[!margin] < 0)
 		/* Arguments are all NULL */
 		return R_NilValue;
-	if (repr == 'e' && (Matrix_int_fast64_t) rdim[0] * rdim[1] > R_XLEN_T_MAX)
+	if (repr == 'e' && (int_fast64_t) rdim[0] * rdim[1] > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 	char rcl[] = "...Matrix";

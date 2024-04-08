@@ -22,7 +22,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	 \
 	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)); \
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
-	Matrix_int_fast64_t mn64 = (Matrix_int_fast64_t) m * n; \
+	int_fast64_t mn64 = (int_fast64_t) m * n; \
 	UNPROTECT(1);
 
 #define SUB1_START_EXTRA(_SEXPTYPE_) \
@@ -74,7 +74,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 			if (mn64 >= INT_MAX) { \
 				/* index is never out of bounds */ \
 				SUB1_LOOP((pw[l] == NA_INTEGER), \
-				          _NA_, _ZERO_, _ONE_, _F_, Matrix_int_fast64_t); \
+				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
 			} else { \
 				int mn = m * n; \
 				SUB1_LOOP((pw[l] == NA_INTEGER || pw[l] > mn), \
@@ -86,12 +86,12 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 				/* m*n may not be exactly representable as double */ \
 				/* but it does not exceed INT_MAX * INT_MAX       */ \
 				SUB1_LOOP((ISNAN(pw[l]) || pw[l] >= 0x1.0p+62 || \
-				           (Matrix_int_fast64_t) pw[l] > mn64), \
-				          _NA_, _ZERO_, _ONE_, _F_, Matrix_int_fast64_t); \
+				           (int_fast64_t) pw[l] > mn64), \
+				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
 			else { \
 				double mn1a = (double) m * n + 1.0; \
 				SUB1_LOOP((ISNAN(pw[l]) || pw[l] >= mn1a), \
-				          _NA_, _ZERO_, _ONE_, _F_, Matrix_int_fast64_t); \
+				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
 			} \
 		} \
 	} while (0)
@@ -342,14 +342,14 @@ SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
 	UNPROTECT(1);
 
-	Matrix_int_fast64_t index, n1a = (Matrix_int_fast64_t) n + 1;
+	int_fast64_t index, n1a = (int_fast64_t) n + 1;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
 				pres[l] = _NA_; \
-			else if ((index = (Matrix_int_fast64_t) pw[l] - 1) % n1a != 0) \
+			else if ((index = (int_fast64_t) pw[l] - 1) % n1a != 0) \
 				pres[l] = _ZERO_; \
 			else if (!nonunit) \
 				pres[l] = _ONE_; \
@@ -491,7 +491,7 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 	SUB1_START_EXTRA(kindToType(cl[0]));
 
-	Matrix_int_fast64_t i_, j_;
+	int_fast64_t i_, j_;
 
 #define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \
@@ -540,7 +540,7 @@ SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 {
 	SUB1_START_EXTRA(kindToType(cl[0]));
 
-	Matrix_int_fast64_t i_, j_;
+	int_fast64_t i_, j_;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \
@@ -1234,7 +1234,7 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) ninj));
 
 	int i_, j_;
-	Matrix_int_fast64_t m_ = m;
+	int_fast64_t m_ = m;
 
 #define SUB2_CASES(_SUB2_) \
 	do { \
@@ -1419,7 +1419,7 @@ SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) ninj_));
 
 	int i_, j_;
-	Matrix_int_fast64_t m_ = m;
+	int_fast64_t m_ = m;
 
 #define SUB2(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_) \
 	do { \
@@ -1532,7 +1532,7 @@ SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
 		*pp1 = INTEGER(p1), *pi1 = NULL,
 		d, k, kend, doSort = 0;
-	Matrix_int_fast64_t nnz = 0;
+	int_fast64_t nnz = 0;
 	*(pp1++) = 0;
 
 #define SUB2_FINISH \
@@ -1685,7 +1685,7 @@ SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	int *pp0 = INTEGER(p0), *pj0 = INTEGER(j0),
 		*pp1 = INTEGER(p1), *pj1 = NULL,
 		d, k, kend, doSort = 0;
-	Matrix_int_fast64_t nnz = 0;
+	int_fast64_t nnz = 0;
 	*(pp1++) = 0;
 
 #define SUB2_FINISH \

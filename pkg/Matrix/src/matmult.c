@@ -172,7 +172,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 
 	if (b == R_NilValue) {
 
-		if ((Matrix_int_fast64_t) rm * rm > R_XLEN_T_MAX)
+		if ((int_fast64_t) rm * rm > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
@@ -245,7 +245,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 
 		if (rk != ((btrans != 'N') ? bn : bm))
 			error(_("non-conformable arguments"));
-		if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+		if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 
@@ -320,7 +320,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
 		error(_("non-conformable arguments"));
-	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -445,7 +445,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
 		error(_("non-conformable arguments"));
-	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -556,7 +556,7 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
 		error(_("non-conformable arguments"));
-	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -647,7 +647,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
 		error(_("non-conformable arguments"));
-	if ((Matrix_int_fast64_t) rm * rn > R_XLEN_T_MAX)
+	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -1018,7 +1018,7 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 	if (((xtrans != 'N') ? X->nrow : X->ncol) != Y->nrow)
 		error(_("non-conformable arguments"));
 	int m = (int) ((xtrans != 'N') ? X->ncol : X->nrow), n = (int) Y->ncol;
-	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
+	if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -1272,7 +1272,7 @@ static
 void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int i, j, packed = XLENGTH(x) != (Matrix_int_fast64_t) m * n;
+	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
 
 #define SCALE(_PREFIX_, _CTYPE_, _PTR_, _OP_, _J_) \
 	do { \
@@ -1319,7 +1319,7 @@ static
 void dense_rowscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int i, j, packed = XLENGTH(x) != (Matrix_int_fast64_t) m * n;
+	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
 	SCALE_CASES(i);
 
 #undef SCALE

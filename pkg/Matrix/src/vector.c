@@ -83,7 +83,7 @@ SEXP CR2spV(SEXP from)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n;
+	int_fast64_t mn = (int_fast64_t) m * n;
 	UNPROTECT(1); /* dim */
 
 	if (mn > 0x1.0p+53)

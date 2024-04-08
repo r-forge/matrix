@@ -993,7 +993,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	}
 
 	if (class[0] == 'z' || class[0] == 'd' || packed) {
-		if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
+		if ((int_fast64_t) n * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n);
@@ -1849,8 +1849,8 @@ SEXP R_dense_marginsum(SEXP obj, SEXP margin, SEXP narm, SEXP mean)
 #define TRY_INCREMENT(_LABEL_) \
 	do { \
 		if ((s >= 0) \
-			? ( t <= MATRIX_INT_FAST64_MAX - s) \
-			: (-t <= s - MATRIX_INT_FAST64_MIN)) { \
+			? ( t <= INT_FAST64_MAX - s) \
+			: (-t <= s - INT_FAST64_MIN)) { \
 			s += t; \
 			t = 0; \
 			count = 0; \
@@ -1928,7 +1928,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 
 	if (class[0] == 'n') {
 		int *px = LOGICAL(x);
-		Matrix_int_fast64_t s = (di == 'N') ? 0LL : n;
+		int_fast64_t s = (di == 'N') ? 0LL : n;
 
 #define SUM_KERNEL(_FOR_) \
 		do { \
@@ -2017,7 +2017,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 	} else {
 		int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
-		Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+		int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
 		unsigned int count = 0;
 		int over = 0;
 

@@ -24,7 +24,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		error(_("attempt to construct non-square %s"),
 		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
-	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n;
+	int_fast64_t mn = (int_fast64_t) m * n;
 	if (((!packed) ? mn : (mn + n) / 2) > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
@@ -270,7 +270,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz,
 		m_ = (int) vlen_;
 		n_ = 1;
 	} else if (m_ < 0) {
-		if (vlen_ > (Matrix_int_fast64_t) INT_MAX * n_) {
+		if (vlen_ > (int_fast64_t) INT_MAX * n_) {
 			if (n_ == 0)
 				error(_("nonempty vector supplied for empty matrix"));
 			else
@@ -278,7 +278,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz,
 		}
 		m_ = (n_ == 0) ? 0 : vlen_ / n_ + (vlen_ % n_ != 0);
 	} else if (n_ < 0) {
-		if (vlen_ > (Matrix_int_fast64_t) m_ * INT_MAX) {
+		if (vlen_ > (int_fast64_t) m_ * INT_MAX) {
 			if (m_ == 0)
 				error(_("nonempty vector supplied for empty matrix"));
 			else
@@ -287,7 +287,7 @@ SEXP R_vector_as_dense(SEXP from, SEXP zzz,
 		n_ = (m_ == 0) ? 0 : vlen_ / m_ + (vlen_ % m_ != 0);
 	}
 
-	Matrix_int_fast64_t mlen_ = (Matrix_int_fast64_t) m_ * n_;
+	int_fast64_t mlen_ = (int_fast64_t) m_ * n_;
 	if (vlen_ <= 1)
 		/* do nothing */ ;
 	else if (mlen_ == 0)
@@ -529,7 +529,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	Matrix_int_fast64_t len = (Matrix_int_fast64_t) m * n;
+	int_fast64_t len = (int_fast64_t) m * n;
 	if (packed)
 		len = (len + n) / 2;
 	if (len > R_XLEN_T_MAX)
@@ -817,7 +817,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
-	Matrix_int_fast64_t len = (Matrix_int_fast64_t) n * n;
+	int_fast64_t len = (int_fast64_t) n * n;
 	if (len > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
@@ -956,7 +956,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	Matrix_int_fast64_t len = (Matrix_int_fast64_t) m * n;
+	int_fast64_t len = (int_fast64_t) m * n;
 	if (len > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
@@ -1038,7 +1038,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
                       int m, int n, int byrow, SEXP dimnames)
 {
 	SEXP length0 = GET_SLOT(from, Matrix_lengthSym);
-	Matrix_int_fast64_t r = (Matrix_int_fast64_t)
+	int_fast64_t r = (int_fast64_t)
 		((TYPEOF(length0) == INTSXP) ? INTEGER(length0)[0] : REAL(length0)[0]);
 
 	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
@@ -1095,7 +1095,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		UNPROTECT(1); /* diag */
 	}
 
-	Matrix_int_fast64_t pos, mn = (Matrix_int_fast64_t) m * n, nnz1 = 0;
+	int_fast64_t pos, mn = (int_fast64_t) m * n, nnz1 = 0;
 	R_xlen_t k = 0, nnz0 = XLENGTH(i0);
 
 #define VAS_SUBCASES(...) \
@@ -1128,12 +1128,12 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			else if (r == mn) \
 				nnz1 = nnz0; \
 			else if (r > mn) \
-				while (k < nnz0 && (Matrix_int_fast64_t) pi0[k++] <= mn) \
+				while (k < nnz0 && (int_fast64_t) pi0[k++] <= mn) \
 					nnz1++; \
 			else { \
-				Matrix_int_fast64_t mn_mod_r = mn % r; \
+				int_fast64_t mn_mod_r = mn % r; \
 				nnz1 = nnz0 * (mn / r); \
-				while (k < nnz0 && (Matrix_int_fast64_t) pi0[k++] <= mn_mod_r) \
+				while (k < nnz0 && (int_fast64_t) pi0[k++] <= mn_mod_r) \
 					nnz1++; \
 			} \
 		} \
@@ -1142,17 +1142,17 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				nnz1 = (mn + n) / 2; \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n <= pos / n) \
 						++nnz1; \
 				} else { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n >= pos / n) \
 						++nnz1; \
 				} \
 			} \
 			else { \
-				Matrix_int_fast64_t a = 0; \
+				int_fast64_t a = 0; \
 				if ((ul == 'U') == !byrow) { \
 				while (a < mn) { \
 					k = 0; \
@@ -1177,17 +1177,17 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				nnz1 = (mn - n) / 2; \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n < pos / n) \
 						++nnz1; \
 				} else { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n > pos / n) \
 						++nnz1; \
 				} \
 			} \
 			else { \
-				Matrix_int_fast64_t a = 0; \
+				int_fast64_t a = 0; \
 				if ((ul == 'U') == !byrow) { \
 				while (a < mn) { \
 					k = 0; \
@@ -1244,7 +1244,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 			else if (r >= mn) { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					++pp1[pos / m_]; \
 					*(pi1++) = pos % m_; \
 					_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
@@ -1252,7 +1252,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 			else { \
-				Matrix_int_fast64_t a = 0; \
+				int_fast64_t a = 0; \
 				while (a < mn) { \
 					k = 0; \
 					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
@@ -1287,7 +1287,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			} \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					if ((i_ = pos % n_) <= (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
@@ -1296,7 +1296,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					++k; \
 				} \
 				} else { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					if ((i_ = pos % n_) >= (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
@@ -1307,7 +1307,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 			else { \
-				Matrix_int_fast64_t a = 0; \
+				int_fast64_t a = 0; \
 				if ((ul == 'U') == !byrow) { \
 				while (a < mn) { \
 					k = 0; \
@@ -1359,7 +1359,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			} \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					if ((i_ = pos % n_) < (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
@@ -1368,7 +1368,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					++k; \
 				} \
 				} else { \
-				while (k < nnz0 && (pos = (Matrix_int_fast64_t) pi0[k] - 1) < mn) { \
+				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					if ((i_ = pos % n_) > (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
@@ -1379,7 +1379,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 			else { \
-				Matrix_int_fast64_t a = 0; \
+				int_fast64_t a = 0; \
 				if ((ul == 'U') == !byrow) { \
 				while (a < mn) { \
 					k = 0; \
@@ -1559,7 +1559,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz,
 			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
 
 	SEXP tmp = GET_SLOT(from, Matrix_lengthSym);
-	Matrix_int_fast64_t vlen_ = (Matrix_int_fast64_t)
+	int_fast64_t vlen_ = (int_fast64_t)
 		((TYPEOF(tmp) == INTSXP) ? INTEGER(tmp)[0] : REAL(tmp)[0]);
 	if (zzz_[1] != 'g' && (m_ < 0) != (n_ < 0)) {
 		if (m_ < 0)
@@ -1572,7 +1572,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz,
 		m_ = (int) vlen_;
 		n_ = 1;
 	} else if (m_ < 0) {
-		if (vlen_ > (Matrix_int_fast64_t) INT_MAX * n_) {
+		if (vlen_ > (int_fast64_t) INT_MAX * n_) {
 			if (n_ == 0)
 				error(_("nonempty vector supplied for empty matrix"));
 			else
@@ -1580,7 +1580,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz,
 		}
 		m_ = (n_ == 0) ? 0 : vlen_ / n_ + (vlen_ % n_ != 0);
 	} else if (n_ < 0) {
-		if (vlen_ > (Matrix_int_fast64_t) m_ * INT_MAX) {
+		if (vlen_ > (int_fast64_t) m_ * INT_MAX) {
 			if (m_ == 0)
 				error(_("nonempty vector supplied for empty matrix"));
 			else
@@ -1589,7 +1589,7 @@ SEXP R_vector_as_sparse(SEXP from, SEXP zzz,
 		n_ = (m_ == 0) ? 0 : vlen_ / m_ + (vlen_ % m_ != 0);
 	}
 
-	Matrix_int_fast64_t mlen_ = (Matrix_int_fast64_t) m_ * n_;
+	int_fast64_t mlen_ = (int_fast64_t) m_ * n_;
 	if (vlen_ <= 1)
 		/* do nothing */ ;
 	else if (mlen_ == 0)
@@ -2841,7 +2841,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 		UNPROTECT(1); /* factors */
 	}
 
-	if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
+	if ((int_fast64_t) n * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
@@ -3246,7 +3246,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
-	if ((Matrix_int_fast64_t) n * n > R_XLEN_T_MAX)
+	if ((int_fast64_t) n * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 	if (n > 0)

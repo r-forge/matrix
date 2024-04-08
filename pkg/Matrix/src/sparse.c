@@ -3162,8 +3162,8 @@ SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
 #define TRY_INCREMENT(_LABEL_) \
 	do { \
 		if ((s >= 0) \
-			? ( t <= MATRIX_INT_FAST64_MAX - s) \
-			: (-t <= s - MATRIX_INT_FAST64_MIN)) { \
+			? ( t <= INT_FAST64_MAX - s) \
+			: (-t <= s - INT_FAST64_MIN)) { \
 			s += t; \
 			t = 0; \
 			count = 0; \
@@ -3219,7 +3219,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			n_ = (class[2] == 'C') ? n : m;
 
 		if (class[0] == 'n') {
-			Matrix_int_fast64_t nnz = pp[n_ - 1];
+			int_fast64_t nnz = pp[n_ - 1];
 			if (di != 'N')
 				nnz += n;
 			if (symmetric) {
@@ -3282,7 +3282,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 		} else {
 			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
-			Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+			int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
 			unsigned int count = 0;
 			int over = 0;
 			for (j_ = 0; j_ < n_; ++j_) {
@@ -3330,7 +3330,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		R_xlen_t k, kend = XLENGTH(i);
 
 		if (class[0] == 'n') {
-			Matrix_int_fast64_t nnz = (Matrix_int_fast64_t) kend;
+			int_fast64_t nnz = (int_fast64_t) kend;
 			if (di != 'N')
 				nnz += n;
 			if (symmetric) {
@@ -3377,7 +3377,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 		} else {
 			int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
-			Matrix_int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
+			int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
 			unsigned int count = 0;
 			int over = 0;
 			for (k = 0; k < kend; ++k) {
@@ -3456,7 +3456,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		? 0 : (((class[2] == 'C') == (ul == 'U')) ? 1 : -1);
 	long double zr = 1.0L, zi = 0.0L;
 
-	Matrix_int_fast64_t mn = (Matrix_int_fast64_t) m * n,
+	int_fast64_t mn = (int_fast64_t) m * n,
 		nnz, nnzmax = (symmetric) ? (mn + n) / 2 : mn;
 
 	if (class[2] != 'T') {
@@ -3596,7 +3596,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		int *pi = INTEGER(i), *pj = INTEGER(j);
 		R_xlen_t k, kend = XLENGTH(i);
 
-		nnz = (Matrix_int_fast64_t) kend;
+		nnz = (int_fast64_t) kend;
 		if (di != 'N')
 			nnz += n;
 		if (class[0] == 'n') {

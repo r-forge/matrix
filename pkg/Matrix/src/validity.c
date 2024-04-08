@@ -286,7 +286,7 @@ SEXP unpackedMatrix_validate(SEXP obj)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	UNPROTECT(2); /* dim, x */
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+	if (XLENGTH(x) != (int_fast64_t) m * n)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
 	return ScalarLogical(1);
 }
@@ -297,7 +297,7 @@ SEXP packedMatrix_validate(SEXP obj)
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
 	UNPROTECT(2); /* dim, x */
 	int n = INTEGER(dim)[0];
-	if (XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+	if (XLENGTH(x) != n + ((int_fast64_t) n * (n - 1)) / 2)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "Dim[1]*(Dim[1]+1)/2");
 	return ScalarLogical(1);
 }
@@ -1138,14 +1138,14 @@ SEXP sparseVector_validate(SEXP obj)
 		      "length", "integer", "double");
 	if (XLENGTH(length) != 1)
 		RMKMS(_("'%s' slot does not have length %d"), "length", 1);
-	Matrix_int_fast64_t n;
+	int_fast64_t n;
 	if (TYPEOF(length) == INTSXP) {
 		int n_ = INTEGER(length)[0];
 		if (n_ == NA_INTEGER)
 			RMKMS(_("'%s' slot is NA"), "length");
 		if (n_ < 0)
 			RMKMS(_("'%s' slot is negative"), "length");
-		n = (Matrix_int_fast64_t) n_;
+		n = (int_fast64_t) n_;
 	} else {
 		double n_ = REAL(length)[0];
 		if (ISNAN(n_))
@@ -1154,7 +1154,7 @@ SEXP sparseVector_validate(SEXP obj)
 			RMKMS(_("'%s' slot is negative"), "length");
 		if (n_ > 0x1.0p+53)
 			RMKMS(_("'%s' slot exceeds %s"), "length", "2^53");
-		n = (Matrix_int_fast64_t) n_;
+		n = (int_fast64_t) n_;
 	}
 
 	SEXP i = GET_SLOT(obj, Matrix_iSym);
@@ -1223,7 +1223,7 @@ SEXP denseSchur_validate(SEXP obj)
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
-	Matrix_int_fast64_t nn = (Matrix_int_fast64_t) n * n;
+	int_fast64_t nn = (int_fast64_t) n * n;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
@@ -1266,7 +1266,7 @@ SEXP denseQR_validate(SEXP obj)
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
-	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+	if (XLENGTH(x) != (int_fast64_t) m * n)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
 
 	SEXP beta = GET_SLOT(obj, Matrix_betaSym);
@@ -1309,7 +1309,7 @@ SEXP denseLU_validate(SEXP obj)
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
-	if (XLENGTH(x) != (Matrix_int_fast64_t) m * n)
+	if (XLENGTH(x) != (int_fast64_t) m * n)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
@@ -1361,8 +1361,8 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
-	int packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
-	if (packed && XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+	int packed = XLENGTH(x) != (int_fast64_t) n * n;
+	if (packed && XLENGTH(x) != n + ((int_fast64_t) n * (n - 1)) / 2)
 		RMKMS(_("'%s' slot does not have length %s or length %s"),
 		      "x", "prod(Dim)", "Dim[1]*(Dim[1]+1)/2");
 
@@ -1411,8 +1411,8 @@ SEXP denseCholesky_validate(SEXP obj)
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
 		      "x", "double", "complex");
-	int j, packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
-	if (packed && XLENGTH(x) != n + ((Matrix_int_fast64_t) n * (n - 1)) / 2)
+	int j, packed = XLENGTH(x) != (int_fast64_t) n * n;
+	if (packed && XLENGTH(x) != n + ((int_fast64_t) n * (n - 1)) / 2)
 		RMKMS(_("'%s' slot does not have length %s or length %s"),
 		      "x", "prod(Dim)", "Dim[1]*(Dim[1]+1)/2");
 
@@ -1972,7 +1972,7 @@ SEXP supernodalCholesky_validate(SEXP obj)
 		if (nr < nc)
 			RMKMS(_("first differences of '%s' slot are less than those of '%s' slot"),
 			      "pi", "super");
-		if ((Matrix_int_fast64_t) nr * nc > INT_MAX)
+		if ((int_fast64_t) nr * nc > INT_MAX)
 			RMKMS(_("supernode lengths exceed %s"), "2^31-1");
 		l = nr * nc;
 		if (ppx[k] - ppx[k - 1] != l)

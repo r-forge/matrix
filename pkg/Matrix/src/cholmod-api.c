@@ -974,7 +974,7 @@ SEXP cholmod_dense_as_sexp(cholmod_dense *A, int doFree)
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
 		FREE_THEN(error(_("dimensions cannot exceed %s"), "2^31-1"));
 	int m = (int) A->nrow, n = (int) A->ncol;
-	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
+	if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 		FREE_THEN(error(_("attempt to allocate vector of length exceeding %s"),
 		                "R_XLEN_T_MAX"));
 	char class[] = ".geMatrix";

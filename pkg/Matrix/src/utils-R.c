@@ -22,8 +22,8 @@ SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
 	SEXP r;
 	int i, j, n_ = asInteger(n), packed_ = asLogical(packed),
 		upper_ = asLogical(upper), diag_ = asLogical(diag);
-	Matrix_int_fast64_t
-		nn = (Matrix_int_fast64_t) n_ * n_,
+	int_fast64_t
+		nn = (int_fast64_t) n_ * n_,
 		nx = (packed_) ? n_ + (nn - n_) / 2 : nn,
 		nr = (diag_) ? n_ + (nn - n_) / 2 : (nn - n_) / 2;
 	if (nx > 0x1.0p+53)
@@ -109,8 +109,8 @@ SEXP R_index_diagonal(SEXP n, SEXP packed, SEXP upper)
 	SEXP r;
 	int j, n_ = asInteger(n), packed_ = asLogical(packed),
 		upper_ = asLogical(upper);
-	Matrix_int_fast64_t
-		nn = (Matrix_int_fast64_t) n_ * n_,
+	int_fast64_t
+		nn = (int_fast64_t) n_ * n_,
 		nx = (packed_) ? n_ + (nn - n_) / 2 : nn;
 	if (nx > 0x1.0p+53)
 		error(_("indices would exceed %s"), "2^53");

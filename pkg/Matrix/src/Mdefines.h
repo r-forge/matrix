@@ -20,16 +20,6 @@
 #include <limits.h>
 #include <float.h>
 
-#ifdef INT_FAST64_MAX
-typedef int_fast64_t Matrix_int_fast64_t;
-# define MATRIX_INT_FAST64_MIN INT_FAST64_MIN
-# define MATRIX_INT_FAST64_MAX INT_FAST64_MAX
-#else
-typedef    long long Matrix_int_fast64_t;
-# define MATRIX_INT_FAST64_MIN      LLONG_MIN
-# define MATRIX_INT_FAST64_MAX      LLONG_MAX
-#endif
-
 #ifndef STRICT_R_HEADERS
 # define STRICT_R_HEADERS
 #endif
@@ -223,11 +213,11 @@ Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
 #define PACKED_AR21_UP(i, j) \
-	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * (       (j) + 1)) / 2))
+	((R_xlen_t) ((i) + ((int_fast64_t) (j) * (       (j) + 1)) / 2))
 #define PACKED_AR21_LO(i, j, m2) \
-	((R_xlen_t) ((i) + ((Matrix_int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
+	((R_xlen_t) ((i) + ((int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
 #define PACKED_LENGTH(m) \
-	((R_xlen_t) ((m) + ((Matrix_int_fast64_t) (m) * (       (m) - 1)) / 2))
+	((R_xlen_t) ((m) + ((int_fast64_t) (m) * (       (m) - 1)) / 2))
 
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)

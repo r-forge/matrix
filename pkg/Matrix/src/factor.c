@@ -1000,7 +1000,7 @@ SEXP denseBunchKaufman_expand(SEXP trf)
 	int n = INTEGER(dim)[1];
 
 	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
-	int packed = XLENGTH(x) != (Matrix_int_fast64_t) n * n;
+	int packed = XLENGTH(x) != (int_fast64_t) n * n;
 
 	SEXP P_ = PROTECT(newObject("pMatrix"));
 	char cl[] = "..CMatrix";

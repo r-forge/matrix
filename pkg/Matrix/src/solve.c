@@ -128,7 +128,7 @@ SEXP denseBunchKaufman_solve(SEXP a, SEXP b)
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
+	int packed = XLENGTH(ax) != (int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
@@ -260,7 +260,7 @@ SEXP denseCholesky_solve(SEXP a, SEXP b)
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
+	int packed = XLENGTH(ax) != (int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
@@ -383,7 +383,7 @@ SEXP trMatrix_solve(SEXP a, SEXP b)
 	SOLVE_START;
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
-	int packed = XLENGTH(ax) != (Matrix_int_fast64_t) m * m;
+	int packed = XLENGTH(ax) != (int_fast64_t) m * m;
 
 	char rcl[] = "...Matrix";
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';

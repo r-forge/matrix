@@ -398,7 +398,7 @@ SEXP CHD2M(cholmod_dense *A, char trans, char shape)
 	if (A->nrow > INT_MAX || A->ncol > INT_MAX)
 		return errorChar(_("dimensions cannot exceed %s"), "2^31-1");
 	int m = (int) A->nrow, n = (int) A->ncol;
-	if ((Matrix_int_fast64_t) m * n > R_XLEN_T_MAX)
+	if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 		return errorChar(_("attempt to allocate vector of length exceeding %s"),
 		                 "R_XLEN_T_MAX");
 	char class[] = "...Matrix";
