@@ -71,6 +71,9 @@ do { \
 		R_Free(_VAR_); \
 } while (0)
 
+#define errorChar(...)   mkChar  (Matrix_sprintf(__VA_ARGS__))
+#define errorString(...) mkString(Matrix_sprintf(__VA_ARGS__))
+
 #define HAS_SLOT(x, name)        R_has_slot      (x, name)
 #define GET_SLOT(x, name)        R_do_slot       (x, name)
 #define SET_SLOT(x, name, value) R_do_slot_assign(x, name, value)

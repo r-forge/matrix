@@ -7,37 +7,35 @@
 SEXP checkpi(SEXP p, SEXP i, int m, int n)
 {
 
-#define MKMS(_FORMAT_, ...) mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
-
 	if (TYPEOF(p) != INTSXP)
-		return MKMS(_("'%s' slot is not of type \"%s\""),
-		            "p", "integer");
+		return errorString(_("'%s' slot is not of type \"%s\""),
+		                   "p", "integer");
 	if (XLENGTH(p) - 1 != n)
-		return MKMS(_("'%s' slot does not have length %s"),
-		            "p", "Dim[2]+1");
+		return errorString(_("'%s' slot does not have length %s"),
+		                   "p", "Dim[2]+1");
 	int *pp = INTEGER(p);
 	if (pp[0] != 0)
-		return MKMS(_("first element of '%s' slot is not 0"),
-		            "p");
+		return errorString(_("first element of '%s' slot is not 0"),
+		                   "p");
 	int j;
 	for (j = 1; j <= n; ++j) {
 		if (pp[j] == NA_INTEGER)
-			return MKMS(_("'%s' slot contains NA"),
-			            "p");
+			return errorString(_("'%s' slot contains NA"),
+			                   "p");
 		if (pp[j] < pp[j - 1])
-			return MKMS(_("'%s' slot is not nondecreasing"),
-			            "p");
+			return errorString(_("'%s' slot is not nondecreasing"),
+			                   "p");
 		if (pp[j] - pp[j - 1] > m)
-			return MKMS(_("first differences of '%s' slot exceed %s"),
-			            "p", "Dim[1]");
+			return errorString(_("first differences of '%s' slot exceed %s"),
+			                   "p", "Dim[1]");
 	}
 
 	if (TYPEOF(i) != INTSXP)
-		return MKMS(_("'%s' slot is not of type \"%s\""),
-		            "i", "integer");
+		return errorString(_("'%s' slot is not of type \"%s\""),
+		                   "i", "integer");
 	if (XLENGTH(i) < pp[n])
-		return MKMS(_("'%s' slot has length less than %s"),
-		            "i", "p[length(p)]");
+		return errorString(_("'%s' slot has length less than %s"),
+		                   "i", "p[length(p)]");
 	int *pi = INTEGER(i), k, kend, ik, i0, sorted = 1;
 	for (j = 1, k = 0; j <= n; ++j) {
 		kend = pp[j];
@@ -45,16 +43,16 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 		while (k < kend) {
 			ik = pi[k];
 			if (ik == NA_INTEGER)
-				return MKMS(_("'%s' slot contains NA"),
-				            "i");
+				return errorString(_("'%s' slot contains NA"),
+				                   "i");
 			if (ik < 0 || ik >= m)
-				return MKMS(_("'%s' slot has elements not in {%s}"),
-				            "i", "0,...,Dim[1]-1");
+				return errorString(_("'%s' slot has elements not in {%s}"),
+				                   "i", "0,...,Dim[1]-1");
 			if (ik < i0)
 				sorted = 0;
 			else if (ik == i0)
-				return MKMS(_("'%s' slot is not increasing within columns after sorting"),
-				            "i");
+				return errorString(_("'%s' slot is not increasing within columns after sorting"),
+				                   "i");
 			i0 = ik;
 			++k;
 		}
@@ -68,9 +66,6 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 /* .validateCsparse(x, sort.if.needed = TRUE) */
 SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 {
-
-#define MKMS(_FORMAT_, ...) mkString(Matrix_sprintf(_FORMAT_, __VA_ARGS__))
-
 	SEXP dim = GET_SLOT(x, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
@@ -91,8 +86,8 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 				ik = pi[k];
 				if (ik <= i0) {
 					UNPROTECT(3); /* cpi, i, p */
-					return MKMS(_("'%s' slot is not increasing within columns after sorting"),
-					            "i");
+					return errorString(_("'%s' slot is not increasing within columns after sorting"),
+					                   "i");
 				}
 				i0 = ik;
 				++k;

@@ -230,8 +230,6 @@ cholmod_dense *M2CHD(SEXP obj, char trans)
 	return A;
 }
 
-#define errorChar(...) mkChar(Matrix_sprintf(__VA_ARGS__))
-
 SEXP CHF2M(cholmod_factor *L, int values)
 {
 	values = values && (L->xtype == CHOLMOD_REAL || L->xtype == CHOLMOD_COMPLEX);
