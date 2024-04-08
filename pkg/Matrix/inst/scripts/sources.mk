@@ -2,7 +2,7 @@ sources = \
 	Csparse.c \
 	attrib.c \
 	bind.c \
-	cholmod-common.c \
+	cholmod-api.c \
 	cholmod-etc.c \
 	coerce.c \
 	cs-etc.c \

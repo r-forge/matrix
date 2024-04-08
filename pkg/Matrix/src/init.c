@@ -2,7 +2,7 @@
 #include "Csparse.h"
 #include "attrib.h"
 #include "bind.h"
-#include "cholmod-common.h"
+#include "cholmod-api.h"
 #include "coerce.h"
 #include "dense.h"
 #include "determinant.h"

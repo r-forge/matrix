@@ -1,5 +1,5 @@
-#ifndef MATRIX_CHOLMOD_COMMON_H
-#define MATRIX_CHOLMOD_COMMON_H
+#ifndef MATRIX_CHOLMOD_API_H
+#define MATRIX_CHOLMOD_API_H
 
 #include "cholmod-etc.h"
 
@@ -23,4 +23,4 @@ double          cholmod_factor_ldetA (cholmod_factor *);
 cholmod_factor *cholmod_factor_update(cholmod_factor *, cholmod_sparse *,
                                       double);
 
-#endif /* MATRIX_CHOLMOD_COMMON_H */
+#endif /* MATRIX_CHOLMOD_API_H */

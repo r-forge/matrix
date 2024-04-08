@@ -8,8 +8,8 @@ attrib.o: attrib.c Mdefines.h version.h \
   Msymbols.h utils.h attrib.h
 bind.o: bind.c Mdefines.h version.h \
   Msymbols.h utils.h coerce.h bind.h
-cholmod-common.o: cholmod-common.c Mdefines.h version.h \
-  Msymbols.h utils.h cholmod-common.h \
+cholmod-api.o: cholmod-api.c Mdefines.h version.h \
+  Msymbols.h utils.h cholmod-api.h \
   cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h
 cholmod-etc.o: cholmod-etc.c Mdefines.h version.h \
@@ -42,7 +42,7 @@ idz.o: idz.c Mdefines.h version.h \
   Msymbols.h utils.h idz.h
 init.o: init.c Mdefines.h version.h \
   Msymbols.h utils.h Csparse.h \
-  attrib.h bind.h cholmod-common.h cholmod-etc.h \
+  attrib.h bind.h cholmod-api.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
   expm.h factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
@@ -68,7 +68,7 @@ solve.o: solve.c Lapack-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h version.h \
   Msymbols.h utils.h idz.h solve.h
 sparse.o: sparse.c Mdefines.h version.h \
-  Msymbols.h utils.h sparse.h
+  Msymbols.h utils.h idz.h sparse.h
 subassign.o: subassign.c Mdefines.h version.h \
   Msymbols.h utils.h subassign.h \
   t_subassign.c
