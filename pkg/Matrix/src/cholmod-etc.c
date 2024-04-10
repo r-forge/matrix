@@ -46,9 +46,9 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
 	const char *class = valid[ivalid];
-	values = values && (class[0] == 'd' || class[0] == 'z');
 	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
 	memset(L, 0, sizeof(cholmod_factor));
+	values = values && (class[0] == 'd' || class[0] == 'z');
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		perm = PROTECT(GET_SLOT(obj, Matrix_permSym)),
 		colcount = PROTECT(GET_SLOT(obj, Matrix_colcountSym)),
@@ -140,15 +140,15 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
 	const char *class = valid[ivalid];
-	values = values && (class[0] == 'd' || class[0] == 'z');
-	char trans = (class[2] == 'C') ? 'N' : 'C';
 	cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse));
 	memset(A, 0, sizeof(cholmod_sparse));
+	values = values && (class[0] == 'd' || class[0] == 'z');
+	int mg = (class[2] == 'C') ? 1 : 0;
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(obj, (trans == 'N') ? Matrix_iSym : Matrix_jSym));
-	A->nrow = INTEGER(dim)[(trans == 'N') ? 0 : 1];
-	A->ncol = INTEGER(dim)[(trans == 'N') ? 1 : 0];
+		i = PROTECT(GET_SLOT(obj, (mg == 1) ? Matrix_iSym : Matrix_jSym));
+	A->nrow = INTEGER(dim)[(mg == 1) ? 0 : 1];
+	A->ncol = INTEGER(dim)[(mg == 1) ? 1 : 0];
 	A->nzmax = INTEGER(p)[A->ncol];
 	A->p = INTEGER(p);
 	A->i = INTEGER(i);
@@ -159,8 +159,8 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	A->sorted = 1;
 	A->packed = 1;
 	if (class[1] == 's') {
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	A->stype = ((*CHAR(STRING_ELT(uplo, 0)) == 'U') == (trans == 'N')) ? -1 : 1;
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		A->stype = ((*CHAR(STRING_ELT(uplo, 0)) == 'U') == (mg == 1)) ? -1 : 1;
 	}
 	if (values) {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
