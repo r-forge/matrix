@@ -160,7 +160,7 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 	A->packed = 1;
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		A->stype = ((*CHAR(STRING_ELT(uplo, 0)) == 'U') == (mg == 1)) ? -1 : 1;
+		A->stype = ((*CHAR(STRING_ELT(uplo, 0)) == 'U') == (mg == 1)) ? 1 : -1;
 	}
 	if (values) {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
