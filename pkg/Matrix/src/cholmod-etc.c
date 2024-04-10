@@ -135,13 +135,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 
 cholmod_sparse *M2CHS(SEXP obj, int values)
 {
-	static const char *valid[] = {
-		"ngCMatrix", "nsCMatrix", "ntCMatrix",
-		"dgCMatrix", "dsCMatrix", "dtCMatrix",
-		"zgCMatrix", "zsCMatrix", "ztCMatrix",
-		"ngRMatrix", "nsRMatrix", "ntRMatrix",
-		"dgRMatrix", "dsRMatrix", "dtRMatrix",
-		"zgRMatrix", "zsRMatrix", "ztRMatrix", "" };
+	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
@@ -238,8 +232,7 @@ cholmod_dense *M2CHD(SEXP obj, char trans)
 
 SEXP CHF2M(cholmod_factor *L, int values)
 {
-	values = values &&
-		(L->xtype == CHOLMOD_REAL || L->xtype == CHOLMOD_COMPLEX);
+	values = values && (L->xtype == CHOLMOD_REAL || L->xtype == CHOLMOD_COMPLEX);
 	if (L->itype != CHOLMOD_INT)
 		return errorChar(_("wrong '%s'"), "itype");
 	if (values && L->dtype != CHOLMOD_DOUBLE)
@@ -345,8 +338,7 @@ SEXP CHF2M(cholmod_factor *L, int values)
 SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 {
 	cholmod_sparse *A_ = A;
-	values = values &&
-		(A->xtype == CHOLMOD_REAL || A->xtype == CHOLMOD_COMPLEX);
+	values = values && (A->xtype == CHOLMOD_REAL || A->xtype == CHOLMOD_COMPLEX);
 	if (A->itype != CHOLMOD_INT)
 		return errorChar(_("wrong '%s'"), "itype");
 	if (values && A->dtype != CHOLMOD_DOUBLE)
