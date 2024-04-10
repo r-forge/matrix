@@ -4,9 +4,9 @@
 #include "Csparse.h"
 
 /* NB: mostly parallel to CsparseMatrix_validate in ./validity.c */
-SEXP checkpi(SEXP p, SEXP i, int m, int n)
+SEXP checkpi(SEXP dim, SEXP p, SEXP i)
 {
-
+	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
 	if (TYPEOF(p) != INTSXP)
 		return errorString(_("'%s' slot is not of type \"%s\""),
 		                   "p", "integer");
@@ -29,7 +29,6 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 			return errorString(_("first differences of '%s' slot exceed %s"),
 			                   "p", "Dim[1]");
 	}
-
 	if (TYPEOF(i) != INTSXP)
 		return errorString(_("'%s' slot is not of type \"%s\""),
 		                   "i", "integer");
@@ -57,7 +56,6 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 			++k;
 		}
 	}
-
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = sorted;
 	return ans;
@@ -66,37 +64,18 @@ SEXP checkpi(SEXP p, SEXP i, int m, int n)
 /* .validateCsparse(x, sort.if.needed = TRUE) */
 SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 {
-	SEXP dim = GET_SLOT(x, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-
-	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
+	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)),
+		p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym)),
-		cpi = PROTECT(checkpi(p, i, m, n));
-
+		cpi = checkpi(dim, p, i);
 	if (TYPEOF(cpi) == LGLSXP && !LOGICAL(cpi)[0]) {
 		cholmod_sparse *A = M2CHS(x, 1);
 		A->sorted = 0;
 		if (!cholmod_sort(A, &c))
 			error(_("'%s' failed"), "cholmod_sort");
-		int *pp = (int *) A->p, *pi = (int *) A->i, i0, ik, j, k, kend;
-		for (j = 1, k = 0; j <= n; ++j) {
-			kend = pp[j];
-			i0 = -1;
-			while (k < kend) {
-				ik = pi[k];
-				if (ik <= i0) {
-					UNPROTECT(3); /* cpi, i, p */
-					return errorString(_("'%s' slot is not increasing within columns after sorting"),
-					                   "i");
-				}
-				i0 = ik;
-				++k;
-			}
-		}
-		LOGICAL(cpi)[0] = 1;
+		cpi = checkpi(dim, p, i);
 	}
-
-	UNPROTECT(3); /* cpi, i, p */
+	UNPROTECT(3); /* i, p, dim */
 	return cpi;
 }
 
