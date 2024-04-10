@@ -232,7 +232,8 @@ cholmod_dense *M2CHD(SEXP obj, char trans)
 
 SEXP CHF2M(cholmod_factor *L, int values)
 {
-	values = values && (L->xtype == CHOLMOD_REAL || L->xtype == CHOLMOD_COMPLEX);
+	values = values &&
+		(L->xtype == CHOLMOD_REAL || L->xtype == CHOLMOD_COMPLEX);
 	if (L->itype != CHOLMOD_INT)
 		return errorChar(_("wrong '%s'"), "itype");
 	if (values && L->dtype != CHOLMOD_DOUBLE)
@@ -338,7 +339,8 @@ SEXP CHF2M(cholmod_factor *L, int values)
 SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 {
 	cholmod_sparse *A_ = A;
-	values = values && (A->xtype == CHOLMOD_REAL || A->xtype == CHOLMOD_COMPLEX);
+	values = values &&
+		(A->xtype == CHOLMOD_REAL || A->xtype == CHOLMOD_COMPLEX);
 	if (A->itype != CHOLMOD_INT)
 		return errorChar(_("wrong '%s'"), "itype");
 	if (values && A->dtype != CHOLMOD_DOUBLE)
