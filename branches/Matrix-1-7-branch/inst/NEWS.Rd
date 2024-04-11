@@ -4,6 +4,33 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
+\section{Changes in version 1.7-1 (2024-04-11 r4951)}{
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item Registered routine \code{sexp_as_cholmod_factor} no
+      longer calls \code{cholmod_check_factor} before returning,
+      leaving the decision to check to the caller.  Accordingly,
+      most \code{cholmod_check_*} are now registered, though packages
+      calling them must use \code{LinkingTo: Matrix (>= 1.7-1)}.
+    }
+  }
+}
+
 \section{Changes in version 1.7-0 (2024-03-16 r4662)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
