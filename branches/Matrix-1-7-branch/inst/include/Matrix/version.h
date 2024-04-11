@@ -5,10 +5,10 @@
 /* e.g., R_MATRIX_PACKAGE_VERSION <op> R_version(major, minor, patch) :    */
 
 /* (version)_{10} = (major minor patch)_{256} */
-#define R_MATRIX_PACKAGE_VERSION 67328
+#define R_MATRIX_PACKAGE_VERSION 67329
 #define R_MATRIX_PACKAGE_MAJOR 1
 #define R_MATRIX_PACKAGE_MINOR 7
-#define R_MATRIX_PACKAGE_PATCH 0
+#define R_MATRIX_PACKAGE_PATCH 1
 
 #define R_MATRIX_ABI_VERSION 2
 
