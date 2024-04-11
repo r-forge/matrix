@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-04-08 r4738)}{
+\section{Changes in version 1.8-0 (2024-04-11 r4749)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -31,6 +31,12 @@
       CHOLMOD parameters after modification, ensuring that the reset
       happens fully and correctly even if CHOLMOD adds, removes, or
       changes the default values of the parameters.
+
+      \item Registered routine \code{sexp_as_cholmod_factor} no
+      longer calls \code{cholmod_check_factor} before returning,
+      leaving the decision to check to the caller.  Accordingly,
+      most \code{cholmod_check_*} are now registered, but packages
+      that call them must use \code{LinkingTo: Matrix (>= 1.8-0)}.
     }
   }
 }
