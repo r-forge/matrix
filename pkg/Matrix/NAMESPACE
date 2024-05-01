@@ -22,7 +22,7 @@ importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames,
            extends, getClassDef, getGroupMembers,
            is, isClassDef, kronecker, new, rbind2,
            setAs, setClass, setClassUnion, setGeneric, setMethod,
-           setOldClass, show, slot, "slot<-", slotNames, validObject)
+           show, slot, "slot<-", slotNames, validObject)
 
 importFrom("stats", contr.SAS, contr.helmert, contr.poly, contr.sum,
            contr.treatment, "contrasts<-", cov2cor , diffinv, model.frame,

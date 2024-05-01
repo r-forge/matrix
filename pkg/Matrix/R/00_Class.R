@@ -1028,7 +1028,6 @@ setClass("zsparseVector",
 
 ## Idea: represent x = c(seq(from1, to1, by1), seq(from2, to2, by2), ...)
 ##       as list(first = x[1L], rle = rle(diff(x)))
-setOldClass("rle")
 setClass("rleDiff",
          ## MJ: simpler would be slots = c(first=, lengths=, values=) ...
          slots = c(first = "numeric", rle = "rle"),
