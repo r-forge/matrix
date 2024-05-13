@@ -62,7 +62,7 @@ size_t kindToSize(char kind)
 
 const char *Matrix_nonvirtual(SEXP obj, int mode)
 {
-	if (!IS_S4_OBJECT(obj))
+	if (TYPEOF(obj) != OBJSXP)
 		return "";
 	static const char *valid[] = { VALID_NONVIRTUAL, "" };
 	int ivalid = R_check_class_etc(obj, valid);
@@ -73,7 +73,7 @@ const char *Matrix_nonvirtual(SEXP obj, int mode)
 
 char Matrix_kind(SEXP obj)
 {
-	if (IS_S4_OBJECT(obj)) {
+	if (TYPEOF(obj) == OBJSXP) {
 		static const char *valid[] = { VALID_NONVIRTUAL, "" };
 		int ivalid = R_check_class_etc(obj, valid);
 		if (ivalid < 0)
@@ -98,7 +98,7 @@ char Matrix_kind(SEXP obj)
 
 char Matrix_shape(SEXP obj)
 {
-	if (!IS_S4_OBJECT(obj))
+	if (TYPEOF(obj) != OBJSXP)
 		return '\0';
 	static const char *valid[] = { VALID_NONVIRTUAL, "" };
 	int ivalid = R_check_class_etc(obj, valid);
@@ -110,7 +110,7 @@ char Matrix_shape(SEXP obj)
 
 char Matrix_repr(SEXP obj)
 {
-	if (!IS_S4_OBJECT(obj))
+	if (TYPEOF(obj) != OBJSXP)
 		return '\0';
 	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
 	int ivalid = R_check_class_etc(obj, valid);

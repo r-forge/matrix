@@ -26,7 +26,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		s = CAR(a);
 		if (s == R_NilValue)
 			continue;
-		if (TYPEOF(s) == S4SXP) {
+		if (TYPEOF(s) == OBJSXP) {
 			++nS4;
 			ivalid = R_check_class_etc(s, valid);
 			if (ivalid < 0) {
@@ -191,7 +191,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 
 	for (a = args, e = exprs; a != R_NilValue; a = CDR(a), e = CDR(e)) {
 		s = CAR(a);
-		if ((s == R_NilValue && rdim[!margin] > 0) || TYPEOF(s) == S4SXP)
+		if ((s == R_NilValue && rdim[!margin] > 0) || TYPEOF(s) == OBJSXP)
 			continue;
 		if (s == R_NilValue)
 			rdim[margin] += 1;
@@ -265,7 +265,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		int_fast64_t nnz = 0, len = 0, snnz = 0, slen = 0;
 		for (a = args; a != R_NilValue && nnz < INT_MAX; a = CDR(a)) {
 			s = CAR(a);
-			if (TYPEOF(s) != S4SXP)
+			if (TYPEOF(s) != OBJSXP)
 				continue;
 			ivalid = R_check_class_etc(s, valid);
 			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
@@ -374,7 +374,7 @@ void coerceArgs(SEXP args, int margin,
 			continue;
 		PROTECT_INDEX pid;
 		PROTECT_WITH_INDEX(s, &pid);
-		if (TYPEOF(s) == S4SXP) {
+		if (TYPEOF(s) == OBJSXP) {
 			ivalid = R_check_class_etc(s, valid);
 			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 			switch (scl[2]) {
@@ -534,7 +534,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				s = CAR(a); \
 				if (s == R_NilValue) \
 					continue; \
-				if (TYPEOF(s) != S4SXP) \
+				if (TYPEOF(s) != OBJSXP) \
 					tmp = getAttrib(s, R_DimSymbol); \
 				else { \
 					s = GET_SLOT(s, Matrix_xSym); \
@@ -888,7 +888,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 			if (s == R_NilValue && rdim[!margin] > 0)
 				continue;
 			nms[0] = nms[1] = R_NilValue;
-			if (TYPEOF(s) == S4SXP) {
+			if (TYPEOF(s) == OBJSXP) {
 				ivalid = R_check_class_etc(s, valid);
 				scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
 				tmp = GET_SLOT(s, Matrix_DimSym);

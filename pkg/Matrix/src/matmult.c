@@ -18,7 +18,7 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 		if (xt == yt)
 			error(_("should never happen ..."));
 		SEXP
-			xdim = (TYPEOF(x) == S4SXP)
+			xdim = (TYPEOF(x) == OBJSXP)
 			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol);
 		if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
 			*v = 0;
@@ -35,9 +35,9 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 			SEXP s = x; x = y; y = s;
 		}
 		SEXP
-			xdim = (TYPEOF(x) == S4SXP)
+			xdim = (TYPEOF(x) == OBJSXP)
 			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol),
-			ydim = (TYPEOF(y) == S4SXP)
+			ydim = (TYPEOF(y) == OBJSXP)
 			? GET_SLOT(y, Matrix_DimSym) : getAttrib(y, R_DimSymbol);
 		int xm, xn, ym, yn, x2, y2;
 		xm = xn = ym = yn = -1;
@@ -778,7 +778,7 @@ SEXP R_dense_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans)
 
 #define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
 	do { \
-	if (TYPEOF(_A_) != S4SXP) { \
+	if (TYPEOF(_A_) != OBJSXP) { \
 	REPROTECT(_A_ = matrix_as_dense(_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 0), _PID_); \
 	if (_ISV_) { \
 		/* Vector: discard names and don't transpose again */ \
@@ -1123,7 +1123,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 
 #define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
 	do { \
-	if (TYPEOF(_A_) != S4SXP) { \
+	if (TYPEOF(_A_) != OBJSXP) { \
 	if (boolean_ == NA_LOGICAL || !boolean_) \
 	REPROTECT(_A_ = matrix_as_dense (_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 0), _PID_); \
 	else if (_TRANS_ != 'N') \
@@ -1427,7 +1427,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 
 #define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
 	do { \
-	if (TYPEOF(_A_) != S4SXP) { \
+	if (TYPEOF(_A_) != OBJSXP) { \
 	if (boolean_ == NA_LOGICAL || !boolean_) \
 	REPROTECT(_A_ = matrix_as_dense(_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 2), _PID_); \
 	else \
