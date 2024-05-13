@@ -15,10 +15,10 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #define SUB1_START(_SEXPTYPE_) \
 	SEXPTYPE typ = _SEXPTYPE_; \
 	R_xlen_t l = 0, len = XLENGTH(w); \
-	SEXP res = allocVector(typ, len); \
+	SEXP ans = allocVector(typ, len); \
 	if (len == 0) \
-		return res; \
-	PROTECT(res); \
+		return ans; \
+	PROTECT(ans); \
 	 \
 	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)); \
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
@@ -68,7 +68,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 #define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \
-		_CTYPE_ *pres = _PTR_(res); \
+		_CTYPE_ *pans = _PTR_(ans); \
 		if (TYPEOF(w) == INTSXP) { \
 			int *pw = INTEGER(w); \
 			if (mn64 >= INT_MAX) { \
@@ -109,26 +109,26 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 		_INT_ index, i_, j_; \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else { \
 				index = (_INT_) pw[l] - 1; \
 				if (ge) \
-					pres[l] = _F_(px[index]); \
+					pans[l] = _F_(px[index]); \
 				else { \
 					i_ = index % m; \
 					j_ = index / m; \
 					if (tr) { \
 						if ((upper) ? i_ > j_ : i_ < j_) \
-							pres[l] = _ZERO_; \
+							pans[l] = _ZERO_; \
 						else if (!nonunit && i_ == j_) \
-							pres[l] = _ONE_; \
+							pans[l] = _ONE_; \
 						else \
-							pres[l] = _F_(px[index]); \
+							pans[l] = _F_(px[index]); \
 					} else { \
 						if ((upper) ? i_ > j_ : i_ < j_) \
-							pres[l] = _F_(px[i_ * m + j_]); \
+							pans[l] = _F_(px[i_ * m + j_]); \
 						else \
-							pres[l] = _F_(px[index]); \
+							pans[l] = _F_(px[index]); \
 					} \
 				} \
 			} \
@@ -140,7 +140,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -153,7 +153,7 @@ SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 		_INT_ index, i_, j_; \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else { \
 				index = (_INT_) pw[l] - 1; \
 				i_ = index % m; \
@@ -161,30 +161,30 @@ SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 				if (tr) { \
 					if (upper) { \
 						if (i_ > j_) \
-							pres[l] = _ZERO_; \
+							pans[l] = _ZERO_; \
 						else if (!nonunit && i_ == j_) \
-							pres[l] = _ONE_; \
+							pans[l] = _ONE_; \
 						else \
-							pres[l] = _F_(px[AR21_UP(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
 					} else { \
 						if (i_ < j_) \
-							pres[l] = _ZERO_; \
+							pans[l] = _ZERO_; \
 						else if (!nonunit && i_ == j_) \
-							pres[l] = _ONE_; \
+							pans[l] = _ONE_; \
 						else \
-							pres[l] = _F_(px[AR21_LO(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
 					} \
 				} else { \
 					if (upper) { \
 						if (i_ > j_) \
-							pres[l] = _F_(px[AR21_UP(j_, i_, m)]); \
+							pans[l] = _F_(px[AR21_UP(j_, i_, m)]); \
 						else \
-							pres[l] = _F_(px[AR21_UP(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
 					} else { \
 						if (i_ < j_) \
-							pres[l] = _F_(px[AR21_LO(j_, i_, m)]); \
+							pans[l] = _F_(px[AR21_LO(j_, i_, m)]); \
 						else \
-							pres[l] = _F_(px[AR21_LO(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
 					} \
 				} \
 			} \
@@ -196,7 +196,7 @@ SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -226,9 +226,9 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 					++k; \
 				else { \
 					if (pi[k] > i_) \
-						pres[l] = _ZERO_; \
+						pans[l] = _ZERO_; \
 					else \
-						pres[l] = _F_(px[k]); \
+						pans[l] = _F_(px[k]); \
 					++l; \
 					if (l == len || _NA_SUBSCRIPT_) \
 						j_ = -1; \
@@ -240,7 +240,7 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 				} \
 			} \
 			while (j_ == j) { \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 				++l; \
 				if (l == len || _NA_SUBSCRIPT_) \
 					j_ = -1; \
@@ -253,7 +253,7 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 			j = j_; \
 		} \
 		while (l < len) { \
-			pres[l] = _NA_; \
+			pans[l] = _NA_; \
 			++l; \
 		} \
 	} while (0)
@@ -263,7 +263,7 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(3);
-	return res;
+	return ans;
 }
 
 static
@@ -293,9 +293,9 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 					++k; \
 				else { \
 					if (pj[k] > j_) \
-						pres[l] = _ZERO_; \
+						pans[l] = _ZERO_; \
 					else \
-						pres[l] = _F_(px[k]); \
+						pans[l] = _F_(px[k]); \
 					++l; \
 					if (l == len || _NA_SUBSCRIPT_) \
 						i_ = -1; \
@@ -307,7 +307,7 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 				} \
 			} \
 			while (i_ == i) { \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 				++l; \
 				if (l == len || _NA_SUBSCRIPT_) \
 					i_ = -1; \
@@ -320,7 +320,7 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 			i = i_; \
 		} \
 		while (l < len) { \
-			pres[l] = _NA_; \
+			pans[l] = _NA_; \
 			++l; \
 		} \
 	} while (0)
@@ -330,7 +330,7 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(3);
-	return res;
+	return ans;
 }
 
 static
@@ -348,13 +348,13 @@ SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else if ((index = (int_fast64_t) pw[l] - 1) % n1a != 0) \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 			else if (!nonunit) \
-				pres[l] = _ONE_; \
+				pans[l] = _ONE_; \
 			else \
-				pres[l] = _F_(px[index / n1a]); \
+				pans[l] = _F_(px[index / n1a]); \
 		} \
 	} while (0)
 
@@ -363,7 +363,7 @@ SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -383,15 +383,15 @@ SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 		_INT_ index; \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else { \
 				index = (_INT_) pw[l] - 1; \
 				i_ = (int) (index % m); \
 				j_ = (int) (index / m); \
 				if (!mg) \
-					pres[l] = j_ == pperm[i_] - 1; \
+					pans[l] = j_ == pperm[i_] - 1; \
 				else \
-					pres[l] = i_ == pperm[j_] - 1; \
+					pans[l] = i_ == pperm[j_] - 1; \
 			} \
 		} \
 	} while (0)
@@ -404,7 +404,7 @@ SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 #undef SUB1_START_EXTRA
 
 	UNPROTECT(2);
-	return res;
+	return ans;
 }
 
 /* x[i] with 'i' of type "integer" or "double" {i >= 1 or NA} */
@@ -464,10 +464,10 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #define SUB1_START(_SEXPTYPE_) \
 	SEXPTYPE typ = _SEXPTYPE_; \
 	int l = 0, len = (int) (XLENGTH(w) / 2); \
-	SEXP res = allocVector(typ, len); \
+	SEXP ans = allocVector(typ, len); \
 	if (len == 0) \
-		return res; \
-	PROTECT(res); \
+		return ans; \
+	PROTECT(ans); \
 	int *pw0 = INTEGER(w), *pw1 = pw0 + len;
 
 #define SUB1_START_EXTRA(_SEXPTYPE_) \
@@ -495,7 +495,7 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 #define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \
-		_CTYPE_ *pres = _PTR_(res); \
+		_CTYPE_ *pans = _PTR_(ans); \
 		SUB1_LOOP((pw0[l] == NA_INTEGER || pw1[l] == NA_INTEGER), \
 		          _NA_, _ZERO_, _ONE_, _F_); \
 	} while (0)
@@ -504,24 +504,24 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else { \
 				i_ = pw0[l] - 1; \
 				j_ = pw1[l] - 1; \
 				if (ge) \
-					pres[l] = _F_(px[j_ * m + i_]); \
+					pans[l] = _F_(px[j_ * m + i_]); \
 				else if (tr) { \
 					if ((upper) ? i_ > j_ : i_ < j_) \
-						pres[l] = _ZERO_; \
+						pans[l] = _ZERO_; \
 					else if (!nonunit && i_ == j_) \
-						pres[l] = _ONE_; \
+						pans[l] = _ONE_; \
 					else \
-						pres[l] = _F_(px[j_ * m + i_]); \
+						pans[l] = _F_(px[j_ * m + i_]); \
 				} else { \
 					if ((upper) ? i_ > j_ : i_ < j_) \
-						pres[l] = _F_(px[i_ * m + j_]); \
+						pans[l] = _F_(px[i_ * m + j_]); \
 					else \
-						pres[l] = _F_(px[j_ * m + i_]); \
+						pans[l] = _F_(px[j_ * m + i_]); \
 				} \
 			} \
 		} \
@@ -532,7 +532,7 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -546,37 +546,37 @@ SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else { \
 				i_ = pw0[l] - 1; \
 				j_ = pw1[l] - 1; \
 				if (tr) { \
 					if (upper) { \
 						if (i_ > j_) \
-							pres[l] = _ZERO_; \
+							pans[l] = _ZERO_; \
 						else if (!nonunit && i_ == j_) \
-							pres[l] = _ONE_; \
+							pans[l] = _ONE_; \
 						else \
-							pres[l] = _F_(px[AR21_UP(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
 					} else { \
 						if (i_ < j_) \
-							pres[l] = _ZERO_; \
+							pans[l] = _ZERO_; \
 						else if (!nonunit && i_ == j_) \
-							pres[l] = _ONE_; \
+							pans[l] = _ONE_; \
 						else \
-							pres[l] = _F_(px[AR21_LO(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
 					} \
 				} else { \
 					if (upper) { \
 						if (i_ > j_) \
-							pres[l] = _F_(px[AR21_UP(j_, i_, m)]); \
+							pans[l] = _F_(px[AR21_UP(j_, i_, m)]); \
 						else \
-							pres[l] = _F_(px[AR21_UP(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
 					} else { \
 						if (i_ < j_) \
-							pres[l] = _F_(px[AR21_LO(j_, i_, m)]); \
+							pans[l] = _F_(px[AR21_LO(j_, i_, m)]); \
 						else \
-							pres[l] = _F_(px[AR21_LO(i_, j_, m)]); \
+							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
 					} \
 				} \
 			} \
@@ -588,7 +588,7 @@ SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -616,9 +616,9 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 					++k; \
 				else { \
 					if (pi[k] > i_) \
-						pres[l] = _ZERO_; \
+						pans[l] = _ZERO_; \
 					else \
-						pres[l] = _F_(px[k]); \
+						pans[l] = _F_(px[k]); \
 					++l; \
 					if (l == len || _NA_SUBSCRIPT_) \
 						j_ = -1; \
@@ -629,7 +629,7 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 				} \
 			} \
 			while (j_ == j) { \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 				++l; \
 				if (l == len || _NA_SUBSCRIPT_) \
 					j_ = -1; \
@@ -641,7 +641,7 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 			j = j_; \
 		} \
 		while (l < len) { \
-			pres[l] = _NA_; \
+			pans[l] = _NA_; \
 			++l; \
 		} \
 	} while (0)
@@ -651,7 +651,7 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(3);
-	return res;
+	return ans;
 }
 
 static
@@ -679,9 +679,9 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 					++k; \
 				else { \
 					if (pj[k] > j_) \
-						pres[l] = _ZERO_; \
+						pans[l] = _ZERO_; \
 					else \
-						pres[l] = _F_(px[k]); \
+						pans[l] = _F_(px[k]); \
 					++l; \
 					if (l == len || _NA_SUBSCRIPT_) \
 						i_ = -1; \
@@ -692,7 +692,7 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 				} \
 			} \
 			while (i_ == i) { \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 				++l; \
 				if (l == len || _NA_SUBSCRIPT_) \
 					i_ = -1; \
@@ -704,7 +704,7 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 			i = i_; \
 		} \
 		while (l < len) { \
-			pres[l] = _NA_; \
+			pans[l] = _NA_; \
 			++l; \
 		} \
 	} while (0)
@@ -714,7 +714,7 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(3);
-	return res;
+	return ans;
 }
 
 static
@@ -730,13 +730,13 @@ SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else if (pw0[l] != pw1[l]) \
-				pres[l] = _ZERO_; \
+				pans[l] = _ZERO_; \
 			else if (!nonunit) \
-				pres[l] = _ONE_; \
+				pans[l] = _ONE_; \
 			else \
-				pres[l] = _F_(px[pw0[l] - 1]); \
+				pans[l] = _F_(px[pw0[l] - 1]); \
 		} \
 	} while (0)
 
@@ -745,7 +745,7 @@ SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 #undef SUB1_LOOP
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 static
@@ -764,11 +764,11 @@ SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 	do { \
 		for (l = 0; l < len; ++l) { \
 			if (_NA_SUBSCRIPT_) \
-				pres[l] = _NA_; \
+				pans[l] = _NA_; \
 			else if (!mg) \
-				pres[l] = pw1[l] == pperm[pw0[l] - 1]; \
+				pans[l] = pw1[l] == pperm[pw0[l] - 1]; \
 			else \
-				pres[l] = pw0[l] == pperm[pw1[l] - 1]; \
+				pans[l] = pw0[l] == pperm[pw1[l] - 1]; \
 		} \
 	} while (0)
 
@@ -782,7 +782,7 @@ SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 #undef SUB1_START_EXTRA
 
 	UNPROTECT(2);
-	return res;
+	return ans;
 }
 
 /* x[i] with 'i' of type "integer" and dimensions c(.,2)
@@ -1202,22 +1202,22 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			} \
 		} \
 	} \
-	SEXP res = PROTECT(newObject(cl_)); \
+	SEXP ans = PROTECT(newObject(cl_)); \
 	 \
-	PROTECT(dim = GET_SLOT(res, Matrix_DimSym)); \
+	PROTECT(dim = GET_SLOT(ans, Matrix_DimSym)); \
 	pdim = INTEGER(dim); \
 	pdim[0] = ni; \
 	pdim[1] = nj; \
 	UNPROTECT(1); /* dim */ \
 	 \
 	if ((cl[1] != 's') ? keep < 0 : keep < -1) { \
-		PROTECT(uplo = GET_SLOT(res, Matrix_uploSym)); \
+		PROTECT(uplo = GET_SLOT(ans, Matrix_uploSym)); \
 		SEXP uplo_ = PROTECT(mkChar("L")); \
 		SET_STRING_ELT(uplo, 0, uplo_); \
 		UNPROTECT(2); /* uplo_, uplo */ \
 	} \
 	if (cl[1] == 't' && (keep < -1 || keep > 1)) { \
-		PROTECT(diag = GET_SLOT(res, Matrix_diagSym)); \
+		PROTECT(diag = GET_SLOT(ans, Matrix_diagSym)); \
 		SEXP diag_ = PROTECT(mkChar("U")); \
 		SET_STRING_ELT(diag, 0, diag_); \
 		UNPROTECT(2); /* diag_, diag */ \
@@ -1398,10 +1398,10 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 #undef SUB2
 
-	SET_SLOT(res, Matrix_xSym, x1);
+	SET_SLOT(ans, Matrix_xSym, x1);
 
-	UNPROTECT(3); /* x1, x0, res */
-	return res;
+	UNPROTECT(3); /* x1, x0, ans */
+	return ans;
 }
 
 static
@@ -1507,10 +1507,10 @@ SEXP packedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 #undef SUB2_LOOP
 #undef SUB2
 
-	SET_SLOT(res, Matrix_xSym, x1);
+	SET_SLOT(ans, Matrix_xSym, x1);
 
-	UNPROTECT(3); /* x1, x0, res */
-	return res;
+	UNPROTECT(3); /* x1, x0, ans */
+	return ans;
 }
 
 static
@@ -1549,7 +1549,7 @@ SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)), \
 			x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) nnz)); \
 		SUB2_CASES(SUB2); \
-		SET_SLOT(res, Matrix_xSym, x1); \
+		SET_SLOT(ans, Matrix_xSym, x1); \
 		UNPROTECT(2); /* x1, x0 */ \
 	}
 
@@ -1651,19 +1651,19 @@ SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 #undef SUB2_FINISH
 
-	SET_SLOT(res, Matrix_pSym, p1);
-	SET_SLOT(res, Matrix_iSym, i1);
+	SET_SLOT(ans, Matrix_pSym, p1);
+	SET_SLOT(ans, Matrix_iSym, i1);
 	UNPROTECT(4); /* i1, p1, i0, p0 */
 
 	if (doSort)
-		sort_cr(res, cl);
+		sort_cr(ans, cl);
 	if (cl[1] == 's' && (keep == -1 || keep == 1)) {
 		/* defined in ./sparse.c : */
 		SEXP sparse_force_symmetric(SEXP, const char *, char);
-		res = sparse_force_symmetric(res, cl_, (keep == 1) ? 'U' : 'L');
+		ans = sparse_force_symmetric(ans, cl_, (keep == 1) ? 'U' : 'L');
 	}
-	UNPROTECT(2); /* x, res */
-	return res;
+	UNPROTECT(2); /* x, ans */
+	return ans;
 }
 
 static
@@ -1702,7 +1702,7 @@ SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		SEXP x0 = PROTECT(GET_SLOT(x, Matrix_xSym)), \
 			x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) nnz)); \
 		SUB2_CASES(SUB2); \
-		SET_SLOT(res, Matrix_xSym, x1); \
+		SET_SLOT(ans, Matrix_xSym, x1); \
 		UNPROTECT(2); /* x1, x0 */ \
 	}
 
@@ -1799,19 +1799,19 @@ SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 #undef SUB2_FINISH
 #undef SUB2
 
-	SET_SLOT(res, Matrix_pSym, p1);
-	SET_SLOT(res, Matrix_jSym, j1);
+	SET_SLOT(ans, Matrix_pSym, p1);
+	SET_SLOT(ans, Matrix_jSym, j1);
 	UNPROTECT(4); /* j1, p1, j0, p0 */
 
 	if (doSort)
-		sort_cr(res, cl);
+		sort_cr(ans, cl);
 	if (cl[1] == 's' && (keep == -1 || keep == 1)) {
 		/* defined in ./sparse.c : */
 		SEXP sparse_force_symmetric(SEXP, const char *, char);
-		res = sparse_force_symmetric(res, cl_, (keep == 1) ? 'U' : 'L');
+		ans = sparse_force_symmetric(ans, cl_, (keep == 1) ? 'U' : 'L');
 	}
-	UNPROTECT(2); /* x, res */
-	return res;
+	UNPROTECT(2); /* x, ans */
+	return ans;
 }
 
 static
@@ -1834,9 +1834,9 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 		}
 	}
 
-	SEXP res = PROTECT(newObject(cl_));
+	SEXP ans = PROTECT(newObject(cl_));
 
-	PROTECT(dim = GET_SLOT(res, Matrix_DimSym));
+	PROTECT(dim = GET_SLOT(ans, Matrix_DimSym));
 	pdim = INTEGER(dim);
 	pdim[0] = (int) ni;
 	pdim[1] = (int) nj;
@@ -1844,7 +1844,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 	if (keep > 1) {
 
-		PROTECT(diag = GET_SLOT(res, Matrix_diagSym));
+		PROTECT(diag = GET_SLOT(ans, Matrix_diagSym));
 		SEXP diag_ = PROTECT(mkChar("U"));
 		SET_STRING_ELT(diag, 0, diag_);
 		UNPROTECT(2); /* diag_, diag */
@@ -1869,7 +1869,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 #undef SUB2
 
-		SET_SLOT(res, Matrix_xSym, x1);
+		SET_SLOT(ans, Matrix_xSym, x1);
 		UNPROTECT(2); /* x0, x1 */
 
 	} else {
@@ -1964,9 +1964,9 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 #undef SUB2
 
-		SET_SLOT(res, Matrix_pSym, p1);
-		SET_SLOT(res, Matrix_iSym, i1);
-		SET_SLOT(res, Matrix_xSym, x1);
+		SET_SLOT(ans, Matrix_pSym, p1);
+		SET_SLOT(ans, Matrix_iSym, i1);
+		SET_SLOT(ans, Matrix_xSym, x1);
 		UNPROTECT(4); /* x1, x0, i1, p1 */
 
 		if (nonunit)
@@ -1974,8 +1974,8 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 	}
 
-	UNPROTECT(1); /* res */
-	return res;
+	UNPROTECT(1); /* ans */
+	return ans;
 }
 
 static

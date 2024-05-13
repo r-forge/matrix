@@ -259,25 +259,25 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	}
 
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		res = PROTECT(allocVector(TYPEOF(x), r));
+		ans = PROTECT(allocVector(TYPEOF(x), r));
 
 #define DG_LOOP(_CTYPE_, _PTR_, _ONE_) \
 	do { \
-		_CTYPE_ *pres = _PTR_(res), *px = _PTR_(x); \
+		_CTYPE_ *pans = _PTR_(ans), *px = _PTR_(x); \
 		if (di != 'N') \
 			for (j = 0; j < r; ++j) \
-				*(pres++) = _ONE_; \
+				*(pans++) = _ONE_; \
 		else if (!packed) { \
 			R_xlen_t m1a = (R_xlen_t) m + 1; \
 			for (j = 0; j < r; ++j, px += m1a) \
-				*(pres++) = *px; \
+				*(pans++) = *px; \
 		} \
 		else if (ul == 'U') \
 			for (j = 0; j < n; px += (++j) + 1) \
-				*(pres++) = *px; \
+				*(pans++) = *px; \
 		else \
 			for (j = 0; j < n; px += n - (j++)) \
-				*(pres++) = *px; \
+				*(pans++) = *px; \
 	} while (0)
 
 	switch (class[0]) {
@@ -294,7 +294,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	case 'z':
 		DG_LOOP(Rcomplex, COMPLEX, Matrix_zone);
 		if (class[1] == 's' && ct == 'C')
-			zvreal(COMPLEX(res), XLENGTH(res));
+			zvreal(COMPLEX(ans), XLENGTH(ans));
 		break;
 	default:
 		break;
@@ -309,21 +309,21 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 			cn = VECTOR_ELT(dn, 1);
 		if (cn == R_NilValue) {
 			if (class[1] == 's' && rn != R_NilValue)
-				setAttrib(res, R_NamesSymbol, rn);
+				setAttrib(ans, R_NamesSymbol, rn);
 		} else {
 			if (class[1] == 's')
-				setAttrib(res, R_NamesSymbol, cn);
+				setAttrib(ans, R_NamesSymbol, cn);
 			else if (rn != R_NilValue &&
 			         (rn == cn || equal_character_vectors(rn, cn, r)))
-				setAttrib(res, R_NamesSymbol, (r == m) ? rn : cn);
+				setAttrib(ans, R_NamesSymbol, (r == m) ? rn : cn);
 		}
 		UNPROTECT(1); /* dn */
 	}
 
 #undef DG_LOOP
 
-	UNPROTECT(2); /* x, res */
-	return res;
+	UNPROTECT(2); /* x, ans */
+	return ans;
 }
 
 SEXP R_dense_diag_get(SEXP obj, SEXP names)
@@ -1570,7 +1570,7 @@ do { \
 static
 void dense_colsum(SEXP x, const char *class,
                   int m, int n, char ul, char ct, char di, int narm, int mean,
-                  SEXP res)
+                  SEXP ans)
 {
 	int i, j, count = -1, narm_ = narm && mean && class[0] != 'n',
 		packed = class[2] == 'p';
@@ -1580,7 +1580,7 @@ void dense_colsum(SEXP x, const char *class,
 	             _CAST_, _INCREMENT_ID_, _INCREMENT_CJ_, _SCALE2_) \
 	do { \
 		_CTYPE0_ *px0 = _PTR0_(x); \
-		_CTYPE1_ *px1 = _PTR1_(res), tmp; \
+		_CTYPE1_ *px1 = _PTR1_(ans), tmp; \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
 				*px1 = _ZERO_; \
@@ -1670,7 +1670,7 @@ void dense_colsum(SEXP x, const char *class,
 static
 void dense_rowsum(SEXP x, const char *class,
                   int m, int n, char ul, char ct, char di, int narm, int mean,
-                  SEXP res)
+                  SEXP ans)
 {
 	int i, j, *count = NULL, narm_ = narm && mean && class[0] != 'n',
 		packed = class[2] == 'p', sy = class[1] == 's', he = sy && ct == 'C';
@@ -1686,7 +1686,7 @@ void dense_rowsum(SEXP x, const char *class,
 	             _CAST_, _INCREMENT_ID_, _INCREMENT_CJ_, _SCALE2_) \
 	do { \
 		_CTYPE0_ *px0 = _PTR0_(x); \
-		_CTYPE1_ *px1 = _PTR1_(res), tmp = (di == 'N') ? _ZERO_ : _ONE_; \
+		_CTYPE1_ *px1 = _PTR1_(ans), tmp = (di == 'N') ? _ZERO_ : _ONE_; \
 		for (i = 0; i < m; ++i) \
 			px1[i] = tmp; \
 		if (class[1] == 'g') { \
@@ -1781,7 +1781,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (mg == 0) ? m : n;
 
-	SEXP res = PROTECT(allocVector(SUM_TYPEOF(class[0]), r)),
+	SEXP ans = PROTECT(allocVector(SUM_TYPEOF(class[0]), r)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 
 	SEXP dimnames = (class[1] == 's')
@@ -1790,7 +1790,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 		marnames = VECTOR_ELT(dimnames, mg);
 	if (marnames != R_NilValue) {
 		PROTECT(marnames);
-		setAttrib(res, R_NamesSymbol, marnames);
+		setAttrib(ans, R_NamesSymbol, marnames);
 		UNPROTECT(1); /* marnames */
 	}
 
@@ -1809,12 +1809,12 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	}
 
 	if (mg == 0 || class[1] == 's')
-		dense_rowsum(x, class, m, n, ul, ct, di, narm, mean, res);
+		dense_rowsum(x, class, m, n, ul, ct, di, narm, mean, ans);
 	else
-		dense_colsum(x, class, m, n, ul, ct, di, narm, mean, res);
+		dense_colsum(x, class, m, n, ul, ct, di, narm, mean, ans);
 
-	UNPROTECT(2); /* x, res */
-	return res;
+	UNPROTECT(2); /* x, ans */
+	return ans;
 }
 
 /* (row|col)(Sums|Means)(<denseMatrix>) */
@@ -1865,7 +1865,7 @@ SEXP R_dense_marginsum(SEXP obj, SEXP margin, SEXP narm, SEXP mean)
 
 SEXP dense_sum(SEXP obj, const char *class, int narm)
 {
-	SEXP res;
+	SEXP ans;
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -1944,13 +1944,13 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 #undef SUM_KERNEL
 
 		if (s <= INT_MAX) {
-			res = allocVector(INTSXP, 1);
-			INTEGER(res)[0] = (int) s;
+			ans = allocVector(INTSXP, 1);
+			INTEGER(ans)[0] = (int) s;
 		} else {
-			res = allocVector(REALSXP, 1);
-			REAL(res)[0] = (double) s;
+			ans = allocVector(REALSXP, 1);
+			REAL(ans)[0] = (double) s;
 		}
-		return res;
+		return ans;
 	}
 
 	if (!narm && (class[0] == 'l' || class[0] == 'i')) {
@@ -1960,9 +1960,9 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		do { \
 			_FOR_ { \
 				if (*px == NA_INTEGER) { \
-					res = allocVector(INTSXP, 1); \
-					INTEGER(res)[0] = NA_INTEGER; \
-					return res; \
+					ans = allocVector(INTSXP, 1); \
+					INTEGER(ans)[0] = NA_INTEGER; \
+					return ans; \
 				} \
 				px += 1; \
 			} \
@@ -1993,9 +1993,9 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 
 #undef SUM_KERNEL
 
-		res = allocVector(CPLXSXP, 1);
-		COMPLEX(res)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
-		COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
+		ans = allocVector(CPLXSXP, 1);
+		COMPLEX(ans)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
+		COMPLEX(ans)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
 	} else if (class[0] == 'd') {
 		double *px = REAL(x);
 		long double zr = (di == 'N') ? 0.0L : n;
@@ -2013,8 +2013,8 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 
 #undef SUM_KERNEL
 
-		res = allocVector(REALSXP, 1);
-		REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+		ans = allocVector(REALSXP, 1);
+		REAL(ans)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 	} else {
 		int *px = (class[0] == 'i') ? INTEGER(x) : LOGICAL(x);
 		int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
@@ -2058,20 +2058,20 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 
 #undef SUM_KERNEL
 
-			res = allocVector(REALSXP, 1);
-			REAL(res)[0] = LONGDOUBLE_AS_DOUBLE(zr);
+			ans = allocVector(REALSXP, 1);
+			REAL(ans)[0] = LONGDOUBLE_AS_DOUBLE(zr);
 		} else if (s > INT_MIN && s <= INT_MAX) {
-			res = allocVector(INTSXP, 1);
-			INTEGER(res)[0] = (int) s;
+			ans = allocVector(INTSXP, 1);
+			INTEGER(ans)[0] = (int) s;
 		} else {
-			res = allocVector(REALSXP, 1);
-			REAL(res)[0] = (double) s;
+			ans = allocVector(REALSXP, 1);
+			REAL(ans)[0] = (double) s;
 		}
 	}
 
 #undef SUM_LOOP
 
-	return res;
+	return ans;
 }
 
 /* sum(<denseMatrix>) */
@@ -2092,7 +2092,7 @@ SEXP R_dense_sum(SEXP obj, SEXP narm)
 
 SEXP dense_prod(SEXP obj, const char *class, int narm)
 {
-	SEXP res = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
+	SEXP ans = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -2175,16 +2175,16 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	if (class[0] == 'n') {
 		int *px = LOGICAL(x);
 		if (class[1] == 't')
-			REAL(res)[0] = (n > 1 || (n == 1 && *px == 0)) ? 0.0 : 1.0;
+			REAL(ans)[0] = (n > 1 || (n == 1 && *px == 0)) ? 0.0 : 1.0;
 		else {
 
 #define PROD_KERNEL(_FOR_) \
 			do { \
 				_FOR_ { \
 					if (*px == 0) { \
-						REAL(res)[0] = 0.0; \
-						UNPROTECT(1); /* res */ \
-						return res; \
+						REAL(ans)[0] = 0.0; \
+						UNPROTECT(1); /* ans */ \
+						return ans; \
 					} \
 					px += 1; \
 				} \
@@ -2194,10 +2194,10 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 
 #undef PROD_KERNEL
 
-			REAL(res)[0] = 1.0;
+			REAL(ans)[0] = 1.0;
 		}
-		UNPROTECT(1); /* res */
-		return res;
+		UNPROTECT(1); /* ans */
+		return ans;
 	}
 
 	if (class[0] == 'z') {
@@ -2269,12 +2269,12 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 #undef PROD_LOOP
 
 	if (class[0] == 'z') {
-		COMPLEX(res)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
-		COMPLEX(res)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
+		COMPLEX(ans)[0].r = LONGDOUBLE_AS_DOUBLE(zr);
+		COMPLEX(ans)[0].i = LONGDOUBLE_AS_DOUBLE(zi);
 	} else
-		   REAL(res)[0]   = LONGDOUBLE_AS_DOUBLE(zr);
-	UNPROTECT(1); /* res */
-	return res;
+		   REAL(ans)[0]   = LONGDOUBLE_AS_DOUBLE(zr);
+	UNPROTECT(1); /* ans */
+	return ans;
 }
 
 /* prod(<denseMatrix>) */

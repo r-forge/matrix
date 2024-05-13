@@ -3,21 +3,21 @@
 
 int isPerm(const int *p, int n, int off)
 {
-	int res = 1;
+	int ans = 1;
 	if (n <= 0)
-		return res;
+		return ans;
 	int i, j;
 	char *work;
 	Matrix_Calloc(work, n, char);
 	for (i = 0; i < n; ++i) {
 		if (p[i] == NA_INTEGER || (j = p[i] - off) < 0 || j >= n || work[j]) {
-			res = 0;
+			ans = 0;
 			break;
 		}
 		work[j] = 1;
 	}
 	Matrix_Free(work, n);
-	return res;
+	return ans;
 }
 
 int signPerm(const int *p, int n, int off)

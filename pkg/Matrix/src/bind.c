@@ -492,7 +492,7 @@ void coerceArgs(SEXP args, int margin,
 }
 
 static
-void bindArgs(SEXP args, int margin, SEXP res,
+void bindArgs(SEXP args, int margin, SEXP ans,
               int *rdim, char kind, char repr)
 {
 	SEXP a, s;
@@ -525,7 +525,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP x = PROTECT(allocVector(kindToType(kind), mn)), tmp;
-		SET_SLOT(res, Matrix_xSym, x);
+		SET_SLOT(ans, Matrix_xSym, x);
 
 #define BIND_E(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -604,7 +604,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1));
 		int *pp = INTEGER(p);
-		SET_SLOT(res, Matrix_pSym, p);
+		SET_SLOT(ans, Matrix_pSym, p);
 
 		if (rdim[0] == 0 || rdim[1] == 0) {
 			Matrix_memset(pp, 0, (R_xlen_t) rdim[margin] + 1, sizeof(int));
@@ -631,7 +631,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi;
-		SET_SLOT(res, iSym, i);
+		SET_SLOT(ans, iSym, i);
 
 #define BIND_C1R0(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -660,7 +660,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_C1R0(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(res, Matrix_xSym, x);
+			SET_SLOT(ans, Matrix_xSym, x);
 			BIND_CASES(BIND_C1R0);
 			UNPROTECT(1);
 		}
@@ -670,7 +670,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
 		int *pp = INTEGER(p);
-		SET_SLOT(res, Matrix_pSym, p);
+		SET_SLOT(ans, Matrix_pSym, p);
 		Matrix_memset(pp, 0, (R_xlen_t) rdim[!margin] + 1, sizeof(int));
 
 		if (rdim[0] == 0 || rdim[1] == 0) {
@@ -698,7 +698,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi, *work, k, kend, pos = 0;
-		SET_SLOT(res, iSym, i);
+		SET_SLOT(ans, iSym, i);
 		Matrix_Calloc(work, n, int);
 		Matrix_memcpy(work, pp, n, sizeof(int));
 
@@ -734,7 +734,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_C0R1(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(res, Matrix_xSym, x);
+			SET_SLOT(ans, Matrix_xSym, x);
 			BIND_CASES(BIND_C0R1);
 			UNPROTECT(1);
 		}
@@ -762,8 +762,8 @@ void bindArgs(SEXP args, int margin, SEXP res,
 			i = PROTECT(allocVector(INTSXP, nnz)),
 			j = PROTECT(allocVector(INTSXP, nnz));
 		int *psi, *psj, *pi = INTEGER(i), *pj = INTEGER(j), pos = 0;
-		SET_SLOT(res, Matrix_iSym, i);
-		SET_SLOT(res, Matrix_jSym, j);
+		SET_SLOT(ans, Matrix_iSym, i);
+		SET_SLOT(ans, Matrix_jSym, j);
 
 #define BIND_T(_CTYPE_, _PTR_, _MASK_) \
 		do { \
@@ -802,7 +802,7 @@ void bindArgs(SEXP args, int margin, SEXP res,
 			BIND_T(int, LOGICAL, HIDE);
 		else {
 			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(res, Matrix_xSym, x);
+			SET_SLOT(ans, Matrix_xSym, x);
 			BIND_CASES(BIND_T);
 			UNPROTECT(1);
 		}
@@ -820,10 +820,10 @@ void bindArgs(SEXP args, int margin, SEXP res,
 			Matrix_memcpy(pp, INTEGER(sp), LENGTH(sp), sizeof(int));
 			pp += LENGTH(sp);
 		}
-		SET_SLOT(res, Matrix_permSym, p);
+		SET_SLOT(ans, Matrix_permSym, p);
 		UNPROTECT(1);
 		if (margin)
-			INTEGER(GET_SLOT(res, Matrix_marginSym))[0] = 2;
+			INTEGER(GET_SLOT(ans, Matrix_marginSym))[0] = 2;
 
 	}
 
@@ -865,16 +865,16 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 		rcl[2] = repr;
 		coerceArgs(args, margin, rdim, kind, repr);
 	}
-	SEXP res = PROTECT(newObject(rcl));
-	bindArgs(args, margin, res, rdim, kind, repr);
+	SEXP ans = PROTECT(newObject(rcl));
+	bindArgs(args, margin, ans, rdim, kind, repr);
 
-	SEXP dim = PROTECT(GET_SLOT(res, Matrix_DimSym));
+	SEXP dim = PROTECT(GET_SLOT(ans, Matrix_DimSym));
 	INTEGER(dim)[0] = rdim[0];
 	INTEGER(dim)[1] = rdim[1];
 	UNPROTECT(1);
 
 	if (rdimnames[0] || rdimnames[1]) {
-		SEXP dimnames = PROTECT(GET_SLOT(res, Matrix_DimNamesSym)),
+		SEXP dimnames = PROTECT(GET_SLOT(ans, Matrix_DimNamesSym)),
 			marnames = R_NilValue, nms[2], nms_, a, e, s, tmp;
 		int i, ivalid, r = -1, pos = 0, nprotect = 1;
 		const char *scl;
@@ -942,7 +942,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	}
 
 	UNPROTECT(1);
-	return res;
+	return ans;
 }
 
 SEXP R_bind(SEXP args)
