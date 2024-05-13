@@ -292,7 +292,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 						i = PROTECT(GET_SLOT(s, iSym));
 					int *pi = INTEGER(i), j;
 					snnz *= 2;
-					if (*CHAR(STRING_ELT(GET_SLOT(s, Matrix_uploSym), 0)) == 'U') {
+					if (CHAR(STRING_ELT(GET_SLOT(s, Matrix_uploSym), 0))[0] == 'U') {
 						for (j = 0; j < n; ++j)
 							if (pp[j] < pp[j + 1] && pi[pp[j + 1] - 1] == j)
 								--snnz;
@@ -302,7 +302,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 								--snnz;
 					}
 					UNPROTECT(1);
-				} else if (scl[1] == 't' && *CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
+				} else if (scl[1] == 't' && CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0))[0] != 'N')
 					snnz += sdim[0];
 				UNPROTECT(1);
 				break;
@@ -320,7 +320,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 						if (*(pi++) == *(pj++))
 							--snnz;
 					UNPROTECT(1);
-				} else if (scl[1] == 't' && *CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0)) != 'N')
+				} else if (scl[1] == 't' && CHAR(STRING_ELT(GET_SLOT(s, Matrix_diagSym), 0))[0] != 'N')
 					snnz += sdim[0];
 				UNPROTECT(1);
 				break;

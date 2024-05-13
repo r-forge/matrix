@@ -55,11 +55,11 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	char ul0 = 'U', ul1 = 'U', ct = 'C', di = 'N';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		ul0 = *CHAR(STRING_ELT(uplo, 0));
+		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
 
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(from, Matrix_transSym);
-			ct = *CHAR(STRING_ELT(trans, 0));
+			ct = CHAR(STRING_ELT(trans, 0))[0];
 		}
 
 		if (class[1] == 't') {
@@ -67,7 +67,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 			if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
 				return from;
 			SEXP diag = GET_SLOT(from, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 
@@ -246,15 +246,15 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	if (class[1] != 'g') {
 		if (packed) {
 			SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-			ul = *CHAR(STRING_ELT(uplo, 0));
+			ul = CHAR(STRING_ELT(uplo, 0))[0];
 		}
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(obj, Matrix_transSym);
-			ct = *CHAR(STRING_ELT(trans, 0));
+			ct = CHAR(STRING_ELT(trans, 0))[0];
 		}
 		if (class[1] == 't') {
 			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 
@@ -361,7 +361,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
@@ -461,7 +461,7 @@ SEXP R_dense_diag_set(SEXP from, SEXP value)
 		SEXP dense_as_general(SEXP, const char *, int);
 		if (class[1] == 's' && class[0] == 'z' && tv == tx) {
 			SEXP trans = GET_SLOT(from, Matrix_transSym);
-			int ct = *CHAR(STRING_ELT(trans, 0));
+			int ct = CHAR(STRING_ELT(trans, 0))[0];
 			if (ct == 'C') {
 				PROTECT(from = dense_as_general(from, class, 1));
 				class = valid[R_check_class_etc(from, valid)];
@@ -523,7 +523,7 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul == 'U') {
 			PROTECT(uplo = mkString("L"));
 			SET_SLOT(to, Matrix_uploSym, uplo);
@@ -531,14 +531,14 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 		}
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-			char ct = *CHAR(STRING_ELT(trans, 0));
+			char ct = CHAR(STRING_ELT(trans, 0))[0];
 			if (ct != 'C')
 				SET_SLOT(to, Matrix_transSym, trans);
 			UNPROTECT(1); /* trans */
 		}
 		if (class[1] == 't') {
 			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-			char di = *CHAR(STRING_ELT(diag, 0));
+			char di = CHAR(STRING_ELT(diag, 0))[0];
 			if (di != 'N')
 				SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
@@ -607,7 +607,7 @@ SEXP R_dense_transpose(SEXP from, SEXP trans)
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = *CHAR(trans)) != 'C' && ct != 'T'))
+	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	return dense_transpose(from, valid[ivalid], ct);
@@ -618,14 +618,14 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 	char ul0 = 'U', ul1 = 'U', ct0 = 'C', ct1 = 'C', di = 'N';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		ul0 = ul1 = *CHAR(STRING_ELT(uplo, 0));
+		ul0 = ul1 = CHAR(STRING_ELT(uplo, 0))[0];
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(from, Matrix_transSym);
-			ct0 = ct1 = *CHAR(STRING_ELT(trans, 0));
+			ct0 = ct1 = CHAR(STRING_ELT(trans, 0))[0];
 		}
 		if (class[1] == 't') {
 			SEXP diag = GET_SLOT(from, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 	if (ul != '\0')
@@ -745,13 +745,13 @@ SEXP R_dense_force_symmetric(SEXP from, SEXP uplo, SEXP trans)
 	if (uplo != R_NilValue) {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
-		    ((ul = *CHAR(uplo)) != 'U' && ul != 'L'))
+		    ((ul = CHAR(uplo)[0]) != 'U' && ul != 'L'))
 			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
 	if (trans != R_NilValue) {
 		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-		    ((ct = *CHAR(trans)) != 'C' && ct != 'T'))
+		    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
 			error(_("invalid '%s' to '%s'"), "trans", __func__);
 	}
 
@@ -763,7 +763,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	char ct0 = ct, ct1 = ct;
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct0 = *CHAR(STRING_ELT(trans, 0));
+		ct0 = CHAR(STRING_ELT(trans, 0))[0];
 	}
 
 	if (class[0] != 'z' && class[0] != 'd') {
@@ -803,7 +803,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
@@ -818,7 +818,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	char di = 'N';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = *CHAR(STRING_ELT(diag, 0));
+		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	PROTECT_INDEX pid;
@@ -904,7 +904,7 @@ SEXP R_dense_symmpart(SEXP from, SEXP trans)
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = *CHAR(trans)) != 'C' && ct != 'T'))
+	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	return dense_symmpart(from, valid[ivalid], ct);
@@ -947,7 +947,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U' && class[1] == 's')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
@@ -956,7 +956,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	char ct0 = ct, ct1 = ct;
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		ct0 = *CHAR(STRING_ELT(trans, 0));
+		ct0 = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct0 != 'C')
 			SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1);
@@ -965,7 +965,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	char di = 'N';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = *CHAR(STRING_ELT(diag, 0));
+		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
@@ -1084,7 +1084,7 @@ SEXP R_dense_skewpart(SEXP from, SEXP trans)
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = *CHAR(trans)) != 'C' && ct != 'T'))
+	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	return dense_skewpart(from, valid[ivalid], ct);
@@ -1096,7 +1096,7 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 		if (class[0] != 'z')
 			return 1;
 		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		if (*CHAR(STRING_ELT(trans, 0)) == ct)
+		if (CHAR(STRING_ELT(trans, 0))[0] == ct)
 			return 1;
 		checkDN = 0;
 	}
@@ -1111,7 +1111,7 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 		if (class[0] != 'z' || ct != 'C')
 			return dense_is_diagonal(obj, class);
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		if (*CHAR(STRING_ELT(diag, 0)) != 'N')
+		if (CHAR(STRING_ELT(diag, 0))[0] != 'N')
 			return dense_is_diagonal(obj, class);
 	}
 
@@ -1125,7 +1125,7 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 	}
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -1258,7 +1258,7 @@ SEXP R_dense_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = *CHAR(trans)) != 'C' && ct != 'T'))
+	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
 	int checkDN_;
@@ -1276,7 +1276,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 {
 	if (class[1] == 't') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (upper == NA_LOGICAL || (upper != 0) == (ul == 'U'))
 			return (ul == 'U') ? 1 : -1;
 		else if (dense_is_diagonal(obj, class))
@@ -1289,7 +1289,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 		if (!dense_is_diagonal(obj, class))
 			return 0;
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (upper == NA_LOGICAL)
 			return (ul == 'U') ? 1 : -1;
 		else
@@ -1427,7 +1427,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 	char ul = 'U';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 	}
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -1797,14 +1797,14 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	char ul = 'U', ct = 'C', di = 'N';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(obj, Matrix_transSym);
-			ct = *CHAR(STRING_ELT(trans, 0));
+			ct = CHAR(STRING_ELT(trans, 0))[0];
 		}
 		if (class[1] == 't') {
 			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 
@@ -1873,14 +1873,14 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	char ul = 'U', ct = 'C', di = 'N';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(obj, Matrix_transSym);
-			ct = *CHAR(STRING_ELT(trans, 0));
+			ct = CHAR(STRING_ELT(trans, 0))[0];
 		}
 		if (class[1] == 't') {
 			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 
@@ -2100,14 +2100,14 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	char ul = 'U', ct = 'C', di = 'N';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = *CHAR(STRING_ELT(uplo, 0));
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (class[1] == 's' && class[0] == 'z') {
 			SEXP trans = GET_SLOT(obj, Matrix_transSym);
-			ct = *CHAR(STRING_ELT(trans, 0));
+			ct = CHAR(STRING_ELT(trans, 0))[0];
 		}
 		if (class[1] == 't') {
 			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-			di = *CHAR(STRING_ELT(diag, 0));
+			di = CHAR(STRING_ELT(diag, 0))[0];
 		}
 	}
 

@@ -795,7 +795,7 @@ SEXP tCMatrix_solve(SEXP a, SEXP b, SEXP sparse)
 	SOLVE_START;
 
 	SEXP r, auplo = PROTECT(GET_SLOT(a, Matrix_uploSym));
-	char aul = *CHAR(STRING_ELT(auplo, 0));
+	char aul = CHAR(STRING_ELT(auplo, 0))[0];
 	int i, j;
 	Matrix_cs *A = M2CXS(a, 1);
 	CXSPARSE_XTYPE_SET(A->xtype);

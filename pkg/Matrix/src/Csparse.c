@@ -228,7 +228,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 
 	SEXP uplo = getAttrib(obj, Matrix_uploSym);
 	char ul = (TYPEOF(uplo) == STRSXP && LENGTH(uplo) > 0)
-		? *CHAR(STRING_ELT(uplo, 0)) : 'L';
+		? CHAR(STRING_ELT(uplo, 0))[0] : 'L';
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
 	int *pp = INTEGER(p) + 1, j, k = 0, kend, n = (int) (XLENGTH(p) - 1),
@@ -432,7 +432,7 @@ SEXP Csparse_writeMM(SEXP obj, SEXP file)
 	cholmod_sparse *A = M2CHS(obj, 1);
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = *CHAR(STRING_ELT(uplo, 0));
+		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		A->stype = (ul == 'U') ? 1 : -1;
 	}
 

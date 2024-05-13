@@ -85,14 +85,14 @@ SEXP denseBunchKaufman_determinant(SEXP trf, SEXP logarithm)
 	char ct = 'C';
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = GET_SLOT(trf, Matrix_transSym);
-		ct = *CHAR(STRING_ELT(trans, 0));
+		ct = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct != 'C')
 			sign = NA_INTEGER;
 	}
 
 	if (n > 0) {
 	SEXP uplo = GET_SLOT(trf, Matrix_uploSym);
-	char ul = *CHAR(STRING_ELT(uplo, 0));
+	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP pivot = GET_SLOT(trf, Matrix_permSym);
 	int *ppivot = INTEGER(pivot);
@@ -209,7 +209,7 @@ SEXP denseCholesky_determinant(SEXP trf, SEXP logarithm)
 
 	if (n > 0) {
 	SEXP uplo = GET_SLOT(trf, Matrix_uploSym);
-	char ul = *CHAR(STRING_ELT(uplo, 0));
+	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	int j, packed = XLENGTH(x) != (int_fast64_t) n * n;
 	R_xlen_t n1a = (R_xlen_t) n + 1;

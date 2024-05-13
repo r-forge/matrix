@@ -54,7 +54,7 @@ void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
 	if (!isNull(s)) {
 		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
-		if (*CHAR(s = STRING_ELT(s, J)) != '\0') {
+		if (CHAR(s = STRING_ELT(s, J))[0] != '\0') {
 			SET_STRING_ELT(destnms, 0, s);
 			SET_STRING_ELT(destnms, 1, s);
 		}
@@ -74,9 +74,9 @@ void revDN(SEXP dest, SEXP src) {
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
 	if (!isNull(s)) {
 		SEXP srcnms = s, destnms = PROTECT(allocVector(STRSXP, 2));
-		if (*CHAR(s = STRING_ELT(srcnms, 0)) != '\0')
+		if (CHAR(s = STRING_ELT(srcnms, 0))[0] != '\0')
 			SET_STRING_ELT(destnms, 1, s);
-		if (*CHAR(s = STRING_ELT(srcnms, 1)) != '\0')
+		if (CHAR(s = STRING_ELT(srcnms, 1))[0] != '\0')
 			SET_STRING_ELT(destnms, 0, s);
 		setAttrib(dest, R_NamesSymbol, destnms);
 		UNPROTECT(1);

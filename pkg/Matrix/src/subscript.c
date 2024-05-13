@@ -31,11 +31,11 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	int ge = cl[1] == 'g', tr = cl[1] == 't', upper = 1, nonunit = 1; \
 	if (!ge) { \
 		SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym)); \
-		upper = *CHAR(STRING_ELT(uplo, 0)) == 'U'; \
+		upper = CHAR(STRING_ELT(uplo, 0))[0] == 'U'; \
 		UNPROTECT(1); \
 		if (tr) { \
 			SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym)); \
-			nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N'; \
+			nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N'; \
 			UNPROTECT(1); \
 		} \
 	}
@@ -339,7 +339,7 @@ SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 	SUB1_START(kindToType(cl[0]));
 
 	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
-	int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
+	int nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N';
 	UNPROTECT(1);
 
 	int_fast64_t index, n1a = (int_fast64_t) n + 1;
@@ -480,11 +480,11 @@ SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	int ge = cl[1] == 'g', tr = cl[1] == 't', upper = 1, nonunit = 1; \
 	if (!ge) { \
 		SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym)); \
-		upper = *CHAR(STRING_ELT(uplo, 0)) == 'U'; \
+		upper = CHAR(STRING_ELT(uplo, 0))[0] == 'U'; \
 		UNPROTECT(1); \
 		if (tr) { \
 			SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym)); \
-			nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N'; \
+			nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N'; \
 			UNPROTECT(1); \
 		} \
 	}
@@ -723,7 +723,7 @@ SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 	SUB1_START(kindToType(cl[0]));
 
 	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
-	int nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
+	int nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N';
 	UNPROTECT(1);
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
@@ -1174,11 +1174,11 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	SEXP uplo, diag; \
 	if (cl[1] != 'g') { \
 		PROTECT(uplo = GET_SLOT(x, Matrix_uploSym)); \
-		upper = *CHAR(STRING_ELT(uplo, 0)) == 'U'; \
+		upper = CHAR(STRING_ELT(uplo, 0))[0] == 'U'; \
 		UNPROTECT(1); /* uplo */ \
 		if (cl[1] == 't') { \
 			PROTECT(diag = GET_SLOT(x, Matrix_diagSym)); \
-			nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N'; \
+			nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N'; \
 			UNPROTECT(1); /* diag */ \
 		} \
 	} \
@@ -1821,7 +1821,7 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 	int nonunit = 1, keep = 0;
 	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
-	nonunit = *CHAR(STRING_ELT(diag, 0)) == 'N';
+	nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N';
 	UNPROTECT(1); /* diag */
 
 	char cl_[] = ".gCMatrix";

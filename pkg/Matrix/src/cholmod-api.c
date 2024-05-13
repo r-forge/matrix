@@ -156,7 +156,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	A->packed = 1;
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		A->stype = ((*CHAR(STRING_ELT(uplo, 0)) == 'U') == (mg == 1)) ? 1 : -1;
+		A->stype = ((CHAR(STRING_ELT(uplo, 0))[0] == 'U') == (mg == 1)) ? 1 : -1;
 	}
 	if (!A->sorted && !sortInPlace) {
 		void *tmp;
@@ -208,7 +208,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		error(_("'%s' failed in '%s'"), "cholmod_sort", __func__);
 	if (class[1] == 't' && A->ncol > 0 && allocUnit) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		char di = *CHAR(STRING_ELT(diag, 0));
+		char di = CHAR(STRING_ELT(diag, 0))[0];
 		if (di != 'N') {
 			double one[] = { 1.0, 0.0 };
 			cholmod_sparse *I1 = cholmod_speye(A->nrow, A->ncol, A->xtype, &c);
@@ -271,7 +271,7 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 	A->dtype = CHOLMOD_DOUBLE;
 	if (class[1] == 's') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		A->stype = (*CHAR(STRING_ELT(uplo, 0)) == 'U') ? 1 : -1;
+		A->stype = (CHAR(STRING_ELT(uplo, 0))[0] == 'U') ? 1 : -1;
 	}
 	if (class[0] != 'n') {
 	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
@@ -302,7 +302,7 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 	}
 	if (class[1] == 't' && A->ncol > 0 && allocUnit) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		char di = *CHAR(STRING_ELT(diag, 0));
+		char di = CHAR(STRING_ELT(diag, 0))[0];
 		if (di != 'N') {
 			A->nzmax += A->ncol;
 			void *tmp;
