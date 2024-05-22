@@ -177,43 +177,45 @@ non0.i <- function(M, cM = class(M), uniqT = TRUE) {
         .Call(compressed_non_0_ij, M, FALSE)
     else if(extends(cld, "TsparseMatrix")) {
         if(uniqT && !isUniqueT(M))
-	    .Call(compressed_non_0_ij, .M2C(M), TRUE)
-	else cbind(M@i, M@j, deparse.level = 0L)
-    } else if(extends(cld, "diagonalMatrix")) {
+            .Call(compressed_non_0_ij, .M2C(M), TRUE)
+        else cbind(M@i, M@j, deparse.level = 0L)
+    }
+    else if(extends(cld, "diagonalMatrix")) {
         i <- seq.int(from = 0L, length.out = M@Dim[1L])
         if(M@diag == "N")
-	    i <- i[isN0(M@x)]
-	cbind(i, i, deparse.level = 0L)
-    } else if(extends(cld, "indMatrix")) {
+            i <- i[isN0(M@x)]
+        cbind(i, i, deparse.level = 0L)
+    }
+    else if(extends(cld, "indMatrix")) {
         perm <- M@perm
         i <- seq.int(from = 0L, length.out = length(perm))
         if(M@margin == 1L)
             cbind(i, perm - 1L, deparse.level = 0L)
         else cbind(perm - 1L, i, deparse.level = 0L)
-    } else
-        stop(gettextf("non0.i() not yet implemented for class %s", dQuote(cM)),
-             domain = NA)
+    }
+    else stop(gettextf("'%s' not implemented for class \"%s\"", "non0.i", cM),
+              domain = NA)
 }
 
 ##' the "more versatile / user" function (still not exported):
 non0ind <- function(x, cld = getClassDef(class(x)),
-		    uniqT = TRUE, xtendSymm = TRUE, check.Udiag = TRUE)
+                    uniqT = TRUE, xtendSymm = TRUE, check.Udiag = TRUE)
 {
     if(is.numeric(x)) {
         n <- length(x)
         return(if(n == 0L)
                    integer(0L)
                else if(is.matrix(x))
-                   arrayInd(seq_len(n)[isN0(x)], dim(x)) - 1L
-               else (0:(n-1L))[isN0(x)])
+                   arrayInd(seq_len(n)[is.na(x) | x], dim(x)) - 1L
+               else (0:(n-1L))[is.na(x) | x])
     }
     stopifnot(extends(cld, "sparseMatrix"))
 
     ij <- non0.i(x, cld, uniqT = uniqT)
     if(xtendSymm && extends(cld, "symmetricMatrix")) {
         ## also get "other" triangle, but not the diagonal again
-	notdiag <- ij[, 1L] != ij[, 2L]
-	rbind(ij, ij[notdiag, 2:1], deparse.level = 0L)
+        notdiag <- ij[, 1L] != ij[, 2L]
+        rbind(ij, ij[notdiag, 2:1], deparse.level = 0L)
     } else if(check.Udiag && extends(cld, "triangularMatrix") &&
               x@diag == "U") {
         i <- seq.int(from = 0L, length.out = x@Dim[1L])
@@ -235,7 +237,7 @@ decodeInd <- function(code, nr)
 
 complementInd <- function(ij, dim, orig1=FALSE, checkBnds=FALSE) {
     ## Purpose: Compute the complement of the 2-column 0-based ij-matrix
-    ##		but as 1-based indices
+    ## but as 1-based indices
     n <- prod(dim)
     if(n == 0L)
         return(integer(0L))
@@ -410,16 +412,15 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
 
 ##' *Only* to be used as function in
 ##'    setMethod.("Compare", ...., .Cmp.swap)  -->  ./Ops.R  & ./diagMatrix.R
-.Cmp.swap <- function(e1, e2) {
+.Cmp.swap <- function(e1, e2)
     ## "swap RHS and LHS" and use the method below:
     switch(.Generic,
-	   "==" =,
+           "==" = ,
            "!=" = callGeneric(e2, e1),
-	   "<"	= e2 >	e1,
-	   "<=" = e2 >= e1,
-	   ">"	= e2 <	e1,
-	   ">=" = e2 <= e1)
-}
+           "<"  = e2 >  e1,
+           "<=" = e2 >= e1,
+           ">"  = e2 <  e1,
+           ">=" = e2 <= e1)
 
 .diag.dsC <- function(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag") {
     if(!missing(Chx))
