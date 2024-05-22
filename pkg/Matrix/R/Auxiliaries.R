@@ -1,5 +1,5 @@
-#### "Namespace private" Auxiliaries  such as method functions
-#### (called from more than one place --> need to be defined early)
+## Auxiliary functions, mostly internal (not exported),
+## but see also ./00_Utils.R
 
 is0  <- function(x) !(is.na(x) | x)
 isN0 <- function(x)   is.na(x) | x
