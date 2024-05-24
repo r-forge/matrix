@@ -90,11 +90,9 @@ setMethod("diag<-", c(x = "diagonalMatrix"),
 setMethod("t", c(x = "diagonalMatrix"),
           function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
 
-setMethod("forceSymmetric", c(x = "diagonalMatrix", uplo = "missing"),
-          function(x, uplo) .diag2sparse(x, ".", "s", "C",  "U"))
-
-setMethod("forceSymmetric", c(x = "diagonalMatrix", uplo = "character"),
-          function(x, uplo) .diag2sparse(x, ".", "s", "C", uplo))
+setMethod("forceSymmetric", c(x = "diagonalMatrix"),
+          function(x, uplo = "U", trans = "C", ...)
+              .diag2sparse(x, ".", "s", "C", uplo, trans))
 
 setMethod("symmpart", c(x = "diagonalMatrix"),
           function(x) {

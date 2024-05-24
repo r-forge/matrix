@@ -1237,7 +1237,7 @@ SEXP R_sparse_transpose(SEXP from, SEXP lazy)
 	return sparse_transpose(from, valid[ivalid], lazy_);
 }
 
-SEXP sparse_force_symmetric(SEXP from, const char *class, char ul)
+SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 {
 	char ul0 = 'U', ul1 = 'U';
 	if (class[1] != 'g') {
@@ -1610,8 +1610,8 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul)
 	return to;
 }
 
-/* forceSymmetric(<[CRT]sparseMatrix>, uplo) */
-SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo)
+/* forceSymmetric(<[CRT]sparseMatrix>, uplo, trans) */
+SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo, SEXP trans)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
@@ -1619,15 +1619,21 @@ SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
-	char ul = '\0';
+	char ul = '\0', ct = '\0';
 	if (uplo != R_NilValue) {
 		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
 		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
 		    ((ul = CHAR(uplo)[0]) != 'U' && ul != 'L'))
 			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
+	if (trans != R_NilValue) {
+		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+		    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+			error(_("invalid '%s' to '%s'"), "trans", __func__);
+	}
 
-	return sparse_force_symmetric(from, valid[ivalid], ul);
+	return sparse_force_symmetric(from, valid[ivalid], ul, ct);
 }
 
 SEXP sparse_symmpart(SEXP from, const char *class)

@@ -525,7 +525,7 @@ setMethod("kronecker", c(X = "CsparseMatrix", Y = "CsparseMatrix"),
                       if(uX && uY)
                           r <- ..diagN2U(r, sparse = TRUE)
                   } else if(shape == "s")
-                      r <- .Call(R_sparse_force_symmetric, r, X@uplo)
+                      r <- .Call(R_sparse_force_symmetric, r, X@uplo, "C")
               }
               if(make.dimnames &&
                  !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {
@@ -718,7 +718,7 @@ setMethod("kronecker", c(X = "TsparseMatrix", Y = "TsparseMatrix"),
                       if(uX && uY)
                           r <- ..diagN2U(r, sparse = TRUE)
                   } else if(shape == "s")
-                      r <- .Call(R_sparse_force_symmetric, r, X@uplo)
+                      r <- .Call(R_sparse_force_symmetric, r, X@uplo, "C")
               }
               if(make.dimnames &&
                  !is.null(dnr <- kroneckerDN(dimnames(X), dX, dimnames(Y), dY))) {

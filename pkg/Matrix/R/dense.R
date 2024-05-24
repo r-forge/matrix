@@ -14,10 +14,8 @@
     .Call(R_dense_diag_set, x, value)
 .dense.t <- function(x)
     .Call(R_dense_transpose, x, "T")
-.dense.fS1  <- function(x, uplo)
-    .Call(R_dense_force_symmetric, x, NULL, "C")
-.dense.fS2  <- function(x, uplo)
-    .Call(R_dense_force_symmetric, x, uplo, "C")
+.dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
+    .Call(R_dense_force_symmetric, x, uplo, trans)
 .dense.symmpart <- function(x)
     .Call(R_dense_symmpart, x, "C")
 .dense.skewpart <- function(x)
@@ -114,9 +112,7 @@ setMethod("diag<-", c(x = "denseMatrix"), .dense.diag.set)
 
 setMethod("t"     , c(x = "denseMatrix"), .dense.t)
 
-setMethod("forceSymmetric", c(x = "denseMatrix", uplo =   "missing"), .dense.fS1)
-
-setMethod("forceSymmetric", c(x = "denseMatrix", uplo = "character"), .dense.fS2)
+setMethod("forceSymmetric", c(x = "denseMatrix"), .dense.fS)
 
 setMethod("symmpart", c(x = "denseMatrix"), .dense.symmpart)
 
@@ -201,10 +197,9 @@ setMethod("pack", c(x = "matrix"), .m.pack)
 setMethod("band", c(x = "matrix"), .dense.band)
 setMethod("triu", c(x = "matrix"), .dense.triu)
 setMethod("tril", c(x = "matrix"), .dense.tril)
-setMethod("forceSymmetric", c(x = "matrix", uplo = "missing"),
-          function(x, uplo) .m2dense(x, ".sy", uplo = "U", trans = "C"))
-setMethod("forceSymmetric", c(x = "matrix", uplo = "character"),
-          function(x, uplo) .m2dense(x, ".sy", uplo = uplo, trans = "C"))
+setMethod("forceSymmetric", c(x = "matrix"),
+          function(x, uplo = "U", trans = "C", ...)
+              .m2dense(x, ".sy", uplo = uplo, trans = trans))
 setMethod("symmpart", c(x = "matrix"),
           function(x) {
               Cj <- if(is.complex(x)) Conj else identity
@@ -219,5 +214,5 @@ setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
 setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|t|fS[12]|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
+   list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
                  ls(all.names = TRUE), value = TRUE)))

@@ -76,16 +76,18 @@
 .m2V(from, kind = ".")
 
 .sparse2dense(from, packed = FALSE)
-.diag2dense(from, kind = ".", shape = "t", packed = FALSE, uplo = "U")
+.diag2dense(from, kind = ".", shape = "t", packed = FALSE,
+            uplo = "U", trans = "T")
 .ind2dense(from, kind = "n")
-.m2dense(from, class = ".ge", uplo = "U", trans = "C", diag = "N",
-         margin = 2L)
+.m2dense(from, class = ".ge",
+         uplo = "U", trans = "C", diag = "N", margin = 2L)
 
 .dense2sparse(from, repr = "C")
-.diag2sparse(from, kind = ".", shape = "t", repr = "C", uplo = "U")
+.diag2sparse(from, kind = ".", shape = "t", repr = "C",
+             uplo = "U", trans = "T")
 .ind2sparse(from, kind = "n", repr = ".")
-.m2sparse(from, class = ".gC", uplo = "U", trans = "C", diag = "N",
-          margin = 2L)
+.m2sparse(from, class = ".gC",
+          uplo = "U", trans = "C", diag = "N", margin = 2L)
 
 .tCRT(x, lazy = TRUE)
 

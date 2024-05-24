@@ -50,7 +50,7 @@ setGeneric("facmul",
            signature = c("x", "y"))
 
 setGeneric("forceSymmetric",
-           function(x, uplo)
+           function(x, ...)
                standardGeneric("forceSymmetric"))
 
 setGeneric("isDiagonal",

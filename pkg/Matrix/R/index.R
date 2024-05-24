@@ -128,11 +128,8 @@ setMethod("t", c(x = "indMatrix"),
               r
           })
 
-setMethod("forceSymmetric", c(x = "indMatrix", uplo = "missing"),
-          function(x, uplo) forceSymmetric(.M2kind(x, "n")))
-
-setMethod("forceSymmetric", c(x = "indMatrix", uplo = "character"),
-          function(x, uplo) forceSymmetric(.M2kind(x, "n"), uplo))
+setMethod("forceSymmetric", c(x = "indMatrix"),
+          function(x, ...) forceSymmetric(.M2kind(x, "n"), ...))
 
 setMethod("symmpart", c(x = "indMatrix"),
           function(x) symmpart(.M2kind(x, "d")))

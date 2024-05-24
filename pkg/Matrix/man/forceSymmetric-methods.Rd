@@ -1,5 +1,5 @@
 \name{forceSymmetric-methods}
-\title{Force a Matrix to 'symmetricMatrix' Without Symmetry Checks}
+\title{Symmetrize a Square Matrix}
 %
 \docType{methods}
 \keyword{array}
@@ -8,49 +8,59 @@
 \alias{forceSymmetric}
 \alias{forceSymmetric-methods}
 %
-\alias{forceSymmetric,CsparseMatrix,character-method}
-\alias{forceSymmetric,CsparseMatrix,missing-method}
-\alias{forceSymmetric,RsparseMatrix,character-method}
-\alias{forceSymmetric,RsparseMatrix,missing-method}
-\alias{forceSymmetric,TsparseMatrix,character-method}
-\alias{forceSymmetric,TsparseMatrix,missing-method}
-\alias{forceSymmetric,denseMatrix,character-method}
-\alias{forceSymmetric,denseMatrix,missing-method}
-\alias{forceSymmetric,diagonalMatrix,character-method}
-\alias{forceSymmetric,diagonalMatrix,missing-method}
-\alias{forceSymmetric,indMatrix,character-method}
-\alias{forceSymmetric,indMatrix,missing-method}
-\alias{forceSymmetric,matrix,character-method}
-\alias{forceSymmetric,matrix,missing-method}
+\alias{forceSymmetric,CsparseMatrix-method}
+\alias{forceSymmetric,RsparseMatrix-method}
+\alias{forceSymmetric,TsparseMatrix-method}
+\alias{forceSymmetric,denseMatrix-method}
+\alias{forceSymmetric,diagonalMatrix-method}
+\alias{forceSymmetric,indMatrix-method}
+\alias{forceSymmetric,matrix-method}
 %
 \description{
-  Force a square matrix \code{x} to a \code{\linkS4class{symmetricMatrix}},
-  \bold{without} a symmetry check as it would be applied for \code{as(x,
-    "symmetricMatrix")}.
+Returns the symmetric matrix that results from reflecting one triangle
+of a square matrix onto the other.
 }
 \usage{
-forceSymmetric(x, uplo)
+forceSymmetric(x, \dots)
+
+\S4method{forceSymmetric}{denseMatrix}(x, uplo = NULL, trans = "C", \dots)
+\S4method{forceSymmetric}{CsparseMatrix}(x, uplo = NULL, trans = "C", \dots)
+\S4method{forceSymmetric}{RsparseMatrix}(x, uplo = NULL, trans = "C", \dots)
+\S4method{forceSymmetric}{TsparseMatrix}(x, uplo = NULL, trans = "C", \dots)
+\S4method{forceSymmetric}{diagonalMatrix}(x, uplo = "U", trans = "C", \dots)
+\S4method{forceSymmetric}{indMatrix}(x, \dots)
+\S4method{forceSymmetric}{matrix}(x, uplo = "U", trans = "C", \dots)
 }
 \arguments{
-  \item{x}{any square matrix (of numbers), either \dQuote{"traditional"}
-    (\code{\link{matrix}}) or inheriting from
-    \code{\linkS4class{Matrix}}.}
-  \item{uplo}{optional string, \code{"U"} or \code{"L"} indicating which
-    \dQuote{triangle} half of \code{x} should determine the result.  The
-    default is \code{"U"} unless \code{x} already has a \code{uplo} slot
-    (i.e., when it is \code{\linkS4class{symmetricMatrix}}, or
-    \code{\linkS4class{triangularMatrix}}), where the default will be
-    \code{x@uplo}.}
+\item{x}{a square matrix \code{\linkS4class{Matrix}}.}
+\item{uplo}{a character string, \code{"U"} or \code{"L"}, indicating
+  which of the upper and lower triangles should be reflected.
+  Where it is the default, \code{NULL} is accepted and equivalent
+  to \code{"U"}, unless \code{x} has an \code{uplo} slot, in which
+  case that is used instead.}
+\item{trans}{a character string, \code{"C"} or \code{"T"},
+  indicating if the result should formally equal its conjugate
+  transpose or transpose, i.e., whether the result is formally
+  Hermitian or symmetric.  It matters only in the complex case.
+  The default is \code{"C"}, for consistency with methods for
+  \code{\link{isSymmetric}}.}
+\item{\dots}{optional arguments passed from or to other methods.}
 }
-% \details{
-%
-% }
 \value{
-  a square matrix inheriting from class
-  \code{\linkS4class{symmetricMatrix}}.
+An object inheriting from virtual class
+\code{\linkS4class{symmetricMatrix}},
+representing a Hermitian or symmetric matrix.
 }
-\seealso{\code{\link{symmpart}} for the symmetric part of a matrix, or
-  the coercions \code{as(x, <symmetricMatrix class>)}.
+\details{
+\code{forceSymmetric(x)} can be understood as a coercion to virtual
+class \code{\linkS4class{symmetricMatrix}}.
+However, unlike \code{as(x, "symmetricMatrix")},
+methods for \code{forceSymmetric} do \emph{not} require that \code{x}
+is already approximately symmetric.
+}
+\seealso{
+\code{\link{symmpart}} for the Hermitian or symmetric part of a square
+matrix.
 }
 \examples{
  ## Hilbert matrix
