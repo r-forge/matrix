@@ -27,6 +27,10 @@ setGeneric("band",
                standardGeneric("band"),
            signature = "x")
 
+setGeneric("ct",
+           function(x)
+               standardGeneric("ct"))
+
 setGeneric("expand",
            function(x, ...)
                standardGeneric("expand"))

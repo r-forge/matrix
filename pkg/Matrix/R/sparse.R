@@ -13,7 +13,9 @@
 .sparse.diag.set <- function(x, value)
     .Call(R_sparse_diag_set, x, value)
 .sparse.t <- function(x)
-    .Call(R_sparse_transpose, x, FALSE)
+    .Call(R_sparse_transpose, x, "T", FALSE)
+.sparse.ct <- function(x)
+    .Call(R_sparse_transpose, x, "C", FALSE)
 .sparse.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_sparse_force_symmetric, x, uplo, trans)
 .sparse.symmpart <- function(x, trans = "C", ...)
@@ -96,6 +98,7 @@ setMethod("tril"  , c(x = .cl), .sparse.tril)
 setMethod("diag"  , c(x = .cl), .sparse.diag.get)
 setMethod("diag<-", c(x = .cl), .sparse.diag.set)
 setMethod("t"     , c(x = .cl), .sparse.t)
+setMethod("ct"    , c(x = .cl), .sparse.ct)
 setMethod("forceSymmetric", c(x = .cl), .sparse.fS)
 setMethod("symmpart", c(x = .cl), .sparse.symmpart)
 setMethod("skewpart", c(x = .cl), .sparse.skewpart)
@@ -109,7 +112,7 @@ for(.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
 setMethod("isSymmetric" , c(object = .cl), .sparse.is.sy.dz)
 rm(.cl, .sparse.subclasses)
 
-rm(list = c(grep("^[.]sparse[.](band|tri[ul]|diag[.](get|set)|t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
+rm(list = c(grep("^[.]sparse[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
                  ls(all.names = TRUE), value = TRUE)))
 
 

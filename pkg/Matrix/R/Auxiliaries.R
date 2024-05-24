@@ -128,7 +128,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
         x = if(diag == "N") y else y[FALSE])
 }
 
-.tCRT <- function(x, lazy = TRUE) .Call(R_sparse_transpose, x, lazy)
+.tCRT <- function(x, lazy = TRUE) .Call(R_sparse_transpose, x, "T", lazy)
 
 .drop0 <- function(x, tol = 0, isM = TRUE) {
     if(isM)

@@ -319,7 +319,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 		r = m; m =  n; n =  r;
 		r = a; a = -b; b = -r;
 		ul0 = (ul0 == 'U') ? 'L' : 'U';
-		from = sparse_transpose(from, class, 1);
+		from = sparse_transpose(from, class, 'T', 1);
 	}
 	PROTECT(from);
 
@@ -423,7 +423,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 				UNPROTECT(1); /* x0 */
 			}
 			if (class[2] == 'R')
-				to = sparse_transpose(to, cl, 1);
+				to = sparse_transpose(to, cl, 'T', 1);
 			UNPROTECT(5); /* p1, i0, p0, to, from */
 			return to;
 		}
@@ -481,7 +481,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 			UNPROTECT(2); /* x1, x0 */
 		}
 		if (class[2] == 'R')
-			to = sparse_transpose(to, cl, 1);
+			to = sparse_transpose(to, cl, 'T', 1);
 
 	} else {
 
@@ -1104,7 +1104,7 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 	return from;
 }
 
-SEXP sparse_transpose(SEXP from, const char *class, int lazy)
+SEXP sparse_transpose(SEXP from, const char *class, char ct, int lazy)
 {
 	SEXP to;
 	if (class[2] == 'T' || !lazy)
@@ -1221,7 +1221,7 @@ SEXP sparse_transpose(SEXP from, const char *class, int lazy)
 }
 
 /* t(<[CRT]sparseMatrix>) */
-SEXP R_sparse_transpose(SEXP from, SEXP lazy)
+SEXP R_sparse_transpose(SEXP from, SEXP trans, SEXP lazy)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
@@ -1229,12 +1229,18 @@ SEXP R_sparse_transpose(SEXP from, SEXP lazy)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(from, __func__);
 
+	char ct = 'C';
+	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
+	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
+	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+		error(_("invalid '%s' to '%s'"), "trans", __func__);
+
 	int lazy_;
 	if (TYPEOF(lazy) != LGLSXP || LENGTH(lazy) < 1 ||
 	    (lazy_ = LOGICAL(lazy)[0]) == NA_LOGICAL)
 		error(_("invalid '%s' to '%s'"), "lazy", __func__);
 
-	return sparse_transpose(from, valid[ivalid], lazy_);
+	return sparse_transpose(from, valid[ivalid], ct, lazy_);
 }
 
 SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
@@ -1252,7 +1258,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		/* .s[CRT]Matrix */
 		if (ul0 == ul1)
 			return from;
-		SEXP to = PROTECT(sparse_transpose(from, class, 0));
+		SEXP to = PROTECT(sparse_transpose(from, class, 'T', 0));
 		if (class[0] == 'z') {
 			/* Need _conjugate_ transpose */
 			SEXP x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
@@ -1700,7 +1706,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 		if (class[1] == 'g') {
 
 			cl[1] = 'g';
-			REPROTECT(from = sparse_transpose(from, cl, 0), pid);
+			REPROTECT(from = sparse_transpose(from, cl, 'T', 0), pid);
 
 			SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 				p0_ = PROTECT(GET_SLOT(from, Matrix_pSym)),
@@ -2156,7 +2162,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			*pp1 = INTEGER(p1);
 		pp0++; *(pp1++) = 0;
 
-		REPROTECT(from = sparse_transpose(from, cl, 0), pid);
+		REPROTECT(from = sparse_transpose(from, cl, 'T', 0), pid);
 
 		SEXP
 			p0_ = PROTECT(GET_SLOT(from, Matrix_pSym)),

@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-05-24 r4763)}{
+\section{Changes in version 1.8-0 (2024-05-24 r4764)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -27,7 +27,11 @@
   }
   \subsection{New Features}{
     \itemize{
-      \item .
+      \item Generic function \code{ct} for the conjugate transpose.
+      \code{ct(x)} is equivalent to \code{t(x)} except for complex
+      \code{x}, where it is intended to be more efficient than
+      \code{Conj(t(x))} at least for \code{x} inheriting from virtual
+      class \code{Matrix}.
     }
   }
   \subsection{Bug Fixes}{

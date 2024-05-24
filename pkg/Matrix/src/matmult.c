@@ -998,7 +998,7 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 	}
 
 	if (ztrans != 'N')
-		z = sparse_transpose(z, zclass, 1);
+		z = sparse_transpose(z, zclass, ztrans, 1);
 
 	UNPROTECT(1); /* z */
 	return z;
@@ -1159,7 +1159,7 @@ SEXP R_sparse_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans, SEXP ztrans,
 			REPROTECT(_A_ = dense_as_sparse(_A_, _CLASS_, 'R'), _PID_); \
 			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
 		} \
-		REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, 1), _PID_); \
+		REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, _TRANS_, 1), _PID_); \
 		_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
 		_TRANS_ = 'N'; \
 	} \
@@ -1491,7 +1491,7 @@ SEXP R_diagonal_matmult(SEXP x, SEXP y, SEXP xtrans, SEXP ytrans,
 		if (!id && _CLASS_[1] == 't') \
 			REPROTECT(_A_ = sparse_diag_U2N(_A_, _CLASS_), _PID_); \
 		if (_TRANS_ != 'N') { \
-			REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, 0), _PID_); \
+			REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, _TRANS_, 0), _PID_); \
 			_TRANS_ = 'N'; \
 		} \
 		break; \

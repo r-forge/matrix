@@ -87,8 +87,19 @@ setMethod("diag<-", c(x = "diagonalMatrix"),
               x
           })
 
-setMethod("t", c(x = "diagonalMatrix"),
-          function(x) { x@Dimnames <- x@Dimnames[2:1]; x })
+setMethod( "t", c(x = "diagonalMatrix"),
+          function(x) {
+              x@Dimnames <- x@Dimnames[2:1]
+              x
+          })
+
+setMethod("ct", c(x = "diagonalMatrix"),
+          function(x) {
+              x@Dimnames <- x@Dimnames[2:1]
+              if(is.complex(y <- x@x))
+                  x@x <- Conj(y)
+              x
+          })
 
 setMethod("forceSymmetric", c(x = "diagonalMatrix"),
           function(x, uplo = "U", trans = "C", ...)

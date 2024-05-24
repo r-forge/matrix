@@ -1,5 +1,5 @@
 \name{t-methods}
-\title{Matrix Transpose}
+\title{Matrix (Conjugate) Transpose}
 %
 \docType{methods}
 \keyword{algebra}
@@ -8,6 +8,8 @@
 %
 \alias{t}
 \alias{t-methods}
+\alias{ct}
+\alias{ct-methods}
 %
 \alias{t,CsparseMatrix-method}
 \alias{t,RsparseMatrix-method}
@@ -18,12 +20,23 @@
 \alias{t,pMatrix-method}
 \alias{t,sparseVector-method}
 %
+\alias{ct,CsparseMatrix-method}
+\alias{ct,RsparseMatrix-method}
+\alias{ct,TsparseMatrix-method}
+\alias{ct,denseMatrix-method}
+\alias{ct,diagonalMatrix-method}
+\alias{ct,indMatrix-method}
+\alias{ct,matrix-method}
+\alias{ct,pMatrix-method}
+\alias{ct,sparseVector-method}
+%
 \description{TODO.}
 \usage{
-t(x)
+ t(x)
+ct(x)
 }
 \arguments{
-\item{x}{.}
+\item{x}{a matrix or \code{\linkS4class{Matrix}}.}
 }
 %% \value{}
 %% \seealso{}

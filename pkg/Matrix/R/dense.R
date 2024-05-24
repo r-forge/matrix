@@ -14,6 +14,8 @@
     .Call(R_dense_diag_set, x, value)
 .dense.t <- function(x)
     .Call(R_dense_transpose, x, "T")
+.dense.ct <- function(x)
+    .Call(R_dense_transpose, x, "C")
 .dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_dense_force_symmetric, x, uplo, trans)
 .dense.symmpart <- function(x, trans = "C", ...)
@@ -93,10 +95,10 @@ setMethod("diff", c(x = "denseMatrix"),
               x
           })
 
-setMethod("mean", c(x = "denseMatrix"),
+setMethod("mean"  , c(x = "denseMatrix"),
           function(x, ...) mean.default(.M2v(x), ...))
 
-setMethod("rep", c(x = "denseMatrix"),
+setMethod("rep"   , c(x = "denseMatrix"),
           function(x, ...)          rep(.M2v(x), ...))
 
 setMethod("band"  , c(x = "denseMatrix"), .dense.band)
@@ -110,6 +112,8 @@ setMethod("diag"  , c(x = "denseMatrix"), .dense.diag.get)
 setMethod("diag<-", c(x = "denseMatrix"), .dense.diag.set)
 
 setMethod("t"     , c(x = "denseMatrix"), .dense.t)
+
+setMethod("ct"    , c(x = "denseMatrix"), .dense.ct)
 
 setMethod("forceSymmetric", c(x = "denseMatrix"), .dense.fS)
 
@@ -196,6 +200,8 @@ setMethod("pack", c(x = "matrix"), .m.pack)
 setMethod("band", c(x = "matrix"), .dense.band)
 setMethod("triu", c(x = "matrix"), .dense.triu)
 setMethod("tril", c(x = "matrix"), .dense.tril)
+setMethod("ct", c(x = "matrix"),
+          function(x) if(is.complex(x)) Conj(t(x)) else t(x))
 setMethod("forceSymmetric", c(x = "matrix"),
           function(x, uplo = "U", trans = "C", ...)
               .m2dense(x, ".sy", uplo = uplo, trans = trans))
@@ -213,5 +219,5 @@ setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
 setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
+   list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
                  ls(all.names = TRUE), value = TRUE)))
