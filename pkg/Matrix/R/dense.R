@@ -24,7 +24,7 @@
     .Call(R_dense_skewpart, x, trans)
 .dense.is.di <- function(object)
     .Call(R_dense_is_diagonal, object)
-.dense.is.tr <- function(object, upper = NA, ...)
+.dense.is.tr <- function(object, upper = NA)
     .Call(R_dense_is_triangular, object, upper)
 .dense.is.sy <- function(object, trans = "C", checkDN = TRUE, ...) {
     if(checkDN) {

@@ -150,7 +150,7 @@ setMethod("isDiagonal", c(object = "indMatrix"),
           })
 
 setMethod("isTriangular", c(object = "indMatrix"),
-          function(object, upper = NA, ...) {
+          function(object, upper = NA) {
               d <- object@Dim
               if((n <- d[2L]) != d[1L])
                   return(FALSE)

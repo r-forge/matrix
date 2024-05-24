@@ -24,7 +24,7 @@
     .Call(R_sparse_skewpart, x, trans)
 .sparse.is.di <- function(object)
     .Call(R_sparse_is_diagonal, object)
-.sparse.is.tr <- function(object, upper = NA, ...)
+.sparse.is.tr <- function(object, upper = NA)
     .Call(R_sparse_is_triangular, object, upper)
 .sparse.is.sy <- function(object, trans = "C", checkDN = TRUE, ...) {
     if(checkDN) {

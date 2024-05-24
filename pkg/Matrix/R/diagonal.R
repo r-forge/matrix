@@ -144,7 +144,7 @@ setMethod("isDiagonal", c(object = "diagonalMatrix"),
           function(object) TRUE)
 
 setMethod("isTriangular", c(object = "diagonalMatrix"),
-          function(object, upper = NA, ...)
+          function(object, upper = NA)
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
 setMethod("isSymmetric", c(object = "diagonalMatrix"),

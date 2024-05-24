@@ -40,8 +40,7 @@
   i.e., they have the same number of rows and columns.
 }
 \usage{
-isTriangular(object, upper = NA, \dots)
-
+isTriangular(object, upper = NA)
 isDiagonal(object)
 }
 \arguments{
@@ -51,8 +50,6 @@ isDiagonal(object)
     triangular \code{object}; or otherwise \code{\link{NA}} (the
     default), in which case \code{TRUE} is returned for any triangular
     \code{object}.}
-  \item{\dots}{further arguments passed to methods
-    (currently unused by \pkg{Matrix}).}
 }
 \value{
   A \link{logical}, either \code{TRUE} or \code{FALSE}

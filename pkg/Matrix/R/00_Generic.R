@@ -62,7 +62,7 @@ setGeneric("isDiagonal",
                standardGeneric("isDiagonal"))
 
 setGeneric("isTriangular",
-           function(object, upper = NA, ...)
+           function(object, upper = NA)
                standardGeneric("isTriangular"),
            signature = "object")
 
