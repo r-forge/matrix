@@ -1,5 +1,5 @@
 \name{symmpart-methods}
-\title{Symmetric Part and Skew(symmetric) Part of a Matrix}
+\title{Symmetric and Skew-Symmetric Parts of a Square Matrix}
 %
 \docType{methods}
 \keyword{algebra}
@@ -29,44 +29,49 @@
 \alias{skewpart,matrix-method}
 %
 \description{
-  \code{symmpart(x)} computes the symmetric part \code{(x + t(x))/2} and
-  \code{skewpart(x)} the
-  skew symmetric part \code{(x - t(x))/2} of a square matrix \code{x},
-  more efficiently for specific Matrix classes.
-
-  Note that \code{x == symmpart(x) + skewpart(x)} for all square
-  matrices -- apart from extraneous \code{\link{NA}} values in the RHS.
+\code{symmpart} and \code{skewpart} compute the symmetric and skew
+symmetric parts \code{(x + t(x))/2} and \code{(x - t(x))/2} of a
+square matrix \code{x}.  \code{symmpart(x) + skewpart(x)} is equal
+to \code{x} for all finite square matrices \code{x}.
 }
 \usage{
-symmpart(x)
-skewpart(x)
+symmpart(x, \dots)
+skewpart(x, \dots)
+
+\S4method{symmpart}{denseMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{CsparseMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{RsparseMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{TsparseMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{diagonalMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{indMatrix}(x, \dots)
+\S4method{symmpart}{matrix}(x, trans = "C", \dots)
+
+## Methods for 'skewpart' are parallel
 }
 \arguments{
-  \item{x}{a \emph{square} matrix; either \dQuote{traditional} of class
-    \code{"matrix"}, or typically, inheriting from the
-    \code{\linkS4class{Matrix}} class.}
-}
-\details{
-  These are generic functions with several methods for different matrix
-  classes, use e.g., \code{\link{showMethods}(symmpart)} to see them.
-
-  If the row and column names differ, the result will use the column
-  names unless they are (partly) \code{NULL} where the row names are
-  non-\code{NULL} (see also the examples).
+\item{x}{a square matrix or \code{\linkS4class{Matrix}}.}
+\item{trans}{a character string, \code{"C"} or \code{"T"},
+  indicating either the conjugate transpose or transpose,
+  i.e., whether the result is (skew) Hermitian or symmetric.
+  It matters only in the complex case.  The default is \code{"C"},
+  for consistency with methods for \code{\link{isSymmetric}}.}
+\item{\dots}{optional arguments passed from or to other methods.}
 }
 \value{
-  \code{symmpart(x)} returns a symmetric matrix,
-  inheriting from \code{\linkS4class{symmetricMatrix}}
-  or \code{\linkS4class{diagonalMatrix}} if \code{x}
-  inherits from \code{Matrix}.
-
-  \code{skewpart(x)} returns a skew-symmetric matrix,
-  inheriting from \code{\linkS4class{generalMatrix}},
-  \code{\linkS4class{symmetricMatrix}} or
-  \code{\linkS4class{diagonalMatrix}} if \code{x}
-  inherits from \code{Matrix}.
+\code{symmpart(x)} returns a symmetric or Hermitian matrix,
+inheriting from \code{\linkS4class{symmetricMatrix}}
+or \code{\linkS4class{diagonalMatrix}} if \code{x}
+inherits from \code{Matrix}.
+  
+\code{skewpart(x)} returns a skew-symmetric or skew-Hermitian matrix,
+inheriting from \code{\linkS4class{generalMatrix}},
+\code{\linkS4class{symmetricMatrix}} or
+\code{\linkS4class{diagonalMatrix}} if \code{x}
+inherits from \code{Matrix}.
 }
-\seealso{\code{\link{isSymmetric}}.}
+\seealso{
+\code{\link{isSymmetric}}, \code{\link{forceSymmetric}}.
+}
 \examples{
 m <- Matrix(1:4, 2,2)
 symmpart(m)

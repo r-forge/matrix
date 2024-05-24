@@ -16,22 +16,22 @@
     .Call(R_sparse_transpose, x, FALSE)
 .sparse.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_sparse_force_symmetric, x, uplo, trans)
-.sparse.symmpart <- function(x)
-    .Call(R_sparse_symmpart, x)
-.sparse.skewpart <- function(x)
-    .Call(R_sparse_skewpart, x)
+.sparse.symmpart <- function(x, trans = "C", ...)
+    .Call(R_sparse_symmpart, x, trans)
+.sparse.skewpart <- function(x, trans = "C", ...)
+    .Call(R_sparse_skewpart, x, trans)
 .sparse.is.di <- function(object)
     .Call(R_sparse_is_diagonal, object)
 .sparse.is.tr <- function(object, upper = NA, ...)
     .Call(R_sparse_is_triangular, object, upper)
-.sparse.is.sy <- function(object, checkDN = TRUE, ...) {
+.sparse.is.sy <- function(object, trans = "C", checkDN = TRUE, ...) {
     if(checkDN) {
         ca <- function(check.attributes = TRUE, ...) check.attributes
         checkDN <- ca(...)
     }
-    .Call(R_sparse_is_symmetric, object, checkDN)
+    .Call(R_sparse_is_symmetric, object, trans, checkDN)
 }
-.sparse.is.sy.dz <- function(object, checkDN = TRUE,
+.sparse.is.sy.dz <- function(object, trans = "C", checkDN = TRUE,
                              tol = 100 * .Machine$double.eps, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE
     if(checkDN) {
@@ -40,7 +40,7 @@
     }
     ## be very fast when requiring exact symmetry
     if(tol <= 0)
-        return(.Call(R_sparse_is_symmetric, object, checkDN))
+        return(.Call(R_sparse_is_symmetric, object, trans, checkDN))
     ## pretest: is it square?
     d <- object@Dim
     if((n <- d[2L]) != d[1L])
@@ -53,7 +53,7 @@
 
     ## now handling an n-by-n [dz]g[CRT]Matrix, n >= 1:
 
-    Cj <- if(is.complex(object@x)) Conj else identity
+    Cj <- if(is.complex(object@x) && identical(trans, "C")) Conj else identity
     ae <- function(check.attributes, ...) {
         ## discarding possible user-supplied check.attributes
         all.equal(..., check.attributes = FALSE)

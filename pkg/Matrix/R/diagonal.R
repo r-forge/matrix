@@ -95,9 +95,9 @@ setMethod("forceSymmetric", c(x = "diagonalMatrix"),
               .diag2sparse(x, ".", "s", "C", uplo, trans))
 
 setMethod("symmpart", c(x = "diagonalMatrix"),
-          function(x) {
+          function(x, trans = "C", ...) {
               kind <- .M.kind(x)
-              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
+              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- symDN(x@Dimnames)
               if(x@diag != "N")
@@ -109,23 +109,23 @@ setMethod("symmpart", c(x = "diagonalMatrix"),
                                 "l" = ,
                                 "i" = ,
                                 "d" = as.double(y),
-                                "z" = complex(real = Re(y), imaginary = 0))
+                                "z" = if(identical(trans, "C")) complex(real = Re(y), imaginary = 0) else as.complex(y))
               }
               r
           })
 
 setMethod("skewpart", c(x = "diagonalMatrix"),
-          function(x) {
+          function(x, trans = "C", ...) {
               kind <- .M.kind(x)
-              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
+              r <- new(if(kind != "z") "ddiMatrix" else "zdiMatrix")
               r@Dim <- d <- x@Dim
               r@Dimnames <- symDN(x@Dimnames)
               r@x <-
-                  if(kind == "z") {
-                      if(x@diag != "N")
-                          complex(d[1L])
-                      else complex(real = 0, imaginary = Im(x@x))
-                  } else double(d[1L])
+                  if(kind != "z")
+                      double(d[1L])
+                  else if(x@diag != "N" || !identical(trans, "C"))
+                      complex(d[1L])
+                  else complex(real = 0, imaginary = Im(x@x))
               r
           })
 
@@ -137,13 +137,13 @@ setMethod("isTriangular", c(object = "diagonalMatrix"),
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
 setMethod("isSymmetric", c(object = "diagonalMatrix"),
-          function(object, checkDN = TRUE, ...) {
+          function(object, trans = "C", checkDN = TRUE, ...) {
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...)
                       check.attributes
                   if(ca(...) && !isSymmetricDN(object@Dimnames))
                       return(FALSE)
               }
-              .M.kind(object) != "z" || object@diag != "N" ||
+              .M.kind(object) != "z" || object@diag != "N" || !identical(trans, "C") ||
                   { x <- object@x; isTRUE(all.equal.numeric(x, Conj(x), ...)) }
           })

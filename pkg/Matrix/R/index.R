@@ -132,10 +132,10 @@ setMethod("forceSymmetric", c(x = "indMatrix"),
           function(x, ...) forceSymmetric(.M2kind(x, "n"), ...))
 
 setMethod("symmpart", c(x = "indMatrix"),
-          function(x) symmpart(.M2kind(x, "d")))
+          function(x, ...) symmpart(.M2kind(x, "d"), ...))
 
 setMethod("skewpart", c(x = "indMatrix"),
-          function(x) skewpart(.M2kind(x, "d")))
+          function(x, ...) skewpart(.M2kind(x, "d"), ...))
 
 setMethod("isDiagonal", c(object = "indMatrix"),
           function(object) {

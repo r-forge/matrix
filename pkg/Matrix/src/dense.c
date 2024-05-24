@@ -326,6 +326,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	return ans;
 }
 
+/* diag(<denseMatrix>, names=) */
 SEXP R_dense_diag_get(SEXP obj, SEXP names)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -427,6 +428,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	return to;
 }
 
+/* diag(<denseMatrix>) <- value */
 SEXP R_dense_diag_set(SEXP from, SEXP value)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -593,6 +595,7 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	return to;
 }
 
+/* t(<denseMatrix>) */
 SEXP R_dense_transpose(SEXP from, SEXP trans)
 {
 	static const char *valid[] = {
@@ -734,6 +737,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 	return to;
 }
 
+/* forceSymmetric(<denseMatrix>, uplo, trans) */
 SEXP R_dense_force_symmetric(SEXP from, SEXP uplo, SEXP trans)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -894,6 +898,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	return to;
 }
 
+/* symmpart(<denseMatrix>, trans) */
 SEXP R_dense_symmpart(SEXP from, SEXP trans)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -1074,6 +1079,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	return to;
 }
 
+/* skewpart(<denseMatrix>, trans) */
 SEXP R_dense_skewpart(SEXP from, SEXP trans)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -1242,6 +1248,7 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	return 0;
 }
 
+/* isSymmetric(<denseMatrix>, trans, checkDN, ...) */
 SEXP R_dense_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
 {
 	if (TYPEOF(obj) != OBJSXP) {
@@ -1381,6 +1388,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 	return 0;
 }
 
+/* isTriangular(<denseMatrix>, upper) */
 SEXP R_dense_is_triangular(SEXP obj, SEXP upper)
 {
 	if (TYPEOF(obj) != OBJSXP) {
@@ -1497,6 +1505,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 	return 0;
 }
 
+/* isDiagonal(<denseMatrix>) */
 SEXP R_dense_is_diagonal(SEXP obj)
 {
 	if (TYPEOF(obj) != OBJSXP) {
@@ -1817,7 +1826,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	return ans;
 }
 
-/* (row|col)(Sums|Means)(<denseMatrix>) */
+/* (row|col)(Sums|Means)(<denseMatrix>, na.rm=) */
 SEXP R_dense_marginsum(SEXP obj, SEXP margin, SEXP narm, SEXP mean)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -2074,7 +2083,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	return ans;
 }
 
-/* sum(<denseMatrix>) */
+/* sum(<denseMatrix>, na.rm=) */
 SEXP R_dense_sum(SEXP obj, SEXP narm)
 {
 	static const char *valid[] = { VALID_DENSE, "" };
@@ -2277,7 +2286,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	return ans;
 }
 
-/* prod(<denseMatrix>) */
+/* prod(<denseMatrix>, na.rm=) */
 SEXP R_dense_prod(SEXP obj, SEXP narm)
 {
 	static const char *valid[] = { VALID_DENSE, "" };

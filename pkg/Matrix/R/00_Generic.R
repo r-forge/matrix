@@ -76,11 +76,11 @@ setGeneric("pack",
                standardGeneric("pack"))
 
 setGeneric("skewpart",
-           function(x)
+           function(x, ...)
                standardGeneric("skewpart"))
 
 setGeneric("symmpart",
-           function(x)
+           function(x, ...)
                standardGeneric("symmpart"))
 
 setGeneric("tril",

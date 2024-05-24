@@ -16,22 +16,22 @@
     .Call(R_dense_transpose, x, "T")
 .dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_dense_force_symmetric, x, uplo, trans)
-.dense.symmpart <- function(x)
-    .Call(R_dense_symmpart, x, "C")
-.dense.skewpart <- function(x)
-    .Call(R_dense_skewpart, x, "C")
+.dense.symmpart <- function(x, trans = "C", ...)
+    .Call(R_dense_symmpart, x, trans)
+.dense.skewpart <- function(x, trans = "C", ...)
+    .Call(R_dense_skewpart, x, trans)
 .dense.is.di <- function(object)
     .Call(R_dense_is_diagonal, object)
 .dense.is.tr <- function(object, upper = NA, ...)
     .Call(R_dense_is_triangular, object, upper)
-.dense.is.sy <- function(object, checkDN = TRUE, ...) {
+.dense.is.sy <- function(object, trans = "C", checkDN = TRUE, ...) {
     if(checkDN) {
         ca <- function(check.attributes = TRUE, ...) check.attributes
         checkDN <- ca(...)
     }
-    .Call(R_dense_is_symmetric, object, "C", checkDN)
+    .Call(R_dense_is_symmetric, object, trans, checkDN)
 }
-.dense.is.sy.dz <- function(object, checkDN = TRUE,
+.dense.is.sy.dz <- function(object, trans = "C", checkDN = TRUE,
                             tol = 100 * .Machine$double.eps,
                             tol1 = 8 * tol, ...) {
     ## backwards compatibility: don't check DN if check.attributes=FALSE
@@ -41,7 +41,7 @@
     }
     ## be very fast when requiring exact symmetry
     if(tol <= 0)
-        return(.Call(R_dense_is_symmetric, object, "C", checkDN))
+        return(.Call(R_dense_is_symmetric, object, trans, checkDN))
     ## pretest: is it square?
     d <- object@Dim
     if((n <- d[2L]) != d[1L])
@@ -55,11 +55,10 @@
 
     ## now handling n-by-n [dz]geMatrix, n >= 1:
 
-    Cj <- if(is.complex(object@x)) Conj else identity
-    ae <- function(check.attributes, ...) {
+    Cj <- if(is.complex(object@x) && identical(trans, "C")) Conj else identity
+    ae <- function(check.attributes, ...)
         ## discarding possible user-supplied check.attributes
         all.equal.numeric(..., check.attributes = FALSE)
-    }
 
     ## pretest: outermost rows ~= outermost columns?
     ## (fast for large asymmetric)
@@ -201,13 +200,13 @@ setMethod("forceSymmetric", c(x = "matrix"),
           function(x, uplo = "U", trans = "C", ...)
               .m2dense(x, ".sy", uplo = uplo, trans = trans))
 setMethod("symmpart", c(x = "matrix"),
-          function(x) {
-              Cj <- if(is.complex(x)) Conj else identity
+          function(x, trans = "C", ...) {
+              Cj <- if(is.complex(x) && identical(trans, "C")) Conj else identity
               symmetrizeDN(0.5 * (x + Cj(t(x))))
           })
 setMethod("skewpart", c(x = "matrix"),
-          function(x) {
-              Cj <- if(is.complex(x)) Conj else identity
+          function(x, trans = "C", ...) {
+              Cj <- if(is.complex(x) && identical(trans, "C")) Conj else identity
               symmetrizeDN(0.5 * (x - Cj(t(x))))
           })
 setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)

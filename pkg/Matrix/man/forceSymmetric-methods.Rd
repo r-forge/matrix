@@ -32,18 +32,17 @@ forceSymmetric(x, \dots)
 \S4method{forceSymmetric}{matrix}(x, uplo = "U", trans = "C", \dots)
 }
 \arguments{
-\item{x}{a square matrix \code{\linkS4class{Matrix}}.}
+\item{x}{a square matrix or \code{\linkS4class{Matrix}}.}
 \item{uplo}{a character string, \code{"U"} or \code{"L"}, indicating
   which of the upper and lower triangles should be reflected.
   Where it is the default, \code{NULL} is accepted and equivalent
   to \code{"U"}, unless \code{x} has an \code{uplo} slot, in which
   case that is used instead.}
 \item{trans}{a character string, \code{"C"} or \code{"T"},
-  indicating if the result should formally equal its conjugate
-  transpose or transpose, i.e., whether the result is formally
-  Hermitian or symmetric.  It matters only in the complex case.
-  The default is \code{"C"}, for consistency with methods for
-  \code{\link{isSymmetric}}.}
+  indicating either the conjugate transpose or transpose,
+  i.e., whether the result is formally Hermitian or symmetric.
+  It matters only in the complex case.  The default is \code{"C"},
+  for consistency with methods for \code{\link{isSymmetric}}.}
 \item{\dots}{optional arguments passed from or to other methods.}
 }
 \value{
@@ -59,8 +58,7 @@ methods for \code{forceSymmetric} do \emph{not} require that \code{x}
 is already approximately symmetric.
 }
 \seealso{
-\code{\link{symmpart}} for the Hermitian or symmetric part of a square
-matrix.
+\code{\link{isSymmetric}}, \code{\link{symmpart}}, \code{\link{skewpart}}.
 }
 \examples{
  ## Hilbert matrix

@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-05-24 r4762)}{
+\section{Changes in version 1.8-0 (2024-05-24 r4763)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -17,8 +17,12 @@
       \item The formal argument list of generic function
       \code{forceSymmetric} is changed from \code{(x, uplo)} to
       \code{(x, \dots)}, allowing methods to accept further arguments.
-      A corollary is that the generic function now dispatches only on
-      \code{x}.  Method definitions are adjusted accordingly.
+      The generic function now dispatches only on \code{x}.
+      Method definitions are adjusted accordingly.
+
+      \item The formal argument lists of generic functions
+      \code{symmpart} and \code{skewpart} are changed from \code{(x)} to
+      \code{(x, \dots)}.
     }
   }
   \subsection{New Features}{
