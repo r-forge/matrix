@@ -124,12 +124,15 @@ setMethod("pack", c(x = "packedMatrix"),
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .uM.pack <-
-function(x, ...) .Call(R_dense_as_packed, x, NULL, NULL)
+function(x, ...) .Call(R_dense_as_packed, x, NULL, NULL, NULL)
 
 .uM.pack.ge <-
 function(x, symmetric = NA, upperTri = NA, ...) {
-    if(((sna <- is.na(symmetric)) || symmetric) && isSymmetric(x, ...))
-        .Call(R_dense_as_packed, x, "U", NULL)
+    if(((sna <- is.na(symmetric)) || symmetric) &&
+       ({ trans <- "C"; isSymmetric(x, trans = trans, ...) } ||
+        (is.complex(x@x) &&
+         { trans <- "T"; isSymmetric(x, trans = trans, ...) })))
+        .Call(R_dense_as_packed, x, "U", trans, NULL)
     else if((sna || !symmetric) &&
             (it <- isTriangular(x, upper = upperTri))) {
         uplo <-
@@ -138,7 +141,7 @@ function(x, symmetric = NA, upperTri = NA, ...) {
             else if(upperTri)
                 "U"
             else "L"
-        .Call(R_dense_as_packed, x, uplo, "N")
+        .Call(R_dense_as_packed, x, uplo, NULL, "N")
     } else {
         if(sna)
             stop("matrix is not symmetric or triangular")
@@ -154,7 +157,7 @@ setMethod("unpack", c(x = "unpackedMatrix"),
 setMethod("pack", c(x = "unpackedMatrix"), .uM.pack)
 
 .uM.subclasses <- names(getClassDef("unpackedMatrix")@subclasses)
-for(.cl in grep("^.geMatrix$", .uM.subclasses, value = TRUE))
+for(.cl in grep("^[nlidz]geMatrix$", .uM.subclasses, value = TRUE))
 setMethod("pack", c(x = .cl), .uM.pack.ge)
 rm(.cl, .uM.subclasses)
 
@@ -164,10 +167,12 @@ rm(.cl, .uM.subclasses)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .m.pack <- .uM.pack.ge
+body(.m.pack)[[2L]][[2L]][[3L]] <-
+    quote(isSymmetric(x, ...))
 body(.m.pack)[[2L]][[3L]] <-
-    quote(.m2dense(x, ".sp", uplo = "U", trans = "C"))
+    quote(.m2dense(x, ".sp"))
 body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-
-    quote(.m2dense(x, ".tp", uplo = uplo, diag = "N"))
+    quote(.m2dense(x, ".tp", uplo = uplo))
 
 setMethod("unpack", c(x = "matrix"),
           function(x, ...) .m2dense.checking(x, "."))

@@ -253,7 +253,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_dense_as_general, 1),
 	CALLDEF(R_sparse_as_general, 1),
 	CALLDEF(R_dense_as_unpacked, 1),
-	CALLDEF(R_dense_as_packed, 3),
+	CALLDEF(R_dense_as_packed, 4),
 	CALLDEF(R_sparse_as_Csparse, 1),
 	CALLDEF(R_sparse_as_Rsparse, 1),
 	CALLDEF(R_sparse_as_Tsparse, 1),

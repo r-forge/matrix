@@ -54,8 +54,8 @@ SEXP R_sparse_as_general(SEXP);
 SEXP dense_as_unpacked(SEXP, const char *);
 SEXP R_dense_as_unpacked(SEXP);
 
-SEXP dense_as_packed(SEXP, const char *, char, char);
-SEXP R_dense_as_packed(SEXP, SEXP, SEXP);
+SEXP dense_as_packed(SEXP, const char *, char, char, char);
+SEXP R_dense_as_packed(SEXP, SEXP, SEXP, SEXP);
 
 SEXP sparse_as_Csparse(SEXP, const char *);
 SEXP R_sparse_as_Csparse(SEXP);

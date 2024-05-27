@@ -3360,7 +3360,7 @@ SEXP R_dense_as_unpacked(SEXP s_from)
 	return dense_as_unpacked(s_from, valid[ivalid]);
 }
 
-SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
+SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
 {
 	if (class[2] == 'p')
 		return from;
@@ -3392,6 +3392,13 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 			SET_SLOT(to, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
+
+		if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
+			SEXP trans = PROTECT(mkString("T"));
+			SET_SLOT(to, Matrix_transSym, trans);
+			UNPROTECT(1); /* trans */
+		}
+
 		if (cl[1] == 't' && di != 'N') {
 			SEXP diag = PROTECT(mkString("U"));
 			SET_SLOT(to, Matrix_diagSym, diag);
@@ -3469,7 +3476,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char di)
 }
 
 /* as(<denseMatrix>, "packedMatrix") */
-SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_diag)
+SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_trans, SEXP s_diag)
 {
 	static const char *valid[] = {
 		"corMatrix", "copMatrix",
@@ -3480,21 +3487,29 @@ SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_diag)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
 
-	char ul = 'U', di = '\0';
+	char ul = 'U', ct = 'C', di = '\0';
 	if (valid[ivalid][1] == 'g') {
-		if (TYPEOF(s_uplo) != STRSXP || LENGTH(s_uplo) < 1 ||
-		    (s_uplo = STRING_ELT(s_uplo, 0)) == NA_STRING ||
-		    ((ul = CHAR(s_uplo)[0]) != 'U' && ul != 'L'))
-			error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+		if (s_uplo != R_NilValue) {
+			if (TYPEOF(s_uplo) != STRSXP || LENGTH(s_uplo) < 1 ||
+			    (s_uplo = STRING_ELT(s_uplo, 0)) == NA_STRING ||
+			    ((ul = CHAR(s_uplo)[0]) != 'U' && ul != 'L'))
+				error(_("'%s' must be \"%s\" or \"%s\""), "uplo", "U", "L");
+		}
+		if (s_trans != R_NilValue) {
+			if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+			    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+			    ((ct = CHAR(s_trans)[0]) != 'C' && di != 'T'))
+				error(_("'%s' must be \"%s\" or \"%s\""), "trans", "C", "T");
+		}
 		if (s_diag != R_NilValue) {
-		if (TYPEOF(s_diag) != STRSXP || LENGTH(s_diag) < 1 ||
-		    (s_diag = STRING_ELT(s_diag, 0)) == NA_STRING ||
-		    ((di = CHAR(s_diag)[0]) != 'N' && ul != 'U'))
-			error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
+			if (TYPEOF(s_diag) != STRSXP || LENGTH(s_diag) < 1 ||
+			    (s_diag = STRING_ELT(s_diag, 0)) == NA_STRING ||
+			    ((di = CHAR(s_diag)[0]) != 'N' && ul != 'U'))
+				error(_("'%s' must be \"%s\" or \"%s\""), "diag", "N", "U");
 		}
 	}
 
-	return dense_as_packed(s_from, valid[ivalid], ul, di);
+	return dense_as_packed(s_from, valid[ivalid], ul, ct, di);
 }
 
 void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
@@ -4390,7 +4405,7 @@ SEXP R_Matrix_as_packed(SEXP s_from)
 	case 'y':
 	case 'o':
 	case 'r':
-		return dense_as_packed(s_from, cl, '\0', '\0');
+		return dense_as_packed(s_from, cl, '\0', '\0', '\0');
 	case 'p':
 		return s_from;
 	case 'C':
