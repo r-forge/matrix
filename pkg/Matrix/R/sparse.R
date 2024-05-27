@@ -22,49 +22,31 @@
     .Call(R_sparse_symmpart, x, trans)
 .sparse.skewpart <- function(x, trans = "C", ...)
     .Call(R_sparse_skewpart, x, trans)
-.sparse.is.di <- function(object)
-    .Call(R_sparse_is_diagonal, object)
-.sparse.is.tr <- function(object, upper = NA)
-    .Call(R_sparse_is_triangular, object, upper)
-.sparse.is.sy <- function(object, trans = "C", checkDN = TRUE, ...) {
+.sparse.is.sy <- function(object,
+                          tol = 100 * .Machine$double.eps,
+                          trans = "C", checkDN = TRUE, ...) {
     if(checkDN) {
         ca <- function(check.attributes = TRUE, ...) check.attributes
         checkDN <- ca(...)
     }
-    .Call(R_sparse_is_symmetric, object, trans, checkDN)
-}
-.sparse.is.sy.dz <- function(object, trans = "C", checkDN = TRUE,
-                             tol = 100 * .Machine$double.eps, ...) {
-    ## backwards compatibility: don't check DN if check.attributes=FALSE
-    if(checkDN) {
-        ca <- function(check.attributes = TRUE, ...) check.attributes
-        checkDN <- ca(...)
-    }
-    ## be very fast when requiring exact symmetry
-    if(tol <= 0)
-        return(.Call(R_sparse_is_symmetric, object, trans, checkDN))
-    ## pretest: is it square?
-    d <- object@Dim
-    if((n <- d[2L]) != d[1L])
-        return(FALSE)
-    ## pretest: are DN symmetric in the sense of validObject(<symmetricMatrix>)?
-    if(checkDN && !isSymmetricDN(object@Dimnames))
-        return(FALSE)
-    if(n == 0L)
-        return(TRUE)
-
-    ## now handling an n-by-n [dz]g[CRT]Matrix, n >= 1:
-
-    Cj <- if(is.complex(object@x) && identical(trans, "C")) Conj else identity
-    ae <- function(check.attributes, ...) {
-        ## discarding possible user-supplied check.attributes
-        all.equal(..., check.attributes = FALSE)
-    }
-
-    isTRUE(ae(target    = .M2V(     object  ),
-              current   = .M2V(Cj(t(object))),
+    stopifnot(is.numeric(tol), length(tol) == 1L, !is.na(tol))
+    ans <- .Call(R_sparse_is_symmetric, object, tol <= 0, trans, checkDN)
+    if(!is.na(ans))
+        return(ans)
+    ## 'object' is an n-by-n [dz]sparseMatrix, n >= 1
+    ae <- function(target, current, tolerance, scale = NULL, ...)
+        .V.a.e(target = target, current = current,
+               tolerance = tolerance, scale = scale,
+               check.attributes = FALSE, check.class = FALSE)
+    conjugate <- is.complex(object@x) && identical(trans, "C")
+    op <- if(conjugate) ct else t
+    isTRUE(ae(target = .M2V(object), current = .M2V(op(object)),
               tolerance = tol, ...))
 }
+.sparse.is.tr <- function(object, upper = NA)
+    .Call(R_sparse_is_triangular, object, upper)
+.sparse.is.di <- function(object)
+    .Call(R_sparse_is_diagonal, object)
 
 setMethod("diff", c(x = "sparseMatrix"),
           ## Mostly cut and paste of base::diff.default :
@@ -106,13 +88,9 @@ setMethod("isSymmetric" , c(object = .cl), .sparse.is.sy)
 setMethod("isTriangular", c(object = .cl), .sparse.is.tr)
 setMethod("isDiagonal"  , c(object = .cl), .sparse.is.di)
 }
+rm(.cl)
 
-.sparse.subclasses <- names(getClassDef("sparseMatrix")@subclasses)
-for(.cl in grep("^[dz][gt][CRT]Matrix$", .sparse.subclasses, value = TRUE))
-setMethod("isSymmetric" , c(object = .cl), .sparse.is.sy.dz)
-rm(.cl, .sparse.subclasses)
-
-rm(list = c(grep("^[.]sparse[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di)([.]dz)?)$",
+rm(list = c(grep("^[.]sparse[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di))$",
                  ls(all.names = TRUE), value = TRUE)))
 
 

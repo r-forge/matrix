@@ -148,13 +148,19 @@ setMethod("isTriangular", c(object = "diagonalMatrix"),
               if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
 setMethod("isSymmetric", c(object = "diagonalMatrix"),
-          function(object, trans = "C", checkDN = TRUE, ...) {
+          function(object,
+                   tol = 100 * .Machine$double.eps,
+                   trans = "C", checkDN = TRUE, ...) {
               if(checkDN) {
                   ca <- function(check.attributes = TRUE, ...)
                       check.attributes
                   if(ca(...) && !isSymmetricDN(object@Dimnames))
                       return(FALSE)
               }
-              .M.kind(object) != "z" || object@diag != "N" || !identical(trans, "C") ||
-                  { x <- object@x; isTRUE(all.equal.numeric(x, Conj(x), ...)) }
+              ae <- function(target, current, tolerance, scale = NULL, ...)
+                  all.equal.numeric(target = target, current = current,
+                                    tolerance = tolerance, scale = scale,
+                                    check.attributes = FALSE, check.class = FALSE)
+              !is.complex(x <- object@x) || !identical(trans, "C") ||
+                  object@diag != "N" || isTRUE(ae(x, Conj(x), tolerance = tol, ...))
           })

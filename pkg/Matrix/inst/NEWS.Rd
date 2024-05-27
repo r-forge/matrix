@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-05-24 r4764)}{
+\section{Changes in version 1.8-0 (2024-05-27 r4766)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -18,7 +18,6 @@
       \code{forceSymmetric} is changed from \code{(x, uplo)} to
       \code{(x, \dots)}, allowing methods to accept further arguments.
       The generic function now dispatches only on \code{x}.
-      Method definitions are adjusted accordingly.
 
       \item The formal argument lists of generic functions
       \code{symmpart} and \code{skewpart} are changed from \code{(x)} to
@@ -32,11 +31,20 @@
       \code{x}, where it is intended to be more efficient than
       \code{Conj(t(x))} at least for \code{x} inheriting from virtual
       class \code{Matrix}.
+
+      \item Methods for generic functions \code{isSymmetric},
+      \code{forceSymmetric}, \code{symmpart}, and \code{skewpart}
+      gain argument \code{trans} to support Hermitian and symmetric
+      modes for complex matrices.
     }
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item Methods for \code{isSymmetric(<[dz]Matrix>)} consistently
+      pass \code{countEQ = FALSE}, \code{check.attributes = FALSE}, and
+      \code{check.class = FALSE} to \code{all.equal.numeric}.  Methods
+      for \code{isSymmetric(<[dz]sparseMatrix>)} consistently require
+      a symmetric nonzero pattern.
     }
   }
   \subsection{Misc}{

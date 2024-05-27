@@ -15,16 +15,6 @@
 \alias{isSymmetric,denseMatrix-method}
 \alias{isSymmetric,diagonalMatrix-method}
 \alias{isSymmetric,indMatrix-method}
-% tolerating numerical fuzz for [dz]Matrix:
-\alias{isSymmetric,dgCMatrix-method}
-\alias{isSymmetric,dgRMatrix-method}
-\alias{isSymmetric,dgTMatrix-method}
-\alias{isSymmetric,dgeMatrix-method}
-\alias{isSymmetric,dtCMatrix-method}
-\alias{isSymmetric,dtRMatrix-method}
-\alias{isSymmetric,dtTMatrix-method}
-\alias{isSymmetric,dtpMatrix-method}
-\alias{isSymmetric,dtrMatrix-method}
 %
 \description{
 Tests whether its argument is a symmetric square matrix, by default
@@ -37,15 +27,21 @@ in addition to symmetry in the mathematical sense.
 for subclasses of virtual class \code{\linkS4class{Matrix}}.
 }
 \usage{
-\S4method{isSymmetric}{denseMatrix}(object, trans = "C", checkDN = TRUE, \dots)
-\S4method{isSymmetric}{CsparseMatrix}(object, trans = "C", checkDN = TRUE, \dots)
-\S4method{isSymmetric}{RsparseMatrix}(object, trans = "C", checkDN = TRUE, \dots)
-\S4method{isSymmetric}{TsparseMatrix}(object, trans = "C", checkDN = TRUE, \dots)
-\S4method{isSymmetric}{diagonalMatrix}(object, trans = "C", checkDN = TRUE, \dots)
+\S4method{isSymmetric}{denseMatrix}(object, tol = 100 * .Machine$double.eps, tol1 = 8 * tol,
+            trans = "C", checkDN = TRUE, \dots)
+\S4method{isSymmetric}{CsparseMatrix}(object, tol = 100 * .Machine$double.eps,
+            trans = "C", checkDN = TRUE, \dots)
+\S4method{isSymmetric}{RsparseMatrix}(object, tol = 100 * .Machine$double.eps,
+            trans = "C", checkDN = TRUE, \dots)
+\S4method{isSymmetric}{TsparseMatrix}(object, tol = 100 * .Machine$double.eps,
+            trans = "C", checkDN = TRUE, \dots)
+\S4method{isSymmetric}{diagonalMatrix}(object, tol = 100 * .Machine$double.eps,
+            trans = "C", checkDN = TRUE, \dots)
 \S4method{isSymmetric}{indMatrix}(object, checkDN = TRUE, \dots)
 }
 \arguments{
 \item{object}{a \code{\linkS4class{Matrix}}.}
+\item{tol, tol1}{see \code{\link{isSymmetric.matrix}}.}
 \item{trans}{a character string, \code{"C"} or \code{"T"},
   indicating either the conjugate transpose or transpose,
   i.e., whether to test for Hermitian or symmetric \code{object}.

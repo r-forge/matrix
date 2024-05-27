@@ -1096,8 +1096,11 @@ SEXP R_dense_skewpart(SEXP from, SEXP trans)
 	return dense_skewpart(from, valid[ivalid], ct);
 }
 
-int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
+int dense_is_symmetric(SEXP obj, const char *class,
+                       int exact, char ct, int checkDN)
 {
+	exact = exact || class[0] == 'n' || class[0] == 'l' || class[0] == 'i';
+	
 	if (class[1] == 's') {
 		if (class[0] != 'z')
 			return 1;
@@ -1114,10 +1117,10 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	}
 
 	if (class[1] == 't') {
-		if (class[0] != 'z' || ct != 'C')
-			return dense_is_diagonal(obj, class);
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		if (CHAR(STRING_ELT(diag, 0))[0] != 'N')
+		char di = CHAR(STRING_ELT(diag, 0))[0];
+		if (class[0] == 'n' || class[0] == 'l' || class[0] == 'i' ||
+		    (exact && (class[0] != 'z' || ct != 'C' || di != 'N')))
 			return dense_is_diagonal(obj, class);
 	}
 
@@ -1125,8 +1128,10 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		return 0;
-	if (n == 0 || (n == 1 && ct != 'C'))
+	if (n == 0 || (n == 1 && (class[0] != 'z' || ct != 'C')))
 		return 1;
+	if (!exact)
+		return NA_LOGICAL; /* => do inexact numerical test in R */
 
 	char ul = 'U';
 	if (class[1] != 'g') {
@@ -1180,7 +1185,7 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 						return 0;
 				}
 			}
-		} else if (class[1] == 's') {
+		} else {
 			if (ul == 'U') {
 			for (j = 0; j < n; ++j) {
 				for (i = 0; i < j; ++i) {
@@ -1208,34 +1213,6 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 					}
 				}
 			}
-		} else {
-			if (ul == 'U') {
-			for (j = 0; j < n; ++j) {
-				for (i = 0; i < j; ++i) {
-					if (NOTZERO_COMPLEX((*px)))
-						return 0;
-					px += 1;
-				}
-				if (NOTREAL_COMPLEX((*px)))
-					return 0;
-				px += 1;
-				if (!packed)
-					px += n - j - 1;
-			}
-			} else {
-				for (j = 0; j < n; ++j) {
-					if (!packed)
-						px += j;
-					if (NOTREAL_COMPLEX((*px)))
-						return 0;
-					px += 1;
-					for (i = j + 1; i < n; ++i) {
-						if (NOTZERO_COMPLEX((*px)))
-							return 0;
-						px += 1;
-					}
-				}
-			}
 		}
 		}
 		break;
@@ -1248,8 +1225,8 @@ int dense_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	return 0;
 }
 
-/* isSymmetric(<denseMatrix>, trans, checkDN, ...) */
-SEXP R_dense_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
+/* isSymmetric(<denseMatrix>, tol, tol1, trans, checkDN) */
+SEXP R_dense_is_symmetric(SEXP obj, SEXP exact, SEXP trans, SEXP checkDN)
 {
 	if (TYPEOF(obj) != OBJSXP) {
 		/* defined in ./coerce.c : */
@@ -1262,6 +1239,11 @@ SEXP R_dense_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
 
+	int exact_;
+	if (TYPEOF(exact) != LGLSXP || LENGTH(exact) < 1 ||
+	    (exact_ = LOGICAL(exact)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "exact", "TRUE", "FALSE");
+
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
 	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
@@ -1273,8 +1255,8 @@ SEXP R_dense_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
 	    (checkDN_ = LOGICAL(checkDN)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
 
-	int ans_ = dense_is_symmetric(obj, valid[ivalid], ct, checkDN_);
-	SEXP ans = ScalarLogical(ans_ != 0);
+	int ans_ = dense_is_symmetric(obj, valid[ivalid], exact_, ct, checkDN_);
+	SEXP ans = ScalarLogical(ans_);
 	UNPROTECT(1);
 	return ans;
 }

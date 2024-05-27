@@ -2345,10 +2345,19 @@ SEXP R_sparse_skewpart(SEXP from, SEXP trans)
 	return sparse_skewpart(from, valid[ivalid], ct);
 }
 
-int sparse_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
+int sparse_is_symmetric(SEXP obj, const char *class,
+                        int exact, char ct, int checkDN)
 {
-	if (class[1] == 's')
-		return 1;
+	exact = exact || class[0] == 'n' || class[0] == 'l' || class[0] == 'i';
+
+	if (class[1] == 's') {
+		if (class[0] != 'z')
+			return 1;
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		if (CHAR(STRING_ELT(trans, 0))[0] == ct)
+			return 1;
+		checkDN = 0;
+	}
 
 	if (checkDN) {
 		SEXP dimnames = GET_SLOT(obj, Matrix_DimNamesSym);
@@ -2356,14 +2365,19 @@ int sparse_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 			return 0;
 	}
 
-	if (class[1] == 't')
-		return sparse_is_diagonal(obj, class);
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		char di = CHAR(STRING_ELT(diag, 0))[0];
+		if (class[0] == 'n' || class[0] == 'l' || class[0] == 'i' ||
+		    (exact && (class[0] != 'z' || ct != 'C' || di != 'N')))
+			return sparse_is_diagonal(obj, class);
+	}
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		return 0;
-	if (n <= 1)
+	if (n == 0 || (n == 1 && (class[0] != 'z' || ct != 'C')))
 		return 1;
 
 	if (class[2] == 'T') {
@@ -2416,7 +2430,7 @@ int sparse_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 	     o  that X[j,i] == Conj(X[i,j])
 	     o  that Im(X[j,i]) == 0 if i == j
 	*/
-	if (class[0] == 'n')
+	if (class[0] == 'n' || !exact)
 		IS_LOOP(int, LOGICAL, HIDE, NOTREAL_PATTERN, NOTCONJ_PATTERN);
 	else {
 		SEXP x0 = GET_SLOT(obj, Matrix_xSym);
@@ -2445,7 +2459,7 @@ int sparse_is_symmetric(SEXP obj, const char *class, char ct, int checkDN)
 		if (pp_[j] != pp0[j])
 			goto finish;
 
-	ans = 1;
+	ans = (exact) ? 1 : NA_LOGICAL /* => do inexact numerical test in R */ ;
 
 finish:
 	Matrix_Free(pp_, n);
@@ -2456,16 +2470,21 @@ finish:
 	return ans;
 }
 
-/* isSymmetric(<[CRT]sparseMatrix>, trans, checkDN, ...)
+/* isSymmetric(<[CRT]sparseMatrix>, tol, tol1, trans, checkDN)
    NB: requires symmetric nonzero pattern
 */
-SEXP R_sparse_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
+SEXP R_sparse_is_symmetric(SEXP obj, SEXP exact, SEXP trans, SEXP checkDN)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
 	int ivalid = R_check_class_etc(obj, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(obj, __func__);
+
+	int exact_;
+	if (TYPEOF(exact) != LGLSXP || LENGTH(exact) < 1 ||
+	    (exact_ = LOGICAL(exact)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "exact", "TRUE", "FALSE");
 
 	char ct = 'C';
 	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
@@ -2478,8 +2497,8 @@ SEXP R_sparse_is_symmetric(SEXP obj, SEXP trans, SEXP checkDN)
 	    (checkDN_ = LOGICAL(checkDN)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
 
-	int ans_ = sparse_is_symmetric(obj, valid[ivalid], ct, checkDN_);
-	SEXP ans = ScalarLogical(ans_ != 0);
+	int ans_ = sparse_is_symmetric(obj, valid[ivalid], exact_, ct, checkDN_);
+	SEXP ans = ScalarLogical(ans_);
 	return ans;
 }
 
