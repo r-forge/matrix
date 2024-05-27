@@ -12,37 +12,37 @@ char La_norm_type(SEXP s)
 	if (LENGTH(s) == 0)
 		error(_("argument '%s' has length %d"),
 		      ARGNAME, 0);
-	const char *type = CHAR(STRING_ELT(s, 0));
-	if (type[0] == '\0' || type[1] != '\0')
+	s = STRING_ELT(s, 0);
+	if (CHAR(s)[0] == '\0' || CHAR(s)[1] != '\0')
 		error(_("argument '%s' (\"%s\") does not have string length %d"),
-		      ARGNAME, type, 1);
-	char t = '\0';
-	switch (type[0]) {
+		      ARGNAME, CHAR(s), 1);
+	char type = '\0';
+	switch (CHAR(s)[0]) {
 	case 'M':
 	case 'm':
-		t = 'M';
+		type = 'M';
 		break;
 	case 'O':
 	case 'o':
 	case '1':
-		t = 'O';
+		type = 'O';
 		break;
 	case 'I':
 	case 'i':
-		t = 'I';
+		type = 'I';
 		break;
 	case 'F':
 	case 'f':
 	case 'E':
 	case 'e':
-		t = 'F';
+		type = 'F';
 		break;
 	default:
 		error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", or \"%s\""),
-		      ARGNAME, type, "M", "O", "1", "I", "F", "E");
+		      ARGNAME, CHAR(s), "M", "O", "1", "I", "F", "E");
 		break;
 	}
-	return t;
+	return type;
 #undef ARGNAME
 }
 
@@ -56,194 +56,194 @@ char La_rcond_type(SEXP s)
 	if (LENGTH(s) == 0)
 		error(_("argument '%s' has length %d"),
 		      ARGNAME, 0);
-	const char *type = CHAR(STRING_ELT(s, 0));
-	if (type[0] == '\0' || type[1] != '\0')
+	s = STRING_ELT(s, 0);
+	if (CHAR(s)[0] == '\0' || CHAR(s)[1] != '\0')
 		error(_("argument '%s' (\"%s\") does not have string length %d"),
-		      ARGNAME, type, 1);
-	char t = '\0';
-	switch (type[0]) {
+		      ARGNAME, CHAR(s), 1);
+	char type = '\0';
+	switch (CHAR(s)[0]) {
 	case 'O':
 	case 'o':
 	case '1':
-		t = 'O';
+		type = 'O';
 		break;
 	case 'I':
 	case 'i':
-		t = 'I';
+		type = 'I';
 		break;
 	default:
 		error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", or \"%s\""),
-		      ARGNAME, type, "O", "1", "I");
+		      ARGNAME, CHAR(s), "O", "1", "I");
 		break;
 	}
-	return t;
+	return type;
 #undef ARGNAME
 }
 
-SEXP geMatrix_norm(SEXP obj, SEXP type)
+SEXP geMatrix_norm(SEXP s_obj, SEXP s_type)
 {
-	char t = La_norm_type(type);
+	char type = La_norm_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (m == 0 || n == 0)
 		return ScalarReal(0.0);
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
-	if (t == 'I')
+	if (type == 'I')
 		work = (double *) R_alloc((size_t) m, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
-	F77_CALL(zlange)(&t, &m, &n, COMPLEX(x), &m, work FCONE);
+	F77_CALL(zlange)(&type, &m, &n, COMPLEX(x), &m, work FCONE);
 	else
 	norm =
-	F77_CALL(dlange)(&t, &m, &n,    REAL(x), &m, work FCONE);
+	F77_CALL(dlange)(&type, &m, &n,    REAL(x), &m, work FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
 }
 
-SEXP syMatrix_norm(SEXP obj, SEXP type)
+SEXP syMatrix_norm(SEXP s_obj, SEXP s_type)
 {
-	char t = La_norm_type(type);
+	char type = La_norm_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[1];
 	if (n == 0)
 		return ScalarReal(0.0);
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
-	if (t == 'O' || t == 'I')
+	if (type == 'O' || type == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP) {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C')
 	norm =
-	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zlanhe)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	else
 	norm =
-	F77_CALL(zlansy)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zlansy)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	}
 	else
 	norm =
-	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
+	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
 }
 
-SEXP spMatrix_norm(SEXP obj, SEXP type)
+SEXP spMatrix_norm(SEXP s_obj, SEXP s_type)
 {
-	char t = La_norm_type(type);
+	char type = La_norm_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[1];
 	if (n == 0)
 		return ScalarReal(0.0);
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
-	if (t == 'O' || t == 'I')
+	if (type == 'O' || type == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP) {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C')
 	norm =
-	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zlanhp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	else
 	norm =
-	F77_CALL(zlansp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zlansp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	}
 	else
 	norm =
-	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
+	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
 }
 
-SEXP trMatrix_norm(SEXP obj, SEXP type)
+SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
 {
-	char t = La_norm_type(type);
+	char type = La_norm_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return ScalarReal(0.0);
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
 	char di = CHAR(STRING_ELT(diag, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
-	if (t == 'I')
+	if (type == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
-	F77_CALL(zlantr)(&t, &ul, &di, &n, &n, COMPLEX(x), &n, work FCONE FCONE FCONE);
+	F77_CALL(zlantr)(&type, &ul, &di, &n, &n, COMPLEX(x), &n, work FCONE FCONE FCONE);
 	else
 	norm =
-	F77_CALL(dlantr)(&t, &ul, &di, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
+	F77_CALL(dlantr)(&type, &ul, &di, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
 }
 
-SEXP tpMatrix_norm(SEXP obj, SEXP type)
+SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
 {
-	char t = La_norm_type(type);
+	char type = La_norm_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return ScalarReal(0.0);
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
 	char di = CHAR(STRING_ELT(diag, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
-	if (t == 'I')
+	if (type == 'I')
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
-	F77_CALL(zlantp)(&t, &ul, &di, &n, COMPLEX(x), work FCONE FCONE FCONE);
+	F77_CALL(zlantp)(&type, &ul, &di, &n, COMPLEX(x), work FCONE FCONE FCONE);
 	else
 	norm =
-	F77_CALL(dlantp)(&t, &ul, &di, &n,    REAL(x), work FCONE FCONE FCONE);
+	F77_CALL(dlantp)(&type, &ul, &di, &n,    REAL(x), work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
 }
 
-SEXP geMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (m != n)
 		error(_("%s(%s) is undefined: '%s' is not square"), "rcond", "x", "x");
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
@@ -251,14 +251,14 @@ SEXP geMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	if (TYPEOF(x) == CPLXSXP) {
 	double *rwork = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	norm =
-	F77_CALL(zlange)(&t, &n, &n, COMPLEX(x), &n, work FCONE);
-	F77_CALL(zgecon)(&t, &n,     COMPLEX(y), &n, &norm, &rcond,
+	F77_CALL(zlange)(&type, &n, &n, COMPLEX(x), &n, work FCONE);
+	F77_CALL(zgecon)(&type, &n,     COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
-	F77_CALL(dlange)(&t, &n, &n,    REAL(x), &n, work FCONE);
-	F77_CALL(dgecon)(&t, &n,        REAL(y), &n, &norm, &rcond,
+	F77_CALL(dlange)(&type, &n, &n,    REAL(x), &n, work FCONE);
+	F77_CALL(dgecon)(&type, &n,        REAL(y), &n, &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
 	}
 	UNPROTECT(2); /* x, y */
@@ -266,44 +266,44 @@ SEXP geMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP syMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym)),
 		pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C') {
 	norm =
-	F77_CALL(zlanhe)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
-	F77_CALL(zhecon)(    &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
+	F77_CALL(zlanhe)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zhecon)(       &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
 	} else {
 	norm =
-	F77_CALL(zlansy)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
-	F77_CALL(zsycon)(    &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
+	F77_CALL(zlansy)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zsycon)(       &ul, &n, COMPLEX(y), &n, INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
 	}
 	} else {
 	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
-	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
-	F77_CALL(dsycon)(    &ul, &n,    REAL(y), &n, INTEGER(pivot), &norm, &rcond,
+	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
+	F77_CALL(dsycon)(       &ul, &n,    REAL(y), &n, INTEGER(pivot), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
 	}
 	UNPROTECT(3); /* x, y, pivot */
@@ -311,44 +311,44 @@ SEXP syMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP spMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym)),
 		pivot = PROTECT(GET_SLOT(trf, Matrix_permSym));
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
+	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C') {
 	norm =
-	F77_CALL(zlanhp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
-	F77_CALL(zhpcon)(    &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
+	F77_CALL(zlanhp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zhpcon)(       &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
 	} else {
 	norm =
-	F77_CALL(zlansp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
-	F77_CALL(zspcon)(    &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
+	F77_CALL(zlansp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zspcon)(       &ul, &n, COMPLEX(y), INTEGER(pivot), &norm, &rcond,
 	                 (Rcomplex *) work,        &info FCONE);
 	}
 	} else {
 	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
-	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
-	F77_CALL(dspcon)(    &ul, &n,    REAL(y), INTEGER(pivot), &norm, &rcond,
+	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
+	F77_CALL(dspcon)(       &ul, &n,    REAL(y), INTEGER(pivot), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
 	}
 	UNPROTECT(3); /* x, y, pivot */
@@ -356,19 +356,19 @@ SEXP spMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP poMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP poMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
@@ -376,15 +376,15 @@ SEXP poMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
 	norm =
-	F77_CALL(zlansy)(&t, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
-	F77_CALL(zpocon)(    &ul, &n, COMPLEX(y), &n, &norm, &rcond,
+	F77_CALL(zlansy)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
+	F77_CALL(zpocon)(       &ul, &n, COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
-	F77_CALL(dlansy)(&t, &ul, &n,    REAL(x), &n, work FCONE FCONE);
-	F77_CALL(dpocon)(    &ul, &n, REAL(y), &n, &norm, &rcond,
+	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
+	F77_CALL(dpocon)(       &ul, &n, REAL(y), &n, &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
 	}
 	UNPROTECT(2); /* x, y */
@@ -392,19 +392,19 @@ SEXP poMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP ppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
+SEXP ppMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
@@ -412,15 +412,15 @@ SEXP ppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
 	norm =
-	F77_CALL(zlansp)(&t, &ul, &n, COMPLEX(x), work FCONE FCONE);
-	F77_CALL(zppcon)(    &ul, &n, COMPLEX(y), &norm, &rcond,
+	F77_CALL(zlansp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
+	F77_CALL(zppcon)(       &ul, &n, COMPLEX(y), &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
 	norm =
-	F77_CALL(dlansp)(&t, &ul, &n,    REAL(x), work FCONE FCONE);
-	F77_CALL(dppcon)(    &ul, &n,    REAL(y), &norm, &rcond,
+	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
+	F77_CALL(dppcon)(       &ul, &n,    REAL(y), &norm, &rcond,
 	                 (double   *) work, iwork, &info FCONE);
 	}
 	UNPROTECT(2); /* x, y */
@@ -428,33 +428,33 @@ SEXP ppMatrix_rcond(SEXP obj, SEXP trf, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP trMatrix_rcond(SEXP obj, SEXP type)
+SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
 	char di = CHAR(STRING_ELT(diag, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
-	F77_CALL(ztrcon)(&t, &ul, &di, &n, COMPLEX(x), &n, &rcond,
+	F77_CALL(ztrcon)(&type, &ul, &di, &n, COMPLEX(x), &n, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
-	F77_CALL(dtrcon)(&t, &ul, &di, &n,    REAL(x), &n, &rcond,
+	F77_CALL(dtrcon)(&type, &ul, &di, &n,    REAL(x), &n, &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}
 	UNPROTECT(1); /* x */
@@ -462,33 +462,33 @@ SEXP trMatrix_rcond(SEXP obj, SEXP type)
 	return ScalarReal(rcond);
 }
 
-SEXP tpMatrix_rcond(SEXP obj, SEXP type)
+SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 {
-	char t = La_rcond_type(type);
+	char type = La_rcond_type(s_type);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
 		return(ScalarReal(R_PosInf));
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
 	char di = CHAR(STRING_ELT(diag, 0))[0];
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
-	F77_CALL(ztpcon)(&t, &ul, &di, &n, COMPLEX(x), &rcond,
+	F77_CALL(ztpcon)(&type, &ul, &di, &n, COMPLEX(x), &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
-	F77_CALL(dtpcon)(&t, &ul, &di, &n,    REAL(x), &rcond,
+	F77_CALL(dtpcon)(&type, &ul, &di, &n,    REAL(x), &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}
 	UNPROTECT(1); /* x */

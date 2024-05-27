@@ -73,83 +73,83 @@ void asPerm(const int *p, int *ip, int m, int n, int off, int ioff)
 	return;
 }
 
-SEXP R_isPerm(SEXP p, SEXP off)
+SEXP R_isPerm(SEXP s_p, SEXP s_off)
 {
-	if (TYPEOF(p) != INTSXP)
+	if (TYPEOF(s_p) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "p", "integer");
-	if (TYPEOF(off) != INTSXP)
+	if (TYPEOF(s_off) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "off", "integer");
-	if (XLENGTH(off) != 1)
+	if (XLENGTH(s_off) != 1)
 		error(_("'%s' does not have length %d"), "off", 1);
-	int off_ = INTEGER(off)[0];
-	if (off_ == NA_INTEGER)
+	int off = INTEGER(s_off)[0];
+	if (off == NA_INTEGER)
 		error(_("'%s' is NA"), "off");
-	R_xlen_t n_ = XLENGTH(p);
-	if (n_ > INT_MAX)
+	R_xlen_t n = XLENGTH(s_p);
+	if (n > INT_MAX)
 		return ScalarLogical(0);
-	return ScalarLogical(isPerm(INTEGER(p), (int) n_, off_));
+	return ScalarLogical(isPerm(INTEGER(s_p), (int) n, off));
 }
 
-SEXP R_signPerm(SEXP p, SEXP off)
+SEXP R_signPerm(SEXP s_p, SEXP s_off)
 {
-	if (TYPEOF(p) != INTSXP)
+	if (TYPEOF(s_p) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "p", "integer");
-	if (TYPEOF(off) != INTSXP)
+	if (TYPEOF(s_off) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "off", "integer");
-	if (XLENGTH(off) != 1)
+	if (XLENGTH(s_off) != 1)
 		error(_("'%s' does not have length %d"), "off", 1);
-	int off_ = INTEGER(off)[0];
-	if (off_ == NA_INTEGER)
+	int off = INTEGER(s_off)[0];
+	if (off == NA_INTEGER)
 		error(_("'%s' is NA"), "off");
-	R_xlen_t n_ = XLENGTH(p);
-	if (n_ > INT_MAX)
+	R_xlen_t n = XLENGTH(s_p);
+	if (n > INT_MAX)
 		error(_("attempt to get sign of non-permutation"));
-	return ScalarInteger(signPerm(INTEGER(p), (int) n_, off_));
+	return ScalarInteger(signPerm(INTEGER(s_p), (int) n, off));
 }
 
-SEXP R_invertPerm(SEXP p, SEXP off, SEXP ioff)
+SEXP R_invertPerm(SEXP s_p, SEXP s_off, SEXP s_ioff)
 {
-	if (TYPEOF(p) != INTSXP)
+	if (TYPEOF(s_p) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "p", "integer");
-	if (TYPEOF(off) != INTSXP || TYPEOF(ioff) != INTSXP)
+	if (TYPEOF(s_off) != INTSXP || TYPEOF(s_ioff) != INTSXP)
 		error(_("'%s' or '%s' is not of type \"%s\""), "off", "ioff", "integer");
-	if (XLENGTH(off) != 1 || XLENGTH(ioff) != 1)
+	if (XLENGTH(s_off) != 1 || XLENGTH(s_ioff) != 1)
 		error(_("'%s' or '%s' does not have length %d"), "off", "ioff", 1);
-	int off_ = INTEGER(off)[0], ioff_ = INTEGER(ioff)[0];
-	if (off_ == NA_INTEGER || ioff_ == NA_INTEGER)
+	int off = INTEGER(s_off)[0], ioff = INTEGER(s_ioff)[0];
+	if (off == NA_INTEGER || ioff == NA_INTEGER)
 		error(_("'%s' or '%s' is NA"), "off", "ioff");
-	R_xlen_t n_ = XLENGTH(p);
-	if (n_ > INT_MAX)
+	R_xlen_t n = XLENGTH(s_p);
+	if (n > INT_MAX)
 		error(_("attempt to invert non-permutation"));
-	SEXP ip = PROTECT(allocVector(INTSXP, n_));
-	invertPerm(INTEGER(p), INTEGER(ip), (int) n_, off_, ioff_);
+	SEXP ip = PROTECT(allocVector(INTSXP, n));
+	invertPerm(INTEGER(s_p), INTEGER(ip), (int) n, off, ioff);
 	UNPROTECT(1);
 	return ip;
 }
 
-SEXP R_asPerm(SEXP p, SEXP off, SEXP ioff, SEXP n)
+SEXP R_asPerm(SEXP s_p, SEXP s_off, SEXP s_ioff, SEXP s_n)
 {
-	if (TYPEOF(p) != INTSXP)
+	if (TYPEOF(s_p) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "p", "integer");
-	R_xlen_t m_ = XLENGTH(p);
-	if (m_ > INT_MAX)
+	R_xlen_t m = XLENGTH(s_p);
+	if (m > INT_MAX)
 		error(_("'%s' has length exceeding %s"), "p", "2^31-1");
-	if (TYPEOF(off) != INTSXP || TYPEOF(ioff) != INTSXP)
+	if (TYPEOF(s_off) != INTSXP || TYPEOF(s_ioff) != INTSXP)
 		error(_("'%s' or '%s' is not of type \"%s\""), "off", "ioff", "integer");
-	if (XLENGTH(off) != 1 || XLENGTH(ioff) != 1)
+	if (XLENGTH(s_off) != 1 || XLENGTH(s_ioff) != 1)
 		error(_("'%s' or '%s' does not have length %d"), "off", "ioff", 1);
-	int off_ = INTEGER(off)[0], ioff_ = INTEGER(ioff)[0];
-	if (off_ == NA_INTEGER || ioff_ == NA_INTEGER)
+	int off = INTEGER(s_off)[0], ioff = INTEGER(s_ioff)[0];
+	if (off == NA_INTEGER || ioff == NA_INTEGER)
 		error(_("'%s' or '%s' is NA"), "off", "ioff");
-	if (TYPEOF(n) != INTSXP)
+	if (TYPEOF(s_n) != INTSXP)
 		error(_("'%s' is not of type \"%s\""), "n", "integer");
-	if (XLENGTH(n) != 1)
+	if (XLENGTH(s_n) != 1)
 		error(_("'%s' does not have length %d"), "n", 1);
-	int n_ = INTEGER(n)[0];
-	if (n_ == NA_INTEGER || n_ < m_)
+	int n = INTEGER(s_n)[0];
+	if (n == NA_INTEGER || n < m)
 		error(_("'%s' is NA or less than %s"), "n", "length(p)");
-	SEXP ip = PROTECT(allocVector(INTSXP, n_));
-	asPerm(INTEGER(p), INTEGER(ip), (int) m_, n_, off_, ioff_);
+	SEXP ip = PROTECT(allocVector(INTSXP, n));
+	asPerm(INTEGER(s_p), INTEGER(ip), (int) m, n, off, ioff);
 	UNPROTECT(1);
 	return ip;
 }

@@ -26,7 +26,7 @@ SEXP mkDet(double modulus, int logarithm, int sign)
 	return det;
 }
 
-SEXP denseLU_determinant(SEXP trf, SEXP logarithm)
+SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 {
 
 #define DETERMINANT_START(_F_) \
@@ -34,12 +34,12 @@ SEXP denseLU_determinant(SEXP trf, SEXP logarithm)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
 	if (m != n) \
 		error(_("determinant of non-square matrix is undefined")); \
-	int givelog = asLogical(logarithm) != 0; \
+	int givelog = asLogical(s_logarithm) != 0; \
 	double modulus = 0.0; /* result for n == 0 */
 
-	DETERMINANT_START(trf);
+	DETERMINANT_START(s_trf);
 
-	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
 
 	if (n > 0) {
@@ -52,7 +52,7 @@ SEXP denseLU_determinant(SEXP trf, SEXP logarithm)
 			px += n1a;
 		}
 	} else {
-		SEXP pivot = GET_SLOT(trf, Matrix_permSym);
+		SEXP pivot = GET_SLOT(s_trf, Matrix_permSym);
 		int *ppivot = INTEGER(pivot);
 		double *px = REAL(x);
 		for (j = 0; j < n; ++j) {
@@ -75,26 +75,26 @@ SEXP denseLU_determinant(SEXP trf, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP denseBunchKaufman_determinant(SEXP trf, SEXP logarithm)
+SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 {
-	DETERMINANT_START(trf);
+	DETERMINANT_START(s_trf);
 
-	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int sign = 1;
 
 	char ct = 'C';
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = GET_SLOT(trf, Matrix_transSym);
+		SEXP trans = GET_SLOT(s_trf, Matrix_transSym);
 		ct = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct != 'C')
 			sign = NA_INTEGER;
 	}
 
 	if (n > 0) {
-	SEXP uplo = GET_SLOT(trf, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_trf, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
-	SEXP pivot = GET_SLOT(trf, Matrix_permSym);
+	SEXP pivot = GET_SLOT(s_trf, Matrix_permSym);
 	int *ppivot = INTEGER(pivot);
 
 	int j = 0, packed = XLENGTH(x) != (int_fast64_t) n * n;
@@ -200,15 +200,15 @@ SEXP denseBunchKaufman_determinant(SEXP trf, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP denseCholesky_determinant(SEXP trf, SEXP logarithm)
+SEXP denseCholesky_determinant(SEXP s_trf, SEXP s_logarithm)
 {
-	DETERMINANT_START(trf);
+	DETERMINANT_START(s_trf);
 
-	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int sign = 1;
 
 	if (n > 0) {
-	SEXP uplo = GET_SLOT(trf, Matrix_uploSym);
+	SEXP uplo = GET_SLOT(s_trf, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	int j, packed = XLENGTH(x) != (int_fast64_t) n * n;
@@ -233,7 +233,7 @@ SEXP denseCholesky_determinant(SEXP trf, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseQR_determinant(SEXP orf, SEXP logarithm)
+SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 {
 	DETERMINANT_START(orf);
 
@@ -304,11 +304,11 @@ SEXP sparseQR_determinant(SEXP orf, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseLU_determinant(SEXP trf, SEXP logarithm)
+SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 {
-	DETERMINANT_START(trf);
+	DETERMINANT_START(s_trf);
 
-	SEXP U = PROTECT(GET_SLOT(trf, Matrix_USym)),
+	SEXP U = PROTECT(GET_SLOT(s_trf, Matrix_USym)),
 		x = PROTECT(GET_SLOT(U, Matrix_xSym));
 	int sign = (TYPEOF(x) == CPLXSXP) ? NA_INTEGER : 1;
 
@@ -352,10 +352,10 @@ SEXP sparseLU_determinant(SEXP trf, SEXP logarithm)
 	/* defined in ./perm.c : */
 	int signPerm(const int *, int, int);
 
-	p = GET_SLOT(trf, Matrix_pSym);
+	p = GET_SLOT(s_trf, Matrix_pSym);
 	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 		sign = -sign;
-	p = GET_SLOT(trf, Matrix_qSym);
+	p = GET_SLOT(s_trf, Matrix_qSym);
 	if (signPerm(INTEGER(p), LENGTH(p), 0) < 0)
 		sign = -sign;
 	}
@@ -365,15 +365,15 @@ SEXP sparseLU_determinant(SEXP trf, SEXP logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseCholesky_determinant(SEXP trf, SEXP logarithm, SEXP sqrt)
+SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 {
-	DETERMINANT_START(trf);
+	DETERMINANT_START(s_trf);
 
-	cholmod_factor *L = M2CHF(trf, 1);
+	cholmod_factor *L = M2CHF(s_trf, 1);
 	int sign = 1;
 
 	if (n > 0) {
-	int j, sqrt_ = asLogical(sqrt);
+	int j, sqrt = asLogical(s_sqrt);
 	if (L->is_super) {
 		int k, nc,
 			nsuper = (int) L->nsuper,
@@ -418,7 +418,7 @@ SEXP sparseCholesky_determinant(SEXP trf, SEXP logarithm, SEXP sqrt)
 					if (ISNAN(px[pp[j]].r) || px[pp[j]].r >= 0.0)
 						modulus += log(px[pp[j]].r);
 					else {
-						if (sqrt_)
+						if (sqrt)
 							return mkDet(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]].r);
 						sign = -sign;
@@ -436,7 +436,7 @@ SEXP sparseCholesky_determinant(SEXP trf, SEXP logarithm, SEXP sqrt)
 					if (ISNAN(px[pp[j]]) || px[pp[j]] >= 0.0)
 						modulus += log(px[pp[j]]);
 					else {
-						if (sqrt_)
+						if (sqrt)
 							return mkDet(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]]);
 						sign = -sign;
@@ -445,7 +445,7 @@ SEXP sparseCholesky_determinant(SEXP trf, SEXP logarithm, SEXP sqrt)
 			}
 		}
 	}
-	if (sqrt_)
+	if (sqrt)
 		modulus *= 0.5;
 	}
 

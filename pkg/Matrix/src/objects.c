@@ -139,9 +139,9 @@ char Matrix_repr(SEXP obj)
 	}
 }
 
-SEXP R_Matrix_nonvirtual(SEXP obj, SEXP mode)
+SEXP R_Matrix_nonvirtual(SEXP s_obj, SEXP s_mode)
 {
-	return mkString(Matrix_nonvirtual(obj, asInteger(mode)));
+	return mkString(Matrix_nonvirtual(s_obj, asInteger(s_mode)));
 }
 
 #define RETURN_AS_STRSXP(_C_) \
@@ -155,17 +155,17 @@ do { \
 	} \
 } while (0)
 
-SEXP R_Matrix_kind(SEXP obj)
+SEXP R_Matrix_kind(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_kind (obj));
+	RETURN_AS_STRSXP(Matrix_kind (s_obj));
 }
 
-SEXP R_Matrix_shape(SEXP obj)
+SEXP R_Matrix_shape(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_shape(obj));
+	RETURN_AS_STRSXP(Matrix_shape(s_obj));
 }
 
-SEXP R_Matrix_repr(SEXP obj)
+SEXP R_Matrix_repr(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_repr (obj));
+	RETURN_AS_STRSXP(Matrix_repr (s_obj));
 }

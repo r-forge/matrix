@@ -183,20 +183,20 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 }
 
 /* drop0(<[CRT]sparseMatrix>, tol) */
-SEXP R_sparse_drop0(SEXP from, SEXP tol)
+SEXP R_sparse_drop0(SEXP s_from, SEXP s_tol)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
-	double tol_;
-	if (TYPEOF(tol) != REALSXP || LENGTH(tol) < 1 ||
-	    ISNAN(tol_ = REAL(tol)[0]))
+	double tol;
+	if (TYPEOF(s_tol) != REALSXP || LENGTH(s_tol) < 1 ||
+	    ISNAN(tol = REAL(s_tol)[0]))
 		error(_("'%s' is not a number"), "tol");
 
-	return sparse_drop0(from, valid[ivalid], tol_);
+	return sparse_drop0(s_from, valid[ivalid], tol);
 }
 
 SEXP sparse_diag_U2N(SEXP from, const char *class)
@@ -220,15 +220,15 @@ SEXP sparse_diag_U2N(SEXP from, const char *class)
 /* diagU2N(<[CRT]sparseMatrix>), parallel to R-level ..diagU2N(),
    though that is more general, working for _all_ Matrix
 */
-SEXP R_sparse_diag_U2N(SEXP from)
+SEXP R_sparse_diag_U2N(SEXP s_from)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
-	return sparse_diag_U2N(from, valid[ivalid]);
+	return sparse_diag_U2N(s_from, valid[ivalid]);
 }
 
 SEXP sparse_diag_N2U(SEXP from, const char *class)
@@ -268,15 +268,15 @@ SEXP sparse_diag_N2U(SEXP from, const char *class)
 /* diagN2U(<[CRT]sparseMatrix>), parallel to R-level ..diagN2U(),
    though that is more general, working for _all_ Matrix
 */
-SEXP R_sparse_diag_N2U(SEXP from)
+SEXP R_sparse_diag_N2U(SEXP s_from)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
-	return sparse_diag_N2U(from, valid[ivalid]);
+	return sparse_diag_N2U(s_from, valid[ivalid]);
 }
 
 SEXP sparse_band(SEXP from, const char *class, int a, int b)
@@ -572,34 +572,33 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 
 /* band(<[CRT]sparseMatrix>, k1, k2), tri[ul](<[CRT]sparseMatrix>, k) */
 /* NB: argument validation more or less copied from R_dense_band() */
-SEXP R_sparse_band(SEXP from, SEXP k1, SEXP k2)
+SEXP R_sparse_band(SEXP s_from, SEXP s_a, SEXP s_b)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	UNPROTECT(1);
 
 	int a, b;
-	if (k1 == R_NilValue) // tril()
-		a = -m ; // was (m > 0) ? 1 - m : 0;
-	else if ((a = asInteger(k1)) == NA_INTEGER || a < -m || a > n)
+	if (s_a == R_NilValue)
+		a = -m;
+	else if ((a = asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
 		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
 		      "k1", a, "-Dim[1]", -m, "Dim[2]", n);
-	if (k2 == R_NilValue) // triu()
-		b = n; // was (n > 0) ? n - 1 : 0;
-	else if ((b = asInteger(k2)) == NA_INTEGER || b < -m || b > n)
+	if (s_b == R_NilValue)
+		b = n;
+	else if ((b = asInteger(s_b)) == NA_INTEGER || b < -m || b > n)
 		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
 		      "k2", b, "-Dim[1]", -m, "Dim[2]", n);
 	else if (b < a)
 		error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
 		      "k1", a, "k2", b);
 
-	return sparse_band(from, valid[ivalid], a, b);
+	return sparse_band(s_from, valid[ivalid], a, b);
 }
 
 SEXP sparse_diag_get(SEXP obj, const char *class, int names)
@@ -771,20 +770,20 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 }
 
 /* diag(<[CRT]sparseMatrix>, names=) */
-SEXP R_sparse_diag_get(SEXP obj, SEXP names)
+SEXP R_sparse_diag_get(SEXP s_obj, SEXP s_names)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int names_;
-	if (TYPEOF(names) != LGLSXP || LENGTH(names) < 1 ||
-	    (names_ = LOGICAL(names)[0]) == NA_LOGICAL)
+	int names;
+	if (TYPEOF(s_names) != LGLSXP || LENGTH(s_names) < 1 ||
+	    (names = LOGICAL(s_names)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "names", "TRUE", "FALSE");
 
-	return sparse_diag_get(obj, valid[ivalid], names_);
+	return sparse_diag_get(s_obj, valid[ivalid], names);
 }
 
 SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
@@ -1050,16 +1049,16 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 }
 
 /* diag(<[CRT]sparseMatrix>) <- value */
-SEXP R_sparse_diag_set(SEXP from, SEXP value)
+SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 	const char *class = valid[ivalid];
 
-	SEXPTYPE tx = kindToType(class[0]), tv = TYPEOF(value);
+	SEXPTYPE tx = kindToType(class[0]), tv = TYPEOF(s_value);
 
 	switch (tv) {
 	case LGLSXP:
@@ -1073,35 +1072,35 @@ SEXP R_sparse_diag_set(SEXP from, SEXP value)
 		break;
 	}
 
-	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-	R_xlen_t len = XLENGTH(value);
+	R_xlen_t len = XLENGTH(s_value);
 	if (len != 1 && len != r)
 		error(_("replacement diagonal has wrong length"));
 
 	if (tv <= tx) {
-		PROTECT(from);
-		PROTECT(value = coerceVector(value, tx));
+		PROTECT(s_from);
+		PROTECT(s_value = coerceVector(s_value, tx));
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_kind(SEXP, const char *, char);
 #ifndef MATRIX_ENABLE_IMATRIX
 		if (tv == INTSXP) {
-		PROTECT(from = sparse_as_kind(from, class, 'd'));
-		PROTECT(value = coerceVector(value, REALSXP));
+		PROTECT(s_from = sparse_as_kind(s_from, class, 'd'));
+		PROTECT(s_value = coerceVector(s_value, REALSXP));
 		} else {
 #endif
-		PROTECT(from = sparse_as_kind(from, class, typeToKind(tv)));
-		PROTECT(value);
+		PROTECT(s_from = sparse_as_kind(s_from, class, typeToKind(tv)));
+		PROTECT(s_value);
 #ifndef MATRIX_ENABLE_IMATRIX
 		}
 #endif
-		class = valid[R_check_class_etc(from, valid)];
+		class = valid[R_check_class_etc(s_from, valid)];
 	}
 
-	from = sparse_diag_set(from, class, value);
+	s_from = sparse_diag_set(s_from, class, s_value);
 	UNPROTECT(2);
-	return from;
+	return s_from;
 }
 
 SEXP sparse_transpose(SEXP from, const char *class, char ct, int lazy)
@@ -1221,26 +1220,26 @@ SEXP sparse_transpose(SEXP from, const char *class, char ct, int lazy)
 }
 
 /* t(<[CRT]sparseMatrix>) */
-SEXP R_sparse_transpose(SEXP from, SEXP trans, SEXP lazy)
+SEXP R_sparse_transpose(SEXP s_from, SEXP s_trans, SEXP s_lazy)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
 	char ct = 'C';
-	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
-	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	int lazy_;
-	if (TYPEOF(lazy) != LGLSXP || LENGTH(lazy) < 1 ||
-	    (lazy_ = LOGICAL(lazy)[0]) == NA_LOGICAL)
+	int lazy;
+	if (TYPEOF(s_lazy) != LGLSXP || LENGTH(s_lazy) < 1 ||
+	    (lazy = LOGICAL(s_lazy)[0]) == NA_LOGICAL)
 		error(_("invalid '%s' to '%s'"), "lazy", __func__);
 
-	return sparse_transpose(from, valid[ivalid], ct, lazy_);
+	return sparse_transpose(s_from, valid[ivalid], ct, lazy);
 }
 
 SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
@@ -1617,29 +1616,29 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 }
 
 /* forceSymmetric(<[CRT]sparseMatrix>, uplo, trans) */
-SEXP R_sparse_force_symmetric(SEXP from, SEXP uplo, SEXP trans)
+SEXP R_sparse_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
 	char ul = '\0', ct = '\0';
-	if (uplo != R_NilValue) {
-		if (TYPEOF(uplo) != STRSXP || LENGTH(uplo) < 1 ||
-		    (uplo = STRING_ELT(uplo, 0)) == NA_STRING ||
-		    ((ul = CHAR(uplo)[0]) != 'U' && ul != 'L'))
+	if (s_uplo != R_NilValue) {
+		if (TYPEOF(s_uplo) != STRSXP || LENGTH(s_uplo) < 1 ||
+		    (s_uplo = STRING_ELT(s_uplo, 0)) == NA_STRING ||
+		    ((ul = CHAR(s_uplo)[0]) != 'U' && ul != 'L'))
 			error(_("invalid '%s' to '%s'"), "uplo", __func__);
 	}
-	if (trans != R_NilValue) {
-		if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
-		    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-		    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+	if (s_trans != R_NilValue) {
+		if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+		    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+		    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 			error(_("invalid '%s' to '%s'"), "trans", __func__);
 	}
 
-	return sparse_force_symmetric(from, valid[ivalid], ul, ct);
+	return sparse_force_symmetric(s_from, valid[ivalid], ul, ct);
 }
 
 SEXP sparse_symmpart(SEXP from, const char *class, char ct)
@@ -2062,21 +2061,21 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 }
 
 /* symmpart(<[CRT]sparseMatrix>, trans) */
-SEXP R_sparse_symmpart(SEXP from, SEXP trans)
+SEXP R_sparse_symmpart(SEXP s_from, SEXP s_trans)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
 	char ct = 'C';
-	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
-	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	return sparse_symmpart(from, valid[ivalid], ct);
+	return sparse_symmpart(s_from, valid[ivalid], ct);
 }
 
 SEXP sparse_skewpart(SEXP from, const char *class, char ct)
@@ -2328,21 +2327,21 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 }
 
 /* skewpart(<[CRT]sparseMatrix>, trans) */
-SEXP R_sparse_skewpart(SEXP from, SEXP trans)
+SEXP R_sparse_skewpart(SEXP s_from, SEXP s_trans)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 
 	char ct = 'C';
-	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
-	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	return sparse_skewpart(from, valid[ivalid], ct);
+	return sparse_skewpart(s_from, valid[ivalid], ct);
 }
 
 int sparse_is_symmetric(SEXP obj, const char *class,
@@ -2473,31 +2472,32 @@ finish:
 /* isSymmetric(<[CRT]sparseMatrix>, tol, tol1, trans, checkDN)
    NB: requires symmetric nonzero pattern
 */
-SEXP R_sparse_is_symmetric(SEXP obj, SEXP exact, SEXP trans, SEXP checkDN)
+SEXP R_sparse_is_symmetric(SEXP s_obj,
+                           SEXP s_exact, SEXP s_trans, SEXP s_checkDN)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int exact_;
-	if (TYPEOF(exact) != LGLSXP || LENGTH(exact) < 1 ||
-	    (exact_ = LOGICAL(exact)[0]) == NA_LOGICAL)
+	int exact;
+	if (TYPEOF(s_exact) != LGLSXP || LENGTH(s_exact) < 1 ||
+	    (exact = LOGICAL(s_exact)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "exact", "TRUE", "FALSE");
 
 	char ct = 'C';
-	if (TYPEOF(trans) != STRSXP || LENGTH(trans) < 1 ||
-	    (trans = STRING_ELT(trans, 0)) == NA_STRING ||
-	    ((ct = CHAR(trans)[0]) != 'C' && ct != 'T'))
+	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
+	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
+	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	int checkDN_;
-	if (TYPEOF(checkDN) != LGLSXP || LENGTH(checkDN) < 1 ||
-	    (checkDN_ = LOGICAL(checkDN)[0]) == NA_LOGICAL)
+	int checkDN;
+	if (TYPEOF(s_checkDN) != LGLSXP || LENGTH(s_checkDN) < 1 ||
+	    (checkDN = LOGICAL(s_checkDN)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
 
-	int ans_ = sparse_is_symmetric(obj, valid[ivalid], exact_, ct, checkDN_);
+	int ans_ = sparse_is_symmetric(s_obj, valid[ivalid], exact, ct, checkDN);
 	SEXP ans = ScalarLogical(ans_);
 	return ans;
 }
@@ -2619,22 +2619,22 @@ int sparse_is_triangular(SEXP obj, const char *class, int upper)
 /* isTriangular(<[CRT]sparseMatrix>, upper)
    NB: requires triangular nonzero pattern
 */
-SEXP R_sparse_is_triangular(SEXP obj, SEXP upper)
+SEXP R_sparse_is_triangular(SEXP s_obj, SEXP s_upper)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	if (TYPEOF(upper) != LGLSXP || LENGTH(upper) < 1)
+	if (TYPEOF(s_upper) != LGLSXP || LENGTH(s_upper) < 1)
 		error(_("'%s' must be %s or %s or %s"), "upper", "TRUE", "FALSE", "NA");
-	int upper_ = LOGICAL(upper)[0];
+	int upper = LOGICAL(s_upper)[0];
 
-	int ans_ = sparse_is_triangular(obj, valid[ivalid], upper_);
+	int ans_ = sparse_is_triangular(s_obj, valid[ivalid], upper);
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
-	if (upper_ == NA_LOGICAL && ans_ != 0) {
+	if (upper == NA_LOGICAL && ans_ != 0) {
 		PROTECT(ans);
 		static
 		SEXP kindSym = NULL;
@@ -2691,15 +2691,15 @@ int sparse_is_diagonal(SEXP obj, const char *class)
 /* isDiagonal(<[CRT]sparseMatrix>)
    NB: requires diagonal nonzero pattern
 */
-SEXP R_sparse_is_diagonal(SEXP obj)
+SEXP R_sparse_is_diagonal(SEXP s_obj)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	return ScalarLogical(sparse_is_diagonal(obj, valid[ivalid]));
+	return ScalarLogical(sparse_is_diagonal(s_obj, valid[ivalid]));
 }
 
 #define   MAP(_I_) work[_I_]
@@ -3101,12 +3101,12 @@ void Tsparse_colsum(SEXP obj, const char *class,
 	return;
 }
 
-SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
-                      int narm, int mean, int sparse)
+SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
+                      int sparse)
 {
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1],
-		r = (margin == 0) ? m : n;
+		r = (mg == 0) ? m : n;
 
 	SEXP ans;
 	SEXPTYPE type = SUM_TYPEOF(class[0]);
@@ -3124,7 +3124,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 		SEXP dimnames = (class[1] != 's')
 			? GET_SLOT(obj, Matrix_DimNamesSym)
 			: get_symmetrized_DimNames(obj, -1),
-			marnames = VECTOR_ELT(dimnames, margin);
+			marnames = VECTOR_ELT(dimnames, mg);
 		if (marnames != R_NilValue) {
 			PROTECT(marnames);
 			setAttrib(ans, R_NamesSymbol, marnames);
@@ -3138,7 +3138,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	if (margin == 0) {
+	if (mg == 0) {
 		if (class[2] == 'C') {
 			Csparse_rowsum(obj, class, m, n, di, narm, mean, ans,
 			               Matrix_iSym);
@@ -3173,37 +3173,37 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int margin,
 }
 
 /* (row|col)(Sums|Means)(<[CRT]sparseMatrix>, na.rm=) */
-SEXP R_sparse_marginsum(SEXP obj, SEXP margin,
-                        SEXP narm, SEXP mean, SEXP sparse)
+SEXP R_sparse_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean,
+                        SEXP s_sparse)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int margin_;
-	if (TYPEOF(margin) != INTSXP || LENGTH(margin) < 1 ||
-	    ((margin_ = INTEGER(margin)[0]) != 0 && margin_ != 1))
+	int mg;
+	if (TYPEOF(s_margin) != INTSXP || LENGTH(s_margin) < 1 ||
+	    ((mg = INTEGER(s_margin)[0]) != 0 && mg != 1))
 		error(_("'%s' must be %d or %d"), "margin", 0, 1);
 
-	int narm_;
-	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
-	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+	int narm;
+	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||
+	    (narm = LOGICAL(s_narm)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
 
-	int mean_;
-	if (TYPEOF(mean) != LGLSXP || LENGTH(mean) < 1 ||
-	    (mean_ = LOGICAL(mean)[0]) == NA_LOGICAL)
+	int mean;
+	if (TYPEOF(s_mean) != LGLSXP || LENGTH(s_mean) < 1 ||
+	    (mean = LOGICAL(s_mean)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "mean", "TRUE", "FALSE");
 
-	int sparse_;
-	if (TYPEOF(sparse) != LGLSXP || LENGTH(sparse) < 1 ||
-	    (sparse_ = LOGICAL(sparse)[0]) == NA_LOGICAL)
+	int sparse;
+	if (TYPEOF(s_sparse) != LGLSXP || LENGTH(s_sparse) < 1 ||
+	    (sparse = LOGICAL(s_sparse)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "sparse", "TRUE", "FALSE");
 
-	return sparse_marginsum(obj, valid[ivalid],
-	                        margin_, narm_, mean_, sparse_);
+	return sparse_marginsum(s_obj, valid[ivalid], mg, narm, mean,
+	                        sparse);
 }
 
 #undef SUM_CASES
@@ -3465,20 +3465,20 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 }
 
 /* sum(<[CRT]sparseMatrix>, na.rm=) */
-SEXP R_sparse_sum(SEXP obj, SEXP narm)
+SEXP R_sparse_sum(SEXP s_obj, SEXP s_narm)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int narm_;
-	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
-	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+	int narm;
+	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||
+	    (narm = LOGICAL(s_narm)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
 
-	return sparse_sum(obj, valid[ivalid], narm_);
+	return sparse_sum(s_obj, valid[ivalid], narm);
 }
 
 SEXP sparse_prod(SEXP obj, const char *class, int narm)
@@ -3702,40 +3702,40 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 }
 
 /* prod(<[CRT]sparseMatrix>, na.rm=) */
-SEXP R_sparse_prod(SEXP obj, SEXP narm)
+SEXP R_sparse_prod(SEXP s_obj, SEXP s_narm)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
+	int ivalid = R_check_class_etc(s_obj, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
+		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int narm_;
-	if (TYPEOF(narm) != LGLSXP || LENGTH(narm) < 1 ||
-	    (narm_ = LOGICAL(narm)[0]) == NA_LOGICAL)
+	int narm;
+	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||
+	    (narm = LOGICAL(s_narm)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
 
-	return sparse_prod(obj, valid[ivalid], narm_);
+	return sparse_prod(s_obj, valid[ivalid], narm);
 }
 
 #undef TRY_INCREMENT
 #undef LONGDOUBLE_AS_DOUBLE
 
-SEXP Tsparse_aggregate(SEXP from)
+SEXP Tsparse_aggregate(SEXP s_from)
 {
 	static const char *valid[] = { VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 	const char *cl = valid[ivalid];
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	SEXP dim = PROTECT(GET_SLOT(s_from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	UNPROTECT(1); /* dim */
 
 	SEXP to,
-		i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-		j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
+		i0 = PROTECT(GET_SLOT(s_from, Matrix_iSym)),
+		j0 = PROTECT(GET_SLOT(s_from, Matrix_jSym)),
 		i1 = NULL, j1 = NULL;
 
 	/* defined in ./coerce.c : */
@@ -3745,7 +3745,7 @@ SEXP Tsparse_aggregate(SEXP from)
 		taggr(j0, i0, NULL, &j1, &i1, NULL, n, m);
 		if (!i1) {
 			UNPROTECT(2); /* j0, i0 */
-			return from;
+			return s_from;
 		}
 		PROTECT(i1);
 		PROTECT(j1);
@@ -3754,12 +3754,12 @@ SEXP Tsparse_aggregate(SEXP from)
 		SET_SLOT(to, Matrix_jSym, j1);
 		UNPROTECT(5); /* to, j1, i1, j0, i0 */
 	} else {
-		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
+		SEXP x0 = PROTECT(GET_SLOT(s_from, Matrix_xSym)),
 			x1 = NULL;
 		taggr(j0, i0, x0, &j1, &i1, &x1, n, m);
 		if (!i1) {
 			UNPROTECT(3); /* x0, j0, i0 */
-			return from;
+			return s_from;
 		}
 		PROTECT(i1);
 		PROTECT(j1);
@@ -3781,25 +3781,25 @@ SEXP Tsparse_aggregate(SEXP from)
 		UNPROTECT(1); /* dim */
 	}
 
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	SEXP dimnames = PROTECT(GET_SLOT(s_from, Matrix_DimNamesSym));
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
 	if (cl[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		SEXP uplo = PROTECT(GET_SLOT(s_from, Matrix_uploSym));
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (cl[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+		SEXP diag = PROTECT(GET_SLOT(s_from, Matrix_diagSym));
 		char di = CHAR(STRING_ELT(diag, 0))[0];
 		if (di != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
+		SEXP factors = PROTECT(GET_SLOT(s_from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
 			SET_SLOT(to, Matrix_factorsSym, factors);
 		UNPROTECT(1); /* factors */

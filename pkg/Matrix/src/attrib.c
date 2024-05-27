@@ -29,9 +29,9 @@ int DimNames_is_symmetric(SEXP dn)
 		    strcmp(nrn, ncn) != 0)));
 }
 
-SEXP R_DimNames_is_symmetric(SEXP dn)
+SEXP R_DimNames_is_symmetric(SEXP s_dn)
 {
-	return ScalarLogical(DimNames_is_symmetric(dn));
+	return ScalarLogical(DimNames_is_symmetric(s_dn));
 }
 
 void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
@@ -85,22 +85,22 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
-SEXP R_symDN(SEXP dn)
+SEXP R_symDN(SEXP s_dn)
 {
-	if (DimNames_is_trivial(dn))
-		return dn;
+	if (DimNames_is_trivial(s_dn))
+		return s_dn;
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
-	symDN(newdn, dn, -1);
+	symDN(newdn, s_dn, -1);
 	UNPROTECT(1);
 	return newdn;
 }
 
-SEXP R_revDN(SEXP dn)
+SEXP R_revDN(SEXP s_dn)
 {
-	if (DimNames_is_trivial(dn))
-		return dn;
+	if (DimNames_is_trivial(s_dn))
+		return s_dn;
 	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
-	revDN(newdn, dn);
+	revDN(newdn, s_dn);
 	UNPROTECT(1);
 	return newdn;
 }
@@ -222,15 +222,15 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
 	return;
 }
 
-SEXP R_set_factor(SEXP obj, SEXP nm, SEXP val, SEXP warn)
+SEXP R_set_factor(SEXP s_obj, SEXP s_nm, SEXP s_val, SEXP s_warn)
 {
-	if (TYPEOF(nm) != STRSXP || LENGTH(nm) < 1 ||
-	    (nm = STRING_ELT(nm, 0)) == NA_STRING)
+	if (TYPEOF(s_nm) != STRSXP || LENGTH(s_nm) < 1 ||
+	    (s_nm = STRING_ELT(s_nm, 0)) == NA_STRING)
 		error(_("invalid factor name"));
-	else if (TYPEOF(getAttrib(obj, Matrix_factorsSym)) == VECSXP)
-		set_factor(obj, CHAR(nm), val);
-	else if (asLogical(warn) != 0)
+	else if (TYPEOF(getAttrib(s_obj, Matrix_factorsSym)) == VECSXP)
+		set_factor(s_obj, CHAR(s_nm), s_val);
+	else if (asLogical(s_warn) != 0)
 		warning(_("attempt to set factor on %s without '%s' slot"),
 		        "Matrix", "factors");
-	return val;
+	return s_val;
 }

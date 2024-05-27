@@ -456,111 +456,111 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 	return trf;
 }
 
-SEXP geMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
+SEXP geMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors_ = asLogical(vectors);
+	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
-	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (isNull(scf)) {
-		scf = geMatrix_scf_(obj, asInteger(warn), vectors_);
-		if (vectors_) {
+		scf = geMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		if (vectors) {
 		PROTECT(scf);
-		set_factor(obj, nm, scf);
+		set_factor(s_obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
 	return scf;
 }
 
-SEXP syMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
+SEXP syMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors_ = asLogical(vectors);
+	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
-	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (isNull(scf)) {
-		scf = syMatrix_scf_(obj, asInteger(warn), vectors_);
-		if (vectors_) {
+		scf = syMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		if (vectors) {
 		PROTECT(scf);
-		set_factor(obj, nm, scf);
+		set_factor(s_obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
 	return scf;
 }
 
-SEXP spMatrix_scf(SEXP obj, SEXP warn, SEXP vectors)
+SEXP spMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors_ = asLogical(vectors);
+	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
-	SEXP scf = (vectors_) ? get_factor(obj, nm) : R_NilValue;
+	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (isNull(scf)) {
-		scf = spMatrix_scf_(obj, asInteger(warn), vectors_);
-		if (vectors_) {
+		scf = spMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		if (vectors) {
 		PROTECT(scf);
-		set_factor(obj, nm, scf);
+		set_factor(s_obj, nm, scf);
 		UNPROTECT(1);
 		}
 	}
 	return scf;
 }
 
-SEXP geMatrix_trf(SEXP obj, SEXP warn)
+SEXP geMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseLU";
-	SEXP trf = get_factor(obj, nm);
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		PROTECT(trf = geMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, trf);
+		PROTECT(trf = geMatrix_trf_(s_obj, asInteger(s_warn)));
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
 	return trf;
 }
 
-SEXP syMatrix_trf(SEXP obj, SEXP warn)
+SEXP syMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseBunchKaufman+";
-	SEXP trf = get_factor(obj, nm);
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		PROTECT(trf = syMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, trf);
+		PROTECT(trf = syMatrix_trf_(s_obj, asInteger(s_warn)));
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
 	return trf;
 }
 
-SEXP spMatrix_trf(SEXP obj, SEXP warn)
+SEXP spMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseBunchKaufman-";
-	SEXP trf = get_factor(obj, nm);
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		PROTECT(trf = spMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, trf);
+		PROTECT(trf = spMatrix_trf_(s_obj, asInteger(s_warn)));
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
 	return trf;
 }
 
-SEXP poMatrix_trf(SEXP obj, SEXP warn, SEXP pivot, SEXP tol)
+SEXP poMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_pivot, SEXP s_tol)
 {
-	int pivot_ = asLogical(pivot);
-	const char *nm = (pivot_) ? "denseCholesky++" : "denseCholesky+-";
-	SEXP trf = get_factor(obj, nm);
+	int pivot = asLogical(s_pivot);
+	const char *nm = (pivot) ? "denseCholesky++" : "denseCholesky+-";
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		double tol_ = asReal(tol);
-		PROTECT(trf = poMatrix_trf_(obj, asInteger(warn), pivot_, tol_));
-		set_factor(obj, nm, trf);
+		double tol = asReal(s_tol);
+		PROTECT(trf = poMatrix_trf_(s_obj, asInteger(s_warn), pivot, tol));
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
 	return trf;
 }
 
-SEXP ppMatrix_trf(SEXP obj, SEXP warn)
+SEXP ppMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseCholesky--";
-	SEXP trf = get_factor(obj, nm);
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		PROTECT(trf = ppMatrix_trf_(obj, asInteger(warn)));
-		set_factor(obj, nm, trf);
+		PROTECT(trf = ppMatrix_trf_(s_obj, asInteger(s_warn)));
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
 	return trf;
@@ -773,9 +773,9 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 	cholmod_factorize_p(A, betaRI, NULL, 0, L, &c);
 	cholmod_defaults(&c);
 
-#define PCTRF_FINISH(_WARN_) \
+#define PCTRF_FINISH(_OBJ_, _WARN_) \
 	do { \
-		SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)); \
+		SEXP dimnames = PROTECT(GET_SLOT(_OBJ_, Matrix_DimNamesSym)); \
 		PROTECT(trf = CHF2M(L, 1)); \
 		cholmod_free_factor(&L, &c); \
 		if (TYPEOF(trf) == CHARSXP) { \
@@ -790,97 +790,97 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 		UNPROTECT(2); \
 	} while (0)
 
-	PCTRF_FINISH(warn);
+	PCTRF_FINISH(obj, warn);
 	return trf;
 }
 
-SEXP gCMatrix_orf(SEXP obj, SEXP warn, SEXP order)
+SEXP gCMatrix_orf(SEXP s_obj, SEXP s_warn, SEXP s_order)
 {
-	int order_ = asInteger(order);
-	if (order_ < 0 || order_ > 3)
-		order_ = 0;
-	const char *nm = (order_ > 0) ? "sparseQR~" : "sparseQR";
-	SEXP orf = get_factor(obj, nm);
+	int order = asInteger(s_order);
+	if (order < 0 || order > 3)
+		order = 0;
+	const char *nm = (order > 0) ? "sparseQR~" : "sparseQR";
+	SEXP orf = get_factor(s_obj, nm);
 	if (isNull(orf)) {
-		orf = gCMatrix_orf_(obj, asInteger(warn), order_);
+		orf = gCMatrix_orf_(s_obj, asInteger(s_warn), order);
 		if (!isNull(orf)) {
 		PROTECT(orf);
-		set_factor(obj, nm, orf);
+		set_factor(s_obj, nm, orf);
 		UNPROTECT(1);
 		}
 	}
 	return orf;
 }
 
-SEXP gCMatrix_trf(SEXP obj, SEXP warn, SEXP order, SEXP tol)
+SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 {
-	double tol_ = asReal(tol);
-	if (ISNAN(tol_))
+	double tol = asReal(s_tol);
+	if (ISNAN(tol))
 		error(_("'%s' is not a number"), "tol");
-	int order_ = asInteger(order);
-	if (order_ == NA_INTEGER)
-		order_ = (tol_ == 1.0) ? 2 : 1;
-	else if (order_ < 0 || order_ > 3)
-		order_ = 0;
-	const char *nm = (order_ > 0) ? "sparseLU~" : "sparseLU";
-	SEXP trf = get_factor(obj, nm);
+	int order = asInteger(s_order);
+	if (order == NA_INTEGER)
+		order = (tol == 1.0) ? 2 : 1;
+	else if (order < 0 || order > 3)
+		order = 0;
+	const char *nm = (order > 0) ? "sparseLU~" : "sparseLU";
+	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
-		trf = gCMatrix_trf_(obj, asInteger(warn), order_, tol_);
+		trf = gCMatrix_trf_(s_obj, asInteger(s_warn), order, tol);
 		if (!isNull(trf)) {
 		PROTECT(trf);
-		set_factor(obj, nm, trf);
+		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 		}
 	}
 	return trf;
 }
 
-SEXP pCMatrix_trf(SEXP obj, SEXP warn, SEXP order,
-                  SEXP ll, SEXP super, SEXP beta)
+SEXP pCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order,
+                  SEXP s_ll, SEXP s_super, SEXP s_beta)
 {
-	int warn_ = asInteger(warn), order_ = asInteger(order),
-		ll_ = asLogical(ll), super_ = asLogical(super);
-	Rcomplex beta_ = asComplex(beta);
-	if (order_ < 0 || order_ > 1)
-		order_ = 0;
-	if (!R_FINITE(beta_.r) || !R_FINITE(beta_.i))
+	int warn = asInteger(s_warn), order = asInteger(s_order),
+		ll = asLogical(s_ll), super = asLogical(s_super);
+	Rcomplex beta = asComplex(s_beta);
+	if (order < 0 || order > 1)
+		order = 0;
+	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
 		error(_("'%s' is not a number or not finite"), "beta");
 	SEXP trf = R_NilValue;
 	char nm[] = "..........Cholesky.";
-	nm[18] = (order_ > 0) ? '+' : '-';
-	if (super_ == NA_LOGICAL || super_ == 0) {
+	nm[18] = (order > 0) ? '+' : '-';
+	if (super == NA_LOGICAL || super == 0) {
 		memcpy(nm, "simplicial", 10);
-		trf = get_factor(obj, nm);
-		if (!isNull(trf)) super_ = 0;
+		trf = get_factor(s_obj, nm);
+		if (!isNull(trf)) super = 0;
 	}
-	if (isNull(trf) && (super_ == NA_LOGICAL || super_ != 0)) {
+	if (isNull(trf) && (super == NA_LOGICAL || super != 0)) {
 		memcpy(nm, "supernodal", 10);
-		trf = get_factor(obj, nm);
-		if (!isNull(trf)) super_ = 1;
+		trf = get_factor(s_obj, nm);
+		if (!isNull(trf)) super = 1;
 	}
-	if (beta_.r != 0.0 || beta_.i != 0.0 || isNull(trf) ||
-	    (super_ == 0 && ll_ != 0)) {
-		if (beta_.r != 0.0 || beta_.i != 0.0) {
+	if (beta.r != 0.0 || beta.i != 0.0 || isNull(trf) ||
+	    (super == 0 && ll != 0)) {
+		if (beta.r != 0.0 || beta.i != 0.0) {
 			PROTECT(trf);
-			trf = pCMatrix_trf_(obj, trf, warn_, order_, &ll_, &super_, beta_);
+			trf = pCMatrix_trf_(s_obj, trf, warn, order, &ll, &super, beta);
 			UNPROTECT(1);
 		} else {
 			if (isNull(trf)) {
 			int zz_ = 0;
-			trf = pCMatrix_trf_(obj, trf, warn_, order_, &zz_, &super_, beta_);
+			trf = pCMatrix_trf_(s_obj, trf, warn, order, &zz_, &super, beta);
 			if (!isNull(trf)) {
-			memcpy(nm, (super_ == 0) ? "simplicial" : "supernodal", 10);
+			memcpy(nm, (super == 0) ? "simplicial" : "supernodal", 10);
 			PROTECT(trf);
-			set_factor(obj, nm, trf);
+			set_factor(s_obj, nm, trf);
 			UNPROTECT(1);
 			}
 			}
-			if (!isNull(trf) && super_ == 0 && ll_ != 0) {
+			if (!isNull(trf) && super == 0 && ll != 0) {
 			PROTECT(trf);
 			cholmod_factor *L = M2CHF(trf, 1);
 			L = cholmod_copy_factor(L, &c);
 			cholmod_change_factor(L->xtype, 1, 0, 1, 1, L, &c);
-			PCTRF_FINISH(warn_);
+			PCTRF_FINISH(s_obj, warn);
 			UNPROTECT(1);
 			}
 		}
@@ -888,21 +888,21 @@ SEXP pCMatrix_trf(SEXP obj, SEXP warn, SEXP order,
 	return trf;
 }
 
-SEXP sparseCholesky_update(SEXP trf, SEXP obj, SEXP beta)
+SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 {
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
 
-	Rcomplex beta_ = asComplex(beta);
-	if (!R_FINITE(beta_.r) || !R_FINITE(beta_.i))
+	Rcomplex beta = asComplex(s_beta);
+	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
 		error(_("'%s' is not a number or not finite"), "beta");
 
-	cholmod_sparse *A = M2CHS(obj, 1);
-	cholmod_factor *L = M2CHF(trf, 1);
-	double betaRI[2]; betaRI[0] = beta_.r; betaRI[1] = beta_.i;
+	cholmod_sparse *A = M2CHS(s_obj, 1);
+	cholmod_factor *L = M2CHF(s_trf, 1);
+	double betaRI[2]; betaRI[0] = beta.r; betaRI[1] = beta.i;
 
-	if (Matrix_shape(obj) == 's') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	if (Matrix_shape(s_obj) == 's') {
+		SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		A->stype = (ul == 'U') ? 1 : -1;
 	}
@@ -920,44 +920,44 @@ SEXP sparseCholesky_update(SEXP trf, SEXP obj, SEXP beta)
 
 #define UPDOWN_FINISH \
 	do { \
-		SEXP dimnames = PROTECT(GET_SLOT(trf, Matrix_DimNamesSym)); \
-		PROTECT(trf = CHF2M(L, 1)); \
+		SEXP dimnames = PROTECT(GET_SLOT(s_trf, Matrix_DimNamesSym)); \
+		PROTECT(s_trf = CHF2M(L, 1)); \
 		cholmod_free_factor(&L, &c); \
-		if (TYPEOF(trf) == CHARSXP) \
-			error("%s", CHAR(trf)); \
-		SET_SLOT(trf, Matrix_DimNamesSym, dimnames); \
+		if (TYPEOF(s_trf) == CHARSXP) \
+			error("%s", CHAR(s_trf)); \
+		SET_SLOT(s_trf, Matrix_DimNamesSym, dimnames); \
 		UNPROTECT(2); \
 	} while (0)
 
 	UPDOWN_FINISH;
-	return trf;
+	return s_trf;
 }
 
-SEXP sparseCholesky_updown(SEXP trf, SEXP obj, SEXP update)
+SEXP sparseCholesky_updown(SEXP s_trf, SEXP s_obj, SEXP s_update)
 {
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
 
-	cholmod_sparse *A = M2CHS(obj, 1);
-	cholmod_factor *L = M2CHF(trf, 1);
+	cholmod_sparse *A = M2CHS(s_obj, 1);
+	cholmod_factor *L = M2CHF(s_trf, 1);
 
-	if (Matrix_shape(obj) == 's') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+	if (Matrix_shape(s_obj) == 's') {
+		SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		A->stype = (ul == 'U') ? 1 : -1;
 	}
 
 	L = cholmod_copy_factor(L, &c);
-	cholmod_updown(asLogical(update) != 0, A, L, &c);
+	cholmod_updown(asLogical(s_update) != 0, A, L, &c);
 
 	UPDOWN_FINISH;
-	return trf;
+	return s_trf;
 }
 
-SEXP sparseCholesky_diag_get(SEXP trf, SEXP square)
+SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_square)
 {
-	cholmod_factor *L = M2CHF(trf, 1);
-	int n = (int) L->n, square_ = asLogical(square);
+	cholmod_factor *L = M2CHF(s_trf, 1);
+	int n = (int) L->n, square = asLogical(s_square);
 	SEXP y = allocVector(REALSXP, n);
 	double *py = REAL(y);
 	if (L->is_super) {
@@ -974,19 +974,19 @@ SEXP sparseCholesky_diag_get(SEXP trf, SEXP square)
 			px_ = px + ppx[k];
 			for (j = 0; j < nc; ++j) {
 				*py = *px_;
-				if (square_)
+				if (square)
 					*py *= *py;
 				++py;
 				px_ += nr1a;
 			}
 		}
 	} else {
-		square_ = square_ && L->is_ll;
+		square = square && L->is_ll;
 		int j, *pp = (int *) L->p;
 		double *px = (double *) L->x;
 		for (j = 0; j < n; ++j) {
 			*py = px[pp[j]];
-			if (square_)
+			if (square)
 				*py *= *py;
 			++py;
 		}
@@ -994,12 +994,12 @@ SEXP sparseCholesky_diag_get(SEXP trf, SEXP square)
 	return y;
 }
 
-SEXP denseBunchKaufman_expand(SEXP trf)
+SEXP denseBunchKaufman_expand(SEXP s_trf)
 {
-	SEXP dim = PROTECT(GET_SLOT(trf, Matrix_DimSym));
+	SEXP dim = PROTECT(GET_SLOT(s_trf, Matrix_DimSym));
 	int n = INTEGER(dim)[1];
 
-	SEXP x = PROTECT(GET_SLOT(trf, Matrix_xSym));
+	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int packed = XLENGTH(x) != (int_fast64_t) n * n;
 
 	SEXP P_ = PROTECT(newObject("pMatrix"));
@@ -1016,7 +1016,7 @@ SEXP denseBunchKaufman_expand(SEXP trf)
 		SET_SLOT(D_, Matrix_DimSym, dim);
 	}
 
-	SEXP uplo = PROTECT(GET_SLOT(trf, Matrix_uploSym));
+	SEXP uplo = PROTECT(GET_SLOT(s_trf, Matrix_uploSym));
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 	if (ul != 'U') {
 		SET_SLOT(T_, Matrix_uploSym, uplo);
@@ -1025,7 +1025,7 @@ SEXP denseBunchKaufman_expand(SEXP trf)
 	UNPROTECT(1); /* uplo */
 
 	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = PROTECT(GET_SLOT(trf, Matrix_transSym));
+		SEXP trans = PROTECT(GET_SLOT(s_trf, Matrix_transSym));
 		char ct = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct != 'C')
 			SET_SLOT(D_, Matrix_transSym, trans);
@@ -1039,7 +1039,7 @@ SEXP denseBunchKaufman_expand(SEXP trf)
 	int i, j, s;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
-	SEXP pivot = PROTECT(GET_SLOT(trf, Matrix_permSym)),
+	SEXP pivot = PROTECT(GET_SLOT(s_trf, Matrix_permSym)),
 		D_p = PROTECT(allocVector(INTSXP, n1a));
 	int *ppivot = INTEGER(pivot), *D_pp = INTEGER(D_p),
 		b = n, dp = (ul == 'U') ? 1 : 2;

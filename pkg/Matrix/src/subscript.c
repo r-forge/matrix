@@ -408,22 +408,22 @@ SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 }
 
 /* x[i] with 'i' of type "integer" or "double" {i >= 1 or NA} */
-SEXP R_subscript_1ary(SEXP x, SEXP i)
+SEXP R_subscript_1ary(SEXP s_x, SEXP s_i)
 {
 	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(x, valid);
+	int ivalid = R_check_class_etc(s_x, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(x, __func__);
+		ERROR_INVALID_CLASS(s_x, __func__);
 	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
-	validObject(x, cl);
+	validObject(s_x, cl);
 
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
-		return unpackedMatrix_subscript_1ary(x, i, cl);
+		return unpackedMatrix_subscript_1ary(s_x, s_i, cl);
 	case 'p':
-		return   packedMatrix_subscript_1ary(x, i, cl);
+		return   packedMatrix_subscript_1ary(s_x, s_i, cl);
 
 	/* NB: for [CRT], the caller must preprocess 'x' and 'i';
 	   symmetric and unit triangular 'x' are not handled specially,
@@ -432,9 +432,9 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 	*/
 
 	case 'C':
-		return  CsparseMatrix_subscript_1ary(x, i, cl);
+		return  CsparseMatrix_subscript_1ary(s_x, s_i, cl);
 	case 'R':
-		return  RsparseMatrix_subscript_1ary(x, i, cl);
+		return  RsparseMatrix_subscript_1ary(s_x, s_i, cl);
 	case 'T':
 	{
 		char cl_[] = "..CMatrix";
@@ -444,16 +444,16 @@ SEXP R_subscript_1ary(SEXP x, SEXP i)
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_Csparse(SEXP, const char *);
 
-		x = sparse_as_Csparse(x, cl);
-		PROTECT(x);
-		x = CsparseMatrix_subscript_1ary(x, i, cl_);
+		s_x = sparse_as_Csparse(s_x, cl);
+		PROTECT(s_x);
+		s_x = CsparseMatrix_subscript_1ary(s_x, s_i, cl_);
 		UNPROTECT(1);
-		return x;
+		return s_x;
 	}
 	case 'i':
-		return diagonalMatrix_subscript_1ary(x, i, cl);
+		return diagonalMatrix_subscript_1ary(s_x, s_i, cl);
 	default:
-		return      indMatrix_subscript_1ary(x, i);
+		return      indMatrix_subscript_1ary(s_x, s_i);
 	}
 }
 
@@ -788,22 +788,22 @@ SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 /* x[i] with 'i' of type "integer" and dimensions c(.,2)
    {i[,1] in 1:m or NA, i[,2] in 1:n or NA}
 */
-SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
+SEXP R_subscript_1ary_mat(SEXP s_x, SEXP s_i)
 {
 	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(x, valid);
+	int ivalid = R_check_class_etc(s_x, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(x, __func__);
+		ERROR_INVALID_CLASS(s_x, __func__);
 	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
-	validObject(x, cl);
+	validObject(s_x, cl);
 
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
-		return unpackedMatrix_subscript_1ary_mat(x, i, cl);
+		return unpackedMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'p':
-		return   packedMatrix_subscript_1ary_mat(x, i, cl);
+		return   packedMatrix_subscript_1ary_mat(s_x, s_i, cl);
 
 	/* NB: for [CRT], the caller must preprocess 'x' and 'i';
 	   symmetric and unit triangular 'x' are not handled specially,
@@ -812,9 +812,9 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 	*/
 
 	case 'C':
-		return  CsparseMatrix_subscript_1ary_mat(x, i, cl);
+		return  CsparseMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'R':
-		return  RsparseMatrix_subscript_1ary_mat(x, i, cl);
+		return  RsparseMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'T':
 	{
 		char cl_[] = "..CMatrix";
@@ -824,16 +824,16 @@ SEXP R_subscript_1ary_mat(SEXP x, SEXP i)
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_Csparse(SEXP, const char *);
 
-		x = sparse_as_Csparse(x, cl);
-		PROTECT(x);
-		x = CsparseMatrix_subscript_1ary_mat(x, i, cl_);
+		s_x = sparse_as_Csparse(s_x, cl);
+		PROTECT(s_x);
+		s_x = CsparseMatrix_subscript_1ary_mat(s_x, s_i, cl_);
 		UNPROTECT(1);
-		return x;
+		return s_x;
 	}
 	case 'i':
-		return diagonalMatrix_subscript_1ary_mat(x, i, cl);
+		return diagonalMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	default:
-		return      indMatrix_subscript_1ary_mat(x, i);
+		return      indMatrix_subscript_1ary_mat(s_x, s_i);
 	}
 }
 
@@ -2169,25 +2169,25 @@ SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
    not exceeding 2^31-1 {'i' in 1:m or NA, 'j' in 1:n or NA} ...
    but _not_ handling 'Dimnames'
 */
-SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
+SEXP R_subscript_2ary(SEXP s_x, SEXP s_i, SEXP s_j)
 {
-	if (i == R_NilValue && j == R_NilValue)
-		return x;
+	if (s_i == R_NilValue && s_j == R_NilValue)
+		return s_x;
 
 	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(x, valid);
+	int ivalid = R_check_class_etc(s_x, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(x, __func__);
+		ERROR_INVALID_CLASS(s_x, __func__);
 	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 4)];
-	validObject(x, cl);
+	validObject(s_x, cl);
 
 	switch (cl[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
-		return unpackedMatrix_subscript_2ary(x, i, j, cl);
+		return unpackedMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	case 'p':
-		return   packedMatrix_subscript_2ary(x, i, j, cl);
+		return   packedMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	default:
 		break;
 	}
@@ -2209,8 +2209,8 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 		} \
 	} while (0)
 
-	ERROR_IF_ANYNA(i);
-	ERROR_IF_ANYNA(j);
+	ERROR_IF_ANYNA(s_i);
+	ERROR_IF_ANYNA(s_j);
 
 #undef ERROR_IF_ANYNA
 
@@ -2218,9 +2218,9 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 
 	switch (cl[2]) {
 	case 'C':
-		return  CsparseMatrix_subscript_2ary(x, i, j, cl);
+		return  CsparseMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	case 'R':
-		return  RsparseMatrix_subscript_2ary(x, i, j, cl);
+		return  RsparseMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	case 'T':
 	{
 		char cl_[] = "..CMatrix";
@@ -2231,18 +2231,18 @@ SEXP R_subscript_2ary(SEXP x, SEXP i, SEXP j)
 		SEXP sparse_as_Csparse(SEXP, const char *);
 		SEXP sparse_as_Tsparse(SEXP, const char *);
 
-		x = sparse_as_Csparse(x, cl);
-		PROTECT(x);
-		x = CsparseMatrix_subscript_2ary(x, i, j, cl_);
+		s_x = sparse_as_Csparse(s_x, cl);
+		PROTECT(s_x);
+		s_x = CsparseMatrix_subscript_2ary(s_x, s_i, s_j, cl_);
 		UNPROTECT(1);
-		PROTECT(x);
-		x = sparse_as_Tsparse(x, valid[R_check_class_etc(x, valid)]);
+		PROTECT(s_x);
+		s_x = sparse_as_Tsparse(s_x, valid[R_check_class_etc(s_x, valid)]);
 		UNPROTECT(1);
-		return x;
+		return s_x;
 	}
 	case 'i':
-		return diagonalMatrix_subscript_2ary(x, i, j, cl);
+		return diagonalMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	default:
-		return      indMatrix_subscript_2ary(x, i, j, cl);
+		return      indMatrix_subscript_2ary(s_x, s_i, s_j, cl);
 	}
 }

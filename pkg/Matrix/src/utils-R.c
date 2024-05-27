@@ -17,15 +17,15 @@ SEXP R_Matrix_version(void)
 	return ans;
 }
 
-SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
+SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 {
 	SEXP r;
-	int i, j, n_ = asInteger(n), packed_ = asLogical(packed),
-		upper_ = asLogical(upper), diag_ = asLogical(diag);
+	int i, j, n = asInteger(s_n), packed = asLogical(s_packed),
+		upper = asLogical(s_upper), diag = asLogical(s_diag);
 	int_fast64_t
-		nn = (int_fast64_t) n_ * n_,
-		nx = (packed_) ? n_ + (nn - n_) / 2 : nn,
-		nr = (diag_) ? n_ + (nn - n_) / 2 : (nn - n_) / 2;
+		nn = (int_fast64_t) n * n,
+		nx = (packed) ? n + (nn - n) / 2 : nn,
+		nr = (diag) ? n + (nn - n) / 2 : (nn - n) / 2;
 	if (nx > 0x1.0p+53)
 		error(_("indices would exceed %s"), "2^53");
 	if (nr > R_XLEN_T_MAX)
@@ -34,48 +34,48 @@ SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
 
 #define DO_INDEX \
 	do { \
-		if (packed_) { \
-			if (diag_) { \
+		if (packed) { \
+			if (diag) { \
 				while (k <= nr_) \
 					*(pr++) = k++; \
-			} else if (upper_) { \
-				for (j = 0; j < n_; ++j) { \
+			} else if (upper) { \
+				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) \
 						*(pr++) = k++; \
 					k++; \
 				} \
 			} else { \
-				for (j = 0; j < n_; ++j) { \
+				for (j = 0; j < n; ++j) { \
 					k++; \
-					for (i = j+1; i < n_; ++i) \
+					for (i = j+1; i < n; ++i) \
 						*(pr++) = k++; \
 				} \
 			} \
-		} else if (diag_) { \
-			if (upper_) { \
-				for (j = 0; j < n_; ++j) { \
+		} else if (diag) { \
+			if (upper) { \
+				for (j = 0; j < n; ++j) { \
 					for (i = 0; i <= j; ++i) \
 						*(pr++) = k++; \
-					k += n_-j-1; \
+					k += n-j-1; \
 				} \
 			} else { \
-				for (j = 0; j < n_; ++j) { \
+				for (j = 0; j < n; ++j) { \
 					k += j; \
-					for (i = j; i < n_; ++i) \
+					for (i = j; i < n; ++i) \
 						*(pr++) = k++; \
 				} \
 			} \
 		} else { \
-			if (upper_) { \
-				for (j = 0; j < n_; ++j) { \
+			if (upper) { \
+				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) \
 						*(pr++) = k++; \
-					k += n_-j; \
+					k += n-j; \
 				} \
 			} else { \
-				for (j = 0; j < n_; ++j) { \
+				for (j = 0; j < n; ++j) { \
 					k += j+1; \
-					for (i = j+1; i < n_; ++i) \
+					for (i = j+1; i < n; ++i) \
 						*(pr++) = k++; \
 				} \
 			} \
@@ -104,47 +104,47 @@ SEXP R_index_triangle(SEXP n, SEXP packed, SEXP upper, SEXP diag)
 	return r;
 }
 
-SEXP R_index_diagonal(SEXP n, SEXP packed, SEXP upper)
+SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 {
 	SEXP r;
-	int j, n_ = asInteger(n), packed_ = asLogical(packed),
-		upper_ = asLogical(upper);
+	int j, n = asInteger(s_n), packed = asLogical(s_packed),
+		upper = asLogical(s_upper);
 	int_fast64_t
-		nn = (int_fast64_t) n_ * n_,
-		nx = (packed_) ? n_ + (nn - n_) / 2 : nn;
+		nn = (int_fast64_t) n * n,
+		nx = (packed) ? n + (nn - n) / 2 : nn;
 	if (nx > 0x1.0p+53)
 		error(_("indices would exceed %s"), "2^53");
 
 #define DO_INDEX \
 	do { \
-		if (!packed_) { \
-			for (j = 0; j < n_; ++j) { \
+		if (!packed) { \
+			for (j = 0; j < n; ++j) { \
 				*(pr++) = k++; \
-				k += n_; \
+				k += n; \
 			} \
-		} else if (upper_) { \
-			for (j = 0; j < n_; ++j) { \
+		} else if (upper) { \
+			for (j = 0; j < n; ++j) { \
 				*(pr++) = k; \
 				k += j+2; \
 			} \
 		} else { \
-			for (j = 0; j < n_; ++j) { \
+			for (j = 0; j < n; ++j) { \
 				*(pr++) = k; \
-				k += n_-j; \
+				k += n-j; \
 			} \
 		} \
 	} while (0)
 
 	if (nx > INT_MAX) {
 
-		PROTECT(r = allocVector(REALSXP, n_));
+		PROTECT(r = allocVector(REALSXP, n));
 		double k = 1.0, *pr = REAL(r);
 
 		DO_INDEX;
 
 	} else {
 
-		PROTECT(r = allocVector(INTSXP, n_));
+		PROTECT(r = allocVector(INTSXP, n));
 		int k = 1, *pr = INTEGER(r);
 		DO_INDEX;
 
@@ -156,18 +156,18 @@ SEXP R_index_diagonal(SEXP n, SEXP packed, SEXP upper)
 	return r;
 }
 
-SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
+SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 {
-	int do_countNA = asLogical(countNA);
-	R_xlen_t n = XLENGTH(x), nnz = 0;
-	double n_ = asReal(nnzmax);
-	if (!ISNAN(n_) && n_ >= 0.0 && n_ < (double) n)
-		n = (R_xlen_t) n_;
+	int countNA = asLogical(s_countNA);
+	R_xlen_t n = XLENGTH(s_x), nnz = 0;
+	double nnzmax = asReal(s_nnzmax);
+	if (!ISNAN(nnzmax) && nnzmax >= 0.0 && nnzmax < (double) n)
+		n = (R_xlen_t) nnzmax;
 
 #define DO_NNZ(_CTYPE_, _PTR_, _ISNA_, _NOTZERO_, _STRICTLY_NOTZERO_) \
 	do { \
-		_CTYPE_ *px = _PTR_(x); \
-		if (do_countNA == NA_LOGICAL) { \
+		_CTYPE_ *px = _PTR_(s_x); \
+		if (countNA == NA_LOGICAL) { \
 			while (n-- > 0) { \
 				if (_ISNA_(*px)) \
 					return ScalarInteger(NA_INTEGER); \
@@ -175,7 +175,7 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 					++nnz; \
 				++px; \
 			} \
-		} else if (do_countNA != 0) { \
+		} else if (countNA != 0) { \
 			while (n-- > 0) { \
 				if (_NOTZERO_(*px)) \
 					++nnz; \
@@ -190,7 +190,7 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 		} \
 	} while (0)
 
-	switch (TYPEOF(x)) {
+	switch (TYPEOF(s_x)) {
 	case LGLSXP:
 		DO_NNZ(int, LOGICAL,
 		       ISNA_LOGICAL, NOTZERO_LOGICAL, STRICTLY_NOTZERO_LOGICAL);
@@ -208,7 +208,7 @@ SEXP R_nnz(SEXP x, SEXP countNA, SEXP nnzmax)
 		       ISNA_COMPLEX, NOTZERO_COMPLEX, STRICTLY_NOTZERO_COMPLEX);
 	break;
 	default:
-		ERROR_INVALID_TYPE(x, __func__);
+		ERROR_INVALID_TYPE(s_x, __func__);
 	}
 
 #undef DO_NNZ

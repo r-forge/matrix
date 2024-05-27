@@ -1,17 +1,17 @@
 #include "Mdefines.h"
 #include "vector.h"
 
-SEXP v2spV(SEXP from)
+SEXP v2spV(SEXP s_from)
 {
 	SEXP to = NULL, length = NULL, i = NULL, x = NULL;
-	R_xlen_t n_ = XLENGTH(from);
+	R_xlen_t n_ = XLENGTH(s_from);
 
 #define V2SPV(_KIND_, _NZ_, \
 	          _CTYPE1_, _SEXPTYPE1_, _PTR1_, \
 	          _CTYPE2_, _SEXPTYPE2_, _PTR2_) \
 	do { \
 		PROTECT(to = newObject(#_KIND_ "sparseVector")); \
-		_CTYPE1_ *py = _PTR1_(from); \
+		_CTYPE1_ *py = _PTR1_(s_from); \
 		for (k = 0; k < n; ++k) \
 			if (_NZ_(py[k])) \
 				++nnz; \
@@ -29,7 +29,7 @@ SEXP v2spV(SEXP from)
 
 #define V2SPV_CASES(_CTYPE2_, _SEXPTYPE2_, _PTR2_) \
 	do { \
-		switch (TYPEOF(from)) { \
+		switch (TYPEOF(s_from)) { \
 		case LGLSXP: \
 			V2SPV(l, NOTZERO_LOGICAL, int, LGLSXP, LOGICAL, \
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
@@ -47,7 +47,7 @@ SEXP v2spV(SEXP from)
 			      _CTYPE2_, _SEXPTYPE2_, _PTR2_); \
 			break; \
 		default: \
-			ERROR_INVALID_TYPE(from, __func__); \
+			ERROR_INVALID_TYPE(s_from, __func__); \
 			break; \
 		} \
 	} while (0)
@@ -73,15 +73,15 @@ SEXP v2spV(SEXP from)
 	return to;
 }
 
-SEXP CR2spV(SEXP from)
+SEXP CR2spV(SEXP s_from)
 {
 	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
+	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
+		ERROR_INVALID_CLASS(s_from, __func__);
 	const char *cl = valid[ivalid];
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
+	SEXP dim = PROTECT(GET_SLOT(s_from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
 	UNPROTECT(1); /* dim */
@@ -91,13 +91,13 @@ SEXP CR2spV(SEXP from)
 
 	/* defined in ./coerce.c : */
 	SEXP sparse_as_general(SEXP, const char *);
-	PROTECT(from = sparse_as_general(from, cl));
+	PROTECT(s_from = sparse_as_general(s_from, cl));
 
 	char vcl[] = ".sparseVector";
 	vcl[0] = cl[0];
 	SEXP to = PROTECT(newObject(vcl));
 
-	SEXP p = PROTECT(GET_SLOT(from, Matrix_pSym));
+	SEXP p = PROTECT(GET_SLOT(s_from, Matrix_pSym));
 	int *pp = INTEGER(p), nnz = (cl[2] == 'C') ? pp[n] : pp[m];
 
 	SEXP vlength, vi;
@@ -112,7 +112,7 @@ SEXP CR2spV(SEXP from)
 	SET_SLOT(to, Matrix_iSym, vi);
 
 	if (cl[2] == 'C') {
-		SEXP i = PROTECT(GET_SLOT(from, Matrix_iSym));
+		SEXP i = PROTECT(GET_SLOT(s_from, Matrix_iSym));
 		int *pi = INTEGER(i), k, kend, j;
 		if (TYPEOF(vi) == INTSXP) {
 			int *pvi = INTEGER(vi), mj1a = 1;
@@ -136,13 +136,13 @@ SEXP CR2spV(SEXP from)
 			}
 		}
 		if (cl[0] != 'n') {
-			SEXP vx = PROTECT(GET_SLOT(from, Matrix_xSym));
+			SEXP vx = PROTECT(GET_SLOT(s_from, Matrix_xSym));
 			SET_SLOT(to, Matrix_xSym, vx);
 			UNPROTECT(1); /* vx */
 		}
 		UNPROTECT(1); /* i */
 	} else {
-		SEXP j = PROTECT(GET_SLOT(from, Matrix_jSym));
+		SEXP j = PROTECT(GET_SLOT(s_from, Matrix_jSym));
 		int *pj = INTEGER(j), k, kend, tmp, *work;
 		Matrix_Calloc(work, n, int);
 		for (k = 0; k < nnz; ++k)
@@ -186,7 +186,7 @@ SEXP CR2spV(SEXP from)
 		if (cl[0] == 'n')
 			R2SPV(, , HIDE);
 		else {
-			SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym)),
+			SEXP x = PROTECT(GET_SLOT(s_from, Matrix_xSym)),
 				vx = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
 			switch (TYPEOF(x)) {
 			case LGLSXP:
@@ -214,6 +214,6 @@ SEXP CR2spV(SEXP from)
 		Matrix_Free(work, n);
 	}
 
-	UNPROTECT(5); /* vi, vlength, p, to, from */
+	UNPROTECT(5); /* vi, vlength, p, to, s_from */
 	return to;
 }
