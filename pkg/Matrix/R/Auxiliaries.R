@@ -269,7 +269,7 @@ isUniqueT <- function(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
 asUniqueT <- function(x, byrow = FALSE, isT = is(x, "TsparseMatrix"))
     if(isUniqueT(x, byrow, isT)) x else .M2T(if(byrow) .M2R(x) else .M2C(x))
 
-aggregateT <- function(x) .Call(Tsparse_aggregate, x)
+aggregateT <- function(x) .Call(R_sparse_aggregate, x)
 
 mat2triplet <- function(x, uniqT = FALSE) {
     T <- as(x, "TsparseMatrix")

@@ -3,6 +3,9 @@
 
 #include <Rinternals.h>
 
+SEXP sparse_aggregate(SEXP, const char *);
+SEXP R_sparse_aggregate(SEXP);
+
 SEXP sparse_drop0(SEXP, const char *, double);
 SEXP R_sparse_drop0(SEXP, SEXP);
 
@@ -50,7 +53,5 @@ SEXP R_sparse_sum(SEXP, SEXP);
 
 SEXP sparse_prod(SEXP, const char *, int);
 SEXP R_sparse_prod(SEXP, SEXP);
-
-SEXP Tsparse_aggregate(SEXP);
 
 #endif /* MATRIX_SPARSE_H */

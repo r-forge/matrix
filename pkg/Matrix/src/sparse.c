@@ -3,6 +3,100 @@
 #include "idz.h"
 #include "sparse.h"
 
+SEXP sparse_aggregate(SEXP from, const char *class)
+{
+	if (class[2] != 'T')
+		return from;
+
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+
+	SEXP to,
+		i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
+		j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
+		i1 = NULL, j1 = NULL;
+
+	/* defined in ./coerce.c : */
+	void taggr(SEXP, SEXP, SEXP, SEXP *, SEXP *, SEXP *, int, int);
+
+	if (class[0] == 'n') {
+		taggr(j0, i0, NULL, &j1, &i1, NULL, n, m);
+		if (!i1) {
+			UNPROTECT(2); /* j0, i0 */
+			return from;
+		}
+		PROTECT(i1);
+		PROTECT(j1);
+		PROTECT(to = newObject(class));
+		SET_SLOT(to, Matrix_iSym, i1);
+		SET_SLOT(to, Matrix_jSym, j1);
+		UNPROTECT(5); /* to, j1, i1, j0, i0 */
+	} else {
+		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
+			x1 = NULL;
+		taggr(j0, i0, x0, &j1, &i1, &x1, n, m);
+		if (!i1) {
+			UNPROTECT(3); /* x0, j0, i0 */
+			return from;
+		}
+		PROTECT(i1);
+		PROTECT(j1);
+		PROTECT(x1);
+		PROTECT(to = newObject(class));
+		SET_SLOT(to, Matrix_iSym, i1);
+		SET_SLOT(to, Matrix_jSym, j1);
+		SET_SLOT(to, Matrix_xSym, x1);
+		UNPROTECT(7); /* to, x1, j1, i1, x0, j0, i0 */
+	}
+
+	PROTECT(to);
+
+	if (m != n || n > 0) {
+		dim = GET_SLOT(to, Matrix_DimSym);
+		pdim = INTEGER(dim);
+		pdim[0] = m;
+		pdim[1] = n;
+	}
+
+	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
+	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
+	UNPROTECT(1); /* dimnames */
+
+	if (class[1] != 'g') {
+		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
+		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		if (ul != 'U')
+			SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
+	if (class[1] == 't') {
+		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+		char di = CHAR(STRING_ELT(diag, 0))[0];
+		if (di != 'N')
+			SET_SLOT(to, Matrix_diagSym, diag);
+		UNPROTECT(1); /* diag */
+	} else {
+		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
+		if (LENGTH(factors) > 0)
+			SET_SLOT(to, Matrix_factorsSym, factors);
+		UNPROTECT(1); /* factors */
+	}
+
+	UNPROTECT(1); /* to */
+	return to;
+}
+
+SEXP R_sparse_aggregate(SEXP s_from)
+{
+	static const char *valid[] = {
+		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
+	int ivalid = R_check_class_etc(s_from, valid);
+	if (ivalid < 0)
+		ERROR_INVALID_CLASS(s_from, __func__);
+
+	return sparse_aggregate(s_from, valid[ivalid]);
+}
+
 SEXP sparse_drop0(SEXP from, const char *class, double tol)
 {
 	if (class[0] == 'n')
@@ -2982,7 +3076,7 @@ void Tsparse_colsum(SEXP obj, const char *class,
 {
 	int narm_ = narm && mean && class[0] != 'n';
 	if (narm_)
-		obj = Tsparse_aggregate(obj);
+		obj = sparse_aggregate(obj, class);
 	PROTECT(obj);
 
 	SEXP i0 = PROTECT(GET_SLOT(obj, iSym)),
@@ -3228,9 +3322,7 @@ SEXP R_sparse_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean,
 
 SEXP sparse_sum(SEXP obj, const char *class, int narm)
 {
-	if (class[2] == 'T')
-		obj = Tsparse_aggregate(obj);
-	PROTECT(obj);
+	PROTECT(obj = sparse_aggregate(obj, class));
 
 	SEXP ans;
 
@@ -3483,9 +3575,7 @@ SEXP R_sparse_sum(SEXP s_obj, SEXP s_narm)
 
 SEXP sparse_prod(SEXP obj, const char *class, int narm)
 {
-	if (class[2] == 'T')
-		obj = Tsparse_aggregate(obj);
-	PROTECT(obj);
+	PROTECT(obj = sparse_aggregate(obj, class));
 
 	SEXP ans = PROTECT(allocVector((class[0] == 'z') ? CPLXSXP : REALSXP, 1));
 
@@ -3720,91 +3810,3 @@ SEXP R_sparse_prod(SEXP s_obj, SEXP s_narm)
 
 #undef TRY_INCREMENT
 #undef LONGDOUBLE_AS_DOUBLE
-
-SEXP Tsparse_aggregate(SEXP s_from)
-{
-	static const char *valid[] = { VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[ivalid];
-
-	SEXP dim = PROTECT(GET_SLOT(s_from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	UNPROTECT(1); /* dim */
-
-	SEXP to,
-		i0 = PROTECT(GET_SLOT(s_from, Matrix_iSym)),
-		j0 = PROTECT(GET_SLOT(s_from, Matrix_jSym)),
-		i1 = NULL, j1 = NULL;
-
-	/* defined in ./coerce.c : */
-	void taggr(SEXP, SEXP, SEXP, SEXP *, SEXP *, SEXP *, int, int);
-
-	if (cl[0] == 'n') {
-		taggr(j0, i0, NULL, &j1, &i1, NULL, n, m);
-		if (!i1) {
-			UNPROTECT(2); /* j0, i0 */
-			return s_from;
-		}
-		PROTECT(i1);
-		PROTECT(j1);
-		PROTECT(to = newObject(cl));
-		SET_SLOT(to, Matrix_iSym, i1);
-		SET_SLOT(to, Matrix_jSym, j1);
-		UNPROTECT(5); /* to, j1, i1, j0, i0 */
-	} else {
-		SEXP x0 = PROTECT(GET_SLOT(s_from, Matrix_xSym)),
-			x1 = NULL;
-		taggr(j0, i0, x0, &j1, &i1, &x1, n, m);
-		if (!i1) {
-			UNPROTECT(3); /* x0, j0, i0 */
-			return s_from;
-		}
-		PROTECT(i1);
-		PROTECT(j1);
-		PROTECT(x1);
-		PROTECT(to = newObject(cl));
-		SET_SLOT(to, Matrix_iSym, i1);
-		SET_SLOT(to, Matrix_jSym, j1);
-		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(7); /* to, x1, j1, i1, x0, j0, i0 */
-	}
-
-	PROTECT(to);
-
-	if (m != n || n > 0) {
-		PROTECT(dim = GET_SLOT(to, Matrix_DimSym));
-		pdim = INTEGER(dim);
-		pdim[0] = m;
-		pdim[1] = n;
-		UNPROTECT(1); /* dim */
-	}
-
-	SEXP dimnames = PROTECT(GET_SLOT(s_from, Matrix_DimNamesSym));
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
-
-	if (cl[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(s_from, Matrix_uploSym));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (cl[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(s_from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
-			SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	} else {
-		SEXP factors = PROTECT(GET_SLOT(s_from, Matrix_factorsSym));
-		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorsSym, factors);
-		UNPROTECT(1); /* factors */
-	}
-
-	UNPROTECT(1); /* to */
-	return to;
-}

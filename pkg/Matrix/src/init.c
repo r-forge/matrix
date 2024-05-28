@@ -162,6 +162,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_dense_sum, 2),
 	CALLDEF(R_dense_prod, 2),
 
+	CALLDEF(R_sparse_aggregate, 1),
 	CALLDEF(R_sparse_drop0, 2),
 	CALLDEF(R_sparse_diag_U2N, 1),
 	CALLDEF(R_sparse_diag_N2U, 1),
@@ -178,7 +179,6 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_marginsum, 5),
 	CALLDEF(R_sparse_sum, 2),
 	CALLDEF(R_sparse_prod, 2),
-	CALLDEF(Tsparse_aggregate, 1),
 
 	CALLDEF(R_dense_matmult, 4),
 	CALLDEF(R_sparse_matmult, 6),

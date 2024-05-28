@@ -101,8 +101,8 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			case 'T':
 			{
 				/* defined in ./sparse.c : */
-				SEXP Tsparse_aggregate(SEXP);
-				SETCAR(a, Tsparse_aggregate(s));
+				SEXP sparse_aggregate(SEXP, const char *);
+				SETCAR(a, sparse_aggregate(s, scl));
 				anyTsparse = 1;
 				break;
 			}
