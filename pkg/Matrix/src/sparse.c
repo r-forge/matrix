@@ -89,6 +89,8 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 SEXP R_sparse_aggregate(SEXP s_from)
 {
 	static const char *valid[] = {
+		"dpCMatrix", "dpRMatrix", "dpTMatrix",
+		"zpCMatrix", "zpRMatrix", "zpTMatrix",		
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
