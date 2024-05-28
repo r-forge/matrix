@@ -843,7 +843,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		UNPROTECT(1); /* uplo */
 	}
 
-	if (cl[1] == 's' && cl[0] == 'z') {
+	if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
@@ -2150,7 +2150,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		UNPROTECT(1); /* uplo */
 	}
 
-	if (cl[1] == 's' && cl[0] == 'z') {
+	if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
