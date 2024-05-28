@@ -684,11 +684,11 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 }
 
 static
-int strmatch(const char *x, const char **valid)
+int strmatch(const char *s, const char **nms)
 {
 	int i = 0;
-	while (valid[i][0] != '\0') {
-		if (strcmp(x, valid[i]) == 0)
+	while (nms[i][0] != '\0') {
+		if (strcmp(s, nms[i]) == 0)
 			return i;
 		++i;
 	}
