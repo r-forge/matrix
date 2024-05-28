@@ -153,72 +153,53 @@ void set_reversed_DimNames(SEXP obj, SEXP dn) {
 /* .... factors ..................................................... */
 
 static
-int strmatch(const char *x, SEXP valid)
+R_xlen_t strmatch(const char *s, SEXP nms)
 {
-	int i, n = LENGTH(valid);
-	for (i = 0; i < n; ++i)
-		if (strcmp(x, CHAR(STRING_ELT(valid, i))) == 0)
-			return i;
-	return -1;
-}
-
-static
-SEXP append_to_named_list(SEXP x, const char *nm, SEXP val)
-{
-	PROTECT(val);
-	R_xlen_t n = XLENGTH(x);
-	SEXP y = PROTECT(allocVector(VECSXP, n + 1)),
-		ny = PROTECT(allocVector(STRSXP, n + 1)),
-		nval = PROTECT(mkChar(nm));
-	if (n > 0) {
-		SEXP nx = PROTECT(getAttrib(x, R_NamesSymbol));
-		R_xlen_t i;
-		for (i = 0; i < n; ++i) {
-			SET_VECTOR_ELT( y, i, VECTOR_ELT( x, i));
-			SET_STRING_ELT(ny, i, STRING_ELT(nx, i));
-		}
-		UNPROTECT(1);
+	if (TYPEOF(nms) == STRSXP) {
+		for (R_xlen_t i = 0, n = XLENGTH(nms); i < n; ++i)
+			if (strcmp(s, CHAR(STRING_ELT(nms, i))) == 0)
+				return i;
 	}
-	SET_VECTOR_ELT( y, n,  val);
-	SET_STRING_ELT(ny, n, nval);
-	setAttrib(y, R_NamesSymbol, ny);
-	UNPROTECT(4);
-	return y;
+	return (R_xlen_t) -1;
 }
 
 SEXP get_factor(SEXP obj, const char *nm)
 {
-	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym)), val = R_NilValue;
-	if (LENGTH(factors) > 0) {
-		SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-		int i = strmatch(nm, valid);
-		if (i >= 0)
-			val = VECTOR_ELT(factors, i);
-		UNPROTECT(1);
-	}
-	UNPROTECT(1);
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym)),
+		nms = PROTECT(getAttrib(factors, R_NamesSymbol)),
+		val = R_NilValue;
+	R_xlen_t i = strmatch(nm, nms);
+	if (i >= 0)
+		val = VECTOR_ELT(factors, i);
+	UNPROTECT(2);
 	return val;
 }
 
 void set_factor(SEXP obj, const char *nm, SEXP val)
 {
+	PROTECT(obj);
 	PROTECT(val);
-	SEXP factors;
-	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(factors = GET_SLOT(obj, Matrix_factorsSym), &pid);
-	if (LENGTH(factors) > 0) {
-		SEXP valid = PROTECT(getAttrib(factors, R_NamesSymbol));
-		int i = strmatch(nm, valid);
-		UNPROTECT(1);
-		if (i >= 0) {
-			SET_VECTOR_ELT(factors, i, val);
-			UNPROTECT(2);
-			return;
-		}
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym)),
+		nms = PROTECT(getAttrib(factors, R_NamesSymbol));
+	R_xlen_t i = strmatch(nm, nms);
+	if (i >= 0) {
+		SET_VECTOR_ELT(factors, i, val);
+		UNPROTECT(4);
+		return;
 	}
-	REPROTECT(factors = append_to_named_list(factors, nm, val), pid);
-	SET_SLOT(obj, Matrix_factorsSym, factors);
-	UNPROTECT(2);
+	R_xlen_t n = XLENGTH(factors);
+	SEXP factors1 = PROTECT(allocVector(VECSXP, n + 1)),
+		nms1 = PROTECT(allocVector(STRSXP, n + 1));
+	for (i = 0; i < n; ++i) {
+		SET_VECTOR_ELT(factors1, i, VECTOR_ELT(factors, i));
+		if (nms != R_NilValue)
+		SET_STRING_ELT(    nms1, i, STRING_ELT(    nms, i));
+	}
+	SET_VECTOR_ELT(factors1, n,                 val);
+	SET_STRING_ELT(    nms1, n, PROTECT(mkChar(nm)));
+	setAttrib(factors1, R_NamesSymbol, nms1);
+	SET_SLOT(obj, Matrix_factorsSym, factors1);
+	UNPROTECT(7);
 	return;
 }
 
