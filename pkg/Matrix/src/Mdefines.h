@@ -331,4 +331,6 @@ SEXP get_reversed_DimNames(SEXP);
 void set_symmetrized_DimNames(SEXP, SEXP, int);
 void set_reversed_DimNames(SEXP, SEXP);
 
+SEXP get_forced_x(SEXP, const char *);
+
 #endif /* MATRIX_MDEFINES_H */
