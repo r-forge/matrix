@@ -1161,4 +1161,18 @@ setClass("compMatrix")
 setClass("pcorMatrix")
 setClassUnion("replValueSp")
 
+## Matrix 1.8-0
+setClass("BunchKaufmanFactorization")
+setClass("CHMfactor")
+setClass("CHMsimpl")
+setClass("CHMsuper")
+setClass("CholeskyFactorization")
+setClass("SchurFactorization")
+setClass("dCHMsimpl")
+setClass("dCHMsuper")
+setClass("nCHMsimpl")
+setClass("nCHMsuper")
+setClass("pBunchKaufman")
+setClass("pCholesky")
+
 rm(.new, .initialize)

@@ -456,6 +456,19 @@ exportClasses(Matrix, # and its subclasses .............................
               ## MJ: aim to deprecate and eventually remove these
               ##     (except perhaps 'index')
 
+              BunchKaufmanFactorization,
+              CHMfactor,
+              CHMsimpl,
+              CHMsuper,
+              CholeskyFactorization,
+              SchurFactorization,
+              dCHMsimpl,
+              dCHMsuper,
+              nCHMsimpl,
+              nCHMsuper,
+              pBunchKaufman,
+              pCholesky,
+
               abIndex,
               atomicVector,
               compMatrix,

@@ -5,7 +5,25 @@
 \keyword{misc}
 %
 \alias{Matrix-deprecated}
-%
+% 1.8-0
+\alias{BunchKaufmanFactorization-class}
+\alias{CHMfactor-class}
+\alias{CHMsimpl-class}
+\alias{CHMsuper-class}
+\alias{CholeskyFactorization-class}
+\alias{SchurFactorization-class}
+\alias{dCHMsimpl-class}
+\alias{dCHMsuper-class}
+\alias{nCHMsimpl-class}
+\alias{nCHMsuper-class}
+\alias{pBunchKaufman-class}
+\alias{pCholesky-class}
+% 1.7-0
+\alias{atomicVector-class}
+\alias{compMatrix-class}
+\alias{number-class}
+\alias{replValue-class}
+% 1.5-4
 \alias{..2dge}
 \alias{.C2nC}
 \alias{.SuiteSparse_version}
@@ -26,12 +44,7 @@
 \alias{.n2dgT}
 \alias{.nC2d}
 \alias{.nC2l}
-%
-\alias{atomicVector-class}
-\alias{compMatrix-class}
-\alias{number-class}
-\alias{replValue-class}
-%
+% 1.5-0
 \alias{chol2inv,sparseCholesky-method}
 \alias{coerce,RsparseMatrix,dgeMatrix-method}
 \alias{coerce,ddenseMatrix,dgeMatrix-method}
