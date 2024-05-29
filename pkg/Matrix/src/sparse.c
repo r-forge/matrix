@@ -349,9 +349,9 @@ SEXP sparse_diag_N2U(SEXP from, const char *class)
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		UNPROTECT(1); /* uplo */
 		if (ul == 'U')
-			PROTECT(from = sparse_band(from, class,  1, n - 1));
+			PROTECT(from = sparse_band(from, class,  1,  n));
 		else
-			PROTECT(from = sparse_band(from, class, 1 - n, -1));
+			PROTECT(from = sparse_band(from, class, -n, -1));
 	}
 
 	PROTECT(diag = mkString("U"));
