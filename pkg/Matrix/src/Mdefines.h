@@ -84,7 +84,7 @@ extern
 
 /* Often used numbers, defined in ./init.c */
 extern
-Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
+Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 
 #define    MINOF(x, y) ((x < y) ? x : y)
 #define    MAXOF(x, y) ((x < y) ? y : x)

@@ -529,7 +529,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			} while (0)
 
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
+			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zunit);
 			else
 			SOLVE_DENSE_1(double, REAL, 1.0);
 
@@ -729,7 +729,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 			} while (0)
 
 			if (L->xtype == CHOLMOD_COMPLEX)
-			EYE(Rcomplex, Matrix_zone);
+			EYE(Rcomplex, Matrix_zunit);
 			else
 			EYE(double, 1.0);
 
@@ -828,7 +828,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			} while (0)
 
 			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zone);
+			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zunit);
 			else
 			SOLVE_DENSE_1(double, REAL, 1.0);
 
@@ -953,7 +953,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		} while (0)
 
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-		EYE(Rcomplex, COMPLEX, Matrix_zone);
+		EYE(Rcomplex, COMPLEX, Matrix_zunit);
 		else
 		EYE(double, REAL, 1.0);
 

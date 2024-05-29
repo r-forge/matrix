@@ -59,7 +59,7 @@ SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 			break; \
 		case 'z': \
 			_SUB1_X_(Rcomplex, COMPLEX, \
-			         Matrix_zna, Matrix_zzero, Matrix_zone, _F_X_); \
+			         Matrix_zna, Matrix_zzero, Matrix_zunit, _F_X_); \
 			break; \
 		default: \
 			break; \
@@ -1251,7 +1251,7 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			break; \
 		case 'z': \
 			_SUB2_(Rcomplex, COMPLEX, \
-			       Matrix_zna, Matrix_zzero, Matrix_zone); \
+			       Matrix_zna, Matrix_zzero, Matrix_zunit); \
 			break; \
 		default: \
 			break; \

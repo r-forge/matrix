@@ -209,7 +209,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(Rcomplex));
 		if (rk > 0) {
 		Rcomplex *pax = COMPLEX(ax),
-			zero = Matrix_zzero, one = Matrix_zone;
+			zero = Matrix_zzero, one = Matrix_zunit;
 		if (rct == 'C')
 		F77_CALL(zherk)("U", &atrans, &rm, &rk,
 		                & one.r, pax, &am,
@@ -277,7 +277,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		else {
 		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 		Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx),
-			zero = Matrix_zzero, one = Matrix_zone;
+			zero = Matrix_zzero, one = Matrix_zunit;
 		F77_CALL(zgemm)(&atrans, &btrans, &rm, &rn, &rk,
 		                & one, pax, &am, pbx, &bm,
 		                &zero, prx, &rm FCONE FCONE);
@@ -369,7 +369,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (TYPEOF(ax) == CPLXSXP) {
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
-		zero = Matrix_zzero, one = Matrix_zone;
+		zero = Matrix_zzero, one = Matrix_zunit;
 	char act = CHAR(STRING_ELT(GET_SLOT(a, Matrix_transSym), 0))[0];
 	if (btrans == 'N') {
 	if (atrans != 'N' && atrans != act)
@@ -495,7 +495,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (TYPEOF(ax) == CPLXSXP) {
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
-		zero = Matrix_zzero, one = Matrix_zone;
+		zero = Matrix_zzero, one = Matrix_zunit;
 	char act = CHAR(STRING_ELT(GET_SLOT(a, Matrix_transSym), 0))[0];
 	if (aside == 'L') {
 	if (atrans != 'N' && atrans != act)
@@ -614,7 +614,7 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 		rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
 	if (TYPEOF(ax) == CPLXSXP) {
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
-		one = Matrix_zone;
+		one = Matrix_zunit;
 	ztrans2(prx, pbx, bm, bn, btrans);
 	F77_CALL(ztrmm)(&aside, &aul, &atrans, &adi, &rm, &rn,
 	                &one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);

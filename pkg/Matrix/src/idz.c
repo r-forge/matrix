@@ -2,11 +2,11 @@
 #include "idz.h"
 
 #define IDZ \
-TEMPLATE(i,      int,          0  ,         1  ) \
-TEMPLATE(d,   double,          0.0,         1.0) \
-TEMPLATE(z, Rcomplex, Matrix_zzero, Matrix_zone)
+TEMPLATE(i,      int) \
+TEMPLATE(d,   double) \
+TEMPLATE(z, Rcomplex)
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 static void _PREFIX_ ## \
 swap(int n, _CTYPE_ *x, int incx, _CTYPE_ *y, int incy) \
 { \
@@ -23,7 +23,7 @@ swap(int n, _CTYPE_ *x, int incx, _CTYPE_ *y, int incy) \
 IDZ
 #undef TEMPLATE
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 static void _PREFIX_ ## \
 syswapr(char uplo, int n, _CTYPE_ *x, int k0, int k1) \
 { \
@@ -49,7 +49,7 @@ syswapr(char uplo, int n, _CTYPE_ *x, int k0, int k1) \
 IDZ
 #undef TEMPLATE
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
 rowperm2(_CTYPE_ *x, int m, int n, int *p, int off, int invert) \
 { \
@@ -91,7 +91,7 @@ rowperm2(_CTYPE_ *x, int m, int n, int *p, int off, int invert) \
 IDZ
 #undef TEMPLATE
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
 symperm2(_CTYPE_ *x, int n, char uplo, int *p, int off, int invert) \
 { \
@@ -139,57 +139,59 @@ symperm2(_CTYPE_ *x, int n, char uplo, int *p, int off, int invert) \
 IDZ
 #undef TEMPLATE
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-pack2(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char diag) \
+pack2(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans, char diag) \
 { \
+	_CTYPE_ *tmp = dest; \
 	int i, j; \
-	R_xlen_t dpos = 0, spos = 0; \
 	if (uplo == 'U') { \
-		for (j = 0; j < n; spos += n-(++j)) \
+		for (j = 0; j < n; src += n - (++j)) \
 			for (i = 0; i <= j; ++i) \
-				dest[dpos++] = src[spos++]; \
-		if (diag != 'N') { \
-			dpos = 0; \
-			for (j = 0; j < n; dpos += (++j)+1) \
-				dest[dpos] = _ONE_; \
-		} \
+				*(dest++) = *(src++); \
+		if (diag != 'N') \
+			for (j = 0; j < n; tmp += (++j) + 1) \
+				_PREFIX_ ## ASSIGN_UNIT(*tmp); \
+		else if (trans == 'C') \
+			for (j = 0; j < n; tmp += (++j) + 1) \
+				_PREFIX_ ## ASSIGN_RPRJ(*tmp); \
 	} else { \
-		for (j = 0; j < n; spos += (++j)) \
+		for (j = 0; j < n; src += (++j)) \
 			for (i = j; i < n; ++i) \
-				dest[dpos++] = src[spos++]; \
-		if (diag != 'N') { \
-			dpos = 0; \
-			for (j = 0; j < n; dpos += n-(j++)) \
-				dest[dpos] = _ONE_; \
-		} \
+				*(dest++) = *(src++); \
+		if (diag != 'N') \
+			for (j = 0; j < n; tmp += n - (j++)) \
+				_PREFIX_ ## ASSIGN_UNIT(*tmp); \
+		else if (trans == 'C') \
+			for (j = 0; j < n; tmp += n - (j++)) \
+				_PREFIX_ ## ASSIGN_RPRJ(*tmp); \
 	} \
 	return; \
 }
 IDZ
 #undef TEMPLATE
 
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
+#define TEMPLATE(_PREFIX_, _CTYPE_) \
 void _PREFIX_ ## \
-unpack1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char diag) \
+unpack1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans, char diag) \
 { \
+	_CTYPE_ *tmp = dest; \
 	int i, j; \
-	R_xlen_t dpos = 0, spos = 0; \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; dpos += n-(++j)) \
+	R_xlen_t n1a = (R_xlen_t) n + 1; \
+	if (uplo == 'U') \
+		for (j = 0; j < n; dest += n - (++j)) \
 			for (i = 0; i <= j; ++i) \
-				dest[dpos++] = src[spos++]; \
-	} else { \
-		for (j = 0; j < n; dpos += (++j)) \
-			for (i = j; i <  n; ++i) \
-				dest[dpos++] = src[spos++]; \
-	} \
-	if (diag != 'N') { \
-		dpos = 0; \
-		R_xlen_t n1a = (R_xlen_t) n + 1; \
-		for (j = 0; j < n; ++j, dpos += n1a) \
-			dest[dpos] = _ONE_; \
-	} \
+				*(dest++) = *(src++); \
+	else \
+		for (j = 0; j < n; dest += (++j)) \
+			for (i = j; i < n; ++i) \
+				*(dest++) = *(src++); \
+	if (diag != 'N') \
+		for (j = 0; j < n; ++j, tmp += n1a) \
+			_PREFIX_ ## ASSIGN_UNIT(*tmp); \
+	else if (trans == 'C') \
+		for (j = 0; j < n; ++j, tmp += n1a) \
+			_PREFIX_ ## ASSIGN_RPRJ(*tmp); \
 	return; \
 }
 IDZ
@@ -214,15 +216,15 @@ trans2(_CTYPE_ *dest, const _CTYPE_ *src, int m, int n, char trans) \
 	R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
 	int i, j; \
 	if (trans == 'C') \
-	for (j = 0; j < m; ++j, src -= mn1s) \
-		for (i = 0; i < n; ++i, src += m, dest += 1) \
-			ASSIGN_JI_ ## _PREFIX_((*dest), (*src)); \
+		for (j = 0; j < m; ++j, src -= mn1s) \
+			for (i = 0; i < n; ++i, src += m, dest += 1) \
+				_PREFIX_ ## ASSIGN_CONJ(*dest, *src); \
 	else if (trans == 'T') \
-	for (j = 0; j < m; ++j, src -= mn1s) \
-		for (i = 0; i < n; ++i, src += m, dest += 1) \
-			ASSIGN_IJ_ ## _PREFIX_((*dest), (*src)); \
+		for (j = 0; j < m; ++j, src -= mn1s) \
+			for (i = 0; i < n; ++i, src += m, dest += 1) \
+				_PREFIX_ ## ASSIGN_IDEN(*dest, *src); \
 	else \
-	Matrix_memcpy(dest, src, mn1s + 1, sizeof(_CTYPE_)); \
+		memcpy(dest, src, (size_t) (mn1s + 1) * sizeof(_CTYPE_)); \
 	return; \
 }
 IDZ

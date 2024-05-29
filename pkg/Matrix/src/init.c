@@ -23,7 +23,7 @@
 #include <R_ext/Visibility.h>
 
 #include "Msymbols.h"
-Rcomplex Matrix_zzero, Matrix_zone, Matrix_zna;
+Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna;
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 #define  EXTDEF(name, n)  {#name, (DL_FUNC) &name, n}
@@ -384,8 +384,8 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_vectorsSym  = install("vectors");
 	Matrix_xSym        = install("x");
 
-	Matrix_zzero.r = 0.0; Matrix_zone.r = 1.0; Matrix_zna.r = NA_REAL;
-	Matrix_zzero.i = 0.0; Matrix_zone.i = 0.0; Matrix_zna.i = NA_REAL;
+	Matrix_zzero.r = 0.0; Matrix_zunit.r = 1.0; Matrix_zna.r = NA_REAL;
+	Matrix_zzero.i = 0.0; Matrix_zunit.i = 0.0; Matrix_zna.i = NA_REAL;
 
 	Matrix_cholmod_start(&c);
 	return;

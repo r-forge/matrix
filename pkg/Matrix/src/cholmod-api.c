@@ -332,7 +332,7 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 			} else {
 			Rcomplex *Ax = ((Rcomplex *) A->x) + A->nnz;
 			for (int d = 0; d < n; ++d)
-				Ax[d] = Matrix_zone;
+				Ax[d] = Matrix_zunit;
 			}
 			}
 			A->nnz += A->ncol;

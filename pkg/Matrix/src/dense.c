@@ -292,7 +292,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		DG_LOOP(double, REAL, 1.0);
 		break;
 	case 'z':
-		DG_LOOP(Rcomplex, COMPLEX, Matrix_zone);
+		DG_LOOP(Rcomplex, COMPLEX, Matrix_zunit);
 		if (class[1] == 's' && ct == 'C')
 			zvreal(COMPLEX(ans), XLENGTH(ans));
 		break;
@@ -1549,7 +1549,7 @@ do { \
 		break; \
 	case 'z': \
 		SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, \
-		         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, CAST_COMPLEX, \
+		         Matrix_zzero, Matrix_zunit, Matrix_zna, ISNA_COMPLEX, CAST_COMPLEX, \
 		         INCREMENT_COMPLEX_ID, INCREMENT_COMPLEX_CJ, SCALE2_COMPLEX); \
 		break; \
 	default: \

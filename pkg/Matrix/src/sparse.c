@@ -732,7 +732,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 			DG_LOOP(double, REAL, SHOW, FIRSTOF, INCREMENT_REAL, 0.0, 1.0); \
 			break; \
 		case 'z': \
-			DG_LOOP(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX_ID, Matrix_zzero, Matrix_zone); \
+			DG_LOOP(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX_ID, Matrix_zzero, Matrix_zunit); \
 			break; \
 		default: \
 			break; \
@@ -1411,7 +1411,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 			FS_SUBCASES(double, REAL, SHOW, 1.0); \
 			break; \
 		case 'z': \
-			FS_SUBCASES(Rcomplex, COMPLEX, SHOW, Matrix_zone); \
+			FS_SUBCASES(Rcomplex, COMPLEX, SHOW, Matrix_zunit); \
 			break; \
 		default: \
 			break; \
@@ -1991,7 +1991,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 				if (cl[0] == 'd')
 					SP_LOOP(double, REAL, ASSIGN2_REAL_ID, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zunit);
 
 				SET_SLOT(to, Matrix_pSym, p1);
 				SET_SLOT(to,        iSym, i1);
@@ -2122,7 +2122,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 				if (cl[0] == 'd')
 					SP_LOOP(double, REAL, ASSIGN2_REAL_ID, 1.0);
 				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zone);
+					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zunit);
 
 				SET_SLOT(to, Matrix_iSym, i1);
 				SET_SLOT(to, Matrix_jSym, j1);
@@ -2843,7 +2843,7 @@ do { \
 			break; \
 		case 'z': \
 			SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, SHOW, \
-			         Matrix_zzero, Matrix_zone, Matrix_zna, ISNA_COMPLEX, \
+			         Matrix_zzero, Matrix_zunit, Matrix_zna, ISNA_COMPLEX, \
 			         _MAP_, CAST_COMPLEX, INCREMENT_COMPLEX_ID, SCALE2_COMPLEX); \
 			break; \
 		default: \

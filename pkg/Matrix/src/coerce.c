@@ -1013,7 +1013,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 		IAD_SUBCASES(double, REAL, 1.0);
 		break;
 	case 'z':
-		IAD_SUBCASES(Rcomplex, COMPLEX, Matrix_zone);
+		IAD_SUBCASES(Rcomplex, COMPLEX, Matrix_zunit);
 		break;
 	default:
 		break;
@@ -1445,9 +1445,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			break;
 		case 'z':
 			if (x0 == R_NilValue)
-			VAS_SUBCASES(HIDE, SHOW, SECONDOF, Rcomplex, COMPLEX, Matrix_zone, Matrix_zna);
+			VAS_SUBCASES(HIDE, SHOW, SECONDOF, Rcomplex, COMPLEX, Matrix_zunit, Matrix_zna);
 			else
-			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, Rcomplex, COMPLEX, Matrix_zone, Matrix_zna);
+			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, Rcomplex, COMPLEX, Matrix_zunit, Matrix_zna);
 			break;
 		default:
 			break;
@@ -2186,7 +2186,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			DAS_LOOP(double, REAL, _MASK_, NOTZERO_REAL, 1.0); \
 			break; \
 		case 'z': \
-			DAS_LOOP(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX, Matrix_zone); \
+			DAS_LOOP(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX, Matrix_zunit); \
 			break; \
 		default: \
 			break; \
@@ -2440,7 +2440,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 			IAS_SUBCASES(double, REAL, 1.0);
 			break;
 		case 'z':
-			IAS_SUBCASES(Rcomplex, COMPLEX, Matrix_zone);
+			IAS_SUBCASES(Rcomplex, COMPLEX, Matrix_zunit);
 			break;
 		default:
 			break;
@@ -2675,7 +2675,7 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 		{
 			Rcomplex *px = COMPLEX(x);
 			while (nnz--)
-				*(px++) = Matrix_zone;
+				*(px++) = Matrix_zunit;
 			break;
 		}
 		default:
@@ -3002,7 +3002,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			             ASSIGN2_REAL_ID, ASSIGN2_REAL_CJ, ASSIGN2_REAL_RE); \
 			break; \
 		case 'z': \
-			SAG_SUBCASES(Rcomplex, COMPLEX, SHOW, Matrix_zone, \
+			SAG_SUBCASES(Rcomplex, COMPLEX, SHOW, Matrix_zunit, \
 			             ASSIGN2_COMPLEX_ID, ASSIGN2_COMPLEX_CJ, ASSIGN2_COMPLEX_RE); \
 			break; \
 		default: \

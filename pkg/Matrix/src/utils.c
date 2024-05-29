@@ -182,7 +182,7 @@ void naToOne(SEXP x)
 		Rcomplex *px = COMPLEX(x);
 		for (i = 0; i < n; ++i, ++px)
 			if (ISNAN((*px).r) || ISNAN((*px).i))
-				*px = Matrix_zone;
+				*px = Matrix_zunit;
 		break;
 	}
 	default:
