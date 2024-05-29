@@ -4,7 +4,7 @@
 #define IDZ \
 TEMPLATE(i,      int,          0  ,         1  ) \
 TEMPLATE(d,   double,          0.0,         1.0) \
-TEMPLATE(z, Rcomplex, Matrix_zzero, Matrix_zone)
+TEMPLATE(z, Rcomplex, Matrix_zzero, Matrix_zunit)
 
 #define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
 static void _PREFIX_ ## \
