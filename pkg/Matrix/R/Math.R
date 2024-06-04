@@ -213,7 +213,7 @@ setMethod("Math", c(x = "sparseVector"),
               } else {
                   zero <- 0L  ; one <- 1L  ; l <- "i"
               }
-              if(isN0(g0 <- g(zero))) {
+              if((g0 <- g(zero)) | is.na(g0)) {
                   r <- rep.int(g0, x@length)
                   if((nnz <- length(x@i)) > 0L)
                       r[x@i] <- if(kind == "n") rep.int(g(one), nnz) else g(x@x)

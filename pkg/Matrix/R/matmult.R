@@ -1480,7 +1480,7 @@ setMethod("tcrossprod", c(x = "indMatrix", y = "vector"),
               if(k != (if(m == 1L) length(y) else 1L))
                   stop("non-conformable arguments")
               boolArith <- !is.na(boolArith) && boolArith
-              h <- if(boolArith) isN0 else as.double
+              h <- if(boolArith) function(x) x | is.na(x) else as.double
               r <- new(if(boolArith) "ngeMatrix" else "dgeMatrix")
               r@Dim <- d <- c(m, if(m == 1L) 1L else length(y))
               r@Dimnames <- c(x@Dimnames[1L], list(NULL))
