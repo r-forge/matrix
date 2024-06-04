@@ -13,6 +13,12 @@
 #define dIFELSE_NPATTERN(x, y) x
 #define zIFELSE_NPATTERN(x, y) x
 
+#define nNAME(s) i ## s
+#define lNAME(s) i ## s
+#define iNAME(s) i ## s
+#define dNAME(s) d ## s
+#define zNAME(s) z ## s
+
 #define nTYPE int
 #define lTYPE int
 #define iTYPE int
@@ -203,6 +209,18 @@ do { \
 	case 'n': \
 	case 'l': \
 	case 'i': \
+	case 'd': _TEMPLATE_(d); break; \
+	case 'z': _TEMPLATE_(z); break; \
+	default: break; \
+	} \
+} while (0)
+
+#define SWITCH3(_C_, _TEMPLATE_) \
+do { \
+	switch ((_C_)) { \
+	case 'n': \
+	case 'l': \
+	case 'i': _TEMPLATE_(i); break; \
 	case 'd': _TEMPLATE_(d); break; \
 	case 'z': _TEMPLATE_(z); break; \
 	default: break; \
