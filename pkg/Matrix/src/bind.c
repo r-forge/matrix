@@ -1,4 +1,5 @@
 #include "Mdefines.h"
+#include "M5.h"
 #include "coerce.h"
 #include "bind.h"
 
@@ -497,39 +498,19 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 {
 	SEXP a, s;
 
-#define BIND_CASES(_BIND_) \
-	do { \
-		switch (kind) { \
-		case 'l': \
-			_BIND_(int, LOGICAL, SHOW); \
-			break; \
-		case 'i': \
-			_BIND_(int, INTEGER, SHOW); \
-			break; \
-		case 'd': \
-			_BIND_(double, REAL, SHOW); \
-			break; \
-		case 'z': \
-			_BIND_(Rcomplex, COMPLEX, SHOW); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
 	if (repr == 'e') {
 
 		if (rdim[0] == 0 || rdim[1] == 0)
 			return;
 
+		SEXP tmp;
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP x = PROTECT(allocVector(kindToType(kind), mn)), tmp;
-		SET_SLOT(ans, Matrix_xSym, x);
 
-#define BIND_E(_CTYPE_, _PTR_, _MASK_) \
+#define BIND(c) \
 		do { \
-			_CTYPE_ *px = _PTR_(x), *ps; \
+			SEXP x = PROTECT(allocVector(c##TYPESXP, mn)); \
+			c##TYPE *px = c##PTR(x), *ps; \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
 				s = CAR(a); \
 				if (s == R_NilValue) \
@@ -541,16 +522,16 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 					tmp = NULL; \
 				} \
 				mn = XLENGTH(s); \
-				ps = _PTR_(s); \
+				ps = c##PTR(s); \
 				if (margin) { \
 				if (!tmp || (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)) { \
-					Matrix_memcpy(px, ps, mn, sizeof(_CTYPE_)); \
+					Matrix_memcpy(px, ps, mn, sizeof(c##TYPE)); \
 					px += mn; \
 				} else if (mn >= m) { \
-					Matrix_memcpy(px, ps, m , sizeof(_CTYPE_)); \
+					Matrix_memcpy(px, ps, m , sizeof(c##TYPE)); \
 					px += m; \
 				} else if (mn == 1) { \
-					_CTYPE_ v = ps[0]; \
+					c##TYPE v = ps[0]; \
 					for (k = 0; k < m; ++k) \
 						*(px++) = v; \
 				} else { \
@@ -559,11 +540,11 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 						*(px++) = ps[k % mn_]; \
 				} \
 				} else { \
-				_CTYPE_ *py = px; \
+				c##TYPE *py = px; \
 				if (!tmp || (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)) { \
 					m = (int) (mn / n); \
 					for (k = 0; k < n; ++k) { \
-						Matrix_memcpy(py, ps, m, sizeof(_CTYPE_)); \
+						Matrix_memcpy(py, ps, m, sizeof(c##TYPE)); \
 						py += rdim[0]; \
 						ps += m; \
 					} \
@@ -576,7 +557,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 					} \
 					px += 1; \
 				} else if (mn == 1) { \
-					_CTYPE_ v = ps[0]; \
+					c##TYPE v = ps[0]; \
 					for (k = 0; k < n; ++k) { \
 						*py = v; \
 						py += rdim[0]; \
@@ -592,13 +573,13 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				} \
 				} \
 			} \
+			SET_SLOT(ans, Matrix_xSym, x); \
+			UNPROTECT(1); \
 		} while (0)
 
-		if (kind == 'n')
-			BIND_E(int, LOGICAL, SHOW);
-		else
-			BIND_CASES(BIND_E);
-		UNPROTECT(1);
+		SWITCH5(kind, BIND);
+
+#undef BIND
 
 	} else if ((repr == 'C' && margin) || (repr == 'R' && !margin)) {
 
@@ -633,37 +614,50 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int *pi = INTEGER(i), *psi;
 		SET_SLOT(ans, iSym, i);
 
-#define BIND_C1R0(_CTYPE_, _PTR_, _MASK_) \
+#define BIND(c) \
 		do { \
-			_MASK_(_CTYPE_ *px = _PTR_(x), *psx); \
+			c##IF_NPATTERN( \
+			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx; \
+			c##TYPE *px = c##PTR(x), *psx; \
+			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
 				s = CAR(a); \
 				if (s == R_NilValue) \
 					continue; \
 				PROTECT(sp = GET_SLOT(s, Matrix_pSym)); \
-				PROTECT(si = GET_SLOT(s, iSym)); \
-				_MASK_(PROTECT(sx = GET_SLOT(s, Matrix_xSym))); \
+				PROTECT(si = GET_SLOT(s,        iSym)); \
+				c##IF_NPATTERN( \
+				PROTECT(sx = GET_SLOT(s, Matrix_xSym)); \
+				); \
 				psp = INTEGER(sp); \
 				psi = INTEGER(si); \
-				_MASK_(psx = _PTR_(sx)); \
+				c##IF_NPATTERN( \
+				psx =  c##PTR(sx); \
+				); \
 				n = (int) (XLENGTH(sp) - 1); \
 				Matrix_memcpy(pi, psi, psp[n], sizeof(int)); \
-				_MASK_(Matrix_memcpy(px, psx, psp[n], sizeof(_CTYPE_))); \
+				c##IF_NPATTERN( \
+				Matrix_memcpy(px, psx, psp[n], sizeof(c##TYPE)); \
+				); \
 				pi += psp[n]; \
-				_MASK_(px += psp[n]); \
-				_MASK_(UNPROTECT(1)); \
+				c##IF_NPATTERN( \
+				px += psp[n]; \
+				); \
 				UNPROTECT(2); \
+				c##IF_NPATTERN( \
+				UNPROTECT(1); \
+				); \
 			} \
+			c##IF_NPATTERN( \
+			SET_SLOT(ans, Matrix_xSym, x); \
+			UNPROTECT(1); \
+			); \
 		} while (0)
 
-		if (kind == 'n')
-			BIND_C1R0(int, LOGICAL, HIDE);
-		else {
-			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(ans, Matrix_xSym, x);
-			BIND_CASES(BIND_C1R0);
-			UNPROTECT(1);
-		}
+		SWITCH5(kind, BIND);
+
+#undef BIND
+
 		UNPROTECT(2);
 
 	} else if ((repr == 'C' && !margin) || (repr == 'R' && margin)) {
@@ -702,42 +696,53 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		Matrix_Calloc(work, n, int);
 		Matrix_memcpy(work, pp, n, sizeof(int));
 
-#define BIND_C0R1(_CTYPE_, _PTR_, _MASK_) \
+#define BIND(c) \
 		do { \
-			_MASK_(_CTYPE_ *px = _PTR_(x), *psx); \
+			c##IF_NPATTERN( \
+			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
+			c##TYPE *px = c##PTR(x), *psx; \
+			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
 				s = CAR(a); \
 				if (s == R_NilValue) \
 					continue; \
 				PROTECT(sp = GET_SLOT(s, Matrix_pSym)); \
-				PROTECT(si = GET_SLOT(s, iSym)); \
-				_MASK_(PROTECT(sx = GET_SLOT(s, Matrix_xSym))); \
+				PROTECT(si = GET_SLOT(s,        iSym)); \
+				c##IF_NPATTERN( \
+				PROTECT(sx = GET_SLOT(s, Matrix_xSym)); \
+				); \
 				psp = INTEGER(sp); \
 				psi = INTEGER(si); \
-				_MASK_(psx = _PTR_(sx)); \
+				c##IF_NPATTERN( \
+				psx =  c##PTR(sx); \
+				); \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = psp[j + 1]; \
 					while (k < kend) { \
 						pi[work[j]] = *(psi++) + pos; \
-						_MASK_(px[work[j]] = *(psx++)); \
+						c##IF_NPATTERN( \
+						px[work[j]] = *(psx++); \
+						); \
 						work[j]++; \
 						++k; \
 					} \
 				} \
-				_MASK_(UNPROTECT(1)); \
 				UNPROTECT(2); \
+				c##IF_NPATTERN( \
+				UNPROTECT(1); \
+				); \
 				pos += INTEGER(GET_SLOT(s, Matrix_DimSym))[margin]; \
 			} \
+			c##IF_NPATTERN( \
+			SET_SLOT(ans, Matrix_xSym, x); \
+			UNPROTECT(1); \
+			); \
 		} while (0)
 
-		if (kind == 'n')
-			BIND_C0R1(int, LOGICAL, HIDE);
-		else {
-			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(ans, Matrix_xSym, x);
-			BIND_CASES(BIND_C0R1);
-			UNPROTECT(1);
-		}
+		SWITCH5(kind, BIND);
+
+#undef BIND
+
 		UNPROTECT(2);
 		Matrix_Free(work, n);
 
@@ -765,47 +770,60 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		SET_SLOT(ans, Matrix_iSym, i);
 		SET_SLOT(ans, Matrix_jSym, j);
 
-#define BIND_T(_CTYPE_, _PTR_, _MASK_) \
+#define BIND(c) \
 		do { \
-			_MASK_(_CTYPE_ *px = _PTR_(x), *psx); \
+			c##IF_NPATTERN( \
+			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
+			c##TYPE *px = c##PTR(x), *psx; \
+			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
 				s = CAR(a); \
 				if (s == R_NilValue) \
 					continue; \
 				PROTECT(si = GET_SLOT(s, Matrix_iSym)); \
 				PROTECT(sj = GET_SLOT(s, Matrix_jSym)); \
-				_MASK_(PROTECT(sx = GET_SLOT(s, Matrix_xSym))); \
+				c##IF_NPATTERN( \
+				PROTECT(sx = GET_SLOT(s, Matrix_xSym)); \
+				); \
 				psi = INTEGER(si); \
 				psj = INTEGER(sj); \
-				_MASK_(psx = _PTR_(sx)); \
+				c##IF_NPATTERN( \
+				psx =  c##PTR(sx); \
+				); \
 				k = XLENGTH(si); \
 				if (margin) { \
 					while (k--) { \
 						*(pi++) = *(psi++); \
 						*(pj++) = *(psj++) + pos; \
-						_MASK_(*(px++) = *(psx++)); \
+						c##IF_NPATTERN( \
+						*(px++) = *(psx++); \
+						); \
 					} \
 				} else { \
 					while (k--) { \
 						*(pi++) = *(psi++) + pos; \
 						*(pj++) = *(psj++); \
-						_MASK_(*(px++) = *(psx++)); \
+						c##IF_NPATTERN( \
+						*(px++) = *(psx++); \
+						); \
 					} \
 				} \
-				_MASK_(UNPROTECT(1)); \
 				UNPROTECT(2); \
+				c##IF_NPATTERN( \
+				UNPROTECT(1); \
+				); \
 				pos += INTEGER(GET_SLOT(s, Matrix_DimSym))[margin]; \
 			} \
+			c##IF_NPATTERN( \
+			SET_SLOT(ans, Matrix_xSym, x); \
+			UNPROTECT(1); \
+			); \
 		} while (0)
 
-		if (kind == 'n')
-			BIND_T(int, LOGICAL, HIDE);
-		else {
-			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx;
-			SET_SLOT(ans, Matrix_xSym, x);
-			BIND_CASES(BIND_T);
-			UNPROTECT(1);
-		}
+		SWITCH5(kind, BIND);
+
+#undef BIND
+
 		UNPROTECT(2);
 
 	} else {
@@ -826,12 +844,6 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			INTEGER(GET_SLOT(ans, Matrix_marginSym))[0] = 2;
 
 	}
-
-#undef BIND_CASES
-#undef BIND_E
-#undef BIND_C1R0
-#undef BIND_C0R1
-#undef BIND_T
 
 	return;
 }
