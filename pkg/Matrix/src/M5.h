@@ -1,6 +1,18 @@
 #ifndef MATRIX_M5_H
 #define MATRIX_M5_H
 
+#define nIF_NPATTERN(...)
+#define lIF_NPATTERN(...) __VA_ARGS__
+#define iIF_NPATTERN(...) __VA_ARGS__
+#define dIF_NPATTERN(...) __VA_ARGS__
+#define zIF_NPATTERN(...) __VA_ARGS__
+
+#define nIFELSE_NPATTERN(x, y) y
+#define lIFELSE_NPATTERN(x, y) x
+#define iIFELSE_NPATTERN(x, y) x
+#define dIFELSE_NPATTERN(x, y) x
+#define zIFELSE_NPATTERN(x, y) x
+
 #define nTYPE int
 #define lTYPE int
 #define iTYPE int
