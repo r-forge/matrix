@@ -19,6 +19,12 @@
 #define dTYPE double
 #define zTYPE Rcomplex
 
+#define nTYPESXP LGLSXP
+#define lTYPESXP LGLSXP
+#define iTYPESXP INTSXP
+#define dTYPESXP REALSXP
+#define zTYPESXP CPLXSXP
+
 #define nPTR LOGICAL
 #define lPTR LOGICAL
 #define iPTR INTEGER
@@ -191,18 +197,22 @@
 #define zDIVIDE(x, a) \
 	do { (x).r /= a; (x).i /= a; } while (0)
 
-#define CASES2(_C_, _TEMPLATE_) \
+#define SWITCH2(_C_, _TEMPLATE_) \
 do { \
-	switch (_C_) { \
+	switch ((_C_)) { \
+	case 'n': \
+	case 'l': \
+	case 'i': \
 	case 'd': _TEMPLATE_(d); break; \
 	case 'z': _TEMPLATE_(z); break; \
 	default: break; \
 	} \
 } while (0)
 
-#define CASES4(_C_, _TEMPLATE_) \
+#define SWITCH4(_C_, _TEMPLATE_) \
 do { \
-	switch (_C_) { \
+	switch ((_C_)) { \
+	case 'n': \
 	case 'l': _TEMPLATE_(l); break; \
 	case 'i': _TEMPLATE_(i); break; \
 	case 'd': _TEMPLATE_(d); break; \
@@ -211,9 +221,9 @@ do { \
 	} \
 } while (0)
 
-#define CASES5(_C_, _TEMPLATE_) \
+#define SWITCH5(_C_, _TEMPLATE_) \
 do { \
-	switch (_C_) { \
+	switch ((_C_)) { \
 	case 'n': _TEMPLATE_(n); break; \
 	case 'l': _TEMPLATE_(l); break; \
 	case 'i': _TEMPLATE_(i); break; \
