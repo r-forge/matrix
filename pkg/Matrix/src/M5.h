@@ -1,24 +1,6 @@
 #ifndef MATRIX_M5_H
 #define MATRIX_M5_H
 
-#define nIF_NPATTERN(...)
-#define lIF_NPATTERN(...) __VA_ARGS__
-#define iIF_NPATTERN(...) __VA_ARGS__
-#define dIF_NPATTERN(...) __VA_ARGS__
-#define zIF_NPATTERN(...) __VA_ARGS__
-
-#define nIFELSE_NPATTERN(x, y) y
-#define lIFELSE_NPATTERN(x, y) x
-#define iIFELSE_NPATTERN(x, y) x
-#define dIFELSE_NPATTERN(x, y) x
-#define zIFELSE_NPATTERN(x, y) x
-
-#define nNAME(s) i ## s
-#define lNAME(s) i ## s
-#define iNAME(s) i ## s
-#define dNAME(s) d ## s
-#define zNAME(s) z ## s
-
 #define nTYPE int
 #define lTYPE int
 #define iTYPE int
@@ -55,6 +37,30 @@
 #define dNA NA_REAL
 #define zNA Matrix_zna
 
+#define nNAME(s) i ## s
+#define lNAME(s) i ## s
+#define iNAME(s) i ## s
+#define dNAME(s) d ## s
+#define zNAME(s) z ## s
+
+#define nIF_NPATTERN(...)
+#define lIF_NPATTERN(...) __VA_ARGS__
+#define iIF_NPATTERN(...) __VA_ARGS__
+#define dIF_NPATTERN(...) __VA_ARGS__
+#define zIF_NPATTERN(...) __VA_ARGS__
+
+#define nIFELSE_NPATTERN(x, y) y
+#define lIFELSE_NPATTERN(x, y) x
+#define iIFELSE_NPATTERN(x, y) x
+#define dIFELSE_NPATTERN(x, y) x
+#define zIFELSE_NPATTERN(x, y) x
+
+#define nNOT_REAL(x) (0)
+#define lNOT_REAL(x) (0)
+#define iNOT_REAL(x) (0)
+#define dNOT_REAL(x) (0)
+#define zNOT_REAL(x) ((x).i != 0.0)
+
 #define nNOT_ZERO(x) ((x) != 0)
 #define lNOT_ZERO(x) ((x) != 0)
 #define iNOT_ZERO(x) ((x) != 0)
@@ -72,12 +78,6 @@
 #define iNOT_NA(x) ((x) != NA_INTEGER)
 #define dNOT_NA(x) (!ISNAN(x))
 #define zNOT_NA(x) (!ISNAN((x).r) && !ISNAN((x).i))
-
-#define nNOT_REAL(x) 0
-#define lNOT_REAL(x) 0
-#define iNOT_REAL(x) 0
-#define dNOT_REAL(x) 0
-#define zNOT_REAL(x) ((x).i != 0.0)
 
 #define nNOT_IDEN(x, y) \
 	(((x) != 0) != ((y) != 0))
@@ -103,53 +103,71 @@
 	(((ISNAN((x).r)) ? !ISNAN((y).r) : ISNAN((y).r) || (x).r !=  (y).r) || \
 	 ((ISNAN((x).i)) ? !ISNAN((y).i) : ISNAN((y).i) || (x).i != -(y).i))
 
-#define nASSIGN_CONJ(x, y) (x) = (y)
-#define lASSIGN_CONJ(x, y) (x) = (y)
-#define iASSIGN_CONJ(x, y) (x) = (y)
-#define dASSIGN_CONJ(x, y) (x) = (y)
-#define zASSIGN_CONJ(x, y) do { (x).r = (y).r; (x).i = -(y).i; } while (0)
+#define nSET_ZERO(x) ((x) = 0)
+#define lSET_ZERO(x) ((x) = 0)
+#define iSET_ZERO(x) ((x) = 0)
+#define dSET_ZERO(x) ((x) = 0.0)
+#define zSET_ZERO(x) ((x) = Matrix_zzero)
 
-#define nASSIGN_PROJ_REAL(x, y) (x) = (y)
-#define lASSIGN_PROJ_REAL(x, y) (x) = (y)
-#define iASSIGN_PROJ_REAL(x, y) (x) = (y)
-#define dASSIGN_PROJ_REAL(x, y) (x) = (y)
-#define zASSIGN_PROJ_REAL(x, y) do { (x).r = (y).r; (x).i = 0.0; } while (0)
+#define nSET_UNIT(x) ((x) = 1)
+#define lSET_UNIT(x) ((x) = 1)
+#define iSET_UNIT(x) ((x) = 1)
+#define dSET_UNIT(x) ((x) = 1.0)
+#define zSET_UNIT(x) ((x) = Matrix_zunit)
 
-#define nASSIGN_PROJ_IMAG(x) (x) = 0
-#define lASSIGN_PROJ_IMAG(x) (x) = 0
-#define iASSIGN_PROJ_IMAG(x) (x) = 0
-#define dASSIGN_PROJ_IMAG(x) (x) = 0.0
-#define zASSIGN_PROJ_IMAG(x, y) do { (x).r = 0.0; (x).i = (y).i; } while (0)
+#define nSET_NA(x) ((x) = 1)
+#define lSET_NA(x) ((x) = NA_LOGICAL)
+#define iSET_NA(x) ((x) = NA_INTEGER)
+#define dSET_NA(x) ((x) = NA_REAL)
+#define zSET_NA(x) ((x) = Matrix_zna)
 
-#define nSET_ZERO(x) (x) = 0
-#define lSET_ZERO(x) (x) = 0
-#define iSET_ZERO(x) (x) = 0
-#define dSET_ZERO(x) (x) = 0.0
-#define zSET_ZERO(x) (x) = Matrix_zzero
+#define nSET_IDEN(x) (x)
+#define lSET_IDEN(x) (x)
+#define iSET_IDEN(x) (x)
+#define dSET_IDEN(x) (x)
+#define zSET_IDEN(x) (x)
 
-#define nSET_UNIT(x) (x) = 1
-#define lSET_UNIT(x) (x) = 1
-#define iSET_UNIT(x) (x) = 1
-#define dSET_UNIT(x) (x) = 1.0
-#define zSET_UNIT(x) (x) = Matrix_zunit
+#define nSET_CONJ(x) (x)
+#define lSET_CONJ(x) (x)
+#define iSET_CONJ(x) (x)
+#define dSET_CONJ(x) (x)
+#define zSET_CONJ(x) ((x).i = -(x).i, (x))
 
-#define nSET_CONJ(x)
-#define lSET_CONJ(x)
-#define iSET_CONJ(x)
-#define dSET_CONJ(x)
-#define zSET_CONJ(x) (x).i = -(x).i
+#define nSET_PROJ_REAL(x) (x)
+#define lSET_PROJ_REAL(x) (x)
+#define iSET_PROJ_REAL(x) (x)
+#define dSET_PROJ_REAL(x) (x)
+#define zSET_PROJ_REAL(x) ((x).i = 0.0, (x))
 
-#define nSET_PROJ_REAL(x)
-#define lSET_PROJ_REAL(x)
-#define iSET_PROJ_REAL(x)
-#define dSET_PROJ_REAL(x)
-#define zSET_PROJ_REAL(x) (x).i = 0.0
+#define nSET_PROJ_IMAG(x) ((x) = 0)
+#define lSET_PROJ_IMAG(x) ((x) = 0)
+#define iSET_PROJ_IMAG(x) ((x) = 0)
+#define dSET_PROJ_IMAG(x) ((x) = 0.0)
+#define zSET_PROJ_IMAG(x) ((x).r = 0.0, (x))
 
-#define nSET_PROJ_IMAG(x) (x) = 0
-#define lSET_PROJ_IMAG(x) (x) = 0
-#define iSET_PROJ_IMAG(x) (x) = 0
-#define dSET_PROJ_IMAG(x) (x) = 0.0
-#define zSET_PROJ_IMAG(x) (x).r = 0.0
+#define nASSIGN_IDEN(x, y) ((x) = (y))
+#define lASSIGN_IDEN(x, y) ((x) = (y))
+#define iASSIGN_IDEN(x, y) ((x) = (y))
+#define dASSIGN_IDEN(x, y) ((x) = (y))
+#define zASSIGN_IDEN(x, y) ((x) = (y))
+
+#define nASSIGN_CONJ(x, y) ((x) = (y))
+#define lASSIGN_CONJ(x, y) ((x) = (y))
+#define iASSIGN_CONJ(x, y) ((x) = (y))
+#define dASSIGN_CONJ(x, y) ((x) = (y))
+#define zASSIGN_CONJ(x, y) ((x).r = (y).r, (x).i = -(y).i, (x))
+
+#define nASSIGN_PROJ_REAL(x, y) ((x) = (y))
+#define lASSIGN_PROJ_REAL(x, y) ((x) = (y))
+#define iASSIGN_PROJ_REAL(x, y) ((x) = (y))
+#define dASSIGN_PROJ_REAL(x, y) ((x) = (y))
+#define zASSIGN_PROJ_REAL(x, y) ((x).r = (y).r, (x).i = 0.0, (x))
+
+#define nASSIGN_PROJ_IMAG(x, y) ((x) = 0)
+#define lASSIGN_PROJ_IMAG(x, y) ((x) = 0)
+#define iASSIGN_PROJ_IMAG(x, y) ((x) = 0)
+#define dASSIGN_PROJ_IMAG(x, y) ((x) = 0.0)
+#define zASSIGN_PROJ_IMAG(x, y) ((x).r = 0.0, (x).i = (y).i, (x))
 
 #define nINCREMENT_IDEN(x, y) \
 	do { \
