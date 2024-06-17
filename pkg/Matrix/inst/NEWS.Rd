@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-05-29 r4776)}{
+\section{Changes in version 1.8-0 (2024-06-17 r4789)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -56,7 +56,7 @@
   }
 }
 
-\section{Changes in version 1.7-1 (2024-04-11 r4951)}{
+\section{Changes in version 1.7-1 (2024-06-17 r4789)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -69,7 +69,10 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item Installation under architecture-specific builds of \R{}
+      works again.  It was broken in version 1.7-0, where changes to
+      \file{src/Makevars} resulted in a preprocessor search path not
+      including \file{${R_INCLUDE_DIR}${R_ARCH}}.
     }
   }
   \subsection{Misc}{
