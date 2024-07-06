@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-06-18 r4792)}{
+\section{Changes in version 1.8-0 (2024-07-06 r4797)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -52,6 +52,10 @@
       \item \proglang{C} code uses new (since \R{} 4.4.0) \code{OBJSXP}
       in place of deprecated \code{S4SXP} and \code{TYPEOF(.) == OBJSXP}
       in place of (not specific enough) \code{IS_S4_OBJECT(.)}.
+
+      \item \proglang{C} code is simplified using definitions in new
+      header \file{M5.h} for templated dispatch on object \dQuote{kind}
+      \samp{[nlidz]}.
     }
   }
 }

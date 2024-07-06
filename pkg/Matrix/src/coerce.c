@@ -1,5 +1,6 @@
 #include <math.h> /* trunc */
 #include "Mdefines.h"
+#include "M5.h"
 #include "idz.h"
 #include "coerce.h"
 
@@ -24,8 +25,9 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		error(_("attempt to construct non-square %s"),
 		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
-	int_fast64_t mn = (int_fast64_t) m * n;
-	if (((!packed) ? mn : (mn + n) / 2) > R_XLEN_T_MAX)
+	int_fast64_t mn = (int_fast64_t) m * n,
+		lengthout = (!packed) ? mn : n + (mn - n) / 2;
+	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -58,22 +60,22 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 	}
 
 	/* FIXME: add argument 'new' and conditionally avoid allocation */
-	SEXP x = PROTECT(allocVector(tt, (!packed) ? mn : (mn + n) / 2));
+	SEXP x = PROTECT(allocVector(tt, (R_xlen_t) lengthout));
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
 
-#define VAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_, _NA_) \
+#define VAD(c) \
 	do { \
-		_CTYPE_ *dest = _PTR_(x), *src = _PTR_(from); \
+		c##TYPE *dest = c##PTR(x), *src = c##PTR(from); \
 		if (r == 0) { \
 			while (mn-- > 0) \
-				*(dest++) = _NA_; \
+				*(dest++) = c##NA; \
 		} else if (r == 1) { \
 			while (mn-- > 0) \
 				*(dest++) = *src; \
 		} else if (!packed) { \
 			if (!recycle) \
-				_PREFIX_ ## trans2(dest, src, n, m, (!byrow) ? 'N' : 'T'); \
+				c##NAME(trans2)(dest, src, n, m, (!byrow) ? 'N' : 'T');	\
 			else { \
 				if (!byrow) { \
 					k = 0; \
@@ -137,24 +139,9 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		} \
 	} while (0)
 
-	switch (tt) {
-	case LGLSXP:
-		VAD_SUBCASES(i, int, LOGICAL, NA_LOGICAL);
-		break;
-	case INTSXP:
-		VAD_SUBCASES(i, int, INTEGER, NA_INTEGER);
-		break;
-	case REALSXP:
-		VAD_SUBCASES(d, double, REAL, NA_REAL);
-		break;
-	case CPLXSXP:
-		VAD_SUBCASES(z, Rcomplex, COMPLEX, Matrix_zna);
-		break;
-	default:
-		break;
-	}
+	SWITCH4(cl[0], VAD);
 
-#undef VAD_SUBCASES
+#undef VAD
 
 	SET_SLOT(to, Matrix_xSym, x);
 
@@ -373,7 +360,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
 	if (doDN) {
-		if (cl[1] == 's')
+		if (cl[1] == 's' || cl[1] == 'p')
 			set_symmetrized_DimNames(to, dimnames, -1);
 		else
 			SET_SLOT(to, Matrix_DimNamesSym, dimnames);
@@ -399,60 +386,40 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 
 	if (!packed) {
 
-		if (new <= 0 || (new <= 1 && ATTRIB(from) == R_NilValue) ||
-		    !MAYBE_REFERENCED(from)) {
+	if (new <= 0 || (new <= 1 && ATTRIB(from) == R_NilValue) ||
+	    !MAYBE_REFERENCED(from)) {
 
-			if (ATTRIB(from) != R_NilValue && new >= 1) {
-				/* 'from' has attributes and no references : */
-				SET_ATTRIB(from, R_NilValue);
-				if (OBJECT(from))
-					SET_OBJECT(from, 0);
-			}
-			x = from;
-
-		} else {
-
-			PROTECT(x = allocVector(tt, mn));
-			++nprotect;
-			switch (tt) {
-			case LGLSXP:
-				memcpy(LOGICAL(x), LOGICAL(from), sizeof(int) * mn);
-				break;
-			case INTSXP:
-				memcpy(INTEGER(x), INTEGER(from), sizeof(int) * mn);
-				break;
-			case REALSXP:
-				memcpy(REAL(x), REAL(from), sizeof(double) * mn);
-				break;
-			case CPLXSXP:
-				memcpy(COMPLEX(x), COMPLEX(from), sizeof(Rcomplex) * mn);
-				break;
-			default:
-				break;
-			}
-
+		if (ATTRIB(from) != R_NilValue && new >= 1) {
+			/* 'from' has attributes and no references : */
+			SET_ATTRIB(from, R_NilValue);
+			if (OBJECT(from))
+				SET_OBJECT(from, 0);
 		}
+		x = from;
 
 	} else {
 
-		PROTECT(x = allocVector(tt, (mn - n) / 2 + n));
+		PROTECT(x = allocVector(tt, mn));
 		++nprotect;
-		switch (tt) {
-		case LGLSXP:
-			ipack2(LOGICAL(x), LOGICAL(from), n, ul, '\0', 'N');
-			break;
-		case INTSXP:
-			ipack2(INTEGER(x), INTEGER(from), n, ul, '\0', 'N');
-			break;
-		case REALSXP:
-			dpack2(REAL(x), REAL(from), n, ul, '\0', 'N');
-			break;
-		case CPLXSXP:
-			zpack2(COMPLEX(x), COMPLEX(from), n, ul, '\0', 'N');
-			break;
-		default:
-			break;
-		}
+
+#define MAD(c) memcpy(c##PTR(x), c##PTR(from), sizeof(c##TYPE) * mn)
+
+		SWITCH4(cl[0], MAD);
+
+#undef MAD
+
+	}
+
+	} else {
+
+		PROTECT(x = allocVector(tt, n + (mn - n) / 2));
+		++nprotect;
+
+#define MAD(c) c##NAME(pack2)(c##PTR(x), c##PTR(from), n, ul, '\0', 'N')
+
+		SWITCH4(cl[0], MAD);
+
+#undef MAD
 
 	}
 
@@ -529,19 +496,18 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	int_fast64_t len = (int_fast64_t) m * n;
-	if (packed)
-		len = (len + n) / 2;
-	if (len > R_XLEN_T_MAX)
+	int_fast64_t mn = (int_fast64_t) m * n,
+		lengthout = (!packed) ? mn : n + (mn - n) / 2;
+	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	if (class[2] != 'C' && packed && len > R_XLEN_T_MAX)
+	if (class[2] != 'C' && packed && mn > R_XLEN_T_MAX)
 		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
 		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
-	double bytes = (double) len * kindToSize(cl[0]);
-	if (bytes > 0x1.0p+30 /* 1 GiB */)
+	double nbytes = (double) lengthout * kindToSize(cl[0]);
+	if (nbytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		        0x1.0p-30 * nbytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -575,13 +541,10 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 
 	/* It remains to fill 'x' ... */
 
-	SEXP x1 = PROTECT(allocVector(kindToType(class[0]), (R_xlen_t) len)),
-		p0, i0, j0;
-	int *pp, *pi, *pj, nprotect = 2;
+	SEXP p0, i0, j0;
+	int *pp, *pi, *pj, nprotect = 1;
 	p0 = i0 = j0 = NULL;
 	pp = pi = pj = NULL;
-	SET_SLOT(to, Matrix_xSym, x1);
-
 	if (class[2] != 'T') {
 		PROTECT(p0 = GET_SLOT(from, Matrix_pSym));
 		++nprotect;
@@ -598,192 +561,120 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		pj = INTEGER(j0);
 	}
 
-#define SAD_CASES \
+#define SAD(c) \
 	do { \
-		switch (class[0]) { \
-		case 'l': \
-			SAD_SUBCASES(int, LOGICAL, SHOW, FIRSTOF, INCREMENT_LOGICAL); \
-			break; \
-		case 'i': \
-			SAD_SUBCASES(int, INTEGER, SHOW, FIRSTOF, INCREMENT_INTEGER); \
-			break; \
-		case 'd': \
-			SAD_SUBCASES(double, REAL, SHOW, FIRSTOF, INCREMENT_REAL); \
-			break; \
-		case 'z': \
-			SAD_SUBCASES(Rcomplex, COMPLEX, SHOW, FIRSTOF, INCREMENT_COMPLEX_ID); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-#define SAD_SUBCASES(_CTYPE_, _PTR_, _MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
-		       _CTYPE_ *px1 = _PTR_(x1) ; \
-		memset(px1, 0, sizeof(_CTYPE_) * (R_xlen_t) len); \
-		if (!packed) \
-			/* .(ge|sy|po|tr)Matrix */ \
-			SAD_SUBSUBCASES(SAD_LOOP_C2NP, SAD_LOOP_R2NP, SAD_LOOP_T2NP, \
-			                _MASK_, _REPLACE_, _INCREMENT_); \
-		else if (ul == 'U') \
-			/* upper triangular .(sp|pp|tp)Matrix */ \
-			SAD_SUBSUBCASES(SAD_LOOP_C2UP, SAD_LOOP_R2UP, SAD_LOOP_T2UP, \
-			                _MASK_, _REPLACE_, _INCREMENT_); \
-		else \
-			/* lower triangular .(sp|pp|tp)Matrix */ \
-			SAD_SUBSUBCASES(SAD_LOOP_C2LP, SAD_LOOP_R2LP, SAD_LOOP_T2LP, \
-			                _MASK_, _REPLACE_, _INCREMENT_); \
-	} while (0)
-
-#define SAD_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
+		c##IF_NPATTERN( \
+		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
+		c##TYPE *px0 = c##PTR(x0); \
+		); \
+		SEXP x1 = PROTECT(allocVector(c##TYPESXP, (R_xlen_t) lengthout)); \
+		c##TYPE *px1 = c##PTR(x1); \
+		memset(px1, 0, sizeof(c##TYPE) * (R_xlen_t) lengthout); \
 		switch (class[2]) { \
 		case 'C': \
 		{ \
-			int j, k, kend; \
-			_LOOP_C_(_MASK_, _REPLACE_, _INCREMENT_); \
+			int j, k = 0, kend; \
+			if (!packed) \
+				for (j = 0; j < n; ++j) { \
+					kend = pp[j]; \
+					while (k < kend) { \
+						px1[*pi] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pi; c##IF_NPATTERN(++px0); \
+					} \
+					px1 += m; \
+				} \
+			else if (ul == 'U') \
+				for (j = 0; j < n; ++j) { \
+					kend = pp[j]; \
+					while (k < kend) { \
+						px1[*pi] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pi; c##IF_NPATTERN(++px0); \
+					} \
+					px1 += j + 1; \
+				} \
+			else \
+				for (j = 0; j < n; ++j) { \
+					kend = pp[j]; \
+					while (k < kend) { \
+						px1[*pi - j] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pi; c##IF_NPATTERN(++px0); \
+					} \
+					px1 += n - j; \
+				} \
 			break; \
 		} \
 		case 'R': \
 		{ \
-			int i, k, kend; \
-			_LOOP_R_(_MASK_, _REPLACE_, _INCREMENT_); \
+			int i, k = 0, kend; \
+			int_fast64_t index, m1 = (int_fast64_t) m; \
+			if (!packed) \
+				for (i = 0; i < m; ++i) { \
+					kend = pp[i]; \
+					while (k < kend) { \
+						index = m1 * *pj; \
+						px1[index] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pj; c##IF_NPATTERN(++px0); \
+					} \
+					px1 += 1; \
+				} \
+			else if (ul == 'U') \
+				for (i = 0; i < m; ++i) { \
+					kend = pp[i]; \
+					while (k < kend) { \
+						index = PACKED_AR21_UP((int_fast64_t) i, (int_fast64_t) *pj); \
+						px1[index] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pj; c##IF_NPATTERN(++px0); \
+					} \
+				} \
+			else \
+				for (i = 0; i < m; ++i) { \
+					kend = pp[i]; \
+					while (k < kend) { \
+						index = PACKED_AR21_LO((int_fast64_t) i, (int_fast64_t) *pj, m1); \
+						px1[index] = c##IFELSE_NPATTERN(*px0, 1); \
+						++k; ++pj; c##IF_NPATTERN(++px0); \
+					} \
+				} \
 			break; \
 		} \
 		case 'T': \
 		{ \
-			size_t index; \
-			R_xlen_t k, kend = XLENGTH(i0);	\
-			_LOOP_T_(_MASK_, _REPLACE_, _INCREMENT_); \
+			R_xlen_t k, kend = XLENGTH(i0); \
+			int_fast64_t index, m1 = (int_fast64_t) m; \
+			if (!packed) \
+				for (k = 0; k < kend; ++k) { \
+					index = m1 * *pj + *pi; \
+					c##INCREMENT_IDEN(px1[index], *px0); \
+					++pi; ++pj; c##IF_NPATTERN(++px0); \
+				} \
+			else if (ul == 'U') \
+				for (k = 0; k < kend; ++k) { \
+					index = PACKED_AR21_UP((int_fast64_t) *pi, (int_fast64_t) *pj); \
+					c##INCREMENT_IDEN(px1[index], *px0); \
+					++pi; ++pj; c##IF_NPATTERN(++px0); \
+				} \
+			else \
+				for (k = 0; k < kend; ++k) { \
+					index = PACKED_AR21_LO((int_fast64_t) *pi, (int_fast64_t) *pj, m1); \
+					c##INCREMENT_IDEN(px1[index], *px0); \
+					++pi; ++pj; c##IF_NPATTERN(++px0); \
+				} \
 			break; \
 		} \
 		default: \
 			break; \
 		} \
+		SET_SLOT(to, Matrix_xSym, x1); \
+		c##IF_NPATTERN( \
+		UNPROTECT(1); \
+		); \
+		UNPROTECT(1); \
 	} while (0)
 
-#define SAD_LOOP_C2NP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		for (j = 0, k = 0; j < n; ++j, px1 += m) { \
-			kend = pp[j]; \
-			while (k < kend) { \
-				px1[*pi] = _REPLACE_(*px0, 1); \
-				++k; ++pi; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
+	SWITCH5(class[0], SAD);
 
-#define SAD_LOOP_C2UP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		for (j = 0, k = 0; j < n; px1 += (++j)) { \
-			kend = pp[j]; \
-			while (k < kend) { \
-				px1[*pi] = _REPLACE_(*px0, 1); \
-				++k; ++pi; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
-
-#define SAD_LOOP_C2LP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		for (j = 0, k = 0; j < n; px1 += n - (j++)) { \
-			kend = pp[j]; \
-			while (k < kend) { \
-				px1[*pi - j] = _REPLACE_(*px0, 1); \
-				++k; ++pi; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
-
-#define SAD_LOOP_R2NP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		size_t m1 = (size_t) m; \
-		for (i = 0, k = 0; i < m; ++i, ++px1) { \
-			kend = pp[i]; \
-			while (k < kend) { \
-				px1[m1 * *pj] = _REPLACE_(*px0, 1); \
-				++k; ++pj; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
-
-#define SAD_LOOP_R2UP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		for (i = 0, k = 0; i < n; ++i) { \
-			kend = pp[i]; \
-			while (k < kend) { \
-				px1[PACKED_AR21_UP((size_t) i, (size_t) *pj)] = \
-					_REPLACE_(*px0, 1); \
-				++k; ++pj; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
-
-#define SAD_LOOP_R2LP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		size_t m1 = (size_t) m; \
-		for (i = 0, k = 0; i < n; ++i) { \
-			kend = pp[i]; \
-			while (k < kend) { \
-				px1[PACKED_AR21_LO((size_t) i, (size_t) *pj, m1)] =	\
-					_REPLACE_(*px0, 1);	\
-				++k; ++pj; _MASK_(++px0); \
-			} \
-		} \
-	} while (0)
-
-#define SAD_LOOP_T2NP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		size_t m1 = (size_t) m; \
-		for (k = 0; k < kend; ++k) { \
-			index = m1 * *pj + *pi; \
-			_INCREMENT_(px1[index], (*px0)); \
-			++pi; ++pj; _MASK_(++px0); \
-		} \
-	} while (0)
-
-#define SAD_LOOP_T2UP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		for (k = 0; k < kend; ++k) { \
-			index = PACKED_AR21_UP((size_t) *pi, (size_t) *pj); \
-			_INCREMENT_(px1[index], (*px0)); \
-			++pi; ++pj; _MASK_(++px0); \
-		} \
-	} while (0)
-
-#define SAD_LOOP_T2LP(_MASK_, _REPLACE_, _INCREMENT_) \
-	do { \
-		size_t m1 = (R_xlen_t) m; \
-		for (k = 0; k < kend; ++k) { \
-			index = PACKED_AR21_LO((size_t) *pi, (size_t) *pj, m1); \
-			_INCREMENT_(px1[index], (*px0)); \
-			++pi; ++pj; _MASK_(++px0); \
-		} \
-	} while (0)
-
-	if (class[0] == 'n')
-		SAD_SUBCASES(int, LOGICAL, HIDE, SECONDOF, INCREMENT_PATTERN);
-	else {
-		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
-		SAD_CASES;
-		UNPROTECT(1); /* x0 */
-	}
-
-#undef SAD_CASES
-#undef SAD_SUBCASES
-#undef SAD_SUBSUBCASES
-#undef SAD_LOOP_C2NP
-#undef SAD_LOOP_C2UP
-#undef SAD_LOOP_C2LP
-#undef SAD_LOOP_R2NP
-#undef SAD_LOOP_R2UP
-#undef SAD_LOOP_R2LP
-#undef SAD_LOOP_T2NP
-#undef SAD_LOOP_T2UP
-#undef SAD_LOOP_T2LP
-
+#undef SAD
+		
 	UNPROTECT(nprotect);
 	return to;
 }
@@ -799,10 +690,12 @@ SEXP R_sparse_as_dense(SEXP s_from, SEXP s_packed)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
 
-	int packed;
+	int packed = 0;
+	if (valid[ivalid][1] != 'g') {
 	if (TYPEOF(s_packed) != LGLSXP || LENGTH(s_packed) < 1 ||
 	    (packed = LOGICAL(s_packed)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "packed", "TRUE", "FALSE");
+	}
 
 	return sparse_as_dense(s_from, valid[ivalid], packed);
 }
@@ -821,14 +714,15 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
-	int_fast64_t len = (int_fast64_t) n * n;
-	if (len > R_XLEN_T_MAX)
+	int_fast64_t nn = (int_fast64_t) n * n,
+		lengthout = (!packed) ? nn : n + (nn - n) / 2;
+	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) len * kindToSize(cl[0]);
-	if (bytes > 0x1.0p+30 /* 1 GiB */)
+	double nbytes = (double) lengthout * kindToSize(cl[0]);
+	if (nbytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		        0x1.0p-30 * nbytes);
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -859,7 +753,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	UNPROTECT(1); /* diag */
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
-	if (class[0] != cl[0]) {
+	if (cl[0] != class[0]) {
 		if (class[0] == 'n' && cl[0] == 'l')
 			x0 = duplicate(x0);
 		else
@@ -870,38 +764,21 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		PROTECT(x0);
 	}
 
-	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) len));
+	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) lengthout));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define DAD_SUBCASES(_PREFIX_, _CTYPE_, _PTR_) \
+#define DAD(c) \
 	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			_PREFIX_ ## force2(px1, px0, n, ul, 'D', -di); \
+			c##NAME(force2)(px1, px0, n, ul, 1, -di); \
 		else \
-			_PREFIX_ ## force1(px1, px0, n, ul, 'D', -di); \
+			c##NAME(force1)(px1, px0, n, ul, 1, -di); \
 	} while (0)
 
-	switch (cl[0]) {
-	case 'n':
-	case 'l':
-		DAD_SUBCASES(i, int, LOGICAL);
-		break;
-	case 'i':
-		DAD_SUBCASES(i, int, INTEGER);
-		break;
-	case 'd':
-		DAD_SUBCASES(d, double, REAL);
-		break;
-	case 'z':
-		DAD_SUBCASES(z, Rcomplex, COMPLEX);
-		break;
-	default:
-		break;
-	}
+	SWITCH4(cl[0], DAD);
 
-#undef DAD_CASES
-#undef DAD_SUBCASES
+#undef DAD
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -965,14 +842,14 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	int_fast64_t len = (int_fast64_t) m * n;
-	if (len > R_XLEN_T_MAX)
+	int_fast64_t lengthout = (int_fast64_t) m * n;
+	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) len * kindToSize(cl[0]);
-	if (bytes > 0x1.0p+30 /* 1 GiB */)
+	double nbytes = (double) lengthout * kindToSize(cl[0]);
+	if (nbytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		        0x1.0p-30 * nbytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -984,42 +861,30 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
 	int *pperm = INTEGER(perm);
 
-	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) len));
+	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) lengthout));
 	SET_SLOT(to, Matrix_xSym, x);
 
-#define IAD_SUBCASES(_CTYPE_, _PTR_, _ONE_) \
+#define IAD(c) \
 	do { \
-		_CTYPE_ *px = _PTR_(x); \
-		memset(px, 0, sizeof(_CTYPE_) * (R_xlen_t) len); \
+		c##TYPE *px = c##PTR(x); \
+		memset(px, 0, sizeof(c##TYPE) * (R_xlen_t) lengthout); \
 		if (mg == 0) { \
-			R_xlen_t m1 = (R_xlen_t) m; \
-			for (int i = 0; i < m; ++i) \
-				px[i + m1 * (*(pperm++) - 1)] = _ONE_; \
+			int_fast64_t m1 = (int_fast64_t) m; \
+			for (int i = 0; i < m; ++i) { \
+				px[m1 * (*(pperm++) - 1)] = c##UNIT; \
+				px += 1; \
+			} \
 		} else { \
-			for (int j = 0; j < n; ++j, px += m) \
-				px[          *(pperm++) - 1 ] = _ONE_; \
+			for (int j = 0; j < n; ++j) { \
+				px[      *(pperm++) - 1 ] = c##UNIT; \
+				px += m; \
+			} \
 		} \
 	} while (0)
 
-	switch (cl[0]) {
-	case 'n':
-	case 'l':
-		IAD_SUBCASES(int, LOGICAL, 1);
-		break;
-	case 'i':
-		IAD_SUBCASES(int, INTEGER, 1);
-		break;
-	case 'd':
-		IAD_SUBCASES(double, REAL, 1.0);
-		break;
-	case 'z':
-		IAD_SUBCASES(Rcomplex, COMPLEX, Matrix_zunit);
-		break;
-	default:
-		break;
-	}
+	SWITCH4(cl[0], IAD);
 
-#undef IAD_SUBCASES
+#undef IAD
 
 	UNPROTECT(3); /* x, perm, to */
 	return to;
