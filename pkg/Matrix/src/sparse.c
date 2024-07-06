@@ -483,7 +483,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_pSym, p1);
 
 		if (class[1] == 's' && !sy) {
-			Matrix_memset(pp1, 0, n, sizeof(int));
+			memset(pp1, 0, sizeof(int) * n);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
 				while (k < kend) {
@@ -535,7 +535,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 			if (class[1] == 's' && !sy) { \
 				int *pp1_; \
 				Matrix_Calloc(pp1_, n, int); \
-				Matrix_memcpy(pp1_, pp1 - 1, n, sizeof(int)); \
+				memcpy(pp1_, pp1 - 1, sizeof(int) * n); \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
 					while (k < kend) { \
@@ -818,7 +818,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 			_CTYPE_ *pans = _PTR_(ans); \
-			Matrix_memset(pans, 0, r, sizeof(_CTYPE_)); \
+			memset(pans, 0, sizeof(_CTYPE_) * r); \
 			for (k = 0; k < nnz0; ++k) { \
 				if (*pi0 == *pj0) \
 					_INCREMENT_(pans[*pi0], (*px0)); \
@@ -1660,9 +1660,9 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			if (class[1] == 't' && di != 'N') { \
 				if (ul0 == ul1) { \
-					Matrix_memcpy(pi1, pi0, nnz0, sizeof(int)); \
-					Matrix_memcpy(pj1, pj0, nnz0, sizeof(int)); \
-					_MASK_(Matrix_memcpy(px1, px0, nnz0, sizeof(_CTYPE_))); \
+					memcpy(pi1, pi0, sizeof(int) * nnz0); \
+					memcpy(pj1, pj0, sizeof(int) * nnz0); \
+					_MASK_(memcpy(px1, px0, sizeof(_CTYPE_) * nnz0)); \
 					pi1 += nnz0; \
 					pj1 += nnz0; \
 					_MASK_(px1 += nnz0); \
@@ -2219,7 +2219,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			if (class[2] != 'T') {
 				SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
 				int *pp1 = INTEGER(p1);
-				Matrix_memset(pp1, 0, (R_xlen_t) n + 1, sizeof(int));
+				memset(pp1, 0, sizeof(int) * ((R_xlen_t) n + 1));
 				SET_SLOT(to, Matrix_pSym, p1);
 				UNPROTECT(1); /* p1 */
 			}
@@ -2487,7 +2487,7 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 		i0 = PROTECT(GET_SLOT(obj,        iSym));
 	int i, j, k, kend, *pp_, *pp0 = INTEGER(p0) + 1, *pi0 = INTEGER(i0);
 	Matrix_Calloc(pp_, n, int);
-	Matrix_memcpy(pp_, pp0 - 1, n, sizeof(int));
+	memcpy(pp_, pp0 - 1, sizeof(int) * n);
 
 	int ans = 0;
 

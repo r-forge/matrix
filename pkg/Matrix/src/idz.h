@@ -1,6 +1,7 @@
 #ifndef MATRIX_IDZ_H
 #define MATRIX_IDZ_H
 
+#include <stddef.h> /* size_t, ptrdiff_t */
 #include <Rinternals.h>
 
 void iswap2(size_t,      int *, ptrdiff_t,      int *, ptrdiff_t);

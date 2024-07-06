@@ -894,7 +894,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		SET_SLOT(to, Matrix_xSym, x1);
 		if (class[0] == 'z') {
 			Rcomplex *px1 = COMPLEX(x1);
-			Matrix_memset(px1, 0, len, sizeof(Rcomplex));
+			memset(px1, 0, sizeof(Rcomplex) * len);
 			if (ct0 != ct1) {
 				Rcomplex *px0 = COMPLEX(x1);
 				while (len--)
@@ -902,7 +902,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 			}
 		} else {
 			double *px1 = REAL(x1);
-			Matrix_memset(px1, 0, len, sizeof(double));
+			memset(px1, 0, sizeof(double) * len);
 		}
 		UNPROTECT(4); /* x1, x0, to, from */
 		return to;

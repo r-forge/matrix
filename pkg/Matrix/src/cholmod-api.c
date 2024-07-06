@@ -162,10 +162,10 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		void *tmp;
 		tmp = A->p;
 		A->p = (void *) R_alloc(A->ncol + 1, sizeof(int));
-		memcpy(A->p, tmp, (A->ncol + 1) * sizeof(int));
+		memcpy(A->p, tmp, sizeof(int) * (A->ncol + 1));
 		tmp = A->i;
 		A->i = (void *) R_alloc(A->nzmax, sizeof(int));
-		memcpy(A->i, tmp, A->nzmax * sizeof(int));
+		memcpy(A->i, tmp, sizeof(int) * A->nzmax);
 	}
 	if (class[0] != 'n') {
 	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
@@ -187,7 +187,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		if (!A->sorted && !sortInPlace) {
 			void *tmp = A->x;
 			A->x = (void *) R_alloc(A->nzmax, sizeof(double));
-			memcpy(A->x, tmp, A->nzmax * sizeof(double));
+			memcpy(A->x, tmp, sizeof(double) * A->nzmax);
 		}
 		break;
 	case 'z':
@@ -196,7 +196,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		if (!A->sorted && !sortInPlace) {
 			void *tmp = A->x;
 			A->x = (void *) R_alloc(A->nzmax, sizeof(Rcomplex));
-			memcpy(A->x, tmp, A->nzmax * sizeof(Rcomplex));
+			memcpy(A->x, tmp, sizeof(Rcomplex) * A->nzmax);
 		}
 		break;
 	default:
@@ -216,14 +216,14 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 			cholmod_sparse *A1 = cholmod_add(A, I1, one, one, 1, 1, &c);
 			A->nzmax = ((int *) A1->p)[A->ncol];
 			A->p = (void *) R_alloc(A->ncol + 1, sizeof(int));
-			memcpy(A->p, A1->p, (A->ncol + 1) * sizeof(int));
+			memcpy(A->p, A1->p, sizeof(int) * (A->ncol + 1));
 			A->i = (void *) R_alloc(A->nzmax, sizeof(int));
-			memcpy(A->i, A1->i, A->nzmax * sizeof(int));
+			memcpy(A->i, A1->i, sizeof(int) * A->nzmax);
 			if (A->xtype != CHOLMOD_PATTERN) {
 			size_t size = (A->xtype == CHOLMOD_REAL)
 				? sizeof(double) : sizeof(Rcomplex);
 			A->x = (void *) R_alloc(A->nzmax, size);
-			memcpy(A->x, A1->x, A->nzmax * size);
+			memcpy(A->x, A1->x, size        * A->nzmax);
 			}
 			cholmod_free_sparse(&I1, &c);
 			cholmod_free_sparse(&A1, &c);
@@ -308,16 +308,16 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 			void *tmp;
 			tmp = A->i;
 			A->i = (void *) R_alloc(A->nzmax, sizeof(int));
-			memcpy(A->i, tmp, A->nnz * sizeof(int));
+			memcpy(A->i, tmp, sizeof(int) * A->nnz);
 			tmp = A->j;
 			A->j = (void *) R_alloc(A->nzmax, sizeof(int));
-			memcpy(A->j, tmp, A->nnz * sizeof(int));
+			memcpy(A->j, tmp, sizeof(int) * A->nnz);
 			if (A->xtype != CHOLMOD_PATTERN) {
 			size_t size = (A->xtype == CHOLMOD_REAL)
 				? sizeof(double) : sizeof(Rcomplex);
 			tmp = A->x;
 			A->x = (void *) R_alloc(A->nzmax, size);
-			memcpy(A->x, tmp, A->nnz * size);
+			memcpy(A->x, tmp, size        * A->nnz);
 			}
 			int n = (int) A->ncol;
 			int *Ai = ((int *) A->i) + A->nnz,
@@ -526,12 +526,12 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 	INTEGER(dim)[0] = INTEGER(dim)[1] = (int) L->n;
 	if (L->ordering != CHOLMOD_NATURAL) {
 	SEXP perm = PROTECT(allocVector(INTSXP, (R_xlen_t) L->n));
-	memcpy(INTEGER(perm), L->Perm, L->n * sizeof(int));
+	memcpy(INTEGER(perm), L->Perm, sizeof(int) * L->n);
 	SET_SLOT(to, Matrix_permSym, perm);
 	UNPROTECT(1);
 	}
 	SEXP colcount = PROTECT(allocVector(INTSXP, (R_xlen_t) L->n));
-	memcpy(INTEGER(colcount), L->ColCount, L->n * sizeof(int));
+	memcpy(INTEGER(colcount), L->ColCount, sizeof(int) * L->n);
 	SET_SLOT(to, Matrix_colcountSym, colcount);
 	UNPROTECT(1);
 	if (L->is_super) {
@@ -543,10 +543,10 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 			s = PROTECT(allocVector(INTSXP, (R_xlen_t) L->ssize));
 		INTEGER(maxcsize)[0] = (int) L->maxcsize;
 		INTEGER(maxesize)[0] = (int) L->maxesize;
-		memcpy(INTEGER(super), L->super, (L->nsuper + 1) * sizeof(int));
-		memcpy(INTEGER(pi), L->pi, (L->nsuper + 1) * sizeof(int));
-		memcpy(INTEGER(px), L->px, (L->nsuper + 1) * sizeof(int));
-		memcpy(INTEGER(s), L->s, L->ssize * sizeof(int));
+		memcpy(INTEGER(super), L->super, sizeof(int) * (L->nsuper + 1));
+		memcpy(INTEGER(pi), L->pi, sizeof(int) * (L->nsuper + 1));
+		memcpy(INTEGER(px), L->px, sizeof(int) * (L->nsuper + 1));
+		memcpy(INTEGER(s), L->s, sizeof(int) * L->ssize);
 		SET_SLOT(to, Matrix_superSym, super);
 		SET_SLOT(to, Matrix_piSym, pi);
 		SET_SLOT(to, Matrix_pxSym, px);
@@ -561,11 +561,11 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 			prev = PROTECT(allocVector(INTSXP, (R_xlen_t) (L->n + 2))),
 			is_ll = PROTECT(GET_SLOT(to, Matrix_isllSym)),
 			is_monotonic = PROTECT(GET_SLOT(to, Matrix_ismtSym));
-		memcpy(INTEGER(p), L->p, (L->n + 1) * sizeof(int));
-		memcpy(INTEGER(i), L->i, L->nzmax * sizeof(int));
-		memcpy(INTEGER(nz), L->nz, L->n * sizeof(int));
-		memcpy(INTEGER(next), L->next, (L->n + 2) * sizeof(int));
-		memcpy(INTEGER(prev), L->prev, (L->n + 2) * sizeof(int));
+		memcpy(INTEGER(p), L->p, sizeof(int) * (L->n + 1));
+		memcpy(INTEGER(i), L->i, sizeof(int) * L->nzmax);
+		memcpy(INTEGER(nz), L->nz, sizeof(int) * L->n);
+		memcpy(INTEGER(next), L->next, sizeof(int) * (L->n + 2));
+		memcpy(INTEGER(prev), L->prev, sizeof(int) * (L->n + 2));
 		LOGICAL(is_ll)[0] = L->is_ll != 0;
 		LOGICAL(is_monotonic)[0] = L->is_monotonic != 0;
 		SET_SLOT(to, Matrix_pSym, p);
@@ -583,10 +583,10 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 	size_t nnz = (L->is_super) ? L->xsize : L->nzmax;
 	if (L->xtype == CHOLMOD_REAL) {
 		PROTECT(x = allocVector(REALSXP, (R_xlen_t) nnz));
-		memcpy(REAL(x), L->x, nnz * sizeof(double));
+		memcpy(REAL(x), L->x, sizeof(double) * nnz);
 	} else {
 		PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) nnz));
-		memcpy(COMPLEX(x), L->x, nnz * sizeof(Rcomplex));
+		memcpy(COMPLEX(x), L->x, sizeof(Rcomplex) * nnz);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 	UNPROTECT(1);
@@ -669,8 +669,8 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 		i = PROTECT(allocVector(INTSXP, nnz));
 	INTEGER(dim)[0] = m;
 	INTEGER(dim)[1] = n;
-	memcpy(INTEGER(p), A->p, ((size_t) n + 1) * sizeof(int));
-	memcpy(INTEGER(i), A->i, nnz * sizeof(int));
+	memcpy(INTEGER(p), A->p, sizeof(int) * ((R_xlen_t) n + 1));
+	memcpy(INTEGER(i), A->i, sizeof(int) * nnz);
 	SET_SLOT(to, Matrix_pSym, p);
 	SET_SLOT(to, Matrix_iSym, i);
 	if (A->xtype != CHOLMOD_PATTERN) {
@@ -684,11 +684,11 @@ SEXP cholmod_sparse_as_sexp(cholmod_sparse *A, int doFree,
 			px[k] = (ISNAN(Ax[k])) ? NA_LOGICAL : (Ax[k] != 0.0);
 	} else {
 		PROTECT(x = allocVector(REALSXP, nnz));
-		memcpy(REAL(x), A->x, nnz * sizeof(double));
+		memcpy(REAL(x), A->x, sizeof(double) * nnz);
 	}
 	} else {
 		PROTECT(x = allocVector(CPLXSXP, nnz));
-		memcpy(COMPLEX(x), A->x, nnz * sizeof(Rcomplex));
+		memcpy(COMPLEX(x), A->x, sizeof(Rcomplex) * nnz);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 	UNPROTECT(1);
@@ -779,8 +779,8 @@ SEXP cholmod_triplet_as_sexp(cholmod_triplet *A, int doFree,
 	INTEGER(dim)[0] = (int) A->nrow;
 	INTEGER(dim)[1] = (int) A->ncol;
 	if (A->stype == 0) {
-		memcpy(INTEGER(i), A->i, A->nnz * sizeof(int));
-		memcpy(INTEGER(j), A->j, A->nnz * sizeof(int));
+		memcpy(INTEGER(i), A->i, sizeof(int) * A->nnz);
+		memcpy(INTEGER(j), A->j, sizeof(int) * A->nnz);
 	} else {
 		int *pi = INTEGER(i), *Ai = (int *) A->i,
 			*pj = INTEGER(j), *Aj = (int *) A->j;
@@ -807,11 +807,11 @@ SEXP cholmod_triplet_as_sexp(cholmod_triplet *A, int doFree,
 			px[k] = (ISNAN(Ax[k])) ? NA_LOGICAL : (Ax[k] != 0.0);
 	} else {
 		PROTECT(x = allocVector(REALSXP, (R_xlen_t) A->nnz));
-		memcpy(REAL(x), A->x, A->nnz * sizeof(double));
+		memcpy(REAL(x), A->x, sizeof(double) * A->nnz);
 	}
 	} else {
 		PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) A->nnz));
-		memcpy(COMPLEX(x), A->x, A->nnz * sizeof(Rcomplex));
+		memcpy(COMPLEX(x), A->x, sizeof(Rcomplex) * A->nnz);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 	UNPROTECT(1);
@@ -887,10 +887,10 @@ SEXP cholmod_dense_as_sexp(cholmod_dense *A, int doFree)
 	SEXP x;
 	if (A->xtype == CHOLMOD_REAL) {
 		PROTECT(x = allocVector(REALSXP, (R_xlen_t) m * n));
-		memcpy(REAL(x), A->x, (size_t) m * n * sizeof(double));
+		memcpy(REAL(x), A->x, sizeof(double) * m * n);
 	} else {
 		PROTECT(x = allocVector(CPLXSXP, (R_xlen_t) m * n));
-		memcpy(COMPLEX(x), A->x, (size_t) m * n * sizeof(Rcomplex));
+		memcpy(COMPLEX(x), A->x, sizeof(Rcomplex) * m * n);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 	UNPROTECT(1);

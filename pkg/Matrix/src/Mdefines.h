@@ -59,9 +59,9 @@ do { \
 	if (_N_ >= Matrix_CallocThreshold) \
 		_VAR_ = R_Calloc(_N_, _CTYPE_); \
 	else { \
-		_VAR_ = (_CTYPE_ *) alloca((size_t) (_N_) * sizeof(_CTYPE_)); \
+		_VAR_ = (_CTYPE_ *) alloca(sizeof(_CTYPE_) * (size_t) (_N_)); \
 		R_CheckStack(); \
-		memset(_VAR_, 0, (size_t) (_N_) * sizeof(_CTYPE_)); \
+		memset(_VAR_, 0, sizeof(_CTYPE_) * (size_t) (_N_)); \
 	} \
 } while (0)
 

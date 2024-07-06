@@ -119,7 +119,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 		error(_("'%s' failed"), "cs_qrsol");
 	if (A->n < A->m) {
 		SEXP tmp = allocVector(REALSXP, A->n);
-		Matrix_memcpy(REAL(tmp), REAL(b), A->n, sizeof(double));
+		memcpy(REAL(tmp), REAL(b), sizeof(double) * A->n);
 		b = tmp;
 	}
 	UNPROTECT(1);
@@ -176,15 +176,15 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	SET_VECTOR_ELT(ans, 0, tmp);
 	/* coef : */
 	PROTECT(tmp = allocVector(REALSXP, At->nrow));
-	Matrix_memcpy(REAL(tmp),   C->x, At->nrow, sizeof(double));
+	memcpy(REAL(tmp),   C->x, sizeof(double) * At->nrow);
 	SET_VECTOR_ELT(ans, 1, tmp);
 	/* Xty : */
 	PROTECT(tmp = allocVector(REALSXP, At->nrow));
-	Matrix_memcpy(REAL(tmp), AtB->x, At->nrow, sizeof(double));
+	memcpy(REAL(tmp), AtB->x, sizeof(double) * At->nrow);
 	SET_VECTOR_ELT(ans, 2, tmp);
 	/* resid : */
 	PROTECT(tmp = allocVector(REALSXP, At->ncol));
-	Matrix_memcpy(REAL(tmp),   R->x, At->ncol, sizeof(double));
+	memcpy(REAL(tmp),   R->x, sizeof(double) * At->ncol);
 	SET_VECTOR_ELT(ans, 3, tmp);
 
 	cholmod_free_factor(&  L, &c);
@@ -361,25 +361,25 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 	case 6:
 		SET_STRING_ELT(nms, k, mkChar("cc5"));
 		tmp = allocVector(INTSXP, 5);
-		memcpy(INTEGER(tmp), D->cc, 5 * sizeof(int));
+		memcpy(INTEGER(tmp), D->cc, sizeof(int) * 5);
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 5:
 		SET_STRING_ELT(nms, k, mkChar("rr5"));
 		tmp = allocVector(INTSXP, 5);
-		memcpy(INTEGER(tmp), D->rr, 5 * sizeof(int));
+		memcpy(INTEGER(tmp), D->rr, sizeof(int) * 5);
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 4:
 		SET_STRING_ELT(nms, k, mkChar("s"));
 		tmp = allocVector(INTSXP, D->nb + 1);
-		memcpy(INTEGER(tmp), D->s, (D->nb + 1) * sizeof(int));
+		memcpy(INTEGER(tmp), D->s , sizeof(int) * (D->nb + 1));
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 3:
 		SET_STRING_ELT(nms, k, mkChar("r"));
 		tmp = allocVector(INTSXP, D->nb + 1);
-		memcpy(INTEGER(tmp), D->r, (D->nb + 1) * sizeof(int));
+		memcpy(INTEGER(tmp), D->r , sizeof(int) * (D->nb + 1));
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 2:

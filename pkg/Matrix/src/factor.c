@@ -32,7 +32,7 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y),
 			*pv = COMPLEX(v), *pw = COMPLEX(w), tmp, *work = &tmp;
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		memcpy(py, px, sizeof(Rcomplex) * XLENGTH(y));
 		F77_CALL(zgees)((vectors) ? "V" : "N", "N", NULL,
 		                &n, py, &n, &zero, pw,        pv, &n,
 		                work, &lwork, rwork, NULL, &info FCONE FCONE);
@@ -45,7 +45,7 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 		} else {
 		double *px = REAL(x), *py = REAL(y),
 			*pv = REAL(v), *pw = REAL(w), tmp, *work = &tmp;
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		memcpy(py, px, sizeof(double) * XLENGTH(y));
 		F77_CALL(dgees)((vectors) ? "V" : "N", "N", NULL,
 		                &n, py, &n, &zero, pw, rwork, pv, &n,
 		                work, &lwork,        NULL, &info FCONE FCONE);
@@ -114,7 +114,7 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *pv = COMPLEX(v), tmp, *work = &tmp;
 		double *rwork = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-		Matrix_memcpy(pv, px, XLENGTH(v), sizeof(Rcomplex));
+		memcpy(pv, px, sizeof(Rcomplex) * XLENGTH(v));
 		F77_CALL(zheev)((vectors) ? "V" : "N", &ul,
 		                &n, pv, &n, pw, work, &lwork, rwork, &info FCONE FCONE);
 		lwork = (int) tmp.r;
@@ -124,7 +124,7 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 		ERROR_LAPACK_5(zheev, info, warn);
 		} else {
 		double *px = REAL(x), *pv = REAL(v), tmp, *work = &tmp;
-		Matrix_memcpy(pv, px, XLENGTH(v), sizeof(double));
+		memcpy(pv, px, sizeof(double) * XLENGTH(v));
 		F77_CALL(dsyev)((vectors) ? "V" : "N", &ul,
 		                &n, pv, &n, pw, work, &lwork,        &info FCONE FCONE);
 		lwork = (int) tmp;
@@ -179,14 +179,14 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), *pv = COMPLEX(v),
 			*work = (Rcomplex *) R_alloc((size_t) 2 * n, sizeof(Rcomplex));
 		double *rwork = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		memcpy(py, px, sizeof(Rcomplex) * XLENGTH(y));
 		F77_CALL(zhpev)((vectors) ? "V" : "N", &ul,
 		                &n, py, pw, pv, &n, work, rwork, &info FCONE FCONE);
 		ERROR_LAPACK_5(zhpev, info, warn);
 		} else {
 		double *px = REAL(x), *py = REAL(y), *pv = REAL(v),
 			*work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		memcpy(py, px, sizeof(double) * XLENGTH(y));
 		F77_CALL(dspev)((vectors) ? "V" : "N", &ul,
 		                &n, py, pw, pv, &n, work,        &info FCONE FCONE);
 		ERROR_LAPACK_5(dspev, info, warn);
@@ -218,12 +218,12 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 		int *pperm = INTEGER(perm), info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		memcpy(py, px, sizeof(Rcomplex) * XLENGTH(y));
 		F77_CALL(zgetrf)(&m, &n, py, &m, pperm, &info);
 		ERROR_LAPACK_2(zgetrf, info, warn, U);
 		} else {
 		double *px = REAL(x), *py = REAL(y);
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		memcpy(py, px, sizeof(double) * XLENGTH(y));
 		F77_CALL(dgetrf)(&m, &n, py, &m, pperm, &info);
 		ERROR_LAPACK_2(dgetrf, info, warn, U);
 		}
@@ -263,7 +263,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		int *pperm = INTEGER(perm), info, lwork = -1;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), tmp, *work;
-		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
+		memset(py, 0, sizeof(Rcomplex) * XLENGTH(y));
 		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
 		if (ct == 'C') {
 		F77_CALL(zhetrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
@@ -280,7 +280,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		}
 		} else {
 		double *px = REAL(x), *py = REAL(y), tmp, *work;
-		Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
+		memset(py, 0, sizeof(double) * XLENGTH(y));
 		F77_CALL(dlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
 		F77_CALL(dsytrf)(&ul, &n, py, &n, pperm, &tmp, &lwork, &info FCONE);
 		lwork = (int) tmp;
@@ -324,7 +324,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		int *pperm = INTEGER(perm), info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+		memcpy(py, px, sizeof(Rcomplex) * XLENGTH(y));
 		if (ct == 'C') {
 		F77_CALL(zhptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(zhptrf, info, warn, D);
@@ -334,7 +334,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		}
 		} else {
 		double *px = REAL(x), *py = REAL(y);
-		Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+		memcpy(py, px, sizeof(double) * XLENGTH(y));
 		F77_CALL(dsptrf)(&ul, &n, py, pperm, &info FCONE);
 		ERROR_LAPACK_2(dsptrf, info, warn, D);
 		}
@@ -366,7 +366,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		int info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
-		Matrix_memset(py, 0, XLENGTH(y), sizeof(Rcomplex));
+		memset(py, 0, sizeof(Rcomplex) * XLENGTH(y));
 		F77_CALL(zlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
 		if (!pivot) {
 		F77_CALL(zpotrf)(&ul, &n, py, &n, &info FCONE);
@@ -381,7 +381,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 			int j, d = n - rank;
 			py += (R_xlen_t) rank * n + rank;
 			for (j = rank; j < n; ++j) {
-				Matrix_memset(py, 0, d, sizeof(Rcomplex));
+				memset(py, 0, sizeof(Rcomplex) * d);
 				py += n;
 			}
 		}
@@ -390,7 +390,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		}
 		} else {
 		double *px = REAL(x), *py = REAL(y);
-		Matrix_memset(py, 0, XLENGTH(y), sizeof(double));
+		memset(py, 0, sizeof(double) * XLENGTH(y));
 		F77_CALL(dlacpy)(&ul, &n, &n, px, &n, py, &n FCONE);
 		if (!pivot) {
 		F77_CALL(dpotrf)(&ul, &n, py, &n, &info FCONE);
@@ -405,7 +405,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 			int j, d = n - rank;
 			py += (R_xlen_t) rank * n + rank;
 			for (j = rank; j < n; ++j) {
-				Matrix_memset(py, 0, d, sizeof(double));
+				memset(py, 0, sizeof(double) * d);
 				py += n;
 			}
 		}
@@ -440,12 +440,12 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 		int info;
 		if (TYPEOF(x) == CPLXSXP) {
 			Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
-			Matrix_memcpy(py, px, XLENGTH(y), sizeof(Rcomplex));
+			memcpy(py, px, sizeof(Rcomplex) * XLENGTH(y));
 			F77_CALL(zpptrf)(&ul, &n, py, &info FCONE);
 			ERROR_LAPACK_3(zpptrf, info, warn);
 		} else {
 			double *px = REAL(x), *py = REAL(y);
-			Matrix_memcpy(py, px, XLENGTH(y), sizeof(double));
+			memcpy(py, px, sizeof(double) * XLENGTH(y));
 			F77_CALL(dpptrf)(&ul, &n, py, &info FCONE);
 			ERROR_LAPACK_3(dpptrf, info, warn);
 		}
@@ -632,18 +632,18 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	UNPROTECT(2); /* R, V */
 
 	SEXP beta = PROTECT(allocVector(REALSXP, A->n));
-	Matrix_memcpy(REAL(beta), N->B, A->n, sizeof(double));
+	memcpy(REAL(beta), N->B, sizeof(double) * A->n);
 	SET_SLOT(orf, Matrix_betaSym, beta);
 	UNPROTECT(1); /* beta */
 
 	SEXP p = PROTECT(allocVector(INTSXP, S->m2));
-	Matrix_memcpy(INTEGER(p), P, S->m2, sizeof(int));
+	memcpy(INTEGER(p), P, sizeof(int) * S->m2);
 	SET_SLOT(orf, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 
 	if (order > 0) {
 	SEXP q = PROTECT(allocVector(INTSXP, A->n));
-	Matrix_memcpy(INTEGER(q), S->q, A->n, sizeof(int));
+	memcpy(INTEGER(q), S->q, sizeof(int) * A->n);
 	SET_SLOT(orf, Matrix_qSym, q);
 	UNPROTECT(1); /* q */
 	}
@@ -706,12 +706,12 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 	UNPROTECT(3); /* uplo, U, L */
 
 	SEXP p = PROTECT(allocVector(INTSXP, A->m));
-	Matrix_memcpy(INTEGER(p), P, A->m, sizeof(int));
+	memcpy(INTEGER(p), P, sizeof(int) * A->m);
 	SET_SLOT(trf, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 	if (order > 0) {
 	SEXP q = PROTECT(allocVector(INTSXP, A->n));
-	Matrix_memcpy(INTEGER(q), S->q, A->n, sizeof(int));
+	memcpy(INTEGER(q), S->q, sizeof(int) * A->n);
 	SET_SLOT(trf, Matrix_qSym, q);
 	UNPROTECT(1); /* q */
 	}

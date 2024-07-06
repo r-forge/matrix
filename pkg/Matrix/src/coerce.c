@@ -416,16 +416,16 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 			++nprotect;
 			switch (tt) {
 			case LGLSXP:
-				Matrix_memcpy(LOGICAL(x), LOGICAL(from), mn, sizeof(int));
+				memcpy(LOGICAL(x), LOGICAL(from), sizeof(int) * mn);
 				break;
 			case INTSXP:
-				Matrix_memcpy(INTEGER(x), INTEGER(from), mn, sizeof(int));
+				memcpy(INTEGER(x), INTEGER(from), sizeof(int) * mn);
 				break;
 			case REALSXP:
-				Matrix_memcpy(REAL(x), REAL(from), mn, sizeof(double));
+				memcpy(REAL(x), REAL(from), sizeof(double) * mn);
 				break;
 			case CPLXSXP:
-				Matrix_memcpy(COMPLEX(x), COMPLEX(from), mn, sizeof(Rcomplex));
+				memcpy(COMPLEX(x), COMPLEX(from), sizeof(Rcomplex) * mn);
 				break;
 			default:
 				break;
@@ -622,7 +622,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	do { \
 		_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 		       _CTYPE_ *px1 = _PTR_(x1) ; \
-		Matrix_memset(px1, 0, len, sizeof(_CTYPE_)); \
+		memset(px1, 0, sizeof(_CTYPE_) * (R_xlen_t) len); \
 		if (!packed) \
 			/* .(ge|sy|po|tr)Matrix */ \
 			SAD_SUBSUBCASES(SAD_LOOP_C2NP, SAD_LOOP_R2NP, SAD_LOOP_T2NP, \
@@ -990,7 +990,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 #define IAD_SUBCASES(_CTYPE_, _PTR_, _ONE_) \
 	do { \
 		_CTYPE_ *px = _PTR_(x); \
-		Matrix_memset(px, 0, (R_xlen_t) len, sizeof(_CTYPE_)); \
+		memset(px, 0, sizeof(_CTYPE_) * (R_xlen_t) len); \
 		if (mg == 0) { \
 			R_xlen_t m1 = (R_xlen_t) m; \
 			for (int i = 0; i < m; ++i) \
@@ -1233,7 +1233,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
 	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1);
-	Matrix_memset(pp1 - 1, 0, (R_xlen_t) n + 1, sizeof(int));
+	memset(pp1 - 1, 0, sizeof(int) * ((R_xlen_t) n + 1));
 	k = 0;
 
 #define VAS_SUBSUBCASES(_MASK0_, _MASK1_, _REPLACE_, _CTYPE_, _PTR_, _ONE_, _NA_) \
@@ -2166,7 +2166,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		if (cl[2] != 'T') {
 			SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
 			SET_SLOT(to, Matrix_pSym, p);
-			Matrix_memset(INTEGER(p), 0, (R_xlen_t) n + 1, sizeof(int));
+			memset(INTEGER(p), 0, sizeof(int) * ((R_xlen_t) n + 1));
 			UNPROTECT(1); /* p */
 		}
 		UNPROTECT(1); /* to */
@@ -2399,7 +2399,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	} else {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1));
 		int k, *pp = INTEGER(p);
-		Matrix_memset(pp, 0, (R_xlen_t) s + 1, sizeof(int));
+		memset(pp, 0, sizeof(int) * ((R_xlen_t) s + 1));
 		for (k = 0; k < r; ++k)
 			++pp[pperm[k]];
 		for (k = 0; k < s; ++k)
@@ -2407,7 +2407,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SEXP j = PROTECT(allocVector(INTSXP, r));
 		int *pj = INTEGER(j), *work;
 		Matrix_Calloc(work, s, int);
-		Matrix_memcpy(work, pp, s, sizeof(int));
+		memcpy(work, pp, sizeof(int) * s);
 		--work;
 		for (k = 0; k < r; ++k)
 			pj[work[pperm[k]]++] = k;
@@ -3018,7 +3018,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		pp0++; *(pp1++) = 0;
 
 		if (class[1] == 's' || class[1] == 'p') {
-			Matrix_memset(pp1, 0, n, sizeof(int));
+			memset(pp1, 0, sizeof(int) * n);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
 				while (k < kend) {
@@ -3054,7 +3054,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			if (class[1] == 's' || class[1] == 'p') { \
 				int *pp1_; \
 				Matrix_Calloc(pp1_, n, int); \
-				Matrix_memcpy(pp1_, pp1 - 1, n, sizeof(int)); \
+				memcpy(pp1_, pp1 - 1, sizeof(int) * n); \
 				if (ct == 'C') { \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
@@ -3202,9 +3202,9 @@ SEXP sparse_as_general(SEXP from, const char *class)
 				} \
 				} \
 			} else { \
-				Matrix_memcpy(pi1, pi0, nnz0, sizeof(int)); \
-				Matrix_memcpy(pj1, pj0, nnz0, sizeof(int)); \
-				_MASK_(Matrix_memcpy(px1, px0, nnz0, sizeof(_CTYPE_))); \
+				memcpy(pi1, pi0, sizeof(int) * nnz0); \
+				memcpy(pj1, pj0, sizeof(int) * nnz0); \
+				_MASK_(memcpy(px1, px0, sizeof(_CTYPE_) * nnz0)); \
 				pi1 += nnz0; \
 				pj1 += nnz0; \
 				_MASK_(px1 += nnz0); \
@@ -3515,7 +3515,7 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1),
 		*pi0 = INTEGER(i0), *pi1 = INTEGER(i1),
 		i, j, k, kend, nnz = pp0[n];
-	Matrix_memset(pp1, 0, (R_xlen_t) m + 1, sizeof(int));
+	memset(pp1, 0, sizeof(int) * ((R_xlen_t) m + 1));
 	++pp0; ++pp1;
 	for (k = 0; k < nnz; ++k)
 		++pp1[pi0[k]];
@@ -3524,7 +3524,7 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 
 	int *pp1_;
 	Matrix_Calloc(pp1_, m, int);
-	Matrix_memcpy(pp1_, pp1 - 1, m, sizeof(int));
+	memcpy(pp1_, pp1 - 1, sizeof(int) * m);
 
 #define TRANS_LOOP(_CTYPE_, _PTR_, _MASK_) \
 	do { \
@@ -3663,7 +3663,7 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 		/*   px_[k]: corresponding data, "cumulated" appropriately        */ \
 		 \
 		k = 0; \
-		Matrix_memset(workB, 0, n, sizeof(int)); \
+		memset(workB, 0, sizeof(int) * n); \
 		for (i = 0; i < m; ++i) { \
 			kend_ = workC[i]; \
 			while (k < kend_) { \
@@ -4147,7 +4147,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		UNPROTECT(1); /* i */
 	} else {
 		SEXP i_ = PROTECT(allocVector(INTSXP, nnz));
-		Matrix_memcpy(INTEGER(i_), INTEGER(i), nnz, sizeof(int));
+		memcpy(INTEGER(i_), INTEGER(i), sizeof(int) * nnz);
 		SET_SLOT(to, iSym, i_);
 		UNPROTECT(2); /* i_, i */
 	}
@@ -4171,16 +4171,16 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_xSym, x_);
 			switch (class[0]) {
 			case 'l':
-				Matrix_memcpy(LOGICAL(x_), LOGICAL(x), nnz, sizeof(int));
+				memcpy(LOGICAL(x_), LOGICAL(x), sizeof(int) * nnz);
 				break;
 			case 'i':
-				Matrix_memcpy(INTEGER(x_), INTEGER(x), nnz, sizeof(int));
+				memcpy(INTEGER(x_), INTEGER(x), sizeof(int) * nnz);
 				break;
 			case 'd':
-				Matrix_memcpy(REAL(x_), REAL(x), nnz, sizeof(double));
+				memcpy(REAL(x_), REAL(x), sizeof(double) * nnz);
 				break;
 			case 'z':
-				Matrix_memcpy(COMPLEX(x_), COMPLEX(x), nnz, sizeof(Rcomplex));
+				memcpy(COMPLEX(x_), COMPLEX(x), sizeof(Rcomplex) * nnz);
 				break;
 			default:
 				break;

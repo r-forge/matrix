@@ -206,7 +206,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rm));
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
-		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(Rcomplex));
+		memset(prx, 0, sizeof(Rcomplex) * rm * rm);
 		if (rk > 0) {
 		Rcomplex *pax = COMPLEX(ax),
 			zero = Matrix_zzero, one = Matrix_zunit;
@@ -221,7 +221,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		}
 		} else {
 		double *prx = REAL(rx);
-		Matrix_memset(prx, 0, (R_xlen_t) rm * rm, sizeof(double));
+		memset(prx, 0, sizeof(double) * rm * rm);
 		if (rk > 0) {
 		double *pax = REAL(ax),
 			zero = 0.0, one = 1.0;
@@ -273,7 +273,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
 		if (rk == 0)
-		Matrix_memset(prx, 0, (R_xlen_t) rm * rn, sizeof(Rcomplex));
+		memset(prx, 0, sizeof(Rcomplex) * rm * rn);
 		else {
 		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 		Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx),
@@ -286,7 +286,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		} else {
 		double *prx = REAL(rx);
 		if (rk == 0)
-		Matrix_memset(prx, 0, (R_xlen_t) rm * rn, sizeof(double));
+		memset(prx, 0, sizeof(double) * rm * rn);
 		else {
 		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 		double *pax = REAL(ax), *pbx = REAL(bx),
@@ -1580,13 +1580,13 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 	switch (kind) {
 	case 'z':
-		Matrix_memcpy(COMPLEX(x1), COMPLEX(x0), XLENGTH(x0), sizeof(Rcomplex));
+		memcpy(COMPLEX(x1), COMPLEX(x0), sizeof(Rcomplex) * XLENGTH(x0));
 		break;
 	case 'd':
-		Matrix_memcpy(   REAL(x1),    REAL(x0), XLENGTH(x0), sizeof(  double));
+		memcpy(   REAL(x1),    REAL(x0), sizeof(  double) * XLENGTH(x0));
 		break;
 	default:
-		Matrix_memcpy(LOGICAL(x1), LOGICAL(x0), XLENGTH(x0), sizeof(     int));
+		memcpy(LOGICAL(x1), LOGICAL(x0), sizeof(     int) * XLENGTH(x0));
 		break;
 	}
 	SET_SLOT(z, Matrix_xSym, x1);

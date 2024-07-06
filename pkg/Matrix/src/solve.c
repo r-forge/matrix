@@ -503,7 +503,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			do { \
 				_CTYPE_ *prx = _PTR_(rx), \
 					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-				Matrix_memset(prx, 0, mn, sizeof(_CTYPE_)); \
+				memset(prx, 0, sizeof(_CTYPE_) * mn); \
 				for (j = 0; j < n; ++j) { \
 					prx[j] = _ONE_; \
 					Matrix_cs_pvec(pap, prx, work, m); \
@@ -707,7 +707,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 #define EYE(_CTYPE_, _ONE_) \
 			do { \
 				_CTYPE_ *B__x = (_CTYPE_ *) B->x; \
-				Matrix_memset(B__x, 0, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+				memset(B__x, 0, sizeof(_CTYPE_) * m * n); \
 				for (j = 0; j < n; ++j) { \
 					*B__x = _ONE_; \
 					B__x += m1a; \
@@ -802,7 +802,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
 			do { \
 				_CTYPE_ *prx = _PTR_(rx); \
-				Matrix_memset(prx, 0, mn, sizeof(_CTYPE_)); \
+				memset(prx, 0, sizeof(_CTYPE_) * mn); \
 				for (j = 0; j < n; ++j) { \
 					prx[j] = _ONE_; \
 					if (aul == 'U') \
@@ -826,7 +826,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
 			do { \
 				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx); \
-				Matrix_memcpy(prx, pbx, mn, sizeof(_CTYPE_)); \
+				memcpy(prx, pbx, sizeof(_CTYPE_) * mn); \
 				for (j = 0; j < n; ++j) { \
 					if (aul == 'U') \
 						Matrix_cs_usolve(A, prx); \
@@ -921,7 +921,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 #define EYE(_CTYPE_, _PTR_, _ONE_) \
 		do { \
 			_CTYPE_ *pyx = _PTR_(yx); \
-			Matrix_memset(pyx, 0, mn, sizeof(_CTYPE_)); \
+			memset(pyx, 0, sizeof(_CTYPE_) * mn); \
 			if (isNull(s_yxjj)) { \
 				for (j = 0; j < n; ++j) { \
 					*pyx = _ONE_; \
@@ -1004,7 +1004,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r < m) \
-					Matrix_memset(work + r, 0, m - r, sizeof(_CTYPE_)); \
+					memset(work + r, 0, sizeof(_CTYPE_) * (m - r)); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1018,7 +1018,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r > 0) \
-					Matrix_memset(work, 0, r, sizeof(_CTYPE_)); \
+					memset(work, 0, sizeof(_CTYPE_) * r); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1029,7 +1029,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */ \
 			for (j = 0; j < n; ++j) { \
 				Matrix_cs_pvec(pp, pyx, work, m); \
-				Matrix_memcpy(pax, work, m, sizeof(_CTYPE_)); \
+				memcpy(pax, work, sizeof(_CTYPE_) * m); \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
 				pyx += m; \
@@ -1038,7 +1038,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 			break; \
 		case 4: /* qr.qy {w/ perm.} : A = P1' Q y */ \
 			for (j = 0; j < n; ++j) { \
-				Matrix_memcpy(work, pyx, m, sizeof(_CTYPE_)); \
+				memcpy(work, pyx, sizeof(_CTYPE_) * m); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1048,7 +1048,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 5: /* qr.qty {w/o perm.} : A = Q' y */ \
 			if (ax != yx) \
-				Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+				memcpy(pax, pyx, sizeof(_CTYPE_) * m * n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
@@ -1057,7 +1057,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 6: /* qr.qy {w/o perm.} : A = Q y */ \
 			if (ax != yx) \
-				Matrix_memcpy(pax, pyx, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+				memcpy(pax, pyx, sizeof(_CTYPE_) * m * n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \

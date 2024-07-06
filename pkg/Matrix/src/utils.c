@@ -2,6 +2,8 @@
 #include "Mdefines.h"
 #include "utils.h"
 
+#if 0
+
 /* memset() but passing length and size rather than their product
    which can overflow size_t ... hence _safer_ than Memzero()
 */
@@ -129,6 +131,8 @@ void *Matrix_memcpy(void *dest, const void *src, R_xlen_t length, size_t size)
 
 	return dest;
 }
+
+#endif
 
 char *Matrix_sprintf(const char *format, ...)
 {
