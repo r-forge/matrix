@@ -280,7 +280,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			case 'y':
 			case 'r':
 			case 'p':
-				snnz = (scl[1] != 't') ? slen : ((slen + sdim[0]) / 2);
+				snnz = (scl[1] != 't') ? slen : sdim[0] + (slen - sdim[0]) / 2;
 				break;
 			case 'C':
 			case 'R':
