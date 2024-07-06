@@ -1,16 +1,14 @@
 #include "Mdefines.h"
+#include "M5.h"
 #include "idz.h"
 
-#define IDZ \
-TEMPLATE(i,      int,          0  ,         1  ) \
-TEMPLATE(d,   double,          0.0,         1.0) \
-TEMPLATE(z, Rcomplex, Matrix_zzero, Matrix_zunit)
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-static void _PREFIX_ ## \
-swap(int n, _CTYPE_ *x, int incx, _CTYPE_ *y, int incy) \
+#define TEMPLATE(c) \
+void \
+c##swap2(size_t n, \
+         c##TYPE *x, ptrdiff_t incx, \
+         c##TYPE *y, ptrdiff_t incy) \
 { \
-	_CTYPE_ tmp; \
+	c##TYPE tmp; \
 	while (n--) { \
 		tmp = *x; \
 		*x = *y; \
@@ -19,602 +17,873 @@ swap(int n, _CTYPE_ *x, int incx, _CTYPE_ *y, int incy) \
 		y += incy; \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-static void _PREFIX_ ## \
-syswapr(char uplo, int n, _CTYPE_ *x, int k0, int k1) \
+} \
+ \
+void \
+c##swap1(size_t n, \
+         c##TYPE *x, ptrdiff_t incx, ptrdiff_t incincx, \
+         c##TYPE *y, ptrdiff_t incy, ptrdiff_t incincy) \
 { \
-	_CTYPE_ *x0 = x + (R_xlen_t) k0 * n, *x1 = x + (R_xlen_t) k1 * n, \
-		tmp; \
+	c##TYPE tmp; \
+	while (n--) { \
+		tmp = *x; \
+		*x = *y; \
+		*y = tmp; \
+		x += incx; \
+		y += incy; \
+		incx += incincx; \
+		incy += incincy; \
+	} \
+	return; \
+} \
+ \
+void \
+c##copy2(size_t n, \
+               c##TYPE *x, ptrdiff_t incx, \
+         const c##TYPE *y, ptrdiff_t incy) \
+{ \
+	while (n--) { \
+		*x = *y; \
+		x += incx; \
+		y += incy; \
+	} \
+	return; \
+} \
+ \
+void \
+c##copy1(size_t n, \
+               c##TYPE *x, ptrdiff_t incx, ptrdiff_t incincx, \
+         const c##TYPE *y, ptrdiff_t incy, ptrdiff_t incincy) \
+{ \
+	while (n--) { \
+		*x = *y; \
+		x += incx; \
+		y += incy; \
+		incx += incincx; \
+		incy += incincy; \
+	} \
+	return; \
+} \
+ \
+static void \
+c##symswapr2(c##TYPE *x, \
+             size_t n, char uplo, size_t i, size_t j) \
+{ \
+	if (i >= j) { \
+		if (i == j) \
+			return; \
+		size_t k = i; \
+		i = j; \
+		j = k; \
+	} \
+	c##TYPE *xi = x + i * n, *xj = x + j * n, tmp; \
+	tmp = xi[i]; \
+	xi[i] = xj[j]; \
+	xj[j] = tmp; \
 	if (uplo == 'U') { \
-		_PREFIX_ ## swap(k0, x0, 1, x1, 1); \
-		tmp = x0[k0]; \
-		x0[k0] = x1[k1]; \
-		x1[k1] = tmp; \
-		_PREFIX_ ## swap(k1 - k0 - 1, x0 + k0 + n, n, x1 + k0 + 1, 1); \
-		_PREFIX_ ## swap(n  - k1 - 1, x1 + k0 + n, n, x1 + k1 + n, n); \
+		c##swap2(i, xi, 1, xj, 1); \
+		c##swap2(j - i - 1, xi + i + n, n, xj + i + 1, 1); \
+		c##swap2(n - j - 1, xj + i + n, n, xj + j + n, n); \
 	} else { \
-		_PREFIX_ ## swap(k0, x + k0, n, x + k1, n); \
-		tmp = x0[k0]; \
-		x0[k0] = x1[k1]; \
-		x1[k1] = tmp; \
-		_PREFIX_ ## swap(k1 - k0 - 1, x0 + k0 + 1, 1, x0 + k1 + n, n); \
-		_PREFIX_ ## swap(n  - k1 - 1, x0 + k1 + 1, 1, x1 + k1 + 1, 1); \
+		c##swap2(i, x + i, n, x + j, n); \
+		c##swap2(j - i - 1, xi + i + 1, 1, xi + j + n, n); \
+		c##swap2(n - j - 1, xi + j + 1, 1, xj + j + 1, 1); \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-rowperm2(_CTYPE_ *x, int m, int n, int *p, int off, int invert) \
+} \
+ \
+static void \
+c##symswapr1(c##TYPE *x, \
+             size_t n, char uplo, size_t i, size_t j) \
 { \
-	int i, k0, k1; \
-	for (i = 0; i < m; ++i) \
-		p[i] = -(p[i] - off + 1); \
-	if (!invert) { \
-		for (i = 0; i < m; ++i) { \
-			if (p[i] > 0) \
-				continue; \
-			k0 = i; \
-			p[k0] = -p[k0]; \
-			k1 = p[k0] - 1; \
-			while (p[k1] < 0) { \
-				_PREFIX_ ## swap(n, x + k0, m, x + k1, m); \
-				k0 = k1; \
-				p[k0] = -p[k0]; \
-				k1 = p[k0] - 1; \
-			} \
-		} \
-	} else { \
-		for (i = 0; i < m; ++i) { \
-			if (p[i] > 0) \
-				continue; \
-			k0 = i; \
-			p[k0] = -p[k0]; \
-			k1 = p[k0] - 1; \
-			while (k1 != k0) { \
-				_PREFIX_ ## swap(n, x + k0, m, x + k1, m); \
-				p[k1] = -p[k1]; \
-				k1 = p[k1] - 1; \
-			} \
-		} \
+	if (i >= j) { \
+		if (i == j) \
+			return; \
+		size_t k = i; \
+		i = j; \
+		j = k; \
 	} \
-	for (i = 0; i < m; ++i) \
-		p[i] = p[i] + off - 1; \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-symperm2(_CTYPE_ *x, int n, char uplo, int *p, int off, int invert) \
-{ \
-	int i, k0, k1; \
-	for (i = 0; i < n; ++i) \
-		p[i] = -(p[i] - off + 1); \
-	if (!invert) { \
-		for (i = 0; i < n; ++i) { \
-			if (p[i] > 0) \
-				continue; \
-			k0 = i; \
-			p[k0] = -p[k0]; \
-			k1 = p[k0] - 1; \
-			while (p[k1] < 0) { \
-				if (k0 < k1) \
-					_PREFIX_ ## syswapr(uplo, n, x, k0, k1); \
-				else \
-					_PREFIX_ ## syswapr(uplo, n, x, k1, k0); \
-				k0 = k1; \
-				p[k0] = -p[k0]; \
-				k1 = p[k0] - 1; \
-			} \
-		} \
-	} else { \
-		for (i = 0; i < n; ++i) { \
-			if (p[i] > 0) \
-				continue; \
-			k0 = i; \
-			p[k0] = -p[k0]; \
-			k1 = p[k0] - 1; \
-			while (k1 != k0) { \
-				if (k0 < k1) \
-					_PREFIX_ ## syswapr(uplo, n, x, k0, k1); \
-				else \
-					_PREFIX_ ## syswapr(uplo, n, x, k1, k0); \
-				p[k1] = -p[k1]; \
-				k1 = p[k1] - 1; \
-			} \
-		} \
-	} \
-	for (i = 0; i < n; ++i) \
-		p[i] = p[i] + off - 1; \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-pack2(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char diag) \
-{ \
-	int i, j; \
-	R_xlen_t dpos = 0, spos = 0; \
+	c##TYPE *xi, *xj, tmp; \
 	if (uplo == 'U') { \
-		for (j = 0; j < n; spos += n-(++j)) \
-			for (i = 0; i <= j; ++i) \
-				dest[dpos++] = src[spos++]; \
-		if (diag != 'N') { \
-			dpos = 0; \
-			for (j = 0; j < n; dpos += (++j)+1) \
-				dest[dpos] = _ONE_; \
+		xi = x + PACKED_AR21_UP(0, i); \
+		xj = x + PACKED_AR21_UP(0, j); \
+		tmp = xi[i]; \
+		xi[i] = xj[j]; \
+		xj[j] = tmp; \
+		c##swap1(i, xi, 1, 0, xj, 1, 0); \
+		c##swap1(j - i - 1, xi + i + (i + 1), i + 2, 1, xj + i +       1,     1, 0); \
+		c##swap1(n - j - 1, xj + i + (j + 1), j + 2, 1, xj + j + (j + 1), j + 2, 1); \
+	} else { \
+		xi = x + PACKED_AR21_LO(i, i, n); \
+		xj = x + PACKED_AR21_LO(j, j, n); \
+		tmp = xi[0]; \
+		xi[0] = xj[0]; \
+		xj[0] = tmp; \
+		c##swap1(i, x + i, n - 1, -1, x + j, n - 1, -1); \
+		c##swap1(j - i - 1, xi + (i - i) + 1, 1, 0, xi + (j - i) + (n - i - 1), n - i - 2, -1); \
+		c##swap1(n - j - 1, xi + (j - i) + 1, 1, 0, xj + (j - j) +           1,         1,  0); \
+	} \
+	return; \
+} \
+ \
+static void \
+c##symcopyr2(c##TYPE *x, const c##TYPE *y, \
+             size_t n, char uplo, size_t i, size_t j) \
+{ \
+	      c##TYPE *xi = x + i * n, *xj = x + j * n; \
+	const c##TYPE *yi = y + i * n, *yj = y + j * n; \
+	xi[i] = yj[j]; \
+	if (uplo == 'U') { \
+		if (i <= j) { \
+			xj[i] = yj[i]; \
+			c##copy2(i, xi, 1, yj, 1); \
+			if (i < j) \
+			c##copy2(j - i - 1, xi + i + n, n, yj + i + 1, 1); \
+			c##copy2(n - j - 1, xj + i + n, n, yj + j + n, n); \
+		} else { \
+			xi[j] = yi[j]; \
+			c##copy2(j, xi, 1, yj, 1); \
+			c##copy2(i - j - 1, xi + j + 1, 1, yj + j + n, n); \
+			c##copy2(n - i - 1, xi + i + n, n, yi + j + n, n); \
 		} \
 	} else { \
-		for (j = 0; j < n; spos += (++j)) \
-			for (i = j; i < n; ++i) \
-				dest[dpos++] = src[spos++]; \
-		if (diag != 'N') { \
-			dpos = 0; \
-			for (j = 0; j < n; dpos += n-(j++)) \
-				dest[dpos] = _ONE_; \
+		if (i <= j) { \
+			xi[j] = yi[j]; \
+			c##copy2(i, x + i, n, y + j, n); \
+			if (i < j) \
+			c##copy2(j - i - 1, xi + i + 1, 1, yi + j + n, n); \
+			c##copy2(n - j - 1, xi + j + 1, 1, yj + j + 1, 1); \
+		} else { \
+			xj[i] = yj[i]; \
+			c##copy2(j, x + i, n, y + j, n); \
+			c##copy2(i - j - 1, xj + i + n, n, yj + j + 1, 1); \
+			c##copy2(n - i - 1, xi + i + 1, 1, yj + i + 1, 1); \
 		} \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-unpack1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char diag) \
+} \
+ \
+static void \
+c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
+             size_t n, char uplo, size_t i, size_t j) \
 { \
-	int i, j; \
-	R_xlen_t dpos = 0, spos = 0; \
+	      c##TYPE *xi, *xj; \
+	const c##TYPE *yi, *yj; \
 	if (uplo == 'U') { \
-		for (j = 0; j < n; dpos += n-(++j)) \
-			for (i = 0; i <= j; ++i) \
-				dest[dpos++] = src[spos++]; \
+		xi = x + PACKED_AR21_UP(0, i); \
+		xj = x + PACKED_AR21_UP(0, j); \
+		yi = y + PACKED_AR21_UP(0, i); \
+		yj = y + PACKED_AR21_UP(0, j); \
+		xi[i] = yj[j]; \
+		if (i <= j) { \
+			xj[i] = yj[i]; \
+			c##copy1(i, xi, 1, 0, yj, 1, 0); \
+			if (i < j) \
+			c##copy1(j - i - 1, xi + i + (i + 1), i + 2, 1, yj + i +       1,     1, 0); \
+			c##copy1(n - j - 1, xj + i + (j + 1), j + 2, 1, yj + j + (j + 1), j + 2, 1); \
+		} else { \
+			xi[j] = yi[j]; \
+			c##copy1(j, xi, 1, 0, yj, 1, 0); \
+			c##copy1(i - j - 1, xi + j + 1, 1, 0,           yj + j + (j + 1), j + 2, 1); \
+			c##copy1(n - i - 1, xi + i + (i + 1), i + 2, 1, yi + j + (i + 1), i + 2, 1); \
+		} \
 	} else { \
-		for (j = 0; j < n; dpos += (++j)) \
-			for (i = j; i <  n; ++i) \
-				dest[dpos++] = src[spos++]; \
-	} \
-	if (diag != 'N') { \
-		dpos = 0; \
-		R_xlen_t n1a = (R_xlen_t) n + 1; \
-		for (j = 0; j < n; ++j, dpos += n1a) \
-			dest[dpos] = _ONE_; \
+		xi = x + PACKED_AR21_LO(i, i, n); \
+		xj = x + PACKED_AR21_LO(j, j, n); \
+		yi = y + PACKED_AR21_LO(i, i, n); \
+		yj = y + PACKED_AR21_LO(j, j, n); \
+		xi[0] = yj[0]; \
+		if (i <= j) { \
+			xi[j] = yi[j]; \
+			c##copy1(i, x + i, n - 1, -1, y + j, n - 1, -1); \
+			if (i < j) \
+			c##copy1(j - i - 1, xi + (i - i) + 1, 1, 0, yi + (j - i) + (n - i - 1), n - i - 2, -1); \
+			c##copy1(n - j - 1, xi + (j - i) + 1, 1, 0, yj + (j - j) +           1,         1,  0); \
+		} else { \
+			xj[i] = yj[i]; \
+			c##copy1(j, x + i, n - 1, -1, y + j, n - 1, -1); \
+			c##copy1(i - j - 1, xj + (i - j) + (n - j - 1), n - j - 2, -1, yj + (j - j) + 1, 1, 0); \
+			c##copy1(n - i - 1, xi + (i - i) +           1,         1,  0, yj + (i - j) + 1, 1, 0); \
+		} \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define ASSIGN_IJ_i(_X_, _Y_) ASSIGN2_REAL_ID   (_X_, _Y_)
-#define ASSIGN_IJ_d(_X_, _Y_) ASSIGN2_REAL_ID   (_X_, _Y_)
-#define ASSIGN_IJ_z(_X_, _Y_) ASSIGN2_COMPLEX_ID(_X_, _Y_)
-
-#define ASSIGN_JI_i(_X_, _Y_) ASSIGN2_REAL_CJ   (_X_, _Y_)
-#define ASSIGN_JI_d(_X_, _Y_) ASSIGN2_REAL_CJ   (_X_, _Y_)
-#define ASSIGN_JI_z(_X_, _Y_) ASSIGN2_COMPLEX_CJ(_X_, _Y_)
-
-#define ASSIGN_JJ_i(_X_)      ASSIGN1_REAL_IM   (_X_, 0.0)
-#define ASSIGN_JJ_d(_X_)      ASSIGN1_REAL_IM   (_X_, 0.0)
-#define ASSIGN_JJ_z(_X_)      ASSIGN1_COMPLEX_IM(_X_, 0.0)
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-trans2(_CTYPE_ *dest, const _CTYPE_ *src, int m, int n, char trans) \
+} \
+ \
+void \
+c##rowperm2(c##TYPE *x, const c##TYPE *y, \
+            int m, int n, const int *p, int off, int invert) \
 { \
-	R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
-	int i, j; \
-	if (trans == 'C') \
-	for (j = 0; j < m; ++j, src -= mn1s) \
-		for (i = 0; i < n; ++i, src += m, dest += 1) \
-			ASSIGN_JI_ ## _PREFIX_((*dest), (*src)); \
-	else if (trans == 'T') \
-	for (j = 0; j < m; ++j, src -= mn1s) \
-		for (i = 0; i < n; ++i, src += m, dest += 1) \
-			ASSIGN_IJ_ ## _PREFIX_((*dest), (*src)); \
-	else \
-	Matrix_memcpy(dest, src, mn1s + 1, sizeof(_CTYPE_)); \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-trans1(_CTYPE_ *dest, const _CTYPE_ *src, int n, char uplo, char trans) \
-{ \
-	_CTYPE_ tmp; \
-	int i, j; \
-	if (trans == 'C') { \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; ++j) { \
-			for (i = j; i < n; ++i) { \
-				tmp = *(src + PACKED_AR21_UP(j, i)); \
-				ASSIGN_JI_ ## _PREFIX_((*dest), tmp); \
-				dest += 1; \
-			} \
-		} \
+	if (m < 0 || n < 0) \
+		return; \
+	if (!p) { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * m * n); \
 	} else { \
-		R_xlen_t n2 = (R_xlen_t) n * 2; \
-		for (j = 0; j < n; ++j) { \
-			for (i = 0; i <= j; ++i) { \
-				tmp = *(src + PACKED_AR21_LO(j, i, n2)); \
-				ASSIGN_JI_ ## _PREFIX_((*dest), tmp); \
-				dest += 1; \
-			} \
-		} \
-	} \
-	} else if (trans == 'T') { \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; ++j) { \
-			for (i = j; i < n; ++i) { \
-				tmp = *(src + PACKED_AR21_UP(j, i)); \
-				ASSIGN_IJ_ ## _PREFIX_((*dest), tmp); \
-				dest += 1; \
-			} \
-		} \
-	} else { \
-		R_xlen_t n2 = (R_xlen_t) n * 2; \
-		for (j = 0; j < n; ++j) { \
-			for (i = 0; i <= j; ++i) { \
-				tmp = *(src + PACKED_AR21_LO(j, i, n2)); \
-				ASSIGN_IJ_ ## _PREFIX_((*dest), tmp); \
-				dest += 1; \
-			} \
-		} \
-	} \
-	} else \
-	Matrix_memcpy(dest, src, PACKED_LENGTH(n), sizeof(_CTYPE_)); \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-syforce2(_CTYPE_ *x, int n, char uplo, char trans) \
-{ \
-	_CTYPE_ *y = x; \
-	int i, j; \
-	if (trans == 'C') { \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; ++j) { \
-			ASSIGN_JJ_ ## _PREFIX_((*x)); \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				ASSIGN_JI_ ## _PREFIX_((*x), (*y)); \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} else { \
-		for (j = 0; j < n; ++j) { \
-			ASSIGN_JJ_ ## _PREFIX_((*y)); \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				ASSIGN_JI_ ## _PREFIX_((*y), (*x)); \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} \
-	} else { \
-	if (uplo == 'U') { \
-		for (j = 0; j < n; ++j) { \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				*x = *y; \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} else { \
-		for (j = 0; j < n; ++j) { \
-			x += 1; \
-			y += n; \
-			for (i = j + 1; i < n; ++i) { \
-				*y = *x; \
-				x += 1; \
-				y += n; \
-			} \
-			x = y = x + j + 1; \
-		} \
-	} \
-	} \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#undef ASSIGN_JJ_i
-#undef ASSIGN_JJ_d
-#undef ASSIGN_JJ_z
-#undef ASSIGN_JI_i
-#undef ASSIGN_JI_d
-#undef ASSIGN_JI_z
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-trforce2(_CTYPE_ *x, int m, int n, char uplo, char diag) \
-{ \
-	_CTYPE_ *y = x; \
-	int i, j, r = (m < n) ? m : n; \
-	if (uplo == 'U') { \
-		for (j = 0; j < r; ++j) { \
-			for (i = j + 1; i < m; ++i) \
-				*(++x) = _ZERO_; \
-			x += j + 2; \
-		} \
-	} else { \
-		for (j = 0; j < r; ++j) { \
-			for (i = 0; i < j; ++i) \
-				*(x++) = _ZERO_; \
-			x += m - j; \
-		} \
-		for (j = r; j < n; ++j) \
+		if (y) { \
+			int i, j; \
+			if (!invert) \
+			for (j = 0; j < n; ++j, x += m, y += m) \
+				for (i = 0; i < m; ++i) \
+					x[i] = y[p[i] - off]; \
+			else \
+			for (j = 0; j < n; ++j, x += m, y += m) \
+				for (i = 0; i < m; ++i) \
+					x[p[i] - off] = y[i]; \
+		} else { \
+			int i, k0, k1, *q; \
+			Matrix_Calloc(q, m, int); \
+			if (!invert) \
 			for (i = 0; i < m; ++i) \
-				*(x++) = _ZERO_; \
-	} \
-	if (diag != 'N') { \
-		R_xlen_t m1a = (R_xlen_t) m + 1; \
-		for (j = 0; j < r; ++j) { \
-			*y = _ONE_; \
-			y += m1a; \
+				q[i] = -(p[i] - off + 1); \
+			else \
+			for (i = 0; i < m; ++i) \
+				q[p[i] - off] = -(i + 1); \
+			for (i = 0; i < m; ++i) { \
+				if (q[i] > 0) \
+					continue; \
+				k0 = i; \
+				q[k0] = -q[k0]; \
+				k1 = q[k0] - 1; \
+				while (q[k1] < 0) { \
+					c##swap2(n, x + k0, m, x + k1, m); \
+					k0 = k1; \
+					q[k0] = -q[k0]; \
+					k1 = q[k0] - 1; \
+				} \
+			} \
+			Matrix_Free(q, m); \
 		} \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-band2(_CTYPE_ *x, int m, int n, int a, int b) \
+} \
+ \
+void \
+c##symperm2(c##TYPE *x, const c##TYPE *y, \
+            int n, char uplo, const int *p, int off, int invert) \
+{ \
+	if (n < 0) \
+		return; \
+	if (!p) { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * n * n); \
+	} else { \
+		if (y) { \
+			int j; \
+			if (!invert) \
+			for (j = 0; j < n; ++j) \
+				c##symcopyr2(x, y, n, uplo, j, p[j] - off); \
+			else \
+			for (j = 0; j < n; ++j) \
+				c##symcopyr2(x, y, n, uplo, p[j] - off, j); \
+		} else { \
+			int j, k0, k1, *q; \
+			Matrix_Calloc(q, n, int); \
+			if (!invert) \
+			for (j = 0; j < n; ++j) \
+				q[j] = -(p[j] - off + 1); \
+			else \
+			for (j = 0; j < n; ++j) \
+				q[p[j] - off] = -(j + 1); \
+			for (j = 0; j < n; ++j) { \
+				if (q[j] > 0) \
+					continue; \
+				k0 = j; \
+				q[k0] = -q[k0]; \
+				k1 = q[k0] - 1; \
+				while (q[k1] < 0) { \
+					c##symswapr2(x, n, uplo, k0, k1); \
+					k0 = k1; \
+					q[k0] = -q[k0]; \
+					k1 = q[k0] - 1; \
+				} \
+			} \
+			Matrix_Free(q, n); \
+		} \
+	} \
+	return; \
+} \
+ \
+void \
+c##symperm1(c##TYPE *x, const c##TYPE *y, \
+            int n, char uplo, const int *p, int off, int invert) \
+{ \
+	if (n < 0) \
+		return; \
+	if (!p) { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH((size_t) n)); \
+	} else { \
+		if (y) { \
+			int j; \
+			if (!invert) \
+			for (j = 0; j < n; ++j) \
+				c##symcopyr1(x, y, n, uplo, j, p[j] - off); \
+			else \
+			for (j = 0; j < n; ++j) \
+				c##symcopyr1(x, y, n, uplo, p[j] - off, j); \
+		} else { \
+			int j, k0, k1, *q; \
+			Matrix_Calloc(q, n, int); \
+			if (!invert) \
+			for (j = 0; j < n; ++j) \
+				q[j] = -(p[j] - off + 1); \
+			else \
+			for (j = 0; j < n; ++j) \
+				q[p[j] - off] = -(j + 1); \
+			for (j = 0; j < n; ++j) { \
+				if (q[j] > 0) \
+					continue; \
+				k0 = j; \
+				q[k0] = -q[k0]; \
+				k1 = q[k0] - 1; \
+				while (q[k1] < 0) { \
+					c##symswapr1(x, n, uplo, k0, k1); \
+					k0 = k1; \
+					q[k0] = -q[k0]; \
+					k1 = q[k0] - 1; \
+				} \
+			} \
+			Matrix_Free(q, n); \
+		} \
+	} \
+	return; \
+} \
+ \
+void \
+c##pack2(c##TYPE *x, const c##TYPE *y, \
+         size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	c##TYPE *tmp = x; \
+	if (uplo == 'U') { \
+	for (j = 0; j < n; y += n - (++j)) \
+		for (i = 0; i <= j; ++i) \
+			*(x++) = *(y++); \
+	if (diag != '\0') { \
+		if (diag != 'N') \
+		for (j = 0, x = tmp; j < n; x += (++j) + 1) \
+			c##SET_UNIT(*x); \
+	} else if (trans == 'C') \
+		for (j = 0, x = tmp; j < n; x += (++j) + 1) \
+			c##SET_PROJ_REAL(*x); \
+	} else { \
+	for (j = 0; j < n; y += (++j)) \
+		for (i = j; i < n; ++i) \
+			*(x++) = *(y++); \
+	if (diag != '\0') { \
+		if (diag != 'N') \
+		for (j = 0, x = tmp; j < n; x += n - (j++)) \
+			c##SET_UNIT(*x); \
+	} else if (trans == 'C') \
+		for (j = 0, x = tmp; j < n; x += n - (j++)) \
+			c##SET_PROJ_REAL(*x); \
+	} \
+	return; \
+} \
+ \
+void \
+c##pack1(c##TYPE *x, const c##TYPE *y, \
+         size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	if (diag != '\0') { \
+		c##TYPE *tmp = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i <= j; ++i) \
+				*(x++) = *(y++); \
+			for (i = j + 1; i < n; ++i) \
+				*(x++) = c##ZERO; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) \
+				*(x++) = c##ZERO; \
+			for (i = j; i < n; ++i) \
+				*(x++) = *(y++); \
+		} \
+		} \
+		if (diag != 'N') { \
+		size_t incx = n + 1; \
+		for (j = 0, x = tmp; j < n; ++j, x += incx) \
+			c##SET_UNIT(*x); \
+		} \
+	} else if (trans == 'C') { \
+		c##TYPE *u = x, *l = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				c##ASSIGN_IDEN(*u, *y); \
+				c##ASSIGN_CONJ(*l, *y); \
+				u += 1; y += 1; l += n; \
+			} \
+			c##ASSIGN_PROJ_REAL(*u, *y); \
+			u += 1; y += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			l += j; u = l + n; \
+			c##ASSIGN_PROJ_REAL(*l, *y); \
+			l += 1; y += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				c##ASSIGN_IDEN(*l, *y); \
+				c##ASSIGN_CONJ(*u, *y); \
+				l += 1; y += 1; u += n; \
+			} \
+		} \
+		} \
+	} else { \
+		c##TYPE *u = x, *l = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				c##ASSIGN_IDEN(*u, *y); \
+				c##ASSIGN_IDEN(*l, *y); \
+				u += 1; y += 1; l += n; \
+			} \
+			c##ASSIGN_IDEN(*u, *y); \
+			u += 1; y += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			l += j; u = l + n; \
+			c##ASSIGN_IDEN(*l, *y); \
+			l += 1; y += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				c##ASSIGN_IDEN(*l, *y); \
+				c##ASSIGN_IDEN(*u, *y); \
+				l += 1; y += 1; u += n; \
+			} \
+		} \
+		} \
+	} \
+	return; \
+} \
+ \
+void \
+c##force2(c##TYPE *x, const c##TYPE *y, \
+          size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	if (diag < '\0') { \
+		if (diag != -'N') { \
+			size_t incx = n + 1; \
+			memset(x, 0, sizeof(c##TYPE) * n * n); \
+			for (j = 0; j < n; ++j, x += incx) \
+				c##SET_UNIT(*x); \
+		} else if (y) { \
+			size_t incx = n + 1; \
+			size_t incy = (trans) ? 1 : incx; \
+			memset(x, 0, sizeof(c##TYPE) * n * n); \
+			for (j = 0; j < n; ++j, x += incx, y += incy) \
+				*x = *y; \
+		} else { \
+			for (j = 1; j < n; ++j) { \
+				x++; \
+				for (i = 0; i < n; ++i) \
+					*(x++) = c##ZERO; \
+			} \
+		} \
+	} else if (diag > '\0') { \
+		c##TYPE *tmp = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			if (!y) \
+				x += j + 1; \
+			else { \
+				for (i = 0; i <= j; ++i) \
+					*(x++) = *(y++); \
+				y += n - j - 1; \
+			} \
+			for (i = j + 1; i < n; ++i) \
+				*(x++) = c##ZERO; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) \
+				*(x++) = c##ZERO; \
+			if (!y) \
+				x += n - j; \
+			else { \
+				y += j; \
+				for (i = j; i < n; ++i) \
+					*(x++) = *(y++); \
+			} \
+		} \
+		} \
+		if (diag != 'N') { \
+		size_t incx = n + 1; \
+		for (j = 0, x = tmp; j < n; ++j, x += incx) \
+			c##SET_UNIT(*x); \
+		} \
+	} else if (trans == 'C') { \
+		c##TYPE *u = x, *l = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (!y) \
+					c##ASSIGN_CONJ(*l, *u); \
+				else { \
+					c##ASSIGN_IDEN(*u, *y); \
+					c##ASSIGN_CONJ(*l, *y); \
+					y += 1; \
+				} \
+				u += 1; l += n; \
+			} \
+			if (!y) \
+				c##SET_PROJ_REAL(*u); \
+			else { \
+				c##ASSIGN_PROJ_REAL(*u, *y); \
+				y += 1; \
+				y += n - j - 1; \
+			} \
+			u += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			l += j; u = l + n; \
+			if (!y) \
+				c##SET_PROJ_REAL(*l); \
+			else { \
+				y += j; \
+				c##ASSIGN_PROJ_REAL(*l, *y); \
+				y += 1; \
+			} \
+			l += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				if (!y) \
+					c##ASSIGN_CONJ(*u, *l); \
+				else { \
+					c##ASSIGN_IDEN(*l, *y); \
+					c##ASSIGN_CONJ(*u, *y); \
+					y += 1; \
+				} \
+				l += 1; u += n; \
+			} \
+		} \
+		} \
+	} else { \
+		c##TYPE *u = x, *l = x; \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (!y) \
+					c##ASSIGN_IDEN(*l, *u); \
+				else { \
+					c##ASSIGN_IDEN(*u, *y); \
+					c##ASSIGN_IDEN(*l, *y); \
+					y += 1; \
+				} \
+				u += 1; l += n; \
+			} \
+			if (y) { \
+				c##ASSIGN_IDEN(*u, *y); \
+				y += 1; \
+				y += n - j - 1; \
+			} \
+			u += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			l += j; u = l + n; \
+			if (y) { \
+				y += j; \
+				c##ASSIGN_IDEN(*l, *y); \
+				y += 1; \
+			} \
+			l += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				if (!y) \
+					c##ASSIGN_IDEN(*u, *l); \
+				else { \
+					c##ASSIGN_IDEN(*l, *y); \
+					c##ASSIGN_IDEN(*u, *y); \
+					y += 1; \
+				} \
+				l += 1; u += n; \
+			} \
+		} \
+		} \
+	} \
+	return; \
+} \
+ \
+void \
+c##force1(c##TYPE *x, const c##TYPE *y, \
+          size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	if (uplo == 'U') { \
+	if (diag < '\0') { \
+		if (diag != -'N') { \
+			memset(x, 0, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+			for (j = 0; j < n; x += (++j) + 1) \
+				*x = c##UNIT; \
+		} else if (y) { \
+			memset(x, 0, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+			for (j = 0; j < n; ++j, x += j + 1, y += (trans) ? 1 : j + 1) \
+				*x = *y; \
+		} else { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < j; ++i) \
+					*(x++) = c##ZERO; \
+				x++; \
+			} \
+		} \
+	} else if (diag > '\0') { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+		if (diag != 'N') \
+		for (j = 0; j < n; x += (++j) + 1) \
+			c##SET_UNIT(*x); \
+	} else if (trans == 'C') { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+		for (j = 0; j < n; x += (++j) + 1) \
+			c##SET_PROJ_REAL(*x); \
+	} \
+	} else { \
+	if (diag < '\0') { \
+		if (diag != -'N') { \
+			memset(x, 0, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+			for (j = 0; j < n; x += n - (j++)) \
+				*x = c##UNIT; \
+		} else if (y) { \
+			memset(x, 0, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+			for (j = 0; j < n; x += n - j, y += (trans) ? 1 : n - j, j++) \
+				*x = *y; \
+		} else { \
+			for (j = 0; j < n; ++j) { \
+				x++; \
+				for (i = j + 1; i < n; ++i) \
+					*(x++) = c##ZERO; \
+			} \
+		} \
+	} else if (diag > '\0') { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+		if (diag != 'N') \
+		for (j = 0; j < n; x += n - (j++)) \
+			c##SET_UNIT(*x); \
+	} else if (trans == 'C') { \
+		if (y) \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+		for (j = 0; j < n; x += n - (j++)) \
+			c##SET_PROJ_REAL(*x); \
+	} \
+	} \
+	return; \
+} \
+ \
+void \
+c##trans2(c##TYPE *x, const c##TYPE *y, \
+          size_t m, size_t n, char trans) \
+{ \
+	size_t i, j, mn = m * n, mn1s = mn - 1; \
+	if (trans == 'N') \
+		memcpy(x, y, sizeof(c##TYPE) * mn); \
+	else if (trans == 'C') \
+		for (j = 0; j < m; ++j, y -= mn1s) \
+			for (i = 0; i < n; ++i, x += 1, y += m) \
+				c##ASSIGN_CONJ(*x, *y); \
+	else \
+		for (j = 0; j < m; ++j, y -= mn1s) \
+			for (i = 0; i < n; ++i, x += 1, y += m) \
+				c##ASSIGN_IDEN(*x, *y); \
+	return; \
+} \
+ \
+void \
+c##trans1(c##TYPE *x, const c##TYPE *y, \
+          size_t n, char uplo, char trans) \
+{ \
+	c##TYPE tmp; \
+	size_t i, j; \
+	if (trans == 'N') { \
+		memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n)); \
+	} else if (trans == 'C') { \
+		if (uplo == 'U') \
+		for (j = 0; j < n; ++j) { \
+			for (i = j; i < n; ++i) { \
+				tmp = *(y + PACKED_AR21_UP(j, i)); \
+				c##ASSIGN_CONJ(*x, tmp); \
+				x += 1; \
+			} \
+		} \
+		else \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i <= j; ++i) { \
+				tmp = *(y + PACKED_AR21_LO(j, i, n)); \
+				c##ASSIGN_CONJ(*x, tmp); \
+				x += 1; \
+			} \
+		} \
+	} else { \
+		if (uplo == 'U') \
+		for (j = 0; j < n; ++j) { \
+			for (i = j; i < n; ++i) { \
+				tmp = *(y + PACKED_AR21_UP(j, i)); \
+				c##ASSIGN_IDEN(*x, tmp); \
+				x += 1; \
+			} \
+		} \
+		else \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i <= j; ++i) { \
+				tmp = *(y + PACKED_AR21_LO(j, i, n)); \
+				c##ASSIGN_IDEN(*x, tmp); \
+				x += 1; \
+			} \
+		} \
+	} \
+	return; \
+} \
+ \
+void \
+c##band2(c##TYPE *x, const c##TYPE *y, \
+         size_t m, size_t n, ptrdiff_t a, ptrdiff_t b) \
 { \
 	if (m == 0 || n == 0) \
 		return; \
-	if (a > b || a >= n || b <= -m) { \
-		Matrix_memset(x, 0, (R_xlen_t) m * n, sizeof(_CTYPE_)); \
+	size_t d; \
+	if (a > b || (a > 0 && a >= n) || (b < 0 && -b >= m)) { \
+		d = m * n; \
+		memset(x, 0, sizeof(c##TYPE) * d); \
 		return; \
 	} \
-	if (a <= -m) a = 1-m; \
-	if (b >=  n) b = n-1; \
- \
-	int i, j, i0, i1, \
+	a = (a < 0 && -a >= m) ? 1 - (ptrdiff_t) m : a; \
+	b = (b > 0 &&  b >= n) ? (ptrdiff_t) n - 1 : b; \
+	size_t i, j, i0, i1, \
 		j0 = (a < 0) ? 0 : a, \
-		j1 = (b < n-m) ? m+b : n; \
- \
+		j1 = (((b < 0) ? m - (-b) : m + b) < n) ? ((b < 0) ? m - (-b) : m + b) : n; \
 	if (j0 > 0) { \
-		R_xlen_t dx = (R_xlen_t) m * j0; \
-		Matrix_memset(x, 0, dx, sizeof(_CTYPE_)); \
-		x += dx; \
+		d = m * j0; \
+		memset(x, 0, sizeof(c##TYPE) * d); \
+		x += d; if (y) y += d; \
 	} \
-	for (j = j0; j < j1; ++j, x += m) { \
-		i0 = j - b; \
-		i1 = j - a + 1; \
-		for (i = 0; i < i0; ++i) \
-			*(x + i) = _ZERO_; \
-		for (i = i1; i < m; ++i) \
-			*(x + i) = _ZERO_; \
+	for (j = j0; j < j1; ++j) { \
+		i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
+		i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
+		for (i =  0; i < i0         ; ++i) \
+			x[i] = c##ZERO; \
+		if (y) { \
+		for (i = i0; i < i1 && i < m; ++i) \
+			x[i] = y[i]; \
+		y += m; \
+		} \
+		for (i = i1;           i < m; ++i) \
+			x[i] = c##ZERO; \
+		x += m; \
 	} \
-	if (j1 < n) \
-		Matrix_memset(x, 0, (R_xlen_t) m * (n - j1), sizeof(_CTYPE_)); \
+	if (j1 < n) { \
+		d = m * (n - j1); \
+		memset(x, 0, sizeof(c##TYPE) * d); \
+		x += d; if (y) y += d; \
+	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-band1(_CTYPE_ *x, int n, int a, int b, char uplo) \
+} \
+ \
+void \
+c##band1(c##TYPE *x, const c##TYPE *y, \
+         size_t n, char uplo, ptrdiff_t a, ptrdiff_t b) \
 { \
 	if (n == 0) \
 		return; \
-	if (a > b || a >= n || b <= -n) { \
-		Matrix_memset(x, 0, PACKED_LENGTH(n), sizeof(_CTYPE_)); \
+	if (uplo == 'U') \
+		a = (a < 0) ? 0 : a; \
+	else \
+		b = (b > 0) ? 0 : b; \
+	size_t d; \
+	if (a > b || (a > 0 && a >= n) || (b < 0 && -b >= n)) { \
+		d = PACKED_LENGTH(n); \
+		memset(x, 0, sizeof(c##TYPE) * d); \
 		return; \
 	} \
-	if (uplo == 'U') { \
-		if (a <   0) a = 0; \
-		if (b >=  n) b = n-1; \
-	} else { \
-		if (b >   0) b = 0; \
-		if (a <= -n) a = 1-n; \
-	} \
- \
-	int i, j, i0, i1, \
+	if (uplo == 'U') \
+		b = (b > 0 &&  b >= n) ? (ptrdiff_t) n - 1 : b;	\
+	else \
+		a = (a < 0 && -a >= n) ? 1 - (ptrdiff_t) n : a;	\
+	size_t i, j, i0, i1, \
 		j0 = (a < 0) ? 0 : a, \
-		j1 = (b < 0) ? n+b : n; \
- \
+		j1 = (b < 0) ? n - (-b) : n; \
 	if (uplo == 'U') { \
 		if (j0 > 0) { \
-			R_xlen_t dx; \
-			Matrix_memset(x, 0, dx = PACKED_LENGTH(j0), \
-			              sizeof(_CTYPE_)); \
-			x += dx; \
+			d = PACKED_LENGTH(j0); \
+			memset(x, 0, sizeof(c##TYPE) * d); \
+			x += d; if (y) y += d; \
 		} \
-		for (j = j0; j < j1; x += (++j)) { \
-			i0 = j - b; \
-			i1 = j - a + 1; \
-			for (i = 0; i < i0; ++i) \
-				*(x + i) = _ZERO_; \
-			for (i = i1; i <= j; ++i) \
-				*(x + i) = _ZERO_; \
+		for (j = j0; j < j1; ++j) { \
+			i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
+			i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
+			for (i =  0; i < i0          ; ++i) \
+				x[i] = c##ZERO; \
+			if (y) { \
+			for (i = i0; i < i1 && i <= j; ++i) \
+				x[i] = y[i]; \
+			y += j + 1; \
+			} \
+			for (i = i1;           i <= j; ++i) \
+				x[i] = c##ZERO; \
+			x += j + 1; \
 		} \
-		if (j1 < n) \
-			Matrix_memset(x, 0, PACKED_LENGTH(n) - PACKED_LENGTH(j1), \
-			              sizeof(_CTYPE_)); \
+		if (j1 < n) { \
+			d = PACKED_LENGTH(n) - PACKED_LENGTH(j1); \
+			memset(x, 0, sizeof(c##TYPE) * d); \
+			x += d; if (y) y += d; \
+		} \
 	} else { \
 		if (j0 > 0) { \
-			R_xlen_t dx = PACKED_LENGTH(n) - PACKED_LENGTH(j0); \
-			Matrix_memset(x, 0, dx, sizeof(_CTYPE_)); \
-			x += dx; \
+			d = PACKED_LENGTH(n) - PACKED_LENGTH(j0); \
+			memset(x, 0, sizeof(c##TYPE) * d); \
+			x += d; if (y) y += d; \
 		} \
-		for (j = j0; j < j1; x += n-(j++)) { \
-			i0 = j - b; \
-			i1 = j - a + 1; \
-			for (i = j; i < i0; ++i) \
-				*(x + i - j) = _ZERO_; \
-			for (i = i1; i < n; ++i) \
-				*(x + i - j) = _ZERO_; \
-		} \
-		if (j1 < n) \
-			Matrix_memset(x, 0, PACKED_LENGTH(n - j1), \
-			              sizeof(_CTYPE_)); \
-	} \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-dcopy2(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-       char uplo, char diag) \
-{ \
-	int j; \
-	R_xlen_t n1a = (R_xlen_t) n + 1; \
-	if (diag != 'N') { \
-		for (j = 0; j < n; ++j, dest += n1a) \
-			*dest = _ONE_; \
-	} else if (length == n) { \
-		/* copying from diagonalMatrix */ \
-		for (j = 0; j < n; ++j, dest += n1a, ++src) \
-			*dest = *src; \
-	} else if (length == (n * n1a) / 2) { \
-		/* copying from packedMatrix */ \
-		if (uplo == 'U') { \
-			for (j = 0; j < n; dest += n1a, src += (++j)+1) \
-				*dest = *src; \
-		} else { \
-			for (j = 0; j < n; dest += n1a, src += n-(j++)) \
-				*dest = *src; \
-		} \
-	} else if (length == (R_xlen_t) n * n) { \
-		/* copying from square unpackedMatrix */ \
-		for (j = 0; j < n; ++j, dest += n1a, src += n1a) \
-			*dest = *src; \
-	} else { \
-		error(_("incompatible '%s' and '%s' in '%s'"), \
-		      "n", "length", __func__); \
-	} \
-	return; \
-}
-IDZ
-#undef TEMPLATE
-
-#define TEMPLATE(_PREFIX_, _CTYPE_, _ZERO_, _ONE_) \
-void _PREFIX_ ## \
-dcopy1(_CTYPE_ *dest, const _CTYPE_ *src, int n, R_xlen_t length, \
-       char uplo_dest, char uplo, char diag) \
-{ \
-	int j; \
-	if (diag != 'N') { \
-		if (uplo_dest == 'U') { \
-			for (j = 0; j < n; dest += (++j)+1) \
-				*dest = _ONE_; \
-		} else { \
-			for (j = 0; j < n; dest += n-(j++)) \
-				*dest = _ONE_; \
-		} \
-	} else if (length == n) { \
-		/* copying from diagonalMatrix */ \
-		if (uplo_dest == 'U') { \
-			for (j = 0; j < n; dest += (++j)+1, ++src) \
-				*dest = *src; \
-		} else { \
-			for (j = 0; j < n; dest += n-(j++), ++src) \
-				*dest = *src; \
-		} \
-	} else if (length == PACKED_LENGTH(n)) { \
-		/* copying from packedMatrix */ \
-		if (uplo_dest == 'U') { \
-			if (uplo == 'U') { \
-				for (j = 0; j < n; src += (++j)+1, dest += j+1) \
-					*dest = *src; \
-			} else { \
-				for (j = 0; j < n; src += n-j, dest += (++j)+1) \
-					*dest = *src; \
+		for (j = j0; j < j1; ++j) { \
+			i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
+			i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
+			for (i =  j; i < i0         ; ++i) \
+				x[i - j] = c##ZERO; \
+			if (y) { \
+			for (i = i0; i < i1 && i < n; ++i) \
+				x[i - j] = y[i - j]; \
+			y += n - j; \
 			} \
-		} else { \
-			if (uplo == 'U') { \
-				for (j = 0; j < n; dest += n-(j++), src += j+1) \
-					*dest = *src; \
-			} else { \
-				for (j = 0; j < n; dest += n-j, src += n-(j++)) \
-					*dest = *src; \
-			} \
+			for (i = i1;           i < n; ++i) \
+				x[i - j] = c##ZERO; \
+			x += n - j; \
 		} \
-	} else if (length == (R_xlen_t) n * n) { \
-		/* copying from square unpackedMatrix */ \
-		R_xlen_t n1a = (R_xlen_t) n + 1; \
-		if (uplo_dest == 'U') { \
-			for (j = 0; j < n; dest += (++j)+1, src += n1a) \
-				*dest = *src; \
-		} else { \
-			for (j = 0; j < n; dest += n-(j++), src += n1a) \
-				*dest = *src; \
+		if (j1 < n) { \
+			d = PACKED_LENGTH(n - j1); \
+			memset(x, 0, sizeof(c##TYPE) * d); \
+			x += d; if (y) y += d; \
 		} \
-	} else { \
-		error(_("incompatible '%s' and '%s' in '%s'"), \
-		      "n", "length", __func__); \
 	} \
 	return; \
-}
-IDZ
-#undef TEMPLATE
+} \
 
-void zdreal2(Rcomplex *x, int n)
-{
-	int j;
-	R_xlen_t n1a = (R_xlen_t) n + 1;
-	for (j = 0; j < n; ++j, x += n1a)
-		(*x).i = 0.0;
-	return;
-}
 
-void zdreal1(Rcomplex *x, int n, char uplo)
-{
-	int j;
-	if (uplo == 'U')
-		for (j = 0; j < n; x += (++j)+1)
-			(*x).i = 0.0;
-	else
-		for (j = 0; j < n; x += n-(j++))
-			(*x).i = 0.0;
-	return;
-}
+TEMPLATE(i)
+TEMPLATE(d)
+TEMPLATE(z)
 
-void zvreal(Rcomplex *x, R_xlen_t n)
+void zvreal(Rcomplex *x, size_t n)
 {
 	while (n--)
 		(*(x++)).i = 0.0;
 	return;
 }
 
-void zvimag(Rcomplex *x, R_xlen_t n)
+void zvimag(Rcomplex *x, size_t n)
 {
 	while (n--)
 		(*(x++)).r = 0.0;
 	return;
 }
 
-void zvconj(Rcomplex *x, R_xlen_t n)
+void zvconj(Rcomplex *x, size_t n)
 {
 	while (n--) {
 		(*x).i = -(*x).i;
@@ -622,5 +891,3 @@ void zvconj(Rcomplex *x, R_xlen_t n)
 	}
 	return;
 }
-
-#undef IDZ

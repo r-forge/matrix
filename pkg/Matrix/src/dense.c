@@ -10,65 +10,30 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
 	/* Need tri[ul](<0-by-0>) and tri[ul](<1-by-1>) to be triangularMatrix */
-	if (a <= 1 - m && b >= n - 1 &&
-	    (class[1] == 't' || m != n || m > 1 || n > 1))
+	if ((m == 0 || n == 0 || (a <= 1 - m && b >= n - 1)) &&
+	    (m != n || n > 1 || class[1] == 't'))
 		return from;
 
-	int ge = 0, sy = 0, tr = 0;
-	ge = m != n || !((tr = a >= 0 || b <= 0 || class[1] == 't') ||
-	                 (sy = a == -b && class[1] == 's'));
+	int ge, sy, tr;
+	tr = class[1] == 't' || (m == n && (a >= 0 || b <= 0));
+	sy = !tr && class[1] == 's' && a == -b;
+	ge = !tr && !sy;
 
-#define BAND_CASES(_DO_) \
-	do { \
-		switch (class[0]) { \
-		case 'n': \
-		case 'l': \
-			_DO_(i, int, LOGICAL); \
-			break; \
-		case 'i': \
-			_DO_(i, int, INTEGER); \
-			break; \
-		case 'd': \
-			_DO_(d, double, REAL); \
-			break; \
-		case 'z': \
-			_DO_(z, Rcomplex, COMPLEX); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-#define BAND(_PREFIX_, _CTYPE_, _PTR_) \
-	_PREFIX_ ## band2(_PTR_(x1), m, n, a, b)
-
-	if (class[1] != 'g' && ge) {
-		/* defined in ./coerce.c : */
-		SEXP dense_as_general(SEXP, const char *, int);
-		PROTECT(from = dense_as_general(from, class, 1));
-		SEXP x1 = PROTECT(GET_SLOT(from, Matrix_xSym));
-		BAND_CASES(BAND);
-		UNPROTECT(2); /* x1, from */
-		return from;
-	}
-
-	char ul0 = 'U', ul1 = 'U', ct = 'C', di = 'N';
+	char ul0 = '\0', ct = '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
-
-		if (class[1] == 's' && class[0] == 'z') {
-			SEXP trans = GET_SLOT(from, Matrix_transSym);
-			ct = CHAR(STRING_ELT(trans, 0))[0];
-		}
-
-		if (class[1] == 't') {
-			/* Be fast if band contains entire triangle */
-			if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (b >= 0 && a <= 1 - m))
-				return from;
-			SEXP diag = GET_SLOT(from, Matrix_diagSym);
-			di = CHAR(STRING_ELT(diag, 0))[0];
-		}
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		/* Be fast if band contains entire triangle */
+		if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (a <= 1 - m && b >= 0))
+			return from;
+		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	char cl[] = "...Matrix";
@@ -89,109 +54,70 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1;
-
-	if (class[1] == 'g' && ge) {
-		PROTECT(x1 = duplicate(x0));
-		if (ATTRIB(x1) != R_NilValue) {
-			SET_ATTRIB(x1, R_NilValue);
-			if (OBJECT(x1))
-				SET_OBJECT(x1, 0);
-		}
-		SET_SLOT(to, Matrix_xSym, x1);
-		BAND_CASES(BAND);
-		UNPROTECT(3); /* x1, x0, to */
-		return to;
-	}
-
-#undef BAND
-
-#define BAND(_PREFIX_, _CTYPE_, _PTR_) \
-	do { \
-		_CTYPE_ *px1 = _PTR_(x1); \
-		if (!packed) \
-			_PREFIX_ ## band2(px1, m, n, a, b); \
-		else \
-			_PREFIX_ ## band1(px1,    n, a, b, ul1); \
-	} while (0)
-
-#define DCOPY(_PREFIX_, _CTYPE_, _PTR_) \
-	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-		Matrix_memset(px1, 0, XLENGTH(x1), sizeof(_CTYPE_)); \
-		if (di == 'N' && a <= 0 && b >= 0) { \
-		if (!packed) \
-			_PREFIX_ ## dcopy2(px1, px0, n, XLENGTH(x1),      ul0, di); \
-		else \
-			_PREFIX_ ## dcopy1(px1, px0, n, XLENGTH(x1), ul1, ul0, di); \
-		} \
-	} while (0)
-
-#define TRANS(_PREFIX_, _CTYPE_, _PTR_) \
-	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-		if (!packed) \
-			_PREFIX_ ## trans2(px1, px0, m, n,      ct); \
-		else \
-			_PREFIX_ ## trans1(px1, px0,    n, ul0, ct); \
-	} while (0)
-
-	/* Returning .(sy|sp|tr|tp)Matrix ... */
-
-	ul1 = (class[1] == 't' || sy) ? ul0 : ((a >= 0) ? 'U' : 'L');
-	if (ul1 != 'U') {
+	char ul1 = (tr && class[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ul0;
+	if (ul1 != '\0' && ul1 != 'U') {
 		SEXP uplo = PROTECT(mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
-	if (ct != 'C' && sy) {
+	if (ct  != '\0' && ct  != 'C' && sy) {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (di != 'N' && tr && a <= 0 && b >= 0) {
+	if (di  != '\0' && di  != 'N' && tr && a <= 0 && b >= 0) {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
 
-	if (class[1] == 't') {
-		if ((ul0 == 'U') ? (b <= 0) : (a >= 0)) {
-			/* Result is either a diagonal matrix or a zero matrix : */
-			PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
-			BAND_CASES(DCOPY);
-		} else {
-			PROTECT(x1 = duplicate(x0));
-			BAND_CASES(BAND);
-		}
-	} else {
-		if (sy || (tr && (class[1] == 'g' || ul0 == ul1 || n <= 1))) {
-			PROTECT(x1 = duplicate(x0));
-			if (ATTRIB(x1) != R_NilValue) {
-				SET_ATTRIB(x1, R_NilValue);
-				if (OBJECT(x1))
-					SET_OBJECT(x1, 0);
-			}
-		} else {
-			/* Band is "opposite" the stored triangle : */
-			PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
-			BAND_CASES(TRANS);
-		}
-		BAND_CASES(BAND);
-		if (class[1] == 's' && class[0] == 'z' && ct == 'C' &&
-		    !sy && (a == 0 || b == 0)) {
-			if (!packed)
-				zdreal2(COMPLEX(x1), n);
-			else
-				zdreal1(COMPLEX(x1), n, ul1);
-		}
-	}
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
+		x1 = PROTECT(allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#undef BAND_CASES
+#define BAND(_PREFIX_, _CTYPE_, _PTR_) \
+	do { \
+		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		if (ge && class[1] != 'g') { \
+		if (!packed) \
+			_PREFIX_ ## force2(px1, px0, n, ul0, ct, di); \
+		else \
+			_PREFIX_ ##  pack1(px1, px0, n, ul0, ct, di); \
+		px0 = NULL; \
+		packed = 0;	\
+		} else if (tr && class[1] == 's' && ul0 != ul1) { \
+		if (!packed) \
+			_PREFIX_ ## trans2(px1, px0, m, n, ct); \
+		else \
+			_PREFIX_ ## trans1(px1, px0, n, ul0, ct); \
+		px0 = NULL; \
+		ul0 = ul1; \
+		} \
+		if (!packed) \
+			_PREFIX_ ## band2(px1, px0, m, n, a, b); \
+		else \
+			_PREFIX_ ## band1(px1, px0, n, ul0, a, b); \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n':
+	case 'l':
+		BAND(i, int, LOGICAL);
+		break;
+	case 'i':
+		BAND(i, int, INTEGER);
+		break;
+	case 'd':
+		BAND(d, double, REAL);
+		break;
+	case 'z':
+		BAND(z, Rcomplex, COMPLEX);
+		break;
+	default:
+		break;
+	}
+
 #undef BAND
-#undef DCOPY
-#undef TRANS
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -618,31 +544,26 @@ SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
 
 SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 {
-	char ul0 = 'U', ul1 = 'U', ct0 = 'C', ct1 = 'C', di = 'N';
+	char ul0 = '\0', ul1 = 'U', ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = ul1 = CHAR(STRING_ELT(uplo, 0))[0];
-		if (class[1] == 's' && class[0] == 'z') {
-			SEXP trans = GET_SLOT(from, Matrix_transSym);
-			ct0 = ct1 = CHAR(STRING_ELT(trans, 0))[0];
-		}
-		if (class[1] == 't') {
-			SEXP diag = GET_SLOT(from, Matrix_diagSym);
-			di = CHAR(STRING_ELT(diag, 0))[0];
-		}
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(from, Matrix_transSym);
+		ct0 = ct1 = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(from, Matrix_diagSym);
+		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 	if (ul != '\0')
 		ul1 = ul;
 	if (ct != '\0' && class[0] == 'z')
 		ct1 = ct;
 
-	if (class[1] == 's') {
-		if (ul0 != ul1)
-			from = dense_transpose(from, class, ct0);
-		if (ct0 == ct1 || class[0] != 'z')
-			return from;
-	}
-	PROTECT(from);
+	if (class[1] == 's' && ul0 == ul1 && (ct0 == ct1 || ct1 == 'C'))
+		return from;
 
 	int packed = class[2] == 'p';
 
@@ -679,19 +600,9 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		UNPROTECT(1); /* trans */
 	}
 
-	PROTECT_INDEX pid;
-	SEXP x0 = GET_SLOT(from, Matrix_xSym);
-	PROTECT_WITH_INDEX(x0, &pid);
-	if (class[1] == 's' && class[0] == 'z') {
-		if (ul0 == ul1)
-			REPROTECT(x0 = duplicate(x0), pid);
-		if (!packed)
-			zdreal2(COMPLEX(x0), n);
-		else
-			zdreal1(COMPLEX(x0), n, ul1);
-	}
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 
-	if (class[1] == 'g' || class[1] == 's' || (ul0 == ul1 && di == 'N'))
+	if (class[1] == 'g' || (class[0] == 't' && ul0 == ul1 && di == 'N'))
 		SET_SLOT(to, Matrix_xSym, x0);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
@@ -700,14 +611,14 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 #define FORCE(_PREFIX_, _CTYPE_, _PTR_) \
 		do { \
 			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-			if (ul0 == ul1) \
-				Matrix_memcpy(px1, px0, XLENGTH(x1), sizeof(_CTYPE_)); \
-			else \
-				Matrix_memset(px1,   0, XLENGTH(x1), sizeof(_CTYPE_)); \
 			if (!packed) \
-				_PREFIX_ ## dcopy2(px1, px0, n, XLENGTH(x0),      ul0, di); \
-			else \
-				_PREFIX_ ## dcopy1(px1, px0, n, XLENGTH(x0), ul1, ul0, di); \
+				_PREFIX_ ## force2(px1, px0, n, ul0, ct0, di); \
+			else if (ul0 == ul1) \
+				_PREFIX_ ## force1(px1, px0, n, ul0, ct0, di); \
+			else { \
+				_PREFIX_ ## trans1(px1, px0, n, ul0, ct0); \
+				_PREFIX_ ## force1(px1, NULL, n, ul1, ct0, di); \
+			} \
 		} while (0)
 
 		switch (class[0]) {
@@ -733,7 +644,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		UNPROTECT(1); /* x1 */
 	}
 
-	UNPROTECT(3); /* x0, to, from */
+	UNPROTECT(2); /* x0, to */
 	return to;
 }
 
@@ -804,7 +715,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = 'U';
+	char ul = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -819,7 +730,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		UNPROTECT(1); /* trans */
 	}
 
-	char di = 'N';
+	char di = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
@@ -860,7 +771,8 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 				} \
 				px = (py += j + 2); \
 			} \
-		} else if (ul == 'U') { \
+		} else { \
+			if (ul == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < j; ++i) { \
 					_SCALE1_((*px), 0.5); \
@@ -868,7 +780,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 				} \
 				px += (!packed) ? n - j : 1; \
 			} \
-		} else { \
+			} else { \
 			for (j = 0; j < n; ++j) { \
 				px += (!packed) ? j + 1 : 1; \
 				for (i = j + 1; i < n; ++i) { \
@@ -876,12 +788,11 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 					px += 1; \
 				} \
 			} \
-		} \
-		if (di != 'N') { \
-		if (!packed) \
-			_PREFIX_ ## dcopy2(_PTR_(x), NULL, n, -1,     'U', di); \
-		else \
-			_PREFIX_ ## dcopy1(_PTR_(x), NULL, n, -1, ul, 'U', di); \
+			} \
+			if (!packed) \
+				_PREFIX_ ## force2(_PTR_(x), NULL, n, ul, '\0', di); \
+			else \
+				_PREFIX_ ## force1(_PTR_(x), NULL, n, ul, '\0', di); \
 		} \
 	} while (0)
 
@@ -1100,7 +1011,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
                        int exact, char ct, int checkDN)
 {
 	exact = exact || class[0] == 'n' || class[0] == 'l' || class[0] == 'i';
-	
+
 	if (class[1] == 's') {
 		if (class[0] != 'z')
 			return 1;

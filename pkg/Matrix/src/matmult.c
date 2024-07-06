@@ -154,7 +154,7 @@ do { \
 #define CONJ1(_X_, _N_) \
 do { \
 	int n = (int) _N_; \
-	size_t mn = (size_t) PACKED_LENGTH(n); \
+	size_t mn = PACKED_LENGTH((size_t) n); \
 	Rcomplex *dest = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
 	Rcomplex *src = (Rcomplex *) _X_; \
 	for (size_t k = 0; k < mn; ++k) \
@@ -405,7 +405,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	prx += rincp;
 	}
 	if (aside != 'L' && btrans == 'C')
-		zvconj(pax, (R_xlen_t) rk * rk); /* in place */
+		zvconj(pax, (size_t) rk * rk); /* in place */
 	}
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
@@ -522,7 +522,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : act)) == 'C')
-		zvconj(prx, (R_xlen_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * rn); /* in place */
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
 		zero = 0.0, one = 1.0;
@@ -719,7 +719,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 		CONJ1(pax, rk);
 	ztrans2(prx, pbx, bm, bn, btransp);
 	if (aside != 'L' && atrans == 'C' && btrans == 'N')
-		zvconj(prx, (R_xlen_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * rn); /* in place */
 	for (i = 0; i < rn; ++i) {
 	F77_CALL(ztpmv)(&aul, &atransp, &adi, &rk,
 	                pax, prx, &rinc FCONE FCONE FCONE);
@@ -727,7 +727,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : 'T')) == 'C')
-		zvconj(prx, (R_xlen_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * rn); /* in place */
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx);
 	dtrans2(prx, pbx, bm, bn, btransp);
@@ -1307,9 +1307,11 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 		} \
 		if (di != '\0' && di != 'N') { \
 			if (!packed) \
-				_PREFIX_ ## dcopy2(_PTR_(x), pd, n, n,     'U', 'N'); \
+				_PREFIX_ ## copy2(n, _PTR_(x), (ptrdiff_t) n + 1, pd, 1); \
+			else if (ul == 'U') \
+				_PREFIX_ ## copy1(n, _PTR_(x), 2,  1, pd, 1, 0); \
 			else \
-				_PREFIX_ ## dcopy1(_PTR_(x), pd, n, n, ul, 'U', 'N'); \
+				_PREFIX_ ## copy1(n, _PTR_(x), n, -1, pd, 1, 0); \
 		} \
 	} while (0)
 

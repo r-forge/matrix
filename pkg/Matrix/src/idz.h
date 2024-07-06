@@ -3,90 +3,68 @@
 
 #include <Rinternals.h>
 
-#define IDZ \
-TEMPLATE(i,      int); \
-TEMPLATE(d,   double); \
-TEMPLATE(z, Rcomplex);
+void iswap2(size_t,      int *, ptrdiff_t,      int *, ptrdiff_t);
+void dswap2(size_t,   double *, ptrdiff_t,   double *, ptrdiff_t);
+void zswap2(size_t, Rcomplex *, ptrdiff_t, Rcomplex *, ptrdiff_t);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-rowperm2(_CTYPE_ *, int, int, int *, int, int)
-IDZ
-#undef TEMPLATE
+void iswap1(size_t,      int *, ptrdiff_t, ptrdiff_t,      int *, ptrdiff_t, ptrdiff_t);
+void dswap1(size_t,   double *, ptrdiff_t, ptrdiff_t,   double *, ptrdiff_t, ptrdiff_t);
+void zswap1(size_t, Rcomplex *, ptrdiff_t, ptrdiff_t, Rcomplex *, ptrdiff_t, ptrdiff_t);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-symperm2(_CTYPE_ *, int, char, int *, int, int)
-IDZ
-#undef TEMPLATE
+void icopy2(size_t,      int *, ptrdiff_t, const      int *, ptrdiff_t);
+void dcopy2(size_t,   double *, ptrdiff_t, const   double *, ptrdiff_t);
+void zcopy2(size_t, Rcomplex *, ptrdiff_t, const Rcomplex *, ptrdiff_t);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-pack2(_CTYPE_ *, const _CTYPE_ *, int, char, char)
-IDZ
-#undef TEMPLATE
+void icopy1(size_t,      int *, ptrdiff_t, ptrdiff_t, const      int *, ptrdiff_t, ptrdiff_t);
+void dcopy1(size_t,   double *, ptrdiff_t, ptrdiff_t, const   double *, ptrdiff_t, ptrdiff_t);
+void zcopy1(size_t, Rcomplex *, ptrdiff_t, ptrdiff_t, const Rcomplex *, ptrdiff_t, ptrdiff_t);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-unpack1(_CTYPE_ *, const _CTYPE_ *, int, char, char)
-IDZ
-#undef TEMPLATE
+void irowperm2(     int *, const      int *, int, int, const int *, int, int);
+void drowperm2(  double *, const   double *, int, int, const int *, int, int);
+void zrowperm2(Rcomplex *, const Rcomplex *, int, int, const int *, int, int);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-trans2(_CTYPE_ *, const _CTYPE_ *, int, int, char)
-IDZ
-#undef TEMPLATE
+void isymperm2(     int *, const      int *, int, char, const int *, int, int);
+void dsymperm2(  double *, const   double *, int, char, const int *, int, int);
+void zsymperm2(Rcomplex *, const Rcomplex *, int, char, const int *, int, int);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-trans1(_CTYPE_ *, const _CTYPE_ *, int, char, char)
-IDZ
-#undef TEMPLATE
+void isymperm1(     int *, const      int *, int, char, const int *, int, int);
+void dsymperm1(  double *, const   double *, int, char, const int *, int, int);
+void zsymperm1(Rcomplex *, const Rcomplex *, int, char, const int *, int, int);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-syforce2(_CTYPE_ *, int, char, char)
-IDZ
-#undef TEMPLATE
+void ipack2(     int *, const      int *, size_t, char, char, char);
+void dpack2(  double *, const   double *, size_t, char, char, char);
+void zpack2(Rcomplex *, const Rcomplex *, size_t, char, char, char);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-trforce2(_CTYPE_ *, int, int, char, char)
-IDZ
-#undef TEMPLATE
+void ipack1(     int *, const      int *, size_t, char, char, char);
+void dpack1(  double *, const   double *, size_t, char, char, char);
+void zpack1(Rcomplex *, const Rcomplex *, size_t, char, char, char);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-band2(_CTYPE_ *, int, int, int, int)
-IDZ
-#undef TEMPLATE
+void iforce2(     int *, const      int *, size_t, char, char, char);
+void dforce2(  double *, const   double *, size_t, char, char, char);
+void zforce2(Rcomplex *, const Rcomplex *, size_t, char, char, char);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-band1(_CTYPE_ *, int, int, int, char)
-IDZ
-#undef TEMPLATE
+void iforce1(     int *, const      int *, size_t, char, char, char);
+void dforce1(  double *, const   double *, size_t, char, char, char);
+void zforce1(Rcomplex *, const Rcomplex *, size_t, char, char, char);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-dcopy2(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char)
-IDZ
-#undef TEMPLATE
+void itrans2(     int *, const      int *, size_t, size_t, char);
+void dtrans2(  double *, const   double *, size_t, size_t, char);
+void ztrans2(Rcomplex *, const Rcomplex *, size_t, size_t, char);
 
-#define TEMPLATE(_PREFIX_, _CTYPE_) \
-void _PREFIX_ ## \
-dcopy1(_CTYPE_ *, const _CTYPE_ *, int, R_xlen_t, char, char, char)
-IDZ
-#undef TEMPLATE
+void itrans1(     int *, const      int *, size_t, char, char);
+void dtrans1(  double *, const   double *, size_t, char, char);
+void ztrans1(Rcomplex *, const Rcomplex *, size_t, char, char);
 
-void zdreal2(Rcomplex *, int);
-void zdreal1(Rcomplex *, int, char);
+void iband2(     int *, const      int *, size_t, size_t, ptrdiff_t, ptrdiff_t);
+void dband2(  double *, const   double *, size_t, size_t, ptrdiff_t, ptrdiff_t);
+void zband2(Rcomplex *, const Rcomplex *, size_t, size_t, ptrdiff_t, ptrdiff_t);
 
-void zvreal(Rcomplex *, R_xlen_t);
-void zvimag(Rcomplex *, R_xlen_t);
-void zvconj(Rcomplex *, R_xlen_t);
+void iband1(     int *, const      int *, size_t, char, ptrdiff_t, ptrdiff_t);
+void dband1(  double *, const   double *, size_t, char, ptrdiff_t, ptrdiff_t);
+void zband1(Rcomplex *, const Rcomplex *, size_t, char, ptrdiff_t, ptrdiff_t);
 
-#undef IDZ
+void zvreal(Rcomplex *, size_t);
+void zvimag(Rcomplex *, size_t);
+void zvconj(Rcomplex *, size_t);
 
 #endif /* MATRIX_IDZ_H */

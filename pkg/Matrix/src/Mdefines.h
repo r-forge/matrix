@@ -216,11 +216,11 @@ Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
 #define PACKED_AR21_UP(i, j) \
-	((R_xlen_t) ((i) + ((int_fast64_t) (j) * (       (j) + 1)) / 2))
-#define PACKED_AR21_LO(i, j, m2) \
-	((R_xlen_t) ((i) + ((int_fast64_t) (j) * ((m2) - (j) - 1)) / 2))
-#define PACKED_LENGTH(m) \
-	((R_xlen_t) ((m) + ((int_fast64_t) (m) * (       (m) - 1)) / 2))
+	((i) + ((j) * (            (j) + 1U)) / 2U)
+#define PACKED_AR21_LO(i, j, n) \
+	((i) + ((j) * ((n) - (j) - 1U + (n))) / 2U)
+#define PACKED_LENGTH(n) \
+	((n) + ((n) * (            (n) - 1U)) / 2U)
 
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)

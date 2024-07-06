@@ -290,57 +290,42 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 		SEXP rx, aperm = PROTECT(getAttrib(s_a, Matrix_permSym));
 		int info, pivoted = TYPEOF(aperm) == INTSXP && LENGTH(aperm) > 0;
 		if (isNull(s_b)) {
-			rx = duplicate(ax);
-			PROTECT(rx);
+			PROTECT(rx = allocVector(TYPEOF(ax), XLENGTH(ax)));
 			if (TYPEOF(ax) == CPLXSXP) {
 			if (!packed) {
+				memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * m * m);
 				F77_CALL(zpotri)(&aul, &m, COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(zpotri, info, 2, L);
-				if (pivoted)
-					zsymperm2(COMPLEX(rx), n, aul, INTEGER(aperm), 1, 1);
+				zsymperm2(COMPLEX(rx), NULL,
+				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			} else {
+				memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * PACKED_LENGTH((size_t) m));
 				F77_CALL(zpptri)(&aul, &m, COMPLEX(rx),     &info FCONE);
 				ERROR_LAPACK_2(zpptri, info, 2, L);
-				if (pivoted) {
-					/* FIXME: zsymperm2 supporting packed matrices */
-					Rcomplex *work;
-					size_t lwork = (size_t) n * n;
-					Matrix_Calloc(work, lwork, Rcomplex);
-					zunpack1 (work, COMPLEX(rx), n, aul, 'N');
-					zsymperm2(work, n, aul, INTEGER(aperm), 1, 1);
-					zpack2   (COMPLEX(rx), work, n, aul, 'N');
-					Matrix_Free(work, lwork);
-				}
+				zsymperm1(COMPLEX(rx), NULL,
+				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			}
 			} else {
 			if (!packed) {
+				memcpy(   REAL(rx),    REAL(ax), sizeof(  double) * m * m);
 				F77_CALL(dpotri)(&aul, &m,    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
-				if (pivoted)
-					dsymperm2(   REAL(rx), n, aul, INTEGER(aperm), 1, 1);
+				dsymperm2(   REAL(rx), NULL,
+				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			} else {
+				memcpy(   REAL(rx),    REAL(ax), sizeof(  double) * PACKED_LENGTH((size_t) m));
 				F77_CALL(dpptri)(&aul, &m,    REAL(rx),     &info FCONE);
 				ERROR_LAPACK_2(dpptri, info, 2, L);
-				if (pivoted) {
-					/* FIXME: dsymperm2 supporting packed matrices */
-					double *work;
-					size_t lwork = (size_t) n * n;
-					Matrix_Calloc(work, lwork, double);
-					dunpack1 (work,    REAL(rx), n, aul, 'N');
-					dsymperm2(work, n, aul, INTEGER(aperm), 1, 1);
-					dpack2   (   REAL(rx), work, n, aul, 'N');
-					Matrix_Free(work, lwork);
-				}
+				dsymperm1(   REAL(rx), NULL,
+				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			}
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
-			rx = duplicate(bx);
-			UNPROTECT(1); /* bx */
-			PROTECT(rx);
+			PROTECT(rx = allocVector(TYPEOF(ax), XLENGTH(bx)));
 			if (TYPEOF(ax) == CPLXSXP) {
-			if (pivoted)
-				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 0);
+			zrowperm2(COMPLEX(rx), COMPLEX(bx),
+			          m, n, (pivoted) ? INTEGER(aperm) : NULL, 1, 0);
 			if (!packed) {
 				F77_CALL(zpotrs)(&aul, &m, &n, COMPLEX(ax), &m,
 				                 COMPLEX(rx), &m, &info FCONE);
@@ -350,11 +335,11 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 				                 COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(zpptrs, info);
 			}
-			if (pivoted)
-				zrowperm2(COMPLEX(rx), m, n, INTEGER(aperm), 1, 1);
+			zrowperm2(COMPLEX(rx), NULL,
+			          m, n, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			} else {
-			if (pivoted)
-				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 0);
+			drowperm2(   REAL(rx),    REAL(bx),
+			          m, n, (pivoted) ? INTEGER(aperm) : NULL, 1, 0);
 			if (!packed) {
 				F77_CALL(dpotrs)(&aul, &m, &n,    REAL(ax), &m,
 				                    REAL(rx), &m, &info FCONE);
@@ -364,9 +349,10 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 				                    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_1(dpptrs, info);
 			}
-			if (pivoted)
-				drowperm2(   REAL(rx), m, n, INTEGER(aperm), 1, 1);
+			drowperm2(   REAL(rx), NULL,
+			          m, n, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			}
+			UNPROTECT(1); /* bx */
 		}
 		SET_SLOT(r, Matrix_xSym, rx);
 		UNPROTECT(2); /* rx, aperm */
