@@ -64,7 +64,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
 
-#define VAD(c, ...) \
+#define VAD(c) \
 	do { \
 		c##TYPE *dest = c##PTR(x), *src = c##PTR(from); \
 		if (r == 0) { \
@@ -402,7 +402,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		PROTECT(x = allocVector(tt, mn));
 		++nprotect;
 
-#define MAD(c, ...) memcpy(c##PTR(x), c##PTR(from), sizeof(c##TYPE) * mn)
+#define MAD(c) memcpy(c##PTR(x), c##PTR(from), sizeof(c##TYPE) * mn)
 
 		SWITCH4(cl[0], MAD);
 
@@ -415,7 +415,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		PROTECT(x = allocVector(tt, n + (mn - n) / 2));
 		++nprotect;
 
-#define MAD(c, ...) c##NAME(pack2)(c##PTR(x), c##PTR(from), n, ul, '\0', 'N')
+#define MAD(c) c##NAME(pack2)(c##PTR(x), c##PTR(from), n, ul, '\0', 'N')
 
 		SWITCH4(cl[0], MAD);
 
@@ -561,7 +561,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		pj = INTEGER(j0);
 	}
 
-#define SAD(c, ...) \
+#define SAD(c) \
 	do { \
 		c##IF_NPATTERN( \
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
@@ -767,7 +767,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) lengthout));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define DAD(c, ...) \
+#define DAD(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
@@ -864,7 +864,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) lengthout));
 	SET_SLOT(to, Matrix_xSym, x);
 
-#define IAD(c, ...) \
+#define IAD(c) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
 		memset(px, 0, sizeof(c##TYPE) * (R_xlen_t) lengthout); \

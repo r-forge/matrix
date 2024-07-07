@@ -507,7 +507,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
 
-#define BIND(c, ...) \
+#define BIND(c) \
 		do { \
 			SEXP x = PROTECT(allocVector(c##TYPESXP, mn)); \
 			c##TYPE *px = c##PTR(x), *ps; \
@@ -614,7 +614,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int *pi = INTEGER(i), *psi;
 		SET_SLOT(ans, iSym, i);
 
-#define BIND(c, ...) \
+#define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx; \
@@ -696,7 +696,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		Matrix_Calloc(work, n, int);
 		memcpy(work, pp, sizeof(int) * n);
 
-#define BIND(c, ...) \
+#define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
@@ -770,7 +770,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		SET_SLOT(ans, Matrix_iSym, i);
 		SET_SLOT(ans, Matrix_jSym, j);
 
-#define BIND(c, ...) \
+#define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
