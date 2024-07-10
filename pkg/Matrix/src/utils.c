@@ -152,7 +152,7 @@ int equalString(SEXP s1, SEXP s2, R_xlen_t n)
 		s1_ = STRING_ELT(s1, j);
 		s2_ = STRING_ELT(s2, j);
 		if ((s1_ == NA_STRING) != (s2_ == NA_STRING) ||
-		    strcmp(CHAR(s1_), CHAR(s1_)) != 0)
+		    strcmp(CHAR(s1_), CHAR(s2_)) != 0)
 			return 0;
 	}
 	return 1;
