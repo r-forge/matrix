@@ -11,6 +11,10 @@ void *Matrix_memcpy(void *, const void *, R_xlen_t, size_t);
 char *Matrix_sprintf(const char *, ...);
 
 int equalString(SEXP, SEXP, R_xlen_t);
+SEXP duplicateVector(SEXP);
+SEXP allocZero(SEXPTYPE, R_xlen_t);
+SEXP allocUnit(SEXPTYPE, R_xlen_t);
+SEXP allocSeqInt(int, R_xlen_t);
 void naToOne(SEXP);
 
 #endif /* MATRIX_UTILS_H */

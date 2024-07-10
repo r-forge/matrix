@@ -158,6 +158,115 @@ int equalString(SEXP s1, SEXP s2, R_xlen_t n)
 	return 1;
 }
 
+SEXP duplicateVector(SEXP x)
+{
+	SEXPTYPE type = TYPEOF(x);
+	R_xlen_t length = XLENGTH(x);
+	SEXP ans = allocVector(type, length);
+	switch (type) {
+	case RAWSXP:
+		memcpy(    RAW(ans),     RAW(x), sizeof(   Rbyte) * length);
+		break;
+	case LGLSXP:
+		memcpy(LOGICAL(ans), LOGICAL(x), sizeof(     int) * length);
+		break;
+	case INTSXP:
+		memcpy(INTEGER(ans), INTEGER(x), sizeof(     int) * length);
+		break;
+	case REALSXP:
+		memcpy(   REAL(ans),    REAL(x), sizeof(  double) * length);
+		break;
+	case CPLXSXP:
+		memcpy(COMPLEX(ans), COMPLEX(x), sizeof(Rcomplex) * length);
+		break;
+	default:
+		break;
+	}
+	return ans;
+}
+
+SEXP allocZero(SEXPTYPE type, R_xlen_t length)
+{
+	SEXP ans = allocVector(type, length);
+	switch (type) {
+	case RAWSXP:
+		memset(    RAW(ans), 0, sizeof(   Rbyte) * length);
+		break;
+	case LGLSXP:
+		memset(LOGICAL(ans), 0, sizeof(     int) * length);
+		break;
+	case INTSXP:
+		memset(INTEGER(ans), 0, sizeof(     int) * length);
+		break;
+	case REALSXP:
+		memset(   REAL(ans), 0, sizeof(  double) * length);
+		break;
+	case CPLXSXP:
+		memset(COMPLEX(ans), 0, sizeof(Rcomplex) * length);
+		break;
+	default:
+		break;
+	}
+	return ans;
+}
+
+SEXP allocUnit(SEXPTYPE type, R_xlen_t length)
+{
+	SEXP ans = allocVector(type, length);
+	R_xlen_t i;
+	switch (type) {
+	case RAWSXP:
+	{
+		Rbyte *pans = RAW(ans);
+		for (i = 0; i < length; ++i)
+			*(pans++) = 1;
+		break;
+	}
+	case LGLSXP:
+	{
+		int *pans = LOGICAL(ans);
+		for (i = 0; i < length; ++i)
+			*(pans++) = 1;
+		break;
+	}
+	case INTSXP:
+	{
+		int *pans = INTEGER(ans);
+		for (i = 0; i < length; ++i)
+			*(pans++) = 1;
+		break;
+	}
+	case REALSXP:
+	{
+		double *pans = REAL(ans);
+		for (i = 0; i < length; ++i)
+			*(pans++) = 1.0;
+		break;
+	}
+	case CPLXSXP:
+	{
+		Rcomplex *pans = COMPLEX(ans);
+		Rcomplex u; tmp.r = 1.0; tmp.i = 0.0;
+		for (i = 0; i < length; ++i)
+			*(pans++) = u;
+		break;
+	}
+	default:
+		break;
+	}
+	return ans;
+}
+
+SEXP allocSeqInt(int from, R_xlen_t length)
+{
+	SEXP ans = allocVector(INTSXP, length);
+	int *pans = INTEGER(ans);
+	R_xlen_t i;
+	for (i = 0; i < length; ++i)
+		*(pans++) = from++;
+	return ans;
+}
+
 void naToOne(SEXP x)
 {
 	R_xlen_t i, n = XLENGTH(x);
