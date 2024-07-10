@@ -146,7 +146,6 @@ char *Matrix_sprintf(const char *format, ...)
 
 int equalString(SEXP s1, SEXP s2, R_xlen_t n)
 {
-	/* FIXME? not distinguishing between NA_STRING and "NA" */
 	SEXP s1_, s2_;
 	R_xlen_t j;
 	for (j = 0; j < n; ++j) {
