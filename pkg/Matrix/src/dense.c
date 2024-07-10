@@ -208,6 +208,9 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 
 	switch (class[0]) {
 	case 'n':
+		DG_LOOP(int, LOGICAL, 1);
+		naToUnit(ans);
+		break;
 	case 'l':
 		DG_LOOP(int, LOGICAL, 1);
 		break;

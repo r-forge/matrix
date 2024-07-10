@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-07-10 r4800)}{
+\section{Changes in version 1.8-0 (2024-07-11 r4808)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -45,6 +45,9 @@
       \code{check.class = FALSE} to \code{all.equal.numeric}.  Methods
       for \code{isSymmetric(<[dz]sparseMatrix>)} consistently require
       a symmetric nonzero pattern.
+
+      \item \code{diag(<ndenseMatrix>)} replaces \code{NA} with
+      \code{TRUE}.
     }
   }
   \subsection{Misc}{
