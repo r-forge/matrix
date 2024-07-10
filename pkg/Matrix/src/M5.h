@@ -131,19 +131,19 @@
 #define lSET_CONJ(x)
 #define iSET_CONJ(x)
 #define dSET_CONJ(x)
-#define zSET_CONJ(x) ((x).i = -(x).i, (x))
+#define zSET_CONJ(x) ((x).i = -(x).i)
 
 #define nSET_PROJ_REAL(x)
 #define lSET_PROJ_REAL(x)
 #define iSET_PROJ_REAL(x)
 #define dSET_PROJ_REAL(x)
-#define zSET_PROJ_REAL(x) ((x).i = 0.0, (x))
+#define zSET_PROJ_REAL(x) ((x).i = 0.0)
 
 #define nSET_PROJ_IMAG(x) ((x) = 0)
 #define lSET_PROJ_IMAG(x) ((x) = 0)
 #define iSET_PROJ_IMAG(x) ((x) = 0)
 #define dSET_PROJ_IMAG(x) ((x) = 0.0)
-#define zSET_PROJ_IMAG(x) ((x).r = 0.0, (x))
+#define zSET_PROJ_IMAG(x) ((x).r = 0.0)
 
 #define nASSIGN_IDEN(x, y) ((x) = (y))
 #define lASSIGN_IDEN(x, y) ((x) = (y))
@@ -155,19 +155,19 @@
 #define lASSIGN_CONJ(x, y) ((x) = (y))
 #define iASSIGN_CONJ(x, y) ((x) = (y))
 #define dASSIGN_CONJ(x, y) ((x) = (y))
-#define zASSIGN_CONJ(x, y) ((x).r = (y).r, (x).i = -(y).i, (x))
+#define zASSIGN_CONJ(x, y) ((x).r = (y).r, (x).i = -(y).i)
 
 #define nASSIGN_PROJ_REAL(x, y) ((x) = (y))
 #define lASSIGN_PROJ_REAL(x, y) ((x) = (y))
 #define iASSIGN_PROJ_REAL(x, y) ((x) = (y))
 #define dASSIGN_PROJ_REAL(x, y) ((x) = (y))
-#define zASSIGN_PROJ_REAL(x, y) ((x).r = (y).r, (x).i = 0.0, (x))
+#define zASSIGN_PROJ_REAL(x, y) ((x).r = (y).r, (x).i = 0.0)
 
 #define nASSIGN_PROJ_IMAG(x, y) ((x) = 0)
 #define lASSIGN_PROJ_IMAG(x, y) ((x) = 0)
 #define iASSIGN_PROJ_IMAG(x, y) ((x) = 0)
 #define dASSIGN_PROJ_IMAG(x, y) ((x) = 0.0)
-#define zASSIGN_PROJ_IMAG(x, y) ((x).r = 0.0, (x).i = (y).i, (x))
+#define zASSIGN_PROJ_IMAG(x, y) ((x).r = 0.0, (x).i = (y).i)
 
 #define nINCREMENT_IDEN(x, y) \
 	do { \
