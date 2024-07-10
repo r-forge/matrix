@@ -504,10 +504,10 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	if (class[2] != 'C' && packed && mn > R_XLEN_T_MAX)
 		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
 		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
-	double nbytes = (double) lengthout * kindToSize(cl[0]);
-	if (nbytes > 0x1.0p+30 /* 1 GiB */)
+	double bytes = (double) lengthout * kindToSize(cl[0]);
+	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * nbytes);
+		        0x1.0p-30 * bytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -674,7 +674,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	SWITCH5(class[0], SAD);
 
 #undef SAD
-		
+
 	UNPROTECT(nprotect);
 	return to;
 }
@@ -719,10 +719,10 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double nbytes = (double) lengthout * kindToSize(cl[0]);
-	if (nbytes > 0x1.0p+30 /* 1 GiB */)
+	double bytes = (double) lengthout * kindToSize(cl[0]);
+	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * nbytes);
+		        0x1.0p-30 * bytes);
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -846,10 +846,10 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	if (lengthout > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double nbytes = (double) lengthout * kindToSize(cl[0]);
-	if (nbytes > 0x1.0p+30 /* 1 GiB */)
+	double bytes = (double) lengthout * kindToSize(cl[0]);
+	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * nbytes);
+		        0x1.0p-30 * bytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -916,7 +916,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		((TYPEOF(length0) == INTSXP) ? INTEGER(length0)[0] : REAL(length0)[0]);
 
 	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-		x0 = getAttrib(from, Matrix_xSym);
+		x0 = PROTECT(getAttrib(from, Matrix_xSym));
 
 	SEXPTYPE tf = TYPEOF(x0);
 	char cl[] = "...Matrix";
@@ -930,12 +930,11 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		cl[0] = 'd';
 #endif
 	SEXPTYPE tt = kindToType(cl[0]);
-	if (x0 != R_NilValue) {
-		PROTECT(x0);
+	if (x0 != R_NilValue && cl[0] != 'n') {
 		x0 = coerceVector(x0, tt);
 		UNPROTECT(1); /* x0 */
+		PROTECT(x0);
 	}
-	PROTECT(x0);
 
 	if (cl[1] != 'g' && m != n)
 		error(_("attempt to construct non-square %s"),
@@ -972,28 +971,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 	int_fast64_t pos, mn = (int_fast64_t) m * n, nnz1 = 0;
 	R_xlen_t k = 0, nnz0 = XLENGTH(i0);
 
-#define VAS_SUBCASES(...) \
+#define VAS__(d) \
 	do { \
-		switch (TYPEOF(i0)) { \
-		case INTSXP: \
-		{ \
-			int *pi0 = INTEGER(i0); \
-			VAS_SUBSUBCASES(__VA_ARGS__); \
-			break; \
-		} \
-		case REALSXP: \
-		{ \
-			double *pi0 = REAL(i0); \
-			VAS_SUBSUBCASES(__VA_ARGS__); \
-			break; \
-		} \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-#define VAS_SUBSUBCASES() \
-	do { \
+		d##TYPE *pi0 = d##PTR(i0); \
 		if (nnz0 == 0) \
 			/* do nothing */ ; \
 		else if (cl[1] == 'g') { \
@@ -1013,7 +993,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		} \
 		else if (cl[1] == 's' || cl[1] == 'p' || di == 'N') { \
 			if (r == 0) \
-				nnz1 = (mn + n) / 2; \
+				nnz1 = n + (mn - n) / 2; \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
 				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
@@ -1083,9 +1063,12 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		} \
 	} while (0)
 
-	VAS_SUBCASES();
+	if (TYPEOF(i0) == INTSXP)
+		VAS__(i);
+	else
+		VAS__(d);
 
-#undef VAS_SUBSUBCASES
+#undef VAS__
 
 	if (nnz1 > INT_MAX)
 		error(_("attempt to construct %s with more than %s nonzero entries"),
@@ -1098,13 +1081,19 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
 	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1);
-	memset(pp1 - 1, 0, sizeof(int) * ((R_xlen_t) n + 1));
+	memset(pp1 - 1, 0, sizeof(int) * ((R_xlen_t) n_ + 1));
 	k = 0;
 
-#define VAS_SUBSUBCASES(_MASK0_, _MASK1_, _REPLACE_, _CTYPE_, _PTR_, _ONE_, _NA_) \
+#define VAS__(d, c0, c1) \
 	do { \
-		_MASK0_(_CTYPE_ *px0 = _PTR_(x0)); \
-		_MASK1_(_CTYPE_ *px1 = _PTR_(x1)); \
+		d ##TYPE *pi0 = d ##PTR(i0); \
+		c0##IF_NPATTERN( \
+		c0##TYPE *px0 = c0##PTR(x0); \
+		); \
+		c1##IF_NPATTERN( \
+		SEXP x1 = PROTECT(allocVector(c1##TYPESXP, nnz1)); \
+		c1##TYPE *px1 = c1##PTR(x1); \
+		); \
 		if (nnz1 == 0) \
 			/* do nothing */ ; \
 		else if (cl[1] == 'g') { \
@@ -1113,7 +1102,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					pp1[j_] = m; \
 					for (i_ = 0; i_ < m_; ++i_) { \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _NA_); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c1##NA; \
+						); \
 					} \
 				} \
 			} \
@@ -1121,7 +1112,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
 					++pp1[pos / m_]; \
 					*(pi1++) = pos % m_; \
-					_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+					c1##IF_NPATTERN( \
+					*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+					); \
 					++k; \
 				} \
 			} \
@@ -1132,7 +1125,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
 						++pp1[pos / m_]; \
 						*(pi1++) = pos % m_; \
-						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 						++k; \
 					} \
 					a += r; \
@@ -1146,7 +1141,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					pp1[j_] = j_ + 1; \
 					for (i_ = 0; i_ <= j_; ++i_) { \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _NA_); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c1##NA; \
+						); \
 					} \
 				} \
 				} else { \
@@ -1154,7 +1151,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					pp1[j_] = n_ - j_; \
 					for (i_ = j_; i_ < n_; ++i_) { \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _NA_); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c1##NA; \
+						); \
 					} \
 				} \
 				} \
@@ -1165,7 +1164,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					if ((i_ = pos % n_) <= (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
 					++k; \
 				} \
@@ -1174,7 +1175,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					if ((i_ = pos % n_) >= (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
 					++k; \
 				} \
@@ -1189,7 +1192,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						if ((i_ = pos % n) <= (j_ = pos / n)) { \
 							++pp1[j_]; \
 							*(pi1++) = i_; \
-							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+							c1##IF_NPATTERN( \
+							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+							); \
 						} \
 						++k; \
 					} \
@@ -1202,7 +1207,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						if ((i_ = pos % n) >= (j_ = pos / n)) { \
 							++pp1[j_]; \
 							*(pi1++) = i_; \
-							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+							c1##IF_NPATTERN( \
+							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+							); \
 						} \
 						++k; \
 					} \
@@ -1218,7 +1225,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					pp1[j_] = j_; \
 					for (i_ = 0; i_ < j_; ++i_) { \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _NA_); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c1##NA; \
+						); \
 					} \
 				} \
 				} else { \
@@ -1226,7 +1235,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					pp1[j_] = n_ - j_ - 1; \
 					for (i_ = j_ + 1; i_ < n_; ++i_) { \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _NA_); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c1##NA; \
+						); \
 					} \
 				} \
 				} \
@@ -1237,7 +1248,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					if ((i_ = pos % n_) < (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
 					++k; \
 				} \
@@ -1246,7 +1259,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					if ((i_ = pos % n_) > (j_ = pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
-						_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
 					++k; \
 				} \
@@ -1261,7 +1276,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						if ((i_ = pos % n) < (j_ = pos / n)) { \
 							++pp1[j_]; \
 							*(pi1++) = i_; \
-							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+							c1##IF_NPATTERN( \
+							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+							); \
 						} \
 						++k; \
 					} \
@@ -1274,7 +1291,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						if ((i_ = pos % n) > (j_ = pos / n)) { \
 							++pp1[j_]; \
 							*(pi1++) = i_; \
-							_MASK1_(*(px1++) = _REPLACE_(px0[k], _ONE_)); \
+							c1##IF_NPATTERN( \
+							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+							); \
 						} \
 						++k; \
 					} \
@@ -1283,46 +1302,41 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 		} \
+		c1##IF_NPATTERN( \
+		SET_SLOT(to, Matrix_xSym, x1); \
+		UNPROTECT(1); \
+		); \
 	} while (0)
 
-	if (cl[0] == 'n')
-		VAS_SUBCASES(HIDE, HIDE, , , , , );
-	else {
-		SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz1));
-		switch (cl[0]) {
-		case 'l':
-			if (x0 == R_NilValue)
-			VAS_SUBCASES(HIDE, SHOW, SECONDOF, int, LOGICAL, 1, NA_LOGICAL);
-			else
-			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, int, LOGICAL, 1, NA_LOGICAL);
-			break;
-		case 'i':
-			if (x0 == R_NilValue)
-			VAS_SUBCASES(HIDE, SHOW, SECONDOF, int, INTEGER, 1, NA_INTEGER);
-			else
-			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, int, INTEGER, 1, NA_INTEGER);
-			break;
-		case 'd':
-			if (x0 == R_NilValue)
-			VAS_SUBCASES(HIDE, SHOW, SECONDOF, double, REAL, 1.0, NA_REAL);
-			else
-			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, double, REAL, 1.0, NA_REAL);
-			break;
-		case 'z':
-			if (x0 == R_NilValue)
-			VAS_SUBCASES(HIDE, SHOW, SECONDOF, Rcomplex, COMPLEX, Matrix_zunit, Matrix_zna);
-			else
-			VAS_SUBCASES(SHOW, SHOW,  FIRSTOF, Rcomplex, COMPLEX, Matrix_zunit, Matrix_zna);
-			break;
-		default:
-			break;
-		}
-		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(1); /* x1 */
-	}
+	if (x0 == R_NilValue) {
 
-#undef VAS_SUBCASES
-#undef VAS_SUBSUBCASES
+#define VAS(c) \
+		do { \
+			if (TYPEOF(i0) == INTSXP) \
+				VAS__(i, n, c); \
+			else \
+				VAS__(d, n, c); \
+		} while (0)
+
+		SWITCH5(cl[0], VAS);
+
+#undef VAS
+
+	} else {
+
+#define VAS(c) \
+		do { \
+			if (TYPEOF(i0) == INTSXP) \
+				VAS__(i, c, c); \
+			else \
+				VAS__(d, c, c); \
+		} while (0)
+
+		SWITCH5(cl[0], VAS);
+
+#undef VAS
+
+	}
 
 	for (j_ = 0; j_ < n_; ++j_)
 		pp1[j_] += pp1[j_ - 1];
@@ -1599,279 +1613,13 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		UNPROTECT(1); /* diag */
 	}
 
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		p1, i1, j1;
+	SEXP p1, i1, j1;
 	int i, j, *pp, *pi, *pj;
-	R_xlen_t nnz = 0;
 	p1 = i1 = j1 = NULL;
 	pp = pi = pj = NULL;
 
-#define DAS_CASES(_MASK_) \
-	do { \
-		switch (class[0]) { \
-		case 'l': \
-			DAS_SUBCASES(int, LOGICAL, _MASK_, NOTZERO_LOGICAL); \
-			break; \
-		case 'i': \
-			DAS_SUBCASES(int, INTEGER, _MASK_, NOTZERO_INTEGER); \
-			break; \
-		case 'd': \
-			DAS_SUBCASES(double, REAL, _MASK_, NOTZERO_REAL); \
-			break; \
-		case 'z': \
-			DAS_SUBCASES(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-#define DAS_SUBCASES(_CTYPE_, _PTR_, _MASK_, _NOTZERO_) \
-	do { \
-		       _CTYPE_ *px0 = _PTR_(x0) ; \
-		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
-		if (class[1] == 'g') \
-			/* .geMatrix */ \
-			DAS_SUBSUBCASES(DAS_LOOP_GEN2C, DAS_LOOP_GEN2R, DAS_LOOP_GEN2C, \
-			                _MASK_, _NOTZERO_); \
-		else if (!packed && (di == '\0' || di == 'N')) \
-			/* .(sy|po)Matrix, non-unit diagonal .trMatrix */ \
-			DAS_SUBSUBCASES(DAS_LOOP_TRN2C, DAS_LOOP_TRN2R, DAS_LOOP_TRN2C, \
-			                _MASK_, _NOTZERO_); \
-		else if (!packed) \
-			/* unit diagonal .trMatrix */ \
-			DAS_SUBSUBCASES(DAS_LOOP_TRU2C, DAS_LOOP_TRU2R, DAS_LOOP_TRU2C, \
-			                _MASK_, _NOTZERO_); \
-		else if (di == '\0' || di == 'N') \
-			/* .(sp|pp)Matrix, non-unit diagonal .tpMatrix */ \
-			DAS_SUBSUBCASES(DAS_LOOP_TPN2C, DAS_LOOP_TPN2R, DAS_LOOP_TPN2C, \
-			                _MASK_, _NOTZERO_); \
-		else \
-			/* unit diagonal .tpMatrix */ \
-			DAS_SUBSUBCASES(DAS_LOOP_TPU2C, DAS_LOOP_TPU2R, DAS_LOOP_TPU2C, \
-			                _MASK_, _NOTZERO_); \
-	} while (0)
-
-#undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NOTZERO_) \
-	do { \
-		switch (cl[2]) { \
-		case 'C': \
-			_LOOP_C_(_NOTZERO_, ++nnz, DAS_VALID2C); \
-			break; \
-		case 'R': \
-			_LOOP_R_(_NOTZERO_, ++nnz, DAS_VALID2R); \
-			break; \
-		case 'T': \
-			_LOOP_T_(_NOTZERO_, ++nnz, DAS_VALID2T); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
-#define DAS_LOOP_GEN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		for (j = 0; j < n; ++j) { \
-			for (i = 0; i < m; ++i, ++px0) \
-				if (_NOTZERO_(*px0)) _DO_INNER_; \
-			_DO_OUTER_; \
-		} \
-	} while (0)
-
-#define DAS_LOOP_GEN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		R_xlen_t mn1s = (R_xlen_t) m * n - 1; \
-		for (i = 0; i < m; ++i, px0 -= mn1s) { \
-			for (j = 0; j < n; ++j, px0 += m) \
-				if (_NOTZERO_(*px0)) _DO_INNER_; \
-			_DO_OUTER_; \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TRN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		if (ul == 'U') { \
-			for (j = 0; j < n; px0 += n - (++j)) { \
-				for (i = 0; i <= j; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} else { \
-			for (j = 0; j < n; px0 += (++j)) { \
-				for (i = j; i < n; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TRN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		R_xlen_t d; \
-		if (ul == 'U') { \
-			d = (R_xlen_t) n * n - 1; \
-			for (i = 0; i < n; ++i, px0 -= (d -= n)) { \
-				for (j = i; j < n; ++j, px0 += n) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} else { \
-			d = -1; \
-			for (i = 0; i < n; ++i, px0 -= (d += n)) { \
-				for (j = 0; j <= i; ++j, px0 += n) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TRU2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		if (ul == 'U') { \
-			px0 += n; \
-			for (j = 1; j < n; ++j) { \
-				for (i = 0; i < j; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-				px0 += n - j; \
-			} \
-		} else { \
-			for (j = 0; j < n; ++j) { \
-				px0 += j + 1; \
-				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TRU2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		R_xlen_t d; \
-		if (ul == 'U') { \
-			d = (R_xlen_t) n * (n - 1) - 1; \
-			for (i = 0; i < n; ++i) { \
-				for (j = i + 1; j < n; ++j) { \
-					px0 += n; \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				} \
-				_DO_OUTER_; \
-				px0 -= (d -= n); \
-			} \
-		} else { \
-			++px0; \
-			d = -1; \
-			for (i = 1; i < n; ++i) { \
-				for (j = 0; j < i; ++j) { \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-					px0 += n; \
-				} \
-				_DO_OUTER_; \
-				px0 -= (d += n); \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TPN2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		if (ul == 'U') { \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i <= j; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} else { \
-			for (j = 0; j < n; ++j) { \
-				for (i = j; i < n; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TPN2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		R_xlen_t d; \
-		if (ul == 'U') { \
-			d = (R_xlen_t) PACKED_LENGTH((size_t) n) - 1; \
-			for (i = 0; i < n; px0 -= (d -= (++i))) { \
-				for (j = i; j < n; px0 += (++j)) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} else { \
-			d = -1; \
-			for (i = 0; i < n; px0 -= (d += n - (++i))) { \
-				for (j = 0; j <= i; px0 += n - (++j)) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TPU2C(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		if (ul == 'U') { \
-			for (j = 1; j < n; ++j) { \
-				++px0; \
-				for (i = 0; i < j; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} else { \
-			for (j = 0; j < n; ++j) { \
-				++px0; \
-				for (i = j + 1; i < n; ++i, ++px0) \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				_DO_OUTER_; \
-			} \
-		} \
-	} while (0)
-
-#define DAS_LOOP_TPU2R(_NOTZERO_, _DO_INNER_, _DO_OUTER_) \
-	do { \
-		R_xlen_t d; \
-		if (ul == 'U') { \
-			d = (R_xlen_t) PACKED_LENGTH((size_t) (n - 1)) - 1; \
-			for (i = 0; i < n; ++i) { \
-				for (j = i + 1; j < n; ++j) { \
-					px0 += j; \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-				} \
-				_DO_OUTER_; \
-				px0 -= (d -= i + 1); \
-			} \
-		} else { \
-			++px0; \
-			d = -1; \
-			for (i = 1; i < n; ++i) { \
-				for (j = 0; j < i; ++j) { \
-					if (_NOTZERO_(*px0)) _DO_INNER_; \
-					px0 += n - j - 1; \
-				} \
-				_DO_OUTER_; \
-				px0 -= (d += n - i); \
-			} \
-		} \
-	} while (0)
-
-#define DAS_VALID2T \
-	if (nnz > INT_MAX) \
-		error(_("attempt to construct %s with more than %s nonzero entries"), \
-		      "sparseMatrix", "2^31-1")
-
-#define DAS_VALID2C \
-	do { DAS_VALID2T; else *(pp++) = (int) nnz; } while (0)
-
-#define DAS_VALID2R DAS_VALID2C
-
-	/* First we loop over the _nontrivial part_ of the denseMatrix 'from',
-	   by row ('R' case) or by column ('C' and 'T' cases), counting the
-	   nonzero entries and filling the 'p' slot of the result accordingly
-	   ('C' and 'R' cases) ...
-	*/
-
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+	R_xlen_t nnz = 0;
 	int nprotect = 2;
 
 	if (cl[2] != 'T') {
@@ -1881,13 +1629,251 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		SET_SLOT(to, Matrix_pSym, p1);
 		pp = INTEGER(p1);
 		*(pp++) = 0;
-		if (r > 0 && di != '\0' && di != 'N' && ul == ((cl[2] == 'C') ? 'U' : 'L'))
-			*(pp++) = 0; /* first row or column skipped in these loops */
 	}
-	if (class[0] == 'n')
-		DAS_SUBCASES(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
-	else
-		DAS_CASES(HIDE);
+
+#define DAS_CHECK \
+	do { \
+		if (nnz > INT_MAX) \
+			error(_("attempt to construct %s with more than %s nonzero entries"), \
+			      "sparseMatrix", "2^31-1"); \
+		*(pp++) = (int) nnz; \
+	} while (0)
+
+#define DAS_BYCOL(c, kernel, hook) \
+	do { \
+		if (class[1] == 'g') { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < m; ++i) { \
+					if (c##NOT_ZERO(*px0)) \
+						kernel;	\
+					px0 += 1; \
+				} \
+				hook; \
+			} \
+		} else if (!packed && (di == '\0' || di == 'N')) { \
+			if (ul == 'U') \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i <= j; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					px0 += m - j - 1; \
+					hook; \
+				} \
+			else \
+				for (j = 0; j < n; ++j) { \
+					px0 += j; \
+					for (i = j; i < m; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					hook; \
+				} \
+		} else if (!packed) { \
+			if (ul == 'U') \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					px0 += m - j; \
+					hook; \
+				} \
+			else \
+				for (j = 0; j < n; ++j) { \
+					px0 += j + 1; \
+					for (i = j + 1; i < m; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					hook; \
+				} \
+		} else if (di == '\0' || di == 'N') { \
+			if (ul == 'U') \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i <= j; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					hook; \
+				} \
+			else \
+				for (j = 0; j < n; ++j) { \
+					for (i = j; i < m; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel; \
+						px0 += 1; \
+					} \
+					hook; \
+				} \
+		} else { \
+			if (ul == 'U') \
+				for (j = 0; j < n; ++j) { \
+					for (i = 0; i < j; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					px0 += 1; \
+					hook; \
+				} \
+			else \
+				for (j = 0; j < n; ++j) { \
+					px0 += 1; \
+					for (i = j + 1; i < m; ++i) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += 1; \
+					} \
+					hook; \
+				} \
+		} \
+	} while (0)
+
+#define DAS_BYROW(c, kernel, hook) \
+	do { \
+		int_fast64_t d; \
+		if (class[1] == 'g') { \
+			d = (int_fast64_t) m * n - 1; \
+			for (i = 0; i < m; ++i) { \
+				for (j = 0; j < n; ++j) { \
+					if (c##NOT_ZERO(*px0)) \
+						kernel;	\
+					px0 += m; \
+				} \
+				px0 -= d; \
+				hook; \
+			} \
+		} else if (!packed && (di == '\0' || di == 'N')) { \
+			if (ul == 'U') { \
+				d = (int_fast64_t) m * n - 1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = i; j < n; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += m; \
+					} \
+					px0 -= (d -= m); \
+					hook; \
+				} \
+			} else { \
+				d = -1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = 0; j <= i; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += m; \
+					} \
+					px0 -= (d += m); \
+					hook; \
+				} \
+			} \
+		} else if (!packed) { \
+			if (ul == 'U') { \
+				d = (int_fast64_t) m * n - 1; \
+				for (i = 0; i < m; ++i) { \
+					px0 += m; \
+					for (j = i + 1; j < n; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += m; \
+					} \
+					px0 -= (d -= m); \
+					hook; \
+				} \
+			} else { \
+				d = -1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = 0; j < i; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += m; \
+					} \
+					px0 += m; \
+					px0 -= (d += m); \
+					hook; \
+				} \
+			} \
+		} else if (di == '\0' || di == 'N')	{ \
+			if (ul == 'U') { \
+				d = PACKED_LENGTH((int_fast64_t) n) - 1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = i; j < n; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += j + 1; \
+					} \
+					px0 -= (d -= i + 1); \
+					hook; \
+				} \
+			} else { \
+				d = -1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = 0; j <= i; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += m - j - 1; \
+					} \
+					px0 -= (d += m - i - 1); \
+					hook; \
+				} \
+			} \
+		} else { \
+			if (ul == 'U') { \
+				d = PACKED_LENGTH((int_fast64_t) n) - 1; \
+				for (i = 0; i < m; ++i) { \
+					px0 += i + 1; \
+					for (j = i + 1; j < n; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel;	\
+						px0 += j + 1; \
+					} \
+					px0 -= (d -= i + 1); \
+					hook; \
+				} \
+			} else { \
+				d = -1; \
+				for (i = 0; i < m; ++i) { \
+					for (j = 0; j < i; ++j) { \
+						if (c##NOT_ZERO(*px0)) \
+							kernel; \
+						px0 += m - j - 1; \
+					} \
+					px0 += m - i - 1; \
+					px0 -= (d += m - i - 1); \
+					hook; \
+				} \
+			} \
+		} \
+	} while (0)
+
+#define DAS(c) \
+	do { \
+		c##TYPE *px0 = c##PTR(x0); \
+		switch (cl[2]) { \
+		case 'C': \
+			DAS_BYCOL(c, ++nnz, DAS_CHECK); \
+			break; \
+		case 'R': \
+			DAS_BYROW(c, ++nnz, DAS_CHECK); \
+			break; \
+		case 'T': \
+			DAS_BYCOL(c, ++nnz, ); \
+			break; \
+		default: \
+			break; \
+		} \
+	} while (0)
+
+	SWITCH5(class[0], DAS);
+
+#undef DAS
+
 	if (cl[2] != 'R') {
 		PROTECT(i1 = allocVector(INTSXP, nnz));
 		++nprotect;
@@ -1901,66 +1887,48 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		pj = INTEGER(j1);
 	}
 
-#undef DAS_SUBSUBCASES
-#define DAS_SUBSUBCASES(_LOOP_C_, _LOOP_R_, _LOOP_T_, _MASK_, _NOTZERO_) \
+#define DAS(c) \
 	do { \
-		switch (repr) { \
+		c##TYPE *px0 = c##PTR(x0); \
+		c##IF_NPATTERN( \
+		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+		c##TYPE *px1 = c##PTR(x1); \
+		); \
+		switch (cl[2]) { \
 		case 'C': \
-			_LOOP_C_(_NOTZERO_, \
-			         do { \
-			             *(pi++) = i; \
-			             _MASK_(*(px1++) = *px0); \
-			         } while (0), ); \
+			DAS_BYCOL(c, \
+			          do { \
+			          	*(pi++) = i; \
+			          	c##IF_NPATTERN(*(px1++) = *px0); \
+			          } while (0), ); \
 			break; \
 		case 'R': \
-			_LOOP_R_(_NOTZERO_, \
-			         do { \
-			             *(pj++) = j; \
-			             _MASK_(*(px1++) = *px0); \
-			         } while (0), ); \
+			DAS_BYROW(c, \
+			          do { \
+			          	*(pj++) = j; \
+			          	c##IF_NPATTERN(*(px1++) = *px0); \
+			          } while (0), ); \
 			break; \
 		case 'T': \
-			_LOOP_T_(_NOTZERO_, \
-			         do { \
-			             *(pi++) = i; \
-			             *(pj++) = j; \
-			             _MASK_(*(px1++) = *px0); \
-			         } while (0), ); \
+			DAS_BYCOL(c, \
+			          do { \
+			          	*(pi++) = i; \
+			          	*(pj++) = j; \
+			          	c##IF_NPATTERN(*(px1++) = *px0); \
+			          } while (0), ); \
 			break; \
 		default: \
 			break; \
 		} \
+		c##IF_NPATTERN( \
+		SET_SLOT(to, Matrix_xSym, x1); \
+		UNPROTECT(1); /* x1 */ \
+		); \
 	} while (0)
 
-	/* Then we loop back over the same entries in order to fill
-	   the 'i', 'j', and 'x' slots of the result (whichever exist) ...
-	*/
+	SWITCH5(class[0], DAS);
 
-	if (class[0] == 'n')
-		DAS_SUBCASES(int, LOGICAL, HIDE, NOTZERO_LOGICAL);
-	else {
-		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
-		SET_SLOT(to, Matrix_xSym, x1);
-		DAS_CASES(SHOW);
-		UNPROTECT(1); /* x1 */
-	}
-
-#undef DAS_CASES
-#undef DAS_SUBCASES
-#undef DAS_SUBSUBCASES
-#undef DAS_VALID2C
-#undef DAS_VALID2R
-#undef DAS_VALID2T
-#undef DAS_LOOP_GEN2C
-#undef DAS_LOOP_GEN2R
-#undef DAS_LOOP_TRN2C
-#undef DAS_LOOP_TRN2R
-#undef DAS_LOOP_TRU2C
-#undef DAS_LOOP_TRU2R
-#undef DAS_LOOP_TPN2C
-#undef DAS_LOOP_TPN2R
-#undef DAS_LOOP_TPU2C
-#undef DAS_LOOP_TPU2R
+#undef DAS
 
 	UNPROTECT(nprotect);
 	return to;
@@ -2015,7 +1983,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		UNPROTECT(1); /* uplo */
 	}
 
-	if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
+	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
@@ -2038,26 +2006,6 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		return to;
 	}
 
-#define DAS_CASES(_MASK_) \
-	do { \
-		switch (cl[0]) { \
-		case 'l': \
-			DAS_LOOP(int, LOGICAL, _MASK_, NOTZERO_LOGICAL, 1); \
-			break; \
-		case 'i': \
-			DAS_LOOP(int, INTEGER, _MASK_, NOTZERO_INTEGER, 1); \
-			break; \
-		case 'd': \
-			DAS_LOOP(double, REAL, _MASK_, NOTZERO_REAL, 1.0); \
-			break; \
-		case 'z': \
-			DAS_LOOP(Rcomplex, COMPLEX, _MASK_, NOTZERO_COMPLEX, Matrix_zunit); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
-
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 	if (class[0] != cl[0]) {
 		if (class[0] == 'n' && cl[0] == 'l')
@@ -2070,7 +2018,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		PROTECT(x0);
 	}
 
-	int d, nnz;
+	int j, nnz;
 	if (cl[2] != 'T') {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
 		SET_SLOT(to, Matrix_pSym, p);
@@ -2079,91 +2027,98 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		if (di == 'N') {
 			nnz = 0;
 
-#undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
+#define DAS(c) \
 			do { \
-				_CTYPE_ *px0 = _PTR_(x0); \
-				for (d = 0; d < n; ++d) { \
-					if (_NOTZERO_(*px0)) \
+				c##TYPE *px0 = c##PTR(x0); \
+				for (j = 0; j < n; ++j) { \
+					if (c##NOT_ZERO(*px0)) \
 						++nnz; \
+					px0 += 1; \
 					*(pp++) = nnz; \
-					++px0; \
 				} \
 			} while (0)
 
-			if (cl[0] == 'n')
-				DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
-			else
-				DAS_CASES(SHOW);
+			SWITCH4(cl[0], DAS);
+
+#undef DAS
+
 		} else {
 			nnz = n;
-			for (d = 1; d <= n; ++d)
-				*(pp++) = d;
+			for (j = 1; j <= n; ++j)
+				*(pp++) = j;
 		}
 		UNPROTECT(1); /* p */
 	} else {
 		if (di == 'N') {
 			nnz = 0;
 
-#undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
+#define DAS(c) \
 			do { \
-				_CTYPE_ *px0 = _PTR_(x0); \
-				for (d = 0; d < n; ++d) { \
-					if (_NOTZERO_(*px0)) \
+				c##TYPE *px0 = c##PTR(x0); \
+				for (j = 0; j < n; ++j) { \
+					if (c##NOT_ZERO(*px0)) \
 						++nnz; \
-					++px0; \
+					px0 += 1; \
 				} \
 			} while (0)
 
-			if (cl[0] == 'n')
-				DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
-			else
-				DAS_CASES(SHOW);
+			SWITCH4(cl[0], DAS);
+
+#undef DAS
+
 		} else
 			nnz = n;
 	}
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
-	if (cl[2] != 'T')
-		SET_SLOT(to, (cl[2] == 'C') ? Matrix_iSym : Matrix_jSym, i1);
-	else {
+	if (cl[2] != 'R')
 		SET_SLOT(to, Matrix_iSym, i1);
+	if (cl[2] != 'C')
 		SET_SLOT(to, Matrix_jSym, i1);
-	}
 	int *pi1 = INTEGER(i1);
 
-#undef DAS_LOOP
-#define DAS_LOOP(_CTYPE_, _PTR_, _MASK_, _NOTZERO_, _ONE_) \
-	do { \
-		_MASK_(_CTYPE_ *px1 = _PTR_(x1)); \
-		if (di == 'N') { \
-			_CTYPE_ *px0 = _PTR_(x0); \
-			for (d = 0; d < n; ++d) { \
-				if (_NOTZERO_(*px0)) { \
-					*(pi1++) = d; \
-					_MASK_(*(px1++) = *px0); \
-				} \
-				++px0; \
-			} \
-		} else { \
-			for (d = 0; d < n; ++d) { \
-				*(pi1++) = d; \
-				_MASK_(*(px1++) = _ONE_); \
-			} \
-		} \
-	} while (0)
-
-	if (cl[0] == 'n')
-		DAS_LOOP(int, LOGICAL, HIDE, NOTZERO_LOGICAL, 1);
-	else if (di == 'N' && nnz == n) {
-		SET_SLOT(to, Matrix_xSym, x0);
-		DAS_CASES(HIDE);
+	if (nnz == n && di == 'N') {
+		for (j = 0; j < n; ++j)
+			*(pi1++) = j;
+		if (cl[0] != 'n')
+			SET_SLOT(to, Matrix_xSym, x0);
 	} else {
-		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
-		SET_SLOT(to, Matrix_xSym, x1);
-		DAS_CASES(SHOW);
-		UNPROTECT(1); /* x1 */
+
+#define DAS(c) \
+		do { \
+			c##TYPE *px0 = c##PTR(x0); \
+			c##IF_NPATTERN( \
+			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			c##TYPE *px1 = c##PTR(x1); \
+			); \
+			if (di == 'N') { \
+				for (j = 0; j < n; ++j) { \
+					if (c##NOT_ZERO(*px0)) { \
+						*(pi1++) = j; \
+						c##IF_NPATTERN( \
+						*(px1++) = *px0; \
+						); \
+					} \
+					px0 += 1; \
+				} \
+			} else { \
+				for (j = 0; j < n; ++j) { \
+					*(pi1++) = j; \
+					c##IF_NPATTERN( \
+					*(px1++) = c##UNIT; \
+					); \
+				} \
+			} \
+			c##IF_NPATTERN( \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			UNPROTECT(1); /* x1 */ \
+			); \
+		} while (0)
+
+		SWITCH5(cl[0], DAS);
+
+#undef DAS
+
 	}
 
 	UNPROTECT(3); /* i1, x0, to */
@@ -2238,12 +2193,12 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	UNPROTECT(1); /* dimnames */
 
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
-	int *pperm = INTEGER(perm);
+	int k, *pperm = INTEGER(perm);
 
 	if (cl[2] == 'T') {
 		SEXP i = PROTECT(allocVector(INTSXP, r)),
 			j = PROTECT(allocVector(INTSXP, r));
-		int k, *pi = INTEGER(i), *pj = INTEGER(j);
+		int *pi = INTEGER(i), *pj = INTEGER(j);
 		for (k = 0; k < r; ++k) {
 			*(pi++) = k;
 			*(pj++) = *(pperm++) - 1;
@@ -2253,7 +2208,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	} else if ((cl[2] == 'C') == (mg != 0)) {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) r + 1)),
 			i = PROTECT(allocVector(INTSXP, r));
-		int k, *pp = INTEGER(p), *pi = INTEGER(i);
+		int *pp = INTEGER(p), *pi = INTEGER(i);
 		for (k = 0; k < r; ++k) {
 			*(pp++) = k;
 			*(pi++) = *(pperm++) - 1;
@@ -2263,7 +2218,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SET_SLOT(to, (mg != 0) ? Matrix_iSym : Matrix_jSym, i);
 	} else {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1));
-		int k, *pp = INTEGER(p);
+		int *pp = INTEGER(p);
 		memset(pp, 0, sizeof(int) * ((R_xlen_t) s + 1));
 		for (k = 0; k < r; ++k)
 			++pp[pperm[k]];
@@ -2287,33 +2242,19 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SEXP x = PROTECT(allocVector(kindToType(cl[0]), r));
 		SET_SLOT(to, Matrix_xSym, x);
 
-#define IAS_SUBCASES(_CTYPE_, _PTR_, _ONE_) \
+#define IAS(c) \
 		do { \
-			_CTYPE_ *px = _PTR_(x); \
-			for (int k = 0; k < r; ++k) \
-				*(px++) = _ONE_; \
+			c##TYPE *px = c##PTR(x); \
+			for (k = 0; k < r; ++k) \
+				*(px++) = c##UNIT; \
 		} while (0)
 
-		switch (cl[0]) {
-		case 'l':
-			IAS_SUBCASES(int, LOGICAL, 1);
-			break;
-		case 'i':
-			IAS_SUBCASES(int, INTEGER, 1);
-			break;
-		case 'd':
-			IAS_SUBCASES(double, REAL, 1.0);
-			break;
-		case 'z':
-			IAS_SUBCASES(Rcomplex, COMPLEX, Matrix_zunit);
-			break;
-		default:
-			break;
-		}
+		SWITCH4(cl[0], IAS);
+
+#undef IAS
+
 		UNPROTECT(1); /* x */
 	}
-
-#undef IAS_SUBCASES
 
 	UNPROTECT(2); /* perm, to */
 	return to;
