@@ -246,7 +246,7 @@ SEXP allocUnit(SEXPTYPE type, R_xlen_t length)
 	case CPLXSXP:
 	{
 		Rcomplex *pans = COMPLEX(ans);
-		Rcomplex u; tmp.r = 1.0; tmp.i = 0.0;
+		Rcomplex u; u.r = 1.0; u.i = 0.0;
 		for (i = 0; i < length; ++i)
 			*(pans++) = u;
 		break;
@@ -267,44 +267,52 @@ SEXP allocSeqInt(int from, R_xlen_t length)
 	return ans;
 }
 
-void naToOne(SEXP x)
+void naToUnit(SEXP x)
 {
-	R_xlen_t i, n = XLENGTH(x);
+	R_xlen_t i, length = XLENGTH(x);
 	switch (TYPEOF(x)) {
 	case LGLSXP:
 	{
 		int *px = LOGICAL(x);
-		for (i = 0; i < n; ++i, ++px)
+		for (i = 0; i < length; ++i) {
 			if (*px == NA_LOGICAL)
 				*px = 1;
+			px += 1;
+		}
 		break;
 	}
 	case INTSXP:
 	{
 		int *px = INTEGER(x);
-		for (i = 0; i < n; ++i, ++px)
+		for (i = 0; i < length; ++i) {
 			if (*px == NA_INTEGER)
 				*px = 1;
+			px += 1;
+		}
 		break;
 	}
 	case REALSXP:
 	{
 		double *px = REAL(x);
-		for (i = 0; i < n; ++i, ++px)
+		for (i = 0; i < length; ++i) {
 			if (ISNAN(*px))
 				*px = 1.0;
+			px += 1;
+		}
 		break;
 	}
 	case CPLXSXP:
 	{
 		Rcomplex *px = COMPLEX(x);
-		for (i = 0; i < n; ++i, ++px)
+		Rcomplex u; u.r = 1.0; u.i = 0.0;
+		for (i = 0; i < length; ++i) {
 			if (ISNAN((*px).r) || ISNAN((*px).i))
-				*px = Matrix_zunit;
+				*px = u;
+			px += 1;
+		}
 		break;
 	}
 	default:
-		ERROR_INVALID_TYPE(x, __func__);
 		break;
 	}
 	return;

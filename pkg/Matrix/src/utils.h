@@ -15,6 +15,6 @@ SEXP duplicateVector(SEXP);
 SEXP allocZero(SEXPTYPE, R_xlen_t);
 SEXP allocUnit(SEXPTYPE, R_xlen_t);
 SEXP allocSeqInt(int, R_xlen_t);
-void naToOne(SEXP);
+void naToUnit(SEXP);
 
 #endif /* MATRIX_UTILS_H */

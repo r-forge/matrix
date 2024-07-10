@@ -753,7 +753,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		else
 			x0 = coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
-			naToOne(x0);
+			naToUnit(x0);
 		UNPROTECT(1); /* x0 */
 		PROTECT(x0);
 	}
@@ -2017,7 +2017,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		else
 			x0 = coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
-			naToOne(x0);
+			naToUnit(x0);
 		UNPROTECT(1); /* x0 */
 		PROTECT(x0);
 	}
@@ -2312,12 +2312,12 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 		REPROTECT(x = coerceVector(x, tt), pid);
 		if (class[0] == 'n')
 			/* n->[idz] */
-			naToOne(x);
+			naToUnit(x);
 	} else if (new) {
 		REPROTECT(x = duplicate(x), pid);
 		if (class[0] == 'n')
 			/* n->l */
-			naToOne(x);
+			naToUnit(x);
 	} else {
 		if (class[0] == 'n') {
 			/* n->l */
@@ -2326,7 +2326,7 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 			for (i = 0; i < len; ++i, ++px) {
 				if (*px == NA_LOGICAL) {
 					REPROTECT(x = duplicate(x), pid);
-					naToOne(x);
+					naToUnit(x);
 					break;
 				}
 			}
@@ -2540,7 +2540,7 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 				for (i = 0; i < len; ++i, ++px) {
 					if (*px == NA_LOGICAL) {
 						REPROTECT(x = duplicate(x), pid);
-						naToOne(x);
+						naToUnit(x);
 						break;
 					}
 				}
@@ -2549,7 +2549,7 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 			REPROTECT(x = coerceVector(x, tt), pid);
 			if (class[0] == 'n')
 				/* n->[idz] */
-				naToOne(x);
+				naToUnit(x);
 		}
 		SET_SLOT(to, Matrix_xSym, x);
 		UNPROTECT(1); /* x */
@@ -4053,7 +4053,7 @@ SEXP R_Matrix_as_vector(SEXP s_from)
 	case 'i':
 		if (cl[0] == 'n') {
 			PROTECT(to);
-			naToOne(to);
+			naToUnit(to);
 			UNPROTECT(1);
 		}
 		break;
@@ -4128,7 +4128,7 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 	case 'p':
 	case 'i':
 		if (cl[0] == 'n')
-			naToOne(to);
+			naToUnit(to);
 		break;
 	default:
 		break;
