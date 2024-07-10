@@ -240,7 +240,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 			if (class[1] == 's')
 				setAttrib(ans, R_NamesSymbol, cn);
 			else if (rn != R_NilValue &&
-			         (rn == cn || equal_character_vectors(rn, cn, r)))
+			         (rn == cn || equalString(rn, cn, r)))
 				setAttrib(ans, R_NamesSymbol, (r == m) ? rn : cn);
 		}
 		UNPROTECT(1); /* dn */

@@ -144,12 +144,18 @@ char *Matrix_sprintf(const char *format, ...)
 	return buf;
 }
 
-int equal_character_vectors(SEXP s1, SEXP s2, int n)
+int equalString(SEXP s1, SEXP s2, R_xlen_t n)
 {
 	/* FIXME? not distinguishing between NA_STRING and "NA" */
-	for (int i = 0; i < n; ++i)
-		if (strcmp(CHAR(STRING_ELT(s1, i)), CHAR(STRING_ELT(s2, i))) != 0)
+	SEXP s1_, s2_;
+	R_xlen_t j;
+	for (j = 0; j < n; ++j) {
+		s1_ = STRING_ELT(s1, j);
+		s2_ = STRING_ELT(s2, j);
+		if ((s1_ == NA_STRING) != (s2_ == NA_STRING) ||
+		    strcmp(CHAR(s1_), CHAR(s1_)) != 0)
 			return 0;
+	}
 	return 1;
 }
 

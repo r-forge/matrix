@@ -22,7 +22,7 @@ int DimNames_is_symmetric(SEXP dn)
 		   !isNull(cn = VECTOR_ELT(dn, 1)) &&
 		   rn != cn &&
 		   ((n = LENGTH(rn)) != LENGTH(cn) ||
-		    !equal_character_vectors(rn, cn, n))) ||
+		    !equalString(rn, cn, n))) ||
 		  ((!isNull(ndn = getAttrib(dn, R_NamesSymbol)) &&
 		    *(nrn = CHAR(STRING_ELT(ndn, 0))) != '\0' &&
 		    *(ncn = CHAR(STRING_ELT(ndn, 1))) != '\0' &&

@@ -10,7 +10,7 @@ void *Matrix_memcpy(void *, const void *, R_xlen_t, size_t);
 #endif
 char *Matrix_sprintf(const char *, ...);
 
-int equal_character_vectors(SEXP, SEXP, int);
+int equalString(SEXP, SEXP, R_xlen_t);
 void naToOne(SEXP);
 
 #endif /* MATRIX_UTILS_H */

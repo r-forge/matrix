@@ -220,7 +220,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 			PROTECT(rn = ANY_TO_STRING(rn));
 			PROTECT(cn = ANY_TO_STRING(cn));
 			UNPROTECT(4); /* cn, rn */
-			if (!equal_character_vectors(rn, cn, n))
+			if (!equalString(rn, cn, n))
 				RMKMS(_("%s[1] differs from %s[2]"), "Dimnames", "Dimnames");
 		}
 	}
