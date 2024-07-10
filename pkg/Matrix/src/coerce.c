@@ -399,14 +399,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 
 	} else {
 
-		PROTECT(x = allocVector(tt, mn));
+		PROTECT(x = duplicateVector(from));
 		++nprotect;
-
-#define MAD(c) memcpy(c##PTR(x), c##PTR(from), sizeof(c##TYPE) * mn)
-
-		SWITCH4(cl[0], MAD);
-
-#undef MAD
 
 	}
 
@@ -755,7 +749,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 	if (cl[0] != class[0]) {
 		if (class[0] == 'n' && cl[0] == 'l')
-			x0 = duplicate(x0);
+			x0 = duplicateVector(x0);
 		else
 			x0 = coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
@@ -1995,21 +1989,31 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
-	if (cl[1] == 't' && di != 'N') {
+	if (di != 'N') {
 		if (cl[2] != 'T') {
-			SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
-			SET_SLOT(to, Matrix_pSym, p);
-			memset(INTEGER(p), 0, sizeof(int) * ((R_xlen_t) n + 1));
-			UNPROTECT(1); /* p */
+			SEXP p1 = PROTECT(allocSeqInt(0, (R_xlen_t) n + 1));
+			SET_SLOT(to, Matrix_pSym, p1);
+			UNPROTECT(1); /* p1 */
+		}
+		SEXP i1 = PROTECT(allocSeqInt(0, n));
+		if (cl[2] != 'R')
+			SET_SLOT(to, Matrix_iSym, i1);
+		if (cl[2] != 'C')
+			SET_SLOT(to, Matrix_jSym, i1);
+		UNPROTECT(1); /* i1 */
+		if (cl[0] != 'n' && cl[1] != 't') {
+			SEXP x1 = PROTECT(allocUnit(kindToType(cl[1])));
+			SET_SLOT(to, Matrix_xSym, x1);
+			UNPROTECT(1); /* x1 */
 		}
 		UNPROTECT(1); /* to */
 		return to;
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
-	if (class[0] != cl[0]) {
+	if (cl[0] != class[0]) {
 		if (class[0] == 'n' && cl[0] == 'l')
-			x0 = duplicate(x0);
+			x0 = duplicateVector(x0);
 		else
 			x0 = coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
@@ -2018,56 +2022,47 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		PROTECT(x0);
 	}
 
-	int j, nnz;
-	if (cl[2] != 'T') {
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
-		SET_SLOT(to, Matrix_pSym, p);
-		int *pp = INTEGER(p);
-		*(pp++) = 0;
-		if (di == 'N') {
-			nnz = 0;
+	int j, nnz = 0;
+	if (cl[2] == 'T') {
 
 #define DAS(c) \
-			do { \
-				c##TYPE *px0 = c##PTR(x0); \
-				for (j = 0; j < n; ++j) { \
-					if (c##NOT_ZERO(*px0)) \
-						++nnz; \
-					px0 += 1; \
-					*(pp++) = nnz; \
-				} \
-			} while (0)
+		do { \
+			c##TYPE *px0 = c##PTR(x0); \
+			for (j = 0; j < n; ++j) { \
+				if (c##NOT_ZERO(*px0)) \
+					++nnz; \
+				px0 += 1; \
+			} \
+		} while (0)
 
-			SWITCH4(cl[0], DAS);
+		SWITCH4(cl[0], DAS);
 
 #undef DAS
 
-		} else {
-			nnz = n;
-			for (j = 1; j <= n; ++j)
-				*(pp++) = j;
-		}
-		UNPROTECT(1); /* p */
 	} else {
-		if (di == 'N') {
-			nnz = 0;
 
+		SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
+		SET_SLOT(to, Matrix_pSym, p1);
+		int *pp1 = INTEGER(p1);
+		*(pp1++) = 0;
+		
 #define DAS(c) \
-			do { \
-				c##TYPE *px0 = c##PTR(x0); \
-				for (j = 0; j < n; ++j) { \
-					if (c##NOT_ZERO(*px0)) \
-						++nnz; \
-					px0 += 1; \
-				} \
-			} while (0)
+		do { \
+			c##TYPE *px0 = c##PTR(x0); \
+			for (j = 0; j < n; ++j) { \
+				if (c##NOT_ZERO(*px0)) \
+					++nnz; \
+				px0 += 1; \
+				*(pp1++) = nnz; \
+			} \
+		} while (0)
 
-			SWITCH4(cl[0], DAS);
+		SWITCH4(cl[0], DAS);
 
 #undef DAS
 
-		} else
-			nnz = n;
+		UNPROTECT(1); /* p1 */
+
 	}
 
 	SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
@@ -2077,7 +2072,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		SET_SLOT(to, Matrix_jSym, i1);
 	int *pi1 = INTEGER(i1);
 
-	if (nnz == n && di == 'N') {
+	if (nnz == n) {
 		for (j = 0; j < n; ++j)
 			*(pi1++) = j;
 		if (cl[0] != 'n')
@@ -2091,23 +2086,14 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px1 = c##PTR(x1); \
 			); \
-			if (di == 'N') { \
-				for (j = 0; j < n; ++j) { \
-					if (c##NOT_ZERO(*px0)) { \
-						*(pi1++) = j; \
-						c##IF_NPATTERN( \
-						*(px1++) = *px0; \
-						); \
-					} \
-					px0 += 1; \
-				} \
-			} else { \
-				for (j = 0; j < n; ++j) { \
+			for (j = 0; j < n; ++j) { \
+				if (c##NOT_ZERO(*px0)) { \
 					*(pi1++) = j; \
 					c##IF_NPATTERN( \
-					*(px1++) = c##UNIT; \
+					*(px1++) = *px0; \
 					); \
 				} \
+				px0 += 1; \
 			} \
 			c##IF_NPATTERN( \
 			SET_SLOT(to, Matrix_xSym, x1); \
@@ -2239,20 +2225,8 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	UNPROTECT(2);
 
 	if (cl[0] != 'n') {
-		SEXP x = PROTECT(allocVector(kindToType(cl[0]), r));
+		SEXP x = PROTECT(allocUnit(kindToType(cl[0]), r));
 		SET_SLOT(to, Matrix_xSym, x);
-
-#define IAS(c) \
-		do { \
-			c##TYPE *px = c##PTR(x); \
-			for (k = 0; k < r; ++k) \
-				*(px++) = c##UNIT; \
-		} while (0)
-
-		SWITCH4(cl[0], IAS);
-
-#undef IAS
-
 		UNPROTECT(1); /* x */
 	}
 
@@ -2444,13 +2418,15 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 	if (class[2] != 'R') {
 		SEXP i = PROTECT(GET_SLOT(from, Matrix_iSym));
 		SET_SLOT(to, Matrix_iSym, i);
-		if (nnz < 1)
+		if (nnz < 0)
 		nnz = XLENGTH(i);
 		UNPROTECT(1); /* i */
 	}
 	if (class[2] != 'C') {
 		SEXP j = PROTECT(GET_SLOT(from, Matrix_jSym));
 		SET_SLOT(to, Matrix_jSym, j);
+		if (nnz < 0)
+		nnz = XLENGTH(j);
 		UNPROTECT(1); /* j */
 	}
 	if (class[0] == 'n') {
