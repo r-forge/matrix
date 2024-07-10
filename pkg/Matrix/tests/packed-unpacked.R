@@ -183,13 +183,14 @@ testDenseMatrix <- function(Class, ...) {
         else
             sample(c(.NA, .ZERO, .ONE), r, TRUE)
 
+    if (is.n && anyNA(m2))
+        m2[is.na(m2)] <- TRUE
     if (is.sy) {
         tri0(m2, diag = TRUE) <- tri0(t(m2), diag = TRUE)
         dimnames(m2) <- Matrix:::symDN(M@Dimnames)
     }
-    if (is.tr && M@diag == "U") {
+    if (is.tr && M@diag == "U")
         diag(m2) <- .ONE
-    }
 
     pM <-
         if (is.p)
