@@ -26,8 +26,8 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
 	int_fast64_t mn = (int_fast64_t) m * n,
-		lengthout = (!packed) ? mn : n + (mn - n) / 2;
-	if (lengthout > R_XLEN_T_MAX)
+		xlen = (!packed) ? mn : n + (mn - n) / 2;
+	if (xlen > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -60,7 +60,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 	}
 
 	/* FIXME: add argument 'new' and conditionally avoid allocation */
-	SEXP x = PROTECT(allocVector(tt, (R_xlen_t) lengthout));
+	SEXP x = PROTECT(allocVector(tt, (R_xlen_t) xlen));
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
 
@@ -491,14 +491,14 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n,
-		lengthout = (!packed) ? mn : n + (mn - n) / 2;
-	if (lengthout > R_XLEN_T_MAX)
+		xlen = (!packed) ? mn : n + (mn - n) / 2;
+	if (xlen > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 	if (class[2] != 'C' && packed && mn > R_XLEN_T_MAX)
 		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
 		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
-	double bytes = (double) lengthout * kindToSize(cl[0]);
+	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -561,9 +561,9 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
 		c##TYPE *px0 = c##PTR(x0); \
 		); \
-		SEXP x1 = PROTECT(allocVector(c##TYPESXP, (R_xlen_t) lengthout)); \
+		SEXP x1 = PROTECT(allocVector(c##TYPESXP, (R_xlen_t) xlen)); \
 		c##TYPE *px1 = c##PTR(x1); \
-		memset(px1, 0, sizeof(c##TYPE) * (R_xlen_t) lengthout); \
+		memset(px1, 0, sizeof(c##TYPE) * (R_xlen_t) xlen); \
 		switch (class[2]) { \
 		case 'C': \
 		{ \
@@ -709,11 +709,11 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
 	int_fast64_t nn = (int_fast64_t) n * n,
-		lengthout = (!packed) ? nn : n + (nn - n) / 2;
-	if (lengthout > R_XLEN_T_MAX)
+		xlen = (!packed) ? nn : n + (nn - n) / 2;
+	if (xlen > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) lengthout * kindToSize(cl[0]);
+	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -758,7 +758,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		PROTECT(x0);
 	}
 
-	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) lengthout));
+	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) xlen));
 	SET_SLOT(to, Matrix_xSym, x1);
 
 #define DAD(c) \
@@ -836,11 +836,11 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	int_fast64_t lengthout = (int_fast64_t) m * n;
-	if (lengthout > R_XLEN_T_MAX)
+	int_fast64_t xlen = (int_fast64_t) m * n;
+	if (xlen > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
-	double bytes = (double) lengthout * kindToSize(cl[0]);
+	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
 		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
 		        0x1.0p-30 * bytes);
@@ -855,13 +855,13 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
 	int *pperm = INTEGER(perm);
 
-	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) lengthout));
+	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) xlen));
 	SET_SLOT(to, Matrix_xSym, x);
 
 #define IAD(c) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
-		memset(px, 0, sizeof(c##TYPE) * (R_xlen_t) lengthout); \
+		memset(px, 0, sizeof(c##TYPE) * (R_xlen_t) xlen); \
 		if (mg == 0) { \
 			int_fast64_t m1 = (int_fast64_t) m; \
 			for (int i = 0; i < m; ++i) { \
@@ -2330,9 +2330,8 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 	} else {
 		if (class[0] == 'n') {
 			/* n->l */
-			R_xlen_t i, length = XLENGTH(x);
 			int *px = LOGICAL(x);
-			for (i = 0; i < length; ++i) {
+			for (R_xlen_t k = 0, kend = XLENGTH(x); k < kend; ++k) {
 				if (*(px++) == NA_LOGICAL) {
 					REPROTECT(x = duplicateVector(x), pid);
 					naToUnit(x);
@@ -2512,9 +2511,8 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 		if (TYPEOF(x) == tt) {
 			if (class[0] == 'n') {
 				/* n->l */
-				R_xlen_t i, length = XLENGTH(x);
 				int *px = LOGICAL(x);
-				for (i = 0; i < length; ++i) {
+				for (int j = 0; j < n; ++j) {
 					if (*(px++) == NA_LOGICAL) {
 						REPROTECT(x = duplicateVector(x), pid);
 						naToUnit(x);
@@ -3908,9 +3906,8 @@ SEXP R_Matrix_as_vector(SEXP s_from)
 	case 'e':
 		to = GET_SLOT(s_from, Matrix_xSym);
 		if (cl[0] == 'n') {
-			R_xlen_t i, length = XLENGTH(to);
 			int *px = LOGICAL(to);
-			for (i = 0; i < length; ++i) {
+			for (R_xlen_t k = 0, kend = XLENGTH(to); k < kend; ++k) {
 				if (*(px++) == NA_LOGICAL) {
 					PROTECT(to);
 					to = duplicateVector(to);
