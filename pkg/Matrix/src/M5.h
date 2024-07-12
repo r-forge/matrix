@@ -211,6 +211,45 @@
 #define dINCREMENT_CONJ(x, y) dINCREMENT_IDEN(x, y)
 #define zINCREMENT_CONJ(x, y) do { (x).r += (y).r; (x).i -= (y).i; } while (0)
 
+#define nDECREMENT_IDEN(x, y)
+#define lDECREMENT_IDEN(x, y) \
+	do { \
+		if ((y) == NA_LOGICAL) { \
+			if ((x) == 0) \
+				(x) = NA_LOGICAL; \
+		} else if ((y) == 0) \
+			(x) = 1; \
+	} while (0)
+#define iDECREMENT_IDEN(x, y) \
+	do { \
+		if ((x) != NA_INTEGER) { \
+			if ((y) == NA_INTEGER) \
+				(x) = NA_INTEGER; \
+			else if (((y) < 0) \
+					 ? ((x) >  INT_MAX + (y)) \
+					 : ((x) <= INT_MIN + (y))) { \
+				warning(_("NAs produced by integer overflow")); \
+				(x) = NA_INTEGER; \
+			} else \
+				(x) -= (y); \
+		} \
+	} while (0)
+#define dDECREMENT_IDEN(x, y) \
+	do { \
+		(x) -= (y); \
+	} while (0)
+#define zDECREMENT_IDEN(x, y) \
+	do { \
+		(x).r -= (y).r; \
+		(x).i -= (y).i; \
+	} while (0)
+
+#define nDECREMENT_CONJ(x, y) nDECREMENT_IDEN(x, y)
+#define lDECREMENT_CONJ(x, y) lDECREMENT_IDEN(x, y)
+#define iDECREMENT_CONJ(x, y) iDECREMENT_IDEN(x, y)
+#define dDECREMENT_CONJ(x, y) dDECREMENT_IDEN(x, y)
+#define zDECREMENT_CONJ(x, y) do { (x).r -= (y).r; (x).i += (y).i; } while (0)
+
 #define dMULTIPLY(x, a) \
 	do { (x)   *= a;             } while (0)
 #define zMULTIPLY(x, a) \
