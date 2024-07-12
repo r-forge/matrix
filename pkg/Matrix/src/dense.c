@@ -1,4 +1,5 @@
 #include "Mdefines.h"
+#include "M5.h"
 #include "idz.h"
 #include "dense.h"
 
@@ -75,47 +76,31 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		x1 = PROTECT(allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define BAND(_PREFIX_, _CTYPE_, _PTR_) \
+#define BAND(c) \
 	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (ge && class[1] != 'g') { \
 		if (!packed) \
-			_PREFIX_ ## force2(px1, px0, n, ul0, ct, di); \
+			c##NAME(force2)(px1, px0, n, ul0, ct, di); \
 		else \
-			_PREFIX_ ##  pack1(px1, px0, n, ul0, ct, di); \
+			c##NAME( pack1)(px1, px0, n, ul0, ct, di); \
 		px0 = NULL; \
 		packed = 0;	\
 		} else if (tr && class[1] == 's' && ul0 != ul1) { \
 		if (!packed) \
-			_PREFIX_ ## trans2(px1, px0, m, n, ct); \
+			c##NAME(trans2)(px1, px0, m,   n, ct); \
 		else \
-			_PREFIX_ ## trans1(px1, px0, n, ul0, ct); \
+			c##NAME(trans1)(px1, px0, n, ul0, ct); \
 		px0 = NULL; \
 		ul0 = ul1; \
 		} \
 		if (!packed) \
-			_PREFIX_ ## band2(px1, px0, m, n, a, b); \
+			c##NAME( band2)(px1, px0, m,   n, a, b); \
 		else \
-			_PREFIX_ ## band1(px1, px0, n, ul0, a, b); \
+			c##NAME( band1)(px1, px0, n, ul0, a, b); \
 	} while (0)
 
-	switch (class[0]) {
-	case 'n':
-	case 'l':
-		BAND(i, int, LOGICAL);
-		break;
-	case 'i':
-		BAND(i, int, INTEGER);
-		break;
-	case 'd':
-		BAND(d, double, REAL);
-		break;
-	case 'z':
-		BAND(z, Rcomplex, COMPLEX);
-		break;
-	default:
-		break;
-	}
+	SWITCH4(class[0], BAND);
 
 #undef BAND
 
@@ -166,68 +151,47 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	int packed = class[2] == 'p';
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
-	char ul = 'U', ct = 'C', di = 'N';
+	char ul = '\0', ct = '\0', di = '\0';
 	if (class[1] != 'g') {
-		if (packed) {
-			SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-			ul = CHAR(STRING_ELT(uplo, 0))[0];
-		}
-		if (class[1] == 's' && class[0] == 'z') {
-			SEXP trans = GET_SLOT(obj, Matrix_transSym);
-			ct = CHAR(STRING_ELT(trans, 0))[0];
-		}
-		if (class[1] == 't') {
-			SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-			di = CHAR(STRING_ELT(diag, 0))[0];
-		}
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		ans = PROTECT(allocVector(TYPEOF(x), r));
 
-#define DG_LOOP(_CTYPE_, _PTR_, _ONE_) \
+#define DIAG(c) \
 	do { \
-		_CTYPE_ *pans = _PTR_(ans), *px = _PTR_(x); \
-		if (di != 'N') \
-			for (j = 0; j < r; ++j) \
-				*(pans++) = _ONE_; \
-		else if (!packed) { \
-			R_xlen_t m1a = (R_xlen_t) m + 1; \
-			for (j = 0; j < r; ++j, px += m1a) \
-				*(pans++) = *px; \
-		} \
+		c##TYPE *pans = c##PTR(ans), *px = c##PTR(x); \
+		if (di != '\0' && di != 'N') \
+			for (int j = 0; j < r; ++j) \
+				*(pans++) = c##UNIT; \
+		else if (!packed) \
+			c##NAME(copy2)(r, pans, 1, px, (R_xlen_t) m + 1); \
 		else if (ul == 'U') \
-			for (j = 0; j < n; px += (++j) + 1) \
-				*(pans++) = *px; \
+			c##NAME(copy1)(n, pans, 1, 0, px, 2,  1); \
 		else \
-			for (j = 0; j < n; px += n - (j++)) \
-				*(pans++) = *px; \
+			c##NAME(copy1)(n, pans, 1, 0, px, n, -1); \
 	} while (0)
 
-	switch (class[0]) {
-	case 'n':
-		DG_LOOP(int, LOGICAL, 1);
+	SWITCH4(class[0], DIAG);
+
+#undef DIAG
+
+	if (class[0] == 'n')
 		naToUnit(ans);
-		break;
-	case 'l':
-		DG_LOOP(int, LOGICAL, 1);
-		break;
-	case 'i':
-		DG_LOOP(int, INTEGER, 1);
-		break;
-	case 'd':
-		DG_LOOP(double, REAL, 1.0);
-		break;
-	case 'z':
-		DG_LOOP(Rcomplex, COMPLEX, Matrix_zunit);
-		if (class[1] == 's' && ct == 'C')
-			zvreal(COMPLEX(ans), XLENGTH(ans));
-		break;
-	default:
-		break;
-	}
+	if (class[0] == 'z' && class[1] == 's' && ct == 'C')
+		zvreal(COMPLEX(ans), r);
 
 	if (names) {
 		/* NB: The logic here must be adjusted once the validity method
@@ -248,8 +212,6 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		}
 		UNPROTECT(1); /* dn */
 	}
-
-#undef DG_LOOP
 
 	UNPROTECT(2); /* x, ans */
 	return ans;
@@ -276,10 +238,10 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	int packed = class[2] == 'p';
 
 	SEXP to = PROTECT(newObject(class));
-	int v = LENGTH(value) != 1;
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n, j;
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n,
+		v = LENGTH(value) == r;
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -288,7 +250,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = 'U';
+	char ul = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -299,59 +261,26 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 
 	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
 	if (new) {
-		x = duplicate(x);
+		x = duplicateVector(x);
 		UNPROTECT(1); /* x */
 		PROTECT(x);
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 
-#define DS_LOOP(_CTYPE_, _PTR_) \
+#define DIAG(c) \
 	do { \
-		_CTYPE_ *px = _PTR_(x), *pvalue = _PTR_(value); \
-		if (!packed) { \
-			R_xlen_t m1a = (R_xlen_t) m + 1; \
-			if (v) \
-				for (j = 0; j < r; ++j, px += m1a) \
-					*px = *(pvalue++); \
-			else \
-				for (j = 0; j < r; ++j, px += m1a) \
-					*px = *pvalue; \
-		} else if (ul == 'U') { \
-			if (v) \
-				for (j = 0; j < n; px += (++j) + 1) \
-					*px = *(pvalue++); \
-			else \
-				for (j = 0; j < n; px += (++j) + 1) \
-					*px = *pvalue; \
-		} else { \
-			if (v) \
-				for (j = 0; j < n; px += n - (j++)) \
-					*px = *(pvalue++); \
-			else \
-				for (j = 0; j < n; px += n - (j++)) \
-					*px = *pvalue; \
-		} \
+		c##TYPE *px = c##PTR(x), *pvalue = c##PTR(value); \
+		if (!packed) \
+			c##NAME(copy2)(r, px, (R_xlen_t) m + 1, pvalue, v); \
+		else if (ul == 'U') \
+			c##NAME(copy1)(n, px, 2,  1, pvalue, v, 0); \
+		else  \
+			c##NAME(copy1)(n, px, n, -1, pvalue, v, 0); \
 	} while (0)
 
-	switch (class[0]) {
-	case 'n':
-	case 'l':
-		DS_LOOP(int, LOGICAL);
-		break;
-	case 'i':
-		DS_LOOP(int, INTEGER);
-		break;
-	case 'd':
-		DS_LOOP(double, REAL);
-		break;
-	case 'z':
-		DS_LOOP(Rcomplex, COMPLEX);
-		break;
-	default:
-		break;
-	}
+	SWITCH4(class[0], DIAG);
 
-#undef DS_LOOP
+#undef DIAG
 
 	UNPROTECT(2); /* x, to */
 	return to;
@@ -382,8 +311,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 
 	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-	R_xlen_t len = XLENGTH(s_value);
-	if (len != 1 && len != r)
+	if (XLENGTH(s_value) != 1 && XLENGTH(s_value) != r)
 		error(_("replacement diagonal has wrong length"));
 
 	int new = 1;
@@ -451,7 +379,7 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 		set_reversed_DimNames(to, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = 'U';
+	char ul = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -490,33 +418,16 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
-#define TRANS(_PREFIX_, _CTYPE_, _PTR_) \
+#define TRANS(c) \
 	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			_PREFIX_ ## trans2(px1, px0, m, n,     ct); \
+			c##NAME(trans2)(px1, px0, m,  n, ct); \
 		else \
-			_PREFIX_ ## trans1(px1, px0,    n, ul, ct); \
+			c##NAME(trans1)(px1, px0, n, ul, ct); \
 	} while (0)
 
-	switch (class[0]) {
-	case 'n':
-	case 'l':
-		TRANS(i, int, LOGICAL);
-		break;
-	case 'i':
-		TRANS(i, int, INTEGER);
-		break;
-	case 'c':
-	case 'd':
-		TRANS(d, double, REAL);
-		break;
-	case 'z':
-		TRANS(z, Rcomplex, COMPLEX);
-		break;
-	default:
-		break;
-	}
+	SWITCH4((class[0] == 'c') ? 'd' : class[0], TRANS);
 
 #undef TRANS
 
@@ -536,7 +447,7 @@ SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
 
-	char ct = 'C';
+	char ct = '\0';
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
 	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
@@ -611,36 +522,20 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 		SET_SLOT(to, Matrix_xSym, x1);
 
-#define FORCE(_PREFIX_, _CTYPE_, _PTR_) \
+#define FORCE(c) \
 		do { \
-			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
+			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			if (!packed) \
-				_PREFIX_ ## force2(px1, px0, n, ul0, ct0, di); \
+				c##NAME(force2)(px1,  px0, n, ul0, ct0, di); \
 			else if (ul0 == ul1) \
-				_PREFIX_ ## force1(px1, px0, n, ul0, ct0, di); \
+				c##NAME(force1)(px1,  px0, n, ul0, ct0, di); \
 			else { \
-				_PREFIX_ ## trans1(px1, px0, n, ul0, ct0); \
-				_PREFIX_ ## force1(px1, NULL, n, ul1, ct0, di); \
+				c##NAME(trans1)(px1,  px0, n, ul0, ct0); \
+				c##NAME(force1)(px1, NULL, n, ul1, ct0, di); \
 			} \
 		} while (0)
 
-		switch (class[0]) {
-		case 'n':
-		case 'l':
-			FORCE(i, int, LOGICAL);
-			break;
-		case 'i':
-			FORCE(i, int, INTEGER);
-			break;
-		case 'd':
-			FORCE(d, double, REAL);
-			break;
-		case 'z':
-			FORCE(z, Rcomplex, COMPLEX);
-			break;
-		default:
-			break;
-		}
+		SWITCH4(class[0], FORCE);
 
 #undef FORCE
 
@@ -678,20 +573,20 @@ SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 
 SEXP dense_symmpart(SEXP from, const char *class, char ct)
 {
-	char ct0 = ct, ct1 = ct;
+	/* defined in ./coerce.c : */
+	SEXP dense_as_kind(SEXP, const char *, char, int);
+	PROTECT(from = dense_as_kind(from, class, ',', 0));
+
+	char ct0 = (ct == '\0') ? 'C' : ct, ct1 = ct0;
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = GET_SLOT(from, Matrix_transSym);
 		ct0 = CHAR(STRING_ELT(trans, 0))[0];
 	}
 
-	if (class[0] != 'z' && class[0] != 'd') {
-		/* defined in ./coerce.c : */
-		SEXP dense_as_kind(SEXP, const char *, char, int);
-		from = dense_as_kind(from, class, 'd', 0);
-	}
-	if (class[1] == 's' && ct0 == ct1)
+	if (class[1] == 's' && ct0 == ct1) {
+		UNPROTECT(1);
 		return from;
-	PROTECT(from);
+	}
 
 	int packed = class[2] == 'p';
 
@@ -704,7 +599,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((ct == 'C')
+		error((ct1 == 'C')
 		      ? _("attempt to get Hermitian part of non-square matrix")
 		      : _("attempt to get symmetric part of non-square matrix"));
 	if (n > 0)
@@ -739,76 +634,111 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	PROTECT_INDEX pid;
-	SEXP x = GET_SLOT(from, Matrix_xSym);
-	PROTECT_WITH_INDEX(x, &pid);
-	if (class[0] == 'z' || class[0] == 'd')
-		REPROTECT(x = duplicate(x), pid);
-	SET_SLOT(to, Matrix_xSym, x);
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
+		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+	SET_SLOT(to, Matrix_xSym, x1);
 
-	if (class[1] == 's' && ct0 != ct1) {
+	if (class[1] == 's') {
+
 		/* Symmetric part of Hermitian matrix is real part */
 		/* Hermitian part of symmetric matrix is real part */
-		zvreal(COMPLEX(x), XLENGTH(x));
-		UNPROTECT(3); /* x, to, from */
-		return to;
+
+		zvreal(COMPLEX(x1), XLENGTH(x1));
+
+	} else {
+
+		int i, j;
+
+#define SPART(c) \
+		do { \
+			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
+			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
+			if (!packed) \
+				memset(px1, 0, sizeof(c##TYPE) * XLENGTH(x1)); \
+			if (class[1] == 'g') { \
+				if (ct1 == 'C') \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##INCREMENT_CONJ(*pu1, *pl0); \
+							c##MULTIPLY(*pu1, 0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+							pl0 += n; \
+						} \
+						c##ASSIGN_PROJ_REAL(*pu1, *pu0); \
+						pu0 += n - j; \
+						pu1 += n - j; \
+						pl0 = px0 + j + 1; \
+					} \
+				else \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##INCREMENT_IDEN(*pu1, *pl0); \
+							c##MULTIPLY(*pu1, 0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+							pl0 += n; \
+						} \
+						c##ASSIGN_IDEN(*pu1, *pu0); \
+						pu0 += n - j; \
+						pu1 += n - j; \
+						pl0 = px0 + j + 1; \
+					} \
+			} else { \
+				if (ul == 'U') \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##MULTIPLY(*pu1, 0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+						} \
+						if (di != 'N') \
+							c##SET_UNIT(*pu1); \
+						else if (ct1 == 'C') \
+							c##ASSIGN_PROJ_REAL(*pu1, *pu0); \
+						else \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+						pu0 += 1; \
+						pu1 += 1; \
+						if (!packed) { \
+							pu0 += n - j - 1; \
+							pu1 += n - j - 1; \
+						} \
+					} \
+				else \
+					for (j = 0; j < n; ++j) { \
+						if (!packed) { \
+							pl0 += j; \
+							pl1 += j; \
+						} \
+						if (di != 'N') \
+							c##SET_UNIT(*pl1); \
+						else if (ct1 == 'C') \
+							c##ASSIGN_PROJ_REAL(*pl1, *pl0); \
+						else \
+							c##ASSIGN_IDEN(*pl1, *pl0); \
+						pl0 += 1; \
+						pl1 += 1; \
+						for (i = j + 1; i < n; ++i) { \
+							c##ASSIGN_IDEN(*pl1, *pl0); \
+							c##MULTIPLY(*pl1, 0.5); \
+							pl0 += 1; \
+							pl1 += 1; \
+						} \
+					} \
+			} \
+		} while (0)
+
+		SWITCH2(class[0], SPART);
+
+#undef SPART
+
 	}
 
-	int i, j;
-
-#define SP_LOOP(_PREFIX_, _CTYPE_, _PTR_, \
-	            _INCREMENT_ID_, _INCREMENT_CJ_, _SCALE1_) \
-	do { \
-		_CTYPE_ *px = _PTR_(x); \
-		if (class[1] == 'g') { \
-			_CTYPE_ *py = px; \
-			for (j = 0; j < n; ++j) { \
-				for (i = j + 1; i < n; ++i) { \
-					px += n; \
-					py += 1; \
-					if (ct1 == 'C') \
-						_INCREMENT_CJ_((*px), (*py)); \
-					else \
-						_INCREMENT_ID_((*px), (*py)); \
-					_SCALE1_((*px), 0.5); \
-				} \
-				px = (py += j + 2); \
-			} \
-		} else { \
-			if (ul == 'U') { \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i < j; ++i) { \
-					_SCALE1_((*px), 0.5); \
-					px += 1; \
-				} \
-				px += (!packed) ? n - j : 1; \
-			} \
-			} else { \
-			for (j = 0; j < n; ++j) { \
-				px += (!packed) ? j + 1 : 1; \
-				for (i = j + 1; i < n; ++i) { \
-					_SCALE1_((*px), 0.5); \
-					px += 1; \
-				} \
-			} \
-			} \
-			if (!packed) \
-				_PREFIX_ ## force2(_PTR_(x), NULL, n, ul, '\0', di); \
-			else \
-				_PREFIX_ ## force1(_PTR_(x), NULL, n, ul, '\0', di); \
-		} \
-	} while (0)
-
-	if (class[0] == 'z')
-		SP_LOOP(z, Rcomplex, COMPLEX,
-		        INCREMENT_COMPLEX_ID, INCREMENT_COMPLEX_CJ, SCALE1_COMPLEX);
-	else
-		SP_LOOP(d, double, REAL,
-		        INCREMENT_REAL, INCREMENT_REAL, SCALE1_REAL);
-
-#undef SP_LOOP
-
-	UNPROTECT(3); /* x, to, from */
+	UNPROTECT(4); /* x1, x0, to, from */
 	return to;
 }
 
@@ -820,7 +750,7 @@ SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
 
-	char ct = 'C';
+	char ct = '\0';
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
 	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
@@ -831,18 +761,15 @@ SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
 
 SEXP dense_skewpart(SEXP from, const char *class, char ct)
 {
-	if (class[0] != 'z' && class[0] != 'd') {
-		/* defined in ./coerce.c : */
-		SEXP dense_as_kind(SEXP, const char *, char, int);
-		from = dense_as_kind(from, class, 'd', 0);
-	}
-	PROTECT(from);
+	/* defined in ./coerce.c : */
+	SEXP dense_as_kind(SEXP, const char *, char, int);
+	PROTECT(from = dense_as_kind(from, class, ',', 0));
 
 	int packed = class[2] == 'p';
 
 	char cl[] = "...Matrix";
 	cl[0] = (class[0] == 'z') ? 'z' : 'd';
-	cl[1] = (class[1] == 's') ? class[1] : 'g';
+	cl[1] = (class[1] == 's') ? 's' : 'g';
 	cl[2] = (class[1] == 's') ? class[2] : 'e';
 	SEXP to = PROTECT(newObject(cl));
 
@@ -863,7 +790,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = 'U';
+	char ul = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -872,7 +799,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		UNPROTECT(1); /* uplo */
 	}
 
-	char ct0 = ct, ct1 = ct;
+	char ct0 = (ct == '\0') ? 'C' : ct, ct1 = ct0;
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
 		ct0 = CHAR(STRING_ELT(trans, 0))[0];
@@ -881,113 +808,146 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		UNPROTECT(1);
 	}
 
-	char di = 'N';
+	char di = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1;
 
 	if (class[1] == 's') {
+
 		/* Skew-symmetric part of Hermitian matrix is imaginary part */
 		/* Skew-Hermitian part of symmetric matrix is imaginary part */
-		R_xlen_t len = XLENGTH(x1);
-		PROTECT(x1 = allocVector(TYPEOF(x0), len));
-		SET_SLOT(to, Matrix_xSym, x1);
+
+		PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
 		if (class[0] == 'z') {
 			Rcomplex *px1 = COMPLEX(x1);
-			memset(px1, 0, sizeof(Rcomplex) * len);
-			if (ct0 != ct1) {
-				Rcomplex *px0 = COMPLEX(x1);
-				while (len--)
-					(*(px1++)).i = (*(px0++)).i;
+			if (ct0 == ct1)
+			memset(px1, 0, sizeof(Rcomplex) * XLENGTH(x1));
+			else {
+			Rcomplex *px0 = COMPLEX(x0);
+			for (R_xlen_t k = 0, kend = XLENGTH(x1); k < kend; ++k) {
+				zASSIGN_PROJ_IMAG(*px1, *px0);
+				px0 += 1;
+				px1 += 1;
+			}
 			}
 		} else {
 			double *px1 = REAL(x1);
-			memset(px1, 0, sizeof(double) * len);
+			memset(px1, 0, sizeof(double) * XLENGTH(x1));
 		}
-		UNPROTECT(4); /* x1, x0, to, from */
-		return to;
-	}
 
-	if (class[0] == 'z' || class[0] == 'd' || packed) {
-		if ((int_fast64_t) n * n > R_XLEN_T_MAX)
+	} else {
+
+		if (class[0] == 't' && (int_fast64_t) n * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
-		x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n);
-	}
-	PROTECT(x1);
-	SET_SLOT(to, Matrix_xSym, x1);
+		PROTECT(x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 
-	int i, j;
-	R_xlen_t upos = 0, lpos = 0;
+		int i, j;
 
-#define SP_LOOP(_CTYPE_, _PTR_, _ZERO_, \
-	            _ASSIGN2_ID_, _ASSIGN2_IM_, _INCREMENT_) \
-	do { \
-		_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-		if (class[1] == 'g') { \
-			for (j = 0; j < n; ++j) { \
-				lpos = j; \
-				for (i = 0; i < j; ++i) { \
-					_ASSIGN2_ID_(px1[upos], 0.5 * px0[upos]); \
-					_INCREMENT_(px1[upos], -0.5 * px0[lpos]); \
-					_ASSIGN2_ID_(px1[lpos], -px1[upos]); \
-					upos += 1; \
-					lpos += n; \
-				} \
+#define SPART(c) \
+		do { \
+			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
+			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
+			if (class[1] == 'g') { \
 				if (ct1 == 'C') \
-					_ASSIGN2_IM_(px1[upos], px0[upos]); \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##DECREMENT_CONJ(*pu1, *pl0); \
+							c##ASSIGN_CONJ(*pl1, *pu1); \
+							c##MULTIPLY(*pu1,  0.5); \
+							c##MULTIPLY(*pl1, -0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+							pl0 += n; \
+							pl1 += n; \
+						} \
+						c##ASSIGN_PROJ_IMAG(*pu1, *pu0); \
+						pu0 += n - j; \
+						pu1 += n - j; \
+						pl0 = px0 + j + 1; \
+						pl1 = px1 + j + 1; \
+					} \
 				else \
-					px1[upos] = _ZERO_; \
-				upos += n - j; \
-			} \
-		} else if (ul == 'U') { \
-			for (j = 0; j < n; ++j) { \
-				lpos = j; \
-				for (i = 0; i < j; ++i) { \
-					_ASSIGN2_ID_(px1[upos], 0.5 * (*px0)); \
-					_ASSIGN2_ID_(px1[lpos], -px1[upos]); \
-					px0 += 1; \
-					upos += 1; \
-					lpos += n; \
-				} \
-				if (ct1 == 'C' && di == 'N') \
-					_ASSIGN2_IM_(px1[upos], (*px0)); \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##DECREMENT_IDEN(*pu1, *pl0); \
+							c##ASSIGN_IDEN(*pl1, *pu1); \
+							c##MULTIPLY(*pu1,  0.5); \
+							c##MULTIPLY(*pl1, -0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+							pl0 += n; \
+							pl1 += n; \
+						} \
+						c##SET_ZERO(*pu1); \
+						pu0 += n - j; \
+						pu1 += n - j; \
+						pl0 = px0 + j + 1; \
+						pl1 = px1 + j + 1; \
+					} \
+			} else { \
+				if (ul == 'U') \
+					for (j = 0; j < n; ++j) { \
+						for (i = 0; i < j; ++i) { \
+							c##ASSIGN_IDEN(*pu1, *pu0); \
+							c##ASSIGN_IDEN(*pl1, *pu0); \
+							c##MULTIPLY(*pu1,  0.5); \
+							c##MULTIPLY(*pl1, -0.5); \
+							pu0 += 1; \
+							pu1 += 1; \
+							pl1 += n; \
+						} \
+						if (di != 'N' || ct1 != 'C') \
+							c##SET_ZERO(*pu1); \
+						else \
+							c##ASSIGN_PROJ_IMAG(*pu1, *pu0); \
+						pu0 += 1; \
+						pu1 += 1; \
+						pl1 += n; \
+						if (!packed) \
+						pu0 += n - j - 1; \
+						pu1 += n - j - 1; \
+						pl1 = px1 + j + 1; \
+					} \
 				else \
-					px1[upos] = _ZERO_; \
-				px0 += (!packed) ? n - j : 1; \
-				upos += n - j; \
+					for (j = 0; j < n; ++j) { \
+						if (!packed) \
+						pl0 += j; \
+						pl1 += j; \
+						pu1 = pl1; \
+						if (di != 'N' || ct1 != 'C') \
+							c##SET_ZERO(*pl1); \
+						else \
+							c##ASSIGN_PROJ_IMAG(*pl1, *pl0); \
+						pl0 += 1; \
+						pl1 += 1; \
+						pu1 += n; \
+						for (i = j + 1; i < n; ++i) { \
+							c##ASSIGN_IDEN(*pl1, *pl0); \
+							c##ASSIGN_IDEN(*pu1, *pl0); \
+							c##MULTIPLY(*pl1,  0.5); \
+							c##MULTIPLY(*pu1, -0.5); \
+							pl0 += 1; \
+							pl1 += 1; \
+							pu1 += n; \
+						} \
+					} \
 			} \
-		} else { \
-			for (j = 0; j < n; ++j) { \
-				upos = lpos; \
-				if (ct1 == 'C' && di == 'N') \
-					_ASSIGN2_IM_(px1[lpos], (*px0)); \
-				else \
-					px1[lpos] = _ZERO_; \
-				for (i = j + 1; i < n; ++i) { \
-					px0 += 1; \
-					upos += n; \
-					lpos += 1; \
-					_ASSIGN2_ID_(px1[lpos], 0.5 * (*px0)); \
-					_ASSIGN2_ID_(px1[upos], -px1[lpos]); \
-				} \
-				px0 += (!packed) ? j + 2 : 1; \
-				lpos += j + 2; \
-			} \
-		} \
-	} while (0)
+		} while (0)
 
-	if (class[0] == 'z')
-		SP_LOOP(Rcomplex, COMPLEX, Matrix_zzero,
-		        ASSIGN2_COMPLEX_ID, ASSIGN2_COMPLEX_CJ, INCREMENT_COMPLEX_ID);
-	else
-		SP_LOOP(double, REAL, 0.0,
-		        ASSIGN2_REAL_ID, ASSIGN2_REAL_IM, INCREMENT_REAL);
+		SWITCH2(class[0], SPART);
 
-#undef SP_LOOP
+#undef SPART
+
+	}
+
+	SET_SLOT(to, Matrix_xSym, x1);
 
 	UNPROTECT(4); /* x1, x0, to, from */
 	return to;
@@ -1001,7 +961,7 @@ SEXP R_dense_skewpart(SEXP s_from, SEXP s_trans)
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
 
-	char ct = 'C';
+	char ct = '\0';
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
 	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
@@ -1047,7 +1007,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 	if (!exact)
 		return NA_LOGICAL; /* => do inexact numerical test in R */
 
-	char ul = 'U';
+	char ul = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
