@@ -247,15 +247,15 @@ SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
 	double norm, rcond;
 	int info;
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP) {
-	double *rwork = (double *) R_alloc((size_t) 2 * n, sizeof(double));
+	double *rwork = (double *) R_alloc((size_t) n * 2, sizeof(double));
 	norm =
 	F77_CALL(zlange)(&type, &n, &n, COMPLEX(x), &n, work FCONE);
 	F77_CALL(zgecon)(&type, &n,     COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	norm =
 	F77_CALL(dlange)(&type, &n, &n,    REAL(x), &n, work FCONE);
 	F77_CALL(dgecon)(&type, &n,        REAL(y), &n, &norm, &rcond,
@@ -284,7 +284,7 @@ SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
 	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C') {
@@ -299,8 +299,8 @@ SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	                 (Rcomplex *) work,        &info FCONE);
 	}
 	} else {
-	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 2, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	norm =
 	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	F77_CALL(dsycon)(       &ul, &n,    REAL(y), &n, INTEGER(pivot), &norm, &rcond,
@@ -329,7 +329,7 @@ SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
 	SEXP trans = GET_SLOT(s_obj, Matrix_transSym);
 	char ct = CHAR(STRING_ELT(trans, 0))[0];
 	if (ct == 'C') {
@@ -344,8 +344,8 @@ SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	                 (Rcomplex *) work,        &info FCONE);
 	}
 	} else {
-	double * work = (double *) R_alloc((size_t) 2 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 2, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	norm =
 	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
 	F77_CALL(dspcon)(       &ul, &n,    REAL(y), INTEGER(pivot), &norm, &rcond,
@@ -373,15 +373,15 @@ SEXP poMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
+	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
 	norm =
 	F77_CALL(zlansy)(&type, &ul, &n, COMPLEX(x), &n, work FCONE FCONE);
 	F77_CALL(zpocon)(       &ul, &n, COMPLEX(y), &n, &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 3, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	norm =
 	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	F77_CALL(dpocon)(       &ul, &n, REAL(y), &n, &norm, &rcond,
@@ -409,15 +409,15 @@ SEXP ppMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	double norm, rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
+	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
 	norm =
 	F77_CALL(zlansp)(&type, &ul, &n, COMPLEX(x), work FCONE FCONE);
 	F77_CALL(zppcon)(       &ul, &n, COMPLEX(y), &norm, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE);
 	} else {
-	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	norm =
 	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
 	F77_CALL(dppcon)(       &ul, &n,    REAL(y), &norm, &rcond,
@@ -447,13 +447,13 @@ SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 	double rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
+	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
 	F77_CALL(ztrcon)(&type, &ul, &di, &n, COMPLEX(x), &n, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
-	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 3, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	F77_CALL(dtrcon)(&type, &ul, &di, &n,    REAL(x), &n, &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}
@@ -481,13 +481,13 @@ SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 	double rcond;
 	int info;
 	if (TYPEOF(x) == CPLXSXP) {
-	double * work = (double *) R_alloc((size_t) 4 * n, sizeof(double));
-	double *rwork = (double *) R_alloc((size_t)     n, sizeof(double));
+	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
+	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
 	F77_CALL(ztpcon)(&type, &ul, &di, &n, COMPLEX(x), &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
-	double * work = (double *) R_alloc((size_t) 3 * n, sizeof(double));
-	int    *iwork = (int    *) R_alloc((size_t)     n, sizeof(int   ));
+	double * work = (double *) R_alloc((size_t) n * 3, sizeof(double));
+	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
 	F77_CALL(dtpcon)(&type, &ul, &di, &n,    REAL(x), &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}

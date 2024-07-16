@@ -1747,7 +1747,7 @@ SEXP sparseCholesky_validate(SEXP obj)
 
 SEXP simplicialCholesky_validate(SEXP obj)
 {
-	int pattern = !HAS_SLOT(obj, Matrix_minorSym);	
+	int pattern = !HAS_SLOT(obj, Matrix_minorSym);
 	if (pattern)
 		return ScalarLogical(1);
 
@@ -1905,8 +1905,8 @@ SEXP simplicialCholesky_validate(SEXP obj)
 
 SEXP supernodalCholesky_validate(SEXP obj)
 {
-	int pattern = !HAS_SLOT(obj, Matrix_minorSym);	
-	
+	int pattern = !HAS_SLOT(obj, Matrix_minorSym);
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 

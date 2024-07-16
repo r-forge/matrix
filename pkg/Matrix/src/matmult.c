@@ -1,6 +1,7 @@
 #include "Lapack-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
+#include "M5.h"
 #include "idz.h"
 #include "coerce.h"
 #include "dense.h"
@@ -142,23 +143,21 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 
 #define CONJ2(_X_, _M_, _N_) \
 do { \
-	int m = (int) _M_, n = (int) _N_; \
-	size_t mn = (size_t) m * n; \
-	Rcomplex *dest = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	size_t m = (size_t) _M_, n = (size_t) _N_, xlen = m * n; \
 	Rcomplex *src = (Rcomplex *) _X_; \
-	for (size_t k = 0; k < mn; ++k) \
-		ASSIGN2_COMPLEX_CJ(dest[k], src[k]); \
+	Rcomplex *dest = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
+	for (size_t k = 0; k < xlen; ++k) \
+		zASSIGN_CONJ(dest[k], src[k]); \
 	_X_ = dest; \
 } while (0)
 
 #define CONJ1(_X_, _N_) \
 do { \
-	int n = (int) _N_; \
-	size_t mn = PACKED_LENGTH((size_t) n); \
-	Rcomplex *dest = (Rcomplex *) R_alloc(mn, sizeof(Rcomplex)); \
+	size_t n = (size_t) _N_, xlen = PACKED_LENGTH(n); \
 	Rcomplex *src = (Rcomplex *) _X_; \
-	for (size_t k = 0; k < mn; ++k) \
-		ASSIGN2_COMPLEX_CJ(dest[k], src[k]); \
+	Rcomplex *dest = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
+	for (size_t k = 0; k < xlen; ++k) \
+		zASSIGN_CONJ(dest[k], src[k]); \
 	_X_ = dest; \
 } while (0)
 
@@ -206,7 +205,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rm));
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
-		memset(prx, 0, sizeof(Rcomplex) * rm * rm);
+		memset(prx, 0, sizeof(Rcomplex) * (size_t) rm * (size_t) rm);
 		if (rk > 0) {
 		Rcomplex *pax = COMPLEX(ax),
 			zero = Matrix_zzero, one = Matrix_zunit;
@@ -221,7 +220,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		}
 		} else {
 		double *prx = REAL(rx);
-		memset(prx, 0, sizeof(double) * rm * rm);
+		memset(prx, 0, sizeof(double) * (size_t) rm * (size_t) rm);
 		if (rk > 0) {
 		double *pax = REAL(ax),
 			zero = 0.0, one = 1.0;
@@ -273,7 +272,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
 		if (rk == 0)
-		memset(prx, 0, sizeof(Rcomplex) * rm * rn);
+		memset(prx, 0, sizeof(Rcomplex) * (size_t) rm * (size_t) rn);
 		else {
 		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 		Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx),
@@ -286,7 +285,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		} else {
 		double *prx = REAL(rx);
 		if (rk == 0)
-		memset(prx, 0, sizeof(double) * rm * rn);
+		memset(prx, 0, sizeof(double) * (size_t) rm * (size_t) rn);
 		else {
 		SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym));
 		double *pax = REAL(ax), *pbx = REAL(bx),
@@ -405,7 +404,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	prx += rincp;
 	}
 	if (aside != 'L' && btrans == 'C')
-		zvconj(pax, (size_t) rk * rk); /* in place */
+		zvconj(pax, (size_t) rk * (size_t) rk); /* in place */
 	}
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
@@ -522,7 +521,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : act)) == 'C')
-		zvconj(prx, (size_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
 		zero = 0.0, one = 1.0;
@@ -615,13 +614,13 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	if (TYPEOF(ax) == CPLXSXP) {
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
 		one = Matrix_zunit;
-	ztrans2(prx, pbx, bm, bn, btrans);
+	ztrans2(prx, pbx, (size_t) bm, (size_t) bn, btrans);
 	F77_CALL(ztrmm)(&aside, &aul, &atrans, &adi, &rm, &rn,
 	                &one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
 		one = 1.0;
-	dtrans2(prx, pbx, bm, bn, btrans);
+	dtrans2(prx, pbx, (size_t) bm, (size_t) bn, btrans);
 	F77_CALL(dtrmm)(&aside, &aul, &atrans, &adi, &rm, &rn,
 	                &one, pax, &rk, prx, &rm FCONE FCONE FCONE FCONE);
 	}
@@ -717,9 +716,9 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx);
 	if (aside != 'L' && atrans != 'N' && btrans != 'N' && atrans != btrans)
 		CONJ1(pax, rk);
-	ztrans2(prx, pbx, bm, bn, btransp);
+	ztrans2(prx, pbx, (size_t) bm, (size_t) bn, btransp);
 	if (aside != 'L' && atrans == 'C' && btrans == 'N')
-		zvconj(prx, (size_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
 	for (i = 0; i < rn; ++i) {
 	F77_CALL(ztpmv)(&aul, &atransp, &adi, &rk,
 	                pax, prx, &rinc FCONE FCONE FCONE);
@@ -727,10 +726,10 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : 'T')) == 'C')
-		zvconj(prx, (size_t) rm * rn); /* in place */
+		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx);
-	dtrans2(prx, pbx, bm, bn, btransp);
+	dtrans2(prx, pbx, (size_t) bm, (size_t) bn, btransp);
 	for (i = 0; i < rn; ++i) {
 	F77_CALL(dtpmv)(&aul, &atransp, &adi, &rk,
 	                pax, prx, &rinc FCONE FCONE FCONE);
@@ -970,9 +969,9 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 		if (ytrans != 'N')
 			cholmod_free_sparse(&Y, &c);
 		if (triangular < -1)
-			cholmod_band_inplace(-Z->nrow, -1, !boolean, Z, &c);
+			cholmod_band_inplace(-((int) Z->nrow), -1, !boolean, Z, &c);
 		else if (triangular > 1)
-			cholmod_band_inplace( 1,  Z->ncol, !boolean, Z, &c);
+			cholmod_band_inplace(1, (int) Z->ncol, !boolean, Z, &c);
 		PROTECT(z = CHS2M(Z, !boolean, zclass[1]));
 		cholmod_free_sparse(&Z, &c);
 
@@ -1018,8 +1017,8 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 
 	if (((xtrans != 'N') ? X->nrow : X->ncol) != Y->nrow)
 		error(_("non-conformable arguments"));
-	int m = (int) ((xtrans != 'N') ? X->ncol : X->nrow), n = (int) Y->ncol;
-	if ((int_fast64_t) m * n > R_XLEN_T_MAX)
+	size_t m = (xtrans != 'N') ? X->ncol : X->nrow, n = Y->ncol;
+	if (m * n > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
 
@@ -1033,8 +1032,8 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 	SEXP z = PROTECT(newObject(zclass));
 
 	SEXP zdim = GET_SLOT(z, Matrix_DimSym);
-	INTEGER(zdim)[0] = (ztrans != 'N') ? n : m;
-	INTEGER(zdim)[1] = (ztrans != 'N') ? m : n;
+	INTEGER(zdim)[0] = (int) ((ztrans != 'N') ? n : m);
+	INTEGER(zdim)[1] = (int) ((ztrans != 'N') ? m : n);
 
 	SEXP xdimnames = (symmetric != 0)
 		? PROTECT(get_symmetrized_DimNames(x, -1))
@@ -1066,8 +1065,8 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 	double alpha[2] = { 1.0, 0.0 }, beta[2] = { 0.0, 0.0 };
 	cholmod_dense *Z = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(Z, 0, sizeof(cholmod_dense));
-	Z->nrow = (size_t) m;
-	Z->ncol = (size_t) n;
+	Z->nrow = m;
+	Z->ncol = n;
 	Z->d = Z->nrow;
 	Z->nzmax = Z->nrow * Z->ncol;
 	Z->xtype = X->xtype;
@@ -1075,14 +1074,14 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 
 	SEXP zx;
 	if (zclass[0] == 'z') {
-	PROTECT(zx = allocVector(CPLXSXP, (R_xlen_t) m * n));
+	PROTECT(zx = allocVector(CPLXSXP, (R_xlen_t) (m * n)));
 	Z->x = (ztrans != 'N')
-		? (Rcomplex *) R_alloc((size_t) m * n, sizeof(Rcomplex))
+		? (Rcomplex *) R_alloc(m * n, sizeof(Rcomplex))
 		: COMPLEX(zx);
 	} else {
-	PROTECT(zx = allocVector(REALSXP, (R_xlen_t) m * n));
+	PROTECT(zx = allocVector(REALSXP, (R_xlen_t) (m * n)));
 	Z->x = (ztrans != 'N')
-		? (double *) R_alloc((size_t) m * n, sizeof(double))
+		? (double *) R_alloc(m * n, sizeof(double))
 		: REAL(zx);
 	}
 	cholmod_sdmult(X, xtrans != 'N', alpha, beta, Y, Z, &c);
@@ -1306,12 +1305,13 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 			} \
 		} \
 		if (di != '\0' && di != 'N') { \
+			size_t n_ = (size_t) n; \
 			if (!packed) \
-				_PREFIX_ ## copy2(n, _PTR_(x), (ptrdiff_t) n + 1, pd, 1); \
+				_PREFIX_ ## copy2(n_, _PTR_(x), n_ + 1, pd, 1); \
 			else if (ul == 'U') \
-				_PREFIX_ ## copy1(n, _PTR_(x), 2,  1, pd, 1, 0); \
+				_PREFIX_ ## copy1(n_, _PTR_(x), 2 , 1, 0, pd, 1, 0, 0); \
 			else \
-				_PREFIX_ ## copy1(n, _PTR_(x), n, -1, pd, 1, 0); \
+				_PREFIX_ ## copy1(n_, _PTR_(x), n_, 1, 1, pd, 1, 0, 0); \
 		} \
 	} while (0)
 
@@ -1580,13 +1580,13 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 	switch (kind) {
 	case 'z':
-		memcpy(COMPLEX(x1), COMPLEX(x0), sizeof(Rcomplex) * XLENGTH(x0));
+		memcpy(COMPLEX(x1), COMPLEX(x0), sizeof(Rcomplex) * (size_t) XLENGTH(x0));
 		break;
 	case 'd':
-		memcpy(   REAL(x1),    REAL(x0), sizeof(  double) * XLENGTH(x0));
+		memcpy(   REAL(x1),    REAL(x0), sizeof(  double) * (size_t) XLENGTH(x0));
 		break;
 	default:
-		memcpy(LOGICAL(x1), LOGICAL(x0), sizeof(     int) * XLENGTH(x0));
+		memcpy(LOGICAL(x1), LOGICAL(x0), sizeof(     int) * (size_t) XLENGTH(x0));
 		break;
 	}
 	SET_SLOT(z, Matrix_xSym, x1);

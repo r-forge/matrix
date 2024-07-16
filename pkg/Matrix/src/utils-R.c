@@ -407,9 +407,9 @@ SEXP Mmatrix(SEXP args)
 	PROTECT(ans = allocMatrix(TYPEOF(vals), nr, nc));
 	if (lendat) {
 		if (isVector(vals))
-			copyMatrix(ans, vals, byrow);
+			copyMatrix(ans, vals, (Rboolean) byrow);
 		else
-			copyListMatrix(ans, vals, byrow);
+			copyListMatrix(ans, vals, (Rboolean) byrow);
 	} else if (isVector(vals)) { /* fill with NAs */
 		R_xlen_t N = (R_xlen_t) nr * nc, i;
 		switch (TYPEOF(vals)) {
@@ -530,7 +530,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 {
 	SEXP ans;
 	int *ij_di = NULL, n, nprot=1;
-	Rboolean check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
+	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
 
 	if (TYPEOF(di) != INTSXP) {
 		di = PROTECT(coerceVector(di, INTSXP));
@@ -608,7 +608,7 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 {
 	SEXP ans;
 	int n = LENGTH(i), nprot = 1;
-	Rboolean check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
+	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
 
 	if (TYPEOF(di)!= INTSXP) {
 		di = PROTECT(coerceVector(di,INTSXP));

@@ -373,9 +373,9 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 			if(verbose) REprintf("(nnz_v=%d) --> %d ", nnz_val, nnz_x);
 #endif
 			// C doc on realloc() says that the old content is *preserve*d
-			ri = R_Realloc(ri, nnz_x, int);
+			ri = R_Realloc(ri, (size_t) nnz_x, int);
 #ifdef _has_x_slot_
-			rx = R_Realloc(rx, nnz_x, Type_x);
+			rx = R_Realloc(rx, (size_t) nnz_x, Type_x);
 #endif
 		    }
 		    // 3) fill them ...

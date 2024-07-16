@@ -165,19 +165,19 @@ SEXP duplicateVector(SEXP x)
 	SEXP ans = allocVector(type, length);
 	switch (type) {
 	case RAWSXP:
-		memcpy(    RAW(ans),     RAW(x), sizeof(   Rbyte) * length);
+		memcpy(    RAW(ans),     RAW(x), sizeof(   Rbyte) * (size_t) length);
 		break;
 	case LGLSXP:
-		memcpy(LOGICAL(ans), LOGICAL(x), sizeof(     int) * length);
+		memcpy(LOGICAL(ans), LOGICAL(x), sizeof(     int) * (size_t) length);
 		break;
 	case INTSXP:
-		memcpy(INTEGER(ans), INTEGER(x), sizeof(     int) * length);
+		memcpy(INTEGER(ans), INTEGER(x), sizeof(     int) * (size_t) length);
 		break;
 	case REALSXP:
-		memcpy(   REAL(ans),    REAL(x), sizeof(  double) * length);
+		memcpy(   REAL(ans),    REAL(x), sizeof(  double) * (size_t) length);
 		break;
 	case CPLXSXP:
-		memcpy(COMPLEX(ans), COMPLEX(x), sizeof(Rcomplex) * length);
+		memcpy(COMPLEX(ans), COMPLEX(x), sizeof(Rcomplex) * (size_t) length);
 		break;
 	default:
 		break;
@@ -190,19 +190,19 @@ SEXP allocZero(SEXPTYPE type, R_xlen_t length)
 	SEXP ans = allocVector(type, length);
 	switch (type) {
 	case RAWSXP:
-		memset(    RAW(ans), 0, sizeof(   Rbyte) * length);
+		memset(    RAW(ans), 0, sizeof(   Rbyte) * (size_t) length);
 		break;
 	case LGLSXP:
-		memset(LOGICAL(ans), 0, sizeof(     int) * length);
+		memset(LOGICAL(ans), 0, sizeof(     int) * (size_t) length);
 		break;
 	case INTSXP:
-		memset(INTEGER(ans), 0, sizeof(     int) * length);
+		memset(INTEGER(ans), 0, sizeof(     int) * (size_t) length);
 		break;
 	case REALSXP:
-		memset(   REAL(ans), 0, sizeof(  double) * length);
+		memset(   REAL(ans), 0, sizeof(  double) * (size_t) length);
 		break;
 	case CPLXSXP:
-		memset(COMPLEX(ans), 0, sizeof(Rcomplex) * length);
+		memset(COMPLEX(ans), 0, sizeof(Rcomplex) * (size_t) length);
 		break;
 	default:
 		break;

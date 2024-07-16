@@ -68,8 +68,8 @@ SEXP geMatrix_expm(SEXP x)
     }
 
     /* Pade' approximation. Powers v^8, v^7, ..., v^1 */
-    memset(npp, 0, sizeof(double) * nsqr);
-    memset(dpp, 0, sizeof(double) * nsqr);
+    memset(npp, 0, sizeof(double) * (size_t) nsqr);
+    memset(dpp, 0, sizeof(double) * (size_t) nsqr);
     m1_j = -1;
     for (j = 7; j >=0; j--) {
 	double mult = padec[j];

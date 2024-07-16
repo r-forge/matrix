@@ -78,6 +78,9 @@ do { \
 #define GET_SLOT(x, name)        R_do_slot       (x, name)
 #define SET_SLOT(x, name, value) R_do_slot_assign(x, name, value)
 
+/* TYPEOF returns int, not SEXPTYPE (unsigned int) => -Wsign-conversion */
+#define TYPEOF(s) ((SEXPTYPE) (TYPEOF)(s))
+
 /* Often used symbols, defined in ./init.c */
 extern
 #include "Msymbols.h"

@@ -75,7 +75,8 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 				*(dest++) = *src; \
 		} else if (!packed) { \
 			if (!recycle) \
-				c##NAME(trans2)(dest, src, n, m, (!byrow) ? 'N' : 'T'); \
+				c##NAME(trans2)(dest, src, (size_t) n, (size_t) m, \
+				                (!byrow) ? 'N' : 'T'); \
 			else { \
 				if (!byrow) { \
 					k = 0; \
@@ -263,7 +264,7 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 			else
 				error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
-		m = (n == 0) ? 0 : vlen / n + (vlen % n != 0);
+		m = (int) ((n == 0) ? 0 : vlen / n + (vlen % n != 0));
 	} else if (n < 0) {
 		if (vlen > (int_fast64_t) m * INT_MAX) {
 			if (m == 0)
@@ -271,7 +272,7 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 			else
 				error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
-		n = (m == 0) ? 0 : vlen / m + (vlen % m != 0);
+		n = (int) ((m == 0) ? 0 : vlen / m + (vlen % m != 0));
 	}
 
 	int_fast64_t mlen = (int_fast64_t) m * n;
@@ -409,7 +410,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		PROTECT(x = allocVector(tt, n + (mn - n) / 2));
 		++nprotect;
 
-#define MAD(c) c##NAME(pack2)(c##PTR(x), c##PTR(from), n, ul, '\0', 'N')
+#define MAD(c) c##NAME(pack2)(c##PTR(x), c##PTR(from), (size_t) n, \
+                              ul, '\0', 'N')
 
 		SWITCH4(cl[0], MAD);
 
@@ -563,7 +565,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		); \
 		SEXP x1 = PROTECT(allocVector(c##TYPESXP, (R_xlen_t) xlen)); \
 		c##TYPE *px1 = c##PTR(x1); \
-		memset(px1, 0, sizeof(c##TYPE) * (R_xlen_t) xlen); \
+		memset(px1, 0, sizeof(c##TYPE) * (size_t) xlen); \
 		switch (class[2]) { \
 		case 'C': \
 		{ \
@@ -765,9 +767,9 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			c##NAME(force2)(px1, px0, n, ul, 1, -di); \
+			c##NAME(force2)(px1, px0, (size_t) n, ul, 1, -di); \
 		else \
-			c##NAME(force1)(px1, px0, n, ul, 1, -di); \
+			c##NAME(force1)(px1, px0, (size_t) n, ul, 1, -di); \
 	} while (0)
 
 	SWITCH4(cl[0], DAD);
@@ -861,7 +863,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 #define IAD(c) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
-		memset(px, 0, sizeof(c##TYPE) * (R_xlen_t) xlen); \
+		memset(px, 0, sizeof(c##TYPE) * (size_t) xlen); \
 		if (mg == 0) { \
 			int_fast64_t m1 = (int_fast64_t) m; \
 			for (int i = 0; i < m; ++i) { \
@@ -990,33 +992,32 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				nnz1 = n + (mn - n) / 2; \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n <= pos / n) \
 						++nnz1; \
 				} else { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n >= pos / n) \
 						++nnz1; \
 				} \
 			} \
 			else { \
 				int_fast64_t a = 0; \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
-						if (pos % n <= pos / n) \
-							++nnz1; \
-					a += r; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n <= pos / n) \
+						++nnz1; \
+				a += r; \
 				} \
-				} else { \
+				else \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
-						if (pos % n >= pos / n) \
-							++nnz1; \
-					a += r; \
-				} \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n >= pos / n) \
+						++nnz1; \
+				a += r; \
 				} \
 			} \
 		} \
@@ -1025,33 +1026,32 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				nnz1 = (mn - n) / 2; \
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n < pos / n) \
 						++nnz1; \
 				} else { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k++] - 1) < mn) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k++] - 1) < mn) \
 					if (pos % n > pos / n) \
 						++nnz1; \
 				} \
 			} \
 			else { \
 				int_fast64_t a = 0; \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
-						if (pos % n < pos / n) \
-							++nnz1; \
-					a += r; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n < pos / n) \
+						++nnz1; \
+				a += r; \
 				} \
-				} else { \
+				else \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k++] - 1) < mn) \
-						if (pos % n > pos / n) \
-							++nnz1; \
-					a += r; \
-				} \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k++] - 1) < mn) \
+					if (pos % n > pos / n) \
+						++nnz1; \
+				a += r; \
 				} \
 			} \
 		} \
@@ -1075,7 +1075,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
 	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1);
-	memset(pp1 - 1, 0, sizeof(int) * ((R_xlen_t) n_ + 1));
+	memset(pp1 - 1, 0, sizeof(int) * ((size_t) n_ + 1));
 	k = 0;
 
 #define VAS__(d, c0, c1) \
@@ -1091,7 +1091,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		if (nnz1 == 0) \
 			/* do nothing */ ; \
 		else if (cl[1] == 'g') { \
-			if (r == 0) { \
+			if (r == 0) \
 				for (j_ = 0; j_ < n_; ++j_) { \
 					pp1[j_] = m; \
 					for (i_ = 0; i_ < m_; ++i_) { \
@@ -1101,9 +1101,8 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 				} \
-			} \
-			else if (r >= mn) { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
+			else if (r >= mn) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
 					++pp1[pos / m_]; \
 					*(pi1++) = pos % m_; \
 					c1##IF_NPATTERN( \
@@ -1111,26 +1110,25 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					); \
 					++k; \
 				} \
-			} \
 			else { \
 				int_fast64_t a = 0; \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
-						++pp1[pos / m_]; \
-						*(pi1++) = pos % m_; \
-						c1##IF_NPATTERN( \
-						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
-						); \
-						++k; \
-					} \
-					a += r; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
+					++pp1[pos / m_]; \
+					*(pi1++) = pos % m_; \
+					c1##IF_NPATTERN( \
+					*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+					); \
+					++k; \
+				} \
+				a += r; \
 				} \
 			} \
 		} \
 		else if (cl[1] == 's' || cl[1] == 'p' || di == 'N') { \
 			if (r == 0) { \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				for (j_ = 0; j_ < n_; ++j_) { \
 					pp1[j_] = j_ + 1; \
 					for (i_ = 0; i_ <= j_; ++i_) { \
@@ -1140,7 +1138,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 				} \
-				} else { \
+				else \
 				for (j_ = 0; j_ < n_; ++j_) { \
 					pp1[j_] = n_ - j_; \
 					for (i_ = j_; i_ < n_; ++i_) { \
@@ -1150,12 +1148,11 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 				} \
-				} \
 			} \
 			else if (r >= mn) { \
-				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = pos % n_) <= (j_ = pos / n_)) { \
+				if ((ul == 'U') == !byrow) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n_) <= (j_ = (int) pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
 						c1##IF_NPATTERN( \
@@ -1164,9 +1161,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					} \
 					++k; \
 				} \
-				} else { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = pos % n_) >= (j_ = pos / n_)) { \
+				else \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n_) >= (j_ = (int) pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
 						c1##IF_NPATTERN( \
@@ -1174,47 +1171,45 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 					++k; \
-				} \
 				} \
 			} \
 			else { \
 				int_fast64_t a = 0; \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
-						if ((i_ = pos % n) <= (j_ = pos / n)) { \
-							++pp1[j_]; \
-							*(pi1++) = i_; \
-							c1##IF_NPATTERN( \
-							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
-							); \
-						} \
-						++k; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n) <= (j_ = (int) pos / n)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
-					a += r; \
+					++k; \
 				} \
-				} else { \
+				a += r; \
+				} \
+				else \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
-						if ((i_ = pos % n) >= (j_ = pos / n)) { \
-							++pp1[j_]; \
-							*(pi1++) = i_; \
-							c1##IF_NPATTERN( \
-							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
-							); \
-						} \
-						++k; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n) >= (j_ = (int) pos / n)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
-					a += r; \
+					++k; \
 				} \
+				a += r; \
 				} \
 			} \
 		} \
 		else { \
 			if (r == 0) { \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				for (j_ = 0; j_ < n_; ++j_) { \
 					pp1[j_] = j_; \
 					for (i_ = 0; i_ < j_; ++i_) { \
@@ -1224,7 +1219,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 				} \
-				} else { \
+				else \
 				for (j_ = 0; j_ < n_; ++j_) { \
 					pp1[j_] = n_ - j_ - 1; \
 					for (i_ = j_ + 1; i_ < n_; ++i_) { \
@@ -1234,12 +1229,11 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 				} \
-				} \
 			} \
 			else if (r >= mn) { \
-				if ((ul == 'U') == !byrow) { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = pos % n_) < (j_ = pos / n_)) { \
+				if ((ul == 'U') == !byrow) \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n_) < (j_ = (int) pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
 						c1##IF_NPATTERN( \
@@ -1248,9 +1242,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 					} \
 					++k; \
 				} \
-				} else { \
-				while (k < nnz0 && (pos = (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = pos % n_) > (j_ = pos / n_)) { \
+				else \
+				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n_) > (j_ = (int) pos / n_)) { \
 						++pp1[j_]; \
 						*(pi1++) = i_; \
 						c1##IF_NPATTERN( \
@@ -1258,41 +1252,39 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 						); \
 					} \
 					++k; \
-				} \
 				} \
 			} \
 			else { \
 				int_fast64_t a = 0; \
-				if ((ul == 'U') == !byrow) { \
+				if ((ul == 'U') == !byrow) \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
-						if ((i_ = pos % n) < (j_ = pos / n)) { \
-							++pp1[j_]; \
-							*(pi1++) = i_; \
-							c1##IF_NPATTERN( \
-							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
-							); \
-						} \
-						++k; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n) < (j_ = (int) pos / n)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
-					a += r; \
+					++k; \
 				} \
-				} else { \
+				a += r; \
+				} \
+				else \
 				while (a < mn) { \
-					k = 0; \
-					while (k < nnz0 && (pos = a + pi0[k] - 1) < mn) { \
-						if ((i_ = pos % n) > (j_ = pos / n)) { \
-							++pp1[j_]; \
-							*(pi1++) = i_; \
-							c1##IF_NPATTERN( \
-							*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
-							); \
-						} \
-						++k; \
+				k = 0; \
+				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
+					if ((i_ = (int) pos % n) > (j_ = (int) pos / n)) { \
+						++pp1[j_]; \
+						*(pi1++) = i_; \
+						c1##IF_NPATTERN( \
+						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
+						); \
 					} \
-					a += r; \
+					++k; \
 				} \
+				a += r; \
 				} \
 			} \
 		} \
@@ -1460,7 +1452,7 @@ SEXP R_vector_as_sparse(SEXP s_from, SEXP s_zzz,
 			else
 				error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
-		m = (n == 0) ? 0 : vlen / n + (vlen % n != 0);
+		m = (int) ((n == 0) ? 0 : vlen / n + (vlen % n != 0));
 	} else if (n < 0) {
 		if (vlen > (int_fast64_t) m * INT_MAX) {
 			if (m == 0)
@@ -1468,7 +1460,7 @@ SEXP R_vector_as_sparse(SEXP s_from, SEXP s_zzz,
 			else
 				error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
-		n = (m == 0) ? 0 : vlen / m + (vlen % m != 0);
+		n = (int) ((m == 0) ? 0 : vlen / m + (vlen % m != 0));
 	}
 
 	int_fast64_t mlen = (int_fast64_t) m * n;
@@ -2213,7 +2205,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	} else {
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1));
 		int *pp = INTEGER(p);
-		memset(pp, 0, sizeof(int) * ((R_xlen_t) s + 1));
+		memset(pp, 0, sizeof(int) * ((size_t) s + 1));
 		for (k = 0; k < r; ++k)
 			++pp[pperm[k]];
 		for (k = 0; k < s; ++k)
@@ -2221,7 +2213,7 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SEXP j = PROTECT(allocVector(INTSXP, r));
 		int *pj = INTEGER(j), *work;
 		Matrix_Calloc(work, s, int);
-		memcpy(work, pp, sizeof(int) * s);
+		memcpy(work, pp, sizeof(int) * (size_t) s);
 		--work;
 		for (k = 0; k < r; ++k)
 			pj[work[pperm[k]]++] = k;
@@ -2632,11 +2624,11 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (packed) \
-			c##NAME( pack1)(px1,  px0, n, ul, ct, di); \
+			c##NAME( pack1)(px1,  px0, (size_t) n, ul, ct, di); \
 		else if (new) \
-			c##NAME(force2)(px1,  px0, n, ul, ct, di); \
+			c##NAME(force2)(px1,  px0, (size_t) n, ul, ct, di); \
 		else \
-			c##NAME(force2)(px1, NULL, n, ul, ct, di); \
+			c##NAME(force2)(px1, NULL, (size_t) n, ul, ct, di); \
 	} while (0)
 
 	SWITCH4(class[0], DAG);
@@ -2737,7 +2729,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		pp0++; *(pp1++) = 0;
 
 		if (class[1] == 's' || class[1] == 'p') {
-			memset(pp1, 0, sizeof(int) * n);
+			memset(pp1, 0, sizeof(int) * (size_t) n);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
 				while (k < kend) {
@@ -2775,7 +2767,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			if (class[1] == 's' || class[1] == 'p') { \
 				int *pp1_; \
 				Matrix_Calloc(pp1_, n, int); \
-				memcpy(pp1_, pp1 - 1, sizeof(int) * n); \
+				memcpy(pp1_, pp1 - 1, sizeof(int) * (size_t) n); \
 				if (ct == 'C') { \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
@@ -2950,12 +2942,12 @@ SEXP sparse_as_general(SEXP from, const char *class)
 				} \
 				} \
 			} else { \
-				memcpy(pi1, pi0, sizeof(    int) * nnz0); \
-				memcpy(pj1, pj0, sizeof(    int) * nnz0); \
+				memcpy(pi1, pi0, sizeof(    int) * (size_t) nnz0); \
+				memcpy(pj1, pj0, sizeof(    int) * (size_t) nnz0); \
 				pi1 += nnz0; \
 				pj1 += nnz0; \
 				c##IF_NPATTERN( \
-				memcpy(px1, px0, sizeof(c##TYPE) * nnz0); \
+				memcpy(px1, px0, sizeof(c##TYPE) * (size_t) nnz0); \
 				px1 += nnz0; \
 				); \
 				for (j = 0; j < n; ++j) { \
@@ -3060,7 +3052,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 #define UNPACK(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
-		c##NAME(pack1)(px1, px0, n, ul, '\0', 'N'); \
+		c##NAME(pack1)(px1, px0, (size_t) n, ul, '\0', 'N'); \
 	} while (0)
 
 	SWITCH4((cl[0] == 'c') ? 'd' : cl[0], UNPACK);
@@ -3176,7 +3168,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
 #define PACK(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
-		c##NAME(pack2)(px1, px0, n, ul, '\0', 'N'); \
+		c##NAME(pack2)(px1, px0, (size_t) n, ul, '\0', 'N'); \
 	} while (0)
 
 	SWITCH4((cl[0] == 'c') ? 'd' : cl[0], PACK);
@@ -3230,7 +3222,7 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1),
 		*pi0 = INTEGER(i0), *pi1 = INTEGER(i1),
 		i, j, k, kend, nnz = pp0[n];
-	memset(pp1, 0, sizeof(int) * ((R_xlen_t) m + 1));
+	memset(pp1, 0, sizeof(int) * ((size_t) m + 1));
 	++pp0; ++pp1;
 	for (k = 0; k < nnz; ++k)
 		++pp1[pi0[k]];
@@ -3239,7 +3231,7 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 
 	int *pp1_;
 	Matrix_Calloc(pp1_, m, int);
-	memcpy(pp1_, pp1 - 1, sizeof(int) * m);
+	memcpy(pp1_, pp1 - 1, sizeof(int) * (size_t) m);
 
 #define TRANS(c) \
 	do { \
@@ -3271,21 +3263,18 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
            int m, int n)
 {
-	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
-	if (nnz0 > INT_MAX)
+	if (XLENGTH(i0) > INT_MAX)
 		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
 		      "TsparseMatrix", "i", "j", "2^31-1");
-
-	/* FIXME: test for overflow and throw error only in that case */
+	int nnz0 = (int) XLENGTH(i0), nnz1 = 0;
 
 	PROTECT(*p1 = allocVector(INTSXP, (R_xlen_t) n + 1));
 	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pp1 = INTEGER(*p1), *pi1,
-		i, j, r = (m < n) ? n : m;
-	R_xlen_t k, kstart, kend, kend_;
+		i, j, r = (m < n) ? n : m, k, kstart, kend, kend_;
 	*(pp1++) = 0;
 
 	int *workA, *workB, *workC, *pj_;
-	size_t lwork = (size_t) m + r + m + nnz0;
+	int_fast64_t lwork = (int_fast64_t) m + r + m + nnz0;
 	Matrix_Calloc(workA, lwork, int);
 	workB = workA + m;
 	workC = workB + r;
@@ -3371,7 +3360,7 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 		/*   px_[k]: corresponding data, "cumulated" appropriately        */ \
 		 \
 		k = 0; \
-		memset(workB, 0, sizeof(int) * n); \
+		memset(workB, 0, sizeof(int) * (size_t) n); \
 		for (i = 0; i < m; ++i) { \
 			kend_ = workC[i]; \
 			while (k < kend_) { \
@@ -3436,19 +3425,16 @@ void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
 void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
            int m, int n)
 {
-	R_xlen_t nnz0 = XLENGTH(i0), nnz1 = 0;
-	if (nnz0 > INT_MAX)
+	if (XLENGTH(i0) > INT_MAX)
 		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
 		      "TsparseMatrix", "i", "j", "2^31-1");
-
-	/* FIXME: test for overflow and throw error only in that case */
+	int nnz0 = (int) XLENGTH(i0), nnz1 = 0;
 
 	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pi1, *pj1,
-		i, j, r = (m < n) ? n : m;
-	R_xlen_t k, kstart, kend, kend_;
+		i, j, r = (m < n) ? n : m, k, kstart, kend, kend_;
 
 	int *workA, *workB, *workC, *pj_;
-	size_t lwork = (size_t) m + r + m + nnz0;
+	int_fast64_t lwork = (int_fast64_t) m + r + m + nnz0;
 	Matrix_Calloc(workA, lwork, int);
 	workB = workA + m;
 	workC = workB + r;
@@ -3837,7 +3823,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		SET_SLOT(to, iSym, i0);
 	else {
 		SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
-		memcpy(INTEGER(i1), INTEGER(i0), sizeof(int) * nnz);
+		memcpy(INTEGER(i1), INTEGER(i0), sizeof(int) * (size_t) nnz);
 		SET_SLOT(to, iSym, i1);
 		UNPROTECT(1); /* i1 */
 	}
@@ -3860,7 +3846,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 			SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SAT(c) memcpy(c##PTR(x1), c##PTR(x0), sizeof(c##TYPE) * nnz)
+#define SAT(c) memcpy(c##PTR(x1), c##PTR(x0), sizeof(c##TYPE) * (size_t) nnz)
 
 			SWITCH4(class[0], SAT);
 

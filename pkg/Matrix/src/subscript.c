@@ -840,7 +840,7 @@ SEXP R_subscript_1ary_mat(SEXP s_x, SEXP s_i)
 static
 int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
 {
-	int k, ident = memcmp(pi, pj, sizeof(int) * n) == 0;
+	int k, ident = memcmp(pi, pj, sizeof(int) * (size_t) n) == 0;
 	if (checkNA) {
 		if (ident) {
 			for (k = 0; k < n; ++k)
@@ -912,7 +912,7 @@ int keep_tr(int *pi, int *pj, int n, int upper, int nonunit, int checkNA)
 static
 int keep_sy(int *pi, int *pj, int n, int upper, int checkNA)
 {
-	if (memcmp(pi, pj, sizeof(int) * n) != 0)
+	if (memcmp(pi, pj, sizeof(int) * (size_t) n) != 0)
 		return 0;
 	int k, r = (upper) ? 1 : -1;
 	if (checkNA) {
@@ -943,7 +943,7 @@ int keep_sy(int *pi, int *pj, int n, int upper, int checkNA)
 static
 int keep_di(int *pi, int *pj, int n, int nonunit, int checkNA, int lwork)
 {
-	int k, ident = memcmp(pi, pj, sizeof(int) * n) == 0;
+	int k, ident = memcmp(pi, pj, sizeof(int) * (size_t) n) == 0;
 	if (checkNA) {
 		if (ident) {
 			for (k = 0; k < n; ++k)
@@ -1000,7 +1000,7 @@ void sort_cr(SEXP obj, const char *cl)
 	int *pp = INTEGER(p), *pi = INTEGER(i);
 
 	int i_, j_, k, kend, nnz = pp[n], *workA, *workB, *workC;
-	size_t lwork = (size_t) m + 1 + r + nnz;
+	int_fast64_t lwork = (int_fast64_t) m + 1 + r + nnz;
 	Matrix_Calloc(workA, lwork, int);
 	workB = workA + m + 1;
 	workC = workB + r;
@@ -1290,7 +1290,7 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 					          XIJ_SY_L, , , _NA_, _ZERO_, _ONE_); \
 			} \
 		} else if (cl_[1] == 't') { \
-			memset(px1, 0, sizeof(_CTYPE_) * XLENGTH(x1)); \
+			memset(px1, 0, sizeof(_CTYPE_) * (size_t) XLENGTH(x1)); \
 			if (upper) { \
 				if (nonunit) { \
 					if (keep > 0) \
@@ -1333,7 +1333,7 @@ SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 				} \
 			} \
 		} else { \
-			memset(px1, 0, sizeof(_CTYPE_) * XLENGTH(x1)); \
+			memset(px1, 0, sizeof(_CTYPE_) * (size_t) XLENGTH(x1)); \
 			if (upper) { \
 				if (keep > 0) \
 					SUB2_LOOP(for (ki = 0; ki <= kj; ++ki), \
@@ -1573,9 +1573,9 @@ SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 				kend = pp0[pj[kj]]; \
 				d = kend - k; \
 				if (d) { \
-					memcpy(pi1, pi0 + k, sizeof(int) * d); \
+					memcpy(pi1, pi0 + k, sizeof(int) * (size_t) d); \
 					pi1 += d; \
-					_MASK_(memcpy(px1, px0 + k, sizeof(*px1) * d)); \
+					_MASK_(memcpy(px1, px0 + k, sizeof(*px1) * (size_t) d)); \
 					_MASK_(px1 += d); \
 				} \
 			} \
@@ -1588,7 +1588,7 @@ SEXP CsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	} else {
 
 		int *workA, *workB, *workC;
-		size_t lwork = (size_t) m + m + ni;
+		int_fast64_t lwork = (int_fast64_t) m + m + ni;
 		Matrix_Calloc(workA, lwork, int);
 		workB = workA + m;
 		workC = workB + m;
@@ -1720,9 +1720,9 @@ SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 				kend = pp0[pi[ki]]; \
 				d = kend - k; \
 				if (d) { \
-					memcpy(pj1, pj0 + k, sizeof(int) * d); \
+					memcpy(pj1, pj0 + k, sizeof(int) * (size_t) d); \
 					pj1 += d; \
-					_MASK_(memcpy(px1, px0 + k, sizeof(*px1) * d)); \
+					_MASK_(memcpy(px1, px0 + k, sizeof(*px1) * (size_t) d)); \
 					_MASK_(px1 += d); \
 				} \
 			} \
@@ -1735,7 +1735,7 @@ SEXP RsparseMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 	} else {
 
 		int *workA, *workB, *workC;
-		size_t lwork = (size_t) n + n + nj;
+		int_fast64_t lwork = (int_fast64_t) n + n + nj;
 		Matrix_Calloc(workA, lwork, int);
 		workB = workA + n;
 		workC = workB + n;
@@ -2098,7 +2098,7 @@ SEXP indMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 			UNPROTECT(1); /* perm1 */
 		} else {
 			int *workA, *workB, *workC;
-			size_t lwork = (size_t) n + n + m;
+			int_fast64_t lwork = (int_fast64_t) n + n + m;
 			Matrix_Calloc(workA, lwork, int);
 			workB = workA + n;
 			workC = workB + n;

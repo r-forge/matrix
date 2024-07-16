@@ -90,7 +90,7 @@ SEXP R_sparse_aggregate(SEXP s_from)
 {
 	static const char *valid[] = {
 		"dpCMatrix", "dpRMatrix", "dpTMatrix",
-		"zpCMatrix", "zpRMatrix", "zpTMatrix",		
+		"zpCMatrix", "zpRMatrix", "zpTMatrix",
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
@@ -483,7 +483,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_pSym, p1);
 
 		if (class[1] == 's' && !sy) {
-			memset(pp1, 0, sizeof(int) * n);
+			memset(pp1, 0, sizeof(int) * (size_t) n);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
 				while (k < kend) {
@@ -535,7 +535,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 			if (class[1] == 's' && !sy) { \
 				int *pp1_; \
 				Matrix_Calloc(pp1_, n, int); \
-				memcpy(pp1_, pp1 - 1, sizeof(int) * n); \
+				memcpy(pp1_, pp1 - 1, sizeof(int) * (size_t) n); \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
 					while (k < kend) { \
@@ -818,7 +818,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 		do { \
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0)); \
 			_CTYPE_ *pans = _PTR_(ans); \
-			memset(pans, 0, sizeof(_CTYPE_) * r); \
+			memset(pans, 0, sizeof(_CTYPE_) * (size_t) r); \
 			for (k = 0; k < nnz0; ++k) { \
 				if (*pi0 == *pj0) \
 					_INCREMENT_(pans[*pi0], (*px0)); \
@@ -1357,7 +1357,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		if (class[0] == 'z') {
 			/* Need _conjugate_ transpose */
 			SEXP x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
-			zvconj(COMPLEX(x1), XLENGTH(x1));
+			zvconj(COMPLEX(x1), (size_t) XLENGTH(x1));
 			UNPROTECT(1); /* x1 */
 		}
 		UNPROTECT(1) /* to */;
@@ -1627,7 +1627,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
 		int *pi0 = INTEGER(i0),
 			*pj0 = INTEGER(j0);
-		R_xlen_t j, k, nnz0 = XLENGTH(i0), nnz1 = 0;
+		R_xlen_t k, nnz0 = XLENGTH(i0), nnz1 = 0;
 
 		/* Counting number of nonzero elements in triangle ... */
 
@@ -1651,6 +1651,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 			j1 = PROTECT(allocVector(INTSXP, nnz1));
 		int *pi1 = INTEGER(i1),
 			*pj1 = INTEGER(j1);
+		int j;
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 
@@ -1660,9 +1661,9 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 			_MASK_(_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1)); \
 			if (class[1] == 't' && di != 'N') { \
 				if (ul0 == ul1) { \
-					memcpy(pi1, pi0, sizeof(int) * nnz0); \
-					memcpy(pj1, pj0, sizeof(int) * nnz0); \
-					_MASK_(memcpy(px1, px0, sizeof(_CTYPE_) * nnz0)); \
+					memcpy(pi1, pi0, sizeof(int) * (size_t) nnz0); \
+					memcpy(pj1, pj0, sizeof(int) * (size_t) nnz0); \
+					_MASK_(memcpy(px1, px0, sizeof(_CTYPE_) * (size_t) nnz0)); \
 					pi1 += nnz0; \
 					pj1 += nnz0; \
 					_MASK_(px1 += nnz0); \
@@ -2010,7 +2011,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			else {
 				/* Symmetric part of Hermitian matrix is real part */
 				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), XLENGTH(x1));
+				zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
 				SET_SLOT(to, Matrix_xSym, x1);
 				UNPROTECT(1); /* x1 */
 			}
@@ -2141,7 +2142,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			else {
 				/* Symmetric part of Hermitian matrix is real part */
 				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), XLENGTH(x1));
+				zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
 				SET_SLOT(to, Matrix_xSym, x1);
 				UNPROTECT(1); /* x1 */
 			}
@@ -2219,7 +2220,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			if (class[2] != 'T') {
 				SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
 				int *pp1 = INTEGER(p1);
-				memset(pp1, 0, sizeof(int) * ((R_xlen_t) n + 1));
+				memset(pp1, 0, sizeof(int) * ((size_t) n + 1));
 				SET_SLOT(to, Matrix_pSym, p1);
 				UNPROTECT(1); /* p1 */
 			}
@@ -2241,7 +2242,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			}
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(duplicate(x0));
-			zvimag(COMPLEX(x1), XLENGTH(x1));
+			zvimag(COMPLEX(x1), (size_t) XLENGTH(x1));
 			SET_SLOT(to, Matrix_xSym, x1);
 			UNPROTECT(2); /* x1, x0 */
 		}
@@ -2487,7 +2488,7 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 		i0 = PROTECT(GET_SLOT(obj,        iSym));
 	int i, j, k, kend, *pp_, *pp0 = INTEGER(p0) + 1, *pi0 = INTEGER(i0);
 	Matrix_Calloc(pp_, n, int);
-	memcpy(pp_, pp0 - 1, sizeof(int) * n);
+	memcpy(pp_, pp0 - 1, sizeof(int) * (size_t) n);
 
 	int ans = 0;
 
@@ -3433,7 +3434,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 				kend = pp[j_];
 				while (k < kend) {
 					if (!narm || px[k] != NA_INTEGER) {
-						int d = (symmetric && pi[k] != j_) ? 2 : 1;
+						unsigned int d = (symmetric && pi[k] != j_) ? 2 : 1;
 						if (count > UINT_MAX - d)
 							TRY_INCREMENT(ifoverC);
 						t += (d == 2) ? 2LL * px[k] : px[k];
@@ -3526,7 +3527,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			int over = 0;
 			for (k = 0; k < kend; ++k) {
 				if (!narm || px[k] != NA_INTEGER) {
-					int d = (symmetric && pi[k] != pj[k]) ? 2 : 1;
+					unsigned int d = (symmetric && pi[k] != pj[k]) ? 2 : 1;
 					if (count > UINT_MAX - d)
 						TRY_INCREMENT(ifoverT);
 					t += (d == 2) ? 2LL * px[k] : px[k];

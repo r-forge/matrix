@@ -292,28 +292,26 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 		if (isNull(s_b)) {
 			PROTECT(rx = allocVector(TYPEOF(ax), XLENGTH(ax)));
 			if (TYPEOF(ax) == CPLXSXP) {
+			memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * (size_t) XLENGTH(ax));
 			if (!packed) {
-				memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * m * m);
 				F77_CALL(zpotri)(&aul, &m, COMPLEX(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(zpotri, info, 2, L);
 				zsymperm2(COMPLEX(rx), NULL,
 				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			} else {
-				memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * PACKED_LENGTH((size_t) m));
 				F77_CALL(zpptri)(&aul, &m, COMPLEX(rx),     &info FCONE);
 				ERROR_LAPACK_2(zpptri, info, 2, L);
 				zsymperm1(COMPLEX(rx), NULL,
 				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			}
 			} else {
+			memcpy(   REAL(rx),    REAL(ax), sizeof(  double) * (size_t) XLENGTH(ax));
 			if (!packed) {
-				memcpy(   REAL(rx),    REAL(ax), sizeof(  double) * m * m);
 				F77_CALL(dpotri)(&aul, &m,    REAL(rx), &m, &info FCONE);
 				ERROR_LAPACK_2(dpotri, info, 2, L);
 				dsymperm2(   REAL(rx), NULL,
 				          m, aul, (pivoted) ? INTEGER(aperm) : NULL, 1, 1);
 			} else {
-				memcpy(   REAL(rx),    REAL(ax), sizeof(  double) * PACKED_LENGTH((size_t) m));
 				F77_CALL(dpptri)(&aul, &m,    REAL(rx),     &info FCONE);
 				ERROR_LAPACK_2(dpptri, info, 2, L);
 				dsymperm1(   REAL(rx), NULL,
@@ -503,7 +501,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			do { \
 				_CTYPE_ *prx = _PTR_(rx), \
 					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-				memset(prx, 0, sizeof(_CTYPE_) * mn); \
+				memset(prx, 0, sizeof(_CTYPE_) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
 					prx[j] = _ONE_; \
 					Matrix_cs_pvec(pap, prx, work, m); \
@@ -571,7 +569,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		int Bfr = isNull(s_b) || pap;
 
 		int k, top, nz, nzmax,
-			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
+			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
 
 #define SOLVE_SPARSE_TRIANGULAR(_CTYPE_, _A_, _ALO_, _BFR_, _ACL_, _BCL_) \
 		do { \
@@ -695,22 +693,22 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 
 	SEXP r;
 	int j;
+	size_t m_ = (size_t) m, n_ = (size_t) n;
 	cholmod_factor *L = M2CHF(s_a, 1);
 	if (!asLogical(s_sparse)) {
 		cholmod_dense *B = NULL, *X = NULL;
 		if (isNull(s_b)) {
-			B = cholmod_allocate_dense(m, n, m, L->xtype, &c);
+			B = cholmod_allocate_dense(m_, n_, m_, L->xtype, &c);
 			if (!B)
 				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
-			R_xlen_t m1a = (R_xlen_t) m + 1;
 
 #define EYE(_CTYPE_, _ONE_) \
 			do { \
 				_CTYPE_ *B__x = (_CTYPE_ *) B->x; \
-				memset(B__x, 0, sizeof(_CTYPE_) * m * n); \
+				memset(B__x, 0, sizeof(_CTYPE_) * m_ * n_); \
 				for (j = 0; j < n; ++j) { \
 					*B__x = _ONE_; \
-					B__x += m1a; \
+					B__x += m_ + 1; \
 				} \
 			} while (0)
 
@@ -738,7 +736,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	} else {
 		cholmod_sparse *B = NULL, *X = NULL;
 		if (isNull(s_b)) {
-			B = cholmod_speye(m, n, L->xtype, &c);
+			B = cholmod_speye(m_, n_, L->xtype, &c);
 			if (!B)
 				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
 			X = cholmod_spsolve(ivalid, L, B, &c);
@@ -802,7 +800,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
 			do { \
 				_CTYPE_ *prx = _PTR_(rx); \
-				memset(prx, 0, sizeof(_CTYPE_) * mn); \
+				memset(prx, 0, sizeof(_CTYPE_) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
 					prx[j] = _ONE_; \
 					if (aul == 'U') \
@@ -826,7 +824,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
 			do { \
 				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx); \
-				memcpy(prx, pbx, sizeof(_CTYPE_) * mn); \
+				memcpy(prx, pbx, sizeof(_CTYPE_) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
 					if (aul == 'U') \
 						Matrix_cs_usolve(A, prx); \
@@ -857,7 +855,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
 
 		int k, top, nz, nzmax,
-			*iwork = (int *) R_alloc((size_t) 2 * m, sizeof(int));
+			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
 
 #define SOLVE_SPARSE(_CTYPE_) \
 		do { \
@@ -921,7 +919,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 #define EYE(_CTYPE_, _PTR_, _ONE_) \
 		do { \
 			_CTYPE_ *pyx = _PTR_(yx); \
-			memset(pyx, 0, sizeof(_CTYPE_) * mn); \
+			memset(pyx, 0, sizeof(_CTYPE_) * (size_t) mn); \
 			if (isNull(s_yxjj)) { \
 				for (j = 0; j < n; ++j) { \
 					*pyx = _ONE_; \
@@ -1004,7 +1002,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r < m) \
-					memset(work + r, 0, sizeof(_CTYPE_) * (m - r)); \
+					memset(work + r, 0, sizeof(_CTYPE_) * (size_t) (m - r)); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1018,7 +1016,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r > 0) \
-					memset(work, 0, sizeof(_CTYPE_) * r); \
+					memset(work, 0, sizeof(_CTYPE_) * (size_t) r); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1029,7 +1027,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */ \
 			for (j = 0; j < n; ++j) { \
 				Matrix_cs_pvec(pp, pyx, work, m); \
-				memcpy(pax, work, sizeof(_CTYPE_) * m); \
+				memcpy(pax, work, sizeof(_CTYPE_) * (size_t) m); \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
 				pyx += m; \
@@ -1038,7 +1036,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 			break; \
 		case 4: /* qr.qy {w/ perm.} : A = P1' Q y */ \
 			for (j = 0; j < n; ++j) { \
-				memcpy(work, pyx, sizeof(_CTYPE_) * m); \
+				memcpy(work, pyx, sizeof(_CTYPE_) * (size_t) m); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1048,7 +1046,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 5: /* qr.qty {w/o perm.} : A = Q' y */ \
 			if (ax != yx) \
-				memcpy(pax, pyx, sizeof(_CTYPE_) * m * n); \
+				memcpy(pax, pyx, sizeof(_CTYPE_) * (size_t) m * (size_t) n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
@@ -1057,7 +1055,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 6: /* qr.qy {w/o perm.} : A = Q y */ \
 			if (ax != yx) \
-				memcpy(pax, pyx, sizeof(_CTYPE_) * m * n); \
+				memcpy(pax, pyx, sizeof(_CTYPE_) * (size_t) m * (size_t) n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \

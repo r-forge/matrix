@@ -1,24 +1,24 @@
 #ifndef MATRIX_IDZ_H
 #define MATRIX_IDZ_H
 
-#include <stddef.h> /* size_t, ptrdiff_t */
+#include <stddef.h> /* size_t */
 #include <Rinternals.h>
 
-void iswap2(size_t,      int *, ptrdiff_t,      int *, ptrdiff_t);
-void dswap2(size_t,   double *, ptrdiff_t,   double *, ptrdiff_t);
-void zswap2(size_t, Rcomplex *, ptrdiff_t, Rcomplex *, ptrdiff_t);
+void iswap2(size_t,      int *, size_t,      int *, size_t);
+void dswap2(size_t,   double *, size_t,   double *, size_t);
+void zswap2(size_t, Rcomplex *, size_t, Rcomplex *, size_t);
 
-void iswap1(size_t,      int *, ptrdiff_t, ptrdiff_t,      int *, ptrdiff_t, ptrdiff_t);
-void dswap1(size_t,   double *, ptrdiff_t, ptrdiff_t,   double *, ptrdiff_t, ptrdiff_t);
-void zswap1(size_t, Rcomplex *, ptrdiff_t, ptrdiff_t, Rcomplex *, ptrdiff_t, ptrdiff_t);
+void iswap1(size_t,      int *, size_t, size_t, int,      int *, size_t, size_t, int);
+void dswap1(size_t,   double *, size_t, size_t, int,   double *, size_t, size_t, int);
+void zswap1(size_t, Rcomplex *, size_t, size_t, int, Rcomplex *, size_t, size_t, int);
 
-void icopy2(size_t,      int *, ptrdiff_t, const      int *, ptrdiff_t);
-void dcopy2(size_t,   double *, ptrdiff_t, const   double *, ptrdiff_t);
-void zcopy2(size_t, Rcomplex *, ptrdiff_t, const Rcomplex *, ptrdiff_t);
+void icopy2(size_t,      int *, size_t, const      int *, size_t);
+void dcopy2(size_t,   double *, size_t, const   double *, size_t);
+void zcopy2(size_t, Rcomplex *, size_t, const Rcomplex *, size_t);
 
-void icopy1(size_t,      int *, ptrdiff_t, ptrdiff_t, const      int *, ptrdiff_t, ptrdiff_t);
-void dcopy1(size_t,   double *, ptrdiff_t, ptrdiff_t, const   double *, ptrdiff_t, ptrdiff_t);
-void zcopy1(size_t, Rcomplex *, ptrdiff_t, ptrdiff_t, const Rcomplex *, ptrdiff_t, ptrdiff_t);
+void icopy1(size_t,      int *, size_t, size_t, int, const      int *, size_t, size_t, int);
+void dcopy1(size_t,   double *, size_t, size_t, int, const   double *, size_t, size_t, int);
+void zcopy1(size_t, Rcomplex *, size_t, size_t, int, const Rcomplex *, size_t, size_t, int);
 
 void irowperm2(     int *, const      int *, int, int, const int *, int, int);
 void drowperm2(  double *, const   double *, int, int, const int *, int, int);
@@ -56,13 +56,13 @@ void itrans1(     int *, const      int *, size_t, char, char);
 void dtrans1(  double *, const   double *, size_t, char, char);
 void ztrans1(Rcomplex *, const Rcomplex *, size_t, char, char);
 
-void iband2(     int *, const      int *, size_t, size_t, ptrdiff_t, ptrdiff_t);
-void dband2(  double *, const   double *, size_t, size_t, ptrdiff_t, ptrdiff_t);
-void zband2(Rcomplex *, const Rcomplex *, size_t, size_t, ptrdiff_t, ptrdiff_t);
+void iband2(     int *, const      int *, size_t, size_t, size_t, size_t);
+void dband2(  double *, const   double *, size_t, size_t, size_t, size_t);
+void zband2(Rcomplex *, const Rcomplex *, size_t, size_t, size_t, size_t);
 
-void iband1(     int *, const      int *, size_t, char, ptrdiff_t, ptrdiff_t);
-void dband1(  double *, const   double *, size_t, char, ptrdiff_t, ptrdiff_t);
-void zband1(Rcomplex *, const Rcomplex *, size_t, char, ptrdiff_t, ptrdiff_t);
+void iband1(     int *, const      int *, size_t, char, size_t, size_t);
+void dband1(  double *, const   double *, size_t, char, size_t, size_t);
+void zband1(Rcomplex *, const Rcomplex *, size_t, char, size_t, size_t);
 
 void zvreal(Rcomplex *, size_t);
 void zvimag(Rcomplex *, size_t);

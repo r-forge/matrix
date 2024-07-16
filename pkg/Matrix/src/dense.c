@@ -76,28 +76,34 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		x1 = PROTECT(allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
+	size_t
+		m_ = (size_t) m,
+		n_ = (size_t) n,
+		a_ = (size_t) ((int_fast64_t) m + a),
+		b_ = (size_t) ((int_fast64_t) m + b);
+
 #define BAND(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (ge && class[1] != 'g') { \
 		if (!packed) \
-			c##NAME(force2)(px1, px0, n, ul0, ct, di); \
+			c##NAME(force2)(px1, px0, n_, ul0, ct, di); \
 		else \
-			c##NAME( pack1)(px1, px0, n, ul0, ct, di); \
+			c##NAME( pack1)(px1, px0, n_, ul0, ct, di); \
 		px0 = NULL; \
-		packed = 0;	\
+		packed = 0; \
 		} else if (tr && class[1] == 's' && ul0 != ul1) { \
 		if (!packed) \
-			c##NAME(trans2)(px1, px0, m,   n, ct); \
+			c##NAME(trans2)(px1, px0, m_, n_ , ct); \
 		else \
-			c##NAME(trans1)(px1, px0, n, ul0, ct); \
+			c##NAME(trans1)(px1, px0, n_, ul0, ct); \
 		px0 = NULL; \
 		ul0 = ul1; \
 		} \
 		if (!packed) \
-			c##NAME( band2)(px1, px0, m,   n, a, b); \
+			c##NAME( band2)(px1, px0, m_, n_ , a_, b_); \
 		else \
-			c##NAME( band1)(px1, px0, n, ul0, a, b); \
+			c##NAME( band1)(px1, px0, n_, ul0, a_, b_); \
 	} while (0)
 
 	SWITCH4(class[0], BAND);
@@ -170,6 +176,8 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		ans = PROTECT(allocVector(TYPEOF(x), r));
 
+	size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r;
+
 #define DIAG(c) \
 	do { \
 		c##TYPE *pans = c##PTR(ans), *px = c##PTR(x); \
@@ -177,11 +185,11 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 			for (int j = 0; j < r; ++j) \
 				*(pans++) = c##UNIT; \
 		else if (!packed) \
-			c##NAME(copy2)(r, pans, 1, px, (R_xlen_t) m + 1); \
+			c##NAME(copy2)(r_, pans, 1, px, m_ + 1); \
 		else if (ul == 'U') \
-			c##NAME(copy1)(n, pans, 1, 0, px, 2,  1); \
+			c##NAME(copy1)(n_, pans, 1, 0, 0, px, 2 , 1, 0); \
 		else \
-			c##NAME(copy1)(n, pans, 1, 0, px, n, -1); \
+			c##NAME(copy1)(n_, pans, 1, 0, 0, px, n_, 1, 1); \
 	} while (0)
 
 	SWITCH4(class[0], DIAG);
@@ -191,7 +199,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	if (class[0] == 'n')
 		naToUnit(ans);
 	if (class[0] == 'z' && class[1] == 's' && ct == 'C')
-		zvreal(COMPLEX(ans), r);
+		zvreal(COMPLEX(ans), r_);
 
 	if (names) {
 		/* NB: The logic here must be adjusted once the validity method
@@ -240,8 +248,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	SEXP to = PROTECT(newObject(class));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n,
-		v = LENGTH(value) == r;
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -267,15 +274,18 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	}
 	SET_SLOT(to, Matrix_xSym, x);
 
+	size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r,
+		v_ = (LENGTH(value) == r) ? 1 : 0;
+
 #define DIAG(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pvalue = c##PTR(value); \
 		if (!packed) \
-			c##NAME(copy2)(r, px, (R_xlen_t) m + 1, pvalue, v); \
+			c##NAME(copy2)(r_, px, m_ + 1, pvalue, v_); \
 		else if (ul == 'U') \
-			c##NAME(copy1)(n, px, 2,  1, pvalue, v, 0); \
+			c##NAME(copy1)(n_, px, 2 , 1, 0, pvalue, v_, 0, 0); \
 		else  \
-			c##NAME(copy1)(n, px, n, -1, pvalue, v, 0); \
+			c##NAME(copy1)(n_, px, n_, 1, 1, pvalue, v_, 0, 0); \
 	} while (0)
 
 	SWITCH4(class[0], DIAG);
@@ -418,13 +428,15 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 	SET_SLOT(to, Matrix_xSym, x1);
 
+	size_t m_ = (size_t) m, n_ = (size_t) n;
+
 #define TRANS(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			c##NAME(trans2)(px1, px0, m,  n, ct); \
+			c##NAME(trans2)(px1, px0, m_, n_, ct); \
 		else \
-			c##NAME(trans1)(px1, px0, n, ul, ct); \
+			c##NAME(trans1)(px1, px0, n_, ul, ct); \
 	} while (0)
 
 	SWITCH4((class[0] == 'c') ? 'd' : class[0], TRANS);
@@ -522,16 +534,18 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
 		SET_SLOT(to, Matrix_xSym, x1);
 
+		size_t n_ = (size_t) n;
+
 #define FORCE(c) \
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			if (!packed) \
-				c##NAME(force2)(px1,  px0, n, ul0, ct0, di); \
+				c##NAME(force2)(px1,  px0, n_, ul0, ct0, di); \
 			else if (ul0 == ul1) \
-				c##NAME(force1)(px1,  px0, n, ul0, ct0, di); \
+				c##NAME(force1)(px1,  px0, n_, ul0, ct0, di); \
 			else { \
-				c##NAME(trans1)(px1,  px0, n, ul0, ct0); \
-				c##NAME(force1)(px1, NULL, n, ul1, ct0, di); \
+				c##NAME(trans1)(px1,  px0, n_, ul0, ct0); \
+				c##NAME(force1)(px1, NULL, n_, ul1, ct0, di); \
 			} \
 		} while (0)
 
@@ -643,7 +657,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		/* Symmetric part of Hermitian matrix is real part */
 		/* Hermitian part of symmetric matrix is real part */
 
-		zvreal(COMPLEX(x1), XLENGTH(x1));
+		zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
 
 	} else {
 
@@ -654,7 +668,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
 			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
 			if (!packed) \
-				memset(px1, 0, sizeof(c##TYPE) * XLENGTH(x1)); \
+				memset(px1, 0, sizeof(c##TYPE) * (size_t) XLENGTH(x1)); \
 			if (class[1] == 'g') { \
 				if (ct1 == 'C') \
 					for (j = 0; j < n; ++j) { \
@@ -825,7 +839,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		if (class[0] == 'z') {
 			Rcomplex *px1 = COMPLEX(x1);
 			if (ct0 == ct1)
-			memset(px1, 0, sizeof(Rcomplex) * XLENGTH(x1));
+			memset(px1, 0, sizeof(Rcomplex) * (size_t) XLENGTH(x1));
 			else {
 			Rcomplex *px0 = COMPLEX(x0);
 			for (R_xlen_t k = 0, kend = XLENGTH(x1); k < kend; ++k) {
@@ -836,7 +850,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 			}
 		} else {
 			double *px1 = REAL(x1);
-			memset(px1, 0, sizeof(double) * XLENGTH(x1));
+			memset(px1, 0, sizeof(double) * (size_t) XLENGTH(x1));
 		}
 
 	} else {
@@ -1891,7 +1905,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		do { \
 			_FOR_ { \
 				if (!(narm && *px == NA_INTEGER)) { \
-					int d = (sy && i != j) ? 2 : 1; \
+					unsigned int d = (sy && i != j) ? 2 : 1; \
 					if (count > UINT_MAX - d) \
 						TRY_INCREMENT(ifover); \
 					t += (d == 2) ? 2LL * *px : *px; \

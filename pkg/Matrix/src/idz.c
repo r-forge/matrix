@@ -5,62 +5,62 @@
 #define TEMPLATE(c) \
 void \
 c##swap2(size_t n, \
-         c##TYPE *x, ptrdiff_t incx, \
-         c##TYPE *y, ptrdiff_t incy) \
+         c##TYPE *x, size_t dx, \
+         c##TYPE *y, size_t dy) \
 { \
 	c##TYPE tmp; \
 	while (n--) { \
 		tmp = *x; \
 		*x = *y; \
 		*y = tmp; \
-		x += incx; \
-		y += incy; \
+		x += dx; \
+		y += dy; \
 	} \
 	return; \
 } \
  \
 void \
 c##swap1(size_t n, \
-         c##TYPE *x, ptrdiff_t incx, ptrdiff_t incincx, \
-         c##TYPE *y, ptrdiff_t incy, ptrdiff_t incincy) \
+         c##TYPE *x, size_t dx, size_t addx, int nddx, \
+         c##TYPE *y, size_t dy, size_t addy, int nddy) \
 { \
 	c##TYPE tmp; \
 	while (n--) { \
 		tmp = *x; \
 		*x = *y; \
 		*y = tmp; \
-		x += incx; \
-		y += incy; \
-		incx += incincx; \
-		incy += incincy; \
+		x += dx; \
+		y += dy; \
+		if (nddx) dx -= addx; else dx += addx; \
+		if (nddy) dy -= addy; else dy += addy; \
 	} \
 	return; \
 } \
  \
 void \
 c##copy2(size_t n, \
-               c##TYPE *x, ptrdiff_t incx, \
-         const c##TYPE *y, ptrdiff_t incy) \
+               c##TYPE *x, size_t dx, \
+         const c##TYPE *y, size_t dy) \
 { \
 	while (n--) { \
 		*x = *y; \
-		x += incx; \
-		y += incy; \
+		x += dx; \
+		y += dy; \
 	} \
 	return; \
 } \
  \
 void \
 c##copy1(size_t n, \
-               c##TYPE *x, ptrdiff_t incx, ptrdiff_t incincx, \
-         const c##TYPE *y, ptrdiff_t incy, ptrdiff_t incincy) \
+               c##TYPE *x, size_t dx, size_t addx, int nddx, \
+         const c##TYPE *y, size_t dy, size_t addy, int nddy) \
 { \
 	while (n--) { \
 		*x = *y; \
-		x += incx; \
-		y += incy; \
-		incx += incincx; \
-		incy += incincy; \
+		x += dx; \
+		y += dy; \
+		if (nddx) dx -= addx; else dx += addx; \
+		if (nddy) dy -= addy; else dy += addy; \
 	} \
 	return; \
 } \
@@ -69,9 +69,9 @@ static void \
 c##symswapr2(c##TYPE *x, \
              size_t n, char uplo, size_t i, size_t j) \
 { \
-	if (i >= j) { \
-		if (i == j) \
-			return; \
+	if (n == 0 || i == j) \
+		return; \
+	if (i > j) { \
 		size_t k = i; \
 		i = j; \
 		j = k; \
@@ -96,9 +96,9 @@ static void \
 c##symswapr1(c##TYPE *x, \
              size_t n, char uplo, size_t i, size_t j) \
 { \
+	if (n == 0 || i == j) \
+		return; \
 	if (i >= j) { \
-		if (i == j) \
-			return; \
 		size_t k = i; \
 		i = j; \
 		j = k; \
@@ -110,18 +110,18 @@ c##symswapr1(c##TYPE *x, \
 		tmp = xi[i]; \
 		xi[i] = xj[j]; \
 		xj[j] = tmp; \
-		c##swap1(i, xi, 1, 0, xj, 1, 0); \
-		c##swap1(j - i - 1, xi + i + (i + 1), i + 2, 1, xj + i +       1,     1, 0); \
-		c##swap1(n - j - 1, xj + i + (j + 1), j + 2, 1, xj + j + (j + 1), j + 2, 1); \
+		c##swap1(i, xi, 1, 0, 0, xj, 1, 0, 0); \
+		c##swap1(j - i - 1, xi + i + (i + 1), i + 2, 1, 0, xj + i +       1,     1, 0, 0); \
+		c##swap1(n - j - 1, xj + i + (j + 1), j + 2, 1, 0, xj + j + (j + 1), j + 2, 1, 0); \
 	} else { \
 		xi = x + PACKED_AR21_LO(i, i, n); \
 		xj = x + PACKED_AR21_LO(j, j, n); \
 		tmp = xi[0]; \
 		xi[0] = xj[0]; \
 		xj[0] = tmp; \
-		c##swap1(i, x + i, n - 1, -1, x + j, n - 1, -1); \
-		c##swap1(j - i - 1, xi + (i - i) + 1, 1, 0, xi + (j - i) + (n - i - 1), n - i - 2, -1); \
-		c##swap1(n - j - 1, xi + (j - i) + 1, 1, 0, xj + (j - j) +           1,         1,  0); \
+		c##swap1(i, x + i, n - 1, 1, 1, x + j, n - 1, 1, 1); \
+		c##swap1(j - i - 1, xi + (i - i) + 1, 1, 0, 0, xi + (j - i) + (n - i - 1), n - i - 2, 1, 1); \
+		c##swap1(n - j - 1, xi + (j - i) + 1, 1, 0, 0, xj + (j - j) +           1,         1, 0, 0); \
 	} \
 	return; \
 } \
@@ -130,6 +130,8 @@ static void \
 c##symcopyr2(c##TYPE *x, const c##TYPE *y, \
              size_t n, char uplo, size_t i, size_t j) \
 { \
+	if (n == 0) \
+		return; \
 	      c##TYPE *xi = x + i * n, *xj = x + j * n; \
 	const c##TYPE *yi = y + i * n, *yj = y + j * n; \
 	xi[i] = yj[j]; \
@@ -167,6 +169,8 @@ static void \
 c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
              size_t n, char uplo, size_t i, size_t j) \
 { \
+	if (n == 0) \
+		return; \
 	      c##TYPE *xi, *xj; \
 	const c##TYPE *yi, *yj; \
 	if (uplo == 'U') { \
@@ -177,15 +181,15 @@ c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
 		xi[i] = yj[j]; \
 		if (i <= j) { \
 			xj[i] = yj[i]; \
-			c##copy1(i, xi, 1, 0, yj, 1, 0); \
+			c##copy1(i, xi, 1, 0, 0, yj, 1, 0, 0); \
 			if (i < j) \
-			c##copy1(j - i - 1, xi + i + (i + 1), i + 2, 1, yj + i +       1,     1, 0); \
-			c##copy1(n - j - 1, xj + i + (j + 1), j + 2, 1, yj + j + (j + 1), j + 2, 1); \
+			c##copy1(j - i - 1, xi + i + (i + 1), i + 2, 1, 0, yj + i +       1,     1, 0, 0); \
+			c##copy1(n - j - 1, xj + i + (j + 1), j + 2, 1, 0, yj + j + (j + 1), j + 2, 1, 0); \
 		} else { \
 			xi[j] = yi[j]; \
-			c##copy1(j, xi, 1, 0, yj, 1, 0); \
-			c##copy1(i - j - 1, xi + j + 1, 1, 0,           yj + j + (j + 1), j + 2, 1); \
-			c##copy1(n - i - 1, xi + i + (i + 1), i + 2, 1, yi + j + (i + 1), i + 2, 1); \
+			c##copy1(j, xi, 1, 0, 0, yj, 1, 0, 0); \
+			c##copy1(i - j - 1, xi + j + 1, 1, 0, 0,           yj + j + (j + 1), j + 2, 1, 0); \
+			c##copy1(n - i - 1, xi + i + (i + 1), 0, i + 2, 1, yi + j + (i + 1), i + 2, 1, 0); \
 		} \
 	} else { \
 		xi = x + PACKED_AR21_LO(i, i, n); \
@@ -195,15 +199,15 @@ c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
 		xi[0] = yj[0]; \
 		if (i <= j) { \
 			xi[j] = yi[j]; \
-			c##copy1(i, x + i, n - 1, -1, y + j, n - 1, -1); \
+			c##copy1(i, x + i, n - 1, 1, 1, y + j, n - 1, 1, 1); \
 			if (i < j) \
-			c##copy1(j - i - 1, xi + (i - i) + 1, 1, 0, yi + (j - i) + (n - i - 1), n - i - 2, -1); \
-			c##copy1(n - j - 1, xi + (j - i) + 1, 1, 0, yj + (j - j) +           1,         1,  0); \
+			c##copy1(j - i - 1, xi + (i - i) + 1, 1, 0, 0, yi + (j - i) + (n - i - 1), n - i - 2, 1, 1); \
+			c##copy1(n - j - 1, xi + (j - i) + 1, 1, 0, 0, yj + (j - j) +           1,         1, 0, 0); \
 		} else { \
 			xj[i] = yj[i]; \
-			c##copy1(j, x + i, n - 1, -1, y + j, n - 1, -1); \
-			c##copy1(i - j - 1, xj + (i - j) + (n - j - 1), n - j - 2, -1, yj + (j - j) + 1, 1, 0); \
-			c##copy1(n - i - 1, xi + (i - i) +           1,         1,  0, yj + (i - j) + 1, 1, 0); \
+			c##copy1(j, x + i, n - 1, 1, 1, y + j, n - 1, 1, 1); \
+			c##copy1(i - j - 1, xj + (i - j) + (n - j - 1), n - j - 2, 1, 1, yj + (j - j) + 1, 1, 0, 0); \
+			c##copy1(n - i - 1, xi + (i - i) +           1,         1, 0, 0, yj + (i - j) + 1, 1, 0, 0); \
 		} \
 	} \
 	return; \
@@ -213,11 +217,12 @@ void \
 c##rowperm2(c##TYPE *x, const c##TYPE *y, \
             int m, int n, const int *p, int off, int invert) \
 { \
-	if (m < 0 || n < 0) \
+	if (m <= 0 || n <= 0) \
 		return; \
+	size_t m_ = (size_t) m, n_ = (size_t) n; \
 	if (!p) { \
 		if (y) \
-			memcpy(x, y, sizeof(c##TYPE) * m * n); \
+			memcpy(x, y, sizeof(c##TYPE) * m_ * n_); \
 	} else { \
 		if (y) { \
 			int i, j; \
@@ -245,7 +250,7 @@ c##rowperm2(c##TYPE *x, const c##TYPE *y, \
 				q[k0] = -q[k0]; \
 				k1 = q[k0] - 1; \
 				while (q[k1] < 0) { \
-					c##swap2(n, x + k0, m, x + k1, m); \
+					c##swap2(n_, x + k0, m_, x + k1, m_); \
 					k0 = k1; \
 					q[k0] = -q[k0]; \
 					k1 = q[k0] - 1; \
@@ -261,20 +266,21 @@ void \
 c##symperm2(c##TYPE *x, const c##TYPE *y, \
             int n, char uplo, const int *p, int off, int invert) \
 { \
-	if (n < 0) \
+	if (n <= 0) \
 		return; \
+	size_t n_ = (size_t) n; \
 	if (!p) { \
 		if (y) \
-			memcpy(x, y, sizeof(c##TYPE) * n * n); \
+			memcpy(x, y, sizeof(c##TYPE) * n_ * n_); \
 	} else { \
 		if (y) { \
 			int j; \
 			if (!invert) \
 			for (j = 0; j < n; ++j) \
-				c##symcopyr2(x, y, n, uplo, j, p[j] - off); \
+				c##symcopyr2(x, y, n_, uplo, (size_t) j, (size_t) (p[j] - off)); \
 			else \
 			for (j = 0; j < n; ++j) \
-				c##symcopyr2(x, y, n, uplo, p[j] - off, j); \
+				c##symcopyr2(x, y, n_, uplo, (size_t) (p[j] - off), (size_t) j); \
 		} else { \
 			int j, k0, k1, *q; \
 			Matrix_Calloc(q, n, int); \
@@ -291,7 +297,7 @@ c##symperm2(c##TYPE *x, const c##TYPE *y, \
 				q[k0] = -q[k0]; \
 				k1 = q[k0] - 1; \
 				while (q[k1] < 0) { \
-					c##symswapr2(x, n, uplo, k0, k1); \
+					c##symswapr2(x, n_, uplo, (size_t) k0, (size_t) k1); \
 					k0 = k1; \
 					q[k0] = -q[k0]; \
 					k1 = q[k0] - 1; \
@@ -307,20 +313,21 @@ void \
 c##symperm1(c##TYPE *x, const c##TYPE *y, \
             int n, char uplo, const int *p, int off, int invert) \
 { \
-	if (n < 0) \
+	if (n <= 0) \
 		return; \
+	size_t n_ = (size_t) n; \
 	if (!p) { \
 		if (y) \
-			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH((size_t) n)); \
+			memcpy(x, y, sizeof(c##TYPE) * PACKED_LENGTH(n_)); \
 	} else { \
 		if (y) { \
 			int j; \
 			if (!invert) \
 			for (j = 0; j < n; ++j) \
-				c##symcopyr1(x, y, n, uplo, j, p[j] - off); \
+				c##symcopyr1(x, y, n_, uplo, (size_t) j, (size_t) (p[j] - off)); \
 			else \
 			for (j = 0; j < n; ++j) \
-				c##symcopyr1(x, y, n, uplo, p[j] - off, j); \
+				c##symcopyr1(x, y, n_, uplo, (size_t) (p[j] - off), (size_t) j); \
 		} else { \
 			int j, k0, k1, *q; \
 			Matrix_Calloc(q, n, int); \
@@ -337,7 +344,7 @@ c##symperm1(c##TYPE *x, const c##TYPE *y, \
 				q[k0] = -q[k0]; \
 				k1 = q[k0] - 1; \
 				while (q[k1] < 0) { \
-					c##symswapr1(x, n, uplo, k0, k1); \
+					c##symswapr1(x, n_, uplo, (size_t) k0, (size_t) k1); \
 					k0 = k1; \
 					q[k0] = -q[k0]; \
 					k1 = q[k0] - 1; \
@@ -404,8 +411,8 @@ c##pack1(c##TYPE *x, const c##TYPE *y, \
 		} \
 		} \
 		if (diag != 'N') { \
-		size_t incx = n + 1; \
-		for (j = 0, x = tmp; j < n; ++j, x += incx) \
+		size_t dx = n + 1; \
+		for (j = 0, x = tmp; j < n; ++j, x += dx) \
 			c##SET_UNIT(*x); \
 		} \
 	} else if (trans == 'C') { \
@@ -469,15 +476,15 @@ c##force2(c##TYPE *x, const c##TYPE *y, \
 	size_t i, j; \
 	if (diag < '\0') { \
 		if (diag != -'N') { \
-			size_t incx = n + 1; \
+			size_t dx = n + 1; \
 			memset(x, 0, sizeof(c##TYPE) * n * n); \
-			for (j = 0; j < n; ++j, x += incx) \
+			for (j = 0; j < n; ++j, x += dx) \
 				c##SET_UNIT(*x); \
 		} else if (y) { \
-			size_t incx = n + 1; \
-			size_t incy = (trans) ? 1 : incx; \
+			size_t dx = n + 1; \
+			size_t dy = (trans) ? 1 : dx; \
 			memset(x, 0, sizeof(c##TYPE) * n * n); \
-			for (j = 0; j < n; ++j, x += incx, y += incy) \
+			for (j = 0; j < n; ++j, x += dx, y += dy) \
 				*x = *y; \
 		} else { \
 			for (j = 1; j < n; ++j) { \
@@ -514,8 +521,8 @@ c##force2(c##TYPE *x, const c##TYPE *y, \
 		} \
 		} \
 		if (diag != 'N') { \
-		size_t incx = n + 1; \
-		for (j = 0, x = tmp; j < n; ++j, x += incx) \
+		size_t dx = n + 1; \
+		for (j = 0, x = tmp; j < n; ++j, x += dx) \
 			c##SET_UNIT(*x); \
 		} \
 	} else if (trans == 'C') { \
@@ -745,37 +752,37 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
  \
 void \
 c##band2(c##TYPE *x, const c##TYPE *y, \
-         size_t m, size_t n, ptrdiff_t a, ptrdiff_t b) \
+         size_t m, size_t n, size_t a, size_t b) \
 { \
 	if (m == 0 || n == 0) \
 		return; \
 	size_t d; \
-	if (a > b || (a > 0 && a >= n) || (b < 0 && -b >= m)) { \
+	if (a > b || a >= m + n || b == 0) { \
 		d = m * n; \
 		memset(x, 0, sizeof(c##TYPE) * d); \
 		return; \
 	} \
-	a = (a < 0 && -a >= m) ? 1 - (ptrdiff_t) m : a; \
-	b = (b > 0 &&  b >= n) ? (ptrdiff_t) n - 1 : b; \
+	a = (a == 0) ? 1 : a; \
+	b = (b >= m + n) ? m + n - 1 : b; \
 	size_t i, j, i0, i1, \
-		j0 = (a < 0) ? 0 : a, \
-		j1 = (((b < 0) ? m - (-b) : m + b) < n) ? ((b < 0) ? m - (-b) : m + b) : n; \
+		j0 = (a < m) ? 0 : a - m, \
+		j1 = (b < n) ? b : n; \
 	if (j0 > 0) { \
 		d = m * j0; \
 		memset(x, 0, sizeof(c##TYPE) * d); \
 		x += d; if (y) y += d; \
 	} \
 	for (j = j0; j < j1; ++j) { \
-		i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
-		i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
-		for (i =  0; i < i0         ; ++i) \
+		i0 = (b <= m + j) ? m + j - b     : 0; \
+		i1 = (a >= j + 1) ? m + j - a + 1 : m; \
+		for (i =  0; i < i0; ++i) \
 			x[i] = c##ZERO; \
 		if (y) { \
-		for (i = i0; i < i1 && i < m; ++i) \
+		for (i = i0; i < i1; ++i) \
 			x[i] = y[i]; \
 		y += m; \
 		} \
-		for (i = i1;           i < m; ++i) \
+		for (i = i1; i <  m; ++i) \
 			x[i] = c##ZERO; \
 		x += m; \
 	} \
@@ -789,27 +796,27 @@ c##band2(c##TYPE *x, const c##TYPE *y, \
  \
 void \
 c##band1(c##TYPE *x, const c##TYPE *y, \
-         size_t n, char uplo, ptrdiff_t a, ptrdiff_t b) \
+         size_t n, char uplo, size_t a, size_t b) \
 { \
 	if (n == 0) \
 		return; \
 	if (uplo == 'U') \
-		a = (a < 0) ? 0 : a; \
+		a = (a < n) ? n : a; \
 	else \
-		b = (b > 0) ? 0 : b; \
+		b = (b > n) ? n : b; \
 	size_t d; \
-	if (a > b || (a > 0 && a >= n) || (b < 0 && -b >= n)) { \
+	if (a > b || a >= n + n || b == 0) { \
 		d = PACKED_LENGTH(n); \
 		memset(x, 0, sizeof(c##TYPE) * d); \
 		return; \
 	} \
 	if (uplo == 'U') \
-		b = (b > 0 &&  b >= n) ? (ptrdiff_t) n - 1 : b;	\
+		b = (b >= n + n) ? n + n - 1 : b; \
 	else \
-		a = (a < 0 && -a >= n) ? 1 - (ptrdiff_t) n : a;	\
+		a = (a == 0) ? 1 : a; \
 	size_t i, j, i0, i1, \
-		j0 = (a < 0) ? 0 : a, \
-		j1 = (b < 0) ? n - (-b) : n; \
+		j0 = (a < n) ? 0 : a - n, \
+		j1 = (b < n) ? b : n; \
 	if (uplo == 'U') { \
 		if (j0 > 0) { \
 			d = PACKED_LENGTH(j0); \
@@ -817,16 +824,16 @@ c##band1(c##TYPE *x, const c##TYPE *y, \
 			x += d; if (y) y += d; \
 		} \
 		for (j = j0; j < j1; ++j) { \
-			i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
-			i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
-			for (i =  0; i < i0          ; ++i) \
+			i0 = (b <= n + j) ? n + j - b     :     0; \
+			i1 = (a >= n    ) ? n + j - a + 1 : j + 1; \
+			for (i =  0; i < i0; ++i) \
 				x[i] = c##ZERO; \
 			if (y) { \
-			for (i = i0; i < i1 && i <= j; ++i) \
+			for (i = i0; i < i1; ++i) \
 				x[i] = y[i]; \
 			y += j + 1; \
 			} \
-			for (i = i1;           i <= j; ++i) \
+			for (i = i1; i <= j; ++i) \
 				x[i] = c##ZERO; \
 			x += j + 1; \
 		} \
@@ -842,16 +849,16 @@ c##band1(c##TYPE *x, const c##TYPE *y, \
 			x += d; if (y) y += d; \
 		} \
 		for (j = j0; j < j1; ++j) { \
-			i0 = (b < 0) ? j + (-b)     : ((b <= j) ? j - b     : 0); \
-			i1 = (a < 0) ? j + (-a) + 1 :             j - a + 1     ; \
-			for (i =  j; i < i0         ; ++i) \
+			i0 = (b <= n    ) ? n + j - b     : j; \
+			i1 = (a >= j + 1) ? n + j - a + 1 : n; \
+			for (i =  j; i < i0; ++i) \
 				x[i - j] = c##ZERO; \
 			if (y) { \
-			for (i = i0; i < i1 && i < n; ++i) \
+			for (i = i0; i < i1; ++i) \
 				x[i - j] = y[i - j]; \
 			y += n - j; \
 			} \
-			for (i = i1;           i < n; ++i) \
+			for (i = i1; i <  n; ++i) \
 				x[i - j] = c##ZERO; \
 			x += n - j; \
 		} \

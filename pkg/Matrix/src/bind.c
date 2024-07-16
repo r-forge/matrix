@@ -525,10 +525,10 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				ps = c##PTR(s); \
 				if (margin) { \
 				if (!tmp || (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)) { \
-					memcpy(px, ps, sizeof(c##TYPE) * mn); \
+					memcpy(px, ps, sizeof(c##TYPE) * (size_t) mn); \
 					px += mn; \
 				} else if (mn >= m) { \
-					memcpy(px, ps, sizeof(c##TYPE) * m); \
+					memcpy(px, ps, sizeof(c##TYPE) * (size_t) m); \
 					px += m; \
 				} else if (mn == 1) { \
 					c##TYPE v = ps[0]; \
@@ -544,7 +544,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				if (!tmp || (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)) { \
 					m = (int) (mn / n); \
 					for (k = 0; k < n; ++k) { \
-						memcpy(py, ps, sizeof(c##TYPE) * m); \
+						memcpy(py, ps, sizeof(c##TYPE) * (size_t) m); \
 						py += rdim[0]; \
 						ps += m; \
 					} \
@@ -588,7 +588,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		SET_SLOT(ans, Matrix_pSym, p);
 
 		if (rdim[0] == 0 || rdim[1] == 0) {
-			memset(pp, 0, sizeof(int) * ((R_xlen_t) rdim[margin] + 1));
+			memset(pp, 0, sizeof(int) * ((size_t) rdim[margin] + 1));
 			UNPROTECT(1);
 			return;
 		}
@@ -635,9 +635,9 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				psx =  c##PTR(sx); \
 				); \
 				n = (int) (XLENGTH(sp) - 1); \
-				memcpy(pi, psi, sizeof(    int) * psp[n]); \
+				memcpy(pi, psi, sizeof(    int) * (size_t) psp[n]); \
 				c##IF_NPATTERN( \
-				memcpy(px, psx, sizeof(c##TYPE) * psp[n]); \
+				memcpy(px, psx, sizeof(c##TYPE) * (size_t) psp[n]); \
 				); \
 				pi += psp[n]; \
 				c##IF_NPATTERN( \
@@ -665,7 +665,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
 		int *pp = INTEGER(p);
 		SET_SLOT(ans, Matrix_pSym, p);
-		memset(pp, 0, sizeof(int) * ((R_xlen_t) rdim[!margin] + 1));
+		memset(pp, 0, sizeof(int) * ((size_t) rdim[!margin] + 1));
 
 		if (rdim[0] == 0 || rdim[1] == 0) {
 			UNPROTECT(1);
@@ -694,7 +694,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int *pi = INTEGER(i), *psi, *work, k, kend, pos = 0;
 		SET_SLOT(ans, iSym, i);
 		Matrix_Calloc(work, n, int);
-		memcpy(work, pp, sizeof(int) * n);
+		memcpy(work, pp, sizeof(int) * (size_t) n);
 
 #define BIND(c) \
 		do { \
@@ -835,7 +835,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			if (s == R_NilValue)
 				continue;
 			sp = GET_SLOT(s, Matrix_permSym);
-			memcpy(pp, INTEGER(sp), sizeof(int) * LENGTH(sp));
+			memcpy(pp, INTEGER(sp), sizeof(int) * (size_t) LENGTH(sp));
 			pp += LENGTH(sp);
 		}
 		SET_SLOT(ans, Matrix_permSym, p);
