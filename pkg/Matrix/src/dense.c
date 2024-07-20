@@ -1740,9 +1740,6 @@ SEXP R_dense_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean)
 		} \
 	} while (0)
 
-#define LONGDOUBLE_AS_DOUBLE(v) \
-	(v > DBL_MAX) ? R_PosInf : ((v < -DBL_MAX) ? R_NegInf : (double) v);
-
 SEXP dense_sum(SEXP obj, const char *class, int narm)
 {
 	SEXP ans;

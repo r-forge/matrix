@@ -89,6 +89,9 @@ extern
 extern
 Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 
+#define LONGDOUBLE_AS_DOUBLE(x) \
+	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
+
 #define    MINOF(x, y) ((x < y) ? x : y)
 #define    MAXOF(x, y) ((x < y) ? y : x)
 #define  FIRSTOF(x, y) (x)
