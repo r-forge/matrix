@@ -24,7 +24,7 @@ SEXP R_dense_symmpart(SEXP, SEXP);
 SEXP dense_skewpart(SEXP, const char *, char);
 SEXP R_dense_skewpart(SEXP, SEXP);
 
-int dense_is_symmetric(SEXP, const char *, int, char, int);
+int dense_is_symmetric(SEXP, const char *, char, int, int);
 SEXP R_dense_is_symmetric(SEXP, SEXP, SEXP, SEXP);
 
 int dense_is_triangular(SEXP, const char *, int);

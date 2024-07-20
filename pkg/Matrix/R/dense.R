@@ -30,7 +30,7 @@
         checkDN <- ca(...)
     }
     stopifnot(is.numeric(tol), length(tol) == 1L, !is.na(tol))
-    ans <- .Call(R_dense_is_symmetric, object, tol <= 0, trans, checkDN)
+    ans <- .Call(R_dense_is_symmetric, object, trans, tol <= 0, checkDN)
     if(!is.na(ans))
         return(ans)
     ## 'object' is an n-by-n [dz]denseMatrix, n >= 1
