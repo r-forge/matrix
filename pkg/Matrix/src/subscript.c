@@ -206,7 +206,7 @@ SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k = 0, kend;
+	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
 	do { \
@@ -273,7 +273,7 @@ SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(x, Matrix_jSym));
-	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k = 0, kend;
+	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
 	do { \
@@ -598,7 +598,7 @@ SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(x, Matrix_iSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k = 0, kend;
+	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \
@@ -661,7 +661,7 @@ SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
 
 	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(x, Matrix_jSym));
-	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k = 0, kend;
+	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k, kend;
 
 #define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
 	do { \

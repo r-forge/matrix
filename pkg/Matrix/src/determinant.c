@@ -82,7 +82,7 @@ SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int sign = 1;
 
-	char ct = 'C';
+	char ct = '\0';
 	if (TYPEOF(x) == CPLXSXP) {
 		SEXP trans = GET_SLOT(s_trf, Matrix_transSym);
 		ct = CHAR(STRING_ELT(trans, 0))[0];
@@ -249,10 +249,10 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 	if (n > 0) {
 	SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(R, Matrix_iSym));
-	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
+	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k, kend;
 	if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x);
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend && pi[kend - 1] == j) {
 				if (ISNAN(px[kend - 1].r) || px[kend - 1].r >= 0.0)
@@ -269,7 +269,7 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 		}
 	} else {
 		double *px = REAL(x);
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend && pi[kend - 1] == j) {
 				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)
@@ -315,10 +315,10 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	if (n > 0) {
 	SEXP p = PROTECT(GET_SLOT(U, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(U, Matrix_iSym));
-	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k = 0, kend;
+	int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k, kend;
 	if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x);
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend && pi[kend - 1] == j)
 				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
@@ -330,7 +330,7 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 		}
 	} else {
 		double *px = REAL(x);
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend && pi[kend - 1] == j) {
 				if (ISNAN(px[kend - 1]) || px[kend - 1] >= 0.0)

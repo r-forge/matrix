@@ -231,7 +231,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 		? CHAR(STRING_ELT(uplo, 0))[0] : 'L';
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym));
-	int *pp = INTEGER(p) + 1, j, k = 0, kend, n = (int) (XLENGTH(p) - 1),
+	int *pp = INTEGER(p) + 1, j, k, kend, n = (int) (XLENGTH(p) - 1),
 		len = (ivalid < 5) ? 1 : ((ivalid < 6) ? 2 : n);
 
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
@@ -243,7 +243,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 	switch (ivalid) {
 	case 0: /*    trace */
 		pans[0] = 0.0;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend)
 				pans[0] += px[(ul == 'U') ? kend - 1 : k];
@@ -252,7 +252,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 		break;
 	case 1: /*   sumLog */
 		pans[0] = 0.0;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend)
 				pans[0] += log(px[(ul == 'U') ? kend - 1 : k]);
@@ -261,7 +261,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 		break;
 	case 2: /*     prod */
 		pans[0] = 1.0;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			if (k < kend)
 				pans[0] *= px[(ul == 'U') ? kend - 1 : k];
@@ -272,7 +272,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 		break;
 	case 3: /*      min */
 		pans[0] = R_PosInf;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			tmp = (k < kend) ? px[(ul == 'U') ? kend - 1 : k] : 0.0;
 			if (ISNAN(tmp)) {
@@ -286,7 +286,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 		break;
 	case 4: /*      max */
 		pans[0] = R_NegInf;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			tmp = (k < kend) ? px[(ul == 'U') ? kend - 1 : k] : 0.0;
 			if (ISNAN(tmp)) {
@@ -301,7 +301,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 	case 5: /*    range */
 		pans[0] = R_PosInf;
 		pans[1] = R_NegInf;
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			tmp = (k < kend) ? px[(ul == 'U') ? kend - 1 : k] : 0.0;
 			if (ISNAN(tmp)) {
@@ -325,7 +325,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 			if (TYPEOF(perm) == INTSXP && LENGTH(perm) == n)
 				pperm = INTEGER(perm);
 		}
-		for (j = 0; j < n; ++j) {
+		for (j = 0, k = 0; j < n; ++j) {
 			kend = pp[j];
 			pans[(pperm) ? pperm[j] : j] =
 				(k < kend) ? px[(ul == 'U') ? kend - 1 : k] : 0.0;

@@ -3357,7 +3357,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 			i = PROTECT(GET_SLOT(obj,        iSym));
-		int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j_, k = 0, kend,
+		int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j_, k, kend,
 			n_ = (class[2] == 'C') ? n : m;
 
 		if (class[0] == 'n') {
@@ -3369,7 +3369,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 				char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 				nnz *= 2;
-				for (j_ = 0; j_ < n_; ++j_) {
+				for (j_ = 0, k = 0; j_ < n_; ++j_) {
 					kend = pp[j_];
 					if (k < kend && pi[(ul == 'U') ? kend - 1 : k] == j_)
 						--nnz;
@@ -3393,7 +3393,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		if (class[0] == 'z') {
 			Rcomplex *px = COMPLEX(x);
 			long double zr = (di == 'N') ? 0.0L : n, zi = 0.0L;
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				while (k < kend) {
 					if (!(narm && (ISNAN(px[k].r) || ISNAN(px[k].i)))) {
@@ -3411,7 +3411,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		} else if (class[0] == 'd') {
 			double *px = REAL(x);
 			long double zr = (di == 'N') ? 0.0L : n;
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				while (k < kend) {
 					if (!(narm && ISNAN(px[k])))
@@ -3427,7 +3427,7 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 			int_fast64_t s = (di == 'N') ? 0LL : n, t = 0LL;
 			unsigned int count = 0;
 			int over = 0;
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				while (k < kend) {
 					if (!narm || px[k] != NA_INTEGER) {
@@ -3604,7 +3604,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 			i = PROTECT(GET_SLOT(obj,        iSym));
-		int *pp = INTEGER(p) + 1, *pi = INTEGER(i), i_, j_, k = 0, kend,
+		int *pp = INTEGER(p) + 1, *pi = INTEGER(i), i_, j_, k, kend,
 			m_ = (class[2] == 'C') ? m : n, n_ = (class[2] == 'C') ? n : m,
 			seen0 = 0;
 
@@ -3623,7 +3623,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		if (class[0] == 'z') {
 			Rcomplex *px = COMPLEX(x);
 			long double zr0, zi0;
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				if (seen0 || kend - k == m_) {
 					while (k < kend) {
@@ -3667,7 +3667,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			}
 		} else if (class[0] == 'd') {
 			double *px = REAL(x);
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				if (seen0 || kend - k == m_) {
 					while (k < kend) {
@@ -3696,7 +3696,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			}
 		} else {
 			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
-			for (j_ = 0; j_ < n_; ++j_) {
+			for (j_ = 0, k = 0; j_ < n_; ++j_) {
 				kend = pp[j_];
 				if (seen0 || kend - k == m_) {
 					while (k < kend) {
