@@ -3,6 +3,7 @@
 #include "cs-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
+#include "M5.h"
 #include "factor.h"
 
 /* defined in ./attrib.c : */
@@ -243,7 +244,7 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = 'C';
+	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = '\0';
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
@@ -304,7 +305,7 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = 'C';
+	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = '\0';
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
@@ -1067,9 +1068,9 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (ul == 'U') ? len - 2 : 0;
 	SEXP ans = PROTECT(allocVector(VECSXP, len));
 
-#define EXPAND(_CTYPE_, _PTR_) \
+#define EXPAND(c) \
 	do { \
-		_CTYPE_ *T_px, *D_px = _PTR_(D_x), *px = _PTR_(x); \
+		c##TYPE *T_px, *D_px = c##PTR(D_x), *px = c##PTR(x); \
 		 \
 		j = 0; \
 		while (b--) { \
@@ -1086,7 +1087,7 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 			P_pperm = INTEGER(P_perm); \
 			T_pp = INTEGER(T_p); \
 			T_pi = INTEGER(T_i); \
-			T_px = _PTR_(T_x); \
+			T_px = c##PTR(T_x); \
 			T_pp[0] = 0; \
 			 \
 			for (i = 0; i < j; ++i) { \
@@ -1180,9 +1181,9 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	} while (0)
 
 	if (TYPEOF(x) == CPLXSXP)
-		EXPAND(Rcomplex, COMPLEX);
+		EXPAND(z);
 	else
-		EXPAND(double, REAL);
+		EXPAND(d);
 
 	SET_SLOT(D_, Matrix_iSym, D_i);
 	SET_SLOT(D_, Matrix_xSym, D_x);
