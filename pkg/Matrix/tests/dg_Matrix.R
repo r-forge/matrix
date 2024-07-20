@@ -93,7 +93,7 @@ tt <- try(solve(M.)) # less nice: factor is *not* cached
 M1 <- M. + 0.5*Diagonal(nrow(M.))
 luM1 <- lu(M1)
 d1 <- determinant(as(M1,"denseMatrix"))
-stopifnot(identical(luM1, M1@factors[["sparseLU~"]]),
+stopifnot(identical(luM1, M1@factors[["sparseLU+"]]),
 	  diag(luM1@L) == 1,# L is *unit*-triangular
 	  all.equal(log(-prod(diag(luM1@U))), c(d1$modulus)))
 

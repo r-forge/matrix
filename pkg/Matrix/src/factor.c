@@ -800,7 +800,7 @@ SEXP gCMatrix_orf(SEXP s_obj, SEXP s_warn, SEXP s_order)
 	int order = asInteger(s_order);
 	if (order < 0 || order > 3)
 		order = 0;
-	const char *nm = (order > 0) ? "sparseQR~" : "sparseQR";
+	const char *nm = (order > 0) ? "sparseQR+" : "sparseQR-";
 	SEXP orf = get_factor(s_obj, nm);
 	if (isNull(orf)) {
 		orf = gCMatrix_orf_(s_obj, asInteger(s_warn), order);
@@ -823,7 +823,7 @@ SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 		order = (tol == 1.0) ? 2 : 1;
 	else if (order < 0 || order > 3)
 		order = 0;
-	const char *nm = (order > 0) ? "sparseLU~" : "sparseLU";
+	const char *nm = (order > 0) ? "sparseLU+" : "sparseLU-";
 	SEXP trf = get_factor(s_obj, nm);
 	if (isNull(trf)) {
 		trf = gCMatrix_trf_(s_obj, asInteger(s_warn), order, tol);
