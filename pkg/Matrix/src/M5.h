@@ -250,11 +250,17 @@
 #define dDECREMENT_CONJ(x, y) dDECREMENT_IDEN(x, y)
 #define zDECREMENT_CONJ(x, y) do { (x).r -= (y).r; (x).i += (y).i; } while (0)
 
+#define nMULTIPLY(x, a) /* unused hence no-op for now */
+#define lMULTIPLY(x, a) /* ditto */
+#define iMULTIPLY(x, a) /* ditto */
 #define dMULTIPLY(x, a) \
 	do { (x)   *= a;             } while (0)
 #define zMULTIPLY(x, a) \
 	do { (x).r *= a; (x).i *= a; } while (0)
 
+#define nDIVIDE(x, a) /* unused hence no-op for now */
+#define lDIVIDE(x, a) /* ditto */
+#define iDIVIDE(x, a) /* ditto */
 #define dDIVIDE(x, a) \
 	do { (x)   /= a;             } while (0)
 #define zDIVIDE(x, a) \
