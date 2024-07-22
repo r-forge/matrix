@@ -875,7 +875,7 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 		triangular = (xul != yul) ? 0 : ((xdi != ydi || xdi == 'N') ? 1 : 2); \
 		if (xul != 'U') \
 			triangular = -triangular; \
-		} while (0);
+		} while (0)
 
 		DO_TR;
 
@@ -1238,34 +1238,24 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	return s_x;
 }
 
-#define MULTIPLY_COMPLEX(_X_, _D_) \
+#define zSCALE(x, y) \
 	do { \
-		tmp = (_X_); \
-		(_X_).r = tmp.r * (_D_).r - tmp.i * (_D_).i; \
-		(_X_).i = tmp.r * (_D_).i + tmp.i * (_D_).r; \
+		Rcomplex tmp = (x); \
+		(x).r = tmp.r * (y).r - tmp.i * (y).i; \
+		(x).i = tmp.r * (y).i + tmp.i * (y).r; \
 	} while (0)
-#define MULTIPLY_REAL(_X_, _D_) \
-	(_X_) = (_X_)  * (_D_)
-#define MULTIPLY_LOGICAL(_X_, _D_) \
-	(_X_) = (_X_) && (_D_)
+#define dSCALE(x, y) \
+	(x) = (x)  * (y)
+#define lSCALE(x, y) \
+	(x) = (x) && (y)
 
-#define SCALE_CASES(_J_) \
+#define SCALE3(t, index) \
 	do { \
-		switch (TYPEOF(d)) { \
-		case CPLXSXP: \
-		{ \
-			Rcomplex tmp; \
-			SCALE(z, Rcomplex, COMPLEX, MULTIPLY_COMPLEX, _J_); \
-			break; \
-		} \
-		case REALSXP: \
-			SCALE(d, double, REAL, MULTIPLY_REAL, _J_); \
-			break; \
-		case LGLSXP: \
-			SCALE(i, int, LOGICAL, MULTIPLY_LOGICAL, _J_); \
-			break; \
-		default: \
-			break; \
+		switch (t) { \
+		case CPLXSXP: SCALE(z, index); break; \
+		case REALSXP: SCALE(d, index); break; \
+		case  LGLSXP: SCALE(l, index); break; \
+		default: break; \
 		} \
 	} while (0)
 
@@ -1275,31 +1265,31 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
 
-#define SCALE(_PREFIX_, _CTYPE_, _PTR_, _OP_, _J_) \
+#define SCALE(c, index) \
 	do { \
-		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
+		c##TYPE *px = c##PTR(x), *pd = c##PTR(d); \
 		if (ul == '\0') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < m; ++i) { \
-					_OP_(*px, pd[_J_]); \
+					c##SCALE(*px, pd[index]); \
 					++px; \
 				} \
 			} \
 		} else if (ul == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i <= j; ++i) { \
-					_OP_(*px, pd[_J_]); \
+					c##SCALE(*px, pd[index]); \
 					++px; \
 				} \
 				if (!packed) \
-					px += m - j - 1; \
+					px += n - j - 1; \
 			} \
 		} else { \
 			for (j = 0; j < n; ++j) { \
 				if (!packed) \
 					px += j; \
-				for (i = j; i < m; ++i) { \
-					_OP_(*px, pd[_J_]); \
+				for (i = j; i < n; ++i) { \
+					c##SCALE(*px, pd[index]); \
 					++px; \
 				} \
 			} \
@@ -1307,15 +1297,15 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 		if (di != '\0' && di != 'N') { \
 			size_t n_ = (size_t) n; \
 			if (!packed) \
-				_PREFIX_ ## copy2(n_, _PTR_(x), n_ + 1, pd, 1); \
+				c##NAME(copy2)(n_, c##PTR(x), n_ + 1, pd, 1); \
 			else if (ul == 'U') \
-				_PREFIX_ ## copy1(n_, _PTR_(x), 2 , 1, 0, pd, 1, 0, 0); \
+				c##NAME(copy1)(n_, c##PTR(x), 2 , 1, 0, pd, 1, 0, 0); \
 			else \
-				_PREFIX_ ## copy1(n_, _PTR_(x), n_, 1, 1, pd, 1, 0, 0); \
+				c##NAME(copy1)(n_, c##PTR(x), n_, 1, 1, pd, 1, 0, 0); \
 		} \
 	} while (0)
 
-	SCALE_CASES(j);
+	SCALE3(TYPEOF(d), j);
 	return;
 }
 
@@ -1324,7 +1314,7 @@ void dense_rowscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
-	SCALE_CASES(i);
+	SCALE3(TYPEOF(d), i);
 
 #undef SCALE
 
@@ -1338,16 +1328,16 @@ void Csparse_colscale(SEXP obj, SEXP d)
 {
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym));
-	int *pp = INTEGER(p) + 1, n = (int) (XLENGTH(p) - 1), j, k = 0, kend;
+	int *pp = INTEGER(p) + 1, n = (int) (XLENGTH(p) - 1), j, k, kend;
 	UNPROTECT(2); /* p, x */
 
-#define SCALE(_PREFIX_, _CTYPE_, _PTR_, _OP_, _J_) \
+#define SCALE(c, index) \
 	do { \
-		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
-		for (j = 0; j < n; ++j) { \
+		c##TYPE *px = c##PTR(x), *pd = c##PTR(d); \
+		for (j = 0, k = 0; j < n; ++j) { \
 			kend = pp[j]; \
 			while (k < kend) { \
-				_OP_(*px, *pd); \
+				c##SCALE(*px, *pd); \
 				++px; \
 				++k; \
 			} \
@@ -1355,7 +1345,7 @@ void Csparse_colscale(SEXP obj, SEXP d)
 		} \
 	} while (0)
 
-	SCALE_CASES();
+	SCALE3(TYPEOF(d), );
 
 #undef SCALE
 
@@ -1370,20 +1360,20 @@ void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(obj, iSym));
-	int *pi = INTEGER(i), k, nnz = INTEGER(p)[XLENGTH(p) - 1];
+	int *pi = INTEGER(i), k, kend = INTEGER(p)[XLENGTH(p) - 1];
 	UNPROTECT(3); /* i, p, x */
 
-#define SCALE(_PREFIX_, _CTYPE_, _PTR_, _OP_, _J_) \
+#define SCALE(c, index)	\
 	do { \
-		_CTYPE_ *px = _PTR_(x), *pd = _PTR_(d); \
-		for (k = 0; k < nnz; ++k) { \
-			_OP_(*px, pd[*pi]); \
+		c##TYPE *px = c##PTR(x), *pd = c##PTR(d); \
+		for (k = 0; k < kend; ++k) { \
+			c##SCALE(*px, pd[*pi]); \
 			++px; \
 			++pi; \
 		} \
 	} while (0)
 
-	SCALE_CASES();
+	SCALE3(TYPEOF(d), );
 	return;
 }
 
@@ -1395,14 +1385,16 @@ void Tsparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		i = PROTECT(GET_SLOT(obj, iSym));
 	int *pi = INTEGER(i);
-	R_xlen_t k, nnz = XLENGTH(i);
+	R_xlen_t k, kend = XLENGTH(i);
 	UNPROTECT(2); /* i, x */
-	SCALE_CASES();
+	SCALE3(TYPEOF(d), );
 
 #undef SCALE
 
 	return;
 }
+
+#undef SCALE3
 
 SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
                         SEXP s_xtrans, SEXP s_ytrans,
