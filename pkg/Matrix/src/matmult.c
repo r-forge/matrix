@@ -776,7 +776,7 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	} \
 	} while (0)
 
-#define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
 	REPROTECT(_A_ = matrix_as_dense(_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 0), _PID_); \
@@ -789,9 +789,9 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	} \
 	} while (0)
 
-	DO_S3(s_x, xclass, xtrans, xpid, v % 2);
+	DO_S3(s_x, xtrans, xpid, v % 2);
 	if (s_y != R_NilValue)
-	DO_S3(s_y, yclass, ytrans, ypid, v > 1);
+	DO_S3(s_y, ytrans, ypid, v > 1);
 
 #undef DO_S3
 
@@ -1122,7 +1122,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	const char *xclass = NULL, *yclass = NULL;
 	int ivalid;
 
-#define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
 	if (boolean == NA_LOGICAL || !boolean) \
@@ -1140,9 +1140,9 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	} \
 	} while (0)
 
-	DO_S3(s_x, xclass, xtrans, xpid, v % 2);
+	DO_S3(s_x, xtrans, xpid, v % 2);
 	if (s_y != R_NilValue)
-	DO_S3(s_y, xclass, ytrans, ypid, v > 1);
+	DO_S3(s_y, ytrans, ypid, v > 1);
 
 #undef DO_S3
 
@@ -1423,7 +1423,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	const char *xclass = NULL, *yclass = NULL;
 	int ivalid;
 
-#define DO_S3(_A_, _CLASS_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
 	if (boolean == NA_LOGICAL || !boolean) \
@@ -1439,9 +1439,9 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	} \
 	} while (0)
 
-	DO_S3(s_x, xclass, xtrans, xpid, v % 2);
+	DO_S3(s_x, xtrans, xpid, v % 2);
 	if (s_y != R_NilValue)
-	DO_S3(s_y, yclass, ytrans, ypid, v > 1);
+	DO_S3(s_y, ytrans, ypid, v > 1);
 
 #undef DO_S3
 
