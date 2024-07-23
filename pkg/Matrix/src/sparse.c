@@ -2442,7 +2442,7 @@ SEXP R_sparse_skewpart(SEXP s_from, SEXP s_trans)
 }
 
 int sparse_is_symmetric(SEXP obj, const char *class,
-                        int exact, char ct, int checkDN)
+                        char ct, int exact, int checkDN)
 {
 	exact = exact || class[0] == 'n' || class[0] == 'l' || class[0] == 'i';
 
@@ -2570,7 +2570,7 @@ finish:
    NB: requires symmetric nonzero pattern
 */
 SEXP R_sparse_is_symmetric(SEXP s_obj,
-                           SEXP s_exact, SEXP s_trans, SEXP s_checkDN)
+                           SEXP s_trans, SEXP s_exact, SEXP s_checkDN)
 {
 	static const char *valid[] = {
 		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, "" };
@@ -2578,23 +2578,23 @@ SEXP R_sparse_is_symmetric(SEXP s_obj,
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_obj, __func__);
 
-	int exact;
-	if (TYPEOF(s_exact) != LGLSXP || LENGTH(s_exact) < 1 ||
-	    (exact = LOGICAL(s_exact)[0]) == NA_LOGICAL)
-		error(_("'%s' must be %s or %s"), "exact", "TRUE", "FALSE");
-
 	char ct = 'C';
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
 	    (s_trans = STRING_ELT(s_trans, 0)) == NA_STRING ||
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
+	int exact;
+	if (TYPEOF(s_exact) != LGLSXP || LENGTH(s_exact) < 1 ||
+	    (exact = LOGICAL(s_exact)[0]) == NA_LOGICAL)
+		error(_("'%s' must be %s or %s"), "exact", "TRUE", "FALSE");
+
 	int checkDN;
 	if (TYPEOF(s_checkDN) != LGLSXP || LENGTH(s_checkDN) < 1 ||
 	    (checkDN = LOGICAL(s_checkDN)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
 
-	int ans_ = sparse_is_symmetric(s_obj, valid[ivalid], exact, ct, checkDN);
+	int ans_ = sparse_is_symmetric(s_obj, valid[ivalid], ct, exact, checkDN);
 	SEXP ans = ScalarLogical(ans_);
 	return ans;
 }
