@@ -1,6 +1,3 @@
-#ifndef MATRIX_MSYMBOLS_H
-#define MATRIX_MSYMBOLS_H
-
 SEXP
 	Matrix_DimNamesSym,
 	Matrix_DimSym,
@@ -38,5 +35,3 @@ SEXP
 	Matrix_valuesSym,
 	Matrix_vectorsSym,
 	Matrix_xSym;
-
-#endif /* MATRIX_MSYMBOLS_H */
