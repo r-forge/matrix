@@ -4,7 +4,7 @@
 setMethod("Schur", c(x = "denseMatrix"),
           function(x, vectors = TRUE, ...) {
               x <- .M2kind(x, ",")
-              switch(substr(.M.nonvirtual(x), 2L, 3L),
+              switch(substr(.M.class(x), 2L, 3L),
                      "ge" = .Call(geMatrix_scf, x, TRUE, vectors),
                      "sy" = .Call(syMatrix_scf, x, TRUE, vectors),
                      "sp" = .Call(spMatrix_scf, x, TRUE, vectors),

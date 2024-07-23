@@ -9,7 +9,7 @@ setMethod("norm", c(x = "denseMatrix", type = "character"),
               if(identical(type, "2"))
                   return(base::norm(.M2m(x), type = "2"))
               x <- .M2kind(x, ",")
-              switch(substr(.M.nonvirtual(x), 2L, 3L),
+              switch(substr(.M.class(x), 2L, 3L),
                      "ge" = .Call(geMatrix_norm, x, type),
                      "sy" = .Call(syMatrix_norm, x, type),
                      "sp" = .Call(spMatrix_norm, x, type),
@@ -116,7 +116,7 @@ setMethod("rcond", c(x = "ANY", norm = "missing"),
 setMethod("rcond", c(x = "denseMatrix", norm = "character"),
           function(x, norm, ...) {
               x <- .M2kind(x, ",")
-              switch(substr(.M.nonvirtual(x, 3L), 2L, 3L),
+              switch(substr(.M.class(x, 3L), 2L, 3L),
                      "ge" =
                          {
                              d <- x@Dim

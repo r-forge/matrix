@@ -4,7 +4,7 @@
 
 ## Operations such as rounding can lose positive semidefiniteness
 ## but not symmetry, hence:
-.indefinite <- function(x) as(x, .M.nonvirtual(x, 4L))
+.indefinite <- function(x) as(x, .M.class(x, 4L))
 
 .dsy2dpo <- .dsp2dpp <- function(from) {
     if(is.null(tryCatch(Cholesky(from, perm = FALSE),

@@ -16,7 +16,7 @@ setMethod("Summary", c(x = "denseMatrix"),
               if(.Generic == "prod")
                   return(prod(.Call(R_dense_prod, x, na.rm),
                               ..., na.rm = na.rm))
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
@@ -46,7 +46,7 @@ setMethod("Summary", c(x = "sparseMatrix"),
               if(.Generic == "prod")
                   return(prod(.Call(R_sparse_prod, x, na.rm),
                               ..., na.rm = na.rm))
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)

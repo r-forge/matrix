@@ -3,7 +3,7 @@
 
 setMethod("anyNA", c(x = "denseMatrix"),
           function(x, recursive = FALSE) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               if(substr(cl, 1L, 1L)  == "n")
                   return(FALSE)
               if((shape <- substr(cl, 2L, 2L)) == "g")
@@ -40,7 +40,7 @@ setMethod("anyNA", c(x = "sparseVector"),
 
 setMethod("is.na", c(x = "denseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- substr(cl, 1L, 1L) == "n"
               substr(cl, 1L, 1L) <- "n"
               r <- new(cl)
@@ -62,7 +62,7 @@ setMethod("is.na", c(x = "denseMatrix"),
 
 setMethod("is.na", c(x = "sparseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- substr(cl, 1L, 1L) == "n"
               substr(cl, 1L, 1L) <- if(never) "n" else "l"
               r <- new(cl)
@@ -122,7 +122,7 @@ setMethod("is.na", c(x = "sparseVector"),
 
 setMethod("is.nan", c(x = "denseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- switch(substr(cl, 1L, 1L), "d" = , "z" = FALSE, TRUE)
               substr(cl, 1L, 1L) <- "n"
               r <- new(cl)
@@ -144,7 +144,7 @@ setMethod("is.nan", c(x = "denseMatrix"),
 
 setMethod("is.nan", c(x = "sparseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- switch(substr(cl, 1L, 1L), "d" = , "z" = FALSE, TRUE)
               substr(cl, 1L, 1L) <- if(never) "n" else "l"
               r <- new(cl)
@@ -204,7 +204,7 @@ setMethod("is.nan", c(x = "sparseVector"),
 
 setMethod("is.infinite", c(x = "denseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- switch(substr(cl, 1L, 1L), "d" = , "z" = FALSE, TRUE)
               substr(cl, 1L, 1L) <- "n"
               r <- new(cl)
@@ -226,7 +226,7 @@ setMethod("is.infinite", c(x = "denseMatrix"),
 
 setMethod("is.infinite", c(x = "sparseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               never <- switch(substr(cl, 1L, 1L), "d" = , "z" = FALSE, TRUE)
               substr(cl, 1L, 1L) <- if(never) "n" else "l"
               r <- new(cl)
@@ -285,7 +285,7 @@ setMethod("is.infinite", c(x = "sparseVector"),
 
 setMethod("is.finite", c(x = "denseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               always <- substr(cl, 1L, 1L) == "n"
               packed <- substr(cl, 3L, 3L) == "p"
               if((shape <- substr(cl, 2L, 2L)) != "s")
@@ -326,7 +326,7 @@ setMethod("is.finite", c(x = "denseMatrix"),
 
 setMethod("is.finite", c(x = "sparseMatrix"),
           function(x) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               always <- substr(cl, 1L, 1L) == "n"
               if(substr(cl, 2L, 2L) != "s")
                   r <- new("ngeMatrix")

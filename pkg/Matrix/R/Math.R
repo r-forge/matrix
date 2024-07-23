@@ -14,7 +14,7 @@ setMethod("Math", c(x = "denseMatrix"),
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
                   return(g(.M2v(x)))
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               if (kind == "z") {
@@ -46,7 +46,7 @@ setMethod("Math", c(x = "denseMatrix"),
 
 setMethod("log", c(x = "denseMatrix"),
           function(x, ...) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               if(kind != "z")
@@ -69,7 +69,7 @@ setMethod("Math", c(x = "sparseMatrix"),
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
                   return(g(.M2v(x)))
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
@@ -110,7 +110,7 @@ setMethod("Math", c(x = "sparseMatrix"),
 
 setMethod("log", c(x = "sparseMatrix"),
           function(x, ...) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
@@ -138,7 +138,7 @@ setMethod("Math", c(x = "diagonalMatrix"),
               g <- get(.Generic, mode = "function")
               if(startsWith(.Generic, "cum"))
                   return(g(.M2v(x)))
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               if (kind == "z") {
                   zero <- 0+0i; one <- 1+0i; a <- as.complex
@@ -171,7 +171,7 @@ setMethod("Math", c(x = "diagonalMatrix"),
 
 setMethod("log", c(x = "diagonalMatrix"),
           function(x, ...) {
-              cl <- .M.nonvirtual(x)
+              cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               if(kind == "z") {
                   zero <- 0+0i; one <- 1+0i

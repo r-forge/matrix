@@ -3,7 +3,7 @@
 ##   "co.Matrix" -> "dp.Matrix"  if  mode >= 2L
 ##   "dp.Matrix" -> "ds.Matrix"  if  mode >= 4L
 ##   "zp.Matrix" -> "zs.Matrix"  if  mode >= 4L
-.M.nonvirtual <- function(x, mode = 5L)
+.M.class <- function(x, mode = 5L)
     .Call(R_Matrix_nonvirtual, x, mode) # for 'mode' in 0:5
 
 ## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
@@ -17,9 +17,9 @@
 .M.repr  <- function(x) .Call(R_Matrix_repr , x)
 
 .isMatrix   <- function(x)
-    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) == "M"
+    nzchar(cl <- .M.class(x)) && substr(cl, 4L, 4L) == "M"
 .isVector   <- function(x)
-    nzchar(cl <- .M.nonvirtual(x)) && substr(cl, 4L, 4L) != "M"
+    nzchar(cl <- .M.class(x)) && substr(cl, 4L, 4L) != "M"
 .isUnpacked <- function(x) .M.repr(x) == "u"
 .isPacked   <- function(x) .M.repr(x) == "p"
 .isC        <- function(x) .M.repr(x) == "C"

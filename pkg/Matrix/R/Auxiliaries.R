@@ -297,7 +297,7 @@ dmperm <- function(x, nAns = 6L, seed = 0L) {
 ## (matrix|denseMatrix)->denseMatrix as similar as possible to "target"
 as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
     kind <- .M.kind(x)
-    cl <- .M.nonvirtual(new(cld))
+    cl <- .M.class(new(cld))
     if(cl == "indMatrix")
         cl <- "ngeMatrix"
     symmetric <- substr(cl, 2L, 2L) == "s" && isSymmetric(x)
@@ -327,7 +327,7 @@ as_denseClass <- function(x, cl, cld = getClassDef(cl)) {
 ## (matrix|sparseMatrix)->CsparseMatrix as similar as possible to "target"
 as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
     kind <- .M.kind(x)
-    cl <- .M.nonvirtual(new(cld))
+    cl <- .M.class(new(cld))
     if(cl == "indMatrix")
         cl <- "ngeMatrix"
     symmetric <- substr(cl, 2L, 2L) == "s" && isSymmetric(x)

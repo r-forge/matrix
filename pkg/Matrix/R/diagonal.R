@@ -6,7 +6,7 @@ setMethod("band", c(x = "diagonalMatrix"),
           function(x, k1, k2, ...) {
               if(k1 <= 0L && k2 >= 0L)
                   return(x)
-              r <- new(.M.nonvirtual(x))
+              r <- new(.M.class(x))
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- vector(typeof(x@x), d[1L])
@@ -17,7 +17,7 @@ setMethod("triu", c(x = "diagonalMatrix"),
           function(x, k = 0L, ...) {
               if(k <= 0L)
                   return(x)
-              r <- new(.M.nonvirtual(x))
+              r <- new(.M.class(x))
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- vector(typeof(x@x), d[1L])
@@ -28,7 +28,7 @@ setMethod("tril", c(x = "diagonalMatrix"),
           function(x, k = 0L, ...) {
               if(k >= 0L)
                   return(x)
-              r <- new(.M.nonvirtual(x))
+              r <- new(.M.class(x))
               r@Dim <- d <- x@Dim
               r@Dimnames <- x@Dimnames
               r@x <- vector(typeof(x@x), d[1L])
