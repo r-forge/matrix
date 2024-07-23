@@ -3882,16 +3882,16 @@ SEXP R_Matrix_as_vector(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
 	SEXP to = NULL;
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(s_from, &pid);
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 		to = GET_SLOT(s_from, Matrix_xSym);
-		if (cl[0] == 'n') {
+		if (class[0] == 'n') {
 			int *px = LOGICAL(to);
 			for (R_xlen_t k = 0, kend = XLENGTH(to); k < kend; ++k) {
 				if (*(px++) == NA_LOGICAL) {
@@ -3907,36 +3907,36 @@ SEXP R_Matrix_as_vector(SEXP s_from)
 	case 'o':
 	case 'r':
 	case 'p':
-		REPROTECT(s_from = dense_as_general(s_from, cl, 1), pid);
+		REPROTECT(s_from = dense_as_general(s_from, class, 1), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'C':
 	case 'R':
 	case 'T':
-		REPROTECT(s_from = sparse_as_dense(s_from, cl, 0), pid);
-		REPROTECT(s_from = dense_as_general(s_from, cl, 0), pid);
+		REPROTECT(s_from = sparse_as_dense(s_from, class, 0), pid);
+		REPROTECT(s_from = dense_as_general(s_from, class, 0), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(s_from = diagonal_as_dense(s_from, cl, '.', 'g', 0, '\0', '\0'), pid);
+		REPROTECT(s_from = diagonal_as_dense(s_from, class, '.', 'g', 0, '\0', '\0'), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'd':
-		REPROTECT(s_from = index_as_dense(s_from, cl, 'n'), pid);
+		REPROTECT(s_from = index_as_dense(s_from, class, 'n'), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	default:
 		break;
 	}
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
 	case 'i':
-		if (cl[0] == 'n') {
+		if (class[0] == 'n') {
 			PROTECT(to);
 			naToUnit(to);
 			UNPROTECT(1);
@@ -3957,13 +3957,13 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
 	SEXP to = NULL;
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(s_from, &pid);
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 		PROTECT(to = GET_SLOT(s_from, Matrix_xSym));
 		to = duplicate(to);
@@ -3973,22 +3973,22 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 	case 'o':
 	case 'r':
 	case 'p':
-		REPROTECT(s_from = dense_as_general(s_from, cl, 1), pid);
+		REPROTECT(s_from = dense_as_general(s_from, class, 1), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'C':
 	case 'R':
 	case 'T':
-		REPROTECT(s_from = sparse_as_dense(s_from, cl, 0), pid);
-		REPROTECT(s_from = dense_as_general(s_from, cl, 0), pid);
+		REPROTECT(s_from = sparse_as_dense(s_from, class, 0), pid);
+		REPROTECT(s_from = dense_as_general(s_from, class, 0), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'i':
-		REPROTECT(s_from = diagonal_as_dense(s_from, cl, '.', 'g', 0, '\0', '\0'), pid);
+		REPROTECT(s_from = diagonal_as_dense(s_from, class, '.', 'g', 0, '\0', '\0'), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	case 'd':
-		REPROTECT(s_from = index_as_dense(s_from, cl, 'n'), pid);
+		REPROTECT(s_from = index_as_dense(s_from, class, 'n'), pid);
 		to = GET_SLOT(s_from, Matrix_xSym);
 		break;
 	default:
@@ -4005,14 +4005,14 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 		setAttrib(to, R_DimNamesSymbol, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
 	case 'i':
-		if (cl[0] == 'n')
+		if (class[0] == 'n')
 			naToUnit(to);
 		break;
 	default:
@@ -4030,24 +4030,24 @@ SEXP R_Matrix_as_unpacked(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 		return s_from;
 	case 'p':
-		return dense_as_unpacked(s_from, cl);
+		return dense_as_unpacked(s_from, class);
 	case 'C':
 	case 'R':
 	case 'T':
-		return sparse_as_dense(s_from, cl, 0);
+		return sparse_as_dense(s_from, class, 0);
 	case 'i':
-		return diagonal_as_dense(s_from, cl, '.', 't', 0, 'U', '\0');
+		return diagonal_as_dense(s_from, class, '.', 't', 0, 'U', '\0');
 	case 'd':
-		return index_as_dense(s_from, cl, 'n');
+		return index_as_dense(s_from, class, 'n');
 	default:
 		return R_NilValue;
 	}
@@ -4060,24 +4060,24 @@ SEXP R_Matrix_as_packed(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 1)];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 		error(_("attempt to pack a %s"), "generalMatrix");
 		return R_NilValue;
 	case 'y':
 	case 'o':
 	case 'r':
-		return dense_as_packed(s_from, cl, '\0', '\0', '\0');
+		return dense_as_packed(s_from, class, '\0', '\0', '\0');
 	case 'p':
 		return s_from;
 	case 'C':
 	case 'R':
 	case 'T':
-		return sparse_as_dense(s_from, cl, 1);
+		return sparse_as_dense(s_from, class, 1);
 	case 'i':
-		return diagonal_as_dense(s_from, cl, '.', 't', 1, 'U', '\0');
+		return diagonal_as_dense(s_from, class, '.', 't', 1, 'U', '\0');
 	case 'd':
 		error(_("attempt to pack an %s"), "indMatrix");
 		return R_NilValue;
@@ -4093,23 +4093,23 @@ SEXP R_Matrix_as_Csparse(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
-		return dense_as_sparse(s_from, cl, 'C');
+		return dense_as_sparse(s_from, class, 'C');
 	case 'C':
 	case 'R':
 	case 'T':
-		return sparse_as_Csparse(s_from, cl);
+		return sparse_as_Csparse(s_from, class);
 	case 'i':
-		return diagonal_as_sparse(s_from, cl, '.', 't', 'C', 'U', '\0');
+		return diagonal_as_sparse(s_from, class, '.', 't', 'C', 'U', '\0');
 	case 'd':
-		return index_as_sparse(s_from, cl, 'n', 'C');
+		return index_as_sparse(s_from, class, 'n', 'C');
 	default:
 		return R_NilValue;
 	}
@@ -4122,23 +4122,23 @@ SEXP R_Matrix_as_Rsparse(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
-		return dense_as_sparse(s_from, cl, 'R');
+		return dense_as_sparse(s_from, class, 'R');
 	case 'C':
 	case 'R':
 	case 'T':
-		return sparse_as_Rsparse(s_from, cl);
+		return sparse_as_Rsparse(s_from, class);
 	case 'i':
-		return diagonal_as_sparse(s_from, cl, '.', 't', 'R', 'U', '\0');
+		return diagonal_as_sparse(s_from, class, '.', 't', 'R', 'U', '\0');
 	case 'd':
-		return index_as_sparse(s_from, cl, 'n', 'R');
+		return index_as_sparse(s_from, class, 'n', 'R');
 	default:
 		return R_NilValue;
 	}
@@ -4151,23 +4151,23 @@ SEXP R_Matrix_as_Tsparse(SEXP s_from)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
-		return dense_as_sparse(s_from, cl, 'T');
+		return dense_as_sparse(s_from, class, 'T');
 	case 'C':
 	case 'R':
 	case 'T':
-		return sparse_as_Tsparse(s_from, cl);
+		return sparse_as_Tsparse(s_from, class);
 	case 'i':
-		return diagonal_as_sparse(s_from, cl, '.', 't', 'T', 'U', '\0');
+		return diagonal_as_sparse(s_from, class, '.', 't', 'T', 'U', '\0');
 	case 'd':
-		return index_as_sparse(s_from, cl, 'n', 'T');
+		return index_as_sparse(s_from, class, 'n', 'T');
 	default:
 		return R_NilValue;
 	}
@@ -4180,7 +4180,7 @@ SEXP R_Matrix_as_kind(SEXP s_from, SEXP s_kind, SEXP s_sparse)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
 	char kind;
 	if (TYPEOF(s_kind) != STRSXP || LENGTH(s_kind) < 1 ||
@@ -4192,48 +4192,48 @@ SEXP R_Matrix_as_kind(SEXP s_from, SEXP s_kind, SEXP s_sparse)
 		error(_("'%s' must be %s or %s or %s"), "sparse", "TRUE", "FALSE", "NA");
 	int sparse = LOGICAL(s_sparse)[0];
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
 		if (sparse == NA_LOGICAL || !sparse)
-			s_from = dense_as_kind(s_from, cl, kind, 0);
+			s_from = dense_as_kind(s_from, class, kind, 0);
 		else {
-			s_from = dense_as_sparse(s_from, cl, 'C');
+			s_from = dense_as_sparse(s_from, class, 'C');
 			PROTECT(s_from);
 			ivalid = R_check_class_etc(s_from, valid);
-			cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
-			s_from = sparse_as_kind(s_from, cl, kind);
+			class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+			s_from = sparse_as_kind(s_from, class, kind);
 			UNPROTECT(1);
 		}
 		return s_from;
 	case 'C':
 	case 'R':
 	case 'T':
-		s_from = sparse_as_kind(s_from, cl, kind);
+		s_from = sparse_as_kind(s_from, class, kind);
 		if (sparse != NA_LOGICAL && !sparse) {
 			PROTECT(s_from);
 			ivalid = R_check_class_etc(s_from, valid);
-			cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
-			s_from = sparse_as_dense(s_from, cl, 0);
+			class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+			s_from = sparse_as_dense(s_from, class, 0);
 			UNPROTECT(1);
 		}
 		return s_from;
 	case 'i':
 		if (sparse == NA_LOGICAL)
-			s_from = diagonal_as_kind(s_from, cl, kind);
+			s_from = diagonal_as_kind(s_from, class, kind);
 		else if (sparse)
-			s_from = diagonal_as_sparse(s_from, cl, kind, 't', 'C', 'U', '\0');
+			s_from = diagonal_as_sparse(s_from, class, kind, 't', 'C', 'U', '\0');
 		else
-			s_from = diagonal_as_dense(s_from, cl, kind, 't', 0, 'U', '\0');
+			s_from = diagonal_as_dense(s_from, class, kind, 't', 0, 'U', '\0');
 		return s_from;
 	case 'd':
 		if (sparse == NA_LOGICAL || sparse)
-			s_from = index_as_sparse(s_from, cl, kind, '.');
+			s_from = index_as_sparse(s_from, class, kind, '.');
 		else
-			s_from = index_as_dense(s_from, cl, kind);
+			s_from = index_as_dense(s_from, class, kind);
 		return s_from;
 	default:
 		return R_NilValue;
@@ -4247,7 +4247,7 @@ SEXP R_Matrix_as_general(SEXP s_from, SEXP s_kind)
 	int ivalid = R_check_class_etc(s_from, valid);
 	if (ivalid < 0)
 		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+	const char *class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
 
 	char kind;
 	if (TYPEOF(s_kind) != STRSXP || LENGTH(s_kind) < 1 ||
@@ -4255,36 +4255,36 @@ SEXP R_Matrix_as_general(SEXP s_from, SEXP s_kind)
 	    (kind = CHAR(s_kind)[0]) == '\0')
 		error(_("invalid '%s' to '%s'"), "kind", __func__);
 
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'o':
 	case 'r':
 	case 'p':
 	{
-		char z = cl[0];
-		s_from = dense_as_kind(s_from, cl, kind, 1);
+		char z = class[0];
+		s_from = dense_as_kind(s_from, class, kind, 1);
 		PROTECT(s_from);
 		ivalid = R_check_class_etc(s_from, valid);
-		cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
-		s_from = dense_as_general(s_from, cl, kindToType(cl[0]) == kindToType(z));
+		class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+		s_from = dense_as_general(s_from, class, kindToType(class[0]) == kindToType(z));
 		UNPROTECT(1);
 		return s_from;
 	}
 	case 'C':
 	case 'R':
 	case 'T':
-		s_from = sparse_as_kind(s_from, cl, kind);
+		s_from = sparse_as_kind(s_from, class, kind);
 		PROTECT(s_from);
 		ivalid = R_check_class_etc(s_from, valid);
-		cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
-		s_from = sparse_as_general(s_from, cl);
+		class = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 3)];
+		s_from = sparse_as_general(s_from, class);
 		UNPROTECT(1);
 		return s_from;
 	case 'i':
-		return diagonal_as_sparse(s_from, cl, kind, 'g', 'C', '\0', '\0');
+		return diagonal_as_sparse(s_from, class, kind, 'g', 'C', '\0', '\0');
 	case 'd':
-		return index_as_sparse(s_from, cl, kind, '.');
+		return index_as_sparse(s_from, class, kind, '.');
 	default:
 		return R_NilValue;
 	}
