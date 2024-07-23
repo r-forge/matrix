@@ -124,10 +124,7 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 		s_from = matrix_as_dense(s_from, ".ge", '\0', '\0', '\0', 1, 0);
 	}
 	PROTECT(s_from);
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
+	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
@@ -147,7 +144,7 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 		error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
 		      "k1", a, "k2", b);
 
-	s_from = dense_band(s_from, valid[ivalid], a, b);
+	s_from = dense_band(s_from, class, a, b);
 	UNPROTECT(1);
 	return s_from;
 }
@@ -228,17 +225,14 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 /* diag(<denseMatrix>, names=) */
 SEXP R_dense_diag_get(SEXP s_obj, SEXP s_names)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	int names;
 	if (TYPEOF(s_names) != LGLSXP || LENGTH(s_names) < 1 ||
 	    (names = LOGICAL(s_names)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "names", "TRUE", "FALSE");
 
-	return dense_diag_get(s_obj, valid[ivalid], names);
+	return dense_diag_get(s_obj, class, names);
 }
 
 SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
@@ -299,12 +293,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 /* diag(<denseMatrix>) <- value */
 SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *class = valid[ivalid];
-
+	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 	SEXPTYPE tx = kindToType(class[0]), tv = TYPEOF(s_value);
 
 	switch (tv) {
@@ -333,7 +322,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 			int ct = CHAR(STRING_ELT(trans, 0))[0];
 			if (ct == 'C') {
 				PROTECT(s_from = dense_as_general(s_from, class, 1));
-				class = valid[R_check_class_etc(s_from, valid)];
+				class = Matrix_class(s_from, valid_dense, 6, __func__);
 				new = 0;
 				UNPROTECT(1);
 			}
@@ -354,7 +343,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 #ifndef MATRIX_ENABLE_IMATRIX
 		}
 #endif
-		class = valid[R_check_class_etc(s_from, valid)];
+		class = Matrix_class(s_from, valid_dense, 6, __func__);
 		new = 0;
 	}
 
@@ -450,14 +439,7 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 /* t(<denseMatrix>) */
 SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
 {
-	static const char *valid[] = {
-		"corMatrix", "copMatrix",
-		"dpoMatrix", "dppMatrix",
-		"zpoMatrix", "zppMatrix",
-		VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
+	const char *class = Matrix_class(s_from, valid_dense, 0, __func__);
 
 	char ct;
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
@@ -465,7 +447,7 @@ SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	return dense_transpose(s_from, valid[ivalid], ct);
+	return dense_transpose(s_from, class, ct);
 }
 
 SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
@@ -563,10 +545,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 /* forceSymmetric(<denseMatrix>, uplo, trans) */
 SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
+	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	char ul = '\0', ct = '\0';
 	if (s_uplo != R_NilValue) {
@@ -582,7 +561,7 @@ SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 			error(_("invalid '%s' to '%s'"), "trans", __func__);
 	}
 
-	return dense_force_symmetric(s_from, valid[ivalid], ul, ct);
+	return dense_force_symmetric(s_from, class, ul, ct);
 }
 
 SEXP dense_symmpart(SEXP from, const char *class, char ct)
@@ -759,10 +738,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 /* symmpart(<denseMatrix>, trans) */
 SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
+	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	char ct;
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
@@ -770,7 +746,7 @@ SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	return dense_symmpart(s_from, valid[ivalid], ct);
+	return dense_symmpart(s_from, class, ct);
 }
 
 SEXP dense_skewpart(SEXP from, const char *class, char ct)
@@ -970,10 +946,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 /* skewpart(<denseMatrix>, trans) */
 SEXP R_dense_skewpart(SEXP s_from, SEXP s_trans)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
+	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	char ct = '\0';
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
@@ -981,7 +954,7 @@ SEXP R_dense_skewpart(SEXP s_from, SEXP s_trans)
 	    ((ct = CHAR(s_trans)[0]) != 'C' && ct != 'T'))
 		error(_("invalid '%s' to '%s'"), "trans", __func__);
 
-	return dense_skewpart(s_from, valid[ivalid], ct);
+	return dense_skewpart(s_from, class, ct);
 }
 
 int dense_is_symmetric(SEXP obj, const char *class,
@@ -1138,10 +1111,7 @@ SEXP R_dense_is_symmetric(SEXP s_obj,
 		s_obj = matrix_as_dense(s_obj, ".ge", '\0', '\0', '\0', 1, 0);
 	}
 	PROTECT(s_obj);
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	char ct;
 	if (TYPEOF(s_trans) != STRSXP || LENGTH(s_trans) < 1 ||
@@ -1159,7 +1129,7 @@ SEXP R_dense_is_symmetric(SEXP s_obj,
 	    (checkDN = LOGICAL(s_checkDN)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "checkDN", "TRUE", "FALSE");
 
-	int ans_ = dense_is_symmetric(s_obj, valid[ivalid], ct, exact, checkDN);
+	int ans_ = dense_is_symmetric(s_obj, class, ct, exact, checkDN);
 	SEXP ans = ScalarLogical(ans_);
 	UNPROTECT(1);
 	return ans;
@@ -1267,16 +1237,13 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 		s_obj = matrix_as_dense(s_obj, ".ge", '\0', '\0', '\0', 1, 0);
 	}
 	PROTECT(s_obj);
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	if (TYPEOF(s_upper) != LGLSXP || LENGTH(s_upper) < 1)
 		error(_("'%s' must be %s or %s or %s"), "upper", "TRUE", "FALSE", "NA");
 	int upper = LOGICAL(s_upper)[0];
 
-	int ans_ = dense_is_triangular(s_obj, valid[ivalid], upper);
+	int ans_ = dense_is_triangular(s_obj, class, upper);
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
 	if (upper == NA_LOGICAL && ans_ != 0) {
@@ -1370,12 +1337,9 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 		s_obj = matrix_as_dense(s_obj, ".ge", '\0', '\0', '\0', 1, 0);
 	}
 	PROTECT(s_obj);
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
-	int ans_ = dense_is_diagonal(s_obj, valid[ivalid]);
+	int ans_ = dense_is_diagonal(s_obj, class);
 	SEXP ans = ScalarLogical(ans_ != 0);
 	UNPROTECT(1);
 	return ans;
@@ -1630,10 +1594,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 /* (row|col)(Sums|Means)(<denseMatrix>, na.rm=) */
 SEXP R_dense_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	int mg;
 	if (TYPEOF(s_margin) != INTSXP || LENGTH(s_margin) < 1 ||
@@ -1650,7 +1611,7 @@ SEXP R_dense_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean)
 	    (mean = LOGICAL(s_mean)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "mean", "TRUE", "FALSE");
 
-	return dense_marginsum(s_obj, valid[ivalid], mg, narm, mean);
+	return dense_marginsum(s_obj, class, mg, narm, mean);
 }
 
 SEXP dense_sum(SEXP obj, const char *class, int narm)
@@ -1865,17 +1826,14 @@ over:
 /* sum(<denseMatrix>, na.rm=) */
 SEXP R_dense_sum(SEXP s_obj, SEXP s_narm)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	int narm;
 	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||
 	    (narm = LOGICAL(s_narm)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
 
-	return dense_sum(s_obj, valid[ivalid], narm);
+	return dense_sum(s_obj, class, narm);
 }
 
 SEXP dense_prod(SEXP obj, const char *class, int narm)
@@ -2074,15 +2032,12 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 /* prod(<denseMatrix>, na.rm=) */
 SEXP R_dense_prod(SEXP s_obj, SEXP s_narm)
 {
-	static const char *valid[] = { VALID_DENSE, "" };
-	int ivalid = R_check_class_etc(s_obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_obj, __func__);
+	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	int narm;
 	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||
 	    (narm = LOGICAL(s_narm)[0]) == NA_LOGICAL)
 		error(_("'%s' must be %s or %s"), "narm", "TRUE", "FALSE");
 
-	return dense_prod(s_obj, valid[ivalid], narm);
+	return dense_prod(s_obj, class, narm);
 }

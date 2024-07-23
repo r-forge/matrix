@@ -75,11 +75,7 @@ SEXP v2spV(SEXP s_from)
 
 SEXP CR2spV(SEXP s_from)
 {
-	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(s_from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_from, __func__);
-	const char *cl = valid[ivalid];
+	const char *cl = Matrix_class(s_from, valid_sparse_compressed, 6, __func__);
 
 	SEXP dim = PROTECT(GET_SLOT(s_from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];

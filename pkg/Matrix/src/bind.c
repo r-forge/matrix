@@ -3,8 +3,6 @@
 #include "coerce.h"
 #include "bind.h"
 
-static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-
 static SEXP tagWasVector = NULL;
 
 static
@@ -15,7 +13,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 	int nS4 = 0, nDense = 0,
 		anyCsparse = 0, anyRsparse = 0, anyTsparse = 0, anyDiagonal = 0,
 		anyN = 0, anyL = 0, anyI = 0, anyD = 0, anyZ = 0,
-		i, ivalid, *sdim;
+		i, *sdim;
 	R_xlen_t slen;
 	const char *scl;
 
@@ -29,14 +27,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			continue;
 		if (TYPEOF(s) == OBJSXP) {
 			++nS4;
-			ivalid = R_check_class_etc(s, valid);
-			if (ivalid < 0) {
-				if (margin)
-					ERROR_INVALID_CLASS(s, "cbind.Matrix");
-				else
-					ERROR_INVALID_CLASS(s, "rbind.Matrix");
-			}
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = Matrix_class(s, valid_matrix, 7, "R_bind");
 
 			tmp = GET_SLOT(s, Matrix_DimSym);
 			sdim = INTEGER(tmp);
@@ -137,10 +128,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				anyZ = 1;
 				break;
 			default:
-				if (margin)
-					ERROR_INVALID_TYPE(s, "cbind.Matrix");
-				else
-					ERROR_INVALID_TYPE(s, "rbind.Matrix");
+				ERROR_INVALID_TYPE(s, "R_bind");
 				break;
 			}
 
@@ -268,8 +256,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			s = CAR(a);
 			if (TYPEOF(s) != OBJSXP)
 				continue;
-			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = Matrix_class(s, valid_matrix, 7, "R_bind");
 
 			PROTECT(tmp = GET_SLOT(s, Matrix_DimSym));
 			sdim = INTEGER(tmp);
@@ -363,7 +350,7 @@ void coerceArgs(SEXP args, int margin,
                 int *rdim, char kind, char repr)
 {
 	SEXP a, s, t, tmp;
-	int ivalid, isM;
+	int isM;
 	char scl_[] = "...Matrix";
 	const char *scl;
 
@@ -376,8 +363,7 @@ void coerceArgs(SEXP args, int margin,
 		PROTECT_INDEX pid;
 		PROTECT_WITH_INDEX(s, &pid);
 		if (TYPEOF(s) == OBJSXP) {
-			ivalid = R_check_class_etc(s, valid);
-			scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+			scl = Matrix_class(s, valid_matrix, 7, "R_bind");
 			switch (scl[2]) {
 			case 'e':
 			case 'y':
@@ -888,7 +874,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 	if (rdimnames[0] || rdimnames[1]) {
 		SEXP dimnames = PROTECT(GET_SLOT(ans, Matrix_DimNamesSym)),
 			marnames = R_NilValue, nms[2], nms_, a, e, s, tmp;
-		int i, ivalid, r = -1, pos = 0, nprotect = 1;
+		int i, r = -1, pos = 0, nprotect = 1;
 		const char *scl;
 		if (rdimnames[margin]) {
 			PROTECT(marnames = allocVector(STRSXP, rdim[margin]));
@@ -901,8 +887,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 				continue;
 			nms[0] = nms[1] = R_NilValue;
 			if (TYPEOF(s) == OBJSXP) {
-				ivalid = R_check_class_etc(s, valid);
-				scl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+				scl = Matrix_class(s, valid_matrix, 7, "R_bind");
 				tmp = GET_SLOT(s, Matrix_DimSym);
 				r = INTEGER(tmp)[margin];
 				tmp = GET_SLOT(s, Matrix_DimNamesSym);

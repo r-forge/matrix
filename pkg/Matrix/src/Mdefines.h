@@ -81,13 +81,20 @@ do { \
 /* TYPEOF returns int, not SEXPTYPE (unsigned int) => -Wsign-conversion */
 #define TYPEOF(s) ((SEXPTYPE) (TYPEOF)(s))
 
-/* Often used symbols, defined in ./init.c */
+/* Often used symbols, declared in ./init.c */
 extern
 #include "Msymbols.h"
 
-/* Often used numbers, defined in ./init.c */
+/* Often used numbers, declared in ./init.c */
 extern
 Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
+
+/* Often used arrays of nonvirtual class names, declared in ./objects.c */
+extern
+const char *valid_dense[], *valid_sparse[],
+	*valid_sparse_compressed[], *valid_sparse_triplet[],
+	*valid_diagonal[], *valid_index[],
+	*valid_matrix[], *valid_vector[], *valid_matrix_or_vector[];
 
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
@@ -231,6 +238,10 @@ Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)
 
+#define ERROR_OOM(_FUNC_) \
+	error(_("out of memory in '%s'"), \
+	      _FUNC_)
+
 #define ERROR_INVALID_TYPE(_X_, _FUNC_) \
 	error(_("invalid type \"%s\" in '%s'"), \
 	      type2char(TYPEOF(_X_)), _FUNC_)
@@ -247,73 +258,6 @@ do { \
 	} \
 } while (0)
 
-/* FIXME: use bit masks intead ?? */
-
-#define VALID_NONVIRTUAL_MATRIX \
-/*  0 */ "corMatrix", "copMatrix", \
-/*  2 */ "dpCMatrix", "dpRMatrix", "dpTMatrix", "dpoMatrix", "dppMatrix", \
-/*  7 */ "zpCMatrix", "zpRMatrix", "zpTMatrix", "zpoMatrix", "zppMatrix", \
-/* 12 */   "pMatrix", \
-/* 13 */ "indMatrix", \
-/* 14 */ "ngCMatrix", "ngRMatrix", "ngTMatrix", "ngeMatrix", "ndiMatrix", \
-/* 19 */ "nsCMatrix", "nsRMatrix", "nsTMatrix", "nsyMatrix", "nspMatrix", \
-/* 24 */ "ntCMatrix", "ntRMatrix", "ntTMatrix", "ntrMatrix", "ntpMatrix", \
-/* 29 */ "lgCMatrix", "lgRMatrix", "lgTMatrix", "lgeMatrix", "ldiMatrix", \
-/* 34 */ "lsCMatrix", "lsRMatrix", "lsTMatrix", "lsyMatrix", "lspMatrix", \
-/* 39 */ "ltCMatrix", "ltRMatrix", "ltTMatrix", "ltrMatrix", "ltpMatrix", \
-/* 44 */ "igCMatrix", "igRMatrix", "igTMatrix", "igeMatrix", "idiMatrix", \
-/* 49 */ "isCMatrix", "isRMatrix", "isTMatrix", "isyMatrix", "ispMatrix", \
-/* 54 */ "itCMatrix", "itRMatrix", "itTMatrix", "itrMatrix", "itpMatrix", \
-/* 59 */ "dgCMatrix", "dgRMatrix", "dgTMatrix", "dgeMatrix", "ddiMatrix", \
-/* 64 */ "dsCMatrix", "dsRMatrix", "dsTMatrix", "dsyMatrix", "dspMatrix", \
-/* 69 */ "dtCMatrix", "dtRMatrix", "dtTMatrix", "dtrMatrix", "dtpMatrix", \
-/* 74 */ "zgCMatrix", "zgRMatrix", "zgTMatrix", "zgeMatrix", "zdiMatrix", \
-/* 79 */ "zsCMatrix", "zsRMatrix", "zsTMatrix", "zsyMatrix", "zspMatrix", \
-/* 84 */ "ztCMatrix", "ztRMatrix", "ztTMatrix", "ztrMatrix", "ztpMatrix"
-
-#define VALID_NONVIRTUAL_VECTOR \
-/* 89 */ "nsparseVector", "lsparseVector", "isparseVector", \
-         "dsparseVector", "zsparseVector"
-
-#define VALID_NONVIRTUAL VALID_NONVIRTUAL_MATRIX, VALID_NONVIRTUAL_VECTOR
-
-/* mode % 2: p -> ind                */
-/* mode / 2: co. -> [dz]p. -> [dz]s. */
-#define VALID_NONVIRTUAL_SHIFT(i, mode) \
-	(i + ((i >= 13) ? 0 : ((i >= 12) ? (mode % 2 != 0) : ((i >= 7) ? (mode >= 4) * 72 : ((i >= 2) ? (mode >= 4) * 62 : ((i >= 0) ? (mode >= 2) * 5 + (mode >= 4) * 62 : 0))))))
-
-#define VALID_DENSE \
-"ngeMatrix", "nsyMatrix", "nspMatrix", "ntrMatrix", "ntpMatrix", \
-"lgeMatrix", "lsyMatrix", "lspMatrix", "ltrMatrix", "ltpMatrix", \
-"igeMatrix", "isyMatrix", "ispMatrix", "itrMatrix", "itpMatrix", \
-"dgeMatrix", "dsyMatrix", "dspMatrix", "dtrMatrix", "dtpMatrix", \
-"zgeMatrix", "zsyMatrix", "zspMatrix", "ztrMatrix", "ztpMatrix"
-
-#define VALID_CSPARSE \
-"ngCMatrix", "nsCMatrix", "ntCMatrix", \
-"lgCMatrix", "lsCMatrix", "ltCMatrix", \
-"igCMatrix", "isCMatrix", "itCMatrix", \
-"dgCMatrix", "dsCMatrix", "dtCMatrix", \
-"zgCMatrix", "zsCMatrix", "ztCMatrix"
-
-#define VALID_RSPARSE \
-"ngRMatrix", "nsRMatrix", "ntRMatrix", \
-"lgRMatrix", "lsRMatrix", "ltRMatrix", \
-"igRMatrix", "isRMatrix", "itRMatrix", \
-"dgRMatrix", "dsRMatrix", "dtRMatrix", \
-"zgRMatrix", "zsRMatrix", "ztRMatrix"
-
-#define VALID_TSPARSE \
-"ngTMatrix", "nsTMatrix", "ntTMatrix", \
-"lgTMatrix", "lsTMatrix", "ltTMatrix", \
-"igTMatrix", "isTMatrix", "itTMatrix", \
-"dgTMatrix", "dsTMatrix", "dtTMatrix", \
-"zgTMatrix", "zsTMatrix", "ztTMatrix"
-
-#define VALID_DIAGONAL \
-"ndiMatrix", "ldiMatrix", "idiMatrix", "ddiMatrix", "zdiMatrix"
-
-
 /* What we want declared "everywhere" : */
 
 #include "utils.h"
@@ -324,6 +268,8 @@ void validObject(SEXP, const char *);
 char typeToKind(SEXPTYPE);
 SEXPTYPE kindToType(char);
 size_t kindToSize(char);
+
+const char *Matrix_class(SEXP, const char **, int, const char *);
 
 int DimNames_is_trivial(SEXP);
 int DimNames_is_symmetric(SEXP);

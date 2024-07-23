@@ -408,11 +408,7 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 /* writeMM(obj, file) */
 SEXP Csparse_writeMM(SEXP obj, SEXP file)
 {
-	static const char *valid[] = { VALID_CSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(obj, valid_sparse_compressed, 6, __func__);
 
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(obj, &pid);
@@ -420,13 +416,13 @@ SEXP Csparse_writeMM(SEXP obj, SEXP file)
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_kind(SEXP, const char *, char);
 		REPROTECT(obj = sparse_as_kind(obj, class, 'd'), pid);
-		class = valid[R_check_class_etc(obj, valid)];
+		class = Matrix_class(obj, valid_sparse_compressed, 6, __func__);
 	}
 	if (class[1] == 't') {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_general(SEXP, const char *);
 		REPROTECT(obj = sparse_as_general(obj, class), pid);
-		class = valid[R_check_class_etc(obj, valid)];
+		class = Matrix_class(obj, valid_sparse_compressed, 6, __func__);
 	}
 
 	cholmod_sparse *A = M2CHS(obj, 1);

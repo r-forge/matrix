@@ -410,11 +410,7 @@ SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
 /* x[i] with 'i' of type "integer" or "double" {i >= 1 or NA} */
 SEXP R_subscript_1ary(SEXP s_x, SEXP s_i)
 {
-	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(s_x, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+	const char *cl = Matrix_class(s_x, valid_matrix, 7, __func__);
 	validObject(s_x, cl);
 
 	switch (cl[2]) {
@@ -790,11 +786,7 @@ SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
 */
 SEXP R_subscript_1ary_mat(SEXP s_x, SEXP s_i)
 {
-	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(s_x, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
+	const char *cl = Matrix_class(s_x, valid_matrix, 7, __func__);
 	validObject(s_x, cl);
 
 	switch (cl[2]) {
@@ -2174,11 +2166,7 @@ SEXP R_subscript_2ary(SEXP s_x, SEXP s_i, SEXP s_j)
 	if (s_i == R_NilValue && s_j == R_NilValue)
 		return s_x;
 
-	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(s_x, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(s_x, __func__);
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 4)];
+	const char *cl = Matrix_class(s_x, valid_matrix, 7, __func__);
 	validObject(s_x, cl);
 
 	switch (cl[2]) {
@@ -2236,7 +2224,7 @@ SEXP R_subscript_2ary(SEXP s_x, SEXP s_i, SEXP s_j)
 		s_x = CsparseMatrix_subscript_2ary(s_x, s_i, s_j, cl_);
 		UNPROTECT(1);
 		PROTECT(s_x);
-		s_x = sparse_as_Tsparse(s_x, valid[R_check_class_etc(s_x, valid)]);
+		s_x = sparse_as_Tsparse(s_x, Matrix_class(s_x, valid_matrix, 7, __func__));
 		UNPROTECT(1);
 		return s_x;
 	}

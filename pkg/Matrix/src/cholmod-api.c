@@ -21,10 +21,7 @@ cholmod_factor *sexp_as_cholmod_factor(cholmod_factor *L, SEXP from)
 		"nsimplicialCholesky", "nsupernodalCholesky",
 		"dsimplicialCholesky", "dsupernodalCholesky",
 		"zsimplicialCholesky", "zsupernodalCholesky", "" };
-	int ivalid = R_check_class_etc(from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(from, valid, -1, __func__);
 	memset(L, 0, sizeof(cholmod_factor));
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
 		perm = PROTECT(GET_SLOT(from, Matrix_permSym)),
@@ -133,11 +130,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	/* defined in ./Csparse.c : */
 	SEXP checkpi(SEXP dim, SEXP p, SEXP i);
 
-	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(from, valid_sparse_compressed, 6, __func__);
 	memset(A, 0, sizeof(cholmod_sparse));
 	int mg = (class[2] == 'C') ? 1 : 0;
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
@@ -254,11 +247,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
                                          Rboolean allocUnit)
 {
-	static const char *valid[] = { VALID_TSPARSE, "" };
-	int ivalid = R_check_class_etc(from, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(from, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(from, valid_sparse_triplet, 6, __func__);
 	memset(A, 0, sizeof(cholmod_triplet));
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym)),
 		i = PROTECT(GET_SLOT(from, Matrix_pSym)),
@@ -368,9 +357,9 @@ cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 {
 	static const char *valid[] = {
 		"ngeMatrix", "lgeMatrix", "igeMatrix", "dgeMatrix", "zgeMatrix", "" };
-	int ivalid = R_check_class_etc(from, valid);
+	const char *class = Matrix_class(from, valid, 0, NULL);
 	int m, n;
-	if (ivalid >= 0) {
+	if (class) {
 		SEXP dim = GET_SLOT(from, Matrix_DimSym);
 		m = INTEGER(dim)[0];
 		n = INTEGER(dim)[1];
@@ -406,7 +395,7 @@ cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 	case LGLSXP:
 	case INTSXP:
 	{
-		int pattern = ivalid == 0;
+		int pattern = class[0] == 'n';
 		int *px = (TYPEOF(from) == LGLSXP) ? LOGICAL(from) : INTEGER(from);
 		double *Ax = (double *) R_alloc(A->nzmax, sizeof(double));
 		for (size_t k = 0; k < A->nzmax; ++k)

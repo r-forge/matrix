@@ -1,12 +1,17 @@
 #include "Lapack-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
+#include "Mclasses.h"
 #include "M5.h"
 #include "idz.h"
 #include "coerce.h"
 #include "dense.h"
 #include "sparse.h"
 #include "matmult.h"
+
+static const char *valid_matmult[] = {
+VALID_DIAGONAL, VALID_SPARSE, VALID_DENSE, "" };
+/* ptr:      0,            5,          56, 87 */
 
 static
 void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
@@ -758,24 +763,6 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-	static const char *valid[] = { VALID_DENSE, "" };
-	const char *xclass = NULL, *yclass = NULL;
-	int ivalid;
-
-#define DO_CC \
-	do { \
-	ivalid = R_check_class_etc(s_x, valid); \
-	if (ivalid < 0) \
-		ERROR_INVALID_CLASS(s_x, __func__); \
-	xclass = valid[ivalid]; \
-	if (s_y != R_NilValue) { \
-	ivalid = R_check_class_etc(s_y, valid); \
-	if (ivalid < 0) \
-		ERROR_INVALID_CLASS(s_y, __func__); \
-	yclass = valid[ivalid]; \
-	} \
-	} while (0)
-
 #define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
@@ -795,7 +782,11 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 
 #undef DO_S3
 
-	DO_CC;
+	const char **valid = valid_matmult + 56;
+	const char *xclass = NULL, *yclass = NULL;
+	xclass = Matrix_class(s_x, valid, 6, __func__);
+	if (s_y != R_NilValue)
+	yclass = Matrix_class(s_y, valid, 6, __func__);
 
 	char kind = (xclass[0] == 'z' || (s_y != R_NilValue && yclass[0] == 'z'))
 		? 'z' : 'd';
@@ -804,7 +795,7 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	do { \
 	if (_CLASS_[0] != kind) { \
 		REPROTECT(_A_ = dense_as_kind(_A_, _CLASS_, kind, 0), _PID_); \
-		_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 	} \
 	} while (0)
 
@@ -1117,11 +1108,6 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-	static const char *valid[] = {
-		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
-	const char *xclass = NULL, *yclass = NULL;
-	int ivalid;
-
 #define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
@@ -1146,7 +1132,11 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 
 #undef DO_S3
 
-	DO_CC;
+	const char **valid = valid_matmult + 5;
+	const char *xclass = NULL, *yclass = NULL;
+	xclass = Matrix_class(s_x, valid, 6, __func__);
+	if (s_y != R_NilValue)
+	yclass = Matrix_class(s_y, valid, 6, __func__);
 
 	if (boolean == NA_LOGICAL)
 		boolean = xclass[0] == 'n' && (s_y == R_NilValue || yclass[0] == 'n');
@@ -1158,10 +1148,10 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	if (_CLASS_[2] != 'C' && _TRANS_ != 'N') { \
 		if (_CLASS_[2] != 'R' && _CLASS_[2] != 'T') { \
 			REPROTECT(_A_ = dense_as_sparse(_A_, _CLASS_, 'R'), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, _TRANS_, 1), _PID_); \
-		_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		_TRANS_ = 'N'; \
 	} \
 	if (_CLASS_[2] != 'C') { \
@@ -1169,7 +1159,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 			REPROTECT(_A_ = dense_as_sparse(_A_, _CLASS_, 'C'), _PID_); \
 		else \
 			REPROTECT(_A_ = sparse_as_Csparse(_A_, _CLASS_), _PID_); \
-		_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 	} \
 	if (_TRANS_ != 'N' && _CLASS_[1] == 's' && \
 	    (_CLASS_[0] != 'z' || CHAR(STRING_ELT(GET_SLOT(_A_, Matrix_transSym), 0))[0] == _TRANS_)) \
@@ -1179,7 +1169,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 			REPROTECT(_A_ = sparse_drop0(_A_, _CLASS_, 0.0), _PID_); \
 		else { \
 			REPROTECT(_A_ = sparse_as_kind(_A_, _CLASS_, kind), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 	} \
 	} while (0)
@@ -1204,7 +1194,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 			char xct = CHAR(STRING_ELT(xtrans, 0))[0];
 			if (xct != 'C') {
 				REPROTECT(s_x = sparse_as_general(s_x, xclass), xpid);
-				xclass = valid[R_check_class_etc(s_x, valid)];
+				xclass = Matrix_class(s_x, valid, 6, __func__);
 			}
 		}
 		int symmetric = xclass[1] == 's';
@@ -1216,7 +1206,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 		}
 		if (yclass[0] != kind) {
 			REPROTECT(s_y = dense_as_kind(s_y, yclass, kind, 0), ypid);
-			yclass = valid[R_check_class_etc(s_y, valid)];
+			yclass = Matrix_class(s_y, valid, 6, __func__);
 		}
 		REPROTECT(s_x = sparse_diag_U2N(s_x, xclass), xpid);
 		REPROTECT(s_y = dense_as_general(s_y, yclass, 1), ypid);
@@ -1417,12 +1407,6 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-	static const char *valid[] = {
-		VALID_DIAGONAL,
-		VALID_CSPARSE, VALID_RSPARSE, VALID_TSPARSE, VALID_DENSE, "" };
-	const char *xclass = NULL, *yclass = NULL;
-	int ivalid;
-
 #define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
 	do { \
 	if (TYPEOF(_A_) != OBJSXP) { \
@@ -1445,7 +1429,11 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 
 #undef DO_S3
 
-	DO_CC;
+	const char **valid = valid_matmult;
+	const char *xclass = NULL, *yclass = NULL;
+	xclass = Matrix_class(s_x, valid, 6, __func__);
+	if (s_y != R_NilValue)
+	yclass = Matrix_class(s_y, valid, 6, __func__);
 
 	if (boolean == NA_LOGICAL)
 		boolean = xclass[0] == 'n' && yclass[0] == 'n';
@@ -1472,7 +1460,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	case 'i': \
 		if (!id && _CLASS_[0] != ks) { \
 			REPROTECT(_A_ = diagonal_as_kind(_A_, _CLASS_, ks), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		break; \
 	case 'C': \
@@ -1480,11 +1468,11 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	case 'T': \
 		if (_CLASS_[0] != ks) { \
 			REPROTECT(_A_ = sparse_as_kind(_A_, _CLASS_, ks), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		if (!id && _CLASS_[1] == 's') { \
 			REPROTECT(_A_ = sparse_as_general(_A_, _CLASS_), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		if (!id && _CLASS_[1] == 't') \
 			REPROTECT(_A_ = sparse_diag_U2N(_A_, _CLASS_), _PID_); \
@@ -1496,11 +1484,11 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	default: \
 		if (_CLASS_[0] != kd) { \
 			REPROTECT(_A_ = dense_as_kind(_A_, _CLASS_, kd, 1), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		if (!id && _CLASS_[1] == 's') { \
 			REPROTECT(_A_ = dense_as_general(_A_, _CLASS_, _A_ == _ ## _A_), _PID_); \
-			_CLASS_ = valid[R_check_class_etc(_A_, valid)]; \
+			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
 		} \
 		if (_TRANS_ != 'N') { \
 			REPROTECT(_A_ = dense_transpose(_A_, _CLASS_, _TRANS_), _PID_); \

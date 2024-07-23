@@ -1,10 +1,10 @@
 ## "...Matrix" or ".sparseVector" or "", mapping:
-##     "pMatrix" -> "indMatrix"  if  mode %% 2L
-##   "co.Matrix" -> "dp.Matrix"  if  mode >= 2L
-##   "dp.Matrix" -> "ds.Matrix"  if  mode >= 4L
-##   "zp.Matrix" -> "zs.Matrix"  if  mode >= 4L
-.M.class <- function(x, mode = 5L)
-    .Call(R_Matrix_nonvirtual, x, mode) # for 'mode' in 0:5
+##     "pMatrix" -> "indMatrix"  if  bit 0 is set
+##   "co.Matrix" -> "dp.Matrix"  if  bit 1 is set
+##   "dp.Matrix" -> "ds.Matrix"  if  bit 2 is set
+##   "zp.Matrix" -> "zs.Matrix"  if  bit 2 is set
+.M.class <- function(x, mode = 7L)
+    .Call(R_Matrix_class, x, mode) # for 'mode' in 0:7
 
 ## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
 ## otherwise ""

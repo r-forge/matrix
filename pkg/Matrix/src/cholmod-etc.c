@@ -42,10 +42,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 		"nsimplicialCholesky", "nsupernodalCholesky",
 		"dsimplicialCholesky", "dsupernodalCholesky",
 		"zsimplicialCholesky", "zsupernodalCholesky", "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(obj, valid, -1, __func__);
 	cholmod_factor *L = (cholmod_factor *) R_alloc(1, sizeof(cholmod_factor));
 	memset(L, 0, sizeof(cholmod_factor));
 	values = values && (class[0] == 'd' || class[0] == 'z');
@@ -134,11 +131,7 @@ cholmod_factor *M2CHF(SEXP obj, int values)
 
 cholmod_sparse *M2CHS(SEXP obj, int values)
 {
-	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(obj, valid_sparse_compressed, 6, __func__);
 	cholmod_sparse *A = (cholmod_sparse *) R_alloc(1, sizeof(cholmod_sparse));
 	memset(A, 0, sizeof(cholmod_sparse));
 	values = values && (class[0] == 'd' || class[0] == 'z');
@@ -183,10 +176,7 @@ cholmod_sparse *M2CHS(SEXP obj, int values)
 cholmod_dense *M2CHD(SEXP obj, char trans)
 {
 	static const char *valid[] = { "dgeMatrix", "zgeMatrix", "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(obj, valid, 0, __func__);
 	cholmod_dense *A = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(A, 0, sizeof(cholmod_dense));
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),

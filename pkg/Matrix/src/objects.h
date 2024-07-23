@@ -3,7 +3,7 @@
 
 #include <Rinternals.h>
 
-SEXP R_Matrix_nonvirtual(SEXP, SEXP);
+SEXP R_Matrix_class(SEXP, SEXP);
 SEXP R_Matrix_kind (SEXP);
 SEXP R_Matrix_shape(SEXP);
 SEXP R_Matrix_repr (SEXP);

@@ -2062,7 +2062,7 @@ SEXP supernodalCholesky_validate(SEXP obj)
 	return ScalarLogical(1);
 }
 
-/* where 'cl' must be an element of VALID_NONVIRTUAL_MATRIX */
+/* where 'cl' must be an element of 'valid_matrix' */
 void validObject(SEXP obj, const char *cl)
 {
 #ifndef MATRIX_DISABLE_VALIDITY

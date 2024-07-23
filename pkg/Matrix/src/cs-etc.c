@@ -5,11 +5,7 @@ int Matrix_cs_xtype; /* flag indicating use of cs_di_* or cs_ci_* */
 
 Matrix_cs *M2CXS(SEXP obj, int values)
 {
-	static const char *valid[] = { VALID_CSPARSE, VALID_RSPARSE, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		ERROR_INVALID_CLASS(obj, __func__);
-	const char *class = valid[ivalid];
+	const char *class = Matrix_class(obj, valid_sparse_compressed, 6, __func__);
 	values = values && (class[0] == 'd' || class[0] == 'z');
 	char trans = (class[2] == 'C') ? 'N' : 'C';
 	Matrix_cs *A = (Matrix_cs *) R_alloc(1, sizeof(Matrix_cs));

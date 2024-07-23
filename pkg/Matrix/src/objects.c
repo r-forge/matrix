@@ -1,5 +1,16 @@
 #include "Mdefines.h"
+#include "Mclasses.h"
 #include "objects.h"
+
+const char *valid_dense            [] = { VALID_DENSE            , "" };
+const char *valid_sparse           [] = { VALID_SPARSE           , "" };
+const char *valid_sparse_compressed[] = { VALID_SPARSE_COMPRESSED, "" };
+const char *valid_sparse_triplet   [] = { VALID_SPARSE_TRIPLET   , "" };
+const char *valid_diagonal         [] = { VALID_DIAGONAL         , "" };
+const char *valid_index            [] = { VALID_INDEX            , "" };
+const char *valid_matrix           [] = { VALID_MATRIX           , "" };
+const char *valid_vector           [] = { VALID_VECTOR           , "" };
+const char *valid_matrix_or_vector [] = { VALID_MATRIX_OR_VECTOR , "" };
 
 SEXP newObject(const char *what)
 {
@@ -60,27 +71,61 @@ size_t kindToSize(char kind)
 	}
 }
 
-const char *Matrix_nonvirtual(SEXP obj, int mode)
+const char *Matrix_superclass(const char *class, int mode)
 {
-	if (TYPEOF(obj) != OBJSXP)
-		return "";
-	static const char *valid[] = { VALID_NONVIRTUAL, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
-		return "";
-	return valid[VALID_NONVIRTUAL_SHIFT(ivalid, mode)];
+	if (class[0] == 'p') {
+		if (mode & 1)
+			return "indMatrix";
+	} else if (class[1] == 'o') {
+		if (mode & 4)
+			switch (class[2]) {
+			case 'r': return "dsyMatrix";
+			case 'p': return "dspMatrix";
+			}
+		if (mode & 2)
+			switch (class[2]) {
+			case 'r': return "dpoMatrix";
+			case 'p': return "dppMatrix";
+			}
+	} else if (class[1] == 'p') {
+		if (mode & 4) {
+			if (class[0] == 'z')
+			switch (class[2]) {
+			case 'C': return "zsCMatrix";
+			case 'R': return "zsRMatrix";
+			case 'T': return "zsTMatrix";
+			case 'o': return "zsyMatrix";
+			case 'p': return "zspMatrix";
+			}
+			else
+			switch (class[2]) {
+			case 'C': return "dsCMatrix";
+			case 'R': return "dsRMatrix";
+			case 'T': return "dsTMatrix";
+			case 'o': return "dsyMatrix";
+			case 'p': return "dspMatrix";
+			}
+		}
+	}
+	return class;
+}
+
+const char *Matrix_class(SEXP x, const char **valid, int mode,
+                         const char *caller)
+{
+	int i = R_check_class_etc(x, valid);
+	if (i >= 0)
+		return (mode < 0) ? valid[i] : Matrix_superclass(valid[i], mode);
+	else {
+		if (caller)
+			ERROR_INVALID_CLASS(x, caller);
+		return NULL;
+	}
 }
 
 char Matrix_kind(SEXP obj)
 {
-	if (TYPEOF(obj) == OBJSXP) {
-		static const char *valid[] = { VALID_NONVIRTUAL, "" };
-		int ivalid = R_check_class_etc(obj, valid);
-		if (ivalid < 0)
-			return '\0';
-		const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
-		return (cl[2] == 'd') ? 'n' : cl[0];
-	} else {
+	if (TYPEOF(obj) != OBJSXP)
 		switch (TYPEOF(obj)) {
 		case LGLSXP:
 			return 'l';
@@ -93,31 +138,30 @@ char Matrix_kind(SEXP obj)
 		default:
 			return '\0';
 		}
-	}
+	const char *class = Matrix_class(obj, valid_matrix_or_vector, 7, NULL);
+	if (!class)
+		return '\0';
+	return (class[2] == 'd') ? 'n' : class[0];
 }
 
 char Matrix_shape(SEXP obj)
 {
 	if (TYPEOF(obj) != OBJSXP)
 		return '\0';
-	static const char *valid[] = { VALID_NONVIRTUAL, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
+	const char *class = Matrix_class(obj, valid_matrix_or_vector, 7, NULL);
+	if (!class)
 		return '\0';
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
-	return (cl[3] != 'M') ? 'g' : ((cl[2] == 'd') ? 'i' : cl[1]);
+	return (class[2] == 'd') ? 'i' : ((class[3] == 'M') ? class[1] : 'g');
 }
 
 char Matrix_repr(SEXP obj)
 {
 	if (TYPEOF(obj) != OBJSXP)
 		return '\0';
-	static const char *valid[] = { VALID_NONVIRTUAL_MATRIX, "" };
-	int ivalid = R_check_class_etc(obj, valid);
-	if (ivalid < 0)
+	const char *class = Matrix_class(obj, valid_matrix_or_vector, 7, NULL);
+	if (!class)
 		return '\0';
-	const char *cl = valid[VALID_NONVIRTUAL_SHIFT(ivalid, 5)];
-	switch (cl[2]) {
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
@@ -139,33 +183,26 @@ char Matrix_repr(SEXP obj)
 	}
 }
 
-SEXP R_Matrix_nonvirtual(SEXP s_obj, SEXP s_mode)
+SEXP R_Matrix_class(SEXP s_obj, SEXP s_mode)
 {
-	return mkString(Matrix_nonvirtual(s_obj, asInteger(s_mode)));
+	const char *class = Matrix_class(s_obj, valid_matrix_or_vector, asInteger(s_mode), NULL);
+	return mkString((!class) ? "" : class);
 }
-
-#define RETURN_AS_STRSXP(_C_) \
-do { \
-	char c = _C_; \
-	if (!c) \
-		return mkString(""); \
-	else { \
-		char s[] = { c, '\0' }; \
-		return mkString(s); \
-	} \
-} while (0)
 
 SEXP R_Matrix_kind(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_kind (s_obj));
+	char s[] = { Matrix_kind (s_obj), '\0' };
+	return mkString(s);
 }
 
 SEXP R_Matrix_shape(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_shape(s_obj));
+	char s[] = { Matrix_shape(s_obj), '\0' };
+	return mkString(s);
 }
 
 SEXP R_Matrix_repr(SEXP s_obj)
 {
-	RETURN_AS_STRSXP(Matrix_repr (s_obj));
+	char s[] = { Matrix_repr (s_obj), '\0' };
+	return mkString(s);
 }
