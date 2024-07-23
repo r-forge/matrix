@@ -430,12 +430,6 @@ SEXP Csparse_writeMM(SEXP obj, SEXP file)
 	}
 
 	cholmod_sparse *A = M2CHS(obj, 1);
-	if (class[1] == 's') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		A->stype = (ul == 'U') ? 1 : -1;
-	}
-
 	const char *filename = CHAR(asChar(file));
 	FILE *f = fopen(filename, "w");
 	if (!f)
