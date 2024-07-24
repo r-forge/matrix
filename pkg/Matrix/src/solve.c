@@ -465,9 +465,6 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 	return r;
 }
 
-#define ERROR_SOLVE_OOM(_ACL_, _BCL_) \
-	error(_("%s(<%s>, <%s>) failed: out of memory"), "solve", _ACL_, _BCL_)
-
 #define IF_COMPLEX(_IF_, _ELSE_) \
 	((CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? (_IF_) : (_ELSE_))
 
@@ -559,25 +556,25 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			if (B && pap) {
 				int *papinv = Matrix_cs_pinv(pap, m);
 				if (!papinv)
-					ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+					ERROR_OOM(__func__);
 				B = Matrix_cs_permute(B, papinv, NULL, 1);
 				papinv = Matrix_cs_free(papinv);
 			}
 		}
 		if (!B)
-			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+			ERROR_OOM(__func__);
 		int Bfr = isNull(s_b) || pap;
 
 		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
 
-#define SOLVE_SPARSE_TRIANGULAR(_CTYPE_, _A_, _ALO_, _BFR_, _ACL_, _BCL_) \
+#define SOLVE_SPARSE_TRIANGULAR(_CTYPE_, _A_, _ALO_, _BFR_) \
 		do { \
 			X = Matrix_cs_spalloc(m, n, B->nzmax, 1, 0); \
 			if (!X) { \
 				if (_BFR_) \
 					B = Matrix_cs_spfree(B); \
-				ERROR_SOLVE_OOM(_ACL_, _BCL_); \
+				ERROR_OOM(__func__); \
 			} \
 			_CTYPE_ *X__x = (_CTYPE_ *) X->x; \
 			X->p[0] = nz = 0; \
@@ -598,7 +595,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 						if (_BFR_) \
 							B = Matrix_cs_spfree(B); \
 						X = Matrix_cs_spfree(X); \
-						ERROR_SOLVE_OOM(_ACL_, _BCL_); \
+						ERROR_OOM(__func__); \
 					} \
 					X__x = (_CTYPE_ *) X->x; \
 				} \
@@ -625,10 +622,8 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_SPARSE(_CTYPE_) \
 		do { \
 			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, L, 1, Bfr, \
-			                        "sparseLU", ".gCMatrix"); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, U, 0,   1, \
-			                        "sparseLU", ".gCMatrix"); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, L, 1, Bfr); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, U, 0,   1); \
 		} while (0)
 
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
@@ -642,7 +637,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			X = Matrix_cs_permute(B, paq, NULL, 1);
 			B = Matrix_cs_spfree(B);
 			if (!X)
-				ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+				ERROR_OOM(__func__);
 			B = X;
 		}
 
@@ -651,11 +646,11 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		X = Matrix_cs_transpose(B, 1);
 		B = Matrix_cs_spfree(B);
 		if (!X)
-			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+			ERROR_OOM(__func__);
 		B = Matrix_cs_transpose(X, 1);
 		X = Matrix_cs_spfree(X);
 		if (!B)
-			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+			ERROR_OOM(__func__);
 
 		PROTECT(r = CXS2M(B, 1, 'g'));
 		B = Matrix_cs_spfree(B);
@@ -700,7 +695,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 		if (isNull(s_b)) {
 			B = cholmod_allocate_dense(m_, n_, m_, L->xtype, &c);
 			if (!B)
-				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
+				ERROR_OOM(__func__);
 
 #define EYE(_CTYPE_, _ONE_) \
 			do { \
@@ -722,14 +717,14 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 			X = cholmod_solve(ivalid, L, B, &c);
 			cholmod_free_dense(&B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
+				ERROR_OOM(__func__);
 			PROTECT(r = CHD2M(X, 'N',
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHD(s_b, 'N');
 			X = cholmod_solve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("sparseCholesky", ".geMatrix");
+				ERROR_OOM(__func__);
 			PROTECT(r = CHD2M(X, 'N', 'g'));
 		}
 		cholmod_free_dense(&X, &c);
@@ -738,7 +733,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 		if (isNull(s_b)) {
 			B = cholmod_speye(m_, n_, L->xtype, &c);
 			if (!B)
-				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
+				ERROR_OOM(__func__);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			cholmod_free_sparse(&B, &c);
 			if (X && ivalid < 7) {
@@ -750,14 +745,14 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 				X = B;
 			}
 			if (!X)
-				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
+				ERROR_OOM(__func__);
 			PROTECT(r = CHS2M(X, 1,
 				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHS(s_b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
 			if (!X)
-				ERROR_SOLVE_OOM("sparseCholesky", ".gCMatrix");
+				ERROR_OOM(__func__);
 			PROTECT(r = CHS2M(X, 1, 'g'));
 		}
 		cholmod_free_sparse(&X, &c);
@@ -852,7 +847,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		else
 			B = M2CXS(s_b, 1);
 		if (!B)
-			ERROR_SOLVE_OOM("sparseLU", ".gCMatrix");
+			ERROR_OOM(__func__);
 
 		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
@@ -860,8 +855,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 #define SOLVE_SPARSE(_CTYPE_) \
 		do { \
 			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, A, aul != 'U', isNull(s_b), \
-			                        ".tCMatrix", ".gCMatrix"); \
+			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, A, aul != 'U', isNull(s_b)); \
 		} while (0)
 
 		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
@@ -876,11 +870,11 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		X = Matrix_cs_transpose(B, 1);
 		B = Matrix_cs_spfree(B);
 		if (!X)
-			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
+			ERROR_OOM(__func__);
 		B = Matrix_cs_transpose(X, 1);
 		X = Matrix_cs_spfree(X);
 		if (!B)
-			ERROR_SOLVE_OOM(".tCMatrix", ".gCMatrix");
+			ERROR_OOM(__func__);
 
 		PROTECT(r = CXS2M(B, 1, (isNull(s_b)) ? 't' : 'g'));
 		B = Matrix_cs_spfree(B);
