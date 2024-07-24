@@ -615,7 +615,7 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	DO_SORT(N->U, T);
 
 	char cl[] = ".sparseQR";
-	cl[0] = (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? 'z' : 'd';
+	cl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP orf = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
@@ -687,7 +687,7 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 	DO_SORT(N->U, T);
 
 	char cl[] = ".sparseLU";
-	cl[0] = (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? 'z' : 'd';
+	cl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
@@ -727,7 +727,7 @@ oom:
 		error  (_("LU factorization of %s failed: out of memory or near-singular"),
 		        ".gCMatrix");
 	else if (warn > 0)
-		warning(_("LU factorization of %s failed: out of memory or near-singu"),
+		warning(_("LU factorization of %s failed: out of memory or near-singular"),
 		        ".gCMatrix");
 	return R_NilValue;
 }

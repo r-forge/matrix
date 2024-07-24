@@ -466,15 +466,6 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 	return r;
 }
 
-#define CXK(t) \
-	((t == CXSPARSE_COMPLEX) ?     'z' :     'd')
-#define CXT(t) \
-	((t == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP)
-#define CHK(t) \
-	((t ==  CHOLMOD_COMPLEX) ?     'z' :     'd')
-#define CHT(t) \
-	((t ==  CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP)
-
 SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 {
 	SOLVE_START;
@@ -494,14 +485,14 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		char rcl[] = ".geMatrix";
-		rcl[0] = CXK(L->xtype);
+		rcl[0] = (L->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 		PROTECT(r = newObject(rcl));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(CXT(L->xtype), mn));
+		SEXP rx = PROTECT(allocVector((L->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (isNull(s_b)) {
 
 #define SOLVE_DENSE(c) \
@@ -519,7 +510,10 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			SWITCH2(CXK(L->xtype), SOLVE_DENSE);
+			if (L->xtype == CXSPARSE_COMPLEX)
+			SOLVE_DENSE(z);
+			else
+			SOLVE_DENSE(d);
 
 #undef SOLVE_DENSE
 
@@ -540,7 +534,10 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			SWITCH2(CXK(L->xtype), SOLVE_DENSE);
+			if (L->xtype == CXSPARSE_COMPLEX)
+			SOLVE_DENSE(z);
+			else
+			SOLVE_DENSE(d);
 
 #undef SOLVE_DENSE
 
@@ -630,7 +627,10 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			SOLVE_SPARSE_TRIANGULAR(c, U, 0,   1); \
 		} while (0)
 
-		SWITCH2(CXK(L->xtype), SOLVE_SPARSE);
+		if (L->xtype == CXSPARSE_COMPLEX)
+		SOLVE_SPARSE(z);
+		else
+		SOLVE_SPARSE(d);
 
 #undef SOLVE_SPARSE
 
@@ -767,7 +767,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		char rcl[] = "...Matrix";
-		rcl[0] = CXK(A->xtype);
+		rcl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 		rcl[1] = (isNull(s_b)) ? 't' : 'g';
 		rcl[2] = (isNull(s_b)) ? 'r' : 'e';
 		PROTECT(r = newObject(rcl));
@@ -776,7 +776,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(CXT(A->xtype), mn));
+		SEXP rx = PROTECT(allocVector((A->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (isNull(s_b)) {
 
 #define SOLVE_DENSE(c) \
@@ -793,7 +793,10 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			SWITCH2(CXK(A->xtype), SOLVE_DENSE);
+			if (A->xtype == CXSPARSE_COMPLEX)
+			SOLVE_DENSE(z);
+			else
+			SOLVE_DENSE(d);
 
 #undef SOLVE_DENSE
 
@@ -813,7 +816,10 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			SWITCH2(CXK(A->xtype), SOLVE_DENSE);
+			if (A->xtype == CXSPARSE_COMPLEX)
+			SOLVE_DENSE(z);
+			else
+			SOLVE_DENSE(d);
 
 #undef SOLVE_DENSE
 
@@ -839,7 +845,10 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			SOLVE_SPARSE_TRIANGULAR(c, A, aul != 'U', isNull(s_b)); \
 		} while (0)
 
-		SWITCH2(CXK(A->xtype), SOLVE_SPARSE);
+		if (A->xtype == CXSPARSE_COMPLEX)
+		SOLVE_SPARSE(z);
+		else
+		SOLVE_SPARSE(d);
 
 #undef SOLVE_SPARSE
 
@@ -888,7 +897,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
-		PROTECT(yx = allocVector(CXT(V_->xtype), mn));
+		PROTECT(yx = allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 
 #define EYE(c) \
 		do { \
@@ -910,7 +919,10 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
 		} while (0)
 
-		SWITCH2(CXK(V_->xtype), EYE);
+		if (V_->xtype == CXSPARSE_COMPLEX)
+		EYE(z);
+		else
+		EYE(d);
 
 #undef EYE
 
@@ -939,7 +951,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		ax = yx;
 	else {
 		R_xlen_t mn = (R_xlen_t) padim[0] * padim[1];
-		PROTECT(ax = allocVector(CXT(V_->xtype), mn));
+		PROTECT(ax = allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		++nprotect;
 	}
 
@@ -1039,7 +1051,10 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		} \
 	} while (0)
 
-	SWITCH2(CXK(V_->xtype), MATMULT);
+	if (V_->xtype == CXSPARSE_COMPLEX)
+	MATMULT(z);
+	else
+	MATMULT(d);
 
 #undef MATMULT
 
