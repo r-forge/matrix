@@ -1598,8 +1598,8 @@ SEXP R_dense_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean)
 
 	int mg;
 	if (TYPEOF(s_margin) != INTSXP || LENGTH(s_margin) < 1 ||
-	    ((mg = INTEGER(s_margin)[0]) != 0 && mg != 1))
-		error(_("'%s' must be %d or %d"), "margin", 0, 1);
+	    ((mg = INTEGER(s_margin)[0] - 1) != 0 && mg != 1))
+		error(_("'%s' must be %d or %d"), "margin", 1, 2);
 
 	int narm;
 	if (TYPEOF(s_narm) != LGLSXP || LENGTH(s_narm) < 1 ||

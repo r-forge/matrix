@@ -5,16 +5,16 @@
 
 setMethod("colSums",  c(x = "denseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...)
-              .Call(R_dense_marginsum, x, 1L, na.rm, FALSE))
+              .Call(R_dense_marginsum, x, 2L, na.rm, FALSE))
 setMethod("colMeans", c(x = "denseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...)
-              .Call(R_dense_marginsum, x, 1L, na.rm,  TRUE))
+              .Call(R_dense_marginsum, x, 2L, na.rm,  TRUE))
 setMethod("rowSums",  c(x = "denseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...)
-              .Call(R_dense_marginsum, x, 0L, na.rm, FALSE))
+              .Call(R_dense_marginsum, x, 1L, na.rm, FALSE))
 setMethod("rowMeans", c(x = "denseMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...)
-              .Call(R_dense_marginsum, x, 0L, na.rm,  TRUE))
+              .Call(R_dense_marginsum, x, 1L, na.rm,  TRUE))
 
 
 ## ==== sparseMatrix ===================================================
@@ -24,16 +24,16 @@ setMethod("rowMeans", c(x = "denseMatrix"),
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
 setMethod("colSums",  c(x = .cl),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(R_sparse_marginsum, x, 1L, na.rm, FALSE, sparseResult))
+              .Call(R_sparse_marginsum, x, 2L, na.rm, FALSE, sparseResult))
 setMethod("colMeans", c(x = .cl),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(R_sparse_marginsum, x, 1L, na.rm,  TRUE, sparseResult))
+              .Call(R_sparse_marginsum, x, 2L, na.rm,  TRUE, sparseResult))
 setMethod("rowSums",  c(x = .cl),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(R_sparse_marginsum, x, 0L, na.rm, FALSE, sparseResult))
+              .Call(R_sparse_marginsum, x, 1L, na.rm, FALSE, sparseResult))
 setMethod("rowMeans", c(x = .cl),
           function(x, na.rm = FALSE, dims = 1L, sparseResult = FALSE, ...)
-              .Call(R_sparse_marginsum, x, 0L, na.rm,  TRUE, sparseResult))
+              .Call(R_sparse_marginsum, x, 1L, na.rm,  TRUE, sparseResult))
 }
 rm(.cl)
 
