@@ -258,6 +258,78 @@ do { \
 	} \
 } while (0)
 
+#define VALID_UPLO(s, c) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+		(s = STRING_ELT(s, 0)) == NA_STRING || \
+		((c = CHAR(s)[0]) != 'U' && c != 'L')) \
+		error(_("'%s' must be \"%c\" or \"%c\""),  "uplo", 'U', 'L'); \
+} while (0)
+
+#define VALID_TRANS(s, c) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+    	(s = STRING_ELT(s, 0)) == NA_STRING || \
+    	((c = CHAR(s)[0]) != 'C' && c != 'T')) \
+		error(_("'%s' is not \"%c\" or \"%c\""), "trans", 'C', 'T'); \
+} while (0)
+
+#define VALID_DIAG(s, c) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+    	(s = STRING_ELT(s, 0)) == NA_STRING || \
+    	((c = CHAR(s)[0]) != 'N' && c != 'U')) \
+		error(_("'%s' is not \"%c\" or \"%c\""),  "diag", 'N', 'U'); \
+} while (0)
+
+#define VALID_KIND(s, c) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+	    (s = STRING_ELT(s, 0)) == NA_STRING || \
+	    ((c = CHAR(s)[0]) != 'n' && c != 'l' && c != 'i' && c != 'd' && c != 'z' && c != '.' && c != ',')) \
+		error(_("'%s' is not \"%c\", \"%c\", \"%c\", \"%c\", or \"%c\""), \
+		      "kind", 'n', 'l', 'i', 'd', 'z'); \
+} while (0)
+
+#define VALID_SHAPE(s, c) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+	    (s = STRING_ELT(s, 0)) == NA_STRING || \
+	    ((c = CHAR(s)[0]) != 'g' && c != 's' && c != 'p' && c != 't')) \
+		error(_("'%s' is not \"%c\", \"%c\", \"%c\", or \"%c\""), \
+		      "shape", 'g', 's', 'p', 't'); \
+} while (0)
+
+#define VALID_REPR(s, c, dot) \
+do { \
+	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
+	    (s = STRING_ELT(s, 0)) == NA_STRING || \
+	    ((c = CHAR(s)[0]) != 'C' && c != 'R' && c != 'T' && !(dot && c != '.'))) \
+		error(_("'%s' is not \"%c\", \"%c\", or \"%c\""), \
+		      "repr", 'C', 'R', 'T'); \
+} while (0)
+
+#define VALID_MARGIN(s, d) \
+do { \
+	if (TYPEOF(s) != INTSXP || LENGTH(s) < 1 || \
+	    ((d = INTEGER(s)[0] - 1) != 0 && d != 1)) \
+		error(_("'%s' is not %d or %d"), "margin", 1, 2); \
+} while (0)
+
+#define VALID_LOGIC2(s, d) \
+do { \
+	if (TYPEOF(s) != LGLSXP || LENGTH(s) < 1 || \
+	    ((d = LOGICAL(s)[0]) == NA_LOGICAL)) \
+		error(_("'%s' is not %s or %s"), #d, "TRUE", "FALSE"); \
+} while (0)
+
+#define VALID_LOGIC3(s, d) \
+do { \
+	if (TYPEOF(s) != LGLSXP || LENGTH(s) < 1) \
+		error(_("'%s' is not %s, %s, or %s"), #d, "TRUE", "FALSE", "NA"); \
+	d = LOGICAL(s)[0]; \
+} while (0)
+
 #define VALID_DENSE \
 "ngeMatrix", "lgeMatrix", "igeMatrix", "dgeMatrix", "zgeMatrix", \
 "nsyMatrix", "lsyMatrix", "isyMatrix", "dsyMatrix", "zsyMatrix", \
