@@ -210,7 +210,7 @@ SEXP R_set_factor(SEXP s_obj, SEXP s_nm, SEXP s_val, SEXP s_warn)
 		error(_("invalid factor name"));
 	else if (TYPEOF(getAttrib(s_obj, Matrix_factorsSym)) == VECSXP)
 		set_factor(s_obj, CHAR(s_nm), s_val);
-	else if (asLogical(s_warn) != 0)
+	else if (asLogical(s_warn))
 		warning(_("attempt to set factor on %s without '%s' slot"),
 		        "Matrix", "factors");
 	return s_val;

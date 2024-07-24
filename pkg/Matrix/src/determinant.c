@@ -34,7 +34,7 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
 	if (m != n) \
 		error(_("determinant of non-square matrix is undefined")); \
-	int givelog = asLogical(s_logarithm) != 0; \
+	int givelog = asLogical(s_logarithm); \
 	double modulus = 0.0; /* result for n == 0 */
 
 	DETERMINANT_START(s_trf);
