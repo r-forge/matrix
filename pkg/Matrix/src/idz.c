@@ -487,9 +487,11 @@ c##force2(c##TYPE *x, const c##TYPE *y, \
 			for (j = 0; j < n; ++j, x += dx, y += dy) \
 				*x = *y; \
 		} else { \
-			for (j = 1; j < n; ++j) { \
+			for (j = 0; j < n; ++j) { \
+				for (i = 0; i < j; ++i) \
+					*(x++) = c##ZERO; \
 				x++; \
-				for (i = 0; i < n; ++i) \
+				for (i = j + 1; i < n; ++i) \
 					*(x++) = c##ZERO; \
 			} \
 		} \
