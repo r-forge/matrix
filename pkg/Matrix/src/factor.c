@@ -942,12 +942,6 @@ SEXP sparseCholesky_updown(SEXP s_trf, SEXP s_obj, SEXP s_update)
 	cholmod_sparse *A = M2CHS(s_obj, 1);
 	cholmod_factor *L = M2CHF(s_trf, 1);
 
-	if (Matrix_shape(s_obj) == 's') {
-		SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		A->stype = (ul == 'U') ? 1 : -1;
-	}
-
 	L = cholmod_copy_factor(L, &c);
 	cholmod_updown(asLogical(s_update) != 0, A, L, &c);
 
