@@ -2,6 +2,7 @@
 #include "cs-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
+#include "M5.h"
 #include "idz.h"
 #include "solve.h"
 
@@ -74,7 +75,7 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 		SEXP apivot = PROTECT(GET_SLOT(s_a, Matrix_permSym)), rx;
 		int info;
 		if (isNull(s_b)) {
-			rx = duplicate(ax);
+			rx = duplicateVector(ax);
 			PROTECT(rx);
 			int lwork = -1;
 			if (TYPEOF(ax) == CPLXSXP) {
@@ -100,7 +101,7 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
-			rx = duplicate(bx);
+			rx = duplicateVector(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
@@ -169,7 +170,7 @@ SEXP denseBunchKaufman_solve(SEXP s_a, SEXP s_b)
 		SEXP apivot = PROTECT(GET_SLOT(s_a, Matrix_permSym)), rx;
 		int info;
 		if (isNull(s_b)) {
-			rx = duplicate(ax);
+			rx = duplicateVector(ax);
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
 			Rcomplex *work = (Rcomplex *) R_alloc((size_t) m, sizeof(Rcomplex));
@@ -208,7 +209,7 @@ SEXP denseBunchKaufman_solve(SEXP s_a, SEXP s_b)
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
-			rx = duplicate(bx);
+			rx = duplicateVector(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
@@ -405,7 +406,7 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 		SEXP rx;
 		int info;
 		if (isNull(s_b)) {
-			rx = duplicate(ax);
+			rx = duplicateVector(ax);
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
 			if (!packed) {
@@ -430,7 +431,7 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
-			rx = duplicate(bx);
+			rx = duplicateVector(bx);
 			UNPROTECT(1); /* bx */
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
@@ -465,8 +466,14 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 	return r;
 }
 
-#define IF_COMPLEX(_IF_, _ELSE_) \
-	((CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX) ? (_IF_) : (_ELSE_))
+#define CXK(t) \
+	((t == CXSPARSE_COMPLEX) ?     'z' :     'd')
+#define CXT(t) \
+	((t == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP)
+#define CHK(t) \
+	((t ==  CHOLMOD_COMPLEX) ?     'z' :     'd')
+#define CHT(t) \
+	((t ==  CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP)
 
 SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 {
@@ -483,24 +490,27 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 	Matrix_cs *L = M2CXS(aL, 1), *U = M2CXS(aU, 1);
 	CXSPARSE_XTYPE_SET(L->xtype);
 	if (!asLogical(s_sparse)) {
+		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
 		char rcl[] = ".geMatrix";
-		rcl[0] = IF_COMPLEX('z', 'd');
+		rcl[0] = CXK(L->xtype);
 		PROTECT(r = newObject(rcl));
 		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
 		int *prdim = INTEGER(rdim);
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
+		SEXP rx = PROTECT(allocVector(CXT(L->xtype), mn));
 		if (isNull(s_b)) {
 
-#define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
+#define SOLVE_DENSE(c) \
 			do { \
-				_CTYPE_ *prx = _PTR_(rx), \
-					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-				memset(prx, 0, sizeof(_CTYPE_) * (size_t) mn); \
+				c##TYPE *prx = c##PTR(rx), \
+					*work = (c##TYPE *) R_alloc((size_t) m, sizeof(c##TYPE)); \
+				memset(prx, 0, sizeof(c##TYPE) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
-					prx[j] = _ONE_; \
+					prx[j] = c##UNIT; \
 					Matrix_cs_pvec(pap, prx, work, m); \
 					Matrix_cs_lsolve(L, work); \
 					Matrix_cs_usolve(U, work); \
@@ -509,20 +519,17 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zunit);
-			else
-			SOLVE_DENSE_1(double, REAL, 1.0);
+			SWITCH2(CXK(L->xtype), SOLVE_DENSE);
 
-#undef SOLVE_DENSE_1
+#undef SOLVE_DENSE
 
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
 
-#define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
+#define SOLVE_DENSE(c) \
 			do { \
-				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx), \
-					*work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+				c##TYPE *prx = c##PTR(rx), *pbx = c##PTR(bx), \
+					*work = (c##TYPE *) R_alloc((size_t) m, sizeof(c##TYPE)); \
 				for (j = 0; j < n; ++j) { \
 					Matrix_cs_pvec(pap, pbx, work, m); \
 					Matrix_cs_lsolve(L, work); \
@@ -533,12 +540,9 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_2(Rcomplex, COMPLEX);
-			else
-			SOLVE_DENSE_2(double, REAL);
+			SWITCH2(CXK(L->xtype), SOLVE_DENSE);
 
-#undef SOLVE_DENSE_2
+#undef SOLVE_DENSE
 
 			UNPROTECT(1); /* bx */
 		}
@@ -568,7 +572,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
 
-#define SOLVE_SPARSE_TRIANGULAR(_CTYPE_, _A_, _ALO_, _BFR_) \
+#define SOLVE_SPARSE_TRIANGULAR(c, _A_, _ALO_, _BFR_) \
 		do { \
 			X = Matrix_cs_spalloc(m, n, B->nzmax, 1, 0); \
 			if (!X) { \
@@ -576,7 +580,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 					B = Matrix_cs_spfree(B); \
 				ERROR_OOM(__func__); \
 			} \
-			_CTYPE_ *X__x = (_CTYPE_ *) X->x; \
+			c##TYPE *X__x = (c##TYPE *) X->x; \
 			X->p[0] = nz = 0; \
 			nzmax = X->nzmax; \
 			for (j = 0, k = 0; j < n; ++j) { \
@@ -597,7 +601,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 						X = Matrix_cs_spfree(X); \
 						ERROR_OOM(__func__); \
 					} \
-					X__x = (_CTYPE_ *) X->x; \
+					X__x = (c##TYPE *) X->x; \
 				} \
 				X->p[j + 1] = nz; \
 				if (_ALO_) { \
@@ -619,17 +623,14 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 			B = X; \
 		} while (0)
 
-#define SOLVE_SPARSE(_CTYPE_) \
+#define SOLVE_SPARSE(c) \
 		do { \
-			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, L, 1, Bfr); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, U, 0,   1); \
+			c##TYPE *work = (c##TYPE *) R_alloc((size_t) m, sizeof(c##TYPE)); \
+			SOLVE_SPARSE_TRIANGULAR(c, L, 1, Bfr); \
+			SOLVE_SPARSE_TRIANGULAR(c, U, 0,   1); \
 		} while (0)
 
-		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-		SOLVE_SPARSE(Rcomplex);
-		else
-		SOLVE_SPARSE(double);
+		SWITCH2(CXK(L->xtype), SOLVE_SPARSE);
 
 #undef SOLVE_SPARSE
 
@@ -687,33 +688,17 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	SOLVE_START;
 
 	SEXP r;
-	int j;
 	size_t m_ = (size_t) m, n_ = (size_t) n;
 	cholmod_factor *L = M2CHF(s_a, 1);
 	if (!asLogical(s_sparse)) {
+		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
 		cholmod_dense *B = NULL, *X = NULL;
 		if (isNull(s_b)) {
-			B = cholmod_allocate_dense(m_, n_, m_, L->xtype, &c);
+			B = cholmod_eye(m_, n_, L->xtype + L->dtype, &c);
 			if (!B)
 				ERROR_OOM(__func__);
-
-#define EYE(_CTYPE_, _ONE_) \
-			do { \
-				_CTYPE_ *B__x = (_CTYPE_ *) B->x; \
-				memset(B__x, 0, sizeof(_CTYPE_) * m_ * n_); \
-				for (j = 0; j < n; ++j) { \
-					*B__x = _ONE_; \
-					B__x += m_ + 1; \
-				} \
-			} while (0)
-
-			if (L->xtype == CHOLMOD_COMPLEX)
-			EYE(Rcomplex, Matrix_zunit);
-			else
-			EYE(double, 1.0);
-
-#undef EYE
-
 			X = cholmod_solve(ivalid, L, B, &c);
 			cholmod_free_dense(&B, &c);
 			if (!X)
@@ -731,7 +716,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	} else {
 		cholmod_sparse *B = NULL, *X = NULL;
 		if (isNull(s_b)) {
-			B = cholmod_speye(m_, n_, L->xtype, &c);
+			B = cholmod_speye(m_, n_, L->xtype + L->dtype, &c);
 			if (!B)
 				ERROR_OOM(__func__);
 			X = cholmod_spsolve(ivalid, L, B, &c);
@@ -739,8 +724,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 			if (X && ivalid < 7) {
 				if (!X->sorted)
 					cholmod_sort(X, &c);
-				B = cholmod_copy(X,
-					(ivalid == 2 || ivalid == 4) ? -1 : 1, 1, &c);
+				B = cholmod_copy(X, (ivalid == 2 || ivalid == 4) ? -1 : 1, 1, &c);
 				cholmod_free_sparse(&X, &c);
 				X = B;
 			}
@@ -779,8 +763,11 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 	Matrix_cs *A = M2CXS(s_a, 1);
 	CXSPARSE_XTYPE_SET(A->xtype);
 	if (!asLogical(s_sparse)) {
+		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
 		char rcl[] = "...Matrix";
-		rcl[0] = IF_COMPLEX('z', 'd');
+		rcl[0] = CXK(A->xtype);
 		rcl[1] = (isNull(s_b)) ? 't' : 'g';
 		rcl[2] = (isNull(s_b)) ? 'r' : 'e';
 		PROTECT(r = newObject(rcl));
@@ -789,15 +776,15 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
+		SEXP rx = PROTECT(allocVector(CXT(A->xtype), mn));
 		if (isNull(s_b)) {
 
-#define SOLVE_DENSE_1(_CTYPE_, _PTR_, _ONE_) \
+#define SOLVE_DENSE(c) \
 			do { \
-				_CTYPE_ *prx = _PTR_(rx); \
-				memset(prx, 0, sizeof(_CTYPE_) * (size_t) mn); \
+				c##TYPE *prx = c##PTR(rx); \
+				memset(prx, 0, sizeof(c##TYPE) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
-					prx[j] = _ONE_; \
+					prx[j] = c##UNIT; \
 					if (aul == 'U') \
 						Matrix_cs_usolve(A, prx); \
 					else \
@@ -806,20 +793,17 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_1(Rcomplex, COMPLEX, Matrix_zunit);
-			else
-			SOLVE_DENSE_1(double, REAL, 1.0);
+			SWITCH2(CXK(A->xtype), SOLVE_DENSE);
 
-#undef SOLVE_DENSE_1
+#undef SOLVE_DENSE
 
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
 
-#define SOLVE_DENSE_2(_CTYPE_, _PTR_) \
+#define SOLVE_DENSE(c) \
 			do { \
-				_CTYPE_ *prx = _PTR_(rx), *pbx = _PTR_(bx); \
-				memcpy(prx, pbx, sizeof(_CTYPE_) * (size_t) mn); \
+				c##TYPE *prx = c##PTR(rx), *pbx = c##PTR(bx); \
+				memcpy(prx, pbx, sizeof(c##TYPE) * (size_t) mn); \
 				for (j = 0; j < n; ++j) { \
 					if (aul == 'U') \
 						Matrix_cs_usolve(A, prx); \
@@ -829,12 +813,9 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 				} \
 			} while (0)
 
-			if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-			SOLVE_DENSE_2(Rcomplex, COMPLEX);
-			else
-			SOLVE_DENSE_2(double, REAL);
+			SWITCH2(CXK(A->xtype), SOLVE_DENSE);
 
-#undef SOLVE_DENSE_2
+#undef SOLVE_DENSE
 
 			UNPROTECT(1); /* bx */
 		}
@@ -852,16 +833,13 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		int k, top, nz, nzmax,
 			*iwork = (int *) R_alloc((size_t) m * 2, sizeof(int));
 
-#define SOLVE_SPARSE(_CTYPE_) \
+#define SOLVE_SPARSE(c) \
 		do { \
-			_CTYPE_ *work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
-			SOLVE_SPARSE_TRIANGULAR(_CTYPE_, A, aul != 'U', isNull(s_b)); \
+			c##TYPE *work = (c##TYPE *) R_alloc((size_t) m, sizeof(c##TYPE)); \
+			SOLVE_SPARSE_TRIANGULAR(c, A, aul != 'U', isNull(s_b)); \
 		} while (0)
 
-		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-		SOLVE_SPARSE(Rcomplex);
-		else
-		SOLVE_SPARSE(double);
+		SWITCH2(CXK(A->xtype), SOLVE_SPARSE);
 
 #undef SOLVE_SPARSE
 
@@ -906,21 +884,23 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	SEXP yx;
 	if (isNull(s_y)) {
 		n = (asLogical(s_complete)) ? m : r;
-
+		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
+			error(_("attempt to allocate vector of length exceeding %s"),
+			      "R_XLEN_T_MAX");
 		R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
-		PROTECT(yx = allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
+		PROTECT(yx = allocVector(CXT(V_->xtype), mn));
 
-#define EYE(_CTYPE_, _PTR_, _ONE_) \
+#define EYE(c) \
 		do { \
-			_CTYPE_ *pyx = _PTR_(yx); \
-			memset(pyx, 0, sizeof(_CTYPE_) * (size_t) mn); \
+			c##TYPE *pyx = c##PTR(yx); \
+			memset(pyx, 0, sizeof(c##TYPE) * (size_t) mn); \
 			if (isNull(s_yxjj)) { \
 				for (j = 0; j < n; ++j) { \
-					*pyx = _ONE_; \
+					*pyx = c##UNIT; \
 					pyx += m1a; \
 				} \
 			} else if (TYPEOF(s_yxjj) == TYPEOF(yx) && XLENGTH(s_yxjj) >= n) { \
-				_CTYPE_ *pyxjj = _PTR_(s_yxjj); \
+				c##TYPE *pyxjj = c##PTR(s_yxjj); \
 				for (j = 0; j < n; ++j) { \
 					*pyx = *pyxjj; \
 					pyx += m1a; \
@@ -930,10 +910,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
 		} while (0)
 
-		if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-		EYE(Rcomplex, COMPLEX, Matrix_zunit);
-		else
-		EYE(double, REAL, 1.0);
+		SWITCH2(CXK(V_->xtype), EYE);
 
 #undef EYE
 
@@ -949,7 +926,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	}
 
 	char acl[] = ".geMatrix";
-	acl[0] = IF_COMPLEX('z', 'd');
+	acl[0] = CXK(V_->xtype);
 	SEXP a = PROTECT(newObject(acl));
 
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
@@ -962,15 +939,15 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		ax = yx;
 	else {
 		R_xlen_t mn = (R_xlen_t) padim[0] * padim[1];
-		PROTECT(ax = allocVector(IF_COMPLEX(CPLXSXP, REALSXP), mn));
+		PROTECT(ax = allocVector(CXT(V_->xtype), mn));
 		++nprotect;
 	}
 
-#define MATMULT(_CTYPE_, _PTR_) \
+#define MATMULT(c) \
 	do { \
-		_CTYPE_ *pyx = _PTR_(yx), *pax = _PTR_(ax), *work = NULL; \
+		c##TYPE *pyx = c##PTR(yx), *pax = c##PTR(ax), *work = NULL; \
 		if (op < 5) \
-			work = (_CTYPE_ *) R_alloc((size_t) m, sizeof(_CTYPE_)); \
+			work = (c##TYPE *) R_alloc((size_t) m, sizeof(c##TYPE)); \
 		switch (op) { \
 		case 0: /* qr.coef : A = P2 R1^{-1} Q1' P1 y */ \
 		{ \
@@ -996,7 +973,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r < m) \
-					memset(work + r, 0, sizeof(_CTYPE_) * (size_t) (m - r)); \
+					memset(work + r, 0, sizeof(c##TYPE) * (size_t) (m - r)); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1010,7 +987,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				if (r > 0) \
-					memset(work, 0, sizeof(_CTYPE_) * (size_t) r); \
+					memset(work, 0, sizeof(c##TYPE) * (size_t) r); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1021,7 +998,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		case 3: /* qr.qty {w/ perm.} : A = Q' P1 y */ \
 			for (j = 0; j < n; ++j) { \
 				Matrix_cs_pvec(pp, pyx, work, m); \
-				memcpy(pax, work, sizeof(_CTYPE_) * (size_t) m); \
+				memcpy(pax, work, sizeof(c##TYPE) * (size_t) m); \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
 				pyx += m; \
@@ -1030,7 +1007,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 			break; \
 		case 4: /* qr.qy {w/ perm.} : A = P1' Q y */ \
 			for (j = 0; j < n; ++j) { \
-				memcpy(work, pyx, sizeof(_CTYPE_) * (size_t) m); \
+				memcpy(work, pyx, sizeof(c##TYPE) * (size_t) m); \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], work); \
 				Matrix_cs_ipvec(pp, work, pax, m); \
@@ -1040,7 +1017,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 5: /* qr.qty {w/o perm.} : A = Q' y */ \
 			if (ax != yx) \
-				memcpy(pax, pyx, sizeof(_CTYPE_) * (size_t) m * (size_t) n); \
+				memcpy(pax, pyx, sizeof(c##TYPE) * (size_t) m * (size_t) n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = 0; i < r; ++i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
@@ -1049,7 +1026,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		break; \
 		case 6: /* qr.qy {w/o perm.} : A = Q y */ \
 			if (ax != yx) \
-				memcpy(pax, pyx, sizeof(_CTYPE_) * (size_t) m * (size_t) n); \
+				memcpy(pax, pyx, sizeof(c##TYPE) * (size_t) m * (size_t) n); \
 			for (j = 0; j < n; ++j) { \
 				for (i = r - 1; i >= 0; --i) \
 					Matrix_cs_happly(V_, i, pbeta[i], pax); \
@@ -1062,11 +1039,9 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		} \
 	} while (0)
 
-	if (CXSPARSE_XTYPE_GET() == CXSPARSE_COMPLEX)
-	MATMULT(Rcomplex, COMPLEX);
-	else
-	MATMULT(double, REAL);
-	SET_SLOT(a, Matrix_xSym, ax);
+	SWITCH2(CXK(V_->xtype), MATMULT);
+
+#undef MATMULT
 
 	UNPROTECT(nprotect); /* ax, a, yx, p, beta, V */
 	return a;
