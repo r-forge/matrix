@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "Mclasses.h"
 #include "objects.h"
 
 const char *valid_dense            [] = { VALID_DENSE            , "" };

@@ -1,7 +1,6 @@
 #include "Lapack-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"
-#include "Mclasses.h"
 #include "M5.h"
 #include "idz.h"
 #include "coerce.h"
