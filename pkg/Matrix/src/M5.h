@@ -55,17 +55,23 @@
 #define dIFELSE_NPATTERN(x, y) x
 #define zIFELSE_NPATTERN(x, y) x
 
-#define nNOT_REAL(x) (0)
-#define lNOT_REAL(x) (0)
-#define iNOT_REAL(x) (0)
-#define dNOT_REAL(x) (0)
-#define zNOT_REAL(x) ((x).i != 0.0)
-
 #define nNOT_ZERO(x) ((x) != 0)
 #define lNOT_ZERO(x) ((x) != 0)
 #define iNOT_ZERO(x) ((x) != 0)
 #define dNOT_ZERO(x) ((x) != 0.0)
 #define zNOT_ZERO(x) ((x).r != 0.0 || (x).i != 0.0)
+
+#define nNOT_ZERO_REAL(x) ((x) != 0)
+#define lNOT_ZERO_REAL(x) ((x) != 0)
+#define iNOT_ZERO_REAL(x) ((x) != 0)
+#define dNOT_ZERO_REAL(x) ((x) != 0.0)
+#define zNOT_ZERO_REAL(x) ((x).r != 0.0)
+
+#define nNOT_ZERO_IMAG(x) (0)
+#define lNOT_ZERO_IMAG(x) (0)
+#define iNOT_ZERO_IMAG(x) (0)
+#define dNOT_ZERO_IMAG(x) (0)
+#define zNOT_ZERO_IMAG(x) ((x).i != 0.0)
 
 #define nNOT_ZERO_TOL(x, tol) ((x) != 0)
 #define lNOT_ZERO_TOL(x, tol) ((x) != 0)

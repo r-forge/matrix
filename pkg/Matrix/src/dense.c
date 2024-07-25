@@ -1021,7 +1021,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 				pu += 1;
 				pl += n;
 			}
-			if (zNOT_REAL(*pu))
+			if (zNOT_ZERO_IMAG(*pu))
 				return 0;
 			pu += n - j;
 			pl = px + j + 1;
@@ -1030,11 +1030,11 @@ int dense_is_symmetric(SEXP obj, const char *class,
 		if (ul == 'U')
 		for (j = 0; j < n; ++j) {
 			for (i = 0; i < j; ++i) {
-				if (zNOT_REAL(*pu))
+				if (zNOT_ZERO_IMAG(*pu))
 					return 0;
 				pu += 1;
 			}
-			if (ct == 'C' && zNOT_REAL(*pu))
+			if (ct == 'C' && zNOT_ZERO_IMAG(*pu))
 				return 0;
 			pu += 1;
 			if (!packed)
@@ -1044,11 +1044,11 @@ int dense_is_symmetric(SEXP obj, const char *class,
 		for (j = 0; j < n; ++j) {
 			if (!packed)
 			pl += j;
-			if (ct == 'C' && zNOT_REAL(*pl))
+			if (ct == 'C' && zNOT_ZERO_IMAG(*pl))
 				return 0;
 			pl += 1;
 			for (i = j + 1; i < n; ++i) {
-				if (zNOT_REAL(*pl))
+				if (zNOT_ZERO_IMAG(*pl))
 					return 0;
 				pl += 1;
 			}
@@ -1061,7 +1061,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 					return 0;
 				pu += 1;
 			}
-			if (zNOT_REAL(*pu))
+			if (zNOT_ZERO_IMAG(*pu))
 				return 0;
 			pu += 1;
 			if (!packed)
@@ -1071,7 +1071,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 		for (j = 0; j < n; ++j) {
 			if (!packed)
 			pl += j;
-			if (zNOT_REAL(*pl))
+			if (zNOT_ZERO_IMAG(*pl))
 				return 0;
 			pl += 1;
 			for (i = j + 1; i < n; ++i) {
