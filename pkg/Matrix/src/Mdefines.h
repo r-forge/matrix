@@ -386,6 +386,7 @@ char typeToKind(SEXPTYPE);
 SEXPTYPE kindToType(char);
 size_t kindToSize(char);
 
+const char *Matrix_superclass(const char *, int);
 const char *Matrix_class(SEXP, const char **, int, const char *);
 
 int DimNames_is_trivial(SEXP);
