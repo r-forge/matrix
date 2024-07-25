@@ -365,7 +365,7 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	return mkDet(modulus, givelog, sign);
 }
 
-SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
+SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
 {
 	DETERMINANT_START(s_trf);
 
@@ -373,7 +373,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 	int sign = 1;
 
 	if (n > 0) {
-	int j, sqrt = asLogical(s_sqrt);
+	int j, root = asLogical(s_root);
 	if (L->is_super) {
 		int k, nc,
 			nsuper = (int) L->nsuper,
@@ -418,7 +418,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 					if (ISNAN(px[pp[j]].r) || px[pp[j]].r >= 0.0)
 						modulus += log(px[pp[j]].r);
 					else {
-						if (sqrt)
+						if (root)
 							return mkDet(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]].r);
 						sign = -sign;
@@ -436,7 +436,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 					if (ISNAN(px[pp[j]]) || px[pp[j]] >= 0.0)
 						modulus += log(px[pp[j]]);
 					else {
-						if (sqrt)
+						if (root)
 							return mkDet(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]]);
 						sign = -sign;
@@ -445,7 +445,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 			}
 		}
 	}
-	if (sqrt)
+	if (root)
 		modulus *= 0.5;
 	}
 

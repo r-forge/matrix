@@ -1,4 +1,4 @@
-#include <math.h> /* fabs */
+#include <math.h> /* fabs, sqrt */
 #include "Lapack-etc.h"
 #include "cs-etc.h"
 #include "cholmod-etc.h"
@@ -949,13 +949,13 @@ SEXP sparseCholesky_updown(SEXP s_trf, SEXP s_obj, SEXP s_update)
 	return s_trf;
 }
 
-SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
+SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_root)
 {
 	cholmod_factor *L = M2CHF(s_trf, 1);
 	int n = (int) L->n;
 	SEXP ans = allocVector((L->xtype == CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP, n);
 	if (n > 0) {
-	int j, sqrt = asLogical(s_sqrt);
+	int j, root = asLogical(s_root);
 	if (L->is_super) {
 		int k, nc,
 			nsuper = (int) L->nsuper,
@@ -972,7 +972,7 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
 				for (j = 0; j < nc; ++j) {
 					(*pa).r = (*py).r;
 					(*pa).i = 0.0;
-					if (!sqrt)
+					if (!root)
 						(*pa).r *= (*pa).r;
 					pa += 1;
 					py += nr1a;
@@ -986,7 +986,7 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
 				py = px + ppx[k];
 				for (j = 0; j < nc; ++j) {
 					*pa = *py;
-					if (!sqrt)
+					if (!root)
 						*pa *= *pa;
 					pa += 1;
 					py += nr1a;
@@ -1001,14 +1001,14 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
 				for (j = 0; j < n; ++j) {
 					pa[j].r = px[pp[j]].r;
 					pa[j].i = 0.0;
-					if (!sqrt)
+					if (!root)
 						pa[j].r *= pa[j].r;
 				}
 			} else {
 				for (j = 0; j < n; ++j) {
 					pa[j].r = px[pp[j]].r;
 					pa[j].i = 0.0;
-					if (sqrt)
+					if (root)
 						pa[j].r = (pa[j].r >= 0.0) ? sqrt(pa[j].r) : R_NaN;
 				}
 			}
@@ -1017,13 +1017,13 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
 			if (L->is_ll) {
 				for (j = 0; j < n; ++j) {
 					pa[j] = px[pp[j]];
-					if (!sqrt)
+					if (!root)
 						pa[j] *= pa[j];
 				}
 			} else {
 				for (j = 0; j < n; ++j) {
 					pa[j] = px[pp[j]];
-					if (sqrt)
+					if (root)
 						pa[j] = (pa[j] >= 0.0) ? sqrt(pa[j]) : R_NaN;
 				}
 			}
