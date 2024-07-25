@@ -26,14 +26,14 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
 	}
 	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
+		SEXP trans = GET_SLOT(from, Matrix_transSym);
 		ct = CHAR(STRING_ELT(trans, 0))[0];
 	}
 	if (class[1] == 't') {
 		/* Be fast if band contains entire triangle */
 		if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (a <= 1 - m && b >= 0))
 			return from;
-		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
@@ -562,7 +562,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	}
 
 	if (class[1] == 's' && ct0 == ct1) {
-		UNPROTECT(1);
+		UNPROTECT(1); /* from */
 		return from;
 	}
 
