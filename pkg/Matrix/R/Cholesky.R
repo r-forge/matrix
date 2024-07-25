@@ -373,7 +373,7 @@ setAs("supernodalCholesky", "dgCMatrix",
 
 setMethod("diag", c(x = "sparseCholesky"),
           function(x = 1, nrow, ncol, names = TRUE)
-              .Call(sparseCholesky_diag_get, x, TRUE))
+              .Call(sparseCholesky_diag_get, x, FALSE))
 
 setMethod("expand1", c(x = "simplicialCholesky"),
           function(x, which, ...) {

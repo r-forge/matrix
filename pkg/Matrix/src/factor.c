@@ -949,44 +949,88 @@ SEXP sparseCholesky_updown(SEXP s_trf, SEXP s_obj, SEXP s_update)
 	return s_trf;
 }
 
-SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_square)
+SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_sqrt)
 {
 	cholmod_factor *L = M2CHF(s_trf, 1);
-	int n = (int) L->n, square = asLogical(s_square);
-	SEXP y = allocVector(REALSXP, n);
-	double *py = REAL(y);
+	int n = (int) L->n;
+	SEXP ans = allocVector((L->xtype == CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP, n);
+	if (n > 0) {
+	int j, sqrt = asLogical(s_sqrt);
 	if (L->is_super) {
-		int k, j, nc,
+		int k, nc,
 			nsuper = (int) L->nsuper,
 			*psuper = (int *) L->super,
 			*ppi = (int *) L->pi,
 			*ppx = (int *) L->px;
-		double *px = (double *) L->x, *px_;
 		R_xlen_t nr1a;
-		for (k = 0; k < nsuper; ++k) {
-			nc = psuper[k+1] - psuper[k];
-			nr1a = (R_xlen_t) (ppi[k+1] - ppi[k]) + 1;
-			px_ = px + ppx[k];
-			for (j = 0; j < nc; ++j) {
-				*py = *px_;
-				if (square)
-					*py *= *py;
-				++py;
-				px_ += nr1a;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *pa = COMPLEX(ans), *px = (Rcomplex *) L->x, *py;
+			for (k = 0; k < nsuper; ++k) {
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
+				py = px + ppx[k];
+				for (j = 0; j < nc; ++j) {
+					(*pa).r = (*py).r;
+					(*pa).i = 0.0;
+					if (!sqrt)
+						(*pa).r *= (*pa).r;
+					pa += 1;
+					py += nr1a;
+				}
+			}
+		} else {
+			double *pa = REAL(ans), *px = (double *) L->x, *py;
+			for (k = 0; k < nsuper; ++k) {
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
+				py = px + ppx[k];
+				for (j = 0; j < nc; ++j) {
+					*pa = *py;
+					if (!sqrt)
+						*pa *= *pa;
+					pa += 1;
+					py += nr1a;
+				}
 			}
 		}
 	} else {
-		square = square && L->is_ll;
-		int j, *pp = (int *) L->p;
-		double *px = (double *) L->x;
-		for (j = 0; j < n; ++j) {
-			*py = px[pp[j]];
-			if (square)
-				*py *= *py;
-			++py;
+		int *pp = (int *) L->p;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *pa = COMPLEX(ans), *px = (Rcomplex *) L->x;
+			if (L->is_ll) {
+				for (j = 0; j < n; ++j) {
+					pa[j].r = px[pp[j]].r;
+					pa[j].i = 0.0;
+					if (!sqrt)
+						pa[j].r *= pa[j].r;
+				}
+			} else {
+				for (j = 0; j < n; ++j) {
+					pa[j].r = px[pp[j]].r;
+					pa[j].i = 0.0;
+					if (sqrt)
+						pa[j].r = (pa[j].r >= 0.0) ? sqrt(pa[j].r) : R_NaN;
+				}
+			}
+		} else {
+			double *pa = REAL(ans), *px = (double *) L->x;
+			if (L->is_ll) {
+				for (j = 0; j < n; ++j) {
+					pa[j] = px[pp[j]];
+					if (!sqrt)
+						pa[j] *= pa[j];
+				}
+			} else {
+				for (j = 0; j < n; ++j) {
+					pa[j] = px[pp[j]];
+					if (sqrt)
+						pa[j] = (pa[j] >= 0.0) ? sqrt(pa[j]) : R_NaN;
+				}
+			}
 		}
 	}
-	return y;
+	}
+	return ans;
 }
 
 SEXP denseBunchKaufman_expand(SEXP s_trf)
