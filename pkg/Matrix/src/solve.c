@@ -938,7 +938,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	}
 
 	char acl[] = ".geMatrix";
-	acl[0] = CXK(V_->xtype);
+	acl[0] = (V_->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP a = PROTECT(newObject(acl));
 
 	SEXP adim = GET_SLOT(a, Matrix_DimSym);
