@@ -954,6 +954,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		PROTECT(ax = allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		++nprotect;
 	}
+	SET_SLOT(a, Matrix_xSym, ax);
 
 #define MATMULT(c) \
 	do { \
