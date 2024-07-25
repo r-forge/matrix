@@ -170,33 +170,40 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		ans = PROTECT(allocVector(TYPEOF(x), r));
+	SEXP ans;
 
-	size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r;
+	if (di != '\0' && di != 'N') {
+
+		PROTECT(ans = allocUnit  (kindToType(class[0]), r));
+
+	} else {
+
+		PROTECT(ans = allocVector(kindToType(class[0]), r));
+
+		SEXP x = GET_SLOT(obj, Matrix_xSym);
+		size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r;
 
 #define DIAG(c) \
-	do { \
-		c##TYPE *pa = c##PTR(ans), *px = c##PTR(x); \
-		if (di != '\0' && di != 'N') \
-			for (int j = 0; j < r; ++j) \
-				*(pa++) = c##UNIT; \
-		else if (!packed) \
-			c##NAME(copy2)(r_, pa, 1, px, m_ + 1); \
-		else if (ul == 'U') \
-			c##NAME(copy1)(n_, pa, 1, 0, 0, px, 2 , 1, 0); \
-		else \
-			c##NAME(copy1)(n_, pa, 1, 0, 0, px, n_, 1, 1); \
-	} while (0)
+		do { \
+			c##TYPE *pa = c##PTR(ans), *px = c##PTR(x); \
+			if (!packed) \
+				c##NAME(copy2)(r_, pa, 1, px, m_ + 1); \
+			else if (ul == 'U') \
+				c##NAME(copy1)(n_, pa, 1, 0, 0, px, 2 , 1, 0); \
+			else \
+				c##NAME(copy1)(n_, pa, 1, 0, 0, px, n_, 1, 1); \
+		} while (0)
 
-	SWITCH4(class[0], DIAG);
+		SWITCH4(class[0], DIAG);
 
 #undef DIAG
 
-	if (class[0] == 'n')
-		naToUnit(ans);
-	if (class[0] == 'z' && class[1] == 's' && ct == 'C')
-		zvreal(COMPLEX(ans), r_);
+		if (class[0] == 'n')
+			naToUnit(ans);
+		if (class[0] == 'z' && class[1] == 's' && ct == 'C')
+			zvreal(COMPLEX(ans), r_);
+
+	}
 
 	if (names) {
 		/* NB: The logic here must be adjusted once the validity method
@@ -218,7 +225,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		UNPROTECT(1); /* dn */
 	}
 
-	UNPROTECT(2); /* x, ans */
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 
