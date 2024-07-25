@@ -67,6 +67,12 @@
 #define dNOT_ZERO(x) ((x) != 0.0)
 #define zNOT_ZERO(x) ((x).r != 0.0 || (x).i != 0.0)
 
+#define nNOT_ZERO_TOL(x, tol) ((x) != 0)
+#define lNOT_ZERO_TOL(x, tol) ((x) != 0)
+#define iNOT_ZERO_TOL(x, tol) ((x) != 0)
+#define dNOT_ZERO_TOL(x, tol) (ISNAN(x) || fabs(x) > tol)
+#define zNOT_ZERO_TOL(x, tol) (ISNAN((x).r) || ISNAN((x).i) || hypot((x).r, (x).i) > tol)
+
 #define nNOT_UNIT(x) ((x) == 0)
 #define lNOT_UNIT(x) ((x) != 1)
 #define iNOT_UNIT(x) ((x) != 1)
@@ -86,7 +92,7 @@
 #define iNOT_IDEN(x, y) \
 	((x) != (y))
 #define dNOT_IDEN(x, y) \
-	((ISNAN(x)) ? !ISNAN(y) : ISNAN(y) || x != y)
+	((ISNAN(x)) ? !ISNAN(y) : ISNAN(y) || (x) != (y))
 #define zNOT_IDEN(x, y) \
 	(((ISNAN((x).r)) ? !ISNAN((y).r) : ISNAN((y).r) || (x).r != (y).r) || \
 	 ((ISNAN((x).i)) ? !ISNAN((y).i) : ISNAN((y).i) || (x).i != (y).i))
