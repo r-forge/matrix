@@ -382,25 +382,25 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_sqrt)
 			*ppx = (int *) L->px;
 		R_xlen_t nr1a;
 		if (L->xtype == CHOLMOD_COMPLEX) {
-			Rcomplex *px = (Rcomplex *) L->x, *px_;
+			Rcomplex *px = (Rcomplex *) L->x, *py;
 			for (k = 0; k < nsuper; ++k) {
 				nc = psuper[k + 1] - psuper[k];
 				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
-				px_ = px + ppx[k];
+				py = px + ppx[k];
 				for (j = 0; j < nc; ++j) {
-					modulus += log((*px_).r);
-					px_ += nr1a;
+					modulus += log((*py).r);
+					py += nr1a;
 				}
 			}
 		} else {
-			double *px = (double *) L->x, *px_;
+			double *px = (double *) L->x, *py;
 			for (k = 0; k < nsuper; ++k) {
 				nc = psuper[k + 1] - psuper[k];
 				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
-				px_ = px + ppx[k];
+				py = px + ppx[k];
 				for (j = 0; j < nc; ++j) {
-					modulus += log(*px_);
-					px_ += nr1a;
+					modulus += log(*py);
+					py += nr1a;
 				}
 			}
 		}
