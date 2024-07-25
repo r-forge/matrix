@@ -1526,18 +1526,24 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} else if (!packed && (di == '\0' || di == 'N')) { \
 			if (ul == 'U') \
 				for (j = 0; j < n; ++j) { \
-					for (i = 0; i <= j; ++i) { \
+					for (i = 0; i < j; ++i) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += 1; \
 					} \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += 1; \
 					px0 += m - j - 1; \
 					hook; \
 				} \
 			else \
 				for (j = 0; j < n; ++j) { \
 					px0 += j; \
-					for (i = j; i < m; ++i) { \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += 1; \
+					for (i = j + 1; i < m; ++i) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += 1; \
@@ -1568,16 +1574,22 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 		} else if (di == '\0' || di == 'N') { \
 			if (ul == 'U') \
 				for (j = 0; j < n; ++j) { \
-					for (i = 0; i <= j; ++i) { \
+					for (i = 0; i < j; ++i) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += 1; \
 					} \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += 1; \
 					hook; \
 				} \
 			else \
 				for (j = 0; j < n; ++j) { \
-					for (i = j; i < m; ++i) { \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += 1; \
+					for (i = j + 1; i < m; ++i) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += 1; \
@@ -1626,7 +1638,10 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			if (ul == 'U') { \
 				d = (int_fast64_t) m * n - 1; \
 				for (i = 0; i < m; ++i) { \
-					for (j = i; j < n; ++j) { \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += m; \
+					for (j = i + 1; j < n; ++j) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += m; \
@@ -1637,11 +1652,14 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			} else { \
 				d = -1; \
 				for (i = 0; i < m; ++i) { \
-					for (j = 0; j <= i; ++j) { \
+					for (j = 0; j < i; ++j) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += m; \
 					} \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += m; \
 					px0 -= (d += m); \
 					hook; \
 				} \
@@ -1676,7 +1694,10 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			if (ul == 'U') { \
 				d = PACKED_LENGTH((int_fast64_t) n) - 1; \
 				for (i = 0; i < m; ++i) { \
-					for (j = i; j < n; ++j) { \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += i + 1; \
+					for (j = i + 1; j < n; ++j) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += j + 1; \
@@ -1687,11 +1708,14 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 			} else { \
 				d = -1; \
 				for (i = 0; i < m; ++i) { \
-					for (j = 0; j <= i; ++j) { \
+					for (j = 0; j < i; ++j) { \
 						if (c##NOT_ZERO(*px0)) \
 							kernel; \
 						px0 += m - j - 1; \
 					} \
+					if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
+						kernel; \
+					px0 += m - i - 1; \
 					px0 -= (d += m - i - 1); \
 					hook; \
 				} \
