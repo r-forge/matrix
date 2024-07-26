@@ -1931,7 +1931,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		do { \
 			c##TYPE *px0 = c##PTR(x0); \
 			for (j = 0; j < n; ++j) { \
-				if (c##NOT_ZERO(*px0)) \
+				if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
 					++nnz; \
 				px0 += 1; \
 			} \
@@ -1952,7 +1952,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		do { \
 			c##TYPE *px0 = c##PTR(x0); \
 			for (j = 0; j < n; ++j) { \
-				if (c##NOT_ZERO(*px0)) \
+				if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
 					++nnz; \
 				px0 += 1; \
 				*(pp1++) = nnz; \
@@ -1989,7 +1989,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 			c##TYPE *px1 = c##PTR(x1); \
 			); \
 			for (j = 0; j < n; ++j) { \
-				if (c##NOT_ZERO(*px0)) { \
+				if ((ct == 'C') ? c##NOT_ZERO_REAL(*px0) : c##NOT_ZERO(*px0)) \
 					*(pi1++) = j; \
 					c##IF_NPATTERN( \
 					*(px1++) = *px0; \
