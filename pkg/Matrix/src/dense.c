@@ -366,17 +366,11 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	SEXP to = PROTECT(newObject(class));
 
 	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	if (m != n) {
-		dim = GET_SLOT(to, Matrix_DimSym);
-		pdim = INTEGER(dim);
-		pdim[0] = n;
-		pdim[1] = m;
-	} else if (n > 0) {
-		PROTECT(dim);
-		SET_SLOT(to, Matrix_DimSym, dim);
-		UNPROTECT(1); /* dim */
-	}
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];	
+	dim = GET_SLOT(to, Matrix_DimSym);
+	pdim = INTEGER(dim);
+	pdim[0] = n;
+	pdim[1] = m;
 
 	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
 	if (class[1] == 's' || class[1] == 'p' || class[1] == 'o')
@@ -394,30 +388,25 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 			SET_SLOT(to, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
-		if (class[1] == 's' && class[0] == 'z') {
-			SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-			char ct = CHAR(STRING_ELT(trans, 0))[0];
-			if (ct != 'C')
-				SET_SLOT(to, Matrix_transSym, trans);
-			UNPROTECT(1); /* trans */
-		}
-		if (class[1] == 't') {
-			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-			char di = CHAR(STRING_ELT(diag, 0))[0];
-			if (di != 'N')
-				SET_SLOT(to, Matrix_diagSym, diag);
-			UNPROTECT(1); /* diag */
-		} else {
-			SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
-			if (LENGTH(factors) > 0)
-				SET_SLOT(to, Matrix_factorsSym, factors);
-			UNPROTECT(1); /* factors */
-			if (class[1] == 'o' && n > 0) {
-				SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
-				SET_SLOT(to, Matrix_sdSym, sd);
-				UNPROTECT(1); /* sd */
-			}
-		}
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
+		char ct = CHAR(STRING_ELT(trans, 0))[0];
+		if (ct != 'C')
+			SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
+	}
+	if (class[1] == 't') {
+		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
+		char di = CHAR(STRING_ELT(diag, 0))[0];
+		if (di != 'N')
+			SET_SLOT(to, Matrix_diagSym, diag);
+		UNPROTECT(1); /* diag */
+	}
+	if (class[1] == 'o' && n > 0) {
+		SEXP sd = PROTECT(GET_SLOT(from, Matrix_sdSym));
+		SET_SLOT(to, Matrix_sdSym, sd);
+		UNPROTECT(1); /* sd */
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
