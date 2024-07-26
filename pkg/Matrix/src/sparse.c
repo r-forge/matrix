@@ -1311,7 +1311,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		if (class[0] == 'z') {
 			/* Need _conjugate_ transpose */
 			SEXP x1 = PROTECT(GET_SLOT(to, Matrix_xSym));
-			zvconj(COMPLEX(x1), (size_t) XLENGTH(x1));
+			zvconj(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
 			UNPROTECT(1); /* x1 */
 		}
 		UNPROTECT(1) /* to */;
@@ -1951,7 +1951,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			else {
 				/* Symmetric part of Hermitian matrix is real part */
 				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
+				zvreal(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
 				SET_SLOT(to, Matrix_xSym, x1);
 				UNPROTECT(1); /* x1 */
 			}
@@ -2082,7 +2082,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			else {
 				/* Symmetric part of Hermitian matrix is real part */
 				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
+				zvreal(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
 				SET_SLOT(to, Matrix_xSym, x1);
 				UNPROTECT(1); /* x1 */
 			}
@@ -2175,7 +2175,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			}
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(duplicate(x0));
-			zvimag(COMPLEX(x1), (size_t) XLENGTH(x1));
+			zvimag(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
 			SET_SLOT(to, Matrix_xSym, x1);
 			UNPROTECT(2); /* x1, x0 */
 		}

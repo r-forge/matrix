@@ -64,8 +64,8 @@ void iband1(     int *, const      int *, size_t, char, size_t, size_t);
 void dband1(  double *, const   double *, size_t, char, size_t, size_t);
 void zband1(Rcomplex *, const Rcomplex *, size_t, char, size_t, size_t);
 
-void zvreal(Rcomplex *, size_t);
-void zvimag(Rcomplex *, size_t);
-void zvconj(Rcomplex *, size_t);
+void zvreal(Rcomplex *, const Rcomplex *, size_t);
+void zvimag(Rcomplex *, const Rcomplex *, size_t);
+void zvconj(Rcomplex *, const Rcomplex *, size_t);
 
 #endif /* MATRIX_IDZ_H */

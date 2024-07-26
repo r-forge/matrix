@@ -148,21 +148,19 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 #define CONJ2(_X_, _M_, _N_) \
 do { \
 	size_t m = (size_t) _M_, n = (size_t) _N_, xlen = m * n; \
-	Rcomplex *src = (Rcomplex *) _X_; \
-	Rcomplex *dest = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
-	for (size_t k = 0; k < xlen; ++k) \
-		zASSIGN_CONJ(dest[k], src[k]); \
-	_X_ = dest; \
+	Rcomplex *x = (Rcomplex *) _X_; \
+	Rcomplex *y = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
+	zvconj(x, y, xlen); \
+	_X_ = y; \
 } while (0)
 
 #define CONJ1(_X_, _N_) \
 do { \
 	size_t n = (size_t) _N_, xlen = PACKED_LENGTH(n); \
-	Rcomplex *src = (Rcomplex *) _X_; \
-	Rcomplex *dest = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
-	for (size_t k = 0; k < xlen; ++k) \
-		zASSIGN_CONJ(dest[k], src[k]); \
-	_X_ = dest; \
+	Rcomplex *x = (Rcomplex *) _X_; \
+	Rcomplex *y = (Rcomplex *) R_alloc(xlen, sizeof(Rcomplex)); \
+	zvconj(x, y, xlen); \
+	_X_ = y; \
 } while (0)
 
 /* op(<,ge>) * op(<,ge>) */
@@ -408,7 +406,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	prx += rincp;
 	}
 	if (aside != 'L' && btrans == 'C')
-		zvconj(pax, (size_t) rk * (size_t) rk); /* in place */
+		zvconj(pax, NULL, (size_t) rk * (size_t) rk);
 	}
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
@@ -525,7 +523,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : act)) == 'C')
-		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
+		zvconj(prx, NULL, (size_t) rm * (size_t) rn);
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx),
 		zero = 0.0, one = 1.0;
@@ -722,7 +720,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 		CONJ1(pax, rk);
 	ztrans2(prx, pbx, (size_t) bm, (size_t) bn, btransp);
 	if (aside != 'L' && atrans == 'C' && btrans == 'N')
-		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
+		zvconj(prx, NULL, (size_t) rm * (size_t) rn);
 	for (i = 0; i < rn; ++i) {
 	F77_CALL(ztpmv)(&aul, &atransp, &adi, &rk,
 	                pax, prx, &rinc FCONE FCONE FCONE);
@@ -730,7 +728,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	}
 	if (aside != 'L' &&
 	    ((btrans != 'N') ? btrans : ((atrans != 'N') ? atrans : 'T')) == 'C')
-		zvconj(prx, (size_t) rm * (size_t) rn); /* in place */
+		zvconj(prx, NULL, (size_t) rm * (size_t) rn);
 	} else {
 	double *pax = REAL(ax), *pbx = REAL(bx), *prx = REAL(rx);
 	dtrans2(prx, pbx, (size_t) bm, (size_t) bn, btransp);

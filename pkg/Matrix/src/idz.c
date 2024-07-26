@@ -878,25 +878,43 @@ TEMPLATE(i)
 TEMPLATE(d)
 TEMPLATE(z)
 
-void zvreal(Rcomplex *x, size_t n)
+void zvreal(Rcomplex *x, const Rcomplex *y, size_t n)
 {
+	if (y)
+	while (n--) {
+		(* x   ).r = (*(y++)).r;
+		(*(x++)).i = 0.0;
+	}
+	else
 	while (n--)
 		(*(x++)).i = 0.0;
 	return;
 }
 
-void zvimag(Rcomplex *x, size_t n)
+void zvimag(Rcomplex *x, const Rcomplex *y, size_t n)
 {
+	if (y)
+	while (n--) {
+		(* x   ).r = 0.0;
+		(*(x++)).i = (*(y++)).i;
+	}
+	else
 	while (n--)
 		(*(x++)).r = 0.0;
 	return;
 }
 
-void zvconj(Rcomplex *x, size_t n)
+void zvconj(Rcomplex *x, const Rcomplex *y, size_t n)
 {
+	if (y)
+	while (n--) {
+		(* x   ).r =  (* y   ).r;
+		(*(x++)).i = -(*(y++)).i;
+	}
+	else
 	while (n--) {
 		(*x).i = -(*x).i;
-		++x;
+		x++;
 	}
 	return;
 }

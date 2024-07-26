@@ -202,7 +202,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		if (class[0] == 'n')
 			naToUnit(ans);
 		if (class[0] == 'z' && class[1] == 's' && ct == 'C')
-			zvreal(COMPLEX(ans), r_);
+			zvreal(COMPLEX(ans), NULL, r_);
 
 	}
 
@@ -617,7 +617,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		/* Symmetric part of Hermitian matrix is real part */
 		/* Hermitian part of symmetric matrix is real part */
 
-		zvreal(COMPLEX(x1), (size_t) XLENGTH(x1));
+		zvreal(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x1));
 
 	} else {
 
