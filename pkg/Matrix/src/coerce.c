@@ -994,12 +994,16 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		error(_("attempt to construct %s with more than %s nonzero entries"),
 		      "sparseMatrix", "2^31-1");
 
-	int i_, j_, m_ = (byrow) ? n : m, n_ = (byrow) ? m : n;
+	if (byrow) {
+		int tmp;
+		tmp = m; m = n; n = tmp;
+	}
+	
 	SEXP iSym = (byrow) ? Matrix_jSym : Matrix_iSym,
-		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n_ + 1)),
+		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 		i1 = PROTECT(allocVector(INTSXP, nnz1));
-	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1);
-	memset(pp1 - 1, 0, sizeof(int) * ((size_t) n_ + 1));
+	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1), i, j;
+	memset(pp1 - 1, 0, sizeof(int) * ((size_t) n + 1));
 	SET_SLOT(to, Matrix_pSym, p1);
 	SET_SLOT(to,        iSym, i1);
 
@@ -1019,10 +1023,10 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			/* do nothing */ ; \
 		else if (cl[1] == 'g') { \
 			if (r == 0) \
-				for (j_ = 0; j_ < n_; ++j_) { \
-					pp1[j_] = m; \
-					for (i_ = 0; i_ < m_; ++i_) { \
-						*(pi1++) = i_; \
+				for (j = 0; j < n; ++j) { \
+					pp1[j] = m; \
+					for (i = 0; i < m; ++i) { \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c1##NA; \
 						); \
@@ -1030,8 +1034,8 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			else if (r >= mn) \
 				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
-					++pp1[pos / m_]; \
-					*(pi1++) = pos % m_; \
+					++pp1[pos / m]; \
+					*(pi1++) = pos % m; \
 					c1##IF_NPATTERN( \
 					*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 					); \
@@ -1042,8 +1046,8 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (a < mn) { \
 				k = 0; \
 				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
-					++pp1[pos / m_]; \
-					*(pi1++) = pos % m_; \
+					++pp1[pos / m]; \
+					*(pi1++) = pos % m; \
 					c1##IF_NPATTERN( \
 					*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 					); \
@@ -1056,20 +1060,20 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		else if (cl[1] == 's' || cl[1] == 'p' || di == 'N') { \
 			if (r == 0) { \
 				if ((ul == 'U') == !byrow) \
-				for (j_ = 0; j_ < n_; ++j_) { \
-					pp1[j_] = j_ + 1; \
-					for (i_ = 0; i_ <= j_; ++i_) { \
-						*(pi1++) = i_; \
+				for (j = 0; j < n; ++j) { \
+					pp1[j] = j + 1; \
+					for (i = 0; i <= j; ++i) { \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c1##NA; \
 						); \
 					} \
 				} \
 				else \
-				for (j_ = 0; j_ < n_; ++j_) { \
-					pp1[j_] = n_ - j_; \
-					for (i_ = j_; i_ < n_; ++i_) { \
-						*(pi1++) = i_; \
+				for (j = 0; j < n; ++j) { \
+					pp1[j] = n - j; \
+					for (i = j; i < n; ++i) { \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c1##NA; \
 						); \
@@ -1079,9 +1083,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) \
 				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n_) <= (j_ = (int) pos / n_)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) <= (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1090,9 +1094,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 				else \
 				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n_) >= (j_ = (int) pos / n_)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) >= (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1106,9 +1110,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (a < mn) { \
 				k = 0; \
 				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n) <= (j_ = (int) pos / n)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) <= (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1121,9 +1125,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (a < mn) { \
 				k = 0; \
 				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n) >= (j_ = (int) pos / n)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) >= (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1137,20 +1141,20 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		else { \
 			if (r == 0) { \
 				if ((ul == 'U') == !byrow) \
-				for (j_ = 0; j_ < n_; ++j_) { \
-					pp1[j_] = j_; \
-					for (i_ = 0; i_ < j_; ++i_) { \
-						*(pi1++) = i_; \
+				for (j = 0; j < n; ++j) { \
+					pp1[j] = j; \
+					for (i = 0; i < j; ++i) { \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c1##NA; \
 						); \
 					} \
 				} \
 				else \
-				for (j_ = 0; j_ < n_; ++j_) { \
-					pp1[j_] = n_ - j_ - 1; \
-					for (i_ = j_ + 1; i_ < n_; ++i_) { \
-						*(pi1++) = i_; \
+				for (j = 0; j < n; ++j) { \
+					pp1[j] = n - j - 1; \
+					for (i = j + 1; i < n; ++i) { \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c1##NA; \
 						); \
@@ -1160,9 +1164,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 			else if (r >= mn) { \
 				if ((ul == 'U') == !byrow) \
 				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n_) < (j_ = (int) pos / n_)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) < (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1171,9 +1175,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				} \
 				else \
 				while (k < nnz0 && (pos =     (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n_) > (j_ = (int) pos / n_)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) > (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1187,9 +1191,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (a < mn) { \
 				k = 0; \
 				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n) < (j_ = (int) pos / n)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) < (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1202,9 +1206,9 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 				while (a < mn) { \
 				k = 0; \
 				while (k < nnz0 && (pos = a + (int_fast64_t) pi0[k] - 1) < mn) { \
-					if ((i_ = (int) pos % n) > (j_ = (int) pos / n)) { \
-						++pp1[j_]; \
-						*(pi1++) = i_; \
+					if ((i = (int) pos % n) > (j = (int) pos / n)) { \
+						++pp1[j]; \
+						*(pi1++) = i; \
 						c1##IF_NPATTERN( \
 						*(px1++) = c0##IFELSE_NPATTERN(px0[k], c1##UNIT); \
 						); \
@@ -1251,8 +1255,8 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 
 	}
 
-	for (j_ = 0; j_ < n_; ++j_)
-		pp1[j_] += pp1[j_ - 1];
+	for (j = 0; j < n; ++j)
+		pp1[j] += pp1[j - 1];
 
 	switch (zzz[2]) {
 	case 'C':
