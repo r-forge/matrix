@@ -74,7 +74,6 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
-	SET_SLOT(to, Matrix_xSym, x1);
 
 	size_t
 		m_ = (size_t) m,
@@ -109,6 +108,8 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	SWITCH4(class[0], BAND);
 
 #undef BAND
+
+	SET_SLOT(to, Matrix_xSym, x1);
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -145,7 +146,7 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 		      "k1", a, "k2", b);
 
 	s_from = dense_band(s_from, class, a, b);
-	UNPROTECT(1);
+	UNPROTECT(1); /* s_from */
 	return s_from;
 }
 
@@ -207,7 +208,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 
 	if (names) {
 		/* NB: The logic here must be adjusted once the validity method
-		   for 'symmetricMatrix' enforce symmetric 'Dimnames'
+		   for 'symmetricMatrix' enforces symmetric 'Dimnames'
 		*/
 		SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 			rn = VECTOR_ELT(dn, 0),
@@ -271,25 +272,26 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 		UNPROTECT(1); /* x */
 		PROTECT(x);
 	}
-	SET_SLOT(to, Matrix_xSym, x);
 
 	size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r,
-		v_ = (LENGTH(value) == r) ? 1 : 0;
+		d_ = (LENGTH(value) == r) ? 1 : 0;
 
 #define DIAG(c) \
 	do { \
-		c##TYPE *px = c##PTR(x), *pvalue = c##PTR(value); \
+		c##TYPE *px = c##PTR(x), *pv = c##PTR(value); \
 		if (!packed) \
-			c##NAME(copy2)(r_, px, m_ + 1, pvalue, v_); \
+			c##NAME(copy2)(r_, px, m_ + 1, pv, d_); \
 		else if (ul == 'U') \
-			c##NAME(copy1)(n_, px, 2 , 1, 0, pvalue, v_, 0, 0); \
+			c##NAME(copy1)(n_, px, 2 , 1, 0, pv, d_, 0, 0); \
 		else  \
-			c##NAME(copy1)(n_, px, n_, 1, 1, pvalue, v_, 0, 0); \
+			c##NAME(copy1)(n_, px, n_, 1, 1, pv, d_, 0, 0); \
 	} while (0)
 
 	SWITCH4(class[0], DIAG);
 
 #undef DIAG
+
+	SET_SLOT(to, Matrix_xSym, x);
 
 	UNPROTECT(2); /* x, to */
 	return to;
@@ -329,7 +331,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 				PROTECT(s_from = dense_as_general(s_from, class, 1));
 				class = Matrix_class(s_from, valid_dense, 6, __func__);
 				new = 0;
-				UNPROTECT(1);
+				UNPROTECT(1); /* s_from */
 			}
 		}
 		PROTECT(s_from);
@@ -353,7 +355,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 	}
 
 	s_from = dense_diag_set(s_from, class, s_value, new);
-	UNPROTECT(2);
+	UNPROTECT(2); /* s_value, s_from */
 	return s_from;
 }
 
@@ -420,8 +422,6 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
-	SET_SLOT(to, Matrix_xSym, x1);
-
 	size_t m_ = (size_t) m, n_ = (size_t) n;
 
 #define TRANS(c) \
@@ -436,6 +436,8 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	SWITCH4((class[0] == 'c') ? 'd' : class[0], TRANS);
 
 #undef TRANS
+
+	SET_SLOT(to, Matrix_xSym, x1);
 
 	UNPROTECT(3); /* x1, x0, to */
 	return to;
@@ -516,8 +518,6 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		SET_SLOT(to, Matrix_xSym, x0);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
-		SET_SLOT(to, Matrix_xSym, x1);
-
 		size_t n_ = (size_t) n;
 
 #define FORCE(c) \
@@ -537,6 +537,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 
 #undef FORCE
 
+		SET_SLOT(to, Matrix_xSym, x1);
 		UNPROTECT(1); /* x1 */
 	}
 
@@ -621,7 +622,6 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
-	SET_SLOT(to, Matrix_xSym, x1);
 
 	if (class[1] == 's') {
 
@@ -723,6 +723,8 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 
 	}
 
+	SET_SLOT(to, Matrix_xSym, x1);
+
 	UNPROTECT(4); /* x1, x0, to, from */
 	return to;
 }
@@ -784,7 +786,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		ct0 = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct0 != 'C')
 			SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1);
+		UNPROTECT(1); /* trans */
 	}
 
 	char di = '\0';
@@ -1108,7 +1110,7 @@ SEXP R_dense_is_symmetric(SEXP s_obj,
 
 	int ans_ = dense_is_symmetric(s_obj, class, ct, exact, checkDN);
 	SEXP ans = ScalarLogical(ans_);
-	UNPROTECT(1);
+	UNPROTECT(1); /* s_obj */
 	return ans;
 }
 
@@ -1230,9 +1232,9 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 		if (!kindSym)
 			kindSym = install("kind");
 		setAttrib(ans, kindSym, kindVal);
-		UNPROTECT(2);
+		UNPROTECT(2); /* kindVal, ans */
 	}
-	UNPROTECT(1);
+	UNPROTECT(1); /* s_obj */
 	return ans;
 }
 
@@ -1317,7 +1319,7 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 
 	int ans_ = dense_is_diagonal(s_obj, class);
 	SEXP ans = ScalarLogical(ans_ != 0);
-	UNPROTECT(1);
+	UNPROTECT(1); /* s_obj */
 	return ans;
 }
 
