@@ -20,21 +20,21 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	sy = !tr && class[1] == 's' && a == -b;
 	ge = !tr && !sy;
 
-	char ul0 = '\0', ct = '\0', di = '\0';
+	char ul0 = '\0', ct0 = '\0', di0 = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
 	}
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
+		ct0 = CHAR(STRING_ELT(trans, 0))[0];
 	}
 	if (class[1] == 't') {
 		/* Be fast if band contains entire triangle */
 		if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (a <= 1 - m && b >= 0))
 			return from;
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		di0 = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	char cl[] = "...Matrix";
@@ -61,12 +61,12 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
-	if (ct  != '\0' && ct  != 'C' && sy) {
+	if (ct0 != '\0' && ct0 != 'C' && sy) {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (di  != '\0' && di  != 'N' && tr && a <= 0 && b >= 0) {
+	if (di0 != '\0' && di0 != 'N' && tr && a <= 0 && b >= 0) {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -86,16 +86,16 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (ge && class[1] != 'g') { \
 		if (!packed) \
-			c##NAME(force2)(px1, px0, n_, ul0, ct, di); \
+			c##NAME(force2)(px1, px0, n_, ul0, ct0, di0); \
 		else \
-			c##NAME( pack1)(px1, px0, n_, ul0, ct, di); \
+			c##NAME( pack1)(px1, px0, n_, ul0, ct0, di0); \
 		px0 = NULL; \
 		packed = 0; \
 		} else if (tr && class[1] == 's' && ul0 != ul1) { \
 		if (!packed) \
-			c##NAME(trans2)(px1, px0, m_, n_ , ct); \
+			c##NAME(trans2)(px1, px0, m_, n_ , ct0); \
 		else \
-			c##NAME(trans1)(px1, px0, n_, ul0, ct); \
+			c##NAME(trans1)(px1, px0, n_, ul0, ct0); \
 		px0 = NULL; \
 		ul0 = ul1; \
 		} \
@@ -243,9 +243,8 @@ SEXP R_dense_diag_get(SEXP s_obj, SEXP s_names)
 
 SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 {
-	int packed = class[2] == 'p';
-
 	SEXP to = PROTECT(newObject(class));
+	int packed = class[2] == 'p';
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
@@ -257,13 +256,20 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0';
+	char ul = '\0', ct = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+		if (ct != 'C')
+			SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
 	}
 
 	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
@@ -359,14 +365,16 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 	return s_from;
 }
 
-SEXP dense_transpose(SEXP from, const char *class, char ct)
+SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 {
+	if (class[0] != 'z')
+		op_ct = '\0';
+	
+	SEXP to = PROTECT(newObject(class));
 	int packed = class[2] == 'p';
 
-	SEXP to = PROTECT(newObject(class));
-
 	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];	
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	dim = GET_SLOT(to, Matrix_DimSym);
 	pdim = INTEGER(dim);
 	pdim[0] = n;
@@ -379,7 +387,7 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 		set_reversed_DimNames(to, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0';
+	char ul = '\0', ct = '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -391,14 +399,14 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	}
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
+		ct = CHAR(STRING_ELT(trans, 0))[0];
 		if (ct != 'C')
 			SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
+		di = CHAR(STRING_ELT(diag, 0))[0];
 		if (di != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -417,9 +425,9 @@ SEXP dense_transpose(SEXP from, const char *class, char ct)
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			c##NAME(trans2)(px1, px0, m_, n_, ct); \
+			c##NAME(trans2)(px1, px0, m_, n_, op_ct); \
 		else \
-			c##NAME(trans1)(px1, px0, n_, ul, ct); \
+			c##NAME(trans1)(px1, px0, n_, ul, op_ct); \
 	} while (0)
 
 	SWITCH4((class[0] == 'c') ? 'd' : class[0], TRANS);
@@ -443,9 +451,15 @@ SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
 	return dense_transpose(s_from, class, ct);
 }
 
-SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
+SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 {
-	char ul0 = '\0', ul1 = 'U', ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0', di = '\0';
+	if (class[0] != 'z')
+		op_ct = '\0';
+
+	char
+		ul0 = '\0', ul1 = 'U',
+		ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0',
+		di0 = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = ul1 = CHAR(STRING_ELT(uplo, 0))[0];
@@ -456,21 +470,20 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		di0 = CHAR(STRING_ELT(diag, 0))[0];
 	}
-	if (ul != '\0')
-		ul1 = ul;
-	if (ct != '\0' && class[0] == 'z')
-		ct1 = ct;
+	if (op_ul != '\0')
+		ul1 = op_ul;
+	if (op_ct != '\0')
+		ct1 = op_ct;
 
-	if (class[1] == 's' && ul0 == ul1 && (ct0 == ct1 || ct1 == 'C'))
+	if (class[1] == 's' && ul0 == ul1 && ct0 == ct1)
 		return from;
 
 	int packed = class[2] == 'p';
 
-	char cl[] = "...Matrix";
+	char cl[] = ".s.Matrix";
 	cl[0] = class[0];
-	cl[1] = 's';
 	cl[2] = (packed) ? 'p' : 'y';
 	SEXP to = PROTECT(newObject(cl));
 
@@ -494,8 +507,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
-
-	if (ct1 != 'C' && class[0] == 'z') {
+	if (ct1 != 'C' && ct1 != '\0') {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
@@ -503,7 +515,9 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 
-	if (class[1] == 'g' || (class[0] == 't' && ul0 == ul1 && di == 'N'))
+	if ((class[1] == 'g') ||
+	    (class[1] == 's' && ul0 == ul1 && ct0 != 'C') ||
+	    (class[1] == 't' && ul0 == ul1 && di0 == 'N'))
 		SET_SLOT(to, Matrix_xSym, x0);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
@@ -513,12 +527,12 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char ul, char ct)
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			if (!packed) \
-				c##NAME(force2)(px1,  px0, n_, ul0, ct0, di); \
+				c##NAME(force2)(px1,  px0, n_, ul0, ct0, di0); \
 			else if (ul0 == ul1) \
-				c##NAME(force1)(px1,  px0, n_, ul0, ct0, di); \
+				c##NAME(force1)(px1,  px0, n_, ul0, ct0, di0); \
 			else { \
 				c##NAME(trans1)(px1,  px0, n_, ul0, ct0); \
-				c##NAME(force1)(px1, NULL, n_, ul1, ct0, di); \
+				c##NAME(force1)(px1, NULL, n_, ul1, ct0, di0); \
 			} \
 		} while (0)
 
@@ -546,19 +560,22 @@ SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 	return dense_force_symmetric(s_from, class, ul, ct);
 }
 
-SEXP dense_symmpart(SEXP from, const char *class, char ct)
+SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 {
 	/* defined in ./coerce.c : */
 	SEXP dense_as_kind(SEXP, const char *, char, int);
 	PROTECT(from = dense_as_kind(from, class, ',', 0));
 
-	char ct0 = ct, ct1 = ct;
+	if (class[0] != 'z')
+		op_ct = '\0';
+
+	char ct = '\0';
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct0 = CHAR(STRING_ELT(trans, 0))[0];
+		ct = CHAR(STRING_ELT(trans, 0))[0];
 	}
 
-	if (class[1] == 's' && ct0 == ct1) {
+	if (class[1] == 's' && op_ct == ct) {
 		UNPROTECT(1); /* from */
 		return from;
 	}
@@ -574,7 +591,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((ct1 == 'C')
+		error((op_ct == 'C')
 		      ? _("attempt to get Hermitian part of non-square matrix")
 		      : _("attempt to get symmetric part of non-square matrix"));
 	if (n > 0)
@@ -588,7 +605,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0';
+	char ul = '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -596,17 +613,15 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
-
-	if (class[0] == 'z' && ct1 != 'C') {
-		SEXP trans = PROTECT(mkString("T"));
-		SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-
-	char di = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	if (op_ct != '\0' && op_ct != 'C') {
+		SEXP trans = PROTECT(mkString("T"));
+		SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
@@ -630,7 +645,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 			if (!packed) \
 				memset(px1, 0, sizeof(c##TYPE) * (size_t) XLENGTH(x1)); \
 			if (class[1] == 'g') { \
-				if (ct1 == 'C') \
+				if (op_ct == 'C') \
 					for (j = 0; j < n; ++j) { \
 						for (i = 0; i < j; ++i) { \
 							c##ASSIGN_IDEN(*pu1, *pu0); \
@@ -671,7 +686,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 						} \
 						if (di != 'N') \
 							c##SET_UNIT(*pu1); \
-						else if (ct1 == 'C') \
+						else if (op_ct == 'C') \
 							c##ASSIGN_PROJ_REAL(*pu1, *pu0); \
 						else \
 							c##ASSIGN_IDEN(*pu1, *pu0); \
@@ -690,7 +705,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char ct)
 						} \
 						if (di != 'N') \
 							c##SET_UNIT(*pl1); \
-						else if (ct1 == 'C') \
+						else if (op_ct == 'C') \
 							c##ASSIGN_PROJ_REAL(*pl1, *pl0); \
 						else \
 							c##ASSIGN_IDEN(*pl1, *pl0); \
@@ -729,11 +744,14 @@ SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
 	return dense_symmpart(s_from, class, ct);
 }
 
-SEXP dense_skewpart(SEXP from, const char *class, char ct)
+SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 {
 	/* defined in ./coerce.c : */
 	SEXP dense_as_kind(SEXP, const char *, char, int);
 	PROTECT(from = dense_as_kind(from, class, ',', 0));
+
+	if (class[0] != 'z')
+		op_ct = '\0';
 
 	int packed = class[2] == 'p';
 
@@ -746,7 +764,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((ct == 'C')
+		error((op_ct == 'C')
 		      ? _("attempt to get skew-Hermitian part of non-square matrix")
 		      : _("attempt to get skew-symmetric part of non-square matrix"));
 	if (n > 0)
@@ -760,7 +778,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0';
+	char ul = '\0', ct = '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -768,17 +786,13 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
-
-	char ct0 = ct, ct1 = ct;
 	if (class[1] == 's' && class[0] == 'z') {
 		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		ct0 = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct0 != 'C')
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+		if (ct != 'C')
 			SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-
-	char di = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
@@ -791,27 +805,16 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 		/* Skew-symmetric part of Hermitian matrix is imaginary part */
 		/* Skew-Hermitian part of symmetric matrix is imaginary part */
 
-		PROTECT(x1 = allocVector(TYPEOF(x0), XLENGTH(x0)));
-		if (class[0] == 'z') {
-			Rcomplex *px1 = COMPLEX(x1);
-			if (ct0 == ct1)
-			memset(px1, 0, sizeof(Rcomplex) * (size_t) XLENGTH(x1));
-			else {
-			Rcomplex *px0 = COMPLEX(x0);
-			for (R_xlen_t k = 0, kend = XLENGTH(x1); k < kend; ++k) {
-				zASSIGN_PROJ_IMAG(*px1, *px0);
-				px0 += 1;
-				px1 += 1;
-			}
-			}
-		} else {
-			double *px1 = REAL(x1);
-			memset(px1, 0, sizeof(double) * (size_t) XLENGTH(x1));
+		if (op_ct == ct)
+		PROTECT(x1 = allocZero(TYPEOF(x0), XLENGTH(x0)));
+		else {
+		PROTECT(x1 = allocVector(CPLXSXP, XLENGTH(x0)));
+		zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x1));
 		}
 
 	} else {
 
-		if (class[0] == 't' && (int_fast64_t) n * n > R_XLEN_T_MAX)
+		if ((int_fast64_t) n * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		PROTECT(x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n));
@@ -823,7 +826,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
 			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
 			if (class[1] == 'g') { \
-				if (ct1 == 'C') \
+				if (op_ct == 'C') \
 					for (j = 0; j < n; ++j) { \
 						for (i = 0; i < j; ++i) { \
 							c##ASSIGN_IDEN(*pu1, *pu0); \
@@ -873,7 +876,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 							pu1 += 1; \
 							pl1 += n; \
 						} \
-						if (di != 'N' || ct1 != 'C') \
+						if (di != 'N' || op_ct != 'C') \
 							c##SET_ZERO(*pu1); \
 						else \
 							c##ASSIGN_PROJ_IMAG(*pu1, *pu0); \
@@ -891,7 +894,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char ct)
 						pl0 += j; \
 						pl1 += j; \
 						pu1 = pl1; \
-						if (di != 'N' || ct1 != 'C') \
+						if (di != 'N' || op_ct != 'C') \
 							c##SET_ZERO(*pl1); \
 						else \
 							c##ASSIGN_PROJ_IMAG(*pl1, *pl0); \
@@ -935,15 +938,21 @@ SEXP R_dense_skewpart(SEXP s_from, SEXP s_trans)
 }
 
 int dense_is_symmetric(SEXP obj, const char *class,
-                       char ct, int exact, int checkDN)
+                       char op_ct, int exact, int checkDN)
 {
-	exact = exact || class[0] == 'n' || class[0] == 'l' || class[0] == 'i';
+	if (class[0] != 'z') {
+		op_ct = '\0';
+		if (class[0] != 'd')
+			exact = 1;
+	}
 
+	char ct = '\0';
 	if (class[1] == 's') {
 		if (class[0] != 'z')
 			return 1;
 		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		if (CHAR(STRING_ELT(trans, 0))[0] == ct)
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+		if (op_ct == ct)
 			return 1;
 		checkDN = 0;
 	}
@@ -954,10 +963,11 @@ int dense_is_symmetric(SEXP obj, const char *class,
 			return 0;
 	}
 
+	char di = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (exact && (class[0] != 'z' || ct != 'C' || di != 'N'))
+		di = CHAR(STRING_ELT(diag, 0))[0];
+		if (exact && (di != 'N' || op_ct != 'C'))
 			return dense_is_diagonal(obj, class);
 	}
 
@@ -965,7 +975,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
 		return 0;
-	if (n == 0 || (n == 1 && (class[0] != 'z' || ct != 'C')))
+	if (n == 0 || (n == 1 && op_ct != 'C'))
 		return 1;
 	if (!exact)
 		return NA_LOGICAL; /* => do inexact numerical test in R */
@@ -979,7 +989,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-	if (class[1] == 'g' && (class[0] != 'z' || ct != 'C')) {
+	if (class[1] == 'g' && op_ct != 'C') {
 
 #define ISS(c) \
 	do { \
@@ -1025,7 +1035,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 					return 0;
 				pu += 1;
 			}
-			if (ct == 'C' && zNOT_ZERO_IMAG(*pu))
+			if (op_ct == 'C' && zNOT_ZERO_IMAG(*pu))
 				return 0;
 			pu += 1;
 			if (!packed)
@@ -1035,7 +1045,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 		for (j = 0; j < n; ++j) {
 			if (!packed)
 			pl += j;
-			if (ct == 'C' && zNOT_ZERO_IMAG(*pl))
+			if (op_ct == 'C' && zNOT_ZERO_IMAG(*pl))
 				return 0;
 			pl += 1;
 			for (i = j + 1; i < n; ++i) {
@@ -1103,15 +1113,15 @@ SEXP R_dense_is_symmetric(SEXP s_obj,
 	return ans;
 }
 
-int dense_is_triangular(SEXP obj, const char *class, int upper)
+int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 {
 	if (class[1] == 't') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (upper == NA_LOGICAL || (upper != 0) == (ul == 'U'))
-			return (ul == 'U') ? 1 : -1;
+		if (op_ul == '\0' || op_ul == ul)
+			return (   ul == 'U') ? 1 : -1;
 		else if (dense_is_diagonal(obj, class))
-			return (upper != 0) ? 1 : -1;
+			return (op_ul == 'U') ? 1 : -1;
 		else
 			return 0;
 	}
@@ -1119,12 +1129,13 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 	if (class[1] == 's') {
 		if (!dense_is_diagonal(obj, class))
 			return 0;
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (upper == NA_LOGICAL)
-			return (ul == 'U') ? 1 : -1;
-		else
-			return (upper != 0) ? 1 : -1;
+		else if (op_ul != '\0')
+			return (op_ul == 'U') ? 1 : -1;
+		else {
+			SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+			char ul = CHAR(STRING_ELT(uplo, 0))[0];
+			return (   ul == 'U') ? 1 : -1;
+		}
 	}
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
@@ -1132,7 +1143,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 	if (pdim[1] != n)
 		return 0;
 	if (n <= 1)
-		return (upper != 0) ? 1 : -1;
+		return (op_ul == '\0' || op_ul == 'U') ? 1 : -1;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
@@ -1140,7 +1151,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 #define IST(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
-		if (upper == NA_LOGICAL) { \
+		if (op_ul == '\0') { \
 			for (j = 0; j < n; ++j) { \
 				pl += j + 1; \
 				for (i = j + 1; i < n; ++i) { \
@@ -1166,7 +1177,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 			if (j == n) \
 				return -1; \
 			return 0; \
-		} else if (upper != 0) { \
+		} else if (op_ul == 'U') { \
 			for (j = 0; j < n; ++j) { \
 				pl += j + 1; \
 				for (i = j + 1; i < n; ++i) { \
@@ -1193,7 +1204,7 @@ int dense_is_triangular(SEXP obj, const char *class, int upper)
 
 #undef IST
 
-	return (upper != 0) ? 1 : -1;
+	return (op_ul == '\0' || op_ul == 'U') ? 1 : -1;
 }
 
 /* isTriangular(<denseMatrix>, upper) */
@@ -1210,7 +1221,8 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 	int upper;
 	VALID_LOGIC3(s_upper, upper);
 
-	int ans_ = dense_is_triangular(s_obj, class, upper);
+	int ans_ = dense_is_triangular(s_obj, class,
+		(upper == NA_LOGICAL) ? '\0' : ((upper != 0) ? 'U' : 'L'));
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
 	if (upper == NA_LOGICAL && ans_ != 0) {
