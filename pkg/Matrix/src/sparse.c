@@ -1263,15 +1263,15 @@ SEXP sparse_transpose(SEXP from, const char *class, char ct, int lazy)
 	SET_SLOT(to,        iSym, i1);
 
 	/* defined in ./coerce.c : */
-	void trans(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, int, int);
+	void trans(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, int, int, char);
 
 	if (class[0] == 'n')
-		trans(p0, i0, NULL, p1, i1, NULL, m_, n_);
+		trans(p0, i0, NULL, p1, i1, NULL, m_, n_, 'T');
 	else {
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 			x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[n_]));
 		SET_SLOT(to, Matrix_xSym, x1);
-		trans(p0, i0, x0, p1, i1, x1, m_, n_);
+		trans(p0, i0, x0, p1, i1, x1, m_, n_, 'T');
 		UNPROTECT(2); /* x1, x0 */
 	}
 	UNPROTECT(5); /* i1, p1, i0, p0, to */

@@ -3043,7 +3043,7 @@ SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_trans, SEXP s_diag)
 }
 
 void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
-           int m, int n)
+           int m, int n, char ct)
 {
 	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1),
 		*pi0 = INTEGER(i0), *pi1 = INTEGER(i1),
@@ -3064,13 +3064,27 @@ void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
 		c##IF_NPATTERN( \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		); \
+		if (ct == 'C') \
 		for (j = 0, k = 0; j < n; ++j) { \
 			kend = pp0[j]; \
 			while (k < kend) { \
 				i = pi0[k]; \
 				pi1[pp1_[i]] = j; \
 				c##IF_NPATTERN( \
-				px1[pp1_[i]] = px0[k]; \
+				c##ASSIGN_CONJ(px1[pp1_[i]], px0[k]); \
+				); \
+				++pp1_[i]; \
+				++k; \
+			} \
+		} \
+		else \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = pp0[j]; \
+			while (k < kend) { \
+				i = pi0[k]; \
+				pi1[pp1_[i]] = j; \
+				c##IF_NPATTERN( \
+				c##ASSIGN_IDEN(px1[pp1_[i]], px0[k]); \
 				); \
 				++pp1_[i]; \
 				++k; \
@@ -3433,12 +3447,12 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 		SET_SLOT(to, Matrix_pSym, p1);
 		SET_SLOT(to, Matrix_iSym, i1);
 		if (class[0] == 'n')
-			trans(p0, j0, NULL, p1, i1, NULL, n, m);
+			trans(p0, j0, NULL, p1, i1, NULL, n, m, 'T');
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[m]));
 			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, j0, x0, p1, i1, x1, n, m);
+			trans(p0, j0, x0, p1, i1, x1, n, m, 'T');
 			UNPROTECT(2); /* x1, x0 */
 		}
 		UNPROTECT(4); /* i1, p1, j0, p0 */
@@ -3534,12 +3548,12 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 		SET_SLOT(to, Matrix_pSym, p1);
 		SET_SLOT(to, Matrix_jSym, j1);
 		if (class[0] == 'n')
-			trans(p0, i0, NULL, p1, j1, NULL, m, n);
+			trans(p0, i0, NULL, p1, j1, NULL, m, n, 'T');
 		else {
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
 				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[n]));
 			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, i0, x0, p1, j1, x1, m, n);
+			trans(p0, i0, x0, p1, j1, x1, m, n, 'T');
 			UNPROTECT(2); /* x1, x0 */
 		}
 		UNPROTECT(4); /* j1, p1, i0, p0 */
