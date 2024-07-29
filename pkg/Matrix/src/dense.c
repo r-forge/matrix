@@ -582,9 +582,8 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 
 	int packed = class[2] == 'p';
 
-	char cl[] = "...Matrix";
+	char cl[] = ".s.Matrix";
 	cl[0] = (class[0] == 'z') ? 'z' : 'd';
-	cl[1] = 's';
 	cl[2] = (packed) ? 'p' : 'y';
 	SEXP to = PROTECT(newObject(cl));
 
