@@ -872,6 +872,52 @@ c##band1(c##TYPE *x, const c##TYPE *y, \
 	} \
 	return; \
 } \
+ \
+void \
+c##sptrans(int *p0, int *i0, c##TYPE *x0, \
+           int *p1, int *i1, c##TYPE *x1, \
+           int m, int n, char trans) \
+{ \
+	int i, j, k, kend, nnz = p0[n], *p_ = NULL; \
+	Matrix_Calloc(p_, m, int); \
+	p0++; *(p1++) = 0; \
+	memset(pp1, 0, sizeof(int) * (size_t) m); \
+	for (k = 0; k < nnz; ++k) \
+		++p1[i0[k]]; \
+	for (i = 0; i < m; ++i) \
+		p1[i] += (p_[i] = p1[i - 1]); \
+	if (!x1) \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = p0[j]; \
+			while (k < kend) { \
+				i = i0[k]; \
+				i1[p_[i]++] = j; \
+				++k; \
+			} \
+		} \
+	else if (trans == 'C') \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = p0[j]; \
+			while (k < kend) { \
+				i = i0[k]; \
+				c##ASSIGN_CONJ(x1[p_[i]], x0[k]); \
+				i1[p_[i]++] = j; \
+				++k; \
+			} \
+		} \
+	else \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = p0[j]; \
+			while (k < kend) { \
+				i = i0[k]; \
+				c##ASSIGN_IDEN(x1[p_[i]], x0[k]); \
+				i1[p_[i]++] = j; \
+				++k; \
+			} \
+		} \
+	Matrix_Free(p_, m); \
+	return; \
+} \
 
 
 TEMPLATE(i)

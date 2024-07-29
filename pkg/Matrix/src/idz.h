@@ -64,6 +64,10 @@ void iband1(     int *, const      int *, size_t, char, size_t, size_t);
 void dband1(  double *, const   double *, size_t, char, size_t, size_t);
 void zband1(Rcomplex *, const Rcomplex *, size_t, char, size_t, size_t);
 
+void isptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char);
+void dsptrans(int *, int *,   double *, const int *, const int *, const   double *, int, int, char);
+void zsptrans(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, char);
+
 void zvreal(Rcomplex *, const Rcomplex *, size_t);
 void zvimag(Rcomplex *, const Rcomplex *, size_t);
 void zvconj(Rcomplex *, const Rcomplex *, size_t);
