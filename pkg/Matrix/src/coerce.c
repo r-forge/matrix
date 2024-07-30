@@ -998,7 +998,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 		int tmp;
 		tmp = m; m = n; n = tmp;
 	}
-	
+
 	SEXP iSym = (byrow) ? Matrix_jSym : Matrix_iSym,
 		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 		i1 = PROTECT(allocVector(INTSXP, nnz1));
@@ -3042,356 +3042,6 @@ SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_trans, SEXP s_diag)
 	return dense_as_packed(s_from, class, ul, ct, di);
 }
 
-void trans(SEXP p0, SEXP i0, SEXP x0, SEXP p1, SEXP i1, SEXP x1,
-           int m, int n, char ct)
-{
-	int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1),
-		*pi0 = INTEGER(i0), *pi1 = INTEGER(i1),
-		i, j, k, kend, nnz = pp0[n];
-	pp0++; *(pp1++) = 0;
-	memset(pp1, 0, sizeof(int) * (size_t) m);
-	for (k = 0; k < nnz; ++k)
-		++pp1[pi0[k]];
-	for (i = 0; i < m; ++i)
-		pp1[i] += pp1[i - 1];
-
-	int *pp1_;
-	Matrix_Calloc(pp1_, m, int);
-	memcpy(pp1_, pp1 - 1, sizeof(int) * (size_t) m);
-
-#define TRANS(c) \
-	do { \
-		c##IF_NPATTERN( \
-		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
-		); \
-		if (ct == 'C') \
-		for (j = 0, k = 0; j < n; ++j) { \
-			kend = pp0[j]; \
-			while (k < kend) { \
-				i = pi0[k]; \
-				pi1[pp1_[i]] = j; \
-				c##IF_NPATTERN( \
-				c##ASSIGN_CONJ(px1[pp1_[i]], px0[k]); \
-				); \
-				++pp1_[i]; \
-				++k; \
-			} \
-		} \
-		else \
-		for (j = 0, k = 0; j < n; ++j) { \
-			kend = pp0[j]; \
-			while (k < kend) { \
-				i = pi0[k]; \
-				pi1[pp1_[i]] = j; \
-				c##IF_NPATTERN( \
-				c##ASSIGN_IDEN(px1[pp1_[i]], px0[k]); \
-				); \
-				++pp1_[i]; \
-				++k; \
-			} \
-		} \
-	} while (0)
-
-	SWITCH5((x0 && x1 && TYPEOF(x0) == TYPEOF(x1)) ? typeToKind(TYPEOF(x0)) : 'n', TRANS);
-
-#undef TRANS
-
-	Matrix_Free(pp1_, m);
-	return;
-}
-
-void tsort(SEXP i0, SEXP j0, SEXP x0, SEXP *p1, SEXP *i1, SEXP *x1,
-           int m, int n)
-{
-	if (XLENGTH(i0) > INT_MAX)
-		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
-		      "TsparseMatrix", "i", "j", "2^31-1");
-	int nnz0 = (int) XLENGTH(i0), nnz1 = 0;
-
-	PROTECT(*p1 = allocVector(INTSXP, (R_xlen_t) n + 1));
-	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pp1 = INTEGER(*p1), *pi1,
-		i, j, r = (m < n) ? n : m, k, kstart, kend, kend_;
-	*(pp1++) = 0;
-
-	int *workA, *workB, *workC, *pj_;
-	int_fast64_t lwork = (int_fast64_t) m + r + m + nnz0;
-	Matrix_Calloc(workA, lwork, int);
-	workB = workA + m;
-	workC = workB + r;
-	pj_   = workC + m;
-
-#define TSORT(c) \
-	do { \
-		c##IF_NPATTERN( \
-		c##TYPE *px0 = c##PTR(x0), *px1, *px_; \
-		Matrix_Calloc(px_, nnz0, c##TYPE); \
-		); \
-		 \
-		/* 1. Tabulate column indices in workA[i]                         */ \
-		 \
-		for (k = 0; k < nnz0; ++k) \
-			++workA[pi0[k]]; \
-		 \
-		/* 2. Compute cumulative sum in workA[i], copying to workB[i]     */ \
-		/*                                                                */ \
-		/* workA[i]: number of column indices listed for row i,           */ \
-		/*           incl. duplicates                                     */ \
-		 \
-		for (i = 1; i < m; ++i) \
-			workA[i] += (workB[i] = workA[i - 1]); \
-		 \
-		/* 3. Group column indices and data by row in pj_[k], px_[k]      */ \
-		/*                                                                */ \
-		/* workA[i]: number of column indices listed for row <= i,        */ \
-		/*           incl. duplicates                                     */ \
-		/* workB[i]: number of column indices listed for row <  i,        */ \
-		/*           incl. duplicates                                     */ \
-		 \
-		for (k = 0; k < nnz0; ++k) { \
-			pj_[workB[pi0[k]]] = pj0[k]; \
-			c##IF_NPATTERN( \
-			px_[workB[pi0[k]]] = px0[k]; \
-			); \
-			++workB[pi0[k]]; \
-		} \
-		 \
-		/* 4. Gather _unique_ column indices at the front of each group,  */ \
-		/*    aggregating data accordingly; record in workC[i] where      */ \
-		/*    the unique column indices stop and the duplicates begin     */ \
-		/*                                                                */ \
-		/* workB[.]: unused                                               */ \
-		/*   pj_[k]: column indices grouped by row,                       */ \
-		/*           incl. duplicates, unsorted                           */ \
-		/*   px_[k]: corresponding data                                   */ \
-		 \
-		k = 0; \
-		for (j = 0; j < n; ++j) \
-			workB[j] = -1; \
-		for (i = 0; i < m; ++i) { \
-			kstart = kend_ = k; \
-			kend = workA[i]; \
-			while (k < kend) { \
-				if (workB[pj_[k]] < kstart) { \
-					/* Have not yet seen this column index */ \
-					workB[pj_[k]] = kend_; \
-					pj_[kend_] = pj_[k]; \
-					c##IF_NPATTERN( \
-					px_[kend_] = px_[k]; \
-					); \
-					++kend_; \
-				} else { \
-					/* Have already seen this column index */ \
-					c##IF_NPATTERN( \
-					c##INCREMENT_IDEN(px_[workB[pj_[k]]], px_[k]); \
-					); \
-				} \
-				++k; \
-			} \
-			workC[i] = kend_; \
-			nnz1 += kend_ - kstart; \
-		} \
-		 \
-		/* 5. Tabulate _unique_ column indices in workB[j]                */ \
-		/*                                                                */ \
-		/* workC[i]: pointer to first non-unique column index in row i    */ \
-		/*   pi_[k]: column indices grouped by row,                       */ \
-		/*           with unique indices in front,                        */ \
-		/*           i.e., in positions workA[i - 1] <= k < workC[i]      */ \
-		/*   px_[k]: corresponding data, "cumulated" appropriately        */ \
-		 \
-		k = 0; \
-		memset(workB, 0, sizeof(int) * (size_t) n); \
-		for (i = 0; i < m; ++i) { \
-			kend_ = workC[i]; \
-			while (k < kend_) { \
-				++workB[pj_[k]]; \
-				++k; \
-			} \
-			k = workA[i]; \
-		} \
-		 \
-		/* 6. Compute cumulative sum in pp1[j], copying to workB[j]       */ \
-		/*                                                                */ \
-		/* workB[j]: number of nonzero elements in column j               */ \
-		 \
-		for (j = 0; j < n; ++j) { \
-			pp1[j] = pp1[j - 1] + workB[j]; \
-			workB[j] = pp1[j - 1]; \
-		} \
-		 \
-		PROTECT(*i1 = allocVector(    INTSXP, nnz1)); \
-		pi1 = INTEGER(*i1); \
-		c##IF_NPATTERN( \
-		PROTECT(*x1 = allocVector(c##TYPESXP, nnz1)); \
-		px1 =  c##PTR(*x1); \
-		); \
-		 \
-		/* 7. Pop unique (i,j) pairs from the unsorted stacks 0 <= i < m  */ \
-		/*    onto new stacks 0 <= j < n, which will be sorted            */ \
-		/*                                                                */ \
-		/* workB[j]: number of nonzero elements in columns <  j           */ \
-		/*   pp1[j]: number of nonzero elements in columns <= j           */ \
-		 \
-		k = 0; \
-		for (i = 0; i < m; ++i) { \
-			kend_ = workC[i]; \
-			while (k < kend_) { \
-				pi1[workB[pj_[k]]] = i; \
-				c##IF_NPATTERN( \
-				px1[workB[pj_[k]]] = px_[k]; \
-				); \
-				++workB[pj_[k]]; \
-				++k; \
-			} \
-			k = workA[i]; \
-		} \
-		 \
-		c##IF_NPATTERN( \
-		Matrix_Free(px_, nnz0); \
-		UNPROTECT(1); /* *x1 */ \
-		); \
-		UNPROTECT(1); /* *i1 */ \
-	} while (0)
-
-	SWITCH5((x0) ? typeToKind(TYPEOF(x0)) : 'n', TSORT);
-
-#undef TSORT
-
-	Matrix_Free(workA, lwork);
-	UNPROTECT(1); /* *p1 */
-	return;
-}
-
-void taggr(SEXP i0, SEXP j0, SEXP x0, SEXP *i1, SEXP *j1, SEXP *x1,
-           int m, int n)
-{
-	if (XLENGTH(i0) > INT_MAX)
-		error(_("unable to aggregate %s with '%s' and '%s' slots of length exceeding %s"),
-		      "TsparseMatrix", "i", "j", "2^31-1");
-	int nnz0 = (int) XLENGTH(i0), nnz1 = 0;
-
-	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), *pi1, *pj1,
-		i, j, r = (m < n) ? n : m, k, kstart, kend, kend_;
-
-	int *workA, *workB, *workC, *pj_;
-	int_fast64_t lwork = (int_fast64_t) m + r + m + nnz0;
-	Matrix_Calloc(workA, lwork, int);
-	workB = workA + m;
-	workC = workB + r;
-	pj_   = workC + m;
-
-#define TAGGR(c) \
-	do { \
-		c##IF_NPATTERN( \
-		c##TYPE *px0 = c##PTR(x0), *px1, *px_; \
-		Matrix_Calloc(px_, nnz0, c##TYPE); \
-		); \
-		 \
-		/* 1. Tabulate column indices in workA[i]                         */ \
-		 \
-		for (k = 0; k < nnz0; ++k) \
-			++workA[pi0[k]]; \
-		 \
-		/* 2. Compute cumulative sum in workA[i], copying to workB[i]     */ \
-		/*                                                                */ \
-		/* workA[i]: number of column indices listed for row i,           */ \
-		/*           incl. duplicates                                     */ \
-		 \
-		for (i = 1; i < m; ++i) \
-			workA[i] += (workB[i] = workA[i - 1]); \
-		 \
-		/* 3. Group column indices and data by row in pj_[k], px_[k]      */ \
-		/*                                                                */ \
-		/* workA[i]: number of column indices listed for row <= i,        */ \
-		/*           incl. duplicates                                     */ \
-		/* workB[i]: number of column indices listed for row <  i,        */ \
-		/*           incl. duplicates                                     */ \
-		 \
-		for (k = 0; k < nnz0; ++k) { \
-			pj_[workB[pi0[k]]] = pj0[k]; \
-			c##IF_NPATTERN( \
-			px_[workB[pi0[k]]] = px0[k]; \
-			); \
-			++workB[pi0[k]]; \
-		} \
-		 \
-		/* 4. Gather _unique_ column indices at the front of each group,  */ \
-		/*    aggregating data accordingly; record in workC[i] where      */ \
-		/*    the unique column indices stop and the duplicates begin     */ \
-		/*                                                                */ \
-		/* workB[.]: unused                                               */ \
-		/*   pj_[k]: column indices grouped by row,                       */ \
-		/*           incl. duplicates, unsorted                           */ \
-		/*   px_[k]: corresponding data                                   */ \
-		 \
-		k = 0; \
-		for (j = 0; j < n; ++j) \
-			workB[j] = -1; \
-		for (i = 0; i < m; ++i) { \
-			kstart = kend_ = k; \
-			kend = workA[i]; \
-			while (k < kend) { \
-				if (workB[pj_[k]] < kstart) { \
-					/* Have not yet seen this column index */ \
-					workB[pj_[k]] = kend_; \
-					pj_[kend_] = pj_[k]; \
-					c##IF_NPATTERN( \
-					px_[kend_] = px_[k]; \
-					); \
-					++kend_; \
-				} else { \
-					/* Have already seen this column index */ \
-					c##IF_NPATTERN( \
-					c##INCREMENT_IDEN(px_[workB[pj_[k]]], px_[k]); \
-					); \
-				} \
-				++k; \
-			} \
-			workC[i] = kend_; \
-			nnz1 += kend_ - kstart; \
-		} \
-		if (nnz1 != nnz0) { \
-			PROTECT(*i1 = allocVector(    INTSXP, nnz1)); \
-			PROTECT(*j1 = allocVector(    INTSXP, nnz1)); \
-			pi1 = INTEGER(*i1); \
-			pj1 = INTEGER(*j1); \
-			c##IF_NPATTERN( \
-			PROTECT(*x1 = allocVector(c##TYPESXP, nnz1)); \
-			px1 =  c##PTR(*x1); \
-			); \
-			 \
-			k = 0; \
-			for (i = 0; i < m; ++i) { \
-				kend_ = workC[i]; \
-				while (k < kend_) { \
-					*(pi1++) =      i ; \
-					*(pj1++) = pj_[k] ; \
-					c##IF_NPATTERN( \
-					*(px1++) = px_[k]; \
-					); \
-					++k; \
-				} \
-				k = workA[i]; \
-			} \
-			 \
-			c##IF_NPATTERN( \
-			UNPROTECT(1); /* x1 */ \
-			); \
-			UNPROTECT(2); /* j1, i1 */ \
-		} \
-		c##IF_NPATTERN( \
-		Matrix_Free(px_, nnz0); \
-		); \
-	} while (0)
-
-	SWITCH5((x0) ? typeToKind(TYPEOF(x0)) : 'n', TAGGR);
-
-#undef TAGGR
-
-	Matrix_Free(workA, lwork);
-	return;
-}
-
 SEXP sparse_as_Csparse(SEXP from, const char *class)
 {
 	if (class[2] == 'C')
@@ -3444,41 +3094,81 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 			i1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[m]));
+		int *pp0 = INTEGER(p0), *pj0 = INTEGER(j0),
+			*pp1 = INTEGER(p1), *pi1 = INTEGER(i1), *iwork = NULL;
 		SET_SLOT(to, Matrix_pSym, p1);
 		SET_SLOT(to, Matrix_iSym, i1);
-		if (class[0] == 'n')
-			trans(p0, j0, NULL, p1, i1, NULL, n, m, 'T');
-		else {
-			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[m]));
-			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, j0, x0, p1, i1, x1, n, m, 'T');
-			UNPROTECT(2); /* x1, x0 */
-		}
+		Matrix_Calloc(iwork, n, int);
+
+#define SAC(c) \
+		do { \
+			c##TYPE *px0 = NULL, *px1 = NULL; \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
+				x1 = PROTECT(allocVector(c##TYPESXP, INTEGER(p0)[m])); \
+			px0 = c##PTR(x0); \
+			px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			UNPROTECT(2); /* x1, x0 */ \
+			); \
+			c##sptrans(pp1, pi1, px1, pp0, pj0, px0, n, m, 'T', iwork); \
+		} while (0)
+
+		SWITCH5(class[0], SAC);
+
+#undef SAC
+
+		Matrix_Free(iwork, n);
 		UNPROTECT(4); /* i1, p1, j0, p0 */
 	} else {
-		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
-			p1 = NULL, i1 = NULL;
-		if (class[0] == 'n') {
-			tsort(i0, j0, NULL, &p1, &i1, NULL, m, n);
-			PROTECT(p1);
-			PROTECT(i1);
-			SET_SLOT(to, Matrix_pSym, p1);
-			SET_SLOT(to, Matrix_iSym, i1);
-			UNPROTECT(2); /* i1, p1 */
-		} else {
-			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = NULL;
-			tsort(i0, j0, x0, &p1, &i1, &x1, m, n);
-			PROTECT(p1);
-			PROTECT(i1);
-			PROTECT(x1);
-			SET_SLOT(to, Matrix_pSym, p1);
-			SET_SLOT(to, Matrix_iSym, i1);
-			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(4); /* x1, i1, p1, x0 */
-		}
+		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
+		if (XLENGTH(i0) > INT_MAX)
+			error(_("number of triplets to be aggregated exceeds %s"),
+			      "2^31-1");
+		int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0);
+
+		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), p1, i1;
+		int *pj0 = INTEGER(j0), *pp1 = NULL, *pi1 = NULL, *iwork = NULL;
+		size_t liwork = (size_t) ((int_fast64_t) m + 1 + m + n + nnz),
+			lwork = (size_t) nnz;
+		Matrix_Calloc(iwork, liwork, int);
+
+#define SAC(c) \
+		do { \
+			c##TYPE *px0 = NULL, *px1 = NULL, *work = NULL; \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
+			px0 = c##PTR(x0); \
+			Matrix_Calloc(work, lwork, c##TYPE); \
+			); \
+			c##spsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
+			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) n + 1)), \
+			PROTECT(i1 = allocVector(INTSXP, nnz)); \
+			pp1 = INTEGER(p1); \
+			pi1 = INTEGER(i1); \
+			SET_SLOT(to, Matrix_pSym, p1); \
+			SET_SLOT(to, Matrix_iSym, i1); \
+			c##IF_NPATTERN( \
+			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			); \
+			c##spsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
+			c##IF_NPATTERN( \
+			UNPROTECT(1); /* x1 */ \
+			); \
+			UNPROTECT(2); /* i1, p1 */ \
+			c##IF_NPATTERN( \
+			Matrix_Free(work, lwork); \
+			UNPROTECT(1); /* x0 */ \
+			); \
+		} while (0)
+
+		SWITCH5(class[0], SAC);
+
+#undef SAC
+
+		Matrix_Free(iwork, liwork);
 		UNPROTECT(2); /* j0, i0 */
 	}
 
@@ -3545,41 +3235,81 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
 			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) m + 1)),
 			j1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[n]));
+		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
+			*pp1 = INTEGER(p1), *pj1 = INTEGER(j1), *iwork = NULL;
 		SET_SLOT(to, Matrix_pSym, p1);
 		SET_SLOT(to, Matrix_jSym, j1);
-		if (class[0] == 'n')
-			trans(p0, i0, NULL, p1, j1, NULL, m, n, 'T');
-		else {
-			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = PROTECT(allocVector(TYPEOF(x0), INTEGER(p0)[n]));
-			SET_SLOT(to, Matrix_xSym, x1);
-			trans(p0, i0, x0, p1, j1, x1, m, n, 'T');
-			UNPROTECT(2); /* x1, x0 */
-		}
+		Matrix_Calloc(iwork, m, int);
+
+#define SAR(c) \
+		do { \
+			c##TYPE *px0 = NULL, *px1 = NULL; \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
+				x1 = PROTECT(allocVector(c##TYPESXP, INTEGER(p0)[n])); \
+			px0 = c##PTR(x0); \
+			px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			UNPROTECT(2); /* x1, x0 */ \
+			); \
+			c##sptrans(pp1, pj1, px1, pp0, pi0, px0, m, n, 'T', iwork); \
+		} while (0)
+
+		SWITCH5(class[0], SAR);
+
+#undef SAR
+
+		Matrix_Free(iwork, m);
 		UNPROTECT(4); /* j1, p1, i0, p0 */
 	} else {
-		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
-			p1 = NULL, j1 = NULL;
-		if (class[0] == 'n') {
-			tsort(j0, i0, NULL, &p1, &j1, NULL, n, m);
-			PROTECT(p1);
-			PROTECT(j1);
-			SET_SLOT(to, Matrix_pSym, p1);
-			SET_SLOT(to, Matrix_jSym, j1);
-			UNPROTECT(2); /* j1, p1 */
-		} else {
-			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = NULL;
-			tsort(j0, i0, x0, &p1, &j1, &x1, n, m);
-			PROTECT(p1);
-			PROTECT(j1);
-			PROTECT(x1);
-			SET_SLOT(to, Matrix_pSym, p1);
-			SET_SLOT(to, Matrix_jSym, j1);
-			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(4); /* x1, j1, p1, x0 */
-		}
+		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
+		if (XLENGTH(i0) > INT_MAX)
+			error(_("number of triplets to be aggregated exceeds %s"),
+			      "2^31-1");
+		int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0);
+
+		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), p1, j1;
+		int *pj0 = INTEGER(j0), *pp1 = NULL, *pj1 = NULL, *iwork = NULL;
+		size_t liwork = (size_t) ((int_fast64_t) n + 1 + n + m + nnz),
+			lwork = (size_t) nnz;
+		Matrix_Calloc(iwork, liwork, int);
+
+#define SAR(c) \
+		do { \
+			c##TYPE *px0 = NULL, *px1 = NULL, *work = NULL; \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
+			px0 = c##PTR(x0); \
+			Matrix_Calloc(work, nnz, c##TYPE); \
+			); \
+			c##spsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) m + 1)), \
+			PROTECT(j1 = allocVector(INTSXP, nnz)); \
+			pp1 = INTEGER(p1); \
+			pj1 = INTEGER(j1); \
+			SET_SLOT(to, Matrix_pSym, p1); \
+			SET_SLOT(to, Matrix_jSym, j1); \
+			c##IF_NPATTERN( \
+			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			); \
+			c##spsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+			c##IF_NPATTERN( \
+			UNPROTECT(1); /* x1 */ \
+			); \
+			UNPROTECT(2); /* j1, p1 */ \
+			c##IF_NPATTERN( \
+			Matrix_Free(work, lwork); \
+			UNPROTECT(1); /* x0 */ \
+			); \
+		} while (0)
+
+		SWITCH5(class[0], SAR);
+
+#undef SAR
+
+		Matrix_Free(iwork, liwork);
 		UNPROTECT(2); /* j0, i0 */
 	}
 
@@ -3641,10 +3371,17 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		UNPROTECT(1); /* factors */
 	}
 
+	if (class[2] == 'R') {
+		int tmp;
+		tmp = m; m = n; n = tmp;
+	}
+
+	SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
+	int *pp0 = INTEGER(p0), nnz = pp0[n];
+	pp0++;
+
 	SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
-		p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 		i0 = PROTECT(GET_SLOT(from, iSym));
-	int *pp0 = INTEGER(p0) + 1, r = (class[2] == 'C') ? n : m, nnz = pp0[r - 1];
 	if (XLENGTH(i0) == nnz)
 		SET_SLOT(to, iSym, i0);
 	else {
@@ -3653,16 +3390,16 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		SET_SLOT(to, iSym, i1);
 		UNPROTECT(1); /* i1 */
 	}
+
 	SEXP jSym = (class[2] == 'C') ? Matrix_jSym : Matrix_iSym,
 		j1 = PROTECT(allocVector(INTSXP, nnz));
 	int *pj1 = INTEGER(j1), j, k, kend;
 	SET_SLOT(to, jSym, j1);
-	for (j = 0, k = 0; j < r; ++j) {
+	for (j = 0, k = 0; j < n; ++j) {
 		kend = pp0[j];
 		while (k < kend)
 			pj1[k++] = j;
 	}
-	UNPROTECT(3); /* j1, i0, p0 */
 
 	if (class[0] != 'n') {
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
@@ -3683,7 +3420,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		UNPROTECT(1); /* x0 */
 	}
 
-	UNPROTECT(1); /* to */
+	UNPROTECT(4); /* j1, i0, p0, to */
 	return to;
 }
 
