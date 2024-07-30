@@ -872,57 +872,224 @@ c##band1(c##TYPE *x, const c##TYPE *y, \
 	} \
 	return; \
 } \
- \
-void \
-c##sptrans(int *p0, int *i0, c##TYPE *x0, \
-           int *p1, int *i1, c##TYPE *x1, \
-           int m, int n, char trans) \
-{ \
-	int i, j, k, kend, nnz = p0[n], *p_ = NULL; \
-	Matrix_Calloc(p_, m, int); \
-	p0++; *(p1++) = 0; \
-	memset(pp1, 0, sizeof(int) * (size_t) m); \
-	for (k = 0; k < nnz; ++k) \
-		++p1[i0[k]]; \
-	for (i = 0; i < m; ++i) \
-		p1[i] += (p_[i] = p1[i - 1]); \
-	if (!x1) \
-		for (j = 0, k = 0; j < n; ++j) { \
-			kend = p0[j]; \
-			while (k < kend) { \
-				i = i0[k]; \
-				i1[p_[i]++] = j; \
-				++k; \
-			} \
-		} \
-	else if (trans == 'C') \
-		for (j = 0, k = 0; j < n; ++j) { \
-			kend = p0[j]; \
-			while (k < kend) { \
-				i = i0[k]; \
-				c##ASSIGN_CONJ(x1[p_[i]], x0[k]); \
-				i1[p_[i]++] = j; \
-				++k; \
-			} \
-		} \
-	else \
-		for (j = 0, k = 0; j < n; ++j) { \
-			kend = p0[j]; \
-			while (k < kend) { \
-				i = i0[k]; \
-				c##ASSIGN_IDEN(x1[p_[i]], x0[k]); \
-				i1[p_[i]++] = j; \
-				++k; \
-			} \
-		} \
-	Matrix_Free(p_, m); \
-	return; \
-} \
 
 
 TEMPLATE(i)
 TEMPLATE(d)
 TEMPLATE(z)
+
+#undef TEMPLATE
+
+#define TEMPLATE(c) \
+void c##spaggr(      int *i1,       int *j1,       c##TYPE *x1, \
+               const int *i0, const int *j0, const c##TYPE *x0, \
+               int m, int n, int *nnz, int *iwork, c##TYPE *work) \
+{ \
+	int *iworkA = iwork, *iworkB = iworkA + m + 1, *iworkC = iworkB + m, \
+		*j_ = iworkC + n, i, j, k, kend, ka, kb; \
+	c##IF_NPATTERN( \
+	c##TYPE *x_ = work; \
+	); \
+	 \
+	if (!i1) { \
+	 \
+	int nnz0 = *nnz, nnz1 = 0; \
+	 \
+	/* 1. Tabulate column indices in iworkA[i]                        */ \
+	 \
+	for (i = 0; i <= m; ++i) \
+		iworkA[i] = 0; \
+	++iworkA; \
+	for (k = 0; k < nnz0; ++k) \
+		++iworkA[i0[k]]; \
+	for (i = 0; i < m; ++i) \
+		iworkA[i] += iworkA[i - 1]; \
+	--iworkA; \
+	 \
+	/* iworkA[i]: number of column indices listed for row < i,        */ \
+	/*            incl. duplicates                                    */ \
+	 \
+	/* 2. Group column indices and data by row in j_[k], x_[k]        */ \
+	 \
+	for (k = 0; k < nnz0; ++k) { \
+		c##IF_NPATTERN( \
+		x_[iworkA[i0[k]]  ] = x0[k]; \
+		); \
+		j_[iworkA[i0[k]]++] = j0[k]; \
+	} \
+	 \
+	/* iworkA[i]: number of column indices listed for row <= i,       */ \
+	/*            incl. duplicates                                    */ \
+	/*     j_[k]: column indices grouped by row,                      */ \
+	/*            incl. duplicates, unsorted                          */ \
+	/*     x_[k]: corresponding data                                  */ \
+	 \
+	/* 3. Gather _unique_ column indices at the front of each group,  */ \
+	/*    aggregating data accordingly; record in iworkB[i] where     */ \
+	/*    the unique column indices stop and the duplicates begin     */ \
+	 \
+	for (j = 0; j < n; ++j) \
+		iworkC[j] = -1; \
+	for (i = 0, k = 0; i < m; ++i) { \
+		kend = iworkA[i]; \
+		ka = kb = k; \
+		while (k < kend) { \
+			if (iworkC[j_[k]] < ka) { \
+				/* Have not yet seen this column index */ \
+				iworkC[j_[k]] = kb; \
+				c##IF_NPATTERN( \
+				x_[kb  ] = x_[k]; \
+				); \
+				j_[kb++] = j_[k]; \
+			} else { \
+				/* Have already seen this column index */ \
+				c##IF_NPATTERN( \
+				c##INCREMENT_IDEN(x_[iworkC[j_[k]]], x_[k]); \
+				); \
+			} \
+			++k; \
+		} \
+		iworkB[i] = kb; \
+		nnz1 += kb - ka; \
+	} \
+	 \
+	/* iworkB[i]: pointer to first non-unique column index in row i   */ \
+	/*     j_[k]: column indices grouped by row                       */ \
+	/*            with unique indices in front,                       */ \
+	/*            i.e., in positions iworkA[i - 1] <= k < iworkB[i]   */ \
+	/*     x_[k]: corresponding data "cumulated" appropriately        */ \
+	 \
+	*nnz = nnz1; \
+	 \
+	} else { \
+	 \
+	/* 4. Copy unique (i,j) pairs from the unsorted stacks 0 <= i < m */ \
+	 \
+	for (i = 0, k = 0; i < m; ++i) { \
+		kb = iworkB[i]; \
+		while (k < kb) { \
+			*(i1++) = i; \
+			*(j1++) = j_[k]; \
+			c##IF_NPATTERN( \
+			*(x1++) = x_[k]; \
+			); \
+			++k; \
+		} \
+		k = iworkA[i]; \
+	} \
+	 \
+	} \
+	 \
+	return; \
+} \
+ \
+void c##spsort(      int *p1,       int *i1,       c##TYPE *x1, \
+               const int *i0, const int *j0, const c##TYPE *x0, \
+               int m, int n, int *nnz, int *iwork, c##TYPE *work) \
+{ \
+	if (!i1) { \
+	 \
+	c##spaggr(NULL, NULL, NULL, i0, j0, x0, m, n, nnz, iwork, work); \
+	 \
+	} else { \
+	 \
+	int *iworkA = iwork, *iworkB = iworkA + m + 1, *iworkC = iworkB + m, \
+		*j_ = iworkC + n, i, j, k, kb; \
+	c##IF_NPATTERN( \
+	c##TYPE *x_ = work; \
+	); \
+	 \
+	/* 4. Tabulate _unique_ column indices in iworkC[j]               */ \
+	 \
+	for (j = 0; j <= n; ++j) \
+		p1[j] = 0; \
+	++p1; \
+	for (i = 0, k = 0; i < m; ++i) { \
+		kb = iworkB[i]; \
+		while (k < kb) { \
+			++p1[j_[k]]; \
+			++k; \
+		} \
+		k = iworkA[i]; \
+	} \
+	for (j = 0; j < n; ++j) \
+		p1[j] += (iworkC[j] = p1[j - 1]); \
+	--p1; \
+	 \
+	/* iworkC[j]: number of nonzero elements in columns < j           */ \
+	 \
+	/* 5. Pop unique (i,j) pairs from the unsorted stacks 0 <= i < m  */ \
+	/*    onto new stacks 0 <= j < n, which will be sorted            */ \
+	 \
+	for (i = 0, k = 0; i < m; ++i) { \
+		kb = iworkB[i]; \
+		while (k < kb) { \
+			c##IF_NPATTERN( \
+			x1[iworkC[j_[k]]  ] = x_[k]; \
+			); \
+			i1[iworkC[j_[k]]++] = i; \
+			++k; \
+		} \
+		k = iworkA[i]; \
+	} \
+	 \
+	/* iworkC[j]: number of nonzero elements in columns <= j          */ \
+	 \
+	} \
+	 \
+	return; \
+} \
+ \
+void c##sptrans(      int *p1,       int *i1,       c##TYPE *x1, \
+                const int *p0, const int *i0, const c##TYPE *x0, \
+                int m, int n, char trans, int *iwork) \
+{ \
+	int i, j, k, kend, nnz = p0[n]; \
+	p0++; \
+	 \
+	for (i = 0; i <= m; ++i) \
+		p1[i] = 0; \
+	++p1; \
+	for (k = 0; k < nnz; ++k) \
+		++p1[i0[k]]; \
+	for (i = 0; i < m; ++i) \
+		p1[i] += (iwork[i] = p1[i - 1]); \
+	--p1; \
+	 \
+	if (trans == 'C') \
+	for (j = 0, k = 0; j < n; ++j) { \
+		kend = p0[j]; \
+		while (k < kend) { \
+			c##IF_NPATTERN( \
+			c##ASSIGN_CONJ(x1[iwork[i0[k]]], x0[k]); \
+			); \
+			i1[iwork[i0[k]]++] = j; \
+			++k; \
+		} \
+	} \
+	else \
+	for (j = 0, k = 0; j < n; ++j) { \
+		kend = p0[j]; \
+		while (k < kend) { \
+			c##IF_NPATTERN( \
+			c##ASSIGN_IDEN(x1[iwork[i0[k]]], x0[k]); \
+			); \
+			i1[iwork[i0[k]]++] = j; \
+			++k; \
+		} \
+	} \
+	 \
+	return; \
+} \
+
+
+TEMPLATE(n)
+TEMPLATE(l)
+TEMPLATE(i)
+TEMPLATE(d)
+TEMPLATE(z)
+
+#undef TEMPLATE
 
 void zvreal(Rcomplex *x, const Rcomplex *y, size_t n)
 {
