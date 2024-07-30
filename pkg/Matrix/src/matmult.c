@@ -913,7 +913,7 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 			cholmod_free_sparse(&X, &c);
 		if (!Z->sorted)
 			cholmod_sort(Z, &c);
-		X = cholmod_copy(Z, 1, !boolean, &c);
+		X = cholmod_copy(Z, (ztrans != 'N') ? -1 : 1, !boolean, &c);
 		cholmod_free_sparse(&Z, &c);
 		Z = X;
 		PROTECT(z = CHS2M(Z, !boolean, zclass[1]));
@@ -923,6 +923,12 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
 		symDN(zdimnames, xdimnames, (xtrans != 'N') ? 1 : 0);
 		UNPROTECT(2); /* zdimnames, xdimnames */
+
+		if (ztrans != 'N') {
+			SEXP zuplo = PROTECT(mkString("L"));
+			SET_SLOT(z, Matrix_uploSym, zuplo);
+			UNPROTECT(1); /* zuplo */
+		}
 
 		if (zclass[1] == 's' && zclass[0] == 'z') {
 			SEXP ztrans = PROTECT(mkString("T"));

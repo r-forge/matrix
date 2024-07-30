@@ -369,7 +369,7 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 {
 	if (class[0] != 'z')
 		op_ct = '\0';
-	
+
 	SEXP to = PROTECT(newObject(class));
 	int packed = class[2] == 'p';
 
@@ -1208,7 +1208,7 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 
 #undef IST
 
-	return (op_ul == '\0' || op_ul == 'U') ? 1 : -1;
+	return 0;
 }
 
 /* isTriangular(<denseMatrix>, upper) */

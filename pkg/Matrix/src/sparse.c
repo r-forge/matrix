@@ -1353,7 +1353,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		op_ct = '\0';
 
 	char
-		ul0 = '\0', ul1 = (class[2] != 'R') ? 'U' : 'L',
+		ul0 = '\0', ul1 = 'U',
 		ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0',
 		di0 = '\0';
 	if (class[1] != 'g') {
@@ -2488,7 +2488,7 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 			} \
 		} \
 	} while (0)
-		
+
 	SWITCH5((exact) ? class[0] : 'n', ISS);
 
 #undef ISS
@@ -2620,45 +2620,45 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 		pp++;
 		UNPROTECT(2); /* i, p */
 
-		if (op_ul == '\0') {
-			/* Examine  last entry in each "column" */
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[kend - 1] > j)
-					break;
-				k = kend;
-			}
-			if (j == n)
-				return (class[2] == 'C') ? 1 : -1;
-			/* Examine first entry in each "column" */
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[k] < j)
-					break;
-				k = kend;
-			}
-			if (j == n)
-				return (class[2] == 'C') ? -1 : 1;
-			return 0;
-		} else if ((class[2] == 'C') == (op_ul == 'U')) {
-			/* Examine  last entry in each "column" */
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[kend - 1] > j)
-					return 0;
-				k = kend;
-			}
-			return (class[2] == 'C') ? 1 : -1;
-		} else {
-			/* Examine first entry in each "column" */
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[k] < j)
-					return 0;
-				k = kend;
-			}
-			return (class[2] == 'C') ? -1 : 1;
+#define IST_CURL(t) \
+		do { \
+			for (j = 0, k = 0; j < n; ++j) { \
+				kend = pp[j]; \
+				if (k < kend && pi[kend - 1] > j) \
+					break; \
+				k = kend; \
+			} \
+			if (j == n) \
+				return t; \
+		} while (0)
+
+#define IST_CLRU(t) \
+		do { \
+			for (j = 0, k = 0; j < n; ++j) { \
+				kend = pp[j]; \
+				if (k < kend && pi[k] < j) \
+					break; \
+				k = kend; \
+			} \
+			if (j == n) \
+				return t; \
+		} while (0)
+
+		if (op_ul == '\0' || op_ul == 'U') {
+			if (class[2] == 'C')
+			IST_CURL(1);
+			else
+			IST_CLRU(1);
 		}
+		if (op_ul == '\0' || op_ul != 'U') {
+			if (class[2] == 'C')
+			IST_CLRU(-1);
+			else
+			IST_CURL(-1);
+		}
+
+#undef IST_CURL
+#undef IST_CLRU
 
 	} else {
 
@@ -2668,31 +2668,24 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 		R_xlen_t k, kend = XLENGTH(i);
 		UNPROTECT(2); /* i, j */
 
-		if (op_ul == '\0') {
+		if (op_ul == '\0' || op_ul == 'U') {
 			for (k = 0; k < kend; ++k)
 				if (pi[k] > pj[k])
 					break;
 			if (k == kend)
 				return  1;
+		}
+		if (op_ul == '\0' || op_ul != 'U') {
 			for (k = 0; k < kend; ++k)
 				if (pi[k] < pj[k])
 					break;
 			if (k == kend)
 				return -1;
-			return  0;
-		} else if (op_ul == 'U') {
-			for (k = 0; k < kend; ++k)
-				if (pi[k] > pj[k])
-					return 0;
-			return  1;
-		} else {
-			for (k = 0; k < kend; ++k)
-				if (pi[k] < pj[k])
-					return 0;
-			return -1;
 		}
 
 	}
+
+	return 0;
 }
 
 /* isTriangular(<[CRT]sparseMatrix>, upper)
@@ -2755,7 +2748,7 @@ int sparse_is_diagonal(SEXP obj, const char *class)
 		int *pi = INTEGER(i), *pj = INTEGER(j);
 		R_xlen_t k, kend = XLENGTH(i);
 		UNPROTECT(2); /* j, i */
-		
+
 		for (k = 0; k < kend; ++k)
 			if (pi[k] != pj[k])
 				return 0;
