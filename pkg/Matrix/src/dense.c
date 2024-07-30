@@ -289,7 +289,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 			c##NAME(copy2)(r_, px, m_ + 1, pv, d_); \
 		else if (ul == 'U') \
 			c##NAME(copy1)(n_, px, 2 , 1, 0, pv, d_, 0, 0); \
-		else  \
+		else \
 			c##NAME(copy1)(n_, px, n_, 1, 1, pv, d_, 0, 0); \
 	} while (0)
 
@@ -977,7 +977,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 	if (n == 0 || (n == 1 && op_ct != 'C'))
 		return 1;
 	if (!exact)
-		return NA_LOGICAL; /* => do inexact numerical test in R */
+		return NA_LOGICAL; /* do inexact numerical test in R */
 
 	char ul = '\0';
 	if (class[1] != 'g') {
@@ -1027,6 +1027,9 @@ int dense_is_symmetric(SEXP obj, const char *class,
 			pl = px + j + 1;
 		}
 	} else if (class[1] == 's') {
+		/* Testing if Hermitian matrix is symmetric */
+		/*      or if symmetric matrix is Hermitian */
+		/* <=====> if matrix is real                */
 		if (ul == 'U')
 		for (j = 0; j < n; ++j) {
 			for (i = 0; i < j; ++i) {
@@ -1054,6 +1057,8 @@ int dense_is_symmetric(SEXP obj, const char *class,
 			}
 		}
 	} else {
+		/* Testing if non-unit triangular matrix is Hermitian */
+		/* <=====> if matrix is real and diagonal             */
 		if (ul == 'U')
 		for (j = 0; j < n; ++j) {
 			for (i = 0; i < j; ++i) {
@@ -1154,7 +1159,7 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 			for (j = 0; j < n; ++j) { \
 				pl += j + 1; \
 				for (i = j + 1; i < n; ++i) { \
-					if (c##NOT_ZERO(*pl)) {	\
+					if (c##NOT_ZERO(*pl)) { \
 						j = n; \
 						break; \
 					} \
@@ -1394,7 +1399,7 @@ void dense_colsum(SEXP x, const char *class,
 				tmp = c##CAST(*px); \
 				d##INCREMENT_IDEN(*pa, tmp); \
 			} \
-			else if (!narm)	\
+			else if (!narm) \
 				*pa = d##NA; \
 			else if (mean) \
 				--count; \
