@@ -39,7 +39,7 @@ SEXP R_sparse_skewpart(SEXP, SEXP);
 int sparse_is_symmetric(SEXP, const char *, char, int, int);
 SEXP R_sparse_is_symmetric(SEXP, SEXP, SEXP, SEXP);
 
-int sparse_is_triangular(SEXP, const char *, int);
+int sparse_is_triangular(SEXP, const char *, char);
 SEXP R_sparse_is_triangular(SEXP, SEXP);
 
 int sparse_is_diagonal(SEXP, const char *);
