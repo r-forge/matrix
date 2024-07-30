@@ -1172,8 +1172,8 @@ setMethod("crossprod", c(x = "sparseVector", y = "missing"),
               if(if(is.na(boolArith)) .M.kind(x) == "n" else boolArith) {
                   if(!is.na(boolArith))
                       x <- .V2kind(.drop0(x, isM = FALSE), "n")
-                  .m2sparse(length(x@i) > 0L, "nsR")
-              } else .m2sparse(sum(x * x), ",sR"))
+                  .m2sparse(length(x@i) > 0L, "nsR", uplo = "L")
+              } else .m2sparse(sum(x * x), ",sR", uplo = "L"))
 
 setMethod("crossprod", c(x = "sparseVector", y = "sparseVector"),
           function(x, y = NULL, boolArith = NA, ...)

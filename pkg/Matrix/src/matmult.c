@@ -913,7 +913,7 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 			cholmod_free_sparse(&X, &c);
 		if (!Z->sorted)
 			cholmod_sort(Z, &c);
-		X = cholmod_copy(Z, (ztrans != 'N') ? -1 : 1, !boolean, &c);
+		X = cholmod_copy(Z, 1, !boolean, &c);
 		cholmod_free_sparse(&Z, &c);
 		Z = X;
 		PROTECT(z = CHS2M(Z, !boolean, zclass[1]));
@@ -923,12 +923,6 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 			zdimnames = PROTECT(GET_SLOT(z, Matrix_DimNamesSym));
 		symDN(zdimnames, xdimnames, (xtrans != 'N') ? 1 : 0);
 		UNPROTECT(2); /* zdimnames, xdimnames */
-
-		if (ztrans != 'N') {
-			SEXP zuplo = PROTECT(mkString("L"));
-			SET_SLOT(z, Matrix_uploSym, zuplo);
-			UNPROTECT(1); /* zuplo */
-		}
 
 		if (zclass[1] == 's' && zclass[0] == 'z') {
 			SEXP ztrans = PROTECT(mkString("T"));
@@ -1350,7 +1344,7 @@ void Csparse_rowscale(SEXP obj, SEXP d, SEXP iSym)
 	int *pi = INTEGER(i), k, kend = INTEGER(p)[XLENGTH(p) - 1];
 	UNPROTECT(3); /* i, p, x */
 
-#define SCALE(c, index)	\
+#define SCALE(c, index) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pd = c##PTR(d); \
 		for (k = 0; k < kend; ++k) { \
