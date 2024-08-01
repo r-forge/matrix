@@ -99,11 +99,6 @@ const char *valid_dense[], *valid_sparse[],
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
-#define    MINOF(x, y) ((x < y) ? x : y)
-#define    MAXOF(x, y) ((x < y) ? y : x)
-#define  FIRSTOF(x, y) (x)
-#define SECONDOF(x, y) (y)
-
 #define ISNA_PATTERN(_X_) (0)
 #define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
 #define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
@@ -126,36 +121,6 @@ const char *valid_dense[], *valid_sparse[],
 	(!ISNA_REAL   (_X_) && NOTZERO_REAL   (_X_))
 #define STRICTLY_NOTZERO_COMPLEX(_X_) \
 	(!ISNA_COMPLEX(_X_) && NOTZERO_COMPLEX(_X_))
-
-#define NOTREAL_PATTERN(_X_) 0
-#define NOTREAL_LOGICAL(_X_) 0
-#define NOTREAL_INTEGER(_X_) 0
-#define NOTREAL_REAL(_X_)    0
-#define NOTREAL_COMPLEX(_X_) (_X_.i != 0.0)
-
-#define NOTEQUAL_PATTERN(_X_, _Y_) \
-	((_X_ != 0) != (_Y_ != 0))
-#define NOTEQUAL_LOGICAL(_X_, _Y_) \
-	(_X_ != _Y_)
-#define NOTEQUAL_INTEGER(_X_, _Y_) \
-	(_X_ != _Y_)
-#define NOTEQUAL_REAL(_X_, _Y_) \
-	((ISNAN(_X_)) ? !ISNAN(_Y_) : ISNAN(_Y_) || _X_ != _Y_)
-#define NOTEQUAL_COMPLEX(_X_, _Y_) \
-	(((ISNAN(_X_.r)) ? !ISNAN(_Y_.r) : ISNAN(_Y_.r) || _X_.r != _Y_.r) || \
-	 ((ISNAN(_X_.i)) ? !ISNAN(_Y_.i) : ISNAN(_Y_.i) || _X_.i != _Y_.i))
-
-#define NOTCONJ_PATTERN(_X_, _Y_) \
-	((_X_ != 0) != (_Y_ != 0))
-#define NOTCONJ_LOGICAL(_X_, _Y_) \
-	(_X_ != _Y_)
-#define NOTCONJ_INTEGER(_X_, _Y_) \
-	(_X_ != _Y_)
-#define NOTCONJ_REAL(_X_, _Y_) \
-	((ISNAN(_X_)) ? !ISNAN(_Y_) : ISNAN(_Y_) || _X_ != _Y_)
-#define NOTCONJ_COMPLEX(_X_, _Y_) \
-	(((ISNAN(_X_.r)) ? !ISNAN(_Y_.r) : ISNAN(_Y_.r) || _X_.r !=  _Y_.r) || \
-	 ((ISNAN(_X_.i)) ? !ISNAN(_Y_.i) : ISNAN(_Y_.i) || _X_.i != -_Y_.i))
 
 #define INCREMENT_PATTERN(_X_, _Y_) \
 	do { \
@@ -197,31 +162,6 @@ const char *valid_dense[], *valid_sparse[],
 		_X_.r += _Y_.r; \
 		_X_.i -= _Y_.i; \
 	} while (0)
-
-#define ASSIGN1_REAL_RE(_X_, _Y_) _X_ = _Y_
-#define ASSIGN1_REAL_IM(_X_, _Y_)
-
-#define ASSIGN1_COMPLEX_RE(_X_, _Y_) _X_.r = _Y_
-#define ASSIGN1_COMPLEX_IM(_X_, _Y_) _X_.i = _Y_
-
-#define ASSIGN2_REAL_ID(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_REAL_CJ(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_REAL_RE(_X_, _Y_) _X_ = _Y_
-#define ASSIGN2_REAL_IM(_X_, _Y_) _X_ = 0.0
-
-#define ASSIGN2_COMPLEX_ID(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i =  _Y_.i; } while (0)
-#define ASSIGN2_COMPLEX_CJ(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i = -_Y_.i; } while (0)
-#define ASSIGN2_COMPLEX_RE(_X_, _Y_) \
-	do { _X_.r = _Y_.r; _X_.i =    0.0; } while (0)
-#define ASSIGN2_COMPLEX_IM(_X_, _Y_) \
-	do { _X_.r =   0.0; _X_.i =  _Y_.i; } while (0)
-
-#define SCALE1_REAL(_X_, _A_) \
-	do { _X_   *= _A_;               } while (0)
-#define SCALE1_COMPLEX(_X_, _A_) \
-	do { _X_.r *= _A_; _X_.i *= _A_; } while (0)
 
 #define SCALE2_REAL(_X_, _A_) \
 	do { _X_   /= _A_;               } while (0)
