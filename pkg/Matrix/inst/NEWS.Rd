@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-08-01 r4868)}{
+\section{Changes in version 1.8-0 (2024-08-01 r4871)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -66,6 +66,10 @@
 
       \item Warnings emitted by \option{-Wconversion} (but not those
       originating in SuiteSparse) are resolved.
+
+      \item \file{src/Makevars} is adjusted to ensure that use of
+      illegal entry points in SuiteSparse libraries is detected by
+      \command{R CMD check}. % TODO: patch SuiteSparse to avoid NOTE
     }
   }
 }
