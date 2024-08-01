@@ -18,8 +18,8 @@
     .Call(R_dense_transpose, x, "C")
 .dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_dense_force_symmetric, x, uplo, trans)
-.dense.symmpart <- function(x, trans = "C", ...)
-    .Call(R_dense_symmpart, x, "U", trans)
+.dense.symmpart <- function(x, uplo = "U", trans = "C", ...)
+    .Call(R_dense_symmpart, x, uplo, trans)
 .dense.skewpart <- function(x, trans = "C", ...)
     .Call(R_dense_skewpart, x, trans)
 .dense.is.sy <- function(object,

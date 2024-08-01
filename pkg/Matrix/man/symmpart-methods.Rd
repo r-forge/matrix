@@ -38,18 +38,21 @@ to \code{x} for all finite square matrices \code{x}.
 symmpart(x, \dots)
 skewpart(x, \dots)
 
-\S4method{symmpart}{denseMatrix}(x, trans = "C", \dots)
-\S4method{symmpart}{CsparseMatrix}(x, trans = "C", \dots)
-\S4method{symmpart}{RsparseMatrix}(x, trans = "C", \dots)
-\S4method{symmpart}{TsparseMatrix}(x, trans = "C", \dots)
+\S4method{symmpart}{denseMatrix}(x, uplo = "U", trans = "C", \dots)
+\S4method{symmpart}{CsparseMatrix}(x, uplo = "U", trans = "C", \dots)
+\S4method{symmpart}{RsparseMatrix}(x, uplo = "U", trans = "C", \dots)
+\S4method{symmpart}{TsparseMatrix}(x, uplo = "U", trans = "C", \dots)
 \S4method{symmpart}{diagonalMatrix}(x, trans = "C", \dots)
 \S4method{symmpart}{indMatrix}(x, \dots)
 \S4method{symmpart}{matrix}(x, trans = "C", \dots)
 
-## Methods for 'skewpart' are parallel
+## Methods for 'skewpart' are parallel, but without 'uplo'
 }
 \arguments{
 \item{x}{a square matrix or \code{\linkS4class{Matrix}}.}
+\item{uplo}{a character string, \code{"U"} or \code{"L"}, indicating
+  which of the upper and lower triangles of the symmetric part is
+  stored in the result.}
 \item{trans}{a character string, \code{"C"} or \code{"T"},
   indicating either the conjugate transpose or transpose,
   i.e., whether the result is (skew) Hermitian or symmetric.

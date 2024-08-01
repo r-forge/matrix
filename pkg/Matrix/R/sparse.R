@@ -18,8 +18,8 @@
     .Call(R_sparse_transpose, x, "C", FALSE)
 .sparse.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_sparse_force_symmetric, x, uplo, trans)
-.sparse.symmpart <- function(x, trans = "C", ...)
-    .Call(R_sparse_symmpart, x, trans)
+.sparse.symmpart <- function(x, uplo = "U", trans = "C", ...)
+    .Call(R_sparse_symmpart, x, uplo, trans)
 .sparse.skewpart <- function(x, trans = "C", ...)
     .Call(R_sparse_skewpart, x, trans)
 .sparse.is.sy <- function(object,

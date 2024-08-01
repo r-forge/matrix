@@ -554,8 +554,9 @@ SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	char ul = '\0', ct = '\0';
-	if (s_uplo  != R_NilValue) VALID_UPLO (s_uplo , ul);
-	if (s_trans != R_NilValue) VALID_TRANS(s_trans, ct);
+	if (s_uplo != R_NilValue)
+	VALID_UPLO (s_uplo , ul);
+	VALID_TRANS(s_trans, ct);
 
 	return dense_force_symmetric(s_from, class, ul, ct);
 }

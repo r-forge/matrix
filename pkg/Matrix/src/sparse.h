@@ -30,8 +30,8 @@ SEXP R_sparse_transpose(SEXP, SEXP, SEXP);
 SEXP sparse_force_symmetric(SEXP, const char *, char, char);
 SEXP R_sparse_force_symmetric(SEXP, SEXP, SEXP);
 
-SEXP sparse_symmpart(SEXP, const char *, char);
-SEXP R_sparse_symmpart(SEXP, SEXP);
+SEXP sparse_symmpart(SEXP, const char *, char, char);
+SEXP R_sparse_symmpart(SEXP, SEXP, SEXP);
 
 SEXP sparse_skewpart(SEXP, const char *, char);
 SEXP R_sparse_skewpart(SEXP, SEXP);

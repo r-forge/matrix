@@ -1692,34 +1692,46 @@ SEXP R_sparse_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 	const char *class = Matrix_class(s_from, valid_sparse, 6, __func__);
 
 	char ul = '\0', ct = '\0';
-	if (s_uplo  != R_NilValue) VALID_UPLO (s_uplo , ul);
-	if (s_trans != R_NilValue) VALID_TRANS(s_trans, ct);
+	if (s_uplo != R_NilValue)
+	VALID_UPLO (s_uplo , ul);
+	VALID_TRANS(s_trans, ct);
 
 	return sparse_force_symmetric(s_from, class, ul, ct);
 }
 
-SEXP sparse_symmpart(SEXP from, const char *class, char ct)
+SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 {
-	if (class[0] != 'z' && class[0] != 'd') {
-		/* defined in ./coerce.c : */
-		SEXP sparse_as_kind(SEXP, const char *, char);
-		from = sparse_as_kind(from, class, 'd');
-	}
-	if (class[0] != 'z' && class[1] == 's')
-		return from;
+	/* defined in ./coerce.c : */
+	SEXP sparse_as_kind(SEXP, const char *, char);
+	PROTECT(from = sparse_as_kind(from, class, ','));
 
-	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(from, &pid);
+	if (class[1] != 'g')
+		op_ul = '\0';
+	if (class[0] != 'z')
+		op_ct = '\0';
+
+	char ct = '\0';
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(from, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+
+	if (class[1] == 's' && op_ct == ct) {
+		UNPROTECT(1); /* from */
+		return from;
+	}
 
 	char cl[] = ".s.Matrix";
-	cl[0] = (class[0] != 'z') ? 'd' : 'z';
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error(_("attempt to get symmetric part of non-square matrix"));
+		error((op_ct == 'C')
+		      ? _("attempt to get Hermitian part of non-square matrix")
+		      : _("attempt to get symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -1731,24 +1743,31 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = 'U', di = 'N';
+	char ul = '\0', di = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul != 'U')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
-		if (class[1] == 't') {
-			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-			di = CHAR(STRING_ELT(diag, 0))[0];
-			UNPROTECT(1); /* diag */
-		}
-	} else if (class[2] == 'R') {
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(from, Matrix_diagSym);
+		di = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	if (op_ul != '\0' && op_ul != 'U') {
 		SEXP uplo = PROTECT(mkString("L"));
-		ul = 'L';
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
+	if (op_ct != '\0' && op_ct != 'C') {
+		SEXP trans = PROTECT(mkString("T"));
+		SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
+	}
+
+	int upper = (class[0] != 'R') == (op_ul == 'U' || ul == 'U');
 
 	if (class[2] != 'T') {
 
@@ -1756,24 +1775,27 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			i0 = PROTECT(GET_SLOT(from,        iSym)),
 			x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
-		int j, k, kend, *pp0 = INTEGER(p0) + 1, *pi0 = INTEGER(i0),
-			nnz = pp0[n - 1];
+		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
+			j, k, kend, nnz0 = pp0[n], nnz1;
+		pp0++;
 
 		if (class[1] == 'g') {
 
-			cl[1] = 'g';
-			REPROTECT(from = sparse_transpose(from, cl, 'T', 0), pid);
+			int *iwork = NULL;
+			size_t liwork = (size_t) ((int_fast64_t) n + n + 1 + nnz0);
+			Matrix_Calloc(iwork, liwork, int);
 
-			SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
-				p0_ = PROTECT(GET_SLOT(from, Matrix_pSym)),
-				i0_ = PROTECT(GET_SLOT(from,        iSym)),
-				x0_ = PROTECT(GET_SLOT(from, Matrix_xSym));
-			int k_, kend_, *pp0_ = INTEGER(p0_) + 1, *pi0_ = INTEGER(i0_),
-				*pp1 = INTEGER(p1);
+			int *pp0_ = iwork + n + 1, *pi0_ = iwork + n + n + 1;
+			nsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
+			memcpy(iwork, pp0 - 1, sizeof(int) * (size_t) n);
+
+			SEXP p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));
+			int *pp1 = INTEGER(p1), k_, kend_;
 			*(pp1++) = 0;
+			SET_SLOT(to, Matrix_pSym, p1);
 
 			for (j = 0, k = 0, k_ = 0; j < n; ++j) {
-				kend = pp0[j];
+				kend  = pp0 [j];
 				kend_ = pp0_[j];
 				pp1[j] = pp1[j - 1];
 				while (k < kend) {
@@ -1799,182 +1821,210 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 					}
 				}
 			}
+			nnz1 = pp1[n - 1];
 
-			SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n - 1])),
-				x1 = PROTECT(allocVector(kindToType(cl[0]), pp1[n - 1]));
-			int *pi1 = INTEGER(i1);
+			SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
+			int *pi1 = INTEGER(i1), l;
+			SET_SLOT(to,        iSym, i1);
+			SET_SLOT(to, Matrix_xSym, x1);
 
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_, _INCREMENT_) \
+#define SPART(c) \
 			do { \
-				_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1), \
-					*px0_ = _PTR_(x0_); \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				if (op_ct == 'C') \
 				for (j = 0, k = 0, k_ = 0; j < n; ++j) { \
-					kend = pp0[j]; \
+					kend  = pp0 [j]; \
 					kend_ = pp0_[j]; \
 					while (k < kend) { \
-						if (pi0[k] > j) \
+						if (upper && pi0[k] > j) \
 							k = kend; \
+						else if (!upper && pi0[k] < j) \
+							++k; \
 						else { \
 							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
+								l = iwork[pi0_[k_]]++; \
 								*pi1 = pi0_[k_]; \
-								_ASSIGN_((*px1), 0.5 * px0_[k_]); \
+								c##ASSIGN_CONJ(*px1, px0[l]); \
+								c##MULTIPLY(*px1, 0.5); \
 								++k_; ++pi1; ++px1; \
 							} \
+							l = iwork[j]++; \
 							*pi1 = pi0[k]; \
-							_ASSIGN_((*px1), 0.5 * px0[k]); \
-							if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
-								_INCREMENT_((*px1), 0.5 * px0_[k_]); \
+							if (pi0[k] == j) { \
+								c##ASSIGN_PROJ_REAL(*px1, px0[k]); \
 								++k_; \
+							} else { \
+								c##ASSIGN_IDEN(*px1, px0[k]); \
+								if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
+									l = iwork[pi0[k]]++; \
+									c##INCREMENT_CONJ(*px1, px0[l]); \
+									++k_; \
+								} \
+								c##MULTIPLY(*px1, 0.5); \
 							} \
 							++k; ++pi1; ++px1; \
 						} \
 					} \
 					while (k_ < kend_) { \
-						if (pi0_[k_] > j) \
+						if (upper && pi0_[k_] > j) \
 							k_ = kend_; \
+						else if (!upper && pi0_[k_] < j) \
+							++k_; \
 						else { \
+							l = iwork[pi0_[k_]]++; \
 							*pi1 = pi0_[k_]; \
-							_ASSIGN_((*px1), 0.5 * px0_[k_]); \
+							c##ASSIGN_CONJ(*px1, px0[l]); \
+							c##MULTIPLY(*px1, 0.5); \
+							++k_; ++pi1; ++px1; \
+						} \
+					} \
+				} \
+				else \
+				for (j = 0, k = 0, k_ = 0; j < n; ++j) { \
+					kend  = pp0 [j]; \
+					kend_ = pp0_[j]; \
+					while (k < kend) { \
+						if (upper && pi0[k] > j) \
+							k = kend; \
+						else if (!upper && pi0[k] < j) \
+							++k; \
+						else { \
+							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
+								l = iwork[pi0_[k_]]++; \
+								*pi1 = pi0_[k_]; \
+								c##ASSIGN_IDEN(*px1, px0[l]); \
+								c##MULTIPLY(*px1, 0.5); \
+								++k_; ++pi1; ++px1; \
+							} \
+							l = iwork[j]++; \
+							*pi1 = pi0[k]; \
+							if (pi0[k] == j) { \
+								c##ASSIGN_IDEN(*px1, px0[k]); \
+								++k_; \
+							} else { \
+								c##ASSIGN_IDEN(*px1, px0[k]); \
+								if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
+									l = iwork[pi0[k]]++; \
+									c##INCREMENT_IDEN(*px1, px0[l]); \
+									++k_; \
+								} \
+								c##MULTIPLY(*px1, 0.5); \
+							} \
+							++k; ++pi1; ++px1; \
+						} \
+					} \
+					while (k_ < kend_) { \
+						if (upper && pi0_[k_] > j) \
+							k_ = kend_; \
+						else if (!upper && pi0_[k_] < j) \
+							++k_; \
+						else { \
+							l = iwork[pi0_[k_]]++; \
+							*pi1 = pi0_[k_]; \
+							c##ASSIGN_IDEN(*px1, px0[l]); \
+							c##MULTIPLY(*px1, 0.5); \
 							++k_; ++pi1; ++px1; \
 						} \
 					} \
 				} \
 			} while (0)
 
-			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN2_REAL_ID, INCREMENT_REAL);
-			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, INCREMENT_COMPLEX_ID);
+			SWITCH2(cl[0], SPART);
 
-			SET_SLOT(to, Matrix_pSym, p1);
-			SET_SLOT(to,        iSym, i1);
-			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(6); /* x1, i1, p1, x0_, i0_, p0_ */
+#undef SPART
 
-		} else if (class[1] == 't') {
+			Matrix_Free(iwork, liwork);
+			UNPROTECT(3); /* x1, i1, p1 */
 
-			int leading = (class[2] == 'C') == (ul != 'U');
-
-			if (di == 'N') {
-
-				SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
-
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
-				do { \
-					_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-					if (leading) { \
-						for (j = 0, k = 0; j < n; ++j) { \
-							kend = pp0[j]; \
-							if (k < kend) { \
-								if (pi0[k] == j) \
-									*px1 = *px0; \
-								else \
-									_ASSIGN_((*px1), 0.5 * (*px0)); \
-								++k, ++px0; ++px1; \
-								while (k < kend) { \
-									_ASSIGN_((*px1), 0.5 * (*px0)); \
-									++k; ++px0; ++px1; \
-								} \
-							} \
-						} \
-					} else { \
-						for (j = 0, k = 0; j < n; ++j) { \
-							kend = pp0[j]; \
-							if (k < kend) { \
-								while (k < kend - 1) { \
-									_ASSIGN_((*px1), 0.5 * (*px0)); \
-									++k; ++px0; ++px1; \
-								} \
-								if (pi0[k] == j) \
-									*px1 = *px0; \
-								else \
-									_ASSIGN_((*px1), 0.5 * (*px0)); \
-								++k; ++px0; ++px1; \
-							} \
-						} \
-					} \
-				} while (0)
-
-				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_REAL_ID);
-				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID);
-
-				SET_SLOT(to, Matrix_pSym, p0);
-				SET_SLOT(to,        iSym, i0);
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(1); /* x1 */
-
-			} else {
-
-				nnz += n;
-				SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
-					i1 = PROTECT(allocVector(INTSXP, nnz)),
-					x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
-				int *pp1 = INTEGER(p1), *pi1 = INTEGER(i1);
-				*(pp1++) = 0;
-
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_, _ONE_) \
-				do { \
-					_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-					if (leading) { \
-						for (j = 0, k = 0; j < n; ++j) { \
-							kend = pp0[j]; \
-							pp1[j] = pp1[j - 1] + kend - k + 1; \
-							*pi1 = j; \
-							_ASSIGN_((*px1), _ONE_); \
-							++pi1, ++px1; \
-							while (k < kend) { \
-								*pi1 = *pi0; \
-								_ASSIGN_((*px1), 0.5 * (*px0)); \
-								++k; ++pi0; ++pi1; ++px0; ++px1; \
-							} \
-						} \
-					} else { \
-						for (j = 0, k = 0; j < n; ++j) { \
-							kend = pp0[j]; \
-							pp1[j] = pp1[j - 1] + kend - k + 1; \
-							while (k < kend) { \
-								*pi1 = *pi0; \
-								_ASSIGN_((*px1), 0.5 * (*px0)); \
-								++k; ++pi0; ++pi1; ++px0; ++px1; \
-							} \
-							*pi1 = j; \
-							_ASSIGN_((*px1), _ONE_); \
-							++pi1; ++px1; \
-						} \
-					} \
-				} while (0)
-
-				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_REAL_ID, 1.0);
-				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zunit);
-
-				SET_SLOT(to, Matrix_pSym, p1);
-				SET_SLOT(to,        iSym, i1);
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(3); /* p1, i1, x1 */
-
-			}
-
-		} else {
+		} else if (class[1] == 's') {
 
 			SET_SLOT(to, Matrix_pSym, p0);
 			SET_SLOT(to,        iSym, i0);
 
-			if (cl[0] == 'd')
-				SET_SLOT(to, Matrix_xSym, x0);
-			else {
-				/* Symmetric part of Hermitian matrix is real part */
-				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(1); /* x1 */
-			}
+			/* Symmetric part of Hermitian matrix is real part */
+			/* Hermitian part of symmetric matrix is real part */
+			SEXP x1 = PROTECT(allocVector(CPLXSXP, nnz0));
+			zvreal(COMPLEX(x1), COMPLEX(x0), (size_t) nnz0);
+			SET_SLOT(to, Matrix_xSym, x1);
+			UNPROTECT(1); /* x1 */
+
+		} else if (di == 'N') {
+
+			SET_SLOT(to, Matrix_pSym, p0);
+			SET_SLOT(to,        iSym, i0);
+
+			SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz0));
+			SET_SLOT(to, Matrix_xSym, x1);
+
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				for (j = 0, k = 0; j < n; ++j) { \
+					kend = pp0[j]; \
+					while (k < kend) { \
+						if (pi0[k] != j) { \
+							c##ASSIGN_IDEN(*px1, px0[k]); \
+							c##MULTIPLY(*px1, 0.5); \
+						} \
+						else if (op_ct == 'C') \
+							c##ASSIGN_PROJ_REAL(*px1, px0[k]); \
+						else \
+							c##ASSIGN_IDEN(*px1, px0[k]); \
+						++k; ++px1; \
+					} \
+				} \
+			} while (0)
+
+			SWITCH2(cl[0], SPART);
+
+#undef SPART
+
+			UNPROTECT(1); /* x1 */
+
+		} else {
+
+			nnz1 = nnz0 + n;
+
+			SEXP p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0))),
+				i1 = PROTECT(allocVector(INTSXP, nnz1)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
+			int *pp1 = INTEGER(p1), *pi1 = INTEGER(i1);
+			*(pp1++) = 0;
+			SET_SLOT(to, Matrix_pSym, p1);
+			SET_SLOT(to,        iSym, i1);
+			SET_SLOT(to, Matrix_xSym, x1);
+
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				for (j = 0, k = 0; j < n; ++j) { \
+					kend = pp0[j]; \
+					if (!upper) { \
+						*pi1 = j; \
+						*px1 = c##UNIT; \
+						++pi1; ++px1; \
+					} \
+					while (k < kend) { \
+						*pi1 = pi0[k]; \
+						c##ASSIGN_IDEN(*px1, px0[k]); \
+						c##MULTIPLY(*px1, 0.5); \
+						++k; ++pi1; ++px1; \
+					} \
+					if (upper) { \
+						*pi1 = j; \
+						*px1 = c##UNIT; \
+						++pi1; ++px1; \
+					} \
+					pp1[j] = kend + j + 1; \
+				} \
+			} while (0)
+
+			SWITCH2(cl[0], SPART);
+
+#undef SPART
+
+			UNPROTECT(3); /* x1, i1, p1 */
 
 		}
 
@@ -1986,126 +2036,139 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 			x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 		int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0);
-		R_xlen_t k, nnz = XLENGTH(i0);
+		R_xlen_t k, nnz0 = XLENGTH(i0), nnz1;
 
 		if (class[1] == 'g') {
 
-			SEXP i1 = PROTECT(allocVector(INTSXP, nnz)),
-				j1 = PROTECT(allocVector(INTSXP, nnz)),
-				x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
+			SEXP i1 = PROTECT(allocVector(INTSXP, nnz0)),
+				j1 = PROTECT(allocVector(INTSXP, nnz0)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz0));
 			int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
+			SET_SLOT(to, Matrix_iSym, i1);
+			SET_SLOT(to, Matrix_jSym, j1);
+			SET_SLOT(to, Matrix_xSym, x1);
 
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
+#define SPART(c) \
 			do { \
-				_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-				for (k = 0; k < nnz; ++k) { \
-					if (*pi0 == *pj0) { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				if (op_ct == 'C') \
+				for (k = 0; k < nnz0; ++k) { \
+					if (*pi0 != *pj0) { \
+						if ((upper) ? *pi0 < *pj0 : *pi0 > *pj0) { \
 						*pi1 = *pi0; \
 						*pj1 = *pj0; \
-						*px1 = *px0; \
-					} else if (*pi0 < *pj0) { \
+						c##ASSIGN_IDEN(*px1, *px0); \
+						} else { \
+						*pi1 = *pj0; \
+						*pj1 = *pi0; \
+						c##ASSIGN_CONJ(*px1, *px0); \
+						} \
+						c##MULTIPLY(*px1, 0.5); \
+					} else { \
 						*pi1 = *pi0; \
 						*pj1 = *pj0; \
-						_ASSIGN_((*px1), 0.5 * (*px0)); \
+						c##ASSIGN_PROJ_REAL(*px1, *px0); \
+					} \
+					++pi0; ++pi1; ++pj0; ++pj1; ++px0; ++px1; \
+				} \
+				else \
+				for (k = 0; k < nnz0; ++k) { \
+					if ((upper) ? *pi0 <= *pj0 : *pi0 >= *pj0) { \
+						*pi1 = *pi0; \
+						*pj1 = *pj0; \
 					} else { \
 						*pi1 = *pj0; \
 						*pj1 = *pi0; \
-						_ASSIGN_((*px1), 0.5 * (*px0)); \
 					} \
+					c##ASSIGN_IDEN(*px1, *px0); \
+					if (*pi0 != *pj0) \
+					c##MULTIPLY(*px1, 0.5); \
 					++pi0; ++pi1; ++pj0; ++pj1; ++px0; ++px1; \
 				} \
 			} while (0)
 
-			if (cl[0] == 'd')
-				SP_LOOP(double, REAL, ASSIGN2_REAL_ID);
-			else
-				SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID);
+			SWITCH2(cl[0], SPART);
 
-			SET_SLOT(to, Matrix_iSym, i1);
-			SET_SLOT(to, Matrix_jSym, j1);
-			SET_SLOT(to, Matrix_xSym, x1);
+#undef SPART
+
 			UNPROTECT(3); /* x1, j1, i1 */
 
-		} else if (class[1] == 't') {
-
-			if (di == 'N') {
-
-				SEXP x1 = PROTECT(allocVector(kindToType(cl[0]), nnz));
-
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
-				do { \
-					_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-					for (k = 0; k < nnz; ++k) { \
-						if (*pi0 == *pj0) \
-							*px1 = *px0; \
-						else \
-							_ASSIGN_((*px1), 0.5 * (*px0)); \
-						++px0; ++px1; \
-					} \
-				} while (0)
-
-				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_REAL_ID);
-				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID);
-
-				SET_SLOT(to, Matrix_iSym, i0);
-				SET_SLOT(to, Matrix_jSym, j0);
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(1); /* x1 */
-
-			} else {
-
-				SEXP i1 = PROTECT(allocVector(INTSXP, nnz + n)),
-					j1 = PROTECT(allocVector(INTSXP, nnz + n)),
-					x1 = PROTECT(allocVector(kindToType(cl[0]), nnz + n));
-				int j, *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
-
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_, _ONE_) \
-				do { \
-					_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-					for (k = 0; k < nnz; ++k) { \
-						*pi1 = *pi0; \
-						*pj1 = *pj0; \
-						_ASSIGN_((*px1), 0.5 * (*px0)); \
-						++pi0; ++pi1; ++pj0; ++pj1; ++px0; ++px1; \
-					} \
-					for (j = 0; j < n; ++j) { \
-						*pi1 = *pj1 = j; \
-						_ASSIGN_((*px1), _ONE_); \
-						++pi1; ++pj1; ++px1; \
-					} \
-				} while (0)
-
-				if (cl[0] == 'd')
-					SP_LOOP(double, REAL, ASSIGN2_REAL_ID, 1.0);
-				else
-					SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, Matrix_zunit);
-
-				SET_SLOT(to, Matrix_iSym, i1);
-				SET_SLOT(to, Matrix_jSym, j1);
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(3); /* x1, j1, i1 */
-
-			}
-
-		} else {
+		} else if (class[1] == 's') {
 
 			SET_SLOT(to, Matrix_iSym, i0);
 			SET_SLOT(to, Matrix_jSym, j0);
 
-			if (cl[0] == 'd')
-				SET_SLOT(to, Matrix_xSym, x0);
-			else {
-				/* Symmetric part of Hermitian matrix is real part */
-				SEXP x1 = PROTECT(duplicate(x0));
-				zvreal(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
-				SET_SLOT(to, Matrix_xSym, x1);
-				UNPROTECT(1); /* x1 */
-			}
+			/* Symmetric part of Hermitian matrix is real part */
+			/* Hermitian part of symmetric matrix is real part */
+			SEXP x1 = PROTECT(allocVector(CPLXSXP, nnz0));
+			zvreal(COMPLEX(x1), COMPLEX(x0), (size_t) nnz0);
+			SET_SLOT(to, Matrix_xSym, x1);
+			UNPROTECT(1); /* x1 */
+
+		} else if (di == 'N') {
+
+			SET_SLOT(to, Matrix_iSym, i0);
+			SET_SLOT(to, Matrix_jSym, j0);
+
+			SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz0));
+			SET_SLOT(to, Matrix_xSym, x1);
+
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				for (k = 0; k < nnz0; ++k) { \
+					if (*pi0 != *pj0) { \
+						c##ASSIGN_IDEN(*px1, *px0); \
+						c##MULTIPLY(*px1, 0.5); \
+					} \
+					else if (op_ct == 'C') \
+						c##ASSIGN_PROJ_REAL(*px1, *px0); \
+					else \
+						c##ASSIGN_IDEN(*px1, *px0); \
+					++pi0; ++pj0; ++px0; ++px1; \
+				} \
+			} while (0)
+
+			SWITCH2(cl[0], SPART);
+
+#undef SPART
+
+			UNPROTECT(1); /* x1 */
+
+		} else {
+
+			nnz1 = nnz0 + n;
+
+			SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
+				j1 = PROTECT(allocVector(INTSXP, nnz1)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
+			int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1), j;
+			SET_SLOT(to, Matrix_iSym, i1);
+			SET_SLOT(to, Matrix_jSym, j1);
+			SET_SLOT(to, Matrix_xSym, x1);
+
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				for (k = 0; k < nnz0; ++k) { \
+					*pi1 = *pi0; \
+					*pj1 = *pj0; \
+					c##ASSIGN_IDEN(*px1, *px0); \
+					c##MULTIPLY(*px1, 0.5); \
+					++pi0; ++pi1; ++pj0; ++pj1; ++px0; ++px1; \
+				} \
+				for (j = 0; j < n; ++j) { \
+					*pi1 = *pj1 = j; \
+					*px1 = c##UNIT; \
+					++pi1; ++pj1; ++px1; \
+				} \
+			} while (0)
+
+			SWITCH2(cl[0], SPART);
+
+#undef SPART
+
+			UNPROTECT(3); /* x1, j1, i1 */
 
 		}
 
@@ -2117,38 +2180,39 @@ SEXP sparse_symmpart(SEXP from, const char *class, char ct)
 	return to;
 }
 
-/* symmpart(<[CRT]sparseMatrix>, trans) */
-SEXP R_sparse_symmpart(SEXP s_from, SEXP s_trans)
+/* symmpart(<[CRT]sparseMatrix>, uplo, trans) */
+SEXP R_sparse_symmpart(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 {
 	const char *class = Matrix_class(s_from, valid_sparse, 6, __func__);
 
-	char ct = 'C';
+	char ul, ct;
+	VALID_UPLO (s_uplo , ul);
 	VALID_TRANS(s_trans, ct);
 
-	return sparse_symmpart(s_from, class, ct);
+	return sparse_symmpart(s_from, class, ul, ct);
 }
 
-SEXP sparse_skewpart(SEXP from, const char *class, char ct)
+SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 {
-	if (class[0] != 'z' && class[0] != 'd') {
-		/* defined in ./coerce.c : */
-		SEXP sparse_as_kind(SEXP, const char *, char);
-		from = sparse_as_kind(from, class, 'd');
-	}
+	/* defined in ./coerce.c : */
+	SEXP sparse_as_kind(SEXP, const char *, char);
+	PROTECT(from = sparse_as_kind(from, class, ','));
 
-	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(from, &pid);
+	if (class[0] != 'z')
+		op_ct = '\0';
 
 	char cl[] = "...Matrix";
-	cl[0] = (class[0] != 'z') ? 'd' : 'z';
-	cl[1] = (class[1] != 's') ? 'g' : 's';
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
+	cl[1] = (class[1] == 's') ? 's' : 'g';
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error(_("attempt to get skew-symmetric part of non-square matrix"));
+		error((op_ct == 'C')
+		      ? _("attempt to get skew-Hermitian part of non-square matrix")
+		      : _("attempt to get skew-symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -2160,166 +2224,232 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	if (class[1] == 's') {
-
+	char ul = '\0', ct = '\0';
+	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+		if (ul != 'U' && class[1] == 's')
 			SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+		if (ct != 'C')
+			SET_SLOT(to, Matrix_transSym, trans);
+		UNPROTECT(1); /* trans */
+	}
 
-		/* Skew-symmetric part of Hermitian matrix is imaginary part */
-		if (class[0] != 'z') {
-			if (class[2] != 'T') {
-				SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
-				int *pp1 = INTEGER(p1);
-				memset(pp1, 0, sizeof(int) * ((size_t) n + 1));
-				SET_SLOT(to, Matrix_pSym, p1);
-				UNPROTECT(1); /* p1 */
-			}
-		} else {
-			if (class[2] != 'T') {
-				SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
-				SET_SLOT(to, Matrix_pSym, p0);
-				UNPROTECT(1); /* p0 */
-			}
-			if (class[2] != 'R') {
-				SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
-				SET_SLOT(to, Matrix_iSym, i0);
-				UNPROTECT(1); /* i0 */
-			}
-			if (class[2] != 'C') {
-				SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
-				SET_SLOT(to, Matrix_jSym, j0);
-				UNPROTECT(1); /* j0 */
-			}
-			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-				x1 = PROTECT(duplicate(x0));
-			zvimag(COMPLEX(x1), NULL, (size_t) XLENGTH(x1));
-			SET_SLOT(to, Matrix_xSym, x1);
-			UNPROTECT(2); /* x1, x0 */
+	if (class[1] == 's' && op_ct == ct) {
+		if (class[2] != 'T') {
+			SEXP p1 = PROTECT(allocZero(INTSXP, (R_xlen_t) n + 1));
+			SET_SLOT(to, Matrix_pSym, p1);
+			UNPROTECT(1); /* p1 */
 		}
+		UNPROTECT(2); /* to, from */
+		return to;
+	}
 
-	} else if (class[2] != 'T') {
+	if (class[2] != 'T') {
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			i0 = PROTECT(GET_SLOT(from,        iSym)),
-			x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
-		int j, k, kend, k_, kend_, *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
-			*pp1 = INTEGER(p1);
-		pp0++; *(pp1++) = 0;
+			x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
+			j, k, kend, nnz0 = pp0[n], nnz1;
+		pp0++;
 
-		REPROTECT(from = sparse_transpose(from, cl, 'T', 0), pid);
+		if (class[1] == 's') {
 
-		SEXP
-			p0_ = PROTECT(GET_SLOT(from, Matrix_pSym)),
-			i0_ = PROTECT(GET_SLOT(from,        iSym)),
-			x0_ = PROTECT(GET_SLOT(from, Matrix_xSym));
-		int *pp0_ = INTEGER(p0_), *pi0_ = INTEGER(i0_), *pp1_;
-		pp0_++;
-		Matrix_Calloc(pp1_, n, int);
+			SET_SLOT(to, Matrix_pSym, p0);
+			SET_SLOT(to,        iSym, i0);
 
-		for (j = 0, k = 0, k_ = 0; j < n; ++j) {
-			kend = pp0[j];
-			kend_ = pp0_[j];
-			while (k < kend) {
-				if (pi0[k] >= j)
-					k = kend;
-				else {
-					while (k_ < kend_ && pi0_[k_] < pi0[k]) {
-						++pp1_[j];
-						++pp1_[pi0_[k_]];
+			/* Skew-symmetric part of Hermitian matrix is imaginary part */
+			/* Skew-Hermitian part of symmetric matrix is imaginary part */
+			SEXP x1 = PROTECT(allocVector(CPLXSXP, nnz0));
+			zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) nnz0);
+			SET_SLOT(to, Matrix_xSym, x1);
+			UNPROTECT(1); /* x1 */
+
+		} else {
+
+			int *iwork = NULL;
+			size_t liwork = (size_t) ((int_fast64_t) n + n + 1 + nnz0);
+			Matrix_Calloc(iwork, liwork, int);
+
+			int *pp0_ = iwork + n + 1, *pi0_ = iwork + n + n + 1;
+			nsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
+			memcpy(iwork, pp0 - 1, sizeof(int) * (size_t) n);
+
+			SEXP p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));
+			int *pp1 = INTEGER(p1), k_, kend_;
+			*(pp1++) = 0;
+			SET_SLOT(to, Matrix_pSym, p1);
+
+			for (j = 0, k = 0, k_ = 0; j < n; ++j) {
+				kend  = pp0 [j];
+				kend_ = pp0_[j];
+				pp1[j] = 0;
+				while (k < kend) {
+					if (pi0[k] >= j)
+						k = kend;
+					else {
+						while (k_ < kend_ && pi0_[k_] < pi0[k]) {
+							++pp1[j];
+							++pp1[pi0_[k_]];
+							++k_;
+						}
+						++pp1[j];
+						++pp1[pi0[k]];
+						if (k_ < kend_ && pi0_[k_] == pi0[k])
+							++k_;
+						++k;
+					}
+				}
+				while (k_ < kend_) {
+					if (pi0_[k_] >= j)
+						k_ = kend_;
+					else {
+						++pp1[j];
+						++pp1[pi0_[k_]];
 						++k_;
 					}
-					++pp1_[j];
-					++pp1_[pi0[k]];
-					if (k_ < kend_ && pi0_[k_] == pi0[k])
-						++k_;
-					++k;
 				}
 			}
-			while (k_ < kend_) {
-				if (pi0_[k_] >= j)
-					k_ = kend_;
-				else {
-					++pp1_[j];
-					++pp1_[pi0_[k_]];
-					++k_;
-				}
-			}
-		}
+			for (j = 0; j < n; ++j)
+				pp1[j] += pp1[j - 1];
+			nnz1 = pp1[n - 1];
+			for (j = n - 1; j >= 0; --j)
+				pp1[j] = pp1[j - 1];
 
-		for (j = 0; j < n; ++j) {
-			pp1[j] = pp1[j - 1] + pp1_[j];
-			pp1_[j] = pp1[j - 1];
-		}
+			SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
+			int *pi1 = INTEGER(i1), l;
+			SET_SLOT(to,        iSym, i1);
+			SET_SLOT(to, Matrix_xSym, x1);
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n - 1])),
-			x1 = PROTECT(allocVector(kindToType(cl[0]), pp1[n - 1]));
-		int *pi1 = INTEGER(i1);
-
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_, _INCREMENT_) \
-		do { \
-			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1), \
-				*px0_ = _PTR_(x0_); \
-			for (j = 0, k = 0, k_ = 0; j < n; ++j) { \
-				kend = pp0[j]; \
-				kend_ = pp0_[j]; \
-				while (k < kend) { \
-					if (pi0[k] >= j) \
-						k = kend; \
-					else { \
-						while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
-							pi1[pp1_[j]] = pi0_[k_]; \
-							_ASSIGN_(px1[pp1_[j]], -0.5 * px0_[k_]); \
-							pi1[pp1_[pi0_[k_]]] = j; \
-							_ASSIGN_(px1[pp1_[pi0_[k_]]], -px1[pp1_[j]]); \
-							++pp1_[j]; \
-							++pp1_[pi0_[k_]]; \
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				if (op_ct == 'C') \
+				for (j = 0, k = 0, k_ = 0; j < n; ++j) { \
+					kend  = pp0 [j]; \
+					kend_ = pp0_[j]; \
+					while (k < kend) { \
+						if (pi0[k] > j) \
+							k = kend; \
+						else { \
+							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
+								l = iwork[pi0_[k_]]++; \
+								c##ASSIGN_CONJ(px1[pp1[       j]], px0[l]); \
+								c##ASSIGN_IDEN(px1[pp1[pi0_[k_]]], px0[l]); \
+								c##MULTIPLY   (px1[pp1[       j]],   -0.5); \
+								c##MULTIPLY   (px1[pp1[pi0_[k_]]],    0.5); \
+								pi1[pp1[       j]++] = pi0_[k_]; \
+								pi1[pp1[pi0_[k_]]++] =        j; \
+								++k_; \
+							} \
+							l = iwork[j]++; \
+							if (pi0[k] == j) \
+								++k_; \
+							else { \
+								c##ASSIGN_IDEN(px1[pp1[     j]], px0[k]); \
+								c##ASSIGN_CONJ(px1[pp1[pi0[k]]], px0[k]); \
+								if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
+									l = iwork[pi0[k]]++; \
+									c##DECREMENT_CONJ(px1[pp1[     j]], px0[l]); \
+									c##DECREMENT_IDEN(px1[pp1[pi0[k]]], px0[l]); \
+									++k_; \
+								} \
+								c##MULTIPLY   (px1[pp1[     j]],    0.5); \
+								c##MULTIPLY   (px1[pp1[pi0[k]]],   -0.5); \
+								pi1[pp1[     j]++] = pi0[k]; \
+								pi1[pp1[pi0[k]]++] =      j; \
+							} \
+							++k; \
+						} \
+					} \
+					while (k_ < kend_) { \
+						if (pi0_[k_] >= j) \
+							k_ = kend_; \
+						else { \
+							l = iwork[pi0_[k_]]++; \
+							c##ASSIGN_CONJ(px1[pp1[       j]], px0[l]); \
+							c##ASSIGN_IDEN(px1[pp1[pi0_[k_]]], px0[l]); \
+							c##MULTIPLY   (px1[pp1[       j]],   -0.5); \
+							c##MULTIPLY   (px1[pp1[pi0_[k_]]],    0.5); \
+							pi1[pp1[       j]++] = pi0_[k_]; \
+							pi1[pp1[pi0_[k_]]++] =        j; \
 							++k_; \
 						} \
-						pi1[pp1_[j]] = pi0[k]; \
-						_ASSIGN_(px1[pp1_[j]], 0.5 * px0[k]); \
-						if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
-							_INCREMENT_(px1[pp1_[j]], -0.5 * px0_[k_]); \
+					} \
+				} \
+				else \
+				for (j = 0, k = 0, k_ = 0; j < n; ++j) { \
+					kend  = pp0 [j]; \
+					kend_ = pp0_[j]; \
+					while (k < kend) { \
+						if (pi0[k] > j) \
+							k = kend; \
+						else { \
+							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
+								l = iwork[pi0_[k_]]++; \
+								c##ASSIGN_IDEN(px1[pp1[       j]], px0[l]); \
+								c##ASSIGN_IDEN(px1[pp1[pi0_[k_]]], px0[l]); \
+								c##MULTIPLY   (px1[pp1[       j]],   -0.5); \
+								c##MULTIPLY   (px1[pp1[pi0_[k_]]],    0.5); \
+								pi1[pp1[       j]++] = pi0_[k_]; \
+								pi1[pp1[pi0_[k_]]++] =        j; \
+								++k_; \
+							} \
+							l = iwork[j]++; \
+							if (pi0[k] == j) \
+								++k_; \
+							else { \
+								c##ASSIGN_IDEN(px1[pp1[     j]], px0[k]); \
+								c##ASSIGN_IDEN(px1[pp1[pi0[k]]], px0[k]); \
+								if (k_ < kend_ && pi0_[k_] == pi0[k]) { \
+									l = iwork[pi0[k]]++; \
+									c##DECREMENT_IDEN(px1[pp1[     j]], px0[l]); \
+									c##DECREMENT_IDEN(px1[pp1[pi0[k]]], px0[l]); \
+									++k_; \
+								} \
+								c##MULTIPLY   (px1[pp1[     j]],    0.5); \
+								c##MULTIPLY   (px1[pp1[pi0[k]]],   -0.5); \
+								pi1[pp1[     j]++] = pi0[k]; \
+								pi1[pp1[pi0[k]]++] =      j; \
+							} \
+							++k; \
+						} \
+					} \
+					while (k_ < kend_) { \
+						if (pi0_[k_] >= j) \
+							k_ = kend_; \
+						else { \
+							l = iwork[pi0_[k_]]++; \
+							c##ASSIGN_IDEN(px1[pp1[       j]], px0[l]); \
+							c##ASSIGN_IDEN(px1[pp1[pi0_[k_]]], px0[l]); \
+							c##MULTIPLY   (px1[pp1[       j]],   -0.5); \
+							c##MULTIPLY   (px1[pp1[pi0_[k_]]],    0.5); \
+							pi1[pp1[       j]++] = pi0_[k_]; \
+							pi1[pp1[pi0_[k_]]++] =        j; \
 							++k_; \
 						} \
-						pi1[pp1_[pi0[k]]] = j; \
-						_ASSIGN_(px1[pp1_[pi0[k]]], -px1[pp1_[j]]); \
-						++pp1_[j]; \
-						++pp1_[pi0[k]]; \
-						++k; \
 					} \
 				} \
-				while (k_ < kend_) { \
-					if (pi0_[k_] >= j) \
-						k_ = kend_; \
-					else { \
-						pi1[pp1_[j]] = pi0_[k_]; \
-						_ASSIGN_(px1[pp1_[j]], -0.5 * px0_[k_]); \
-						pi1[pp1_[pi0_[k_]]] = j; \
-						_ASSIGN_(px1[pp1_[pi0_[k_]]], -px1[pp1_[j]]); \
-						++pp1_[j]; \
-						++pp1_[pi0_[k_]]; \
-						++k_; \
-					} \
-				} \
-			} \
-		} while (0)
+			} while (0)
 
-		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN2_REAL_ID, INCREMENT_REAL);
-		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID, INCREMENT_COMPLEX_ID);
+			SWITCH2(cl[0], SPART);
 
-		Matrix_Free(pp1_, n);
-		SET_SLOT(to, Matrix_pSym, p1);
-		SET_SLOT(to,        iSym, i1);
-		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(9); /* x1, i1, p1, x0, i0, p0, x0_, i0_, p0_ */
+#undef SPART
+
+			Matrix_Free(iwork, liwork);
+			UNPROTECT(3); /* x1, i1, p1 */
+
+		}
+
+		UNPROTECT(3); /* x0, i0, p0 */
 
 	} else {
 
@@ -2327,50 +2457,70 @@ SEXP sparse_skewpart(SEXP from, const char *class, char ct)
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
 			x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 		int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0);
-		R_xlen_t k, nnz0 = XLENGTH(i0), nnz1 = nnz0;
+		R_xlen_t k, nnz0 = XLENGTH(i0), nnz1;
 
-		for (k = 0; k < nnz0; ++k)
-			if (pi0[k] == pj0[k])
-				--nnz1;
-		nnz1 *= 2;
+		if (class[1] == 's') {
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
-			j1 = PROTECT(allocVector(INTSXP, nnz1)),
-			x1 = PROTECT(allocVector(kindToType(cl[0]), nnz1));
-		int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
+			SET_SLOT(to, Matrix_iSym, i0);
+			SET_SLOT(to, Matrix_jSym, j0);
 
-#undef SP_LOOP
-#define SP_LOOP(_CTYPE_, _PTR_, _ASSIGN_) \
-		do { \
-			_CTYPE_ *px0 = _PTR_(x0), *px1 = _PTR_(x1); \
-			for (k = 0; k < nnz0; ++k) { \
-				if (*pi0 != *pj0) { \
-					*pi1 = *pi0; \
-					*pj1 = *pj0; \
-					_ASSIGN_((*px1),  0.5 * (*px0)); \
-					++pi1; ++pj1; ++px1; \
-					*pi1 = *pj0; \
-					*pj1 = *pi0; \
-					_ASSIGN_((*px1), -0.5 * (*px0)); \
-					++pi1; ++pj1; ++px1; \
+			/* Skew-symmetric part of Hermitian matrix is imaginary part */
+			/* Skew-Hermitian part of symmetric matrix is imaginary part */
+			SEXP x1 = PROTECT(allocVector(CPLXSXP, nnz0));
+			zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) nnz0);
+			SET_SLOT(to, Matrix_xSym, x1);
+			UNPROTECT(1); /* x1 */
+
+		} else {
+
+			nnz1 = nnz0;
+			for (k = 0; k < nnz0; ++k)
+				if (pi0[k] == pj0[k])
+					--nnz1;
+			nnz1 *= 2;
+
+			SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
+				j1 = PROTECT(allocVector(INTSXP, nnz1)),
+				x1 = PROTECT(allocVector(TYPEOF(x0), nnz1));
+			int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
+			SET_SLOT(to, Matrix_iSym, i1);
+			SET_SLOT(to, Matrix_jSym, j1);
+			SET_SLOT(to, Matrix_xSym, x1);
+
+#define SPART(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+				for (k = 0; k < nnz0; ++k) { \
+					if (*pi0 != *pj0) { \
+						*pi1 = *pi0; \
+						*pj1 = *pj0; \
+						c##ASSIGN_IDEN(*px1, *px0); \
+						c##MULTIPLY(*px1,  0.5); \
+						++pi1; ++pj1; ++px1; \
+						*pi1 = *pj0; \
+						*pj1 = *pi0; \
+						if (op_ct == 'C') \
+						c##ASSIGN_CONJ(*px1, *px0); \
+						else \
+						c##ASSIGN_IDEN(*px1, *px0); \
+						c##MULTIPLY(*px1, -0.5); \
+						++pi1; ++pj1; ++px1; \
+					} \
+					++pi0; ++pj0; ++px0; \
 				} \
-				++pi0; ++pj0; ++px0; \
-			} \
-		} while (0)
+			} while (0)
 
-		if (cl[0] == 'd')
-			SP_LOOP(double, REAL, ASSIGN2_REAL_ID);
-		else
-			SP_LOOP(Rcomplex, COMPLEX, ASSIGN2_COMPLEX_ID);
+			SWITCH2(cl[0], SPART);
 
-		SET_SLOT(to, Matrix_iSym, i1);
-		SET_SLOT(to, Matrix_jSym, j1);
-		SET_SLOT(to, Matrix_xSym, x1);
-		UNPROTECT(6); /* x1, j1, i1, x0, j0, i0 */
+#undef SPART
+
+			UNPROTECT(3); /* x1, j1, i1 */
+
+		}
+
+		UNPROTECT(3); /* x0, j0, i0 */
 
 	}
-
-#undef SP_LOOP
 
 	UNPROTECT(2); /* to, from */
 	return to;
@@ -2381,7 +2531,7 @@ SEXP R_sparse_skewpart(SEXP s_from, SEXP s_trans)
 {
 	const char *class = Matrix_class(s_from, valid_sparse, 6, __func__);
 
-	char ct = 'C';
+	char ct;
 	VALID_TRANS(s_trans, ct);
 
 	return sparse_skewpart(s_from, class, ct);

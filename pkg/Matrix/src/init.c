@@ -171,7 +171,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_diag_set, 2),
 	CALLDEF(R_sparse_transpose, 3),
 	CALLDEF(R_sparse_force_symmetric, 3),
-	CALLDEF(R_sparse_symmpart, 2),
+	CALLDEF(R_sparse_symmpart, 3),
 	CALLDEF(R_sparse_skewpart, 2),
 	CALLDEF(R_sparse_is_symmetric, 4),
 	CALLDEF(R_sparse_is_triangular, 2),

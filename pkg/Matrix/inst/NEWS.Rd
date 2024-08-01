@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-07-30 r4865)}{
+\section{Changes in version 1.8-0 (2024-08-01 r4868)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -36,6 +36,10 @@
       \code{forceSymmetric}, \code{symmpart}, and \code{skewpart}
       gain argument \code{trans} to support Hermitian and symmetric
       modes for complex matrices.
+
+      \item Methods for generic function \code{symmpart} gain argument
+      \code{uplo} for control over the \code{uplo} slot of the result
+      of \code{symmpart(<generalMatrix>)}.
     }
   }
   \subsection{Bug Fixes}{
