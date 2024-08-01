@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-08-01 r4871)}{
+\section{Changes in version 1.8-0 (2024-08-01 r4872)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -66,15 +66,11 @@
 
       \item Warnings emitted by \option{-Wconversion} (but not those
       originating in SuiteSparse) are resolved.
-
-      \item \file{src/Makevars} is adjusted to ensure that use of
-      illegal entry points in SuiteSparse libraries is detected by
-      \command{R CMD check}. % TODO: patch SuiteSparse to avoid NOTE
     }
   }
 }
 
-\section{Changes in version 1.7-1 (2024-06-18 r4792)}{
+\section{Changes in version 1.7-1 (2024-08-01 r4872)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -100,6 +96,10 @@
       leaving the decision to check to the caller.  Accordingly,
       most \code{cholmod_check_*} are now registered, though packages
       calling them must use \code{LinkingTo: Matrix (>= 1.7-1)}.
+
+      \item \file{src/Makevars} is adjusted to ensure that use of
+      illegal entry points in SuiteSparse libraries is detected by
+      \command{R CMD check}. % TODO: patch SuiteSparse to avoid NOTE
     }
   }
 }
