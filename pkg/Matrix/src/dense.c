@@ -560,12 +560,14 @@ SEXP R_dense_force_symmetric(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 	return dense_force_symmetric(s_from, class, ul, ct);
 }
 
-SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
+SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 {
 	/* defined in ./coerce.c : */
 	SEXP dense_as_kind(SEXP, const char *, char, int);
 	PROTECT(from = dense_as_kind(from, class, ',', 0));
 
+	if (class[1] != 'g')
+		op_ul = '\0';
 	if (class[0] != 'z')
 		op_ct = '\0';
 
@@ -617,6 +619,11 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
+	if (op_ul != '\0' && op_ul != 'U') {
+		SEXP uplo = PROTECT(mkString("L"));
+		SET_SLOT(to, Matrix_uploSym, uplo);
+		UNPROTECT(1); /* uplo */
+	}
 	if (op_ct != '\0' && op_ct != 'C') {
 		SEXP trans = PROTECT(mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
@@ -630,8 +637,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 
 		/* Symmetric part of Hermitian matrix is real part */
 		/* Hermitian part of symmetric matrix is real part */
-
-		zvreal(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x1));
+		zvreal(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x0));
 
 	} else {
 
@@ -644,7 +650,8 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 			if (!packed) \
 				memset(px1, 0, sizeof(c##TYPE) * (size_t) XLENGTH(x1)); \
 			if (class[1] == 'g') { \
-				if (op_ct == 'C') \
+				if (op_ul == 'U') {	\
+					if (op_ct == 'C') \
 					for (j = 0; j < n; ++j) { \
 						for (i = 0; i < j; ++i) { \
 							c##ASSIGN_IDEN(*pu1, *pu0); \
@@ -655,11 +662,13 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 							pl0 += n; \
 						} \
 						c##ASSIGN_PROJ_REAL(*pu1, *pu0); \
-						pu0 += n - j; \
-						pu1 += n - j; \
+						pu0 += 1; \
+						pu1 += 1; \
+						pu0 += n - j - 1; \
+						pu1 += n - j - 1; \
 						pl0 = px0 + j + 1; \
 					} \
-				else \
+					else \
 					for (j = 0; j < n; ++j) { \
 						for (i = 0; i < j; ++i) { \
 							c##ASSIGN_IDEN(*pu1, *pu0); \
@@ -670,10 +679,48 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 							pl0 += n; \
 						} \
 						c##ASSIGN_IDEN(*pu1, *pu0); \
-						pu0 += n - j; \
-						pu1 += n - j; \
+						pu0 += 1; \
+						pu1 += 1; \
+						pu0 += n - j - 1; \
+						pu1 += n - j - 1; \
 						pl0 = px0 + j + 1; \
 					} \
+				} else { \
+					if (op_ct == 'C') \
+					for (j = 0; j < n; ++j) { \
+						pl0 += j; \
+						pl1 += j; \
+						pu0 = pl0 + n; \
+						c##ASSIGN_PROJ_REAL(*pl1, *pl0); \
+						pl0 += 1; \
+						pl1 += 1; \
+						for (i = j + 1; i < n; ++i) { \
+							c##ASSIGN_IDEN(*pl1, *pl0); \
+							c##INCREMENT_CONJ(*pl1, *pu0); \
+							c##MULTIPLY(*pl1, 0.5); \
+							pl0 += 1; \
+							pl1 += 1; \
+							pu0 += n; \
+						} \
+					} \
+					else \
+					for (j = 0; j < n; ++j) { \
+						pl0 += j; \
+						pl1 += j; \
+						pu0 = pl0 + n; \
+						c##ASSIGN_IDEN(*pl1, *pl0); \
+						pl0 += 1; \
+						pl1 += 1; \
+						for (i = j + 1; i < n; ++i) { \
+							c##ASSIGN_IDEN(*pl1, *pl0); \
+							c##INCREMENT_IDEN(*pl1, *pu0); \
+							c##MULTIPLY(*pl1, 0.5); \
+							pl0 += 1; \
+							pl1 += 1; \
+							pu0 += n; \
+						} \
+					} \
+				} \
 			} else { \
 				if (ul == 'U') \
 					for (j = 0; j < n; ++j) { \
@@ -732,15 +779,16 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ct)
 	return to;
 }
 
-/* symmpart(<denseMatrix>, trans) */
-SEXP R_dense_symmpart(SEXP s_from, SEXP s_trans)
+/* symmpart(<denseMatrix>, uplo, trans) */
+SEXP R_dense_symmpart(SEXP s_from, SEXP s_uplo, SEXP s_trans)
 {
 	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
-	char ct;
+	char ul, ct;
+	VALID_UPLO (s_uplo , ul);
 	VALID_TRANS(s_trans, ct);
 
-	return dense_symmpart(s_from, class, ct);
+	return dense_symmpart(s_from, class, ul, ct);
 }
 
 SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
@@ -803,12 +851,11 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 
 		/* Skew-symmetric part of Hermitian matrix is imaginary part */
 		/* Skew-Hermitian part of symmetric matrix is imaginary part */
-
 		if (op_ct == ct)
 		PROTECT(x1 = allocZero(TYPEOF(x0), XLENGTH(x0)));
 		else {
 		PROTECT(x1 = allocVector(CPLXSXP, XLENGTH(x0)));
-		zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x1));
+		zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x0));
 		}
 
 	} else {

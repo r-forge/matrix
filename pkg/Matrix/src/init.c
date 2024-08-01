@@ -153,7 +153,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_dense_diag_set, 2),
 	CALLDEF(R_dense_transpose, 2),
 	CALLDEF(R_dense_force_symmetric, 3),
-	CALLDEF(R_dense_symmpart, 2),
+	CALLDEF(R_dense_symmpart, 3),
 	CALLDEF(R_dense_skewpart, 2),
 	CALLDEF(R_dense_is_symmetric, 4),
 	CALLDEF(R_dense_is_triangular, 2),
