@@ -651,7 +651,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			if (!packed) \
 				memset(px1, 0, sizeof(c##TYPE) * (size_t) XLENGTH(x1)); \
 			if (class[1] == 'g') { \
-				if (op_ul == 'U') {	\
+				if (op_ul == 'U') { \
 					if (op_ct == 'C') \
 					for (j = 0; j < n; ++j) { \
 						for (i = 0; i < j; ++i) { \
