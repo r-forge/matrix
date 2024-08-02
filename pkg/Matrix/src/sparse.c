@@ -2970,13 +2970,13 @@ void Csparse_colsum(SEXP obj, const char *class,
 
 	int full = nnz1 == n;
 
-#define SUM(c, d) \
+#define SUM(c0, c1) \
 	do { \
-		c##IF_NPATTERN( \
+		c0##IF_NPATTERN( \
 		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
-		c##TYPE *px0 = c##PTR(x0); \
+		c0##TYPE *px0 = c0##PTR(x0); \
 		); \
-		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		c1##TYPE *px1 = c1##PTR(x1), tmp1 = (un) ? c1##UNIT : c1##ZERO; \
 		for (j = 0, k = 0; j < n; ++j) { \
 			kend = pp0[j]; \
 			if (full || k < kend) { \
@@ -2984,19 +2984,19 @@ void Csparse_colsum(SEXP obj, const char *class,
 				if (mean) \
 					count = m; \
 				while (k < kend) { \
-					if (c##NOT_NA(*px0)) \
-						d##INCREMENT_IDEN(*px1, c##CAST(*px0)); \
+					if (c0##NOT_NA(*px0)) \
+						c1##INCREMENT_IDEN(*px1, c0##CAST(*px0)); \
 					else if (!narm) \
-						*px1 = d##NA; \
+						*px1 = c1##NA; \
 					else if (mean) \
 						--count; \
-					c##IF_NPATTERN( \
+					c0##IF_NPATTERN( \
 					++px0; \
 					); \
 					++k; \
 				} \
 				if (mean) \
-					d##DIVIDE(*px1, count); \
+					c1##DIVIDE(*px1, count); \
 				++px1; \
 			} \
 		} \
@@ -3074,14 +3074,14 @@ void Csparse_rowsum(SEXP obj, const char *class,
 	}
 	PROTECT(x1);
 
-#define SUM(c, d) \
+#define SUM(c0, c1) \
 	do { \
-		c##IF_NPATTERN( \
+		c0##IF_NPATTERN( \
 		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
-		c##TYPE *px0 = c##PTR(x0); \
+		c0##TYPE *px0 = c0##PTR(x0); \
 		); \
-		c##TYPE                    tmp0; \
-		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		c0##TYPE                     tmp0; \
+		c1##TYPE *px1 = c1##PTR(x1), tmp1 = (un) ? c1##UNIT : c1##ZERO; \
 		for (i = 0; i < nnz1; ++i) \
 			px1[i] = tmp1; \
 		for (j = 0, k = 0; j < n; ++j) { \
@@ -3089,22 +3089,22 @@ void Csparse_rowsum(SEXP obj, const char *class,
 			while (k < kend) { \
 				i = pi0[k]; \
 				if (he && i == j) \
-				c##ASSIGN_PROJ_REAL(tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+				c0##ASSIGN_PROJ_REAL(tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
 				else \
-				c##ASSIGN_IDEN     (tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
-				if (c##NOT_NA(tmp0)) { \
-					d##INCREMENT_IDEN(px1[MAP(i)], c##CAST(tmp0)); \
+				c0##ASSIGN_IDEN     (tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
+				if (c0##NOT_NA(tmp0)) { \
+					c1##INCREMENT_IDEN(px1[MAP(i)], c0##CAST(tmp0)); \
 					if (sy && i != j) { \
 					if (he) \
-					d##INCREMENT_CONJ(px1[MAP(j)], c##CAST(tmp0)); \
+					c1##INCREMENT_CONJ(px1[MAP(j)], c0##CAST(tmp0)); \
 					else \
-					d##INCREMENT_IDEN(px1[MAP(j)], c##CAST(tmp0)); \
+					c1##INCREMENT_IDEN(px1[MAP(j)], c0##CAST(tmp0)); \
 					} \
 				} \
 				else if (!narm) { \
-					px1[MAP(i)] = d##NA; \
+					px1[MAP(i)] = c1##NA; \
 					if (sy && i != j) \
-					px1[MAP(j)] = d##NA; \
+					px1[MAP(j)] = c1##NA; \
 				} \
 				else if (mean) { \
 					--count[MAP(i)]; \
@@ -3117,10 +3117,10 @@ void Csparse_rowsum(SEXP obj, const char *class,
 		if (mean) { \
 			if (!narm) \
 				for (i = 0; i < nnz1; ++i) \
-					d##DIVIDE(px1[i], n); \
+					c1##DIVIDE(px1[i], n); \
 			else \
 				for (i = 0; i < nnz1; ++i) \
-					d##DIVIDE(px1[i], count[i]); \
+					c1##DIVIDE(px1[i], count[i]); \
 		} \
 	} while (0)
 
@@ -3214,36 +3214,36 @@ void Tsparse_colsum(SEXP obj, const char *class,
 	}
 	PROTECT(x1);
 
-#define SUM(c, d) \
+#define SUM(c0, c1) \
 	do { \
-		c##IF_NPATTERN( \
+		c0##IF_NPATTERN( \
 		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
-		c##TYPE *px0 = c##PTR(x0); \
+		c0##TYPE *px0 = c0##PTR(x0); \
 		); \
-		c##TYPE                    tmp0; \
-		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		c0##TYPE                     tmp0; \
+		c1##TYPE *px1 = c1##PTR(x1), tmp1 = (un) ? c1##UNIT : c1##ZERO; \
 		for (j = 0; j < nnz1; ++j) \
 			px1[j] = tmp1; \
 		for (k = 0; k < kend; ++k) { \
 			i = pi0[k]; \
 			j = pj0[k]; \
 			if (he && i == j) \
-			c##ASSIGN_PROJ_REAL(tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+			c0##ASSIGN_PROJ_REAL(tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
 			else \
-			c##ASSIGN_IDEN     (tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
-			if (c##NOT_NA(tmp0)) { \
-				d##INCREMENT_IDEN(px1[MAP(j)], c##CAST(tmp0)); \
+			c0##ASSIGN_IDEN     (tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
+			if (c0##NOT_NA(tmp0)) { \
+				c1##INCREMENT_IDEN(px1[MAP(j)], c0##CAST(tmp0)); \
 				if (sy && i != j) { \
 				if (he) \
-				d##INCREMENT_CONJ(px1[MAP(i)], c##CAST(tmp0)); \
+				c1##INCREMENT_CONJ(px1[MAP(i)], c0##CAST(tmp0)); \
 				else \
-				d##INCREMENT_IDEN(px1[MAP(i)], c##CAST(tmp0)); \
+				c1##INCREMENT_IDEN(px1[MAP(i)], c0##CAST(tmp0)); \
 				} \
 			} \
 			else if (!narm) { \
-				px1[MAP(j)] = d##NA; \
+				px1[MAP(j)] = c1##NA; \
 				if (sy && i != j) \
-				px1[MAP(i)] = d##NA; \
+				px1[MAP(i)] = c1##NA; \
 			} \
 			else if (mean) { \
 				--count[MAP(j)]; \
@@ -3254,10 +3254,10 @@ void Tsparse_colsum(SEXP obj, const char *class,
 		if (mean) { \
 			if (!narm) \
 				for (j = 0; j < nnz1; ++j) \
-					d##DIVIDE(px1[j], m); \
+					c1##DIVIDE(px1[j], m); \
 			else \
 				for (j = 0; j < nnz1; ++j) \
-					d##DIVIDE(px1[j], count[j]); \
+					c1##DIVIDE(px1[j], count[j]); \
 		} \
 	} while (0)
 

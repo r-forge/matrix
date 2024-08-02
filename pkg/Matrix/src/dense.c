@@ -1391,20 +1391,20 @@ void dense_colsum(SEXP x, const char *class,
 {
 	int i, j, count = -1, packed = class[2] == 'p';
 
-#define SUM(c, d) \
+#define SUM(c0, c1) \
 	do { \
-		c##TYPE *px0 = c##PTR(  x); \
-		d##TYPE *px1 = d##PTR(ans); \
+		c0##TYPE *px0 = c0##PTR(  x); \
+		c1##TYPE *px1 = c1##PTR(ans); \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
-				*px1 = d##ZERO; \
+				*px1 = c1##ZERO; \
 				SUM_KERNEL(c, d, for (i = 0; i < m; ++i)); \
 				px1 += 1; \
 			} \
 		} else if (di == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				*px1 = d##ZERO; \
+				*px1 = c1##ZERO; \
 				SUM_KERNEL(c, d, for (i = 0; i <= j; ++i)); \
 				if (!packed) \
 					px0 += n - j - 1; \
@@ -1412,7 +1412,7 @@ void dense_colsum(SEXP x, const char *class,
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
-				*px1 = d##ZERO; \
+				*px1 = c1##ZERO; \
 				if (!packed) \
 					px0 += j; \
 				SUM_KERNEL(c, d, for (i = j; i < n; ++i)); \
@@ -1421,7 +1421,7 @@ void dense_colsum(SEXP x, const char *class,
 		} else { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				*px1 = d##UNIT; \
+				*px1 = c1##UNIT; \
 				SUM_KERNEL(c, d, for (i = 0; i < j; ++i)); \
 				px0 += 1; \
 				if (!packed) \
@@ -1430,7 +1430,7 @@ void dense_colsum(SEXP x, const char *class,
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
-				*px1 = d##UNIT; \
+				*px1 = c1##UNIT; \
 				if (!packed) \
 					px0 += j; \
 				px0 += 1; \
@@ -1440,21 +1440,21 @@ void dense_colsum(SEXP x, const char *class,
 		} \
 	} while (0)
 
-#define SUM_KERNEL(c, d, __for__) \
+#define SUM_KERNEL(c0, c1, __for__) \
 	do { \
 		if (mean) \
 			count = m; \
 		__for__ { \
-			if (c##NOT_NA(*px0)) \
-				d##INCREMENT_IDEN(*px1, c##CAST(*px0)); \
+			if (c0##NOT_NA(*px0)) \
+				c1##INCREMENT_IDEN(*px1, c0##CAST(*px0)); \
 			else if (!narm) \
-				*px1 = d##NA; \
+				*px1 = c1##NA; \
 			else if (mean) \
 				--count; \
 			px0 += 1; \
 		} \
 		if (mean) \
-			d##DIVIDE(*px1, count); \
+			c1##DIVIDE(*px1, count); \
 	} while (0)
 
 	switch (class[0]) {
@@ -1487,10 +1487,10 @@ void dense_rowsum(SEXP x, const char *class,
 			count[i] = n;
 	}
 
-#define SUM(c, d) \
+#define SUM(c0, c1) \
 	do { \
-		c##TYPE *px0 = c##PTR(  x), tmp0; \
-		d##TYPE *px1 = d##PTR(ans), tmp1 = (un) ? c##UNIT : c##ZERO; \
+		c0##TYPE *px0 = c0##PTR(  x), tmp0; \
+		c1##TYPE *px1 = c1##PTR(ans), tmp1 = (un) ? c0##UNIT : c0##ZERO; \
 		for (i = 0; i < m; ++i) \
 			px1[i] = tmp1; \
 		if (class[1] == 'g') { \
@@ -1528,32 +1528,32 @@ void dense_rowsum(SEXP x, const char *class,
 		if (mean) { \
 			if (!narm) \
 				for (i = 0; i < m; ++i) \
-					d##DIVIDE(px1[i], n); \
+					c1##DIVIDE(px1[i], n); \
 			else \
 				for (i = 0; i < m; ++i) \
-					d##DIVIDE(px1[i], count[i]); \
+					c1##DIVIDE(px1[i], count[i]); \
 		} \
 	} while (0)
 
-#define SUM_KERNEL(c, d, __for__) \
+#define SUM_KERNEL(c0, c1, __for__) \
 	do { \
 		__for__ { \
 			if (he && i == j) \
-			c##ASSIGN_PROJ_REAL(tmp0, *px0); \
+			c0##ASSIGN_PROJ_REAL(tmp0, *px0); \
 			else \
-			c##ASSIGN_IDEN     (tmp0, *px0); \
-			if (c##NOT_NA(tmp0)) { \
-				d##INCREMENT_IDEN(px1[i], c##CAST(tmp0)); \
+			c0##ASSIGN_IDEN     (tmp0, *px0); \
+			if (c0##NOT_NA(tmp0)) { \
+				c1##INCREMENT_IDEN(px1[i], c0##CAST(tmp0)); \
 				if (sy && i != j) { \
 				if (he) \
-				d##INCREMENT_CONJ(px1[j], c##CAST(tmp0)); \
+				c1##INCREMENT_CONJ(px1[j], c0##CAST(tmp0)); \
 				else \
-				d##INCREMENT_IDEN(px1[j], c##CAST(tmp0)); \
+				c1##INCREMENT_IDEN(px1[j], c0##CAST(tmp0)); \
 				} \
 			} else if (!narm) { \
-				px1[i] = d##NA; \
+				px1[i] = c1##NA; \
 				if (sy && i != j) \
-				px1[j] = d##NA; \
+				px1[j] = c1##NA; \
 			} else if (mean) { \
 				--count[i]; \
 				if (sy && i != j) \
