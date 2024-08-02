@@ -1393,49 +1393,49 @@ void dense_colsum(SEXP x, const char *class,
 
 #define SUM(c, d) \
 	do { \
-		c##TYPE *px = c##PTR(x); \
-		d##TYPE *pa = d##PTR(ans); \
+		c##TYPE *px0 = c##PTR(  x); \
+		d##TYPE *px1 = d##PTR(ans); \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
-				*pa = d##ZERO; \
+				*px1 = d##ZERO; \
 				SUM_KERNEL(c, d, for (i = 0; i < m; ++i)); \
-				pa += 1; \
+				px1 += 1; \
 			} \
 		} else if (di == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				*pa = d##ZERO; \
+				*px1 = d##ZERO; \
 				SUM_KERNEL(c, d, for (i = 0; i <= j; ++i)); \
 				if (!packed) \
-					px += n - j - 1; \
-				pa += 1; \
+					px0 += n - j - 1; \
+				px1 += 1; \
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
-				*pa = d##ZERO; \
+				*px1 = d##ZERO; \
 				if (!packed) \
-					px += j; \
+					px0 += j; \
 				SUM_KERNEL(c, d, for (i = j; i < n; ++i)); \
-				pa += 1; \
+				px1 += 1; \
 			} \
 		} else { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				*pa = d##UNIT; \
+				*px1 = d##UNIT; \
 				SUM_KERNEL(c, d, for (i = 0; i < j; ++i)); \
-				px += 1; \
+				px0 += 1; \
 				if (!packed) \
-					px += n - j - 1; \
-				pa += 1; \
+					px0 += n - j - 1; \
+				px1 += 1; \
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
-				*pa = d##UNIT; \
+				*px1 = d##UNIT; \
 				if (!packed) \
-					px += j; \
-				px += 1; \
+					px0 += j; \
+				px0 += 1; \
 				SUM_KERNEL(c, d, for (i = j + 1; i < n; ++i)); \
-				pa += 1; \
+				px1 += 1; \
 			} \
 		} \
 	} while (0)
@@ -1445,16 +1445,16 @@ void dense_colsum(SEXP x, const char *class,
 		if (mean) \
 			count = m; \
 		__for__ { \
-			if (c##NOT_NA(*px)) \
-				d##INCREMENT_IDEN(*pa, c##CAST(*px)); \
+			if (c##NOT_NA(*px0)) \
+				d##INCREMENT_IDEN(*px1, c##CAST(*px0)); \
 			else if (!narm) \
-				*pa = d##NA; \
+				*px1 = d##NA; \
 			else if (mean) \
 				--count; \
-			px += 1; \
+			px0 += 1; \
 		} \
 		if (mean) \
-			d##DIVIDE(*pa, count); \
+			d##DIVIDE(*px1, count); \
 	} while (0)
 
 	switch (class[0]) {
@@ -1489,10 +1489,10 @@ void dense_rowsum(SEXP x, const char *class,
 
 #define SUM(c, d) \
 	do { \
-		c##TYPE *px = c##PTR(x); \
-		d##TYPE *pa = d##PTR(ans), tmp = (un) ? c##UNIT : c##ZERO; \
+		c##TYPE *px0 = c##PTR(  x), tmp0; \
+		d##TYPE *px1 = d##PTR(ans), tmp1 = (un) ? c##UNIT : c##ZERO; \
 		for (i = 0; i < m; ++i) \
-			pa[i] = tmp; \
+			px1[i] = tmp1; \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) \
 				SUM_KERNEL(c, d, for (i = 0; i < m; ++i)); \
@@ -1501,37 +1501,37 @@ void dense_rowsum(SEXP x, const char *class,
 			for (j = 0; j < n; ++j) { \
 				SUM_KERNEL(c, d, for (i = 0; i <= j; ++i)); \
 				if (!packed) \
-					px += n - j - 1; \
+					px0 += n - j - 1; \
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
 				if (!packed) \
-					px += j; \
+					px0 += j; \
 				SUM_KERNEL(c, d, for (i = j; i < n; ++i)); \
 			} \
 		} else { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				SUM_KERNEL(c, d, for (i = 0; i < j; ++i)); \
-				px += 1; \
+				px0 += 1; \
 				if (!packed) \
-					px += n - j - 1; \
+					px0 += n - j - 1; \
 			} \
 			else \
 			for (j = 0; j < n; ++j) { \
 				if (!packed) \
-					px += j; \
-				px += 1; \
+					px0 += j; \
+				px0 += 1; \
 				SUM_KERNEL(c, d, for (i = j + 1; i < n; ++i)); \
 			} \
 		} \
 		if (mean) { \
 			if (!narm) \
 				for (i = 0; i < m; ++i) \
-					d##DIVIDE(pa[i], n); \
+					d##DIVIDE(px1[i], n); \
 			else \
 				for (i = 0; i < m; ++i) \
-					d##DIVIDE(pa[i], count[i]); \
+					d##DIVIDE(px1[i], count[i]); \
 		} \
 	} while (0)
 
@@ -1539,27 +1539,27 @@ void dense_rowsum(SEXP x, const char *class,
 	do { \
 		__for__ { \
 			if (he && i == j) \
-			d##ASSIGN_PROJ_REAL(tmp, c##CAST(*px)); \
+			c##ASSIGN_PROJ_REAL(tmp0, *px0); \
 			else \
-			d##ASSIGN_IDEN     (tmp, c##CAST(*px)); \
-			if (c##NOT_NA(tmp)) { \
-				d##INCREMENT_IDEN(pa[i], tmp); \
+			c##ASSIGN_IDEN     (tmp0, *px0); \
+			if (c##NOT_NA(tmp0)) { \
+				d##INCREMENT_IDEN(px1[i], c##CAST(tmp0)); \
 				if (sy && i != j) { \
 				if (he) \
-				d##INCREMENT_CONJ(pa[j], tmp); \
+				d##INCREMENT_CONJ(px1[j], c##CAST(tmp0)); \
 				else \
-				d##INCREMENT_IDEN(pa[j], tmp); \
+				d##INCREMENT_IDEN(px1[j], c##CAST(tmp0)); \
 				} \
 			} else if (!narm) { \
-				pa[i] = d##NA; \
+				px1[i] = d##NA; \
 				if (sy && i != j) \
-				pa[j] = d##NA; \
+				px1[j] = d##NA; \
 			} else if (mean) { \
 				--count[i]; \
 				if (sy && i != j) \
 				--count[j]; \
 			} \
-			px += 1; \
+			px0 += 1; \
 		} \
 	} while (0)
 

@@ -2916,90 +2916,44 @@ SEXP R_sparse_is_diagonal(SEXP s_obj)
 	return ScalarLogical(sparse_is_diagonal(s_obj, class));
 }
 
-#define   MAP(_I_) work[_I_]
-#define NOMAP(_I_)      _I_
+#define MAP(i) (map) ? map[i] : i
 
-#define CAST_PATTERN(_X_)   1
-#define CAST_LOGICAL(_X_) (_X_ != 0)
-#define CAST_INTEGER(_X_)  _X_
-#define CAST_REAL(_X_)     _X_
-#define CAST_COMPLEX(_X_)  _X_
-
-#define SUM_CASES(_MAP_) \
-do { \
-	if (class[0] == 'n') { \
-		if (mean) \
-		SUM_LOOP(int, LOGICAL, double, REAL, HIDE, \
-		         0.0, 1.0, NA_REAL, ISNA_PATTERN, \
-		         _MAP_, CAST_PATTERN, INCREMENT_REAL, SCALE2_REAL); \
-		else \
-		SUM_LOOP(int, LOGICAL, int, INTEGER, HIDE, \
-		         0, 1, NA_INTEGER, ISNA_PATTERN, \
-		         _MAP_, CAST_PATTERN, INCREMENT_INTEGER, SCALE2_REAL); \
-	} else { \
-		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)); \
-		switch (class[0]) { \
-		case 'l': \
-			if (mean) \
-			SUM_LOOP(int, LOGICAL, double, REAL, SHOW, \
-			         0.0, 1.0, NA_REAL, ISNA_LOGICAL, \
-			         _MAP_, CAST_LOGICAL, INCREMENT_REAL, SCALE2_REAL); \
-			else \
-			SUM_LOOP(int, LOGICAL, int, INTEGER, SHOW, \
-			         0, 1, NA_INTEGER, ISNA_LOGICAL, \
-			         _MAP_, CAST_LOGICAL, INCREMENT_INTEGER, SCALE2_REAL); \
-			break; \
-		case 'i': \
-			SUM_LOOP(int, INTEGER, double, REAL, SHOW, \
-			         0.0, 1.0, NA_REAL, ISNA_INTEGER, \
-			         _MAP_, CAST_INTEGER, INCREMENT_REAL, SCALE2_REAL); \
-			break; \
-		case 'd': \
-			SUM_LOOP(double, REAL, double, REAL, SHOW, \
-			         0.0, 1.0, NA_REAL, ISNA_REAL, \
-			         _MAP_, CAST_REAL, INCREMENT_REAL, SCALE2_REAL); \
-			break; \
-		case 'z': \
-			SUM_LOOP(Rcomplex, COMPLEX, Rcomplex, COMPLEX, SHOW, \
-			         Matrix_zzero, Matrix_zunit, Matrix_zna, ISNA_COMPLEX, \
-			         _MAP_, CAST_COMPLEX, INCREMENT_COMPLEX_ID, SCALE2_COMPLEX); \
-			break; \
-		default: \
-			break; \
-		} \
-		UNPROTECT(1); /* x0 */ \
-	} \
-} while (0)
+#define nCAST(x) (1)
+#define lCAST(x) (x != 0)
+#define iCAST(x) (x)
+#define dCAST(x) (x)
+#define zCAST(x) (x)
 
 #define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
 static
 void Csparse_colsum(SEXP obj, const char *class,
-                    int m, int n, char di, int narm, int mean,
+                    int m, int n, char ul, char ct, char di, int narm, int mean,
                     SEXP ans)
 {
-	int narm_ = narm && mean && class[0] != 'n';
-
 	SEXP p0 = PROTECT(GET_SLOT(obj, Matrix_pSym));
-	int *pp0 = INTEGER(p0) + 1, j, k, kend, nnz1 = n, count = -1;
+	int *pp0 = INTEGER(p0), j, k, kend, nnz1, count = -1,
+		un = class[1] == 't' && di != 'N';
+	pp0++;
 
-	if (TYPEOF(ans) == OBJSXP) {
-
-		if (di == 'N') {
+	SEXP x1;
+	if (TYPEOF(ans) != OBJSXP) {
+		nnz1 = n;
+		x1 = ans;
+	} else {
+		if (un)
+			nnz1 = n;
+		else {
 			nnz1 = 0;
 			for (j = 0; j < n; ++j)
 				if (pp0[j - 1] < pp0[j])
 					++nnz1;
 		}
 
-		SEXP
-		j1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
-		SET_SLOT(ans, Matrix_iSym, j1);
-		SET_SLOT(ans, Matrix_xSym, x1);
-
+		SEXP j1 = PROTECT(allocVector(INTSXP, nnz1));
 		int *pj1 = INTEGER(j1);
-		if (di != 'N')
+		SET_SLOT(ans, Matrix_iSym, j1);
+		if (un)
 			for (j = 0; j < n; ++j)
 				*(pj1++) = j + 1;
 		else
@@ -3007,337 +2961,361 @@ void Csparse_colsum(SEXP obj, const char *class,
 				if (pp0[j - 1] < pp0[j])
 					*(pj1++) = j + 1;
 
-#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
-		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
-		do { \
-			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
-			       _CTYPE1_ *px1 = _PTR1_(x1) , tmp; \
-			for (j = 0, k = 0; j < n; ++j) { \
-				kend = pp0[j]; \
-				if (k < kend || nnz1 == n) { \
-					*px1 = (di != 'N') ? _ONE_ : _ZERO_; \
-					if (mean) \
-						count = m; \
-					while (k < kend) { \
-						if (_ISNA_(*px0)) { \
-							if (!narm) \
-								*px1 = _NA_; \
-							else if (narm_) \
-								--count; \
-						} else { \
-							tmp = _CAST_(*px0); \
-							_INCREMENT_((*px1), tmp); \
-						} \
-						_MASK_(++px0); \
-						++k; \
-					} \
-					if (mean) \
-						_SCALE2_((*px1), count); \
-					++px1; \
-				} \
-			} \
-		} while (0)
+		PROTECT(x1 = allocVector(SUM_TYPEOF(class[0]), nnz1));
+		SET_SLOT(ans, Matrix_xSym, x1);
 
-		SUM_CASES(MAP);
 		UNPROTECT(2); /* x1, j1 */
+	}
+	PROTECT(x1);
 
-	} else {
+	int full = nnz1 == n;
 
-		SEXP x1 = ans;
-		SUM_CASES(NOMAP);
+#define SUM(c, d) \
+	do { \
+		c##IF_NPATTERN( \
+		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
+		c##TYPE *px0 = c##PTR(x0); \
+		); \
+		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = pp0[j]; \
+			if (full || k < kend) { \
+				*px1 = tmp1; \
+				if (mean) \
+					count = m; \
+				while (k < kend) { \
+					if (c##NOT_NA(*px0)) \
+						d##INCREMENT_IDEN(*px1, c##CAST(*px0)); \
+					else if (!narm) \
+						*px1 = d##NA; \
+					else if (mean) \
+						--count; \
+					c##IF_NPATTERN( \
+					++px0; \
+					); \
+					++k; \
+				} \
+				if (mean) \
+					d##DIVIDE(*px1, count); \
+				++px1; \
+			} \
+		} \
+	} while (0)
 
+	switch (class[0]) {
+	case 'n': if (mean) SUM(n, d); else SUM(n, i); break;
+	case 'l': if (mean) SUM(l, d); else SUM(l, i); break;
+	case 'i':                           SUM(i, d); break;
+	case 'd':                           SUM(d, d); break;
+	case 'z':                           SUM(z, z); break;
+	default:                                       break;
 	}
 
-#undef SUM_LOOP
+#undef SUM
 
-	UNPROTECT(1); /* p0 */
+	UNPROTECT(2); /* x1, p0 */
 	return;
 }
 
 static
 void Csparse_rowsum(SEXP obj, const char *class,
-                    int m, int n, char di, int narm, int mean,
+                    int m, int n, char ul, char ct, char di, int narm, int mean,
                     SEXP ans, SEXP iSym)
 {
-	int narm_ = narm && mean && class[0] != 'n';
-
 	SEXP p0 = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-		i0 = PROTECT(GET_SLOT(obj, iSym));
-	int *pp0 = INTEGER(p0) + 1, *pi0 = INTEGER(i0), i, j, k, kend,
-		nnz0 = pp0[n - 1], nnz1 = m;
+		i0 = PROTECT(GET_SLOT(obj,        iSym));
+	int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0), i, j, k, kend, nnz1,
+		*count = NULL, *map = NULL,
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && di != 'N';
+	pp0++;
 
-	if (TYPEOF(ans) == OBJSXP) {
-
-		int *work;
-		Matrix_Calloc(work, m, int);
-		if (di != 'N')
+	SEXP x1;
+	if (TYPEOF(ans) != OBJSXP) {
+		nnz1 = m;
+		x1 = ans;
+		if (narm && mean) {
+			Matrix_Calloc(count, m, int);
 			for (i = 0; i < m; ++i)
-				work[i] = i;
+				count[i] = n;
+		}
+	} else {
+		if (un)
+			nnz1 = m;
 		else {
-			if (class[1] != 's') {
-				for (k = 0; k < nnz0; ++k)
-					++work[pi0[k]];
-			} else {
-				for (j = 0, k = 0; j < n; ++j) {
-					kend = pp0[j];
-					while (k < kend) {
-						++work[pi0[k]];
-						if (pi0[k] != j)
-						++work[     j];
-						++k;
-					}
+			nnz1 = 0;
+			Matrix_Calloc(map, m, int);
+			for (j = 0, k = 0; j < n; ++j) {
+				kend = pp0[j];
+				while (k < kend) {
+					i = pi0[k];
+					++map[i];
+					if (sy && i != j)
+					++map[j];
+					++k;
 				}
 			}
-			nnz1 = 0;
 			for (i = 0; i < m; ++i)
-				work[i] = (work[i]) ? nnz1++ : -1;
+				map[i] = (map[i]) ? nnz1++ : -1;
 		}
 
-		SEXP
-		i1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
+		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1));
 		SET_SLOT(ans, Matrix_iSym, i1);
-		SET_SLOT(ans, Matrix_xSym, x1);
-		int *pi1 = INTEGER(i1);
-		if (narm_)
+		if (narm && mean) {
+			count = INTEGER(i1);
 			for (i = 0; i < nnz1; ++i)
-				pi1[i] = n;
-
-#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
-		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
-		do { \
-			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
-			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
-			       _CTYPE1_  tmp = (di != 'N') ? _ONE_ : _ZERO_; \
-			for (i = 0; i < nnz1; ++i) \
-				px1[i] = tmp; \
-			if (class[1] != 's') { \
-				for (k = 0; k < nnz0; ++k) { \
-					if (_ISNA_(px0[k])) { \
-						if (!narm) \
-							px1[_MAP_(pi0[k])] = _NA_; \
-						else if (narm_) \
-							--pi1[_MAP_(pi0[k])]; \
-					} else { \
-						tmp = _CAST_(px0[k]); \
-						_INCREMENT_(px1[_MAP_(pi0[k])], tmp); \
-					} \
-				} \
-			} else { \
-				int off; \
-				for (j = 0, k = 0; j < n; ++j) { \
-					kend = pp0[j]; \
-					while (k < kend) { \
-						off = pi0[k] != j; \
-						if (_ISNA_(px0[k])) { \
-							if (!narm) { \
-								px1[_MAP_(pi0[k])] = _NA_; \
-								if (off) \
-								px1[_MAP_(     j)] = _NA_; \
-							} else if (narm_) { \
-								--pi1[_MAP_(pi0[k])]; \
-								if (off) \
-								--pi1[_MAP_(     j)]; \
-							} \
-						} else { \
-							tmp = _CAST_(px0[k]); \
-							_INCREMENT_(px1[_MAP_(pi0[k])], tmp); \
-							if (off) \
-							_INCREMENT_(px1[_MAP_(     j)], tmp); \
-						} \
-						++k; \
-					} \
-				} \
-			} \
-			if (mean) { \
-				if (narm_) \
-					for (i = 0; i < nnz1; ++i) \
-						_SCALE2_(px1[i], pi1[i]); \
-				else \
-					for (i = 0; i < nnz1; ++i) \
-						_SCALE2_(px1[i], n); \
-			} \
-		} while (0)
-
-		SUM_CASES(MAP);
-		for (i = 0; i < m; ++i)
-			if (work[i] >= 0)
-				*(pi1++) = i + 1;
-		Matrix_Free(work, m);
-		UNPROTECT(2); /* x1, i1 */
-
-	} else {
-
-		SEXP x1 = ans;
-		int *pi1 = NULL;
-		if (narm_) {
-			Matrix_Calloc(pi1, m, int);
-			for (i = 0; i < m; ++i)
-				pi1[i] = n;
+				count[i] = n;
 		}
-		SUM_CASES(NOMAP);
-		if (narm_)
-			Matrix_Free(pi1, m);
 
+		PROTECT(x1 = allocVector(SUM_TYPEOF(class[0]), nnz1));
+		SET_SLOT(ans, Matrix_xSym, x1);
+
+		UNPROTECT(2); /* x1, i1 */
+	}
+	PROTECT(x1);
+
+#define SUM(c, d) \
+	do { \
+		c##IF_NPATTERN( \
+		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
+		c##TYPE *px0 = c##PTR(x0); \
+		); \
+		c##TYPE                    tmp0; \
+		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		for (i = 0; i < nnz1; ++i) \
+			px1[i] = tmp1; \
+		for (j = 0, k = 0; j < n; ++j) { \
+			kend = pp0[j]; \
+			while (k < kend) { \
+				i = pi0[k]; \
+				if (he && i == j) \
+				c##ASSIGN_PROJ_REAL(tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+				else \
+				c##ASSIGN_IDEN     (tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+				if (c##NOT_NA(tmp0)) { \
+					d##INCREMENT_IDEN(px1[MAP(i)], c##CAST(tmp0)); \
+					if (sy && i != j) { \
+					if (he) \
+					d##INCREMENT_CONJ(px1[MAP(j)], c##CAST(tmp0)); \
+					else \
+					d##INCREMENT_IDEN(px1[MAP(j)], c##CAST(tmp0)); \
+					} \
+				} \
+				else if (!narm) { \
+					px1[MAP(i)] = d##NA; \
+					if (sy && i != j) \
+					px1[MAP(j)] = d##NA; \
+				} \
+				else if (mean) { \
+					--count[MAP(i)]; \
+					if (sy && i != j) \
+					--count[MAP(j)]; \
+				} \
+				++k; \
+			} \
+		} \
+		if (mean) { \
+			if (!narm) \
+				for (i = 0; i < nnz1; ++i) \
+					d##DIVIDE(px1[i], n); \
+			else \
+				for (i = 0; i < nnz1; ++i) \
+					d##DIVIDE(px1[i], count[i]); \
+		} \
+	} while (0)
+
+	switch (class[0]) {
+	case 'n': if (mean) SUM(n, d); else SUM(n, i); break;
+	case 'l': if (mean) SUM(l, d); else SUM(l, i); break;
+	case 'i':                           SUM(i, d); break;
+	case 'd':                           SUM(d, d); break;
+	case 'z':                           SUM(z, z); break;
+	default:                                       break;
 	}
 
-#undef SUM_LOOP
+#undef SUM
 
-	UNPROTECT(2); /* i0, p0 */
+	if (TYPEOF(ans) != OBJSXP) {
+		if (count)
+			Matrix_Free(count, m);
+	} else {
+		SEXP i1 = GET_SLOT(ans, Matrix_iSym);
+		int *pi1 = INTEGER(i1);
+		if (map) {
+			for (i = 0; i < m; ++i)
+				if (map[i] >= 0)
+					pi1[map[i]] = i + 1;
+			Matrix_Free(map, m);
+		}
+		else
+			for (i = 0; i < m; ++i)
+				pi1[i] = i + 1;
+	}
+
+	UNPROTECT(3); /* x1, i0, p0 */
 	return;
 }
 
 static
 void Tsparse_colsum(SEXP obj, const char *class,
-                    int m, int n, char di, int narm, int mean,
+                    int m, int n, char ul, char ct, char di, int narm, int mean,
                     SEXP ans, SEXP iSym, SEXP jSym)
 {
-	int narm_ = narm && mean && class[0] != 'n';
-	if (narm_)
+	if (narm && mean)
 		obj = sparse_aggregate(obj, class);
 	PROTECT(obj);
 
 	SEXP i0 = PROTECT(GET_SLOT(obj, iSym)),
 		j0 = PROTECT(GET_SLOT(obj, jSym));
-	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), j, nnz1 = n;
-	R_xlen_t k, nnz0 = XLENGTH(i0);
+	int *pi0 = INTEGER(i0), *pj0 = INTEGER(j0), i, j, nnz1,
+		*count = NULL, *map = NULL,
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && di != 'N';;
+	R_xlen_t k, kend = XLENGTH(i0);
 
-	if (TYPEOF(ans) == OBJSXP) {
-
-		int *work;
-		Matrix_Calloc(work, n, int);
-		if (di != 'N')
+	SEXP x1;
+	if (TYPEOF(ans) != OBJSXP) {
+		nnz1 = n;
+		x1 = ans;
+		if (narm && mean) {
+			Matrix_Calloc(count, n, int);
 			for (j = 0; j < n; ++j)
-				work[j] = j;
+				count[j] = m;
+		}
+	} else {
+		if (un)
+			nnz1 = n;
 		else {
-			if (class[1] != 's') {
-				for (k = 0; k < nnz0; ++k)
-					++work[pj0[k]];
-			} else {
-				for (k = 0; k < nnz0; ++k) {
-					++work[pj0[k]];
-					if (pi0[k] != pj0[k])
-					++work[pi0[k]];
-				}
-			}
 			nnz1 = 0;
+			Matrix_Calloc(map, n, int);
+			for (k = 0; k < kend; ++k) {
+				i = pi0[k];
+				j = pj0[k];
+				++map[j];
+				if (sy && i != j)
+				++map[i];
+			}
 			for (j = 0; j < n; ++j)
-				work[j] = (work[j]) ? nnz1++ : -1;
+				map[j] = (map[j]) ? nnz1++ : -1;
 		}
 
-		SEXP
-		j1 = PROTECT(allocVector(INTSXP, nnz1)),
-		x1 = PROTECT(allocVector(SUM_TYPEOF(class[0]), nnz1));
+		SEXP j1 = PROTECT(allocVector(INTSXP, nnz1));
 		SET_SLOT(ans, Matrix_iSym, j1);
-		SET_SLOT(ans, Matrix_xSym, x1);
-		int *pj1 = INTEGER(j1);
-		if (narm_)
+		if (narm && mean) {
+			count = INTEGER(j1);
 			for (j = 0; j < nnz1; ++j)
-				pj1[j] = m;
+				count[j] = m;
+		}
 
-#define SUM_LOOP(_CTYPE0_, _PTR0_, _CTYPE1_, _PTR1_, _MASK_, \
-		         _ZERO_, _ONE_, _NA_, _ISNA_, \
-		         _MAP_, _CAST_, _INCREMENT_, _SCALE2_) \
-		do { \
-			_MASK_(_CTYPE0_ *px0 = _PTR0_(x0)); \
-			       _CTYPE1_ *px1 = _PTR1_(x1) ; \
-			       _CTYPE1_  tmp = (di != 'N') ? _ONE_ : _ZERO_; \
-			for (j = 0; j < nnz1; ++j) \
-				px1[j] = tmp; \
-			if (class[1] != 's') { \
-				for (k = 0; k < nnz0; ++k) { \
-					if (_ISNA_(px0[k])) { \
-						if (!narm) \
-							px1[_MAP_(pj0[k])] = _NA_; \
-						else if (narm_) \
-							--pj1[_MAP_(pj0[k])]; \
-					} else { \
-						tmp = _CAST_(px0[k]); \
-						_INCREMENT_(px1[_MAP_(pj0[k])], tmp); \
-					} \
-				} \
-			} else { \
-				int off; \
-				for (k = 0; k < nnz0; ++k) { \
-					off = pi0[k] != pj0[k]; \
-					if (_ISNA_(px0[k])) { \
-						if (!narm) { \
-							px1[_MAP_(pj0[k])] = _NA_; \
-							if (off) \
-							px1[_MAP_(pi0[k])] = _NA_; \
-						} else if (narm_) { \
-							--pj1[_MAP_(pj0[k])]; \
-							if (off) \
-							--pj1[_MAP_(pi0[k])]; \
-						} \
-					} else { \
-						tmp = _CAST_(px0[k]); \
-						_INCREMENT_(px1[_MAP_(pj0[k])], tmp); \
-						if (off) \
-						_INCREMENT_(px1[_MAP_(pi0[k])], tmp); \
-					} \
-				} \
-			} \
-			if (mean) { \
-				if (narm_) \
-					for (j = 0; j < nnz1; ++j) \
-						_SCALE2_(px1[j], pj1[j]); \
-				else \
-					for (j = 0; j < nnz1; ++j) \
-						_SCALE2_(px1[j], m); \
-			} \
-		} while (0)
+		PROTECT(x1 = allocVector(SUM_TYPEOF(class[0]), nnz1));
+		SET_SLOT(ans, Matrix_xSym, x1);
 
-		SUM_CASES(MAP);
-		for (j = 0; j < n; ++j)
-			if (work[j] >= 0)
-				*(pj1++) = j + 1;
-		Matrix_Free(work, n);
 		UNPROTECT(2); /* x1, j1 */
+	}
+	PROTECT(x1);
 
-	} else {
+#define SUM(c, d) \
+	do { \
+		c##IF_NPATTERN( \
+		SEXP x0 = GET_SLOT(obj, Matrix_xSym); \
+		c##TYPE *px0 = c##PTR(x0); \
+		); \
+		c##TYPE                    tmp0; \
+		d##TYPE *px1 = d##PTR(x1), tmp1 = (un) ? d##UNIT : d##ZERO; \
+		for (j = 0; j < nnz1; ++j) \
+			px1[j] = tmp1; \
+		for (k = 0; k < kend; ++k) { \
+			i = pi0[k]; \
+			j = pj0[k]; \
+			if (he && i == j) \
+			c##ASSIGN_PROJ_REAL(tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+			else \
+			c##ASSIGN_IDEN     (tmp0, c##IFELSE_NPATTERN(px0[k], c##UNIT)); \
+			if (c##NOT_NA(tmp0)) { \
+				d##INCREMENT_IDEN(px1[MAP(j)], c##CAST(tmp0)); \
+				if (sy && i != j) { \
+				if (he) \
+				d##INCREMENT_CONJ(px1[MAP(i)], c##CAST(tmp0)); \
+				else \
+				d##INCREMENT_IDEN(px1[MAP(i)], c##CAST(tmp0)); \
+				} \
+			} \
+			else if (!narm) { \
+				px1[MAP(j)] = d##NA; \
+				if (sy && i != j) \
+				px1[MAP(i)] = d##NA; \
+			} \
+			else if (mean) { \
+				--count[MAP(j)]; \
+				if (sy && i != j) \
+				--count[MAP(i)]; \
+			} \
+		} \
+		if (mean) { \
+			if (!narm) \
+				for (j = 0; j < nnz1; ++j) \
+					d##DIVIDE(px1[j], m); \
+			else \
+				for (j = 0; j < nnz1; ++j) \
+					d##DIVIDE(px1[j], count[j]); \
+		} \
+	} while (0)
 
-		SEXP x1 = ans;
-		int *pj1 = NULL;
-		if (narm_)
-			Matrix_Calloc(pj1, n, int);
-		SUM_CASES(NOMAP);
-		if (narm_)
-			Matrix_Free(pj1, n);
-
+	switch (class[0]) {
+	case 'n': if (mean) SUM(n, d); else SUM(n, i); break;
+	case 'l': if (mean) SUM(l, d); else SUM(l, i); break;
+	case 'i':                           SUM(i, d); break;
+	case 'd':                           SUM(d, d); break;
+	case 'z':                           SUM(z, z); break;
+	default:                                       break;
 	}
 
-#undef SUM_LOOP
+#undef SUM
 
-	UNPROTECT(3); /* j0, i0, obj */
+	if (TYPEOF(ans) != OBJSXP) {
+		if (count)
+			Matrix_Free(count, n);
+	} else {
+		SEXP j1 = GET_SLOT(ans, Matrix_iSym);
+		int *pj1 = INTEGER(j1);
+		if (map) {
+			for (j = 0; j < n; ++j)
+				if (map[j] >= 0)
+					pj1[map[j]] = j + 1;
+			Matrix_Free(map, n);
+		}
+		else
+			for (j = 0; j < n; ++j)
+				pj1[j] = j + 1;
+	}
+
+	UNPROTECT(4); /* x1, j0, i0, obj */
 	return;
 }
 
 SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
                       int sparse)
 {
+	narm = narm && class[0] != 'n';
+
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1],
-		r = (mg == 0) ? m : n;
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (mg == 0) ? m : n;
 
 	SEXP ans;
 	SEXPTYPE type = SUM_TYPEOF(class[0]);
 	if (sparse) {
 		char cl[] = ".sparseVector";
-		cl[0] = (type == CPLXSXP) ? 'z' : ((type == REALSXP) ? 'd' : 'i');
+		cl[0] = typeToKind(type);
 		PROTECT(ans = newObject(cl));
 
-		SEXP length = PROTECT(ScalarInteger(r));
-		SET_SLOT(ans, Matrix_lengthSym, length);
-		UNPROTECT(1); /* length */
+		SEXP length = GET_SLOT(ans, Matrix_lengthSym);
+		INTEGER(length)[0] = r;
 	} else {
 		PROTECT(ans = allocVector(type, r));
 
-		SEXP dimnames = (class[1] != 's')
-			? GET_SLOT(obj, Matrix_DimNamesSym)
-			: get_symmetrized_DimNames(obj, -1),
+		SEXP dimnames = (class[1] == 's')
+			? get_symmetrized_DimNames(obj, -1)
+			: GET_SLOT(obj, Matrix_DimNamesSym),
 			marnames = VECTOR_ELT(dimnames, mg);
 		if (marnames != R_NilValue) {
 			PROTECT(marnames);
@@ -3346,41 +3324,60 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
 		}
 	}
 
-	char di = 'N';
+	char ul = '\0', ct = '\0', di = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	if (mg == 0) {
-		if (class[2] == 'C') {
-			Csparse_rowsum(obj, class, m, n, di, narm, mean, ans,
+	if (mg == 0)
+		switch (class[2]) {
+		case 'C':
+			Csparse_rowsum(obj, class, m, n, ul, ct, di, narm, mean, ans,
 			               Matrix_iSym);
-		} else if (class[2] == 'R') {
-			if (class[1] != 's')
-			Csparse_colsum(obj, class, n, m, di, narm, mean, ans);
-			else
-			Csparse_rowsum(obj, class, n, m, di, narm, mean, ans,
+			break;
+		case 'R':
+			if (class[1] == 's')
+			Csparse_rowsum(obj, class, n, m, ul, ct, di, narm, mean, ans,
 			               Matrix_jSym);
-		} else {
-			Tsparse_colsum(obj, class, n, m, di, narm, mean, ans,
+			else
+			Csparse_colsum(obj, class, n, m, ul, ct, di, narm, mean, ans);
+			break;
+		case 'T':
+			Tsparse_colsum(obj, class, n, m, ul, ct, di, narm, mean, ans,
 			               Matrix_jSym, Matrix_iSym);
+			break;
+		default:
+			break;
 		}
-	} else {
-		if (class[2] == 'C') {
-			if (class[1] != 's')
-			Csparse_colsum(obj, class, m, n, di, narm, mean, ans);
-			else
-			Csparse_rowsum(obj, class, m, n, di, narm, mean, ans,
+	else
+		switch (class[2]) {
+		case 'C':
+			if (class[1] == 's')
+			Csparse_rowsum(obj, class, m, n, ul, ct, di, narm, mean, ans,
 			               Matrix_iSym);
-		} else if (class[2] == 'R') {
-			Csparse_rowsum(obj, class, n, m, di, narm, mean, ans,
+			else
+			Csparse_colsum(obj, class, m, n, ul, ct, di, narm, mean, ans);
+			break;
+		case 'R':
+			Csparse_rowsum(obj, class, n, m, ul, ct, di, narm, mean, ans,
 			               Matrix_jSym);
-		} else {
-			Tsparse_colsum(obj, class, m, n, di, narm, mean, ans,
+			break;
+		case 'T':
+			Tsparse_colsum(obj, class, m, n, ul, ct, di, narm, mean, ans,
 			               Matrix_iSym, Matrix_jSym);
+			break;
+		default:
+			break;
 		}
-	}
 
 	UNPROTECT(1); /* ans */
 	return ans;
@@ -3400,12 +3397,10 @@ SEXP R_sparse_marginsum(SEXP s_obj, SEXP s_margin, SEXP s_narm, SEXP s_mean,
 	VALID_LOGIC2(s_mean  , mean  );
 	VALID_LOGIC2(s_sparse, sparse);
 
-	return sparse_marginsum(s_obj, class, mg, narm, mean,
-	                        sparse);
+	return sparse_marginsum(s_obj, class, mg, narm, mean, sparse);
 }
 
 #undef SUM_CASES
-#undef SUM_TYPEOF
 
 #define TRY_INCREMENT(_LABEL_) \
 	do { \
@@ -3896,6 +3891,3 @@ SEXP R_sparse_prod(SEXP s_obj, SEXP s_narm)
 
 	return sparse_prod(s_obj, class, narm);
 }
-
-#undef TRY_INCREMENT
-#undef LONGDOUBLE_AS_DOUBLE
