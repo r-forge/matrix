@@ -99,74 +99,11 @@ const char *valid_dense[], *valid_sparse[],
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
-#define ISNA_PATTERN(_X_) (0)
-#define ISNA_LOGICAL(_X_) ((_X_) == NA_LOGICAL)
-#define ISNA_INTEGER(_X_) ((_X_) == NA_INTEGER)
-#define ISNA_REAL(_X_)    (ISNAN(_X_))
-#define ISNA_COMPLEX(_X_) (ISNAN((_X_).r) || ISNAN((_X_).i))
-
 #define NOTZERO_PATTERN(_X_) ((_X_) != 0)
 #define NOTZERO_LOGICAL(_X_) ((_X_) != 0)
 #define NOTZERO_INTEGER(_X_) ((_X_) != 0)
 #define NOTZERO_REAL(_X_)    ((_X_) != 0.0)
 #define NOTZERO_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
-
-#define STRICTLY_NOTZERO_PATTERN(_X_) \
-	(                      NOTZERO_PATTERN(_X_))
-#define STRICTLY_NOTZERO_LOGICAL(_X_) \
-	(!ISNA_LOGICAL(_X_) && NOTZERO_LOGICAL(_X_))
-#define STRICTLY_NOTZERO_INTEGER(_X_) \
-	(!ISNA_INTEGER(_X_) && NOTZERO_INTEGER(_X_))
-#define STRICTLY_NOTZERO_REAL(_X_) \
-	(!ISNA_REAL   (_X_) && NOTZERO_REAL   (_X_))
-#define STRICTLY_NOTZERO_COMPLEX(_X_) \
-	(!ISNA_COMPLEX(_X_) && NOTZERO_COMPLEX(_X_))
-
-#define INCREMENT_PATTERN(_X_, _Y_) \
-	do { \
-		_X_ = 1; \
-	} while (0)
-#define INCREMENT_LOGICAL(_X_, _Y_) \
-	do { \
-		if (_Y_ == NA_LOGICAL) { \
-			if (_X_ == 0) \
-				_X_ = NA_LOGICAL; \
-		} else if (_Y_ != 0) \
-			_X_ = 1; \
-	} while (0)
-#define INCREMENT_INTEGER(_X_, _Y_) \
-	do { \
-		if (_X_ != NA_INTEGER) { \
-			if (_Y_ == NA_INTEGER) \
-				_X_ = NA_INTEGER; \
-			else if ((_Y_ < 0) \
-					 ? (_X_ <= INT_MIN - _Y_) \
-					 : (_X_ >  INT_MAX - _Y_)) { \
-				warning(_("NAs produced by integer overflow")); \
-				_X_ = NA_INTEGER; \
-			} else \
-				_X_ += _Y_; \
-		} \
-	} while (0)
-#define INCREMENT_REAL(_X_, _Y_) \
-	do { \
-		_X_ += _Y_; \
-	} while (0)
-#define INCREMENT_COMPLEX_ID(_X_, _Y_) \
-	do { \
-		_X_.r += _Y_.r; \
-		_X_.i += _Y_.i; \
-	} while (0)
-#define INCREMENT_COMPLEX_CJ(_X_, _Y_) \
-	do { \
-		_X_.r += _Y_.r; \
-		_X_.i -= _Y_.i; \
-	} while (0)
-
-#define SCALE2_REAL(_X_, _A_) \
-	do { _X_   /= _A_;               } while (0)
-#define SCALE2_COMPLEX(_X_, _A_) \
-	do { _X_.r /= _A_; _X_.i /= _A_; } while (0)
 
 #define PACKED_AR21_UP(i, j) \
 	((i) + ((j) * (            (j) + 1U)) / 2U)

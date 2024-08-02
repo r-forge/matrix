@@ -1,4 +1,5 @@
 #include "Mdefines.h"
+#include "M5.h"
 #include "utils-R.h"
 
 SEXP R_Matrix_version(void)
@@ -164,54 +165,35 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 	if (!ISNAN(nnzmax) && nnzmax >= 0.0 && nnzmax < (double) n)
 		n = (R_xlen_t) nnzmax;
 
-#define DO_NNZ(_CTYPE_, _PTR_, _ISNA_, _NOTZERO_, _STRICTLY_NOTZERO_) \
+#define NNZ(c) \
 	do { \
-		_CTYPE_ *px = _PTR_(s_x); \
+		c##TYPE *px = c##PTR(s_x); \
 		if (countNA == NA_LOGICAL) { \
 			while (n-- > 0) { \
-				if (_ISNA_(*px)) \
+				if (!c##NOT_NA(*px)) \
 					return ScalarInteger(NA_INTEGER); \
-				if (_NOTZERO_(*px)) \
+				if (c##NOT_ZERO(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else if (countNA != 0) { \
 			while (n-- > 0) { \
-				if (_NOTZERO_(*px)) \
+				if (c##NOT_ZERO(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} else { \
 			while (n-- > 0) { \
-				if (_STRICTLY_NOTZERO_(*px)) \
+				if (c##NOT_NA(*px) && c##NOT_ZERO(*px)) \
 					++nnz; \
 				++px; \
 			} \
 		} \
 	} while (0)
 
-	switch (TYPEOF(s_x)) {
-	case LGLSXP:
-		DO_NNZ(int, LOGICAL,
-		       ISNA_LOGICAL, NOTZERO_LOGICAL, STRICTLY_NOTZERO_LOGICAL);
-		break;
-	case INTSXP:
-		DO_NNZ(int, INTEGER,
-		       ISNA_INTEGER, NOTZERO_INTEGER, STRICTLY_NOTZERO_INTEGER);
-	break;
-	case REALSXP:
-		DO_NNZ(double, REAL,
-		       ISNA_REAL, NOTZERO_REAL, STRICTLY_NOTZERO_REAL);
-	break;
-	case CPLXSXP:
-		DO_NNZ(Rcomplex, COMPLEX,
-		       ISNA_COMPLEX, NOTZERO_COMPLEX, STRICTLY_NOTZERO_COMPLEX);
-	break;
-	default:
-		ERROR_INVALID_TYPE(s_x, __func__);
-	}
+	SWITCH4(typeToKind(TYPEOF(s_x)), NNZ);
 
-#undef DO_NNZ
+#undef NNZ
 
 	return (nnz <= INT_MAX)
 		? ScalarInteger((int) nnz) : ScalarReal((double) nnz);
