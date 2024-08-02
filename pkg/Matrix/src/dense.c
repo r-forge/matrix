@@ -1382,6 +1382,8 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 #define dCAST(x) (x)
 #define zCAST(x) (x)
 
+#define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
+
 static
 void dense_colsum(SEXP x, const char *class,
                   int m, int n, char ul, char ct, char di, int narm, int mean,
@@ -1392,7 +1394,7 @@ void dense_colsum(SEXP x, const char *class,
 #define SUM(c, d) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
-		d##TYPE *pa = d##PTR(ans), tmp; \
+		d##TYPE *pa = d##PTR(ans); \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
 				*pa = d##ZERO; \
@@ -1443,10 +1445,8 @@ void dense_colsum(SEXP x, const char *class,
 		if (mean) \
 			count = m; \
 		__for__ { \
-			if (c##NOT_NA(*px)) { \
-				tmp = c##CAST(*px); \
-				d##INCREMENT_IDEN(*pa, tmp); \
-			} \
+			if (c##NOT_NA(*px)) \
+				d##INCREMENT_IDEN(*pa, c##CAST(*px)); \
 			else if (!narm) \
 				*pa = d##NA; \
 			else if (mean) \
@@ -1478,7 +1478,8 @@ void dense_rowsum(SEXP x, const char *class,
                   SEXP ans)
 {
 	int i, j, *count = NULL, packed = XLENGTH(x) != (int_fast64_t) m * n,
-		sy = class[1] == 's', he = sy && ct == 'C';
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && di != 'N';
 
 	if (mean && narm) {
 		Matrix_Calloc(count, m, int);
@@ -1489,8 +1490,7 @@ void dense_rowsum(SEXP x, const char *class,
 #define SUM(c, d) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
-		d##TYPE *pa = d##PTR(ans), \
-			tmp = (class[1] != 't' || di == 'N') ? c##ZERO : c##UNIT; \
+		d##TYPE *pa = d##PTR(ans), tmp = (un) ? c##UNIT : c##ZERO; \
 		for (i = 0; i < m; ++i) \
 			pa[i] = tmp; \
 		if (class[1] == 'g') { \
@@ -1526,20 +1526,23 @@ void dense_rowsum(SEXP x, const char *class,
 			} \
 		} \
 		if (mean) { \
-			if (narm) \
-				for (i = 0; i < m; ++i) \
-					d##DIVIDE(pa[i], count[i]); \
-			else \
+			if (!narm) \
 				for (i = 0; i < m; ++i) \
 					d##DIVIDE(pa[i], n); \
+			else \
+				for (i = 0; i < m; ++i) \
+					d##DIVIDE(pa[i], count[i]); \
 		} \
 	} while (0)
 
 #define SUM_KERNEL(c, d, __for__) \
 	do { \
 		__for__ { \
-			if (c##NOT_NA(*px)) { \
-				tmp = c##CAST(*px); \
+			if (he && i == j) \
+			d##ASSIGN_PROJ_REAL(tmp, c##CAST(*px)); \
+			else \
+			d##ASSIGN_IDEN     (tmp, c##CAST(*px)); \
+			if (c##NOT_NA(tmp)) { \
 				d##INCREMENT_IDEN(pa[i], tmp); \
 				if (sy && i != j) { \
 				if (he) \
@@ -1583,8 +1586,6 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (mg == 0) ? m : n;
-
-#define SUM_TYPEOF(c) (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
 	SEXP ans = PROTECT(allocVector(SUM_TYPEOF(class[0]), r)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
