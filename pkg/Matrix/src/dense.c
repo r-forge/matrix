@@ -1398,14 +1398,14 @@ void dense_colsum(SEXP x, const char *class,
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) { \
 				*px1 = c1##ZERO; \
-				SUM_KERNEL(c, d, for (i = 0; i < m; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i < m; ++i)); \
 				px1 += 1; \
 			} \
 		} else if (di == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				*px1 = c1##ZERO; \
-				SUM_KERNEL(c, d, for (i = 0; i <= j; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i <= j; ++i)); \
 				if (!packed) \
 					px0 += n - j - 1; \
 				px1 += 1; \
@@ -1415,14 +1415,14 @@ void dense_colsum(SEXP x, const char *class,
 				*px1 = c1##ZERO; \
 				if (!packed) \
 					px0 += j; \
-				SUM_KERNEL(c, d, for (i = j; i < n; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = j; i < n; ++i)); \
 				px1 += 1; \
 			} \
 		} else { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				*px1 = c1##UNIT; \
-				SUM_KERNEL(c, d, for (i = 0; i < j; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i < j; ++i)); \
 				px0 += 1; \
 				if (!packed) \
 					px0 += n - j - 1; \
@@ -1434,7 +1434,7 @@ void dense_colsum(SEXP x, const char *class,
 				if (!packed) \
 					px0 += j; \
 				px0 += 1; \
-				SUM_KERNEL(c, d, for (i = j + 1; i < n; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = j + 1; i < n; ++i)); \
 				px1 += 1; \
 			} \
 		} \
@@ -1495,11 +1495,11 @@ void dense_rowsum(SEXP x, const char *class,
 			px1[i] = tmp1; \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) \
-				SUM_KERNEL(c, d, for (i = 0; i < m; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i < m; ++i)); \
 		} else if (class[1] == 's' || di == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				SUM_KERNEL(c, d, for (i = 0; i <= j; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i <= j; ++i)); \
 				if (!packed) \
 					px0 += n - j - 1; \
 			} \
@@ -1507,12 +1507,12 @@ void dense_rowsum(SEXP x, const char *class,
 			for (j = 0; j < n; ++j) { \
 				if (!packed) \
 					px0 += j; \
-				SUM_KERNEL(c, d, for (i = j; i < n; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = j; i < n; ++i)); \
 			} \
 		} else { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
-				SUM_KERNEL(c, d, for (i = 0; i < j; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = 0; i < j; ++i)); \
 				px0 += 1; \
 				if (!packed) \
 					px0 += n - j - 1; \
@@ -1522,7 +1522,7 @@ void dense_rowsum(SEXP x, const char *class,
 				if (!packed) \
 					px0 += j; \
 				px0 += 1; \
-				SUM_KERNEL(c, d, for (i = j + 1; i < n; ++i)); \
+				SUM_KERNEL(c0, c1, for (i = j + 1; i < n; ++i)); \
 			} \
 		} \
 		if (mean) { \
