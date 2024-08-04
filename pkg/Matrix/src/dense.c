@@ -1657,9 +1657,11 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SEXP ans = R_NilValue, x = GET_SLOT(obj, Matrix_xSym);
+	SEXP x = GET_SLOT(obj, Matrix_xSym),
+		ans = R_NilValue;
 	int i, j, packed = class[2] == 'p',
-		sy = class[1] == 's', he = sy && ct == 'C';
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && di != 'N';
 
 #define SUM \
 	do { \
@@ -1701,7 +1703,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	case 'n':
 	{
 		int *px = LOGICAL(x);
-		int_fast64_t s = (class[1] != 't' || di == 'N') ? 0 : n;
+		int_fast64_t s = (un) ? n : 0;
 
 #define SUM_KERNEL(__for__) \
 		do { \
@@ -1726,23 +1728,8 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	case 'i':
 	{
 		int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
-		int_fast64_t s = (class[0] != 't' || di == 'N') ? 0 : n, t = 0;
+		int_fast64_t s = (un) ? n : 0, t = 0;
 		unsigned int count = 0;
-
-#define SUM_KERNEL(__for__) \
-		do { \
-			__for__ { \
-				if (*px != NA_INTEGER) { \
-					unsigned int d = (sy && i != j) ? 2 : 1; \
-					if (count > UINT_MAX - d) \
-						TRY_INCREMENT(s, t); \
-					t += (sy && i != j) ? 2LL * *px : *px; \
-					count += d; \
-				} else if (!narm) \
-					return ScalarInteger(NA_INTEGER); \
-				px += 1; \
-			} \
-		} while (0)
 
 #define TRY_INCREMENT(x, y) \
 		do { \
@@ -1756,6 +1743,22 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 				goto over; \
 		} while (0)
 
+#define SUM_KERNEL(__for__) \
+		do { \
+			__for__ { \
+				if (*px != NA_INTEGER) { \
+					unsigned int d = (sy && i != j) ? 2 : 1; \
+					if (count > UINT_MAX - d) \
+						TRY_INCREMENT(s, t); \
+					t += (sy && i != j) ? 2LL * *px : *px; \
+					count += d; \
+				} \
+				else if (!narm) \
+					return ScalarInteger(NA_INTEGER); \
+				px += 1; \
+			} \
+		} while (0)
+
 		SUM;
 
 #undef SUM_KERNEL
@@ -1767,10 +1770,9 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		else
 			ans = ScalarReal((double) s);
 		break;
-
 over:
 		px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
-		long double lr = (class[1] != 't' || di == 'N') ? 0.0 : (double) n;
+		long double lr = (un) ? (long double) n : 0.0;
 
 #define SUM_KERNEL(__for__) \
 		do { \
@@ -1793,7 +1795,7 @@ over:
 	case 'd':
 	{
 		double *px = REAL(x);
-		long double lr = (class[1] != 't' || di == 'N') ? 0.0 : (double) n;
+		long double lr = (un) ? (long double) n : 0.0;
 
 #define SUM_KERNEL(__for__) \
 		do { \
@@ -1813,16 +1815,17 @@ over:
 	}
 	case 'z':
 	{
-		Rcomplex *px = COMPLEX(x);
-		long double lr = (class[1] != 't' || di == 'N') ? 0.0 : (double) n;
+		Rcomplex *px = COMPLEX(x), tmp;
+		long double lr = (un) ? (long double) n : 0.0;
 		long double li = 0.0;
 
 #define SUM_KERNEL(__for__) \
 		do { \
 			__for__ { \
-				if (!(narm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
-					lr += (sy && i != j) ?                2.0L * (*px).r  : (*px).r; \
-					li += (sy && i != j) ? ((he) ? 0.0L : 2.0L * (*px).i) : (*px).i; \
+				if (!(narm && (ISNAN((*px).r) || (!he && ISNAN((*px).i))))) { \
+					lr += (sy && i != j) ? 2.0L * (*px).r : (*px).r; \
+					if (!he) \
+					li += (sy && i != j) ? 2.0L * (*px).i : (*px).i; \
 				} \
 				px += 1; \
 			} \
@@ -1832,7 +1835,6 @@ over:
 
 #undef SUM_KERNEL
 
-		Rcomplex tmp;
 		tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 		tmp.i = LONGDOUBLE_AS_DOUBLE(li);
 		ans = ScalarComplex(tmp);
@@ -1877,9 +1879,10 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 		di = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SEXP ans, x = GET_SLOT(obj, Matrix_xSym);
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = class[2] == 'p',
-		sy = class[1] == 's', he = sy && ct == 'C';
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && di != 'N';
 	long double lr = 1.0, li = 0.0;
 
 #define PROD \
@@ -1940,7 +1943,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	{
 		int *px = LOGICAL(x);
 		if (class[1] == 't') {
-			if (n > 1 || (n == 1 && *px == 0))
+			if (n > 1 || (n == 1 && !un && *px == 0))
 				return ScalarReal(0.0);
 			break;
 		}
@@ -2009,19 +2012,24 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 #define PROD_KERNEL(__for__) \
 		do { \
 			__for__ { \
-				if (!(narm && (ISNAN((*px).r) || ISNAN((*px).i)))) { \
-					lr0 = lr; li0 = li; \
-					lr = lr0 * (*px).r - li0 * (*px).i; \
-					li = li0 * (*px).r + lr0 * (*px).i; \
-					if (sy && i != j) { \
-					lr0 = lr; li0 = li; \
+				if (!(narm && (ISNAN((*px).r) || (!(he && i == j) && ISNAN((*px).i))))) { \
 					if (he) { \
-					lr = lr0 * (*px).r + li0 * (*px).i; \
-					li = li0 * (*px).r - lr0 * (*px).i; \
+						lr0 = (*px).r; \
+						if (i != j) { \
+						li0 = (*px).i; \
+						lr0 = lr0 * lr0 + li0 * li0; \
+						} \
+						lr *= lr0; \
+						li *= lr0; \
 					} else { \
-					lr = lr0 * (*px).r - li0 * (*px).i; \
-					li = li0 * (*px).r + lr0 * (*px).i; \
-					} \
+						lr0 = lr; li0 = li; \
+						lr = lr0 * (*px).r - li0 * (*px).i; \
+						li = li0 * (*px).r + lr0 * (*px).i; \
+						if (i != j) { \
+						lr0 = lr; li0 = li; \
+						lr = lr0 * (*px).r - li0 * (*px).i; \
+						li = li0 * (*px).r + lr0 * (*px).i; \
+						} \
 					} \
 				} \
 				px += 1; \
@@ -2040,6 +2048,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 
 #undef PROD
 
+	SEXP ans;
 	if (class[0] != 'z')
 		ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 	else {
