@@ -829,7 +829,7 @@ SEXP R_index_as_dense(SEXP s_from, SEXP s_kind)
 	return index_as_dense(s_from, class, kind);
 }
 
-SEXP vector_as_sparse(SEXP from, const char *zzz,
+SEXP Vector_as_sparse(SEXP from, const char *zzz,
                       char ul, char ct, char di,
                       int m, int n, int byrow, SEXP dimnames)
 {
@@ -1276,7 +1276,7 @@ SEXP vector_as_sparse(SEXP from, const char *zzz,
 	return to;
 }
 
-SEXP R_vector_as_sparse(SEXP s_from, SEXP s_zzz,
+SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
                         SEXP s_uplo, SEXP s_trans, SEXP s_diag,
                         SEXP s_m, SEXP s_n, SEXP s_byrow, SEXP s_dimnames)
 {
@@ -1387,7 +1387,7 @@ SEXP R_vector_as_sparse(SEXP s_from, SEXP s_zzz,
 		        m, n, (long long) vlen);
 
 	return
-	vector_as_sparse(s_from, zzz, ul, ct, di, m, n, byrow, s_dimnames);
+	Vector_as_sparse(s_from, zzz, ul, ct, di, m, n, byrow, s_dimnames);
 }
 
 SEXP matrix_as_sparse(SEXP from, const char *zzz,
@@ -3431,12 +3431,422 @@ SEXP R_sparse_as_Tsparse(SEXP s_from)
 	return sparse_as_Tsparse(s_from, class);
 }
 
+SEXP vector_as_Vector(SEXP from, char kind)
+{
+	R_xlen_t vlen = XLENGTH(from);
+	if (vlen > 0x1.0p+53)
+		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+	
+	SEXPTYPE tf = TYPEOF(from);
+	char cl[] = ".sparseVector";
+	cl[0] = (kind == '.') ? typeToKind(tf) : ((kind == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : kind);
+	SEXPTYPE tt = kindToType(cl[0]);
+	SEXP to = newObject(cl);
+	if (vlen == 0)
+		return to;
+	PROTECT(to);
+
+	SEXP length = PROTECT(allocVector((vlen <= INT_MAX) ? INTSXP : REALSXP, 1));
+	if (TYPEOF(length) == INTSXP)
+	INTEGER(length)[0] = (int) vlen;
+	else
+	REAL(length)[0] = (double) vlen;
+	SET_SLOT(to, Matrix_lengthSym, length);
+	UNPROTECT(1); /* length */
+
+	SEXP x0 = from;
+	R_xlen_t k, nnz = 0;
+
+#define COUNT(c) \
+	do { \
+		c##TYPE *px0 = c##PTR(x0); \
+		for (k = 0; k < vlen; ++k) \
+			if (c##NOT_ZERO(px0[k])) \
+				++nnz; \
+	} while (0)
+
+	SWITCH4(typeToKind(tf), COUNT);
+
+#undef COUNT
+
+	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz));
+	SET_SLOT(to, Matrix_iSym, i1);
+
+#define VAV(c) \
+	do { \
+		if (TYPEOF(i1) == INTSXP) \
+			VAV__(i, c); \
+		else \
+			VAV__(d, c); \
+	} while (0)
+	
+#define VAV__(d, c) \
+	do { \
+		d##TYPE *pi1 = d##PTR(i1); \
+		c##TYPE *px0 = c##PTR(x0); \
+		c##IF_NPATTERN( \
+		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+		c##TYPE *px1 = c##PTR(x1); \
+		); \
+		for (k = 0; k < vlen; ++k) \
+			if (c##NOT_ZERO(px0[k])) { \
+				*(pi1++) = (d##TYPE) (k + 1); \
+				c##IF_NPATTERN( \
+				*(px1++) = px0[k]; \
+				); \
+			} \
+		c##IF_NPATTERN( \
+		PROTECT(x1 = coerceVector(x1, tt)); \
+		SET_SLOT(to, Matrix_xSym, x1); \
+		UNPROTECT(2); /* x1 */ \
+		); \
+	} while (0)
+
+	SWITCH5((kind == 'n') ? 'n' : typeToKind(tf), VAV);
+
+#undef VAV__
+#undef VAV
+
+	UNPROTECT(2); /* i1, to */
+	return to;
+}
+
+SEXP R_vector_as_Vector(SEXP s_from, SEXP s_kind)
+{
+	switch (TYPEOF(s_from)) {
+	case LGLSXP:
+	case INTSXP:
+	case REALSXP:
+	case CPLXSXP:
+		break;
+	default:
+		ERROR_INVALID_TYPE(s_from, __func__);
+		break;
+	}
+
+	char kind;
+	VALID_KIND(s_kind, kind);
+
+	return vector_as_Vector(s_from, kind);
+}
+
+SEXP sparse_as_Vector(SEXP from, const char *class)
+{
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
+	if (mn > 0x1.0p+53)
+		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+
+	char cl[] = ".sparseVector";
+	cl[0] = class[0];
+	SEXP to = newObject(cl);
+	if (mn == 0)
+		return to;
+	PROTECT(to);
+	
+	SEXP length = PROTECT(allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	if (TYPEOF(length) == INTSXP)
+	INTEGER(length)[0] = (int) mn;
+	else
+	REAL(length)[0] = (double) mn;
+	SET_SLOT(to, Matrix_lengthSym, length);
+	UNPROTECT(1); /* length */
+
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(from, &pid);
+	if (class[2] == 'T') {
+	REPROTECT(from = sparse_as_Csparse(from, class), pid);
+	class = Matrix_class(from, valid_sparse, 2, __func__);
+	}
+	REPROTECT(from = sparse_as_general(from, class), pid);
+
+	SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
+	int *pp0 = INTEGER(p0), nnz = pp0[(class[2] == 'C') ? n : m];
+	pp0++;
+	if (nnz == 0) {
+		UNPROTECT(3); /* p0, from, to */
+		return to;
+	}
+
+	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz));
+	SET_SLOT(to, Matrix_iSym, i1);
+
+#define SAV(c) \
+	do { \
+		if (TYPEOF(i1) == INTSXP) \
+			SAV__(i, c); \
+		else \
+			SAV__(d, c); \
+	} while (0)
+
+	if (class[2] == 'C') {
+		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
+		int *pi0 = INTEGER(i0), j, k, kend;
+
+#define SAV__(d, c) \
+		do { \
+			d##TYPE *pi1 = d##PTR(i1), l = (d##TYPE) 1, dl = (d##TYPE) m; \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
+				x1 = PROTECT(allocVector(c##TYPESXP, nnz));	\
+			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			UNPROTECT(2); /* x1, x0 */ \
+			); \
+			for (j = 0, k = 0; j < n; ++j) { \
+				kend = pp0[j]; \
+				while (k < kend) { \
+					c##IF_NPATTERN( \
+					*(px1++) = px0[k]; \
+					); \
+					*(pi1++) = pi0[k] + l; \
+					++k; \
+				} \
+				l += dl; \
+			} \
+		} while (0)
+
+		SWITCH5(class[0], SAV);
+
+#undef SAV__
+
+		UNPROTECT(1); /* i0 */
+	} else {
+		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym));
+		int *pj0 = INTEGER(j0), i, j, k, kend, *iwork = NULL;
+		size_t liwork = (size_t) n + 1;
+		Matrix_Calloc(iwork, liwork, int);
+
+		++iwork;
+		for (k = 0; k < nnz; ++k)
+			++iwork[pj0[k]];
+		for (j = 0; j < n; ++j)
+			iwork[j] += iwork[j - 1];
+		--iwork;
+
+#define SAV__(d, c) \
+		do { \
+			d##TYPE *pi1 = d##PTR(i1); \
+			c##IF_NPATTERN( \
+			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
+				x1 = PROTECT(allocVector(c##TYPESXP, nnz));	\
+			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
+			SET_SLOT(to, Matrix_xSym, x1); \
+			UNPROTECT(2); /* x1, x0 */ \
+			); \
+			for (i = 0, k = 0; i < m; ++i) { \
+				kend = pp0[i]; \
+				while (k < kend) { \
+					j = pj0[k]; \
+					c##IF_NPATTERN( \
+					px1[iwork[j]  ] = px0[k]; \
+					); \
+					pi1[iwork[j]++] = i + 1 + j * (d##TYPE) m; \
+					++k; \
+				} \
+			} \
+		} while (0)
+
+		SWITCH5(class[0], SAV);
+
+#undef SAV__
+
+		Matrix_Free(iwork, liwork);
+		UNPROTECT(1); /* j0 */
+	}
+
+#undef SAV
+
+	UNPROTECT(4); /* i1, p0, from, to */
+	return to;
+}
+
+/* as(<[CRT]sparseMatrix>, "sparseVector") */
+SEXP R_sparse_as_Vector(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_sparse, 2, __func__);
+	return sparse_as_Vector(s_from, class);
+}
+
+SEXP diagonal_as_Vector(SEXP from, const char *class)
+{
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int n = INTEGER(dim)[0];
+	int_fast64_t nn = (int_fast64_t) n * n;
+	if (nn > 0x1.0p+53)
+		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+
+	char cl[] = ".sparseVector";
+	cl[0] = class[0];
+	SEXP to = newObject(cl);
+	if (nn == 0)
+		return to;
+	PROTECT(to);
+
+	SEXP length = PROTECT(allocVector((nn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	if (TYPEOF(length) == INTSXP)
+	INTEGER(length)[0] = (int) nn;
+	else
+	REAL(length)[0] = (double) nn;
+	SET_SLOT(to, Matrix_lengthSym, length);
+	UNPROTECT(1); /* length */
+
+	SEXP diag = GET_SLOT(from, Matrix_diagSym);
+	char di = CHAR(STRING_ELT(diag, 0))[0];
+
+	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
+	int j, nnz1;
+
+	if (di != 'N')
+		nnz1 = n;
+	else {
+		nnz1 = 0;
+
+#define COUNT(c) \
+		do { \
+			c##TYPE *px0 = c##PTR(x0); \
+			for (j = 0; j < n; ++j) \
+				if (c##NOT_ZERO(px0[j])) \
+					++nnz1; \
+			} while (0)
+
+		SWITCH4(class[0], COUNT);
+
+#undef COUNT
+
+	}
+
+	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz1));
+	SET_SLOT(to, Matrix_iSym, i1);
+
+#define DAV(c) \
+	do { \
+		if (TYPEOF(i1) == INTSXP) \
+			DAV__(i, c); \
+		else \
+			DAV__(d, c); \
+	} while (0)
+
+#define DAV__(d, c) \
+	do { \
+		d##TYPE *pi1 = d##PTR(i1), l = (d##TYPE) 1, dl = (d##TYPE) (n + 1); \
+		c##TYPE *px0 = c##PTR(x0); \
+		c##IF_NPATTERN( \
+		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz1)); \
+		c##TYPE *px1 = c##PTR(x1); \
+		SET_SLOT(to, Matrix_xSym, x1); \
+		UNPROTECT(1); /* x1 */ \
+		); \
+		for (j = 0; j < n; ++j) { \
+			if (di != 'N' || c##NOT_ZERO(px0[j])) { \
+				*(pi1++) = l; \
+				c##IF_NPATTERN( \
+				*(px1++) = (di != 'N') ? c##UNIT : px0[j]; \
+				); \
+			} \
+			l += dl; \
+		} \
+	} while (0)
+
+	SWITCH5(class[0], DAV);
+
+#undef DAV__
+#undef DAV
+
+	UNPROTECT(3); /* i1, x0, to */
+	return to;
+}
+
+/* as(<diagonalMatrix>, "sparseVector") */
+SEXP R_diagonal_as_Vector(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_diagonal, 0, __func__);
+	return diagonal_as_Vector(s_from, class);
+}
+
+SEXP index_as_Vector(SEXP from, const char *class)
+{
+	SEXP dim = GET_SLOT(from, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
+	if (mn > 0x1.0p+53)
+		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+
+	SEXP to = newObject("nsparseVector");
+	if (mn == 0)
+		return to;
+	PROTECT(to);
+
+	SEXP length = PROTECT(allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	if (TYPEOF(length) == INTSXP)
+	INTEGER(length)[0] = (int) mn;
+	else
+	REAL(length)[0] = (double) mn;
+	SET_SLOT(to, Matrix_lengthSym, length);
+	UNPROTECT(1); /* length */
+
+	SEXP margin = GET_SLOT(from, Matrix_marginSym);
+	int mg = INTEGER(margin)[0] - 1;
+
+	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
+	int *pperm = INTEGER(perm);
+
+	SEXP i1 = PROTECT(allocVector(TYPEOF(length), (mg == 0) ? m : n));
+	SET_SLOT(to, Matrix_iSym, i1);
+
+	if (mg == 0) {
+		int i, j, *iwork = NULL;
+		size_t liwork = (size_t) n + 1;
+		Matrix_Calloc(iwork, liwork, int);
+		for (i = 0; i < m; ++i)
+			++iwork[pperm[i]];
+		for (j = 1; j <= n; ++j)
+			iwork[j] += iwork[j - 1];
+		if (TYPEOF(i1) == INTSXP) {
+			int *pi1 = INTEGER(i1);
+			for (i = 0; i < m; ++i) {
+				j = pperm[i] - 1;
+				pi1[iwork[j]++] = i + 1 + j * m;
+			}
+		} else {
+			double *pi1 = REAL(i1);
+			for (i = 0; i < m; ++i) {
+				j = pperm[i] - 1;
+				pi1[iwork[j]++] = i + 1 + j * (double) m;
+			}
+		}
+		Matrix_Free(iwork, liwork);
+	} else {
+		int j;
+		if (TYPEOF(i1) == INTSXP) {
+			int *pi1 = INTEGER(i1);
+			for (j = 0; j < n; ++j)
+				pi1[j] = pperm[j] + j * m;
+		} else {
+			double *pi1 = REAL(i1);
+			for (j = 0; j < n; ++j)
+				pi1[j] = pperm[j] + j * (double) m;
+		}
+	}
+
+	UNPROTECT(3); /* i1, perm, to */
+	return to;
+}
+
+/* as(<indMatrix>, "sparseVector") */
+SEXP R_index_as_Vector(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_index, 0, __func__);
+	return index_as_Vector(s_from, class);
+}
+
 /* as(<Matrix>, "vector") */
 SEXP R_Matrix_as_vector(SEXP s_from)
 {
 	const char *class = Matrix_class(s_from, valid_matrix, 7, __func__);
 
-	SEXP to = NULL;
+	SEXP to = R_NilValue;
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(s_from, &pid);
 
@@ -3505,14 +3915,14 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 {
 	const char *class = Matrix_class(s_from, valid_matrix, 7, __func__);
 
-	SEXP to = NULL;
+	SEXP to = R_NilValue;
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(s_from, &pid);
 
 	switch (class[2]) {
 	case 'e':
 		PROTECT(to = GET_SLOT(s_from, Matrix_xSym));
-		to = duplicate(to);
+		to = duplicateVector(to);
 		UNPROTECT(1); /* to */
 		break;
 	case 'y':
@@ -3692,6 +4102,34 @@ SEXP R_Matrix_as_Tsparse(SEXP s_from)
 		return diagonal_as_sparse(s_from, class, '.', 't', 'T', 'U', '\0');
 	case 'd':
 		return index_as_sparse(s_from, class, 'n', 'T');
+	default:
+		return R_NilValue;
+	}
+}
+
+/* as(<Matrix>, "sparseVector") */
+SEXP R_Matrix_as_Vector(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_matrix, 7, __func__);
+
+	switch (class[2]) {
+	case 'e':
+	case 'y':
+	case 'r':
+	case 'p':
+		PROTECT(s_from = dense_as_sparse(s_from, class, 'C'));
+		class = Matrix_class(s_from, valid_matrix, 7, __func__);
+		s_from = sparse_as_Vector(s_from, class);
+		UNPROTECT(1); /* s_from */
+		return s_from;
+	case 'C':
+	case 'R':
+	case 'T':
+		return sparse_as_Vector(s_from, class);
+	case 'i':
+		return diagonal_as_Vector(s_from, class);
+	case 'd':
+		return index_as_Vector(s_from, class);
 	default:
 		return R_NilValue;
 	}

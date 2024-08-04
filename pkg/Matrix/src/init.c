@@ -18,7 +18,6 @@
 #include "subscript.h"
 #include "utils-R.h"
 #include "validity.h"
-#include "vector.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
@@ -233,15 +232,12 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(trMatrix_rcond, 2),
 	CALLDEF(tpMatrix_rcond, 2),
 
-	CALLDEF(v2spV, 1),
-	CALLDEF(CR2spV, 1),
-
 	CALLDEF(R_vector_as_dense, 9),
 	CALLDEF(R_matrix_as_dense, 6),
 	CALLDEF(R_sparse_as_dense, 2),
 	CALLDEF(R_diagonal_as_dense, 6),
 	CALLDEF(R_index_as_dense, 2),
-	CALLDEF(R_vector_as_sparse, 9),
+	CALLDEF(R_Vector_as_sparse, 9),
 	CALLDEF(R_matrix_as_sparse, 6),
 	CALLDEF(R_dense_as_sparse, 2),
 	CALLDEF(R_diagonal_as_sparse, 6),
@@ -257,6 +253,10 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_sparse_as_Csparse, 1),
 	CALLDEF(R_sparse_as_Rsparse, 1),
 	CALLDEF(R_sparse_as_Tsparse, 1),
+	CALLDEF(R_vector_as_Vector, 2),
+	CALLDEF(R_sparse_as_Vector, 1),
+	CALLDEF(R_diagonal_as_Vector, 1),
+	CALLDEF(R_index_as_Vector, 1),
 	CALLDEF(R_Matrix_as_vector, 1),
 	CALLDEF(R_Matrix_as_matrix, 1),
 	CALLDEF(R_Matrix_as_unpacked, 1),
@@ -264,6 +264,7 @@ static R_CallMethodDef CallEntries[] = {
 	CALLDEF(R_Matrix_as_Csparse, 1),
 	CALLDEF(R_Matrix_as_Rsparse, 1),
 	CALLDEF(R_Matrix_as_Tsparse, 1),
+	CALLDEF(R_Matrix_as_Vector, 1),
 	CALLDEF(R_Matrix_as_kind, 3),
 	CALLDEF(R_Matrix_as_general, 2),
 

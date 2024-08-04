@@ -88,7 +88,7 @@ setMethod("Math", c(x = "sparseMatrix"),
               if(shape == "s" || (shape == "t" && stay0))
                   r@uplo <- x@uplo
               if(!stay0) {
-                  y <- .Call(CR2spV, if(repr == "T") .M2C(x) else x)
+                  y <- .M2V(x)
                   tmp <- rep.int(g0, y@length)
                   tmp[y@i] <- a(g(if(kind == "n") one else y@x))
                   r@x <- tmp
@@ -126,7 +126,7 @@ setMethod("log", c(x = "sparseMatrix"),
               r@Dimnames <- x@Dimnames
               if(shape == "s")
                   r@uplo <- x@uplo
-              y <- .Call(CR2spV, if(repr == "T") .M2C(x) else x)
+              y <- .M2V(x)
               tmp <- rep.int(log(zero, ...), y@length)
               tmp[y@i] <- log(if(kind == "n") one else y@x, ...)
               r@x <- tmp

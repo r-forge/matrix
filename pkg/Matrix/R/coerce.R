@@ -60,6 +60,9 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .M2T <- function(from)
     .Call(R_Matrix_as_Tsparse, from)
 
+.M2V <- function(from)
+    .Call(R_Matrix_as_Vector, from)
+
 .sparse2dense <- function(from, packed = FALSE)
     .Call(R_sparse_as_dense, from, packed)
 
@@ -137,6 +140,9 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     else
         .m2sparse(from, paste0(kind, "g", repr))
 }
+
+.m2V <- function(from, kind = ".")
+    .Call(R_vector_as_Vector, from, kind)
 
 .V2kind <- function(from, kind = ".") {
     if(kind == ".")
@@ -240,80 +246,6 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-## FIXME: define R_Matrix_as_sparseVector in ../src/coerce.c and use here
-.M2V <- function(from) {
-    repr <- .M.repr(from)
-    if(repr == "u" || repr == "p")
-        return(.Call( v2spV, .M2v(from)))
-    if(repr == "C" || repr == "R")
-        return(.Call(CR2spV,      from ))
-    if(repr == "T")
-        return(.Call(CR2spV, .M2C(from)))
-    if(repr != "d" && repr != "i") {
-        if(is.object(from))
-            stop(gettextf("invalid class \"%s\" in '%s'",
-                          class(from)[1L], ".M2V"),
-                 domain = NA)
-        else
-            stop(gettextf("invalid type \"%s\" in '%s'",
-                          typeof(from), ".M2V"),
-                 domain = NA)
-    }
-    d <- from@Dim
-    m <- d[1L]
-    n <- d[2L]
-    mn <- prod(d)
-    if(mn <= .Machine$integer.max)
-        mn <- as.integer(mn)
-    else if(mn > 0x1p+53)
-        stop(gettextf("%s length cannot exceed %s", "sparseVector", "2^53"),
-             domain = NA)
-    kind <- .M.kind(from)
-    to <- new(paste0(kind, "sparseVector"))
-    to@length <- mn
-    to@i <-
-        if(repr == "d") {
-            if(kind == "n" && from@diag == "N")
-                indDiag(n)[from@x | is.na(from@x)]
-            else
-                indDiag(n)
-        } else if(is.integer(mn)) {
-            if(from@margin == 1L)
-                seq.int(to =   0L, by = 1L, length.out = m) +
-                    from@perm * m
-            else
-                seq.int(from = 0L, by =  m, length.out = n) +
-                    from@perm
-        } else {
-            if(from@margin == 1L)
-                seq.int(  to = 0, by =            1, length.out = m) +
-                    from@perm * as.double(m)
-            else
-                seq.int(from = 0, by = as.double(m), length.out = n) +
-                    as.double(from@perm)
-        }
-    if(kind != "n")
-        to@x <-
-            if(from@diag == "N")
-                from@x
-            else rep.int(switch(kind, "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i), n)
-    to
-}
-
-.m2V <- function(from, kind = ".") {
-    to <- .Call(v2spV, from)
-    if(kind == ".")
-        to
-    else {
-        to. <- new(paste0(kind, "sparseVector"))
-        to.@length <- to@length
-        to.@i <- to@i
-        if(kind != "n")
-            to.@x <- as.vector(to@x, typeof(to.@x))
-        to.
-    }
-}
-
 
 ## ==== To vector ======================================================
 
@@ -407,7 +339,7 @@ setAs("matrix", "sparseVector",
 setAs("vector", "sparseVector",
       function(from) .m2V(from))
 setAs(   "ANY", "sparseVector",
-      function(from) as(as.vector(from), "sparseVector"))
+      function(from) .m2V(as.vector(from)))
 
 
 ## ==== To "kind" ======================================================

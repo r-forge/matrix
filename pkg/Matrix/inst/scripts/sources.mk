@@ -22,5 +22,4 @@ sources = \
 	subscript.c \
 	utils-R.c \
 	utils.c \
-	validity.c \
-	vector.c
+	validity.c
