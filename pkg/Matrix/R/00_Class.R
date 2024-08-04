@@ -969,7 +969,7 @@ setClass("zsupernodalCholesky",
 setClass("sparseVector",
          contains = "VIRTUAL",
          slots = c(length = "numeric", i = "numeric"),
-         prototype = list(length = 0L),
+         prototype = list(length = 0L, i = integer(0L)),
          validity = function(object) .Call(sparseVector_validate, object))
 
 ## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
