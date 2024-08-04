@@ -3436,7 +3436,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 	R_xlen_t vlen = XLENGTH(from);
 	if (vlen > 0x1.0p+53)
 		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
-	
+
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = ".sparseVector";
 	cl[0] = (kind == '.') ? typeToKind(tf) : ((kind == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : kind);
@@ -3479,7 +3479,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 		else \
 			VAV__(d, c); \
 	} while (0)
-	
+
 #define VAV__(d, c) \
 	do { \
 		d##TYPE *pi1 = d##PTR(i1); \
@@ -3544,7 +3544,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 	if (mn == 0)
 		return to;
 	PROTECT(to);
-	
+
 	SEXP length = PROTECT(allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
 	if (TYPEOF(length) == INTSXP)
 	INTEGER(length)[0] = (int) mn;
@@ -3589,7 +3589,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 			d##TYPE *pi1 = d##PTR(i1), l = (d##TYPE) 1, dl = (d##TYPE) m; \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, nnz));	\
+				x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
@@ -3630,7 +3630,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 			d##TYPE *pi1 = d##PTR(i1); \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, nnz));	\
+				x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
