@@ -3702,13 +3702,14 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 			i = PROTECT(GET_SLOT(obj,        iSym));
-		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend,
-			seen0 = 0;
+		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend;
 		pp++;
 
 		UNPROTECT(4); /* i, p, x, obj */
 
-		int upper = (class[2] == 'C') == (ul == 'U'), i0 = 0, i1 = m;
+		int seen0 = 0, i0, i1,
+			upper = !sy || (class[2] == 'C') == (ul == 'U'),
+			lower = !sy || (class[2] == 'C') == (ul != 'U');
 
 		switch (class[0]) {
 		case 'n':
@@ -3721,15 +3722,13 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			int *px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
-				if (!seen0 && sy) {
-					if (upper)
-						i1 = j + 1;
-					else
-						i0 = j;
+				if (!seen0) {
+					i0 = (upper) ? 0 : j;
+					i1 = (lower) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
-						if (pi[k] == i0 || (un && pi[k] == ++i0))
+						if (pi[k] == i0 || (un && i0 == j && pi[k] == ++i0))
 							++i0;
 						else {
 							lr *= 0.0;
@@ -3743,7 +3742,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 						lr *= NA_REAL;
 					++k;
 				}
-				if (!seen0 && i0 < i1) {
+				if (!(seen0 || i1 == i0 || (un && i0 == j && i1 == ++i0))) {
 					lr *= 0.0;
 					seen0 = 1;
 				}
@@ -3755,15 +3754,13 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			double *px = REAL(x);
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
-				if (!seen0 && sy) {
-					if (upper)
-						i1 = j + 1;
-					else
-						i0 = j;
+				if (!seen0) {
+					i0 = (upper) ? 0 : j;
+					i1 = (lower) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
-						if (pi[k] == i0 || (un && pi[k] == ++i0))
+						if (pi[k] == i0 || (un && i0 == j && pi[k] == ++i0))
 							++i0;
 						else {
 							lr *= 0.0;
@@ -3775,7 +3772,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 							? (long double) px[k] * px[k] : px[k];
 					++k;
 				}
-				if (!seen0 && i0 < i1) {
+				if (!(seen0 || i1 == i0 || (un && i0 == j && i1 == ++i0))) {
 					lr *= 0.0;
 					seen0 = 1;
 				}
@@ -3788,15 +3785,13 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			long double lr0, li0;
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
-				if (!seen0 && sy) {
-					if (upper)
-						i1 = j + 1;
-					else
-						i0 = j;
+				if (!seen0) {
+					i0 = (upper) ? 0 : j;
+					i1 = (lower) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
-						if (pi[k] == i0 || (un && pi[k] == ++i0))
+						if (pi[k] == i0 || (un && i0 == j && pi[k] == ++i0))
 							++i0;
 						else {
 							lr *= 0.0;
@@ -3826,7 +3821,7 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 					}
 					++k;
 				}
-				if (!seen0 && i0 < i1) {
+				if (!(seen0 || i1 == i0 || (un && i0 == j && i1 == ++i0))) {
 					lr *= 0.0;
 					li *= 0.0;
 					seen0 = 1;
