@@ -99,21 +99,12 @@ const char *valid_dense[], *valid_sparse[],
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
-#define NOTZERO_PATTERN(_X_) ((_X_) != 0)
-#define NOTZERO_LOGICAL(_X_) ((_X_) != 0)
-#define NOTZERO_INTEGER(_X_) ((_X_) != 0)
-#define NOTZERO_REAL(_X_)    ((_X_) != 0.0)
-#define NOTZERO_COMPLEX(_X_) ((_X_).r != 0.0 || (_X_).i != 0.0)
-
 #define PACKED_AR21_UP(i, j) \
 	((i) + ((j) * (            (j) + 1U)) / 2U)
 #define PACKED_AR21_LO(i, j, n) \
 	((i) + ((j) * ((n) - (j) - 1U + (n))) / 2U)
 #define PACKED_LENGTH(n) \
 	((n) + ((n) * (            (n) - 1U)) / 2U)
-
-#define SHOW(...) __VA_ARGS__
-#define HIDE(...)
 
 #define ERROR_OOM(_FUNC_) \
 	error(_("out of memory in '%s'"), \

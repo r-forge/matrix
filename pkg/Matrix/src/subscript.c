@@ -1,4 +1,5 @@
 #include "Mdefines.h"
+#include "M5.h"
 #include "subscript.h"
 
 #define F_X( _X_)  (_X_)
@@ -7,6 +8,9 @@
 
 #define AR21_UP(i, j, m) i + j + (        j * (    j - 1)) / 2
 #define AR21_LO(i, j, m) i +     (j * m + j * (m - j - 1)) / 2
+
+#define SHOW(...) __VA_ARGS__
+#define HIDE(...)
 
 static
 SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
@@ -1874,32 +1878,14 @@ SEXP diagonalMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)
 
 			Matrix_Calloc(work, n, char);
 
-#define SUB2_WORK(_CTYPE_, _PTR_, _NOTZERO_) \
+#define SUB2_WORK(c) \
 			do { \
-				_CTYPE_ *px0 = _PTR_(x0); \
+				c##TYPE *px0 = c##PTR(x0); \
 				for (j_ = 0; j_ < n; ++j_) \
-					work[j_] = _NOTZERO_(px0[j_]); \
+					work[j_] = c##NOT_ZERO(px0[j_]); \
 			} while (0)
 
-			switch (cl[0]) {
-			case 'n':
-				SUB2_WORK(int, LOGICAL, NOTZERO_PATTERN);
-				break;
-			case 'l':
-				SUB2_WORK(int, LOGICAL, NOTZERO_LOGICAL);
-				break;
-			case 'i':
-				SUB2_WORK(int, INTEGER, NOTZERO_INTEGER);
-				break;
-			case 'd':
-				SUB2_WORK(double, REAL, NOTZERO_REAL);
-				break;
-			case 'z':
-				SUB2_WORK(Rcomplex, COMPLEX, NOTZERO_COMPLEX);
-				break;
-			default:
-				break;
-			}
+			SWITCH5(cl[0], SUB2_WORK);
 
 #undef SUB2_WORK
 
