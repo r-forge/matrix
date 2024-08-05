@@ -80,7 +80,7 @@
 #define zNOT_ZERO_TOL(x, tol) (ISNAN((x).r) || ISNAN((x).i) || hypot((x).r, (x).i) > tol)
 
 #define nNOT_UNIT(x) ((x) == 0)
-#define lNOT_UNIT(x) ((x) != 1)
+#define lNOT_UNIT(x) ((x) == 0 || (x) == NA_LOGICAL)
 #define iNOT_UNIT(x) ((x) != 1)
 #define dNOT_UNIT(x) ((x) != 1.0)
 #define zNOT_UNIT(x) ((x).r != 1.0 || (x).i != 0.0)
