@@ -20,7 +20,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 	sy = !tr && class[1] == 's' && a == -b;
 	ge = !tr && !sy;
 
-	char ul0 = '\0', ct0 = '\0', di0 = '\0';
+	char ul0 = '\0', ct0 = '\0', nu0 = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
@@ -34,7 +34,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (a <= 1 - m && b >= 0))
 			return from;
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di0 = CHAR(STRING_ELT(diag, 0))[0];
+		nu0 = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	char cl[] = "...Matrix";
@@ -66,7 +66,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (di0 != '\0' && di0 != 'N' && tr && a <= 0 && b >= 0) {
+	if (nu0 != '\0' && nu0 != 'N' && tr && a <= 0 && b >= 0) {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -86,9 +86,9 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (ge && class[1] != 'g') { \
 		if (!packed) \
-			c##NAME(force2)(px1, px0, n_, ul0, ct0, di0); \
+			c##NAME(force2)(px1, px0, n_, ul0, ct0, nu0); \
 		else \
-			c##NAME( pack1)(px1, px0, n_, ul0, ct0, di0); \
+			c##NAME( pack1)(px1, px0, n_, ul0, ct0, nu0); \
 		px0 = NULL; \
 		packed = 0; \
 		} else if (tr && class[1] == 's' && ul0 != ul1) { \
@@ -157,7 +157,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -168,12 +168,12 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP ans;
 
-	if (di != '\0' && di != 'N') {
+	if (nu != '\0' && nu != 'N') {
 
 		PROTECT(ans = allocUnit  (kindToType(class[0]), r));
 
@@ -387,7 +387,7 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 		set_reversed_DimNames(to, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -406,8 +406,8 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -459,7 +459,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 	char
 		ul0 = '\0', ul1 = 'U',
 		ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0',
-		di0 = '\0';
+		nu0 = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul0 = ul1 = CHAR(STRING_ELT(uplo, 0))[0];
@@ -470,7 +470,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di0 = CHAR(STRING_ELT(diag, 0))[0];
+		nu0 = CHAR(STRING_ELT(diag, 0))[0];
 	}
 	if (op_ul != '\0')
 		ul1 = op_ul;
@@ -517,7 +517,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 
 	if ((class[1] == 'g') ||
 	    (class[1] == 's' && ul0 == ul1 && ct0 != 'C') ||
-	    (class[1] == 't' && ul0 == ul1 && di0 == 'N'))
+	    (class[1] == 't' && ul0 == ul1 && nu0 == 'N'))
 		SET_SLOT(to, Matrix_xSym, x0);
 	else {
 		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
@@ -527,12 +527,12 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			if (!packed) \
-				c##NAME(force2)(px1,  px0, n_, ul0, ct0, di0); \
+				c##NAME(force2)(px1,  px0, n_, ul0, ct0, nu0); \
 			else if (ul0 == ul1) \
-				c##NAME(force1)(px1,  px0, n_, ul0, ct0, di0); \
+				c##NAME(force1)(px1,  px0, n_, ul0, ct0, nu0); \
 			else { \
 				c##NAME(trans1)(px1,  px0, n_, ul0, ct0); \
-				c##NAME(force1)(px1, NULL, n_, ul1, ct0, di0); \
+				c##NAME(force1)(px1, NULL, n_, ul1, ct0, nu0); \
 			} \
 		} while (0)
 
@@ -607,7 +607,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0', di = '\0';
+	char ul = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -617,7 +617,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	if (op_ul != '\0' && op_ul != 'U') {
@@ -731,7 +731,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 							pu0 += 1; \
 							pu1 += 1; \
 						} \
-						if (di != 'N') \
+						if (nu != 'N') \
 							c##SET_UNIT(*pu1); \
 						else if (op_ct == 'C') \
 							c##ASSIGN_PROJ_REAL(*pu1, *pu0); \
@@ -750,7 +750,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 							pl0 += j; \
 							pl1 += j; \
 						} \
-						if (di != 'N') \
+						if (nu != 'N') \
 							c##SET_UNIT(*pl1); \
 						else if (op_ct == 'C') \
 							c##ASSIGN_PROJ_REAL(*pl1, *pl0); \
@@ -826,7 +826,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 		set_symmetrized_DimNames(to, dimnames, -1);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -843,7 +843,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1;
@@ -923,7 +923,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 							pu1 += 1; \
 							pl1 += n; \
 						} \
-						if (di != 'N' || op_ct != 'C') \
+						if (nu != 'N' || op_ct != 'C') \
 							c##SET_ZERO(*pu1); \
 						else \
 							c##ASSIGN_PROJ_IMAG(*pu1, *pu0); \
@@ -941,7 +941,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 						pl0 += j; \
 						pl1 += j; \
 						pu1 = pl1; \
-						if (di != 'N' || op_ct != 'C') \
+						if (nu != 'N' || op_ct != 'C') \
 							c##SET_ZERO(*pl1); \
 						else \
 							c##ASSIGN_PROJ_IMAG(*pl1, *pl0); \
@@ -1010,11 +1010,11 @@ int dense_is_symmetric(SEXP obj, const char *class,
 			return 0;
 	}
 
-	char di = '\0';
+	char nu = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
-		if (exact && (di != 'N' || op_ct != 'C'))
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (exact && (nu != 'N' || op_ct != 'C'))
 			return dense_is_diagonal(obj, class);
 	}
 
@@ -1386,7 +1386,7 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 
 static
 void dense_colsum(SEXP x, const char *class,
-                  int m, int n, char ul, char ct, char di, int narm, int mean,
+                  int m, int n, char ul, char ct, char nu, int narm, int mean,
                   SEXP ans)
 {
 	int i, j, count = -1, packed = class[2] == 'p';
@@ -1401,7 +1401,7 @@ void dense_colsum(SEXP x, const char *class,
 				SUM_KERNEL(c0, c1, for (i = 0; i < m; ++i)); \
 				px1 += 1; \
 			} \
-		} else if (di == 'N') { \
+		} else if (nu == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				*px1 = c1##ZERO; \
@@ -1474,12 +1474,12 @@ void dense_colsum(SEXP x, const char *class,
 
 static
 void dense_rowsum(SEXP x, const char *class,
-                  int m, int n, char ul, char ct, char di, int narm, int mean,
+                  int m, int n, char ul, char ct, char nu, int narm, int mean,
                   SEXP ans)
 {
 	int i, j, *count = NULL, packed = XLENGTH(x) != (int_fast64_t) m * n,
 		sy = class[1] == 's', he = sy && ct == 'C',
-		un = class[1] == 't' && di != 'N';
+		un = class[1] == 't' && nu != 'N';
 
 	if (mean && narm) {
 		Matrix_Calloc(count, m, int);
@@ -1496,7 +1496,7 @@ void dense_rowsum(SEXP x, const char *class,
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) \
 				SUM_KERNEL(c0, c1, for (i = 0; i < m; ++i)); \
-		} else if (class[1] == 's' || di == 'N') { \
+		} else if (class[1] == 's' || nu == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				SUM_KERNEL(c0, c1, for (i = 0; i <= j; ++i)); \
@@ -1600,7 +1600,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 		UNPROTECT(1); /* marnames */
 	}
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -1611,13 +1611,13 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	if (mg == 0 || class[1] == 's')
-		dense_rowsum(x, class, m, n, ul, ct, di, narm, mean, ans);
+		dense_rowsum(x, class, m, n, ul, ct, nu, narm, mean, ans);
 	else
-		dense_colsum(x, class, m, n, ul, ct, di, narm, mean, ans);
+		dense_colsum(x, class, m, n, ul, ct, nu, narm, mean, ans);
 
 	UNPROTECT(2); /* x, ans */
 	return ans;
@@ -1643,7 +1643,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -1654,21 +1654,21 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym),
 		ans = R_NilValue;
 	int i, j, packed = class[2] == 'p',
 		sy = class[1] == 's', he = sy && ct == 'C',
-		un = class[1] == 't' && di != 'N';
+		un = class[1] == 't' && nu != 'N';
 
 #define SUM \
 	do { \
 		if (class[1] == 'g') { \
 			for (j = 0; j < n; ++j) \
 				SUM_KERNEL(for (i = 0; i < m; ++i)); \
-		} else if (class[1] == 's' || di == 'N') { \
+		} else if (class[1] == 's' || nu == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				SUM_KERNEL(for (i = 0; i <= j; ++i)); \
@@ -1865,7 +1865,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -1876,13 +1876,13 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 	}
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = class[2] == 'p',
 		sy = class[1] == 's', he = sy && ct == 'C',
-		un = class[1] == 't' && di != 'N';
+		un = class[1] == 't' && nu != 'N';
 	long double lr = 1.0, li = 0.0;
 
 #define PROD \
@@ -1903,7 +1903,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 					px += j; \
 				PROD_KERNEL(for (i = j; i < n; ++i)); \
 			} \
-		} else if (di == 'N') { \
+		} else if (nu == 'N') { \
 			if (ul == 'U') \
 			for (j = 0; j < n; ++j) { \
 				if (j == 1) { lr *= 0.0L; li *= 0.0L; } \

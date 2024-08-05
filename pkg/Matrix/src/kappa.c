@@ -185,7 +185,7 @@ SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
@@ -193,10 +193,10 @@ SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
-	F77_CALL(zlantr)(&type, &ul, &di, &n, &n, COMPLEX(x), &n, work FCONE FCONE FCONE);
+	F77_CALL(zlantr)(&type, &ul, &nu, &n, &n, COMPLEX(x), &n, work FCONE FCONE FCONE);
 	else
 	norm =
-	F77_CALL(dlantr)(&type, &ul, &di, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
+	F77_CALL(dlantr)(&type, &ul, &nu, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
@@ -215,7 +215,7 @@ SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
@@ -223,10 +223,10 @@ SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
 		work = (double *) R_alloc((size_t) n, sizeof(double));
 	if (TYPEOF(x) == CPLXSXP)
 	norm =
-	F77_CALL(zlantp)(&type, &ul, &di, &n, COMPLEX(x), work FCONE FCONE FCONE);
+	F77_CALL(zlantp)(&type, &ul, &nu, &n, COMPLEX(x), work FCONE FCONE FCONE);
 	else
 	norm =
-	F77_CALL(dlantp)(&type, &ul, &di, &n,    REAL(x), work FCONE FCONE FCONE);
+	F77_CALL(dlantp)(&type, &ul, &nu, &n,    REAL(x), work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
 	return ScalarReal(norm);
@@ -441,7 +441,7 @@ SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double rcond;
@@ -449,12 +449,12 @@ SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
-	F77_CALL(ztrcon)(&type, &ul, &di, &n, COMPLEX(x), &n, &rcond,
+	F77_CALL(ztrcon)(&type, &ul, &nu, &n, COMPLEX(x), &n, &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) n * 3, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
-	F77_CALL(dtrcon)(&type, &ul, &di, &n,    REAL(x), &n, &rcond,
+	F77_CALL(dtrcon)(&type, &ul, &nu, &n,    REAL(x), &n, &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}
 	UNPROTECT(1); /* x */
@@ -475,7 +475,7 @@ SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP diag = GET_SLOT(s_obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double rcond;
@@ -483,12 +483,12 @@ SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 	if (TYPEOF(x) == CPLXSXP) {
 	double * work = (double *) R_alloc((size_t) n * 4, sizeof(double));
 	double *rwork = (double *) R_alloc((size_t) n    , sizeof(double));
-	F77_CALL(ztpcon)(&type, &ul, &di, &n, COMPLEX(x), &rcond,
+	F77_CALL(ztpcon)(&type, &ul, &nu, &n, COMPLEX(x), &rcond,
 	                 (Rcomplex *) work, rwork, &info FCONE FCONE FCONE);
 	} else {
 	double * work = (double *) R_alloc((size_t) n * 3, sizeof(double));
 	int    *iwork = (int    *) R_alloc((size_t) n    , sizeof(int   ));
-	F77_CALL(dtpcon)(&type, &ul, &di, &n,    REAL(x), &rcond,
+	F77_CALL(dtpcon)(&type, &ul, &nu, &n,    REAL(x), &rcond,
 	                 (double   *) work, iwork, &info FCONE FCONE FCONE);
 	}
 	UNPROTECT(1); /* x */

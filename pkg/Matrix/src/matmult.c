@@ -1247,7 +1247,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	} while (0)
 
 static
-void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
+void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char nu)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
@@ -1281,7 +1281,7 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 				} \
 			} \
 		} \
-		if (di != '\0' && di != 'N') { \
+		if (nu != '\0' && nu != 'N') { \
 			size_t n_ = (size_t) n; \
 			if (!packed) \
 				c##NAME(copy2)(n_, c##PTR(x), n_ + 1, pd, 1); \
@@ -1297,7 +1297,7 @@ void dense_colscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
 }
 
 static
-void dense_rowscale(SEXP obj, SEXP d, int m, int n, char ul, char di)
+void dense_rowscale(SEXP obj, SEXP d, int m, int n, char ul, char nu)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = XLENGTH(x) != (int_fast64_t) m * n;
@@ -1516,7 +1516,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	          ydimnames, (ytrans != 'N') ? 0 : 1);
 	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
 
-	char ul = '\0', di = '\0';
+	char ul = '\0', nu = '\0';
 	if (zclass[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT((mg == 0) ? s_y : s_x, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -1526,8 +1526,8 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	}
 	if (zclass[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT((mg == 0) ? s_y : s_x, Matrix_diagSym));
-		di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N' && id)
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N' && id)
 			SET_SLOT(z, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -1594,9 +1594,9 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 		break;
 	default:
 		if (mg == 0)
-			dense_rowscale(z, d, m, n, ul, di);
+			dense_rowscale(z, d, m, n, ul, nu);
 		else
-			dense_colscale(z, d, m, n, ul, di);
+			dense_colscale(z, d, m, n, ul, nu);
 		break;
 	}
 	UNPROTECT(1); /* d */

@@ -5,7 +5,7 @@
 #include "coerce.h"
 
 SEXP vector_as_dense(SEXP from, const char *zzz,
-                     char ul, char ct, char di,
+                     char ul, char ct, char nu,
                      int m, int n, int byrow, SEXP dimnames)
 {
 	SEXPTYPE tf = TYPEOF(from);
@@ -53,7 +53,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (cl[1] == 't' && di != 'N') {
+	if (cl[1] == 't' && nu != 'N') {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -177,10 +177,10 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "denseMatrix");
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
 	if (zzz[1] == 's') VALID_TRANS(s_trans, ct);
-	if (zzz[1] == 't') VALID_DIAG (s_diag , di);
+	if (zzz[1] == 't') VALID_DIAG (s_diag , nu);
 
 	int m = -1;
 	if (s_m != R_NilValue) {
@@ -271,11 +271,11 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 		        m, n, (long long) vlen);
 
 	return
-	vector_as_dense(s_from, zzz, ul, ct, di, m, n, byrow, s_dimnames);
+	vector_as_dense(s_from, zzz, ul, ct, nu, m, n, byrow, s_dimnames);
 }
 
 SEXP matrix_as_dense(SEXP from, const char *zzz,
-                     char ul, char ct, char di, int mg, int new)
+                     char ul, char ct, char nu, int mg, int new)
 {
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = "...Matrix";
@@ -360,7 +360,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (cl[1] == 't' && di != 'N') {
+	if (cl[1] == 't' && nu != 'N') {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -435,15 +435,15 @@ SEXP R_matrix_as_dense(SEXP s_from, SEXP s_zzz,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "denseMatrix");
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
 	if (zzz[1] == 's') VALID_TRANS(s_trans, ct);
-	if (zzz[1] == 't') VALID_DIAG (s_diag , di);
+	if (zzz[1] == 't') VALID_DIAG (s_diag , nu);
 
 	int mg;
 	VALID_MARGIN(s_margin, mg);
 
-	return matrix_as_dense(s_from, zzz, ul, ct, di, mg, 1);
+	return matrix_as_dense(s_from, zzz, ul, ct, nu, mg, 1);
 }
 
 SEXP sparse_as_dense(SEXP from, const char *class, int packed)
@@ -478,7 +478,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -495,8 +495,8 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -699,8 +699,8 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	}
 
 	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (cl[1] == 't' && di != 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (cl[1] == 't' && nu != 'N')
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
@@ -722,9 +722,9 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
-			c##NAME(force2)(px1, px0, (size_t) n, ul, 1, -di); \
+			c##NAME(force2)(px1, px0, (size_t) n, ul, 1, -nu); \
 		else \
-			c##NAME(force1)(px1, px0, (size_t) n, ul, 1, -di); \
+			c##NAME(force1)(px1, px0, (size_t) n, ul, 1, -nu); \
 	} while (0)
 
 	SWITCH4(cl[0], DAD);
@@ -830,7 +830,7 @@ SEXP R_index_as_dense(SEXP s_from, SEXP s_kind)
 }
 
 SEXP Vector_as_sparse(SEXP from, const char *zzz,
-                      char ul, char ct, char di,
+                      char ul, char ct, char nu,
                       int m, int n, int byrow, SEXP dimnames)
 {
 	SEXP length0 = GET_SLOT(from, Matrix_lengthSym);
@@ -884,7 +884,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
-	if (cl[1] == 't' && di != 'N') {
+	if (cl[1] == 't' && nu != 'N') {
 		SEXP diag = PROTECT(mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
@@ -913,7 +913,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 					++nnz1; \
 			} \
 		} \
-		else if (cl[1] == 's' || cl[1] == 'p' || di == 'N') { \
+		else if (cl[1] == 's' || cl[1] == 'p' || nu == 'N') { \
 			if (r == 0) \
 				nnz1 = n + (mn - n) / 2; \
 			else if (r >= mn) { \
@@ -1057,7 +1057,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 				} \
 			} \
 		} \
-		else if (cl[1] == 's' || cl[1] == 'p' || di == 'N') { \
+		else if (cl[1] == 's' || cl[1] == 'p' || nu == 'N') { \
 			if (r == 0) { \
 				if ((ul == 'U') == !byrow) \
 				for (j = 0; j < n; ++j) { \
@@ -1291,10 +1291,10 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
 	if (zzz[1] == 's') VALID_TRANS(s_trans, ct);
-	if (zzz[1] == 't') VALID_DIAG (s_diag , di);
+	if (zzz[1] == 't') VALID_DIAG (s_diag , nu);
 
 	int m = -1;
 	if (s_m != R_NilValue) {
@@ -1387,11 +1387,11 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 		        m, n, (long long) vlen);
 
 	return
-	Vector_as_sparse(s_from, zzz, ul, ct, di, m, n, byrow, s_dimnames);
+	Vector_as_sparse(s_from, zzz, ul, ct, nu, m, n, byrow, s_dimnames);
 }
 
 SEXP matrix_as_sparse(SEXP from, const char *zzz,
-                      char ul, char ct, char di, int mg)
+                      char ul, char ct, char nu, int mg)
 {
 	char cl[] = "...Matrix";
 	cl[0] = typeToKind(TYPEOF(from));
@@ -1403,7 +1403,7 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz,
 #endif
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
-	REPROTECT(from = matrix_as_dense(from, cl, ul, ct, di, mg, 0), pid);
+	REPROTECT(from = matrix_as_dense(from, cl, ul, ct, nu, mg, 0), pid);
 	REPROTECT(from = dense_as_sparse(from, cl, zzz[2]), pid);
 	cl[2] = zzz[2];
 	REPROTECT(from = sparse_as_kind(from, cl, zzz[0]), pid);
@@ -1435,15 +1435,15 @@ SEXP R_matrix_as_sparse(SEXP s_from, SEXP s_zzz,
 		error(_("second argument of '%s' does not specify a subclass of %s"),
 		      __func__, "[CRT]sparseMatrix");
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
 	if (zzz[1] == 's') VALID_TRANS(s_trans, ct);
-	if (zzz[1] == 't') VALID_DIAG (s_diag , di);
+	if (zzz[1] == 't') VALID_DIAG (s_diag , nu);
 
 	int mg;
 	VALID_MARGIN(s_margin, mg);
 
-	return matrix_as_sparse(s_from, zzz, ul, ct, di, mg);
+	return matrix_as_sparse(s_from, zzz, ul, ct, nu, mg);
 }
 
 SEXP dense_as_sparse(SEXP from, const char *class, char repr)
@@ -1470,7 +1470,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 	UNPROTECT(1); /* dimnames */
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -1487,8 +1487,8 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -1530,7 +1530,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 				} \
 				hook; \
 			} \
-		} else if (!packed && (di == '\0' || di == 'N')) { \
+		} else if (!packed && (nu == '\0' || nu == 'N')) { \
 			if (ul == 'U') \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
@@ -1582,7 +1582,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 					} \
 					hook; \
 				} \
-		} else if (di == '\0' || di == 'N') { \
+		} else if (nu == '\0' || nu == 'N') { \
 			if (ul == 'U') \
 				for (j = 0; j < n; ++j) { \
 					for (i = 0; i < j; ++i) { \
@@ -1649,7 +1649,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 				px0 -= d; \
 				hook; \
 			} \
-		} else if (!packed && (di == '\0' || di == 'N')) { \
+		} else if (!packed && (nu == '\0' || nu == 'N')) { \
 			if (ul == 'U') { \
 				d = (int_fast64_t) m * n - 1; \
 				for (i = 0; i < m; ++i) { \
@@ -1709,7 +1709,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 					hook; \
 				} \
 			} \
-		} else if (di == '\0' || di == 'N')	{ \
+		} else if (nu == '\0' || nu == 'N')	{ \
 			if (ul == 'U') { \
 				d = PACKED_LENGTH((int_fast64_t) n) - 1; \
 				for (i = 0; i < m; ++i) { \
@@ -1901,12 +1901,12 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	}
 
 	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (cl[1] == 't' && di != 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (cl[1] == 't' && nu != 'N')
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
-	if (di != 'N') {
+	if (nu != 'N') {
 		if (cl[1] == 't') {
 			if (cl[2] != 'T') {
 				SEXP p1 = PROTECT(allocZero(INTSXP, (R_xlen_t) n + 1));
@@ -2188,8 +2188,8 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -2284,8 +2284,8 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -2365,12 +2365,12 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 	UNPROTECT(1); /* dimnames */
 
 	SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (di != 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (nu != 'N')
 		SET_SLOT(to, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
-	if (di == 'N') {
+	if (nu == 'N') {
 		PROTECT_INDEX pid;
 		SEXP x;
 		PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pid);
@@ -2463,10 +2463,10 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 		ct = CHAR(STRING_ELT(trans, 0))[0];
 	}
 
-	char di = '\0';
+	char nu = '\0';
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		di = CHAR(STRING_ELT(diag, 0))[0];
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	} else {
 		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
 		if (LENGTH(factors) > 0)
@@ -2484,11 +2484,11 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (packed) \
-			c##NAME( pack1)(px1,  px0, (size_t) n, ul, ct, di); \
+			c##NAME( pack1)(px1,  px0, (size_t) n, ul, ct, nu); \
 		else if (new) \
-			c##NAME(force2)(px1,  px0, (size_t) n, ul, ct, di); \
+			c##NAME(force2)(px1,  px0, (size_t) n, ul, ct, nu); \
 		else \
-			c##NAME(force2)(px1, NULL, (size_t) n, ul, ct, di); \
+			c##NAME(force2)(px1, NULL, (size_t) n, ul, ct, nu); \
 	} while (0)
 
 	SWITCH4(class[0], DAG);
@@ -2533,8 +2533,8 @@ SEXP sparse_as_general(SEXP from, const char *class)
 
 	if (class[1] == 't') {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di == 'N') {
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu == 'N') {
 			if (class[2] != 'T') {
 				SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
 				SET_SLOT(to, Matrix_pSym, p0);
@@ -2881,8 +2881,8 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 
 	if (cl[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
@@ -2925,7 +2925,7 @@ SEXP R_dense_as_unpacked(SEXP s_from)
 	return dense_as_unpacked(s_from, class);
 }
 
-SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
+SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char nu)
 {
 	if (class[2] == 'p')
 		return from;
@@ -2935,7 +2935,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
 	cl[1] = class[1];
 	cl[2] = 'p';
 	if (class[1] == 'g')
-		cl[1] = (di == '\0') ? 's' : 't';
+		cl[1] = (nu == '\0') ? 's' : 't';
 	SEXP to = PROTECT(newObject(cl));
 
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
@@ -2967,7 +2967,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
 			UNPROTECT(1); /* trans */
 		}
 
-		if (cl[1] == 't' && di != 'N') {
+		if (cl[1] == 't' && nu != 'N') {
 			SEXP diag = PROTECT(mkString("U"));
 			SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
@@ -2989,8 +2989,8 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char di)
 
 		if (cl[1] == 't') {
 			SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-			di = CHAR(STRING_ELT(diag, 0))[0];
-			if (di != 'N')
+			nu = CHAR(STRING_ELT(diag, 0))[0];
+			if (nu != 'N')
 				SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
 		} else {
@@ -3032,14 +3032,14 @@ SEXP R_dense_as_packed(SEXP s_from, SEXP s_uplo, SEXP s_trans, SEXP s_diag)
 {
 	const char *class = Matrix_class(s_from, valid_dense, 0, __func__);
 
-	char ul = '\0', ct = '\0', di = '\0';
+	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] == 'g') {
 	if (s_uplo  != R_NilValue) VALID_UPLO (s_uplo , ul);
 	if (s_trans != R_NilValue) VALID_TRANS(s_trans, ct);
-	if (s_diag  != R_NilValue) VALID_DIAG (s_diag , di);
+	if (s_diag  != R_NilValue) VALID_DIAG (s_diag , nu);
 	}
 
-	return dense_as_packed(s_from, class, ul, ct, di);
+	return dense_as_packed(s_from, class, ul, ct, nu);
 }
 
 SEXP sparse_as_Csparse(SEXP from, const char *class)
@@ -3078,8 +3078,8 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
@@ -3219,8 +3219,8 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
@@ -3360,8 +3360,8 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 	}
 	if (class[1] == 't') {
 		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N')
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N')
 			SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	} else {
@@ -3693,12 +3693,12 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 	UNPROTECT(1); /* length */
 
 	SEXP diag = GET_SLOT(from, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 	int j, nnz1;
 
-	if (di != 'N')
+	if (nu != 'N')
 		nnz1 = n;
 	else {
 		nnz1 = 0;
@@ -3739,10 +3739,10 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 		UNPROTECT(1); /* x1 */ \
 		); \
 		for (j = 0; j < n; ++j) { \
-			if (di != 'N' || c##NOT_ZERO(px0[j])) { \
+			if (nu != 'N' || c##NOT_ZERO(px0[j])) { \
 				*(pi1++) = l; \
 				c##IF_NPATTERN( \
-				*(px1++) = (di != 'N') ? c##UNIT : px0[j]; \
+				*(px1++) = (nu != 'N') ? c##UNIT : px0[j]; \
 				); \
 			} \
 			l += dl; \

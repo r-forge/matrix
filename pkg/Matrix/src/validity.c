@@ -273,8 +273,8 @@ SEXP triangularMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
 	if (XLENGTH(diag) != 1)
 		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
-	const char *di = CHAR(STRING_ELT(diag, 0));
-	if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
+	const char *nu = CHAR(STRING_ELT(diag, 0));
+	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
 
 	return ScalarLogical(1);
@@ -455,10 +455,10 @@ SEXP diagonalMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
 	if (XLENGTH(diag) != 1)
 		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
-	const char *di = CHAR(STRING_ELT(diag, 0));
-	if (di[0] == '\0' || di[1] != '\0' || (di[0] != 'N' && di[0] != 'U'))
+	const char *nu = CHAR(STRING_ELT(diag, 0));
+	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
-	int nonunit = di[0] == 'N';
+	int nonunit = nu[0] == 'N';
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (XLENGTH(x) != ((nonunit) ? n : 0))
@@ -571,8 +571,8 @@ SEXP sCMatrix_validate(SEXP obj)
 SEXP tCMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (di == 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (nu == 'N')
 		return sCMatrix_validate(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
@@ -662,8 +662,8 @@ SEXP sRMatrix_validate(SEXP obj)
 SEXP tRMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (di == 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (nu == 'N')
 		return sRMatrix_validate(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
@@ -743,8 +743,8 @@ SEXP sTMatrix_validate(SEXP obj)
 SEXP tTMatrix_validate(SEXP obj)
 {
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char di = CHAR(STRING_ELT(diag, 0))[0];
-	if (di == 'N')
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+	if (nu == 'N')
 		return sTMatrix_validate(obj);
 
 	SEXP i = GET_SLOT(obj, Matrix_iSym);

@@ -201,8 +201,8 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 		error(_("'%s' failed in '%s'"), "cholmod_sort", __func__);
 	if (class[1] == 't' && A->ncol > 0 && allocUnit) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N') {
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N') {
 			double one[] = { 1.0, 0.0 };
 			cholmod_sparse *I1 = cholmod_speye(A->nrow, A->ncol, A->xtype, &c);
 			I1->stype = A->stype;
@@ -294,8 +294,8 @@ cholmod_triplet *sexp_as_cholmod_triplet(cholmod_triplet *A, SEXP from,
 	}
 	if (class[1] == 't' && A->ncol > 0 && allocUnit) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		char di = CHAR(STRING_ELT(diag, 0))[0];
-		if (di != 'N') {
+		char nu = CHAR(STRING_ELT(diag, 0))[0];
+		if (nu != 'N') {
 			A->nzmax += A->ncol;
 			void *tmp;
 			tmp = A->i;
