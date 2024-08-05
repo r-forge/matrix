@@ -1270,14 +1270,14 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 	PROTECT(s_obj);
 	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
-	int upper;
-	VALID_LOGIC3(s_upper, upper);
+	int up;
+	VALID_LOGIC3(s_upper, up);
 
 	int ans_ = dense_is_triangular(s_obj, class,
-		(upper == NA_LOGICAL) ? '\0' : ((upper != 0) ? 'U' : 'L'));
+		(up == NA_LOGICAL) ? '\0' : ((up != 0) ? 'U' : 'L'));
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
-	if (upper == NA_LOGICAL && ans_ != 0) {
+	if (up == NA_LOGICAL && ans_ != 0) {
 		PROTECT(ans);
 		static
 		SEXP kindSym = NULL;
@@ -1377,7 +1377,7 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 }
 
 #define nCAST(x) (x != 0)
-#define lCAST(x) (x != 0)
+#define lCAST(x) (x)
 #define iCAST(x) (x)
 #define dCAST(x) (x)
 #define zCAST(x) (x)

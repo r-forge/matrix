@@ -761,7 +761,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 			i = PROTECT(GET_SLOT(obj,        iSym));
 		int *pp = INTEGER(p), *pi = INTEGER(i), j, k, kend,
-			upper = (class[2] == 'C') == (ul == 'U');
+			up = (class[2] == 'C') == (ul == 'U');
 		pp++;
 
 #define DIAG(c) \
@@ -787,8 +787,8 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 			else \
 				for (j = 0, k = 0; j < r; ++j) { \
 					kend = pp[j]; \
-					pa[j] = (k < kend && pi[(upper) ? kend - 1 : k] == j) \
-						? c##IFELSE_NPATTERN(px[(upper) ? kend - 1 : k], c##UNIT) \
+					pa[j] = (k < kend && pi[(up) ? kend - 1 : k] == j) \
+						? c##IFELSE_NPATTERN(px[(up) ? kend - 1 : k], c##UNIT) \
 						: c##ZERO; \
 					k = kend; \
 				} \
@@ -920,7 +920,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));
 		int *pp0 = INTEGER(p0), *pp1 = INTEGER(p1), *pi0 = INTEGER(i0),
 			j, k, kend, nd0 = 0, nd1 = 0,
-			upper = (class[2] == 'C') == (ul == 'U');
+			up = (class[2] == 'C') == (ul == 'U');
 		pp0++; *(pp1++) = 0;
 		SET_SLOT(to, Matrix_pSym, p1);
 
@@ -944,7 +944,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		else if (class[1] == 's' || nu == 'N')
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
-				if (k < kend && pi0[(upper) ? kend - 1 : k] == j)
+				if (k < kend && pi0[(up) ? kend - 1 : k] == j)
 					++nd0;
 				k = kend;
 				pp1[j] = kend - nd0;
@@ -1407,7 +1407,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		UNPROTECT(1); /* trans */
 	}
 
-	int upper = (class[0] != 'R') == (ul1 == 'U');
+	int up = (class[0] != 'R') == (ul1 == 'U');
 
 	if (class[2] != 'T') {
 
@@ -1458,7 +1458,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
 				while (k < kend) {
-					if ((upper) ? pi0[k] <= j : pi0[k] >= j)
+					if ((up) ? pi0[k] <= j : pi0[k] >= j)
 						++nnz1;
 					++k;
 				}
@@ -1469,7 +1469,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		else if (nu0 == 'N')
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp0[j];
-				if (k < kend && pi0[(upper) ? k : kend - 1] == j)
+				if (k < kend && pi0[(up) ? k : kend - 1] == j)
 					++nnz1;
 				pp1[j] = nnz1;
 				k = kend;
@@ -1502,7 +1502,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
 					while (k < kend) { \
-						if ((upper) ? pi0[k] <= j : pi0[k] >= j) { \
+						if ((up) ? pi0[k] <= j : pi0[k] >= j) { \
 							*(pi1++) = pi0[k]; \
 							c##IF_NPATTERN( \
 							*(px1++) = px0[k]; \
@@ -1519,18 +1519,18 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 				if (ct0 == 'C') \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp1[j]; \
-					if (k < kend && pi1[(upper) ? kend - 1 : k] == j) \
-						c##SET_PROJ_REAL(px1[(upper) ? kend - 1 : k]); \
+					if (k < kend && pi1[(up) ? kend - 1 : k] == j) \
+						c##SET_PROJ_REAL(px1[(up) ? kend - 1 : k]); \
 					k = kend; \
 				} \
 			} \
 			else if (nu0 == 'N') \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
-					if (k < kend && pi0[(upper) ? k : kend - 1] == j) { \
+					if (k < kend && pi0[(up) ? k : kend - 1] == j) { \
 						*(pi1++) = j; \
 						c##IF_NPATTERN( \
-						*(px1++) = px0[(upper) ? k : kend - 1]; \
+						*(px1++) = px0[(up) ? k : kend - 1]; \
 						); \
 					} \
 					k = kend; \
@@ -1538,7 +1538,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 			else if (ul0 == ul1) \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
-					if (!upper) { \
+					if (!up) { \
 					*(pi1++) = j; \
 					c##IF_NPATTERN( \
 					*(px1++) = c##UNIT; \
@@ -1551,7 +1551,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 						); \
 						++k; \
 					} \
-					if (upper) { \
+					if (up) { \
 					*(pi1++) = j; \
 					c##IF_NPATTERN( \
 					*(px1++) = c##UNIT; \
@@ -1619,7 +1619,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 
 		if (class[1] == 'g' || nu0 == 'N') {
 			for (k = 0; k < nnz0; ++k)
-				if ((upper) ? pi0[k] <= pj0[k] : pi0[k] >= pj0[k])
+				if ((up) ? pi0[k] <= pj0[k] : pi0[k] >= pj0[k])
 					++nnz1;
 		}
 		else
@@ -1642,7 +1642,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 			); \
 			if (class[1] == 'g' || nu0 == 'N') \
 				for (k = 0; k < nnz0; ++k) { \
-					if ((upper) ? pi0[k] <= pj0[k] : pi0[k] >= pj0[k]) { \
+					if ((up) ? pi0[k] <= pj0[k] : pi0[k] >= pj0[k]) { \
 						*(pi1++) = pi0[k]; \
 						*(pj1++) = pj0[k]; \
 						c##IF_NPATTERN( \
@@ -1767,7 +1767,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 		UNPROTECT(1); /* trans */
 	}
 
-	int upper = (class[0] != 'R') == (op_ul == 'U' || ul == 'U');
+	int up = (class[0] != 'R') == (op_ul == 'U' || ul == 'U');
 
 	if (class[2] != 'T') {
 
@@ -1837,9 +1837,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 					kend  = pp0 [j]; \
 					kend_ = pp0_[j]; \
 					while (k < kend) { \
-						if (upper && pi0[k] > j) \
+						if (up && pi0[k] > j) \
 							k = kend; \
-						else if (!upper && pi0[k] < j) \
+						else if (!up && pi0[k] < j) \
 							++k; \
 						else { \
 							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
@@ -1867,9 +1867,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 						} \
 					} \
 					while (k_ < kend_) { \
-						if (upper && pi0_[k_] > j) \
+						if (up && pi0_[k_] > j) \
 							k_ = kend_; \
-						else if (!upper && pi0_[k_] < j) \
+						else if (!up && pi0_[k_] < j) \
 							++k_; \
 						else { \
 							l = iwork[pi0_[k_]]++; \
@@ -1885,9 +1885,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 					kend  = pp0 [j]; \
 					kend_ = pp0_[j]; \
 					while (k < kend) { \
-						if (upper && pi0[k] > j) \
+						if (up && pi0[k] > j) \
 							k = kend; \
-						else if (!upper && pi0[k] < j) \
+						else if (!up && pi0[k] < j) \
 							++k; \
 						else { \
 							while (k_ < kend_ && pi0_[k_] < pi0[k]) { \
@@ -1915,9 +1915,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 						} \
 					} \
 					while (k_ < kend_) { \
-						if (upper && pi0_[k_] > j) \
+						if (up && pi0_[k_] > j) \
 							k_ = kend_; \
-						else if (!upper && pi0_[k_] < j) \
+						else if (!up && pi0_[k_] < j) \
 							++k_; \
 						else { \
 							l = iwork[pi0_[k_]]++; \
@@ -2000,7 +2000,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
-					if (!upper) { \
+					if (!up) { \
 						*pi1 = j; \
 						*px1 = c##UNIT; \
 						++pi1; ++px1; \
@@ -2011,7 +2011,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 						c##MULTIPLY(*px1, 0.5); \
 						++k; ++pi1; ++px1; \
 					} \
-					if (upper) { \
+					if (up) { \
 						*pi1 = j; \
 						*px1 = c##UNIT; \
 						++pi1; ++px1; \
@@ -2054,7 +2054,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				if (op_ct == 'C') \
 				for (k = 0; k < nnz0; ++k) { \
 					if (*pi0 != *pj0) { \
-						if ((upper) ? *pi0 < *pj0 : *pi0 > *pj0) { \
+						if ((up) ? *pi0 < *pj0 : *pi0 > *pj0) { \
 						*pi1 = *pi0; \
 						*pj1 = *pj0; \
 						c##ASSIGN_IDEN(*px1, *px0); \
@@ -2073,7 +2073,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 				else \
 				for (k = 0; k < nnz0; ++k) { \
-					if ((upper) ? *pi0 <= *pj0 : *pi0 >= *pj0) { \
+					if ((up) ? *pi0 <= *pj0 : *pi0 >= *pj0) { \
 						*pi1 = *pi0; \
 						*pj1 = *pj0; \
 					} else { \
@@ -2845,14 +2845,14 @@ SEXP R_sparse_is_triangular(SEXP s_obj, SEXP s_upper)
 {
 	const char *class = Matrix_class(s_obj, valid_sparse, 6, __func__);
 
-	int upper;
-	VALID_LOGIC3(s_upper, upper);
+	int up;
+	VALID_LOGIC3(s_upper, up);
 
 	int ans_ = sparse_is_triangular(s_obj, class,
-		(upper == NA_LOGICAL) ? '\0' : ((upper != 0) ? 'U' : 'L'));
+		(up == NA_LOGICAL) ? '\0' : ((up != 0) ? 'U' : 'L'));
 	SEXP ans = allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
-	if (upper == NA_LOGICAL && ans_ != 0) {
+	if (up == NA_LOGICAL && ans_ != 0) {
 		PROTECT(ans);
 		static
 		SEXP kindSym = NULL;
@@ -2919,7 +2919,7 @@ SEXP R_sparse_is_diagonal(SEXP s_obj)
 #define MAP(i) (map) ? map[i] : i
 
 #define nCAST(x) (1)
-#define lCAST(x) (x != 0)
+#define lCAST(x) (x)
 #define iCAST(x) (x)
 #define dCAST(x) (x)
 #define zCAST(x) (x)
@@ -3458,11 +3458,11 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 		{
 			int_fast64_t s = (int_fast64_t) pp[n - 1] + ((un) ? n : 0);
 			if (sy) {
-				int upper = (class[2] == 'C') == (ul == 'U');
+				int up = (class[2] == 'C') == (ul == 'U');
 				s *= 2;
 				for (j = 0, k = 0; j < n; ++j) {
 					kend = pp[j];
-					if (k < kend && pi[(upper) ? kend - 1 : k] == j)
+					if (k < kend && pi[(up) ? kend - 1 : k] == j)
 						--s;
 					k = kend;
 				}
@@ -3708,8 +3708,8 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 		UNPROTECT(4); /* i, p, x, obj */
 
 		int seen0 = 0, i0, i1,
-			upper = !sy || (class[2] == 'C') == (ul == 'U'),
-			lower = !sy || (class[2] == 'C') == (ul != 'U');
+			up = !sy || (class[2] == 'C') == (ul == 'U'),
+			lo = !sy || (class[2] == 'C') == (ul != 'U');
 
 		switch (class[0]) {
 		case 'n':
@@ -3723,8 +3723,8 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
 				if (!seen0) {
-					i0 = (upper) ? 0 : j;
-					i1 = (lower) ? m : j + 1;
+					i0 = (up) ? 0 : j;
+					i1 = (lo) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
@@ -3755,8 +3755,8 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
 				if (!seen0) {
-					i0 = (upper) ? 0 : j;
-					i1 = (lower) ? m : j + 1;
+					i0 = (up) ? 0 : j;
+					i1 = (lo) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
@@ -3786,8 +3786,8 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 			for (j = 0, k = 0; j < n; ++j) {
 				kend = pp[j];
 				if (!seen0) {
-					i0 = (upper) ? 0 : j;
-					i1 = (lower) ? m : j + 1;
+					i0 = (up) ? 0 : j;
+					i1 = (lo) ? m : j + 1;
 				}
 				while (k < kend) {
 					if (!seen0) {
