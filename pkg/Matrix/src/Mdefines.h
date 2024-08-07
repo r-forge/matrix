@@ -116,7 +116,7 @@ const char *valid_dense[], *valid_sparse[],
 
 #define ERROR_INVALID_CLASS(_X_, _FUNC_) \
 do { \
-	if (!OBJECT(_X_)) \
+	if (!R_isObject(_X_)) \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else { \
 		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
