@@ -3,7 +3,6 @@
 ## ~~~~ Not under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Unwanted by DB or MM (still?)
-2copy
 ^[A-Za-z0-9][-_A-Za-z0-9]*[.]R$
 auto$
 -log-
@@ -14,21 +13,19 @@ _check_
 [.]li?st$
 [A-Za-z][+]$
 [A-Za-z][+][A-Za-z0-9]$
-Jagan[_-]
 M1mac
 Matrix_[1-9][0-9]*[.][0-9]
-jss.submit
 .*_results
 TAGS
 _no_UFlong
-_?svn-?
+^do-
+^svn-?
 ^R/.*[.]R_+$
 ^misc$
 ^old$
 ^src/SuiteSparse-.*$
 ^tests/.*[.]Rout.*[24]b$
 ^tests/.*_(doExtra|nX)$
-^vignettes/fullpage[.]sty$
 
 ## Unwanted by everyone
 [.]Rhistory$
