@@ -387,12 +387,10 @@ SEXP Mmatrix(SEXP args)
 #endif
 
 	PROTECT(ans = allocMatrix(TYPEOF(vals), nr, nc));
-	if (lendat) {
-		if (isVector(vals))
-			copyMatrix(ans, vals, (Rboolean) byrow);
-		else
-			copyListMatrix(ans, vals, (Rboolean) byrow);
-	} else if (isVector(vals)) { /* fill with NAs */
+	if (isVector(vals)) {
+	    if(lendat)
+		copyMatrix(ans, vals, (Rboolean) byrow);
+	    else { /* fill with NAs */
 		R_xlen_t N = (R_xlen_t) nr * nc, i;
 		switch (TYPEOF(vals)) {
 		case STRSXP:
@@ -429,6 +427,7 @@ SEXP Mmatrix(SEXP args)
 			/* don't fill with anything */
 			;
 		}
+	    }
 	}
 	if (!isNull(dimnames)&& length(dimnames) > 0)
 		ans = dimnamesgets(ans, dimnames);
