@@ -81,7 +81,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 				if (!byrow) { \
 					k = 0; \
 					while (mn-- > 0) { \
-						if (k == r) k = 0; \
+						k %= r; \
 						*(dest++) = src[k++]; \
 					} \
 				} else { \
@@ -2677,7 +2677,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 				} \
 				} \
 				Matrix_Free(pp1_, n); \
-			} else if (ul == ((class[2] == 'C') ? 'U' : 'L')) { \
+			} else if ((class[2] == 'C') == (ul == 'U')) { \
 				for (j = 0, k = 0; j < n; ++j) { \
 					kend = pp0[j]; \
 					while (k < kend) { \
