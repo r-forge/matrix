@@ -107,20 +107,16 @@
                              shape = .M.shape(x),
                              repr = .M.repr(x),
                              unsorted = is.unsorted(i)) {
-    if(!any(repr == c("C", "R", "T")))
-        return(.Call(R_subscript_1ary, x, i))
-    if(shape == "t" && x@diag != "N")
-        x <- ..diagU2N(x)
-    if(shape == "s" || repr == "R") {
+    if(repr == "R" || ((repr == "C" || repr == "T") && shape == "s")) {
         x.length <- prod(d <- x@Dim)
-        if(x.length < 0x1p+53) {
+        if(x.length <= 0x1p+53) {
             r <- max(x.length, i, na.rm = TRUE)
-            if(r >= x.length + 1)
-                i[i >= x.length + 1] <- NA
+            if(r > x.length)
+                i[i > x.length] <- NA
         } else if(is.double(i)) {
             r <- max(0x1p+53, i, na.rm = TRUE)
             if(r > 0x1p+53) {
-                if(any(i > 0x1p+53 && i <= x.length, na.rm = TRUE))
+                if(any(i > 0x1p+53 & i <= x.length, na.rm = TRUE))
                     ## could be avoided in C, which has 64-bit integers :
                     warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
                             domain = NA)
@@ -130,36 +126,28 @@
         i1s <- i - 1L
         m <- d[1L]
         i. <- as.integer(i1s %% m)
+        j. <- as.integer(i1s %/% m)
         if(shape == "s") {
-            j. <- as.integer(i1s %/% m)
             op <- if(x@uplo == "U") `>` else `<`
             if(length(w <- which(op(i., j.)))) {
                 i.. <- i.[w]
                 j.. <- j.[w]
-                if(repr == "R")
-                    i.[w] <- j..
-                if(x.length > .Machine$integer.max)
-                    m <- as.double(m)
-                i[w] <- m * i.. + j.. + 1L
+                i.[w] <- j..
+                j.[w] <- i..
                 unsorted <- TRUE # Bug #6839
             }
         }
     }
     o <-
-        if(repr == "R")
-            order(i., i)
-        else if(is.na(unsorted) || unsorted)
-            sort.list(i)
-        else return(.Call(R_subscript_1ary, x, i))
-    if(is.unsorted(o)) {
-        s <- .Call(R_subscript_1ary, x, i[o])
-        s[o] <- s
-        s
-    } else .Call(R_subscript_1ary, x, i)
+    if(repr == "R")
+        order(i., j.)
+    else if((repr == "C" || repr == "T") && (is.na(unsorted) || unsorted))
+        (if(shape == "s") order(j., i.) else sort.list(i))
+    .Call(R_subscript_1ary, x, i, o)
 }
 
 ## x[i] where 'i' is any array or Matrix
-.subscript.1ary.mat <- function(x, i) {
+.subscript.1ary.arr <- function(x, i) {
     if(isS4(i)) {
         if(!.isMatrix(i))
             stop(.subscript.invalid(i), domain = NA)
@@ -202,7 +190,7 @@
                        i <- i[i. > 0L, , drop = FALSE]
                    if(!all(j. <- i[, 2L], na.rm = TRUE))
                        i <- i[j. > 0L, , drop = FALSE]
-                   ..subscript.1ary.mat(x, i)
+                   ..subscript.1ary.arr(x, i)
                },
            character =
                {
@@ -214,31 +202,27 @@
                        ## integer row contains at least one NA,
                        ## indicating non-match that should not be ignored
                        stop("subscript out of bounds")
-                   ..subscript.1ary.mat(x, m)
+                   ..subscript.1ary.arr(x, m)
                },
            stop(.subscript.invalid(i), domain = NA))
 }
 
 ## x[i] where 'i' is a 2-column matrix of type "integer"
 ## with i[, 1L] in 1:m (or NA) and i[, 2L] in 1:n (or NA)
-..subscript.1ary.mat <- function(x, i,
+..subscript.1ary.arr <- function(x, i,
                                  shape = .M.shape(x),
                                  repr = .M.repr(x)) {
-    if(!any(repr == c("C", "R", "T")))
-        return(.Call(R_subscript_1ary_mat, x, i))
-    if(shape == "t" && x@diag != "N")
-        x <- ..diagU2N(x)
-    i. <- i[, 1L]
-    j. <- i[, 2L]
-    if(shape == "s") {
-        op <- if(x@uplo == "U") `>` else `<`
-        if(length(w <- which(op(i., j.)))) {
-            i[w, ] <- i[w, 2:1]
-            i. <- i[, 1L]
-            j. <- i[, 2L]
-        }
-    }
     o <-
+    if(repr == "C" || repr == "R" || repr == "T") {
+        i. <- i[, 1L]
+        j. <- i[, 2L]
+        if(shape == "s") {
+            op <- if(x@uplo == "U") `>` else `<`
+            if(length(w <- which(op(i., j.)))) {
+                i. <- i[, 1L]
+                j. <- i[, 2L]
+            }
+        }
         if(repr == "R") {
             if(anyNA(j.))
                 i.[is.na(j.)] <- NA
@@ -248,11 +232,8 @@
                 j.[is.na(i.)] <- NA
             order(j., i.)
         }
-    if(is.unsorted(o)) {
-        s <- .Call(R_subscript_1ary_mat, x, i[o, , drop = FALSE])
-        s[o] <- s
-        s
-    } else .Call(R_subscript_1ary_mat, x, i)
+    }
+    .Call(R_subscript_1ary_2col, x, i, o)
 }
 
 ## x[i, j, drop] where 'i' and 'j' are NULL or any vector
@@ -447,7 +428,7 @@ setMethod("[",
               na <- nargs()
               if(na == 2L)
                   ## x[i=]
-                  .subscript.1ary.mat(x, i)
+                  .subscript.1ary.arr(x, i)
               else if(na == 3L)
                   ## x[i=, ], x[, i=]
                   .subscript.2ary(x, i, , drop = TRUE)

@@ -2,834 +2,727 @@
 #include "M5.h"
 #include "subscript.h"
 
-#define F_X( _X_)  (_X_)
-#define F_ND(_X_) ((_X_) ? 1 : 0)
-#define F_NS(_X_)          1
-
 #define AR21_UP(i, j, m) i + j + (        j * (    j - 1)) / 2
 #define AR21_LO(i, j, m) i +     (j * m + j * (m - j - 1)) / 2
 
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)
 
+#define lCAST(x) (x)
+#define iCAST(x) (x)
+#define dCAST(x) (x)
+#define zCAST(x) (x)
+
+#define iOOB(s, t, mn) (s == NA_INTEGER || (t = s - 1) >= mn)
+#define dOOB(s, t, mn) (ISNAN(s) || s >= 0x1.0p+63 || (t = (int_fast64_t) s - 1) >= mn)
+
+#define SUB1(c) \
+do { \
+	if (TYPEOF(s) == INTSXP) \
+		SUB1__(i, c); \
+	else \
+		SUB1__(d, c); \
+} while (0)
+
+#undef nCAST
+#define nCAST(x) (x != 0)
+
 static
-SEXP unpackedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
+SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
+	R_xlen_t slen = XLENGTH(s);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
 
-#define SUB1_START(_SEXPTYPE_) \
-	SEXPTYPE typ = _SEXPTYPE_; \
-	R_xlen_t l = 0, len = XLENGTH(w); \
-	SEXP ans = allocVector(typ, len); \
-	if (len == 0) \
-		return ans; \
-	PROTECT(ans); \
-	 \
-	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)); \
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
-	int_fast64_t mn64 = (int_fast64_t) m * n; \
-	UNPROTECT(1);
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
 
-#define SUB1_START_EXTRA(_SEXPTYPE_) \
-	SUB1_START(_SEXPTYPE_); \
-	 \
-	int ge = cl[1] == 'g', tr = cl[1] == 't', upper = 1, nonunit = 1; \
-	if (!ge) { \
-		SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym)); \
-		upper = CHAR(STRING_ELT(uplo, 0))[0] == 'U'; \
-		UNPROTECT(1); \
-		if (tr) { \
-			SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym)); \
-			nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N'; \
-			UNPROTECT(1); \
-		} \
+	char ul = '\0', ct = '\0', nu = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SUB1_START_EXTRA(kindToType(cl[0]));
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	R_xlen_t l;
+	int_fast64_t b, i, j, k;
 
-#define SUB1_CASES(_SUB1_N_, _SUB1_X_, _F_N_, _F_X_) \
-	do { \
-		switch (cl[0]) { \
-		case 'n': \
-			_SUB1_N_(int, LOGICAL, NA_LOGICAL, 0, 1, _F_N_); \
-			break; \
-		case 'l': \
-			_SUB1_X_(int, LOGICAL, NA_LOGICAL, 0, 1, _F_X_); \
-			break; \
-		case 'i': \
-			_SUB1_X_(int, INTEGER, NA_INTEGER, 0, 1, _F_X_); \
-			break; \
-		case 'd': \
-			_SUB1_X_(double, REAL, NA_REAL, 0.0, 1.0, _F_X_); \
-			break; \
-		case 'z': \
-			_SUB1_X_(Rcomplex, COMPLEX, \
-			         Matrix_zna, Matrix_zzero, Matrix_zunit, _F_X_); \
-			break; \
-		default: \
-			break; \
-		} \
-	} while (0)
+	int packed = class[2] == 'p',
+		ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && nu != 'N', up = ul == 'U';
 
-#define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
+#define SUB1__(d, c) \
 	do { \
-		_CTYPE_ *pans = _PTR_(ans); \
-		if (TYPEOF(w) == INTSXP) { \
-			int *pw = INTEGER(w); \
-			if (mn64 >= INT_MAX) { \
-				/* index is never out of bounds */ \
-				SUB1_LOOP((pw[l] == NA_INTEGER), \
-				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
-			} else { \
-				int mn = m * n; \
-				SUB1_LOOP((pw[l] == NA_INTEGER || pw[l] > mn), \
-				          _NA_, _ZERO_, _ONE_, _F_, int); \
+		d##TYPE *ps = d##PTR(s); \
+		c##TYPE *pa = c##PTR(ans); \
+		c##TYPE *px = c##PTR(x); \
+		for (l = 0; l < slen; ++l) { \
+			if (d##OOB(ps[l], k, mn)) { \
+				pa[l] = c##NA; \
+				continue; \
 			} \
-		} else { \
-			double *pw = REAL(w); \
-			if (mn64 >= 0x1.0p+53) \
-				/* m*n may not be exactly representable as double */ \
-				/* but it does not exceed INT_MAX * INT_MAX       */ \
-				SUB1_LOOP((ISNAN(pw[l]) || pw[l] >= 0x1.0p+62 || \
-				           (int_fast64_t) pw[l] > mn64), \
-				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
-			else { \
-				double mn1a = (double) m * n + 1.0; \
-				SUB1_LOOP((ISNAN(pw[l]) || pw[l] >= mn1a), \
-				          _NA_, _ZERO_, _ONE_, _F_, int_fast64_t); \
+			if (ge) { \
+				c##ASSIGN_IDEN(pa[l], c##CAST(px[k])); \
+				continue; \
 			} \
-		} \
-	} while (0)
-
-#define SUB1_X(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
-	do { \
-		PROTECT(x = GET_SLOT(x, Matrix_xSym)); \
-		_CTYPE_ *px = _PTR_(x); \
-		SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_); \
-		UNPROTECT(1); \
-	} while (0)
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		_INT_ index, i_, j_; \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else { \
-				index = (_INT_) pw[l] - 1; \
-				if (ge) \
-					pans[l] = _F_(px[index]); \
-				else { \
-					i_ = index % m; \
-					j_ = index / m; \
-					if (tr) { \
-						if ((upper) ? i_ > j_ : i_ < j_) \
-							pans[l] = _ZERO_; \
-						else if (!nonunit && i_ == j_) \
-							pans[l] = _ONE_; \
-						else \
-							pans[l] = _F_(px[index]); \
-					} else { \
-						if ((upper) ? i_ > j_ : i_ < j_) \
-							pans[l] = _F_(px[i_ * m + j_]); \
-						else \
-							pans[l] = _F_(px[index]); \
-					} \
-				} \
+			i = k % m; \
+			j = k / m; \
+			b = (up) ? j - i : i - j; \
+			if (!sy) { \
+			if (b < 0) { \
+				pa[l] = c##ZERO; \
+				continue; \
 			} \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(1);
-	return ans;
-}
-
-static
-SEXP packedMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START_EXTRA(kindToType(cl[0]));
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		_INT_ index, i_, j_; \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else { \
-				index = (_INT_) pw[l] - 1; \
-				i_ = index % m; \
-				j_ = index / m; \
-				if (tr) { \
-					if (upper) { \
-						if (i_ > j_) \
-							pans[l] = _ZERO_; \
-						else if (!nonunit && i_ == j_) \
-							pans[l] = _ONE_; \
-						else \
-							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
-					} else { \
-						if (i_ < j_) \
-							pans[l] = _ZERO_; \
-						else if (!nonunit && i_ == j_) \
-							pans[l] = _ONE_; \
-						else \
-							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
-					} \
-				} else { \
-					if (upper) { \
-						if (i_ > j_) \
-							pans[l] = _F_(px[AR21_UP(j_, i_, m)]); \
-						else \
-							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
-					} else { \
-						if (i_ < j_) \
-							pans[l] = _F_(px[AR21_LO(j_, i_, m)]); \
-						else \
-							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
-					} \
-				} \
+			if (un && b == 0) { \
+				pa[l] = c##UNIT; \
+				continue; \
 			} \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(1);
-	return ans;
-}
-
-static
-SEXP CsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START(kindToType(cl[0]));
-
-	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(x, Matrix_iSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k, kend;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		_INT_ index; \
-		if (_NA_SUBSCRIPT_) \
-			j = -1; \
-		else { \
-			index = (_INT_) pw[l] - 1; \
-			i_ =     (int) (index % m); \
-			j_ = j = (int) (index / m); \
-		} \
-		while (j >= 0) { \
-			k = pp[j]; \
-			kend = pp[j + 1]; \
-			while (k < kend && j_ == j) { \
-				if (pi[k] < i_) \
-					++k; \
-				else { \
-					if (pi[k] > i_) \
-						pans[l] = _ZERO_; \
-					else \
-						pans[l] = _F_(px[k]); \
-					++l; \
-					if (l == len || _NA_SUBSCRIPT_) \
-						j_ = -1; \
-					else { \
-						index = (_INT_) pw[l] - 1; \
-						i_ = (int) (index % m); \
-						j_ = (int) (index / m); \
-					} \
-				} \
 			} \
-			while (j_ == j) { \
-				pans[l] = _ZERO_; \
-				++l; \
-				if (l == len || _NA_SUBSCRIPT_) \
-					j_ = -1; \
-				else { \
-					index = (_INT_) pw[l] - 1; \
-					i_ = (int) (index % m); \
-					j_ = (int) (index / m); \
-				} \
-			} \
-			j = j_; \
-		} \
-		while (l < len) { \
-			pans[l] = _NA_; \
-			++l; \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_N, SUB1_X, F_NS, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(3);
-	return ans;
-}
-
-static
-SEXP RsparseMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START(kindToType(cl[0]));
-
-	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
-		j = PROTECT(GET_SLOT(x, Matrix_jSym));
-	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k, kend;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		_INT_ index; \
-		if (_NA_SUBSCRIPT_) \
-			i = -1; \
-		else { \
-			index = (_INT_) pw[l] - 1; \
-			i_ = i = (int) (index % m); \
-			j_ =     (int) (index / m); \
-		} \
-		while (i >= 0) { \
-			k = pp[i]; \
-			kend = pp[i + 1]; \
-			while (k < kend && i_ == i) { \
-				if (pj[k] < j_) \
-					++k; \
-				else { \
-					if (pj[k] > j_) \
-						pans[l] = _ZERO_; \
-					else \
-						pans[l] = _F_(px[k]); \
-					++l; \
-					if (l == len || _NA_SUBSCRIPT_) \
-						i_ = -1; \
-					else { \
-						index = (_INT_) pw[l] - 1; \
-						i_ = (int) (index % m); \
-						j_ = (int) (index / m); \
-					} \
-				} \
-			} \
-			while (i_ == i) { \
-				pans[l] = _ZERO_; \
-				++l; \
-				if (l == len || _NA_SUBSCRIPT_) \
-					i_ = -1; \
-				else { \
-					index = (_INT_) pw[l] - 1; \
-					i_ = (int) (index % m); \
-					j_ = (int) (index / m); \
-				} \
-			} \
-			i = i_; \
-		} \
-		while (l < len) { \
-			pans[l] = _NA_; \
-			++l; \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_N, SUB1_X, F_NS, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(3);
-	return ans;
-}
-
-static
-SEXP diagonalMatrix_subscript_1ary(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START(kindToType(cl[0]));
-
-	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
-	int nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N';
-	UNPROTECT(1);
-
-	int_fast64_t index, n1a = (int_fast64_t) n + 1;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else if ((index = (int_fast64_t) pw[l] - 1) % n1a != 0) \
-				pans[l] = _ZERO_; \
-			else if (!nonunit) \
-				pans[l] = _ONE_; \
-			else \
-				pans[l] = _F_(px[index / n1a]); \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(1);
-	return ans;
-}
-
-static
-SEXP indMatrix_subscript_1ary(SEXP x, SEXP w)
-{
-	SUB1_START(LGLSXP);
-
-	SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
-	int *pperm = INTEGER(perm), i_, j_;
-
-	SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
-	int mg = INTEGER(margin)[0] - 1;
-	UNPROTECT(1);
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_, _INT_) \
-	do { \
-		_INT_ index; \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else { \
-				index = (_INT_) pw[l] - 1; \
-				i_ = (int) (index % m); \
-				j_ = (int) (index / m); \
-				if (!mg) \
-					pans[l] = j_ == pperm[i_] - 1; \
+			if (!packed) { \
+				if (b >= 0) \
+					/* do nothing */; \
 				else \
-					pans[l] = i_ == pperm[j_] - 1; \
+					k = i * m + j; \
+			} else if (up) { \
+				if (b >= 0) \
+					k = PACKED_AR21_UP(i, j); \
+				else \
+					k = PACKED_AR21_UP(j, i); \
+			} else { \
+				if (b >= 0) \
+					k = PACKED_AR21_LO(i, j, m); \
+				else \
+					k = PACKED_AR21_LO(j, i, m); \
 			} \
+			if (!he || b > 0) \
+				c##ASSIGN_IDEN     (pa[l], c##CAST(px[k])); \
+			else if (b == 0) \
+				c##ASSIGN_PROJ_REAL(pa[l], c##CAST(px[k])); \
+			else \
+				c##ASSIGN_CONJ     (pa[l], c##CAST(px[k])); \
 		} \
 	} while (0)
 
-	SUB1_N(int, LOGICAL, NA_LOGICAL, 0, 1, );
+	SWITCH5(class[0], SUB1);
 
-#undef SUB1_LOOP
-#undef SUB1_N
-#undef SUB1_START
-#undef SUB1_START_EXTRA
+#undef SUB1__
 
-	UNPROTECT(2);
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 
-/* x[i] with 'i' of type "integer" or "double" {i >= 1 or NA} */
-SEXP R_subscript_1ary(SEXP s_x, SEXP s_i)
+#undef nCAST
+#define nCAST(x) (1)
+
+static
+SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 {
-	const char *cl = Matrix_class(s_x, valid_matrix, 7, __func__);
-	validObject(s_x, cl);
+	R_xlen_t slen = XLENGTH(s);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
 
-	switch (cl[2]) {
-	case 'e':
-	case 'y':
-	case 'r':
-		return unpackedMatrix_subscript_1ary(s_x, s_i, cl);
-	case 'p':
-		return   packedMatrix_subscript_1ary(s_x, s_i, cl);
-
-	/* NB: for [CRT], the caller must preprocess 'x' and 'i';
-	   symmetric and unit triangular 'x' are not handled specially,
-	   and it is assumed for speed that 'i' is sorted by row [R]
-	   or column [CT] with NA last
-	*/
-
-	case 'C':
-		return  CsparseMatrix_subscript_1ary(s_x, s_i, cl);
-	case 'R':
-		return  RsparseMatrix_subscript_1ary(s_x, s_i, cl);
-	case 'T':
-	{
-		char cl_[] = "..CMatrix";
-		cl_[0] = cl[0];
-		cl_[1] = cl[1];
-
+	if (class[2] == 'T') {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_Csparse(SEXP, const char *);
-
-		s_x = sparse_as_Csparse(s_x, cl);
-		PROTECT(s_x);
-		s_x = CsparseMatrix_subscript_1ary(s_x, s_i, cl_);
-		UNPROTECT(1);
-		return s_x;
+		obj = sparse_as_Csparse(obj, class);
 	}
-	case 'i':
-		return diagonalMatrix_subscript_1ary(s_x, s_i, cl);
-	default:
-		return      indMatrix_subscript_1ary(s_x, s_i);
+	PROTECT(obj);
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
+
+	char ul = '\0', ct = '\0', nu = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
 	}
-}
-
-static
-SEXP unpackedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
-{
-
-#define SUB1_START(_SEXPTYPE_) \
-	SEXPTYPE typ = _SEXPTYPE_; \
-	int l = 0, len = (int) (XLENGTH(w) / 2); \
-	SEXP ans = allocVector(typ, len); \
-	if (len == 0) \
-		return ans; \
-	PROTECT(ans); \
-	int *pw0 = INTEGER(w), *pw1 = pw0 + len;
-
-#define SUB1_START_EXTRA(_SEXPTYPE_) \
-	SUB1_START(_SEXPTYPE_); \
-	 \
-	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)); \
-	int m = INTEGER(dim)[0]; \
-	UNPROTECT(1); \
-	 \
-	int ge = cl[1] == 'g', tr = cl[1] == 't', upper = 1, nonunit = 1; \
-	if (!ge) { \
-		SEXP uplo = PROTECT(GET_SLOT(x, Matrix_uploSym)); \
-		upper = CHAR(STRING_ELT(uplo, 0))[0] == 'U'; \
-		UNPROTECT(1); \
-		if (tr) { \
-			SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym)); \
-			nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N'; \
-			UNPROTECT(1); \
-		} \
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu = CHAR(STRING_ELT(diag, 0))[0];
 	}
 
-	SUB1_START_EXTRA(kindToType(cl[0]));
+	SEXP iSym = (class[2] != 'R') ? Matrix_iSym : Matrix_jSym,
+		p_ = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		i_ = PROTECT(GET_SLOT(obj,        iSym));
+	int *pp = INTEGER(p_), *pi = INTEGER(i_), j_, k_, kend_;
+	pp++;
 
-	int_fast64_t i_, j_;
+	int *po_i = (TYPEOF(o) == INTSXP) ? INTEGER(o) : NULL;
+	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
 
-#define SUB1_N(_CTYPE_, _PTR_, _NA_, _ZERO_, _ONE_, _F_) \
+	R_xlen_t l = 0, l_;
+	int b, i, j, tmp;
+	int_fast64_t k;
+
+	int byrow = class[2] == 'R',
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && nu != 'N', up = (!byrow) == (ul == 'U');
+
+#define MAP(l) \
+	(po_i) ? (R_xlen_t) po_i[l] - 1 : (po_d) ? (R_xlen_t) po_d[l] - 1 : l
+
+#define ADV(d) \
 	do { \
-		_CTYPE_ *pans = _PTR_(ans); \
-		SUB1_LOOP((pw0[l] == NA_INTEGER || pw1[l] == NA_INTEGER), \
-		          _NA_, _ZERO_, _ONE_, _F_); \
-	} while (0)
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
-	do { \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else { \
-				i_ = pw0[l] - 1; \
-				j_ = pw1[l] - 1; \
-				if (ge) \
-					pans[l] = _F_(px[j_ * m + i_]); \
-				else if (tr) { \
-					if ((upper) ? i_ > j_ : i_ < j_) \
-						pans[l] = _ZERO_; \
-					else if (!nonunit && i_ == j_) \
-						pans[l] = _ONE_; \
-					else \
-						pans[l] = _F_(px[j_ * m + i_]); \
-				} else { \
-					if ((upper) ? i_ > j_ : i_ < j_) \
-						pans[l] = _F_(px[i_ * m + j_]); \
-					else \
-						pans[l] = _F_(px[j_ * m + i_]); \
-				} \
-			} \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(1);
-	return ans;
-}
-
-static
-SEXP packedMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START_EXTRA(kindToType(cl[0]));
-
-	int_fast64_t i_, j_;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
-	do { \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else { \
-				i_ = pw0[l] - 1; \
-				j_ = pw1[l] - 1; \
-				if (tr) { \
-					if (upper) { \
-						if (i_ > j_) \
-							pans[l] = _ZERO_; \
-						else if (!nonunit && i_ == j_) \
-							pans[l] = _ONE_; \
-						else \
-							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
-					} else { \
-						if (i_ < j_) \
-							pans[l] = _ZERO_; \
-						else if (!nonunit && i_ == j_) \
-							pans[l] = _ONE_; \
-						else \
-							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
-					} \
-				} else { \
-					if (upper) { \
-						if (i_ > j_) \
-							pans[l] = _F_(px[AR21_UP(j_, i_, m)]); \
-						else \
-							pans[l] = _F_(px[AR21_UP(i_, j_, m)]); \
-					} else { \
-						if (i_ < j_) \
-							pans[l] = _F_(px[AR21_LO(j_, i_, m)]); \
-						else \
-							pans[l] = _F_(px[AR21_LO(i_, j_, m)]); \
-					} \
-				} \
-			} \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(1);
-	return ans;
-}
-
-static
-SEXP CsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START(kindToType(cl[0]));
-
-	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
-		i = PROTECT(GET_SLOT(x, Matrix_iSym));
-	int *pp = INTEGER(p), *pi = INTEGER(i), i_, j_, j, k, kend;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
-	do { \
-		if (_NA_SUBSCRIPT_) \
+		if (l >= slen) \
 			j = -1; \
 		else { \
-			i_ =     pw0[l] - 1; \
-			j_ = j = pw1[l] - 1; \
+			l_ = MAP(l); \
+			if (d##OOB(ps[l_], k, mn)) \
+				j = -1; \
+			else { \
+				if (byrow) { \
+					i = (int) (k / m); \
+					j = (int) (k % m); \
+				} \
+				else { \
+					i = (int) (k % m); \
+					j = (int) (k / m); \
+				} \
+				if (sy && (b = (up) ? j - i : i - j) < 0) { \
+					tmp =   i; \
+					i   =   j; \
+					j   = tmp; \
+				} \
+				++l; \
+			} \
 		} \
+	} while (0)
+
+#define SUB1__(d, c) \
+	do { \
+		d##TYPE *ps = d##PTR(s); \
+		c##TYPE *pa = c##PTR(ans); \
+		c##IF_NPATTERN( \
+		SEXP x = GET_SLOT(obj, Matrix_xSym); \
+		c##TYPE *px = c##PTR(x); \
+		); \
+		ADV(d); \
 		while (j >= 0) { \
-			k = pp[j]; \
-			kend = pp[j + 1]; \
-			while (k < kend && j_ == j) { \
-				if (pi[k] < i_) \
-					++k; \
+			j_ = j; \
+			k_ = pp[j_ - 1]; \
+			kend_ = pp[j_]; \
+			while (k_ < kend_ && j == j_) { \
+				if (pi[k_] < i) \
+					++k_; \
 				else { \
-					if (pi[k] > i_) \
-						pans[l] = _ZERO_; \
+					if (pi[k_] > i) \
+						pa[l_] = (un && i == j) ? c##UNIT : c##ZERO; \
+					else if (!he || b > 0) \
+						c##ASSIGN_IDEN     (pa[l_], c##CAST(px[k_])); \
+					else if (b == 0) \
+						c##ASSIGN_PROJ_REAL(pa[l_], c##CAST(px[k_])); \
 					else \
-						pans[l] = _F_(px[k]); \
-					++l; \
-					if (l == len || _NA_SUBSCRIPT_) \
-						j_ = -1; \
-					else { \
-						i_ = pw0[l] - 1; \
-						j_ = pw1[l] - 1; \
-					} \
+						c##ASSIGN_CONJ     (pa[l_], c##CAST(px[k_])); \
+					ADV(d); \
 				} \
 			} \
-			while (j_ == j) { \
-				pans[l] = _ZERO_; \
-				++l; \
-				if (l == len || _NA_SUBSCRIPT_) \
-					j_ = -1; \
-				else { \
-					i_ = pw0[l] - 1; \
-					j_ = pw1[l] - 1; \
-				} \
+			while (j == j_) { \
+				pa[l_] = (un && i == j) ? c##UNIT : c##ZERO; \
+				ADV(d); \
 			} \
-			j = j_; \
 		} \
-		while (l < len) { \
-			pans[l] = _NA_; \
+		while (l < slen) { \
+			l_ = MAP(l); \
+			pa[l_] = c##NA; \
 			++l; \
 		} \
 	} while (0)
 
-	SUB1_CASES(SUB1_N, SUB1_X, F_NS, F_X);
+	SWITCH5(class[0], SUB1);
 
-#undef SUB1_LOOP
+#undef MAP
+#undef ADV
+#undef SUB1__
 
-	UNPROTECT(3);
+	UNPROTECT(4); /* i, p, ans, obj */
 	return ans;
 }
 
-static
-SEXP RsparseMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
-{
-	SUB1_START(kindToType(cl[0]));
-
-	SEXP p = PROTECT(GET_SLOT(x, Matrix_pSym)),
-		j = PROTECT(GET_SLOT(x, Matrix_jSym));
-	int *pp = INTEGER(p), *pj = INTEGER(j), i, i_, j_, k, kend;
-
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
-	do { \
-		if (_NA_SUBSCRIPT_) \
-			i = -1; \
-		else { \
-			i_ = i = pw0[l] - 1; \
-			j_ =     pw1[l] - 1; \
-		} \
-		while (i >= 0) { \
-			k = pp[i]; \
-			kend = pp[i + 1]; \
-			while (k < kend && i_ == i) { \
-				if (pj[k] < j_) \
-					++k; \
-				else { \
-					if (pj[k] > j_) \
-						pans[l] = _ZERO_; \
-					else \
-						pans[l] = _F_(px[k]); \
-					++l; \
-					if (l == len || _NA_SUBSCRIPT_) \
-						i_ = -1; \
-					else { \
-						i_ = pw0[l] - 1; \
-						j_ = pw1[l] - 1; \
-					} \
-				} \
-			} \
-			while (i_ == i) { \
-				pans[l] = _ZERO_; \
-				++l; \
-				if (l == len || _NA_SUBSCRIPT_) \
-					i_ = -1; \
-				else { \
-					i_ = pw0[l] - 1; \
-					j_ = pw1[l] - 1; \
-				} \
-			} \
-			i = i_; \
-		} \
-		while (l < len) { \
-			pans[l] = _NA_; \
-			++l; \
-		} \
-	} while (0)
-
-	SUB1_CASES(SUB1_N, SUB1_X, F_NS, F_X);
-
-#undef SUB1_LOOP
-
-	UNPROTECT(3);
-	return ans;
-}
+#undef nCAST
+#define nCAST(x) (x != 0)
 
 static
-SEXP diagonalMatrix_subscript_1ary_mat(SEXP x, SEXP w, const char *cl)
+SEXP diagonal_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
-	SUB1_START(kindToType(cl[0]));
+	R_xlen_t slen = XLENGTH(s);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
 
-	SEXP diag = PROTECT(GET_SLOT(x, Matrix_diagSym));
-	int nonunit = CHAR(STRING_ELT(diag, 0))[0] == 'N';
-	UNPROTECT(1);
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int n = INTEGER(dim)[0];
+	int_fast64_t nn = (int_fast64_t) n * n, n1a = (int_fast64_t) n + 1;
 
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
+	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	R_xlen_t l;
+	int_fast64_t k;
+
+	int un = nu != 'N';
+
+#define SUB1__(d, c) \
 	do { \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else if (pw0[l] != pw1[l]) \
-				pans[l] = _ZERO_; \
-			else if (!nonunit) \
-				pans[l] = _ONE_; \
+		d##TYPE *ps = d##PTR(s); \
+		c##TYPE *pa = c##PTR(ans); \
+		c##TYPE *px = c##PTR(x); \
+		for (l = 0; l < slen; ++l) { \
+			if (d##OOB(ps[l], k, nn)) \
+				pa[l] = c##NA; \
+			else if (k % n1a) \
+				pa[l] = c##ZERO; \
+			else if (un) \
+				pa[l] = c##UNIT; \
 			else \
-				pans[l] = _F_(px[pw0[l] - 1]); \
+				pa[l] = c##CAST(px[k / n1a]); \
 		} \
 	} while (0)
 
-	SUB1_CASES(SUB1_X, SUB1_X, F_ND, F_X);
+	SWITCH5(class[0], SUB1);
 
-#undef SUB1_LOOP
+#undef SUB1__
 
-	UNPROTECT(1);
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 
 static
-SEXP indMatrix_subscript_1ary_mat(SEXP x, SEXP w)
+SEXP index_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
-	SUB1_START(LGLSXP);
+	R_xlen_t slen = XLENGTH(s);
+	SEXP ans = allocVector(LGLSXP, slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
+	int *pa = LOGICAL(ans);
 
-	SEXP perm = PROTECT(GET_SLOT(x, Matrix_permSym));
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
+
+	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
+	int mg = INTEGER(margin)[0] - 1;
+
+	SEXP perm = GET_SLOT(obj, Matrix_permSym);
 	int *pperm = INTEGER(perm);
 
-	SEXP margin = PROTECT(GET_SLOT(x, Matrix_marginSym));
-	int mg = INTEGER(margin)[0] - 1;
-	UNPROTECT(1);
+	R_xlen_t l;
+	int_fast64_t k;
 
-#define SUB1_LOOP(_NA_SUBSCRIPT_, _NA_, _ZERO_, _ONE_, _F_) \
+#define SUB1__(d, c) \
 	do { \
-		for (l = 0; l < len; ++l) { \
-			if (_NA_SUBSCRIPT_) \
-				pans[l] = _NA_; \
-			else if (!mg) \
-				pans[l] = pw1[l] == pperm[pw0[l] - 1]; \
+		d##TYPE *ps = d##PTR(s); \
+		for (l = 0; l < slen; ++l) { \
+			if (d##OOB(ps[l], k, mn)) \
+				pa[l] = NA_LOGICAL; \
+			else if (mg == 0) \
+				pa[l] = k / m == pperm[k % m] - 1; \
 			else \
-				pans[l] = pw0[l] == pperm[pw1[l] - 1]; \
+				pa[l] = k % m == pperm[k / m] - 1; \
 		} \
 	} while (0)
 
-	SUB1_N(int, LOGICAL, NA_LOGICAL, 0, 1, );
+	SUB1();
 
-#undef SUB1_LOOP
-#undef SUB1_N
-#undef SUB1_X
-#undef SUB1_CASES
-#undef SUB1_START
-#undef SUB1_START_EXTRA
+#undef SUB1__
 
-	UNPROTECT(2);
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 
-/* x[i] with 'i' of type "integer" and dimensions c(.,2)
-   {i[,1] in 1:m or NA, i[,2] in 1:n or NA}
-*/
-SEXP R_subscript_1ary_mat(SEXP s_x, SEXP s_i)
+/* x[s] where 's' is a vector of type "integer" or "double"      */
+/* with elements greater than or equal to 1 (or NA)              */
+/* NB: for [CRT], the caller must provide a permutation 'o' of   */
+/*     the processed subscript op(s) sorting the latter by row   */
+/*     then by column [R] or by column then by row [CT].         */
+/*     For general and triangular matrices, 'op' is an identity. */
+/*     For symmetric matrices:                                   */
+/*                                                               */
+/*                     / i+j*m if (i,j) is " on-side"            */
+/*         op(i+j*m) =                                           */
+/*                     \ j+i*m if (i,j) is "off-side"            */
+/*                                                               */
+/*     o=NULL <==> o=seq_along(s)                                */
+SEXP R_subscript_1ary(SEXP s_obj, SEXP s_s, SEXP s_o)
 {
-	const char *cl = Matrix_class(s_x, valid_matrix, 7, __func__);
-	validObject(s_x, cl);
-
-	switch (cl[2]) {
+	const char *class = Matrix_class(s_obj, valid_matrix, 7, __func__);
+	validObject(s_obj, class);
+	switch (class[2]) {
 	case 'e':
 	case 'y':
 	case 'r':
-		return unpackedMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'p':
-		return   packedMatrix_subscript_1ary_mat(s_x, s_i, cl);
-
-	/* NB: for [CRT], the caller must preprocess 'x' and 'i';
-	   symmetric and unit triangular 'x' are not handled specially,
-	   and it is assumed for speed that 'i' is sorted by row [R]
-	   or column [CT] with NA (incl. out-of-bounds indices) last
-	*/
-
+		return    dense_subscript_1ary(s_obj, class, s_s);
 	case 'C':
-		return  CsparseMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'R':
-		return  RsparseMatrix_subscript_1ary_mat(s_x, s_i, cl);
 	case 'T':
-	{
-		char cl_[] = "..CMatrix";
-		cl_[0] = cl[0];
-		cl_[1] = cl[1];
+		return   sparse_subscript_1ary(s_obj, class, s_s, s_o);
+	case 'i':
+		return diagonal_subscript_1ary(s_obj, class, s_s);
+	case 'd':
+		return    index_subscript_1ary(s_obj, class, s_s);
+	default:
+		return R_NilValue;
+	}
+}
 
+#undef SUB1
+
+#undef nCAST
+#define nCAST(x) (x != 0)
+
+static
+SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+{
+	int slen = (int) (XLENGTH(s) / 2);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
+	int *psi = INTEGER(s), *psj = psi + slen;
+
+	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
+	int m = INTEGER(dim)[0];
+
+	char ul = '\0', ct = '\0', nu = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int l;
+	int_fast64_t b, i, j, k;
+
+	int packed = class[2] == 'p',
+		ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && nu != 'N', up = ul == 'U';
+
+#define SUB1(c) \
+	do { \
+		c##TYPE *pa = c##PTR(ans); \
+		c##TYPE *px = c##PTR(x); \
+		for (l = 0; l < slen; ++l) { \
+			if (psi[l] == NA_INTEGER || psj[l] == NA_INTEGER) { \
+				pa[l] = c##NA; \
+				continue; \
+			} \
+			i = (int_fast64_t) psi[l] - 1; \
+			j = (int_fast64_t) psj[l] - 1; \
+			if (ge) { \
+				c##ASSIGN_IDEN(pa[l], c##CAST(px[j * m + i])); \
+				continue; \
+			} \
+			b = (up) ? j - i : i - j; \
+			if (!sy) { \
+			if (b < 0) { \
+				pa[l] = c##ZERO; \
+				continue; \
+			} \
+			if (un && b == 0) { \
+				pa[l] = c##UNIT; \
+				continue; \
+			} \
+			} \
+			if (!packed) { \
+				if (b >= 0) \
+					k = j * m + i; \
+				else \
+					k = i * m + j; \
+			} else if (up) { \
+				if (b >= 0) \
+					k = PACKED_AR21_UP(i, j); \
+				else \
+					k = PACKED_AR21_UP(j, i); \
+			} else { \
+				if (b >= 0) \
+					k = PACKED_AR21_LO(i, j, m); \
+				else \
+					k = PACKED_AR21_LO(j, i, m); \
+			} \
+			if (!he || b > 0) \
+				c##ASSIGN_IDEN     (pa[l], c##CAST(px[k])); \
+			else if (b == 0) \
+				c##ASSIGN_PROJ_REAL(pa[l], c##CAST(px[k])); \
+			else \
+				c##ASSIGN_CONJ     (pa[l], c##CAST(px[k])); \
+		} \
+	} while (0)
+
+	SWITCH5(class[0], SUB1);
+
+#undef SUB1
+
+	UNPROTECT(1); /* ans */
+	return ans;
+}
+
+#undef nCAST
+#define nCAST(x) (1)
+
+static
+SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
+{
+	int slen = (int) (XLENGTH(s) / 2);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
+	int *psi = INTEGER(s), *psj = psi + slen;
+
+	if (class[2] == 'T') {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_Csparse(SEXP, const char *);
-
-		s_x = sparse_as_Csparse(s_x, cl);
-		PROTECT(s_x);
-		s_x = CsparseMatrix_subscript_1ary_mat(s_x, s_i, cl_);
-		UNPROTECT(1);
-		return s_x;
+		obj = sparse_as_Csparse(obj, class);
 	}
+	PROTECT(obj);
+
+	char ul = '\0', ct = '\0', nu = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	SEXP iSym = (class[2] != 'R') ? Matrix_iSym : Matrix_jSym,
+		p_ = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+		i_ = PROTECT(GET_SLOT(obj,        iSym));
+	int *pp = INTEGER(p_), *pi = INTEGER(i_), j_, k_, kend_;
+	pp++;
+
+	int *po_i = (TYPEOF(o) == INTSXP) ? INTEGER(o) : NULL;
+	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
+
+	int l = 0, l_;
+	int b, i, j, tmp;
+
+	int byrow = class[2] == 'R',
+		sy = class[1] == 's', he = sy && ct == 'C',
+		un = class[1] == 't' && nu != 'N', up = (!byrow) == (ul == 'U');
+
+#define MAP(l) \
+	(po_i) ? (int) po_i[l] - 1 : (po_d) ? (int) po_d[l] - 1 : l
+
+#define ADV \
+	do { \
+		if (l >= slen) \
+			j = -1; \
+		else { \
+			l_ = MAP(l); \
+			if (psi[l_] == NA_INTEGER || psj[l_] == NA_INTEGER) \
+				j = -1; \
+			else { \
+				if (byrow) { \
+					i = psj[l_] - 1; \
+					j = psi[l_] - 1; \
+				} \
+				else { \
+					i = psi[l_] - 1; \
+					j = psj[l_] - 1; \
+				} \
+				if (sy && (b = (up) ? j - i : i - j) < 0) { \
+					tmp =   i; \
+					i   =   j; \
+					j   = tmp; \
+				} \
+				++l; \
+			} \
+		} \
+	} while (0)
+
+#define SUB1(c) \
+	do { \
+		c##TYPE *pa = c##PTR(ans); \
+		c##IF_NPATTERN( \
+		SEXP x = GET_SLOT(obj, Matrix_xSym); \
+		c##TYPE *px = c##PTR(x); \
+		); \
+		ADV; \
+		while (j >= 0) { \
+			j_ = j; \
+			k_ = pp[j_ - 1]; \
+			kend_ = pp[j_]; \
+			while (k_ < kend_ && j == j_) { \
+				if (pi[k_] < i) \
+					++k_; \
+				else { \
+					if (pi[k_] > i) \
+						pa[l_] = (un && i == j) ? c##UNIT : c##ZERO; \
+					else if (!he || b > 0) \
+						c##ASSIGN_IDEN     (pa[l_], c##CAST(px[k_])); \
+					else if (b == 0) \
+						c##ASSIGN_PROJ_REAL(pa[l_], c##CAST(px[k_])); \
+					else \
+						c##ASSIGN_CONJ     (pa[l_], c##CAST(px[k_])); \
+					ADV; \
+				} \
+			} \
+			while (j == j_) { \
+				pa[l_] = (un && i == j) ? c##UNIT : c##ZERO; \
+				ADV; \
+			} \
+		} \
+		while (l < slen) { \
+			l_ = MAP(l); \
+			pa[l_] = c##NA; \
+			++l; \
+		} \
+	} while (0)
+
+	SWITCH5(class[0], SUB1);
+
+#undef MAP
+#undef ADV
+#undef SUB1
+
+	UNPROTECT(4); /* i, p, ans, obj */
+	return ans;
+}
+
+#undef nCAST
+#define nCAST(x) (x != 0)
+
+static
+SEXP diagonal_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+{
+	int slen = (int) (XLENGTH(s) / 2);
+	SEXP ans = allocVector(kindToType(class[0]), slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
+	int *psi = INTEGER(s), *psj = psi + slen;
+
+	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	char nu = CHAR(STRING_ELT(diag, 0))[0];
+
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	int l;
+
+	int un = nu != 'N';
+
+#define SUB1(c) \
+	do { \
+		c##TYPE *pa = c##PTR(ans); \
+		c##TYPE *px = c##PTR(x); \
+		for (l = 0; l < slen; ++l) { \
+			if (psi[l] == NA_INTEGER || psj[l] == NA_INTEGER) \
+				pa[l] = c##NA; \
+			else if (psi[l] != psj[l]) \
+				pa[l] = c##ZERO; \
+			else if (un) \
+				pa[l] = c##UNIT; \
+			else \
+				pa[l] = c##CAST(px[psi[l] - 1]); \
+		} \
+	} while (0)
+
+	SWITCH5(class[0], SUB1);
+
+#undef SUB1
+
+	UNPROTECT(1); /* ans */
+	return ans;
+}
+
+static
+SEXP index_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+{
+	int slen = (int) (XLENGTH(s) / 2);
+	SEXP ans = allocVector(LGLSXP, slen);
+	if (slen == 0)
+		return ans;
+	PROTECT(ans);
+	int *psi = INTEGER(s), *psj = psi + slen, *pa = LOGICAL(ans);
+
+	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
+	int mg = INTEGER(margin)[0] - 1;
+
+	SEXP perm = GET_SLOT(obj, Matrix_permSym);
+	int *pperm = INTEGER(perm);
+
+	int l;
+
+	for (l = 0; l < slen; ++l) {
+		if (psi[l] == NA_INTEGER || psj[l] == NA_INTEGER)
+			pa[l] = NA_LOGICAL;
+		else if (mg == 0)
+			pa[l] = psj[l] == pperm[psi[l]] - 1;
+		else
+			pa[l] = psi[l] == pperm[psj[l]] - 1;
+	}
+
+	UNPROTECT(1); /* ans */
+	return ans;
+}
+
+/* x[s] where 's' is a 2-column matrix of type "integer"         */
+/* with s[, 1L] in 1:m (or NA) and s[, 2L] in 1:n (or NA)        */
+/* NB: for [CRT], the caller must provide a permutation 'o' of   */
+/*     the processed subscript op(s) sorting the latter by row   */
+/*     then by column [R] or by column then by row [CT].         */
+/*     For general and triangular matrices, 'op' is an identity. */
+/*     For symmetric matrices:                                   */
+/*                                                               */
+/*                     / (i,j) if (i,j) is " on-side"            */
+/*         op((i,j)) =                                           */
+/*                     \ (j,i) if (i,j) is "off-side"            */
+/*                                                               */
+/*     o=NULL <==> o=seq_len(nrow(s))                            */
+SEXP R_subscript_1ary_2col(SEXP s_obj, SEXP s_s, SEXP s_o)
+{
+	const char *class = Matrix_class(s_obj, valid_matrix, 7, __func__);
+	validObject(s_obj, class);
+	switch (class[2]) {
+	case 'e':
+	case 'y':
+	case 'r':
+	case 'p':
+		return    dense_subscript_1ary_2col(s_obj, class, s_s);
+	case 'C':
+	case 'R':
+	case 'T':
+		return   sparse_subscript_1ary_2col(s_obj, class, s_s, s_o);
 	case 'i':
-		return diagonalMatrix_subscript_1ary_mat(s_x, s_i, cl);
+		return diagonal_subscript_1ary_2col(s_obj, class, s_s);
+	case 'd':
+		return    index_subscript_1ary_2col(s_obj, class, s_s);
 	default:
-		return      indMatrix_subscript_1ary_mat(s_x, s_i);
+		return R_NilValue;
 	}
 }
 
