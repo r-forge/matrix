@@ -1040,6 +1040,58 @@ void c##tspsort(      int *p1,       int *i1,       c##TYPE *x1, \
 	return; \
 } \
  \
+void c##cspsort(int *p1, int *i1, c##TYPE *x1, \
+                int m, int n, int *iwork, c##TYPE *work) \
+{ \
+	int *iworkA = iwork, *iworkB = iworkA + m + 1, \
+		*j_ = iworkB + ((m < n) ? n : m), i, j, k, kend, nnz = p1[n]; \
+	c##IF_NPATTERN( \
+	c##TYPE *x_ = work; \
+	); \
+	 \
+	for (i = 0; i <= m; ++i) \
+		iworkA[i] = 0; \
+	++iworkA; \
+	for (k = 0; k < nnz; ++k) \
+		++iworkA[i1[k]]; \
+	for (i = 0; i < m; ++i) \
+		iworkA[i] += (iworkB[i] = iworkA[i - 1]); \
+	--iworkA; \
+	 \
+	++p1; \
+	for (j = 0, k = 0; j < n; ++j) { \
+		kend = p1[j]; \
+		while (k < kend) { \
+			i = i1[k]; \
+			c##IF_NPATTERN( \
+			x_[iworkB[i]  ] = x1[k]; \
+			); \
+			j_[iworkB[i]++] = j; \
+			++k; \
+		} \
+	} \
+	--p1; \
+	 \
+	for (j = 0; j < n; ++j) \
+		iworkB[j] = p1[j]; \
+	 \
+	++iworkA; \
+	for (i = 0, k = 0; i < m; ++i) { \
+		kend = iworkA[i]; \
+		while (k < kend) { \
+			j = j_[k]; \
+			c##IF_NPATTERN( \
+			x1[iworkB[j]  ] = x_[k]; \
+			); \
+			i1[iworkB[j]++] = i; \
+			++k; \
+		} \
+	} \
+	--iworkA; \
+	 \
+	return; \
+} \
+ \
 void c##csptrans(      int *p1,       int *i1,       c##TYPE *x1, \
                  const int *p0, const int *i0, const c##TYPE *x0, \
                  int m, int n, char trans, int *iwork) \

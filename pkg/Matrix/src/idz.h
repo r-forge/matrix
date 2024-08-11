@@ -76,6 +76,12 @@ void itspsort(int *, int *,      int *, const int *, const int *, const      int
 void dtspsort(int *, int *,   double *, const int *, const int *, const   double *, int, int, int *, int *,   double *);
 void ztspsort(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, int *, int *, Rcomplex *);
 
+void ncspsort(int *, int *,      int *, int, int, int *,      int *);
+void lcspsort(int *, int *,      int *, int, int, int *,      int *);
+void icspsort(int *, int *,      int *, int, int, int *,      int *);
+void dcspsort(int *, int *,   double *, int, int, int *,   double *);
+void zcspsort(int *, int *, Rcomplex *, int, int, int *, Rcomplex *);
+
 void ncsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
 void lcsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
 void icsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
