@@ -2,9 +2,6 @@
 #include "M5.h"
 #include "subscript.h"
 
-#define AR21_UP(i, j, m) i + j + (        j * (    j - 1)) / 2
-#define AR21_LO(i, j, m) i +     (j * m + j * (m - j - 1)) / 2
-
 #define SHOW(...) __VA_ARGS__
 #define HIDE(...)
 
@@ -96,9 +93,9 @@ SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 					k = i * m + j; \
 			} else if (up) { \
 				if (b >= 0) \
-					k = PACKED_AR21_UP(i, j); \
+					k = PACKED_AR21_UP(i, j, m); \
 				else \
-					k = PACKED_AR21_UP(j, i); \
+					k = PACKED_AR21_UP(j, i, m); \
 			} else { \
 				if (b >= 0) \
 					k = PACKED_AR21_LO(i, j, m); \
@@ -459,9 +456,9 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 					k = i * m + j; \
 			} else if (up) { \
 				if (b >= 0) \
-					k = PACKED_AR21_UP(i, j); \
+					k = PACKED_AR21_UP(i, j, m); \
 				else \
-					k = PACKED_AR21_UP(j, i); \
+					k = PACKED_AR21_UP(j, i, m); \
 			} else { \
 				if (b >= 0) \
 					k = PACKED_AR21_LO(i, j, m); \
@@ -1001,22 +998,22 @@ void sort_cr(SEXP obj, const char *cl)
 
 #define XIJ_TP_U_N(_X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ <= _J_) \
-	 ? *(_X_ + AR21_UP(_I_, _J_, _M_)) \
+	 ? *(_X_ + PACKED_AR21_UP(_I_, _J_, _M_)) \
 	 : _ZERO_)
 
 #define XIJ_TP_U_U(_X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ < _J_) \
-	 ? *(_X_ + AR21_UP(_I_, _J_, _M_)) \
+	 ? *(_X_ + PACKED_AR21_UP(_I_, _J_, _M_)) \
 	 : ((_I_ == _J_) ? _ONE_ : _ZERO_))
 
 #define XIJ_TP_L_N(_X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ >= _J_) \
-	 ? *(_X_ + AR21_LO(_I_, _J_, _M_)) \
+	 ? *(_X_ + PACKED_AR21_LO(_I_, _J_, _M_)) \
 	 : _ZERO_)
 
 #define XIJ_TP_L_U(_X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ > _J_) \
-	 ? *(_X_ + AR21_LO(_I_, _J_, _M_)) \
+	 ? *(_X_ + PACKED_AR21_LO(_I_, _J_, _M_)) \
 	 : ((_I_ == _J_) ? _ONE_ : _ZERO_))
 
 #define XIJ_SY_U(  _X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
@@ -1031,13 +1028,13 @@ void sort_cr(SEXP obj, const char *cl)
 
 #define XIJ_SP_U(  _X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ <= _J_) \
-	 ? *(_X_ + AR21_UP(_I_, _J_, _M_)) \
-	 : *(_X_ + AR21_UP(_J_, _I_, _M_)))
+	 ? *(_X_ + PACKED_AR21_UP(_I_, _J_, _M_)) \
+	 : *(_X_ + PACKED_AR21_UP(_J_, _I_, _M_)))
 
 #define XIJ_SP_L(  _X_, _I_, _J_, _M_, _ZERO_, _ONE_) \
 	((_I_ >= _J_) \
-	 ? *(_X_ + AR21_LO(_I_, _J_, _M_)) \
-	 : *(_X_ + AR21_LO(_J_, _I_, _M_)))
+	 ? *(_X_ + PACKED_AR21_LO(_I_, _J_, _M_)) \
+	 : *(_X_ + PACKED_AR21_LO(_J_, _I_, _M_)))
 
 static
 SEXP unpackedMatrix_subscript_2ary(SEXP x, SEXP i, SEXP j, const char *cl)

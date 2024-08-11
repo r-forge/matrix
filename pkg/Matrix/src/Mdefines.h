@@ -99,7 +99,7 @@ const char *valid_dense[], *valid_sparse[],
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
-#define PACKED_AR21_UP(i, j) \
+#define PACKED_AR21_UP(i, j, n) \
 	((i) + ((j) * (            (j) + 1U)) / 2U)
 #define PACKED_AR21_LO(i, j, n) \
 	((i) + ((j) * ((n) - (j) - 1U + (n))) / 2U)

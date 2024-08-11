@@ -105,8 +105,8 @@ c##symswapr1(c##TYPE *x, \
 	} \
 	c##TYPE *xi, *xj, tmp; \
 	if (uplo == 'U') { \
-		xi = x + PACKED_AR21_UP(0, i); \
-		xj = x + PACKED_AR21_UP(0, j); \
+		xi = x + PACKED_AR21_UP(0, i, n); \
+		xj = x + PACKED_AR21_UP(0, j, n); \
 		tmp = xi[i]; \
 		xi[i] = xj[j]; \
 		xj[j] = tmp; \
@@ -174,10 +174,10 @@ c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
 	      c##TYPE *xi, *xj; \
 	const c##TYPE *yi, *yj; \
 	if (uplo == 'U') { \
-		xi = x + PACKED_AR21_UP(0, i); \
-		xj = x + PACKED_AR21_UP(0, j); \
-		yi = y + PACKED_AR21_UP(0, i); \
-		yj = y + PACKED_AR21_UP(0, j); \
+		xi = x + PACKED_AR21_UP(0, i, n); \
+		xj = x + PACKED_AR21_UP(0, j, n); \
+		yi = y + PACKED_AR21_UP(0, i, n); \
+		yj = y + PACKED_AR21_UP(0, j, n); \
 		xi[i] = yj[j]; \
 		if (i <= j) { \
 			xj[i] = yj[i]; \
@@ -718,7 +718,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		if (uplo == 'U') \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
-				tmp = *(y + PACKED_AR21_UP(j, i)); \
+				tmp = *(y + PACKED_AR21_UP(j, i, n)); \
 				c##ASSIGN_CONJ(*x, tmp); \
 				x += 1; \
 			} \
@@ -735,7 +735,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		if (uplo == 'U') \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
-				tmp = *(y + PACKED_AR21_UP(j, i)); \
+				tmp = *(y + PACKED_AR21_UP(j, i, n)); \
 				c##ASSIGN_IDEN(*x, tmp); \
 				x += 1; \
 			} \

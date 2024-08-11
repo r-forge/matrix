@@ -583,7 +583,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 				for (i = 0, k = 0; i < m; ++i) { \
 					kend = pp0[i]; \
 					while (k < kend) { \
-						index = PACKED_AR21_UP((int_fast64_t) i, (int_fast64_t) *pj0); \
+						index = PACKED_AR21_UP((int_fast64_t) i, (int_fast64_t) *pj0, m1); \
 						px1[index] = c##IFELSE_NPATTERN(*px0, 1); \
 						++k; ++pj0; c##IF_NPATTERN(++px0); \
 					} \
@@ -611,7 +611,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 				} \
 			else if (ul == 'U') \
 				for (k = 0; k < kend; ++k) { \
-					index = PACKED_AR21_UP((int_fast64_t) *pi0, (int_fast64_t) *pj0); \
+					index = PACKED_AR21_UP((int_fast64_t) *pi0, (int_fast64_t) *pj0, m1); \
 					c##INCREMENT_IDEN(px1[index], *px0); \
 					++pi0; ++pj0; c##IF_NPATTERN(++px0); \
 				} \
