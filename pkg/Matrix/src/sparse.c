@@ -37,7 +37,7 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		px0 = c##PTR(x0); \
 		Matrix_Calloc(work, lwork, c##TYPE); \
 		); \
-		c##spaggr(pj1, pi1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+		c##tspaggr(pj1, pi1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
 		if (nnz != nnz_) { \
 		PROTECT(to = newObject(class)); \
 		PROTECT(i1 = allocVector(INTSXP, nnz)), \
@@ -51,7 +51,7 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		px1 = c##PTR(x1); \
 		SET_SLOT(to, Matrix_xSym, x1); \
 		); \
-		c##spaggr(pj1, pi1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+		c##tspaggr(pj1, pi1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
 		c##IF_NPATTERN( \
 		UNPROTECT(1); /* x1 */ \
 		); \
@@ -1291,7 +1291,7 @@ SEXP sparse_transpose(SEXP from, const char *class, char op_ct, int lazy)
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
 			); \
-			c##sptrans(pp1, pi1, px1, pp0, pi0, px0, m, n, op_ct, iwork); \
+			c##csptrans(pp1, pi1, px1, pp0, pi0, px0, m, n, op_ct, iwork); \
 		} while (0)
 
 		SWITCH5(class[0], TRANS);
@@ -1514,7 +1514,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 			else if (class[1] == 's') { \
 				int *iwork = NULL; \
 				Matrix_Calloc(iwork, n, int); \
-				c##sptrans(pp1, pi1, px1, pp0, pi0, px0, n, n, ct0, iwork); \
+				c##csptrans(pp1, pi1, px1, pp0, pi0, px0, n, n, ct0, iwork); \
 				Matrix_Free(iwork, n); \
 				if (ct0 == 'C') \
 				for (j = 0, k = 0; j < n; ++j) { \
@@ -1786,7 +1786,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			Matrix_Calloc(iwork, liwork, int);
 
 			int *pp0_ = iwork + n + 1, *pi0_ = iwork + n + n + 1;
-			nsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
+			ncsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
 			memcpy(iwork, pp0 - 1, sizeof(int) * (size_t) n);
 
 			SEXP p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));
@@ -2279,7 +2279,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 			Matrix_Calloc(iwork, liwork, int);
 
 			int *pp0_ = iwork + n + 1, *pi0_ = iwork + n + n + 1;
-			nsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
+			ncsptrans(pp0_ - 1, pi0_, NULL, pp0 - 1, pi0, NULL, n, n, 'T', iwork);
 			memcpy(iwork, pp0 - 1, sizeof(int) * (size_t) n);
 
 			SEXP p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));

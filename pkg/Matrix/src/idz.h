@@ -64,23 +64,23 @@ void iband1(     int *, const      int *, size_t, char, size_t, size_t);
 void dband1(  double *, const   double *, size_t, char, size_t, size_t);
 void zband1(Rcomplex *, const Rcomplex *, size_t, char, size_t, size_t);
 
-void nspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void lspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void ispaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void dspaggr(int *, int *,   double *, const int *, const int *, const   double *, int, int, int *, int *,   double *);
-void zspaggr(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, int *, int *, Rcomplex *);
+void ntspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void ltspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void itspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void dtspaggr(int *, int *,   double *, const int *, const int *, const   double *, int, int, int *, int *,   double *);
+void ztspaggr(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, int *, int *, Rcomplex *);
 
-void nspsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void lspsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void ispsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
-void dspsort(int *, int *,   double *, const int *, const int *, const   double *, int, int, int *, int *,   double *);
-void zspsort(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, int *, int *, Rcomplex *);
+void ntspsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void ltspsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void itspsort(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
+void dtspsort(int *, int *,   double *, const int *, const int *, const   double *, int, int, int *, int *,   double *);
+void ztspsort(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, int *, int *, Rcomplex *);
 
-void nsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
-void lsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
-void isptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
-void dsptrans(int *, int *,   double *, const int *, const int *, const   double *, int, int, char, int *);
-void zsptrans(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, char, int *);
+void ncsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
+void lcsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
+void icsptrans(int *, int *,      int *, const int *, const int *, const      int *, int, int, char, int *);
+void dcsptrans(int *, int *,   double *, const int *, const int *, const   double *, int, int, char, int *);
+void zcsptrans(int *, int *, Rcomplex *, const int *, const int *, const Rcomplex *, int, int, char, int *);
 
 void zvreal(Rcomplex *, const Rcomplex *, size_t);
 void zvimag(Rcomplex *, const Rcomplex *, size_t);

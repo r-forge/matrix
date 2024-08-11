@@ -3111,7 +3111,7 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
 			); \
-			c##sptrans(pp1, pi1, px1, pp0, pj0, px0, n, m, 'T', iwork); \
+			c##csptrans(pp1, pi1, px1, pp0, pj0, px0, n, m, 'T', iwork); \
 		} while (0)
 
 		SWITCH5(class[0], SAC);
@@ -3141,7 +3141,7 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			px0 = c##PTR(x0); \
 			Matrix_Calloc(work, lwork, c##TYPE); \
 			); \
-			c##spsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
+			c##tspsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
 			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) n + 1)), \
 			PROTECT(i1 = allocVector(INTSXP, nnz)); \
 			pp1 = INTEGER(p1); \
@@ -3153,7 +3153,7 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			); \
-			c##spsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
+			c##tspsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
 			c##IF_NPATTERN( \
 			UNPROTECT(1); /* x1 */ \
 			); \
@@ -3252,7 +3252,7 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
 			); \
-			c##sptrans(pp1, pj1, px1, pp0, pi0, px0, m, n, 'T', iwork); \
+			c##csptrans(pp1, pj1, px1, pp0, pi0, px0, m, n, 'T', iwork); \
 		} while (0)
 
 		SWITCH5(class[0], SAR);
@@ -3282,7 +3282,7 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			px0 = c##PTR(x0); \
 			Matrix_Calloc(work, nnz, c##TYPE); \
 			); \
-			c##spsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+			c##tspsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
 			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) m + 1)), \
 			PROTECT(j1 = allocVector(INTSXP, nnz)); \
 			pp1 = INTEGER(p1); \
@@ -3294,7 +3294,7 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			); \
-			c##spsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
+			c##tspsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
 			c##IF_NPATTERN( \
 			UNPROTECT(1); /* x1 */ \
 			); \

@@ -881,9 +881,9 @@ TEMPLATE(z)
 #undef TEMPLATE
 
 #define TEMPLATE(c) \
-void c##spaggr(      int *i1,       int *j1,       c##TYPE *x1, \
-               const int *i0, const int *j0, const c##TYPE *x0, \
-               int m, int n, int *nnz, int *iwork, c##TYPE *work) \
+void c##tspaggr(      int *i1,       int *j1,       c##TYPE *x1, \
+                const int *i0, const int *j0, const c##TYPE *x0, \
+                int m, int n, int *nnz, int *iwork, c##TYPE *work) \
 { \
 	int *iworkA = iwork, *iworkB = iworkA + m + 1, *iworkC = iworkB + m, \
 		*j_ = iworkC + n, i, j, k, kend, ka, kb; \
@@ -983,13 +983,13 @@ void c##spaggr(      int *i1,       int *j1,       c##TYPE *x1, \
 	return; \
 } \
  \
-void c##spsort(      int *p1,       int *i1,       c##TYPE *x1, \
-               const int *i0, const int *j0, const c##TYPE *x0, \
-               int m, int n, int *nnz, int *iwork, c##TYPE *work) \
+void c##tspsort(      int *p1,       int *i1,       c##TYPE *x1, \
+                const int *i0, const int *j0, const c##TYPE *x0, \
+                int m, int n, int *nnz, int *iwork, c##TYPE *work) \
 { \
 	if (!i1) { \
 	 \
-	c##spaggr(NULL, NULL, NULL, i0, j0, x0, m, n, nnz, iwork, work); \
+	c##tspaggr(NULL, NULL, NULL, i0, j0, x0, m, n, nnz, iwork, work); \
 	 \
 	} else { \
 	 \
@@ -1040,9 +1040,9 @@ void c##spsort(      int *p1,       int *i1,       c##TYPE *x1, \
 	return; \
 } \
  \
-void c##sptrans(      int *p1,       int *i1,       c##TYPE *x1, \
-                const int *p0, const int *i0, const c##TYPE *x0, \
-                int m, int n, char trans, int *iwork) \
+void c##csptrans(      int *p1,       int *i1,       c##TYPE *x1, \
+                 const int *p0, const int *i0, const c##TYPE *x0, \
+                 int m, int n, char trans, int *iwork) \
 { \
 	int i, j, k, kend, nnz = p0[n]; \
 	p0++; \
