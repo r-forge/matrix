@@ -1,0 +1,5 @@
+macbuilder
+^00
+^Windows
+^svn-
+\.(patch|diff|orig)$
