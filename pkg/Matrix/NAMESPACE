@@ -20,7 +20,7 @@ importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames,
            Arith, Compare, Complex, Logic, Math, Math2, Ops, Summary,
            as, callGeneric, callNextMethod, canCoerce, cbind2, coerce,
            extends, getClassDef, getGroupMembers,
-           is, isClassDef, kronecker, new, rbind2,
+           initialize, is, isClassDef, kronecker, new, rbind2,
            setAs, setClass, setClassUnion, setGeneric, setMethod,
            show, slot, "slot<-", slotNames, validObject)
 
@@ -257,7 +257,7 @@ exportMethods(image)
 
 ## From 'methods'
 exportMethods(Arith, Compare, Logic, Math, Math2, Ops, Summary,
-              cbind2, coerce, rbind2, show)
+              cbind2, coerce, initialize, rbind2, show)
 
 ## From 'stats'
 exportMethods(cov2cor, toeplitz, update)

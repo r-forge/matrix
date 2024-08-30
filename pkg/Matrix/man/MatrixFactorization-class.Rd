@@ -14,6 +14,8 @@
 \alias{QR-class}
 \alias{Schur-class}
 %
+\alias{initialize,MatrixFactorization-method}
+%
 \description{
   \code{MatrixFactorization} is the virtual class of
   factorizations of \eqn{m \times n}{m-by-n} matrices \eqn{A},
