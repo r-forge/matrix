@@ -101,14 +101,14 @@ SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 					k = i * m + j; \
 			} else if (up) { \
 				if (b >= 0) \
-					k = PACKED_AR21_UP(i, j, m); \
+					k = DENSE_INDEX_U(i, j, m); \
 				else \
-					k = PACKED_AR21_UP(j, i, m); \
+					k = DENSE_INDEX_U(j, i, m); \
 			} else { \
 				if (b >= 0) \
-					k = PACKED_AR21_LO(i, j, m); \
+					k = DENSE_INDEX_L(i, j, m); \
 				else \
-					k = PACKED_AR21_LO(j, i, m); \
+					k = DENSE_INDEX_L(j, i, m); \
 			} \
 			if (!he || b > 0) \
 				c##ASSIGN_IDEN     (pa[l], c##CAST(px[k])); \
@@ -442,7 +442,7 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 			i = (int_fast64_t) ps0[l] - 1; \
 			j = (int_fast64_t) ps1[l] - 1; \
 			if (ge) { \
-				c##ASSIGN_IDEN(pa[l], c##CAST(px[j * m + i])); \
+				c##ASSIGN_IDEN(pa[l], c##CAST(px[DENSE_INDEX_N(i, j, m)])); \
 				continue; \
 			} \
 			b = (up) ? j - i : i - j; \
@@ -463,14 +463,14 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 					k = i * m + j; \
 			} else if (up) { \
 				if (b >= 0) \
-					k = PACKED_AR21_UP(i, j, m); \
+					k = DENSE_INDEX_U(i, j, m); \
 				else \
-					k = PACKED_AR21_UP(j, i, m); \
+					k = DENSE_INDEX_U(j, i, m); \
 			} else { \
 				if (b >= 0) \
-					k = PACKED_AR21_LO(i, j, m); \
+					k = DENSE_INDEX_L(i, j, m); \
 				else \
-					k = PACKED_AR21_LO(j, i, m); \
+					k = DENSE_INDEX_L(j, i, m); \
 			} \
 			if (!he || b > 0) \
 				c##ASSIGN_IDEN     (pa[l], c##CAST(px[k])); \
@@ -858,7 +858,7 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 }
 
 #define XIJ_GE(c, x, i, j, m) \
-	*(x + (j * m + i))
+	*(x + DENSE_INDEX_N(i, j, m))
 
 #define XIJ_SY_U(c, x, i, j, m) \
 	((i <= j) \
@@ -872,13 +872,13 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 
 #define XIJ_SP_U(c, x, i, j, m) \
 	((i <= j) \
-	 ? *(x + PACKED_AR21_UP(i, j, m)) \
-	 : *(x + PACKED_AR21_UP(j, i, m)))
+	 ? *(x + DENSE_INDEX_U(i, j, m)) \
+	 : *(x + DENSE_INDEX_U(j, i, m)))
 
 #define XIJ_SP_L(c, x, i, j, m) \
 	((i >= j) \
-	 ? *(x + PACKED_AR21_LO(i, j, m)) \
-	 : *(x + PACKED_AR21_LO(j, i, m)))
+	 ? *(x + DENSE_INDEX_L(i, j, m)) \
+	 : *(x + DENSE_INDEX_L(j, i, m)))
 
 #define XIJ_TR_U_N(c, x, i, j, m) \
 	((i <= j) \
@@ -892,12 +892,12 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 
 #define XIJ_TP_U_N(c, x, i, j, m) \
 	((i <= j) \
-	 ? *(x + PACKED_AR21_UP(i, j, m)) \
+	 ? *(x + DENSE_INDEX_U(i, j, m)) \
 	 : c##ZERO)
 
 #define XIJ_TP_L_N(c, x, i, j, m) \
 	((i >= j) \
-	 ? *(x + PACKED_AR21_LO(i, j, m)) \
+	 ? *(x + DENSE_INDEX_L(i, j, m)) \
 	 : c##ZERO)
 
 #define XIJ_TR_U_U(c, x, i, j, m) \
@@ -912,12 +912,12 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 
 #define XIJ_TP_U_U(c, x, i, j, m) \
 	((i < j) \
-	 ? *(x + PACKED_AR21_UP(i, j, m)) \
+	 ? *(x + DENSE_INDEX_U(i, j, m)) \
 	 : ((i == j) ? c##UNIT : c##ZERO))
 
 #define XIJ_TP_L_U(c, x, i, j, m) \
 	((i > j) \
-	 ? *(x + PACKED_AR21_LO(i, j, m)) \
+	 ? *(x + DENSE_INDEX_L(i, j, m)) \
 	 : ((i == j) ? c##UNIT : c##ZERO))
 
 static

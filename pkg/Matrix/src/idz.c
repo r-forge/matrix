@@ -105,8 +105,8 @@ c##symswapr1(c##TYPE *x, \
 	} \
 	c##TYPE *xi, *xj, tmp; \
 	if (uplo == 'U') { \
-		xi = x + PACKED_AR21_UP(0, i, n); \
-		xj = x + PACKED_AR21_UP(0, j, n); \
+		xi = x + DENSE_INDEX_U(0, i, n); \
+		xj = x + DENSE_INDEX_U(0, j, n); \
 		tmp = xi[i]; \
 		xi[i] = xj[j]; \
 		xj[j] = tmp; \
@@ -114,8 +114,8 @@ c##symswapr1(c##TYPE *x, \
 		c##swap1(j - i - 1, xi + i + (i + 1), i + 2, 1, 0, xj + i +       1,     1, 0, 0); \
 		c##swap1(n - j - 1, xj + i + (j + 1), j + 2, 1, 0, xj + j + (j + 1), j + 2, 1, 0); \
 	} else { \
-		xi = x + PACKED_AR21_LO(i, i, n); \
-		xj = x + PACKED_AR21_LO(j, j, n); \
+		xi = x + DENSE_INDEX_L(i, i, n); \
+		xj = x + DENSE_INDEX_L(j, j, n); \
 		tmp = xi[0]; \
 		xi[0] = xj[0]; \
 		xj[0] = tmp; \
@@ -174,10 +174,10 @@ c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
 	      c##TYPE *xi, *xj; \
 	const c##TYPE *yi, *yj; \
 	if (uplo == 'U') { \
-		xi = x + PACKED_AR21_UP(0, i, n); \
-		xj = x + PACKED_AR21_UP(0, j, n); \
-		yi = y + PACKED_AR21_UP(0, i, n); \
-		yj = y + PACKED_AR21_UP(0, j, n); \
+		xi = x + DENSE_INDEX_U(0, i, n); \
+		xj = x + DENSE_INDEX_U(0, j, n); \
+		yi = y + DENSE_INDEX_U(0, i, n); \
+		yj = y + DENSE_INDEX_U(0, j, n); \
 		xi[i] = yj[j]; \
 		if (i <= j) { \
 			xj[i] = yj[i]; \
@@ -192,10 +192,10 @@ c##symcopyr1(c##TYPE *x, const c##TYPE *y, \
 			c##copy1(n - i - 1, xi + i + (i + 1), 0, i + 2, 1, yi + j + (i + 1), i + 2, 1, 0); \
 		} \
 	} else { \
-		xi = x + PACKED_AR21_LO(i, i, n); \
-		xj = x + PACKED_AR21_LO(j, j, n); \
-		yi = y + PACKED_AR21_LO(i, i, n); \
-		yj = y + PACKED_AR21_LO(j, j, n); \
+		xi = x + DENSE_INDEX_L(i, i, n); \
+		xj = x + DENSE_INDEX_L(j, j, n); \
+		yi = y + DENSE_INDEX_L(i, i, n); \
+		yj = y + DENSE_INDEX_L(j, j, n); \
 		xi[0] = yj[0]; \
 		if (i <= j) { \
 			xi[j] = yi[j]; \
@@ -718,7 +718,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		if (uplo == 'U') \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
-				tmp = *(y + PACKED_AR21_UP(j, i, n)); \
+				tmp = *(y + DENSE_INDEX_U(j, i, n)); \
 				c##ASSIGN_CONJ(*x, tmp); \
 				x += 1; \
 			} \
@@ -726,7 +726,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		else \
 		for (j = 0; j < n; ++j) { \
 			for (i = 0; i <= j; ++i) { \
-				tmp = *(y + PACKED_AR21_LO(j, i, n)); \
+				tmp = *(y + DENSE_INDEX_L(j, i, n)); \
 				c##ASSIGN_CONJ(*x, tmp); \
 				x += 1; \
 			} \
@@ -735,7 +735,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		if (uplo == 'U') \
 		for (j = 0; j < n; ++j) { \
 			for (i = j; i < n; ++i) { \
-				tmp = *(y + PACKED_AR21_UP(j, i, n)); \
+				tmp = *(y + DENSE_INDEX_U(j, i, n)); \
 				c##ASSIGN_IDEN(*x, tmp); \
 				x += 1; \
 			} \
@@ -743,7 +743,7 @@ c##trans1(c##TYPE *x, const c##TYPE *y, \
 		else \
 		for (j = 0; j < n; ++j) { \
 			for (i = 0; i <= j; ++i) { \
-				tmp = *(y + PACKED_AR21_LO(j, i, n)); \
+				tmp = *(y + DENSE_INDEX_L(j, i, n)); \
 				c##ASSIGN_IDEN(*x, tmp); \
 				x += 1; \
 			} \

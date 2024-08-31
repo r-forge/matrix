@@ -99,10 +99,12 @@ const char *valid_dense[], *valid_sparse[],
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
-#define PACKED_AR21_UP(i, j, n) \
+#define DENSE_INDEX_N(i, j, m) \
+	((i) + (j) * (m))
+#define DENSE_INDEX_U(i, j, m) \
 	((i) + ((j) * (            (j) + 1U)) / 2U)
-#define PACKED_AR21_LO(i, j, n) \
-	((i) + ((j) * ((n) - (j) - 1U + (n))) / 2U)
+#define DENSE_INDEX_L(i, j, m) \
+	((i) + ((j) * ((m) - (j) - 1U + (m))) / 2U)
 #define PACKED_LENGTH(n) \
 	((n) + ((n) * (            (n) - 1U)) / 2U)
 
