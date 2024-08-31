@@ -2,7 +2,7 @@ sources = \
 	Csparse.c \
 	attrib.c \
 	bind.c \
-	cholmod-api.c \
+	cholmod-common.c \
 	cholmod-etc.c \
 	coerce.c \
 	cs-etc.c \
@@ -22,4 +22,5 @@ sources = \
 	subscript.c \
 	utils-R.c \
 	utils.c \
-	validity.c
+	validity.c \
+	vector.c
