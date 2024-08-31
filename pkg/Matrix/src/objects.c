@@ -164,7 +164,7 @@ char Matrix_repr(SEXP obj)
 	case 'e':
 	case 'y':
 	case 'r':
-		return 'u'; /* unpackedMatrix */
+		return 'n'; /* unpackedMatrix */
 	case 'p':
 		return 'p'; /*   packedMatrix */
 	case 'C':

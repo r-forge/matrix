@@ -37,7 +37,7 @@ function(x, exclude.informal, exclude.factors) {
                  "C" = c("p", "i", if(.M.kind(x) != "n") "x"),
                  "R" = c("p", "j", if(.M.kind(x) != "n") "x"),
                  "T" = c("i", "j", if(.M.kind(x) != "n") "x"),
-                 "d" = , "u" = , "p" = "x",
+                 "d" = , "n" = , "p" = "x",
                  "i" = "perm"),
           switch(.M.shape(x),
                  "g" = if(exclude.factors) "factors",

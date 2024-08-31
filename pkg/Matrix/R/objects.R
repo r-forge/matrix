@@ -13,21 +13,21 @@
 ## "[gstdi]" for Matrix, sparseVector 'x'; otherwise ""
 .M.shape <- function(x) .Call(R_Matrix_shape, x)
 
-## "[upCRTdi]" for Matrix 'x'; otherwise ""
+## "[npCRTdi]" for Matrix 'x'; otherwise ""
 .M.repr  <- function(x) .Call(R_Matrix_repr , x)
 
 .isMatrix   <- function(x)
     nzchar(cl <- .M.class(x)) && substr(cl, 4L, 4L) == "M"
 .isVector   <- function(x)
     nzchar(cl <- .M.class(x)) && substr(cl, 4L, 4L) != "M"
-.isUnpacked <- function(x) .M.repr(x) == "u"
+.isUnpacked <- function(x) .M.repr(x) == "n"
 .isPacked   <- function(x) .M.repr(x) == "p"
 .isC        <- function(x) .M.repr(x) == "C"
 .isR        <- function(x) .M.repr(x) == "R"
 .isT        <- function(x) .M.repr(x) == "T"
 .isDiagonal <- function(x) .M.repr(x) == "d"
 .isInd      <- function(x) .M.repr(x) == "i"
-.isDense    <- function(x) any(.M.repr(x) == c("u", "p"))
+.isDense    <- function(x) any(.M.repr(x) == c("n", "p"))
 .isSparse   <- function(x) any(.M.repr(x) == c("C", "R", "T", "d", "i"))
 .isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
 
