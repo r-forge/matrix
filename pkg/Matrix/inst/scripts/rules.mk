@@ -78,7 +78,8 @@ subassign.o: subassign.c Mdefines.h version.h \
   Msymbols.h utils.h subassign.h \
   t_subassign.c
 subscript.o: subscript.c Mdefines.h version.h \
-  Msymbols.h utils.h subscript.h
+  Msymbols.h utils.h M5.h idz.h \
+  subscript.h
 utils-R.o: utils-R.c Mdefines.h version.h \
   Msymbols.h utils.h M5.h utils-R.h \
   t_rle.c
