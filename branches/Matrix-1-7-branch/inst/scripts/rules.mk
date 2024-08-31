@@ -8,7 +8,10 @@ attrib.o: attrib.c Mdefines.h version.h \
   Msymbols.h utils.h attrib.h
 bind.o: bind.c Mdefines.h version.h \
   Msymbols.h utils.h coerce.h bind.h
-## missing cholmod-api.c
+cholmod-common.o: cholmod-common.c Mdefines.h version.h \
+  Msymbols.h utils.h cholmod-common.h \
+  cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
+  SuiteSparse/CHOLMOD/Include/cholmod.h
 cholmod-etc.o: cholmod-etc.c Mdefines.h version.h \
   Msymbols.h utils.h idz.h \
   cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
@@ -78,3 +81,5 @@ utils.o: utils.c Mdefines.h version.h \
   Msymbols.h utils.h
 validity.o: validity.c Mdefines.h version.h \
   Msymbols.h utils.h validity.h
+vector.o: vector.c Mdefines.h version.h \
+  Msymbols.h utils.h vector.h
