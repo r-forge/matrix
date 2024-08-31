@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-1 (2024-08-01 r4872)}{
+\section{Changes in version 1.7-1 (2024-08-31 r4907)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -31,9 +31,8 @@
       most \code{cholmod_check_*} are now registered, though packages
       calling them must use \code{LinkingTo: Matrix (>= 1.7-1)}.
 
-      \item \file{src/Makevars} is adjusted to ensure that use of
-      illegal entry points in SuiteSparse libraries is detected by
-      \command{R CMD check}. % TODO: patch SuiteSparse to avoid NOTE
+      \item Internal SuiteSparse and METIS libraries are further
+      patched to avoid possible use of illegal entry points.
     }
   }
 }

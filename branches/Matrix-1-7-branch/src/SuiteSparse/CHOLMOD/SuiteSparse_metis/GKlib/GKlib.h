@@ -123,6 +123,17 @@
 
 #include "gk_proto.h"
 
+#include <R_ext/Print.h>
+#undef printf
+#define printf Rprintf
+#undef vprintf
+#define vprintf Rvprintf
+
+# include <R_ext/Error.h>
+# undef errexit
+# define errexit(...) error(__VA_ARGS__)
+# undef gk_errexit
+# define gk_errexit(sig, ...) error(__VA_ARGS__)
 
 #endif  /* GKlib.h */
 
