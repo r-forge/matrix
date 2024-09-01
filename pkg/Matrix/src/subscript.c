@@ -174,7 +174,7 @@ SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
 
 	R_xlen_t l = 0, l_;
-	int b, i, j, tmp;
+	int b, i, j;
 	int_fast64_t k;
 
 	int byrow = class[2] == 'R',
@@ -201,11 +201,8 @@ SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 					i = (int) (k % m); \
 					j = (int) (k / m); \
 				} \
-				if (sy && (b = (up) ? j - i : i - j) < 0) { \
-					tmp =   i; \
-					i   =   j; \
-					j   = tmp; \
-				} \
+				if (sy && (b = (up) ? j - i : i - j) < 0) \
+					SWAP(i, j, int, ); \
 				++l; \
 			} \
 		} \
@@ -533,7 +530,7 @@ SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
 
 	int l = 0, l_;
-	int b, i, j, tmp;
+	int b, i, j;
 
 	int byrow = class[2] == 'R',
 		sy = class[1] == 's', he = sy && ct == 'C',
@@ -559,11 +556,8 @@ SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 					i = ps0[l_] - 1; \
 					j = ps1[l_] - 1; \
 				} \
-				if (sy && (b = (up) ? j - i : i - j) < 0) { \
-					tmp =   i; \
-					i   =   j; \
-					j   = tmp; \
-				} \
+				if (sy && (b = (up) ? j - i : i - j) < 0) \
+					SWAP(i, j, int, ); \
 				++l; \
 			} \
 		} \
@@ -1159,10 +1153,8 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		return obj;
 
 	int mg = (class[2] == 'R') ? 0 : 1;
-	if (!mg) {
-		SEXP tmp;
-		tmp = si; si = sj; sj = tmp;
-	}
+	if (!mg)
+		SWAP(si, sj, SEXP, );
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[!mg], n = pdim[mg];
@@ -1594,10 +1586,8 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
 	int mg = INTEGER(margin)[0] - 1;
-	if (mg) {
-		SEXP tmp;
-		tmp = si; si = sj; sj = tmp;
-	}
+	if (mg)
+		SWAP(si, sj, SEXP, );
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];

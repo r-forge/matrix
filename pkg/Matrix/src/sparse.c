@@ -491,9 +491,8 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 	if (class[2] != 'T') {
 
 		if (class[2] == 'R') {
-			int tmp;
-			tmp = m; m =  n; n =  tmp;
-			tmp = a; a = -b; b = -tmp;
+			SWAP(m, n, int, );
+			SWAP(a, b, int, -);
 		}
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
@@ -909,10 +908,8 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 
 	if (class[2] != 'T') {
 
-		if (class[2] == 'R') {
-			int tmp;
-			tmp = m; m = n; n = tmp;
-		}
+		if (class[2] == 'R')
+			SWAP(m, n, int, );
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
@@ -1242,10 +1239,8 @@ SEXP sparse_transpose(SEXP from, const char *class, char op_ct, int lazy)
 
 	if (class[2] != 'T') {
 
-		if (class[2] == 'R') {
-			int tmp;
-			tmp = m; m = n; n = tmp;
-		}
+		if (class[2] == 'R')
+			SWAP(m, n, int, );
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			jSym = (class[2] == 'C') ? Matrix_jSym : Matrix_iSym,
@@ -3440,10 +3435,8 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 
 	if (class[2] != 'T') {
 
-		if (class[2] == 'R') {
-			int tmp;
-			tmp = m; m = n; n = tmp;
-		}
+		if (class[2] == 'R')
+			SWAP(m, n, int, );
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
@@ -3694,10 +3687,8 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 
 	if (class[2] != 'T') {
 
-		if (class[2] == 'R') {
-			int tmp;
-			tmp = m; m = n; n = tmp;
-		}
+		if (class[2] == 'R')
+			SWAP(m, n, int, );
 
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),

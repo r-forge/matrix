@@ -994,10 +994,8 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		error(_("attempt to construct %s with more than %s nonzero entries"),
 		      "sparseMatrix", "2^31-1");
 
-	if (byrow) {
-		int tmp;
-		tmp = m; m = n; n = tmp;
-	}
+	if (byrow)
+		SWAP(m, n, int, );
 
 	SEXP iSym = (byrow) ? Matrix_jSym : Matrix_iSym,
 		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
@@ -3371,10 +3369,8 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		UNPROTECT(1); /* factors */
 	}
 
-	if (class[2] == 'R') {
-		int tmp;
-		tmp = m; m = n; n = tmp;
-	}
+	if (class[2] == 'R')
+		SWAP(m, n, int, );
 
 	SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym));
 	int *pp0 = INTEGER(p0), nnz = pp0[n];

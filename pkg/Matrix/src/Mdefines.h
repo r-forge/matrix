@@ -108,6 +108,8 @@ const char *valid_dense[], *valid_sparse[],
 #define PACKED_LENGTH(n) \
 	((n) + ((n) * (            (n) - 1U)) / 2U)
 
+#define SWAP(a, b, t, op) do { t tmp = op(a); a = op(b); b = tmp; } while (0)
+
 #define ERROR_OOM(_FUNC_) \
 	error(_("out of memory in '%s'"), \
 	      _FUNC_)

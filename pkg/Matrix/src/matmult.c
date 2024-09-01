@@ -36,8 +36,8 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 	} else {
 		/* MJ: So that I don't lose my mind ... : */
 		if (zt) {
-			int tmp = !xt; xt = !yt; yt = tmp;
-			SEXP s = x; x = y; y = s;
+			SWAP(x, y, SEXP, );
+			SWAP(xt, yt, int, !);
 		}
 		SEXP
 			xdim = (TYPEOF(x) == OBJSXP)
@@ -114,8 +114,8 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 		*m = (xt) ? xn : xm;
 		*n = (yt) ? ym : yn;
 		if (zt) {
-			int tmp = !xt; xt = !yt; yt = tmp;
-			tmp = *m; *m = *n; *n = tmp;
+			SWAP(*m, *n, int, );
+			SWAP(xt, yt, int, !);
 		}
 	}
 	if (*v % 2) *xtrans = (xt) ? 'T' : 'N';
