@@ -461,8 +461,7 @@ setMethod("[",
           })
 
 setMethod("[",
-          c(x = "sparseVector", i = "missing", j = "missing",
-            drop = "missing"),
+          c(x = "sparseVector", i = "missing", j = "missing", drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
@@ -470,8 +469,7 @@ setMethod("[",
           })
 
 setMethod("[",
-          c(x = "sparseVector", i = "index", j = "missing",
-            drop = "missing"),
+          c(x = "sparseVector", i = "index", j = "missing", drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
@@ -585,8 +583,7 @@ setMethod("[",
           })
 
 setMethod("[",
-          c(x = "sparseVector", i = "nsparseVector", j = "missing",
-            drop = "missing"),
+          c(x = "sparseVector", i = "nsparseVector", j = "missing", drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
@@ -594,8 +591,7 @@ setMethod("[",
           })
 
 setMethod("[",
-          c(x = "sparseVector", i = "lsparseVector", j = "missing",
-            drop = "missing"),
+          c(x = "sparseVector", i = "lsparseVector", j = "missing", drop = "missing"),
           function(x, i, j, ..., drop = TRUE) {
               if(nargs() != 2L)
                   stop("incorrect number of dimensions")
@@ -603,8 +599,7 @@ setMethod("[",
           })
 
 setMethod("[",
-          c(x = "sparseVector", i = "NULL", j = "ANY",
-            drop = "ANY"),
+          c(x = "sparseVector", i = "NULL", j = "ANY", drop = "ANY"),
           function(x, i, j, ..., drop = TRUE) {
               i <- integer(0L)
               callGeneric()

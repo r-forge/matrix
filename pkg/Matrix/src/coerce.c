@@ -997,7 +997,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 	if (byrow)
 		SWAP(m, n, int, );
 
-	SEXP iSym = (byrow) ? Matrix_jSym : Matrix_iSym,
+	SEXP iSym = (!byrow) ? Matrix_iSym : Matrix_jSym,
 		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
 		i1 = PROTECT(allocVector(INTSXP, nnz1));
 	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1), i, j;
