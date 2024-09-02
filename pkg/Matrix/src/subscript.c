@@ -45,6 +45,7 @@ SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
 
+	int packed = class[2] == 'p';
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -63,8 +64,7 @@ SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 	R_xlen_t l;
 	int_fast64_t b, i, j, k;
 
-	int packed = class[2] == 'p',
-		ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
+	int ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
 		un = class[1] == 't' && nu != 'N', up = ul == 'U';
 
 #define SUB1__(d, c) \
@@ -405,6 +405,7 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int m = INTEGER(dim)[0];
 
+	int packed = class[2] == 'p';
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (class[1] != 'g') {
 		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -423,8 +424,7 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 	int l;
 	int_fast64_t b, i, j, k;
 
-	int packed = class[2] == 'p',
-		ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
+	int ge = class[1] == 'g', sy = class[1] == 's', he = sy && ct == 'C',
 		un = class[1] == 't' && nu != 'N', up = ul == 'U';
 
 #define SUB1(c) \
@@ -851,69 +851,6 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 	}
 }
 
-#define XIJ_GE(c, x, i, j, m) \
-	*(x + DENSE_INDEX_N(i, j, m))
-
-#define XIJ_SY_U(c, x, i, j, m) \
-	((i <= j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : XIJ_GE(c, x, j, i, m))
-
-#define XIJ_SY_L(c, x, i, j, m) \
-	((i >= j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : XIJ_GE(c, x, j, i, m))
-
-#define XIJ_SP_U(c, x, i, j, m) \
-	((i <= j) \
-	 ? *(x + DENSE_INDEX_U(i, j, m)) \
-	 : *(x + DENSE_INDEX_U(j, i, m)))
-
-#define XIJ_SP_L(c, x, i, j, m) \
-	((i >= j) \
-	 ? *(x + DENSE_INDEX_L(i, j, m)) \
-	 : *(x + DENSE_INDEX_L(j, i, m)))
-
-#define XIJ_TR_U_N(c, x, i, j, m) \
-	((i <= j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : c##ZERO)
-
-#define XIJ_TR_L_N(c, x, i, j, m) \
-	((i >= j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : c##ZERO)
-
-#define XIJ_TP_U_N(c, x, i, j, m) \
-	((i <= j) \
-	 ? *(x + DENSE_INDEX_U(i, j, m)) \
-	 : c##ZERO)
-
-#define XIJ_TP_L_N(c, x, i, j, m) \
-	((i >= j) \
-	 ? *(x + DENSE_INDEX_L(i, j, m)) \
-	 : c##ZERO)
-
-#define XIJ_TR_U_U(c, x, i, j, m) \
-	((i < j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : ((i == j) ? c##UNIT : c##ZERO))
-
-#define XIJ_TR_L_U(c, x, i, j, m) \
-	((i > j) \
-	 ? XIJ_GE(c, x, i, j, m) \
-	 : ((i == j) ? c##UNIT : c##ZERO))
-
-#define XIJ_TP_U_U(c, x, i, j, m) \
-	((i < j) \
-	 ? *(x + DENSE_INDEX_U(i, j, m)) \
-	 : ((i == j) ? c##UNIT : c##ZERO))
-
-#define XIJ_TP_L_U(c, x, i, j, m) \
-	((i > j) \
-	 ? *(x + DENSE_INDEX_L(i, j, m)) \
-	 : ((i == j) ? c##UNIT : c##ZERO))
-
 static
 SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 {
@@ -923,20 +860,6 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 
-	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
-
 	int ki, kj,
 		mi = si == R_NilValue,
 		mj = sj == R_NilValue,
@@ -945,13 +868,42 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		*pi = (mi) ? NULL : INTEGER(si),
 		*pj = (mj) ? NULL : INTEGER(sj);
 
-	int stay = (class[1] == 'g') ? 0 : (class[1] == 's') ? stay_sy(pi, ni, pj, nj, n, ul, 1) : stay_tr(pi, ni, pj, nj, n, ul, 1),
-		packed = class[2] == 'p';
+	int packed = class[2] == 'p';
+	char ul0 = '\0', ct0 = '\0', nu0 = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct0 = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu0 = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	int stay = (class[1] == 'g') ? 0 : (class[1] == 's')
+		? stay_sy(pi, ni, pj, nj, n, ul0, 1)
+		: stay_tr(pi, ni, pj, nj, n, ul0, 1);
 	int_fast64_t ninj = (int_fast64_t) ni * nj,
 		xlen = (!packed || stay == 0) ? ninj : ni + (ninj - ni) / 2;
 	if (xlen > R_XLEN_T_MAX)
 		error(_("attempt to allocate vector of length exceeding %s"),
 		      "R_XLEN_T_MAX");
+
+	char ul1 = '\0', ct1 = '\0', nu1 = '\0';
+	if (stay != 0) {
+	if (class[1] != 'g')
+		ul1 = (stay > 0) ? 'U' : 'L';
+	if (class[1] == 's' && class[0] == 'z')
+		ct1 = ct0;
+	if (class[1] == 't')
+		nu1 = (ABS(stay) == 1) ? 'N' : nu0;
+	}
+
+	int he = class[1] == 's' && ct0 == 'C' && ct1 != 'C',
+		un = class[1] == 't' && nu0 != 'N';
 
 	char cl[] = "...Matrix";
 	cl[0] = class[0];
@@ -963,15 +915,15 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	INTEGER(dim)[0] = ni;
 	INTEGER(dim)[1] = nj;
 
-	if (cl[1] != 'g' && stay < 0) {
+	if (cl[1] != 'g' && ul1 != 'U') {
 		SEXP uplo = GET_SLOT(ans, Matrix_uploSym);
 		SET_STRING_ELT(uplo, 0, mkChar("L"));
 	}
-	if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
+	if (cl[1] == 's' && ct1 != 'C' && cl[0] == 'z') {
 		SEXP trans = GET_SLOT(ans, Matrix_transSym);
 		SET_STRING_ELT(trans, 0, mkChar("T"));
 	}
-	if (cl[1] == 't' && nu != 'N' && (stay < -1 || stay > 1)) {
+	if (cl[1] == 't' && nu1 != 'N') {
 		SEXP diag = GET_SLOT(ans, Matrix_diagSym);
 		SET_STRING_ELT(diag, 0, mkChar("U"));
 	}
@@ -985,128 +937,90 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 #define SUB2(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
-		if (!packed && stay != 0) \
+		if (!packed && cl[1] != 'g') \
 			memset(px1, 0, sizeof(c##TYPE) * (size_t) XLENGTH(x1)); \
 		if (class[1] == 'g') { \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_GE, , ); \
+			SUB2__(c, ASSIGN_GE, N, N, for (ki =  0; ki <  ni; ++ki), , ); \
 		} else if (class[1] == 's' && !packed) { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_SY_U, , ); \
+			if (ul1 == '\0') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, N, for (ki =  0; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_SY_L, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_SY_U, \
+			SUB2__(c, ASSIGN_SY, L, N, for (ki =  0; ki <  ni; ++ki), , ); \
+			} else if (ul1 == 'U') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, N, for (ki =  0; ki <= kj; ++ki), \
 			       , px1 += ni - kj - 1); \
 			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_SY_L, \
+			SUB2__(c, ASSIGN_SY, L, N, for (ki =  0; ki <= kj; ++ki), \
 			       , px1 += ni - kj - 1); \
 			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_SY_U, \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, N, for (ki = kj; ki <  ni; ++ki), \
 			       px1 += kj, ); \
 			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_SY_L, \
+			SUB2__(c, ASSIGN_SY, L, N, for (ki = kj; ki <  ni; ++ki), \
 			       px1 += kj, ); \
 			} \
 		} else if (class[1] == 's') { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_SP_U, , ); \
+			if (ul1 == '\0') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, U, for (ki =  0; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_SP_L, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_SP_U, , ); \
+			SUB2__(c, ASSIGN_SY, L, L, for (ki =  0; ki <  ni; ++ki), , ); \
+			} else if (ul1 == 'U') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, U, for (ki =  0; ki <= kj; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_SP_L, , ); \
+			SUB2__(c, ASSIGN_SY, L, L, for (ki =  0; ki <= kj; ++ki), , ); \
 			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_SP_U, , ); \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_SY, U, U, for (ki = kj; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_SP_L, , ); \
-			} \
-		} else if (nu == 'N' && !packed) { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TR_U_N, , ); \
-			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TR_L_N, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TR_U_N, \
-			       , px1 += ni - kj - 1); \
-			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TR_L_N, \
-			       , px1 += ni - kj - 1); \
-			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TR_U_N, \
-			       px1 += kj, ); \
-			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TR_L_N, \
-			       px1 += kj, ); \
-			} \
-		} else if (nu == 'N') { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TP_U_N, , ); \
-			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TP_L_N, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TP_U_N, , ); \
-			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TP_L_N, , ); \
-			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TP_U_N, , ); \
-			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TP_L_N, , ); \
+			SUB2__(c, ASSIGN_SY, L, L, for (ki = kj; ki <  ni; ++ki), , ); \
 			} \
 		} else if (!packed) { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TR_U_U, , ); \
+			if (ul1 == '\0') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, N, for (ki =  0; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TR_L_U, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TR_U_U, \
+			SUB2__(c, ASSIGN_TR, L, N, for (ki =  0; ki <  ni; ++ki), , ); \
+			} else if (ul1 == 'U') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, N, for (ki =  0; ki <= kj; ++ki), \
 			       , px1 += ni - kj - 1); \
 			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TR_L_U, \
+			SUB2__(c, ASSIGN_TR, L, N, for (ki =  0; ki <= kj; ++ki), \
 			       , px1 += ni - kj - 1); \
 			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TR_U_U, \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, N, for (ki = kj; ki <  ni; ++ki), \
 			       px1 += kj, ); \
 			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TR_L_U, \
+			SUB2__(c, ASSIGN_TR, L, N, for (ki = kj; ki <  ni; ++ki), \
 			       px1 += kj, ); \
 			} \
 		} else { \
-			if (stay == 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TP_U_U, , ); \
+			if (ul1 == '\0') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, U, for (ki =  0; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <  ni; ++ki), XIJ_TP_L_U, , ); \
-			} else if (stay > 0) { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TP_U_U, , ); \
+			SUB2__(c, ASSIGN_TR, L, L, for (ki =  0; ki <  ni; ++ki), , ); \
+			} else if (ul1 == 'U') { \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, U, for (ki =  0; ki <= kj; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki =  0; ki <= kj; ++ki), XIJ_TP_L_U, , ); \
+			SUB2__(c, ASSIGN_TR, L, L, for (ki =  0; ki <= kj; ++ki), , ); \
 			} else { \
-			if (ul == 'U') \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TP_U_U, , ); \
+			if (ul0 == 'U') \
+			SUB2__(c, ASSIGN_TR, U, U, for (ki = kj; ki <  ni; ++ki), , ); \
 			else \
-			SUB2__(c, for (ki = kj; ki <  ni; ++ki), XIJ_TP_L_U, , ); \
+			SUB2__(c, ASSIGN_TR, L, L, for (ki = kj; ki <  ni; ++ki), , ); \
 			} \
 		} \
 	} while (0)
 
-#define SUB2__(c, __for__, index, jump0, jump1) \
+#define SUB2__(c, assign, s, t, __for__, jump0, jump1) \
 	do { \
 		for (kj = 0; kj < nj; ++kj) { \
 			if (mj) \
@@ -1131,11 +1045,42 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 					*(px1++) = c##NA; \
 					continue; \
 				} \
-				*(px1++) = index(c, px0, i, j, m); \
+				assign(c, px0, px1, i, j, m, s, t); \
+				px1++; \
 			} \
 			jump1; \
 		} \
 	} while (0)
+
+#define ASSIGN_GE(c, x, y, i, j, m, s, t) \
+	do { \
+		c##ASSIGN_IDEN(*y, x[DENSE_INDEX_N(i, j, m)]); \
+	} while (0)
+
+#define ASSIGN_SY(c, x, y, i, j, m, s, t) \
+	do { \
+		if (he && i == j) \
+			c##ASSIGN_PROJ_REAL(*y, x[DENSE_INDEX_##t(i, j, m)]); \
+		else if (CMP_##s(i, j)) \
+			c##ASSIGN_IDEN     (*y, x[DENSE_INDEX_##t(i, j, m)]); \
+		else if (he) \
+			c##ASSIGN_CONJ     (*y, x[DENSE_INDEX_##t(j, i, m)]); \
+		else \
+			c##ASSIGN_IDEN     (*y, x[DENSE_INDEX_##t(j, i, m)]); \
+	} while (0)
+
+#define ASSIGN_TR(c, x, y, i, j, m, s, t) \
+	do { \
+		if (un && i == j) \
+			c##ASSIGN_IDEN(*y, c##UNIT); \
+		else if (CMP_##s(i, j)) \
+			c##ASSIGN_IDEN(*y, x[DENSE_INDEX_##t(i, j, m)]); \
+		else \
+			c##ASSIGN_IDEN(*y, c##ZERO); \
+	} while (0)
+
+#define CMP_U(i, j) i <= j
+#define CMP_L(i, j) i >= j
 
 	SWITCH4(class[0], SUB2);
 
@@ -1159,22 +1104,6 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[!mg], n = pdim[mg];
 
-	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (!mg)
-			ul = (ul == 'U') ? 'L' : 'U';
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
-
 	int ki, kj,
 		mi = si == R_NilValue,
 		mj = sj == R_NilValue,
@@ -1182,13 +1111,39 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		nj = (mj) ? n : LENGTH(sj),
 		*pi = (mi) ? NULL : INTEGER(si),
 		*pj = (mj) ? NULL : INTEGER(sj);
-
 	if (anyNA(pi, ni) || anyNA(pj, nj))
 		error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
 		      "x[i, j]", "x", "sparseMatrix");
-	int stay = (class[1] == 'g') ? 0 : (class[1] == 's') ? stay_sy(pi, ni, pj, nj, n, ul, 0) : stay_tr(pi, ni, pj, nj, n, ul, 0);
-	if (!mg)
-		stay = -stay;
+
+	char ul0 = '\0', ct0 = '\0', nu0 = '\0';
+	if (class[1] != 'g') {
+		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
+		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
+		if (!mg)
+			ul0 = (ul0 == 'U') ? 'L' : 'U';
+	}
+	if (class[1] == 's' && class[0] == 'z') {
+		SEXP trans = GET_SLOT(obj, Matrix_transSym);
+		ct0 = CHAR(STRING_ELT(trans, 0))[0];
+	}
+	if (class[1] == 't') {
+		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+		nu0 = CHAR(STRING_ELT(diag, 0))[0];
+	}
+
+	int stay = (class[1] == 'g') ? 0 : (class[1] == 's')
+		? stay_sy(pi, ni, pj, nj, n, ul0, 0)
+		: stay_tr(pi, ni, pj, nj, n, ul0, 0);
+
+	char ul1 = '\0', ct1 = '\0', nu1 = '\0';
+	if (stay != 0) {
+	if (class[1] != 'g')
+		ul1 = (stay > 0) ? 'U' : 'L';
+	if (class[1] == 's' && class[0] == 'z')
+		ct1 = ct0;
+	if (class[1] == 't')
+		nu1 = (ABS(stay) == 1) ? 'N' : nu0;
+	}
 
 	char class__[] = "...Matrix";
 	class__[0] = class[0];
@@ -1202,7 +1157,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		REPROTECT(obj = sparse_as_Csparse(obj, class__), pid_obj);
 		class__[2] = 'C';
 	}
-	if (class[1] != 'g' && stay >= -1 && stay <= 1) {
+	if (class[1] != 'g' && ABS(stay) <= 1) {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_general(SEXP, const char *);
 		REPROTECT(obj = sparse_as_general(obj, class__), pid_obj);
@@ -1213,8 +1168,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	cl[0] = class  [0];
 	cl[1] = class  [1];
 	cl[2] = class__[2];
-	if ((class[1] == 's' && stay >= -1 && stay <= 1) ||
-	    (class[1] == 't' && stay == 0))
+	if (ABS(stay) <= ((class[1] != 's') ? 0 : 1))
 		cl[1] = 'g';
 	PROTECT_INDEX pid_ans;
 	SEXP ans;
@@ -1224,15 +1178,15 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	INTEGER(dim)[!mg] = ni;
 	INTEGER(dim)[ mg] = nj;
 
-	if (cl[1] != 'g' && stay < 0) {
+	if (cl[1] != 'g' && (mg == (ul1 != 'U'))) {
 		SEXP uplo = GET_SLOT(ans, Matrix_uploSym);
 		SET_STRING_ELT(uplo, 0, mkChar("L"));
 	}
-	if (cl[1] == 's' && cl[0] == 'z' && ct != 'C') {
+	if (cl[1] == 's' && ct1 != 'C' && cl[0] == 'z') {
 		SEXP trans = GET_SLOT(ans, Matrix_transSym);
 		SET_STRING_ELT(trans, 0, mkChar("T"));
 	}
-	if (cl[1] == 't' && nu != 'N' && (stay < -1 || stay > 1)) {
+	if (cl[1] == 't' && nu1 != 'N') {
 		SEXP diag = GET_SLOT(ans, Matrix_diagSym);
 		SET_STRING_ELT(diag, 0, mkChar("U"));
 	}
@@ -1398,10 +1352,10 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 	}
 
-	if (class[1] == 's' && cl[1] == 'g' && stay != 0) {
+	if (class[1] == 's' && ABS(stay) == 1) {
 		/* defined in ./sparse.c : */
 		SEXP sparse_force_symmetric(SEXP, const char *, char, char);
-		REPROTECT(ans = sparse_force_symmetric(ans, cl, (stay > 0) ? 'U' : 'L', ct), pid_ans);
+		REPROTECT(ans = sparse_force_symmetric(ans, cl, (mg == (ul1 == 'U')) ? 'U' : 'L', ct1), pid_ans);
 		cl[1] = 's';
 	}
 	if (class[2] == 'T') {
@@ -1424,9 +1378,6 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	int un = CHAR(STRING_ELT(diag, 0))[0] != 'N';
-
 	int ki, kj,
 		mi = si == R_NilValue,
 		mj = sj == R_NilValue,
@@ -1434,28 +1385,34 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		nj = (mj) ? n : LENGTH(sj),
 		*pi = (mi) ? NULL : INTEGER(si),
 		*pj = (mj) ? NULL : INTEGER(sj);
-
 	if (anyNA(pi, ni) || anyNA(pj, nj))
 		error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
 		      "x[i, j]", "x", "sparseMatrix");
+
 	int stay = stay_di(pi, ni, pj, nj, n, 0);
+
+	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
+	char nu0 = CHAR(STRING_ELT(diag, 0))[0],
+		nu1 = (stay <= 0) ? '\0' : (stay <= 1) ? 'N' : nu0;
+
+	int un = nu0 != 'N';
 
 	char cl[] = "...Matrix";
 	cl[0] = class[0];
-	cl[1] = (stay > 0) ? 'd' : 'g';
-	cl[2] = (stay > 0) ? 'i' : 'C';
+	cl[1] = (stay <= 0) ? 'g' : 'd';
+	cl[2] = (stay <= 0) ? 'C' : 'i';
 	SEXP ans = PROTECT(newObject(cl));
 
 	dim = GET_SLOT(ans, Matrix_DimSym);
 	INTEGER(dim)[0] = ni;
 	INTEGER(dim)[1] = nj;
 
-	if (un && stay > 1) {
+	if (nu1 != '\0' && nu1 != 'N') {
 
 		diag = GET_SLOT(ans, Matrix_diagSym);
 		SET_STRING_ELT(diag, 0, mkChar("U"));
 
-	} else if (stay > 0) {
+	} else if (nu1 != '\0') {
 
 		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 			x1 = PROTECT(allocVector(TYPEOF(x0), ni));

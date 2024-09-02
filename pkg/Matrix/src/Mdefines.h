@@ -110,6 +110,8 @@ const char *valid_dense[], *valid_sparse[],
 
 #define SWAP(a, b, t, op) do { t tmp = op(a); a = op(b); b = tmp; } while (0)
 
+#define  ABS(i) (((i) < 0) ? -(i) : (i))
+
 #define ERROR_OOM(_FUNC_) \
 	error(_("out of memory in '%s'"), \
 	      _FUNC_)
