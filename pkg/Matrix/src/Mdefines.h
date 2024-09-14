@@ -54,21 +54,21 @@ extern void *alloca(size_t);
 # endif
 #endif
 
-#define Matrix_Calloc(_VAR_, _N_, _CTYPE_) \
+#define Matrix_Calloc(p, n, t) \
 do { \
-	if (_N_ >= Matrix_CallocThreshold) \
-		_VAR_ = R_Calloc(_N_, _CTYPE_); \
+	if (n >= Matrix_CallocThreshold) \
+		p = R_Calloc(n, t); \
 	else { \
-		_VAR_ = (_CTYPE_ *) alloca(sizeof(_CTYPE_) * (size_t) (_N_)); \
+		p = (t *) alloca(sizeof(t) * (size_t) (n)); \
 		R_CheckStack(); \
-		memset(_VAR_, 0, sizeof(_CTYPE_) * (size_t) (_N_)); \
+		memset(p, 0, sizeof(t) * (size_t) (n)); \
 	} \
 } while (0)
 
-#define Matrix_Free(_VAR_, _N_) \
+#define Matrix_Free(p, n) \
 do { \
-	if (_N_ >= Matrix_CallocThreshold) \
-		R_Free(_VAR_); \
+	if (n >= Matrix_CallocThreshold) \
+		R_Free(p); \
 } while (0)
 
 #define errorChar(...)   mkChar  (Matrix_sprintf(__VA_ARGS__))
