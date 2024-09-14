@@ -81,21 +81,6 @@ do { \
 /* TYPEOF returns int, not SEXPTYPE (unsigned int) => -Wsign-conversion */
 #define TYPEOF(s) ((SEXPTYPE) (TYPEOF)(s))
 
-/* Often used symbols, declared in ./init.c */
-extern
-#include "Msymbols.h"
-
-/* Often used numbers, declared in ./init.c */
-extern
-Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
-
-/* Often used arrays of nonvirtual class names, declared in ./objects.c */
-extern
-const char *valid_dense[], *valid_sparse[],
-	*valid_sparse_compressed[], *valid_sparse_triplet[],
-	*valid_diagonal[], *valid_index[],
-	*valid_matrix[], *valid_vector[], *valid_matrix_or_vector[];
-
 #define LONGDOUBLE_AS_DOUBLE(x) \
 	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
 
@@ -250,6 +235,21 @@ VALID_DENSE, VALID_SPARSE, VALID_DIAGONAL, VALID_INDEX
 VALID_MATRIX, VALID_VECTOR
 
 /* What we want declared "everywhere" : */
+
+/* Often used symbols, declared in ./init.c */
+extern
+#include "Msymbols.h"
+
+/* Often used numbers, declared in ./init.c */
+extern
+Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
+
+/* Often used arrays of nonvirtual class names, declared in ./objects.c */
+extern
+const char *valid_dense[], *valid_sparse[],
+	*valid_sparse_compressed[], *valid_sparse_triplet[],
+	*valid_diagonal[], *valid_index[],
+	*valid_matrix[], *valid_vector[], *valid_matrix_or_vector[];
 
 #include "utils.h"
 
