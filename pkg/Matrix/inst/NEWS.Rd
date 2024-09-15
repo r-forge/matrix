@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-08-31 r4907)}{
+\section{Changes in version 1.8-0 (2024-09-15 r4923)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -58,7 +58,7 @@
     \itemize{
       \item \proglang{C} code uses new (since \R{} 4.4.0) \code{OBJSXP}
       in place of deprecated \code{S4SXP} and \code{TYPEOF(.) == OBJSXP}
-      in place of (not specific enough) \code{IS_S4_OBJECT(.)}.
+      in place of (not specific enough) \code{isS4(.)}.
 
       \item \proglang{C} code is simplified using definitions in new
       header \file{M5.h} for templated dispatch on object \dQuote{kind}
@@ -70,7 +70,7 @@
   }
 }
 
-\section{Changes in version 1.7-1 (2024-08-31 r4907)}{
+\section{Changes in version 1.7-1 (2024-09-15 r4923)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -99,6 +99,10 @@
 
       \item Internal SuiteSparse and METIS libraries are further
       patched to avoid possible use of illegal entry points.
+
+      \item Non-API entry points \code{OBJECT}, \code{IS_S4_OBJECT},
+      \code{SET_OBJECT}, \code{ATTRIB}, and \code{SET_ATTRIB} are no
+      longer used.
     }
   }
 }

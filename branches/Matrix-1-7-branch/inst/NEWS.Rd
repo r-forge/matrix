@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.7-1 (2024-08-31 r4907)}{
+\section{Changes in version 1.7-1 (2024-09-15 r4923)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item .
@@ -33,6 +33,10 @@
 
       \item Internal SuiteSparse and METIS libraries are further
       patched to avoid possible use of illegal entry points.
+
+      \item Non-API entry points \code{OBJECT}, \code{IS_S4_OBJECT},
+      \code{SET_OBJECT}, \code{ATTRIB}, and \code{SET_ATTRIB} are no
+      longer used.
     }
   }
 }
