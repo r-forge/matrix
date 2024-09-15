@@ -1,4 +1,3 @@
-#include <math.h> /* trunc */
 #include "Mdefines.h"
 #include "M5.h"
 #include "idz.h"

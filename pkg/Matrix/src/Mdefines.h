@@ -14,11 +14,14 @@
 # define _POSIX_C_SOURCE 200809L
 #endif
 
-#include <string.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <limits.h>
-#include <float.h>
+#include <float.h> /* DBL_EPSILON */
+#include <limits.h> /* INT_MAX */
+#include <math.h> /* fabs, hypot, sqrt, ... */
+#include <stdarg.h> /* va_list, va_start, ... */
+#include <stddef.h> /* size_t */
+#include <stdint.h> /* int_fast64_t */
+#include <stdio.h> /* vsnprintf */
+#include <string.h> /* memcpy, memset */
 
 #ifndef STRICT_R_HEADERS
 # define STRICT_R_HEADERS

@@ -1,4 +1,3 @@
-#include <stdio.h> /* vsnprintf */
 #include "Mdefines.h"
 #include "utils.h"
 

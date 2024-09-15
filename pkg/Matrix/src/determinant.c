@@ -1,5 +1,5 @@
-#include <Rmath.h> /* math.h, logspace_add, logspace_sub */
 #include "Mdefines.h"
+#include <Rmath.h> /* logspace_add, logspace_sub */
 #include "cholmod-etc.h"
 #include "determinant.h"
 
