@@ -20,6 +20,13 @@
 #include <limits.h>
 #include <float.h>
 
+#ifndef STRICT_R_HEADERS
+# define STRICT_R_HEADERS
+#endif
+
+#include <R.h>
+#include <Rinternals.h>
+
 /* Copy and paste from WRE : */
 #ifdef ENABLE_NLS
 # include <libintl.h>
@@ -46,13 +53,6 @@
 extern void *alloca(size_t);
 # endif
 #endif
-
-#ifndef STRICT_R_HEADERS
-# define STRICT_R_HEADERS
-#endif
-
-#include <R.h>
-#include <Rinternals.h>
 
 #define Matrix_Calloc(p, n, t) \
 do { \
