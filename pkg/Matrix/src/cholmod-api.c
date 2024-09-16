@@ -375,7 +375,7 @@ cholmod_dense *sexp_as_cholmod_dense(cholmod_dense *A, SEXP from)
 			ERROR_INVALID_TYPE(from, __func__);
 			break;
 		}
-		SEXP dim = getAttrib(from, R_DimSymbol);
+		SEXP dim = Rf_getAttrib(from, R_DimSymbol);
 		if (TYPEOF(dim) == INTSXP && LENGTH(dim) == 2) {
 			m = INTEGER(dim)[0];
 			n = INTEGER(dim)[1];

@@ -292,7 +292,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	SEXP to = PROTECT(newObject(cl));
 	int nprotect = 2;
 
-	SEXP dim = getAttrib(from, R_DimSymbol), dimnames;
+	SEXP dim = Rf_getAttrib(from, R_DimSymbol), dimnames;
 	int *pdim, isM, m, n, doDN;
 	R_xlen_t mn = XLENGTH(from);
 
@@ -309,7 +309,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 			pdim[1] = n;
 		}
 
-		PROTECT(dimnames = getAttrib(from, R_DimNamesSymbol));
+		PROTECT(dimnames = Rf_getAttrib(from, R_DimNamesSymbol));
 		++nprotect;
 		doDN = dimnames != R_NilValue;
 
@@ -327,7 +327,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 			pdim[1] = n = 1;
 		}
 
-		SEXP nms = PROTECT(getAttrib(from, R_NamesSymbol));
+		SEXP nms = PROTECT(Rf_getAttrib(from, R_NamesSymbol));
 		++nprotect;
 		doDN = nms != R_NilValue;
 		if (doDN) {
@@ -834,7 +834,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		((TYPEOF(length0) == INTSXP) ? INTEGER(length0)[0] : REAL(length0)[0]);
 
 	SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-		x0 = PROTECT(getAttrib(from, Matrix_xSym));
+		x0 = PROTECT(Rf_getAttrib(from, Matrix_xSym));
 
 	SEXPTYPE tf = TYPEOF(x0);
 	char cl[] = "...Matrix";
@@ -3944,12 +3944,12 @@ SEXP R_Matrix_as_matrix(SEXP s_from)
 	PROTECT(to);
 
 	SEXP dim = PROTECT(GET_SLOT(s_from, Matrix_DimSym));
-	setAttrib(to, R_DimSymbol, dim);
+	Rf_setAttrib(to, R_DimSymbol, dim);
 	UNPROTECT(1); /* dim */
 
 	SEXP dimnames = PROTECT(GET_SLOT(s_from, Matrix_DimNamesSym));
 	if (!DimNames_is_trivial(dimnames))
-		setAttrib(to, R_DimNamesSymbol, dimnames);
+		Rf_setAttrib(to, R_DimNamesSymbol, dimnames);
 	UNPROTECT(1); /* dimnames */
 
 	switch (class[2]) {

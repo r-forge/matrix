@@ -24,7 +24,7 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 			error(_("should never happen ..."));
 		SEXP
 			xdim = (TYPEOF(x) == OBJSXP)
-			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol);
+			? GET_SLOT(x, Matrix_DimSym) : Rf_getAttrib(x, R_DimSymbol);
 		if (TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2) {
 			*v = 0;
 			*m = *n = INTEGER(xdim)[(xt) ? 1 : 0];
@@ -41,9 +41,9 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 		}
 		SEXP
 			xdim = (TYPEOF(x) == OBJSXP)
-			? GET_SLOT(x, Matrix_DimSym) : getAttrib(x, R_DimSymbol),
+			? GET_SLOT(x, Matrix_DimSym) : Rf_getAttrib(x, R_DimSymbol),
 			ydim = (TYPEOF(y) == OBJSXP)
-			? GET_SLOT(y, Matrix_DimSym) : getAttrib(y, R_DimSymbol);
+			? GET_SLOT(y, Matrix_DimSym) : Rf_getAttrib(y, R_DimSymbol);
 		int xm, xn, ym, yn, x2, y2;
 		xm = xn = ym = yn = -1;
 		x2 = TYPEOF(xdim) == INTSXP && LENGTH(xdim) == 2;
@@ -130,15 +130,15 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 		SET_VECTOR_ELT(dest, 0, s);
 	if ((s = VECTOR_ELT(bsrc, bi)) != R_NilValue)
 		SET_VECTOR_ELT(dest, 1, s);
-	PROTECT(asrc = getAttrib(asrc, R_NamesSymbol));
-	PROTECT(bsrc = getAttrib(bsrc, R_NamesSymbol));
+	PROTECT(asrc = Rf_getAttrib(asrc, R_NamesSymbol));
+	PROTECT(bsrc = Rf_getAttrib(bsrc, R_NamesSymbol));
 	if (asrc != R_NilValue || bsrc != R_NilValue) {
 		SEXP destnms = PROTECT(Rf_allocVector(STRSXP, 2));
 		if (asrc != R_NilValue && CHAR(s = STRING_ELT(asrc, ai))[0] != '\0')
 			SET_STRING_ELT(destnms, 0, s);
 		if (bsrc != R_NilValue && CHAR(s = STRING_ELT(bsrc, bi))[0] != '\0')
 			SET_STRING_ELT(destnms, 1, s);
-		setAttrib(dest, R_NamesSymbol, destnms);
+		Rf_setAttrib(dest, R_NamesSymbol, destnms);
 		UNPROTECT(1);
 	}
 	UNPROTECT(2);

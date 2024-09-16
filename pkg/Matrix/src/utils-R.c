@@ -14,7 +14,7 @@ SEXP R_Matrix_version(void)
 	SET_STRING_ELT(nms, 0, Rf_mkChar("package"));
 	SET_STRING_ELT(nms, 1, Rf_mkChar("abi"));
 	SET_STRING_ELT(nms, 2, Rf_mkChar("suitesparse"));
-	setAttrib(ans, R_NamesSymbol, nms);
+	Rf_setAttrib(ans, R_NamesSymbol, nms);
 	UNPROTECT(2);
 	return ans;
 }
@@ -431,7 +431,7 @@ SEXP Mmatrix(SEXP args)
 	    }
 	}
 	if (dimnames != R_NilValue && Rf_length(dimnames) > 0)
-		ans = dimnamesgets(ans, dimnames);
+		ans = Rf_dimnamesgets(ans, dimnames);
 	UNPROTECT(1);
 	return ans;
 }
@@ -523,7 +523,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 		nprot++;
 	}
 	if (!Rf_isMatrix(ij) ||
-	    (ij_di = INTEGER(getAttrib(ij, R_DimSymbol)))[1] != 2)
+	    (ij_di = INTEGER(Rf_getAttrib(ij, R_DimSymbol)))[1] != 2)
 		error(_("Argument ij must be 2-column integer matrix"));
 	n = ij_di[0];
 	int *Di = INTEGER(di), *IJ = INTEGER(ij),

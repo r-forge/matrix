@@ -17,9 +17,9 @@ SEXP mkDet(double modulus, int logarithm, int sign)
 		logarithmSym = Rf_install("logarithm");
 	SET_STRING_ELT(nms, 0, Rf_mkChar("modulus"));
 	SET_STRING_ELT(nms, 1, Rf_mkChar("sign"));
-	setAttrib(det, R_NamesSymbol, nms);
-	setAttrib(det, R_ClassSymbol, cl);
-	setAttrib(det0, logarithmSym, det0a);
+	Rf_setAttrib(det, R_NamesSymbol, nms);
+	Rf_setAttrib(det, R_ClassSymbol, cl);
+	Rf_setAttrib(det0, logarithmSym, det0a);
 	SET_VECTOR_ELT(det, 0, det0);
 	SET_VECTOR_ELT(det, 1, det1);
 	UNPROTECT(6);

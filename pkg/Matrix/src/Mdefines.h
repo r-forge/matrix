@@ -42,10 +42,7 @@
 #include <Rversion.h> /* R_VERSION, ... */
 
 #ifdef R_NO_REMAP
-#define dimnamesgets      Rf_dimnamesgets
 #define error             Rf_error
-#define getAttrib         Rf_getAttrib
-#define setAttrib         Rf_setAttrib
 #define warning           Rf_warning
 #endif
 

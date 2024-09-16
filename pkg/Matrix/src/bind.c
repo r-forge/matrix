@@ -132,7 +132,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				break;
 			}
 
-			tmp = getAttrib(s, R_DimSymbol);
+			tmp = Rf_getAttrib(s, R_DimSymbol);
 			if (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2) {
 				sdim = INTEGER(tmp);
 				if (rdim[!margin] < 0)
@@ -148,7 +148,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				rdim[margin] += sdim[margin];
 
 				if (!rdimnames[0] || !rdimnames[1]) {
-					tmp = getAttrib(s, R_DimNamesSymbol);
+					tmp = Rf_getAttrib(s, R_DimNamesSymbol);
 					if (tmp != R_NilValue)
 						for (i = 0; i < 2; ++i)
 							if (!rdimnames[i] &&
@@ -185,7 +185,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 		if (s == R_NilValue)
 			rdim[margin] += 1;
 		else {
-			tmp = getAttrib(s, R_DimSymbol);
+			tmp = Rf_getAttrib(s, R_DimSymbol);
 			if (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2)
 				continue;
 			slen = XLENGTH(s);
@@ -201,7 +201,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 					warning(_("number of columns of result is not a multiple of vector length"));
 			}
 			if (!rdimnames[!margin] && slen == rdim[!margin]) {
-				tmp = getAttrib(s, R_NamesSymbol);
+				tmp = Rf_getAttrib(s, R_NamesSymbol);
 				if (tmp != R_NilValue)
 					rdimnames[!margin] = 1;
 			}
@@ -445,7 +445,7 @@ void coerceArgs(SEXP args, int margin,
 				break;
 			}
 		} else {
-			tmp = getAttrib(s, R_DimSymbol);
+			tmp = Rf_getAttrib(s, R_DimSymbol);
 			isM = TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2;
 			if (!isM) {
 				if (rdim[!margin] > 0 && XLENGTH(s) == 0) {
@@ -502,7 +502,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				if (s == R_NilValue) \
 					continue; \
 				if (TYPEOF(s) != OBJSXP) \
-					tmp = getAttrib(s, R_DimSymbol); \
+					tmp = Rf_getAttrib(s, R_DimSymbol); \
 				else { \
 					s = GET_SLOT(s, Matrix_xSym); \
 					tmp = NULL; \
@@ -899,17 +899,17 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 					for (i = 0; i < 2; ++i)
 						nms[i] = VECTOR_ELT(tmp, i);
 			} else {
-				tmp = getAttrib(s, R_DimSymbol);
+				tmp = Rf_getAttrib(s, R_DimSymbol);
 				if (TYPEOF(tmp) == INTSXP && LENGTH(tmp) == 2) {
 					r = INTEGER(tmp)[margin];
-					tmp = getAttrib(s, R_DimNamesSymbol);
+					tmp = Rf_getAttrib(s, R_DimNamesSymbol);
 					if (tmp != R_NilValue)
 						for (i = 0; i < 2; ++i)
 							nms[i] = VECTOR_ELT(tmp, i);
 				} else if (rdim[!margin] == 0 || XLENGTH(s) > 0) {
 					r = 1;
 					if (rdim[!margin] > 0 && XLENGTH(s) == rdim[!margin])
-						nms[!margin] = getAttrib(s, R_NamesSymbol);
+						nms[!margin] = Rf_getAttrib(s, R_NamesSymbol);
 				}
 			}
 			if (TAG(a) != R_NilValue) { /* only if 's' is or was a vector */

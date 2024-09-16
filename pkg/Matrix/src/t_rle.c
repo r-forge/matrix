@@ -84,7 +84,7 @@ SEXP Matrix_RLE_(SEXP x_, SEXP force_)
 	    Memcpy(INTEGER(VECTOR_ELT(ans, 0)), len, c);
 	    Memcpy(STYP_x_(VECTOR_ELT(ans, 1)), val, c);
 	}
-	setAttrib(ans, R_ClassSymbol, Rf_mkString("rle"));
+	Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("rle"));
 
 	if(n > 0) { R_Free(len); R_Free(val); }
 	UNPROTECT(2);

@@ -215,13 +215,13 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 			cn = VECTOR_ELT(dn, 1);
 		if (cn == R_NilValue) {
 			if (class[1] == 's' && rn != R_NilValue)
-				setAttrib(ans, R_NamesSymbol, rn);
+				Rf_setAttrib(ans, R_NamesSymbol, rn);
 		} else {
 			if (class[1] == 's')
-				setAttrib(ans, R_NamesSymbol, cn);
+				Rf_setAttrib(ans, R_NamesSymbol, cn);
 			else if (rn != R_NilValue &&
 			         (rn == cn || equalString(rn, cn, r)))
-				setAttrib(ans, R_NamesSymbol, (r == m) ? rn : cn);
+				Rf_setAttrib(ans, R_NamesSymbol, (r == m) ? rn : cn);
 		}
 		UNPROTECT(1); /* dn */
 	}
@@ -1284,7 +1284,7 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 		SEXP kindVal = PROTECT(Rf_mkString((ans_ > 0) ? "U" : "L"));
 		if (!kindSym)
 			kindSym = Rf_install("kind");
-		setAttrib(ans, kindSym, kindVal);
+		Rf_setAttrib(ans, kindSym, kindVal);
 		UNPROTECT(2); /* kindVal, ans */
 	}
 	UNPROTECT(1); /* s_obj */
@@ -1596,7 +1596,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 		marnames = VECTOR_ELT(dimnames, mg);
 	if (marnames != R_NilValue) {
 		PROTECT(marnames);
-		setAttrib(ans, R_NamesSymbol, marnames);
+		Rf_setAttrib(ans, R_NamesSymbol, marnames);
 		UNPROTECT(1); /* marnames */
 	}
 

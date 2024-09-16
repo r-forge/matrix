@@ -14,15 +14,15 @@ void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
 		SET_VECTOR_ELT(rdn, 0, s);
 	if ((s = VECTOR_ELT(bdn, 1)) != R_NilValue)
 		SET_VECTOR_ELT(rdn, 1, s);
-	PROTECT(adn = getAttrib(adn, R_NamesSymbol));
-	PROTECT(bdn = getAttrib(bdn, R_NamesSymbol));
+	PROTECT(adn = Rf_getAttrib(adn, R_NamesSymbol));
+	PROTECT(bdn = Rf_getAttrib(bdn, R_NamesSymbol));
 	if (adn != R_NilValue || bdn != R_NilValue) {
 		PROTECT(s = Rf_allocVector(STRSXP, 2));
 		if (adn != R_NilValue)
 			SET_STRING_ELT(s, 0, STRING_ELT(adn, 1));
 		if (bdn != R_NilValue)
 			SET_STRING_ELT(s, 1, STRING_ELT(bdn, 1));
-		setAttrib(rdn, R_NamesSymbol, s);
+		Rf_setAttrib(rdn, R_NamesSymbol, s);
 		UNPROTECT(1);
 	}
 	UNPROTECT(2);
@@ -288,7 +288,7 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 	}
 
 	if (m > 0) {
-		SEXP rx, aperm = PROTECT(getAttrib(s_a, Matrix_permSym));
+		SEXP rx, aperm = PROTECT(Rf_getAttrib(s_a, Matrix_permSym));
 		int info, pivoted = TYPEOF(aperm) == INTSXP && LENGTH(aperm) > 0;
 		if (s_b == R_NilValue) {
 			PROTECT(rx = Rf_allocVector(TYPEOF(ax), XLENGTH(ax)));

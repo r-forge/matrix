@@ -226,7 +226,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 	    (ivalid = strmatch(CHAR(op), valid)) < 0)
 		error(_("invalid '%s' to '%s'"), "op", __func__);
 
-	SEXP uplo = getAttrib(obj, Matrix_uploSym);
+	SEXP uplo = Rf_getAttrib(obj, Matrix_uploSym);
 	char ul = (TYPEOF(uplo) == STRSXP && LENGTH(uplo) > 0)
 		? CHAR(STRING_ELT(uplo, 0))[0] : 'L';
 
@@ -321,7 +321,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 
 		int *pperm = NULL;
 		if (ivalid == 7) {
-			SEXP perm = getAttrib(obj, Matrix_permSym);
+			SEXP perm = Rf_getAttrib(obj, Matrix_permSym);
 			if (TYPEOF(perm) == INTSXP && LENGTH(perm) == n)
 				pperm = INTEGER(perm);
 		}
@@ -400,7 +400,7 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 		break;
 	}
 	D = Matrix_cs_dfree(D);
-	setAttrib(ans, R_NamesSymbol, nms);
+	Rf_setAttrib(ans, R_NamesSymbol, nms);
 	UNPROTECT(2);
 	return ans;
 }

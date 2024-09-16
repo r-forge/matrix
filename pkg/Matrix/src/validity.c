@@ -116,10 +116,10 @@ SEXP R_DimNames_fixup(SEXP dimnames)
 		SET_VECTOR_ELT(dimnames_, i, s);
 		UNPROTECT(1); /* s */
 	}
-	s = getAttrib(dimnames, R_NamesSymbol);
+	s = Rf_getAttrib(dimnames, R_NamesSymbol);
 	if (s != R_NilValue) {
 		PROTECT(s);
-		setAttrib(dimnames_, R_NamesSymbol, s);
+		Rf_setAttrib(dimnames_, R_NamesSymbol, s);
 		UNPROTECT(1); /* s */
 	}
 	UNPROTECT(1); /* dimnames_ */
@@ -168,7 +168,7 @@ SEXP generalMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "factors", "list");
 	if (XLENGTH(factors) > 0) {
 		PROTECT(factors);
-		SEXP nms = getAttrib(factors, R_NamesSymbol);
+		SEXP nms = Rf_getAttrib(factors, R_NamesSymbol);
 		UNPROTECT(1); /* factors */
 		if (nms == R_NilValue)
 			RMKMS(_("'%s' slot has no '%s' attribute"), "factors", "names");
@@ -199,7 +199,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	 : Rf_coerceVector(x, STRSXP))
 
 	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		ndn = getAttrib(dn, R_NamesSymbol);
+		ndn = Rf_getAttrib(dn, R_NamesSymbol);
 	UNPROTECT(1); /* dn */
 
 	const char *ndn0, *ndn1;
