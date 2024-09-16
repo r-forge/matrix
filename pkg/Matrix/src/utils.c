@@ -44,7 +44,7 @@ SEXP duplicateVector(SEXP x)
 {
 	SEXPTYPE type = TYPEOF(x);
 	R_xlen_t length = XLENGTH(x);
-	SEXP ans = allocVector(type, length);
+	SEXP ans = Rf_allocVector(type, length);
 	switch (type) {
 	case RAWSXP:
 		memcpy(    RAW(ans),     RAW(x), sizeof(   Rbyte) * (size_t) length);
@@ -69,7 +69,7 @@ SEXP duplicateVector(SEXP x)
 
 SEXP allocZero(SEXPTYPE type, R_xlen_t length)
 {
-	SEXP ans = allocVector(type, length);
+	SEXP ans = Rf_allocVector(type, length);
 	switch (type) {
 	case RAWSXP:
 		memset(    RAW(ans), 0, sizeof(   Rbyte) * (size_t) length);
@@ -94,7 +94,7 @@ SEXP allocZero(SEXPTYPE type, R_xlen_t length)
 
 SEXP allocUnit(SEXPTYPE type, R_xlen_t length)
 {
-	SEXP ans = allocVector(type, length);
+	SEXP ans = Rf_allocVector(type, length);
 	R_xlen_t i;
 	switch (type) {
 	case RAWSXP:
@@ -141,7 +141,7 @@ SEXP allocUnit(SEXPTYPE type, R_xlen_t length)
 
 SEXP allocSeqInt(int from, R_xlen_t length)
 {
-	SEXP ans = allocVector(INTSXP, length);
+	SEXP ans = Rf_allocVector(INTSXP, length);
 	int *pans = INTEGER(ans);
 	R_xlen_t i;
 	for (i = 0; i < length; ++i)

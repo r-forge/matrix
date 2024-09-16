@@ -204,7 +204,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	    val_x = STYP_x(		      GET_SLOT(value, Matrix_xSym));
 	}
     }
-    int64_t len_val = (int64_t) asReal(GET_SLOT(value, Matrix_lengthSym));
+    int64_t len_val = (int64_t) Rf_asReal(GET_SLOT(value, Matrix_lengthSym));
     /* llen_i = (int64_t) len_i; */
 
     SEXP ans;
@@ -420,12 +420,12 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	SET_SLOT(ans, Matrix_diagSym, Rf_duplicate(GET_SLOT(x, Matrix_diagSym)));
     }
     // now assign the i- and x- slots,  free memory and return :
-	PROTECT(islot = allocVector(INTSXP, nnz));
+	PROTECT(islot = Rf_allocVector(INTSXP, nnz));
 	Memcpy(INTEGER(islot), ri, nnz);
 	SET_SLOT(ans, Matrix_iSym, islot);
 	UNPROTECT(1);
 #ifdef _has_x_slot_
-	PROTECT(islot = allocVector(SXP_x, nnz));
+	PROTECT(islot = Rf_allocVector(SXP_x, nnz));
 	Memcpy(STYP_x(islot), rx, nnz);
 	SET_SLOT(ans, Matrix_xSym, islot);
 	UNPROTECT(1);

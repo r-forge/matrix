@@ -57,23 +57,23 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 
 	char ul1 = (tr && class[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ul0;
 	if (ul1 != '\0' && ul1 != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (ct0 != '\0' && ct0 != 'C' && sy) {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (nu0 != '\0' && nu0 != 'N' && tr && a <= 0 && b >= 0) {
-		SEXP diag = PROTECT(mkString("U"));
+		SEXP diag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), (!packed || ge) ? (R_xlen_t) m * n : (R_xlen_t) PACKED_LENGTH((size_t) n)));
 
 	size_t
 		m_ = (size_t) m,
@@ -133,12 +133,12 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 	int a, b;
 	if (s_a == R_NilValue)
 		a = -m;
-	else if ((a = asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
+	else if ((a = Rf_asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
 		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
 		      "k1", a, "-Dim[1]", -m, "Dim[2]", n);
 	if (s_b == R_NilValue)
 		b = n;
-	else if ((b = asInteger(s_b)) == NA_INTEGER || b < -m || b > n)
+	else if ((b = Rf_asInteger(s_b)) == NA_INTEGER || b < -m || b > n)
 		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
 		      "k2", b, "-Dim[1]", -m, "Dim[2]", n);
 	else if (b < a)
@@ -179,7 +179,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 
 	} else {
 
-		PROTECT(ans = allocVector(kindToType(class[0]), r));
+		PROTECT(ans = Rf_allocVector(kindToType(class[0]), r));
 
 		SEXP x = GET_SLOT(obj, Matrix_xSym);
 		size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r;
@@ -392,7 +392,7 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
 		ul = CHAR(STRING_ELT(uplo, 0))[0];
 		if (ul == 'U') {
-			PROTECT(uplo = mkString("L"));
+			PROTECT(uplo = Rf_mkString("L"));
 			SET_SLOT(to, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
@@ -418,7 +418,7 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 	size_t m_ = (size_t) m, n_ = (size_t) n;
 
 #define TRANS(c) \
@@ -503,12 +503,12 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 	UNPROTECT(1); /* dimnames */
 
 	if (ul1 != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (ct1 != 'C' && ct1 != '\0') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
@@ -520,7 +520,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 	    (class[1] == 't' && ul0 == ul1 && nu0 == 'N'))
 		SET_SLOT(to, Matrix_xSym, x0);
 	else {
-		SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+		SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 		size_t n_ = (size_t) n;
 
 #define FORCE(c) \
@@ -621,18 +621,18 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 	}
 
 	if (op_ul != '\0' && op_ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (op_ct != '\0' && op_ct != 'C') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 
 	if (class[1] == 's') {
 
@@ -855,7 +855,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 		if (op_ct == ct)
 		PROTECT(x1 = allocZero(TYPEOF(x0), XLENGTH(x0)));
 		else {
-		PROTECT(x1 = allocVector(CPLXSXP, XLENGTH(x0)));
+		PROTECT(x1 = Rf_allocVector(CPLXSXP, XLENGTH(x0)));
 		zvimag(COMPLEX(x1), COMPLEX(x0), (size_t) XLENGTH(x0));
 		}
 
@@ -864,7 +864,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 		if ((int_fast64_t) n * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
-		PROTECT(x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n));
+		PROTECT(x1 = Rf_allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 
 		int i, j;
 
@@ -1275,13 +1275,13 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 
 	int ans_ = dense_is_triangular(s_obj, class,
 		(up == NA_LOGICAL) ? '\0' : ((up != 0) ? 'U' : 'L'));
-	SEXP ans = allocVector(LGLSXP, 1);
+	SEXP ans = Rf_allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
 	if (up == NA_LOGICAL && ans_ != 0) {
 		PROTECT(ans);
 		static
 		SEXP kindSym = NULL;
-		SEXP kindVal = PROTECT(mkString((ans_ > 0) ? "U" : "L"));
+		SEXP kindVal = PROTECT(Rf_mkString((ans_ > 0) ? "U" : "L"));
 		if (!kindSym)
 			kindSym = Rf_install("kind");
 		setAttrib(ans, kindSym, kindVal);
@@ -1587,7 +1587,7 @@ SEXP dense_marginsum(SEXP obj, const char *class, int mg, int narm, int mean)
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (mg == 0) ? m : n;
 
-	SEXP ans = PROTECT(allocVector(SUM_TYPEOF(class[0]), r)),
+	SEXP ans = PROTECT(Rf_allocVector(SUM_TYPEOF(class[0]), r)),
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 
 	SEXP dimnames = (class[1] == 's')

@@ -43,23 +43,23 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 
 	if (cl[1] != 'g' && ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (cl[1] == 't' && nu != 'N') {
-		SEXP diag = PROTECT(mkString("U"));
+		SEXP diag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
 
 	/* FIXME: add argument 'new' and conditionally avoid allocation */
-	SEXP x = PROTECT(allocVector(tt, (R_xlen_t) xlen));
+	SEXP x = PROTECT(Rf_allocVector(tt, (R_xlen_t) xlen));
 	R_xlen_t k, r = XLENGTH(from);
 	int i, j, recycle = r < mn;
 
@@ -331,7 +331,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 		++nprotect;
 		doDN = nms != R_NilValue;
 		if (doDN) {
-			PROTECT(dimnames = allocVector(VECSXP, 2));
+			PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
 			++nprotect;
 			SET_VECTOR_ELT(dimnames, (mg == 0) ? 1 : 0, nms);
 		}
@@ -350,17 +350,17 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	}
 
 	if (cl[1] != 'g' && ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (cl[1] == 't' && nu != 'N') {
-		SEXP diag = PROTECT(mkString("U"));
+		SEXP diag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -386,7 +386,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 
 	} else {
 
-		PROTECT(x = allocVector(tt, n + (mn - n) / 2));
+		PROTECT(x = Rf_allocVector(tt, n + (mn - n) / 2));
 		++nprotect;
 
 #define MAD(c) c##NAME(pack2)(c##PTR(x), c##PTR(from), (size_t) n, \
@@ -525,7 +525,7 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 		SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)); \
 		c##TYPE *px0 = c##PTR(x0); \
 		); \
-		SEXP x1 = PROTECT(allocVector(c##TYPESXP, (R_xlen_t) xlen)); \
+		SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, (R_xlen_t) xlen)); \
 		c##TYPE *px1 = c##PTR(x1); \
 		memset(px1, 0, sizeof(c##TYPE) * (size_t) xlen); \
 		switch (class[2]) { \
@@ -683,13 +683,13 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	UNPROTECT(1); /* dimnames */
 
 	if (cl[1] != 'g' && ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 
 	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
@@ -712,7 +712,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		PROTECT(x0);
 	}
 
-	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) xlen));
+	SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), (R_xlen_t) xlen));
 
 #define DAD(c) \
 	do { \
@@ -784,7 +784,7 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
 	int *pperm = INTEGER(perm);
 
-	SEXP x = PROTECT(allocVector(kindToType(cl[0]), (R_xlen_t) xlen));
+	SEXP x = PROTECT(Rf_allocVector(kindToType(cl[0]), (R_xlen_t) xlen));
 
 #define IAD(c) \
 	do { \
@@ -871,17 +871,17 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
 
 	if (cl[1] != 'g' && ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
 	if (cl[1] == 't' && nu != 'N') {
-		SEXP diag = PROTECT(mkString("U"));
+		SEXP diag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(to, Matrix_diagSym, diag);
 		UNPROTECT(1); /* diag */
 	}
@@ -994,8 +994,8 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		SWAP(m, n, int, );
 
 	SEXP iSym = (!byrow) ? Matrix_iSym : Matrix_jSym,
-		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
-		i1 = PROTECT(allocVector(INTSXP, nnz1));
+		p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) n + 1)),
+		i1 = PROTECT(Rf_allocVector(INTSXP, nnz1));
 	int *pp1 = INTEGER(p1) + 1, *pi1 = INTEGER(i1), i, j;
 	memset(pp1 - 1, 0, sizeof(int) * ((size_t) n + 1));
 	SET_SLOT(to, Matrix_pSym, p1);
@@ -1010,7 +1010,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		c0##TYPE *px0 = c0##PTR(x0); \
 		); \
 		c1##IF_NPATTERN( \
-		SEXP x1 = PROTECT(allocVector(c1##TYPESXP, nnz1)); \
+		SEXP x1 = PROTECT(Rf_allocVector(c1##TYPESXP, nnz1)); \
 		c1##TYPE *px1 = c1##PTR(x1); \
 		); \
 		if (nnz1 == 0) \
@@ -1498,7 +1498,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 
 	if (cl[2] != 'T') {
 		int r = (cl[2] == 'C') ? n : m;
-		PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) r + 1));
+		PROTECT(p1 = Rf_allocVector(INTSXP, (R_xlen_t) r + 1));
 		++nprotect;
 		pp1 = INTEGER(p1);
 		*(pp1++) = 0;
@@ -1789,13 +1789,13 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 #undef DAS
 
 	if (cl[2] != 'R') {
-		PROTECT(i1 = allocVector(INTSXP, nnz));
+		PROTECT(i1 = Rf_allocVector(INTSXP, nnz));
 		++nprotect;
 		pi1 = INTEGER(i1);
 		SET_SLOT(to, Matrix_iSym, i1);
 	}
 	if (cl[2] != 'C') {
-		PROTECT(j1 = allocVector(INTSXP, nnz));
+		PROTECT(j1 = Rf_allocVector(INTSXP, nnz));
 		++nprotect;
 		pj1 = INTEGER(j1);
 		SET_SLOT(to, Matrix_jSym, j1);
@@ -1805,7 +1805,7 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	do { \
 		c##TYPE *px0 = c##PTR(x0); \
 		c##IF_NPATTERN( \
-		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+		SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 		c##TYPE *px1 = c##PTR(x1); \
 		); \
 		switch (cl[2]) { \
@@ -1883,13 +1883,13 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 	UNPROTECT(1); /* dimnames */
 
 	if (cl[1] != 'g' && ul != 'U') {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(to, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
 
 	if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-		SEXP trans = PROTECT(mkString("T"));
+		SEXP trans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(to, Matrix_transSym, trans);
 		UNPROTECT(1); /* trans */
 	}
@@ -1960,7 +1960,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 
 	} else {
 
-		SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1));
+		SEXP p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) n + 1));
 		int *pp1 = INTEGER(p1);
 		*(pp1++) = 0;
 		SET_SLOT(to, Matrix_pSym, p1);
@@ -1984,7 +1984,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 
 	}
 
-	SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
+	SEXP i1 = PROTECT(Rf_allocVector(INTSXP, nnz));
 	int *pi1 = INTEGER(i1);
 	if (cl[2] != 'R')
 		SET_SLOT(to, Matrix_iSym, i1);
@@ -2002,7 +2002,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		do { \
 			c##TYPE *px0 = c##PTR(x0); \
 			c##IF_NPATTERN( \
-			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px1 = c##PTR(x1); \
 			); \
 			for (j = 0; j < n; ++j) { \
@@ -2074,8 +2074,8 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 	int k, *pperm = INTEGER(perm);
 
 	if (cl[2] == 'T') {
-		SEXP i = PROTECT(allocVector(INTSXP, r)),
-			j = PROTECT(allocVector(INTSXP, r));
+		SEXP i = PROTECT(Rf_allocVector(INTSXP, r)),
+			j = PROTECT(Rf_allocVector(INTSXP, r));
 		int *pi = INTEGER(i), *pj = INTEGER(j);
 		for (k = 0; k < r; ++k) {
 			*(pi++) = k;
@@ -2085,8 +2085,8 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SET_SLOT(to, Matrix_jSym, (mg == 0) ? j : i);
 		UNPROTECT(2); /* j, i */
 	} else if ((cl[2] == 'C') == (mg != 0)) {
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) r + 1)),
-			i = PROTECT(allocVector(INTSXP, r));
+		SEXP p = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) r + 1)),
+			i = PROTECT(Rf_allocVector(INTSXP, r));
 		int *pp = INTEGER(p), *pi = INTEGER(i);
 		for (k = 0; k < r; ++k) {
 			*(pp++) = k;
@@ -2097,14 +2097,14 @@ SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 		SET_SLOT(to, (mg != 0) ? Matrix_iSym : Matrix_jSym, i);
 		UNPROTECT(2); /* i, p */
 	} else {
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) s + 1));
+		SEXP p = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) s + 1));
 		int *pp = INTEGER(p);
 		memset(pp, 0, sizeof(int) * ((size_t) s + 1));
 		for (k = 0; k < r; ++k)
 			++pp[pperm[k]];
 		for (k = 0; k < s; ++k)
 			pp[k + 1] += pp[k];
-		SEXP j = PROTECT(allocVector(INTSXP, r));
+		SEXP j = PROTECT(Rf_allocVector(INTSXP, r));
 		int *pj = INTEGER(j), *work;
 		Matrix_Calloc(work, s, int);
 		memcpy(work, pp, sizeof(int) * (size_t) s);
@@ -2471,7 +2471,7 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), x1 = x0;
 	int nprotect = 2;
 	if (packed || new) {
-		PROTECT(x1 = allocVector(TYPEOF(x0), (R_xlen_t) n * n));
+		PROTECT(x1 = Rf_allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 		++nprotect;
 	}
 #define DAG(c) \
@@ -2573,7 +2573,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
 			p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			i0 = PROTECT(GET_SLOT(from,        iSym)),
-			p1 = PROTECT(allocVector(INTSXP, XLENGTH(p0)));
+			p1 = PROTECT(Rf_allocVector(INTSXP, XLENGTH(p0)));
 		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0), *pp1 = INTEGER(p1),
 			j, k, kend;
 		pp0++; *(pp1++) = 0;
@@ -2604,7 +2604,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 				pp1[j] = pp0[j] + j + 1;
 		}
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[n - 1]));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[n - 1]));
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(to, iSym, i1);
 
@@ -2612,7 +2612,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, pp1[n - 1])); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, pp1[n - 1])); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			); \
 			if (class[1] == 's' || class[1] == 'p') { \
@@ -2733,8 +2733,8 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			      "R_XLEN_T_MAX");
 		nnz1 += nnz0;
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, nnz1)),
-			j1 = PROTECT(allocVector(INTSXP, nnz1));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, nnz1)),
+			j1 = PROTECT(Rf_allocVector(INTSXP, nnz1));
 		int *pi1 = INTEGER(i1), *pj1 = INTEGER(j1);
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
@@ -2743,7 +2743,7 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, nnz1)); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz1)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			); \
 			if (class[1] == 's' || class[1] == 'p') { \
@@ -2894,7 +2894,7 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) n * n));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 
 #define UNPACK(c) \
 	do { \
@@ -2948,7 +2948,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char nu)
 		if (ul == '\0')
 			ul = 'U';
 		if (ul != 'U') {
-			SEXP uplo = PROTECT(mkString("L"));
+			SEXP uplo = PROTECT(Rf_mkString("L"));
 			SET_SLOT(to, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
@@ -2956,13 +2956,13 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char nu)
 		if (ct == '\0')
 			ct = 'C';
 		if (cl[1] == 's' && ct != 'C' && cl[0] == 'z') {
-			SEXP trans = PROTECT(mkString("T"));
+			SEXP trans = PROTECT(Rf_mkString("T"));
 			SET_SLOT(to, Matrix_transSym, trans);
 			UNPROTECT(1); /* trans */
 		}
 
 		if (cl[1] == 't' && nu != 'N') {
-			SEXP diag = PROTECT(mkString("U"));
+			SEXP diag = PROTECT(Rf_mkString("U"));
 			SET_SLOT(to, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
 		}
@@ -3003,7 +3003,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char nu)
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), PACKED_LENGTH((R_xlen_t) n)));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), PACKED_LENGTH((R_xlen_t) n)));
 
 #define PACK(c) \
 	do { \
@@ -3086,8 +3086,8 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 	if (class[2] == 'R') {
 		SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			j0 = PROTECT(GET_SLOT(from, Matrix_jSym)),
-			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) n + 1)),
-			i1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[m]));
+			p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) n + 1)),
+			i1 = PROTECT(Rf_allocVector(INTSXP, INTEGER(p0)[m]));
 		int *pp0 = INTEGER(p0), *pj0 = INTEGER(j0),
 			*pp1 = INTEGER(p1), *pi1 = INTEGER(i1), *iwork = NULL;
 		SET_SLOT(to, Matrix_pSym, p1);
@@ -3099,7 +3099,7 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			c##TYPE *px0 = NULL, *px1 = NULL; \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, INTEGER(p0)[m])); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, INTEGER(p0)[m])); \
 			px0 = c##PTR(x0); \
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
@@ -3136,14 +3136,14 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 			Matrix_Calloc(work, lwork, c##TYPE); \
 			); \
 			c##tspsort(pp1, pi1, px1, pi0, pj0, px0, m, n, &nnz, iwork, work); \
-			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) n + 1)), \
-			PROTECT(i1 = allocVector(INTSXP, nnz)); \
+			PROTECT(p1 = Rf_allocVector(INTSXP, (R_xlen_t) n + 1)), \
+			PROTECT(i1 = Rf_allocVector(INTSXP, nnz)); \
 			pp1 = INTEGER(p1); \
 			pi1 = INTEGER(i1); \
 			SET_SLOT(to, Matrix_pSym, p1); \
 			SET_SLOT(to, Matrix_iSym, i1); \
 			c##IF_NPATTERN( \
-			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			); \
@@ -3227,8 +3227,8 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 	if (class[2] == 'C') {
 		SEXP p0 = PROTECT(GET_SLOT(from, Matrix_pSym)),
 			i0 = PROTECT(GET_SLOT(from, Matrix_iSym)),
-			p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) m + 1)),
-			j1 = PROTECT(allocVector(INTSXP, INTEGER(p0)[n]));
+			p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) m + 1)),
+			j1 = PROTECT(Rf_allocVector(INTSXP, INTEGER(p0)[n]));
 		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
 			*pp1 = INTEGER(p1), *pj1 = INTEGER(j1), *iwork = NULL;
 		SET_SLOT(to, Matrix_pSym, p1);
@@ -3240,7 +3240,7 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			c##TYPE *px0 = NULL, *px1 = NULL; \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, INTEGER(p0)[n])); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, INTEGER(p0)[n])); \
 			px0 = c##PTR(x0); \
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
@@ -3277,14 +3277,14 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 			Matrix_Calloc(work, nnz, c##TYPE); \
 			); \
 			c##tspsort(pp1, pj1, px1, pj0, pi0, px0, n, m, &nnz, iwork, work); \
-			PROTECT(p1 = allocVector(INTSXP, (R_xlen_t) m + 1)), \
-			PROTECT(j1 = allocVector(INTSXP, nnz)); \
+			PROTECT(p1 = Rf_allocVector(INTSXP, (R_xlen_t) m + 1)), \
+			PROTECT(j1 = Rf_allocVector(INTSXP, nnz)); \
 			pp1 = INTEGER(p1); \
 			pj1 = INTEGER(j1); \
 			SET_SLOT(to, Matrix_pSym, p1); \
 			SET_SLOT(to, Matrix_jSym, j1); \
 			c##IF_NPATTERN( \
-			SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+			SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 			px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			); \
@@ -3377,14 +3377,14 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 	if (XLENGTH(i0) == nnz)
 		SET_SLOT(to, iSym, i0);
 	else {
-		SEXP i1 = PROTECT(allocVector(INTSXP, nnz));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, nnz));
 		memcpy(INTEGER(i1), INTEGER(i0), sizeof(int) * (size_t) nnz);
 		SET_SLOT(to, iSym, i1);
 		UNPROTECT(1); /* i1 */
 	}
 
 	SEXP jSym = (class[2] == 'C') ? Matrix_jSym : Matrix_iSym,
-		j1 = PROTECT(allocVector(INTSXP, nnz));
+		j1 = PROTECT(Rf_allocVector(INTSXP, nnz));
 	int *pj1 = INTEGER(j1), j, k, kend;
 	SET_SLOT(to, jSym, j1);
 	for (j = 0, k = 0; j < n; ++j) {
@@ -3398,7 +3398,7 @@ SEXP sparse_as_Tsparse(SEXP from, const char *class)
 		if (XLENGTH(x0) == nnz)
 			SET_SLOT(to, Matrix_xSym, x0);
 		else {
-			SEXP x1 = PROTECT(allocVector(TYPEOF(x0), nnz));
+			SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), nnz));
 
 #define SAT(c) memcpy(c##PTR(x1), c##PTR(x0), sizeof(c##TYPE) * (size_t) nnz)
 
@@ -3438,7 +3438,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 		return to;
 	PROTECT(to);
 
-	SEXP length = PROTECT(allocVector((vlen <= INT_MAX) ? INTSXP : REALSXP, 1));
+	SEXP length = PROTECT(Rf_allocVector((vlen <= INT_MAX) ? INTSXP : REALSXP, 1));
 	if (TYPEOF(length) == INTSXP)
 	INTEGER(length)[0] = (int) vlen;
 	else
@@ -3461,7 +3461,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 
 #undef COUNT
 
-	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz));
+	SEXP i1 = PROTECT(Rf_allocVector(TYPEOF(length), nnz));
 	SET_SLOT(to, Matrix_iSym, i1);
 
 #define VAV(c) \
@@ -3477,7 +3477,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 		d##TYPE *pi1 = d##PTR(i1); \
 		c##TYPE *px0 = c##PTR(x0); \
 		c##IF_NPATTERN( \
-		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+		SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 		c##TYPE *px1 = c##PTR(x1); \
 		); \
 		for (k = 0; k < vlen; ++k) \
@@ -3537,7 +3537,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 		return to;
 	PROTECT(to);
 
-	SEXP length = PROTECT(allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	SEXP length = PROTECT(Rf_allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
 	if (TYPEOF(length) == INTSXP)
 	INTEGER(length)[0] = (int) mn;
 	else
@@ -3561,7 +3561,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 		return to;
 	}
 
-	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz));
+	SEXP i1 = PROTECT(Rf_allocVector(TYPEOF(length), nnz));
 	SET_SLOT(to, Matrix_iSym, i1);
 
 #define SAV(c) \
@@ -3581,7 +3581,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 			d##TYPE *pi1 = d##PTR(i1), l = (d##TYPE) 1, dl = (d##TYPE) m; \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
@@ -3622,7 +3622,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 			d##TYPE *pi1 = d##PTR(i1); \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, nnz)); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(to, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
@@ -3676,7 +3676,7 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 		return to;
 	PROTECT(to);
 
-	SEXP length = PROTECT(allocVector((nn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	SEXP length = PROTECT(Rf_allocVector((nn <= INT_MAX) ? INTSXP : REALSXP, 1));
 	if (TYPEOF(length) == INTSXP)
 	INTEGER(length)[0] = (int) nn;
 	else
@@ -3709,7 +3709,7 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 
 	}
 
-	SEXP i1 = PROTECT(allocVector(TYPEOF(length), nnz1));
+	SEXP i1 = PROTECT(Rf_allocVector(TYPEOF(length), nnz1));
 	SET_SLOT(to, Matrix_iSym, i1);
 
 #define DAV(c) \
@@ -3725,7 +3725,7 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 		d##TYPE *pi1 = d##PTR(i1), l = (d##TYPE) 1, dl = (d##TYPE) (n + 1); \
 		c##TYPE *px0 = c##PTR(x0); \
 		c##IF_NPATTERN( \
-		SEXP x1 = PROTECT(allocVector(c##TYPESXP, nnz1)); \
+		SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, nnz1)); \
 		c##TYPE *px1 = c##PTR(x1); \
 		SET_SLOT(to, Matrix_xSym, x1); \
 		UNPROTECT(1); /* x1 */ \
@@ -3770,7 +3770,7 @@ SEXP index_as_Vector(SEXP from, const char *class)
 		return to;
 	PROTECT(to);
 
-	SEXP length = PROTECT(allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
+	SEXP length = PROTECT(Rf_allocVector((mn <= INT_MAX) ? INTSXP : REALSXP, 1));
 	if (TYPEOF(length) == INTSXP)
 	INTEGER(length)[0] = (int) mn;
 	else
@@ -3784,7 +3784,7 @@ SEXP index_as_Vector(SEXP from, const char *class)
 	SEXP perm = PROTECT(GET_SLOT(from, Matrix_permSym));
 	int *pperm = INTEGER(perm);
 
-	SEXP i1 = PROTECT(allocVector(TYPEOF(length), (mg == 0) ? m : n));
+	SEXP i1 = PROTECT(Rf_allocVector(TYPEOF(length), (mg == 0) ? m : n));
 	SET_SLOT(to, Matrix_iSym, i1);
 
 	if (mg == 0) {

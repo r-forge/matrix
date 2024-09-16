@@ -495,7 +495,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 
 #define BIND(c) \
 		do { \
-			SEXP x = PROTECT(allocVector(c##TYPESXP, mn)); \
+			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, mn)); \
 			c##TYPE *px = c##PTR(x), *ps; \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
 				s = CAR(a); \
@@ -569,7 +569,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 
 	} else if ((repr == 'C' && margin) || (repr == 'R' && !margin)) {
 
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1));
+		SEXP p = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) rdim[margin] + 1));
 		int *pp = INTEGER(p);
 		SET_SLOT(ans, Matrix_pSym, p);
 
@@ -595,7 +595,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				*(pp++) = nnz = nnz + (psp[j + 1] - psp[j]);
 		}
 
-		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
+		SEXP i = PROTECT(Rf_allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi;
 		SET_SLOT(ans, iSym, i);
@@ -603,7 +603,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 #define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
-			SEXP x = PROTECT(allocVector(kindToType(kind), nnz)), sx; \
+			SEXP x = PROTECT(Rf_allocVector(kindToType(kind), nnz)), sx; \
 			c##TYPE *px = c##PTR(x), *psx; \
 			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
@@ -648,7 +648,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 
 	} else if ((repr == 'C' && !margin) || (repr == 'R' && margin)) {
 
-		SEXP p = PROTECT(allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
+		SEXP p = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) rdim[!margin] + 1));
 		int *pp = INTEGER(p);
 		SET_SLOT(ans, Matrix_pSym, p);
 		memset(pp, 0, sizeof(int) * ((size_t) rdim[!margin] + 1));
@@ -675,7 +675,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		--pp;
 
 		int nnz = pp[n];
-		SEXP i = PROTECT(allocVector(INTSXP, nnz)), si,
+		SEXP i = PROTECT(Rf_allocVector(INTSXP, nnz)), si,
 			iSym = (repr == 'C') ? Matrix_iSym : Matrix_jSym;
 		int *pi = INTEGER(i), *psi, *work, k, kend, pos = 0;
 		SET_SLOT(ans, iSym, i);
@@ -685,7 +685,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 #define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
-			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
+			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, nnz)), sx; \
 			c##TYPE *px = c##PTR(x), *psx; \
 			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
@@ -750,8 +750,8 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		}
 
 		SEXP si, sj,
-			i = PROTECT(allocVector(INTSXP, nnz)),
-			j = PROTECT(allocVector(INTSXP, nnz));
+			i = PROTECT(Rf_allocVector(INTSXP, nnz)),
+			j = PROTECT(Rf_allocVector(INTSXP, nnz));
 		int *psi, *psj, *pi = INTEGER(i), *pj = INTEGER(j), pos = 0;
 		SET_SLOT(ans, Matrix_iSym, i);
 		SET_SLOT(ans, Matrix_jSym, j);
@@ -759,7 +759,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 #define BIND(c) \
 		do { \
 			c##IF_NPATTERN( \
-			SEXP x = PROTECT(allocVector(c##TYPESXP, nnz)), sx; \
+			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, nnz)), sx; \
 			c##TYPE *px = c##PTR(x), *psx; \
 			); \
 			for (a = args; a != R_NilValue; a = CDR(a)) { \
@@ -814,7 +814,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 
 	} else {
 
-		SEXP p = PROTECT(allocVector(INTSXP, rdim[margin])), sp;
+		SEXP p = PROTECT(Rf_allocVector(INTSXP, rdim[margin])), sp;
 		int *pp = INTEGER(p);
 		for (a = args; a != R_NilValue; a = CDR(a)) {
 			s = CAR(a);
@@ -877,7 +877,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 		int i, r = -1, pos = 0, nprotect = 1;
 		const char *scl;
 		if (rdimnames[margin]) {
-			PROTECT(marnames = allocVector(STRSXP, rdim[margin]));
+			PROTECT(marnames = Rf_allocVector(STRSXP, rdim[margin]));
 			++nprotect;
 			SET_VECTOR_ELT(dimnames, margin, marnames);
 		}
@@ -916,7 +916,7 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 				if (TAG(a) != tagWasVector)
 					nms[margin] = Rf_coerceVector(TAG(a), STRSXP);
 				else if (level == 2) {
-					PROTECT(nms_ = allocVector(EXPRSXP, 1));
+					PROTECT(nms_ = Rf_allocVector(EXPRSXP, 1));
 					SET_VECTOR_ELT(nms_, 0, CAR(e));
 					nms[margin] = Rf_coerceVector(nms_, STRSXP);
 					UNPROTECT(1);
@@ -948,5 +948,5 @@ SEXP R_bind(SEXP args)
 	args = CDR(args);  level = CAR(args);
 	args = CDR(args); margin = CAR(args);
 	args = CDR(args);  exprs = CAR(args);
-	return bind(CDR(args), CDR(exprs), asInteger(margin), asInteger(level));
+	return bind(CDR(args), CDR(exprs), Rf_asInteger(margin), Rf_asInteger(level));
 }

@@ -56,7 +56,7 @@ SEXP checkpi(SEXP dim, SEXP p, SEXP i)
 			++k;
 		}
 	}
-	SEXP ans = allocVector(LGLSXP, 1);
+	SEXP ans = Rf_allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = sorted;
 	return ans;
 }
@@ -103,7 +103,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 {
 	/* FIXME? 'cs_qrsol' supports underdetermined systems.  */
 	/*        We should only require LENGTH(b) = max(m, n). */
-	int order_ = asInteger(order);
+	int order_ = Rf_asInteger(order);
 	if (order_ < 0 || order_ > 3)
 		order_ = 0;
 	Matrix_cs *A = M2CXS(a, 1);
@@ -118,7 +118,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	if (!Matrix_cs_qrsol(order_, A, REAL(b)))
 		error(_("'%s' failed"), "cs_qrsol");
 	if (A->n < A->m) {
-		SEXP tmp = allocVector(REALSXP, A->n);
+		SEXP tmp = Rf_allocVector(REALSXP, A->n);
 		memcpy(REAL(tmp), REAL(b), sizeof(double) * (size_t) A->n);
 		b = tmp;
 	}
@@ -170,20 +170,20 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 		error(_("'%s' failed"), "cholmod_sdmult");
 
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
-	SEXP ans = PROTECT(mkNamed(VECSXP, nms)), tmp;
+	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
 	/* L : */
 	PROTECT(tmp = CHF2M(L, 1));
 	SET_VECTOR_ELT(ans, 0, tmp);
 	/* coef : */
-	PROTECT(tmp = allocVector(REALSXP, (R_xlen_t) At->nrow));
+	PROTECT(tmp = Rf_allocVector(REALSXP, (R_xlen_t) At->nrow));
 	memcpy(REAL(tmp),   C->x, sizeof(double) * At->nrow);
 	SET_VECTOR_ELT(ans, 1, tmp);
 	/* Xty : */
-	PROTECT(tmp = allocVector(REALSXP, (R_xlen_t) At->nrow));
+	PROTECT(tmp = Rf_allocVector(REALSXP, (R_xlen_t) At->nrow));
 	memcpy(REAL(tmp), AtB->x, sizeof(double) * At->nrow);
 	SET_VECTOR_ELT(ans, 2, tmp);
 	/* resid : */
-	PROTECT(tmp = allocVector(REALSXP, (R_xlen_t) At->ncol));
+	PROTECT(tmp = Rf_allocVector(REALSXP, (R_xlen_t) At->ncol));
 	memcpy(REAL(tmp),   R->x, sizeof(double) * At->ncol);
 	SET_VECTOR_ELT(ans, 3, tmp);
 
@@ -237,7 +237,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	double *px = REAL(x), tmp;
 
-	SEXP ans = PROTECT(allocVector(REALSXP, len));
+	SEXP ans = PROTECT(Rf_allocVector(REALSXP, len));
 	double *pans = REAL(ans);
 
 	switch (ivalid) {
@@ -346,52 +346,52 @@ SEXP Csparse_dmperm(SEXP x, SEXP nans, SEXP seed)
 {
 	Matrix_cs *A = M2CXS(x, 0);
 	CXSPARSE_XTYPE_SET(A->xtype);
-	Matrix_csd *D = Matrix_cs_dmperm(A, asInteger(seed));
+	Matrix_csd *D = Matrix_cs_dmperm(A, Rf_asInteger(seed));
 	if (!D)
 		return R_NilValue; /* MJ: why not an error ... ? */
-	int len = asInteger(nans);
+	int len = Rf_asInteger(nans);
 	if (len < 0)
 		len = 0;
 	else if (len > 6)
 		len = 6;
-	SEXP nms = PROTECT(allocVector(STRSXP, len)),
-		ans = PROTECT(allocVector(VECSXP, len)), tmp;
+	SEXP nms = PROTECT(Rf_allocVector(STRSXP, len)),
+		ans = PROTECT(Rf_allocVector(VECSXP, len)), tmp;
 	int k = len - 1;
 	switch (len) {
 	case 6:
-		SET_STRING_ELT(nms, k, mkChar("cc5"));
-		tmp = allocVector(INTSXP, 5);
+		SET_STRING_ELT(nms, k, Rf_mkChar("cc5"));
+		tmp = Rf_allocVector(INTSXP, 5);
 		memcpy(INTEGER(tmp), D->cc, sizeof(int) * 5);
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 5:
-		SET_STRING_ELT(nms, k, mkChar("rr5"));
-		tmp = allocVector(INTSXP, 5);
+		SET_STRING_ELT(nms, k, Rf_mkChar("rr5"));
+		tmp = Rf_allocVector(INTSXP, 5);
 		memcpy(INTEGER(tmp), D->rr, sizeof(int) * 5);
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 4:
-		SET_STRING_ELT(nms, k, mkChar("s"));
-		tmp = allocVector(INTSXP, D->nb + 1);
+		SET_STRING_ELT(nms, k, Rf_mkChar("s"));
+		tmp = Rf_allocVector(INTSXP, D->nb + 1);
 		memcpy(INTEGER(tmp), D->s , sizeof(int) * (size_t) (D->nb + 1));
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 3:
-		SET_STRING_ELT(nms, k, mkChar("r"));
-		tmp = allocVector(INTSXP, D->nb + 1);
+		SET_STRING_ELT(nms, k, Rf_mkChar("r"));
+		tmp = Rf_allocVector(INTSXP, D->nb + 1);
 		memcpy(INTEGER(tmp), D->r , sizeof(int) * (size_t) (D->nb + 1));
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 2:
-		SET_STRING_ELT(nms, k, mkChar("q"));
-		tmp = allocVector(INTSXP, A->n);
+		SET_STRING_ELT(nms, k, Rf_mkChar("q"));
+		tmp = Rf_allocVector(INTSXP, A->n);
 		for (int j = 0, *q0 = D->q, *q1 = INTEGER(tmp); j < A->n; ++j)
 			q1[j] = q0[j] + 1;
 		SET_VECTOR_ELT(ans, k, tmp);
 		k--;
 	case 1:
-		SET_STRING_ELT(nms, k, mkChar("p"));
-		tmp = allocVector(INTSXP, A->m);
+		SET_STRING_ELT(nms, k, Rf_mkChar("p"));
+		tmp = Rf_allocVector(INTSXP, A->m);
 		for (int i = 0, *p0 = D->p, *p1 = INTEGER(tmp); i < A->m; ++i)
 			p1[i] = p0[i] + 1;
 		SET_VECTOR_ELT(ans, k, tmp);
@@ -426,7 +426,7 @@ SEXP Csparse_writeMM(SEXP obj, SEXP file)
 	}
 
 	cholmod_sparse *A = M2CHS(obj, 1);
-	const char *filename = CHAR(asChar(file));
+	const char *filename = CHAR(Rf_asChar(file));
 	FILE *f = fopen(filename, "w");
 	if (!f)
 		error(_("failed to open file \"%s\" for writing"), filename);

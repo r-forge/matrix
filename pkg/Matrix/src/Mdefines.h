@@ -42,17 +42,9 @@
 #include <Rversion.h> /* R_VERSION, ... */
 
 #ifdef R_NO_REMAP
-#define allocVector       Rf_allocVector
-#define asChar            Rf_asChar
-#define asInteger         Rf_asInteger
-#define asLogical         Rf_asLogical
-#define asReal            Rf_asReal
 #define dimnamesgets      Rf_dimnamesgets
 #define error             Rf_error
 #define getAttrib         Rf_getAttrib
-#define mkChar            Rf_mkChar
-#define mkNamed           Rf_mkNamed
-#define mkString          Rf_mkString
 #define setAttrib         Rf_setAttrib
 #define warning           Rf_warning
 #endif
@@ -90,8 +82,8 @@ do { \
 #endif
 #define _(String) dgettext(Matrix_TranslationDomain, String)
 
-#define errorChar(...)   mkChar  (Matrix_sprintf(__VA_ARGS__))
-#define errorString(...) mkString(Matrix_sprintf(__VA_ARGS__))
+#define errorChar(...)   Rf_mkChar  (Matrix_sprintf(__VA_ARGS__))
+#define errorString(...) Rf_mkString(Matrix_sprintf(__VA_ARGS__))
 
 #define HAS_SLOT(x, name)        R_has_slot      (x, name)
 #define GET_SLOT(x, name)        R_do_slot       (x, name)

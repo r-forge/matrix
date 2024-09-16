@@ -6,17 +6,17 @@
 static
 SEXP mkDet(double modulus, int logarithm, int sign)
 {
-	SEXP nms = PROTECT(allocVector(STRSXP, 2)),
-		cl = PROTECT(mkString("det")),
-		det = PROTECT(allocVector(VECSXP, 2)),
+	SEXP nms = PROTECT(Rf_allocVector(STRSXP, 2)),
+		cl = PROTECT(Rf_mkString("det")),
+		det = PROTECT(Rf_allocVector(VECSXP, 2)),
 		det0 = PROTECT(Rf_ScalarReal((logarithm) ? modulus : exp(modulus))),
 		det1 = PROTECT(Rf_ScalarInteger(sign)),
 		det0a = PROTECT(Rf_ScalarLogical(logarithm));
 	static SEXP logarithmSym = NULL;
 	if (!logarithmSym)
 		logarithmSym = Rf_install("logarithm");
-	SET_STRING_ELT(nms, 0, mkChar("modulus"));
-	SET_STRING_ELT(nms, 1, mkChar("sign"));
+	SET_STRING_ELT(nms, 0, Rf_mkChar("modulus"));
+	SET_STRING_ELT(nms, 1, Rf_mkChar("sign"));
 	setAttrib(det, R_NamesSymbol, nms);
 	setAttrib(det, R_ClassSymbol, cl);
 	setAttrib(det0, logarithmSym, det0a);
@@ -34,7 +34,7 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
 	if (m != n) \
 		error(_("determinant of non-square matrix is undefined")); \
-	int givelog = asLogical(s_logarithm); \
+	int givelog = Rf_asLogical(s_logarithm); \
 	double modulus = 0.0; /* result for n == 0 */
 
 	DETERMINANT_START(s_trf);
@@ -373,7 +373,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
 	int sign = 1;
 
 	if (n > 0) {
-	int j, root = asLogical(s_root);
+	int j, root = Rf_asLogical(s_root);
 	if (L->is_super) {
 		int k, nc,
 			nsuper = (int) L->nsuper,

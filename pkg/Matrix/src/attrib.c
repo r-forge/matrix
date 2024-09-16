@@ -53,7 +53,7 @@ void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 	}
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
 	if (s != R_NilValue) {
-		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
+		SEXP destnms = PROTECT(Rf_allocVector(STRSXP, 2));
 		if (CHAR(s = STRING_ELT(s, J))[0] != '\0') {
 			SET_STRING_ELT(destnms, 0, s);
 			SET_STRING_ELT(destnms, 1, s);
@@ -73,7 +73,7 @@ void revDN(SEXP dest, SEXP src) {
 		SET_VECTOR_ELT(dest, 0, s);
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
 	if (s != R_NilValue) {
-		SEXP srcnms = s, destnms = PROTECT(allocVector(STRSXP, 2));
+		SEXP srcnms = s, destnms = PROTECT(Rf_allocVector(STRSXP, 2));
 		if (CHAR(s = STRING_ELT(srcnms, 0))[0] != '\0')
 			SET_STRING_ELT(destnms, 1, s);
 		if (CHAR(s = STRING_ELT(srcnms, 1))[0] != '\0')
@@ -89,7 +89,7 @@ SEXP R_symDN(SEXP s_dn)
 {
 	if (DimNames_is_trivial(s_dn))
 		return s_dn;
-	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 	symDN(newdn, s_dn, -1);
 	UNPROTECT(1);
 	return newdn;
@@ -99,7 +99,7 @@ SEXP R_revDN(SEXP s_dn)
 {
 	if (DimNames_is_trivial(s_dn))
 		return s_dn;
-	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 	revDN(newdn, s_dn);
 	UNPROTECT(1);
 	return newdn;
@@ -111,7 +111,7 @@ SEXP get_symmetrized_DimNames(SEXP obj, int J) {
 		UNPROTECT(1);
 		return dn;
 	}
-	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 	symDN(newdn, dn, J);
 	UNPROTECT(2);
 	return newdn;
@@ -123,7 +123,7 @@ SEXP get_reversed_DimNames(SEXP obj) {
 		UNPROTECT(1);
 		return dn;
 	}
-	SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 	revDN(newdn, dn);
 	UNPROTECT(2);
 	return newdn;
@@ -131,7 +131,7 @@ SEXP get_reversed_DimNames(SEXP obj) {
 
 void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
 	if (!DimNames_is_trivial(dn)) {
-		SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+		SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 		symDN(newdn, dn, J);
 		SET_SLOT(obj, Matrix_DimNamesSym, newdn);
 		UNPROTECT(1);
@@ -141,7 +141,7 @@ void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
 
 void set_reversed_DimNames(SEXP obj, SEXP dn) {
 	if (!DimNames_is_trivial(dn)) {
-		SEXP newdn = PROTECT(allocVector(VECSXP, 2));
+		SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
 		revDN(newdn, dn);
 		SET_SLOT(obj, Matrix_DimNamesSym, newdn);
 		UNPROTECT(1);
@@ -188,18 +188,18 @@ void set_factor(SEXP obj, const char *nm, SEXP val)
 		return;
 	}
 	R_xlen_t n = XLENGTH(factors);
-	SEXP factors1 = PROTECT(allocVector(VECSXP, n + 1)),
-		nms1 = PROTECT(allocVector(STRSXP, n + 1));
+	SEXP factors1 = PROTECT(Rf_allocVector(VECSXP, n + 1)),
+		nms1 = PROTECT(Rf_allocVector(STRSXP, n + 1));
 	for (i = 0; i < n; ++i) {
 		SET_VECTOR_ELT(factors1, i, VECTOR_ELT(factors, i));
 		if (nms != R_NilValue)
 		SET_STRING_ELT(    nms1, i, STRING_ELT(    nms, i));
 	}
-	SET_VECTOR_ELT(factors1, n,                 val);
-	SET_STRING_ELT(    nms1, n, PROTECT(mkChar(nm)));
+	SET_VECTOR_ELT(factors1, n,           val);
+	SET_STRING_ELT(    nms1, n, Rf_mkChar(nm));
 	setAttrib(factors1, R_NamesSymbol, nms1);
 	SET_SLOT(obj, Matrix_factorsSym, factors1);
-	UNPROTECT(7);
+	UNPROTECT(6);
 	return;
 }
 
@@ -210,7 +210,7 @@ SEXP R_set_factor(SEXP s_obj, SEXP s_nm, SEXP s_val, SEXP s_warn)
 		error(_("invalid factor name"));
 	else if (TYPEOF(getAttrib(s_obj, Matrix_factorsSym)) == VECSXP)
 		set_factor(s_obj, CHAR(s_nm), s_val);
-	else if (asLogical(s_warn))
+	else if (Rf_asLogical(s_warn))
 		warning(_("attempt to set factor on %s without '%s' slot"),
 		        "Matrix", "factors");
 	return s_val;

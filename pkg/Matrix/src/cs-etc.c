@@ -52,8 +52,8 @@ SEXP CXS2M(Matrix_cs *A, int values, char shape)
 	int nnz = A->p[A->n];
 	SEXP obj = PROTECT(newObject(class)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		p = PROTECT(allocVector(INTSXP, (R_xlen_t) A->n + 1)),
-		i = PROTECT(allocVector(INTSXP, nnz));
+		p = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) A->n + 1)),
+		i = PROTECT(Rf_allocVector(INTSXP, nnz));
 	INTEGER(dim)[0] = A->m;
 	INTEGER(dim)[1] = A->n;
 	memcpy(INTEGER(p), A->p, sizeof(int) * ((size_t) A->n + 1));
@@ -63,10 +63,10 @@ SEXP CXS2M(Matrix_cs *A, int values, char shape)
 	if (values) {
 	SEXP x;
 	if (A->xtype == CXSPARSE_REAL) {
-		PROTECT(x = allocVector(REALSXP, nnz));
+		PROTECT(x = Rf_allocVector(REALSXP, nnz));
 		memcpy(REAL(x), A->x, sizeof(double) * (size_t) nnz);
 	} else {
-		PROTECT(x = allocVector(CPLXSXP, nnz));
+		PROTECT(x = Rf_allocVector(CPLXSXP, nnz));
 		memcpy(COMPLEX(x), A->x, sizeof(Rcomplex) * (size_t) nnz);
 	}
 	SET_SLOT(obj, Matrix_xSym, x);

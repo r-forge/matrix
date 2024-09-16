@@ -6,14 +6,14 @@
 SEXP R_Matrix_version(void)
 {
 	SEXP ans, nms;
-	PROTECT(ans = allocVector(INTSXP, 3));
+	PROTECT(ans = Rf_allocVector(INTSXP, 3));
 	INTEGER(ans)[0] = MATRIX_PACKAGE_VERSION;
 	INTEGER(ans)[1] = MATRIX_ABI_VERSION;
 	INTEGER(ans)[2] = MATRIX_SUITESPARSE_VERSION;
-	PROTECT(nms = allocVector(STRSXP, 3));
-	SET_STRING_ELT(nms, 0, mkChar("package"));
-	SET_STRING_ELT(nms, 1, mkChar("abi"));
-	SET_STRING_ELT(nms, 2, mkChar("suitesparse"));
+	PROTECT(nms = Rf_allocVector(STRSXP, 3));
+	SET_STRING_ELT(nms, 0, Rf_mkChar("package"));
+	SET_STRING_ELT(nms, 1, Rf_mkChar("abi"));
+	SET_STRING_ELT(nms, 2, Rf_mkChar("suitesparse"));
 	setAttrib(ans, R_NamesSymbol, nms);
 	UNPROTECT(2);
 	return ans;
@@ -22,8 +22,8 @@ SEXP R_Matrix_version(void)
 SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 {
 	SEXP r;
-	int i, j, n = asInteger(s_n), packed = asLogical(s_packed),
-		upper = asLogical(s_upper), diag = asLogical(s_diag);
+	int i, j, n = Rf_asInteger(s_n), packed = Rf_asLogical(s_packed),
+		upper = Rf_asLogical(s_upper), diag = Rf_asLogical(s_diag);
 	int_fast64_t
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn,
@@ -86,14 +86,14 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 
 	if (nx > INT_MAX) {
 
-		PROTECT(r = allocVector(REALSXP, (R_xlen_t) nr));
+		PROTECT(r = Rf_allocVector(REALSXP, (R_xlen_t) nr));
 		double k = 1.0, nr_ = (double) nr, *pr = REAL(r);
 
 		DO_INDEX;
 
 	} else {
 
-		PROTECT(r = allocVector(INTSXP, (R_xlen_t) nr));
+		PROTECT(r = Rf_allocVector(INTSXP, (R_xlen_t) nr));
 		int k = 1, nr_ = (int) nr, *pr = INTEGER(r);
 
 		DO_INDEX;
@@ -109,8 +109,8 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 {
 	SEXP r;
-	int j, n = asInteger(s_n), packed = asLogical(s_packed),
-		upper = asLogical(s_upper);
+	int j, n = Rf_asInteger(s_n), packed = Rf_asLogical(s_packed),
+		upper = Rf_asLogical(s_upper);
 	int_fast64_t
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn;
@@ -139,14 +139,14 @@ SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 
 	if (nx > INT_MAX) {
 
-		PROTECT(r = allocVector(REALSXP, n));
+		PROTECT(r = Rf_allocVector(REALSXP, n));
 		double k = 1.0, *pr = REAL(r);
 
 		DO_INDEX;
 
 	} else {
 
-		PROTECT(r = allocVector(INTSXP, n));
+		PROTECT(r = Rf_allocVector(INTSXP, n));
 		int k = 1, *pr = INTEGER(r);
 		DO_INDEX;
 
@@ -160,9 +160,9 @@ SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 
 SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 {
-	int countNA = asLogical(s_countNA);
+	int countNA = Rf_asLogical(s_countNA);
 	R_xlen_t n = XLENGTH(s_x), nnz = 0;
-	double nnzmax = asReal(s_nnzmax);
+	double nnzmax = Rf_asReal(s_nnzmax);
 	if (!ISNAN(nnzmax) && nnzmax >= 0.0 && nnzmax < (double) n)
 		n = (R_xlen_t) nnzmax;
 
@@ -330,17 +330,17 @@ SEXP Mmatrix(SEXP args)
 	lendat = XLENGTH(vals);
 	snr = CAR(args); args = CDR(args);
 	snc = CAR(args); args = CDR(args);
-	byrow = asLogical(CAR(args)); args = CDR(args);
+	byrow = Rf_asLogical(CAR(args)); args = CDR(args);
 	if (byrow == NA_INTEGER)
 		error(_("invalid '%s' argument"), "byrow");
 	dimnames = CAR(args);
 	args = CDR(args);
-	miss_nr = asLogical(CAR(args)); args = CDR(args);
-	miss_nc = asLogical(CAR(args));
+	miss_nr = Rf_asLogical(CAR(args)); args = CDR(args);
+	miss_nc = Rf_asLogical(CAR(args));
 
 	if (!miss_nr) {
 		if (!Rf_isNumeric(snr)) error(_("non-numeric matrix extent"));
-		nr = asInteger(snr);
+		nr = Rf_asInteger(snr);
 		if (nr == NA_INTEGER)
 			error(_("invalid 'nrow' value (too large or NA)"));
 		if (nr < 0)
@@ -348,7 +348,7 @@ SEXP Mmatrix(SEXP args)
 	}
 	if (!miss_nc) {
 		if (!Rf_isNumeric(snc)) error(_("non-numeric matrix extent"));
-		nc = asInteger(snc);
+		nc = Rf_asInteger(snc);
 		if (nc == NA_INTEGER)
 			error(_("invalid 'ncol' value (too large or NA)"));
 		if (nc < 0)
@@ -464,7 +464,7 @@ int *expand_cmprPt(int ncol, const int mp[], int mj[])
  */
 SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 {
-    int col = asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
+    int col = Rf_asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
     SEXP ans, indSym = col ? Matrix_iSym : Matrix_jSym;
     SEXP indP = PROTECT(GET_SLOT(x, indSym)),
 	 pP   = PROTECT(GET_SLOT(x, Matrix_pSym));
@@ -492,7 +492,7 @@ SEXP Matrix_expand_pointers(SEXP pP)
 {
 	int n = Rf_length(pP) - 1;
 	int *p = INTEGER(pP);
-	SEXP ans = PROTECT(allocVector(INTSXP, p[n]));
+	SEXP ans = PROTECT(Rf_allocVector(INTSXP, p[n]));
 
 	expand_cmprPt(n, p, INTEGER(ans));
 	UNPROTECT(1);
@@ -512,7 +512,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 {
 	SEXP ans;
 	int *ij_di = NULL, n, nprot=1;
-	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
+	int check_bounds = Rf_asLogical(chk_bnds), one_ind = Rf_asLogical(orig_1);
 
 	if (TYPEOF(di) != INTSXP) {
 		di = PROTECT(Rf_coerceVector(di, INTSXP));
@@ -530,7 +530,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 		*j_ = IJ+n;/* pointer offset! */
 
 	if ((Di[0] * (double) Di[1]) >= 1 + (double)INT_MAX) { /* need double */
-		ans = PROTECT(allocVector(REALSXP, n));
+		ans = PROTECT(Rf_allocVector(REALSXP, n));
 		double *ii = REAL(ans), nr = (double) Di[0];
 
 #define do_ii_FILL(_i_, _j_) \
@@ -566,7 +566,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 
 		do_ii_FILL(IJ, j_);
 	} else {
-	ans = PROTECT(allocVector(INTSXP, n));
+	ans = PROTECT(Rf_allocVector(INTSXP, n));
 	int *ii = INTEGER(ans), nr = Di[0];
 
 	do_ii_FILL(IJ, j_);
@@ -590,7 +590,7 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 {
 	SEXP ans;
 	int n = LENGTH(i), nprot = 1;
-	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
+	int check_bounds = Rf_asLogical(chk_bnds), one_ind = Rf_asLogical(orig_1);
 
 	if (TYPEOF(di)!= INTSXP) {
 		di = PROTECT(Rf_coerceVector(di,INTSXP));
@@ -610,12 +610,12 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 	int *Di = INTEGER(di), *i_ = INTEGER(i), *j_ = INTEGER(j);
 
 	if ((Di[0] * (double) Di[1]) >= 1 + (double) INT_MAX) { /* need double */
-		ans = PROTECT(allocVector(REALSXP, n));
+		ans = PROTECT(Rf_allocVector(REALSXP, n));
 		double *ii = REAL(ans), nr = (double) Di[0];
 
 		do_ii_FILL(i_, j_);
 	} else {
-		ans = PROTECT(allocVector(INTSXP, n));
+		ans = PROTECT(Rf_allocVector(INTSXP, n));
 		int *ii = INTEGER(ans), nr = Di[0];
 
 		do_ii_FILL(i_, j_);

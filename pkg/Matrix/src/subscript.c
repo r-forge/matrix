@@ -36,7 +36,7 @@ static
 SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -134,7 +134,7 @@ static
 SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 {
 	R_xlen_t slen = XLENGTH(s);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -265,7 +265,7 @@ static
 SEXP diagonal_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -311,7 +311,7 @@ static
 SEXP index_subscript_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
-	SEXP ans = allocVector(LGLSXP, slen);
+	SEXP ans = Rf_allocVector(LGLSXP, slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -396,7 +396,7 @@ static
 SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -493,7 +493,7 @@ static
 SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 {
 	int slen = (int) (XLENGTH(s) / 2);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -619,7 +619,7 @@ static
 SEXP diagonal_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
-	SEXP ans = allocVector(kindToType(class[0]), slen);
+	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -659,7 +659,7 @@ static
 SEXP index_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
-	SEXP ans = allocVector(LGLSXP, slen);
+	SEXP ans = Rf_allocVector(LGLSXP, slen);
 	if (slen == 0)
 		return ans;
 	PROTECT(ans);
@@ -917,19 +917,19 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 	if (cl[1] != 'g' && ul1 != 'U') {
 		SEXP uplo = GET_SLOT(ans, Matrix_uploSym);
-		SET_STRING_ELT(uplo, 0, mkChar("L"));
+		SET_STRING_ELT(uplo, 0, Rf_mkChar("L"));
 	}
 	if (cl[1] == 's' && ct1 != 'C' && cl[0] == 'z') {
 		SEXP trans = GET_SLOT(ans, Matrix_transSym);
-		SET_STRING_ELT(trans, 0, mkChar("T"));
+		SET_STRING_ELT(trans, 0, Rf_mkChar("T"));
 	}
 	if (cl[1] == 't' && nu1 != 'N') {
 		SEXP diag = GET_SLOT(ans, Matrix_diagSym);
-		SET_STRING_ELT(diag, 0, mkChar("U"));
+		SET_STRING_ELT(diag, 0, Rf_mkChar("U"));
 	}
 
 	SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		x1 = PROTECT(allocVector(TYPEOF(x0), (R_xlen_t) xlen));
+		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), (R_xlen_t) xlen));
 	SET_SLOT(ans, Matrix_xSym, x1);
 
 	int_fast64_t i, j;
@@ -1180,21 +1180,21 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 	if (cl[1] != 'g' && (mg == (ul1 != 'U'))) {
 		SEXP uplo = GET_SLOT(ans, Matrix_uploSym);
-		SET_STRING_ELT(uplo, 0, mkChar("L"));
+		SET_STRING_ELT(uplo, 0, Rf_mkChar("L"));
 	}
 	if (cl[1] == 's' && ct1 != 'C' && cl[0] == 'z') {
 		SEXP trans = GET_SLOT(ans, Matrix_transSym);
-		SET_STRING_ELT(trans, 0, mkChar("T"));
+		SET_STRING_ELT(trans, 0, Rf_mkChar("T"));
 	}
 	if (cl[1] == 't' && nu1 != 'N') {
 		SEXP diag = GET_SLOT(ans, Matrix_diagSym);
-		SET_STRING_ELT(diag, 0, mkChar("U"));
+		SET_STRING_ELT(diag, 0, Rf_mkChar("U"));
 	}
 
 	SEXP iSym = (class[2] != 'R') ? Matrix_iSym : Matrix_jSym,
 		p0 = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i0 = PROTECT(GET_SLOT(obj,        iSym)),
-		p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+		p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) nj + 1));
 	int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0), *pp1 = INTEGER(p1),
 		i, j, k, kend;
 	pp0++; *(pp1++) = 0;
@@ -1212,7 +1212,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			error(_("%s too dense for %s; would have more than %s nonzero entries"),
 			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, (int) nnz));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, (int) nnz));
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(ans, iSym, i1);
 
@@ -1220,7 +1220,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, (int) nnz)); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, (int) nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(ans, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
@@ -1283,7 +1283,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			error(_("%s too dense for %s; would have more than %s nonzero entries"),
 			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, (int) nnz));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, (int) nnz));
 		int *pi1 = INTEGER(i1), d;
 		SET_SLOT(ans, iSym, i1);
 
@@ -1291,7 +1291,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)), \
-				x1 = PROTECT(allocVector(c##TYPESXP, (int) nnz)); \
+				x1 = PROTECT(Rf_allocVector(c##TYPESXP, (int) nnz)); \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			SET_SLOT(ans, Matrix_xSym, x1); \
 			UNPROTECT(2); /* x1, x0 */ \
@@ -1410,12 +1410,12 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	if (nu1 != '\0' && nu1 != 'N') {
 
 		diag = GET_SLOT(ans, Matrix_diagSym);
-		SET_STRING_ELT(diag, 0, mkChar("U"));
+		SET_STRING_ELT(diag, 0, Rf_mkChar("U"));
 
 	} else if (nu1 != '\0') {
 
 		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-			x1 = PROTECT(allocVector(TYPEOF(x0), ni));
+			x1 = PROTECT(Rf_allocVector(TYPEOF(x0), ni));
 		SET_SLOT(ans, Matrix_xSym, x1);
 
 		int j;
@@ -1440,7 +1440,7 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 		SEXP x0 = PROTECT(GET_SLOT(obj, Matrix_xSym));
 
-		SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+		SEXP p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) nj + 1));
 		int *pp1 = INTEGER(p1), j;
 		*(pp1++) = 0;
 		SET_SLOT(ans, Matrix_pSym, p1);
@@ -1477,7 +1477,7 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			error(_("%s too dense for %s; would have more than %s nonzero entries"),
 			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj - 1]));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[nj - 1]));
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(ans, Matrix_iSym, i1);
 
@@ -1485,7 +1485,7 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		do { \
 			c##TYPE *px0 = c##PTR(x0); \
 			c##IF_NPATTERN( \
-			SEXP x1 = PROTECT(allocVector(c##TYPESXP, pp1[nj - 1])); \
+			SEXP x1 = PROTECT(Rf_allocVector(c##TYPESXP, pp1[nj - 1])); \
 			c##TYPE *px1 = c##PTR(x1); \
 			SET_SLOT(ans, Matrix_xSym, x1); \
 			UNPROTECT(1); /* x1 */ \
@@ -1578,7 +1578,7 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		INTEGER(margin)[0] = mg + 1;
 
 		int *tmp = pperm;
-		REPROTECT(perm = allocVector(INTSXP, ni), pid_perm);
+		REPROTECT(perm = Rf_allocVector(INTSXP, ni), pid_perm);
 		pperm = INTEGER(perm);
 		SET_SLOT(ans, Matrix_permSym, perm);
 
@@ -1607,7 +1607,7 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		invertPerm(pj, iwork, nj, 1, 1);
 
 		int *tmp = pperm;
-		REPROTECT(perm = allocVector(INTSXP, nj), pid_perm);
+		REPROTECT(perm = Rf_allocVector(INTSXP, nj), pid_perm);
 		pperm = INTEGER(perm);
 		SET_SLOT(ans, Matrix_permSym, perm);
 
@@ -1620,7 +1620,7 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 
 		int *pp0 = iwork, *pp_ = pp0 + n + 1, *pi0 = pp_ + n;
 
-		SEXP p1 = PROTECT(allocVector(INTSXP, (R_xlen_t) nj + 1));
+		SEXP p1 = PROTECT(Rf_allocVector(INTSXP, (R_xlen_t) nj + 1));
 		int *pp1 = INTEGER(p1), i, j, k, kend, k_;
 		*(pp1++) = 0;
 		SET_SLOT(ans, Matrix_pSym, p1);
@@ -1639,7 +1639,7 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			error(_("%s too dense for %s; would have more than %s nonzero entries"),
 			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
-		SEXP i1 = PROTECT(allocVector(INTSXP, pp1[nj - 1]));
+		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[nj - 1]));
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(ans, (!mg) ? Matrix_iSym : Matrix_jSym, i1);
 

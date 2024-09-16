@@ -37,7 +37,7 @@
 SEXP Matrix_RLE_(SEXP x_, SEXP force_)
 {
     int n = LENGTH(PROTECT(x_ = Rf_coerceVector(x_, SXP_ans)));
-    Rboolean no_force = !asLogical(force_);
+    Rboolean no_force = !Rf_asLogical(force_);
     if (no_force && n < 3) {
 	UNPROTECT(1); return R_NilValue;
     } else {
@@ -77,14 +77,14 @@ SEXP Matrix_RLE_(SEXP x_, SEXP force_)
 	    len[c] = ln;
 	    c++;
         }
-	ans = PROTECT(mkNamed(VECSXP, res_nms));
-	SET_VECTOR_ELT(ans, 0, allocVector(INTSXP, c)); /* lengths */
-	SET_VECTOR_ELT(ans, 1, allocVector(SXP_ans, c)); /* values */
+	ans = PROTECT(Rf_mkNamed(VECSXP, res_nms));
+	SET_VECTOR_ELT(ans, 0, Rf_allocVector(INTSXP, c)); /* lengths */
+	SET_VECTOR_ELT(ans, 1, Rf_allocVector(SXP_ans, c)); /* values */
 	if(n > 0) {
 	    Memcpy(INTEGER(VECTOR_ELT(ans, 0)), len, c);
 	    Memcpy(STYP_x_(VECTOR_ELT(ans, 1)), val, c);
 	}
-	setAttrib(ans, R_ClassSymbol, mkString("rle"));
+	setAttrib(ans, R_ClassSymbol, Rf_mkString("rle"));
 
 	if(n > 0) { R_Free(len); R_Free(val); }
 	UNPROTECT(2);

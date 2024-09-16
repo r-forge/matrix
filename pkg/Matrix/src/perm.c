@@ -121,7 +121,7 @@ SEXP R_invertPerm(SEXP s_p, SEXP s_off, SEXP s_ioff)
 	R_xlen_t n = XLENGTH(s_p);
 	if (n > INT_MAX)
 		error(_("attempt to invert non-permutation"));
-	SEXP ip = PROTECT(allocVector(INTSXP, n));
+	SEXP ip = PROTECT(Rf_allocVector(INTSXP, n));
 	invertPerm(INTEGER(s_p), INTEGER(ip), (int) n, off, ioff);
 	UNPROTECT(1);
 	return ip;
@@ -148,7 +148,7 @@ SEXP R_asPerm(SEXP s_p, SEXP s_off, SEXP s_ioff, SEXP s_n)
 	int n = INTEGER(s_n)[0];
 	if (n == NA_INTEGER || n < m)
 		error(_("'%s' is NA or less than %s"), "n", "length(p)");
-	SEXP ip = PROTECT(allocVector(INTSXP, n));
+	SEXP ip = PROTECT(Rf_allocVector(INTSXP, n));
 	asPerm(INTEGER(s_p), INTEGER(ip), (int) m, n, off, ioff);
 	UNPROTECT(1);
 	return ip;

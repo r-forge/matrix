@@ -25,9 +25,9 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 	SET_SLOT(scf, Matrix_DimSym, dim);
 	SET_SLOT(scf, Matrix_DimNamesSym, dimnames);
 	if (n > 0) {
-		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
-			v = PROTECT(allocVector(TYPEOF(x), (vectors) ? XLENGTH(x) : 0)),
-			w = PROTECT(allocVector(TYPEOF(x), n));
+		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
+			v = PROTECT(Rf_allocVector(TYPEOF(x), (vectors) ? XLENGTH(x) : 0)),
+			w = PROTECT(Rf_allocVector(TYPEOF(x), n));
 		int info, lwork = -1, zero = 0;
 		double *rwork = (double *) R_alloc((size_t) n, sizeof(double));
 		if (TYPEOF(x) == CPLXSXP) {
@@ -59,7 +59,7 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 		int j;
 		for (j = 0; j < n; ++j) {
 			if (fabs(rwork[j]) > 10.0 * DBL_EPSILON * fabs(pw[j])) {
-				SEXP w_ = allocVector(CPLXSXP, n);
+				SEXP w_ = Rf_allocVector(CPLXSXP, n);
 				Rcomplex *pw_ = COMPLEX(w_);
 				for (j = 0; j < n; ++j) {
 					pw_[j].r =    pw[j];
@@ -107,8 +107,8 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 	set_symmetrized_DimNames(scf, dimnames, -1);
 	if (n > 0) {
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-			v = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
-			w = PROTECT(allocVector(REALSXP, n));
+			v = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
+			w = PROTECT(Rf_allocVector(REALSXP, n));
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		int info, lwork = -1;
 		double *pw = REAL(w);
@@ -170,9 +170,9 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 	set_symmetrized_DimNames(scf, dimnames, -1);
 	if (n > 0) {
 		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x))),
-			v = PROTECT(allocVector(TYPEOF(x), (vectors) ? (R_xlen_t) n * n : 0)),
-			w = PROTECT(allocVector(REALSXP, n));
+			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
+			v = PROTECT(Rf_allocVector(TYPEOF(x), (vectors) ? (R_xlen_t) n * n : 0)),
+			w = PROTECT(Rf_allocVector(REALSXP, n));
 		char ul = CHAR(STRING_ELT(uplo, 0))[0];
 		int info;
 		double *pw = REAL(w);
@@ -214,8 +214,8 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 	SET_SLOT(trf, Matrix_DimSym, dim);
 	SET_SLOT(trf, Matrix_DimNamesSym, dimnames);
 	if (r > 0) {
-		SEXP perm = PROTECT(allocVector(INTSXP, r)),
-			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		SEXP perm = PROTECT(Rf_allocVector(INTSXP, r)),
+			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int *pperm = INTEGER(perm), info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
@@ -259,8 +259,8 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
-		SEXP perm = PROTECT(allocVector(INTSXP, n)),
-			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n)),
+			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int *pperm = INTEGER(perm), info, lwork = -1;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y), tmp, *work;
@@ -320,8 +320,8 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		UNPROTECT(1); /* trans */
 	}
 	if (n > 0) {
-		SEXP perm = PROTECT(allocVector(INTSXP, n)),
-			y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n)),
+			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int *pperm = INTEGER(perm), info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
@@ -363,7 +363,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 	set_symmetrized_DimNames(trf, dimnames, -1);
 	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (n > 0) {
-		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
 		if (TYPEOF(x) == CPLXSXP) {
 		Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
@@ -373,7 +373,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		F77_CALL(zpotrf)(&ul, &n, py, &n, &info FCONE);
 		ERROR_LAPACK_3(zpotrf, info, warn);
 		} else {
-		SEXP perm = PROTECT(allocVector(INTSXP, n));
+		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n));
 		int *pperm = INTEGER(perm), rank;
 		double *work = (double *) R_alloc((size_t) n * 2, sizeof(double));
 		F77_CALL(zpstrf)(&ul, &n, py, &n, pperm, &rank, &tol, work, &info FCONE);
@@ -397,7 +397,7 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		F77_CALL(dpotrf)(&ul, &n, py, &n, &info FCONE);
 		ERROR_LAPACK_3(dpotrf, info, warn);
 		} else {
-		SEXP perm = PROTECT(allocVector(INTSXP, n));
+		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n));
 		int *pperm = INTEGER(perm), rank;
 		double *work = (double *) R_alloc((size_t) n * 2, sizeof(double));
 		F77_CALL(dpstrf)(&ul, &n, py, &n, pperm, &rank, &tol, work, &info FCONE);
@@ -437,7 +437,7 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 	set_symmetrized_DimNames(trf, dimnames, -1);
 	SET_SLOT(trf, Matrix_uploSym, uplo);
 	if (n > 0) {
-		SEXP y = PROTECT(allocVector(TYPEOF(x), XLENGTH(x)));
+		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
 		if (TYPEOF(x) == CPLXSXP) {
 			Rcomplex *px = COMPLEX(x), *py = COMPLEX(y);
@@ -459,11 +459,11 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 
 SEXP geMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors = asLogical(s_vectors);
+	int vectors = Rf_asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (scf == R_NilValue) {
-		scf = geMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		scf = geMatrix_scf_(s_obj, Rf_asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
 		set_factor(s_obj, nm, scf);
@@ -475,11 +475,11 @@ SEXP geMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 
 SEXP syMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors = asLogical(s_vectors);
+	int vectors = Rf_asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (scf == R_NilValue) {
-		scf = syMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		scf = syMatrix_scf_(s_obj, Rf_asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
 		set_factor(s_obj, nm, scf);
@@ -491,11 +491,11 @@ SEXP syMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 
 SEXP spMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 {
-	int vectors = asLogical(s_vectors);
+	int vectors = Rf_asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
 	if (scf == R_NilValue) {
-		scf = spMatrix_scf_(s_obj, asInteger(s_warn), vectors);
+		scf = spMatrix_scf_(s_obj, Rf_asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
 		set_factor(s_obj, nm, scf);
@@ -510,7 +510,7 @@ SEXP geMatrix_trf(SEXP s_obj, SEXP s_warn)
 	const char *nm = "denseLU";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		PROTECT(trf = geMatrix_trf_(s_obj, asInteger(s_warn)));
+		PROTECT(trf = geMatrix_trf_(s_obj, Rf_asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
@@ -522,7 +522,7 @@ SEXP syMatrix_trf(SEXP s_obj, SEXP s_warn)
 	const char *nm = "denseBunchKaufman+";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		PROTECT(trf = syMatrix_trf_(s_obj, asInteger(s_warn)));
+		PROTECT(trf = syMatrix_trf_(s_obj, Rf_asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
@@ -534,7 +534,7 @@ SEXP spMatrix_trf(SEXP s_obj, SEXP s_warn)
 	const char *nm = "denseBunchKaufman-";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		PROTECT(trf = spMatrix_trf_(s_obj, asInteger(s_warn)));
+		PROTECT(trf = spMatrix_trf_(s_obj, Rf_asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
@@ -543,12 +543,12 @@ SEXP spMatrix_trf(SEXP s_obj, SEXP s_warn)
 
 SEXP poMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_pivot, SEXP s_tol)
 {
-	int pivot = asLogical(s_pivot);
+	int pivot = Rf_asLogical(s_pivot);
 	const char *nm = (pivot) ? "denseCholesky++" : "denseCholesky+-";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		double tol = asReal(s_tol);
-		PROTECT(trf = poMatrix_trf_(s_obj, asInteger(s_warn), pivot, tol));
+		double tol = Rf_asReal(s_tol);
+		PROTECT(trf = poMatrix_trf_(s_obj, Rf_asInteger(s_warn), pivot, tol));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
@@ -560,7 +560,7 @@ SEXP ppMatrix_trf(SEXP s_obj, SEXP s_warn)
 	const char *nm = "denseCholesky--";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		PROTECT(trf = ppMatrix_trf_(s_obj, asInteger(s_warn)));
+		PROTECT(trf = ppMatrix_trf_(s_obj, Rf_asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
 	}
@@ -632,18 +632,18 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	SET_SLOT(orf, Matrix_RSym, R);
 	UNPROTECT(2); /* R, V */
 
-	SEXP beta = PROTECT(allocVector(REALSXP, A->n));
+	SEXP beta = PROTECT(Rf_allocVector(REALSXP, A->n));
 	memcpy(REAL(beta), N->B, sizeof(double) * (size_t) A->n);
 	SET_SLOT(orf, Matrix_betaSym, beta);
 	UNPROTECT(1); /* beta */
 
-	SEXP p = PROTECT(allocVector(INTSXP, S->m2));
+	SEXP p = PROTECT(Rf_allocVector(INTSXP, S->m2));
 	memcpy(INTEGER(p), P, sizeof(int) * (size_t) S->m2);
 	SET_SLOT(orf, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 
 	if (order > 0) {
-	SEXP q = PROTECT(allocVector(INTSXP, A->n));
+	SEXP q = PROTECT(Rf_allocVector(INTSXP, A->n));
 	memcpy(INTEGER(q), S->q, sizeof(int) * (size_t) A->n);
 	SET_SLOT(orf, Matrix_qSym, q);
 	UNPROTECT(1); /* q */
@@ -700,18 +700,18 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 
 	SEXP L = PROTECT(CXS2M(N->L, 1, 't')),
 		U = PROTECT(CXS2M(N->U, 1, 't')),
-		uplo = PROTECT(mkString("L"));
+		uplo = PROTECT(Rf_mkString("L"));
 	SET_SLOT(L, Matrix_uploSym, uplo);
 	SET_SLOT(trf, Matrix_LSym, L);
 	SET_SLOT(trf, Matrix_USym, U);
 	UNPROTECT(3); /* uplo, U, L */
 
-	SEXP p = PROTECT(allocVector(INTSXP, A->m));
+	SEXP p = PROTECT(Rf_allocVector(INTSXP, A->m));
 	memcpy(INTEGER(p), P, sizeof(int) * (size_t) A->m);
 	SET_SLOT(trf, Matrix_pSym, p);
 	UNPROTECT(1); /* p */
 	if (order > 0) {
-	SEXP q = PROTECT(allocVector(INTSXP, A->n));
+	SEXP q = PROTECT(Rf_allocVector(INTSXP, A->n));
 	memcpy(INTEGER(q), S->q, sizeof(int) * (size_t) A->n);
 	SET_SLOT(trf, Matrix_qSym, q);
 	UNPROTECT(1); /* q */
@@ -797,13 +797,13 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 
 SEXP gCMatrix_orf(SEXP s_obj, SEXP s_warn, SEXP s_order)
 {
-	int order = asInteger(s_order);
+	int order = Rf_asInteger(s_order);
 	if (order < 0 || order > 3)
 		order = 0;
 	const char *nm = (order > 0) ? "sparseQR+" : "sparseQR-";
 	SEXP orf = get_factor(s_obj, nm);
 	if (orf == R_NilValue) {
-		orf = gCMatrix_orf_(s_obj, asInteger(s_warn), order);
+		orf = gCMatrix_orf_(s_obj, Rf_asInteger(s_warn), order);
 		if (orf != R_NilValue) {
 		PROTECT(orf);
 		set_factor(s_obj, nm, orf);
@@ -815,10 +815,10 @@ SEXP gCMatrix_orf(SEXP s_obj, SEXP s_warn, SEXP s_order)
 
 SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 {
-	double tol = asReal(s_tol);
+	double tol = Rf_asReal(s_tol);
 	if (ISNAN(tol))
 		error(_("'%s' is not a number"), "tol");
-	int order = asInteger(s_order);
+	int order = Rf_asInteger(s_order);
 	if (order == NA_INTEGER)
 		order = (tol == 1.0) ? 2 : 1;
 	else if (order < 0 || order > 3)
@@ -826,7 +826,7 @@ SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 	const char *nm = (order > 0) ? "sparseLU+" : "sparseLU-";
 	SEXP trf = get_factor(s_obj, nm);
 	if (trf == R_NilValue) {
-		trf = gCMatrix_trf_(s_obj, asInteger(s_warn), order, tol);
+		trf = gCMatrix_trf_(s_obj, Rf_asInteger(s_warn), order, tol);
 		if (trf != R_NilValue) {
 		PROTECT(trf);
 		set_factor(s_obj, nm, trf);
@@ -839,8 +839,8 @@ SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 SEXP pCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order,
                   SEXP s_ll, SEXP s_super, SEXP s_beta)
 {
-	int warn = asInteger(s_warn), order = asInteger(s_order),
-		ll = asLogical(s_ll), super = asLogical(s_super);
+	int warn = Rf_asInteger(s_warn), order = Rf_asInteger(s_order),
+		ll = Rf_asLogical(s_ll), super = Rf_asLogical(s_super);
 	Rcomplex beta = asComplex(s_beta);
 	if (order < 0 || order > 1)
 		order = 0;
@@ -943,7 +943,7 @@ SEXP sparseCholesky_updown(SEXP s_trf, SEXP s_obj, SEXP s_update)
 	cholmod_factor *L = M2CHF(s_trf, 1);
 
 	L = cholmod_copy_factor(L, &c);
-	cholmod_updown(asLogical(s_update) != 0, A, L, &c);
+	cholmod_updown(Rf_asLogical(s_update) != 0, A, L, &c);
 
 	UPDOWN_FINISH;
 	return s_trf;
@@ -953,9 +953,9 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_root)
 {
 	cholmod_factor *L = M2CHF(s_trf, 1);
 	int n = (int) L->n;
-	SEXP ans = allocVector((L->xtype == CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP, n);
+	SEXP ans = Rf_allocVector((L->xtype == CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP, n);
 	if (n > 0) {
-	int j, root = asLogical(s_root);
+	int j, root = Rf_asLogical(s_root);
 	if (L->is_super) {
 		int k, nc,
 			nsuper = (int) L->nsuper,
@@ -1071,7 +1071,7 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 		UNPROTECT(1); /* trans */
 	}
 
-	SEXP diag = PROTECT(mkString("U"));
+	SEXP diag = PROTECT(Rf_mkString("U"));
 	SET_SLOT(T_, Matrix_diagSym, diag);
 	UNPROTECT(1); /* diag */
 
@@ -1079,7 +1079,7 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
 	SEXP pivot = PROTECT(GET_SLOT(s_trf, Matrix_permSym)),
-		D_p = PROTECT(allocVector(INTSXP, n1a));
+		D_p = PROTECT(Rf_allocVector(INTSXP, n1a));
 	int *ppivot = INTEGER(pivot), *D_pp = INTEGER(D_p),
 		b = n, dp = (ul == 'U') ? 1 : 2;
 	D_pp[0] = 0;
@@ -1099,12 +1099,12 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	UNPROTECT(1); /* D_p */
 
 	SEXP P, P_perm, T, T_p, T_i, T_x,
-		D_i = PROTECT(allocVector(INTSXP, D_pp[n])),
-		D_x = PROTECT(allocVector(TYPEOF(x), D_pp[n]));
+		D_i = PROTECT(Rf_allocVector(INTSXP, D_pp[n])),
+		D_x = PROTECT(Rf_allocVector(TYPEOF(x), D_pp[n]));
 	int *P_pperm, *T_pp, *T_pi, *D_pi = INTEGER(D_i);
 
 	R_xlen_t len = (R_xlen_t) 2 * b + 1, k = (ul == 'U') ? len - 2 : 0;
-	SEXP ans = PROTECT(allocVector(VECSXP, len));
+	SEXP ans = PROTECT(Rf_allocVector(VECSXP, len));
 
 #define EXPAND(c) \
 	do { \
@@ -1116,11 +1116,11 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 			dp = (ul == 'U') ? j : n - j - s; \
 			 \
 			PROTECT(P = Rf_duplicate(P_)); \
-			PROTECT(P_perm = allocVector(INTSXP, n)); \
+			PROTECT(P_perm = Rf_allocVector(INTSXP, n)); \
 			PROTECT(T = Rf_duplicate(T_)); \
-			PROTECT(T_p = allocVector(INTSXP, n1a)); \
-			PROTECT(T_i = allocVector(INTSXP, (R_xlen_t) s * dp)); \
-			PROTECT(T_x = allocVector(TYPEOF(x), (R_xlen_t) s * dp)); \
+			PROTECT(T_p = Rf_allocVector(INTSXP, n1a)); \
+			PROTECT(T_i = Rf_allocVector(INTSXP, (R_xlen_t) s * dp)); \
+			PROTECT(T_x = Rf_allocVector(TYPEOF(x), (R_xlen_t) s * dp)); \
 			 \
 			P_pperm = INTEGER(P_perm); \
 			T_pp = INTEGER(T_p); \

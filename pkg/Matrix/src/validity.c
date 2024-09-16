@@ -1,7 +1,7 @@
 #include "Mdefines.h"
 #include "validity.h"
 
-#define     MK(_FORMAT_     )       mkString(_FORMAT_             )
+#define     MK(_FORMAT_     )    Rf_mkString(_FORMAT_             )
 #define     MS(_FORMAT_, ...) Matrix_sprintf(_FORMAT_, __VA_ARGS__)
 
 #define    RMK(_FORMAT_     ) \
@@ -50,7 +50,7 @@ char *Dim_validate(SEXP dim)
 SEXP R_Dim_validate(SEXP dim)
 {
 	char *msg = Dim_validate(dim);
-	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
+	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
 char *DimNames_validate(SEXP dimnames, int *pdim)
@@ -88,7 +88,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 {
 	char *msg = DimNames_validate(dimnames, INTEGER(dim));
-	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
+	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
 SEXP R_DimNames_fixup(SEXP dimnames)
@@ -101,7 +101,7 @@ SEXP R_DimNames_fixup(SEXP dimnames)
 			(LENGTH(s) == 0 || TYPEOF(s) != STRSXP);
 	if (!fixup)
 		return dimnames;
-	SEXP dimnames_ = PROTECT(allocVector(VECSXP, 2));
+	SEXP dimnames_ = PROTECT(Rf_allocVector(VECSXP, 2));
 	for (i = 0; i < 2; ++i) {
 		if ((s = VECTOR_ELT(dimnames, i)) == R_NilValue || LENGTH(s) == 0)
 			continue;
@@ -142,7 +142,7 @@ SEXP Matrix_validate(SEXP obj)
 		UNPROTECT(1); /* dimnames */
 	}
 	UNPROTECT(1); /* dim */
-	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
+	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
 #define KINDMATRIX_VALIDATE(_PREFIX_, _SEXPTYPE_) \

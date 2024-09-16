@@ -185,24 +185,24 @@ char Matrix_repr(SEXP obj)
 
 SEXP R_Matrix_class(SEXP s_obj, SEXP s_mode)
 {
-	const char *class = Matrix_class(s_obj, valid_matrix_or_vector, asInteger(s_mode), NULL);
-	return mkString((!class) ? "" : class);
+	const char *class = Matrix_class(s_obj, valid_matrix_or_vector, Rf_asInteger(s_mode), NULL);
+	return Rf_mkString((!class) ? "" : class);
 }
 
 SEXP R_Matrix_kind(SEXP s_obj)
 {
 	char s[] = { Matrix_kind (s_obj), '\0' };
-	return mkString(s);
+	return Rf_mkString(s);
 }
 
 SEXP R_Matrix_shape(SEXP s_obj)
 {
 	char s[] = { Matrix_shape(s_obj), '\0' };
-	return mkString(s);
+	return Rf_mkString(s);
 }
 
 SEXP R_Matrix_repr(SEXP s_obj)
 {
 	char s[] = { Matrix_repr (s_obj), '\0' };
-	return mkString(s);
+	return Rf_mkString(s);
 }

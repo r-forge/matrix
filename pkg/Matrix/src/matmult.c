@@ -133,7 +133,7 @@ void matmultDN(SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi) {
 	PROTECT(asrc = getAttrib(asrc, R_NamesSymbol));
 	PROTECT(bsrc = getAttrib(bsrc, R_NamesSymbol));
 	if (asrc != R_NilValue || bsrc != R_NilValue) {
-		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
+		SEXP destnms = PROTECT(Rf_allocVector(STRSXP, 2));
 		if (asrc != R_NilValue && CHAR(s = STRING_ELT(asrc, ai))[0] != '\0')
 			SET_STRING_ELT(destnms, 0, s);
 		if (bsrc != R_NilValue && CHAR(s = STRING_ELT(bsrc, bi))[0] != '\0')
@@ -198,13 +198,13 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		UNPROTECT(2); /* rdimnames, adimnames */
 
 		if (rct != 'C') {
-		SEXP rtrans = PROTECT(mkString("T"));
+		SEXP rtrans = PROTECT(Rf_mkString("T"));
 		SET_SLOT(r, Matrix_transSym, rtrans);
 		UNPROTECT(1); /* rtrans */
 		}
 
 		if (rm > 0) {
-		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rm));
+		SEXP rx = PROTECT(Rf_allocVector(TYPEOF(ax), (R_xlen_t) rm * rm));
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
 		memset(prx, 0, sizeof(Rcomplex) * (size_t) rm * (size_t) rm);
@@ -270,7 +270,7 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 		UNPROTECT(3); /* rdimnames, bdimnames, adimnames */
 
 		if (rm > 0 && rn > 0) {
-		SEXP rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+		SEXP rx = PROTECT(Rf_allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
 		if (TYPEOF(ax) == CPLXSXP) {
 		Rcomplex *prx = COMPLEX(rx);
 		if (rk == 0)
@@ -359,7 +359,7 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (rm > 0 && rn > 0) {
 	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+		rx = PROTECT(Rf_allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
 	char aul = CHAR(STRING_ELT(GET_SLOT(a, Matrix_uploSym), 0))[0];
 	int i,
 		d     = (aside == 'L') ? rn : rm,
@@ -485,7 +485,7 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 
 	if (rm > 0 && rn > 0) {
 	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+		rx = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t) rm * rn));
 	char aul = CHAR(STRING_ELT(GET_SLOT(a, Matrix_uploSym), 0))[0];
 	int i,
 		d     = ( aside == 'L'                    ) ? rn : rm,
@@ -586,7 +586,7 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
 	char aul = CHAR(STRING_ELT(auplo, 0))[0];
 	if (triangular < 0) {
-		SEXP ruplo = PROTECT(mkString("L"));
+		SEXP ruplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(r, Matrix_uploSym, ruplo);
 		UNPROTECT(1); /* ruplo */
 	}
@@ -594,7 +594,7 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	SEXP adiag = GET_SLOT(a, Matrix_diagSym);
 	char adi = CHAR(STRING_ELT(adiag, 0))[0];
 	if (triangular < -1 || triangular > 1) {
-		SEXP rdiag = PROTECT(mkString("U"));
+		SEXP rdiag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(r, Matrix_diagSym, rdiag);
 		UNPROTECT(1); /* rdiag */
 	}
@@ -612,7 +612,7 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 
 	if (rm > 0 && rn > 0) {
 	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
+		rx = PROTECT(Rf_allocVector(TYPEOF(ax), (R_xlen_t) rm * rn));
 	if (TYPEOF(ax) == CPLXSXP) {
 	Rcomplex *pax = COMPLEX(ax), *pbx = COMPLEX(bx), *prx = COMPLEX(rx),
 		one = Matrix_zunit;
@@ -677,7 +677,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	SEXP auplo = GET_SLOT(a, Matrix_uploSym);
 	char aul = CHAR(STRING_ELT(auplo, 0))[0];
 	if (triangular < 0) {
-		SEXP ruplo = PROTECT(mkString("L"));
+		SEXP ruplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(r, Matrix_uploSym, ruplo);
 		UNPROTECT(1); /* ruplo */
 	}
@@ -685,7 +685,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 	SEXP adiag = GET_SLOT(a, Matrix_diagSym);
 	char adi = CHAR(STRING_ELT(adiag, 0))[0];
 	if (triangular < -1 || triangular > 1) {
-		SEXP rdiag = PROTECT(mkString("U"));
+		SEXP rdiag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(r, Matrix_diagSym, rdiag);
 		UNPROTECT(1); /* rdiag */
 	}
@@ -705,7 +705,7 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 
 	if (rm > 0 && rn > 0) {
 	SEXP bx = PROTECT(GET_SLOT(b, Matrix_xSym)),
-		rx = PROTECT(allocVector(REALSXP, (R_xlen_t) rm * rn));
+		rx = PROTECT(Rf_allocVector(REALSXP, (R_xlen_t) rm * rn));
 	int i, rinc = (aside == 'L') ? 1 : rm, rincp = (aside == 'L') ? rm : 1;
 
 	char
@@ -925,13 +925,13 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 		UNPROTECT(2); /* zdimnames, xdimnames */
 
 		if (ztrans != 'N') {
-			SEXP zuplo = PROTECT(mkString("L"));
+			SEXP zuplo = PROTECT(Rf_mkString("L"));
 			SET_SLOT(z, Matrix_uploSym, zuplo);
 			UNPROTECT(1); /* zuplo */
 		}
 
 		if (zclass[1] == 's' && zclass[0] == 'z') {
-			SEXP ztrans = PROTECT(mkString("T"));
+			SEXP ztrans = PROTECT(Rf_mkString("T"));
 			SET_SLOT(z, Matrix_transSym, ztrans);
 			UNPROTECT(1); /* ztrans */
 		}
@@ -972,13 +972,13 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 		UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
 
 		if (triangular < 0) {
-			SEXP uplo = PROTECT(mkString("L"));
+			SEXP uplo = PROTECT(Rf_mkString("L"));
 			SET_SLOT(z, Matrix_uploSym, uplo);
 			UNPROTECT(1); /* uplo */
 		}
 
 		if (triangular < -1 || triangular > 1) {
-			SEXP diag = PROTECT(mkString("U"));
+			SEXP diag = PROTECT(Rf_mkString("U"));
 			SET_SLOT(z, Matrix_diagSym, diag);
 			UNPROTECT(1); /* diag */
 		}
@@ -1039,13 +1039,13 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 	UNPROTECT(3); /* zdimnames, ydimnames, xdimnames */
 
 	if (triangular != 0 && (ztrans != 'N') == (triangular > 0)) {
-		SEXP zuplo = PROTECT(mkString("L"));
+		SEXP zuplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(z, Matrix_uploSym, zuplo);
 		UNPROTECT(1); /* zuplo */
 	}
 
 	if (triangular < -1 || triangular > 1) {
-		SEXP zdiag = PROTECT(mkString("U"));
+		SEXP zdiag = PROTECT(Rf_mkString("U"));
 		SET_SLOT(z, Matrix_diagSym, zdiag);
 		UNPROTECT(1); /* zdiag */
 	}
@@ -1062,12 +1062,12 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 
 	SEXP zx;
 	if (zclass[0] == 'z') {
-	PROTECT(zx = allocVector(CPLXSXP, (R_xlen_t) (m * n)));
+	PROTECT(zx = Rf_allocVector(CPLXSXP, (R_xlen_t) (m * n)));
 	Z->x = (ztrans != 'N')
 		? (Rcomplex *) R_alloc(m * n, sizeof(Rcomplex))
 		: COMPLEX(zx);
 	} else {
-	PROTECT(zx = allocVector(REALSXP, (R_xlen_t) (m * n)));
+	PROTECT(zx = Rf_allocVector(REALSXP, (R_xlen_t) (m * n)));
 	Z->x = (ztrans != 'N')
 		? (double *) R_alloc(m * n, sizeof(double))
 		: REAL(zx);
@@ -1554,7 +1554,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	if (id || ((mg == 0) ? s_y != _s_y : s_x != _s_x))
 	SET_SLOT(z, Matrix_xSym, x0);
 	else {
-	SEXP x1 = PROTECT(allocVector(TYPEOF(x0), XLENGTH(x0)));
+	SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 	switch (kind) {
 	case 'z':
 		memcpy(COMPLEX(x1), COMPLEX(x0), sizeof(Rcomplex) * (size_t) XLENGTH(x0));

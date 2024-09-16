@@ -17,7 +17,7 @@ void solveDN(SEXP rdn, SEXP adn, SEXP bdn)
 	PROTECT(adn = getAttrib(adn, R_NamesSymbol));
 	PROTECT(bdn = getAttrib(bdn, R_NamesSymbol));
 	if (adn != R_NilValue || bdn != R_NilValue) {
-		PROTECT(s = allocVector(STRSXP, 2));
+		PROTECT(s = Rf_allocVector(STRSXP, 2));
 		if (adn != R_NilValue)
 			SET_STRING_ELT(s, 0, STRING_ELT(adn, 1));
 		if (bdn != R_NilValue)
@@ -291,7 +291,7 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 		SEXP rx, aperm = PROTECT(getAttrib(s_a, Matrix_permSym));
 		int info, pivoted = TYPEOF(aperm) == INTSXP && LENGTH(aperm) > 0;
 		if (s_b == R_NilValue) {
-			PROTECT(rx = allocVector(TYPEOF(ax), XLENGTH(ax)));
+			PROTECT(rx = Rf_allocVector(TYPEOF(ax), XLENGTH(ax)));
 			if (TYPEOF(ax) == CPLXSXP) {
 			memcpy(COMPLEX(rx), COMPLEX(ax), sizeof(Rcomplex) * (size_t) XLENGTH(ax));
 			if (!packed) {
@@ -321,7 +321,7 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 			}
 		} else {
 			SEXP bx = PROTECT(GET_SLOT(s_b, Matrix_xSym));
-			PROTECT(rx = allocVector(TYPEOF(ax), XLENGTH(bx)));
+			PROTECT(rx = Rf_allocVector(TYPEOF(ax), XLENGTH(bx)));
 			if (TYPEOF(ax) == CPLXSXP) {
 			zrowperm2(COMPLEX(rx), COMPLEX(bx),
 			          m, n, (pivoted) ? INTEGER(aperm) : NULL, 1, 0);
@@ -480,7 +480,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		*paq = (LENGTH(aq)) ? INTEGER(aq) : NULL;
 	Matrix_cs *L = M2CXS(aL, 1), *U = M2CXS(aU, 1);
 	CXSPARSE_XTYPE_SET(L->xtype);
-	if (!asLogical(s_sparse)) {
+	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
@@ -492,7 +492,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector((L->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
+		SEXP rx = PROTECT(Rf_allocVector((L->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (s_b == R_NilValue) {
 
 #define SOLVE_DENSE(c) \
@@ -690,7 +690,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	SEXP r;
 	size_t m_ = (size_t) m, n_ = (size_t) n;
 	cholmod_factor *L = M2CHF(s_a, 1);
-	if (!asLogical(s_sparse)) {
+	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
@@ -742,7 +742,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 		cholmod_free_sparse(&X, &c);
 	}
 	if (s_b == R_NilValue && (ivalid == 2 || ivalid == 4)) {
-		SEXP uplo = PROTECT(mkString("L"));
+		SEXP uplo = PROTECT(Rf_mkString("L"));
 		SET_SLOT(r, Matrix_uploSym, uplo);
 		UNPROTECT(1); /* uplo */
 	}
@@ -762,7 +762,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 	int i, j;
 	Matrix_cs *A = M2CXS(s_a, 1);
 	CXSPARSE_XTYPE_SET(A->xtype);
-	if (!asLogical(s_sparse)) {
+	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
@@ -776,7 +776,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		prdim[0] = m;
 		prdim[1] = n;
 		R_xlen_t mn = (R_xlen_t) m * n;
-		SEXP rx = PROTECT(allocVector((A->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
+		SEXP rx = PROTECT(Rf_allocVector((A->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (s_b == R_NilValue) {
 
 #define SOLVE_DENSE(c) \
@@ -888,16 +888,16 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	SEXP p = PROTECT(GET_SLOT(s_qr, Matrix_pSym));
 	int *pp = (LENGTH(p) > 0) ? INTEGER(p) : NULL;
 
-	int m = V_->m, r = V_->n, n, i, j, op = asInteger(s_op), nprotect = 5;
+	int m = V_->m, r = V_->n, n, i, j, op = Rf_asInteger(s_op), nprotect = 5;
 
 	SEXP yx;
 	if (s_y == R_NilValue) {
-		n = (asLogical(s_complete)) ? m : r;
+		n = (Rf_asLogical(s_complete)) ? m : r;
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
 			error(_("attempt to allocate vector of length exceeding %s"),
 			      "R_XLEN_T_MAX");
 		R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
-		PROTECT(yx = allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
+		PROTECT(yx = Rf_allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 
 #define EYE(c) \
 		do { \
@@ -951,7 +951,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		ax = yx;
 	else {
 		R_xlen_t mn = (R_xlen_t) padim[0] * padim[1];
-		PROTECT(ax = allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
+		PROTECT(ax = Rf_allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		++nprotect;
 	}
 	SET_SLOT(a, Matrix_xSym, ax);
