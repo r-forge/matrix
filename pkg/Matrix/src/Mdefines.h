@@ -42,20 +42,14 @@
 #include <Rversion.h> /* R_VERSION, ... */
 
 #ifdef R_NO_REMAP
-#define allocMatrix       Rf_allocMatrix
 #define allocVector       Rf_allocVector
 #define asChar            Rf_asChar
-#define asCharacterFactor Rf_asCharacterFactor
 #define asInteger         Rf_asInteger
 #define asLogical         Rf_asLogical
 #define asReal            Rf_asReal
-#define coerceVector      Rf_coerceVector
-#define copyMatrix        Rf_copyMatrix
 #define dimnamesgets      Rf_dimnamesgets
-#define duplicate         Rf_duplicate
 #define error             Rf_error
 #define getAttrib         Rf_getAttrib
-#define length(x)         Rf_length(x)
 #define mkChar            Rf_mkChar
 #define mkNamed           Rf_mkNamed
 #define mkString          Rf_mkString

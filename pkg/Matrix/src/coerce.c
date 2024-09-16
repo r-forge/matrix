@@ -18,7 +18,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 #endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	int packed = cl[2] == 'p';
-	PROTECT(from = coerceVector(from, tt));
+	PROTECT(from = Rf_coerceVector(from, tt));
 
 	if (cl[1] != 'g' && m != n)
 		error(_("attempt to construct non-square %s"),
@@ -287,7 +287,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 #endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	int packed = cl[2] == 'p';
-	PROTECT(from = coerceVector(from, tt));
+	PROTECT(from = Rf_coerceVector(from, tt));
 
 	SEXP to = PROTECT(newObject(cl));
 	int nprotect = 2;
@@ -705,7 +705,7 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 		if (class[0] == 'n' && cl[0] == 'l')
 			x0 = duplicateVector(x0);
 		else
-			x0 = coerceVector(x0, kindToType(cl[0]));
+			x0 = Rf_coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
 			naToUnit(x0);
 		UNPROTECT(1); /* x0 */
@@ -849,7 +849,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 #endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	if (x0 != R_NilValue && cl[0] != 'n') {
-		x0 = coerceVector(x0, tt);
+		x0 = Rf_coerceVector(x0, tt);
 		UNPROTECT(1); /* x0 */
 		PROTECT(x0);
 	}
@@ -1934,7 +1934,7 @@ SEXP diagonal_as_sparse(SEXP from, const char *class,
 		if (class[0] == 'n' && cl[0] == 'l')
 			x0 = duplicateVector(x0);
 		else
-			x0 = coerceVector(x0, kindToType(cl[0]));
+			x0 = Rf_coerceVector(x0, kindToType(cl[0]));
 		if (class[0] == 'n')
 			naToUnit(x0);
 		UNPROTECT(1); /* x0 */
@@ -2193,7 +2193,7 @@ SEXP dense_as_kind(SEXP from, const char *class, char kind, int new)
 	PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pid);
 
 	if (TYPEOF(x) != tt) {
-		REPROTECT(x = coerceVector(x, tt), pid);
+		REPROTECT(x = Rf_coerceVector(x, tt), pid);
 		if (class[0] == 'n')
 			/* n->[idz] */
 			naToUnit(x);
@@ -2314,7 +2314,7 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 		PROTECT_INDEX pid;
 		SEXP x;
 		PROTECT_WITH_INDEX(x = GET_SLOT(from, Matrix_xSym), &pid);
-		REPROTECT(x = coerceVector(x, tt), pid);
+		REPROTECT(x = Rf_coerceVector(x, tt), pid);
 		SET_SLOT(to, Matrix_xSym, x);
 		UNPROTECT(1); /* x */
 	}
@@ -2381,7 +2381,7 @@ SEXP diagonal_as_kind(SEXP from, const char *class, char kind)
 				}
 			}
 		} else {
-			REPROTECT(x = coerceVector(x, tt), pid);
+			REPROTECT(x = Rf_coerceVector(x, tt), pid);
 			if (class[0] == 'n')
 				/* n->[idz] */
 				naToUnit(x);
@@ -3488,7 +3488,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 				); \
 			} \
 		c##IF_NPATTERN( \
-		PROTECT(x1 = coerceVector(x1, tt)); \
+		PROTECT(x1 = Rf_coerceVector(x1, tt)); \
 		SET_SLOT(to, Matrix_xSym, x1); \
 		UNPROTECT(2); /* x1 */ \
 		); \

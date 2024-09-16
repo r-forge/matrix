@@ -213,7 +213,7 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 // allFalse <- function(x) !any(x) && !any(is.na(x)) ## ~= all0
 SEXP R_all0(SEXP x) {
 	if (!Rf_isVectorAtomic(x)) {
-		if (length(x) == 0) return TRUE_;
+		if (Rf_length(x) == 0) return TRUE_;
 		// Typically S4.  TODO: Call the R code above, instead!
 		error(_("Argument must be numeric-like atomic vector"));
 	}
@@ -259,7 +259,7 @@ SEXP R_all0(SEXP x) {
 // anyFalse <- function(x) isTRUE(any(!x)) ## ~= any0
 SEXP R_any0(SEXP x) {
 	if (!Rf_isVectorAtomic(x)) {
-		if (length(x) == 0) return FALSE_;
+		if (Rf_length(x) == 0) return FALSE_;
 		// Typically S4.  TODO: Call the R code above, instead!
 		error(_("Argument must be numeric-like atomic vector"));
 	}
@@ -387,10 +387,10 @@ SEXP Mmatrix(SEXP args)
 		error(_("too many elements specified"));
 #endif
 
-	PROTECT(ans = allocMatrix(TYPEOF(vals), nr, nc));
+	PROTECT(ans = Rf_allocMatrix(TYPEOF(vals), nr, nc));
 	if (Rf_isVector(vals)) {
 	    if(lendat)
-		copyMatrix(ans, vals, (Rboolean) byrow);
+		Rf_copyMatrix(ans, vals, (Rboolean) byrow);
 	    else { /* fill with NAs */
 		R_xlen_t N = (R_xlen_t) nr * nc, i;
 		switch (TYPEOF(vals)) {
@@ -430,7 +430,7 @@ SEXP Mmatrix(SEXP args)
 		}
 	    }
 	}
-	if (dimnames != R_NilValue && length(dimnames) > 0)
+	if (dimnames != R_NilValue && Rf_length(dimnames) > 0)
 		ans = dimnamesgets(ans, dimnames);
 	UNPROTECT(1);
 	return ans;
@@ -473,7 +473,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 	n_el   = INTEGER(pP)[nouter]; /* is only == length(indP), if the
 				     inner slot is not over-allocated */
 
-    ij = INTEGER(ans = PROTECT(allocMatrix(INTSXP, n_el, 2)));
+    ij = INTEGER(ans = PROTECT(Rf_allocMatrix(INTSXP, n_el, 2)));
     /* expand the compressed margin to 'i' or 'j' : */
     expand_cmprPt(nouter, INTEGER(pP), &ij[col ? n_el : 0]);
     /* and copy the other one: */
@@ -490,7 +490,7 @@ SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 
 SEXP Matrix_expand_pointers(SEXP pP)
 {
-	int n = length(pP) - 1;
+	int n = Rf_length(pP) - 1;
 	int *p = INTEGER(pP);
 	SEXP ans = PROTECT(allocVector(INTSXP, p[n]));
 
@@ -515,11 +515,11 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
 
 	if (TYPEOF(di) != INTSXP) {
-		di = PROTECT(coerceVector(di, INTSXP));
+		di = PROTECT(Rf_coerceVector(di, INTSXP));
 		nprot++;
 	}
 	if (TYPEOF(ij) != INTSXP) {
-		ij = PROTECT(coerceVector(ij, INTSXP));
+		ij = PROTECT(Rf_coerceVector(ij, INTSXP));
 		nprot++;
 	}
 	if (!Rf_isMatrix(ij) ||
@@ -593,15 +593,15 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 	int check_bounds = asLogical(chk_bnds), one_ind = asLogical(orig_1);
 
 	if (TYPEOF(di)!= INTSXP) {
-		di = PROTECT(coerceVector(di,INTSXP));
+		di = PROTECT(Rf_coerceVector(di,INTSXP));
 		nprot++;
 	}
 	if (TYPEOF(i) != INTSXP) {
-		i = PROTECT(coerceVector(i, INTSXP));
+		i = PROTECT(Rf_coerceVector(i, INTSXP));
 		nprot++;
 	}
 	if (TYPEOF(j) != INTSXP) {
-		j = PROTECT(coerceVector(j, INTSXP));
+		j = PROTECT(Rf_coerceVector(j, INTSXP));
 		nprot++;
 	}
 	if (LENGTH(j) != n)

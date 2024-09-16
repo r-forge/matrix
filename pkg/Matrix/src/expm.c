@@ -24,7 +24,7 @@ SEXP geMatrix_expm(SEXP x)
     const int n = Dims[1];
     const R_xlen_t n_ = n, np1 = n + 1, nsqr = n_ * n_; // nsqr = n^2
 
-    SEXP val = PROTECT(duplicate(x));
+    SEXP val = PROTECT(Rf_duplicate(x));
     int i, ilo, ilos, ihi, ihis, j, sqpow;
     int *pivot = R_Calloc(n, int);
     double *dpp = R_Calloc(nsqr, double), /* denominator power Pade' */

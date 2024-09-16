@@ -36,7 +36,7 @@
  */
 SEXP Matrix_RLE_(SEXP x_, SEXP force_)
 {
-    int n = LENGTH(PROTECT(x_ = coerceVector(x_, SXP_ans)));
+    int n = LENGTH(PROTECT(x_ = Rf_coerceVector(x_, SXP_ans)));
     Rboolean no_force = !asLogical(force_);
     if (no_force && n < 3) {
 	UNPROTECT(1); return R_NilValue;

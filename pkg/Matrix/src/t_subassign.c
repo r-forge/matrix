@@ -149,8 +149,8 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     SEXP
 	islot   = GET_SLOT(x, Matrix_iSym),
 	dimslot = GET_SLOT(x, Matrix_DimSym),
-	i_cp = PROTECT(coerceVector(i_, INTSXP)),
-	j_cp = PROTECT(coerceVector(j_, INTSXP));
+	i_cp = PROTECT(Rf_coerceVector(i_, INTSXP)),
+	j_cp = PROTECT(Rf_coerceVector(j_, INTSXP));
     // for d.CMatrix and l.CMatrix  but not n.CMatrix:
 
     int *dims = INTEGER(dimslot),
@@ -173,7 +173,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 #endif
 
     SEXP val_i_slot, val_x_slot;
-    val_i_slot = PROTECT(coerceVector(GET_SLOT(value, Matrix_iSym), REALSXP));
+    val_i_slot = PROTECT(Rf_coerceVector(GET_SLOT(value, Matrix_iSym), REALSXP));
     double *val_i = REAL(val_i_slot);
     int nnz_val = LENGTH(GET_SLOT(value, Matrix_iSym)), n_prot = 4;
     Type_x *val_x = NULL;
@@ -198,7 +198,7 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 		error(_("programming error in Csparse_subassign() should never happen"));
 	    }
 	    // otherwise: "coerce" :  as(., <sparseVector>) :
-	    val_x_slot = PROTECT(coerceVector(GET_SLOT(value, Matrix_xSym), SXP_x)); n_prot++;
+	    val_x_slot = PROTECT(Rf_coerceVector(GET_SLOT(value, Matrix_xSym), SXP_x)); n_prot++;
 	    val_x = STYP_x(val_x_slot);
 	} else {
 	    val_x = STYP_x(		      GET_SLOT(value, Matrix_xSym));
@@ -208,12 +208,12 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     /* llen_i = (int64_t) len_i; */
 
     SEXP ans;
-    /* Instead of simple "duplicate": PROTECT(ans = duplicate(x)) , build up: */
+    /* Instead of simple "duplicate" ans = Rf_duplicate(x), build up: */
     // Assuming that ans will have the same basic Matrix type as x :
     ans = PROTECT(newObject(valid_cM[ctype_x]));
-    SET_SLOT(ans, Matrix_DimSym,      duplicate(dimslot));
-    SET_SLOT(ans, Matrix_DimNamesSym, duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
-    SET_SLOT(ans, Matrix_pSym,        duplicate(GET_SLOT(x, Matrix_pSym)));
+    SET_SLOT(ans, Matrix_DimSym,      Rf_duplicate(dimslot));
+    SET_SLOT(ans, Matrix_DimNamesSym, Rf_duplicate(GET_SLOT(x, Matrix_DimNamesSym)));
+    SET_SLOT(ans, Matrix_pSym,        Rf_duplicate(GET_SLOT(x, Matrix_pSym)));
     SEXP r_pslot = GET_SLOT(ans, Matrix_pSym);
     // and assign the i- and x- slots at the end, as they are potentially modified
     // not just in content, but also in their *length*
@@ -416,8 +416,8 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     }// for( jj )
 
     if(ctype_x == 1) { // triangularMatrix: copy the 'diag' and 'uplo' slots
-	SET_SLOT(ans, Matrix_uploSym, duplicate(GET_SLOT(x, Matrix_uploSym)));
-	SET_SLOT(ans, Matrix_diagSym, duplicate(GET_SLOT(x, Matrix_diagSym)));
+	SET_SLOT(ans, Matrix_uploSym, Rf_duplicate(GET_SLOT(x, Matrix_uploSym)));
+	SET_SLOT(ans, Matrix_diagSym, Rf_duplicate(GET_SLOT(x, Matrix_diagSym)));
     }
     // now assign the i- and x- slots,  free memory and return :
 	PROTECT(islot = allocVector(INTSXP, nnz));

@@ -455,7 +455,7 @@ void coerceArgs(SEXP args, int margin,
 				SET_TAG(a, (t != R_NilValue) ? t : tagWasVector);
 			}
 			if (TYPEOF(s) != kindToType(kind))
-				REPROTECT(s = coerceVector(s, kindToType(kind)), pid);
+				REPROTECT(s = Rf_coerceVector(s, kindToType(kind)), pid);
 			if (repr != 'e') {
 				if (!isM && XLENGTH(s) != rdim[!margin]) {
 					static SEXP replen = NULL;
@@ -914,14 +914,14 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 			}
 			if (TAG(a) != R_NilValue) { /* only if 's' is or was a vector */
 				if (TAG(a) != tagWasVector)
-					nms[margin] = coerceVector(TAG(a), STRSXP);
+					nms[margin] = Rf_coerceVector(TAG(a), STRSXP);
 				else if (level == 2) {
 					PROTECT(nms_ = allocVector(EXPRSXP, 1));
 					SET_VECTOR_ELT(nms_, 0, CAR(e));
-					nms[margin] = coerceVector(nms_, STRSXP);
+					nms[margin] = Rf_coerceVector(nms_, STRSXP);
 					UNPROTECT(1);
 				} else if (level == 1 && TYPEOF(CAR(e)) == SYMSXP)
-					nms[margin] = coerceVector(CAR(e), STRSXP);
+					nms[margin] = Rf_coerceVector(CAR(e), STRSXP);
 			}
 			if (rdimnames[!margin] && nms[!margin] != R_NilValue) {
 				SET_VECTOR_ELT(dimnames, !margin, nms[!margin]);

@@ -1115,9 +1115,9 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 			s = (ppivot[j] > 0) ? 1 : 2; \
 			dp = (ul == 'U') ? j : n - j - s; \
 			 \
-			PROTECT(P = duplicate(P_)); \
+			PROTECT(P = Rf_duplicate(P_)); \
 			PROTECT(P_perm = allocVector(INTSXP, n)); \
-			PROTECT(T = duplicate(T_)); \
+			PROTECT(T = Rf_duplicate(T_)); \
 			PROTECT(T_p = allocVector(INTSXP, n1a)); \
 			PROTECT(T_i = allocVector(INTSXP, (R_xlen_t) s * dp)); \
 			PROTECT(T_x = allocVector(TYPEOF(x), (R_xlen_t) s * dp)); \

@@ -108,9 +108,9 @@ SEXP R_DimNames_fixup(SEXP dimnames)
 		if (TYPEOF(s) == STRSXP)
 			PROTECT(s);
 		else if (TYPEOF(s) == INTSXP && Rf_inherits(s, "factor"))
-			PROTECT(s = asCharacterFactor(s));
+			PROTECT(s = Rf_asCharacterFactor(s));
 		else {
-			PROTECT(s = coerceVector(s, STRSXP));
+			PROTECT(s = Rf_coerceVector(s, STRSXP));
 			CLEAR_ATTRIB(s);
 		}
 		SET_VECTOR_ELT(dimnames_, i, s);
@@ -195,8 +195,8 @@ SEXP symmetricMatrix_validate(SEXP obj)
 
 # define ANY_TO_STRING(x) \
 	((TYPEOF(x) == INTSXP && Rf_inherits(x, "factor")) \
-	 ? asCharacterFactor(x) \
-	 : coerceVector(x, STRSXP))
+	 ? Rf_asCharacterFactor(x) \
+	 : Rf_coerceVector(x, STRSXP))
 
 	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
 		ndn = getAttrib(dn, R_NamesSymbol);

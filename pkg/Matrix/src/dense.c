@@ -341,14 +341,14 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 			}
 		}
 		PROTECT(s_from);
-		PROTECT(s_value = coerceVector(s_value, tx));
+		PROTECT(s_value = Rf_coerceVector(s_value, tx));
 	} else {
 		/* defined in ./coerce.c : */
 		SEXP dense_as_kind(SEXP, const char *, char, int);
 #ifndef MATRIX_ENABLE_IMATRIX
 		if (tv == INTSXP) {
 		PROTECT(s_from = dense_as_kind(s_from, class, 'd', 0));
-		PROTECT(s_value = coerceVector(s_value, REALSXP));
+		PROTECT(s_value = Rf_coerceVector(s_value, REALSXP));
 		} else {
 #endif
 		PROTECT(s_from = dense_as_kind(s_from, class, typeToKind(tv), 0));

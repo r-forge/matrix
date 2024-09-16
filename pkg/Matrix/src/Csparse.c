@@ -85,7 +85,7 @@ SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 	Matrix_cs *A = M2CXS(a, 1);
 	CXSPARSE_XTYPE_SET(CXSPARSE_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
-		duplicate(b) : coerceVector(b, REALSXP));
+		Rf_duplicate(b) : Rf_coerceVector(b, REALSXP));
 	if (A->m != A->n || A->m <= 0)
 		error(_("'%s' is empty or not square"), "a");
 	if (LENGTH(b) != A->m)
@@ -109,7 +109,7 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	Matrix_cs *A = M2CXS(a, 1);
 	CXSPARSE_XTYPE_SET(CXSPARSE_REAL);
 	PROTECT(b = (TYPEOF(b) == REALSXP)
-		? duplicate(b) : coerceVector(b, REALSXP));
+		? Rf_duplicate(b) : Rf_coerceVector(b, REALSXP));
 	if (LENGTH(b) != A->m)
 		error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
 	if (A->n <= 0 || A->n > A->m)
@@ -132,7 +132,7 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 {
 	/* Find least squares solution of A * X = B, given A' and B : */
 	cholmod_sparse *At = M2CHS(at, 1);
-	PROTECT(b = coerceVector(b, REALSXP));
+	PROTECT(b = Rf_coerceVector(b, REALSXP));
 	if (LENGTH(b) != At->ncol)
 		error(_("dimensions of '%s' and '%s' are inconsistent"), "at", "b");
 	if (At->ncol <= 0 || At->ncol < At->nrow)
