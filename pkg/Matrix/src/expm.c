@@ -36,7 +36,7 @@ SEXP geMatrix_expm(SEXP x)
     R_CheckStack();
 
     if (n < 1 || Dims[0] != n)
-	error(_("Matrix exponential requires square, non-null matrix"));
+	Rf_error(_("Matrix exponential requires square, non-null matrix"));
     if(n == 1) {
 	v[0] = exp(v[0]);
 	UNPROTECT(1);
@@ -53,9 +53,9 @@ SEXP geMatrix_expm(SEXP x)
 
     /* Preconditioning 2. Balancing with dgebal. */
     F77_CALL(dgebal)("P", &n, v, &n, &ilo, &ihi, perm, &j FCONE);
-    if (j) error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
+    if (j) Rf_error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
     F77_CALL(dgebal)("S", &n, v, &n, &ilos, &ihis, scale, &j FCONE);
-    if (j) error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
+    if (j) Rf_error(_("geMatrix_expm: LAPACK routine dgebal returned %d"), j);
 
     /* Preconditioning 3. Scaling according to infinity norm */
     inf_norm = F77_CALL(dlange)("I", &n, &n, v, &n, work FCONE);
@@ -93,9 +93,9 @@ SEXP geMatrix_expm(SEXP x)
 
     /* Pade' approximation is solve(dpp, npp) */
     F77_CALL(dgetrf)(&n, &n, dpp, &n, pivot, &j);
-    if (j) error(_("geMatrix_expm: dgetrf returned error code %d"), j);
+    if (j) Rf_error(_("geMatrix_expm: dgetrf returned error code %d"), j);
     F77_CALL(dgetrs)("N", &n, &n, dpp, &n, pivot, npp, &n, &j FCONE);
-    if (j) error(_("geMatrix_expm: dgetrs returned error code %d"), j);
+    if (j) Rf_error(_("geMatrix_expm: dgetrs returned error code %d"), j);
     Memcpy(v, npp, nsqr);
 
     /* Now undo all of the preconditioning */

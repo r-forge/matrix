@@ -2074,8 +2074,8 @@ void validObject(SEXP obj, const char *cl)
 	do { \
 		status = _CLASS_ ## _validate(obj); \
 		if (TYPEOF(status) == STRSXP) \
-			error(_("invalid class \"%s\" object: %s"), \
-			      cl, CHAR(STRING_ELT(status, 0))); \
+			Rf_error(_("invalid class \"%s\" object: %s"), \
+			         cl, CHAR(STRING_ELT(status, 0))); \
 	} while (0)
 
 #define IS_VALID_SPARSE(_C_) \

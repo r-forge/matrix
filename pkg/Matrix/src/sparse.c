@@ -12,8 +12,8 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 	if (XLENGTH(i0) < 2)
 		return from;
 	if (XLENGTH(i0) > INT_MAX)
-		error(_("number of triplets to be aggregated exceeds %s"),
-		      "2^31-1");
+		Rf_error(_("number of triplets to be aggregated exceeds %s"),
+		         "2^31-1");
 	PROTECT(i0);
 	int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0), nnz_ = nnz;
 
@@ -350,7 +350,7 @@ SEXP R_sparse_drop0(SEXP s_from, SEXP s_tol)
 	double tol;
 	if (TYPEOF(s_tol) != REALSXP || LENGTH(s_tol) < 1 ||
 	    ISNAN(tol = REAL(s_tol)[0]))
-		error(_("'%s' is not a number"), "tol");
+		Rf_error(_("'%s' is not a number"), "tol");
 
 	return sparse_drop0(s_from, class, tol);
 }
@@ -712,16 +712,16 @@ SEXP R_sparse_band(SEXP s_from, SEXP s_a, SEXP s_b)
 	if (s_a == R_NilValue)
 		a = -m;
 	else if ((a = Rf_asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
-		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
-		      "k1", a, "-Dim[1]", -m, "Dim[2]", n);
+		Rf_error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
+		         "k1", a, "-Dim[1]", -m, "Dim[2]", n);
 	if (s_b == R_NilValue)
 		b = n;
 	else if ((b = Rf_asInteger(s_b)) == NA_INTEGER || b < -m || b > n)
-		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
-		      "k2", b, "-Dim[1]", -m, "Dim[2]", n);
+		Rf_error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
+		         "k2", b, "-Dim[1]", -m, "Dim[2]", n);
 	else if (b < a)
-		error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
-		      "k1", a, "k2", b);
+		Rf_error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
+		         "k1", a, "k2", b);
 
 	return sparse_band(s_from, class, a, b);
 }
@@ -975,7 +975,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 #undef COUNT
 
 		if (nd1 - nd0 > INT_MAX - pp0[n - 1])
-			error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
+			Rf_error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[n - 1]));
 		int *pi1 = INTEGER(i1);
@@ -1065,7 +1065,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 #undef COUNT
 
 		if (nd1 - nd0 > R_XLEN_T_MAX - nnz0)
-			error(_("%s cannot exceed %s"), "length(i)", "R_XLEN_T_MAX");
+			Rf_error(_("%s cannot exceed %s"), "length(i)", "R_XLEN_T_MAX");
 		nnz1 += nd1 - nd0;
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, nnz1)),
@@ -1136,15 +1136,15 @@ SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 	case CPLXSXP:
 		break;
 	default:
-		error(_("replacement diagonal has incompatible type \"%s\""),
-		      Rf_type2char(tv));
+		Rf_error(_("replacement diagonal has incompatible type \"%s\""),
+		         Rf_type2char(tv));
 		break;
 	}
 
 	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 	if (XLENGTH(s_value) != 1 && XLENGTH(s_value) != r)
-		error(_("replacement diagonal has wrong length"));
+		Rf_error(_("replacement diagonal has wrong length"));
 
 	if (tv <= tx) {
 		/* defined in ./coerce.c : */
@@ -1378,7 +1378,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error(_("attempt to symmetrize a non-square matrix"));
+		Rf_error(_("attempt to symmetrize a non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -1723,9 +1723,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((op_ct == 'C')
-		      ? _("attempt to get Hermitian part of non-square matrix")
-		      : _("attempt to get symmetric part of non-square matrix"));
+		Rf_error((op_ct == 'C')
+		         ? _("attempt to get Hermitian part of non-square matrix")
+		         : _("attempt to get symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -2204,9 +2204,9 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((op_ct == 'C')
-		      ? _("attempt to get skew-Hermitian part of non-square matrix")
-		      : _("attempt to get skew-symmetric part of non-square matrix"));
+		Rf_error((op_ct == 'C')
+		         ? _("attempt to get skew-Hermitian part of non-square matrix")
+		         : _("attempt to get skew-symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */

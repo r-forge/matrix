@@ -889,8 +889,8 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	int_fast64_t ninj = (int_fast64_t) ni * nj,
 		xlen = (!packed || stay == 0) ? ninj : ni + (ninj - ni) / 2;
 	if (xlen > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	char ul1 = '\0', ct1 = '\0', nu1 = '\0';
 	if (stay != 0) {
@@ -1112,8 +1112,8 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		*pi = (mi) ? NULL : INTEGER(si),
 		*pj = (mj) ? NULL : INTEGER(sj);
 	if (anyNA(pi, ni) || anyNA(pj, nj))
-		error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
-		      "x[i, j]", "x", "sparseMatrix");
+		Rf_error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
+		         "x[i, j]", "x", "sparseMatrix");
 
 	char ul0 = '\0', ct0 = '\0', nu0 = '\0';
 	if (class[1] != 'g') {
@@ -1209,8 +1209,8 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			pp1[kj] = (int) nnz;
 		}
 		if (nnz > INT_MAX)
-			error(_("%s too dense for %s; would have more than %s nonzero entries"),
-			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
+			Rf_error(_("%s too dense for %s; would have more than %s nonzero entries"),
+			         "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, (int) nnz));
 		int *pi1 = INTEGER(i1);
@@ -1280,8 +1280,8 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			pp1[kj] = (int) nnz;
 		}
 		if (nnz > INT_MAX)
-			error(_("%s too dense for %s; would have more than %s nonzero entries"),
-			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
+			Rf_error(_("%s too dense for %s; would have more than %s nonzero entries"),
+			         "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, (int) nnz));
 		int *pi1 = INTEGER(i1), d;
@@ -1386,8 +1386,8 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		*pi = (mi) ? NULL : INTEGER(si),
 		*pj = (mj) ? NULL : INTEGER(sj);
 	if (anyNA(pi, ni) || anyNA(pj, nj))
-		error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
-		      "x[i, j]", "x", "sparseMatrix");
+		Rf_error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
+		         "x[i, j]", "x", "sparseMatrix");
 
 	int stay = stay_di(pi, ni, pj, nj, n, 0);
 
@@ -1474,8 +1474,8 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 #undef COUNT
 
 		if (kj < nj)
-			error(_("%s too dense for %s; would have more than %s nonzero entries"),
-			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
+			Rf_error(_("%s too dense for %s; would have more than %s nonzero entries"),
+			         "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[nj - 1]));
 		int *pi1 = INTEGER(i1);
@@ -1558,8 +1558,8 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		*pj = (mj) ? NULL : INTEGER(sj);
 
 	if (anyNA(pi, ni) || anyNA(pj, nj))
-		error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
-		      "x[i, j]", "x", "sparseMatrix");
+		Rf_error(_("NA subscripts in %s not supported for '%s' inheriting from %s"),
+		         "x[i, j]", "x", "sparseMatrix");
 	int stay = class[0] == 'p';
 
 	PROTECT_INDEX pid_ans;
@@ -1636,8 +1636,8 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			pp1[kj] = (int) nnz;
 		}
 		if (nnz > INT_MAX)
-			error(_("%s too dense for %s; would have more than %s nonzero entries"),
-			      "x[i, j]", "[CR]sparseMatrix", "2^31-1");
+			Rf_error(_("%s too dense for %s; would have more than %s nonzero entries"),
+			         "x[i, j]", "[CR]sparseMatrix", "2^31-1");
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, pp1[nj - 1]));
 		int *pi1 = INTEGER(i1);

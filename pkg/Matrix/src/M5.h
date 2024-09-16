@@ -1,6 +1,8 @@
 #ifndef MATRIX_M5_H
 #define MATRIX_M5_H
 
+#include <R_ext/Error.h>
+
 #define nTYPE int
 #define lTYPE int
 #define iTYPE int
@@ -201,7 +203,7 @@
 			else if (((y) < 0) \
 					 ? ((x) <= INT_MIN - (y)) \
 					 : ((x) >  INT_MAX - (y))) { \
-				warning(_("NAs produced by integer overflow")); \
+				Rf_warning(_("NAs produced by integer overflow")); \
 				(x) = NA_INTEGER; \
 			} else \
 				(x) += (y); \
@@ -240,7 +242,7 @@
 			else if (((y) < 0) \
 					 ? ((x) >  INT_MAX + (y)) \
 					 : ((x) <= INT_MIN + (y))) { \
-				warning(_("NAs produced by integer overflow")); \
+				Rf_warning(_("NAs produced by integer overflow")); \
 				(x) = NA_INTEGER; \
 			} else \
 				(x) -= (y); \

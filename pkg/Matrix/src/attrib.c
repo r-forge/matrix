@@ -207,11 +207,11 @@ SEXP R_set_factor(SEXP s_obj, SEXP s_nm, SEXP s_val, SEXP s_warn)
 {
 	if (TYPEOF(s_nm) != STRSXP || LENGTH(s_nm) < 1 ||
 	    (s_nm = STRING_ELT(s_nm, 0)) == NA_STRING)
-		error(_("invalid factor name"));
+		Rf_error(_("invalid factor name"));
 	else if (TYPEOF(Rf_getAttrib(s_obj, Matrix_factorsSym)) == VECSXP)
 		set_factor(s_obj, CHAR(s_nm), s_val);
 	else if (Rf_asLogical(s_warn))
-		warning(_("attempt to set factor on %s without '%s' slot"),
-		        "Matrix", "factors");
+		Rf_warning(_("attempt to set factor on %s without '%s' slot"),
+		           "Matrix", "factors");
 	return s_val;
 }

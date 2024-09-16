@@ -35,12 +35,12 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				rdim[!margin] = sdim[!margin];
 			else if (sdim[!margin] != rdim[!margin]) {
 				if (margin)
-					error(_("number of rows of matrices must match"));
+					Rf_error(_("number of rows of matrices must match"));
 				else
-					error(_("number of columns of matrices must match"));
+					Rf_error(_("number of columns of matrices must match"));
 			}
 			if (sdim[margin] > INT_MAX - rdim[margin])
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 			rdim[margin] += sdim[margin];
 
 			if (!rdimnames[0] || !rdimnames[1]) {
@@ -139,12 +139,12 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 					rdim[!margin] = sdim[!margin];
 				else if (rdim[!margin] != sdim[!margin]) {
 					if (margin)
-						error(_("number of rows of matrices must match"));
+						Rf_error(_("number of rows of matrices must match"));
 					else
-						error(_("number of columns of matrices must match"));
+						Rf_error(_("number of columns of matrices must match"));
 				}
 				if (sdim[margin] > INT_MAX - rdim[margin])
-					error(_("dimensions cannot exceed %s"), "2^31-1");
+					Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 				rdim[margin] += sdim[margin];
 
 				if (!rdimnames[0] || !rdimnames[1]) {
@@ -168,7 +168,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				continue;
 			slen = XLENGTH(s);
 			if (slen > INT_MAX)
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 			else if (slen > maxlen)
 				maxlen = slen;
 		}
@@ -192,13 +192,13 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 			if (slen == 0 && rdim[!margin] > 0)
 				continue;
 			if (rdim[margin] == INT_MAX)
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 			rdim[margin] += 1;
 			if (slen > rdim[!margin] || rdim[!margin] % (int) slen) {
 				if (margin)
-					warning(_("number of rows of result is not a multiple of vector length"));
+					Rf_warning(_("number of rows of result is not a multiple of vector length"));
 				else
-					warning(_("number of columns of result is not a multiple of vector length"));
+					Rf_warning(_("number of columns of result is not a multiple of vector length"));
 			}
 			if (!rdimnames[!margin] && slen == rdim[!margin]) {
 				tmp = Rf_getAttrib(s, R_NamesSymbol);
@@ -590,7 +590,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			psp = INTEGER(sp);
 			n = (int) (XLENGTH(sp) - 1);
 			if (psp[n] > INT_MAX - nnz)
-				error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
+				Rf_error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 			for (j = 0; j < n; ++j)
 				*(pp++) = nnz = nnz + (psp[j + 1] - psp[j]);
 		}
@@ -668,7 +668,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			sp = GET_SLOT(s, Matrix_pSym);
 			psp = INTEGER(sp) + 1;
 			if (n > 0 && psp[n - 1] > INT_MAX - pp[n - 1])
-				error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
+				Rf_error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp[j] += psp[j];
 		}
@@ -744,8 +744,8 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 				continue;
 			k = XLENGTH(GET_SLOT(s, Matrix_iSym));
 			if (k > R_XLEN_T_MAX - nnz)
-				error(_("attempt to allocate vector of length exceeding %s"),
-				      "R_XLEN_T_MAX");
+				Rf_error(_("attempt to allocate vector of length exceeding %s"),
+				         "R_XLEN_T_MAX");
 			nnz += k;
 		}
 
@@ -848,12 +848,12 @@ SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 		/* Arguments are all NULL */
 		return R_NilValue;
 	if (repr == 'e' && (int_fast64_t) rdim[0] * rdim[1] > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	char rcl[] = "...Matrix";
 	if (kind == '\0' || repr == '\0') {
 		if (kind != repr)
-			error(_("should never happen ..."));
+			Rf_error(_("should never happen ..."));
 		rcl[0] = 'i';
 		rcl[1] = 'n';
 		rcl[2] = 'd';

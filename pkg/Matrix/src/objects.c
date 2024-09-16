@@ -30,8 +30,8 @@ char typeToKind(SEXPTYPE type)
 	case CPLXSXP:
 		return 'z';
 	default:
-		error(_("unexpected type \"%s\" in '%s'"),
-		      Rf_type2char(type), __func__);
+		Rf_error(_("unexpected type \"%s\" in '%s'"),
+		         Rf_type2char(type), __func__);
 		return '\0';
 	}
 }
@@ -49,7 +49,7 @@ SEXPTYPE kindToType(char kind)
 	case 'z':
 		return CPLXSXP;
 	default:
-		error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
+		Rf_error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
 		return NILSXP;
 	}
 }
@@ -66,7 +66,7 @@ size_t kindToSize(char kind)
 	case 'z':
 		return sizeof(Rcomplex);
 	default:
-		error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
+		Rf_error(_("unexpected kind \"%c\" in '%s'"), kind, __func__);
 		return 0;
 	}
 }

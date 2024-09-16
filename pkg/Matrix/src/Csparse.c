@@ -72,7 +72,7 @@ SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
 		cholmod_sparse *A = M2CHS(x, 1);
 		A->sorted = 0;
 		if (!cholmod_sort(A, &c))
-			error(_("'%s' failed"), "cholmod_sort");
+			Rf_error(_("'%s' failed"), "cholmod_sort");
 		cpi = checkpi(dim, p, i);
 	}
 	UNPROTECT(3); /* i, p, dim */
@@ -87,11 +87,11 @@ SEXP dgCMatrix_lusol(SEXP a, SEXP b)
 	PROTECT(b = (TYPEOF(b) == REALSXP) ?
 		Rf_duplicate(b) : Rf_coerceVector(b, REALSXP));
 	if (A->m != A->n || A->m <= 0)
-		error(_("'%s' is empty or not square"), "a");
+		Rf_error(_("'%s' is empty or not square"), "a");
 	if (LENGTH(b) != A->m)
-		error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
+		Rf_error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
 	if (!Matrix_cs_lusol(1, A, REAL(b), 1e-07))
-		error(_("'%s' failed"), "cs_lusol");
+		Rf_error(_("'%s' failed"), "cs_lusol");
 	UNPROTECT(1);
 	return b;
 }
@@ -111,12 +111,12 @@ SEXP dgCMatrix_qrsol(SEXP a, SEXP b, SEXP order)
 	PROTECT(b = (TYPEOF(b) == REALSXP)
 		? Rf_duplicate(b) : Rf_coerceVector(b, REALSXP));
 	if (LENGTH(b) != A->m)
-		error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
+		Rf_error(_("dimensions of '%s' and '%s' are inconsistent"), "a", "b");
 	if (A->n <= 0 || A->n > A->m)
-		error(_("%s(%s, %s) requires m-by-n '%s' with m >= n > 0"),
-		      "dgCMatrix_qrsol", "a", "b", "a");
+		Rf_error(_("%s(%s, %s) requires m-by-n '%s' with m >= n > 0"),
+		         "dgCMatrix_qrsol", "a", "b", "a");
 	if (!Matrix_cs_qrsol(order_, A, REAL(b)))
-		error(_("'%s' failed"), "cs_qrsol");
+		Rf_error(_("'%s' failed"), "cs_qrsol");
 	if (A->n < A->m) {
 		SEXP tmp = Rf_allocVector(REALSXP, A->n);
 		memcpy(REAL(tmp), REAL(b), sizeof(double) * (size_t) A->n);
@@ -134,16 +134,16 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	cholmod_sparse *At = M2CHS(at, 1);
 	PROTECT(b = Rf_coerceVector(b, REALSXP));
 	if (LENGTH(b) != At->ncol)
-		error(_("dimensions of '%s' and '%s' are inconsistent"), "at", "b");
+		Rf_error(_("dimensions of '%s' and '%s' are inconsistent"), "at", "b");
 	if (At->ncol <= 0 || At->ncol < At->nrow)
-		error(_("%s(%s, %s) requires m-by-n '%s' with n >= m > 0"),
-		      "dgCMatrix_cholsol", "at", "b", "at");
+		Rf_error(_("%s(%s, %s) requires m-by-n '%s' with n >= m > 0"),
+		         "dgCMatrix_cholsol", "at", "b", "at");
 	double zero[] = { 0.0, 0.0 }, one[] = {1.0, 0.0}, mone[] = { -1.0, 0.0 };
 
 	/* L * L' = A' * A */
 	cholmod_factor *L = cholmod_analyze(At, &c);
 	if (!cholmod_factorize(At, L, &c))
-		error(_("'%s' failed"), "cholmod_factorize");
+		Rf_error(_("'%s' failed"), "cholmod_factorize");
 
 	cholmod_dense *B = (cholmod_dense *) R_alloc(1, sizeof(cholmod_dense));
 	memset(B, 0, sizeof(cholmod_dense));
@@ -157,17 +157,17 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 	cholmod_dense *AtB = cholmod_allocate_dense(
 		At->nrow, 1, At->nrow, CHOLMOD_REAL, &c);
 	if (!cholmod_sdmult(At, 0, one, zero, B, AtB, &c))
-		error(_("'%s' failed"), "cholmod_sdmult");
+		Rf_error(_("'%s' failed"), "cholmod_sdmult");
 
 	/* C := solve(A' * A, A' * B) = solve(L', solve(L, A' * B)) */
 	cholmod_dense *C = cholmod_solve(CHOLMOD_A, L, AtB, &c);
 	if (!C)
-		error(_("'%s' failed"), "cholmod_solve");
+		Rf_error(_("'%s' failed"), "cholmod_solve");
 
 	/* R := A * A' * C - B = 1 * (A')' * A' * X + (-1) * B */
 	cholmod_dense *R = cholmod_copy_dense(B, &c);
 	if (!cholmod_sdmult(At, 1, mone, one, C, R, &c))
-		error(_("'%s' failed"), "cholmod_sdmult");
+		Rf_error(_("'%s' failed"), "cholmod_sdmult");
 
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
 	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
@@ -224,7 +224,7 @@ SEXP dtCMatrix_diag(SEXP obj, SEXP op)
 	if (TYPEOF(op) != STRSXP || LENGTH(op) < 1 ||
 	    (op = STRING_ELT(op, 0)) == NA_STRING ||
 	    (ivalid = strmatch(CHAR(op), valid)) < 0)
-		error(_("invalid '%s' to '%s'"), "op", __func__);
+		Rf_error(_("invalid '%s' to '%s'"), "op", __func__);
 
 	SEXP uplo = Rf_getAttrib(obj, Matrix_uploSym);
 	char ul = (TYPEOF(uplo) == STRSXP && LENGTH(uplo) > 0)
@@ -429,9 +429,9 @@ SEXP Csparse_writeMM(SEXP obj, SEXP file)
 	const char *filename = CHAR(Rf_asChar(file));
 	FILE *f = fopen(filename, "w");
 	if (!f)
-		error(_("failed to open file \"%s\" for writing"), filename);
+		Rf_error(_("failed to open file \"%s\" for writing"), filename);
 	if (!cholmod_write_sparse(f, A, (cholmod_sparse *) NULL, (char *) NULL, &c))
-		error(_("'%s' failed"), "cholmod_write_sparse");
+		Rf_error(_("'%s' failed"), "cholmod_write_sparse");
 	fclose(f);
 
 	UNPROTECT(1);

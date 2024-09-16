@@ -36,13 +36,13 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 	SEXP adim = GET_SLOT(s_a, Matrix_DimSym); \
 	int *padim = INTEGER(adim), m = padim[0], n = padim[1]; \
 	if (m != n) \
-		error(_("'%s' is not square"), "a"); \
+		Rf_error(_("'%s' is not square"), "a"); \
 	if (s_b != R_NilValue) { \
 	SEXP bdim = GET_SLOT(s_b, Matrix_DimSym); \
 	int *pbdim = INTEGER(bdim); \
 	if (pbdim[0] != m) \
-		error(_("dimensions of '%s' and '%s' are inconsistent"), \
-		      "a", "b"); \
+		Rf_error(_("dimensions of '%s' and '%s' are inconsistent"), \
+		         "a", "b"); \
 	n = pbdim[1]; \
 	}
 
@@ -482,8 +482,8 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 	CXSPARSE_XTYPE_SET(L->xtype);
 	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		char rcl[] = ".geMatrix";
 		rcl[0] = (L->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 		PROTECT(r = newObject(rcl));
@@ -586,8 +586,8 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 					if (_BFR_) \
 						B = Matrix_cs_spfree(B); \
 					X = Matrix_cs_spfree(X); \
-					error(_("attempt to construct %s with more than %s nonzero elements"), \
-					      "sparseMatrix", "2^31-1"); \
+					Rf_error(_("attempt to construct %s with more than %s nonzero elements"), \
+					         "sparseMatrix", "2^31-1"); \
 				} \
 				nz += m - top; \
 				if (nz > nzmax) { \
@@ -683,7 +683,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	if (TYPEOF(s_system) != STRSXP || LENGTH(s_system) < 1 ||
 	    (s_system = STRING_ELT(s_system, 0)) == NA_STRING ||
 	    (ivalid = strmatch(CHAR(s_system), valid)) < 0)
-		error(_("invalid '%s' to '%s'"), "system", __func__);
+		Rf_error(_("invalid '%s' to '%s'"), "system", __func__);
 
 	SOLVE_START;
 
@@ -692,8 +692,8 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 	cholmod_factor *L = M2CHF(s_a, 1);
 	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		cholmod_dense *B = NULL, *X = NULL;
 		if (s_b == R_NilValue) {
 			B = cholmod_eye(m_, n_, L->xtype + L->dtype, &c);
@@ -764,8 +764,8 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 	CXSPARSE_XTYPE_SET(A->xtype);
 	if (!Rf_asLogical(s_sparse)) {
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		char rcl[] = "...Matrix";
 		rcl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 		rcl[1] = (s_b == R_NilValue) ? 't' : 'g';
@@ -894,8 +894,8 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	if (s_y == R_NilValue) {
 		n = (Rf_asLogical(s_complete)) ? m : r;
 		if ((int_fast64_t) m * n > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		R_xlen_t mn = (R_xlen_t) m * n, m1a = (R_xlen_t) m + 1;
 		PROTECT(yx = Rf_allocVector((V_->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 
@@ -916,7 +916,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 					pyxjj += 1; \
 				} \
 			} else \
-				error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
+				Rf_error(_("invalid '%s' to '%s'"), "yxjj", __func__); \
 		} while (0)
 
 		if (V_->xtype == CXSPARSE_COMPLEX)
@@ -930,8 +930,8 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 		SEXP ydim = GET_SLOT(s_y, Matrix_DimSym);
 		int *pydim = INTEGER(ydim);
 		if (pydim[0] != m)
-			error(_("dimensions of '%s' and '%s' are inconsistent"),
-			      "qr", "y");
+			Rf_error(_("dimensions of '%s' and '%s' are inconsistent"),
+			         "qr", "y");
 		n = pydim[1];
 
 		PROTECT(yx = GET_SLOT(s_y, Matrix_xSym));
@@ -1047,7 +1047,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 			} \
 		break; \
 		default: \
-			error(_("invalid '%s' to '%s'"), "op", __func__); \
+			Rf_error(_("invalid '%s' to '%s'"), "op", __func__); \
 			break; \
 		} \
 	} while (0)

@@ -134,16 +134,16 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 	if (s_a == R_NilValue)
 		a = -m;
 	else if ((a = Rf_asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
-		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
-		      "k1", a, "-Dim[1]", -m, "Dim[2]", n);
+		Rf_error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
+		         "k1", a, "-Dim[1]", -m, "Dim[2]", n);
 	if (s_b == R_NilValue)
 		b = n;
 	else if ((b = Rf_asInteger(s_b)) == NA_INTEGER || b < -m || b > n)
-		error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
-		      "k2", b, "-Dim[1]", -m, "Dim[2]", n);
+		Rf_error(_("'%s' (%d) must be an integer from %s (%d) to %s (%d)"),
+		         "k2", b, "-Dim[1]", -m, "Dim[2]", n);
 	else if (b < a)
-		error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
-		      "k1", a, "k2", b);
+		Rf_error(_("'%s' (%d) must be less than or equal to '%s' (%d)"),
+		         "k1", a, "k2", b);
 
 	s_from = dense_band(s_from, class, a, b);
 	UNPROTECT(1); /* s_from */
@@ -316,15 +316,15 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 	case CPLXSXP:
 		break;
 	default:
-		error(_("replacement diagonal has incompatible type \"%s\""),
-		      Rf_type2char(tv));
+		Rf_error(_("replacement diagonal has incompatible type \"%s\""),
+		         Rf_type2char(tv));
 		break;
 	}
 
 	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 	if (XLENGTH(s_value) != 1 && XLENGTH(s_value) != r)
-		error(_("replacement diagonal has wrong length"));
+		Rf_error(_("replacement diagonal has wrong length"));
 
 	int new = 1;
 	if (tv <= tx) {
@@ -490,7 +490,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error(_("attempt to symmetrize a non-square matrix"));
+		Rf_error(_("attempt to symmetrize a non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -593,9 +593,9 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((op_ct == 'C')
-		      ? _("attempt to get Hermitian part of non-square matrix")
-		      : _("attempt to get symmetric part of non-square matrix"));
+		Rf_error((op_ct == 'C')
+		         ? _("attempt to get Hermitian part of non-square matrix")
+		         : _("attempt to get symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -812,9 +812,9 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error((op_ct == 'C')
-		      ? _("attempt to get skew-Hermitian part of non-square matrix")
-		      : _("attempt to get skew-symmetric part of non-square matrix"));
+		Rf_error((op_ct == 'C')
+		         ? _("attempt to get skew-Hermitian part of non-square matrix")
+		         : _("attempt to get skew-symmetric part of non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -862,8 +862,8 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 	} else {
 
 		if ((int_fast64_t) n * n > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		PROTECT(x1 = Rf_allocVector(TYPEOF(x0), (R_xlen_t) n * n));
 
 		int i, j;

@@ -21,7 +21,7 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 	int zt = *ztrans == 'C' || *ztrans == 'T'; if (!zt) *ztrans = 'N';
 	if (y == R_NilValue) {
 		if (xt == yt)
-			error(_("should never happen ..."));
+			Rf_error(_("should never happen ..."));
 		SEXP
 			xdim = (TYPEOF(x) == OBJSXP)
 			? GET_SLOT(x, Matrix_DimSym) : Rf_getAttrib(x, R_DimSymbol);
@@ -32,7 +32,7 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 			*v = 1;
 			*m = *n = (xt) ? 1 : LENGTH(x);
 		} else
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 	} else {
 		/* MJ: So that I don't lose my mind ... : */
 		if (zt) {
@@ -53,13 +53,13 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 			xm = pxdim[0];
 			xn = pxdim[1];
 		} else if (XLENGTH(x) > INT_MAX)
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		if (y2) {
 			int *pydim = INTEGER(ydim);
 			ym = pydim[0];
 			yn = pydim[1];
 		} else if (XLENGTH(y) > INT_MAX)
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		/* MJ: R's do_matprod behaves quite asymmetrically ... what a pain */
 		if (x2 && y2)
 			*v = 0;
@@ -110,7 +110,7 @@ void matmultDim(SEXP x, SEXP y, char *xtrans, char *ytrans, char *ztrans,
 			}
 		}
 		if (((xt) ? xm : xn) != ((yt) ? yn : ym))
-			error(_("non-conformable arguments"));
+			Rf_error(_("non-conformable arguments"));
 		*m = (xt) ? xn : xm;
 		*n = (yt) ? ym : yn;
 		if (zt) {
@@ -174,8 +174,8 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 	if (b == R_NilValue) {
 
 		if ((int_fast64_t) rm * rm > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 
 		SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -245,10 +245,10 @@ SEXP geMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans)
 			rn = (btrans != 'N') ? bm : bn;
 
 		if (rk != ((btrans != 'N') ? bn : bm))
-			error(_("non-conformable arguments"));
+			Rf_error(_("non-conformable arguments"));
 		if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 
 		SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -320,10 +320,10 @@ SEXP syMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 		rm = (btrans != 'N') ? bn : bm, rn = (btrans != 'N') ? bm : bn;
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
-		error(_("non-conformable arguments"));
+		Rf_error(_("non-conformable arguments"));
 	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -445,10 +445,10 @@ SEXP spMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside)
 		rm = (btrans != 'N') ? bn : bm, rn = (btrans != 'N') ? bm : bn;
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
-		error(_("non-conformable arguments"));
+		Rf_error(_("non-conformable arguments"));
 	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -556,10 +556,10 @@ SEXP trMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 		rm = (btrans != 'N') ? bn : bm, rn = (btrans != 'N') ? bm : bn;
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
-		error(_("non-conformable arguments"));
+		Rf_error(_("non-conformable arguments"));
 	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -647,10 +647,10 @@ SEXP tpMatrix_matmult(SEXP a, SEXP b, char atrans, char btrans, char aside,
 		rm = (btrans != 'N') ? bn : bm, rn = (btrans != 'N') ? bm : bn;
 
 	if (rk != (((aside == 'L') == (btrans != 'N')) ? bn : bm))
-		error(_("non-conformable arguments"));
+		Rf_error(_("non-conformable arguments"));
 	if ((int_fast64_t) rm * rn > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	SEXP ax = PROTECT(GET_SLOT(a, Matrix_xSym));
 
@@ -942,7 +942,7 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 
 		if (((xtrans != 'N') ? X->nrow : X->ncol) !=
 		    ((ytrans != 'N') ? Y->ncol : Y->nrow))
-			error(_("non-conformable arguments"));
+			Rf_error(_("non-conformable arguments"));
 
 		zclass[0] = (boolean) ? 'n' : ((X->xtype != CHOLMOD_COMPLEX && Y->xtype != CHOLMOD_COMPLEX) ? 'd' : 'z');
 		zclass[1] = (triangular != 0) ? 't' : 'g';
@@ -1004,11 +1004,11 @@ SEXP gCgeMatrix_matmult(SEXP x, SEXP y, int xtrans, char ytrans, char ztrans,
 	cholmod_dense *Y = M2CHD(y, ytrans);
 
 	if (((xtrans != 'N') ? X->nrow : X->ncol) != Y->nrow)
-		error(_("non-conformable arguments"));
+		Rf_error(_("non-conformable arguments"));
 	size_t m = (xtrans != 'N') ? X->ncol : X->nrow, n = Y->ncol;
 	if (m * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	if (X->xtype == CHOLMOD_COMPLEX && xtrans == 'T')
 		CONJ2(X->x, X->nrow, X->ncol);
@@ -1091,7 +1091,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
                       SEXP s_boolean)
 {
 	if (TYPEOF(s_boolean) != LGLSXP || LENGTH(s_boolean) < 1)
-		error(_("invalid '%s' to '%s'"), "boolean", __func__);
+		Rf_error(_("invalid '%s' to '%s'"), "boolean", __func__);
 	int boolean = LOGICAL(s_boolean)[0];
 
 	char
@@ -1390,7 +1390,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	SEXP _s_x = s_x, _s_y = s_y; /* for later pointer comparison */
 
 	if (TYPEOF(s_boolean) != LGLSXP || LENGTH(s_boolean) < 1)
-		error(_("invalid '%s' to '%s'"), "boolean", __func__);
+		Rf_error(_("invalid '%s' to '%s'"), "boolean", __func__);
 	int boolean = LOGICAL(s_boolean)[0];
 
 	char
@@ -1446,7 +1446,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 		mg = 1;
 		id = CHAR(STRING_ELT(GET_SLOT(s_y, Matrix_diagSym), 0))[0] != 'N';
 	} else
-		error(_("should never happen ..."));
+		Rf_error(_("should never happen ..."));
 
 #define DO_AS(_A_, _CLASS_, _TRANS_, _PID_) \
 	do { \

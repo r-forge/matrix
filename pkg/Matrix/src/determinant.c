@@ -33,7 +33,7 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	SEXP dim = GET_SLOT(_F_, Matrix_DimSym); \
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
 	if (m != n) \
-		error(_("determinant of non-square matrix is undefined")); \
+		Rf_error(_("determinant of non-square matrix is undefined")); \
 	int givelog = Rf_asLogical(s_logarithm); \
 	double modulus = 0.0; /* result for n == 0 */
 
@@ -243,8 +243,8 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 
 	dim = GET_SLOT(R, Matrix_DimSym);
 	if (INTEGER(dim)[0] > n)
-		error(_("%s(<%s>) does not support structurally rank deficient case"),
-			  "determinant", "sparseQR");
+		Rf_error(_("%s(<%s>) does not support structurally rank deficient case"),
+		         "determinant", "sparseQR");
 
 	if (n > 0) {
 	SEXP p = PROTECT(GET_SLOT(R, Matrix_pSym)),

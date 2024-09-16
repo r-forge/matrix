@@ -29,10 +29,10 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 		nx = (packed) ? n + (nn - n) / 2 : nn,
 		nr = (diag) ? n + (nn - n) / 2 : (nn - n) / 2;
 	if (nx > 0x1.0p+53)
-		error(_("indices would exceed %s"), "2^53");
+		Rf_error(_("indices would exceed %s"), "2^53");
 	if (nr > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 #define DO_INDEX \
 	do { \
@@ -115,7 +115,7 @@ SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn;
 	if (nx > 0x1.0p+53)
-		error(_("indices would exceed %s"), "2^53");
+		Rf_error(_("indices would exceed %s"), "2^53");
 
 #define DO_INDEX \
 	do { \
@@ -215,7 +215,7 @@ SEXP R_all0(SEXP x) {
 	if (!Rf_isVectorAtomic(x)) {
 		if (Rf_length(x) == 0) return TRUE_;
 		// Typically S4.  TODO: Call the R code above, instead!
-		error(_("Argument must be numeric-like atomic vector"));
+		Rf_error(_("Argument must be numeric-like atomic vector"));
 	}
 	R_xlen_t i, n = XLENGTH(x);
 	if (n == 0) return TRUE_;
@@ -250,7 +250,7 @@ SEXP R_all0(SEXP x) {
 		return TRUE_;
 	}
 	}
-	error(_("Argument must be numeric-like atomic vector"));
+	Rf_error(_("Argument must be numeric-like atomic vector"));
 	return R_NilValue; // -Wall
 }
 
@@ -261,7 +261,7 @@ SEXP R_any0(SEXP x) {
 	if (!Rf_isVectorAtomic(x)) {
 		if (Rf_length(x) == 0) return FALSE_;
 		// Typically S4.  TODO: Call the R code above, instead!
-		error(_("Argument must be numeric-like atomic vector"));
+		Rf_error(_("Argument must be numeric-like atomic vector"));
 	}
 	R_xlen_t i, n = XLENGTH(x);
 	if (n == 0) return FALSE_;
@@ -292,7 +292,7 @@ SEXP R_any0(SEXP x) {
 		return FALSE_;
 	}
 	}
-	error(_("Argument must be numeric-like atomic vector"));
+	Rf_error(_("Argument must be numeric-like atomic vector"));
 	return R_NilValue; // -Wall
 }
 
@@ -325,43 +325,43 @@ SEXP Mmatrix(SEXP args)
 	case VECSXP:
 		break;
 	default:
-		error(_("'data' must be of a vector type"));
+		Rf_error(_("'data' must be of a vector type"));
 	}
 	lendat = XLENGTH(vals);
 	snr = CAR(args); args = CDR(args);
 	snc = CAR(args); args = CDR(args);
 	byrow = Rf_asLogical(CAR(args)); args = CDR(args);
 	if (byrow == NA_INTEGER)
-		error(_("invalid '%s' argument"), "byrow");
+		Rf_error(_("invalid '%s' argument"), "byrow");
 	dimnames = CAR(args);
 	args = CDR(args);
 	miss_nr = Rf_asLogical(CAR(args)); args = CDR(args);
 	miss_nc = Rf_asLogical(CAR(args));
 
 	if (!miss_nr) {
-		if (!Rf_isNumeric(snr)) error(_("non-numeric matrix extent"));
+		if (!Rf_isNumeric(snr)) Rf_error(_("non-numeric matrix extent"));
 		nr = Rf_asInteger(snr);
 		if (nr == NA_INTEGER)
-			error(_("invalid 'nrow' value (too large or NA)"));
+			Rf_error(_("invalid 'nrow' value (too large or NA)"));
 		if (nr < 0)
-			error(_("invalid 'nrow' value (< 0)"));
+			Rf_error(_("invalid 'nrow' value (< 0)"));
 	}
 	if (!miss_nc) {
-		if (!Rf_isNumeric(snc)) error(_("non-numeric matrix extent"));
+		if (!Rf_isNumeric(snc)) Rf_error(_("non-numeric matrix extent"));
 		nc = Rf_asInteger(snc);
 		if (nc == NA_INTEGER)
-			error(_("invalid 'ncol' value (too large or NA)"));
+			Rf_error(_("invalid 'ncol' value (too large or NA)"));
 		if (nc < 0)
-			error(_("invalid 'ncol' value (< 0)"));
+			Rf_error(_("invalid 'ncol' value (< 0)"));
 	}
 	if (miss_nr && miss_nc) {
-		if (lendat > INT_MAX) error("data is too long");
+		if (lendat > INT_MAX) Rf_error("data is too long");
 		nr = (int) lendat;
 	} else if (miss_nr) {
-		if (lendat > (double) nc * INT_MAX) error("data is too long");
+		if (lendat > (double) nc * INT_MAX) Rf_error("data is too long");
 		nr = (int) ceil((double) lendat / (double) nc);
 	} else if (miss_nc) {
-		if (lendat > (double) nr * INT_MAX) error("data is too long");
+		if (lendat > (double) nr * INT_MAX) Rf_error("data is too long");
 		nc = (int) ceil((double) lendat / (double) nr);
 	}
 
@@ -370,21 +370,21 @@ SEXP Mmatrix(SEXP args)
 		if (lendat > 1 && nrc % lendat != 0) {
 			if ((lendat > nr && (lendat / nr) * nr != lendat) ||
 			    (lendat < nr && (nr / lendat) * lendat != nr))
-				warning(_("data length [%lld] is not a sub-multiple "
-				          "or multiple of the number of rows [%d]"),
-				        (long long)lendat, nr);
+				Rf_warning(_("data length [%lld] is not a sub-multiple "
+				             "or multiple of the number of rows [%d]"),
+				           (long long) lendat, nr);
 			else if ((lendat > nc && (lendat / nc) * nc != lendat) ||
 				 (lendat < nc && (nc / lendat) * lendat != nc))
-				warning(_("data length [%lld] is not a sub-multiple "
-				          "or multiple of the number of columns [%d]"),
-					(long long)lendat, nc);
+				Rf_warning(_("data length [%lld] is not a sub-multiple "
+				             "or multiple of the number of columns [%d]"),
+				           (long long) lendat, nc);
 		} else if (lendat > 1 && nrc == 0)
-			warning(_("data length exceeds size of matrix"));
+			Rf_warning(_("data length exceeds size of matrix"));
 	}
 
 #ifndef LONG_VECTOR_SUPPORT
 	if ((double) nr * (double) nc > INT_MAX)
-		error(_("too many elements specified"));
+		Rf_error(_("too many elements specified"));
 #endif
 
 	PROTECT(ans = Rf_allocMatrix(TYPEOF(vals), nr, nc));
@@ -524,7 +524,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 	}
 	if (!Rf_isMatrix(ij) ||
 	    (ij_di = INTEGER(Rf_getAttrib(ij, R_DimSymbol)))[1] != 2)
-		error(_("Argument ij must be 2-column integer matrix"));
+		Rf_error(_("Argument ij must be 2-column integer matrix"));
 	n = ij_di[0];
 	int *Di = INTEGER(di), *IJ = INTEGER(ij),
 		*j_ = IJ+n;/* pointer offset! */
@@ -549,9 +549,9 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 						j_i = _j_[i]; \
 					} \
 					if (i_i < 0 || i_i >= Di[0]) \
-						error(_("subscript 'i' out of bounds in M[ij]")); \
+						Rf_error(_("subscript 'i' out of bounds in M[ij]")); \
 					if (j_i < 0 || j_i >= Di[1]) \
-						error(_("subscript 'j' out of bounds in M[ij]")); \
+						Rf_error(_("subscript 'j' out of bounds in M[ij]")); \
 					ii[i] = i_i + j_i * nr; \
 				} \
 			} \
@@ -605,7 +605,7 @@ SEXP m_encodeInd2(SEXP i, SEXP j, SEXP di, SEXP orig_1, SEXP chk_bnds)
 		nprot++;
 	}
 	if (LENGTH(j) != n)
-		error(_("i and j must be integer vectors of the same length"));
+		Rf_error(_("i and j must be integer vectors of the same length"));
 
 	int *Di = INTEGER(di), *i_ = INTEGER(i), *j_ = INTEGER(j);
 

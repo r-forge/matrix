@@ -7,15 +7,15 @@ char La_norm_type(SEXP s)
 {
 #define ARGNAME "type"
 	if (TYPEOF(s) != STRSXP)
-		error(_("argument '%s' is not of type \"%s\""),
-		      ARGNAME, "character");
+		Rf_error(_("argument '%s' is not of type \"%s\""),
+		         ARGNAME, "character");
 	if (LENGTH(s) == 0)
-		error(_("argument '%s' has length %d"),
-		      ARGNAME, 0);
+		Rf_error(_("argument '%s' has length %d"),
+		         ARGNAME, 0);
 	s = STRING_ELT(s, 0);
 	if (CHAR(s)[0] == '\0' || CHAR(s)[1] != '\0')
-		error(_("argument '%s' (\"%s\") does not have string length %d"),
-		      ARGNAME, CHAR(s), 1);
+		Rf_error(_("argument '%s' (\"%s\") does not have string length %d"),
+		         ARGNAME, CHAR(s), 1);
 	char type = '\0';
 	switch (CHAR(s)[0]) {
 	case 'M':
@@ -38,8 +38,8 @@ char La_norm_type(SEXP s)
 		type = 'F';
 		break;
 	default:
-		error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", or \"%s\""),
-		      ARGNAME, CHAR(s), "M", "O", "1", "I", "F", "E");
+		Rf_error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", or \"%s\""),
+		         ARGNAME, CHAR(s), "M", "O", "1", "I", "F", "E");
 		break;
 	}
 	return type;
@@ -51,15 +51,15 @@ char La_rcond_type(SEXP s)
 {
 #define ARGNAME "norm"
 	if (TYPEOF(s) != STRSXP)
-		error(_("argument '%s' is not of type \"%s\""),
-		      ARGNAME, "character");
+		Rf_error(_("argument '%s' is not of type \"%s\""),
+		         ARGNAME, "character");
 	if (LENGTH(s) == 0)
-		error(_("argument '%s' has length %d"),
-		      ARGNAME, 0);
+		Rf_error(_("argument '%s' has length %d"),
+		         ARGNAME, 0);
 	s = STRING_ELT(s, 0);
 	if (CHAR(s)[0] == '\0' || CHAR(s)[1] != '\0')
-		error(_("argument '%s' (\"%s\") does not have string length %d"),
-		      ARGNAME, CHAR(s), 1);
+		Rf_error(_("argument '%s' (\"%s\") does not have string length %d"),
+		         ARGNAME, CHAR(s), 1);
 	char type = '\0';
 	switch (CHAR(s)[0]) {
 	case 'O':
@@ -72,8 +72,8 @@ char La_rcond_type(SEXP s)
 		type = 'I';
 		break;
 	default:
-		error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", or \"%s\""),
-		      ARGNAME, CHAR(s), "O", "1", "I");
+		Rf_error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", or \"%s\""),
+		         ARGNAME, CHAR(s), "O", "1", "I");
 		break;
 	}
 	return type;
@@ -239,7 +239,8 @@ SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (m != n)
-		error(_("%s(%s) is undefined: '%s' is not square"), "rcond", "x", "x");
+		Rf_error(_("%s(%s) is undefined: '%s' is not square"),
+		         "rcond", "x", "x");
 	if (n == 0)
 		return(Rf_ScalarReal(R_PosInf));
 

@@ -21,14 +21,14 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 	PROTECT(from = Rf_coerceVector(from, tt));
 
 	if (cl[1] != 'g' && m != n)
-		error(_("attempt to construct non-square %s"),
-		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
+		Rf_error(_("attempt to construct non-square %s"),
+		         (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
 	int_fast64_t mn = (int_fast64_t) m * n,
 		xlen = (!packed) ? mn : n + (mn - n) / 2;
 	if (xlen > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 
 	SEXP to = PROTECT(newObject(cl));
 
@@ -173,8 +173,8 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
 	      (zzz[1] == 'p' && (zzz[2] == 'o' || zzz[2] == 'p')) ||
 	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("second argument of '%s' does not specify a subclass of %s"),
-		      __func__, "denseMatrix");
+		Rf_error(_("second argument of '%s' does not specify a subclass of %s"),
+		         __func__, "denseMatrix");
 
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
@@ -193,12 +193,12 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 			if (LENGTH(s_m) >= 1 && !ISNAN(tmp = REAL(s_m)[0]) &&
 			    tmp >= 0.0) {
 				if (trunc(tmp) > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
+					Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 				m = (int) tmp;
 			}
 		}
 		if (m < 0)
-			error(_("invalid '%s' to '%s'"), "m", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "m", __func__);
 	}
 
 	int n = -1;
@@ -213,12 +213,12 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 			if (LENGTH(s_n) >= 1 && !ISNAN(tmp = REAL(s_n)[0]) &&
 			    tmp >= 0.0) {
 				if (trunc(tmp) > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
+					Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 				n = (int) tmp;
 			}
 		}
 		if (n < 0)
-			error(_("invalid '%s' to '%s'"), "n", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "n", __func__);
 	}
 
 	int byrow;
@@ -226,7 +226,7 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 
 	if (s_dimnames != R_NilValue)
 		if (TYPEOF(s_dimnames) != VECSXP || LENGTH(s_dimnames) != 2)
-			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "dimnames", __func__);
 
 	R_xlen_t vlen = XLENGTH(s_from);
 	if (zzz[1] != 'g' && (m < 0) != (n < 0)) {
@@ -236,23 +236,23 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 			n = m;
 	} else if (m < 0 && n < 0) {
 		if (vlen > INT_MAX)
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		m = (int) vlen;
 		n = 1;
 	} else if (m < 0) {
 		if (vlen > (int_fast64_t) INT_MAX * n) {
 			if (n == 0)
-				error(_("nonempty vector supplied for empty matrix"));
+				Rf_error(_("nonempty vector supplied for empty matrix"));
 			else
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
 		m = (int) ((n == 0) ? 0 : vlen / n + (vlen % n != 0));
 	} else if (n < 0) {
 		if (vlen > (int_fast64_t) m * INT_MAX) {
 			if (m == 0)
-				error(_("nonempty vector supplied for empty matrix"));
+				Rf_error(_("nonempty vector supplied for empty matrix"));
 			else
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
 		n = (int) ((m == 0) ? 0 : vlen / m + (vlen % m != 0));
 	}
@@ -261,13 +261,13 @@ SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
 	if (vlen <= 1)
 		/* do nothing */ ;
 	else if (mlen == 0)
-		warning(_("nonempty vector supplied for empty matrix"));
+		Rf_warning(_("nonempty vector supplied for empty matrix"));
 	else if (vlen > mlen)
-		warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
-		        (long long) vlen, m, n);
+		Rf_warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
+		           (long long) vlen, m, n);
 	else if (mlen % vlen != 0)
-		warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
-		        m, n, (long long) vlen);
+		Rf_warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
+		           m, n, (long long) vlen);
 
 	return
 	vector_as_dense(s_from, zzz, ul, ct, nu, m, n, byrow, s_dimnames);
@@ -316,7 +316,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	} else {
 
 		if (mn > INT_MAX)
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		dim = GET_SLOT(to, Matrix_DimSym);
 		pdim = INTEGER(dim);
 		if (mg == 0) {
@@ -339,8 +339,8 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	}
 
 	if (cl[1] != 'g' && m != n)
-		error(_("attempt to construct non-square %s"),
-		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
+		Rf_error(_("attempt to construct non-square %s"),
+		         (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
 	if (doDN) {
 		if (cl[1] == 's' || cl[1] == 'p')
@@ -428,8 +428,8 @@ SEXP R_matrix_as_dense(SEXP s_from, SEXP s_zzz,
 	      (zzz[1] == 's' && (zzz[2] == 'y' || zzz[2] == 'p')) ||
 	      (zzz[1] == 'p' && (zzz[2] == 'o' || zzz[2] == 'p')) ||
 	      (zzz[1] == 't' && (zzz[2] == 'r' || zzz[2] == 'p'))))
-		error(_("second argument of '%s' does not specify a subclass of %s"),
-		      __func__, "denseMatrix");
+		Rf_error(_("second argument of '%s' does not specify a subclass of %s"),
+		         __func__, "denseMatrix");
 
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
@@ -457,15 +457,15 @@ SEXP sparse_as_dense(SEXP from, const char *class, int packed)
 	int_fast64_t mn = (int_fast64_t) m * n,
 		xlen = (!packed) ? mn : n + (mn - n) / 2;
 	if (xlen > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	if (class[2] != 'C' && packed && mn > R_XLEN_T_MAX)
-		error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
-		      "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
+		Rf_error(_("coercing n-by-n %s to %s is not supported for n*n exceeding %s"),
+		         "[RT]sparseMatrix", "packedMatrix", "R_XLEN_T_MAX");
 	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
-		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		Rf_warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
+		           0x1.0p-30 * bytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -665,12 +665,12 @@ SEXP diagonal_as_dense(SEXP from, const char *class,
 	int_fast64_t nn = (int_fast64_t) n * n,
 		xlen = (!packed) ? nn : n + (nn - n) / 2;
 	if (xlen > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
-		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		Rf_warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
+		           0x1.0p-30 * bytes);
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -767,12 +767,12 @@ SEXP index_as_dense(SEXP from, const char *class, char kind)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t xlen = (int_fast64_t) m * n;
 	if (xlen > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	double bytes = (double) xlen * kindToSize(cl[0]);
 	if (bytes > 0x1.0p+30 /* 1 GiB */)
-		warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
-		        0x1.0p-30 * bytes);
+		Rf_warning(_("sparse->dense coercion: allocating vector of size %0.1f GiB"),
+		           0x1.0p-30 * bytes);
 	if (m != n || n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -855,8 +855,8 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 	}
 
 	if (cl[1] != 'g' && m != n)
-		error(_("attempt to construct non-square %s"),
-		      (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
+		Rf_error(_("attempt to construct non-square %s"),
+		         (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
 
 	SEXP to = PROTECT(newObject(cl));
 
@@ -987,8 +987,8 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 #undef VAS__
 
 	if (nnz1 > INT_MAX)
-		error(_("attempt to construct %s with more than %s nonzero entries"),
-		      "sparseMatrix", "2^31-1");
+		Rf_error(_("attempt to construct %s with more than %s nonzero entries"),
+		         "sparseMatrix", "2^31-1");
 
 	if (byrow)
 		SWAP(m, n, int, );
@@ -1282,8 +1282,8 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 	    (zzz = CHAR(s_zzz))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 'p' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("second argument of '%s' does not specify a subclass of %s"),
-		      __func__, "[CRT]sparseMatrix");
+		Rf_error(_("second argument of '%s' does not specify a subclass of %s"),
+		         __func__, "[CRT]sparseMatrix");
 
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
@@ -1302,12 +1302,12 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 			if (LENGTH(s_m) >= 1 && !ISNAN(tmp = REAL(s_m)[0]) &&
 			    tmp >= 0.0) {
 				if (trunc(tmp) > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
+					Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 				m = (int) tmp;
 			}
 		}
 		if (m < 0)
-			error(_("invalid '%s' to '%s'"), "m", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "m", __func__);
 	}
 
 	int n = -1;
@@ -1322,12 +1322,12 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 			if (LENGTH(s_n) >= 1 && !ISNAN(tmp = REAL(s_n)[0]) &&
 			    tmp >= 0.0) {
 				if (trunc(tmp) > INT_MAX)
-					error(_("dimensions cannot exceed %s"), "2^31-1");
+					Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 				n = (int) tmp;
 			}
 		}
 		if (n < 0)
-			error(_("invalid '%s' to '%s'"), "n", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "n", __func__);
 	}
 
 	int byrow;
@@ -1335,7 +1335,7 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 
 	if (s_dimnames != R_NilValue)
 		if (TYPEOF(s_dimnames) != VECSXP || LENGTH(s_dimnames) != 2)
-			error(_("invalid '%s' to '%s'"), "dimnames", __func__);
+			Rf_error(_("invalid '%s' to '%s'"), "dimnames", __func__);
 
 	SEXP tmp = GET_SLOT(s_from, Matrix_lengthSym);
 	int_fast64_t vlen = (int_fast64_t)
@@ -1347,23 +1347,23 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 			n = m;
 	} else if (m < 0 && n < 0) {
 		if (vlen > INT_MAX)
-			error(_("dimensions cannot exceed %s"), "2^31-1");
+			Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		m = (int) vlen;
 		n = 1;
 	} else if (m < 0) {
 		if (vlen > (int_fast64_t) INT_MAX * n) {
 			if (n == 0)
-				error(_("nonempty vector supplied for empty matrix"));
+				Rf_error(_("nonempty vector supplied for empty matrix"));
 			else
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
 		m = (int) ((n == 0) ? 0 : vlen / n + (vlen % n != 0));
 	} else if (n < 0) {
 		if (vlen > (int_fast64_t) m * INT_MAX) {
 			if (m == 0)
-				error(_("nonempty vector supplied for empty matrix"));
+				Rf_error(_("nonempty vector supplied for empty matrix"));
 			else
-				error(_("dimensions cannot exceed %s"), "2^31-1");
+				Rf_error(_("dimensions cannot exceed %s"), "2^31-1");
 		}
 		n = (int) ((m == 0) ? 0 : vlen / m + (vlen % m != 0));
 	}
@@ -1372,13 +1372,13 @@ SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
 	if (vlen <= 1)
 		/* do nothing */ ;
 	else if (mlen == 0)
-		warning(_("nonempty vector supplied for empty matrix"));
+		Rf_warning(_("nonempty vector supplied for empty matrix"));
 	else if (vlen > mlen)
-		warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
-		        (long long) vlen, m, n);
+		Rf_warning(_("vector length (%lld) exceeds matrix length (%d * %d)"),
+		           (long long) vlen, m, n);
 	else if (mlen % vlen != 0)
-		warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
-		        m, n, (long long) vlen);
+		Rf_warning(_("matrix length (%d * %d) is not a multiple of vector length (%lld)"),
+		           m, n, (long long) vlen);
 
 	return
 	Vector_as_sparse(s_from, zzz, ul, ct, nu, m, n, byrow, s_dimnames);
@@ -1426,8 +1426,8 @@ SEXP R_matrix_as_sparse(SEXP s_from, SEXP s_zzz,
 	    (zzz = CHAR(s_zzz))[0] == '\0' ||
 	    (zzz[1] != 'g' && zzz[1] != 's' && zzz[1] != 'p' && zzz[1] != 't') ||
 	    (zzz[2] != 'C' && zzz[2] != 'R' && zzz[2] != 'T'))
-		error(_("second argument of '%s' does not specify a subclass of %s"),
-		      __func__, "[CRT]sparseMatrix");
+		Rf_error(_("second argument of '%s' does not specify a subclass of %s"),
+		         __func__, "[CRT]sparseMatrix");
 
 	char ul = '\0', ct = '\0', nu = '\0';
 	if (zzz[1] != 'g') VALID_UPLO (s_uplo , ul);
@@ -1508,8 +1508,8 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 #define DAS_CHECK \
 	do { \
 		if (nnz > INT_MAX) \
-			error(_("attempt to construct %s with more than %s nonzero entries"), \
-			      "sparseMatrix", "2^31-1"); \
+			Rf_error(_("attempt to construct %s with more than %s nonzero entries"), \
+			         "sparseMatrix", "2^31-1"); \
 		*(pp1++) = (int) nnz; \
 	} while (0)
 
@@ -2435,8 +2435,8 @@ SEXP dense_as_general(SEXP from, const char *class, int new)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
 	if ((int_fast64_t) n * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -2592,14 +2592,14 @@ SEXP sparse_as_general(SEXP from, const char *class)
 			for (j = 1; j < n; ++j)
 				pp1[j] += pp1[j - 1];
 			if (pp1[n - 1] > INT_MAX - pp0[n - 1])
-				error(_("attempt to construct %s with more than %s nonzero entries"),
-				      "sparseMatrix", "2^31-1");
+				Rf_error(_("attempt to construct %s with more than %s nonzero entries"),
+				         "sparseMatrix", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp1[j] += pp0[j];
 		} else {
 			if (n > INT_MAX - pp0[n - 1])
-				error(_("attempt to construct %s with more than %s nonzero entries"),
-				      "sparseMatrix", "2^31-1");
+				Rf_error(_("attempt to construct %s with more than %s nonzero entries"),
+				         "sparseMatrix", "2^31-1");
 			for (j = 0; j < n; ++j)
 				pp1[j] = pp0[j] + j + 1;
 		}
@@ -2729,8 +2729,8 @@ SEXP sparse_as_general(SEXP from, const char *class)
 		} else
 			nnz1 = n;
 		if (nnz1 > R_XLEN_T_MAX - nnz0)
-			error(_("attempt to allocate vector of length exceeding %s"),
-			      "R_XLEN_T_MAX");
+			Rf_error(_("attempt to allocate vector of length exceeding %s"),
+			         "R_XLEN_T_MAX");
 		nnz1 += nnz0;
 
 		SEXP i1 = PROTECT(Rf_allocVector(INTSXP, nnz1)),
@@ -2849,8 +2849,8 @@ SEXP dense_as_unpacked(SEXP from, const char *class)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int n = INTEGER(dim)[0];
 	if ((int_fast64_t) n * n > R_XLEN_T_MAX)
-		error(_("attempt to allocate vector of length exceeding %s"),
-		      "R_XLEN_T_MAX");
+		Rf_error(_("attempt to allocate vector of length exceeding %s"),
+		         "R_XLEN_T_MAX");
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -2935,7 +2935,7 @@ SEXP dense_as_packed(SEXP from, const char *class, char ul, char ct, char nu)
 	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
 	int *pdim = INTEGER(dim), n = pdim[0];
 	if (pdim[1] != n)
-		error(_("attempt to pack non-square matrix"));
+		Rf_error(_("attempt to pack non-square matrix"));
 	if (n > 0)
 		SET_SLOT(to, Matrix_DimSym, dim);
 	UNPROTECT(1); /* dim */
@@ -3117,8 +3117,8 @@ SEXP sparse_as_Csparse(SEXP from, const char *class)
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
 		if (XLENGTH(i0) > INT_MAX)
-			error(_("number of triplets to be aggregated exceeds %s"),
-			      "2^31-1");
+			Rf_error(_("number of triplets to be aggregated exceeds %s"),
+			         "2^31-1");
 		int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0);
 
 		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), p1, i1;
@@ -3258,8 +3258,8 @@ SEXP sparse_as_Rsparse(SEXP from, const char *class)
 	} else {
 		SEXP i0 = PROTECT(GET_SLOT(from, Matrix_iSym));
 		if (XLENGTH(i0) > INT_MAX)
-			error(_("number of triplets to be aggregated exceeds %s"),
-			      "2^31-1");
+			Rf_error(_("number of triplets to be aggregated exceeds %s"),
+			         "2^31-1");
 		int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0);
 
 		SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), p1, j1;
@@ -3427,7 +3427,7 @@ SEXP vector_as_Vector(SEXP from, char kind)
 {
 	R_xlen_t vlen = XLENGTH(from);
 	if (vlen > 0x1.0p+53)
-		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	SEXPTYPE tf = TYPEOF(from);
 	char cl[] = ".sparseVector";
@@ -3528,7 +3528,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
 	if (mn > 0x1.0p+53)
-		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	char cl[] = ".sparseVector";
 	cl[0] = class[0];
@@ -3667,7 +3667,7 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 	int n = INTEGER(dim)[0];
 	int_fast64_t nn = (int_fast64_t) n * n;
 	if (nn > 0x1.0p+53)
-		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	char cl[] = ".sparseVector";
 	cl[0] = class[0];
@@ -3763,7 +3763,7 @@ SEXP index_as_Vector(SEXP from, const char *class)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
 	if (mn > 0x1.0p+53)
-		error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
+		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	SEXP to = newObject("nsparseVector");
 	if (mn == 0)
@@ -4002,7 +4002,7 @@ SEXP R_Matrix_as_packed(SEXP s_from)
 
 	switch (class[2]) {
 	case 'e':
-		error(_("attempt to pack a %s"), "generalMatrix");
+		Rf_error(_("attempt to pack a %s"), "generalMatrix");
 		return R_NilValue;
 	case 'y':
 	case 'o':
@@ -4017,7 +4017,7 @@ SEXP R_Matrix_as_packed(SEXP s_from)
 	case 'i':
 		return diagonal_as_dense(s_from, class, '.', 't', 1, 'U', '\0');
 	case 'd':
-		error(_("attempt to pack an %s"), "indMatrix");
+		Rf_error(_("attempt to pack an %s"), "indMatrix");
 		return R_NilValue;
 	default:
 		return R_NilValue;

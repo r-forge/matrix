@@ -18,7 +18,7 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	int *pdim = INTEGER(dim), n = pdim[1];
 	if (pdim[0] != n)
-		error(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+		Rf_error(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP scf = PROTECT(newObject(cl));
@@ -599,8 +599,8 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	CXSPARSE_XTYPE_SET(A->xtype);
 
 	if (A->m < A->n)
-		error(_("QR factorization of m-by-n %s requires m >= n"),
-		      ".gCMatrix");
+		Rf_error(_("QR factorization of m-by-n %s requires m >= n"),
+		         ".gCMatrix");
 
 	Matrix_cs  *T = NULL;
 	Matrix_css *S = NULL;
@@ -656,11 +656,11 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 oom:
 	DO_FREE(T, S, N, P);
 	if (warn > 1)
-		error  (_("QR factorization of %s failed: out of memory"),
-		        ".gCMatrix");
+		Rf_error  (_("QR factorization of %s failed: out of memory"),
+		           ".gCMatrix");
 	else if (warn > 0)
-		warning(_("QR factorization of %s failed: out of memory"),
-		        ".gCMatrix");
+		Rf_warning(_("QR factorization of %s failed: out of memory"),
+		           ".gCMatrix");
 	return R_NilValue;
 }
 
@@ -671,8 +671,8 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 	CXSPARSE_XTYPE_SET(A->xtype);
 
 	if (A->m != A->n)
-		error(_("LU factorization of m-by-n %s requires m == n"),
-		      ".gCMatrix");
+		Rf_error(_("LU factorization of m-by-n %s requires m == n"),
+		         ".gCMatrix");
 
 	Matrix_cs  *T = NULL;
 	Matrix_css *S = NULL;
@@ -724,11 +724,11 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 oom:
 	DO_FREE(T, S, N, P);
 	if (warn > 1)
-		error  (_("LU factorization of %s failed: out of memory or near-singular"),
-		        ".gCMatrix");
+		Rf_error  (_("LU factorization of %s failed: out of memory or near-singular"),
+		           ".gCMatrix");
 	else if (warn > 0)
-		warning(_("LU factorization of %s failed: out of memory or near-singular"),
-		        ".gCMatrix");
+		Rf_warning(_("LU factorization of %s failed: out of memory or near-singular"),
+		           ".gCMatrix");
 	return R_NilValue;
 }
 
@@ -781,9 +781,9 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 		cholmod_free_factor(&L, &c); \
 		if (TYPEOF(trf) == CHARSXP) { \
 			if (_WARN_ > 1) \
-				error  ("%s", CHAR(trf)); \
+				Rf_error  ("%s", CHAR(trf)); \
 			else if (_WARN_ > 0) \
-				warning("%s", CHAR(trf)); \
+				Rf_warning("%s", CHAR(trf)); \
 			UNPROTECT(2); \
 			return R_NilValue; \
 		} \
@@ -817,7 +817,7 @@ SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 {
 	double tol = Rf_asReal(s_tol);
 	if (ISNAN(tol))
-		error(_("'%s' is not a number"), "tol");
+		Rf_error(_("'%s' is not a number"), "tol");
 	int order = Rf_asInteger(s_order);
 	if (order == NA_INTEGER)
 		order = (tol == 1.0) ? 2 : 1;
@@ -845,7 +845,7 @@ SEXP pCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order,
 	if (order < 0 || order > 1)
 		order = 0;
 	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
-		error(_("'%s' is not a number or not finite"), "beta");
+		Rf_error(_("'%s' is not a number or not finite"), "beta");
 	SEXP trf = R_NilValue;
 	char nm[] = "..........Cholesky.";
 	nm[18] = (order > 0) ? '+' : '-';
@@ -896,7 +896,7 @@ SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 
 	Rcomplex beta = asComplex(s_beta);
 	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
-		error(_("'%s' is not a number or not finite"), "beta");
+		Rf_error(_("'%s' is not a number or not finite"), "beta");
 
 	cholmod_sparse *A = M2CHS(s_obj, 1);
 	cholmod_factor *L = M2CHF(s_trf, 1);
@@ -925,7 +925,7 @@ SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 		PROTECT(s_trf = CHF2M(L, 1)); \
 		cholmod_free_factor(&L, &c); \
 		if (TYPEOF(s_trf) == CHARSXP) \
-			error("%s", CHAR(s_trf)); \
+			Rf_error("%s", CHAR(s_trf)); \
 		SET_SLOT(s_trf, Matrix_DimNamesSym, dimnames); \
 		UNPROTECT(2); \
 	} while (0)

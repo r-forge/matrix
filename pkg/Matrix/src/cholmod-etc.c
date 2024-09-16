@@ -11,11 +11,11 @@ void Matrix_cholmod_error_handler(int status, const char *file, int line,
 {
 	cholmod_defaults(&c);
 	if (status < 0)
-		error(_("CHOLMOD error '%s' at file '%s', line %d"),
-		      message, file, line);
+		Rf_error(_("CHOLMOD error '%s' at file '%s', line %d"),
+		         message, file, line);
 	else
-		warning(_("CHOLMOD warning '%s' at file '%s', line %d"),
-		        message, file, line);
+		Rf_warning(_("CHOLMOD warning '%s' at file '%s', line %d"),
+		           message, file, line);
 	return;
 }
 
@@ -23,7 +23,7 @@ int Matrix_cholmod_start(cholmod_common *Common)
 {
 	int ans = cholmod_start(Common);
 	if (!ans)
-		error(_("'%s' failed in '%s'"), "cholmod_start", __func__);
+		Rf_error(_("'%s' failed in '%s'"), "cholmod_start", __func__);
 	Common->error_handler = Matrix_cholmod_error_handler;
 	return ans;
 }
@@ -32,7 +32,7 @@ int Matrix_cholmod_finish(cholmod_common *Common)
 {
 	int ans = cholmod_finish(Common);
 	if (!ans)
-		error(_("'%s' failed in '%s'"), "cholmod_finish", __func__);
+		Rf_error(_("'%s' failed in '%s'"), "cholmod_finish", __func__);
 	return ans;
 }
 

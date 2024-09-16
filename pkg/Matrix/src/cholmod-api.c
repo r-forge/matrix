@@ -198,7 +198,7 @@ cholmod_sparse *sexp_as_cholmod_sparse(cholmod_sparse *A, SEXP from,
 	UNPROTECT(1); /* x */
 	}
 	if (!A->sorted && !cholmod_sort(A, &c))
-		error(_("'%s' failed in '%s'"), "cholmod_sort", __func__);
+		Rf_error(_("'%s' failed in '%s'"), "cholmod_sort", __func__);
 	if (class[1] == 't' && A->ncol > 0 && allocUnit) {
 		SEXP diag = GET_SLOT(from, Matrix_diagSym);
 		char nu = CHAR(STRING_ELT(diag, 0))[0];
@@ -469,7 +469,7 @@ SEXP cholmod_factor_as_sexp(cholmod_factor *L, int doFree)
 #define errorFree(...) \
 	do { \
 		MAYBE_FREE; \
-		error(__VA_ARGS__); \
+		Rf_error(__VA_ARGS__); \
 	} while (0)
 
 #define MAYBE_FREE \
@@ -928,8 +928,8 @@ double cholmod_factor_ldetA(cholmod_factor *L)
 			for (p = lp[j]; li[p] != j && p < lp[j + 1]; p++)
 				;
 			if (li[p] != j) {
-				error(_("invalid simplicial Cholesky factorization: structural zero on main diagonal in column %d"),
-				      j);
+				Rf_error(_("invalid simplicial Cholesky factorization: structural zero on main diagonal in column %d"),
+				         j);
 				break;
 			}
 			ans += log(lx[p] * ((L->is_ll) ? lx[p] : 1.0));
@@ -963,9 +963,9 @@ cholmod_factor *cholmod_factor_update(cholmod_factor *L, cholmod_sparse *A,
 	z[0] = beta;
 	z[1] = 0.0;
 	if (!cholmod_factorize_p(A, z, NULL, 0, L, &c))
-		error(_("'%s' failed in '%s'"), "cholmod_factorize_p", __func__);
+		Rf_error(_("'%s' failed in '%s'"), "cholmod_factorize_p", __func__);
 	if (L->is_ll != ll &&
 	    !cholmod_change_factor(L->xtype, ll, L->is_super, 1, 1, L, &c))
-		error(_("'%s' failed in '%s'"), "cholmod_change_factor", __func__);
+		Rf_error(_("'%s' failed in '%s'"), "cholmod_change_factor", __func__);
 	return L;
 }

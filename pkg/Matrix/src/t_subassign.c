@@ -138,9 +138,9 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
     int ctype_x = R_check_class_etc(x,     valid_cM),
 	ctype_v = R_check_class_etc(value, valid_spv);
     if (ctype_x < 0)
-	error(_("invalid class of 'x' in Csparse_subassign()"));
+	Rf_error(_("invalid class of 'x' in Csparse_subassign()"));
     if (ctype_v < 0)
-	error(_("invalid class of 'value' in Csparse_subassign()"));
+	Rf_error(_("invalid class of 'value' in Csparse_subassign()"));
     Rboolean value_is_nsp = ctype_v == 1;
 #ifndef _has_x_slot_ // i.e. "n.CMatrix" : sparseVECTOR == "nsparseVector"
     if(!value_is_nsp) value_is_nsp = (ctype_v == 0);
@@ -183,19 +183,19 @@ SEXP Csparse_subassign(SEXP x, SEXP i_, SEXP j_, SEXP value)
 	    case x_pattern:// "n"
 	    case x_logical:// "l"
 		if(ctype_v >= 3)
-		    warning(_("x[] <- val: val is coerced to logical for \"%s\" x"),
-			    valid_cM[ctype_x]);
+		    Rf_warning(_("x[] <- val: val is coerced to logical for \"%s\" x"),
+			       valid_cM[ctype_x]);
 		break;
 	    case x_integer:
 		if(ctype_v >= 4)
-		    error(_("x[] <- val: val should be integer or logical, is coerced to integer, for \"%s\" x"),
-			  valid_cM[ctype_x]);
+		    Rf_error(_("x[] <- val: val should be integer or logical, is coerced to integer, for \"%s\" x"),
+			     valid_cM[ctype_x]);
 		break;
 	    case x_double:
 	    case x_complex: // coercion should be tried (and fail for complex -> double) below
 		break;
 	    default:
-		error(_("programming error in Csparse_subassign() should never happen"));
+		Rf_error(_("programming error in Csparse_subassign() should never happen"));
 	    }
 	    // otherwise: "coerce" :  as(., <sparseVector>) :
 	    val_x_slot = PROTECT(Rf_coerceVector(GET_SLOT(value, Matrix_xSym), SXP_x)); n_prot++;

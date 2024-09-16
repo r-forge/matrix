@@ -41,11 +41,6 @@
 #include <Rinternals.h> /* SEXP, ... */
 #include <Rversion.h> /* R_VERSION, ... */
 
-#ifdef R_NO_REMAP
-#define error             Rf_error
-#define warning           Rf_warning
-#endif
-
 #define Matrix_ErrorBufferSize   4096
 #define Matrix_CallocThreshold   8192
 #define Matrix_TranslationDomain "Matrix"
@@ -106,20 +101,20 @@ do { \
 #define  ABS(i) (((i) < 0) ? -(i) : (i))
 
 #define ERROR_OOM(_FUNC_) \
-	error(_("out of memory in '%s'"), \
-	      _FUNC_)
+	Rf_error(_("out of memory in '%s'"), \
+	         _FUNC_)
 
 #define ERROR_INVALID_TYPE(_X_, _FUNC_) \
-	error(_("invalid type \"%s\" in '%s'"), \
-	      Rf_type2char(TYPEOF(_X_)), _FUNC_)
+	Rf_error(_("invalid type \"%s\" in '%s'"), \
+	         Rf_type2char(TYPEOF(_X_)), _FUNC_)
 
 #define ERROR_INVALID_CLASS(_X_, _FUNC_) \
 do { \
 	if (!Rf_isObject(_X_)) \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else \
-		error(_("invalid class \"%s\" in '%s'"), \
-		      CHAR(STRING_ELT(Rf_getAttrib(_X_, R_ClassSymbol), 0)), _FUNC_); \
+		Rf_error(_("invalid class \"%s\" in '%s'"), \
+		         CHAR(STRING_ELT(Rf_getAttrib(_X_, R_ClassSymbol), 0)), _FUNC_); \
 } while (0)
 
 #define VALID_UPLO(s, c) \
@@ -127,7 +122,7 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 		(s = STRING_ELT(s, 0)) == NA_STRING || \
 		((c = CHAR(s)[0]) != 'U' && c != 'L')) \
-		error(_("'%s' must be \"%c\" or \"%c\""),  "uplo", 'U', 'L'); \
+		Rf_error(_("'%s' must be \"%c\" or \"%c\""),  "uplo", 'U', 'L'); \
 } while (0)
 
 #define VALID_TRANS(s, c) \
@@ -135,7 +130,7 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
 	    ((c = CHAR(s)[0]) != 'C' && c != 'T')) \
-		error(_("'%s' is not \"%c\" or \"%c\""), "trans", 'C', 'T'); \
+		Rf_error(_("'%s' is not \"%c\" or \"%c\""), "trans", 'C', 'T'); \
 } while (0)
 
 #define VALID_DIAG(s, c) \
@@ -143,7 +138,7 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
 	    ((c = CHAR(s)[0]) != 'N' && c != 'U')) \
-		error(_("'%s' is not \"%c\" or \"%c\""),  "diag", 'N', 'U'); \
+		Rf_error(_("'%s' is not \"%c\" or \"%c\""),  "diag", 'N', 'U'); \
 } while (0)
 
 #define VALID_KIND(s, c) \
@@ -151,8 +146,8 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
 	    ((c = CHAR(s)[0]) != 'n' && c != 'l' && c != 'i' && c != 'd' && c != 'z' && c != '.' && c != ',')) \
-		error(_("'%s' is not \"%c\", \"%c\", \"%c\", \"%c\", or \"%c\""), \
-		      "kind", 'n', 'l', 'i', 'd', 'z'); \
+		Rf_error(_("'%s' is not \"%c\", \"%c\", \"%c\", \"%c\", or \"%c\""), \
+		         "kind", 'n', 'l', 'i', 'd', 'z'); \
 } while (0)
 
 #define VALID_SHAPE(s, c) \
@@ -160,8 +155,8 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
 	    ((c = CHAR(s)[0]) != 'g' && c != 's' && c != 'p' && c != 't')) \
-		error(_("'%s' is not \"%c\", \"%c\", \"%c\", or \"%c\""), \
-		      "shape", 'g', 's', 'p', 't'); \
+		Rf_error(_("'%s' is not \"%c\", \"%c\", \"%c\", or \"%c\""), \
+		         "shape", 'g', 's', 'p', 't'); \
 } while (0)
 
 #define VALID_REPR(s, c, dot) \
@@ -169,28 +164,28 @@ do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
 	    ((c = CHAR(s)[0]) != 'C' && c != 'R' && c != 'T' && !(dot && c != '.'))) \
-		error(_("'%s' is not \"%c\", \"%c\", or \"%c\""), \
-		      "repr", 'C', 'R', 'T'); \
+		Rf_error(_("'%s' is not \"%c\", \"%c\", or \"%c\""), \
+		         "repr", 'C', 'R', 'T'); \
 } while (0)
 
 #define VALID_MARGIN(s, d) \
 do { \
 	if (TYPEOF(s) != INTSXP || LENGTH(s) < 1 || \
 	    ((d = INTEGER(s)[0] - 1) != 0 && d != 1)) \
-		error(_("'%s' is not %d or %d"), "margin", 1, 2); \
+		Rf_error(_("'%s' is not %d or %d"), "margin", 1, 2); \
 } while (0)
 
 #define VALID_LOGIC2(s, d) \
 do { \
 	if (TYPEOF(s) != LGLSXP || LENGTH(s) < 1 || \
 	    ((d = LOGICAL(s)[0]) == NA_LOGICAL)) \
-		error(_("'%s' is not %s or %s"), #d, "TRUE", "FALSE"); \
+		Rf_error(_("'%s' is not %s or %s"), #d, "TRUE", "FALSE"); \
 } while (0)
 
 #define VALID_LOGIC3(s, d) \
 do { \
 	if (TYPEOF(s) != LGLSXP || LENGTH(s) < 1) \
-		error(_("'%s' is not %s, %s, or %s"), #d, "TRUE", "FALSE", "NA"); \
+		Rf_error(_("'%s' is not %s, %s, or %s"), #d, "TRUE", "FALSE", "NA"); \
 	d = LOGICAL(s)[0]; \
 } while (0)
 
