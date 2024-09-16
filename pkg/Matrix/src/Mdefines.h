@@ -1,16 +1,7 @@
 #ifndef MATRIX_MDEFINES_H
 #define MATRIX_MDEFINES_H
 
-#include "version.h"
-
-#define Matrix_Domain "Matrix"
-#define Matrix_CallocThreshold 8192
-#define Matrix_ErrorBufferSize 4096
-
-/* NB: system headers should come before R headers */
-
 #ifdef __GLIBC__
-/* ensure that strdup() and others are declared when string.h is included : */
 # define _POSIX_C_SOURCE 200809L
 #endif
 
@@ -23,38 +14,35 @@
 #include <stdio.h> /* vsnprintf */
 #include <string.h> /* memcpy, memset */
 
-#ifndef STRICT_R_HEADERS
-# define STRICT_R_HEADERS
+#include <Rconfig.h> /* HAVE_ALLOCA_H, ENABLE_NLS */
+#if !defined(__GNUC__) && defined(HAVE_ALLOCA_H)
+# include <alloca.h> /* alloca */
 #endif
-
-#include <R.h>
-#include <Rinternals.h>
-
-/* Copy and paste from WRE : */
 #ifdef ENABLE_NLS
-# include <libintl.h>
-# define _(String) dgettext(Matrix_Domain, String)
-#else
-# define _(String) (String)
-# define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
+# include <libintl.h> /* dgettext, dngettext */
 #endif
 
-/* Copy and paste from Defn.h : */
-/* 'alloca' is neither C99 nor POSIX */
+#undef STRICT_R_HEADERS
+#define STRICT_R_HEADERS
+
+#include <R_ext/Arith.h> /* ISNAN, R_FINITE, ... */
+#include <R_ext/Boolean.h> /* Rboolean */
+#include <R_ext/Complex.h> /* Rcomplex */
+#include <R_ext/Error.h> /* Rf_error, Rf_warning */
+#include <R_ext/Memory.h> /* R_alloc */
+#include <R_ext/Utils.h> /* R_CheckStack */
+#include <R_ext/RS.h> /* R_Calloc, R_Free */
+#include <Rinternals.h> /* SEXP, ... */
+#include <Rversion.h> /* R_VERSION, ... */
+
+#define Matrix_ErrorBufferSize   4096
+#define Matrix_CallocThreshold   8192
+#define Matrix_TranslationDomain "Matrix"
+
 #ifdef __GNUC__
-/* This covers GNU, Clang and Intel compilers */
-/* #undef needed in case some other header, e.g. malloc.h, already did this */
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
+# define Matrix_alloca(x) __builtin_alloca((x))
 #else
-# ifdef HAVE_ALLOCA_H
-/* This covers native compilers on Solaris and AIX */
-#  include <alloca.h>
-# endif
-/* It might have been defined via some other standard header, e.g. stdlib.h */
-# if !HAVE_DECL_ALLOCA
-extern void *alloca(size_t);
-# endif
+# define Matrix_alloca(x)           alloca((x))
 #endif
 
 #define Matrix_Calloc(p, n, t) \
@@ -62,7 +50,7 @@ do { \
 	if (n >= Matrix_CallocThreshold) \
 		p = R_Calloc(n, t); \
 	else { \
-		p = (t *) alloca(sizeof(t) * (size_t) (n)); \
+		p = (t *) Matrix_alloca(sizeof(t) * (size_t) (n)); \
 		R_CheckStack(); \
 		memset(p, 0, sizeof(t) * (size_t) (n)); \
 	} \
@@ -73,6 +61,12 @@ do { \
 	if (n >= Matrix_CallocThreshold) \
 		R_Free(p); \
 } while (0)
+
+#ifndef ENABLE_NLS
+# define dgettext(Domain, String) (String)
+# define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
+#endif
+#define _(String) dgettext(Matrix_TranslationDomain, String)
 
 #define errorChar(...)   mkChar  (Matrix_sprintf(__VA_ARGS__))
 #define errorString(...) mkString(Matrix_sprintf(__VA_ARGS__))

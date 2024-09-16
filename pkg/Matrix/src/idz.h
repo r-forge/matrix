@@ -2,7 +2,7 @@
 #define MATRIX_IDZ_H
 
 #include <stddef.h> /* size_t */
-#include <Rinternals.h>
+#include <R_ext/Complex.h> /* Rcomplex */
 
 void iswap2(size_t,      int *, size_t,      int *, size_t);
 void dswap2(size_t,   double *, size_t,   double *, size_t);
