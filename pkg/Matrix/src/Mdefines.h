@@ -119,7 +119,7 @@ do { \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else \
 		error(_("invalid class \"%s\" in '%s'"), \
-		      CHAR(STRING_ELT(getAttrib(_X_, R_ClassSymbol), 0)), _FUNC_); \
+		      CHAR(STRING_ELT(Rf_getAttrib(_X_, R_ClassSymbol), 0)), _FUNC_); \
 } while (0)
 
 #define VALID_UPLO(s, c) \
