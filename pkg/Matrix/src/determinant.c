@@ -137,15 +137,15 @@ SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 				logcc = 2.0 * log(hypot(c.r, c.i));
 				if ((a.r < 0.0) != (b.r < 0.0)) {
 					/* det = ab - cc = -(abs(ab) + cc) < 0 */
-					modulus += logspace_add(logab, logcc);
+					modulus += Rf_logspace_add(logab, logcc);
 					sign = -sign;
 				} else if (logab < logcc) {
 					/* det = ab - cc = -(cc - ab) < 0 */
-					modulus += logspace_sub(logcc, logab);
+					modulus += Rf_logspace_sub(logcc, logab);
 					sign = -sign;
 				} else {
 					/* det = ab - cc > 0 */
-					modulus += logspace_sub(logab, logcc);
+					modulus += Rf_logspace_sub(logab, logcc);
 				}
 				}
 				j += 2;
@@ -180,15 +180,15 @@ SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 				logcc = 2.0 * log(fabs(c));
 				if ((a < 0.0) != (b < 0.0)) {
 					/* det = ab - cc = -(abs(ab) + cc) < 0 */
-					modulus += logspace_add(logab, logcc);
+					modulus += Rf_logspace_add(logab, logcc);
 					sign = -sign;
 				} else if (logab < logcc) {
 					/* det = ab - cc = -(cc - ab) < 0 */
-					modulus += logspace_sub(logcc, logab);
+					modulus += Rf_logspace_sub(logcc, logab);
 					sign = -sign;
 				} else {
 					/* det = ab - cc > 0 */
-					modulus += logspace_sub(logab, logcc);
+					modulus += Rf_logspace_sub(logab, logcc);
 				}
 				j += 2;
 			}
