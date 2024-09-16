@@ -129,11 +129,11 @@
 #undef vprintf
 #define vprintf Rvprintf
 
-# include <R_ext/Error.h>
-# undef errexit
-# define errexit(...) error(__VA_ARGS__)
-# undef gk_errexit
-# define gk_errexit(sig, ...) error(__VA_ARGS__)
+#include <R_ext/Error.h>
+#undef errexit
+#define errexit(...) Rf_error(__VA_ARGS__)
+#undef gk_errexit
+#define gk_errexit(sig, ...) Rf_error(__VA_ARGS__)
 
 #endif  /* GKlib.h */
 
