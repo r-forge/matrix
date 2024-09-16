@@ -170,7 +170,7 @@ SEXP dgCMatrix_cholsol(SEXP at, SEXP b)
 		error(_("'%s' failed"), "cholmod_sdmult");
 
 	const char *nms[] = {"L", "coef", "Xty", "resid", ""};
-	SEXP ans = PROTECT(Rf_mkNamed(VECSXP, nms)), tmp;
+	SEXP ans = PROTECT(mkNamed(VECSXP, nms)), tmp;
 	/* L : */
 	PROTECT(tmp = CHF2M(L, 1));
 	SET_VECTOR_ELT(ans, 0, tmp);

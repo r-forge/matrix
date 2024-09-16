@@ -25,6 +25,9 @@
 #undef STRICT_R_HEADERS
 #define STRICT_R_HEADERS
 
+#undef R_NO_REMAP
+#define R_NO_REMAP
+
 #undef R_NO_REMAP_RMATH
 /* #define R_NO_REMAP_RMATH */
 
@@ -37,6 +40,43 @@
 #include <R_ext/RS.h> /* R_Calloc, R_Free */
 #include <Rinternals.h> /* SEXP, ... */
 #include <Rversion.h> /* R_VERSION, ... */
+
+#ifdef R_NO_REMAP
+#define ScalarComplex     Rf_ScalarComplex
+#define ScalarInteger     Rf_ScalarInteger
+#define ScalarLogical     Rf_ScalarLogical
+#define ScalarReal        Rf_ScalarReal
+#define allocMatrix       Rf_allocMatrix
+#define allocVector       Rf_allocVector
+#define asChar            Rf_asChar
+#define asCharacterFactor Rf_asCharacterFactor
+#define asInteger         Rf_asInteger
+#define asLogical         Rf_asLogical
+#define asReal            Rf_asReal
+#define coerceVector      Rf_coerceVector
+#define copyMatrix        Rf_copyMatrix
+#define dimnamesgets      Rf_dimnamesgets
+#define duplicate         Rf_duplicate
+#define error             Rf_error
+#define eval              Rf_eval
+#define getAttrib         Rf_getAttrib
+#define inherits          Rf_inherits
+#define install           Rf_install
+#define isMatrix          Rf_isMatrix
+#define isNull            Rf_isNull
+#define isNumeric         Rf_isNumeric
+#define isObject          Rf_isObject
+#define isVector          Rf_isVector
+#define isVectorAtomic    Rf_isVectorAtomic
+#define lang3             Rf_lang3
+#define length(x)         Rf_length(x)
+#define mkChar            Rf_mkChar
+#define mkNamed           Rf_mkNamed
+#define mkString          Rf_mkString
+#define setAttrib         Rf_setAttrib
+#define type2char         Rf_type2char
+#define warning           Rf_warning
+#endif
 
 #define Matrix_ErrorBufferSize   4096
 #define Matrix_CallocThreshold   8192
@@ -107,7 +147,7 @@ do { \
 
 #define ERROR_INVALID_CLASS(_X_, _FUNC_) \
 do { \
-	if (!Rf_isObject(_X_)) \
+	if (!isObject(_X_)) \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
 	else { \
 		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
@@ -128,16 +168,16 @@ do { \
 #define VALID_TRANS(s, c) \
 do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
-    	(s = STRING_ELT(s, 0)) == NA_STRING || \
-    	((c = CHAR(s)[0]) != 'C' && c != 'T')) \
+	    (s = STRING_ELT(s, 0)) == NA_STRING || \
+	    ((c = CHAR(s)[0]) != 'C' && c != 'T')) \
 		error(_("'%s' is not \"%c\" or \"%c\""), "trans", 'C', 'T'); \
 } while (0)
 
 #define VALID_DIAG(s, c) \
 do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
-    	(s = STRING_ELT(s, 0)) == NA_STRING || \
-    	((c = CHAR(s)[0]) != 'N' && c != 'U')) \
+	    (s = STRING_ELT(s, 0)) == NA_STRING || \
+	    ((c = CHAR(s)[0]) != 'N' && c != 'U')) \
 		error(_("'%s' is not \"%c\" or \"%c\""),  "diag", 'N', 'U'); \
 } while (0)
 

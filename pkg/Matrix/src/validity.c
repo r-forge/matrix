@@ -1199,7 +1199,7 @@ SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym)); \
 	UNPROTECT(2); /* i, x */ \
 	if (TYPEOF(x) != _SEXPTYPE_) \
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_));	 \
+		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
 	if (XLENGTH(x) != XLENGTH(i)) \
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x"); \
 	return ScalarLogical(1); \
