@@ -841,7 +841,7 @@ SEXP pCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order,
 {
 	int warn = Rf_asInteger(s_warn), order = Rf_asInteger(s_order),
 		ll = Rf_asLogical(s_ll), super = Rf_asLogical(s_super);
-	Rcomplex beta = asComplex(s_beta);
+	Rcomplex beta = Rf_asComplex(s_beta);
 	if (order < 0 || order > 1)
 		order = 0;
 	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
@@ -894,7 +894,7 @@ SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 	/* defined in ./objects.c : */
 	char Matrix_shape(SEXP);
 
-	Rcomplex beta = asComplex(s_beta);
+	Rcomplex beta = Rf_asComplex(s_beta);
 	if (!R_FINITE(beta.r) || !R_FINITE(beta.i))
 		Rf_error(_("'%s' is not a number or not finite"), "beta");
 
