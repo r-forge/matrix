@@ -73,7 +73,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 		s = VECTOR_ELT(dimnames, i);
 		if (s == R_NilValue)
 			continue;
-		if (!isVector(s))
+		if (!Rf_isVector(s))
 			RMS(_("%s[[%d]] is not NULL or a vector"), "Dimnames", i + 1);
 		ns = XLENGTH(s);
 		if (ns != pdim[i] && ns != 0)
@@ -107,7 +107,7 @@ SEXP R_DimNames_fixup(SEXP dimnames)
 			continue;
 		if (TYPEOF(s) == STRSXP)
 			PROTECT(s);
-		else if (TYPEOF(s) == INTSXP && inherits(s, "factor"))
+		else if (TYPEOF(s) == INTSXP && Rf_inherits(s, "factor"))
 			PROTECT(s = asCharacterFactor(s));
 		else {
 			PROTECT(s = coerceVector(s, STRSXP));
@@ -150,7 +150,8 @@ SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
 { \
 	SEXP x = GET_SLOT(obj, Matrix_xSym); \
 	if (TYPEOF(x) != _SEXPTYPE_) \
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
+		RMKMS(_("'%s' slot is not of type \"%s\""), \
+		      "x", Rf_type2char(_SEXPTYPE_)); \
 	return Rf_ScalarLogical(1); \
 }
 KINDMATRIX_VALIDATE(n,  LGLSXP)
@@ -193,7 +194,7 @@ SEXP symmetricMatrix_validate(SEXP obj)
 	*/
 
 # define ANY_TO_STRING(x) \
-	((TYPEOF(x) == INTSXP && inherits(x, "factor")) \
+	((TYPEOF(x) == INTSXP && Rf_inherits(x, "factor")) \
 	 ? asCharacterFactor(x) \
 	 : coerceVector(x, STRSXP))
 
@@ -1199,9 +1200,11 @@ SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym)); \
 	UNPROTECT(2); /* i, x */ \
 	if (TYPEOF(x) != _SEXPTYPE_) \
-		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
+		RMKMS(_("'%s' slot is not of type \"%s\""), \
+		      "x", Rf_type2char(_SEXPTYPE_)); \
 	if (XLENGTH(x) != XLENGTH(i)) \
-		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x"); \
+		RMKMS(_("'%s' and '%s' slots do not have equal length"), \
+		      "i", "x"); \
 	return Rf_ScalarLogical(1); \
 }
 KINDVECTOR_VALIDATE(l,  LGLSXP)

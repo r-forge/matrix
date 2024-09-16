@@ -30,7 +30,8 @@ char typeToKind(SEXPTYPE type)
 	case CPLXSXP:
 		return 'z';
 	default:
-		error(_("unexpected type \"%s\" in '%s'"), type2char(type), __func__);
+		error(_("unexpected type \"%s\" in '%s'"),
+		      Rf_type2char(type), __func__);
 		return '\0';
 	}
 }

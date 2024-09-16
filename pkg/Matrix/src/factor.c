@@ -462,7 +462,7 @@ SEXP geMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
-	if (isNull(scf)) {
+	if (scf == R_NilValue) {
 		scf = geMatrix_scf_(s_obj, asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
@@ -478,7 +478,7 @@ SEXP syMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
-	if (isNull(scf)) {
+	if (scf == R_NilValue) {
 		scf = syMatrix_scf_(s_obj, asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
@@ -494,7 +494,7 @@ SEXP spMatrix_scf(SEXP s_obj, SEXP s_warn, SEXP s_vectors)
 	int vectors = asLogical(s_vectors);
 	const char *nm = "denseSchur";
 	SEXP scf = (vectors) ? get_factor(s_obj, nm) : R_NilValue;
-	if (isNull(scf)) {
+	if (scf == R_NilValue) {
 		scf = spMatrix_scf_(s_obj, asInteger(s_warn), vectors);
 		if (vectors) {
 		PROTECT(scf);
@@ -509,7 +509,7 @@ SEXP geMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseLU";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		PROTECT(trf = geMatrix_trf_(s_obj, asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
@@ -521,7 +521,7 @@ SEXP syMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseBunchKaufman+";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		PROTECT(trf = syMatrix_trf_(s_obj, asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
@@ -533,7 +533,7 @@ SEXP spMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseBunchKaufman-";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		PROTECT(trf = spMatrix_trf_(s_obj, asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
@@ -546,7 +546,7 @@ SEXP poMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_pivot, SEXP s_tol)
 	int pivot = asLogical(s_pivot);
 	const char *nm = (pivot) ? "denseCholesky++" : "denseCholesky+-";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		double tol = asReal(s_tol);
 		PROTECT(trf = poMatrix_trf_(s_obj, asInteger(s_warn), pivot, tol));
 		set_factor(s_obj, nm, trf);
@@ -559,7 +559,7 @@ SEXP ppMatrix_trf(SEXP s_obj, SEXP s_warn)
 {
 	const char *nm = "denseCholesky--";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		PROTECT(trf = ppMatrix_trf_(s_obj, asInteger(s_warn)));
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
@@ -739,8 +739,8 @@ static
 SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
                    int warn, int order, int *ll, int *super, Rcomplex beta)
 {
-	cholmod_sparse *A =                        M2CHS(obj, 1);
-	cholmod_factor *L = (isNull(trf)) ? NULL : M2CHF(trf, 1);
+	cholmod_sparse *A =                              M2CHS(obj, 1);
+	cholmod_factor *L = (trf == R_NilValue) ? NULL : M2CHF(trf, 1);
 	double betaRI[2]; betaRI[0] = beta.r; betaRI[1] = beta.i;
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -802,9 +802,9 @@ SEXP gCMatrix_orf(SEXP s_obj, SEXP s_warn, SEXP s_order)
 		order = 0;
 	const char *nm = (order > 0) ? "sparseQR+" : "sparseQR-";
 	SEXP orf = get_factor(s_obj, nm);
-	if (isNull(orf)) {
+	if (orf == R_NilValue) {
 		orf = gCMatrix_orf_(s_obj, asInteger(s_warn), order);
-		if (!isNull(orf)) {
+		if (orf != R_NilValue) {
 		PROTECT(orf);
 		set_factor(s_obj, nm, orf);
 		UNPROTECT(1);
@@ -825,9 +825,9 @@ SEXP gCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order, SEXP s_tol)
 		order = 0;
 	const char *nm = (order > 0) ? "sparseLU+" : "sparseLU-";
 	SEXP trf = get_factor(s_obj, nm);
-	if (isNull(trf)) {
+	if (trf == R_NilValue) {
 		trf = gCMatrix_trf_(s_obj, asInteger(s_warn), order, tol);
-		if (!isNull(trf)) {
+		if (trf != R_NilValue) {
 		PROTECT(trf);
 		set_factor(s_obj, nm, trf);
 		UNPROTECT(1);
@@ -852,31 +852,31 @@ SEXP pCMatrix_trf(SEXP s_obj, SEXP s_warn, SEXP s_order,
 	if (super == NA_LOGICAL || super == 0) {
 		memcpy(nm, "simplicial", 10);
 		trf = get_factor(s_obj, nm);
-		if (!isNull(trf)) super = 0;
+		if (trf != R_NilValue) super = 0;
 	}
-	if (isNull(trf) && (super == NA_LOGICAL || super != 0)) {
+	if (trf == R_NilValue && (super == NA_LOGICAL || super != 0)) {
 		memcpy(nm, "supernodal", 10);
 		trf = get_factor(s_obj, nm);
-		if (!isNull(trf)) super = 1;
+		if (trf != R_NilValue) super = 1;
 	}
-	if (beta.r != 0.0 || beta.i != 0.0 || isNull(trf) ||
+	if (beta.r != 0.0 || beta.i != 0.0 || trf == R_NilValue ||
 	    (super == 0 && ll != 0)) {
 		if (beta.r != 0.0 || beta.i != 0.0) {
 			PROTECT(trf);
 			trf = pCMatrix_trf_(s_obj, trf, warn, order, &ll, &super, beta);
 			UNPROTECT(1);
 		} else {
-			if (isNull(trf)) {
+			if (trf == R_NilValue) {
 			int zz_ = 0;
 			trf = pCMatrix_trf_(s_obj, trf, warn, order, &zz_, &super, beta);
-			if (!isNull(trf)) {
+			if (trf != R_NilValue) {
 			memcpy(nm, (super == 0) ? "simplicial" : "supernodal", 10);
 			PROTECT(trf);
 			set_factor(s_obj, nm, trf);
 			UNPROTECT(1);
 			}
 			}
-			if (!isNull(trf) && super == 0 && ll != 0) {
+			if (trf != R_NilValue && super == 0 && ll != 0) {
 			PROTECT(trf);
 			cholmod_factor *L = M2CHF(trf, 1);
 			L = cholmod_copy_factor(L, &c);

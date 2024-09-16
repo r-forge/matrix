@@ -212,7 +212,7 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 // all0	 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse
 // allFalse <- function(x) !any(x) && !any(is.na(x)) ## ~= all0
 SEXP R_all0(SEXP x) {
-	if (!isVectorAtomic(x)) {
+	if (!Rf_isVectorAtomic(x)) {
 		if (length(x) == 0) return TRUE_;
 		// Typically S4.  TODO: Call the R code above, instead!
 		error(_("Argument must be numeric-like atomic vector"));
@@ -258,7 +258,7 @@ SEXP R_all0(SEXP x) {
 // any0 <- function(x) isTRUE(any(x == 0)) ## ~= anyFalse
 // anyFalse <- function(x) isTRUE(any(!x)) ## ~= any0
 SEXP R_any0(SEXP x) {
-	if (!isVectorAtomic(x)) {
+	if (!Rf_isVectorAtomic(x)) {
 		if (length(x) == 0) return FALSE_;
 		// Typically S4.  TODO: Call the R code above, instead!
 		error(_("Argument must be numeric-like atomic vector"));
@@ -339,7 +339,7 @@ SEXP Mmatrix(SEXP args)
 	miss_nc = asLogical(CAR(args));
 
 	if (!miss_nr) {
-		if (!isNumeric(snr)) error(_("non-numeric matrix extent"));
+		if (!Rf_isNumeric(snr)) error(_("non-numeric matrix extent"));
 		nr = asInteger(snr);
 		if (nr == NA_INTEGER)
 			error(_("invalid 'nrow' value (too large or NA)"));
@@ -347,7 +347,7 @@ SEXP Mmatrix(SEXP args)
 			error(_("invalid 'nrow' value (< 0)"));
 	}
 	if (!miss_nc) {
-		if (!isNumeric(snc)) error(_("non-numeric matrix extent"));
+		if (!Rf_isNumeric(snc)) error(_("non-numeric matrix extent"));
 		nc = asInteger(snc);
 		if (nc == NA_INTEGER)
 			error(_("invalid 'ncol' value (too large or NA)"));
@@ -388,7 +388,7 @@ SEXP Mmatrix(SEXP args)
 #endif
 
 	PROTECT(ans = allocMatrix(TYPEOF(vals), nr, nc));
-	if (isVector(vals)) {
+	if (Rf_isVector(vals)) {
 	    if(lendat)
 		copyMatrix(ans, vals, (Rboolean) byrow);
 	    else { /* fill with NAs */
@@ -430,7 +430,7 @@ SEXP Mmatrix(SEXP args)
 		}
 	    }
 	}
-	if (!isNull(dimnames)&& length(dimnames) > 0)
+	if (dimnames != R_NilValue && length(dimnames) > 0)
 		ans = dimnamesgets(ans, dimnames);
 	UNPROTECT(1);
 	return ans;
@@ -522,7 +522,7 @@ SEXP m_encodeInd(SEXP ij, SEXP di, SEXP orig_1, SEXP chk_bnds)
 		ij = PROTECT(coerceVector(ij, INTSXP));
 		nprot++;
 	}
-	if (!isMatrix(ij) ||
+	if (!Rf_isMatrix(ij) ||
 	    (ij_di = INTEGER(getAttrib(ij, R_DimSymbol)))[1] != 2)
 		error(_("Argument ij must be 2-column integer matrix"));
 	n = ij_di[0];

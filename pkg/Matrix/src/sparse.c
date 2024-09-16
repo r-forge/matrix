@@ -1137,7 +1137,7 @@ SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 		break;
 	default:
 		error(_("replacement diagonal has incompatible type \"%s\""),
-		      type2char(tv));
+		      Rf_type2char(tv));
 		break;
 	}
 

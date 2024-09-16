@@ -55,19 +55,11 @@
 #define duplicate         Rf_duplicate
 #define error             Rf_error
 #define getAttrib         Rf_getAttrib
-#define inherits          Rf_inherits
-#define isMatrix          Rf_isMatrix
-#define isNull            Rf_isNull
-#define isNumeric         Rf_isNumeric
-#define isObject          Rf_isObject
-#define isVector          Rf_isVector
-#define isVectorAtomic    Rf_isVectorAtomic
 #define length(x)         Rf_length(x)
 #define mkChar            Rf_mkChar
 #define mkNamed           Rf_mkNamed
 #define mkString          Rf_mkString
 #define setAttrib         Rf_setAttrib
-#define type2char         Rf_type2char
 #define warning           Rf_warning
 #endif
 
@@ -136,18 +128,15 @@ do { \
 
 #define ERROR_INVALID_TYPE(_X_, _FUNC_) \
 	error(_("invalid type \"%s\" in '%s'"), \
-	      type2char(TYPEOF(_X_)), _FUNC_)
+	      Rf_type2char(TYPEOF(_X_)), _FUNC_)
 
 #define ERROR_INVALID_CLASS(_X_, _FUNC_) \
 do { \
-	if (!isObject(_X_)) \
+	if (!Rf_isObject(_X_)) \
 		ERROR_INVALID_TYPE(_X_, _FUNC_); \
-	else { \
-		SEXP class = PROTECT(getAttrib(_X_, R_ClassSymbol)); \
+	else \
 		error(_("invalid class \"%s\" in '%s'"), \
-		      CHAR(STRING_ELT(class, 0)), _FUNC_); \
-		UNPROTECT(1); \
-	} \
+		      CHAR(STRING_ELT(getAttrib(_X_, R_ClassSymbol), 0)), _FUNC_); \
 } while (0)
 
 #define VALID_UPLO(s, c) \

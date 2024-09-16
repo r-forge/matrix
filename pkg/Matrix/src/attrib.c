@@ -6,9 +6,9 @@
 int DimNames_is_trivial(SEXP dn)
 {
 	return
-		isNull(VECTOR_ELT(dn, 0)) &&
-		isNull(VECTOR_ELT(dn, 1)) &&
-		isNull(getAttrib(dn, R_NamesSymbol));
+		VECTOR_ELT(dn, 0) == R_NilValue &&
+		VECTOR_ELT(dn, 1) == R_NilValue &&
+		getAttrib(dn, R_NamesSymbol) == R_NilValue;
 }
 
 int DimNames_is_symmetric(SEXP dn)
@@ -18,12 +18,12 @@ int DimNames_is_symmetric(SEXP dn)
 	int n;
 
 	return
-		!((!isNull(rn = VECTOR_ELT(dn, 0)) &&
-		   !isNull(cn = VECTOR_ELT(dn, 1)) &&
+		!(((rn = VECTOR_ELT(dn, 0)) != R_NilValue &&
+		   (cn = VECTOR_ELT(dn, 1)) != R_NilValue &&
 		   rn != cn &&
 		   ((n = LENGTH(rn)) != LENGTH(cn) ||
 		    !equalString(rn, cn, n))) ||
-		  ((!isNull(ndn = getAttrib(dn, R_NamesSymbol)) &&
+		  (((ndn = getAttrib(dn, R_NamesSymbol)) != R_NilValue &&
 		    *(nrn = CHAR(STRING_ELT(ndn, 0))) != '\0' &&
 		    *(ncn = CHAR(STRING_ELT(ndn, 1))) != '\0' &&
 		    strcmp(nrn, ncn) != 0)));
@@ -38,21 +38,21 @@ void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 {
 	SEXP s;
 	if (J < 0) {
-		if (!isNull(s = VECTOR_ELT(src, J = 1)) ||
-		    !isNull(s = VECTOR_ELT(src, J = 0))) {
+		if ((s = VECTOR_ELT(src, J = 1)) != R_NilValue ||
+		    (s = VECTOR_ELT(src, J = 0)) != R_NilValue) {
 			SET_VECTOR_ELT(dest, 0, s);
 			SET_VECTOR_ELT(dest, 1, s);
 		} else {
 			J = 1;
 		}
 	} else {
-		if (!isNull(s = VECTOR_ELT(src, J))) {
+		if ((s = VECTOR_ELT(src, J)) != R_NilValue) {
 			SET_VECTOR_ELT(dest, 0, s);
 			SET_VECTOR_ELT(dest, 1, s);
 		}
 	}
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
-	if (!isNull(s)) {
+	if (s != R_NilValue) {
 		SEXP destnms = PROTECT(allocVector(STRSXP, 2));
 		if (CHAR(s = STRING_ELT(s, J))[0] != '\0') {
 			SET_STRING_ELT(destnms, 0, s);
@@ -67,12 +67,12 @@ void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 
 void revDN(SEXP dest, SEXP src) {
 	SEXP s;
-	if (!isNull(s = VECTOR_ELT(src, 0)))
+	if ((s = VECTOR_ELT(src, 0)) != R_NilValue)
 		SET_VECTOR_ELT(dest, 1, s);
-	if (!isNull(s = VECTOR_ELT(src, 1)))
+	if ((s = VECTOR_ELT(src, 1)) != R_NilValue)
 		SET_VECTOR_ELT(dest, 0, s);
 	PROTECT(s = getAttrib(src, R_NamesSymbol));
-	if (!isNull(s)) {
+	if (s != R_NilValue) {
 		SEXP srcnms = s, destnms = PROTECT(allocVector(STRSXP, 2));
 		if (CHAR(s = STRING_ELT(srcnms, 0))[0] != '\0')
 			SET_STRING_ELT(destnms, 1, s);
