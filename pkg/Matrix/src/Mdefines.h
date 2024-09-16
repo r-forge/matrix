@@ -53,39 +53,40 @@
 
 #define Matrix_Calloc(p, n, t) \
 do { \
-	if (n >= Matrix_CallocThreshold) \
-		p = R_Calloc(n, t); \
+	if ((n) >= Matrix_CallocThreshold) \
+		(p) = R_Calloc((n), t); \
 	else { \
-		p = (t *) Matrix_alloca(sizeof(t) * (size_t) (n)); \
+		(p) = (t *) Matrix_alloca(sizeof(t) * (size_t) (n)); \
 		R_CheckStack(); \
-		memset(p, 0, sizeof(t) * (size_t) (n)); \
+		memset((p), 0, sizeof(t) * (size_t) (n)); \
 	} \
 } while (0)
 
 #define Matrix_Free(p, n) \
 do { \
-	if (n >= Matrix_CallocThreshold) \
-		R_Free(p); \
+	if ((n) >= Matrix_CallocThreshold) \
+		R_Free((p)); \
 } while (0)
 
 #ifndef ENABLE_NLS
 # define dgettext(Domain, String) (String)
-# define dngettext(Domain, String, StringP, N) ((N == 1) ? String : StringP)
+# define dngettext(Domain, String, StringP, N) (((N) == 1) ? String : StringP)
 #endif
 #define _(String) dgettext(Matrix_TranslationDomain, String)
 
 #define errorChar(...)   Rf_mkChar  (Matrix_sprintf(__VA_ARGS__))
 #define errorString(...) Rf_mkString(Matrix_sprintf(__VA_ARGS__))
 
-#define HAS_SLOT(x, name)        R_has_slot      (x, name)
-#define GET_SLOT(x, name)        R_do_slot       (x, name)
-#define SET_SLOT(x, name, value) R_do_slot_assign(x, name, value)
+#define HAS_SLOT(x, name)        R_has_slot      ((x), (name))
+#define GET_SLOT(x, name)        R_do_slot       ((x), (name))
+#define SET_SLOT(x, name, value) R_do_slot_assign((x), (name), (value))
 
 /* TYPEOF returns int, not SEXPTYPE (unsigned int) => -Wsign-conversion */
-#define TYPEOF(s) ((SEXPTYPE) (TYPEOF)(s))
+#define TYPEOF(s) \
+	((SEXPTYPE) (TYPEOF)((s)))
 
 #define LONGDOUBLE_AS_DOUBLE(x) \
-	((x > DBL_MAX) ? R_PosInf : ((x < -DBL_MAX) ? R_NegInf : (double) x))
+	(((x) > DBL_MAX) ? R_PosInf : (((x) < -DBL_MAX) ? R_NegInf : (double) (x)))
 
 #define DENSE_INDEX_N(i, j, m) \
 	((i) + (j) * (m))
@@ -96,9 +97,11 @@ do { \
 #define PACKED_LENGTH(n) \
 	((n) + ((n) * (            (n) - 1U)) / 2U)
 
-#define SWAP(a, b, t, op) do { t tmp = op(a); a = op(b); b = tmp; } while (0)
+#define ABS(i) \
+	(((i) < 0) ? -(i) : (i))
 
-#define  ABS(i) (((i) < 0) ? -(i) : (i))
+#define SWAP(a, b, t, op) \
+	do { t tmp = op(a); a = op(b); b = tmp; } while (0)
 
 #define ERROR_OOM(_FUNC_) \
 	Rf_error(_("out of memory in '%s'"), \
