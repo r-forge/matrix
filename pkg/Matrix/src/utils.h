@@ -1,7 +1,6 @@
 #ifndef MATRIX_UTILS_H
 #define MATRIX_UTILS_H
 
-#include <stddef.h> /* size_t */
 #include <Rinternals.h>
 #include <Rversion.h>
 

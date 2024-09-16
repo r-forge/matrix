@@ -15,7 +15,8 @@ ssenv = \
 	AR="$(AR)" \
 	RANLIB="$(RANLIB)"
 
-PKG_CPPFLAGS = -I"$(ssdir)/SuiteSparse_config"
+PKG_CPPFLAGS = -I"$(ssdir)/SuiteSparse_config" \
+	-DSTRICT_R_HEADERS -DR_NO_REMAP # -DR_NO_REMAP_RMATH # R bug #18800
 PKG_CFLAGS = $(C_VISIBILITY)
 PKG_LIBS = $(sslib) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 

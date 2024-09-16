@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-09-15 r4923)}{
+\section{Changes in version 1.8-0 (2024-09-16 r4938)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -63,6 +63,9 @@
       \item \proglang{C} code is simplified using definitions in new
       header \file{M5.h} for templated dispatch on object \dQuote{kind}
       \samp{[nlidz]}.
+
+      \item \proglang{C} code is compiled with preprocessor options
+      \option{-DSTRICT_R_HEADERS} and \option{-DR_NO_REMAP}.
 
       \item Warnings emitted by \option{-Wconversion} (but not those
       originating in SuiteSparse) are resolved.

@@ -22,15 +22,6 @@
 # include <libintl.h> /* dgettext, dngettext */
 #endif
 
-#undef STRICT_R_HEADERS
-#define STRICT_R_HEADERS
-
-#undef R_NO_REMAP
-#define R_NO_REMAP
-
-#undef R_NO_REMAP_RMATH
-/* #define R_NO_REMAP_RMATH */
-
 #include <R_ext/Arith.h> /* ISNAN, R_FINITE, ... */
 #include <R_ext/Boolean.h> /* Rboolean */
 #include <R_ext/Complex.h> /* Rcomplex */
