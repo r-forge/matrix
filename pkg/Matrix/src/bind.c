@@ -460,10 +460,10 @@ void coerceArgs(SEXP args, int margin,
 				if (!isM && XLENGTH(s) != rdim[!margin]) {
 					static SEXP replen = NULL;
 					if (!replen)
-						replen = install("rep_len");
+						replen = Rf_install("rep_len");
 					SEXP lengthout = PROTECT(Rf_ScalarInteger(rdim[!margin])),
-						call = PROTECT(lang3(replen, s, lengthout));
-					REPROTECT(s = eval(call, R_GlobalEnv), pid);
+						call = PROTECT(Rf_lang3(replen, s, lengthout));
+					REPROTECT(s = Rf_eval(call, R_GlobalEnv), pid);
 					UNPROTECT(2);
 				}
 				scl_[1] = 'g';
@@ -838,7 +838,7 @@ static
 SEXP bind(SEXP args, SEXP exprs, int margin, int level)
 {
 	if (!tagWasVector)
-		tagWasVector = install(".__WAS_VECTOR__."); /* for now, a hack */
+		tagWasVector = Rf_install(".__WAS_VECTOR__."); /* for now, a hack */
 
 	int rdim[2], rdimnames[2];
 	char kind = '\0', repr = '\0';

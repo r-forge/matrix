@@ -54,17 +54,14 @@
 #define dimnamesgets      Rf_dimnamesgets
 #define duplicate         Rf_duplicate
 #define error             Rf_error
-#define eval              Rf_eval
 #define getAttrib         Rf_getAttrib
 #define inherits          Rf_inherits
-#define install           Rf_install
 #define isMatrix          Rf_isMatrix
 #define isNull            Rf_isNull
 #define isNumeric         Rf_isNumeric
 #define isObject          Rf_isObject
 #define isVector          Rf_isVector
 #define isVectorAtomic    Rf_isVectorAtomic
-#define lang3             Rf_lang3
 #define length(x)         Rf_length(x)
 #define mkChar            Rf_mkChar
 #define mkNamed           Rf_mkNamed

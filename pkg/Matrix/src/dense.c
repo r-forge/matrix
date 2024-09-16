@@ -1283,7 +1283,7 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 		SEXP kindSym = NULL;
 		SEXP kindVal = PROTECT(mkString((ans_ > 0) ? "U" : "L"));
 		if (!kindSym)
-			kindSym = install("kind");
+			kindSym = Rf_install("kind");
 		setAttrib(ans, kindSym, kindVal);
 		UNPROTECT(2); /* kindVal, ans */
 	}

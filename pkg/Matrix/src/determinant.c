@@ -14,7 +14,7 @@ SEXP mkDet(double modulus, int logarithm, int sign)
 		det0a = PROTECT(Rf_ScalarLogical(logarithm));
 	static SEXP logarithmSym = NULL;
 	if (!logarithmSym)
-		logarithmSym = install("logarithm");
+		logarithmSym = Rf_install("logarithm");
 	SET_STRING_ELT(nms, 0, mkChar("modulus"));
 	SET_STRING_ELT(nms, 1, mkChar("sign"));
 	setAttrib(det, R_NamesSymbol, nms);
