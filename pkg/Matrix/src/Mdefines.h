@@ -42,10 +42,6 @@
 #include <Rversion.h> /* R_VERSION, ... */
 
 #ifdef R_NO_REMAP
-#define ScalarComplex     Rf_ScalarComplex
-#define ScalarInteger     Rf_ScalarInteger
-#define ScalarLogical     Rf_ScalarLogical
-#define ScalarReal        Rf_ScalarReal
 #define allocMatrix       Rf_allocMatrix
 #define allocVector       Rf_allocVector
 #define asChar            Rf_asChar

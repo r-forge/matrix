@@ -365,7 +365,7 @@ SEXP sparse_diag_U2N(SEXP from, const char *class)
 	if (nu == 'N')
 		return from;
 
-	SEXP value = PROTECT(ScalarLogical(1));
+	SEXP value = PROTECT(Rf_ScalarLogical(1));
 	from = R_sparse_diag_set(from, value);
 	UNPROTECT(1); /* value */
 
@@ -2719,7 +2719,7 @@ SEXP R_sparse_is_symmetric(SEXP s_obj,
 	VALID_LOGIC2(s_checkDN, checkDN);
 
 	int ans_ = sparse_is_symmetric(s_obj, class, ct, exact, checkDN);
-	SEXP ans = ScalarLogical(ans_);
+	SEXP ans = Rf_ScalarLogical(ans_);
 	return ans;
 }
 
@@ -2907,7 +2907,7 @@ int sparse_is_diagonal(SEXP obj, const char *class)
 SEXP R_sparse_is_diagonal(SEXP s_obj)
 {
 	const char *class = Matrix_class(s_obj, valid_sparse, 6, __func__);
-	return ScalarLogical(sparse_is_diagonal(s_obj, class));
+	return Rf_ScalarLogical(sparse_is_diagonal(s_obj, class));
 }
 
 #define MAP(i) (map) ? map[i] : i
@@ -3460,9 +3460,9 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 				}
 			}
 			if (s <= INT_MAX)
-				ans = ScalarInteger((int) s);
+				ans = Rf_ScalarInteger((int) s);
 			else
-				ans = ScalarReal((double) s);
+				ans = Rf_ScalarReal((double) s);
 			break;
 		}
 		case 'l':
@@ -3482,15 +3482,15 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 						count += d;
 					}
 					else if (!narm)
-						return ScalarInteger(NA_INTEGER);
+						return Rf_ScalarInteger(NA_INTEGER);
 					++k;
 				}
 			}
 			TRY_INCREMENT(s, t, overC);
 			if (s > INT_MIN && s <= INT_MAX)
-				ans = ScalarInteger((int) s);
+				ans = Rf_ScalarInteger((int) s);
 			else
-				ans = ScalarReal((double) s);
+				ans = Rf_ScalarReal((double) s);
 			break;
 overC:
 			;
@@ -3501,11 +3501,11 @@ overC:
 					if (px[k] != NA_INTEGER)
 						lr += (sy && pi[k] != j) ? 2.0L * px[k] : px[k];
 					else if (!narm)
-						return ScalarInteger(NA_INTEGER);
+						return Rf_ScalarInteger(NA_INTEGER);
 					++k;
 				}
 			}
-			ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+			ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 			break;
 		}
 		case 'd':
@@ -3520,7 +3520,7 @@ overC:
 					++k;
 				}
 			}
-			ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+			ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 			break;
 		}
 		case 'z':
@@ -3541,7 +3541,7 @@ overC:
 			}
 			tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 			tmp.i = LONGDOUBLE_AS_DOUBLE(li);
-			ans = ScalarComplex(tmp);
+			ans = Rf_ScalarComplex(tmp);
 			break;
 		}
 		default:
@@ -3568,9 +3568,9 @@ overC:
 						--s;
 			}
 			if (s <= INT_MAX)
-				ans = ScalarInteger((int) s);
+				ans = Rf_ScalarInteger((int) s);
 			else
-				ans = ScalarReal((double) s);
+				ans = Rf_ScalarReal((double) s);
 			break;
 		}
 		case 'l':
@@ -3588,12 +3588,12 @@ overC:
 					count += d;
 				}
 				else if (!narm)
-					return ScalarInteger(NA_INTEGER);
+					return Rf_ScalarInteger(NA_INTEGER);
 			TRY_INCREMENT(s, t, overT);
 			if (s > INT_MIN && s <= INT_MAX)
-				ans = ScalarInteger((int) s);
+				ans = Rf_ScalarInteger((int) s);
 			else
-				ans = ScalarReal((double) s);
+				ans = Rf_ScalarReal((double) s);
 			break;
 overT:
 			;
@@ -3602,9 +3602,9 @@ overT:
 				if (px[k] != NA_INTEGER)
 					lr += (sy && pi[k] != pj[k]) ? 2.0L * px[k] : px[k];
 				else if (!narm)
-					return ScalarInteger(NA_INTEGER);
+					return Rf_ScalarInteger(NA_INTEGER);
 			}
-			ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+			ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 			break;
 		}
 		case 'd':
@@ -3614,7 +3614,7 @@ overT:
 			for (k = 0; k < kend; ++k)
 				if (!(narm && ISNAN(px[k])))
 					lr += (sy && pi[k] != pj[k]) ? 2.0L * px[k] : px[k];
-			ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+			ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 			break;
 		}
 		case 'z':
@@ -3630,7 +3630,7 @@ overT:
 				}
 			tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 			tmp.i = LONGDOUBLE_AS_DOUBLE(li);
-			ans = ScalarComplex(tmp);
+			ans = Rf_ScalarComplex(tmp);
 			break;
 		}
 		default:
@@ -3891,12 +3891,12 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 
 	SEXP ans;
 	if (class[0] != 'z')
-		ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+		ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 	else {
 		Rcomplex tmp;
 		tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 		tmp.i = LONGDOUBLE_AS_DOUBLE(li);
-		ans = ScalarComplex(tmp);
+		ans = Rf_ScalarComplex(tmp);
 	}
 	return ans;
 }

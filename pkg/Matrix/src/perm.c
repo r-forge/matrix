@@ -86,8 +86,8 @@ SEXP R_isPerm(SEXP s_p, SEXP s_off)
 		error(_("'%s' is NA"), "off");
 	R_xlen_t n = XLENGTH(s_p);
 	if (n > INT_MAX)
-		return ScalarLogical(0);
-	return ScalarLogical(isPerm(INTEGER(s_p), (int) n, off));
+		return Rf_ScalarLogical(0);
+	return Rf_ScalarLogical(isPerm(INTEGER(s_p), (int) n, off));
 }
 
 SEXP R_signPerm(SEXP s_p, SEXP s_off)
@@ -104,7 +104,7 @@ SEXP R_signPerm(SEXP s_p, SEXP s_off)
 	R_xlen_t n = XLENGTH(s_p);
 	if (n > INT_MAX)
 		error(_("attempt to get sign of non-permutation"));
-	return ScalarInteger(signPerm(INTEGER(s_p), (int) n, off));
+	return Rf_ScalarInteger(signPerm(INTEGER(s_p), (int) n, off));
 }
 
 SEXP R_invertPerm(SEXP s_p, SEXP s_off, SEXP s_ioff)

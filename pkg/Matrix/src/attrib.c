@@ -31,7 +31,7 @@ int DimNames_is_symmetric(SEXP dn)
 
 SEXP R_DimNames_is_symmetric(SEXP s_dn)
 {
-	return ScalarLogical(DimNames_is_symmetric(s_dn));
+	return Rf_ScalarLogical(DimNames_is_symmetric(s_dn));
 }
 
 void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)

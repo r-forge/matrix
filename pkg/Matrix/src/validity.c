@@ -50,7 +50,7 @@ char *Dim_validate(SEXP dim)
 SEXP R_Dim_validate(SEXP dim)
 {
 	char *msg = Dim_validate(dim);
-	return (msg) ? mkString(msg) : ScalarLogical(1);
+	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
 }
 
 char *DimNames_validate(SEXP dimnames, int *pdim)
@@ -88,7 +88,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 {
 	char *msg = DimNames_validate(dimnames, INTEGER(dim));
-	return (msg) ? mkString(msg) : ScalarLogical(1);
+	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
 }
 
 SEXP R_DimNames_fixup(SEXP dimnames)
@@ -142,7 +142,7 @@ SEXP Matrix_validate(SEXP obj)
 		UNPROTECT(1); /* dimnames */
 	}
 	UNPROTECT(1); /* dim */
-	return (msg) ? mkString(msg) : ScalarLogical(1);
+	return (msg) ? mkString(msg) : Rf_ScalarLogical(1);
 }
 
 #define KINDMATRIX_VALIDATE(_PREFIX_, _SEXPTYPE_) \
@@ -151,7 +151,7 @@ SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
 	SEXP x = GET_SLOT(obj, Matrix_xSym); \
 	if (TYPEOF(x) != _SEXPTYPE_) \
 		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
-	return ScalarLogical(1); \
+	return Rf_ScalarLogical(1); \
 }
 KINDMATRIX_VALIDATE(n,  LGLSXP)
 KINDMATRIX_VALIDATE(l,  LGLSXP)
@@ -173,7 +173,7 @@ SEXP generalMatrix_validate(SEXP obj)
 			RMKMS(_("'%s' slot has no '%s' attribute"), "factors", "names");
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP symmetricMatrix_validate(SEXP obj)
@@ -275,7 +275,7 @@ SEXP triangularMatrix_validate(SEXP obj)
 	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP unpackedMatrix_validate(SEXP obj)
@@ -286,7 +286,7 @@ SEXP unpackedMatrix_validate(SEXP obj)
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (XLENGTH(x) != (int_fast64_t) m * n)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP packedMatrix_validate(SEXP obj)
@@ -297,7 +297,7 @@ SEXP packedMatrix_validate(SEXP obj)
 	int n = INTEGER(dim)[0];
 	if (XLENGTH(x) != n + ((int_fast64_t) n * (n - 1)) / 2)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "Dim[1]*(Dim[1]+1)/2");
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP CsparseMatrix_validate(SEXP obj)
@@ -348,7 +348,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP RsparseMatrix_validate(SEXP obj)
@@ -399,7 +399,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP TsparseMatrix_validate(SEXP obj)
@@ -438,7 +438,7 @@ SEXP TsparseMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP diagonalMatrix_validate(SEXP obj)
@@ -463,7 +463,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
 		      "diag", (nonunit) ? "N" : "U", "x", (nonunit) ? "Dim[1]" : "0");
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP indMatrix_validate(SEXP obj)
@@ -499,7 +499,7 @@ SEXP indMatrix_validate(SEXP obj)
 		++pperm;
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP pMatrix_validate(SEXP obj)
@@ -523,7 +523,7 @@ SEXP pMatrix_validate(SEXP obj)
 		Matrix_Free(work, lwork);
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sCMatrix_validate(SEXP obj)
@@ -563,7 +563,7 @@ SEXP sCMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP tCMatrix_validate(SEXP obj)
@@ -614,7 +614,7 @@ SEXP tCMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sRMatrix_validate(SEXP obj)
@@ -654,7 +654,7 @@ SEXP sRMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP tRMatrix_validate(SEXP obj)
@@ -705,7 +705,7 @@ SEXP tRMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sTMatrix_validate(SEXP obj)
@@ -735,7 +735,7 @@ SEXP sTMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP tTMatrix_validate(SEXP obj)
@@ -782,7 +782,7 @@ SEXP tTMatrix_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xgCMatrix_validate(SEXP obj)
@@ -792,7 +792,7 @@ SEXP xgCMatrix_validate(SEXP obj)
 	UNPROTECT(2); /* i, x */
 	if (XLENGTH(x) != XLENGTH(i))
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x");
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xsCMatrix_validate(SEXP obj)
@@ -818,7 +818,7 @@ SEXP xgRMatrix_validate(SEXP obj)
 	UNPROTECT(2); /* j, x */
 	if (XLENGTH(x) != XLENGTH(j))
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "j", "x");
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xsRMatrix_validate(SEXP obj)
@@ -844,7 +844,7 @@ SEXP xgTMatrix_validate(SEXP obj)
 	UNPROTECT(2); /* i, x */
 	if (XLENGTH(x) != XLENGTH(i))
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x");
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xsTMatrix_validate(SEXP obj)
@@ -890,7 +890,7 @@ SEXP xpoMatrix_validate(SEXP obj)
 			RMK(_("matrix has diagonal elements with negative real part"));
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xppMatrix_validate(SEXP obj)
@@ -929,7 +929,7 @@ SEXP xppMatrix_validate(SEXP obj)
 	}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xpCMatrix_validate(SEXP obj)
@@ -976,7 +976,7 @@ SEXP xpCMatrix_validate(SEXP obj)
 	}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xpRMatrix_validate(SEXP obj)
@@ -1023,7 +1023,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 	}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP xpTMatrix_validate(SEXP obj)
@@ -1067,7 +1067,7 @@ SEXP xpTMatrix_validate(SEXP obj)
 	}
 	Matrix_Free(work, lwork);
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP corMatrix_validate(SEXP obj)
@@ -1092,7 +1092,7 @@ SEXP corMatrix_validate(SEXP obj)
 		if (!ISNAN(psd[j]) && psd[j] < 0.0)
 			RMKMS(_("'%s' slot has negative elements"), "sd");
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP copMatrix_validate(SEXP obj)
@@ -1125,7 +1125,7 @@ SEXP copMatrix_validate(SEXP obj)
 		if (!ISNAN(psd[j]) && psd[j] < 0.0)
 			RMKMS(_("'%s' slot has negative elements"), "sd");
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sparseVector_validate(SEXP obj)
@@ -1189,7 +1189,7 @@ SEXP sparseVector_validate(SEXP obj)
 		}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 #define KINDVECTOR_VALIDATE(_PREFIX_, _SEXPTYPE_) \
@@ -1202,7 +1202,7 @@ SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
 		RMKMS(_("'%s' slot is not of type \"%s\""), "x", type2char(_SEXPTYPE_)); \
 	if (XLENGTH(x) != XLENGTH(i)) \
 		RMKMS(_("'%s' and '%s' slots do not have equal length"), "i", "x"); \
-	return ScalarLogical(1); \
+	return Rf_ScalarLogical(1); \
 }
 KINDVECTOR_VALIDATE(l,  LGLSXP)
 KINDVECTOR_VALIDATE(i,  INTSXP)
@@ -1252,7 +1252,7 @@ SEXP denseSchur_validate(SEXP obj)
 	if (XLENGTH(values) != n)
 		RMKMS(_("'%s' slot does not have length %s"), "values", "Dim[1]");
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP denseQR_validate(SEXP obj)
@@ -1295,7 +1295,7 @@ SEXP denseQR_validate(SEXP obj)
 	}
 	Matrix_Free(work, lwork);
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP denseLU_validate(SEXP obj)
@@ -1325,7 +1325,7 @@ SEXP denseLU_validate(SEXP obj)
 		++pperm;
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP denseBunchKaufman_validate(SEXP obj)
@@ -1386,7 +1386,7 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 			RMKMS(_("'%s' slot has unpaired negative elements"), "perm");
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP denseCholesky_validate(SEXP obj)
@@ -1473,7 +1473,7 @@ SEXP denseCholesky_validate(SEXP obj)
 		Matrix_Free(work, lwork);
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sparseQR_validate(SEXP obj)
@@ -1580,7 +1580,7 @@ SEXP sparseQR_validate(SEXP obj)
 	}
 	Matrix_Free(work, lwork);
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sparseLU_validate(SEXP obj)
@@ -1682,7 +1682,7 @@ SEXP sparseLU_validate(SEXP obj)
 	}
 	Matrix_Free(work, lwork);
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP sparseCholesky_validate(SEXP obj)
@@ -1740,14 +1740,14 @@ SEXP sparseCholesky_validate(SEXP obj)
 			RMKMS(_("%s is not in {%s}"), "colcount[j]", "0,...,Dim[2]-j+1");
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP simplicialCholesky_validate(SEXP obj)
 {
 	int pattern = !HAS_SLOT(obj, Matrix_minorSym);
 	if (pattern)
-		return ScalarLogical(1);
+		return Rf_ScalarLogical(1);
 
 	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
@@ -1898,7 +1898,7 @@ SEXP simplicialCholesky_validate(SEXP obj)
 	}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 SEXP supernodalCholesky_validate(SEXP obj)
@@ -2022,7 +2022,7 @@ SEXP supernodalCholesky_validate(SEXP obj)
 		RMKMS(_("'%s' slot is negative or exceeds %s"), "maxesize", "Dim[1]");
 
 	if (pattern)
-		return ScalarLogical(1);
+		return Rf_ScalarLogical(1);
 
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\" or \"%s\""),
@@ -2057,7 +2057,7 @@ SEXP supernodalCholesky_validate(SEXP obj)
 	}
 	}
 
-	return ScalarLogical(1);
+	return Rf_ScalarLogical(1);
 }
 
 /* where 'cl' must be an element of 'valid_matrix' */

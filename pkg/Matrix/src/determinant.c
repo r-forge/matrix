@@ -9,9 +9,9 @@ SEXP mkDet(double modulus, int logarithm, int sign)
 	SEXP nms = PROTECT(allocVector(STRSXP, 2)),
 		cl = PROTECT(mkString("det")),
 		det = PROTECT(allocVector(VECSXP, 2)),
-		det0 = PROTECT(ScalarReal((logarithm) ? modulus : exp(modulus))),
-		det1 = PROTECT(ScalarInteger(sign)),
-		det0a = PROTECT(ScalarLogical(logarithm));
+		det0 = PROTECT(Rf_ScalarReal((logarithm) ? modulus : exp(modulus))),
+		det1 = PROTECT(Rf_ScalarInteger(sign)),
+		det0a = PROTECT(Rf_ScalarLogical(logarithm));
 	static SEXP logarithmSym = NULL;
 	if (!logarithmSym)
 		logarithmSym = install("logarithm");

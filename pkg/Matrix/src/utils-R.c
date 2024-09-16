@@ -172,7 +172,7 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 		if (countNA == NA_LOGICAL) { \
 			while (n-- > 0) { \
 				if (!c##NOT_NA(*px)) \
-					return ScalarInteger(NA_INTEGER); \
+					return Rf_ScalarInteger(NA_INTEGER); \
 				if (c##NOT_ZERO(*px)) \
 					++nnz; \
 				++px; \
@@ -197,7 +197,7 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 #undef NNZ
 
 	return (nnz <= INT_MAX)
-		? ScalarInteger((int) nnz) : ScalarReal((double) nnz);
+		? Rf_ScalarInteger((int) nnz) : Rf_ScalarReal((double) nnz);
 }
 
 
@@ -205,8 +205,8 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 /* ================================================================== */
 
 
-#define TRUE_  ScalarLogical(1)
-#define FALSE_ ScalarLogical(0)
+#define TRUE_  Rf_ScalarLogical(1)
+#define FALSE_ Rf_ScalarLogical(0)
 
 // Fast implementation of [ originally in  ../R/Auxiliaries.R ]
 // all0	 <- function(x) !any(is.na(x)) && all(!x) ## ~= allFalse

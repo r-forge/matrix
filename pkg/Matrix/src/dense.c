@@ -1160,7 +1160,7 @@ SEXP R_dense_is_symmetric(SEXP s_obj,
 	VALID_LOGIC2(s_checkDN, checkDN);
 
 	int ans_ = dense_is_symmetric(s_obj, class, ct, exact, checkDN);
-	SEXP ans = ScalarLogical(ans_);
+	SEXP ans = Rf_ScalarLogical(ans_);
 	UNPROTECT(1); /* s_obj */
 	return ans;
 }
@@ -1371,7 +1371,7 @@ SEXP R_dense_is_diagonal(SEXP s_obj)
 	const char *class = Matrix_class(s_obj, valid_dense, 6, __func__);
 
 	int ans_ = dense_is_diagonal(s_obj, class);
-	SEXP ans = ScalarLogical(ans_ != 0);
+	SEXP ans = Rf_ScalarLogical(ans_ != 0);
 	UNPROTECT(1); /* s_obj */
 	return ans;
 }
@@ -1719,9 +1719,9 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 #undef SUM_KERNEL
 
 		if (s <= INT_MAX)
-			ans = ScalarInteger((int) s);
+			ans = Rf_ScalarInteger((int) s);
 		else
-			ans = ScalarReal((double) s);
+			ans = Rf_ScalarReal((double) s);
 		break;
 	}
 	case 'l':
@@ -1754,7 +1754,7 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 					count += d; \
 				} \
 				else if (!narm) \
-					return ScalarInteger(NA_INTEGER); \
+					return Rf_ScalarInteger(NA_INTEGER); \
 				px += 1; \
 			} \
 		} while (0)
@@ -1766,9 +1766,9 @@ SEXP dense_sum(SEXP obj, const char *class, int narm)
 		TRY_INCREMENT(s, t);
 
 		if (s > INT_MIN && s <= INT_MAX)
-			ans = ScalarInteger((int) s);
+			ans = Rf_ScalarInteger((int) s);
 		else
-			ans = ScalarReal((double) s);
+			ans = Rf_ScalarReal((double) s);
 		break;
 over:
 		px = (class[0] == 'l') ? LOGICAL(x) : INTEGER(x);
@@ -1780,7 +1780,7 @@ over:
 				if (*px != NA_INTEGER) \
 					lr += (sy && i != j) ? 2.0L * *px : *px; \
 				else if (!narm) \
-					return ScalarInteger(NA_INTEGER); \
+					return Rf_ScalarInteger(NA_INTEGER); \
 				px += 1; \
 			} \
 		} while (0)
@@ -1789,7 +1789,7 @@ over:
 
 #undef SUM_KERNEL
 
-		ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+		ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 		break;
 	}
 	case 'd':
@@ -1810,7 +1810,7 @@ over:
 
 #undef SUM_KERNEL
 
-		ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+		ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 		break;
 	}
 	case 'z':
@@ -1837,7 +1837,7 @@ over:
 
 		tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 		tmp.i = LONGDOUBLE_AS_DOUBLE(li);
-		ans = ScalarComplex(tmp);
+		ans = Rf_ScalarComplex(tmp);
 		break;
 	}
 	default:
@@ -1944,7 +1944,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 		int *px = LOGICAL(x);
 		if (class[1] == 't') {
 			if (n > 1 || (n == 1 && !un && *px == 0))
-				return ScalarReal(0.0);
+				return Rf_ScalarReal(0.0);
 			break;
 		}
 
@@ -1952,7 +1952,7 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 		do { \
 			__for__ { \
 				if (*px == 0) \
-					return ScalarReal(0.0); \
+					return Rf_ScalarReal(0.0); \
 				px += 1; \
 			} \
 		} while (0)
@@ -2050,12 +2050,12 @@ SEXP dense_prod(SEXP obj, const char *class, int narm)
 
 	SEXP ans;
 	if (class[0] != 'z')
-		ans = ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
+		ans = Rf_ScalarReal(LONGDOUBLE_AS_DOUBLE(lr));
 	else {
 		Rcomplex tmp;
 		tmp.r = LONGDOUBLE_AS_DOUBLE(lr);
 		tmp.i = LONGDOUBLE_AS_DOUBLE(li);
-		ans = ScalarComplex(tmp);
+		ans = Rf_ScalarComplex(tmp);
 	}
 	return ans;
 }

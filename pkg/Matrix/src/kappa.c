@@ -87,7 +87,7 @@ SEXP geMatrix_norm(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
 	if (m == 0 || n == 0)
-		return ScalarReal(0.0);
+		return Rf_ScalarReal(0.0);
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym));
 	double norm, *work = NULL;
@@ -101,7 +101,7 @@ SEXP geMatrix_norm(SEXP s_obj, SEXP s_type)
 	F77_CALL(dlange)(&type, &m, &n,    REAL(x), &m, work FCONE);
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(norm);
+	return Rf_ScalarReal(norm);
 }
 
 SEXP syMatrix_norm(SEXP s_obj, SEXP s_type)
@@ -111,7 +111,7 @@ SEXP syMatrix_norm(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[1];
 	if (n == 0)
-		return ScalarReal(0.0);
+		return Rf_ScalarReal(0.0);
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -135,7 +135,7 @@ SEXP syMatrix_norm(SEXP s_obj, SEXP s_type)
 	F77_CALL(dlansy)(&type, &ul, &n,    REAL(x), &n, work FCONE FCONE);
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(norm);
+	return Rf_ScalarReal(norm);
 }
 
 SEXP spMatrix_norm(SEXP s_obj, SEXP s_type)
@@ -145,7 +145,7 @@ SEXP spMatrix_norm(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[1];
 	if (n == 0)
-		return ScalarReal(0.0);
+		return Rf_ScalarReal(0.0);
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -169,7 +169,7 @@ SEXP spMatrix_norm(SEXP s_obj, SEXP s_type)
 	F77_CALL(dlansp)(&type, &ul, &n,    REAL(x), work FCONE FCONE);
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(norm);
+	return Rf_ScalarReal(norm);
 }
 
 SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
@@ -179,7 +179,7 @@ SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return ScalarReal(0.0);
+		return Rf_ScalarReal(0.0);
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -199,7 +199,7 @@ SEXP trMatrix_norm(SEXP s_obj, SEXP s_type)
 	F77_CALL(dlantr)(&type, &ul, &nu, &n, &n,    REAL(x), &n, work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(norm);
+	return Rf_ScalarReal(norm);
 }
 
 SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
@@ -209,7 +209,7 @@ SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return ScalarReal(0.0);
+		return Rf_ScalarReal(0.0);
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -229,7 +229,7 @@ SEXP tpMatrix_norm(SEXP s_obj, SEXP s_type)
 	F77_CALL(dlantp)(&type, &ul, &nu, &n,    REAL(x), work FCONE FCONE FCONE);
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(norm);
+	return Rf_ScalarReal(norm);
 }
 
 SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
@@ -241,7 +241,7 @@ SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	if (m != n)
 		error(_("%s(%s) is undefined: '%s' is not square"), "rcond", "x", "x");
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP x = PROTECT(GET_SLOT(s_obj, Matrix_xSym)),
 		y = PROTECT(GET_SLOT(trf, Matrix_xSym));
@@ -263,7 +263,7 @@ SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	}
 	UNPROTECT(2); /* x, y */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
@@ -273,7 +273,7 @@ SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -308,7 +308,7 @@ SEXP syMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	}
 	UNPROTECT(3); /* x, y, pivot */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
@@ -318,7 +318,7 @@ SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -353,7 +353,7 @@ SEXP spMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	}
 	UNPROTECT(3); /* x, y, pivot */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP poMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
@@ -363,7 +363,7 @@ SEXP poMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -389,7 +389,7 @@ SEXP poMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	}
 	UNPROTECT(2); /* x, y */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP ppMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
@@ -399,7 +399,7 @@ SEXP ppMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -425,7 +425,7 @@ SEXP ppMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 	}
 	UNPROTECT(2); /* x, y */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
@@ -435,7 +435,7 @@ SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -459,7 +459,7 @@ SEXP trMatrix_rcond(SEXP s_obj, SEXP s_type)
 	}
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }
 
 SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
@@ -469,7 +469,7 @@ SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 	SEXP dim = GET_SLOT(s_obj, Matrix_DimSym);
 	int n = INTEGER(dim)[0];
 	if (n == 0)
-		return(ScalarReal(R_PosInf));
+		return(Rf_ScalarReal(R_PosInf));
 
 	SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
 	char ul = CHAR(STRING_ELT(uplo, 0))[0];
@@ -493,5 +493,5 @@ SEXP tpMatrix_rcond(SEXP s_obj, SEXP s_type)
 	}
 	UNPROTECT(1); /* x */
 
-	return ScalarReal(rcond);
+	return Rf_ScalarReal(rcond);
 }

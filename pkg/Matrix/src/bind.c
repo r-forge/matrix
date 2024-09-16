@@ -461,7 +461,7 @@ void coerceArgs(SEXP args, int margin,
 					static SEXP replen = NULL;
 					if (!replen)
 						replen = install("rep_len");
-					SEXP lengthout = PROTECT(ScalarInteger(rdim[!margin])),
+					SEXP lengthout = PROTECT(Rf_ScalarInteger(rdim[!margin])),
 						call = PROTECT(lang3(replen, s, lengthout));
 					REPROTECT(s = eval(call, R_GlobalEnv), pid);
 					UNPROTECT(2);
