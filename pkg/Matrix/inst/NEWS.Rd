@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-09-16 r4938)}{
+\section{Changes in version 1.8-0 (2024-10-04 r4940)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -73,17 +73,7 @@
   }
 }
 
-\section{Changes in version 1.7-1 (2024-09-15 r4923)}{
-  \subsection{Significant User-Visible Changes}{
-    \itemize{
-      \item .
-    }
-  }
-  \subsection{New Features}{
-    \itemize{
-      \item .
-    }
-  }
+\section{Changes in version 1.7-1 (2024-10-04 r4940)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Installation under architecture-specific builds of \R{}
