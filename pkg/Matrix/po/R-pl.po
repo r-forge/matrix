@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-2-2\n"
 "Report-Msgid-Bugs-To: bugs.r-project.org\n"
-"POT-Creation-Date: 2024-03-15 17:22\n"
+"POT-Creation-Date: 2024-10-17 13:08\n"
 "PO-Revision-Date: 2014-03-27 14:47+0100\n"
 "Last-Translator: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
 "Language-Team: Łukasz Daniel <lukasz.daniel@gmail.com>\n"
@@ -43,7 +43,7 @@ msgstr "nie można przekształcić wartości 'NA' na 'nsparseMatrix'"
 # Matrix/R/Auxiliaries.R: 641
 # stop(gettextf("not yet implemented for class %s", dQuote(class.x)), domain = "R-Matrix")
 #, fuzzy
-msgid "non0.i() not yet implemented for class %s"
+msgid "'%s' not implemented for class \"%s\""
 msgstr "jeszcze niezaimplementowane dla klasy %s"
 
 msgid "%s=\"%s\" invalid for %s@uplo=\"%s\""
@@ -329,7 +329,7 @@ msgstr "pośrednie 'r' jest typu %s"
 msgid "not yet implemented .. please report"
 msgstr "jeszcze niezaimplementowane .. proszę zgłosić raport"
 
-msgid "'%s' has non-finite values"
+msgid "missing requisite Schur vectors"
 msgstr ""
 
 msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
@@ -462,15 +462,6 @@ msgid "invalid %s=\"%s\" to '%s'"
 msgstr "Niepoprawny typ przechowywania: %s"
 
 msgid "dimensions cannot exceed %s"
-msgstr ""
-
-# Matrix/R/sparseMatrix.R: 372
-# stop(gettextf("invalid 'col.names' string: %s", cn), domain = "R-Matrix")
-#, fuzzy
-msgid "invalid class \"%s\" in '%s'"
-msgstr "niepoprawny łańcuch 'col.names': %s"
-
-msgid "%s length cannot exceed %s"
 msgstr ""
 
 # Matrix/R/condest.R: 74
@@ -749,6 +740,9 @@ msgstr "macierz nie jest trójkątna"
 #, fuzzy
 msgid "matrix is not triangular"
 msgstr "'x' nie jest macierzą symetryczną ani trójkątną"
+
+msgid "should never happen ..."
+msgstr ""
 
 msgid ""
 "the default value of argument '%s' of method '%s(<%s>, <%s>)' may change "
@@ -1406,7 +1400,7 @@ msgstr ""
 msgid "invalid '%s' argument"
 msgstr "niepoprawne 'data'"
 
-msgid "should never happen ..."
+msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'%s' is deprecated; using '%s' instead"
@@ -1431,6 +1425,18 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "niepoprawne 'data'"
+
+# Matrix/R/Auxiliaries.R: 641
+# stop(gettextf("not yet implemented for class %s", dQuote(class.x)), domain = "R-Matrix")
+#, fuzzy
+#~ msgid "non0.i() not yet implemented for class %s"
+#~ msgstr "jeszcze niezaimplementowane dla klasy %s"
+
+# Matrix/R/sparseMatrix.R: 372
+# stop(gettextf("invalid 'col.names' string: %s", cn), domain = "R-Matrix")
+#, fuzzy
+#~ msgid "invalid class \"%s\" in '%s'"
+#~ msgstr "niepoprawny łańcuch 'col.names': %s"
 
 # Matrix/R/abIndex.R: 165
 # stop("wrong sign in 'by' argument")
@@ -1469,12 +1475,6 @@ msgstr "niepoprawne 'data'"
 #, fuzzy
 #~ msgid "complex \"diagonalMatrix\" not yet implemented"
 #~ msgstr "ogólna klasa 'Matrix' jeszcze nie jest zaimplementowana dla %s"
-
-# Matrix/R/Auxiliaries.R: 641
-# stop(gettextf("not yet implemented for class %s", dQuote(class.x)), domain = "R-Matrix")
-#, fuzzy
-#~ msgid "not yet implemented for class \"%s\""
-#~ msgstr "jeszcze niezaimplementowane dla klasy %s"
 
 # Matrix/R/sparseMatrix.R: 731
 # stop("invalid 'type'")

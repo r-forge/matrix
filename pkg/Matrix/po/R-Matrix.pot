@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.8-0\n"
-"POT-Creation-Date: 2024-03-15 17:22\n"
+"POT-Creation-Date: 2024-10-17 13:08\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "cannot coerce matrix of type \"%s\" to %s"
 msgstr ""
 
-msgid "non0.i() not yet implemented for class %s"
+msgid "'%s' not implemented for class \"%s\""
 msgstr ""
 
 msgid "%s=\"%s\" invalid for %s@uplo=\"%s\""
@@ -175,7 +175,7 @@ msgstr ""
 msgid "not yet implemented .. please report"
 msgstr ""
 
-msgid "'%s' has non-finite values"
+msgid "missing requisite Schur vectors"
 msgstr ""
 
 msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
@@ -245,12 +245,6 @@ msgid "invalid %s=\"%s\" to '%s'"
 msgstr ""
 
 msgid "dimensions cannot exceed %s"
-msgstr ""
-
-msgid "invalid class \"%s\" in '%s'"
-msgstr ""
-
-msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'A' must be a square matrix"
@@ -434,6 +428,9 @@ msgid "matrix is not symmetric"
 msgstr ""
 
 msgid "matrix is not triangular"
+msgstr ""
+
+msgid "should never happen ..."
 msgstr ""
 
 msgid "the default value of argument '%s' of method '%s(<%s>, <%s>)' may change from %s to %s as soon as the next release of Matrix; set '%s' when programming"
@@ -790,7 +787,7 @@ msgstr ""
 msgid "invalid '%s' argument"
 msgstr ""
 
-msgid "should never happen ..."
+msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'%s' is deprecated; using '%s' instead"

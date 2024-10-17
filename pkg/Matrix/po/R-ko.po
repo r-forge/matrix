@@ -14,7 +14,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-3\n"
-"POT-Creation-Date: 2024-03-15 17:22\n"
+"POT-Creation-Date: 2024-10-17 13:08\n"
 "PO-Revision-Date: 2015-07-15 17:14-0600\n"
 "Last-Translator:Chel Hee Lee  <chl948@mail.usask.ca>\n"
 "Language-Team: Chel Hee Lee  <chl948@mail.usask.ca>\n"
@@ -42,7 +42,7 @@ msgid "cannot coerce matrix of type \"%s\" to %s"
 msgstr "'NA'를 \"nsparseMatrix\"으로 강제변환(coerce)할 수 없습니다."
 
 #, fuzzy
-msgid "non0.i() not yet implemented for class %s"
+msgid "'%s' not implemented for class \"%s\""
 msgstr "클래스 %s의 경우에 아직 구현되지 않았습니다."
 
 msgid "%s=\"%s\" invalid for %s@uplo=\"%s\""
@@ -226,7 +226,7 @@ msgstr "intermediate 'r' is of type %s"
 msgid "not yet implemented .. please report"
 msgstr "아직 구현되지 않았습니다.  보고를 부탁드립니다."
 
-msgid "'%s' has non-finite values"
+msgid "missing requisite Schur vectors"
 msgstr ""
 
 msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
@@ -309,13 +309,6 @@ msgid "invalid %s=\"%s\" to '%s'"
 msgstr "%s는 사용할 수 없는 저장형식(storage format)입니다."
 
 msgid "dimensions cannot exceed %s"
-msgstr ""
-
-#, fuzzy
-msgid "invalid class \"%s\" in '%s'"
-msgstr "%s은 올바른 'col.names' 문자열이 아닙니다"
-
-msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'A' must be a square matrix"
@@ -523,6 +516,9 @@ msgstr "삼각행렬이 아닙니다."
 #, fuzzy
 msgid "matrix is not triangular"
 msgstr "'x'는 대칭(symmetric)도 아니고 삼각(triangular)도 아닙니다."
+
+msgid "should never happen ..."
+msgstr ""
 
 msgid ""
 "the default value of argument '%s' of method '%s(<%s>, <%s>)' may change "
@@ -970,7 +966,7 @@ msgstr ""
 msgid "invalid '%s' argument"
 msgstr "입력된 'data'는 올바르지 않습니다."
 
-msgid "should never happen ..."
+msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'%s' is deprecated; using '%s' instead"
@@ -991,6 +987,14 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "입력된 'data'는 올바르지 않습니다."
+
+#, fuzzy
+#~ msgid "non0.i() not yet implemented for class %s"
+#~ msgstr "클래스 %s의 경우에 아직 구현되지 않았습니다."
+
+#, fuzzy
+#~ msgid "invalid class \"%s\" in '%s'"
+#~ msgstr "%s은 올바른 'col.names' 문자열이 아닙니다"
 
 #, fuzzy
 #~ msgid "invalid 'each' argument"
@@ -1017,10 +1021,6 @@ msgstr "입력된 'data'는 올바르지 않습니다."
 #, fuzzy
 #~ msgid "complex \"diagonalMatrix\" not yet implemented"
 #~ msgstr "%s의 경우에는 아직 구현되지 않은 일반적인 Matrix 클래스입니다."
-
-#, fuzzy
-#~ msgid "not yet implemented for class \"%s\""
-#~ msgstr "클래스 %s의 경우에 아직 구현되지 않았습니다."
 
 #, fuzzy
 #~ msgid "invalid 'uplo'"

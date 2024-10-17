@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Matrix 1.1-1\n"
-"POT-Creation-Date: 2024-03-15 17:22\n"
+"POT-Creation-Date: 2024-10-17 13:08\n"
 "PO-Revision-Date: 2021-02-11 11:04+0100\n"
 "Last-Translator: Philippe Grosjean <phgrosjean@sciviews.org>\n"
 "Language-Team: none\n"
@@ -30,7 +30,7 @@ msgid "cannot coerce matrix of type \"%s\" to %s"
 msgstr "impossible de convertir automatiquement des 'NA's en \"nsparseMatrix\""
 
 #, fuzzy
-msgid "non0.i() not yet implemented for class %s"
+msgid "'%s' not implemented for class \"%s\""
 msgstr "pas encore implémenté pour la classe %s"
 
 msgid "%s=\"%s\" invalid for %s@uplo=\"%s\""
@@ -208,7 +208,7 @@ msgstr "le 'r' intermédiaire est de type %s"
 msgid "not yet implemented .. please report"
 msgstr "pas encore implémenté .. veuillez reporter ceci"
 
-msgid "'%s' has non-finite values"
+msgid "missing requisite Schur vectors"
 msgstr ""
 
 msgid "'%1$s' is not \"%2$s\", \"%3$s\", or \"%2$s.\""
@@ -293,13 +293,6 @@ msgid "invalid %s=\"%s\" to '%s'"
 msgstr "Type de stockage incorrect : %s"
 
 msgid "dimensions cannot exceed %s"
-msgstr ""
-
-#, fuzzy
-msgid "invalid class \"%s\" in '%s'"
-msgstr "chaîne de caractères 'col.names' incorrecte : %s"
-
-msgid "%s length cannot exceed %s"
 msgstr ""
 
 msgid "'A' must be a square matrix"
@@ -512,6 +505,9 @@ msgstr "la matrice n'est pas triangulaire"
 #, fuzzy
 msgid "matrix is not triangular"
 msgstr "'x' n'est ni symétrique ni triangulaire"
+
+msgid "should never happen ..."
+msgstr ""
 
 msgid ""
 "the default value of argument '%s' of method '%s(<%s>, <%s>)' may change "
@@ -956,7 +952,7 @@ msgstr ""
 msgid "invalid '%s' argument"
 msgstr "'data' incorrect"
 
-msgid "should never happen ..."
+msgid "%s length cannot exceed %s"
 msgstr ""
 
 #, fuzzy
@@ -979,6 +975,14 @@ msgstr ""
 #, fuzzy
 msgid "invalid 'Class2'"
 msgstr "'data' incorrect"
+
+#, fuzzy
+#~ msgid "non0.i() not yet implemented for class %s"
+#~ msgstr "pas encore implémenté pour la classe %s"
+
+#, fuzzy
+#~ msgid "invalid class \"%s\" in '%s'"
+#~ msgstr "chaîne de caractères 'col.names' incorrecte : %s"
 
 #~ msgid "qr2rankMatrix(.): QR has negative diag(R) entries"
 #~ msgstr "qr2rankMatrix(.): QR a des entrées négatives dans diag(R)"
@@ -1010,10 +1014,6 @@ msgstr "'data' incorrect"
 #, fuzzy
 #~ msgid "complex \"diagonalMatrix\" not yet implemented"
 #~ msgstr "classe Matrix générale pas encore implémentée pour %s"
-
-#, fuzzy
-#~ msgid "not yet implemented for class \"%s\""
-#~ msgstr "pas encore implémenté pour la classe %s"
 
 #, fuzzy
 #~ msgid "invalid 'uplo'"
