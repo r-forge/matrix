@@ -34,4 +34,7 @@ SEXP
 	Matrix_uploSym,
 	Matrix_valuesSym,
 	Matrix_vectorsSym,
-	Matrix_xSym;
+	Matrix_xSym,
+	Matrix_LChar,
+	Matrix_TChar,
+	Matrix_UChar;

@@ -385,6 +385,10 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	Matrix_vectorsSym  = Rf_install("vectors");
 	Matrix_xSym        = Rf_install("x");
 
+	Matrix_LChar = Rf_mkChar("L");
+	Matrix_TChar = Rf_mkChar("T");
+	Matrix_UChar = Rf_mkChar("U");
+
 	Matrix_zzero.r = 0.0; Matrix_zunit.r = 1.0; Matrix_zna.r = NA_REAL;
 	Matrix_zzero.i = 0.0; Matrix_zunit.i = 0.0; Matrix_zna.i = NA_REAL;
 
