@@ -81,7 +81,7 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 		a_ = (size_t) ((int_fast64_t) m + a),
 		b_ = (size_t) ((int_fast64_t) m + b);
 
-#define BAND(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (ge && class[1] != 'g') { \
@@ -105,9 +105,9 @@ SEXP dense_band(SEXP from, const char *class, int a, int b)
 			c##NAME( band1)(px1, px0, n_, ul0, a_, b_); \
 	} while (0)
 
-	SWITCH4(class[0], BAND);
+	SWITCH4(class[0], TEMPLATE);
 
-#undef BAND
+#undef TEMPLATE
 
 	SET_SLOT(to, Matrix_xSym, x1);
 
@@ -184,7 +184,7 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 		SEXP x = GET_SLOT(obj, Matrix_xSym);
 		size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r;
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *pa = c##PTR(ans), *px = c##PTR(x); \
 			if (!packed) \
@@ -195,9 +195,9 @@ SEXP dense_diag_get(SEXP obj, const char *class, int names)
 				c##NAME(copy1)(n_, pa, 1, 0, 0, px, n_, 1, 1); \
 		} while (0)
 
-		SWITCH4(class[0], DIAG);
+		SWITCH4(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 		if (class[0] == 'n')
 			naToUnit(ans);
@@ -282,7 +282,7 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 	size_t m_ = (size_t) m, n_ = (size_t) n, r_ = (size_t) r,
 		d_ = (LENGTH(value) == r) ? 1 : 0;
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pv = c##PTR(value); \
 		if (!packed) \
@@ -293,9 +293,9 @@ SEXP dense_diag_set(SEXP from, const char *class, SEXP value, int new)
 			c##NAME(copy1)(n_, px, n_, 1, 1, pv, d_, 0, 0); \
 	} while (0)
 
-	SWITCH4(class[0], DIAG);
+	SWITCH4(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 	SET_SLOT(to, Matrix_xSym, x);
 
@@ -421,7 +421,7 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 	size_t m_ = (size_t) m, n_ = (size_t) n;
 
-#define TRANS(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 		if (!packed) \
@@ -430,9 +430,9 @@ SEXP dense_transpose(SEXP from, const char *class, char op_ct)
 			c##NAME(trans1)(px1, px0, n_, ul, op_ct); \
 	} while (0)
 
-	SWITCH4((class[0] == 'c') ? 'd' : class[0], TRANS);
+	SWITCH4((class[0] == 'c') ? 'd' : class[0], TEMPLATE);
 
-#undef TRANS
+#undef TEMPLATE
 
 	SET_SLOT(to, Matrix_xSym, x1);
 
@@ -523,7 +523,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 		SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
 		size_t n_ = (size_t) n;
 
-#define FORCE(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 			if (!packed) \
@@ -536,9 +536,9 @@ SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 			} \
 		} while (0)
 
-		SWITCH4(class[0], FORCE);
+		SWITCH4(class[0], TEMPLATE);
 
-#undef FORCE
+#undef TEMPLATE
 
 		SET_SLOT(to, Matrix_xSym, x1);
 		UNPROTECT(1); /* x1 */
@@ -644,7 +644,7 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 
 		int i, j;
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
 			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
@@ -768,9 +768,9 @@ SEXP dense_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			} \
 		} while (0)
 
-		SWITCH2(class[0], SPART);
+		SWITCH2(class[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 	}
 
@@ -868,7 +868,7 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 
 		int i, j;
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = c##PTR(x0), *pu0 = px0, *pl0 = px0; \
 			c##TYPE *px1 = c##PTR(x1), *pu1 = px1, *pl1 = px1; \
@@ -961,9 +961,9 @@ SEXP dense_skewpart(SEXP from, const char *class, char op_ct)
 			} \
 		} while (0)
 
-		SWITCH2(class[0], SPART);
+		SWITCH2(class[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 	}
 
@@ -1038,7 +1038,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 
 	if (class[1] == 'g' && op_ct != 'C') {
 
-#define ISS(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
 		for (j = 0; j < n; ++j) { \
@@ -1053,9 +1053,9 @@ int dense_is_symmetric(SEXP obj, const char *class,
 		} \
 	} while (0)
 
-	SWITCH5(class[0], ISS);
+	SWITCH5(class[0], TEMPLATE);
 
-#undef ISS
+#undef TEMPLATE
 
 	} else {
 
@@ -1200,7 +1200,7 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-#define IST(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
 		if (op_ul == '\0') { \
@@ -1252,9 +1252,9 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 		} \
 	} while (0)
 
-	SWITCH4(class[0], IST);
+	SWITCH4(class[0], TEMPLATE);
 
-#undef IST
+#undef TEMPLATE
 
 	return 0;
 }
@@ -1309,7 +1309,7 @@ int dense_is_diagonal(SEXP obj, const char *class)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j, packed = class[2] == 'p';
 
-#define ISD(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
 		if (class[1] == 'g') { \
@@ -1352,9 +1352,9 @@ int dense_is_diagonal(SEXP obj, const char *class)
 		return 1; \
 	} while (0)
 
-	SWITCH4(class[0], ISD);
+	SWITCH4(class[0], TEMPLATE);
 
-#undef ISD
+#undef TEMPLATE
 
 	return 1;
 }

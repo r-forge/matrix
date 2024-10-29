@@ -28,7 +28,7 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		lwork = (size_t) nnz;
 	Matrix_Calloc(iwork, liwork, int);
 
-#define AGGR(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px0 = NULL, *px1 = NULL, *work = NULL; \
 		c##IF_NPATTERN( \
@@ -62,9 +62,9 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		); \
 	} while (0)
 
-	SWITCH5(class[0], AGGR);
+	SWITCH5(class[0], TEMPLATE);
 
-#undef AGGR
+#undef TEMPLATE
 
 	Matrix_Free(iwork, liwork);
 	UNPROTECT(2); /* j0, i0 */
@@ -155,7 +155,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 
 		if (ct != 'C') {
 
-#define COUNT(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0); \
 				for (k = 0; k < nnz0; ++k) \
@@ -163,7 +163,9 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 						++nnz1; \
 			} while (0)
 
-			SWITCH4(class[0], COUNT);
+			SWITCH4(class[0], TEMPLATE);
+
+#undef TEMPLATE
 
 		} else {
 
@@ -197,7 +199,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 
 		if (ct != 'C') {
 
-#define DROP0(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (j = 0, k = 0; j < n; ++j) { \
@@ -213,9 +215,9 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 				} \
 			} while (0)
 
-			SWITCH4(class[0], DROP0);
+			SWITCH4(class[0], TEMPLATE);
 
-#undef DROP0
+#undef TEMPLATE
 
 		} else {
 
@@ -246,9 +248,17 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 
 		if (ct != 'C') {
 
-			SWITCH4(class[0], COUNT);
+#define TEMPLATE(c) \
+			do { \
+				c##TYPE *px0 = c##PTR(x0); \
+				for (k = 0; k < nnz0; ++k) \
+					if (NZ(c, px0[k])) \
+						++nnz1; \
+			} while (0)
 
-#undef COUNT
+			SWITCH4(class[0], TEMPLATE);
+
+#undef TEMPLATE
 
 		} else {
 
@@ -276,7 +286,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 
 		if (ct != 'C') {
 
-#define DROP0(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (k = 0; k < nnz0; ++k) \
@@ -287,9 +297,9 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 					} \
 			} while (0)
 
-			SWITCH4(class[0], DROP0);
+			SWITCH4(class[0], TEMPLATE);
 
-#undef DROP0
+#undef TEMPLATE
 
 		} else {
 
@@ -548,7 +558,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(to, iSym, i1);
 
-#define BAND(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
@@ -599,9 +609,9 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 			} \
 		} while (0)
 
-		SWITCH5(class[0], BAND);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef BAND
+#undef TEMPLATE
 
 		UNPROTECT(4); /* i1, p1, i0, p0 */
 
@@ -641,7 +651,7 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 
-#define BAND(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
@@ -687,9 +697,9 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 				} \
 		} while (0)
 
-		SWITCH5(class[0], BAND);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef BAND
+#undef TEMPLATE
 
 		UNPROTECT(4); /* j1, i1, j0, i0 */
 
@@ -762,7 +772,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 			up = (class[2] == 'C') == (ul == 'U');
 		pp++;
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *pa = c##PTR(ans); \
 			c##IF_NPATTERN( \
@@ -792,9 +802,9 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 				} \
 		} while (0)
 
-		SWITCH5(class[0], DIAG);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 		UNPROTECT(2); /* i, p */
 
@@ -810,7 +820,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 		int *pi = INTEGER(i), *pj = INTEGER(j);
 		R_xlen_t k, kend = XLENGTH(i);
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *pa = c##PTR(ans); \
 			memset(pa, 0, sizeof(c##TYPE) * (size_t) r); \
@@ -823,9 +833,9 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 					c##INCREMENT_IDEN(pa[pi[k]], px[k]); \
 		} while (0)
 
-		SWITCH5(class[0], DIAG);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 		UNPROTECT(2); /* j0, i0 */
 
@@ -949,7 +959,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			for (j = 0; j < n; ++j)
 				pp1[j] = pp0[j];
 
-#define COUNT(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *pv = c##PTR(value); \
 			if (LENGTH(value) == r) { \
@@ -970,9 +980,9 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			} \
 		} while (0)
 
-		SWITCH4(class[0], COUNT);
+		SWITCH4(class[0], TEMPLATE);
 
-#undef COUNT
+#undef TEMPLATE
 
 		if (nd1 - nd0 > INT_MAX - pp0[n - 1])
 			Rf_error(_("%s cannot exceed %s"), "p[length(p)]", "2^31-1");
@@ -981,7 +991,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(to, iSym, i1);
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
@@ -1028,9 +1038,9 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			} \
 		} while (0)
 
-		SWITCH5(class[0], DIAG);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 		UNPROTECT(4); /* i1, p1, i0, p0 */
 
@@ -1046,7 +1056,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 				if (pi0[k] == pj0[k])
 					++nd0;
 
-#define COUNT(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *pv = c##PTR(value); \
 			if (LENGTH(value) == r) { \
@@ -1060,9 +1070,9 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			} \
 		} while (0)
 
-		SWITCH4(class[0], COUNT);
+		SWITCH4(class[0], TEMPLATE);
 
-#undef COUNT
+#undef TEMPLATE
 
 		if (nd1 - nd0 > R_XLEN_T_MAX - nnz0)
 			Rf_error(_("%s cannot exceed %s"), "length(i)", "R_XLEN_T_MAX");
@@ -1074,7 +1084,7 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 
-#define DIAG(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
@@ -1111,9 +1121,9 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 			} \
 		} while (0)
 
-		SWITCH5(class[0], DIAG);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef DIAG
+#undef TEMPLATE
 
 		UNPROTECT(4); /* j1, i1, j0, i0 */
 
@@ -1274,7 +1284,7 @@ SEXP sparse_transpose(SEXP from, const char *class, char op_ct, int lazy)
 		SET_SLOT(to,        iSym, i1);
 		Matrix_Calloc(iwork, m, int);
 
-#define TRANS(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = NULL, *px1 = NULL; \
 			c##IF_NPATTERN( \
@@ -1288,9 +1298,9 @@ SEXP sparse_transpose(SEXP from, const char *class, char op_ct, int lazy)
 			c##csptrans(pp1, pi1, px1, pp0, pi0, px0, m, n, op_ct, iwork); \
 		} while (0)
 
-		SWITCH5(class[0], TRANS);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef TRANS
+#undef TEMPLATE
 
 		Matrix_Free(iwork, m);
 		UNPROTECT(2); /* j1, p1 */
@@ -1481,7 +1491,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		int *pi1 = INTEGER(i1);
 		SET_SLOT(to, iSym, i1);
 
-#define FORCE(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = NULL, *px1 = NULL; \
 			c##IF_NPATTERN( \
@@ -1561,9 +1571,9 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 				} \
 		} while (0)
 
-		SWITCH5(class[0], FORCE);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef FORCE
+#undef TEMPLATE
 
 		UNPROTECT(2); /* i1, p1 */
 
@@ -1625,7 +1635,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		SET_SLOT(to, Matrix_iSym, i1);
 		SET_SLOT(to, Matrix_jSym, j1);
 
-#define FORCE(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)), \
@@ -1664,9 +1674,9 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 			} \
 		} while (0)
 
-		SWITCH5(class[0], FORCE);
+		SWITCH5(class[0], TEMPLATE);
 
-#undef FORCE
+#undef TEMPLATE
 
 		UNPROTECT(2); /* j1, i1 */
 
@@ -1823,7 +1833,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SET_SLOT(to,        iSym, i1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				if (op_ct == 'C') \
@@ -1924,9 +1934,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			Matrix_Free(iwork, liwork);
 			UNPROTECT(3); /* x1, i1, p1 */
@@ -1951,7 +1961,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), nnz0));
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (j = 0, k = 0; j < n; ++j) { \
@@ -1970,9 +1980,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(1); /* x1 */
 
@@ -1989,7 +1999,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SET_SLOT(to,        iSym, i1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (j = 0, k = 0; j < n; ++j) { \
@@ -2014,9 +2024,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(3); /* x1, i1, p1 */
 
@@ -2042,7 +2052,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SET_SLOT(to, Matrix_jSym, j1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				if (op_ct == 'C') \
@@ -2081,9 +2091,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(3); /* x1, j1, i1 */
 
@@ -2107,7 +2117,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SEXP x1 = PROTECT(Rf_allocVector(TYPEOF(x0), nnz0));
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (k = 0; k < nnz0; ++k) { \
@@ -2123,9 +2133,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(1); /* x1 */
 
@@ -2141,7 +2151,7 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 			SET_SLOT(to, Matrix_jSym, j1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (k = 0; k < nnz0; ++k) { \
@@ -2158,9 +2168,9 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(3); /* x1, j1, i1 */
 
@@ -2323,7 +2333,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 			SET_SLOT(to,        iSym, i1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				if (op_ct == 'C') \
@@ -2434,9 +2444,9 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			Matrix_Free(iwork, liwork);
 			UNPROTECT(3); /* x1, i1, p1 */
@@ -2481,7 +2491,7 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 			SET_SLOT(to, Matrix_jSym, j1);
 			SET_SLOT(to, Matrix_xSym, x1);
 
-#define SPART(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
 				for (k = 0; k < nnz0; ++k) { \
@@ -2504,9 +2514,9 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 				} \
 			} while (0)
 
-			SWITCH2(cl[0], SPART);
+			SWITCH2(cl[0], TEMPLATE);
 
-#undef SPART
+#undef TEMPLATE
 
 			UNPROTECT(3); /* x1, j1, i1 */
 
@@ -2604,7 +2614,7 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 
 	if (class[1] == 'g' && !(exact && op_ct == 'C')) {
 
-#define ISS(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##IF_NPATTERN( \
 		SEXP x = GET_SLOT(obj, Matrix_xSym); \
@@ -2633,9 +2643,9 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 		} \
 	} while (0)
 
-	SWITCH5((exact) ? class[0] : 'n', ISS);
+	SWITCH5((exact) ? class[0] : 'n', TEMPLATE);
 
-#undef ISS
+#undef TEMPLATE
 
 	} else {
 
@@ -2764,7 +2774,7 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 		pp++;
 		UNPROTECT(2); /* i, p */
 
-#define IST_CURL(t) \
+#define CURL(t) \
 		do { \
 			for (j = 0, k = 0; j < n; ++j) { \
 				kend = pp[j]; \
@@ -2776,7 +2786,7 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 				return t; \
 		} while (0)
 
-#define IST_CLRU(t) \
+#define CLRU(t) \
 		do { \
 			for (j = 0, k = 0; j < n; ++j) { \
 				kend = pp[j]; \
@@ -2790,19 +2800,19 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 
 		if (op_ul == '\0' || op_ul == 'U') {
 			if (class[2] == 'C')
-			IST_CURL(1);
+			CURL(1);
 			else
-			IST_CLRU(1);
+			CLRU(1);
 		}
 		if (op_ul == '\0' || op_ul != 'U') {
 			if (class[2] == 'C')
-			IST_CLRU(-1);
+			CLRU(-1);
 			else
-			IST_CURL(-1);
+			CURL(-1);
 		}
 
-#undef IST_CURL
-#undef IST_CLRU
+#undef CURL
+#undef CLRU
 
 	} else {
 

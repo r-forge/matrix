@@ -493,7 +493,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int k, m = rdim[0], n = rdim[1];
 		R_xlen_t mn = (R_xlen_t) m * n;
 
-#define BIND(c) \
+#define TEMPLATE(c) \
 		do { \
 			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, mn)); \
 			c##TYPE *px = c##PTR(x), *ps; \
@@ -563,9 +563,9 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			UNPROTECT(1); \
 		} while (0)
 
-		SWITCH5(kind, BIND);
+		SWITCH5(kind, TEMPLATE);
 
-#undef BIND
+#undef TEMPLATE
 
 	} else if ((repr == 'C' && margin) || (repr == 'R' && !margin)) {
 
@@ -600,7 +600,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		int *pi = INTEGER(i), *psi;
 		SET_SLOT(ans, iSym, i);
 
-#define BIND(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(Rf_allocVector(kindToType(kind), nnz)), sx; \
@@ -640,9 +640,9 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			); \
 		} while (0)
 
-		SWITCH5(kind, BIND);
+		SWITCH5(kind, TEMPLATE);
 
-#undef BIND
+#undef TEMPLATE
 
 		UNPROTECT(2);
 
@@ -682,7 +682,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		Matrix_Calloc(work, n, int);
 		memcpy(work, pp, sizeof(int) * (size_t) n);
 
-#define BIND(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, nnz)), sx; \
@@ -725,9 +725,9 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			); \
 		} while (0)
 
-		SWITCH5(kind, BIND);
+		SWITCH5(kind, TEMPLATE);
 
-#undef BIND
+#undef TEMPLATE
 
 		UNPROTECT(2);
 		Matrix_Free(work, n);
@@ -756,7 +756,7 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 		SET_SLOT(ans, Matrix_iSym, i);
 		SET_SLOT(ans, Matrix_jSym, j);
 
-#define BIND(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##IF_NPATTERN( \
 			SEXP x = PROTECT(Rf_allocVector(c##TYPESXP, nnz)), sx; \
@@ -806,9 +806,9 @@ void bindArgs(SEXP args, int margin, SEXP ans,
 			); \
 		} while (0)
 
-		SWITCH5(kind, BIND);
+		SWITCH5(kind, TEMPLATE);
 
-#undef BIND
+#undef TEMPLATE
 
 		UNPROTECT(2);
 

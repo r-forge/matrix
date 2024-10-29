@@ -1326,7 +1326,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 			liwork = (size_t) ((int_fast64_t) ni + 1 + ((ni < nj) ? nj : ni) + nnz);
 			Matrix_Calloc(iwork, liwork, int);
 
-#define SORT(c) \
+#define TEMPLATE(c) \
 			do { \
 				c##TYPE *px1 = NULL, *work = NULL; \
 				c##IF_NPATTERN( \
@@ -1341,9 +1341,9 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 				); \
 			} while (0)
 
-			SWITCH5(class[0], SORT);
+			SWITCH5(class[0], TEMPLATE);
 
-#undef SORT
+#undef TEMPLATE
 
 			Matrix_Free(iwork, liwork);
 		}
@@ -1445,7 +1445,7 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		*(pp1++) = 0;
 		SET_SLOT(ans, Matrix_pSym, p1);
 
-#define COUNT(c) \
+#define TEMPLATE(c) \
 		do { \
 			c##TYPE *px0 = c##PTR(x0); \
 			for (kj = 0; kj < nj; ++kj) { \
@@ -1469,9 +1469,9 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 		} while (0)
 
 		kj = -1;
-		SWITCH4(class[0], COUNT);
+		SWITCH4(class[0], TEMPLATE);
 
-#undef COUNT
+#undef TEMPLATE
 
 		if (kj < nj)
 			Rf_error(_("%s too dense for %s; would have more than %s nonzero entries"),

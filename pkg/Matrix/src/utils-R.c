@@ -166,7 +166,7 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 	if (!ISNAN(nnzmax) && nnzmax >= 0.0 && nnzmax < (double) n)
 		n = (R_xlen_t) nnzmax;
 
-#define NNZ(c) \
+#define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(s_x); \
 		if (countNA == NA_LOGICAL) { \
@@ -192,9 +192,9 @@ SEXP R_nnz(SEXP s_x, SEXP s_countNA, SEXP s_nnzmax)
 		} \
 	} while (0)
 
-	SWITCH4(typeToKind(TYPEOF(s_x)), NNZ);
+	SWITCH4(typeToKind(TYPEOF(s_x)), TEMPLATE);
 
-#undef NNZ
+#undef TEMPLATE
 
 	return (nnz <= INT_MAX)
 		? Rf_ScalarInteger((int) nnz) : Rf_ScalarReal((double) nnz);
