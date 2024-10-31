@@ -4,11 +4,11 @@
 #include "M5.h"
 #include "idz.h"
 #include "coerce.h"
-#include "sparse.h"
-#include "matmult.h"
 
 SEXP dense_transpose(SEXP, const char *, char);
 SEXP sparse_transpose(SEXP, const char *, char, int);
+SEXP sparse_drop0(SEXP, const char *, double);
+SEXP sparse_diag_U2N(SEXP, const char *);
 
 static const char *valid_matmult[] = {
 VALID_DIAGONAL, VALID_SPARSE, VALID_DENSE, "" };

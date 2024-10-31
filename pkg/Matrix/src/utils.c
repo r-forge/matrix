@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "utils.h"
 
 #if R_VERSION < R_Version(4, 5, 0)
 int ANY_ATTRIB(SEXP x)

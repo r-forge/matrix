@@ -1,5 +1,6 @@
 #include "Mdefines.h"
 #include "M5.h"
+#include "idz.h"
 
 SEXP sparse_aggregate(SEXP from, const char *class)
 {

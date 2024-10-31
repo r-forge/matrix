@@ -1,6 +1,5 @@
 #include "Lapack-etc.h"
 #include "Mdefines.h"
-#include "kappa.h"
 
 static
 char La_norm_type(SEXP s)

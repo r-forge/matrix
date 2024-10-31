@@ -4,7 +4,6 @@
 #include "cholmod-etc.h"
 #include "Mdefines.h"
 #include "M5.h"
-#include "factor.h"
 
 /* defined in ./attrib.c : */
 SEXP get_factor(SEXP, const char *);

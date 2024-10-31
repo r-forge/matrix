@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "subassign.h"
 
 enum x_slot_kind {
 	x_unknown = -2,  /* NA */

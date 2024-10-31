@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "perm.h"
 
 int isPerm(const int *p, int n, int off)
 {

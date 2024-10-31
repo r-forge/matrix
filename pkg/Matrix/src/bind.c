@@ -1,7 +1,6 @@
 #include "Mdefines.h"
 #include "M5.h"
 #include "coerce.h"
-#include "bind.h"
 
 static SEXP tagWasVector = NULL;
 

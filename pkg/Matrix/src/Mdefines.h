@@ -289,7 +289,19 @@ const char *valid_dense[], *valid_sparse[],
 	*valid_diagonal[], *valid_index[],
 	*valid_matrix[], *valid_vector[], *valid_matrix_or_vector[];
 
-#include "utils.h"
+#if R_VERSION < R_Version(4, 5, 0)
+int ANY_ATTRIB(SEXP);
+void CLEAR_ATTRIB(SEXP);
+#endif
+
+char *Matrix_sprintf(const char *, ...);
+
+int equalString(SEXP, SEXP, R_xlen_t);
+SEXP duplicateVector(SEXP);
+SEXP allocZero(SEXPTYPE, R_xlen_t);
+SEXP allocUnit(SEXPTYPE, R_xlen_t);
+SEXP allocSeqInt(int, R_xlen_t);
+void naToUnit(SEXP);
 
 SEXP newObject(const char *);
 void validObject(SEXP, const char *);

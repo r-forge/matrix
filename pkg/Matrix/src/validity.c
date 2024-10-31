@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "validity.h"
 
 #define     MK(_FORMAT_     )    Rf_mkString(_FORMAT_             )
 #define     MS(_FORMAT_, ...) Matrix_sprintf(_FORMAT_, __VA_ARGS__)
@@ -32,6 +31,7 @@
    Called by various class validity methods (see below).
 */
 
+static
 char *Dim_validate(SEXP dim)
 {
 	if (TYPEOF(dim) != INTSXP)
@@ -53,6 +53,7 @@ SEXP R_Dim_validate(SEXP dim)
 	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
+static
 char *DimNames_validate(SEXP dimnames, int *pdim)
 {
 	if (TYPEOF(dimnames) != VECSXP)

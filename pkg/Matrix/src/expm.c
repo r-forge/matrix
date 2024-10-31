@@ -1,6 +1,5 @@
 #include "Lapack-etc.h"
 #include "Mdefines.h"
-#include "expm.h"
 
 /* For matrix exponential calculation : */
 const static double padec [] =

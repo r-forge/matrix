@@ -1,7 +1,6 @@
 #include "Mdefines.h"
 #include <Rmath.h> /* logspace_add, logspace_sub */
 #include "cholmod-etc.h"
-#include "determinant.h"
 
 static
 SEXP mkDet(double modulus, int logarithm, int sign)

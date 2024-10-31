@@ -1,7 +1,6 @@
 #include "Mdefines.h"
 #include "M5.h"
 #include "version.h"
-#include "utils-R.h"
 
 SEXP R_Matrix_version(void)
 {

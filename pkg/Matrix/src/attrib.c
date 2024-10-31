@@ -1,5 +1,4 @@
 #include "Mdefines.h"
-#include "attrib.h"
 
 /* .... Dimnames .................................................... */
 
