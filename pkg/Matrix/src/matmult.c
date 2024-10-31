@@ -4,7 +4,6 @@
 #include "M5.h"
 #include "idz.h"
 #include "coerce.h"
-#include "dense.h"
 #include "sparse.h"
 #include "matmult.h"
 

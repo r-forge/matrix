@@ -3,7 +3,6 @@
 #include "bind.h"
 #include "cholmod-api.h"
 #include "coerce.h"
-#include "dense.h"
 #include "determinant.h"
 #include "expm.h"
 #include "factor.h"
@@ -46,6 +45,15 @@ SEXP R_sparse_symmpart(SEXP, SEXP, SEXP);
 
 SEXP R_dense_skewpart(SEXP, SEXP);
 SEXP R_sparse_skewpart(SEXP, SEXP);
+
+SEXP R_dense_marginsum(SEXP, SEXP, SEXP, SEXP);
+SEXP R_sparse_marginsum(SEXP, SEXP, SEXP, SEXP, SEXP);
+
+SEXP R_dense_sum(SEXP, SEXP);
+SEXP R_sparse_sum(SEXP, SEXP);
+
+SEXP R_dense_prod(SEXP, SEXP);
+SEXP R_sparse_prod(SEXP, SEXP);
 
 SEXP R_dense_transpose(SEXP, SEXP);
 SEXP R_sparse_transpose(SEXP, SEXP, SEXP);

@@ -1,4 +1,4 @@
-## METHODS FOR GENERIC: colSums, rowSums, colMeans, rowMeans
+## METHODS FOR GENERIC: colSums, colMeans, rowSums, rowMeans
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## ==== denseMatrix ====================================================
@@ -42,16 +42,16 @@ rm(.cl)
 
 .diag.cS <- .diag.rS <- function(x, na.rm = FALSE, dims = 1L, ...) {
     kind <- .M.kind(x)
-    if((n <- x@Dim[1L]) == 0L)
+    if ((n <- x@Dim[1L]) == 0L)
         return(vector(switch(kind, "z" = "complex", "d" = , "i" = "double", "integer"), 0L))
-    else if(x@diag != "N")
+    else if (x@diag != "N")
         r <- rep.int(switch(kind, "z" = 1+0i, "d" = , "i" = 1, 1L), n)
     else {
         r <- switch(kind, "z" = , "d" = x@x, "i" = as.double(x@x), as.integer(x@x))
-        if((na.rm || kind == "n") && anyNA(r))
+        if ((na.rm || kind == "n") && anyNA(r))
             r[is.na(r)] <- switch(kind, "z" = 0+0i, "d" = , "i" = 0, "n" = 1L, 0L)
     }
-    if(!is.null(nms <- x@Dimnames[[.MARGIN]]))
+    if (!is.null(nms <- x@Dimnames[[.MARGIN]]))
         names(r) <- nms
     r
 }
@@ -60,19 +60,19 @@ body(.diag.rS) <- do.call(substitute, list(body(.diag.rS), list(.MARGIN = 1L)))
 
 .diag.cM <- .diag.rM <- function(x, na.rm = FALSE, dims = 1L, ...) {
     kind <- .M.kind(x)
-    if((n <- x@Dim[1L]) == 0L)
+    if ((n <- x@Dim[1L]) == 0L)
         return(vector(switch(kind, "z" = "complex", "double"), 0L))
-    else if(x@diag != "N")
+    else if (x@diag != "N")
         r <- rep.int(switch(kind, "z" = 1+0i, 1) / n, n)
     else {
         r <- x@x / n
-        if((na.rm || kind == "n") && anyNA(r))
+        if ((na.rm || kind == "n") && anyNA(r))
             r[is.na(r)] <- switch(kind,
-                                  "z" = if(n == 1L) NaN * (0+0i) else 0+0i,
+                                  "z" = if (n == 1L) NaN * (0+0i) else 0+0i,
                                   "n" = 1 / n,
-                                  if(n == 1L) NaN else 0)
+                                  if (n == 1L) NaN else 0)
     }
-    if(!is.null(nms <- x@Dimnames[[.MARGIN]]))
+    if (!is.null(nms <- x@Dimnames[[.MARGIN]]))
         names(r) <- nms
     r
 }
@@ -92,40 +92,40 @@ rm(.diag.cS, .diag.cM, .diag.rS, .diag.rM)
 setMethod("colSums",  c(x = "indMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...) {
               n <- x@Dim[2L]
-              r <- if(x@margin == 1L)
+              r <- if (x@margin == 1L)
                        tabulate(x@perm, n)
                    else rep.int(1L, n)
-              if(!is.null(nms <- x@Dimnames[[2L]]))
+              if (!is.null(nms <- x@Dimnames[[2L]]))
                   names(r) <- nms
               r
           })
 setMethod("colMeans",  c(x = "indMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...) {
               n <- (d <- x@Dim)[2L]
-              r <- if(x@margin == 1L)
+              r <- if (x@margin == 1L)
                        tabulate(x@perm, n) / d[1L]
                    else rep.int(1 / d[1L], n)
-              if(!is.null(nms <- x@Dimnames[[2L]]))
+              if (!is.null(nms <- x@Dimnames[[2L]]))
                   names(r) <- nms
               r
           })
 setMethod("rowSums",  c(x = "indMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...) {
               m <- x@Dim[1L]
-              r <- if(x@margin == 1L)
+              r <- if (x@margin == 1L)
                        rep.int(1L, m)
                    else tabulate(x@perm, m)
-              if(!is.null(nms <- x@Dimnames[[1L]]))
+              if (!is.null(nms <- x@Dimnames[[1L]]))
                   names(r) <- nms
               r
           })
 setMethod("rowMeans",  c(x = "indMatrix"),
           function(x, na.rm = FALSE, dims = 1L, ...) {
               m <- (d <- x@Dim)[1L]
-              r <- if(x@margin == 1L)
+              r <- if (x@margin == 1L)
                        rep.int(1 / d[2L], m)
                    else tabulate(x@perm, m) / d[2L]
-              if(!is.null(nms <- x@Dimnames[[1L]]))
+              if (!is.null(nms <- x@Dimnames[[1L]]))
                   names(r) <- nms
               r
           })

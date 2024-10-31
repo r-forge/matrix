@@ -123,9 +123,6 @@ do { \
 #define TYPEOF(s) \
 	((SEXPTYPE) (TYPEOF)((s)))
 
-#define LONGDOUBLE_AS_DOUBLE(x) \
-	(((x) > DBL_MAX) ? R_PosInf : (((x) < -DBL_MAX) ? R_NegInf : (double) (x)))
-
 #define DENSE_INDEX_N(i, j, m) \
 	((i) + (j) * (m))
 #define DENSE_INDEX_U(i, j, m) \

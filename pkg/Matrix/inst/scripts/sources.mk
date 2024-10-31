@@ -1,13 +1,14 @@
 sources = \
 	Csparse.c \
+	Summary.c \
 	attrib.c \
 	band.c \
 	bind.c \
 	cholmod-api.c \
 	cholmod-etc.c \
 	coerce.c \
+	colSums.c \
 	cs-etc.c \
-	dense.c \
 	determinant.c \
 	diag.c \
 	expm.c \

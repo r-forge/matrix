@@ -4,6 +4,8 @@ Csparse.o: Csparse.c Mdefines.h \
   SuiteSparse/CXSparse/Include/cs.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Csparse.h
+Summary.o: Summary.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 attrib.o: attrib.c Mdefines.h \
   Msymbols.h utils.h attrib.h
 band.o: band.c Mdefines.h \
@@ -22,13 +24,12 @@ cholmod-etc.o: cholmod-etc.c Mdefines.h \
 coerce.o: coerce.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h \
   coerce.h
+colSums.o: colSums.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 cs-etc.o: cs-etc.c Mdefines.h \
   Msymbols.h utils.h cs-etc.h \
   SuiteSparse/CXSparse/Include/cs.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h
-dense.o: dense.c Mdefines.h \
-  Msymbols.h utils.h M5.h idz.h \
-  dense.h
 determinant.o: determinant.c Mdefines.h \
   Msymbols.h utils.h \
   cholmod-etc.h \
@@ -53,8 +54,8 @@ init.o: init.c Csparse.h \
   attrib.h bind.h \
   cholmod-api.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
-  SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
-  expm.h factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
+  SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h determinant.h expm.h \
+  factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
   subassign.h subscript.h utils-R.h validity.h \
   Msymbols.h
 isDiagonal.o: isDiagonal.c Mdefines.h \
@@ -70,13 +71,13 @@ matmult.o: matmult.c Lapack-etc.h \
   cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
-  Msymbols.h utils.h M5.h idz.h coerce.h dense.h sparse.h matmult.h
+  Msymbols.h utils.h M5.h idz.h coerce.h sparse.h matmult.h
 objects.o: objects.c Mdefines.h \
   Msymbols.h utils.h objects.h
 perm.o: perm.c Mdefines.h \
   Msymbols.h utils.h perm.h
 skewpart.o: skewpart.c Mdefines.h \
-  Msymbols.h utils.h M5.h
+  Msymbols.h utils.h M5.h idz.h
 solve.o: solve.c Lapack-etc.h \
   cs-etc.h \
   SuiteSparse/CXSparse/Include/cs.h \
@@ -93,7 +94,7 @@ subscript.o: subscript.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h \
   subscript.h
 symmpart.o: symmpart.c Mdefines.h \
-  Msymbols.h utils.h M5.h
+  Msymbols.h utils.h M5.h idz.h
 t.o: t.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h
 utils-R.o: utils-R.c Mdefines.h \
