@@ -40,28 +40,3 @@ setMethod("skewpart", c(x = "diagonalMatrix"),
                   else complex(real = 0, imaginary = Im(x@x))
               r
           })
-
-setMethod("isDiagonal", c(object = "diagonalMatrix"),
-          function(object) TRUE)
-
-setMethod("isTriangular", c(object = "diagonalMatrix"),
-          function(object, upper = NA)
-              if(is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
-
-setMethod("isSymmetric", c(object = "diagonalMatrix"),
-          function(object,
-                   tol = 100 * .Machine$double.eps,
-                   trans = "C", checkDN = TRUE, ...) {
-              if(checkDN) {
-                  ca <- function(check.attributes = TRUE, ...)
-                      check.attributes
-                  if(ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
-              }
-              ae <- function(target, current, tolerance, scale = NULL, ...)
-                  all.equal.numeric(target = target, current = current,
-                                    tolerance = tolerance, scale = scale,
-                                    check.attributes = FALSE, check.class = FALSE)
-              !is.complex(x <- object@x) || !identical(trans, "C") ||
-                  object@diag != "N" || isTRUE(ae(x, Conj(x), tolerance = tol, ...))
-          })

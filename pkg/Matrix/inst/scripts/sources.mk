@@ -14,6 +14,9 @@ sources = \
 	factor.c \
 	idz.c \
 	init.c \
+	isDiagonal.c \
+	isSymmetric.c \
+	isTriangular.c \
 	kappa.c \
 	matmult.c \
 	objects.c \

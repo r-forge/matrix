@@ -101,54 +101,6 @@ setMethod("symmpart", c(x = "indMatrix"),
 setMethod("skewpart", c(x = "indMatrix"),
           function(x, ...) skewpart(.M2kind(x, "d"), ...))
 
-setMethod("isDiagonal", c(object = "indMatrix"),
-          function(object) {
-              d <- object@Dim
-              if((n <- d[2L]) != d[1L])
-                  return(FALSE)
-              all(object@perm == seq_len(n))
-          })
-
-setMethod("isTriangular", c(object = "indMatrix"),
-          function(object, upper = NA) {
-              d <- object@Dim
-              if((n <- d[2L]) != d[1L])
-                  return(FALSE)
-              if(object@margin == 1L) {
-                  i <- seq_len(n)
-                  j <- object@perm
-              } else {
-                  i <- object@perm
-                  j <- seq_len(n)
-              }
-              if(is.na(upper)) {
-                  if(all(j >= i))
-                      return(`attr<-`(TRUE, "kind", "U"))
-                  if(all(i <= j))
-                      return(`attr<-`(TRUE, "kind", "L"))
-                  FALSE
-              } else if(upper) {
-                  all(j >= i)
-              } else {
-                  all(i <= j)
-              }
-          })
-
-setMethod("isSymmetric", c(object = "indMatrix"),
-          function(object, checkDN = TRUE, ...) {
-              d <- object@Dim
-              if((n <- d[2L]) != d[1L])
-                  return(FALSE)
-              if(checkDN) {
-                  ca <- function(check.attributes = TRUE, ...) check.attributes
-                  if(ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
-              }
-              perm <- object@perm
-              all(perm[perm] == seq_len(n))
-          })
-
-
 
 ## METHODS FOR CLASS: pMatrix
 ## permutation matrices, i.e., matrices with standard unit vectors

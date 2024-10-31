@@ -55,6 +55,12 @@ init.o: init.c Csparse.h \
   expm.h factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
   subassign.h subscript.h utils-R.h validity.h \
   Msymbols.h
+isDiagonal.o: isDiagonal.c Mdefines.h \
+  Msymbols.h utils.h M5.h
+isSymmetric.o: isSymmetric.c Mdefines.h \
+  Msymbols.h utils.h M5.h
+isTriangular.o: isTriangular.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 kappa.o: kappa.c Lapack-etc.h \
   Mdefines.h \
   Msymbols.h utils.h kappa.h

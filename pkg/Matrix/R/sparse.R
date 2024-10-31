@@ -8,31 +8,6 @@
     .Call(R_sparse_symmpart, x, uplo, trans)
 .sparse.skewpart <- function(x, trans = "C", ...)
     .Call(R_sparse_skewpart, x, trans)
-.sparse.is.sy <- function(object,
-                          tol = 100 * .Machine$double.eps,
-                          trans = "C", checkDN = TRUE, ...) {
-    if(checkDN) {
-        ca <- function(check.attributes = TRUE, ...) check.attributes
-        checkDN <- ca(...)
-    }
-    stopifnot(is.numeric(tol), length(tol) == 1L, !is.na(tol))
-    ans <- .Call(R_sparse_is_symmetric, object, trans, tol <= 0, checkDN)
-    if(!is.na(ans))
-        return(ans)
-    ## 'object' is an n-by-n [dz]sparseMatrix, n >= 1
-    ae <- function(target, current, tolerance, scale = NULL, ...)
-        .V.a.e(target = target, current = current,
-               tolerance = tolerance, scale = scale,
-               check.attributes = FALSE, check.class = FALSE)
-    conjugate <- is.complex(object@x) && identical(trans, "C")
-    op <- if(conjugate) ct else t
-    isTRUE(ae(target = .M2V(object), current = .M2V(op(object)),
-              tolerance = tol, ...))
-}
-.sparse.is.tr <- function(object, upper = NA)
-    .Call(R_sparse_is_triangular, object, upper)
-.sparse.is.di <- function(object)
-    .Call(R_sparse_is_diagonal, object)
 
 setMethod("diff", c(x = "sparseMatrix"),
           ## Mostly cut and paste of base::diff.default :
@@ -63,13 +38,10 @@ for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
 setMethod("forceSymmetric", c(x = .cl), .sparse.fS)
 setMethod("symmpart", c(x = .cl), .sparse.symmpart)
 setMethod("skewpart", c(x = .cl), .sparse.skewpart)
-setMethod("isSymmetric" , c(object = .cl), .sparse.is.sy)
-setMethod("isTriangular", c(object = .cl), .sparse.is.tr)
-setMethod("isDiagonal"  , c(object = .cl), .sparse.is.di)
 }
 rm(.cl)
 
-rm(list = c(grep("^[.]sparse[.](fS|symmpart|skewpart|is[.](sy|tr|di))$",
+rm(list = c(grep("^[.]sparse[.](fS|symmpart|skewpart)$",
                  ls(all.names = TRUE), value = TRUE)))
 
 

@@ -8,40 +8,6 @@
     .Call(R_dense_symmpart, x, uplo, trans)
 .dense.skewpart <- function(x, trans = "C", ...)
     .Call(R_dense_skewpart, x, trans)
-.dense.is.sy <- function(object,
-                         tol = 100 * .Machine$double.eps, tol1 = 8 * tol,
-                         trans = "C", checkDN = TRUE, ...) {
-    if(checkDN) {
-        ca <- function(check.attributes = TRUE, ...) check.attributes
-        checkDN <- ca(...)
-    }
-    stopifnot(is.numeric(tol), length(tol) == 1L, !is.na(tol))
-    ans <- .Call(R_dense_is_symmetric, object, trans, tol <= 0, checkDN)
-    if(!is.na(ans))
-        return(ans)
-    ## 'object' is an n-by-n [dz]denseMatrix, n >= 1
-    ae <- function(target, current, tolerance, scale = NULL, ...)
-        all.equal.numeric(target = target, current = current,
-                          tolerance = tolerance, scale = scale,
-                          check.attributes = FALSE, check.class = FALSE)
-    conjugate <- is.complex(object@x) && identical(trans, "C")
-    if(length(tol1) && (n <- object@Dim[1L]) > 1L) {
-        op <- if(conjugate) Conj else identity
-        for(i in if(n > 4L) c(1L, 2L, n - 1L, n) else 1L:n)
-            if(is.character(ae(target = object[i, ], current = op(object[, i]),
-                               tolerance = tol1, ...)))
-                return(FALSE)
-    }
-    object <- .M2gen(object)
-    op <- if(conjugate) ct else t
-    isTRUE(ae(target = object@x, current = op(object)@x,
-              tolerance = tol, ...))
-}
-.dense.is.tr <- function(object, upper = NA)
-    .Call(R_dense_is_triangular, object, upper)
-.dense.is.di <- function(object)
-    .Call(R_dense_is_diagonal, object)
-
 setMethod("diff", c(x = "denseMatrix"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
@@ -72,12 +38,6 @@ setMethod("forceSymmetric", c(x = "denseMatrix"), .dense.fS)
 setMethod("symmpart", c(x = "denseMatrix"), .dense.symmpart)
 
 setMethod("skewpart", c(x = "denseMatrix"), .dense.skewpart)
-
-setMethod("isSymmetric" , c(object = "denseMatrix"), .dense.is.sy)
-
-setMethod("isTriangular", c(object = "denseMatrix"), .dense.is.tr)
-
-setMethod("isDiagonal"  , c(object = "denseMatrix"), .dense.is.di)
 
 
 ## METHODS FOR CLASS: unpackedMatrix (virtual)
@@ -162,9 +122,7 @@ setMethod("skewpart", c(x = "matrix"),
               op <- if(is.complex(x) && identical(trans, "C")) Conj else identity
               symmetrizeDN(0.5 * (x - op(t(x))))
           })
-setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
-setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](fS|symmpart|skewpart|is[.](sy|tr|di))$",
+   list = c(grep("^[.]dense[.](fS|symmpart|skewpart)$",
                  ls(all.names = TRUE), value = TRUE)))

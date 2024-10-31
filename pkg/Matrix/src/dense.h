@@ -12,15 +12,6 @@ SEXP R_dense_symmpart(SEXP, SEXP, SEXP);
 SEXP dense_skewpart(SEXP, const char *, char);
 SEXP R_dense_skewpart(SEXP, SEXP);
 
-int dense_is_symmetric(SEXP, const char *, char, int, int);
-SEXP R_dense_is_symmetric(SEXP, SEXP, SEXP, SEXP);
-
-int dense_is_triangular(SEXP, const char *, char);
-SEXP R_dense_is_triangular(SEXP, SEXP);
-
-int dense_is_diagonal(SEXP, const char *);
-SEXP R_dense_is_diagonal(SEXP);
-
 SEXP dense_marginsum(SEXP, const char *, int, int, int);
 SEXP R_dense_marginsum(SEXP, SEXP, SEXP, SEXP);
 

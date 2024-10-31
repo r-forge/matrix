@@ -355,7 +355,6 @@ SEXP R_dense_band(SEXP s_from, SEXP s_a, SEXP s_b)
 		s_from = matrix_as_dense(s_from, ".ge", '\0', '\0', '\0', 1, 0);
 	}
 	PROTECT(s_from);
-
 	const char *class = Matrix_class(s_from, valid_dense, 6, __func__);
 
 	int *pdim = DIM(s_from), m = pdim[0], n = pdim[1], a, b;
