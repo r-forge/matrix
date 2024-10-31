@@ -2,13 +2,6 @@
 ## sparse matrices, in some cases restricted to CSC, CSR, triplet
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.sparse.fS  <- function(x, uplo = NULL, trans = "C", ...)
-    .Call(R_sparse_force_symmetric, x, uplo, trans)
-.sparse.symmpart <- function(x, uplo = "U", trans = "C", ...)
-    .Call(R_sparse_symmpart, x, uplo, trans)
-.sparse.skewpart <- function(x, trans = "C", ...)
-    .Call(R_sparse_skewpart, x, trans)
-
 setMethod("diff", c(x = "sparseMatrix"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
@@ -33,16 +26,6 @@ setMethod("mean", c(x = "sparseMatrix"),
 
 setMethod("rep", c(x = "sparseMatrix"),
           function(x, ...)  rep(as(x, "sparseVector"), ...))
-
-for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
-setMethod("forceSymmetric", c(x = .cl), .sparse.fS)
-setMethod("symmpart", c(x = .cl), .sparse.symmpart)
-setMethod("skewpart", c(x = .cl), .sparse.skewpart)
-}
-rm(.cl)
-
-rm(list = c(grep("^[.]sparse[.](fS|symmpart|skewpart)$",
-                 ls(all.names = TRUE), value = TRUE)))
 
 
 if(FALSE) ### FIXME: This would *NOT* be needed, if    as.matrix(<sparseMatrix>) was a no-op ;

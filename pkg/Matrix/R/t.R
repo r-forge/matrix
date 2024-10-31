@@ -51,4 +51,18 @@ function(x) {
 setMethod( "t", c(x = "indMatrix"), .fn)
 setMethod("ct", c(x = "indMatrix"), .fn)
 
+.fn <-
+function(x) {
+    r <- new("pMatrix")
+    r@Dim <- x@Dim
+    r@Dimnames = x@Dimnames[2:1]
+    r@perm <- x@perm
+    if(x@margin == 1L)
+        r@margin <- 2L
+    r
+}
+
+setMethod( "t", c(x = "pMatrix"), .fn)
+setMethod("ct", c(x = "pMatrix"), .fn)
+
 rm(.cl, .fn)

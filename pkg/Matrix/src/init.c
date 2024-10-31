@@ -29,6 +29,9 @@ SEXP R_sparse_diag_get(SEXP, SEXP);
 SEXP R_dense_diag_set(SEXP, SEXP);
 SEXP R_sparse_diag_set(SEXP, SEXP);
 
+SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
+SEXP R_sparse_force_symmetric(SEXP, SEXP, SEXP);
+
 SEXP R_dense_is_diagonal(SEXP);
 SEXP R_sparse_is_diagonal(SEXP);
 
@@ -37,6 +40,12 @@ SEXP R_sparse_is_triangular(SEXP, SEXP);
 
 SEXP R_dense_is_symmetric(SEXP, SEXP, SEXP, SEXP);
 SEXP R_sparse_is_symmetric(SEXP, SEXP, SEXP, SEXP);
+
+SEXP R_dense_symmpart(SEXP, SEXP, SEXP);
+SEXP R_sparse_symmpart(SEXP, SEXP, SEXP);
+
+SEXP R_dense_skewpart(SEXP, SEXP);
+SEXP R_sparse_skewpart(SEXP, SEXP);
 
 SEXP R_dense_transpose(SEXP, SEXP);
 SEXP R_sparse_transpose(SEXP, SEXP, SEXP);

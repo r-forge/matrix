@@ -1275,7 +1275,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 	}
 
 	if (class[1] == 's' && ABS(stay) == 1) {
-		/* defined in ./sparse.c : */
+		/* defined in ./forceSymmetric.c : */
 		SEXP sparse_force_symmetric(SEXP, const char *, char, char);
 		REPROTECT(ans = sparse_force_symmetric(ans, cl, (mg == (ul1 == 'U')) ? 'U' : 'L', ct1), pid_ans);
 		cl[1] = 's';

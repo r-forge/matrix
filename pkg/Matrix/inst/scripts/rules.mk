@@ -45,6 +45,8 @@ factor.o: factor.c Lapack-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h utils.h M5.h factor.h
+forceSymmetric.o: forceSymmetric.c Mdefines.h \
+  Msymbols.h utils.h M5.h idz.h
 idz.o: idz.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h
 init.o: init.c Csparse.h \
@@ -73,6 +75,8 @@ objects.o: objects.c Mdefines.h \
   Msymbols.h utils.h objects.h
 perm.o: perm.c Mdefines.h \
   Msymbols.h utils.h perm.h
+skewpart.o: skewpart.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 solve.o: solve.c Lapack-etc.h \
   cs-etc.h \
   SuiteSparse/CXSparse/Include/cs.h \
@@ -88,6 +92,8 @@ subassign.o: subassign.c Mdefines.h \
 subscript.o: subscript.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h \
   subscript.h
+symmpart.o: symmpart.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 t.o: t.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h
 utils-R.o: utils-R.c Mdefines.h \

@@ -12,6 +12,7 @@ sources = \
 	diag.c \
 	expm.c \
 	factor.c \
+	forceSymmetric.c \
 	idz.c \
 	init.c \
 	isDiagonal.c \
@@ -21,10 +22,12 @@ sources = \
 	matmult.c \
 	objects.c \
 	perm.c \
+	skewpart.c \
 	solve.c \
 	sparse.c \
 	subassign.c \
 	subscript.c \
+	symmpart.c \
 	t.c \
 	utils-R.c \
 	utils.c \

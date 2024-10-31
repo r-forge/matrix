@@ -3,15 +3,6 @@
 
 #include <Rinternals.h>
 
-SEXP dense_force_symmetric(SEXP, const char *, char, char);
-SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
-
-SEXP dense_symmpart(SEXP, const char *, char, char);
-SEXP R_dense_symmpart(SEXP, SEXP, SEXP);
-
-SEXP dense_skewpart(SEXP, const char *, char);
-SEXP R_dense_skewpart(SEXP, SEXP);
-
 SEXP dense_marginsum(SEXP, const char *, int, int, int);
 SEXP R_dense_marginsum(SEXP, SEXP, SEXP, SEXP);
 

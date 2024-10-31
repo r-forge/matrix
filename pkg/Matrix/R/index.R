@@ -92,15 +92,6 @@ setAs("nsparseMatrix", "indMatrix",
           stop("matrix must have exactly one entry in each row or column")
       })
 
-setMethod("forceSymmetric", c(x = "indMatrix"),
-          function(x, ...) forceSymmetric(.M2kind(x, "n"), ...))
-
-setMethod("symmpart", c(x = "indMatrix"),
-          function(x, ...) symmpart(.M2kind(x, "d"), ...))
-
-setMethod("skewpart", c(x = "indMatrix"),
-          function(x, ...) skewpart(.M2kind(x, "d"), ...))
-
 
 ## METHODS FOR CLASS: pMatrix
 ## permutation matrices, i.e., matrices with standard unit vectors
@@ -148,18 +139,3 @@ setAs("nsparseMatrix", "pMatrix",
 
 setAs("indMatrix", "pMatrix",
       function(from) new("pMatrix", from))
-
-.tmp <- function(x) {
-    r <- new("pMatrix")
-    r@Dim <- x@Dim
-    r@Dimnames = x@Dimnames[2:1]
-    r@perm <- x@perm
-    if(x@margin == 1L)
-        r@margin <- 2L
-    r
-}
-
-setMethod( "t", c(x = "pMatrix"), .tmp)
-setMethod("ct", c(x = "pMatrix"), .tmp)
-
-rm(.tmp)

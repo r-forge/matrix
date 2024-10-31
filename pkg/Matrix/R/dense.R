@@ -2,12 +2,6 @@
 ## dense matrices with unpacked _or_ packed storage
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
-    .Call(R_dense_force_symmetric, x, uplo, trans)
-.dense.symmpart <- function(x, uplo = "U", trans = "C", ...)
-    .Call(R_dense_symmpart, x, uplo, trans)
-.dense.skewpart <- function(x, trans = "C", ...)
-    .Call(R_dense_skewpart, x, trans)
 setMethod("diff", c(x = "denseMatrix"),
           ## Mostly cut and paste of base::diff.default :
           function(x, lag = 1L, differences = 1L, ...) {
@@ -32,12 +26,6 @@ setMethod("mean"  , c(x = "denseMatrix"),
 
 setMethod("rep"   , c(x = "denseMatrix"),
           function(x, ...)          rep(.M2v(x), ...))
-
-setMethod("forceSymmetric", c(x = "denseMatrix"), .dense.fS)
-
-setMethod("symmpart", c(x = "denseMatrix"), .dense.symmpart)
-
-setMethod("skewpart", c(x = "denseMatrix"), .dense.skewpart)
 
 
 ## METHODS FOR CLASS: unpackedMatrix (virtual)
@@ -109,20 +97,5 @@ body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-
 setMethod("unpack", c(x = "matrix"),
           function(x, ...) .m2dense.checking(x, "."))
 setMethod("pack", c(x = "matrix"), .m.pack)
-setMethod("forceSymmetric", c(x = "matrix"),
-          function(x, uplo = "U", trans = "C", ...)
-              .m2dense(x, ".sy", uplo = uplo, trans = trans))
-setMethod("symmpart", c(x = "matrix"),
-          function(x, trans = "C", ...) {
-              op <- if(is.complex(x) && identical(trans, "C")) Conj else identity
-              symmetrizeDN(0.5 * (x + op(t(x))))
-          })
-setMethod("skewpart", c(x = "matrix"),
-          function(x, trans = "C", ...) {
-              op <- if(is.complex(x) && identical(trans, "C")) Conj else identity
-              symmetrizeDN(0.5 * (x - op(t(x))))
-          })
 
-rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](fS|symmpart|skewpart)$",
-                 ls(all.names = TRUE), value = TRUE)))
+rm(.uM.pack, .uM.pack.ge, .m.pack)
