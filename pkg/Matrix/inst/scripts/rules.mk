@@ -13,7 +13,7 @@ band.o: band.c Mdefines.h \
 bind.o: bind.c Mdefines.h \
   Msymbols.h M5.h coerce.h
 canonicalize.o: canonicalize.c Mdefines.h \
-  Msymbols.h M5.h
+  Msymbols.h M5.h idz.h
 cholmod-api.o: cholmod-api.c Mdefines.h \
   Msymbols.h cholmod-api.h \
   cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
@@ -89,8 +89,10 @@ symmpart.o: symmpart.c Mdefines.h \
 t.o: t.c Mdefines.h \
   Msymbols.h M5.h idz.h
 utils-R.o: utils-R.c Mdefines.h \
-  Msymbols.h M5.h version.h t_rle.c
+  Msymbols.h M5.h t_rle.c
 utils.o: utils.c Mdefines.h \
   Msymbols.h
 validity.o: validity.c Mdefines.h \
   Msymbols.h
+version.o: version.c \
+  version.h

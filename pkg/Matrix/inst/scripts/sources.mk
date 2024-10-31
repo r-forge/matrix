@@ -32,4 +32,5 @@ sources = \
 	t.c \
 	utils-R.c \
 	utils.c \
-	validity.c
+	validity.c \
+	version.c

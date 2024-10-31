@@ -193,7 +193,6 @@ SEXP R_dense_transpose(SEXP, SEXP);
 SEXP R_sparse_transpose(SEXP, SEXP, SEXP);
 
 /* utils-R.c : */
-SEXP R_Matrix_version(void);
 SEXP R_index_triangle(SEXP, SEXP, SEXP, SEXP);
 SEXP R_index_diagonal(SEXP, SEXP, SEXP);
 SEXP R_nnz(SEXP, SEXP, SEXP);
@@ -266,6 +265,9 @@ SEXP sparseLU_validate(SEXP);
 SEXP sparseCholesky_validate(SEXP);
 SEXP simplicialCholesky_validate(SEXP);
 SEXP supernodalCholesky_validate(SEXP);
+
+/* version.c : */
+SEXP R_Matrix_version(void);
 
 #define     CALL_METHOD(name, n) {#name, (DL_FUNC) &name, n}
 #define EXTERNAL_METHOD(name, n) {#name, (DL_FUNC) &name, n}
@@ -459,7 +461,6 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_transpose, 3),
 
 	/* utils-R.c : */
-	CALL_METHOD(R_Matrix_version, 0),
 	CALL_METHOD(R_index_triangle, 4),
 	CALL_METHOD(R_index_diagonal, 3),
 	CALL_METHOD(R_nnz, 3),
@@ -531,6 +532,9 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(sparseCholesky_validate, 1),
 	CALL_METHOD(simplicialCholesky_validate, 1),
 	CALL_METHOD(supernodalCholesky_validate, 1),
+
+	/* version.c */
+	CALL_METHOD(R_Matrix_version, 0),
 
 	{NULL, NULL, 0}
 };
