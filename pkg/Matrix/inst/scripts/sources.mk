@@ -4,6 +4,7 @@ sources = \
 	attrib.c \
 	band.c \
 	bind.c \
+	canonicalize.c \
 	cholmod-api.c \
 	cholmod-etc.c \
 	coerce.c \
@@ -25,7 +26,6 @@ sources = \
 	perm.c \
 	skewpart.c \
 	solve.c \
-	sparse.c \
 	subassign.c \
 	subscript.c \
 	symmpart.c \

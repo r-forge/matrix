@@ -533,7 +533,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 		    TRANS(s_from) == 'C') {
 			PROTECT(s_from = dense_as_general(s_from, class, 1));
 			class = Matrix_class(s_from, valid_dense, 6, __func__);
-			UNPROTECT(1); /* s_from */
+			UNPROTECT(1);
 			new = 0;
 		}
 		PROTECT(s_from);
@@ -557,7 +557,7 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 	}
 
 	s_from = dense_diag_set(s_from, class, s_value, new);
-	UNPROTECT(2); /* s_value, s_from */
+	UNPROTECT(2);
 	return s_from;
 }
 
@@ -590,7 +590,7 @@ SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 		    TRANS(s_from) == 'C') {
 			PROTECT(s_from = sparse_as_general(s_from, class));
 			class = Matrix_class(s_from, valid_sparse, 6, __func__);
-			UNPROTECT(1); /* s_from */
+			UNPROTECT(1);
 		}
 		PROTECT(s_from);
 		PROTECT(s_value = Rf_coerceVector(s_value, tx));
@@ -612,6 +612,51 @@ SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 	}
 
 	s_from = sparse_diag_set(s_from, class, s_value);
-	UNPROTECT(2); /* s_value, s_from */
+	UNPROTECT(2);
 	return s_from;
+}
+
+SEXP sparse_diag_U2N(SEXP from, const char *class)
+{
+	if (class[1] != 't' || DIAG(from) == 'N')
+		return from;
+	SEXP value = PROTECT(Rf_ScalarLogical(1)),
+		to = R_sparse_diag_set(from, value);
+	UNPROTECT(1); /* value */
+	return to;
+}
+
+SEXP sparse_diag_N2U(SEXP from, const char *class)
+{
+	/* defined in ./band.c : */
+	SEXP sparse_band(SEXP, const char *, int, int);
+	
+	if (class[1] != 't' || DIAG(from) != 'N')
+		return from;
+	SEXP to;
+	int n = DIM(from)[1];
+	if (n == 0) {
+		PROTECT(to = newObject(class));
+		if (UPLO(from) != 'U')
+			SET_UPLO(to);
+	}
+	else if (UPLO(from) == 'U')
+		PROTECT(to = sparse_band(from, class,  1,  n));
+	else
+		PROTECT(to = sparse_band(from, class, -n, -1));
+	SET_DIAG(to);
+	UNPROTECT(1); /* to */
+	return from;
+}
+
+SEXP R_sparse_diag_U2N(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_sparse, 2, __func__);
+	return sparse_diag_U2N(s_from, class);
+}
+
+SEXP R_sparse_diag_N2U(SEXP s_from)
+{
+	const char *class = Matrix_class(s_from, valid_sparse, 2, __func__);
+	return sparse_diag_N2U(s_from, class);
 }

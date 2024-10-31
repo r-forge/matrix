@@ -11,13 +11,17 @@
 #include "objects.h"
 #include "perm.h"
 #include "solve.h"
-#include "sparse.h"
 #include "subassign.h"
 #include "subscript.h"
 #include "utils-R.h"
 #include "validity.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
+
+SEXP R_sparse_aggregate(SEXP);
+SEXP R_sparse_drop0(SEXP, SEXP);
+SEXP R_sparse_diag_U2N(SEXP);
+SEXP R_sparse_diag_N2U(SEXP);
 
 SEXP R_dense_band(SEXP, SEXP, SEXP);
 SEXP R_sparse_band(SEXP, SEXP, SEXP);

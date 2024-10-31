@@ -13,6 +13,8 @@ band.o: band.c Mdefines.h \
 bind.o: bind.c Mdefines.h \
   Msymbols.h utils.h M5.h coerce.h \
   bind.h
+canonicalize.o: canonicalize.c Mdefines.h \
+  Msymbols.h utils.h M5.h
 cholmod-api.o: cholmod-api.c Mdefines.h \
   Msymbols.h utils.h cholmod-api.h \
   cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
@@ -55,8 +57,8 @@ init.o: init.c Csparse.h \
   cholmod-api.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h determinant.h expm.h \
-  factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
-  subassign.h subscript.h utils-R.h validity.h \
+  factor.h kappa.h matmult.h objects.h perm.h solve.h subassign.h \
+  subscript.h utils-R.h validity.h \
   Msymbols.h
 isDiagonal.o: isDiagonal.c Mdefines.h \
   Msymbols.h utils.h M5.h
@@ -84,9 +86,6 @@ solve.o: solve.c Lapack-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h utils.h M5.h idz.h solve.h
-sparse.o: sparse.c Mdefines.h \
-  Msymbols.h utils.h M5.h idz.h \
-  sparse.h
 subassign.o: subassign.c Mdefines.h \
   Msymbols.h utils.h subassign.h \
   t_subassign.c
