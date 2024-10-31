@@ -3,6 +3,9 @@
 #include "Mdefines.h"
 #include "M5.h"
 
+/* defined in ./sparse.c : */
+SEXP sparse_aggregate(SEXP, const char *);
+
 #define LONGDOUBLE_AS_DOUBLE(x) \
 (((x) > DBL_MAX) ? R_PosInf : (((x) < -DBL_MAX) ? R_NegInf : (double) (x)))
 

@@ -3,6 +3,9 @@
 #include "Mdefines.h"
 #include "M5.h"
 
+/* defined in ./sparse.c : */
+SEXP sparse_aggregate(SEXP, const char *);
+
 #define SUM_TYPEOF(c) \
 (c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
 
@@ -455,11 +458,8 @@ void Tsparse_colsum(SEXP obj, const char *class,
                     int narm, int mean,
                     SEXP ans, SEXP iSym, SEXP jSym)
 {
-	if (narm && mean) {
-		/* defined in ./sparse.c : */
-		SEXP sparse_aggregate(SEXP, const char *);
+	if (narm && mean)
 		obj = sparse_aggregate(obj, class);
-	}
 	PROTECT(obj);
 
 	SEXP i0 = PROTECT(GET_SLOT(obj, iSym)),
@@ -675,6 +675,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg,
 			               ans, Matrix_jSym);
 			else
 			Csparse_colsum(obj, class, n, m, ul, ct, nu, narm, mean,
+			               ans);
 			break;
 		case 'T':
 			Tsparse_colsum(obj, class, n, m, ul, ct, nu, narm, mean,
@@ -691,6 +692,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg,
 			               ans, Matrix_iSym);
 			else
 			Csparse_colsum(obj, class, m, n, ul, ct, nu, narm, mean,
+			               ans);
 			break;
 		case 'R':
 			Csparse_rowsum(obj, class, n, m, ul, ct, nu, narm, mean,
