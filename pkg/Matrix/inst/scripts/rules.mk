@@ -6,6 +6,8 @@ Csparse.o: Csparse.c Mdefines.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Csparse.h
 attrib.o: attrib.c Mdefines.h \
   Msymbols.h utils.h attrib.h
+band.o: band.c Mdefines.h \
+  Msymbols.h utils.h M5.h idz.h
 bind.o: bind.c Mdefines.h \
   Msymbols.h utils.h M5.h coerce.h \
   bind.h
@@ -43,14 +45,14 @@ factor.o: factor.c Lapack-etc.h \
   Msymbols.h utils.h M5.h factor.h
 idz.o: idz.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h
-init.o: init.c Mdefines.h \
-  Msymbols.h utils.h Csparse.h \
-  attrib.h bind.h cholmod-api.h cholmod-etc.h \
+init.o: init.c Csparse.h \
+  attrib.h bind.h \
+  cholmod-api.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h coerce.h dense.h determinant.h \
   expm.h factor.h kappa.h matmult.h objects.h perm.h solve.h sparse.h \
   subassign.h subscript.h utils-R.h validity.h \
-  
+  Msymbols.h
 kappa.o: kappa.c Lapack-etc.h \
   Mdefines.h \
   Msymbols.h utils.h kappa.h

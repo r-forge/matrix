@@ -2,39 +2,6 @@
 ## diagonal matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("band", c(x = "diagonalMatrix"),
-          function(x, k1, k2, ...) {
-              if(k1 <= 0L && k2 >= 0L)
-                  return(x)
-              r <- new(.M.class(x))
-              r@Dim <- d <- x@Dim
-              r@Dimnames <- x@Dimnames
-              r@x <- vector(typeof(x@x), d[1L])
-              r
-          })
-
-setMethod("triu", c(x = "diagonalMatrix"),
-          function(x, k = 0L, ...) {
-              if(k <= 0L)
-                  return(x)
-              r <- new(.M.class(x))
-              r@Dim <- d <- x@Dim
-              r@Dimnames <- x@Dimnames
-              r@x <- vector(typeof(x@x), d[1L])
-              r
-          })
-
-setMethod("tril", c(x = "diagonalMatrix"),
-          function(x, k = 0L, ...) {
-              if(k >= 0L)
-                  return(x)
-              r <- new(.M.class(x))
-              r@Dim <- d <- x@Dim
-              r@Dimnames <- x@Dimnames
-              r@x <- vector(typeof(x@x), d[1L])
-              r
-          })
-
 setMethod("diag", c(x = "diagonalMatrix"),
           function(x = 1, nrow, ncol, names = TRUE) {
               kind <- .M.kind(x)

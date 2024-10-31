@@ -1,6 +1,7 @@
 sources = \
 	Csparse.c \
 	attrib.c \
+	band.c \
 	bind.c \
 	cholmod-api.c \
 	cholmod-etc.c \

@@ -92,15 +92,6 @@ setAs("nsparseMatrix", "indMatrix",
           stop("matrix must have exactly one entry in each row or column")
       })
 
-setMethod("band", c(x = "indMatrix"),
-          function(x, k1, k2, ...) band(.M2kind(x, "n"), k1, k2, ...))
-
-setMethod("triu", c(x = "indMatrix"),
-          function(x, k = 0L, ...) triu(.M2kind(x, "n"), k, ...))
-
-setMethod("tril", c(x = "indMatrix"),
-          function(x, k = 0L, ...) tril(.M2kind(x, "n"), k, ...))
-
 setMethod("diag", c(x = "indMatrix"),
           function(x = 1, nrow, ncol, names = TRUE) {
               if((m <- min(x@Dim)) == 0L)

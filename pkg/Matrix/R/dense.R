@@ -2,12 +2,6 @@
 ## dense matrices with unpacked _or_ packed storage
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.dense.band <- function(x, k1, k2, ...)
-    .Call(R_dense_band, x, k1, k2)
-.dense.triu <- function(x, k = 0L, ...)
-    .Call(R_dense_band, x, k, NULL)
-.dense.tril <- function(x, k = 0L, ...)
-    .Call(R_dense_band, x, NULL, k)
 .dense.diag.get <- function(x = 1, nrow, ncol, names = TRUE)
     .Call(R_dense_diag_get, x, names)
 .dense.diag.set <- function(x, value)
@@ -80,12 +74,6 @@ setMethod("mean"  , c(x = "denseMatrix"),
 
 setMethod("rep"   , c(x = "denseMatrix"),
           function(x, ...)          rep(.M2v(x), ...))
-
-setMethod("band"  , c(x = "denseMatrix"), .dense.band)
-
-setMethod("triu"  , c(x = "denseMatrix"), .dense.triu)
-
-setMethod("tril"  , c(x = "denseMatrix"), .dense.tril)
 
 setMethod("diag"  , c(x = "denseMatrix"), .dense.diag.get)
 
@@ -177,9 +165,6 @@ body(.m.pack)[[2L]][[4L]][[3L]][[3L]] <-
 setMethod("unpack", c(x = "matrix"),
           function(x, ...) .m2dense.checking(x, "."))
 setMethod("pack", c(x = "matrix"), .m.pack)
-setMethod("band", c(x = "matrix"), .dense.band)
-setMethod("triu", c(x = "matrix"), .dense.triu)
-setMethod("tril", c(x = "matrix"), .dense.tril)
 setMethod("ct", c(x = "matrix"),
           function(x) if(is.complex(x)) Conj(t(x)) else t(x))
 setMethod("forceSymmetric", c(x = "matrix"),
@@ -199,5 +184,5 @@ setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
 setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di))$",
+   list = c(grep("^[.]dense[.](diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di))$",
                  ls(all.names = TRUE), value = TRUE)))

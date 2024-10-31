@@ -3,9 +3,6 @@
 
 #include <Rinternals.h>
 
-SEXP dense_band(SEXP, const char *, int, int);
-SEXP R_dense_band(SEXP, SEXP, SEXP);
-
 SEXP dense_diag_get(SEXP, const char *, int);
 SEXP R_dense_diag_get(SEXP, SEXP);
 

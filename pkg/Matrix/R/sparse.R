@@ -2,8 +2,6 @@
 ## sparse matrices, in some cases restricted to CSC, CSR, triplet
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.sparse.band <- function(x, k1, k2, ...)
-    .Call(R_sparse_band, x, k1, k2)
 .sparse.triu <- function(x, k = 0L, ...)
     .Call(R_sparse_band, x, k, NULL)
 .sparse.tril <- function(x, k = 0L, ...)
@@ -74,9 +72,6 @@ setMethod("rep", c(x = "sparseMatrix"),
           function(x, ...)  rep(as(x, "sparseVector"), ...))
 
 for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
-setMethod("band"  , c(x = .cl), .sparse.band)
-setMethod("triu"  , c(x = .cl), .sparse.triu)
-setMethod("tril"  , c(x = .cl), .sparse.tril)
 setMethod("diag"  , c(x = .cl), .sparse.diag.get)
 setMethod("diag<-", c(x = .cl), .sparse.diag.set)
 setMethod("t"     , c(x = .cl), .sparse.t)
@@ -90,7 +85,7 @@ setMethod("isDiagonal"  , c(object = .cl), .sparse.is.di)
 }
 rm(.cl)
 
-rm(list = c(grep("^[.]sparse[.](band|tri[ul]|diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di))$",
+rm(list = c(grep("^[.]sparse[.](diag[.](get|set)|c?t|fS|symmpart|skewpart|is[.](sy|tr|di))$",
                  ls(all.names = TRUE), value = TRUE)))
 
 

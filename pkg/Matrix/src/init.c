@@ -20,6 +20,9 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
+SEXP R_dense_band(SEXP, SEXP, SEXP);
+SEXP R_sparse_band(SEXP, SEXP, SEXP);
+
 #include "Msymbols.h"
 Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna;
 

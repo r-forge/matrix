@@ -15,9 +15,6 @@ SEXP R_sparse_diag_U2N(SEXP);
 SEXP sparse_diag_N2U(SEXP, const char *);
 SEXP R_sparse_diag_N2U(SEXP);
 
-SEXP sparse_band(SEXP, const char *, int, int);
-SEXP R_sparse_band(SEXP, SEXP, SEXP);
-
 SEXP sparse_diag_get(SEXP, const char *, int);
 SEXP R_sparse_diag_get(SEXP, SEXP);
 
