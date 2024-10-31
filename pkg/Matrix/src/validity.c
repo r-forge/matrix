@@ -179,9 +179,8 @@ SEXP generalMatrix_validate(SEXP obj)
 
 SEXP symmetricMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 #ifdef ENFORCE_SYMMETRIC_DIMNAMES
@@ -253,9 +252,8 @@ SEXP symmetricMatrix_validate(SEXP obj)
 
 SEXP triangularMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -281,10 +279,8 @@ SEXP triangularMatrix_validate(SEXP obj)
 
 SEXP unpackedMatrix_validate(SEXP obj)
 {
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	UNPROTECT(2); /* dim, x */
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (XLENGTH(x) != (int_fast64_t) m * n)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "prod(Dim)");
 	return Rf_ScalarLogical(1);
@@ -292,10 +288,8 @@ SEXP unpackedMatrix_validate(SEXP obj)
 
 SEXP packedMatrix_validate(SEXP obj)
 {
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
-		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	UNPROTECT(2); /* dim, x */
-	int n = INTEGER(dim)[0];
+	int n = DIM(obj)[1];
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (XLENGTH(x) != n + ((int_fast64_t) n * (n - 1)) / 2)
 		RMKMS(_("'%s' slot does not have length %s"), "x", "Dim[1]*(Dim[1]+1)/2");
 	return Rf_ScalarLogical(1);
@@ -303,8 +297,7 @@ SEXP packedMatrix_validate(SEXP obj)
 
 SEXP CsparseMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
@@ -354,8 +347,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
 
 SEXP RsparseMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym));
@@ -405,8 +397,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
 
 SEXP TsparseMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
 	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym));
@@ -444,9 +435,8 @@ SEXP TsparseMatrix_validate(SEXP obj)
 
 SEXP diagonalMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
@@ -478,8 +468,7 @@ SEXP indMatrix_validate(SEXP obj)
 	if (mg != 0 && mg != 1)
 		RMKMS(_("'%s' slot is not %d or %d"), "margin", 1, 2);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[mg], n = pdim[!mg];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 	if (m > 0 && n == 0)
 		RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
 		      (mg == 0) ? "m" : "0", (mg == 0) ? "0" : "n", "indMatrix",
@@ -505,9 +494,8 @@ SEXP indMatrix_validate(SEXP obj)
 
 SEXP pMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	if (n > 1) {
@@ -534,8 +522,7 @@ SEXP sCMatrix_validate(SEXP obj)
 	if (pp[n] > 0) {
 		PROTECT(p);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP i = GET_SLOT(obj, Matrix_iSym);
 		int *pi = INTEGER(i), j, k, kend;
@@ -569,9 +556,7 @@ SEXP sCMatrix_validate(SEXP obj)
 
 SEXP tCMatrix_validate(SEXP obj)
 {
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char nu = CHAR(STRING_ELT(diag, 0))[0];
-	if (nu == 'N')
+	if (DIAG(obj) == 'N')
 		return sCMatrix_validate(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
@@ -579,8 +564,7 @@ SEXP tCMatrix_validate(SEXP obj)
 	if (pp[n] > 0) {
 		PROTECT(p);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP i = GET_SLOT(obj, Matrix_iSym);
 		int *pi = INTEGER(i), j, k, kend;
@@ -625,8 +609,7 @@ SEXP sRMatrix_validate(SEXP obj)
 	if (pp[m] > 0) {
 		PROTECT(p);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP j = GET_SLOT(obj, Matrix_jSym);
 		int *pj = INTEGER(j), i, k, kend;
@@ -660,9 +643,7 @@ SEXP sRMatrix_validate(SEXP obj)
 
 SEXP tRMatrix_validate(SEXP obj)
 {
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char nu = CHAR(STRING_ELT(diag, 0))[0];
-	if (nu == 'N')
+	if (DIAG(obj) == 'N')
 		return sRMatrix_validate(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
@@ -670,8 +651,7 @@ SEXP tRMatrix_validate(SEXP obj)
 	if (pp[m] > 0) {
 		PROTECT(p);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP j = GET_SLOT(obj, Matrix_jSym);
 		int *pj = INTEGER(j), i, k, kend;
@@ -716,8 +696,7 @@ SEXP sTMatrix_validate(SEXP obj)
 	if (nnz > 0) {
 		PROTECT(i);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP j = GET_SLOT(obj, Matrix_jSym);
 		int *pi = INTEGER(i), *pj = INTEGER(j);
@@ -741,9 +720,7 @@ SEXP sTMatrix_validate(SEXP obj)
 
 SEXP tTMatrix_validate(SEXP obj)
 {
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	char nu = CHAR(STRING_ELT(diag, 0))[0];
-	if (nu == 'N')
+	if (DIAG(obj) == 'N')
 		return sTMatrix_validate(obj);
 
 	SEXP i = GET_SLOT(obj, Matrix_iSym);
@@ -751,8 +728,7 @@ SEXP tTMatrix_validate(SEXP obj)
 	if (nnz > 0) {
 		PROTECT(i);
 
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 
 		SEXP j = GET_SLOT(obj, Matrix_jSym);
 		int *pi = INTEGER(i), *pj = INTEGER(j);
@@ -871,8 +847,7 @@ SEXP xtTMatrix_validate(SEXP obj)
 
 SEXP xpoMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
+	int n = DIM(obj)[1], j;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -882,8 +857,7 @@ SEXP xpoMatrix_validate(SEXP obj)
 		if (!ISNAN(*px) && *px < 0.0)
 			RMK(_("matrix has negative diagonal elements"));
 	} else {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (CHAR(STRING_ELT(trans, 0))[0] != 'C')
+	if (TRANS(obj) != 'C')
 		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
 	Rcomplex *px = COMPLEX(x);
 	for (j = 0; j < n; ++j, px += n1a)
@@ -896,11 +870,8 @@ SEXP xpoMatrix_validate(SEXP obj)
 
 SEXP xppMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	int n = DIM(obj)[1], j;
+	char ul = UPLO(obj);
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) == REALSXP) {
@@ -915,8 +886,7 @@ SEXP xppMatrix_validate(SEXP obj)
 			RMK(_("matrix has negative diagonal elements"));
 	}
 	} else {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (CHAR(STRING_ELT(trans, 0))[0] != 'C')
+	if (TRANS(obj) != 'C')
 		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
 	Rcomplex *px = COMPLEX(x);
 	if (ul == 'U') {
@@ -935,11 +905,8 @@ SEXP xppMatrix_validate(SEXP obj)
 
 SEXP xpCMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	int n = DIM(obj)[1], j;
+	char ul = UPLO(obj);
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
@@ -960,8 +927,7 @@ SEXP xpCMatrix_validate(SEXP obj)
 			RMK(_("matrix has negative diagonal elements"));
 	}
 	} else {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (CHAR(STRING_ELT(trans, 0))[0] != 'C')
+	if (TRANS(obj) != 'C')
 		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
 	Rcomplex *px = COMPLEX(x);
 	if (ul == 'U') {
@@ -982,11 +948,8 @@ SEXP xpCMatrix_validate(SEXP obj)
 
 SEXP xpRMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int i, m = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	int m = DIM(obj)[0], i;
+	char ul = UPLO(obj);
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
@@ -1007,8 +970,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 			RMK(_("matrix has negative diagonal elements"));
 	}
 	} else {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (CHAR(STRING_ELT(trans, 0))[0] != 'C')
+	if (TRANS(obj) != 'C')
 		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
 	Rcomplex *px = COMPLEX(x);
 	if (ul == 'U') {
@@ -1029,8 +991,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 
 SEXP xpTMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
+	int n = DIM(obj)[1];
 
 	SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
@@ -1053,8 +1014,7 @@ SEXP xpTMatrix_validate(SEXP obj)
 		if (!ISNAN(work[n]) && work[n] < 0.0)
 			FRMK(_("matrix has negative diagonal elements"));
 	} else {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (CHAR(STRING_ELT(trans, 0))[0] != 'C')
+	if (TRANS(obj) != 'C')
 		RMKMS(_("'%s' slot is not \"%s\""), "trans", "C");
 	Rcomplex *px = COMPLEX(x);
 	while (nnz--) {
@@ -1073,8 +1033,7 @@ SEXP xpTMatrix_validate(SEXP obj)
 
 SEXP corMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
+	int n = DIM(obj)[1], j;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -1098,11 +1057,8 @@ SEXP corMatrix_validate(SEXP obj)
 
 SEXP copMatrix_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int j, n = INTEGER(dim)[0];
-
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	int n = DIM(obj)[1], j;
+	char ul = UPLO(obj);
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	double *px = REAL(x);
@@ -1220,9 +1176,8 @@ SEXP MatrixFactorization_validate(SEXP obj)
 
 SEXP denseSchur_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 	int_fast64_t nn = (int_fast64_t) n * n;
 
@@ -1260,8 +1215,7 @@ SEXP denseSchur_validate(SEXP obj)
 
 SEXP denseQR_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
@@ -1303,8 +1257,7 @@ SEXP denseQR_validate(SEXP obj)
 
 SEXP denseLU_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
@@ -1333,9 +1286,8 @@ SEXP denseLU_validate(SEXP obj)
 
 SEXP denseBunchKaufman_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -1394,9 +1346,8 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 
 SEXP denseCholesky_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
@@ -1483,8 +1434,7 @@ SEXP sparseQR_validate(SEXP obj)
 {
 	/* MJ: assuming for simplicity that 'V' and 'R' slots are formally valid */
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 	if (m < n)
 		RMK(_("matrix has more columns than rows"));
 
@@ -1495,16 +1445,13 @@ SEXP sparseQR_validate(SEXP obj)
 		RMKMS(_("'%s' slot does not have length %s"), "beta", "Dim[2]");
 
 	SEXP p, i, q;
-	int *pp, *pi, *pq, j, k, kend;
+	int *pp, *pi, *pq, j, k, kend, m0;
 
 	SEXP V = PROTECT(GET_SLOT(obj, Matrix_VSym));
-	PROTECT(dim = GET_SLOT(V, Matrix_DimSym));
 	PROTECT(p = GET_SLOT(V, Matrix_pSym));
 	PROTECT(i = GET_SLOT(V, Matrix_iSym));
-	UNPROTECT(4); /* i, p, dim, V */
-
-	pdim = INTEGER(dim);
-	int m0 = pdim[0];
+	pdim = DIM(V); m0 = pdim[0];
+	UNPROTECT(3); /* i, p, V */
 	if (m0 < m)
 		RMKMS(_("'%s' slot has fewer than %s rows"), "V", "Dim[1]");
 	if (m0 > m + n)
@@ -1523,12 +1470,10 @@ SEXP sparseQR_validate(SEXP obj)
 	}
 
 	SEXP R = PROTECT(GET_SLOT(obj, Matrix_RSym));
-	PROTECT(dim = GET_SLOT(R, Matrix_DimSym));
 	PROTECT(p = GET_SLOT(R, Matrix_pSym));
 	PROTECT(i = GET_SLOT(R, Matrix_iSym));
-	UNPROTECT(4); /* i, p, dim, R */
-
-	pdim = INTEGER(dim);
+	pdim = DIM(R);
+	UNPROTECT(3); /* i, p, R */
 	if (pdim[0] != m0)
 		RMKMS(_("'%s' slot does not have %s row"), "R", "nrow(V)");
 	if (pdim[1] != n)
@@ -1590,23 +1535,21 @@ SEXP sparseLU_validate(SEXP obj)
 {
 	/* MJ: assuming for simplicity that 'L' and 'U' slots are formally valid */
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym), uplo, diag;
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	char ul, nu;
 
 	SEXP L = PROTECT(GET_SLOT(obj, Matrix_LSym));
-	PROTECT(dim = GET_SLOT(L, Matrix_DimSym));
-	PROTECT(uplo = GET_SLOT(L, Matrix_uploSym));
-	PROTECT(diag = GET_SLOT(L, Matrix_diagSym));
-	UNPROTECT(4); /* diag, uplo, dim, L */
-
-	pdim = INTEGER(dim);
+	ul = UPLO(L);
+	nu = DIAG(L);
+	pdim = DIM(L);
+	UNPROTECT(1); /* L */
 	if (pdim[0] != n || pdim[1] != n)
 		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "L", "Dim");
-	if (CHAR(STRING_ELT(uplo, 0))[0] == 'U')
+	if (ul == 'U')
 		RMKMS(_("'%s' slot is upper (not lower) triangular"), "L");
-	if (CHAR(STRING_ELT(diag, 0))[0] == 'N') {
+	if (nu == 'N') {
 		PROTECT(L);
 		SEXP p = PROTECT(GET_SLOT(L, Matrix_pSym)),
 			i = PROTECT(GET_SLOT(L, Matrix_iSym)),
@@ -1634,14 +1577,12 @@ SEXP sparseLU_validate(SEXP obj)
 	}
 
 	SEXP U = PROTECT(GET_SLOT(obj, Matrix_USym));
-	PROTECT(dim = GET_SLOT(U, Matrix_DimSym));
-	PROTECT(uplo = GET_SLOT(U, Matrix_uploSym));
-	UNPROTECT(3); /* uplo, dim, U */
-
-	pdim = INTEGER(dim);
+	ul = UPLO(U);
+	pdim = DIM(U);
+	UNPROTECT(1); /* U */
 	if (pdim[0] != n || pdim[1] != n)
 		RMKMS(_("dimensions of '%s' slot are not identical to '%s'"), "U", "Dim");
-	if (CHAR(STRING_ELT(uplo, 0))[0] != 'U')
+	if (ul != 'U')
 		RMKMS(_("'%s' slot is lower (not upper) triangular"), "U");
 
 	SEXP p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
@@ -1690,9 +1631,8 @@ SEXP sparseLU_validate(SEXP obj)
 
 SEXP sparseCholesky_validate(SEXP obj)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
 	SEXP ordering = GET_SLOT(obj, Matrix_orderingSym);
@@ -1752,8 +1692,7 @@ SEXP simplicialCholesky_validate(SEXP obj)
 	if (pattern)
 		return Rf_ScalarLogical(1);
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
+	int n = DIM(obj)[1];
 	if (n == INT_MAX)
 		RMKMS(_("%s is not representable as \"%s\""), "Dim[2]+1", "integer");
 
@@ -1906,10 +1845,7 @@ SEXP simplicialCholesky_validate(SEXP obj)
 
 SEXP supernodalCholesky_validate(SEXP obj)
 {
-	int pattern = !HAS_SLOT(obj, Matrix_minorSym);
-
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
+	int pattern = !HAS_SLOT(obj, Matrix_minorSym), n = DIM(obj)[1];
 
 	if (!pattern) {
 	SEXP minor = GET_SLOT(obj, Matrix_minorSym);

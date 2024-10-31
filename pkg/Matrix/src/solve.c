@@ -33,13 +33,11 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 {
 
 #define SOLVE_START \
-	SEXP adim = GET_SLOT(s_a, Matrix_DimSym); \
-	int *padim = INTEGER(adim), m = padim[0], n = padim[1]; \
+	int *padim = DIM(s_a), m = padim[0], n = padim[1]; \
 	if (m != n) \
 		Rf_error(_("'%s' is not square"), "a"); \
 	if (s_b != R_NilValue) { \
-	SEXP bdim = GET_SLOT(s_b, Matrix_DimSym); \
-	int *pbdim = INTEGER(bdim); \
+	int *pbdim = DIM(s_b); \
 	if (pbdim[0] != m) \
 		Rf_error(_("dimensions of '%s' and '%s' are inconsistent"), \
 		         "a", "b"); \
@@ -47,12 +45,12 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 	}
 
 #define SOLVE_FINISH \
-	SEXP rdimnames = PROTECT(GET_SLOT(r, Matrix_DimNamesSym)), \
-		adimnames = PROTECT(GET_SLOT(s_a, Matrix_DimNamesSym)); \
+	SEXP rdimnames = PROTECT(DIMNAMES(r, 0)), \
+		adimnames = PROTECT(DIMNAMES(s_a, 0)); \
 	if (s_b == R_NilValue) \
-		revDN(rdimnames, adimnames); \
+		cpyDN(rdimnames, adimnames, 1); \
 	else { \
-		SEXP bdimnames = PROTECT(GET_SLOT(s_b, Matrix_DimNamesSym)); \
+		SEXP bdimnames = PROTECT(DIMNAMES(s_b, 0)); \
 		solveDN(rdimnames, adimnames, bdimnames); \
 		UNPROTECT(1); /* bdimnames */ \
 	} \
@@ -66,10 +64,7 @@ SEXP denseLU_solve(SEXP s_a, SEXP s_b)
 	rcl[0] = (TYPEOF(ax) == CPLXSXP) ? 'z' : 'd';
 	SEXP r = PROTECT(newObject(rcl));
 
-	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
+	SET_DIM(r, m, n);
 
 	if (m > 0) {
 		SEXP apivot = PROTECT(GET_SLOT(s_a, Matrix_permSym)), rx;
@@ -142,29 +137,15 @@ SEXP denseBunchKaufman_solve(SEXP s_a, SEXP s_b)
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
-	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
+	SET_DIM(r, m, n);
 
-	SEXP auplo = GET_SLOT(s_a, Matrix_uploSym);
-	char aul = CHAR(STRING_ELT(auplo, 0))[0];
-	if (s_b == R_NilValue && aul != 'U') {
-		PROTECT(auplo);
-		SET_SLOT(r, Matrix_uploSym, auplo);
-		UNPROTECT(1); /* auplo */
-	}
+	char aul = UPLO(s_a);
+	if (s_b == R_NilValue && aul != 'U')
+		SET_UPLO(r);
 
-	char act = 'C';
-	if (TYPEOF(ax) == CPLXSXP) {
-	SEXP atrans = GET_SLOT(s_a, Matrix_transSym);
-	act = CHAR(STRING_ELT(atrans, 0))[0];
-	if (s_b == R_NilValue && act != 'C') {
-		PROTECT(atrans);
-		SET_SLOT(r, Matrix_transSym, atrans);
-		UNPROTECT(1); /* atrans */
-	}
-	}
+	char act = (TYPEOF(ax) == CPLXSXP) ? TRANS(s_a) : 'C';
+	if (s_b == R_NilValue && act != 'C')
+		SET_TRANS(r);
 
 	if (m > 0) {
 		SEXP apivot = PROTECT(GET_SLOT(s_a, Matrix_permSym)), rx;
@@ -274,18 +255,11 @@ SEXP denseCholesky_solve(SEXP s_a, SEXP s_b)
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
-	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
+	SET_DIM(r, m, n);
 
-	SEXP auplo = GET_SLOT(s_a, Matrix_uploSym);
-	char aul = CHAR(STRING_ELT(auplo, 0))[0];
-	if (s_b == R_NilValue && aul != 'U') {
-		PROTECT(auplo);
-		SET_SLOT(r, Matrix_uploSym, auplo);
-		UNPROTECT(1); /* auplo */
-	}
+	char aul = UPLO(s_a);;
+	if (s_b == R_NilValue && aul != 'U')
+		SET_UPLO(r);
 
 	if (m > 0) {
 		SEXP rx, aperm = PROTECT(Rf_getAttrib(s_a, Matrix_permSym));
@@ -381,26 +355,15 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 	}
 	SEXP r = PROTECT(newObject(rcl));
 
-	SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-	int *prdim = INTEGER(rdim);
-	prdim[0] = m;
-	prdim[1] = n;
+	SET_DIM(r, m, n);
 
-	SEXP auplo = GET_SLOT(s_a, Matrix_uploSym);
-	char aul = CHAR(STRING_ELT(auplo, 0))[0];
-	if (s_b == R_NilValue && aul != 'U') {
-		PROTECT(auplo);
-		SET_SLOT(r, Matrix_uploSym, auplo);
-		UNPROTECT(1); /* auplo */
-	}
+	char aul = UPLO(s_a);
+	if (s_b == R_NilValue && aul != 'U')
+		SET_UPLO(r);
 
-	SEXP adiag = GET_SLOT(s_a, Matrix_diagSym);
-	char adi = CHAR(STRING_ELT(adiag, 0))[0];
-	if (s_b == R_NilValue && adi != 'N') {
-		PROTECT(adiag);
-		SET_SLOT(r, Matrix_diagSym, adiag);
-		UNPROTECT(1); /* adiag */
-	}
+	char anu = DIAG(s_a);
+	if (s_b == R_NilValue && anu != 'N')
+		SET_DIAG(r);
 
 	if (m > 0) {
 		SEXP rx;
@@ -410,21 +373,21 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
 			if (!packed) {
-				F77_CALL(ztrtri)(&aul, &adi, &m, COMPLEX(rx), &m,
+				F77_CALL(ztrtri)(&aul, &anu, &m, COMPLEX(rx), &m,
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(ztrtri, info, 2, A);
 			} else {
-				F77_CALL(ztptri)(&aul, &adi, &m, COMPLEX(rx),
+				F77_CALL(ztptri)(&aul, &anu, &m, COMPLEX(rx),
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(ztptri, info, 2, A);
 			}
 			} else {
 			if (!packed) {
-				F77_CALL(dtrtri)(&aul, &adi, &m,    REAL(rx), &m,
+				F77_CALL(dtrtri)(&aul, &anu, &m,    REAL(rx), &m,
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(dtrtri, info, 2, A);
 			} else {
-				F77_CALL(dtptri)(&aul, &adi, &m,    REAL(rx),
+				F77_CALL(dtptri)(&aul, &anu, &m,    REAL(rx),
 				                 &info FCONE FCONE);
 				ERROR_LAPACK_2(dtptri, info, 2, A);
 			}
@@ -436,21 +399,21 @@ SEXP trMatrix_solve(SEXP s_a, SEXP s_b)
 			PROTECT(rx);
 			if (TYPEOF(ax) == CPLXSXP) {
 			if (!packed) {
-				F77_CALL(ztrtrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax), &m,
+				F77_CALL(ztrtrs)(&aul, "N", &anu, &m, &n, COMPLEX(ax), &m,
 				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(ztrtrs, info);
 			} else {
-				F77_CALL(ztptrs)(&aul, "N", &adi, &m, &n, COMPLEX(ax),
+				F77_CALL(ztptrs)(&aul, "N", &anu, &m, &n, COMPLEX(ax),
 				                 COMPLEX(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(ztptrs, info);
 			}
 			} else {
 			if (!packed) {
-				F77_CALL(dtrtrs)(&aul, "N", &adi, &m, &n,    REAL(ax), &m,
+				F77_CALL(dtrtrs)(&aul, "N", &anu, &m, &n,    REAL(ax), &m,
 				                    REAL(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(dtrtrs, info);
 			} else {
-				F77_CALL(dtptrs)(&aul, "N", &adi, &m, &n,    REAL(ax),
+				F77_CALL(dtptrs)(&aul, "N", &anu, &m, &n,    REAL(ax),
 				                    REAL(rx), &m, &info FCONE FCONE FCONE);
 				ERROR_LAPACK_1(dtptrs, info);
 			}
@@ -487,10 +450,7 @@ SEXP sparseLU_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		char rcl[] = ".geMatrix";
 		rcl[0] = (L->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 		PROTECT(r = newObject(rcl));
-		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-		int *prdim = INTEGER(rdim);
-		prdim[0] = m;
-		prdim[1] = n;
+		SET_DIM(r, m, n);
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP rx = PROTECT(Rf_allocVector((L->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (s_b == R_NilValue) {
@@ -741,11 +701,8 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse, SEXP s_system)
 		}
 		cholmod_free_sparse(&X, &c);
 	}
-	if (s_b == R_NilValue && (ivalid == 2 || ivalid == 4)) {
-		SEXP uplo = PROTECT(Rf_mkString("L"));
-		SET_SLOT(r, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
+	if (s_b == R_NilValue && (ivalid == 2 || ivalid == 4))
+		SET_UPLO(r);
 
 	SOLVE_FINISH;
 
@@ -757,8 +714,8 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 {
 	SOLVE_START;
 
-	SEXP r, auplo = PROTECT(GET_SLOT(s_a, Matrix_uploSym));
-	char aul = CHAR(STRING_ELT(auplo, 0))[0];
+	SEXP r;
+	char aul = UPLO(s_a);
 	int i, j;
 	Matrix_cs *A = M2CXS(s_a, 1);
 	CXSPARSE_XTYPE_SET(A->xtype);
@@ -771,10 +728,7 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		rcl[1] = (s_b == R_NilValue) ? 't' : 'g';
 		rcl[2] = (s_b == R_NilValue) ? 'r' : 'e';
 		PROTECT(r = newObject(rcl));
-		SEXP rdim = GET_SLOT(r, Matrix_DimSym);
-		int *prdim = INTEGER(rdim);
-		prdim[0] = m;
-		prdim[1] = n;
+		SET_DIM(r, m, n);
 		R_xlen_t mn = (R_xlen_t) m * n;
 		SEXP rx = PROTECT(Rf_allocVector((A->xtype == CXSPARSE_COMPLEX) ? CPLXSXP : REALSXP, mn));
 		if (s_b == R_NilValue) {
@@ -866,12 +820,12 @@ SEXP tCMatrix_solve(SEXP s_a, SEXP s_b, SEXP s_sparse)
 		PROTECT(r = CXS2M(B, 1, (s_b == R_NilValue) ? 't' : 'g'));
 		B = Matrix_cs_spfree(B);
 	}
-	if (s_b == R_NilValue)
-		SET_SLOT(r, Matrix_uploSym, auplo);
+	if (s_b == R_NilValue && aul != 'U')
+		SET_UPLO(r);
 
 	SOLVE_FINISH;
 
-	UNPROTECT(2); /* r, auplo */
+	UNPROTECT(1); /* r */
 	return r;
 }
 
@@ -927,8 +881,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 #undef EYE
 
 	} else {
-		SEXP ydim = GET_SLOT(s_y, Matrix_DimSym);
-		int *pydim = INTEGER(ydim);
+		int *pydim = DIM(s_y);
 		if (pydim[0] != m)
 			Rf_error(_("dimensions of '%s' and '%s' are inconsistent"),
 			         "qr", "y");
@@ -941,8 +894,7 @@ SEXP sparseQR_matmult(SEXP s_qr, SEXP s_y, SEXP s_op,
 	acl[0] = (V_->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP a = PROTECT(newObject(acl));
 
-	SEXP adim = GET_SLOT(a, Matrix_DimSym);
-	int *padim = INTEGER(adim);
+	int *padim = DIM(a);
 	padim[0] = (op != 0) ? m : r;
 	padim[1] = n;
 

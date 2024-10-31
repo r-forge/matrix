@@ -29,22 +29,22 @@ int DimNames_is_symmetric(SEXP dn)
 		    strcmp(nrn, ncn) != 0)));
 }
 
-SEXP R_DimNames_is_symmetric(SEXP s_dn)
+SEXP R_DimNames_is_symmetric(SEXP dn)
 {
-	return Rf_ScalarLogical(DimNames_is_symmetric(s_dn));
+	return Rf_ScalarLogical(DimNames_is_symmetric(dn));
 }
 
 void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 {
+	J = (J < 0) ? -1 : (J != 0);
 	SEXP s;
 	if (J < 0) {
 		if ((s = VECTOR_ELT(src, J = 1)) != R_NilValue ||
 		    (s = VECTOR_ELT(src, J = 0)) != R_NilValue) {
 			SET_VECTOR_ELT(dest, 0, s);
 			SET_VECTOR_ELT(dest, 1, s);
-		} else {
+		} else
 			J = 1;
-		}
 	} else {
 		if ((s = VECTOR_ELT(src, J)) != R_NilValue) {
 			SET_VECTOR_ELT(dest, 0, s);
@@ -65,19 +65,31 @@ void symDN(SEXP dest, SEXP src, int J /* -1|0|1 */)
 	return;
 }
 
-void revDN(SEXP dest, SEXP src) {
+SEXP R_symDN(SEXP dn)
+{
+	if (DimNames_is_trivial(dn))
+		return dn;
+	SEXP value = PROTECT(Rf_allocVector(VECSXP, 2));
+	symDN(value, dn, -1);
+	UNPROTECT(1);
+	return value;
+}
+
+void cpyDN(SEXP dest, SEXP src, int J /* 0|1 */)
+{
+	J = J != 0;
 	SEXP s;
 	if ((s = VECTOR_ELT(src, 0)) != R_NilValue)
-		SET_VECTOR_ELT(dest, 1, s);
+		SET_VECTOR_ELT(dest,  J, s);
 	if ((s = VECTOR_ELT(src, 1)) != R_NilValue)
-		SET_VECTOR_ELT(dest, 0, s);
+		SET_VECTOR_ELT(dest, !J, s);
 	PROTECT(s = Rf_getAttrib(src, R_NamesSymbol));
 	if (s != R_NilValue) {
 		SEXP srcnms = s, destnms = PROTECT(Rf_allocVector(STRSXP, 2));
 		if (CHAR(s = STRING_ELT(srcnms, 0))[0] != '\0')
-			SET_STRING_ELT(destnms, 1, s);
+			SET_STRING_ELT(destnms,  J, s);
 		if (CHAR(s = STRING_ELT(srcnms, 1))[0] != '\0')
-			SET_STRING_ELT(destnms, 0, s);
+			SET_STRING_ELT(destnms, !J, s);
 		Rf_setAttrib(dest, R_NamesSymbol, destnms);
 		UNPROTECT(1);
 	}
@@ -85,67 +97,37 @@ void revDN(SEXP dest, SEXP src) {
 	return;
 }
 
-SEXP R_symDN(SEXP s_dn)
+SEXP (DIMNAMES)(SEXP obj, int mode)
 {
-	if (DimNames_is_trivial(s_dn))
-		return s_dn;
-	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-	symDN(newdn, s_dn, -1);
-	UNPROTECT(1);
-	return newdn;
+	SEXP dn = GET_SLOT(obj, Matrix_DimNamesSym);
+	if (mode != 0) {
+		PROTECT(dn);
+		if (!DimNames_is_trivial(dn)) {
+			SEXP value = PROTECT(Rf_allocVector(VECSXP, 2));
+			if (mode < 0)
+				symDN(value, dn, mode);
+			else
+				cpyDN(value, dn, mode);
+			UNPROTECT(1);
+			dn = value;
+		}
+		UNPROTECT(1);
+	}
+	return dn;
 }
 
-SEXP R_revDN(SEXP s_dn)
+void (SET_DIMNAMES)(SEXP obj, int mode, SEXP value)
 {
-	if (DimNames_is_trivial(s_dn))
-		return s_dn;
-	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-	revDN(newdn, s_dn);
+	PROTECT(value);
+	if (!DimNames_is_trivial(value)) {
+		SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
+		if (mode < 0)
+			symDN(dn, value, mode);
+		else
+			cpyDN(dn, value, mode);
+		UNPROTECT(1);
+	}
 	UNPROTECT(1);
-	return newdn;
-}
-
-SEXP get_symmetrized_DimNames(SEXP obj, int J) {
-	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	if (DimNames_is_trivial(dn)) {
-		UNPROTECT(1);
-		return dn;
-	}
-	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-	symDN(newdn, dn, J);
-	UNPROTECT(2);
-	return newdn;
-}
-
-SEXP get_reversed_DimNames(SEXP obj) {
-	SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	if (DimNames_is_trivial(dn)) {
-		UNPROTECT(1);
-		return dn;
-	}
-	SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-	revDN(newdn, dn);
-	UNPROTECT(2);
-	return newdn;
-}
-
-void set_symmetrized_DimNames(SEXP obj, SEXP dn, int J) {
-	if (!DimNames_is_trivial(dn)) {
-		SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-		symDN(newdn, dn, J);
-		SET_SLOT(obj, Matrix_DimNamesSym, newdn);
-		UNPROTECT(1);
-	}
-	return;
-}
-
-void set_reversed_DimNames(SEXP obj, SEXP dn) {
-	if (!DimNames_is_trivial(dn)) {
-		SEXP newdn = PROTECT(Rf_allocVector(VECSXP, 2));
-		revDN(newdn, dn);
-		SET_SLOT(obj, Matrix_DimNamesSym, newdn);
-		UNPROTECT(1);
-	}
 	return;
 }
 

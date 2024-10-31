@@ -15,15 +15,11 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		Rf_error(_("number of triplets to be aggregated exceeds %s"),
 		         "2^31-1");
 	PROTECT(i0);
-	int *pi0 = INTEGER(i0), nnz = (int) XLENGTH(i0), nnz_ = nnz;
-
-	SEXP to;
-
-	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-
-	SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), i1, j1;
-	int *pj0 = INTEGER(j0), *pi1 = NULL, *pj1 = NULL, *iwork = NULL;
+	SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), i1, j1, to;
+	int *pi0 = INTEGER(i0), *pi1 = NULL,
+		*pj0 = INTEGER(j0), *pj1 = NULL,
+		*pdim = DIM(from), m = pdim[0], n = pdim[1],
+		nnz = (int) XLENGTH(i0), nnz_ = nnz, *iwork = NULL;
 	size_t liwork = (size_t) ((int_fast64_t) n + 1 + n + m + nnz),
 		lwork = (size_t) nnz;
 	Matrix_Calloc(iwork, liwork, int);
@@ -73,43 +69,16 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		return from;
 
 	PROTECT(to);
-
-	dim = GET_SLOT(to, Matrix_DimSym);
-	pdim = INTEGER(dim);
-	pdim[0] = m;
-	pdim[1] = n;
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
-
-	if (class[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-	if (class[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char nu = CHAR(STRING_ELT(diag, 0))[0];
-		if (nu != 'N')
-			SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	} else {
-		SEXP factors = PROTECT(GET_SLOT(from, Matrix_factorsSym));
-		if (LENGTH(factors) > 0)
-			SET_SLOT(to, Matrix_factorsSym, factors);
-		UNPROTECT(1); /* factors */
-	}
-
+	SET_DIM(to, m, n);
+	SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
+	if (class[1] != 'g' && UPLO(from) != 'U')
+		SET_UPLO(to);
+	if (class[1] == 's' && class[0] == 'z' && TRANS(from) != 'C')
+		SET_TRANS(to);
+	if (class[1] == 't' && DIAG(from) != 'N')
+		SET_DIAG(to);
+	if (class[1] != 't')
+		COPY_SLOT(to, from, Matrix_factorsSym);
 	UNPROTECT(1); /* to */
 	return to;
 }
@@ -123,20 +92,14 @@ SEXP R_sparse_aggregate(SEXP s_from)
 
 SEXP sparse_drop0(SEXP from, const char *class, double tol)
 {
-	PROTECT(from = sparse_aggregate(from, class));
-
-	if (class[0] == 'n') {
-		UNPROTECT(1); /* from */
+	from = sparse_aggregate(from, class);
+	if (class[0] == 'n')
 		return from;
-	}
+	PROTECT(from);
 
-	SEXP trans = R_NilValue;
 	char ct = '\0';
-	if (class[1] == 's' && class[0] == 'z') {
-		trans = GET_SLOT(from, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	PROTECT(trans);
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(from);
 
 	SEXP to;
 	int strict = ISNAN(tol) || tol <= 0.0;
@@ -150,7 +113,8 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 			i0 = PROTECT(GET_SLOT(from,        iSym)),
 			x0 = PROTECT(GET_SLOT(from, Matrix_xSym));
 		int *pp0 = INTEGER(p0), *pi0 = INTEGER(i0),
-			n = (int) (XLENGTH(p0) - 1), j, k, kend, nnz0 = pp0[n], nnz1 = 0;
+			n = (int) (XLENGTH(p0) - 1), j, k, kend,
+			nnz0 = pp0[n], nnz1 = 0;
 		pp0++;
 
 		if (ct != 'C') {
@@ -182,7 +146,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 		}
 
 		if (nnz1 == nnz0) {
-			UNPROTECT(5); /* x0, i0, p0, trans, from */
+			UNPROTECT(4); /* x0, i0, p0, from */
 			return from;
 		}
 
@@ -270,7 +234,7 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 		}
 
 		if (nnz1 == nnz0) {
-			UNPROTECT(5); /* x0, j0, i0, trans, from */
+			UNPROTECT(4); /* x0, j0, i0, from */
 			return from;
 		}
 
@@ -318,37 +282,16 @@ SEXP sparse_drop0(SEXP from, const char *class, double tol)
 	}
 
 	PROTECT(to);
-
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	if (m != n || n > 0)
-		SET_SLOT(to, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
-
-	if (class[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		if (ct != 'C')
-			SET_SLOT(to, Matrix_transSym, trans);
-	}
-	if (class[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char nu = CHAR(STRING_ELT(diag, 0))[0];
-		if (nu != 'N')
-			SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	}
-
-	UNPROTECT(3); /* to, trans, from */
+	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
+	SET_DIM(to, m, n);
+	SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
+	if (class[1] != 'g' && UPLO(from) != 'U')
+		SET_UPLO(to);
+	if (class[1] == 's' && class[0] == 'z' && ct != 'C')
+		SET_TRANS(to);
+	if (class[1] == 't' && DIAG(from) != 'N')
+		SET_DIAG(to);
+	UNPROTECT(2); /* to, from */
 	return to;
 }
 
@@ -367,19 +310,12 @@ SEXP R_sparse_drop0(SEXP s_from, SEXP s_tol)
 
 SEXP sparse_diag_U2N(SEXP from, const char *class)
 {
-	if (class[1] != 't')
+	if (class[1] != 't' || DIAG(from) == 'N')
 		return from;
-
-	SEXP diag = GET_SLOT(from, Matrix_diagSym);
-	char nu = CHAR(STRING_ELT(diag, 0))[0];
-	if (nu == 'N')
-		return from;
-
-	SEXP value = PROTECT(Rf_ScalarLogical(1));
-	from = R_sparse_diag_set(from, value);
+	SEXP value = PROTECT(Rf_ScalarLogical(1)),
+		to = R_sparse_diag_set(from, value);
 	UNPROTECT(1); /* value */
-
-	return from;
+	return to;
 }
 
 /* diagU2N(<[CRT]sparseMatrix>) */
@@ -391,33 +327,21 @@ SEXP R_sparse_diag_U2N(SEXP s_from)
 
 SEXP sparse_diag_N2U(SEXP from, const char *class)
 {
-	if (class[1] != 't')
+	if (class[1] != 't' || DIAG(from) != 'N')
 		return from;
-
-	SEXP diag = GET_SLOT(from, Matrix_diagSym);
-	char nu = CHAR(STRING_ELT(diag, 0))[0];
-	if (nu != 'N')
-		return from;
-	PROTECT(diag = Rf_mkString("U"));
-
-	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int n = INTEGER(dim)[0];
-
-	SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
-
+	SEXP to;
+	int n = DIM(from)[1];
 	if (n == 0) {
-		PROTECT(from = newObject(class));
-		if (ul != 'U')
-			SET_SLOT(from, Matrix_DimSym, uplo);
+		PROTECT(to = newObject(class));
+		if (UPLO(from) != 'U')
+			SET_UPLO(to);
 	}
-	else if (ul == 'U')
-		PROTECT(from = sparse_band(from, class,  1,  n));
+	else if (UPLO(from) == 'U')
+		PROTECT(to = sparse_band(from, class,  1,  n));
 	else
-		PROTECT(from = sparse_band(from, class, -n, -1));
-	SET_SLOT(from, Matrix_diagSym, diag);
-
-	UNPROTECT(3); /* from, uplo, diag */
+		PROTECT(to = sparse_band(from, class, -n, -1));
+	SET_DIAG(to);
+	UNPROTECT(1); /* to */
 	return from;
 }
 
@@ -430,8 +354,7 @@ SEXP R_sparse_diag_N2U(SEXP s_from)
 
 SEXP sparse_band(SEXP from, const char *class, int a, int b)
 {
-	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
 
 	/* Need tri[ul](<0-by-0>) and tri[ul](<1-by-1>) to be triangularMatrix */
 	if ((m == 0 || n == 0 || (a <= 1 - m && b >= n - 1)) &&
@@ -444,20 +367,15 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 	ge = !tr && !sy;
 
 	char ul0 = '\0', ct0 = '\0', nu0 = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		ul0 = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct0 = CHAR(STRING_ELT(trans, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul0 = UPLO(from);
+	if (class[1] == 's' && class[0] == 'z')
+		ct0 = TRANS(from);
 	if (class[1] == 't') {
 		/* Be fast if band contains entire triangle */
 		if ((ul0 == 'U') ? (a <= 0 && b >= n - 1) : (a <= 1 - m && b >= 0))
 			return from;
-		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		nu0 = CHAR(STRING_ELT(diag, 0))[0];
+		nu0 = DIAG(from);
 	}
 
 	char cl[] = "...Matrix";
@@ -466,34 +384,16 @@ SEXP sparse_band(SEXP from, const char *class, int a, int b)
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
-	dim = GET_SLOT(to, Matrix_DimSym);
-	pdim = INTEGER(dim);
-	pdim[0] = m;
-	pdim[1] = n;
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's' && !sy)
-		set_symmetrized_DimNames(to, dimnames, -1);
-	else
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
+	SET_DIM(to, m, n);
+	SET_DIMNAMES(to, -(class[1] == 's' && !sy), DIMNAMES(from, 0));
 
 	char ul1 = (tr && class[1] != 't') ? ((a >= 0) ? 'U' : 'L') : ul0;
-	if (ul1 != '\0' && ul1 != 'U') {
-		SEXP uplo = PROTECT(Rf_mkString("L"));
-		SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (ct0 != '\0' && ct0 != 'C' && sy) {
-		SEXP trans = PROTECT(Rf_mkString("T"));
-		SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-	if (nu0 != '\0' && nu0 != 'N' && tr && a <= 0 && b >= 0) {
-		SEXP diag = PROTECT(Rf_mkString("U"));
-		SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	}
+	if (ul1 != '\0' && ul1 != 'U')
+		SET_UPLO(to);
+	if (ct0 != '\0' && ct0 != 'C' && sy)
+		SET_TRANS(to);
+	if (nu0 != '\0' && nu0 != 'N' && tr && a <= 0 && b >= 0)
+		SET_DIAG(to);
 
 	int d;
 
@@ -715,10 +615,7 @@ SEXP R_sparse_band(SEXP s_from, SEXP s_a, SEXP s_b)
 {
 	const char *class = Matrix_class(s_from, valid_sparse, 6, __func__);
 
-	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-
-	int a, b;
+	int *pdim = DIM(s_from), m = pdim[0], n = pdim[1], a, b;
 	if (s_a == R_NilValue)
 		a = -m;
 	else if ((a = Rf_asInteger(s_a)) == NA_INTEGER || a < -m || a > n)
@@ -738,22 +635,16 @@ SEXP R_sparse_band(SEXP s_from, SEXP s_a, SEXP s_b)
 
 SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1],
+		r = (m < n) ? m : n;
 
 	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul = UPLO(obj);
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(obj);
+	if (class[1] == 't')
+		nu = DIAG(obj);
 
 	SEXP ans;
 
@@ -848,7 +739,7 @@ SEXP sparse_diag_get(SEXP obj, const char *class, int names)
 		/* NB: The logic here must be adjusted once the validity method
 		   for 'symmetricMatrix' enforces symmetric 'Dimnames'
 		*/
-		SEXP dn = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
+		SEXP dn = PROTECT(DIMNAMES(obj, 0)),
 			rn = VECTOR_ELT(dn, 0),
 			cn = VECTOR_ELT(dn, 1);
 		if (cn == R_NilValue) {
@@ -883,35 +774,18 @@ SEXP sparse_diag_set(SEXP from, const char *class, SEXP value)
 {
 	SEXP to = PROTECT(newObject(class));
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-	if (m != n || n > 0)
-		SET_SLOT(to, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
+	int *pdim = DIM(from), m = pdim[0], n = pdim[1],
+		r = (m < n) ? m : n;
+	SET_DIM(to, m, n);
+	SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
 
 	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g' && (ul = UPLO(from)) != 'U')
+		SET_UPLO(to);
+	if (class[1] == 's' && class[0] == 'z' && (ct = TRANS(from)) != 'C')
+		SET_TRANS(to);
+	if (class[1] == 't' && (nu = DIAG(from)) != 'N')
+		;
 
 	int mode = 0;
 
@@ -1151,22 +1025,19 @@ SEXP R_sparse_diag_set(SEXP s_from, SEXP s_value)
 		break;
 	}
 
-	SEXP dim = GET_SLOT(s_from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	int *pdim = DIM(s_from), m = pdim[0], n = pdim[1],
+		r = (m < n) ? m : n;
 	if (XLENGTH(s_value) != 1 && XLENGTH(s_value) != r)
 		Rf_error(_("replacement diagonal has wrong length"));
 
 	if (tv <= tx) {
 		/* defined in ./coerce.c : */
 		SEXP sparse_as_general(SEXP, const char *);
-		if (class[1] == 's' && class[0] == 'z' && tv == tx) {
-			SEXP trans = GET_SLOT(s_from, Matrix_transSym);
-			int ct = CHAR(STRING_ELT(trans, 0))[0];
-			if (ct == 'C') {
-				PROTECT(s_from = sparse_as_general(s_from, class));
-				class = Matrix_class(s_from, valid_sparse, 6, __func__);
-				UNPROTECT(1); /* s_from */
-			}
+		if (class[1] == 's' && class[0] == 'z' && tv == tx &&
+		    TRANS(s_from) == 'C') {
+			PROTECT(s_from = sparse_as_general(s_from, class));
+			class = Matrix_class(s_from, valid_sparse, 6, __func__);
+			UNPROTECT(1); /* s_from */
 		}
 		PROTECT(s_from);
 		PROTECT(s_value = Rf_coerceVector(s_value, tx));
@@ -1208,43 +1079,15 @@ SEXP sparse_transpose(SEXP from, const char *class, char op_ct, int lazy)
 		PROTECT(to = newObject(cl));
 	}
 
-	SEXP dim = GET_SLOT(from, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
-	dim = GET_SLOT(to, Matrix_DimSym);
-	pdim = INTEGER(dim);
-	pdim[0] = n;
-	pdim[1] = m;
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's' || class[1] == 'p')
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	else
-		set_reversed_DimNames(to, dimnames);
-	UNPROTECT(1); /* dimnames */
-
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul == 'U') {
-			PROTECT(uplo = Rf_mkString("L"));
-			SET_SLOT(to, Matrix_uploSym, uplo);
-			UNPROTECT(1); /* uplo */
-		}
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-	if (class[1] == 't') {
-		SEXP diag = PROTECT(GET_SLOT(from, Matrix_diagSym));
-		char nu = CHAR(STRING_ELT(diag, 0))[0];
-		if (nu != 'N')
-			SET_SLOT(to, Matrix_diagSym, diag);
-		UNPROTECT(1); /* diag */
-	}
+	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
+	SET_DIM(to, n, m);
+	SET_DIMNAMES(to, class[1] != 's' && class[1] != 'p', DIMNAMES(from, 0));
+	if (class[1] != 'g' && UPLO(from) == 'U')
+		SET_UPLO(to);
+	if (class[1] == 's' && class[0] == 'z' && TRANS(from) != 'C')
+		SET_TRANS(to);
+	if (class[1] == 't' && DIAG(from) != 'N')
+		SET_DIAG(to);
 
 	if (class[2] != 'T') {
 
@@ -1360,18 +1203,12 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 		ul0 = '\0', ul1 = 'U',
 		ct0 = '\0', ct1 = (class[0] == 'z') ? 'C' : '\0',
 		nu0 = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(from, Matrix_uploSym);
-		ul0 = ul1 = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct0 = ct1 = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		nu0 = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul0 = ul1 = UPLO(from);
+	if (class[1] == 's' && class[0] == 'z')
+		ct0 = ct1 = TRANS(from);
+	if (class[1] == 't')
+		nu0 = DIAG(from);
 	if (op_ul != '\0')
 		ul1 = op_ul;
 	if (op_ct != '\0')
@@ -1385,31 +1222,15 @@ SEXP sparse_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(from), n = pdim[1];
+	if (pdim[0] != n)
 		Rf_error(_("attempt to symmetrize a non-square matrix"));
-	if (n > 0)
-		SET_SLOT(to, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's')
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	else
-		set_symmetrized_DimNames(to, dimnames, -1);
-	UNPROTECT(1); /* dimnames */
-
-	if (ul1 != 'U') {
-		SEXP uplo = PROTECT(Rf_mkString("L"));
-		SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (ct1 != 'C' && ct1 != '\0') {
-		SEXP trans = PROTECT(Rf_mkString("T"));
-		SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
+	SET_DIM(to, n, n);
+	SET_DIMNAMES(to, -(class[1] != 's'), DIMNAMES(from, 0));
+	if (ul1 != 'U')
+		SET_UPLO(to);
+	if (ct1 != 'C' && ct1 != '\0')
+		SET_TRANS(to);
 
 	int up = (class[0] != 'R') == (ul1 == 'U');
 
@@ -1715,10 +1536,8 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 		op_ct = '\0';
 
 	char ct = '\0';
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(from, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(from);
 
 	if (class[1] == 's' && op_ct == ct) {
 		UNPROTECT(1); /* from */
@@ -1730,46 +1549,24 @@ SEXP sparse_symmpart(SEXP from, const char *class, char op_ul, char op_ct)
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(from), n = pdim[1];
+	if (pdim[0] != n)
 		Rf_error((op_ct == 'C')
 		         ? _("attempt to get Hermitian part of non-square matrix")
 		         : _("attempt to get symmetric part of non-square matrix"));
-	if (n > 0)
-		SET_SLOT(to, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's')
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	else
-		set_symmetrized_DimNames(to, dimnames, -1);
-	UNPROTECT(1); /* dimnames */
+	SET_DIM(to, n, n);
+	SET_DIMNAMES(to, -(class[1] != 's'), DIMNAMES(from, 0));
 
 	char ul = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(from, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g' && (ul = UPLO(from)) != 'U')
+		SET_UPLO(to);
+	if (class[1] == 't' && (nu = DIAG(from)) != 'N')
+		;
 
-	if (op_ul != '\0' && op_ul != 'U') {
-		SEXP uplo = PROTECT(Rf_mkString("L"));
-		SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (op_ct != '\0' && op_ct != 'C') {
-		SEXP trans = PROTECT(Rf_mkString("T"));
-		SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
+	if (op_ul != '\0' && op_ul != 'U')
+		SET_UPLO(to);
+	if (op_ct != '\0' && op_ct != 'C')
+		SET_TRANS(to);
 
 	int up = (class[0] != 'R') == (op_ul == 'U' || ul == 'U');
 
@@ -2211,38 +2008,19 @@ SEXP sparse_skewpart(SEXP from, const char *class, char op_ct)
 	cl[2] = class[2];
 	SEXP to = PROTECT(newObject(cl));
 
-	SEXP dim = PROTECT(GET_SLOT(from, Matrix_DimSym));
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(from), n = pdim[1];
+	if (pdim[0] != n)
 		Rf_error((op_ct == 'C')
 		         ? _("attempt to get skew-Hermitian part of non-square matrix")
 		         : _("attempt to get skew-symmetric part of non-square matrix"));
-	if (n > 0)
-		SET_SLOT(to, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(from, Matrix_DimNamesSym));
-	if (class[1] == 's')
-		SET_SLOT(to, Matrix_DimNamesSym, dimnames);
-	else
-		set_symmetrized_DimNames(to, dimnames, -1);
-	UNPROTECT(1); /* dimnames */
+	SET_DIM(to, n, n);
+	SET_DIMNAMES(to, -(class[1] != 's'), DIMNAMES(from, 0));
 
 	char ul = '\0', ct = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = PROTECT(GET_SLOT(from, Matrix_uploSym));
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-		if (ul != 'U' && class[1] == 's')
-			SET_SLOT(to, Matrix_uploSym, uplo);
-		UNPROTECT(1); /* uplo */
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = PROTECT(GET_SLOT(from, Matrix_transSym));
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(to, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
+	if (class[1] != 'g' && (ul = UPLO(from)) != 'U' && class[1] == 's')
+		SET_UPLO(to);
+	if (class[1] == 's' && class[0] == 'z' && (ct = TRANS(from)) != 'C')
+		SET_TRANS(to);
 
 	if (class[1] == 's' && op_ct == ct) {
 		if (class[2] != 'T') {
@@ -2554,32 +2332,26 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 	if (class[1] == 's') {
 		if (class[0] != 'z')
 			return 1;
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
+		ct = TRANS(obj);
 		if (op_ct == ct)
 			return 1;
 		checkDN = 0;
 	}
 
-	if (checkDN) {
-		SEXP dimnames = GET_SLOT(obj, Matrix_DimNamesSym);
-		if (!DimNames_is_symmetric(dimnames))
-			return 0;
-	}
+	if (checkDN && !DimNames_is_symmetric(DIMNAMES(obj, 0)))
+		return 0;
 
 	char nu = '\0';
 	if (class[1] == 't') {
 		if (!sparse_is_diagonal(obj, class))
 			return 0;
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
+		nu = DIAG(obj);
 		if (nu != 'N' || op_ct != 'C')
 			return 1;
 	}
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		return 0;
 	if (n == 0 || (n == 1 && op_ct != 'C'))
 		return 1;
@@ -2603,7 +2375,8 @@ int sparse_is_symmetric(SEXP obj, const char *class,
 	SEXP iSym = (class[2] != 'R') ? Matrix_iSym : Matrix_jSym,
 		p_ = PROTECT(GET_SLOT(obj, Matrix_pSym)),
 		i_ = PROTECT(GET_SLOT(obj,        iSym));
-	int *pp = INTEGER(p_), *pi = INTEGER(i_), i, j, k, kend, *iwork = NULL;
+	int *pp = INTEGER(p_), *pi = INTEGER(i_), i, j, k, kend,
+		*iwork = NULL;
 	if (class[1] == 'g') {
 	Matrix_Calloc(iwork, n, int);
 	memcpy(iwork, pp, sizeof(int) * (size_t) n);
@@ -2736,8 +2509,7 @@ SEXP R_sparse_is_symmetric(SEXP s_obj,
 int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 {
 	if (class[1] == 't') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 		if (op_ul == '\0' || op_ul == ul)
 			return (   ul == 'U') ? 1 : -1;
 		else if (sparse_is_diagonal(obj, class))
@@ -2752,15 +2524,13 @@ int sparse_is_triangular(SEXP obj, const char *class, char op_ul)
 		else if (op_ul != '\0')
 			return (op_ul == 'U') ? 1 : -1;
 		else {
-			SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-			char ul = CHAR(STRING_ELT(uplo, 0))[0];
+			char ul = UPLO(obj);
 			return (   ul == 'U') ? 1 : -1;
 		}
 	}
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		return 0;
 	if (n <= 1)
 		return ((op_ul == '\0') ? class[2] != 'R' : op_ul == 'U') ? 1 : -1;
@@ -2871,9 +2641,8 @@ SEXP R_sparse_is_triangular(SEXP s_obj, SEXP s_upper)
 
 int sparse_is_diagonal(SEXP obj, const char *class)
 {
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), n = pdim[0];
-	if (pdim[1] != n)
+	int *pdim = DIM(obj), n = pdim[1];
+	if (pdim[0] != n)
 		return 0;
 	if (n <= 1)
 		return 1;
@@ -3302,8 +3071,8 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
 {
 	narm = narm && class[0] != 'n';
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (mg == 0) ? m : n;
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1],
+		r = (mg == 0) ? m : n;
 
 	SEXP ans;
 	SEXPTYPE type = SUM_TYPEOF(class[0]);
@@ -3317,9 +3086,7 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
 	} else {
 		PROTECT(ans = Rf_allocVector(type, r));
 
-		SEXP dimnames = (class[1] == 's')
-			? get_symmetrized_DimNames(obj, -1)
-			: GET_SLOT(obj, Matrix_DimNamesSym),
+		SEXP dimnames = DIMNAMES(obj, -(class[1] == 's')),
 			marnames = VECTOR_ELT(dimnames, mg);
 		if (marnames != R_NilValue) {
 			PROTECT(marnames);
@@ -3329,18 +3096,12 @@ SEXP sparse_marginsum(SEXP obj, const char *class, int mg, int narm, int mean,
 	}
 
 	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul = UPLO(obj);
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(obj);
+	if (class[1] == 't')
+		nu = DIAG(obj);
 
 	if (mg == 0)
 		switch (class[2]) {
@@ -3408,22 +3169,15 @@ SEXP sparse_sum(SEXP obj, const char *class, int narm)
 {
 	PROTECT(obj = sparse_aggregate(obj, class));
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
 	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul = UPLO(obj);
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(obj);
+	if (class[1] == 't')
+		nu = DIAG(obj);
 
 	SEXP x = PROTECT((class[0] == 'n') ? R_NilValue : GET_SLOT(obj, Matrix_xSym)),
 		ans = R_NilValue;
@@ -3669,22 +3423,15 @@ SEXP sparse_prod(SEXP obj, const char *class, int narm)
 {
 	PROTECT(obj = sparse_aggregate(obj, class));
 
-	SEXP dim = GET_SLOT(obj, Matrix_DimSym);
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
 	char ul = '\0', ct = '\0', nu = '\0';
-	if (class[1] != 'g') {
-		SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-		ul = CHAR(STRING_ELT(uplo, 0))[0];
-	}
-	if (class[1] == 's' && class[0] == 'z') {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-	}
-	if (class[1] == 't') {
-		SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-		nu = CHAR(STRING_ELT(diag, 0))[0];
-	}
+	if (class[1] != 'g')
+		ul = UPLO(obj);
+	if (class[1] == 's' && class[0] == 'z')
+		ct = TRANS(obj);
+	if (class[1] == 't')
+		nu = DIAG(obj);
 
 	SEXP x = PROTECT((class[0] == 'n') ? R_NilValue : GET_SLOT(obj, Matrix_xSym));
 	int sy = class[1] == 's', he = sy && ct == 'C',

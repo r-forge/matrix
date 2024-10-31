@@ -72,7 +72,54 @@ do { \
 #define GET_SLOT(x, name)        R_do_slot       ((x), (name))
 #define SET_SLOT(x, name, value) R_do_slot_assign((x), (name), (value))
 
-/* TYPEOF returns int, not SEXPTYPE (unsigned int) => -Wsign-conversion */
+#define COPY_SLOT(dest, src, name) \
+	do { \
+		SEXP value = GET_SLOT((src), (name)); \
+		if (XLENGTH(value) > 0) { \
+			PROTECT(value); \
+			SET_SLOT((dest), (name), value); \
+			UNPROTECT(1); \
+		} \
+	} while (0)
+
+#define     DIM(x) \
+	INTEGER(GET_SLOT((x), Matrix_DimSym))
+#define SET_DIM(x, m, n) \
+	do { \
+		int __m__ = (m), __n__ = (n); \
+		if (__m__ != __n__ || __n__ > 0) { \
+			int *p = INTEGER(GET_SLOT((x), Matrix_DimSym)); \
+			p[0] = (m); p[1] = (n); \
+		} \
+	} while (0)
+
+#define     DIMNAMES(x, mode) \
+	(DIMNAMES)((x), (mode))
+#define SET_DIMNAMES(x, mode, value) \
+	(SET_DIMNAMES)((x), (mode), (value))
+
+#define     UPLO(x) \
+	CHAR(STRING_ELT(GET_SLOT((x), Matrix_uploSym), 0))[0]
+#define SET_UPLO(x) \
+	SET_STRING_ELT(GET_SLOT((x), Matrix_uploSym), 0, Matrix_LChar)
+
+#define     TRANS(x) \
+	CHAR(STRING_ELT(GET_SLOT((x), Matrix_transSym), 0))[0]
+#define SET_TRANS(x) \
+	SET_STRING_ELT(GET_SLOT((x), Matrix_transSym), 0, Matrix_TChar)
+
+#define     DIAG(x) \
+	CHAR(STRING_ELT(GET_SLOT((x), Matrix_diagSym), 0))[0]
+#define SET_DIAG(x) \
+	SET_STRING_ELT(GET_SLOT((x), Matrix_diagSym), 0, Matrix_UChar)
+
+#define     MARGIN(x) \
+	(INTEGER(GET_SLOT((x), Matrix_marginSym))[0] - 1)
+#define SET_MARGIN(x, j) \
+	do { \
+		INTEGER(GET_SLOT((x), Matrix_marginSym))[0] = (j) + 1; \
+	} while (0)
+
 #define TYPEOF(s) \
 	((SEXPTYPE) (TYPEOF)((s)))
 
@@ -261,12 +308,9 @@ int DimNames_is_trivial(SEXP);
 int DimNames_is_symmetric(SEXP);
 
 void symDN(SEXP, SEXP, int);
-void revDN(SEXP, SEXP);
+void cpyDN(SEXP, SEXP, int);
 
-SEXP get_symmetrized_DimNames(SEXP, int);
-SEXP get_reversed_DimNames(SEXP);
-
-void set_symmetrized_DimNames(SEXP, SEXP, int);
-void set_reversed_DimNames(SEXP, SEXP);
+SEXP (DIMNAMES)(SEXP, int);
+void (SET_DIMNAMES)(SEXP, int, SEXP);
 
 #endif /* MATRIX_MDEFINES_H */

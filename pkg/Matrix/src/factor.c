@@ -13,17 +13,15 @@ void set_factor(SEXP, const char *, SEXP);
 static
 SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int *pdim = INTEGER(dim), n = pdim[1];
+	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		Rf_error(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP scf = PROTECT(newObject(cl));
-	SET_SLOT(scf, Matrix_DimSym, dim);
-	SET_SLOT(scf, Matrix_DimNamesSym, dimnames);
+	SET_DIM(scf, n, n);
+	SET_DIMNAMES(scf, 0, DIMNAMES(obj, 0));
 	if (n > 0) {
 		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
 			v = PROTECT(Rf_allocVector(TYPEOF(x), (vectors) ? XLENGTH(x) : 0)),
@@ -76,7 +74,7 @@ SEXP geMatrix_scf_(SEXP obj, int warn, int vectors)
 		SET_SLOT(scf, Matrix_valuesSym, w);
 		UNPROTECT(3); /* w, v, y */
 	}
-	UNPROTECT(4); /* scf, x, dimnames, dim */
+	UNPROTECT(2); /* scf, x */
 	return scf;
 }
 
@@ -84,32 +82,26 @@ static
 SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C') {
-			/* defined in ./coerce.c : */
-			SEXP dense_as_general(SEXP, const char *, int);
-			PROTECT(obj = dense_as_general(obj, "zsyMatrix", 1));
-			obj = geMatrix_scf_(obj, warn, vectors);
-			UNPROTECT(1);
-			return obj;
-		}
+	if (TYPEOF(x) == CPLXSXP && TRANS(obj) != 'C') {
+		/* defined in ./coerce.c : */
+		SEXP dense_as_general(SEXP, const char *, int);
+		obj = dense_as_general(obj, "zsyMatrix", 1);
+		PROTECT(obj);
+		obj = geMatrix_scf_(obj, warn, vectors);
+		UNPROTECT(1);
+		return obj;
 	}
 	PROTECT(x);
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	int n = INTEGER(dim)[1];
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP scf = PROTECT(newObject(cl));
-	SET_SLOT(scf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(scf, dimnames, -1);
+	int n = DIM(obj)[1];
+	SET_DIM(scf, n, n);
+	SET_DIMNAMES(scf, -1, DIMNAMES(obj, 0));
 	if (n > 0) {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-			v = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
+		SEXP v = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
 			w = PROTECT(Rf_allocVector(REALSXP, n));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 		int info, lwork = -1;
 		double *pw = REAL(w);
 		if (TYPEOF(x) == CPLXSXP) {
@@ -137,9 +129,9 @@ SEXP syMatrix_scf_(SEXP obj, int warn, int vectors)
 		if (vectors)
 		SET_SLOT(scf, Matrix_vectorsSym, v);
 		SET_SLOT(scf, Matrix_valuesSym, w);
-		UNPROTECT(3); /* w, v, uplo */
+		UNPROTECT(2); /* w, v */
 	}
-	UNPROTECT(4); /* scf, dimnames, dim, x */
+	UNPROTECT(2); /* scf, x */
 	return scf;
 }
 
@@ -147,33 +139,27 @@ static
 SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = GET_SLOT(obj, Matrix_transSym);
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C') {
-			/* defined in ./coerce.c : */
-			SEXP dense_as_general(SEXP, const char *, int);
-			PROTECT(obj = dense_as_general(obj, "zspMatrix", 1));
-			obj = geMatrix_scf_(obj, warn, vectors);
-			UNPROTECT(1);
-			return obj;
-		}
+	if (TYPEOF(x) == CPLXSXP && TRANS(obj) != 'C') {
+		/* defined in ./coerce.c : */
+		SEXP dense_as_general(SEXP, const char *, int);
+		obj = dense_as_general(obj, "zspMatrix", 1);
+		PROTECT(obj);
+		obj = geMatrix_scf_(obj, warn, vectors);
+		UNPROTECT(1);
+		return obj;
 	}
 	PROTECT(x);
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	int n = INTEGER(dim)[1];
 	char cl[] = ".denseSchur";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP scf = PROTECT(newObject(cl));
-	SET_SLOT(scf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(scf, dimnames, -1);
+	int n = DIM(obj)[1];
+	SET_DIM(scf, n, n);
+	SET_DIMNAMES(scf, -1, DIMNAMES(obj, 0));
 	if (n > 0) {
-		SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
+		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x))),
 			v = PROTECT(Rf_allocVector(TYPEOF(x), (vectors) ? (R_xlen_t) n * n : 0)),
 			w = PROTECT(Rf_allocVector(REALSXP, n));
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
+		char ul = UPLO(obj);
 		int info;
 		double *pw = REAL(w);
 		if (TYPEOF(x) == CPLXSXP) {
@@ -195,24 +181,22 @@ SEXP spMatrix_scf_(SEXP obj, int warn, int vectors)
 		if (vectors)
 		SET_SLOT(scf, Matrix_vectorsSym, v);
 		SET_SLOT(scf, Matrix_valuesSym, w);
-		UNPROTECT(4); /* w, v, y, uplo */
+		UNPROTECT(3); /* w, v, y */
 	}
-	UNPROTECT(4); /* scf, dimnames, dim, x */
+	UNPROTECT(2); /* scf, x */
 	return scf;
 }
 
 static
 SEXP geMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseLU";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	SET_SLOT(trf, Matrix_DimNamesSym, dimnames);
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	SET_DIM(trf, m, n);
+	SET_DIMNAMES(trf, 0, DIMNAMES(obj, 0));
 	if (r > 0) {
 		SEXP perm = PROTECT(Rf_allocVector(INTSXP, r)),
 			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
@@ -232,32 +216,26 @@ SEXP geMatrix_trf_(SEXP obj, int warn)
 		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(4); /* trf, x, dimnames, dim */
+	UNPROTECT(2); /* trf, x */
 	return trf;
 }
 
 static
 SEXP syMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = '\0';
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(trf, dimnames, -1);
-	SET_SLOT(trf, Matrix_uploSym, uplo);
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(trf, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
+	int n = DIM(obj)[1];
+	SET_DIM(trf, n, n);
+	SET_DIMNAMES(trf, -1, DIMNAMES(obj, 0));
+	char ul = UPLO(obj),
+		ct = (TYPEOF(x) == CPLXSXP) ? TRANS(obj) : 'C';
+	if (ul != 'U')
+		SET_UPLO(trf);
+	if (ct != 'C')
+		SET_TRANS(trf);
 	if (n > 0) {
 		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n)),
 			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
@@ -293,32 +271,26 @@ SEXP syMatrix_trf_(SEXP obj, int warn)
 		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	UNPROTECT(2); /* trf, x */
 	return trf;
 }
 
 static
 SEXP spMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0], ct = '\0';
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseBunchKaufman";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(trf, dimnames, -1);
-	SET_SLOT(trf, Matrix_uploSym, uplo);
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(trf, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
+	int n = DIM(obj)[1];
+	SET_DIM(trf, n, n);
+	SET_DIMNAMES(trf, -1, DIMNAMES(obj, 0));
+	char ul = UPLO(obj),
+		ct = (TYPEOF(x) == CPLXSXP) ? TRANS(obj) : 'C';
+	if (ul != 'U')
+		SET_UPLO(trf);
+	if (ct != 'C')
+		SET_TRANS(trf);
 	if (n > 0) {
 		SEXP perm = PROTECT(Rf_allocVector(INTSXP, n)),
 			y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
@@ -343,25 +315,23 @@ SEXP spMatrix_trf_(SEXP obj, int warn)
 		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(2); /* y, perm */
 	}
-	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	UNPROTECT(2); /* trf, x */
 	return trf;
 }
 
 static
 SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseCholesky";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(trf, dimnames, -1);
-	SET_SLOT(trf, Matrix_uploSym, uplo);
+	int n = DIM(obj)[1];
+	SET_DIM(trf, n, n);
+	SET_DIMNAMES(trf, -1, DIMNAMES(obj, 0));
+	char ul = UPLO(obj);
+	if (ul != 'U')
+		SET_UPLO(trf);
 	if (n > 0) {
 		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
@@ -417,25 +387,23 @@ SEXP poMatrix_trf_(SEXP obj, int warn, int pivot, double tol)
 		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(1); /* y */
 	}
-	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	UNPROTECT(2); /* trf, x */
 	return trf;
 }
 
 static
 SEXP ppMatrix_trf_(SEXP obj, int warn)
 {
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),
-		dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym)),
-		uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym)),
-		x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	int n = INTEGER(dim)[1];
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseCholesky";
 	cl[0] = (TYPEOF(x) == CPLXSXP) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	set_symmetrized_DimNames(trf, dimnames, -1);
-	SET_SLOT(trf, Matrix_uploSym, uplo);
+	int n = DIM(obj)[1];
+	SET_DIM(trf, n, n);
+	SET_DIMNAMES(trf, -1, DIMNAMES(obj, 0));
+	char ul = UPLO(obj);
+	if (ul != 'U')
+		SET_UPLO(trf);
 	if (n > 0) {
 		SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 		int info;
@@ -453,7 +421,7 @@ SEXP ppMatrix_trf_(SEXP obj, int warn)
 		SET_SLOT(trf, Matrix_xSym, y);
 		UNPROTECT(1); /* y */
 	}
-	UNPROTECT(5); /* trf, x, uplo, dimnames, dim */
+	UNPROTECT(2); /* trf, x */
 	return trf;
 }
 
@@ -618,13 +586,8 @@ SEXP gCMatrix_orf_(SEXP obj, int warn, int order)
 	cl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP orf = PROTECT(newObject(cl));
 
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	SET_SLOT(orf, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	SET_SLOT(orf, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
+	SET_DIM(orf, A->m, A->n);
+	SET_DIMNAMES(orf, 0, DIMNAMES(obj, 0));
 
 	SEXP V = PROTECT(CXS2M(N->L, 1, 'g')),
 		R = PROTECT(CXS2M(N->U, 1, 'g'));
@@ -690,21 +653,15 @@ SEXP gCMatrix_trf_(SEXP obj, int warn, int order, double tol)
 	cl[0] = (A->xtype == CXSPARSE_COMPLEX) ? 'z' : 'd';
 	SEXP trf = PROTECT(newObject(cl));
 
-	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	SET_SLOT(trf, Matrix_DimSym, dim);
-	UNPROTECT(1); /* dim */
-
-	SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-	SET_SLOT(trf, Matrix_DimNamesSym, dimnames);
-	UNPROTECT(1); /* dimnames */
+	SET_DIM(trf, A->m, A->n);
+	SET_DIMNAMES(trf, 0, DIMNAMES(obj, 0));
 
 	SEXP L = PROTECT(CXS2M(N->L, 1, 't')),
-		U = PROTECT(CXS2M(N->U, 1, 't')),
-		uplo = PROTECT(Rf_mkString("L"));
-	SET_SLOT(L, Matrix_uploSym, uplo);
+		U = PROTECT(CXS2M(N->U, 1, 't'));
+	SET_UPLO(L);
 	SET_SLOT(trf, Matrix_LSym, L);
 	SET_SLOT(trf, Matrix_USym, U);
-	UNPROTECT(3); /* uplo, U, L */
+	UNPROTECT(2); /* U, L */
 
 	SEXP p = PROTECT(Rf_allocVector(INTSXP, A->m));
 	memcpy(INTEGER(p), P, sizeof(int) * (size_t) A->m);
@@ -743,9 +700,7 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 	cholmod_factor *L = (trf == R_NilValue) ? NULL : M2CHF(trf, 1);
 	double betaRI[2]; betaRI[0] = beta.r; betaRI[1] = beta.i;
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
-	A->stype = (ul == 'U') ? 1 : -1;
+	A->stype = (UPLO(obj) == 'U') ? 1 : -1;
 
 	if (L)
 		L = cholmod_copy_factor(L, &c);
@@ -776,7 +731,7 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 
 #define PCTRF_FINISH(_OBJ_, _WARN_) \
 	do { \
-		SEXP dimnames = PROTECT(GET_SLOT(_OBJ_, Matrix_DimNamesSym)); \
+		SEXP dimnames = PROTECT(DIMNAMES(_OBJ_, 0)); \
 		PROTECT(trf = CHF2M(L, 1)); \
 		cholmod_free_factor(&L, &c); \
 		if (TYPEOF(trf) == CHARSXP) { \
@@ -787,7 +742,7 @@ SEXP pCMatrix_trf_(SEXP obj, SEXP trf,
 			UNPROTECT(2); \
 			return R_NilValue; \
 		} \
-		set_symmetrized_DimNames(trf, dimnames, -1); \
+		SET_DIMNAMES(trf, -1, dimnames); \
 		UNPROTECT(2); \
 	} while (0)
 
@@ -902,11 +857,8 @@ SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 	cholmod_factor *L = M2CHF(s_trf, 1);
 	double betaRI[2]; betaRI[0] = beta.r; betaRI[1] = beta.i;
 
-	if (Matrix_shape(s_obj) == 's') {
-		SEXP uplo = GET_SLOT(s_obj, Matrix_uploSym);
-		char ul = CHAR(STRING_ELT(uplo, 0))[0];
-		A->stype = (ul == 'U') ? 1 : -1;
-	}
+	if (Matrix_shape(s_obj) == 's')
+	A->stype = (UPLO(s_obj) == 'U') ? 1 : -1;
 
 	L = cholmod_copy_factor(L, &c);
 
@@ -921,12 +873,12 @@ SEXP sparseCholesky_update(SEXP s_trf, SEXP s_obj, SEXP s_beta)
 
 #define UPDOWN_FINISH \
 	do { \
-		SEXP dimnames = PROTECT(GET_SLOT(s_trf, Matrix_DimNamesSym)); \
+		SEXP dimnames = PROTECT(DIMNAMES(s_trf, 0)); \
 		PROTECT(s_trf = CHF2M(L, 1)); \
 		cholmod_free_factor(&L, &c); \
 		if (TYPEOF(s_trf) == CHARSXP) \
 			Rf_error("%s", CHAR(s_trf)); \
-		SET_SLOT(s_trf, Matrix_DimNamesSym, dimnames); \
+		SET_DIMNAMES(s_trf, 0, dimnames); \
 		UNPROTECT(2); \
 	} while (0)
 
@@ -1035,11 +987,7 @@ SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_root)
 
 SEXP denseBunchKaufman_expand(SEXP s_trf)
 {
-	SEXP dim = PROTECT(GET_SLOT(s_trf, Matrix_DimSym));
-	int n = INTEGER(dim)[1];
-
 	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
-	int packed = XLENGTH(x) != (int_fast64_t) n * n;
 
 	SEXP P_ = PROTECT(newObject("pMatrix"));
 	char cl[] = "..CMatrix";
@@ -1049,31 +997,20 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	cl[1] = 's';
 	SEXP D_ = PROTECT(newObject(cl));
 
-	if (n > 0) {
-		SET_SLOT(P_, Matrix_DimSym, dim);
-		SET_SLOT(T_, Matrix_DimSym, dim);
-		SET_SLOT(D_, Matrix_DimSym, dim);
-	}
+	int n = DIM(s_trf)[1], packed = XLENGTH(x) != (int_fast64_t) n * n;
+	SET_DIM(P_, n, n);
+	SET_DIM(T_, n, n);
+	SET_DIM(D_, n, n);
 
-	SEXP uplo = PROTECT(GET_SLOT(s_trf, Matrix_uploSym));
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	char ul = UPLO(s_trf),
+		ct = (TYPEOF(x) == CPLXSXP) ? TRANS(s_trf) : 'C';
 	if (ul != 'U') {
-		SET_SLOT(T_, Matrix_uploSym, uplo);
-		SET_SLOT(D_, Matrix_uploSym, uplo);
+		SET_UPLO(T_);
+		SET_UPLO(D_);
 	}
-	UNPROTECT(1); /* uplo */
-
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = PROTECT(GET_SLOT(s_trf, Matrix_transSym));
-		char ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			SET_SLOT(D_, Matrix_transSym, trans);
-		UNPROTECT(1); /* trans */
-	}
-
-	SEXP diag = PROTECT(Rf_mkString("U"));
-	SET_SLOT(T_, Matrix_diagSym, diag);
-	UNPROTECT(1); /* diag */
+	if (ct != 'C')
+		SET_TRANS(D_);
+	SET_DIAG(T_);
 
 	int i, j, s;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -1227,6 +1164,6 @@ SEXP denseBunchKaufman_expand(SEXP s_trf)
 	SET_SLOT(D_, Matrix_xSym, D_x);
 	SET_VECTOR_ELT(ans, len-1, D_);
 
-	UNPROTECT(9); /* ans, D_x, D_i, pivot, D_, T_, P_, x, dim */
+	UNPROTECT(8); /* ans, D_x, D_i, pivot, D_, T_, P_, x */
 	return ans;
 }

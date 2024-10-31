@@ -30,9 +30,8 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 {
 
 #define DETERMINANT_START(_F_) \
-	SEXP dim = GET_SLOT(_F_, Matrix_DimSym); \
-	int *pdim = INTEGER(dim), m = pdim[0], n = pdim[1]; \
-	if (m != n) \
+	int *pdim = DIM(_F_), n = pdim[1]; \
+	if (pdim[0] != n) \
 		Rf_error(_("determinant of non-square matrix is undefined")); \
 	int givelog = Rf_asLogical(s_logarithm); \
 	double modulus = 0.0; /* result for n == 0 */
@@ -82,17 +81,12 @@ SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
 	int sign = 1;
 
-	char ct = '\0';
-	if (TYPEOF(x) == CPLXSXP) {
-		SEXP trans = GET_SLOT(s_trf, Matrix_transSym);
-		ct = CHAR(STRING_ELT(trans, 0))[0];
-		if (ct != 'C')
-			sign = NA_INTEGER;
-	}
+	char ct = (TYPEOF(x) == CPLXSXP) ? TRANS(s_trf) : 'C';
+	if (ct != 'C')
+		sign = NA_INTEGER;
 
 	if (n > 0) {
-	SEXP uplo = GET_SLOT(s_trf, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	char ul = UPLO(s_trf);
 
 	SEXP pivot = GET_SLOT(s_trf, Matrix_permSym);
 	int *ppivot = INTEGER(pivot);
@@ -208,8 +202,7 @@ SEXP denseCholesky_determinant(SEXP s_trf, SEXP s_logarithm)
 	int sign = 1;
 
 	if (n > 0) {
-	SEXP uplo = GET_SLOT(s_trf, Matrix_uploSym);
-	char ul = CHAR(STRING_ELT(uplo, 0))[0];
+	char ul = UPLO(s_trf);
 
 	int j, packed = XLENGTH(x) != (int_fast64_t) n * n;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -241,8 +234,7 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 		x = PROTECT(GET_SLOT(R, Matrix_xSym));
 	int sign = 1;
 
-	dim = GET_SLOT(R, Matrix_DimSym);
-	if (INTEGER(dim)[0] > n)
+	if (DIM(R)[0] > n)
 		Rf_error(_("%s(<%s>) does not support structurally rank deficient case"),
 		         "determinant", "sparseQR");
 
