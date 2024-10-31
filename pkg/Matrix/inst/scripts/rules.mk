@@ -80,6 +80,8 @@ subassign.o: subassign.c Mdefines.h \
 subscript.o: subscript.c Mdefines.h \
   Msymbols.h utils.h M5.h idz.h \
   subscript.h
+t.o: t.c Mdefines.h \
+  Msymbols.h utils.h M5.h idz.h
 utils-R.o: utils-R.c Mdefines.h \
   Msymbols.h utils.h M5.h version.h \
   utils-R.h t_rle.c

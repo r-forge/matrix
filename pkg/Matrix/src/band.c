@@ -1,4 +1,4 @@
-/* C implementation of methods for band(., k1, k2) */
+/* C implementation of methods for band, triu, tril */
 
 #include "Mdefines.h"
 #include "M5.h"

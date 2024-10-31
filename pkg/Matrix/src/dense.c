@@ -194,62 +194,6 @@ SEXP R_dense_diag_set(SEXP s_from, SEXP s_value)
 	return s_from;
 }
 
-SEXP dense_transpose(SEXP from, const char *class, char op_ct)
-{
-	if (class[0] != 'z')
-		op_ct = '\0';
-
-	SEXP to = PROTECT(newObject(class));
-	int packed = class[2] == 'p';
-
-	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
-	SET_DIM(to, n, m);
-	SET_DIMNAMES(to, class[1] != 's' && class[1] != 'p' && class[1] != 'o', DIMNAMES(from, 0));
-
-	char ul = '\0';
-	if (class[1] != 'g' && (ul = UPLO(from)) == 'U')
-		SET_UPLO(to);
-	if (class[1] == 's' && class[0] == 'z' && TRANS(from) != 'C')
-		SET_TRANS(to);
-	if (class[1] == 't' && DIAG(from) != 'N')
-		SET_DIAG(to);
-	if (class[1] == 'o')
-		COPY_SLOT(to, from, Matrix_sdSym);
-
-	SEXP x0 = PROTECT(GET_SLOT(from, Matrix_xSym)),
-		x1 = PROTECT(Rf_allocVector(TYPEOF(x0), XLENGTH(x0)));
-	size_t m_ = (size_t) m, n_ = (size_t) n;
-
-#define TEMPLATE(c) \
-	do { \
-		c##TYPE *px0 = c##PTR(x0), *px1 = c##PTR(x1); \
-		if (!packed) \
-			c##NAME(trans2)(px1, px0, m_, n_, op_ct); \
-		else \
-			c##NAME(trans1)(px1, px0, n_, ul, op_ct); \
-	} while (0)
-
-	SWITCH4((class[0] == 'c') ? 'd' : class[0], TEMPLATE);
-
-#undef TEMPLATE
-
-	SET_SLOT(to, Matrix_xSym, x1);
-
-	UNPROTECT(3); /* x1, x0, to */
-	return to;
-}
-
-/* t(<denseMatrix>) */
-SEXP R_dense_transpose(SEXP s_from, SEXP s_trans)
-{
-	const char *class = Matrix_class(s_from, valid_dense, 0, __func__);
-
-	char ct;
-	VALID_TRANS(s_trans, ct);
-
-	return dense_transpose(s_from, class, ct);
-}
-
 SEXP dense_force_symmetric(SEXP from, const char *class, char op_ul, char op_ct)
 {
 	if (class[0] != 'z')

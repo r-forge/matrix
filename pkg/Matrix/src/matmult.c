@@ -8,6 +8,9 @@
 #include "sparse.h"
 #include "matmult.h"
 
+SEXP dense_transpose(SEXP, const char *, char);
+SEXP sparse_transpose(SEXP, const char *, char, int);
+
 static const char *valid_matmult[] = {
 VALID_DIAGONAL, VALID_SPARSE, VALID_DENSE, "" };
 /* ptr:      0,            5,          56, 87 */

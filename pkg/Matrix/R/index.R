@@ -108,21 +108,6 @@ setMethod("diag", c(x = "indMatrix"),
 setMethod("diag<-", c(x = "indMatrix"),
           function(x, value) `diag<-`(.M2kind(x, "n"), value))
 
-.tmp <- function(x) {
-    r <- new("indMatrix")
-    r@Dim <- x@Dim[2:1]
-    r@Dimnames = x@Dimnames[2:1]
-    r@perm <- x@perm
-    if(x@margin == 1L)
-        r@margin <- 2L
-    r
-}
-
-setMethod( "t", c(x = "indMatrix"), .tmp)
-setMethod("ct", c(x = "indMatrix"), .tmp)
-
-rm(.tmp)
-
 setMethod("forceSymmetric", c(x = "indMatrix"),
           function(x, ...) forceSymmetric(.M2kind(x, "n"), ...))
 

@@ -23,6 +23,9 @@
 SEXP R_dense_band(SEXP, SEXP, SEXP);
 SEXP R_sparse_band(SEXP, SEXP, SEXP);
 
+SEXP R_dense_transpose(SEXP, SEXP);
+SEXP R_sparse_transpose(SEXP, SEXP, SEXP);
+
 #include "Msymbols.h"
 Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna;
 

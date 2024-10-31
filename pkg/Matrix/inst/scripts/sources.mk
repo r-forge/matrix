@@ -21,6 +21,7 @@ sources = \
 	sparse.c \
 	subassign.c \
 	subscript.c \
+	t.c \
 	utils-R.c \
 	utils.c \
 	validity.c

@@ -9,9 +9,6 @@ SEXP R_dense_diag_get(SEXP, SEXP);
 SEXP dense_diag_set(SEXP, const char *, SEXP, int);
 SEXP R_dense_diag_set(SEXP, SEXP);
 
-SEXP dense_transpose(SEXP, const char *, char);
-SEXP R_dense_transpose(SEXP, SEXP);
-
 SEXP dense_force_symmetric(SEXP, const char *, char, char);
 SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
 
