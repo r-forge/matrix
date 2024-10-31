@@ -65,4 +65,9 @@ function(x) {
 setMethod( "t", c(x = "pMatrix"), .fn)
 setMethod("ct", c(x = "pMatrix"), .fn)
 
+setMethod( "t", c(x = "sparseVector"),
+          function(x) .tCRT(.V2C(x), trans = "T"))
+setMethod("ct", c(x = "sparseVector"),
+          function(x) .tCRT(.V2C(x), trans = "C"))
+
 rm(.cl, .fn)

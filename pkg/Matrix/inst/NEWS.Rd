@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-10-30 r4951)}{
+\section{Changes in version 1.8-0 (2024-10-31 r4964)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -40,6 +40,9 @@
       \item Methods for generic function \code{symmpart} gain argument
       \code{uplo} for control over the \code{uplo} slot of the result
       of \code{symmpart(<generalMatrix>)}.
+
+      \item \code{sort(<sparseVector>)} works, now that \code{sort} is
+      an implicit generic function in package \pkg{methods}.
     }
   }
   \subsection{Bug Fixes}{

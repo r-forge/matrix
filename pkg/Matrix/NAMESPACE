@@ -195,7 +195,7 @@ exportMethods("%&%",
               updown,
               writeMM)
 
-## From 'base'  --- several of these are  implicitGeneric
+## From 'base'  ---  several of these are 'implicitGeneric'
 exportMethods("!",
               "%*%",
               "+",
@@ -245,6 +245,7 @@ exportMethods("!",
               rowMeans,
               rowSums,
               solve,
+              sort,
               summary,
               t,
               tcrossprod,

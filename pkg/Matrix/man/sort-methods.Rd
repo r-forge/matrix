@@ -12,11 +12,12 @@
 %
 \description{TODO.}
 \usage{
-\S4method{sort}{sparseVector}(x, decreasing = FALSE, \dots)
+\S4method{sort}{sparseVector}(x, decreasing = FALSE, na.last = NA, \dots)
 }
 \arguments{
 \item{x}{.}
 \item{decreasing}{.}
+\item{na.last}{.}
 \item{\dots}{.}
 }
 %% \value{}

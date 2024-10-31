@@ -89,7 +89,7 @@
 .m2sparse(from, class = ".gC",
           uplo = "U", trans = "C", diag = "N", margin = 2L)
 
-.tCRT(x, lazy = TRUE)
+.tCRT(x, trans = "T", lazy = TRUE)
 
 .diag.dsC(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag")
 
