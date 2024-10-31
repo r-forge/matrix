@@ -10,10 +10,7 @@
 \alias{unpack}
 \alias{unpack-methods}
 %
-\alias{pack,dgeMatrix-method}
-\alias{pack,lgeMatrix-method}
 \alias{pack,matrix-method}
-\alias{pack,ngeMatrix-method}
 \alias{pack,packedMatrix-method}
 \alias{pack,sparseMatrix-method}
 \alias{pack,unpackedMatrix-method}
@@ -33,9 +30,7 @@
 }
 \usage{
 pack(x, \dots)
-\S4method{pack}{dgeMatrix}(x, symmetric = NA, upperTri = NA, \dots)
-\S4method{pack}{lgeMatrix}(x, symmetric = NA, upperTri = NA, \dots)
-\S4method{pack}{ngeMatrix}(x, symmetric = NA, upperTri = NA, \dots)
+\S4method{pack}{unpackedMatrix}(x, symmetric = NA, upperTri = NA, \dots)
 \S4method{pack}{matrix}(x, symmetric = NA, upperTri = NA, \dots)
 
 unpack(x, \dots)
