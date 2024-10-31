@@ -1,3 +1,5 @@
+/* C implementation of methods for %&%, %*%, crossprod, tcrossprod */
+
 #include "Lapack-etc.h"
 #include "cholmod-etc.h"
 #include "Mdefines.h"

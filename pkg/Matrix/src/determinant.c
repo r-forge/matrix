@@ -1,3 +1,5 @@
+/* C implementation of methods for determinant */
+
 #include "Mdefines.h"
 #include <Rmath.h> /* logspace_add, logspace_sub */
 #include "cholmod-etc.h"

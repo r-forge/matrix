@@ -1,3 +1,5 @@
+/* C implementation of methods for expm */
+
 #include "Lapack-etc.h"
 #include "Mdefines.h"
 

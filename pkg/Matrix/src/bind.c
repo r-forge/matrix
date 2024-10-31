@@ -1,3 +1,5 @@
+/* C implementation of methods for cbind, rbind */
+
 #include "Mdefines.h"
 #include "M5.h"
 #include "coerce.h"

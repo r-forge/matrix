@@ -1,3 +1,5 @@
+/* C implementation of methods for norm, rcond */
+
 #include "Lapack-etc.h"
 #include "Mdefines.h"
 

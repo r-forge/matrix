@@ -1,3 +1,5 @@
+/* C implementation of methods for [<-, [[<- */
+
 #include "Mdefines.h"
 
 enum x_slot_kind {
