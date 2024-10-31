@@ -23,6 +23,12 @@
 SEXP R_dense_band(SEXP, SEXP, SEXP);
 SEXP R_sparse_band(SEXP, SEXP, SEXP);
 
+SEXP R_dense_diag_get(SEXP, SEXP);
+SEXP R_sparse_diag_get(SEXP, SEXP);
+
+SEXP R_dense_diag_set(SEXP, SEXP);
+SEXP R_sparse_diag_set(SEXP, SEXP);
+
 SEXP R_dense_transpose(SEXP, SEXP);
 SEXP R_sparse_transpose(SEXP, SEXP, SEXP);
 

@@ -2,58 +2,6 @@
 ## diagonal matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("diag", c(x = "diagonalMatrix"),
-          function(x = 1, nrow, ncol, names = TRUE) {
-              kind <- .M.kind(x)
-              r <-
-                  if(x@diag != "N") {
-                      one <- switch(kind, "n" = , "l" = TRUE, "i" = 1L, "d" = 1, "z" = 1+0i)
-                      rep.int(one, x@Dim[1L])
-                  } else {
-                      y <- x@x
-                      if(kind == "n" && anyNA(y)) y | is.na(y) else y
-                  }
-              if(names &&
-                 !any(vapply(dn <- x@Dimnames, is.null, NA)) &&
-                 {
-                     i <- seq_len(min(x@Dim))
-                     identical(nms <- dn[[1L]][i], dn[[2L]][i])
-                 })
-                  names(r) <- nms
-              r
-          })
-
-setMethod("diag<-", c(x = "diagonalMatrix"),
-          function(x, value) {
-              n <- x@Dim[2L]
-              nv <- length(value)
-              if(nv != 1L && nv != n)
-                  stop("replacement diagonal has wrong length")
-              x@x <-
-                  if(is.logical(x@x))
-                      switch(typeof(value),
-                             logical = rep_len(value, n),
-                             integer =,
-                             double =
-                                 {
-                                     x <- .M2kind(x, "d")
-                                     rep_len(as.double(x), n)
-                                 },
-                             stop(gettextf("replacement diagonal has incompatible type \"%s\"",
-                                           typeof(value)),
-                                  domain = NA))
-                  else
-                      switch(typeof(value),
-                             logical =,
-                             integer =,
-                             double = rep_len(as.double(value), n),
-                             stop(gettextf("replacement diagonal has incompatible type \"%s\"",
-                                           typeof(value)),
-                                  domain = NA))
-              x@diag <- "N"
-              x
-          })
-
 setMethod("forceSymmetric", c(x = "diagonalMatrix"),
           function(x, uplo = "U", trans = "C", ...)
               .diag2sparse(x, ".", "s", "C", uplo, trans))

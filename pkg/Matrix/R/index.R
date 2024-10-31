@@ -92,22 +92,6 @@ setAs("nsparseMatrix", "indMatrix",
           stop("matrix must have exactly one entry in each row or column")
       })
 
-setMethod("diag", c(x = "indMatrix"),
-          function(x = 1, nrow, ncol, names = TRUE) {
-              if((m <- min(x@Dim)) == 0L)
-                  return(logical(0L))
-              i <- seq_len(m)
-              r <- x@perm[i] == i
-              if(names &&
-                 !any(vapply(dn <- x@Dimnames, is.null, NA)) &&
-                 identical(nms <- dn[[1L]][i], dn[[2L]][i]))
-                  names(r) <- nms
-              r
-          })
-
-setMethod("diag<-", c(x = "indMatrix"),
-          function(x, value) `diag<-`(.M2kind(x, "n"), value))
-
 setMethod("forceSymmetric", c(x = "indMatrix"),
           function(x, ...) forceSymmetric(.M2kind(x, "n"), ...))
 

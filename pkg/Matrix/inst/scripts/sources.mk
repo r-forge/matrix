@@ -9,6 +9,7 @@ sources = \
 	cs-etc.c \
 	dense.c \
 	determinant.c \
+	diag.c \
 	expm.c \
 	factor.c \
 	idz.c \

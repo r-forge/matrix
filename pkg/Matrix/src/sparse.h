@@ -15,12 +15,6 @@ SEXP R_sparse_diag_U2N(SEXP);
 SEXP sparse_diag_N2U(SEXP, const char *);
 SEXP R_sparse_diag_N2U(SEXP);
 
-SEXP sparse_diag_get(SEXP, const char *, int);
-SEXP R_sparse_diag_get(SEXP, SEXP);
-
-SEXP sparse_diag_set(SEXP, const char *, SEXP);
-SEXP R_sparse_diag_set(SEXP, SEXP);
-
 SEXP sparse_force_symmetric(SEXP, const char *, char, char);
 SEXP R_sparse_force_symmetric(SEXP, SEXP, SEXP);
 

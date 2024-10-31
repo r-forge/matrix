@@ -2,10 +2,6 @@
 ## sparse matrices, in some cases restricted to CSC, CSR, triplet
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.sparse.diag.get <- function(x = 1, nrow, ncol, names = TRUE)
-    .Call(R_sparse_diag_get, x, names)
-.sparse.diag.set <- function(x, value)
-    .Call(R_sparse_diag_set, x, value)
 .sparse.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_sparse_force_symmetric, x, uplo, trans)
 .sparse.symmpart <- function(x, uplo = "U", trans = "C", ...)
@@ -64,8 +60,6 @@ setMethod("rep", c(x = "sparseMatrix"),
           function(x, ...)  rep(as(x, "sparseVector"), ...))
 
 for(.cl in paste0(c("C", "R", "T"), "sparseMatrix")) {
-setMethod("diag"  , c(x = .cl), .sparse.diag.get)
-setMethod("diag<-", c(x = .cl), .sparse.diag.set)
 setMethod("forceSymmetric", c(x = .cl), .sparse.fS)
 setMethod("symmpart", c(x = .cl), .sparse.symmpart)
 setMethod("skewpart", c(x = .cl), .sparse.skewpart)
@@ -75,7 +69,7 @@ setMethod("isDiagonal"  , c(object = .cl), .sparse.is.di)
 }
 rm(.cl)
 
-rm(list = c(grep("^[.]sparse[.](diag[.](get|set)|fS|symmpart|skewpart|is[.](sy|tr|di))$",
+rm(list = c(grep("^[.]sparse[.](fS|symmpart|skewpart|is[.](sy|tr|di))$",
                  ls(all.names = TRUE), value = TRUE)))
 
 

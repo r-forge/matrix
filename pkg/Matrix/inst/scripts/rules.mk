@@ -34,6 +34,8 @@ determinant.o: determinant.c Mdefines.h \
   cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h determinant.h
+diag.o: diag.c Mdefines.h \
+  Msymbols.h utils.h M5.h idz.h
 expm.o: expm.c Lapack-etc.h \
   Mdefines.h \
   Msymbols.h utils.h expm.h

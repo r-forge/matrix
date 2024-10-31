@@ -2,10 +2,6 @@
 ## dense matrices with unpacked _or_ packed storage
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.dense.diag.get <- function(x = 1, nrow, ncol, names = TRUE)
-    .Call(R_dense_diag_get, x, names)
-.dense.diag.set <- function(x, value)
-    .Call(R_dense_diag_set, x, value)
 .dense.fS  <- function(x, uplo = NULL, trans = "C", ...)
     .Call(R_dense_force_symmetric, x, uplo, trans)
 .dense.symmpart <- function(x, uplo = "U", trans = "C", ...)
@@ -70,10 +66,6 @@ setMethod("mean"  , c(x = "denseMatrix"),
 
 setMethod("rep"   , c(x = "denseMatrix"),
           function(x, ...)          rep(.M2v(x), ...))
-
-setMethod("diag"  , c(x = "denseMatrix"), .dense.diag.get)
-
-setMethod("diag<-", c(x = "denseMatrix"), .dense.diag.set)
 
 setMethod("forceSymmetric", c(x = "denseMatrix"), .dense.fS)
 
@@ -174,5 +166,5 @@ setMethod("isTriangular", c(object = "matrix"), .dense.is.tr)
 setMethod("isDiagonal"  , c(object = "matrix"), .dense.is.di)
 
 rm(.uM.pack, .uM.pack.ge, .m.pack,
-   list = c(grep("^[.]dense[.](diag[.](get|set)|fS|symmpart|skewpart|is[.](sy|tr|di))$",
+   list = c(grep("^[.]dense[.](fS|symmpart|skewpart|is[.](sy|tr|di))$",
                  ls(all.names = TRUE), value = TRUE)))
