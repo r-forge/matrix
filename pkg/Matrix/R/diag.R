@@ -45,12 +45,8 @@ setMethod("diag", c(x = "indMatrix"),
           })
 
 setMethod("diag", c(x = "denseCholesky"),
-          function(x = 1, nrow, ncol, names = TRUE) {
-              packed <- length(x@x) != prod(x@Dim)
-              d <- diag(as(x, if (!packed) "dtrMatrix" else "dtpMatrix"),
-                        names = FALSE)
-              d * d
-          })
+          function(x = 1, nrow, ncol, names = TRUE)
+              .Call(denseCholesky_diag_get, x, FALSE))
 
 setMethod("diag", c(x = "sparseCholesky"),
           function(x = 1, nrow, ncol, names = TRUE)

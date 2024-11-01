@@ -35,8 +35,12 @@ determinant.o: determinant.c Mdefines.h \
   cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h
-diag.o: diag.c Mdefines.h \
+diag.o: diag.c cholmod-etc.h \
+  SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
+  SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h M5.h idz.h
+expand.o: expand.c Mdefines.h \
+  Msymbols.h M5.h
 expm.o: expm.c Lapack-etc.h \
   Mdefines.h \
   Msymbols.h
@@ -91,6 +95,10 @@ symmpart.o: symmpart.c Mdefines.h \
   Msymbols.h M5.h idz.h
 t.o: t.c Mdefines.h \
   Msymbols.h M5.h idz.h
+updown.o: updown.c cholmod-etc.h \
+  SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
+  SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
+  Msymbols.h M5.h
 utils-R.o: utils-R.c Mdefines.h \
   Msymbols.h M5.h t_rle.c
 utils.o: utils.c Mdefines.h \

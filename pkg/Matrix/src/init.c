@@ -90,6 +90,11 @@ SEXP R_dense_diag_set(SEXP, SEXP);
 SEXP R_sparse_diag_set(SEXP, SEXP);
 SEXP R_sparse_diag_U2N(SEXP);
 SEXP R_sparse_diag_N2U(SEXP);
+SEXP denseCholesky_diag_get(SEXP, SEXP);
+SEXP sparseCholesky_diag_get(SEXP, SEXP);
+
+/* expand.c : */
+SEXP denseBunchKaufman_expand(SEXP);
 
 /* expm.c : */
 SEXP geMatrix_expm(SEXP);
@@ -106,10 +111,6 @@ SEXP ppMatrix_trf(SEXP, SEXP);
 SEXP gCMatrix_orf(SEXP, SEXP, SEXP);
 SEXP gCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP pCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP sparseCholesky_update(SEXP, SEXP, SEXP);
-SEXP sparseCholesky_updown(SEXP, SEXP, SEXP);
-SEXP sparseCholesky_diag_get(SEXP, SEXP);
-SEXP denseBunchKaufman_expand(SEXP);
 
 /* forceSymmetric.c : */
 SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
@@ -193,6 +194,10 @@ SEXP R_sparse_symmpart(SEXP, SEXP, SEXP);
 /* t.c : */
 SEXP R_dense_transpose(SEXP, SEXP);
 SEXP R_sparse_transpose(SEXP, SEXP, SEXP);
+
+/* updown.c : */
+SEXP sparseCholesky_updown(SEXP, SEXP, SEXP);
+SEXP sparseCholesky_update(SEXP, SEXP, SEXP);
 
 /* utils-R.c : */
 SEXP R_index_triangle(SEXP, SEXP, SEXP, SEXP);
@@ -360,6 +365,11 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_diag_set, 2),
 	CALL_METHOD(R_sparse_diag_U2N, 1),
 	CALL_METHOD(R_sparse_diag_N2U, 1),
+	CALL_METHOD(denseCholesky_diag_get, 2),
+	CALL_METHOD(sparseCholesky_diag_get, 2),
+
+	/* expand.c : */
+	CALL_METHOD(denseBunchKaufman_expand, 1),
 
 	/* expm.c : */
 	CALL_METHOD(geMatrix_expm, 1),
@@ -376,10 +386,6 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(gCMatrix_orf, 3),
 	CALL_METHOD(gCMatrix_trf, 4),
 	CALL_METHOD(pCMatrix_trf, 6),
-	CALL_METHOD(sparseCholesky_update, 3),
-	CALL_METHOD(sparseCholesky_updown, 3),
-	CALL_METHOD(sparseCholesky_diag_get, 2),
-	CALL_METHOD(denseBunchKaufman_expand, 1),
 
 	/* forceSymmetric.c : */
 	CALL_METHOD(R_dense_force_symmetric, 3),
@@ -463,6 +469,10 @@ static R_CallMethodDef CallMethodTable[] = {
 	/* t.c : */
 	CALL_METHOD(R_dense_transpose, 2),
 	CALL_METHOD(R_sparse_transpose, 3),
+
+	/* updown.c : */
+	CALL_METHOD(sparseCholesky_updown, 3),
+	CALL_METHOD(sparseCholesky_update, 3),
 
 	/* utils-R.c : */
 	CALL_METHOD(R_index_triangle, 4),

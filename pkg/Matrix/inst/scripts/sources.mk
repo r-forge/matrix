@@ -12,6 +12,7 @@ sources = \
 	cs-etc.c \
 	determinant.c \
 	diag.c \
+	expand.c \
 	expm.c \
 	factor.c \
 	forceSymmetric.c \
@@ -31,6 +32,7 @@ sources = \
 	subscript.c \
 	symmpart.c \
 	t.c \
+	updown.c \
 	utils-R.c \
 	utils.c \
 	validity.c \

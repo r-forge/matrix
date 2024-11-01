@@ -1,5 +1,7 @@
 /* C implementation of methods for diag, diag<- */
 
+#include <math.h> /* sqrt */
+#include "cholmod-etc.h"
 #include "Mdefines.h"
 #include "M5.h"
 #include "idz.h"
@@ -659,4 +661,124 @@ SEXP R_sparse_diag_N2U(SEXP s_from)
 {
 	const char *class = Matrix_class(s_from, valid_sparse, 2, __func__);
 	return sparse_diag_N2U(s_from, class);
+}
+
+SEXP denseCholesky_diag_get(SEXP s_trf, SEXP s_root)
+{
+	SEXP x = PROTECT(GET_SLOT(s_trf, Matrix_xSym));
+	int n = DIM(s_trf)[1];
+	char ul = UPLO(s_trf);
+	SEXP ans = Rf_allocVector(TYPEOF(x), n);
+	if (n > 0) {
+	int j, root = Rf_asLogical(s_root),
+		packed = XLENGTH(x) != (int_fast64_t) n * n;
+	R_xlen_t dx = (!packed) ? (R_xlen_t) n + 1 : (ul == 'U') ? 1 : (R_xlen_t) n + 1,
+		ddx = (!packed) ? 0 : (ul == 'U') ? 1 : -1;
+	if (TYPEOF(x) == CPLXSXP) {
+		Rcomplex *pa = COMPLEX(ans), *px = COMPLEX(x);
+		for (j = 0; j < n; ++j) {
+			(*pa).r = (*px).r;
+			(*pa).i = 0.0;
+			if (!root)
+				(*pa).r *= (*pa).r;
+			pa += 1;
+			px += (dx += ddx);
+		}
+	} else {
+		double *pa = REAL(ans), *px = REAL(x);
+		for (j = 0; j < n; ++j) {
+			*pa = *px;
+			if (!root)
+				*pa *= *pa;
+			pa += 1;
+			px += (dx += ddx);
+		}
+	}
+	}
+	UNPROTECT(1);
+	return ans;
+}
+
+SEXP sparseCholesky_diag_get(SEXP s_trf, SEXP s_root)
+{
+	cholmod_factor *L = M2CHF(s_trf, 1);
+	int n = (int) L->n;
+	SEXP ans = Rf_allocVector((L->xtype == CHOLMOD_COMPLEX) ? CPLXSXP : REALSXP, n);
+	if (n > 0) {
+	int j, root = Rf_asLogical(s_root);
+	if (L->is_super) {
+		int k, nc,
+			nsuper = (int) L->nsuper,
+			*psuper = (int *) L->super,
+			*ppi = (int *) L->pi,
+			*ppx = (int *) L->px;
+		R_xlen_t nr1a;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *pa = COMPLEX(ans), *px = (Rcomplex *) L->x, *py;
+			for (k = 0; k < nsuper; ++k) {
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
+				py = px + ppx[k];
+				for (j = 0; j < nc; ++j) {
+					(*pa).r = (*py).r;
+					(*pa).i = 0.0;
+					if (!root)
+						(*pa).r *= (*pa).r;
+					pa += 1;
+					py += nr1a;
+				}
+			}
+		} else {
+			double *pa = REAL(ans), *px = (double *) L->x, *py;
+			for (k = 0; k < nsuper; ++k) {
+				nc = psuper[k + 1] - psuper[k];
+				nr1a = (R_xlen_t) (ppi[k + 1] - ppi[k]) + 1;
+				py = px + ppx[k];
+				for (j = 0; j < nc; ++j) {
+					*pa = *py;
+					if (!root)
+						*pa *= *pa;
+					pa += 1;
+					py += nr1a;
+				}
+			}
+		}
+	} else {
+		int *pp = (int *) L->p;
+		if (L->xtype == CHOLMOD_COMPLEX) {
+			Rcomplex *pa = COMPLEX(ans), *px = (Rcomplex *) L->x;
+			if (L->is_ll) {
+				for (j = 0; j < n; ++j) {
+					pa[j].r = px[pp[j]].r;
+					pa[j].i = 0.0;
+					if (!root)
+						pa[j].r *= pa[j].r;
+				}
+			} else {
+				for (j = 0; j < n; ++j) {
+					pa[j].r = px[pp[j]].r;
+					pa[j].i = 0.0;
+					if (root)
+						pa[j].r = (pa[j].r >= 0.0) ? sqrt(pa[j].r) : R_NaN;
+				}
+			}
+		} else {
+			double *pa = REAL(ans), *px = (double *) L->x;
+			if (L->is_ll) {
+				for (j = 0; j < n; ++j) {
+					pa[j] = px[pp[j]];
+					if (!root)
+						pa[j] *= pa[j];
+				}
+			} else {
+				for (j = 0; j < n; ++j) {
+					pa[j] = px[pp[j]];
+					if (root)
+						pa[j] = (pa[j] >= 0.0) ? sqrt(pa[j]) : R_NaN;
+				}
+			}
+		}
+	}
+	}
+	return ans;
 }
