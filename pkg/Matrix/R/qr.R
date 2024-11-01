@@ -1,12 +1,12 @@
 ## METHODS FOR GENERIC: qr
-## pivoted QR factorization of dense and sparse matrices
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: Well, I'd very much like to _not_ truncate by default ...
 ##     not least because qr.qy and qr.qty should remain inverses ...
 .qr.rank.def.truncating <- TRUE
 
-.qr.rank.def.warn <- function(qr) {
+.qr.rank.def.warn <-
+function(qr) {
     if(m0 <- qr@V@Dim[1L] - qr@Dim[1L])
         warning(gettextf("matrix is structurally rank deficient; using augmented matrix with additional %d row(s) of zeros",
                          m0),
@@ -26,73 +26,8 @@ setMethod("qr", c(x = "dgCMatrix"),
           })
 
 
-## METHODS FOR CLASS: sparseQR
+## METHODS FOR GENERIC: qr.Q, qr.R, qr.X
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-setMethod("expand1", c(x = "sparseQR"),
-          function(x, which, ...) {
-              .qr.rank.def.warn(x)
-              R <- x@R
-              d <- R@Dim
-              m <- d[1L]
-              n <- d[2L]
-              switch(which,
-                     "P1" =, "P1." = {
-                         r <- new("pMatrix")
-                         r@Dim <- c(m, m)
-                         r@perm <- x@p + 1L
-                         if(which == "P1.")
-                             r@margin <- 2L
-                         r
-                     },
-                     "P2" =, "P2." = {
-                         r <- new("pMatrix")
-                         r@Dim <- c(n, n)
-                         r@perm <- if(length(x@q)) x@q + 1L else seq_len(n)
-                         if(which == "P2")
-                             r@margin <- 2L
-                         r
-                     },
-                     "Q"  = .Call(sparseQR_matmult, x, NULL, 6L,  TRUE, NULL),
-                     "Q1" = .Call(sparseQR_matmult, x, NULL, 6L, FALSE, NULL),
-                     "R"  = R,
-                     "R1" = triu(if(m == n) R else R[seq_len(n), , drop = FALSE]),
-                     stop(gettextf("'%1$s' is not \"%2$s1\", \"%2$s1.\", \"%2$s2\", \"%2$s2.\", \"%3$s\", \"%3$s1\", \"%4$s\", or \"%4$s1\"",
-                                   "which", "P", "Q", "R"),
-                          domain = NA))
-          })
-
-## returning list(P1', Q, R, P2'), where A = P1' Q R P2'
-setMethod("expand2", c(x = "sparseQR"),
-          function(x, complete = FALSE, ...) {
-              m0 <- .qr.rank.def.warn(x)
-              R <- x@R
-              d <- R@Dim
-              m <- d[1L]
-              n <- d[2L]
-              dn <- x@Dimnames
-              if(m0 && !is.null(dn[[1L]]))
-                  length(dn[[1L]]) <- m
-              Q <- .Call(sparseQR_matmult, x, NULL, 6L, complete, NULL)
-              if(!complete && n < m)
-                  R <- R[seq_len(n), , drop = FALSE]
-              p1 <- x@p
-              p2 <- x@q
-              P1. <- new("pMatrix",
-                         Dim = c(m, m),
-                         Dimnames = c(dn[1L], list(NULL)),
-                         margin = 1L,
-                         perm = invertPerm(p1, 0L, 1L))
-              P2. <- new("pMatrix",
-                         Dim = c(n, n),
-                         Dimnames = c(list(NULL), dn[2L]),
-                         margin = 2L,
-                         perm = if(length(p2)) invertPerm(p2, 0L, 1L) else seq_len(n))
-              if(complete)
-                  list(P1. = P1., Q = Q, R = R, P2. = P2.)
-              else
-                  list(P1. = P1., Q1 = Q, R1 = triu(R), P2. = P2.)
-          })
 
 setMethod("qr.Q", c(qr = "sparseQR"),
           function(qr, complete = FALSE, Dvec) {
@@ -124,7 +59,8 @@ setMethod("qr.Q", c(qr = "sparseQR"),
               Q
           })
 
-qrR <- function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
+qrR <-
+function(qr, complete = FALSE, backPermute = TRUE, row.names = TRUE) {
     m0 <- .qr.rank.def.warn(qr)
     R <- qr@R
     d <- R@Dim
@@ -160,7 +96,6 @@ setMethod("qr.R", c(qr = "sparseQR"),
               qrR(qr, complete = complete, backPermute = backPermute,
                   row.names = FALSE))
 
-## https://stat.ethz.ch/pipermail/r-devel/2023-June/082649.html
 setMethod("qr.X", c(qr = "sparseQR"),
           function(qr, complete = FALSE, ncol) {
               m0 <- .qr.rank.def.warn(qr)
@@ -219,7 +154,12 @@ setMethod("qr.X", c(qr = "sparseQR"),
               r
           })
 
-.qr.y0 <- function(y, m0) {
+
+## METHODS FOR GENERIC: qr.coef, qr.fitted, qr.resid, qr.qty, qr.qy
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.qr.y0 <-
+function(y, m0) {
     d <- y@Dim
     d[1L] <- (m <- d[1L]) + m0
     dn <- y@Dimnames

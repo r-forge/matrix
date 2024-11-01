@@ -715,3 +715,94 @@ setAs("nsparseMatrix", "pMatrix",
 setAs("indMatrix", "pMatrix",
       function(from)
           new("pMatrix", from))
+
+
+## ==== More from MatrixFactorization ==================================
+
+setAs("denseSchur", "dgeMatrix",
+      function(from) {
+          to <- new("dgeMatrix")
+          to@Dim <- from@Dim
+          to@x <- from@x
+          to
+      })
+
+setAs("denseLU", "dgeMatrix",
+      function(from) {
+          to <- new("dgeMatrix")
+          to@Dim <- from@Dim
+          to@x <- from@x
+          to
+      })
+
+setAs("denseBunchKaufman", "dtrMatrix",
+      function(from) {
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
+          to@Dim <- from@Dim
+          to@uplo <- from@uplo
+          to@x <- from@x
+          if (!packed) to else unpack(to)
+      })
+
+setAs("denseBunchKaufman", "dtpMatrix",
+      function(from) {
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
+          to@Dim <- from@Dim
+          to@uplo <- from@uplo
+          to@x <- from@x
+          if (!packed) pack(to) else to
+      })
+
+setAs("denseCholesky", "dtrMatrix",
+      function(from) {
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
+          to@Dim <- from@Dim
+          to@uplo <- from@uplo
+          to@x <- from@x
+          if (!packed) to else unpack(to)
+      })
+
+setAs("denseCholesky", "dtpMatrix",
+      function(from) {
+          packed <- length(from@x) != prod(from@Dim)
+          to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
+          to@Dim <- from@Dim
+          to@uplo <- from@uplo
+          to@x <- from@x
+          if (!packed) pack(to) else to
+      })
+
+setAs("simplicialCholesky", "dtCMatrix",
+      function(from) {
+          nz <- from@nz
+          k <- sequence.default(nz, from@p[seq_along(nz)] + 1L)
+
+          to <- new("dtCMatrix")
+          to@Dim  <- from@Dim
+          to@uplo <- "L"
+          to@p <- c(0L, cumsum(nz))
+          to@i <- from@i[k]
+          to@x <- from@x[k]
+          to
+      })
+
+setAs("supernodalCholesky", "dgCMatrix",
+      function(from) {
+          super <- from@super
+          pi <- from@pi
+          b <- length(super)
+
+          nr <- pi[-1L] - pi[-b]
+          nc <- super[-1L] - super[-b]
+          dp <- rep.int(nr, nc)
+
+          to <- new("dgCMatrix")
+          to@Dim <- from@Dim
+          to@p <- c(0L, cumsum(dp))
+          to@i <- from@s[sequence.default(dp, rep.int(pi[-b] + 1L, nc))]
+          to@x <- from@x
+          to
+      })

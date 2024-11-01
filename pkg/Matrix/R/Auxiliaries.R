@@ -430,6 +430,22 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     ##    ^^^^^^^^^^^^^^ in ../src/Csparse.c
 }
 
+.CHF.is.perm <- function(x)
+    x@ordering != 0L
+.CHF.is.LDL <- function(x)
+    .hasSlot(x, "is_ll") && !x@is_ll
+.CHF.is.super <- function(x)
+    .hasSlot(x, "super")
+
+# Exported:
+isLDL <- function(x) {
+    if(is(x, "sparseCholesky"))
+        .CHF.is.LDL(x)
+    else stop(gettextf("'%s' does not inherit from virtual class %s",
+                       "x", "sparseCholesky"),
+              domain = NA)
+}
+
 dimScale <- function(x, d1 = sqrt(1/diag(x, names = FALSE)), d2 = d1) {
     dim.x <- dim(x)
     D1 <- Diagonal(n = dim.x[1L], x = d1)
