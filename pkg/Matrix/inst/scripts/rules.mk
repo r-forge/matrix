@@ -60,17 +60,20 @@ isSymmetric.o: isSymmetric.c Mdefines.h \
   Msymbols.h M5.h
 isTriangular.o: isTriangular.c Mdefines.h \
   Msymbols.h M5.h
-kappa.o: kappa.c Lapack-etc.h \
-  Mdefines.h \
-  Msymbols.h
 matmult.o: matmult.c Lapack-etc.h \
   cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h M5.h idz.h coerce.h
+norm.o: norm.c Lapack-etc.h \
+  Mdefines.h \
+  Msymbols.h
 objects.o: objects.c Mdefines.h \
   Msymbols.h
 perm.o: perm.c Mdefines.h \
+  Msymbols.h
+rcond.o: rcond.c Lapack-etc.h \
+  Mdefines.h \
   Msymbols.h
 skewpart.o: skewpart.c Mdefines.h \
   Msymbols.h M5.h idz.h

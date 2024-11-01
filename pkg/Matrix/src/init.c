@@ -127,24 +127,17 @@ SEXP R_sparse_is_symmetric(SEXP, SEXP, SEXP, SEXP);
 SEXP R_dense_is_triangular(SEXP, SEXP);
 SEXP R_sparse_is_triangular(SEXP, SEXP);
 
-/* kappa.c : */
+/* matmult.c : */
+SEXP R_dense_matmult(SEXP, SEXP, SEXP, SEXP);
+SEXP R_sparse_matmult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_diagonal_matmult(SEXP, SEXP, SEXP, SEXP, SEXP);
+
+/* norm.c : */
 SEXP geMatrix_norm(SEXP, SEXP);
 SEXP syMatrix_norm(SEXP, SEXP);
 SEXP spMatrix_norm(SEXP, SEXP);
 SEXP trMatrix_norm(SEXP, SEXP);
 SEXP tpMatrix_norm(SEXP, SEXP);
-SEXP geMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP syMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP spMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP poMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP ppMatrix_rcond(SEXP, SEXP, SEXP);
-SEXP trMatrix_rcond(SEXP, SEXP);
-SEXP tpMatrix_rcond(SEXP, SEXP);
-
-/* matmult.c : */
-SEXP R_dense_matmult(SEXP, SEXP, SEXP, SEXP);
-SEXP R_sparse_matmult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP R_diagonal_matmult(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 /* objects.c : */
 SEXP R_Matrix_class(SEXP, SEXP);
@@ -157,6 +150,15 @@ SEXP R_isPerm(SEXP, SEXP);
 SEXP R_signPerm(SEXP, SEXP);
 SEXP R_invertPerm(SEXP, SEXP, SEXP);
 SEXP R_asPerm(SEXP, SEXP, SEXP, SEXP);
+
+/* rcond.c : */
+SEXP geMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP syMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP spMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP poMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP ppMatrix_rcond(SEXP, SEXP, SEXP);
+SEXP trMatrix_rcond(SEXP, SEXP);
+SEXP tpMatrix_rcond(SEXP, SEXP);
 
 /* skewpart.c : */
 SEXP R_dense_skewpart(SEXP, SEXP);
@@ -395,24 +397,17 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_dense_is_triangular, 2),
 	CALL_METHOD(R_sparse_is_triangular, 2),
 
-	/* kappa.c : */
+	/* matmult.c : */
+	CALL_METHOD(R_dense_matmult, 4),
+	CALL_METHOD(R_sparse_matmult, 6),
+	CALL_METHOD(R_diagonal_matmult, 5),
+
+	/* norm.c : */
 	CALL_METHOD(geMatrix_norm, 2),
 	CALL_METHOD(syMatrix_norm, 2),
 	CALL_METHOD(spMatrix_norm, 2),
 	CALL_METHOD(trMatrix_norm, 2),
 	CALL_METHOD(tpMatrix_norm, 2),
-	CALL_METHOD(geMatrix_rcond, 3),
-	CALL_METHOD(syMatrix_rcond, 3),
-	CALL_METHOD(spMatrix_rcond, 3),
-	CALL_METHOD(poMatrix_rcond, 3),
-	CALL_METHOD(ppMatrix_rcond, 3),
-	CALL_METHOD(trMatrix_rcond, 2),
-	CALL_METHOD(tpMatrix_rcond, 2),
-
-	/* matmult.c : */
-	CALL_METHOD(R_dense_matmult, 4),
-	CALL_METHOD(R_sparse_matmult, 6),
-	CALL_METHOD(R_diagonal_matmult, 5),
 
 	/* objects.c : */
 	CALL_METHOD(R_Matrix_class, 2),
@@ -425,6 +420,15 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_signPerm, 2),
 	CALL_METHOD(R_invertPerm, 3),
 	CALL_METHOD(R_asPerm, 4),
+
+	/* rcond.c : */
+	CALL_METHOD(geMatrix_rcond, 3),
+	CALL_METHOD(syMatrix_rcond, 3),
+	CALL_METHOD(spMatrix_rcond, 3),
+	CALL_METHOD(poMatrix_rcond, 3),
+	CALL_METHOD(ppMatrix_rcond, 3),
+	CALL_METHOD(trMatrix_rcond, 2),
+	CALL_METHOD(tpMatrix_rcond, 2),
 
 	/* skewpart.c : */
 	CALL_METHOD(R_dense_skewpart, 2),

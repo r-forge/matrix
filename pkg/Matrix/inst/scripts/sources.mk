@@ -20,10 +20,11 @@ sources = \
 	isDiagonal.c \
 	isSymmetric.c \
 	isTriangular.c \
-	kappa.c \
 	matmult.c \
+	norm.c \
 	objects.c \
 	perm.c \
+	rcond.c \
 	skewpart.c \
 	solve.c \
 	subassign.c \
