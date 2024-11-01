@@ -28,17 +28,18 @@ function(a, tol, rcond.a = rcond(a)) {
 ##     kappa(A) <= kappa(P1') * kappa(L) * kappa(U) * kappa(P2')
 ##              ==          1 * kappa(L) * kappa(U) * 1
 ##
-## If  U  is diagonally dominant, i.e., if there exists  a > 1  such that :
+## If  U  is diagonally dominant, i.e., if there exists  a > 1
+## such that
 ##
-##     abs(U[i,i]) >= a * sum(abs(U[i,-i]))        i = 1, ... , n
+##     abs(U[i, i]) >= a * sum(abs(U[i, -i]))        i = 1, ... , n
 ##
 ## then :
 ##
-##     kappa(U) <= ((a + 1) / (a - 1)) * max(abs(diag(U))) / min(abs(diag(U)))
+##     kappa(U) <= (a + 1)/(a - 1) * max(abs(diag(U)))/min(abs(diag(U)))
 ##
 ## The bound contracts as  a --> Inf  and in the limit we have:
 ##
-##     kappa(A) / kappa(L) <= kappa(U) <= max(abs(diag(U))) / min(abs(diag(U)))
+##     kappa(A)/kappa(L) <= kappa(U) <= max(abs(diag(U)))/min(abs(diag(U)))
 ##
 .solve.checkCondBound <-
 function(u, tol, rad.u = range(abs(diag(u, names = FALSE)))) {
@@ -53,8 +54,7 @@ function(u, tol, rad.u = range(abs(diag(u, names = FALSE)))) {
 
 .solve.checkDiagonal <-
 function(diag.a) {
-    zero <- diag.a == 0
-    if(any(zero, na.rm = TRUE))
+    if(any(zero <- !diag.a, na.rm = TRUE))
         stop(gettextf("matrix is exactly singular, D[i,i]=0, i=%d",
                       which.max(zero)),
              domain = NA)
@@ -433,12 +433,13 @@ setMethod("solve", c(a = "dsCMatrix", b = "sparseMatrix"),
 ##  4. RsparseMatrix excl. triangularMatrix
 ########################################################################
 
-## TODO: implement triangular solver for dtRMatrix, so that we can handle
+## TODO: implement triangular solver for dtRMatrix and ztRMatrix,
+##       so that we can handle
+##
 ##       A = <dgRMatrix>  and  A' = .tCRT(A)  like so:
 ##
 ##                   P1 A' P2 = L U
 ##       A x = b  <==================>  x = P1' inv(L') inv(U') P2' b
-##
 
 setMethod("solve", c(a = "RsparseMatrix", b = "ANY"),
           function(a, b, ...) {
@@ -462,65 +463,66 @@ setMethod("solve", c(a = "TsparseMatrix", b = "ANY"),
 ##  6. diagonalMatrix
 ########################################################################
 
-setMethod("solve", c(a = "diagonalMatrix", b = "ANY"),
+setMethod("solve", c(a = "diagonalMatrix", b = "missing"),
           function(a, b, ...) {
-              a <- .M2kind(a, ",")
-              if(missing(b)) solve(a, ...) else solve(a, b, ...)
-          })
-
-setMethod("solve", c(a = "ddiMatrix", b = "missing"),
-          function(a, b, ...) {
+              x <- a@x
+              r <- new(if(is.complex(x)) "zdiMatrix" else "ddiMatrix")
+              r@Dim <- a@Dim
+              r@Dimnames <- a@Dimnames[2:1]
               if(a@diag == "N") {
-                  x <- a@x
+                  if(.M.kind(a) == "n")
+                      x <- x | is.na(x)
                   .solve.checkDiagonal(x)
                   a@x <- 1 / x
               }
-              a@Dimnames <- a@Dimnames[2:1]
               a
           })
 
-setMethod("solve", c(a = "ddiMatrix", b = "vector"),
+setMethod("solve", c(a = "diagonalMatrix", b = "vector"),
           function(a, b, ...) {
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
+              x <- a@x
+              z <- is.complex(x) || is.complex(b)
+              as. <- if(z) as.complex else as.double
               r <-
-                  if(a@diag == "N") {
-                      x <- a@x
-                      .solve.checkDiagonal(x)
-                      as.double(b) / x
-                  } else as.double(b)
+              if(a@diag == "N") {
+                  if(.M.kind(a) == "n")
+                      x <- x | is.na(x)
+                  .solve.checkDiagonal(x)
+                  as.(b) / x
+              } else as.(b)
               names(r) <- a@Dimnames[[2L]]
               r
           })
 
-setMethod("solve", c(a = "ddiMatrix", b = "matrix"),
+setMethod("solve", c(a = "diagonalMatrix", b = "matrix"),
           function(a, b, ...) {
+              a <- .M2kind(a, if(is.complex(b)) "z" else ",")
               d <- dim(b)
               .solve.checkDim2(a@Dim[1L], d[1L])
               dn <- dimnames(b)
-              r <- new("dgeMatrix")
+              x <- a@x
+              z <- is.complex(x) || is.complex(b)
+              as. <- if(z) as.complex else as.double
+              r <- new(if(z) "zgeMatrix" else "dgeMatrix")
               r@Dim <- d
               r@Dimnames <- c(a@Dimnames[2L],
                               if(is.null(dn)) list(NULL) else dn[2L])
               r@x <-
               if(a@diag == "N") {
-                  x <- a@x
+                  if(.M.kind(a) == "n")
+                      x <- x | is.na(x)
                   .solve.checkDiagonal(x)
-                  as.double(b) / x
-              } else as.double(b)
+                  as.(b) / x
+              } else as.(b)
               r
           })
 
-setMethod("solve", c(a = "ddiMatrix", b = "Matrix"),
+setMethod("solve", c(a = "diagonalMatrix", b = "Matrix"),
           function(a, b, ...) {
               .solve.checkDim2(a@Dim[1L], b@Dim[1L])
-              if(a@diag == "N") {
-                  x <- a@x
-                  .solve.checkDiagonal(x)
-                  a@x <- 1 / x
-              }
-              a@Dimnames <- a@Dimnames[2:1]
-              a %*% b
+              solve(a) %*% b
           })
 
 
@@ -545,9 +547,12 @@ setMethod("solve", c(a = "indMatrix", b = "ANY"),
 
 setMethod("solve", c(a = "pMatrix", b = "missing"),
           function(a, b, ...) {
-              a@Dimnames <- a@Dimnames[2:1]
-              a@margin <- if(a@margin == 1L) 2L else 1L
-              a
+              r <- new("pMatrix")
+              r@Dim <- a@Dim
+              r@Dimnames <- a@Dimnames[2:1]
+              r@perm <- a@perm
+              r@margin <- if(a@margin == 1L) 2L else 1L
+              r
           })
 
 setMethod("solve", c(a = "pMatrix", b = "vector"),
@@ -555,7 +560,9 @@ setMethod("solve", c(a = "pMatrix", b = "vector"),
               m <- length(b)
               .solve.checkDim2(a@Dim[1L], m)
               perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
-              r <- as.double(b)[perm]
+              z <- is.complex(b)
+              as. <- if(z) as.complex else as.double
+              r <- as.(b)[perm]
               names(r) <- a@Dimnames[[2L]]
               r
           })
@@ -566,11 +573,13 @@ setMethod("solve", c(a = "pMatrix", b = "matrix"),
               .solve.checkDim2(a@Dim[1L], d[1L])
               dn <- dimnames(b)
               perm <- if(a@margin == 1L) invertPerm(a@perm) else a@perm
-              r <- new("dgeMatrix")
+              z <- is.complex(b)
+              as. <- if(z) as.complex else as.double
+              r <- new(if(z) "zgeMatrix" else "dgeMatrix")
               r@Dim <- d
               r@Dimnames <- c(a@Dimnames[2L],
                               if(is.null(dn)) list(NULL) else dn[2L])
-              r@x <- as.double(b[perm, , drop = FALSE])
+              r@x <- as.(b[perm, , drop = FALSE])
               r
           })
 

@@ -25,10 +25,10 @@
 \alias{solve,MatrixFactorization,vector-method}
 \alias{solve,RsparseMatrix,ANY-method}
 \alias{solve,TsparseMatrix,ANY-method}
-\alias{solve,ddiMatrix,Matrix-method}
-\alias{solve,ddiMatrix,matrix-method}
-\alias{solve,ddiMatrix,missing-method}
-\alias{solve,ddiMatrix,vector-method}
+\alias{solve,diagonalMatrix,Matrix-method}
+\alias{solve,diagonalMatrix,matrix-method}
+\alias{solve,diagonalMatrix,missing-method}
+\alias{solve,diagonalMatrix,vector-method}
 \alias{solve,denseBunchKaufman,missing-method}
 \alias{solve,denseBunchKaufman,dgeMatrix-method}
 \alias{solve,denseCholesky,missing-method}
@@ -44,7 +44,6 @@
 \alias{solve,dgCMatrix,sparseMatrix-method}
 \alias{solve,dgCMatrix,vector-method}
 \alias{solve,dgeMatrix,ANY-method}
-\alias{solve,diagonalMatrix,ANY-method}
 \alias{solve,dpoMatrix,ANY-method}
 \alias{solve,dppMatrix,ANY-method}
 \alias{solve,dsCMatrix,denseMatrix-method}
