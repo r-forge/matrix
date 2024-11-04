@@ -9,9 +9,10 @@ function(x, decreasing = FALSE, na.last = NA, ...) {
     n <- length(x)
     kind <- .M.kind(x)
     if (kind == "n") {
-        x@i <- if (decreasing)
-                   seq_len(nnz)
-               else seq.int(to = n, length.out = nnz)
+        x@i <-
+            if (decreasing)
+                seq_len(nnz)
+            else seq.int(to = n, length.out = nnz)
         return(x)
     }
     x@x <- y <- sort.int(x@x, na.last = na.last,
