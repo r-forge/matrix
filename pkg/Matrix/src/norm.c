@@ -47,40 +47,6 @@ char La_norm_type(SEXP s)
 #undef ARGNAME
 }
 
-static
-char La_rcond_type(SEXP s)
-{
-#define ARGNAME "norm"
-	if (TYPEOF(s) != STRSXP)
-		Rf_error(_("argument '%s' is not of type \"%s\""),
-		         ARGNAME, "character");
-	if (LENGTH(s) == 0)
-		Rf_error(_("argument '%s' has length %d"),
-		         ARGNAME, 0);
-	s = STRING_ELT(s, 0);
-	if (CHAR(s)[0] == '\0' || CHAR(s)[1] != '\0')
-		Rf_error(_("argument '%s' (\"%s\") does not have string length %d"),
-		         ARGNAME, CHAR(s), 1);
-	char type = '\0';
-	switch (CHAR(s)[0]) {
-	case 'O':
-	case 'o':
-	case '1':
-		type = 'O';
-		break;
-	case 'I':
-	case 'i':
-		type = 'I';
-		break;
-	default:
-		Rf_error(_("argument '%s' (\"%s\") is not \"%s\", \"%s\", or \"%s\""),
-		         ARGNAME, CHAR(s), "O", "1", "I");
-		break;
-	}
-	return type;
-#undef ARGNAME
-}
-
 SEXP geMatrix_norm(SEXP s_obj, SEXP s_type)
 {
 	char type = La_norm_type(s_type);
