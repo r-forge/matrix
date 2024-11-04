@@ -14,16 +14,19 @@ function(qr) {
     m0
 }
 
-setMethod("qr", c(x = "sparseMatrix"),
-          function(x, ...)
-              qr(.M2gen(.M2C(x), ","), ...))
-
-setMethod("qr", c(x = "dgCMatrix"),
+for(.cl in paste0(c("d", "z"), "gCMatrix"))
+setMethod("qr", c(x = .cl),
           function(x, order = 3L, ...) {
               r <- .Call(gCMatrix_orf, x, 2L, order)
               .qr.rank.def.warn(r)
               r
           })
+
+setMethod("qr", c(x = "sparseMatrix"),
+          function(x, ...)
+              qr(.M2gen(.M2C(x), ","), ...))
+
+rm(.cl)
 
 
 ## METHODS FOR GENERIC: qr.Q, qr.R, qr.X
@@ -35,7 +38,8 @@ setMethod("qr.Q", c(qr = "sparseQR"),
               if(missing(Dvec))
                   Dvec <- NULL
               else {
-                  storage.mode(Dvec) <- "double"
+                  if(!is.complex(Dvec))
+                      storage.mode(Dvec) <- typeof(qr@R@x)
                   if(length(Dvec) != qr@V@Dim[if(complete) 1L else 2L])
                       stop(gettextf("'%s' has the wrong length", "Dvec"),
                            domain = NA)
@@ -165,14 +169,17 @@ function(y, m0) {
     dn <- y@Dimnames
     if(!is.null(dn[[1L]]))
         length(dn[[1L]]) <- d[1L]
-    y0 <- new("dgeMatrix")
+    x <- y@x
+    z <- is.complex(x)
+    y0 <- new(if(z) "zgeMatrix" else "dgeMatrix")
     y0@Dim <- d
     y0@Dimnames <- dn
-    y0@x <- as.double(`[<-`(array(0, d), seq_len(m), , y@x))
+    y0@x <- as.vector(`[<-`(array(if(z) 0+0i else 0, d), seq_len(m), , x))
     y0
 }
 
-setMethod("qr.coef", c(qr = "sparseQR", y = "dgeMatrix"),
+for(.cl in paste0(c("d", "z"), "geMatrix"))
+setMethod("qr.coef", c(qr = "sparseQR", y = .cl),
           function(qr, y) {
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
@@ -183,17 +190,18 @@ setMethod("qr.coef", c(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.coef", c(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.coef(qr, .m2dense(y, ",ge"))))
+         drop(qr.coef(qr, .m2dense(     y , ",ge"))))
 
 setMethod("qr.coef", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.coef(qr, .m2dense(y, ",ge")))
+              qr.coef(qr, .m2dense(     y , ",ge")) )
 
 setMethod("qr.coef", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.coef(qr, .m2dense(.M2m(y), ",ge")))
+              qr.coef(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.fitted", c(qr = "sparseQR", y = "dgeMatrix"),
+for(.cl in paste0(c("d", "z"), "geMatrix"))
+setMethod("qr.fitted", c(qr = "sparseQR", y = .cl),
           function(qr, y, k = qr$rank) {
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
@@ -206,17 +214,18 @@ setMethod("qr.fitted", c(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.fitted", c(qr = "sparseQR", y = "vector"),
           function(qr, y, k = qr$rank)
-              drop(qr.fitted(qr, .m2dense(y, ",ge"))))
+         drop(qr.fitted(qr, .m2dense(     y , ",ge"))))
 
 setMethod("qr.fitted", c(qr = "sparseQR", y = "matrix"),
           function(qr, y, k = qr$rank)
-              qr.fitted(qr, .m2dense(y, ",ge")))
+              qr.fitted(qr, .m2dense(     y , ",ge")) )
 
 setMethod("qr.fitted", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y, k = qr$rank)
-              qr.fitted(qr, .m2dense(.M2m(y), ",ge")))
+              qr.fitted(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.resid", c(qr = "sparseQR", y = "dgeMatrix"),
+for(.cl in paste0(c("d", "z"), "geMatrix"))
+setMethod("qr.resid", c(qr = "sparseQR", y = .cl),
           function(qr, y) {
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
@@ -229,17 +238,18 @@ setMethod("qr.resid", c(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.resid", c(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.resid(qr, .m2dense(y, ",ge"))))
+         drop(qr.resid(qr, .m2dense(     y , ",ge"))))
 
 setMethod("qr.resid", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.resid(qr, .m2dense(y, ",ge")))
+              qr.resid(qr, .m2dense(     y , ",ge")) )
 
 setMethod("qr.resid", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.resid(qr, .m2dense(.M2m(y), ",ge")))
+              qr.resid(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.qty", c(qr = "sparseQR", y = "dgeMatrix"),
+for(.cl in paste0(c("d", "z"), "geMatrix"))
+setMethod("qr.qty", c(qr = "sparseQR", y = .cl),
           function(qr, y) {
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
@@ -252,17 +262,18 @@ setMethod("qr.qty", c(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.qty", c(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.qty(qr, .m2dense(y, ",ge"))))
+         drop(qr.qty(qr, .m2dense(     y , ",ge"))))
 
 setMethod("qr.qty", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.qty(qr, .m2dense(y, ",ge")))
+              qr.qty(qr, .m2dense(     y , ",ge")) )
 
 setMethod("qr.qty", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.qty(qr, .m2dense(.M2m(y), ",ge")))
+              qr.qty(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.qy", c(qr = "sparseQR", y = "dgeMatrix"),
+for(.cl in paste0(c("d", "z"), "geMatrix"))
+setMethod("qr.qy", c(qr = "sparseQR", y = .cl),
           function(qr, y) {
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
@@ -283,12 +294,14 @@ setMethod("qr.qy", c(qr = "sparseQR", y = "dgeMatrix"),
 
 setMethod("qr.qy", c(qr = "sparseQR", y = "vector"),
           function(qr, y)
-              drop(qr.qy(qr, .m2dense(y, ",ge"))))
+         drop(qr.qy(qr, .m2dense(     y , ",ge"))))
 
 setMethod("qr.qy", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
-              qr.qy(qr, .m2dense(y, ",ge")))
+              qr.qy(qr, .m2dense(     y , ",ge")) )
 
 setMethod("qr.qy", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
-              qr.qy(qr, .m2dense(.M2m(y), ",ge")))
+              qr.qy(qr, .m2dense(.M2m(y), ",ge")) )
+
+rm(.cl)

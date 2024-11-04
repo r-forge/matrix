@@ -9,86 +9,72 @@
 \alias{solve}
 \alias{solve-methods}
 %
-\alias{solve,ANY,ANY-method}
-\alias{solve,CsparseMatrix,ANY-method}
+\alias{solve,CsparseMatrix,CsparseMatrix-method}
+\alias{solve,CsparseMatrix,denseMatrix-method}
+\alias{solve,CsparseMatrix,missing-method}
+\alias{solve,Matrix,CsparseMatrix-method}
+\alias{solve,Matrix,RsparseMatrix-method}
+\alias{solve,Matrix,TsparseMatrix-method}
+\alias{solve,Matrix,denseMatrix-method}
+\alias{solve,Matrix,diagonalMatrix-method}
+\alias{solve,Matrix,indMatrix-method}
+\alias{solve,Matrix,matrix-method}
 \alias{solve,Matrix,sparseVector-method}
+\alias{solve,Matrix,vector-method}
 \alias{solve,MatrixFactorization,CsparseMatrix-method}
 \alias{solve,MatrixFactorization,RsparseMatrix-method}
 \alias{solve,MatrixFactorization,TsparseMatrix-method}
 \alias{solve,MatrixFactorization,denseMatrix-method}
-\alias{solve,MatrixFactorization,dgCMatrix-method}
-\alias{solve,MatrixFactorization,dgeMatrix-method}
 \alias{solve,MatrixFactorization,diagonalMatrix-method}
 \alias{solve,MatrixFactorization,indMatrix-method}
 \alias{solve,MatrixFactorization,matrix-method}
 \alias{solve,MatrixFactorization,sparseVector-method}
 \alias{solve,MatrixFactorization,vector-method}
-\alias{solve,RsparseMatrix,ANY-method}
-\alias{solve,TsparseMatrix,ANY-method}
-\alias{solve,diagonalMatrix,Matrix-method}
+\alias{solve,RsparseMatrix,CsparseMatrix-method}
+\alias{solve,RsparseMatrix,denseMatrix-method}
+\alias{solve,RsparseMatrix,missing-method}
+\alias{solve,TsparseMatrix,CsparseMatrix-method}
+\alias{solve,TsparseMatrix,denseMatrix-method}
+\alias{solve,TsparseMatrix,missing-method}
+\alias{solve,denseBunchKaufman,denseMatrix-method}
+\alias{solve,denseBunchKaufman,missing-method}
+\alias{solve,denseCholesky,denseMatrix-method}
+\alias{solve,denseCholesky,missing-method}
+\alias{solve,denseLU,denseMatrix-method}
+\alias{solve,denseLU,missing-method}
+\alias{solve,denseMatrix,denseMatrix-method}
+\alias{solve,denseMatrix,missing-method}
+\alias{solve,denseSchur,denseMatrix-method}
+\alias{solve,denseSchur,missing-method}
+\alias{solve,diagonalMatrix,CsparseMatrix-method}
+\alias{solve,diagonalMatrix,RsparseMatrix-method}
+\alias{solve,diagonalMatrix,TsparseMatrix-method}
+\alias{solve,diagonalMatrix,denseMatrix-method}
+\alias{solve,diagonalMatrix,diagonalMatrix-method}
+\alias{solve,diagonalMatrix,indMatrix-method}
 \alias{solve,diagonalMatrix,matrix-method}
 \alias{solve,diagonalMatrix,missing-method}
 \alias{solve,diagonalMatrix,vector-method}
-\alias{solve,denseBunchKaufman,missing-method}
-\alias{solve,denseBunchKaufman,dgeMatrix-method}
-\alias{solve,denseCholesky,missing-method}
-\alias{solve,denseCholesky,dgeMatrix-method}
-\alias{solve,denseLU,missing-method}
-\alias{solve,denseLU,dgeMatrix-method}
-\alias{solve,denseSchur,missing-method}
-\alias{solve,denseSchur,dgeMatrix-method}
-\alias{solve,denseMatrix,ANY-method}
-\alias{solve,dgCMatrix,denseMatrix-method}
-\alias{solve,dgCMatrix,matrix-method}
-\alias{solve,dgCMatrix,missing-method}
-\alias{solve,dgCMatrix,sparseMatrix-method}
-\alias{solve,dgCMatrix,vector-method}
-\alias{solve,dgeMatrix,ANY-method}
-\alias{solve,dpoMatrix,ANY-method}
-\alias{solve,dppMatrix,ANY-method}
-\alias{solve,dsCMatrix,denseMatrix-method}
-\alias{solve,dsCMatrix,matrix-method}
-\alias{solve,dsCMatrix,missing-method}
-\alias{solve,dsCMatrix,sparseMatrix-method}
-\alias{solve,dsCMatrix,vector-method}
-\alias{solve,dspMatrix,ANY-method}
-\alias{solve,dsyMatrix,ANY-method}
-\alias{solve,dtCMatrix,dgCMatrix-method}
-\alias{solve,dtCMatrix,dgeMatrix-method}
-\alias{solve,dtCMatrix,missing-method}
-\alias{solve,dtCMatrix,triangularMatrix-method}
-\alias{solve,dtpMatrix,dgeMatrix-method}
-\alias{solve,dtpMatrix,missing-method}
-\alias{solve,dtpMatrix,triangularMatrix-method}
-\alias{solve,dtrMatrix,dgeMatrix-method}
-\alias{solve,dtrMatrix,missing-method}
-\alias{solve,dtrMatrix,triangularMatrix-method}
-\alias{solve,indMatrix,ANY-method}
+\alias{solve,indMatrix,CsparseMatrix-method}
+\alias{solve,indMatrix,RsparseMatrix-method}
+\alias{solve,indMatrix,TsparseMatrix-method}
+\alias{solve,indMatrix,denseMatrix-method}
+\alias{solve,indMatrix,diagonalMatrix-method}
+\alias{solve,indMatrix,indMatrix-method}
+\alias{solve,indMatrix,matrix-method}
+\alias{solve,indMatrix,missing-method}
+\alias{solve,indMatrix,vector-method}
 \alias{solve,matrix,Matrix-method}
 \alias{solve,matrix,sparseVector-method}
-\alias{solve,pMatrix,Matrix-method}
-\alias{solve,pMatrix,matrix-method}
-\alias{solve,pMatrix,missing-method}
-\alias{solve,pMatrix,vector-method}
+\alias{solve,sparseCholesky,CsparseMatrix-method}
+\alias{solve,sparseCholesky,denseMatrix-method}
 \alias{solve,sparseCholesky,missing-method}
-\alias{solve,sparseCholesky,dgeMatrix-method}
-\alias{solve,sparseCholesky,dgCMatrix-method}
+\alias{solve,sparseLU,CsparseMatrix-method}
+\alias{solve,sparseLU,denseMatrix-method}
 \alias{solve,sparseLU,missing-method}
-\alias{solve,sparseLU,dgeMatrix-method}
-\alias{solve,sparseLU,dgCMatrix-method}
+\alias{solve,sparseQR,CsparseMatrix-method}
+\alias{solve,sparseQR,denseMatrix-method}
 \alias{solve,sparseQR,missing-method}
-\alias{solve,sparseQR,dgeMatrix-method}
-\alias{solve,sparseQR,dgCMatrix-method}
-\alias{solve,triangularMatrix,CsparseMatrix-method}
-\alias{solve,triangularMatrix,RsparseMatrix-method}
-\alias{solve,triangularMatrix,TsparseMatrix-method}
-\alias{solve,triangularMatrix,denseMatrix-method}
-\alias{solve,triangularMatrix,dgCMatrix-method}
-\alias{solve,triangularMatrix,dgeMatrix-method}
-\alias{solve,triangularMatrix,diagonalMatrix-method}
-\alias{solve,triangularMatrix,indMatrix-method}
-\alias{solve,triangularMatrix,matrix-method}
-\alias{solve,triangularMatrix,vector-method}
 %
 \description{
   Methods for generic function \code{\link[base]{solve}} for solving
@@ -100,19 +86,20 @@
 \usage{
 solve(a, b, ...)
 
-\S4method{solve}{dgeMatrix,ANY}(a, b, tol = .Machine$double.eps, \dots)
+\S4method{solve}{denseMatrix,missing}(a, b, tol = .Machine$double.eps, \dots)
+\S4method{solve}{denseMatrix,denseMatrix}(a, b, tol = .Machine$double.eps, \dots)
 
-\S4method{solve}{dgCMatrix,missing}(a, b, sparse = TRUE, \dots)
-\S4method{solve}{dgCMatrix,matrix}(a, b, sparse = FALSE, \dots)
-\S4method{solve}{dgCMatrix,denseMatrix}(a, b, sparse = FALSE, \dots)
-\S4method{solve}{dgCMatrix,sparseMatrix}(a, b, sparse = TRUE, \dots)
+\S4method{solve}{CsparseMatrix,missing}(a, b, sparse = TRUE, \dots)
+\S4method{solve}{CsparseMatrix,denseMatrix}(a, b, sparse = FALSE, \dots)
+\S4method{solve}{CsparseMatrix,CsparseMatrix}(a, b, sparse = TRUE, \dots)
 
-\S4method{solve}{denseLU,dgeMatrix}(a, b, \dots)
-\S4method{solve}{denseBunchKaufman,dgeMatrix}(a, b, \dots)
-\S4method{solve}{denseCholesky,dgeMatrix}(a, b, \dots)
-\S4method{solve}{sparseQR,dgCMatrix}(a, b, \dots)
-\S4method{solve}{sparseLU,dgCMatrix}(a, b, tol = .Machine$double.eps, \dots)
-\S4method{solve}{sparseCholesky,dgCMatrix}(a, b, system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
+\S4method{solve}{denseLU,denseMatrix}(a, b, \dots)
+\S4method{solve}{denseBunchKaufman,denseMatrix}(a, b, \dots)
+\S4method{solve}{denseCholesky,denseMatrix}(a, b, \dots)
+\S4method{solve}{sparseQR,CsparseMatrix}(a, b, sparse = TRUE, \dots)
+\S4method{solve}{sparseLU,CsparseMatrix}(a, b, sparse = TRUE, tol = .Machine$double.eps, \dots)
+\S4method{solve}{sparseCholesky,CsparseMatrix}(a, b, sparse = TRUE,
+      system = c("A", "LDLt", "LD", "DLt", "L", "Lt", "D", "P", "Pt"), \dots)
 }
 \arguments{
   \item{a}{a \link[=is.finite]{finite} square matrix or
