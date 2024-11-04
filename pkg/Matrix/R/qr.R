@@ -25,8 +25,6 @@ setMethod("qr", c(x = "sparseMatrix"),
           function(x, ...)
               qr(.M2gen(.M2C(x), ","), ...))
 
-rm(.cl)
-
 
 ## METHODS FOR GENERIC: qr.Q, qr.R, qr.X
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -302,5 +300,3 @@ setMethod("qr.qy", c(qr = "sparseQR", y = "matrix"),
 setMethod("qr.qy", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
               qr.qy(qr, .m2dense(.M2m(y), ",ge")) )
-
-rm(.cl)
