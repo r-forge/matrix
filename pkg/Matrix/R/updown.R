@@ -27,8 +27,6 @@ setMethod("updown",
               .Call(sparseCholesky_updown, L, C, update)
           })
 
-rm(.cl)
-
 
 ## METHODS FOR GENERIC: update
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
