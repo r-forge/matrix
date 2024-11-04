@@ -26,7 +26,7 @@
 .isR        <- function(x) .M.repr(x) == "R"
 .isT        <- function(x) .M.repr(x) == "T"
 .isDiagonal <- function(x) .M.repr(x) == "d"
-.isInd      <- function(x) .M.repr(x) == "i"
+.isIndex    <- function(x) .M.repr(x) == "i"
 .isDense    <- function(x) any(.M.repr(x) == c("n", "p"))
 .isSparse   <- function(x) any(.M.repr(x) == c("C", "R", "T", "d", "i"))
 .isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
