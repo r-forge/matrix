@@ -11,9 +11,7 @@
 %
 \alias{updown,character,ANY,ANY-method}
 \alias{updown,logical,Matrix,sparseCholesky-method}
-\alias{updown,logical,dgCMatrix,sparseCholesky-method}
-\alias{updown,logical,dsCMatrix,sparseCholesky-method}
-\alias{updown,logical,dtCMatrix,sparseCholesky-method}
+\alias{updown,logical,CsparseMatrix,sparseCholesky-method}
 \alias{updown,logical,matrix,sparseCholesky-method}
 %
 \description{
