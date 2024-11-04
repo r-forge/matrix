@@ -25,38 +25,32 @@
 \alias{qr.resid}
 \alias{qr.resid-methods}
 %
-\alias{qr,dgCMatrix-method}
+\alias{qr,CsparseMatrix-method}
 \alias{qr,sparseMatrix-method}
-\alias{qr,zgCMatrix-method}
 %
 \alias{qr.Q,sparseQR-method}
 \alias{qr.R,sparseQR-method}
 \alias{qr.X,sparseQR-method}
 \alias{qr.coef,sparseQR,Matrix-method}
-\alias{qr.coef,sparseQR,dgeMatrix-method}
+\alias{qr.coef,sparseQR,denseMatrix-method}
 \alias{qr.coef,sparseQR,matrix-method}
 \alias{qr.coef,sparseQR,vector-method}
-\alias{qr.coef,sparseQR,zgeMatrix-method}
 \alias{qr.fitted,sparseQR,Matrix-method}
-\alias{qr.fitted,sparseQR,dgeMatrix-method}
+\alias{qr.fitted,sparseQR,denseMatrix-method}
 \alias{qr.fitted,sparseQR,matrix-method}
 \alias{qr.fitted,sparseQR,vector-method}
-\alias{qr.fitted,sparseQR,zgeMatrix-method}
 \alias{qr.qty,sparseQR,Matrix-method}
-\alias{qr.qty,sparseQR,dgeMatrix-method}
+\alias{qr.qty,sparseQR,denseMatrix-method}
 \alias{qr.qty,sparseQR,matrix-method}
 \alias{qr.qty,sparseQR,vector-method}
-\alias{qr.qty,sparseQR,zgeMatrix-method}
 \alias{qr.qy,sparseQR,Matrix-method}
-\alias{qr.qy,sparseQR,dgeMatrix-method}
+\alias{qr.qy,sparseQR,denseMatrix-method}
 \alias{qr.qy,sparseQR,matrix-method}
 \alias{qr.qy,sparseQR,vector-method}
-\alias{qr.qy,sparseQR,zgeMatrix-method}
 \alias{qr.resid,sparseQR,Matrix-method}
-\alias{qr.resid,sparseQR,dgeMatrix-method}
+\alias{qr.resid,sparseQR,denseMatrix-method}
 \alias{qr.resid,sparseQR,matrix-method}
 \alias{qr.resid,sparseQR,vector-method}
-\alias{qr.resid,sparseQR,zgeMatrix-method}
 %
 \alias{qrR}
 %
@@ -84,7 +78,7 @@
 }
 \usage{
 qr(x, \dots)
-\S4method{qr}{dgCMatrix}(x, order = 3L, \dots)
+\S4method{qr}{CsparseMatrix}(x, order = 3L, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite} matrix or
