@@ -34,6 +34,7 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 
 	SEXP to = PROTECT(newObject(cl));
 	SET_DIM(to, m, n);
+	if (dimnames != R_NilValue)
 	SET_DIMNAMES(to, -(cl[1] == 's' || cl[1] == 'p'), dimnames);
 	if (cl[1] != 'g' && ul != 'U')
 		SET_UPLO(to);
@@ -135,7 +136,8 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 
 SEXP R_vector_as_dense(SEXP s_from, SEXP s_zzz,
                        SEXP s_uplo, SEXP s_trans, SEXP s_diag,
-                       SEXP s_m, SEXP s_n, SEXP s_byrow, SEXP s_dimnames)
+                       SEXP s_m, SEXP s_n, SEXP s_byrow,
+                       SEXP s_dimnames)
 {
 	switch (TYPEOF(s_from)) {
 	case LGLSXP:
@@ -780,6 +782,7 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 
 	SEXP to = PROTECT(newObject(cl));
 	SET_DIM(to, m, n);
+	if (dimnames != R_NilValue)
 	SET_DIMNAMES(to, -(cl[1] == 's' || cl[1] == 'p'), dimnames);
 	if (cl[1] != 'g' && ul != 'U')
 		SET_UPLO(to);
@@ -1176,7 +1179,8 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 
 SEXP R_Vector_as_sparse(SEXP s_from, SEXP s_zzz,
                         SEXP s_uplo, SEXP s_trans, SEXP s_diag,
-                        SEXP s_m, SEXP s_n, SEXP s_byrow, SEXP s_dimnames)
+                        SEXP s_m, SEXP s_n, SEXP s_byrow,
+                        SEXP s_dimnames)
 {
 	Matrix_class(s_from, valid_vector, 0, __func__);
 

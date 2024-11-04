@@ -83,6 +83,13 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .ind2sparse <- function(from, kind = "n", repr = ".")
     .Call(R_index_as_sparse, from, kind, repr)
 
+.v2dense <- function(from, class = ".ge",
+                     uplo = "U", trans = "C", diag = "N",
+                     nrow = 1L, ncol = 1L, byrow = FALSE,
+                     dimnames = NULL)
+    .Call(R_vector_as_dense, from, class, uplo, trans, diag,
+          nrow, ncol, byrow, dimnames)
+
 .m2dense <- function(from, class = ".ge",
                      uplo = "U", trans = "C", diag = "N", margin = 2L)
     .Call(R_matrix_as_dense, from, class, uplo, trans, diag, margin)
@@ -111,6 +118,13 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     else
         .m2dense(from, paste0(kind, "ge"))
 }
+
+.V2sparse <- function(from, class = ".gC",
+                      uplo = "U", trans = "C", diag = "N",
+                      nrow = 1L, ncol = 1L, byrow = FALSE,
+                      dimnames = NULL)
+    .Call(R_Vector_as_sparse, from, class, uplo, trans, diag,
+          nrow, ncol, byrow, dimnames)
 
 .m2sparse <- function(from, class = ".gC",
                       uplo = "U", trans = "C", diag = "N", margin = 2L)
