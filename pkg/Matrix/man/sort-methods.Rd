@@ -8,6 +8,8 @@
 \alias{sort}
 \alias{sort-methods}
 %
+\alias{sort,denseMatrix-method}
+\alias{sort,sparseMatrix-method}
 \alias{sort,sparseVector-method}
 %
 \description{TODO.}

@@ -52,4 +52,11 @@ function(x, decreasing = FALSE, na.last = NA, ...) {
     x
 }
 
-setMethod("sort", c(x = "sparseVector"), .V.sort)
+setMethod("sort", c(x = "denseMatrix"),
+          function(x, ...) sort(.M2v(x), ...))
+
+setMethod("sort", c(x = "sparseMatrix"),
+          function(x, ...) sort(.M2V(x), ...))
+
+setMethod("sort", c(x = "sparseVector"),
+          .V.sort)
