@@ -9,28 +9,44 @@ setMethod("!", c(x = "sparseVector"),
 
 setMethod("!", c(x = "ndenseMatrix"),
           function(x) {
-              if(.M.shape(x) == "t")
+              if((shape <- .M.shape(x)) == "t")
                   x <- .M2gen(x)
-              x@x <- { y <- x@x; if(anyNA(y)) !(y | is.na(y)) else !y }
-              x
+              r <- new(.M.class(x))
+              r@Dim <- x@Dim
+              r@Dimnames <- x@Dimnames
+              if(shape == "s")
+                  r@uplo <- x@uplo
+              r@x <- { y <- x@x; !(y | is.na(y)) }
+              r
           })
+
 setMethod("!", c(x = "ldenseMatrix"),
           function(x) {
-              if(.M.shape(x) == "t")
+              if((shape <- .M.shape(x)) == "t")
                   x <- .M2gen(x)
-              x@x <- !x@x
-              x
+              r <- new(.M.class(x))
+              r@Dim <- x@Dim
+              r@Dimnames <- x@Dimnames
+              if(shape == "s")
+                  r@uplo <- x@uplo
+              r@x <- !x@x
+              r
           })
 
 setMethod("!", c(x = "nsparseMatrix"),
           function(x) {
-              x <- .sparse2dense(if(.M.shape(x) == "t") .M2gen(x) else x)
+              if(.M.shape(x) == "t")
+                  x <- .M2gen(x)
+              x <- .sparse2dense(x)
               x@x <- !x@x
               x
           })
+
 setMethod("!", c(x = "lsparseMatrix"),
           function(x) {
-              x <- .sparse2dense(if(.M.shape(x) == "t") .M2gen(x) else x)
+              if(.M.shape(x) == "t")
+                  x <- .M2gen(x)
+              x <- .sparse2dense(x)
               x@x <- !x@x
               x
           })
@@ -43,6 +59,7 @@ setMethod("!", c(x = "ndiMatrix"),
               x@x <- !x@x
               x
           })
+
 setMethod("!", c(x = "ldiMatrix"),
           function(x) {
               x <- .diag2dense(x, ".", "g")
@@ -50,14 +67,15 @@ setMethod("!", c(x = "ldiMatrix"),
               x
           })
 
-setMethod("!", c(x = "nsparseVector"),
-          function(x) !.V2v(x))
-setMethod("!", c(x = "lsparseVector"),
-          function(x) !.V2v(x))
-
 setMethod("!", c(x = "indMatrix"),
           function(x) {
               x <- .ind2dense(x)
               x@x <- !x@x
               x
           })
+
+setMethod("!", c(x = "nsparseVector"),
+          function(x) !.V2v(x))
+
+setMethod("!", c(x = "lsparseVector"),
+          function(x) !.V2v(x))
