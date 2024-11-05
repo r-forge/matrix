@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-01 r4969)}{
+\section{Changes in version 1.8-0 (2024-11-05 r4991)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -41,8 +41,14 @@
       \code{uplo} for control over the \code{uplo} slot of the result
       of \code{symmpart(<generalMatrix>)}.
 
-      \item \code{sort(<sparseVector>)} works, now that \code{sort} is
-      an implicit generic function in package \pkg{methods}.
+      \item \code{sort(x, \dots)} works for \code{x} inheriting from
+      virtual class \code{Matrix} or virtual class \code{sparseVector}.
+      It is possible now that \code{sort} is an implicit generic
+      function in package \pkg{methods}.
+
+      \item \code{kappa(z, \dots)} works for \code{z} inheriting from
+      virtual class \code{Matrix}, trivially computing the reciprocal
+      of \code{rcond(z, \dots)}.
     }
   }
   \subsection{Bug Fixes}{
