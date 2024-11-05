@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-05 r4991)}{
+\section{Changes in version 1.8-0 (2024-11-05 r4995)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -46,9 +46,18 @@
       It is possible now that \code{sort} is an implicit generic
       function in package \pkg{methods}.
 
-      \item \code{kappa(z, \dots)} works for \code{z} inheriting from
-      virtual class \code{Matrix}, trivially computing the reciprocal
-      of \code{rcond(z, \dots)}.
+      \item A method is defined for \code{kappa(z, \dots)} for
+      \code{z} inheriting from virtual class \code{Matrix}.  It
+      computes the reciprocal of \code{rcond(z, \dots)} and thus
+      supports all of the optional arguments of methods for
+      \code{rcond}.  Hence, in \pkg{Matrix} (unlike in \pkg{base}),
+      \code{kappa} and \code{rcond} have \dQuote{consistent}
+      interfaces.
+
+      \item Methods for \code{rcond} gain arguments \code{exact},
+      \code{inverse}, and \code{warn} providing more precise control
+      over behaviour and an interface more similar to the default
+      method for \code{kappa} in \pkg{base}.
     }
   }
   \subsection{Bug Fixes}{

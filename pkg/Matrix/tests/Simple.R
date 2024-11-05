@@ -482,10 +482,10 @@ m@Dimnames[[2]] <- m@Dimnames[[1]]
 ## not valid anymore:
 (val <- validObject(m, test=TRUE)); stopifnot(is.character(val))
 dm <- as(m0, "denseMatrix"); rm(m)
-stopifnot(all.equal(rcond(dm), rcond(m.), tolerance = 1e-14),
+stopifnot(all.equal(rcond(dm, warn = FALSE) -> rk, rcond(m., warn = FALSE), tolerance = 1e-14),
 	  ##^^^^^^^ dm and m. are both dense, interestingly small differences
 	  ## show in at least one case of optimized BLAS
-	  all.equal(rcond(dm), 0.4899474520656),
+	  all.equal(rk, 0.4899474520656),
           ## show(<dgRMatrix>) had revealed a bug in C:
           identical(capture.output(show(as(m0, "RsparseMatrix")))[-(1:2)],
                     gsub("0", ".",  capture.output(show(m.))[-1])))

@@ -6,6 +6,8 @@ setMethod("kappa", c(z = "Matrix"),
 
 
 ## METHODS FOR GENERIC: rcond
+## NB: approximation by QR factorization is exact for
+##     rcond(<square>, norm = <"2" or "F">)
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("rcond", c(x = "ANY", norm = "missing"),
@@ -13,28 +15,49 @@ setMethod("rcond", c(x = "ANY", norm = "missing"),
               rcond(x, norm = "O", ...))
 
 setMethod("rcond", c(x = "denseMatrix", norm = "character"),
-          function(x, norm, ...) {
+          function(x, norm, exact = FALSE, inverse = solve(x),
+                   warn = TRUE, ...) {
+              switch(EXPR = norm,
+                     "2" =,
+                     "M" =, "m" =,
+                     "F" =, "f" =, "E" =, "e" =
+                         exact <- TRUE,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =
+                         NULL,
+                     stop(gettext("invalid %s=\"%s\"",
+                                  "norm", norm),
+                          domain = NA))
+              d <- x@Dim
+              if ((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
+                  return(Inf)
               x <- .M2kind(x, ",")
-              switch(substr(.M.class(x, 2L), 2L, 3L),
+              if (exact)
+              switch(EXPR = norm,
+                     "2" =,
+                         {
+                             s <- svd(x, nu = 0L, nv = 0L)[["d"]]
+                             if (s[1L] > 0) s[length(s)]/s[1L] else 0
+                         },
+                     "M" =, "m" =,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =,
+                     "F" =, "f" =, "E" =, "e" =
+                         1/(norm(x, type = norm) * norm(inverse, type = norm)))
+              else
+              switch(EXPR = substr(.M.class(x, 2L), 2L, 3L),
                      "ge" =
                          {
-                             d <- x@Dim
-                             m <- d[1L]
-                             n <- d[2L]
                              if (m == n) {
-                                 trf <- lu(x, warnSing = FALSE)
-                                 .Call(geMatrix_rcond, x, trf, norm)
+                             trf <- lu(x, warnSing = FALSE)
+                             .Call(geMatrix_rcond, x, trf, norm)
                              } else {
-                                 ## MJ: norm(A = P1' Q R P2') = norm(R) holds
-                                 ##     in general only for norm == "2", but
-                                 ##     La_rcond_type() disallows norm == "2"
-                                 ##     ... FIXME ??
-                                 if (m < n) {
-                                     x <- t(x)
-                                     n <- m
-                                 }
-                                 R <- triu(qr(x)[["qr"]][seq_len(n), , drop = FALSE])
-                                 rcond(R, norm = norm, ...)
+                             if (warn)
+                             warning(gettextf("rcond(%s, %s) via QR factorization; dubious for non-square '%s', %s=\"%s\"",
+                                              "x", "norm", "x", "norm", norm),
+                                     domain = NA)
+                             R <- triu(qr(if (m < n) ct(x) else x)[["qr"]][seq_len(if (m < n) m else n), , drop = FALSE])
+                             .Call(trMatrix_rcond, R, norm)
                              }
                          },
                      "sy" =
@@ -50,12 +73,11 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                      "po" =
                          {
                              ok <- TRUE
-                             trf <- tryCatch(
-                                 Cholesky(x, perm = FALSE),
-                                 error = function(e) {
-                                     ok <<- FALSE
-                                     BunchKaufman(x, warnSing = FALSE)
-                                 })
+                             trf <- tryCatch(Cholesky(x, perm = FALSE),
+                                             error = function(e) {
+                                                 ok <<- FALSE
+                                                 BunchKaufman(x, warnSing = FALSE)
+                                             })
                              if (ok)
                                  .Call(poMatrix_rcond, x, trf, norm)
                              else .Call(syMatrix_rcond, x, trf, norm)
@@ -63,12 +85,11 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                      "pp" =
                          {
                              ok <- TRUE
-                             trf <- tryCatch(
-                                 Cholesky(x, perm = FALSE),
-                                 error = function(e) {
-                                     ok <<- FALSE
-                                     BunchKaufman(x, warnSing = FALSE)
-                                 })
+                             trf <- tryCatch(Cholesky(x, perm = FALSE),
+                                             error = function(e) {
+                                                 ok <<- FALSE
+                                                 BunchKaufman(x, warnSing = FALSE)
+                                             })
                              if (ok)
                                  .Call(ppMatrix_rcond, x, trf, norm)
                              else .Call(spMatrix_rcond, x, trf, norm)
@@ -78,33 +99,46 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
           })
 
 setMethod("rcond", c(x = "sparseMatrix", norm = "character"),
-          function(x, norm, useInv = FALSE, ...) {
+          function(x, norm, exact = FALSE, inverse = solve(x),
+                   warn = TRUE, ...) {
+              switch(EXPR = norm,
+                     "2" =,
+                     "M" =, "m" =,
+                     "F" =, "f" =, "E" =, "e" =
+                         exact <- TRUE,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =
+                         NULL,
+                     stop(gettext("invalid %s=\"%s\"",
+                                  "norm", norm),
+                          domain = NA))
               d <- x@Dim
               if ((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
                   return(Inf)
-              if (m == n) {
-                  if (isS4(useInv) || useInv) {
-                      if (!isS4(useInv))
-                          useInv <- solve(x)
-                      1/(norm(x, type = norm) * norm(useInv, type = norm))
-                  } else {
-                      warning(gettextf("'%s' via sparse -> dense coercion",
-                                       "rcond"),
-                              domain = NA)
-                      rcond(.M2unpacked(x), norm = norm, ...)
-                  }
-              } else {
-                  ## MJ: norm(A = P1' Q R P2') = norm(R) holds in general
-                  ##     only for norm == "2", but La_rcond_type() disallows
-                  ##     norm == "2" ... FIXME ??
-                  if (m < n) {
-                      x <- t(x)
-                      n <- m
-                  }
-                  R <- triu(qr(x)@R[seq_len(n), , drop = FALSE])
-                  rcond(R, norm = norm, ...)
+              x <- .M2kind(x, ",")
+              if (exact)
+              switch(EXPR = norm,
+                     "2" =,
+                         {
+                             s <- svd(x, nu = 0L, nv = 0L)[["d"]]
+                             if (s[1L] > 0) s[length(s)]/s[1L] else 0
+                         },
+                     "M" =, "m" =,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =,
+                     "F" =, "f" =, "E" =, "e" =
+                         1/(norm(x, type = norm) * norm(inverse, type = norm)))
+              else if (m == n)
+              rcond(.sparse2dense(x), norm = norm, exact = FALSE, ...)
+              else {
+              if (warn)
+              warning(gettextf("rcond(%s, %s) via QR factorization; dubious for non-square '%s', %s=\"%s\"",
+                               "x", "norm", "x", "norm", norm),
+                      domain = NA)
+              R <- triu(qr(if (m < n) ct(x) else x)@R[seq_len(if (m < n) m else n), , drop = FALSE])
+              rcond(R, norm = norm, exact = FALSE, ...)
               }
-           })
+          })
 
 setMethod("rcond", c(x = "diagonalMatrix", norm = "character"),
           function(x, norm, ...) {
@@ -116,13 +150,13 @@ setMethod("rcond", c(x = "diagonalMatrix", norm = "character"),
                       y <- y | is.na(y)
               }
               switch(EXPR = norm[1L],
-                     "O" =, "o" =, "1" =,
-                     "I" =, "i" =,
                      "2" =,
-                     "M" =, "m" =
+                     "M" =, "m" =,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =
                          if (nonunit) {
-                             ry <- range(abs(y))
-                             ry[1L]/ry[2L]
+                             r <- range(abs(y))
+                             if (r[2L] > 0) r[1L]/r[2L] else 0
                          } else 1,
                      "F" =, "f" =, "E" =, "e" =
                          if (nonunit) {
@@ -144,11 +178,11 @@ setMethod("rcond", c(x = "indMatrix", norm = "character"),
               if (m == n) {
                   if (anyDuplicated.default(x@perm))
                       return(0)
-                  switch(EXPR = norm[1L],
-                         "O" =, "o" =, "1" =,
-                         "I" =, "i" =,
+                  switch(EXPR = norm,
                          "2" =,
-                         "M" =, "m" =
+                         "M" =, "m" =,
+                         "O" =, "o" =, "1" =,
+                         "I" =, "i" =
                              1,
                          "F" =, "f" =, "E" =, "e" =
                              1/n,
@@ -169,11 +203,11 @@ setMethod("rcond", c(x = "pMatrix", norm = "character"),
           function(x, norm, ...) {
               if ((n <- x@Dim[1L]) == 0L)
                   return(Inf)
-              switch(EXPR = norm[1L],
-                     "O" =, "o" =, "1" =,
-                     "I" =, "i" =,
+              switch(EXPR = norm,
                      "2" =,
-                     "M" =, "m" =
+                     "M" =, "m" =,
+                     "O" =, "o" =, "1" =,
+                     "I" =, "i" =
                          1,
                      "F" =, "f" =, "E" =, "e" =
                          1/n,

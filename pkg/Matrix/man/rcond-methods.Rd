@@ -24,7 +24,8 @@
 kappa(z, \dots)
 rcond(x, norm, \dots)
 
-\S4method{rcond}{sparseMatrix,character}(x, norm, useInv=FALSE, \dots)
+\S4method{rcond}{sparseMatrix,character}(x, norm, exact = FALSE, inverse = solve(x),
+      warn = TRUE, \dots)
 }
 \description{
   Estimate the reciprocal of the condition number of a matrix.
@@ -41,19 +42,22 @@ rcond(x, norm, \dots)
     otherwise, the other possible value is \code{"I"} for the infinity
     norm, see also \code{\link{norm}}.
   }
-  \item{useInv}{logical (or \code{"Matrix"} containing
-    \code{\link{solve}(x)}).  If not false, compute the reciprocal
-    condition number as \eqn{1/(\|x\| \cdot \|x^{-1}\|)}{1/(||x|| * ||x^(-1)||)},
-    where \eqn{x^{-1}}{x^(-1)} is the inverse of \eqn{x}, \code{solve(x)}.
+  \item{exact}{.}
+  \item{inverse}{.}
+  \item{warn}{.}
+  %% \item{useInv}{logical (or \code{"Matrix"} containing
+  %%   \code{\link{solve}(x)}).  If not false, compute the reciprocal
+  %%   condition number as \eqn{1/(\|x\| \cdot \|x^{-1}\|)}{1/(||x|| * ||x^(-1)||)},
+  %%   where \eqn{x^{-1}}{x^(-1)} is the inverse of \eqn{x}, \code{solve(x)}.
 
-    This may be an efficient alternative (only) in situations where
-    \code{solve(x)} is fast (or known), e.g., for (very) sparse or
-    triangular matrices.
+  %%   This may be an efficient alternative (only) in situations where
+  %%   \code{solve(x)} is fast (or known), e.g., for (very) sparse or
+  %%   triangular matrices.
 
-    Note that the \emph{result} may differ depending on \code{useInv},
-    as per default, when it is false, an \emph{approximation} is
-    computed.
-  }
+  %%   Note that the \emph{result} may differ depending on \code{useInv},
+  %%   as per default, when it is false, an \emph{approximation} is
+  %%   computed.
+  %% }
   \item{\dots}{further arguments passed to or from other methods.}
 }
 \value{
@@ -136,11 +140,11 @@ dim(M3 <- kronecker(bdiag(M,M),MM)) # 12'800 ^ 2
 if(interactive()) ## takes about 2 seconds if you have >= 8 GB RAM
   system.time(r <- rcond(M3))
 ## whereas this is *fast* even though it computes  solve(M3)
-system.time(r. <- rcond(M3, useInv=TRUE))
+system.time(r. <- rcond(M3, exact=TRUE))
 if(interactive()) ## the values are not the same
   c(r, r.)  # 0.05555 0.013888
-## for all 4 norms available for sparseMatrix :
-cbind(rr <- sapply(c("1","I","F","M"),
-             function(N) rcond(M3, norm=N, useInv=TRUE)))
+## for all norms available for sparseMatrix, except "2" :
+cbind(rr <- sapply(c("O","I","F","M"),
+             function(N) rcond(M3, norm=N, exact=TRUE)))
 \dontshow{stopifnot(all.equal(r., 1/72, tolerance=1e-12))}
 }

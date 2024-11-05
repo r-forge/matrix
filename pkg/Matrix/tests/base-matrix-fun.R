@@ -19,7 +19,7 @@ str(D1 <- dist(m11))
 str(rs <- apply(m1, 1, sum))
 
 stopifnot(identical(kappa(Matrix(2:5, 2)),
-                    kappa(matrix(2:5, 2))))
+                    kappa(matrix(2:5, 2), method = "direct")))
 ## used to seg.fault, PR#7984,
 ## because qr() was calling the wrong as.matrix()
 

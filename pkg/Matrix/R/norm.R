@@ -24,14 +24,9 @@ setMethod("norm", c(x = "sparseMatrix", type = "character"),
                   return(0)
               switch(EXPR = type,
                      "2" =
-                         {
-                             warning(gettextf("'%s' via sparse -> dense coercion",
-                                              "norm"),
-                                     domain = NA)
-                             base::norm(.M2m(x), type = "2")
-                         },
+                         base::norm(.M2m(x), type = "2"),
                      "M" =, "m" =
-                         max(abs(range(x))),
+                         max(range(abs(x))),
                      "O" =, "o" =, "1" =
                          max(colSums(abs(x))),
                      "I" =, "i" =
@@ -61,7 +56,7 @@ setMethod("norm", c(x = "diagonalMatrix", type = "character"),
                      "M" =, "m" =,
                      "O" =, "o" =, "1" =,
                      "I" =, "i" =
-                         if (nonunit) max(abs(range(y))) else 1,
+                         if (nonunit) max(abs(y)) else 1,
                      "F" =, "f" =, "E" =, "e" =
                          if (nonunit) {
                              if (is.complex(y))
