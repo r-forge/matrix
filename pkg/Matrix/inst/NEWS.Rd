@@ -58,6 +58,8 @@
       \code{inverse}, and \code{warn} providing more precise control
       over behaviour and an interface more similar to the default
       method for \code{kappa} in \pkg{base}.
+
+      \item All methods for \code{rcond} support the 2-norm.
     }
   }
   \subsection{Bug Fixes}{
