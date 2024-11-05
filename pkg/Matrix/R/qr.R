@@ -183,7 +183,7 @@ setMethod("qr.coef", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
               qr.coef(qr, .m2dense(     y , ",ge")) )
 
-setMethod("qr.coef", c(qr = "sparseQR", y = "Matrix"),
+setMethod("qr.coef", c(qr = "sparseQR", y = "sparseMatrix"),
           function(qr, y)
               qr.coef(qr, .m2dense(.M2m(y), ",ge")) )
 
@@ -205,7 +205,7 @@ setMethod("qr.fitted", c(qr = "sparseQR", y = "matrix"),
           function(qr, y, k = qr$rank)
               qr.fitted(qr, .m2dense(     y , ",ge")) )
 
-setMethod("qr.fitted", c(qr = "sparseQR", y = "Matrix"),
+setMethod("qr.fitted", c(qr = "sparseQR", y = "sparseMatrix"),
           function(qr, y, k = qr$rank)
               qr.fitted(qr, .m2dense(.M2m(y), ",ge")) )
 
@@ -229,7 +229,7 @@ setMethod("qr.resid", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
               qr.resid(qr, .m2dense(     y , ",ge")) )
 
-setMethod("qr.resid", c(qr = "sparseQR", y = "Matrix"),
+setMethod("qr.resid", c(qr = "sparseQR", y = "sparseMatrix"),
           function(qr, y)
               qr.resid(qr, .m2dense(.M2m(y), ",ge")) )
 
@@ -253,7 +253,7 @@ setMethod("qr.qty", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
               qr.qty(qr, .m2dense(     y , ",ge")) )
 
-setMethod("qr.qty", c(qr = "sparseQR", y = "Matrix"),
+setMethod("qr.qty", c(qr = "sparseQR", y = "sparseMatrix"),
           function(qr, y)
               qr.qty(qr, .m2dense(.M2m(y), ",ge")) )
 
@@ -277,7 +277,7 @@ setMethod("qr.qy", c(qr = "sparseQR", y = "matrix"),
           function(qr, y)
               qr.qy(qr, .m2dense(     y , ",ge")) )
 
-setMethod("qr.qy", c(qr = "sparseQR", y = "Matrix"),
+setMethod("qr.qy", c(qr = "sparseQR", y = "sparseMatrix"),
           function(qr, y)
               qr.qy(qr, .m2dense(.M2m(y), ",ge")) )
 
