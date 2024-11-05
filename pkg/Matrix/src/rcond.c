@@ -43,8 +43,8 @@ SEXP geMatrix_rcond(SEXP s_obj, SEXP trf, SEXP s_type)
 
 	int *pdim = DIM(s_obj), n = pdim[1];
 	if (pdim[0] != n)
-		Rf_error(_("%s(%s) is undefined: '%s' is not square"),
-		         "rcond", "x", "x");
+		Rf_error(_("non-square matrix arguments not supported by '%s'"),
+		         __func__);
 	if (n == 0)
 		return(Rf_ScalarReal(R_PosInf));
 
