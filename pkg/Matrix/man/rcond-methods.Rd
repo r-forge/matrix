@@ -1,13 +1,17 @@
 \name{rcond-methods}
-\title{Estimate the Reciprocal Condition Number}
+\title{Estimate the (Reciprocal) Condition Number}
 %
 \docType{methods}
 \keyword{algebra}
 \keyword{math}
 \keyword{methods}
 %
+\alias{kappa}
+\alias{kappa-methods}
 \alias{rcond}
 \alias{rcond-methods}
+%
+\alias{kappa,Matrix-method}
 %
 \alias{rcond,ANY,missing-method}
 \alias{rcond,denseMatrix,character-method}
@@ -17,6 +21,7 @@
 \alias{rcond,sparseMatrix,character-method}
 %
 \usage{
+kappa(z, \dots)
 rcond(x, norm, \dots)
 
 \S4method{rcond}{sparseMatrix,character}(x, norm, useInv=FALSE, \dots)
@@ -28,7 +33,7 @@ rcond(x, norm, \dots)
   \code{\link{showMethods}(rcond)}.
 }
 \arguments{
-  \item{x}{an \R object that inherits from the \code{Matrix} class.}
+  \item{x, z}{an \R object that inherits from the \code{Matrix} class.}
   \item{norm}{character string indicating the type of norm to be used in
     the estimate. The default is \code{"O"} for the 1-norm (\code{"O"} is
     equivalent to \code{"1"}).  For sparse matrices, when \code{useInv=TRUE},
