@@ -723,8 +723,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse,
 			cholmod_free_dense(&B, &c);
 			if (!X)
 				ERROR_OOM(__func__);
-			PROTECT(r = CHD2M(X, 'N',
-				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
+			PROTECT(r = CHD2M(X, 'N', (ivalid < 2) ? ((L->is_ll) ? 'p' : 's') : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHD(s_b, 'N');
 			X = cholmod_solve(ivalid, L, B, &c);
@@ -750,8 +749,7 @@ SEXP sparseCholesky_solve(SEXP s_a, SEXP s_b, SEXP s_sparse,
 			}
 			if (!X)
 				ERROR_OOM(__func__);
-			PROTECT(r = CHS2M(X, 1,
-				(ivalid < 2) ? 'p' : ((ivalid < 7) ? 't' : 'g')));
+			PROTECT(r = CHS2M(X, 1, (ivalid < 2) ? ((L->is_ll) ? 'p' : 's') : ((ivalid < 7) ? 't' : 'g')));
 		} else {
 			B = M2CHS(s_b, 1);
 			X = cholmod_spsolve(ivalid, L, B, &c);
