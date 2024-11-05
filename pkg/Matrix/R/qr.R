@@ -175,16 +175,6 @@ function(y, m0) {
     y0
 }
 
-setMethod("qr.coef", c(qr = "sparseQR", y = "denseMatrix"),
-          function(qr, y) {
-              y <- .M2gen(y, ",")
-              if(m0 <- .qr.rank.def.warn(qr))
-                  y <- .qr.y0(y, m0)
-              r <- .Call(sparseQR_matmult, qr, y, 0L, NA, NULL)
-              r@Dimnames <- c(qr@Dimnames[2L], y@Dimnames[2L])
-              r
-          })
-
 setMethod("qr.coef", c(qr = "sparseQR", y = "vector"),
           function(qr, y)
          drop(qr.coef(qr, .m2dense(     y , ",ge"))))
@@ -197,15 +187,13 @@ setMethod("qr.coef", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
               qr.coef(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.fitted", c(qr = "sparseQR", y = "denseMatrix"),
-          function(qr, y, k = qr$rank) {
+setMethod("qr.coef", c(qr = "sparseQR", y = "denseMatrix"),
+          function(qr, y) {
               y <- .M2gen(y, ",")
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
-              r <- .Call(sparseQR_matmult, qr, y, 1L, NA, NULL)
-              r@Dimnames <- y@Dimnames
-              if(m0 && .qr.rank.def.truncating)
-                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r <- .Call(sparseQR_matmult, qr, y, 0L, NA, NULL)
+              r@Dimnames <- c(qr@Dimnames[2L], y@Dimnames[2L])
               r
           })
 
@@ -221,12 +209,12 @@ setMethod("qr.fitted", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y, k = qr$rank)
               qr.fitted(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.resid", c(qr = "sparseQR", y = "denseMatrix"),
-          function(qr, y) {
+setMethod("qr.fitted", c(qr = "sparseQR", y = "denseMatrix"),
+          function(qr, y, k = qr$rank) {
               y <- .M2gen(y, ",")
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
-              r <- .Call(sparseQR_matmult, qr, y, 2L, NA, NULL)
+              r <- .Call(sparseQR_matmult, qr, y, 1L, NA, NULL)
               r@Dimnames <- y@Dimnames
               if(m0 && .qr.rank.def.truncating)
                   r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
@@ -245,13 +233,13 @@ setMethod("qr.resid", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
               qr.resid(qr, .m2dense(.M2m(y), ",ge")) )
 
-setMethod("qr.qty", c(qr = "sparseQR", y = "denseMatrix"),
+setMethod("qr.resid", c(qr = "sparseQR", y = "denseMatrix"),
           function(qr, y) {
               y <- .M2gen(y, ",")
               if(m0 <- .qr.rank.def.warn(qr))
                   y <- .qr.y0(y, m0)
-              r <- .Call(sparseQR_matmult, qr, y, 3L, NA, NULL)
-              r@Dimnames <- c(list(NULL), y@Dimnames[2L])
+              r <- .Call(sparseQR_matmult, qr, y, 2L, NA, NULL)
+              r@Dimnames <- y@Dimnames
               if(m0 && .qr.rank.def.truncating)
                   r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
               r
@@ -268,6 +256,30 @@ setMethod("qr.qty", c(qr = "sparseQR", y = "matrix"),
 setMethod("qr.qty", c(qr = "sparseQR", y = "Matrix"),
           function(qr, y)
               qr.qty(qr, .m2dense(.M2m(y), ",ge")) )
+
+setMethod("qr.qty", c(qr = "sparseQR", y = "denseMatrix"),
+          function(qr, y) {
+              y <- .M2gen(y, ",")
+              if(m0 <- .qr.rank.def.warn(qr))
+                  y <- .qr.y0(y, m0)
+              r <- .Call(sparseQR_matmult, qr, y, 3L, NA, NULL)
+              r@Dimnames <- c(list(NULL), y@Dimnames[2L])
+              if(m0 && .qr.rank.def.truncating)
+                  r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
+              r
+          })
+
+setMethod("qr.qy", c(qr = "sparseQR", y = "vector"),
+          function(qr, y)
+         drop(qr.qy(qr, .m2dense(     y , ",ge"))))
+
+setMethod("qr.qy", c(qr = "sparseQR", y = "matrix"),
+          function(qr, y)
+              qr.qy(qr, .m2dense(     y , ",ge")) )
+
+setMethod("qr.qy", c(qr = "sparseQR", y = "Matrix"),
+          function(qr, y)
+              qr.qy(qr, .m2dense(.M2m(y), ",ge")) )
 
 setMethod("qr.qy", c(qr = "sparseQR", y = "denseMatrix"),
           function(qr, y) {
@@ -288,15 +300,3 @@ setMethod("qr.qy", c(qr = "sparseQR", y = "denseMatrix"),
                   r <- r[seq_len(r@Dim[1L] - m0), , drop = FALSE]
               r
           })
-
-setMethod("qr.qy", c(qr = "sparseQR", y = "vector"),
-          function(qr, y)
-         drop(qr.qy(qr, .m2dense(     y , ",ge"))))
-
-setMethod("qr.qy", c(qr = "sparseQR", y = "matrix"),
-          function(qr, y)
-              qr.qy(qr, .m2dense(     y , ",ge")) )
-
-setMethod("qr.qy", c(qr = "sparseQR", y = "Matrix"),
-          function(qr, y)
-              qr.qy(qr, .m2dense(.M2m(y), ",ge")) )
