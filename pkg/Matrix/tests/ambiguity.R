@@ -1,8 +1,6 @@
 library(Matrix)
-if (requireNamespace("SparseM", quietly = TRUE))
-    library(SparseM)
-if (requireNamespace("graph", quietly = TRUE))
-    library(graph)
+requireNamespace("SparseM")
+requireNamespace("graph")
 
 ns <- asNamespace("Matrix")
 generics <- getGenerics(ns)
