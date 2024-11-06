@@ -2,6 +2,7 @@
 
 #include "Mdefines.h"
 #include "M5.h"
+#include "idz.h"
 
 int dense_is_diagonal(SEXP obj, const char *class)
 {
@@ -16,49 +17,22 @@ int dense_is_diagonal(SEXP obj, const char *class)
 		ul = UPLO(obj);
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int i, j, packed = class[2] == 'p';
+	int packed = class[2] == 'p';
 
 #define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x); \
 		if (class[1] == 'g') { \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i < j; ++i) { \
-					if (c##NOT_ZERO(*px)) \
-						return 0; \
-					px += 1; \
-				} \
-				px += 1; \
-				for (i = j + 1; i < n; ++i) { \
-					if (c##NOT_ZERO(*px)) \
-						return 0; \
-					px += 1; \
-				} \
-			} \
-		} else if (ul == 'U') { \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i < j; ++i) { \
-					if (c##NOT_ZERO(*px)) \
-						return 0; \
-					px += 1; \
-				} \
-				px += 1; \
-				if (!packed) \
-				px += n - j - 1; \
-			} \
+			if (c##NAME(test2)(px, (size_t) n, '\0', '\0', -'N')) \
+				return 0; \
+		} else if (!packed) { \
+			ul = (ul == 'U') ? 'L' : 'U'; \
+			if (c##NAME(test2)(px, (size_t) n,   ul, '\0',  'N')) \
+				return 0; \
 		} else { \
-			for (j = 0; j < n; ++j) { \
-				if (!packed) \
-				px += j; \
-				px += 1; \
-				for (i = j + 1; i < n; ++i) { \
-					if (c##NOT_ZERO(*px)) \
-						return 0; \
-					px += 1; \
-				} \
-			} \
+			if (c##NAME(test1)(px, (size_t) n,   ul, '\0', -'N')) \
+				return 0; \
 		} \
-		return 1; \
 	} while (0)
 
 	SWITCH4(class[0], TEMPLATE);

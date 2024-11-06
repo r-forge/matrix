@@ -881,6 +881,134 @@ TEMPLATE(z)
 #undef TEMPLATE
 
 #define TEMPLATE(c) \
+int \
+c##test2(const c##TYPE *x, \
+         size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	if (diag < '\0') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+			if (diag != -'N' && c##NOT_UNIT(*x)) \
+				return 1; \
+			x += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+		} \
+	} else if (diag > '\0') { \
+		if (uplo == 'U') { \
+		for (j = 0; j < n; ++j) { \
+			x += j; \
+			if (diag != 'N' && c##NOT_UNIT(*x)) \
+				return 1; \
+			x += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+		} \
+		} else { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+			if (diag != 'N' && c##NOT_UNIT(*x)) \
+				return 1; \
+			x += 1; \
+			x += n - j - 1; \
+		} \
+		} \
+	} else if (trans == 'C') { \
+		const c##TYPE *u = x, *l = x; \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (c##NOT_CONJ(*l, *u)) \
+					return 1; \
+				u += 1; l += n; \
+			} \
+			if (c##NOT_ZERO_IMAG(*u)) \
+				return 1; \
+			u += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+	} else { \
+		const c##TYPE *u = x, *l = x; \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (c##NOT_IDEN(*l, *u)) \
+					return 1; \
+				u += 1; l += n; \
+			} \
+			u += 1; \
+			u += n - j - 1; l = x + j + 1; \
+		} \
+	} \
+	return 0; \
+} \
+ \
+int \
+c##test1(const c##TYPE *x, \
+         size_t n, char uplo, char trans, char diag) \
+{ \
+	size_t i, j; \
+	if (uplo == 'U') { \
+	if (diag < '\0') { \
+		for (j = 0; j < n; ++j) { \
+			for (i = 0; i < j; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+			if (diag != -'N' && c##NOT_UNIT(*x)) \
+				return 1; \
+			x += 1; \
+		} \
+	} else if (diag > '\0') { \
+		if (diag != 'N') \
+		for (j = 0; j < n; x += (++j) + 1) \
+			if (c##NOT_UNIT(*x)) \
+				return 1; \
+	} else if (trans == 'C') { \
+		for (j = 0; j < n; x += (++j) + 1) \
+			if (c##NOT_ZERO_IMAG(*x)) \
+				return 1; \
+	} \
+	} else { \
+	if (diag < '\0') { \
+		for (j = 0; j < n; ++j) { \
+			if (diag != -'N' && c##NOT_UNIT(*x)) \
+				return 1; \
+			x += 1; \
+			for (i = j + 1; i < n; ++i) { \
+				if (c##NOT_ZERO(*x)) \
+					return 1; \
+				x += 1; \
+			} \
+		} \
+	} else if (diag > '\0') { \
+		if (diag != 'N') \
+		for (j = 0; j < n; x += n - (j++)) \
+			if (c##NOT_UNIT(*x)) \
+				return 1; \
+	} else if (trans == 'C') { \
+		for (j = 0; j < n; x += n - (j++)) \
+			if (c##NOT_ZERO_IMAG(*x)) \
+				return 1; \
+	} \
+	} \
+	return 0; \
+} \
+ \
 void c##tspaggr(      int *i1,       int *j1,       c##TYPE *x1, \
                 const int *i0, const int *j0, const c##TYPE *x0, \
                 int m, int n, int *nnz, int *iwork, c##TYPE *work) \
@@ -906,10 +1034,10 @@ void c##tspaggr(      int *i1,       int *j1,       c##TYPE *x1, \
 		iworkA[i] += iworkA[i - 1]; \
 	--iworkA; \
 	 \
-	/* iworkA[i]: number of column indices listed for row < i,        */ \
-	/*            incl. duplicates                                    */ \
+	/* iworkA[i]: number of column indices listed for row < i,      */ \
+	/*            incl. duplicates                                  */ \
 	 \
-	/* 2. Group column indices and data by row in j_[k], x_[k]        */ \
+	/* 2. Group column indices and data by row in j_[k], x_[k]      */ \
 	 \
 	for (k = 0; k < nnz0; ++k) { \
 		c##IF_NPATTERN( \
@@ -918,15 +1046,15 @@ void c##tspaggr(      int *i1,       int *j1,       c##TYPE *x1, \
 		j_[iworkA[i0[k]]++] = j0[k]; \
 	} \
 	 \
-	/* iworkA[i]: number of column indices listed for row <= i,       */ \
-	/*            incl. duplicates                                    */ \
-	/*     j_[k]: column indices grouped by row,                      */ \
-	/*            incl. duplicates, unsorted                          */ \
-	/*     x_[k]: corresponding data                                  */ \
+	/* iworkA[i]: number of column indices listed for row <= i,     */ \
+	/*            incl. duplicates                                  */ \
+	/*     j_[k]: column indices grouped by row,                    */ \
+	/*            incl. duplicates, unsorted                        */ \
+	/*     x_[k]: corresponding data                                */ \
 	 \
-	/* 3. Gather _unique_ column indices at the front of each group,  */ \
-	/*    aggregating data accordingly; record in iworkB[i] where     */ \
-	/*    the unique column indices stop and the duplicates begin     */ \
+	/* 3. Gather unique column indices at the front of each group,  */ \
+	/*    aggregating data accordingly; record in iworkB[i] where   */ \
+	/*    the unique column indices stop and the duplicates begin   */ \
 	 \
 	for (j = 0; j < n; ++j) \
 		iworkC[j] = -1; \
@@ -953,17 +1081,17 @@ void c##tspaggr(      int *i1,       int *j1,       c##TYPE *x1, \
 		nnz1 += kb - ka; \
 	} \
 	 \
-	/* iworkB[i]: pointer to first non-unique column index in row i   */ \
-	/*     j_[k]: column indices grouped by row                       */ \
-	/*            with unique indices in front,                       */ \
-	/*            i.e., in positions iworkA[i - 1] <= k < iworkB[i]   */ \
-	/*     x_[k]: corresponding data "cumulated" appropriately        */ \
+	/* iworkB[i]: pointer to first non-unique column index in row i */ \
+	/*     j_[k]: column indices grouped by row                     */ \
+	/*            with unique indices in front,                     */ \
+	/*            i.e., in positions iworkA[i - 1] <= k < iworkB[i] */ \
+	/*     x_[k]: corresponding data "cumulated" appropriately      */ \
 	 \
 	*nnz = nnz1; \
 	 \
 	} else { \
 	 \
-	/* 4. Copy unique (i,j) pairs from the unsorted stacks 0 <= i < m */ \
+	/* 4. Copy unique (i,j) pairs from unsorted stacks 0 <= i < m   */ \
 	 \
 	for (i = 0, k = 0; i < m; ++i) { \
 		kb = iworkB[i]; \
@@ -999,7 +1127,7 @@ void c##tspsort(      int *p1,       int *i1,       c##TYPE *x1, \
 	c##TYPE *x_ = work; \
 	); \
 	 \
-	/* 4. Tabulate _unique_ column indices in iworkC[j]               */ \
+	/* 4. Tabulate _unique_ column indices in iworkC[j]             */ \
 	 \
 	for (j = 0; j <= n; ++j) \
 		p1[j] = 0; \
@@ -1016,10 +1144,10 @@ void c##tspsort(      int *p1,       int *i1,       c##TYPE *x1, \
 		p1[j] += (iworkC[j] = p1[j - 1]); \
 	--p1; \
 	 \
-	/* iworkC[j]: number of nonzero elements in columns < j           */ \
+	/* iworkC[j]: number of nonzero elements in columns < j         */ \
 	 \
-	/* 5. Pop unique (i,j) pairs from the unsorted stacks 0 <= i < m  */ \
-	/*    onto new stacks 0 <= j < n, which will be sorted            */ \
+	/* 5. Pop unique (i,j) pairs from unsorted stacks 0 <= i < m    */ \
+	/*    onto new stacks 0 <= j < n, which will be sorted          */ \
 	 \
 	for (i = 0, k = 0; i < m; ++i) { \
 		kb = iworkB[i]; \
@@ -1033,7 +1161,7 @@ void c##tspsort(      int *p1,       int *i1,       c##TYPE *x1, \
 		k = iworkA[i]; \
 	} \
 	 \
-	/* iworkC[j]: number of nonzero elements in columns <= j          */ \
+	/* iworkC[j]: number of nonzero elements in columns <= j        */ \
 	 \
 	} \
 	 \

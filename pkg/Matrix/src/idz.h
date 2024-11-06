@@ -64,6 +64,18 @@ void iband1(     int *, const      int *, size_t, char, size_t, size_t);
 void dband1(  double *, const   double *, size_t, char, size_t, size_t);
 void zband1(Rcomplex *, const Rcomplex *, size_t, char, size_t, size_t);
 
+int ntest2(const      int *, size_t, char, char, char);
+int ltest2(const      int *, size_t, char, char, char);
+int itest2(const      int *, size_t, char, char, char);
+int dtest2(const   double *, size_t, char, char, char);
+int ztest2(const Rcomplex *, size_t, char, char, char);
+
+int ntest1(const      int *, size_t, char, char, char);
+int ltest1(const      int *, size_t, char, char, char);
+int itest1(const      int *, size_t, char, char, char);
+int dtest1(const   double *, size_t, char, char, char);
+int ztest1(const Rcomplex *, size_t, char, char, char);
+
 void ntspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
 void ltspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);
 void itspaggr(int *, int *,      int *, const int *, const int *, const      int *, int, int, int *, int *,      int *);

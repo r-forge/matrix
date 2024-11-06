@@ -2,6 +2,7 @@
 
 #include "Mdefines.h"
 #include "M5.h"
+#include "idz.h"
 
 /* defined in ./isDiagonal.c :*/
 int dense_is_diagonal(SEXP, const char *);
@@ -42,53 +43,12 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 #define TEMPLATE(c) \
 	do { \
 		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
-		if (op_ul == '\0') { \
-			for (j = 0; j < n; ++j) { \
-				pl += j + 1; \
-				for (i = j + 1; i < n; ++i) { \
-					if (c##NOT_ZERO(*pl)) { \
-						j = n; \
-						break; \
-					} \
-					pl += 1; \
-				} \
-			} \
-			if (j == n) \
-				return  1; \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i < j; ++i) { \
-					if (c##NOT_ZERO(*pu)) { \
-						j = n; \
-						break; \
-					} \
-					pu += 1; \
-				} \
-				pu += n - j; \
-			} \
-			if (j == n) \
-				return -1; \
-			return 0; \
-		} else if (op_ul == 'U') { \
-			for (j = 0; j < n; ++j) { \
-				pl += j + 1; \
-				for (i = j + 1; i < n; ++i) { \
-					if (c##NOT_ZERO(*pl)) \
-						return 0; \
-					pl += 1; \
-				} \
-			} \
+		if ((op_ul == '\0' || op_ul == 'U') && \
+		    !c##NAME(test2)(px, (size_t) n, 'U', '\0', 'N')) \
 			return  1; \
-		} else { \
-			for (j = 0; j < n; ++j) { \
-				for (i = 0; i < j; ++i) { \
-					if (c##NOT_ZERO(*pu)) \
-						return 0; \
-					pu += 1; \
-				} \
-				pu += n - j; \
-			} \
+		if ((op_ul == '\0' || op_ul != 'U') && \
+		    !c##NAME(test2)(px, (size_t) n, 'L', '\0', 'N')) \
 			return -1; \
-		} \
 	} while (0)
 
 	SWITCH4(class[0], TEMPLATE);

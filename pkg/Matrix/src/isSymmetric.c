@@ -2,6 +2,7 @@
 
 #include "Mdefines.h"
 #include "M5.h"
+#include "idz.h"
 
 /* defined in ./isDiagonal.c :*/
 int dense_is_diagonal(SEXP, const char *);
@@ -51,21 +52,13 @@ int dense_is_symmetric(SEXP obj, const char *class,
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	int i, j;
 
-	if (class[1] == 'g' && op_ct != 'C') {
+	if (class[1] == 'g') {
 
 #define TEMPLATE(c) \
 	do { \
-		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
-		for (j = 0; j < n; ++j) { \
-			for (i = 0; i < j; ++i) { \
-				if (c##NOT_IDEN(*pu, *pl)) \
-					return 0; \
-				pu += 1; \
-				pl += n; \
-			} \
-			pu += n - j; \
-			pl = px + j + 1; \
-		} \
+		c##TYPE *px = c##PTR(x); \
+		if (c##NAME(test2)(px, (size_t) n, '\0', op_ct, '\0')) \
+			return 0; \
 	} while (0)
 
 	SWITCH5(class[0], TEMPLATE);
@@ -76,20 +69,7 @@ int dense_is_symmetric(SEXP obj, const char *class,
 
 	Rcomplex *px = COMPLEX(x), *pu = px, *pl = px;
 	int packed = class[2] == 'p';
-	if (class[1] == 'g') {
-		for (j = 0; j < n; ++j) {
-			for (i = 0; i < j; ++i) {
-				if (zNOT_CONJ(*pu, *pl))
-					return 0;
-				pu += 1;
-				pl += n;
-			}
-			if (zNOT_ZERO_IMAG(*pu))
-				return 0;
-			pu += n - j;
-			pl = px + j + 1;
-		}
-	} else if (class[1] == 's') {
+	if (class[1] == 's') {
 		/* Testing if Hermitian matrix is symmetric */
 		/*      or if symmetric matrix is Hermitian */
 		/* <=====> if matrix is real                */
