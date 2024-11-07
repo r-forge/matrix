@@ -24,7 +24,7 @@ function(x, each) {
         stop(gettextf("%s length cannot exceed %s",
                       "sparseVector", "2^53"),
              domain = NA)
-    else if (n * each > .Machine$integer.max) {
+    if (n * each > .Machine$integer.max) {
         a <- as.double
         one <- 1
     } else {
@@ -63,7 +63,7 @@ function(x, times) {
         stop(gettextf("%s length cannot exceed %s",
                       "sparseVector", "2^53"),
              domain = NA)
-    else if (n * times > .Machine$integer.max) {
+    if (n * times > .Machine$integer.max) {
         a <- as.double
         zero <- 0
     } else {

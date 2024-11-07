@@ -9,12 +9,12 @@ setMethod("!", c(x = "sparseVector"),
 
 setMethod("!", c(x = "ndenseMatrix"),
           function(x) {
-              if((shape <- .M.shape(x)) == "t")
+              if ((shape <- .M.shape(x)) == "t")
                   x <- .M2gen(x)
               r <- new(.M.class(x))
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames
-              if(shape == "s")
+              if (shape == "s")
                   r@uplo <- x@uplo
               r@x <- { y <- x@x; !(y | is.na(y)) }
               r
@@ -22,12 +22,12 @@ setMethod("!", c(x = "ndenseMatrix"),
 
 setMethod("!", c(x = "ldenseMatrix"),
           function(x) {
-              if((shape <- .M.shape(x)) == "t")
+              if ((shape <- .M.shape(x)) == "t")
                   x <- .M2gen(x)
               r <- new(.M.class(x))
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames
-              if(shape == "s")
+              if (shape == "s")
                   r@uplo <- x@uplo
               r@x <- !x@x
               r
@@ -35,7 +35,7 @@ setMethod("!", c(x = "ldenseMatrix"),
 
 setMethod("!", c(x = "nsparseMatrix"),
           function(x) {
-              if(.M.shape(x) == "t")
+              if (.M.shape(x) == "t")
                   x <- .M2gen(x)
               x <- .sparse2dense(x)
               x@x <- !x@x
@@ -44,7 +44,7 @@ setMethod("!", c(x = "nsparseMatrix"),
 
 setMethod("!", c(x = "lsparseMatrix"),
           function(x) {
-              if(.M.shape(x) == "t")
+              if (.M.shape(x) == "t")
                   x <- .M2gen(x)
               x <- .sparse2dense(x)
               x@x <- !x@x
@@ -53,7 +53,7 @@ setMethod("!", c(x = "lsparseMatrix"),
 
 setMethod("!", c(x = "ndiMatrix"),
           function(x) {
-              if(x@diag == "N" && anyNA(y <- x@x))
+              if (x@diag == "N" && anyNA(y <- x@x))
                   x@x <- y | is.na(y)
               x <- .diag2dense(x, ".", "g")
               x@x <- !x@x

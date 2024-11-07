@@ -385,10 +385,8 @@ setMethod("solve", c(a = "CsparseMatrix", b = "CsparseMatrix"),
               solve(trf, b, sparse = sparse, ...)
           })
 
-## TODO: implement triangular solver for dtRMatrix and ztRMatrix,
-##       so that we can handle
-##
-##       A = <dgRMatrix>  and  A' = .tCRT(A)  like so:
+## TODO: implement triangular solver for [dz]tRMatrix, so that we can
+##       handle  A = <[dz]gRMatrix>  and  A' = .tCRT(A)  like so:
 ##
 ##                   P1 A' P2 = L U
 ##       A x = b  <==================>  x = P1' inv(L') inv(U') P2' b

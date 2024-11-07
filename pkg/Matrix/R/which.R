@@ -31,7 +31,7 @@ setMethod("which", c(x = "lsparseMatrix"),
               if (arr.ind)
                   arrayInd(wh, x@Dim, dimnames(x), useNames = useNames)
               else wh
-           })
+          })
 
 setMethod("which", c(x = "ndiMatrix"),
           function(x, arr.ind = FALSE, useNames = TRUE) {
