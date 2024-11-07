@@ -1,32 +1,34 @@
+/* C implementation of methods for forceCanonical */
+
 #include "Mdefines.h"
 #include "M5.h"
 #include "idz.h"
 
-SEXP dense_canonicalize(SEXP from, const char *class)
+SEXP dense_force_canonical(SEXP from, const char *class, int check)
 {
+	if (class[1] == 'g' && class[0] != 'n')
+		return from;
+	SEXP x = GET_SLOT(from, Matrix_xSym);
+	int naToUnitIfPattern = (check) ? 0 : 1;
+	if (class[0] == 'n' && !naToUnitIfPattern) {
+		int *px = LOGICAL(x);
+		R_xlen_t nx = XLENGTH(x);
+		while (nx-- > 0) if (*(px++) == NA_LOGICAL) break;
+		naToUnitIfPattern = nx >= 0;
+		if (class[1] == 'g' && !naToUnitIfPattern)
+			return from;
+	}
+	PROTECT(x);
 	int *pdim = DIM(from), m = pdim[0], n = pdim[1],
-		packed = class[2] == 'p';
-
-	char ul = '\0', ct = '\0', nu = '\0';
+		packed = class[2] == 'p', canonical = !naToUnitIfPattern;
+	char ul = '\0', ct = (class[1] == 'p') ? 'C' : '\0', nu = '\0';
 	if (class[1] != 'g')
 		ul = UPLO(from);
 	if (class[1] == 's' && class[0] == 'z')
 		ct = TRANS(from);
-	if (class[1] == 'p' && class[0] == 'z')
-		ct = 'C';
 	if (class[1] == 't')
 		nu = DIAG(from);
-
-	SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
-	int patternWithNA = 0;
-	if (class[0] == 'n') {
-		int *px = LOGICAL(x);
-		R_xlen_t nx = XLENGTH(x);
-		while (nx-- > 0) if (*(px++) == NA_LOGICAL) break;
-		patternWithNA = nx >= 0;
-	}
-	int canonical = !patternWithNA;
-	if (canonical && class[1] != 'g') {
+	if (canonical) {
 #define TEMPLATE(c) \
 		do { \
 			c##TYPE *px = c##PTR(x); \
@@ -36,10 +38,9 @@ SEXP dense_canonicalize(SEXP from, const char *class)
 		} while (0)
 		SWITCH5(class[0], TEMPLATE);
 #undef TEMPLATE
+		if (canonical)
+			return from;
 	}
-
-	SEXP to = from;
-	if (!canonical) {
 	SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 #define TEMPLATE(c) \
 	do { \
@@ -53,12 +54,12 @@ SEXP dense_canonicalize(SEXP from, const char *class)
 	} while (0)
 	SWITCH4(class[0], TEMPLATE);
 #undef TEMPLATE
-	if (patternWithNA) {
+	if (class[0] == 'n' && naToUnitIfPattern) {
 		int *py = LOGICAL(y);
 		R_xlen_t ny = XLENGTH(y);
 		while (ny-- > 0) { *py = *py != 0; ++py; }
 	}
-	PROTECT(to = newObject(class));
+	SEXP to = PROTECT(newObject(class));
 	SET_DIM(to, m, n);
 	SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
 	if (class[1] != 'g' && ul != 'U')
@@ -70,13 +71,11 @@ SEXP dense_canonicalize(SEXP from, const char *class)
 	if (class[1] == 'o')
 		COPY_SLOT(to, from, Matrix_sdSym);
 	SET_SLOT(to, Matrix_xSym, y);
-	UNPROTECT(2); /* to, y */
-	}
-	UNPROTECT(1); /* x */ 
+	UNPROTECT(3); /* to, y, x */
 	return to;
 }
 
-SEXP sparse_canonicalize(SEXP from, const char *class)
+SEXP sparse_force_canonical(SEXP from, const char *class, int check)
 {
 	SEXP to = from;
 	switch (class[1]) {
@@ -87,7 +86,7 @@ SEXP sparse_canonicalize(SEXP from, const char *class)
 		if (class[0] == 'z' && TRANS(from) == 'C') {
 		SEXP x = PROTECT(GET_SLOT(from, Matrix_xSym));
 		Rcomplex *px = COMPLEX(x);
-		int n = DIM(from)[1];
+		int n = DIM(from)[1], canonical = (check) ? 1 : 0;
 		char ul = UPLO(from);
 		if (class[2] != 'T') {
 			SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
@@ -95,63 +94,68 @@ SEXP sparse_canonicalize(SEXP from, const char *class)
 				i = PROTECT(GET_SLOT(from, iSym));
 			int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k_, k, kend,
 				up = (class[2] == 'C') == (ul == 'U');
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j &&
-				    (ISNAN(px[k_].i) || px[k_].i != 0.0))
-					break;
-				k = kend;
+			j = 0; k = 0;
+			if (canonical) {
+				for (; j < n; ++j) {
+					kend = pp[j];
+					if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j &&
+					    (ISNAN(px[k_].i) || px[k_].i != 0.0))
+						break;
+					k = kend;
+				}
+				canonical = j == n;
 			}
-			if (j < n) {
-			SEXP y = PROTECT(duplicateVector(x));
-			Rcomplex *py = COMPLEX(y);
-			for (; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j)
-					py[k_].r = 0.0;
-			}
-			PROTECT(to = newObject(class));
-			SET_DIM(to, n, n);
-			SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
-			if (ul != 'U')
-				SET_UPLO(to);
-			SET_SLOT(to, Matrix_pSym, p);
-			SET_SLOT(to, Matrix_iSym, i);
-			SET_SLOT(to, Matrix_xSym, y);
-			UNPROTECT(2); /* to, y */
+			if (!canonical) {
+				SEXP y = PROTECT(duplicateVector(x));
+				Rcomplex *py = COMPLEX(y);
+				for (; j < n; ++j) {
+					kend = pp[j];
+					if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j)
+						py[k_].r = 0.0;
+				}
+				PROTECT(to = newObject(class));
+				SET_DIM(to, n, n);
+				SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
+				if (ul != 'U')
+					SET_UPLO(to);
+				SET_SLOT(to, Matrix_pSym, p);
+				SET_SLOT(to, Matrix_iSym, i);
+				SET_SLOT(to, Matrix_xSym, y);
+				UNPROTECT(2); /* to, y */
 			}
 			UNPROTECT(2); /* i, p */
 		} else {
 			SEXP i = PROTECT(GET_SLOT(from, Matrix_iSym)),
 				j = PROTECT(GET_SLOT(from, Matrix_jSym));
 			int *pi = INTEGER(i), *pj = INTEGER(j);
-			R_xlen_t k, kend = XLENGTH(i);
-			for (k = 0; k < kend; ++k) {
-				if (pi[k] == pj[k] &&
-				    (ISNAN(px[k].i) || px[k].i != 0.0))
-					break;
+			R_xlen_t k = 0, kend = XLENGTH(i);
+			if (canonical) {
+				for (; k < kend; ++k)
+					if (pi[k] == pj[k] &&
+					    (ISNAN(px[k].i) || px[k].i != 0.0))
+						break;
+				canonical = k == kend;
 			}
-			if (k < kend) {
-			SEXP y = PROTECT(duplicateVector(x));
-			Rcomplex *py = COMPLEX(y);
-			for (; k < kend; ++k)
-				if (pi[k] == pj[k])
-					py[k].i = 0.0;
-			PROTECT(to = newObject(class));
-			SET_DIM(to, n, n);
-			SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
-			if (ul != 'U')
-				SET_UPLO(to);
-			SET_SLOT(to, Matrix_iSym, i);
-			SET_SLOT(to, Matrix_jSym, j);
-			SET_SLOT(to, Matrix_xSym, y);
-			UNPROTECT(2); /* to, y */
+			if (!canonical) {
+				SEXP y = PROTECT(duplicateVector(x));
+				Rcomplex *py = COMPLEX(y);
+				for (; k < kend; ++k)
+					if (pi[k] == pj[k])
+						py[k].i = 0.0;
+				PROTECT(to = newObject(class));
+				SET_DIM(to, n, n);
+				SET_DIMNAMES(to, 0, DIMNAMES(from, 0));
+				if (ul != 'U')
+					SET_UPLO(to);
+				SET_SLOT(to, Matrix_iSym, i);
+				SET_SLOT(to, Matrix_jSym, j);
+				SET_SLOT(to, Matrix_xSym, y);
+				UNPROTECT(2); /* to, y */
 			}
 			UNPROTECT(2); /* j, i */
 		}
 		UNPROTECT(1); /* x */
 		}
-		break;
 	case 'o':
 		break;
 	case 't':
@@ -171,18 +175,30 @@ SEXP sparse_canonicalize(SEXP from, const char *class)
 		UNPROTECT(1); /* value */
 		}
 		break;
+	default:
+		Rf_error("should never happen ...");
+		to = R_NilValue;
+		break;
 	}
 	return to;
 }
 
-SEXP R_dense_canonicalize(SEXP s_from)
+SEXP R_dense_force_canonical(SEXP s_from, SEXP s_check)
 {
 	const char *class = Matrix_class(s_from, valid_dense, 0, __func__);
-	return dense_canonicalize(s_from, class);
+
+	int check;
+	VALID_LOGIC2(s_check, check);
+	
+	return dense_force_canonical(s_from, class, check);
 }
 
-SEXP R_sparse_canonicalize(SEXP s_from)
+SEXP R_sparse_force_canonical(SEXP s_from, SEXP s_check)
 {
 	const char *class = Matrix_class(s_from, valid_sparse, 0, __func__);
-	return sparse_canonicalize(s_from, class);
+
+	int check;
+	VALID_LOGIC2(s_check, check);
+	
+	return sparse_force_canonical(s_from, class, check);
 }

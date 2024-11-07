@@ -53,9 +53,17 @@ setGeneric("facmul",
                standardGeneric("facmul"),
            signature = c("x", "y"))
 
+setGeneric("forceCanonical",
+           function(x, ...)
+               standardGeneric("forceCanonical"))
+
 setGeneric("forceSymmetric",
            function(x, ...)
                standardGeneric("forceSymmetric"))
+
+setGeneric("isCanonical",
+           function(x, ...)
+               standardGeneric("isCanonical"))
 
 setGeneric("isDiagonal",
            function(object)

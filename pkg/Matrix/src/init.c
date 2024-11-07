@@ -33,10 +33,6 @@ SEXP R_sparse_band(SEXP, SEXP, SEXP);
 /* bind.c : */
 SEXP R_bind(SEXP);
 
-/* canonicalize.c : */
-SEXP R_dense_canonicalize(SEXP);
-SEXP R_sparse_canonicalize(SEXP);
-
 /* coerce.c : */
 SEXP R_vector_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP R_matrix_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -118,9 +114,17 @@ SEXP gCMatrix_orf(SEXP, SEXP, SEXP);
 SEXP gCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
 SEXP pCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
+/* forceCanonical.c : */
+SEXP R_dense_force_canonical(SEXP, SEXP);
+SEXP R_sparse_force_canonical(SEXP, SEXP);
+
 /* forceSymmetric.c : */
 SEXP R_dense_force_symmetric(SEXP, SEXP, SEXP);
 SEXP R_sparse_force_symmetric(SEXP, SEXP, SEXP);
+
+/* isCanonical.c : */
+SEXP R_dense_is_canonical(SEXP);
+SEXP R_sparse_is_canonical(SEXP);
 
 /* isDiagonal.c : */
 SEXP R_dense_is_diagonal(SEXP);
@@ -314,10 +318,6 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_dense_band, 3),
 	CALL_METHOD(R_sparse_band, 3),
 
-	/* canonicalize.c : */
-	CALL_METHOD(R_dense_canonicalize, 1),
-	CALL_METHOD(R_sparse_canonicalize, 1),
-
 	/* coerce.c : */
 	CALL_METHOD(R_vector_as_dense, 9),
 	CALL_METHOD(R_matrix_as_dense, 6),
@@ -399,9 +399,17 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(gCMatrix_trf, 4),
 	CALL_METHOD(pCMatrix_trf, 6),
 
+	/* forceCanonical.c : */
+	CALL_METHOD(R_dense_force_canonical, 2),
+	CALL_METHOD(R_sparse_force_canonical, 2),
+
 	/* forceSymmetric.c : */
 	CALL_METHOD(R_dense_force_symmetric, 3),
 	CALL_METHOD(R_sparse_force_symmetric, 3),
+
+	/* isCanonical.c : */
+	CALL_METHOD(R_dense_is_canonical, 1),
+	CALL_METHOD(R_sparse_is_canonical, 1),
 
 	/* isDiagonal.c : */
 	CALL_METHOD(R_dense_is_diagonal, 1),

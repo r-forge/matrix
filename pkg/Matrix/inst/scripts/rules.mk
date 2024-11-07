@@ -14,8 +14,6 @@ band.o: band.c Mdefines.h \
   Msymbols.h M5.h idz.h
 bind.o: bind.c Mdefines.h \
   Msymbols.h M5.h coerce.h
-canonicalize.o: canonicalize.c Mdefines.h \
-  Msymbols.h M5.h idz.h
 cholmod-api.o: cholmod-api.c Mdefines.h \
   Msymbols.h cholmod-api.h \
   cholmod-etc.h SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
@@ -54,6 +52,8 @@ factor.o: factor.c Lapack-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h M5.h
+forceCanonical.o: forceCanonical.c Mdefines.h \
+  Msymbols.h M5.h idz.h
 forceSymmetric.o: forceSymmetric.c Mdefines.h \
   Msymbols.h M5.h idz.h
 idz.o: idz.c Mdefines.h \
@@ -62,6 +62,8 @@ init.o: init.c cholmod-api.h cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h \
   Msymbols.h
+isCanonical.o: isCanonical.c Mdefines.h \
+  Msymbols.h M5.h idz.h
 isDiagonal.o: isDiagonal.c Mdefines.h \
   Msymbols.h M5.h idz.h
 isSymmetric.o: isSymmetric.c Mdefines.h \

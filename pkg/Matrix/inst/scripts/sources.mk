@@ -5,7 +5,6 @@ sources = \
 	attrib.c \
 	band.c \
 	bind.c \
-	canonicalize.c \
 	cholmod-api.c \
 	cholmod-etc.c \
 	coerce.c \
@@ -17,9 +16,11 @@ sources = \
 	expand.c \
 	expm.c \
 	factor.c \
+	forceCanonical.c \
 	forceSymmetric.c \
 	idz.c \
 	init.c \
+	isCanonical.c \
 	isDiagonal.c \
 	isSymmetric.c \
 	isTriangular.c \
