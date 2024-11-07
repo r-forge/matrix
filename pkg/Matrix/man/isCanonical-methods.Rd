@@ -24,10 +24,10 @@
   representation.
 }
 \usage{
-isCanonical(x, \dots)
+isCanonical(object, \dots)
 }
 \arguments{
-  \item{x}{an \R{} object.}
+  \item{object}{an \R{} object.}
   \item{\dots}{optional arguments passed to methods.}
 }
 \details{

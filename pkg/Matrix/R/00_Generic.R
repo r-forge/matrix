@@ -62,7 +62,7 @@ setGeneric("forceSymmetric",
                standardGeneric("forceSymmetric"))
 
 setGeneric("isCanonical",
-           function(x, ...)
+           function(object, ...)
                standardGeneric("isCanonical"))
 
 setGeneric("isDiagonal",
