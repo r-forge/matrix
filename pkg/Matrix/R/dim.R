@@ -124,7 +124,7 @@ setMethod("length", c(x = "sparseVector"),
           function(x)
               if(is.integer(r <- x@length))
                   r
-              else if(r - 1 <= .Machine$integer.max)
+              else if(r - 1 < .Machine$integer.max)
                   as.integer(r)
               else trunc(r))
 
