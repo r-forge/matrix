@@ -31,6 +31,8 @@ SEXP R_sparse_band(SEXP, SEXP, SEXP);
 SEXP R_bind(SEXP);
 
 /* canonicalize.c : */
+SEXP R_dense_canonicalize(SEXP);
+SEXP R_sparse_canonicalize(SEXP);
 SEXP R_sparse_aggregate(SEXP);
 SEXP R_sparse_drop0(SEXP, SEXP);
 
@@ -306,6 +308,8 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_band, 3),
 
 	/* canonicalize.c : */
+	CALL_METHOD(R_dense_canonicalize, 1),
+	CALL_METHOD(R_sparse_canonicalize, 1),
 	CALL_METHOD(R_sparse_aggregate, 1),
 	CALL_METHOD(R_sparse_drop0, 2),
 
