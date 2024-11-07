@@ -18,6 +18,9 @@ SEXP R_sparse_sum(SEXP, SEXP);
 SEXP R_dense_prod(SEXP, SEXP);
 SEXP R_sparse_prod(SEXP, SEXP);
 
+/* aggregate.c : */
+SEXP R_sparse_aggregate(SEXP);
+
 /* attrib.c : */
 SEXP R_DimNames_is_symmetric(SEXP);
 SEXP R_symDN(SEXP);
@@ -33,8 +36,6 @@ SEXP R_bind(SEXP);
 /* canonicalize.c : */
 SEXP R_dense_canonicalize(SEXP);
 SEXP R_sparse_canonicalize(SEXP);
-SEXP R_sparse_aggregate(SEXP);
-SEXP R_sparse_drop0(SEXP, SEXP);
 
 /* coerce.c : */
 SEXP R_vector_as_dense(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -94,6 +95,9 @@ SEXP R_sparse_diag_U2N(SEXP);
 SEXP R_sparse_diag_N2U(SEXP);
 SEXP denseCholesky_diag_get(SEXP, SEXP);
 SEXP sparseCholesky_diag_get(SEXP, SEXP);
+
+/* dropzero.c : */
+SEXP R_sparse_dropzero(SEXP, SEXP);
 
 /* expand.c : */
 SEXP denseBunchKaufman_expand(SEXP);
@@ -298,6 +302,9 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_dense_prod, 2),
 	CALL_METHOD(R_sparse_prod, 2),
 
+	/* aggregate.c : */
+	CALL_METHOD(R_sparse_aggregate, 1),
+
 	/* attrib.c : */
 	CALL_METHOD(R_DimNames_is_symmetric, 1),
 	CALL_METHOD(R_symDN, 1),
@@ -310,8 +317,6 @@ static R_CallMethodDef CallMethodTable[] = {
 	/* canonicalize.c : */
 	CALL_METHOD(R_dense_canonicalize, 1),
 	CALL_METHOD(R_sparse_canonicalize, 1),
-	CALL_METHOD(R_sparse_aggregate, 1),
-	CALL_METHOD(R_sparse_drop0, 2),
 
 	/* coerce.c : */
 	CALL_METHOD(R_vector_as_dense, 9),
@@ -371,6 +376,9 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_diag_N2U, 1),
 	CALL_METHOD(denseCholesky_diag_get, 2),
 	CALL_METHOD(sparseCholesky_diag_get, 2),
+
+	/* dropzero.c : */
+	CALL_METHOD(R_sparse_dropzero, 2),
 
 	/* expand.c : */
 	CALL_METHOD(denseBunchKaufman_expand, 1),

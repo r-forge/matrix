@@ -6,6 +6,8 @@ Csparse.o: Csparse.c Mdefines.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h
 Summary.o: Summary.c Mdefines.h \
   Msymbols.h M5.h
+aggregate.o: aggregate.c Mdefines.h \
+  Msymbols.h M5.h idz.h
 attrib.o: attrib.c Mdefines.h \
   Msymbols.h
 band.o: band.c Mdefines.h \
@@ -39,6 +41,8 @@ diag.o: diag.c cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h Mdefines.h \
   Msymbols.h M5.h idz.h
+dropzero.o: dropzero.c Mdefines.h \
+  Msymbols.h M5.h
 expand.o: expand.c Mdefines.h \
   Msymbols.h M5.h
 expm.o: expm.c Lapack-etc.h \
@@ -59,11 +63,11 @@ init.o: init.c cholmod-api.h cholmod-etc.h \
   SuiteSparse/CHOLMOD/Include/cholmod.h \
   Msymbols.h
 isDiagonal.o: isDiagonal.c Mdefines.h \
-  Msymbols.h M5.h
+  Msymbols.h M5.h idz.h
 isSymmetric.o: isSymmetric.c Mdefines.h \
-  Msymbols.h M5.h
+  Msymbols.h M5.h idz.h
 isTriangular.o: isTriangular.c Mdefines.h \
-  Msymbols.h M5.h
+  Msymbols.h M5.h idz.h
 matmult.o: matmult.c Lapack-etc.h \
   cholmod-etc.h \
   SuiteSparse/SuiteSparse_config/SuiteSparse_config.h \

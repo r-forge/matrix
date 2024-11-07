@@ -1,6 +1,7 @@
 sources = \
 	Csparse.c \
 	Summary.c \
+	aggregate.c \
 	attrib.c \
 	band.c \
 	bind.c \
@@ -12,6 +13,7 @@ sources = \
 	cs-etc.c \
 	determinant.c \
 	diag.c \
+	dropzero.c \
 	expand.c \
 	expm.c \
 	factor.c \

@@ -662,8 +662,8 @@ stopifnot(identical(cu * 1:8, tu * 1:8), # but are no longer triangular
           identical(cu > .1, as(tu > .1, "CsparseMatrix")),
           all(cu >= 0, na.rm=TRUE), !all(cu >= 1), is.na(all(tu >= 0)),
           ## Csparse_drop: preserves triangularity incl diag="U"
-          ## ^^^^^^^^^^^^ now using more general R_sparse_drop0
-          identical(cu, .Call(Matrix:::R_sparse_drop0, cu, 0.))
+          ## ^^^^^^^^^^^^ now using more general R_sparse_dropzero
+          identical(cu, .Call(Matrix:::R_sparse_dropzero, cu, 0.))
           )
 assert.EQ.mat(cu * 1:8, mu * 1:8)
 

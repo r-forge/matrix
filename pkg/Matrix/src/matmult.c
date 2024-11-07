@@ -9,7 +9,7 @@
 
 SEXP dense_transpose(SEXP, const char *, char);
 SEXP sparse_transpose(SEXP, const char *, char, int);
-SEXP sparse_drop0(SEXP, const char *, double);
+SEXP sparse_dropzero(SEXP, const char *, double);
 SEXP sparse_diag_U2N(SEXP, const char *);
 
 static const char *valid_matmult[] = {
@@ -1099,7 +1099,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 		_TRANS_ = 'N'; \
 	if (_CLASS_[0] != kind) { \
 		if (boolean) \
-			REPROTECT(_A_ = sparse_drop0(_A_, _CLASS_, 0.0), _PID_); \
+			REPROTECT(_A_ = sparse_dropzero(_A_, _CLASS_, 0.0), _PID_); \
 		else { \
 			REPROTECT(_A_ = sparse_as_kind(_A_, _CLASS_, kind), _PID_); \
 			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
@@ -1518,7 +1518,7 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	}
 
 	if (boolean && (zclass[2] == 'C' || zclass[2] == 'R' || zclass[2] == 'T')) {
-		REPROTECT(z = sparse_drop0(z, zclass, 0.0), zpid);
+		REPROTECT(z = sparse_dropzero(z, zclass, 0.0), zpid);
 		REPROTECT(z = sparse_as_kind(z, zclass, 'n'), zpid);
 	}
 

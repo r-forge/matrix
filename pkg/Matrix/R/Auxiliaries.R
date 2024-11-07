@@ -133,7 +133,7 @@ forceDiagonal <- function(x, diag = NA_character_) {
 
 .drop0 <- function(x, tol = 0, isM = TRUE) {
     if(isM)
-        return(.Call(R_sparse_drop0, x, tol))
+        return(.Call(R_sparse_dropzero, x, tol))
     ## TODO: write sparseVector code in C and respecting 'tol'
     if(.M.kind(x) == "n")
         return(x)
@@ -157,7 +157,7 @@ drop0 <- function(x, tol = 0, is.Csparse = NA, give.Csparse = TRUE) {
         else return(x) # n[gst][CRT]Matrix or indMatrix
     if(tryCoerce)
         x <- if(isS4(x)) .M2C(x) else .m2sparse.checking(x, ".", "C")
-    .Call(R_sparse_drop0, x, as.double(tol))
+    .Call(R_sparse_dropzero, x, as.double(tol))
 }
 
 indDiag <- function(n, upper = TRUE, packed = FALSE)

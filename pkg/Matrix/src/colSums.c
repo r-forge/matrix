@@ -3,7 +3,7 @@
 #include "Mdefines.h"
 #include "M5.h"
 
-/* defined in ./sparse.c : */
+/* defined in ./aggregate.c : */
 SEXP sparse_aggregate(SEXP, const char *);
 
 #define SUM_TYPEOF(c) \

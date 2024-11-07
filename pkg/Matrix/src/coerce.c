@@ -2089,7 +2089,7 @@ SEXP sparse_as_kind(SEXP from, const char *class, char kind)
 
 	if (class[2] == 'T' && (class[0] == 'n' || class[0] == 'l') &&
 	    kind != 'n' && kind != 'l') {
-		/* defined in ./sparse.c : */
+		/* defined in ./aggregate.c : */
 		SEXP sparse_aggregate(SEXP, const char *);
 		from = sparse_aggregate(from, class);
 	}

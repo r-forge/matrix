@@ -93,7 +93,7 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 				break;
 			case 'T':
 			{
-				/* defined in ./sparse.c : */
+				/* defined in ./aggregate.c : */
 				SEXP sparse_aggregate(SEXP, const char *);
 				SETCAR(a, sparse_aggregate(s, scl));
 				anyTsparse = 1;
