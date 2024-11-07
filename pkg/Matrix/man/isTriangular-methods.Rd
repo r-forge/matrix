@@ -40,8 +40,8 @@
   i.e., they have the same number of rows and columns.
 }
 \usage{
-isTriangular(object, upper = NA)
-isDiagonal(object)
+isTriangular(object, upper = NA, \dots)
+isDiagonal(object, \dots)
 }
 \arguments{
   \item{object}{an \R object, typically a matrix.}

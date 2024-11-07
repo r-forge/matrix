@@ -23,7 +23,9 @@
   \code{\linkS4class{Matrix}}.
 }
 \usage{
-nnzero(x, na.counted = NA)
+nnzero(x, \dots)
+\S4method{nnzero}{denseMatrix}(x, na.counted = NA, \dots)
+\S4method{nnzero}{sparseMatrix}(x, na.counted = NA, \dots)
 }
 \arguments{
   \item{x}{an \R object, typically inheriting from class

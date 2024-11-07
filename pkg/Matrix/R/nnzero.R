@@ -32,7 +32,7 @@ setMethod("nnzero", c(x =    "ANY"), .nnzero.fallback)
 setMethod("nnzero", c(x = "vector"), .nnzero.dispatching)
 
 setMethod("nnzero", c(x = "denseMatrix"),
-          function(x, na.counted = NA) {
+          function(x, na.counted = NA, ...) {
               d <- x@Dim
               if(any(d == 0L))
                   return(0L)
@@ -48,7 +48,7 @@ setMethod("nnzero", c(x = "denseMatrix"),
           })
 
 setMethod("nnzero", c(x = "sparseMatrix"),
-          function(x, na.counted = NA) {
+          function(x, na.counted = NA, ...) {
               d <- x@Dim
               if(any(d == 0L))
                   return(0L)
@@ -65,7 +65,7 @@ setMethod("nnzero", c(x = "sparseMatrix"),
           })
 
 setMethod("nnzero", c(x = "diagonalMatrix"),
-          function(x, na.counted = NA) {
+          function(x, na.counted = NA, ...) {
               if(x@diag != "N")
                   x@Dim[1L]
               else {
@@ -77,11 +77,11 @@ setMethod("nnzero", c(x = "diagonalMatrix"),
           })
 
 setMethod("nnzero", c(x = "indMatrix"),
-          function(x, na.counted = NA)
+          function(x, ...)
               length(x@perm))
 
 setMethod("nnzero", c(x = "sparseCholesky"),
-          function(x, na.counted = NA)
-              nnzero(as(x, "CsparseMatrix"), na.counted))
+          function(x, ...)
+              nnzero(as(x, "CsparseMatrix"), ...))
 
 rm(.nnzero.dispatching)

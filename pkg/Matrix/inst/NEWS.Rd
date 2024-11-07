@@ -19,9 +19,14 @@
       \code{(x, \dots)}, allowing methods to accept further arguments.
       The generic function now dispatches only on \code{x}.
 
+      \item The formal argument list of generic function
+      \code{nnzero} is changed from \code{(x, na.counted)} to
+      \code{(x, \dots)}, allowing methods to accept further arguments.
+
       \item The formal argument lists of generic functions
-      \code{symmpart} and \code{skewpart} are changed from \code{(x)} to
-      \code{(x, \dots)}.
+      \code{symmpart}, \code{skewpart}, \code{isDiagonal}, and
+      \code{isTriangular} gain \code{\dots}, allowing methods to accept
+      further arguments.
     }
   }
   \subsection{New Features}{

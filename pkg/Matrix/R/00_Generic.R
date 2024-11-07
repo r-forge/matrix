@@ -66,11 +66,11 @@ setGeneric("isCanonical",
                standardGeneric("isCanonical"))
 
 setGeneric("isDiagonal",
-           function(object)
+           function(object, ...)
                standardGeneric("isDiagonal"))
 
 setGeneric("isTriangular",
-           function(object, upper = NA)
+           function(object, upper = NA, ...)
                standardGeneric("isTriangular"),
            signature = "object")
 
@@ -79,9 +79,8 @@ setGeneric("lu",
                standardGeneric("lu"))
 
 setGeneric("nnzero",
-           function(x, na.counted = NA)
-               standardGeneric("nnzero"),
-           signature = "x")
+           function(x, ...)
+               standardGeneric("nnzero"))
 
 setGeneric("pack",
            function(x, ...)

@@ -3,20 +3,20 @@
 
 for (.cl in c("matrix", "denseMatrix"))
 setMethod("isTriangular", c(object = .cl),
-          function(object, upper = NA)
+          function(object, upper = NA, ...)
               .Call(R_dense_is_triangular, object, upper))
 
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
 setMethod("isTriangular", c(object = .cl),
-          function(object, upper = NA)
+          function(object, upper = NA, ...)
               .Call(R_sparse_is_triangular, object, upper))
 
 setMethod("isTriangular", c(object = "diagonalMatrix"),
-          function(object, upper = NA)
+          function(object, upper = NA, ...)
               if (is.na(upper)) `attr<-`(TRUE, "kind", "U") else TRUE)
 
 setMethod("isTriangular", c(object = "indMatrix"),
-          function(object, upper = NA) {
+          function(object, upper = NA, ...) {
               d <- object@Dim
               if ((n <- d[2L]) != d[1L])
                   return(FALSE)
