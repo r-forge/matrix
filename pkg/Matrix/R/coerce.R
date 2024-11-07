@@ -36,7 +36,7 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
 .M2diag <- function(from) {
     if (!isDiagonal(from))
         stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
-    forceDiagonal(from)
+    forceDiagonal.backcomp(from)
 }
 
 .M2v <- function(from)
@@ -316,7 +316,7 @@ setAs("sparseVector", "Matrix",
 setAs("matrix", "Matrix",
       function(from) {
           if(isDiagonal(from))
-              forceDiagonal(from)
+              forceDiagonal.backcomp(from)
           else if(.sparseDefault(from))
               .m2sparse.checking(from, ".", "C")
           else .m2dense.checking(from, ".")
@@ -388,7 +388,7 @@ setAs("matrix", "nMatrix",
 setAs("matrix", "lMatrix",
       function(from) {
           if(isDiagonal(from))
-              forceDiagonal(`storage.mode<-`(from, "logical"))
+              forceDiagonal.backcomp(`storage.mode<-`(from, "logical"))
           else if(.sparseDefault(from))
               .m2sparse.checking(from, "l", "C")
           else .m2dense.checking(from, "l")
@@ -396,7 +396,7 @@ setAs("matrix", "lMatrix",
 setAs("matrix", "dMatrix",
       function(from) {
           if(isDiagonal(from))
-              forceDiagonal(`storage.mode<-`(from, "double"))
+              forceDiagonal.backcomp(`storage.mode<-`(from, "double"))
           else if(.sparseDefault(from))
               .m2sparse.checking(from, "d", "C")
           else .m2dense.checking(from, "d")

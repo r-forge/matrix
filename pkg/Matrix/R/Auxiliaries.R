@@ -66,10 +66,8 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     }
 }
 
-## MJ: Implement forceTriangular() and export this and that?
-## MJ: Notably this provides a model for (maybe, in the future) allowing
-## forceSymmetric(<non-square>) ... by truncating the "too long" dimension.
-forceDiagonal <- function(x, diag = NA_character_) {
+## FIXME: "deprecated"; adjust methods that use this ...
+forceDiagonal.backcomp <- function(x, diag = NA_character_) {
     y <- diag(x, names = FALSE) # FIXME? don't allocate if diag == "U"
     cl <- switch(typeof(y),
                  logical =

@@ -1440,7 +1440,7 @@ replDiag <- function(x, i, j, ..., value) {
     ## TODO: the following is a bit expensive; have cases above e.g. [i,] where
     ## ----- we could check *much* faster :
     if(isDiagonal(x))
-        forceDiagonal(x)
+        forceDiagonal.backcomp(x)
     else if(isSymmetric(x))
         forceSymmetric(x)
     else if(!(it <- isTriangular(x)))

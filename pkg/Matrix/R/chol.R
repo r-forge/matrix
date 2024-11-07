@@ -18,7 +18,7 @@ setMethod("chol", c(x = "triangularMatrix"),
                   ch <- chol(forceSymmetric(x, uplo), ...)
                   ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
                   ch
-              } else chol(forceDiagonal(x, x@diag), ...)
+              } else chol(forceDiagonal(x, diag = x@diag), ...)
           })
 
 setMethod("chol", c(x = "diagonalMatrix"),

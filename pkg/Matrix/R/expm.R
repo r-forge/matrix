@@ -67,5 +67,5 @@ setMethod("expm", c(x = "matrix"),
               if(d[1L] != d[2L])
                   stop("matrix is not square")
               storage.mode(x) <- "double"
-              expm(if(isDiagonal(x)) forceDiagonal(x) else .m2dense(x, ".ge"))
+              expm(if(isDiagonal(x)) forceDiagonal.backcomp(x) else .m2dense(x, ".ge"))
           })
