@@ -43,6 +43,7 @@ nnzero(x, \dots)
     }
     For sparse matrices, you may often want to use \code{na.counted = TRUE}.
   }
+  \item{\dots}{optional arguments passed from or to other methods.}
 }
 % \details{
 % }
