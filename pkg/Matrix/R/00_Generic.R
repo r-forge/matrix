@@ -57,9 +57,17 @@ setGeneric("forceCanonical",
            function(x, ...)
                standardGeneric("forceCanonical"))
 
+setGeneric("forceDiagonal",
+           function(x, ...)
+               standardGeneric("forceDiagonal"))
+
 setGeneric("forceSymmetric",
            function(x, ...)
                standardGeneric("forceSymmetric"))
+
+setGeneric("forceTriangular",
+           function(x, ...)
+               standardGeneric("forceTriangular"))
 
 setGeneric("isCanonical",
            function(object, ...)
