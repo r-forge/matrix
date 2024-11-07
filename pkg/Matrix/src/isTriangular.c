@@ -38,11 +38,10 @@ int dense_is_triangular(SEXP obj, const char *class, char op_ul)
 		return (op_ul == '\0' || op_ul == 'U') ? 1 : -1;
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	int i, j;
 
 #define TEMPLATE(c) \
 	do { \
-		c##TYPE *px = c##PTR(x), *pu = px, *pl = px; \
+		c##TYPE *px = c##PTR(x); \
 		if ((op_ul == '\0' || op_ul == 'U') && \
 		    !c##NAME(test2)(px, (size_t) n, 'U', '\0', 'N')) \
 			return  1; \
