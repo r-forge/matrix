@@ -1,5 +1,5 @@
 \name{isTriangular-methods}
-\title{Test whether a Matrix is Triangular or Diagonal}
+\title{Test if a Matrix is Triangular}
 %
 \docType{methods}
 \keyword{array}
@@ -8,8 +8,6 @@
 %
 \alias{isTriangular}
 \alias{isTriangular-methods}
-\alias{isDiagonal}
-\alias{isDiagonal-methods}
 %
 \alias{isTriangular,CsparseMatrix-method}
 \alias{isTriangular,RsparseMatrix-method}
@@ -19,29 +17,20 @@
 \alias{isTriangular,indMatrix-method}
 \alias{isTriangular,matrix-method}
 %
-\alias{isDiagonal,CsparseMatrix-method}
-\alias{isDiagonal,RsparseMatrix-method}
-\alias{isDiagonal,TsparseMatrix-method}
-\alias{isDiagonal,denseMatrix-method}
-\alias{isDiagonal,diagonalMatrix-method}
-\alias{isDiagonal,indMatrix-method}
-\alias{isDiagonal,matrix-method}
-%
 \description{
-  \code{isTriangular} and \code{isDiagonal} test whether their argument
-  is a triangular or diagonal matrix, respectively.  Unlike the analogous
-  \code{\link{isSymmetric}}, these two functions are generically
-  from \pkg{Matrix} rather than \code{base}.  Hence \pkg{Matrix}
+  \code{isTriangular} tests whether its argument
+  is a triangular matrix.  Unlike the analogous
+  \code{\link{isSymmetric}}, it is generically
+  from \pkg{Matrix} rather than \pkg{base}.  Hence \pkg{Matrix}
   defines methods for traditional matrices of implicit \link{class}
   \code{"\link{matrix}"} in addition to matrices inheriting from
   virtual class \code{"\linkS4class{Matrix}"}.
 
-  By our definition, triangular and diagonal matrices are \emph{square},
+  By our definition, triangular matrices are \emph{square},
   i.e., they have the same number of rows and columns.
 }
 \usage{
 isTriangular(object, upper = NA, \dots)
-isDiagonal(object, \dots)
 }
 \arguments{
   \item{object}{an \R object, typically a matrix.}
@@ -50,6 +39,7 @@ isDiagonal(object, \dots)
     triangular \code{object}; or otherwise \code{\link{NA}} (the
     default), in which case \code{TRUE} is returned for any triangular
     \code{object}.}
+  \item{\dots}{optional arguments passed from or to other methods.}
 }
 \value{
   A \link{logical}, either \code{TRUE} or \code{FALSE}
@@ -64,8 +54,7 @@ isDiagonal(object, \dots)
 }
 \seealso{
   \code{\link{isSymmetric}};
-  virtual classes \code{"\linkS4class{triangularMatrix}"} and
-  \code{"\linkS4class{diagonalMatrix}"} and their subclasses.
+  virtual class \code{"\linkS4class{triangularMatrix}"} and subclasses.
 }
 \examples{
 isTriangular(Diagonal(4))
@@ -75,9 +64,6 @@ isTriangular(M) # TRUE (*and* of formal class "dtrMatrix")
 isTriangular(as(M, "generalMatrix")) # still triangular, even if not "formally"
 isTriangular(crossprod(M)) # FALSE
 
-isDiagonal(matrix(c(2,0,0,1), 2,2)) # TRUE
-
 ## Look at implementations:
 showMethods("isTriangular", includeDefs = TRUE)
-showMethods("isDiagonal", includeDefs = TRUE)
 }
