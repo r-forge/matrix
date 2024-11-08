@@ -15,7 +15,7 @@
 \alias{nnzero,indMatrix-method}
 \alias{nnzero,sparseCholesky-method}
 \alias{nnzero,sparseMatrix-method}
-\alias{nnzero,vector-method}
+\alias{nnzero,sparseVector-method}
 %
 \description{
   Returns the number of non-zero values of a numeric-like \R object, and

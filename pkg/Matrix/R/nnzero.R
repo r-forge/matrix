@@ -1,35 +1,34 @@
 ## METHODS FOR GENERIC: nnzero
-## * used to retrieve number of nonzero elements,
-##   i.e., number of elements excl. both structural and non-structural zeros
-## * like MATLAB's nnz() but more sophisticated due to handling of NA
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## na.counted:
 ## FALSE ... NA is treated as    zero and so excluded from count
 ##  TRUE ... NA is treated as nonzero and so included   in count
-##    NA ... NA is indeterminate (could be zero or nonzero) hence count is NA
+##    NA ... NA is indeterminate (zero or nonzero) hence count is NA
 
- sparseDefault <- function(x) length(x) > 2 *  nnzero(x, na.counted = TRUE)
-.sparseDefault <- function(x) length(x) > 2 * .nnzero(x, na.counted = TRUE)
-
-## For logical, integer, double, and complex vectors
-.nnzero <- function(x, na.counted = NA, nnzmax = length(x))
+.nnzero <-
+function(x, na.counted = TRUE, nnzmax = length(x))
     .Call(R_nnz, x, na.counted, nnzmax)
 
-## For any class with methods for 'is.na' and '!='
-.nnzero.fallback <- function(x, na.counted = NA)
-    sum(if(is.na(na.counted))
-            x != 0
-        else if(na.counted)
-            is.na(x) | x != 0
-        else !is.na(x) & x != 0)
+.sparseDefault <-
+function(x, na.counted = TRUE, tol = 0.5)
+    .nnzero(x, na.counted = na.counted) < tol * length(x)
 
-.nnzero.dispatching <- function(x, na.counted = NA)
-    switch(typeof(x), logical =, integer =, double =, complex = .nnzero,
-           .nnzero.fallback)(x, na.counted)
+ sparseDefault <-
+function(x, na.counted = TRUE, tol = 0.5)
+     nnzero(x, na.counted = na.counted) < tol * length(x)
 
-setMethod("nnzero", c(x =    "ANY"), .nnzero.fallback)
-setMethod("nnzero", c(x = "vector"), .nnzero.dispatching)
+setMethod("nnzero", c(x = "ANY"),
+          function(x, na.counted = NA, ...)
+              switch(typeof(x),
+                     logical =, integer =, double =, complex =
+                         .nnzero(x, na.counted),
+                     ## Else hope that methods exist for 'is.na', '!=' :
+                     sum(if(is.na(na.counted))
+                             x != 0
+                         else if(na.counted)
+                             is.na(x) | x != 0
+                         else !is.na(x) & x != 0)))
 
 setMethod("nnzero", c(x = "denseMatrix"),
           function(x, na.counted = NA, ...) {
@@ -69,10 +68,9 @@ setMethod("nnzero", c(x = "diagonalMatrix"),
               if(x@diag != "N")
                   x@Dim[1L]
               else {
-                  y <- x@x
-                  if(.M.kind(x) == "n" && anyNA(y))
-                      y <- y | is.na(y)
-                  .nnzero(y, na.counted)
+                  if(.M.kind(x) == "n")
+                      na.counted <- TRUE
+                  .nnzero(x@x, na.counted)
               }
           })
 
@@ -80,8 +78,12 @@ setMethod("nnzero", c(x = "indMatrix"),
           function(x, ...)
               length(x@perm))
 
+setMethod("nnzero", c(x = "sparseVector"),
+          function(x, na.counted = NA, ...)
+              if(.M.kind(x) == "n")
+                  length(x@i)
+              else .nnzero(x@x, na.counted))
+
 setMethod("nnzero", c(x = "sparseCholesky"),
           function(x, ...)
               nnzero(as(x, "CsparseMatrix"), ...))
-
-rm(.nnzero.dispatching)
