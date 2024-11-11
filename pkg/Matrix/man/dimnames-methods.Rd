@@ -13,6 +13,7 @@
 %
 \alias{dimnames,Matrix-method}
 \alias{dimnames,MatrixFactorization-method}
+\alias{dimnames,sparseVector-method}
 \alias{dimnames,symmetricMatrix-method}
 %
 \alias{dimnames<-,Matrix,NULL-method}
@@ -23,9 +24,6 @@
 \alias{dimnames<-,generalMatrix,list-method}
 \alias{dimnames<-,symmetricMatrix,NULL-method}
 \alias{dimnames<-,symmetricMatrix,list-method}
-%
-\alias{unname,Matrix-method}
-\alias{unname,MatrixFactorization-method}
 %
 \description{TODO.}
 \usage{
