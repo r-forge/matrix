@@ -71,7 +71,7 @@ int sparse_is_canonical(SEXP obj, const char *class)
 			for (k = 0; k < kend; ++k)
 				if (pi[k] == pj[k] &&
 				    (ISNAN(px[k].i) || px[k].i != 0.0))
-					return 0;			
+					return 0;
 		}
 		}
 		return 1;

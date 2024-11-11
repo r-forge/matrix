@@ -189,7 +189,7 @@ SEXP R_dense_force_canonical(SEXP s_from, SEXP s_check)
 
 	int check;
 	VALID_LOGIC2(s_check, check);
-	
+
 	return dense_force_canonical(s_from, class, check);
 }
 
@@ -199,6 +199,6 @@ SEXP R_sparse_force_canonical(SEXP s_from, SEXP s_check)
 
 	int check;
 	VALID_LOGIC2(s_check, check);
-	
+
 	return sparse_force_canonical(s_from, class, check);
 }

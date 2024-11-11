@@ -632,7 +632,7 @@ SEXP sparse_diag_N2U(SEXP from, const char *class)
 {
 	/* defined in ./band.c : */
 	SEXP sparse_band(SEXP, const char *, int, int);
-	
+
 	if (class[1] != 't' || DIAG(from) != 'N')
 		return from;
 	SEXP to;

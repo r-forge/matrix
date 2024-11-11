@@ -1920,7 +1920,7 @@ SEXP R_diagonal_as_sparse(SEXP s_from,
 SEXP index_as_sparse(SEXP from, const char *class, char kind, char repr)
 {
 	int mg = MARGIN(from);
-	
+
 	char cl[] = ".g.Matrix";
 	cl[0] = (kind == '.') ? 'n' : ((kind == ',') ? 'd' : kind);
 	cl[2] = (repr == '.') ? ((mg == 0) ? 'R' : 'C') : repr;
