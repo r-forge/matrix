@@ -32,15 +32,10 @@
 
 \S4method{dimnames}{Matrix,list}(x) <- value
 \S4method{dimnames}{MatrixFactorization,list}(x) <- value
-
-\S4method{unname}{Matrix}(obj, force = FALSE)
-\S4method{unname}{MatrixFactorization}(obj, force = FALSE)
 }
 \arguments{
 \item{x}{.}
 \item{value}{.}
-\item{obj}{.}
-\item{force}{.}
 }
 %% \value{}
 %% \seealso{}

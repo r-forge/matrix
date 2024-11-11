@@ -106,7 +106,7 @@ setMethod("dim", c(x = "sparseVector"),
 ## METHODS FOR GENERIC: dim<-
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("dim<-", c(x = "denseMatrix", value = "numeric")),
+setMethod("dim<-", c(x = "denseMatrix", value = "numeric"),
           function(x, value) {
               d <- x@Dim
               s <- validDimGetsValue(value, prod(d))
@@ -115,7 +115,7 @@ setMethod("dim<-", c(x = "denseMatrix", value = "numeric")),
               value <- as.integer(value)
               if (all(value == d))
                   return(x)
-              r <- paste0(.M.kind(x), "geMatrix")
+              r <- new(paste0(.M.kind(x), "geMatrix"))
               r@Dim <- value
               r@x <- .M2v(x)
               r
@@ -175,7 +175,7 @@ rm(.cl)
 
 for (.cl in c("denseMatrix", "sparseMatrix", "sparseVector"))
 setMethod("length<-", c(x = .cl, value = "numeric"),
-          function(x) {
+          function(x, value) {
               mn <- length(x)
               s <- validLengthGetsValue(value, mn)
               if (is.character(s))

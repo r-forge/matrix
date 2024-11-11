@@ -125,7 +125,7 @@ setMethod("determinant",
                                     error = function(e) lu(x, errSing = FALSE))
                   }
               if (isS4(trf))
-                  determinant(trf, logarithm, ...)
+                  determinant(trf, logarithm, sqrt = FALSE, ...)
               else .mkDet(if (anyNA(x)) NaN else -Inf, logarithm, 1L)
           })
 

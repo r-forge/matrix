@@ -36,7 +36,7 @@
 \S4method{dim}{Matrix}(x)
 \S4method{dim}{MatrixFactorization}(x)
 
-\S4method{dim}{sparseVector}(x) <- value
+\S4method{dim}{sparseVector,numeric}(x) <- value
 
 \S4method{length}{Matrix}(x)
 \S4method{length}{MatrixFactorization}(x)
