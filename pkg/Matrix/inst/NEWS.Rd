@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-07 r5006)}{
+\section{Changes in version 1.8-0 (2024-11-11 r5020)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -65,6 +65,11 @@
       method for \code{kappa} in \pkg{base}.
 
       \item All methods for \code{rcond} support the 2-norm.
+
+      \item Methods for \code{Cholesky(A=<sparseMatrix>, \dots)} gain a
+      logical argument \code{force}, indicating which of
+      \code{forceSymmetric(A)} and \code{tcrossprod(A)} is factorized
+      when \code{A} is not formally symmetric.
     }
   }
   \subsection{Bug Fixes}{

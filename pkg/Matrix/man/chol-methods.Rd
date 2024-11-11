@@ -9,16 +9,12 @@
 \alias{chol}
 \alias{chol-methods}
 %
-\alias{chol,ddiMatrix-method}
+\alias{chol,CsparseMatrix-method}
+\alias{chol,RsparseMatrix-method}
+\alias{chol,TsparseMatrix-method}
+\alias{chol,denseMatrix-method}
 \alias{chol,diagonalMatrix-method}
-\alias{chol,dsCMatrix-method}
-\alias{chol,dsRMatrix-method}
-\alias{chol,dsTMatrix-method}
-\alias{chol,dspMatrix-method}
-\alias{chol,dsyMatrix-method}
-\alias{chol,generalMatrix-method}
-\alias{chol,symmetricMatrix-method}
-\alias{chol,triangularMatrix-method}
+\alias{chol,indMatrix-method}
 %
 \description{
   Computes the upper triangular Cholesky factor of an
@@ -41,12 +37,8 @@
 }
 \usage{
 chol(x, \dots)
-\S4method{chol}{dsyMatrix}(x, pivot = FALSE, tol = -1, \dots)
-\S4method{chol}{dspMatrix}(x, \dots)
-\S4method{chol}{dsCMatrix}(x, pivot = FALSE, \dots)
-\S4method{chol}{ddiMatrix}(x, \dots)
-\S4method{chol}{generalMatrix}(x, uplo = "U", \dots)
-\S4method{chol}{triangularMatrix}(x, uplo = "U", \dots)
+\S4method{chol}{denseMatrix}(x, pivot = FALSE, tol = -1, \dots)
+\S4method{chol}{CsparseMatrix}(x, pivot = FALSE, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite}, symmetric, positive
@@ -67,11 +59,6 @@ chol(x, \dots)
     The factorization algorithm stops if the pivot is less than
     or equal to \code{tol}.  Negative \code{tol} is equivalent
     to \code{nrow(x) * .Machine$double.eps * max(diag(x))}.}
-  \item{uplo}{a string, either \code{"U"} or \code{"L"},
-    indicating which triangle of \code{x} should be used
-    to compute the factorization.  The default is \code{"U"},
-    even for lower triangular \code{x}, to be consistent with
-    \code{\link[base]{chol}} from \pkg{base}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{

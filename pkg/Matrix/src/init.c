@@ -3,6 +3,13 @@
 #include <R_ext/Visibility.h>
 #include <Rinternals.h>
 
+/* BunchKaufman.c : */
+SEXP R_dense_bunchkaufman(SEXP, SEXP, SEXP, SEXP);
+
+/* Cholesky.c : */
+SEXP R_dense_cholesky(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP R_sparse_cholesky(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
 /* Csparse.c : */
 SEXP CsparseMatrix_validate_maybe_sorting(SEXP);
 SEXP dgCMatrix_lusol(SEXP, SEXP);
@@ -11,6 +18,9 @@ SEXP dgCMatrix_cholsol(SEXP, SEXP);
 SEXP dtCMatrix_diag(SEXP, SEXP);
 SEXP Csparse_dmperm(SEXP, SEXP, SEXP);
 SEXP Csparse_writeMM(SEXP, SEXP);
+
+/* Schur.c : */
+SEXP R_dense_schur(SEXP, SEXP, SEXP);
 
 /* Summary.c : */
 SEXP R_dense_sum(SEXP, SEXP);
@@ -101,19 +111,6 @@ SEXP denseBunchKaufman_expand(SEXP);
 /* expm.c : */
 SEXP geMatrix_expm(SEXP);
 
-/* factor.c : */
-SEXP geMatrix_scf(SEXP, SEXP, SEXP);
-SEXP syMatrix_scf(SEXP, SEXP, SEXP);
-SEXP spMatrix_scf(SEXP, SEXP, SEXP);
-SEXP geMatrix_trf(SEXP, SEXP);
-SEXP syMatrix_trf(SEXP, SEXP);
-SEXP spMatrix_trf(SEXP, SEXP);
-SEXP poMatrix_trf(SEXP, SEXP, SEXP, SEXP);
-SEXP ppMatrix_trf(SEXP, SEXP);
-SEXP gCMatrix_orf(SEXP, SEXP, SEXP);
-SEXP gCMatrix_trf(SEXP, SEXP, SEXP, SEXP);
-SEXP pCMatrix_trf(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-
 /* forceCanonical.c : */
 SEXP R_dense_force_canonical(SEXP, SEXP);
 SEXP R_sparse_force_canonical(SEXP, SEXP);
@@ -138,6 +135,10 @@ SEXP R_sparse_is_symmetric(SEXP, SEXP, SEXP, SEXP);
 SEXP R_dense_is_triangular(SEXP, SEXP);
 SEXP R_sparse_is_triangular(SEXP, SEXP);
 
+/* lu.c : */
+SEXP R_dense_lu(SEXP, SEXP);
+SEXP R_sparse_lu(SEXP, SEXP, SEXP, SEXP);
+
 /* matmult.c : */
 SEXP R_dense_matmult(SEXP, SEXP, SEXP, SEXP);
 SEXP R_sparse_matmult(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -161,6 +162,9 @@ SEXP R_isPerm(SEXP, SEXP);
 SEXP R_signPerm(SEXP, SEXP);
 SEXP R_invertPerm(SEXP, SEXP, SEXP);
 SEXP R_asPerm(SEXP, SEXP, SEXP, SEXP);
+
+/* qr.c : */
+SEXP R_sparse_qr(SEXP, SEXP, SEXP);
 
 /* rcond.c : */
 SEXP geMatrix_rcond(SEXP, SEXP, SEXP);
@@ -291,6 +295,13 @@ SEXP R_Matrix_version(void);
 #define        REGISTER(name   ) R_RegisterCCallable("Matrix", #name, (DL_FUNC) name)
 
 static R_CallMethodDef CallMethodTable[] = {
+	/* BunchKaufman.c : */
+	CALL_METHOD(R_dense_bunchkaufman, 4),
+
+	/* Cholesky.c : */
+	CALL_METHOD(R_dense_cholesky, 5),
+	CALL_METHOD(R_sparse_cholesky, 8),
+
 	/* Csparse.c : */
 	CALL_METHOD(CsparseMatrix_validate_maybe_sorting, 1),
 	CALL_METHOD(dgCMatrix_lusol, 2),
@@ -299,6 +310,9 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(dtCMatrix_diag, 2),
 	CALL_METHOD(Csparse_dmperm, 3),
 	CALL_METHOD(Csparse_writeMM, 2),
+
+	/* Schur.c : */
+	CALL_METHOD(R_dense_schur, 3),
 
 	/* Summary.c : */
 	CALL_METHOD(R_dense_sum, 2),
@@ -386,19 +400,6 @@ static R_CallMethodDef CallMethodTable[] = {
 	/* expm.c : */
 	CALL_METHOD(geMatrix_expm, 1),
 
-	/* factor.c : */
-	CALL_METHOD(geMatrix_scf, 3),
-	CALL_METHOD(syMatrix_scf, 3),
-	CALL_METHOD(spMatrix_scf, 3),
-	CALL_METHOD(geMatrix_trf, 2),
-	CALL_METHOD(syMatrix_trf, 2),
-	CALL_METHOD(spMatrix_trf, 2),
-	CALL_METHOD(poMatrix_trf, 4),
-	CALL_METHOD(ppMatrix_trf, 2),
-	CALL_METHOD(gCMatrix_orf, 3),
-	CALL_METHOD(gCMatrix_trf, 4),
-	CALL_METHOD(pCMatrix_trf, 6),
-
 	/* forceCanonical.c : */
 	CALL_METHOD(R_dense_force_canonical, 2),
 	CALL_METHOD(R_sparse_force_canonical, 2),
@@ -423,6 +424,10 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_dense_is_triangular, 2),
 	CALL_METHOD(R_sparse_is_triangular, 2),
 
+	/* lu.c : */
+	CALL_METHOD(R_dense_lu, 2),
+	CALL_METHOD(R_sparse_lu, 4),
+
 	/* matmult.c : */
 	CALL_METHOD(R_dense_matmult, 4),
 	CALL_METHOD(R_sparse_matmult, 6),
@@ -446,6 +451,9 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_signPerm, 2),
 	CALL_METHOD(R_invertPerm, 3),
 	CALL_METHOD(R_asPerm, 4),
+
+	/* qr.c : */
+	CALL_METHOD(R_sparse_qr, 3),
 
 	/* rcond.c : */
 	CALL_METHOD(geMatrix_rcond, 3),

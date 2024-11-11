@@ -1,46 +1,43 @@
 ## METHODS FOR GENERIC: chol2inv
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol2inv", c(x = "generalMatrix"),
+setMethod("chol2inv", c(x = "denseMatrix"),
           function(x, uplo = "U", ...) {
               d <- x@Dim
-              if (d[1L] != d[2L])
-                  stop("matrix is not square")
-              chol2inv((if (  uplo == "U") triu else tril)(x), ...)
+              switch(.M.shape(x),
+                     "g" =
+                         if (d[1L] != d[2L])
+                             stop("matrix is not square"),
+                     "s" =
+                         uplo <- x@uplo,
+                     "t" =
+                         {
+                             uplo <- x@uplo
+                             if (x@diag != "N")
+                                 diag(x) <- TRUE
+                         })
+              i <- if (uplo == "U") 2L else 1L
+              x <- .M2kind(x, ",")
+              y <- x@x
+              z <- is.complex(y)
+              trf <- new(if (z) "zdenseCholesky" else "ddenseCholesky")
+              trf@Dim <- d
+              trf@Dimnames <- dimnames(x)[c(i, i)]
+              trf@uplo <- uplo
+              trf@x <- y
+              .Call(denseCholesky_solve, trf, NULL)
           })
 
-setMethod("chol2inv", c(x = "symmetricMatrix"),
-          function(x, ...)
-              chol2inv((if (x@uplo == "U") triu else tril)(x), ...))
-
-setMethod("chol2inv", c(x = "triangularMatrix"),
-          function(x, ...)
-              chol2inv(.M2kind(x, ","), ...))
-
-setMethod("chol2inv", c(x = "diagonalMatrix"),
-          function(x, ...)
-              chol2inv(.M2kind(x, ","), ...))
-
-for (.cl in paste0("dt", c("r", "p"), "Matrix"))
-setMethod("chol2inv", c(x = .cl),
-          function(x, ...) {
-              if (x@diag != "N")
-                  x <- ..diagU2N(x)
-              r <- .Call(denseCholesky_solve, x, NULL)
-              i <- if (x@uplo == "U") 2L else 1L
-              r@Dimnames <- x@Dimnames[c(i, i)]
-              r
+setMethod("chol2inv", c(x = "sparseMatrix"),
+          function(x, uplo = "U", ...) {
+              d <- x@Dim
+              switch(.M.shape(x),
+                     "g" =, "i" =
+                         if (d[1L] != d[2L])
+                             stop("matrix is not square"),
+                     "s" =, "t" =
+                         uplo <- x@uplo)
+              if (uplo == "U")
+                  tcrossprod(solve(triu(x)))
+              else crossprod(solve(tril(x)))
           })
-
-for (.cl in paste0("dt", c("C", "R", "T"), "Matrix"))
-setMethod("chol2inv", c(x = .cl),
-          function(x, ...)
-              (if (x@uplo == "U") tcrossprod else crossprod)(solve(x)))
-
-## Argument 'uplo' can affect the 'Dimnames' of the result here :
-
-setMethod("chol2inv", c(x = "ddiMatrix"),
-          function(x, uplo = "U", ...)
-              (if (  uplo == "U") tcrossprod else crossprod)(solve(x)))
-
-rm(.cl)

@@ -26,7 +26,10 @@
 \alias{qr.resid-methods}
 %
 \alias{qr,CsparseMatrix-method}
-\alias{qr,sparseMatrix-method}
+\alias{qr,RsparseMatrix-method}
+\alias{qr,TsparseMatrix-method}
+\alias{qr,diagonalMatrix-method}
+\alias{qr,indMatrix-method}
 %
 \alias{qr.Q,sparseQR-method}
 \alias{qr.R,sparseQR-method}

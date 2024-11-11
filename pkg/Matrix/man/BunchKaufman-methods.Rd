@@ -9,9 +9,9 @@
 \alias{BunchKaufman}
 \alias{BunchKaufman-methods}
 %
-\alias{BunchKaufman,dspMatrix-method}
-\alias{BunchKaufman,dsyMatrix-method}
+\alias{BunchKaufman,denseMatrix-method}
 \alias{BunchKaufman,matrix-method}
+\alias{BunchKaufman,sparseMatrix-method}
 %
 \description{
   Computes the Bunch-Kaufman factorization of an \eqn{n \times n}{n-by-n}
@@ -33,9 +33,8 @@
 }
 \usage{
 BunchKaufman(x, \dots)
-\S4method{BunchKaufman}{dsyMatrix}(x, warnSing = TRUE, \dots)
-\S4method{BunchKaufman}{dspMatrix}(x, warnSing = TRUE, \dots)
-\S4method{BunchKaufman}{matrix}(x, uplo = "U", \dots)
+\S4method{BunchKaufman}{denseMatrix}(x, warnSing = TRUE, uplo = "U", trans = "C", \dots)
+\S4method{BunchKaufman}{matrix}(x, \dots)
 }
 \arguments{
   \item{x}{a \link[=is.finite]{finite} symmetric matrix or
@@ -47,6 +46,7 @@ BunchKaufman(x, \dots)
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{x} should be used
     to compute the factorization.}
+  \item{trans}{.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{

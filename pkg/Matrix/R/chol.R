@@ -1,62 +1,46 @@
 ## METHODS FOR GENERIC: chol
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setMethod("chol", c(x = "generalMatrix"),
-          function(x, uplo = "U", ...) {
-              ch <- chol(forceSymmetric(x, uplo), ...)
-              ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
-              ch
+setMethod("chol", c(x = "denseMatrix"),
+          function(x, pivot = FALSE, tol = -1, ...) {
+              trf <- .Call(R_dense_cholesky, x, if (pivot) 1L else 2L, pivot, tol, NULL)
+              r <- expand1(trf, "L.")
+              dimnames(r) <- dimnames(x)
+              r
           })
 
-setMethod("chol", c(x = "symmetricMatrix"),
-          function(x, ...)
-              chol(.M2kind(x, ","), ...))
+for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
+setMethod("chol", c(x = .cl),
+          function(x, pivot = FALSE, ...) {
+              trf <- .Call(R_sparse_cholesky, x, 2L, pivot, FALSE, FALSE, 0, TRUE, NULL)
+              r <- expand1(trf, "L.")
 
-setMethod("chol", c(x = "triangularMatrix"),
-          function(x, uplo = "U", ...) {
-              if (identical(uplo, x@uplo)) {
-                  ch <- chol(forceSymmetric(x, uplo), ...)
-                  ch@Dimnames <- x@Dimnames # restore asymmetric 'Dimnames'
-                  ch
-              } else chol(forceDiagonal(x, diag = x@diag), ...)
+              dimnames(r) <- dimnames(x)
+              r
           })
 
 setMethod("chol", c(x = "diagonalMatrix"),
+          function(x, direct = TRUE, ...) {
+              if (direct) {
+                  z <- is.complex(x@x)
+                  r <- new(if (z) "zdiMatrix" else "ddiMatrix")
+                  r@Dim <- d <- x@Dim
+                  r@Dimnames <- x@Dimnames
+                  if (x@diag != "N")
+                      r@diag <- "U"
+                  else if (d[1L] > 0L) {
+                      x <- .M2kind(x, ",")
+                      y <- x@x
+                      if (z && any(is.na(tmp <- range(Im(y))) | tmp != 0))
+                          stop("matrix is not Hermitian")
+                      if (is.na(tmp <- min(if (z) Re(y) else y)) || tmp < 0)
+                          stop("matrix is not positive semidefinite")
+                      r@x <- sqrt(y)
+                  }
+                  r
+              } else chol(.diag2sparse(x, ",", "s", "C"), ...)
+          })
+
+setMethod("chol", c(x = "indMatrix"),
           function(x, ...)
-              chol(.M2kind(x, ","), ...))
-
-setMethod("chol", c(x = "dsyMatrix"),
-          function(x, pivot = FALSE, tol = -1, ...) {
-              ch <- as(Cholesky(x, perm = pivot, tol = tol), "dtrMatrix")
-              ch@Dimnames <- dimnames(x)
-              if (ch@uplo != "U") t(ch) else ch
-          })
-
-setMethod("chol", c(x = "dspMatrix"),
-          function(x, ...) {
-              ch <- as(Cholesky(x), "dtpMatrix")
-              ch@Dimnames <- dimnames(x)
-              if (ch@uplo != "U") t(ch) else ch
-          })
-
-for(.cl in paste0("ds", c("C", "R", "T"), "Matrix"))
-setMethod("chol", c(x = .cl),
-          function(x, pivot = FALSE, ...) {
-              ch <- t(as(Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE),
-                         "dtCMatrix")) # FIXME? give dtRMatrix, dtTMatrix?
-              ch@Dimnames <- dimnames(x)
-              ch
-          })
-rm(.cl)
-
-setMethod("chol", c(x = "ddiMatrix"),
-          function(x, ...) {
-              if (length(y <- x@x)) {
-                  if (is.na(min.y <- min(y)) || min.y < 0)
-                      stop(gettextf("%1$s(%2$s) is undefined: '%2$s' is not positive semidefinite",
-                                    "chol", "x"),
-                           domain = NA)
-                  x@x <- sqrt(y)
-              }
-              x
-          })
+              chol(.ind2sparse(x, ",", "C"), ...))

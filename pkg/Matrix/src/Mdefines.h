@@ -322,4 +322,7 @@ void cpyDN(SEXP, SEXP, int);
 SEXP (DIMNAMES)(SEXP, int);
 void (SET_DIMNAMES)(SEXP, int, SEXP);
 
+SEXP get_factor(SEXP, const char *);
+void set_factor(SEXP, const char *, SEXP);
+
 #endif /* MATRIX_MDEFINES_H */

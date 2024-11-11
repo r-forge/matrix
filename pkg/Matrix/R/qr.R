@@ -14,16 +14,21 @@ function(qr) {
     m0
 }
 
-setMethod("qr", c(x = "CsparseMatrix"),
+for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
+setMethod("qr", c(x = .cl),
           function(x, order = 3L, ...) {
-              r <- .Call(gCMatrix_orf, .M2gen(x, ","), 2L, order)
+              r <- .Call(R_sparse_qr, x, 2L, order)
               .qr.rank.def.warn(r)
               r
           })
 
-setMethod("qr", c(x = "sparseMatrix"),
+setMethod("qr", c(x = "diagonalMatrix"),
           function(x, ...)
-              qr(.M2gen(.M2C(x), ","), ...))
+              qr(.diag2sparse(x, ",", "g", "C"), ...))
+
+setMethod("qr", c(x = "indMatrix"),
+          function(x, ...)
+              qr(.ind2sparse(x, ",", "C"), ...))
 
 
 ## METHODS FOR GENERIC: qr.Q, qr.R, qr.X

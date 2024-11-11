@@ -670,7 +670,7 @@ L. <- new("dtCMatrix", Dim = c(1L, 1L), uplo = "L",
 S. <- forceSymmetric(L.)
 lu(S.)
 stopifnot(validObject(lu(L.)), # was invalid
-          identical(names(S.@factors), "sparseLU")) # was "lu"
+          identical(names(S.@factors), "sparseLU+")) # was "lu"
 
 ## chol() should give matrix with 'Dimnames',
 ## even if 'Dimnames' are not cached

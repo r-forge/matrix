@@ -9,24 +9,13 @@
 \alias{lu}
 \alias{lu-methods}
 %
+\alias{lu,CsparseMatrix-method}
+\alias{lu,RsparseMatrix-method}
+\alias{lu,TsparseMatrix-method}
 \alias{lu,denseMatrix-method}
 \alias{lu,diagonalMatrix-method}
-\alias{lu,dgCMatrix-method}
-\alias{lu,dgRMatrix-method}
-\alias{lu,dgTMatrix-method}
-\alias{lu,dgeMatrix-method}
-\alias{lu,dsCMatrix-method}
-\alias{lu,dsRMatrix-method}
-\alias{lu,dsTMatrix-method}
-\alias{lu,dspMatrix-method}
-\alias{lu,dsyMatrix-method}
-\alias{lu,dtCMatrix-method}
-\alias{lu,dtRMatrix-method}
-\alias{lu,dtTMatrix-method}
-\alias{lu,dtpMatrix-method}
-\alias{lu,dtrMatrix-method}
+\alias{lu,indMatrix-method}
 \alias{lu,matrix-method}
-\alias{lu,sparseMatrix-method}
 %
 \description{
   Computes the pivoted LU factorization of an \eqn{m \times n}{m-by-n}
@@ -52,11 +41,9 @@
 }
 \usage{
 lu(x, \dots)
-\S4method{lu}{dgeMatrix}(x, warnSing = TRUE, \dots)
-\S4method{lu}{dgCMatrix}(x, errSing = TRUE, order = NA_integer_,
-  tol = 1, \dots)
-\S4method{lu}{dsyMatrix}(x, cache = TRUE, \dots)
-\S4method{lu}{dsCMatrix}(x, cache = TRUE, \dots)
+\S4method{lu}{denseMatrix}(x, warnSing = TRUE, direct = FALSE, \dots)
+\S4method{lu}{CsparseMatrix}(x, errSing = TRUE, order = NA_integer_,
+  tol = 1, direct = FALSE, \dots)
 \S4method{lu}{matrix}(x, \dots)
 }
 \arguments{
@@ -85,11 +72,11 @@ lu(x, \dots)
     where \code{a} is the maximum in absolute value of the
     other possible pivot elements.
     Set \code{tol < 1} only if you know what you are doing.}
-  \item{cache}{a logical indicating if the result should be
-    cached in \code{x@factors[["LU"]]}.  Note that
-    caching is experimental and that only methods for classes
-    extending \code{\linkS4class{generalMatrix}} or
-    \code{\linkS4class{symmetricMatrix}} will have this argument.}
+  \item{direct}{a logical indicating if the result should be
+    constructed \dQuote{directly} where \code{x} is already
+    (formally) upper triangular or unit lower triangular.
+    In this case, methods do not permute or test for singular
+    \code{x}.}
   \item{\dots}{further arguments passed to or from methods.}
 }
 \value{

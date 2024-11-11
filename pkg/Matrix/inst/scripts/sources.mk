@@ -1,5 +1,8 @@
 sources = \
+	BunchKaufman.c \
+	Cholesky.c \
 	Csparse.c \
+	Schur.c \
 	Summary.c \
 	aggregate.c \
 	attrib.c \
@@ -15,7 +18,6 @@ sources = \
 	dropzero.c \
 	expand.c \
 	expm.c \
-	factor.c \
 	forceCanonical.c \
 	forceSymmetric.c \
 	idz.c \
@@ -24,10 +26,12 @@ sources = \
 	isDiagonal.c \
 	isSymmetric.c \
 	isTriangular.c \
+	lu.c \
 	matmult.c \
 	norm.c \
 	objects.c \
 	perm.c \
+	qr.c \
 	rcond.c \
 	skewpart.c \
 	solve.c \

@@ -10,17 +10,13 @@
 \alias{Cholesky}
 \alias{Cholesky-methods}
 %
-\alias{Cholesky,ddiMatrix-method}
+\alias{Cholesky,CsparseMatrix-method}
+\alias{Cholesky,RsparseMatrix-method}
+\alias{Cholesky,TsparseMatrix-method}
+\alias{Cholesky,denseMatrix-method}
 \alias{Cholesky,diagonalMatrix-method}
-\alias{Cholesky,dsCMatrix-method}
-\alias{Cholesky,dsRMatrix-method}
-\alias{Cholesky,dsTMatrix-method}
-\alias{Cholesky,dspMatrix-method}
-\alias{Cholesky,dsyMatrix-method}
-\alias{Cholesky,generalMatrix-method}
+\alias{Cholesky,indMatrix-method}
 \alias{Cholesky,matrix-method}
-\alias{Cholesky,symmetricMatrix-method}
-\alias{Cholesky,triangularMatrix-method}
 %
 \description{
   Computes the pivoted Cholesky factorization of an
@@ -48,14 +44,10 @@
 }
 \usage{
 Cholesky(A, \dots)
-\S4method{Cholesky}{dsyMatrix}(A, perm = TRUE, tol = -1, \dots)
-\S4method{Cholesky}{dspMatrix}(A, \dots)
-\S4method{Cholesky}{dsCMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
-    Imult = 0, \dots)
-\S4method{Cholesky}{ddiMatrix}(A, \dots)
-\S4method{Cholesky}{generalMatrix}(A, uplo = "U", \dots)
-\S4method{Cholesky}{triangularMatrix}(A, uplo = "U", \dots)
-\S4method{Cholesky}{matrix}(A, uplo = "U", \dots)
+\S4method{Cholesky}{denseMatrix}(A, perm = TRUE, tol = -1, uplo = "U", \dots)
+\S4method{Cholesky}{CsparseMatrix}(A, perm = TRUE, LDL = !super, super = FALSE,
+         Imult = 0, force = TRUE, uplo = "U", \dots)
+\S4method{Cholesky}{matrix}(A, \dots)
 }
 \arguments{
   \item{A}{a \link[=is.finite]{finite}, symmetric matrix or
@@ -105,6 +97,7 @@ Cholesky(A, \dots)
     as \code{Imult > max(rowSums(abs(A)) - diag(abs(A)))} ensures
     that \code{A + Imult * diag(nrow(A))} is diagonally dominant.
     (Symmetric, diagonally dominant matrices are positive definite.)}
+  \item{force}{.}
   \item{uplo}{a string, either \code{"U"} or \code{"L"},
     indicating which triangle of \code{A} should be used
     to compute the factorization.  The default is \code{"U"},

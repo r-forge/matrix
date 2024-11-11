@@ -9,17 +9,8 @@
 \alias{chol2inv}
 \alias{chol2inv-methods}
 %
-\alias{chol2inv,ANY-method}
-\alias{chol2inv,ddiMatrix-method}
-\alias{chol2inv,diagonalMatrix-method}
-\alias{chol2inv,dtCMatrix-method}
-\alias{chol2inv,dtRMatrix-method}
-\alias{chol2inv,dtTMatrix-method}
-\alias{chol2inv,dtrMatrix-method}
-\alias{chol2inv,dtpMatrix-method}
-\alias{chol2inv,generalMatrix-method}
-\alias{chol2inv,symmetricMatrix-method}
-\alias{chol2inv,triangularMatrix-method}
+\alias{chol2inv,denseMatrix-method}
+\alias{chol2inv,sparseMatrix-method}
 %
 \description{
   Given \emph{formally} upper and lower triangular matrices
@@ -35,9 +26,8 @@
 }
 \usage{
 chol2inv(x, \dots)
-\S4method{chol2inv}{dtrMatrix}(x, \dots)
-\S4method{chol2inv}{dtCMatrix}(x, \dots)
-\S4method{chol2inv}{generalMatrix}(x, uplo = "U", \dots)
+\S4method{chol2inv}{denseMatrix}(x, uplo = "U", \dots)
+\S4method{chol2inv}{sparseMatrix}(x, uplo = "U", \dots)
 }
 \arguments{
   \item{x}{a square matrix or \code{\linkS4class{Matrix}},
