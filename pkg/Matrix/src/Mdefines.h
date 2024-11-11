@@ -224,7 +224,7 @@ do { \
 do { \
 	if (TYPEOF(s) != LGLSXP || LENGTH(s) < 1) \
 		Rf_error(_("'%s' is not %s, %s, or %s"), #d, "TRUE", "FALSE", "NA"); \
-	d = LOGICAL(s)[0]; \
+	else d = LOGICAL(s)[0]; \
 } while (0)
 
 #define VALID_DENSE \

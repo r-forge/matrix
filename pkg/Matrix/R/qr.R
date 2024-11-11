@@ -38,7 +38,8 @@ setMethod("qr.Q", c(qr = "sparseQR"),
                   if (!is.complex(Dvec))
                       storage.mode(Dvec) <- typeof(qr@R@x)
                   if (length(Dvec) != qr@V@Dim[if (complete) 1L else 2L])
-                      stop(gettextf("'%s' has the wrong length", "Dvec"),
+                      stop(gettextf("'%s' has the wrong length",
+                                    "Dvec"),
                            domain = NA)
               }
               Q <- .Call(sparseQR_matmult, qr, NULL, 4L, complete, Dvec)

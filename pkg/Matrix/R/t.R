@@ -57,7 +57,7 @@ function(x) {
     r@Dim <- x@Dim
     r@Dimnames = x@Dimnames[2:1]
     r@perm <- x@perm
-    if(x@margin == 1L)
+    if (x@margin == 1L)
         r@margin <- 2L
     r
 }

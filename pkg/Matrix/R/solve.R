@@ -4,22 +4,24 @@
 .solve.checkDim1 <-
 function(nrow.a, ncol.a) {
     if (nrow.a != ncol.a)
-        stop(gettextf("'%s' is not square", "a"),
+        stop(gettextf("'%s' is not square",
+                      "a"),
              domain = NA)
 }
 
 .solve.checkDim2 <-
 function(nrow.a, nrow.b) {
     if (nrow.a != nrow.b)
-        stop(gettextf("dimensions of '%s' and '%s' are inconsistent", "a", "b"),
+        stop(gettextf("dimensions of '%s' and '%s' are inconsistent",
+                      "a", "b"),
              domain = NA)
 }
 
 .solve.checkCondition <-
 function(a, tol, rcond.a = rcond(a)) {
     if (tol > 0 && a@Dim[1L] > 0L && rcond.a < tol)
-        stop(gettextf("'%1$s' is computationally singular, rcond(%1$s)=%2$g",
-                      "a", rcond.a),
+        stop(gettextf("'%s' is computationally singular, rcond(%s)=%g",
+                      "a", "a", rcond.a),
              domain = NA)
 }
 
@@ -55,8 +57,8 @@ function(u, tol, rad.u = range(abs(diag(u, names = FALSE)))) {
 .solve.checkDiagonal <-
 function(diag.a) {
     if (any(zero <- !diag.a, na.rm = TRUE))
-        stop(gettextf("matrix is exactly singular, D[i,i]=0, i=%d",
-                      which.max(zero)),
+        stop(gettextf("'%s' is exactly singular, D[i,i]=0, i=%d",
+                      "a", which.max(zero)),
              domain = NA)
 }
 
@@ -65,10 +67,12 @@ function(perm, margin, n) {
     if (anyDuplicated.default(perm)) {
         i <- seq_len(n)[-perm][1L]
         if (margin == 1L)
-        stop(gettextf("matrix is exactly singular, J[,j]=0, j=%d", i),
+        stop(gettextf("'%s' is exactly singular, J[,j]=0, j=%d",
+                      "a", i),
              domain = NA)
         else
-        stop(gettextf("matrix is exactly singular, J[i,]=0, i=%d", i),
+        stop(gettextf("'%s' is exactly singular, J[i,]=0, i=%d",
+                      "a", i),
              domain = NA)
     }
 }
