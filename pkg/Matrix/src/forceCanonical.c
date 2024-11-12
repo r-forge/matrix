@@ -38,8 +38,10 @@ SEXP dense_force_canonical(SEXP from, const char *class, int check)
 		} while (0)
 		SWITCH5(class[0], TEMPLATE);
 #undef TEMPLATE
-		if (canonical)
+		if (canonical) {
+			UNPROTECT(1); /* x */
 			return from;
+		}
 	}
 	SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 #define TEMPLATE(c) \
