@@ -1,4 +1,4 @@
-\name{cbind2-methods}
+\name{bind-methods}
 \title{'cbind()' and 'rbind()' recursively built on cbind2/rbind2}
 %
 \docType{methods}
@@ -10,6 +10,7 @@
 \alias{cbind2-methods}
 \alias{rbind2}
 \alias{rbind2-methods}
+\alias{bind-methods}
 %
 \alias{cbind2,Matrix,Matrix-method}
 \alias{cbind2,Matrix,NULL-method}
