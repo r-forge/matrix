@@ -1,16 +1,18 @@
 ## METHODS FOR GENERIC: c
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-c.Matrix <- function(...) {
-    if(nargs() == 0L)
+c.Matrix <-
+function(...) {
+    if (nargs() == 0L)
         return(NULL)
     args <- lapply(list(...), as.vector)
     unlist(args, FALSE, TRUE)
 }
 
-c.sparseVector <- function(...) {
+c.sparseVector <-
+function(...) {
     N <- nargs()
-    if(N == 0L)
+    if (N == 0L)
         return(NULL)
     args        <- lapply(list(...), as, "sparseVector")
     args.length <- vapply(args, slot, 0, "length")
@@ -21,14 +23,14 @@ c.sparseVector <- function(...) {
     i <- match(vapply(args, .M.kind, ""), s)
     k <- range(i)
     n <- sum(args.length)
-    a <- if(n - 1 <= .Machine$integer.max) as.integer else as.double
+    a <- if (n - 1 <= .Machine$integer.max) as.integer else as.double
 
     r <- new(paste0(s[k[2L]], "sparseVector"))
     r@length <- a(n)
     r@i <- a(unlist(args.i, FALSE, FALSE)) +
         rep.int(cumsum(c(0L, a(args.length)[-N])), args.nnz)
-    if(k[2L] > 1L) {
-        if(k[1L] > 1L)
+    if (k[2L] > 1L) {
+        if (k[1L] > 1L)
             args.x <- lapply(args, slot, "x")
         else {
             pattern <- i == 1L
@@ -41,9 +43,9 @@ c.sparseVector <- function(...) {
     r
 }
 
-## These are insufficient as dispatch only consides the first argument,
+## These are insufficient as dispatch considers only the first argument,
 ## which need not be a Matrix or sparseVector:
-if(FALSE) {
+if (FALSE) {
 setMethod("c", c(x = "Matrix"),
           function(x, ...) c.Matrix      (x, ...))
 setMethod("c", c(x = "sparseVector"),
@@ -55,17 +57,21 @@ setMethod("c", c(x = "sparseVector"),
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## MJ: not yet registered or exported
-cbind.Matrix <- function(..., deparse.level = 1)
+cbind.Matrix <-
+function(..., deparse.level = 1)
     .External(R_bind, deparse.level, 1L, substitute(list(...)), ...)
-rbind.Matrix <- function(..., deparse.level = 1)
+rbind.Matrix <-
+function(..., deparse.level = 1)
     .External(R_bind, deparse.level, 0L, substitute(list(...)), ...)
 
 
 ## METHODS FOR GENERIC: cbind2, rbind2
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.cbind2 <- function(x, y, ...) cbind.Matrix(x, y, deparse.level = 0L)
-.rbind2 <- function(x, y, ...) rbind.Matrix(x, y, deparse.level = 0L)
+.cbind2 <-
+function(x, y, ...) cbind.Matrix(x, y, deparse.level = 0L)
+.rbind2 <-
+function(x, y, ...) rbind.Matrix(x, y, deparse.level = 0L)
 
 setMethod("cbind2", c(x = "Matrix", y = "missing"),
           function(x, y, ...) x)
