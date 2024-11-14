@@ -77,6 +77,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 	Rcomplex *a = COMPLEX(x0), *x = COMPLEX(x1), *work, *tmp,
 		zero = Matrix_zzero, unit = Matrix_zunit, trace = zero;
 	memcpy(x, a, sizeof(Rcomplex) * nn);
+	/* 1. Shift */
 	k = 0;
 	for (j = 0; j < n; ++j) {
 		trace.r += x[k].r;
@@ -91,17 +92,27 @@ SEXP dense_expm(SEXP obj, const char *class)
 		x[k].i -= trace.i;
 		k += dk;
 	}
+	/* 2. Balance */
 	F77_CALL(zgebal)("B", &n, x, &n, &ilo, &ihi, scale, &info FCONE);
-	ilo -= 1; ihi -= 1;
 	ERROR_LAPACK_1(zgebal, info);
+	ilo -= 1; ihi -= 1;
+	/* 3. Scale */
 	norm = F77_CALL(zlange)("O", &n, &n, x, &n, (double *) 0 FCONE);
 	if (!R_FINITE(norm))
 		Rf_error("matrix one-norm is not finite");
 	s = (norm <= thetam[4]) ? 0 : (int) ceil(log2(norm / thetam[4]));
+	if (s > 0) {
+		double e = ldexp(1.0, -s);
+		for (k = 0; k < nn; ++k) {
+			x[k].r *= e;
+			x[k].i *= e;
+		}
+	}
+	/* 4. Pade approximation */
 	for (l = 0; l < 4; ++l)
 		if (norm <= thetam[l])
 			break;
-	b = &padecm[l][0];
+	b = &padecm[l][0]; /* Pade coefficients */
 	work = (Rcomplex *) R_alloc(nn * 2, sizeof(Rcomplex));
 	Rcomplex *u = work, *v = u + nn;
 	memset(u, 0, sizeof(Rcomplex) * nn * 2);
@@ -112,6 +123,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 		k += dk;
 	}
 	if (l < 4) {
+		/* Pade approximant of degree 3, 5, 7, or 9 */
 		b += 2;
 		work = (Rcomplex *) R_alloc((l > 0) ? nn * 3 : nn, sizeof(Rcomplex));
 		Rcomplex *a2 = work, *a2m = work + nn, *a2m2 = a2m + nn;
@@ -143,16 +155,10 @@ SEXP dense_expm(SEXP obj, const char *class)
 		                u, &n, &zero, a2, &n FCONE FCONE);
 		memcpy(u, a2, sizeof(Rcomplex) * nn);
 	} else {
+		/* Pade approximant of degree 13 */
 		work = (Rcomplex *) R_alloc(nn * 5, sizeof(Rcomplex));
 		Rcomplex *a2 = work, *a4 = a2 + nn, *a6 = a4 + nn,
 			*upart = a6 + nn, *vpart = upart + nn;
-		if (s > 0) {
-			double e = ldexp(1.0, -s);
-			for (k = 0; k < nn; ++k) {
-				x[k].r *= e;
-				x[k].i *= e;
-			}
-		}
 		F77_CALL(zgemm)("N", "N", &n, &n, &n, &unit, x , &n,
 		                x , &n, &zero, a2, &n FCONE FCONE);
 		F77_CALL(zgemm)("N", "N", &n, &n, &n, &unit, a2, &n,
@@ -187,6 +193,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 	ERROR_LAPACK_2(zgetrf, info, 2, U);
 	F77_CALL(zgetrs)("N", &n, &n, u, &n, pivot, x, &n, &info FCONE);
 	ERROR_LAPACK_1(zgetrs, info);
+	/* 5. Square */
 	if (s > 0) {
 		u = x;
 		for (i = 0; i < s; ++i) {
@@ -197,6 +204,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 		if (s % 2)
 			memcpy(x, u, sizeof(Rcomplex) * nn);
 	}
+	/* 6. Inverse balance */
 	tmp = x;
 	for (j = 0; j < n; ++j) {
 		for (i = ilo; i <= ihi; ++i) {
@@ -213,7 +221,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 		}
 		tmp += n;
 	}
-	for (j = ilo - 1; j >= 0; ++j) {
+	for (j = ilo - 1; j >= 0; --j) {
 		i = (int) scale[j] - 1;
 		if (i != j) {
 			zswap2(n1, x + n1 * (size_t) i, 1, x + n1 * (size_t) j, 1);
@@ -227,6 +235,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 			zswap2(n1, x + i, n1, x + j, n1);
 		}
 	}
+	/* 7. Inverse shift */
 #define asC(x) ((double _Complex *) &(x))[0]
 #define asR(x) ((       Rcomplex *) &(x))[0]
 	Rcomplex x___;
@@ -243,6 +252,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 	double *a = REAL(x0), *x = REAL(x1), *work, *tmp,
 		zero = 0.0, unit = 1.0, trace = zero;
 	memcpy(x, a, sizeof(double) * nn);
+	/* 1. Shift */
 	k = 0;
 	for (j = 0; j < n; ++j) {
 		trace += x[k];
@@ -254,17 +264,25 @@ SEXP dense_expm(SEXP obj, const char *class)
 		x[k] -= trace;
 		k += dk;
 	}
+	/* 2. Balance */
 	F77_CALL(dgebal)("B", &n, x, &n, &ilo, &ihi, scale, &info FCONE);
 	ERROR_LAPACK_1(dgebal, info);
 	ilo -= 1; ihi -= 1;
+	/* 3. Scale */
 	norm = F77_CALL(dlange)("O", &n, &n, x, &n, (double *) 0 FCONE);
 	if (!R_FINITE(norm))
 		Rf_error("matrix one-norm is not finite");
 	s = (norm <= thetam[4]) ? 0 : (int) ceil(log2(norm / thetam[4]));
+	if (s > 0) {
+		double e = ldexp(1.0, -s);
+		for (k = 0; k < nn; ++k)
+			x[k] *= e;
+	}
+	/* 4. Pade approximation */	
 	for (l = 0; l < 4; ++l)
 		if (norm <= thetam[l])
 			break;
-	b = &padecm[l][0];
+	b = &padecm[l][0]; /* Pade coefficients */
 	work = (double *) R_alloc(nn * 2, sizeof(double));
 	double *u = work, *v = u + nn;
 	memset(u, 0, sizeof(double) * nn * 2);
@@ -275,6 +293,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 		k += dk;
 	}
 	if (l < 4) {
+		/* Pade approximant of degree 3, 5, 7, or 9 */
 		b += 2;
 		work = (double *) R_alloc((l > 0) ? nn * 3 : nn, sizeof(double));
 		double *a2 = work, *a2m = work + nn, *a2m2 = a2m + nn;
@@ -302,14 +321,10 @@ SEXP dense_expm(SEXP obj, const char *class)
 		                u, &n, &zero, a2, &n FCONE FCONE);
 		memcpy(u, a2, sizeof(double) * nn);
 	} else {
+		/* Pade approximant of degree 13 */
 		work = (double *) R_alloc(nn * 5, sizeof(double));
 		double *a2 = work, *a4 = a2 + nn, *a6 = a4 + nn,
 			*upart = a6 + nn, *vpart = upart + nn;
-		if (s > 0) {
-			double e = ldexp(1.0, -s);
-			for (k = 0; k < nn; ++k)
-				x[k] *= e;
-		}
 		F77_CALL(dgemm)("N", "N", &n, &n, &n, &unit, x , &n,
 		                x , &n, &zero, a2, &n FCONE FCONE);
 		F77_CALL(dgemm)("N", "N", &n, &n, &n, &unit, a2, &n,
@@ -338,7 +353,8 @@ SEXP dense_expm(SEXP obj, const char *class)
 	ERROR_LAPACK_2(dgetrf, info, 2, U);
 	F77_CALL(dgetrs)("N", &n, &n, u, &n, pivot, x, &n, &info FCONE);
 	ERROR_LAPACK_1(dgetrs, info);
-	if (l >= 4) {
+	/* 5. Square */
+	if (s > 0) {
 		u = x;
 		for (i = 0; i < s; ++i) {
 			F77_CALL(dgemm)("N", "N", &n, &n, &n, &unit, u, &n,
@@ -348,6 +364,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 		if (s % 2)
 			memcpy(x, u, sizeof(double) * nn);
 	}
+	/* 6. Inverse balance */
 	tmp = x;
 	for (j = 0; j < n; ++j) {
 		for (i = ilo; i <= ihi; ++i)
@@ -374,6 +391,7 @@ SEXP dense_expm(SEXP obj, const char *class)
 			dswap2(n1, x + i, n1, x + j, n1);
 		}
 	}
+	/* 7. Inverse shift */
 	trace = exp(trace);
 	for (k = 0; k < nn; ++k)
 		x[k] *= trace;
