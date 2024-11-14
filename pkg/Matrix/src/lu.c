@@ -11,6 +11,13 @@ SEXP sparse_as_Csparse(SEXP, const char *);
 
 SEXP dense_lu(SEXP obj, const char *class, int warn)
 {
+	char cl[] = ".denseLU";
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
+	SEXP ans = PROTECT(newObject(cl));
+	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
+	SET_DIM(ans, m, n);
+	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
+	if (r > 0) {
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(obj, &pid);
 	if (class[0] != 'z' && class[0] != 'd') {
@@ -19,15 +26,8 @@ SEXP dense_lu(SEXP obj, const char *class, int warn)
 	}
 	if (class[1] != 'g')
 		REPROTECT(obj = dense_as_general(obj, class, 1), pid);
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	char cl[] = ".denseLU";
-	cl[0] = class[0];
-	SEXP ans = PROTECT(newObject(cl));
-	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
-	SET_DIM(ans, m, n);
-	SET_DIMNAMES(ans, 0, DIMNAMES(obj, 0));
-	if (r > 0) {
 	SEXP perm = PROTECT(Rf_allocVector(INTSXP, r)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 	int *pperm = INTEGER(perm), info;
 	if (TYPEOF(x) == CPLXSXP) {
@@ -43,9 +43,9 @@ SEXP dense_lu(SEXP obj, const char *class, int warn)
 	}
 	SET_SLOT(ans, Matrix_permSym, perm);
 	SET_SLOT(ans, Matrix_xSym, y);
-	UNPROTECT(2); /* y, perm */
+	UNPROTECT(4); /* y, x, perm, obj */
 	}
-	UNPROTECT(3); /* ans, x, obj */
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 

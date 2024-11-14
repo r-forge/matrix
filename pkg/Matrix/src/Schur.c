@@ -10,6 +10,12 @@ SEXP dense_schur(SEXP obj, const char *class, int warn, int vectors)
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		Rf_error(_("matrix is not square"));
+	char cl[] = ".denseSchur";
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
+	SEXP ans = PROTECT(newObject(cl));
+	SET_DIM(ans, n, n);
+	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
+	if (n > 0) {
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(obj, &pid);
 	if (class[0] != 'z' && class[0] != 'd') {
@@ -21,14 +27,7 @@ SEXP dense_schur(SEXP obj, const char *class, int warn, int vectors)
 		REPROTECT(obj = dense_as_general(obj, class, 1), pid);
 		class = Matrix_class(obj, valid_dense, 6, __func__);
 	}
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	char cl[] = ".denseSchur";
-	cl[0] = class[0];
-	SEXP ans = PROTECT(newObject(cl));
-	SET_DIM(ans, n, n);
-	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
-	if (n > 0) {
-	SEXP y, v, w;
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)), y, v, w;
 	int info;
 	if (class[1] == 'g') {
 	PROTECT(y = Rf_allocVector(TYPEOF(x), XLENGTH(x)));
@@ -133,9 +132,9 @@ SEXP dense_schur(SEXP obj, const char *class, int warn, int vectors)
 	if (vectors)
 	SET_SLOT(ans, Matrix_vectorsSym, v);
 	SET_SLOT(ans, Matrix_valuesSym, w);
-	UNPROTECT(3); /* w, v, y */
+	UNPROTECT(5); /* w, v, y, x, obj */
 	}
-	UNPROTECT(3); /* ans, x, obj */
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 

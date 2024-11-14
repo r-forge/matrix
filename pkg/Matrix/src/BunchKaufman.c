@@ -13,19 +13,10 @@ SEXP dense_bunchkaufman(SEXP obj, const char *class, int warn,
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		Rf_error(_("matrix is not square"));
-	PROTECT_INDEX pid;
-	PROTECT_WITH_INDEX(obj, &pid);
-	if (class[0] != 'z' && class[0] != 'd') {
-		REPROTECT(obj = dense_as_kind(obj, class, ',', 1), pid);
-		class = Matrix_class(obj, valid_dense, 6, __func__);
-	}
-	if (class[1] == 't' && DIAG(obj) != 'N')
-		REPROTECT(obj = dense_force_canonical(obj, class, 0), pid);
 	ul = (class[1] != 'g') ? UPLO(obj) : (ul == '\0') ? 'U' : ul;
 	ct = (class[1] == 's' && class[0] == 'z') ? TRANS(obj) : ct;
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
 	char cl[] = ".denseBunchKaufman";
-	cl[0] = class[0];
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
 	SEXP ans = PROTECT(newObject(cl));
 	SET_DIM(ans, n, n);
 	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
@@ -34,7 +25,16 @@ SEXP dense_bunchkaufman(SEXP obj, const char *class, int warn,
 	if (ct != 'C' && class[0] == 'z')
 		SET_TRANS(ans);
 	if (n > 0) {
+	PROTECT_INDEX pid;
+	PROTECT_WITH_INDEX(obj, &pid);
+	if (class[0] != 'z' && class[0] != 'd') {
+		REPROTECT(obj = dense_as_kind(obj, class, ',', 1), pid);
+		class = Matrix_class(obj, valid_dense, 6, __func__);
+	}
+	if (class[1] == 't' && DIAG(obj) != 'N')
+		REPROTECT(obj = dense_force_canonical(obj, class, 0), pid);
 	SEXP perm = PROTECT(Rf_allocVector(INTSXP, n)),
+		x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 	int *pperm = INTEGER(perm), info;
 	if (class[2] != 'p') {
@@ -86,9 +86,9 @@ SEXP dense_bunchkaufman(SEXP obj, const char *class, int warn,
 	}
 	SET_SLOT(ans, Matrix_permSym, perm);
 	SET_SLOT(ans, Matrix_xSym, y);
-	UNPROTECT(2); /* y, perm */
+	UNPROTECT(4); /* y, x, perm, obj */
 	}
-	UNPROTECT(3); /* ans, x, obj */
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 

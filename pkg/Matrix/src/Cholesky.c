@@ -23,6 +23,15 @@ SEXP dense_cholesky(SEXP obj, const char *class, int warn, int pivot,
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		Rf_error(_("matrix is not square"));
+	ul = (class[1] != 'g') ? UPLO(obj) : (ul == '\0') ? 'U' : ul;
+	char cl[] = ".denseCholesky";
+	cl[0] = (class[0] == 'z') ? 'z' : 'd';
+	SEXP ans = PROTECT(newObject(cl));
+	SET_DIM(ans, n, n);
+	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
+	if (ul != 'U')
+		SET_UPLO(ans);
+	if (n > 0) {
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(obj, &pid);
 	if (class[0] != 'z' && class[0] != 'd') {
@@ -31,17 +40,8 @@ SEXP dense_cholesky(SEXP obj, const char *class, int warn, int pivot,
 	}
 	if (class[1] == 't' && DIAG(obj) != 'N')
 		REPROTECT(obj = dense_force_canonical(obj, class, 0), pid);
-	ul = (class[1] != 'g') ? UPLO(obj) : (ul == '\0') ? 'U' : ul;
-	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
-	char cl[] = ".denseCholesky";
-	cl[0] = class[0];
-	SEXP ans = PROTECT(newObject(cl));
-	SET_DIM(ans, n, n);
-	SET_DIMNAMES(ans, -(class[1] == 's'), DIMNAMES(obj, 0));
-	if (ul != 'U')
-		SET_UPLO(ans);
-	if (n > 0) {
-	SEXP y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
+	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
+		y = PROTECT(Rf_allocVector(TYPEOF(x), XLENGTH(x)));
 	int info;
 	if (class[2] != 'p') {
 	if (TYPEOF(x) == CPLXSXP) {
@@ -109,9 +109,9 @@ SEXP dense_cholesky(SEXP obj, const char *class, int warn, int pivot,
 	}
 	}
 	SET_SLOT(ans, Matrix_xSym, y);
-	UNPROTECT(1); /* y */
+	UNPROTECT(3); /* y, x, obj */
 	}
-	UNPROTECT(3); /* trf, x, obj */
+	UNPROTECT(1); /* ans */
 	return ans;
 }
 
