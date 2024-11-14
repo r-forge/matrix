@@ -9,16 +9,10 @@
 \alias{expm}
 \alias{expm-methods}
 %
-\alias{expm,Matrix-method}
-\alias{expm,dMatrix-method}
-\alias{expm,ddiMatrix-method}
-\alias{expm,dgeMatrix-method}
-\alias{expm,dspMatrix-method}
-\alias{expm,dsparseMatrix-method}
-\alias{expm,dsyMatrix-method}
-\alias{expm,dtpMatrix-method}
-\alias{expm,dtrMatrix-method}
+\alias{expm,denseMatrix-method}
+\alias{expm,diagonalMatrix-method}
 \alias{expm,matrix-method}
+\alias{expm,sparseMatrix-method}
 %
 \description{
   Compute the exponential of a matrix.

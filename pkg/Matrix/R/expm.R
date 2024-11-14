@@ -2,70 +2,32 @@
 ## the matrix exponential
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## MJ: currently going via ddiMatrix or dgeMatrix in all cases
+setMethod("expm", c(x = "denseMatrix"),
+          function(x)
+              .Call(R_dense_expm, x))
 
-setMethod("expm", c(x = "Matrix"),
+setMethod("expm", c(x = "sparseMatrix"),
+          function(x)
+              .Call(R_dense_expm, .M2unpacked(x)))
+
+setMethod("expm", c(x = "diagonalMatrix"),
           function(x) {
-              d <- x@Dim
-              if(d[1L] != d[2L])
-                  stop("matrix is not square")
-              expm(.M2kind(x, "d"))
+              x <- .M2kind(x, ",")
+              z <- is.complex(y <- x@x)
+              r <- new(if (z) "zdiMatrix" else "ddiMatrix")
+              r@Dim <- d <- x@Dim
+              r@Dimnames <- x@Dimnames
+              r@x <-
+                  if (x@diag == "N")
+                      exp(y)
+                  else rep.int(exp(if (z) 1+0i else 1), d[1L])
+              r
           })
 
-setMethod("expm", c(x = "dsparseMatrix"),
-          function(x) {
-              d <- x@Dim
-              if(d[1L] != d[2L])
-                  stop("matrix is not square")
-              expm(.sparse2dense(x))
-          })
-
-setMethod("expm", c(x = "ddiMatrix"),
-          function(x) {
-              if(x@diag == "N") {
-                  x@x <- exp(x@x)
-              } else {
-                  x@diag <- "N"
-                  x@x <- rep.int(exp(1), x@Dim[1L])
-              }
-              x
-          })
-
-setMethod("expm", c(x = "dgeMatrix"),
-          function(x) .Call(geMatrix_expm, x))
-
-setMethod("expm", c(x = "dtrMatrix"),
-          function(x) {
-              r <- .Call(geMatrix_expm, .M2gen(x))
-              if(x@uplo == "U") triu(r) else tril(r)
-          })
-
-setMethod("expm", c(x = "dtpMatrix"),
-          function(x) {
-              r <- .Call(geMatrix_expm, .M2gen(x))
-              ## Pack without checking:
-              .Call(R_dense_as_packed, r, x@uplo, NULL, "N")
-          })
-
-setMethod("expm", c(x = "dsyMatrix"),
-          function(x) {
-              r <- .Call(geMatrix_expm, .M2gen(x))
-              forceSymmetric(r)
-          })
-
-setMethod("expm", c(x = "dspMatrix"),
-          function(x) {
-              r <- .Call(geMatrix_expm, .M2gen(x))
-              ## Pack without checking:
-              .Call(R_dense_as_packed, r, x@uplo, "C", NULL)
-          })
-
-## Until R supports it:
 setMethod("expm", c(x = "matrix"),
           function(x) {
               d <- dim(x)
-              if(d[1L] != d[2L])
+              if (d[1L] != d[2L])
                   stop("matrix is not square")
-              storage.mode(x) <- "double"
-              expm(if(isDiagonal(x)) forceDiagonal.backcomp(x) else .m2dense(x, ".ge"))
+              .Call(R_dense_expm, .m2dense(x, ",ge"))
           })

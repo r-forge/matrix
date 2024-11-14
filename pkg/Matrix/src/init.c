@@ -109,7 +109,7 @@ SEXP R_sparse_dropzero(SEXP, SEXP);
 SEXP denseBunchKaufman_expand(SEXP);
 
 /* expm.c : */
-SEXP geMatrix_expm(SEXP);
+SEXP R_dense_expm(SEXP);
 
 /* forceCanonical.c : */
 SEXP R_dense_force_canonical(SEXP, SEXP);
@@ -398,7 +398,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(denseBunchKaufman_expand, 1),
 
 	/* expm.c : */
-	CALL_METHOD(geMatrix_expm, 1),
+	CALL_METHOD(R_dense_expm, 1),
 
 	/* forceCanonical.c : */
 	CALL_METHOD(R_dense_force_canonical, 2),

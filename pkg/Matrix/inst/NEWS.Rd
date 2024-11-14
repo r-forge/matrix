@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-11 r5020)}{
+\section{Changes in version 1.8-0 (2024-11-14 r5028)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -70,6 +70,12 @@
       logical argument \code{force}, indicating which of
       \code{forceSymmetric(A)} and \code{tcrossprod(A)} is factorized
       when \code{A} is not formally symmetric.
+
+      \item Methods for \code{expm(x=<denseMatrix>)} are revised to
+      diagonalize Hermitian \code{x} and to employ Higham's (2005)
+      implementation of the scaling and squaring algorithm for
+      non-Hermitian \code{x}.  The result for Hermitian \code{x} is
+      now formally positive definite.
     }
   }
   \subsection{Bug Fixes}{

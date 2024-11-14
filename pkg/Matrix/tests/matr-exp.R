@@ -16,8 +16,8 @@ rE <- replicate(100,
               relErr(as(expm(as(diag(x), "generalMatrix")),
                         "matrix"),
                      diag(exp(x))) })
-stopifnot(mean(rE) < 1e-15,
-          max(rE)  < 1e-14)
+stopifnot(mean(rE) < 3e-15,
+          max(rE)  < 4e-14)
 summary(rE)
 
 ## Some small matrices
