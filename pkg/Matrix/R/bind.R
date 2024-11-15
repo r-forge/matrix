@@ -15,15 +15,15 @@ function(...) {
     if (N == 0L)
         return(NULL)
     args        <- lapply(list(...), as, "sparseVector")
-    args.length <- vapply(args, slot, 0, "length")
-    args.i      <- lapply(args, slot,         "i")
+    args.length <- trunc(vapply(args, slot, 0, "length"))
+    args.i      <- lapply(args, slot, "i")
     args.nnz    <- lengths(args.i, FALSE)
 
     s <- c("n", "l", "i", "d", "z")
     i <- match(vapply(args, .M.kind, ""), s)
     k <- range(i)
     n <- sum(args.length)
-    a <- if (n - 1 <= .Machine$integer.max) as.integer else as.double
+    a <- if (n - 1 < .Machine[["integer.max"]]) as.integer else as.double
 
     r <- new(paste0(s[k[2L]], "sparseVector"))
     r@length <- a(n)
