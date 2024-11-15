@@ -1,30 +1,31 @@
 /* C implementation of methods for determinant */
 
+#include "cholmod-etc.h"
 #include "Mdefines.h"
 #include <Rmath.h> /* logspace_add, logspace_sub */
-#include "cholmod-etc.h"
 
 static
-SEXP mkDet(double modulus, int logarithm, int sign)
+SEXP det(double modulus, int logarithm, int sign)
 {
-	SEXP nms = PROTECT(Rf_allocVector(STRSXP, 2)),
-		cl = PROTECT(Rf_mkString("det")),
-		det = PROTECT(Rf_allocVector(VECSXP, 2)),
-		det0 = PROTECT(Rf_ScalarReal((logarithm) ? modulus : exp(modulus))),
-		det1 = PROTECT(Rf_ScalarInteger(sign)),
-		det0a = PROTECT(Rf_ScalarLogical(logarithm));
+	SEXP s_modulus = PROTECT(Rf_ScalarReal((logarithm) ? modulus : exp(modulus))),
+		s_logarithm = PROTECT(Rf_ScalarLogical(logarithm)),
+		s_sign = PROTECT(Rf_ScalarInteger(sign)),
+		ans = PROTECT(Rf_allocVector(VECSXP, 2)),
+		class = PROTECT(Rf_allocVector(STRSXP, 1)),
+		names = PROTECT(Rf_allocVector(STRSXP, 2));
 	static SEXP logarithmSym = NULL;
 	if (!logarithmSym)
 		logarithmSym = Rf_install("logarithm");
-	SET_STRING_ELT(nms, 0, Rf_mkChar("modulus"));
-	SET_STRING_ELT(nms, 1, Rf_mkChar("sign"));
-	Rf_setAttrib(det, R_NamesSymbol, nms);
-	Rf_setAttrib(det, R_ClassSymbol, cl);
-	Rf_setAttrib(det0, logarithmSym, det0a);
-	SET_VECTOR_ELT(det, 0, det0);
-	SET_VECTOR_ELT(det, 1, det1);
+	SET_STRINT_ELT(class, 0, Rf_mkChar("det"));
+	SET_STRING_ELT(names, 0, Rf_mkChar("modulus"));
+	SET_STRING_ELT(names, 1, Rf_mkChar("sign"));
+	Rf_setAttrib(ans, R_ClassSymbol, class);
+	Rf_setAttrib(ans, R_NamesSymbol, names);
+	Rf_setAttrib(s_modulus, logarithmSym, s_logarithm);
+	SET_VECTOR_ELT(ans, 0, s_modulus);
+	SET_VECTOR_ELT(ans, 1, s_sign);
 	UNPROTECT(6);
-	return det;
+	return ans;
 }
 
 SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
@@ -33,7 +34,7 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 #define DETERMINANT_START(_F_) \
 	int *pdim = DIM(_F_), n = pdim[1]; \
 	if (pdim[0] != n) \
-		Rf_error(_("determinant of non-square matrix is undefined")); \
+		Rf_error(_("matrix is not square")); \
 	int givelog = Rf_asLogical(s_logarithm); \
 	double modulus = 0.0; /* result for n == 0 */
 
@@ -72,7 +73,7 @@ SEXP denseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	}
 
 	UNPROTECT(1); /* x */
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }
 
 SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
@@ -192,7 +193,7 @@ SEXP denseBunchKaufman_determinant(SEXP s_trf, SEXP s_logarithm)
 	}
 
 	UNPROTECT(1); /* x */
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }
 
 SEXP denseCholesky_determinant(SEXP s_trf, SEXP s_logarithm)
@@ -224,7 +225,7 @@ SEXP denseCholesky_determinant(SEXP s_trf, SEXP s_logarithm)
 	}
 
 	UNPROTECT(1); /* x */
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }
 
 SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
@@ -256,7 +257,7 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 				}
 			} else {
 				UNPROTECT(4); /* i, p, x, R */
-				return mkDet(R_NegInf, givelog, 1);
+				return det(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
@@ -273,7 +274,7 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 				}
 			} else {
 				UNPROTECT(4); /* i, p, x, R */
-				return mkDet(R_NegInf, givelog, 1);
+				return det(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
@@ -294,7 +295,7 @@ SEXP sparseQR_determinant(SEXP orf, SEXP s_logarithm)
 	}
 
 	UNPROTECT(2); /* x, R */
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }
 
 SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
@@ -317,7 +318,7 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 				modulus += log(hypot(px[kend - 1].r, px[kend - 1].i));
 			else {
 				UNPROTECT(4); /* i, p, x, U */
-				return mkDet(R_NegInf, givelog, 1);
+				return det(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
@@ -334,7 +335,7 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 				}
 			} else {
 				UNPROTECT(4); /* i, p, x, U */
-				return mkDet(R_NegInf, givelog, 1);
+				return det(R_NegInf, givelog, 1);
 			}
 			k = kend;
 		}
@@ -355,7 +356,7 @@ SEXP sparseLU_determinant(SEXP s_trf, SEXP s_logarithm)
 	}
 
 	UNPROTECT(2); /* x, U */
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }
 
 SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
@@ -412,7 +413,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
 						modulus += log(px[pp[j]].r);
 					else {
 						if (root)
-							return mkDet(R_NaN, givelog, 1);
+							return det(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]].r);
 						sign = -sign;
 					}
@@ -430,7 +431,7 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
 						modulus += log(px[pp[j]]);
 					else {
 						if (root)
-							return mkDet(R_NaN, givelog, 1);
+							return det(R_NaN, givelog, 1);
 						modulus += log(-px[pp[j]]);
 						sign = -sign;
 					}
@@ -442,5 +443,5 @@ SEXP sparseCholesky_determinant(SEXP s_trf, SEXP s_logarithm, SEXP s_root)
 		modulus *= 0.5;
 	}
 
-	return mkDet(modulus, givelog, sign);
+	return det(modulus, givelog, sign);
 }

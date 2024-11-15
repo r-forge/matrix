@@ -1,7 +1,7 @@
 ## METHODS FOR GENERIC: determinant
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.mkDet <-
+.det <-
 function(modulus = sum(log(abs(x))),
          logarithm = TRUE,
          sign =
@@ -34,10 +34,10 @@ setMethod("determinant",
           c(x = "denseSchur", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               if (is.complex(values <- x@values) == is.complex(x@x))
-                  .mkDet(x = values, logarithm = logarithm)
+                  .det(x = values, logarithm = logarithm)
               else if (is.complex(values))
-                  .mkDet(x = values, logarithm = logarithm,
-                         sign = if (Re(prod(values)) < 0) -1L else 1L)
+                  .det(x = values, logarithm = logarithm,
+                       sign = if (Re(prod(values)) < 0) -1L else 1L)
               else stop("should never happen ...")
           })
 
@@ -93,7 +93,7 @@ setMethod("determinant",
           function(x, logarithm = TRUE, ...) {
               d <- x@Dim
               if (d[1L] != d[2L])
-                  stop("determinant of non-square matrix is undefined")
+                  stop("matrix is not square")
               repr <- .M.repr(x)
               switch(repr, "R" = x <- .tCRT(x), "T" = x <- .M2C(x))
               trf <-
@@ -102,7 +102,7 @@ setMethod("determinant",
                   else lu(x, errSing = FALSE)
               if (isS4(trf))
                   determinant(trf, logarithm, ...)
-              else .mkDet(if (anyNA(x)) NaN else -Inf, logarithm, 1L)
+              else .det(if (anyNA(x)) NaN else -Inf, logarithm, 1L)
           })
 
 setMethod("determinant",
@@ -126,7 +126,7 @@ setMethod("determinant",
                   }
               if (isS4(trf))
                   determinant(trf, logarithm, sqrt = FALSE, ...)
-              else .mkDet(if (anyNA(x)) NaN else -Inf, logarithm, 1L)
+              else .det(if (anyNA(x)) NaN else -Inf, logarithm, 1L)
           })
 
 for (.cl in c("triangularMatrix", "diagonalMatrix"))
@@ -134,23 +134,23 @@ setMethod("determinant",
           c(x = .cl, logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
               if (x@diag == "N")
-                  .mkDet(x = diag(x, names = FALSE), logarithm = logarithm)
-              else .mkDet(0, logarithm, 1L))
+                  .det(x = diag(x, names = FALSE), logarithm = logarithm)
+              else .det(0, logarithm, 1L))
 
 setMethod("determinant",
           c(x = "indMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
               d <- x@Dim
               if (d[1L] != d[2L])
-                  stop("determinant of non-square matrix is undefined")
+                  stop("matrix is not square")
               if (anyDuplicated.default(perm <- x@perm))
-                  .mkDet(-Inf, logarithm, 1L)
-              else .mkDet(0, logarithm, signPerm(perm))
+                  .det(-Inf, logarithm, 1L)
+              else .det(0, logarithm, signPerm(perm))
           })
 
 setMethod("determinant",
           c(x = "pMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...)
-              .mkDet(0, logarithm, signPerm(x@perm)))
+              .det(0, logarithm, signPerm(x@perm)))
 
 rm(.cl)
