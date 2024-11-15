@@ -16,7 +16,7 @@ SEXP det(double modulus, int logarithm, int sign)
 	static SEXP logarithmSym = NULL;
 	if (!logarithmSym)
 		logarithmSym = Rf_install("logarithm");
-	SET_STRINT_ELT(class, 0, Rf_mkChar("det"));
+	SET_STRING_ELT(class, 0, Rf_mkChar("det"));
 	SET_STRING_ELT(names, 0, Rf_mkChar("modulus"));
 	SET_STRING_ELT(names, 1, Rf_mkChar("sign"));
 	Rf_setAttrib(ans, R_ClassSymbol, class);
