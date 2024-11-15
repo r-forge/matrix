@@ -25,9 +25,5 @@ setMethod("expm", c(x = "diagonalMatrix"),
           })
 
 setMethod("expm", c(x = "matrix"),
-          function(x) {
-              d <- dim(x)
-              if (d[1L] != d[2L])
-                  stop("matrix is not square")
-              .Call(R_dense_expm, .m2dense(x, ",ge"))
-          })
+          function(x)
+              .Call(R_dense_expm, .m2dense(x, ",ge")))
