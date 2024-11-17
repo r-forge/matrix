@@ -1,9 +1,8 @@
 #ifndef MATRIX_CHOLMOD_ETC_H
 #define MATRIX_CHOLMOD_ETC_H
 
-#include <Rinternals.h>
-#include "SuiteSparse/SuiteSparse_config/SuiteSparse_config.h"
 #include "SuiteSparse/CHOLMOD/Include/cholmod.h"
+#include <Rinternals.h>
 
 extern cholmod_common c ;
 extern cholmod_common cl;

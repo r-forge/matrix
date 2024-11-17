@@ -1,8 +1,8 @@
 #ifndef MATRIX_CS_ETC_H
 #define MATRIX_CS_ETC_H
 
-#include <Rinternals.h>
 #include "SuiteSparse/CXSparse/Include/cs.h"
+#include <Rinternals.h>
 
 #define CXSPARSE_PATTERN 0
 #define CXSPARSE_REAL    1
