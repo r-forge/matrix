@@ -9,8 +9,7 @@
 \alias{cov2cor}
 \alias{cov2cor-methods}
 %
-\alias{cov2cor,denseMatrix-method}
-\alias{cov2cor,sparseMatrix-method}
+\alias{cov2cor,Matrix-method}
 %
 \description{TODO.}
 \usage{

@@ -860,10 +860,6 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 
 		zclass[0] = (boolean) ? 'n' : ((X->xtype != CHOLMOD_COMPLEX) ? 'd' : 'z');
 		zclass[1] = (boolean) ? 's' : ((X->xtype != CHOLMOD_COMPLEX) ? 'p' : ((((xtrans != 'N') ? xtrans : ytrans) == 'C') ? 'p' : 's'));
-#ifndef MATRIX_ENABLE_POSDEF
-		if (zclass[1] == 'p')
-			zclass[1] = 's';
-#endif
 
 		if (xtrans != 'N')
 			X = cholmod_transpose(X, ASMODE(xtrans), &c);

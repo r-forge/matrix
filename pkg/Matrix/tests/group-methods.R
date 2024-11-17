@@ -237,7 +237,7 @@ nm1 <- as(lm1, "nMatrix")
 
 stopifnot(validObject(lm1), validObject(lm2),
           validObject(nm1), validObject(nm2),
-          identical(dsc, dsc * as(lm1, "dMatrix")))
+          identical(as(dsc, "symmetricMatrix"), dsc * as(lm1, "dMatrix")))
 
 crossprod(lm1) # lm1: "lsC*"
 cnm1 <- crossprod(nm1, boolArith = FALSE)

@@ -4,7 +4,14 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-14 r5028)}{
+\section{Changes in version 1.8-0 (2024-11-16 r5036)}{
+  \subsection{Deprecated and Defunct}{
+    \itemize{
+      \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
+      deprecated.  Coerce to new virtual class \code{posdefMatrix}
+      instead.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item This version will introduce integer matrices, complex
@@ -27,6 +34,12 @@
       \code{symmpart}, \code{skewpart}, \code{isDiagonal}, and
       \code{isTriangular} gain \code{\dots}, allowing methods to accept
       further arguments.
+
+      \item Methods for \code{cov2cor} coerce the (symmetrized)
+      argument to new virtual class \code{posdefMatrix} before scaling.
+      Hence an error is signaled where the (symmetrized) argument
+      is not positive definite.  Use \code{dimScale} (introduced in
+      \pkg{Matrix} 1.5-2) for more general scaling.
     }
   }
   \subsection{New Features}{
@@ -76,6 +89,14 @@
       implementation of the scaling and squaring algorithm for
       non-Hermitian \code{x}.  The result for Hermitian \code{x} is
       now formally positive definite.
+
+      \item New virtual class \code{posdefMatrix} extending
+      \code{symmetricMatrix} and extended by nonvirtual classes
+      \code{[dz]p[opCRT]Matrix}, all of which are new except for
+      \code{dp[op]Matrix}.  This class represents positive
+      \emph{semi}definite matrices.  Coercions to the class attempt
+      Cholesky factorization, which may fail for near-singular
+      positive semidefinite matrices.
     }
   }
   \subsection{Bug Fixes}{

@@ -1356,10 +1356,6 @@ SEXP dense_as_sparse(SEXP from, const char *class, char repr)
 	cl[0] = class[0];
 	cl[1] = class[1];
 	cl[2] = repr;
-#ifndef MATRIX_ENABLE_POSDEF
-	if (cl[1] == 'p')
-		cl[1] = 's';
-#endif
 	SEXP to = PROTECT(newObject(cl));
 
 	int *pdim = DIM(from), m = pdim[0], n = pdim[1];

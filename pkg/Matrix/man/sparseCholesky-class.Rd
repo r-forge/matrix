@@ -302,8 +302,8 @@ stopifnot(exprs = {
 ## Factorization handled as factorized matrix
 ## (in some cases only optionally, depending on arguments)
 b <- rnorm(n)
-stopifnot(identical(det(A), det(ch.A, sqrt = FALSE)),
-          identical(solve(A, b), solve(ch.A, b, system = "A")))
+stopifnot(all.equal(det(A), det(ch.A, sqrt = FALSE)),
+          all.equal(solve(A, b), solve(ch.A, b, system = "A")))
 
 u1 <- update(ch.A,   A , mult = sqrt(2))
 u2 <- update(ch.A, t(M), mult = sqrt(2)) # updating with crossprod(M), not M

@@ -207,7 +207,7 @@ tstMatrixClass <-
         cat. <- function(...) cat(bl.string(offset), ...)
 
         clNam <- cl@subClass
-        deprecated <- grepl("^[dln](ge|tr|sy|tp|sp|[gts][CRT])Matrix$", clNam)
+        deprecated <- grepl("^[nlidz](ge|sy|sp|po|pp|tr|tp|[gspt][CRT])Matrix$", clNam)
 	cat("\n==>")
         cat.(clNam)
         ##---------

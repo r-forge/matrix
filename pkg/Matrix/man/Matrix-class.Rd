@@ -18,14 +18,10 @@
 \alias{coerce,Matrix,CsparseMatrix-method}
 \alias{coerce,Matrix,RsparseMatrix-method}
 \alias{coerce,Matrix,TsparseMatrix-method}
-\alias{coerce,Matrix,copMatrix-method}
-\alias{coerce,Matrix,corMatrix-method}
 \alias{coerce,Matrix,dMatrix-method}
 \alias{coerce,Matrix,ddenseMatrix-method}
 \alias{coerce,Matrix,denseMatrix-method}
 \alias{coerce,Matrix,diagonalMatrix-method}
-\alias{coerce,Matrix,dpoMatrix-method}
-\alias{coerce,Matrix,dppMatrix-method}
 \alias{coerce,Matrix,dsparseMatrix-method}
 \alias{coerce,Matrix,generalMatrix-method}
 \alias{coerce,Matrix,indMatrix-method}
@@ -38,6 +34,7 @@
 \alias{coerce,Matrix,nsparseMatrix-method}
 \alias{coerce,Matrix,pMatrix-method}
 \alias{coerce,Matrix,packedMatrix-method}
+\alias{coerce,Matrix,posdefMatrix-method}
 \alias{coerce,Matrix,sparseMatrix-method}
 \alias{coerce,Matrix,sparseVector-method}
 \alias{coerce,Matrix,symmetricMatrix-method}

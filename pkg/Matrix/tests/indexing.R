@@ -365,7 +365,7 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
         R.@x > 0
         R.@x == as.integer(R.@x)## so it is an integer-valued chol-decomp !
         ## shows that (1) As is *not* singular  (2) the matrix is not random
-        all.equal(crossprod(R.), As, tolerance=1e-15)
+        all.equal(as(crossprod(R.), "symmetricMatrix"), As, tolerance=1e-15)
     })
     print(summary(evA <- eigen(As, only.values=TRUE)$values))
     print(tail(evA)) ## largest three ~= 10^7,  smallest two *negative*
@@ -489,7 +489,7 @@ stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
           )
 
 x.x <- crossprod(mC)
-stopifnot(class(x.x) == "dsCMatrix",
+stopifnot(class(x.x) == "dpCMatrix",
           class(x.x. <- round(x.x / 10000)) == "dsCMatrix",
           identical(x.x[cbind(2:6, 2:6)],
                     diag(x.x[2:6, 2:6], names=FALSE)))

@@ -3,7 +3,7 @@
 
 setMethod("chol", c(x = "denseMatrix"),
           function(x, pivot = FALSE, tol = -1, ...) {
-              trf <- .Call(R_dense_cholesky, x, if (pivot) 1L else 2L, pivot, tol, NULL)
+              trf <- Cholesky(x, perm = pivot, tol = tol)
               r <- expand1(trf, "L.")
               dimnames(r) <- dimnames(x)
               r
@@ -12,7 +12,7 @@ setMethod("chol", c(x = "denseMatrix"),
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
 setMethod("chol", c(x = .cl),
           function(x, pivot = FALSE, ...) {
-              trf <- .Call(R_sparse_cholesky, x, 2L, pivot, FALSE, FALSE, 0, TRUE, NULL)
+              trf <- Cholesky(x, perm = pivot, LDL = FALSE, super = FALSE)
               r <- expand1(trf, "L.")
 
               dimnames(r) <- dimnames(x)

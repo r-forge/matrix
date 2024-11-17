@@ -55,12 +55,16 @@ setClass("generalMatrix",
          slots = c(factors = "list"),
          validity = function(object) .Call(generalMatrix_validate, object))
 
-## Virtual class of symmetric matrices
+## Virtual class of Hermitian or symmetric matrices
 setClass("symmetricMatrix",
          contains = c("VIRTUAL", "Matrix"),
          slots = c(uplo = "character", factors = "list"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(symmetricMatrix_validate, object))
+
+## Virtual class of positive semidefinite matrices
+setClass("posdefMatrix",
+         contains = c("VIRTUAL", "symmetricMatrix"))
 
 ## Virtual class of triangular matrices
 setClass("triangularMatrix",
@@ -333,7 +337,7 @@ setClass("dsyMatrix",
 
 ## Unpacked, symmetric, positive semidefinite
 setClass("dpoMatrix",
-         contains = "dsyMatrix",
+         contains = c("dsyMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpoMatrix_validate, object))
 
 ## Unpacked, symmetric, positive semidefinite, correlation
@@ -352,7 +356,7 @@ setClass("dspMatrix",
 
 ## Packed, symmetric, positive semidefinite
 setClass("dppMatrix",
-         contains = "dspMatrix",
+         contains = c("dspMatrix", "posdefMatrix"),
          validity = function(object) .Call(xppMatrix_validate, object))
 
 ## Packed, symmetric, positive semidefinite, correlation
@@ -381,7 +385,7 @@ setClass("zsyMatrix",
 
 ## Unpacked, Hermitian, positive semidefinite
 setClass("zpoMatrix",
-         contains = "zsyMatrix",
+         contains = c("zsyMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpoMatrix_validate, object))
 
 ## Unpacked, triangular
@@ -396,7 +400,7 @@ setClass("zspMatrix",
 
 ## Packed, Hermitian, positive semidefinite
 setClass("zppMatrix",
-         contains = "zspMatrix",
+         contains = c("zspMatrix", "posdefMatrix"),
          validity = function(object) .Call(xppMatrix_validate, object))
 
 ## Packed, triangular
@@ -576,12 +580,10 @@ setClass("dsCMatrix",
          contains = c("CsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          validity = function(object) .Call(xsCMatrix_validate, object))
 
-if(FALSE) { # --NOT YET--
 ## CSC, symmetric, positive semidefinite
 setClass("dpCMatrix",
-         contains = "dsCMatrix",
+         contains = c("dsCMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpCMatrix_validate, object))
-} # --NOT YET--
 
 ## CSC, triangular
 setClass("dtCMatrix",
@@ -598,12 +600,10 @@ setClass("dsRMatrix",
          contains = c("RsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          validity = function(object) .Call(xsRMatrix_validate, object))
 
-if(FALSE) { # --NOT YET--
 ## CSR, symmetric, positive semidefinite
 setClass("dpRMatrix",
-         contains = "dsRMatrix",
+         contains = c("dsRMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpRMatrix_validate, object))
-} # --NOT YET--
 
 ## CSR, triangular
 setClass("dtRMatrix",
@@ -620,12 +620,10 @@ setClass("dsTMatrix",
          contains = c("TsparseMatrix", "dsparseMatrix", "symmetricMatrix"),
          validity = function(object) .Call(xsTMatrix_validate, object))
 
-if(FALSE) { # --NOT YET--
 ## Triplet, symmetric, positive semidefinite
 setClass("dpTMatrix",
-         contains = "dsTMatrix",
+         contains = c("dsTMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpTMatrix_validate, object))
-} # --NOT YET--
 
 ## Triplet, triangular
 setClass("dtTMatrix",
@@ -654,7 +652,7 @@ setClass("zsCMatrix",
 
 ## CSC, Hermitian, positive semidefinite
 setClass("zpCMatrix",
-         contains = "zsCMatrix",
+         contains = c("zsCMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpCMatrix_validate, object))
 
 ## CSC, triangular
@@ -676,7 +674,7 @@ setClass("zsRMatrix",
 
 ## CSR, Hermitian, positive semidefinite
 setClass("zpRMatrix",
-         contains = "zsRMatrix",
+         contains = c("zsRMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpRMatrix_validate, object))
 
 ## CSR, triangular
@@ -698,7 +696,7 @@ setClass("zsTMatrix",
 
 ## Triplet, Hermitian, positive semidefinite
 setClass("zpTMatrix",
-         contains = "zsTMatrix",
+         contains = c("zsTMatrix", "posdefMatrix"),
          validity = function(object) .Call(xpTMatrix_validate, object))
 
 ## Triplet, triangular

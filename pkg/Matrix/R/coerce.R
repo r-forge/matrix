@@ -828,115 +828,108 @@ setAs("supernodalCholesky", "dgCMatrix",
 ## but not symmetry, hence:
 .indefinite <- function(x) as(x, .M.class(x, 6L))
 
-.dsy2dpo <- .dsp2dpp <- function(from) {
-    if(is.null(tryCatch(Cholesky(from, perm = FALSE),
-                        error = function(e) NULL)))
-        stop("not a positive definite matrix (and positive semidefiniteness is not checked)")
-    to <- new(.CLASS)
-    to@Dim <- from@Dim
-    to@Dimnames <- from@Dimnames
-    to@uplo <- from@uplo
-    to@x <- from@x
-    to@factors <- from@factors
-    to
-}
-body(.dsy2dpo)[[3L]][[3L]][[2L]] <- "dpoMatrix"
-body(.dsp2dpp)[[3L]][[3L]][[2L]] <- "dppMatrix"
-
-setAs("dppMatrix", "dpoMatrix", function(from) unpack(from))
-setAs("dpoMatrix", "dppMatrix", function(from)   pack(from))
-
-setAs("dsyMatrix", "dpoMatrix", .dsy2dpo)
-setAs("dspMatrix", "dppMatrix", .dsp2dpp)
-
-setAs("Matrix", "dpoMatrix",
-      function(from) .dsy2dpo(.M2unpacked(.M2sym(.M2kind(from, "d")))))
-setAs("Matrix", "dppMatrix",
-      function(from) .dsp2dpp(.M2packed  (.M2sym(.M2kind(from, "d")))))
-
-setAs("matrix", "dpoMatrix",
+setAs("Matrix", "posdefMatrix",
       function(from) {
-          storage.mode(from) <- "double"
-          .dsy2dpo(.M2sym(from))
-      })
-setAs("matrix", "dppMatrix",
-      function(from) {
-          storage.mode(from) <- "double"
-          .dsp2dpp(pack(from, symmetric = TRUE))
+          if (!isSymmetric(from))
+              stop("matrix is not Hermitian")
+          from <- .M2kind(forceSymmetric(from), ",")
+          repr <- .M.repr(from)
+          tryCatch(switch(repr,
+                          "C" =, "R" =, "T" =
+                              suppressWarnings(
+                              Cholesky(from, perm = FALSE, LDL = FALSE, super = FALSE)
+                              ),
+                          "n" =, "p" =
+                              Cholesky(from, perm = FALSE)),
+                   error = function(e) stop("matrix is not positive definite"))
+          z <- is.complex(y <- from@x)
+          to <- new(paste0(if (z) "zp" else "dp",
+                           if (repr == "n") "o" else repr,
+                           "Matrix"))
+          to@Dim <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          to@factors <- from@factors
+          switch(repr,
+                 "C" = { to@p <- from@p; to@i <- from@i },
+                 "R" = { to@p <- from@p; to@j <- from@j },
+                 "T" = { to@i <- from@i; to@j <- from@j })
+          to@x <- y
+          to
       })
 
-
-## ==== More from/to correlation =======================================
-
-.dpo2cor <- function(from) {
-    if(!is.null(to <- from@factors$correlation))
-        return(to)
-    sd <- sqrt(diag(from, names = FALSE))
-
-    to <- new("corMatrix")
-    to@Dim <- d <- from@Dim
-    to@Dimnames <- from@Dimnames
-    to@uplo <- from@uplo
-    to@sd <- sd
-
-    n <- d[1L]
-    x <- from@x / sd / rep(sd, each = n)
-    x[indDiag(n)] <- 1
-    to@x <- x
-
-    .set.factor(from, "correlation", to)
-}
-
-.dpp2cop <- function(from) {
-    if(!is.null(to <- from@factors$correlation))
-        return(to)
-    sd <- sqrt(diag(from, names = FALSE))
-
-    to <- new("copMatrix")
-    to@Dim <- d <- from@Dim
-    to@Dimnames <- from@Dimnames
-    to@uplo <- uplo <- from@uplo
-    to@sd <- sd
-
-    n <- d[1L]
-    u <- uplo == "U"
-    if(u) {
-        r <- seq_len(n)
-        s <- 1L
-    } else {
-        r <- seq.int(to = 1L, by = -1L, length.out = n)
-        s <- seq_len(n)
-    }
-    x <-  from@x / rep.int(sd, r) / sd[sequence.default(r, s)]
-    x[indDiag(n, upper = u, packed = TRUE)] <- 1
-    to@x <- x
-
-    .set.factor(from, "correlation", to)
-}
-
-setAs("copMatrix", "corMatrix", function(from) unpack(from))
-setAs("corMatrix", "copMatrix", function(from)   pack(from))
-
-setAs("dpoMatrix", "corMatrix", .dpo2cor)
-setAs("dppMatrix", "copMatrix", .dpp2cop)
-
-setAs("dsyMatrix", "corMatrix",
-      function(from) .dpo2cor(.dsy2dpo(from)))
-setAs("dspMatrix", "copMatrix",
-      function(from) .dpp2cop(.dsp2dpp(from)))
+setAs("matrix", "posdefMatrix",
+      function(from) {
+          if (!isSymmetric(from))
+              stop("matrix is not Hermitian")
+          if (length(from) > 0L)
+          tryCatch(chol(from),
+                   error = function(e) stop("matrix is not positive definite"))
+          z <- is.complex(from)
+          to <- new(if (z) "zpoMatrix" else "dpoMatrix")
+          to@Dim <- dim(from)
+          if (!is.null(dn <- dimnames(from)))
+              to@Dimnames <- symDN(dn)
+          to@x <- if (z) as.complex(from) else as.double(from)
+          to
+      })
 
 setAs("Matrix", "corMatrix",
-      function(from) .dpo2cor(.dsy2dpo(.M2unpacked(.M2sym(.M2kind(from, "d"))))))
+      function(from) as(as(as(as(from, "dMatrix", strict = FALSE), "posdefMatrix", strict = FALSE), "unpackedMatrix", strict = FALSE), "corMatrix"))
+
 setAs("Matrix", "copMatrix",
-      function(from) .dpp2cop(.dsp2dpp(.M2packed  (.M2sym(.M2kind(from, "d"))))))
+      function(from) as(as(as(as(from, "dMatrix", strict = FALSE), "posdefMatrix", strict = FALSE),   "packedMatrix", strict = FALSE), "copMatrix"))
 
 setAs("matrix", "corMatrix",
-      function(from) {
-          storage.mode(from) <- "double"
-          .dpo2cor (.dsy2dpo(.M2sym(from)))
-      })
+      function(from) as(as(as(`storage.mode<-`(from, "double"), "posdefMatrix", strict = FALSE), "unpackedMatrix", strict = FALSE), "corMatrix"))
+
 setAs("matrix", "copMatrix",
+      function(from) as(as(as(`storage.mode<-`(from, "double"), "posdefMatrix", strict = FALSE),   "packedMatrix", strict = FALSE), "copMatrix"))
+
+setAs("dsyMatrix", "corMatrix",
+      function(from) as(as(from, "posdefMatrix"), "corMatrix"))
+
+setAs("dspMatrix", "copMatrix",
+      function(from) as(as(from, "posdefMatrix"), "copMatrix"))
+
+setAs("dpoMatrix", "corMatrix",
       function(from) {
-          storage.mode(from) <- "double"
-          .dpp2cop(.dsp2dpp(pack(from, symmetric = TRUE)))
+          to <- new("corMatrix")
+          to@Dim <- d <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- from@uplo
+          if((n <- d[1L]) > 0L) {
+          x <- from@x
+          k <- seq.int(from = 1L, by = n + 1, length.out = n)
+          to@sd <- sd <- sqrt(x[k])
+          x <- x / sd / rep(sd, each = n)
+          x[k] <- 1
+          to@x <- x
+          }
+          to
+      })
+
+setAs("dppMatrix", "copMatrix",
+      function(from) {
+          to <- new("copMatrix")
+          to@Dim <- d <- from@Dim
+          to@Dimnames <- from@Dimnames
+          to@uplo <- uplo <- from@uplo
+          if((n <- d[1L]) > 0L) {
+          x <- from@x
+          if(uplo == "U") {
+              r <- 1L:n
+              s <- 1L
+              k <- cumsum(r)
+          } else {
+              r <- n:1L
+              s <- 1L:n
+              k <- cumsum(c(1L, r[-n]))
+          }
+          to@sd <- sd <- sqrt(x[k])
+          x <- x / rep.int(sd, r) / sd[sequence.default(r, s)]
+          x[k] <- 1
+          to@x <- x
+          }
+          to
       })

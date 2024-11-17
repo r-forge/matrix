@@ -343,10 +343,6 @@ SEXP CHS2M(cholmod_sparse *A, int values, char shape)
 	char class[] = "..CMatrix";
 	class[0] = (!values) ? 'n' : ((A->xtype == CHOLMOD_REAL) ? 'd' : 'z');
 	class[1] = shape;
-#ifndef MATRIX_ENABLE_POSDEF
-	if (class[1] == 'p')
-		class[1] = 's';
-#endif
 	int nnz = ((int *) A->p)[A->ncol];
 	SEXP obj = PROTECT(newObject(class)),
 		dim = PROTECT(GET_SLOT(obj, Matrix_DimSym)),

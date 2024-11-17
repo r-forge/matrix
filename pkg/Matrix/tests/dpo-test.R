@@ -43,14 +43,14 @@ stopifnotValid(h4,  "symmetricMatrix")
 h9p[1,2] <- 99
 stopifnot(class(h9p) == "dgeMatrix", h9p[1,1:2] == c(10,99))
 
-str(h9p <- as(h9, "dppMatrix"))# {again}
+str(h9p <- as(h9, "packedMatrix"))# {again}
 h6 <- h9[1:6,1:6]
 stopifnot(all(h6 == Hilbert(6)), length(h6@factors) == 0)
 stopifnotValid(th9p <- t(h9p), "dppMatrix")
 stopifnotValid(h9p@factors[["denseCholesky+-"]], "denseCholesky")
 H6  <- as(h6, "packedMatrix")
-pp6 <- as(H6, "dppMatrix")
-po6 <- as(pp6, "dpoMatrix")
+pp6 <- as(H6, "posdefMatrix")
+po6 <- as(pp6, "unpackedMatrix")
 hs <- as(h9p, "dspMatrix")
 stopifnot(identical(names(H6 @factors), "denseCholesky--"),
           identical(names(pp6@factors), "denseCholesky--"),
@@ -163,7 +163,7 @@ x <- c(2,1,1,2)
 mM <- Matrix(x, 2,2, dimnames=rep( list(c("A","B")), 2))# dsy
 mM
 stopifnot(length(mM@factors)== 0)
-(po <- as(mM, "dpoMatrix")) # still has dimnames
+(po <- as(mM, "posdefMatrix")) # still has dimnames
 mm <- as(mM, "matrix")
 msy <- as(mm, "symmetricMatrix")
 stopifnot(Qidentical(mM, msy),

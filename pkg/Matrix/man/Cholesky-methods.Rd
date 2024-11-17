@@ -316,8 +316,8 @@ str(E.ch.A4 <- expand2(simpl1, LDL = FALSE), max.level = 2L)
 stopifnot(exprs = {
     all.equal(E.ch.A4[["L" ]], e.ch.A4[["L1" ]] \%*\% sqrt(e.ch.A4[["D"]]))
     all.equal(E.ch.A4[["L."]], sqrt(e.ch.A4[["D"]]) \%*\% e.ch.A4[["L1."]])
-    all.equal(A4, as(Reduce(`\%*\%`, e.ch.A4), "symmetricMatrix"))
-    all.equal(A4, as(Reduce(`\%*\%`, E.ch.A4), "symmetricMatrix"))
+    all.equal(A4, as(Reduce(`\%*\%`, e.ch.A4), "posdefMatrix"))
+    all.equal(A4, as(Reduce(`\%*\%`, E.ch.A4), "posdefMatrix"))
 })
 
 ## The "same" permutation matrix with "alternate" representation

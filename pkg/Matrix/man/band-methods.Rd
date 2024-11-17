@@ -118,7 +118,7 @@ band(sm, -2,1) # -> "dgC"
 (x.x <- crossprod(mm))
 tril(x.x)
 xx <- tril(x.x) + triu(x.x, 1) ## the same as x.x (but stored differently):
-txx <- t(as(xx, "symmetricMatrix"))
+txx <- t(as(xx, "posdefMatrix"))
 stopifnot(identical(triu(x.x), t(tril(x.x))),
 	  identical(class(x.x), class(txx)),
 	  identical(as(x.x, "generalMatrix"), as(txx, "generalMatrix")))

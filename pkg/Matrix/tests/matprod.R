@@ -433,7 +433,7 @@ assert.EQ.mat(tcrossprod(t(V),A), tva)
 stopifnotValid(s.s <-  crossprod(sv,sv), "Matrix")
 stopifnotValid(ss. <- tcrossprod(sv,sv), "sparseMatrix")
 stopifnot(identical(as(s.s, "symmetricMatrix"),  crossprod(sv)),
-          identical(as(ss., "symmetricMatrix"), tcrossprod(sv)))
+          identical(as(ss., "symmetricMatrix"), as(tcrossprod(sv), "symmetricMatrix")))
 assert.EQ.mat(s.s,  crossprod(v,v))
 assert.EQ.mat(ss., tcrossprod(v,v))
 
@@ -521,8 +521,10 @@ stopifnot(exprs = {
                asGe(cu %*% D4), mcu %*% D4)
     identical4(asGe(tcrossprod(D4, cu)), tcrossprod(D4,mcu),
                asGe(D4 %*% t(cu)), D4 %*% t(mcu))
-    identical( crossprod(cu), Matrix( crossprod(mcu),sparse=TRUE))
-    identical(tcrossprod(cu), Matrix(tcrossprod(mcu),sparse=TRUE))
+    identical(as( crossprod(cu), "symmetricMatrix"),
+              Matrix( crossprod(mcu),sparse=TRUE))
+    identical(as(tcrossprod(cu), "symmetricMatrix"),
+              Matrix(tcrossprod(mcu),sparse=TRUE))
 })
 assert.EQ.mat( crossprod(cu, D4),  crossprod(mcu, d4))
 assert.EQ.mat(tcrossprod(cu, D4), tcrossprod(mcu, d4))
@@ -738,8 +740,10 @@ chk.ngMatrix <- function(M, verbose = TRUE) {
     stopifnotValid(tdM <- tcrossprod(dM, M), "CsparseMatrix")
     assert.EQ.mat (cdM,  crossprod(m))
     assert.EQ.mat (tdM, tcrossprod(m))
-    stopifnot(identical( crossprod(dM), as(cdM, "symmetricMatrix")))
-    stopifnot(identical(tcrossprod(dM), as(tdM, "symmetricMatrix")))
+    stopifnot(identical(as( crossprod(dM), "symmetricMatrix"),
+                        as(cdM, "symmetricMatrix")))
+    stopifnot(identical(as(tcrossprod(dM), "symmetricMatrix"),
+                        as(tdM, "symmetricMatrix")))
     invisible(TRUE)
 }
 
@@ -760,8 +764,10 @@ assert.EQ.mat(t(sM) %*% sM,
 	      t(sm) %*% sm, tol=0)
 stopifnotValid(cM <- crossprod(sM),  "dsCMatrix")
 stopifnotValid(tM <- tcrossprod(sM), "dsCMatrix")
-stopifnot(identical(cM, as(t(sM) %*% sM, "symmetricMatrix")),
-	  identical(tM, forceSymmetric(sM %*% t(sM))))
+stopifnot(identical(as(cM, "symmetricMatrix"),
+                    as(t(sM) %*% sM, "symmetricMatrix")),
+          identical(as(tM, "symmetricMatrix"),
+                    forceSymmetric(sM %*% t(sM))))
 assert.EQ.mat( cM,     crossprod(sm))
 assert.EQ.mat( tM, as(tcrossprod(sm),"matrix"))
 dm <- as(sM, "denseMatrix")
@@ -783,8 +789,8 @@ stopifnot(as.vector(print(t(M %*% 1:6))) ==
 	  c(as(M,"matrix") %*% 1:6))
 (M.M <- crossprod(M))
 MM. <- tcrossprod(M)
-stopifnot(class(MM.) == "dsCMatrix",
-	  class(M.M) == "dsCMatrix")
+stopifnot(class(MM.) == "dpCMatrix",
+	  class(M.M) == "dpCMatrix")
 
 M3 <- Matrix(c(rep(c(2,0),4),3), 3,3, sparse=TRUE)
 I3 <- as(Diagonal(3), "CsparseMatrix")
@@ -811,7 +817,7 @@ isValid(I3tt, "triangularMatrix")
 m <- matrix(0, 4,7); m[c(1, 3, 6, 9, 11, 22, 27)] <- 1
 (mm <- Matrix(m))
 (cm <- Matrix(crossprod(m)))
-stopifnot(identical(crossprod(mm), cm))
+stopifnot(identical(as(crossprod(mm), "symmetricMatrix"), cm))
 (tm1 <- Matrix(tcrossprod(m))) #-> had bug in 'Matrix()' !
 (tm2 <- tcrossprod(mm))
 Im2 <- solve(tm2[-4,-4])
@@ -823,7 +829,7 @@ assertError(m  %*% P) # ditto
 assertError(crossprod(t(mm), P)) # ditto
 stopifnotValid(tm1, "dsCMatrix")
 stopifnot(exprs = {
-    all.equal(tm1, tm2, tolerance = 1e-15)
+    all.equal(tm1, as(tm2, "symmetricMatrix"), tolerance = 1e-15)
     all.equal(Im2 %*% tm2[1:3,], Matrix(cbind(diag(3), 0)))
     identical(p, as.matrix(P))
     all(P %*% m == as.matrix(P) %*% m)
@@ -984,10 +990,14 @@ stopifnot(identical(dim(m02 %*% Diagonal(x=c(1,2))), c(0L, 2L)),
 stopifnotValid(R <- as(m, "RsparseMatrix"), "RsparseMatrix")
 stopifnotValid(T <- as(m, "TsparseMatrix"), "TsparseMatrix")
 stopifnot(exprs = {
-    all.equal(as(t(R) %*% R, "symmetricMatrix"),  crossprod(R) -> cR)
-    all.equal(as(R %*% t(R), "symmetricMatrix"), tcrossprod(R) -> tR)
-    all.equal(as(R %*% t(m), "symmetricMatrix"), as(tcrossprod(m), "RsparseMatrix"))
-    all.equal(as(m %*% t(R), "symmetricMatrix"), as(tcrossprod(m), "CsparseMatrix"))
+    all.equal(as(t(R) %*% R, "symmetricMatrix"),
+              as( crossprod(R), "symmetricMatrix") -> cR)
+    all.equal(as(R %*% t(R), "symmetricMatrix"),
+              as(tcrossprod(R), "symmetricMatrix") -> tR)
+    all.equal(as(R %*% t(m), "symmetricMatrix"),
+              as(as(tcrossprod(m), "symmetricMatrix"), "RsparseMatrix"))
+    all.equal(as(m %*% t(R), "symmetricMatrix"),
+              as(as(tcrossprod(m), "symmetricMatrix"), "CsparseMatrix"))
     ## failed in Matrix <= 1.4.1  (since 1.2.0, when 'boolArith' was introduced):
     all.equal(as(cR, "RsparseMatrix"), as( crossprod(R, T), "symmetricMatrix"))
     all.equal(as(cR, "CsparseMatrix"), as( crossprod(T, R), "symmetricMatrix"))

@@ -278,8 +278,8 @@ exportClasses(Matrix, # and its subclasses .............................
 
               generalMatrix,
               symmetricMatrix,
+              posdefMatrix,
               triangularMatrix,
-              diagonalMatrix,
 
               denseMatrix,
               unpackedMatrix,
@@ -289,6 +289,9 @@ exportClasses(Matrix, # and its subclasses .............................
               CsparseMatrix,
               RsparseMatrix,
               TsparseMatrix,
+              diagonalMatrix,
+              indMatrix,
+              pMatrix,
 
               nMatrix,
 
@@ -403,9 +406,6 @@ exportClasses(Matrix, # and its subclasses .............................
               ## ztTMatrix,
 
               ## zdiMatrix,
-
-              indMatrix,
-              pMatrix,
 
               MatrixFactorization, # and its subclasses ................
 

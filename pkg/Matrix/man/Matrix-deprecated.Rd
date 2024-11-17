@@ -18,6 +18,14 @@
 \alias{nCHMsuper-class}
 \alias{pBunchKaufman-class}
 \alias{pCholesky-class}
+\alias{coerce,Matrix,dpoMatrix-method}
+\alias{coerce,Matrix,dppMatrix-method}
+\alias{coerce,dsyMatrix,dpoMatrix-method}
+\alias{coerce,dspMatrix,dppMatrix-method}
+\alias{coerce,dpoMatrix,dppMatrix-method}
+\alias{coerce,dppMatrix,dpoMatrix-method}
+\alias{coerce,matrix,dpoMatrix-method}
+\alias{coerce,matrix,dppMatrix-method}
 % 1.7-0
 \alias{atomicVector-class}
 \alias{compMatrix-class}

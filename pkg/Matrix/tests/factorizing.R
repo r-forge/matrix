@@ -380,8 +380,8 @@ chkCholesky <- function(chmf, A) {
     stopifnot(is(chmf, "sparseCholesky"),
               validObject(chmf),
               is(A, "Matrix"), isSymmetric(A))
-    if(!is(A, "dsCMatrix"))
-        A <- as(as(as(A, "CsparseMatrix"), "symmetricMatrix", "dMatrix"))
+    if(!is(A, "dpCMatrix"))
+        A <- as(as(as(A, "CsparseMatrix"), "posdefMatrix"), "dMatrix", strict = FALSE)
     L <- drop0(zapsmall(L. <- as(chmf, "CsparseMatrix")))
     cat("no. nonzeros in L {before / after drop0(zapsmall(.))}: ",
         c(nnzero(L.), nnzero(L)), "\n") ## 112, 95
@@ -731,7 +731,7 @@ set.seed(24831)
 n <- 16L
 mS <- tcrossprod(matrix(rnorm(n * n), n, n,
                         dimnames = list(A = paste0("s", seq_len(n)), NULL)))
-sS <- as(pS <- as(S <- as(mS, "dpoMatrix"), "packedMatrix"), "CsparseMatrix")
+sS <- as(pS <- as(S <- as(mS, "posdefMatrix"), "packedMatrix"), "CsparseMatrix")
 stopifnot(exprs = {
     chkMF(   S , mS,    Schur)
     chkMF(  pS , mS,    Schur)

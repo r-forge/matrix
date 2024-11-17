@@ -170,12 +170,12 @@ stopifnot(exprs = {
     identical(dns, dimnames(cm))
     inherits(cM, "dpoMatrix")
     identical(dns, dimnames(cM))
-    inherits((cS <- cov2cor(S <- as(m, "sparseMatrix"))), "dsCMatrix")
+    inherits(cS <- cov2cor(S <- as(m, "sparseMatrix")), "dpCMatrix")
     identical(dns, dimnames(cS))
-    all.equal(cS, dimScale(S))
+    all.equal(as(cS, "symmetricMatrix"), dimScale(S))
     all.equal(as(cM, "sparseMatrix"), cS,
               tolerance=2e-15) # see even tol=0
-    all.equal(as(cM, "dpoMatrix"), as(dimScale(M), "dpoMatrix"),
+    all.equal(cM, as(dimScale(M), "posdefMatrix"),
               tolerance=2e-15) # seen 1.665e-16
 })
 

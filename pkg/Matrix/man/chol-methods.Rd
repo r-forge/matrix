@@ -190,8 +190,10 @@ x4 <- solve(A4, b4)
 stopifnot(exprs = {
     identical(R4.nopivot, expand1(ch.A4.nopivot, "L."))
     identical(R4, expand1(ch.A4, "L."))
-    all.equal(A4, crossprod(R4.nopivot))
-    all.equal(A4[ch.A4@perm + 1L, ch.A4@perm + 1L], crossprod(R4))
+    all.equal(A4,
+              as(crossprod(R4.nopivot), "symmetricMatrix"))
+    all.equal(A4[ch.A4@perm + 1L, ch.A4@perm + 1L],
+              as(crossprod(R4        ), "symmetricMatrix"))
     all.equal(diag(R4.nopivot), sqrt(diag(ch.A4.nopivot)))
     all.equal(diag(R4), sqrt(diag(ch.A4)))
     all.equal(sqrt(det4), det(R4.nopivot))
