@@ -3,18 +3,25 @@
 ##   "co.Matrix" -> "dp.Matrix"  if  bit 1 is set
 ##   "dp.Matrix" -> "ds.Matrix"  if  bit 2 is set
 ##   "zp.Matrix" -> "zs.Matrix"  if  bit 2 is set
-.M.class <- function(x, mode = 7L)
-    .Call(R_Matrix_class, x, mode) # for 'mode' in 0:7
+.M.class <-
+function(x, mode = 7L)
+    .Call(R_Matrix_class, x, mode)
 
-## "[nlidz]" for Matrix, sparseVector, logical, integer, double, complex 'x';
-## otherwise ""
-.M.kind  <- function(x) .Call(R_Matrix_kind , x)
+## "[nlidz]" for Matrix, sparseVector,
+## logical, integer, double, complex 'x'; otherwise ""
+.M.kind <-
+function(x)
+    .Call(R_Matrix_kind , x)
 
-## "[gstdi]" for Matrix, sparseVector 'x'; otherwise ""
-.M.shape <- function(x) .Call(R_Matrix_shape, x)
+## "[gsptdi]" for Matrix, sparseVector 'x'; otherwise ""
+.M.shape <-
+function(x, mode = 7L)
+    .Call(R_Matrix_shape, x, mode)
 
-## "[npCRTdi]" for Matrix 'x'; otherwise ""
-.M.repr  <- function(x) .Call(R_Matrix_repr , x)
+## "[CRTdinp]" for Matrix 'x'; otherwise ""
+.M.repr <-
+function(x)
+    .Call(R_Matrix_repr , x)
 
 .isMatrix   <- function(x)
     nzchar(cl <- .M.class(x)) && substr(cl, 4L, 4L) == "M"

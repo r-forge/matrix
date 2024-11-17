@@ -154,7 +154,7 @@ SEXP tpMatrix_norm(SEXP, SEXP);
 /* objects.c : */
 SEXP R_Matrix_class(SEXP, SEXP);
 SEXP R_Matrix_kind(SEXP);
-SEXP R_Matrix_shape(SEXP);
+SEXP R_Matrix_shape(SEXP, SEXP);
 SEXP R_Matrix_repr(SEXP);
 
 /* perm.c : */
@@ -443,7 +443,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	/* objects.c : */
 	CALL_METHOD(R_Matrix_class, 2),
 	CALL_METHOD(R_Matrix_kind, 1),
-	CALL_METHOD(R_Matrix_shape, 1),
+	CALL_METHOD(R_Matrix_shape, 2),
 	CALL_METHOD(R_Matrix_repr, 1),
 
 	/* perm.c : */

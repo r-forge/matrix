@@ -108,17 +108,16 @@ setMethod("determinant",
 setMethod("determinant",
           c(x = "symmetricMatrix", logarithm = "logical"),
           function(x, logarithm = TRUE, ...) {
-              posdef <- substr(.M.class(x, 2L), 2L, 2L) == "p"
               repr <- .M.repr(x)
               switch(repr, "R" = x <- .tCRT(x), "T" = x <- .M2C(x))
               trf <-
                   if (repr == "n" || repr == "p") {
-                      if (posdef)
+                      if (.M.shape(x, 2L) == "p")
                           tryCatch(Cholesky(x, perm = FALSE),
                                    error = function(e) BunchKaufman(x, warnSing = FALSE))
                       else BunchKaufman(x, warnSing = FALSE)
                   } else {
-                      if (posdef)
+                      if (.M.shape(x, 2L) == "p")
                           tryCatch(Cholesky(x, perm = TRUE, LDL = FALSE, super = FALSE),
                                    error = function(e) NULL)
                       else tryCatch(Cholesky(x, perm = TRUE, LDL = TRUE, super = FALSE),

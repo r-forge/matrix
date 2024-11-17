@@ -276,7 +276,7 @@ setMethod("solve", c(a = "denseMatrix", b = "missing"),
               a <- .M2kind(a, ",")
               .solve.checkCondition(a, tol)
               trf <-
-              switch(substr(.M.class(a, 2L), 2L, 2L),
+              switch(.M.shape(a, 2L),
                      "g" = lu(a, warnSing = FALSE),
                      "s" = BunchKaufman(a, warnSing = FALSE),
                      "p" = Cholesky(a, perm = FALSE),
@@ -292,7 +292,7 @@ setMethod("solve", c(a = "denseMatrix", b = "denseMatrix"),
               a <- .M2kind(a, ",")
               .solve.checkCondition(a, tol)
               trf <-
-              switch(substr(.M.class(a, 2L), 2L, 2L),
+              switch(.M.shape(a, 2L),
                      "g" = lu(a, warnSing = FALSE),
                      "s" = BunchKaufman(a, warnSing = FALSE),
                      "p" = Cholesky(a, perm = FALSE),
@@ -316,7 +316,7 @@ setMethod("solve", c(a = "CsparseMatrix", b = "missing"),
               .solve.checkDim1(adim[1L], adim[2L])
               a <- .M2kind(a, ",")
               trf <-
-              switch(substr(.M.class(a, 2L), 2L, 2L),
+              switch(.M.shape(a, 2L),
                      "g" = lu(a, errSing = TRUE),
                      "s" = tryCatch(Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                                     error = function(e) lu(a, errSing = TRUE)),
@@ -337,7 +337,7 @@ setMethod("solve", c(a = "CsparseMatrix", b = "denseMatrix"),
               .solve.checkDim1(adim[1L], adim[2L])
               a <- .M2kind(a, ",")
               trf <-
-              switch(substr(.M.class(a, 2L), 2L, 2L),
+              switch(.M.shape(a, 2L),
                      "g" = lu(a, errSing = TRUE),
                      "s" = tryCatch(Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                                     error = function(e) lu(a, errSing = TRUE)),
@@ -366,7 +366,7 @@ setMethod("solve", c(a = "CsparseMatrix", b = "CsparseMatrix"),
               .solve.checkDim1(adim[1L], adim[2L])
               a <- .M2kind(a, ",")
               trf <-
-              switch(substr(.M.class(a, 2L), 2L, 2L),
+              switch(.M.shape(a, 2L),
                      "g" = lu(a, errSing = TRUE),
                      "s" = tryCatch(Cholesky(a, perm = TRUE, LDL = TRUE, super = FALSE),
                                     error = function(e) lu(a, errSing = TRUE)),

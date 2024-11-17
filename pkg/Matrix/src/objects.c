@@ -114,7 +114,7 @@ const char *Matrix_class(SEXP x, const char **valid, int mode,
 {
 	int i = R_check_class_etc(x, valid);
 	if (i >= 0)
-		return (mode < 0) ? valid[i] : Matrix_superclass(valid[i], mode);
+		return (mode <= 0) ? valid[i] : Matrix_superclass(valid[i], mode);
 	else {
 		if (caller)
 			ERROR_INVALID_CLASS(x, caller);
@@ -143,14 +143,14 @@ char Matrix_kind(SEXP obj)
 	return (class[2] == 'd') ? 'n' : class[0];
 }
 
-char Matrix_shape(SEXP obj)
+char Matrix_shape(SEXP obj, int mode)
 {
 	if (TYPEOF(obj) != OBJSXP)
 		return '\0';
-	const char *class = Matrix_class(obj, valid_matrix_or_vector, 7, NULL);
+	const char *class = Matrix_class(obj, valid_matrix_or_vector, mode, NULL);
 	if (!class)
 		return '\0';
-	return (class[2] == 'd') ? 'i' : ((class[3] == 'M') ? class[1] : 'g');
+	return (class[2] == 'd') ? 'i' : (class[3] == 'M') ? class[1] : 'g';
 }
 
 char Matrix_repr(SEXP obj)
@@ -194,9 +194,9 @@ SEXP R_Matrix_kind(SEXP s_obj)
 	return Rf_mkString(s);
 }
 
-SEXP R_Matrix_shape(SEXP s_obj)
+SEXP R_Matrix_shape(SEXP s_obj, SEXP s_mode)
 {
-	char s[] = { Matrix_shape(s_obj), '\0' };
+	char s[] = { Matrix_shape(s_obj, Rf_asInteger(s_mode)), '\0' };
 	return Rf_mkString(s);
 }
 
