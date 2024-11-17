@@ -290,9 +290,9 @@ SEXP R_sparse_cholesky(SEXP s_obj, SEXP s_warn, SEXP s_order,
 			cholmod_free_factor(&L, &c);
 			if (TYPEOF(tmp) == CHARSXP) {
 				if (warn > 1)
-					Rf_error  ("%s", CHAR(ans));
+					Rf_error  ("%s", CHAR(tmp));
 				else if (warn > 0)
-					Rf_warning("%s", CHAR(ans));
+					Rf_warning("%s", CHAR(tmp));
 				ans = R_NilValue;
 			} else {
 				SET_DIMNAMES(tmp, 0, DIMNAMES(ans, 0));
