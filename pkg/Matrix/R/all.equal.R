@@ -5,7 +5,7 @@
 function(target, current, ...) {
     if ((l1 <- length(target)) != (l2 <- length(current)))
         return(paste0("length(target) is ", l1, ", length(current) is ", l2))
-    if (is.integer(l1) || l1 - 1 < .Machine$integer.max) {
+    if (is.integer(l1) || l1 - 1 < .Machine[["integer.max"]]) {
         i1 <- as.integer( target@i)
         i2 <- as.integer(current@i)
     } else {
@@ -26,25 +26,18 @@ function(target, current, ...) {
 function(x, exclude.informal, exclude.factors) {
     a <- attributes(x)
     if (isS4(x) && exclude.informal)
-        a <- a[.slotNames(a)]
+        a <- a[names(getClassDef(class(x))@slots)]
     if (length(a) == 0L)
         return(NULL)
     exclude <-
     if (!isS4(x))
         c("class", "dim", "dimnames")
-    else if (.isMatrix(x))
-        c("class", "Dim", "Dimnames",
-          switch(.M.repr(x),
-                 "C" = c("p", "i", if (.M.kind(x) != "n") "x"),
-                 "R" = c("p", "j", if (.M.kind(x) != "n") "x"),
-                 "T" = c("i", "j", if (.M.kind(x) != "n") "x"),
-                 "d" =, "n" =, "p" = "x",
-                 "i" = "perm"),
-          switch(.M.shape(x),
-                 "g" = if (exclude.factors) "factors",
-                 "s" = c("uplo", if (exclude.factors) "factors"),
-                 "t" = c("uplo", "diag"),
-                 "d" = "diag"))
+    else if (.isMatrix(x)) {
+        tmp <- c("class", names(getClassDef(.M.class(x, 0L), package = "Matrix")@slots))
+        if (exclude.factors)
+            tmp
+        else tmp[tmp != "factors"]
+    }
     else "class"
     nms <- names(a)
     i <- match(nms, exclude, 0L) == 0L
@@ -131,12 +124,12 @@ setMethod("all.equal",
 function(x, exclude.informal) {
     a <- attributes(x)
     if (isS4(x) && exclude.informal)
-        a <- a[.slotNames(a)]
+        a <- a[names(getClassDef(class(x))@slots)]
     if (length(a) == 0L)
         return(NULL)
     exclude <-
     if (.isVector(x))
-        c("class", "length", "i", if (.M.kind(x) != "n") "x")
+        c("class", names(getClassDef(.M.class(x, 0L), package = "Matrix")@slots))
     else "class"
     nms <- names(a)
     i <- match(nms, exclude, 0L) == 0L
