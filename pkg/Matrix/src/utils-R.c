@@ -10,8 +10,8 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn,
 		nr = (diag) ? n + (nn - n) / 2 : (nn - n) / 2;
-	if (nx > 0x1.0p+53)
-		Rf_error(_("indices would exceed %s"), "2^53");
+	if (nx > (1LL << 53))
+		Rf_error(_("maximum index would exceed %s"), "2^53");
 	if (nr > R_XLEN_T_MAX)
 		Rf_error(_("attempt to allocate vector of length exceeding %s"),
 		         "R_XLEN_T_MAX");
@@ -96,8 +96,8 @@ SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 	int_fast64_t
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn;
-	if (nx > 0x1.0p+53)
-		Rf_error(_("indices would exceed %s"), "2^53");
+	if (nx > (1LL << 53))
+		Rf_error(_("maximum index would exceed %s"), "2^53");
 
 #define DO_INDEX \
 	do { \

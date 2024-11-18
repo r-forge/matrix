@@ -3044,7 +3044,7 @@ SEXP R_sparse_as_Tsparse(SEXP s_from)
 SEXP vector_as_Vector(SEXP from, char kind)
 {
 	R_xlen_t vlen = XLENGTH(from);
-	if (vlen > 0x1.0p+53)
+	if (vlen > (1LL << 53))
 		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	SEXPTYPE tf = TYPEOF(from);
@@ -3144,7 +3144,7 @@ SEXP sparse_as_Vector(SEXP from, const char *class)
 {
 	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
-	if (mn > 0x1.0p+53)
+	if (mn > (1LL << 53))
 		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	char cl[] = ".sparseVector";
@@ -3282,7 +3282,7 @@ SEXP diagonal_as_Vector(SEXP from, const char *class)
 {
 	int n = DIM(from)[0];
 	int_fast64_t nn = (int_fast64_t) n * n;
-	if (nn > 0x1.0p+53)
+	if (nn > (1LL << 53))
 		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	char cl[] = ".sparseVector";
@@ -3375,7 +3375,7 @@ SEXP index_as_Vector(SEXP from, const char *class)
 {
 	int *pdim = DIM(from), m = pdim[0], n = pdim[1];
 	int_fast64_t mn = (int_fast64_t) m * n;
-	if (mn > 0x1.0p+53)
+	if (mn > (1LL << 53))
 		Rf_error(_("%s length cannot exceed %s"), "sparseVector", "2^53");
 
 	SEXP to = newObject("nsparseVector");
