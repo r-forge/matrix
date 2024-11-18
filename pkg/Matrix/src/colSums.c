@@ -7,7 +7,7 @@
 SEXP sparse_aggregate(SEXP, const char *);
 
 #define SUM_TYPEOF(c) \
-(c == 'z') ? CPLXSXP : ((mean || c == 'd' || c == 'i') ? REALSXP : INTSXP)
+(c == 'z') ? CPLXSXP : (mean || c == 'd' || c == 'i') ? REALSXP : INTSXP
 
 #define MAP(i) (map) ? map[i] : i
 
@@ -389,12 +389,12 @@ void Csparse_rowsum(SEXP obj, const char *class,
 				else \
 				c0##ASSIGN_IDEN     (tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
 				if (c0##NOT_NA(tmp0)) { \
-					c1##INCREMENT_IDEN(px1[MAP(i)], c0##CAST(tmp0)); \
+					c1##INCREMENT_IDEN(px1[MAP(i)], tmp0); \
 					if (sy && i != j) { \
 					if (he) \
-					c1##INCREMENT_CONJ(px1[MAP(j)], c0##CAST(tmp0)); \
+					c1##INCREMENT_CONJ(px1[MAP(j)], tmp0); \
 					else \
-					c1##INCREMENT_IDEN(px1[MAP(j)], c0##CAST(tmp0)); \
+					c1##INCREMENT_IDEN(px1[MAP(j)], tmp0); \
 					} \
 				} \
 				else if (!narm) { \
@@ -529,12 +529,12 @@ void Tsparse_colsum(SEXP obj, const char *class,
 			else \
 			c0##ASSIGN_IDEN     (tmp0, c0##IFELSE_NPATTERN(px0[k], c0##UNIT)); \
 			if (c0##NOT_NA(tmp0)) { \
-				c1##INCREMENT_IDEN(px1[MAP(j)], c0##CAST(tmp0)); \
+				c1##INCREMENT_IDEN(px1[MAP(j)], tmp0); \
 				if (sy && i != j) { \
 				if (he) \
-				c1##INCREMENT_CONJ(px1[MAP(i)], c0##CAST(tmp0)); \
+				c1##INCREMENT_CONJ(px1[MAP(i)], tmp0); \
 				else \
-				c1##INCREMENT_IDEN(px1[MAP(i)], c0##CAST(tmp0)); \
+				c1##INCREMENT_IDEN(px1[MAP(i)], tmp0); \
 				} \
 			} \
 			else if (!narm) { \

@@ -192,7 +192,8 @@
 		if ((y) == NA_LOGICAL) { \
 			if ((x) == 0) \
 				(x) = NA_LOGICAL; \
-		} else if ((y) != 0) \
+		} \
+		else if ((y) != 0) \
 			(x) = 1; \
 	} while (0)
 #define iINCREMENT_IDEN(x, y) \
@@ -200,13 +201,16 @@
 		if ((x) != NA_INTEGER) { \
 			if ((y) == NA_INTEGER) \
 				(x) = NA_INTEGER; \
-			else if (((y) < 0) \
-					 ? ((x) <= INT_MIN - (y)) \
-					 : ((x) >  INT_MAX - (y))) { \
-				Rf_warning(_("NAs produced by integer overflow")); \
-				(x) = NA_INTEGER; \
-			} else \
-				(x) += (y); \
+			else if ((y) != 0) { \
+				if (((y) > 0) \
+				    ? ((x) >  INT_MAX - (y)) \
+				    : ((x) <= INT_MIN - (y))) { \
+					Rf_warning(_("NAs produced by integer overflow")); \
+					(x) = NA_INTEGER; \
+				} \
+				else \
+					(x) += (y); \
+			} \
 		} \
 	} while (0)
 #define dINCREMENT_IDEN(x, y) \
@@ -231,7 +235,8 @@
 		if ((y) == NA_LOGICAL) { \
 			if ((x) == 0) \
 				(x) = NA_LOGICAL; \
-		} else if ((y) == 0) \
+		} \
+		else if ((y) == 0) \
 			(x) = 1; \
 	} while (0)
 #define iDECREMENT_IDEN(x, y) \
@@ -239,13 +244,16 @@
 		if ((x) != NA_INTEGER) { \
 			if ((y) == NA_INTEGER) \
 				(x) = NA_INTEGER; \
-			else if (((y) < 0) \
-					 ? ((x) >  INT_MAX + (y)) \
-					 : ((x) <= INT_MIN + (y))) { \
-				Rf_warning(_("NAs produced by integer overflow")); \
-				(x) = NA_INTEGER; \
-			} else \
-				(x) -= (y); \
+			else if ((y) != 0) { \
+				if (((y) < 0) \
+				    ? ((x) >  INT_MAX + (y)) \
+				    : ((x) <= INT_MIN + (y))) { \
+					Rf_warning(_("NAs produced by integer overflow")); \
+					(x) = NA_INTEGER; \
+				} \
+				else \
+					(x) -= (y); \
+			} \
 		} \
 	} while (0)
 #define dDECREMENT_IDEN(x, y) \
@@ -280,50 +288,50 @@
 #define zDIVIDE(x, a) \
 	do { (x).r /= a; (x).i /= a; } while (0)
 
-#define SWITCH2(_C_, _TEMPLATE_) \
+#define SWITCH2(c, template) \
 do { \
-	switch ((_C_)) { \
+	switch ((c)) { \
 	case 'n': \
 	case 'l': \
 	case 'i': \
-	case 'd': _TEMPLATE_(d); break; \
-	case 'z': _TEMPLATE_(z); break; \
+	case 'd': template(d); break; \
+	case 'z': template(z); break; \
 	default: break; \
 	} \
 } while (0)
 
-#define SWITCH3(_C_, _TEMPLATE_) \
+#define SWITCH3(c, template) \
 do { \
-	switch ((_C_)) { \
+	switch ((c)) { \
 	case 'n': \
 	case 'l': \
-	case 'i': _TEMPLATE_(i); break; \
-	case 'd': _TEMPLATE_(d); break; \
-	case 'z': _TEMPLATE_(z); break; \
+	case 'i': template(i); break; \
+	case 'd': template(d); break; \
+	case 'z': template(z); break; \
 	default: break; \
 	} \
 } while (0)
 
-#define SWITCH4(_C_, _TEMPLATE_) \
+#define SWITCH4(c, template) \
 do { \
-	switch ((_C_)) { \
+	switch ((c)) { \
 	case 'n': \
-	case 'l': _TEMPLATE_(l); break; \
-	case 'i': _TEMPLATE_(i); break; \
-	case 'd': _TEMPLATE_(d); break; \
-	case 'z': _TEMPLATE_(z); break; \
+	case 'l': template(l); break; \
+	case 'i': template(i); break; \
+	case 'd': template(d); break; \
+	case 'z': template(z); break; \
 	default: break; \
 	} \
 } while (0)
 
-#define SWITCH5(_C_, _TEMPLATE_) \
+#define SWITCH5(c, template) \
 do { \
-	switch ((_C_)) { \
-	case 'n': _TEMPLATE_(n); break; \
-	case 'l': _TEMPLATE_(l); break; \
-	case 'i': _TEMPLATE_(i); break; \
-	case 'd': _TEMPLATE_(d); break; \
-	case 'z': _TEMPLATE_(z); break; \
+	switch ((c)) { \
+	case 'n': template(n); break; \
+	case 'l': template(l); break; \
+	case 'i': template(i); break; \
+	case 'd': template(d); break; \
+	case 'z': template(z); break; \
 	default: break; \
 	} \
 } while (0)

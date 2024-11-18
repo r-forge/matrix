@@ -161,7 +161,7 @@ SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
 
 	R_xlen_t l = 0, l_;
-	int b, i, j;
+	int b = 0, i, j;
 	int_fast64_t k;
 
 	int byrow = class[2] == 'R',
@@ -496,7 +496,7 @@ SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 	double *po_d = (TYPEOF(o) == REALSXP) ? REAL(o) : NULL;
 
 	int l = 0, l_;
-	int b, i, j;
+	int b = 0, i, j;
 
 	int byrow = class[2] == 'R',
 		sy = class[1] == 's', he = sy && ct == 'C',

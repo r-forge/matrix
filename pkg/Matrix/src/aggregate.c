@@ -14,7 +14,8 @@ SEXP sparse_aggregate(SEXP from, const char *class)
 		Rf_error(_("number of triplets to be aggregated exceeds %s"),
 		         "2^31-1");
 	PROTECT(i0);
-	SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), i1, j1, to;
+	SEXP j0 = PROTECT(GET_SLOT(from, Matrix_jSym)), i1, j1,
+		to = R_NilValue;
 	int *pi0 = INTEGER(i0), *pi1 = NULL,
 		*pj0 = INTEGER(j0), *pj1 = NULL,
 		*pdim = DIM(from), m = pdim[0], n = pdim[1],
