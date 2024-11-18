@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-11-16 r5036)}{
+\section{Changes in version 1.8-0 (2024-11-18 r5045)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
@@ -109,6 +109,12 @@
 
       \item \code{diag(<ndenseMatrix>)} replaces \code{NA} with
       \code{TRUE}.
+
+      \item If the exact result of \code{prod(dim(x))} is not
+      representable in double precision, then the result of
+      \code{length(x)} is truncated towards zero and gets an attribute
+      \code{off} such that the exact result of \code{length(x) + off}
+      is the exact result of \code{prod(dim(x))}.
     }
   }
   \subsection{Misc}{

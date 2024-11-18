@@ -155,17 +155,17 @@ setMethod("dim<-", c(x = "sparseVector", value = "numeric"),
 for (.cl in c("Matrix", "MatrixFactorization"))
 setMethod("length", c(x = .cl),
           function(x)
-              if ((r <- prod(x@Dim)) > .Machine[["integer.max"]])
-                  r
-              else as.integer(r))
+              .Call(R_Dim_prod, x@Dim))
 
 setMethod("length", c(x = "sparseVector"),
-          function(x)
-              if (is.integer(r <- x@length))
+          function(x) {
+              r <- x@length
+              if (is.integer(r))
                   r
               else if (r - 1 < .Machine[["integer.max"]])
                   as.integer(r)
-              else trunc(r))
+              else trunc(r)
+          })
 
 rm(.cl)
 

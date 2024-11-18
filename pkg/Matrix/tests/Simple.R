@@ -1590,6 +1590,20 @@ for(n in 0:7) {
     }
 }
 
+## length(x) where product of nrow(x) and ncol(x) is not exactly
+## representable in double precision:
+x <- new("ngTMatrix", Dim = rep(as.integer(0x1p+31-1), 2L))
+stopifnot(identical(length(x), structure(0x1p+62 - 0x1p+32, off = 1)))
+## On the other hand:
+y <- new("ngTMatrix", Dim = rep(as.integer(0x1p+30), 2L))
+stopifnot(identical(length(y), 0x1p+60)) # big but representable
+                                         # ==> no attribute
+
+
+
+
+
+
 ## Platform - and other such info -- so we find it in old saved outputs
 .libPaths()
 SysI <- Sys.info()

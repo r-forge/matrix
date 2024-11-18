@@ -32,6 +32,7 @@ SEXP R_sparse_prod(SEXP, SEXP);
 SEXP R_sparse_aggregate(SEXP);
 
 /* attrib.c : */
+SEXP R_Dim_prod(SEXP);
 SEXP R_DimNames_is_symmetric(SEXP);
 SEXP R_symDN(SEXP);
 SEXP R_set_factor(SEXP, SEXP, SEXP, SEXP);
@@ -324,6 +325,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_aggregate, 1),
 
 	/* attrib.c : */
+	CALL_METHOD(R_Dim_prod, 1),
 	CALL_METHOD(R_DimNames_is_symmetric, 1),
 	CALL_METHOD(R_symDN, 1),
 	CALL_METHOD(R_set_factor, 4),
