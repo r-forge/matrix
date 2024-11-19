@@ -10,76 +10,59 @@ function(i) {
 
 .subscript.recycle <-
 function(i, n, pattern) {
-    ## Return integer or double vector corresponding
-    ## to [nl]sparseVector 'i' recycled to length 'n' :
+    ## Return what would be the result of seq_len(n)[as.vector(i)] for
+    ## 'i' of class nsparseVector (pattern = TRUE) or lsparseVector;
+    ## n = 0,...,(2^31-1)^2.
     if (length(i.i <- i@i) == 0L)
         integer(0L)
     else if ((i.length <- length(i)) >= n) {
-        if (i.length > n) {
-            if (n < 0x1p+53) {
-                if (i.i[length(i.i)] >= n + 1)
-                    i.i[i.i >= n + 1] <- NA
-            } else {
-                if (i.i[length(i.i)] > n)
-                    i.i[i.i > n] <- NA
-            }
-        }
+        if (i.length > n && i.i[length(i.i)] - 1L >= n)
+            i.i[i.i - 1L >= n] <- NA
         if (pattern) i.i else i.i[i@x]
     }
     else {
         r <- ceiling(n / i.length)
-        n. <- r * i.length
-        i.i <-
-            if (n. <= .Machine$integer.max)
-                rep.int(as.integer(i.i), r) +
-                    rep(seq.int(from = 0L,
-                                by = as.integer(i.length),
-                                length.out = r),
-                        each = length(i.i))
-            else if (i.i[length(i.i)] + (r - 1) * i.length <= 0x1p+53)
-                rep.int(as.double(i.i), r) +
-                    rep(seq.int(from = 0,
-                                by = as.double(i.length),
-                                length.out = r),
-                        each = length(i.i))
-            else stop(gettextf("recycled %s would have maximal index exceeding %s",
-                               "[nl]sparseVector", "2^53"),
-                      domain = NA)
-        if (pattern) {
-            if (n. > n) i.i[      i.i <= n] else i.i
-        } else {
-            if (n. > n) i.i[i@x & i.i <= n] else i.i[i@x]
+        as. <- if (r * i.length - 1 < .Machine[["integer.max"]])
+                   as.integer
+               else as.double
+        J <- as.(i.i) - 1L # go to 0-based
+        J <- rep.int(J, r) +
+            rep(as.(seq.int(from = 0L, by = i.length, length.out = r)),
+                each = length(J))
+        J <- if (pattern)
+                 (if (J[length(J)] >= n) J[      J < n] else J     )
+             else
+                 (if (J[length(J)] >= n) J[i@x & J < n] else J[i@x])
+        if (J[length(J)] >= 0x1p+53) {
+            ## Elements of 'J' may be the result of rounding a
+            ## non-representable number; no obvious way (in R)
+            ## to handle this possibility, hence:
+            warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
+                    domain = NA)
+            J[J >= 0x1p+53] <- NA
         }
+        J + 1L # return to 1-based
     }
 }
 
 ## x[i] where 'i' is NULL or any vector or sparseVector
 .subscript.1ary <-
 function(x, i) {
-    x.length <- prod(x@Dim)
+    x.length <- length(x)
     if (is.null(i))
         i <- integer(0L)
     else if (isS4(i)) {
-        if (!.isVector(i))
+        if (!.isVector(i) || (kind <- .M.kind(i)) == "z")
             stop(.subscript.invalid(i), domain = NA)
-        kind <- .M.kind(i)
-        if ((pattern <- kind == "n") || kind == "l") {
-            ## [nl]sparseVector
-            i <- .subscript.recycle(i, x.length, pattern)
-            return(..subscript.1ary(x, i, unsorted = !pattern && anyNA(i)))
+        if (kind == "i" || kind == "d")
+            i <- i@x
+        else {
+            i <- .subscript.recycle(i, x.length, kind == "n")
+            return(..subscript.1ary(x, i, unsorted = kind == "l" && anyNA(i)))
         }
-        i <- i@x
     }
     switch(typeof(i),
-           double =
-               {
-                   r <- min(1, i, na.rm = TRUE)
-                   if (r < 1)
-                       i <- if (r <= -1)
-                                seq_len(x.length)[i] # FIXME
-                            else i[i >= 1]
-                   ..subscript.1ary(x, i)
-               },
+           double =,
            integer =
                {
                    r <- min(1L, i, na.rm = TRUE)
@@ -91,7 +74,8 @@ function(x, i) {
                },
            logical =
                {
-                   if ((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
+                   i.length <- length(i)
+                   if (i.length > 0L && !is.na(a <- all(i)) && a) {
                        if (i.length <= x.length)
                            as.vector(x)
                        else c(as.vector(x), rep.int(NA, i.length - x.length))
@@ -100,13 +84,13 @@ function(x, i) {
                },
            character =
                {
-                   rep.int(if (.hasSlot(x, "x")) x@x[NA_integer_] else NA,
+                   rep.int(if (.M.kind(x) == "n") NA else x@x[NA_integer_],
                            length(i))
                },
            stop(.subscript.invalid(i), domain = NA))
 }
 
-## x[i] where 'i' is vector of type "integer" or "double"
+## x[i] where 'i' is a vector of type "integer" or "double"
 ## with elements greater than or equal to 1 (or NA)
 ..subscript.1ary <-
 function(x, i,
@@ -114,11 +98,11 @@ function(x, i,
          repr = .M.repr(x),
          unsorted = is.unsorted(i)) {
     if (repr == "R" || ((repr == "C" || repr == "T") && shape == "s")) {
-        x.length <- prod(d <- x@Dim)
+        x.length <- length(x)
         if (x.length <= 0x1p+53) {
             r <- max(x.length, i, na.rm = TRUE)
-            if (r > x.length)
-                i[i > x.length] <- NA
+            if (r - 1L >= x.length)
+                i[i - 1L >= x.length] <- NA
         }
         else if (is.double(i)) {
             r <- max(0x1p+53, i, na.rm = TRUE)
@@ -131,7 +115,7 @@ function(x, i,
             }
         }
         i1s <- i - 1L
-        m <- d[1L]
+        m <- x@Dim[1L]
         i. <- as.integer(i1s %% m)
         j. <- as.integer(i1s %/% m)
         if (shape == "s") {
@@ -148,28 +132,23 @@ function(x, i,
     o <-
     if (repr == "R")
         order(i., j.)
-    else if ((repr == "C" || repr == "T") && (is.na(unsorted) || unsorted))
+    else if ((repr == "C" || repr == "T") &&
+             (is.na(unsorted) || unsorted))
         (if (shape == "s") order(j., i.) else sort.list(i))
     .Call(R_subscript_1ary, x, i, o)
 }
 
 ## x[i] where 'i' is any array or Matrix
-.subscript.1ary.arr <-
+.subscript.1ary.2col <-
 function(x, i) {
     if (isS4(i)) {
-        if (!.isMatrix(i))
+        if (!.isMatrix(i) || (kind <- .M.kind(i)) == "z")
             stop(.subscript.invalid(i), domain = NA)
-        if ((logic <- any(.M.kind(i) == c("n", "l"))) || i@Dim[2L] != 2L) {
-            if (logic && all(i@Dim) && !is.na(a <- all(i)) && a) {
-                x <- as.vector(x)
-                if ((i.length <- length(i)) <= (x.length <- length(x)))
-                    return(x)
-                else return(c(x, rep.int(NA, i.length - x.length)))
-            }
+        if (kind == "n" || kind == "l" || i@Dim[2L] != 2L) {
             i <- if (.isDense(i)) .M2v(i) else .M2V(i)
             return(.subscript.1ary(x, i))
         }
-        i <- as(i, "matrix")
+        i <- .M2m(i)
     }
     else if (is.logical(i) || length(di <- dim(i)) != 2L || di[2L] != 2L)
         return(.subscript.1ary(x, i))
@@ -178,47 +157,46 @@ function(x, i) {
            integer =
                {
                    storage.mode(i) <- "integer"
-                   if (min(1L, i, na.rm = TRUE) < 1L)
+                   if (min(0L, i, na.rm = TRUE) <= -1L)
                        stop("negative values are not allowed in a matrix subscript")
                    dx <- x@Dim
                    m <- dx[1L]
                    n <- dx[2L]
-                   if (m == n) {
-                       if (max(n, i, na.rm = TRUE) > n)
-                           stop("subscript out of bounds")
-                   } else {
-                       if (max(m, i[, 1L], na.rm = TRUE) > m ||
-                          max(n, i[, 2L], na.rm = TRUE) > n)
-                           stop("subscript out of bounds")
-                   }
-                   ## * rows containing 0 are deleted
-                   ## * rows containing NA are kept
-                   ## * rows containing both 0 and NA are handled
-                   ##   according to value in first column
-                   if (is.na(a <- all(i. <- i[, 1L])) || !a)
+                   i. <- i[, 1L]
+                   j. <- i[, 2L]
+                   if (max(m, i., na.rm = TRUE) > m ||
+                       max(n, j., na.rm = TRUE) > n)
+                       stop("subscript out of bounds")
+                   ## rows containing 0 are deleted;
+                   ## rows containing NA are kept;
+                   ## rows containing both 0 and NA are handled
+                   ## according to value in first column
+                   if (is.na(a <- all(i.)) || !a)
                        i <- i[i. > 0L, , drop = FALSE]
-                   if (!all(j. <- i[, 2L], na.rm = TRUE))
+                   if (!all(j., na.rm = TRUE))
                        i <- i[j. > 0L, , drop = FALSE]
-                   ..subscript.1ary.arr(x, i)
+                   ..subscript.1ary.2col(x, i)
                },
            character =
                {
                    dnx <- dimnames(x)
-                   m <- c(match(i[, 1L], dnx[[1L]]), match(i[, 2L], dnx[[2L]]))
+                   m <- c(match(i[, 1L], dnx[[1L]]),
+                          match(i[, 2L], dnx[[2L]]))
                    dim(m) <- di
                    if (any(!rowSums(is.na(i)) & rowSums(is.na(m))))
-                       ## error if character row contains zero NA and
-                       ## integer row contains at least one NA,
-                       ## indicating non-match that should not be ignored
+                       ## error if character row contains zero NA
+                       ## and integer row contains at least one NA,
+                       ## indicating non-match that should not be
+                       ## ignored
                        stop("subscript out of bounds")
-                   ..subscript.1ary.arr(x, m)
+                   ..subscript.1ary.2col(x, m)
                },
            stop(.subscript.invalid(i), domain = NA))
 }
 
 ## x[i] where 'i' is a 2-column matrix of type "integer"
 ## with i[, 1L] in 1:m (or NA) and i[, 2L] in 1:n (or NA)
-..subscript.1ary.arr <-
+..subscript.1ary.2col <-
 function(x, i,
          shape = .M.shape(x),
          repr = .M.repr(x)) {
@@ -252,51 +230,40 @@ function(x, i, j, drop) {
     d <- x@Dim
     l <- list(if (missing(i)) NULL else if (is.null(i)) integer(0L) else i,
               if (missing(j)) NULL else if (is.null(j)) integer(0L) else j)
-    for (pos in 1:2) {
-        if (!is.null(k <- l[[pos]])) {
-            l[pos] <- list(
-                switch(typeof(k),
-                       double =
-                           {
-                               r <- d[pos]
-                               if (max(r, k, na.rm = TRUE) >= r + 1)
-                                   stop("subscript out of bounds")
-                               if (min(1, k, na.rm = TRUE) < 1)
-                                   seq_len(r)[k]
-                               else as.integer(k)
-                           },
-                       integer =
-                           {
-                               r <- d[pos]
-                               if (max(r, k, na.rm = TRUE) > r)
-                                   stop("subscript out of bounds")
-                               if (min(1L, k, na.rm = TRUE) < 1L)
-                                   seq_len(r)[k]
-                               else k
-                           },
-                       logical =
-                           {
-                               r <- d[pos]
-                               if (length(k) > r)
-                                   stop("logical subscript too long")
-                               if (length(k) && !is.na(a <- all(k)) && a)
-                                   NULL
-                               else seq_len(r)[k]
-                           },
-                       character =
-                           {
-                               if (length(k) == 0L)
-                                   integer(0L)
-                               else if (is.null(nms <- dimnames(x)[[pos]]) ||
-                                       anyNA(k <- match(k, nms)))
-                                   stop("subscript out of bounds")
-                               else k
-                           },
-                       stop(.subscript.invalid(k), domain = NA)))
-        }
-    }
+    for (pos in 1:2)
+        if (!is.null(k <- l[[pos]]))
+            l[pos] <-
+            list(switch(typeof(k),
+                        double =,
+                        integer =
+                            {
+                                r <- d[pos]
+                                if (max(r, k, na.rm = TRUE) - 1L >= r)
+                                    stop("subscript out of bounds")
+                                if (min(1L, k, na.rm = TRUE) < 1L)
+                                    seq_len(r)[k]
+                                else as.integer(k)
+                            },
+                        logical =
+                            {
+                                r <- d[pos]
+                                if (length(k) > r)
+                                    stop("logical subscript too long")
+                                if (length(k) > 0L && !is.na(a <- all(k)) && a)
+                                    NULL
+                                else seq_len(r)[k]
+                            },
+                        character =
+                            {
+                                if (is.null(nms <- dimnames(x)[[pos]]) ||
+                                    anyNA(k <- match(k, nms)))
+                                    stop("subscript out of bounds")
+                                else k
+                            },
+                        stop(.subscript.invalid(k), domain = NA)))
     if (is.double(lengths(l, use.names = FALSE)))
-        stop(gettextf("dimensions cannot exceed %s", "2^31-1"), domain = NA)
+        stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
+             domain = NA)
     ..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
 }
 
@@ -317,7 +284,7 @@ function(x, i, j, drop) {
         r@Dimnames <- dn
     }
     if ((is.na(drop) || drop) && any(r@Dim == 1L))
-        drop(as(r, "matrix"))
+        drop(.M2m(r))
     else r
 }
 
@@ -442,7 +409,7 @@ setMethod("[",
               na <- nargs()
               if (na == 2L)
                   ## x[i=]
-                  .subscript.1ary.arr(x, i)
+                  .subscript.1ary.2col(x, i)
               else if (na == 3L)
                   ## x[i=, ], x[, i=]
                   .subscript.2ary(x, i, , drop = TRUE)
@@ -487,110 +454,76 @@ setMethod("[",
           function(x, i, j, ..., drop = TRUE) {
               if (nargs() != 2L)
                   stop("incorrect number of dimensions")
-              x.length <- length(x)
               pattern <- .M.kind(x) == "n"
+              x.length <- length(x)
               switch(typeof(i),
-                     double =
-                         {
-                             r <- min(1, i, na.rm = TRUE)
-                             if (r <= -1) {
-                                 if (r <= -x.length - 1)
-                                     i <- i[i > -x.length - 1]
-                                 r <- max(-1, i)
-                                 if (is.na(r) || r >= 1)
-                                     stop("only zeros may be mixed with negative subscripts")
-                                 if (r > -1)
-                                     i <- i[i <= -1]
-                                 d <- unique.default(sort.int(-trunc(i)))
-                                 k <- match(x@i, d, 0L) == 0L
-                                 x@length <- length(x) - length(d)
-                                 x@i <-
-                                     {
-                                         tmp <- x@i[k]
-                                         tmp - findInterval(tmp, d) # !!
-                                     }
-                                 if (!pattern)
-                                     x@x <- x@x[k]
-                             } else {
-                                 if (r < 1)
-                                     i <- i[i >= 1]
-                                 if (max(0, i, na.rm = TRUE) >= x.length + 1)
-                                     i[i >= x.length + 1] <- NA
-                                 if ((a <- anyNA(i)) && pattern) {
-                                     x <- .V2kind(x, "l")
-                                     pattern <- FALSE
-                                 }
-                                 j <- match(trunc(i), x@i, 0L)
-                                 x@length <- length(i)
-                                 x@i <-
-                                     if (!a)
-                                         which(j != 0L)
-                                     else {
-                                         i. <- is.na(i)
-                                         j[i.] <- NA
-                                         which(j != 0L | i.)
-                                     }
-                                 if (!pattern)
-                                     x@x <- x@x[j]
-                             }
-                             x
-                         },
+                     double =,
                      integer =
                          {
+                             trunc. <-
+                             function(x)
+                                 if (is.double(x)) trunc(x) else x
+                             x.i <- trunc.(x@i)
                              r <- min(1L, i, na.rm = TRUE)
                              if (r <= -1L) {
-                                 if (r < -x.length)
-                                     i <- i[i >= -x.length]
+                                 if (r <= -x.length - 1L)
+                                     i <- i[i > -x.length - 1L]
                                  r <- max(-1L, i)
                                  if (is.na(r) || r >= 1L)
                                      stop("only zeros may be mixed with negative subscripts")
                                  if (r > -1L)
                                      i <- i[i <= -1L]
-                                 d <- unique.default(sort.int(-i))
-                                 k <- is.na(match(x@i, d))
+                                 d <- unique.default(sort.int(-trunc.(i)))
+                                 m <- match(x.i, d, 0L)
                                  x@length <- length(x) - length(d)
                                  x@i <-
                                      {
-                                         tmp <- x@i[k]
+                                         tmp <- x.i[m == 0L]
                                          tmp - findInterval(tmp, d) # !!
                                      }
                                  if (!pattern)
-                                     x@x <- x@x[k]
+                                     x@x <- x@x[m == 0L]
                              } else {
                                  if (r < 1L)
                                      i <- i[i >= 1L]
-                                 if (max(0L, i, na.rm = TRUE) > x.length)
-                                     i[i > x.length] <- NA
+                                 if (max(0L, i, na.rm = TRUE) - 1L >= x.length)
+                                     i[i - 1L >= x.length] <- NA
                                  if ((a <- anyNA(i)) && pattern) {
                                      x <- .V2kind(x, "l")
                                      pattern <- FALSE
                                  }
-                                 j <- match(i, x@i, 0L)
+                                 d <- trunc.(i)
+                                 m <- match(d, x.i, 0L)
                                  x@length <- length(i)
                                  x@i <-
                                      if (!a)
-                                         which(j != 0L)
+                                         which(m != 0L)
                                      else {
                                          i. <- is.na(i)
-                                         j[i.] <- NA
-                                         which(j != 0L | i.)
+                                         m[i.] <- NA
+                                         which(m != 0L | i.)
                                      }
                                  if (!pattern)
-                                     x@x <- x@x[j]
+                                     x@x <- x@x[m]
                              }
                              x
                          },
                      logical =
                          {
-                             if ((i.length <- length(i)) && !is.na(a <- all(i)) && a) {
-                                 if (i.length > x.length) {
-                                     if (pattern)
+                             i.length <- length(i)
+                             if (i.length > 0L && !is.na(a <- all(i)) && a) {
+                                 if (i.length <= x.length)
+                                     x
+                                 else {
+                                     if (pattern) {
                                          x <- .V2kind(x, "l")
+                                         pattern <- FALSE
+                                     }
                                      x@length <- i.length
                                      x@i <- c(x@i, (x.length + 1):i.length)
                                      x@x <- c(x@x, rep.int(NA, i.length - x.length))
+                                     x
                                  }
-                                 x
                              }
                              else x[.m2V(i)] # recursively
                          },
