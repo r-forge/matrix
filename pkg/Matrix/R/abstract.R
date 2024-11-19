@@ -336,8 +336,8 @@ setMethod("as.vector" , c(x = "abIndex"),
 
 ## For that, we really  need  "[" and/or  "rep"() methods -- TODO --
 ##
-setMethod("[", c(x = "abIndex", i = "index"),
-	  function (x, i, j, ..., drop)
+setMethod("[", c(x = "abIndex", i = "ANY", j = "missing", drop = "missing"),
+	  function (x, i, j, ..., drop = TRUE)
       {
           switch(x@kind,
 		 "rleDiff" = {
@@ -353,7 +353,7 @@ setMethod("[", c(x = "abIndex", i = "index"),
                  },
                  "int32" =, "double" =
                  ## as it's not rle-packed, can remain simple:
-                 x@x[i])
+                 if (missing(i)) x@x[] else x@x[i])
       })
 
 ##' Endpoints of all linear stretches -- auxiliary for range(.)

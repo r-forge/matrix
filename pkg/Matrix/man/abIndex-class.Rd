@@ -7,7 +7,7 @@
 \alias{abIndex-class}
 \alias{seqMat-class} % not yet documented {unexported}
 %
-\alias{[,abIndex,index,ANY,ANY-method}
+\alias{[,abIndex,ANY,missing,missing-method}
 \alias{Arith,abIndex,abIndex-method}
 \alias{Arith,abIndex,numLike-method}
 \alias{Arith,numLike,abIndex-method}
