@@ -23,7 +23,6 @@
 \alias{[,Matrix,missing,missing,logical-method}
 \alias{[,Matrix,missing,missing,missing-method}
 \alias{[,Matrix,nMatrix,missing,missing-method}
-\alias{[,abIndex,index,ANY,ANY-method}
 \alias{[,sparseVector,NULL,ANY,ANY-method}
 \alias{[,sparseVector,index,missing,missing-method}
 \alias{[,sparseVector,lsparseVector,missing,missing-method}

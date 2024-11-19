@@ -7,6 +7,7 @@
 \alias{abIndex-class}
 \alias{seqMat-class} % not yet documented {unexported}
 %
+\alias{[,abIndex,index,ANY,ANY-method}
 \alias{Arith,abIndex,abIndex-method}
 \alias{Arith,abIndex,numLike-method}
 \alias{Arith,numLike,abIndex-method}
@@ -14,6 +15,9 @@
 \alias{Ops,abIndex,ANY-method}
 \alias{Ops,abIndex,abIndex-method}
 \alias{Summary,abIndex-method}
+\alias{all.equal,abIndex,abIndex-method}
+\alias{all.equal,abIndex,numLike-method}
+\alias{all.equal,numLike,abIndex-method}
 \alias{as.integer,abIndex-method}
 \alias{as.numeric,abIndex-method}
 \alias{as.vector,abIndex-method}
@@ -24,6 +28,9 @@
 \alias{coerce,logical,abIndex-method}
 \alias{coerce,numeric,abIndex-method}
 \alias{drop,abIndex-method}
+\alias{is.finite,abIndex-method}
+\alias{is.infinite,abIndex-method}
+\alias{is.na,abIndex-method}
 \alias{length,abIndex-method}
 \alias{show,abIndex-method}
 %

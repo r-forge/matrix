@@ -29,7 +29,6 @@
 \alias{is.na,CsparseMatrix-method}
 \alias{is.na,RsparseMatrix-method}
 \alias{is.na,TsparseMatrix-method}
-\alias{is.na,abIndex-method}
 \alias{is.na,denseMatrix-method}
 \alias{is.na,diagonalMatrix-method}
 \alias{is.na,indMatrix-method}
@@ -46,17 +45,14 @@
 \alias{is.infinite,CsparseMatrix-method}
 \alias{is.infinite,RsparseMatrix-method}
 \alias{is.infinite,TsparseMatrix-method}
-\alias{is.infinite,abIndex-method}
 \alias{is.infinite,denseMatrix-method}
 \alias{is.infinite,diagonalMatrix-method}
 \alias{is.infinite,indMatrix-method}
-\alias{is.infinite,sparseMatrix-method}
 \alias{is.infinite,sparseVector-method}
 %
 \alias{is.finite,CsparseMatrix-method}
 \alias{is.finite,RsparseMatrix-method}
 \alias{is.finite,TsparseMatrix-method}
-\alias{is.finite,abIndex-method}
 \alias{is.finite,denseMatrix-method}
 \alias{is.finite,diagonalMatrix-method}
 \alias{is.finite,indMatrix-method}

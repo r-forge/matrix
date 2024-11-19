@@ -13,9 +13,6 @@
 \alias{all.equal,Matrix,Matrix-method}
 \alias{all.equal,Matrix,sparseVector-method}
 \alias{all.equal,Matrix,vector-method}
-\alias{all.equal,abIndex,abIndex-method}
-\alias{all.equal,abIndex,numLike-method}
-\alias{all.equal,numLike,abIndex-method}
 \alias{all.equal,sparseVector,Matrix-method}
 \alias{all.equal,sparseVector,sparseVector-method}
 \alias{all.equal,sparseVector,vector-method}
