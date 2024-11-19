@@ -274,20 +274,65 @@ VALID_MATRIX, VALID_VECTOR
 
 /* What we want declared "everywhere" : */
 
-/* Often used symbols, declared in ./init.c */
-extern
-#include "Msymbols.h"
+extern SEXP
+	Matrix_DimNamesSym,
+	Matrix_DimSym,
+	Matrix_LSym,
+	Matrix_RSym,
+	Matrix_USym,
+	Matrix_VSym,
+	Matrix_betaSym,
+	Matrix_colcountSym,
+	Matrix_diagSym,
+	Matrix_factorsSym,
+	Matrix_iSym,
+	Matrix_isllSym,
+	Matrix_ismtSym,
+	Matrix_jSym,
+	Matrix_kindSym,
+	Matrix_lengthSym,
+	Matrix_logarithmSym,
+	Matrix_marginSym,
+	Matrix_maxcsizeSym,
+	Matrix_maxesizeSym,
+	Matrix_minorSym,
+	Matrix_nextSym,
+	Matrix_nzSym,
+	Matrix_offSym,
+	Matrix_orderingSym,
+	Matrix_pSym,
+	Matrix_permSym,
+	Matrix_piSym,
+	Matrix_prevSym,
+	Matrix_pxSym,
+	Matrix_qSym,
+	Matrix_sSym,
+	Matrix_sdSym,
+	Matrix_superSym,
+	Matrix_transSym,
+	Matrix_uploSym,
+	Matrix_valuesSym,
+	Matrix_vectorsSym,
+	Matrix_xSym,
+	Matrix_LChar,
+	Matrix_TChar,
+	Matrix_UChar;
 
-/* Often used numbers, declared in ./init.c */
-extern
-Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna; /* 0+0i, 1+0i, NA+NAi */
+extern Rcomplex
+	Matrix_zzero,
+	Matrix_zunit,
+	Matrix_zna;
 
-/* Often used arrays of nonvirtual class names, declared in ./objects.c */
-extern
-const char *valid_dense[], *valid_sparse[],
-	*valid_sparse_compressed[], *valid_sparse_triplet[],
-	*valid_diagonal[], *valid_index[],
-	*valid_matrix[], *valid_vector[], *valid_matrix_or_vector[];
+extern const char
+	*valid_dense[],
+	*valid_sparse[],
+	*valid_sparse_compressed[],
+	*valid_sparse_triplet[],
+	*valid_diagonal[],
+	*valid_index[],
+	*valid_matrix[],
+	*valid_vector[],
+	*valid_matrix_or_vector[];
 
 #if R_VERSION < R_Version(4, 5, 0)
 int ANY_ATTRIB(SEXP);

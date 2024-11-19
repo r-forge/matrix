@@ -13,15 +13,12 @@ SEXP det(double modulus, int logarithm, int sign)
 		ans = PROTECT(Rf_allocVector(VECSXP, 2)),
 		class = PROTECT(Rf_allocVector(STRSXP, 1)),
 		names = PROTECT(Rf_allocVector(STRSXP, 2));
-	static SEXP logarithmSym = NULL;
-	if (!logarithmSym)
-		logarithmSym = Rf_install("logarithm");
 	SET_STRING_ELT(class, 0, Rf_mkChar("det"));
 	SET_STRING_ELT(names, 0, Rf_mkChar("modulus"));
 	SET_STRING_ELT(names, 1, Rf_mkChar("sign"));
 	Rf_setAttrib(ans, R_ClassSymbol, class);
 	Rf_setAttrib(ans, R_NamesSymbol, names);
-	Rf_setAttrib(s_modulus, logarithmSym, s_logarithm);
+	Rf_setAttrib(s_modulus, Matrix_logarithmSym, s_logarithm);
 	SET_VECTOR_ELT(ans, 0, s_modulus);
 	SET_VECTOR_ELT(ans, 1, s_sign);
 	UNPROTECT(6);

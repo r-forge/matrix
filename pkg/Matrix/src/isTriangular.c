@@ -181,13 +181,10 @@ SEXP R_dense_is_triangular(SEXP s_obj, SEXP s_upper)
 	SEXP ans = Rf_allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
 	if (up == NA_LOGICAL && ans_ != 0) {
+		SEXP kind;
 		PROTECT(ans);
-		static
-		SEXP kindSym = NULL;
-		SEXP kindVal = PROTECT(Rf_mkString((ans_ > 0) ? "U" : "L"));
-		if (!kindSym)
-			kindSym = Rf_install("kind");
-		Rf_setAttrib(ans, kindSym, kindVal);
+		PROTECT(kind = Rf_mkString((ans_ > 0) ? "U" : "L"));
+		Rf_setAttrib(ans, Matrix_kindSym, kind);
 		UNPROTECT(2);
 	}
 	UNPROTECT(1);
@@ -207,13 +204,10 @@ SEXP R_sparse_is_triangular(SEXP s_obj, SEXP s_upper)
 	SEXP ans = Rf_allocVector(LGLSXP, 1);
 	LOGICAL(ans)[0] = ans_ != 0;
 	if (up == NA_LOGICAL && ans_ != 0) {
+		SEXP kind;
 		PROTECT(ans);
-		static
-		SEXP kindSym = NULL;
-		SEXP kindVal = PROTECT(Rf_mkString((ans_ > 0) ? "U" : "L"));
-		if (!kindSym)
-			kindSym = Rf_install("kind");
-		Rf_setAttrib(ans, kindSym, kindVal);
+		PROTECT(kind = Rf_mkString((ans_ > 0) ? "U" : "L"));
+		Rf_setAttrib(ans, Matrix_kindSym, kind);
 		UNPROTECT(2);
 	}
 	return ans;

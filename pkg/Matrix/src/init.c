@@ -593,8 +593,54 @@ static const R_ExternalMethodDef ExternalMethodTable[] = {
 	{NULL, NULL, 0}
 };
 
-#include "Msymbols.h"
-Rcomplex Matrix_zzero, Matrix_zunit, Matrix_zna;
+SEXP
+	Matrix_DimNamesSym,
+	Matrix_DimSym,
+	Matrix_LSym,
+	Matrix_RSym,
+	Matrix_USym,
+	Matrix_VSym,
+	Matrix_betaSym,
+	Matrix_colcountSym,
+	Matrix_diagSym,
+	Matrix_factorsSym,
+	Matrix_iSym,
+	Matrix_isllSym,
+	Matrix_ismtSym,
+	Matrix_jSym,
+	Matrix_kindSym,
+	Matrix_lengthSym,
+	Matrix_logarithmSym,
+	Matrix_marginSym,
+	Matrix_maxcsizeSym,
+	Matrix_maxesizeSym,
+	Matrix_minorSym,
+	Matrix_nextSym,
+	Matrix_nzSym,
+	Matrix_offSym,
+	Matrix_orderingSym,
+	Matrix_pSym,
+	Matrix_permSym,
+	Matrix_piSym,
+	Matrix_prevSym,
+	Matrix_pxSym,
+	Matrix_qSym,
+	Matrix_sSym,
+	Matrix_sdSym,
+	Matrix_superSym,
+	Matrix_transSym,
+	Matrix_uploSym,
+	Matrix_valuesSym,
+	Matrix_vectorsSym,
+	Matrix_xSym,
+	Matrix_LChar,
+	Matrix_TChar,
+	Matrix_UChar;
+
+Rcomplex
+	Matrix_zzero,
+	Matrix_zunit,
+	Matrix_zna;
 
 void attribute_visible R_init_Matrix(DllInfo *info)
 {
@@ -664,42 +710,45 @@ void attribute_visible R_init_Matrix(DllInfo *info)
 	REGISTER(cholmod_factor_ldetA);
 	REGISTER(cholmod_factor_update);
 
-	Matrix_DimNamesSym = Rf_install("Dimnames");
-	Matrix_DimSym      = Rf_install("Dim");
-	Matrix_LSym        = Rf_install("L");
-	Matrix_RSym        = Rf_install("R");
-	Matrix_USym        = Rf_install("U");
-	Matrix_VSym        = Rf_install("V");
-	Matrix_betaSym     = Rf_install("beta");
-	Matrix_colcountSym = Rf_install("colcount");
-	Matrix_diagSym     = Rf_install("diag");
-	Matrix_factorsSym  = Rf_install("factors");
-	Matrix_iSym        = Rf_install("i");
-	Matrix_isllSym     = Rf_install("is_ll");
-	Matrix_ismtSym     = Rf_install("is_monotonic");
-	Matrix_jSym        = Rf_install("j");
-	Matrix_lengthSym   = Rf_install("length");
-	Matrix_marginSym   = Rf_install("margin");
-	Matrix_maxcsizeSym = Rf_install("maxcsize");
-	Matrix_maxesizeSym = Rf_install("maxesize");
-	Matrix_minorSym    = Rf_install("minor");
-	Matrix_nextSym     = Rf_install("next");
-	Matrix_nzSym       = Rf_install("nz");
-	Matrix_orderingSym = Rf_install("ordering");
-	Matrix_pSym        = Rf_install("p");
-	Matrix_permSym     = Rf_install("perm");
-	Matrix_piSym       = Rf_install("pi");
-	Matrix_prevSym     = Rf_install("prev");
-	Matrix_pxSym       = Rf_install("px");
-	Matrix_qSym        = Rf_install("q");
-	Matrix_sSym        = Rf_install("s");
-	Matrix_sdSym       = Rf_install("sd");
-	Matrix_superSym    = Rf_install("super");
-	Matrix_transSym    = Rf_install("trans");
-	Matrix_uploSym     = Rf_install("uplo");
-	Matrix_valuesSym   = Rf_install("values");
-	Matrix_vectorsSym  = Rf_install("vectors");
-	Matrix_xSym        = Rf_install("x");
+	Matrix_DimNamesSym  = Rf_install("Dimnames");
+	Matrix_DimSym       = Rf_install("Dim");
+	Matrix_LSym         = Rf_install("L");
+	Matrix_RSym         = Rf_install("R");
+	Matrix_USym         = Rf_install("U");
+	Matrix_VSym         = Rf_install("V");
+	Matrix_betaSym      = Rf_install("beta");
+	Matrix_colcountSym  = Rf_install("colcount");
+	Matrix_diagSym      = Rf_install("diag");
+	Matrix_factorsSym   = Rf_install("factors");
+	Matrix_iSym         = Rf_install("i");
+	Matrix_isllSym      = Rf_install("is_ll");
+	Matrix_ismtSym      = Rf_install("is_monotonic");
+	Matrix_jSym         = Rf_install("j");
+	Matrix_kindSym      = Rf_install("kind");
+	Matrix_lengthSym    = Rf_install("length");
+	Matrix_logarithmSym = Rf_install("logarithm");
+	Matrix_marginSym    = Rf_install("margin");
+	Matrix_maxcsizeSym  = Rf_install("maxcsize");
+	Matrix_maxesizeSym  = Rf_install("maxesize");
+	Matrix_minorSym     = Rf_install("minor");
+	Matrix_nextSym      = Rf_install("next");
+	Matrix_nzSym        = Rf_install("nz");
+	Matrix_offSym       = Rf_install("off");
+	Matrix_orderingSym  = Rf_install("ordering");
+	Matrix_pSym         = Rf_install("p");
+	Matrix_permSym      = Rf_install("perm");
+	Matrix_piSym        = Rf_install("pi");
+	Matrix_prevSym      = Rf_install("prev");
+	Matrix_pxSym        = Rf_install("px");
+	Matrix_qSym         = Rf_install("q");
+	Matrix_sSym         = Rf_install("s");
+	Matrix_sdSym        = Rf_install("sd");
+	Matrix_superSym     = Rf_install("super");
+	Matrix_transSym     = Rf_install("trans");
+	Matrix_uploSym      = Rf_install("uplo");
+	Matrix_valuesSym    = Rf_install("values");
+	Matrix_vectorsSym   = Rf_install("vectors");
+	Matrix_xSym         = Rf_install("x");
 
 	Matrix_LChar = Rf_mkChar("L");
 	Matrix_TChar = Rf_mkChar("T");

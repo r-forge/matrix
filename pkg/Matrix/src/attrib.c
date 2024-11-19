@@ -4,12 +4,9 @@
 
 SEXP R_Dim_prod(SEXP dim)
 {
-	int m = 0, n = 0;
-	if (TYPEOF(dim) != INTSXP || XLENGTH(dim) != 2 ||
-	    (m = INTEGER(dim)[0]) < 0 || (n = INTEGER(dim)[1]) < 0)
-		Rf_error(_("invalid '%s' to '%s'"), "dim", __func__);
-	int_fast64_t mn = (int_fast64_t) m * n;
 	SEXP ans;
+	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
+	int_fast64_t mn = (int_fast64_t) m * n;
 	if (mn <= INT_MAX) {
 		ans = Rf_allocVector(INTSXP, 1);
 		INTEGER(ans)[0] = (int) mn;
@@ -20,14 +17,15 @@ SEXP R_Dim_prod(SEXP dim)
 		ans = Rf_allocVector(REALSXP, 1);
 		REAL(ans)[0] = (double) mn_;
 		if (mn_ != mn) {
+			SEXP off;
 			PROTECT(ans);
-			static
-			SEXP offSym = NULL;
-			SEXP offVal = PROTECT(Rf_allocVector(REALSXP, 1));
-			if (!offSym)
-				offSym = Rf_install("off");
-			REAL(offVal)[0] = (double) (mn - mn_);
-			Rf_setAttrib(ans, offSym, offVal);
+			PROTECT(off = Rf_allocVector(REALSXP, 1));
+			REAL(off)[0] = (double) (mn - mn_);
+			Rf_setAttrib(ans, Matrix_offSym, off);
+#if 0
+			Rf_warning(_("true length %llu truncated to %llu"),
+			           mn, mn_);
+#endif
 			UNPROTECT(2);
 		}
 	}
