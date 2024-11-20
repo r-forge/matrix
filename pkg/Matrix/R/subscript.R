@@ -12,37 +12,34 @@ function(i) {
 function(i, n, pattern) {
     ## Return what would be the result of seq_len(n)[as.vector(i)] for
     ## 'i' of class nsparseVector (pattern = TRUE) or lsparseVector;
-    ## n = 0,...,(2^31-1)^2.
-    if (length(i.i <- i@i) == 0L)
-        integer(0L)
-    else if ((i.length <- length(i)) >= n) {
-        if (i.length > n && i.i[length(i.i)] - 1L >= n)
-            i.i[i.i - 1L >= n] <- NA
-        if (pattern) i.i else i.i[i@x]
+    ## length(i) < n = 0,...,(2^31-1)^2.
+    i.length <- length(i)
+    if (i.length >= n)
+        stop("should never happen ...")
+    i.i <- i@i
+    if (length(i.i) == 0L)
+        return(integer(0L))
+    r <- ceiling(n / i.length)
+    as. <- if (r * i.length - 1 < .Machine[["integer.max"]])
+               as.integer
+           else as.double
+    J <- as.(i.i) - 1L # go to 0-based
+    J <- rep.int(J, r) +
+        rep(as.(seq.int(from = 0L, by = i.length, length.out = r)),
+            each = length(J))
+    J <- if (pattern)
+             (if (J[length(J)] >= n) J[      J < n] else J     )
+         else
+             (if (J[length(J)] >= n) J[i@x & J < n] else J[i@x])
+    if (J[length(J)] >= 0x1p+53) {
+        ## Elements of 'J' may be the result of rounding a
+        ## non-representable number; no obvious way (in R)
+        ## to handle this possibility, hence:
+        warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
+                domain = NA)
+        J[J >= 0x1p+53] <- NA
     }
-    else {
-        r <- ceiling(n / i.length)
-        as. <- if (r * i.length - 1 < .Machine[["integer.max"]])
-                   as.integer
-               else as.double
-        J <- as.(i.i) - 1L # go to 0-based
-        J <- rep.int(J, r) +
-            rep(as.(seq.int(from = 0L, by = i.length, length.out = r)),
-                each = length(J))
-        J <- if (pattern)
-                 (if (J[length(J)] >= n) J[      J < n] else J     )
-             else
-                 (if (J[length(J)] >= n) J[i@x & J < n] else J[i@x])
-        if (J[length(J)] >= 0x1p+53) {
-            ## Elements of 'J' may be the result of rounding a
-            ## non-representable number; no obvious way (in R)
-            ## to handle this possibility, hence:
-            warning(gettextf("subscripts exceeding %s replaced with NA", "2^53"),
-                    domain = NA)
-            J[J >= 0x1p+53] <- NA
-        }
-        J + 1L # return to 1-based
-    }
+    J + 1L # return to 1-based
 }
 
 ## x[i]
@@ -56,24 +53,25 @@ function(x, i) {
         .isV <- !.isM && .isVector(i)
         if ((!.isM && !.isV) || (kind <- .M.kind(i)) == "z")
             stop(.subscript.invalid(i), domain = NA)
-        if (.isM) {
-            if ((kind == "i" || kind == "d") && i@Dim[2L] == 2L)
-                i <- .M2m(i)
-            else if (.isDense(i))
-                i <- .M2v(i)
-            else {
-                i <- .M2V(i)
-                .isV <- TRUE
-            }
-        }
-        if (.isV) {
-            if (kind == "i" || kind == "d")
-                i <- i@x
-            else {
-                i <- .subscript.recycle(i, x.length, kind == "n")
-                return(..subscript.1ary(x, i, unsorted = kind == "l" && anyNA(i)))
-            }
-        }
+        if (.isM)
+            i <-
+                if ((kind == "i" || kind == "d") && i@Dim[2L] == 2L)
+                    .M2m(i)
+                else if (.isDense(i))
+                    .M2v(i)
+                else {
+                    .isV <- TRUE
+                    .M2V(i)
+                }
+        if (.isV)
+            i <-
+                if (kind == "i" || kind == "d")
+                    i@x
+                else if (length(i) < x.length)
+                    .subscript.recycle(i, x.length, kind == "n")
+                else if (kind == "n")
+                    i@i
+                else i@i[i@x]
     }
     else if (is.object(i))
         i <- switch(typeof(i),
@@ -254,29 +252,33 @@ function(x, i, j, drop) {
             .isV <- !.isM && .isVector(k)
             if ((!.isM && !.isV) || (kind <- .M.kind(k)) == "z")
                 stop(.subscript.invalid(k), domain = NA)
-            if (.isM) {
-                if (.isDense(k))
-                    k <- .M2v(k)
-                else {
-                    k <- .M2V(k)
-                    .isV <- TRUE
-                }
-            }
-            if (.isV) {
-                if (kind == "i" || kind == "d")
-                    k <- k@x
-                else if (length(k) <= r)
-                    k <- .subscript.recycle(k, r, kind == "n")
-                else stop("logical subscript too long")
-            }
+            if (.isM)
+                k <-
+                    if (.isDense(k))
+                        .M2v(k)
+                    else {
+                        .isV <- TRUE
+                        .M2V(k)
+                    }
+            if (.isV)
+                k <-
+                    if (kind == "i" || kind == "d")
+                        k@x
+                    else if (length(k) > r)
+                        stop("logical subscript too long")
+                    else if (length(k) < r)
+                        .subscript.recycle(k, r, kind == "n")
+                    else if (kind == "n")
+                        k@i
+                    else k@i[k@x]
         }
         else if (is.object(k))
             k <- switch(typeof(i),
                         double =,
                         integer =,
                         logical =,
-                        character = as.vector(i),
-                        i)
+                        character = as.vector(k),
+                        k)
         l[pos] <-
         list(switch(typeof(k),
                     double =,
@@ -467,19 +469,23 @@ setMethod("[",
                   .isV <- !.isM && .isVector(i)
                   if ((!.isM && !.isV) || (kind <- .M.kind(i)) == "z")
                       stop(.subscript.invalid(i), domain = NA)
-                  if (.isM) {
-                      if (.isDense(i))
-                          i <- .M2v(i)
-                      else {
-                          i <- .M2V(i)
-                          .isV <- TRUE
-                      }
-                  }
-                  if (.isV) {
-                      if (kind == "i" || kind == "d")
-                          i <- i@x
-                      else i <- .subscript.recycle(i, x.length, kind == "n")
-                  }
+                  if (.isM)
+                      i <-
+                          if (.isDense(i))
+                              .M2v(i)
+                          else {
+                              .isV <- TRUE
+                              .M2V(i)
+                          }
+                  if (.isV)
+                      i <-
+                          if (kind == "i" || kind == "d")
+                              i@x
+                          else if (length(i) < x.length)
+                              .subscript.recycle(i, x.length, kind == "n")
+                          else if (kind == "n")
+                              i@i
+                          else i@i[i@x]
               }
               else if (is.object(i))
                   i <- switch(typeof(i),
