@@ -13,12 +13,12 @@ function(i, n, pattern) {
     ## Return what would be the result of seq_len(n)[as.vector(i)] for
     ## 'i' of class nsparseVector (pattern = TRUE) or lsparseVector;
     ## length(i) < n = 0,...,(2^31-1)^2.
-    i.length <- length(i)
-    if (i.length >= n)
-        stop("should never happen ...")
     i.i <- i@i
     if (length(i.i) == 0L)
         return(integer(0L))
+    i.length <- length(i)
+    if (i.length >= n)
+        stop("should never happen ...")
     r <- ceiling(n / i.length)
     as. <- if (r * i.length - 1 < .Machine[["integer.max"]])
                as.integer
