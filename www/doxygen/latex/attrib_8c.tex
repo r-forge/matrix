@@ -1,0 +1,233 @@
+\doxysection{attrib.\+c File Reference}
+\hypertarget{attrib_8c}{}\label{attrib_8c}\index{attrib.c@{attrib.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_ab3d2fcbebd44b1345cc7ef07f6e136c0}{R\+\_\+\+Dim\+\_\+prod}} (SEXP dim)
+\item 
+int \mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{Dim\+Names\+\_\+is\+\_\+trivial}} (SEXP dn)
+\item 
+int \mbox{\hyperlink{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384}{Dim\+Names\+\_\+is\+\_\+symmetric}} (SEXP dn)
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_a5ffa392b74a113f0879ac01e6fc14291}{R\+\_\+\+Dim\+Names\+\_\+is\+\_\+symmetric}} (SEXP dn)
+\item 
+void \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{sym\+DN}} (SEXP dest, SEXP src, int J)
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_a091170b866d801d168a5b76a5018cb00}{R\+\_\+sym\+DN}} (SEXP dn)
+\item 
+void \mbox{\hyperlink{attrib_8c_ab601aeef02127ae15e459880f107acca}{cpy\+DN}} (SEXP dest, SEXP src, int J)
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_ae3e06e9624470e34247c9ab851adb3e7}{DIMNAMES}} (SEXP obj, int mode)
+\item 
+void \mbox{\hyperlink{attrib_8c_aa4bb9093b3eb2c6833aa7b63ab882bbb}{SET\+\_\+\+DIMNAMES}} (SEXP obj, int mode, SEXP value)
+\item 
+static R\+\_\+xlen\+\_\+t \mbox{\hyperlink{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}{strmatch}} (const char \texorpdfstring{$\ast$}{*}s, SEXP nms)
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\+\_\+factor}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}nm)
+\item 
+void \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\+\_\+factor}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}nm, SEXP val)
+\item 
+SEXP \mbox{\hyperlink{attrib_8c_a7d478983a9cbc3b79a75cde8c6594ad3}{R\+\_\+set\+\_\+factor}} (SEXP s\+\_\+obj, SEXP s\+\_\+nm, SEXP s\+\_\+val, SEXP s\+\_\+warn)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{attrib_8c_ab601aeef02127ae15e459880f107acca}\index{attrib.c@{attrib.c}!cpyDN@{cpyDN}}
+\index{cpyDN@{cpyDN}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{cpyDN()}{cpyDN()}}
+{\footnotesize\ttfamily \label{attrib_8c_ab601aeef02127ae15e459880f107acca} 
+void cpy\+DN (\begin{DoxyParamCaption}\item[{SEXP}]{dest}{, }\item[{SEXP}]{src}{, }\item[{int}]{J}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00110}{110}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{attrib_8c_source_l00132}{DIMNAMES()}}, and \mbox{\hyperlink{attrib_8c_source_l00151}{SET\+\_\+\+DIMNAMES()}}.
+
+\Hypertarget{attrib_8c_ae3e06e9624470e34247c9ab851adb3e7}\index{attrib.c@{attrib.c}!DIMNAMES@{DIMNAMES}}
+\index{DIMNAMES@{DIMNAMES}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{DIMNAMES()}{DIMNAMES()}}
+{\footnotesize\ttfamily \label{attrib_8c_ae3e06e9624470e34247c9ab851adb3e7} 
+SEXP DIMNAMES (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00132}{132}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{attrib_8c_source_l00110}{cpy\+DN()}}, \mbox{\hyperlink{attrib_8c_source_l00038}{Dim\+Names\+\_\+is\+\_\+trivial()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, and \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}.
+
+\Hypertarget{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384}\index{attrib.c@{attrib.c}!DimNames\_is\_symmetric@{DimNames\_is\_symmetric}}
+\index{DimNames\_is\_symmetric@{DimNames\_is\_symmetric}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{DimNames\_is\_symmetric()}{DimNames\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384} 
+int Dim\+Names\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{dn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00046}{46}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00028}{equal\+String()}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{attrib_8c_source_l00064}{R\+\_\+\+Dim\+Names\+\_\+is\+\_\+symmetric()}}, and \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}\index{attrib.c@{attrib.c}!DimNames\_is\_trivial@{DimNames\_is\_trivial}}
+\index{DimNames\_is\_trivial@{DimNames\_is\_trivial}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{DimNames\_is\_trivial()}{DimNames\_is\_trivial()}}
+{\footnotesize\ttfamily \label{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391} 
+int Dim\+Names\+\_\+is\+\_\+trivial (\begin{DoxyParamCaption}\item[{SEXP}]{dn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00038}{38}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{attrib_8c_source_l00132}{DIMNAMES()}}, \mbox{\hyperlink{coerce_8c_source_l03516}{R\+\_\+\+Matrix\+\_\+as\+\_\+matrix()}}, \mbox{\hyperlink{attrib_8c_source_l00100}{R\+\_\+sym\+DN()}}, and \mbox{\hyperlink{attrib_8c_source_l00151}{SET\+\_\+\+DIMNAMES()}}.
+
+\Hypertarget{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}\index{attrib.c@{attrib.c}!get\_factor@{get\_factor}}
+\index{get\_factor@{get\_factor}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{get\_factor()}{get\_factor()}}
+{\footnotesize\ttfamily \label{attrib_8c_a8020f66fe6a710571778b0fef76a16d6} 
+SEXP get\+\_\+factor (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{nm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00180}{180}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, and \mbox{\hyperlink{attrib_8c_source_l00170}{strmatch()}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{R\+\_\+dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00197}{R\+\_\+dense\+\_\+cholesky()}}, \mbox{\hyperlink{lu_8c_source_l00154}{R\+\_\+dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}, \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, \mbox{\hyperlink{lu_8c_source_l00174}{R\+\_\+sparse\+\_\+lu()}}, and \mbox{\hyperlink{qr_8c_source_l00115}{R\+\_\+sparse\+\_\+qr()}}.
+
+\Hypertarget{attrib_8c_ab3d2fcbebd44b1345cc7ef07f6e136c0}\index{attrib.c@{attrib.c}!R\_Dim\_prod@{R\_Dim\_prod}}
+\index{R\_Dim\_prod@{R\_Dim\_prod}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{R\_Dim\_prod()}{R\_Dim\_prod()}}
+{\footnotesize\ttfamily \label{attrib_8c_ab3d2fcbebd44b1345cc7ef07f6e136c0} 
+SEXP R\+\_\+\+Dim\+\_\+prod (\begin{DoxyParamCaption}\item[{SEXP}]{dim}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00005}{5}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{init_8c_source_l00620}{Matrix\+\_\+off\+Sym}}.
+
+\Hypertarget{attrib_8c_a5ffa392b74a113f0879ac01e6fc14291}\index{attrib.c@{attrib.c}!R\_DimNames\_is\_symmetric@{R\_DimNames\_is\_symmetric}}
+\index{R\_DimNames\_is\_symmetric@{R\_DimNames\_is\_symmetric}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{R\_DimNames\_is\_symmetric()}{R\_DimNames\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{attrib_8c_a5ffa392b74a113f0879ac01e6fc14291} 
+SEXP R\+\_\+\+Dim\+Names\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{dn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00064}{64}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{attrib_8c_source_l00046}{Dim\+Names\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{attrib_8c_a7d478983a9cbc3b79a75cde8c6594ad3}\index{attrib.c@{attrib.c}!R\_set\_factor@{R\_set\_factor}}
+\index{R\_set\_factor@{R\_set\_factor}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{R\_set\_factor()}{R\_set\_factor()}}
+{\footnotesize\ttfamily \label{attrib_8c_a7d478983a9cbc3b79a75cde8c6594ad3} 
+SEXP R\+\_\+set\+\_\+factor (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+nm}{, }\item[{SEXP}]{s\+\_\+val}{, }\item[{SEXP}]{s\+\_\+warn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00220}{220}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{attrib_8c_a091170b866d801d168a5b76a5018cb00}\index{attrib.c@{attrib.c}!R\_symDN@{R\_symDN}}
+\index{R\_symDN@{R\_symDN}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{R\_symDN()}{R\_symDN()}}
+{\footnotesize\ttfamily \label{attrib_8c_a091170b866d801d168a5b76a5018cb00} 
+SEXP R\+\_\+sym\+DN (\begin{DoxyParamCaption}\item[{SEXP}]{dn}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00100}{100}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{attrib_8c_source_l00038}{Dim\+Names\+\_\+is\+\_\+trivial()}}, and \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}.
+
+\Hypertarget{attrib_8c_aa4bb9093b3eb2c6833aa7b63ab882bbb}\index{attrib.c@{attrib.c}!SET\_DIMNAMES@{SET\_DIMNAMES}}
+\index{SET\_DIMNAMES@{SET\_DIMNAMES}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{SET\_DIMNAMES()}{SET\_DIMNAMES()}}
+{\footnotesize\ttfamily \label{attrib_8c_aa4bb9093b3eb2c6833aa7b63ab882bbb} 
+void SET\+\_\+\+DIMNAMES (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{mode}{, }\item[{SEXP}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00151}{151}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{attrib_8c_source_l00110}{cpy\+DN()}}, \mbox{\hyperlink{attrib_8c_source_l00038}{Dim\+Names\+\_\+is\+\_\+trivial()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, and \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}.
+
+\Hypertarget{attrib_8c_a8da2554b065e650629767301d01f3f64}\index{attrib.c@{attrib.c}!set\_factor@{set\_factor}}
+\index{set\_factor@{set\_factor}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{set\_factor()}{set\_factor()}}
+{\footnotesize\ttfamily \label{attrib_8c_a8da2554b065e650629767301d01f3f64} 
+void set\+\_\+factor (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{nm}{, }\item[{SEXP}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00192}{192}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, and \mbox{\hyperlink{attrib_8c_source_l00170}{strmatch()}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{R\+\_\+dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00197}{R\+\_\+dense\+\_\+cholesky()}}, \mbox{\hyperlink{lu_8c_source_l00154}{R\+\_\+dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}, \mbox{\hyperlink{attrib_8c_source_l00220}{R\+\_\+set\+\_\+factor()}}, \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, \mbox{\hyperlink{lu_8c_source_l00174}{R\+\_\+sparse\+\_\+lu()}}, and \mbox{\hyperlink{qr_8c_source_l00115}{R\+\_\+sparse\+\_\+qr()}}.
+
+\Hypertarget{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}\index{attrib.c@{attrib.c}!strmatch@{strmatch}}
+\index{strmatch@{strmatch}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{strmatch()}{strmatch()}}
+{\footnotesize\ttfamily \label{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6} 
+static R\+\_\+xlen\+\_\+t strmatch (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{SEXP}]{nms}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00170}{170}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{attrib_8c_source_l00180}{get\+\_\+factor()}}, and \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}.
+
+\Hypertarget{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}\index{attrib.c@{attrib.c}!symDN@{symDN}}
+\index{symDN@{symDN}!attrib.c@{attrib.c}}
+\doxysubsubsection{\texorpdfstring{symDN()}{symDN()}}
+{\footnotesize\ttfamily \label{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07} 
+void sym\+DN (\begin{DoxyParamCaption}\item[{SEXP}]{dest}{, }\item[{SEXP}]{src}{, }\item[{int}]{J}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{attrib_8c_source_l00069}{69}} of file \mbox{\hyperlink{attrib_8c_source}{attrib.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{attrib_8c_source_l00132}{DIMNAMES()}}, \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00172}{ge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{attrib_8c_source_l00100}{R\+\_\+sym\+DN()}}, \mbox{\hyperlink{attrib_8c_source_l00151}{SET\+\_\+\+DIMNAMES()}}, and \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}.
+

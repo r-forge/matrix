@@ -1,0 +1,1177 @@
+\doxysection{validity.\+c File Reference}
+\hypertarget{validity_8c}{}\label{validity_8c}\index{validity.c@{validity.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{validity_8c_ab97282eb01138daf0133e13a83966b54}{MK}}(\+\_\+\+FORMAT\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_aff3d55e38915c95b343e9a7f8355fa40}{MS}}(\+\_\+\+FORMAT\+\_\+, ...)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a1ffd1643f1b96fcc318bbd7b83f191fc}{RMK}}(\+\_\+\+FORMAT\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a4123c9af63a2382ebb576cc9bc0d10c1}{RMS}}(\+\_\+\+FORMAT\+\_\+, ...)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a9419cdc50f570580d6c5bed1e25785fb}{RMKMS}}(\+\_\+\+FORMAT\+\_\+, ...)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a7d6f2d27ddaae364615af1486711d6a6}{FRMK}}(\+\_\+\+FORMAT\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a57222633841e2cc5a0997fb2042d120b}{FRMS}}(\+\_\+\+FORMAT\+\_\+, ...)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a379cf95ea51cb7b80e2be3082c3ab46e}{FRMKMS}}(\+\_\+\+FORMAT\+\_\+, ...)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a957827e8ffe23fa1ea1e117b777214f4}{KINDMATRIX\+\_\+\+VALIDATE}}(\+\_\+\+PREFIX\+\_\+,  \+\_\+\+SEXPTYPE\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_a9cc78d6b36051657dea2916b88281c2f}{KINDVECTOR\+\_\+\+VALIDATE}}(\+\_\+\+PREFIX\+\_\+,  \+\_\+\+SEXPTYPE\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_af711258d771c2ec127ef91846f1d455d}{IS\+\_\+\+VALID}}(\+\_\+\+CLASS\+\_\+)
+\item 
+\#define \mbox{\hyperlink{validity_8c_aa730d9d047d9d7a84aad203cfab91232}{IS\+\_\+\+VALID\+\_\+\+SPARSE}}(\+\_\+\+C\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{validity_8c_a10ce6e15b8e3ef56ce75afc03038d7a7}{Dim\+\_\+validate}} (SEXP dim)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a7b3bd310ff981a8fd691d44050e6bba9}{R\+\_\+\+Dim\+\_\+validate}} (SEXP dim)
+\item 
+static char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{validity_8c_a11af375e309f28a113abd9aad5b77d23}{Dim\+Names\+\_\+validate}} (SEXP dimnames, int \texorpdfstring{$\ast$}{*}pdim)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a9a7dd09cafdebff05f282125d401bea7}{R\+\_\+\+Dim\+Names\+\_\+validate}} (SEXP dimnames, SEXP dim)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a85fc17c28a3a1b5034edbecdd1fe2f07}{R\+\_\+\+Dim\+Names\+\_\+fixup}} (SEXP dimnames)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a845140e3175761376a0347d3e256b7dc}{Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_abe41b0856b7d76a02a7d7473298b2420}{general\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a0d501d2a856f4fdfd3acab0d14888b6e}{symmetric\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a0193c7fc2f398bf2a8431b22eb76d7c3}{triangular\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ab416f1acc7e6ea3354a7dbdf48346d6c}{unpacked\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a6560a519b952b15b989d16d555aeaed3}{packed\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ac90817b5857b8bcb8c01b89015c82518}{Csparse\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a2c6868cb12ecad3d289048b95d60b7ce}{Rsparse\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a25c6023bb615531ff95dbf3e80270353}{Tsparse\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a2ff1d492dcfffd04f9e2996f164e1bbe}{diagonal\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_adaf005e4b912d905959a03b664b9cafb}{ind\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a297460e8c04ee9d42c4fe26e7b964b94}{p\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a3c2c3ca656ba24a4c55c40fc523151c8}{s\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a157952d4658b4621bbeb4343bb2f3cf7}{t\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a67759e646fa143990dc376d25842eb3e}{s\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a38ac55ef1f9d7be1b752b6ab522c5c0c}{t\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_aef218b65ba9d0ab3bcf6006ef5e5fd2e}{s\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ace806886a205fcb5f3e43d25abf9be2e}{t\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a2efe1dae2976e4d48221b83cb1605ac4}{xg\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_af8ee8966e36a4d2d40243e537af76a67}{xs\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a8ccde9ea712c2d3323235b703b1ca125}{xt\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a6918755f74fac1b7239daad3ba5ada8d}{xg\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ac8b3bf5d485e52dbfc638ed4a17c3f2d}{xs\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ad4a19fd1d2b41d3f09be1789fdedeef7}{xt\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_aae2ba5eb01916f6d11e64d9a0bbca2ea}{xg\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a839c2fd8b27dbf2fe55a8f3c6b4b6999}{xs\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ac22743c5c28b556f114ee3118f193d3b}{xt\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_aabf136b9e9efa0f483a7ccda9247244f}{xpo\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a59c7e4a9ff02402b0d20e052bad9c44c}{xpp\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a41ef79b7d95fdf77ad46b3c127ee70a6}{xp\+CMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_aca2b39b1281674c6c58d83c8c4d26045}{xp\+RMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_adf09fe2fbd39a758e6b87e373de093b7}{xp\+TMatrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a26229db2c053dfc90f5a27e45e352e65}{cor\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a36566170fc4efc4a133fde0a5e8b018f}{cop\+Matrix\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a627b5daf7e0263c2c6b8deb3ab85b65a}{sparse\+Vector\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a098cda802a858284669b799bfd0c6674}{Matrix\+Factorization\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ac19422632e7581c7055ecbd4a57f2f01}{dense\+Schur\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_aafe293851d46f23e016fc827cb5a020f}{dense\+QR\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_adbc57b6782a7c77a40c3692814446c25}{dense\+LU\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a1b9528da7e832d476082740f9b2e0d99}{dense\+Bunch\+Kaufman\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_ae96112c4395cfe4101445733d11f58e6}{dense\+Cholesky\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a4747e9fb1dacf187f0c117324de35e51}{sparse\+QR\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a80f593ac74bd3578e45cb69bbbc76adb}{sparse\+LU\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a796e30a711ff2ac03b2ccf9e5b305d6c}{sparse\+Cholesky\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a40bdc1ebdec152c9a04b1fc5abd1b841}{simplicial\+Cholesky\+\_\+validate}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{validity_8c_a91af943091404e64bc9622d4ada6c8a2}{supernodal\+Cholesky\+\_\+validate}} (SEXP obj)
+\item 
+void \mbox{\hyperlink{validity_8c_a3b4ca315fa1a5d502950452ab489ba16}{valid\+Object}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{validity_8c_a7d6f2d27ddaae364615af1486711d6a6}\index{validity.c@{validity.c}!FRMK@{FRMK}}
+\index{FRMK@{FRMK}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{FRMK}{FRMK}}
+{\footnotesize\ttfamily \label{validity_8c_a7d6f2d27ddaae364615af1486711d6a6} 
+\#define FRMK(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Matrix\_Free(work,\ lwork);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMK\ \ (\_FORMAT\_\ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00013}{13}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00993}{xp\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a379cf95ea51cb7b80e2be3082c3ab46e}\index{validity.c@{validity.c}!FRMKMS@{FRMKMS}}
+\index{FRMKMS@{FRMKMS}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{FRMKMS}{FRMKMS}}
+{\footnotesize\ttfamily \label{validity_8c_a379cf95ea51cb7b80e2be3082c3ab46e} 
+\#define FRMKMS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Matrix\_Free(work,\ lwork);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMKMS(\_FORMAT\_,\ \_\_VA\_ARGS\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00023}{23}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l01348}{dense\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01217}{dense\+QR\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00496}{p\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01633}{sparse\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01535}{sparse\+LU\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l01434}{sparse\+QR\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a57222633841e2cc5a0997fb2042d120b}\index{validity.c@{validity.c}!FRMS@{FRMS}}
+\index{FRMS@{FRMS}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{FRMS}{FRMS}}
+{\footnotesize\ttfamily \label{validity_8c_a57222633841e2cc5a0997fb2042d120b} 
+\#define FRMS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Matrix\_Free(work,\ lwork);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMS\ \ (\_FORMAT\_,\ \_\_VA\_ARGS\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00018}{18}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+\Hypertarget{validity_8c_af711258d771c2ec127ef91846f1d455d}\index{validity.c@{validity.c}!IS\_VALID@{IS\_VALID}}
+\index{IS\_VALID@{IS\_VALID}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{IS\_VALID}{IS\_VALID}}
+{\footnotesize\ttfamily \label{validity_8c_af711258d771c2ec127ef91846f1d455d} 
+\#define IS\+\_\+\+VALID(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+CLASS\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ status\ =\ \_CLASS\_\ \#\#\ \_validate(obj);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(status)\ ==\ STRSXP)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}invalid\ class\ \(\backslash\)"{}\%s\(\backslash\)"{}\ object:\ \%s"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}},\ CHAR(STRING\_ELT(status,\ 0)));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}.
+
+\Hypertarget{validity_8c_aa730d9d047d9d7a84aad203cfab91232}\index{validity.c@{validity.c}!IS\_VALID\_SPARSE@{IS\_VALID\_SPARSE}}
+\index{IS\_VALID\_SPARSE@{IS\_VALID\_SPARSE}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{IS\_VALID\_SPARSE}{IS\_VALID\_SPARSE}}
+{\footnotesize\ttfamily \label{validity_8c_aa730d9d047d9d7a84aad203cfab91232} 
+\#define IS\+\_\+\+VALID\+\_\+\+SPARSE(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+C\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ IS\_VALID(\_C\_\ \#\#\ sparseMatrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ ==\ \textcolor{charliteral}{'n'})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'s'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(s\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'t'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(t\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'g'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(xg\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'s'}\ ||\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'p'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(xs\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'t'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(xt\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ ==\ \textcolor{charliteral}{'p'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ IS\_VALID(xp\ \#\#\ \_C\_\ \#\#\ Matrix);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}.
+
+\Hypertarget{validity_8c_a957827e8ffe23fa1ea1e117b777214f4}\index{validity.c@{validity.c}!KINDMATRIX\_VALIDATE@{KINDMATRIX\_VALIDATE}}
+\index{KINDMATRIX\_VALIDATE@{KINDMATRIX\_VALIDATE}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{KINDMATRIX\_VALIDATE}{KINDMATRIX\_VALIDATE}}
+{\footnotesize\ttfamily \label{validity_8c_a957827e8ffe23fa1ea1e117b777214f4} 
+\#define KINDMATRIX\+\_\+\+VALIDATE(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+PREFIX\+\_\+}{, }\item[{}]{\+\_\+\+SEXPTYPE\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SEXP\ \_PREFIX\_\ \#\#\ \mbox{\hyperlink{validity_8c_a845140e3175761376a0347d3e256b7dc}{Matrix\_validate}}(SEXP\ obj)\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ !=\ \_SEXPTYPE\_)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMKMS(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ slot\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}x"{}},\ Rf\_type2char(\_SEXPTYPE\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(1);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00149}{149}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+\Hypertarget{validity_8c_a9cc78d6b36051657dea2916b88281c2f}\index{validity.c@{validity.c}!KINDVECTOR\_VALIDATE@{KINDVECTOR\_VALIDATE}}
+\index{KINDVECTOR\_VALIDATE@{KINDVECTOR\_VALIDATE}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{KINDVECTOR\_VALIDATE}{KINDVECTOR\_VALIDATE}}
+{\footnotesize\ttfamily \label{validity_8c_a9cc78d6b36051657dea2916b88281c2f} 
+\#define KINDVECTOR\+\_\+\+VALIDATE(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+PREFIX\+\_\+}{, }\item[{}]{\+\_\+\+SEXPTYPE\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SEXP\ \_PREFIX\_\ \#\#\ \mbox{\hyperlink{validity_8c_a627b5daf7e0263c2c6b8deb3ab85b65a}{sparseVector\_validate}}(SEXP\ obj)\ \(\backslash\)}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ i,\ x\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ !=\ \_SEXPTYPE\_)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMKMS(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ slot\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}x"{}},\ Rf\_type2char(\_SEXPTYPE\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (XLENGTH(x)\ !=\ XLENGTH(i))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ RMKMS(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ and\ '\%s'\ slots\ do\ not\ have\ equal\ length"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}i"{}},\ \textcolor{stringliteral}{"{}x"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(1);\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01153}{1153}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+\Hypertarget{validity_8c_ab97282eb01138daf0133e13a83966b54}\index{validity.c@{validity.c}!MK@{MK}}
+\index{MK@{MK}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{MK}{MK}}
+{\footnotesize\ttfamily \label{validity_8c_ab97282eb01138daf0133e13a83966b54} 
+\#define MK(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Rf\_mkString(\_FORMAT\_\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00003}{3}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+\Hypertarget{validity_8c_aff3d55e38915c95b343e9a7f8355fa40}\index{validity.c@{validity.c}!MS@{MS}}
+\index{MS@{MS}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{MS}{MS}}
+{\footnotesize\ttfamily \label{validity_8c_aff3d55e38915c95b343e9a7f8355fa40} 
+\#define MS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{Mdefines_8h_a5b1ccd590aaa415d97d2d1df77871475}{Matrix\_sprintf}}(\_FORMAT\_,\ \_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00004}{4}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+\Hypertarget{validity_8c_a1ffd1643f1b96fcc318bbd7b83f191fc}\index{validity.c@{validity.c}!RMK@{RMK}}
+\index{RMK@{RMK}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{RMK}{RMK}}
+{\footnotesize\ttfamily \label{validity_8c_a1ffd1643f1b96fcc318bbd7b83f191fc} 
+\#define RMK(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{validity_8c_ab97282eb01138daf0133e13a83966b54}{MK}}(\ \ \ \_FORMAT\_\ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00006}{6}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l01059}{cop\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01035}{cor\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01348}{dense\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01690}{simplicial\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01434}{sparse\+QR\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01847}{supernodal\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00907}{xp\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00849}{xpo\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00872}{xpp\+Matrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00950}{xp\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a9419cdc50f570580d6c5bed1e25785fb}\index{validity.c@{validity.c}!RMKMS@{RMKMS}}
+\index{RMKMS@{RMKMS}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{RMKMS}{RMKMS}}
+{\footnotesize\ttfamily \label{validity_8c_a9419cdc50f570580d6c5bed1e25785fb} 
+\#define RMKMS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{validity_8c_ab97282eb01138daf0133e13a83966b54}{MK}}(\mbox{\hyperlink{validity_8c_aff3d55e38915c95b343e9a7f8355fa40}{MS}}(\_FORMAT\_,\ \_\_VA\_ARGS\_\_))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00010}{10}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l01059}{cop\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01035}{cor\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00299}{Csparse\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01288}{dense\+Bunch\+Kaufman\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01348}{dense\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01259}{dense\+LU\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01217}{dense\+QR\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01178}{dense\+Schur\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00437}{diagonal\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00165}{general\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00461}{ind\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00290}{packed\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00496}{p\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00349}{Rsparse\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00519}{s\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01690}{simplicial\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01633}{sparse\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01535}{sparse\+LU\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01434}{sparse\+QR\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01089}{sparse\+Vector\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00606}{s\+RMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00693}{s\+TMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l01847}{supernodal\+Cholesky\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00181}{symmetric\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00558}{t\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00254}{triangular\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00645}{t\+RMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00399}{Tsparse\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00722}{t\+TMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00281}{unpacked\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00766}{xg\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00792}{xg\+RMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00818}{xg\+TMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00907}{xp\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00849}{xpo\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00872}{xpp\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00950}{xp\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00993}{xp\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a4123c9af63a2382ebb576cc9bc0d10c1}\index{validity.c@{validity.c}!RMS@{RMS}}
+\index{RMS@{RMS}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{RMS}{RMS}}
+{\footnotesize\ttfamily \label{validity_8c_a4123c9af63a2382ebb576cc9bc0d10c1} 
+\#define RMS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+FORMAT\+\_\+}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \ \ \ \mbox{\hyperlink{validity_8c_aff3d55e38915c95b343e9a7f8355fa40}{MS}}(\_FORMAT\_,\ \_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00008}{8}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00035}{Dim\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00057}{Dim\+Names\+\_\+validate()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{validity_8c_a36566170fc4efc4a133fde0a5e8b018f}\index{validity.c@{validity.c}!copMatrix\_validate@{copMatrix\_validate}}
+\index{copMatrix\_validate@{copMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{copMatrix\_validate()}{copMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a36566170fc4efc4a133fde0a5e8b018f} 
+SEXP cop\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01059}{1059}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{validity_8c_a26229db2c053dfc90f5a27e45e352e65}\index{validity.c@{validity.c}!corMatrix\_validate@{corMatrix\_validate}}
+\index{corMatrix\_validate@{corMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{corMatrix\_validate()}{corMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a26229db2c053dfc90f5a27e45e352e65} 
+SEXP cor\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01035}{1035}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_ac90817b5857b8bcb8c01b89015c82518}\index{validity.c@{validity.c}!CsparseMatrix\_validate@{CsparseMatrix\_validate}}
+\index{CsparseMatrix\_validate@{CsparseMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{CsparseMatrix\_validate()}{CsparseMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ac90817b5857b8bcb8c01b89015c82518} 
+SEXP Csparse\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00299}{299}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a1b9528da7e832d476082740f9b2e0d99}\index{validity.c@{validity.c}!denseBunchKaufman\_validate@{denseBunchKaufman\_validate}}
+\index{denseBunchKaufman\_validate@{denseBunchKaufman\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{denseBunchKaufman\_validate()}{denseBunchKaufman\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a1b9528da7e832d476082740f9b2e0d99} 
+SEXP dense\+Bunch\+Kaufman\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01288}{1288}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00071}{HAS\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00631}{Matrix\+\_\+trans\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_ae96112c4395cfe4101445733d11f58e6}\index{validity.c@{validity.c}!denseCholesky\_validate@{denseCholesky\_validate}}
+\index{denseCholesky\_validate@{denseCholesky\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{denseCholesky\_validate()}{denseCholesky\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ae96112c4395cfe4101445733d11f58e6} 
+SEXP dense\+Cholesky\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01348}{1348}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_adbc57b6782a7c77a40c3692814446c25}\index{validity.c@{validity.c}!denseLU\_validate@{denseLU\_validate}}
+\index{denseLU\_validate@{denseLU\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{denseLU\_validate()}{denseLU\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_adbc57b6782a7c77a40c3692814446c25} 
+SEXP dense\+LU\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01259}{1259}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_aafe293851d46f23e016fc827cb5a020f}\index{validity.c@{validity.c}!denseQR\_validate@{denseQR\_validate}}
+\index{denseQR\_validate@{denseQR\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{denseQR\_validate()}{denseQR\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_aafe293851d46f23e016fc827cb5a020f} 
+SEXP dense\+QR\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01217}{1217}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00603}{Matrix\+\_\+beta\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_ac19422632e7581c7055ecbd4a57f2f01}\index{validity.c@{validity.c}!denseSchur\_validate@{denseSchur\_validate}}
+\index{denseSchur\_validate@{denseSchur\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{denseSchur\_validate()}{denseSchur\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ac19422632e7581c7055ecbd4a57f2f01} 
+SEXP dense\+Schur\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01178}{1178}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00633}{Matrix\+\_\+values\+Sym}}, \mbox{\hyperlink{init_8c_source_l00634}{Matrix\+\_\+vectors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a2ff1d492dcfffd04f9e2996f164e1bbe}\index{validity.c@{validity.c}!diagonalMatrix\_validate@{diagonalMatrix\_validate}}
+\index{diagonalMatrix\_validate@{diagonalMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{diagonalMatrix\_validate()}{diagonalMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a2ff1d492dcfffd04f9e2996f164e1bbe} 
+SEXP diagonal\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00437}{437}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a10ce6e15b8e3ef56ce75afc03038d7a7}\index{validity.c@{validity.c}!Dim\_validate@{Dim\_validate}}
+\index{Dim\_validate@{Dim\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{Dim\_validate()}{Dim\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a10ce6e15b8e3ef56ce75afc03038d7a7} 
+static char \texorpdfstring{$\ast$}{*} Dim\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{dim}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00035}{35}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00136}{Matrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00050}{R\+\_\+\+Dim\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a11af375e309f28a113abd9aad5b77d23}\index{validity.c@{validity.c}!DimNames\_validate@{DimNames\_validate}}
+\index{DimNames\_validate@{DimNames\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{DimNames\_validate()}{DimNames\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a11af375e309f28a113abd9aad5b77d23} 
+static char \texorpdfstring{$\ast$}{*} Dim\+Names\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{dimnames}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{pdim}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00057}{57}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{validity_8c_source_l00008}{RMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00136}{Matrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00089}{R\+\_\+\+Dim\+Names\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_abe41b0856b7d76a02a7d7473298b2420}\index{validity.c@{validity.c}!generalMatrix\_validate@{generalMatrix\_validate}}
+\index{generalMatrix\_validate@{generalMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{generalMatrix\_validate()}{generalMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_abe41b0856b7d76a02a7d7473298b2420} 
+SEXP general\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00165}{165}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00181}{symmetric\+Matrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_adaf005e4b912d905959a03b664b9cafb}\index{validity.c@{validity.c}!indMatrix\_validate@{indMatrix\_validate}}
+\index{indMatrix\_validate@{indMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{indMatrix\_validate()}{indMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_adaf005e4b912d905959a03b664b9cafb} 
+SEXP ind\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00461}{461}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00614}{Matrix\+\_\+margin\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a845140e3175761376a0347d3e256b7dc}\index{validity.c@{validity.c}!Matrix\_validate@{Matrix\_validate}}
+\index{Matrix\_validate@{Matrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_validate()}{Matrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a845140e3175761376a0347d3e256b7dc} 
+SEXP Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00136}{136}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00035}{Dim\+\_\+validate()}}, \mbox{\hyperlink{validity_8c_source_l00057}{Dim\+Names\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l01173}{Matrix\+Factorization\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a098cda802a858284669b799bfd0c6674}\index{validity.c@{validity.c}!MatrixFactorization\_validate@{MatrixFactorization\_validate}}
+\index{MatrixFactorization\_validate@{MatrixFactorization\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{MatrixFactorization\_validate()}{MatrixFactorization\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a098cda802a858284669b799bfd0c6674} 
+SEXP Matrix\+Factorization\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01173}{1173}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00136}{Matrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a6560a519b952b15b989d16d555aeaed3}\index{validity.c@{validity.c}!packedMatrix\_validate@{packedMatrix\_validate}}
+\index{packedMatrix\_validate@{packedMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{packedMatrix\_validate()}{packedMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a6560a519b952b15b989d16d555aeaed3} 
+SEXP packed\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00290}{290}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+\Hypertarget{validity_8c_a297460e8c04ee9d42c4fe26e7b964b94}\index{validity.c@{validity.c}!pMatrix\_validate@{pMatrix\_validate}}
+\index{pMatrix\_validate@{pMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{pMatrix\_validate()}{pMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a297460e8c04ee9d42c4fe26e7b964b94} 
+SEXP p\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00496}{496}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+\Hypertarget{validity_8c_a7b3bd310ff981a8fd691d44050e6bba9}\index{validity.c@{validity.c}!R\_Dim\_validate@{R\_Dim\_validate}}
+\index{R\_Dim\_validate@{R\_Dim\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{R\_Dim\_validate()}{R\_Dim\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a7b3bd310ff981a8fd691d44050e6bba9} 
+SEXP R\+\_\+\+Dim\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{dim}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00050}{50}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00035}{Dim\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a85fc17c28a3a1b5034edbecdd1fe2f07}\index{validity.c@{validity.c}!R\_DimNames\_fixup@{R\_DimNames\_fixup}}
+\index{R\_DimNames\_fixup@{R\_DimNames\_fixup}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{R\_DimNames\_fixup()}{R\_DimNames\_fixup()}}
+{\footnotesize\ttfamily \label{validity_8c_a85fc17c28a3a1b5034edbecdd1fe2f07} 
+SEXP R\+\_\+\+Dim\+Names\+\_\+fixup (\begin{DoxyParamCaption}\item[{SEXP}]{dimnames}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00095}{95}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a9a7dd09cafdebff05f282125d401bea7}\index{validity.c@{validity.c}!R\_DimNames\_validate@{R\_DimNames\_validate}}
+\index{R\_DimNames\_validate@{R\_DimNames\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{R\_DimNames\_validate()}{R\_DimNames\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a9a7dd09cafdebff05f282125d401bea7} 
+SEXP R\+\_\+\+Dim\+Names\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{dimnames}{, }\item[{SEXP}]{dim}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00089}{89}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00057}{Dim\+Names\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a2c6868cb12ecad3d289048b95d60b7ce}\index{validity.c@{validity.c}!RsparseMatrix\_validate@{RsparseMatrix\_validate}}
+\index{RsparseMatrix\_validate@{RsparseMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{RsparseMatrix\_validate()}{RsparseMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a2c6868cb12ecad3d289048b95d60b7ce} 
+SEXP Rsparse\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00349}{349}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a3c2c3ca656ba24a4c55c40fc523151c8}\index{validity.c@{validity.c}!sCMatrix\_validate@{sCMatrix\_validate}}
+\index{sCMatrix\_validate@{sCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sCMatrix\_validate()}{sCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a3c2c3ca656ba24a4c55c40fc523151c8} 
+SEXP s\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00519}{519}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00558}{t\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00776}{xs\+CMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a40bdc1ebdec152c9a04b1fc5abd1b841}\index{validity.c@{validity.c}!simplicialCholesky\_validate@{simplicialCholesky\_validate}}
+\index{simplicialCholesky\_validate@{simplicialCholesky\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{simplicialCholesky\_validate()}{simplicialCholesky\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a40bdc1ebdec152c9a04b1fc5abd1b841} 
+SEXP simplicial\+Cholesky\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01690}{1690}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00071}{HAS\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00608}{Matrix\+\_\+isll\+Sym}}, \mbox{\hyperlink{init_8c_source_l00609}{Matrix\+\_\+ismt\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00618}{Matrix\+\_\+next\+Sym}}, \mbox{\hyperlink{init_8c_source_l00619}{Matrix\+\_\+nz\+Sym}}, \mbox{\hyperlink{init_8c_source_l00625}{Matrix\+\_\+prev\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a796e30a711ff2ac03b2ccf9e5b305d6c}\index{validity.c@{validity.c}!sparseCholesky\_validate@{sparseCholesky\_validate}}
+\index{sparseCholesky\_validate@{sparseCholesky\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_validate()}{sparseCholesky\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a796e30a711ff2ac03b2ccf9e5b305d6c} 
+SEXP sparse\+Cholesky\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01633}{1633}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{init_8c_source_l00604}{Matrix\+\_\+colcount\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00621}{Matrix\+\_\+ordering\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a80f593ac74bd3578e45cb69bbbc76adb}\index{validity.c@{validity.c}!sparseLU\_validate@{sparseLU\_validate}}
+\index{sparseLU\_validate@{sparseLU\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sparseLU\_validate()}{sparseLU\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a80f593ac74bd3578e45cb69bbbc76adb} 
+SEXP sparse\+LU\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01535}{1535}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00599}{Matrix\+\_\+\+LSym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00627}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{init_8c_source_l00601}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{validity_8c_a4747e9fb1dacf187f0c117324de35e51}\index{validity.c@{validity.c}!sparseQR\_validate@{sparseQR\_validate}}
+\index{sparseQR\_validate@{sparseQR\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sparseQR\_validate()}{sparseQR\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a4747e9fb1dacf187f0c117324de35e51} 
+SEXP sparse\+QR\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01434}{1434}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00023}{FRMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00603}{Matrix\+\_\+beta\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00627}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{init_8c_source_l00600}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{init_8c_source_l00602}{Matrix\+\_\+\+VSym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a627b5daf7e0263c2c6b8deb3ab85b65a}\index{validity.c@{validity.c}!sparseVector\_validate@{sparseVector\_validate}}
+\index{sparseVector\_validate@{sparseVector\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sparseVector\_validate()}{sparseVector\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a627b5daf7e0263c2c6b8deb3ab85b65a} 
+SEXP sparse\+Vector\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01089}{1089}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00612}{Matrix\+\_\+length\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a67759e646fa143990dc376d25842eb3e}\index{validity.c@{validity.c}!sRMatrix\_validate@{sRMatrix\_validate}}
+\index{sRMatrix\_validate@{sRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sRMatrix\_validate()}{sRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a67759e646fa143990dc376d25842eb3e} 
+SEXP s\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00606}{606}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00645}{t\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00802}{xs\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_aef218b65ba9d0ab3bcf6006ef5e5fd2e}\index{validity.c@{validity.c}!sTMatrix\_validate@{sTMatrix\_validate}}
+\index{sTMatrix\_validate@{sTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{sTMatrix\_validate()}{sTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_aef218b65ba9d0ab3bcf6006ef5e5fd2e} 
+SEXP s\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00693}{693}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00722}{t\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00828}{xs\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a91af943091404e64bc9622d4ada6c8a2}\index{validity.c@{validity.c}!supernodalCholesky\_validate@{supernodalCholesky\_validate}}
+\index{supernodalCholesky\_validate@{supernodalCholesky\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{supernodalCholesky\_validate()}{supernodalCholesky\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a91af943091404e64bc9622d4ada6c8a2} 
+SEXP supernodal\+Cholesky\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l01847}{1847}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00071}{HAS\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00615}{Matrix\+\_\+maxcsize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00616}{Matrix\+\_\+maxesize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00624}{Matrix\+\_\+pi\+Sym}}, \mbox{\hyperlink{init_8c_source_l00626}{Matrix\+\_\+px\+Sym}}, \mbox{\hyperlink{init_8c_source_l00628}{Matrix\+\_\+s\+Sym}}, \mbox{\hyperlink{init_8c_source_l00630}{Matrix\+\_\+super\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a0d501d2a856f4fdfd3acab0d14888b6e}\index{validity.c@{validity.c}!symmetricMatrix\_validate@{symmetricMatrix\_validate}}
+\index{symmetricMatrix\_validate@{symmetricMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{symmetricMatrix\_validate()}{symmetricMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a0d501d2a856f4fdfd3acab0d14888b6e} 
+SEXP symmetric\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00181}{181}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{utils_8c_source_l00028}{equal\+String()}}, \mbox{\hyperlink{validity_8c_source_l00165}{general\+Matrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00071}{HAS\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{init_8c_source_l00631}{Matrix\+\_\+trans\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a157952d4658b4621bbeb4343bb2f3cf7}\index{validity.c@{validity.c}!tCMatrix\_validate@{tCMatrix\_validate}}
+\index{tCMatrix\_validate@{tCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{tCMatrix\_validate()}{tCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a157952d4658b4621bbeb4343bb2f3cf7} 
+SEXP t\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00558}{558}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{validity_8c_source_l00519}{s\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00784}{xt\+CMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a0193c7fc2f398bf2a8431b22eb76d7c3}\index{validity.c@{validity.c}!triangularMatrix\_validate@{triangularMatrix\_validate}}
+\index{triangularMatrix\_validate@{triangularMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{triangularMatrix\_validate()}{triangularMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a0193c7fc2f398bf2a8431b22eb76d7c3} 
+SEXP triangular\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00254}{254}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a38ac55ef1f9d7be1b752b6ab522c5c0c}\index{validity.c@{validity.c}!tRMatrix\_validate@{tRMatrix\_validate}}
+\index{tRMatrix\_validate@{tRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{tRMatrix\_validate()}{tRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a38ac55ef1f9d7be1b752b6ab522c5c0c} 
+SEXP t\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00645}{645}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{validity_8c_source_l00606}{s\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00810}{xt\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a25c6023bb615531ff95dbf3e80270353}\index{validity.c@{validity.c}!TsparseMatrix\_validate@{TsparseMatrix\_validate}}
+\index{TsparseMatrix\_validate@{TsparseMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{TsparseMatrix\_validate()}{TsparseMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a25c6023bb615531ff95dbf3e80270353} 
+SEXP Tsparse\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00399}{399}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_ace806886a205fcb5f3e43d25abf9be2e}\index{validity.c@{validity.c}!tTMatrix\_validate@{tTMatrix\_validate}}
+\index{tTMatrix\_validate@{tTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{tTMatrix\_validate()}{tTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ace806886a205fcb5f3e43d25abf9be2e} 
+SEXP t\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00722}{722}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{validity_8c_source_l00693}{s\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00836}{xt\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_ab416f1acc7e6ea3354a7dbdf48346d6c}\index{validity.c@{validity.c}!unpackedMatrix\_validate@{unpackedMatrix\_validate}}
+\index{unpackedMatrix\_validate@{unpackedMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{unpackedMatrix\_validate()}{unpackedMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ab416f1acc7e6ea3354a7dbdf48346d6c} 
+SEXP unpacked\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00281}{281}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+\Hypertarget{validity_8c_a3b4ca315fa1a5d502950452ab489ba16}\index{validity.c@{validity.c}!validObject@{validObject}}
+\index{validObject@{validObject}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{validObject()}{validObject()}}
+{\footnotesize\ttfamily \label{validity_8c_a3b4ca315fa1a5d502950452ab489ba16} 
+void valid\+Object (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{cl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l02004}{2004}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{validity_8c_af711258d771c2ec127ef91846f1d455d}{IS\+\_\+\+VALID}}, and \mbox{\hyperlink{validity_8c_aa730d9d047d9d7a84aad203cfab91232}{IS\+\_\+\+VALID\+\_\+\+SPARSE}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, and \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{validity_8c_a2efe1dae2976e4d48221b83cb1605ac4}\index{validity.c@{validity.c}!xgCMatrix\_validate@{xgCMatrix\_validate}}
+\index{xgCMatrix\_validate@{xgCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xgCMatrix\_validate()}{xgCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a2efe1dae2976e4d48221b83cb1605ac4} 
+SEXP xg\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00766}{766}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00776}{xs\+CMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00784}{xt\+CMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a6918755f74fac1b7239daad3ba5ada8d}\index{validity.c@{validity.c}!xgRMatrix\_validate@{xgRMatrix\_validate}}
+\index{xgRMatrix\_validate@{xgRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xgRMatrix\_validate()}{xgRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a6918755f74fac1b7239daad3ba5ada8d} 
+SEXP xg\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00792}{792}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00802}{xs\+RMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00810}{xt\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_aae2ba5eb01916f6d11e64d9a0bbca2ea}\index{validity.c@{validity.c}!xgTMatrix\_validate@{xgTMatrix\_validate}}
+\index{xgTMatrix\_validate@{xgTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xgTMatrix\_validate()}{xgTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_aae2ba5eb01916f6d11e64d9a0bbca2ea} 
+SEXP xg\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00818}{818}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}.
+
+
+
+Referenced by \mbox{\hyperlink{validity_8c_source_l00828}{xs\+TMatrix\+\_\+validate()}}, and \mbox{\hyperlink{validity_8c_source_l00836}{xt\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a41ef79b7d95fdf77ad46b3c127ee70a6}\index{validity.c@{validity.c}!xpCMatrix\_validate@{xpCMatrix\_validate}}
+\index{xpCMatrix\_validate@{xpCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xpCMatrix\_validate()}{xpCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a41ef79b7d95fdf77ad46b3c127ee70a6} 
+SEXP xp\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00907}{907}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{validity_8c_aabf136b9e9efa0f483a7ccda9247244f}\index{validity.c@{validity.c}!xpoMatrix\_validate@{xpoMatrix\_validate}}
+\index{xpoMatrix\_validate@{xpoMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xpoMatrix\_validate()}{xpoMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_aabf136b9e9efa0f483a7ccda9247244f} 
+SEXP xpo\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00849}{849}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_a59c7e4a9ff02402b0d20e052bad9c44c}\index{validity.c@{validity.c}!xppMatrix\_validate@{xppMatrix\_validate}}
+\index{xppMatrix\_validate@{xppMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xppMatrix\_validate()}{xppMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a59c7e4a9ff02402b0d20e052bad9c44c} 
+SEXP xpp\+Matrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00872}{872}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{validity_8c_aca2b39b1281674c6c58d83c8c4d26045}\index{validity.c@{validity.c}!xpRMatrix\_validate@{xpRMatrix\_validate}}
+\index{xpRMatrix\_validate@{xpRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xpRMatrix\_validate()}{xpRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_aca2b39b1281674c6c58d83c8c4d26045} 
+SEXP xp\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00950}{950}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00006}{RMK}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{validity_8c_adf09fe2fbd39a758e6b87e373de093b7}\index{validity.c@{validity.c}!xpTMatrix\_validate@{xpTMatrix\_validate}}
+\index{xpTMatrix\_validate@{xpTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xpTMatrix\_validate()}{xpTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_adf09fe2fbd39a758e6b87e373de093b7} 
+SEXP xp\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00993}{993}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{validity_8c_source_l00013}{FRMK}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{validity_8c_source_l00010}{RMKMS}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{validity_8c_af8ee8966e36a4d2d40243e537af76a67}\index{validity.c@{validity.c}!xsCMatrix\_validate@{xsCMatrix\_validate}}
+\index{xsCMatrix\_validate@{xsCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xsCMatrix\_validate()}{xsCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_af8ee8966e36a4d2d40243e537af76a67} 
+SEXP xs\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00776}{776}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00519}{s\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00766}{xg\+CMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_ac8b3bf5d485e52dbfc638ed4a17c3f2d}\index{validity.c@{validity.c}!xsRMatrix\_validate@{xsRMatrix\_validate}}
+\index{xsRMatrix\_validate@{xsRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xsRMatrix\_validate()}{xsRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ac8b3bf5d485e52dbfc638ed4a17c3f2d} 
+SEXP xs\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00802}{802}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00606}{s\+RMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00792}{xg\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a839c2fd8b27dbf2fe55a8f3c6b4b6999}\index{validity.c@{validity.c}!xsTMatrix\_validate@{xsTMatrix\_validate}}
+\index{xsTMatrix\_validate@{xsTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xsTMatrix\_validate()}{xsTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a839c2fd8b27dbf2fe55a8f3c6b4b6999} 
+SEXP xs\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00828}{828}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00693}{s\+TMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00818}{xg\+TMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_a8ccde9ea712c2d3323235b703b1ca125}\index{validity.c@{validity.c}!xtCMatrix\_validate@{xtCMatrix\_validate}}
+\index{xtCMatrix\_validate@{xtCMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xtCMatrix\_validate()}{xtCMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_a8ccde9ea712c2d3323235b703b1ca125} 
+SEXP xt\+CMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00784}{784}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00558}{t\+CMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00766}{xg\+CMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_ad4a19fd1d2b41d3f09be1789fdedeef7}\index{validity.c@{validity.c}!xtRMatrix\_validate@{xtRMatrix\_validate}}
+\index{xtRMatrix\_validate@{xtRMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xtRMatrix\_validate()}{xtRMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ad4a19fd1d2b41d3f09be1789fdedeef7} 
+SEXP xt\+RMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00810}{810}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00645}{t\+RMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00792}{xg\+RMatrix\+\_\+validate()}}.
+
+\Hypertarget{validity_8c_ac22743c5c28b556f114ee3118f193d3b}\index{validity.c@{validity.c}!xtTMatrix\_validate@{xtTMatrix\_validate}}
+\index{xtTMatrix\_validate@{xtTMatrix\_validate}!validity.c@{validity.c}}
+\doxysubsubsection{\texorpdfstring{xtTMatrix\_validate()}{xtTMatrix\_validate()}}
+{\footnotesize\ttfamily \label{validity_8c_ac22743c5c28b556f114ee3118f193d3b} 
+SEXP xt\+TMatrix\+\_\+validate (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{validity_8c_source_l00836}{836}} of file \mbox{\hyperlink{validity_8c_source}{validity.\+c}}.
+
+
+
+References \mbox{\hyperlink{validity_8c_source_l00722}{t\+TMatrix\+\_\+validate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{validity_8c_source_l00818}{xg\+TMatrix\+\_\+validate()}}.
+

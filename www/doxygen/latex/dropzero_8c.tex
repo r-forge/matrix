@@ -1,0 +1,156 @@
+\doxysection{dropzero.\+c File Reference}
+\hypertarget{dropzero_8c}{}\label{dropzero_8c}\index{dropzero.c@{dropzero.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  x)
+\item 
+\#define \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{dropzero_8c_afb1c8951292fbf040810d569c48da95b}{sparse\+\_\+dropzero}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, double tol)
+\item 
+SEXP \mbox{\hyperlink{dropzero_8c_a26ecbad53f6bfcc47469c3fcec6123d3}{R\+\_\+sparse\+\_\+dropzero}} (SEXP s\+\_\+from, SEXP s\+\_\+tol)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}\index{dropzero.c@{dropzero.c}!NZ@{NZ}}
+\index{NZ@{NZ}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{NZ}{NZ}}
+{\footnotesize\ttfamily \label{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7} 
+\#define NZ(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((strict)\ ?\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(x)\ :\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO\_TOL(x,\ tol))}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}.
+
+\Hypertarget{dropzero_8c_a5c943ec4d393860c44273d898e789156}\index{dropzero.c@{dropzero.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{dropzero_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ nnz0;\ ++k)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ px0[k]))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nnz1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}.
+
+\Hypertarget{dropzero_8c_a5c943ec4d393860c44273d898e789156}\index{dropzero.c@{dropzero.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{dropzero_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[j]\ =\ pp1[j\ -\/\ 1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp0[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ px0[k]))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pi1[pp1[j]\ \ ]\ =\ pi0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px1[pp1[j]++]\ =\ px0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{dropzero_8c_a5c943ec4d393860c44273d898e789156}\index{dropzero.c@{dropzero.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{dropzero_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ nnz0;\ ++k)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ px0[k]))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nnz1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{dropzero_8c_a5c943ec4d393860c44273d898e789156}\index{dropzero.c@{dropzero.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{dropzero_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ nnz0;\ ++k)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ px0[k]))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pi1++)\ =\ pi0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pj1++)\ =\ pj0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ px0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dropzero_8c_a26ecbad53f6bfcc47469c3fcec6123d3}\index{dropzero.c@{dropzero.c}!R\_sparse\_dropzero@{R\_sparse\_dropzero}}
+\index{R\_sparse\_dropzero@{R\_sparse\_dropzero}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_dropzero()}{R\_sparse\_dropzero()}}
+{\footnotesize\ttfamily \label{dropzero_8c_a26ecbad53f6bfcc47469c3fcec6123d3} 
+SEXP R\+\_\+sparse\+\_\+dropzero (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+tol}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dropzero_8c_source_l00211}{211}} of file \mbox{\hyperlink{dropzero_8c_source}{dropzero.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{dropzero_8c_afb1c8951292fbf040810d569c48da95b}\index{dropzero.c@{dropzero.c}!sparse\_dropzero@{sparse\_dropzero}}
+\index{sparse\_dropzero@{sparse\_dropzero}!dropzero.c@{dropzero.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_dropzero()}{sparse\_dropzero()}}
+{\footnotesize\ttfamily \label{dropzero_8c_afb1c8951292fbf040810d569c48da95b} 
+SEXP sparse\+\_\+dropzero (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{double}]{tol}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dropzero_8c_source_l00004}{4}} of file \mbox{\hyperlink{dropzero_8c_source}{dropzero.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{dropzero_8c_source_l00211}{R\+\_\+sparse\+\_\+dropzero()}}.
+

@@ -1,0 +1,181 @@
+\doxysection{is\+Symmetric.\+c File Reference}
+\hypertarget{isSymmetric_8c}{}\label{isSymmetric_8c}\index{isSymmetric.c@{isSymmetric.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{isSymmetric_8c_a4b3634c76326f1b182e622deaf84edc8}{dense\+\_\+is\+\_\+diagonal}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{isSymmetric_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8}{sparse\+\_\+is\+\_\+diagonal}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{isSymmetric_8c_a3bfe51ee6d0e889b3e91609acf197109}{dense\+\_\+is\+\_\+symmetric}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ct, int exact, int check\+DN)
+\item 
+int \mbox{\hyperlink{isSymmetric_8c_aacbfe63e871c20e248d831cdda3e8402}{sparse\+\_\+is\+\_\+symmetric}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ct, int exact, int check\+DN)
+\item 
+SEXP \mbox{\hyperlink{isSymmetric_8c_a8013b27f2db50783fe36110677e683dc}{R\+\_\+dense\+\_\+is\+\_\+symmetric}} (SEXP s\+\_\+obj, SEXP s\+\_\+trans, SEXP s\+\_\+exact, SEXP s\+\_\+check\+DN)
+\item 
+SEXP \mbox{\hyperlink{isSymmetric_8c_a1061e48eecd4623d1f0b794c3726ab2a}{R\+\_\+sparse\+\_\+is\+\_\+symmetric}} (SEXP s\+\_\+obj, SEXP s\+\_\+trans, SEXP s\+\_\+exact, SEXP s\+\_\+check\+DN)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}\index{isSymmetric.c@{isSymmetric.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{charliteral}{'\(\backslash\)0'},\ op\_ct,\ \textcolor{charliteral}{'\(\backslash\)0'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, and \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}\index{isSymmetric.c@{isSymmetric.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ pi[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (i\ <\ j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (iwork[i]\ ==\ pp[i]\ ||\ pi[iwork[i]]\ !=\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ done;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_IDEN(px[k],\ px[iwork[i]]))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ done;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++iwork[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++iwork[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (pi[k]\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++iwork[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{isSymmetric_8c_a4b3634c76326f1b182e622deaf84edc8}\index{isSymmetric.c@{isSymmetric.c}!dense\_is\_diagonal@{dense\_is\_diagonal}}
+\index{dense\_is\_diagonal@{dense\_is\_diagonal}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_diagonal()}{dense\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a4b3634c76326f1b182e622deaf84edc8} 
+int dense\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00007}{7}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{isSymmetric_8c_a3bfe51ee6d0e889b3e91609acf197109}\index{isSymmetric.c@{isSymmetric.c}!dense\_is\_symmetric@{dense\_is\_symmetric}}
+\index{dense\_is\_symmetric@{dense\_is\_symmetric}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_symmetric()}{dense\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a3bfe51ee6d0e889b3e91609acf197109} 
+int dense\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{, }\item[{int}]{exact}{, }\item[{int}]{check\+DN}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isSymmetric_8c_source_l00011}{11}} of file \mbox{\hyperlink{isSymmetric_8c_source}{is\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{isDiagonal_8c_source_l00007}{dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{attrib_8c_source_l00046}{Dim\+Names\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{M5_8h_source_l00064}{z\+NOT\+\_\+\+ZERO}}, and \mbox{\hyperlink{M5_8h_source_l00076}{z\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00305}{R\+\_\+dense\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{isSymmetric_8c_a8013b27f2db50783fe36110677e683dc}\index{isSymmetric.c@{isSymmetric.c}!R\_dense\_is\_symmetric@{R\_dense\_is\_symmetric}}
+\index{R\_dense\_is\_symmetric@{R\_dense\_is\_symmetric}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_is\_symmetric()}{R\_dense\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a8013b27f2db50783fe36110677e683dc} 
+SEXP R\+\_\+dense\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+trans}{, }\item[{SEXP}]{s\+\_\+exact}{, }\item[{SEXP}]{s\+\_\+check\+DN}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isSymmetric_8c_source_l00305}{305}} of file \mbox{\hyperlink{isSymmetric_8c_source}{is\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}.
+
+\Hypertarget{isSymmetric_8c_a1061e48eecd4623d1f0b794c3726ab2a}\index{isSymmetric.c@{isSymmetric.c}!R\_sparse\_is\_symmetric@{R\_sparse\_is\_symmetric}}
+\index{R\_sparse\_is\_symmetric@{R\_sparse\_is\_symmetric}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_is\_symmetric()}{R\_sparse\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_a1061e48eecd4623d1f0b794c3726ab2a} 
+SEXP R\+\_\+sparse\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+trans}{, }\item[{SEXP}]{s\+\_\+exact}{, }\item[{SEXP}]{s\+\_\+check\+DN}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isSymmetric_8c_source_l00331}{331}} of file \mbox{\hyperlink{isSymmetric_8c_source}{is\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}, and \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}.
+
+\Hypertarget{isSymmetric_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8}\index{isSymmetric.c@{isSymmetric.c}!sparse\_is\_diagonal@{sparse\_is\_diagonal}}
+\index{sparse\_is\_diagonal@{sparse\_is\_diagonal}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_diagonal()}{sparse\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8} 
+int sparse\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00045}{45}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{isSymmetric_8c_aacbfe63e871c20e248d831cdda3e8402}\index{isSymmetric.c@{isSymmetric.c}!sparse\_is\_symmetric@{sparse\_is\_symmetric}}
+\index{sparse\_is\_symmetric@{sparse\_is\_symmetric}!isSymmetric.c@{isSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_symmetric()}{sparse\_is\_symmetric()}}
+{\footnotesize\ttfamily \label{isSymmetric_8c_aacbfe63e871c20e248d831cdda3e8402} 
+int sparse\+\_\+is\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{, }\item[{int}]{exact}{, }\item[{int}]{check\+DN}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isSymmetric_8c_source_l00138}{138}} of file \mbox{\hyperlink{isSymmetric_8c_source}{is\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{attrib_8c_source_l00046}{Dim\+Names\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00045}{sparse\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{isSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{M5_8h_source_l00116}{z\+NOT\+\_\+\+CONJ}}, and \mbox{\hyperlink{M5_8h_source_l00076}{z\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00331}{R\+\_\+sparse\+\_\+is\+\_\+symmetric()}}.
+

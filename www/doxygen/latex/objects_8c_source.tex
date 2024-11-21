@@ -1,0 +1,213 @@
+\doxysection{objects.\+c}
+\hypertarget{objects_8c_source}{}\label{objects_8c_source}\index{objects.c@{objects.c}}
+\mbox{\hyperlink{objects_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00003}\mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{00003}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}}\ \ \ \ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_a2453fa4ee6e6093eb045822cf12482c3}{VALID\_DENSE}}\ \ \ \ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00004}\mbox{\hyperlink{objects_8c_a7f0675824c3b023f866f8927e0dec18e}{00004}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a7f0675824c3b023f866f8927e0dec18e}{valid\_sparse}}\ \ \ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_a2f50ad262b583a4b997749536ac64fb7}{VALID\_SPARSE}}\ \ \ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00005}\mbox{\hyperlink{objects_8c_a2580d8216f67f91d5bbfbdc19d7214b2}{00005}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a2580d8216f67f91d5bbfbdc19d7214b2}{valid\_sparse\_compressed}}[]\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_a2fb3abf1b237615044f5e80f8b7c33a4}{VALID\_SPARSE\_COMPRESSED}},\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00006}\mbox{\hyperlink{objects_8c_afec357c45619c5c77c854059405e0c65}{00006}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_afec357c45619c5c77c854059405e0c65}{valid\_sparse\_triplet}}\ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_afe56c272ab70257a8f517f9de1f1c314}{VALID\_SPARSE\_TRIPLET}}\ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00007}\mbox{\hyperlink{objects_8c_acd66675657cf8c0f2c3a4ee5aff80bdf}{00007}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_acd66675657cf8c0f2c3a4ee5aff80bdf}{valid\_diagonal}}\ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_a7a40ad54440d757a8d3bf1643e82c623}{VALID\_DIAGONAL}}\ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00008}\mbox{\hyperlink{objects_8c_a884a7e8add13b3221cf1dd30cc7cfecb}{00008}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a884a7e8add13b3221cf1dd30cc7cfecb}{valid\_index}}\ \ \ \ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_ae02d348af0f67411c61191d49d52c2b0}{VALID\_INDEX}}\ \ \ \ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00009}\mbox{\hyperlink{objects_8c_a3956a926b863f2b1fc1be04e7bb8ec75}{00009}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a3956a926b863f2b1fc1be04e7bb8ec75}{valid\_matrix}}\ \ \ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_ae1d68aea00bdb53f6ca548c9c063f022}{VALID\_MATRIX}}\ \ \ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00010}\mbox{\hyperlink{objects_8c_af2642d84b42c6c017b6423c78cdbc270}{00010}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_af2642d84b42c6c017b6423c78cdbc270}{valid\_vector}}\ \ \ \ \ \ \ \ \ \ \ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_ad9ddef2aba7ca759334b235ad5d080cc}{VALID\_VECTOR}}\ \ \ \ \ \ \ \ \ \ \ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00011}\mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{00011}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\_matrix\_or\_vector}}\ []\ =\ \{\ \mbox{\hyperlink{Mdefines_8h_a04186bdb8acc14cc2beb892c1a02cc29}{VALID\_MATRIX\_OR\_VECTOR}}\ ,\ \textcolor{stringliteral}{"{}"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00013}\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{00013}}\ SEXP\ \mbox{\hyperlink{objects_8c_a5a5de25950e28d9a6ff503c126756c27}{newObject}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *what)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00015}00015\ \ \ \ \ SEXP\ \textcolor{keyword}{class\ }=\ PROTECT(R\_do\_MAKE\_CLASS(what)),\ obj\ =\ R\_do\_new\_object(\textcolor{keyword}{class});}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00016}00016\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{return}\ obj;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00020}\mbox{\hyperlink{Mdefines_8h_a401b637b367eff33e3c6b7ca5caf752a}{00020}}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{objects_8c_a96dd5626aa0810d030d22785c30b7b62}{typeToKind}}(SEXPTYPE\ type)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordflow}{switch}\ (type)\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{case}\ LGLSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'l'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{case}\ INTSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'i'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{case}\ REALSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'d'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{case}\ CPLXSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00032}00032\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}unexpected\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}\ in\ '\%s'"{}}),}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_type2char(type),\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00036}00036\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00038}\mbox{\hyperlink{Mdefines_8h_a67e0086e042a22730b86597f78409dbb}{00038}}\ SEXPTYPE\ \mbox{\hyperlink{objects_8c_ae80f0eb7ce1f16864a4014d8727c6b04}{kindToType}}(\textcolor{keywordtype}{char}\ kind)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00039}00039\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{switch}\ (kind)\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ LGLSXP;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00044}00044\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ INTSXP;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ REALSXP;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ CPLXSXP;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}unexpected\ kind\ \(\backslash\)"{}\%c\(\backslash\)"{}\ in\ '\%s'"{}}),\ kind,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NILSXP;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00056}\mbox{\hyperlink{Mdefines_8h_ad9fb3afe8ec66e6c6f0247af32df1910}{00056}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{objects_8c_a67d8f80f93eb2ef49468ba7c81e7d56d}{kindToSize}}(\textcolor{keywordtype}{char}\ kind)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00057}00057\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{switch}\ (kind)\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(int);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(double);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00065}00065\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(Rcomplex);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}unexpected\ kind\ \(\backslash\)"{}\%c\(\backslash\)"{}\ in\ '\%s'"{}}),\ kind,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00073}\mbox{\hyperlink{Mdefines_8h_ae1fcd90e4b93c583de9fde5319f7cd9a}{00073}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a218ec14a1a89d6aa2e82cc1b5a46f004}{Matrix\_superclass}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ mode)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00074}00074\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'p'})\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ \&\ 1)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}indMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00078}00078\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'o'})\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ \&\ 4)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[2])\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dsyMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dspMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ \&\ 2)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[2])\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dpoMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dppMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00089}00089\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'p'})\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ \&\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[2])\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}zsCMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}zsRMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}zsTMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}zsyMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}zspMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[2])\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dsCMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dsRMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dsTMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dsyMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}dspMatrix"{}};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00109}00109\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{class};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00112}\mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{00112}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\_class}}(SEXP\ x,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ **valid,\ \textcolor{keywordtype}{int}\ mode,}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *caller)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00114}00114\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00115}00115\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ R\_check\_class\_etc(x,\ valid);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ 0)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (mode\ <=\ 0)\ ?\ valid[i]\ :\ \mbox{\hyperlink{objects_8c_a218ec14a1a89d6aa2e82cc1b5a46f004}{Matrix\_superclass}}(valid[i],\ mode);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00118}00118\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (caller)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a1a33d55f7692a7cc1a8f39a6a462258b}{ERROR\_INVALID\_CLASS}}(x,\ caller);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00123}00123\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00125}\mbox{\hyperlink{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57}{00125}}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57}{Matrix\_kind}}(SEXP\ obj)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00126}00126\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00127}00127\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(obj)\ !=\ OBJSXP)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(obj))\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ LGLSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'l'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ INTSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'i'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ REALSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'d'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ CPLXSXP:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00140}00140\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\_class}}(obj,\ \mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\_matrix\_or\_vector}},\ 7,\ NULL);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00141}00141\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'d'})\ ?\ \textcolor{charliteral}{'n'}\ :\ \textcolor{keyword}{class}[0];}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00144}00144\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00146}\mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{00146}}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{Matrix\_shape}}(SEXP\ obj,\ \textcolor{keywordtype}{int}\ mode)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00147}00147\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00148}00148\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(obj)\ !=\ OBJSXP)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\_class}}(obj,\ \mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\_matrix\_or\_vector}},\ mode,\ NULL);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00153}00153\ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'d'})\ ?\ \textcolor{charliteral}{'i'}\ :\ (\textcolor{keyword}{class}[3]\ ==\ \textcolor{charliteral}{'M'})\ ?\ \textcolor{keyword}{class}[1]\ :\ \textcolor{charliteral}{'g'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00154}00154\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00156}\mbox{\hyperlink{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51}{00156}}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51}{Matrix\_repr}}(SEXP\ obj)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00157}00157\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00158}00158\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(obj)\ !=\ OBJSXP)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00160}00160\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\_class}}(obj,\ \mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\_matrix\_or\_vector}},\ 7,\ NULL);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00161}00161\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[2])\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00164}00164\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00165}00165\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'n'};\ \textcolor{comment}{/*\ unpackedMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00168}00168\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'p'};\ \textcolor{comment}{/*\ \ \ packedMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00170}00170\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'C'};\ \textcolor{comment}{/*\ \ CsparseMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00172}00172\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'R'};\ \textcolor{comment}{/*\ \ RsparseMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00174}00174\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'T'};\ \textcolor{comment}{/*\ \ TsparseMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'d'};\ \textcolor{comment}{/*\ diagonalMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00178}00178\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'i'};\ \textcolor{comment}{/*\ \ \ \ \ \ indMatrix\ */}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00180}00180\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00183}00183\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00185}\mbox{\hyperlink{init_8c_a2fb6eebe78e7ec9d546a1187796a69ac}{00185}}\ SEXP\ \mbox{\hyperlink{objects_8c_a63fb14962e9c37f938e222f707b4676e}{R\_Matrix\_class}}(SEXP\ s\_obj,\ SEXP\ s\_mode)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00186}00186\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00187}00187\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\_matrix\_or\_vector}},\ Rf\_asInteger(s\_mode),\ NULL);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00188}00188\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_mkString((!\textcolor{keyword}{class})\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \textcolor{keyword}{class});}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00189}00189\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00191}\mbox{\hyperlink{init_8c_a9e21ad77e6f84fa1df89ac6dc6518e95}{00191}}\ SEXP\ \mbox{\hyperlink{objects_8c_a96bf1ce46c5b23d475eeab0163a29ee0}{R\_Matrix\_kind}}(SEXP\ s\_obj)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00192}00192\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00193}00193\ \ \ \ \ \textcolor{keywordtype}{char}\ s[]\ =\ \{\ \mbox{\hyperlink{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57}{Matrix\_kind}}\ (s\_obj),\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_mkString(s);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00197}\mbox{\hyperlink{init_8c_ae9b39486d9d404631ad48ea6d0128038}{00197}}\ SEXP\ \mbox{\hyperlink{objects_8c_a2aa2807578ab91beeeed0d41e7345cdc}{R\_Matrix\_shape}}(SEXP\ s\_obj,\ SEXP\ s\_mode)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00198}00198\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00199}00199\ \ \ \ \ \textcolor{keywordtype}{char}\ s[]\ =\ \{\ \mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{Matrix\_shape}}(s\_obj,\ Rf\_asInteger(s\_mode)),\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00200}00200\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_mkString(s);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00201}00201\ \}}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00203}\mbox{\hyperlink{init_8c_a20a771c46187df9a4e12aefee1258f12}{00203}}\ SEXP\ \mbox{\hyperlink{objects_8c_a2bac630c41361390db9c65739d5ea6de}{R\_Matrix\_repr}}(SEXP\ s\_obj)}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00204}00204\ \{}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00205}00205\ \ \ \ \ \textcolor{keywordtype}{char}\ s[]\ =\ \{\ \mbox{\hyperlink{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51}{Matrix\_repr}}\ (s\_obj),\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00206}00206\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_mkString(s);}
+\DoxyCodeLine{\Hypertarget{objects_8c_source_l00207}00207\ \}}
+
+\end{DoxyCode}

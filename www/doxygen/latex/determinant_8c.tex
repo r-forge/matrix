@@ -1,0 +1,154 @@
+\doxysection{determinant.\+c File Reference}
+\hypertarget{determinant_8c}{}\label{determinant_8c}\index{determinant.c@{determinant.c}}
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include $<$Rmath.\+h$>$}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}(\+\_\+\+F\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static SEXP \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}} (double modulus, int logarithm, int sign)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_a8fa199c38446b528fa28a54fc5c56ad9}{dense\+LU\+\_\+determinant}} (SEXP s\+\_\+trf, SEXP s\+\_\+logarithm)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_abb1e95d3290fb50e5c154996365b9f3c}{dense\+Bunch\+Kaufman\+\_\+determinant}} (SEXP s\+\_\+trf, SEXP s\+\_\+logarithm)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_a3055c2c0a4008e50ef75db756cdf7179}{dense\+Cholesky\+\_\+determinant}} (SEXP s\+\_\+trf, SEXP s\+\_\+logarithm)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_ac389e7594c4fce57c8eae674faa4d7c7}{sparse\+QR\+\_\+determinant}} (SEXP orf, SEXP s\+\_\+logarithm)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_a749798540ca84a964e824adc0c3bb859}{sparse\+LU\+\_\+determinant}} (SEXP s\+\_\+trf, SEXP s\+\_\+logarithm)
+\item 
+SEXP \mbox{\hyperlink{determinant_8c_a280b1145a3fca15d05570239508fbf3d}{sparse\+Cholesky\+\_\+determinant}} (SEXP s\+\_\+trf, SEXP s\+\_\+logarithm, SEXP s\+\_\+root)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}\index{determinant.c@{determinant.c}!DETERMINANT\_START@{DETERMINANT\_START}}
+\index{DETERMINANT\_START@{DETERMINANT\_START}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{DETERMINANT\_START}{DETERMINANT\_START}}
+{\footnotesize\ttfamily \label{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8} 
+\#define DETERMINANT\+\_\+\+START(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+F\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(\_F\_),\ n\ =\ pdim[1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (pdim[0]\ !=\ n)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}matrix\ is\ not\ square"{}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ givelog\ =\ Rf\_asLogical(s\_logarithm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{double}\ modulus\ =\ 0.0;\ \textcolor{comment}{/*\ result\ for\ n\ ==\ 0\ */}}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{determinant_8c_source_l00076}{dense\+Bunch\+Kaufman\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00196}{dense\+Cholesky\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00028}{dense\+LU\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00359}{sparse\+Cholesky\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00298}{sparse\+LU\+\_\+determinant()}}, and \mbox{\hyperlink{determinant_8c_source_l00228}{sparse\+QR\+\_\+determinant()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{determinant_8c_abb1e95d3290fb50e5c154996365b9f3c}\index{determinant.c@{determinant.c}!denseBunchKaufman\_determinant@{denseBunchKaufman\_determinant}}
+\index{denseBunchKaufman\_determinant@{denseBunchKaufman\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{denseBunchKaufman\_determinant()}{denseBunchKaufman\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_abb1e95d3290fb50e5c154996365b9f3c} 
+SEXP dense\+Bunch\+Kaufman\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+logarithm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00076}{76}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{determinant_8c_a3055c2c0a4008e50ef75db756cdf7179}\index{determinant.c@{determinant.c}!denseCholesky\_determinant@{denseCholesky\_determinant}}
+\index{denseCholesky\_determinant@{denseCholesky\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{denseCholesky\_determinant()}{denseCholesky\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_a3055c2c0a4008e50ef75db756cdf7179} 
+SEXP dense\+Cholesky\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+logarithm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00196}{196}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{determinant_8c_a8fa199c38446b528fa28a54fc5c56ad9}\index{determinant.c@{determinant.c}!denseLU\_determinant@{denseLU\_determinant}}
+\index{denseLU\_determinant@{denseLU\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{denseLU\_determinant()}{denseLU\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_a8fa199c38446b528fa28a54fc5c56ad9} 
+SEXP dense\+LU\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+logarithm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00028}{28}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{determinant_8c_aba585313ae01376d066009b349b2fb68}\index{determinant.c@{determinant.c}!det@{det}}
+\index{det@{det}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{det()}{det()}}
+{\footnotesize\ttfamily \label{determinant_8c_aba585313ae01376d066009b349b2fb68} 
+static SEXP det (\begin{DoxyParamCaption}\item[{double}]{modulus}{, }\item[{int}]{logarithm}{, }\item[{int}]{sign}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00008}{8}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{init_8c_source_l00613}{Matrix\+\_\+logarithm\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{determinant_8c_source_l00076}{dense\+Bunch\+Kaufman\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00196}{dense\+Cholesky\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00028}{dense\+LU\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00359}{sparse\+Cholesky\+\_\+determinant()}}, \mbox{\hyperlink{determinant_8c_source_l00298}{sparse\+LU\+\_\+determinant()}}, and \mbox{\hyperlink{determinant_8c_source_l00228}{sparse\+QR\+\_\+determinant()}}.
+
+\Hypertarget{determinant_8c_a280b1145a3fca15d05570239508fbf3d}\index{determinant.c@{determinant.c}!sparseCholesky\_determinant@{sparseCholesky\_determinant}}
+\index{sparseCholesky\_determinant@{sparseCholesky\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_determinant()}{sparseCholesky\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_a280b1145a3fca15d05570239508fbf3d} 
+SEXP sparse\+Cholesky\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+logarithm}{, }\item[{SEXP}]{s\+\_\+root}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00359}{359}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, and \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}.
+
+\Hypertarget{determinant_8c_a749798540ca84a964e824adc0c3bb859}\index{determinant.c@{determinant.c}!sparseLU\_determinant@{sparseLU\_determinant}}
+\index{sparseLU\_determinant@{sparseLU\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{sparseLU\_determinant()}{sparseLU\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_a749798540ca84a964e824adc0c3bb859} 
+SEXP sparse\+LU\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+logarithm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00298}{298}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00627}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{init_8c_source_l00601}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{perm_8c_source_l00022}{sign\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{determinant_8c_ac389e7594c4fce57c8eae674faa4d7c7}\index{determinant.c@{determinant.c}!sparseQR\_determinant@{sparseQR\_determinant}}
+\index{sparseQR\_determinant@{sparseQR\_determinant}!determinant.c@{determinant.c}}
+\doxysubsubsection{\texorpdfstring{sparseQR\_determinant()}{sparseQR\_determinant()}}
+{\footnotesize\ttfamily \label{determinant_8c_ac389e7594c4fce57c8eae674faa4d7c7} 
+SEXP sparse\+QR\+\_\+determinant (\begin{DoxyParamCaption}\item[{SEXP}]{orf}{, }\item[{SEXP}]{s\+\_\+logarithm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{determinant_8c_source_l00228}{228}} of file \mbox{\hyperlink{determinant_8c_source}{determinant.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{determinant_8c_source_l00008}{det()}}, \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00627}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{init_8c_source_l00600}{Matrix\+\_\+\+RSym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{perm_8c_source_l00022}{sign\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+

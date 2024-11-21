@@ -1,0 +1,367 @@
+\doxysection{objects.\+c File Reference}
+\hypertarget{objects_8c}{}\label{objects_8c}\index{objects.c@{objects.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{objects_8c_a5a5de25950e28d9a6ff503c126756c27}{new\+Object}} (const char \texorpdfstring{$\ast$}{*}what)
+\item 
+char \mbox{\hyperlink{objects_8c_a96dd5626aa0810d030d22785c30b7b62}{type\+To\+Kind}} (SEXPTYPE type)
+\item 
+SEXPTYPE \mbox{\hyperlink{objects_8c_ae80f0eb7ce1f16864a4014d8727c6b04}{kind\+To\+Type}} (char kind)
+\item 
+size\+\_\+t \mbox{\hyperlink{objects_8c_a67d8f80f93eb2ef49468ba7c81e7d56d}{kind\+To\+Size}} (char kind)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a218ec14a1a89d6aa2e82cc1b5a46f004}{Matrix\+\_\+superclass}} (const char \texorpdfstring{$\ast$}{*}class, int mode)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}{Matrix\+\_\+class}} (SEXP x, const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}valid, int mode, const char \texorpdfstring{$\ast$}{*}caller)
+\item 
+char \mbox{\hyperlink{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57}{Matrix\+\_\+kind}} (SEXP obj)
+\item 
+char \mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{Matrix\+\_\+shape}} (SEXP obj, int mode)
+\item 
+char \mbox{\hyperlink{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51}{Matrix\+\_\+repr}} (SEXP obj)
+\item 
+SEXP \mbox{\hyperlink{objects_8c_a63fb14962e9c37f938e222f707b4676e}{R\+\_\+\+Matrix\+\_\+class}} (SEXP s\+\_\+obj, SEXP s\+\_\+mode)
+\item 
+SEXP \mbox{\hyperlink{objects_8c_a96bf1ce46c5b23d475eeab0163a29ee0}{R\+\_\+\+Matrix\+\_\+kind}} (SEXP s\+\_\+obj)
+\item 
+SEXP \mbox{\hyperlink{objects_8c_a2aa2807578ab91beeeed0d41e7345cdc}{R\+\_\+\+Matrix\+\_\+shape}} (SEXP s\+\_\+obj, SEXP s\+\_\+mode)
+\item 
+SEXP \mbox{\hyperlink{objects_8c_a2bac630c41361390db9c65739d5ea6de}{R\+\_\+\+Matrix\+\_\+repr}} (SEXP s\+\_\+obj)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a2e645349fc5f08190a8ff086cfbff6e2}{valid\+\_\+dense}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2453fa4ee6e6093eb045822cf12482c3}{VALID\+\_\+\+DENSE}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a7f0675824c3b023f866f8927e0dec18e}{valid\+\_\+sparse}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2f50ad262b583a4b997749536ac64fb7}{VALID\+\_\+\+SPARSE}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a2580d8216f67f91d5bbfbdc19d7214b2}{valid\+\_\+sparse\+\_\+compressed}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2fb3abf1b237615044f5e80f8b7c33a4}{VALID\+\_\+\+SPARSE\+\_\+\+COMPRESSED}}, "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_afec357c45619c5c77c854059405e0c65}{valid\+\_\+sparse\+\_\+triplet}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_afe56c272ab70257a8f517f9de1f1c314}{VALID\+\_\+\+SPARSE\+\_\+\+TRIPLET}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_acd66675657cf8c0f2c3a4ee5aff80bdf}{valid\+\_\+diagonal}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a7a40ad54440d757a8d3bf1643e82c623}{VALID\+\_\+\+DIAGONAL}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a884a7e8add13b3221cf1dd30cc7cfecb}{valid\+\_\+index}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ae02d348af0f67411c61191d49d52c2b0}{VALID\+\_\+\+INDEX}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_a3956a926b863f2b1fc1be04e7bb8ec75}{valid\+\_\+matrix}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ae1d68aea00bdb53f6ca548c9c063f022}{VALID\+\_\+\+MATRIX}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_af2642d84b42c6c017b6423c78cdbc270}{valid\+\_\+vector}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ad9ddef2aba7ca759334b235ad5d080cc}{VALID\+\_\+\+VECTOR}} , "{}"{} \}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}{valid\+\_\+matrix\+\_\+or\+\_\+vector}} \mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a04186bdb8acc14cc2beb892c1a02cc29}{VALID\+\_\+\+MATRIX\+\_\+\+OR\+\_\+\+VECTOR}} , "{}"{} \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{objects_8c_a67d8f80f93eb2ef49468ba7c81e7d56d}\index{objects.c@{objects.c}!kindToSize@{kindToSize}}
+\index{kindToSize@{kindToSize}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{kindToSize()}{kindToSize()}}
+{\footnotesize\ttfamily \label{objects_8c_a67d8f80f93eb2ef49468ba7c81e7d56d} 
+size\+\_\+t kind\+To\+Size (\begin{DoxyParamCaption}\item[{char}]{kind}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00056}{56}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, and \mbox{\hyperlink{coerce_8c_source_l00414}{sparse\+\_\+as\+\_\+dense()}}.
+
+\Hypertarget{objects_8c_ae80f0eb7ce1f16864a4014d8727c6b04}\index{objects.c@{objects.c}!kindToType@{kindToType}}
+\index{kindToType@{kindToType}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{kindToType()}{kindToType()}}
+{\footnotesize\ttfamily \label{objects_8c_ae80f0eb7ce1f16864a4014d8727c6b04} 
+SEXPTYPE kind\+To\+Type (\begin{DoxyParamCaption}\item[{char}]{kind}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00038}{38}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{subscript_8c_source_l00037}{dense\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00377}{dense\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02160}{diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{subscript_8c_source_l00252}{diagonal\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00585}{diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01916}{index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{coerce_8c_source_l03798}{R\+\_\+\+Matrix\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{subscript_8c_source_l00128}{sparse\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00465}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{coerce_8c_source_l00008}{vector\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00750}{Vector\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+
+\Hypertarget{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe}\index{objects.c@{objects.c}!Matrix\_class@{Matrix\_class}}
+\index{Matrix\_class@{Matrix\_class}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_class()}{Matrix\_class()}}
+{\footnotesize\ttfamily \label{objects_8c_a44d05e7e42a2e6521f857b78af1a0afe} 
+const char \texorpdfstring{$\ast$}{*} Matrix\+\_\+class (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{valid}{, }\item[{int}]{mode}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{caller}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00112}{112}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00149}{ERROR\+\_\+\+INVALID\+\_\+\+CLASS}}, and \mbox{\hyperlink{objects_8c_source_l00073}{Matrix\+\_\+superclass()}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}, \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Csparse_8c_source_l00408}{Csparse\+\_\+write\+MM()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{lu_8c_source_l00012}{dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{M2\+CHD()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{objects_8c_source_l00125}{Matrix\+\_\+kind()}}, \mbox{\hyperlink{objects_8c_source_l00156}{Matrix\+\_\+repr()}}, \mbox{\hyperlink{objects_8c_source_l00146}{Matrix\+\_\+shape()}}, \mbox{\hyperlink{coerce_8c_source_l02292}{R\+\_\+dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02066}{R\+\_\+dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02717}{R\+\_\+dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l01735}{R\+\_\+dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l02648}{R\+\_\+dense\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{band_8c_source_l00350}{R\+\_\+dense\+\_\+band()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{R\+\_\+dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00197}{R\+\_\+dense\+\_\+cholesky()}}, \mbox{\hyperlink{diag_8c_source_l00205}{R\+\_\+dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{expm_8c_source_l00466}{R\+\_\+dense\+\_\+expm()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00188}{R\+\_\+dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00401}{R\+\_\+dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isCanonical_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+canonical()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00305}{R\+\_\+dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{isTriangular_8c_source_l00166}{R\+\_\+dense\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{lu_8c_source_l00154}{R\+\_\+dense\+\_\+lu()}}, \mbox{\hyperlink{colSums_8c_source_l00729}{R\+\_\+dense\+\_\+marginsum()}}, \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{Summary_8c_source_l00898}{R\+\_\+dense\+\_\+prod()}}, \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}, \mbox{\hyperlink{skewpart_8c_source_l00482}{R\+\_\+dense\+\_\+skewpart()}}, \mbox{\hyperlink{Summary_8c_source_l00445}{R\+\_\+dense\+\_\+sum()}}, \mbox{\hyperlink{symmpart_8c_source_l00661}{R\+\_\+dense\+\_\+symmpart()}}, \mbox{\hyperlink{t_8c_source_l00170}{R\+\_\+dense\+\_\+transpose()}}, \mbox{\hyperlink{coerce_8c_source_l00666}{R\+\_\+diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02211}{R\+\_\+diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01898}{R\+\_\+diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03368}{R\+\_\+diagonal\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, \mbox{\hyperlink{coerce_8c_source_l00740}{R\+\_\+index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02227}{R\+\_\+index\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01989}{R\+\_\+index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03440}{R\+\_\+index\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{coerce_8c_source_l03638}{R\+\_\+\+Matrix\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l03798}{R\+\_\+\+Matrix\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l03741}{R\+\_\+\+Matrix\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l03516}{R\+\_\+\+Matrix\+\_\+as\+\_\+matrix()}}, \mbox{\hyperlink{coerce_8c_source_l03609}{R\+\_\+\+Matrix\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l03663}{R\+\_\+\+Matrix\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03688}{R\+\_\+\+Matrix\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03583}{R\+\_\+\+Matrix\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{coerce_8c_source_l03713}{R\+\_\+\+Matrix\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{coerce_8c_source_l03447}{R\+\_\+\+Matrix\+\_\+as\+\_\+vector()}}, \mbox{\hyperlink{objects_8c_source_l00185}{R\+\_\+\+Matrix\+\_\+class()}}, \mbox{\hyperlink{aggregate_8c_source_l00086}{R\+\_\+sparse\+\_\+aggregate()}}, \mbox{\hyperlink{coerce_8c_source_l02841}{R\+\_\+sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l00589}{R\+\_\+sparse\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02592}{R\+\_\+sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02150}{R\+\_\+sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02957}{R\+\_\+sparse\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03038}{R\+\_\+sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03275}{R\+\_\+sparse\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{band_8c_source_l00380}{R\+\_\+sparse\+\_\+band()}}, \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, \mbox{\hyperlink{diag_8c_source_l00215}{R\+\_\+sparse\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00660}{R\+\_\+sparse\+\_\+diag\+\_\+\+N2\+U()}}, \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{diag_8c_source_l00654}{R\+\_\+sparse\+\_\+diag\+\_\+\+U2\+N()}}, \mbox{\hyperlink{dropzero_8c_source_l00211}{R\+\_\+sparse\+\_\+dropzero()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00198}{R\+\_\+sparse\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00413}{R\+\_\+sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isCanonical_8c_source_l00092}{R\+\_\+sparse\+\_\+is\+\_\+canonical()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00103}{R\+\_\+sparse\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00331}{R\+\_\+sparse\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{isTriangular_8c_source_l00195}{R\+\_\+sparse\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{lu_8c_source_l00174}{R\+\_\+sparse\+\_\+lu()}}, \mbox{\hyperlink{colSums_8c_source_l00713}{R\+\_\+sparse\+\_\+marginsum()}}, \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}, \mbox{\hyperlink{Summary_8c_source_l00908}{R\+\_\+sparse\+\_\+prod()}}, \mbox{\hyperlink{qr_8c_source_l00115}{R\+\_\+sparse\+\_\+qr()}}, \mbox{\hyperlink{skewpart_8c_source_l00492}{R\+\_\+sparse\+\_\+skewpart()}}, \mbox{\hyperlink{Summary_8c_source_l00455}{R\+\_\+sparse\+\_\+sum()}}, \mbox{\hyperlink{symmpart_8c_source_l00672}{R\+\_\+sparse\+\_\+symmpart()}}, \mbox{\hyperlink{t_8c_source_l00180}{R\+\_\+sparse\+\_\+transpose()}}, \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l01180}{R\+\_\+\+Vector\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{bind_8c_source_l00010}{scan\+Args()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00356}{sexp\+\_\+as\+\_\+cholmod\+\_\+dense()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00018}{sexp\+\_\+as\+\_\+cholmod\+\_\+factor()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00127}{sexp\+\_\+as\+\_\+cholmod\+\_\+sparse()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00247}{sexp\+\_\+as\+\_\+cholmod\+\_\+triplet()}}, \mbox{\hyperlink{coerce_8c_source_l03143}{sparse\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, and \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}.
+
+\Hypertarget{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57}\index{objects.c@{objects.c}!Matrix\_kind@{Matrix\_kind}}
+\index{Matrix\_kind@{Matrix\_kind}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_kind()}{Matrix\_kind()}}
+{\footnotesize\ttfamily \label{objects_8c_a5c6a737dcc33b7e94bdba2593c584f57} 
+char Matrix\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00125}{125}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{objects_8c_source_l00011}{valid\+\_\+matrix\+\_\+or\+\_\+vector}}.
+
+
+
+Referenced by \mbox{\hyperlink{objects_8c_source_l00191}{R\+\_\+\+Matrix\+\_\+kind()}}.
+
+\Hypertarget{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51}\index{objects.c@{objects.c}!Matrix\_repr@{Matrix\_repr}}
+\index{Matrix\_repr@{Matrix\_repr}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_repr()}{Matrix\_repr()}}
+{\footnotesize\ttfamily \label{objects_8c_a87cdbaca5af8823dfab3b849c6d7bd51} 
+char Matrix\+\_\+repr (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00156}{156}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{objects_8c_source_l00011}{valid\+\_\+matrix\+\_\+or\+\_\+vector}}.
+
+
+
+Referenced by \mbox{\hyperlink{objects_8c_source_l00203}{R\+\_\+\+Matrix\+\_\+repr()}}.
+
+\Hypertarget{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}\index{objects.c@{objects.c}!Matrix\_shape@{Matrix\_shape}}
+\index{Matrix\_shape@{Matrix\_shape}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_shape()}{Matrix\_shape()}}
+{\footnotesize\ttfamily \label{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0} 
+char Matrix\+\_\+shape (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00146}{146}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{objects_8c_source_l00011}{valid\+\_\+matrix\+\_\+or\+\_\+vector}}.
+
+
+
+Referenced by \mbox{\hyperlink{objects_8c_source_l00197}{R\+\_\+\+Matrix\+\_\+shape()}}, and \mbox{\hyperlink{updown_8c_source_l00030}{sparse\+Cholesky\+\_\+update()}}.
+
+\Hypertarget{objects_8c_a218ec14a1a89d6aa2e82cc1b5a46f004}\index{objects.c@{objects.c}!Matrix\_superclass@{Matrix\_superclass}}
+\index{Matrix\_superclass@{Matrix\_superclass}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_superclass()}{Matrix\_superclass()}}
+{\footnotesize\ttfamily \label{objects_8c_a218ec14a1a89d6aa2e82cc1b5a46f004} 
+const char \texorpdfstring{$\ast$}{*} Matrix\+\_\+superclass (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00073}{73}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}.
+
+\Hypertarget{objects_8c_a5a5de25950e28d9a6ff503c126756c27}\index{objects.c@{objects.c}!newObject@{newObject}}
+\index{newObject@{newObject}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{newObject()}{newObject()}}
+{\footnotesize\ttfamily \label{objects_8c_a5a5de25950e28d9a6ff503c126756c27} 
+SEXP new\+Object (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{what}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00013}{13}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00375}{CHD2\+M()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00222}{CHF2\+M()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00851}{cholmod\+\_\+dense\+\_\+as\+\_\+sexp()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00466}{cholmod\+\_\+factor\+\_\+as\+\_\+sexp()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00625}{cholmod\+\_\+sparse\+\_\+as\+\_\+sexp()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00740}{cholmod\+\_\+triplet\+\_\+as\+\_\+sexp()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00328}{CHS2\+M()}}, \mbox{\hyperlink{t__subassign_8c_source_l00122}{Csparse\+\_\+subassign()}}, \mbox{\hyperlink{cs-etc_8c_source_l00042}{CXS2\+M()}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02654}{dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l01351}{dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l02598}{dense\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{band_8c_source_l00007}{dense\+\_\+band()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{diag_8c_source_l00225}{dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{lu_8c_source_l00012}{dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{symmpart_8c_source_l00011}{dense\+\_\+symmpart()}}, \mbox{\hyperlink{t_8c_source_l00007}{dense\+\_\+transpose()}}, \mbox{\hyperlink{expand_8c_source_l00006}{dense\+Bunch\+Kaufman\+\_\+expand()}}, \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02160}{diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03281}{diagonal\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00172}{ge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01916}{index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03374}{index\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{subscript_8c_source_l01443}{index\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l00414}{sparse\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02847}{sparse\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l02963}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03143}{sparse\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{band_8c_source_l00095}{sparse\+\_\+band()}}, \mbox{\hyperlink{diag_8c_source_l00631}{sparse\+\_\+diag\+\_\+\+N2\+U()}}, \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}, \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{symmpart_8c_source_l00205}{sparse\+\_\+symmpart()}}, \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}, \mbox{\hyperlink{coerce_8c_source_l00008}{vector\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00750}{Vector\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+
+\Hypertarget{objects_8c_a63fb14962e9c37f938e222f707b4676e}\index{objects.c@{objects.c}!R\_Matrix\_class@{R\_Matrix\_class}}
+\index{R\_Matrix\_class@{R\_Matrix\_class}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{R\_Matrix\_class()}{R\_Matrix\_class()}}
+{\footnotesize\ttfamily \label{objects_8c_a63fb14962e9c37f938e222f707b4676e} 
+SEXP R\+\_\+\+Matrix\+\_\+class (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00185}{185}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, and \mbox{\hyperlink{objects_8c_source_l00011}{valid\+\_\+matrix\+\_\+or\+\_\+vector}}.
+
+\Hypertarget{objects_8c_a96bf1ce46c5b23d475eeab0163a29ee0}\index{objects.c@{objects.c}!R\_Matrix\_kind@{R\_Matrix\_kind}}
+\index{R\_Matrix\_kind@{R\_Matrix\_kind}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{R\_Matrix\_kind()}{R\_Matrix\_kind()}}
+{\footnotesize\ttfamily \label{objects_8c_a96bf1ce46c5b23d475eeab0163a29ee0} 
+SEXP R\+\_\+\+Matrix\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00191}{191}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00125}{Matrix\+\_\+kind()}}.
+
+\Hypertarget{objects_8c_a2bac630c41361390db9c65739d5ea6de}\index{objects.c@{objects.c}!R\_Matrix\_repr@{R\_Matrix\_repr}}
+\index{R\_Matrix\_repr@{R\_Matrix\_repr}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{R\_Matrix\_repr()}{R\_Matrix\_repr()}}
+{\footnotesize\ttfamily \label{objects_8c_a2bac630c41361390db9c65739d5ea6de} 
+SEXP R\+\_\+\+Matrix\+\_\+repr (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00203}{203}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00156}{Matrix\+\_\+repr()}}.
+
+\Hypertarget{objects_8c_a2aa2807578ab91beeeed0d41e7345cdc}\index{objects.c@{objects.c}!R\_Matrix\_shape@{R\_Matrix\_shape}}
+\index{R\_Matrix\_shape@{R\_Matrix\_shape}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{R\_Matrix\_shape()}{R\_Matrix\_shape()}}
+{\footnotesize\ttfamily \label{objects_8c_a2aa2807578ab91beeeed0d41e7345cdc} 
+SEXP R\+\_\+\+Matrix\+\_\+shape (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00197}{197}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00146}{Matrix\+\_\+shape()}}.
+
+\Hypertarget{objects_8c_a96dd5626aa0810d030d22785c30b7b62}\index{objects.c@{objects.c}!typeToKind@{typeToKind}}
+\index{typeToKind@{typeToKind}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{typeToKind()}{typeToKind()}}
+{\footnotesize\ttfamily \label{objects_8c_a96dd5626aa0810d030d22785c30b7b62} 
+char type\+To\+Kind (\begin{DoxyParamCaption}\item[{SEXPTYPE}]{type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00020}{20}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01295}{matrix\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{utils-R_8c_source_l00143}{R\+\_\+nnz()}}, \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}, \mbox{\hyperlink{coerce_8c_source_l00008}{vector\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00750}{Vector\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{objects_8c_a2e645349fc5f08190a8ff086cfbff6e2}\index{objects.c@{objects.c}!valid\_dense@{valid\_dense}}
+\index{valid\_dense@{valid\_dense}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_dense}{valid\_dense}}
+{\footnotesize\ttfamily \label{objects_8c_a2e645349fc5f08190a8ff086cfbff6e2} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+dense\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2453fa4ee6e6093eb045822cf12482c3}{VALID\+\_\+\+DENSE}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00003}{3}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{lu_8c_source_l00012}{dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{coerce_8c_source_l02292}{R\+\_\+dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02066}{R\+\_\+dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02717}{R\+\_\+dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l01735}{R\+\_\+dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l02648}{R\+\_\+dense\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{band_8c_source_l00350}{R\+\_\+dense\+\_\+band()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{R\+\_\+dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00197}{R\+\_\+dense\+\_\+cholesky()}}, \mbox{\hyperlink{diag_8c_source_l00205}{R\+\_\+dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{expm_8c_source_l00466}{R\+\_\+dense\+\_\+expm()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00188}{R\+\_\+dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00401}{R\+\_\+dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isCanonical_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+canonical()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00305}{R\+\_\+dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{isTriangular_8c_source_l00166}{R\+\_\+dense\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{lu_8c_source_l00154}{R\+\_\+dense\+\_\+lu()}}, \mbox{\hyperlink{colSums_8c_source_l00729}{R\+\_\+dense\+\_\+marginsum()}}, \mbox{\hyperlink{Summary_8c_source_l00898}{R\+\_\+dense\+\_\+prod()}}, \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}, \mbox{\hyperlink{skewpart_8c_source_l00482}{R\+\_\+dense\+\_\+skewpart()}}, \mbox{\hyperlink{Summary_8c_source_l00445}{R\+\_\+dense\+\_\+sum()}}, \mbox{\hyperlink{symmpart_8c_source_l00661}{R\+\_\+dense\+\_\+symmpart()}}, and \mbox{\hyperlink{t_8c_source_l00170}{R\+\_\+dense\+\_\+transpose()}}.
+
+\Hypertarget{objects_8c_acd66675657cf8c0f2c3a4ee5aff80bdf}\index{objects.c@{objects.c}!valid\_diagonal@{valid\_diagonal}}
+\index{valid\_diagonal@{valid\_diagonal}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_diagonal}{valid\_diagonal}}
+{\footnotesize\ttfamily \label{objects_8c_acd66675657cf8c0f2c3a4ee5aff80bdf} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+diagonal\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a7a40ad54440d757a8d3bf1643e82c623}{VALID\+\_\+\+DIAGONAL}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00007}{7}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_a884a7e8add13b3221cf1dd30cc7cfecb}\index{objects.c@{objects.c}!valid\_index@{valid\_index}}
+\index{valid\_index@{valid\_index}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_index}{valid\_index}}
+{\footnotesize\ttfamily \label{objects_8c_a884a7e8add13b3221cf1dd30cc7cfecb} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+index\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ae02d348af0f67411c61191d49d52c2b0}{VALID\+\_\+\+INDEX}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00008}{8}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_a3956a926b863f2b1fc1be04e7bb8ec75}\index{objects.c@{objects.c}!valid\_matrix@{valid\_matrix}}
+\index{valid\_matrix@{valid\_matrix}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_matrix}{valid\_matrix}}
+{\footnotesize\ttfamily \label{objects_8c_a3956a926b863f2b1fc1be04e7bb8ec75} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+matrix\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ae1d68aea00bdb53f6ca548c9c063f022}{VALID\+\_\+\+MATRIX}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00009}{9}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7}\index{objects.c@{objects.c}!valid\_matrix\_or\_vector@{valid\_matrix\_or\_vector}}
+\index{valid\_matrix\_or\_vector@{valid\_matrix\_or\_vector}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_matrix\_or\_vector}{valid\_matrix\_or\_vector}}
+{\footnotesize\ttfamily \label{objects_8c_acb53efa7a3a139c2f7ff81d73b4eb8f7} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+matrix\+\_\+or\+\_\+vector\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a04186bdb8acc14cc2beb892c1a02cc29}{VALID\+\_\+\+MATRIX\+\_\+\+OR\+\_\+\+VECTOR}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00011}{11}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{objects_8c_source_l00125}{Matrix\+\_\+kind()}}, \mbox{\hyperlink{objects_8c_source_l00156}{Matrix\+\_\+repr()}}, \mbox{\hyperlink{objects_8c_source_l00146}{Matrix\+\_\+shape()}}, and \mbox{\hyperlink{objects_8c_source_l00185}{R\+\_\+\+Matrix\+\_\+class()}}.
+
+\Hypertarget{objects_8c_a7f0675824c3b023f866f8927e0dec18e}\index{objects.c@{objects.c}!valid\_sparse@{valid\_sparse}}
+\index{valid\_sparse@{valid\_sparse}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_sparse}{valid\_sparse}}
+{\footnotesize\ttfamily \label{objects_8c_a7f0675824c3b023f866f8927e0dec18e} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+sparse\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2f50ad262b583a4b997749536ac64fb7}{VALID\+\_\+\+SPARSE}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00004}{4}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_a2580d8216f67f91d5bbfbdc19d7214b2}\index{objects.c@{objects.c}!valid\_sparse\_compressed@{valid\_sparse\_compressed}}
+\index{valid\_sparse\_compressed@{valid\_sparse\_compressed}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_sparse\_compressed}{valid\_sparse\_compressed}}
+{\footnotesize\ttfamily \label{objects_8c_a2580d8216f67f91d5bbfbdc19d7214b2} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+sparse\+\_\+compressed\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_a2fb3abf1b237615044f5e80f8b7c33a4}{VALID\+\_\+\+SPARSE\+\_\+\+COMPRESSED}}, "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00005}{5}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_afec357c45619c5c77c854059405e0c65}\index{objects.c@{objects.c}!valid\_sparse\_triplet@{valid\_sparse\_triplet}}
+\index{valid\_sparse\_triplet@{valid\_sparse\_triplet}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_sparse\_triplet}{valid\_sparse\_triplet}}
+{\footnotesize\ttfamily \label{objects_8c_afec357c45619c5c77c854059405e0c65} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+sparse\+\_\+triplet\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_afe56c272ab70257a8f517f9de1f1c314}{VALID\+\_\+\+SPARSE\+\_\+\+TRIPLET}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00006}{6}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+
+\Hypertarget{objects_8c_af2642d84b42c6c017b6423c78cdbc270}\index{objects.c@{objects.c}!valid\_vector@{valid\_vector}}
+\index{valid\_vector@{valid\_vector}!objects.c@{objects.c}}
+\doxysubsubsection{\texorpdfstring{valid\_vector}{valid\_vector}}
+{\footnotesize\ttfamily \label{objects_8c_af2642d84b42c6c017b6423c78cdbc270} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+vector\mbox{[}$\,$\mbox{]} = \{ \mbox{\hyperlink{Mdefines_8h_ad9ddef2aba7ca759334b235ad5d080cc}{VALID\+\_\+\+VECTOR}} , "{}"{} \}}
+
+
+
+Definition at line \mbox{\hyperlink{objects_8c_source_l00010}{10}} of file \mbox{\hyperlink{objects_8c_source}{objects.\+c}}.
+

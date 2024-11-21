@@ -1,0 +1,132 @@
+\doxysection{force\+Symmetric.\+c File Reference}
+\hypertarget{forceSymmetric_8c}{}\label{forceSymmetric_8c}\index{forceSymmetric.c@{forceSymmetric.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{forceSymmetric_8c_aa185a3a62961f8afa452bcc2fc8e1626}{dense\+\_\+force\+\_\+symmetric}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ul, char op\+\_\+ct)
+\item 
+SEXP \mbox{\hyperlink{forceSymmetric_8c_a56273246280226ce2a59d621b8b4df9b}{sparse\+\_\+force\+\_\+symmetric}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ul, char op\+\_\+ct)
+\item 
+SEXP \mbox{\hyperlink{forceSymmetric_8c_afd4ae9e36514ef542bf362c376242f07}{R\+\_\+dense\+\_\+force\+\_\+symmetric}} (SEXP s\+\_\+from, SEXP s\+\_\+uplo, SEXP s\+\_\+trans)
+\item 
+SEXP \mbox{\hyperlink{forceSymmetric_8c_afa8b0eade48797d7fbee63129735050d}{R\+\_\+sparse\+\_\+force\+\_\+symmetric}} (SEXP s\+\_\+from, SEXP s\+\_\+uplo, SEXP s\+\_\+trans)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}\index{forceSymmetric.c@{forceSymmetric.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(force2)(px1,\ \ px0,\ n\_,\ ul0,\ ct0,\ nu0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ul0\ ==\ ul1)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(force1)(px1,\ \ px0,\ n\_,\ ul0,\ ct0,\ nu0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(trans1)(px1,\ \ px0,\ n\_,\ ul0,\ ct0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(force1)(px1,\ NULL,\ n\_,\ ul1,\ ct0,\ nu0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{dense\+\_\+force\+\_\+symmetric()}}, and \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}.
+
+\Hypertarget{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}\index{forceSymmetric.c@{forceSymmetric.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}\index{forceSymmetric.c@{forceSymmetric.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{forceSymmetric_8c_aa185a3a62961f8afa452bcc2fc8e1626}\index{forceSymmetric.c@{forceSymmetric.c}!dense\_force\_symmetric@{dense\_force\_symmetric}}
+\index{dense\_force\_symmetric@{dense\_force\_symmetric}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{dense\_force\_symmetric()}{dense\_force\_symmetric()}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_aa185a3a62961f8afa452bcc2fc8e1626} 
+SEXP dense\+\_\+force\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ul}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{7}} of file \mbox{\hyperlink{forceSymmetric_8c_source}{force\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00401}{R\+\_\+dense\+\_\+force\+\_\+symmetric()}}.
+
+\Hypertarget{forceSymmetric_8c_afd4ae9e36514ef542bf362c376242f07}\index{forceSymmetric.c@{forceSymmetric.c}!R\_dense\_force\_symmetric@{R\_dense\_force\_symmetric}}
+\index{R\_dense\_force\_symmetric@{R\_dense\_force\_symmetric}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_force\_symmetric()}{R\_dense\_force\_symmetric()}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_afd4ae9e36514ef542bf362c376242f07} 
+SEXP R\+\_\+dense\+\_\+force\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+uplo}{, }\item[{SEXP}]{s\+\_\+trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceSymmetric_8c_source_l00401}{401}} of file \mbox{\hyperlink{forceSymmetric_8c_source}{force\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00158}{VALID\+\_\+\+UPLO}}.
+
+\Hypertarget{forceSymmetric_8c_afa8b0eade48797d7fbee63129735050d}\index{forceSymmetric.c@{forceSymmetric.c}!R\_sparse\_force\_symmetric@{R\_sparse\_force\_symmetric}}
+\index{R\_sparse\_force\_symmetric@{R\_sparse\_force\_symmetric}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_force\_symmetric()}{R\_sparse\_force\_symmetric()}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_afa8b0eade48797d7fbee63129735050d} 
+SEXP R\+\_\+sparse\+\_\+force\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+uplo}{, }\item[{SEXP}]{s\+\_\+trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceSymmetric_8c_source_l00413}{413}} of file \mbox{\hyperlink{forceSymmetric_8c_source}{force\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}, \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00158}{VALID\+\_\+\+UPLO}}.
+
+\Hypertarget{forceSymmetric_8c_a56273246280226ce2a59d621b8b4df9b}\index{forceSymmetric.c@{forceSymmetric.c}!sparse\_force\_symmetric@{sparse\_force\_symmetric}}
+\index{sparse\_force\_symmetric@{sparse\_force\_symmetric}!forceSymmetric.c@{forceSymmetric.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_force\_symmetric()}{sparse\_force\_symmetric()}}
+{\footnotesize\ttfamily \label{forceSymmetric_8c_a56273246280226ce2a59d621b8b4df9b} 
+SEXP sparse\+\_\+force\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ul}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{83}} of file \mbox{\hyperlink{forceSymmetric_8c_source}{force\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{M5_8h_source_l00172}{z\+ASSIGN\+\_\+\+CONJ}}, \mbox{\hyperlink{M5_8h_source_l00166}{z\+ASSIGN\+\_\+\+IDEN}}, and \mbox{\hyperlink{M5_8h_source_l00178}{z\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00413}{R\+\_\+sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+

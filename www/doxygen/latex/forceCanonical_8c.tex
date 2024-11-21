@@ -1,0 +1,148 @@
+\doxysection{force\+Canonical.\+c File Reference}
+\hypertarget{forceCanonical_8c}{}\label{forceCanonical_8c}\index{forceCanonical.c@{forceCanonical.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{forceCanonical_8c_a9cf1bcaab15c16704d7410d067d3fc40}{dense\+\_\+force\+\_\+canonical}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, int check)
+\item 
+SEXP \mbox{\hyperlink{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc}{sparse\+\_\+force\+\_\+canonical}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, int check)
+\item 
+SEXP \mbox{\hyperlink{forceCanonical_8c_af59df1fb88c2cecacd8f572e503cf02e}{R\+\_\+dense\+\_\+force\+\_\+canonical}} (SEXP s\+\_\+from, SEXP s\+\_\+check)
+\item 
+SEXP \mbox{\hyperlink{forceCanonical_8c_a57ea8b3bf10f14caf5a6cddfe2ffea02}{R\+\_\+sparse\+\_\+force\+\_\+canonical}} (SEXP s\+\_\+from, SEXP s\+\_\+check)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}\index{forceCanonical.c@{forceCanonical.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ canonical\ =\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test1)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, and \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}.
+
+\Hypertarget{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}\index{forceCanonical.c@{forceCanonical.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x),\ *py\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ memcpy(py,\ px,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ m\ *\ (\textcolor{keywordtype}{size\_t})\ n);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(force2)(py,\ px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#NAME(force1)(py,\ px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}\index{forceCanonical.c@{forceCanonical.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ value\ =\ Rf\_allocVector(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPESXP,\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(value)[0]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{forceCanonical_8c_a9cf1bcaab15c16704d7410d067d3fc40}\index{forceCanonical.c@{forceCanonical.c}!dense\_force\_canonical@{dense\_force\_canonical}}
+\index{dense\_force\_canonical@{dense\_force\_canonical}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{dense\_force\_canonical()}{dense\_force\_canonical()}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_a9cf1bcaab15c16704d7410d067d3fc40} 
+SEXP dense\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00007}{7}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, and \mbox{\hyperlink{forceCanonical_8c_source_l00188}{R\+\_\+dense\+\_\+force\+\_\+canonical()}}.
+
+\Hypertarget{forceCanonical_8c_af59df1fb88c2cecacd8f572e503cf02e}\index{forceCanonical.c@{forceCanonical.c}!R\_dense\_force\_canonical@{R\_dense\_force\_canonical}}
+\index{R\_dense\_force\_canonical@{R\_dense\_force\_canonical}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_force\_canonical()}{R\_dense\_force\_canonical()}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_af59df1fb88c2cecacd8f572e503cf02e} 
+SEXP R\+\_\+dense\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00188}{188}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}.
+
+\Hypertarget{forceCanonical_8c_a57ea8b3bf10f14caf5a6cddfe2ffea02}\index{forceCanonical.c@{forceCanonical.c}!R\_sparse\_force\_canonical@{R\_sparse\_force\_canonical}}
+\index{R\_sparse\_force\_canonical@{R\_sparse\_force\_canonical}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_force\_canonical()}{R\_sparse\_force\_canonical()}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_a57ea8b3bf10f14caf5a6cddfe2ffea02} 
+SEXP R\+\_\+sparse\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00198}{198}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc}\index{forceCanonical.c@{forceCanonical.c}!sparse\_force\_canonical@{sparse\_force\_canonical}}
+\index{sparse\_force\_canonical@{sparse\_force\_canonical}!forceCanonical.c@{forceCanonical.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_force\_canonical()}{sparse\_force\_canonical()}}
+{\footnotesize\ttfamily \label{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc} 
+SEXP sparse\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00080}{80}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceCanonical_8c_source_l00198}{R\+\_\+sparse\+\_\+force\+\_\+canonical()}}.
+

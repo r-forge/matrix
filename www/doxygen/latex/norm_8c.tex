@@ -1,0 +1,128 @@
+\doxysection{norm.\+c File Reference}
+\hypertarget{norm_8c}{}\label{norm_8c}\index{norm.c@{norm.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{norm_8c_ac10f556ba524831a7e977629d1b1250a}{ARGNAME}}~"{}type"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static char \mbox{\hyperlink{norm_8c_a527c38797a584c76cb22ffdcec790420}{La\+\_\+norm\+\_\+type}} (SEXP s)
+\item 
+SEXP \mbox{\hyperlink{norm_8c_a33ae6a32bf1d6b62861681109aae398c}{ge\+Matrix\+\_\+norm}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{norm_8c_a1b247fdba53ef3444be5e72cc453ca4f}{sy\+Matrix\+\_\+norm}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{norm_8c_afebc3fcaa1cfecde59427f0a06597418}{sp\+Matrix\+\_\+norm}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{norm_8c_ab8159433921d2a44708912d489444d19}{tr\+Matrix\+\_\+norm}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{norm_8c_af3e835b002193adc605a690a4032b08e}{tp\+Matrix\+\_\+norm}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{norm_8c_ac10f556ba524831a7e977629d1b1250a}\index{norm.c@{norm.c}!ARGNAME@{ARGNAME}}
+\index{ARGNAME@{ARGNAME}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{ARGNAME}{ARGNAME}}
+{\footnotesize\ttfamily \label{norm_8c_ac10f556ba524831a7e977629d1b1250a} 
+\#define ARGNAME~"{}type"{}}
+
+
+
+Referenced by \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{norm_8c_a33ae6a32bf1d6b62861681109aae398c}\index{norm.c@{norm.c}!geMatrix\_norm@{geMatrix\_norm}}
+\index{geMatrix\_norm@{geMatrix\_norm}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{geMatrix\_norm()}{geMatrix\_norm()}}
+{\footnotesize\ttfamily \label{norm_8c_a33ae6a32bf1d6b62861681109aae398c} 
+SEXP ge\+Matrix\+\_\+norm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00050}{50}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{norm_8c_a527c38797a584c76cb22ffdcec790420}\index{norm.c@{norm.c}!La\_norm\_type@{La\_norm\_type}}
+\index{La\_norm\_type@{La\_norm\_type}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{La\_norm\_type()}{La\_norm\_type()}}
+{\footnotesize\ttfamily \label{norm_8c_a527c38797a584c76cb22ffdcec790420} 
+static char La\+\_\+norm\+\_\+type (\begin{DoxyParamCaption}\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00007}{7}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{norm_8c_ac10f556ba524831a7e977629d1b1250a}{ARGNAME}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{norm_8c_source_l00050}{ge\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{norm_8c_source_l00102}{sp\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{norm_8c_source_l00073}{sy\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{norm_8c_source_l00155}{tp\+Matrix\+\_\+norm()}}, and \mbox{\hyperlink{norm_8c_source_l00131}{tr\+Matrix\+\_\+norm()}}.
+
+\Hypertarget{norm_8c_afebc3fcaa1cfecde59427f0a06597418}\index{norm.c@{norm.c}!spMatrix\_norm@{spMatrix\_norm}}
+\index{spMatrix\_norm@{spMatrix\_norm}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{spMatrix\_norm()}{spMatrix\_norm()}}
+{\footnotesize\ttfamily \label{norm_8c_afebc3fcaa1cfecde59427f0a06597418} 
+SEXP sp\+Matrix\+\_\+norm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00102}{102}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{norm_8c_a1b247fdba53ef3444be5e72cc453ca4f}\index{norm.c@{norm.c}!syMatrix\_norm@{syMatrix\_norm}}
+\index{syMatrix\_norm@{syMatrix\_norm}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{syMatrix\_norm()}{syMatrix\_norm()}}
+{\footnotesize\ttfamily \label{norm_8c_a1b247fdba53ef3444be5e72cc453ca4f} 
+SEXP sy\+Matrix\+\_\+norm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00073}{73}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{norm_8c_af3e835b002193adc605a690a4032b08e}\index{norm.c@{norm.c}!tpMatrix\_norm@{tpMatrix\_norm}}
+\index{tpMatrix\_norm@{tpMatrix\_norm}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{tpMatrix\_norm()}{tpMatrix\_norm()}}
+{\footnotesize\ttfamily \label{norm_8c_af3e835b002193adc605a690a4032b08e} 
+SEXP tp\+Matrix\+\_\+norm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00155}{155}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{norm_8c_ab8159433921d2a44708912d489444d19}\index{norm.c@{norm.c}!trMatrix\_norm@{trMatrix\_norm}}
+\index{trMatrix\_norm@{trMatrix\_norm}!norm.c@{norm.c}}
+\doxysubsubsection{\texorpdfstring{trMatrix\_norm()}{trMatrix\_norm()}}
+{\footnotesize\ttfamily \label{norm_8c_ab8159433921d2a44708912d489444d19} 
+SEXP tr\+Matrix\+\_\+norm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{norm_8c_source_l00131}{131}} of file \mbox{\hyperlink{norm_8c_source}{norm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{norm_8c_source_l00007}{La\+\_\+norm\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+

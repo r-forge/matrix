@@ -1,0 +1,432 @@
+\doxysection{utils-\/R.c File Reference}
+\hypertarget{utils-R_8c}{}\label{utils-R_8c}\index{utils-\/R.c@{utils-\/R.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}t\+\_\+rle.\+c"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}{DO\+\_\+\+INDEX}}
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}{DO\+\_\+\+INDEX}}
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_aca1e6c3771fa0306e1dad2b11d22a8e5}{TRUE\+\_\+}}~Rf\+\_\+\+Scalar\+Logical(1)
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_ad4986ecbba005b963f63a85f7c8c281d}{FALSE\+\_\+}}~Rf\+\_\+\+Scalar\+Logical(0)
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_a6ff3b1a7feee493bc441c202122efacb}{do\+\_\+ii\+\_\+\+FILL}}(\+\_\+i\+\_\+,  \+\_\+j\+\_\+)
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_ad6f267b86c16da93e3305859b7ed90bc}{\+\_\+rle\+\_\+d\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{utils-R_8c_a0788b4232615e4ae1a4693518e312e36}{\+\_\+rle\+\_\+i\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_aa7751a47211eaa3ea3ceb54bd6a7afa3}{R\+\_\+index\+\_\+triangle}} (SEXP s\+\_\+n, SEXP s\+\_\+packed, SEXP s\+\_\+upper, SEXP s\+\_\+diag)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_ae33b7cf67bd3ecaf07234f58fac07e71}{R\+\_\+index\+\_\+diagonal}} (SEXP s\+\_\+n, SEXP s\+\_\+packed, SEXP s\+\_\+upper)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_a3d7ab0369d4e927595f9d0918128feaa}{R\+\_\+nnz}} (SEXP s\+\_\+x, SEXP s\+\_\+count\+NA, SEXP s\+\_\+nnzmax)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_a134457be169282ecd6963766955894ee}{R\+\_\+all0}} (SEXP x)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_ae4ff71e6ea4ef713a5ebed332b7f4edd}{R\+\_\+any0}} (SEXP x)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_afc91c5a5b60dbee9d7aa429836fdc68f}{Mmatrix}} (SEXP args)
+\item 
+static int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{utils-R_8c_a5e73311cf4dfab0cb80f191a748f5080}{expand\+\_\+cmpr\+Pt}} (int ncol, const int mp\mbox{[}$\,$\mbox{]}, int mj\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Expand compressed pointers in the array mp into a full set of indices in the array mj. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{utils-R_8c_a5a606c1716b4105aa8658ec849d36f43}{compressed\+\_\+non\+\_\+0\+\_\+ij}} (SEXP x, SEXP colP)
+\begin{DoxyCompactList}\small\item\em Return a 2 column matrix \textquotesingle{}\textquotesingle{} cbind(i, j) \textquotesingle{}\textquotesingle{} of 0-\/origin index vectors (i,j) which entirely correspond to the (i,j) slots of as(x, "{}\+Tsparse\+Matrix"{}) \+: \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{utils-R_8c_af9c3d821b08775115572c042d9e61a28}{Matrix\+\_\+expand\+\_\+pointers}} (SEXP pP)
+\item 
+SEXP \mbox{\hyperlink{utils-R_8c_a88799aec22f69e6ecb9927db214faca7}{m\+\_\+encode\+Ind}} (SEXP ij, SEXP di, SEXP orig\+\_\+1, SEXP chk\+\_\+bnds)
+\begin{DoxyCompactList}\small\item\em Encode Matrix index (i,j) \texorpdfstring{$\vert$}{|}-\/-\/\texorpdfstring{$>$}{>} i + j \texorpdfstring{$\ast$}{*} nrow \{i,j \+: 0-\/origin\}. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{utils-R_8c_a2252c3ef876063ac45ad7b4af54cd070}{m\+\_\+encode\+Ind2}} (SEXP i, SEXP j, SEXP di, SEXP orig\+\_\+1, SEXP chk\+\_\+bnds)
+\begin{DoxyCompactList}\small\item\em Encode Matrix index (i,j) \texorpdfstring{$\vert$}{|}-\/-\/\texorpdfstring{$>$}{>} i + j \texorpdfstring{$\ast$}{*} nrow \{i,j \+: 0-\/origin\}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{utils-R_8c_ad6f267b86c16da93e3305859b7ed90bc}\index{utils-\/R.c@{utils-\/R.c}!\_rle\_d\_@{\_rle\_d\_}}
+\index{\_rle\_d\_@{\_rle\_d\_}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{\_rle\_d\_}{\_rle\_d\_}}
+{\footnotesize\ttfamily \label{utils-R_8c_ad6f267b86c16da93e3305859b7ed90bc} 
+\#define \+\_\+rle\+\_\+d\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00610}{610}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+\Hypertarget{utils-R_8c_a0788b4232615e4ae1a4693518e312e36}\index{utils-\/R.c@{utils-\/R.c}!\_rle\_i\_@{\_rle\_i\_}}
+\index{\_rle\_i\_@{\_rle\_i\_}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{\_rle\_i\_}{\_rle\_i\_}}
+{\footnotesize\ttfamily \label{utils-R_8c_a0788b4232615e4ae1a4693518e312e36} 
+\#define \+\_\+rle\+\_\+i\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00614}{614}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+\Hypertarget{utils-R_8c_a6ff3b1a7feee493bc441c202122efacb}\index{utils-\/R.c@{utils-\/R.c}!do\_ii\_FILL@{do\_ii\_FILL}}
+\index{do\_ii\_FILL@{do\_ii\_FILL}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{do\_ii\_FILL}{do\_ii\_FILL}}
+{\footnotesize\ttfamily \label{utils-R_8c_a6ff3b1a7feee493bc441c202122efacb} 
+\#define do\+\_\+ii\+\_\+\+FILL(\begin{DoxyParamCaption}\item[{}]{\+\_\+i\+\_\+}{, }\item[{}]{\+\_\+j\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (check\_bounds)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (i\ =\ 0;\ i\ <\ n;\ i++)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\_i\_[i]\ ==\ NA\_INTEGER\ ||\ \_j\_[i]\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ii[i]\ =\ NA\_INTEGER;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{register}\ \textcolor{keywordtype}{int}\ i\_i,\ j\_i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (one\_ind)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\_i\ =\ \_i\_[i]-\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\_i\ =\ \_j\_[i]-\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\_i\ =\ \_i\_[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\_i\ =\ \_j\_[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (i\_i\ <\ 0\ ||\ i\_i\ >=\ Di[0])\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}subscript\ 'i'\ out\ of\ bounds\ in\ M[ij]"{}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (j\_i\ <\ 0\ ||\ j\_i\ >=\ Di[1])\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}subscript\ 'j'\ out\ of\ bounds\ in\ M[ij]"{}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ii[i]\ =\ i\_i\ +\ j\_i\ *\ nr;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (i\ =\ 0;\ i\ <\ n;\ i++)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ii[i]\ =\ (\_i\_[i]\ ==\ NA\_INTEGER\ ||\ \_j\_[i]\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ NA\_INTEGER\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ((one\_ind)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ ((\_i\_[i]-\/1)\ +\ (\_j\_[i]-\/1)\ *\ nr)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \ \ \_i\_[i]\ +\ \_j\_[i]\ *\ nr);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00493}{m\+\_\+encode\+Ind()}}, and \mbox{\hyperlink{utils-R_8c_source_l00571}{m\+\_\+encode\+Ind2()}}.
+
+\Hypertarget{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}\index{utils-\/R.c@{utils-\/R.c}!DO\_INDEX@{DO\_INDEX}}
+\index{DO\_INDEX@{DO\_INDEX}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{DO\_INDEX}{DO\_INDEX}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa} 
+\#define DO\+\_\+\+INDEX}
+
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00091}{R\+\_\+index\+\_\+diagonal()}}, and \mbox{\hyperlink{utils-R_8c_source_l00004}{R\+\_\+index\+\_\+triangle()}}.
+
+\Hypertarget{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}\index{utils-\/R.c@{utils-\/R.c}!DO\_INDEX@{DO\_INDEX}}
+\index{DO\_INDEX@{DO\_INDEX}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{DO\_INDEX}{DO\_INDEX}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa} 
+\#define DO\+\_\+\+INDEX}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (!packed)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pr++)\ =\ k++;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ +=\ n;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (upper)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pr++)\ =\ k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ +=\ j+2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pr++)\ =\ k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ +=\ n-\/j;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{utils-R_8c_ad4986ecbba005b963f63a85f7c8c281d}\index{utils-\/R.c@{utils-\/R.c}!FALSE\_@{FALSE\_}}
+\index{FALSE\_@{FALSE\_}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{FALSE\_}{FALSE\_}}
+{\footnotesize\ttfamily \label{utils-R_8c_ad4986ecbba005b963f63a85f7c8c281d} 
+\#define FALSE\+\_\+~Rf\+\_\+\+Scalar\+Logical(0)}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00191}{191}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00196}{R\+\_\+all0()}}, and \mbox{\hyperlink{utils-R_8c_source_l00242}{R\+\_\+any0()}}.
+
+\Hypertarget{utils-R_8c_a5c943ec4d393860c44273d898e789156}\index{utils-\/R.c@{utils-\/R.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}}
+{\footnotesize\ttfamily \label{utils-R_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(s\_x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (countNA\ ==\ NA\_LOGICAL)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ while\ (n-\/-\/\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_NA(*px))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarInteger(NA\_INTEGER);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(*px))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nnz;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (countNA\ !=\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ while\ (n-\/-\/\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(*px))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nnz;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ while\ (n-\/-\/\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_NA(*px)\ \&\&\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(*px))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nnz;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00143}{R\+\_\+nnz()}}.
+
+\Hypertarget{utils-R_8c_aca1e6c3771fa0306e1dad2b11d22a8e5}\index{utils-\/R.c@{utils-\/R.c}!TRUE\_@{TRUE\_}}
+\index{TRUE\_@{TRUE\_}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{TRUE\_}{TRUE\_}}
+{\footnotesize\ttfamily \label{utils-R_8c_aca1e6c3771fa0306e1dad2b11d22a8e5} 
+\#define TRUE\+\_\+~Rf\+\_\+\+Scalar\+Logical(1)}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00190}{190}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00196}{R\+\_\+all0()}}, and \mbox{\hyperlink{utils-R_8c_source_l00242}{R\+\_\+any0()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{utils-R_8c_a5a606c1716b4105aa8658ec849d36f43}\index{utils-\/R.c@{utils-\/R.c}!compressed\_non\_0\_ij@{compressed\_non\_0\_ij}}
+\index{compressed\_non\_0\_ij@{compressed\_non\_0\_ij}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{compressed\_non\_0\_ij()}{compressed\_non\_0\_ij()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a5a606c1716b4105aa8658ec849d36f43} 
+SEXP compressed\+\_\+non\+\_\+0\+\_\+ij (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{SEXP}]{colP}{}\end{DoxyParamCaption})}
+
+
+
+Return a 2 column matrix \textquotesingle{}\textquotesingle{} cbind(i, j) \textquotesingle{}\textquotesingle{} of 0-\/origin index vectors (i,j) which entirely correspond to the (i,j) slots of as(x, "{}\+Tsparse\+Matrix"{}) \+: 
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00447}{447}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils-R_8c_source_l00432}{expand\+\_\+cmpr\+Pt()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}.
+
+\Hypertarget{utils-R_8c_a5e73311cf4dfab0cb80f191a748f5080}\index{utils-\/R.c@{utils-\/R.c}!expand\_cmprPt@{expand\_cmprPt}}
+\index{expand\_cmprPt@{expand\_cmprPt}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{expand\_cmprPt()}{expand\_cmprPt()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a5e73311cf4dfab0cb80f191a748f5080} 
+static int \texorpdfstring{$\ast$}{*} expand\+\_\+cmpr\+Pt (\begin{DoxyParamCaption}\item[{int}]{ncol}{, }\item[{const int}]{mp}{\mbox{[}$\,$\mbox{]}, }\item[{int}]{mj}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Expand compressed pointers in the array mp into a full set of indices in the array mj. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ncol} & number of columns (or rows) \\
+\hline
+{\em mp} & column pointer vector of length ncol + 1 \\
+\hline
+{\em mj} & vector of length mp\mbox{[}ncol\mbox{]} to hold the result\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+mj 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00432}{432}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{utils-R_8c_source_l00447}{compressed\+\_\+non\+\_\+0\+\_\+ij()}}, and \mbox{\hyperlink{utils-R_8c_source_l00473}{Matrix\+\_\+expand\+\_\+pointers()}}.
+
+\Hypertarget{utils-R_8c_a88799aec22f69e6ecb9927db214faca7}\index{utils-\/R.c@{utils-\/R.c}!m\_encodeInd@{m\_encodeInd}}
+\index{m\_encodeInd@{m\_encodeInd}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{m\_encodeInd()}{m\_encodeInd()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a88799aec22f69e6ecb9927db214faca7} 
+SEXP m\+\_\+encode\+Ind (\begin{DoxyParamCaption}\item[{SEXP}]{ij}{, }\item[{SEXP}]{di}{, }\item[{SEXP}]{orig\+\_\+1}{, }\item[{SEXP}]{chk\+\_\+bnds}{}\end{DoxyParamCaption})}
+
+
+
+Encode Matrix index (i,j) \texorpdfstring{$\vert$}{|}-\/-\/\texorpdfstring{$>$}{>} i + j \texorpdfstring{$\ast$}{*} nrow \{i,j \+: 0-\/origin\}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ij} & 2-\/column integer matrix \\
+\hline
+{\em di} & dim(.), i.\+e. length 2 integer vector \\
+\hline
+{\em chk\+\_\+bnds} & logical indicating 0 \texorpdfstring{$<$}{<}= ij\mbox{[},k\mbox{]} \texorpdfstring{$<$}{<} di\mbox{[}k\mbox{]} need to be checked.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+encoded index; integer if prod(dim) is small; double otherwise 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00493}{493}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils-R_8c_a6ff3b1a7feee493bc441c202122efacb}{do\+\_\+ii\+\_\+\+FILL}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{utils-R_8c_a2252c3ef876063ac45ad7b4af54cd070}\index{utils-\/R.c@{utils-\/R.c}!m\_encodeInd2@{m\_encodeInd2}}
+\index{m\_encodeInd2@{m\_encodeInd2}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{m\_encodeInd2()}{m\_encodeInd2()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a2252c3ef876063ac45ad7b4af54cd070} 
+SEXP m\+\_\+encode\+Ind2 (\begin{DoxyParamCaption}\item[{SEXP}]{i}{, }\item[{SEXP}]{j}{, }\item[{SEXP}]{di}{, }\item[{SEXP}]{orig\+\_\+1}{, }\item[{SEXP}]{chk\+\_\+bnds}{}\end{DoxyParamCaption})}
+
+
+
+Encode Matrix index (i,j) \texorpdfstring{$\vert$}{|}-\/-\/\texorpdfstring{$>$}{>} i + j \texorpdfstring{$\ast$}{*} nrow \{i,j \+: 0-\/origin\}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i} & integer vector \\
+\hline
+{\em j} & integer vector of same length as \textquotesingle{}i\textquotesingle{} \\
+\hline
+{\em orig\+\_\+1} & logical\+: if TRUE, "{}1-\/origin"{} otherwise "{}0-\/origin"{} \\
+\hline
+{\em di} & dim(.), i.\+e. length 2 integer vector \\
+\hline
+{\em chk\+\_\+bnds} & logical indicating 0 \texorpdfstring{$<$}{<}= ij\mbox{[},k\mbox{]} \texorpdfstring{$<$}{<} di\mbox{[}k\mbox{]} need to be checked.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+encoded index; integer if prod(dim) is small; double otherwise 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00571}{571}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils-R_8c_a6ff3b1a7feee493bc441c202122efacb}{do\+\_\+ii\+\_\+\+FILL}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{utils-R_8c_af9c3d821b08775115572c042d9e61a28}\index{utils-\/R.c@{utils-\/R.c}!Matrix\_expand\_pointers@{Matrix\_expand\_pointers}}
+\index{Matrix\_expand\_pointers@{Matrix\_expand\_pointers}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_expand\_pointers()}{Matrix\_expand\_pointers()}}
+{\footnotesize\ttfamily \label{utils-R_8c_af9c3d821b08775115572c042d9e61a28} 
+SEXP Matrix\+\_\+expand\+\_\+pointers (\begin{DoxyParamCaption}\item[{SEXP}]{pP}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00473}{473}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils-R_8c_source_l00432}{expand\+\_\+cmpr\+Pt()}}.
+
+\Hypertarget{utils-R_8c_afc91c5a5b60dbee9d7aa429836fdc68f}\index{utils-\/R.c@{utils-\/R.c}!Mmatrix@{Mmatrix}}
+\index{Mmatrix@{Mmatrix}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{Mmatrix()}{Mmatrix()}}
+{\footnotesize\ttfamily \label{utils-R_8c_afc91c5a5b60dbee9d7aa429836fdc68f} 
+SEXP Mmatrix (\begin{DoxyParamCaption}\item[{SEXP}]{args}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00290}{290}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{utils-R_8c_a134457be169282ecd6963766955894ee}\index{utils-\/R.c@{utils-\/R.c}!R\_all0@{R\_all0}}
+\index{R\_all0@{R\_all0}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{R\_all0()}{R\_all0()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a134457be169282ecd6963766955894ee} 
+SEXP R\+\_\+all0 (\begin{DoxyParamCaption}\item[{SEXP}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00196}{196}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils-R_8c_source_l00191}{FALSE\+\_\+}}, \mbox{\hyperlink{utils-R_8c_source_l00190}{TRUE\+\_\+}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{utils-R_8c_ae4ff71e6ea4ef713a5ebed332b7f4edd}\index{utils-\/R.c@{utils-\/R.c}!R\_any0@{R\_any0}}
+\index{R\_any0@{R\_any0}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{R\_any0()}{R\_any0()}}
+{\footnotesize\ttfamily \label{utils-R_8c_ae4ff71e6ea4ef713a5ebed332b7f4edd} 
+SEXP R\+\_\+any0 (\begin{DoxyParamCaption}\item[{SEXP}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00242}{242}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils-R_8c_source_l00191}{FALSE\+\_\+}}, \mbox{\hyperlink{utils-R_8c_source_l00190}{TRUE\+\_\+}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{utils-R_8c_ae33b7cf67bd3ecaf07234f58fac07e71}\index{utils-\/R.c@{utils-\/R.c}!R\_index\_diagonal@{R\_index\_diagonal}}
+\index{R\_index\_diagonal@{R\_index\_diagonal}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{R\_index\_diagonal()}{R\_index\_diagonal()}}
+{\footnotesize\ttfamily \label{utils-R_8c_ae33b7cf67bd3ecaf07234f58fac07e71} 
+SEXP R\+\_\+index\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+n}{, }\item[{SEXP}]{s\+\_\+packed}{, }\item[{SEXP}]{s\+\_\+upper}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00091}{91}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}{DO\+\_\+\+INDEX}}.
+
+\Hypertarget{utils-R_8c_aa7751a47211eaa3ea3ceb54bd6a7afa3}\index{utils-\/R.c@{utils-\/R.c}!R\_index\_triangle@{R\_index\_triangle}}
+\index{R\_index\_triangle@{R\_index\_triangle}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{R\_index\_triangle()}{R\_index\_triangle()}}
+{\footnotesize\ttfamily \label{utils-R_8c_aa7751a47211eaa3ea3ceb54bd6a7afa3} 
+SEXP R\+\_\+index\+\_\+triangle (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+n}{, }\item[{SEXP}]{s\+\_\+packed}{, }\item[{SEXP}]{s\+\_\+upper}{, }\item[{SEXP}]{s\+\_\+diag}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00004}{4}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{utils-R_8c_ae984a0da3b36fc26bc8c5c79ac1fc1fa}{DO\+\_\+\+INDEX}}.
+
+\Hypertarget{utils-R_8c_a3d7ab0369d4e927595f9d0918128feaa}\index{utils-\/R.c@{utils-\/R.c}!R\_nnz@{R\_nnz}}
+\index{R\_nnz@{R\_nnz}!utils-\/R.c@{utils-\/R.c}}
+\doxysubsubsection{\texorpdfstring{R\_nnz()}{R\_nnz()}}
+{\footnotesize\ttfamily \label{utils-R_8c_a3d7ab0369d4e927595f9d0918128feaa} 
+SEXP R\+\_\+nnz (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+x}{, }\item[{SEXP}]{s\+\_\+count\+NA}{, }\item[{SEXP}]{s\+\_\+nnzmax}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils-R_8c_source_l00143}{143}} of file \mbox{\hyperlink{utils-R_8c_source}{utils-\/\+R.\+c}}.
+
+
+
+References \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{utils-R_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{objects_8c_source_l00020}{type\+To\+Kind()}}.
+

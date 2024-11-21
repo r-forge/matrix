@@ -1,0 +1,27 @@
+\doxysection{cholmod-\/etc.h}
+\hypertarget{cholmod-etc_8h_source}{}\label{cholmod-etc_8h_source}\index{cholmod-\/etc.h@{cholmod-\/etc.h}}
+\mbox{\hyperlink{cholmod-etc_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ MATRIX\_CHOLMOD\_ETC\_H}}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ MATRIX\_CHOLMOD\_ETC\_H}}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}SuiteSparse/CHOLMOD/Include/cholmod.h"{}}}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <Rinternals.h>}}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00007}00007\ \textcolor{keyword}{extern}\ cholmod\_common\ \mbox{\hyperlink{cholmod-etc_8h_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ ;}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00008}00008\ \textcolor{keyword}{extern}\ cholmod\_common\ \mbox{\hyperlink{cholmod-etc_8h_ac49bea018a4b4cb10cd713589039cdda}{cl}};}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00010}00010\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cholmod-etc_8h_a5f5763bb20a8aa5db07f588df5737237}{Matrix\_cholmod\_start}}\ (cholmod\_common\ *);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00011}00011\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{cholmod-etc_8h_a91ef960a4bef42ec58ead516aedfca12}{Matrix\_cholmod\_finish}}(cholmod\_common\ *);}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00013}00013\ cholmod\_factor\ *\mbox{\hyperlink{cholmod-etc_8h_ac5295a90416bb7b1193920f2f2611a2c}{M2CHF}}(SEXP,\ \ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00014}00014\ cholmod\_sparse\ *\mbox{\hyperlink{cholmod-etc_8h_ac329bd1d0030a4c43761963ad1b83e7e}{M2CHS}}(SEXP,\ \ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00015}00015\ cholmod\_dense\ \ *\mbox{\hyperlink{cholmod-etc_8h_a4a17be692c459df37357b216b9ebe007}{M2CHD}}(SEXP,\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00017}00017\ SEXP\ \mbox{\hyperlink{cholmod-etc_8h_a43800de5a5adfee2271ac50457afb26f}{CHF2M}}(cholmod\_factor\ *,\ \ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00018}00018\ SEXP\ \mbox{\hyperlink{cholmod-etc_8h_a4d0511b8b0cfae32c0d027b32c01acac}{CHS2M}}(cholmod\_sparse\ *,\ \ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00019}00019\ SEXP\ \mbox{\hyperlink{cholmod-etc_8h_ae4905e9ccf1084ae2a7f780c092a5185}{CHD2M}}(cholmod\_dense\ \ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{cholmod-etc_8h_source_l00021}00021\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ MATRIX\_CHOLMOD\_ETC\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

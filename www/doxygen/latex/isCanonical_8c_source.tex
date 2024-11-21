@@ -1,0 +1,102 @@
+\doxysection{is\+Canonical.\+c}
+\hypertarget{isCanonical_8c_source}{}\label{isCanonical_8c_source}\index{isCanonical.c@{isCanonical.c}}
+\mbox{\hyperlink{isCanonical_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00001}00001\ \textcolor{comment}{/*\ C\ implementation\ of\ methods\ for\ isCanonical\ */}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{M5_8h}{M5.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{idz_8h}{idz.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00007}\mbox{\hyperlink{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b}{00007}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b}{dense\_is\_canonical}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00009}00009\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'n'})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00010}00010\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00011}00011\ \ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00012}00012\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'n'})\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *px\ =\ LOGICAL(x);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ R\_xlen\_t\ nx\ =\ XLENGTH(x);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (nx-\/-\/\ >\ 0)\ \textcolor{keywordflow}{if}\ (*(px++)\ ==\ NA\_LOGICAL)\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00019}00019\ \ \ \ \ PROTECT(x);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00020}00020\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(obj)[1],\ packed\ =\ \textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'p'};}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj),\ ct\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'p'})\ ?\ \textcolor{charliteral}{'C'}\ :\ \textcolor{charliteral}{'\(\backslash\)0'},\ nu\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00023}00023\ \ \ \ \ \ \ \ \ ct\ =\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(obj);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'t'})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00025}00025\ \ \ \ \ \ \ \ \ nu\ =\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(obj);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00026}00026\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00027}00027\ \textcolor{preprocessor}{\#define\ TEMPLATE(c)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ c\#\#TYPE\ *px\ =\ c\#\#PTR(x);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00030}00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ (!packed)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ ?\ !c\#\#NAME(test2)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00032}00032\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ :\ !c\#\#NAME(test1)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{M5_8h_a3d0bdfd9c1220a37d7c27ee51442e38e}{SWITCH5}}(\textcolor{keyword}{class}[0],\ \mbox{\hyperlink{isCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}});}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00035}00035\ \textcolor{preprocessor}{\#undef\ TEMPLATE}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00036}00036\ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}should\ never\ happen\ ..."{}});}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00038}00038\ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00040}\mbox{\hyperlink{isCanonical_8c_a26966d1169a121c057de412731d50b8f}{00040}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{isCanonical_8c_a26966d1169a121c057de412731d50b8f}{sparse\_is\_canonical}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00041}00041\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[1])\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(obj)\ ==\ \textcolor{charliteral}{'C'})\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(obj)[1];}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ !=\ \textcolor{charliteral}{'T'})\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ iSym\ =\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'C'})\ ?\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ :\ \mbox{\hyperlink{init_8c_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}},}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ iSym));}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *pp\ =\ INTEGER(p)\ +\ 1,\ *pi\ =\ INTEGER(i),\ j,\ k\_,\ k,\ kend,}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ up\ =\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'C'})\ ==\ (ul\ ==\ \textcolor{charliteral}{'U'});}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(3);\ \textcolor{comment}{/*\ i,\ p,\ x\ */}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[k\_\ =\ (up)\ ?\ kend\ -\/\ 1\ :\ k]\ ==\ j\ \&\&}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (ISNAN(px[k\_].i)\ ||\ px[k\_].i\ !=\ 0.0))}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}}));}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *pi\ =\ INTEGER(i),\ *pj\ =\ INTEGER(j);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ R\_xlen\_t\ k,\ kend\ =\ XLENGTH(i);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(3);\ \textcolor{comment}{/*\ j,\ i,\ x\ */}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ kend;\ ++k)}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi[k]\ ==\ pj[k]\ \&\&}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (ISNAN(px[k].i)\ ||\ px[k].i\ !=\ 0.0))}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(obj)\ ==\ \textcolor{charliteral}{'N'};}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00080}00080\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}should\ never\ happen\ ..."{}});}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00086}\mbox{\hyperlink{init_8c_a251be66202aa3f8b50b6a8871ceb2458}{00086}}\ SEXP\ \mbox{\hyperlink{isCanonical_8c_a181d51e2a211a617ce5e9bc6a207d1ee}{R\_dense\_is\_canonical}}(SEXP\ s\_obj)}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00087}00087\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00088}00088\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(\mbox{\hyperlink{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b}{dense\_is\_canonical}}(s\_obj,\ \textcolor{keyword}{class}));}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00090}00090\ \}}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00092}\mbox{\hyperlink{init_8c_aa06356fc2536ab544b0c0072e801919a}{00092}}\ SEXP\ \mbox{\hyperlink{isCanonical_8c_a2d70be1a6da9dea14d1651155b9ce522}{R\_sparse\_is\_canonical}}(SEXP\ s\_obj)}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00093}00093\ \{}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00094}00094\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00095}00095\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(\mbox{\hyperlink{isCanonical_8c_a26966d1169a121c057de412731d50b8f}{sparse\_is\_canonical}}(s\_obj,\ \textcolor{keyword}{class}));}
+\DoxyCodeLine{\Hypertarget{isCanonical_8c_source_l00096}00096\ \}}
+
+\end{DoxyCode}

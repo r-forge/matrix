@@ -1,0 +1,424 @@
+\doxysection{cholmod-\/api.h File Reference}
+\hypertarget{cholmod-api_8h}{}\label{cholmod-api_8h}\index{cholmod-\/api.h@{cholmod-\/api.h}}
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_a45e6d33544fe2136489f8eb5e0f252eb}{sexp\+\_\+as\+\_\+cholmod\+\_\+factor}} (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}, SEXP)
+\begin{DoxyCompactList}\small\item\em Coerce from sparse\+Cholesky to (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}) \end{DoxyCompactList}\item 
+cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_ae8eb59e6d0724d47080bdd4131b33960}{sexp\+\_\+as\+\_\+cholmod\+\_\+sparse}} (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}, SEXP, Rboolean, Rboolean)
+\begin{DoxyCompactList}\small\item\em Coerce from \mbox{[}CR\mbox{]}sparse\+Matrix to (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}) \end{DoxyCompactList}\item 
+cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_afc39de666fdb79e52b443e5b8e1b6585}{sexp\+\_\+as\+\_\+cholmod\+\_\+triplet}} (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}, SEXP, Rboolean)
+\begin{DoxyCompactList}\small\item\em Coerce from Tsparse\+Matrix to (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}) \end{DoxyCompactList}\item 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_a92972d381d304fa4d6807a9b6682672a}{sexp\+\_\+as\+\_\+cholmod\+\_\+dense}} (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}, SEXP)
+\begin{DoxyCompactList}\small\item\em Coerce from .ge\+Matrix or vector to (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) \end{DoxyCompactList}\item 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_ab1cfaad063342f9d84229fc8e2144b48}{numeric\+\_\+as\+\_\+cholmod\+\_\+dense}} (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*}, int, int)
+\begin{DoxyCompactList}\small\item\em Coerce from (double \texorpdfstring{$\ast$}{*}) to (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) with given dimensions. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{cholmod-api_8h_aed3941f46ddd56a016643fa5a044ab27}{cholmod\+\_\+factor\+\_\+as\+\_\+sexp}} (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}, int)
+\begin{DoxyCompactList}\small\item\em Coerce from (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}) to sparse\+Cholesky. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{cholmod-api_8h_a7abe875eb40e24e506518442ef85d8a9}{cholmod\+\_\+sparse\+\_\+as\+\_\+sexp}} (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}, int, int, int, const char \texorpdfstring{$\ast$}{*}, SEXP)
+\begin{DoxyCompactList}\small\item\em Coerce from (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}) to Csparse\+Matrix. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{cholmod-api_8h_ac77a41d8ce0621c0114dc1da49b827a9}{cholmod\+\_\+triplet\+\_\+as\+\_\+sexp}} (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}, int, int, int, const char \texorpdfstring{$\ast$}{*}, SEXP)
+\begin{DoxyCompactList}\small\item\em Coerce from (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}) to Tsparse\+Matrix. \end{DoxyCompactList}\item 
+SEXP \mbox{\hyperlink{cholmod-api_8h_a9d1ff9a96dee0ea10c5dd57b1a94dbf2}{cholmod\+\_\+dense\+\_\+as\+\_\+sexp}} (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}, int)
+\begin{DoxyCompactList}\small\item\em Coerce from (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) to \mbox{[}dz\mbox{]}ge\+Matrix. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{cholmod-api_8h_a819be658968bbd9c75cc6daf615eeeff}{cholmod\+\_\+factor\+\_\+ldetA}} (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*})
+\begin{DoxyCompactList}\small\item\em Log determinant from Cholesky factorization. \end{DoxyCompactList}\item 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-api_8h_a4077799e5a6746557d9f210646d4b529}{cholmod\+\_\+factor\+\_\+update}} (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}, cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}, double)
+\begin{DoxyCompactList}\small\item\em Update a Cholesky factorization. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{cholmod-api_8h_a9d1ff9a96dee0ea10c5dd57b1a94dbf2}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_dense\_as\_sexp@{cholmod\_dense\_as\_sexp}}
+\index{cholmod\_dense\_as\_sexp@{cholmod\_dense\_as\_sexp}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_dense\_as\_sexp()}{cholmod\_dense\_as\_sexp()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a9d1ff9a96dee0ea10c5dd57b1a94dbf2} 
+SEXP cholmod\+\_\+dense\+\_\+as\+\_\+sexp (\begin{DoxyParamCaption}\item[{cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{do\+Free}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) to \mbox{[}dz\mbox{]}ge\+Matrix. 
+
+Allocates an S4 object of class \mbox{[}dz\mbox{]}ge\+Matrix and copies into the slots from members of a pointed-\/to cholmod\+\_\+dense struct. The specific class of the result is determined by struct member xtype.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+dense struct. \\
+\hline
+{\em do\+Free} & a flag indicating if and how to free A before returning. (0) don\textquotesingle{}t free, (\texorpdfstring{$>$}{>}0) free with cholmod\+\_\+free\+\_\+dense, (\texorpdfstring{$<$}{<}0) free with R\+\_\+\+Free.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A \mbox{[}dz\mbox{]}ge\+Matrix. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00851}{851}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-api_8c_aa47f78f8eb6c9c8a41e2e482081c4dfd}{error\+Free}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cholmod-api_8c_a0408e52248f514befc0a7bacb1184197}{MAYBE\+\_\+\+FREE}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_aed3941f46ddd56a016643fa5a044ab27}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_factor\_as\_sexp@{cholmod\_factor\_as\_sexp}}
+\index{cholmod\_factor\_as\_sexp@{cholmod\_factor\_as\_sexp}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_factor\_as\_sexp()}{cholmod\_factor\_as\_sexp()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_aed3941f46ddd56a016643fa5a044ab27} 
+SEXP cholmod\+\_\+factor\+\_\+as\+\_\+sexp (\begin{DoxyParamCaption}\item[{cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{int}]{do\+Free}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}) to sparse\+Cholesky. 
+
+Allocates an S4 object inheriting from virtual class sparse\+Cholesky and copies into the slots from members of a pointed-\/to cholmod\+\_\+factor struct. The specific class of the result is determined by struct members xtype and is\+\_\+super.
+
+
+\begin{DoxyParams}{Parameters}
+{\em L} & a pointer to a cholmod\+\_\+factor struct. \\
+\hline
+{\em do\+Free} & a flag indicating if and how to free L before returning. (0) don\textquotesingle{}t free, (\texorpdfstring{$>$}{>}0) free with cholmod\+\_\+free\+\_\+factor, (\texorpdfstring{$<$}{<}0) free with R\+\_\+\+Free.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A sparse\+Cholesky. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00466}{466}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-api_8c_aa47f78f8eb6c9c8a41e2e482081c4dfd}{error\+Free}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00604}{Matrix\+\_\+colcount\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00608}{Matrix\+\_\+isll\+Sym}}, \mbox{\hyperlink{init_8c_source_l00609}{Matrix\+\_\+ismt\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00615}{Matrix\+\_\+maxcsize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00616}{Matrix\+\_\+maxesize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00618}{Matrix\+\_\+next\+Sym}}, \mbox{\hyperlink{init_8c_source_l00619}{Matrix\+\_\+nz\+Sym}}, \mbox{\hyperlink{init_8c_source_l00621}{Matrix\+\_\+ordering\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00624}{Matrix\+\_\+pi\+Sym}}, \mbox{\hyperlink{init_8c_source_l00625}{Matrix\+\_\+prev\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00626}{Matrix\+\_\+px\+Sym}}, \mbox{\hyperlink{init_8c_source_l00628}{Matrix\+\_\+s\+Sym}}, \mbox{\hyperlink{init_8c_source_l00630}{Matrix\+\_\+super\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cholmod-api_8c_a0408e52248f514befc0a7bacb1184197}{MAYBE\+\_\+\+FREE}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_a819be658968bbd9c75cc6daf615eeeff}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_factor\_ldetA@{cholmod\_factor\_ldetA}}
+\index{cholmod\_factor\_ldetA@{cholmod\_factor\_ldetA}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_factor\_ldetA()}{cholmod\_factor\_ldetA()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a819be658968bbd9c75cc6daf615eeeff} 
+double cholmod\+\_\+factor\+\_\+ldetA (\begin{DoxyParamCaption}\item[{cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}}]{L}{}\end{DoxyParamCaption})}
+
+
+
+Log determinant from Cholesky factorization. 
+
+Computes log(det(\+A)) given the Cholesky factorization of A as P1 \texorpdfstring{$\ast$}{*} A \texorpdfstring{$\ast$}{*} P1\textquotesingle{} = L1 \texorpdfstring{$\ast$}{*} D \texorpdfstring{$\ast$}{*} L1\textquotesingle{} = L \texorpdfstring{$\ast$}{*} L\textquotesingle{}, L = L1 \texorpdfstring{$\ast$}{*} sqrt(\+D). The result is computed as sum(log(diag(\+D))) or 2\texorpdfstring{$\ast$}{*}sum(log(diag(\+L))), depending on members is\+\_\+super and is\+\_\+ll of the supplied struct. Note that CHOLMOD does not require diag(\+D) to be positive and that this routine does not check (FIXME).
+
+
+\begin{DoxyParams}{Parameters}
+{\em L} & a pointer to a cholmod\+\_\+factor struct. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00911}{911}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_a4077799e5a6746557d9f210646d4b529}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_factor\_update@{cholmod\_factor\_update}}
+\index{cholmod\_factor\_update@{cholmod\_factor\_update}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_factor\_update()}{cholmod\_factor\_update()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a4077799e5a6746557d9f210646d4b529} 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} cholmod\+\_\+factor\+\_\+update (\begin{DoxyParamCaption}\item[{cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{double}]{beta}{}\end{DoxyParamCaption})}
+
+
+
+Update a Cholesky factorization. 
+
+Updates in-\/place the Cholesky factorization of a symmetric matrix X+alpha\texorpdfstring{$\ast$}{*}I with the Cholesky factorization of (1) A+beta\texorpdfstring{$\ast$}{*}I, where A is a symmetric matrix sharing the nonzero pattern of X, or (2) A\texorpdfstring{$\ast$}{*}A\textquotesingle{}+beta\texorpdfstring{$\ast$}{*}I, where A is a general matrix sharing the nonzero pattern of Y, assuming that X = Y\texorpdfstring{$\ast$}{*}Y\textquotesingle{}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em L} & a pointer to a cholmod\+\_\+factor struct, to be modified in-\/place. \\
+\hline
+{\em A} & a pointer to a cholmod\+\_\+sparse struct. \\
+\hline
+{\em beta} & a multiplier, typically positive, to guarantee strict diagonal dominance.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+L. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00958}{958}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_a7abe875eb40e24e506518442ef85d8a9}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_sparse\_as\_sexp@{cholmod\_sparse\_as\_sexp}}
+\index{cholmod\_sparse\_as\_sexp@{cholmod\_sparse\_as\_sexp}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_sparse\_as\_sexp()}{cholmod\_sparse\_as\_sexp()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a7abe875eb40e24e506518442ef85d8a9} 
+SEXP cholmod\+\_\+sparse\+\_\+as\+\_\+sexp (\begin{DoxyParamCaption}\item[{cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{do\+Free}{, }\item[{int}]{ttype}{, }\item[{int}]{do\+Logic}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{diag\+String}{, }\item[{SEXP}]{dimnames}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}) to Csparse\+Matrix. 
+
+Allocates an S4 object inheriting from virtual class Csparse\+Matrix and copies into the slots from members of a pointed-\/to cholmod\+\_\+sparse struct. The specific class of the result is determined by struct members xtype and stype and by arguments ttype and do\+Logic.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+sparse struct. \\
+\hline
+{\em do\+Free} & a flag indicating if and how to free A before returning. (0) don\textquotesingle{}t free, (\texorpdfstring{$>$}{>}0) free with cholmod\+\_\+free\+\_\+sparse, (\texorpdfstring{$<$}{<}0) free with R\+\_\+\+Free. \\
+\hline
+{\em ttype} & a flag indicating if the result should be a .t\+CMatrix. (0) not .t\+CMatrix, (\texorpdfstring{$>$}{>}0) .t\+CMatrix with uplo="{}\+U"{}, (\texorpdfstring{$<$}{<}0) .t\+CMatrix with uplo="{}\+L"{}. If ttype=0, then the result is a .g\+CMatrix or .s\+CMatrix depending on stype. (0) .g\+CMatrix, (\texorpdfstring{$>$}{>}0) .s\+CMatrix with uplo="{}\+U"{}, (\texorpdfstring{$<$}{<}0) .s\+CMatrix with uplo="{}\+L"{}. \\
+\hline
+{\em do\+Logic} & a flag indicating if the result should be a l.\+CMatrix if xtype=CHOLMOD\+\_\+\+REAL. \\
+\hline
+{\em diag\+String} & a null-\/terminated string or NULL. The diag slot of a .t\+CMatrix result is "{}\+N"{} if and only if diag\+String is NULL or diag\+String\mbox{[}0\mbox{]} is \textquotesingle{}N\textquotesingle{}. \\
+\hline
+{\em dimnames} & an R object specifying the Dimnames slot of the result, unused if not a list of length 2.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A Csparse\+Matrix. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00625}{625}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-api_8c_aa47f78f8eb6c9c8a41e2e482081c4dfd}{error\+Free}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cholmod-api_8c_a0408e52248f514befc0a7bacb1184197}{MAYBE\+\_\+\+FREE}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_ac77a41d8ce0621c0114dc1da49b827a9}\index{cholmod-\/api.h@{cholmod-\/api.h}!cholmod\_triplet\_as\_sexp@{cholmod\_triplet\_as\_sexp}}
+\index{cholmod\_triplet\_as\_sexp@{cholmod\_triplet\_as\_sexp}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{cholmod\_triplet\_as\_sexp()}{cholmod\_triplet\_as\_sexp()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_ac77a41d8ce0621c0114dc1da49b827a9} 
+SEXP cholmod\+\_\+triplet\+\_\+as\+\_\+sexp (\begin{DoxyParamCaption}\item[{cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{do\+Free}{, }\item[{int}]{ttype}{, }\item[{int}]{do\+Logic}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{diag\+String}{, }\item[{SEXP}]{dimnames}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}) to Tsparse\+Matrix. 
+
+Allocates an S4 object inheriting from virtual class Tsparse\+Matrix and copies into the slots from members of a pointed-\/to cholmod\+\_\+triplet struct. The specific class of the result is determined by struct members xtype and stype and by arguments ttype and do\+Logic.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+triplet struct. \\
+\hline
+{\em do\+Free} & a flag indicating if and how to free A before returning. (0) don\textquotesingle{}t free, (\texorpdfstring{$>$}{>}0) free with cholmod\+\_\+free\+\_\+triplet, (\texorpdfstring{$<$}{<}0) free with R\+\_\+\+Free. \\
+\hline
+{\em ttype} & a flag indicating if the result should be a .t\+TMatrix. (0) not .t\+TMatrix, (\texorpdfstring{$>$}{>}0) .t\+TMatrix with uplo="{}\+U"{}, (\texorpdfstring{$<$}{<}0) .t\+TMatrix with uplo="{}\+L"{}. If ttype=0, then the result is a .g\+TMatrix or .s\+TMatrix depending on stype. (0) .g\+TMatrix, (\texorpdfstring{$>$}{>}0) .s\+TMatrix with uplo="{}\+U"{}, (\texorpdfstring{$<$}{<}0) .s\+TMatrix with uplo="{}\+L"{}. \\
+\hline
+{\em do\+Logic} & a flag indicating if the result should be an l.\+TMatrix if xtype=CHOLMOD\+\_\+\+REAL. \\
+\hline
+{\em diag\+String} & a null-\/terminated string or NULL. The diag slot of a .t\+TMatrix result is "{}\+N"{} if and only if diag\+String is NULL or diag\+String\mbox{[}0\mbox{]} is \textquotesingle{}N\textquotesingle{}. \\
+\hline
+{\em dimnames} & an R object specifying the Dimnames slot of the result, unused if not a list of length 2.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A Tsparse\+Matrix. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00740}{740}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-api_8c_aa47f78f8eb6c9c8a41e2e482081c4dfd}{error\+Free}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cholmod-api_8c_a0408e52248f514befc0a7bacb1184197}{MAYBE\+\_\+\+FREE}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_ab1cfaad063342f9d84229fc8e2144b48}\index{cholmod-\/api.h@{cholmod-\/api.h}!numeric\_as\_cholmod\_dense@{numeric\_as\_cholmod\_dense}}
+\index{numeric\_as\_cholmod\_dense@{numeric\_as\_cholmod\_dense}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{numeric\_as\_cholmod\_dense()}{numeric\_as\_cholmod\_dense()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_ab1cfaad063342f9d84229fc8e2144b48} 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} numeric\+\_\+as\+\_\+cholmod\+\_\+dense (\begin{DoxyParamCaption}\item[{cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{int}]{nrow}{, }\item[{int}]{ncol}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from (double \texorpdfstring{$\ast$}{*}) to (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) with given dimensions. 
+
+An analogue of base\+::matrix(data, nrow, ncol), where typeof(data)=="{}double"{} and length(data)==nrow\texorpdfstring{$\ast$}{*}ncol.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+dense struct, to be modified in-\/place. \\
+\hline
+{\em data} & a pointer to an nrow\texorpdfstring{$\ast$}{*}ncol\texorpdfstring{$\ast$}{*}sizeof(double) block of memory. \\
+\hline
+{\em nrow} & the desired number of rows. \\
+\hline
+{\em ncol} & the desired number of columns.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00436}{436}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_a92972d381d304fa4d6807a9b6682672a}\index{cholmod-\/api.h@{cholmod-\/api.h}!sexp\_as\_cholmod\_dense@{sexp\_as\_cholmod\_dense}}
+\index{sexp\_as\_cholmod\_dense@{sexp\_as\_cholmod\_dense}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{sexp\_as\_cholmod\_dense()}{sexp\_as\_cholmod\_dense()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a92972d381d304fa4d6807a9b6682672a} 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} sexp\+\_\+as\+\_\+cholmod\+\_\+dense (\begin{DoxyParamCaption}\item[{cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{SEXP}]{from}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from .ge\+Matrix or vector to (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}) 
+
+Sets the members of a pointed-\/to cholmod\+\_\+dense struct, using "{}data"{} obtained from slots of a .ge\+Matrix. The result should {\itshape not} be freed using cholmod\+\_\+free\+\_\+dense, as the resulting members point to memory controlled by R, not by CHOLMOD.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+dense struct, to be modified in-\/place. \\
+\hline
+{\em from} & an S4 object inheriting from class .ge\+Matrix {\itshape or} a traditional vector of type "{}logical"{}, "{}integer"{}, "{}double"{}, or "{}complex"{} (to be handled as a 1-\/column matrix if not a matrix).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00356}{356}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00145}{ERROR\+\_\+\+INVALID\+\_\+\+TYPE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_a45e6d33544fe2136489f8eb5e0f252eb}\index{cholmod-\/api.h@{cholmod-\/api.h}!sexp\_as\_cholmod\_factor@{sexp\_as\_cholmod\_factor}}
+\index{sexp\_as\_cholmod\_factor@{sexp\_as\_cholmod\_factor}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{sexp\_as\_cholmod\_factor()}{sexp\_as\_cholmod\_factor()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_a45e6d33544fe2136489f8eb5e0f252eb} 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} sexp\+\_\+as\+\_\+cholmod\+\_\+factor (\begin{DoxyParamCaption}\item[{cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{SEXP}]{from}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from sparse\+Cholesky to (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}) 
+
+Sets the members of a pointed-\/to cholmod\+\_\+factor struct, using "{}data"{} obtained from slots of a sparse\+Cholesky. The result should {\itshape not} be freed using cholmod\+\_\+free\+\_\+factor, as the resulting members point to memory controlled by R, not by CHOLMOD.
+
+
+\begin{DoxyParams}{Parameters}
+{\em L} & a pointer to a cholmod\+\_\+factor struct, to be modified in-\/place. \\
+\hline
+{\em from} & an S4 object inheriting from virtual class sparse\+Cholesky.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+L. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00018}{18}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00604}{Matrix\+\_\+colcount\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00608}{Matrix\+\_\+isll\+Sym}}, \mbox{\hyperlink{init_8c_source_l00609}{Matrix\+\_\+ismt\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00615}{Matrix\+\_\+maxcsize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00616}{Matrix\+\_\+maxesize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00618}{Matrix\+\_\+next\+Sym}}, \mbox{\hyperlink{init_8c_source_l00619}{Matrix\+\_\+nz\+Sym}}, \mbox{\hyperlink{init_8c_source_l00621}{Matrix\+\_\+ordering\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00624}{Matrix\+\_\+pi\+Sym}}, \mbox{\hyperlink{init_8c_source_l00625}{Matrix\+\_\+prev\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00626}{Matrix\+\_\+px\+Sym}}, \mbox{\hyperlink{init_8c_source_l00628}{Matrix\+\_\+s\+Sym}}, \mbox{\hyperlink{init_8c_source_l00630}{Matrix\+\_\+super\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_ae8eb59e6d0724d47080bdd4131b33960}\index{cholmod-\/api.h@{cholmod-\/api.h}!sexp\_as\_cholmod\_sparse@{sexp\_as\_cholmod\_sparse}}
+\index{sexp\_as\_cholmod\_sparse@{sexp\_as\_cholmod\_sparse}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{sexp\_as\_cholmod\_sparse()}{sexp\_as\_cholmod\_sparse()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_ae8eb59e6d0724d47080bdd4131b33960} 
+cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*} sexp\+\_\+as\+\_\+cholmod\+\_\+sparse (\begin{DoxyParamCaption}\item[{cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{SEXP}]{from}{, }\item[{Rboolean}]{alloc\+Unit}{, }\item[{Rboolean}]{sort\+In\+Place}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from \mbox{[}CR\mbox{]}sparse\+Matrix to (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}) 
+
+Sets the members of a pointed-\/to cholmod\+\_\+sparse struct, using "{}data"{} obtained from slots of a \mbox{[}CR\mbox{]}sparse\+Matrix. The result should {\itshape not} be freed using cholmod\+\_\+free\+\_\+sparse, as the resulting members point to memory controlled by R, not by CHOLMOD.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+sparse struct, to be modified in-\/place. \\
+\hline
+{\em from} & an S4 object inheriting from virtual class \mbox{[}CR\mbox{]}sparse\+Matrix. \\
+\hline
+{\em alloc\+Unit} & a boolean indicating if the unit diagonal of formally unit triangular \mbox{[}CR\mbox{]}sparse\+Matrix should be allocated. \\
+\hline
+{\em sort\+In\+Place} & a boolean indicating if unsorted \mbox{[}CR\mbox{]}sparse\+Matrix should be sorted in place to avoid an allocation.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00127}{127}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils_8c_source_l00094}{alloc\+Unit()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{Csparse_8c_source_l00006}{checkpi()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00329}{valid\+\_\+sparse\+\_\+compressed}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-api_8h_afc39de666fdb79e52b443e5b8e1b6585}\index{cholmod-\/api.h@{cholmod-\/api.h}!sexp\_as\_cholmod\_triplet@{sexp\_as\_cholmod\_triplet}}
+\index{sexp\_as\_cholmod\_triplet@{sexp\_as\_cholmod\_triplet}!cholmod-\/api.h@{cholmod-\/api.h}}
+\doxysubsubsection{\texorpdfstring{sexp\_as\_cholmod\_triplet()}{sexp\_as\_cholmod\_triplet()}}
+{\footnotesize\ttfamily \label{cholmod-api_8h_afc39de666fdb79e52b443e5b8e1b6585} 
+cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*} sexp\+\_\+as\+\_\+cholmod\+\_\+triplet (\begin{DoxyParamCaption}\item[{cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{SEXP}]{from}{, }\item[{Rboolean}]{alloc\+Unit}{}\end{DoxyParamCaption})}
+
+
+
+Coerce from Tsparse\+Matrix to (cholmod\+\_\+triplet \texorpdfstring{$\ast$}{*}) 
+
+Sets the members of a pointed-\/to cholmod\+\_\+triplet struct, using "{}data"{} obtained from slots of a Tsparse\+Matrix. The result should {\itshape not} be freed using cholmod\+\_\+free\+\_\+sparse, as the resulting members point to memory controlled by R, not by CHOLMOD.
+
+
+\begin{DoxyParams}{Parameters}
+{\em A} & a pointer to a cholmod\+\_\+triplet struct, to be modified in-\/place. \\
+\hline
+{\em from} & an S4 object inheriting from virtual class Tsparse\+Matrix. \\
+\hline
+{\em alloc\+Unit} & a boolean indicating if the unit diagonal of formally unit triangular Tsparse\+Matrix should be allocated.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{cholmod-api_8c_source_l00247}{247}} of file \mbox{\hyperlink{cholmod-api_8c_source}{cholmod-\/api.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00094}{alloc\+Unit()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00605}{Matrix\+\_\+diag\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00330}{valid\+\_\+sparse\+\_\+triplet}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+

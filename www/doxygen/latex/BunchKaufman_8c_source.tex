@@ -1,0 +1,125 @@
+\doxysection{Bunch\+Kaufman.\+c}
+\hypertarget{BunchKaufman_8c_source}{}\label{BunchKaufman_8c_source}\index{BunchKaufman.c@{BunchKaufman.c}}
+\mbox{\hyperlink{BunchKaufman_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Lapack-etc_8h}{Lapack-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00004}00004\ \textcolor{comment}{/*\ defined\ in\ ./coerce.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00005}00005\ SEXP\ \mbox{\hyperlink{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00007}00007\ \textcolor{comment}{/*\ defined\ in\ ./forceCanonical.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00008}00008\ SEXP\ \mbox{\hyperlink{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\_force\_canonical}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00010}\mbox{\hyperlink{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e}{00010}}\ SEXP\ \mbox{\hyperlink{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e}{dense\_bunchkaufman}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ warn,}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00011}00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ ul,\ \textcolor{keywordtype}{char}\ ct)}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00013}00013\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(obj),\ n\ =\ pdim[1];}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00014}00014\ \ \ \ \ \textcolor{keywordflow}{if}\ (pdim[0]\ !=\ n)}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}matrix\ is\ not\ square"{}}));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00016}00016\ \ \ \ \ ul\ =\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'g'})\ ?\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj)\ :\ (ul\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ ?\ \textcolor{charliteral}{'U'}\ :\ ul;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00017}00017\ \ \ \ \ ct\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})\ ?\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(obj)\ :\ ct;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00018}00018\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[]\ =\ \textcolor{stringliteral}{"{}.denseBunchKaufman"{}};}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ =\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})\ ?\ \textcolor{charliteral}{'z'}\ :\ \textcolor{charliteral}{'d'};}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00020}00020\ \ \ \ \ SEXP\ ans\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(ans,\ n,\ n);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(ans,\ -\/(\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}),\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(obj,\ 0));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00024}00024\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(ans);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ !=\ \textcolor{charliteral}{'C'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a73b72184aa5f669b3d7faf07f44ee2f9}{SET\_TRANS}}(ans);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00028}00028\ \ \ \ \ PROTECT\_INDEX\ pid;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00029}00029\ \ \ \ \ PROTECT\_WITH\_INDEX(obj,\ \&pid);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00030}00030\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'z'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'d'})\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00031}00031\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(obj,\ \textcolor{keyword}{class},\ \textcolor{charliteral}{','},\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'t'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(obj)\ !=\ \textcolor{charliteral}{'N'})}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00035}00035\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\_force\_canonical}}(obj,\ \textcolor{keyword}{class},\ 0),\ pid);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00036}00036\ \ \ \ \ SEXP\ perm\ =\ PROTECT(Rf\_allocVector(INTSXP,\ n)),}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00037}00037\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00038}00038\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x),\ XLENGTH(x)));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00039}00039\ \ \ \ \ \textcolor{keywordtype}{int}\ *pperm\ =\ INTEGER(perm),\ info;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ !=\ \textcolor{charliteral}{'p'})\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{int}\ lwork\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00043}00043\ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x),\ *py\ =\ COMPLEX(y),\ tmp,\ *work;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00044}00044\ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00045}00045\ \ \ \ \ F77\_CALL(zlacpy)(\&ul,\ \&n,\ \&n,\ px,\ \&n,\ py,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ ==\ \textcolor{charliteral}{'C'})\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00047}00047\ \ \ \ \ F77\_CALL(zhetrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ \&tmp,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00048}00048\ \ \ \ \ lwork\ =\ (int)\ tmp.r;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00049}00049\ \ \ \ \ work\ =\ (Rcomplex\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ lwork,\ \textcolor{keyword}{sizeof}(Rcomplex));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00050}00050\ \ \ \ \ F77\_CALL(zhetrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ work,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(zhetrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00052}00052\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00053}00053\ \ \ \ \ F77\_CALL(zsytrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ \&tmp,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00054}00054\ \ \ \ \ lwork\ =\ (int)\ tmp.r;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00055}00055\ \ \ \ \ work\ =\ (Rcomplex\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ lwork,\ \textcolor{keyword}{sizeof}(Rcomplex));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00056}00056\ \ \ \ \ F77\_CALL(zsytrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ work,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(zsytrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00059}00059\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00060}00060\ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x),\ *py\ =\ REAL(y),\ tmp,\ *work;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00061}00061\ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00062}00062\ \ \ \ \ F77\_CALL(dlacpy)(\&ul,\ \&n,\ \&n,\ px,\ \&n,\ py,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00063}00063\ \ \ \ \ F77\_CALL(dsytrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ \&tmp,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00064}00064\ \ \ \ \ lwork\ =\ (int)\ tmp;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00065}00065\ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ lwork,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00066}00066\ \ \ \ \ F77\_CALL(dsytrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ work,\ \&lwork,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00067}00067\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(dsytrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00069}00069\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00071}00071\ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x),\ *py\ =\ COMPLEX(y);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00072}00072\ \ \ \ \ memcpy(py,\ px,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ ==\ \textcolor{charliteral}{'C'})\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00074}00074\ \ \ \ \ F77\_CALL(zhptrf)(\&ul,\ \&n,\ py,\ pperm,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(zhptrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00076}00076\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00077}00077\ \ \ \ \ F77\_CALL(zsptrf)(\&ul,\ \&n,\ py,\ pperm,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(zsptrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00079}00079\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00080}00080\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00081}00081\ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x),\ *py\ =\ REAL(y);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00082}00082\ \ \ \ \ memcpy(py,\ px,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00083}00083\ \ \ \ \ F77\_CALL(dsptrf)(\&ul,\ \&n,\ py,\ pperm,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(dsptrf,\ info,\ warn,\ D);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00086}00086\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}},\ perm);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00088}00088\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ y);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00089}00089\ \ \ \ \ UNPROTECT(4);\ \textcolor{comment}{/*\ y,\ x,\ perm,\ obj\ */}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00091}00091\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ ans\ */}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00092}00092\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00093}00093\ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00095}\mbox{\hyperlink{BunchKaufman_8c_a95b96ac960d0a9f423b48f92fc0cfd4d}{00095}}\ SEXP\ \mbox{\hyperlink{BunchKaufman_8c_a95b96ac960d0a9f423b48f92fc0cfd4d}{R\_dense\_bunchkaufman}}(SEXP\ s\_obj,\ SEXP\ s\_warn,}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ s\_uplo,\ SEXP\ s\_trans)}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00097}00097\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00098}00098\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00099}00099\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \textcolor{charliteral}{'\(\backslash\)0'},\ ct\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00100}00100\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\_uplo\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a4ff01bcfac826370356a63ee5a5971ed}{VALID\_UPLO}}\ (s\_uplo\ ,\ ul);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ab7d0465c740527510af45c7e62a7fa35}{VALID\_TRANS}}(s\_trans,\ ct);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00103}00103\ \ \ \ \ \textcolor{keywordtype}{int}\ cache\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})\ \&\&}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00104}00104\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ ||\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'d'});}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00105}00105\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *nm\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'p'})}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}denseBunchKaufman-\/"{}}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}denseBunchKaufman+"{}};}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00108}00108\ \ \ \ \ SEXP\ ans\ =\ (cache)\ ?\ \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\_factor}}(s\_obj,\ nm)\ :\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00109}00109\ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ ==\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ warn\ =\ Rf\_asInteger(s\_warn);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00111}00111\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e}{dense\_bunchkaufman}}(s\_obj,\ \textcolor{keyword}{class},\ warn,\ ul,\ ct);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cache)\ \{}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\_factor}}(s\_obj,\ nm,\ ans);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00118}00118\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{BunchKaufman_8c_source_l00119}00119\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,657 @@
+\doxysection{cs-\/etc.h File Reference}
+\hypertarget{cs-etc_8h}{}\label{cs-etc_8h}\index{cs-\/etc.h@{cs-\/etc.h}}
+{\ttfamily \#include "{}Suite\+Sparse/\+CXSparse/\+Include/cs.\+h"{}}\newline
+{\ttfamily \#include $<$Rinternals.\+h$>$}\newline
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\+\_\+cs\+\_\+sparse}}
+\item 
+struct \mbox{\hyperlink{structMatrix__cs__symbolic}{Matrix\+\_\+cs\+\_\+symbolic}}
+\item 
+struct \mbox{\hyperlink{structMatrix__cs__numeric}{Matrix\+\_\+cs\+\_\+numeric}}
+\item 
+struct \mbox{\hyperlink{structMatrix__cs__dmperm__results}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{cs-etc_8h_a4bd4a22b133f3bef317659d6835aa438}{CXSPARSE\+\_\+\+PATTERN}}~0
+\item 
+\#define \mbox{\hyperlink{cs-etc_8h_a402eec8c8f9f29ac56751e35753450bb}{CXSPARSE\+\_\+\+REAL}}~1
+\item 
+\#define \mbox{\hyperlink{cs-etc_8h_ab21bc821897800dddc6831ad1bca58cc}{CXSPARSE\+\_\+\+COMPLEX}}~2
+\item 
+\#define \mbox{\hyperlink{cs-etc_8h_a35002c9618994f10f422a672e8391929}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}()
+\item 
+\#define \mbox{\hyperlink{cs-etc_8h_a3d9d325cba5e5b86672a0e51cd23db34}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+SET}}(\+\_\+\+VALUE\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\+\_\+cs\+\_\+sparse}} \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}}
+\item 
+typedef struct \mbox{\hyperlink{structMatrix__cs__symbolic}{Matrix\+\_\+cs\+\_\+symbolic}} \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}}
+\item 
+typedef struct \mbox{\hyperlink{structMatrix__cs__numeric}{Matrix\+\_\+cs\+\_\+numeric}} \mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}}
+\item 
+typedef struct \mbox{\hyperlink{structMatrix__cs__dmperm__results}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results}} \mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a625b8fc4a0b09495197359265ab1b180}{M2\+CXS}} (SEXP, int)
+\item 
+SEXP \mbox{\hyperlink{cs-etc_8h_a077978ca94ed8d00f3aad316d7beba4a}{CXS2M}} (\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int, char)
+\item 
+\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ad7908eebfb9580a15bc518148583799b}{Matrix\+\_\+cs\+\_\+dfree}} (\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a6602e27ed09cab345e76214c21aae830}{Matrix\+\_\+cs\+\_\+dmperm}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a912154ceabf5353dc92f9bb1ba3f33a3}{Matrix\+\_\+cs\+\_\+dropzeros}} (\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*})
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_aa7b480c887b5449ae21c3d38e693c62b}{Matrix\+\_\+cs\+\_\+free}} (void \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{cs-etc_8h_ac41f6b6c0149002713c902dd5aade157}{Matrix\+\_\+cs\+\_\+happly}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int, double, void \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a65926791c0035302b669a2b9147bf209}{Matrix\+\_\+cs\+\_\+ipvec}} (const int \texorpdfstring{$\ast$}{*}, const void \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_ad08824310a5ea3402b165d442f9dcce9}{Matrix\+\_\+cs\+\_\+lsolve}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ab293b6d038ee9a589a13758a9a8af0d2}{Matrix\+\_\+cs\+\_\+lu}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, const \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*}, double)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a2150c7e06efafc35b22e4594431808db}{Matrix\+\_\+cs\+\_\+lusol}} (int, const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*}, double)
+\item 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ac5a6d9a65e4c82fa994e5f1a68ce22eb}{Matrix\+\_\+cs\+\_\+nfree}} (\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a3557931469082cf58829a847ec23faa4}{Matrix\+\_\+cs\+\_\+permute}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ac41e8e3b5c69b159e2385a8629cdd655}{Matrix\+\_\+cs\+\_\+pinv}} (const int \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a7c60e670347c7d4fd734d3168a217a6b}{Matrix\+\_\+cs\+\_\+pvec}} (const int \texorpdfstring{$\ast$}{*}, const void \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*}, int)
+\item 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ad11952c781c8f71decf5678a41f3ec14}{Matrix\+\_\+cs\+\_\+qr}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, const \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a598d16d81401161aa53b222504796c94}{Matrix\+\_\+cs\+\_\+qrsol}} (int, const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ac9d5d423bb425dfc108f68d7a49c5168}{Matrix\+\_\+cs\+\_\+sfree}} (\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*})
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_ac7354ffae095a3e3ccf8add52e6f6988}{Matrix\+\_\+cs\+\_\+spalloc}} (int, int, int, int, int)
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a2b6fbf6b0849cb9e7c7f16efa16d033e}{Matrix\+\_\+cs\+\_\+speye}} (int, int, int, int)
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_aedbdf46e99d844d1c9293a4859f36442}{Matrix\+\_\+cs\+\_\+spfree}} (\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{cs-etc_8h_ad3dccdc4c3677312ba34077df4f7b512}{Matrix\+\_\+cs\+\_\+sprealloc}} (\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_ae8e4749e18ea8ea9d2a26e65a27d9b43}{Matrix\+\_\+cs\+\_\+spsolve}} (\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int, int \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int)
+\item 
+\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a97ce92ac761ef3205b79866b7438e052}{Matrix\+\_\+cs\+\_\+sqr}} (int, const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cs-etc_8h_a4eae5d4649ec91dcf97da84a1cba9816}{Matrix\+\_\+cs\+\_\+transpose}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+int \mbox{\hyperlink{cs-etc_8h_a4809efe2cb19a09688a08b24d5d3ab7d}{Matrix\+\_\+cs\+\_\+usolve}} (const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}, void \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{cs-etc_8h_abd8956da89df1bd636ee1b52df794ea6}{Matrix\+\_\+cs\+\_\+xtype}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{cs-etc_8h_ab21bc821897800dddc6831ad1bca58cc}\index{cs-\/etc.h@{cs-\/etc.h}!CXSPARSE\_COMPLEX@{CXSPARSE\_COMPLEX}}
+\index{CXSPARSE\_COMPLEX@{CXSPARSE\_COMPLEX}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXSPARSE\_COMPLEX}{CXSPARSE\_COMPLEX}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ab21bc821897800dddc6831ad1bca58cc} 
+\#define CXSPARSE\+\_\+\+COMPLEX~2}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8h_source_l00009}{9}} of file \mbox{\hyperlink{cs-etc_8h_source}{cs-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{cs-etc_8c_source_l00042}{CXS2\+M()}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{cs-etc_8c_source_l00077}{Matrix\+\_\+cs\+\_\+dfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00089}{Matrix\+\_\+cs\+\_\+dmperm()}}, \mbox{\hyperlink{cs-etc_8c_source_l00101}{Matrix\+\_\+cs\+\_\+dropzeros()}}, \mbox{\hyperlink{cs-etc_8c_source_l00113}{Matrix\+\_\+cs\+\_\+free()}}, \mbox{\hyperlink{cs-etc_8c_source_l00125}{Matrix\+\_\+cs\+\_\+happly()}}, \mbox{\hyperlink{cs-etc_8c_source_l00137}{Matrix\+\_\+cs\+\_\+ipvec()}}, \mbox{\hyperlink{cs-etc_8c_source_l00149}{Matrix\+\_\+cs\+\_\+lsolve()}}, \mbox{\hyperlink{cs-etc_8c_source_l00161}{Matrix\+\_\+cs\+\_\+lu()}}, \mbox{\hyperlink{cs-etc_8c_source_l00173}{Matrix\+\_\+cs\+\_\+lusol()}}, \mbox{\hyperlink{cs-etc_8c_source_l00185}{Matrix\+\_\+cs\+\_\+nfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00197}{Matrix\+\_\+cs\+\_\+permute()}}, \mbox{\hyperlink{cs-etc_8c_source_l00222}{Matrix\+\_\+cs\+\_\+pinv()}}, \mbox{\hyperlink{cs-etc_8c_source_l00234}{Matrix\+\_\+cs\+\_\+pvec()}}, \mbox{\hyperlink{cs-etc_8c_source_l00246}{Matrix\+\_\+cs\+\_\+qr()}}, \mbox{\hyperlink{cs-etc_8c_source_l00258}{Matrix\+\_\+cs\+\_\+qrsol()}}, \mbox{\hyperlink{cs-etc_8c_source_l00270}{Matrix\+\_\+cs\+\_\+sfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00282}{Matrix\+\_\+cs\+\_\+spalloc()}}, \mbox{\hyperlink{cs-etc_8c_source_l00307}{Matrix\+\_\+cs\+\_\+speye()}}, \mbox{\hyperlink{cs-etc_8c_source_l00337}{Matrix\+\_\+cs\+\_\+spfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00349}{Matrix\+\_\+cs\+\_\+sprealloc()}}, \mbox{\hyperlink{cs-etc_8c_source_l00361}{Matrix\+\_\+cs\+\_\+spsolve()}}, \mbox{\hyperlink{cs-etc_8c_source_l00373}{Matrix\+\_\+cs\+\_\+sqr()}}, \mbox{\hyperlink{cs-etc_8c_source_l00385}{Matrix\+\_\+cs\+\_\+transpose()}}, \mbox{\hyperlink{cs-etc_8c_source_l00410}{Matrix\+\_\+cs\+\_\+usolve()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_a4bd4a22b133f3bef317659d6835aa438}\index{cs-\/etc.h@{cs-\/etc.h}!CXSPARSE\_PATTERN@{CXSPARSE\_PATTERN}}
+\index{CXSPARSE\_PATTERN@{CXSPARSE\_PATTERN}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXSPARSE\_PATTERN}{CXSPARSE\_PATTERN}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a4bd4a22b133f3bef317659d6835aa438} 
+\#define CXSPARSE\+\_\+\+PATTERN~0}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8h_source_l00007}{7}} of file \mbox{\hyperlink{cs-etc_8h_source}{cs-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}.
+
+\Hypertarget{cs-etc_8h_a402eec8c8f9f29ac56751e35753450bb}\index{cs-\/etc.h@{cs-\/etc.h}!CXSPARSE\_REAL@{CXSPARSE\_REAL}}
+\index{CXSPARSE\_REAL@{CXSPARSE\_REAL}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXSPARSE\_REAL}{CXSPARSE\_REAL}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a402eec8c8f9f29ac56751e35753450bb} 
+\#define CXSPARSE\+\_\+\+REAL~1}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8h_source_l00008}{8}} of file \mbox{\hyperlink{cs-etc_8h_source}{cs-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{cs-etc_8c_source_l00042}{CXS2\+M()}}, \mbox{\hyperlink{Csparse_8c_source_l00082}{dg\+CMatrix\+\_\+lusol()}}, \mbox{\hyperlink{Csparse_8c_source_l00101}{dg\+CMatrix\+\_\+qrsol()}}, and \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}.
+
+\Hypertarget{cs-etc_8h_a35002c9618994f10f422a672e8391929}\index{cs-\/etc.h@{cs-\/etc.h}!CXSPARSE\_XTYPE\_GET@{CXSPARSE\_XTYPE\_GET}}
+\index{CXSPARSE\_XTYPE\_GET@{CXSPARSE\_XTYPE\_GET}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXSPARSE\_XTYPE\_GET}{CXSPARSE\_XTYPE\_GET}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a35002c9618994f10f422a672e8391929} 
+\#define CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{cs-etc_8h_abd8956da89df1bd636ee1b52df794ea6}{Matrix\_cs\_xtype}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8h_source_l00011}{11}} of file \mbox{\hyperlink{cs-etc_8h_source}{cs-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{cs-etc_8c_source_l00077}{Matrix\+\_\+cs\+\_\+dfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00089}{Matrix\+\_\+cs\+\_\+dmperm()}}, \mbox{\hyperlink{cs-etc_8c_source_l00101}{Matrix\+\_\+cs\+\_\+dropzeros()}}, \mbox{\hyperlink{cs-etc_8c_source_l00113}{Matrix\+\_\+cs\+\_\+free()}}, \mbox{\hyperlink{cs-etc_8c_source_l00125}{Matrix\+\_\+cs\+\_\+happly()}}, \mbox{\hyperlink{cs-etc_8c_source_l00137}{Matrix\+\_\+cs\+\_\+ipvec()}}, \mbox{\hyperlink{cs-etc_8c_source_l00149}{Matrix\+\_\+cs\+\_\+lsolve()}}, \mbox{\hyperlink{cs-etc_8c_source_l00161}{Matrix\+\_\+cs\+\_\+lu()}}, \mbox{\hyperlink{cs-etc_8c_source_l00173}{Matrix\+\_\+cs\+\_\+lusol()}}, \mbox{\hyperlink{cs-etc_8c_source_l00185}{Matrix\+\_\+cs\+\_\+nfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00197}{Matrix\+\_\+cs\+\_\+permute()}}, \mbox{\hyperlink{cs-etc_8c_source_l00222}{Matrix\+\_\+cs\+\_\+pinv()}}, \mbox{\hyperlink{cs-etc_8c_source_l00234}{Matrix\+\_\+cs\+\_\+pvec()}}, \mbox{\hyperlink{cs-etc_8c_source_l00246}{Matrix\+\_\+cs\+\_\+qr()}}, \mbox{\hyperlink{cs-etc_8c_source_l00258}{Matrix\+\_\+cs\+\_\+qrsol()}}, \mbox{\hyperlink{cs-etc_8c_source_l00270}{Matrix\+\_\+cs\+\_\+sfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00282}{Matrix\+\_\+cs\+\_\+spalloc()}}, \mbox{\hyperlink{cs-etc_8c_source_l00307}{Matrix\+\_\+cs\+\_\+speye()}}, \mbox{\hyperlink{cs-etc_8c_source_l00337}{Matrix\+\_\+cs\+\_\+spfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00349}{Matrix\+\_\+cs\+\_\+sprealloc()}}, \mbox{\hyperlink{cs-etc_8c_source_l00361}{Matrix\+\_\+cs\+\_\+spsolve()}}, \mbox{\hyperlink{cs-etc_8c_source_l00373}{Matrix\+\_\+cs\+\_\+sqr()}}, \mbox{\hyperlink{cs-etc_8c_source_l00385}{Matrix\+\_\+cs\+\_\+transpose()}}, and \mbox{\hyperlink{cs-etc_8c_source_l00410}{Matrix\+\_\+cs\+\_\+usolve()}}.
+
+\Hypertarget{cs-etc_8h_a3d9d325cba5e5b86672a0e51cd23db34}\index{cs-\/etc.h@{cs-\/etc.h}!CXSPARSE\_XTYPE\_SET@{CXSPARSE\_XTYPE\_SET}}
+\index{CXSPARSE\_XTYPE\_SET@{CXSPARSE\_XTYPE\_SET}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXSPARSE\_XTYPE\_SET}{CXSPARSE\_XTYPE\_SET}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a3d9d325cba5e5b86672a0e51cd23db34} 
+\#define CXSPARSE\+\_\+\+XTYPE\+\_\+\+SET(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+VALUE\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{cs-etc_8h_abd8956da89df1bd636ee1b52df794ea6}{Matrix\_cs\_xtype}}\ =\ \_VALUE\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8h_source_l00012}{12}} of file \mbox{\hyperlink{cs-etc_8h_source}{cs-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00344}{Csparse\+\_\+dmperm()}}, \mbox{\hyperlink{Csparse_8c_source_l00082}{dg\+CMatrix\+\_\+lusol()}}, \mbox{\hyperlink{Csparse_8c_source_l00101}{dg\+CMatrix\+\_\+qrsol()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs@{Matrix\_cs}}
+\index{Matrix\_cs@{Matrix\_cs}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs}{Matrix\_cs}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358} 
+typedef struct \mbox{\hyperlink{structMatrix__cs__sparse}{Matrix\+\_\+cs\+\_\+sparse}} \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}}}
+
+\Hypertarget{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_csd@{Matrix\_csd}}
+\index{Matrix\_csd@{Matrix\_csd}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_csd}{Matrix\_csd}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5} 
+typedef struct \mbox{\hyperlink{structMatrix__cs__dmperm__results}{Matrix\+\_\+cs\+\_\+dmperm\+\_\+results}} \mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}}}
+
+\Hypertarget{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_csn@{Matrix\_csn}}
+\index{Matrix\_csn@{Matrix\_csn}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_csn}{Matrix\_csn}}
+{\footnotesize\ttfamily \label{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc} 
+typedef struct \mbox{\hyperlink{structMatrix__cs__numeric}{Matrix\+\_\+cs\+\_\+numeric}} \mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}}}
+
+\Hypertarget{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_css@{Matrix\_css}}
+\index{Matrix\_css@{Matrix\_css}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_css}{Matrix\_css}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37} 
+typedef struct \mbox{\hyperlink{structMatrix__cs__symbolic}{Matrix\+\_\+cs\+\_\+symbolic}} \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}}}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{cs-etc_8h_a077978ca94ed8d00f3aad316d7beba4a}\index{cs-\/etc.h@{cs-\/etc.h}!CXS2M@{CXS2M}}
+\index{CXS2M@{CXS2M}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{CXS2M()}{CXS2M()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a077978ca94ed8d00f3aad316d7beba4a} 
+SEXP CXS2M (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{values}{, }\item[{char}]{shape}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00042}{42}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00008}{CXSPARSE\+\_\+\+REAL}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8h_source_l00022}{Matrix\+\_\+cs\+\_\+sparse\+::i}}, \mbox{\hyperlink{cs-etc_8h_source_l00019}{Matrix\+\_\+cs\+\_\+sparse\+::m}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cs-etc_8h_source_l00020}{Matrix\+\_\+cs\+\_\+sparse\+::n}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{cs-etc_8h_source_l00021}{Matrix\+\_\+cs\+\_\+sparse\+::p}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8h_source_l00023}{Matrix\+\_\+cs\+\_\+sparse\+::x}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+
+
+Referenced by \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_a625b8fc4a0b09495197359265ab1b180}\index{cs-\/etc.h@{cs-\/etc.h}!M2CXS@{M2CXS}}
+\index{M2CXS@{M2CXS}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{M2CXS()}{M2CXS()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a625b8fc4a0b09495197359265ab1b180} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} M2\+CXS (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00006}{6}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00007}{CXSPARSE\+\_\+\+PATTERN}}, \mbox{\hyperlink{cs-etc_8h_source_l00008}{CXSPARSE\+\_\+\+REAL}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8h_source_l00022}{Matrix\+\_\+cs\+\_\+sparse\+::i}}, \mbox{\hyperlink{cs-etc_8h_source_l00019}{Matrix\+\_\+cs\+\_\+sparse\+::m}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cs-etc_8h_source_l00020}{Matrix\+\_\+cs\+\_\+sparse\+::n}}, \mbox{\hyperlink{cs-etc_8h_source_l00024}{Matrix\+\_\+cs\+\_\+sparse\+::nz}}, \mbox{\hyperlink{cs-etc_8h_source_l00018}{Matrix\+\_\+cs\+\_\+sparse\+::nzmax}}, \mbox{\hyperlink{cs-etc_8h_source_l00021}{Matrix\+\_\+cs\+\_\+sparse\+::p}}, \mbox{\hyperlink{Mdefines_8h_source_l00329}{valid\+\_\+sparse\+\_\+compressed}}, \mbox{\hyperlink{cs-etc_8h_source_l00023}{Matrix\+\_\+cs\+\_\+sparse\+::x}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00344}{Csparse\+\_\+dmperm()}}, \mbox{\hyperlink{Csparse_8c_source_l00082}{dg\+CMatrix\+\_\+lusol()}}, \mbox{\hyperlink{Csparse_8c_source_l00101}{dg\+CMatrix\+\_\+qrsol()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_ad7908eebfb9580a15bc518148583799b}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_dfree@{Matrix\_cs\_dfree}}
+\index{Matrix\_cs\_dfree@{Matrix\_cs\_dfree}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_dfree()}{Matrix\_cs\_dfree()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ad7908eebfb9580a15bc518148583799b} 
+\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+dfree (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*}}]{D}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00077}{77}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00344}{Csparse\+\_\+dmperm()}}.
+
+\Hypertarget{cs-etc_8h_a6602e27ed09cab345e76214c21aae830}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_dmperm@{Matrix\_cs\_dmperm}}
+\index{Matrix\_cs\_dmperm@{Matrix\_cs\_dmperm}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_dmperm()}{Matrix\_cs\_dmperm()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a6602e27ed09cab345e76214c21aae830} 
+\mbox{\hyperlink{cs-etc_8h_ad93b9060bcfc3660371ac199f529b2f5}{Matrix\+\_\+csd}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+dmperm (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{seed}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00089}{89}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00344}{Csparse\+\_\+dmperm()}}.
+
+\Hypertarget{cs-etc_8h_a912154ceabf5353dc92f9bb1ba3f33a3}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_dropzeros@{Matrix\_cs\_dropzeros}}
+\index{Matrix\_cs\_dropzeros@{Matrix\_cs\_dropzeros}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_dropzeros()}{Matrix\_cs\_dropzeros()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a912154ceabf5353dc92f9bb1ba3f33a3} 
+int Matrix\+\_\+cs\+\_\+dropzeros (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00101}{101}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_aa7b480c887b5449ae21c3d38e693c62b}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_free@{Matrix\_cs\_free}}
+\index{Matrix\_cs\_free@{Matrix\_cs\_free}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_free()}{Matrix\_cs\_free()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_aa7b480c887b5449ae21c3d38e693c62b} 
+void \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00113}{113}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_ac41f6b6c0149002713c902dd5aade157}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_happly@{Matrix\_cs\_happly}}
+\index{Matrix\_cs\_happly@{Matrix\_cs\_happly}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_happly()}{Matrix\_cs\_happly()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ac41f6b6c0149002713c902dd5aade157} 
+int Matrix\+\_\+cs\+\_\+happly (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{V}{, }\item[{int}]{i}{, }\item[{double}]{beta}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00125}{125}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_a65926791c0035302b669a2b9147bf209}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_ipvec@{Matrix\_cs\_ipvec}}
+\index{Matrix\_cs\_ipvec@{Matrix\_cs\_ipvec}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_ipvec()}{Matrix\_cs\_ipvec()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a65926791c0035302b669a2b9147bf209} 
+int Matrix\+\_\+cs\+\_\+ipvec (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00137}{137}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_ad08824310a5ea3402b165d442f9dcce9}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_lsolve@{Matrix\_cs\_lsolve}}
+\index{Matrix\_cs\_lsolve@{Matrix\_cs\_lsolve}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_lsolve()}{Matrix\_cs\_lsolve()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ad08824310a5ea3402b165d442f9dcce9} 
+int Matrix\+\_\+cs\+\_\+lsolve (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00149}{149}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_ab293b6d038ee9a589a13758a9a8af0d2}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_lu@{Matrix\_cs\_lu}}
+\index{Matrix\_cs\_lu@{Matrix\_cs\_lu}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_lu()}{Matrix\_cs\_lu()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ab293b6d038ee9a589a13758a9a8af0d2} 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+lu (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*}}]{S}{, }\item[{double}]{tol}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00161}{161}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}.
+
+\Hypertarget{cs-etc_8h_a2150c7e06efafc35b22e4594431808db}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_lusol@{Matrix\_cs\_lusol}}
+\index{Matrix\_cs\_lusol@{Matrix\_cs\_lusol}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_lusol()}{Matrix\_cs\_lusol()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a2150c7e06efafc35b22e4594431808db} 
+int Matrix\+\_\+cs\+\_\+lusol (\begin{DoxyParamCaption}\item[{int}]{order}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{double}]{tol}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00173}{173}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00082}{dg\+CMatrix\+\_\+lusol()}}.
+
+\Hypertarget{cs-etc_8h_ac5a6d9a65e4c82fa994e5f1a68ce22eb}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_nfree@{Matrix\_cs\_nfree}}
+\index{Matrix\_cs\_nfree@{Matrix\_cs\_nfree}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_nfree()}{Matrix\_cs\_nfree()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ac5a6d9a65e4c82fa994e5f1a68ce22eb} 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+nfree (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*}}]{N}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00185}{185}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_a3557931469082cf58829a847ec23faa4}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_permute@{Matrix\_cs\_permute}}
+\index{Matrix\_cs\_permute@{Matrix\_cs\_permute}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_permute()}{Matrix\_cs\_permute()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a3557931469082cf58829a847ec23faa4} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+permute (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{pinv}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{q}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00197}{197}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_ac41e8e3b5c69b159e2385a8629cdd655}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_pinv@{Matrix\_cs\_pinv}}
+\index{Matrix\_cs\_pinv@{Matrix\_cs\_pinv}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_pinv()}{Matrix\_cs\_pinv()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ac41e8e3b5c69b159e2385a8629cdd655} 
+int \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+pinv (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00222}{222}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, and \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_a7c60e670347c7d4fd734d3168a217a6b}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_pvec@{Matrix\_cs\_pvec}}
+\index{Matrix\_cs\_pvec@{Matrix\_cs\_pvec}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_pvec()}{Matrix\_cs\_pvec()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a7c60e670347c7d4fd734d3168a217a6b} 
+int Matrix\+\_\+cs\+\_\+pvec (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00234}{234}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_ad11952c781c8f71decf5678a41f3ec14}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_qr@{Matrix\_cs\_qr}}
+\index{Matrix\_cs\_qr@{Matrix\_cs\_qr}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_qr()}{Matrix\_cs\_qr()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ad11952c781c8f71decf5678a41f3ec14} 
+\mbox{\hyperlink{cs-etc_8h_aa4a98443a944bcd44b116626a65f52dc}{Matrix\+\_\+csn}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+qr (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*}}]{S}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00246}{246}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}.
+
+\Hypertarget{cs-etc_8h_a598d16d81401161aa53b222504796c94}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_qrsol@{Matrix\_cs\_qrsol}}
+\index{Matrix\_cs\_qrsol@{Matrix\_cs\_qrsol}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_qrsol()}{Matrix\_cs\_qrsol()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a598d16d81401161aa53b222504796c94} 
+int Matrix\+\_\+cs\+\_\+qrsol (\begin{DoxyParamCaption}\item[{int}]{order}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00258}{258}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00101}{dg\+CMatrix\+\_\+qrsol()}}.
+
+\Hypertarget{cs-etc_8h_ac9d5d423bb425dfc108f68d7a49c5168}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_sfree@{Matrix\_cs\_sfree}}
+\index{Matrix\_cs\_sfree@{Matrix\_cs\_sfree}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_sfree()}{Matrix\_cs\_sfree()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ac9d5d423bb425dfc108f68d7a49c5168} 
+\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+sfree (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*}}]{S}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00270}{270}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_ac7354ffae095a3e3ccf8add52e6f6988}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_spalloc@{Matrix\_cs\_spalloc}}
+\index{Matrix\_cs\_spalloc@{Matrix\_cs\_spalloc}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_spalloc()}{Matrix\_cs\_spalloc()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ac7354ffae095a3e3ccf8add52e6f6988} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+spalloc (\begin{DoxyParamCaption}\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{int}]{nzmax}{, }\item[{int}]{values}{, }\item[{int}]{triplet}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00282}{282}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+
+
+Referenced by \mbox{\hyperlink{cs-etc_8c_source_l00307}{Matrix\+\_\+cs\+\_\+speye()}}.
+
+\Hypertarget{cs-etc_8h_a2b6fbf6b0849cb9e7c7f16efa16d033e}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_speye@{Matrix\_cs\_speye}}
+\index{Matrix\_cs\_speye@{Matrix\_cs\_speye}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_speye()}{Matrix\_cs\_speye()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a2b6fbf6b0849cb9e7c7f16efa16d033e} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+speye (\begin{DoxyParamCaption}\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{int}]{values}{, }\item[{int}]{triplet}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00307}{307}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}, \mbox{\hyperlink{cs-etc_8h_source_l00022}{Matrix\+\_\+cs\+\_\+sparse\+::i}}, \mbox{\hyperlink{cs-etc_8c_source_l00282}{Matrix\+\_\+cs\+\_\+spalloc()}}, \mbox{\hyperlink{cs-etc_8h_source_l00021}{Matrix\+\_\+cs\+\_\+sparse\+::p}}, and \mbox{\hyperlink{cs-etc_8h_source_l00023}{Matrix\+\_\+cs\+\_\+sparse\+::x}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_aedbdf46e99d844d1c9293a4859f36442}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_spfree@{Matrix\_cs\_spfree}}
+\index{Matrix\_cs\_spfree@{Matrix\_cs\_spfree}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_spfree()}{Matrix\_cs\_spfree()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_aedbdf46e99d844d1c9293a4859f36442} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+spfree (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00337}{337}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_ad3dccdc4c3677312ba34077df4f7b512}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_sprealloc@{Matrix\_cs\_sprealloc}}
+\index{Matrix\_cs\_sprealloc@{Matrix\_cs\_sprealloc}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_sprealloc()}{Matrix\_cs\_sprealloc()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ad3dccdc4c3677312ba34077df4f7b512} 
+int Matrix\+\_\+cs\+\_\+sprealloc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{nzmax}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00349}{349}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_ae8e4749e18ea8ea9d2a26e65a27d9b43}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_spsolve@{Matrix\_cs\_spsolve}}
+\index{Matrix\_cs\_spsolve@{Matrix\_cs\_spsolve}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_spsolve()}{Matrix\_cs\_spsolve()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_ae8e4749e18ea8ea9d2a26e65a27d9b43} 
+int Matrix\+\_\+cs\+\_\+spsolve (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{B}{, }\item[{int}]{k}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{xi}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{pinv}{, }\item[{int}]{lo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00361}{361}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+\Hypertarget{cs-etc_8h_a97ce92ac761ef3205b79866b7438e052}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_sqr@{Matrix\_cs\_sqr}}
+\index{Matrix\_cs\_sqr@{Matrix\_cs\_sqr}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_sqr()}{Matrix\_cs\_sqr()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a97ce92ac761ef3205b79866b7438e052} 
+\mbox{\hyperlink{cs-etc_8h_a19e9b3370d7b744c1a1a0d05e3e52f37}{Matrix\+\_\+css}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+sqr (\begin{DoxyParamCaption}\item[{int}]{order}{, }\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{qr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00373}{373}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+Referenced by \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, and \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}.
+
+\Hypertarget{cs-etc_8h_a4eae5d4649ec91dcf97da84a1cba9816}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_transpose@{Matrix\_cs\_transpose}}
+\index{Matrix\_cs\_transpose@{Matrix\_cs\_transpose}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_transpose()}{Matrix\_cs\_transpose()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a4eae5d4649ec91dcf97da84a1cba9816} 
+\mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*} Matrix\+\_\+cs\+\_\+transpose (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00385}{385}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{cs-etc_8h_a4809efe2cb19a09688a08b24d5d3ab7d}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_usolve@{Matrix\_cs\_usolve}}
+\index{Matrix\_cs\_usolve@{Matrix\_cs\_usolve}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_usolve()}{Matrix\_cs\_usolve()}}
+{\footnotesize\ttfamily \label{cs-etc_8h_a4809efe2cb19a09688a08b24d5d3ab7d} 
+int Matrix\+\_\+cs\+\_\+usolve (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{cs-etc_8h_a9bcd85f1900b4f5c50894057d541d358}{Matrix\+\_\+cs}} \texorpdfstring{$\ast$}{*}}]{U}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00410}{410}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, and \mbox{\hyperlink{cs-etc_8h_source_l00011}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+GET}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{cs-etc_8h_abd8956da89df1bd636ee1b52df794ea6}\index{cs-\/etc.h@{cs-\/etc.h}!Matrix\_cs\_xtype@{Matrix\_cs\_xtype}}
+\index{Matrix\_cs\_xtype@{Matrix\_cs\_xtype}!cs-\/etc.h@{cs-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cs\_xtype}{Matrix\_cs\_xtype}}
+{\footnotesize\ttfamily \label{cs-etc_8h_abd8956da89df1bd636ee1b52df794ea6} 
+int Matrix\+\_\+cs\+\_\+xtype\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{cs-etc_8c_source_l00004}{4}} of file \mbox{\hyperlink{cs-etc_8c_source}{cs-\/etc.\+c}}.
+

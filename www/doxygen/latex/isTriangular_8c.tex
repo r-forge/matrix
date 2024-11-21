@@ -1,0 +1,206 @@
+\doxysection{is\+Triangular.\+c File Reference}
+\hypertarget{isTriangular_8c}{}\label{isTriangular_8c}\index{isTriangular.c@{isTriangular.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{isTriangular_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{isTriangular_8c_afebdf0c90fe0cd56229f166d13164374}{CURL}}(t)
+\item 
+\#define \mbox{\hyperlink{isTriangular_8c_a61eba351115ef16d3ec5c5cb8b25a76d}{CLRU}}(t)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{isTriangular_8c_a4b3634c76326f1b182e622deaf84edc8}{dense\+\_\+is\+\_\+diagonal}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{isTriangular_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8}{sparse\+\_\+is\+\_\+diagonal}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+int \mbox{\hyperlink{isTriangular_8c_aa3e20e0537902fdf65ed92d295e07290}{dense\+\_\+is\+\_\+triangular}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ul)
+\item 
+int \mbox{\hyperlink{isTriangular_8c_aebdf3def8a36ab0124a538a72432f46f}{sparse\+\_\+is\+\_\+triangular}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ul)
+\item 
+SEXP \mbox{\hyperlink{isTriangular_8c_aa78591f3cccc61cbc03e1dcf45bd0be3}{R\+\_\+dense\+\_\+is\+\_\+triangular}} (SEXP s\+\_\+obj, SEXP s\+\_\+upper)
+\item 
+SEXP \mbox{\hyperlink{isTriangular_8c_a62709ff883fb3fc789fa5319920a7c87}{R\+\_\+sparse\+\_\+is\+\_\+triangular}} (SEXP s\+\_\+obj, SEXP s\+\_\+upper)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{isTriangular_8c_a61eba351115ef16d3ec5c5cb8b25a76d}\index{isTriangular.c@{isTriangular.c}!CLRU@{CLRU}}
+\index{CLRU@{CLRU}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{CLRU}{CLRU}}
+{\footnotesize\ttfamily \label{isTriangular_8c_a61eba351115ef16d3ec5c5cb8b25a76d} 
+\#define CLRU(\begin{DoxyParamCaption}\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (k\ <\ kend\ \&\&\ pi[k]\ <\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (j\ ==\ n)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ t;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00060}{sparse\+\_\+is\+\_\+triangular()}}.
+
+\Hypertarget{isTriangular_8c_afebdf0c90fe0cd56229f166d13164374}\index{isTriangular.c@{isTriangular.c}!CURL@{CURL}}
+\index{CURL@{CURL}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{CURL}{CURL}}
+{\footnotesize\ttfamily \label{isTriangular_8c_afebdf0c90fe0cd56229f166d13164374} 
+\#define CURL(\begin{DoxyParamCaption}\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (k\ <\ kend\ \&\&\ pi[kend\ -\/\ 1]\ >\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (j\ ==\ n)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ t;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00060}{sparse\+\_\+is\+\_\+triangular()}}.
+
+\Hypertarget{isTriangular_8c_a5c943ec4d393860c44273d898e789156}\index{isTriangular.c@{isTriangular.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}}
+{\footnotesize\ttfamily \label{isTriangular_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((op\_ul\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}\ ||\ op\_ul\ ==\ \textcolor{charliteral}{'U'})\ \&\&\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{charliteral}{'U'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'N'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((op\_ul\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}\ ||\ op\_ul\ !=\ \textcolor{charliteral}{'U'})\ \&\&\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{charliteral}{'L'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'N'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00011}{dense\+\_\+is\+\_\+triangular()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{isTriangular_8c_a4b3634c76326f1b182e622deaf84edc8}\index{isTriangular.c@{isTriangular.c}!dense\_is\_diagonal@{dense\_is\_diagonal}}
+\index{dense\_is\_diagonal@{dense\_is\_diagonal}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_diagonal()}{dense\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_a4b3634c76326f1b182e622deaf84edc8} 
+int dense\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00007}{7}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{isDiagonal_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00011}{dense\+\_\+is\+\_\+triangular()}}, and \mbox{\hyperlink{isDiagonal_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+diagonal()}}.
+
+\Hypertarget{isTriangular_8c_aa3e20e0537902fdf65ed92d295e07290}\index{isTriangular.c@{isTriangular.c}!dense\_is\_triangular@{dense\_is\_triangular}}
+\index{dense\_is\_triangular@{dense\_is\_triangular}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_triangular()}{dense\_is\_triangular()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_aa3e20e0537902fdf65ed92d295e07290} 
+int dense\+\_\+is\+\_\+triangular (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ul}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isTriangular_8c_source_l00011}{11}} of file \mbox{\hyperlink{isTriangular_8c_source}{is\+Triangular.\+c}}.
+
+
+
+References \mbox{\hyperlink{isDiagonal_8c_source_l00007}{dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{isTriangular_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00166}{R\+\_\+dense\+\_\+is\+\_\+triangular()}}.
+
+\Hypertarget{isTriangular_8c_aa78591f3cccc61cbc03e1dcf45bd0be3}\index{isTriangular.c@{isTriangular.c}!R\_dense\_is\_triangular@{R\_dense\_is\_triangular}}
+\index{R\_dense\_is\_triangular@{R\_dense\_is\_triangular}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_is\_triangular()}{R\_dense\_is\_triangular()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_aa78591f3cccc61cbc03e1dcf45bd0be3} 
+SEXP R\+\_\+dense\+\_\+is\+\_\+triangular (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+upper}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isTriangular_8c_source_l00166}{166}} of file \mbox{\hyperlink{isTriangular_8c_source}{is\+Triangular.\+c}}.
+
+
+
+References \mbox{\hyperlink{isTriangular_8c_source_l00011}{dense\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00611}{Matrix\+\_\+kind\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00223}{VALID\+\_\+\+LOGIC3}}.
+
+\Hypertarget{isTriangular_8c_a62709ff883fb3fc789fa5319920a7c87}\index{isTriangular.c@{isTriangular.c}!R\_sparse\_is\_triangular@{R\_sparse\_is\_triangular}}
+\index{R\_sparse\_is\_triangular@{R\_sparse\_is\_triangular}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_is\_triangular()}{R\_sparse\_is\_triangular()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_a62709ff883fb3fc789fa5319920a7c87} 
+SEXP R\+\_\+sparse\+\_\+is\+\_\+triangular (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+upper}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isTriangular_8c_source_l00195}{195}} of file \mbox{\hyperlink{isTriangular_8c_source}{is\+Triangular.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00611}{Matrix\+\_\+kind\+Sym}}, \mbox{\hyperlink{isTriangular_8c_source_l00060}{sparse\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{Mdefines_8h_source_l00223}{VALID\+\_\+\+LOGIC3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{isTriangular_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8}\index{isTriangular.c@{isTriangular.c}!sparse\_is\_diagonal@{sparse\_is\_diagonal}}
+\index{sparse\_is\_diagonal@{sparse\_is\_diagonal}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_diagonal()}{sparse\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_aa8aaaa10e58144dd4fc6f1ed9a1ee2f8} 
+int sparse\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00045}{45}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{isDiagonal_8c_source_l00103}{R\+\_\+sparse\+\_\+is\+\_\+diagonal()}}, and \mbox{\hyperlink{isTriangular_8c_source_l00060}{sparse\+\_\+is\+\_\+triangular()}}.
+
+\Hypertarget{isTriangular_8c_aebdf3def8a36ab0124a538a72432f46f}\index{isTriangular.c@{isTriangular.c}!sparse\_is\_triangular@{sparse\_is\_triangular}}
+\index{sparse\_is\_triangular@{sparse\_is\_triangular}!isTriangular.c@{isTriangular.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_triangular()}{sparse\_is\_triangular()}}
+{\footnotesize\ttfamily \label{isTriangular_8c_aebdf3def8a36ab0124a538a72432f46f} 
+int sparse\+\_\+is\+\_\+triangular (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ul}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isTriangular_8c_source_l00060}{60}} of file \mbox{\hyperlink{isTriangular_8c_source}{is\+Triangular.\+c}}.
+
+
+
+References \mbox{\hyperlink{isTriangular_8c_a61eba351115ef16d3ec5c5cb8b25a76d}{CLRU}}, \mbox{\hyperlink{isTriangular_8c_afebdf0c90fe0cd56229f166d13164374}{CURL}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{isDiagonal_8c_source_l00045}{sparse\+\_\+is\+\_\+diagonal()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isTriangular_8c_source_l00195}{R\+\_\+sparse\+\_\+is\+\_\+triangular()}}.
+

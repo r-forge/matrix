@@ -1,0 +1,171 @@
+\doxysection{bind.\+c File Reference}
+\hypertarget{bind_8c}{}\label{bind_8c}\index{bind.c@{bind.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}coerce.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bind_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{bind_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{bind_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{bind_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{bind_8c_ad3126d0d5da8461397a9a0abde14f142}{scan\+Args}} (SEXP args, SEXP exprs, int margin, int level, int \texorpdfstring{$\ast$}{*}rdim, int \texorpdfstring{$\ast$}{*}rdimnames, char \texorpdfstring{$\ast$}{*}kind, char \texorpdfstring{$\ast$}{*}repr)
+\item 
+static void \mbox{\hyperlink{bind_8c_a1fa585cc78c5929f585dfe5169dbb60b}{coerce\+Args}} (SEXP args, int margin, int \texorpdfstring{$\ast$}{*}rdim, char kind, char repr)
+\item 
+static void \mbox{\hyperlink{bind_8c_a3c092c5e8d35dab522bf2632a44980a4}{bind\+Args}} (SEXP args, int margin, SEXP ans, int \texorpdfstring{$\ast$}{*}rdim, char kind, char repr)
+\item 
+static SEXP \mbox{\hyperlink{bind_8c_af54d72179798d8a45ff05bf0d8df5574}{bind}} (SEXP args, SEXP exprs, int margin, int level)
+\item 
+SEXP \mbox{\hyperlink{bind_8c_a3c17fbfbed5eb9a3646306f012b04862}{R\+\_\+bind}} (SEXP args)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static SEXP \mbox{\hyperlink{bind_8c_a6106d0921d185192ef8e3d1f71be077f}{tag\+Was\+Vector}} = NULL
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bind_8c_a5c943ec4d393860c44273d898e789156}\index{bind.c@{bind.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{bind_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00483}{bind\+Args()}}.
+
+\Hypertarget{bind_8c_a5c943ec4d393860c44273d898e789156}\index{bind.c@{bind.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{bind_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{bind_8c_a5c943ec4d393860c44273d898e789156}\index{bind.c@{bind.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{bind_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{bind_8c_a5c943ec4d393860c44273d898e789156}\index{bind.c@{bind.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{bind_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bind_8c_af54d72179798d8a45ff05bf0d8df5574}\index{bind.c@{bind.c}!bind@{bind}}
+\index{bind@{bind}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{bind()}{bind()}}
+{\footnotesize\ttfamily \label{bind_8c_af54d72179798d8a45ff05bf0d8df5574} 
+static SEXP bind (\begin{DoxyParamCaption}\item[{SEXP}]{args}{, }\item[{SEXP}]{exprs}{, }\item[{int}]{margin}{, }\item[{int}]{level}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00839}{839}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{bind_8c_source_l00483}{bind\+Args()}}, \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{bind_8c_source_l00010}{scan\+Args()}}, \mbox{\hyperlink{bind_8c_source_l00007}{tag\+Was\+Vector}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00946}{R\+\_\+bind()}}.
+
+\Hypertarget{bind_8c_a3c092c5e8d35dab522bf2632a44980a4}\index{bind.c@{bind.c}!bindArgs@{bindArgs}}
+\index{bindArgs@{bindArgs}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{bindArgs()}{bindArgs()}}
+{\footnotesize\ttfamily \label{bind_8c_a3c092c5e8d35dab522bf2632a44980a4} 
+static void bind\+Args (\begin{DoxyParamCaption}\item[{SEXP}]{args}{, }\item[{int}]{margin}{, }\item[{SEXP}]{ans}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{rdim}{, }\item[{char}]{kind}{, }\item[{char}]{repr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00483}{483}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00118}{SET\+\_\+\+MARGIN}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, and \mbox{\hyperlink{bind_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}.
+
+\Hypertarget{bind_8c_a1fa585cc78c5929f585dfe5169dbb60b}\index{bind.c@{bind.c}!coerceArgs@{coerceArgs}}
+\index{coerceArgs@{coerceArgs}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{coerceArgs()}{coerceArgs()}}
+{\footnotesize\ttfamily \label{bind_8c_a1fa585cc78c5929f585dfe5169dbb60b} 
+static void coerce\+Args (\begin{DoxyParamCaption}\item[{SEXP}]{args}{, }\item[{int}]{margin}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{rdim}{, }\item[{char}]{kind}{, }\item[{char}]{repr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00350}{350}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+References \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01351}{dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01916}{index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{coerce_8c_source_l01295}{matrix\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l00414}{sparse\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02847}{sparse\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l02963}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{bind_8c_source_l00007}{tag\+Was\+Vector}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}.
+
+\Hypertarget{bind_8c_a3c17fbfbed5eb9a3646306f012b04862}\index{bind.c@{bind.c}!R\_bind@{R\_bind}}
+\index{R\_bind@{R\_bind}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{R\_bind()}{R\_bind()}}
+{\footnotesize\ttfamily \label{bind_8c_a3c17fbfbed5eb9a3646306f012b04862} 
+SEXP R\+\_\+bind (\begin{DoxyParamCaption}\item[{SEXP}]{args}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00946}{946}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+References \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}.
+
+\Hypertarget{bind_8c_ad3126d0d5da8461397a9a0abde14f142}\index{bind.c@{bind.c}!scanArgs@{scanArgs}}
+\index{scanArgs@{scanArgs}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{scanArgs()}{scanArgs()}}
+{\footnotesize\ttfamily \label{bind_8c_ad3126d0d5da8461397a9a0abde14f142} 
+static void scan\+Args (\begin{DoxyParamCaption}\item[{SEXP}]{args}{, }\item[{SEXP}]{exprs}{, }\item[{int}]{margin}{, }\item[{int}]{level}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{rdim}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{rdimnames}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{kind}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{repr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00010}{10}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00145}{ERROR\+\_\+\+INVALID\+\_\+\+TYPE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00116}{MARGIN}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00597}{Matrix\+\_\+\+Dim\+Names\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{bind_8c_a6106d0921d185192ef8e3d1f71be077f}\index{bind.c@{bind.c}!tagWasVector@{tagWasVector}}
+\index{tagWasVector@{tagWasVector}!bind.c@{bind.c}}
+\doxysubsubsection{\texorpdfstring{tagWasVector}{tagWasVector}}
+{\footnotesize\ttfamily \label{bind_8c_a6106d0921d185192ef8e3d1f71be077f} 
+SEXP tag\+Was\+Vector = NULL\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bind_8c_source_l00007}{7}} of file \mbox{\hyperlink{bind_8c_source}{bind.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00839}{bind()}}, and \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}.
+

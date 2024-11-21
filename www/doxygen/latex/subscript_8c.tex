@@ -1,0 +1,1124 @@
+\doxysection{subscript.\+c File Reference}
+\hypertarget{subscript_8c}{}\label{subscript_8c}\index{subscript.c@{subscript.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}{SUB1}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a0bc7957889d51d27195a4f72626d38d8}{i\+OOB}}(s,  t,  mn)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a16ae3bfcbd1e469aec35f6a1c91c7395}{d\+OOB}}(s,  t,  mn)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a500d2c0309955ca4feeed799aa2e2767}{l\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_af6920beb87d2fc835d63b188518246ed}{i\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_aa1ef1a3984e7672050a17891ad52981c}{d\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a1f75abdbc23c19db6db44012b5203bc3}{z\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a107a55758045899f241b6710864b6d15}{SUB1\+\_\+\+\_\+}}(d,  \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}{MAP}}(l)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12851f633dea69bcf0bce314887617d2}{ADV}}(d)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a107a55758045899f241b6710864b6d15}{SUB1\+\_\+\+\_\+}}(d,  \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a107a55758045899f241b6710864b6d15}{SUB1\+\_\+\+\_\+}}(d,  \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a107a55758045899f241b6710864b6d15}{SUB1\+\_\+\+\_\+}}(d,  \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}{SUB1}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}{MAP}}(l)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_ae0a0c445b0c47d87e027bd23254d085e}{ADV}}
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}{SUB1}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}{SUB1}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a0ca0e30e8eb79075d59edee2c6ba32a2}{SUB2\+\_\+\+\_\+}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  assign,  s,  t,  \+\_\+\+\_\+for\+\_\+\+\_\+,  jump0,  jump1)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a8c3fec659dc344f6917ff0af3851694b}{ASSIGN\+\_\+\+GE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  x,  y,  i,  j,  m,  s,  t)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a9f4f4c3495a7c5bbcc8754ca9d7392c1}{ASSIGN\+\_\+\+SY}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  x,  y,  i,  j,  m,  s,  t)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_abcfe148084e7e322198796cc291361c5}{ASSIGN\+\_\+\+TR}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  x,  y,  i,  j,  m,  s,  t)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_aad810d3b28ff206fea3af2dd25256d46}{CMP\+\_\+U}}(i,  j)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a98e633bf476d7b07f946dd50efeac0fb}{CMP\+\_\+L}}(i,  j)
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{subscript_8c_ae9d8d3fc26154773d75589d7b1d42e10}{any\+NA}} (int \texorpdfstring{$\ast$}{*}p, int n)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a61970b2e74e882aefc566713b361aa96}{dense\+\_\+subscript\+\_\+1ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_aaaaf10930a167395e4771b11775ae565}{sparse\+\_\+subscript\+\_\+1ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s, SEXP o)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a4b96b53bb760a5e64ef0cfbdc2a99843}{diagonal\+\_\+subscript\+\_\+1ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_ac0f92f99ac54c893f95a02ec21fcfed7}{index\+\_\+subscript\+\_\+1ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+SEXP \mbox{\hyperlink{subscript_8c_a0a7dc751870d82752abb9254a1245a9d}{R\+\_\+subscript\+\_\+1ary}} (SEXP s\+\_\+obj, SEXP s\+\_\+s, SEXP s\+\_\+o)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a1fbbd2dfe536f8ddb70065406d4532aa}{dense\+\_\+subscript\+\_\+1ary\+\_\+2col}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a53e6af62cdd8798d6f7cad085c6136ea}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s, SEXP o)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_aea0dfa36946f493bfa2e11ed37bd8e46}{diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a671f633e6be8a793535d253bdc8a1e73}{index\+\_\+subscript\+\_\+1ary\+\_\+2col}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP s)
+\item 
+SEXP \mbox{\hyperlink{subscript_8c_ab875546c9ec8d99060332d8d072e0e99}{R\+\_\+subscript\+\_\+1ary\+\_\+2col}} (SEXP s\+\_\+obj, SEXP s\+\_\+s, SEXP s\+\_\+o)
+\item 
+static int \mbox{\hyperlink{subscript_8c_a4338d3a223c84541be6b5c88356892dc}{stay\+\_\+sy}} (int \texorpdfstring{$\ast$}{*}pi, int ni, int \texorpdfstring{$\ast$}{*}pj, int nj, int n, char uplo, int check\+NA)
+\item 
+static int \mbox{\hyperlink{subscript_8c_a132db238eb2218d70220cb9353ebb39e}{stay\+\_\+tr}} (int \texorpdfstring{$\ast$}{*}pi, int ni, int \texorpdfstring{$\ast$}{*}pj, int nj, int n, char uplo, int check\+NA)
+\item 
+static int \mbox{\hyperlink{subscript_8c_a0ab2f4b61a622e78fbd9c02c3d11c722}{stay\+\_\+di}} (int \texorpdfstring{$\ast$}{*}pi, int ni, int \texorpdfstring{$\ast$}{*}pj, int nj, int n, int check\+NA)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a42aab6c0aa3f5d7d99fc00ad34086473}{dense\+\_\+subscript\+\_\+2ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP si, SEXP sj)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a7a2cab9a47da89d25e43add86f6833ea}{sparse\+\_\+subscript\+\_\+2ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP si, SEXP sj)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a9a294bfb8298e666ee398570cd39a825}{diagonal\+\_\+subscript\+\_\+2ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP si, SEXP sj)
+\item 
+static SEXP \mbox{\hyperlink{subscript_8c_a20a04ec3bb197b20bd2b75b64613e72f}{index\+\_\+subscript\+\_\+2ary}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, SEXP si, SEXP sj)
+\item 
+SEXP \mbox{\hyperlink{subscript_8c_a612d7fc0477db89dd20ef7c29a88d4ae}{R\+\_\+subscript\+\_\+2ary}} (SEXP s\+\_\+obj, SEXP s\+\_\+si, SEXP s\+\_\+sj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{subscript_8c_a12851f633dea69bcf0bce314887617d2}\index{subscript.c@{subscript.c}!ADV@{ADV}}
+\index{ADV@{ADV}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{ADV}{ADV}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12851f633dea69bcf0bce314887617d2} 
+\#define ADV(\begin{DoxyParamCaption}\item[{}]{d}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (l\ >=\ slen)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ j\ =\ -\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ l\_\ =\ \mbox{\hyperlink{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}{MAP}}(l);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (d\#\#OOB(ps[l\_],\ k,\ mn))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ -\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (byrow)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ (int)\ (k\ /\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ (int)\ (k\ \%\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ (int)\ (k\ \%\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ (int)\ (k\ /\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (sy\ \&\&\ (b\ =\ (up)\ ?\ j\ -\/\ i\ :\ i\ -\/\ j)\ <\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SWAP(i,\ j,\ \textcolor{keywordtype}{int},\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++l;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_ae0a0c445b0c47d87e027bd23254d085e}\index{subscript.c@{subscript.c}!ADV@{ADV}}
+\index{ADV@{ADV}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{ADV}{ADV}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_ae0a0c445b0c47d87e027bd23254d085e} 
+\#define ADV}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (l\ >=\ slen)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ j\ =\ -\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ l\_\ =\ \mbox{\hyperlink{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}{MAP}}(l);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (ps0[l\_]\ ==\ NA\_INTEGER\ ||\ ps1[l\_]\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ -\/1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (byrow)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ ps1[l\_]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ ps0[l\_]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ ps0[l\_]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ ps1[l\_]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (sy\ \&\&\ (b\ =\ (up)\ ?\ j\ -\/\ i\ :\ i\ -\/\ j)\ <\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SWAP(i,\ j,\ \textcolor{keywordtype}{int},\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++l;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a8c3fec659dc344f6917ff0af3851694b}\index{subscript.c@{subscript.c}!ASSIGN\_GE@{ASSIGN\_GE}}
+\index{ASSIGN\_GE@{ASSIGN\_GE}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{ASSIGN\_GE}{ASSIGN\_GE}}
+{\footnotesize\ttfamily \label{subscript_8c_a8c3fec659dc344f6917ff0af3851694b} 
+\#define ASSIGN\+\_\+\+GE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{i}{, }\item[{}]{j}{, }\item[{}]{m}{, }\item[{}]{s}{, }\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_IDEN(*y,\ x[\mbox{\hyperlink{Mdefines_8h_a4704fde677d31ff185a28465f0c3aa35}{DENSE\_INDEX\_N}}(i,\ j,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a9f4f4c3495a7c5bbcc8754ca9d7392c1}\index{subscript.c@{subscript.c}!ASSIGN\_SY@{ASSIGN\_SY}}
+\index{ASSIGN\_SY@{ASSIGN\_SY}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{ASSIGN\_SY}{ASSIGN\_SY}}
+{\footnotesize\ttfamily \label{subscript_8c_a9f4f4c3495a7c5bbcc8754ca9d7392c1} 
+\#define ASSIGN\+\_\+\+SY(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{i}{, }\item[{}]{j}{, }\item[{}]{m}{, }\item[{}]{s}{, }\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (he\ \&\&\ i\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_PROJ\_REAL(*y,\ x[DENSE\_INDEX\_\#\#t(i,\ j,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (CMP\_\#\#s(i,\ j))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_IDEN\ \ \ \ \ (*y,\ x[DENSE\_INDEX\_\#\#t(i,\ j,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (he)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_CONJ\ \ \ \ \ (*y,\ x[DENSE\_INDEX\_\#\#t(j,\ i,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#ASSIGN\_IDEN\ \ \ \ \ (*y,\ x[DENSE\_INDEX\_\#\#t(j,\ i,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_abcfe148084e7e322198796cc291361c5}\index{subscript.c@{subscript.c}!ASSIGN\_TR@{ASSIGN\_TR}}
+\index{ASSIGN\_TR@{ASSIGN\_TR}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{ASSIGN\_TR}{ASSIGN\_TR}}
+{\footnotesize\ttfamily \label{subscript_8c_abcfe148084e7e322198796cc291361c5} 
+\#define ASSIGN\+\_\+\+TR(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{i}{, }\item[{}]{j}{, }\item[{}]{m}{, }\item[{}]{s}{, }\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (un\ \&\&\ i\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_IDEN(*y,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (CMP\_\#\#s(i,\ j))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_IDEN(*y,\ x[DENSE\_INDEX\_\#\#t(i,\ j,\ m)]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#ASSIGN\_IDEN(*y,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a98e633bf476d7b07f946dd50efeac0fb}\index{subscript.c@{subscript.c}!CMP\_L@{CMP\_L}}
+\index{CMP\_L@{CMP\_L}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{CMP\_L}{CMP\_L}}
+{\footnotesize\ttfamily \label{subscript_8c_a98e633bf476d7b07f946dd50efeac0fb} 
+\#define CMP\+\_\+L(\begin{DoxyParamCaption}\item[{}]{i}{, }\item[{}]{j}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ >=\ j}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_aad810d3b28ff206fea3af2dd25256d46}\index{subscript.c@{subscript.c}!CMP\_U@{CMP\_U}}
+\index{CMP\_U@{CMP\_U}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{CMP\_U}{CMP\_U}}
+{\footnotesize\ttfamily \label{subscript_8c_aad810d3b28ff206fea3af2dd25256d46} 
+\#define CMP\+\_\+U(\begin{DoxyParamCaption}\item[{}]{i}{, }\item[{}]{j}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ <=\ j}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_aa1ef1a3984e7672050a17891ad52981c}\index{subscript.c@{subscript.c}!dCAST@{dCAST}}
+\index{dCAST@{dCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{dCAST}{dCAST}}
+{\footnotesize\ttfamily \label{subscript_8c_aa1ef1a3984e7672050a17891ad52981c} 
+\#define d\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00030}{30}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a16ae3bfcbd1e469aec35f6a1c91c7395}\index{subscript.c@{subscript.c}!dOOB@{dOOB}}
+\index{dOOB@{dOOB}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{dOOB}{dOOB}}
+{\footnotesize\ttfamily \label{subscript_8c_a16ae3bfcbd1e469aec35f6a1c91c7395} 
+\#define d\+OOB(\begin{DoxyParamCaption}\item[{}]{s}{, }\item[{}]{t}{, }\item[{}]{mn}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(ISNAN(s)\ ||\ s\ >=\ 0x1.0p+63\ ||\ (t\ =\ (int\_fast64\_t)\ s\ -\/\ 1)\ >=\ mn)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00026}{26}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_af6920beb87d2fc835d63b188518246ed}\index{subscript.c@{subscript.c}!iCAST@{iCAST}}
+\index{iCAST@{iCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{iCAST}{iCAST}}
+{\footnotesize\ttfamily \label{subscript_8c_af6920beb87d2fc835d63b188518246ed} 
+\#define i\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00029}{29}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a0bc7957889d51d27195a4f72626d38d8}\index{subscript.c@{subscript.c}!iOOB@{iOOB}}
+\index{iOOB@{iOOB}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{iOOB}{iOOB}}
+{\footnotesize\ttfamily \label{subscript_8c_a0bc7957889d51d27195a4f72626d38d8} 
+\#define i\+OOB(\begin{DoxyParamCaption}\item[{}]{s}{, }\item[{}]{t}{, }\item[{}]{mn}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(s\ ==\ NA\_INTEGER\ ||\ (t\ =\ s\ -\/\ 1)\ >=\ mn)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00025}{25}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a500d2c0309955ca4feeed799aa2e2767}\index{subscript.c@{subscript.c}!lCAST@{lCAST}}
+\index{lCAST@{lCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{lCAST}{lCAST}}
+{\footnotesize\ttfamily \label{subscript_8c_a500d2c0309955ca4feeed799aa2e2767} 
+\#define l\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00028}{28}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}\index{subscript.c@{subscript.c}!MAP@{MAP}}
+\index{MAP@{MAP}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{MAP}{MAP}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba} 
+\#define MAP(\begin{DoxyParamCaption}\item[{}]{l}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (po\_i)\ ?\ (R\_xlen\_t)\ po\_i[l]\ -\/\ 1\ :\ (po\_d)\ ?\ (R\_xlen\_t)\ po\_d[l]\ -\/\ 1\ :\ l}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba}\index{subscript.c@{subscript.c}!MAP@{MAP}}
+\index{MAP@{MAP}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{MAP}{MAP}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_a9744b0224b7daacf73f8b136a1f0c7ba} 
+\#define MAP(\begin{DoxyParamCaption}\item[{}]{l}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (po\_i)\ ?\ (\textcolor{keywordtype}{int})\ po\_i[l]\ -\/\ 1\ :\ (po\_d)\ ?\ (\textcolor{keywordtype}{int})\ po\_d[l]\ -\/\ 1\ :\ l}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_afc284c48a9b97bf4044416d70617efbe}\index{subscript.c@{subscript.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{subscript_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00034}{34}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}\index{subscript.c@{subscript.c}!SUB1@{SUB1}}
+\index{SUB1@{SUB1}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1}{SUB1}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a} 
+\#define SUB1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s)\ ==\ INTSXP)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SUB1\_\_(i,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SUB1\_\_(d,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00017}{17}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00037}{dense\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00377}{dense\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l00252}{diagonal\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00585}{diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l00296}{index\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00128}{sparse\+\_\+subscript\+\_\+1ary()}}, and \mbox{\hyperlink{subscript_8c_source_l00465}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col()}}.
+
+\Hypertarget{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}\index{subscript.c@{subscript.c}!SUB1@{SUB1}}
+\index{SUB1@{SUB1}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1}{SUB1}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a} 
+\#define SUB1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00017}{17}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}\index{subscript.c@{subscript.c}!SUB1@{SUB1}}
+\index{SUB1@{SUB1}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1}{SUB1}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a} 
+\#define SUB1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00017}{17}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a}\index{subscript.c@{subscript.c}!SUB1@{SUB1}}
+\index{SUB1@{SUB1}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1}{SUB1}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a7912405953fa1f1ea33f45990c7bfc2a} 
+\#define SUB1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pa\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(ans);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (l\ =\ 0;\ l\ <\ slen;\ ++l)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (ps0[l]\ ==\ NA\_INTEGER\ ||\ ps1[l]\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ps0[l]\ !=\ ps1[l])\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (un)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#CAST(px[ps0[l]\ -\/\ 1]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00017}{17}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+\Hypertarget{subscript_8c_a107a55758045899f241b6710864b6d15}\index{subscript.c@{subscript.c}!SUB1\_\_@{SUB1\_\_}}
+\index{SUB1\_\_@{SUB1\_\_}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1\_\_}{SUB1\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a107a55758045899f241b6710864b6d15} 
+\#define SUB1\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{subscript_8c_a107a55758045899f241b6710864b6d15}\index{subscript.c@{subscript.c}!SUB1\_\_@{SUB1\_\_}}
+\index{SUB1\_\_@{SUB1\_\_}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1\_\_}{SUB1\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a107a55758045899f241b6710864b6d15} 
+\#define SUB1\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{subscript_8c_a107a55758045899f241b6710864b6d15}\index{subscript.c@{subscript.c}!SUB1\_\_@{SUB1\_\_}}
+\index{SUB1\_\_@{SUB1\_\_}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1\_\_}{SUB1\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a107a55758045899f241b6710864b6d15} 
+\#define SUB1\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ d\#\#TYPE\ *ps\ =\ d\#\#PTR(s);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pa\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(ans);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (l\ =\ 0;\ l\ <\ slen;\ ++l)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (d\#\#OOB(ps[l],\ k,\ nn))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (k\ \%\ n1a)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (un)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#CAST(px[k\ /\ n1a]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a107a55758045899f241b6710864b6d15}\index{subscript.c@{subscript.c}!SUB1\_\_@{SUB1\_\_}}
+\index{SUB1\_\_@{SUB1\_\_}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB1\_\_}{SUB1\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{subscript_8c_a107a55758045899f241b6710864b6d15} 
+\#define SUB1\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{d}{, }\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ d\#\#TYPE\ *ps\ =\ d\#\#PTR(s);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (l\ =\ 0;\ l\ <\ slen;\ ++l)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (d\#\#OOB(ps[l],\ k,\ mn))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ NA\_LOGICAL;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mg\ ==\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ k\ /\ m\ ==\ pperm[k\ \%\ m]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[l]\ =\ k\ \%\ m\ ==\ pperm[k\ /\ m]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}\index{subscript.c@{subscript.c}!SUB2@{SUB2}}
+\index{SUB2@{SUB2}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2}{SUB2}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508} 
+\#define SUB2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}\index{subscript.c@{subscript.c}!SUB2@{SUB2}}
+\index{SUB2@{SUB2}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2}{SUB2}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508} 
+\#define SUB2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPESXP,\ (\textcolor{keywordtype}{int})\ nnz));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SET\_SLOT(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x1,\ x0\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (kj\ =\ 0;\ kj\ <\ nj;\ ++kj)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ pj[kj]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ pp0[j\ -\/\ 1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp0[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pi1++)\ =\ pi0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ px0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}\index{subscript.c@{subscript.c}!SUB2@{SUB2}}
+\index{SUB2@{SUB2}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2}{SUB2}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508} 
+\#define SUB2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPESXP,\ (\textcolor{keywordtype}{int})\ nnz));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SET\_SLOT(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x1,\ x0\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (kj\ =\ 0;\ kj\ <\ nj;\ ++kj)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ (mj)\ ?\ kj\ :\ pj[kj]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ pp0[j\ -\/\ 1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp0[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ pi0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d\ =\ iworkA[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ki\ =\ iworkB[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (d-\/-\/)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(pi1++)\ =\ ki;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ px0[k];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ki\ =\ iworkC[ki];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}\index{subscript.c@{subscript.c}!SUB2@{SUB2}}
+\index{SUB2@{SUB2}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2}{SUB2}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508} 
+\#define SUB2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0)\ -\/\ 1,\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (ki\ =\ 0;\ ki\ <\ ni;\ ++ki)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*(pi++)\ !=\ (j\ =\ *(pj++)))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ (un)\ ?\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT\ :\ px0[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}\index{subscript.c@{subscript.c}!SUB2@{SUB2}}
+\index{SUB2@{SUB2}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2}{SUB2}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508} 
+\#define SUB2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{subscript_8c_a0ca0e30e8eb79075d59edee2c6ba32a2}\index{subscript.c@{subscript.c}!SUB2\_\_@{SUB2\_\_}}
+\index{SUB2\_\_@{SUB2\_\_}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{SUB2\_\_}{SUB2\_\_}}
+{\footnotesize\ttfamily \label{subscript_8c_a0ca0e30e8eb79075d59edee2c6ba32a2} 
+\#define SUB2\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{assign}{, }\item[{}]{s}{, }\item[{}]{t}{, }\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{, }\item[{}]{jump0}{, }\item[{}]{jump1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (kj\ =\ 0;\ kj\ <\ nj;\ ++kj)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (mj)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ kj;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (pj[kj]\ !=\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ pj[kj]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ jump0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ jump1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ jump0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (mi)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ ki;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (pi[ki]\ !=\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ pi[ki]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(px1++)\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ assign(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ px0,\ px1,\ i,\ j,\ m,\ s,\ t);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px1++;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ jump1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a5c943ec4d393860c44273d898e789156}\index{subscript.c@{subscript.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px1\ =\ NULL,\ *work\ =\ NULL;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ x1\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_Calloc(work,\ nnz,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#cspsort(INTEGER(p1),\ INTEGER(i1),\ px1,\ ni,\ nj,\ iwork,\ work);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a6ba1866ce3389288a13fc0348cd03515}{Matrix\_Free}}(work,\ nnz);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x1\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a5c943ec4d393860c44273d898e789156}\index{subscript.c@{subscript.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{subscript_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (kj\ =\ 0;\ kj\ <\ nj;\ ++kj)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ (mj)\ ?\ kj\ :\ pj[kj]\ -\/\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[kj]\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (un\ ||\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(px0[j]))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (mi)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (ki\ =\ 0;\ ki\ <\ ni;\ ++ki)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ki\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++pp1[kj];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (ki\ =\ 0;\ ki\ <\ ni;\ ++ki)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi[ki]\ -\/\ 1\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++pp1[kj];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (pp1[kj]\ >\ INT\_MAX\ -\/\ pp1[kj\ -\/\ 1])\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[kj]\ +=\ pp1[kj\ -\/\ 1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{subscript_8c_a1f75abdbc23c19db6db44012b5203bc3}\index{subscript.c@{subscript.c}!zCAST@{zCAST}}
+\index{zCAST@{zCAST}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{zCAST}{zCAST}}
+{\footnotesize\ttfamily \label{subscript_8c_a1f75abdbc23c19db6db44012b5203bc3} 
+\#define z\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00031}{31}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{subscript_8c_ae9d8d3fc26154773d75589d7b1d42e10}\index{subscript.c@{subscript.c}!anyNA@{anyNA}}
+\index{anyNA@{anyNA}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{anyNA()}{anyNA()}}
+{\footnotesize\ttfamily \label{subscript_8c_ae9d8d3fc26154773d75589d7b1d42e10} 
+static int any\+NA (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00008}{8}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01443}{index\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l00780}{stay\+\_\+di()}}, \mbox{\hyperlink{subscript_8c_source_l00688}{stay\+\_\+sy()}}, and \mbox{\hyperlink{subscript_8c_source_l00717}{stay\+\_\+tr()}}.
+
+\Hypertarget{subscript_8c_a61970b2e74e882aefc566713b361aa96}\index{subscript.c@{subscript.c}!dense\_subscript\_1ary@{dense\_subscript\_1ary}}
+\index{dense\_subscript\_1ary@{dense\_subscript\_1ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{dense\_subscript\_1ary()}{dense\_subscript\_1ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a61970b2e74e882aefc566713b361aa96} 
+static SEXP dense\+\_\+subscript\+\_\+1ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00037}{37}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}.
+
+\Hypertarget{subscript_8c_a1fbbd2dfe536f8ddb70065406d4532aa}\index{subscript.c@{subscript.c}!dense\_subscript\_1ary\_2col@{dense\_subscript\_1ary\_2col}}
+\index{dense\_subscript\_1ary\_2col@{dense\_subscript\_1ary\_2col}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{dense\_subscript\_1ary\_2col()}{dense\_subscript\_1ary\_2col()}}
+{\footnotesize\ttfamily \label{subscript_8c_a1fbbd2dfe536f8ddb70065406d4532aa} 
+static SEXP dense\+\_\+subscript\+\_\+1ary\+\_\+2col (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00377}{377}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}.
+
+\Hypertarget{subscript_8c_a42aab6c0aa3f5d7d99fc00ad34086473}\index{subscript.c@{subscript.c}!dense\_subscript\_2ary@{dense\_subscript\_2ary}}
+\index{dense\_subscript\_2ary@{dense\_subscript\_2ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{dense\_subscript\_2ary()}{dense\_subscript\_2ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a42aab6c0aa3f5d7d99fc00ad34086473} 
+static SEXP dense\+\_\+subscript\+\_\+2ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{si}{, }\item[{SEXP}]{sj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00817}{817}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00135}{ABS}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{subscript_8c_source_l00688}{stay\+\_\+sy()}}, \mbox{\hyperlink{subscript_8c_source_l00717}{stay\+\_\+tr()}}, \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a4b96b53bb760a5e64ef0cfbdc2a99843}\index{subscript.c@{subscript.c}!diagonal\_subscript\_1ary@{diagonal\_subscript\_1ary}}
+\index{diagonal\_subscript\_1ary@{diagonal\_subscript\_1ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{diagonal\_subscript\_1ary()}{diagonal\_subscript\_1ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a4b96b53bb760a5e64ef0cfbdc2a99843} 
+static SEXP diagonal\+\_\+subscript\+\_\+1ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00252}{252}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, and \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}.
+
+\Hypertarget{subscript_8c_aea0dfa36946f493bfa2e11ed37bd8e46}\index{subscript.c@{subscript.c}!diagonal\_subscript\_1ary\_2col@{diagonal\_subscript\_1ary\_2col}}
+\index{diagonal\_subscript\_1ary\_2col@{diagonal\_subscript\_1ary\_2col}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{diagonal\_subscript\_1ary\_2col()}{diagonal\_subscript\_1ary\_2col()}}
+{\footnotesize\ttfamily \label{subscript_8c_aea0dfa36946f493bfa2e11ed37bd8e46} 
+static SEXP diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00585}{585}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, and \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}.
+
+\Hypertarget{subscript_8c_a9a294bfb8298e666ee398570cd39a825}\index{subscript.c@{subscript.c}!diagonal\_subscript\_2ary@{diagonal\_subscript\_2ary}}
+\index{diagonal\_subscript\_2ary@{diagonal\_subscript\_2ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{diagonal\_subscript\_2ary()}{diagonal\_subscript\_2ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a9a294bfb8298e666ee398570cd39a825} 
+static SEXP diagonal\+\_\+subscript\+\_\+2ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{si}{, }\item[{SEXP}]{sj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l01296}{1296}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{subscript_8c_source_l00780}{stay\+\_\+di()}}, \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{subscript_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_ac0f92f99ac54c893f95a02ec21fcfed7}\index{subscript.c@{subscript.c}!index\_subscript\_1ary@{index\_subscript\_1ary}}
+\index{index\_subscript\_1ary@{index\_subscript\_1ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{index\_subscript\_1ary()}{index\_subscript\_1ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_ac0f92f99ac54c893f95a02ec21fcfed7} 
+static SEXP index\+\_\+subscript\+\_\+1ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00296}{296}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00116}{MARGIN}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, and \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}.
+
+\Hypertarget{subscript_8c_a671f633e6be8a793535d253bdc8a1e73}\index{subscript.c@{subscript.c}!index\_subscript\_1ary\_2col@{index\_subscript\_1ary\_2col}}
+\index{index\_subscript\_1ary\_2col@{index\_subscript\_1ary\_2col}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{index\_subscript\_1ary\_2col()}{index\_subscript\_1ary\_2col()}}
+{\footnotesize\ttfamily \label{subscript_8c_a671f633e6be8a793535d253bdc8a1e73} 
+static SEXP index\+\_\+subscript\+\_\+1ary\+\_\+2col (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00624}{624}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00116}{MARGIN}}, and \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}.
+
+\Hypertarget{subscript_8c_a20a04ec3bb197b20bd2b75b64613e72f}\index{subscript.c@{subscript.c}!index\_subscript\_2ary@{index\_subscript\_2ary}}
+\index{index\_subscript\_2ary@{index\_subscript\_2ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{index\_subscript\_2ary()}{index\_subscript\_2ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a20a04ec3bb197b20bd2b75b64613e72f} 
+static SEXP index\+\_\+subscript\+\_\+2ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{si}{, }\item[{SEXP}]{sj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l01443}{1443}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{perm_8c_source_l00047}{invert\+Perm()}}, \mbox{\hyperlink{perm_8c_source_l00003}{is\+Perm()}}, \mbox{\hyperlink{Mdefines_8h_source_l00116}{MARGIN}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00118}{SET\+\_\+\+MARGIN}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, and \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a0a7dc751870d82752abb9254a1245a9d}\index{subscript.c@{subscript.c}!R\_subscript\_1ary@{R\_subscript\_1ary}}
+\index{R\_subscript\_1ary@{R\_subscript\_1ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{R\_subscript\_1ary()}{R\_subscript\_1ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a0a7dc751870d82752abb9254a1245a9d} 
+SEXP R\+\_\+subscript\+\_\+1ary (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+s}{, }\item[{SEXP}]{s\+\_\+o}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00348}{348}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00037}{dense\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00252}{diagonal\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00296}{index\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{subscript_8c_source_l00128}{sparse\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}, and \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}.
+
+\Hypertarget{subscript_8c_ab875546c9ec8d99060332d8d072e0e99}\index{subscript.c@{subscript.c}!R\_subscript\_1ary\_2col@{R\_subscript\_1ary\_2col}}
+\index{R\_subscript\_1ary\_2col@{R\_subscript\_1ary\_2col}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{R\_subscript\_1ary\_2col()}{R\_subscript\_1ary\_2col()}}
+{\footnotesize\ttfamily \label{subscript_8c_ab875546c9ec8d99060332d8d072e0e99} 
+SEXP R\+\_\+subscript\+\_\+1ary\+\_\+2col (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+s}{, }\item[{SEXP}]{s\+\_\+o}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00664}{664}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00377}{dense\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l00585}{diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l00624}{index\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{subscript_8c_source_l00465}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}, and \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}.
+
+\Hypertarget{subscript_8c_a612d7fc0477db89dd20ef7c29a88d4ae}\index{subscript.c@{subscript.c}!R\_subscript\_2ary@{R\_subscript\_2ary}}
+\index{R\_subscript\_2ary@{R\_subscript\_2ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{R\_subscript\_2ary()}{R\_subscript\_2ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a612d7fc0477db89dd20ef7c29a88d4ae} 
+SEXP R\+\_\+subscript\+\_\+2ary (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+si}{, }\item[{SEXP}]{s\+\_\+sj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l01580}{1580}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{subscript_8c_source_l01443}{index\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{Mdefines_8h_source_l00333}{valid\+\_\+matrix}}, and \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}.
+
+\Hypertarget{subscript_8c_aaaaf10930a167395e4771b11775ae565}\index{subscript.c@{subscript.c}!sparse\_subscript\_1ary@{sparse\_subscript\_1ary}}
+\index{sparse\_subscript\_1ary@{sparse\_subscript\_1ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_subscript\_1ary()}{sparse\_subscript\_1ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_aaaaf10930a167395e4771b11775ae565} 
+static SEXP sparse\+\_\+subscript\+\_\+1ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{, }\item[{SEXP}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00128}{128}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00348}{R\+\_\+subscript\+\_\+1ary()}}.
+
+\Hypertarget{subscript_8c_a53e6af62cdd8798d6f7cad085c6136ea}\index{subscript.c@{subscript.c}!sparse\_subscript\_1ary\_2col@{sparse\_subscript\_1ary\_2col}}
+\index{sparse\_subscript\_1ary\_2col@{sparse\_subscript\_1ary\_2col}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_subscript\_1ary\_2col()}{sparse\_subscript\_1ary\_2col()}}
+{\footnotesize\ttfamily \label{subscript_8c_a53e6af62cdd8798d6f7cad085c6136ea} 
+static SEXP sparse\+\_\+subscript\+\_\+1ary\+\_\+2col (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{s}{, }\item[{SEXP}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00465}{465}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{subscript_8c_source_l00017}{SUB1}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00664}{R\+\_\+subscript\+\_\+1ary\+\_\+2col()}}.
+
+\Hypertarget{subscript_8c_a7a2cab9a47da89d25e43add86f6833ea}\index{subscript.c@{subscript.c}!sparse\_subscript\_2ary@{sparse\_subscript\_2ary}}
+\index{sparse\_subscript\_2ary@{sparse\_subscript\_2ary}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_subscript\_2ary()}{sparse\_subscript\_2ary()}}
+{\footnotesize\ttfamily \label{subscript_8c_a7a2cab9a47da89d25e43add86f6833ea} 
+static SEXP sparse\+\_\+subscript\+\_\+2ary (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{si}{, }\item[{SEXP}]{sj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l01037}{1037}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00135}{ABS}}, \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02963}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_source_l00688}{stay\+\_\+sy()}}, \mbox{\hyperlink{subscript_8c_source_l00717}{stay\+\_\+tr()}}, \mbox{\hyperlink{subscript_8c_a12f0cbc870dcd3eb8552d9050debd508}{SUB2}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{subscript_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01580}{R\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a0ab2f4b61a622e78fbd9c02c3d11c722}\index{subscript.c@{subscript.c}!stay\_di@{stay\_di}}
+\index{stay\_di@{stay\_di}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{stay\_di()}{stay\_di()}}
+{\footnotesize\ttfamily \label{subscript_8c_a0ab2f4b61a622e78fbd9c02c3d11c722} 
+static int stay\+\_\+di (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{pi}{, }\item[{int}]{ni}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{pj}{, }\item[{int}]{nj}{, }\item[{int}]{n}{, }\item[{int}]{check\+NA}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00780}{780}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, and \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a4338d3a223c84541be6b5c88356892dc}\index{subscript.c@{subscript.c}!stay\_sy@{stay\_sy}}
+\index{stay\_sy@{stay\_sy}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{stay\_sy()}{stay\_sy()}}
+{\footnotesize\ttfamily \label{subscript_8c_a4338d3a223c84541be6b5c88356892dc} 
+static int stay\+\_\+sy (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{pi}{, }\item[{int}]{ni}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{pj}{, }\item[{int}]{nj}{, }\item[{int}]{n}{, }\item[{char}]{uplo}{, }\item[{int}]{check\+NA}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00688}{688}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{subscript_8c_a132db238eb2218d70220cb9353ebb39e}\index{subscript.c@{subscript.c}!stay\_tr@{stay\_tr}}
+\index{stay\_tr@{stay\_tr}!subscript.c@{subscript.c}}
+\doxysubsubsection{\texorpdfstring{stay\_tr()}{stay\_tr()}}
+{\footnotesize\ttfamily \label{subscript_8c_a132db238eb2218d70220cb9353ebb39e} 
+static int stay\+\_\+tr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{pi}{, }\item[{int}]{ni}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{pj}{, }\item[{int}]{nj}{, }\item[{int}]{n}{, }\item[{char}]{uplo}{, }\item[{int}]{check\+NA}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{subscript_8c_source_l00717}{717}} of file \mbox{\hyperlink{subscript_8c_source}{subscript.\+c}}.
+
+
+
+References \mbox{\hyperlink{subscript_8c_source_l00008}{any\+NA()}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+

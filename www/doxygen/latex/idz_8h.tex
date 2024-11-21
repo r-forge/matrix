@@ -1,0 +1,702 @@
+\doxysection{idz.\+h File Reference}
+\hypertarget{idz_8h}{}\label{idz_8h}\index{idz.h@{idz.h}}
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$R\+\_\+ext/\+Complex.\+h$>$}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{idz_8h_aa1281b1e25471295d988d987fb5401c9}{iswap2}} (size\+\_\+t, int \texorpdfstring{$\ast$}{*}, size\+\_\+t, int \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2}} (size\+\_\+t, double \texorpdfstring{$\ast$}{*}, size\+\_\+t, double \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2}} (size\+\_\+t, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a7f171d6cfd9f66e50a2a7dcb1f851ec9}{iswap1}} (size\+\_\+t, int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a10cd814a6b9c9d7d3538d0b9efa0de74}{dswap1}} (size\+\_\+t, double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_ab6d03832e49142178942a7aaa3457acb}{zswap1}} (size\+\_\+t, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a5bccdce29f7ab57a43c63356013475c9}{icopy2}} (size\+\_\+t, int \texorpdfstring{$\ast$}{*}, size\+\_\+t, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a22ea66b184fc148eae04c107f76f4b32}{dcopy2}} (size\+\_\+t, double \texorpdfstring{$\ast$}{*}, size\+\_\+t, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a12d89aeee00c5f3e92fa29254b6eebac}{zcopy2}} (size\+\_\+t, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_ada6427688ffd0a0fcb6a00a4ebd34863}{icopy1}} (size\+\_\+t, int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_af1390d9c6087fbaaf4ad9f5197dbf24d}{dcopy1}} (size\+\_\+t, double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_aedba7b060838731165da9dc20fd680d6}{zcopy1}} (size\+\_\+t, Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a927024728107b930f9cdb0e8e4096f2f}{irowperm2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a74e3330dd01b2a0eb850bac0ac351610}{drowperm2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, int, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_ab61d5490766c488e6a26212fcd074d96}{zrowperm2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, int, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a3d7d1a10e6a18641d3972fe0dd5537ba}{isymperm2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a36e49d922615be3dad6c9a036ac85a49}{dsymperm2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a4c4ed35257d75d0f2c1fc2616acaba5b}{zsymperm2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_ae7bc72aae74f99e7def5951681ddcef1}{isymperm1}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_aa6e47d6a5128c1187d211f31a9f96fb8}{dsymperm1}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a56ddb9d86a2d8c95d33feb969c8a4341}{zsymperm1}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, char, const int \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+void \mbox{\hyperlink{idz_8h_a56b314a38cb65bc7061ff8eb0bd834f1}{ipack2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a8877dbb2b7ec2d2e55dfd435a0464dc8}{dpack2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a04abb0029c9596505ce1eb857e68b43b}{zpack2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a82d4f93ccc5bcdcb757305d13dc347b8}{ipack1}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a5eb1cf097217f857918680188b6eefad}{dpack1}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a3c08b636f8defe4521ead390d10a1527}{zpack1}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a1aaacc267a66490b4904a457f0833ac9}{iforce2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_af28a7bafbdb111aa754f8ee76528b1bb}{dforce2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_ade5ddfb3141192020a09c5fccb4b85e0}{zforce2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a8c5ea061c66a259970fbb344c6ab7049}{iforce1}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_af9c4a531e23fbc7a2efb1fd0d0621b9d}{dforce1}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a6cb2601d069ec4872f963fe38fa34060}{zforce1}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_aced8e2a275dccb529cf4ec2ab5c59cca}{itrans2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a58a7f6efd7ec5dc2aafe2022dfa6e4cb}{itrans1}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_aeaed9128dcf3b53bf6e578453f069b3f}{dtrans1}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a9648c491e25deb710374c872362af645}{ztrans1}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a6d2fc9fe24a3629a9e246cd946e65818}{iband2}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, size\+\_\+t, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a38c1fe1bf575b16bf43e68629b7e2ae7}{dband2}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, size\+\_\+t, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_ac8f1a4982124422e8f204980e9e64ea0}{zband2}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, size\+\_\+t, size\+\_\+t, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_ad7e845abe05b9d71fb0316b50ae7400c}{iband1}} (int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, size\+\_\+t, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a6cbffe15f69b2e59b531f2b39f9465a5}{dband1}} (double \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, size\+\_\+t, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a53193f20f927fbf9af92f8ceb02310e6}{zband1}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, size\+\_\+t, size\+\_\+t)
+\item 
+int \mbox{\hyperlink{idz_8h_a3ae0f4f345a055a1a657b49113239445}{ntest2}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_af119d3272de0bf93b7c707339204f2aa}{ltest2}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_aef39e4c631e2393a4082505a715c6930}{itest2}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_a42fce3344475aea3312d53d423041305}{dtest2}} (const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_aae69a6bf01f0a8d5fe8a1ddd53b28694}{ztest2}} (const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_ab41f984b7b84d30818afff85c23d0ec5}{ntest1}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_a13afd960aca706011424e1e524e8f640}{ltest1}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_a32deec6508b50884df3163ea1ef0df3d}{itest1}} (const int \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_a0f331d3c616a2d721a3fad3c6cfd6015}{dtest1}} (const double \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+int \mbox{\hyperlink{idz_8h_ab46eaeb5fafc35aaea1e426fe58992af}{ztest1}} (const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t, char, char, char)
+\item 
+void \mbox{\hyperlink{idz_8h_a79b133ab685eec32a04a80e851933cff}{ntspaggr}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_abee0fad46d60d95f68632b768c1c2934}{ltspaggr}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_ae43a4ae521cbf03e779182b53d215540}{itspaggr}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_adaa7939fb66c36bf74233df2f0dc002a}{dtspaggr}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_ad2977bc7d00b3412d1cd92a85e37d327}{ztspaggr}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a7767b89b0719b3df0201530a29e299d3}{ntspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a4df62154aaf9e127eb55c4a439f29b49}{ltspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a243e92696c7029806308559f5c704035}{itspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_ad5139e3d2f6e5ba5f64ad96bf6b12abe}{dtspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_aa066c65014d2091e67815ef539d67727}{ztspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a469b7a1555f0f57576a3e90b436bcca1}{ncspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_af5e63651628cfdd4668bed94d14b91f6}{lcspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_ac9ffcab6b3f0a33ad6ab715ffb30643d}{icspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a04d6f1328d879f58922584698a218df0}{dcspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a97981bb89db348bb643fb54081d084a7}{zcspsort}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*}, int, int, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a96a29b7f716b257a036f4e7a7d159dcf}{ncsptrans}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, char, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a0300578d7071e6d2d9b7300294fcc730}{lcsptrans}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, char, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a50abdf133bddcd7cc9e811ef0d6e0a75}{icsptrans}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, int, int, char, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_aba9341c26d0b0b10a324a6f5041b69ad}{dcsptrans}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, double \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const double \texorpdfstring{$\ast$}{*}, int, int, char, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a8f70a49088bd7dda5438b66f7039e480}{zcsptrans}} (int \texorpdfstring{$\ast$}{*}, int \texorpdfstring{$\ast$}{*}, Rcomplex \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const int \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, int, int, char, int \texorpdfstring{$\ast$}{*})
+\item 
+void \mbox{\hyperlink{idz_8h_a54894a75726f02a04a1e147f7757760a}{zvreal}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a3433eacb36c13bf7e4a27123c0656281}{zvimag}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\item 
+void \mbox{\hyperlink{idz_8h_a66b2bc0093fab6d320aea25152dc13db}{zvconj}} (Rcomplex \texorpdfstring{$\ast$}{*}, const Rcomplex \texorpdfstring{$\ast$}{*}, size\+\_\+t)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{idz_8h_a6cbffe15f69b2e59b531f2b39f9465a5}\index{idz.h@{idz.h}!dband1@{dband1}}
+\index{dband1@{dband1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dband1()}{dband1()}}
+{\footnotesize\ttfamily \label{idz_8h_a6cbffe15f69b2e59b531f2b39f9465a5} 
+void dband1 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a38c1fe1bf575b16bf43e68629b7e2ae7}\index{idz.h@{idz.h}!dband2@{dband2}}
+\index{dband2@{dband2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dband2()}{dband2()}}
+{\footnotesize\ttfamily \label{idz_8h_a38c1fe1bf575b16bf43e68629b7e2ae7} 
+void dband2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_af1390d9c6087fbaaf4ad9f5197dbf24d}\index{idz.h@{idz.h}!dcopy1@{dcopy1}}
+\index{dcopy1@{dcopy1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dcopy1()}{dcopy1()}}
+{\footnotesize\ttfamily \label{idz_8h_af1390d9c6087fbaaf4ad9f5197dbf24d} 
+void dcopy1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a22ea66b184fc148eae04c107f76f4b32}\index{idz.h@{idz.h}!dcopy2@{dcopy2}}
+\index{dcopy2@{dcopy2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dcopy2()}{dcopy2()}}
+{\footnotesize\ttfamily \label{idz_8h_a22ea66b184fc148eae04c107f76f4b32} 
+void dcopy2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a04d6f1328d879f58922584698a218df0}\index{idz.h@{idz.h}!dcspsort@{dcspsort}}
+\index{dcspsort@{dcspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dcspsort()}{dcspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a04d6f1328d879f58922584698a218df0} 
+void dcspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aba9341c26d0b0b10a324a6f5041b69ad}\index{idz.h@{idz.h}!dcsptrans@{dcsptrans}}
+\index{dcsptrans@{dcsptrans}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dcsptrans()}{dcsptrans()}}
+{\footnotesize\ttfamily \label{idz_8h_aba9341c26d0b0b10a324a6f5041b69ad} 
+void dcsptrans (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_af9c4a531e23fbc7a2efb1fd0d0621b9d}\index{idz.h@{idz.h}!dforce1@{dforce1}}
+\index{dforce1@{dforce1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dforce1()}{dforce1()}}
+{\footnotesize\ttfamily \label{idz_8h_af9c4a531e23fbc7a2efb1fd0d0621b9d} 
+void dforce1 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_af28a7bafbdb111aa754f8ee76528b1bb}\index{idz.h@{idz.h}!dforce2@{dforce2}}
+\index{dforce2@{dforce2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dforce2()}{dforce2()}}
+{\footnotesize\ttfamily \label{idz_8h_af28a7bafbdb111aa754f8ee76528b1bb} 
+void dforce2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a5eb1cf097217f857918680188b6eefad}\index{idz.h@{idz.h}!dpack1@{dpack1}}
+\index{dpack1@{dpack1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dpack1()}{dpack1()}}
+{\footnotesize\ttfamily \label{idz_8h_a5eb1cf097217f857918680188b6eefad} 
+void dpack1 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a8877dbb2b7ec2d2e55dfd435a0464dc8}\index{idz.h@{idz.h}!dpack2@{dpack2}}
+\index{dpack2@{dpack2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dpack2()}{dpack2()}}
+{\footnotesize\ttfamily \label{idz_8h_a8877dbb2b7ec2d2e55dfd435a0464dc8} 
+void dpack2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a74e3330dd01b2a0eb850bac0ac351610}\index{idz.h@{idz.h}!drowperm2@{drowperm2}}
+\index{drowperm2@{drowperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{drowperm2()}{drowperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_a74e3330dd01b2a0eb850bac0ac351610} 
+void drowperm2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_a10cd814a6b9c9d7d3538d0b9efa0de74}\index{idz.h@{idz.h}!dswap1@{dswap1}}
+\index{dswap1@{dswap1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dswap1()}{dswap1()}}
+{\footnotesize\ttfamily \label{idz_8h_a10cd814a6b9c9d7d3538d0b9efa0de74} 
+void dswap1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a210f5aa621e0c76c16786d02b4450d13}\index{idz.h@{idz.h}!dswap2@{dswap2}}
+\index{dswap2@{dswap2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dswap2()}{dswap2()}}
+{\footnotesize\ttfamily \label{idz_8h_a210f5aa621e0c76c16786d02b4450d13} 
+void dswap2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{idz_8h_aa6e47d6a5128c1187d211f31a9f96fb8}\index{idz.h@{idz.h}!dsymperm1@{dsymperm1}}
+\index{dsymperm1@{dsymperm1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dsymperm1()}{dsymperm1()}}
+{\footnotesize\ttfamily \label{idz_8h_aa6e47d6a5128c1187d211f31a9f96fb8} 
+void dsymperm1 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_a36e49d922615be3dad6c9a036ac85a49}\index{idz.h@{idz.h}!dsymperm2@{dsymperm2}}
+\index{dsymperm2@{dsymperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dsymperm2()}{dsymperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_a36e49d922615be3dad6c9a036ac85a49} 
+void dsymperm2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_a0f331d3c616a2d721a3fad3c6cfd6015}\index{idz.h@{idz.h}!dtest1@{dtest1}}
+\index{dtest1@{dtest1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtest1()}{dtest1()}}
+{\footnotesize\ttfamily \label{idz_8h_a0f331d3c616a2d721a3fad3c6cfd6015} 
+int dtest1 (\begin{DoxyParamCaption}\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a42fce3344475aea3312d53d423041305}\index{idz.h@{idz.h}!dtest2@{dtest2}}
+\index{dtest2@{dtest2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtest2()}{dtest2()}}
+{\footnotesize\ttfamily \label{idz_8h_a42fce3344475aea3312d53d423041305} 
+int dtest2 (\begin{DoxyParamCaption}\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aeaed9128dcf3b53bf6e578453f069b3f}\index{idz.h@{idz.h}!dtrans1@{dtrans1}}
+\index{dtrans1@{dtrans1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtrans1()}{dtrans1()}}
+{\footnotesize\ttfamily \label{idz_8h_aeaed9128dcf3b53bf6e578453f069b3f} 
+void dtrans1 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a9649f01a22b85f5ec16971da9b926e73}\index{idz.h@{idz.h}!dtrans2@{dtrans2}}
+\index{dtrans2@{dtrans2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtrans2()}{dtrans2()}}
+{\footnotesize\ttfamily \label{idz_8h_a9649f01a22b85f5ec16971da9b926e73} 
+void dtrans2 (\begin{DoxyParamCaption}\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{cholmod-etc_8c_source_l00375}{CHD2\+M()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{M2\+CHD()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{idz_8h_adaa7939fb66c36bf74233df2f0dc002a}\index{idz.h@{idz.h}!dtspaggr@{dtspaggr}}
+\index{dtspaggr@{dtspaggr}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtspaggr()}{dtspaggr()}}
+{\footnotesize\ttfamily \label{idz_8h_adaa7939fb66c36bf74233df2f0dc002a} 
+void dtspaggr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ad5139e3d2f6e5ba5f64ad96bf6b12abe}\index{idz.h@{idz.h}!dtspsort@{dtspsort}}
+\index{dtspsort@{dtspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{dtspsort()}{dtspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_ad5139e3d2f6e5ba5f64ad96bf6b12abe} 
+void dtspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const double \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{double \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ad7e845abe05b9d71fb0316b50ae7400c}\index{idz.h@{idz.h}!iband1@{iband1}}
+\index{iband1@{iband1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iband1()}{iband1()}}
+{\footnotesize\ttfamily \label{idz_8h_ad7e845abe05b9d71fb0316b50ae7400c} 
+void iband1 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a6d2fc9fe24a3629a9e246cd946e65818}\index{idz.h@{idz.h}!iband2@{iband2}}
+\index{iband2@{iband2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iband2()}{iband2()}}
+{\footnotesize\ttfamily \label{idz_8h_a6d2fc9fe24a3629a9e246cd946e65818} 
+void iband2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ada6427688ffd0a0fcb6a00a4ebd34863}\index{idz.h@{idz.h}!icopy1@{icopy1}}
+\index{icopy1@{icopy1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{icopy1()}{icopy1()}}
+{\footnotesize\ttfamily \label{idz_8h_ada6427688ffd0a0fcb6a00a4ebd34863} 
+void icopy1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a5bccdce29f7ab57a43c63356013475c9}\index{idz.h@{idz.h}!icopy2@{icopy2}}
+\index{icopy2@{icopy2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{icopy2()}{icopy2()}}
+{\footnotesize\ttfamily \label{idz_8h_a5bccdce29f7ab57a43c63356013475c9} 
+void icopy2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ac9ffcab6b3f0a33ad6ab715ffb30643d}\index{idz.h@{idz.h}!icspsort@{icspsort}}
+\index{icspsort@{icspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{icspsort()}{icspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_ac9ffcab6b3f0a33ad6ab715ffb30643d} 
+void icspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a50abdf133bddcd7cc9e811ef0d6e0a75}\index{idz.h@{idz.h}!icsptrans@{icsptrans}}
+\index{icsptrans@{icsptrans}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{icsptrans()}{icsptrans()}}
+{\footnotesize\ttfamily \label{idz_8h_a50abdf133bddcd7cc9e811ef0d6e0a75} 
+void icsptrans (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a8c5ea061c66a259970fbb344c6ab7049}\index{idz.h@{idz.h}!iforce1@{iforce1}}
+\index{iforce1@{iforce1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iforce1()}{iforce1()}}
+{\footnotesize\ttfamily \label{idz_8h_a8c5ea061c66a259970fbb344c6ab7049} 
+void iforce1 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a1aaacc267a66490b4904a457f0833ac9}\index{idz.h@{idz.h}!iforce2@{iforce2}}
+\index{iforce2@{iforce2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iforce2()}{iforce2()}}
+{\footnotesize\ttfamily \label{idz_8h_a1aaacc267a66490b4904a457f0833ac9} 
+void iforce2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a82d4f93ccc5bcdcb757305d13dc347b8}\index{idz.h@{idz.h}!ipack1@{ipack1}}
+\index{ipack1@{ipack1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ipack1()}{ipack1()}}
+{\footnotesize\ttfamily \label{idz_8h_a82d4f93ccc5bcdcb757305d13dc347b8} 
+void ipack1 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a56b314a38cb65bc7061ff8eb0bd834f1}\index{idz.h@{idz.h}!ipack2@{ipack2}}
+\index{ipack2@{ipack2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ipack2()}{ipack2()}}
+{\footnotesize\ttfamily \label{idz_8h_a56b314a38cb65bc7061ff8eb0bd834f1} 
+void ipack2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a927024728107b930f9cdb0e8e4096f2f}\index{idz.h@{idz.h}!irowperm2@{irowperm2}}
+\index{irowperm2@{irowperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{irowperm2()}{irowperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_a927024728107b930f9cdb0e8e4096f2f} 
+void irowperm2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a7f171d6cfd9f66e50a2a7dcb1f851ec9}\index{idz.h@{idz.h}!iswap1@{iswap1}}
+\index{iswap1@{iswap1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iswap1()}{iswap1()}}
+{\footnotesize\ttfamily \label{idz_8h_a7f171d6cfd9f66e50a2a7dcb1f851ec9} 
+void iswap1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aa1281b1e25471295d988d987fb5401c9}\index{idz.h@{idz.h}!iswap2@{iswap2}}
+\index{iswap2@{iswap2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{iswap2()}{iswap2()}}
+{\footnotesize\ttfamily \label{idz_8h_aa1281b1e25471295d988d987fb5401c9} 
+void iswap2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ae7bc72aae74f99e7def5951681ddcef1}\index{idz.h@{idz.h}!isymperm1@{isymperm1}}
+\index{isymperm1@{isymperm1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{isymperm1()}{isymperm1()}}
+{\footnotesize\ttfamily \label{idz_8h_ae7bc72aae74f99e7def5951681ddcef1} 
+void isymperm1 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a3d7d1a10e6a18641d3972fe0dd5537ba}\index{idz.h@{idz.h}!isymperm2@{isymperm2}}
+\index{isymperm2@{isymperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{isymperm2()}{isymperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_a3d7d1a10e6a18641d3972fe0dd5537ba} 
+void isymperm2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a32deec6508b50884df3163ea1ef0df3d}\index{idz.h@{idz.h}!itest1@{itest1}}
+\index{itest1@{itest1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itest1()}{itest1()}}
+{\footnotesize\ttfamily \label{idz_8h_a32deec6508b50884df3163ea1ef0df3d} 
+int itest1 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aef39e4c631e2393a4082505a715c6930}\index{idz.h@{idz.h}!itest2@{itest2}}
+\index{itest2@{itest2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itest2()}{itest2()}}
+{\footnotesize\ttfamily \label{idz_8h_aef39e4c631e2393a4082505a715c6930} 
+int itest2 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a58a7f6efd7ec5dc2aafe2022dfa6e4cb}\index{idz.h@{idz.h}!itrans1@{itrans1}}
+\index{itrans1@{itrans1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itrans1()}{itrans1()}}
+{\footnotesize\ttfamily \label{idz_8h_a58a7f6efd7ec5dc2aafe2022dfa6e4cb} 
+void itrans1 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aced8e2a275dccb529cf4ec2ab5c59cca}\index{idz.h@{idz.h}!itrans2@{itrans2}}
+\index{itrans2@{itrans2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itrans2()}{itrans2()}}
+{\footnotesize\ttfamily \label{idz_8h_aced8e2a275dccb529cf4ec2ab5c59cca} 
+void itrans2 (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ae43a4ae521cbf03e779182b53d215540}\index{idz.h@{idz.h}!itspaggr@{itspaggr}}
+\index{itspaggr@{itspaggr}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itspaggr()}{itspaggr()}}
+{\footnotesize\ttfamily \label{idz_8h_ae43a4ae521cbf03e779182b53d215540} 
+void itspaggr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a243e92696c7029806308559f5c704035}\index{idz.h@{idz.h}!itspsort@{itspsort}}
+\index{itspsort@{itspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{itspsort()}{itspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a243e92696c7029806308559f5c704035} 
+void itspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_af5e63651628cfdd4668bed94d14b91f6}\index{idz.h@{idz.h}!lcspsort@{lcspsort}}
+\index{lcspsort@{lcspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{lcspsort()}{lcspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_af5e63651628cfdd4668bed94d14b91f6} 
+void lcspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a0300578d7071e6d2d9b7300294fcc730}\index{idz.h@{idz.h}!lcsptrans@{lcsptrans}}
+\index{lcsptrans@{lcsptrans}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{lcsptrans()}{lcsptrans()}}
+{\footnotesize\ttfamily \label{idz_8h_a0300578d7071e6d2d9b7300294fcc730} 
+void lcsptrans (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a13afd960aca706011424e1e524e8f640}\index{idz.h@{idz.h}!ltest1@{ltest1}}
+\index{ltest1@{ltest1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ltest1()}{ltest1()}}
+{\footnotesize\ttfamily \label{idz_8h_a13afd960aca706011424e1e524e8f640} 
+int ltest1 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_af119d3272de0bf93b7c707339204f2aa}\index{idz.h@{idz.h}!ltest2@{ltest2}}
+\index{ltest2@{ltest2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ltest2()}{ltest2()}}
+{\footnotesize\ttfamily \label{idz_8h_af119d3272de0bf93b7c707339204f2aa} 
+int ltest2 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_abee0fad46d60d95f68632b768c1c2934}\index{idz.h@{idz.h}!ltspaggr@{ltspaggr}}
+\index{ltspaggr@{ltspaggr}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ltspaggr()}{ltspaggr()}}
+{\footnotesize\ttfamily \label{idz_8h_abee0fad46d60d95f68632b768c1c2934} 
+void ltspaggr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a4df62154aaf9e127eb55c4a439f29b49}\index{idz.h@{idz.h}!ltspsort@{ltspsort}}
+\index{ltspsort@{ltspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ltspsort()}{ltspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a4df62154aaf9e127eb55c4a439f29b49} 
+void ltspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a469b7a1555f0f57576a3e90b436bcca1}\index{idz.h@{idz.h}!ncspsort@{ncspsort}}
+\index{ncspsort@{ncspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ncspsort()}{ncspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a469b7a1555f0f57576a3e90b436bcca1} 
+void ncspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a96a29b7f716b257a036f4e7a7d159dcf}\index{idz.h@{idz.h}!ncsptrans@{ncsptrans}}
+\index{ncsptrans@{ncsptrans}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ncsptrans()}{ncsptrans()}}
+{\footnotesize\ttfamily \label{idz_8h_a96a29b7f716b257a036f4e7a7d159dcf} 
+void ncsptrans (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}, and \mbox{\hyperlink{symmpart_8c_source_l00205}{sparse\+\_\+symmpart()}}.
+
+\Hypertarget{idz_8h_ab41f984b7b84d30818afff85c23d0ec5}\index{idz.h@{idz.h}!ntest1@{ntest1}}
+\index{ntest1@{ntest1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ntest1()}{ntest1()}}
+{\footnotesize\ttfamily \label{idz_8h_ab41f984b7b84d30818afff85c23d0ec5} 
+int ntest1 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a3ae0f4f345a055a1a657b49113239445}\index{idz.h@{idz.h}!ntest2@{ntest2}}
+\index{ntest2@{ntest2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ntest2()}{ntest2()}}
+{\footnotesize\ttfamily \label{idz_8h_a3ae0f4f345a055a1a657b49113239445} 
+int ntest2 (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a79b133ab685eec32a04a80e851933cff}\index{idz.h@{idz.h}!ntspaggr@{ntspaggr}}
+\index{ntspaggr@{ntspaggr}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ntspaggr()}{ntspaggr()}}
+{\footnotesize\ttfamily \label{idz_8h_a79b133ab685eec32a04a80e851933cff} 
+void ntspaggr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a7767b89b0719b3df0201530a29e299d3}\index{idz.h@{idz.h}!ntspsort@{ntspsort}}
+\index{ntspsort@{ntspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ntspsort()}{ntspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a7767b89b0719b3df0201530a29e299d3} 
+void ntspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a53193f20f927fbf9af92f8ceb02310e6}\index{idz.h@{idz.h}!zband1@{zband1}}
+\index{zband1@{zband1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zband1()}{zband1()}}
+{\footnotesize\ttfamily \label{idz_8h_a53193f20f927fbf9af92f8ceb02310e6} 
+void zband1 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ac8f1a4982124422e8f204980e9e64ea0}\index{idz.h@{idz.h}!zband2@{zband2}}
+\index{zband2@{zband2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zband2()}{zband2()}}
+{\footnotesize\ttfamily \label{idz_8h_ac8f1a4982124422e8f204980e9e64ea0} 
+void zband2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aedba7b060838731165da9dc20fd680d6}\index{idz.h@{idz.h}!zcopy1@{zcopy1}}
+\index{zcopy1@{zcopy1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zcopy1()}{zcopy1()}}
+{\footnotesize\ttfamily \label{idz_8h_aedba7b060838731165da9dc20fd680d6} 
+void zcopy1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a12d89aeee00c5f3e92fa29254b6eebac}\index{idz.h@{idz.h}!zcopy2@{zcopy2}}
+\index{zcopy2@{zcopy2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zcopy2()}{zcopy2()}}
+{\footnotesize\ttfamily \label{idz_8h_a12d89aeee00c5f3e92fa29254b6eebac} 
+void zcopy2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a97981bb89db348bb643fb54081d084a7}\index{idz.h@{idz.h}!zcspsort@{zcspsort}}
+\index{zcspsort@{zcspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zcspsort()}{zcspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_a97981bb89db348bb643fb54081d084a7} 
+void zcspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a8f70a49088bd7dda5438b66f7039e480}\index{idz.h@{idz.h}!zcsptrans@{zcsptrans}}
+\index{zcsptrans@{zcsptrans}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zcsptrans()}{zcsptrans()}}
+{\footnotesize\ttfamily \label{idz_8h_a8f70a49088bd7dda5438b66f7039e480} 
+void zcsptrans (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a6cb2601d069ec4872f963fe38fa34060}\index{idz.h@{idz.h}!zforce1@{zforce1}}
+\index{zforce1@{zforce1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zforce1()}{zforce1()}}
+{\footnotesize\ttfamily \label{idz_8h_a6cb2601d069ec4872f963fe38fa34060} 
+void zforce1 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ade5ddfb3141192020a09c5fccb4b85e0}\index{idz.h@{idz.h}!zforce2@{zforce2}}
+\index{zforce2@{zforce2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zforce2()}{zforce2()}}
+{\footnotesize\ttfamily \label{idz_8h_ade5ddfb3141192020a09c5fccb4b85e0} 
+void zforce2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a3c08b636f8defe4521ead390d10a1527}\index{idz.h@{idz.h}!zpack1@{zpack1}}
+\index{zpack1@{zpack1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zpack1()}{zpack1()}}
+{\footnotesize\ttfamily \label{idz_8h_a3c08b636f8defe4521ead390d10a1527} 
+void zpack1 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a04abb0029c9596505ce1eb857e68b43b}\index{idz.h@{idz.h}!zpack2@{zpack2}}
+\index{zpack2@{zpack2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zpack2()}{zpack2()}}
+{\footnotesize\ttfamily \label{idz_8h_a04abb0029c9596505ce1eb857e68b43b} 
+void zpack2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ab61d5490766c488e6a26212fcd074d96}\index{idz.h@{idz.h}!zrowperm2@{zrowperm2}}
+\index{zrowperm2@{zrowperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zrowperm2()}{zrowperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_ab61d5490766c488e6a26212fcd074d96} 
+void zrowperm2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_ab6d03832e49142178942a7aaa3457acb}\index{idz.h@{idz.h}!zswap1@{zswap1}}
+\index{zswap1@{zswap1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zswap1()}{zswap1()}}
+{\footnotesize\ttfamily \label{idz_8h_ab6d03832e49142178942a7aaa3457acb} 
+void zswap1 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_ae3b9703187db28aa0db075769316b632}\index{idz.h@{idz.h}!zswap2@{zswap2}}
+\index{zswap2@{zswap2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zswap2()}{zswap2()}}
+{\footnotesize\ttfamily \label{idz_8h_ae3b9703187db28aa0db075769316b632} 
+void zswap2 (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{idz_8h_a56ddb9d86a2d8c95d33feb969c8a4341}\index{idz.h@{idz.h}!zsymperm1@{zsymperm1}}
+\index{zsymperm1@{zsymperm1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zsymperm1()}{zsymperm1()}}
+{\footnotesize\ttfamily \label{idz_8h_a56ddb9d86a2d8c95d33feb969c8a4341} 
+void zsymperm1 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_a4c4ed35257d75d0f2c1fc2616acaba5b}\index{idz.h@{idz.h}!zsymperm2@{zsymperm2}}
+\index{zsymperm2@{zsymperm2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zsymperm2()}{zsymperm2()}}
+{\footnotesize\ttfamily \label{idz_8h_a4c4ed35257d75d0f2c1fc2616acaba5b} 
+void zsymperm2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{char}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{idz_8h_ab46eaeb5fafc35aaea1e426fe58992af}\index{idz.h@{idz.h}!ztest1@{ztest1}}
+\index{ztest1@{ztest1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztest1()}{ztest1()}}
+{\footnotesize\ttfamily \label{idz_8h_ab46eaeb5fafc35aaea1e426fe58992af} 
+int ztest1 (\begin{DoxyParamCaption}\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aae69a6bf01f0a8d5fe8a1ddd53b28694}\index{idz.h@{idz.h}!ztest2@{ztest2}}
+\index{ztest2@{ztest2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztest2()}{ztest2()}}
+{\footnotesize\ttfamily \label{idz_8h_aae69a6bf01f0a8d5fe8a1ddd53b28694} 
+int ztest2 (\begin{DoxyParamCaption}\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a9648c491e25deb710374c872362af645}\index{idz.h@{idz.h}!ztrans1@{ztrans1}}
+\index{ztrans1@{ztrans1}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztrans1()}{ztrans1()}}
+{\footnotesize\ttfamily \label{idz_8h_a9648c491e25deb710374c872362af645} 
+void ztrans1 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a25be5d1010056054a58cfed596e50579}\index{idz.h@{idz.h}!ztrans2@{ztrans2}}
+\index{ztrans2@{ztrans2}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztrans2()}{ztrans2()}}
+{\footnotesize\ttfamily \label{idz_8h_a25be5d1010056054a58cfed596e50579} 
+void ztrans2 (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{size\+\_\+t}]{}{, }\item[{char}]{}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{cholmod-etc_8c_source_l00375}{CHD2\+M()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{M2\+CHD()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{idz_8h_ad2977bc7d00b3412d1cd92a85e37d327}\index{idz.h@{idz.h}!ztspaggr@{ztspaggr}}
+\index{ztspaggr@{ztspaggr}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztspaggr()}{ztspaggr()}}
+{\footnotesize\ttfamily \label{idz_8h_ad2977bc7d00b3412d1cd92a85e37d327} 
+void ztspaggr (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_aa066c65014d2091e67815ef539d67727}\index{idz.h@{idz.h}!ztspsort@{ztspsort}}
+\index{ztspsort@{ztspsort}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{ztspsort()}{ztspsort()}}
+{\footnotesize\ttfamily \label{idz_8h_aa066c65014d2091e67815ef539d67727} 
+void ztspsort (\begin{DoxyParamCaption}\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int}]{}{, }\item[{int}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{}{, }\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{idz_8h_a66b2bc0093fab6d320aea25152dc13db}\index{idz.h@{idz.h}!zvconj@{zvconj}}
+\index{zvconj@{zvconj}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zvconj()}{zvconj()}}
+{\footnotesize\ttfamily \label{idz_8h_a66b2bc0093fab6d320aea25152dc13db} 
+void zvconj (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{y}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{idz_8c_source_l01300}{1300}} of file \mbox{\hyperlink{idz_8c_source}{idz.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{idz_8h_a3433eacb36c13bf7e4a27123c0656281}\index{idz.h@{idz.h}!zvimag@{zvimag}}
+\index{zvimag@{zvimag}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zvimag()}{zvimag()}}
+{\footnotesize\ttfamily \label{idz_8h_a3433eacb36c13bf7e4a27123c0656281} 
+void zvimag (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{y}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{idz_8c_source_l01287}{1287}} of file \mbox{\hyperlink{idz_8c_source}{idz.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, and \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}.
+
+\Hypertarget{idz_8h_a54894a75726f02a04a1e147f7757760a}\index{idz.h@{idz.h}!zvreal@{zvreal}}
+\index{zvreal@{zvreal}!idz.h@{idz.h}}
+\doxysubsubsection{\texorpdfstring{zvreal()}{zvreal()}}
+{\footnotesize\ttfamily \label{idz_8h_a54894a75726f02a04a1e147f7757760a} 
+void zvreal (\begin{DoxyParamCaption}\item[{Rcomplex \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{const Rcomplex \texorpdfstring{$\ast$}{*}}]{y}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{idz_8c_source_l01274}{1274}} of file \mbox{\hyperlink{idz_8c_source}{idz.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{symmpart_8c_source_l00011}{dense\+\_\+symmpart()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, and \mbox{\hyperlink{symmpart_8c_source_l00205}{sparse\+\_\+symmpart()}}.
+

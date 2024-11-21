@@ -1,0 +1,153 @@
+\doxysection{perm.\+c File Reference}
+\hypertarget{perm_8c}{}\label{perm_8c}\index{perm.c@{perm.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{is\+Perm}} (const int \texorpdfstring{$\ast$}{*}p, int n, int off)
+\item 
+int \mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{sign\+Perm}} (const int \texorpdfstring{$\ast$}{*}p, int n, int off)
+\item 
+void \mbox{\hyperlink{perm_8c_a96444b341a79d7f4b19174ae8d9755de}{invert\+Perm}} (const int \texorpdfstring{$\ast$}{*}p, int \texorpdfstring{$\ast$}{*}ip, int n, int off, int ioff)
+\item 
+void \mbox{\hyperlink{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c}{as\+Perm}} (const int \texorpdfstring{$\ast$}{*}p, int \texorpdfstring{$\ast$}{*}ip, int m, int n, int off, int ioff)
+\item 
+SEXP \mbox{\hyperlink{perm_8c_a99b2124cd209ca8500a6f905ecbb8aed}{R\+\_\+is\+Perm}} (SEXP s\+\_\+p, SEXP s\+\_\+off)
+\item 
+SEXP \mbox{\hyperlink{perm_8c_a338d1e5ff3a5d3b4ea4a1ea3be881cf7}{R\+\_\+sign\+Perm}} (SEXP s\+\_\+p, SEXP s\+\_\+off)
+\item 
+SEXP \mbox{\hyperlink{perm_8c_a24542afbe5202a47c00d5ae2ed259647}{R\+\_\+invert\+Perm}} (SEXP s\+\_\+p, SEXP s\+\_\+off, SEXP s\+\_\+ioff)
+\item 
+SEXP \mbox{\hyperlink{perm_8c_a524b04f2870c98b49b69b4cbf4151fb4}{R\+\_\+as\+Perm}} (SEXP s\+\_\+p, SEXP s\+\_\+off, SEXP s\+\_\+ioff, SEXP s\+\_\+n)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c}\index{perm.c@{perm.c}!asPerm@{asPerm}}
+\index{asPerm@{asPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{asPerm()}{asPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c} 
+void as\+Perm (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{ip}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{int}]{off}{, }\item[{int}]{ioff}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00057}{57}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{perm_8c_source_l00133}{R\+\_\+as\+Perm()}}.
+
+\Hypertarget{perm_8c_a96444b341a79d7f4b19174ae8d9755de}\index{perm.c@{perm.c}!invertPerm@{invertPerm}}
+\index{invertPerm@{invertPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{invertPerm()}{invertPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a96444b341a79d7f4b19174ae8d9755de} 
+void invert\+Perm (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{ip}{, }\item[{int}]{n}{, }\item[{int}]{off}{, }\item[{int}]{ioff}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00047}{47}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{perm_8c_source_l00003}{is\+Perm()}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01443}{index\+\_\+subscript\+\_\+2ary()}}, and \mbox{\hyperlink{perm_8c_source_l00109}{R\+\_\+invert\+Perm()}}.
+
+\Hypertarget{perm_8c_a816215ef66f35c9b37617be29e741ddc}\index{perm.c@{perm.c}!isPerm@{isPerm}}
+\index{isPerm@{isPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{isPerm()}{isPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a816215ef66f35c9b37617be29e741ddc} 
+int is\+Perm (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int}]{n}{, }\item[{int}]{off}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00003}{3}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, and \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}.
+
+
+
+Referenced by \mbox{\hyperlink{subscript_8c_source_l01443}{index\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{perm_8c_source_l00047}{invert\+Perm()}}, \mbox{\hyperlink{perm_8c_source_l00075}{R\+\_\+is\+Perm()}}, and \mbox{\hyperlink{perm_8c_source_l00022}{sign\+Perm()}}.
+
+\Hypertarget{perm_8c_a524b04f2870c98b49b69b4cbf4151fb4}\index{perm.c@{perm.c}!R\_asPerm@{R\_asPerm}}
+\index{R\_asPerm@{R\_asPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{R\_asPerm()}{R\_asPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a524b04f2870c98b49b69b4cbf4151fb4} 
+SEXP R\+\_\+as\+Perm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+p}{, }\item[{SEXP}]{s\+\_\+off}{, }\item[{SEXP}]{s\+\_\+ioff}{, }\item[{SEXP}]{s\+\_\+n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00133}{133}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{perm_8c_source_l00057}{as\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{perm_8c_a24542afbe5202a47c00d5ae2ed259647}\index{perm.c@{perm.c}!R\_invertPerm@{R\_invertPerm}}
+\index{R\_invertPerm@{R\_invertPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{R\_invertPerm()}{R\_invertPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a24542afbe5202a47c00d5ae2ed259647} 
+SEXP R\+\_\+invert\+Perm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+p}{, }\item[{SEXP}]{s\+\_\+off}{, }\item[{SEXP}]{s\+\_\+ioff}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00109}{109}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{perm_8c_source_l00047}{invert\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{perm_8c_a99b2124cd209ca8500a6f905ecbb8aed}\index{perm.c@{perm.c}!R\_isPerm@{R\_isPerm}}
+\index{R\_isPerm@{R\_isPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{R\_isPerm()}{R\_isPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a99b2124cd209ca8500a6f905ecbb8aed} 
+SEXP R\+\_\+is\+Perm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+p}{, }\item[{SEXP}]{s\+\_\+off}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00075}{75}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{perm_8c_source_l00003}{is\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{perm_8c_a338d1e5ff3a5d3b4ea4a1ea3be881cf7}\index{perm.c@{perm.c}!R\_signPerm@{R\_signPerm}}
+\index{R\_signPerm@{R\_signPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{R\_signPerm()}{R\_signPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_a338d1e5ff3a5d3b4ea4a1ea3be881cf7} 
+SEXP R\+\_\+sign\+Perm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+p}{, }\item[{SEXP}]{s\+\_\+off}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00092}{92}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{perm_8c_source_l00022}{sign\+Perm()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{perm_8c_abc949217622ddc601c32dd90f2cf0a81}\index{perm.c@{perm.c}!signPerm@{signPerm}}
+\index{signPerm@{signPerm}!perm.c@{perm.c}}
+\doxysubsubsection{\texorpdfstring{signPerm()}{signPerm()}}
+{\footnotesize\ttfamily \label{perm_8c_abc949217622ddc601c32dd90f2cf0a81} 
+int sign\+Perm (\begin{DoxyParamCaption}\item[{const int \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{int}]{n}{, }\item[{int}]{off}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perm_8c_source_l00022}{22}} of file \mbox{\hyperlink{perm_8c_source}{perm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{perm_8c_source_l00003}{is\+Perm()}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, and \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}.
+
+
+
+Referenced by \mbox{\hyperlink{perm_8c_source_l00092}{R\+\_\+sign\+Perm()}}, \mbox{\hyperlink{determinant_8c_source_l00298}{sparse\+LU\+\_\+determinant()}}, and \mbox{\hyperlink{determinant_8c_source_l00228}{sparse\+QR\+\_\+determinant()}}.
+

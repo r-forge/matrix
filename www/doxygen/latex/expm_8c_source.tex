@@ -1,0 +1,476 @@
+\doxysection{expm.\+c}
+\hypertarget{expm_8c_source}{}\label{expm_8c_source}\index{expm.c@{expm.c}}
+\mbox{\hyperlink{expm_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00001}00001\ \textcolor{comment}{/*\ C\ implementation\ of\ methods\ for\ expm\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <complex.h>}\ \textcolor{comment}{/*\ \_Complex,\ cexp\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Lapack-etc_8h}{Lapack-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{idz_8h}{idz.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00008}\mbox{\hyperlink{expm_8c_a91562487f693b54f81eff915b13369c7}{00008}}\ \textcolor{preprocessor}{\#define\ SHOW(x,\ header)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00009}00009\ \textcolor{preprocessor}{do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00010}00010\ \textcolor{preprocessor}{\ \ \ \ Rprintf("{}\%s\ ...\(\backslash\)n"{},\ (header));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00011}00011\ \textcolor{preprocessor}{\ \ \ \ for\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00012}00012\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Rprintf("{}\ \ \ \ \%\ .8e\(\backslash\)n"{},\ (x)[k]);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00013}00013\ \textcolor{preprocessor}{\}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00015}00015\ \textcolor{comment}{/*\ defined\ in\ ./Schur.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00016}00016\ SEXP\ \mbox{\hyperlink{expm_8c_a838e05c88a50f2908ab573fdb099cf00}{dense\_schur}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00018}00018\ \textcolor{comment}{/*\ defined\ in\ ./coerce.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00019}00019\ SEXP\ \mbox{\hyperlink{expm_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00020}00020\ SEXP\ \mbox{\hyperlink{expm_8c_a5c995aaeda42d8d81c6117465a279239}{dense\_as\_general}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00021}00021\ SEXP\ \mbox{\hyperlink{expm_8c_a78779016e3e6941b95dd4b54b42b7af6}{dense\_as\_packed}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00023}\mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{00023}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[]\ =\ \{\ 1.5e-\/2,\ 2.5e-\/1,\ 9.5e-\/1,\ 2.1e+0,\ 5.4e+0\ \};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00024}\mbox{\hyperlink{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}{00024}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}{padecm}}[][14]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00025}00025\ \ \ \ \ \{\ 120.0,\ 60.0,\ 12.0,\ 1.0\ \},}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00026}00026\ \ \ \ \ \{\ 30240.0,\ 15120.0,\ 3360.0,\ 420.0,\ 30.0,\ 1.0\ \},}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00027}00027\ \ \ \ \ \{\ 17297280.0,\ 8648640.0,\ 1995840.0,\ 277200.0,\ 25200.0,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00028}00028\ \ \ \ \ \ \ 1512.0,\ 56.0,\ 1.0\ \},}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00029}00029\ \ \ \ \ \{\ 17643225600.0,\ 8821612800.0,\ 2075673600.0,\ 302702400.0,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00030}00030\ \ \ \ \ \ \ 30270240.0,\ 2162160.0,\ 110880.0,\ 3960.0,\ 90.0,\ 1.0\ \},}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00031}00031\ \ \ \ \ \{\ 64764752532480000.0,\ 32382376266240000.0,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00032}00032\ \ \ \ \ \ \ 7771770303897600.0,\ 1187353796428800.0,\ 129060195264000.0,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00033}00033\ \ \ \ \ \ \ 10559470521600.0,\ 670442572800.0,\ 33522128640.0,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00034}00034\ \ \ \ \ \ \ 1323241920.0,\ 40840800.0,\ 960960.0,\ 16380.0,\ 182.0,\ 1.0\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00036}\mbox{\hyperlink{expm_8c_a1b7f313626e435eb0096af2bda38ae7c}{00036}}\ SEXP\ \mbox{\hyperlink{expm_8c_a1b7f313626e435eb0096af2bda38ae7c}{dense\_expm}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class})}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00037}00037\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00038}00038\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(obj),\ n\ =\ pdim[1];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (pdim[0]\ !=\ n)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00040}00040\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}matrix\ is\ not\ square"{}}));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{int}\ cs\ =\ \textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(obj)\ !=\ \textcolor{charliteral}{'C'};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00042}00042\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[]\ =\ \textcolor{stringliteral}{"{}...Matrix"{}};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ =\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})\ ?\ \textcolor{charliteral}{'z'}\ :\ \textcolor{charliteral}{'d'};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'}\ ||\ cs)\ ?\ \textcolor{charliteral}{'g'}\ :\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})\ ?\ \textcolor{charliteral}{'p'}\ :\ \textcolor{charliteral}{'t'};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[2]\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'}\ ||\ cs)\ ?\ \textcolor{charliteral}{'e'}\ :\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})\ ?\ \textcolor{charliteral}{'o'}\ :\ \textcolor{charliteral}{'r'};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00047}00047\ \ \ \ \ SEXP\ ans\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(ans,\ n,\ n);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(ans,\ -\/(\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}),\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(obj,\ 0));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ !=\ \textcolor{charliteral}{'g'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj)\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(ans);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00054}00054\ \ \ \ \ PROTECT\_INDEX\ pid;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00055}00055\ \ \ \ \ PROTECT\_WITH\_INDEX(obj,\ \&pid);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00056}00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'z'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'d'})\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{expm_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(obj,\ \textcolor{keyword}{class},\ \textcolor{charliteral}{','},\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00059}00059\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'s'}\ ||\ cs)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00063}00063\ \ \ \ \ \textcolor{comment}{/*\ Implementation\ of\ Algorithm\ 2.3\ from\ Higham\ (2005).\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00065}00065\ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{expm_8c_a5c995aaeda42d8d81c6117465a279239}{dense\_as\_general}}(obj,\ \textcolor{keyword}{class},\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00067}00067\ \ \ \ \ SEXP\ x0\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x0),\ XLENGTH(x0)));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00069}00069\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n1\ =\ (size\_t)\ n,\ nn\ =\ n1\ *\ n1,\ dk\ =\ n1\ +\ 1,\ k;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00070}00070\ \ \ \ \ \textcolor{keywordtype}{int}\ *pivot\ =\ (\textcolor{keywordtype}{int}\ *)\ R\_alloc(n1,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ i,\ j,\ l,\ s,\ ilo,\ ihi,\ info;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00072}00072\ \ \ \ \ \textcolor{keywordtype}{double}\ *scale\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc(n1,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ norm,\ *b;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x0)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00077}00077\ \ \ \ \ Rcomplex\ *a\ =\ COMPLEX(x0),\ *x\ =\ COMPLEX(x1),\ *work,\ *tmp,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ zero\ =\ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}},\ unit\ =\ \mbox{\hyperlink{init_8c_a83c79a44063ff24ef06cca12140e2e3c}{Matrix\_zunit}},\ trace\ =\ zero;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00079}00079\ \ \ \ \ memcpy(x,\ a,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00080}00080\ \ \ \ \ \textcolor{comment}{/*\ 1.\ Shift\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00081}00081\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00082}00082\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ trace.r\ +=\ x[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ trace.i\ +=\ x[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00086}00086\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00087}00087\ \ \ \ \ trace.r\ /=\ (double)\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00088}00088\ \ \ \ \ trace.i\ /=\ (double)\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00089}00089\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00090}00090\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00091}00091\ \ \ \ \ \ \ \ \ x[k].r\ -\/=\ trace.r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ x[k].i\ -\/=\ trace.i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00093}00093\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00095}00095\ \ \ \ \ \textcolor{comment}{/*\ 2.\ Balance\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00096}00096\ \ \ \ \ F77\_CALL(zgebal)(\textcolor{stringliteral}{"{}B"{}},\ \&n,\ x,\ \&n,\ \&ilo,\ \&ihi,\ scale,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}{ERROR\_LAPACK\_1}}(zgebal,\ info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00098}00098\ \ \ \ \ ilo\ -\/=\ 1;\ ihi\ -\/=\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00099}00099\ \ \ \ \ \textcolor{comment}{/*\ 3.\ Scale\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00100}00100\ \ \ \ \ norm\ =\ F77\_CALL(zlange)(\textcolor{stringliteral}{"{}O"{}},\ \&n,\ \&n,\ x,\ \&n,\ (\textcolor{keywordtype}{double}\ *)\ 0\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (!R\_FINITE(norm))}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}matrix\ one-\/norm\ is\ not\ finite"{}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00103}00103\ \ \ \ \ s\ =\ (norm\ <=\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[4])\ ?\ 0\ :\ (int)\ ceil(log2(norm\ /\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[4]));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ e\ =\ ldexp(1.0,\ -\/s);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ x[k].r\ *=\ e;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ x[k].i\ *=\ e;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00111}00111\ \ \ \ \ \textcolor{comment}{/*\ 4.\ Pade\ approximation\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00112}00112\ \ \ \ \ \textcolor{keywordflow}{for}\ (l\ =\ 0;\ l\ <\ 4;\ ++l)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (norm\ <=\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[l])}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00115}00115\ \ \ \ \ b\ =\ \&\mbox{\hyperlink{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}{padecm}}[l][0];\ \textcolor{comment}{/*\ Pade\ coefficients\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00116}00116\ \ \ \ \ work\ =\ (Rcomplex\ *)\ R\_alloc(nn\ *\ 2,\ \textcolor{keyword}{sizeof}(Rcomplex));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00117}00117\ \ \ \ \ Rcomplex\ *u\ =\ work,\ *v\ =\ u\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00118}00118\ \ \ \ \ memset(u,\ 0,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ nn\ *\ 2);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00119}00119\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00120}00120\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ u[k].r\ =\ b[1];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ v[k].r\ =\ b[0];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00123}00123\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{if}\ (l\ <\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Pade\ approximant\ of\ degree\ 3,\ 5,\ 7,\ or\ 9\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00127}00127\ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00128}00128\ \ \ \ \ \ \ \ \ work\ =\ (Rcomplex\ *)\ R\_alloc((l\ >\ 0)\ ?\ nn\ *\ 3\ :\ nn,\ \textcolor{keyword}{sizeof}(Rcomplex));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00129}00129\ \ \ \ \ \ \ \ \ Rcomplex\ *a2\ =\ work,\ *a2m\ =\ work\ +\ nn,\ *a2m2\ =\ a2m\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ u[k].r\ +=\ b[1]\ *\ a2[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ u[k].i\ +=\ b[1]\ *\ a2[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ v[k].r\ +=\ b[0]\ *\ a2[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ v[k].i\ +=\ b[0]\ *\ a2[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (l\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(a2m,\ a2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ l;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a2m,\ \&n,\ \&zero,\ a2m2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u[k].r\ +=\ b[1]\ *\ a2m2[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u[k].i\ +=\ b[1]\ *\ a2m2[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[k].r\ +=\ b[0]\ *\ a2m2[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[k].i\ +=\ b[0]\ *\ a2m2[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ a2m2;\ a2m2\ =\ a2m;\ a2m\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00153}00153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ memcpy(u,\ a2,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00157}00157\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Pade\ approximant\ of\ degree\ 13\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ work\ =\ (Rcomplex\ *)\ R\_alloc(nn\ *\ 5,\ \textcolor{keyword}{sizeof}(Rcomplex));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ Rcomplex\ *a2\ =\ work,\ *a4\ =\ a2\ +\ nn,\ *a6\ =\ a4\ +\ nn,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ *upart\ =\ a6\ +\ nn,\ *vpart\ =\ upart\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00162}00162\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x\ ,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x\ ,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00164}00164\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a2,\ \&n,\ \&zero,\ a4,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a4,\ \&n,\ \&zero,\ a6,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ u[k].r\ +=\ b[3]\ *\ a2[k].r\ +\ b[5]\ *\ a4[k].r\ +\ b[7]\ *\ a6[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ u[k].i\ +=\ b[3]\ *\ a2[k].i\ +\ b[5]\ *\ a4[k].i\ +\ b[7]\ *\ a6[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ v[k].r\ +=\ b[2]\ *\ a2[k].r\ +\ b[4]\ *\ a4[k].r\ +\ b[6]\ *\ a6[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ v[k].i\ +=\ b[2]\ *\ a2[k].i\ +\ b[4]\ *\ a4[k].i\ +\ b[6]\ *\ a6[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ upart[k].r\ =\ b[9]\ *\ a2[k].r\ +\ b[11]\ *\ a4[k].r\ +\ b[13]\ *\ a6[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ upart[k].i\ =\ b[9]\ *\ a2[k].i\ +\ b[11]\ *\ a4[k].i\ +\ b[13]\ *\ a6[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ vpart[k].r\ =\ b[8]\ *\ a2[k].r\ +\ b[10]\ *\ a4[k].r\ +\ b[12]\ *\ a6[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ vpart[k].i\ =\ b[8]\ *\ a2[k].i\ +\ b[10]\ *\ a4[k].i\ +\ b[12]\ *\ a6[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00178}00178\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a6,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ upart,\ \&n,\ \&unit,\ u,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00180}00180\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a6,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vpart,\ \&n,\ \&unit,\ v,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ memcpy(u,\ a2,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00186}00186\ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ x[k].r\ =\ \ u[k].r\ +\ v[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00188}00188\ \ \ \ \ \ \ \ \ x[k].i\ =\ \ u[k].i\ +\ v[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00189}00189\ \ \ \ \ \ \ \ \ u[k].r\ =\ -\/u[k].r\ +\ v[k].r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00190}00190\ \ \ \ \ \ \ \ \ u[k].i\ =\ -\/u[k].i\ +\ v[k].i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00192}00192\ \ \ \ \ F77\_CALL(zgetrf)(\&n,\ \&n,\ u,\ \&n,\ pivot,\ \&info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(zgetrf,\ info,\ 2,\ U);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00194}00194\ \ \ \ \ F77\_CALL(zgetrs)(\textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ u,\ \&n,\ pivot,\ x,\ \&n,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00195}00195\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}{ERROR\_LAPACK\_1}}(zgetrs,\ info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00196}00196\ \ \ \ \ \textcolor{comment}{/*\ 5.\ Square\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00197}00197\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00198}00198\ \ \ \ \ \ \ \ \ u\ =\ x;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00199}00199\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ s;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ u,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ v,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ v;\ v\ =\ u;\ u\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00203}00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ \%\ 2)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(x,\ u,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00206}00206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00207}00207\ \ \ \ \ \textcolor{comment}{/*\ 6.\ Inverse\ balance\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00208}00208\ \ \ \ \ tmp\ =\ x;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00209}00209\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ ilo;\ i\ <=\ ihi;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i].r\ *=\ scale[i];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i].i\ *=\ scale[i];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00213}00213\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00214}00214\ \ \ \ \ \ \ \ \ tmp\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00215}00215\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00216}00216\ \ \ \ \ tmp\ =\ x\ +\ n1\ *\ (size\_t)\ ilo;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ilo;\ j\ <=\ ihi;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00218}00218\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i].r\ /=\ scale[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i].i\ /=\ scale[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00221}00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00222}00222\ \ \ \ \ \ \ \ \ tmp\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00223}00223\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00224}00224\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ilo\ -\/\ 1;\ j\ >=\ 0;\ -\/-\/j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00225}00225\ \ \ \ \ \ \ \ \ i\ =\ (int)\ scale[j]\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2}}(n1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ i,\ 1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ j,\ 1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2}}(n1,\ x\ +\ i,\ n1,\ x\ +\ j,\ n1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00229}00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00231}00231\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ihi\ +\ 1;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00232}00232\ \ \ \ \ \ \ \ \ i\ =\ (int)\ scale[j]\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2}}(n1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ i,\ 1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ j,\ 1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2}}(n1,\ x\ +\ i,\ n1,\ x\ +\ j,\ n1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00236}00236\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00237}00237\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00238}00238\ \ \ \ \ \textcolor{comment}{/*\ 7.\ Inverse\ shift\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00239}00239\ \textcolor{preprocessor}{\#define\ asC(x)\ ((double\ \_Complex\ *)\ \&(x))[0]}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00240}00240\ \textcolor{preprocessor}{\#define\ asR(x)\ ((\ \ \ \ \ \ \ Rcomplex\ *)\ \&(x))[0]}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00241}00241\ \ \ \ \ Rcomplex\ x\_\_\_;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00242}00242\ \ \ \ \ \textcolor{keywordtype}{double}\ \_Complex\ z\ =\ cexp(\mbox{\hyperlink{expm_8c_a96789029538f4deea8b3a34e52e4a2b0}{asC}}(trace));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00243}00243\ \ \ \ \ trace\ =\ \mbox{\hyperlink{expm_8c_a4deb5f6064f69a8368421e065cb4cd18}{asR}}(z);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00245}00245\ \ \ \ \ \ \ \ \ x\_\_\_\ =\ x[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00246}00246\ \ \ \ \ \ \ \ \ x[k].r\ =\ x\_\_\_.r\ *\ trace.r\ -\/\ x\_\_\_.i\ *\ trace.i;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00247}00247\ \ \ \ \ \ \ \ \ x[k].i\ =\ x\_\_\_.r\ *\ trace.i\ +\ x\_\_\_.i\ *\ trace.r;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00248}00248\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00250}00250\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00252}00252\ \ \ \ \ \textcolor{keywordtype}{double}\ *a\ =\ REAL(x0),\ *x\ =\ REAL(x1),\ *work,\ *tmp,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00253}00253\ \ \ \ \ \ \ \ \ zero\ =\ 0.0,\ unit\ =\ 1.0,\ trace\ =\ zero;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00254}00254\ \ \ \ \ memcpy(x,\ a,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00255}00255\ \ \ \ \ \textcolor{comment}{/*\ 1.\ Shift\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00256}00256\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00257}00257\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00258}00258\ \ \ \ \ \ \ \ \ trace\ +=\ x[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00259}00259\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00260}00260\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00261}00261\ \ \ \ \ trace\ /=\ (double)\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00262}00262\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00263}00263\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00264}00264\ \ \ \ \ \ \ \ \ x[k]\ -\/=\ trace;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00265}00265\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00266}00266\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00267}00267\ \ \ \ \ \textcolor{comment}{/*\ 2.\ Balance\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00268}00268\ \ \ \ \ F77\_CALL(dgebal)(\textcolor{stringliteral}{"{}B"{}},\ \&n,\ x,\ \&n,\ \&ilo,\ \&ihi,\ scale,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00269}00269\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}{ERROR\_LAPACK\_1}}(dgebal,\ info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00270}00270\ \ \ \ \ ilo\ -\/=\ 1;\ ihi\ -\/=\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00271}00271\ \ \ \ \ \textcolor{comment}{/*\ 3.\ Scale\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00272}00272\ \ \ \ \ norm\ =\ F77\_CALL(dlange)(\textcolor{stringliteral}{"{}O"{}},\ \&n,\ \&n,\ x,\ \&n,\ (\textcolor{keywordtype}{double}\ *)\ 0\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00273}00273\ \ \ \ \ \textcolor{keywordflow}{if}\ (!R\_FINITE(norm))}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00274}00274\ \ \ \ \ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}matrix\ one-\/norm\ is\ not\ finite"{}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00275}00275\ \ \ \ \ s\ =\ (norm\ <=\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[4])\ ?\ 0\ :\ (int)\ ceil(log2(norm\ /\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[4]));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00276}00276\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00277}00277\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ e\ =\ ldexp(1.0,\ -\/s);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ x[k]\ *=\ e;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00280}00280\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00281}00281\ \ \ \ \ \textcolor{comment}{/*\ 4.\ Pade\ approximation\ */}\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00282}00282\ \ \ \ \ \textcolor{keywordflow}{for}\ (l\ =\ 0;\ l\ <\ 4;\ ++l)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (norm\ <=\ \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}}[l])}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00285}00285\ \ \ \ \ b\ =\ \&\mbox{\hyperlink{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}{padecm}}[l][0];\ \textcolor{comment}{/*\ Pade\ coefficients\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00286}00286\ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc(nn\ *\ 2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00287}00287\ \ \ \ \ \textcolor{keywordtype}{double}\ *u\ =\ work,\ *v\ =\ u\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00288}00288\ \ \ \ \ memset(u,\ 0,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn\ *\ 2);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00289}00289\ \ \ \ \ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00290}00290\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00291}00291\ \ \ \ \ \ \ \ \ u[k]\ =\ b[1];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00292}00292\ \ \ \ \ \ \ \ \ v[k]\ =\ b[0];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00293}00293\ \ \ \ \ \ \ \ \ k\ +=\ dk;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00294}00294\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00295}00295\ \ \ \ \ \textcolor{keywordflow}{if}\ (l\ <\ 4)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Pade\ approximant\ of\ degree\ 3,\ 5,\ 7,\ or\ 9\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00297}00297\ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00298}00298\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((l\ >\ 0)\ ?\ nn\ *\ 3\ :\ nn,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00299}00299\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *a2\ =\ work,\ *a2m\ =\ work\ +\ nn,\ *a2m2\ =\ a2m\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00300}00300\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00302}00302\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ u[k]\ +=\ b[1]\ *\ a2[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ v[k]\ +=\ b[0]\ *\ a2[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00305}00305\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00306}00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (l\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(a2m,\ a2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ l;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a2m,\ \&n,\ \&zero,\ a2m2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u[k]\ +=\ b[1]\ *\ a2m2[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[k]\ +=\ b[0]\ *\ a2m2[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ a2m2;\ a2m2\ =\ a2m;\ a2m\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00319}00319\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00320}00320\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00322}00322\ \ \ \ \ \ \ \ \ memcpy(u,\ a2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00323}00323\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00324}00324\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Pade\ approximant\ of\ degree\ 13\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00325}00325\ \ \ \ \ \ \ \ \ work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc(nn\ *\ 5,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *a2\ =\ work,\ *a4\ =\ a2\ +\ nn,\ *a6\ =\ a4\ +\ nn,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ *upart\ =\ a6\ +\ nn,\ *vpart\ =\ upart\ +\ nn;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00328}00328\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x\ ,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x\ ,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00330}00330\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a2,\ \&n,\ \&zero,\ a4,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00332}00332\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a2,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a4,\ \&n,\ \&zero,\ a6,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ u[k]\ +=\ b[3]\ *\ a2[k]\ +\ b[5]\ *\ a4[k]\ +\ b[7]\ *\ a6[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ v[k]\ +=\ b[2]\ *\ a2[k]\ +\ b[4]\ *\ a4[k]\ +\ b[6]\ *\ a6[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ upart[k]\ =\ b[9]\ *\ a2[k]\ +\ b[11]\ *\ a4[k]\ +\ b[13]\ *\ a6[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ vpart[k]\ =\ b[8]\ *\ a2[k]\ +\ b[10]\ *\ a4[k]\ +\ b[12]\ *\ a6[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00339}00339\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00340}00340\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a6,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ upart,\ \&n,\ \&unit,\ u,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00342}00342\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ a6,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vpart,\ \&n,\ \&unit,\ v,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00344}00344\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ x,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ a2,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00346}00346\ \ \ \ \ \ \ \ \ memcpy(u,\ a2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00347}00347\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00348}00348\ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00349}00349\ \ \ \ \ \ \ \ \ x[k]\ =\ \ u[k]\ +\ v[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00350}00350\ \ \ \ \ \ \ \ \ u[k]\ =\ -\/u[k]\ +\ v[k];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00351}00351\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00352}00352\ \ \ \ \ F77\_CALL(dgetrf)(\&n,\ \&n,\ u,\ \&n,\ pivot,\ \&info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00353}00353\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\_LAPACK\_2}}(dgetrf,\ info,\ 2,\ U);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00354}00354\ \ \ \ \ F77\_CALL(dgetrs)(\textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ u,\ \&n,\ pivot,\ x,\ \&n,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}{ERROR\_LAPACK\_1}}(dgetrs,\ info);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00356}00356\ \ \ \ \ \textcolor{comment}{/*\ 5.\ Square\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00357}00357\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00358}00358\ \ \ \ \ \ \ \ \ u\ =\ x;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00359}00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ s;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}N"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ u,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u,\ \&n,\ \&zero,\ v,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ v;\ v\ =\ u;\ u\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00363}00363\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ \%\ 2)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(x,\ u,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ nn);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00366}00366\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00367}00367\ \ \ \ \ \textcolor{comment}{/*\ 6.\ Inverse\ balance\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00368}00368\ \ \ \ \ tmp\ =\ x;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00369}00369\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00370}00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ ilo;\ i\ <=\ ihi;\ ++i)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i]\ *=\ scale[i];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00372}00372\ \ \ \ \ \ \ \ \ tmp\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00374}00374\ \ \ \ \ tmp\ =\ x\ +\ n1\ *\ (size\_t)\ ilo;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00375}00375\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ilo;\ j\ <=\ ihi;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00376}00376\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ tmp[i]\ /=\ scale[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00378}00378\ \ \ \ \ \ \ \ \ tmp\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00379}00379\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00380}00380\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ilo\ -\/\ 1;\ j\ >=\ 0;\ -\/-\/j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00381}00381\ \ \ \ \ \ \ \ \ i\ =\ (int)\ scale[j]\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2}}(n1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ i,\ 1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ j,\ 1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2}}(n1,\ x\ +\ i,\ n1,\ x\ +\ j,\ n1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00385}00385\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00386}00386\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00387}00387\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ ihi\ +\ 1;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00388}00388\ \ \ \ \ \ \ \ \ i\ =\ (int)\ scale[j]\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00389}00389\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2}}(n1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ i,\ 1,\ x\ +\ n1\ *\ (\textcolor{keywordtype}{size\_t})\ j,\ 1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2}}(n1,\ x\ +\ i,\ n1,\ x\ +\ j,\ n1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00392}00392\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00393}00393\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00394}00394\ \ \ \ \ \textcolor{comment}{/*\ 7.\ Inverse\ shift\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00395}00395\ \ \ \ \ trace\ =\ exp(trace);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00396}00396\ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nn;\ ++k)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00397}00397\ \ \ \ \ \ \ \ \ x[k]\ *=\ trace;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00399}00399\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00401}00401\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00402}00402\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x1,\ x0\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00404}00404\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00406}00406\ \ \ \ \ \textcolor{comment}{/*\ Use\ the\ Schur\ factorization\ as\ the\ argument\ is\ Hermitian.\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00408}00408\ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{expm_8c_a838e05c88a50f2908ab573fdb099cf00}{dense\_schur}}(obj,\ \textcolor{keyword}{class},\ 2,\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00409}00409\ \ \ \ \ SEXP\ vectors\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_af3f5567020e46e1e8dc3bed44fc8c74e}{Matrix\_vectorsSym}})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00410}00410\ \ \ \ \ \ \ \ \ values\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a3f68a858ab6539551fc3718c982e15d5}{Matrix\_valuesSym}})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00411}00411\ \ \ \ \ \ \ \ \ x1\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(vectors),\ XLENGTH(vectors)));}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00412}00412\ \ \ \ \ \textcolor{keywordtype}{double}\ *w\ =\ REAL(values);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00413}00413\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n1\ =\ (size\_t)\ n,\ nn\ =\ n1\ *\ n1;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00414}00414\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ j;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00415}00415\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00416}00416\ \ \ \ \ \ \ \ \ w[j]\ =\ exp(w[j]);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00417}00417\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(vectors)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00418}00418\ \ \ \ \ \ \ \ \ Rcomplex\ *qw\ =\ (Rcomplex\ *)\ R\_alloc(nn,\ \textcolor{keyword}{sizeof}(Rcomplex)),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ *q\ =\ COMPLEX(vectors),\ *x\ =\ COMPLEX(x1),\ *tmp\ =\ qw,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ zero\ =\ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}},\ unit\ =\ \mbox{\hyperlink{init_8c_a83c79a44063ff24ef06cca12140e2e3c}{Matrix\_zunit}};}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qw[i].r\ =\ q[i].r\ *\ w[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qw[i].i\ =\ q[i].i\ *\ w[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ qw\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ q\ \ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00428}00428\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00429}00429\ \ \ \ \ \ \ \ \ qw\ =\ tmp;\ q\ =\ COMPLEX(vectors);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00430}00430\ \ \ \ \ \ \ \ \ F77\_CALL(zgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}C"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ qw,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q,\ \&n,\ \&zero,\ x,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00432}00432\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *qw\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc(nn,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})),}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ *q\ =\ REAL(vectors),\ *x\ =\ REAL(x1),\ *tmp\ =\ qw,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ zero\ =\ 0.0,\ unit\ =\ 1.0;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00436}00436\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ qw[i]\ =\ q[i]\ *\ w[j];}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ qw\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ q\ \ +=\ n;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00441}00441\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00442}00442\ \ \ \ \ \ \ \ \ qw\ =\ tmp;\ q\ =\ REAL(vectors);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00443}00443\ \ \ \ \ \ \ \ \ F77\_CALL(dgemm)(\textcolor{stringliteral}{"{}N"{}},\ \textcolor{stringliteral}{"{}C"{}},\ \&n,\ \&n,\ \&n,\ \&unit,\ qw,\ \&n,}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q,\ \&n,\ \&zero,\ x,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00445}00445\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00447}00447\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ x1);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00448}00448\ \ \ \ \ UNPROTECT(3);\ \textcolor{comment}{/*\ x1,\ values,\ vectors\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00449}00449\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00450}00450\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00452}00452\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ obj\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00456}00456\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[1]\ !=\ \textcolor{charliteral}{'g'}\ \&\&\ \textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'p'})\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00457}00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00458}00458\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{expm_8c_a78779016e3e6941b95dd4b54b42b7af6}{dense\_as\_packed}}(ans,\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \ \textcolor{charliteral}{'C'},\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00459}00459\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00460}00460\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{expm_8c_a78779016e3e6941b95dd4b54b42b7af6}{dense\_as\_packed}}(ans,\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \ \textcolor{charliteral}{'N'});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00461}00461\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00462}00462\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ ans\ */}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00463}00463\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00464}00464\ \}}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00466}\mbox{\hyperlink{expm_8c_a79cf8936cd6ac290efba4da5e1788553}{00466}}\ SEXP\ \mbox{\hyperlink{expm_8c_a79cf8936cd6ac290efba4da5e1788553}{R\_dense\_expm}}(SEXP\ s\_obj)}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00467}00467\ \{}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00468}00468\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00469}00469\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{expm_8c_a1b7f313626e435eb0096af2bda38ae7c}{dense\_expm}}(s\_obj,\ \textcolor{keyword}{class});}
+\DoxyCodeLine{\Hypertarget{expm_8c_source_l00470}00470\ \}}
+
+\end{DoxyCode}

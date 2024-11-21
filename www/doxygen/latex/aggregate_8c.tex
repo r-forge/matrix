@@ -1,0 +1,65 @@
+\doxysection{aggregate.\+c File Reference}
+\hypertarget{aggregate_8c}{}\label{aggregate_8c}\index{aggregate.c@{aggregate.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{aggregate_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{aggregate_8c_a5916ad3d7d8a0eaa54641a61805054f3}{sparse\+\_\+aggregate}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{aggregate_8c_a484555b56be56d4076e6f37bfc774215}{R\+\_\+sparse\+\_\+aggregate}} (SEXP s\+\_\+from)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{aggregate_8c_a5c943ec4d393860c44273d898e789156}\index{aggregate.c@{aggregate.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!aggregate.c@{aggregate.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}}
+{\footnotesize\ttfamily \label{aggregate_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{aggregate_8c_a484555b56be56d4076e6f37bfc774215}\index{aggregate.c@{aggregate.c}!R\_sparse\_aggregate@{R\_sparse\_aggregate}}
+\index{R\_sparse\_aggregate@{R\_sparse\_aggregate}!aggregate.c@{aggregate.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_aggregate()}{R\_sparse\_aggregate()}}
+{\footnotesize\ttfamily \label{aggregate_8c_a484555b56be56d4076e6f37bfc774215} 
+SEXP R\+\_\+sparse\+\_\+aggregate (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aggregate_8c_source_l00086}{86}} of file \mbox{\hyperlink{aggregate_8c_source}{aggregate.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{aggregate_8c_a5916ad3d7d8a0eaa54641a61805054f3}\index{aggregate.c@{aggregate.c}!sparse\_aggregate@{sparse\_aggregate}}
+\index{sparse\_aggregate@{sparse\_aggregate}!aggregate.c@{aggregate.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_aggregate()}{sparse\_aggregate()}}
+{\footnotesize\ttfamily \label{aggregate_8c_a5916ad3d7d8a0eaa54641a61805054f3} 
+SEXP sparse\+\_\+aggregate (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aggregate_8c_source_l00005}{5}} of file \mbox{\hyperlink{aggregate_8c_source}{aggregate.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{aggregate_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{aggregate_8c_source_l00086}{R\+\_\+sparse\+\_\+aggregate()}}, \mbox{\hyperlink{bind_8c_source_l00010}{scan\+Args()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{Summary_8c_source_l00659}{sparse\+\_\+prod()}}, \mbox{\hyperlink{Summary_8c_source_l00216}{sparse\+\_\+sum()}}, and \mbox{\hyperlink{colSums_8c_source_l00456}{Tsparse\+\_\+colsum()}}.
+

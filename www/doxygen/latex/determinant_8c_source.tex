@@ -1,0 +1,450 @@
+\doxysection{determinant.\+c}
+\hypertarget{determinant_8c_source}{}\label{determinant_8c_source}\index{determinant.c@{determinant.c}}
+\mbox{\hyperlink{determinant_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00001}00001\ \textcolor{comment}{/*\ C\ implementation\ of\ methods\ for\ determinant\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{cholmod-etc_8h}{cholmod-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <Rmath.h>}\ \textcolor{comment}{/*\ logspace\_add,\ logspace\_sub\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00007}00007\ \textcolor{keyword}{static}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00008}\mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{00008}}\ SEXP\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(\textcolor{keywordtype}{double}\ modulus,\ \textcolor{keywordtype}{int}\ logarithm,\ \textcolor{keywordtype}{int}\ sign)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00010}00010\ \ \ \ \ SEXP\ s\_modulus\ =\ PROTECT(Rf\_ScalarReal((logarithm)\ ?\ modulus\ :\ exp(modulus))),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00011}00011\ \ \ \ \ \ \ \ \ s\_logarithm\ =\ PROTECT(Rf\_ScalarLogical(logarithm)),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00012}00012\ \ \ \ \ \ \ \ \ s\_sign\ =\ PROTECT(Rf\_ScalarInteger(sign)),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ ans\ =\ PROTECT(Rf\_allocVector(VECSXP,\ 2)),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ PROTECT(Rf\_allocVector(STRSXP,\ 1)),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ names\ =\ PROTECT(Rf\_allocVector(STRSXP,\ 2));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00016}00016\ \ \ \ \ SET\_STRING\_ELT(\textcolor{keyword}{class},\ 0,\ Rf\_mkChar(\textcolor{stringliteral}{"{}det"{}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00017}00017\ \ \ \ \ SET\_STRING\_ELT(names,\ 0,\ Rf\_mkChar(\textcolor{stringliteral}{"{}modulus"{}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00018}00018\ \ \ \ \ SET\_STRING\_ELT(names,\ 1,\ Rf\_mkChar(\textcolor{stringliteral}{"{}sign"{}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00019}00019\ \ \ \ \ Rf\_setAttrib(ans,\ R\_ClassSymbol,\ \textcolor{keyword}{class});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00020}00020\ \ \ \ \ Rf\_setAttrib(ans,\ R\_NamesSymbol,\ names);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00021}00021\ \ \ \ \ Rf\_setAttrib(s\_modulus,\ \mbox{\hyperlink{init_8c_a4a0e495253bfd64de0d5bb50f45f5a7b}{Matrix\_logarithmSym}},\ s\_logarithm);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00022}00022\ \ \ \ \ SET\_VECTOR\_ELT(ans,\ 0,\ s\_modulus);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00023}00023\ \ \ \ \ SET\_VECTOR\_ELT(ans,\ 1,\ s\_sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00024}00024\ \ \ \ \ UNPROTECT(6);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00028}\mbox{\hyperlink{determinant_8c_a8fa199c38446b528fa28a54fc5c56ad9}{00028}}\ SEXP\ \mbox{\hyperlink{determinant_8c_a8fa199c38446b528fa28a54fc5c56ad9}{denseLU\_determinant}}(SEXP\ s\_trf,\ SEXP\ s\_logarithm)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00031}00031\ \textcolor{preprocessor}{\#define\ DETERMINANT\_START(\_F\_)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00032}00032\ \textcolor{preprocessor}{\ \ \ \ int\ *pdim\ =\ DIM(\_F\_),\ n\ =\ pdim[1];\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ if\ (pdim[0]\ !=\ n)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00034}00034\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Rf\_error(\_("{}matrix\ is\ not\ square"{}));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ int\ givelog\ =\ Rf\_asLogical(s\_logarithm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ double\ modulus\ =\ 0.0;\ }\textcolor{comment}{/*\ result\ for\ n\ ==\ 0\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00040}00040\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ ?\ NA\_INTEGER\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00044}00044\ \ \ \ \ \textcolor{keywordtype}{int}\ j;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00045}00045\ \ \ \ \ R\_xlen\_t\ n1a\ =\ (R\_xlen\_t)\ n\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(hypot((*px).r,\ (*px).i));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ n1a;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00052}00052\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ SEXP\ pivot\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *ppivot\ =\ INTEGER(pivot);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(*px)\ ||\ *px\ >=\ 0.0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(*px);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*ppivot\ !=\ j\ +\ 1)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/(*px));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*ppivot\ ==\ j\ +\ 1)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ n1a;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ ppivot\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00072}00072\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00076}\mbox{\hyperlink{determinant_8c_abb1e95d3290fb50e5c154996365b9f3c}{00076}}\ SEXP\ \mbox{\hyperlink{determinant_8c_abb1e95d3290fb50e5c154996365b9f3c}{denseBunchKaufman\_determinant}}(SEXP\ s\_trf,\ SEXP\ s\_logarithm)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00077}00077\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00080}00080\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00081}00081\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00083}00083\ \ \ \ \ \textcolor{keywordtype}{char}\ ct\ =\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ ?\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(s\_trf)\ :\ \textcolor{charliteral}{'C'};}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ !=\ \textcolor{charliteral}{'C'})}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ sign\ =\ NA\_INTEGER;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00087}00087\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00088}00088\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00090}00090\ \ \ \ \ SEXP\ pivot\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00091}00091\ \ \ \ \ \textcolor{keywordtype}{int}\ *ppivot\ =\ INTEGER(pivot);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00093}00093\ \ \ \ \ \textcolor{keywordtype}{int}\ j\ =\ 0,\ packed\ =\ XLENGTH(x)\ !=\ (int\_fast64\_t)\ n\ *\ n;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00094}00094\ \ \ \ \ R\_xlen\_t\ n1a\ =\ (R\_xlen\_t)\ n\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00095}00095\ \ \ \ \ \textcolor{keywordtype}{double}\ logab,\ logcc;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x),\ a,\ b,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}};}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (j\ <\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ a\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ppivot[j]\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ !=\ \textcolor{charliteral}{'C'})}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(hypot(a.r,\ a.i));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ISNAN(a.r)\ ||\ a.r\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(a.r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/a.r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ ((ul\ ==\ \textcolor{charliteral}{'U'})\ ?\ j\ +\ 2\ :\ n\ -\/\ j);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ ==\ \textcolor{charliteral}{'U'})\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ j\ +\ 2;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ =\ *(px\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ j\ +\ 3;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ =\ *(px\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ n\ -\/\ j;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ n\ -\/\ j\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ct\ !=\ \textcolor{charliteral}{'C'})}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(hypot(a.r\ *\ b.r\ -\/\ a.i\ *\ b.i\ -\/}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.r\ *\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.r\ +\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.i\ *\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.i,}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a.r\ *\ b.i\ +\ a.i\ *\ b.r\ -\/}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2.0\ *\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.r\ *\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.i));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ logab\ =\ log(fabs(a.r))\ +\ log(fabs(b.r));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ logcc\ =\ 2.0\ *\ log(hypot(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.r,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.i));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((a.r\ <\ 0.0)\ !=\ (b.r\ <\ 0.0))\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ =\ -\/(abs(ab)\ +\ cc)\ <\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_add(logab,\ logcc);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (logab\ <\ logcc)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ =\ -\/(cc\ -\/\ ab)\ <\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_sub(logcc,\ logab);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ >\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_sub(logab,\ logcc);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00147}00147\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x),\ a,\ b,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}};}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (j\ <\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ a\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ppivot[j]\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*px\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(a);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/a);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ ((ul\ ==\ \textcolor{charliteral}{'U'})\ ?\ j\ +\ 2\ :\ n\ -\/\ j);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ ==\ \textcolor{charliteral}{'U'})\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ j\ +\ 2;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ =\ *(px\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ j\ +\ 3;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ =\ *(px\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ n\ -\/\ j;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ *px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ n\ -\/\ j\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ logab\ =\ log(fabs(a))\ +\ log(fabs(b));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ logcc\ =\ 2.0\ *\ log(fabs(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((a\ <\ 0.0)\ !=\ (b\ <\ 0.0))\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ =\ -\/(abs(ab)\ +\ cc)\ <\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_add(logab,\ logcc);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (logab\ <\ logcc)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ =\ -\/(cc\ -\/\ ab)\ <\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_sub(logcc,\ logab);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ det\ =\ ab\ -\/\ cc\ >\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ Rf\_logspace\_sub(logab,\ logcc);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00188}00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00189}00189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00190}00190\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00192}00192\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00193}00193\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00194}00194\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00196}\mbox{\hyperlink{determinant_8c_a3055c2c0a4008e50ef75db756cdf7179}{00196}}\ SEXP\ \mbox{\hyperlink{determinant_8c_a3055c2c0a4008e50ef75db756cdf7179}{denseCholesky\_determinant}}(SEXP\ s\_trf,\ SEXP\ s\_logarithm)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00197}00197\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00198}00198\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00200}00200\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00201}00201\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00203}00203\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00204}00204\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00206}00206\ \ \ \ \ \textcolor{keywordtype}{int}\ j,\ packed\ =\ XLENGTH(x)\ !=\ (int\_fast64\_t)\ n\ *\ n;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00207}00207\ \ \ \ \ R\_xlen\_t\ n1a\ =\ (R\_xlen\_t)\ n\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00208}00208\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00209}00209\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log((*px).r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ ((ul\ ==\ \textcolor{charliteral}{'U'})\ ?\ j\ +\ 2\ :\ n\ -\/\ j);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00213}00213\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00214}00214\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00215}00215\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(*px);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ (!packed)\ ?\ n1a\ :\ ((ul\ ==\ \textcolor{charliteral}{'U'})\ ?\ j\ +\ 2\ :\ n\ -\/\ j);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00220}00220\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00221}00221\ \ \ \ \ modulus\ *=\ 2.0;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00222}00222\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00224}00224\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00225}00225\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00226}00226\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00228}\mbox{\hyperlink{determinant_8c_ac389e7594c4fce57c8eae674faa4d7c7}{00228}}\ SEXP\ \mbox{\hyperlink{determinant_8c_ac389e7594c4fce57c8eae674faa4d7c7}{sparseQR\_determinant}}(SEXP\ orf,\ SEXP\ s\_logarithm)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00229}00229\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00230}00230\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(orf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00232}00232\ \ \ \ \ SEXP\ R\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(orf,\ \mbox{\hyperlink{init_8c_a83e2c364ecd0a12a9812564b234399e9}{Matrix\_RSym}})),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00233}00233\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(R,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00234}00234\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00236}00236\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(R)[0]\ >\ n)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00237}00237\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}\%s(<\%s>)\ does\ not\ support\ structurally\ rank\ deficient\ case"{}}),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}determinant"{}},\ \textcolor{stringliteral}{"{}sparseQR"{}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00240}00240\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00241}00241\ \ \ \ \ SEXP\ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(R,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00242}00242\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(R,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00243}00243\ \ \ \ \ \textcolor{keywordtype}{int}\ *pp\ =\ INTEGER(p)\ +\ 1,\ *pi\ =\ INTEGER(i),\ j,\ k,\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00245}00245\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00246}00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[kend\ -\/\ 1]\ ==\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(px[kend\ -\/\ 1].r)\ ||\ px[kend\ -\/\ 1].r\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[kend\ -\/\ 1].r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/px[kend\ -\/\ 1].r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(4);\ \textcolor{comment}{/*\ i,\ p,\ x,\ R\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NegInf,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00260}00260\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00261}00261\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00262}00262\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[kend\ -\/\ 1]\ ==\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(px[kend\ -\/\ 1])\ ||\ px[kend\ -\/\ 1]\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[kend\ -\/\ 1]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/px[kend\ -\/\ 1]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(4);\ \textcolor{comment}{/*\ i,\ p,\ x,\ R\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NegInf,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00277}00277\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00279}00279\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ i,\ p\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00281}00281\ \ \ \ \ \textcolor{comment}{/*\ defined\ in\ ./perm.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00282}00282\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *,\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00284}00284\ \ \ \ \ p\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(orf,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00285}00285\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(INTEGER(p),\ LENGTH(p),\ 0)\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00286}00286\ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00287}00287\ \ \ \ \ p\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(orf,\ \mbox{\hyperlink{init_8c_ad586fdbea11a9c3622770727ba1302b4}{Matrix\_qSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00288}00288\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(INTEGER(p),\ LENGTH(p),\ 0)\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00289}00289\ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00290}00290\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ \%\ 2)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00291}00291\ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00292}00292\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00294}00294\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x,\ R\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00295}00295\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00296}00296\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00298}\mbox{\hyperlink{determinant_8c_a749798540ca84a964e824adc0c3bb859}{00298}}\ SEXP\ \mbox{\hyperlink{determinant_8c_a749798540ca84a964e824adc0c3bb859}{sparseLU\_determinant}}(SEXP\ s\_trf,\ SEXP\ s\_logarithm)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00299}00299\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00300}00300\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00302}00302\ \ \ \ \ SEXP\ U\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_aeb964248a8c8272cc7e9b06ee383c264}{Matrix\_USym}})),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00303}00303\ \ \ \ \ \ \ \ \ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(U,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00304}00304\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ ?\ NA\_INTEGER\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00306}00306\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00307}00307\ \ \ \ \ SEXP\ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(U,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00308}00308\ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(U,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00309}00309\ \ \ \ \ \textcolor{keywordtype}{int}\ *pp\ =\ INTEGER(p)\ +\ 1,\ *pi\ =\ INTEGER(i),\ j,\ k,\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00310}00310\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00311}00311\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00312}00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[kend\ -\/\ 1]\ ==\ j)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(hypot(px[kend\ -\/\ 1].r,\ px[kend\ -\/\ 1].i));}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(4);\ \textcolor{comment}{/*\ i,\ p,\ x,\ U\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NegInf,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00321}00321\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00322}00322\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00323}00323\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00324}00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[kend\ -\/\ 1]\ ==\ j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(px[kend\ -\/\ 1])\ ||\ px[kend\ -\/\ 1]\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[kend\ -\/\ 1]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/px[kend\ -\/\ 1]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(4);\ \textcolor{comment}{/*\ i,\ p,\ x,\ U\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NegInf,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00338}00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00339}00339\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00340}00340\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ i,\ p\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00342}00342\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ !=\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00343}00343\ \ \ \ \ \textcolor{comment}{/*\ defined\ in\ ./perm.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00344}00344\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *,\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00346}00346\ \ \ \ \ p\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00347}00347\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(INTEGER(p),\ LENGTH(p),\ 0)\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00348}00348\ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00349}00349\ \ \ \ \ p\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(s\_trf,\ \mbox{\hyperlink{init_8c_ad586fdbea11a9c3622770727ba1302b4}{Matrix\_qSym}});}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00350}00350\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(INTEGER(p),\ LENGTH(p),\ 0)\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00351}00351\ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00352}00352\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00353}00353\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00355}00355\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ x,\ U\ */}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00356}00356\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00357}00357\ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00359}\mbox{\hyperlink{determinant_8c_a280b1145a3fca15d05570239508fbf3d}{00359}}\ SEXP\ \mbox{\hyperlink{determinant_8c_a280b1145a3fca15d05570239508fbf3d}{sparseCholesky\_determinant}}(SEXP\ s\_trf,\ SEXP\ s\_logarithm,\ SEXP\ s\_root)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00360}00360\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00361}00361\ \ \ \ \ \mbox{\hyperlink{determinant_8c_a8896417d94e0c47a11f9fa4d71fa8ec8}{DETERMINANT\_START}}(s\_trf);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00363}00363\ \ \ \ \ cholmod\_factor\ *L\ =\ \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2CHF}}(s\_trf,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00364}00364\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00366}00366\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00367}00367\ \ \ \ \ \textcolor{keywordtype}{int}\ j,\ root\ =\ Rf\_asLogical(s\_root);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00368}00368\ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>is\_super)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00369}00369\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ k,\ nc,}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ nsuper\ =\ (int)\ L-\/>nsuper,}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ *psuper\ =\ (\textcolor{keywordtype}{int}\ *)\ L-\/>super,}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ *ppi\ =\ (\textcolor{keywordtype}{int}\ *)\ L-\/>pi,}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ *ppx\ =\ (\textcolor{keywordtype}{int}\ *)\ L-\/>px;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00374}00374\ \ \ \ \ \ \ \ \ R\_xlen\_t\ nr1a;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>xtype\ ==\ CHOLMOD\_COMPLEX)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ (Rcomplex\ *)\ L-\/>x,\ *py;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nsuper;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nc\ =\ psuper[k\ +\ 1]\ -\/\ psuper[k];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nr1a\ =\ (R\_xlen\_t)\ (ppi[k\ +\ 1]\ -\/\ ppi[k])\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py\ =\ px\ +\ ppx[k];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ nc;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log((*py).r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py\ +=\ nr1a;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00386}00386\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ (\textcolor{keywordtype}{double}\ *)\ L-\/>x,\ *py;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (k\ =\ 0;\ k\ <\ nsuper;\ ++k)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nc\ =\ psuper[k\ +\ 1]\ -\/\ psuper[k];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nr1a\ =\ (R\_xlen\_t)\ (ppi[k\ +\ 1]\ -\/\ ppi[k])\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py\ =\ px\ +\ ppx[k];}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ nc;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(*py);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py\ +=\ nr1a;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00397}00397\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00398}00398\ \ \ \ \ \ \ \ \ modulus\ *=\ 2.0;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00399}00399\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *pp\ =\ (\textcolor{keywordtype}{int}\ *)\ L-\/>p;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00401}00401\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>xtype\ ==\ CHOLMOD\_COMPLEX)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ (Rcomplex\ *)\ L-\/>x;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>is\_ll)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[pp[j]].r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ *=\ 2.0;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(px[pp[j]].r)\ ||\ px[pp[j]].r\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[pp[j]].r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (root)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NaN,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/px[pp[j]].r);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00419}00419\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ (\textcolor{keywordtype}{double}\ *)\ L-\/>x;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (L-\/>is\_ll)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[pp[j]]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ *=\ 2.0;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(px[pp[j]])\ ||\ px[pp[j]]\ >=\ 0.0)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(px[pp[j]]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (root)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(R\_NaN,\ givelog,\ 1);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modulus\ +=\ log(-\/px[pp[j]]);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00437}00437\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00438}00438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00439}00439\ \ \ \ \ \textcolor{keywordflow}{if}\ (root)}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00440}00440\ \ \ \ \ \ \ \ \ modulus\ *=\ 0.5;}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00441}00441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00443}00443\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{determinant_8c_aba585313ae01376d066009b349b2fb68}{det}}(modulus,\ givelog,\ sign);}
+\DoxyCodeLine{\Hypertarget{determinant_8c_source_l00444}00444\ \}}
+
+\end{DoxyCode}

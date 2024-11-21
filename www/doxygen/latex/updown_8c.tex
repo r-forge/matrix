@@ -1,0 +1,74 @@
+\doxysection{updown.\+c File Reference}
+\hypertarget{updown_8c}{}\label{updown_8c}\index{updown.c@{updown.c}}
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{updown_8c_a7ebf04fed94610de8546f733d4de1858}{UPDOWN\+\_\+\+FINISH}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{updown_8c_a1bc958fc6a9080d194a097690e0ca715}{sparse\+Cholesky\+\_\+updown}} (SEXP s\+\_\+trf, SEXP s\+\_\+obj, SEXP s\+\_\+update)
+\item 
+SEXP \mbox{\hyperlink{updown_8c_ac006b65742ae3d3b58d5b9e787ff7b7b}{sparse\+Cholesky\+\_\+update}} (SEXP s\+\_\+trf, SEXP s\+\_\+obj, SEXP s\+\_\+beta)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{updown_8c_a7ebf04fed94610de8546f733d4de1858}\index{updown.c@{updown.c}!UPDOWN\_FINISH@{UPDOWN\_FINISH}}
+\index{UPDOWN\_FINISH@{UPDOWN\_FINISH}!updown.c@{updown.c}}
+\doxysubsubsection{\texorpdfstring{UPDOWN\_FINISH}{UPDOWN\_FINISH}}
+{\footnotesize\ttfamily \label{updown_8c_a7ebf04fed94610de8546f733d4de1858} 
+\#define UPDOWN\+\_\+\+FINISH}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ dimnames\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(s\_trf,\ 0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ PROTECT(s\_trf\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9}{CHF2M}}(L,\ 1));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cholmod\_free\_factor(\&L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_trf)\ ==\ CHARSXP)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}\%s"{}},\ CHAR(s\_trf));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_DIMNAMES(s\_trf,\ 0,\ dimnames);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(2);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{updown_8c_source_l00030}{sparse\+Cholesky\+\_\+update()}}, and \mbox{\hyperlink{updown_8c_source_l00007}{sparse\+Cholesky\+\_\+updown()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{updown_8c_ac006b65742ae3d3b58d5b9e787ff7b7b}\index{updown.c@{updown.c}!sparseCholesky\_update@{sparseCholesky\_update}}
+\index{sparseCholesky\_update@{sparseCholesky\_update}!updown.c@{updown.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_update()}{sparseCholesky\_update()}}
+{\footnotesize\ttfamily \label{updown_8c_ac006b65742ae3d3b58d5b9e787ff7b7b} 
+SEXP sparse\+Cholesky\+\_\+update (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+beta}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{updown_8c_source_l00030}{30}} of file \mbox{\hyperlink{updown_8c_source}{updown.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{objects_8c_source_l00146}{Matrix\+\_\+shape()}}, \mbox{\hyperlink{updown_8c_a7ebf04fed94610de8546f733d4de1858}{UPDOWN\+\_\+\+FINISH}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{updown_8c_a1bc958fc6a9080d194a097690e0ca715}\index{updown.c@{updown.c}!sparseCholesky\_updown@{sparseCholesky\_updown}}
+\index{sparseCholesky\_updown@{sparseCholesky\_updown}!updown.c@{updown.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_updown()}{sparseCholesky\_updown()}}
+{\footnotesize\ttfamily \label{updown_8c_a1bc958fc6a9080d194a097690e0ca715} 
+SEXP sparse\+Cholesky\+\_\+updown (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+update}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{updown_8c_source_l00007}{7}} of file \mbox{\hyperlink{updown_8c_source}{updown.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, and \mbox{\hyperlink{updown_8c_a7ebf04fed94610de8546f733d4de1858}{UPDOWN\+\_\+\+FINISH}}.
+

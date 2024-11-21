@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['valid_5fdense_0',['VALID_DENSE',['../Mdefines_8h.html#a2453fa4ee6e6093eb045822cf12482c3',1,'Mdefines.h']]],
+  ['valid_5fdiag_1',['VALID_DIAG',['../Mdefines_8h.html#ad68a74228ba74fbe00ed1311c0148490',1,'Mdefines.h']]],
+  ['valid_5fdiagonal_2',['VALID_DIAGONAL',['../Mdefines_8h.html#a7a40ad54440d757a8d3bf1643e82c623',1,'Mdefines.h']]],
+  ['valid_5findex_3',['VALID_INDEX',['../Mdefines_8h.html#ae02d348af0f67411c61191d49d52c2b0',1,'Mdefines.h']]],
+  ['valid_5fkind_4',['VALID_KIND',['../Mdefines_8h.html#a4a89b587e4bdcac4c1c49a7781300aca',1,'Mdefines.h']]],
+  ['valid_5flogic2_5',['VALID_LOGIC2',['../Mdefines_8h.html#af2c97a732548aa3a1a2062de2b72fe2e',1,'Mdefines.h']]],
+  ['valid_5flogic3_6',['VALID_LOGIC3',['../Mdefines_8h.html#a2ddb7d37357dd9d02777de7845a84806',1,'Mdefines.h']]],
+  ['valid_5fmargin_7',['VALID_MARGIN',['../Mdefines_8h.html#afb636f384dfe7e26245cf417f2cc8944',1,'Mdefines.h']]],
+  ['valid_5fmatrix_8',['VALID_MATRIX',['../Mdefines_8h.html#ae1d68aea00bdb53f6ca548c9c063f022',1,'Mdefines.h']]],
+  ['valid_5fmatrix_5for_5fvector_9',['VALID_MATRIX_OR_VECTOR',['../Mdefines_8h.html#a04186bdb8acc14cc2beb892c1a02cc29',1,'Mdefines.h']]],
+  ['valid_5frepr_10',['VALID_REPR',['../Mdefines_8h.html#a853ac627bd25c16707018fc39ae9bfba',1,'Mdefines.h']]],
+  ['valid_5fshape_11',['VALID_SHAPE',['../Mdefines_8h.html#a48e302c209eedb3b0533918e2cd748e7',1,'Mdefines.h']]],
+  ['valid_5fsparse_12',['VALID_SPARSE',['../Mdefines_8h.html#a2f50ad262b583a4b997749536ac64fb7',1,'Mdefines.h']]],
+  ['valid_5fsparse_5fcompressed_13',['VALID_SPARSE_COMPRESSED',['../Mdefines_8h.html#a2fb3abf1b237615044f5e80f8b7c33a4',1,'Mdefines.h']]],
+  ['valid_5fsparse_5ftriplet_14',['VALID_SPARSE_TRIPLET',['../Mdefines_8h.html#afe56c272ab70257a8f517f9de1f1c314',1,'Mdefines.h']]],
+  ['valid_5ftrans_15',['VALID_TRANS',['../Mdefines_8h.html#ab7d0465c740527510af45c7e62a7fa35',1,'Mdefines.h']]],
+  ['valid_5fuplo_16',['VALID_UPLO',['../Mdefines_8h.html#a4ff01bcfac826370356a63ee5a5971ed',1,'Mdefines.h']]],
+  ['valid_5fvector_17',['VALID_VECTOR',['../Mdefines_8h.html#ad9ddef2aba7ca759334b235ad5d080cc',1,'Mdefines.h']]]
+];

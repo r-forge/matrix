@@ -1,0 +1,174 @@
+\doxysection{skewpart.\+c File Reference}
+\hypertarget{skewpart_8c}{}\label{skewpart_8c}\index{skewpart.c@{skewpart.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{skewpart_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{skewpart_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{skewpart_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_a7f1b3376bbd12ac57f8c35fe8000de60}{sparse\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char)
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_a81744bf18742db42390759b81c46f4b3}{dense\+\_\+skewpart}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ct)
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_a82cc141342d61a2c30cdef5f23530786}{sparse\+\_\+skewpart}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, char op\+\_\+ct)
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_ada3de09233c484de2df826e308ad3d6b}{R\+\_\+dense\+\_\+skewpart}} (SEXP s\+\_\+from, SEXP s\+\_\+trans)
+\item 
+SEXP \mbox{\hyperlink{skewpart_8c_a5c2eadcd71f9912f7bbbbb0a5026b81f}{R\+\_\+sparse\+\_\+skewpart}} (SEXP s\+\_\+from, SEXP s\+\_\+trans)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{skewpart_8c_a5c943ec4d393860c44273d898e789156}\index{skewpart.c@{skewpart.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{skewpart_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, and \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}.
+
+\Hypertarget{skewpart_8c_a5c943ec4d393860c44273d898e789156}\index{skewpart.c@{skewpart.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{skewpart_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{skewpart_8c_a5c943ec4d393860c44273d898e789156}\index{skewpart.c@{skewpart.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{skewpart_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px0\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x0),\ *px1\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ nnz0;\ ++k)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*pi0\ !=\ *pj0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *pi1\ =\ *pi0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *pj1\ =\ *pj0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_IDEN(*px1,\ *px0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#MULTIPLY(*px1,\ \ 0.5);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++pi1;\ ++pj1;\ ++px1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *pi1\ =\ *pj0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *pj1\ =\ *pi0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (op\_ct\ ==\ \textcolor{charliteral}{'C'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ASSIGN\_CONJ(*px1,\ *px0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\#\#ASSIGN\_IDEN(*px1,\ *px0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#MULTIPLY(*px1,\ -\/0.5);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++pi1;\ ++pj1;\ ++px1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++pi0;\ ++pj0;\ ++px0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{skewpart_8c_af80c19f69e49b1c83bc823de660d30d8}\index{skewpart.c@{skewpart.c}!dense\_as\_kind@{dense\_as\_kind}}
+\index{dense\_as\_kind@{dense\_as\_kind}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_kind()}{dense\_as\_kind()}}
+{\footnotesize\ttfamily \label{skewpart_8c_af80c19f69e49b1c83bc823de660d30d8} 
+SEXP dense\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02000}{2000}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}.
+
+\Hypertarget{skewpart_8c_a81744bf18742db42390759b81c46f4b3}\index{skewpart.c@{skewpart.c}!dense\_skewpart@{dense\_skewpart}}
+\index{dense\_skewpart@{dense\_skewpart}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{dense\_skewpart()}{dense\_skewpart()}}
+{\footnotesize\ttfamily \label{skewpart_8c_a81744bf18742db42390759b81c46f4b3} 
+SEXP dense\+\_\+skewpart (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{skewpart_8c_source_l00011}{11}} of file \mbox{\hyperlink{skewpart_8c_source}{skewpart.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils_8c_source_l00069}{alloc\+Zero()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00291}{SWITCH2}}, \mbox{\hyperlink{skewpart_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01287}{zvimag()}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00482}{R\+\_\+dense\+\_\+skewpart()}}.
+
+\Hypertarget{skewpart_8c_ada3de09233c484de2df826e308ad3d6b}\index{skewpart.c@{skewpart.c}!R\_dense\_skewpart@{R\_dense\_skewpart}}
+\index{R\_dense\_skewpart@{R\_dense\_skewpart}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_skewpart()}{R\_dense\_skewpart()}}
+{\footnotesize\ttfamily \label{skewpart_8c_ada3de09233c484de2df826e308ad3d6b} 
+SEXP R\+\_\+dense\+\_\+skewpart (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{skewpart_8c_source_l00482}{482}} of file \mbox{\hyperlink{skewpart_8c_source}{skewpart.\+c}}.
+
+
+
+References \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}.
+
+\Hypertarget{skewpart_8c_a5c2eadcd71f9912f7bbbbb0a5026b81f}\index{skewpart.c@{skewpart.c}!R\_sparse\_skewpart@{R\_sparse\_skewpart}}
+\index{R\_sparse\_skewpart@{R\_sparse\_skewpart}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_skewpart()}{R\_sparse\_skewpart()}}
+{\footnotesize\ttfamily \label{skewpart_8c_a5c2eadcd71f9912f7bbbbb0a5026b81f} 
+SEXP R\+\_\+sparse\+\_\+skewpart (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{skewpart_8c_source_l00492}{492}} of file \mbox{\hyperlink{skewpart_8c_source}{skewpart.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}, \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}, and \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}.
+
+\Hypertarget{skewpart_8c_a7f1b3376bbd12ac57f8c35fe8000de60}\index{skewpart.c@{skewpart.c}!sparse\_as\_kind@{sparse\_as\_kind}}
+\index{sparse\_as\_kind@{sparse\_as\_kind}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_as\_kind()}{sparse\_as\_kind()}}
+{\footnotesize\ttfamily \label{skewpart_8c_a7f1b3376bbd12ac57f8c35fe8000de60} 
+SEXP sparse\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02076}{2076}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}.
+
+\Hypertarget{skewpart_8c_a82cc141342d61a2c30cdef5f23530786}\index{skewpart.c@{skewpart.c}!sparse\_skewpart@{sparse\_skewpart}}
+\index{sparse\_skewpart@{sparse\_skewpart}!skewpart.c@{skewpart.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_skewpart()}{sparse\_skewpart()}}
+{\footnotesize\ttfamily \label{skewpart_8c_a82cc141342d61a2c30cdef5f23530786} 
+SEXP sparse\+\_\+skewpart (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{skewpart_8c_source_l00169}{169}} of file \mbox{\hyperlink{skewpart_8c_source}{skewpart.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{utils_8c_source_l00069}{alloc\+Zero()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{idz_8h_a96a29b7f716b257a036f4e7a7d159dcf}{ncsptrans()}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{M5_8h_source_l00291}{SWITCH2}}, \mbox{\hyperlink{skewpart_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01287}{zvimag()}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00492}{R\+\_\+sparse\+\_\+skewpart()}}.
+

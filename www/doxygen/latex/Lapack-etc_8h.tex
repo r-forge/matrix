@@ -1,0 +1,188 @@
+\doxysection{Lapack-\/etc.h File Reference}
+\hypertarget{Lapack-etc_8h}{}\label{Lapack-etc_8h}\index{Lapack-\/etc.h@{Lapack-\/etc.h}}
+{\ttfamily \#include $<$Rconfig.\+h$>$}\newline
+{\ttfamily \#include $<$R\+\_\+ext/\+Lapack.\+h$>$}\newline
+{\ttfamily \#include $<$R\+\_\+ext/\+Error.\+h$>$}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a1acda27db1b58455d70c4949a7917ab6}{USE\+\_\+\+FC\+\_\+\+LEN\+\_\+T}}
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}}
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}{ERROR\+\_\+\+LAPACK\+\_\+1}}(\+\_\+\+ROUTINE\+\_\+,  \+\_\+\+INFO\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}{ERROR\+\_\+\+LAPACK\+\_\+2}}(\+\_\+\+ROUTINE\+\_\+,  \+\_\+\+INFO\+\_\+,  \+\_\+\+WARN\+\_\+,  \+\_\+\+LETTER\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}{ERROR\+\_\+\+LAPACK\+\_\+3}}(\+\_\+\+ROUTINE\+\_\+,  \+\_\+\+INFO\+\_\+,  \+\_\+\+WARN\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a6748c32e1437e861b7e37f2e62bb0a46}{ERROR\+\_\+\+LAPACK\+\_\+4}}(\+\_\+\+ROUTINE\+\_\+,  \+\_\+\+INFO\+\_\+,  \+\_\+\+WARN\+\_\+,  \+\_\+\+RANK\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Lapack-etc_8h_a75bd71ec59c552ba5fd8764e1c178cd3}{ERROR\+\_\+\+LAPACK\+\_\+5}}(\+\_\+\+ROUTINE\+\_\+,  \+\_\+\+INFO\+\_\+,  \+\_\+\+WARN\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!ERROR\_LAPACK\_1@{ERROR\_LAPACK\_1}}
+\index{ERROR\_LAPACK\_1@{ERROR\_LAPACK\_1}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_LAPACK\_1}{ERROR\_LAPACK\_1}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a52f1591589aa199b6eca8bd651acabfb} 
+\#define ERROR\+\_\+\+LAPACK\+\_\+1(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+ROUTINE\+\_\+}{, }\item[{}]{\+\_\+\+INFO\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ ((\_INFO\_)\ <\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ argument\ \%d\ had\ illegal\ value"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ -\/(\_INFO\_));\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{18}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!ERROR\_LAPACK\_2@{ERROR\_LAPACK\_2}}
+\index{ERROR\_LAPACK\_2@{ERROR\_LAPACK\_2}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_LAPACK\_2}{ERROR\_LAPACK\_2}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a7088daaea40c09e083c890db5aadf59e} 
+\#define ERROR\+\_\+\+LAPACK\+\_\+2(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+ROUTINE\+\_\+}{, }\item[{}]{\+\_\+\+INFO\+\_\+}{, }\item[{}]{\+\_\+\+WARN\+\_\+}{, }\item[{}]{\+\_\+\+LETTER\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ERROR\_LAPACK\_1(\_ROUTINE\_,\ \_INFO\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ ((\_INFO\_)\ >\ 0\ \&\&\ (\_WARN\_)\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_WARN\_\ >\ 1)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ matrix\ is\ exactly\ singular,\ \%s[i,i]=0,\ i=\%d"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ \#\_LETTER\_,\ (\_INFO\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ matrix\ is\ exactly\ singular,\ \%s[i,i]=0,\ i=\%d"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ \#\_LETTER\_,\ (\_INFO\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{25}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{lu_8c_source_l00012}{dense\+\_\+lu()}}, \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!ERROR\_LAPACK\_3@{ERROR\_LAPACK\_3}}
+\index{ERROR\_LAPACK\_3@{ERROR\_LAPACK\_3}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_LAPACK\_3}{ERROR\_LAPACK\_3}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db} 
+\#define ERROR\+\_\+\+LAPACK\+\_\+3(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+ROUTINE\+\_\+}{, }\item[{}]{\+\_\+\+INFO\+\_\+}{, }\item[{}]{\+\_\+\+WARN\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ERROR\_LAPACK\_1(\_ROUTINE\_,\ \_INFO\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ ((\_INFO\_)\ >\ 0\ \&\&\ (\_WARN\_)\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_WARN\_\ >\ 1)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ leading\ principal\ minor\ of\ order\ \%d\ is\ not\ positive"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ (\_INFO\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ leading\ principal\ minor\ of\ order\ \%d\ is\ not\ positive"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ (\_INFO\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00038}{38}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}.
+
+\Hypertarget{Lapack-etc_8h_a6748c32e1437e861b7e37f2e62bb0a46}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!ERROR\_LAPACK\_4@{ERROR\_LAPACK\_4}}
+\index{ERROR\_LAPACK\_4@{ERROR\_LAPACK\_4}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_LAPACK\_4}{ERROR\_LAPACK\_4}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a6748c32e1437e861b7e37f2e62bb0a46} 
+\#define ERROR\+\_\+\+LAPACK\+\_\+4(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+ROUTINE\+\_\+}{, }\item[{}]{\+\_\+\+INFO\+\_\+}{, }\item[{}]{\+\_\+\+WARN\+\_\+}{, }\item[{}]{\+\_\+\+RANK\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ ERROR\_LAPACK\_1(\_ROUTINE\_,\ \_INFO\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((\_INFO\_)\ >\ 0\ \&\&\ (\_WARN\_)\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\_WARN\_\ >\ 1)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ matrix\ is\ rank\ deficient\ or\ not\ positive\ definite,\ the\ \_computed\_\ rank\ is\ \%d"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ (\_RANK\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ matrix\ is\ rank\ deficient\ or\ not\ positive\ definite,\ the\ \_computed\_\ rank\ is\ \%d"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_,\ (\_RANK\_));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00051}{51}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}.
+
+\Hypertarget{Lapack-etc_8h_a75bd71ec59c552ba5fd8764e1c178cd3}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!ERROR\_LAPACK\_5@{ERROR\_LAPACK\_5}}
+\index{ERROR\_LAPACK\_5@{ERROR\_LAPACK\_5}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{ERROR\_LAPACK\_5}{ERROR\_LAPACK\_5}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a75bd71ec59c552ba5fd8764e1c178cd3} 
+\#define ERROR\+\_\+\+LAPACK\+\_\+5(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+ROUTINE\+\_\+}{, }\item[{}]{\+\_\+\+INFO\+\_\+}{, }\item[{}]{\+\_\+\+WARN\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ ERROR\_LAPACK\_1(\_ROUTINE\_,\ \_INFO\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((\_INFO\_)\ >\ 0\ \&\&\ (\_WARN\_)\ >\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\_WARN\_\ >\ 1)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ failed\ to\ compute\ all\ eigenvalues"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}LAPACK\ routine\ '\%s':\ failed\ to\ compute\ all\ eigenvalues"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\_ROUTINE\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00064}{64}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}.
+
+\Hypertarget{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!FCONE@{FCONE}}
+\index{FCONE@{FCONE}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{FCONE}{FCONE}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529} 
+\#define FCONE}
+
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{13}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, \mbox{\hyperlink{matmult_8c_source_l00172}{ge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{norm_8c_source_l00050}{ge\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{rcond_8c_source_l00040}{ge\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00154}{po\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00187}{pp\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{norm_8c_source_l00102}{sp\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{rcond_8c_source_l00114}{sp\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{norm_8c_source_l00073}{sy\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{rcond_8c_source_l00074}{sy\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{norm_8c_source_l00155}{tp\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{rcond_8c_source_l00248}{tp\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{norm_8c_source_l00131}{tr\+Matrix\+\_\+norm()}}, \mbox{\hyperlink{rcond_8c_source_l00220}{tr\+Matrix\+\_\+rcond()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{Lapack-etc_8h_a1acda27db1b58455d70c4949a7917ab6}\index{Lapack-\/etc.h@{Lapack-\/etc.h}!USE\_FC\_LEN\_T@{USE\_FC\_LEN\_T}}
+\index{USE\_FC\_LEN\_T@{USE\_FC\_LEN\_T}!Lapack-\/etc.h@{Lapack-\/etc.h}}
+\doxysubsubsection{\texorpdfstring{USE\_FC\_LEN\_T}{USE\_FC\_LEN\_T}}
+{\footnotesize\ttfamily \label{Lapack-etc_8h_a1acda27db1b58455d70c4949a7917ab6} 
+\#define USE\+\_\+\+FC\+\_\+\+LEN\+\_\+T}
+
+
+
+Definition at line \mbox{\hyperlink{Lapack-etc_8h_source_l00005}{5}} of file \mbox{\hyperlink{Lapack-etc_8h_source}{Lapack-\/etc.\+h}}.
+

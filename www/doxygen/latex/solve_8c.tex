@@ -1,0 +1,435 @@
+\doxysection{solve.\+c File Reference}
+\hypertarget{solve_8c}{}\label{solve_8c}\index{solve.c@{solve.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}cs-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}
+\item 
+\#define \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}
+\item 
+\#define \mbox{\hyperlink{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f}{PROMOTE}}(A)
+\item 
+\#define \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_ab8b3a8f9aa4253cc8571e2a0b82996cf}{SOLVE\+\_\+\+SPARSE\+\_\+\+TRIANGULAR}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  \+\_\+\+A\+\_\+,  \+\_\+\+ALO\+\_\+,  \+\_\+\+BFR\+\_\+)
+\item 
+\#define \mbox{\hyperlink{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}{SOLVE\+\_\+\+SPARSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}{SOLVE\+\_\+\+SPARSE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{solve_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{solve_8c_a96cff8fa337fe4ce1e53f3badc9794a9}{solve\+DN}} (SEXP rdn, SEXP adn, SEXP bdn)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a2eedcd4231882e98d5654525faca3665}{dense\+LU\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a15e57f158685f5beed0c4f3942f46551}{dense\+Bunch\+Kaufman\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_adb255dfd2af405ac7a06b076be4effc1}{dense\+Cholesky\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_add8fe66c8c1d73312e12110ed9327696}{tr\+Matrix\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a8bfc07257e31d38897d935ff4dd6b295}{sparse\+LU\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b, SEXP s\+\_\+sparse)
+\item 
+static int \mbox{\hyperlink{solve_8c_a61129800982dd45068020ee45c0575fd}{strmatch}} (const char \texorpdfstring{$\ast$}{*}s, const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}nms)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a10df07c56f4e25b3f5d76f256df3f530}{sparse\+Cholesky\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b, SEXP s\+\_\+sparse, SEXP s\+\_\+system)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a8b991f00ea539a8cba938129f296ded7}{t\+CMatrix\+\_\+solve}} (SEXP s\+\_\+a, SEXP s\+\_\+b, SEXP s\+\_\+sparse)
+\item 
+SEXP \mbox{\hyperlink{solve_8c_a86887cf5eff7db9824c049f5a60edc36}{sparse\+QR\+\_\+matmult}} (SEXP s\+\_\+qr, SEXP s\+\_\+y, SEXP s\+\_\+op, SEXP s\+\_\+complete, SEXP s\+\_\+yxjj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f}\index{solve.c@{solve.c}!PROMOTE@{PROMOTE}}
+\index{PROMOTE@{PROMOTE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{PROMOTE}{PROMOTE}}
+{\footnotesize\ttfamily \label{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f} 
+\#define PROMOTE(\begin{DoxyParamCaption}\item[{}]{A}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ n\ =\ (size\_t)\ (A)-\/>nzmax;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ *x\ =\ (\textcolor{keywordtype}{double}\ *)\ (A)-\/>x;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rcomplex\ *y\ =\ (Rcomplex\ *)\ R\_alloc(n,\ \textcolor{keyword}{sizeof}(Rcomplex));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ while\ (n-\/-\/\ >\ 0)\ \{\ (*(y)).r\ =\ *(x++);\ (*(y++)).i\ =\ 0.0;\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (A)-\/>x\ =\ y;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (A)-\/>xtype\ =\ \mbox{\hyperlink{cs-etc_8h_ab21bc821897800dddc6831ad1bca58cc}{CXSPARSE\_COMPLEX}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}\index{solve.c@{solve.c}!SOLVE\_DENSE@{SOLVE\_DENSE}}
+\index{SOLVE\_DENSE@{SOLVE\_DENSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_DENSE}{SOLVE\_DENSE}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0} 
+\#define SOLVE\+\_\+\+DENSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *prx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(rx),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *work\ =\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ m,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ memset(prx,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ mn);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx[j]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_pvec(pap,\ prx,\ work,\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_lsolve(L,\ work);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_usolve(U,\ work);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_ipvec(paq,\ work,\ prx,\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx\ +=\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}\index{solve.c@{solve.c}!SOLVE\_DENSE@{SOLVE\_DENSE}}
+\index{SOLVE\_DENSE@{SOLVE\_DENSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_DENSE}{SOLVE\_DENSE}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0} 
+\#define SOLVE\+\_\+\+DENSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *prx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(rx),\ *pbx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(bx),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *work\ =\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ m,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_pvec(pap,\ pbx,\ work,\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_lsolve(L,\ work);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_usolve(U,\ work);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_ipvec(paq,\ work,\ prx,\ m);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx\ +=\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pbx\ +=\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}\index{solve.c@{solve.c}!SOLVE\_DENSE@{SOLVE\_DENSE}}
+\index{SOLVE\_DENSE@{SOLVE\_DENSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_DENSE}{SOLVE\_DENSE}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0} 
+\#define SOLVE\+\_\+\+DENSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *prx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(rx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ memset(prx,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ mn);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx[j]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (aul\ ==\ \textcolor{charliteral}{'U'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_usolve(A,\ prx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_lsolve(A,\ prx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx\ +=\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}\index{solve.c@{solve.c}!SOLVE\_DENSE@{SOLVE\_DENSE}}
+\index{SOLVE\_DENSE@{SOLVE\_DENSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_DENSE}{SOLVE\_DENSE}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0} 
+\#define SOLVE\+\_\+\+DENSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *prx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(rx),\ *pbx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(bx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(prx,\ pbx,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ mn);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (aul\ ==\ \textcolor{charliteral}{'U'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_usolve(A,\ prx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Matrix\_cs\_lsolve(A,\ prx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prx\ +=\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}\index{solve.c@{solve.c}!SOLVE\_FINISH@{SOLVE\_FINISH}}
+\index{SOLVE\_FINISH@{SOLVE\_FINISH}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_FINISH}{SOLVE\_FINISH}}
+{\footnotesize\ttfamily \label{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f} 
+\#define SOLVE\+\_\+\+FINISH}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ SEXP\ rdimnames\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(r,\ 0)),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ adimnames\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(s\_a,\ 0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (s\_b\ ==\ R\_NilValue)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ cpyDN(rdimnames,\ adimnames,\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ bdimnames\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(s\_b,\ 0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ solveDN(rdimnames,\ adimnames,\ bdimnames);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ bdimnames\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ adimnames,\ rdimnames\ */}}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}\index{solve.c@{solve.c}!SOLVE\_SPARSE@{SOLVE\_SPARSE}}
+\index{SOLVE\_SPARSE@{SOLVE\_SPARSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_SPARSE}{SOLVE\_SPARSE}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{solve_8c_a30c5f2398f17e1fe8f34c695cc469600} 
+\#define SOLVE\+\_\+\+SPARSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *work\ =\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ m,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SOLVE\_SPARSE\_TRIANGULAR(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ L,\ 1,\ Bfr);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SOLVE\_SPARSE\_TRIANGULAR(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ U,\ 0,\ \ \ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}\index{solve.c@{solve.c}!SOLVE\_SPARSE@{SOLVE\_SPARSE}}
+\index{SOLVE\_SPARSE@{SOLVE\_SPARSE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_SPARSE}{SOLVE\_SPARSE}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{solve_8c_a30c5f2398f17e1fe8f34c695cc469600} 
+\#define SOLVE\+\_\+\+SPARSE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *work\ =\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ m,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SOLVE\_SPARSE\_TRIANGULAR(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},\ A,\ aul\ !=\ \textcolor{charliteral}{'U'},\ s\_b\ ==\ R\_NilValue);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{solve_8c_ab8b3a8f9aa4253cc8571e2a0b82996cf}\index{solve.c@{solve.c}!SOLVE\_SPARSE\_TRIANGULAR@{SOLVE\_SPARSE\_TRIANGULAR}}
+\index{SOLVE\_SPARSE\_TRIANGULAR@{SOLVE\_SPARSE\_TRIANGULAR}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_SPARSE\_TRIANGULAR}{SOLVE\_SPARSE\_TRIANGULAR}}
+{\footnotesize\ttfamily \label{solve_8c_ab8b3a8f9aa4253cc8571e2a0b82996cf} 
+\#define SOLVE\+\_\+\+SPARSE\+\_\+\+TRIANGULAR(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+ALO\+\_\+}{, }\item[{}]{\+\_\+\+BFR\+\_\+}{}\end{DoxyParamCaption})}
+
+\Hypertarget{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}\index{solve.c@{solve.c}!SOLVE\_START@{SOLVE\_START}}
+\index{SOLVE\_START@{SOLVE\_START}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{SOLVE\_START}{SOLVE\_START}}
+{\footnotesize\ttfamily \label{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732} 
+\#define SOLVE\+\_\+\+START}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *padim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(s\_a),\ m\ =\ padim[0],\ n\ =\ padim[1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (m\ !=\ n)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ square"{}}),\ \textcolor{stringliteral}{"{}a"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (s\_b\ !=\ R\_NilValue)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ *pbdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(s\_b);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (pbdim[0]\ !=\ m)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}dimensions\ of\ '\%s'\ and\ '\%s'\ are\ inconsistent"{}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}b"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ n\ =\ pbdim[1];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00257}{dense\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00467}{sparse\+LU\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00771}{t\+CMatrix\+\_\+solve()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_a5c943ec4d393860c44273d898e789156}\index{solve.c@{solve.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{solve_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pyx\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(yx);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ memset(pyx,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ mn);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (s\_yxjj\ ==\ R\_NilValue)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ one\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy2)((size\_t)\ n,\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pyx,\ (size\_t)\ m\ +\ 1,\ \&one,\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ s\_yxjj\ =\ Rf\_coerceVector(s\_yxjj,\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPESXP);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pyxjj\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(s\_yxjj);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy2)((size\_t)\ n,\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pyx,\ (size\_t)\ m\ +\ 1,\ pyxjj,\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00902}{sparse\+QR\+\_\+matmult()}}.
+
+\Hypertarget{solve_8c_a5c943ec4d393860c44273d898e789156}\index{solve.c@{solve.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{solve_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{solve_8c_a15e57f158685f5beed0c4f3942f46551}\index{solve.c@{solve.c}!denseBunchKaufman\_solve@{denseBunchKaufman\_solve}}
+\index{denseBunchKaufman\_solve@{denseBunchKaufman\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{denseBunchKaufman\_solve()}{denseBunchKaufman\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_a15e57f158685f5beed0c4f3942f46551} 
+SEXP dense\+Bunch\+Kaufman\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00130}{130}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{ERROR\+\_\+\+LAPACK\+\_\+1}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{solve_8c_adb255dfd2af405ac7a06b076be4effc1}\index{solve.c@{solve.c}!denseCholesky\_solve@{denseCholesky\_solve}}
+\index{denseCholesky\_solve@{denseCholesky\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{denseCholesky\_solve()}{denseCholesky\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_adb255dfd2af405ac7a06b076be4effc1} 
+SEXP dense\+Cholesky\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00257}{257}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{idz_8h_a74e3330dd01b2a0eb850bac0ac351610}{drowperm2()}}, \mbox{\hyperlink{idz_8h_aa6e47d6a5128c1187d211f31a9f96fb8}{dsymperm1()}}, \mbox{\hyperlink{idz_8h_a36e49d922615be3dad6c9a036ac85a49}{dsymperm2()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{ERROR\+\_\+\+LAPACK\+\_\+1}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{idz_8h_ab61d5490766c488e6a26212fcd074d96}{zrowperm2()}}, \mbox{\hyperlink{idz_8h_a56ddb9d86a2d8c95d33feb969c8a4341}{zsymperm1()}}, and \mbox{\hyperlink{idz_8h_a4c4ed35257d75d0f2c1fc2616acaba5b}{zsymperm2()}}.
+
+\Hypertarget{solve_8c_a2eedcd4231882e98d5654525faca3665}\index{solve.c@{solve.c}!denseLU\_solve@{denseLU\_solve}}
+\index{denseLU\_solve@{denseLU\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{denseLU\_solve()}{denseLU\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_a2eedcd4231882e98d5654525faca3665} 
+SEXP dense\+LU\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00033}{33}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{ERROR\+\_\+\+LAPACK\+\_\+1}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{solve_8c_a96cff8fa337fe4ce1e53f3badc9794a9}\index{solve.c@{solve.c}!solveDN@{solveDN}}
+\index{solveDN@{solveDN}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{solveDN()}{solveDN()}}
+{\footnotesize\ttfamily \label{solve_8c_a96cff8fa337fe4ce1e53f3badc9794a9} 
+static void solve\+DN (\begin{DoxyParamCaption}\item[{SEXP}]{rdn}{, }\item[{SEXP}]{adn}{, }\item[{SEXP}]{bdn}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00011}{11}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+\Hypertarget{solve_8c_a10df07c56f4e25b3f5d76f256df3f530}\index{solve.c@{solve.c}!sparseCholesky\_solve@{sparseCholesky\_solve}}
+\index{sparseCholesky\_solve@{sparseCholesky\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_solve()}{sparseCholesky\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_a10df07c56f4e25b3f5d76f256df3f530} 
+SEXP sparse\+Cholesky\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{, }\item[{SEXP}]{s\+\_\+sparse}{, }\item[{SEXP}]{s\+\_\+system}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00697}{697}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00375}{CHD2\+M()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00328}{CHS2\+M()}}, \mbox{\hyperlink{Mdefines_8h_source_l00141}{ERROR\+\_\+\+OOM}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{M2\+CHD()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{solve_8c_source_l00686}{strmatch()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{solve_8c_a8bfc07257e31d38897d935ff4dd6b295}\index{solve.c@{solve.c}!sparseLU\_solve@{sparseLU\_solve}}
+\index{sparseLU\_solve@{sparseLU\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{sparseLU\_solve()}{sparseLU\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_a8bfc07257e31d38897d935ff4dd6b295} 
+SEXP sparse\+LU\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{, }\item[{SEXP}]{s\+\_\+sparse}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00467}{467}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cs-etc_8c_source_l00042}{CXS2\+M()}}, \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00012}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+SET}}, \mbox{\hyperlink{Mdefines_8h_source_l00141}{ERROR\+\_\+\+OOM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8h_source_l00022}{Matrix\+\_\+cs\+\_\+sparse\+::i}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{cs-etc_8c_source_l00101}{Matrix\+\_\+cs\+\_\+dropzeros()}}, \mbox{\hyperlink{cs-etc_8c_source_l00113}{Matrix\+\_\+cs\+\_\+free()}}, \mbox{\hyperlink{cs-etc_8c_source_l00197}{Matrix\+\_\+cs\+\_\+permute()}}, \mbox{\hyperlink{cs-etc_8c_source_l00222}{Matrix\+\_\+cs\+\_\+pinv()}}, \mbox{\hyperlink{cs-etc_8c_source_l00307}{Matrix\+\_\+cs\+\_\+speye()}}, \mbox{\hyperlink{cs-etc_8c_source_l00337}{Matrix\+\_\+cs\+\_\+spfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00385}{Matrix\+\_\+cs\+\_\+transpose()}}, \mbox{\hyperlink{init_8c_source_l00599}{Matrix\+\_\+\+LSym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00627}{Matrix\+\_\+q\+Sym}}, \mbox{\hyperlink{init_8c_source_l00601}{Matrix\+\_\+\+USym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f}{PROMOTE}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}{SOLVE\+\_\+\+SPARSE}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+\Hypertarget{solve_8c_a86887cf5eff7db9824c049f5a60edc36}\index{solve.c@{solve.c}!sparseQR\_matmult@{sparseQR\_matmult}}
+\index{sparseQR\_matmult@{sparseQR\_matmult}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{sparseQR\_matmult()}{sparseQR\_matmult()}}
+{\footnotesize\ttfamily \label{solve_8c_a86887cf5eff7db9824c049f5a60edc36} 
+SEXP sparse\+QR\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+qr}{, }\item[{SEXP}]{s\+\_\+y}{, }\item[{SEXP}]{s\+\_\+op}{, }\item[{SEXP}]{s\+\_\+complete}{, }\item[{SEXP}]{s\+\_\+yxjj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00902}{902}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00012}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+SET}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8h_source_l00019}{Matrix\+\_\+cs\+\_\+sparse\+::m}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{init_8c_source_l00603}{Matrix\+\_\+beta\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00602}{Matrix\+\_\+\+VSym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{cs-etc_8h_source_l00020}{Matrix\+\_\+cs\+\_\+sparse\+::n}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f}{PROMOTE}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{solve_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+\Hypertarget{solve_8c_a61129800982dd45068020ee45c0575fd}\index{solve.c@{solve.c}!strmatch@{strmatch}}
+\index{strmatch@{strmatch}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{strmatch()}{strmatch()}}
+{\footnotesize\ttfamily \label{solve_8c_a61129800982dd45068020ee45c0575fd} 
+static int strmatch (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{const char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{nms}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00686}{686}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{solve_8c_a8b991f00ea539a8cba938129f296ded7}\index{solve.c@{solve.c}!tCMatrix\_solve@{tCMatrix\_solve}}
+\index{tCMatrix\_solve@{tCMatrix\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{tCMatrix\_solve()}{tCMatrix\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_a8b991f00ea539a8cba938129f296ded7} 
+SEXP t\+CMatrix\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{, }\item[{SEXP}]{s\+\_\+sparse}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00771}{771}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cs-etc_8c_source_l00042}{CXS2\+M()}}, \mbox{\hyperlink{cs-etc_8h_source_l00009}{CXSPARSE\+\_\+\+COMPLEX}}, \mbox{\hyperlink{cs-etc_8h_source_l00012}{CXSPARSE\+\_\+\+XTYPE\+\_\+\+SET}}, \mbox{\hyperlink{Mdefines_8h_source_l00141}{ERROR\+\_\+\+OOM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{cs-etc_8c_source_l00006}{M2\+CXS()}}, \mbox{\hyperlink{cs-etc_8c_source_l00101}{Matrix\+\_\+cs\+\_\+dropzeros()}}, \mbox{\hyperlink{cs-etc_8c_source_l00307}{Matrix\+\_\+cs\+\_\+speye()}}, \mbox{\hyperlink{cs-etc_8c_source_l00337}{Matrix\+\_\+cs\+\_\+spfree()}}, \mbox{\hyperlink{cs-etc_8c_source_l00385}{Matrix\+\_\+cs\+\_\+transpose()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{solve_8c_a57e1f2ffceb5d977d8b515ac7680d66f}{PROMOTE}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{solve_8c_aa1d6966ed9099397bbae580bbd6cd8a0}{SOLVE\+\_\+\+DENSE}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a30c5f2398f17e1fe8f34c695cc469600}{SOLVE\+\_\+\+SPARSE}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{cs-etc_8h_source_l00025}{Matrix\+\_\+cs\+\_\+sparse\+::xtype}}.
+
+\Hypertarget{solve_8c_add8fe66c8c1d73312e12110ed9327696}\index{solve.c@{solve.c}!trMatrix\_solve@{trMatrix\_solve}}
+\index{trMatrix\_solve@{trMatrix\_solve}!solve.c@{solve.c}}
+\doxysubsubsection{\texorpdfstring{trMatrix\_solve()}{trMatrix\_solve()}}
+{\footnotesize\ttfamily \label{solve_8c_add8fe66c8c1d73312e12110ed9327696} 
+SEXP tr\+Matrix\+\_\+solve (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+a}{, }\item[{SEXP}]{s\+\_\+b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{solve_8c_source_l00367}{367}} of file \mbox{\hyperlink{solve_8c_source}{solve.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{ERROR\+\_\+\+LAPACK\+\_\+1}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{solve_8c_a35ebfff72c4b7dfd731a673fd6ae1e9f}{SOLVE\+\_\+\+FINISH}}, \mbox{\hyperlink{solve_8c_a99cdc0a4e2fe811a44519f4bbe394732}{SOLVE\+\_\+\+START}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+

@@ -1,0 +1,86 @@
+\doxysection{Bunch\+Kaufman.\+c File Reference}
+\hypertarget{BunchKaufman_8c}{}\label{BunchKaufman_8c}\index{BunchKaufman.c@{BunchKaufman.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\+\_\+force\+\_\+canonical}} (SEXP, const char \texorpdfstring{$\ast$}{*}, int)
+\item 
+SEXP \mbox{\hyperlink{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e}{dense\+\_\+bunchkaufman}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int warn, char ul, char ct)
+\item 
+SEXP \mbox{\hyperlink{BunchKaufman_8c_a95b96ac960d0a9f423b48f92fc0cfd4d}{R\+\_\+dense\+\_\+bunchkaufman}} (SEXP s\+\_\+obj, SEXP s\+\_\+warn, SEXP s\+\_\+uplo, SEXP s\+\_\+trans)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8}\index{BunchKaufman.c@{BunchKaufman.c}!dense\_as\_kind@{dense\_as\_kind}}
+\index{dense\_as\_kind@{dense\_as\_kind}!BunchKaufman.c@{BunchKaufman.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_kind()}{dense\_as\_kind()}}
+{\footnotesize\ttfamily \label{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8} 
+SEXP dense\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02000}{2000}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{utils_8c_source_l00151}{na\+To\+Unit()}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e}\index{BunchKaufman.c@{BunchKaufman.c}!dense\_bunchkaufman@{dense\_bunchkaufman}}
+\index{dense\_bunchkaufman@{dense\_bunchkaufman}!BunchKaufman.c@{BunchKaufman.c}}
+\doxysubsubsection{\texorpdfstring{dense\_bunchkaufman()}{dense\_bunchkaufman()}}
+{\footnotesize\ttfamily \label{BunchKaufman_8c_aba17c9a20eec62ea9c8f5d1a138a152e} 
+SEXP dense\+\_\+bunchkaufman (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{warn}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{10}} of file \mbox{\hyperlink{BunchKaufman_8c_source}{Bunch\+Kaufman.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{R\+\_\+dense\+\_\+bunchkaufman()}}.
+
+\Hypertarget{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321}\index{BunchKaufman.c@{BunchKaufman.c}!dense\_force\_canonical@{dense\_force\_canonical}}
+\index{dense\_force\_canonical@{dense\_force\_canonical}!BunchKaufman.c@{BunchKaufman.c}}
+\doxysubsubsection{\texorpdfstring{dense\_force\_canonical()}{dense\_force\_canonical()}}
+{\footnotesize\ttfamily \label{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321} 
+SEXP dense\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00007}{7}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}.
+
+\Hypertarget{BunchKaufman_8c_a95b96ac960d0a9f423b48f92fc0cfd4d}\index{BunchKaufman.c@{BunchKaufman.c}!R\_dense\_bunchkaufman@{R\_dense\_bunchkaufman}}
+\index{R\_dense\_bunchkaufman@{R\_dense\_bunchkaufman}!BunchKaufman.c@{BunchKaufman.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_bunchkaufman()}{R\_dense\_bunchkaufman()}}
+{\footnotesize\ttfamily \label{BunchKaufman_8c_a95b96ac960d0a9f423b48f92fc0cfd4d} 
+SEXP R\+\_\+dense\+\_\+bunchkaufman (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+warn}{, }\item[{SEXP}]{s\+\_\+uplo}{, }\item[{SEXP}]{s\+\_\+trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{BunchKaufman_8c_source_l00095}{95}} of file \mbox{\hyperlink{BunchKaufman_8c_source}{Bunch\+Kaufman.\+c}}.
+
+
+
+References \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{attrib_8c_source_l00180}{get\+\_\+factor()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, \mbox{\hyperlink{Mdefines_8h_source_l00166}{VALID\+\_\+\+TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00158}{VALID\+\_\+\+UPLO}}.
+

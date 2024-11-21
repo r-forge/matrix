@@ -1,0 +1,234 @@
+\doxysection{expm.\+c File Reference}
+\hypertarget{expm_8c}{}\label{expm_8c}\index{expm.c@{expm.c}}
+{\ttfamily \#include $<$complex.\+h$>$}\newline
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{expm_8c_a91562487f693b54f81eff915b13369c7}{SHOW}}(x,  header)
+\item 
+\#define \mbox{\hyperlink{expm_8c_a96789029538f4deea8b3a34e52e4a2b0}{asC}}(x)
+\item 
+\#define \mbox{\hyperlink{expm_8c_a4deb5f6064f69a8368421e065cb4cd18}{asR}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{expm_8c_a838e05c88a50f2908ab573fdb099cf00}{dense\+\_\+schur}} (SEXP, const char \texorpdfstring{$\ast$}{*}, int, int)
+\item 
+SEXP \mbox{\hyperlink{expm_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{expm_8c_a5c995aaeda42d8d81c6117465a279239}{dense\+\_\+as\+\_\+general}} (SEXP, const char \texorpdfstring{$\ast$}{*}, int)
+\item 
+SEXP \mbox{\hyperlink{expm_8c_a78779016e3e6941b95dd4b54b42b7af6}{dense\+\_\+as\+\_\+packed}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, char, char)
+\item 
+SEXP \mbox{\hyperlink{expm_8c_a1b7f313626e435eb0096af2bda38ae7c}{dense\+\_\+expm}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{expm_8c_a79cf8936cd6ac290efba4da5e1788553}{R\+\_\+dense\+\_\+expm}} (SEXP s\+\_\+obj)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static double \mbox{\hyperlink{expm_8c_a565721419066dfd9501f5ba00a786ed5}{thetam}} \mbox{[}$\,$\mbox{]} = \{ 1.\+5e-\/2, 2.\+5e-\/1, 9.\+5e-\/1, 2.\+1e+0, 5.\+4e+0 \}
+\item 
+static double \mbox{\hyperlink{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}{padecm}} \mbox{[}$\,$\mbox{]}\mbox{[}14\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{expm_8c_a96789029538f4deea8b3a34e52e4a2b0}\index{expm.c@{expm.c}!asC@{asC}}
+\index{asC@{asC}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{asC}{asC}}
+{\footnotesize\ttfamily \label{expm_8c_a96789029538f4deea8b3a34e52e4a2b0} 
+\#define asC(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\textcolor{keywordtype}{double}\ \_Complex\ *)\ \&(x))[0]}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_a4deb5f6064f69a8368421e065cb4cd18}\index{expm.c@{expm.c}!asR@{asR}}
+\index{asR@{asR}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{asR}{asR}}
+{\footnotesize\ttfamily \label{expm_8c_a4deb5f6064f69a8368421e065cb4cd18} 
+\#define asR(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\ \ \ \ \ \ \ Rcomplex\ *)\ \&(x))[0]}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_a91562487f693b54f81eff915b13369c7}\index{expm.c@{expm.c}!SHOW@{SHOW}}
+\index{SHOW@{SHOW}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{SHOW}{SHOW}}
+{\footnotesize\ttfamily \label{expm_8c_a91562487f693b54f81eff915b13369c7} 
+\#define SHOW(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{header}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ Rprintf(\textcolor{stringliteral}{"{}\%s\ ...\(\backslash\)n"{}},\ (header));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ for\ (k\ =\ 0;\ k\ <\ nn;\ ++k)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rprintf(\textcolor{stringliteral}{"{}\ \ \ \ \%\ .8e\(\backslash\)n"{}},\ (x)[k]);\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{expm_8c_source_l00008}{8}} of file \mbox{\hyperlink{expm_8c_source}{expm.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{expm_8c_a5c995aaeda42d8d81c6117465a279239}\index{expm.c@{expm.c}!dense\_as\_general@{dense\_as\_general}}
+\index{dense\_as\_general@{dense\_as\_general}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_general()}{dense\_as\_general()}}
+{\footnotesize\ttfamily \label{expm_8c_a5c995aaeda42d8d81c6117465a279239} 
+SEXP dense\+\_\+as\+\_\+general (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02237}{2237}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_af80c19f69e49b1c83bc823de660d30d8}\index{expm.c@{expm.c}!dense\_as\_kind@{dense\_as\_kind}}
+\index{dense\_as\_kind@{dense\_as\_kind}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_kind()}{dense\_as\_kind()}}
+{\footnotesize\ttfamily \label{expm_8c_af80c19f69e49b1c83bc823de660d30d8} 
+SEXP dense\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02000}{2000}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_a78779016e3e6941b95dd4b54b42b7af6}\index{expm.c@{expm.c}!dense\_as\_packed@{dense\_as\_packed}}
+\index{dense\_as\_packed@{dense\_as\_packed}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_packed()}{dense\_as\_packed()}}
+{\footnotesize\ttfamily \label{expm_8c_a78779016e3e6941b95dd4b54b42b7af6} 
+SEXP dense\+\_\+as\+\_\+packed (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02654}{2654}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00132}{PACKED\+\_\+\+LENGTH}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{coerce_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{coerce_8c_source_l02717}{R\+\_\+dense\+\_\+as\+\_\+packed()}}, and \mbox{\hyperlink{coerce_8c_source_l03609}{R\+\_\+\+Matrix\+\_\+as\+\_\+packed()}}.
+
+\Hypertarget{expm_8c_a1b7f313626e435eb0096af2bda38ae7c}\index{expm.c@{expm.c}!dense\_expm@{dense\_expm}}
+\index{dense\_expm@{dense\_expm}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{dense\_expm()}{dense\_expm()}}
+{\footnotesize\ttfamily \label{expm_8c_a1b7f313626e435eb0096af2bda38ae7c} 
+SEXP dense\+\_\+expm (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{expm_8c_source_l00036}{36}} of file \mbox{\hyperlink{expm_8c_source}{expm.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{expm_8c_a96789029538f4deea8b3a34e52e4a2b0}{asC}}, \mbox{\hyperlink{expm_8c_a4deb5f6064f69a8368421e065cb4cd18}{asR}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02654}{dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{idz_8h_a210f5aa621e0c76c16786d02b4450d13}{dswap2()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00018}{ERROR\+\_\+\+LAPACK\+\_\+1}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00025}{ERROR\+\_\+\+LAPACK\+\_\+2}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00633}{Matrix\+\_\+values\+Sym}}, \mbox{\hyperlink{init_8c_source_l00634}{Matrix\+\_\+vectors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{init_8c_source_l00641}{Matrix\+\_\+zzero}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{expm_8c_source_l00024}{padecm}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{expm_8c_source_l00023}{thetam}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{idz_8h_ae3b9703187db28aa0db075769316b632}{zswap2()}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00466}{R\+\_\+dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_a838e05c88a50f2908ab573fdb099cf00}\index{expm.c@{expm.c}!dense\_schur@{dense\_schur}}
+\index{dense\_schur@{dense\_schur}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{dense\_schur()}{dense\_schur()}}
+{\footnotesize\ttfamily \label{expm_8c_a838e05c88a50f2908ab573fdb099cf00} 
+SEXP dense\+\_\+schur (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{warn}{, }\item[{int}]{vectors}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Schur_8c_source_l00008}{8}} of file \mbox{\hyperlink{Schur_8c_source}{Schur.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00064}{ERROR\+\_\+\+LAPACK\+\_\+5}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00633}{Matrix\+\_\+values\+Sym}}, \mbox{\hyperlink{init_8c_source_l00634}{Matrix\+\_\+vectors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, and \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}.
+
+\Hypertarget{expm_8c_a79cf8936cd6ac290efba4da5e1788553}\index{expm.c@{expm.c}!R\_dense\_expm@{R\_dense\_expm}}
+\index{R\_dense\_expm@{R\_dense\_expm}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_expm()}{R\_dense\_expm()}}
+{\footnotesize\ttfamily \label{expm_8c_a79cf8936cd6ac290efba4da5e1788553} 
+SEXP R\+\_\+dense\+\_\+expm (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{expm_8c_source_l00466}{466}} of file \mbox{\hyperlink{expm_8c_source}{expm.\+c}}.
+
+
+
+References \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58}\index{expm.c@{expm.c}!padecm@{padecm}}
+\index{padecm@{padecm}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{padecm}{padecm}}
+{\footnotesize\ttfamily \label{expm_8c_ad55c66a324fab1aa1748cb9d295e8f58} 
+double padecm\mbox{[}$\,$\mbox{]}\mbox{[}14\mbox{]}\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \{\ 120.0,\ 60.0,\ 12.0,\ 1.0\ \},}
+\DoxyCodeLine{\ \ \ \ \{\ 30240.0,\ 15120.0,\ 3360.0,\ 420.0,\ 30.0,\ 1.0\ \},}
+\DoxyCodeLine{\ \ \ \ \{\ 17297280.0,\ 8648640.0,\ 1995840.0,\ 277200.0,\ 25200.0,}
+\DoxyCodeLine{\ \ \ \ \ \ 1512.0,\ 56.0,\ 1.0\ \},}
+\DoxyCodeLine{\ \ \ \ \{\ 17643225600.0,\ 8821612800.0,\ 2075673600.0,\ 302702400.0,}
+\DoxyCodeLine{\ \ \ \ \ \ 30270240.0,\ 2162160.0,\ 110880.0,\ 3960.0,\ 90.0,\ 1.0\ \},}
+\DoxyCodeLine{\ \ \ \ \{\ 64764752532480000.0,\ 32382376266240000.0,}
+\DoxyCodeLine{\ \ \ \ \ \ 7771770303897600.0,\ 1187353796428800.0,\ 129060195264000.0,}
+\DoxyCodeLine{\ \ \ \ \ \ 10559470521600.0,\ 670442572800.0,\ 33522128640.0,}
+\DoxyCodeLine{\ \ \ \ \ \ 1323241920.0,\ 40840800.0,\ 960960.0,\ 16380.0,\ 182.0,\ 1.0\ \}\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{expm_8c_source_l00024}{24}} of file \mbox{\hyperlink{expm_8c_source}{expm.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+
+\Hypertarget{expm_8c_a565721419066dfd9501f5ba00a786ed5}\index{expm.c@{expm.c}!thetam@{thetam}}
+\index{thetam@{thetam}!expm.c@{expm.c}}
+\doxysubsubsection{\texorpdfstring{thetam}{thetam}}
+{\footnotesize\ttfamily \label{expm_8c_a565721419066dfd9501f5ba00a786ed5} 
+double thetam\mbox{[}$\,$\mbox{]} = \{ 1.\+5e-\/2, 2.\+5e-\/1, 9.\+5e-\/1, 2.\+1e+0, 5.\+4e+0 \}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{expm_8c_source_l00023}{23}} of file \mbox{\hyperlink{expm_8c_source}{expm.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}.
+

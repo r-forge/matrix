@@ -1,0 +1,212 @@
+\doxysection{force\+Canonical.\+c}
+\hypertarget{forceCanonical_8c_source}{}\label{forceCanonical_8c_source}\index{forceCanonical.c@{forceCanonical.c}}
+\mbox{\hyperlink{forceCanonical_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00001}00001\ \textcolor{comment}{/*\ C\ implementation\ of\ methods\ for\ forceCanonical\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{M5_8h}{M5.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{idz_8h}{idz.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00007}\mbox{\hyperlink{BunchKaufman_8c_a4fd0a81592143b70bdd15b8e01b16321}{00007}}\ SEXP\ \mbox{\hyperlink{forceCanonical_8c_a9cf1bcaab15c16704d7410d067d3fc40}{dense\_force\_canonical}}(SEXP\ from,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ check)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00009}00009\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'n'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00010}00010\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ from;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00011}00011\ \ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00012}00012\ \ \ \ \ \textcolor{keywordtype}{int}\ naToUnitIfPattern\ =\ (check)\ ?\ 0\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00013}00013\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'n'}\ \&\&\ !naToUnitIfPattern)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *px\ =\ LOGICAL(x);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ R\_xlen\_t\ nx\ =\ XLENGTH(x);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (nx-\/-\/\ >\ 0)\ \textcolor{keywordflow}{if}\ (*(px++)\ ==\ NA\_LOGICAL)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00017}00017\ \ \ \ \ \ \ \ \ naToUnitIfPattern\ =\ nx\ >=\ 0;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00018}00018\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'}\ \&\&\ !naToUnitIfPattern)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ from;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00021}00021\ \ \ \ \ PROTECT(x);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(from),\ m\ =\ pdim[0],\ n\ =\ pdim[1],}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00023}00023\ \ \ \ \ \ \ \ \ packed\ =\ \textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'p'},\ canonical\ =\ !naToUnitIfPattern;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \textcolor{charliteral}{'\(\backslash\)0'},\ ct\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'p'})\ ?\ \textcolor{charliteral}{'C'}\ :\ \textcolor{charliteral}{'\(\backslash\)0'},\ nu\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'g'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(from);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ ct\ =\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(from);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'t'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00030}00030\ \ \ \ \ \ \ \ \ nu\ =\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(from);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{if}\ (canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00032}00032\ \textcolor{preprocessor}{\#define\ TEMPLATE(c)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00034}00034\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#TYPE\ *px\ =\ c\#\#PTR(x);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ canonical\ =\ (!packed)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ !c\#\#NAME(test2)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ !c\#\#NAME(test1)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{M5_8h_a3d0bdfd9c1220a37d7c27ee51442e38e}{SWITCH5}}(\textcolor{keyword}{class}[0],\ \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00040}00040\ \textcolor{preprocessor}{\#undef\ TEMPLATE}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ from;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00046}00046\ \ \ \ \ SEXP\ y\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x),\ XLENGTH(x)));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00047}00047\ \textcolor{preprocessor}{\#define\ TEMPLATE(c)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00048}00048\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00049}00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ c\#\#TYPE\ *px\ =\ c\#\#PTR(x),\ *py\ =\ c\#\#PTR(y);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00050}00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (class[1]\ ==\ 'g')\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00051}00051\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ memcpy(py,\ px,\ sizeof(c\#\#TYPE)\ *\ (size\_t)\ m\ *\ (size\_t)\ n);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00052}00052\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ if\ (!packed)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#NAME(force2)(py,\ px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00054}00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#NAME(force1)(py,\ px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00056}00056\ \textcolor{preprocessor}{\ \ \ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{M5_8h_ad75d2f3f86085236205a60ad7a56340b}{SWITCH4}}(\textcolor{keyword}{class}[0],\ \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00058}00058\ \textcolor{preprocessor}{\#undef\ TEMPLATE}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'n'}\ \&\&\ naToUnitIfPattern)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *py\ =\ LOGICAL(y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ R\_xlen\_t\ ny\ =\ XLENGTH(y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (ny-\/-\/\ >\ 0)\ \{\ *py\ =\ *py\ !=\ 0;\ ++py;\ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00064}00064\ \ \ \ \ SEXP\ to\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\textcolor{keyword}{class}));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(to,\ m,\ n);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(to,\ 0,\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(from,\ 0));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'g'}\ \&\&\ ul\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(to);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ ct\ !=\ \textcolor{charliteral}{'C'}\ \&\&\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a73b72184aa5f669b3d7faf07f44ee2f9}{SET\_TRANS}}(to);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00071}00071\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'t'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ae531a5abb3560eccb784f99aae04eb46}{COPY\_SLOT}}(to,\ from,\ \mbox{\hyperlink{init_8c_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'o'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_ae531a5abb3560eccb784f99aae04eb46}{COPY\_SLOT}}(to,\ from,\ \mbox{\hyperlink{init_8c_a1520d9422561030d0797f706cdb06509}{Matrix\_sdSym}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00076}00076\ \ \ \ \ UNPROTECT(3);\ \textcolor{comment}{/*\ to,\ y,\ x\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{return}\ to;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00080}\mbox{\hyperlink{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc}{00080}}\ SEXP\ \mbox{\hyperlink{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc}{sparse\_force\_canonical}}(SEXP\ from,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ check)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00081}00081\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00082}00082\ \ \ \ \ SEXP\ to\ =\ from;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00083}00083\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{class}[1])\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00086}00086\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00087}00087\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(from)\ ==\ \textcolor{charliteral}{'C'})\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}}));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(from)[1],\ canonical\ =\ (check)\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(from);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ !=\ \textcolor{charliteral}{'T'})\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ iSym\ =\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'C'})\ ?\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}}\ :\ \mbox{\hyperlink{init_8c_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}},}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ p\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}})),}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ iSym));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *pp\ =\ INTEGER(p)\ +\ 1,\ *pi\ =\ INTEGER(i),\ j,\ k\_,\ k,\ kend,}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ up\ =\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'C'})\ ==\ (ul\ ==\ \textcolor{charliteral}{'U'});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ 0;\ k\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[k\_\ =\ (up)\ ?\ kend\ -\/\ 1\ :\ k]\ ==\ j\ \&\&}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (ISNAN(px[k\_].i)\ ||\ px[k\_].i\ !=\ 0.0))}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ canonical\ =\ j\ ==\ n;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a3f84b9d9612a9f11c35c79d7ab54c7e4}{duplicateVector}}(x));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rcomplex\ *py\ =\ COMPLEX(y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (k\ <\ kend\ \&\&\ pi[k\_\ =\ (up)\ ?\ kend\ -\/\ 1\ :\ k]\ ==\ j)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py[k\_].r\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(to\ =\ \mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\textcolor{keyword}{class}));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(to,\ n,\ n);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(to,\ 0,\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(from,\ 0));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(to);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_af08cd6c75b2da4b71c2eb605e00e94ab}{Matrix\_pSym}},\ p);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ to,\ y\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ i,\ p\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00129}00129\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ i\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}})),}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ j\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(from,\ \mbox{\hyperlink{init_8c_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}}));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *pi\ =\ INTEGER(i),\ *pj\ =\ INTEGER(j);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ R\_xlen\_t\ k\ =\ 0,\ kend\ =\ XLENGTH(i);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ k\ <\ kend;\ ++k)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi[k]\ ==\ pj[k]\ \&\&}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (ISNAN(px[k].i)\ ||\ px[k].i\ !=\ 0.0))}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ canonical\ =\ k\ ==\ kend;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!canonical)\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ y\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a3f84b9d9612a9f11c35c79d7ab54c7e4}{duplicateVector}}(x));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rcomplex\ *py\ =\ COMPLEX(y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ k\ <\ kend;\ ++k)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi[k]\ ==\ pj[k])}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ py[k].i\ =\ 0.0;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(to\ =\ \mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\textcolor{keyword}{class}));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(to,\ n,\ n);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(to,\ 0,\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(from,\ 0));}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(to);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a900b6b19a8e80b529c1a26eb9fb6156d}{Matrix\_iSym}},\ i);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a92da52e94414e4e2c04f11a6dce844d7}{Matrix\_jSym}},\ j);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(to,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ y);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ to,\ y\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ j,\ i\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ x\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00161}00161\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(from)\ !=\ \textcolor{charliteral}{'N'})\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ defined\ in\ ./diag.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00166}00166\ \ \ \ \ \ \ \ \ SEXP\ \mbox{\hyperlink{diag_8c_ad82b908d13de044f7621a16966c20e55}{sparse\_diag\_set}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ SEXP);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ SEXP\ value\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00168}00168\ \textcolor{preprocessor}{\#define\ TEMPLATE(c)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00169}00169\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00170}00170\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ value\ =\ Rf\_allocVector(c\#\#TYPESXP,\ 1);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00171}00171\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#PTR(value)[0]\ =\ c\#\#UNIT;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00172}00172\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{M5_8h_ad75d2f3f86085236205a60ad7a56340b}{SWITCH4}}(\textcolor{keyword}{class}[0],\ \mbox{\hyperlink{forceCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00174}00174\ \textcolor{preprocessor}{\#undef\ TEMPLATE}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ PROTECT(value);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00176}00176\ \ \ \ \ \ \ \ \ to\ =\ \mbox{\hyperlink{diag_8c_ad82b908d13de044f7621a16966c20e55}{sparse\_diag\_set}}(from,\ \textcolor{keyword}{class},\ value);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00177}00177\ \ \ \ \ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ value\ */}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00178}00178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00179}00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00180}00180\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ Rf\_error(\textcolor{stringliteral}{"{}should\ never\ happen\ ..."{}});}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ to\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00185}00185\ \ \ \ \ \textcolor{keywordflow}{return}\ to;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00186}00186\ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00188}\mbox{\hyperlink{forceCanonical_8c_af59df1fb88c2cecacd8f572e503cf02e}{00188}}\ SEXP\ \mbox{\hyperlink{forceCanonical_8c_af59df1fb88c2cecacd8f572e503cf02e}{R\_dense\_force\_canonical}}(SEXP\ s\_from,\ SEXP\ s\_check)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00189}00189\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00190}00190\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_from,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 0,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00192}00192\ \ \ \ \ \textcolor{keywordtype}{int}\ check;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_af2c97a732548aa3a1a2062de2b72fe2e}{VALID\_LOGIC2}}(s\_check,\ check);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00195}00195\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{forceCanonical_8c_a9cf1bcaab15c16704d7410d067d3fc40}{dense\_force\_canonical}}(s\_from,\ \textcolor{keyword}{class},\ check);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00196}00196\ \}}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00198}\mbox{\hyperlink{forceCanonical_8c_a57ea8b3bf10f14caf5a6cddfe2ffea02}{00198}}\ SEXP\ \mbox{\hyperlink{forceCanonical_8c_a57ea8b3bf10f14caf5a6cddfe2ffea02}{R\_sparse\_force\_canonical}}(SEXP\ s\_from,\ SEXP\ s\_check)}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00199}00199\ \{}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00200}00200\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_from,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 0,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00202}00202\ \ \ \ \ \textcolor{keywordtype}{int}\ check;}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_af2c97a732548aa3a1a2062de2b72fe2e}{VALID\_LOGIC2}}(s\_check,\ check);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{forceCanonical_8c_ad8c5af11af62df70a2ee0969011c6ccc}{sparse\_force\_canonical}}(s\_from,\ \textcolor{keyword}{class},\ check);}
+\DoxyCodeLine{\Hypertarget{forceCanonical_8c_source_l00206}00206\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,487 @@
+\doxysection{col\+Sums.\+c File Reference}
+\hypertarget{colSums_8c}{}\label{colSums_8c}\index{colSums.c@{colSums.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a3e39b0ea9afebadaba32b8ae1eb419ea}{SUM\+\_\+\+TYPEOF}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a15cd122f8826fcf0dd5e3437e3153b0a}{MAP}}(i)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a500d2c0309955ca4feeed799aa2e2767}{l\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_af6920beb87d2fc835d63b188518246ed}{i\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_aa1ef1a3984e7672050a17891ad52981c}{d\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a1f75abdbc23c19db6db44012b5203bc3}{z\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}(c0,  c1)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8}{SUM\+\_\+\+KERNEL}}(c0,  c1,  \+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}(c0,  c1)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8}{SUM\+\_\+\+KERNEL}}(c0,  c1,  \+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_afc284c48a9b97bf4044416d70617efbe}{n\+CAST}}(x)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}(c0,  c1)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}(c0,  c1)
+\item 
+\#define \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}(c0,  c1)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{colSums_8c_a72e7af212baeff229d9bf132518f0bc3}{sparse\+\_\+aggregate}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+static void \mbox{\hyperlink{colSums_8c_a4ea11a91ebb93b1b8fc6a72ffa99bf4a}{dense\+\_\+colsum}} (SEXP x, const char \texorpdfstring{$\ast$}{*}class, int m, int n, char ul, char ct, char nu, int narm, int mean, SEXP ans)
+\item 
+static void \mbox{\hyperlink{colSums_8c_aa196d7b2b1ca50b274c63fd71e701b78}{dense\+\_\+rowsum}} (SEXP x, const char \texorpdfstring{$\ast$}{*}class, int m, int n, char ul, char ct, char nu, int narm, int mean, SEXP ans)
+\item 
+static void \mbox{\hyperlink{colSums_8c_a854dc47ec65d069adda6ede171bfbd1d}{Csparse\+\_\+colsum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int m, int n, char ul, char ct, char nu, int narm, int mean, SEXP ans)
+\item 
+static void \mbox{\hyperlink{colSums_8c_ad9878437567105db35250e4aeb71c72b}{Csparse\+\_\+rowsum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int m, int n, char ul, char ct, char nu, int narm, int mean, SEXP ans, SEXP i\+Sym)
+\item 
+static void \mbox{\hyperlink{colSums_8c_a56b5fb58e307560bf280549576117885}{Tsparse\+\_\+colsum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int m, int n, char ul, char ct, char nu, int narm, int mean, SEXP ans, SEXP i\+Sym, SEXP j\+Sym)
+\item 
+SEXP \mbox{\hyperlink{colSums_8c_a34594ed778c7cc16684f85a40e04a90f}{dense\+\_\+marginsum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int mg, int narm, int mean)
+\item 
+SEXP \mbox{\hyperlink{colSums_8c_a5446cc5fac297cb478973c1d8c4e19da}{sparse\+\_\+marginsum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int mg, int narm, int mean, int sparse)
+\item 
+SEXP \mbox{\hyperlink{colSums_8c_ab7a4966311dbde49690da0d8e6b8d5af}{R\+\_\+sparse\+\_\+marginsum}} (SEXP s\+\_\+obj, SEXP s\+\_\+margin, SEXP s\+\_\+narm, SEXP s\+\_\+mean, SEXP s\+\_\+sparse)
+\item 
+SEXP \mbox{\hyperlink{colSums_8c_ac7e1d13b5220f35b86c02d4e2ccb6c04}{R\+\_\+dense\+\_\+marginsum}} (SEXP s\+\_\+obj, SEXP s\+\_\+margin, SEXP s\+\_\+narm, SEXP s\+\_\+mean)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{colSums_8c_aa1ef1a3984e7672050a17891ad52981c}\index{colSums.c@{colSums.c}!dCAST@{dCAST}}
+\index{dCAST@{dCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{dCAST}{dCAST}}
+{\footnotesize\ttfamily \label{colSums_8c_aa1ef1a3984e7672050a17891ad52981c} 
+\#define d\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00016}{16}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_af6920beb87d2fc835d63b188518246ed}\index{colSums.c@{colSums.c}!iCAST@{iCAST}}
+\index{iCAST@{iCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{iCAST}{iCAST}}
+{\footnotesize\ttfamily \label{colSums_8c_af6920beb87d2fc835d63b188518246ed} 
+\#define i\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00015}{15}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_a500d2c0309955ca4feeed799aa2e2767}\index{colSums.c@{colSums.c}!lCAST@{lCAST}}
+\index{lCAST@{lCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{lCAST}{lCAST}}
+{\footnotesize\ttfamily \label{colSums_8c_a500d2c0309955ca4feeed799aa2e2767} 
+\#define l\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00014}{14}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_a15cd122f8826fcf0dd5e3437e3153b0a}\index{colSums.c@{colSums.c}!MAP@{MAP}}
+\index{MAP@{MAP}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{MAP}{MAP}}
+{\footnotesize\ttfamily \label{colSums_8c_a15cd122f8826fcf0dd5e3437e3153b0a} 
+\#define MAP(\begin{DoxyParamCaption}\item[{}]{i}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(map)\ ?\ map[i]\ :\ i}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00012}{12}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_afc284c48a9b97bf4044416d70617efbe}\index{colSums.c@{colSums.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{colSums_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00020}{20}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_afc284c48a9b97bf4044416d70617efbe}\index{colSums.c@{colSums.c}!nCAST@{nCAST}}
+\index{nCAST@{nCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{nCAST}{nCAST}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{colSums_8c_afc284c48a9b97bf4044416d70617efbe} 
+\#define n\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00020}{20}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+\Hypertarget{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}\index{colSums.c@{colSums.c}!SUM@{SUM}}
+\index{SUM@{SUM}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90} 
+\#define SUM(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{}\end{DoxyParamCaption})}
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00224}{Csparse\+\_\+colsum()}}, \mbox{\hyperlink{colSums_8c_source_l00316}{Csparse\+\_\+rowsum()}}, \mbox{\hyperlink{colSums_8c_source_l00023}{dense\+\_\+colsum()}}, \mbox{\hyperlink{colSums_8c_source_l00112}{dense\+\_\+rowsum()}}, and \mbox{\hyperlink{colSums_8c_source_l00456}{Tsparse\+\_\+colsum()}}.
+
+\Hypertarget{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}\index{colSums.c@{colSums.c}!SUM@{SUM}}
+\index{SUM@{SUM}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90} 
+\#define SUM(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{}\end{DoxyParamCaption})}
+
+\Hypertarget{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}\index{colSums.c@{colSums.c}!SUM@{SUM}}
+\index{SUM@{SUM}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90} 
+\#define SUM(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c0\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SEXP\ x0\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c0\#\#TYPE\ *px0\ =\ c0\#\#PTR(x0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c1\#\#TYPE\ *px1\ =\ c1\#\#PTR(x1),\ tmp1\ =\ (un)\ ?\ c1\#\#UNIT\ :\ c1\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp0[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (full\ ||\ k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *px1\ =\ tmp1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\ =\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (c0\#\#NOT\_NA(*px0))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#INCREMENT\_IDEN(*px1,\ c0\#\#CAST(*px0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *px1\ =\ c1\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/count;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c0\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#DIVIDE(*px1,\ count);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}\index{colSums.c@{colSums.c}!SUM@{SUM}}
+\index{SUM@{SUM}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90} 
+\#define SUM(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{}\end{DoxyParamCaption})}
+
+\Hypertarget{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}\index{colSums.c@{colSums.c}!SUM@{SUM}}
+\index{SUM@{SUM}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90} 
+\#define SUM(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{}\end{DoxyParamCaption})}
+
+\Hypertarget{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8}\index{colSums.c@{colSums.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{, }\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ count\ =\ m;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (c0\#\#NOT\_NA(*px0))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#INCREMENT\_IDEN(*px1,\ c0\#\#CAST(*px0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *px1\ =\ c1\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/count;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ px0\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (mean)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c1\#\#DIVIDE(*px1,\ count);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8}\index{colSums.c@{colSums.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{colSums_8c_ae3f3199071eb496a96a58561d44ab1a8} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{c0}{, }\item[{}]{c1}{, }\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (he\ \&\&\ i\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c0\#\#ASSIGN\_PROJ\_REAL(tmp0,\ *px0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c0\#\#ASSIGN\_IDEN\ \ \ \ \ (tmp0,\ *px0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (c0\#\#NOT\_NA(tmp0))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#INCREMENT\_IDEN(px1[i],\ c0\#\#CAST(tmp0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (sy\ \&\&\ i\ !=\ j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (he)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#INCREMENT\_CONJ(px1[j],\ c0\#\#CAST(tmp0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c1\#\#INCREMENT\_IDEN(px1[j],\ c0\#\#CAST(tmp0));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px1[i]\ =\ c1\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (sy\ \&\&\ i\ !=\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px1[j]\ =\ c1\#\#NA;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (mean)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/count[i];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (sy\ \&\&\ i\ !=\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/count[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ px0\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{colSums_8c_a3e39b0ea9afebadaba32b8ae1eb419ea}\index{colSums.c@{colSums.c}!SUM\_TYPEOF@{SUM\_TYPEOF}}
+\index{SUM\_TYPEOF@{SUM\_TYPEOF}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_TYPEOF}{SUM\_TYPEOF}}
+{\footnotesize\ttfamily \label{colSums_8c_a3e39b0ea9afebadaba32b8ae1eb419ea} 
+\#define SUM\+\_\+\+TYPEOF(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ ==\ \textcolor{charliteral}{'z'})\ ?\ CPLXSXP\ :\ (mean\ ||\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ ==\ \textcolor{stringliteral}{'d'}\ ||\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\ ==\ \textcolor{stringliteral}{'i'})\ ?\ REALSXP\ :\ INTSXP}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00009}{9}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00224}{Csparse\+\_\+colsum()}}, \mbox{\hyperlink{colSums_8c_source_l00316}{Csparse\+\_\+rowsum()}}, \mbox{\hyperlink{colSums_8c_source_l00593}{dense\+\_\+marginsum()}}, \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}, and \mbox{\hyperlink{colSums_8c_source_l00456}{Tsparse\+\_\+colsum()}}.
+
+\Hypertarget{colSums_8c_a1f75abdbc23c19db6db44012b5203bc3}\index{colSums.c@{colSums.c}!zCAST@{zCAST}}
+\index{zCAST@{zCAST}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{zCAST}{zCAST}}
+{\footnotesize\ttfamily \label{colSums_8c_a1f75abdbc23c19db6db44012b5203bc3} 
+\#define z\+CAST(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00017}{17}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{colSums_8c_a854dc47ec65d069adda6ede171bfbd1d}\index{colSums.c@{colSums.c}!Csparse\_colsum@{Csparse\_colsum}}
+\index{Csparse\_colsum@{Csparse\_colsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{Csparse\_colsum()}{Csparse\_colsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_a854dc47ec65d069adda6ede171bfbd1d} 
+static void Csparse\+\_\+colsum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{SEXP}]{ans}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00224}{224}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}, \mbox{\hyperlink{colSums_8c_source_l00009}{SUM\+\_\+\+TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_ad9878437567105db35250e4aeb71c72b}\index{colSums.c@{colSums.c}!Csparse\_rowsum@{Csparse\_rowsum}}
+\index{Csparse\_rowsum@{Csparse\_rowsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{Csparse\_rowsum()}{Csparse\_rowsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_ad9878437567105db35250e4aeb71c72b} 
+static void Csparse\+\_\+rowsum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{SEXP}]{ans}{, }\item[{SEXP}]{i\+Sym}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00316}{316}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}, \mbox{\hyperlink{colSums_8c_source_l00009}{SUM\+\_\+\+TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_a4ea11a91ebb93b1b8fc6a72ffa99bf4a}\index{colSums.c@{colSums.c}!dense\_colsum@{dense\_colsum}}
+\index{dense\_colsum@{dense\_colsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{dense\_colsum()}{dense\_colsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_a4ea11a91ebb93b1b8fc6a72ffa99bf4a} 
+static void dense\+\_\+colsum (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{SEXP}]{ans}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00023}{23}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00593}{dense\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_a34594ed778c7cc16684f85a40e04a90f}\index{colSums.c@{colSums.c}!dense\_marginsum@{dense\_marginsum}}
+\index{dense\_marginsum@{dense\_marginsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{dense\_marginsum()}{dense\_marginsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_a34594ed778c7cc16684f85a40e04a90f} 
+SEXP dense\+\_\+marginsum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{mg}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00593}{593}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{colSums_8c_source_l00023}{dense\+\_\+colsum()}}, \mbox{\hyperlink{colSums_8c_source_l00112}{dense\+\_\+rowsum()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{colSums_8c_source_l00009}{SUM\+\_\+\+TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00729}{R\+\_\+dense\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_aa196d7b2b1ca50b274c63fd71e701b78}\index{colSums.c@{colSums.c}!dense\_rowsum@{dense\_rowsum}}
+\index{dense\_rowsum@{dense\_rowsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{dense\_rowsum()}{dense\_rowsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_aa196d7b2b1ca50b274c63fd71e701b78} 
+static void dense\+\_\+rowsum (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{SEXP}]{ans}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00112}{112}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, and \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00593}{dense\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_ac7e1d13b5220f35b86c02d4e2ccb6c04}\index{colSums.c@{colSums.c}!R\_dense\_marginsum@{R\_dense\_marginsum}}
+\index{R\_dense\_marginsum@{R\_dense\_marginsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_marginsum()}{R\_dense\_marginsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_ac7e1d13b5220f35b86c02d4e2ccb6c04} 
+SEXP R\+\_\+dense\+\_\+marginsum (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+margin}{, }\item[{SEXP}]{s\+\_\+narm}{, }\item[{SEXP}]{s\+\_\+mean}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00729}{729}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{colSums_8c_source_l00593}{dense\+\_\+marginsum()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00209}{VALID\+\_\+\+MARGIN}}.
+
+\Hypertarget{colSums_8c_ab7a4966311dbde49690da0d8e6b8d5af}\index{colSums.c@{colSums.c}!R\_sparse\_marginsum@{R\_sparse\_marginsum}}
+\index{R\_sparse\_marginsum@{R\_sparse\_marginsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_marginsum()}{R\_sparse\_marginsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_ab7a4966311dbde49690da0d8e6b8d5af} 
+SEXP R\+\_\+sparse\+\_\+marginsum (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+margin}{, }\item[{SEXP}]{s\+\_\+narm}{, }\item[{SEXP}]{s\+\_\+mean}{, }\item[{SEXP}]{s\+\_\+sparse}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00713}{713}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, \mbox{\hyperlink{Mdefines_8h_source_l00209}{VALID\+\_\+\+MARGIN}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{colSums_8c_a72e7af212baeff229d9bf132518f0bc3}\index{colSums.c@{colSums.c}!sparse\_aggregate@{sparse\_aggregate}}
+\index{sparse\_aggregate@{sparse\_aggregate}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_aggregate()}{sparse\_aggregate()}}
+{\footnotesize\ttfamily \label{colSums_8c_a72e7af212baeff229d9bf132518f0bc3} 
+SEXP sparse\+\_\+aggregate (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aggregate_8c_source_l00005}{5}} of file \mbox{\hyperlink{aggregate_8c_source}{aggregate.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00456}{Tsparse\+\_\+colsum()}}.
+
+\Hypertarget{colSums_8c_a5446cc5fac297cb478973c1d8c4e19da}\index{colSums.c@{colSums.c}!sparse\_marginsum@{sparse\_marginsum}}
+\index{sparse\_marginsum@{sparse\_marginsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_marginsum()}{sparse\_marginsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_a5446cc5fac297cb478973c1d8c4e19da} 
+SEXP sparse\+\_\+marginsum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{mg}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{int}]{sparse}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00629}{629}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{colSums_8c_source_l00224}{Csparse\+\_\+colsum()}}, \mbox{\hyperlink{colSums_8c_source_l00316}{Csparse\+\_\+rowsum()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00612}{Matrix\+\_\+length\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{colSums_8c_source_l00009}{SUM\+\_\+\+TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{colSums_8c_source_l00456}{Tsparse\+\_\+colsum()}}, \mbox{\hyperlink{objects_8c_source_l00020}{type\+To\+Kind()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00713}{R\+\_\+sparse\+\_\+marginsum()}}.
+
+\Hypertarget{colSums_8c_a56b5fb58e307560bf280549576117885}\index{colSums.c@{colSums.c}!Tsparse\_colsum@{Tsparse\_colsum}}
+\index{Tsparse\_colsum@{Tsparse\_colsum}!colSums.c@{colSums.c}}
+\doxysubsubsection{\texorpdfstring{Tsparse\_colsum()}{Tsparse\_colsum()}}
+{\footnotesize\ttfamily \label{colSums_8c_a56b5fb58e307560bf280549576117885} 
+static void Tsparse\+\_\+colsum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{ct}{, }\item[{char}]{nu}{, }\item[{int}]{narm}{, }\item[{int}]{mean}{, }\item[{SEXP}]{ans}{, }\item[{SEXP}]{i\+Sym}{, }\item[{SEXP}]{j\+Sym}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{colSums_8c_source_l00456}{456}} of file \mbox{\hyperlink{colSums_8c_source}{col\+Sums.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{colSums_8c_a0eacf3b289fc24a6851a3f316ebe2c90}{SUM}}, \mbox{\hyperlink{colSums_8c_source_l00009}{SUM\+\_\+\+TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}.
+

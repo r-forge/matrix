@@ -1,0 +1,119 @@
+\doxysection{is\+Diagonal.\+c File Reference}
+\hypertarget{isDiagonal_8c}{}\label{isDiagonal_8c}\index{isDiagonal.c@{isDiagonal.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{isDiagonal_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{isDiagonal_8c_aea5723ec5c6d52308ee5ee54a73fec8f}{dense\+\_\+is\+\_\+diagonal}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+int \mbox{\hyperlink{isDiagonal_8c_af1f394734c5e4fcb4e0b16eca6856190}{sparse\+\_\+is\+\_\+diagonal}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{isDiagonal_8c_a91d17eb1d61bc2635777de0acccba470}{R\+\_\+dense\+\_\+is\+\_\+diagonal}} (SEXP s\+\_\+obj)
+\item 
+SEXP \mbox{\hyperlink{isDiagonal_8c_a32dadf9b225ffb6a9451a6f46848200d}{R\+\_\+sparse\+\_\+is\+\_\+diagonal}} (SEXP s\+\_\+obj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{isDiagonal_8c_a5c943ec4d393860c44273d898e789156}\index{isDiagonal.c@{isDiagonal.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!isDiagonal.c@{isDiagonal.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}}
+{\footnotesize\ttfamily \label{isDiagonal_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ -\/\textcolor{charliteral}{'N'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!packed)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ ul\ =\ (ul\ ==\ \textcolor{charliteral}{'U'})\ ?\ \textcolor{charliteral}{'L'}\ :\ \textcolor{stringliteral}{'U'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \ \ ul,\ \textcolor{charliteral}{'\(\backslash\)0'},\ \ \textcolor{charliteral}{'N'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test1)(px,\ (\textcolor{keywordtype}{size\_t})\ n,\ \ \ ul,\ \textcolor{charliteral}{'\(\backslash\)0'},\ -\/\textcolor{charliteral}{'N'}))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isDiagonal_8c_source_l00007}{dense\+\_\+is\+\_\+diagonal()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{isDiagonal_8c_aea5723ec5c6d52308ee5ee54a73fec8f}\index{isDiagonal.c@{isDiagonal.c}!dense\_is\_diagonal@{dense\_is\_diagonal}}
+\index{dense\_is\_diagonal@{dense\_is\_diagonal}!isDiagonal.c@{isDiagonal.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_diagonal()}{dense\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isDiagonal_8c_aea5723ec5c6d52308ee5ee54a73fec8f} 
+int dense\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00007}{7}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{isDiagonal_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{isTriangular_8c_source_l00011}{dense\+\_\+is\+\_\+triangular()}}, and \mbox{\hyperlink{isDiagonal_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+diagonal()}}.
+
+\Hypertarget{isDiagonal_8c_a91d17eb1d61bc2635777de0acccba470}\index{isDiagonal.c@{isDiagonal.c}!R\_dense\_is\_diagonal@{R\_dense\_is\_diagonal}}
+\index{R\_dense\_is\_diagonal@{R\_dense\_is\_diagonal}!isDiagonal.c@{isDiagonal.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_is\_diagonal()}{R\_dense\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isDiagonal_8c_a91d17eb1d61bc2635777de0acccba470} 
+SEXP R\+\_\+dense\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00086}{86}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{isDiagonal_8c_source_l00007}{dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+\Hypertarget{isDiagonal_8c_a32dadf9b225ffb6a9451a6f46848200d}\index{isDiagonal.c@{isDiagonal.c}!R\_sparse\_is\_diagonal@{R\_sparse\_is\_diagonal}}
+\index{R\_sparse\_is\_diagonal@{R\_sparse\_is\_diagonal}!isDiagonal.c@{isDiagonal.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_is\_diagonal()}{R\_sparse\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isDiagonal_8c_a32dadf9b225ffb6a9451a6f46848200d} 
+SEXP R\+\_\+sparse\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00103}{103}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00045}{sparse\+\_\+is\+\_\+diagonal()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{isDiagonal_8c_af1f394734c5e4fcb4e0b16eca6856190}\index{isDiagonal.c@{isDiagonal.c}!sparse\_is\_diagonal@{sparse\_is\_diagonal}}
+\index{sparse\_is\_diagonal@{sparse\_is\_diagonal}!isDiagonal.c@{isDiagonal.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_diagonal()}{sparse\_is\_diagonal()}}
+{\footnotesize\ttfamily \label{isDiagonal_8c_af1f394734c5e4fcb4e0b16eca6856190} 
+int sparse\+\_\+is\+\_\+diagonal (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isDiagonal_8c_source_l00045}{45}} of file \mbox{\hyperlink{isDiagonal_8c_source}{is\+Diagonal.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{isDiagonal_8c_source_l00103}{R\+\_\+sparse\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}, and \mbox{\hyperlink{isTriangular_8c_source_l00060}{sparse\+\_\+is\+\_\+triangular()}}.
+

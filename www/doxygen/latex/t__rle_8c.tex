@@ -1,0 +1,38 @@
+\doxysection{t\+\_\+rle.\+c File Reference}
+\hypertarget{t__rle_8c}{}\label{t__rle_8c}\index{t\_rle.c@{t\_rle.c}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{t__rle_8c_a846ddc6554134fb4f45e1185514b60da}{Matrix\+\_\+\+RLE\+\_\+}} (SEXP x\+\_\+, SEXP force\+\_\+)
+\begin{DoxyCompactList}\small\item\em RLE (Run Length Encoding) -- only when it\textquotesingle{}s worth. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{t__rle_8c_a846ddc6554134fb4f45e1185514b60da}\index{t\_rle.c@{t\_rle.c}!Matrix\_RLE\_@{Matrix\_RLE\_}}
+\index{Matrix\_RLE\_@{Matrix\_RLE\_}!t\_rle.c@{t\_rle.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_RLE\_()}{Matrix\_RLE\_()}}
+{\footnotesize\ttfamily \label{t__rle_8c_a846ddc6554134fb4f45e1185514b60da} 
+SEXP Matrix\+\_\+\+RLE\+\_\+ (\begin{DoxyParamCaption}\item[{SEXP}]{x\+\_\+}{, }\item[{SEXP}]{force\+\_\+}{}\end{DoxyParamCaption})}
+
+
+
+RLE (Run Length Encoding) -- only when it\textquotesingle{}s worth. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x\+\_\+} & R vector which can be coerced to "{}double"{} / "{}integer"{} \\
+\hline
+{\em force\+\_\+} & R logical indicating if the result must be "{}\+RLE"{} even when inefficient\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+NULL or a valid R object of class "{}rle"{} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{t__rle_8c_source_l00037}{37}} of file \mbox{\hyperlink{t__rle_8c_source}{t\+\_\+rle.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}.
+

@@ -1,0 +1,237 @@
+\doxysection{attrib.\+c}
+\hypertarget{attrib_8c_source}{}\label{attrib_8c_source}\index{attrib.c@{attrib.c}}
+\mbox{\hyperlink{attrib_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00003}00003\ \textcolor{comment}{/*\ ....\ Dim\ .........................................................\ */}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00005}\mbox{\hyperlink{attrib_8c_ab3d2fcbebd44b1345cc7ef07f6e136c0}{00005}}\ SEXP\ \mbox{\hyperlink{attrib_8c_ab3d2fcbebd44b1345cc7ef07f6e136c0}{R\_Dim\_prod}}(SEXP\ dim)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00006}00006\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00007}00007\ \ \ \ \ SEXP\ ans;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00008}00008\ \ \ \ \ \textcolor{keywordtype}{int}\ m\ =\ INTEGER(dim)[0],\ n\ =\ INTEGER(dim)[1];}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00009}00009\ \ \ \ \ int\_fast64\_t\ mn\ =\ (int\_fast64\_t)\ m\ *\ n;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00010}00010\ \ \ \ \ \textcolor{keywordflow}{if}\ (mn\ <=\ INT\_MAX)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00011}00011\ \ \ \ \ \ \ \ \ ans\ =\ Rf\_allocVector(INTSXP,\ 1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00012}00012\ \ \ \ \ \ \ \ \ INTEGER(ans)[0]\ =\ (int)\ mn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00013}00013\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ int\_fast64\_t\ mn\_\ =\ (int\_fast64\_t)\ (\textcolor{keywordtype}{double})\ mn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mn\_\ >\ mn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ mn\_\ =\ (int\_fast64\_t)\ nextafter((\textcolor{keywordtype}{double})\ mn,\ 0.0);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00017}00017\ \ \ \ \ \ \ \ \ ans\ =\ Rf\_allocVector(REALSXP,\ 1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00018}00018\ \ \ \ \ \ \ \ \ REAL(ans)[0]\ =\ (double)\ mn\_;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mn\_\ !=\ mn)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ off;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(off\ =\ Rf\_allocVector(REALSXP,\ 1));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ REAL(off)[0]\ =\ (double)\ (mn\ -\/\ mn\_);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_setAttrib(ans,\ \mbox{\hyperlink{init_8c_ab6538f1a4ec8152dbe3f173c75a3bc7e}{Matrix\_offSym}},\ off);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00025}00025\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}true\ length\ \%llu\ truncated\ to\ \%llu"{}}),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mn,\ mn\_);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00028}00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00030}00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00032}00032\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00033}00033\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00036}00036\ \textcolor{comment}{/*\ ....\ Dimnames\ ....................................................\ */}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00038}\mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{00038}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{DimNames\_is\_trivial}}(SEXP\ dn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00039}00039\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ VECTOR\_ELT(dn,\ 0)\ ==\ R\_NilValue\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00042}00042\ \ \ \ \ \ \ \ \ VECTOR\_ELT(dn,\ 1)\ ==\ R\_NilValue\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ Rf\_getAttrib(dn,\ R\_NamesSymbol)\ ==\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00046}\mbox{\hyperlink{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384}{00046}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384}{DimNames\_is\_symmetric}}(SEXP\ dn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00048}00048\ \ \ \ \ SEXP\ rn,\ cn,\ ndn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *nrn,\ *ncn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00050}00050\ \ \ \ \ \textcolor{keywordtype}{int}\ n;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ !(((rn\ =\ VECTOR\_ELT(dn,\ 0))\ !=\ R\_NilValue\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ (cn\ =\ VECTOR\_ELT(dn,\ 1))\ !=\ R\_NilValue\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ rn\ !=\ cn\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ ((n\ =\ LENGTH(rn))\ !=\ LENGTH(cn)\ ||}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{Mdefines_8h_ab39c58e86de5df37b29ae7b4af356582}{equalString}}(rn,\ cn,\ n)))\ ||}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ (((ndn\ =\ Rf\_getAttrib(dn,\ R\_NamesSymbol))\ !=\ R\_NilValue\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ *(nrn\ =\ CHAR(STRING\_ELT(ndn,\ 0)))\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ *(ncn\ =\ CHAR(STRING\_ELT(ndn,\ 1)))\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ strcmp(nrn,\ ncn)\ !=\ 0)));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00064}\mbox{\hyperlink{attrib_8c_a5ffa392b74a113f0879ac01e6fc14291}{00064}}\ SEXP\ \mbox{\hyperlink{attrib_8c_a5ffa392b74a113f0879ac01e6fc14291}{R\_DimNames\_is\_symmetric}}(SEXP\ dn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00065}00065\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(\mbox{\hyperlink{attrib_8c_a4e6bd00056ce1820f3262136ee0f0384}{DimNames\_is\_symmetric}}(dn));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00069}\mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{00069}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{symDN}}(SEXP\ dest,\ SEXP\ src,\ \textcolor{keywordtype}{int}\ J\ \textcolor{comment}{/*\ -\/1|0|1\ */})}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00070}00070\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00071}00071\ \ \ \ \ J\ =\ (J\ <\ 0)\ ?\ -\/1\ :\ (J\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00072}00072\ \ \ \ \ SEXP\ s;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (J\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((s\ =\ VECTOR\_ELT(src,\ J\ =\ 1))\ !=\ R\_NilValue\ ||}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ (s\ =\ VECTOR\_ELT(src,\ J\ =\ 0))\ !=\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ 0,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ 1,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ J\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00080}00080\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((s\ =\ VECTOR\_ELT(src,\ J))\ !=\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ 0,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ 1,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00086}00086\ \ \ \ \ PROTECT(s\ =\ Rf\_getAttrib(src,\ R\_NamesSymbol));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00087}00087\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ !=\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ SEXP\ destnms\ =\ PROTECT(Rf\_allocVector(STRSXP,\ 2));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (CHAR(s\ =\ STRING\_ELT(s,\ J))[0]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_STRING\_ELT(destnms,\ 0,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_STRING\_ELT(destnms,\ 1,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00093}00093\ \ \ \ \ \ \ \ \ Rf\_setAttrib(dest,\ R\_NamesSymbol,\ destnms);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00094}00094\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00096}00096\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00098}00098\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00100}\mbox{\hyperlink{attrib_8c_a091170b866d801d168a5b76a5018cb00}{00100}}\ SEXP\ \mbox{\hyperlink{attrib_8c_a091170b866d801d168a5b76a5018cb00}{R\_symDN}}(SEXP\ dn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00101}00101\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00102}00102\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{DimNames\_is\_trivial}}(dn))}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00104}00104\ \ \ \ \ SEXP\ value\ =\ PROTECT(Rf\_allocVector(VECSXP,\ 2));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{symDN}}(value,\ dn,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00106}00106\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00107}00107\ \ \ \ \ \textcolor{keywordflow}{return}\ value;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00108}00108\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00110}\mbox{\hyperlink{attrib_8c_ab601aeef02127ae15e459880f107acca}{00110}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{attrib_8c_ab601aeef02127ae15e459880f107acca}{cpyDN}}(SEXP\ dest,\ SEXP\ src,\ \textcolor{keywordtype}{int}\ J\ \textcolor{comment}{/*\ 0|1\ */})}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00111}00111\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00112}00112\ \ \ \ \ J\ =\ J\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00113}00113\ \ \ \ \ SEXP\ s;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{if}\ ((s\ =\ VECTOR\_ELT(src,\ 0))\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ \ J,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{if}\ ((s\ =\ VECTOR\_ELT(src,\ 1))\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00117}00117\ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(dest,\ !J,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00118}00118\ \ \ \ \ PROTECT(s\ =\ Rf\_getAttrib(src,\ R\_NamesSymbol));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\ !=\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ SEXP\ srcnms\ =\ s,\ destnms\ =\ PROTECT(Rf\_allocVector(STRSXP,\ 2));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (CHAR(s\ =\ STRING\_ELT(srcnms,\ 0))[0]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_STRING\_ELT(destnms,\ \ J,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (CHAR(s\ =\ STRING\_ELT(srcnms,\ 1))[0]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ SET\_STRING\_ELT(destnms,\ !J,\ s);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ Rf\_setAttrib(dest,\ R\_NamesSymbol,\ destnms);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00127}00127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00128}00128\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00130}00130\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00132}\mbox{\hyperlink{attrib_8c_ae3e06e9624470e34247c9ab851adb3e7}{00132}}\ SEXP\ (\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}})(SEXP\ obj,\ \textcolor{keywordtype}{int}\ mode)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00133}00133\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00134}00134\ \ \ \ \ SEXP\ dn\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a93d8b8a3cd9c897599b3e2d996821a0b}{Matrix\_DimNamesSym}});}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00135}00135\ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ PROTECT(dn);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{DimNames\_is\_trivial}}(dn))\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ value\ =\ PROTECT(Rf\_allocVector(VECSXP,\ 2));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{symDN}}(value,\ dn,\ mode);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_ab601aeef02127ae15e459880f107acca}{cpyDN}}(value,\ dn,\ mode);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ dn\ =\ value;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00145}00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00146}00146\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00147}00147\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00148}00148\ \ \ \ \ \textcolor{keywordflow}{return}\ dn;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00149}00149\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00151}\mbox{\hyperlink{attrib_8c_aa4bb9093b3eb2c6833aa7b63ab882bbb}{00151}}\ void\ (\mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}})(SEXP\ obj,\ \textcolor{keywordtype}{int}\ mode,\ SEXP\ value)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00152}00152\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00153}00153\ \ \ \ \ PROTECT(value);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00154}00154\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{attrib_8c_a732a1db03b1190a8e91d4e62eeea7391}{DimNames\_is\_trivial}}(value))\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ SEXP\ dn\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a93d8b8a3cd9c897599b3e2d996821a0b}{Matrix\_DimNamesSym}}));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{symDN}}(dn,\ value,\ mode);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_ab601aeef02127ae15e459880f107acca}{cpyDN}}(dn,\ value,\ mode);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00162}00162\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00164}00164\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00167}00167\ \textcolor{comment}{/*\ ....\ factors\ .....................................................\ */}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00169}00169\ \textcolor{keyword}{static}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00170}\mbox{\hyperlink{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}{00170}}\ R\_xlen\_t\ \mbox{\hyperlink{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}{strmatch}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ SEXP\ nms)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00171}00171\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00172}00172\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(nms)\ ==\ STRSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (R\_xlen\_t\ i\ =\ 0,\ n\ =\ XLENGTH(nms);\ i\ <\ n;\ ++i)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(s,\ CHAR(STRING\_ELT(nms,\ i)))\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00177}00177\ \ \ \ \ \textcolor{keywordflow}{return}\ (R\_xlen\_t)\ -\/1;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00178}00178\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00180}\mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{00180}}\ SEXP\ \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\_factor}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *nm)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00181}00181\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00182}00182\ \ \ \ \ SEXP\ factors\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}})),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ nms\ =\ PROTECT(Rf\_getAttrib(factors,\ R\_NamesSymbol)),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ val\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00185}00185\ \ \ \ \ R\_xlen\_t\ i\ =\ \mbox{\hyperlink{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}{strmatch}}(nm,\ nms);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00186}00186\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ 0)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ val\ =\ VECTOR\_ELT(factors,\ i);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00188}00188\ \ \ \ \ UNPROTECT(2);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00189}00189\ \ \ \ \ \textcolor{keywordflow}{return}\ val;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00190}00190\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00192}\mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{00192}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\_factor}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *nm,\ SEXP\ val)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00193}00193\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00194}00194\ \ \ \ \ PROTECT(obj);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00195}00195\ \ \ \ \ PROTECT(val);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00196}00196\ \ \ \ \ SEXP\ factors\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}})),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00197}00197\ \ \ \ \ \ \ \ \ nms\ =\ PROTECT(Rf\_getAttrib(factors,\ R\_NamesSymbol));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00198}00198\ \ \ \ \ R\_xlen\_t\ i\ =\ \mbox{\hyperlink{attrib_8c_ab256d6aa296e8c9449f5d744c5b685c6}{strmatch}}(nm,\ nms);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00199}00199\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00200}00200\ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(factors,\ i,\ val);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00201}00201\ \ \ \ \ \ \ \ \ UNPROTECT(4);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00203}00203\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00204}00204\ \ \ \ \ R\_xlen\_t\ n\ =\ XLENGTH(factors);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00205}00205\ \ \ \ \ SEXP\ factors1\ =\ PROTECT(Rf\_allocVector(VECSXP,\ n\ +\ 1)),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00206}00206\ \ \ \ \ \ \ \ \ nms1\ =\ PROTECT(Rf\_allocVector(STRSXP,\ n\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00208}00208\ \ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(factors1,\ i,\ VECTOR\_ELT(factors,\ i));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nms\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00210}00210\ \ \ \ \ \ \ \ \ SET\_STRING\_ELT(\ \ \ \ nms1,\ i,\ STRING\_ELT(\ \ \ \ nms,\ i));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00212}00212\ \ \ \ \ SET\_VECTOR\_ELT(factors1,\ n,\ \ \ \ \ \ \ \ \ \ \ val);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00213}00213\ \ \ \ \ SET\_STRING\_ELT(\ \ \ \ nms1,\ n,\ Rf\_mkChar(nm));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00214}00214\ \ \ \ \ Rf\_setAttrib(factors1,\ R\_NamesSymbol,\ nms1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00215}00215\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}},\ factors1);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00216}00216\ \ \ \ \ UNPROTECT(6);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00218}00218\ \}}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00220}\mbox{\hyperlink{attrib_8c_a7d478983a9cbc3b79a75cde8c6594ad3}{00220}}\ SEXP\ \mbox{\hyperlink{attrib_8c_a7d478983a9cbc3b79a75cde8c6594ad3}{R\_set\_factor}}(SEXP\ s\_obj,\ SEXP\ s\_nm,\ SEXP\ s\_val,\ SEXP\ s\_warn)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00221}00221\ \{}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00222}00222\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_nm)\ !=\ STRSXP\ ||\ LENGTH(s\_nm)\ <\ 1\ ||}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00223}00223\ \ \ \ \ \ \ \ \ (s\_nm\ =\ STRING\_ELT(s\_nm,\ 0))\ ==\ NA\_STRING)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00224}00224\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}invalid\ factor\ name"{}}));}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00225}00225\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(Rf\_getAttrib(s\_obj,\ \mbox{\hyperlink{init_8c_a2faa3fc96fc68ab6d388d99292c7b588}{Matrix\_factorsSym}}))\ ==\ VECSXP)}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00226}00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\_factor}}(s\_obj,\ CHAR(s\_nm),\ s\_val);}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00227}00227\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (Rf\_asLogical(s\_warn))}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00228}00228\ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}attempt\ to\ set\ factor\ on\ \%s\ without\ '\%s'\ slot"{}}),}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Matrix"{}},\ \textcolor{stringliteral}{"{}factors"{}});}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00230}00230\ \ \ \ \ \textcolor{keywordflow}{return}\ s\_val;}
+\DoxyCodeLine{\Hypertarget{attrib_8c_source_l00231}00231\ \}}
+
+\end{DoxyCode}

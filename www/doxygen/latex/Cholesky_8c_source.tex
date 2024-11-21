@@ -1,0 +1,312 @@
+\doxysection{Cholesky.\+c}
+\hypertarget{Cholesky_8c_source}{}\label{Cholesky_8c_source}\index{Cholesky.c@{Cholesky.c}}
+\mbox{\hyperlink{Cholesky_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Lapack-etc_8h}{Lapack-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{cholmod-etc_8h}{cholmod-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00005}00005\ \textcolor{comment}{/*\ defined\ in\ ./coerce.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00006}00006\ SEXP\ \mbox{\hyperlink{Cholesky_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00007}00007\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60}{sparse\_as\_kind}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00008}00008\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a2e2a5724be872e07c3f1a3bf835e8422}{sparse\_as\_general}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00009}00009\ SEXP\ \mbox{\hyperlink{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f}{sparse\_as\_Csparse}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00011}00011\ \textcolor{comment}{/*\ defined\ in\ ./forceCanonical.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00012}00012\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\_force\_canonical}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00014}00014\ \textcolor{comment}{/*\ defined\ in\ ./forceSymmetric.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00015}00015\ SEXP\ \mbox{\hyperlink{Cholesky_8c_ad926ad4dd0d79d81d82fee5ff090108b}{sparse\_force\_symmetric}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00017}00017\ \textcolor{comment}{/*\ defined\ in\ ./t.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00018}00018\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a03c78144d411cca2c647b0536d8499b3}{sparse\_transpose}}(SEXP,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *,\ \textcolor{keywordtype}{char},\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00020}\mbox{\hyperlink{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2}{00020}}\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2}{dense\_cholesky}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ warn,\ \textcolor{keywordtype}{int}\ pivot,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ tol,\ \textcolor{keywordtype}{char}\ ul)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00023}00023\ \ \ \ \ \textcolor{keywordtype}{int}\ *pdim\ =\ \mbox{\hyperlink{Mdefines_8h_a8fc6a2907a5d6c8bfa268abb4bff8636}{DIM}}(obj),\ n\ =\ pdim[1];}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (pdim[0]\ !=\ n)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00025}00025\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}matrix\ is\ not\ square"{}}));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00026}00026\ \ \ \ \ ul\ =\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'g'})\ ?\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj)\ :\ (ul\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ ?\ \textcolor{charliteral}{'U'}\ :\ ul;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[]\ =\ \textcolor{stringliteral}{"{}.denseCholesky"{}};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}[0]\ =\ (\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'})\ ?\ \textcolor{charliteral}{'z'}\ :\ \textcolor{charliteral}{'d'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00029}00029\ \ \ \ \ SEXP\ ans\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_ad794d2d904f14e22e2e24c4bed786708}{newObject}}(\mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a0b0b1c3066220d60f5f86359074ba1bd}{SET\_DIM}}(ans,\ n,\ n);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(ans,\ -\/(\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}),\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(obj,\ 0));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00032}00032\ \ \ \ \ \textcolor{keywordflow}{if}\ (ul\ !=\ \textcolor{charliteral}{'U'})}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a336441c5766ecae5c548ca283dab02c0}{SET\_UPLO}}(ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00035}00035\ \ \ \ \ PROTECT\_INDEX\ pid;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00036}00036\ \ \ \ \ PROTECT\_WITH\_INDEX(obj,\ \&pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00037}00037\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'z'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'d'})\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00038}00038\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(obj,\ \textcolor{keyword}{class},\ \textcolor{charliteral}{','},\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'t'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(obj)\ !=\ \textcolor{charliteral}{'N'})}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00042}00042\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\_force\_canonical}}(obj,\ \textcolor{keyword}{class},\ 0),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00043}00043\ \ \ \ \ SEXP\ x\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}})),}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00044}00044\ \ \ \ \ \ \ \ \ y\ =\ PROTECT(Rf\_allocVector(\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x),\ XLENGTH(x)));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00045}00045\ \ \ \ \ \textcolor{keywordtype}{int}\ info;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ !=\ \textcolor{charliteral}{'p'})\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00047}00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00048}00048\ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x),\ *py\ =\ COMPLEX(y);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00049}00049\ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00050}00050\ \ \ \ \ F77\_CALL(zlacpy)(\&ul,\ \&n,\ \&n,\ px,\ \&n,\ py,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00051}00051\ \ \ \ \ \textcolor{keywordflow}{if}\ (!pivot)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00052}00052\ \ \ \ \ F77\_CALL(zpotrf)(\&ul,\ \&n,\ py,\ \&n,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}{ERROR\_LAPACK\_3}}(zpotrf,\ info,\ warn);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00054}00054\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00055}00055\ \ \ \ \ SEXP\ perm\ =\ PROTECT(Rf\_allocVector(INTSXP,\ n));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00056}00056\ \ \ \ \ \textcolor{keywordtype}{int}\ *pperm\ =\ INTEGER(perm),\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00057}00057\ \ \ \ \ \textcolor{keywordtype}{double}\ *work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n\ *\ 2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00058}00058\ \ \ \ \ F77\_CALL(zpstrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ \&rank,\ \&tol,\ work,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6748c32e1437e861b7e37f2e62bb0a46}{ERROR\_LAPACK\_4}}(zpstrf,\ info,\ warn,\ rank);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (info\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ j,\ d\ =\ n\ -\/\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ py\ +=\ (R\_xlen\_t)\ rank\ *\ n\ +\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ rank;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ (\textcolor{keywordtype}{size\_t})\ d);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ py\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}},\ perm);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00070}00070\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ perm\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00072}00072\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00073}00073\ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x),\ *py\ =\ REAL(y);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00074}00074\ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00075}00075\ \ \ \ \ F77\_CALL(dlacpy)(\&ul,\ \&n,\ \&n,\ px,\ \&n,\ py,\ \&n\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00076}00076\ \ \ \ \ \textcolor{keywordflow}{if}\ (!pivot)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00077}00077\ \ \ \ \ F77\_CALL(dpotrf)(\&ul,\ \&n,\ py,\ \&n,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}{ERROR\_LAPACK\_3}}(dpotrf,\ info,\ warn);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00079}00079\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00080}00080\ \ \ \ \ SEXP\ perm\ =\ PROTECT(Rf\_allocVector(INTSXP,\ n));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00081}00081\ \ \ \ \ \textcolor{keywordtype}{int}\ *pperm\ =\ INTEGER(perm),\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00082}00082\ \ \ \ \ \textcolor{keywordtype}{double}\ *work\ =\ (\textcolor{keywordtype}{double}\ *)\ R\_alloc((\textcolor{keywordtype}{size\_t})\ n\ *\ 2,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00083}00083\ \ \ \ \ F77\_CALL(dpstrf)(\&ul,\ \&n,\ py,\ \&n,\ pperm,\ \&rank,\ \&tol,\ work,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00085}00085\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6748c32e1437e861b7e37f2e62bb0a46}{ERROR\_LAPACK\_4}}(dpstrf,\ info,\ warn,\ rank);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00086}00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (info\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ j,\ d\ =\ n\ -\/\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ py\ +=\ (R\_xlen\_t)\ rank\ *\ n\ +\ rank;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ rank;\ j\ <\ n;\ ++j)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ memset(py,\ 0,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ (\textcolor{keywordtype}{size\_t})\ d);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ py\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00094}00094\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a1e4c56ea9d2e084e0cb7154bcc13e196}{Matrix\_permSym}},\ perm);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00095}00095\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ perm\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00096}00096\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00098}00098\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(x)\ ==\ CPLXSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00100}00100\ \ \ \ \ Rcomplex\ *px\ =\ COMPLEX(x),\ *py\ =\ COMPLEX(y);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00101}00101\ \ \ \ \ memcpy(py,\ px,\ \textcolor{keyword}{sizeof}(Rcomplex)\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00102}00102\ \ \ \ \ F77\_CALL(zpptrf)(\&ul,\ \&n,\ py,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}{ERROR\_LAPACK\_3}}(zpptrf,\ info,\ warn);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00104}00104\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00105}00105\ \ \ \ \ \textcolor{keywordtype}{double}\ *px\ =\ REAL(x),\ *py\ =\ REAL(y);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00106}00106\ \ \ \ \ memcpy(py,\ px,\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})\ *\ (\textcolor{keywordtype}{size\_t})\ XLENGTH(y));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00107}00107\ \ \ \ \ F77\_CALL(dpptrf)(\&ul,\ \&n,\ py,\ \&info\ \mbox{\hyperlink{Lapack-etc_8h_a24159b4842915664a9cd3d4cce56b529}{FCONE}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{Lapack-etc_8h_a6374e3dd6bb2ad081c90cc95219da4db}{ERROR\_LAPACK\_3}}(dpptrf,\ info,\ warn);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00111}00111\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_aee09bb5723bf209739e63e2f00c41ff7}{SET\_SLOT}}(ans,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}},\ y);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00112}00112\ \ \ \ \ UNPROTECT(3);\ \textcolor{comment}{/*\ y,\ x,\ obj\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00114}00114\ \ \ \ \ UNPROTECT(1);\ \textcolor{comment}{/*\ ans\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00116}00116\ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00118}\mbox{\hyperlink{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}{00118}}\ SEXP\ \mbox{\hyperlink{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}{sparse\_cholesky}}(SEXP\ obj,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class},\ \textcolor{keywordtype}{int}\ warn,\ \textcolor{keywordtype}{int}\ order,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ *ll,\ \textcolor{keywordtype}{int}\ *super,\ Rcomplex\ beta,\ \textcolor{keywordtype}{int}\ force,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ ul,\ SEXP\ trf)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00121}00121\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00122}00122\ \ \ \ \ PROTECT\_INDEX\ pid;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00123}00123\ \ \ \ \ PROTECT\_WITH\_INDEX(obj,\ \&pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00124}00124\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'z'}\ \&\&\ \textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'d'})\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00125}00125\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60}{sparse\_as\_kind}}(obj,\ \textcolor{keyword}{class},\ \textcolor{charliteral}{','}),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00127}00127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00128}00128\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ (\textcolor{keyword}{class}[0]\ !=\ \textcolor{charliteral}{'z'}\ ||\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(obj)\ ==\ \textcolor{charliteral}{'C'}))}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00129}00129\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00130}00130\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (force)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00132}00132\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_ad926ad4dd0d79d81d82fee5ff090108b}{sparse\_force\_symmetric}}(obj,\ \textcolor{keyword}{class},\ ul,\ \textcolor{charliteral}{'C'}),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00134}00134\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_a2e2a5724be872e07c3f1a3bf835e8422}{sparse\_as\_general}}(obj,\ \textcolor{keyword}{class}),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00137}00137\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ !=\ \textcolor{charliteral}{'C'})\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'R'}\ \&\&\ \textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00139}00139\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_a03c78144d411cca2c647b0536d8499b3}{sparse\_transpose}}(obj,\ \textcolor{keyword}{class},\ \textcolor{charliteral}{'C'},\ 1),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ REPROTECT(obj\ =\ \mbox{\hyperlink{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f}{sparse\_as\_Csparse}}(obj,\ \textcolor{keyword}{class}),\ pid);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(obj,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00145}00145\ \ \ \ \ cholmod\_sparse\ *A\ =\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340}{M2CHS}}(obj,\ 1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00146}00146\ \ \ \ \ cholmod\_factor\ *L\ =\ (trf\ ==\ R\_NilValue)\ ?\ NULL\ :\ \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2CHF}}(trf,\ 1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00147}00147\ \ \ \ \ \textcolor{keywordtype}{double}\ b[2];\ b[0]\ =\ beta.r;\ b[1]\ =\ beta.i;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00149}00149\ \ \ \ \ A-\/>stype\ =\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'s'})\ ?\ 0\ :\ (\mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(obj)\ ==\ \textcolor{charliteral}{'U'})\ ?\ 1\ :\ -\/1;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{if}\ (L)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00152}00152\ \ \ \ \ \ \ \ \ L\ =\ cholmod\_copy\_factor(L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00153}00153\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (order\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.nmethods\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.method[0].ordering\ =\ CHOLMOD\_NATURAL;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.postorder\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00159}00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.supernodal\ =\ (!super\ ||\ *super\ ==\ NA\_LOGICAL)\ ?\ CHOLMOD\_AUTO\ :}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ ((*super\ !=\ 0)\ ?\ CHOLMOD\_SUPERNODAL\ :\ CHOLMOD\_SIMPLICIAL);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ L\ =\ cholmod\_analyze(A,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00164}00164\ \ \ \ \ \textcolor{keywordflow}{if}\ (super)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00165}00165\ \ \ \ \ \ \ \ \ *super\ =\ L-\/>is\_super\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{if}\ (ll)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00167}00167\ \ \ \ \ \ \ \ \ *ll\ \ \ \ =\ L-\/>is\_super\ !=\ 0\ ||\ L-\/>is\_ll\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00169}00169\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_asis\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00170}00170\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_ll\ =\ ((ll)\ ?\ *ll\ :\ L-\/>is\_ll)\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00171}00171\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_super\ =\ ((super)\ ?\ *super\ :\ L-\/>is\_super)\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00172}00172\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_pack\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_monotonic\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00175}00175\ \ \ \ \ cholmod\_factorize\_p(A,\ b,\ NULL,\ 0,\ L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00176}00176\ \ \ \ \ cholmod\_defaults(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00178}00178\ \ \ \ \ SEXP\ ans\ =\ PROTECT(\mbox{\hyperlink{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9}{CHF2M}}(L,\ 1));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00179}00179\ \ \ \ \ cholmod\_free\_factor(\&L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00180}00180\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(ans)\ ==\ CHARSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (warn\ >\ 1)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\textcolor{stringliteral}{"{}\%s"{}},\ CHAR(ans));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (warn\ >\ 0)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\textcolor{stringliteral}{"{}\%s"{}},\ CHAR(ans));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00185}00185\ \ \ \ \ \ \ \ \ ans\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00186}00186\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00187}00187\ \ \ \ \ \ \ \ \ SEXP\ adimnames\ =\ PROTECT(Rf\_allocVector(VECSXP,\ 2)),}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ odimnames\ =\ PROTECT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(obj,\ 0));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00189}00189\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a7bef798f87dcdfb53b770853a2c35d07}{symDN}}(adimnames,\ odimnames,\ (\textcolor{keyword}{class}[1]\ !=\ \textcolor{charliteral}{'s'})\ ?\ 0\ :\ -\/1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(ans,\ 0,\ adimnames);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00191}00191\ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ odimnames,\ adimnames\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00192}00192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00193}00193\ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ ans,\ obj\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00197}\mbox{\hyperlink{Cholesky_8c_a7bf9963d3b8cd730acc8c887b5b0dc8d}{00197}}\ SEXP\ \mbox{\hyperlink{Cholesky_8c_a7bf9963d3b8cd730acc8c887b5b0dc8d}{R\_dense\_cholesky}}(SEXP\ s\_obj,\ SEXP\ s\_warn,\ SEXP\ s\_pivot,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ s\_tol,\ SEXP\ s\_uplo)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00199}00199\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00200}00200\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_a2e645349fc5f08190a8ff086cfbff6e2}{valid\_dense}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00201}00201\ \ \ \ \ \textcolor{keywordtype}{int}\ pivot\ =\ Rf\_asLogical(s\_pivot);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00202}00202\ \ \ \ \ \textcolor{keywordtype}{double}\ tol\ =\ Rf\_asReal(s\_tol);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00203}00203\ \ \ \ \ \textcolor{keywordflow}{if}\ (ISNAN(tol))}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00204}00204\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ a\ number"{}}),\ \textcolor{stringliteral}{"{}tol"{}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00205}00205\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00206}00206\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\_uplo\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00207}00207\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a4ff01bcfac826370356a63ee5a5971ed}{VALID\_UPLO}}(s\_uplo,\ ul);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00208}00208\ \ \ \ \ \textcolor{keywordtype}{int}\ cache\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})\ \&\&}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00209}00209\ \ \ \ \ \ \ \ \ ((\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(s\_obj)\ ==\ \textcolor{charliteral}{'C'})\ ||\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'d'});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00210}00210\ \ \ \ \ \textcolor{keywordtype}{char}\ nm[]\ =\ \textcolor{stringliteral}{"{}denseCholesky.."{}};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00211}00211\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \textcolor{keyword}{class}[2]\ ==\ \textcolor{charliteral}{'p'})}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00212}00212\ \ \ \ \ \ \ \ \ nm[13]\ =\ nm[14]\ =\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00213}00213\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00214}00214\ \ \ \ \ \ \ \ \ nm[13]\ =\ \textcolor{charliteral}{'+'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00215}00215\ \ \ \ \ \ \ \ \ nm[14]\ =\ (!pivot)\ ?\ \textcolor{charliteral}{'-\/'}\ :\ \textcolor{charliteral}{'+'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00216}00216\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00217}00217\ \ \ \ \ SEXP\ ans\ =\ (cache)\ ?\ \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\_factor}}(s\_obj,\ nm)\ :\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00218}00218\ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ ==\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ warn\ =\ Rf\_asInteger(s\_warn);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00220}00220\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2}{dense\_cholesky}}(s\_obj,\ \textcolor{keyword}{class},\ warn,\ pivot,\ tol,\ ul);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cache)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\_factor}}(s\_obj,\ nm,\ ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00227}00227\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00228}00228\ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00230}\mbox{\hyperlink{Cholesky_8c_ac53ac4dece914aa2797721456e64d206}{00230}}\ SEXP\ \mbox{\hyperlink{Cholesky_8c_ac53ac4dece914aa2797721456e64d206}{R\_sparse\_cholesky}}(SEXP\ s\_obj,\ SEXP\ s\_warn,\ SEXP\ s\_order,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ s\_ll,\ SEXP\ s\_super,\ SEXP\ s\_beta,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ s\_force,\ SEXP\ s\_uplo)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00233}00233\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00234}00234\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{class\ }=\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(s\_obj,\ \mbox{\hyperlink{Mdefines_8h_ae98a03d973eef7cb0a5d401a42167b0a}{valid\_sparse}},\ 6,\ \_\_func\_\_);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00235}00235\ \ \ \ \ \textcolor{keywordtype}{int}\ warn\ =\ Rf\_asInteger(s\_warn),\ order\ =\ Rf\_asInteger(s\_order),}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00236}00236\ \ \ \ \ \ \ \ \ ll\ =\ Rf\_asLogical(s\_ll),\ super\ =\ Rf\_asLogical(s\_super),}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00237}00237\ \ \ \ \ \ \ \ \ force\ =\ Rf\_asLogical(s\_force);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00238}00238\ \ \ \ \ Rcomplex\ beta\ =\ Rf\_asComplex(s\_beta);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00239}00239\ \ \ \ \ \textcolor{keywordflow}{if}\ (order\ <\ 0\ ||\ order\ >\ 1)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00240}00240\ \ \ \ \ \ \ \ \ order\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00241}00241\ \ \ \ \ \textcolor{keywordflow}{if}\ (!R\_FINITE(beta.r)\ ||\ !R\_FINITE(beta.i))}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00242}00242\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ a\ number\ or\ not\ finite"{}}),\ \textcolor{stringliteral}{"{}beta"{}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00243}00243\ \ \ \ \ \textcolor{keywordtype}{char}\ ul\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{if}\ (s\_uplo\ !=\ R\_NilValue)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00245}00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a4ff01bcfac826370356a63ee5a5971ed}{VALID\_UPLO}}(s\_uplo,\ ul);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00246}00246\ \ \ \ \ \textcolor{keywordtype}{int}\ cache\ =\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'s'})\ \&\&}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00247}00247\ \ \ \ \ \ \ \ \ ((\textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'z'}\ \&\&\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(s\_obj)\ ==\ \textcolor{charliteral}{'C'})\ ||\ \textcolor{keyword}{class}[0]\ ==\ \textcolor{charliteral}{'d'});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00248}00248\ \ \ \ \ \textcolor{keywordtype}{char}\ nm[]\ =\ \textcolor{stringliteral}{"{}..........Cholesky."{}};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00249}00249\ \ \ \ \ nm[18]\ =\ (order\ ==\ 0)\ ?\ \textcolor{charliteral}{'-\/'}\ :\ \textcolor{charliteral}{'+'};}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00250}00250\ \ \ \ \ SEXP\ ans\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00251}00251\ \ \ \ \ \textcolor{keywordflow}{if}\ (cache)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00252}00252\ \ \ \ \ \textcolor{keywordflow}{if}\ (super\ ==\ NA\_LOGICAL\ ||\ super\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00253}00253\ \ \ \ \ \ \ \ \ memcpy(nm,\ \textcolor{stringliteral}{"{}simplicial"{}},\ 10);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00254}00254\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\_factor}}(s\_obj,\ nm);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ !=\ R\_NilValue)\ super\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00257}00257\ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ ==\ R\_NilValue\ \&\&\ (super\ ==\ NA\_LOGICAL\ ||\ super\ !=\ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00258}00258\ \ \ \ \ \ \ \ \ memcpy(nm,\ \textcolor{stringliteral}{"{}supernodal"{}},\ 10);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00259}00259\ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{attrib_8c_a8020f66fe6a710571778b0fef76a16d6}{get\_factor}}(s\_obj,\ nm);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ !=\ R\_NilValue)\ super\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00261}00261\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00263}00263\ \ \ \ \ \textcolor{keywordflow}{if}\ (beta.r\ !=\ 0.0\ ||\ beta.i\ !=\ 0.0\ ||\ ans\ ==\ R\_NilValue\ ||}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00264}00264\ \ \ \ \ \ \ \ \ (super\ ==\ 0\ \&\&\ ll\ !=\ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00265}00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (beta.r\ !=\ 0.0\ ||\ beta.i\ !=\ 0.0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}{sparse\_cholesky}}(s\_obj,\ \textcolor{keyword}{class},\ warn,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order,\ \&ll,\ \&super,\ beta,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ force,\ ul,\ ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00271}00271\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ ==\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ zz\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ ans\ =\ \mbox{\hyperlink{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}{sparse\_cholesky}}(s\_obj,\ \textcolor{keyword}{class},\ warn,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order,\ \&zz,\ \&super,\ beta,}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ force,\ ul,\ ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cache\ \&\&\ ans\ !=\ R\_NilValue)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ memcpy(nm,\ (super\ ==\ 0)\ ?\ \textcolor{stringliteral}{"{}simplicial"{}}\ :\ \textcolor{stringliteral}{"{}supernodal"{}},\ 10);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{attrib_8c_a8da2554b065e650629767301d01f3f64}{set\_factor}}(s\_obj,\ nm,\ ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ans\ !=\ R\_NilValue\ \&\&\ super\ ==\ 0\ \&\&\ ll\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ PROTECT(ans);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ cholmod\_factor\ *L\ =\ \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2CHF}}(ans,\ 1);}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ L\ =\ cholmod\_copy\_factor(L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ cholmod\_change\_factor(L-\/>xtype,\ 1,\ 0,\ 1,\ 1,\ L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ SEXP\ tmp\ =\ PROTECT(\mbox{\hyperlink{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9}{CHF2M}}(L,\ 1));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ cholmod\_free\_factor(\&L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(tmp)\ ==\ CHARSXP)\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (warn\ >\ 1)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error\ \ (\textcolor{stringliteral}{"{}\%s"{}},\ CHAR(tmp));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (warn\ >\ 0)}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\textcolor{stringliteral}{"{}\%s"{}},\ CHAR(tmp));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ans\ =\ R\_NilValue;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a3b154239b71543385a74945409e71bd6}{SET\_DIMNAMES}}(tmp,\ 0,\ \mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(ans,\ 0));}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ans\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ UNPROTECT(2);\ \textcolor{comment}{/*\ tmp,\ ans\ */}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00303}00303\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00304}00304\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00305}00305\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{Cholesky_8c_source_l00306}00306\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,229 @@
+\doxysection{cholmod-\/etc.c File Reference}
+\hypertarget{cholmod-etc_8c}{}\label{cholmod-etc_8c}\index{cholmod-\/etc.c@{cholmod-\/etc.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{cholmod-etc_8c_a0eca99ad9f9b3a8a9fe9484826fcacf4}{Matrix\+\_\+cholmod\+\_\+error\+\_\+handler}} (int status, const char \texorpdfstring{$\ast$}{*}file, int line, const char \texorpdfstring{$\ast$}{*}message)
+\item 
+int \mbox{\hyperlink{cholmod-etc_8c_a35c4118a6d7e2a47231cb5c1854b3c86}{Matrix\+\_\+cholmod\+\_\+start}} (cholmod\+\_\+common \texorpdfstring{$\ast$}{*}Common)
+\item 
+int \mbox{\hyperlink{cholmod-etc_8c_a8ba5cb83c91db1c80482736db0afa923}{Matrix\+\_\+cholmod\+\_\+finish}} (cholmod\+\_\+common \texorpdfstring{$\ast$}{*}Common)
+\item 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2\+CHF}} (SEXP obj, int values)
+\item 
+cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340}{M2\+CHS}} (SEXP obj, int values)
+\item 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{cholmod-etc_8c_aec6ea8cf116803b4e62e9167376577bc}{M2\+CHD}} (SEXP obj, char trans)
+\item 
+SEXP \mbox{\hyperlink{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9}{CHF2M}} (cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}L, int values)
+\item 
+SEXP \mbox{\hyperlink{cholmod-etc_8c_ac8ea13443ccf21cb12222b730d530f1b}{CHS2M}} (cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}A, int values, char shape)
+\item 
+SEXP \mbox{\hyperlink{cholmod-etc_8c_afa5b2e665207fb7da61aa0511d3c18a3}{CHD2M}} (cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}A, char trans, char shape)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+cholmod\+\_\+common \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}
+\item 
+cholmod\+\_\+common \mbox{\hyperlink{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}{cl}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{cholmod-etc_8c_afa5b2e665207fb7da61aa0511d3c18a3}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!CHD2M@{CHD2M}}
+\index{CHD2M@{CHD2M}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{CHD2M()}{CHD2M()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_afa5b2e665207fb7da61aa0511d3c18a3} 
+SEXP CHD2M (\begin{DoxyParamCaption}\item[{cholmod\+\_\+dense \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{char}]{trans}{, }\item[{char}]{shape}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00375}{375}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2()}}, \mbox{\hyperlink{Mdefines_8h_source_l00068}{error\+Char}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, and \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2()}}.
+
+
+
+Referenced by \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!CHF2M@{CHF2M}}
+\index{CHF2M@{CHF2M}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{CHF2M()}{CHF2M()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_ac248d076d5ab1b976d8bfa8cd04918e9} 
+SEXP CHF2M (\begin{DoxyParamCaption}\item[{cholmod\+\_\+factor \texorpdfstring{$\ast$}{*}}]{L}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00222}{222}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00068}{error\+Char}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00604}{Matrix\+\_\+colcount\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00608}{Matrix\+\_\+isll\+Sym}}, \mbox{\hyperlink{init_8c_source_l00609}{Matrix\+\_\+ismt\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00615}{Matrix\+\_\+maxcsize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00616}{Matrix\+\_\+maxesize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00618}{Matrix\+\_\+next\+Sym}}, \mbox{\hyperlink{init_8c_source_l00619}{Matrix\+\_\+nz\+Sym}}, \mbox{\hyperlink{init_8c_source_l00621}{Matrix\+\_\+ordering\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00624}{Matrix\+\_\+pi\+Sym}}, \mbox{\hyperlink{init_8c_source_l00625}{Matrix\+\_\+prev\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00626}{Matrix\+\_\+px\+Sym}}, \mbox{\hyperlink{init_8c_source_l00628}{Matrix\+\_\+s\+Sym}}, \mbox{\hyperlink{init_8c_source_l00630}{Matrix\+\_\+super\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00130}{dg\+CMatrix\+\_\+cholsol()}}, \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, and \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}.
+
+\Hypertarget{cholmod-etc_8c_ac8ea13443ccf21cb12222b730d530f1b}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!CHS2M@{CHS2M}}
+\index{CHS2M@{CHS2M}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{CHS2M()}{CHS2M()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_ac8ea13443ccf21cb12222b730d530f1b} 
+SEXP CHS2M (\begin{DoxyParamCaption}\item[{cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*}}]{A}{, }\item[{int}]{values}{, }\item[{char}]{shape}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00328}{328}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{Mdefines_8h_source_l00068}{error\+Char}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{cholmod-etc_8c_aec6ea8cf116803b4e62e9167376577bc}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!M2CHD@{M2CHD}}
+\index{M2CHD@{M2CHD}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{M2CHD()}{M2CHD()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_aec6ea8cf116803b4e62e9167376577bc} 
+cholmod\+\_\+dense \texorpdfstring{$\ast$}{*} M2\+CHD (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{char}]{trans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{176}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}.
+
+\Hypertarget{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!M2CHF@{M2CHF}}
+\index{M2CHF@{M2CHF}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{M2CHF()}{M2CHF()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d} 
+cholmod\+\_\+factor \texorpdfstring{$\ast$}{*} M2\+CHF (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{39}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00604}{Matrix\+\_\+colcount\+Sym}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00608}{Matrix\+\_\+isll\+Sym}}, \mbox{\hyperlink{init_8c_source_l00609}{Matrix\+\_\+ismt\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00615}{Matrix\+\_\+maxcsize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00616}{Matrix\+\_\+maxesize\+Sym}}, \mbox{\hyperlink{init_8c_source_l00617}{Matrix\+\_\+minor\+Sym}}, \mbox{\hyperlink{init_8c_source_l00618}{Matrix\+\_\+next\+Sym}}, \mbox{\hyperlink{init_8c_source_l00619}{Matrix\+\_\+nz\+Sym}}, \mbox{\hyperlink{init_8c_source_l00621}{Matrix\+\_\+ordering\+Sym}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00624}{Matrix\+\_\+pi\+Sym}}, \mbox{\hyperlink{init_8c_source_l00625}{Matrix\+\_\+prev\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00626}{Matrix\+\_\+px\+Sym}}, \mbox{\hyperlink{init_8c_source_l00628}{Matrix\+\_\+s\+Sym}}, \mbox{\hyperlink{init_8c_source_l00630}{Matrix\+\_\+super\+Sym}}, and \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{determinant_8c_source_l00359}{sparse\+Cholesky\+\_\+determinant()}}, \mbox{\hyperlink{diag_8c_source_l00702}{sparse\+Cholesky\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{updown_8c_source_l00030}{sparse\+Cholesky\+\_\+update()}}, and \mbox{\hyperlink{updown_8c_source_l00007}{sparse\+Cholesky\+\_\+updown()}}.
+
+\Hypertarget{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!M2CHS@{M2CHS}}
+\index{M2CHS@{M2CHS}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{M2CHS()}{M2CHS()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340} 
+cholmod\+\_\+sparse \texorpdfstring{$\ast$}{*} M2\+CHS (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{int}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{132}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00632}{Matrix\+\_\+uplo\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{Mdefines_8h_source_l00329}{valid\+\_\+sparse\+\_\+compressed}}.
+
+
+
+Referenced by \mbox{\hyperlink{Csparse_8c_source_l00408}{Csparse\+\_\+write\+MM()}}, \mbox{\hyperlink{Csparse_8c_source_l00064}{Csparse\+Matrix\+\_\+validate\+\_\+maybe\+\_\+sorting()}}, \mbox{\hyperlink{Csparse_8c_source_l00130}{dg\+CMatrix\+\_\+cholsol()}}, \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{updown_8c_source_l00030}{sparse\+Cholesky\+\_\+update()}}, and \mbox{\hyperlink{updown_8c_source_l00007}{sparse\+Cholesky\+\_\+updown()}}.
+
+\Hypertarget{cholmod-etc_8c_a0eca99ad9f9b3a8a9fe9484826fcacf4}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!Matrix\_cholmod\_error\_handler@{Matrix\_cholmod\_error\_handler}}
+\index{Matrix\_cholmod\_error\_handler@{Matrix\_cholmod\_error\_handler}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cholmod\_error\_handler()}{Matrix\_cholmod\_error\_handler()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_a0eca99ad9f9b3a8a9fe9484826fcacf4} 
+static void Matrix\+\_\+cholmod\+\_\+error\+\_\+handler (\begin{DoxyParamCaption}\item[{int}]{status}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{message}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00009}{9}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}.
+
+
+
+Referenced by \mbox{\hyperlink{cholmod-etc_8c_source_l00022}{Matrix\+\_\+cholmod\+\_\+start()}}.
+
+\Hypertarget{cholmod-etc_8c_a8ba5cb83c91db1c80482736db0afa923}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!Matrix\_cholmod\_finish@{Matrix\_cholmod\_finish}}
+\index{Matrix\_cholmod\_finish@{Matrix\_cholmod\_finish}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cholmod\_finish()}{Matrix\_cholmod\_finish()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_a8ba5cb83c91db1c80482736db0afa923} 
+int Matrix\+\_\+cholmod\+\_\+finish (\begin{DoxyParamCaption}\item[{cholmod\+\_\+common \texorpdfstring{$\ast$}{*}}]{Common}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00031}{31}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00764}{R\+\_\+unload\+\_\+\+Matrix()}}.
+
+\Hypertarget{cholmod-etc_8c_a35c4118a6d7e2a47231cb5c1854b3c86}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!Matrix\_cholmod\_start@{Matrix\_cholmod\_start}}
+\index{Matrix\_cholmod\_start@{Matrix\_cholmod\_start}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_cholmod\_start()}{Matrix\_cholmod\_start()}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_a35c4118a6d7e2a47231cb5c1854b3c86} 
+int Matrix\+\_\+cholmod\+\_\+start (\begin{DoxyParamCaption}\item[{cholmod\+\_\+common \texorpdfstring{$\ast$}{*}}]{Common}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00022}{22}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, and \mbox{\hyperlink{cholmod-etc_8c_source_l00009}{Matrix\+\_\+cholmod\+\_\+error\+\_\+handler()}}.
+
+
+
+Referenced by \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!c@{c}}
+\index{c@{c}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{c}{c}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4} 
+cholmod\+\_\+common c}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{5}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{cholmod-api_8c_source_l00958}{cholmod\+\_\+factor\+\_\+update()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00625}{cholmod\+\_\+sparse\+\_\+as\+\_\+sexp()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00328}{CHS2\+M()}}, \mbox{\hyperlink{Csparse_8c_source_l00408}{Csparse\+\_\+write\+MM()}}, \mbox{\hyperlink{Csparse_8c_source_l00064}{Csparse\+Matrix\+\_\+validate\+\_\+maybe\+\_\+sorting()}}, \mbox{\hyperlink{determinant_8c_source_l00076}{dense\+Bunch\+Kaufman\+\_\+determinant()}}, \mbox{\hyperlink{Csparse_8c_source_l00130}{dg\+CMatrix\+\_\+cholsol()}}, \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00009}{Matrix\+\_\+cholmod\+\_\+error\+\_\+handler()}}, \mbox{\hyperlink{t__rle_8c_source_l00037}{Matrix\+\_\+\+RLE\+\_\+()}}, \mbox{\hyperlink{init_8c_source_l00645}{R\+\_\+init\+\_\+\+Matrix()}}, \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}, \mbox{\hyperlink{init_8c_source_l00764}{R\+\_\+unload\+\_\+\+Matrix()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00127}{sexp\+\_\+as\+\_\+cholmod\+\_\+sparse()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{solve_8c_source_l00697}{sparse\+Cholesky\+\_\+solve()}}, \mbox{\hyperlink{updown_8c_source_l00030}{sparse\+Cholesky\+\_\+update()}}, and \mbox{\hyperlink{updown_8c_source_l00007}{sparse\+Cholesky\+\_\+updown()}}.
+
+\Hypertarget{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda}\index{cholmod-\/etc.c@{cholmod-\/etc.c}!cl@{cl}}
+\index{cl@{cl}!cholmod-\/etc.c@{cholmod-\/etc.c}}
+\doxysubsubsection{\texorpdfstring{cl}{cl}}
+{\footnotesize\ttfamily \label{cholmod-etc_8c_ac49bea018a4b4cb10cd713589039cdda} 
+cholmod\+\_\+common cl}
+
+
+
+Definition at line \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{6}} of file \mbox{\hyperlink{cholmod-etc_8c_source}{cholmod-\/etc.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02654}{dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l01351}{dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l02598}{dense\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{band_8c_source_l00007}{dense\+\_\+band()}}, \mbox{\hyperlink{BunchKaufman_8c_source_l00010}{dense\+\_\+bunchkaufman()}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{lu_8c_source_l00012}{dense\+\_\+lu()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{symmpart_8c_source_l00011}{dense\+\_\+symmpart()}}, \mbox{\hyperlink{expand_8c_source_l00006}{dense\+Bunch\+Kaufman\+\_\+expand()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02160}{diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03281}{diagonal\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01916}{index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01295}{matrix\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l00414}{sparse\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l02847}{sparse\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l02963}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03143}{sparse\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{band_8c_source_l00095}{sparse\+\_\+band()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{lu_8c_source_l00079}{sparse\+\_\+lu()}}, \mbox{\hyperlink{colSums_8c_source_l00629}{sparse\+\_\+marginsum()}}, \mbox{\hyperlink{qr_8c_source_l00036}{sparse\+\_\+qr()}}, \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}, \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{symmpart_8c_source_l00205}{sparse\+\_\+symmpart()}}, \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, \mbox{\hyperlink{validity_8c_source_l02004}{valid\+Object()}}, \mbox{\hyperlink{coerce_8c_source_l00008}{vector\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00750}{Vector\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+

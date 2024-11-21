@@ -1,0 +1,64 @@
+\doxysection{updown.\+c}
+\hypertarget{updown_8c_source}{}\label{updown_8c_source}\index{updown.c@{updown.c}}
+\mbox{\hyperlink{updown_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00001}00001\ \textcolor{comment}{/*\ C\ implementation\ of\ methods\ for\ updown,\ update\ */}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{cholmod-etc_8h}{cholmod-\/etc.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{M5_8h}{M5.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00007}\mbox{\hyperlink{init_8c_a33a702a4659aa3487bacfe5562b6fb65}{00007}}\ SEXP\ \mbox{\hyperlink{updown_8c_a1bc958fc6a9080d194a097690e0ca715}{sparseCholesky\_updown}}(SEXP\ s\_trf,\ SEXP\ s\_obj,\ SEXP\ s\_update)}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00009}00009\ \ \ \ \ cholmod\_factor\ *L\ =\ \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2CHF}}(s\_trf,\ 1);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00010}00010\ \ \ \ \ cholmod\_sparse\ *A\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340}{M2CHS}}(s\_obj,\ 1);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00012}00012\ \ \ \ \ L\ =\ cholmod\_copy\_factor(L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00013}00013\ \ \ \ \ cholmod\_updown(Rf\_asLogical(s\_update)\ !=\ 0,\ A,\ L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00015}00015\ \textcolor{preprocessor}{\#define\ UPDOWN\_FINISH\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SEXP\ dimnames\ =\ PROTECT(DIMNAMES(s\_trf,\ 0));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ PROTECT(s\_trf\ =\ CHF2M(L,\ 1));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ cholmod\_free\_factor(\&L,\ \&c);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (TYPEOF(s\_trf)\ ==\ CHARSXP)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00021}00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ Rf\_error("{}\%s"{},\ CHAR(s\_trf));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00022}00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SET\_DIMNAMES(s\_trf,\ 0,\ dimnames);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00023}00023\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ UNPROTECT(2);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00024}00024\ \textcolor{preprocessor}{\ \ \ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{updown_8c_a7ebf04fed94610de8546f733d4de1858}{UPDOWN\_FINISH}};}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{return}\ s\_trf;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00028}00028\ \}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00030}\mbox{\hyperlink{init_8c_aa6b7f065398f80bf8797a03ba9d15b3f}{00030}}\ SEXP\ \mbox{\hyperlink{updown_8c_ac006b65742ae3d3b58d5b9e787ff7b7b}{sparseCholesky\_update}}(SEXP\ s\_trf,\ SEXP\ s\_obj,\ SEXP\ s\_beta)}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00032}00032\ \ \ \ \ Rcomplex\ beta\ =\ Rf\_asComplex(s\_beta);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{if}\ (!R\_FINITE(beta.r)\ ||\ !R\_FINITE(beta.i))}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00034}00034\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ a\ number\ or\ not\ finite"{}}),\ \textcolor{stringliteral}{"{}beta"{}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00036}00036\ \ \ \ \ cholmod\_factor\ *L\ =\ \mbox{\hyperlink{cholmod-etc_8c_a6da8dae492e95ad91087568a49e0ec5d}{M2CHF}}(s\_trf,\ 1);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00037}00037\ \ \ \ \ cholmod\_sparse\ *A\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac02a1b751c39e5c9f73dce15c27a2340}{M2CHS}}(s\_obj,\ 1);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00038}00038\ \ \ \ \ \textcolor{keywordtype}{double}\ b[2];\ b[0]\ =\ beta.r;\ b[1]\ =\ beta.i;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00040}00040\ \ \ \ \ \textcolor{comment}{/*\ defined\ in\ ./objects.c\ :\ */}}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{Matrix\_shape}}(SEXP);}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{objects_8c_a60070fc3b5d4ae09cbc839cdde1eb5b0}{Matrix\_shape}}(s\_obj)\ ==\ \textcolor{charliteral}{'s'})}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00043}00043\ \ \ \ \ \ \ \ \ A-\/>stype\ =\ (\mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(s\_obj)\ ==\ \textcolor{charliteral}{'U'})\ ?\ 1\ :\ -\/1;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00045}00045\ \ \ \ \ L\ =\ cholmod\_copy\_factor(L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_asis\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_ll\ =\ L-\/>is\_ll;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_super\ =\ L-\/>is\_super;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_pack\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}.final\_monotonic\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00053}00053\ \ \ \ \ cholmod\_factorize\_p(A,\ b,\ NULL,\ 0,\ L,\ \&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00054}00054\ \ \ \ \ cholmod\_defaults(\&\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}});}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{updown_8c_a7ebf04fed94610de8546f733d4de1858}{UPDOWN\_FINISH}};}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00057}00057\ \ \ \ \ \textcolor{keywordflow}{return}\ s\_trf;}
+\DoxyCodeLine{\Hypertarget{updown_8c_source_l00058}00058\ \}}
+
+\end{DoxyCode}

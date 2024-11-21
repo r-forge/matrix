@@ -1,0 +1,129 @@
+\doxysection{utils.\+c File Reference}
+\hypertarget{utils_8c}{}\label{utils_8c}\index{utils.c@{utils.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{utils_8c_ac3ce944ada4f0182687b9ba6eb1e398e}{Matrix\+\_\+sprintf}} (const char \texorpdfstring{$\ast$}{*}format,...)
+\item 
+int \mbox{\hyperlink{utils_8c_a3b9c5accadb50574db36226cd1aab133}{equal\+String}} (SEXP s1, SEXP s2, R\+\_\+xlen\+\_\+t n)
+\item 
+SEXP \mbox{\hyperlink{utils_8c_abacff1b9474399dcc740ff7957f77997}{duplicate\+Vector}} (SEXP x)
+\item 
+SEXP \mbox{\hyperlink{utils_8c_a7941786dae5d078d4c0c4415171bd73d}{alloc\+Zero}} (SEXPTYPE type, R\+\_\+xlen\+\_\+t length)
+\item 
+SEXP \mbox{\hyperlink{utils_8c_ad52654249e65767dda66d3bde976241e}{alloc\+Unit}} (SEXPTYPE type, R\+\_\+xlen\+\_\+t length)
+\item 
+SEXP \mbox{\hyperlink{utils_8c_ac60d5d6f9ea8703b8b9992e69752ce33}{alloc\+Seq\+Int}} (int from, R\+\_\+xlen\+\_\+t length)
+\item 
+void \mbox{\hyperlink{utils_8c_ab0e6a1d2bdf10b9ad4ca9807821fa1c0}{na\+To\+Unit}} (SEXP x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{utils_8c_ac60d5d6f9ea8703b8b9992e69752ce33}\index{utils.c@{utils.c}!allocSeqInt@{allocSeqInt}}
+\index{allocSeqInt@{allocSeqInt}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{allocSeqInt()}{allocSeqInt()}}
+{\footnotesize\ttfamily \label{utils_8c_ac60d5d6f9ea8703b8b9992e69752ce33} 
+SEXP alloc\+Seq\+Int (\begin{DoxyParamCaption}\item[{int}]{from}{, }\item[{R\+\_\+xlen\+\_\+t}]{length}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00141}{141}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}.
+
+\Hypertarget{utils_8c_ad52654249e65767dda66d3bde976241e}\index{utils.c@{utils.c}!allocUnit@{allocUnit}}
+\index{allocUnit@{allocUnit}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{allocUnit()}{allocUnit()}}
+{\footnotesize\ttfamily \label{utils_8c_ad52654249e65767dda66d3bde976241e} 
+SEXP alloc\+Unit (\begin{DoxyParamCaption}\item[{SEXPTYPE}]{type}{, }\item[{R\+\_\+xlen\+\_\+t}]{length}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00094}{94}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l01916}{index\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00127}{sexp\+\_\+as\+\_\+cholmod\+\_\+sparse()}}, \mbox{\hyperlink{cholmod-api_8c_source_l00247}{sexp\+\_\+as\+\_\+cholmod\+\_\+triplet()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, and \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}.
+
+\Hypertarget{utils_8c_a7941786dae5d078d4c0c4415171bd73d}\index{utils.c@{utils.c}!allocZero@{allocZero}}
+\index{allocZero@{allocZero}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{allocZero()}{allocZero()}}
+{\footnotesize\ttfamily \label{utils_8c_a7941786dae5d078d4c0c4415171bd73d} 
+SEXP alloc\+Zero (\begin{DoxyParamCaption}\item[{SEXPTYPE}]{type}{, }\item[{R\+\_\+xlen\+\_\+t}]{length}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00069}{69}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}.
+
+\Hypertarget{utils_8c_abacff1b9474399dcc740ff7957f77997}\index{utils.c@{utils.c}!duplicateVector@{duplicateVector}}
+\index{duplicateVector@{duplicateVector}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{duplicateVector()}{duplicateVector()}}
+{\footnotesize\ttfamily \label{utils_8c_abacff1b9474399dcc740ff7957f77997} 
+SEXP duplicate\+Vector (\begin{DoxyParamCaption}\item[{SEXP}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00042}{42}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00225}{dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{solve_8c_source_l00130}{dense\+Bunch\+Kaufman\+\_\+solve()}}, \mbox{\hyperlink{solve_8c_source_l00033}{dense\+LU\+\_\+solve()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02160}{diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l03516}{R\+\_\+\+Matrix\+\_\+as\+\_\+matrix()}}, \mbox{\hyperlink{coerce_8c_source_l03447}{R\+\_\+\+Matrix\+\_\+as\+\_\+vector()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}, and \mbox{\hyperlink{solve_8c_source_l00367}{tr\+Matrix\+\_\+solve()}}.
+
+\Hypertarget{utils_8c_a3b9c5accadb50574db36226cd1aab133}\index{utils.c@{utils.c}!equalString@{equalString}}
+\index{equalString@{equalString}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{equalString()}{equalString()}}
+{\footnotesize\ttfamily \label{utils_8c_a3b9c5accadb50574db36226cd1aab133} 
+int equal\+String (\begin{DoxyParamCaption}\item[{SEXP}]{s1}{, }\item[{SEXP}]{s2}{, }\item[{R\+\_\+xlen\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00028}{28}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{attrib_8c_source_l00046}{Dim\+Names\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, and \mbox{\hyperlink{validity_8c_source_l00181}{symmetric\+Matrix\+\_\+validate()}}.
+
+\Hypertarget{utils_8c_ac3ce944ada4f0182687b9ba6eb1e398e}\index{utils.c@{utils.c}!Matrix\_sprintf@{Matrix\_sprintf}}
+\index{Matrix\_sprintf@{Matrix\_sprintf}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{Matrix\_sprintf()}{Matrix\_sprintf()}}
+{\footnotesize\ttfamily \label{utils_8c_ac3ce944ada4f0182687b9ba6eb1e398e} 
+char \texorpdfstring{$\ast$}{*} Matrix\+\_\+sprintf (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{format}{, }\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00018}{18}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00035}{Matrix\+\_\+\+Error\+Buffer\+Size}}.
+
+\Hypertarget{utils_8c_ab0e6a1d2bdf10b9ad4ca9807821fa1c0}\index{utils.c@{utils.c}!naToUnit@{naToUnit}}
+\index{naToUnit@{naToUnit}!utils.c@{utils.c}}
+\doxysubsubsection{\texorpdfstring{naToUnit()}{naToUnit()}}
+{\footnotesize\ttfamily \label{utils_8c_ab0e6a1d2bdf10b9ad4ca9807821fa1c0} 
+void na\+To\+Unit (\begin{DoxyParamCaption}\item[{SEXP}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utils_8c_source_l00151}{151}} of file \mbox{\hyperlink{utils_8c_source}{utils.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02160}{diagonal\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03516}{R\+\_\+\+Matrix\+\_\+as\+\_\+matrix()}}, and \mbox{\hyperlink{coerce_8c_source_l03447}{R\+\_\+\+Matrix\+\_\+as\+\_\+vector()}}.
+

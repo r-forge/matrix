@@ -1,0 +1,458 @@
+\doxysection{Summary.\+c File Reference}
+\hypertarget{Summary_8c}{}\label{Summary_8c}\index{Summary.c@{Summary.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a3e2afbeb1d8f2b0ebea9886dd78d1273}{LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE}}(x)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_acc9eba97a70107f511d5b1241d8a35be}{TRY\+\_\+\+INCREMENT}}(x,  y,  label)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a1319745524dbd8748dba95bb12b19f19}{SUM}}
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}{SUM\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}{SUM\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}{SUM\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}{SUM\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}{SUM\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a6fb685ced489c960ab8a71e915f72539}{PROD}}
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a896052253b6880290c064ad9f705bcb3}{PROD\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a896052253b6880290c064ad9f705bcb3}{PROD\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a896052253b6880290c064ad9f705bcb3}{PROD\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\item 
+\#define \mbox{\hyperlink{Summary_8c_a896052253b6880290c064ad9f705bcb3}{PROD\+\_\+\+KERNEL}}(\+\_\+\+\_\+for\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a72e7af212baeff229d9bf132518f0bc3}{sparse\+\_\+aggregate}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a636aa6af3e4a563804d3da67332622ca}{dense\+\_\+sum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a194eb35e35635d42702ba7370885d316}{sparse\+\_\+sum}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a3db9aa09d78af63f5d94384e6a8d53e7}{R\+\_\+dense\+\_\+sum}} (SEXP s\+\_\+obj, SEXP s\+\_\+narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a813402c2894a137d3cb7cd5184ca1ebd}{R\+\_\+sparse\+\_\+sum}} (SEXP s\+\_\+obj, SEXP s\+\_\+narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_aea68524e89a53bb430a1bd5db63207b8}{dense\+\_\+prod}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_afe781b462ea217925ac08dd6822f0f31}{sparse\+\_\+prod}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_aa43eec42a79cf5ebcd2c4a972ff0a06c}{R\+\_\+dense\+\_\+prod}} (SEXP s\+\_\+obj, SEXP s\+\_\+narm)
+\item 
+SEXP \mbox{\hyperlink{Summary_8c_a3ceda4a93cd8b2f057a05840f2e7f5e0}{R\+\_\+sparse\+\_\+prod}} (SEXP s\+\_\+obj, SEXP s\+\_\+narm)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{Summary_8c_a3e2afbeb1d8f2b0ebea9886dd78d1273}\index{Summary.c@{Summary.c}!LONGDOUBLE\_AS\_DOUBLE@{LONGDOUBLE\_AS\_DOUBLE}}
+\index{LONGDOUBLE\_AS\_DOUBLE@{LONGDOUBLE\_AS\_DOUBLE}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{LONGDOUBLE\_AS\_DOUBLE}{LONGDOUBLE\_AS\_DOUBLE}}
+{\footnotesize\ttfamily \label{Summary_8c_a3e2afbeb1d8f2b0ebea9886dd78d1273} 
+\#define LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(((x)\ >\ DBL\_MAX)\ ?\ R\_PosInf\ :\ (((x)\ <\ -\/DBL\_MAX)\ ?\ R\_NegInf\ :\ (double)\ (x)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00009}{9}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00465}{dense\+\_\+prod()}}, \mbox{\hyperlink{Summary_8c_source_l00024}{dense\+\_\+sum()}}, \mbox{\hyperlink{Summary_8c_source_l00659}{sparse\+\_\+prod()}}, and \mbox{\hyperlink{Summary_8c_source_l00216}{sparse\+\_\+sum()}}.
+
+\Hypertarget{Summary_8c_a6fb685ced489c960ab8a71e915f72539}\index{Summary.c@{Summary.c}!PROD@{PROD}}
+\index{PROD@{PROD}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{PROD}{PROD}}
+{\footnotesize\ttfamily \label{Summary_8c_a6fb685ced489c960ab8a71e915f72539} 
+\#define PROD}
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00465}{dense\+\_\+prod()}}.
+
+\Hypertarget{Summary_8c_a896052253b6880290c064ad9f705bcb3}\index{Summary.c@{Summary.c}!PROD\_KERNEL@{PROD\_KERNEL}}
+\index{PROD\_KERNEL@{PROD\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{PROD\_KERNEL}{PROD\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{Summary_8c_a896052253b6880290c064ad9f705bcb3} 
+\#define PROD\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*px\ ==\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarReal(0.0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a896052253b6880290c064ad9f705bcb3}\index{Summary.c@{Summary.c}!PROD\_KERNEL@{PROD\_KERNEL}}
+\index{PROD\_KERNEL@{PROD\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{PROD\_KERNEL}{PROD\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{Summary_8c_a896052253b6880290c064ad9f705bcb3} 
+\#define PROD\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*px\ !=\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ *=\ (sy\ \&\&\ i\ !=\ j)\ ?\ (\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{double})\ *px\ *\ *px\ :\ *px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ *=\ NA\_REAL;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a896052253b6880290c064ad9f705bcb3}\index{Summary.c@{Summary.c}!PROD\_KERNEL@{PROD\_KERNEL}}
+\index{PROD\_KERNEL@{PROD\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{PROD\_KERNEL}{PROD\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{Summary_8c_a896052253b6880290c064ad9f705bcb3} 
+\#define PROD\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!(narm\ \&\&\ ISNAN(*px)))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ *=\ (sy\ \&\&\ i\ !=\ j)\ ?\ (\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{double})\ *px\ *\ *px\ :\ *px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a896052253b6880290c064ad9f705bcb3}\index{Summary.c@{Summary.c}!PROD\_KERNEL@{PROD\_KERNEL}}
+\index{PROD\_KERNEL@{PROD\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{PROD\_KERNEL}{PROD\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{Summary_8c_a896052253b6880290c064ad9f705bcb3} 
+\#define PROD\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!(narm\ \&\&\ (ISNAN((*px).r)\ ||\ (!(he\ \&\&\ i\ ==\ j)\ \&\&\ ISNAN((*px).i)))))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (he)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr0\ =\ (*px).r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (i\ !=\ j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ li0\ =\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr0\ =\ lr0\ *\ lr0\ +\ li0\ *\ li0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ *=\ lr0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ li\ *=\ lr0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr0\ =\ lr;\ li0\ =\ li;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ =\ lr0\ *\ (*px).r\ -\/\ li0\ *\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ li\ =\ li0\ *\ (*px).r\ +\ lr0\ *\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (i\ !=\ j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr0\ =\ lr;\ li0\ =\ li;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ =\ lr0\ *\ (*px).r\ -\/\ li0\ *\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ li\ =\ li0\ *\ (*px).r\ +\ lr0\ *\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a1319745524dbd8748dba95bb12b19f19}\index{Summary.c@{Summary.c}!SUM@{SUM}}
+\index{SUM@{SUM}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM}{SUM}}
+{\footnotesize\ttfamily \label{Summary_8c_a1319745524dbd8748dba95bb12b19f19} 
+\#define SUM}
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00024}{dense\+\_\+sum()}}.
+
+\Hypertarget{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}\index{Summary.c@{Summary.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*px\ !=\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ s\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2\ :\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}\index{Summary.c@{Summary.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*px\ !=\ NA\_INTEGER)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ d\ =\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2\ :\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (count\ >\ UINT\_MAX\ -\/\ d)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TRY\_INCREMENT(s,\ t,\ over);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ t\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2LL\ *\ *px\ :\ *px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\ +=\ d;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarInteger(NA\_INTEGER);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}\index{Summary.c@{Summary.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (*px\ !=\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2.0L\ *\ *px\ :\ *px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!narm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarInteger(NA\_INTEGER);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}\index{Summary.c@{Summary.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!(narm\ \&\&\ ISNAN(*px)))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2.0L\ *\ *px\ :\ *px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c}\index{Summary.c@{Summary.c}!SUM\_KERNEL@{SUM\_KERNEL}}
+\index{SUM\_KERNEL@{SUM\_KERNEL}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{SUM\_KERNEL}{SUM\_KERNEL}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{Summary_8c_a9ac11050f5b2cc3f19812bab039a004c} 
+\#define SUM\+\_\+\+KERNEL(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+\_\+for\+\_\+\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_\_for\_\_\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!(narm\ \&\&\ (ISNAN((*px).r)\ ||\ (!he\ \&\&\ ISNAN((*px).i)))))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lr\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2.0L\ *\ (*px).r\ :\ (*px).r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (!he)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ li\ +=\ (sy\ \&\&\ i\ !=\ j)\ ?\ 2.0L\ *\ (*px).i\ :\ (*px).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ px\ +=\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{Summary_8c_acc9eba97a70107f511d5b1241d8a35be}\index{Summary.c@{Summary.c}!TRY\_INCREMENT@{TRY\_INCREMENT}}
+\index{TRY\_INCREMENT@{TRY\_INCREMENT}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{TRY\_INCREMENT}{TRY\_INCREMENT}}
+{\footnotesize\ttfamily \label{Summary_8c_acc9eba97a70107f511d5b1241d8a35be} 
+\#define TRY\+\_\+\+INCREMENT(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{label}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ ((x\ >=\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ ?\ (\ y\ <=\ INT\_FAST64\_MAX\ -\/\ x)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ :\ (-\/y\ <=\ x\ -\/\ INT\_FAST64\_MIN))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ x\ +=\ y;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ y\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ count\ =\ 0;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ goto\ label;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00012}{12}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00024}{dense\+\_\+sum()}}, and \mbox{\hyperlink{Summary_8c_source_l00216}{sparse\+\_\+sum()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{Summary_8c_aea68524e89a53bb430a1bd5db63207b8}\index{Summary.c@{Summary.c}!dense\_prod@{dense\_prod}}
+\index{dense\_prod@{dense\_prod}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{dense\_prod()}{dense\_prod()}}
+{\footnotesize\ttfamily \label{Summary_8c_aea68524e89a53bb430a1bd5db63207b8} 
+SEXP dense\+\_\+prod (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00465}{465}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Summary_8c_source_l00009}{LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Summary_8c_a6fb685ced489c960ab8a71e915f72539}{PROD}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00898}{R\+\_\+dense\+\_\+prod()}}.
+
+\Hypertarget{Summary_8c_a636aa6af3e4a563804d3da67332622ca}\index{Summary.c@{Summary.c}!dense\_sum@{dense\_sum}}
+\index{dense\_sum@{dense\_sum}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{dense\_sum()}{dense\_sum()}}
+{\footnotesize\ttfamily \label{Summary_8c_a636aa6af3e4a563804d3da67332622ca} 
+SEXP dense\+\_\+sum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00024}{24}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Summary_8c_source_l00009}{LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Summary_8c_a1319745524dbd8748dba95bb12b19f19}{SUM}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Summary_8c_source_l00012}{TRY\+\_\+\+INCREMENT}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00445}{R\+\_\+dense\+\_\+sum()}}.
+
+\Hypertarget{Summary_8c_aa43eec42a79cf5ebcd2c4a972ff0a06c}\index{Summary.c@{Summary.c}!R\_dense\_prod@{R\_dense\_prod}}
+\index{R\_dense\_prod@{R\_dense\_prod}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_prod()}{R\_dense\_prod()}}
+{\footnotesize\ttfamily \label{Summary_8c_aa43eec42a79cf5ebcd2c4a972ff0a06c} 
+SEXP R\+\_\+dense\+\_\+prod (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00898}{898}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Summary_8c_source_l00465}{dense\+\_\+prod()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}.
+
+\Hypertarget{Summary_8c_a3db9aa09d78af63f5d94384e6a8d53e7}\index{Summary.c@{Summary.c}!R\_dense\_sum@{R\_dense\_sum}}
+\index{R\_dense\_sum@{R\_dense\_sum}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_sum()}{R\_dense\_sum()}}
+{\footnotesize\ttfamily \label{Summary_8c_a3db9aa09d78af63f5d94384e6a8d53e7} 
+SEXP R\+\_\+dense\+\_\+sum (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00445}{445}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Summary_8c_source_l00024}{dense\+\_\+sum()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}.
+
+\Hypertarget{Summary_8c_a3ceda4a93cd8b2f057a05840f2e7f5e0}\index{Summary.c@{Summary.c}!R\_sparse\_prod@{R\_sparse\_prod}}
+\index{R\_sparse\_prod@{R\_sparse\_prod}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_prod()}{R\_sparse\_prod()}}
+{\footnotesize\ttfamily \label{Summary_8c_a3ceda4a93cd8b2f057a05840f2e7f5e0} 
+SEXP R\+\_\+sparse\+\_\+prod (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00908}{908}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Summary_8c_source_l00659}{sparse\+\_\+prod()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{Summary_8c_a813402c2894a137d3cb7cd5184ca1ebd}\index{Summary.c@{Summary.c}!R\_sparse\_sum@{R\_sparse\_sum}}
+\index{R\_sparse\_sum@{R\_sparse\_sum}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_sum()}{R\_sparse\_sum()}}
+{\footnotesize\ttfamily \label{Summary_8c_a813402c2894a137d3cb7cd5184ca1ebd} 
+SEXP R\+\_\+sparse\+\_\+sum (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00455}{455}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Summary_8c_source_l00216}{sparse\+\_\+sum()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{Summary_8c_a72e7af212baeff229d9bf132518f0bc3}\index{Summary.c@{Summary.c}!sparse\_aggregate@{sparse\_aggregate}}
+\index{sparse\_aggregate@{sparse\_aggregate}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_aggregate()}{sparse\_aggregate()}}
+{\footnotesize\ttfamily \label{Summary_8c_a72e7af212baeff229d9bf132518f0bc3} 
+SEXP sparse\+\_\+aggregate (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aggregate_8c_source_l00005}{5}} of file \mbox{\hyperlink{aggregate_8c_source}{aggregate.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{aggregate_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{aggregate_8c_source_l00086}{R\+\_\+sparse\+\_\+aggregate()}}, \mbox{\hyperlink{bind_8c_source_l00010}{scan\+Args()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{Summary_8c_source_l00659}{sparse\+\_\+prod()}}, and \mbox{\hyperlink{Summary_8c_source_l00216}{sparse\+\_\+sum()}}.
+
+\Hypertarget{Summary_8c_afe781b462ea217925ac08dd6822f0f31}\index{Summary.c@{Summary.c}!sparse\_prod@{sparse\_prod}}
+\index{sparse\_prod@{sparse\_prod}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_prod()}{sparse\_prod()}}
+{\footnotesize\ttfamily \label{Summary_8c_afe781b462ea217925ac08dd6822f0f31} 
+SEXP sparse\+\_\+prod (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00659}{659}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Summary_8c_source_l00009}{LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00908}{R\+\_\+sparse\+\_\+prod()}}.
+
+\Hypertarget{Summary_8c_a194eb35e35635d42702ba7370885d316}\index{Summary.c@{Summary.c}!sparse\_sum@{sparse\_sum}}
+\index{sparse\_sum@{sparse\_sum}!Summary.c@{Summary.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_sum()}{sparse\_sum()}}
+{\footnotesize\ttfamily \label{Summary_8c_a194eb35e35635d42702ba7370885d316} 
+SEXP sparse\+\_\+sum (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{narm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Summary_8c_source_l00216}{216}} of file \mbox{\hyperlink{Summary_8c_source}{Summary.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Summary_8c_source_l00009}{LONGDOUBLE\+\_\+\+AS\+\_\+\+DOUBLE}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Summary_8c_source_l00012}{TRY\+\_\+\+INCREMENT}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{Summary_8c_source_l00455}{R\+\_\+sparse\+\_\+sum()}}.
+

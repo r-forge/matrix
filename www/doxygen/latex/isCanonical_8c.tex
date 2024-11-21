@@ -1,0 +1,111 @@
+\doxysection{is\+Canonical.\+c File Reference}
+\hypertarget{isCanonical_8c}{}\label{isCanonical_8c}\index{isCanonical.c@{isCanonical.c}}
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{isCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b}{dense\+\_\+is\+\_\+canonical}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+int \mbox{\hyperlink{isCanonical_8c_a26966d1169a121c057de412731d50b8f}{sparse\+\_\+is\+\_\+canonical}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{isCanonical_8c_a181d51e2a211a617ce5e9bc6a207d1ee}{R\+\_\+dense\+\_\+is\+\_\+canonical}} (SEXP s\+\_\+obj)
+\item 
+SEXP \mbox{\hyperlink{isCanonical_8c_a2d70be1a6da9dea14d1651155b9ce522}{R\+\_\+sparse\+\_\+is\+\_\+canonical}} (SEXP s\+\_\+obj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{isCanonical_8c_a5c943ec4d393860c44273d898e789156}\index{isCanonical.c@{isCanonical.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!isCanonical.c@{isCanonical.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}}
+{\footnotesize\ttfamily \label{isCanonical_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ return\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ ?\ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test2)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ :\ !\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(test1)(px,\ (size\_t)\ n,\ ul,\ ct,\ nu);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{isCanonical_8c_source_l00007}{dense\+\_\+is\+\_\+canonical()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b}\index{isCanonical.c@{isCanonical.c}!dense\_is\_canonical@{dense\_is\_canonical}}
+\index{dense\_is\_canonical@{dense\_is\_canonical}!isCanonical.c@{isCanonical.c}}
+\doxysubsubsection{\texorpdfstring{dense\_is\_canonical()}{dense\_is\_canonical()}}
+{\footnotesize\ttfamily \label{isCanonical_8c_a4783b3d3b4c1c98ab27765410984203b} 
+int dense\+\_\+is\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isCanonical_8c_source_l00007}{7}} of file \mbox{\hyperlink{isCanonical_8c_source}{is\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{isCanonical_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isCanonical_8c_source_l00086}{R\+\_\+dense\+\_\+is\+\_\+canonical()}}.
+
+\Hypertarget{isCanonical_8c_a181d51e2a211a617ce5e9bc6a207d1ee}\index{isCanonical.c@{isCanonical.c}!R\_dense\_is\_canonical@{R\_dense\_is\_canonical}}
+\index{R\_dense\_is\_canonical@{R\_dense\_is\_canonical}!isCanonical.c@{isCanonical.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_is\_canonical()}{R\_dense\_is\_canonical()}}
+{\footnotesize\ttfamily \label{isCanonical_8c_a181d51e2a211a617ce5e9bc6a207d1ee} 
+SEXP R\+\_\+dense\+\_\+is\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isCanonical_8c_source_l00086}{86}} of file \mbox{\hyperlink{isCanonical_8c_source}{is\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{isCanonical_8c_source_l00007}{dense\+\_\+is\+\_\+canonical()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+\Hypertarget{isCanonical_8c_a2d70be1a6da9dea14d1651155b9ce522}\index{isCanonical.c@{isCanonical.c}!R\_sparse\_is\_canonical@{R\_sparse\_is\_canonical}}
+\index{R\_sparse\_is\_canonical@{R\_sparse\_is\_canonical}!isCanonical.c@{isCanonical.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_is\_canonical()}{R\_sparse\_is\_canonical()}}
+{\footnotesize\ttfamily \label{isCanonical_8c_a2d70be1a6da9dea14d1651155b9ce522} 
+SEXP R\+\_\+sparse\+\_\+is\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isCanonical_8c_source_l00092}{92}} of file \mbox{\hyperlink{isCanonical_8c_source}{is\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{isCanonical_8c_source_l00040}{sparse\+\_\+is\+\_\+canonical()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{isCanonical_8c_a26966d1169a121c057de412731d50b8f}\index{isCanonical.c@{isCanonical.c}!sparse\_is\_canonical@{sparse\_is\_canonical}}
+\index{sparse\_is\_canonical@{sparse\_is\_canonical}!isCanonical.c@{isCanonical.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_is\_canonical()}{sparse\_is\_canonical()}}
+{\footnotesize\ttfamily \label{isCanonical_8c_a26966d1169a121c057de412731d50b8f} 
+int sparse\+\_\+is\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{isCanonical_8c_source_l00040}{40}} of file \mbox{\hyperlink{isCanonical_8c_source}{is\+Canonical.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{isCanonical_8c_source_l00092}{R\+\_\+sparse\+\_\+is\+\_\+canonical()}}.
+

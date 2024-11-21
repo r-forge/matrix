@@ -1,0 +1,160 @@
+\doxysection{rcond.\+c File Reference}
+\hypertarget{rcond_8c}{}\label{rcond_8c}\index{rcond.c@{rcond.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{rcond_8c_ac10f556ba524831a7e977629d1b1250a}{ARGNAME}}~"{}norm"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static char \mbox{\hyperlink{rcond_8c_ae14a8f7ee04570112f094bee3278e300}{La\+\_\+rcond\+\_\+type}} (SEXP s)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_a918f324f94a830d741e9bddb7e5c74da}{ge\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP trf, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_acc368a9b82acd4068bf69153d8b046c6}{sy\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP trf, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_ae854adc84a41915b184d964f25a43fcf}{sp\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP trf, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_a1ce16dc82859770a59b6d8286d6e2a96}{po\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP trf, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_a1ac1c23988ed527dc6d79c1db75a4203}{pp\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP trf, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_a123c23ed615a61f432b2c397dc9d2d61}{tr\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\item 
+SEXP \mbox{\hyperlink{rcond_8c_a4e947c154c4be56788994c312c751734}{tp\+Matrix\+\_\+rcond}} (SEXP s\+\_\+obj, SEXP s\+\_\+type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{rcond_8c_ac10f556ba524831a7e977629d1b1250a}\index{rcond.c@{rcond.c}!ARGNAME@{ARGNAME}}
+\index{ARGNAME@{ARGNAME}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{ARGNAME}{ARGNAME}}
+{\footnotesize\ttfamily \label{rcond_8c_ac10f556ba524831a7e977629d1b1250a} 
+\#define ARGNAME~"{}norm"{}}
+
+
+
+Referenced by \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{rcond_8c_a918f324f94a830d741e9bddb7e5c74da}\index{rcond.c@{rcond.c}!geMatrix\_rcond@{geMatrix\_rcond}}
+\index{geMatrix\_rcond@{geMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{geMatrix\_rcond()}{geMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_a918f324f94a830d741e9bddb7e5c74da} 
+SEXP ge\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{trf}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00040}{40}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+\Hypertarget{rcond_8c_ae14a8f7ee04570112f094bee3278e300}\index{rcond.c@{rcond.c}!La\_rcond\_type@{La\_rcond\_type}}
+\index{La\_rcond\_type@{La\_rcond\_type}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{La\_rcond\_type()}{La\_rcond\_type()}}
+{\footnotesize\ttfamily \label{rcond_8c_ae14a8f7ee04570112f094bee3278e300} 
+static char La\+\_\+rcond\+\_\+type (\begin{DoxyParamCaption}\item[{SEXP}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00007}{7}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{rcond_8c_ac10f556ba524831a7e977629d1b1250a}{ARGNAME}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{rcond_8c_source_l00040}{ge\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00154}{po\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00187}{pp\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00114}{sp\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00074}{sy\+Matrix\+\_\+rcond()}}, \mbox{\hyperlink{rcond_8c_source_l00248}{tp\+Matrix\+\_\+rcond()}}, and \mbox{\hyperlink{rcond_8c_source_l00220}{tr\+Matrix\+\_\+rcond()}}.
+
+\Hypertarget{rcond_8c_a1ce16dc82859770a59b6d8286d6e2a96}\index{rcond.c@{rcond.c}!poMatrix\_rcond@{poMatrix\_rcond}}
+\index{poMatrix\_rcond@{poMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{poMatrix\_rcond()}{poMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_a1ce16dc82859770a59b6d8286d6e2a96} 
+SEXP po\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{trf}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00154}{154}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{rcond_8c_a1ac1c23988ed527dc6d79c1db75a4203}\index{rcond.c@{rcond.c}!ppMatrix\_rcond@{ppMatrix\_rcond}}
+\index{ppMatrix\_rcond@{ppMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{ppMatrix\_rcond()}{ppMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_a1ac1c23988ed527dc6d79c1db75a4203} 
+SEXP pp\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{trf}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00187}{187}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{rcond_8c_ae854adc84a41915b184d964f25a43fcf}\index{rcond.c@{rcond.c}!spMatrix\_rcond@{spMatrix\_rcond}}
+\index{spMatrix\_rcond@{spMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{spMatrix\_rcond()}{spMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_ae854adc84a41915b184d964f25a43fcf} 
+SEXP sp\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{trf}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00114}{114}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{rcond_8c_acc368a9b82acd4068bf69153d8b046c6}\index{rcond.c@{rcond.c}!syMatrix\_rcond@{syMatrix\_rcond}}
+\index{syMatrix\_rcond@{syMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{syMatrix\_rcond()}{syMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_acc368a9b82acd4068bf69153d8b046c6} 
+SEXP sy\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{trf}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00074}{74}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{rcond_8c_a4e947c154c4be56788994c312c751734}\index{rcond.c@{rcond.c}!tpMatrix\_rcond@{tpMatrix\_rcond}}
+\index{tpMatrix\_rcond@{tpMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{tpMatrix\_rcond()}{tpMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_a4e947c154c4be56788994c312c751734} 
+SEXP tp\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00248}{248}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{rcond_8c_a123c23ed615a61f432b2c397dc9d2d61}\index{rcond.c@{rcond.c}!trMatrix\_rcond@{trMatrix\_rcond}}
+\index{trMatrix\_rcond@{trMatrix\_rcond}!rcond.c@{rcond.c}}
+\doxysubsubsection{\texorpdfstring{trMatrix\_rcond()}{trMatrix\_rcond()}}
+{\footnotesize\ttfamily \label{rcond_8c_a123c23ed615a61f432b2c397dc9d2d61} 
+SEXP tr\+Matrix\+\_\+rcond (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+type}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rcond_8c_source_l00220}{220}} of file \mbox{\hyperlink{rcond_8c_source}{rcond.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{rcond_8c_source_l00007}{La\+\_\+rcond\+\_\+type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+

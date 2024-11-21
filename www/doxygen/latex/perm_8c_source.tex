@@ -1,0 +1,172 @@
+\doxysection{perm.\+c}
+\hypertarget{perm_8c_source}{}\label{perm_8c_source}\index{perm.c@{perm.c}}
+\mbox{\hyperlink{perm_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{Mdefines_8h}{Mdefines.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00003}\mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{00003}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{isPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *p,\ \textcolor{keywordtype}{int}\ n,\ \textcolor{keywordtype}{int}\ off)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00004}00004\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00005}00005\ \ \ \ \ \textcolor{keywordtype}{int}\ ans\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00006}00006\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 0)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00007}00007\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00008}00008\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ j;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00009}00009\ \ \ \ \ \textcolor{keywordtype}{char}\ *work;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00010}00010\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a32297dfc52f291c7925072295062079e}{Matrix\_Calloc}}(work,\ n,\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00011}00011\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00012}00012\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (p[i]\ ==\ NA\_INTEGER\ ||\ (j\ =\ p[i]\ -\/\ off)\ <\ 0\ ||\ j\ >=\ n\ ||\ work[j])\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \ \ \ ans\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00015}00015\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00016}00016\ \ \ \ \ \ \ \ \ work[j]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00017}00017\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a6ba1866ce3389288a13fc0348cd03515}{Matrix\_Free}}(work,\ n);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00019}00019\ \ \ \ \ \textcolor{keywordflow}{return}\ ans;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00020}00020\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00022}\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{00022}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *p,\ \textcolor{keywordtype}{int}\ n,\ \textcolor{keywordtype}{int}\ off)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00023}00023\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{isPerm}}(p,\ n,\ off))}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00025}00025\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}attempt\ to\ get\ sign\ of\ non-\/permutation"{}}));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{int}\ sign\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 0)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ pos\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00030}00030\ \ \ \ \ \textcolor{keywordtype}{char}\ *work;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a32297dfc52f291c7925072295062079e}{Matrix\_Calloc}}(work,\ n,\ \textcolor{keywordtype}{char});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00032}00032\ \ \ \ \ \textcolor{keywordflow}{while}\ (pos\ <\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00033}00033\ \ \ \ \ \ \ \ \ work[pos]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00034}00034\ \ \ \ \ \ \ \ \ i\ =\ p[pos]\ -\/\ off;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!work[i])\ \{\ \textcolor{comment}{/*\ transposition\ */}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ sign\ =\ -\/sign;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ work[i]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ p[i]\ -\/\ off;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (pos\ <\ n\ \&\&\ work[pos])}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ ++pos;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{Mdefines_8h_a6ba1866ce3389288a13fc0348cd03515}{Matrix\_Free}}(work,\ n);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00044}00044\ \ \ \ \ \textcolor{keywordflow}{return}\ sign;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00045}00045\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00047}\mbox{\hyperlink{perm_8c_a96444b341a79d7f4b19174ae8d9755de}{00047}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{perm_8c_a96444b341a79d7f4b19174ae8d9755de}{invertPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *p,\ \textcolor{keywordtype}{int}\ *ip,\ \textcolor{keywordtype}{int}\ n,\ \textcolor{keywordtype}{int}\ off,\ \textcolor{keywordtype}{int}\ ioff)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00048}00048\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{isPerm}}(p,\ n,\ off))}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00050}00050\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}attempt\ to\ invert\ non-\/permutation"{}}));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00051}00051\ \ \ \ \ \textcolor{keywordtype}{int}\ j;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{for}\ (j\ =\ 0;\ j\ <\ n;\ ++j)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ ip[p[j]\ -\/\ off]\ =\ j\ +\ ioff;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00057}\mbox{\hyperlink{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c}{00057}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c}{asPerm}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ *p,\ \textcolor{keywordtype}{int}\ *ip,\ \textcolor{keywordtype}{int}\ m,\ \textcolor{keywordtype}{int}\ n,\ \textcolor{keywordtype}{int}\ off,\ \textcolor{keywordtype}{int}\ ioff)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00058}00058\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00059}00059\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ j,\ tmp;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ ++i)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ ip[i]\ =\ i\ +\ ioff;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ m;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ j\ =\ p[i]\ -\/\ off;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (j\ <\ 0\ ||\ j\ >=\ n)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}invalid\ transposition\ vector"{}}));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (j\ !=\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ ip[j];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ ip[j]\ =\ ip[i];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ ip[i]\ =\ tmp;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00072}00072\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00075}\mbox{\hyperlink{init_8c_a5608c683a0496ff8209e687169d4942a}{00075}}\ SEXP\ \mbox{\hyperlink{perm_8c_a99b2124cd209ca8500a6f905ecbb8aed}{R\_isPerm}}(SEXP\ s\_p,\ SEXP\ s\_off)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00076}00076\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_p)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \textcolor{stringliteral}{"{}p"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_off)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00080}00080\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{if}\ (XLENGTH(s\_off)\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ does\ not\ have\ length\ \%d"{}}),\ \textcolor{stringliteral}{"{}off"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00083}00083\ \ \ \ \ \textcolor{keywordtype}{int}\ off\ =\ INTEGER(s\_off)[0];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{if}\ (off\ ==\ NA\_INTEGER)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ NA"{}}),\ \textcolor{stringliteral}{"{}off"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00086}00086\ \ \ \ \ R\_xlen\_t\ n\ =\ XLENGTH(s\_p);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00087}00087\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ INT\_MAX)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(0);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00089}00089\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarLogical(\mbox{\hyperlink{perm_8c_a816215ef66f35c9b37617be29e741ddc}{isPerm}}(INTEGER(s\_p),\ (\textcolor{keywordtype}{int})\ n,\ off));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00090}00090\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00092}\mbox{\hyperlink{init_8c_ad5f4bbb86926c264b96a5de70a63e70d}{00092}}\ SEXP\ \mbox{\hyperlink{perm_8c_a338d1e5ff3a5d3b4ea4a1ea3be881cf7}{R\_signPerm}}(SEXP\ s\_p,\ SEXP\ s\_off)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00093}00093\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_p)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00095}00095\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \textcolor{stringliteral}{"{}p"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_off)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00097}00097\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),\ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (XLENGTH(s\_off)\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00099}00099\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ does\ not\ have\ length\ \%d"{}}),\ \textcolor{stringliteral}{"{}off"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00100}00100\ \ \ \ \ \textcolor{keywordtype}{int}\ off\ =\ INTEGER(s\_off)[0];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (off\ ==\ NA\_INTEGER)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00102}00102\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ NA"{}}),\ \textcolor{stringliteral}{"{}off"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00103}00103\ \ \ \ \ R\_xlen\_t\ n\ =\ XLENGTH(s\_p);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ INT\_MAX)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00105}00105\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}attempt\ to\ get\ sign\ of\ non-\/permutation"{}}));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00106}00106\ \ \ \ \ \textcolor{keywordflow}{return}\ Rf\_ScalarInteger(\mbox{\hyperlink{perm_8c_abc949217622ddc601c32dd90f2cf0a81}{signPerm}}(INTEGER(s\_p),\ (\textcolor{keywordtype}{int})\ n,\ off));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00107}00107\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00109}\mbox{\hyperlink{init_8c_abbfd0d8c6edca69b0384961e814a4152}{00109}}\ SEXP\ \mbox{\hyperlink{perm_8c_a24542afbe5202a47c00d5ae2ed259647}{R\_invertPerm}}(SEXP\ s\_p,\ SEXP\ s\_off,\ SEXP\ s\_ioff)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00110}00110\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00111}00111\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_p)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00112}00112\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_off)\ !=\ INTSXP\ ||\ \mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_ioff)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00115}00115\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00117}00117\ \ \ \ \ \textcolor{keywordflow}{if}\ (XLENGTH(s\_off)\ !=\ 1\ ||\ XLENGTH(s\_ioff)\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00118}00118\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ does\ not\ have\ length\ \%d"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00120}00120\ \ \ \ \ \textcolor{keywordtype}{int}\ off\ =\ INTEGER(s\_off)[0],\ ioff\ =\ INTEGER(s\_ioff)[0];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00121}00121\ \ \ \ \ \textcolor{keywordflow}{if}\ (off\ ==\ NA\_INTEGER\ ||\ ioff\ ==\ NA\_INTEGER)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00122}00122\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ is\ NA"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00124}00124\ \ \ \ \ R\_xlen\_t\ n\ =\ XLENGTH(s\_p);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ INT\_MAX)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00126}00126\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}attempt\ to\ invert\ non-\/permutation"{}}));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00127}00127\ \ \ \ \ SEXP\ ip\ =\ PROTECT(Rf\_allocVector(INTSXP,\ n));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{perm_8c_a96444b341a79d7f4b19174ae8d9755de}{invertPerm}}(INTEGER(s\_p),\ INTEGER(ip),\ (\textcolor{keywordtype}{int})\ n,\ off,\ ioff);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00129}00129\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00130}00130\ \ \ \ \ \textcolor{keywordflow}{return}\ ip;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00131}00131\ \}}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00133}\mbox{\hyperlink{init_8c_a54ad7066b567d04bcf672cefc897b26a}{00133}}\ SEXP\ \mbox{\hyperlink{perm_8c_a524b04f2870c98b49b69b4cbf4151fb4}{R\_asPerm}}(SEXP\ s\_p,\ SEXP\ s\_off,\ SEXP\ s\_ioff,\ SEXP\ s\_n)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00134}00134\ \{}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00135}00135\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_p)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00136}00136\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00138}00138\ \ \ \ \ R\_xlen\_t\ m\ =\ XLENGTH(s\_p);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00139}00139\ \ \ \ \ \textcolor{keywordflow}{if}\ (m\ >\ INT\_MAX)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00140}00140\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ has\ length\ exceeding\ \%s"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}p"{}},\ \textcolor{stringliteral}{"{}2\string^31-\/1"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00142}00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_off)\ !=\ INTSXP\ ||\ \mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_ioff)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00143}00143\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00145}00145\ \ \ \ \ \textcolor{keywordflow}{if}\ (XLENGTH(s\_off)\ !=\ 1\ ||\ XLENGTH(s\_ioff)\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00146}00146\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ does\ not\ have\ length\ \%d"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00148}00148\ \ \ \ \ \textcolor{keywordtype}{int}\ off\ =\ INTEGER(s\_off)[0],\ ioff\ =\ INTEGER(s\_ioff)[0];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00149}00149\ \ \ \ \ \textcolor{keywordflow}{if}\ (off\ ==\ NA\_INTEGER\ ||\ ioff\ ==\ NA\_INTEGER)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00150}00150\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ or\ '\%s'\ is\ NA"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}off"{}},\ \textcolor{stringliteral}{"{}ioff"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00152}00152\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(s\_n)\ !=\ INTSXP)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00153}00153\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ not\ of\ type\ \(\backslash\)"{}\%s\(\backslash\)"{}"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}n"{}},\ \textcolor{stringliteral}{"{}integer"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{if}\ (XLENGTH(s\_n)\ !=\ 1)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00156}00156\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ does\ not\ have\ length\ \%d"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}n"{}},\ 1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00158}00158\ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ INTEGER(s\_n)[0];}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00159}00159\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ NA\_INTEGER\ ||\ n\ <\ m)}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00160}00160\ \ \ \ \ \ \ \ \ Rf\_error(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}'\%s'\ is\ NA\ or\ less\ than\ \%s"{}}),}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}n"{}},\ \textcolor{stringliteral}{"{}length(p)"{}});}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00162}00162\ \ \ \ \ SEXP\ ip\ =\ PROTECT(Rf\_allocVector(INTSXP,\ n));}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{perm_8c_a2c643e7bbce8b10bb73501db3fbddd2c}{asPerm}}(INTEGER(s\_p),\ INTEGER(ip),\ (\textcolor{keywordtype}{int})\ m,\ n,\ off,\ ioff);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00164}00164\ \ \ \ \ UNPROTECT(1);}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00165}00165\ \ \ \ \ \textcolor{keywordflow}{return}\ ip;}
+\DoxyCodeLine{\Hypertarget{perm_8c_source_l00166}00166\ \}}
+
+\end{DoxyCode}

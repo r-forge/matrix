@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['x_0',['x',['../structMatrix__cs__sparse.html#ac3e4cdbf468ce9e39efed12ff3397dc8',1,'Matrix_cs_sparse']]],
+  ['x_5fcomplex_1',['x_complex',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a3ec540f6985f1adf7e7363ff1589a42b',1,'subassign.c']]],
+  ['x_5fdouble_2',['x_double',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a2a95e471311414715f5477d7a4f11564',1,'subassign.c']]],
+  ['x_5finteger_3',['x_integer',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181aae6c99602d8ebd0046fe45aab166d0f0',1,'subassign.c']]],
+  ['x_5flogical_4',['x_logical',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181ab3a3051968f4171a6f035164412f68a5',1,'subassign.c']]],
+  ['x_5fpattern_5',['x_pattern',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181af08efd0da3716cb69cc8dc3a5ca6b76f',1,'subassign.c']]],
+  ['x_5fslot_5fkind_6',['x_slot_kind',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181',1,'subassign.c']]],
+  ['x_5funknown_7',['x_unknown',['../subassign_8c.html#a0513d8a9f2e4f454f1fc3a59c4a6f181a5b79f2665ffefd7ad7338c962314c2d4',1,'subassign.c']]],
+  ['xgcmatrix_5fvalidate_8',['xgCMatrix_validate',['../init_8c.html#ab6a60731ab898a5054c1459cd16f7df9',1,'xgCMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a2efe1dae2976e4d48221b83cb1605ac4',1,'xgCMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xgrmatrix_5fvalidate_9',['xgRMatrix_validate',['../init_8c.html#acd88fb796c15f26fec9efa344a8ba682',1,'xgRMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a6918755f74fac1b7239daad3ba5ada8d',1,'xgRMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xgtmatrix_5fvalidate_10',['xgTMatrix_validate',['../init_8c.html#ada7774c0e20b7dc1ba71cddc2069e4dd',1,'xgTMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#aae2ba5eb01916f6d11e64d9a0bbca2ea',1,'xgTMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xpcmatrix_5fvalidate_11',['xpCMatrix_validate',['../init_8c.html#a1cdf1cd00636cd61533c3624958f536d',1,'xpCMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a41ef79b7d95fdf77ad46b3c127ee70a6',1,'xpCMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xpomatrix_5fvalidate_12',['xpoMatrix_validate',['../init_8c.html#afff7b259ebfcc64138c5ee530e2b2039',1,'xpoMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#aabf136b9e9efa0f483a7ccda9247244f',1,'xpoMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xppmatrix_5fvalidate_13',['xppMatrix_validate',['../init_8c.html#ae1780809616b0426f172f89129aade05',1,'xppMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a59c7e4a9ff02402b0d20e052bad9c44c',1,'xppMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xprmatrix_5fvalidate_14',['xpRMatrix_validate',['../init_8c.html#ae116391b39b9ab5aa7521e1ac3834922',1,'xpRMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#aca2b39b1281674c6c58d83c8c4d26045',1,'xpRMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xptmatrix_5fvalidate_15',['xpTMatrix_validate',['../init_8c.html#a337820b85a75cbf84ee989971fd21643',1,'xpTMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#adf09fe2fbd39a758e6b87e373de093b7',1,'xpTMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xscmatrix_5fvalidate_16',['xsCMatrix_validate',['../init_8c.html#a481fe4b5af127f68c77843e8c9ff547c',1,'xsCMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#af8ee8966e36a4d2d40243e537af76a67',1,'xsCMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xsrmatrix_5fvalidate_17',['xsRMatrix_validate',['../init_8c.html#a547f28b248cb8c67ec04b51b98e9eba0',1,'xsRMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#ac8b3bf5d485e52dbfc638ed4a17c3f2d',1,'xsRMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xstmatrix_5fvalidate_18',['xsTMatrix_validate',['../init_8c.html#a5e4d3ed1dfee5f462a5e556852df4ec4',1,'xsTMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a839c2fd8b27dbf2fe55a8f3c6b4b6999',1,'xsTMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xtcmatrix_5fvalidate_19',['xtCMatrix_validate',['../init_8c.html#a9e4a810994df59fce78c6393dfd016dd',1,'xtCMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#a8ccde9ea712c2d3323235b703b1ca125',1,'xtCMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xtrmatrix_5fvalidate_20',['xtRMatrix_validate',['../init_8c.html#a429b9277a4e462d3736ae960798c7123',1,'xtRMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#ad4a19fd1d2b41d3f09be1789fdedeef7',1,'xtRMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xttmatrix_5fvalidate_21',['xtTMatrix_validate',['../init_8c.html#af18775e3c6e460ff2fe4851b72719896',1,'xtTMatrix_validate(SEXP):&#160;validity.c'],['../validity_8c.html#ac22743c5c28b556f114ee3118f193d3b',1,'xtTMatrix_validate(SEXP obj):&#160;validity.c']]],
+  ['xtype_22',['xtype',['../structMatrix__cs__sparse.html#afc4a09b8722e9a99eb860aa422962175',1,'Matrix_cs_sparse']]]
+];

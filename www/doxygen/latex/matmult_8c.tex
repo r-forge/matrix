@@ -1,0 +1,833 @@
+\doxysection{matmult.\+c File Reference}
+\hypertarget{matmult_8c}{}\label{matmult_8c}\index{matmult.c@{matmult.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+{\ttfamily \#include "{}coerce.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a86a3d44d90ffa52d3c6ec5542951630f}{CONJ2}}(\+\_\+\+X\+\_\+,  \+\_\+\+M\+\_\+,  \+\_\+\+N\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a976890c7a1c1c7e50b77c57e1d02dc5d}{CONJ1}}(\+\_\+\+X\+\_\+,  \+\_\+\+N\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}(\+\_\+\+A\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+,  \+\_\+\+ISV\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}(\+\_\+\+A\+\_\+,  \+\_\+\+CLASS\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_ade83c07bd831fc256caba18fdd415ae8}{DO\+\_\+\+TR}}
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a42b393a8a9407818732e1006053f72d0}{ASMODE}}(\+\_\+\+TRANS\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}(\+\_\+\+A\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+,  \+\_\+\+ISV\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}(\+\_\+\+A\+\_\+,  \+\_\+\+CLASS\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_ad5b2b2b2fa8944de140dad01d1c10432}{z\+SCALE}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a719e40b52a700dbebc08f98c2f797081}{d\+SCALE}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a8cb16b790e1c335a3dfc6bdcc2db06c6}{l\+SCALE}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a99c9ed8ec934018078853e5a70440818}{SCALE3}}(t,  index)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  index)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  index)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  index)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}(\+\_\+\+A\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+,  \+\_\+\+ISV\+\_\+)
+\item 
+\#define \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}(\+\_\+\+A\+\_\+,  \+\_\+\+CLASS\+\_\+,  \+\_\+\+TRANS\+\_\+,  \+\_\+\+PID\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_a526df2401804b0919c18a9b19773c1a2}{dense\+\_\+transpose}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_a03c78144d411cca2c647b0536d8499b3}{sparse\+\_\+transpose}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_a3e12a20d4a63309bb98184100fea12ac}{sparse\+\_\+dropzero}} (SEXP, const char \texorpdfstring{$\ast$}{*}, double)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_ae44c4ed55ba36e48419178280c16d7e0}{sparse\+\_\+diag\+\_\+\+U2N}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+static void \mbox{\hyperlink{matmult_8c_a8543cbd6a8905c6ce6199b9f3df69c75}{matmult\+Dim}} (SEXP x, SEXP y, char \texorpdfstring{$\ast$}{*}xtrans, char \texorpdfstring{$\ast$}{*}ytrans, char \texorpdfstring{$\ast$}{*}ztrans, int \texorpdfstring{$\ast$}{*}m, int \texorpdfstring{$\ast$}{*}n, int \texorpdfstring{$\ast$}{*}v)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a1917e938614314b60d648231086a6f3e}{matmult\+DN}} (SEXP dest, SEXP asrc, int ai, SEXP bsrc, int bi)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_aefd939bdb58133a5446d9de412b0d94b}{ge\+Matrix\+\_\+matmult}} (SEXP a, SEXP b, char atrans, char btrans)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_a512bde2385296bb7e42599eee2d90d1b}{sy\+Matrix\+\_\+matmult}} (SEXP a, SEXP b, char atrans, char btrans, char aside)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_af538a1f8352b5e4b100a13760ec8f3b5}{sp\+Matrix\+\_\+matmult}} (SEXP a, SEXP b, char atrans, char btrans, char aside)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_a9647b2544403bb4d08a0d12de9952ac9}{tr\+Matrix\+\_\+matmult}} (SEXP a, SEXP b, char atrans, char btrans, char aside, int triangular)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_a42cb3dbacb69d1a365d69c2e9318702e}{tp\+Matrix\+\_\+matmult}} (SEXP a, SEXP b, char atrans, char btrans, char aside, int triangular)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_a143e432d687fd1beb58bbecf64b47290}{R\+\_\+dense\+\_\+matmult}} (SEXP s\+\_\+x, SEXP s\+\_\+y, SEXP s\+\_\+xtrans, SEXP s\+\_\+ytrans)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_ae270f071fed20473c39afae13009364c}{g\+Cg\+CMatrix\+\_\+matmult}} (SEXP x, SEXP y, char xtrans, char ytrans, char ztrans, int triangular, int boolean)
+\item 
+static SEXP \mbox{\hyperlink{matmult_8c_a1ad67f05e62cf5676d21a96fa7c0b8d6}{g\+Cge\+Matrix\+\_\+matmult}} (SEXP x, SEXP y, int xtrans, char ytrans, char ztrans, int triangular, int symmetric)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_a78d9cc3bec202b32208e3d91d2bdd087}{R\+\_\+sparse\+\_\+matmult}} (SEXP s\+\_\+x, SEXP s\+\_\+y, SEXP s\+\_\+xtrans, SEXP s\+\_\+ytrans, SEXP s\+\_\+ztrans, SEXP s\+\_\+boolean)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a2e7b31d82434573263348cc3d6b6f98b}{dense\+\_\+colscale}} (SEXP obj, SEXP d, int m, int n, char ul, char nu)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a66457c6e44f769379198d3b45ec8fe4e}{dense\+\_\+rowscale}} (SEXP obj, SEXP d, int m, int n, char ul, char nu)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a53a49c3a67192b59c7779e8599214728}{Csparse\+\_\+colscale}} (SEXP obj, SEXP d)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a3d63330548746ac0b7ac53a5e559a748}{Csparse\+\_\+rowscale}} (SEXP obj, SEXP d, SEXP i\+Sym)
+\item 
+static void \mbox{\hyperlink{matmult_8c_a107441b9fdb5636ef11eb64b31f99b3f}{Tsparse\+\_\+rowscale}} (SEXP obj, SEXP d, SEXP i\+Sym)
+\item 
+SEXP \mbox{\hyperlink{matmult_8c_ae83b3d80e6dcc6bfb760e442338cff73}{R\+\_\+diagonal\+\_\+matmult}} (SEXP s\+\_\+x, SEXP s\+\_\+y, SEXP s\+\_\+xtrans, SEXP s\+\_\+ytrans, SEXP s\+\_\+boolean)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{matmult_8c_a892fa96e6d627e36444e5292e73b240b}{valid\+\_\+matmult}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{matmult_8c_a42b393a8a9407818732e1006053f72d0}\index{matmult.c@{matmult.c}!ASMODE@{ASMODE}}
+\index{ASMODE@{ASMODE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{ASMODE}{ASMODE}}
+{\footnotesize\ttfamily \label{matmult_8c_a42b393a8a9407818732e1006053f72d0} 
+\#define ASMODE(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+TRANS\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((boolean)\ ?\ 0\ :\ (((\_TRANS\_)\ !=\ \textcolor{charliteral}{'C'})\ ?\ 1\ :\ 2))}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a976890c7a1c1c7e50b77c57e1d02dc5d}\index{matmult.c@{matmult.c}!CONJ1@{CONJ1}}
+\index{CONJ1@{CONJ1}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{CONJ1}{CONJ1}}
+{\footnotesize\ttfamily \label{matmult_8c_a976890c7a1c1c7e50b77c57e1d02dc5d} 
+\#define CONJ1(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+X\+\_\+}{, }\item[{}]{\+\_\+\+N\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ n\ =\ (size\_t)\ \_N\_,\ xlen\ =\ \mbox{\hyperlink{Mdefines_8h_abada24a63af67906902eb6e44adcf235}{PACKED\_LENGTH}}(n);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ Rcomplex\ *x\ =\ (Rcomplex\ *)\ \_X\_;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ Rcomplex\ *y\ =\ (Rcomplex\ *)\ R\_alloc(xlen,\ \textcolor{keyword}{sizeof}(Rcomplex));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ zvconj(x,\ y,\ xlen);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \_X\_\ =\ y;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00161}{161}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a86a3d44d90ffa52d3c6ec5542951630f}\index{matmult.c@{matmult.c}!CONJ2@{CONJ2}}
+\index{CONJ2@{CONJ2}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{CONJ2}{CONJ2}}
+{\footnotesize\ttfamily \label{matmult_8c_a86a3d44d90ffa52d3c6ec5542951630f} 
+\#define CONJ2(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+X\+\_\+}{, }\item[{}]{\+\_\+\+M\+\_\+}{, }\item[{}]{\+\_\+\+N\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ m\ =\ (size\_t)\ \_M\_,\ n\ =\ (\textcolor{keywordtype}{size\_t})\ \_N\_,\ xlen\ =\ m\ *\ n;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ Rcomplex\ *x\ =\ (Rcomplex\ *)\ \_X\_;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ Rcomplex\ *y\ =\ (Rcomplex\ *)\ R\_alloc(xlen,\ \textcolor{keyword}{sizeof}(Rcomplex));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ zvconj(x,\ y,\ xlen);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \_X\_\ =\ y;\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00152}{152}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}\index{matmult.c@{matmult.c}!DO\_AS@{DO\_AS}}
+\index{DO\_AS@{DO\_AS}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_AS}{DO\_AS}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a2a43d849f24a1d50becd635f2edfba33} 
+\#define DO\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+CLASS\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_CLASS\_[0]\ !=\ kind)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{BunchKaufman_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\_as\_kind}}(\_A\_,\ \_CLASS\_,\ kind,\ 0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_CLASS\_\ =\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(\_A\_,\ valid,\ 6,\ \_\_func\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}\index{matmult.c@{matmult.c}!DO\_AS@{DO\_AS}}
+\index{DO\_AS@{DO\_AS}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_AS}{DO\_AS}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a2a43d849f24a1d50becd635f2edfba33} 
+\#define DO\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+CLASS\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_CLASS\_[2]\ !=\ \textcolor{charliteral}{'C'}\ \&\&\ \_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_CLASS\_[2]\ !=\ \textcolor{charliteral}{'R'}\ \&\&\ \_CLASS\_[2]\ !=\ \textcolor{charliteral}{'T'})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_a560f863690eefcb6e876728fc8c680ba}{dense\_as\_sparse}}(\_A\_,\ \_CLASS\_,\ \textcolor{charliteral}{'R'}),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_CLASS\_\ =\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(\_A\_,\ valid,\ 6,\ \_\_func\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{matmult_8c_a03c78144d411cca2c647b0536d8499b3}{sparse\_transpose}}(\_A\_,\ \_CLASS\_,\ \_TRANS\_,\ 1),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_CLASS\_\ =\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(\_A\_,\ valid,\ 6,\ \_\_func\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_TRANS\_\ =\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_CLASS\_[2]\ !=\ \textcolor{charliteral}{'C'})\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\_CLASS\_[2]\ !=\ \textcolor{charliteral}{'R'}\ \&\&\ \_CLASS\_[2]\ !=\ \textcolor{charliteral}{'T'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_a560f863690eefcb6e876728fc8c680ba}{dense\_as\_sparse}}(\_A\_,\ \_CLASS\_,\ \textcolor{charliteral}{'C'}),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f}{sparse\_as\_Csparse}}(\_A\_,\ \_CLASS\_),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_CLASS\_\ =\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(\_A\_,\ valid,\ 6,\ \_\_func\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'}\ \&\&\ \_CLASS\_[1]\ ==\ \textcolor{charliteral}{'s'}\ \&\&\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (\_CLASS\_[0]\ !=\ \textcolor{charliteral}{'z'}\ ||\ \mbox{\hyperlink{Mdefines_8h_a7ba67909f41df9786fd774eb0f84a39e}{TRANS}}(\_A\_)\ ==\ \_TRANS\_))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_TRANS\_\ =\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_CLASS\_[0]\ !=\ kind)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (\textcolor{keywordtype}{boolean})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{matmult_8c_a3e12a20d4a63309bb98184100fea12ac}{sparse\_dropzero}}(\_A\_,\ \_CLASS\_,\ 0.0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60}{sparse\_as\_kind}}(\_A\_,\ \_CLASS\_,\ kind),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \_CLASS\_\ =\ \mbox{\hyperlink{Mdefines_8h_a51eec02a487adbf46e1dbba968500f78}{Matrix\_class}}(\_A\_,\ valid,\ 6,\ \_\_func\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}\index{matmult.c@{matmult.c}!DO\_AS@{DO\_AS}}
+\index{DO\_AS@{DO\_AS}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_AS}{DO\_AS}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a2a43d849f24a1d50becd635f2edfba33} 
+\#define DO\+\_\+\+AS(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+CLASS\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{}\end{DoxyParamCaption})}
+
+\Hypertarget{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}\index{matmult.c@{matmult.c}!DO\_S3@{DO\_S3}}
+\index{DO\_S3@{DO\_S3}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_S3}{DO\_S3}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0} 
+\#define DO\+\_\+\+S3(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{, }\item[{}]{\+\_\+\+ISV\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(\_A\_)\ !=\ OBJSXP)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_af1881765bb4e3ebb92dd64aa15cb065d}{matrix\_as\_dense}}(\_A\_,\ \textcolor{stringliteral}{"{},ge"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 0\ :\ 1,\ 0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_ISV\_)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Vector:\ discard\ names\ and\ don't\ transpose\ again\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(\_A\_,\ 0),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 1\ :\ 0,\ R\_NilValue);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_TRANS\_\ =\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}\index{matmult.c@{matmult.c}!DO\_S3@{DO\_S3}}
+\index{DO\_S3@{DO\_S3}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_S3}{DO\_S3}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0} 
+\#define DO\+\_\+\+S3(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{, }\item[{}]{\+\_\+\+ISV\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(\_A\_)\ !=\ OBJSXP)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\textcolor{keywordtype}{boolean}\ ==\ NA\_LOGICAL\ ||\ !\textcolor{keywordtype}{boolean})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_af1881765bb4e3ebb92dd64aa15cb065d}{matrix\_as\_dense}}\ (\_A\_,\ \textcolor{stringliteral}{"{},ge"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 0\ :\ 1,\ 0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_a9da73de9c50fddb396cee655f7096e58}{matrix\_as\_sparse}}(\_A\_,\ \textcolor{stringliteral}{"{}ngR"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ 0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_a9da73de9c50fddb396cee655f7096e58}{matrix\_as\_sparse}}(\_A\_,\ \textcolor{stringliteral}{"{}ngC"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ 0),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_ISV\_)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Discard\ names\ and\ don't\ transpose\ again\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(\_A\_,\ 0),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 1\ :\ 0,\ R\_NilValue);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_TRANS\_\ =\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}\index{matmult.c@{matmult.c}!DO\_S3@{DO\_S3}}
+\index{DO\_S3@{DO\_S3}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_S3}{DO\_S3}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0} 
+\#define DO\+\_\+\+S3(\begin{DoxyParamCaption}\item[{}]{\+\_\+\+A\+\_\+}{, }\item[{}]{\+\_\+\+TRANS\+\_\+}{, }\item[{}]{\+\_\+\+PID\+\_\+}{, }\item[{}]{\+\_\+\+ISV\+\_\+}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\mbox{\hyperlink{Mdefines_8h_af417c70effa0b7e8cc50aea4fadc9b4c}{TYPEOF}}(\_A\_)\ !=\ OBJSXP)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\textcolor{keywordtype}{boolean}\ ==\ NA\_LOGICAL\ ||\ !\textcolor{keywordtype}{boolean})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_af1881765bb4e3ebb92dd64aa15cb065d}{matrix\_as\_dense}}(\_A\_,\ \textcolor{stringliteral}{"{},ge"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 0\ :\ 1,\ 2),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ REPROTECT(\_A\_\ =\ \mbox{\hyperlink{coerce_8c_af1881765bb4e3ebb92dd64aa15cb065d}{matrix\_as\_dense}}(\_A\_,\ \textcolor{stringliteral}{"{}nge"{}},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ \textcolor{charliteral}{'\(\backslash\)0'},\ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 0\ :\ 1,\ 2),\ \_PID\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (\_ISV\_)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Vector:\ discard\ names\ and\ don't\ transpose\ again\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SET\_VECTOR\_ELT(\mbox{\hyperlink{Mdefines_8h_a6dc530714424ab68ccbd1b94e7f0974d}{DIMNAMES}}(\_A\_,\ 0),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\_TRANS\_\ !=\ \textcolor{charliteral}{'N'})\ ?\ 1\ :\ 0,\ R\_NilValue);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \_TRANS\_\ =\ \textcolor{charliteral}{'N'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{matmult_8c_ade83c07bd831fc256caba18fdd415ae8}\index{matmult.c@{matmult.c}!DO\_TR@{DO\_TR}}
+\index{DO\_TR@{DO\_TR}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{DO\_TR}{DO\_TR}}
+{\footnotesize\ttfamily \label{matmult_8c_ade83c07bd831fc256caba18fdd415ae8} 
+\#define DO\+\_\+\+TR}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ xul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(s\_x),\ xnu\ =\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(s\_x),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ yul\ =\ \mbox{\hyperlink{Mdefines_8h_a3687cac97bf1e70c0bb9365a6d00694e}{UPLO}}(s\_y),\ ynu\ =\ \mbox{\hyperlink{Mdefines_8h_a357d29edd522409baaac8880bc94ca3f}{DIAG}}(s\_y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (xtrans\ !=\ \textcolor{charliteral}{'N'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ xul\ =\ (xul\ ==\ \textcolor{charliteral}{'U'})\ ?\ \textcolor{charliteral}{'L'}\ :\ \textcolor{stringliteral}{'U'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (ytrans\ !=\ \textcolor{charliteral}{'N'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ yul\ =\ (yul\ ==\ \textcolor{charliteral}{'U'})\ ?\ \textcolor{charliteral}{'L'}\ :\ \textcolor{stringliteral}{'U'};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ triangular\ =\ (xul\ !=\ yul)\ ?\ 0\ :\ ((xnu\ !=\ ynu\ ||\ xnu\ ==\ \textcolor{stringliteral}{'N'})\ ?\ 1\ :\ 2);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (xul\ !=\ \textcolor{charliteral}{'U'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ triangular\ =\ -\/triangular;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a719e40b52a700dbebc08f98c2f797081}\index{matmult.c@{matmult.c}!dSCALE@{dSCALE}}
+\index{dSCALE@{dSCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{dSCALE}{dSCALE}}
+{\footnotesize\ttfamily \label{matmult_8c_a719e40b52a700dbebc08f98c2f797081} 
+\#define d\+SCALE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (x)\ =\ (x)\ \ *\ (y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01158}{1158}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+\Hypertarget{matmult_8c_a8cb16b790e1c335a3dfc6bdcc2db06c6}\index{matmult.c@{matmult.c}!lSCALE@{lSCALE}}
+\index{lSCALE@{lSCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{lSCALE}{lSCALE}}
+{\footnotesize\ttfamily \label{matmult_8c_a8cb16b790e1c335a3dfc6bdcc2db06c6} 
+\#define l\+SCALE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (x)\ =\ (x)\ \&\&\ (y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01160}{1160}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+\Hypertarget{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}\index{matmult.c@{matmult.c}!SCALE@{SCALE}}
+\index{SCALE@{SCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{SCALE}{SCALE}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436} 
+\#define SCALE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{index}{}\end{DoxyParamCaption})}
+
+\Hypertarget{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}\index{matmult.c@{matmult.c}!SCALE@{SCALE}}
+\index{SCALE@{SCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{SCALE}{SCALE}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436} 
+\#define SCALE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{index}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x),\ *pd\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(d);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ n;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#\mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(*px,\ *pd);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ ++pd;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}\index{matmult.c@{matmult.c}!SCALE@{SCALE}}
+\index{SCALE@{SCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{SCALE}{SCALE}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436} 
+\#define SCALE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{index}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x),\ *pd\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(d);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ kend;\ ++k)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#\mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(*px,\ pd[*pi]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ ++px;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ ++pi;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{matmult_8c_a99c9ed8ec934018078853e5a70440818}\index{matmult.c@{matmult.c}!SCALE3@{SCALE3}}
+\index{SCALE3@{SCALE3}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{SCALE3}{SCALE3}}
+{\footnotesize\ttfamily \label{matmult_8c_a99c9ed8ec934018078853e5a70440818} 
+\#define SCALE3(\begin{DoxyParamCaption}\item[{}]{t}{, }\item[{}]{index}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ switch\ (t)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ CPLXSXP:\ \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(z,\ index);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ REALSXP:\ \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(d,\ index);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \ LGLSXP:\ \mbox{\hyperlink{matmult_8c_a1070959e72f7b4ed9bacb38bf363d436}{SCALE}}(l,\ index);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01163}{1163}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01238}{Csparse\+\_\+colscale()}}, \mbox{\hyperlink{matmult_8c_source_l01269}{Csparse\+\_\+rowscale()}}, \mbox{\hyperlink{matmult_8c_source_l01174}{dense\+\_\+colscale()}}, \mbox{\hyperlink{matmult_8c_source_l01224}{dense\+\_\+rowscale()}}, and \mbox{\hyperlink{matmult_8c_source_l01294}{Tsparse\+\_\+rowscale()}}.
+
+\Hypertarget{matmult_8c_ad5b2b2b2fa8944de140dad01d1c10432}\index{matmult.c@{matmult.c}!zSCALE@{zSCALE}}
+\index{zSCALE@{zSCALE}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{zSCALE}{zSCALE}}
+{\footnotesize\ttfamily \label{matmult_8c_ad5b2b2b2fa8944de140dad01d1c10432} 
+\#define z\+SCALE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Rcomplex\ tmp\ =\ (x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).r\ =\ tmp.r\ *\ (y).r\ -\/\ tmp.i\ *\ (y).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).i\ =\ tmp.r\ *\ (y).i\ +\ tmp.i\ *\ (y).r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01152}{1152}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{matmult_8c_a53a49c3a67192b59c7779e8599214728}\index{matmult.c@{matmult.c}!Csparse\_colscale@{Csparse\_colscale}}
+\index{Csparse\_colscale@{Csparse\_colscale}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{Csparse\_colscale()}{Csparse\_colscale()}}
+{\footnotesize\ttfamily \label{matmult_8c_a53a49c3a67192b59c7779e8599214728} 
+static void Csparse\+\_\+colscale (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{SEXP}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01238}{1238}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{matmult_8c_source_l01163}{SCALE3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a3d63330548746ac0b7ac53a5e559a748}\index{matmult.c@{matmult.c}!Csparse\_rowscale@{Csparse\_rowscale}}
+\index{Csparse\_rowscale@{Csparse\_rowscale}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{Csparse\_rowscale()}{Csparse\_rowscale()}}
+{\footnotesize\ttfamily \label{matmult_8c_a3d63330548746ac0b7ac53a5e559a748} 
+static void Csparse\+\_\+rowscale (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{SEXP}]{d}{, }\item[{SEXP}]{i\+Sym}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01269}{1269}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{matmult_8c_source_l01163}{SCALE3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a2e7b31d82434573263348cc3d6b6f98b}\index{matmult.c@{matmult.c}!dense\_colscale@{dense\_colscale}}
+\index{dense\_colscale@{dense\_colscale}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{dense\_colscale()}{dense\_colscale()}}
+{\footnotesize\ttfamily \label{matmult_8c_a2e7b31d82434573263348cc3d6b6f98b} 
+static void dense\+\_\+colscale (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{SEXP}]{d}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{nu}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01174}{1174}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{matmult_8c_source_l01163}{SCALE3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a66457c6e44f769379198d3b45ec8fe4e}\index{matmult.c@{matmult.c}!dense\_rowscale@{dense\_rowscale}}
+\index{dense\_rowscale@{dense\_rowscale}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{dense\_rowscale()}{dense\_rowscale()}}
+{\footnotesize\ttfamily \label{matmult_8c_a66457c6e44f769379198d3b45ec8fe4e} 
+static void dense\+\_\+rowscale (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{SEXP}]{d}{, }\item[{int}]{m}{, }\item[{int}]{n}{, }\item[{char}]{ul}{, }\item[{char}]{nu}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01224}{1224}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{matmult_8c_source_l01163}{SCALE3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a526df2401804b0919c18a9b19773c1a2}\index{matmult.c@{matmult.c}!dense\_transpose@{dense\_transpose}}
+\index{dense\_transpose@{dense\_transpose}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{dense\_transpose()}{dense\_transpose()}}
+{\footnotesize\ttfamily \label{matmult_8c_a526df2401804b0919c18a9b19773c1a2} 
+SEXP dense\+\_\+transpose (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{t_8c_source_l00007}{7}} of file \mbox{\hyperlink{t_8c_source}{t.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00629}{Matrix\+\_\+sd\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{t_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{t_8c_source_l00170}{R\+\_\+dense\+\_\+transpose()}}.
+
+\Hypertarget{matmult_8c_ae270f071fed20473c39afae13009364c}\index{matmult.c@{matmult.c}!gCgCMatrix\_matmult@{gCgCMatrix\_matmult}}
+\index{gCgCMatrix\_matmult@{gCgCMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{gCgCMatrix\_matmult()}{gCgCMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_ae270f071fed20473c39afae13009364c} 
+static SEXP g\+Cg\+CMatrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{SEXP}]{y}{, }\item[{char}]{xtrans}{, }\item[{char}]{ytrans}{, }\item[{char}]{ztrans}{, }\item[{int}]{triangular}{, }\item[{int}]{boolean}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00848}{848}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{matmult_8c_a42b393a8a9407818732e1006053f72d0}{ASMODE}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00328}{CHS2\+M()}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, and \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a1ad67f05e62cf5676d21a96fa7c0b8d6}\index{matmult.c@{matmult.c}!gCgeMatrix\_matmult@{gCgeMatrix\_matmult}}
+\index{gCgeMatrix\_matmult@{gCgeMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{gCgeMatrix\_matmult()}{gCgeMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a1ad67f05e62cf5676d21a96fa7c0b8d6} 
+static SEXP g\+Cge\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{SEXP}]{y}{, }\item[{int}]{xtrans}{, }\item[{char}]{ytrans}{, }\item[{char}]{ztrans}{, }\item[{int}]{triangular}{, }\item[{int}]{symmetric}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00939}{939}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{matmult_8c_source_l00152}{CONJ2}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00176}{M2\+CHD()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, and \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_aefd939bdb58133a5446d9de412b0d94b}\index{matmult.c@{matmult.c}!geMatrix\_matmult@{geMatrix\_matmult}}
+\index{geMatrix\_matmult@{geMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{geMatrix\_matmult()}{geMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_aefd939bdb58133a5446d9de412b0d94b} 
+static SEXP ge\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{a}{, }\item[{SEXP}]{b}{, }\item[{char}]{atrans}{, }\item[{char}]{btrans}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00172}{172}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{init_8c_source_l00641}{Matrix\+\_\+zzero}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a8543cbd6a8905c6ce6199b9f3df69c75}\index{matmult.c@{matmult.c}!matmultDim@{matmultDim}}
+\index{matmultDim@{matmultDim}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{matmultDim()}{matmultDim()}}
+{\footnotesize\ttfamily \label{matmult_8c_a8543cbd6a8905c6ce6199b9f3df69c75} 
+static void matmult\+Dim (\begin{DoxyParamCaption}\item[{SEXP}]{x}{, }\item[{SEXP}]{y}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{xtrans}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{ytrans}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{ztrans}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{m}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{n}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00020}{20}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00598}{Matrix\+\_\+\+Dim\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a1917e938614314b60d648231086a6f3e}\index{matmult.c@{matmult.c}!matmultDN@{matmultDN}}
+\index{matmultDN@{matmultDN}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{matmultDN()}{matmultDN()}}
+{\footnotesize\ttfamily \label{matmult_8c_a1917e938614314b60d648231086a6f3e} 
+static void matmult\+DN (\begin{DoxyParamCaption}\item[{SEXP}]{dest}{, }\item[{SEXP}]{asrc}{, }\item[{int}]{ai}{, }\item[{SEXP}]{bsrc}{, }\item[{int}]{bi}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00131}{131}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00172}{ge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a143e432d687fd1beb58bbecf64b47290}\index{matmult.c@{matmult.c}!R\_dense\_matmult@{R\_dense\_matmult}}
+\index{R\_dense\_matmult@{R\_dense\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_matmult()}{R\_dense\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a143e432d687fd1beb58bbecf64b47290} 
+SEXP R\+\_\+dense\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+x}{, }\item[{SEXP}]{s\+\_\+y}{, }\item[{SEXP}]{s\+\_\+xtrans}{, }\item[{SEXP}]{s\+\_\+ytrans}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00711}{711}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}, \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}, \mbox{\hyperlink{matmult_8c_ade83c07bd831fc256caba18fdd415ae8}{DO\+\_\+\+TR}}, \mbox{\hyperlink{matmult_8c_source_l00172}{ge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00020}{matmult\+Dim()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{matmult_8c_source_l00428}{sp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00307}{sy\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00613}{tp\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00534}{tr\+Matrix\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l00015}{valid\+\_\+matmult}}.
+
+\Hypertarget{matmult_8c_ae83b3d80e6dcc6bfb760e442338cff73}\index{matmult.c@{matmult.c}!R\_diagonal\_matmult@{R\_diagonal\_matmult}}
+\index{R\_diagonal\_matmult@{R\_diagonal\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{R\_diagonal\_matmult()}{R\_diagonal\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_ae83b3d80e6dcc6bfb760e442338cff73} 
+SEXP R\+\_\+diagonal\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+x}{, }\item[{SEXP}]{s\+\_\+y}{, }\item[{SEXP}]{s\+\_\+xtrans}{, }\item[{SEXP}]{s\+\_\+ytrans}{, }\item[{SEXP}]{s\+\_\+boolean}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01310}{1310}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{matmult_8c_source_l01238}{Csparse\+\_\+colscale()}}, \mbox{\hyperlink{matmult_8c_source_l01269}{Csparse\+\_\+rowscale()}}, \mbox{\hyperlink{matmult_8c_source_l01174}{dense\+\_\+colscale()}}, \mbox{\hyperlink{matmult_8c_source_l01224}{dense\+\_\+rowscale()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}, \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00020}{matmult\+Dim()}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{matmult_8c_source_l01294}{Tsparse\+\_\+rowscale()}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{matmult_8c_source_l00015}{valid\+\_\+matmult}}.
+
+\Hypertarget{matmult_8c_a78d9cc3bec202b32208e3d91d2bdd087}\index{matmult.c@{matmult.c}!R\_sparse\_matmult@{R\_sparse\_matmult}}
+\index{R\_sparse\_matmult@{R\_sparse\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_matmult()}{R\_sparse\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a78d9cc3bec202b32208e3d91d2bdd087} 
+SEXP R\+\_\+sparse\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+x}{, }\item[{SEXP}]{s\+\_\+y}{, }\item[{SEXP}]{s\+\_\+xtrans}{, }\item[{SEXP}]{s\+\_\+ytrans}{, }\item[{SEXP}]{s\+\_\+ztrans}{, }\item[{SEXP}]{s\+\_\+boolean}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01021}{1021}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{matmult_8c_a2a43d849f24a1d50becd635f2edfba33}{DO\+\_\+\+AS}}, \mbox{\hyperlink{matmult_8c_a7dfb3328edd3fb708daa9de23982c9d0}{DO\+\_\+\+S3}}, \mbox{\hyperlink{matmult_8c_ade83c07bd831fc256caba18fdd415ae8}{DO\+\_\+\+TR}}, \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00939}{g\+Cge\+Matrix\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l00020}{matmult\+Dim()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{diag_8c_source_l00621}{sparse\+\_\+diag\+\_\+\+U2\+N()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{matmult_8c_source_l00015}{valid\+\_\+matmult}}.
+
+\Hypertarget{matmult_8c_ae44c4ed55ba36e48419178280c16d7e0}\index{matmult.c@{matmult.c}!sparse\_diag\_U2N@{sparse\_diag\_U2N}}
+\index{sparse\_diag\_U2N@{sparse\_diag\_U2N}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_diag\_U2N()}{sparse\_diag\_U2N()}}
+{\footnotesize\ttfamily \label{matmult_8c_ae44c4ed55ba36e48419178280c16d7e0} 
+SEXP sparse\+\_\+diag\+\_\+\+U2N (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00621}{621}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, and \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00654}{R\+\_\+sparse\+\_\+diag\+\_\+\+U2\+N()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a3e12a20d4a63309bb98184100fea12ac}\index{matmult.c@{matmult.c}!sparse\_dropzero@{sparse\_dropzero}}
+\index{sparse\_dropzero@{sparse\_dropzero}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_dropzero()}{sparse\_dropzero()}}
+{\footnotesize\ttfamily \label{matmult_8c_a3e12a20d4a63309bb98184100fea12ac} 
+SEXP sparse\+\_\+dropzero (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{double}]{tol}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dropzero_8c_source_l00004}{4}} of file \mbox{\hyperlink{dropzero_8c_source}{dropzero.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{dropzero_8c_ad61f8476b8b26a8c4c17f808cebd15a7}{NZ}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{dropzero_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{dropzero_8c_source_l00211}{R\+\_\+sparse\+\_\+dropzero()}}.
+
+\Hypertarget{matmult_8c_a03c78144d411cca2c647b0536d8499b3}\index{matmult.c@{matmult.c}!sparse\_transpose@{sparse\_transpose}}
+\index{sparse\_transpose@{sparse\_transpose}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_transpose()}{sparse\_transpose()}}
+{\footnotesize\ttfamily \label{matmult_8c_a03c78144d411cca2c647b0536d8499b3} 
+SEXP sparse\+\_\+transpose (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{, }\item[{int}]{lazy}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{t_8c_source_l00052}{52}} of file \mbox{\hyperlink{t_8c_source}{t.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00848}{g\+Cg\+CMatrix\+\_\+matmult()}}, and \mbox{\hyperlink{t_8c_source_l00180}{R\+\_\+sparse\+\_\+transpose()}}.
+
+\Hypertarget{matmult_8c_af538a1f8352b5e4b100a13760ec8f3b5}\index{matmult.c@{matmult.c}!spMatrix\_matmult@{spMatrix\_matmult}}
+\index{spMatrix\_matmult@{spMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{spMatrix\_matmult()}{spMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_af538a1f8352b5e4b100a13760ec8f3b5} 
+static SEXP sp\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{a}{, }\item[{SEXP}]{b}{, }\item[{char}]{atrans}{, }\item[{char}]{btrans}{, }\item[{char}]{aside}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00428}{428}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{matmult_8c_source_l00161}{CONJ1}}, \mbox{\hyperlink{matmult_8c_source_l00152}{CONJ2}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{init_8c_source_l00641}{Matrix\+\_\+zzero}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01300}{zvconj()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a512bde2385296bb7e42599eee2d90d1b}\index{matmult.c@{matmult.c}!syMatrix\_matmult@{syMatrix\_matmult}}
+\index{syMatrix\_matmult@{syMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{syMatrix\_matmult()}{syMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a512bde2385296bb7e42599eee2d90d1b} 
+static SEXP sy\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{a}{, }\item[{SEXP}]{b}{, }\item[{char}]{atrans}{, }\item[{char}]{btrans}{, }\item[{char}]{aside}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00307}{307}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{matmult_8c_source_l00152}{CONJ2}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{init_8c_source_l00641}{Matrix\+\_\+zzero}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01300}{zvconj()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a42cb3dbacb69d1a365d69c2e9318702e}\index{matmult.c@{matmult.c}!tpMatrix\_matmult@{tpMatrix\_matmult}}
+\index{tpMatrix\_matmult@{tpMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{tpMatrix\_matmult()}{tpMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a42cb3dbacb69d1a365d69c2e9318702e} 
+static SEXP tp\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{a}{, }\item[{SEXP}]{b}{, }\item[{char}]{atrans}{, }\item[{char}]{btrans}{, }\item[{char}]{aside}{, }\item[{int}]{triangular}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00613}{613}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{matmult_8c_source_l00161}{CONJ1}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2()}}, and \mbox{\hyperlink{idz_8c_source_l01300}{zvconj()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a9647b2544403bb4d08a0d12de9952ac9}\index{matmult.c@{matmult.c}!trMatrix\_matmult@{trMatrix\_matmult}}
+\index{trMatrix\_matmult@{trMatrix\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{trMatrix\_matmult()}{trMatrix\_matmult()}}
+{\footnotesize\ttfamily \label{matmult_8c_a9647b2544403bb4d08a0d12de9952ac9} 
+static SEXP tr\+Matrix\+\_\+matmult (\begin{DoxyParamCaption}\item[{SEXP}]{a}{, }\item[{SEXP}]{b}{, }\item[{char}]{atrans}{, }\item[{char}]{btrans}{, }\item[{char}]{aside}{, }\item[{int}]{triangular}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00534}{534}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{idz_8h_a9649f01a22b85f5ec16971da9b926e73}{dtrans2()}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{matmult_8c_source_l00131}{matmult\+DN()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{init_8c_source_l00642}{Matrix\+\_\+zunit}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8h_a25be5d1010056054a58cfed596e50579}{ztrans2()}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}.
+
+\Hypertarget{matmult_8c_a107441b9fdb5636ef11eb64b31f99b3f}\index{matmult.c@{matmult.c}!Tsparse\_rowscale@{Tsparse\_rowscale}}
+\index{Tsparse\_rowscale@{Tsparse\_rowscale}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{Tsparse\_rowscale()}{Tsparse\_rowscale()}}
+{\footnotesize\ttfamily \label{matmult_8c_a107441b9fdb5636ef11eb64b31f99b3f} 
+static void Tsparse\+\_\+rowscale (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{SEXP}]{d}{, }\item[{SEXP}]{i\+Sym}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l01294}{1294}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{matmult_8c_source_l01163}{SCALE3}}, and \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{matmult_8c_a892fa96e6d627e36444e5292e73b240b}\index{matmult.c@{matmult.c}!valid\_matmult@{valid\_matmult}}
+\index{valid\_matmult@{valid\_matmult}!matmult.c@{matmult.c}}
+\doxysubsubsection{\texorpdfstring{valid\_matmult}{valid\_matmult}}
+{\footnotesize\ttfamily \label{matmult_8c_a892fa96e6d627e36444e5292e73b240b} 
+const char\texorpdfstring{$\ast$}{*} valid\+\_\+matmult\mbox{[}$\,$\mbox{]}\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\mbox{\hyperlink{Mdefines_8h_a7a40ad54440d757a8d3bf1643e82c623}{VALID\_DIAGONAL}},\ \mbox{\hyperlink{Mdefines_8h_a2f50ad262b583a4b997749536ac64fb7}{VALID\_SPARSE}},\ \mbox{\hyperlink{Mdefines_8h_a2453fa4ee6e6093eb045822cf12482c3}{VALID\_DENSE}},\ \textcolor{stringliteral}{"{}"{}}\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{matmult_8c_source_l00015}{15}} of file \mbox{\hyperlink{matmult_8c_source}{matmult.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+

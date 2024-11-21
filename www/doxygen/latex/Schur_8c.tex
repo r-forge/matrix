@@ -1,0 +1,82 @@
+\doxysection{Schur.\+c File Reference}
+\hypertarget{Schur_8c}{}\label{Schur_8c}\index{Schur.c@{Schur.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{Schur_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{Schur_8c_a5c995aaeda42d8d81c6117465a279239}{dense\+\_\+as\+\_\+general}} (SEXP, const char \texorpdfstring{$\ast$}{*}, int)
+\item 
+SEXP \mbox{\hyperlink{Schur_8c_a10ad79af3610c22bf8b9e3be3bae643d}{dense\+\_\+schur}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int warn, int vectors)
+\item 
+SEXP \mbox{\hyperlink{Schur_8c_a1608e971f3d45ab8952cdecb79152eaa}{R\+\_\+dense\+\_\+schur}} (SEXP s\+\_\+obj, SEXP s\+\_\+warn, SEXP s\+\_\+vectors)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{Schur_8c_a5c995aaeda42d8d81c6117465a279239}\index{Schur.c@{Schur.c}!dense\_as\_general@{dense\_as\_general}}
+\index{dense\_as\_general@{dense\_as\_general}!Schur.c@{Schur.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_general()}{dense\_as\_general()}}
+{\footnotesize\ttfamily \label{Schur_8c_a5c995aaeda42d8d81c6117465a279239} 
+SEXP dense\+\_\+as\+\_\+general (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02237}{2237}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{coerce_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{coerce_8c_source_l02292}{R\+\_\+dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{matmult_8c_source_l00711}{R\+\_\+dense\+\_\+matmult()}}, \mbox{\hyperlink{coerce_8c_source_l03798}{R\+\_\+\+Matrix\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l03516}{R\+\_\+\+Matrix\+\_\+as\+\_\+matrix()}}, \mbox{\hyperlink{coerce_8c_source_l03447}{R\+\_\+\+Matrix\+\_\+as\+\_\+vector()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{Schur_8c_af80c19f69e49b1c83bc823de660d30d8}\index{Schur.c@{Schur.c}!dense\_as\_kind@{dense\_as\_kind}}
+\index{dense\_as\_kind@{dense\_as\_kind}!Schur.c@{Schur.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_kind()}{dense\_as\_kind()}}
+{\footnotesize\ttfamily \label{Schur_8c_af80c19f69e49b1c83bc823de660d30d8} 
+SEXP dense\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02000}{2000}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}.
+
+\Hypertarget{Schur_8c_a10ad79af3610c22bf8b9e3be3bae643d}\index{Schur.c@{Schur.c}!dense\_schur@{dense\_schur}}
+\index{dense\_schur@{dense\_schur}!Schur.c@{Schur.c}}
+\doxysubsubsection{\texorpdfstring{dense\_schur()}{dense\_schur()}}
+{\footnotesize\ttfamily \label{Schur_8c_a10ad79af3610c22bf8b9e3be3bae643d} 
+SEXP dense\+\_\+schur (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{warn}{, }\item[{int}]{vectors}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Schur_8c_source_l00008}{8}} of file \mbox{\hyperlink{Schur_8c_source}{Schur.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00064}{ERROR\+\_\+\+LAPACK\+\_\+5}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00633}{Matrix\+\_\+values\+Sym}}, \mbox{\hyperlink{init_8c_source_l00634}{Matrix\+\_\+vectors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+
+
+Referenced by \mbox{\hyperlink{expm_8c_source_l00036}{dense\+\_\+expm()}}, and \mbox{\hyperlink{Schur_8c_source_l00141}{R\+\_\+dense\+\_\+schur()}}.
+
+\Hypertarget{Schur_8c_a1608e971f3d45ab8952cdecb79152eaa}\index{Schur.c@{Schur.c}!R\_dense\_schur@{R\_dense\_schur}}
+\index{R\_dense\_schur@{R\_dense\_schur}!Schur.c@{Schur.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_schur()}{R\_dense\_schur()}}
+{\footnotesize\ttfamily \label{Schur_8c_a1608e971f3d45ab8952cdecb79152eaa} 
+SEXP R\+\_\+dense\+\_\+schur (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+warn}{, }\item[{SEXP}]{s\+\_\+vectors}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Schur_8c_source_l00141}{141}} of file \mbox{\hyperlink{Schur_8c_source}{Schur.\+c}}.
+
+
+
+References \mbox{\hyperlink{Schur_8c_source_l00008}{dense\+\_\+schur()}}, \mbox{\hyperlink{attrib_8c_source_l00180}{get\+\_\+factor()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+

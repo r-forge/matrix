@@ -1,0 +1,215 @@
+\doxysection{Cholesky.\+c File Reference}
+\hypertarget{Cholesky_8c}{}\label{Cholesky_8c}\index{Cholesky.c@{Cholesky.c}}
+{\ttfamily \#include "{}Lapack-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_af80c19f69e49b1c83bc823de660d30d8}{dense\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60}{sparse\+\_\+as\+\_\+kind}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a2e2a5724be872e07c3f1a3bf835e8422}{sparse\+\_\+as\+\_\+general}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f}{sparse\+\_\+as\+\_\+\+Csparse}} (SEXP, const char \texorpdfstring{$\ast$}{*})
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a4fd0a81592143b70bdd15b8e01b16321}{dense\+\_\+force\+\_\+canonical}} (SEXP, const char \texorpdfstring{$\ast$}{*}, int)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_ad926ad4dd0d79d81d82fee5ff090108b}{sparse\+\_\+force\+\_\+symmetric}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, char)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a03c78144d411cca2c647b0536d8499b3}{sparse\+\_\+transpose}} (SEXP, const char \texorpdfstring{$\ast$}{*}, char, int)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2}{dense\+\_\+cholesky}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int warn, int pivot, double tol, char ul)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}{sparse\+\_\+cholesky}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int warn, int order, int \texorpdfstring{$\ast$}{*}ll, int \texorpdfstring{$\ast$}{*}super, Rcomplex beta, int force, char ul, SEXP trf)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_a7bf9963d3b8cd730acc8c887b5b0dc8d}{R\+\_\+dense\+\_\+cholesky}} (SEXP s\+\_\+obj, SEXP s\+\_\+warn, SEXP s\+\_\+pivot, SEXP s\+\_\+tol, SEXP s\+\_\+uplo)
+\item 
+SEXP \mbox{\hyperlink{Cholesky_8c_ac53ac4dece914aa2797721456e64d206}{R\+\_\+sparse\+\_\+cholesky}} (SEXP s\+\_\+obj, SEXP s\+\_\+warn, SEXP s\+\_\+order, SEXP s\+\_\+ll, SEXP s\+\_\+super, SEXP s\+\_\+beta, SEXP s\+\_\+force, SEXP s\+\_\+uplo)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{Cholesky_8c_af80c19f69e49b1c83bc823de660d30d8}\index{Cholesky.c@{Cholesky.c}!dense\_as\_kind@{dense\_as\_kind}}
+\index{dense\_as\_kind@{dense\_as\_kind}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{dense\_as\_kind()}{dense\_as\_kind()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_af80c19f69e49b1c83bc823de660d30d8} 
+SEXP dense\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02000}{2000}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}.
+
+\Hypertarget{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2}\index{Cholesky.c@{Cholesky.c}!dense\_cholesky@{dense\_cholesky}}
+\index{dense\_cholesky@{dense\_cholesky}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{dense\_cholesky()}{dense\_cholesky()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a6c5065346b2b8dbb2cd4e8b0308bd5a2} 
+SEXP dense\+\_\+cholesky (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{warn}{, }\item[{int}]{pivot}{, }\item[{double}]{tol}{, }\item[{char}]{ul}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Cholesky_8c_source_l00020}{20}} of file \mbox{\hyperlink{Cholesky_8c_source}{Cholesky.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00038}{ERROR\+\_\+\+LAPACK\+\_\+3}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00051}{ERROR\+\_\+\+LAPACK\+\_\+4}}, \mbox{\hyperlink{Lapack-etc_8h_source_l00013}{FCONE}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{init_8c_source_l00623}{Matrix\+\_\+perm\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00197}{R\+\_\+dense\+\_\+cholesky()}}.
+
+\Hypertarget{Cholesky_8c_a4fd0a81592143b70bdd15b8e01b16321}\index{Cholesky.c@{Cholesky.c}!dense\_force\_canonical@{dense\_force\_canonical}}
+\index{dense\_force\_canonical@{dense\_force\_canonical}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{dense\_force\_canonical()}{dense\_force\_canonical()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a4fd0a81592143b70bdd15b8e01b16321} 
+SEXP dense\+\_\+force\+\_\+canonical (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{check}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceCanonical_8c_source_l00007}{7}} of file \mbox{\hyperlink{forceCanonical_8c_source}{force\+Canonical.\+c}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, and \mbox{\hyperlink{forceCanonical_8c_source_l00188}{R\+\_\+dense\+\_\+force\+\_\+canonical()}}.
+
+\Hypertarget{Cholesky_8c_a7bf9963d3b8cd730acc8c887b5b0dc8d}\index{Cholesky.c@{Cholesky.c}!R\_dense\_cholesky@{R\_dense\_cholesky}}
+\index{R\_dense\_cholesky@{R\_dense\_cholesky}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_cholesky()}{R\_dense\_cholesky()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a7bf9963d3b8cd730acc8c887b5b0dc8d} 
+SEXP R\+\_\+dense\+\_\+cholesky (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+warn}{, }\item[{SEXP}]{s\+\_\+pivot}{, }\item[{SEXP}]{s\+\_\+tol}{, }\item[{SEXP}]{s\+\_\+uplo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Cholesky_8c_source_l00197}{197}} of file \mbox{\hyperlink{Cholesky_8c_source}{Cholesky.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Cholesky_8c_source_l00020}{dense\+\_\+cholesky()}}, \mbox{\hyperlink{attrib_8c_source_l00180}{get\+\_\+factor()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00158}{VALID\+\_\+\+UPLO}}.
+
+\Hypertarget{Cholesky_8c_ac53ac4dece914aa2797721456e64d206}\index{Cholesky.c@{Cholesky.c}!R\_sparse\_cholesky@{R\_sparse\_cholesky}}
+\index{R\_sparse\_cholesky@{R\_sparse\_cholesky}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_cholesky()}{R\_sparse\_cholesky()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_ac53ac4dece914aa2797721456e64d206} 
+SEXP R\+\_\+sparse\+\_\+cholesky (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+warn}{, }\item[{SEXP}]{s\+\_\+order}{, }\item[{SEXP}]{s\+\_\+ll}{, }\item[{SEXP}]{s\+\_\+super}{, }\item[{SEXP}]{s\+\_\+beta}{, }\item[{SEXP}]{s\+\_\+force}{, }\item[{SEXP}]{s\+\_\+uplo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Cholesky_8c_source_l00230}{230}} of file \mbox{\hyperlink{Cholesky_8c_source}{Cholesky.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00222}{CHF2\+M()}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{attrib_8c_source_l00180}{get\+\_\+factor()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{attrib_8c_source_l00192}{set\+\_\+factor()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}, and \mbox{\hyperlink{Mdefines_8h_source_l00158}{VALID\+\_\+\+UPLO}}.
+
+\Hypertarget{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f}\index{Cholesky.c@{Cholesky.c}!sparse\_as\_Csparse@{sparse\_as\_Csparse}}
+\index{sparse\_as\_Csparse@{sparse\_as\_Csparse}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_as\_Csparse()}{sparse\_as\_Csparse()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_ae8ff8b226e7d58957d4d289c6e3d202f} 
+SEXP sparse\+\_\+as\+\_\+\+Csparse (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02731}{2731}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{coerce_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_source_l00128}{sparse\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00465}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{Cholesky_8c_a2e2a5724be872e07c3f1a3bf835e8422}\index{Cholesky.c@{Cholesky.c}!sparse\_as\_general@{sparse\_as\_general}}
+\index{sparse\_as\_general@{sparse\_as\_general}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_as\_general()}{sparse\_as\_general()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a2e2a5724be872e07c3f1a3bf835e8422} 
+SEXP sparse\+\_\+as\+\_\+general (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02298}{2298}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00075}{COPY\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00606}{Matrix\+\_\+factors\+Sym}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{coerce_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Csparse_8c_source_l00408}{Csparse\+\_\+write\+MM()}}, \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60}\index{Cholesky.c@{Cholesky.c}!sparse\_as\_kind@{sparse\_as\_kind}}
+\index{sparse\_as\_kind@{sparse\_as\_kind}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_as\_kind()}{sparse\_as\_kind()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a7f1b3376bbd12ac57f8c35fe8000de60} 
+SEXP sparse\+\_\+as\+\_\+kind (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{kind}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coerce_8c_source_l02076}{2076}} of file \mbox{\hyperlink{coerce_8c_source}{coerce.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00094}{alloc\+Unit()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00350}{coerce\+Args()}}, \mbox{\hyperlink{Csparse_8c_source_l00408}{Csparse\+\_\+write\+MM()}}, \mbox{\hyperlink{matmult_8c_source_l01310}{R\+\_\+diagonal\+\_\+matmult()}}, \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, and \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}.
+
+\Hypertarget{Cholesky_8c_ac4741974e044da3ce24199c947ed015f}\index{Cholesky.c@{Cholesky.c}!sparse\_cholesky@{sparse\_cholesky}}
+\index{sparse\_cholesky@{sparse\_cholesky}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_cholesky()}{sparse\_cholesky()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_ac4741974e044da3ce24199c947ed015f} 
+SEXP sparse\+\_\+cholesky (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{warn}{, }\item[{int}]{order}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{ll}{, }\item[{int \texorpdfstring{$\ast$}{*}}]{super}{, }\item[{Rcomplex}]{beta}{, }\item[{int}]{force}{, }\item[{char}]{ul}{, }\item[{SEXP}]{trf}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{Cholesky_8c_source_l00118}{118}} of file \mbox{\hyperlink{Cholesky_8c_source}{Cholesky.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00005}{c}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00222}{CHF2\+M()}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00132}{M2\+CHS()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, \mbox{\hyperlink{attrib_8c_source_l00069}{sym\+DN()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00230}{R\+\_\+sparse\+\_\+cholesky()}}.
+
+\Hypertarget{Cholesky_8c_ad926ad4dd0d79d81d82fee5ff090108b}\index{Cholesky.c@{Cholesky.c}!sparse\_force\_symmetric@{sparse\_force\_symmetric}}
+\index{sparse\_force\_symmetric@{sparse\_force\_symmetric}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_force\_symmetric()}{sparse\_force\_symmetric()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_ad926ad4dd0d79d81d82fee5ff090108b} 
+SEXP sparse\+\_\+force\+\_\+symmetric (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ul}{, }\item[{char}]{op\+\_\+ct}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{83}} of file \mbox{\hyperlink{forceSymmetric_8c_source}{force\+Symmetric.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{forceSymmetric_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, \mbox{\hyperlink{M5_8h_source_l00172}{z\+ASSIGN\+\_\+\+CONJ}}, \mbox{\hyperlink{M5_8h_source_l00166}{z\+ASSIGN\+\_\+\+IDEN}}, and \mbox{\hyperlink{M5_8h_source_l00178}{z\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00413}{R\+\_\+sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}, and \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}.
+
+\Hypertarget{Cholesky_8c_a03c78144d411cca2c647b0536d8499b3}\index{Cholesky.c@{Cholesky.c}!sparse\_transpose@{sparse\_transpose}}
+\index{sparse\_transpose@{sparse\_transpose}!Cholesky.c@{Cholesky.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_transpose()}{sparse\_transpose()}}
+{\footnotesize\ttfamily \label{Cholesky_8c_a03c78144d411cca2c647b0536d8499b3} 
+SEXP sparse\+\_\+transpose (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{char}]{op\+\_\+ct}{, }\item[{int}]{lazy}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{t_8c_source_l00052}{52}} of file \mbox{\hyperlink{t_8c_source}{t.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00006}{cl}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00045}{Matrix\+\_\+\+Calloc}}, \mbox{\hyperlink{Mdefines_8h_source_l00056}{Matrix\+\_\+\+Free}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{t_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01300}{zvconj()}}.
+
+
+
+Referenced by \mbox{\hyperlink{Cholesky_8c_source_l00118}{sparse\+\_\+cholesky()}}.
+

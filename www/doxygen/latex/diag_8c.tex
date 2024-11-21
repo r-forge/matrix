@@ -1,0 +1,451 @@
+\doxysection{diag.\+c File Reference}
+\hypertarget{diag_8c}{}\label{diag_8c}\index{diag.c@{diag.c}}
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include "{}cholmod-\/etc.\+h"{}}\newline
+{\ttfamily \#include "{}Mdefines.\+h"{}}\newline
+{\ttfamily \#include "{}M5.\+h"{}}\newline
+{\ttfamily \#include "{}idz.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\item 
+\#define \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a639d57845116858d7fe8081823f4209c}{dense\+\_\+diag\+\_\+get}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int names)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_af8c5ac23660277ec2ec79bd7dd7c4a76}{sparse\+\_\+diag\+\_\+get}} (SEXP obj, const char \texorpdfstring{$\ast$}{*}class, int names)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a15f63bd44652a7aa44f4627b80b47d55}{R\+\_\+dense\+\_\+diag\+\_\+get}} (SEXP s\+\_\+obj, SEXP s\+\_\+names)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_aeac8ba5a748f4720a5aa5116387e9ebf}{R\+\_\+sparse\+\_\+diag\+\_\+get}} (SEXP s\+\_\+obj, SEXP s\+\_\+names)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a3fe20438be222d20ed8aba3f81d2960a}{dense\+\_\+diag\+\_\+set}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, SEXP value, int new)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_ad82b908d13de044f7621a16966c20e55}{sparse\+\_\+diag\+\_\+set}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class, SEXP value)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a1732e14a0338083ab7b8215a5a06f33b}{R\+\_\+dense\+\_\+diag\+\_\+set}} (SEXP s\+\_\+from, SEXP s\+\_\+value)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a08079a0244f9e515e2a6adbacd00d878}{R\+\_\+sparse\+\_\+diag\+\_\+set}} (SEXP s\+\_\+from, SEXP s\+\_\+value)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a41eab1315ec76d499369e00edb08c55f}{sparse\+\_\+diag\+\_\+\+U2N}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a2c2e5aa872c94ac1ba5da47e04506c2b}{sparse\+\_\+diag\+\_\+\+N2U}} (SEXP from, const char \texorpdfstring{$\ast$}{*}class)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a77f3213f69b2d8c11850e9c6d287556a}{R\+\_\+sparse\+\_\+diag\+\_\+\+U2N}} (SEXP s\+\_\+from)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_aa0faaa85ae2ead213fc1732ceb08ace0}{R\+\_\+sparse\+\_\+diag\+\_\+\+N2U}} (SEXP s\+\_\+from)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_add2f1d986679660cdc3ea85037cbeb3f}{dense\+Cholesky\+\_\+diag\+\_\+get}} (SEXP s\+\_\+trf, SEXP s\+\_\+root)
+\item 
+SEXP \mbox{\hyperlink{diag_8c_a9838416cf2729442d36efa957640b26d}{sparse\+Cholesky\+\_\+diag\+\_\+get}} (SEXP s\+\_\+trf, SEXP s\+\_\+root)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pa\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(ans),\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy2)(r\_,\ pa,\ 1,\ px,\ m\_\ +\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ul\ ==\ \textcolor{charliteral}{'U'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy1)(n\_,\ pa,\ 1,\ 0,\ 0,\ px,\ 2\ ,\ 1,\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\#\#NAME(copy1)(n\_,\ pa,\ 1,\ 0,\ 0,\ px,\ n\_,\ 1,\ 1);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00225}{dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, and \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}.
+
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pa\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(ans);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (\textcolor{keyword}{class}[1]\ ==\ \textcolor{charliteral}{'g'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ r;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[j]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ while\ (k\ <\ kend)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (pi[k]\ !=\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++k;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[j]\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IFELSE\_NPATTERN(px[k],\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0,\ k\ =\ 0;\ j\ <\ r;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kend\ =\ pp[j];\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pa[j]\ =\ (k\ <\ kend\ \&\&\ pi[(up)\ ?\ kend\ -\/\ 1\ :\ k]\ ==\ j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IFELSE\_NPATTERN(px[(up)\ ?\ kend\ -\/\ 1\ :\ k],\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#UNIT)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#ZERO;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ k\ =\ kend;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pa\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(ans);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ memset(pa,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE)\ *\ (\textcolor{keywordtype}{size\_t})\ r);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#IF\_NPATTERN(\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ SEXP\ x\ =\ \mbox{\hyperlink{Mdefines_8h_aae955dc7257fba2c0b151319eba848ef}{GET\_SLOT}}(obj,\ \mbox{\hyperlink{init_8c_a8e6ccf1b89de0c7d61722fd1579eb085}{Matrix\_xSym}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ for\ (k\ =\ 0;\ k\ <\ kend;\ ++k)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi[k]\ ==\ pj[k])\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#INCREMENT\_IDEN(pa[pi[k]],\ px[k]);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *px\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(x),\ *pv\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(value);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (!packed)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy2)(r\_,\ px,\ m\_\ +\ 1,\ pv,\ d\_);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ul\ ==\ \textcolor{charliteral}{'U'})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NAME(copy1)(n\_,\ px,\ 2\ ,\ 1,\ 0,\ pv,\ d\_,\ 0,\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ else\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ c\#\#NAME(copy1)(n\_,\ px,\ n\_,\ 1,\ 1,\ pv,\ d\_,\ 0,\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pv\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(value);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (LENGTH(value)\ ==\ r)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mode\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ r;\ ++j)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(pv[j]))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[j]\ +=\ nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ r;\ j\ <\ n;\ ++j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[j]\ +=\ nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(pv[0]))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mode\ =\ 2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ r;\ ++j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[j]\ +=\ ++nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ r;\ j\ <\ n;\ ++j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pp1[j]\ +=\ \ \ nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#TYPE\ *pv\ =\ \mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#PTR(value);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ (LENGTH(value)\ ==\ r)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mode\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ (j\ =\ 0;\ j\ <\ r;\ ++j)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(pv[j]))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++nd1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}\#\#NOT\_ZERO(pv[0]))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mode\ =\ 2;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nd1\ =\ r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+\Hypertarget{diag_8c_a5c943ec4d393860c44273d898e789156}\index{diag.c@{diag.c}!TEMPLATE@{TEMPLATE}}
+\index{TEMPLATE@{TEMPLATE}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{TEMPLATE}{TEMPLATE}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{diag_8c_a5c943ec4d393860c44273d898e789156} 
+\#define TEMPLATE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{diag_8c_a639d57845116858d7fe8081823f4209c}\index{diag.c@{diag.c}!dense\_diag\_get@{dense\_diag\_get}}
+\index{dense\_diag\_get@{dense\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{dense\_diag\_get()}{dense\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_a639d57845116858d7fe8081823f4209c} 
+SEXP dense\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00009}{9}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00094}{alloc\+Unit()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{utils_8c_source_l00028}{equal\+String()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{utils_8c_source_l00151}{na\+To\+Unit()}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01274}{zvreal()}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00205}{R\+\_\+dense\+\_\+diag\+\_\+get()}}.
+
+\Hypertarget{diag_8c_a3fe20438be222d20ed8aba3f81d2960a}\index{diag.c@{diag.c}!dense\_diag\_set@{dense\_diag\_set}}
+\index{dense\_diag\_set@{dense\_diag\_set}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{dense\_diag\_set()}{dense\_diag\_set()}}
+{\footnotesize\ttfamily \label{diag_8c_a3fe20438be222d20ed8aba3f81d2960a} 
+SEXP dense\+\_\+diag\+\_\+set (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{value}{, }\item[{int}]{new}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00225}{225}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{utils_8c_source_l00042}{duplicate\+Vector()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00508}{R\+\_\+dense\+\_\+diag\+\_\+set()}}.
+
+\Hypertarget{diag_8c_add2f1d986679660cdc3ea85037cbeb3f}\index{diag.c@{diag.c}!denseCholesky\_diag\_get@{denseCholesky\_diag\_get}}
+\index{denseCholesky\_diag\_get@{denseCholesky\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{denseCholesky\_diag\_get()}{denseCholesky\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_add2f1d986679660cdc3ea85037cbeb3f} 
+SEXP dense\+Cholesky\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+root}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00666}{666}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00635}{Matrix\+\_\+x\+Sym}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+\Hypertarget{diag_8c_a15f63bd44652a7aa44f4627b80b47d55}\index{diag.c@{diag.c}!R\_dense\_diag\_get@{R\_dense\_diag\_get}}
+\index{R\_dense\_diag\_get@{R\_dense\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_diag\_get()}{R\_dense\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_a15f63bd44652a7aa44f4627b80b47d55} 
+SEXP R\+\_\+dense\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00205}{205}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}, and \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}.
+
+\Hypertarget{diag_8c_a1732e14a0338083ab7b8215a5a06f33b}\index{diag.c@{diag.c}!R\_dense\_diag\_set@{R\_dense\_diag\_set}}
+\index{R\_dense\_diag\_set@{R\_dense\_diag\_set}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_dense\_diag\_set()}{R\_dense\_diag\_set()}}
+{\footnotesize\ttfamily \label{diag_8c_a1732e14a0338083ab7b8215a5a06f33b} 
+SEXP R\+\_\+dense\+\_\+diag\+\_\+set (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00508}{508}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02000}{dense\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00225}{dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{objects_8c_source_l00020}{type\+To\+Kind()}}, and \mbox{\hyperlink{objects_8c_source_l00003}{valid\+\_\+dense}}.
+
+\Hypertarget{diag_8c_aeac8ba5a748f4720a5aa5116387e9ebf}\index{diag.c@{diag.c}!R\_sparse\_diag\_get@{R\_sparse\_diag\_get}}
+\index{R\_sparse\_diag\_get@{R\_sparse\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_diag\_get()}{R\_sparse\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_aeac8ba5a748f4720a5aa5116387e9ebf} 
+SEXP R\+\_\+sparse\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+obj}{, }\item[{SEXP}]{s\+\_\+names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00215}{215}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{Mdefines_8h_source_l00216}{VALID\+\_\+\+LOGIC2}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{diag_8c_aa0faaa85ae2ead213fc1732ceb08ace0}\index{diag.c@{diag.c}!R\_sparse\_diag\_N2U@{R\_sparse\_diag\_N2U}}
+\index{R\_sparse\_diag\_N2U@{R\_sparse\_diag\_N2U}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_diag\_N2U()}{R\_sparse\_diag\_N2U()}}
+{\footnotesize\ttfamily \label{diag_8c_aa0faaa85ae2ead213fc1732ceb08ace0} 
+SEXP R\+\_\+sparse\+\_\+diag\+\_\+\+N2U (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00660}{660}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{diag_8c_source_l00631}{sparse\+\_\+diag\+\_\+\+N2\+U()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{diag_8c_a08079a0244f9e515e2a6adbacd00d878}\index{diag.c@{diag.c}!R\_sparse\_diag\_set@{R\_sparse\_diag\_set}}
+\index{R\_sparse\_diag\_set@{R\_sparse\_diag\_set}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_diag\_set()}{R\_sparse\_diag\_set()}}
+{\footnotesize\ttfamily \label{diag_8c_a08079a0244f9e515e2a6adbacd00d878} 
+SEXP R\+\_\+sparse\+\_\+diag\+\_\+set (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{, }\item[{SEXP}]{s\+\_\+value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00566}{566}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02076}{sparse\+\_\+as\+\_\+kind()}}, \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00123}{TYPEOF}}, \mbox{\hyperlink{objects_8c_source_l00020}{type\+To\+Kind()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00621}{sparse\+\_\+diag\+\_\+\+U2\+N()}}.
+
+\Hypertarget{diag_8c_a77f3213f69b2d8c11850e9c6d287556a}\index{diag.c@{diag.c}!R\_sparse\_diag\_U2N@{R\_sparse\_diag\_U2N}}
+\index{R\_sparse\_diag\_U2N@{R\_sparse\_diag\_U2N}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{R\_sparse\_diag\_U2N()}{R\_sparse\_diag\_U2N()}}
+{\footnotesize\ttfamily \label{diag_8c_a77f3213f69b2d8c11850e9c6d287556a} 
+SEXP R\+\_\+sparse\+\_\+diag\+\_\+\+U2N (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+from}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00654}{654}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{objects_8c_source_l00112}{Matrix\+\_\+class()}}, \mbox{\hyperlink{diag_8c_source_l00621}{sparse\+\_\+diag\+\_\+\+U2\+N()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00328}{valid\+\_\+sparse}}.
+
+\Hypertarget{diag_8c_af8c5ac23660277ec2ec79bd7dd7c4a76}\index{diag.c@{diag.c}!sparse\_diag\_get@{sparse\_diag\_get}}
+\index{sparse\_diag\_get@{sparse\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_diag\_get()}{sparse\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_af8c5ac23660277ec2ec79bd7dd7c4a76} 
+SEXP sparse\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{int}]{names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00080}{80}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{utils_8c_source_l00094}{alloc\+Unit()}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{utils_8c_source_l00028}{equal\+String()}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{objects_8c_source_l00038}{kind\+To\+Type()}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}, and \mbox{\hyperlink{idz_8c_source_l01274}{zvreal()}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00215}{R\+\_\+sparse\+\_\+diag\+\_\+get()}}.
+
+\Hypertarget{diag_8c_a2c2e5aa872c94ac1ba5da47e04506c2b}\index{diag.c@{diag.c}!sparse\_diag\_N2U@{sparse\_diag\_N2U}}
+\index{sparse\_diag\_N2U@{sparse\_diag\_N2U}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_diag\_N2U()}{sparse\_diag\_N2U()}}
+{\footnotesize\ttfamily \label{diag_8c_a2c2e5aa872c94ac1ba5da47e04506c2b} 
+SEXP sparse\+\_\+diag\+\_\+\+N2U (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00631}{631}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00113}{SET\+\_\+\+DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{band_8c_source_l00095}{sparse\+\_\+band()}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00660}{R\+\_\+sparse\+\_\+diag\+\_\+\+N2\+U()}}.
+
+\Hypertarget{diag_8c_ad82b908d13de044f7621a16966c20e55}\index{diag.c@{diag.c}!sparse\_diag\_set@{sparse\_diag\_set}}
+\index{sparse\_diag\_set@{sparse\_diag\_set}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_diag\_set()}{sparse\_diag\_set()}}
+{\footnotesize\ttfamily \label{diag_8c_ad82b908d13de044f7621a16966c20e55} 
+SEXP sparse\+\_\+diag\+\_\+set (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{, }\item[{SEXP}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00271}{271}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00066}{\+\_\+}}, \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, \mbox{\hyperlink{Mdefines_8h_source_l00085}{DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00096}{DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00072}{GET\+\_\+\+SLOT}}, \mbox{\hyperlink{init_8c_source_l00607}{Matrix\+\_\+i\+Sym}}, \mbox{\hyperlink{init_8c_source_l00610}{Matrix\+\_\+j\+Sym}}, \mbox{\hyperlink{init_8c_source_l00622}{Matrix\+\_\+p\+Sym}}, \mbox{\hyperlink{objects_8c_source_l00013}{new\+Object()}}, \mbox{\hyperlink{Mdefines_8h_source_l00087}{SET\+\_\+\+DIM}}, \mbox{\hyperlink{Mdefines_8h_source_l00098}{SET\+\_\+\+DIMNAMES}}, \mbox{\hyperlink{Mdefines_8h_source_l00073}{SET\+\_\+\+SLOT}}, \mbox{\hyperlink{Mdefines_8h_source_l00108}{SET\+\_\+\+TRANS}}, \mbox{\hyperlink{Mdefines_8h_source_l00103}{SET\+\_\+\+UPLO}}, \mbox{\hyperlink{Mdefines_8h_source_l00138}{SWAP}}, \mbox{\hyperlink{M5_8h_source_l00315}{SWITCH4}}, \mbox{\hyperlink{M5_8h_source_l00327}{SWITCH5}}, \mbox{\hyperlink{diag_8c_a5c943ec4d393860c44273d898e789156}{TEMPLATE}}, \mbox{\hyperlink{Mdefines_8h_source_l00106}{TRANS}}, and \mbox{\hyperlink{Mdefines_8h_source_l00101}{UPLO}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}, and \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}.
+
+\Hypertarget{diag_8c_a41eab1315ec76d499369e00edb08c55f}\index{diag.c@{diag.c}!sparse\_diag\_U2N@{sparse\_diag\_U2N}}
+\index{sparse\_diag\_U2N@{sparse\_diag\_U2N}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{sparse\_diag\_U2N()}{sparse\_diag\_U2N()}}
+{\footnotesize\ttfamily \label{diag_8c_a41eab1315ec76d499369e00edb08c55f} 
+SEXP sparse\+\_\+diag\+\_\+\+U2N (\begin{DoxyParamCaption}\item[{SEXP}]{from}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{class}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00621}{621}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{Mdefines_8h_source_l00111}{DIAG}}, and \mbox{\hyperlink{diag_8c_source_l00566}{R\+\_\+sparse\+\_\+diag\+\_\+set()}}.
+
+
+
+Referenced by \mbox{\hyperlink{diag_8c_source_l00654}{R\+\_\+sparse\+\_\+diag\+\_\+\+U2\+N()}}, and \mbox{\hyperlink{matmult_8c_source_l01021}{R\+\_\+sparse\+\_\+matmult()}}.
+
+\Hypertarget{diag_8c_a9838416cf2729442d36efa957640b26d}\index{diag.c@{diag.c}!sparseCholesky\_diag\_get@{sparseCholesky\_diag\_get}}
+\index{sparseCholesky\_diag\_get@{sparseCholesky\_diag\_get}!diag.c@{diag.c}}
+\doxysubsubsection{\texorpdfstring{sparseCholesky\_diag\_get()}{sparseCholesky\_diag\_get()}}
+{\footnotesize\ttfamily \label{diag_8c_a9838416cf2729442d36efa957640b26d} 
+SEXP sparse\+Cholesky\+\_\+diag\+\_\+get (\begin{DoxyParamCaption}\item[{SEXP}]{s\+\_\+trf}{, }\item[{SEXP}]{s\+\_\+root}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{diag_8c_source_l00702}{702}} of file \mbox{\hyperlink{diag_8c_source}{diag.\+c}}.
+
+
+
+References \mbox{\hyperlink{cholmod-etc_8c_source_l00039}{M2\+CHF()}}.
+

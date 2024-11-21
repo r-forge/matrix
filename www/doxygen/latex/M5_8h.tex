@@ -1,0 +1,2872 @@
+\doxysection{M5.\+h File Reference}
+\hypertarget{M5_8h}{}\label{M5_8h}\index{M5.h@{M5.h}}
+{\ttfamily \#include $<$R\+\_\+ext/\+Error.\+h$>$}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{M5_8h_abac5d543f8a5040de0947c9f537f1213}{n\+TYPE}}~int
+\item 
+\#define \mbox{\hyperlink{M5_8h_a066bc34d490c2ac5ca33caf8627a9c6f}{l\+TYPE}}~int
+\item 
+\#define \mbox{\hyperlink{M5_8h_a8af40633af4e55cb616e2027741f8c17}{i\+TYPE}}~int
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4fb2ed1a6c41d1389ea65d8da69655e1}{d\+TYPE}}~double
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6df6ea7eaeadf0cadb226fc2cb14f888}{z\+TYPE}}~Rcomplex
+\item 
+\#define \mbox{\hyperlink{M5_8h_a213f8f219a14a5093dea5893a9218943}{n\+TYPESXP}}~LGLSXP
+\item 
+\#define \mbox{\hyperlink{M5_8h_a63c9d1f2543675005b1626c7cd9026bb}{l\+TYPESXP}}~LGLSXP
+\item 
+\#define \mbox{\hyperlink{M5_8h_ade77ef20855858be904877e5dac75ec0}{i\+TYPESXP}}~INTSXP
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4ca1e28670ce33ec02ffaf5b2e54a053}{d\+TYPESXP}}~REALSXP
+\item 
+\#define \mbox{\hyperlink{M5_8h_a61621629ba48d36f5f24b049a3c71eac}{z\+TYPESXP}}~CPLXSXP
+\item 
+\#define \mbox{\hyperlink{M5_8h_a42fb8a25e048a5a56fd09a16d438a7b8}{n\+PTR}}~LOGICAL
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4d9aa213b3a73350970dda3d42813af4}{l\+PTR}}~LOGICAL
+\item 
+\#define \mbox{\hyperlink{M5_8h_a00bb8851b1097b307fdb4f7df362d4d2}{i\+PTR}}~INTEGER
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3b0e0babe1bd4b266cf475c6c68102fe}{d\+PTR}}~REAL
+\item 
+\#define \mbox{\hyperlink{M5_8h_abe0d335dc1d1895cac0b91e860492d8a}{z\+PTR}}~COMPLEX
+\item 
+\#define \mbox{\hyperlink{M5_8h_a69d21f11f013d953b5dd5a9236e4dddc}{n\+ZERO}}~0
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac403fa59b2b63e507ffc5a66b062d686}{l\+ZERO}}~0
+\item 
+\#define \mbox{\hyperlink{M5_8h_a9bc12609134d45927863b7414ab5d20d}{i\+ZERO}}~0
+\item 
+\#define \mbox{\hyperlink{M5_8h_a45d3bab8d5d3fd2ec6a5c0016fcc7649}{d\+ZERO}}~0.\+0
+\item 
+\#define \mbox{\hyperlink{M5_8h_a971c007207b1d593ec9bbdfb0ebb5a46}{z\+ZERO}}~\mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\+\_\+zzero}}
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa7bacdc7561de95b37292077c3a233e1}{n\+UNIT}}~1
+\item 
+\#define \mbox{\hyperlink{M5_8h_a601d9f1c951beb389e32e2538451f9a5}{l\+UNIT}}~1
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae1e62c9717b2b357b55767278403dd7c}{i\+UNIT}}~1
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6b715b75e4c9d266ecda74c12991c051}{d\+UNIT}}~1.\+0
+\item 
+\#define \mbox{\hyperlink{M5_8h_a34c5175cbd3ed960cd264d05c2bb8a8d}{z\+UNIT}}~\mbox{\hyperlink{init_8c_a83c79a44063ff24ef06cca12140e2e3c}{Matrix\+\_\+zunit}}
+\item 
+\#define \mbox{\hyperlink{M5_8h_afdc8a9db3b84939d3c7fb095e797a021}{n\+NA}}~1
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae141c8093e25db7eb3901f2320ec1814}{l\+NA}}~NA\+\_\+\+LOGICAL
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad442ee225dd3e66c39a80812eeac31a6}{i\+NA}}~NA\+\_\+\+INTEGER
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac791b9ece9606b26abc677abd108bf06}{d\+NA}}~NA\+\_\+\+REAL
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae4b49936b8d64070ecc5d57bbf950499}{z\+NA}}~\mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\+\_\+zna}}
+\item 
+\#define \mbox{\hyperlink{M5_8h_a75271f94d901028a2451124939a85c79}{n\+NAME}}(s)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6f8a1e9256ff081f0496b049af82e948}{l\+NAME}}(s)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2d560855bec90cd4c53f2f1acd2db08c}{i\+NAME}}(s)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a9c2c5454ab7a00d887ced44ca4b4a1a6}{d\+NAME}}(s)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1a77db2b94600013da850d4827316a56}{z\+NAME}}(s)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a11a8d84e2e3a86838d0579e6f77045f7}{n\+IF\+\_\+\+NPATTERN}}(...)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af534ac288744b9e7c150660942fa70fb}{l\+IF\+\_\+\+NPATTERN}}(...)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a5eeb3afeb135147e7f0971c81b70840e}{i\+IF\+\_\+\+NPATTERN}}(...)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a0fd6c83dc3c72d7d5a831315c17c4066}{d\+IF\+\_\+\+NPATTERN}}(...)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a25bb1db4892b4a8f38241be68e5b6dc1}{z\+IF\+\_\+\+NPATTERN}}(...)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac5d144ef6c06e11b2e2a54b33c2b256e}{n\+IFELSE\+\_\+\+NPATTERN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a8f789b827866b8853ea90f26dc4fa683}{l\+IFELSE\+\_\+\+NPATTERN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a7911d5dc65eb59d6dddb7097a5328e89}{i\+IFELSE\+\_\+\+NPATTERN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3b744bcb94adc5c6538db4daadf8e52d}{d\+IFELSE\+\_\+\+NPATTERN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_abb81ebcdde3b37a24bc07d793c8198e8}{z\+IFELSE\+\_\+\+NPATTERN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3eefb593859a193e9f9215f44fd9571f}{n\+NOT\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a95766961d1bb60b35c655e4dd49c4969}{l\+NOT\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a099033cd1b32ec0d5f9be2bcb87ba8be}{i\+NOT\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4b80f4507ac1e11591b79ad068c32213}{d\+NOT\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a618ac6d497c81cc8d64dede477bf6275}{z\+NOT\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a7721fc4e9692868aba31c88a46e517ac}{n\+NOT\+\_\+\+ZERO\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa5eab73dd8be3b833df0fbc431b8cf18}{l\+NOT\+\_\+\+ZERO\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a236027b5c3a0c86e8a33a964dead0225}{i\+NOT\+\_\+\+ZERO\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a351ddf27c9cce241ffa148b2f60957d7}{d\+NOT\+\_\+\+ZERO\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa6bbd064f18ea4dda444c408aaff217d}{z\+NOT\+\_\+\+ZERO\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a87678d10ab0e8852febea0fc585d2b15}{n\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_abe86d917b48ccf08b828714971435358}{l\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2e30c4c9f59db779d964c5c759809121}{i\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab5486c8c4008f3a1feee4b7015afb0df}{d\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae6c54c44c983ef76b82fbe39c816d03d}{z\+NOT\+\_\+\+ZERO\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_abc24743cdbb0bef94955696bc759fadd}{n\+NOT\+\_\+\+ZERO\+\_\+\+TOL}}(x,  tol)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a681b2b680b96cb894ebb0b8e95906f08}{l\+NOT\+\_\+\+ZERO\+\_\+\+TOL}}(x,  tol)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3e8f64264da55c58c22d60fd57842bc9}{i\+NOT\+\_\+\+ZERO\+\_\+\+TOL}}(x,  tol)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae66c334c9258a8835094f6232381d8c7}{d\+NOT\+\_\+\+ZERO\+\_\+\+TOL}}(x,  tol)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a57153fc895018c0bce621ba1255209ba}{z\+NOT\+\_\+\+ZERO\+\_\+\+TOL}}(x,  tol)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1a2eff801d2b653862e9948c4fa1dbac}{n\+NOT\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab9c559a5d5e4335649efe1da4e075d9d}{l\+NOT\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a0545dd17f8815bd4c93fc9fb7d158c2e}{i\+NOT\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a12c935c909d29478eab726a533faf0cf}{d\+NOT\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a7688b0a6824e267a657bc4875e1d19ca}{z\+NOT\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1c71cf3a487081642e5f5b49f10801a7}{n\+NOT\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a57e2ba6d22077ee2fb9d9a22af557f6b}{l\+NOT\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a38cd6699d5e74273b7e5bbc6efc9deb5}{i\+NOT\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a20207667d9d3296ecbb36ecda38e1407}{d\+NOT\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af5f69df3b7fae0df691ab29fac6d0ee4}{z\+NOT\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_afaf319da46335442338a0764e52d09ac}{n\+NOT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab09ac2e7cb2fa08a14c85cd11ed5b10e}{l\+NOT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af6118667add8b33992bd60af406b92b0}{i\+NOT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad65583713dbd901e6b2e5afe83949657}{d\+NOT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_add1dceabd87334c8e702b515f3ad7007}{z\+NOT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6e00b2ba5bb8880d182b5b3931bf792a}{n\+NOT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a60ce9067cfc82bf6293c8992b1f6ad26}{l\+NOT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_abbfd213ac7ea572cc3f26dbc1050f7cd}{i\+NOT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a5ce96650231c2aded405c3230ea37a07}{d\+NOT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad5a872a6452783ecfaf83bac86c9cc0a}{z\+NOT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a41b36c4c08b15376927b6566f90f5230}{n\+SET\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4b97b0f289ba95c658ccd8ba8760d4cc}{l\+SET\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa8248ee474dae17416d4c4298c9ef909}{i\+SET\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af8c15a18bfef2d385c33d851e4360cbd}{d\+SET\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab1d2d03974dcaad165b90e5675e18de9}{z\+SET\+\_\+\+ZERO}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2cbe06a392b1b64bd08e7f1658e6de97}{n\+SET\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6356d902ba2ca275c4244518e278328b}{l\+SET\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1fb65edd8064151c85dba210940cc369}{i\+SET\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4dc370cb2df17b1f691f7169c734d2d1}{d\+SET\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a708569d1ce8485f458cb7b2201533d58}{z\+SET\+\_\+\+UNIT}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac613e37904aea08bb5dc2f66cac9eddd}{n\+SET\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a63f42e4a212111336bfac9385bd0fd1d}{l\+SET\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa4a185b439194954c6625f44ceb0e17d}{i\+SET\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af26fc4b530eb201a0cba97dec8f98166}{d\+SET\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a527b61cbabb94d3d541fbdf1da757a71}{z\+SET\+\_\+\+NA}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4dee229a1c70e4fed6c651c31f635cb2}{n\+SET\+\_\+\+IDEN}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2420aec454c8dca98bd08cf243aef194}{l\+SET\+\_\+\+IDEN}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a812fe714b4b3bf64ee45f2df2f886b58}{i\+SET\+\_\+\+IDEN}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab320195107e9d890a2595c4f880b502f}{d\+SET\+\_\+\+IDEN}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a42ffecc64d44161975f7a2f207b49216}{z\+SET\+\_\+\+IDEN}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a824f3508f0449926af3dd1918a8edccd}{n\+SET\+\_\+\+CONJ}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab35394a63d35e139964dd957a028a52e}{l\+SET\+\_\+\+CONJ}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad6a28caff592dcee162e07d1ef989aff}{i\+SET\+\_\+\+CONJ}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a9bad3322736fda349abcd686adaff7ca}{d\+SET\+\_\+\+CONJ}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6cfaf8e16db91dc2e16d1a5b6f55896d}{z\+SET\+\_\+\+CONJ}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a7f1bd25ebc019c6224aa4e4e7eaa19b9}{n\+SET\+\_\+\+PROJ\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2cadd20ac0e50e43c611ab3cc83ce266}{l\+SET\+\_\+\+PROJ\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4e929cd6a1b06ef678b5839e5d5263ed}{i\+SET\+\_\+\+PROJ\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a32d90f668f5013e5ae362545aab810f0}{d\+SET\+\_\+\+PROJ\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a71f932fa49dc7acd130293a2052165fc}{z\+SET\+\_\+\+PROJ\+\_\+\+REAL}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4915ca6b7f50be249076b4ac08be81bc}{n\+SET\+\_\+\+PROJ\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a0ffd98089abea422b3ae489d03c8f1cb}{l\+SET\+\_\+\+PROJ\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab48a131f5e55ecb588e5d227e82b9d2b}{i\+SET\+\_\+\+PROJ\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a7383569aa5b76c40ddc82254d889348f}{d\+SET\+\_\+\+PROJ\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1f2334abd0f859fb2b5e437b910f8a9f}{z\+SET\+\_\+\+PROJ\+\_\+\+IMAG}}(x)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a39a6a10cbd1a98491fd7258ceb72c3df}{n\+ASSIGN\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab454d3123a6af712b8f015f15b211d85}{l\+ASSIGN\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae1cbeac8742de74db97523a541272977}{i\+ASSIGN\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a531a8e2cb8b080cce5e05dc49327bee3}{d\+ASSIGN\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a0fef0b66b6430642bad9b3df04fede56}{z\+ASSIGN\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a450f4bbc02f2dab4d6228c00ac6a56df}{n\+ASSIGN\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a49cb69e003e6ae48f8d50a4e2a7d5a44}{l\+ASSIGN\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a405c994a73804636c6819e9efb2c8bba}{i\+ASSIGN\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a46e797a6cd84f5d8dbd0c95d312eecc7}{d\+ASSIGN\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a4ba1d6dcf40cba1e813ac38feb1718e8}{z\+ASSIGN\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3ad97a7cee5485cce32945abceed279e}{n\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a26e826d4d690e607e823b1d5be66c9ff}{l\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a60e6555ed7a185b5f6b609b6c3daaab5}{i\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac3b7e8d91d51594016f2cfb948d11cbd}{d\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a50af3ee08ae4b6281266e9cefa65bc1d}{z\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aba7328e130696c3ba09d9eae880c28ae}{n\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a416d74b4874bb7f0143ae77d71f24b36}{l\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab758c53a2c56226362c962b5c2f65f89}{i\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1f6bdbcdd6b857a846e3d5c658600889}{d\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa3716923dfc34571e2eda24878672fb9}{z\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a74c3cc21a8d15ae91f4f477f3bc35029}{n\+INCREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_afef9c3b6d53bf421da19d7f45bd92e77}{l\+INCREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a62e4add77ba4d78ec195730074a89f97}{i\+INCREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a887d6d439362a47945f1dcb4dd47e53f}{d\+INCREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2718c5c8bcb6d4d9e4c6251a60345176}{z\+INCREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2d24957d84f85d2714ae2d790b2c5186}{n\+INCREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a5a66c7ed070d4ba18ec74a10e43b58e6}{l\+INCREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aaef6c81958a5c103db5dee61a2f58813}{i\+INCREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_af147167584eb4dd66538690b13d2b49d}{d\+INCREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ab58cd18a3753d777bf07d0bba230e264}{z\+INCREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6ecefb0fc7efd7a1de8c059a43cb71ba}{n\+DECREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a53215b4856e270fff2b4aed57dcd110a}{l\+DECREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a8ad30cf32f2e6daf74f6397fca02c319}{i\+DECREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a69b56e47999cef5c4d6fab6ea8a36cd1}{d\+DECREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a12793802acf9c35651b4ff907049cc0d}{z\+DECREMENT\+\_\+\+IDEN}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ac04829ebeee7922e494a250740b0d676}{n\+DECREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a191a73a14bca70d0c2e8af2c2d897f85}{l\+DECREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a9ecdb42c43db65d3fdbdef6c1329c146}{i\+DECREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a5b8622442878f250cbe44bb2025ea1cf}{d\+DECREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a830082757b8d8202e3f777bbb27af1b0}{z\+DECREMENT\+\_\+\+CONJ}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad9b5a815ea5d6be00858240227e4ac7a}{n\+MULTIPLY}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae1f3edec57bdca4c81820b497fbb7026}{l\+MULTIPLY}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a1a62e1e6fde4032db801206bcf44eff9}{i\+MULTIPLY}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_abe22b501b78f655213a15fb3ff8502fd}{d\+MULTIPLY}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a900ef6ac282f2ba57fdaf025f267b30a}{z\+MULTIPLY}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a2435f1a956cbf916c4d7242af007f913}{n\+DIVIDE}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_aa5cff57328cf80a3c0c21be000e0f889}{l\+DIVIDE}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a36ec6d935750da12d3b581e46bf42eb9}{i\+DIVIDE}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ae3dfa2313b348772d81d70144b0e936f}{d\+DIVIDE}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a5887daaed2c9f157fab77ab060bca9d7}{z\+DIVIDE}}(x,  a)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3a502fb0765cfd2aeefd0d801ccbfb64}{SWITCH2}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  template)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a6145cb271a6ea53cce9f7ba13f93af02}{SWITCH3}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  template)
+\item 
+\#define \mbox{\hyperlink{M5_8h_ad75d2f3f86085236205a60ad7a56340b}{SWITCH4}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  template)
+\item 
+\#define \mbox{\hyperlink{M5_8h_a3d0bdfd9c1220a37d7c27ee51442e38e}{SWITCH5}}(\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}},  template)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{M5_8h_a46e797a6cd84f5d8dbd0c95d312eecc7}\index{M5.h@{M5.h}!dASSIGN\_CONJ@{dASSIGN\_CONJ}}
+\index{dASSIGN\_CONJ@{dASSIGN\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dASSIGN\_CONJ}{dASSIGN\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a46e797a6cd84f5d8dbd0c95d312eecc7} 
+\#define d\+ASSIGN\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00171}{171}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a531a8e2cb8b080cce5e05dc49327bee3}\index{M5.h@{M5.h}!dASSIGN\_IDEN@{dASSIGN\_IDEN}}
+\index{dASSIGN\_IDEN@{dASSIGN\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dASSIGN\_IDEN}{dASSIGN\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a531a8e2cb8b080cce5e05dc49327bee3} 
+\#define d\+ASSIGN\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00165}{165}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1f6bdbcdd6b857a846e3d5c658600889}\index{M5.h@{M5.h}!dASSIGN\_PROJ\_IMAG@{dASSIGN\_PROJ\_IMAG}}
+\index{dASSIGN\_PROJ\_IMAG@{dASSIGN\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dASSIGN\_PROJ\_IMAG}{dASSIGN\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a1f6bdbcdd6b857a846e3d5c658600889} 
+\#define d\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00183}{183}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac3b7e8d91d51594016f2cfb948d11cbd}\index{M5.h@{M5.h}!dASSIGN\_PROJ\_REAL@{dASSIGN\_PROJ\_REAL}}
+\index{dASSIGN\_PROJ\_REAL@{dASSIGN\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dASSIGN\_PROJ\_REAL}{dASSIGN\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_ac3b7e8d91d51594016f2cfb948d11cbd} 
+\#define d\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00177}{177}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a5b8622442878f250cbe44bb2025ea1cf}\index{M5.h@{M5.h}!dDECREMENT\_CONJ@{dDECREMENT\_CONJ}}
+\index{dDECREMENT\_CONJ@{dDECREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dDECREMENT\_CONJ}{dDECREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a5b8622442878f250cbe44bb2025ea1cf} 
+\#define d\+DECREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a69b56e47999cef5c4d6fab6ea8a36cd1}{dDECREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00272}{272}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a69b56e47999cef5c4d6fab6ea8a36cd1}\index{M5.h@{M5.h}!dDECREMENT\_IDEN@{dDECREMENT\_IDEN}}
+\index{dDECREMENT\_IDEN@{dDECREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dDECREMENT\_IDEN}{dDECREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a69b56e47999cef5c4d6fab6ea8a36cd1} 
+\#define d\+DECREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x)\ -\/=\ (y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00259}{259}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae3dfa2313b348772d81d70144b0e936f}\index{M5.h@{M5.h}!dDIVIDE@{dDIVIDE}}
+\index{dDIVIDE@{dDIVIDE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dDIVIDE}{dDIVIDE}}
+{\footnotesize\ttfamily \label{M5_8h_ae3dfa2313b348772d81d70144b0e936f} 
+\#define d\+DIVIDE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ (x)\ \ \ /=\ a;\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00286}{286}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a0fd6c83dc3c72d7d5a831315c17c4066}\index{M5.h@{M5.h}!dIF\_NPATTERN@{dIF\_NPATTERN}}
+\index{dIF\_NPATTERN@{dIF\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dIF\_NPATTERN}{dIF\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a0fd6c83dc3c72d7d5a831315c17c4066} 
+\#define d\+IF\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00051}{51}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3b744bcb94adc5c6538db4daadf8e52d}\index{M5.h@{M5.h}!dIFELSE\_NPATTERN@{dIFELSE\_NPATTERN}}
+\index{dIFELSE\_NPATTERN@{dIFELSE\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dIFELSE\_NPATTERN}{dIFELSE\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a3b744bcb94adc5c6538db4daadf8e52d} 
+\#define d\+IFELSE\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00057}{57}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af147167584eb4dd66538690b13d2b49d}\index{M5.h@{M5.h}!dINCREMENT\_CONJ@{dINCREMENT\_CONJ}}
+\index{dINCREMENT\_CONJ@{dINCREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dINCREMENT\_CONJ}{dINCREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_af147167584eb4dd66538690b13d2b49d} 
+\#define d\+INCREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a887d6d439362a47945f1dcb4dd47e53f}{dINCREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00229}{229}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a887d6d439362a47945f1dcb4dd47e53f}\index{M5.h@{M5.h}!dINCREMENT\_IDEN@{dINCREMENT\_IDEN}}
+\index{dINCREMENT\_IDEN@{dINCREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dINCREMENT\_IDEN}{dINCREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a887d6d439362a47945f1dcb4dd47e53f} 
+\#define d\+INCREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x)\ +=\ (y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00216}{216}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abe22b501b78f655213a15fb3ff8502fd}\index{M5.h@{M5.h}!dMULTIPLY@{dMULTIPLY}}
+\index{dMULTIPLY@{dMULTIPLY}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dMULTIPLY}{dMULTIPLY}}
+{\footnotesize\ttfamily \label{M5_8h_abe22b501b78f655213a15fb3ff8502fd} 
+\#define d\+MULTIPLY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ (x)\ \ \ *=\ a;\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00278}{278}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac791b9ece9606b26abc677abd108bf06}\index{M5.h@{M5.h}!dNA@{dNA}}
+\index{dNA@{dNA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNA}{dNA}}
+{\footnotesize\ttfamily \label{M5_8h_ac791b9ece9606b26abc677abd108bf06} 
+\#define d\+NA~NA\+\_\+\+REAL}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00039}{39}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a9c2c5454ab7a00d887ced44ca4b4a1a6}\index{M5.h@{M5.h}!dNAME@{dNAME}}
+\index{dNAME@{dNAME}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNAME}{dNAME}}
+{\footnotesize\ttfamily \label{M5_8h_a9c2c5454ab7a00d887ced44ca4b4a1a6} 
+\#define d\+NAME(\begin{DoxyParamCaption}\item[{}]{s}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{d\ \#\#\ s}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00045}{45}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a5ce96650231c2aded405c3230ea37a07}\index{M5.h@{M5.h}!dNOT\_CONJ@{dNOT\_CONJ}}
+\index{dNOT\_CONJ@{dNOT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_CONJ}{dNOT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a5ce96650231c2aded405c3230ea37a07} 
+\#define d\+NOT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ ((ISNAN(x))\ ?\ !ISNAN(y)\ :\ ISNAN(y)\ ||\ x\ !=\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00114}{114}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad65583713dbd901e6b2e5afe83949657}\index{M5.h@{M5.h}!dNOT\_IDEN@{dNOT\_IDEN}}
+\index{dNOT\_IDEN@{dNOT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_IDEN}{dNOT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_ad65583713dbd901e6b2e5afe83949657} 
+\#define d\+NOT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ ((ISNAN(x))\ ?\ !ISNAN(y)\ :\ ISNAN(y)\ ||\ (x)\ !=\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00102}{102}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a20207667d9d3296ecbb36ecda38e1407}\index{M5.h@{M5.h}!dNOT\_NA@{dNOT\_NA}}
+\index{dNOT\_NA@{dNOT\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_NA}{dNOT\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a20207667d9d3296ecbb36ecda38e1407} 
+\#define d\+NOT\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(!ISNAN(x))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00093}{93}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a12c935c909d29478eab726a533faf0cf}\index{M5.h@{M5.h}!dNOT\_UNIT@{dNOT\_UNIT}}
+\index{dNOT\_UNIT@{dNOT\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_UNIT}{dNOT\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a12c935c909d29478eab726a533faf0cf} 
+\#define d\+NOT\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 1.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00087}{87}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4b80f4507ac1e11591b79ad068c32213}\index{M5.h@{M5.h}!dNOT\_ZERO@{dNOT\_ZERO}}
+\index{dNOT\_ZERO@{dNOT\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_ZERO}{dNOT\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a4b80f4507ac1e11591b79ad068c32213} 
+\#define d\+NOT\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00063}{63}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab5486c8c4008f3a1feee4b7015afb0df}\index{M5.h@{M5.h}!dNOT\_ZERO\_IMAG@{dNOT\_ZERO\_IMAG}}
+\index{dNOT\_ZERO\_IMAG@{dNOT\_ZERO\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_ZERO\_IMAG}{dNOT\_ZERO\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_ab5486c8c4008f3a1feee4b7015afb0df} 
+\#define d\+NOT\+\_\+\+ZERO\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00075}{75}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a351ddf27c9cce241ffa148b2f60957d7}\index{M5.h@{M5.h}!dNOT\_ZERO\_REAL@{dNOT\_ZERO\_REAL}}
+\index{dNOT\_ZERO\_REAL@{dNOT\_ZERO\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_ZERO\_REAL}{dNOT\_ZERO\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a351ddf27c9cce241ffa148b2f60957d7} 
+\#define d\+NOT\+\_\+\+ZERO\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00069}{69}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae66c334c9258a8835094f6232381d8c7}\index{M5.h@{M5.h}!dNOT\_ZERO\_TOL@{dNOT\_ZERO\_TOL}}
+\index{dNOT\_ZERO\_TOL@{dNOT\_ZERO\_TOL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dNOT\_ZERO\_TOL}{dNOT\_ZERO\_TOL}}
+{\footnotesize\ttfamily \label{M5_8h_ae66c334c9258a8835094f6232381d8c7} 
+\#define d\+NOT\+\_\+\+ZERO\+\_\+\+TOL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{tol}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(ISNAN(x)\ ||\ fabs(x)\ >\ tol)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00081}{81}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3b0e0babe1bd4b266cf475c6c68102fe}\index{M5.h@{M5.h}!dPTR@{dPTR}}
+\index{dPTR@{dPTR}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dPTR}{dPTR}}
+{\footnotesize\ttfamily \label{M5_8h_a3b0e0babe1bd4b266cf475c6c68102fe} 
+\#define d\+PTR~REAL}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00021}{21}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a9bad3322736fda349abcd686adaff7ca}\index{M5.h@{M5.h}!dSET\_CONJ@{dSET\_CONJ}}
+\index{dSET\_CONJ@{dSET\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_CONJ}{dSET\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a9bad3322736fda349abcd686adaff7ca} 
+\#define d\+SET\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00147}{147}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab320195107e9d890a2595c4f880b502f}\index{M5.h@{M5.h}!dSET\_IDEN@{dSET\_IDEN}}
+\index{dSET\_IDEN@{dSET\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_IDEN}{dSET\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_ab320195107e9d890a2595c4f880b502f} 
+\#define d\+SET\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00141}{141}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af26fc4b530eb201a0cba97dec8f98166}\index{M5.h@{M5.h}!dSET\_NA@{dSET\_NA}}
+\index{dSET\_NA@{dSET\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_NA}{dSET\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_af26fc4b530eb201a0cba97dec8f98166} 
+\#define d\+SET\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ NA\_REAL)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00135}{135}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a7383569aa5b76c40ddc82254d889348f}\index{M5.h@{M5.h}!dSET\_PROJ\_IMAG@{dSET\_PROJ\_IMAG}}
+\index{dSET\_PROJ\_IMAG@{dSET\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_PROJ\_IMAG}{dSET\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a7383569aa5b76c40ddc82254d889348f} 
+\#define d\+SET\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00159}{159}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a32d90f668f5013e5ae362545aab810f0}\index{M5.h@{M5.h}!dSET\_PROJ\_REAL@{dSET\_PROJ\_REAL}}
+\index{dSET\_PROJ\_REAL@{dSET\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_PROJ\_REAL}{dSET\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a32d90f668f5013e5ae362545aab810f0} 
+\#define d\+SET\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00153}{153}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4dc370cb2df17b1f691f7169c734d2d1}\index{M5.h@{M5.h}!dSET\_UNIT@{dSET\_UNIT}}
+\index{dSET\_UNIT@{dSET\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_UNIT}{dSET\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a4dc370cb2df17b1f691f7169c734d2d1} 
+\#define d\+SET\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 1.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00129}{129}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af8c15a18bfef2d385c33d851e4360cbd}\index{M5.h@{M5.h}!dSET\_ZERO@{dSET\_ZERO}}
+\index{dSET\_ZERO@{dSET\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dSET\_ZERO}{dSET\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_af8c15a18bfef2d385c33d851e4360cbd} 
+\#define d\+SET\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00123}{123}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4fb2ed1a6c41d1389ea65d8da69655e1}\index{M5.h@{M5.h}!dTYPE@{dTYPE}}
+\index{dTYPE@{dTYPE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dTYPE}{dTYPE}}
+{\footnotesize\ttfamily \label{M5_8h_a4fb2ed1a6c41d1389ea65d8da69655e1} 
+\#define d\+TYPE~double}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00009}{9}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4ca1e28670ce33ec02ffaf5b2e54a053}\index{M5.h@{M5.h}!dTYPESXP@{dTYPESXP}}
+\index{dTYPESXP@{dTYPESXP}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dTYPESXP}{dTYPESXP}}
+{\footnotesize\ttfamily \label{M5_8h_a4ca1e28670ce33ec02ffaf5b2e54a053} 
+\#define d\+TYPESXP~REALSXP}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00015}{15}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6b715b75e4c9d266ecda74c12991c051}\index{M5.h@{M5.h}!dUNIT@{dUNIT}}
+\index{dUNIT@{dUNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dUNIT}{dUNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a6b715b75e4c9d266ecda74c12991c051} 
+\#define d\+UNIT~1.\+0}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00033}{33}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a45d3bab8d5d3fd2ec6a5c0016fcc7649}\index{M5.h@{M5.h}!dZERO@{dZERO}}
+\index{dZERO@{dZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{dZERO}{dZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a45d3bab8d5d3fd2ec6a5c0016fcc7649} 
+\#define d\+ZERO~0.\+0}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00027}{27}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a405c994a73804636c6819e9efb2c8bba}\index{M5.h@{M5.h}!iASSIGN\_CONJ@{iASSIGN\_CONJ}}
+\index{iASSIGN\_CONJ@{iASSIGN\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iASSIGN\_CONJ}{iASSIGN\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a405c994a73804636c6819e9efb2c8bba} 
+\#define i\+ASSIGN\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00170}{170}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae1cbeac8742de74db97523a541272977}\index{M5.h@{M5.h}!iASSIGN\_IDEN@{iASSIGN\_IDEN}}
+\index{iASSIGN\_IDEN@{iASSIGN\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iASSIGN\_IDEN}{iASSIGN\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_ae1cbeac8742de74db97523a541272977} 
+\#define i\+ASSIGN\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00164}{164}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab758c53a2c56226362c962b5c2f65f89}\index{M5.h@{M5.h}!iASSIGN\_PROJ\_IMAG@{iASSIGN\_PROJ\_IMAG}}
+\index{iASSIGN\_PROJ\_IMAG@{iASSIGN\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iASSIGN\_PROJ\_IMAG}{iASSIGN\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_ab758c53a2c56226362c962b5c2f65f89} 
+\#define i\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00182}{182}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a60e6555ed7a185b5f6b609b6c3daaab5}\index{M5.h@{M5.h}!iASSIGN\_PROJ\_REAL@{iASSIGN\_PROJ\_REAL}}
+\index{iASSIGN\_PROJ\_REAL@{iASSIGN\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iASSIGN\_PROJ\_REAL}{iASSIGN\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a60e6555ed7a185b5f6b609b6c3daaab5} 
+\#define i\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00176}{176}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a9ecdb42c43db65d3fdbdef6c1329c146}\index{M5.h@{M5.h}!iDECREMENT\_CONJ@{iDECREMENT\_CONJ}}
+\index{iDECREMENT\_CONJ@{iDECREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iDECREMENT\_CONJ}{iDECREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a9ecdb42c43db65d3fdbdef6c1329c146} 
+\#define i\+DECREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a8ad30cf32f2e6daf74f6397fca02c319}{iDECREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00271}{271}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a8ad30cf32f2e6daf74f6397fca02c319}\index{M5.h@{M5.h}!iDECREMENT\_IDEN@{iDECREMENT\_IDEN}}
+\index{iDECREMENT\_IDEN@{iDECREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iDECREMENT\_IDEN}{iDECREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a8ad30cf32f2e6daf74f6397fca02c319} 
+\#define i\+DECREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((x)\ !=\ NA\_INTEGER)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ ((y)\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_INTEGER;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((y)\ !=\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (((y)\ <\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ ((x)\ >\ \ INT\_MAX\ +\ (y))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ((x)\ <=\ INT\_MIN\ +\ (y)))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}NAs\ produced\ by\ integer\ overflow"{}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_INTEGER;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ -\/=\ (y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00242}{242}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a36ec6d935750da12d3b581e46bf42eb9}\index{M5.h@{M5.h}!iDIVIDE@{iDIVIDE}}
+\index{iDIVIDE@{iDIVIDE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iDIVIDE}{iDIVIDE}}
+{\footnotesize\ttfamily \label{M5_8h_a36ec6d935750da12d3b581e46bf42eb9} 
+\#define i\+DIVIDE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ ditto\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00285}{285}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a5eeb3afeb135147e7f0971c81b70840e}\index{M5.h@{M5.h}!iIF\_NPATTERN@{iIF\_NPATTERN}}
+\index{iIF\_NPATTERN@{iIF\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iIF\_NPATTERN}{iIF\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a5eeb3afeb135147e7f0971c81b70840e} 
+\#define i\+IF\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00050}{50}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a7911d5dc65eb59d6dddb7097a5328e89}\index{M5.h@{M5.h}!iIFELSE\_NPATTERN@{iIFELSE\_NPATTERN}}
+\index{iIFELSE\_NPATTERN@{iIFELSE\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iIFELSE\_NPATTERN}{iIFELSE\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a7911d5dc65eb59d6dddb7097a5328e89} 
+\#define i\+IFELSE\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00056}{56}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aaef6c81958a5c103db5dee61a2f58813}\index{M5.h@{M5.h}!iINCREMENT\_CONJ@{iINCREMENT\_CONJ}}
+\index{iINCREMENT\_CONJ@{iINCREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iINCREMENT\_CONJ}{iINCREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_aaef6c81958a5c103db5dee61a2f58813} 
+\#define i\+INCREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a62e4add77ba4d78ec195730074a89f97}{iINCREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00228}{228}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a62e4add77ba4d78ec195730074a89f97}\index{M5.h@{M5.h}!iINCREMENT\_IDEN@{iINCREMENT\_IDEN}}
+\index{iINCREMENT\_IDEN@{iINCREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iINCREMENT\_IDEN}{iINCREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a62e4add77ba4d78ec195730074a89f97} 
+\#define i\+INCREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((x)\ !=\ NA\_INTEGER)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ ((y)\ ==\ NA\_INTEGER)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_INTEGER;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((y)\ !=\ 0)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (((y)\ >\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ ((x)\ >\ \ INT\_MAX\ -\/\ (y))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ((x)\ <=\ INT\_MIN\ -\/\ (y)))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Rf\_warning(\mbox{\hyperlink{Mdefines_8h_a32a3cf3d9dd914f5aeeca5423c157934}{\_}}(\textcolor{stringliteral}{"{}NAs\ produced\ by\ integer\ overflow"{}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_INTEGER;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ +=\ (y);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00199}{199}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1a62e1e6fde4032db801206bcf44eff9}\index{M5.h@{M5.h}!iMULTIPLY@{iMULTIPLY}}
+\index{iMULTIPLY@{iMULTIPLY}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iMULTIPLY}{iMULTIPLY}}
+{\footnotesize\ttfamily \label{M5_8h_a1a62e1e6fde4032db801206bcf44eff9} 
+\#define i\+MULTIPLY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ ditto\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00277}{277}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad442ee225dd3e66c39a80812eeac31a6}\index{M5.h@{M5.h}!iNA@{iNA}}
+\index{iNA@{iNA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNA}{iNA}}
+{\footnotesize\ttfamily \label{M5_8h_ad442ee225dd3e66c39a80812eeac31a6} 
+\#define i\+NA~NA\+\_\+\+INTEGER}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00038}{38}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2d560855bec90cd4c53f2f1acd2db08c}\index{M5.h@{M5.h}!iNAME@{iNAME}}
+\index{iNAME@{iNAME}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNAME}{iNAME}}
+{\footnotesize\ttfamily \label{M5_8h_a2d560855bec90cd4c53f2f1acd2db08c} 
+\#define i\+NAME(\begin{DoxyParamCaption}\item[{}]{s}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ \#\#\ s}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00044}{44}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abbfd213ac7ea572cc3f26dbc1050f7cd}\index{M5.h@{M5.h}!iNOT\_CONJ@{iNOT\_CONJ}}
+\index{iNOT\_CONJ@{iNOT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_CONJ}{iNOT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_abbfd213ac7ea572cc3f26dbc1050f7cd} 
+\#define i\+NOT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (x\ !=\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00112}{112}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af6118667add8b33992bd60af406b92b0}\index{M5.h@{M5.h}!iNOT\_IDEN@{iNOT\_IDEN}}
+\index{iNOT\_IDEN@{iNOT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_IDEN}{iNOT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_af6118667add8b33992bd60af406b92b0} 
+\#define i\+NOT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ ((x)\ !=\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00100}{100}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a38cd6699d5e74273b7e5bbc6efc9deb5}\index{M5.h@{M5.h}!iNOT\_NA@{iNOT\_NA}}
+\index{iNOT\_NA@{iNOT\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_NA}{iNOT\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a38cd6699d5e74273b7e5bbc6efc9deb5} 
+\#define i\+NOT\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ NA\_INTEGER)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00092}{92}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a0545dd17f8815bd4c93fc9fb7d158c2e}\index{M5.h@{M5.h}!iNOT\_UNIT@{iNOT\_UNIT}}
+\index{iNOT\_UNIT@{iNOT\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_UNIT}{iNOT\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a0545dd17f8815bd4c93fc9fb7d158c2e} 
+\#define i\+NOT\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00086}{86}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a099033cd1b32ec0d5f9be2bcb87ba8be}\index{M5.h@{M5.h}!iNOT\_ZERO@{iNOT\_ZERO}}
+\index{iNOT\_ZERO@{iNOT\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_ZERO}{iNOT\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a099033cd1b32ec0d5f9be2bcb87ba8be} 
+\#define i\+NOT\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00062}{62}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2e30c4c9f59db779d964c5c759809121}\index{M5.h@{M5.h}!iNOT\_ZERO\_IMAG@{iNOT\_ZERO\_IMAG}}
+\index{iNOT\_ZERO\_IMAG@{iNOT\_ZERO\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_ZERO\_IMAG}{iNOT\_ZERO\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a2e30c4c9f59db779d964c5c759809121} 
+\#define i\+NOT\+\_\+\+ZERO\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00074}{74}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a236027b5c3a0c86e8a33a964dead0225}\index{M5.h@{M5.h}!iNOT\_ZERO\_REAL@{iNOT\_ZERO\_REAL}}
+\index{iNOT\_ZERO\_REAL@{iNOT\_ZERO\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_ZERO\_REAL}{iNOT\_ZERO\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a236027b5c3a0c86e8a33a964dead0225} 
+\#define i\+NOT\+\_\+\+ZERO\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00068}{68}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3e8f64264da55c58c22d60fd57842bc9}\index{M5.h@{M5.h}!iNOT\_ZERO\_TOL@{iNOT\_ZERO\_TOL}}
+\index{iNOT\_ZERO\_TOL@{iNOT\_ZERO\_TOL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iNOT\_ZERO\_TOL}{iNOT\_ZERO\_TOL}}
+{\footnotesize\ttfamily \label{M5_8h_a3e8f64264da55c58c22d60fd57842bc9} 
+\#define i\+NOT\+\_\+\+ZERO\+\_\+\+TOL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{tol}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00080}{80}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a00bb8851b1097b307fdb4f7df362d4d2}\index{M5.h@{M5.h}!iPTR@{iPTR}}
+\index{iPTR@{iPTR}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iPTR}{iPTR}}
+{\footnotesize\ttfamily \label{M5_8h_a00bb8851b1097b307fdb4f7df362d4d2} 
+\#define i\+PTR~INTEGER}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00020}{20}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad6a28caff592dcee162e07d1ef989aff}\index{M5.h@{M5.h}!iSET\_CONJ@{iSET\_CONJ}}
+\index{iSET\_CONJ@{iSET\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_CONJ}{iSET\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_ad6a28caff592dcee162e07d1ef989aff} 
+\#define i\+SET\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00146}{146}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a812fe714b4b3bf64ee45f2df2f886b58}\index{M5.h@{M5.h}!iSET\_IDEN@{iSET\_IDEN}}
+\index{iSET\_IDEN@{iSET\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_IDEN}{iSET\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a812fe714b4b3bf64ee45f2df2f886b58} 
+\#define i\+SET\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00140}{140}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aa4a185b439194954c6625f44ceb0e17d}\index{M5.h@{M5.h}!iSET\_NA@{iSET\_NA}}
+\index{iSET\_NA@{iSET\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_NA}{iSET\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_aa4a185b439194954c6625f44ceb0e17d} 
+\#define i\+SET\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ NA\_INTEGER)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00134}{134}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab48a131f5e55ecb588e5d227e82b9d2b}\index{M5.h@{M5.h}!iSET\_PROJ\_IMAG@{iSET\_PROJ\_IMAG}}
+\index{iSET\_PROJ\_IMAG@{iSET\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_PROJ\_IMAG}{iSET\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_ab48a131f5e55ecb588e5d227e82b9d2b} 
+\#define i\+SET\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00158}{158}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4e929cd6a1b06ef678b5839e5d5263ed}\index{M5.h@{M5.h}!iSET\_PROJ\_REAL@{iSET\_PROJ\_REAL}}
+\index{iSET\_PROJ\_REAL@{iSET\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_PROJ\_REAL}{iSET\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a4e929cd6a1b06ef678b5839e5d5263ed} 
+\#define i\+SET\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00152}{152}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1fb65edd8064151c85dba210940cc369}\index{M5.h@{M5.h}!iSET\_UNIT@{iSET\_UNIT}}
+\index{iSET\_UNIT@{iSET\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_UNIT}{iSET\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a1fb65edd8064151c85dba210940cc369} 
+\#define i\+SET\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00128}{128}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aa8248ee474dae17416d4c4298c9ef909}\index{M5.h@{M5.h}!iSET\_ZERO@{iSET\_ZERO}}
+\index{iSET\_ZERO@{iSET\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iSET\_ZERO}{iSET\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_aa8248ee474dae17416d4c4298c9ef909} 
+\#define i\+SET\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00122}{122}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a8af40633af4e55cb616e2027741f8c17}\index{M5.h@{M5.h}!iTYPE@{iTYPE}}
+\index{iTYPE@{iTYPE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iTYPE}{iTYPE}}
+{\footnotesize\ttfamily \label{M5_8h_a8af40633af4e55cb616e2027741f8c17} 
+\#define i\+TYPE~int}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00008}{8}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ade77ef20855858be904877e5dac75ec0}\index{M5.h@{M5.h}!iTYPESXP@{iTYPESXP}}
+\index{iTYPESXP@{iTYPESXP}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iTYPESXP}{iTYPESXP}}
+{\footnotesize\ttfamily \label{M5_8h_ade77ef20855858be904877e5dac75ec0} 
+\#define i\+TYPESXP~INTSXP}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00014}{14}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae1e62c9717b2b357b55767278403dd7c}\index{M5.h@{M5.h}!iUNIT@{iUNIT}}
+\index{iUNIT@{iUNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iUNIT}{iUNIT}}
+{\footnotesize\ttfamily \label{M5_8h_ae1e62c9717b2b357b55767278403dd7c} 
+\#define i\+UNIT~1}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00032}{32}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a9bc12609134d45927863b7414ab5d20d}\index{M5.h@{M5.h}!iZERO@{iZERO}}
+\index{iZERO@{iZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{iZERO}{iZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a9bc12609134d45927863b7414ab5d20d} 
+\#define i\+ZERO~0}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00026}{26}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a49cb69e003e6ae48f8d50a4e2a7d5a44}\index{M5.h@{M5.h}!lASSIGN\_CONJ@{lASSIGN\_CONJ}}
+\index{lASSIGN\_CONJ@{lASSIGN\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lASSIGN\_CONJ}{lASSIGN\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a49cb69e003e6ae48f8d50a4e2a7d5a44} 
+\#define l\+ASSIGN\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00169}{169}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab454d3123a6af712b8f015f15b211d85}\index{M5.h@{M5.h}!lASSIGN\_IDEN@{lASSIGN\_IDEN}}
+\index{lASSIGN\_IDEN@{lASSIGN\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lASSIGN\_IDEN}{lASSIGN\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_ab454d3123a6af712b8f015f15b211d85} 
+\#define l\+ASSIGN\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00163}{163}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a416d74b4874bb7f0143ae77d71f24b36}\index{M5.h@{M5.h}!lASSIGN\_PROJ\_IMAG@{lASSIGN\_PROJ\_IMAG}}
+\index{lASSIGN\_PROJ\_IMAG@{lASSIGN\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lASSIGN\_PROJ\_IMAG}{lASSIGN\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a416d74b4874bb7f0143ae77d71f24b36} 
+\#define l\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00181}{181}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a26e826d4d690e607e823b1d5be66c9ff}\index{M5.h@{M5.h}!lASSIGN\_PROJ\_REAL@{lASSIGN\_PROJ\_REAL}}
+\index{lASSIGN\_PROJ\_REAL@{lASSIGN\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lASSIGN\_PROJ\_REAL}{lASSIGN\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a26e826d4d690e607e823b1d5be66c9ff} 
+\#define l\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00175}{175}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a191a73a14bca70d0c2e8af2c2d897f85}\index{M5.h@{M5.h}!lDECREMENT\_CONJ@{lDECREMENT\_CONJ}}
+\index{lDECREMENT\_CONJ@{lDECREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lDECREMENT\_CONJ}{lDECREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a191a73a14bca70d0c2e8af2c2d897f85} 
+\#define l\+DECREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a53215b4856e270fff2b4aed57dcd110a}{lDECREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00270}{270}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a53215b4856e270fff2b4aed57dcd110a}\index{M5.h@{M5.h}!lDECREMENT\_IDEN@{lDECREMENT\_IDEN}}
+\index{lDECREMENT\_IDEN@{lDECREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lDECREMENT\_IDEN}{lDECREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a53215b4856e270fff2b4aed57dcd110a} 
+\#define l\+DECREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((y)\ ==\ NA\_LOGICAL)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ ((x)\ ==\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_LOGICAL;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((y)\ ==\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00233}{233}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aa5cff57328cf80a3c0c21be000e0f889}\index{M5.h@{M5.h}!lDIVIDE@{lDIVIDE}}
+\index{lDIVIDE@{lDIVIDE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lDIVIDE}{lDIVIDE}}
+{\footnotesize\ttfamily \label{M5_8h_aa5cff57328cf80a3c0c21be000e0f889} 
+\#define l\+DIVIDE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ ditto\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00284}{284}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af534ac288744b9e7c150660942fa70fb}\index{M5.h@{M5.h}!lIF\_NPATTERN@{lIF\_NPATTERN}}
+\index{lIF\_NPATTERN@{lIF\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lIF\_NPATTERN}{lIF\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_af534ac288744b9e7c150660942fa70fb} 
+\#define l\+IF\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00049}{49}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a8f789b827866b8853ea90f26dc4fa683}\index{M5.h@{M5.h}!lIFELSE\_NPATTERN@{lIFELSE\_NPATTERN}}
+\index{lIFELSE\_NPATTERN@{lIFELSE\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lIFELSE\_NPATTERN}{lIFELSE\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a8f789b827866b8853ea90f26dc4fa683} 
+\#define l\+IFELSE\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00055}{55}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a5a66c7ed070d4ba18ec74a10e43b58e6}\index{M5.h@{M5.h}!lINCREMENT\_CONJ@{lINCREMENT\_CONJ}}
+\index{lINCREMENT\_CONJ@{lINCREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lINCREMENT\_CONJ}{lINCREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a5a66c7ed070d4ba18ec74a10e43b58e6} 
+\#define l\+INCREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_afef9c3b6d53bf421da19d7f45bd92e77}{lINCREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00227}{227}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_afef9c3b6d53bf421da19d7f45bd92e77}\index{M5.h@{M5.h}!lINCREMENT\_IDEN@{lINCREMENT\_IDEN}}
+\index{lINCREMENT\_IDEN@{lINCREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lINCREMENT\_IDEN}{lINCREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_afef9c3b6d53bf421da19d7f45bd92e77} 
+\#define l\+INCREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ ((y)\ ==\ NA\_LOGICAL)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if\ ((x)\ ==\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ NA\_LOGICAL;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((y)\ !=\ 0)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ (x)\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00190}{190}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae1f3edec57bdca4c81820b497fbb7026}\index{M5.h@{M5.h}!lMULTIPLY@{lMULTIPLY}}
+\index{lMULTIPLY@{lMULTIPLY}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lMULTIPLY}{lMULTIPLY}}
+{\footnotesize\ttfamily \label{M5_8h_ae1f3edec57bdca4c81820b497fbb7026} 
+\#define l\+MULTIPLY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ ditto\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00276}{276}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae141c8093e25db7eb3901f2320ec1814}\index{M5.h@{M5.h}!lNA@{lNA}}
+\index{lNA@{lNA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNA}{lNA}}
+{\footnotesize\ttfamily \label{M5_8h_ae141c8093e25db7eb3901f2320ec1814} 
+\#define l\+NA~NA\+\_\+\+LOGICAL}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00037}{37}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6f8a1e9256ff081f0496b049af82e948}\index{M5.h@{M5.h}!lNAME@{lNAME}}
+\index{lNAME@{lNAME}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNAME}{lNAME}}
+{\footnotesize\ttfamily \label{M5_8h_a6f8a1e9256ff081f0496b049af82e948} 
+\#define l\+NAME(\begin{DoxyParamCaption}\item[{}]{s}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ \#\#\ s}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00043}{43}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a60ce9067cfc82bf6293c8992b1f6ad26}\index{M5.h@{M5.h}!lNOT\_CONJ@{lNOT\_CONJ}}
+\index{lNOT\_CONJ@{lNOT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_CONJ}{lNOT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a60ce9067cfc82bf6293c8992b1f6ad26} 
+\#define l\+NOT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (x\ !=\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00110}{110}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab09ac2e7cb2fa08a14c85cd11ed5b10e}\index{M5.h@{M5.h}!lNOT\_IDEN@{lNOT\_IDEN}}
+\index{lNOT\_IDEN@{lNOT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_IDEN}{lNOT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_ab09ac2e7cb2fa08a14c85cd11ed5b10e} 
+\#define l\+NOT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ ((x)\ !=\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00098}{98}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a57e2ba6d22077ee2fb9d9a22af557f6b}\index{M5.h@{M5.h}!lNOT\_NA@{lNOT\_NA}}
+\index{lNOT\_NA@{lNOT\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_NA}{lNOT\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a57e2ba6d22077ee2fb9d9a22af557f6b} 
+\#define l\+NOT\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ NA\_LOGICAL)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00091}{91}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab9c559a5d5e4335649efe1da4e075d9d}\index{M5.h@{M5.h}!lNOT\_UNIT@{lNOT\_UNIT}}
+\index{lNOT\_UNIT@{lNOT\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_UNIT}{lNOT\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_ab9c559a5d5e4335649efe1da4e075d9d} 
+\#define l\+NOT\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ ==\ 0\ ||\ (x)\ ==\ NA\_LOGICAL)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00085}{85}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a95766961d1bb60b35c655e4dd49c4969}\index{M5.h@{M5.h}!lNOT\_ZERO@{lNOT\_ZERO}}
+\index{lNOT\_ZERO@{lNOT\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_ZERO}{lNOT\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a95766961d1bb60b35c655e4dd49c4969} 
+\#define l\+NOT\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00061}{61}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abe86d917b48ccf08b828714971435358}\index{M5.h@{M5.h}!lNOT\_ZERO\_IMAG@{lNOT\_ZERO\_IMAG}}
+\index{lNOT\_ZERO\_IMAG@{lNOT\_ZERO\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_ZERO\_IMAG}{lNOT\_ZERO\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_abe86d917b48ccf08b828714971435358} 
+\#define l\+NOT\+\_\+\+ZERO\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00073}{73}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aa5eab73dd8be3b833df0fbc431b8cf18}\index{M5.h@{M5.h}!lNOT\_ZERO\_REAL@{lNOT\_ZERO\_REAL}}
+\index{lNOT\_ZERO\_REAL@{lNOT\_ZERO\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_ZERO\_REAL}{lNOT\_ZERO\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_aa5eab73dd8be3b833df0fbc431b8cf18} 
+\#define l\+NOT\+\_\+\+ZERO\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00067}{67}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a681b2b680b96cb894ebb0b8e95906f08}\index{M5.h@{M5.h}!lNOT\_ZERO\_TOL@{lNOT\_ZERO\_TOL}}
+\index{lNOT\_ZERO\_TOL@{lNOT\_ZERO\_TOL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lNOT\_ZERO\_TOL}{lNOT\_ZERO\_TOL}}
+{\footnotesize\ttfamily \label{M5_8h_a681b2b680b96cb894ebb0b8e95906f08} 
+\#define l\+NOT\+\_\+\+ZERO\+\_\+\+TOL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{tol}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00079}{79}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4d9aa213b3a73350970dda3d42813af4}\index{M5.h@{M5.h}!lPTR@{lPTR}}
+\index{lPTR@{lPTR}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lPTR}{lPTR}}
+{\footnotesize\ttfamily \label{M5_8h_a4d9aa213b3a73350970dda3d42813af4} 
+\#define l\+PTR~LOGICAL}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00019}{19}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab35394a63d35e139964dd957a028a52e}\index{M5.h@{M5.h}!lSET\_CONJ@{lSET\_CONJ}}
+\index{lSET\_CONJ@{lSET\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_CONJ}{lSET\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_ab35394a63d35e139964dd957a028a52e} 
+\#define l\+SET\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00145}{145}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2420aec454c8dca98bd08cf243aef194}\index{M5.h@{M5.h}!lSET\_IDEN@{lSET\_IDEN}}
+\index{lSET\_IDEN@{lSET\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_IDEN}{lSET\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a2420aec454c8dca98bd08cf243aef194} 
+\#define l\+SET\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00139}{139}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a63f42e4a212111336bfac9385bd0fd1d}\index{M5.h@{M5.h}!lSET\_NA@{lSET\_NA}}
+\index{lSET\_NA@{lSET\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_NA}{lSET\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a63f42e4a212111336bfac9385bd0fd1d} 
+\#define l\+SET\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ NA\_LOGICAL)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00133}{133}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a0ffd98089abea422b3ae489d03c8f1cb}\index{M5.h@{M5.h}!lSET\_PROJ\_IMAG@{lSET\_PROJ\_IMAG}}
+\index{lSET\_PROJ\_IMAG@{lSET\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_PROJ\_IMAG}{lSET\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a0ffd98089abea422b3ae489d03c8f1cb} 
+\#define l\+SET\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00157}{157}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2cadd20ac0e50e43c611ab3cc83ce266}\index{M5.h@{M5.h}!lSET\_PROJ\_REAL@{lSET\_PROJ\_REAL}}
+\index{lSET\_PROJ\_REAL@{lSET\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_PROJ\_REAL}{lSET\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a2cadd20ac0e50e43c611ab3cc83ce266} 
+\#define l\+SET\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00151}{151}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6356d902ba2ca275c4244518e278328b}\index{M5.h@{M5.h}!lSET\_UNIT@{lSET\_UNIT}}
+\index{lSET\_UNIT@{lSET\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_UNIT}{lSET\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a6356d902ba2ca275c4244518e278328b} 
+\#define l\+SET\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00127}{127}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4b97b0f289ba95c658ccd8ba8760d4cc}\index{M5.h@{M5.h}!lSET\_ZERO@{lSET\_ZERO}}
+\index{lSET\_ZERO@{lSET\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lSET\_ZERO}{lSET\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a4b97b0f289ba95c658ccd8ba8760d4cc} 
+\#define l\+SET\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00121}{121}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a066bc34d490c2ac5ca33caf8627a9c6f}\index{M5.h@{M5.h}!lTYPE@{lTYPE}}
+\index{lTYPE@{lTYPE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lTYPE}{lTYPE}}
+{\footnotesize\ttfamily \label{M5_8h_a066bc34d490c2ac5ca33caf8627a9c6f} 
+\#define l\+TYPE~int}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00007}{7}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a63c9d1f2543675005b1626c7cd9026bb}\index{M5.h@{M5.h}!lTYPESXP@{lTYPESXP}}
+\index{lTYPESXP@{lTYPESXP}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lTYPESXP}{lTYPESXP}}
+{\footnotesize\ttfamily \label{M5_8h_a63c9d1f2543675005b1626c7cd9026bb} 
+\#define l\+TYPESXP~LGLSXP}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00013}{13}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a601d9f1c951beb389e32e2538451f9a5}\index{M5.h@{M5.h}!lUNIT@{lUNIT}}
+\index{lUNIT@{lUNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lUNIT}{lUNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a601d9f1c951beb389e32e2538451f9a5} 
+\#define l\+UNIT~1}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00031}{31}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac403fa59b2b63e507ffc5a66b062d686}\index{M5.h@{M5.h}!lZERO@{lZERO}}
+\index{lZERO@{lZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{lZERO}{lZERO}}
+{\footnotesize\ttfamily \label{M5_8h_ac403fa59b2b63e507ffc5a66b062d686} 
+\#define l\+ZERO~0}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00025}{25}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a450f4bbc02f2dab4d6228c00ac6a56df}\index{M5.h@{M5.h}!nASSIGN\_CONJ@{nASSIGN\_CONJ}}
+\index{nASSIGN\_CONJ@{nASSIGN\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nASSIGN\_CONJ}{nASSIGN\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a450f4bbc02f2dab4d6228c00ac6a56df} 
+\#define n\+ASSIGN\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00168}{168}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a39a6a10cbd1a98491fd7258ceb72c3df}\index{M5.h@{M5.h}!nASSIGN\_IDEN@{nASSIGN\_IDEN}}
+\index{nASSIGN\_IDEN@{nASSIGN\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nASSIGN\_IDEN}{nASSIGN\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a39a6a10cbd1a98491fd7258ceb72c3df} 
+\#define n\+ASSIGN\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00162}{162}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aba7328e130696c3ba09d9eae880c28ae}\index{M5.h@{M5.h}!nASSIGN\_PROJ\_IMAG@{nASSIGN\_PROJ\_IMAG}}
+\index{nASSIGN\_PROJ\_IMAG@{nASSIGN\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nASSIGN\_PROJ\_IMAG}{nASSIGN\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_aba7328e130696c3ba09d9eae880c28ae} 
+\#define n\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00180}{180}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3ad97a7cee5485cce32945abceed279e}\index{M5.h@{M5.h}!nASSIGN\_PROJ\_REAL@{nASSIGN\_PROJ\_REAL}}
+\index{nASSIGN\_PROJ\_REAL@{nASSIGN\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nASSIGN\_PROJ\_REAL}{nASSIGN\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a3ad97a7cee5485cce32945abceed279e} 
+\#define n\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00174}{174}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac04829ebeee7922e494a250740b0d676}\index{M5.h@{M5.h}!nDECREMENT\_CONJ@{nDECREMENT\_CONJ}}
+\index{nDECREMENT\_CONJ@{nDECREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nDECREMENT\_CONJ}{nDECREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_ac04829ebeee7922e494a250740b0d676} 
+\#define n\+DECREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a6ecefb0fc7efd7a1de8c059a43cb71ba}{nDECREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00269}{269}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6ecefb0fc7efd7a1de8c059a43cb71ba}\index{M5.h@{M5.h}!nDECREMENT\_IDEN@{nDECREMENT\_IDEN}}
+\index{nDECREMENT\_IDEN@{nDECREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nDECREMENT\_IDEN}{nDECREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a6ecefb0fc7efd7a1de8c059a43cb71ba} 
+\#define n\+DECREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00232}{232}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2435f1a956cbf916c4d7242af007f913}\index{M5.h@{M5.h}!nDIVIDE@{nDIVIDE}}
+\index{nDIVIDE@{nDIVIDE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nDIVIDE}{nDIVIDE}}
+{\footnotesize\ttfamily \label{M5_8h_a2435f1a956cbf916c4d7242af007f913} 
+\#define n\+DIVIDE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ unused\ hence\ no-\/op\ for\ now\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00283}{283}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a11a8d84e2e3a86838d0579e6f77045f7}\index{M5.h@{M5.h}!nIF\_NPATTERN@{nIF\_NPATTERN}}
+\index{nIF\_NPATTERN@{nIF\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nIF\_NPATTERN}{nIF\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a11a8d84e2e3a86838d0579e6f77045f7} 
+\#define n\+IF\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00048}{48}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac5d144ef6c06e11b2e2a54b33c2b256e}\index{M5.h@{M5.h}!nIFELSE\_NPATTERN@{nIFELSE\_NPATTERN}}
+\index{nIFELSE\_NPATTERN@{nIFELSE\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nIFELSE\_NPATTERN}{nIFELSE\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_ac5d144ef6c06e11b2e2a54b33c2b256e} 
+\#define n\+IFELSE\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{y}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00054}{54}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2d24957d84f85d2714ae2d790b2c5186}\index{M5.h@{M5.h}!nINCREMENT\_CONJ@{nINCREMENT\_CONJ}}
+\index{nINCREMENT\_CONJ@{nINCREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nINCREMENT\_CONJ}{nINCREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a2d24957d84f85d2714ae2d790b2c5186} 
+\#define n\+INCREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{M5_8h_a74c3cc21a8d15ae91f4f477f3bc35029}{nINCREMENT\_IDEN}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00226}{226}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a74c3cc21a8d15ae91f4f477f3bc35029}\index{M5.h@{M5.h}!nINCREMENT\_IDEN@{nINCREMENT\_IDEN}}
+\index{nINCREMENT\_IDEN@{nINCREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nINCREMENT\_IDEN}{nINCREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a74c3cc21a8d15ae91f4f477f3bc35029} 
+\#define n\+INCREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x)\ =\ 1;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00186}{186}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad9b5a815ea5d6be00858240227e4ac7a}\index{M5.h@{M5.h}!nMULTIPLY@{nMULTIPLY}}
+\index{nMULTIPLY@{nMULTIPLY}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nMULTIPLY}{nMULTIPLY}}
+{\footnotesize\ttfamily \label{M5_8h_ad9b5a815ea5d6be00858240227e4ac7a} 
+\#define n\+MULTIPLY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{/*\ unused\ hence\ no-\/op\ for\ now\ */}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00275}{275}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_afdc8a9db3b84939d3c7fb095e797a021}\index{M5.h@{M5.h}!nNA@{nNA}}
+\index{nNA@{nNA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNA}{nNA}}
+{\footnotesize\ttfamily \label{M5_8h_afdc8a9db3b84939d3c7fb095e797a021} 
+\#define n\+NA~1}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00036}{36}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a75271f94d901028a2451124939a85c79}\index{M5.h@{M5.h}!nNAME@{nNAME}}
+\index{nNAME@{nNAME}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNAME}{nNAME}}
+{\footnotesize\ttfamily \label{M5_8h_a75271f94d901028a2451124939a85c79} 
+\#define n\+NAME(\begin{DoxyParamCaption}\item[{}]{s}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ \#\#\ s}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00042}{42}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6e00b2ba5bb8880d182b5b3931bf792a}\index{M5.h@{M5.h}!nNOT\_CONJ@{nNOT\_CONJ}}
+\index{nNOT\_CONJ@{nNOT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_CONJ}{nNOT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a6e00b2ba5bb8880d182b5b3931bf792a} 
+\#define n\+NOT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ ((x\ !=\ 0)\ !=\ (y\ !=\ 0))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00108}{108}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_afaf319da46335442338a0764e52d09ac}\index{M5.h@{M5.h}!nNOT\_IDEN@{nNOT\_IDEN}}
+\index{nNOT\_IDEN@{nNOT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_IDEN}{nNOT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_afaf319da46335442338a0764e52d09ac} 
+\#define n\+NOT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (((x)\ !=\ 0)\ !=\ ((y)\ !=\ 0))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00096}{96}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1c71cf3a487081642e5f5b49f10801a7}\index{M5.h@{M5.h}!nNOT\_NA@{nNOT\_NA}}
+\index{nNOT\_NA@{nNOT\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_NA}{nNOT\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a1c71cf3a487081642e5f5b49f10801a7} 
+\#define n\+NOT\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00090}{90}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1a2eff801d2b653862e9948c4fa1dbac}\index{M5.h@{M5.h}!nNOT\_UNIT@{nNOT\_UNIT}}
+\index{nNOT\_UNIT@{nNOT\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_UNIT}{nNOT\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a1a2eff801d2b653862e9948c4fa1dbac} 
+\#define n\+NOT\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ ==\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00084}{84}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3eefb593859a193e9f9215f44fd9571f}\index{M5.h@{M5.h}!nNOT\_ZERO@{nNOT\_ZERO}}
+\index{nNOT\_ZERO@{nNOT\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_ZERO}{nNOT\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a3eefb593859a193e9f9215f44fd9571f} 
+\#define n\+NOT\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00060}{60}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a87678d10ab0e8852febea0fc585d2b15}\index{M5.h@{M5.h}!nNOT\_ZERO\_IMAG@{nNOT\_ZERO\_IMAG}}
+\index{nNOT\_ZERO\_IMAG@{nNOT\_ZERO\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_ZERO\_IMAG}{nNOT\_ZERO\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a87678d10ab0e8852febea0fc585d2b15} 
+\#define n\+NOT\+\_\+\+ZERO\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00072}{72}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a7721fc4e9692868aba31c88a46e517ac}\index{M5.h@{M5.h}!nNOT\_ZERO\_REAL@{nNOT\_ZERO\_REAL}}
+\index{nNOT\_ZERO\_REAL@{nNOT\_ZERO\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_ZERO\_REAL}{nNOT\_ZERO\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a7721fc4e9692868aba31c88a46e517ac} 
+\#define n\+NOT\+\_\+\+ZERO\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00066}{66}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abc24743cdbb0bef94955696bc759fadd}\index{M5.h@{M5.h}!nNOT\_ZERO\_TOL@{nNOT\_ZERO\_TOL}}
+\index{nNOT\_ZERO\_TOL@{nNOT\_ZERO\_TOL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nNOT\_ZERO\_TOL}{nNOT\_ZERO\_TOL}}
+{\footnotesize\ttfamily \label{M5_8h_abc24743cdbb0bef94955696bc759fadd} 
+\#define n\+NOT\+\_\+\+ZERO\+\_\+\+TOL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{tol}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ !=\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00078}{78}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a42fb8a25e048a5a56fd09a16d438a7b8}\index{M5.h@{M5.h}!nPTR@{nPTR}}
+\index{nPTR@{nPTR}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nPTR}{nPTR}}
+{\footnotesize\ttfamily \label{M5_8h_a42fb8a25e048a5a56fd09a16d438a7b8} 
+\#define n\+PTR~LOGICAL}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00018}{18}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a824f3508f0449926af3dd1918a8edccd}\index{M5.h@{M5.h}!nSET\_CONJ@{nSET\_CONJ}}
+\index{nSET\_CONJ@{nSET\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_CONJ}{nSET\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a824f3508f0449926af3dd1918a8edccd} 
+\#define n\+SET\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00144}{144}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4dee229a1c70e4fed6c651c31f635cb2}\index{M5.h@{M5.h}!nSET\_IDEN@{nSET\_IDEN}}
+\index{nSET\_IDEN@{nSET\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_IDEN}{nSET\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a4dee229a1c70e4fed6c651c31f635cb2} 
+\#define n\+SET\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00138}{138}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ac613e37904aea08bb5dc2f66cac9eddd}\index{M5.h@{M5.h}!nSET\_NA@{nSET\_NA}}
+\index{nSET\_NA@{nSET\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_NA}{nSET\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_ac613e37904aea08bb5dc2f66cac9eddd} 
+\#define n\+SET\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00132}{132}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a4915ca6b7f50be249076b4ac08be81bc}\index{M5.h@{M5.h}!nSET\_PROJ\_IMAG@{nSET\_PROJ\_IMAG}}
+\index{nSET\_PROJ\_IMAG@{nSET\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_PROJ\_IMAG}{nSET\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a4915ca6b7f50be249076b4ac08be81bc} 
+\#define n\+SET\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00156}{156}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a7f1bd25ebc019c6224aa4e4e7eaa19b9}\index{M5.h@{M5.h}!nSET\_PROJ\_REAL@{nSET\_PROJ\_REAL}}
+\index{nSET\_PROJ\_REAL@{nSET\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_PROJ\_REAL}{nSET\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a7f1bd25ebc019c6224aa4e4e7eaa19b9} 
+\#define n\+SET\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00150}{150}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2cbe06a392b1b64bd08e7f1658e6de97}\index{M5.h@{M5.h}!nSET\_UNIT@{nSET\_UNIT}}
+\index{nSET\_UNIT@{nSET\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_UNIT}{nSET\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a2cbe06a392b1b64bd08e7f1658e6de97} 
+\#define n\+SET\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00126}{126}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a41b36c4c08b15376927b6566f90f5230}\index{M5.h@{M5.h}!nSET\_ZERO@{nSET\_ZERO}}
+\index{nSET\_ZERO@{nSET\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nSET\_ZERO}{nSET\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a41b36c4c08b15376927b6566f90f5230} 
+\#define n\+SET\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00120}{120}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abac5d543f8a5040de0947c9f537f1213}\index{M5.h@{M5.h}!nTYPE@{nTYPE}}
+\index{nTYPE@{nTYPE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nTYPE}{nTYPE}}
+{\footnotesize\ttfamily \label{M5_8h_abac5d543f8a5040de0947c9f537f1213} 
+\#define n\+TYPE~int}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00006}{6}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a213f8f219a14a5093dea5893a9218943}\index{M5.h@{M5.h}!nTYPESXP@{nTYPESXP}}
+\index{nTYPESXP@{nTYPESXP}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nTYPESXP}{nTYPESXP}}
+{\footnotesize\ttfamily \label{M5_8h_a213f8f219a14a5093dea5893a9218943} 
+\#define n\+TYPESXP~LGLSXP}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00012}{12}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_aa7bacdc7561de95b37292077c3a233e1}\index{M5.h@{M5.h}!nUNIT@{nUNIT}}
+\index{nUNIT@{nUNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nUNIT}{nUNIT}}
+{\footnotesize\ttfamily \label{M5_8h_aa7bacdc7561de95b37292077c3a233e1} 
+\#define n\+UNIT~1}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00030}{30}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a69d21f11f013d953b5dd5a9236e4dddc}\index{M5.h@{M5.h}!nZERO@{nZERO}}
+\index{nZERO@{nZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{nZERO}{nZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a69d21f11f013d953b5dd5a9236e4dddc} 
+\#define n\+ZERO~0}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00024}{24}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a3a502fb0765cfd2aeefd0d801ccbfb64}\index{M5.h@{M5.h}!SWITCH2@{SWITCH2}}
+\index{SWITCH2@{SWITCH2}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{SWITCH2}{SWITCH2}}
+{\footnotesize\ttfamily \label{M5_8h_a3a502fb0765cfd2aeefd0d801ccbfb64} 
+\#define SWITCH2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{template}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ switch\ ((\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keyword}{template}(d);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:\ \textcolor{keyword}{template}(z);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00291}{291}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{skewpart_8c_source_l00011}{dense\+\_\+skewpart()}}, \mbox{\hyperlink{symmpart_8c_source_l00011}{dense\+\_\+symmpart()}}, \mbox{\hyperlink{skewpart_8c_source_l00169}{sparse\+\_\+skewpart()}}, and \mbox{\hyperlink{symmpart_8c_source_l00205}{sparse\+\_\+symmpart()}}.
+
+\Hypertarget{M5_8h_a6145cb271a6ea53cce9f7ba13f93af02}\index{M5.h@{M5.h}!SWITCH3@{SWITCH3}}
+\index{SWITCH3@{SWITCH3}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{SWITCH3}{SWITCH3}}
+{\footnotesize\ttfamily \label{M5_8h_a6145cb271a6ea53cce9f7ba13f93af02} 
+\#define SWITCH3(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{template}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ switch\ ((\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keyword}{template}(i);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keyword}{template}(d);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:\ \textcolor{keyword}{template}(z);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00303}{303}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad75d2f3f86085236205a60ad7a56340b}\index{M5.h@{M5.h}!SWITCH4@{SWITCH4}}
+\index{SWITCH4@{SWITCH4}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{SWITCH4}{SWITCH4}}
+{\footnotesize\ttfamily \label{M5_8h_ad75d2f3f86085236205a60ad7a56340b} 
+\#define SWITCH4(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{template}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ switch\ ((\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keyword}{template}(l);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keyword}{template}(i);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keyword}{template}(d);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:\ \textcolor{keyword}{template}(z);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00315}{315}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{coerce_8c_source_l02237}{dense\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02654}{dense\+\_\+as\+\_\+packed()}}, \mbox{\hyperlink{coerce_8c_source_l02598}{dense\+\_\+as\+\_\+unpacked()}}, \mbox{\hyperlink{band_8c_source_l00007}{dense\+\_\+band()}}, \mbox{\hyperlink{diag_8c_source_l00009}{dense\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00225}{dense\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00007}{dense\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isDiagonal_8c_source_l00007}{dense\+\_\+is\+\_\+diagonal()}}, \mbox{\hyperlink{isTriangular_8c_source_l00011}{dense\+\_\+is\+\_\+triangular()}}, \mbox{\hyperlink{subscript_8c_source_l00817}{dense\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{t_8c_source_l00007}{dense\+\_\+transpose()}}, \mbox{\hyperlink{coerce_8c_source_l00599}{diagonal\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03281}{diagonal\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{subscript_8c_source_l01296}{diagonal\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{coerce_8c_source_l00686}{index\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l00262}{matrix\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{utils-R_8c_source_l00143}{R\+\_\+nnz()}}, \mbox{\hyperlink{coerce_8c_source_l02963}{sparse\+\_\+as\+\_\+\+Tsparse()}}, \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{dropzero_8c_source_l00004}{sparse\+\_\+dropzero()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00080}{sparse\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{coerce_8c_source_l00008}{vector\+\_\+as\+\_\+dense()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+
+\Hypertarget{M5_8h_a3d0bdfd9c1220a37d7c27ee51442e38e}\index{M5.h@{M5.h}!SWITCH5@{SWITCH5}}
+\index{SWITCH5@{SWITCH5}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{SWITCH5}{SWITCH5}}
+{\footnotesize\ttfamily \label{M5_8h_a3d0bdfd9c1220a37d7c27ee51442e38e} 
+\#define SWITCH5(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}}{, }\item[{}]{template}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ switch\ ((\mbox{\hyperlink{cholmod-etc_8c_ac2b5dcf1f18e620b15b2e284dd9f6bd4}{c}}))\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keyword}{template}(n);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keyword}{template}(l);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keyword}{template}(i);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keyword}{template}(d);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:\ \textcolor{keyword}{template}(z);\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00327}{327}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{bind_8c_source_l00483}{bind\+Args()}}, \mbox{\hyperlink{coerce_8c_source_l01351}{dense\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{forceCanonical_8c_source_l00007}{dense\+\_\+force\+\_\+canonical()}}, \mbox{\hyperlink{isCanonical_8c_source_l00007}{dense\+\_\+is\+\_\+canonical()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_source_l00037}{dense\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00377}{dense\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{coerce_8c_source_l01745}{diagonal\+\_\+as\+\_\+sparse()}}, \mbox{\hyperlink{coerce_8c_source_l03281}{diagonal\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{subscript_8c_source_l00252}{diagonal\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00585}{diagonal\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{aggregate_8c_source_l00005}{sparse\+\_\+aggregate()}}, \mbox{\hyperlink{coerce_8c_source_l02731}{sparse\+\_\+as\+\_\+\+Csparse()}}, \mbox{\hyperlink{coerce_8c_source_l00414}{sparse\+\_\+as\+\_\+dense()}}, \mbox{\hyperlink{coerce_8c_source_l02298}{sparse\+\_\+as\+\_\+general()}}, \mbox{\hyperlink{coerce_8c_source_l02847}{sparse\+\_\+as\+\_\+\+Rsparse()}}, \mbox{\hyperlink{coerce_8c_source_l03143}{sparse\+\_\+as\+\_\+\+Vector()}}, \mbox{\hyperlink{band_8c_source_l00095}{sparse\+\_\+band()}}, \mbox{\hyperlink{diag_8c_source_l00080}{sparse\+\_\+diag\+\_\+get()}}, \mbox{\hyperlink{diag_8c_source_l00271}{sparse\+\_\+diag\+\_\+set()}}, \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}, \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}, \mbox{\hyperlink{subscript_8c_source_l00128}{sparse\+\_\+subscript\+\_\+1ary()}}, \mbox{\hyperlink{subscript_8c_source_l00465}{sparse\+\_\+subscript\+\_\+1ary\+\_\+2col()}}, \mbox{\hyperlink{subscript_8c_source_l01037}{sparse\+\_\+subscript\+\_\+2ary()}}, \mbox{\hyperlink{t_8c_source_l00052}{sparse\+\_\+transpose()}}, \mbox{\hyperlink{coerce_8c_source_l00750}{Vector\+\_\+as\+\_\+sparse()}}, and \mbox{\hyperlink{coerce_8c_source_l03044}{vector\+\_\+as\+\_\+\+Vector()}}.
+
+\Hypertarget{M5_8h_a4ba1d6dcf40cba1e813ac38feb1718e8}\index{M5.h@{M5.h}!zASSIGN\_CONJ@{zASSIGN\_CONJ}}
+\index{zASSIGN\_CONJ@{zASSIGN\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zASSIGN\_CONJ}{zASSIGN\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a4ba1d6dcf40cba1e813ac38feb1718e8} 
+\#define z\+ASSIGN\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ =\ (y).r,\ (x).i\ =\ -\/(y).i)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00172}{172}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_a0fef0b66b6430642bad9b3df04fede56}\index{M5.h@{M5.h}!zASSIGN\_IDEN@{zASSIGN\_IDEN}}
+\index{zASSIGN\_IDEN@{zASSIGN\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zASSIGN\_IDEN}{zASSIGN\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a0fef0b66b6430642bad9b3df04fede56} 
+\#define z\+ASSIGN\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ (y))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00166}{166}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_aa3716923dfc34571e2eda24878672fb9}\index{M5.h@{M5.h}!zASSIGN\_PROJ\_IMAG@{zASSIGN\_PROJ\_IMAG}}
+\index{zASSIGN\_PROJ\_IMAG@{zASSIGN\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zASSIGN\_PROJ\_IMAG}{zASSIGN\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_aa3716923dfc34571e2eda24878672fb9} 
+\#define z\+ASSIGN\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ =\ 0.0,\ (x).i\ =\ (y).i)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00184}{184}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a50af3ee08ae4b6281266e9cefa65bc1d}\index{M5.h@{M5.h}!zASSIGN\_PROJ\_REAL@{zASSIGN\_PROJ\_REAL}}
+\index{zASSIGN\_PROJ\_REAL@{zASSIGN\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zASSIGN\_PROJ\_REAL}{zASSIGN\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a50af3ee08ae4b6281266e9cefa65bc1d} 
+\#define z\+ASSIGN\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ =\ (y).r,\ (x).i\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00178}{178}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{forceSymmetric_8c_source_l00083}{sparse\+\_\+force\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_a830082757b8d8202e3f777bbb27af1b0}\index{M5.h@{M5.h}!zDECREMENT\_CONJ@{zDECREMENT\_CONJ}}
+\index{zDECREMENT\_CONJ@{zDECREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zDECREMENT\_CONJ}{zDECREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a830082757b8d8202e3f777bbb27af1b0} 
+\#define z\+DECREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ (x).r\ -\/=\ (y).r;\ (x).i\ +=\ (y).i;\ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00273}{273}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a12793802acf9c35651b4ff907049cc0d}\index{M5.h@{M5.h}!zDECREMENT\_IDEN@{zDECREMENT\_IDEN}}
+\index{zDECREMENT\_IDEN@{zDECREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zDECREMENT\_IDEN}{zDECREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a12793802acf9c35651b4ff907049cc0d} 
+\#define z\+DECREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).r\ -\/=\ (y).r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).i\ -\/=\ (y).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00263}{263}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a5887daaed2c9f157fab77ab060bca9d7}\index{M5.h@{M5.h}!zDIVIDE@{zDIVIDE}}
+\index{zDIVIDE@{zDIVIDE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zDIVIDE}{zDIVIDE}}
+{\footnotesize\ttfamily \label{M5_8h_a5887daaed2c9f157fab77ab060bca9d7} 
+\#define z\+DIVIDE(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ (x).r\ /=\ a;\ (x).i\ /=\ a;\ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00288}{288}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a25bb1db4892b4a8f38241be68e5b6dc1}\index{M5.h@{M5.h}!zIF\_NPATTERN@{zIF\_NPATTERN}}
+\index{zIF\_NPATTERN@{zIF\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zIF\_NPATTERN}{zIF\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_a25bb1db4892b4a8f38241be68e5b6dc1} 
+\#define z\+IF\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00052}{52}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abb81ebcdde3b37a24bc07d793c8198e8}\index{M5.h@{M5.h}!zIFELSE\_NPATTERN@{zIFELSE\_NPATTERN}}
+\index{zIFELSE\_NPATTERN@{zIFELSE\_NPATTERN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zIFELSE\_NPATTERN}{zIFELSE\_NPATTERN}}
+{\footnotesize\ttfamily \label{M5_8h_abb81ebcdde3b37a24bc07d793c8198e8} 
+\#define z\+IFELSE\+\_\+\+NPATTERN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00058}{58}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab58cd18a3753d777bf07d0bba230e264}\index{M5.h@{M5.h}!zINCREMENT\_CONJ@{zINCREMENT\_CONJ}}
+\index{zINCREMENT\_CONJ@{zINCREMENT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zINCREMENT\_CONJ}{zINCREMENT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_ab58cd18a3753d777bf07d0bba230e264} 
+\#define z\+INCREMENT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ (x).r\ +=\ (y).r;\ (x).i\ -\/=\ (y).i;\ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00230}{230}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a2718c5c8bcb6d4d9e4c6251a60345176}\index{M5.h@{M5.h}!zINCREMENT\_IDEN@{zINCREMENT\_IDEN}}
+\index{zINCREMENT\_IDEN@{zINCREMENT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zINCREMENT\_IDEN}{zINCREMENT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a2718c5c8bcb6d4d9e4c6251a60345176} 
+\#define z\+INCREMENT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).r\ +=\ (y).r;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (x).i\ +=\ (y).i;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00220}{220}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a900ef6ac282f2ba57fdaf025f267b30a}\index{M5.h@{M5.h}!zMULTIPLY@{zMULTIPLY}}
+\index{zMULTIPLY@{zMULTIPLY}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zMULTIPLY}{zMULTIPLY}}
+{\footnotesize\ttfamily \label{M5_8h_a900ef6ac282f2ba57fdaf025f267b30a} 
+\#define z\+MULTIPLY(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{a}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{do}\ \{\ (x).r\ *=\ a;\ (x).i\ *=\ a;\ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00280}{280}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ae4b49936b8d64070ecc5d57bbf950499}\index{M5.h@{M5.h}!zNA@{zNA}}
+\index{zNA@{zNA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNA}{zNA}}
+{\footnotesize\ttfamily \label{M5_8h_ae4b49936b8d64070ecc5d57bbf950499} 
+\#define z\+NA~\mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\+\_\+zna}}}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00040}{40}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1a77db2b94600013da850d4827316a56}\index{M5.h@{M5.h}!zNAME@{zNAME}}
+\index{zNAME@{zNAME}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNAME}{zNAME}}
+{\footnotesize\ttfamily \label{M5_8h_a1a77db2b94600013da850d4827316a56} 
+\#define z\+NAME(\begin{DoxyParamCaption}\item[{}]{s}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{z\ \#\#\ s}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00046}{46}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ad5a872a6452783ecfaf83bac86c9cc0a}\index{M5.h@{M5.h}!zNOT\_CONJ@{zNOT\_CONJ}}
+\index{zNOT\_CONJ@{zNOT\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_CONJ}{zNOT\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_ad5a872a6452783ecfaf83bac86c9cc0a} 
+\#define z\+NOT\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (((ISNAN((x).r))\ ?\ !ISNAN((y).r)\ :\ ISNAN((y).r)\ ||\ (x).r\ !=\ \ (y).r)\ ||\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ ((ISNAN((x).i))\ ?\ !ISNAN((y).i)\ :\ ISNAN((y).i)\ ||\ (x).i\ !=\ -\/(y).i))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00116}{116}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_add1dceabd87334c8e702b515f3ad7007}\index{M5.h@{M5.h}!zNOT\_IDEN@{zNOT\_IDEN}}
+\index{zNOT\_IDEN@{zNOT\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_IDEN}{zNOT\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_add1dceabd87334c8e702b515f3ad7007} 
+\#define z\+NOT\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ (((ISNAN((x).r))\ ?\ !ISNAN((y).r)\ :\ ISNAN((y).r)\ ||\ (x).r\ !=\ (y).r)\ ||\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ ((ISNAN((x).i))\ ?\ !ISNAN((y).i)\ :\ ISNAN((y).i)\ ||\ (x).i\ !=\ (y).i))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00104}{104}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_af5f69df3b7fae0df691ab29fac6d0ee4}\index{M5.h@{M5.h}!zNOT\_NA@{zNOT\_NA}}
+\index{zNOT\_NA@{zNOT\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_NA}{zNOT\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_af5f69df3b7fae0df691ab29fac6d0ee4} 
+\#define z\+NOT\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(!ISNAN((x).r)\ \&\&\ !ISNAN((x).i))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00094}{94}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a7688b0a6824e267a657bc4875e1d19ca}\index{M5.h@{M5.h}!zNOT\_UNIT@{zNOT\_UNIT}}
+\index{zNOT\_UNIT@{zNOT\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_UNIT}{zNOT\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a7688b0a6824e267a657bc4875e1d19ca} 
+\#define z\+NOT\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ !=\ 1.0\ ||\ (x).i\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00088}{88}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a618ac6d497c81cc8d64dede477bf6275}\index{M5.h@{M5.h}!zNOT\_ZERO@{zNOT\_ZERO}}
+\index{zNOT\_ZERO@{zNOT\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_ZERO}{zNOT\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a618ac6d497c81cc8d64dede477bf6275} 
+\#define z\+NOT\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ !=\ 0.0\ ||\ (x).i\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00064}{64}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_ae6c54c44c983ef76b82fbe39c816d03d}\index{M5.h@{M5.h}!zNOT\_ZERO\_IMAG@{zNOT\_ZERO\_IMAG}}
+\index{zNOT\_ZERO\_IMAG@{zNOT\_ZERO\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_ZERO\_IMAG}{zNOT\_ZERO\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_ae6c54c44c983ef76b82fbe39c816d03d} 
+\#define z\+NOT\+\_\+\+ZERO\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).i\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00076}{76}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{isSymmetric_8c_source_l00011}{dense\+\_\+is\+\_\+symmetric()}}, and \mbox{\hyperlink{isSymmetric_8c_source_l00138}{sparse\+\_\+is\+\_\+symmetric()}}.
+
+\Hypertarget{M5_8h_aa6bbd064f18ea4dda444c408aaff217d}\index{M5.h@{M5.h}!zNOT\_ZERO\_REAL@{zNOT\_ZERO\_REAL}}
+\index{zNOT\_ZERO\_REAL@{zNOT\_ZERO\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_ZERO\_REAL}{zNOT\_ZERO\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_aa6bbd064f18ea4dda444c408aaff217d} 
+\#define z\+NOT\+\_\+\+ZERO\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ !=\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00070}{70}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a57153fc895018c0bce621ba1255209ba}\index{M5.h@{M5.h}!zNOT\_ZERO\_TOL@{zNOT\_ZERO\_TOL}}
+\index{zNOT\_ZERO\_TOL@{zNOT\_ZERO\_TOL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zNOT\_ZERO\_TOL}{zNOT\_ZERO\_TOL}}
+{\footnotesize\ttfamily \label{M5_8h_a57153fc895018c0bce621ba1255209ba} 
+\#define z\+NOT\+\_\+\+ZERO\+\_\+\+TOL(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{tol}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(ISNAN((x).r)\ ||\ ISNAN((x).i)\ ||\ hypot((x).r,\ (x).i)\ >\ tol)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00082}{82}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_abe0d335dc1d1895cac0b91e860492d8a}\index{M5.h@{M5.h}!zPTR@{zPTR}}
+\index{zPTR@{zPTR}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zPTR}{zPTR}}
+{\footnotesize\ttfamily \label{M5_8h_abe0d335dc1d1895cac0b91e860492d8a} 
+\#define z\+PTR~COMPLEX}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00022}{22}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6cfaf8e16db91dc2e16d1a5b6f55896d}\index{M5.h@{M5.h}!zSET\_CONJ@{zSET\_CONJ}}
+\index{zSET\_CONJ@{zSET\_CONJ}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_CONJ}{zSET\_CONJ}}
+{\footnotesize\ttfamily \label{M5_8h_a6cfaf8e16db91dc2e16d1a5b6f55896d} 
+\#define z\+SET\+\_\+\+CONJ(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).i\ =\ -\/(x).i)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00148}{148}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a42ffecc64d44161975f7a2f207b49216}\index{M5.h@{M5.h}!zSET\_IDEN@{zSET\_IDEN}}
+\index{zSET\_IDEN@{zSET\_IDEN}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_IDEN}{zSET\_IDEN}}
+{\footnotesize\ttfamily \label{M5_8h_a42ffecc64d44161975f7a2f207b49216} 
+\#define z\+SET\+\_\+\+IDEN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00142}{142}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a527b61cbabb94d3d541fbdf1da757a71}\index{M5.h@{M5.h}!zSET\_NA@{zSET\_NA}}
+\index{zSET\_NA@{zSET\_NA}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_NA}{zSET\_NA}}
+{\footnotesize\ttfamily \label{M5_8h_a527b61cbabb94d3d541fbdf1da757a71} 
+\#define z\+SET\+\_\+\+NA(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ \mbox{\hyperlink{init_8c_a8c55f744d0000faee99c13bf98e33022}{Matrix\_zna}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00136}{136}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a1f2334abd0f859fb2b5e437b910f8a9f}\index{M5.h@{M5.h}!zSET\_PROJ\_IMAG@{zSET\_PROJ\_IMAG}}
+\index{zSET\_PROJ\_IMAG@{zSET\_PROJ\_IMAG}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_PROJ\_IMAG}{zSET\_PROJ\_IMAG}}
+{\footnotesize\ttfamily \label{M5_8h_a1f2334abd0f859fb2b5e437b910f8a9f} 
+\#define z\+SET\+\_\+\+PROJ\+\_\+\+IMAG(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).r\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00160}{160}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a71f932fa49dc7acd130293a2052165fc}\index{M5.h@{M5.h}!zSET\_PROJ\_REAL@{zSET\_PROJ\_REAL}}
+\index{zSET\_PROJ\_REAL@{zSET\_PROJ\_REAL}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_PROJ\_REAL}{zSET\_PROJ\_REAL}}
+{\footnotesize\ttfamily \label{M5_8h_a71f932fa49dc7acd130293a2052165fc} 
+\#define z\+SET\+\_\+\+PROJ\+\_\+\+REAL(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x).i\ =\ 0.0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00154}{154}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a708569d1ce8485f458cb7b2201533d58}\index{M5.h@{M5.h}!zSET\_UNIT@{zSET\_UNIT}}
+\index{zSET\_UNIT@{zSET\_UNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_UNIT}{zSET\_UNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a708569d1ce8485f458cb7b2201533d58} 
+\#define z\+SET\+\_\+\+UNIT(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ \mbox{\hyperlink{init_8c_a83c79a44063ff24ef06cca12140e2e3c}{Matrix\_zunit}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00130}{130}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_ab1d2d03974dcaad165b90e5675e18de9}\index{M5.h@{M5.h}!zSET\_ZERO@{zSET\_ZERO}}
+\index{zSET\_ZERO@{zSET\_ZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zSET\_ZERO}{zSET\_ZERO}}
+{\footnotesize\ttfamily \label{M5_8h_ab1d2d03974dcaad165b90e5675e18de9} 
+\#define z\+SET\+\_\+\+ZERO(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((x)\ =\ \mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\_zzero}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00124}{124}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a6df6ea7eaeadf0cadb226fc2cb14f888}\index{M5.h@{M5.h}!zTYPE@{zTYPE}}
+\index{zTYPE@{zTYPE}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zTYPE}{zTYPE}}
+{\footnotesize\ttfamily \label{M5_8h_a6df6ea7eaeadf0cadb226fc2cb14f888} 
+\#define z\+TYPE~Rcomplex}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00010}{10}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a61621629ba48d36f5f24b049a3c71eac}\index{M5.h@{M5.h}!zTYPESXP@{zTYPESXP}}
+\index{zTYPESXP@{zTYPESXP}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zTYPESXP}{zTYPESXP}}
+{\footnotesize\ttfamily \label{M5_8h_a61621629ba48d36f5f24b049a3c71eac} 
+\#define z\+TYPESXP~CPLXSXP}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00016}{16}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a34c5175cbd3ed960cd264d05c2bb8a8d}\index{M5.h@{M5.h}!zUNIT@{zUNIT}}
+\index{zUNIT@{zUNIT}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zUNIT}{zUNIT}}
+{\footnotesize\ttfamily \label{M5_8h_a34c5175cbd3ed960cd264d05c2bb8a8d} 
+\#define z\+UNIT~\mbox{\hyperlink{init_8c_a83c79a44063ff24ef06cca12140e2e3c}{Matrix\+\_\+zunit}}}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00034}{34}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
+\Hypertarget{M5_8h_a971c007207b1d593ec9bbdfb0ebb5a46}\index{M5.h@{M5.h}!zZERO@{zZERO}}
+\index{zZERO@{zZERO}!M5.h@{M5.h}}
+\doxysubsubsection{\texorpdfstring{zZERO}{zZERO}}
+{\footnotesize\ttfamily \label{M5_8h_a971c007207b1d593ec9bbdfb0ebb5a46} 
+\#define z\+ZERO~\mbox{\hyperlink{init_8c_ab8af4c7a5d3132fbaa6618a928ad1a62}{Matrix\+\_\+zzero}}}
+
+
+
+Definition at line \mbox{\hyperlink{M5_8h_source_l00028}{28}} of file \mbox{\hyperlink{M5_8h_source}{M5.\+h}}.
+
