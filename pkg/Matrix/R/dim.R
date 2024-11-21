@@ -3,7 +3,7 @@ function(d)
     .Call(R_Dim_validate, d)
 
 validDimGetsValue <-
-function(value, mn) {
+function(value, dim, len = .Call(R_Dim_prod, as.integer(dim))) {
     if (mode(value) != "numeric")
         gettextf("assigned dimensions are not of type \"%s\" or \"%s\"",
                  "integer", "double")
@@ -15,17 +15,17 @@ function(value, mn) {
     else if (min(value) <= -1L)
         gettext("assigned dimensions are negative")
     else if (is.double(value) &&
-             max(value <- trunc(value)) - 1 >= .Machine[["integer.max"]])
+             max(value) - 1 >= .Machine[["integer.max"]])
         gettextf("assigned dimensions exceed %s",
                  "2^31-1")
-    else if ((p <- prod(value)) != mn)
-        gettextf("assigned dimensions [product %.0f] do not match object length [%.0f]",
-                 p, as.double(mn))
-    else TRUE
+    else if (!identical(p <- .Call(R_Dim_prod, as.integer(value)), len))
+        gettextf("product of assigned dimensions [%.0f] is not equal to object length [%.0f]",
+                 p, len)
+    else as.integer(value)
 }
 
 validLengthGetsValue <-
-function(value, mn) {
+function(value, max) {
     if (mode(value) != "numeric")
         gettextf("assigned length is not of type \"%s\" or \"%s\"",
                  "integer", "double")
@@ -37,10 +37,10 @@ function(value, mn) {
     else if (value <= -1L)
         gettext("assigned length is negative")
     else if (is.double(value) &&
-             (value <- trunc(value)) - 1 >= 0x1p+52)
+             value - 1 >= max)
         gettextf("assigned length exceeds %.0f",
-                 0x1p+52)
-    else TRUE
+                 max)
+    else (if (is.double(value)) trunc else as.integer)(value)
 }
 
 validDN <-
@@ -109,10 +109,9 @@ setMethod("dim", c(x = "sparseVector"),
 setMethod("dim<-", c(x = "denseMatrix", value = "numeric"),
           function(x, value) {
               d <- x@Dim
-              s <- validDimGetsValue(value, prod(d))
-              if (is.character(s))
-                 stop(s, domain = NA)
-              value <- as.integer(value)
+              value <- validDimGetsValue(value, d)
+              if (is.character(value))
+                 stop(value, domain = NA)
               if (all(value == d))
                   return(x)
               r <- new(paste0(.M.kind(x), "geMatrix"))
@@ -124,10 +123,9 @@ setMethod("dim<-", c(x = "denseMatrix", value = "numeric"),
 setMethod("dim<-", c(x = "sparseMatrix", value = "numeric"),
           function(x, value) {
               d <- x@Dim
-              s <- validDimGetsValue(value, prod(d))
-              if (is.character(s))
-                 stop(s, domain = NA)
-              value <- as.integer(value)
+              value <- validDimGetsValue(value, d)
+              if (is.character(value))
+                 stop(value, domain = NA)
               if (all(value == d))
                   return(x)
               cl <- switch(.M.repr(x),
@@ -141,10 +139,9 @@ setMethod("dim<-", c(x = "sparseMatrix", value = "numeric"),
 
 setMethod("dim<-", c(x = "sparseVector", value = "numeric"),
           function(x, value) {
-              s <- validDimGetsValue(value, length(x))
-              if (is.character(s))
-                 stop(s, domain = NA)
-              value <- as.integer(value)
+              value <- validDimGetsValue(value, len = length(x))
+              if (is.character(value))
+                 stop(value, domain = NA)
               .V2sparse(x, ".gC", nrow = value[1L], ncol = value[2L])
           })
 
@@ -173,21 +170,58 @@ rm(.cl)
 ## METHODS FOR GENERIC: length<-
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-for (.cl in c("denseMatrix", "sparseMatrix", "sparseVector"))
-setMethod("length<-", c(x = .cl, value = "numeric"),
+setMethod("length<-", c(x = "denseMatrix", value = "numeric"),
           function(x, value) {
+              value <- validLengthGetsValue(value, 0x1p+52)
+              if (is.character(value))
+                  stop(value, domain = NA)
               mn <- length(x)
-              s <- validLengthGetsValue(value, mn)
-              if (is.character(s))
-                  stop(s, domain = NA)
-              if (is.double(value))
-                  value <- trunc(value)
               if (value == mn)
                   x
-              else x[seq_len(value)]
+              else `length<-`(.M2v(x), value)
           })
 
-rm(.cl)
+setMethod("length<-", c(x = "sparseMatrix", value = "numeric"),
+          function(x, value) {
+              value <- validLengthGetsValue(value, 0x1p+53)
+              if (is.character(value))
+                  stop(value, domain = NA)
+              mn <- length(x)
+              if (value == mn)
+                  x
+              else `length<-`(.M2V(x), value)
+          })
+
+setMethod("length<-", c(x = "sparseVector", value = "numeric"),
+          function(x, value) {
+              value <- validLengthGetsValue(value, 0x1p+53)
+              if (is.character(value))
+                  stop(value, domain = NA)
+              mn <- length(x)
+              if (value == mn)
+                  return(x)
+              i <- x@i
+              kind <- .M.kind(x)
+              y <- new(paste0(kind, "sparseVector"))
+              y@length <- value
+              if (mn < value) {
+                  y@i <- c(i, seq.int(from = mn + 1L, to = value))
+                  if (kind != "n")
+                      y@x <- c(x@x, rep.int(x@x[NA_integer_], value - mn))
+              } else if (length(i) > 0L) {
+                  if (i[length(i)] - 1L < value) {
+                  y@i <- i
+                  if (kind != "n")
+                      y@x <- x@x
+                  } else {
+                  k <- which(i - 1L < value)
+                  y@i <- i[k]
+                  if (kind != "n")
+                      y@x <- x@x[k]
+                  }
+              }
+              y
+          })
 
 
 ## METHODS FOR GENERIC: dimnames
