@@ -4,8 +4,10 @@
 .subscript.invalid <-
 function(i) {
     if (is.object(i))
-        gettextf("invalid subscript class \"%s\"", class(i)[1L])
-    else gettextf("invalid subscript type \"%s\"", typeof(i))
+        gettextf("invalid subscript class \"%s\"",
+                 class(i)[1L])
+    else gettextf("invalid subscript type \"%s\"",
+                  typeof(i))
 }
 
 .subscript.recycle <-

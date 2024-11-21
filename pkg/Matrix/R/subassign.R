@@ -15,9 +15,11 @@
 ##               diagonalMatrix,indMatrix
 
 .subassign.invalid <- function(value) {
-    if (is.object(i))
-        gettextf("invalid subassignment value class \"%s\"", class(i)[1L])
-    else gettextf("invalid subassignment value type \"%s\"", typeof(i))
+    if (is.object(value))
+        gettextf("invalid subassignment value class \"%s\"",
+                 class(value)[1L])
+    else gettextf("invalid subassignment value type \"%s\"",
+                  typeof(value))
 }
 
 if (FALSE) { # TODO
