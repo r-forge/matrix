@@ -502,24 +502,24 @@ setMethod("[",
                              trunc. <-
                              function(x)
                                  if (is.double(x)) trunc(x) else x
-                             x.i <- trunc.(x@i)
+
                              r <- min(1L, i, na.rm = TRUE)
                              if (r <= -1L) {
-                                 if (r <= -x.length - 1L)
-                                     i <- i[i > -x.length - 1L]
+                                 if (r + 1L <= -x.length)
+                                     i <- i[i + 1L > -x.length]
                                  r <- max(-1L, i)
                                  if (is.na(r) || r >= 1L)
                                      stop("only zeros may be mixed with negative subscripts")
                                  if (r > -1L)
                                      i <- i[i <= -1L]
                                  d <- unique.default(sort.int(-trunc.(i)))
-                                 m <- match(x.i, d, 0L)
+                                 m <- match(trunc.(x@i), d, 0L)
                                  y <- new(paste0(kind, "sparseVector"))
-                                 y@length <- length(x) - length(d)
+                                 y@length <- x.length - length(d)
                                  y@i <-
                                      {
-                                         tmp <- x.i[m == 0L]
-                                         tmp - findInterval(tmp, d) # !!
+                                         tmp <- x@i[m == 0L]
+                                         tmp - findInterval(tmp, d)
                                      }
                                  if (kind != "n")
                                      y@x <- x@x[m == 0L]
@@ -527,7 +527,8 @@ setMethod("[",
                              } else {
                                  if (r < 1L)
                                      i <- i[i >= 1L]
-                                 if (max(0L, i, na.rm = TRUE) - 1L >= x.length)
+                                 r <- max(0L, i, na.rm = TRUE)
+                                 if (r - 1L >= x.length)
                                      i[i - 1L >= x.length] <- NA
                                  a <- anyNA(i)
                                  if (a && kind == "n") {
@@ -535,7 +536,7 @@ setMethod("[",
                                      kind <- "l"
                                  }
                                  d <- trunc.(i)
-                                 m <- match(d, x.i, 0L)
+                                 m <- match(d, trunc.(x@i), 0L)
                                  y <- new(paste0(kind, "sparseVector"))
                                  y@length <- length(i)
                                  y@i <-

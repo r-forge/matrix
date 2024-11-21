@@ -14,13 +14,13 @@
 ##               CsparseMatrix,RsparseMatrix,TsparseMatrix,
 ##               diagonalMatrix,indMatrix
 
-if (FALSE) { # TODO
 .subassign.invalid <- function(value) {
     if (is.object(i))
         gettextf("invalid subassignment value class \"%s\"", class(i)[1L])
     else gettextf("invalid subassignment value type \"%s\"", typeof(i))
 }
 
+if (FALSE) { # TODO
 .subassign.1ary <- function(x, i, value) {
 
 }
@@ -102,6 +102,7 @@ setMethod("[<-",
                   ## x[i=, j=, ], etc. <- value
                   stop("incorrect number of dimensions")
           })
+} # TODO
 
 setMethod("[<-",
           c(x = "sparseVector", i = "missing", j = "missing", value = "ANY"),
@@ -118,7 +119,7 @@ setMethod("[<-",
               }
               else
                   value <- switch(typeof(value),
-                                  logical =,
+                                  logical = .m2V(value, .M.kind(x)),
                                   integer =,
                                   double =,
                                   complex = .m2V(value),
@@ -152,13 +153,14 @@ setMethod("[<-",
               }
               else
                   value <- switch(typeof(value),
-                                  logical =,
+                                  logical = .m2V(value, .M.kind(x)),
                                   integer =,
                                   double =,
                                   complex = .m2V(value),
                                   stop(.subassign.invalid(value), domain = NA))
               x.length <- length(x)
               value.length <- length(value)
+              maybeDuplicated <- TRUE
               if (is.null(i))
                   i <- integer(0L)
               else if (typeof(i) == "S4") {
@@ -183,13 +185,13 @@ setMethod("[<-",
                           else if (kind == "n")
                               i@i
                           else i@i[i@x]
+                  maybeDuplicated <- !.isV || kind == "i" || kind == "d"
               }
               else if (is.object(i))
                   i <- switch(typeof(i),
                               double =,
                               integer =,
-                              logical =,
-                              character = as.vector(i),
+                              logical = as.vector(i),
                               i)
               x.kind <- .M.kind(x)
               value.kind <- kind <- .M.kind(value)
@@ -203,29 +205,108 @@ setMethod("[<-",
                   }
               }
               switch(typeof(i),
+                     double =,
+                     integer =
+                         {
+                             trunc. <-
+                             function(x)
+                                 if (is.double(x)) trunc(x) else x
+
+                             r <- min(1L, i, na.rm = TRUE)
+                             if (r <= -1L) {
+                                 if (r + 1L <= -x.length)
+                                     i <- i[i + 1L > -x.length]
+                                 r <- max(-1L, i)
+                                 if (is.na(r) || r >= 1L)
+                                     stop("only zeros may be mixed with negative subscripts")
+                                 if (r > -1L)
+                                     i <- i[i <= -1L]
+                                 d <- unique.default(sort.int(-trunc.(i)))
+                                 i.length <- x.length - length(d)
+                                 if (i.length == 0L)
+                                     return(x)
+                                 if (value.length == 0L)
+                                     stop("replacement has length zero")
+                                 if (i.length %% value.length != 0L)
+                                     warning("number of items to replace is not a multiple of replacement length")
+                                 value <- .V.rep.len(value, i.length)
+                                 m <- match(trunc.(x@i), d, 0L)
+                                 b <- d - seq.int(from = 0L, length.out = length(d))
+                                 y <- new(paste0(kind, "sparseVector"))
+                                 y@length <- x.length
+                                 ii <- c(x@i[m > 0L],
+                                         {
+                                             tmp <- value@i
+                                             tmp + findInterval(tmp, b)
+                                         })
+                                 if (kind == "n")
+                                     y@i <- sort.int(ii)
+                                 else {
+                                     oo <- sort.list(ii)
+                                     y@i <- ii[oo]
+                                     y@x <- c(x@x[m > 0L], value@x)[oo]
+                                 }
+                                 y
+                             } else {
+                                 if (r < 1L)
+                                     i <- i[i >= 1L]
+                                 i.length <- length(i)
+                                 if (i.length > 0L) {
+                                 if (value.length == 0L)
+                                     stop("replacement has length zero")
+                                 if (anyNA(i)) {
+                                 if (value.length > 1L)
+                                     stop("NA subscripts are invalid in subassignment")
+                                 i <- i[!is.na(i)]
+                                 i.length <- length(i)
+                                 }
+                                 }
+                                 if (i.length == 0L)
+                                     return(x)
+                                 if (i.length %% value.length != 0L)
+                                     warning("number of items to replace is not a multiple of replacement length")
+                                 value <- .V.rep.len(value, i.length)
+                                 i.max <- max(i)
+                                 if (i.max - 1L >= x.length)
+                                     length(x) <- i.max
+                                 i. <- trunc.(i)
+                                 if (maybeDuplicated &&
+                                     anyDuplicated(i., fromLast = TRUE)) {
+                                     k <- which(!duplicated(i., fromLast = TRUE))
+                                     i. <- trunc.(i <- i[k])
+                                     value <- value[k]
+                                 }
+                                 m <- match(trunc.(x@i), i., 0L)
+                                 y <- new(paste0(kind, "sparseVector"))
+                                 y@length <- x.length
+                                 ii <- c(x@i[m == 0L], i[value@i])
+                                 if (kind == "n")
+                                     y@i <- sort.int(ii)
+                                 else {
+                                     oo <- sort.list(ii)
+                                     y@i <- ii[oo]
+                                     y@x <- c(x@x[m == 0L], value@x)[oo]
+                                 }
+                                 y
+                             }
+                         },
                      logical =
                          {
                              i.length <- length(i)
                              if (i.length > 0L && !is.na(a <- all(i)) && a) {
-                                 ## ...
+                                 if (value.length == 0L)
+                                     stop("replacement has length zero")
+                                 m.length <- max(i.length, x.length)
+                                 if (m.length %% value.length != 0L)
+                                     warning("number of items to replace is not a multiple of replacement length")
+                                 .V.rep.len(value, m.length)
+                             } else {
+                                 x[.m2V(i)] <- value # recursively
+                                 x
                              }
-                             else `[<-`(x, .m2V(i), value) # recursively
-                         },
-                     integer =
-                         {
-
-                         },
-                     double =
-                         {
-
-                         },
-                     character =
-                         {
-
                          },
                      stop(.subscript.invalid(i), domain = NA))
           })
-} # TODO
 
 
 ## ==== Matrix =========================================================
@@ -1541,125 +1622,3 @@ for (.j in c("missing", "index"))
 setMethod("[<-", c(x = "indMatrix", i = .i, j = .j, value = "ANY"),
                  .indMatrix.sub)
 rm(.indMatrix.sub, .i, .j)
-
-
-## ==== sparseVector ===================================================
-
-## This is a simplified intI() -- for sparseVector indexing:
-intIv <- function(i, n, cl.i = getClassDef(class(i))) {
-### Note: undesirable to use this for negative indices;
-### ----  using seq_len(n) below means we are  NON-sparse ...
-### Fixed, for "x[i] with negative i" at least.
-
-    ## Purpose: translate numeric | logical index     into  1-based integer
-    ## --------------------------------------------------------------------
-    ## Arguments: i: index vector (numeric | logical) *OR* sparseVector
-    ##		  n: array extent { ==	length(.) }
-    if(missing(i))
-	seq_len(n)
-    else if(extends(cl.i, "numeric")) {
-        ## not ok, when max(i) > .Machine$integer.max !  storage.mode(i) <- "integer"
-        int2i(i,n) ##-> ./Tsparse.R
-    }
-    else if (extends(cl.i, "logical")) {
-	seq_len(n)[i]
-    } else if(extends(cl.i, "nsparseVector")) {
-	i@i # the indices are already there !
-    } else if(extends(cl.i, "lsparseVector")) {
-	i@i[i@x] # "drop0", i.e. FALSE; NAs ok
-    } else if (extends(cl.i, "sparseVector")) { ## 'i'sparse, 'd'sparse	 (etc)
-	as.integer(i@x[i@i])
-    }
-    else
-        stop("index must be numeric, logical or sparseVector for indexing sparseVectors")
-} ## intIv()
-
-replSPvec <- function (x, i, value) {
-    n <- x@length
-    ii <- intIv(i, n)
-    lenRepl <- length(ii)
-    if(!lenRepl) return(x)
-    ## else:  lenRepl = length(ii) > 0
-    lenV <- length(value)
-    if(lenV == 0)
-        stop("nothing to replace with")
-    ## else: lenV := length(value) > 0
-    if(lenRepl %% lenV != 0)
-	stop("number of items to replace is not a multiple of replacement length")
-    if(anyDuplicated(ii)) { ## multiple *replacement* indices: last one wins
-	## TODO: in R 2.6.0 use	 duplicate(*, fromLast=TRUE)
-	ir <- lenRepl:1
-	keep <- match(ii, ii[ir]) == ir
-	ii <- ii[keep]
-	lenV <- length(value <- rep(value, length.out = lenRepl)[keep])
-	lenRepl <- length(ii)
-    }
-
-    has.x <- .hasSlot(x, "x")## has "x" slot
-    m <- match(x@i, ii, nomatch = 0)
-    sel <- m > 0L
-
-    ## the simplest case
-    if(all0(value)) { ## just drop the non-zero entries
-	if(any(sel)) { ## non-zero there
-	    x@i <- x@i[!sel]
-	    if(has.x)
-		x@x <- x@x[!sel]
-	}
-	return(x)
-    }
-    ## else --	some( value != 0 ) --
-    if(lenV > lenRepl)
-	stop("too many replacement values")
-    else if(lenV < lenRepl)
-	value <- rep(value, length.out = lenRepl)
-    ## now:  length(value) == lenRepl > 0
-
-    v0 <- is0(value)
-    ## value[1:lenRepl]:  which are structural 0 now, which not?
-    v.sp <- inherits(value, "sparseVector")
-
-    if(any(sel)) {
-	## indices of non-zero entries -- WRT to subvector
-	iN0 <- m[sel] ## == match(x@i[sel], ii)
-
-	## 1a) replace those that are already non-zero with new val.
-	vN0 <- !v0[iN0]
-	if(any(vN0) && has.x) {
-	    vs <- value[iN0[vN0]]
-	    x@x[sel][vN0] <- if(v.sp) sp2vec(vs, mode=typeof(x@x)) else vs
-	}
-	## 1b) replace non-zeros with 0 --> drop entries
-	if(any(!vN0)) {
-	    i <- which(sel)[!vN0]
-	    if(has.x)
-		x@x <- x@x[-i]
-	    x@i <- x@i[-i]
-	}
-	iI0 <- if(length(iN0) < lenRepl) seq_len(lenRepl)[-iN0] # else NULL
-    } else iI0 <- seq_len(lenRepl)
-
-    if(length(iI0) && any(vN0 <- !v0[iI0])) {
-	## 2) add those that were structural 0 (where value != 0)
-	ij0 <- iI0[vN0]
-	ii <- c(x@i, ii[ij0]) # new x@i, must be sorted:
-	iInc <- sort.list(ii)
-	x@i <- ii[iInc]
-	if(has.x) # new @x, sorted along '@i':
-	    x@x <- c(x@x, if(v.sp)
-			      sp2vec(value[ij0], mode=typeof(x@x))
-			  else value[ij0]
-		     )[iInc]
-    }
-    x
-}
-
-setMethod("[<-", c(x = "sparseVector", i = "index", j = "missing",
-				value = "ANY"),
-		 replSPvec)
-
-setMethod("[<-", c(x = "sparseVector",
-                                i = "sparseVector", j = "missing",
-				value = "ANY"),
-                 ## BTW, the important case: 'i' a *logical* sparseVector
-		 replSPvec)

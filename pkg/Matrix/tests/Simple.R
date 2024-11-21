@@ -880,7 +880,7 @@ i1 <- cs. == 1
 cs2 <- cs.
 cs2[i1] <- 0 # failed in *-31 !!
 ## now *index* with a NA-sparseVector :
-i2 <- i1 ; i2[3] <- NA ; li2 <- as.logical(i2)
+i2 <- i1 ; i2[3L] <- NA ; li2 <- as.logical(i2)
 cs3 <- cs. ;	       cs3 [i2] <- 0
 v3 <- as(cs.,"vector"); v3[li2] <- 0
 cs4 <- cs.	     ; cs4[li2] <- 0
