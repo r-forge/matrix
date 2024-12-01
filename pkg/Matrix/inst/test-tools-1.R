@@ -93,11 +93,11 @@ all.equal.X <- function(x,y, except, tol = .Machine$double.eps^0.5, ...)
 ## e.g. in lme4:
 ##  all.equal.X(env(m1), env(m2), except = c("call", "frame"))
 
-## The relative error typically returned by all.equal:
-if(!exists("relErr", mode="function"))##  use sfsmisc::relErr  if {sfsmisc} is attached:
-relErr <- function(target, current) { ## make this work for 'Matrix' ==> no mean() ..
+##' @title The relative error typically returned by all.equal:
+##' @note a copy of  sfsmisc::relErr()  unchanged since 2021-03-10
+relErr <- function(target, current) { ## make this work, also for 'Matrix' ==> no mean() ..
     n <- length(current)
-    if(length(target) < n)
+    if(length(target) < n) # (as we don't use mean())
         target <- rep(target, length.out = n)
     sum(abs(target - current)) / sum(abs(target))
 }
@@ -109,21 +109,41 @@ relErr <- function(target, current) { ## make this work for 'Matrix' ==> no mean
 ##' @return *vector* of the same length as current
 ##' @author Martin Maechler
 ##'
-##' @note OUTDATED/SUPERSEDED by  sfsmisc::relErrV() which deals with Inf, denormalized, ...
-##'    ==> define it only if it does not exist visibly at this point:
-if(!exists("relErrV", mode="function"))
-relErrV <- function(target, current) {
+##' @note a copy of  sfsmisc::relErrV()  as of 2022-04-02
+relErrV <- function(target, current, eps0 = .Machine$double.xmin) {
     n <- length(target <- as.vector(target))
     ## assert( <length current> is multiple of <length target>) :
-    if(length(current) %% n)
+    lc <- length(current)
+    if(!n) {
+	if(!lc) return(numeric()) # everything length 0
+	else stop("length(target) == 0 differing from length(current)")
+    } else if(!lc)
+	stop("length(current) == 0 differing from length(target)")
+    ## else n, lc  > 0
+    if(lc %% n)
 	stop("length(current) must be a multiple of length(target)")
-    RE <- current
-    RE[] <- 0
-    fr <- current/target
-    neq <- is.na(current) | (current != target)
-    RE[neq] <- 1 - fr[neq]
-    RE
+    recycle <- (lc != n) # explicitly recycle
+    R <- if(recycle)
+	     target[rep(seq_len(n), length.out=lc)]
+	 else
+	     target # (possibly "mpfr")
+    R[] <- 0
+    ## use *absolute* error when target is zero {and deal with NAs}:
+    t0 <- abs(target) < eps0 & !(na.t <- is.na(target))
+    R[t0] <- current[t0]
+    ## absolute error also when it is infinite, as (-Inf, Inf) would give NaN:
+    dInf <- is.infinite(E <- current - target)
+    R[dInf] <- E[dInf]
+    useRE <- !dInf & !t0 & (na.t | is.na(current) | (current != target))
+    R[useRE] <- (current/target)[useRE] - 1
+    ## preserve {dim, dimnames, names}  from 'current' :
+    if(!is.null(d <- dim(current)))
+	array(R, dim=d, dimnames=dimnames(current))
+    else if(!is.null(nm <- names(current)) && is.null(names(R))) # not needed for mpfr
+	`names<-`(R, nm)
+    else R
 }
+
 
 ##' @title Number of correct digits: Based on relErrV(), recoding "Inf" to 'zeroDigs'
 ##' @param target  numeric vector of "true" values

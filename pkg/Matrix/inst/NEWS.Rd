@@ -132,6 +132,9 @@
 
       \item Warnings emitted by \option{-Wconversion} (but not those
       originating in SuiteSparse) are resolved.
+
+      \item \file{test-tools-1.R}: update \code{relErrV()}, and use it and
+      \code{relErr()} unconditionally to improve strict reproducibility.
     }
   }
 }
