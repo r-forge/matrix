@@ -1,4 +1,4 @@
-## NB: patterns are matched case insensitively
+## -*-sh-*-  using reg.exp (==> no initial or final '.*'),  but case is ignored!
 
 ## ~~~~ Not under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -15,7 +15,7 @@ _check_
 [A-Za-z][+][A-Za-z0-9]$
 M1mac
 Matrix_[1-9][0-9]*[.][0-9]
-.*_results
+_results
 TAGS
 _no_UFlong
 ^do-
@@ -23,7 +23,7 @@ _no_UFlong
 ^R/.*[.]R_+$
 ^misc$
 ^old$
-^src/SuiteSparse-.*$
+^src/SuiteSparse-
 ^tests/.*[.]Rout.*[24]b$
 ^tests/.*_(doExtra|nX)$
 

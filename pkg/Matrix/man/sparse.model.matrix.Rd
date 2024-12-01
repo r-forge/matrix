@@ -87,9 +87,9 @@ fac2Sparse(from, to = c("d", "l", "n"),
   (\code{\link{t}}) of the model matrix.
 }
 \note{
-  \code{model.Matrix(sparse = TRUE)} from package \CRANpkg{MatrixModels}
-  may be nowadays be preferable to \code{sparse.model.matrix},
-  as \code{model.Matrix} returns an object of class \code{modelMatrix}
+  \code{\link[MatrixModels]{model.Matrix}(sparse = TRUE)} from package
+  \CRANpkg{MatrixModels} may be preferable nowadays to \code{sparse.model.matrix},
+  as \code{model.Matrix} returns an object of class \code{\link[MatrixModels:modelMatrix-class]{modelMatrix}}
   with additional slots \code{assign} and \code{contrasts} relating to
   the model variables.
 }
@@ -114,8 +114,8 @@ dd <- data.frame(a = gl(3,4), b = gl(4,1,12))# balanced 2-way
 options("contrasts") # the default:  "contr.treatment"
 sparse.model.matrix(~ a + b, dd)
 sparse.model.matrix(~ -1+ a + b, dd)# no intercept --> even sparser
-sparse.model.matrix(~ a + b, dd, contrasts = list(a="contr.sum"))
-sparse.model.matrix(~ a + b, dd, contrasts = list(b="contr.SAS"))
+sparse.model.matrix(~ a + b, dd, contrasts.arg = list(a = "contr.sum"))
+sparse.model.matrix(~ a + b, dd, contrasts.arg = list(b = "contr.SAS"))
 
 ## Sparse method is equivalent to the traditional one :
 stopifnot(all(sparse.model.matrix(~    a + b, dd) ==
