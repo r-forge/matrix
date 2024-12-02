@@ -1,13 +1,3 @@
-## README:
-##
-## Validity methods should assume that methods for superclasses have passed,
-## following validObject(). We should _not_ be testing, e.g., length(Dim),
-## typeof(Dimnames), etc. repeatedly ...
-##
-## When checking whether a class is validated correctly, take care to follow
-## the 'contains' recursively!!
-
-
 ## initialize() method for Matrix and MatrixFactorization, which both
 ## allow Dimnames[[i]] to be a vector of type other than "character"
 ## and furthermore to be a vector of length zero rather than NULL ...
@@ -149,11 +139,9 @@ setClass("idenseMatrix",
 setClass("ddenseMatrix",
          contains = c("VIRTUAL", "dMatrix", "denseMatrix"))
 
-if(FALSE) { # --NOT YET--
 ## Virtual class of dense, complex matrices
 setClass("zdenseMatrix",
          contains = c("VIRTUAL", "zMatrix", "denseMatrix"))
-} # --NOT YET--
 
 
 ## ------ Virtual Sparse -----------------------------------------------
@@ -243,11 +231,9 @@ setClass("isparseMatrix",
 setClass("dsparseMatrix",
          contains = c("VIRTUAL", "dMatrix", "sparseMatrix"))
 
-if(FALSE) { # --NOT YET--
 ## Virtual class of sparse, complex matrices
 setClass("zsparseMatrix",
          contains = c("VIRTUAL", "zMatrix", "sparseMatrix"))
-} # --NOT YET--
 
 
 ## ====== Non-Virtual Subclasses =======================================
@@ -370,7 +356,6 @@ setClass("dtpMatrix",
          contains = c("packedMatrix", "ddenseMatrix", "triangularMatrix"))
 
 
-if(FALSE) { # --NOT YET--
 ## ...... Dense, complex ...............................................
 
 ## Unpacked, general
@@ -406,7 +391,6 @@ setClass("zppMatrix",
 ## Packed, triangular
 setClass("ztpMatrix",
          contains = c("packedMatrix", "zdenseMatrix", "triangularMatrix"))
-} # --NOT YET--
 
 
 ## ------ Non-Virtual Sparse -------------------------------------------
@@ -635,7 +619,6 @@ setClass("ddiMatrix",
          contains = c("diagonalMatrix", "dMatrix"))
 
 
-if(FALSE) { # --NOT YET--
 ## ...... Sparse, complex ..............................................
 
 ## CSC, general
@@ -706,8 +689,7 @@ setClass("ztTMatrix",
 
 ## Diagonal
 setClass("zdiMatrix",
-         contains = c("ziagonalMatrix", "zMatrix"))
-} # --NOT YET--
+         contains = c("diagonalMatrix", "zMatrix"))
 
 
 ## ...... Sparse, index ................................................
@@ -757,7 +739,6 @@ setClass("ddenseSchur",
          slots = c(x = "numeric", vectors = "numeric"),
          prototype = list(x = double(0L), vectors = double(0L)))
 
-if(FALSE)
 setClass("zdenseSchur",
          contains = "denseSchur",
          slots = c(x = "complex", vectors = "complex"),
@@ -779,7 +760,6 @@ setClass("ddenseQR",
          slots = c(x = "numeric", beta = "numeric"),
          prototype = list(x = double(0L), beta = double(0L)))
 
-if(FALSE)
 setClass("zdenseQR",
          contains = "denseQR",
          slots = c(x = "complex", beta = "complex"),
@@ -798,7 +778,6 @@ setClass("dsparseQR",
                           R = .new("dgCMatrix"),
                           beta = double(0L)))
 
-if(FALSE)
 setClass("zsparseQR",
          contains = "sparseQR",
          slots = c(V = "zgCMatrix", R = "zgCMatrix", beta = "numeric"),
@@ -822,7 +801,6 @@ setClass("ddenseLU",
          slots = c(x = "numeric"),
          prototype = list(x = double(0L)))
 
-if(FALSE)
 setClass("zdenseLU",
          contains = "denseLU",
          slots = c(x = "complex"),
@@ -840,7 +818,6 @@ setClass("dsparseLU",
          prototype = list(L = .new("dtCMatrix", uplo = "L"),
                           U = .new("dtCMatrix")))
 
-if(FALSE)
 setClass("zsparseLU",
          contains = "sparseLU",
          slots = c(L = "ztCMatrix", U = "ztCMatrix"),
@@ -864,7 +841,6 @@ setClass("ddenseBunchKaufman",
          slots = c(x = "numeric"),
          prototype = list(x = double(0L)))
 
-if(FALSE)
 setClass("zdenseBunchKaufman",
          contains = "denseBunchKaufman",
          slots = c(x = "complex", trans = "character"),
@@ -887,7 +863,6 @@ setClass("ddenseCholesky",
          slots = c(x = "numeric"),
          prototype = list(x = double(0L)))
 
-if(FALSE)
 setClass("zdenseCholesky",
          contains = "denseCholesky",
          slots = c(x = "complex"),
@@ -908,7 +883,6 @@ setClass("dsparseCholesky",
          slots = c(minor = "integer", x = "numeric"),
          prototype = list(minor = 0L, x = double(0L)))
 
-if(FALSE)
 setClass("zsparseCholesky",
          contains = c("VIRTUAL", "sparseCholesky"),
          slots = c(minor = "integer", x = "complex"),
@@ -929,7 +903,6 @@ setClass("dsimplicialCholesky",
          prototype = list(p = 0L, `next` = c(-1L, 0L), prev = c(1L, -1L),
                           is_ll = FALSE, is_monotonic = TRUE))
 
-if(FALSE)
 setClass("zsimplicialCholesky",
          contains = c("zsparseCholesky", "simplicialCholesky"),
          slots = c(p = "integer", i = "integer", nz = "integer",
@@ -953,7 +926,6 @@ setClass("nsupernodalCholesky",
 setClass("dsupernodalCholesky",
          contains = c("dsparseCholesky", "supernodalCholesky"))
 
-if(FALSE)
 setClass("zsupernodalCholesky",
          contains = c("zsparseCholesky", "supernodalCholesky"))
 
@@ -1152,9 +1124,9 @@ setClassUnion("replValue",
 ## [28] saeRobust            scuttle              snpStats
 ## [31] softImpute           spflow               xcms
 ##
-## Define stubs so that the serialized class definitions do not cause S4
-## machinery to throw warnings or errors.  Remove the stubs once binaries
-## in most repositories seem to have been rebuilt under Matrix 1.7-0.
+## Define stubs so that the serialized class definitions do not cause
+## S4 machinery to throw warnings or errors.  Remove the stubs once
+## binaries in most repositories seem to have been rebuilt under 1.7-0.
 setClass("compMatrix")
 setClass("pcorMatrix")
 setClassUnion("replValueSp")

@@ -2002,6 +2002,7 @@ diagOdiag <- function(e1,e2) {
 ### This would be *the* way, but we get tons of "ambiguous method dispatch"
 ## we use this hack instead of signature  x = "diagonalMatrix" :
 diCls <- names(getClassDef("diagonalMatrix")@subclasses)
+diCls <- grep("^[nld]", diCls, value = TRUE)
 if(FALSE) {
 setMethod("Ops", c(e1 = "diagonalMatrix", e2 = "diagonalMatrix"),
           diagOdiag)

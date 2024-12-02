@@ -1,4 +1,14 @@
 library(Matrix)
+## For now:
+setMethod("Ops", c(e1 = "zMatrix", e2 = "zMatrix"),
+          function(e1, e2)
+              as(callGeneric(as(e1, "matrix"), as(e2, "matrix")), "Matrix"))
+setMethod("Ops", c(e1 = "zMatrix", e2 =     "ANY"),
+          function(e1, e2)
+              as(callGeneric(as(e1, "matrix"),    e2           ), "Matrix"))
+setMethod("Ops", c(e1 =     "ANY", e2 = "zMatrix"),
+          function(e1, e2)
+              as(callGeneric(   e1           , as(e2, "matrix")), "Matrix"))
 source(system.file("test-tools.R", package = "Matrix"))# identical3(),
                                         # further  checkMatrix(), etc
 if(interactive()) options(error = recover)

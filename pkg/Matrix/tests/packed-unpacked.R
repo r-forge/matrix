@@ -317,6 +317,8 @@ testDenseMatrix <- function(Class, ...) {
 
 .dense.subclasses <- c(names(getClassDef("packedMatrix")@subclasses),
                        names(getClassDef("unpackedMatrix")@subclasses))
+## For now:
+.dense.subclasses <- grep("^[nld]", .dense.subclasses, value = TRUE)
 stopifnot(all(vapply(.dense.subclasses, testDenseClass, NA, n = 4L)))
 
 

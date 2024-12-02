@@ -474,6 +474,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 	isPerm <- extends(cld, "pMatrix")
     } else isCsp <- isRsp <- isTsp <- isDiag <- isInd <- isPerm <- FALSE
     is.n     <- extends(cld, "nMatrix")
+    is.z     <- extends(cld, "zMatrix")
     nonMatr  <- clNam != (Mcl <- MatrixClass(clNam, cld))
 
     Cat	 <- function(...) if(verbose) cat(...)
@@ -552,6 +553,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
     if(do.matrix && doSummary) {
 	summList <- lapply(getGroupMembers("Summary"), get,
 			   envir = asNamespace("Matrix"))
+	if(is.z) summList <- summList[match(getGroupMembers("Summary"), c("min", "max", "range"), 0L) == 0L]
 	CatF(" Summary: ")
 	for(f in summList) {
 	    ## suppressWarnings():  e.g. any(<double>)	would warn here:
@@ -620,7 +622,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
                            skipSlots = c("diag", "p", "i", "j", "x"))
             isSparse || all(m == m.d)
         })
-    else if(!isInd)
+    else if(!isInd && !(is.z && isSym && m@trans == "C"))
         stopifnot(.MJ.Qidentical(m, m.d, strictClass = FALSE,
                                  skipSlots =
                                      if(((isCsp || isRsp) && has0) || isTsp)
@@ -693,7 +695,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 		    Cat(" skipped (!doDet): ")
 		else if(any(is.na(m.m)) && isTri)
 		    Cat(" skipped: is triang. and has NA: ")
-		else
+		else if(!is.z)
 		    stopifnot(eqDeterminant(m, m.m, NA.Inf.ok=TRUE))
 		Cat("ok\n")
 	    }

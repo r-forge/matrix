@@ -100,16 +100,12 @@ forceDiagonal.backcomp <- function(x, diag = NA_character_) {
                          "ddiMatrix"
                      },
                  complex =
-                     stop(gettextf("complex %s not yet implemented",
-                                   "diagonalMatrix"),
-                          domain = NA),
-              ## complex =
-              ##     {
-              ##         if(is.na(diag))
-              ##             diag <-
-              ##             if(!is.na(a <- all(y == 1+0i)) && a) "U" else "N"
-              ##         "zdiMatrix"
-              ##     },
+                     {
+                         if(is.na(diag))
+                             diag <-
+                             if(!is.na(a <- all(y == 1+0i)) && a) "U" else "N"
+                         "zdiMatrix"
+                     },
                  stop(gettextf("cannot coerce matrix of type \"%s\" to %s",
                                typeof(y), "diagonalMatrix"),
                       domain = NA))
