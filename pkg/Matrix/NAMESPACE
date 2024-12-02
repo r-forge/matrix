@@ -11,24 +11,25 @@ importFrom("grDevices", colorRampPalette, grey)
 
 importFrom("graphics", image, par)
 
-importFrom("grid", convertHeight, convertWidth, current.viewport,
-           gpar, grid.rect)
+importFrom("grid", convertHeight, convertWidth, current.viewport, gpar,
+           grid.rect)
 
 importFrom("lattice", levelplot, panel.levelplot.raster)
 
-importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames,
-           Arith, Compare, Complex, Logic, Math, Math2, Ops, Summary,
-           as, callGeneric, callNextMethod, canCoerce, cbind2, coerce,
-           extends, getClassDef, getGroupMembers,
-           initialize, is, isClassDef, kronecker, new, rbind2,
-           setAs, setClass, setClassUnion, setGeneric, setMethod,
-           show, slot, "slot<-", slotNames, validObject)
+importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames, Arith,
+           Compare, Complex, Logic, Math, Math2, Ops, Summary, as,
+           callGeneric, callNextMethod, canCoerce, cbind2, coerce,
+           extends, getClassDef, getGroupMembers, initialize, is,
+           isClassDef, kronecker, new, rbind2, setAs, setClass,
+           setClassUnion, setGeneric, setMethod, show, slot, "slot<-",
+           slotNames, validObject)
 
 importFrom("stats", contr.SAS, contr.helmert, contr.poly, contr.sum,
-           contr.treatment, "contrasts<-", cov2cor , diffinv, model.frame,
-           rnorm, runif, symnum, terms, toeplitz, update)
+           contr.treatment, "contrasts<-", cov2cor , diffinv,
+           model.frame, rnorm, runif, symnum, terms, toeplitz, update)
 
-importFrom("utils", capture.output, head, head.matrix, str, tail, tail.matrix)
+importFrom("utils", capture.output, head, head.matrix, str, tail,
+           tail.matrix)
 
 
 ## ==== EXPORTS ========================================================
@@ -86,7 +87,7 @@ export(.M2C,
        asUniqueT,
        bandSparse,
        bdiag,
-       ## 'c' dispatches on first argument only, so allow direct method calls :
+       ## c(x, ...) dispatches only on 'x', so allow method calls:
        ## c.Matrix, # not yet (see below)
        c.sparseVector,
        colScale,
@@ -128,17 +129,17 @@ export(.M2C,
        sparseVector)
 
 ## Deprecated since Matrix 1.5-4 {Apr 2023}
-export(..2dge, .C2nC, .T2Cmat, .asmatrix, .dense2sy,
-       .diag2mat, .diag2sT, .diag2tT, .dsy2dsp, .dsy2mat, .dxC2mat,
-       .m2dgC, .m2lgC, .m2ngC, .m2ngCn, .m2ngTn, .n2dgT, .nC2d, .nC2l)
+export(..2dge, .C2nC, .T2Cmat, .asmatrix, .dense2sy, .diag2mat,
+       .diag2sT, .diag2tT, .dsy2dsp, .dsy2mat, .dxC2mat, .m2dgC, .m2lgC,
+       .m2ngC, .m2ngCn, .m2ngTn, .n2dgT, .nC2d, .nC2l)
 
 ## Defunct since Matrix 1.3-3 {May 2021}
 export(cBind, rBind)
 
 ## Redundant now but not yet deprecated ...
-export(.CR2RC, .CR2T, .SuiteSparse_version, .T2CR, .dense2g, .dense2kind,
-       .dense2m, .dense2v, .sparse2g, .sparse2kind, .sparse2m, .sparse2v,
-       .tCR2RC, uniqTsparse)
+export(.CR2RC, .CR2T, .SuiteSparse_version, .T2CR, .dense2g,
+       .dense2kind, .dense2m, .dense2v, .sparse2g, .sparse2kind,
+       .sparse2m, .sparse2v, .tCR2RC, uniqTsparse)
 
 
 ## ---- S3 generic functions -------------------------------------------
@@ -460,7 +461,6 @@ exportClasses(Matrix, # and its subclasses .............................
               zsparseVector,
 
               ## MJ: aim to deprecate and eventually remove these
-              ##     (except perhaps 'index')
 
               BunchKaufmanFactorization,
               CHMfactor,
