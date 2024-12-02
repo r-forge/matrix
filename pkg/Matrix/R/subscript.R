@@ -131,7 +131,7 @@ function(x, i) {
                    if (i.length > 0L && !is.na(a <- all(i)) && a) {
                        if (i.length <= x.length)
                            as.vector(x)
-                       else c(as.vector(x), rep.int(NA, i.length - x.length))
+                       else `length<-`(as.vector(x), i.length)
                    }
                    else .subscript.1ary(x, .m2V(i)) # recursively
                },
