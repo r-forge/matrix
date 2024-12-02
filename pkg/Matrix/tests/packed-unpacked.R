@@ -10,9 +10,7 @@ set.seed(145206)
 
 if (interactive()) {
     options(Matrix.verbose = TRUE, warn = 1, error = recover)
-} else {
-    options(Matrix.verbose = TRUE, warn = 1)
-}
+} else options(Matrix.verbose = TRUE, warn = 1)
 
 U <- function(x, diag = FALSE) x[upper.tri(x, diag)]
 L <- function(x, diag = FALSE) x[lower.tri(x, diag)]
@@ -59,31 +57,29 @@ packedClass <- function(unpackedClass) {
 ...Class <- function(denseClass) {
     cl <- "...Matrix"
     substr(cl, 1L, 1L) <-
-        if (d <- extends(denseClass, dMatrix))
+        if (extends(denseClass, dMatrix))
             "d"
         else if (extends(denseClass, lMatrix))
             "l"
         else
             "n"
     substr(cl, 2L, 3L) <-
-        if (g <- extends(denseClass, generalMatrix))
+        if (extends(denseClass, generalMatrix) -> g)
             "ge"
         else if (extends(denseClass, symmetricMatrix))
             "sy"
         else
             "tr"
-    if (!g && extends(denseClass, packedMatrix)) {
+    if (!g && extends(denseClass, packedMatrix))
         substr(cl, 3L, 3L) <- "p"
-    }
     getClassDef(cl)
 }
 
 ## Tests methods for packed (unpacked) class 'Class'
 ## using randomly generated matrices of size 'n'
 testDenseClass <- function(Class, n) {
-    if (!is(Class, "classRepresentation")) {
+    if (!is(Class, "classRepresentation"))
         Class <- getClassDef(Class)
-    }
     stopifnot(extends(Class, denseMatrix), !isVirtualClass(Class))
 
     is.p  <- extends(Class, packedMatrix)
@@ -332,9 +328,8 @@ M <- new("dgeMatrix", x = as.vector(m), Dim = dim(m))
 rn <- letters[seq_len(n)]
 cn <- letters[seq_len(n + 1L)]
 ldn <- list(list(rn, cn), list(rn, replace(cn, 1L, "")))
-for (dn in ldn) {
+for (dn in ldn)
     stopifnot(identical(diag(`slot<-`(M, "Dimnames", TRUE, dn), names = TRUE),
                         diag(`dimnames<-`(m, dn), names = TRUE)))
-}
 
 cat("Time elapsed:", proc.time(), "\n") # "stats"
