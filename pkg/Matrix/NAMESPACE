@@ -197,7 +197,7 @@ exportMethods("%&%",
               updown,
               writeMM)
 
-## From 'base'  ---  several of these are 'implicitGeneric'
+## From 'base'
 exportMethods("!",
               "%%",
               "%*%",
@@ -211,62 +211,62 @@ exportMethods("!",
               "[<-",
               "^",
               all.equal,
-              anyNA,
+              anyNA, # internal
               as.array,
-              as.complex,
-              as.integer,
-              as.logical,
-              as.matrix,
-              as.numeric,
-              as.vector,
+              as.complex, # internal
+              as.integer, # internal
+              as.logical, # internal
+              as.matrix, # internal
+              as.numeric, # internal
+              as.vector, # internal
               chol,
-              chol2inv,
-              colMeans,
-              colSums,
-              crossprod,
-              determinant,
+              chol2inv, # implicit
+              colMeans, # implicit
+              colSums, # implicit
+              crossprod, # internal
+              determinant, # implicit
               diag,
               "diag<-",
               diff,
-              dim,
-              "dim<-",
-              dimnames,
-              "dimnames<-",
+              dim, # internal
+              "dim<-", # internal
+              dimnames, # internal
+              "dimnames<-", # internal
               drop,
               format,
-              is.finite,
-              is.infinite,
-              is.na,
-              is.nan,
+              is.finite, # internal
+              is.infinite, # internal
+              is.na, # internal
+              is.nan, # internal
               isSymmetric,
               kappa,
               kronecker,
-              length,
-              "length<-",
+              length, # internal
+              "length<-", # internal
               log,
               mean,
-              norm,
+              norm, # implicit
               print,
               qr,
               qr.Q,
-              qr.R,
-              qr.X,
+              qr.R, # implicit
+              qr.X, # implicit
               qr.coef,
               qr.fitted,
               qr.qty,
               qr.qy,
               qr.resid,
-              rcond,
-              rep,
-              rowMeans,
-              rowSums,
+              rcond, # implicit
+              rep, # internal
+              rowMeans, # implicit
+              rowSums, # implicit
               solve,
-              sort,
+              sort, # implicit
               summary,
               t,
-              tcrossprod,
+              tcrossprod, # internal
               which,
-              zapsmall)
+              zapsmall) # implicit
 
 ## From 'graphics'
 exportMethods(image)
@@ -276,7 +276,9 @@ exportMethods(Arith, Compare, Logic, Math, Math2, Ops, Summary,
               cbind2, coerce, initialize, rbind2, show)
 
 ## From 'stats'
-exportMethods(cov2cor, toeplitz, update)
+exportMethods(cov2cor,
+              toeplitz, # implicit
+              update)
 
 ## From 'utils'
 exportMethods(head, tail)
