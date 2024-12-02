@@ -1,18 +1,22 @@
 \name{dMatrix-class}
-\title{(Virtual) Class "dMatrix" of "double" Matrices}
+\title{Virtual Class "dMatrix" of Double Precision Matrices}
 %
 \docType{class}
 \keyword{array}
 \keyword{classes}
 %
 \alias{dMatrix-class}
-\alias{lMatrix-class}
+\alias{ddenseMatrix-class}
+\alias{dsparseMatrix-class}
 %
 \alias{coerce,matrix,dMatrix-method}
 \alias{coerce,vector,dMatrix-method}
 %
-\alias{coerce,matrix,lMatrix-method}
-\alias{coerce,vector,lMatrix-method}
+\alias{coerce,matrix,ddenseMatrix-method}
+\alias{coerce,vector,ddenseMatrix-method}
+%
+\alias{coerce,matrix,dsparseMatrix-method}
+\alias{coerce,vector,dsparseMatrix-method}
 %
 \description{
   The \code{dMatrix} class is a virtual class contained by all actual
@@ -92,4 +96,10 @@ library(stats, pos = "package:base", verbose = FALSE)
  M <- Matrix(rlnorm(56, sd=10), 4,14)
  (M. <- zapsmall(M))
  table(as.logical(M. == 0))
+
+showClass("ddenseMatrix")
+
+showMethods(class = "ddenseMatrix", where = "package:Matrix")
+
+showClass("dsparseMatrix")
 }

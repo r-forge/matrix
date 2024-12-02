@@ -1,0 +1,21 @@
+\name{iMatrix-class}
+\title{Virtual Class "iMatrix" of Integer Matrices}
+%
+\docType{class}
+\keyword{array}
+\keyword{classes}
+%
+\alias{iMatrix-class}
+\alias{idenseMatrix-class}
+\alias{isparseMatrix-class}
+%
+\alias{coerce,matrix,iMatrix-method}
+\alias{coerce,vector,iMatrix-method}
+%
+\alias{coerce,matrix,idenseMatrix-method}
+\alias{coerce,vector,idenseMatrix-method}
+%
+\alias{coerce,matrix,isparseMatrix-method}
+\alias{coerce,vector,isparseMatrix-method}
+%
+\description{TODO.}

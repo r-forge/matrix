@@ -1,14 +1,24 @@
 \name{nMatrix-class}
-\title{Class "nMatrix" of Non-zero Pattern Matrices}
+\title{Virtual Class "nMatrix" of Nonzero Pattern Matrices}
 %
 \docType{class}
 \keyword{array}
 \keyword{classes}
 %
 \alias{nMatrix-class}
+\alias{ndenseMatrix-class}
+\alias{nsparseMatrix-class}
 %
 \alias{coerce,matrix,nMatrix-method}
 \alias{coerce,vector,nMatrix-method}
+%
+\alias{coerce,matrix,ndenseMatrix-method}
+\alias{coerce,vector,ndenseMatrix-method}
+%
+\alias{coerce,matrix,nsparseMatrix-method}
+\alias{coerce,nsparseMatrix,indMatrix-method}
+\alias{coerce,nsparseMatrix,pMatrix-method}
+\alias{coerce,vector,nsparseMatrix-method}
 %
 \description{
   The \code{nMatrix} class is the virtual \dQuote{mother} class of all
@@ -58,6 +68,9 @@
   \code{\linkS4class{Matrix}}.
 }
 \examples{
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+library(utils, pos = "package:base", verbose = FALSE)
+}
 getClass("nMatrix")
 
 L3 <- Matrix(upper.tri(diag(3)))
@@ -66,4 +79,28 @@ as(L3, "nMatrix") # -> ntC*
 
 ## similar, not using Matrix()
 as(upper.tri(diag(3)), "nMatrix")# currently "ngTMatrix"
+
+showClass("ndenseMatrix")
+as(diag(3) > 0, "ndenseMatrix")# -> "nge"
+
+(m <- Matrix(c(0,0,2:0), 3,5, dimnames=list(LETTERS[1:3],NULL)))
+## ``extract the nonzero-pattern of (m) into an nMatrix'':
+nm <- as(m, "nsparseMatrix") ## -> will be a "ngCMatrix"
+str(nm) # no 'x' slot
+nnm <- !nm # no longer sparse
+## consistency check:
+stopifnot(xor(as( nm, "matrix"),
+              as(nnm, "matrix")))
+
+## low-level way of adding "non-structural zeros" :
+nnm <- as(nnm, "lsparseMatrix") # "lgCMatrix"
+nnm@x[2:4] <- c(FALSE, NA, NA)
+nnm
+as(nnm, "nMatrix") # NAs *and* non-structural 0  |--->  'TRUE'
+
+data(KNex, package = "Matrix")
+nmm <- as(KNex $ mm, "nMatrix")
+str(xlx <- crossprod(nmm))# "nsCMatrix"
+stopifnot(isSymmetric(xlx))
+image(xlx, main=paste("crossprod(nmm) : Sparse", class(xlx)))
 }
