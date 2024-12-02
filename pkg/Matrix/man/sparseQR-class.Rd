@@ -9,6 +9,7 @@
 %
 \alias{sparseQR-class}
 \alias{dsparseQR-class}
+\alias{zsparseQR-class}
 %
 \description{
   \code{sparseQR} is the class of sparse, row- and column-pivoted

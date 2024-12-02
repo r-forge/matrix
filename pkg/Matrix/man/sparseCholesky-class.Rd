@@ -11,12 +11,15 @@
 \alias{sparseCholesky-class}
 \alias{nsparseCholesky-class}
 \alias{dsparseCholesky-class}
+\alias{zsparseCholesky-class}
 \alias{simplicialCholesky-class}
 \alias{nsimplicialCholesky-class}
 \alias{dsimplicialCholesky-class}
+\alias{zsimplicialCholesky-class}
 \alias{supernodalCholesky-class}
 \alias{nsupernodalCholesky-class}
 \alias{dsupernodalCholesky-class}
+\alias{zsupernodalCholesky-class}
 %
 \alias{coerce,simplicialCholesky,dtCMatrix-method}
 \alias{coerce,supernodalCholesky,dgCMatrix-method}

@@ -8,6 +8,7 @@
 %
 \alias{denseBunchKaufman-class}
 \alias{ddenseBunchKaufman-class}
+\alias{zdenseBunchKaufman-class}
 %
 \alias{coerce,denseBunchKaufman,dtpMatrix-method}
 \alias{coerce,denseBunchKaufman,dtrMatrix-method}

@@ -8,6 +8,7 @@
 %
 \alias{sparseLU-class}
 \alias{dsparseLU-class}
+\alias{zsparseLU-class}
 %
 \description{
   \code{sparseLU} is the class of sparse, row- and column-pivoted

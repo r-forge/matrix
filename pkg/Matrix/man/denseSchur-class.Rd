@@ -8,6 +8,7 @@
 %
 \alias{denseSchur-class}
 \alias{ddenseSchur-class}
+\alias{zdenseSchur-class}
 %
 \alias{coerce,denseSchur,dgeMatrix-method}
 %

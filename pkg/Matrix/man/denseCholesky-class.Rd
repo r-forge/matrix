@@ -8,6 +8,7 @@
 %
 \alias{denseCholesky-class}
 \alias{ddenseCholesky-class}
+\alias{zdenseCholesky-class}
 %
 \alias{coerce,denseCholesky,dtpMatrix-method}
 \alias{coerce,denseCholesky,dtrMatrix-method}

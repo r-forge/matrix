@@ -8,6 +8,7 @@
 %
 \alias{denseLU-class}
 \alias{ddenseLU-class}
+\alias{zdenseLU-class}
 %
 \alias{coerce,denseLU,dgeMatrix-method}
 %
