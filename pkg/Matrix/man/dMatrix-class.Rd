@@ -9,15 +9,6 @@
 \alias{ddenseMatrix-class}
 \alias{dsparseMatrix-class}
 %
-\alias{coerce,matrix,dMatrix-method}
-\alias{coerce,vector,dMatrix-method}
-%
-\alias{coerce,matrix,ddenseMatrix-method}
-\alias{coerce,vector,ddenseMatrix-method}
-%
-\alias{coerce,matrix,dsparseMatrix-method}
-\alias{coerce,vector,dsparseMatrix-method}
-%
 \description{
   The \code{dMatrix} class is a virtual class contained by all actual
   classes of numeric matrices in the \pkg{Matrix} package.  Similarly,

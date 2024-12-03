@@ -7,11 +7,6 @@
 %
 \alias{sparseMatrix-class}
 %
-\alias{coerce,ANY,sparseMatrix-method}
-\alias{coerce,factor,sparseMatrix-method}
-\alias{coerce,matrix,sparseMatrix-method}
-\alias{coerce,vector,sparseMatrix-method}
-%
 \description{Virtual Mother Class of All Sparse Matrices}
 \section{Slots}{
   \describe{

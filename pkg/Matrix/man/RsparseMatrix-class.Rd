@@ -25,9 +25,6 @@
 \alias{dtRMatrix-class}
 \alias{ztRMatrix-class}
 %
-\alias{coerce,matrix,RsparseMatrix-method}
-\alias{coerce,vector,RsparseMatrix-method}
-%
 \description{The \code{"RsparseMatrix"} class is the virtual class of
   all sparse matrices coded in sorted compressed row-oriented form.
   Since it is a virtual class, no objects may be created from it.  See

@@ -13,10 +13,6 @@
 \alias{ddiMatrix-class}
 \alias{zdiMatrix-class}
 %
-\alias{coerce,diagonalMatrix,symmetricMatrix-method}
-\alias{coerce,diagonalMatrix,triangularMatrix-method}
-\alias{coerce,matrix,diagonalMatrix-method}
-%
 \description{
   Class "diagonalMatrix" is the virtual class of all diagonal matrices.
 }

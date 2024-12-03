@@ -7,8 +7,6 @@
 %
 \alias{triangularMatrix-class}
 %
-\alias{coerce,matrix,triangularMatrix-method}
-%
 \description{
   The virtual class of triangular matrices,\code{"triangularMatrix"},
   the package \pkg{Matrix} contains \emph{square} (\code{\link{nrow} ==

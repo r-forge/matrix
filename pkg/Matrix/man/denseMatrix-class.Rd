@@ -7,10 +7,6 @@
 %
 \alias{denseMatrix-class}
 %
-\alias{coerce,ANY,denseMatrix-method}
-\alias{coerce,matrix,denseMatrix-method}
-\alias{coerce,vector,denseMatrix-method}
-%
 \description{This is the virtual class of all dense (S4) matrices.
   It partitions into two subclasses
   \code{\linkS4class{packedMatrix}} and

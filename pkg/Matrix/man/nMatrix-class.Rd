@@ -9,17 +9,6 @@
 \alias{ndenseMatrix-class}
 \alias{nsparseMatrix-class}
 %
-\alias{coerce,matrix,nMatrix-method}
-\alias{coerce,vector,nMatrix-method}
-%
-\alias{coerce,matrix,ndenseMatrix-method}
-\alias{coerce,vector,ndenseMatrix-method}
-%
-\alias{coerce,matrix,nsparseMatrix-method}
-\alias{coerce,nsparseMatrix,indMatrix-method}
-\alias{coerce,nsparseMatrix,pMatrix-method}
-\alias{coerce,vector,nsparseMatrix-method}
-%
 \description{
   The \code{nMatrix} class is the virtual \dQuote{mother} class of all
   \emph{\bold{n}on-zero pattern} (or simply \emph{patter\bold{n}})

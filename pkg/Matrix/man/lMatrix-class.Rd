@@ -9,15 +9,6 @@
 \alias{ldenseMatrix-class}
 \alias{lsparseMatrix-class}
 %
-\alias{coerce,matrix,lMatrix-method}
-\alias{coerce,vector,lMatrix-method}
-%
-\alias{coerce,matrix,ldenseMatrix-method}
-\alias{coerce,vector,ldenseMatrix-method}
-%
-\alias{coerce,matrix,lsparseMatrix-method}
-\alias{coerce,vector,lsparseMatrix-method}
-%
 \description{TODO.}
 \examples{
 \dontshow{ % for R_DEFAULT_PACKAGES=NULL

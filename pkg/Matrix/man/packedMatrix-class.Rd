@@ -19,8 +19,6 @@
 \alias{dtpMatrix-class}
 \alias{ztpMatrix-class}
 %
-\alias{coerce,matrix,packedMatrix-method}
-%
 \description{
   Class \code{"packedMatrix"} is the \emph{virtual} class of dense
   symmetric or triangular matrices in "packed" format, storing only

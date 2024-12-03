@@ -7,8 +7,6 @@
 %
 \alias{symmetricMatrix-class}
 %
-\alias{coerce,matrix,symmetricMatrix-method}
-%
 \description{
   The virtual class of symmetric matrices, \code{"symmetricMatrix"},
   from the package \pkg{Matrix} contains numeric and logical, dense and

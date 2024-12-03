@@ -7,10 +7,6 @@
 %
 \alias{generalMatrix-class}
 %
-\alias{coerce,generalMatrix,packedMatrix-method}
-\alias{coerce,matrix,generalMatrix-method}
-\alias{coerce,vector,generalMatrix-method}
-%
 \description{
   Virtual class of \dQuote{general} matrices; i.e., matrices
   that do not have a known property such as symmetric, triangular, or

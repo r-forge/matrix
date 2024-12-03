@@ -9,13 +9,4 @@
 \alias{zdenseMatrix-class}
 \alias{zsparseMatrix-class}
 %
-\alias{coerce,matrix,zMatrix-method}
-\alias{coerce,vector,zMatrix-method}
-%
-\alias{coerce,matrix,zdenseMatrix-method}
-\alias{coerce,vector,zdenseMatrix-method}
-%
-\alias{coerce,matrix,zsparseMatrix-method}
-\alias{coerce,vector,zsparseMatrix-method}
-%
 \description{TODO.}

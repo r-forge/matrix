@@ -21,17 +21,6 @@
 \alias{zpoMatrix-class}
 \alias{zppMatrix-class}
 %
-\alias{coerce,matrix,posdefMatrix-method}
-%
-\alias{coerce,Matrix,copMatrix-method}
-\alias{coerce,Matrix,corMatrix-method}
-\alias{coerce,matrix,corMatrix-method}
-\alias{coerce,matrix,copMatrix-method}
-\alias{coerce,dsyMatrix,corMatrix-method}
-\alias{coerce,dspMatrix,copMatrix-method}
-\alias{coerce,dpoMatrix,corMatrix-method}
-\alias{coerce,dppMatrix,copMatrix-method}
-%
 \description{
   \itemize{
     \item The \code{"dpoMatrix"} class is the class of

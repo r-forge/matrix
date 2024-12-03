@@ -25,11 +25,6 @@
 \alias{dtCMatrix-class}
 \alias{ztCMatrix-class}
 %
-\alias{coerce,matrix,CsparseMatrix-method}
-\alias{coerce,vector,CsparseMatrix-method}
-%
-\alias{coerce,matrix,dgCMatrix-method}
-%
 \alias{.validateCsparse}
 %
 \description{The \code{"CsparseMatrix"} class is the virtual class of

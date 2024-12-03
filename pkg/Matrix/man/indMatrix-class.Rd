@@ -8,15 +8,6 @@
 \alias{indMatrix-class}
 \alias{pMatrix-class}
 %
-\alias{coerce,indMatrix,pMatrix-method}
-\alias{coerce,indMatrix,packedMatrix-method}
-\alias{coerce,list,indMatrix-method}
-\alias{coerce,matrix,indMatrix-method}
-\alias{coerce,numeric,indMatrix-method}
-%
-\alias{coerce,matrix,pMatrix-method}
-\alias{coerce,numeric,pMatrix-method}
-%
 \description{
   The \code{indMatrix} class is the class of row and column
   \emph{index} matrices, stored as 1-based integer index vectors.

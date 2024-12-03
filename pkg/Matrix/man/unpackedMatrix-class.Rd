@@ -25,9 +25,6 @@
 \alias{dtrMatrix-class}
 \alias{ztrMatrix-class}
 %
-\alias{coerce,matrix,unpackedMatrix-method}
-\alias{coerce,vector,unpackedMatrix-method}
-%
 \description{
   Class \code{"unpackedMatrix"} is the \emph{virtual} class of dense
   matrices in "unpacked" format, storing all \code{m*n} elements of

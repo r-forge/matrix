@@ -25,9 +25,6 @@
 \alias{dtTMatrix-class}
 \alias{ztTMatrix-class}
 %
-\alias{coerce,matrix,TsparseMatrix-method}
-\alias{coerce,vector,TsparseMatrix-method}
-%
 \description{The \code{"TsparseMatrix"} class is the virtual class of
   all sparse matrices coded in triplet form.  Since it is a virtual class,
   no objects may be created from it.  See
