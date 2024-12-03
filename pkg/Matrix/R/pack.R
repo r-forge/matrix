@@ -29,7 +29,7 @@ setMethod("pack", c(x = "unpackedMatrix"),
                   .Call(R_dense_as_packed, x, NULL, NULL, NULL)
               else if (((sna <- is.na(symmetric)) || symmetric) &&
                        ({ trans <- "C"; isSymmetric(x, trans = trans, ...) } ||
-                        (is.complex(x@x) &&
+                        (.M.kind(x) == "z" &&
                          { trans <- "T"; isSymmetric(x, trans = trans, ...) })))
                   .Call(R_dense_as_packed, x, "U", trans, NULL)
               else if ((sna || !symmetric) &&

@@ -20,6 +20,6 @@ setMethod("forceSymmetric", c(x = "diagonalMatrix"),
 
 setMethod("forceSymmetric", c(x = "indMatrix"),
           function(x, ...)
-              forceSymmetric(.M2kind(x, "n"), ...))
+              forceSymmetric(.ind2sparse(x), ...))
 
 rm(.cl)

@@ -313,8 +313,7 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	}
 
 	if (cl[1] != 'g' && m != n)
-		Rf_error(_("attempt to construct non-square %s"),
-		         (cl[1] == 's' || cl[1] == 'p') ? "symmetricMatrix" : "triangularMatrix");
+		Rf_error(_("matrix is not square"));
 
 	if (doDN)
 		SET_DIMNAMES(to, -(cl[1] == 's' || cl[1] == 'p'), dimnames);

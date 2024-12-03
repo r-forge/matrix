@@ -3,41 +3,33 @@
 
 setMethod("forceDiagonal", c(x = "matrix"),
           function(x, diag = "N", ...) {
-              kind <- .M.kind(x)
-              if (kind == "i")
-                  kind <- "d"
-              n <- min(d <- dim(x))
+              d <- dim(x)
+              if (d[1L] != d[2L])
+                  stop("matrix is not square")
               dn <- dimnames(x)
-              r <- new(paste0(kind, "diMatrix"))
-              r@Dim <- c(n, n)
-              if (!is.null(dn)) {
-              if (max(d) != n &&
-                  !is.null(tmp <- dn[[w <- which.max(d)]]))
-                  dn[[w]] <- tmp[seq_len(n)]
+              r <- new(paste0(.M.kind(x), "diMatrix"))
+              r@Dim <- d
+              if (!is.null(dn))
               r@Dimnames <- dn
-              }
-              if (diag == "N") {
-                  y <- diag(x, names = FALSE)
-                  r@x <- if (is.integer(y)) as.double(y) else y
-              } else r@diag <- "U"
+              if (diag == "N")
+                  r@x <- diag(x, names = FALSE)
+              else r@diag <- "U"
               r
           })
 
 for (.cl in c("denseMatrix", paste0(c("C", "R", "T"), "sparseMatrix")))
 setMethod("forceDiagonal", c(x = .cl),
           function(x, diag = NULL, ...) {
+              d <- x@Dim
+              if (d[1L] != d[2L])
+                  stop("matrix is not square")
+              dn <- dimnames(x)
               diag <-
                   if (is.null(diag))
                       (if (.M.shape(x) != "t") "N" else x@diag)
                   else if (diag == "N") "N" else "U"
-              kind <- .M.kind(x)
-              n <- min(d <- x@Dim)
-              dn <- dimnames(x)
-              r <- new(paste0(kind, "diMatrix"))
-              r@Dim <- c(n, n)
-              if (max(d) != n &&
-                  !is.null(tmp <- dn[[w <- which.max(d)]]))
-                  dn[[w]] <- tmp[seq_len(n)]
+              r <- new(paste0(.M.kind(x), "diMatrix"))
+              r@Dim <- d
               r@Dimnames <- dn
               if (diag == "N")
                   r@x <- diag(x, names = FALSE)
@@ -60,6 +52,6 @@ setMethod("forceDiagonal", c(x = "diagonalMatrix"),
 
 setMethod("forceDiagonal", c(x = "indMatrix"),
           function(x, ...)
-              forceDiagonal(.M2kind(x, "n"), ...))
+              forceDiagonal(.ind2sparse(x), ...))
 
 rm(.cl)

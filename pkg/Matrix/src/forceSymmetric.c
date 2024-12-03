@@ -37,7 +37,7 @@ SEXP dense_force_symmetric(SEXP from, const char *class,
 
 	int *pdim = DIM(from), n = pdim[1];
 	if (pdim[0] != n)
-		Rf_error(_("attempt to symmetrize a non-square matrix"));
+		Rf_error(_("matrix is not square"));
 	SET_DIM(to, n, n);
 	SET_DIMNAMES(to, -(class[1] != 's'), DIMNAMES(from, 0));
 	if (ul1 != 'U')
@@ -111,7 +111,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class,
 
 	int *pdim = DIM(from), n = pdim[1];
 	if (pdim[0] != n)
-		Rf_error(_("attempt to symmetrize a non-square matrix"));
+		Rf_error(_("matrix is not square"));
 	SET_DIM(to, n, n);
 	SET_DIMNAMES(to, -(class[1] != 's'), DIMNAMES(from, 0));
 	if (ul1 != 'U')

@@ -8,6 +8,8 @@ setMethod("forceTriangular", c(x = "matrix"),
 setMethod("forceTriangular", c(x = "denseMatrix"),
           function(x, uplo = NULL, diag = NULL, ...) {
               shape <- .M.shape(x)
+              if (shape == "g" && { d <- x@Dim; d[1L] != d[2L] })
+                  stop("matrix is not square")
               uplo <-
                   if (is.null(uplo))
                       (if (shape == "g") "U" else x@uplo)
@@ -32,6 +34,8 @@ for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
 setMethod("forceTriangular", c(x = .cl),
           function(x, uplo = NULL, diag = NULL, ...) {
               shape <- .M.shape(x)
+              if (shape == "g" && { d <- x@Dim; d[1L] != d[2L] })
+                  stop("matrix is not square")
               uplo <-
                   if (is.null(uplo))
                       (if (shape == "g") "U" else x@uplo)
@@ -66,6 +70,6 @@ setMethod("forceTriangular", c(x = "diagonalMatrix"),
 
 setMethod("forceTriangular", c(x = "indMatrix"),
           function(x, ...)
-              forceTriangular(.M2kind(x, "n"), ...))
+              forceTriangular(.ind2sparse(x), ...))
 
 rm(.cl)
