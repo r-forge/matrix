@@ -10,7 +10,7 @@
 \alias{ddenseLU-class}
 \alias{zdenseLU-class}
 %
-\alias{coerce,denseLU,dgeMatrix-method}
+\alias{coerce,ddenseLU,dgeMatrix-method}
 %
 \description{
   \code{denseLU} is the class of dense, row-pivoted LU factorizations

@@ -10,8 +10,8 @@
 \alias{ddenseCholesky-class}
 \alias{zdenseCholesky-class}
 %
-\alias{coerce,denseCholesky,dtpMatrix-method}
-\alias{coerce,denseCholesky,dtrMatrix-method}
+\alias{coerce,ddenseCholesky,dtrMatrix-method}
+\alias{coerce,ddenseCholesky,dtpMatrix-method}
 %
 \description{
   Classes \code{Cholesky} and \code{pCholesky} represent

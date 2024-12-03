@@ -733,7 +733,7 @@ setAs("indMatrix", "pMatrix",
 
 ## ==== More from MatrixFactorization ==================================
 
-setAs("denseSchur", "dgeMatrix",
+setAs("ddenseSchur", "dgeMatrix",
       function(from) {
           to <- new("dgeMatrix")
           to@Dim <- from@Dim
@@ -741,7 +741,7 @@ setAs("denseSchur", "dgeMatrix",
           to
       })
 
-setAs("denseLU", "dgeMatrix",
+setAs("ddenseLU", "dgeMatrix",
       function(from) {
           to <- new("dgeMatrix")
           to@Dim <- from@Dim
@@ -749,7 +749,7 @@ setAs("denseLU", "dgeMatrix",
           to
       })
 
-setAs("denseBunchKaufman", "dtrMatrix",
+setAs("ddenseBunchKaufman", "dtrMatrix",
       function(from) {
           packed <- length(from@x) != prod(from@Dim)
           to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
@@ -759,7 +759,7 @@ setAs("denseBunchKaufman", "dtrMatrix",
           if (!packed) to else unpack(to)
       })
 
-setAs("denseBunchKaufman", "dtpMatrix",
+setAs("ddenseBunchKaufman", "dtpMatrix",
       function(from) {
           packed <- length(from@x) != prod(from@Dim)
           to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
@@ -769,7 +769,7 @@ setAs("denseBunchKaufman", "dtpMatrix",
           if (!packed) pack(to) else to
       })
 
-setAs("denseCholesky", "dtrMatrix",
+setAs("ddenseCholesky", "dtrMatrix",
       function(from) {
           packed <- length(from@x) != prod(from@Dim)
           to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
@@ -779,7 +779,7 @@ setAs("denseCholesky", "dtrMatrix",
           if (!packed) to else unpack(to)
       })
 
-setAs("denseCholesky", "dtpMatrix",
+setAs("ddenseCholesky", "dtpMatrix",
       function(from) {
           packed <- length(from@x) != prod(from@Dim)
           to <- new(if (!packed) "dtrMatrix" else "dtpMatrix")
@@ -789,7 +789,7 @@ setAs("denseCholesky", "dtpMatrix",
           if (!packed) pack(to) else to
       })
 
-setAs("simplicialCholesky", "dtCMatrix",
+setAs("dsimplicialCholesky", "dtCMatrix",
       function(from) {
           nz <- from@nz
           k <- sequence.default(nz, from@p[seq_along(nz)] + 1L)
@@ -803,7 +803,7 @@ setAs("simplicialCholesky", "dtCMatrix",
           to
       })
 
-setAs("supernodalCholesky", "dgCMatrix",
+setAs("dsupernodalCholesky", "dgCMatrix",
       function(from) {
           super <- from@super
           pi <- from@pi

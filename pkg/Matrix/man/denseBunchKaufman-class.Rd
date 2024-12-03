@@ -10,8 +10,8 @@
 \alias{ddenseBunchKaufman-class}
 \alias{zdenseBunchKaufman-class}
 %
-\alias{coerce,denseBunchKaufman,dtpMatrix-method}
-\alias{coerce,denseBunchKaufman,dtrMatrix-method}
+\alias{coerce,ddenseBunchKaufman,dtrMatrix-method}
+\alias{coerce,ddenseBunchKaufman,dtpMatrix-method}
 %
 \description{
   Classes \code{BunchKaufman} and \code{pBunchKaufman} represent

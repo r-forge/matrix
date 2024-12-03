@@ -21,8 +21,8 @@
 \alias{dsupernodalCholesky-class}
 \alias{zsupernodalCholesky-class}
 %
-\alias{coerce,simplicialCholesky,dtCMatrix-method}
-\alias{coerce,supernodalCholesky,dgCMatrix-method}
+\alias{coerce,dsimplicialCholesky,dtCMatrix-method}
+\alias{coerce,dsupernodalCholesky,dgCMatrix-method}
 %
 \alias{isLDL}
 %
