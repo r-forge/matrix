@@ -8,11 +8,11 @@
 \alias{Complex}
 \alias{Complex-methods}
 %
-\alias{Summary,denseMatrix-method}
-\alias{Summary,diagonalMatrix-method}
-\alias{Summary,indMatrix-method}
-\alias{Summary,sparseMatrix-method}
-\alias{Summary,sparseVector-method}
+\alias{Complex,denseMatrix-method}
+\alias{Complex,diagonalMatrix-method}
+\alias{Complex,indMatrix-method}
+\alias{Complex,sparseMatrix-method}
+\alias{Complex,sparseVector-method}
 %
 \description{TODO.}
 \usage{

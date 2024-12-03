@@ -48,7 +48,7 @@ setMethod("Complex", c(z = "sparseMatrix"),
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
               if (repr == "T")
-                  z <- agregateT(z)
+                  z <- aggregateT(z)
               if (.Generic != "Conj" || kind != "z")
                   substr(cl, 1L, 1L) <- "d"
               if (any(.Generic == c("Arg", "Im"))) {
