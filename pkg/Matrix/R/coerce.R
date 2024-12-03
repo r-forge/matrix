@@ -44,6 +44,7 @@ function(from) {
         stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
     forceDiagonal.backcomp(from)
 }
+..M2diag <- .M2diag # for setAs()
 
 .M2v <-
 function(from)
@@ -365,8 +366,8 @@ setAs("vector", "Matrix",
 setAs(   "ANY", "Matrix",
       function(from) as(as(from, "matrix"), "Matrix"))
 
-if (FALSE) {
-## MJ: not yet ... must first make as(<sparseCholesky>, "Matrix") defunct
+if (FALSE)
+## MJ: not yet as must first make defunct as(<sparseCholesky>, "Matrix")
 setAs("MatrixFactorization", "Matrix",
       function(from) {
           n <- length(x <- expand2(from))
@@ -374,7 +375,6 @@ setAs("MatrixFactorization", "Matrix",
           if (n >= 2L) for (i in 2L:n) to <- to %*% x[[i]]
           to
       })
-}
 
 
 ## ==== To sparseVector ================================================
@@ -510,16 +510,16 @@ setAs("vector", "zsparseVector",
 ..m2gen <-
 function(from) .m2dense(from, ".ge")
 
-setAs(      "Matrix", "generalMatrix", ..M2gen)
-setAs(      "matrix", "generalMatrix", ..m2gen)
-setAs(      "vector", "generalMatrix", ..m2gen)
-setAs("sparseVector", "generalMatrix",  .V2C)
+setAs(      "Matrix",    "generalMatrix", ..M2gen)
+setAs(      "matrix",    "generalMatrix", ..m2gen)
+setAs(      "vector",    "generalMatrix", ..m2gen)
+setAs("sparseVector",    "generalMatrix",  .V2C  )
 
-setAs("Matrix",  "symmetricMatrix", ..M2sym)
-setAs("matrix",  "symmetricMatrix", ..M2sym)
+setAs(      "Matrix",  "symmetricMatrix", ..M2sym)
+setAs(      "matrix",  "symmetricMatrix", ..M2sym)
 
-setAs("Matrix", "triangularMatrix", ..M2tri)
-setAs("matrix", "triangularMatrix", ..M2tri)
+setAs(      "Matrix", "triangularMatrix", ..M2tri)
+setAs(      "matrix", "triangularMatrix", ..M2tri)
 
 setAs("diagonalMatrix",  "symmetricMatrix",
       function(from) {
@@ -532,7 +532,7 @@ setAs("diagonalMatrix", "triangularMatrix",
       function(from)
           .diag2sparse(from, ".", "t", "C"))
 
-rm(..m2gen)
+rm(..M2gen, ..M2sym, ..M2tri, ..m2gen)
 
 
 ## ==== To "representation" ============================================
@@ -550,9 +550,9 @@ setAs("Matrix",  "TsparseMatrix", .M2T)
 setAs("generalMatrix", "packedMatrix", function(from) pack(from))
 
 setAs("matrix",    "denseMatrix",
-      function(from)  .m2dense.checking(from, "."))
+      function(from) .m2dense.checking(from, "."))
 setAs("matrix", "unpackedMatrix",
-      function(from)  .m2dense.checking(from, "."))
+      function(from) .m2dense.checking(from, "."))
 setAs("matrix",   "packedMatrix",
       function(from) pack(from))
 setAs("matrix",   "sparseMatrix",
@@ -572,9 +572,9 @@ setAs("vector",    "denseMatrix",
       function(from)
           if (is.object(from) && length(dim(from)) == 2L) # e.g., data.frame
               as(as.matrix(from),  "denseMatrix")
-          else .m2dense(from, ".ge"))
+          else .m2dense (from, ".ge"))
 setAs("vector", "unpackedMatrix",
-      function(from)  .m2dense(from, ".ge"))
+      function(from) .m2dense (from, ".ge"))
 setAs("vector",   "sparseMatrix",
       function(from)
           if (is.object(from) && length(dim(from)) == 2L) # e.g., data.frame
@@ -599,8 +599,8 @@ setAs("sparseVector",  "CsparseMatrix", .V2C)
 setAs("sparseVector",  "RsparseMatrix", .V2R)
 setAs("sparseVector",  "TsparseMatrix", .V2T)
 
-setAs("Matrix", "diagonalMatrix", .M2diag)
-setAs("matrix", "diagonalMatrix", .M2diag)
+setAs("Matrix", "diagonalMatrix", ..M2diag)
+setAs("matrix", "diagonalMatrix", ..M2diag)
 
 setAs("Matrix", "indMatrix",
       function(from) as(as(from, "nsparseMatrix"), "indMatrix"))
@@ -612,8 +612,22 @@ setAs("Matrix",   "pMatrix",
 setAs("matrix",   "pMatrix",
       function(from) as(as(from, "nsparseMatrix"),   "pMatrix"))
 
+setAs("indMatrix", "pMatrix",
+      function(from)
+          new("pMatrix", from))
 
-## ==== More to indMatrix ==============================================
+rm(..M2diag)
+
+
+## ==== More to index ==================================================
+
+## MJ: could export without dot
+.changeMargin <-
+function(x) {
+    x@margin <- if (x@margin == 1L) 2L else 1L
+    x@perm <- invertPerm(x@perm)
+    x
+}
 
 .perm2ind <-
 function(perm, n, margin = 1L, check.p = 0L) {
@@ -683,14 +697,18 @@ function(perm, n, margin = 1L, check.p = 0L) {
     J
 }
 
+## MJ: deprecate this method and export '.perm2ind'
+setAs("list", "indMatrix",
+      function(from)
+          do.call(.perm2ind, unname(from)))
+
 setAs("numeric", "indMatrix",
       function(from)
           .perm2ind(from))
 
-## FIXME: deprecate this method and export '.perm2ind'
-setAs("list", "indMatrix",
+setAs("numeric", "pMatrix",
       function(from)
-          do.call(.perm2ind, unname(from)))
+          .perm2ind(from, check.p = 2L))
 
 setAs("nsparseMatrix", "indMatrix",
       function(from) {
@@ -715,21 +733,6 @@ setAs("nsparseMatrix", "indMatrix",
           }
           stop("matrix must have exactly one entry in each row or column")
       })
-
-
-## ==== More to pMatrix ================================================
-
-## MJ: could export without dot
-.changeMargin <-
-function(x) {
-    x@margin <- if (x@margin == 1L) 2L else 1L
-    x@perm <- invertPerm(x@perm)
-    x
-}
-
-setAs("numeric", "pMatrix",
-      function(from)
-          .perm2ind(from, check.p = 2L))
 
 setAs("nsparseMatrix", "pMatrix",
       function(from) {
@@ -759,10 +762,6 @@ setAs("nsparseMatrix", "pMatrix",
           }
           stop("matrix must have exactly one entry in each row and column")
       })
-
-setAs("indMatrix", "pMatrix",
-      function(from)
-          new("pMatrix", from))
 
 
 ## ==== More from MatrixFactorization ==================================
@@ -856,7 +855,7 @@ setAs("dsupernodalCholesky", "dgCMatrix",
       })
 
 
-## ==== More from/to positive semidefinite =============================
+## ==== More to positive semidefinite ==================================
 
 ## Operations such as rounding can lose positive semidefiniteness
 ## but not symmetry, hence:

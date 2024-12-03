@@ -9,6 +9,7 @@
 \alias{pMatrix-class}
 %
 \alias{coerce,indMatrix,pMatrix-method}
+\alias{coerce,indMatrix,packedMatrix-method}
 \alias{coerce,list,indMatrix-method}
 \alias{coerce,matrix,indMatrix-method}
 \alias{coerce,numeric,indMatrix-method}

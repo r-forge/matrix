@@ -114,7 +114,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
     ## numeric or logical matrix without a 'class' attribute
     if(doDiag && isDiagonal(data))
         ## as(<[mM]atrix>, "diagonalMatrix") uses check = TRUE (a waste)
-        return(forceDiagonal.backcomp(data))
+        return(forceDiagonal(data))
     if(i.m || i.sM != sparse) {
         data <- as(data, if(sparse) "CsparseMatrix" else "unpackedMatrix")
         if(i.m)
