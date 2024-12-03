@@ -272,7 +272,7 @@ exportMethods("!",
 exportMethods(image)
 
 ## From 'methods'
-exportMethods(Arith, Compare, Logic, Math, Math2, Ops, Summary,
+exportMethods(Arith, Compare, Complex, Logic, Math, Math2, Ops, Summary,
               cbind2, coerce, initialize, rbind2, show)
 
 ## From 'stats'
