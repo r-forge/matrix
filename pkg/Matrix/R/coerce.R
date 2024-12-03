@@ -13,36 +13,41 @@ function(from)
     .Call(R_Matrix_as_general, from, ".")
 
 .M2sym <-
-function(from, ...) {
-    if (isSymmetric(from, ...))
-        forceSymmetric(from)
-    else
-        stop("matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)")
+function(from, uplo = NULL, trans = "C", ...) {
+    if (!isSymmetric(from, trans = trans, ...))
+        stop("matrix is not symmetric; consider forceSymmetric(.)")
+    if (is.null(uplo))
+        forceSymmetric(from, trans = trans)
+    else forceSymmetric(from, uplo = uplo, trans = trans)
 }
-..M2sym <- .M2sym # for setAs()
-formals(..M2sym) <- formals(..M2sym)[-2L]
-body(..M2sym)[[2L]][[2L]] <-
-    body(..M2sym)[[2L]][[2L]][-3L]
+..M2sym <- # for setAs()
+function(from) {
+    if (!isSymmetric(from))
+        stop("matrix is not symmetric; consider forceSymmetric(.)")
+    forceSymmetric(from)
+}
 
 .M2tri <-
-function(from, ...) {
-    if (!(it <- isTriangular(from, ...)))
-        stop("matrix is not triangular; consider triu(.) or tril(.)")
-    else if (attr(it, "kind") == "U")
-        triu(from)
-    else
-        tril(from)
+function(from, uplo = NULL) {
+    upper <- if (is.null(uplo)) NA else uplo == "U"
+    if (!(it <- isTriangular(from, upper = upper)))
+        stop("matrix is not triangular; consider forceTriangular(.)")
+    if (is.null(uplo))
+        uplo <- attr(it, "kind")
+    forceTriangular(from, uplo = uplo)
 }
-..M2tri <- .M2tri # for setAs()
-formals(..M2tri) <- formals(..M2tri)[-2L]
-body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
-    body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]][-3L]
+..M2tri <- # for setAs()
+function(from) {
+    if (!(it <- isTriangular(from)))
+        stop("matrix is not triangular; consider forceTriangular(.)")
+    forceTriangular(from, uplo = attr(it, "kind"))
+}
 
 .M2diag <-
 function(from) {
     if (!isDiagonal(from))
-        stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
-    forceDiagonal.backcomp(from)
+        stop("matrix is not diagonal; consider forceDiagonal(.)")
+    forceDiagonal(from)
 }
 ..M2diag <- .M2diag # for setAs()
 
@@ -118,28 +123,35 @@ function(from, class = ".ge",
 
 .m2dense.checking <-
 function(from, kind = ".", ...) {
-    switch(typeof(from), logical =, integer =, double = NULL,
+    switch(typeof(from),
+           "logical" =, "integer" =, "double" =, "complex" = NULL,
            stop(gettextf("invalid type \"%s\" in '%s'",
                          typeof(from), ".m2dense.checking"),
                 domain = NA))
     if (kind != ".") {
         ## These must happen before isSymmetric() call
+        if (kind == ",")
+            kind <- if (is.complex(from)) "z" else "d"
         storage.mode(from) <-
-            switch(kind, n =, l = "logical", d = "double",
+            switch(kind,
+                   "n" =,
+                   "l" = "logical",
+                   "d" = "double",
+                   "z" = "complex",
                    stop(gettextf("invalid %s=\"%s\" to '%s'",
                                  "kind", kind, ".m2dense.checking"),
                         domain = NA))
         if (kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
     }
-    if (isSymmetric(from, ...))
+    if (!(is <- isSymmetric(from, ...)) && !(it <- isTriangular(from)))
+        .m2dense(from, paste0(kind, "ge"))
+    else if (is)
         .m2dense(from, paste0(kind, "sy"),
                  uplo = "U", trans = "C")
-    else if (it <- isTriangular(from))
+    else
         .m2dense(from, paste0(kind, "tr"),
                  uplo = attr(it, "kind"), diag = "N")
-    else
-        .m2dense(from, paste0(kind, "ge"))
 }
 
 .V2sparse <-
@@ -156,28 +168,35 @@ function(from, class = ".gC",
 
 .m2sparse.checking <-
 function(from, kind = ".", repr = "C", ...) {
-    switch(typeof(from), logical =, integer =, double = NULL,
+    switch(typeof(from),
+           "logical" =, "integer" =, "double" =, "complex" = NULL,
            stop(gettextf("invalid type \"%s\" in '%s'",
                          typeof(from), ".m2sparse.checking"),
                 domain = NA))
     if (kind != ".") {
         ## These must happen before isSymmetric() call
+        if (kind == ",")
+            kind <- if (is.complex(from)) "z" else "d"
         storage.mode(from) <-
-            switch(kind, n =, l = "logical", d = "double",
+            switch(kind,
+                   "n" =,
+                   "l" = "logical",
+                   "d" = "double",
+                   "z" = "complex",
                    stop(gettextf("invalid %s=\"%s\" to '%s'",
                                  "kind", kind, ".m2sparse.checking"),
                         domain = NA))
         if (kind == "n" && anyNA(from))
             from[is.na(from)] <- TRUE
     }
-    if (isSymmetric(from, ...))
+    if (!(is <- isSymmetric(from, ...)) && !(it <- isTriangular(from)))
+        .m2sparse(from, paste0(kind, "g", repr))
+    else if (is)
         .m2sparse(from, paste0(kind, "s", repr),
                   uplo = "U", trans = "C")
-    else if (it <- isTriangular(from))
+    else
         .m2sparse(from, paste0(kind, "t", repr),
                   uplo = attr(it, "kind"), diag = "N")
-    else
-        .m2sparse(from, paste0(kind, "g", repr))
 }
 
 .m2V <-
@@ -216,6 +235,7 @@ function(from) {
     to
 }
 
+.V2a <-
 .V2m <-
 function(from) {
     if (is.double(m <- length(from)))
@@ -225,16 +245,7 @@ function(from) {
     dim(to) <- c(m, 1L)
     to
 }
-
-.V2a <-
-function(from) {
-    if (is.double(m <- length(from)))
-        stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
-             domain = NA)
-    to <- .V2v(from)
-    dim(to) <- m
-    to
-}
+body(.V2a)[[4L]][[3L]] <- quote(m)
 
 .V2unpacked <-
 function(from) {
@@ -242,7 +253,7 @@ function(from) {
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
     kind <- .M.kind(from)
-    to <- new(paste0(if (kind == "i") "d" else kind, "geMatrix"))
+    to <- new(paste0(kind, "geMatrix"))
     to@Dim <- c(m, 1L)
     to@x <- replace(vector(typeof(to@x), m), from@i,
                     if (kind == "n") TRUE else from@x)
@@ -255,12 +266,12 @@ function(from) {
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
     kind <- .M.kind(from)
-    to <- new(paste0(if (kind == "i") "d" else kind, "gCMatrix"))
+    to <- new(paste0(kind, "gCMatrix"))
     to@Dim <- c(m, 1L)
     to@p <- c(0L, length(from@i))
     to@i <- as.integer(from@i) - 1L
     if (kind != "n")
-        to@x <- if (kind == "i") as.double(from@x) else from@x
+        to@x <- from@x
     to
 }
 
@@ -270,12 +281,12 @@ function(from) {
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
     kind <- .M.kind(from)
-    to <- new(paste0(if (kind == "i") "d" else kind, "gRMatrix"))
+    to <- new(paste0(kind, "gRMatrix"))
     to@Dim <- c(m, 1L)
     to@p <- c(0L, cumsum(replace(logical(m), from@i, TRUE)))
     to@j <- integer(length(from@i))
     if (kind != "n")
-        to@x <- if (kind == "i") as.double(from@x) else from@x
+        to@x <- from@x
     to
 }
 
@@ -285,12 +296,12 @@ function(from) {
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
     kind <- .M.kind(from)
-    to <- new(paste0(if (kind == "i") "d" else kind, "gTMatrix"))
+    to <- new(paste0(kind, "gTMatrix"))
     to@Dim <- c(m, 1L)
     to@i <- as.integer(from@i) - 1L
     to@j <- integer(length(from@i))
     if (kind != "n")
-        to@x <- if (kind == "i") as.double(from@x) else from@x
+        to@x <- from@x
     to
 }
 
@@ -350,7 +361,7 @@ setAs("sparseVector", "Matrix",
 setAs("matrix", "Matrix",
       function(from) {
           if (isDiagonal(from))
-              forceDiagonal.backcomp(from)
+              forceDiagonal(from)
           else if (.sparseDefault(from))
               .m2sparse.checking(from, ".", "C")
           else .m2dense.checking(from, ".")
@@ -395,59 +406,97 @@ setAs("Matrix", "nMatrix",
       function(from) .M2kind(from, "n",    NA))
 setAs("Matrix", "lMatrix",
       function(from) .M2kind(from, "l",    NA))
+setAs("Matrix", "iMatrix",
+      function(from) .M2kind(from, "i",    NA))
 setAs("Matrix", "dMatrix",
       function(from) .M2kind(from, "d",    NA))
+setAs("Matrix", "zMatrix",
+      function(from) .M2kind(from, "z",    NA))
 
 setAs("Matrix", "ndenseMatrix",
       function(from) .M2kind(from, "n", FALSE))
 setAs("Matrix", "ldenseMatrix",
       function(from) .M2kind(from, "l", FALSE))
+setAs("Matrix", "idenseMatrix",
+      function(from) .M2kind(from, "i", FALSE))
 setAs("Matrix", "ddenseMatrix",
       function(from) .M2kind(from, "d", FALSE))
+setAs("Matrix", "zdenseMatrix",
+      function(from) .M2kind(from, "z", FALSE))
 
 setAs("Matrix", "nsparseMatrix",
       function(from) .M2kind(from, "n",  TRUE))
 setAs("Matrix", "lsparseMatrix",
       function(from) .M2kind(from, "l",  TRUE))
+setAs("Matrix", "isparseMatrix",
+      function(from) .M2kind(from, "i",  TRUE))
 setAs("Matrix", "dsparseMatrix",
       function(from) .M2kind(from, "d",  TRUE))
+setAs("Matrix", "zsparseMatrix",
+      function(from) .M2kind(from, "z",  TRUE))
 
 setAs("matrix", "nMatrix",
       function(from) {
-          if (.sparseDefault(from))
+          if (isDiagonal(from))
+              .M2kind(forceDiagonal(from), "n")
+          else if (.sparseDefault(from))
               .m2sparse.checking(from, "n", "C")
           else .m2dense.checking(from, "n")
       })
 setAs("matrix", "lMatrix",
-      function(from) {
+      function (from) {
           if (isDiagonal(from))
-              forceDiagonal.backcomp(`storage.mode<-`(from, "logical"))
+              .M2kind(forceDiagonal(from), "l")
           else if (.sparseDefault(from))
               .m2sparse.checking(from, "l", "C")
           else .m2dense.checking(from, "l")
       })
+setAs("matrix", "iMatrix",
+      function (from) {
+          if (isDiagonal(from))
+              .M2kind(forceDiagonal(from), "i")
+          else if (.sparseDefault(from))
+              .m2sparse.checking(from, "i", "C")
+          else .m2dense.checking(from, "i")
+      })
 setAs("matrix", "dMatrix",
       function(from) {
           if (isDiagonal(from))
-              forceDiagonal.backcomp(`storage.mode<-`(from, "double"))
+              .M2kind(forceDiagonal(from), "d")
           else if (.sparseDefault(from))
               .m2sparse.checking(from, "d", "C")
           else .m2dense.checking(from, "d")
+      })
+setAs("matrix", "zMatrix",
+      function (from) {
+          if (isDiagonal(from))
+              .M2kind(forceDiagonal(from), "z")
+          else if (.sparseDefault(from))
+              .m2sparse.checking(from, "z", "C")
+          else .m2dense.checking(from, "z")
       })
 
 setAs("matrix", "ndenseMatrix",
       function(from) .m2dense.checking(from, "n"))
 setAs("matrix", "ldenseMatrix",
       function(from) .m2dense.checking(from, "l"))
+setAs("matrix", "idenseMatrix",
+      function(from) .m2dense.checking(from, "i"))
 setAs("matrix", "ddenseMatrix",
       function(from) .m2dense.checking(from, "d"))
+setAs("matrix", "zdenseMatrix",
+      function(from) .m2dense.checking(from, "z"))
 
 setAs("matrix", "nsparseMatrix",
       function(from) .m2sparse.checking(from, "n", "C"))
 setAs("matrix", "lsparseMatrix",
       function(from) .m2sparse.checking(from, "l", "C"))
+setAs("matrix", "isparseMatrix",
+      function(from) .m2sparse.checking(from, "i", "C"))
 setAs("matrix", "dsparseMatrix",
       function(from) .m2sparse.checking(from, "d", "C"))
+setAs("matrix", "zsparseMatrix",
+      function(from) .m2sparse.checking(from, "z", "C"))
 
 setAs("vector", "nMatrix",
       function(from) {
@@ -461,26 +510,46 @@ setAs("vector", "lMatrix",
               .m2sparse(from, "lgC")
           else .m2dense(from, "lge")
       })
+setAs("vector", "iMatrix",
+      function(from) {
+          if (.sparseDefault(from))
+              .m2sparse(from, "igC")
+          else .m2dense(from, "ige")
+      })
 setAs("vector", "dMatrix",
       function(from) {
           if (.sparseDefault(from))
               .m2sparse(from, "dgC")
           else .m2dense(from, "dge")
       })
+setAs("vector", "zMatrix",
+      function(from) {
+          if (.sparseDefault(from))
+              .m2sparse(from, "zgC")
+          else .m2dense(from, "zge")
+      })
 
 setAs("vector", "ndenseMatrix",
       function(from) .m2dense(from, "nge"))
 setAs("vector", "ldenseMatrix",
       function(from) .m2dense(from, "lge"))
+setAs("vector", "idenseMatrix",
+      function(from) .m2dense(from, "ige"))
 setAs("vector", "ddenseMatrix",
       function(from) .m2dense(from, "dge"))
+setAs("vector", "zdenseMatrix",
+      function(from) .m2dense(from, "zge"))
 
 setAs("vector", "nsparseMatrix",
       function(from) .m2sparse(from, "ngC"))
 setAs("vector", "lsparseMatrix",
       function(from) .m2sparse(from, "lgC"))
+setAs("vector", "isparseMatrix",
+      function(from) .m2sparse(from, "igC"))
 setAs("vector", "dsparseMatrix",
       function(from) .m2sparse(from, "dgC"))
+setAs("vector", "zsparseMatrix",
+      function(from) .m2sparse(from, "zgC"))
 
 setAs("sparseVector", "nsparseVector",
       function(from) .V2kind(from, "n"))
@@ -521,13 +590,12 @@ setAs(      "matrix",  "symmetricMatrix", ..M2sym)
 setAs(      "Matrix", "triangularMatrix", ..M2tri)
 setAs(      "matrix", "triangularMatrix", ..M2tri)
 
-setAs("diagonalMatrix",  "symmetricMatrix",
+setAs("diagonalMatrix", "symmetricMatrix",
       function(from) {
           if (!isSymmetricDN(from@Dimnames))
-              stop("matrix is not symmetric; consider forceSymmetric(.) or symmpart(.)")
+              stop("matrix is not symmetric; consider forceSymmetric(.)")
           .diag2sparse(from, ".", "s", "C")
       })
-
 setAs("diagonalMatrix", "triangularMatrix",
       function(from)
           .diag2sparse(from, ".", "t", "C"))
@@ -545,9 +613,26 @@ setAs("Matrix",  "CsparseMatrix", .M2C)
 setAs("Matrix",  "RsparseMatrix", .M2R)
 setAs("Matrix",  "TsparseMatrix", .M2T)
 
-## Do test for structure:
-## FIXME: wrongly assumes that methods are defined for pack(<sparseMatrix>) ...
-setAs("generalMatrix", "packedMatrix", function(from) pack(from))
+## These signal an error *conditionally*, after testing for structure:
+setAs("generalMatrix", "packedMatrix",
+      function(from) {
+          if ({ trans <- "C"; isSymmetric(from, trans = trans) } ||
+              (.M.kind(from) == "z" &&
+               { trans <- "T"; isSymmetric(from, trans = trans) })) {
+              if (.isDense(from))
+                  .Call(R_dense_as_packed, from, "U", trans, NULL)
+              else .sparse2dense(forceSymmetric(from, uplo = "U", trans = trans), packed = TRUE)
+          }
+          else if (it <- isTriangular(from)) {
+              if (.isDense(from))
+                  .Call(R_dense_as_packed, from, attr(it, "kind"), NULL, "N")
+              else .sparse2dense(forceTriangular(from, uplo = attr(it, "kind"), diag = "N"), packed = TRUE)
+          }
+          else stop("matrix is not symmetric or triangular")
+      })
+setAs("indMatrix", "packedMatrix",
+      function(from)
+          as(.ind2sparse(from), "packedMatrix"))
 
 setAs("matrix",    "denseMatrix",
       function(from) .m2dense.checking(from, "."))
@@ -613,15 +698,14 @@ setAs("matrix",   "pMatrix",
       function(from) as(as(from, "nsparseMatrix"),   "pMatrix"))
 
 setAs("indMatrix", "pMatrix",
-      function(from)
-          new("pMatrix", from))
+      function(from) new("pMatrix", from))
 
 rm(..M2diag)
 
 
 ## ==== More to index ==================================================
 
-## MJ: could export without dot
+## MJ: unused but useful and could export
 .changeMargin <-
 function(x) {
     x@margin <- if (x@margin == 1L) 2L else 1L
@@ -645,8 +729,8 @@ function(perm, n, margin = 1L, check.p = 0L) {
         stop(gettextf("'%s' has elements less than %d",
                       "perm", 1L),
              domain = NA)
-    else if (m > .Machine$integer.max ||
-            (is.double(perm) && trunc(r[2L]) > .Machine$integer.max))
+    else if (m > .Machine[["integer.max"]] ||
+             (is.double(perm) && r[2L] - 1 >= .Machine[["integer.max"]]))
         stop(gettextf("dimensions cannot exceed %s",
                       "2^31-1"),
              domain = NA)
@@ -659,7 +743,7 @@ function(perm, n, margin = 1L, check.p = 0L) {
         stop(gettextf("'%s' is not a non-negative number",
                       "n"),
              domain = NA)
-    else if (is.double(n) && trunc(n) > .Machine$integer.max)
+    else if (is.double(n) && n - 1 >= .Machine[["integer.max"]])
         stop(gettextf("dimensions cannot exceed %s",
                       "2^31-1"),
              domain = NA)

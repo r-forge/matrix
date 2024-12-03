@@ -66,54 +66,6 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     }
 }
 
-## FIXME: "deprecated"; adjust methods that use this ...
-forceDiagonal.backcomp <- function(x, diag = NA_character_) {
-    y <- diag(x, names = FALSE) # FIXME? don't allocate if diag == "U"
-    cl <- switch(typeof(y),
-                 logical =
-                     {
-                         if(is.na(diag))
-                             diag <-
-                             if(!is.na(a <- all(y        )) && a) "U" else "N"
-                         if(.M.kind(x) == "n") "ndiMatrix" else "ldiMatrix"
-                     },
-                 integer =
-                     {
-                         if(is.na(diag))
-                             diag <-
-                             if(!is.na(a <- all(y == 1L  )) && a) "U" else "N"
-                         "idiMatrix"
-                     },
-                 double =
-                     {
-                         if(is.na(diag))
-                             diag <-
-                             if(!is.na(a <- all(y == 1   )) && a) "U" else "N"
-                         "ddiMatrix"
-                     },
-                 complex =
-                     {
-                         if(is.na(diag))
-                             diag <-
-                             if(!is.na(a <- all(y == 1+0i)) && a) "U" else "N"
-                         "zdiMatrix"
-                     },
-                 stop(gettextf("cannot coerce matrix of type \"%s\" to %s",
-                               typeof(y), "diagonalMatrix"),
-                      domain = NA))
-    n <- length(y)
-    d <- dim(x)
-    dn <- dimnames(x) %||% list(NULL, NULL)
-    if(any(d > n)) {
-        d <- c(n, n)
-        w <- if(d[1L] > n) 1L else 2L
-        if(!is.null(dnw <- dn[[w]]))
-            dn[[w]] <- dnw[seq_len(n)]
-    }
-    new(cl, Dim = d, Dimnames = dn, diag = diag,
-        x = if(diag == "N") y else y[FALSE])
-}
-
 .tCRT <- function(x, trans = "T", lazy = TRUE)
     .Call(R_sparse_transpose, x, "T", lazy)
 

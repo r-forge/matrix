@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-12-03 r5070)}{
+\section{Changes in version 1.8-0 (2024-12-03 r5078)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
