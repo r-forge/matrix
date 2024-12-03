@@ -1,15 +1,19 @@
 ## METHODS FOR GENERIC: coerce, as.*
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.M2kind <- function(from, kind = ".", sparse = NA)
+.M2kind <-
+function(from, kind = ".", sparse = NA)
     .Call(R_Matrix_as_kind, from, kind, sparse)
 
-.M2gen <- function(from, kind = ".")
+.M2gen <-
+function(from, kind = ".")
     .Call(R_Matrix_as_general, from, kind)
-..M2gen <- function(from) # for setAs()
+..M2gen <- # for setAs()
+function(from)
     .Call(R_Matrix_as_general, from, ".")
 
-.M2sym <- function(from, ...) {
+.M2sym <-
+function(from, ...) {
     if (isSymmetric(from, ...))
         forceSymmetric(from)
     else
@@ -20,7 +24,8 @@ formals(..M2sym) <- formals(..M2sym)[-2L]
 body(..M2sym)[[2L]][[2L]] <-
     body(..M2sym)[[2L]][[2L]][-3L]
 
-.M2tri <- function(from, ...) {
+.M2tri <-
+function(from, ...) {
     if (!(it <- isTriangular(from, ...)))
         stop("matrix is not triangular; consider triu(.) or tril(.)")
     else if (attr(it, "kind") == "U")
@@ -33,68 +38,85 @@ formals(..M2tri) <- formals(..M2tri)[-2L]
 body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]][-3L]
 
-.M2diag <- function(from) {
+.M2diag <-
+function(from) {
     if (!isDiagonal(from))
         stop("matrix is not diagonal; consider Diagonal(x=diag(.))")
     forceDiagonal.backcomp(from)
 }
 
-.M2v <- function(from)
+.M2v <-
+function(from)
     .Call(R_Matrix_as_vector, from)
 
-.M2m <- function(from)
+.M2m <-
+function(from)
     .Call(R_Matrix_as_matrix, from)
 
-.M2unpacked <- function(from)
+.M2unpacked <-
+function(from)
     .Call(R_Matrix_as_unpacked, from)
 
-.M2packed <- function(from)
+.M2packed <-
+function(from)
     .Call(R_Matrix_as_packed, from)
 
-.M2C <- function(from)
+.M2C <-
+function(from)
     .Call(R_Matrix_as_Csparse, from)
 
-.M2R <- function(from)
+.M2R <-
+function(from)
     .Call(R_Matrix_as_Rsparse, from)
 
-.M2T <- function(from)
+.M2T <-
+function(from)
     .Call(R_Matrix_as_Tsparse, from)
 
-.M2V <- function(from)
+.M2V <-
+function(from)
     .Call(R_Matrix_as_Vector, from)
 
-.sparse2dense <- function(from, packed = FALSE)
+.sparse2dense <-
+function(from, packed = FALSE)
     .Call(R_sparse_as_dense, from, packed)
 
-.diag2dense <- function(from, kind = ".", shape = "t", packed = FALSE,
-                        uplo = "U", trans = "T")
+.diag2dense <-
+function(from, kind = ".", shape = "t", packed = FALSE,
+         uplo = "U", trans = "T")
     .Call(R_diagonal_as_dense, from, kind, shape, packed, uplo, trans)
 
-.ind2dense <- function(from, kind = "n")
+.ind2dense <-
+function(from, kind = "n")
     .Call(R_index_as_dense, from, kind)
 
-.dense2sparse <- function(from, repr = "C")
+.dense2sparse <-
+function(from, repr = "C")
     .Call(R_dense_as_sparse, from, repr)
 
-.diag2sparse <- function(from, kind = ".", shape = "t", repr = "C",
-                         uplo = "U", trans = "T")
+.diag2sparse <-
+function(from, kind = ".", shape = "t", repr = "C",
+         uplo = "U", trans = "T")
     .Call(R_diagonal_as_sparse, from, kind, shape, repr, uplo, trans)
 
-.ind2sparse <- function(from, kind = "n", repr = ".")
+.ind2sparse <-
+function(from, kind = "n", repr = ".")
     .Call(R_index_as_sparse, from, kind, repr)
 
-.v2dense <- function(from, class = ".ge",
-                     uplo = "U", trans = "C", diag = "N",
-                     nrow = 1L, ncol = 1L, byrow = FALSE,
-                     dimnames = NULL)
+.v2dense <-
+function(from, class = ".ge",
+         uplo = "U", trans = "C", diag = "N",
+         nrow = 1L, ncol = 1L, byrow = FALSE, dimnames = NULL)
     .Call(R_vector_as_dense, from, class, uplo, trans, diag,
           nrow, ncol, byrow, dimnames)
 
-.m2dense <- function(from, class = ".ge",
-                     uplo = "U", trans = "C", diag = "N", margin = 2L)
+.m2dense <-
+function(from, class = ".ge",
+         uplo = "U", trans = "C", diag = "N", margin = 2L)
     .Call(R_matrix_as_dense, from, class, uplo, trans, diag, margin)
 
-.m2dense.checking <- function(from, kind = ".", ...) {
+.m2dense.checking <-
+function(from, kind = ".", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
            stop(gettextf("invalid type \"%s\" in '%s'",
                          typeof(from), ".m2dense.checking"),
@@ -119,18 +141,20 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
         .m2dense(from, paste0(kind, "ge"))
 }
 
-.V2sparse <- function(from, class = ".gC",
-                      uplo = "U", trans = "C", diag = "N",
-                      nrow = 1L, ncol = 1L, byrow = FALSE,
-                      dimnames = NULL)
+.V2sparse <-
+function(from, class = ".gC",
+         uplo = "U", trans = "C", diag = "N",
+         nrow = 1L, ncol = 1L, byrow = FALSE, dimnames = NULL)
     .Call(R_Vector_as_sparse, from, class, uplo, trans, diag,
           nrow, ncol, byrow, dimnames)
 
-.m2sparse <- function(from, class = ".gC",
-                      uplo = "U", trans = "C", diag = "N", margin = 2L)
+.m2sparse <-
+function(from, class = ".gC",
+         uplo = "U", trans = "C", diag = "N", margin = 2L)
     .Call(R_matrix_as_sparse, from, class, uplo, trans, diag, margin)
 
-.m2sparse.checking <- function(from, kind = ".", repr = "C", ...) {
+.m2sparse.checking <-
+function(from, kind = ".", repr = "C", ...) {
     switch(typeof(from), logical =, integer =, double = NULL,
            stop(gettextf("invalid type \"%s\" in '%s'",
                          typeof(from), ".m2sparse.checking"),
@@ -155,10 +179,12 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
         .m2sparse(from, paste0(kind, "g", repr))
 }
 
-.m2V <- function(from, kind = ".")
+.m2V <-
+function(from, kind = ".")
     .Call(R_vector_as_Vector, from, kind)
 
-.V2kind <- function(from, kind = ".") {
+.V2kind <-
+function(from, kind = ".") {
     if (kind == ".")
         return(from)
     kind. <- .M.kind(from)
@@ -177,7 +203,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2v <- function(from) {
+.V2v <-
+function(from) {
     if (.M.kind(from) != "n") {
         to <- vector(typeof(from@x), from@length)
         to[from@i] <- from@x
@@ -188,7 +215,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2m <- function(from) {
+.V2m <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -197,7 +225,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2a <- function(from) {
+.V2a <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -206,7 +235,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2unpacked <- function(from) {
+.V2unpacked <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -218,7 +248,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2C <- function(from) {
+.V2C <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -232,7 +263,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2R <- function(from) {
+.V2R <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -246,7 +278,8 @@ body(..M2tri)[[2L]][[2L]][[2L]][[2L]][[3L]] <-
     to
 }
 
-.V2T <- function(from) {
+.V2T <-
+function(from) {
     if (is.double(m <- length(from)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
@@ -269,14 +302,14 @@ if (FALSE) {
 ## which define proper subclasses of Matrix not extending
 ## any of _our_ proper subclasses of Matrix
 as.matrix.Matrix <- function(x, ...) .M2m(x)
- as.array.Matrix <- function(x, ...) .M2m(x)
+as.array.Matrix <- function(x, ...) .M2m(x)
 } else {
 as.matrix.Matrix <- function(x, ...) as(x, "matrix")
- as.array.Matrix <- function(x, ...) as(x, "matrix")
+as.array.Matrix <- function(x, ...) as(x, "matrix")
 setAs("Matrix", "matrix", .M2m)
 }
 as.matrix.sparseVector <- function(x, ...) .V2m(x)
- as.array.sparseVector <- function(x, ...) .V2a(x)
+as.array.sparseVector <- function(x, ...) .V2a(x)
 
 setMethod("as.vector" , c(x = "Matrix"),
           function(x, mode = "any") as.vector(.M2v(x), mode))
@@ -474,7 +507,8 @@ setAs("vector", "zsparseVector",
 
 ## ==== To "shape" =====================================================
 
-..m2gen <- function(from) .m2dense(from, ".ge")
+..m2gen <-
+function(from) .m2dense(from, ".ge")
 
 setAs(      "Matrix", "generalMatrix", ..M2gen)
 setAs(      "matrix", "generalMatrix", ..m2gen)
@@ -487,8 +521,6 @@ setAs("matrix",  "symmetricMatrix", ..M2sym)
 setAs("Matrix", "triangularMatrix", ..M2tri)
 setAs("matrix", "triangularMatrix", ..M2tri)
 
-rm(..m2gen)
-
 setAs("diagonalMatrix",  "symmetricMatrix",
       function(from) {
           if (!isSymmetricDN(from@Dimnames))
@@ -499,6 +531,8 @@ setAs("diagonalMatrix",  "symmetricMatrix",
 setAs("diagonalMatrix", "triangularMatrix",
       function(from)
           .diag2sparse(from, ".", "t", "C"))
+
+rm(..m2gen)
 
 
 ## ==== To "representation" ============================================
@@ -826,7 +860,8 @@ setAs("dsupernodalCholesky", "dgCMatrix",
 
 ## Operations such as rounding can lose positive semidefiniteness
 ## but not symmetry, hence:
-.indefinite <- function(x) as(x, .M.class(x, 6L))
+.indefinite <-
+function(x) as(x, .M.class(x, 6L))
 
 setAs("Matrix", "posdefMatrix",
       function(from) {
