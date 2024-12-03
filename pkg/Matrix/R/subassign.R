@@ -1509,12 +1509,14 @@ replDiag <- function(x, i, j, ..., value) {
     ## TODO: the following is a bit expensive; have cases above e.g. [i,] where
     ## ----- we could check *much* faster :
     if(isDiagonal(x))
-        forceDiagonal(x)
+        forceDiagonal.backcomp(x)
     else if(isSymmetric(x))
         forceSymmetric(x)
     else if(!(it <- isTriangular(x)))
         x
-    else forceTriangular(x, uplo = attr(it, "kind"))
+    else if(attr(it, "kind") == "U")
+        triu(x)
+    else tril(x)
 }
 
 setMethod("[<-", c(x = "diagonalMatrix", i = "index",

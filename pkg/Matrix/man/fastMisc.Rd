@@ -60,8 +60,8 @@
 .M2kind(from, kind = ".", sparse = NA)
 
 .M2gen(from, kind = ".")
-.M2sym(from, uplo = NULL, trans = "C", \dots)
-.M2tri(from, uplo = NULL)
+.M2sym(from, \dots)
+.M2tri(from, \dots)
 .M2diag(from)
 
 .M2v(from)
@@ -150,7 +150,8 @@
     \code{"^[.nld][gst][CRT]"} for \code{.m2sparse},
     where \code{"."} in the first position is equivalent to \code{"l"}
     for logical arguments and \code{"d"} for numeric arguments.}
-  \item{\dots}{optional arguments passed to \code{\link{isSymmetric}}.}
+  \item{\dots}{optional arguments passed to \code{\link{isSymmetric}}
+    or \code{\link{isTriangular}}.}
   %% .tCRT :
   \item{lazy}{a logical indicating if the transpose should be
     constructed with minimal allocation, but possibly \emph{without}

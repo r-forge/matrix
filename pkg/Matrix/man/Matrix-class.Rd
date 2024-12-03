@@ -24,10 +24,7 @@
 \alias{coerce,Matrix,diagonalMatrix-method}
 \alias{coerce,Matrix,dsparseMatrix-method}
 \alias{coerce,Matrix,generalMatrix-method}
-\alias{coerce,Matrix,iMatrix-method}
-\alias{coerce,Matrix,idenseMatrix-method}
 \alias{coerce,Matrix,indMatrix-method}
-\alias{coerce,Matrix,isparseMatrix-method}
 \alias{coerce,Matrix,lMatrix-method}
 \alias{coerce,Matrix,ldenseMatrix-method}
 \alias{coerce,Matrix,lsparseMatrix-method}
@@ -43,9 +40,6 @@
 \alias{coerce,Matrix,symmetricMatrix-method}
 \alias{coerce,Matrix,triangularMatrix-method}
 \alias{coerce,Matrix,unpackedMatrix-method}
-\alias{coerce,Matrix,zMatrix-method}
-\alias{coerce,Matrix,zdenseMatrix-method}
-\alias{coerce,Matrix,zsparseMatrix-method}
 \alias{coerce,matrix,Matrix-method}
 \alias{coerce,vector,Matrix-method}
 \alias{initialize,Matrix-method}
