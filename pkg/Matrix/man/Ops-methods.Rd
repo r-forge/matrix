@@ -15,6 +15,15 @@
 \alias{Logic}
 \alias{Logic-methods}
 %
+\alias{Ops,ANY,iMatrix-method}
+\alias{Ops,ANY,zMatrix-method}
+\alias{Ops,Matrix,iMatrix-method}
+\alias{Ops,Matrix,zMatrix-method}
+\alias{Ops,iMatrix,ANY-method}
+\alias{Ops,iMatrix,Matrix-method}
+\alias{Ops,zMatrix,ANY-method}
+\alias{Ops,zMatrix,Matrix-method}
+%
 \alias{Ops,ANY,Matrix-method}
 \alias{Ops,ANY,ddiMatrix-method}
 \alias{Ops,ANY,ldiMatrix-method}

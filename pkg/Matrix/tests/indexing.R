@@ -1365,7 +1365,7 @@ R.[1:2, ] <- R.[1:2, ] # was an error
 stopifnot(identical(R0, as(R., "RsparseMatrix")))
 
 ## Didn't drop dimensions ...
-stopifnot(identical(t(as(1:6,"CsparseMatrix"))[TRUE, ], as.double(1:6)))
+stopifnot(identical(t(as(1:6+0,"CsparseMatrix"))[TRUE, ], as.double(1:6)))
 
 ## Was briefly wrong prior to Matrix 1.6-0
 set.seed(0)

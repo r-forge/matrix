@@ -95,10 +95,11 @@ showProc.time()
 
 ## lgeMatrix -- rbind2() had bug (in C code):
 is.lge <- function(M) isValid(M, "lgeMatrix")
+is.lgC <- function(M) isValid(M, "lgCMatrix") # until Ops are refactored for 1.8-0
 stopifnot(exprs = {
-    is.lge(rbind(M2 > 0, M2 < 0)) # had Error in rbind2():
+    is.lgC(rbind(M2 > 0, M2 < 0)) # had Error in rbind2():
     ## REAL() can only be applied to a 'numeric', not a 'logical'
-    is.lge(rbind(M2 < 0, M2 > 0)) # ditto
+    is.lgC(rbind(M2 < 0, M2 > 0)) # ditto
     is.lge(rbind(Matrix(1:6 %% 3 != 0, 2,3), FALSE))
     is.lge(L <- rbind(Matrix(TRUE, 2,3), TRUE))
     all(L)

@@ -129,11 +129,9 @@ setClass("ndenseMatrix",
 setClass("ldenseMatrix",
          contains = c("VIRTUAL", "lMatrix", "denseMatrix"))
 
-if(FALSE) { # --NOT YET--
 ## Virtual class of dense, integer matrices
 setClass("idenseMatrix",
          contains = c("VIRTUAL", "iMatrix", "denseMatrix"))
-} # --NOT YET--
 
 ## Virtual class of dense, double matrices
 setClass("ddenseMatrix",
@@ -221,11 +219,9 @@ setClass("nsparseMatrix",
 setClass("lsparseMatrix",
          contains = c("VIRTUAL", "lMatrix", "sparseMatrix"))
 
-if(FALSE) { # --NOT YET--
 ## Virtual class of sparse, integer matrices
 setClass("isparseMatrix",
          contains = c("VIRTUAL", "iMatrix", "sparseMatrix"))
-} # --NOT YET--
 
 ## Virtual class of sparse, double matrices
 setClass("dsparseMatrix",
@@ -286,7 +282,6 @@ setClass("ltpMatrix",
          contains = c("packedMatrix", "ldenseMatrix", "triangularMatrix"))
 
 
-if(FALSE) { # --NOT YET--
 ## ...... Dense, integer ...............................................
 
 ## Unpacked, general
@@ -308,7 +303,6 @@ setClass("ispMatrix",
 ## Packed, triangular
 setClass("itpMatrix",
          contains = c("packedMatrix", "idenseMatrix", "triangularMatrix"))
-} # --NOT YET--
 
 
 ## ...... Dense, double ................................................
@@ -498,7 +492,6 @@ setClass("ldiMatrix",
          contains = c("diagonalMatrix", "lMatrix"))
 
 
-if(FALSE) { # --NOT YET--
 ## ...... Sparse, integer ..............................................
 
 ## CSC, general
@@ -549,7 +542,6 @@ setClass("itTMatrix",
 ## Diagonal
 setClass("idiMatrix",
          contains = c("diagonalMatrix", "iMatrix"))
-} # --NOT YET--
 
 
 ## ...... Sparse, double ...............................................

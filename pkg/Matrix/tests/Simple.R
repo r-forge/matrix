@@ -749,7 +749,7 @@ showProc.time()
 ###-- more solve() methods  {was ./solve.R }
 
 ## first for "dgeMatrix" and all kinds of RHS :
-(m6 <- 1 + as(diag(0:5), "generalMatrix"))
+(m6 <- 1 + as(diag(0:5+0), "generalMatrix"))
 rcond(m6)
 I6 <- as(diag(6), "generalMatrix")
 stopifnot(all.equal(I6, m6 %*% solve(m6)),
@@ -1113,10 +1113,10 @@ stopifnot(sp @uplo=="U", tp @uplo=="U",
 
 ## band():
 n <- 4 ; m <- 6
-r1 <- Matrix(1:24, n,m)
+r1 <- Matrix(1:24+0, n,m)
 validObject(M1 <- band(r1, 0,0))
 (M1 <- as(M1, "sparseMatrix"))
-r2 <- Matrix(1:18, 3, 6)
+r2 <- Matrix(1:18+0, 3, 6)
 stopifnot(identical(M1, bandSparse(n,m, k=0, diagonals = list(diag(r1)))),
 	  identical(band(r2, 0,4),
 		    band(r2, 0,3) + band(r2, 4,4)))
@@ -1247,7 +1247,7 @@ d4d.2 <- .dense2sparse(!!d4da, "C") ## <<- did wrongly make dimnames symmetric
 l4da <- as(d4da, "lMatrix")
 assert.EQ.Mat(l4da, as(l4da,"CsparseMatrix"))
 
-dtr <- tr4 <- triu(Matrix(1:16, 4,4))
+dtr <- tr4 <- triu(Matrix(1:16+0, 4,4))
 dtr@x[Matrix:::indTri(4, upper=FALSE, diag=FALSE)] <- 100*(-3:2)
 stopifnot(all.equal(dtr, tr4), # because are same *as* simple matrices
 	  dtr@x[1:4] == c(1, -(3:1)*100),
@@ -1406,8 +1406,8 @@ stopifnot(identical(.d1, .d0),
                     new("dgCMatrix")),
           identical(Matrix(new("dgCMatrix"), sparse=FALSE, forceCheck=FALSE),
                     new("dgeMatrix")),
-          identical(Matrix(table(1)),       Matrix(1)),
-          identical(Matrix(table(1, 1, 1)), Matrix(1)),
+          identical(Matrix(0+table(1)),       Matrix(1)),
+          identical(Matrix(0+table(1, 1, 1)), Matrix(1)),
           grepl("too long",
                 vapply(alist(Matrix(0, 0.5,    ), Matrix(0,    , 0.5),
                              Matrix(0, 0.0,    ), Matrix(0,    , 0.0)),
@@ -1541,7 +1541,7 @@ x[1L, 1L] <- 1
 stopifnot(identical(x, y))
 
 ## as(<data.frame>, "Matrix") was briefly a error (invalid type "list")
-stopifnot(identical(as(data.frame(a = 1:2, b = 3:4), "Matrix"),
+stopifnot(identical(as(data.frame(a = 1:2+0, b = 3:4+0), "Matrix"),
                     new("dgeMatrix", x = as.double(1:4),
                         Dim = c(2L, 2L), Dimnames = list(NULL, c("a", "b")))))
 

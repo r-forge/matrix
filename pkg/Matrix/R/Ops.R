@@ -103,6 +103,24 @@ if(FALSE) { # unused
 .LogicGenerics   <- getGroupMembers("Logic")
 }
 
+## For now:
+.fn1 <-
+function(e1, e2)
+    as(callGeneric(as(e1, "matrix"),    e2           ), "Matrix")
+.fn2 <-
+function(e1, e2)
+    as(callGeneric(   e1           , as(e2, "matrix")), "Matrix")
+.fn3 <-
+function(e1, e2)
+    as(callGeneric(as(e1, "matrix"), as(e2, "matrix")), "Matrix")
+for(.cl in c("iMatrix", "zMatrix")) {
+setMethod("Ops", c(e1 =      .cl, e2 =    "ANY"), .fn1)
+setMethod("Ops", c(e1 =    "ANY", e2 =      .cl), .fn2)
+setMethod("Ops", c(e1 =      .cl, e2 = "Matrix"), .fn3)
+setMethod("Ops", c(e1 = "Matrix", e2 =      .cl), .fn3)
+}
+rm(.cl, .fn1, .fn2, .fn3)
+
 ### Design decision for *sparseMatrix*:
 ### work via Csparse  since Tsparse are not-unique (<-> slots not compatible)
 

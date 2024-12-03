@@ -1,7 +1,7 @@
 
-R version 4.3.1 Patched (2023-08-08 r84910) -- "Beagle Scouts"
-Copyright (C) 2023 The R Foundation for Statistical Computing
-Platform: aarch64-apple-darwin22.5.0 (64-bit)
+R Under development (unstable) (2024-12-02 r87417) -- "Unsuffered Consequences"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23.6.0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -82,7 +82,7 @@ Loading required package: tools
 A 1 4 7 10 10 40 70 100
 B 2 5 8 11 20 50 80 110
 C 3 6 9 12 30 60 90 120
-3 x 8 Matrix of class "dgeMatrix"
+3 x 8 Matrix of class "igeMatrix"
   a b c  d a  b  c  d
 A 1 4 7 10 2  8 14 20
 B 2 5 8 11 4 10 16 22
@@ -100,7 +100,7 @@ C 3 6 9 12 6 12 18 24
 [4,]   10   40   70  100
 [5,]   20   50   80  110
 [6,]   30   60   90  120
-6 x 4 Matrix of class "dgeMatrix"
+6 x 4 Matrix of class "igeMatrix"
   a  b  c  d
 A 1  4  7 10
 B 2  5  8 11
@@ -108,7 +108,7 @@ C 3  6  9 12
   2  8 14 20
   4 10 16 22
   6 12 18 24
-4 x 4 Matrix of class "dgeMatrix"
+4 x 4 Matrix of class "igeMatrix"
     a  b  c  d
 R1 10 11 10 11
     1  4  7 10
@@ -202,14 +202,15 @@ A 1 4 7 10 100 1 4 7 10
 B 2 5 8 11 100 2 5 8 11
 C 3 6 9 12 100 3 6 9 12
 > showProc.time()
-Time (user system elapsed): 0.051 0.006 0.056 
+Time (user system elapsed): 0.067 0.008 0.075 
 > 
 > ## lgeMatrix -- rbind2() had bug (in C code):
 > is.lge <- function(M) isValid(M, "lgeMatrix")
+> is.lgC <- function(M) isValid(M, "lgCMatrix") # until Ops are refactored for 1.8-0
 > stopifnot(exprs = {
-+     is.lge(rbind(M2 > 0, M2 < 0)) # had Error in rbind2():
++     is.lgC(rbind(M2 > 0, M2 < 0)) # had Error in rbind2():
 +     ## REAL() can only be applied to a 'numeric', not a 'logical'
-+     is.lge(rbind(M2 < 0, M2 > 0)) # ditto
++     is.lgC(rbind(M2 < 0, M2 > 0)) # ditto
 +     is.lge(rbind(Matrix(1:6 %% 3 != 0, 2,3), FALSE))
 +     is.lge(L <- rbind(Matrix(TRUE, 2,3), TRUE))
 +     all(L)
@@ -245,7 +246,7 @@ Time (user system elapsed): 0.051 0.006 0.056
 + 	  identical(.tCRT(d4), cbind(Diagonal(4),     0:3)),
 + 	  identical(.tCRT(m4), rbind(Diagonal(x=-1:2), 0:3)))
 > showProc.time()
-Time (user system elapsed): 0.019 0 0.02 
+Time (user system elapsed): 0.04 0.005 0.045 
 > 
 > ### --- Sparse Matrices ---
 > 
@@ -293,7 +294,7 @@ rbind (m, v= 2 ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 cbind (m, v= 1:0 ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 rbind (m, v= 1:0 ), class(m) : dgeMatrix ,. dgCMatrix ,. dgTMatrix ,.
 > showProc.time()
-Time (user system elapsed): 0.018 0.001 0.019 
+Time (user system elapsed): 0.028 0.001 0.029 
 > 
 > cbind(0, mC); cbind(mC, 0)
 4 x 7 sparse Matrix of class "dgCMatrix"
@@ -538,8 +539,8 @@ v5    .    |    .    |    .
 > 
 > options(op)
 > showProc.time()
-Time (user system elapsed): 0.06 0.003 0.063 
+Time (user system elapsed): 0.087 0.006 0.093 
 > 
 > proc.time()
    user  system elapsed 
-  0.609   0.039   0.646 
+  0.895   0.068   0.959 

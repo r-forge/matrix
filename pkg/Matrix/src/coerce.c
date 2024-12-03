@@ -14,10 +14,6 @@ SEXP vector_as_dense(SEXP from, const char *zzz,
 	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
-#ifndef MATRIX_ENABLE_IMATRIX
-	if (cl[0] == 'i')
-		cl[0] = 'd';
-#endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	int packed = cl[2] == 'p';
 	PROTECT(from = Rf_coerceVector(from, tt));
@@ -267,10 +263,6 @@ SEXP matrix_as_dense(SEXP from, const char *zzz,
 	cl[0] = (zzz[0] == '.') ? typeToKind(tf) : ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = zzz[2];
-#ifndef MATRIX_ENABLE_IMATRIX
-	if (cl[0] == 'i')
-		cl[0] = 'd';
-#endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	int packed = cl[2] == 'p';
 	PROTECT(from = Rf_coerceVector(from, tt));
@@ -765,10 +757,6 @@ SEXP Vector_as_sparse(SEXP from, const char *zzz,
 		: ((zzz[0] == ',') ? ((tf == CPLXSXP) ? 'z' : 'd') : zzz[0]);
 	cl[1] = zzz[1];
 	cl[2] = (byrow) ? 'R' : 'C';
-#ifndef MATRIX_ENABLE_IMATRIX
-	if (cl[0] == 'i')
-		cl[0] = 'd';
-#endif
 	SEXPTYPE tt = kindToType(cl[0]);
 	if (x0 != R_NilValue && cl[0] != 'n') {
 		x0 = Rf_coerceVector(x0, tt);
@@ -1299,10 +1287,6 @@ SEXP matrix_as_sparse(SEXP from, const char *zzz,
 	cl[0] = typeToKind(TYPEOF(from));
 	cl[1] = zzz[1];
 	cl[2] = (zzz[1] == 'g') ? 'e' : ((zzz[1] == 's') ? 'y' : ((zzz[1] == 'p') ? 'o' : 'r'));
-#ifndef MATRIX_ENABLE_IMATRIX
-	if (cl[0] == 'i')
-		cl[0] = 'd';
-#endif
 	PROTECT_INDEX pid;
 	PROTECT_WITH_INDEX(from, &pid);
 	REPROTECT(from = matrix_as_dense(from, cl, ul, ct, nu, mg, 0), pid);

@@ -16,8 +16,8 @@ assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= 1:4) )# int 'x'
 assertError( new("dgeMatrix", Dim = 2:2, x=as.double(1:4)) )# length(Dim) !=2
 assertError( new("dgeMatrix", Dim = as.integer(c(2,2)), x= as.double(1:5)))
 
-checkMatrix(m1 <- Matrix(1:6, ncol=2))
-checkMatrix(m2 <- Matrix(1:7 +0, ncol=3)) # a (desired) warning
+checkMatrix(m1 <- Matrix(1:6+0, ncol=2))
+checkMatrix(m2 <- Matrix(1:7+0, ncol=3)) # a (desired) warning
 c("dgeMatrix", "ddenseMatrix", "generalMatrix", "dMatrix",
   "denseMatrix", "Matrix") -> m1.cl
 stopifnot(!anyNA(match(m1.cl, is(m1))),

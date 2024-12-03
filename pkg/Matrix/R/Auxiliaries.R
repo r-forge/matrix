@@ -82,16 +82,8 @@ forceDiagonal.backcomp <- function(x, diag = NA_character_) {
                          if(is.na(diag))
                              diag <-
                              if(!is.na(a <- all(y == 1L  )) && a) "U" else "N"
-                         storage.mode(y) <- "double"
-                         "ddiMatrix"
+                         "idiMatrix"
                      },
-              ## integer =
-              ##     {
-              ##         if(is.na(diag))
-              ##             diag <-
-              ##             if(!is.na(a <- all(y == 1L  )) && a) "U" else "N"
-              ##         "idiMatrix"
-              ##     },
                  double =
                      {
                          if(is.na(diag))

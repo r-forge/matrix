@@ -134,7 +134,7 @@ str(lutp <- pack(lutr)) # packed matrix: only 10 = 4*(4+1)/2 entries
 stopifnot(all.equal(lutp, pack(!!lutp)))
 
 %% moved from ./dtrMatrix-class-dense.Rd :
-(m <- rbind(2:3, 0:-1))
+(m <- rbind(2:3, 0:-1)+0)
 (M <- as(m, "generalMatrix"))
 
 (T <- as(M, "triangularMatrix")) # formally upper triangular

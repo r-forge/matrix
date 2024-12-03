@@ -40,8 +40,8 @@ stopifnot(exprs = {
 })
 
 ## "Arith" / "Ops"
-M <- Matrix(1:12, 4,3)
-m <- cbind(4:1)
+M <- Matrix(1:12+0, 4, 3)
+m <- cbind(4:1+0)
 stopifnot(exprs = {
     identical(M*m, M*c(m)) # M*m failed in Matrix_1.3-3 pre-release:
     identical(m*M, c(m)*M)

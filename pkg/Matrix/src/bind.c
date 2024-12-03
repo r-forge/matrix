@@ -216,15 +216,10 @@ void scanArgs(SEXP args, SEXP exprs, int margin, int level,
 
 	if (anyZ)
 		*kind = 'z';
-#ifndef MATRIX_ENABLE_IMATRIX
-	else if (anyD || anyI)
-		*kind = 'd';
-#else
 	else if (anyD)
 		*kind = 'd';
 	else if (anyI)
 		*kind = 'i';
-#endif
 	else if (anyL)
 		*kind = 'l';
 	else if (anyN)
