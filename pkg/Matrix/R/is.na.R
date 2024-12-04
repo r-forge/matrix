@@ -333,7 +333,7 @@ setMethod("is.finite", c(x = .cl),
                       if (length(k) > length(x@x)) # was overallocated
                           k <- is.finite(x@x)
                   }
-                  if (is.double(prod(d)))
+                  if (prod(d) > .Machine[["integer.max"]])
                       d <- as.double(d)
                   i <- x@j * d[1L] + x@i + 1L
                   tmp[i] <- k
