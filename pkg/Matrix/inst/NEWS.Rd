@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-12-03 r5078)}{
+\section{Changes in version 1.8-0 (2024-12-03 r5090)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
@@ -119,6 +119,11 @@
   }
   \subsection{Misc}{
     \itemize{
+      \item \pkg{Matrix} version 1.8-0 and higher strictly depend on
+      \R{} \eqn{\ge}{>=} 4.5.0.
+
+      \item \pkg{MatrixModels} is added to \code{Enhances}.
+
       \item \proglang{C} code uses new (since \R{} 4.4.0) \code{OBJSXP}
       in place of deprecated \code{S4SXP} and \code{TYPEOF(.) == OBJSXP}
       in place of (not specific enough) \code{isS4(.)}.
