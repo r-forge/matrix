@@ -545,7 +545,7 @@ setMethod("[<-", c(x = "sparseMatrix", i = "ANY", j = "ANY",
 ## workhorse for "[<-" -- for d*, l*, and n..C-sparse matrices :
 ## ---------     -----
 replCmat <- function (x, i, j, ..., value) {
-    x <- .indefinite(x)
+    x <- .promote(x)
     di <- dim(x)
     dn <- dimnames(x)
     iMi <- missing(i)
@@ -924,7 +924,7 @@ intI <- function(i, n, dn, give.dn = TRUE) {
 ##
 ## workhorse for "[<-" :
 replTmat <- function (x, i, j, ..., value) {
-    x <- .indefinite(x)
+    x <- .promote(x)
 ## NOTE:  need '...', i.e., exact signature such that setMethod()
 ##	  does not use .local() such that nargs() will work correctly:
     di <- dim(x)
@@ -1301,7 +1301,7 @@ replTmat <- function (x, i, j, ..., value) {
 ## ----------------   ./Matrix.R has a general cheap method
 ## This one should become as fast as possible -- is also used from Csparse.R --
 .TM.repl.i.mat <- function (x, i, j, ..., value) {
-    x <- .indefinite(x)
+    x <- .promote(x)
     nA <- nargs()
     if(nA != 3)
 	stop(gettextf("nargs() = %d should never happen; please report.", nA), domain=NA)

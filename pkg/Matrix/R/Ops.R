@@ -1331,7 +1331,7 @@ setMethod("Arith", c(e1 = "dtCMatrix", e2 = "dtCMatrix"),
             e1@x <- callGeneric(e1@x, e2)
             if(.hasSlot(e1, "factors") && length(e1@factors))
                 e1@factors <- list()
-            return(.indefinite(e1))
+            return(.promote(e1))
         }
     }
     ## all other (potentially non-sparse) cases: give up symm, tri,..
@@ -1351,7 +1351,7 @@ setMethod("Arith", c(e1 = "dtCMatrix", e2 = "dtCMatrix"),
             e2@x <- callGeneric(e1, e2@x)
             if(.hasSlot(e2, "factors") && length(e2@factors))
                 e2@factors <- list()
-            return(.indefinite(e2))
+            return(.promote(e2))
         }
     }
     callGeneric(e1, as(.M2gen(.M2kind(e2, "d")), "CsparseMatrix"))

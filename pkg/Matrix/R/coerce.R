@@ -941,11 +941,6 @@ setAs("dsupernodalCholesky", "dgCMatrix",
 
 ## ==== More to positive semidefinite ==================================
 
-## Operations such as rounding can lose positive semidefiniteness
-## but not symmetry, hence:
-.indefinite <-
-function(x) as(x, .M.class(x, 6L))
-
 setAs("Matrix", "posdefMatrix",
       function(from) {
           if (!isSymmetric(from))

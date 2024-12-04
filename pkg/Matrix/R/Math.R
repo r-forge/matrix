@@ -250,7 +250,7 @@ setMethod("log", c(x = "sparseVector"),
 
 setMethod("Math2", c(x = "Matrix"),
           function(x, digits) {
-              x <- .indefinite(.M2kind(x, ","))
+              x <- .promote(.M2kind(x, ","))
               x@x <- get(.Generic, mode = "function")(x@x, digits = digits)
               if(.hasSlot(x, "factors") && length(x@factors) > 0L)
                   x@factors <- list()
@@ -271,7 +271,7 @@ setMethod("Math2", c(x = "sparseVector"),
 setMethod("zapsmall", signature(x = "Matrix"),
           function(x, digits = getOption("digits"),
                    mFUN = function(x, ina) max(abs(x[!ina])), min.d = 0L, ...) {
-              x <- .indefinite(.M2kind(x, ","))
+              x <- .promote(.M2kind(x, ","))
               x@x <- zapsmall(x@x, digits=digits, mFUN=mFUN, min.d=min.d, ...)
               if(.hasSlot(x, "factors") && length(x@factors) > 0L)
                   x@factors <- list()
