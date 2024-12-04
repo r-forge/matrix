@@ -2,7 +2,7 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("mean", c(x = "denseMatrix"),
-          function(x, ...) mean.default(.M2v(x), ...))
+          function(x, ...) mean(.M2v(x), ...))
 
 setMethod("mean", c(x = "sparseMatrix"),
           function(x, ...) mean(.M2V(x), ...))

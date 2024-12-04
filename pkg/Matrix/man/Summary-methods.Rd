@@ -15,10 +15,6 @@
 \alias{Summary,sparseMatrix-method}
 \alias{Summary,sparseVector-method}
 %
-\alias{mean,denseMatrix-method}
-\alias{mean,sparseMatrix-method}
-\alias{mean,sparseVector-method}
-%
 \description{TODO.}
 \usage{
 Summary(x, \dots, na.rm = FALSE)
