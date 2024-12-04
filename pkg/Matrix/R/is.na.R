@@ -3,12 +3,12 @@
 
 setMethod("anyNA", c(x = "denseMatrix"),
           function(x, recursive = FALSE)
-              .M.kind(x) != "n" && anyNA(.forceCanonical(x)@x))
+              .M.kind(x) != "n" && anyNA(forceCanonical(x)@x))
 
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
 setMethod("anyNA", c(x = .cl),
           function(x, recursive = FALSE)
-              .M.kind(x) != "n" && anyNA(.forceCanonical(x)@x))
+              .M.kind(x) != "n" && anyNA(forceCanonical(x)@x))
 
 setMethod("anyNA", c(x = "diagonalMatrix"),
           function(x, recursive = FALSE)
@@ -41,7 +41,7 @@ setMethod("is.na", c(x = "denseMatrix"),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (if (shape == "s") kind == "z" && x@trans == "C" else maybe && x@diag != "N")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               r@x <- if (maybe) is.na(x@x) else logical(length(x@x))
               r
@@ -61,7 +61,7 @@ setMethod("is.na", c(x = .cl),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (shape == "s" && kind == "z" && x@trans == "C")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               if (maybe) {
                   switch(substr(cl, 3L, 3L),
@@ -128,7 +128,7 @@ setMethod("is.nan", c(x = "denseMatrix"),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (if (shape == "s") kind == "z" && x@trans == "C" else maybe && x@diag != "N")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               r@x <- if (maybe) is.nan(x@x) else logical(length(x@x))
               r
@@ -148,7 +148,7 @@ setMethod("is.nan", c(x = .cl),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (shape == "s" && kind == "z" && x@trans == "C")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               if (maybe) {
                   switch(substr(cl, 3L, 3L),
@@ -215,7 +215,7 @@ setMethod("is.infinite", c(x = "denseMatrix"),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (if (shape == "s") kind == "z" && x@trans == "C" else maybe && x@diag != "N")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               r@x <- if (maybe) is.infinite(x@x) else logical(length(x@x))
               r
@@ -235,7 +235,7 @@ setMethod("is.infinite", c(x = .cl),
               if (shape != "g") {
                   r@uplo <- x@uplo
                   if (shape == "s" && kind == "z" && x@trans == "C")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               if (maybe) {
                   switch(substr(cl, 3L, 3L),
@@ -303,7 +303,7 @@ setMethod("is.finite", c(x = "denseMatrix"),
               if (shape == "s") {
                   r@uplo <- x@uplo
                   if (kind == "z" && x@trans == "C")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               else if (maybe && shape == "t")
                   x <- .M2gen(x)
@@ -324,7 +324,7 @@ setMethod("is.finite", c(x = .cl),
               if (shape == "s") {
                   r@uplo <- x@uplo
                   if (kind == "z" && x@trans == "C")
-                      x <- .forceCanonical(x)
+                      x <- forceCanonical(x)
               }
               tmp <- rep.int(TRUE, prod(d))
               if (maybe && !all(k <- is.finite(x@x))) {

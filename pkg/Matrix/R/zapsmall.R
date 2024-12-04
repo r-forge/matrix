@@ -5,7 +5,7 @@
 
 setMethod("zapsmall", signature(x = "Matrix"),
           function(x, ...) {
-              r <- .M2kind(.forceCanonical(.promote(x)), ",")
+              r <- .M2kind(forceCanonical(.promote(x)), ",")
               r@x <- zapsmall(x@x, ...)
               if (.M.shape(r) != "t")
                   r@factors <- list()

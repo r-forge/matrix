@@ -4,6 +4,9 @@
 #include "M5.h"
 #include "idz.h"
 
+/* defined in ./aggregate.c : */
+SEXP sparse_aggregate(SEXP, const char *);
+
 SEXP dense_force_canonical(SEXP from, const char *class, int check)
 {
 	if (class[1] == 'g' && class[0] != 'n')
@@ -79,7 +82,7 @@ SEXP dense_force_canonical(SEXP from, const char *class, int check)
 
 SEXP sparse_force_canonical(SEXP from, const char *class, int check)
 {
-	SEXP to = from;
+	SEXP to = PROTECT(sparse_aggregate(from, class));
 	switch (class[1]) {
 	case 'g':
 		break;
@@ -182,6 +185,7 @@ SEXP sparse_force_canonical(SEXP from, const char *class, int check)
 		to = R_NilValue;
 		break;
 	}
+	UNPROTECT(1); /* to */
 	return to;
 }
 

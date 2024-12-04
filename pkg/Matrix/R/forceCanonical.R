@@ -1,21 +1,31 @@
 ## METHODS FOR GENERIC: forceCanonical
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.forceCanonical <-
-function(x, check = TRUE)
-    switch(.M.repr(x),
-           "n" =, "p" =
-               .Call(R_dense_force_canonical, x, check),
-           "C" =, "R" =, "T" =
-               .Call(R_sparse_force_canonical, x, check),
-           stop("should never happen ..."))
-
 setMethod("forceCanonical", c(x = "denseMatrix"),
           function(x, check = TRUE, ...)
               .Call(R_dense_force_canonical, x, check))
 
-for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
-setMethod("forceCanonical", c(x = .cl),
+setMethod("forceCanonical", c(x = "CsparseMatrix"),
+          function(x, check = TRUE, ...) {
+              if (length(x@i) > (nnz <- x@p[length(x@p)])) {
+                  x@i <- x@i[seq_len(nnz)]
+                  if (.M.kind(x) != "n")
+                  x@x <- x@x[seq_len(nnz)]
+              }
+              .Call(R_sparse_force_canonical, x, check)
+          })
+
+setMethod("forceCanonical", c(x = "RsparseMatrix"),
+          function(x, check = TRUE, ...) {
+              if (length(x@j) > (nnz <- x@p[length(x@p)])) {
+                  x@j <- x@j[seq_len(nnz)]
+                  if (.M.kind(x) != "n")
+                  x@x <- x@x[seq_len(nnz)]
+              }
+              .Call(R_sparse_force_canonical, x, check)
+          })
+
+setMethod("forceCanonical", c(x = "TsparseMatrix"),
           function(x, check = TRUE, ...)
               .Call(R_sparse_force_canonical, x, check))
 
