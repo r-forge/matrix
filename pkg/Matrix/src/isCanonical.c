@@ -39,48 +39,41 @@ int dense_is_canonical(SEXP obj, const char *class)
 
 int sparse_is_canonical(SEXP obj, const char *class)
 {
-	switch (class[1]) {
-	case 'g':
-		return 1;
-	case 's':
-		if (class[0] == 'z' && TRANS(obj) == 'C') {
-		SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+	if ((class[1] == 's' || class[1] == 'p') && class[0] == 'z' &&
+	    TRANS(obj) == 'C') {
+	int n = DIM(obj)[1];
+	char ul = UPLO(obj);
+	if (class[2] != 'T') {
+		SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
+			p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
+			i = PROTECT(GET_SLOT(obj, iSym)),
+			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		int *pp = INTEGER(p) + 1, *pi = INTEGER(i);
 		Rcomplex *px = COMPLEX(x);
-		int n = DIM(obj)[1];
-		char ul = UPLO(obj);
-		if (class[2] != 'T') {
-			SEXP iSym = (class[2] == 'C') ? Matrix_iSym : Matrix_jSym,
-				p = PROTECT(GET_SLOT(obj, Matrix_pSym)),
-				i = PROTECT(GET_SLOT(obj, iSym));
-			int *pp = INTEGER(p) + 1, *pi = INTEGER(i), j, k_, k, kend,
-				up = (class[2] == 'C') == (ul == 'U');
-			UNPROTECT(3); /* i, p, x */
-			for (j = 0, k = 0; j < n; ++j) {
-				kend = pp[j];
-				if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j &&
-				    (ISNAN(px[k_].i) || px[k_].i != 0.0))
-					return 0;
-				k = kend;
-			}
-		} else {
-			SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
-				j = PROTECT(GET_SLOT(obj, Matrix_jSym));
-			int *pi = INTEGER(i), *pj = INTEGER(j);
-			R_xlen_t k, kend = XLENGTH(i);
-			UNPROTECT(3); /* j, i, x */
-			for (k = 0; k < kend; ++k)
-				if (pi[k] == pj[k] &&
-				    (ISNAN(px[k].i) || px[k].i != 0.0))
-					return 0;
+		int j, k_, k, kend, up = (class[2] == 'C') == (ul == 'U');
+		UNPROTECT(3); /* x, i, p */
+		for (j = 0, k = 0; j < n; ++j) {
+			kend = pp[j];
+			if (k < kend && pi[k_ = (up) ? kend - 1 : k] == j &&
+			    (ISNAN(px[k_].i) || px[k_].i != 0.0))
+				return 0;
+			k = kend;
 		}
-		}
-		return 1;
-	case 't':
-		return DIAG(obj) == 'N';
-	default:
-		Rf_error("should never happen ...");
-		return 0;
+	} else {
+		SEXP i = PROTECT(GET_SLOT(obj, Matrix_iSym)),
+			j = PROTECT(GET_SLOT(obj, Matrix_jSym)),
+			x = PROTECT(GET_SLOT(obj, Matrix_xSym));
+		int *pi = INTEGER(i), *pj = INTEGER(j);
+		Rcomplex *px = COMPLEX(x);
+		R_xlen_t k, kend = XLENGTH(i);
+		UNPROTECT(3); /* x, j, i */
+		for (k = 0; k < kend; ++k)
+			if (pi[k] == pj[k] &&
+			    (ISNAN(px[k].i) || px[k].i != 0.0))
+				return 0;
 	}
+	}
+	return 1;
 }
 
 SEXP R_dense_is_canonical(SEXP s_obj)

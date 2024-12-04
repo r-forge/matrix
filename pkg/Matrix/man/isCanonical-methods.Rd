@@ -50,27 +50,16 @@ m1@x <- c(FALSE, TRUE, TRUE, TRUE)
 m1; m1. # same class, same matrix, different representations
 
 ## transpose for symmetric, conjugate transpose for Hermitian
-m2 <- m2. <- new("dsyMatrix", Dim = c(2L, 2L), uplo = "U",
-                 x = c(1, 2, 4, 8))
-m2@x <- c(1, 4, 4, 8)
+m2 <- m2. <- new("zsyMatrix", Dim = c(2L, 2L), uplo = "U", trans = "C",
+                 x = c(1+1i, 2+2i, 4+4i, 8+8i))
+m2@x <- c(1+0i, 4-4i, 4+4i, 8+0i)
 m2; m2.
 
-## zero for triangular, always with diag="U"->"N"
+## zero for triangular, setting diagonal if diag="U"
 m3 <- m3. <- new("dtrMatrix", Dim = c(2L, 2L), uplo = "L", diag = "U",
                  x = c(1, 2, 4, 8))
-m3@x <- c(1, 2, 0, 1); m3@diag <- "N"
+m3@x <- c(1, 2, 0, 1)
 m3; m3.
-
-## nothing to zero in sparse cases, but unit diagonal must be allocated
-m4 <- m4. <- new("ltCMatrix", Dim = c(2L, 2L), uplo = "U", diag = "U",
-                 p = c(0L, 0L, 0L))
-m4@p <- 0:2; m4@i <- 0:1; m4@x <- c(TRUE, TRUE); m4@diag <- "N"
-m4; m4.
-
-## similarly
-m5 <- m5. <- new("ndiMatrix", Dim = c(2L, 2L), diag = "U")
-m5@x <- c(TRUE, TRUE); m5@diag <- "N"
-m5; m5.
 
 ## integer-valued (and where possible integer-typed) slots
 ## for sparse vectors
@@ -84,7 +73,7 @@ v2 <- v2. <- new("nsparseVector", length = im + 1.5, i = im + 0.5)
 v2@length <- im + 1; v2@i <- im
 ## v2; v2. # don't print such long vectors
 
-nms <- paste0(rep(c("m", "v"), c(5L, 2L)), c(1:5, 1:2))
+nms <- paste0(rep(c("m", "v"), c(5L, 2L)), c(1:3, 1:2))
 obj <- mget(nms, inherits = FALSE)
 obj. <- mget(paste0(nms, "."), inherits = FALSE)
 stopifnot( all(vapply(obj , isCanonical, FALSE)),

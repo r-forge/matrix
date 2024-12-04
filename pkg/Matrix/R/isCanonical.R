@@ -1,28 +1,37 @@
 ## METHODS FOR GENERIC: isCanonical
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.isCanonical <-
-function(object)
-    switch(.M.repr(object),
-           "n" =, "p" =
-               .Call(R_dense_is_canonical, object),
-           "C" =, "R" =, "T" =
-               .Call(R_sparse_is_canonical, object),
-           stop("should never happen ..."))
-
 setMethod("isCanonical", c(object = "denseMatrix"),
-          function(object, ...)
-              .Call(R_dense_is_canonical, object))
+          function(object, diag = NULL, ...)
+              .Call(R_dense_is_canonical, object) &&
+              (is.null(diag) || diag != "N" ||
+               .M.shape(object) != "t" || object@diag == "N"))
 
-for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
-setMethod("isCanonical", c(object = .cl),
-          function(object, ...)
-              .Call(R_sparse_is_canonical, object))
+setMethod("isCanonical", c(object = "CsparseMatrix"),
+          function(object, diag = NULL, ...)
+              length(object@i) == object@p[length(object@p)] &&
+              .Call(R_sparse_is_canonical, object) &&
+              (is.null(diag) || diag != "N" ||
+               .M.shape(object) != "t" || object@diag == "N"))
+
+setMethod("isCanonical", c(object = "RsparseMatrix"),
+          function(object, diag = NULL, ...)
+              length(object@j) == object@p[length(object@p)] &&
+              .Call(R_sparse_is_canonical, object) &&
+              (is.null(diag) || diag != "N" ||
+               .M.shape(object) != "t" || object@diag == "N"))
+
+setMethod("isCanonical", c(object = "TsparseMatrix"),
+          function(object, diag = NULL, ...)
+              !anyDuplicatedT(object) &&
+              .Call(R_sparse_is_canonical, object) &&
+              (is.null(diag) || diag != "N" ||
+               .M.shape(object) != "t" || object@diag == "N"))
 
 setMethod("isCanonical", c(object = "diagonalMatrix"),
-          function(object, ...)
-              object@diag == "N" &&
-              (.M.kind(object) != "n" || !anyNA(object@x)))
+          function(object, diag = NULL, ...)
+              (.M.kind(object) != "n" || !anyNA(object@x)) &&
+              (is.null(diag) || diag != "N" || object@diag == "N"))
 
 setMethod("isCanonical", c(object = "indMatrix"),
           function(object, ...)
@@ -37,5 +46,3 @@ setMethod("isCanonical", c(object = "sparseVector"),
                (length(i.) > 0L &&
                 i.[length(i.)] - 1 >= .Machine[["integer.max"]] &&
                 all(i. == trunc(i.)))))
-
-rm(.cl)
