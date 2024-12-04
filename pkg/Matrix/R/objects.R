@@ -3,7 +3,7 @@
 ## to be "ours" (exported by 'Matrix'):
 .promote <-
 function(x, mode = 7L)
-    as(x, .M.class(from, 7L))
+    as(x, .M.class(x, 7L))
 
 ## "...Matrix" or ".sparseVector" or "", promoting:
 ##     "pMatrix" -> "indMatrix"  if  bit 0 is set
