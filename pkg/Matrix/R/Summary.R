@@ -16,25 +16,17 @@ setMethod("Summary", c(x = "denseMatrix"),
               if (.Generic == "prod")
                   return(prod(.Call(R_dense_prod, x, na.rm),
                               ..., na.rm = na.rm))
+              g <- get(.Generic, mode = "function")
+              x <- forceCanonical(x)
               cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
-              repr <- substr(cl, 3L, 3L)
-              zero <- switch(kind, "n" = , "l" = FALSE, "i" = 0L, "d" = 0, "z" = 0+0i)
-              if (shape != "g") {
-                  if (repr != "p")
-                      x <- .M2packed(x)
-                  if (shape == "t" && x@diag != "N")
-                      diag(x) <- TRUE # copying, sadly
-              }
+              zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
               n <- x@Dim[2L]
-              y <- x@x
-              y1 <- if (kind != "n" || !anyNA(y))
-                        y
-                    else y | is.na(y)
+              y1 <- x@x
               y2 <- if (shape == "t" && n > 1L)
                         zero
-              get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "sparseMatrix"),
@@ -46,33 +38,16 @@ setMethod("Summary", c(x = "sparseMatrix"),
               if (.Generic == "prod")
                   return(prod(.Call(R_sparse_prod, x, na.rm),
                               ..., na.rm = na.rm))
+              g <- get(.Generic, mode = "function")
+              x <- forceCanonical(x)
               cl <- .M.class(x)
               kind <- substr(cl, 1L, 1L)
               shape <- substr(cl, 2L, 2L)
               repr <- substr(cl, 3L, 3L)
-              switch(kind,
-                     "n" = ,
-                     "l" = { zero <- FALSE; one <- TRUE },
-                     "i" = { zero <- 0L   ; one <- 1L   },
-                     "d" = { zero <- 0    ; one <- 1    },
-                     "z" = { zero <- 0+0i ; one <- 1+0i })
-              ## Handle overallocation (hopefully rare ...) :
-              if (repr == "T") {
-                  x <- aggregateT(x)
-                  nnz <- length(x@i)
-              } else {
-                  nnz <- { p <- x@p; p[length(p)] }
-                  if (length(if (repr == "C") x@i else x@j) > nnz) {
-                      h <- seq_len(nnz)
-                      if (repr == "C")
-                          x@i <- x@i[h]
-                      else
-                          x@j <- x@j[h]
-                      if (kind != "n")
-                          x@x <- x@x[h]
-                  }
-              }
+              zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
+              unit <- switch(kind, "z" = 1+0i, "d" = 1, "i" = 1L,  TRUE)
               n <- (d <- x@Dim)[2L]
+              nnz <- length(if (repr == "C") x@i else x@j)
               nnz.max <- if (shape == "s") 0.5 * (prod(d) + n) else prod(d)
               y1 <- if (kind != "n")
                         x@x
@@ -81,20 +56,17 @@ setMethod("Summary", c(x = "sparseMatrix"),
                     else logical(0L)
               y2 <- if (nnz < nnz.max)
                         zero
-              y3 <- if (n > 0L && shape == "t" && x@diag != "N")
-                        one
-              get(.Generic, mode = "function")(y1, y2, y3, ..., na.rm = na.rm)
+              y3 <- if (shape == "t" && n > 0L && x@diag != "N")
+                        unit
+              g(y1, y2, y3, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "diagonalMatrix"),
           function(x, ..., na.rm = FALSE) {
+              g <- get(.Generic, mode = "function")
               kind <- .M.kind(x)
-              switch(kind,
-                     "n" = ,
-                     "l" = { zero <- FALSE; one <- TRUE },
-                     "i" = { zero <- 0L   ; one <- 1L   },
-                     "d" = { zero <- 0    ; one <- 1    },
-                     "z" = { zero <- 0+0i ; one <- 1+0i })
+              zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
+              unit <- switch(kind, "z" = 1+0i, "d" = 1, "i" = 1L,  TRUE)
               n <- x@Dim[2L]
               y1 <- if (x@diag == "N") {
                         y <- x@x
@@ -104,39 +76,40 @@ setMethod("Summary", c(x = "diagonalMatrix"),
                                 c(y[1L], zero, y[-1L])
                             else y
                         }
-                        else if (!anyNA(y))
-                            y
                         else y | is.na(y)
                     }
               y2 <- if (n > 1L)
                         zero
               y3 <- if (x@diag != "N") {
                         if (.Generic == "sum")
-                            one * n
+                            unit * n
                         else if (n > 0L)
-                            one
-                        else one[0L]
+                            unit
+                        else unit[0L]
                     }
-              get(.Generic, mode = "function")(y1, y2, y3, ..., na.rm = na.rm)
+              g(y1, y2, y3, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "indMatrix"),
           function(x, ..., na.rm = FALSE) {
+              g <- get(.Generic, mode = "function")
               nnz <- length(x@perm)
+              nnz.max <- prod(x@Dim)
               y1 <- if (.Generic == "sum")
                         nnz
                     else if (nnz > 0L)
                         TRUE
                     else logical(0L)
-              y2 <- if (nnz < prod(x@Dim))
+              y2 <- if (nnz < nnz.max)
                         FALSE
-              get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, ..., na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "sparseVector"),
           function(x, ..., na.rm = FALSE) {
+              g <- get(.Generic, mode = "function")
               kind <- .M.kind(x)
-              zero <- switch(kind, "n" = , "l" = FALSE, "i" = 0L, "d" = 0, "z" = 0+0i)
+              zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
               nnz <- length(i <- x@i)
               nnz.max <- length(x)
               y1 <- if (kind != "n") {
@@ -148,7 +121,8 @@ setMethod("Summary", c(x = "sparseVector"),
                             else if (nnz >= (q <- which.min(i == seq_along(i))))
                                 c(y[1L:(q - 1L)], zero, y[q:nnz])
                             else y
-                        } else y
+                        }
+                        else y
                     }
                     else if (.Generic == "sum")
                         nnz
@@ -157,5 +131,5 @@ setMethod("Summary", c(x = "sparseVector"),
                     else logical(0L)
               y2 <- if (nnz < nnz.max)
                         zero
-              get(.Generic, mode = "function")(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, ..., na.rm = na.rm)
           })
