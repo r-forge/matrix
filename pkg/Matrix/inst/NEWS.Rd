@@ -33,6 +33,20 @@
       users should consider installing \pkg{Matrix} versions 1.7-z
       instead.
 
+      \item Methods for \code{cov2cor} coerce the (symmetrized) argument
+      to new virtual class \code{posdefMatrix} before scaling.  Hence an
+      error is signaled where the (symmetrized) argument is not positive
+      definite.  Use \code{dimScale} (introduced in \pkg{Matrix} 1.5-2)
+      for more general scaling.
+    }
+  }
+  \subsection{Generic Functions}{
+    \itemize{
+      \item New generic function \code{ct} for the conjugate transpose.
+      \code{ct(x)} is equivalent to \code{t(x)} except for complex
+      \code{x}, for which it is intended to be at least as (if not more)
+      efficient as \code{Conj(t(x))}.
+
       \item The formal argument list of generic function
       \code{forceSymmetric} is changed from \code{(x, uplo)} to
       \code{(x, \dots)}, allowing methods to accept further arguments.
@@ -46,22 +60,10 @@
       \code{symmpart}, \code{skewpart}, \code{isDiagonal}, and
       \code{isTriangular} gain \code{\dots}, allowing methods to accept
       further arguments.
-
-      \item Methods for \code{cov2cor} coerce the (symmetrized) argument
-      to new virtual class \code{posdefMatrix} before scaling.  Hence an
-      error is signaled where the (symmetrized) argument is not positive
-      definite.  Use \code{dimScale} (introduced in \pkg{Matrix} 1.5-2)
-      for more general scaling.
     }
   }
   \subsection{New Features}{
     \itemize{
-      \item Generic function \code{ct} for the conjugate transpose.
-      \code{ct(x)} is equivalent to \code{t(x)} except for complex
-      \code{x}, where it is intended to be more efficient than
-      \code{Conj(t(x))} at least for \code{x} inheriting from virtual
-      class \code{Matrix}.
-
       \item Methods for generic functions \code{isSymmetric},
       \code{forceSymmetric}, \code{symmpart}, and \code{skewpart} gain
       argument \code{trans} to support Hermitian and symmetric modes for
@@ -690,6 +692,32 @@
       expected to work as before.
     }
   }
+  \subsection{Generic Functions}{
+    \itemize{
+      \item New generic functions \code{expand1} and \code{expand2},
+      intended to replace \code{expand} and coercions from (subclasses
+      of) \code{MatrixFactorization} to (subclasses of) \code{Matrix}.
+      \code{expand1} is used as
+      \code{expand1(<MatrixFactorization>, <character string>)} and
+      constructs by name factors appearing in the factorization.
+      \code{expand2} is used as \code{expand2(<MatrixFactorization>)}
+      and returns a named list of \emph{all} factors appearing in the
+      factorization, in order and with row names on the first factor
+      and column names on the last factor.  The result can be used to
+      reconstruct the factorized \code{Matrix} as the product of the
+      elements of the list, namely
+      \code{Reduce(`\%*\%`, expand2(.))}.\cr
+      \cr
+      \code{expand} and its methods are retained for backwards
+      compatibility.  They may be formally deprecated in the future,
+      hence new code should use \code{expand1} and \code{expand2}.
+      Notably, \code{expand1} and \code{expand2} have methods for all
+      factorizations in \pkg{Matrix}, whereas \code{expand} continues to
+      have methods only for \code{denseLU}, \code{sparseLU}, and
+      \code{CHMfactor}.  See \code{help("expand-methods")} for a list of
+      methods, including useful optional arguments.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item Methods for subscripting \code{Matrix} now use the more
@@ -740,29 +768,6 @@
       \item The validity method for class \code{sparseQR} now checks
       that the \code{V} slot is lower trapezoidal and that the \code{R}
       slot has non-negative diagonal elements.
-
-      \item New generic functions \code{expand1} and \code{expand2},
-      intended to eventually replace \code{expand} and certain coercions
-      from (subclasses of) \code{MatrixFactorization} to (subclasses of)
-      \code{Matrix}.  \code{expand1} is used as
-      \code{expand1(<MatrixFactorization>, <character string>)} and
-      constructs by name factors appearing in the factorization.
-      \code{expand2} is used as \code{expand2(<MatrixFactorization>)}
-      and returns a named list of \emph{all} factors appearing in the
-      factorization, in order and with row names on the first factor and
-      column names on the last factor.  The result can be used to
-      reconstruct the factorized \code{Matrix} as the product of the
-      elements of the list, namely
-      \code{Reduce(`\%*\%`, expand2(.))}.\cr
-      \cr
-      \code{expand} and its methods are retained for backwards
-      compatibility.  They may be formally deprecated in the future,
-      hence new code should use \code{expand1} and \code{expand2}.
-      Notably, \code{expand1} and \code{expand2} have methods for all
-      factorizations in \pkg{Matrix}, whereas \code{expand} continues to
-      have methods only for \code{denseLU}, \code{sparseLU}, and
-      \code{CHMfactor}.  See \code{help("expand-methods")} for a list of
-      methods, including useful optional arguments.
 
       \item Generic function \code{Cholesky} gains methods for
       \code{denseMatrix} returning an object of class \code{p?Cholesky}.
@@ -2627,11 +2632,15 @@
 }
 
 \section{Changes in version 1.2-0 (2015-04-03, svn r3096)}{
+  \subsection{Generic Functions}{
+    \itemize{
+      \item New generic function \code{\%&\%} for boolean matrix
+      multiplication: that is, matrix multiplication using boolean
+      arithmetic.
+    }
+  }
   \subsection{New Features}{
     \itemize{
-      \item New \code{\%&\%} for \dQuote{boolean arithmetic} matrix
-      product.
-
       \item New argument \code{boolArith = NA} in \code{crossprod()} and
       \code{tcrossprod()}.  \code{boolArith = TRUE} now forces boolean
       arithmetic, where \code{boolArith = FALSE} forces numeric one.
