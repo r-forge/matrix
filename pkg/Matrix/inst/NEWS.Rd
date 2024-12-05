@@ -3,7 +3,7 @@
 \name{NEWS}
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
-%% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
+\newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 \section{Changes in version 1.8-0 (2024-12-03, svn r5090)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
@@ -1031,8 +1031,8 @@
       traditional matrices \code{x} without a \code{dimnames} attribute.
 
       \item Our \code{cov2cor()} methods now again preserve
-      (symmetrized!)  \code{dimnames}, fixing \pkg{Matrix} bug #6783
-      reported by Ben Bolker.
+      (symmetrized!)  \code{dimnames}, fixing \MPR{6783} reported by
+      Ben Bolker.
 
       \item \code{colSums()} and friends now always give a \emph{named}
       result when the marginal \code{Dimnames} are non-\code{NULL}.
@@ -1343,8 +1343,8 @@
       \code{n}, with fewer errors in the \code{m < n} case.
 
       \item \code{crossprod(<Rsparse>, <Tsparse>)} and similar now work
-      again (optional \code{boolArith} was not passed on), fixing Matrix
-      bug #6766 by David Cortes.  Ditto for \code{tcrossprod()}, where
+      again (optional \code{boolArith} was not passed on), fixing
+      \MPR{6766} by David Cortes.  Ditto for \code{tcrossprod()}, where
       the old result was even wrong when it had \dQuote{worked}, before
       \pkg{Matrix} 1.2-0.
 
@@ -1540,15 +1540,15 @@
 
       \item \code{qr(<large sparse>)} no longer segfaults in some cases,
       but now warns about \dQuote{Out of memory} and stops, fixing
-      Matrix bug #6610 reported by Benjamin Tyner.
+      \MPR{6610} reported by Benjamin Tyner.
 
       \item Fixed \code{<sparse> \%*\% <dense>} possible memory
-      corruption, visible via valgrind, fixing \pkg{Matrix} bug #6726
-      reported by David Cortes.
+      corruption, visible via Valgrind, fixing \MPR{6726} reported by
+      David Cortes.
 
-      \item Fixed the (quite \emph{long standing}) \pkg{Matrix} bug
-      #6777, reported by Manuel Koller: \code{tcrossprod(<matrix>,
-      <[dln]sCMatrix>)} has been wrong in some cases.
+      \item Fixed the (quite \emph{long standing}) \MPR{6777}, reported
+      by Manuel Koller: \code{tcrossprod(<matrix>, <[dln]sCMatrix>)} has
+      been wrong in some cases.
     }
   }
   \subsection{New Features}{
@@ -1837,14 +1837,12 @@
       % June 7, "dgTMatrix Segmentation Fault"
 
       \item \code{sparse.model.matrix(.., contrasts.arg = <.. ddiMatrix
-      ..>)} now works correctly, fixing R-Forge \pkg{Matrix} bug #6673
-      by Davor Josipovic.
+      ..>)} now works correctly, fixing \MPR{6673} by Davor Josipovic.
 
       \item \code{sparse.model.matrix(..)} now also works in cases the
       contrast matrix has become a \code{denseMatrix}; e.g., in a case
       using \code{poly(.)} in the formula; now works correctly, fixing
-      R-Forge \pkg{Matrix} bug #6657 and useful suggestions by Nick
-      Hanewinckel.
+      \MPR{6657} and useful suggestions by Nick Hanewinckel.
 
       \item Fixed the internal \code{attr.all_Mat()} auxiliary for
       \code{all.equal()}, notably for the case when exactly one of the
@@ -1862,10 +1860,10 @@
       patch in \PR{18205} by Bill Dunlap.
 
       \item \code{band(M, k1, k2)} now also works when \code{k1 * k2} is
-      larger than 2^31-1, the maximal integer, fixing R-Forge
-      \pkg{Matrix} bug #6743 by Ariel Paulson.  Further, it works when
-      \code{M} is a sparse \code{symmetricMatrix} but the band is not
-      symmetric, \code{k1 != -k2}.
+      larger than 2^31-1, the maximal integer, fixing \bug{6743} by
+      Ariel Paulson.  Further, it works when \code{M} is a sparse
+      \code{symmetricMatrix} but the band is not symmetric,
+      \code{k1 != -k2}.
 
       \item fix leak in C-level code for \code{cbind(m1,m2)} or
       \code{rbind(*)} when \code{m1} is \code{n.Csparse} and \code{m2}
@@ -1875,7 +1873,7 @@
       \item \code{sparseVector(i=integer(), length=2^33)} now does
       show/print, after fixing a bug in the \code{head()} method for
       \emph{empty} sparseVectors.  Reported by David Cortes as
-      \pkg{Matrix} bug #6745.
+      \MPR{6745}.
 
       \item inverting or solving \code{dsCMatrix} no longer catches C
       level warnings too early which would not free, but rather leak
@@ -1900,7 +1898,7 @@
       symmetric matrices.
 
       \item \code{as(<ddiMatrix>, "matrix")} no longer loses dimnames,
-      thanks to Mikael Jagan's report as \pkg{Matrix} bug #6751.
+      thanks to Mikael Jagan's report as \MPR{6751}.
     }
   }
   \subsection{Misc}{
@@ -1942,29 +1940,25 @@
       \item Fixed error message in <dtrMatrix> multiplication.
 
       \item Fixed long-standing bug in \code{R[,j] <- v} when \code{R}
-      is an \code{RsparseMatrix}, R-Forge \pkg{Matrix} bug #6709 by
-      David Cortes.
+      is an \code{RsparseMatrix}, \MPR{6709} by David Cortes.
 
       \item \file{./include/cholmod.h} and
       \file{./include/Matrix_stubs.h} needed updating from SparseSuite
-      update; R-Forge \pkg{Matrix} bug #6714 by Kasper Kristensen
-      (\CRANpkg{TMB} package).
+      update; \MPR{6714} by Kasper Kristensen (package \CRANpkg{TMB}).
 
       \item \code{as.matrix()} and \code{as.array()} now work for
-      \code{sparseVector} as expected; see \pkg{Matrix} bug #6708.
+      \code{sparseVector} as expected; see \MPR{6708}.
 
-      \item \code{M[,]} (and similar) now work as in base \R{}; R-Forge
-      \pkg{Matrix} bug #6720 by David Cortes.
+      \item \code{M[,]} (and similar) now work as in base \R{};
+      \MPR{6720} by David Cortes.
 
       \item \code{-S} now works also when \code{S} has no `factors`
       slot.  It signalled an error, e.g., for sparse triangular matrices
-      \code{S}; R-Forge \pkg{Matrix} bug #6656, reported by Chun Fung
-      (Jackson) Kwok.
+      \code{S}; \MPR{6656}, reported by Chun Fung (Jackson) Kwok.
 
       \item \code{M*2} and similar no longer keep cached factorizations
       (in `factors` slot), but drop them via internal new
-      \code{.empty.factors()}.  R-Forge \pkg{Matrix} bug #6606, reported
-      by Tomas Lumley.
+      \code{.empty.factors()}.  \MPR{6606}, reported by Tomas Lumley.
 
       \item removed the nowhere used (and unexported but still active)
       class union \code{Mnumeric} which actually trickled into many
@@ -2097,7 +2091,7 @@
 
       \item \code{sparse.model.matrix()} gets option \code{sep = ""},
       with, e.g., \code{sep = ":"} allowing to get easier column names;
-      from R-Forge \pkg{Matrix} (non-)bug #6581, by Vitalie Spinu.
+      from \MPR{6581}, by Vitalie Spinu.
     }
   }
   \subsection{Bug Fixes}{
@@ -2115,15 +2109,14 @@
       \item Adapt code to new Fortran requirements of passing length of
       character arguments, thanks to Brian Ripley.
 
-      \item (R-Forge \pkg{Matrix} bug #6659, reported by Georg
-      Kindermann): \code{<sparseVector>[i] <- val} bug fixed.
+      \item \MPR{6659}, reported by Georg Kindermann:
+      \code{<sparseVector>[i] <- val} bug is fixed.
 
-      \item (R-Forge \pkg{Matrix} bug #6666, reported by Ezra Tucker):
-      \code{which(<ldiMatrix>, array.ind=TRUE)} thinko fixed.
+      \item \MPR{6666}, reported by Ezra Tucker:
+      \code{which(<ldiMatrix>, array.ind=TRUE)} thinko is fixed.
 
       \item For R-devel Dec 4, 2020: adapt all.equal() check of sparse
-      matrix images (which contain panel functions with environments
-      ..).
+      matrix images (which contain panel functions with environments).
 
       \item tried fixing warning \emph{'cholmod_factorize_p' accessing
       16 bytes in a region of size 8 [-Wstringop-overflow=]} in
@@ -2288,10 +2281,10 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item (R-Forge \pkg{Matrix} bug #6185): \code{c < 0} now also
-      works for derived sparse Matrices (which only \emph{contain}
-      Matrix classes); via improving hidden \code{MatrixClass()}.  Part
-      of such derived matrices only work in \R{} \eqn{\ge}{>=} 3.5.0.
+      \item \MPR{6185}: \code{c < 0} now also works for derived sparse
+      Matrices (which only \emph{contain} Matrix classes); via improving
+      hidden \code{MatrixClass()}.  Part of such derived matrices only
+      work in \R{} \eqn{\ge}{>=} 3.5.0.
 
       \item using \code{Authors@R} in \file{../DESCRIPTION} to list all
       contributors.
@@ -2518,7 +2511,7 @@
 
       \item \code{cbind2()} and \code{rbind2()} no longer fail to
       determine \code{sparse} when it is unspecified and hence
-      \code{NA}, fixing R-Forge bug #6259.
+      \code{NA}, fixing \MPR{6259}.
     }
   }
 }
@@ -2535,7 +2528,7 @@
       \item Our \code{colSums(x)}, \code{rowMeans(y)}, \dots, methods
       now \dQuote{keep names}, i.e., if the result is a numeric vector,
       and the matrix \code{x} has column or row names, these become the
-      \code{names(.)} of the result, fixing R-Forge bug #6018.
+      \code{names(.)} of the result, fixing \MPR{6018}.
     }
   }
 }
