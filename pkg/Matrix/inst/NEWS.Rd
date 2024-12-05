@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 %% NB: The date (yyyy-mm-dd) is the "Packaged: " date in ../DESCRIPTION
-\section{Changes in version 1.8-0 (2024-12-03 r5090)}{
+\section{Changes in version 1.8-0 (2024-12-03, svn r5090)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
@@ -144,7 +144,7 @@
   }
 }
 
-\section{Changes in version 1.7-1 (2024-10-17 r4948)}{
+\section{Changes in version 1.7-1 (2024-10-17, svn r4948)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Installation under architecture-specific builds of \R{}
@@ -171,7 +171,7 @@
   }
 }
 
-\section{Changes in version 1.7-0 (2024-03-16 r4662)}{
+\section{Changes in version 1.7-0 (2024-03-16, svn r4662)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -236,7 +236,7 @@
   }
 }
 
-\section{Changes in version 1.6-5 (2024-01-06 r4560)}{
+\section{Changes in version 1.6-5 (2024-01-06, svn r4560)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{x[]} works for \code{x} inheriting from virtual class
@@ -269,7 +269,7 @@
   }
 }
 
-\section{Changes in version 1.6-4 (2023-11-29 r4523)}{
+\section{Changes in version 1.6-4 (2023-11-29, svn r4523)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{printf} format mismatches detected by R-devel are
@@ -287,7 +287,7 @@
   }
 }
 
-\section{Changes in version 1.6-3 (2023-11-13 r4513)}{
+\section{Changes in version 1.6-3 (2023-11-13, svn r4513)}{
   \subsection{Misc}{
     \itemize{
       \item With an \R{} built with \command{configure} option
@@ -301,7 +301,7 @@
   }
 }
 
-\section{Changes in version 1.6-2 (2023-11-05 r4503)}{
+\section{Changes in version 1.6-2 (2023-11-05, svn r4503)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -528,7 +528,7 @@
   }
 }
 
-\section{Changes in version 1.6-1.1 (2023-09-08)}{
+\section{Changes in version 1.6-1.1 (2023-09-08, hotfix)}{
   \subsection{Misc}{
     \itemize{
       \item Export the generics \code{crossprod()} and
@@ -538,7 +538,7 @@
   }
 }
 
-\section{Changes in version 1.6-1 (2023-08-11 r4228)}{
+\section{Changes in version 1.6-1 (2023-08-11, svn r4228)}{
   \subsection{New Features}{
     \itemize{
       \item Several new coercion utilities, exported and documented in
@@ -611,7 +611,7 @@
   }
 }
 
-\section{Changes in version 1.6-0 (2023-06-30 r4125)}{
+\section{Changes in version 1.6-0 (2023-06-30, svn r4125)}{
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -949,7 +949,7 @@
   }
 }
 
-\section{Changes in version 1.5-4.1 (2023-05-16)}{% hot patch there
+\section{Changes in version 1.5-4.1 (2023-05-16, hotfix)}{
   \subsection{Misc}{
     \itemize{
       \item Use \code{#ifdef PR18534fixed} to adapt to \R{}'s Lapack
@@ -958,7 +958,7 @@
   }
 }
 
-\section{Changes in version 1.5-4 (2023-04-02 r3837)}{
+\section{Changes in version 1.5-4 (2023-04-02, svn r3837)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -1017,7 +1017,7 @@
   }
 }
 
-\section{Changes in version 1.5-3 (2022-11-10 r3772)}{
+\section{Changes in version 1.5-3 (2022-11-10, svn r3772)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -1093,7 +1093,7 @@
   }
 }
 
-\section{Changes in version 1.5-2 (2022-10-21 r3702)}{
+\section{Changes in version 1.5-2 (2022-10-21, svn r3702)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item C-level functions now \code{PROTECT()} the result of
@@ -1227,7 +1227,7 @@
   }
 }
 
-\section{Changes in version 1.5-1 (2022-09-12 r3642)}{
+\section{Changes in version 1.5-1 (2022-09-12, svn r3642)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item ASAN-detected bugs fixed in C-level functions
@@ -1238,7 +1238,7 @@
   }
 }
 
-\section{Changes in version 1.5-0 (2022-09-09 r3636)}{
+\section{Changes in version 1.5-0 (2022-09-09, svn r3636)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item With a few exceptions, direct coercions to non-virtual
@@ -1772,7 +1772,7 @@
   }
 }
 
-\section{Changes in version 1.4-1 (2022-03-21 r3446)}{
+\section{Changes in version 1.4-1 (2022-03-21, svn r3446)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names}
@@ -1823,7 +1823,7 @@
   }
 }
 
-\section{Changes in version 1.4-0 (2021-12-08 r3419)}{
+\section{Changes in version 1.4-0 (2021-12-08, svn r3419)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -1906,7 +1906,7 @@
   }
 }
 
-\section{Changes in version 1.3-4 (2021-05-24 r3392)}{
+\section{Changes in version 1.3-4 (2021-05-24, svn r3392)}{
   \subsection{Misc}{
     \itemize{
       \item Update \code{matrix(<data>, n,m)} in \file{tests/*} to work
@@ -1915,14 +1915,14 @@
   }
 }
 
-\section{Changes in version 1.3-3 (2021-05-01 r3390)}{
+\section{Changes in version 1.3-3 (2021-05-01, svn r3390)}{
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct: simply
       use \code{cbind()} and \code{rbind()} instead.
     }
   }
-  \subsection{Dependency}{
+  \subsection{Dependencies}{
     \itemize{
       \item For now revert to \code{Depends: R (>= 3.5.0)} to accomodate
       users on older R installations.
@@ -1991,7 +1991,7 @@
   }
 }
 
-\section{Changes in version 1.3-2 (2021-01-05 r3362)}{
+\section{Changes in version 1.3-2 (2021-01-05, svn r3362)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix()} tweaks for the singular values based
@@ -2018,7 +2018,7 @@
   }
 }
 
-\section{Changes in version 1.3-1 (2020-12-23 r3352)}{
+\section{Changes in version 1.3-1 (2020-12-23, svn r3352)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix(<dense>, method="qr.R")} no longer assumes
@@ -2027,8 +2027,8 @@
   }
 }
 
-\section{Changes in version 1.3-0 (2020-12-15 r3351)}{
-  \subsection{Significant User-Visible Change}{
+\section{Changes in version 1.3-0 (2020-12-15, svn r3351)}{
+  \subsection{Significant User-Visible Changes}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} where \code{doDiag=TRUE} has
       always been the \emph{default} is now obeyed also in the sparse
@@ -2128,8 +2128,7 @@
   }
 }
 
-%
-\section{Changes in version 1.2-18 (2019-11-26, manually picked from svn)}{
+\section{Changes in version 1.2-18 (2019-11-26, svn r3300)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}
@@ -2636,7 +2635,7 @@
       \item Partial Korean translations of messages.
     }
   }
-  \subsection{Deprecation}{
+  \subsection{Deprecated and Defunct}{
     \itemize{
       \item For \R{} \eqn{\ge}{>=} 3.2.0, \code{cBind()} and
       \code{rBind()} are deprecated, as they are no longer needed since
@@ -2778,7 +2777,7 @@
     }
 }
 
-\section{Changes in version 1.1-1 (2013-12-28)}{
+\section{Changes in version 1.1-1 (2013-12-28, svn r2933)}{
   \subsection{New Features}{
     \itemize{
       \item \code{image(.., xlim, ylim)}: nicer defaults for the axis
@@ -2967,7 +2966,7 @@
   }
 }
 
-\section{Changes in version 1.0-6 (2012-03-16, publ. 2012-06-18)}{
+\section{Changes in version 1.0-6 (2012-03-16)}{
   \subsection{New Features}{
     \itemize{
       \item .
@@ -3164,19 +3163,19 @@
   }
 }
 
-\section{Version 0.2-4}{
-  \subsection{..., 0.3-1, 0.3-n (n=3,5,...,26): 22 more CRAN releases}{
-    \itemize{
-      \item .............................................
-    }
-  }
-}
+%% \section{Version 0.2-4}{
+%%   \subsection{..., 0.3-n (n=1,3,5,...,26): 22 more CRAN releases}{
+%%     \itemize{
+%%       \item .............................................
+%%     }
+%%   }
+%% }
 
-\section{Version 0.2-1 (2000-07-15)}{
+\section{Changes in version 0.2-1 (2000-07-15)}{
   The first CRAN release of the \pkg{Matrix} package, titled
   \dQuote{A Matrix library for R} authored by Douglas Bates (maintainer,
   principal author) and Saikat DebRoy.
-  \subsection{Features}{
+  \subsection{New Features}{
     \itemize{
       \item \code{Matrix()} constructor for \R{} objects of class
       \code{Matrix}.
