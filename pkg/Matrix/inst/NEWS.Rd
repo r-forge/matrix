@@ -5,6 +5,18 @@
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 \section{Changes in version 1.8-0 (2024-12-03, svn r5090)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
+      \eqn{\ge}{>=} 4.5.
+
+      \item Compilation uses preprocessor options
+      \option{-DSTRICT_R_HEADERS} and \option{-DR_NO_REMAP}.
+
+      \item Warnings surfaced by \option{-Wconversion} (but not those
+      originating in SuiteSparse) are squashed.
+    }
+  }
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item Coercions to \code{dpoMatrix} or \code{dppMatrix} are
@@ -118,11 +130,6 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item \pkg{Matrix} version 1.8-0 and higher strictly depend on
-      \R{} \eqn{\ge}{>=} 4.5.0.
-
-      \item \pkg{MatrixModels} is added to \code{Enhances}.
-
       \item \proglang{C} code uses new (since \R{} 4.4.0) \code{OBJSXP}
       in place of deprecated \code{S4SXP} and \code{TYPEOF(.) == OBJSXP}
       in place of (not specific enough) \code{isS4(.)}.
@@ -130,12 +137,6 @@
       \item \proglang{C} code is simplified using definitions in new
       header \file{M5.h} for templated dispatch on object \dQuote{kind}
       \samp{[nlidz]}.
-
-      \item \proglang{C} code is compiled with preprocessor options
-      \option{-DSTRICT_R_HEADERS} and \option{-DR_NO_REMAP}.
-
-      \item Warnings emitted by \option{-Wconversion} (but not those
-      originating in SuiteSparse) are resolved.
 
       \item \file{test-tools-1.R}: update \code{relErrV()}, and use it
       and \code{relErr()} unconditionally to improve strict
@@ -145,12 +146,12 @@
 }
 
 \section{Changes in version 1.7-1 (2024-10-17, svn r4948)}{
-  \subsection{Bug Fixes}{
+  \subsection{Installation}{
     \itemize{
       \item Installation under architecture-specific builds of \R{}
-      works again.  It was broken in version 1.7-0, where changes to
-      \file{src/Makevars} resulted in \env{CPPFLAGS} not including
-      \option{-I"${R_INCLUDE_DIR}${R_ARCH}"}.
+      works again.  It was broken in \pkg{Matrix} version 1.7-0,
+      where changes to \file{src/Makevars} resulted in \env{CPPFLAGS}
+      not including \option{-I"${R_INCLUDE_DIR}${R_ARCH}"}.
     }
   }
   \subsection{Misc}{
@@ -172,6 +173,12 @@
 }
 
 \section{Changes in version 1.7-0 (2024-03-16, svn r4662)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 1.7-0 depends on \R{}
+      \eqn{\ge}{>=} 4.4.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item The internal collection of SuiteSparse libraries is updated
@@ -202,9 +209,6 @@
       \eqn{<} 1.7-0 and unserialized under \pkg{Matrix} \eqn{\ge}{>=}
       1.7-0 remain valid, retaining a harmless \code{factors}
       \emph{attribute}.
-
-      \item \pkg{Matrix} version 1.7-0 and higher strictly depend on
-      \R{} \eqn{\ge}{>=} 4.4.0.
     }
   }
   \subsection{New Features}{
@@ -270,11 +274,13 @@
 }
 
 \section{Changes in version 1.6-4 (2023-11-29, svn r4523)}{
+  \subsection{Installation}{
+    \itemize{
+      \item Warnings surfaced by \option{-Wformat} are squashed.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
-      \item \code{printf} format mismatches detected by R-devel are
-      fixed in 3 \file{src/*.c}.
-
       \item better deprecation message for \code{..2dge()}.
     }
   }
@@ -302,6 +308,13 @@
 }
 
 \section{Changes in version 1.6-2 (2023-11-05, svn r4503)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \pkg{Matrix} did not pass its checks under \R{} version
+      3.5.0, implicitly violating \code{Depends: R (>= 3.5)}.  This
+      release restores compatibility.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Methods for generic functions \code{rbind2}, \code{cbind2},
@@ -521,10 +534,6 @@
       \code{R_MATRIX_INLINE}, typically with \code{#define
       R_MATRIX_INLINE inline}, to allow the compiler to inline stubs for
       registered routines.
-
-      \item \pkg{Matrix} did not pass its checks under \R{} 3.5.0,
-      implicitly violating \code{Depends: R (>= 3.5.0)}.  This release
-      restores compatibility.
     }
   }
 }
@@ -614,6 +623,30 @@
 }
 
 \section{Changes in version 1.6-0 (2023-06-30, svn r4125)}{
+  \subsection{Dependencies}{
+    \itemize{
+      \item The following \dQuote{weak} dependencies, needed only for a
+      small number of Rd cross references, are removed:
+      \pkg{MatrixModels}, \pkg{expm}, \pkg{igraph}, \pkg{maptools},
+      \pkg{sp}, \pkg{spdep}.  Links to CRAN or Bioconductor in Rd files
+      are preserved.
+
+      \item \pkg{sfsmisc} is moved from \code{Enhances} to
+      \code{Suggests}, as \pkg{Matrix} does not formally enhance it with
+      methods or links to documentation.
+
+      \item \pkg{grDevices} and \pkg{datasets} are added to
+      \code{Imports} and \code{Suggests}, respectively, as \pkg{Matrix}
+      does import from \pkg{grDevices} and (in vignettes) does load data
+      from \pkg{datasets}.
+
+      \item Example, test, and vignette code no longer fails when
+      \env{R_DEFAULT_PACKAGES} is set to \code{NULL}.
+
+      \item Example code uses \code{requireNamespace} instead of
+      \code{require} to preserve the user's search path.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item Class \code{indMatrix} gains a \code{margin} slot with value
@@ -923,29 +956,6 @@
       \item The length of the \pkg{Matrix} namespace has been reduced by
       ~15\%.  More than 100 unused symbols have been removed.
 
-      \item The following dependencies, needed only for a small number
-      of \code{Rd} cross references, have been removed:
-      \pkg{MatrixModels}, \pkg{expm}, \pkg{igraph}, \pkg{maptools},
-      \pkg{sp}, \pkg{spdep}.  Links to CRAN and Bioconductor in
-      \file{.Rd} files are preserved throughout.
-
-      \item \pkg{sfsmisc} has been moved from \code{Enhances} to
-      \code{Suggests}, as \pkg{Matrix} does not formally enhance it by
-      providing methods, etc.
-
-      \item \pkg{grDevices} and \pkg{datasets} have been added to
-      \code{Imports} and \code{Suggests}, respectively, as
-      \file{NAMESPACE} does import from \pkg{grDevices} and vignettes do
-      load data (albeit \emph{un}conditionally) from \pkg{datasets}.
-
-      \item Example, test, and vignette code no longer fails when
-      \env{R_DEFAULT_PACKAGES} is set to \code{NULL}, thanks to
-      additional \dQuote{invisible} \code{library} calls in the
-      problematic source files.
-
-      \item Examples now use \code{requireNamespace} instead of
-      \code{require}, preserving the user search path in more cases.
-
       \item Updates to \file{po/*.\{po,pot\}} and \file{inst/po/*} for
       translators.
     }
@@ -953,15 +963,21 @@
 }
 
 \section{Changes in version 1.5-4.1 (2023-05-16, hotfix)}{
-  \subsection{Misc}{
+  \subsection{Installation}{
     \itemize{
-      \item Use \code{#ifdef PR18534fixed} to adapt to \R{}'s Lapack
-      header fix for \PR{18534}.
+      \item \file{src/Lapack-etc.h} uses \code{#ifdef PR18534fixed},
+      adapting to \PR{18534} without breaking installation under \R{}
+      \eqn{<} 4.3.1.
     }
   }
 }
 
 \section{Changes in version 1.5-4 (2023-04-02, svn r3837)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{sequence.default} is defined for \R{} \eqn{<} 4.0.0.
+    }
+  }
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -989,15 +1005,6 @@
       \code{deprecatedWarning}.
     }
   }
-  \subsection{Bug Fixes}{
-    \itemize{
-      \item Defining \code{sequence.default} for \R{} \eqn{<} 4.0.0, so
-      that \code{kronecker(<CsparseMatrix>, <CsparseMatrix>)},
-      \code{kronecker(<CsparseMatrix>, <diagonalMatrix>)}, and
-      \code{<diagonalMatrix> \%*\% <denseMatrix>} continue to work
-      there.
-    }
-  }
   \subsection{Misc}{
     \itemize{
       \item C-level utilities \code{Matrix_memset()} and
@@ -1021,6 +1028,23 @@
 }
 
 \section{Changes in version 1.5-3 (2022-11-10, svn r3772)}{
+  \subsection{Dependencies}{
+    \itemize{
+      \item \pkg{methods} is moved from \code{Imports} to \code{Depends}
+      as suggested in the WRE manual.  Now \code{as} and other basic S4
+      machinery are available whenever \pkg{Matrix} is attached.  This
+      change affects \R{} processes started with environment variable
+      \env{R_DEFAULT_PACKAGES} set to \code{NULL} (or any list not
+      containing \pkg{methods}).
+    }
+  }
+  \subsection{Compatibility}{
+    \itemize{
+      \item Test involving sparse \code{POSIXlt} in
+      \file{tests/Simple.R} is adapted to possible (unconditional since
+      \R{} version 4.3.0) existence of character component \code{zone}.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{dimScale(x)} with argument \code{d1} missing is no
@@ -1075,17 +1099,6 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item Package \pkg{methods} has been moved from \code{Imports} to
-      \code{Depends}, as suggested in the WRE manual.  Now \code{as()}
-      and other basic S4 machinery are available whenever \pkg{Matrix}
-      is attached.  This change affects \R{} processes started with
-      environment variable \env{R_DEFAULT_PACKAGES} set to \code{NULL}
-      (or some list not containing \pkg{methods}).
-
-      \item \file{Simple.R} test for sparse \code{POSIXlt} example
-      adapted to latest R-devel always having \code{zone} which is
-      character.
-
       \item C-level wrappers for LAPACK \code{d..trf} routines gain an
       argument \code{warn} indicating how to handle \code{info > 0}:
       \code{warn <= 0} is silent, \code{warn = 1} is a warning, and
@@ -1778,6 +1791,12 @@
 }
 
 \section{Changes in version 1.4-1 (2022-03-21, svn r3446)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{tryInvokeRestart} is defined for \R{} \eqn{<} 4.0.0.
+      Thanks to Michael Chirico for the report.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names}
@@ -1817,10 +1836,6 @@
       \item Slightly better patch notably for Windows, for
       \file{src/SuiteSparse_config/SuiteSparse_config.h}
 
-      \item Fix to continue working for \R{} 3.5.0 and newer, providing
-      \code{tryInvokeRestart()} for older versions of \R{}, thanking
-      Michael Chirico for the heads up.
-
       \item Modified \code{AZERO()} to work with \code{R_xlen_t} and new
       \code{AZEROs()} for \code{size_t}; other tweaks to evade
       \code{-Wconversion} warnings.
@@ -1829,6 +1844,13 @@
 }
 
 \section{Changes in version 1.4-0 (2021-12-08, svn r3419)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \file{inst/test-tools-1.R}: \code{Sys.memGB} returns
+      \code{NA.value = 2.10201} on Windows, no longer calling
+      \code{memory.limit} which is a stub since \R{} version 4.2.0.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Update many \file{src/*.c} preventing integer overflow in
@@ -1882,10 +1904,6 @@
       \code{message()}d when \code{getOption("Matrix.verbose")} is
       \code{>= 1}.
 
-      \item \file{test-tools-1.R}: \code{Sys.memGB()} can no longer use
-      \code{memory.limit()} on Windows; no returns \code{NA.value =
-      2.10201} in such cases.
-
       \item \code{ss <- <sparseVector>[i]} gave an invalid sparseVector
       \code{ss} as \code{ss@i} was not necessarily sorted; thanks to a
       report by Quran Wu.
@@ -1910,25 +1928,31 @@
 }
 
 \section{Changes in version 1.3-4 (2021-05-24, svn r3392)}{
-  \subsection{Misc}{
+  \subsection{Compatibility}{
     \itemize{
-      \item Update \code{matrix(<data>, n,m)} in \file{tests/*} to work
-      with \command{R-devel CMD check --as-cran}
+      \item Tests are further revised for length mismatch warning in
+      \code{matrix(data, nrow, ncol)} under \R{} \eqn{\ge}{>=} 4.2.0.
     }
   }
 }
 
 \section{Changes in version 1.3-3 (2021-05-01, svn r3390)}{
+  \subsection{Installation}{
+    \itemize{
+      \item The change to \code{Depends: R (>= 3.6)} is reverted.
+      Installation continues to work under \R{} \eqn{\ge}{>=} 3.5.
+    }
+  }
+  \subsection{Compatibility}{
+    \itemize{
+      \item Tests are revised for length mismatch warning in
+      \code{matrix(data, nrow, ncol)} under \R{} \eqn{\ge}{>=} 4.2.0.
+    }
+  }
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct: simply
       use \code{cbind()} and \code{rbind()} instead.
-    }
-  }
-  \subsection{Dependencies}{
-    \itemize{
-      \item For now revert to \code{Depends: R (>= 3.5.0)} to accomodate
-      users on older \R{} installations.
     }
   }
   \subsection{Bug Fixes}{
@@ -1982,9 +2006,6 @@
       \item In internal \code{diagOdiag()} method, no longer use
       \code{matrix(x, n,n)} when \code{x} is longer than n*n.
 
-      \item Update tests/*.R to future \code{matrix(x, n,k)} warning in
-      more mismatch cases.
-
       \item Eliminating the need for \file{ftp://*}, add the very small
       \code{jgl009} MatrixMarket example to our \file{external/} files.
     }
@@ -1992,6 +2013,16 @@
 }
 
 \section{Changes in version 1.3-2 (2021-01-05, svn r3362)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 1.3-2 depends on \R{}
+      \eqn{\ge}{>=} 3.6.
+
+      \item \code{USE_FC_LEN_T} is defined before \file{R_ext/Lapack.h}
+      is included to support (under \R{} \eqn{\ge}{>=} 3.6.2) passing of
+      character lengths from \proglang{C} to Fortran.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix()} tweaks for the singular values based
@@ -2005,10 +2036,6 @@
 
       \item logical subsetting of 0-dim. (diagonal/triangular) matrices
       fixes.
-
-      \item The new \code{FCONE} macros added for newer Fortran/C
-      compiler combinations are now defined back compatibly with \R{}
-      \eqn{\ge}{>=} 3.6.0.
 
       \item \code{chol(<diagonal dt[CRT]Matrix>)} now works.
 
@@ -2127,6 +2154,12 @@
 }
 
 \section{Changes in version 1.2-18 (2019-11-26, svn r3300)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \file{inst/test-tools-1.R}: a bug-fixed \code{canCoerce}
+      is used under \R{} \eqn{<} 3.6.2.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}
@@ -2144,21 +2177,20 @@
 
       \item \file{test-tools-Matrix.R}: \code{Qidentical()} no longer
       assumes \code{class(<matrix>)} to be of length 1.
-
-      \item \file{test-tools-1.R}: provide bug-fixed \code{canCoerce()}
-      in old \R{} versions.
     }
   }
 }
 
 \section{Changes in version 1.2-17 (2019-03-20, svn r3294)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{isFALSE} is defined for \R{} \eqn{<} 3.5.0.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Fix new \code{PROTECT()} warnings (bugs?) found by
       \command{rchk}.
-
-      \item Provide \code{isFALSE()} for \R{} \eqn{<} 3.5.0 as now need
-      it for sparseMatrix printing.
     }
   }
 }
@@ -2296,6 +2328,12 @@
 }
 
 \section{Changes in version 1.2-11 (2017-08-10, svn r3225)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{length(<NULL>) <- value} is avoided as it is
+      deprecated in \R{} \eqn{\ge}{>=} 3.5.0.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item S4 method dispatch no longer emits ambiguity notes (by
@@ -2308,9 +2346,6 @@
     \itemize{
       \item \code{rankMatrix(<matrix of all 0>)} now gives zero for all
       methods, as it should be.
-
-      \item no longer calling \code{length(NULL) <- <positive>} which
-      has been deprecated in R-devel since July.
 
       \item \code{qr.coef(<sparseQR>, y)} now finally has correct (row)
       names (from pivot back permutation).
@@ -2375,11 +2410,14 @@
 }
 
 \section{Changes in version 1.2-8 (2017-01-16, svn r3201)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item Methods for \code{Ops} handle 0-length operands more
+      consistently, matching changes planned for \R{} version 3.4.0.
+    }
+  }
   \subsection{New Features}{
     \itemize{
-      \item 0-length matrix \code{Ops} (binary operations) are now
-      compatible to R-devel (to be \R{} 3.4.0).
-
       \item C-API:
       \code{SuiteSparse_long} is now defined as \code{int64_t} on all
       platforms, and we now include (C99) \file{inttypes.h}
@@ -2402,15 +2440,15 @@
   }
 }
 
-
 \section{Changes in version 1.2-7.1 (2016-08-29, svn r3187)}{
-  \subsection{Bug Fixes}{
+  \subsection{Installation}{
     \itemize{
-      \item in \proglang{C} code, protect _POSIX_C_SOURCE by #ifdef
-      __GLIBC__
+      \item \code{_POSIX_C_SOURCE} is defined \emph{conditionally}, only
+      \code{#ifdef __GLIBC__}.
     }
   }
 }
+
 \section{Changes in version 1.2-7 (2016-08-27, svn r3185)}{
   \subsection{New Features}{
     \itemize{
@@ -2517,10 +2555,11 @@
 }
 
 \section{Changes in version 1.2-2 (2015-07-03, svn r3131)}{
-  \subsection{New Features}{
+  \subsection{Dependencies}{
     \itemize{
-      \item Explicitly import from \dQuote{base} packages such as
-      \pkg{stats}.
+      \item Objects are more systematically imported from \dQuote{base}
+      packages like \pkg{stats}.  It is no longer assumed that those
+      packages are attached.
     }
   }
   \subsection{Bug Fixes}{
@@ -2665,13 +2704,17 @@
 }
 
 \section{Changes in version 1.1-5 (2015-01-18, svn r3037)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item Methods for matrix multiplication (\code{\%*\%},
+      \code{crossprod}, \code{tcrossprod}) are revised to match the
+      behaviour of \R{} \eqn{\ge}{>=} 3.2.0, which better tolerates
+      matrix-vector products.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item More use of \code{anyNA()} (for speedup).
-
-      \item Matrix products (\code{\%*\%}, \code{crossprod},
-      \code{tcrossprod}) now behave compatibly to \R{} 3.2.0, i.e., more
-      lenient in matching dimensions for matrix - vector products.
 
       \item \code{isTriangular()} gets new optional argument
       \code{upper  = NA}.
@@ -2769,12 +2812,19 @@
 }
 
 \section{Changes in version 1.1-1.1 (2013-12-30, svn r2957)}{
+  \subsection{Installation}{
     \itemize{
-      \item Testing code's \code{assertWarning()} adapted for \R{}
-      \eqn{\le}{<=} 3.0.1.
-
-      \item \code{Depends: R (>= 2.15.2)} eases checking.
+      \item \pkg{Matrix} \eqn{\ge}{>=} 1.1-1.1 depends on \R{}
+      \eqn{\ge}{>=} 2.15.2 to ease checking.
     }
+  }
+  \subsection{Compatibility}{
+    \itemize{
+      \item \file{inst/test-tools-1.R}: \code{assertCondition} is
+      defined for \R{} \eqn{<} 3.0.2 and used by \code{assertWarning}
+      there.
+    }
+  }
 }
 
 \section{Changes in version 1.1-1 (2013-12-28, svn r2933)}{
@@ -2813,6 +2863,12 @@
 }
 
 \section{Changes in version 1.1-0 (2013-10-21, svn r2930)}{
+  \subsection{Dependencies}{
+    \itemize{
+      \item \pkg{methods}, \pkg{stats}, \pkg{utils}, and \pkg{lattice}
+      are moved from \code{Depends} to \code{Imports}.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item \code{fac2sparse} and \code{fac2Sparse} now exported, with a
@@ -2824,8 +2880,6 @@
       \item ensuing \dQuote{C API changes}
 
       \item new \code{.SuiteSparse_version()} function
-
-      \item Many \sQuote{Imports:} instead of \sQuote{Depends:}.
     }
   }
   \subsection{Bug Fixes}{
