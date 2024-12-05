@@ -486,7 +486,7 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item C code now refers to the symbol \code{factors} as
+      \item \proglang{C} code now refers to the symbol \code{factors} as
       \code{Matrix_factorsSym}, rather than \code{Matrix_factorSym}.
 
       \item Certain never or seldom used class unions are removed.
@@ -503,10 +503,11 @@
       \item Files in \file{po/} and \file{inst/po/} have been updated
       due to more frequent use of \code{gettextf} in \file{R/*.R}.
 
-      \item C code is prepared to handle complex matrices and their
-      factorizations.  Notably, new machinery in \file{src/cs-etc.[ch]}
-      will enable linking the CXSparse library instead of the CSparse
-      library, the latter supporting numeric types but not complex ones.
+      \item \proglang{C} code is prepared to handle complex matrices and
+      their factorizations.  Notably, new machinery in
+      \file{src/cs-etc.[ch]} will enable linking the CXSparse library
+      instead of the CSparse library, the latter supporting numeric
+      types but not complex ones.
 
       \item Some API declarations and macros not used by \emph{any}
       reverse \code{LinkingTo} are removed or remapped.
@@ -585,10 +586,10 @@
       \code{Cholesky} and \code{pCholesky} have been enabled (forgotten
       in \pkg{Matrix} 1.6-0).
 
-      \item API C function \code{chm_sparse_to_SEXP} now sorts and packs
-      its first argument \emph{before} assigning struct members to
-      variables, no longer accessing blocks of memory freed by
-      \code{cholmod_sort}.
+      \item API \proglang{C} function \code{chm_sparse_to_SEXP} now
+      sorts and packs its first argument \emph{before} assigning struct
+      members to variables, no longer accessing blocks of memory freed
+      by \code{cholmod_sort}.
     }
   }
   \subsection{Misc}{
@@ -602,11 +603,12 @@
       \item The number of methods for generic functions \code{coerce}
       and \code{as.*} has been reduced substantially, from 306 to 194
       (not counting deprecated ones), partly as a result of efforts to
-      do more fine-grained dispatch in C code.
+      do more fine-grained dispatch in \proglang{C} code.
 
       \item Files in \file{po/} and \file{inst/po/} have been updated
-      (again), as many more C level messages now use format strings as a
-      result of \code{vsnprintf} usage in \file{src/validity.c}.
+      (again), as many more \proglang{C} level messages now use format
+      strings as a result of \code{vsnprintf} usage in
+      \file{src/validity.c}.
     }
   }
 }
@@ -775,7 +777,8 @@
       methods made available by the CSparse library.
 
       \item \code{solve(<dgCMatrix>, b, sparse = TRUE)} is now handled
-      entirely in C code via \code{cs_spsolve} from the CSparse library.
+      entirely in \proglang{C} code via \code{cs_spsolve} from the
+      CSparse library.
 
       \item New utilities \code{invertPerm}, \code{signPerm},
       \code{isPerm}, and \code{asPerm} for computing the inverse and
@@ -914,8 +917,8 @@
       \item Help pages for matrix factorization classes and methods have
       been broadly expanded and updated to use consistent notation.
 
-      \item C code interfacing the CSparse library now checks in more
-      places for failed allocations inside of \code{cs_*()}.
+      \item \proglang{C} code interfacing the CSparse library now checks
+      in more places for failed allocations inside of \code{cs_*()}.
 
       \item The length of the \pkg{Matrix} namespace has been reduced by
       ~15\%.  More than 100 unused symbols have been removed.
@@ -1052,7 +1055,7 @@
     \itemize{
       \item \code{Diagonal()} gets a new optional \code{names} argument.
 
-      \item \code{diag(x) <- value} is now done in C also for
+      \item \code{diag(x) <- value} is now done in \proglang{C} also for
       \code{[CRT]sparseMatrix}.
 
       \item \code{.diagU2N()} gets fast counterpart \code{.diagN2U()}.
@@ -1274,7 +1277,7 @@
   \subsection{Bug Fixes}{
     \itemize{
       \item Symmetrization of \code{<Matrix>@Dimnames} and
-      \code{dimnames(<matrix>)} now goes through C utility
+      \code{dimnames(<matrix>)} now goes through \proglang{C} utility
       \code{symmDN()} in most places, resolving some earlier
       inconsistencies.
 
@@ -1566,12 +1569,13 @@
       subclasses individually.
 
       \item \code{isTriangular} and \code{isDiagonal} are now
-      implemented in C also for \code{[CRT]sparseMatrix} and standard
-      \code{matrix}.  \code{isSymmetric} is now implemented in C for all
-      \code{denseMatrix} and all \code{[CRT]sparseMatrix}, though these
-      C routines are currently only called when testing for \emph{exact}
-      symmetry (always for \code{[ln]Matrix}, only when \code{tol = 0}
-      for \code{dMatrix}).
+      implemented in \proglang{C} also for \code{[CRT]sparseMatrix} and
+      standard \code{matrix}.  \code{isSymmetric} is now implemented in
+      \proglang{C} for all \code{denseMatrix} and all
+      \code{[CRT]sparseMatrix}, though these \proglang{C} routines are
+      currently only called when testing for \emph{exact} symmetry
+      (always for \code{[ln]Matrix}, only when \code{tol = 0} for
+      \code{dMatrix}).
 
       \item Methods for \code{isSymmetric} gain an argument
       \code{checkDN = TRUE} indicating whether symmetry of
@@ -1608,7 +1612,7 @@
 
       \item Validation of \code{<Matrix>@Dimnames[[i]]} now tolerates
       vector types other than character, which are coerced to character
-      in C via the new \code{R_DimNames_fixup()}, for greater
+      in \proglang{C} via the new \code{R_DimNames_fixup()}, for greater
       consistency with base \code{matrix()}.
 
       \item \code{band(x, k1, k2)} is optimized further for both dense
@@ -1647,14 +1651,14 @@
       \item \code{determinant(<ds[yp]Matrix>)} is now much faster in the
       positive definite case, no longer going via \code{dgeMatrix}.
 
-      \item \code{diag(<[CRT]sparseMatrix>)} is now done in C and is
-      highly optimized in the \code{.[ts][CR]Matrix} case.
+      \item \code{diag(<[CRT]sparseMatrix>)} is now done in \proglang{C}
+      and is highly optimized in the \code{.[ts][CR]Matrix} case.
 
-      \item \code{symmpart} and \code{skewpart} are now done in C for
-      all \code{denseMatrix} and all \code{[CRT]sparseMatrix}.  Both now
-      more faithfully preserve the \dQuote{storage} of their argument.
-      (Previously, \code{symmpart(<packedMatrix>)} was an
-      \code{unpackedMatrix}, and
+      \item \code{symmpart} and \code{skewpart} are now done in
+      \proglang{C} for all \code{denseMatrix} and all
+      \code{[CRT]sparseMatrix}.  Both now more faithfully preserve the
+      \dQuote{storage} of their argument.  (Previously,
+      \code{symmpart(<packedMatrix>)} was an \code{unpackedMatrix}, and
       \code{(symm|skew)part(<[RT]sparseMatrix>)} was a
       \code{CsparseMatrix}.)
 
@@ -1766,8 +1770,9 @@
       \code{n = 0} case.
 
       \item \code{.M.kind()}, \code{.M.shape()}, and (new)
-      \code{.M.repr()} are now done in C via \code{R_check_class_etc()},
-      requiring a class definition only in \dQuote{rare} cases.
+      \code{.M.repr()} are now done in \proglang{C} via
+      \code{R_check_class_etc()}, requiring a class definition only in
+      \dQuote{rare} cases.
     }
   }
 }
@@ -1801,10 +1806,10 @@
   }
   \subsection{Misc}{
     \itemize{
-      \item Our C sources now use \code{R_Calloc()}, \code{R_Free()}
-      etc, instead of the shorter versions without 'R_'. Consequently,
-      we get closer to \code{STRICT_R_HEADERS}.  Also, include
-      \code{<float.h>} for \code{DBL_EPSILON}.
+      \item Our \proglang{C} sources now use \code{R_Calloc()},
+      \code{R_Free()} etc, instead of the shorter versions without
+      'R_'. Consequently, we get closer to \code{STRICT_R_HEADERS}.
+      Also, include \code{<float.h>} for \code{DBL_EPSILON}.
 
       \item \code{PROTECT()} 3 more; as from \samp{rchk} for
       \pkg{Matrix} 1.4-0.
@@ -1925,7 +1930,7 @@
   \subsection{Dependencies}{
     \itemize{
       \item For now revert to \code{Depends: R (>= 3.5.0)} to accomodate
-      users on older R installations.
+      users on older \R{} installations.
     }
   }
   \subsection{Bug Fixes}{
@@ -2077,8 +2082,8 @@
       Consequently, e.g., \code{as(<diagonalMatrix>, "CsparseMatrix")}
       now drops such zeros, too.
 
-      \item Updated the crucial underlying C libraries from SuiteSparse,
-      from 4.2.1 to 5.7.1 (from 2020-02-20), visible in
+      \item Updated the crucial underlying \proglang{C} libraries from
+      SuiteSparse, from 4.2.1 to 5.7.1 (from 2020-02-20), visible in
       \code{.SuiteSparse_version()} .
 
       \item \code{sparseMatrix()} gets new argument \code{repr = "C"},
@@ -2262,8 +2267,8 @@
 
       \item large \code{"dspMatrix"} and \code{"dtpMatrix"} objects can
       now be constructed via \code{new(*, Dim = *, x = *)} also when
-      \code{length(x)} is larger than 2^31 (as the C internal validation
-      method no longer suffers from integer overflow).
+      \code{length(x)} is larger than 2^31 (as the \proglang{C} internal
+      validation method no longer suffers from integer overflow).
 
       \item More \samp{PROTECT()}ing to be
       \dQuote{rather safe than sorry} thanks to Tomas Kalibera's check
@@ -2397,8 +2402,8 @@
       sparse and dense \code{"Matrix"}-classed matrices \code{x}.
 
       \item \code{solve(<sparse_LU>)} no gives an error in some cases of
-      singular matrices, where before the C code accessed illegal memory
-      locations.
+      singular matrices, where before the \proglang{C} code accessed
+      illegal memory locations.
     }
   }
 }
@@ -2407,7 +2412,8 @@
 \section{Changes in version 1.2-7.1 (2016-08-29, svn r3187)}{
   \subsection{Bug Fixes}{
     \itemize{
-      \item in C code, protect _POSIX_C_SOURCE by #ifdef __GLIBC__
+      \item in \proglang{C} code, protect _POSIX_C_SOURCE by #ifdef
+      __GLIBC__
     }
   }
 }
@@ -2818,8 +2824,8 @@
       \item \code{fac2sparse} and \code{fac2Sparse} now exported, with a
       new \code{giveCsparse} option.
 
-      \item Update to latest \command{SuiteSparse} C library by Tim
-      Davis, U. Florida.
+      \item Update to latest \command{SuiteSparse} \proglang{C} library
+      by Tim Davis, U. Florida.
 
       \item ensuing \dQuote{C API changes}
 
@@ -3158,7 +3164,8 @@
     \itemize{
       \item Sparse matrices, classes and methods, partly via
 
-      \item Interface to LDL, TAUCS, Metis and UMFPACK C libraries
+      \item Interface to LDL, TAUCS, Metis and UMFPACK \proglang{C}
+      libraries
     }
   }
 }
@@ -3192,7 +3199,7 @@
       \item \code{rcond()}, \code{norm()}, \code{det()}; \code{expand()}
       and \code{facmul()}.
 
-      \item C++ interface to LAPACK
+      \item \proglang{C++} interface to LAPACK
     }
   }
 }
