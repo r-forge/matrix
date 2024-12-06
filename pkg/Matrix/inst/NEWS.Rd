@@ -154,6 +154,12 @@
       not including \option{-I"${R_INCLUDE_DIR}${R_ARCH}"}.
     }
   }
+  \subsection{SuiteSparse}{
+    \itemize{
+      \item Internal SuiteSparse and METIS library sources are patched
+      to avoid possible use of illegal entry points.
+    }
+  }
   \subsection{Misc}{
     \itemize{
       \item Registered routine \code{sexp_as_cholmod_factor} no longer
@@ -161,9 +167,6 @@
       decision to check to the caller.  Accordingly, most
       \code{cholmod_check_*} are now registered, though packages calling
       them must use \code{LinkingTo: Matrix (>= 1.7-1)}.
-
-      \item Internal SuiteSparse and METIS libraries are further patched
-      to avoid possible use of illegal entry points.
 
       \item Non-API entry points \code{OBJECT}, \code{IS_S4_OBJECT},
       \code{SET_OBJECT}, \code{ATTRIB}, and \code{SET_ATTRIB} are no
@@ -179,23 +182,31 @@
       \eqn{\ge}{>=} 4.4.
     }
   }
+  \subsection{SuiteSparse}{
+    \itemize{
+      \item The internal SuiteSparse library sources are updated from
+      version 5.10.1 to version 7.6.0.  We have so far identified one
+      backwards incompatible change: since SuiteSparse version 7.3.0,
+      \code{cholmod_sort(A)} sorts but \emph{does not pack} the matrix
+      \code{A}.  It seems that now \code{cholmod_sort} and
+      \code{cholmod_copy} must be used in conjuction if a sorted
+      \emph{and packed} result is desired.  This change affects only
+      reverse \code{LinkingTo} relying on the old behaviour.  It seems
+      that currently there are no such packages on CRAN or Bioconductor.
+
+      \item CHOLMOD component Partition is compiled along with its
+      dependencies (METIS, CAMD, CCOLAMD).
+
+      \item CXSparse is compiled instead of CSparse, which did not
+      support complex matrices.
+
+      \item The internal SuiteSparse and METIS library sources are
+      patched to squash a significant number of warnings surfaced by
+      \option{-Wall}.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
-      \item The internal collection of SuiteSparse libraries is updated
-      from version 5.10.1 to version 7.6.0.  Hence the \pkg{Matrix} ABI
-      version is incremented from 1 to 2.  Reverse \code{LinkingTo}
-      built under earlier versions of \pkg{Matrix} should be rebuilt
-      from sources by users and maintainers of binary repositories.\cr
-      \cr
-      We have so far identified one backwards incompatible change: since
-      SuiteSparse version 7.3.0, \code{cholmod_sort(A)} sorts but
-      \emph{does not pack} the matrix \code{A}.  It seems that now
-      \code{cholmod_sort} and \code{cholmod_copy} must be used in
-      conjuction if a sorted \emph{and packed} result is desired.  This
-      change affects only reverse \code{LinkingTo} relying on the old
-      behaviour.  (It seems that currently there are no such packages on
-      CRAN or Bioconductor.)
-
       \item The diagonal elements of the \code{R} factor computed by
       \code{qr(<sparseMatrix>)} are no longer constrained to be
       non-negative, due to differences in the implementation of function
@@ -221,20 +232,8 @@
       requires non-negative \code{diag(R)}.
     }
   }
-  \subsection{New Features}{
-    \itemize{
-      \item CHOLMOD component Partition is now compiled along with its
-      dependencies (METIS, CAMD, CCOLAMD).
-
-      \item CXSparse is now compiled instead of CSparse, which did not
-      support complex matrices.
-    }
-  }
   \subsection{Bug Fixes}{
     \itemize{
-      \item CHOLMOD sources are patched to address the significant
-      number of compiler warnings surfaced by \option{-Wall}.
-
       \item The unary subscript \code{x[i]} is correct again for
       \code{x} of class \code{.s[CT]Matrix} and logical \code{i}
       indexing entries outside of the stored triangle.
@@ -1825,6 +1824,13 @@
       Thanks to Michael Chirico for the report.
     }
   }
+  \subsection{SuiteSparse}{
+    \itemize{
+      \item The patch for header
+      \file{SuiteSparse_config/SuiteSparse_config.h}
+      is improved for Windows.
+    }
+  }
   \subsection{Classes}{
     \itemize{
       \item New virtual class \code{packedMatrix} representing dense
@@ -1866,9 +1872,6 @@
 
       \item \code{PROTECT()} 3 more; as from \samp{rchk} for
       \pkg{Matrix} 1.4-0.
-
-      \item Slightly better patch notably for Windows, for
-      \file{src/SuiteSparse_config/SuiteSparse_config.h}
 
       \item Modified \code{AZERO()} to work with \code{R_xlen_t} and new
       \code{AZEROs()} for \code{size_t}; other tweaks to evade
@@ -2103,6 +2106,13 @@
       to Brian Ripley.
     }
   }
+  \subsection{SuiteSparse}{
+    \itemize{
+      \item The internal SuiteSparse library sources are updated from
+      version 4.2.1 to version 5.7.1.  The change is visible in
+      \code{.SuiteSparse_version()}.
+    }
+  }
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} where \code{doDiag=TRUE} has
@@ -2150,10 +2160,6 @@
       TRUE} and hence now by default drops zero diagonal entries.
       Consequently, e.g., \code{as(<diagonalMatrix>, "CsparseMatrix")}
       now drops such zeros, too.
-
-      \item Updated the crucial underlying \proglang{C} libraries from
-      SuiteSparse, from 4.2.1 to 5.7.1 (from 2020-02-20), visible in
-      \code{.SuiteSparse_version()} .
 
       \item \code{sparseMatrix()} gets new argument \code{repr = "C"},
       superseding the (now deprecated) \code{giveCsparse = TRUE}.
@@ -2461,11 +2467,10 @@
       consistently, matching changes planned for \R{} version 3.4.0.
     }
   }
-  \subsection{New Features}{
+  \subsection{SuiteSparse}{
     \itemize{
-      \item C-API:
-      \code{SuiteSparse_long} is now defined as \code{int64_t} on all
-      platforms, and we now include (C99) \file{inttypes.h}
+      \item \code{SuiteSparse_long} is defined as \code{int64_t} on all
+      platforms.  Hence we now include C99 header \file{inttypes.h}.
     }
   }
   \subsection{Bug Fixes}{
@@ -2913,17 +2918,19 @@
       are moved from \code{Depends} to \code{Imports}.
     }
   }
+  \subsection{SuiteSparse}{
+    \itemize{
+      \item The internal SuiteSparse library sources are updated to the
+      latest version.  Use new function \code{.SuiteSparse_version} to
+      get the version in use.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item \code{fac2sparse} and \code{fac2Sparse} now exported, with a
       new \code{giveCsparse} option.
 
-      \item Update to latest \command{SuiteSparse} \proglang{C} library
-      by Tim Davis, U. Florida.
-
       \item ensuing \dQuote{C API changes}
-
-      \item new \code{.SuiteSparse_version()} function
     }
   }
   \subsection{Bug Fixes}{
