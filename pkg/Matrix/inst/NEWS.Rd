@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2024-12-03, svn r5090)}{
+\section{Changes in version 1.8-0 (2024-12-06, svn r5102)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -44,6 +44,35 @@
       \code{tcrossprod(x)} for \code{Matrix} \code{x}.  Coercions to
       \code{posdefMatrix} attempt Cholesky factorization, which can fail
       for near-singular positive semidefinite matrices.
+
+      \item New virtual classes \code{idenseMatrix} and
+      \code{isparseMatrix} representing dense and sparse integer
+      matrices.  They extend \code{iMatrix} (which existed
+      \dQuote{forever} without an implementation) and are extended by
+      new nonvirtual classes \code{i(ge|sy|sp|tr|tp|[gst][CRT])Matrix}.
+
+      \item New nonvirtual class \code{idiMatrix} extending
+      \code{diagonalMatrix} and \code{iMatrix}, for diagonal integer
+      matrices.
+
+      \item New virtual classes \code{zdenseMatrix} and
+      \code{zsparseMatrix} representing dense and sparse complex
+      matrices.  They extend \code{zMatrix} (which existed
+      \dQuote{forever} without an implementation) and are extended by
+      new nonvirtual classes \code{z(ge|sy|sp|tr|tp|[gst][CRT])Matrix}.
+      \code{zs[CRTyp]Matrix} have a \code{trans} slot with value
+      \code{"C"} or \code{"T"}, used to distinguish between complex
+      Hermitian and complex symmetric matrices.  They are extended by
+      \code{zp[CRTop]Matrix}, which represent complex positive
+      semidefinite matrices (and so are contrained to have
+      \code{trans="C"})
+
+      \item New nonvirtual class \code{zdiMatrix} extending
+      \code{diagonalMatrix} and \code{zMatrix}, for diagonal complex
+      matrices.
+
+      %% TODO: explain backwards incompatible changes to the
+      %%       MatrixFactorization hierarchy
     }
   }
   \subsection{Generic Functions}{
@@ -1981,7 +2010,7 @@
       the notice by Aaron Lun.
 
       \item \code{band(M, k1, k2)} now also works when \code{k1 * k2} is
-      larger than 2^31-1, the maximal integer, fixing \bug{6743} by
+      larger than 2^31-1, the maximal integer, fixing \MPR{6743} by
       Ariel Paulson.  Further, it works when \code{M} is a sparse
       \code{symmetricMatrix} but the band is not symmetric,
       \code{k1 != -k2}.
