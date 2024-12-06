@@ -50,8 +50,8 @@
     \itemize{
       \item New generic function \code{ct} for the conjugate transpose.
       \code{ct(x)} is equivalent to \code{t(x)} except for complex
-      \code{x}, for which it is intended to be at least as (if not more)
-      efficient as \code{Conj(t(x))}.
+      \code{x}, for which it is intended to be at least as efficient as
+      (if not more efficient than) \code{Conj(t(x))}.
 
       \item The formal argument list of generic function
       \code{forceSymmetric} is changed from \code{(x, uplo)} to
@@ -183,6 +183,15 @@
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.7-0 depends on \R{}
       \eqn{\ge}{>=} 4.4.
+    }
+  }
+  \subsection{Linking}{
+    \itemize{
+      \item The \pkg{Matrix} ABI version is incremented from 1 to 2.
+
+      \item Reverse \code{LinkingTo} built under earlier versions of
+      \pkg{Matrix} should be rebuilt from sources by users and
+      maintainers of binary repositories.
     }
   }
   \subsection{SuiteSparse}{
@@ -321,6 +330,22 @@
       release restores compatibility.
     }
   }
+  \subsection{Linking}{
+    \itemize{
+      \item Support is added for an ABI version relevant to packages
+      that link against \pkg{Matrix}.  The ABI version is 1 in this
+      release and will be incremented by 1 in each future release that
+      changes the ABI.  It is implicitly 0 in previous releases.
+      Versions and their components are defined in a header for use by
+      packages with \code{LinkingTo: Matrix (>= 1.6-2)} in their
+      \file{DESCRIPTION}.  See \file{inst/include/Matrix/version.h} and
+      (below) \code{Matrix.Version}.
+
+      \item Reverse \code{LinkingTo} built under earlier versions of
+      \pkg{Matrix} should be rebuilt from sources by users and
+      maintainers of binary repositories.
+    }
+  }
   \subsection{C-Level API}{
     \itemize{
       \item API headers are organized under \file{inst/include/Matrix/}
@@ -383,16 +408,6 @@
   }
   \subsection{New Features}{
     \itemize{
-      \item New \R{} function \code{Matrix.Version}, taking no arguments
-      and returning \code{list(package, abi, suitesparse)}, a list
-      containing the numeric versions of the package, its ABI, and the
-      internal SuiteSparse library.  ABI versioning is new: the version
-      is 1 in this release and will be incremented by 1 in each future
-      release that changes the ABI. Versions and their components are
-      defined in a header for use by packages with \code{LinkingTo:
-      Matrix} in \file{DESCRIPTION}.  See
-      \file{inst/include/Matrix/version.h}.
-
       \item \code{mean(<sparseVector>, trim=)} now works efficiently for
       nonzero values of \code{trim}.
 
@@ -569,6 +584,11 @@
       variables, preventing use-after-free.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item Four Valgrind-detected memory bugs are fixed.
+    }
+  }
   \subsection{Classes}{
     \itemize{
       \item Validity methods for classes \code{Cholesky} and
@@ -598,8 +618,6 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Fix four Valgrind-detected memory bugs.
-
       \item \code{<diagonalMatrix> \%*\% <RsparseMatrix>} works again.
 
       \item \code{diag(<non-square RsparseMatrix>) <- value} works
@@ -928,10 +946,6 @@
       \item \code{dimnames(x) <- value} now validates \code{x@Dim}
       before \code{value} to avoid undefined behaviour in C-level check.
 
-      \item \code{invPerm(p)} no longer segfaults for \code{p} that are
-      not valid permutation vectors.  (\code{invPerm(NA)} was enough to
-      trigger a segfault.)
-
       \item \code{chol2inv(x)} now ignores the lower triangular part of
       \code{x} not inheriting from \code{triangularMatrix}.
 
@@ -968,13 +982,20 @@
       matrix is not positive definite.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item \code{invPerm(p)} no longer segfaults for \code{p} that are
+      not valid permutation vectors.  \code{invPerm(NA)} was enough to
+      trigger a segfault.
+
+      \item \proglang{C} code interfacing the CSparse library tests in
+      more places for failed allocations inside of \code{cs_*}.
+    }
+  }
   \subsection{Misc}{
     \itemize{
       \item Help pages for matrix factorization classes and methods have
       been broadly expanded and updated to use consistent notation.
-
-      \item \proglang{C} code interfacing the CSparse library now checks
-      in more places for failed allocations inside of \code{cs_*()}.
 
       \item The length of the \pkg{Matrix} namespace has been reduced by
       ~15\%.  More than 100 unused symbols have been removed.
@@ -1036,6 +1057,12 @@
       \code{deprecatedWarning}.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item Calls to \code{sprintf} are replaced by equivalent calls
+      \code{snprintf} to avoid potential buffer overflow.
+    }
+  }
   \subsection{Misc}{
     \itemize{
       \item C-level utilities \code{Matrix_memset()} and
@@ -1046,9 +1073,6 @@
 
       \item C-level macro \code{Calloc_or_Alloca_TO()} now
       zero-initializes also in the \code{alloca}-using case.
-
-      \item Replace \code{sprintf} with \code{snprintf} globally to
-      avoid potential buffer overflows.
     }
   }
 }
@@ -1157,11 +1181,6 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item C-level functions now \code{PROTECT()} the result of
-      \code{R_do_slot()}, \code{getAttrib()}, \code{mkString()}, etc.
-      in many more (but not yet all) places, resolving many new and some
-      old \code{rchk} warnings.
-
       \item \code{lu(x)@L@uplo} is now \code{"L"}, not \code{"U"}, for
       0-by-0 and 1-by-1 \code{dgCMatrix} \code{x}.
 
@@ -1214,19 +1233,20 @@
       \code{sparseMatrix} \code{x} have not been addressed (yet).
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item In many more (but not yet all) places, \proglang{C}
+      functions protect the values of \code{R_do_slot},
+      \code{Rf_getAttrib}, \code{Rf_mkString}, etc. from garbage
+      collections, squashing many new and some old \command{rchk}
+      warnings.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item \code{is.nan(x)} is now implemented for all \code{x}
       inheriting from virtual class \code{Matrix} or
       \code{sparseVector}.
-
-      \item New C-level validity methods for \code{n[ts][CRT]Matrix},
-      \code{p?Cholesky}, \code{p?BunchKaufman}, \code{Schur},
-      \code{denseLU}, \code{sparseLU}, and \code{sparseQR}.  Notably, in
-      the \code{MatrixFactorization} cases, the following properties are
-      now checked: the dimensions of each factor, the orientation of
-      each triangular (or trapezoidal) factor, and the validity of each
-      permutation vector.
 
       \item \code{Diagonal(n=, x=)} now recycles \code{x} of any
       positive length to length \code{n}.  Previously, recycling was
@@ -1280,12 +1300,12 @@
 }
 
 \section{Changes in version 1.5-1 (2022-09-12, svn r3642)}{
-  \subsection{Bug Fixes}{
+  \subsection{Memory}{
     \itemize{
-      \item ASAN-detected bugs fixed in C-level functions
-      \code{Tsparse_as_CRsparse()} (triggered by \code{.T2C(<0-by-0>)})
-      and \code{pMatrix_validate()} (triggered by
-      \code{as(<length-10000 integer>, "pMatrix")}).
+      \item ASan-detected memory bugs are fixed in \proglang{C}
+      functions \code{Tsparse_as_CRsparse} and \code{pMatrix_validate}.
+      The former was triggered by \code{.T2C(<0-by-0>)} and the latter
+      was triggered by \code{as(<length-10000 integer>, "pMatrix")}.
     }
   }
 }
@@ -1602,17 +1622,20 @@
       \item \code{t(<symmetricMatrix>)} now retains the \code{factors}
       slot, avoiding recomputation.
 
-      \item \code{qr(<large sparse>)} no longer segfaults in some cases,
-      but now warns about \dQuote{Out of memory} and stops, fixing
-      \MPR{6610} reported by Benjamin Tyner.
-
-      \item Fixed \code{<sparse> \%*\% <dense>} possible memory
-      corruption, visible via Valgrind, fixing \MPR{6726} reported by
-      David Cortes.
-
       \item Fixed the (quite \emph{long standing}) \MPR{6777}, reported
       by Manuel Koller: \code{tcrossprod(<matrix>, <[dln]sCMatrix>)} has
       been wrong in some cases.
+    }
+  }
+  \subsection{Memory}{
+    \itemize{
+      \item \code{qr(<big sparse>)} could segfault due to integer
+      overflow inside of \code{cs_multiply}.  Now an error is signaled
+      indicating \dQuote{out of memory}.  Reported by Benjamin Tyner
+      as \MPR{6610}.
+
+      \item Valgrind warning originating in \code{cholmod_sdmult}
+      is squashed.  Reported by David Cortes as \MPR{6726}.
     }
   }
   \subsection{New Features}{
@@ -1858,6 +1881,12 @@
       extended by \code{[nld](sp|tp)Matrix}.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item Protection stack imbalances detected by \command{rchk} are
+      fixed.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{diag(x)} methods now mostly also keep \code{names}
@@ -1890,9 +1919,6 @@
       'R_'. Consequently, we get closer to \code{STRICT_R_HEADERS}.
       Also, include \code{<float.h>} for \code{DBL_EPSILON}.
 
-      \item \code{PROTECT()} 3 more; as from \samp{rchk} for
-      \pkg{Matrix} 1.4-0.
-
       \item Modified \code{AZERO()} to work with \code{R_xlen_t} and new
       \code{AZEROs()} for \code{size_t}.
     }
@@ -1907,13 +1933,37 @@
       \code{memory.limit} which is a stub since \R{} version 4.2.0.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item Several low level functions are adjusted to avoid integer
+      overflow in \code{i+j*m} or similar.  Reported by Dario Strbenac
+      on the R-devel mailing list (\dQuote{dgTMatrix Segmentation
+        Fault}, June 10, 2021).
+
+      \item Leak in \code{as(<dtCMatrix>, "denseMatrix")} when the
+      argument is unit triangular is fixed.  Thanks to Bill Dunlap for
+      the report and patch in \PR{18204}.
+
+      \item Leak in \code{crossprod(<dsCMatrix>)} is fixed.  Thanks to
+      Bill Dunlap for the report and patch in \PR{18205}.
+
+      \item Leaks in \code{solve(<dgCMatrix>, <ddenseMatrix>)} and
+      \code{lu(<dgCMatrix>)} and when the argument is near-singular (or
+      when memory is exhausted) are fixed.  Thanks to Bill Dunlap for
+      the report and patch in \PR{18206}.
+
+      \item Leaks in \code{[cr]bind2(x, y)} when both arguments are
+      sparse and exactly one is nonzero pattern are fixed.  Thanks to
+      Bill Dunlap for the report and patch in \PR{18210}.
+
+      \item \code{solve(<dsCMatrix>, \dots)} restarts after catching
+      warnings signaled from \code{dsCMatrix_*_solve} so that memory is
+      freed rather than leaked.  Thanks to Bill Dunlap for the report
+      and patch in \PR{18214}.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Update many \file{src/*.c} preventing integer overflow in
-      \dQuote{pointer} and index computations for large (dense)
-      matrices; prompted by Dario Strbenac's post to R-devel.
-      % June 7, "dgTMatrix Segmentation Fault"
-
       \item \code{sparse.model.matrix(.., contrasts.arg = <.. ddiMatrix
       ..>)} now works correctly, fixing \MPR{6673} by Davor Josipovic.
 
@@ -1930,35 +1980,16 @@
       logical dense matrices, specifically \code{lgeMatrix}, thanks to
       the notice by Aaron Lun.
 
-      \item fix leak in C-level \code{Csparse_to_dense()} thanks to Bill
-      Dunlap in \R{}'s \PR{18204} and \code{install_lu()} called from
-      \code{solve(<dgCMatrix>)} in \PR{18206}.
-
-      \item fix leak in crossprod(<dsTMatrix>), thanks to report and
-      patch in \PR{18205} by Bill Dunlap.
-
       \item \code{band(M, k1, k2)} now also works when \code{k1 * k2} is
       larger than 2^31-1, the maximal integer, fixing \bug{6743} by
       Ariel Paulson.  Further, it works when \code{M} is a sparse
       \code{symmetricMatrix} but the band is not symmetric,
       \code{k1 != -k2}.
 
-      \item fix leak in C-level code for \code{cbind(m1,m2)} or
-      \code{rbind(*)} when \code{m1} is \code{n.Csparse} and \code{m2}
-      is not, thanks to Bill Dunlap's diagnosis and patch in \R{}'s
-      \PR{18210}.
-
       \item \code{sparseVector(i=integer(), length=2^33)} now does
       show/print, after fixing a bug in the \code{head()} method for
       \emph{empty} sparseVectors.  Reported by David Cortes as
       \MPR{6745}.
-
-      \item inverting or solving \code{dsCMatrix} no longer catches C
-      level warnings too early which would not free, but rather leak
-      memory; thanks to Bill Dunlap's analysis and patch in \R{}'s
-      \PR{18214}.  Additionally, such warnings and error are
-      \code{message()}d when \code{getOption("Matrix.verbose")} is
-      \code{>= 1}.
 
       \item \code{ss <- <sparseVector>[i]} gave an invalid sparseVector
       \code{ss} as \code{ss@i} was not necessarily sorted; thanks to a
@@ -1995,8 +2026,9 @@
 \section{Changes in version 1.3-3 (2021-05-01, svn r3390)}{
   \subsection{Installation}{
     \itemize{
-      \item The change to \code{Depends: R (>= 3.6)} is reverted.
-      Installation continues to work under \R{} \eqn{\ge}{>=} 3.5.
+      \item \pkg{Matrix} \eqn{\ge}{>=} 1.3-3 depends on \R{}
+      \eqn{\ge}{>=} 3.5, relaxing the dependency on \R{} \eqn{\ge}{>=}
+      3.6 introduced in \pkg{Matrix} version 1.3-0.
     }
   }
   \subsection{Compatibility}{
@@ -2009,8 +2041,8 @@
     \itemize{
       \item \file{inst/include/cholmod.h} and
       \file{inst/include/Matrix_stubs.c} needed adjustment after the
-      SparseSuite update in \pkg{Matrix} version 1.3-0.
-      \MPR{6714} by Kasper Kristensen, who maintains \CRANpkg{TMB}.
+      SparseSuite update in \pkg{Matrix} version 1.3-0.  \MPR{6714}
+      reported by Kasper Kristensen, who maintains \CRANpkg{TMB}.
     }
   }
   \subsection{Deprecated and Defunct}{
@@ -2047,13 +2079,13 @@
       \item \code{M[,]} (and similar) now work as in base \R{};
       \MPR{6720} by David Cortes.
 
-      \item \code{-S} now works also when \code{S} has no `factors`
+      \item \code{-S} now works also when \code{S} has no \code{factors}
       slot.  It signalled an error, e.g., for sparse triangular matrices
       \code{S}; \MPR{6656}, reported by Chun Fung (Jackson) Kwok.
 
       \item \code{M*2} and similar no longer keep cached factorizations
       (in `factors` slot), but drop them via internal new
-      \code{.empty.factors()}.  \MPR{6606}, reported by Tomas Lumley.
+      \code{.empty.factors()}.  \MPR{6606}, reported by Thomas Lumley.
 
       \item removed a few duplicated \code{.alias{.}} from
       \file{man/*.Rd}.
@@ -2086,6 +2118,12 @@
       \proglang{C} to Fortran.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item \code{matrix_trf} protects two more objects from garbage
+      collection, squashing two \command{rchk} warnings.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix()} tweaks for the singular values based
@@ -2101,9 +2139,6 @@
       fixes.
 
       \item \code{chol(<diagonal dt[CRT]Matrix>)} now works.
-
-      \item \file{rchk}: fix potentially un\code{PROTECT}ed vars in
-      \file{src/dsyMatrix.c}
     }
   }
 }
@@ -2139,17 +2174,17 @@
   \subsection{Significant User-Visible Changes}{
     \itemize{
       \item \code{Matrix(*, doDiag=TRUE)} where \code{doDiag=TRUE} has
-      always been the \emph{default} is now obeyed also in the sparse
-      case, as all \code{diagonalMatrix} are also \code{sparseMatrix}.
-
+      always been the default is now obeyed also in the sparse case, as
+      all \code{diagonalMatrix} are also \code{sparseMatrix}.\cr
+      \cr
       \code{Matrix(0, 3,3)} returns a \code{ddiMatrix} instead of a
       \code{dsCMatrix} previously.  The latter is still returned from
       \code{Matrix(0, 3,3, doDiag=FALSE)}, and e.g.,
-      \code{.symDiagonal(3,pi)}.
-
+      \code{.symDiagonal(3,pi)}.\cr
+      \cr
       Also a triangular matrix, e.g., \code{dtrMatrix} is detected now
-      in cases with \code{NA}s.
-
+      in cases with \code{NA}s.\cr
+      \cr
       This is both a bug fix \emph{and} an API change which breaks code
       that assumes \code{Matrix(.)} to return a \code{CsparseMatrix}
       in cases where it now returns a \code{diagonalMatrix} (which
@@ -2198,6 +2233,14 @@
       from \MPR{6581}, by Vitalie Spinu.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item The second argument in calls to \code{cholmod_factorize_p}
+      from \code{internal_chm_factor} was a pointer to 1 \code{double}
+      instead of a \code{double} array of length 2, resulting in buffer
+      overflow there.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{rankMatrix(<sparse>, method="qr")} now returns
@@ -2218,11 +2261,6 @@
 
       \item For R-devel Dec 4, 2020: adapt all.equal() check of sparse
       matrix images (which contain panel functions with environments).
-
-      \item tried fixing warning \emph{'cholmod_factorize_p' accessing
-      16 bytes in a region of size 8 [-Wstringop-overflow=]} in
-      \file{src/dsCMatrix.c} (in two places); seen by pre-release-gcc11
-      compilation.
     }
   }
 }
@@ -2234,11 +2272,14 @@
       is used under \R{} \eqn{<} 3.6.2.
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item \code{ddense_skewpart} protects another object from garbage
+      collection, squashing a remaining \command{rchk} warning.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Fix last(?) \code{PROTECT()} warning found by \command{rchk}
-      in \file{src/dense.c}'s \code{ddense_skewpart()}.
-
       \item \code{as(m, "dgTMatrix")} does not lose \code{dimnames}
       anymore when \code{m} is a (traditional) \code{matrix}.
 
@@ -2261,10 +2302,10 @@
       \item \code{isFALSE} is defined for \R{} \eqn{<} 3.5.0.
     }
   }
-  \subsection{Bug Fixes}{
+  \subsection{Memory}{
     \itemize{
-      \item Fix new \code{PROTECT()} warnings (bugs?) found by
-      \command{rchk}.
+      \item \proglang{C} functions protect more objects from garbage
+      collection, squashing several \command{rchk} warnings.
     }
   }
 }
@@ -2319,9 +2360,10 @@
       \item German translation updates.
     }
   }
-  \subsection{Bug Fixes}{
+  \subsection{Memory}{
     \itemize{
-      \item one more \code{PROTECT()}.
+      \item \code{dgCMatrix_cholsol} protects one more object from
+      garbage collection, squashing an \command{rchk} warning.
     }
   }
 }
@@ -2337,6 +2379,13 @@
 
       Also provide low-level \R{} functions \code{.m2dgC()},
       \code{.m2lgC()}, and \code{.m2ngC()} for these.
+    }
+  }
+  \subsection{Memory}{
+    \itemize{
+      \item \proglang{C} functions protect more objects from garbage
+      collection, to be \dQuote{rather safe than sorry}.  Thanks to
+      Tomas Kalibera's \command{rchk} tools.
     }
   }
   \subsection{Bug Fixes}{
@@ -2369,10 +2418,6 @@
       now be constructed via \code{new(*, Dim = *, x = *)} also when
       \code{length(x)} is larger than 2^31 (as the \proglang{C} internal
       validation method no longer suffers from integer overflow).
-
-      \item More \samp{PROTECT()}ing to be
-      \dQuote{rather safe than sorry} thanks to Tomas Kalibera's check
-      tools.
     }
   }
 }
@@ -2430,10 +2475,10 @@
 }
 
 \section{Changes in version 1.2-10 (2017-04-19, svn r3216)}{
-  \subsection{Bug Fixes}{
+  \subsection{Memory}{
     \itemize{
-      \item quite a collection of new \code{PROTECT(.)}'s thanks to
-      Tomas Kalibera's \sQuote{rprotect} analysis.
+      \item \proglang{C} functions protect more objects from garbage
+      collection.  Thanks to Tomas Kalibera's \command{rchk} tools.
     }
   }
 }
@@ -2494,6 +2539,10 @@
     \itemize{
       \item \code{SuiteSparse_long} is defined as \code{int64_t} on all
       platforms.  Hence we now include C99 header \file{inttypes.h}.
+
+      \item The internal CSparse library sources are patched to avoid
+      buffer overflow in \code{cs_usolve} and \code{cs_utsolve} when
+      \code{U} is singular.
     }
   }
   \subsection{Bug Fixes}{
@@ -2505,10 +2554,6 @@
 
       \item \code{rep(x, *)} now works for \code{sparseVector} and
       sparse and dense \code{Matrix}-classed matrices \code{x}.
-
-      \item \code{solve(<sparse_LU>)} no gives an error in some cases of
-      singular matrices, where before the \proglang{C} code accessed
-      illegal memory locations.
     }
   }
 }
@@ -2595,8 +2640,8 @@
 \section{Changes in version 1.2-3 (2015-11-19, svn r3155)}{
   \subsection{C-Level API}{
     \itemize{
-      \item \file{inst/include/Matrix.h} tries harder to provide a
-      correct \samp{alloca} definition for compilers that do not define
+      \item \file{inst/include/Matrix.h} tries harder to define
+      \samp{alloca} correctly for compilers that do not define
       \code{__GNUC__}.
     }
   }
@@ -2665,14 +2710,19 @@
       \command{tidy};-)
     }
   }
+  \subsection{Memory}{
+    \itemize{
+      \item Using \code{alloca} to perform large allocations could
+      overflow the stack, leading in some cases to a segfault.  Now
+      \code{alloca} is used only for small allocations.  Thanks to a
+      report on the R-help mailing list (\dQuote{does segfault mean
+        (always) a bug?}, May 5, 2015).
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{S[] <- T} and \code{S[] <- spV} now work (in more
       cases) for sparse matrices S, T and sparseVector \code{spV}.
-
-      \item Huge dense matrix multiplication did lead to segfaults, see
-      R-help, \dQuote{does segfault mean (always) a bug?}, May 5, 2015.
-      Fixed by using C's Alloca() only in smallish cases.
 
       \item Optional arguments in \code{image()}, e.g.,
       \code{main=<..>)} now also work for \code{lgCMatrix},
