@@ -160,14 +160,17 @@
       to avoid possible use of illegal entry points.
     }
   }
-  \subsection{Misc}{
+  \subsection{C-Level API}{
     \itemize{
       \item Registered routine \code{sexp_as_cholmod_factor} no longer
       calls \code{cholmod_check_factor} before returning, leaving the
       decision to check to the caller.  Accordingly, most
-      \code{cholmod_check_*} are now registered, though packages calling
-      them must use \code{LinkingTo: Matrix (>= 1.7-1)}.
-
+      \code{cholmod_check_*} are registered; packages wanting to use
+      them need \code{LinkingTo: Matrix (>= 1.7-1)}.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
       \item Non-API entry points \code{OBJECT}, \code{IS_S4_OBJECT},
       \code{SET_OBJECT}, \code{ATTRIB}, and \code{SET_ATTRIB} are no
       longer used.
@@ -242,6 +245,16 @@
 }
 
 \section{Changes in version 1.6-5 (2024-01-06, svn r4560)}{
+  \subsection{C-Level API}{
+    \itemize{
+      \item Registered routine \code{cholmod_triplet_as_sexp} transposes
+      entries \dQuote{opposite} the \code{stype} when that is nonzero,
+      following CHOLMOD.
+
+      \item \code{cholmod_defaults} is registered so that calls to
+      API function \code{M_cholmod_defaults} actually work.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{x[]} works for \code{x} inheriting from virtual class
@@ -256,14 +269,6 @@
 
       \item \code{tri[ul](<indMatrix>, k)} now works correctly for
       \code{k != 0}.
-
-      \item \proglang{C} API function \code{cholmod_triplet_as_sexp}
-      transposes entries \dQuote{opposite} the \code{stype} when that is
-      nonzero, following CHOLMOD.
-
-      \item \code{R_init_Matrix} did not register
-      \code{cholmod_defaults}, so calls to the corresponding stub did
-      not work.
     }
   }
   \subsection{Misc}{
@@ -280,16 +285,16 @@
       \item Warnings surfaced by \option{-Wformat} are squashed.
     }
   }
+  \subsection{C-Level API}{
+    \itemize{
+      \item API function \code{M_chm_triplet_to_SEXP}, removed in
+      \pkg{Matrix} version 1.6-2, is restored (as a macro).  It was
+      \dQuote{covertly} used by package \pkg{Rmosek}.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item better deprecation message for \code{..2dge()}.
-    }
-  }
-  \subsection{Misc}{
-    \itemize{
-      \item Entry point \code{M_chm_triplet_to_SEXP}, removed in
-      \pkg{Matrix} version 1.6-2, is restored (as a macro).  It was
-      \dQuote{covertly} used by package \pkg{Rmosek}.
     }
   }
 }
@@ -314,6 +319,30 @@
       \item \pkg{Matrix} did not pass its checks under \R{} version
       3.5.0, implicitly violating \code{Depends: R (>= 3.5)}.  This
       release restores compatibility.
+    }
+  }
+  \subsection{C-Level API}{
+    \itemize{
+      \item API headers are organized under \file{inst/include/Matrix/}
+      for easier namespacing.  Packages should start using
+      \code{LinkingTo: Matrix (>= 1.6-2)} and include the API headers
+      with, e.g., \code{#include <Matrix/Matrix.h>}.
+
+      \item Packages including API headers can define macro
+      \code{R_MATRIX_INLINE}, typically with
+      \code{#define R_MATRIX_INLINE inline}, in order to allow the
+      compiler to inline stubs for registered routines.
+
+      \item Some API function prototypes and macros not used by any
+      reverse \code{LinkingTo} are removed or remapped.
+
+      \item Several API function prototypes used \code{const} qualifiers
+      where the registered routines do not.
+
+      \item The prototype of API function \code{M_cholmod_band_inplace}
+      did not match that of registered routine
+      \code{cholmod_band_inplace}.  The prototype of \code{cholmod_band}
+      was copied by mistake.
     }
   }
   \subsection{Significant User-Visible Changes}{
@@ -489,13 +518,6 @@
       handles structural zeros and \code{NaN} on the main diagonal
       correctly.  Option \code{"diagBack"} now works correctly.
 
-      \item The prototype of API function \code{M_cholmod_band_inplace}
-      was wrongly copied from \code{cholmod_band}, instead of from
-      \code{cholmod_band_inplace}.
-
-      \item Many API function prototypes wrongly used \code{const}
-      qualifiers where the registered routines do not.
-
       \item \code{expm(x)} failed for \code{x} of class \code{dtpMatrix}
       or \code{dspMatrix}, since \pkg{Matrix} version 1.6-1.
 
@@ -525,19 +547,6 @@
       \file{src/cs-etc.[ch]} will enable linking the CXSparse library
       instead of the CSparse library, the latter supporting numeric
       types but not complex ones.
-
-      \item Some API declarations and macros not used by \emph{any}
-      reverse \code{LinkingTo} are removed or remapped.
-
-      \item API headers are now nested under \file{inst/include/Matrix/}
-      for better namespacing.  Where possible, packages should start to
-      use \code{LinkingTo: Matrix (>= 1.6-2)} and include files from the
-      new subdirectory, e.g., with \code{#include <Matrix/Matrix.h>}.
-
-      \item Users including API headers can define macro
-      \code{R_MATRIX_INLINE}, typically with \code{#define
-      R_MATRIX_INLINE inline}, to allow the compiler to inline stubs for
-      registered routines.
     }
   }
 }
@@ -553,6 +562,13 @@
 }
 
 \section{Changes in version 1.6-1 (2023-08-11, svn r4228)}{
+  \subsection{C-Level API}{
+    \itemize{
+      \item Registered routine \code{chm_sparse_to_SEXP} sorts and packs
+      its first argument \emph{before} assigning any struct members to
+      variables, preventing use-after-free.
+    }
+  }
   \subsection{Classes}{
     \itemize{
       \item Validity methods for classes \code{Cholesky} and
@@ -600,11 +616,6 @@
       \item \code{as(<[CR]sparseMatrix>, "generalMatrix")} now checks if
       the number of nonzero entries in the result would exceed
       \code{INT_MAX} and throws an error in that case.
-
-      \item API \proglang{C} function \code{chm_sparse_to_SEXP} now
-      sorts and packs its first argument \emph{before} assigning struct
-      members to variables, no longer accessing blocks of memory freed
-      by \code{cholmod_sort}.
     }
   }
   \subsection{Misc}{
@@ -990,6 +1001,14 @@
       \item \code{sequence.default} is defined for \R{} \eqn{<} 4.0.0.
     }
   }
+  \subsection{C-Level API}{
+    \itemize{
+      \item \file{Rinternals.h} is included in
+      \file{inst/include/Matrix.h} instead of deprecated
+      \file{Rdefines.h}.  The inclusion is done outside of
+      \code{extern "C"}.
+    }
+  }
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item The following low level coercion utilities, which were
@@ -1027,11 +1046,6 @@
 
       \item C-level macro \code{Calloc_or_Alloca_TO()} now
       zero-initializes also in the \code{alloca}-using case.
-
-      \item Replace deprecated \code{Rdefines.h} with
-      \code{Rinternals.h} and move inclusion outside of
-      \code{extern "C"} wrapper in API header
-      \file{inst/include/Matrix.h}.
 
       \item Replace \code{sprintf} with \code{snprintf} globally to
       avoid potential buffer overflows.
@@ -1818,6 +1832,12 @@
 }
 
 \section{Changes in version 1.4-1 (2022-03-21, svn r3446)}{
+  \subsection{Installation}{
+    \itemize{
+      \item Some warnings surfaced by \option{-Wconversion} are
+      squashed.
+    }
+  }
   \subsection{Compatibility}{
     \itemize{
       \item \code{tryInvokeRestart} is defined for \R{} \eqn{<} 4.0.0.
@@ -1874,8 +1894,7 @@
       \pkg{Matrix} 1.4-0.
 
       \item Modified \code{AZERO()} to work with \code{R_xlen_t} and new
-      \code{AZEROs()} for \code{size_t}; other tweaks to evade
-      \code{-Wconversion} warnings.
+      \code{AZEROs()} for \code{size_t}.
     }
   }
 }
@@ -1986,6 +2005,14 @@
       \code{matrix(data, nrow, ncol)} under \R{} \eqn{\ge}{>=} 4.2.0.
     }
   }
+  \subsection{C-Level API}{
+    \itemize{
+      \item \file{inst/include/cholmod.h} and
+      \file{inst/include/Matrix_stubs.c} needed adjustment after the
+      SparseSuite update in \pkg{Matrix} version 1.3-0.
+      \MPR{6714} by Kasper Kristensen, who maintains \CRANpkg{TMB}.
+    }
+  }
   \subsection{Deprecated and Defunct}{
     \itemize{
       \item \code{cBind()} and \code{rBind()} are now defunct: simply
@@ -2013,10 +2040,6 @@
 
       \item Fixed long-standing bug in \code{R[,j] <- v} when \code{R}
       is an \code{RsparseMatrix}, \MPR{6709} by David Cortes.
-
-      \item \file{./include/cholmod.h} and
-      \file{./include/Matrix_stubs.h} needed updating from SparseSuite
-      update; \MPR{6714} by Kasper Kristensen (package \CRANpkg{TMB}).
 
       \item \code{as.matrix()} and \code{as.array()} now work for
       \code{sparseVector} as expected; see \MPR{6708}.
@@ -2570,6 +2593,13 @@
 }
 
 \section{Changes in version 1.2-3 (2015-11-19, svn r3155)}{
+  \subsection{C-Level API}{
+    \itemize{
+      \item \file{inst/include/Matrix.h} tries harder to provide a
+      correct \samp{alloca} definition for compilers that do not define
+      \code{__GNUC__}.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item \code{MatrixClass()} is exported now.
@@ -2583,11 +2613,6 @@
   }
   \subsection{Bug Fixes}{
     \itemize{
-      \item Packages \emph{linking} to \pkg{Matrix} (\code{LinkingTo:}
-      in \file{DESCRIPTION}) now find \samp{alloca} properly defined in
-      \file{Matrix.h} even for non-GNU compilation environments such as
-      on Solaris or AIX.
-
       \item extended \code{n?CMatrix} classes (e.g., from
       \code{setClass(., contains="ngCMatrix")}) now can be coerced via
       \code{as(.)} to \code{d.CMatrix}.
@@ -2925,12 +2950,17 @@
       get the version in use.
     }
   }
+  \subsection{C-Level API}{
+    \itemize{
+      \item \file{inst/include/cholmod.h} is updated to reflect changes
+      in SuiteSparse.  Notably, there were changes in the layout of the
+      various \code{cholmod_*_struct}.
+    }
+  }
   \subsection{New Features}{
     \itemize{
       \item \code{fac2sparse} and \code{fac2Sparse} now exported, with a
       new \code{giveCsparse} option.
-
-      \item ensuing \dQuote{C API changes}
     }
   }
   \subsection{Bug Fixes}{
