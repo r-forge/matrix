@@ -3509,7 +3509,7 @@
   }
   \subsection{Compatibility}{
     \itemize{
-      \item Rd files are adapted to use \code{\method{}{}} markup
+      \item Rd files are adapted to use \code{\\method{}{}} markup
       introduced in \R{} version 1.2.2.
 
       \item One usage of \code{.Alias}, deprecated in \R{} version
